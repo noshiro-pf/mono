@@ -1,0 +1,440 @@
+import { type FixedLengthTuple, type NonZeroNumber } from 'ts-type-forge';
+import { expectType } from '../expect-type.mjs';
+import { pipe, Result } from '../functional/index.mjs';
+import { asNonZeroFiniteNumber } from './branded-types/index.mjs';
+import { Num } from './num.mjs';
+
+const testClamp = (
+  [a, b]: FixedLengthTuple<2, number>,
+  target: number,
+  expected: number,
+): void => {
+  test(`clamp ${target} to [${a}, ${b}]`, () => {
+    expect(Num.clamp(a, b)(target)).toBe(expected);
+  });
+};
+
+describe('Num test', () => {
+  describe('clamp', () => {
+    testClamp([0, 2], 2.3, 2);
+
+    testClamp([0, 2], -0.5, 0);
+
+    testClamp([0, 2], 1.5, 1.5);
+
+    testClamp([0, 2], Number.NaN, 0);
+
+    test('should support regular usage with three parameters', () => {
+      expectTypeOf(Num.clamp(15, 0, 10)).toEqualTypeOf<number>();
+
+      expect(Num.clamp(15, 0, 10)).toBe(10);
+
+      expect(Num.clamp(-5, 0, 10)).toBe(0);
+
+      expect(Num.clamp(5, 0, 10)).toBe(5);
+
+      expect(Num.clamp(Number.NaN, 0, 10)).toBe(0);
+    });
+
+    test('should work with pipe when curried', () => {
+      const clampTo0_10 = Num.clamp(0, 10);
+
+      const result1 = pipe(15).map(clampTo0_10).value;
+
+      expect(result1).toBe(10);
+
+      const result2 = pipe(-5).map(clampTo0_10).value;
+
+      expect(result2).toBe(0);
+
+      const result3 = pipe(7.5).map(clampTo0_10).value;
+
+      expect(result3).toBe(7.5);
+    });
+
+    test('should handle edge cases in curried form', () => {
+      const clampTo5_15 = Num.clamp(5, 15);
+
+      expectType<typeof clampTo5_15, (target: number) => number>('=');
+
+      // Invalid (non-finite) values return the lower bound
+      expect(clampTo5_15(Number.POSITIVE_INFINITY)).toBe(5);
+
+      expect(clampTo5_15(Number.NEGATIVE_INFINITY)).toBe(5);
+
+      expect(clampTo5_15(Number.NaN)).toBe(5);
+    });
+
+    test('should work with negative ranges', () => {
+      expect(Num.clamp(-15, -10, -5)).toBe(-10);
+
+      expect(Num.clamp(-7, -10, -5)).toBe(-7);
+
+      expect(Num.clamp(0, -10, -5)).toBe(-5);
+
+      const clampNegative = Num.clamp(-10, -5);
+
+      expect(clampNegative(-15)).toBe(-10);
+
+      expect(clampNegative(-7)).toBe(-7);
+
+      expect(clampNegative(0)).toBe(-5);
+    });
+  });
+
+  describe('isUintInRangeInclusive', () => {
+    test('truthy case', () => {
+      const f = Num.isUintInRangeInclusive(0, 4);
+
+      const x: number = 2;
+
+      if (f(x)) {
+        expectType<typeof x, 0 | 1 | 2 | 3 | 4>('=');
+      } else {
+        expectType<typeof x, number>('=');
+      }
+
+      assert.isTrue(f(x));
+    });
+
+    test('falsy case', () => {
+      const f = Num.isUintInRangeInclusive(0, 4);
+
+      const x: number = 100;
+
+      if (f(x)) {
+        expectType<typeof x, 0 | 1 | 2 | 3 | 4>('=');
+      } else {
+        expectType<typeof x, number>('=');
+      }
+
+      assert.isFalse(f(x));
+    });
+  });
+
+  describe('from', () => {
+    test('converts string to number', () => {
+      expect(Num.from('123')).toBe(123);
+
+      expect(Num.from('123.45')).toBe(123.45);
+
+      expect(Num.from('-42')).toBe(-42);
+    });
+
+    test('handles edge cases', () => {
+      expect(Num.from('')).toBe(0);
+
+      expect(Num.from('abc')).toBeNaN();
+
+      expect(Num.from(true)).toBe(1);
+
+      expect(Num.from(false)).toBe(0);
+    });
+  });
+
+  describe('safeParseInt', () => {
+    test('parses valid integer strings into Ok', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('123'))).toBe(123);
+
+      expect(Result.unwrapOk(Num.safeParseInt('-42'))).toBe(-42);
+
+      expect(Result.unwrapOk(Num.safeParseInt('+7'))).toBe(7);
+
+      expect(Result.unwrapOk(Num.safeParseInt('0'))).toBe(0);
+
+      expect(Result.unwrapOk(Num.safeParseInt('  12  '))).toBe(12);
+    });
+
+    test('truncates non-integer numeric strings toward zero', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('12.9'))).toBe(12);
+
+      expect(Result.unwrapOk(Num.safeParseInt('-3.5'))).toBe(-3);
+
+      expect(Result.unwrapOk(Num.safeParseInt('1e3'))).toBe(1000);
+    });
+
+    test('rejects trailing non-numeric characters (unlike parseInt)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('123abc')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('12px')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('abc')));
+    });
+
+    test('rejects empty / whitespace-only input (unlike Number)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt(' '.repeat(3))));
+    });
+
+    test('rejects non-finite words', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('NaN')));
+    });
+
+    test('the Err carries a descriptive Error', () => {
+      const result = Num.safeParseInt('nope');
+
+      assert.isTrue(Result.isErr(result));
+
+      if (Result.isErr(result)) {
+        expect(Result.unwrapErr(result)).toBeInstanceOf(Error);
+      }
+    });
+
+    test('composes with Result.unwrapOk + nullish fallback', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('42')) ?? Number.NaN).toBe(42);
+
+      expect(Result.unwrapOk(Num.safeParseInt('')) ?? Number.NaN).toBeNaN();
+    });
+  });
+
+  describe('safeParseFloat', () => {
+    test('parses valid numeric strings into Ok', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('123'))).toBe(123);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('-42'))).toBe(-42);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('+7'))).toBe(7);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('0'))).toBe(0);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('  12  '))).toBe(12);
+    });
+
+    test('preserves decimal values', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('12.9'))).toBe(12.9);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('-3.5'))).toBe(-3.5);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('1e3'))).toBe(1000);
+    });
+
+    test('rejects trailing non-numeric characters (unlike parseFloat)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('123abc')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('12px')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('abc')));
+    });
+
+    test('rejects empty / whitespace-only input (unlike Number)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat(' '.repeat(3))));
+    });
+
+    test('rejects non-finite values', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('-Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('NaN')));
+    });
+
+    test('the Err carries a descriptive Error', () => {
+      const result = Num.safeParseFloat('nope');
+
+      assert.isTrue(Result.isErr(result));
+
+      if (Result.isErr(result)) {
+        expect(Result.unwrapErr(result)).toBeInstanceOf(Error);
+      }
+    });
+
+    test('composes with Result.unwrapOk + nullish fallback', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('1.23')) ?? Number.NaN).toBe(
+        1.23,
+      );
+
+      expect(Result.unwrapOk(Num.safeParseFloat('')) ?? Number.NaN).toBeNaN();
+    });
+  });
+
+  describe('isInRange', () => {
+    test('checks range (lower inclusive, upper exclusive)', () => {
+      const inRange = Num.isInRange(0, 10);
+
+      assert.isTrue(inRange(5));
+
+      assert.isTrue(inRange(0)); // inclusive lower bound
+
+      assert.isFalse(inRange(10)); // exclusive upper bound
+
+      assert.isFalse(inRange(-1));
+
+      assert.isFalse(inRange(15));
+    });
+  });
+
+  describe('isInRangeInclusive', () => {
+    test('checks range (inclusive)', () => {
+      const inRange = Num.isInRangeInclusive(0, 10);
+
+      assert.isTrue(inRange(5));
+
+      assert.isTrue(inRange(0)); // inclusive
+
+      assert.isTrue(inRange(10)); // inclusive
+
+      assert.isFalse(inRange(-1));
+
+      assert.isFalse(inRange(15));
+    });
+  });
+
+  describe('isUintInRange', () => {
+    test('checks uint range (lower inclusive, upper exclusive)', () => {
+      const inRange = Num.isUintInRange(0, 5);
+
+      assert.isTrue(inRange(2));
+
+      assert.isTrue(inRange(0)); // inclusive lower bound
+
+      assert.isFalse(inRange(5)); // exclusive upper bound
+
+      assert.isFalse(inRange(-1));
+    });
+  });
+
+  describe('isNonZero', () => {
+    test('type guard for non-zero numbers', () => {
+      const x: number = 5;
+
+      if (Num.isNonZero(x)) {
+        expectType<typeof x, NonZeroNumber>('=');
+      }
+
+      assert.isTrue(Num.isNonZero(5));
+
+      assert.isTrue(Num.isNonZero(-3));
+
+      assert.isFalse(Num.isNonZero(0));
+    });
+  });
+
+  describe('isNonNegative', () => {
+    test('type guard for non-negative numbers', () => {
+      assert.isTrue(Num.isNonNegative(5));
+
+      assert.isTrue(Num.isNonNegative(0));
+
+      assert.isFalse(Num.isNonNegative(-1));
+    });
+  });
+
+  describe('isPositive', () => {
+    test('type guard for positive numbers', () => {
+      assert.isTrue(Num.isPositive(5));
+
+      assert.isTrue(Num.isPositive(0.1));
+
+      assert.isFalse(Num.isPositive(0));
+
+      assert.isFalse(Num.isPositive(-1));
+    });
+  });
+
+  describe('div', () => {
+    test('basic division', () => {
+      expect(Num.div(10, 2)).toBe(5);
+
+      expect(Num.div(7, 3)).toBe(7 / 3);
+
+      expect(Num.div(-10, 2)).toBe(-5);
+    });
+  });
+
+  describe('divInt', () => {
+    test('integer division (floor)', () => {
+      expect(Num.divInt(10, 3)).toBe(3);
+
+      expect(Num.divInt(7, 2)).toBe(3);
+
+      expect(Num.divInt(-7, 2)).toBe(-4); // floor division
+
+      expect(Num.divInt(10.7, asNonZeroFiniteNumber(3.2))).toBe(3); // floors both operands
+    });
+  });
+
+  describe('roundAt', () => {
+    test('rounds to specified decimal places', () => {
+      expect(Num.roundAt(1.234_56, 2)).toBe(1.23);
+
+      expect(Num.roundAt(1.234_56, 3)).toBe(1.235);
+
+      expect(Num.roundAt(2.555, 2)).toBe(2.56);
+
+      expect(Num.roundAt(123.456, 1)).toBe(123.5);
+    });
+  });
+
+  describe('roundToInt', () => {
+    test('rounds to nearest integer', () => {
+      expect(Num.roundToInt(3.4)).toBe(3);
+
+      expect(Num.roundToInt(3.6)).toBe(4);
+
+      expect(Num.roundToInt(2.5)).toBe(3);
+
+      expect(Num.roundToInt(-2.3)).toBe(-1); // bitwise behavior: -2.3 + 0.5 = -1.8, then floor with bitwise OR
+
+      expect(Num.roundToInt(-2.7)).toBe(-2); // bitwise behavior: -2.7 + 0.5 = -2.2, then floor with bitwise OR
+    });
+  });
+
+  describe('round', () => {
+    test('creates rounding function with specified precision', () => {
+      const round2 = Num.round(2);
+
+      expect(round2(1.234_56)).toBe(1.23);
+
+      expect(round2(2.556)).toBe(2.56);
+
+      const round1 = Num.round(1);
+
+      expect(round1(1.234_56)).toBe(1.2);
+
+      expect(round1(2.56)).toBe(2.6);
+
+      const round3 = Num.round(3);
+
+      expect(round3(1.2346)).toBe(1.235);
+
+      expect(round3(4.5678)).toBe(4.568);
+    });
+  });
+
+  describe('mapNaN2Undefined', () => {
+    test('maps NaN to undefined', () => {
+      expect(Num.mapNaN2Undefined(5)).toBe(5);
+
+      expect(Num.mapNaN2Undefined(0)).toBe(0);
+
+      expect(Num.mapNaN2Undefined(-1.23)).toBe(-1.23);
+
+      expect(Num.mapNaN2Undefined(Number.NaN)).toBeUndefined();
+    });
+  });
+
+  describe('increment', () => {
+    test('increments SmallUint values', () => {
+      expect(Num.increment(0)).toBe(1);
+
+      expect(Num.increment(5)).toBe(6);
+
+      expect(Num.increment(38)).toBe(39);
+    });
+  });
+
+  describe('decrement', () => {
+    test('decrements PositiveSmallInt values', () => {
+      expect(Num.decrement(1)).toBe(0);
+
+      expect(Num.decrement(5)).toBe(4);
+
+      expect(Num.decrement(39)).toBe(38);
+    });
+  });
+});

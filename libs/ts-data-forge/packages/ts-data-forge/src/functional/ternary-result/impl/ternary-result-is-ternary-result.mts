@@ -1,0 +1,32 @@
+import { hasKey, isRecord } from '../../../guard/index.mjs';
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
+import { ErrTypeTagName, OkTypeTagName, WarnTypeTagName } from './tag.mjs';
+
+/**
+ * Checks whether the provided value is a {@link TernaryResult}.
+ *
+ * @example
+ *
+ * ```ts
+ * const okValue = TernaryResult.ok('done');
+ *
+ * const warnValue = TernaryResult.warn('done', 'retry later');
+ *
+ * const notResult = { $$tag: 'ts-data-forge::Result.ok' } as const;
+ *
+ * assert.isTrue(TernaryResult.isTernaryResult(okValue));
+ *
+ * assert.isTrue(TernaryResult.isTernaryResult(warnValue));
+ *
+ * assert.isFalse(TernaryResult.isTernaryResult(notResult));
+ * ```
+ */
+export const isTernaryResult = (
+  maybeResult: unknown,
+): maybeResult is UnknownTernaryResult =>
+  isRecord(maybeResult) &&
+  hasKey(maybeResult, '$$tag') &&
+  hasKey(maybeResult, 'value') &&
+  ((maybeResult.$$tag === WarnTypeTagName && hasKey(maybeResult, 'warning')) ||
+    maybeResult.$$tag === OkTypeTagName ||
+    maybeResult.$$tag === ErrTypeTagName);

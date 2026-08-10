@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "ts-data-forge": ["../ts-data-forge/src/entry-point.mts"]
+    }
+  },
+  "include": ["./src", "./scripts", "./configs"]
+}

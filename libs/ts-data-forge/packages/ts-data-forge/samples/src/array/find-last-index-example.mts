@@ -1,0 +1,21 @@
+// Example: src/array/array-utils.mts (findLastIndex)
+import { Arr } from 'ts-data-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const letters = ['a', 'b', 'c', 'b'] as const;
+
+    const lastIndexOfB = Arr.findLastIndex(letters, (letter) => letter === 'b');
+
+    const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(
+      letters,
+    );
+
+    assert.isTrue(lastIndexOfB === 3);
+
+    assert.isTrue(notFound === -1);
+
+    // embed-sample-code-ignore-below
+  });
+}

@@ -1,0 +1,20 @@
+// Example: src/collections/imap.mts (keys)
+import { IMap } from 'ts-data-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const entries = [
+      ['a', 1],
+      ['b', 2],
+    ] as const satisfies readonly (readonly [string, number])[];
+
+    const map = IMap.create(entries);
+
+    const keys = Array.from(map.keys());
+
+    assert.deepStrictEqual(keys, ['a', 'b']);
+
+    // embed-sample-code-ignore-below
+  });
+}

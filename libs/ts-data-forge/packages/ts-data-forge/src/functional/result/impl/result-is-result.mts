@@ -1,0 +1,28 @@
+import { hasKey, isRecord } from '../../../guard/index.mjs';
+import { type UnknownResult } from '../result.mjs';
+import { ErrTypeTagName, OkTypeTagName } from './tag.mjs';
+
+/**
+ * Checks whether the provided value is a {@link Result<S, E>}.
+ *
+ * @example
+ *
+ * ```ts
+ * const okValue = Result.ok('success');
+ *
+ * const errValue = Result.err(new Error('failure'));
+ *
+ * const notResult = { $$tag: 'ts-data-forge::Result.ok' } as const;
+ *
+ * assert.isTrue(Result.isResult(okValue));
+ *
+ * assert.isTrue(Result.isResult(errValue));
+ *
+ * assert.isFalse(Result.isResult(notResult));
+ * ```
+ */
+export const isResult = (maybeResult: unknown): maybeResult is UnknownResult =>
+  isRecord(maybeResult) &&
+  hasKey(maybeResult, '$$tag') &&
+  hasKey(maybeResult, 'value') &&
+  (maybeResult.$$tag === ErrTypeTagName || maybeResult.$$tag === OkTypeTagName);

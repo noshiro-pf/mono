@@ -1,0 +1,115 @@
+import { castDeepReadonly, castReadonly } from './cast-readonly.mjs';
+
+describe(castReadonly, () => {
+  test('should cast mutable array to readonly', () => {
+    const mutableArr = [1, 2, 3] as const;
+
+    const readonlyArr = castReadonly(mutableArr);
+
+    expect(readonlyArr).toBe(mutableArr); // Same reference
+
+    assert.deepStrictEqual(readonlyArr, [1, 2, 3]);
+  });
+
+  test('should cast mutable object to readonly', () => {
+    const mutableObj = { x: 1, y: 2 } as const;
+
+    const readonlyObj = castReadonly(mutableObj);
+
+    expect(readonlyObj).toBe(mutableObj); // Same reference
+
+    assert.deepStrictEqual(readonlyObj, { x: 1, y: 2 });
+  });
+
+  test('should preserve the runtime value', () => {
+    const original = { value: 42 } as const;
+
+    const readonly = castReadonly(original);
+
+    expect(readonly.value).toBe(42);
+
+    assert.isTrue(Object.is(readonly, original));
+  });
+
+  test('castReadonly should work with primitives', () => {
+    expect(castReadonly(42)).toBe(42);
+
+    expect(castReadonly('hello')).toBe('hello');
+
+    assert.isTrue(castReadonly(true));
+  });
+
+  test('castReadonly should work with null and undefined', () => {
+    expect(castReadonly(null)).toBeNull();
+
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    expect(castReadonly(undefined)).toBeUndefined();
+  });
+});
+
+describe(castDeepReadonly, () => {
+  test('should cast deeply nested structure to readonly', () => {
+    const mutableNested = {
+      a: { b: [1, 2, 3] },
+      c: { d: { e: 'value' } },
+    } as const;
+
+    const readonlyNested = castDeepReadonly(mutableNested);
+
+    expect(readonlyNested).toBe(mutableNested); // Same reference
+
+    assert.deepStrictEqual(readonlyNested.a.b, [1, 2, 3]);
+
+    expect(readonlyNested.c.d.e).toBe('value');
+  });
+
+  test('should preserve runtime value for complex structures', () => {
+    // transformer-ignore-next-line convert-to-readonly
+    const complex = {
+      users: [{ id: 1, profile: { name: 'Alice' } }],
+      settings: { theme: 'dark', options: { debug: true } },
+    } as {
+      users: { id: number; profile: { name: string } }[];
+      settings: { theme: string; options: { debug: boolean } };
+    };
+
+    const readonly = castDeepReadonly(complex);
+
+    expect(readonly).toBe(complex);
+
+    expect(readonly.users[0]?.profile.name).toBe('Alice');
+
+    assert.isTrue(readonly.settings.options.debug);
+  });
+
+  test('should work with arrays of objects', () => {
+    // transformer-ignore-next-line convert-to-readonly
+    const data = [
+      { id: 1, meta: { active: true } },
+      { id: 2, meta: { active: false } },
+    ] as { id: number; meta: { active: boolean } }[];
+
+    const readonly = castDeepReadonly(data);
+
+    expect(readonly).toBe(data);
+
+    expect(readonly[0]?.meta.active).toBe(true);
+
+    expect(readonly[1]?.meta.active).toBe(false);
+  });
+
+  test('castDeepReadonly should work with primitives', () => {
+    expect(castDeepReadonly(42)).toBe(42);
+
+    expect(castDeepReadonly('hello')).toBe('hello');
+
+    assert.isTrue(castDeepReadonly(true));
+  });
+
+  test('castDeepReadonly should work with null and undefined', () => {
+    expect(castDeepReadonly(null)).toBeNull();
+
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    expect(castDeepReadonly(undefined)).toBeUndefined();
+  });
+});

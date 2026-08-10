@@ -1,0 +1,21 @@
+// Example: src/functional/ternary-result/impl/ternary-result-is-ternary-result.mts
+import { TernaryResult } from 'ts-data-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const okValue = TernaryResult.ok('done');
+
+    const warnValue = TernaryResult.warn('done', 'retry later');
+
+    const notResult = { $$tag: 'ts-data-forge::Result.ok' } as const;
+
+    assert.isTrue(TernaryResult.isTernaryResult(okValue));
+
+    assert.isTrue(TernaryResult.isTernaryResult(warnValue));
+
+    assert.isFalse(TernaryResult.isTernaryResult(notResult));
+
+    // embed-sample-code-ignore-below
+  });
+}

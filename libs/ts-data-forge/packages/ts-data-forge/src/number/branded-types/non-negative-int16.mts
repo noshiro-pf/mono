@@ -1,0 +1,193 @@
+import { type NonNegativeInt16 as TtfImported_NonNegativeInt16 } from 'ts-type-forge';
+import { expectType } from '../../expect-type.mjs';
+import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type NonNegativeInt16 = TtfImported_NonNegativeInt16;
+
+type ElementType = NonNegativeInt16;
+
+const typeNameInMessage = 'a non-negative integer in [0, 2^15)';
+
+const {
+  MAX_VALUE,
+  MIN_VALUE,
+  add,
+  castType,
+  div,
+  fromNumber,
+  is,
+  max: max_,
+  min: min_,
+  mul,
+  pow,
+  random,
+  sub,
+} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
+  ElementType,
+  0,
+  number
+>({
+  integerOrSafeInteger: 'SafeInteger',
+  MIN_VALUE: 0,
+  MAX_VALUE: 2 ** 15 - 1,
+  typeNameInMessage,
+} as const);
+
+/**
+ * Type guard that checks if a value is a non-negative integer in [0, 2^15).
+ *
+ * Returns `true` for a non-negative integer in [0, 2^15) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
+ */
+export const isNonNegativeInt16 = is;
+
+/**
+ * Casts a `number` to the `NonNegativeInt16` branded type.
+ *
+ * Validates that the value is a non-negative integer in [0, 2^15) and returns
+ * it with the `NonNegativeInt16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonNegativeInt16`
+ * @throws {TypeError} If the value is not a non-negative integer in [0, 2^15)
+ */
+export const asNonNegativeInt16 = castType;
+
+/**
+ * Namespace providing type-safe operations for the `NonNegativeInt16` branded
+ * type.
+ *
+ * The `NonNegativeInt16` type represents a non-negative integer in [0, 2^15).
+ * Division (`div`) uses floor division.
+ */
+export const NonNegativeInt16 = {
+  /**
+   * Type guard that checks if a value is a non-negative integer in [0, 2^15).
+   *
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
+   * @see {@link isNonNegativeInt16} for usage examples
+   */
+  is,
+
+  /**
+   * The smallest value representable as `NonNegativeInt16` (the lower
+   * saturation target of `fromNumber`).
+   */
+  MIN_VALUE,
+
+  /**
+   * The largest value representable as `NonNegativeInt16` (the upper saturation
+   * target of `fromNumber`).
+   */
+  MAX_VALUE,
+
+  /**
+   * Returns the smallest of the given non-negative integers.
+   *
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as a `NonNegativeInt16`
+   */
+  min: min_,
+
+  /**
+   * Returns the largest of the given non-negative integers.
+   *
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as a `NonNegativeInt16`
+   */
+  max: max_,
+
+  /**
+   * Converts an arbitrary `number` into a `NonNegativeInt16`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
+   *
+   * Unlike `asNonNegativeInt16`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `NonNegativeInt16` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonNegativeInt16`
+   */
+  fromNumber,
+
+  /**
+   * Generates a random `NonNegativeInt16` within the given range.
+   *
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonNegativeInt16` in `[min, max]`
+   */
+  random,
+
+  /**
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonNegativeInt16`
+   * (floored to an integer).
+   *
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as a `NonNegativeInt16`
+   */
+  pow,
+
+  /**
+   * Adds two non-negative integers, returning `a + b` as a `NonNegativeInt16`.
+   *
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as a `NonNegativeInt16`
+   */
+  add,
+
+  /**
+   * Subtracts two non-negative integers, returning `a - b` as a
+   * `NonNegativeInt16`.
+   *
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as a `NonNegativeInt16`
+   */
+  sub,
+
+  /**
+   * Multiplies two non-negative integers, returning `a * b` as a
+   * `NonNegativeInt16`.
+   *
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as a `NonNegativeInt16`
+   */
+  mul,
+
+  /**
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as a
+   * `NonNegativeInt16`.
+   *
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `NonNegativeInt16`
+   */
+  div,
+} as const;
+
+expectType<
+  keyof typeof NonNegativeInt16,
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
+    ElementType,
+    'int' | 'non-negative' | 'range'
+  >
+>('=');
+
+expectType<
+  typeof NonNegativeInt16,
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<
+    ElementType,
+    'int' | 'non-negative' | 'range'
+  >
+>('<=');

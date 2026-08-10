@@ -1,0 +1,713 @@
+import {
+  type ArrayElement,
+  type Decrement,
+  type DeepOmit,
+  type DeepPick,
+  type IsFixedLengthList,
+  type IsUnion,
+  type List,
+  type ReadonlyRecord,
+  type RelaxedExclude,
+  type RelaxedOmit,
+  type RelaxedPick,
+  type StrictOmit,
+  type StrictPick,
+  type TypeEq,
+  type UnknownRecord,
+} from 'ts-type-forge';
+import { Arr } from '../array/index.mjs';
+import { hasKey, isRecord } from '../guard/index.mjs';
+
+/**
+ * A collection of type-safe object utility functions providing functional
+ * programming patterns for object manipulation, including pick, omit, shallow
+ * equality checks, and more.
+ *
+ * All functions maintain TypeScript type safety and support both direct and
+ * curried usage patterns for better composition with pipe operations.
+ */
+export namespace Obj {
+  /**
+   * Performs a shallow equality check on two records using a configurable
+   * equality function. Verifies that both records have the same number of
+   * entries and that for every key in the first record, the corresponding value
+   * passes the equality test with the value in the second record.
+   *
+   * @example
+   *
+   * ```ts
+   * const obj1 = { name: 'Alice', age: 30 } as const;
+   *
+   * const obj2 = { name: 'Alice', age: 30 } as const;
+   *
+   * const obj3 = { name: 'Alice', age: 31 } as const;
+   *
+   * assert.isTrue(Obj.shallowEq(obj1, obj2));
+   *
+   * assert.isFalse(Obj.shallowEq(obj1, obj3));
+   *
+   * // Custom equality function
+   * const obj4 = { value: 1 } as const;
+   *
+   * const obj5 = { value: 1.00001 } as const;
+   *
+   * const closeEnough = (a: unknown, b: unknown): boolean => {
+   *   if (typeof a === 'number' && typeof b === 'number') {
+   *     return Math.abs(a - b) < 0.001;
+   *   }
+   *
+   *   return Object.is(a, b);
+   * };
+   *
+   * assert.isTrue(Obj.shallowEq(obj4, obj5, closeEnough));
+   * ```
+   *
+   * @param a - The first record to compare
+   * @param b - The second record to compare
+   * @param eq - Optional equality function (defaults to Object.is for strict
+   *   equality)
+   * @returns `true` if the records are shallowly equal according to the
+   *   equality function, `false` otherwise
+   */
+  export const shallowEq = (
+    a: UnknownRecord,
+    b: UnknownRecord,
+    eq: (x: unknown, y: unknown) => boolean = Object.is,
+  ): boolean => {
+    const aEntries = Object.entries(a);
+
+    const bEntries = Object.entries(b);
+
+    if (aEntries.length !== bEntries.length) return false;
+
+    return aEntries.every(([k, v]) => eq(b[k], v));
+  };
+
+  /**
+   * Creates a new record that contains only the specified keys from the source
+   * record. This function supports both direct usage and curried form for
+   * functional composition.
+   *
+   * **Type Safety**: Only keys that exist in the source record type are
+   * allowed, preventing runtime errors from accessing non-existent properties.
+   *
+   * @example
+   *
+   * ```ts
+   * const user = {
+   *   id: 1,
+   *   name: 'Bob',
+   *   email: 'bob@example.com',
+   *   password: 'secret',
+   *   role: 'admin',
+   * } as const;
+   *
+   * // Direct usage
+   * const publicInfo = Obj.pick(user, ['id', 'name', 'role']);
+   *
+   * assert.deepStrictEqual(publicInfo, {
+   *   id: 1,
+   *   name: 'Bob',
+   *   role: 'admin',
+   * });
+   *
+   * // Curried usage with pipe
+   * const nameAndEmail = pipe(user).map(Obj.pick(['name', 'email'])).value;
+   *
+   * assert.deepStrictEqual(nameAndEmail, {
+   *   name: 'Bob',
+   *   email: 'bob@example.com',
+   * });
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Keys - The readonly array type of keys to pick from the record
+   * @param record - The source record to pick properties from
+   * @param keys - A readonly array of keys to include in the result
+   * @returns A new record containing only the specified keys and their values
+   */
+  export function pick<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(record: R, keys: Keys): StrictPick<R, ArrayElement<Keys>>;
+
+  // Curried version
+  export function pick<const Keys extends readonly PropertyKey[]>(
+    keys: Keys,
+  ): <const R extends UnknownRecord>(
+    record: R,
+  ) => RelaxedPick<R, ArrayElement<Keys>>;
+
+  export function pick<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(
+    ...args: readonly [record: R, keys: Keys] | readonly [keys: Keys]
+  ):
+    | StrictPick<R, ArrayElement<Keys>>
+    | ((record: R) => RelaxedPick<R, ArrayElement<Keys>>) {
+    switch (args.length) {
+      case 2: {
+        const [record, keys] = args;
+
+        const keysSet = new Set<keyof R>(keys);
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          Object.fromEntries(
+            Object.entries(record).filter(([k, _v]) => keysSet.has(k)),
+          ) as never
+        );
+      }
+
+      case 1: {
+        const [keys] = args;
+
+        return (record: R) => pick(record, keys);
+      }
+    }
+  }
+
+  /**
+   * Creates a new record that excludes the specified keys from the source
+   * record. This function supports both direct usage and curried form for
+   * functional composition.
+   *
+   * **Type Safety**: Only keys that exist in the source record type are
+   * allowed, and the return type precisely reflects which properties remain
+   * after omission.
+   *
+   * @example
+   *
+   * ```ts
+   * const user = {
+   *   id: 1,
+   *   name: 'Charlie',
+   *   email: 'charlie@example.com',
+   *   password: 'secret123',
+   *   internalNote: 'VIP customer',
+   * } as const;
+   *
+   * // Direct usage - remove sensitive fields
+   * const safeUser = Obj.omit(user, ['password', 'internalNote']);
+   *
+   * assert.deepStrictEqual(safeUser, {
+   *   id: 1,
+   *   name: 'Charlie',
+   *   email: 'charlie@example.com',
+   * });
+   *
+   * // Curried usage with pipe
+   * const withoutEmail = pipe(user).map(Obj.omit(['email', 'password'])).value;
+   *
+   * assert.deepStrictEqual(withoutEmail, {
+   *   id: 1,
+   *   name: 'Charlie',
+   *   internalNote: 'VIP customer',
+   * });
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Keys - The readonly array type of keys to omit from the record
+   * @param record - The source record to omit properties from
+   * @param keys - A readonly array of keys to exclude from the result
+   * @returns A new record containing all properties except the specified keys
+   */
+  export function omit<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(record: R, keys: Keys): StrictOmit<R, ArrayElement<Keys>>;
+
+  // Curried version
+  export function omit<const Keys extends readonly PropertyKey[]>(
+    keys: Keys,
+  ): <const R extends UnknownRecord>(
+    record: R,
+  ) => RelaxedOmit<R, ArrayElement<Keys>>;
+
+  export function omit<
+    const R extends UnknownRecord,
+    const Keys extends readonly (keyof R)[],
+  >(
+    ...args:
+      readonly [record: R, keys: Keys] | readonly [keys: readonly PropertyKey[]]
+  ):
+    | StrictOmit<R, ArrayElement<Keys>>
+    | ((record: R) => StrictOmit<R, ArrayElement<Keys>>) {
+    switch (args.length) {
+      case 2: {
+        const [record, keys] = args;
+
+        const keysSet = new Set<keyof R>(keys);
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          Object.fromEntries(
+            Object.entries(record).filter(([k, _v]) => !keysSet.has(k)),
+          ) as never
+        );
+      }
+
+      case 1: {
+        const [keys] = args;
+
+        return <R2 extends UnknownRecord>(record: R2) => {
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          const result = omit(
+            record,
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            keys as readonly (keyof R2)[],
+          ) as RelaxedOmit<R2, ArrayElement<Keys>>;
+
+          return result;
+        };
+      }
+    }
+  }
+
+  /**
+   * Creates an object from an array of key-value pairs with precise TypeScript
+   * typing. This is a type-safe wrapper around `Object.fromEntries` that
+   * provides better type inference and compile-time guarantees about the
+   * resulting object structure.
+   *
+   * **Type Behavior**:
+   *
+   * - When entries is a fixed-length tuple, the exact object type is inferred
+   * - When entries has dynamic length with union key types, `Partial` is applied
+   *   to prevent incorrect assumptions about which keys will be present
+   *
+   * @example
+   *
+   * ```ts
+   * // Fixed-length tuple - exact type inferred
+   * const entries1 = [
+   *   ['name', 'David'],
+   *   ['age', 25],
+   *   ['active', true],
+   * ] as const;
+   *
+   * const obj1 = Obj.fromEntries(entries1);
+   *
+   * assert.deepStrictEqual(obj1, {
+   *   name: 'David',
+   *   age: 25,
+   *   active: true,
+   * });
+   *
+   * // Dynamic length array - Partial type applied
+   * const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
+   *   ['x', 10],
+   *   ['y', 20],
+   * ] as const;
+   *
+   * const obj2 = Obj.fromEntries(dynamicEntries);
+   *
+   * assert.deepStrictEqual(obj2, { x: 10, y: 20 });
+   * ```
+   *
+   * @template Entries - The readonly array type of key-value entry tuples
+   * @param entries - An array of readonly key-value entry tuples `[key, value]`
+   * @returns An object created from the entries with precise typing
+   */
+  export const fromEntries = <
+    const Entries extends readonly (readonly [PropertyKey, unknown])[],
+  >(
+    entries: Entries,
+  ): IsFixedLengthList<Entries> extends true
+    ? TsDataForgeInternals.EntriesToObject<Entries>
+    : TsDataForgeInternals.PartialIfKeyIsUnion<
+        TsDataForgeInternals.KeysOfEntries<Entries>,
+        ReadonlyRecord<
+          TsDataForgeInternals.KeysOfEntries<Entries>,
+          TsDataForgeInternals.ValuesOfEntries<Entries>
+        >
+      > =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    Object.fromEntries(entries) as never;
+
+  /**
+   * Merges multiple records into a single record using `Object.assign`.
+   * Later records override properties from earlier records with the same key.
+   *
+   * @example
+   *
+   * <!-- doc:embed:jsdoc:example:./samples/src/object/merge-example.mts -->
+   *
+   * ```ts
+   * const a = { a: 0, b: 0 } as const;
+   *
+   * const b = { b: 1, c: 0 } as const;
+   *
+   * const result = Obj.merge(a, b);
+   *
+   * assert.deepStrictEqual(result, { a: 0, b: 1, c: 0 });
+   * ```
+   *
+   * <!-- /doc:embed:jsdoc:example:./samples/src/object/merge-example.mts -->
+   *
+   * @param records - The records to merge
+   * @returns A new record with all properties merged
+   */
+  export const merge = <const Records extends readonly UnknownRecord[]>(
+    ...records: Records
+  ): TsDataForgeInternals.MergeAll<Records> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    Object.fromEntries(records.flatMap((r) => Object.entries(r))) as never;
+
+  /**
+   * Deeply picks a nested property from an object along the specified key path.
+   * Supports both direct and curried usage.
+   *
+   * @example
+   *
+   * ```ts
+   * const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+   *
+   * // Direct usage
+   * const result = Obj.deepPick(data, ['a', 'b', 'c']);
+   *
+   * assert.deepStrictEqual(result, { a: { b: { c: 1 } } });
+   *
+   * // Curried usage with pipe
+   * const pickAB = Obj.deepPick(['a', 'b']);
+   *
+   * const result2 = pipe(data).map(pickAB).value;
+   *
+   * assert.deepStrictEqual(result2, { a: { b: { c: 1, d: 2 } } });
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Path - The key path tuple
+   * @param record - The source record
+   * @param path - A readonly tuple of keys representing the nested path
+   * @returns A new record containing only the nested property at the path
+   */
+  export function deepPick<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(record: R, path: Path): DeepPick<R, Path>;
+
+  // Curried version
+  export function deepPick<const Path extends readonly (string | number)[]>(
+    path: Path,
+  ): <const R extends UnknownRecord>(record: R) => DeepPick<R, Path>;
+
+  export function deepPick<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(
+    ...args: readonly [record: R, path: Path] | readonly [path: Path]
+  ): DeepPick<R, Path> | ((record: R) => DeepPick<R, Path>) {
+    switch (args.length) {
+      case 2: {
+        const [record, path] = args;
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          deepPickImpl(record, path) as never
+        );
+      }
+
+      case 1: {
+        const [path] = args;
+
+        return (record: R) => deepPick(record, path);
+      }
+    }
+  }
+
+  /**
+   * Deeply omits a nested property from an object along the specified key path.
+   * Supports both direct and curried usage.
+   *
+   * @example
+   *
+   * ```ts
+   * const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+   *
+   * // Direct usage
+   * const result = Obj.deepOmit(data, ['a', 'b', 'c']);
+   *
+   * assert.deepStrictEqual(result, { a: { b: { d: 2 }, e: 3 }, f: 4 });
+   *
+   * // Curried usage with pipe
+   * const omitAB = Obj.deepOmit(['a', 'b']);
+   *
+   * const result2 = pipe(data).map(omitAB).value;
+   *
+   * assert.deepStrictEqual(result2, { a: { e: 3 }, f: 4 });
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Path - The key path tuple
+   * @param record - The source record
+   * @param path - A readonly tuple of keys representing the nested path to omit
+   * @returns A new record with the nested property at the path removed
+   */
+  export function deepOmit<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(record: R, path: Path): DeepOmit<R, Path>;
+
+  // Curried version
+  export function deepOmit<const Path extends readonly (string | number)[]>(
+    path: Path,
+  ): <const R extends UnknownRecord>(record: R) => DeepOmit<R, Path>;
+
+  export function deepOmit<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(
+    ...args: readonly [record: R, path: Path] | readonly [path: Path]
+  ): DeepOmit<R, Path> | ((record: R) => DeepOmit<R, Path>) {
+    switch (args.length) {
+      case 2: {
+        const [record, path] = args;
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          deepOmitImpl(record, path) as never
+        );
+      }
+
+      case 1: {
+        const [path] = args;
+
+        return (record: R) => deepOmit(record, path);
+      }
+    }
+  }
+}
+
+const deepPickImpl = (
+  record: UnknownRecord,
+  path: readonly (string | number)[],
+): UnknownRecord => {
+  if (!Arr.isNonEmpty(path)) return record;
+
+  const head = path[0];
+
+  if (!hasKey(record, head)) return {};
+
+  const value = record[head];
+
+  const tail = path.slice(1);
+
+  if (!Arr.isNonEmpty(tail)) return { [head]: value };
+
+  if (!isRecord(value)) return { [head]: {} };
+
+  return {
+    [head]: deepPickImpl(value, tail),
+  };
+};
+
+const deepOmitImpl = (
+  record: UnknownRecord,
+  path: readonly (string | number)[],
+): UnknownRecord => {
+  if (!Arr.isNonEmpty(path)) return record;
+
+  const head = path[0];
+
+  if (!hasKey(record, head)) return record;
+
+  const tail = path.slice(1);
+
+  if (!Arr.isNonEmpty(tail)) {
+    return Object.fromEntries(
+      Object.entries(record).filter(([k]) => k !== head),
+    );
+  }
+
+  const value = record[head];
+
+  if (!isRecord(value)) return record;
+
+  return {
+    ...record,
+    [head]: deepOmitImpl(value, tail),
+  };
+};
+
+/**
+ * @internal
+ * Internal type utilities for the Obj module.
+ */
+declare namespace TsDataForgeInternals {
+  type RecursionLimit = 20;
+
+  /** - `[['x', 1], ['y', 3]]` -> `{ x: 1, y: 3 }` */
+  export type EntriesToObject<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  > = Readonly<EntriesToObjectImpl<{}, Entries>>;
+
+  /** @internal */
+  type EntriesToObjectImpl<
+    R,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > =
+    TypeEq<Entries['length'], 0> extends true
+      ? R
+      : EntriesToObjectImpl<
+          R & ReadonlyRecord<Entries[0][0], Entries[0][1]>,
+          List.Tail<Entries>
+        >;
+
+  /**
+   * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
+   * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' |
+   *   'b' | 'c' | 'x' | 'y' | 'z'`
+   *
+   * @note To handle the second example above, recursion needs to be performed on infinite-length Entries,
+   * but since the timing to stop cannot be determined, a recursion limit is set.
+   */
+  export type KeysOfEntries<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > = KeysOfEntriesImpl<never, Entries, RecursionLimit>;
+
+  type KeysOfEntriesImpl<
+    K,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    RemainingNumRecursions extends number,
+  > =
+    TypeEq<RemainingNumRecursions, 0> extends true
+      ? K
+      : TypeEq<Entries['length'], 0> extends true
+        ? K
+        : KeysOfEntriesImpl<
+            K | Entries[0][0],
+            List.Tail<Entries>,
+            Decrement<RemainingNumRecursions>
+          >;
+
+  export type ValuesOfEntries<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > = ValuesOfEntriesImpl<never, Entries, RecursionLimit>;
+
+  type ValuesOfEntriesImpl<
+    K,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    RemainingNumRecursions extends number,
+  > =
+    TypeEq<RemainingNumRecursions, 0> extends true
+      ? K
+      : TypeEq<Entries['length'], 0> extends true
+        ? K
+        : ValuesOfEntriesImpl<
+            K | Entries[0][1],
+            List.Tail<Entries>,
+            Decrement<RemainingNumRecursions>
+          >;
+
+  export type PartialIfKeyIsUnion<K, T> =
+    IsUnion<K> extends true ? Partial<T> : T;
+
+  /**
+   * Merges two object types where keys in B override keys in A, preserving optional modifiers.
+   *
+   * This implementation uses a sophisticated technique to preserve optional property modifiers (`?`)
+   * during the merge operation, which would otherwise be lost in a naive mapped type implementation.
+   *
+   * ## Core Technique: Optional Property Detection
+   *
+   * Uses `{} extends Pick<T, K>` to determine if a property is optional:
+   * - **Required property**: `Pick<T, 'x'>` = `{ x: number }` → `{}` does NOT extend it (false)
+   * - **Optional property**: `Pick<T, 'y'>` = `{ y?: string }` → `{}` DOES extend it (true)
+   *
+   * This works because `{}` (empty object) is assignable to objects with only optional properties
+   * but not to objects with required properties.
+   *
+   * ## Implementation Strategy
+   *
+   * The type is constructed as an intersection of five mapped types:
+   *
+   * 1. **Required properties from B** - Properties in B that are required (override A completely)
+   * 2. **Optional properties from B (not in A)** - New optional properties from B
+   * 3. **Optional properties from B (in A)** - Union of A[K] | B[K] to preserve both possibilities
+   * 4. **Required properties only in A** - Properties in A but not in B that are required
+   * 5. **Optional properties only in A** - Properties in A but not in B that are optional (with `?` modifier)
+   *
+   * Finally, the intersection is flattened using an optional-preserving identity mapping that
+   * re-applies the optional detection logic to maintain the `?` modifiers in the final type.
+   *
+   * @example
+   * ```ts
+   * type A = Readonly<{ x: number; y?: string }>;
+   *
+   * type B = Readonly<{ y?: number; z?: boolean }>;
+   *
+   * type Result = MergeTwo<A, B>;
+   * // Result: Readonly<{ x: number; y?: string | number; z?: boolean }>
+   * ```
+   */
+  // transformer-ignore-next-line
+  type MergeTwo<A extends UnknownRecord, B extends UnknownRecord> = {
+    // 1. Required properties from B (override A completely)
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in keyof B as {} extends StrictPick<B, K> ? never : K]: B[K];
+  } & {
+    // 2. Optional properties from B that are NOT in A
+    readonly [
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      K in keyof B as {} extends StrictPick<B, K>
+        ? K extends keyof A
+          ? never
+          : K
+        : never
+    ]?: B[K];
+  } & {
+    // 3. Optional properties from B that ARE in A (create union)
+    readonly [
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      K in keyof B as {} extends StrictPick<B, K>
+        ? K extends keyof A
+          ? K
+          : never
+        : never
+    ]?: K extends keyof A ? A[K] | B[K] : never;
+  } & {
+    // 4. Required properties only in A (not overridden by B)
+    readonly [
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      K in RelaxedExclude<keyof A, keyof B> as {} extends StrictPick<A, K>
+        ? never
+        : K
+    ]: A[K];
+  } & {
+    // 5. Optional properties only in A (not overridden by B)
+    readonly [
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      K in RelaxedExclude<keyof A, keyof B> as {} extends StrictPick<A, K>
+        ? K
+        : never
+    ]?: A[K];
+  } extends infer O
+    ? Readonly<
+        {
+          // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+          [K in keyof O as {} extends StrictPick<O, K> ? never : K]: O[K];
+        } & {
+          // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+          [K in keyof O as {} extends StrictPick<O, K> ? K : never]?: O[K];
+        }
+      >
+    : never;
+
+  /** Sequentially merges a tuple of object types from left to right. */
+  export type MergeAll<
+    Records extends readonly UnknownRecord[],
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    Acc extends UnknownRecord = {},
+  > =
+    IsFixedLengthList<Records> extends false
+      ? ArrayElement<Records>
+      : Records extends readonly [
+            infer First extends UnknownRecord,
+            ...infer Rest extends readonly UnknownRecord[],
+          ]
+        ? MergeAll<Rest, MergeTwo<Acc, First>>
+        : Acc;
+}

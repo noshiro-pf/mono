@@ -1,0 +1,21 @@
+import * as path from 'node:path';
+import { genIndex } from 'ts-repo-utils';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
+
+const srcDir = path.resolve(workspaceRootPath, './src');
+
+await genIndex({
+  targetDirectory: srcDir,
+  indexFileExtension: '.mts',
+  exportStatementExtension: '.mjs',
+  targetExtensions: ['.mts'],
+  exclude: ({
+    absolutePath,
+    fileName,
+  }: Readonly<{ absolutePath: string; fileName: string }>) =>
+    fileName.endsWith('.test.mts') ||
+    fileName.endsWith('.d.mts') ||
+    absolutePath === path.resolve(srcDir, './entry-point.mts') ||
+    absolutePath.startsWith(path.resolve(srcDir, './array')) ||
+    absolutePath.startsWith(path.resolve(srcDir, './functional')),
+});

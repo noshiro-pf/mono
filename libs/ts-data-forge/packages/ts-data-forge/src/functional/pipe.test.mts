@@ -1,0 +1,155 @@
+import { expectType } from '../expect-type.mjs';
+import { Num } from '../number/index.mjs';
+import { type None, type Some } from '../types.mjs';
+import { Optional } from './optional/index.mjs';
+import { pipe } from './pipe.mjs';
+import { Result } from './result/index.mjs';
+
+describe(pipe, () => {
+  test('basic pipe operations', () => {
+    const result = pipe(5)
+      .map((x) => x * 2)
+      .map((x) => x + 1).value;
+
+    expect(result).toBe(11);
+
+    expectType<typeof result, number>('=');
+  });
+
+  test('pipe with string operations', () => {
+    const result = pipe('hello')
+      .map((s) => s.toUpperCase())
+      .map((s) => `${s}!`).value;
+
+    expect(result).toBe('HELLO!');
+
+    expectType<typeof result, string>('=');
+  });
+
+  test('pipe with array operations', () => {
+    const result = pipe([1, 2, 3])
+      .map((arr) => arr.map((x) => x * 2))
+      .map((arr) => arr.length).value;
+
+    expect(result).toBe(3);
+
+    expectType<typeof result, number>('=');
+  });
+
+  test('mapNullable with non-null value', () => {
+    const s = 5 as number | null;
+
+    const result = pipe(s).mapNullable((x) => x * 2).value;
+
+    expect(result).toBe(10);
+
+    expectType<typeof result, number | undefined>('=');
+  });
+
+  test('mapNullable with null value', () => {
+    const result = pipe(null as number | null).mapNullable((x) => x * 2).value;
+
+    expect(result).toBeUndefined();
+
+    expectType<typeof result, number | undefined>('=');
+  });
+
+  test('mapNullable with undefined value', () => {
+    const result = pipe(undefined as number | undefined).mapNullable(
+      (x) => x * 2,
+    ).value;
+
+    expect(result).toBeUndefined();
+
+    expectType<typeof result, number | undefined>('=');
+  });
+
+  test('mapOptional with Some value', () => {
+    const optional = Optional.some(42);
+
+    const result = pipe(optional).mapOptional((x) => x * 2).value;
+
+    assert.isTrue(Optional.isSome(result));
+
+    if (Optional.isSome(result)) {
+      expect(result.value).toBe(84);
+    }
+
+    expectType<typeof result, Some<number>>('=');
+  });
+
+  test('mapOptional with None value', () => {
+    const optional: Optional<number> = Optional.none;
+
+    const result = pipe(optional).mapOptional((x) => x * 2).value;
+
+    assert.isTrue(Optional.isNone(result));
+
+    expectType<typeof result, None>('=');
+  });
+
+  test('chaining multiple operations', () => {
+    const result = pipe('5')
+      .map((s) => Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN))
+      .map((n) => n * 3)
+      .map((n) => n.toString())
+      .map((s) => `${s} items`).value;
+
+    expect(result).toBe('15 items');
+
+    expectType<typeof result, string>('=');
+  });
+
+  test('typing when used with Result', () => {
+    const validate = <D,>(_u: unknown): Result<D, unknown> =>
+      Result.err(undefined);
+
+    const decodeBranded = (
+      input: string,
+      parse: (s: string) => number | undefined,
+    ): number | undefined => {
+      const v = pipe(input)
+        .map(parse)
+        .mapNullable(validate<number>)
+        .mapNullable((res) => Result.unwrapOk(res)).value;
+
+      expectType<typeof v, number | undefined>('=');
+
+      return v;
+    };
+
+    expect(decodeBranded('', () => undefined)).toBeUndefined();
+  });
+
+  test('typing when used with generics', () => {
+    const validate = <D,>(_u: unknown): Result<D, unknown> =>
+      Result.err(undefined);
+
+    // Regression: a generic brand `D` must survive the whole chain.
+    //
+    // The trigger is a `.map` whose result is a branded *union* such as
+    // `D | undefined`. If `Pipe<A>` distributes over unions, that step expands
+    // into `Pipe<D> | Pipe<undefined>`; calling the next method on the union of
+    // pipe objects then widens `D` to its constraint `number`, so `.value`
+    // collapses to `number | undefined` instead of `D | undefined`.
+    //
+    // The explicit `D | undefined` return annotation is itself the assertion:
+    // were the brand lost, `.value` would be `number | undefined` and the
+    // body would fail to compile.
+    const decodeBranded = <D extends number>(
+      input: string,
+      parse: (s: string) => D | undefined,
+    ): D | undefined => {
+      const v = pipe(input)
+        .map(parse)
+        .mapNullable(validate<D>)
+        .mapNullable((res) => Result.unwrapOk(res)).value;
+
+      expectType<typeof v, D | undefined>('=');
+
+      return v;
+    };
+
+    expect(decodeBranded('', () => undefined)).toBeUndefined();
+  });
+});

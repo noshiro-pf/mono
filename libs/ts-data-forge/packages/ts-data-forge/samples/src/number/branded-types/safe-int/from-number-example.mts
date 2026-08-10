@@ -1,0 +1,21 @@
+// Example: src/number/branded-types/safe-int.mts (SafeInt.fromNumber)
+import { SafeInt } from 'ts-data-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const aboveRange = SafeInt.fromNumber(1e20);
+
+    const withinRange = SafeInt.fromNumber(123);
+
+    const belowRange = SafeInt.fromNumber(-1e20);
+
+    assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
+
+    assert.isTrue(withinRange === 123);
+
+    assert.isTrue(belowRange === Number.MIN_SAFE_INTEGER);
+
+    // embed-sample-code-ignore-below
+  });
+}

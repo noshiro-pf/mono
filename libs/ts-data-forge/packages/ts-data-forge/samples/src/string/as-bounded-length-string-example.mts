@@ -1,0 +1,23 @@
+// Example: src/string/str.mts (Str.asBoundedLengthString)
+import { Str } from 'ts-data-forge';
+import { type BoundedLengthString } from 'ts-type-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const userId = Str.asBoundedLengthString(8, 16, 'user-12345678');
+
+    const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
+
+    assert.isTrue(relaxed.length >= 8 && relaxed.length <= 16);
+
+    // curried version
+    const asUserId = Str.asBoundedLengthString(8, 16);
+
+    assert.strictEqual(asUserId('user-87654321'), 'user-87654321');
+
+    assert.throws(() => Str.asBoundedLengthString(8, 16, 'user')); // length 4 < 8
+
+    // embed-sample-code-ignore-below
+  });
+}

@@ -1,0 +1,23 @@
+// Example: src/number/branded-types/positive-safe-int.mts (PositiveSafeInt.div)
+import { PositiveSafeInt, asPositiveSafeInt } from 'ts-data-forge';
+
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const quotient = PositiveSafeInt.div(
+      asPositiveSafeInt(25),
+      asPositiveSafeInt(4),
+    );
+
+    const clamped = PositiveSafeInt.div(
+      asPositiveSafeInt(5),
+      asPositiveSafeInt(50),
+    );
+
+    assert.isTrue(quotient === 6);
+
+    assert.isTrue(clamped === 1);
+
+    // embed-sample-code-ignore-below
+  });
+}
