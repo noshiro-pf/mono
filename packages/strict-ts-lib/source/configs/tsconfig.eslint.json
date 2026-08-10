@@ -1,4 +1,0 @@
-{
-  "extends": "../../../../configs/tsconfig/tsconfig.lib.type-check.json",
-  "include": ["../temp"]
-}
