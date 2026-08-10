@@ -1,0 +1,57 @@
+name: Style Check
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+    paths-ignore:
+      - '**.png'
+      - '**.jpg'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  style-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          - fmt:full
+          - md
+          - cspell
+          - ws:doc
+          - ws:check:ext
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch main
+        run: git fetch origin main
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@noshiro-pf'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run "${{ matrix.command }}"
+        run: pnpm run ${{ matrix.command }}
+
+      - name: Check if there is no file diff
+        run: pnpm exec assert-repo-is-clean

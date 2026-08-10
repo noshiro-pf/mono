@@ -1,13 +1,15 @@
 {
-  "extends": "./configs/tsconfig/tsconfig.type-check.json",
-  // for VSCode
-  "compilerOptions": {
-    "jsxFactory": "h",
-    "typeRoots": ["node_modules/@types", "packages/**/node_modules/@types"],
-    "types": ["node"]
-  },
+  "extends": [
+    "./configs/tsconfig/tsconfig.type-check.json",
+    "./configs/tsconfig/tsconfig.vite.json"
+  ],
   "include": [
-    "./packages/**/eslint.config.js",
-    "./packages/**/eslint.config.*.mjs"
+    "./scripts/**/*",
+    "./configs/**/*",
+    "./**/eslint.config.mts",
+    "./**/configs/**/*.mts",
+    "./**/configs/**/*.ts",
+    "./**/vite.config.mts",
+    "./.markdownlint-cli2.mjs"
   ]
 }

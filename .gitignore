@@ -1,44 +1,14 @@
-node_modules
-**/.env
-packages/**/build
-packages/**/dist
-packages/**/lib
-packages/**/esm
-packages/**/cjs
-packages/**/configs/**/*.js
-packages/**/scripts/**/*.js
-experimental/**/build
-experimental/**/dist
-experimental/**/lib
-experimental/**/esm
-experimental/**/cjs
-experimental/**/config/**/*.js
-experimental/**/scripts/**/*.js
-!**/react-app-env.d.ts
-!**/vite-env.d.ts
-!**/globals.d.ts
-*.tsbuildinfo
-
 # Logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-firebase-debug.log*
-firebase-debug.*.log*
-pnpm-debug.log*
 lerna-debug.log*
+.pnpm-debug.log*
 
-# Firebase cache
-.firebase/
-
-# Firebase config
-
-# Uncomment this if you'd like others to create their own Firebase project.
-# For a team working on the same Firebase project(s), it is recommended to leave
-# it commented so all members can deploy to the same project(s) in .firebaserc.
-# .firebaserc
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Runtime data
 pids
@@ -51,11 +21,12 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+*.lcov
 
 # nyc test coverage
 .nyc_output
 
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
 # Bower dependency directory (https://bower.io/)
@@ -64,8 +35,18 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (http://nodejs.org/api/addons.html)
+# Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
 
 # Optional npm cache directory
 .npm
@@ -73,6 +54,15 @@ build/Release
 # Optional eslint cache
 .eslintcache
 .eslintcache-deps
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
 # Optional REPL history
 .node_repl_history
@@ -83,15 +73,107 @@ build/Release
 # Yarn Integrity file
 .yarn-integrity
 
-# ReScript
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+out
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+# Comment in the public line in if your project uses Gatsby and not Next.js
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# public
+
+# vuepress build output
+.vuepress/dist
+
+# vuepress v2.x temp and cache directory
+.temp
+.cache
+
+# vitepress build output
+**/.vitepress/dist
+
+# vitepress cache directory
+**/.vitepress/cache
+
+# Docusaurus cache and generated files
+.docusaurus
+
+# Astro generated files
+.astro
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# --------------------------------------------------------------------------
+# mono-specific
+#
+# NOTE: per-package .gitignore files under libs/*/ carry the anchored patterns
+# (e.g. `!/test/dist_/`, `/docs/`), which only resolve correctly relative to the
+# directory that contains them. Do not hoist those here.
+# --------------------------------------------------------------------------
+
+# Build output of the legacy code parked under experimental/
+experimental/**/build
+experimental/**/lib
+experimental/**/esm
+experimental/**/cjs
+experimental/**/config/**/*.js
+experimental/**/scripts/**/*.js
+!**/react-app-env.d.ts
+!**/vite-env.d.ts
+!**/globals.d.ts
+
+# Firebase (experimental/packages/apps/*)
+.firebase/
+firebase-debug.log*
+firebase-debug.*.log*
+
+# wireit (legacy build runner, experimental/ only)
+**/.wireit
+
+# ReScript (experimental/)
 .bsb.lock
 .merlin
 *.bs.js
 *.bs.ts
 *_bs.ts
 
-# wireit
-**/.wireit
+rollup.config-*.mjs
 
 *.local
 
@@ -104,10 +186,7 @@ build/Release
 *.sln
 *.sw?
 
-rollup.config-*.mjs
-
-# playwright
-
+# Playwright
 **/test-results/
 **/playwright-report/
 **/blob-report/

@@ -1,35 +1,38 @@
 packages:
-  - 'packages/**'
-  - 'configs'
-  - 'scripts'
+  - libs/*
+  - apps/*
+  - tools/*
 
-# Yarn 1 hoisted everything into a single flat node_modules at the repo root and
-# the workspace packages rely on that: they invoke build tooling that is
-# declared only in the root package.json. Keep the same layout so the migration
-# does not require touching 269 package.json files.
-nodeLinker: hoisted
+# NOTE: experimental/ is intentionally excluded. It holds the pre-2026 monorepo
+# contents (packages/, configs/, scripts/), kept for reference and revived
+# package by package. Nothing under experimental/ is installed, built, linted or
+# type-checked.
 
-# Workspace dependencies are declared as "*" (608 occurrences) rather than with
-# the workspace: protocol, so they must be resolved from the workspace instead
-# of the registry.
-linkWorkspacePackages: true
+update:
+  githubActions: true
+  ignoreDeps:
+    - typescript
 
-# Yarn 1 only warned about unmet peer dependencies; pnpm installs them by
-# default. Auto-installing would shadow root tooling -- @noshiro/syncflow
-# declares `typescript: ^4.9.3` as a peer, which pulled TypeScript 4.9 into that
-# package and broke its build against the repo's TypeScript 5. Keep Yarn's
-# behavior and resolve peers from what the workspace already installs.
-autoInstallPeers: false
+minimumReleaseAge: 10080 # = 7 days
 
-# Yarn 1 ran every dependency lifecycle script. pnpm 10 blocks them by default,
-# so the packages that genuinely need one (native builds and binary downloads)
-# are allowed explicitly here.
-onlyBuiltDependencies:
-  - '@firebase/util'
-  - '@swc/core'
-  - clasp
-  - core-js
-  - esbuild
-  - protobufjs
-  - re2
-  - unrs-resolver
+minimumReleaseAgeExclude:
+  - '@types/**'
+  - ts-type-forge
+  - eslint-plugin-ts-type-forge
+  - ts-data-forge
+  - eslint-plugin-ts-data-forge
+  - ts-fortress
+  - eslint-plugin-ts-fortress
+  - ts-repo-utils
+  - ts-codemod-lib
+  - synstate
+  - 'synstate-*'
+  - eslint-config-typed
+  - octokit-safe-types
+  - github-settings-as-code
+  - 'strict-ts-lib-*'
+
+allowBuilds:
+  esbuild: true
+  sharp: true # apps/synstate-docs (Astro)
+  unrs-resolver: true
