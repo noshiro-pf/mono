@@ -1,0 +1,191 @@
+## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
+
+### Bug Fixes
+
+- update dependencies ([#194](https://github.com/noshiro-pf/ts-codemod-lib/issues/194)) ([80ef92e](https://github.com/noshiro-pf/ts-codemod-lib/commit/80ef92ec04c3b36942851806954db8bb88571420))
+
+## [2.2.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.3...v2.2.4) (2026-08-05)
+
+### Bug Fixes
+
+- update pnpm-workspace.yaml and run pnpm update ([#189](https://github.com/noshiro-pf/ts-codemod-lib/issues/189)) ([5853a1f](https://github.com/noshiro-pf/ts-codemod-lib/commit/5853a1fe70a09138fb59c574c39d275d86d365fb))
+
+## [2.2.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.2...v2.2.3) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#178](https://github.com/noshiro-pf/ts-codemod-lib/issues/178)) ([7729cb2](https://github.com/noshiro-pf/ts-codemod-lib/commit/7729cb2425ec426d12cdbb46adee412a194922dd))
+
+## [2.2.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.1...v2.2.2) (2026-07-15)
+
+### Bug Fixes
+
+- ignore node_modules and fix infinite loop ([#166](https://github.com/noshiro-pf/ts-codemod-lib/issues/166)) ([56cccb9](https://github.com/noshiro-pf/ts-codemod-lib/commit/56cccb96c21a9abb6096b2c9fc1a95a3c3047b71))
+
+## [2.2.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.0...v2.2.1) (2026-06-29)
+
+### Bug Fixes
+
+- skip adding readonly to union-distribution-guard idioms ([#149](https://github.com/noshiro-pf/ts-codemod-lib/issues/149)) ([49a41a9](https://github.com/noshiro-pf/ts-codemod-lib/commit/49a41a92b78004acc81f0a52d020dcb04c435ebf))
+
+# [2.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.7...v2.2.0) (2026-06-05)
+
+### Features
+
+- add --diff-from option to codemod commands ([#135](https://github.com/noshiro-pf/ts-codemod-lib/issues/135)) ([9cf64c4](https://github.com/noshiro-pf/ts-codemod-lib/commit/9cf64c4cad66f89cbc7d79c1c109939206903472))
+
+## [2.1.7](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.6...v2.1.7) (2026-05-12)
+
+### Bug Fixes
+
+- fix dependencies ([#110](https://github.com/noshiro-pf/ts-codemod-lib/issues/110)) ([3458cab](https://github.com/noshiro-pf/ts-codemod-lib/commit/3458cab78f16ef1e3f51434fca1d7313366cf365))
+
+## [2.1.6](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.5...v2.1.6) (2026-05-11)
+
+### Bug Fixes
+
+- fix replaceRecordWithUnknownRecordTransformer to handle TypeOperatorTypeNode ([#109](https://github.com/noshiro-pf/ts-codemod-lib/issues/109)) ([72966c1](https://github.com/noshiro-pf/ts-codemod-lib/commit/72966c11b0eceee604ee1a941cdb367d8cc9259f))
+
+## [2.1.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.4...v2.1.5) (2026-05-10)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#108](https://github.com/noshiro-pf/ts-codemod-lib/issues/108)) ([e437f14](https://github.com/noshiro-pf/ts-codemod-lib/commit/e437f147f33139a98413a9e7a7f174d1cb919c6a))
+
+## [2.1.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.3...v2.1.4) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#107](https://github.com/noshiro-pf/ts-codemod-lib/issues/107)) ([1253c88](https://github.com/noshiro-pf/ts-codemod-lib/commit/1253c888357261dd397023ff0cc2055eaf96edcd))
+
+## [2.1.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.2...v2.1.3) (2026-04-23)
+
+### Bug Fixes
+
+- update deps ([#95](https://github.com/noshiro-pf/ts-codemod-lib/issues/95)) ([032c6ce](https://github.com/noshiro-pf/ts-codemod-lib/commit/032c6ce4d83f634967ad1b08b14ee5f55104ab96))
+
+## [2.1.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.1...v2.1.2) (2026-04-15)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.5.0 to 6.8.0 ([#75](https://github.com/noshiro-pf/ts-codemod-lib/issues/75)) ([f527f77](https://github.com/noshiro-pf/ts-codemod-lib/commit/f527f777e2e35fab9f09e7b68b99ba18b6fd9b41))
+
+## [2.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.0...v2.1.1) (2026-03-08)
+
+### Bug Fixes
+
+- fix runTransformerCLI to handle uncommitted option correctly ([#58](https://github.com/noshiro-pf/ts-codemod-lib/issues/58)) ([c7cb237](https://github.com/noshiro-pf/ts-codemod-lib/commit/c7cb2378aef94a0db92db64264fbf9af0ab9ba05))
+
+# [2.1.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.5...v2.1.0) (2026-03-02)
+
+### Features
+
+- add ignore comment keywords ([#55](https://github.com/noshiro-pf/ts-codemod-lib/issues/55)) ([474c36c](https://github.com/noshiro-pf/ts-codemod-lib/commit/474c36c6484d0d97fe858619aa184392ea94cda2))
+
+## [2.0.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.4...v2.0.5) (2026-02-16)
+
+### Bug Fixes
+
+- improve parentheses handling of convert-to-readonly ([#45](https://github.com/noshiro-pf/ts-codemod-lib/issues/45)) ([46f078b](https://github.com/noshiro-pf/ts-codemod-lib/commit/46f078b331b534c1c75d5a12ba63efeca3596663))
+
+## [2.0.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.3...v2.0.4) (2026-02-12)
+
+### Bug Fixes
+
+- fix dependencies ([#43](https://github.com/noshiro-pf/ts-codemod-lib/issues/43)) ([8b9af61](https://github.com/noshiro-pf/ts-codemod-lib/commit/8b9af61bf83d83f2bb4dc30762ec5b871d0e80a6))
+
+## [2.0.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.2...v2.0.3) (2026-02-10)
+
+### Bug Fixes
+
+- fix convert-to-readonly to recognize mut prefix of class methods ([#40](https://github.com/noshiro-pf/ts-codemod-lib/issues/40)) ([a156242](https://github.com/noshiro-pf/ts-codemod-lib/commit/a1562426992c366e3ecb9219b5f05b1a512739b5))
+
+## [2.0.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.1...v2.0.2) (2026-02-10)
+
+### Bug Fixes
+
+- fix as-const transformer ([#39](https://github.com/noshiro-pf/ts-codemod-lib/issues/39)) ([40e0395](https://github.com/noshiro-pf/ts-codemod-lib/commit/40e0395257d695d4a4d599cfc9eb68392e4ff0a2))
+
+## [2.0.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.0...v2.0.1) (2026-02-10)
+
+### Bug Fixes
+
+- fix as-const transformer ([#38](https://github.com/noshiro-pf/ts-codemod-lib/issues/38)) ([f9c24eb](https://github.com/noshiro-pf/ts-codemod-lib/commit/f9c24eb99d9cd1821818fa0cc52bdfdcbebc3dd3))
+
+# [2.0.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.2...v2.0.0) (2026-02-10)
+
+### Features
+
+- **breaking:** fix as-const transformer ([#37](https://github.com/noshiro-pf/ts-codemod-lib/issues/37)) ([4b7793d](https://github.com/noshiro-pf/ts-codemod-lib/commit/4b7793d21b6a30a3f3ab7dc95bf740e1c0a0652f))
+
+## [1.4.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.1...v1.4.2) (2026-02-06)
+
+### Bug Fixes
+
+- prevent append-as-const to add const assertion to import statements or directives ([#36](https://github.com/noshiro-pf/ts-codemod-lib/issues/36)) ([c0a8334](https://github.com/noshiro-pf/ts-codemod-lib/commit/c0a8334cc461d818b5a28c020fe0bf88644ee5b9))
+
+## [1.4.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.0...v1.4.1) (2026-02-06)
+
+### Bug Fixes
+
+- fix append-as-const transformer ([#34](https://github.com/noshiro-pf/ts-codemod-lib/issues/34)) ([c59e6b7](https://github.com/noshiro-pf/ts-codemod-lib/commit/c59e6b78fa70cb3d286e4d65797d8607630bd170))
+
+# [1.4.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.1...v1.4.0) (2026-02-06)
+
+### Features
+
+- add uncommitted flag option ([#33](https://github.com/noshiro-pf/ts-codemod-lib/issues/33)) ([a334bae](https://github.com/noshiro-pf/ts-codemod-lib/commit/a334bae93950bc37d1dbba9bdec87a1183ec30fb))
+
+## [1.3.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.0...v1.3.1) (2026-02-02)
+
+### Bug Fixes
+
+- prevent append-as-const to remove necessary `as const` ([#23](https://github.com/noshiro-pf/ts-codemod-lib/issues/23)) ([6899093](https://github.com/noshiro-pf/ts-codemod-lib/commit/68990938b1a6a70f59a7630b1895277891e22383))
+
+# [1.3.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.2.0...v1.3.0) (2026-02-02)
+
+### Features
+
+- add ignore keywords ([#22](https://github.com/noshiro-pf/ts-codemod-lib/issues/22)) ([8707ef9](https://github.com/noshiro-pf/ts-codemod-lib/commit/8707ef9e5e209c97e0514f49cf00a6148628f404))
+
+# [1.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.3...v1.2.0) (2026-01-27)
+
+### Features
+
+- improve transformer-ignore feature ([#18](https://github.com/noshiro-pf/ts-codemod-lib/issues/18)) ([c0202d1](https://github.com/noshiro-pf/ts-codemod-lib/commit/c0202d187a3912abb178ab07c9c7cbee74141c16))
+
+## [1.1.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.2...v1.1.3) (2026-01-25)
+
+### Bug Fixes
+
+- fix convertToReadonlyTypeTransformer behavior for `"aaa" & {}` ([#16](https://github.com/noshiro-pf/ts-codemod-lib/issues/16)) ([93f045e](https://github.com/noshiro-pf/ts-codemod-lib/commit/93f045ea6c520e57ff218e2bd5fa28bd32baf00c))
+
+## [1.1.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.1...v1.1.2) (2026-01-25)
+
+### Bug Fixes
+
+- update default ignorePrefixes of convert-to-readonly and remove "-cli" suffix from commands name ([#14](https://github.com/noshiro-pf/ts-codemod-lib/issues/14)) ([0462ba9](https://github.com/noshiro-pf/ts-codemod-lib/commit/0462ba999f80ac6d508f6287a5232c2363f3aff5))
+
+## [1.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.0...v1.1.1) (2026-01-23)
+
+### Bug Fixes
+
+- change node version requirements ([#13](https://github.com/noshiro-pf/ts-codemod-lib/issues/13)) ([1bb382e](https://github.com/noshiro-pf/ts-codemod-lib/commit/1bb382e24a9c6ec66a9f01ee09adafc7386184b7))
+
+# [1.1.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.0.1...v1.1.0) (2026-01-23)
+
+### Features
+
+- add transformer and CLI commands ([#12](https://github.com/noshiro-pf/ts-codemod-lib/issues/12)) ([3f99181](https://github.com/noshiro-pf/ts-codemod-lib/commit/3f991814ef30bc7ed0197b5720edf41ec0f01fd4))
+
+## [1.0.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.0.0...v1.0.1) (2026-01-11)
+
+### Bug Fixes
+
+- pnpm update ([#4](https://github.com/noshiro-pf/ts-codemod-lib/issues/4)) ([f87860a](https://github.com/noshiro-pf/ts-codemod-lib/commit/f87860aed479bf4ed5c5a3c23830c5817193620a))
+
+# 1.0.0 (2026-01-07)
+
+### Features
+
+- add initial AST-transformers ([#1](https://github.com/noshiro-pf/ts-codemod-lib/issues/1)) ([1721790](https://github.com/noshiro-pf/ts-codemod-lib/commit/17217907c6c1e7c4e41d7c992b3f3fceba18c643))

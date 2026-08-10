@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "./configs/tsconfig/tsconfig.type-check.json",
+    "./configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "ts-codemod-lib": ["./src/entry-point.mts"]
+    }
+  },
+  "include": [
+    "./src",
+    "./test",
+    "./samples",
+    "./test-code",
+    "./scripts",
+    "./configs",
+    "./eslint.config.mts",
+    "./release.config.js",
+    "./.markdownlint-cli2.mjs"
+  ]
+}

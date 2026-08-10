@@ -1,0 +1,185 @@
+{
+  "name": "ts-codemod-lib",
+  "version": "2.2.5",
+  "private": false,
+  "keywords": [
+    "typescript",
+    "codemod",
+    "transformation",
+    "readonly",
+    "immutable"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/ts-codemod-lib.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": [
+    "./dist/cmd/*.mjs"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
+      },
+      "default": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
+      }
+    }
+  },
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/types.d.mts",
+  "bin": {
+    "append-as-const": "./dist/cmd/append-as-const.mjs",
+    "convert-interface-to-type": "./dist/cmd/convert-interface-to-type.mjs",
+    "convert-to-readonly": "./dist/cmd/convert-to-readonly.mjs",
+    "replace-any-with-unknown": "./dist/cmd/replace-any-with-unknown.mjs",
+    "replace-record-with-unknown-record": "./dist/cmd/replace-record-with-unknown-record.mjs"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
+    "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "clean": "pnpm run /clean:.*/",
+    "clean:logs": "npx rimraf ./*.log",
+    "codemod": "run-s codemod:uncommitted:* fmt",
+    "codemod:diff": "run-s codemod:diff:* fmt",
+    "codemod:diff:any-to-unknown": "tsx ./src/cmd/replace-any-with-unknown.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:as-const": "tsx ./src/cmd/append-as-const.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:interface-to-type": "tsx ./src/cmd/convert-interface-to-type.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:readonly": "tsx ./src/cmd/convert-to-readonly.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:unknown-record": "tsx ./src/cmd/replace-record-with-unknown-record.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full": "run-s codemod:full:* fmt",
+    "codemod:full:any-to-unknown": "tsx ./src/cmd/replace-any-with-unknown.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:as-const": "tsx ./src/cmd/append-as-const.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:interface-to-type": "tsx ./src/cmd/convert-interface-to-type.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:readonly": "tsx ./src/cmd/convert-to-readonly.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:unknown-record": "tsx ./src/cmd/replace-record-with-unknown-record.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:any-to-unknown": "tsx ./src/cmd/replace-any-with-unknown.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:as-const": "tsx ./src/cmd/append-as-const.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:interface-to-type": "tsx ./src/cmd/convert-interface-to-type.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:readonly": "tsx ./src/cmd/convert-to-readonly.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:unknown-record": "tsx ./src/cmd/replace-record-with-unknown-record.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "cspell": "cspell \"{**,.changeset/**/*,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress",
+    "doc": "tsx ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
+    "fmt": "format-uncommitted",
+    "fmt:diff": "format-diff-from origin/main",
+    "fmt:full": "prettier --write .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude cmd",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "md": "markdownlint-cli2",
+    "prepare-release": "run-s sync-cli-versions fmt build doc",
+    "repo-settings:apply": "repo-settings apply",
+    "repo-settings:backup": "repo-settings backup",
+    "run:cmd": "tsx ./src/cmd/convert-to-readonly.mts ./test/sample1.mts",
+    "run:test": "tsx ./scripts/test-code/transform-test-code.mts",
+    "sync-cli-versions": "tsx scripts/cmd/sync-cli-versions.mts",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ./node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ./node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ./node_modules/typescript-native/bin/tsc --noEmit",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "ts-data-forge": "^14.1.0",
+    "ts-morph": "^28.0.0",
+    "ts-type-forge": "^9.1.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-replace": "6.0.3",
+    "@rollup/plugin-strip": "3.0.4",
+    "@semantic-release/changelog": "7.0.0",
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/exec": "7.1.0",
+    "@semantic-release/git": "11.0.1",
+    "@semantic-release/github": "12.0.9",
+    "@semantic-release/npm": "13.1.5",
+    "@semantic-release/release-notes-generator": "14.1.1",
+    "@types/node": "26.2.0",
+    "@vitest/browser-playwright": "4.1.10",
+    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/ui": "4.1.10",
+    "cmd-ts": "0.15.0",
+    "conventional-changelog-conventionalcommits": "10.2.1",
+    "cspell": "10.0.1",
+    "dedent": "1.7.2",
+    "esbuild": "0.28.1",
+    "eslint": "10.8.0",
+    "eslint-config-typed": "5.8.4",
+    "eslint-plugin-ts-data-forge": "0.4.2",
+    "eslint-plugin-ts-fortress": "1.0.0",
+    "eslint-plugin-ts-type-forge": "0.6.1",
+    "github-settings-as-code": "2.1.0",
+    "jiti": "2.7.0",
+    "markdownlint": "0.41.1",
+    "markdownlint-cli2": "0.23.2",
+    "npm-run-all2": "9.0.3",
+    "playwright": "1.62.1",
+    "prettier": "3.9.6",
+    "prettier-plugin-organize-imports": "4.3.0",
+    "prettier-plugin-packagejson": "3.0.2",
+    "rollup": "4.62.4",
+    "rollup-plugin-esbuild": "6.2.1",
+    "semantic-release": "25.0.8",
+    "ts-repo-utils": "10.1.7",
+    "tsx": "4.23.4",
+    "typedoc": "0.28.20",
+    "typedoc-github-theme": "0.4.0",
+    "typescript": "6.0.3",
+    "typescript-native": "npm:typescript@7.0.2",
+    "vite": "8.2.0",
+    "vitest": "4.1.10"
+  },
+  "peerDependencies": {
+    "cmd-ts": "0.14.3",
+    "dedent": "1.7.2",
+    "ts-repo-utils": "8.1.0"
+  },
+  "peerDependenciesMeta": {
+    "cmd-ts": {
+      "optional": true
+    },
+    "dedent": {
+      "optional": true
+    },
+    "ts-repo-utils": {
+      "optional": true
+    }
+  },
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

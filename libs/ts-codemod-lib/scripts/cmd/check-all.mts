@@ -1,0 +1,100 @@
+import { $, Result } from 'ts-repo-utils';
+
+/**
+ * Runs all validation and build steps for the project.
+ */
+const checkAll = async (): Promise<void> => {
+  console.info('Starting full project validation and build...\n');
+
+  await logStep({
+    startMessage: 'Installing dependencies',
+    action: () => runCmdStep('pnpm i', 'Failed to install dependencies'),
+    successMessage: 'Dependencies installed',
+  });
+
+  await logStep({
+    startMessage: 'Running spell check',
+    action: () =>
+      runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed'),
+    successMessage: 'Spell check passed',
+  });
+
+  await logStep({
+    startMessage: 'Checking file extensions',
+    action: () =>
+      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+    successMessage: 'File extensions validated',
+  });
+
+  await logStep({
+    startMessage: 'Running tests',
+    action: () => runCmdStep('pnpm run test', 'Tests failed'),
+    successMessage: 'Tests passed',
+  });
+
+  await logStep({
+    startMessage: 'Running test:browser',
+    action: () => runCmdStep('pnpm run test:browser', 'Browser tests failed'),
+    successMessage: 'Browser tests passed',
+  });
+
+  await logStep({
+    startMessage: 'Running lint fixes',
+    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
+    successMessage: 'Lint fixes applied',
+  });
+
+  await logStep({
+    startMessage: 'Running codemod',
+    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    successMessage: 'Codemod applied',
+  });
+
+  await logStep({
+    startMessage: 'Building project',
+    action: () => runCmdStep('pnpm run build', 'Build failed'),
+    successMessage: 'Build succeeded',
+  });
+
+  await logStep({
+    startMessage: 'Formatting code',
+    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
+    successMessage: 'Code formatted',
+  });
+
+  console.info('✅ All checks completed successfully!\n');
+};
+
+const mut_step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  console.info(`${mut_step.current}. ${startMessage}...`);
+
+  await action();
+
+  console.info(`✓ ${successMessage}.\n`);
+
+  mut_step.current += 1;
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${result.value.message}`);
+
+    console.error('❌ Check failed');
+
+    process.exit(1);
+  }
+};
+
+await checkAll();
