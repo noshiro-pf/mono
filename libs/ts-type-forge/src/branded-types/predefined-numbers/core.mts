@@ -48,7 +48,7 @@ type IntRangeKeys =
  * ```ts
  * const checkNaN = (x: number): x is NaNType => Number.isNaN(x);
  *
- * const value: number = parseFloat('invalid');
+ * const value: number = Number.parseFloat('invalid');
  * if (checkNaN(value)) {
  *   const nan: NaNType = value;
  *   console.log(nan); // Handle NaN case specifically
