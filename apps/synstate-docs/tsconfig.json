@@ -5,10 +5,14 @@
   ],
   "compilerOptions": {
     "paths": {
-      "synstate": ["../synstate/src/entry-point.mts"],
-      "synstate-react-hooks": ["../synstate-react-hooks/src/index.mts"],
-      "synstate-preact-hooks": ["../synstate-preact-hooks/src/index.mts"],
-      "synstate-preact-signals": ["../synstate-preact-signals/src/index.mts"]
+      "synstate": ["../../libs/synstate/src/entry-point.mts"],
+      "synstate-react-hooks": ["../../libs/synstate-react-hooks/src/index.mts"],
+      "synstate-preact-hooks": [
+        "../../libs/synstate-preact-hooks/src/index.mts"
+      ],
+      "synstate-preact-signals": [
+        "../../libs/synstate-preact-signals/src/index.mts"
+      ]
     }
   },
   "include": ["./samples", "./src", "./test", "./scripts", "./configs"],

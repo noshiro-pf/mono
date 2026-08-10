@@ -5,7 +5,7 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const benchmarkSamplesDir = path.resolve(
   workspaceRootPath,
-  '../synstate/samples/docs-site/benchmark',
+  '../../libs/synstate/samples/docs-site/benchmark',
 );
 
 const targetMarkdownFiles: readonly string[] = [

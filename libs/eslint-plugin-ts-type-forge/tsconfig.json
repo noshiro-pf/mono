@@ -4,6 +4,10 @@
     "../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // ts-type-forge asserts exact type equality against Node types (e.g.
+    // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
+    // DOM shapes instead and breaks the assertions.
+    "lib": ["ESNext"],
     "paths": {
       "ts-type-forge": ["../ts-type-forge/src/entry-point.mts"]
     }

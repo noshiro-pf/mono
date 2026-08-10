@@ -4,7 +4,7 @@ import { pathExists } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
-const synstateRoot = path.resolve(workspaceRootPath, '../synstate');
+const synstateRoot = path.resolve(workspaceRootPath, '../../libs/synstate');
 
 const refDir = path.resolve(workspaceRootPath, 'src/content/docs/reference');
 

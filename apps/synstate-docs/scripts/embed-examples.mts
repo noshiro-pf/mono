@@ -7,7 +7,7 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const synstateSamplesRoot = path.resolve(
   workspaceRootPath,
-  '../synstate/samples',
+  '../../libs/synstate/samples',
 );
 
 const codeBlockStart = '```tsx';

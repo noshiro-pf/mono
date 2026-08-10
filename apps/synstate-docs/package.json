@@ -2,6 +2,11 @@
   "name": "@synstate/docs",
   "version": "0.0.5",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/synstate-docs"
+  },
   "type": "module",
   "scripts": {
     "build": "run-s doc type-check build:astro",

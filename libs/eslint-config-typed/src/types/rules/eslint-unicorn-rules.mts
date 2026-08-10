@@ -1,10 +1,10 @@
-/* cSpell:disable */
-import { type Linter } from 'eslint';
 import {
   type FixedLengthTuple,
   type NonEmptyTuple,
   type UnknownRecord,
 } from 'ts-type-forge';
+/* cSpell:disable */
+import { type Linter } from 'eslint';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],

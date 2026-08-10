@@ -4,7 +4,8 @@
   "description": "Preact Signals integration for SynState - bridge between synstate observables and @preact/signals",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/synstate.git"
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/synstate-preact-signals"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -59,8 +60,8 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^14.2.0",
-    "ts-type-forge": "^9.2.0"
+    "ts-data-forge": "workspace:^",
+    "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
     "@preact/signals": "2.10.1",

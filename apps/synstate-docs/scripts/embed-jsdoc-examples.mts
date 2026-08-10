@@ -4,7 +4,7 @@ import { type DeepReadonly } from 'ts-type-forge';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
-const synstateRoot = path.resolve(workspaceRootPath, '../synstate');
+const synstateRoot = path.resolve(workspaceRootPath, '../../libs/synstate');
 
 const synstateSamplesDir = path.resolve(synstateRoot, 'samples/src');
 

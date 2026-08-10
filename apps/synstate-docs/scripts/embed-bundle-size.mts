@@ -4,14 +4,16 @@ import * as path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
+// This package lives in apps/ while the packages it measures live in libs/,
+// so they are no longer siblings.
 const synstateDistPath = path.resolve(
   workspaceRootPath,
-  '../synstate/dist/index.mjs',
+  '../../libs/synstate/dist/index.mjs',
 );
 
 const reactHooksDistPath = path.resolve(
   workspaceRootPath,
-  '../synstate-react-hooks/dist/index.mjs',
+  '../../libs/synstate-react-hooks/dist/index.mjs',
 );
 
 const targetMarkdownFiles: readonly string[] = [
@@ -25,7 +27,7 @@ const targetMarkdownFiles: readonly string[] = [
   ),
   path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
   path.resolve(workspaceRootPath, 'src/content/docs/ja/index.mdx'),
-  path.resolve(workspaceRootPath, '../synstate/README.md'),
+  path.resolve(workspaceRootPath, '../../libs/synstate/README.md'),
 ] as const;
 
 const measureBundleSize = async (

@@ -4,7 +4,8 @@
   "description": "Type-safe State Management Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/synstate.git"
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/synstate"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -61,8 +62,8 @@
     "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
-    "ts-data-forge": "^14.2.0",
-    "ts-type-forge": "^9.2.0"
+    "ts-data-forge": "workspace:^",
+    "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "2.12.0",

@@ -16,12 +16,14 @@ export const defineViteConfig = ({
   additionalExcludesInNode,
   additionalExcludesInBrowser,
   optimizeDepsIncludesForBrowser,
+  testTimeout,
   alias,
 }: DeepReadonly<{
   workspaceRootPath: string;
   additionalExcludesInNode?: readonly string[];
   additionalExcludesInBrowser?: readonly string[];
   optimizeDepsIncludesForBrowser?: readonly string[];
+  testTimeout?: number;
   alias?: InlineConfig['alias'];
 }>) =>
   ({
@@ -34,7 +36,10 @@ export const defineViteConfig = ({
             name: 'Node.js',
             environment: 'node',
             ...projectConfig(workspaceRootPath, {
+              include: undefined,
+              includeSource: undefined,
               additionalExcludes: additionalExcludesInNode,
+              testTimeout,
             }),
             typecheck: {
               tsconfig: path.resolve(workspaceRootPath, 'tsconfig.test.json'),
@@ -49,6 +54,7 @@ export const defineViteConfig = ({
               additionalExcludes: additionalExcludesInBrowser,
               includeSource: ['src/**/*.mts'],
               include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+              testTimeout,
             }),
             alias,
             // https://vitest.dev/config/browser/playwright
@@ -71,9 +77,10 @@ export const defineViteConfig = ({
 const projectConfig = (
   workspaceRootPath: string,
   options?: Readonly<{
-    additionalExcludes?: readonly string[];
-    includeSource?: readonly string[];
-    include?: readonly string[];
+    additionalExcludes: readonly string[] | undefined;
+    includeSource: readonly string[] | undefined;
+    include: readonly string[] | undefined;
+    testTimeout: number | undefined;
   }>,
 ) =>
   ({
@@ -81,10 +88,14 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    includeSource: castMutable(options?.includeSource) ?? ['src/**/*.mts'],
+    includeSource: castMutable(options?.includeSource) ?? [
+      'src/**/*.mts',
+      'samples/**/*.{mts,tsx}',
+    ],
     include: castMutable(options?.include) ?? [
       'src/**/*.test.mts',
       'test/**/*.test.mts',
+      'samples/**/*.mts',
     ],
     exclude: [
       '**/*.d.mts',
@@ -92,6 +103,7 @@ const projectConfig = (
       'src/entry-point.mts',
       ...(options?.additionalExcludes ?? []),
     ],
+    testTimeout: options?.testTimeout,
   }) as const satisfies ProjectConfig;
 
 const coverageSettings = () =>

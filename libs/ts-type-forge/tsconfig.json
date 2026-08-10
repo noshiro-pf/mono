@@ -1,6 +1,10 @@
 {
   "extends": ["../../configs/tsconfig/tsconfig.type-check.json"],
   "compilerOptions": {
+    // ts-type-forge asserts exact type equality against Node types (e.g.
+    // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
+    // DOM shapes instead and breaks the assertions.
+    "lib": ["ESNext"],
     "paths": {
       "ts-type-forge": ["./src/entry-point.mts"],
       "ts-type-forge/global": ["./src/global.mts"]

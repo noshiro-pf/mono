@@ -7,7 +7,7 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
-import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
+import { projectRootPath } from '../../scripts/project-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
@@ -17,7 +17,7 @@ export default [
   ...eslintConfigForTypeScript({
     tsconfigRootDir: workspaceRootPath,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [workspaceRootPath, repositoryRootPath],
+    packageDirs: [workspaceRootPath, projectRootPath],
   }),
 
   eslintPluginTsDataForge.configs.recommended,

@@ -13,8 +13,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/ts-type-forge.git",
-    "directory": "packages/eslint-plugin-ts-type-forge"
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/eslint-plugin-ts-type-forge"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@typescript-eslint/utils": "~8.65.0",
-    "ts-data-forge": "~14.0.0",
+    "ts-data-forge": "workspace:~",
     "ts-type-forge": "workspace:*"
   },
   "devDependencies": {
