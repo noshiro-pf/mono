@@ -20,45 +20,45 @@ SynState のアイデアは **既出の概念** である。個々の構成要�
 
 - **最も直接的な先行研究。** Synchronous Dataflow (SDF) において、各ノードが生成・消費するデータ量が事前に指定される場合、「SDFノードのスケジューリングは実行時ではなくコンパイル時（静的に）行える。したがって実行時オーバーヘッドは消滅する」と明言。これは SynState の洞察そのもの。
 - IEEE Transactions on Computers, vol. C-36, no. 1, pp. 24-35, January 1987
-- URL: https://www.semanticscholar.org/paper/Static-Scheduling-of-Synchronous-Data-Flow-Programs-Lee-Messerschmitt/840546d540c4f090851c426fe823dc5b655002f9
+- URL: <https://www.semanticscholar.org/paper/Static-Scheduling-of-Synchronous-Data-Flow-Programs-Lee-Messerschmitt/840546d540c4f090851c426fe823dc5b655002f9>
 
 ### 1.2 Bainomugisha et al. — "A Survey on Reactive Programming" (2013)
 
 - リアクティブプログラミングの包括的サーベイ。静的 vs 動的依存グラフを明確に区別: "In some reactive languages, the graph of dependencies is static, i.e., the graph is fixed throughout the program's execution. In other languages, the graph can be dynamic."
 - グリッチ回避は「式をトポロジカルソートし、その順序で値を更新する」ことで達成されると記述。
 - FrTime, Flapjax, Scala.React をトポロジカル順序でグリッチフリー伝搬を行うシステムとして紹介。
-- URL: https://dl.acm.org/doi/10.1145/2501654.2501666
+- URL: <https://dl.acm.org/doi/10.1145/2501654.2501666>
 
 ### 1.3 Cooper & Krishnamurthi — "Embedding Dynamic Dataflow in a Call-by-Value Language" (ESOP 2006)
 
 - FrTime は各ノードに依存関係より高い**高さ**を割り当て、高さ順の**優先度キュー**で伝搬。ただし FrTime は**動的**グラフをサポートするため、「グラフ構造の一部が変化したとき、動的にソート順序を再計算」する必要がある。
 - これは SynState の洞察の裏返しの証明: 動的グラフでは順序の再計算が必要 = 静的グラフでは不要。
-- URL: https://cs.brown.edu/~sk/Publications/Papers/Published/ck-frtime/paper.pdf
+- URL: <https://cs.brown.edu/~sk/Publications/Papers/Published/ck-frtime/paper.pdf>
 
 ### 1.4 Czaplicki & Chong — "Asynchronous Functional Reactive Programming for GUIs" (PLDI 2013)
 
 - Elm の初期 FRP モデルはプログラム初期化時に決定される**静的シグナルグラフ**を使用。型システムによりリアクティブプリミティブを制限し、固定グラフ構造での効率的実行を保証。SynState の静的トポロジーの主張と密接に関連。
-- URL: https://people.seas.harvard.edu/~chong/pubs/pldi13-elm.pdf
+- URL: <https://people.seas.harvard.edu/~chong/pubs/pldi13-elm.pdf>
 
 ### 1.5 Maier & Odersky — "Deprecating the Observer Pattern with Scala.React" (2012)
 
 - Scala.React がトポロジカル順序に基づく伝搬サイクルの2フェーズでオブザーバーが不整合データを観測しないことを保証する方法を記述。
-- URL: https://infoscience.epfl.ch/record/176887
+- URL: <https://infoscience.epfl.ch/record/176887>
 
 ### 1.6 Burchett, Cooper & Krishnamurthi — "Lowering: A Static Optimization Technique for Transparent Functional Reactivity" (PEPM 2007)
 
 - 依存グラフの**静的解析**によりグラフサイズを削減する最適化を実証。コンパイル時のグラフ解析により「速度とメモリ使用量の両方で劇的な改善」を示す。
-- URL: https://dl.acm.org/doi/10.1145/1244381.1244393
+- URL: <https://dl.acm.org/doi/10.1145/1244381.1244393>
 
 ### 1.7 Salvaneschi et al. — Distributed REScala (OOPSLA 2014)
 
 - 「素直な解決策はトポロジカルソートで時変値を依存順に並べ、その順序で更新すること」とグリッチフリーについて言及。ただし REScala は**動的**依存グラフをサポートし、分散環境ではより洗練されたアプローチが必要。
-- URL: https://dl.acm.org/doi/10.1145/2660193.2660240
+- URL: <https://dl.acm.org/doi/10.1145/2660193.2660240>
 
 ### 1.8 Ritschel — "A Meta Representation for Reactive Dependency Graphs" (UBC Master's Thesis)
 
 - リアクティブシステムにおける静的 vs 動的依存グラフの詳細な分析を提供。
-- URL: https://www.cs.ubc.ca/~ritschel/files/masterthesis.pdf
+- URL: <https://www.cs.ubc.ca/~ritschel/files/masterthesis.pdf>
 
 ---
 
@@ -69,17 +69,17 @@ SynState のアイデアは **既出の概念** である。個々の構成要�
 #### Topologica (datavis-tech)
 
 - **SynState に最も近い OSS。** トポロジカルソートに基づくリアクティブデータフロープログラミングのミニマルライブラリ。依存関係は構築時に宣言。伝搬はトポロジカルソートを使用し、各ノードが更新サイクルごとに1回だけ設定されることを保証。
-- URL: https://github.com/datavis-tech/topologica
+- URL: <https://github.com/datavis-tech/topologica>
 
 #### ReactiveModel / Model.js (datavis-tech / ZJONSSON)
 
 - Topologica の前身。「依存データグラフ上の明示的なトポロジカルソートアルゴリズムで変更を処理する。」完全な「ダイジェスト」の後、変更されたプロパティに推移的に依存するすべてのリアクティブ関数が適切な順序で実行済みとなる。
-- URL: https://github.com/datavis-tech/reactive-model
+- URL: <https://github.com/datavis-tech/reactive-model>
 
 #### Storm.NET
 
 - "Simple Topologically Ordered Reactive Model" — 依存グラフのトポロジカル順序評価を保証し、比較ベースの更新スキップを実装。
-- URL: https://github.com/StormDotNet/Storm.NET
+- URL: <https://github.com/StormDotNet/Storm.NET>
 
 ### 2.2 動的グラフを採用（SynState とは異なるアプローチ）
 
@@ -244,7 +244,7 @@ SynState の `synstate-react-hooks` は `useSyncExternalStore` を使用して R
 - コンポーネントが `subscribe`/`unsubscribe` するだけで動的な購読管理が完結
 - React ツリーの動的な性質はすべて購読レイヤーで吸収される
 
-```
+```text
 [静的グラフ (SynState)] → Observable
         ↓
 [useSyncExternalStore] → コンポーネントが subscribe/unsubscribe
@@ -296,8 +296,8 @@ SynState はオペレーターの学習コストを対価として、ランタ�
 - Czaplicki, E. & Chong, S. (2013). Asynchronous Functional Reactive Programming for GUIs. PLDI.
 - Maier, I. & Odersky, M. (2012). Deprecating the Observer Pattern with Scala.React. EPFL.
 - Salvaneschi, G. et al. (2014). Distributed REScala. OOPSLA.
-- Weststrate, M. (2016). The Fundamental Principles Behind MobX. https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8
-- Topologica: https://github.com/datavis-tech/topologica
-- Storm.NET: https://github.com/StormDotNet/Storm.NET
-- Jotai: https://github.com/pmndrs/jotai
-- MobX: https://github.com/mobxjs/mobx
+- Weststrate, M. (2016). The Fundamental Principles Behind MobX. <https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8>
+- Topologica: <https://github.com/datavis-tech/topologica>
+- Storm.NET: <https://github.com/StormDotNet/Storm.NET>
+- Jotai: <https://github.com/pmndrs/jotai>
+- MobX: <https://github.com/mobxjs/mobx>

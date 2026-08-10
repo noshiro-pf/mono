@@ -7,196 +7,266 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
 {
   // Basic nested pick
   expectType<
-    DeepPick<{ a: { b: { c: number; d: number } } }, ['a', 'b', 'c']>,
-    { a: { b: { c: number } } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: number; d: number }> }> }>,
+      readonly ['a', 'b', 'c']
+    >,
+    Readonly<{ a: Readonly<{ b: Readonly<{ c: number }> }> }>
   >('=');
 
   // Pick at depth 1
-  expectType<DeepPick<{ a: number; b: string }, ['a']>, { a: number }>('=');
+  expectType<
+    DeepPick<Readonly<{ a: number; b: string }>, readonly ['a']>,
+    Readonly<{ a: number }>
+  >('=');
 
   // Pick at depth 1
   expectType<
-    DeepPick<{ a: { b: number; c: string } }, ['a']>,
-    { a: { b: number; c: string } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: number; c: string }> }>,
+      readonly ['a']
+    >,
+    Readonly<{ a: Readonly<{ b: number; c: string }> }>
   >('=');
 
   // Pick at depth 2
   expectType<
-    DeepPick<{ a: { b: number; c: string }; d: boolean }, ['a', 'b']>,
-    { a: { b: number } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: number; c: string }>; d: boolean }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a: Readonly<{ b: number }> }>
   >('=');
 
   // Pick preserves the full path structure
   expectType<
     DeepPick<
-      { a: { b: { c: number; d: string }; e: boolean }; f: number },
-      ['a', 'b', 'd']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number; d: string }>; e: boolean }>;
+        f: number;
+      }>,
+      readonly ['a', 'b', 'd']
     >,
-    { a: { b: { d: string } } }
+    Readonly<{ a: Readonly<{ b: Readonly<{ d: string }> }> }>
   >('=');
 
   // Multiple picks via union of paths
   expectType<
     DeepPick<
-      { a: { b: number; c: string; d: boolean }; e: boolean },
-      ['a', 'b'] | ['a', 'c']
+      Readonly<{
+        a: Readonly<{ b: number; c: string; d: boolean }>;
+        e: boolean;
+      }>,
+      readonly ['a', 'b'] | readonly ['a', 'c']
     >,
-    { a: { b: number; c: string } }
+    Readonly<{ a: Readonly<{ b: number; c: string }> }>
   >('=');
 
   // Multiple picks at different depths
   expectType<
-    DeepPick<{ a: { b: { c: number } }; d: string }, ['a', 'b', 'c'] | ['d']>,
-    { a: { b: { c: number } }; d: string }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: number }> }>; d: string }>,
+      readonly ['a', 'b', 'c'] | readonly ['d']
+    >,
+    Readonly<{ a: Readonly<{ b: Readonly<{ c: number }> }>; d: string }>
   >('=');
 
   // Single key path (depth 1)
   expectType<
-    DeepPick<{ x: number; y: string; z: boolean }, ['x']>,
-    { x: number }
+    DeepPick<Readonly<{ x: number; y: string; z: boolean }>, readonly ['x']>,
+    Readonly<{ x: number }>
   >('=');
 
   // Optional properties
   expectType<
-    DeepPick<{ a?: { b: number; c: string } }, ['a', 'b']>,
-    { a?: { b: number } }
+    DeepPick<
+      Readonly<{ a?: Readonly<{ b: number; c: string }> }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a?: Readonly<{ b: number }> }>
   >('=');
 
   // Readonly properties
   expectType<
-    DeepPick<Readonly<{ a: Readonly<{ b: number; c: string }> }>, ['a', 'b']>,
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: number; c: string }> }>,
+      readonly ['a', 'b']
+    >,
     Readonly<{ a: Readonly<{ b: number }> }>
   >('=');
 
   // Prefix path: shorter path picks entire subtree
   expectType<
-    DeepPick<{ a: { b: number; c: string } }, ['a'] | ['a', 'b']>,
-    { a: { b: number; c: string } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: number; c: string }> }>,
+      readonly ['a'] | readonly ['a', 'b']
+    >,
+    Readonly<{ a: Readonly<{ b: number; c: string }> }>
   >('=');
 
   // Prefix path at deeper level
   expectType<
     DeepPick<
-      { a: { b: { c: number; d: string }; e: boolean } },
-      ['a', 'b'] | ['a', 'b', 'c']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number; d: string }>; e: boolean }>;
+      }>,
+      readonly ['a', 'b'] | readonly ['a', 'b', 'c']
     >,
-    { a: { b: { c: number; d: string } } }
+    Readonly<{ a: Readonly<{ b: Readonly<{ c: number; d: string }> }> }>
   >('=');
 
   // Prefix path: short path skipping 2 levels
   expectType<
-    DeepPick<{ a: { b: { c: number; d: string } } }, ['a'] | ['a', 'b', 'c']>,
-    { a: { b: { c: number; d: string } } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: number; d: string }> }> }>,
+      readonly ['a'] | readonly ['a', 'b', 'c']
+    >,
+    Readonly<{ a: Readonly<{ b: Readonly<{ c: number; d: string }> }> }>
   >('=');
 
   // Prefix path with multiple longer paths
   expectType<
     DeepPick<
-      { a: { b: number; c: string; d: boolean } },
-      ['a'] | ['a', 'b'] | ['a', 'c']
+      Readonly<{ a: Readonly<{ b: number; c: string; d: boolean }> }>,
+      readonly ['a'] | readonly ['a', 'b'] | readonly ['a', 'c']
     >,
-    { a: { b: number; c: string; d: boolean } }
+    Readonly<{ a: Readonly<{ b: number; c: string; d: boolean }> }>
   >('=');
 
   // Prefix path on different keys simultaneously
   expectType<
     DeepPick<
-      { a: { b: number; c: string }; d: { e: number; f: string } },
-      ['a'] | ['d', 'e']
+      Readonly<{
+        a: Readonly<{ b: number; c: string }>;
+        d: Readonly<{ e: number; f: string }>;
+      }>,
+      readonly ['a'] | readonly ['d', 'e']
     >,
-    { a: { b: number; c: string }; d: { e: number } }
+    Readonly<{
+      a: Readonly<{ b: number; c: string }>;
+      d: Readonly<{ e: number }>;
+    }>
   >('=');
 
   // Prefix path with optional property
   expectType<
-    DeepPick<{ a?: { b: number; c: string } }, ['a'] | ['a', 'b']>,
-    { a?: { b: number; c: string } }
+    DeepPick<
+      Readonly<{ a?: Readonly<{ b: number; c: string }> }>,
+      readonly ['a'] | readonly ['a', 'b']
+    >,
+    Readonly<{ a?: Readonly<{ b: number; c: string }> }>
   >('=');
 
   // Path through non-record: leaf pick returns the primitive value
-  expectType<DeepPick<{ a: number }, ['a']>, { a: number }>('=');
+  expectType<
+    DeepPick<Readonly<{ a: number }>, readonly ['a']>,
+    Readonly<{ a: number }>
+  >('=');
 
   // Path through primitive: consistent with RelaxedPick (non-existent key → {})
-  expectType<DeepPick<{ a: number }, ['a', 'b']>, { a: NonNullable<unknown> }>(
-    '=',
-  );
+  expectType<
+    DeepPick<Readonly<{ a: number }>, readonly ['a', 'b']>,
+    Readonly<{ a: NonNullable<unknown> }>
+  >('=');
 
   // Path through primitive with method name: still {} (primitives are opaque)
   expectType<
-    DeepPick<{ a: number }, ['a', 'toString']>,
-    { a: NonNullable<unknown> }
+    DeepPick<Readonly<{ a: number }>, readonly ['a', 'toString']>,
+    Readonly<{ a: NonNullable<unknown> }>
   >('=');
 
   // Non-existent nested key on record: consistent with RelaxedPick
   expectType<
-    DeepPick<{ a: { b: number } }, ['a', 'x']>,
-    { a: NonNullable<unknown> }
+    DeepPick<Readonly<{ a: Readonly<{ b: number }> }>, readonly ['a', 'x']>,
+    Readonly<{ a: NonNullable<unknown> }>
   >('=');
 
   // Non-existent top-level key: consistent with RelaxedPick
-  expectType<DeepPick<{ a: number }, ['x']>, NonNullable<unknown>>('=');
+  expectType<
+    DeepPick<Readonly<{ a: number }>, readonly ['x']>,
+    NonNullable<unknown>
+  >('=');
 
   // Union input: distributes over each member
   expectType<
-    DeepPick<{ a: number; b: string } | { a: boolean; c: number }, ['a']>,
-    { a: number } | { a: boolean }
+    DeepPick<
+      Readonly<{ a: number; b: string } | { a: boolean; c: number }>,
+      readonly ['a']
+    >,
+    Readonly<{ a: number } | { a: boolean }>
   >('=');
 
   // Union input: nested
   expectType<
     DeepPick<
-      { a: { b: number; c: string } } | { a: { b: boolean; d: number } },
-      ['a', 'b']
+      Readonly<
+        | { a: Readonly<{ b: number; c: string }> }
+        | { a: Readonly<{ b: boolean; d: number }> }
+      >,
+      readonly ['a', 'b']
     >,
-    { a: { b: number } } | { a: { b: boolean } }
+    Readonly<{ a: Readonly<{ b: number }> } | { a: Readonly<{ b: boolean }> }>
   >('=');
 
   // Union input: members with disjoint keys
   expectType<
-    DeepPick<{ a: number } | { b: string }, ['a']>,
-    NonNullable<unknown> | { a: number }
+    DeepPick<Readonly<{ a: number } | { b: string }>, readonly ['a']>,
+    NonNullable<unknown> | Readonly<{ a: number }>
   >('=');
 
   // Reference: picking a non-existent key produces an empty object type
-  expectType<RelaxedPick<{ b: number }, 'a'>, {}>('=');
+  expectType<RelaxedPick<Readonly<{ b: number }>, 'a'>, {}>('=');
 
   // Union input with union paths
   expectType<
     DeepPick<
-      | { a: { b: number; c: string } }
-      | { a: { b: boolean; d: number }; e: string },
-      ['a', 'b'] | ['e']
+      Readonly<
+        | { a: Readonly<{ b: number; c: string }> }
+        | { a: Readonly<{ b: boolean; d: number }>; e: string }
+      >,
+      readonly ['a', 'b'] | readonly ['e']
     >,
-    { a: { b: number } } | { a: { b: boolean }; e: string }
+    Readonly<
+      | { a: Readonly<{ b: number }> }
+      | { a: Readonly<{ b: boolean }>; e: string }
+    >
   >('=');
 
   // Intersection input: pick from flattened shape
-  expectType<DeepPick<{ a: number } & { b: string }, ['a']>, { a: number }>(
-    '=',
-  );
+  expectType<
+    DeepPick<Readonly<{ a: number } & { b: string }>, readonly ['a']>,
+    Readonly<{ a: number }>
+  >('=');
 
   // Intersection input: nested
   expectType<
-    DeepPick<{ a: { b: number; c: string } } & { d: boolean }, ['a', 'b']>,
-    { a: { b: number } }
+    DeepPick<
+      Readonly<{ a: Readonly<{ b: number; c: string }> } & { d: boolean }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a: Readonly<{ b: number }> }>
   >('=');
 
   // Intersection input: overlapping keys narrow the value
   expectType<
     DeepPick<
-      { a: { b: number; c: string } } & { a: { b: 1; d: boolean } },
-      ['a', 'b']
+      Readonly<
+        { a: Readonly<{ b: number; c: string }> } & {
+          a: Readonly<{ b: 1; d: boolean }>;
+        }
+      >,
+      readonly ['a', 'b']
     >,
-    { a: { b: 1 } }
+    Readonly<{ a: Readonly<{ b: 1 }> }>
   >('=');
 
   // Intersection input with union paths
   expectType<
     DeepPick<
-      { a: { b: number; c: string } } & { d: boolean },
-      ['a', 'b'] | ['d']
+      Readonly<{ a: Readonly<{ b: number; c: string }> } & { d: boolean }>,
+      readonly ['a', 'b'] | readonly ['d']
     >,
-    { a: { b: number }; d: boolean }
+    Readonly<{ a: Readonly<{ b: number }>; d: boolean }>
   >('=');
 }
 
@@ -204,186 +274,247 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
 {
   // Basic nested omit
   expectType<
-    DeepOmit<{ a: { b: { c: number; d: number } } }, ['a', 'b', 'c']>,
-    { a: { b: { d: number } } }
+    DeepOmit<
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: number; d: number }> }> }>,
+      readonly ['a', 'b', 'c']
+    >,
+    Readonly<{ a: Readonly<{ b: Readonly<{ d: number }> }> }>
   >('=');
 
   // Omit at depth 1
-  expectType<DeepOmit<{ a: number; b: string }, ['a']>, { b: string }>('=');
+  expectType<
+    DeepOmit<Readonly<{ a: number; b: string }>, readonly ['a']>,
+    Readonly<{ b: string }>
+  >('=');
 
   // Omit at depth 2
   expectType<
-    DeepOmit<{ a: { b: number; c: string }; d: boolean }, ['a', 'b']>,
-    { a: { c: string }; d: boolean }
+    DeepOmit<
+      Readonly<{ a: Readonly<{ b: number; c: string }>; d: boolean }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a: Readonly<{ c: string }>; d: boolean }>
   >('=');
 
   // Omit preserves the full structure except the target
   expectType<
     DeepOmit<
-      { a: { b: { c: number; d: string }; e: boolean }; f: number },
-      ['a', 'b', 'c']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number; d: string }>; e: boolean }>;
+        f: number;
+      }>,
+      readonly ['a', 'b', 'c']
     >,
-    { a: { b: { d: string }; e: boolean }; f: number }
+    Readonly<{
+      a: Readonly<{ b: Readonly<{ d: string }>; e: boolean }>;
+      f: number;
+    }>
   >('=');
 
   // Multiple omits via union of paths
   expectType<
     DeepOmit<
-      { a: { b: number; c: string; d: boolean } },
-      ['a', 'b'] | ['a', 'c']
+      Readonly<{ a: Readonly<{ b: number; c: string; d: boolean }> }>,
+      readonly ['a', 'b'] | readonly ['a', 'c']
     >,
-    { a: { d: boolean } }
+    Readonly<{ a: Readonly<{ d: boolean }> }>
   >('=');
 
   // Multiple omits at different depths
   expectType<
     DeepOmit<
-      { a: { b: { c: number }; d: string }; e: boolean },
-      ['a', 'b', 'c'] | ['e']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number }>; d: string }>;
+        e: boolean;
+      }>,
+      readonly ['a', 'b', 'c'] | readonly ['e']
     >,
-    { a: { b: NonNullable<unknown>; d: string } }
+    Readonly<{ a: Readonly<{ b: NonNullable<unknown>; d: string }> }>
   >('=');
 
   // Single key path (depth 1)
   expectType<
-    DeepOmit<{ x: number; y: string; z: boolean }, ['x']>,
-    { y: string; z: boolean }
+    DeepOmit<Readonly<{ x: number; y: string; z: boolean }>, readonly ['x']>,
+    Readonly<{ y: string; z: boolean }>
   >('=');
 
   // Optional properties
   expectType<
-    DeepOmit<{ a?: { b: number; c: string } }, ['a', 'b']>,
-    { a?: { c: string } }
+    DeepOmit<
+      Readonly<{ a?: Readonly<{ b: number; c: string }> }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a?: Readonly<{ c: string }> }>
   >('=');
 
   // Readonly properties
   expectType<
-    DeepOmit<Readonly<{ a: Readonly<{ b: number; c: string }> }>, ['a', 'b']>,
+    DeepOmit<
+      Readonly<{ a: Readonly<{ b: number; c: string }> }>,
+      readonly ['a', 'b']
+    >,
     Readonly<{ a: Readonly<{ c: string }> }>
   >('=');
 
   // Prefix path: shorter path removes entire subtree
   expectType<
-    DeepOmit<{ a: { b: number; c: string }; d: boolean }, ['a'] | ['a', 'b']>,
-    { d: boolean }
+    DeepOmit<
+      Readonly<{ a: Readonly<{ b: number; c: string }>; d: boolean }>,
+      readonly ['a'] | readonly ['a', 'b']
+    >,
+    Readonly<{ d: boolean }>
   >('=');
 
   // Prefix path at deeper level
   expectType<
     DeepOmit<
-      { a: { b: { c: number; d: string }; e: boolean } },
-      ['a', 'b'] | ['a', 'b', 'c']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number; d: string }>; e: boolean }>;
+      }>,
+      readonly ['a', 'b'] | readonly ['a', 'b', 'c']
     >,
-    { a: { e: boolean } }
+    Readonly<{ a: Readonly<{ e: boolean }> }>
   >('=');
 
   // Prefix path: short path skipping 2 levels
   expectType<
     DeepOmit<
-      { a: { b: { c: number; d: string } }; e: boolean },
-      ['a'] | ['a', 'b', 'c']
+      Readonly<{
+        a: Readonly<{ b: Readonly<{ c: number; d: string }> }>;
+        e: boolean;
+      }>,
+      readonly ['a'] | readonly ['a', 'b', 'c']
     >,
-    { e: boolean }
+    Readonly<{ e: boolean }>
   >('=');
 
   // Prefix path with multiple longer paths
   expectType<
     DeepOmit<
-      { a: { b: number; c: string; d: boolean }; e: number },
-      ['a'] | ['a', 'b'] | ['a', 'c']
+      Readonly<{
+        a: Readonly<{ b: number; c: string; d: boolean }>;
+        e: number;
+      }>,
+      readonly ['a'] | readonly ['a', 'b'] | readonly ['a', 'c']
     >,
-    { e: number }
+    Readonly<{ e: number }>
   >('=');
 
   // Prefix path on different keys simultaneously
   expectType<
     DeepOmit<
-      { a: { b: number; c: string }; d: { e: number; f: string } },
-      ['a'] | ['d', 'e']
+      Readonly<{
+        a: Readonly<{ b: number; c: string }>;
+        d: Readonly<{ e: number; f: string }>;
+      }>,
+      readonly ['a'] | readonly ['d', 'e']
     >,
-    { d: { f: string } }
+    Readonly<{ d: Readonly<{ f: string }> }>
   >('=');
 
   // Prefix path with optional property
   expectType<
-    DeepOmit<{ a?: { b: number; c: string }; d: boolean }, ['a'] | ['a', 'b']>,
-    { d: boolean }
+    DeepOmit<
+      Readonly<{ a?: Readonly<{ b: number; c: string }>; d: boolean }>,
+      readonly ['a'] | readonly ['a', 'b']
+    >,
+    Readonly<{ d: boolean }>
   >('=');
 
   // Path through non-record: primitives are opaque, T unchanged
   expectType<
-    DeepOmit<{ a: number; b: string }, ['a', 'toString']>,
-    { a: number; b: string }
+    DeepOmit<Readonly<{ a: number; b: string }>, readonly ['a', 'toString']>,
+    Readonly<{ a: number; b: string }>
   >('=');
 
   // Path through primitive with non-existent key: T unchanged
   expectType<
-    DeepOmit<{ a: number; b: string }, ['a', 'x']>,
-    { a: number; b: string }
+    DeepOmit<Readonly<{ a: number; b: string }>, readonly ['a', 'x']>,
+    Readonly<{ a: number; b: string }>
   >('=');
 
   // Non-existent top-level key: T unchanged
   expectType<
-    DeepOmit<{ a: number; b: string }, ['x']>,
-    { a: number; b: string }
+    DeepOmit<Readonly<{ a: number; b: string }>, readonly ['x']>,
+    Readonly<{ a: number; b: string }>
   >('=');
 
   // Non-existent nested key on record: T unchanged
-  expectType<DeepOmit<{ a: { b: number } }, ['a', 'x']>, { a: { b: number } }>(
-    '=',
-  );
+  expectType<
+    DeepOmit<Readonly<{ a: Readonly<{ b: number }> }>, readonly ['a', 'x']>,
+    Readonly<{ a: Readonly<{ b: number }> }>
+  >('=');
 
   // Union input: distributes over each member
   expectType<
-    DeepOmit<{ a: number; b: string } | { a: boolean; c: number }, ['a']>,
-    { b: string } | { c: number }
+    DeepOmit<
+      Readonly<{ a: number; b: string } | { a: boolean; c: number }>,
+      readonly ['a']
+    >,
+    Readonly<{ b: string } | { c: number }>
   >('=');
 
   // Union input: nested
   expectType<
     DeepOmit<
-      { a: { b: number; c: string } } | { a: { b: boolean; d: number } },
-      ['a', 'b']
+      Readonly<
+        | { a: Readonly<{ b: number; c: string }> }
+        | { a: Readonly<{ b: boolean; d: number }> }
+      >,
+      readonly ['a', 'b']
     >,
-    { a: { c: string } } | { a: { d: number } }
+    Readonly<{ a: Readonly<{ c: string }> } | { a: Readonly<{ d: number }> }>
   >('=');
 
   // Union input: members with different nested shapes
   expectType<
     DeepOmit<
-      { a: { x: number; y: string } } | { a: { x: boolean }; b: number },
-      ['a', 'x']
+      Readonly<
+        | { a: Readonly<{ x: number; y: string }> }
+        | { a: Readonly<{ x: boolean }>; b: number }
+      >,
+      readonly ['a', 'x']
     >,
-    { a: { y: string } } | { a: NonNullable<unknown>; b: number }
+    Readonly<
+      { a: Readonly<{ y: string }> } | { a: NonNullable<unknown>; b: number }
+    >
   >('=');
 
   // Intersection input: omit from flattened shape
-  expectType<DeepOmit<{ a: number } & { b: string }, ['a']>, { b: string }>(
-    '=',
-  );
+  expectType<
+    DeepOmit<Readonly<{ a: number } & { b: string }>, readonly ['a']>,
+    Readonly<{ b: string }>
+  >('=');
 
   // Intersection input: nested
   expectType<
-    DeepOmit<{ a: { b: number; c: string } } & { d: boolean }, ['a', 'b']>,
-    { a: { c: string }; d: boolean }
+    DeepOmit<
+      Readonly<{ a: Readonly<{ b: number; c: string }> } & { d: boolean }>,
+      readonly ['a', 'b']
+    >,
+    Readonly<{ a: Readonly<{ c: string }>; d: boolean }>
   >('=');
 
   // Intersection input: overlapping keys
   expectType<
     DeepOmit<
-      { a: { b: number; c: string } } & { a: { b: 1; d: boolean } },
-      ['a', 'b']
+      Readonly<
+        { a: Readonly<{ b: number; c: string }> } & {
+          a: Readonly<{ b: 1; d: boolean }>;
+        }
+      >,
+      readonly ['a', 'b']
     >,
-    { a: { c: string; d: boolean } }
+    Readonly<{ a: Readonly<{ c: string; d: boolean }> }>
   >('=');
 
   // Intersection input with union paths
   expectType<
     DeepOmit<
-      { a: { b: number; c: string } } & { d: boolean },
-      ['a', 'b'] | ['d']
+      Readonly<{ a: Readonly<{ b: number; c: string }> } & { d: boolean }>,
+      readonly ['a', 'b'] | readonly ['d']
     >,
-    { a: { c: string } }
+    Readonly<{ a: Readonly<{ c: string }> }>
   >('=');
 }
 
@@ -403,12 +534,12 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
   // assertions would then pass under either spelling. (`interface` works too
   // in principle, but `consistent-type-definitions` rewrites it into an alias.)
   class Leaf {
-    x: number = 0;
-    y: string = '';
+    readonly x: number = 0;
+    readonly y: string = '';
   }
 
   class Root {
-    a: Leaf = new Leaf();
+    readonly a: Leaf = new Leaf();
   }
 
   // Fixture integrity: were these to gain an index signature, every assertion
@@ -418,12 +549,24 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
   expectType<Root extends UnknownRecord ? true : false, false>('=');
 
   // Such a value is recursed into, not collapsed to `{}` / left untouched.
-  expectType<DeepPick<{ a: Leaf }, ['a', 'x']>, { a: { x: number } }>('=');
+  expectType<
+    DeepPick<Readonly<{ a: Leaf }>, readonly ['a', 'x']>,
+    Readonly<{ a: Readonly<{ x: number }> }>
+  >('=');
 
-  expectType<DeepOmit<{ a: Leaf }, ['a', 'x']>, { a: { y: string } }>('=');
+  expectType<
+    DeepOmit<Readonly<{ a: Leaf }>, readonly ['a', 'x']>,
+    Readonly<{ a: Readonly<{ y: string }> }>
+  >('=');
 
   // The same holds when it is reached from a root of the same shape.
-  expectType<DeepPick<Root, ['a', 'x']>, { a: { x: number } }>('=');
+  expectType<
+    DeepPick<Root, readonly ['a', 'x']>,
+    Readonly<{ a: Readonly<{ x: number }> }>
+  >('=');
 
-  expectType<DeepOmit<Root, ['a', 'x']>, { a: { y: string } }>('=');
+  expectType<
+    DeepOmit<Root, readonly ['a', 'x']>,
+    Readonly<{ a: Readonly<{ y: string }> }>
+  >('=');
 }

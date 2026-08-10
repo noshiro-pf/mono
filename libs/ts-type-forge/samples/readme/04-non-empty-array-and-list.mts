@@ -22,14 +22,14 @@ const myBlog: Blog = {
     { title: 'First Post', content: 'Hello world!' },
     { title: 'Understanding TypeScript', content: '...' },
   ] as unknown as NonEmptyArray<Post>,
-};
+} as const;
 
 // This would cause a type error:
 const emptyBlog: Blog = {
   name: 'Empty Thoughts',
   // @ts-expect-error `[]` lacks the `MinLength` brand required by NonEmptyArray
   posts: [],
-};
+} as const;
 
 const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
   posts[0].title; // Safe to access posts[0] - guaranteed to exist

@@ -5,7 +5,7 @@ import { type NonPositiveFiniteNumber } from 'ts-type-forge';
 const isNonPositiveFinite = (x: number): x is NonPositiveFiniteNumber =>
   Number.isFinite(x) && x <= 0;
 
-const debt = (amount: NonPositiveFiniteNumber) => ({ debt: amount });
+const debt = (amount: NonPositiveFiniteNumber) => ({ debt: amount }) as const;
 
 // embed-sample-code-ignore-below
 export { debt, isNonPositiveFinite };

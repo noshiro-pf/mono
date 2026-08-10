@@ -9,8 +9,11 @@ type T3 = TypeExtends<'hello', string>; // true (literal extends primitive)
 type T4 = TypeExtends<string, 'hello'>; // false (primitive doesn't extend literal)
 
 // Object assignability
-type T5 = TypeExtends<{ a: number }, UnknownRecord>; // true (specific object extends general object)
-type T6 = TypeExtends<{ a: number; b: string }, { a: number }>; // true (extra properties allowed)
+type T5 = TypeExtends<Readonly<{ a: number }>, UnknownRecord>; // true (specific object extends general object)
+type T6 = TypeExtends<
+  Readonly<{ a: number; b: string }>,
+  Readonly<{ a: number }>
+>; // true (extra properties allowed)
 
 // Special types
 type T7 = TypeExtends<never, string>; // true (never is assignable to anything)

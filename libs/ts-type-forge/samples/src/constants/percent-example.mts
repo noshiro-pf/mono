@@ -7,17 +7,17 @@ const calculateProgress = (completed: number, total: number): Percent => {
   return Math.min(100, Math.max(0, percentage)) as Percent;
 };
 
-const formatPercent = (value: Percent): string => `${value}%`;
+const formatPercent = (value: Percent): string => `${value}%` as const;
 
 const fullProgress = 100 satisfies Percent;
 const halfProgress = 50 satisfies Percent;
 const noProgress = 0 satisfies Percent;
 
 // Usage in progress bars, loading indicators, etc.
-type ProgressBarProps = {
+type ProgressBarProps = Readonly<{
   progress: Percent;
   showLabel?: boolean;
-};
+}>;
 
 // embed-sample-code-ignore-below
 export {

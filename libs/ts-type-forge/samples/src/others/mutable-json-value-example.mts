@@ -8,7 +8,7 @@ const apiPayload: MutableJsonValue = {
     age: 30,
     preferences: ['dark-mode', 'notifications'],
   },
-};
+} as const;
 
 // Can modify the structure
 const updateAge = (payload: MutableJsonValue): void => {

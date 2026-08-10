@@ -7,7 +7,7 @@ const isNegative = (x: number): x is NegativeNumber => x < 0;
 const absoluteValue = (x: NegativeNumber): PositiveNumber =>
   Math.abs(x) as PositiveNumber;
 
-const debt = (amount: NegativeNumber) => ({ type: 'debt', amount });
+const debt = (amount: NegativeNumber) => ({ type: 'debt', amount }) as const;
 
 // embed-sample-code-ignore-below
 export { absoluteValue, debt, isNegative };

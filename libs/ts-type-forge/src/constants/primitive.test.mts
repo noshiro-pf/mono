@@ -32,7 +32,7 @@ expectType<0n, Primitive>('<=');
 // Test that non-primitive types are not part of Primitive
 expectType<{}, Primitive>('!<=');
 
-expectType<[], Primitive>('!<=');
+expectType<readonly [], Primitive>('!<=');
 
 expectType<object, Primitive>('!<=');
 
@@ -44,9 +44,9 @@ expectType<RegExp, Primitive>('!<=');
 
 expectType<Error, Primitive>('!<=');
 
-expectType<Map<any, any>, Primitive>('!<=');
+expectType<ReadonlyMap<any, any>, Primitive>('!<=');
 
-expectType<Set<any>, Primitive>('!<=');
+expectType<ReadonlySet<any>, Primitive>('!<=');
 
 // Test the exact type composition
 expectType<
@@ -73,7 +73,7 @@ expectType<IsPrimitive<undefined>, true>('=');
 
 expectType<IsPrimitive<{}>, false>('=');
 
-expectType<IsPrimitive<[]>, false>('=');
+expectType<IsPrimitive<readonly []>, false>('=');
 
 expectType<IsPrimitive<object>, false>('=');
 
@@ -86,7 +86,7 @@ expectType<OnlyPrimitives<string | object>, string>('=');
 
 expectType<OnlyPrimitives<number | boolean | {}>, number | boolean>('=');
 
-expectType<OnlyPrimitives<Date | string | (() => void) | null>, string | null>(
+expectType<OnlyPrimitives<Date | (() => void) | string | null>, string | null>(
   '=',
 );
 
@@ -98,7 +98,7 @@ expectType<OnlyObjects<string | object>, object>('=');
 expectType<OnlyObjects<number | boolean | {}>, {}>('=');
 
 expectType<
-  OnlyObjects<Date | string | (() => void) | null>,
+  OnlyObjects<Date | (() => void) | string | null>,
   Date | (() => void)
 >('=');
 

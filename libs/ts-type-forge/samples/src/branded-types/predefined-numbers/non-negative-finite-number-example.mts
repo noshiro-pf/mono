@@ -5,8 +5,8 @@ import { type Int, type NonNegativeFiniteNumber } from 'ts-type-forge';
 const isNonNegativeFinite = (x: number): x is NonNegativeFiniteNumber =>
   Number.isFinite(x) && x >= 0;
 
-const distance = (x: NonNegativeFiniteNumber) => ({ meters: x });
-const age = (years: NonNegativeFiniteNumber & Int) => ({ years });
+const distance = (x: NonNegativeFiniteNumber) => ({ meters: x }) as const;
+const age = (years: NonNegativeFiniteNumber & Int) => ({ years }) as const;
 
 // embed-sample-code-ignore-below
 export { age, distance, isNonNegativeFinite };

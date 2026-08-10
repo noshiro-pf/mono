@@ -23,56 +23,83 @@ expectType<UnionToIntersection<1 | 2 | 3>, never>('=');
 
 expectType<UnionToIntersection<1 | 1>, 1>('=');
 
-expectType<UnionToIntersection<{ a: 0 } | { b: 1 }>, { a: 0 } & { b: 1 }>('=');
-
-expectType<UnionToIntersection<{ x: 0; y: 1 } | { x: 0; y: 2 }>, never>('=');
-
 expectType<
-  UnionToIntersection<{ x: 0; y: 1 } | { x: 0; z: 2 }>,
-  { x: 0; y: 1 } & { x: 0; z: 2 }
+  UnionToIntersection<Readonly<{ a: 0 } | { b: 1 }>>,
+  Readonly<{ a: 0 } & { b: 1 }>
 >('=');
 
 expectType<
-  MergeIntersection<UnionToIntersection<{ x: 0; y: 1 } | { x: 0; z: 2 }>>,
-  { x: 0; y: 1; z: 2 }
+  UnionToIntersection<Readonly<{ x: 0; y: 1 } | { x: 0; y: 2 }>>,
+  never
+>('=');
+
+expectType<
+  UnionToIntersection<Readonly<{ x: 0; y: 1 } | { x: 0; z: 2 }>>,
+  Readonly<{ x: 0; y: 1 } & { x: 0; z: 2 }>
+>('=');
+
+expectType<
+  MergeIntersection<
+    UnionToIntersection<Readonly<{ x: 0; y: 1 } | { x: 0; z: 2 }>>
+  >,
+  Readonly<{ x: 0; y: 1; z: 2 }>
 >('=');
 
 // Intersection type tests
-expectType<Intersection<[]>, unknown>('=');
+expectType<Intersection<readonly []>, unknown>('=');
 
-expectType<Intersection<[string]>, string>('=');
+expectType<Intersection<readonly [string]>, string>('=');
 
-expectType<Intersection<[string, number]>, string & number>('=');
-
-expectType<Intersection<[string, number, boolean]>, string & number & boolean>(
-  '=',
-);
-
-expectType<Intersection<[{ a: 1 }, { b: 2 }]>, { a: 1; b: 2 }>('=');
-
-expectType<Intersection<[{ a: 1 }, { b: 2 }, { c: 3 }]>, { a: 1; b: 2; c: 3 }>(
-  '=',
-);
+expectType<Intersection<readonly [string, number]>, string & number>('=');
 
 expectType<
-  Intersection<[{ x: number }, { y: string }, { z: boolean }]>,
-  { x: number; y: string; z: boolean }
+  Intersection<readonly [string, number, boolean]>,
+  string & number & boolean
 >('=');
 
 expectType<
-  Intersection<[{ a: 1; b: 2 }, { b: 2; c: 3 }]>,
-  { a: 1; b: 2; c: 3 }
+  Intersection<readonly [Readonly<{ a: 1 }>, Readonly<{ b: 2 }>]>,
+  Readonly<{ a: 1; b: 2 }>
 >('=');
 
-expectType<Intersection<[{ a: 1; b: 2 }, { b: 3; c: 3 }]>, never>('=');
+expectType<
+  Intersection<
+    readonly [Readonly<{ a: 1 }>, Readonly<{ b: 2 }>, Readonly<{ c: 3 }>]
+  >,
+  Readonly<{ a: 1; b: 2; c: 3 }>
+>('=');
+
+expectType<
+  Intersection<
+    readonly [
+      Readonly<{ x: number }>,
+      Readonly<{ y: string }>,
+      Readonly<{ z: boolean }>,
+    ]
+  >,
+  Readonly<{ x: number; y: string; z: boolean }>
+>('=');
+
+expectType<
+  Intersection<readonly [Readonly<{ a: 1; b: 2 }>, Readonly<{ b: 2; c: 3 }>]>,
+  Readonly<{ a: 1; b: 2; c: 3 }>
+>('=');
+
+expectType<
+  Intersection<readonly [Readonly<{ a: 1; b: 2 }>, Readonly<{ b: 3; c: 3 }>]>,
+  never
+>('=');
 
 // Mixed types intersection
 expectType<
-  Intersection<[{ name: string }, { age: number }]>,
-  { name: string; age: number }
+  Intersection<
+    readonly [Readonly<{ name: string }>, Readonly<{ age: number }>]
+  >,
+  Readonly<{ name: string; age: number }>
 >('=');
 
 // Single record type
-expectType<Intersection<[{ x: number; y: string }]>, { x: number; y: string }>(
-  '=',
-);
+expectType<
+  Intersection<readonly [Readonly<{ x: number; y: string }>]>,
+  Readonly<{ x: number; y: string }>
+>('=');

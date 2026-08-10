@@ -51,7 +51,7 @@ export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
  * ```
  */
 export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
-  StrictOmit<T, K> & { [P in K]: T[P] | undefined }
+  StrictOmit<T, K> & Readonly<{ [P in K]: T[P] | undefined }>
 >;
 
 /**
@@ -92,9 +92,8 @@ export type TSTypeForgeInternals_PickUndefined<R extends UnknownRecord> = {
  * @template R - The record type.
  * @returns A new record type with the same keys as `R` but all values as `never`.
  */
-export type TSTypeForgeInternals_MapToNever<R extends UnknownRecord> = {
-  [K in keyof R]: never;
-};
+export type TSTypeForgeInternals_MapToNever<R extends UnknownRecord> =
+  Readonly<{ [K in keyof R]: never }>;
 
 /**
  * Extracts keys from a record `R` that are explicitly marked as optional using the `?` modifier.

@@ -28,7 +28,7 @@ const newUser: UserCreationData = {
   username: 'jane_doe',
   email: 'jane@example.com',
   bio: 'Software Developer', // Optional
-};
+} as const;
 
 // @ts-expect-error 'nonExistentKey' doesn't exist:
 type InvalidOmit = StrictOmit<UserProfile, 'id' | 'nonExistentKey'>;

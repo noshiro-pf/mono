@@ -118,9 +118,9 @@ export type UnionToIntersection<T> = (
  * type Merged = MergeIntersection<{ a: string } & { b: number }>; // { a: string; b: number }
  * ```
  */
-export type MergeIntersection<R extends UnknownRecord> = {
+export type MergeIntersection<R extends UnknownRecord> = Readonly<{
   [K in keyof R]: R[K];
-};
+}>;
 
 /**
  * Excludes falsy values (false, 0, '', null, undefined) from type `A`.

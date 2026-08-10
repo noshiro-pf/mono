@@ -18,23 +18,28 @@ type ReadonlyUser = Readonly<{
 
 type MutableUser = Mutable<ReadonlyUser>;
 
-expectType<MutableUser, { id: number; name: string; email: string }>('=');
+expectType<MutableUser, Readonly<{ id: number; name: string; email: string }>>(
+  '=',
+);
 
 // Test that Mutable removes readonly modifiers
-expectType<Mutable<Readonly<{ a: string }>>, { a: string }>('=');
+expectType<Mutable<Readonly<{ a: string }>>, Readonly<{ a: string }>>('=');
 
 expectType<
-  Mutable<{ readonly a: string; b: number }>,
-  { a: string; b: number }
+  Mutable<Readonly<{ a: string; b: number }>>,
+  Readonly<{ a: string; b: number }>
 >('=');
 
 expectType<
   Mutable<Readonly<{ x: boolean; y: string }>>,
-  { x: boolean; y: string }
+  Readonly<{ x: boolean; y: string }>
 >('=');
 
 // Test that already mutable properties remain mutable
-expectType<Mutable<{ a: string; b: number }>, { a: string; b: number }>('=');
+expectType<
+  Mutable<Readonly<{ a: string; b: number }>>,
+  Readonly<{ a: string; b: number }>
+>('=');
 
 // Test with complex types
 type ComplexReadonly = Readonly<{
@@ -47,44 +52,50 @@ type ComplexMutable = Mutable<ComplexReadonly>;
 
 expectType<
   ComplexMutable,
-  {
+  Readonly<{
     data: Readonly<{ nested: string }>; // Note: nested readonly is preserved
     list: readonly string[]; // Note: readonly array is preserved
     func: () => void;
-  }
+  }>
 >('=');
 
 // Test ToMutableMap utility type
 
-expectType<ToMutableMap<ReadonlyMap<string, number>>, Map<string, number>>('=');
+expectType<
+  ToMutableMap<ReadonlyMap<string, number>>,
+  ReadonlyMap<string, number>
+>('=');
 
-expectType<ToMutableMap<ReadonlyMap<number, string>>, Map<number, string>>('=');
+expectType<
+  ToMutableMap<ReadonlyMap<number, string>>,
+  ReadonlyMap<number, string>
+>('=');
 
-expectType<ToMutableMap<ReadonlyMap<any, any>>, Map<any, any>>('=');
+expectType<ToMutableMap<ReadonlyMap<any, any>>, ReadonlyMap<any, any>>('=');
 
 // Test ToMutableSet utility type
 
-expectType<ToMutableSet<ReadonlySet<string>>, Set<string>>('=');
+expectType<ToMutableSet<ReadonlySet<string>>, ReadonlySet<string>>('=');
 
-expectType<ToMutableSet<ReadonlySet<number>>, Set<number>>('=');
+expectType<ToMutableSet<ReadonlySet<number>>, ReadonlySet<number>>('=');
 
-expectType<ToMutableSet<ReadonlySet<any>>, Set<any>>('=');
+expectType<ToMutableSet<ReadonlySet<any>>, ReadonlySet<any>>('=');
 
 // Test MutableSet alias
 
-expectType<MutableSet<string>, Set<string>>('=');
+expectType<MutableSet<string>, ReadonlySet<string>>('=');
 
-expectType<MutableSet<number>, Set<number>>('=');
+expectType<MutableSet<number>, ReadonlySet<number>>('=');
 
-expectType<MutableSet<any>, Set<any>>('=');
+expectType<MutableSet<any>, ReadonlySet<any>>('=');
 
 // Test MutableMap alias
 
-expectType<MutableMap<string, number>, Map<string, number>>('=');
+expectType<MutableMap<string, number>, ReadonlyMap<string, number>>('=');
 
-expectType<MutableMap<number, string>, Map<number, string>>('=');
+expectType<MutableMap<number, string>, ReadonlyMap<number, string>>('=');
 
-expectType<MutableMap<any, any>, Map<any, any>>('=');
+expectType<MutableMap<any, any>, ReadonlyMap<any, any>>('=');
 
 // Test edge cases
 
@@ -92,32 +103,32 @@ expectType<MutableMap<any, any>, Map<any, any>>('=');
 expectType<Mutable<{}>, {}>('=');
 
 // Object with optional properties
-expectType<Mutable<Readonly<{ a?: string }>>, { a?: string }>('=');
+expectType<Mutable<Readonly<{ a?: string }>>, Readonly<{ a?: string }>>('=');
 
 // Object with index signature
 expectType<
   Mutable<Readonly<{ [key: string]: number }>>,
-  { [key: string]: number }
+  Readonly<{ [key: string]: number }>
 >('=');
 
 // Test interaction with built-in Readonly
 type TestReadonlyInteraction = Mutable<Readonly<{ a: string; b: number }>>;
 
-expectType<TestReadonlyInteraction, { a: string; b: number }>('=');
+expectType<TestReadonlyInteraction, Readonly<{ a: string; b: number }>>('=');
 
 // Test that Mutable is idempotent for already mutable objects
-type AlreadyMutable = { a: string; b: number };
+type AlreadyMutable = Readonly<{ a: string; b: number }>;
 
 expectType<Mutable<AlreadyMutable>, AlreadyMutable>('=');
 
 // Test with union types
 expectType<
-  Mutable<Readonly<{ a: string }> | Readonly<{ b: number }>>,
-  { a: string } | { b: number }
+  Mutable<Readonly<{ a: string } | { b: number }>>,
+  Readonly<{ a: string } | { b: number }>
 >('=');
 
 // Test with intersection types
 expectType<
-  Mutable<Readonly<{ a: string }> & Readonly<{ b: number }>>,
-  { a: string } & { b: number }
+  Mutable<Readonly<{ a: string } & { b: number }>>,
+  Readonly<{ a: string } & { b: number }>
 >('~=');

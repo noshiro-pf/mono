@@ -12,12 +12,13 @@ import {
   expectType<
     MaxLengthString<3>,
     string &
-      Readonly<{
-        MaxLength: 0 | 1 | 2 | 3;
-      }> &
-      Readonly<{
-        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-      }>
+      Readonly<
+        {
+          MaxLength: 0 | 1 | 2 | 3;
+        } & {
+          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+        }
+      >
   >('=');
 
   // Covariance: M <= N implies MaxLengthString<M> <= MaxLengthString<N>
@@ -46,12 +47,13 @@ import {
   expectType<
     MinLengthString<3>,
     string &
-      Readonly<{
-        MinLength: readonly [0, 0, 0, ...0[]];
-      }> &
-      Readonly<{
-        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-      }>
+      Readonly<
+        {
+          MinLength: readonly [0, 0, 0, ...0[]];
+        } & {
+          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+        }
+      >
   >('=');
 
   // M >= N implies MinLengthString<M> <= MinLengthString<N>
@@ -88,15 +90,15 @@ import {
   expectType<
     BoundedLengthString<2, 5>,
     string &
-      Readonly<{
-        MinLength: readonly [0, 0, ...0[]];
-      }> &
-      Readonly<{
-        MaxLength: 0 | 1 | 2 | 3 | 4 | 5;
-      }> &
-      Readonly<{
-        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-      }>
+      Readonly<
+        {
+          MinLength: readonly [0, 0, ...0[]];
+        } & {
+          MaxLength: 0 | 1 | 2 | 3 | 4 | 5;
+        } & {
+          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+        }
+      >
   >('=');
 
   expectType<
@@ -133,15 +135,15 @@ import {
   expectType<
     FixedLengthString<3>,
     string &
-      Readonly<{
-        MinLength: readonly [0, 0, 0, ...0[]];
-      }> &
-      Readonly<{
-        MaxLength: 0 | 1 | 2 | 3;
-      }> &
-      Readonly<{
-        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-      }>
+      Readonly<
+        {
+          MinLength: readonly [0, 0, 0, ...0[]];
+        } & {
+          MaxLength: 0 | 1 | 2 | 3;
+        } & {
+          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+        }
+      >
   >('=');
 
   expectType<FixedLengthString<3>, BoundedLengthString<3, 3>>('=');

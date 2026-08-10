@@ -126,6 +126,7 @@
     "prettier-plugin-packagejson": "3.0.2",
     "rollup": "4.62.4",
     "rollup-plugin-esbuild": "6.2.1",
+    "ts-repo-utils": "10.1.8",
     "tsx": "4.23.4",
     "typedoc": "0.28.20",
     "typedoc-github-theme": "0.4.0",

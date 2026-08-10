@@ -195,7 +195,7 @@ export type ChangeArrayElement<Ar extends readonly unknown[], Elm> =
  */
 type LengthConstraintKeysOf<Ar extends readonly unknown[]> = RelaxedExclude<
   keyof Ar,
-  keyof unknown[] | keyof (readonly unknown[]) | `${number}`
+  keyof (readonly unknown[]) | keyof (readonly unknown[]) | `${number}`
 >;
 
 /**
@@ -220,9 +220,9 @@ type MaxLengthConstraintBrand<Allowed extends number> = Readonly<{
  */
 type CountFixedPrefix<
   Prefix extends readonly unknown[],
-  Counter extends readonly 0[] = [],
+  Counter extends readonly 0[] = readonly [],
 > = Prefix extends readonly [unknown, ...infer Rest]
-  ? CountFixedPrefix<Rest, [...Counter, 0]>
+  ? CountFixedPrefix<Rest, readonly [...Counter, 0]>
   : Counter['length'];
 
 /**
@@ -236,9 +236,9 @@ type CountFixedPrefix<
  */
 type CountContiguousUintUnion<
   Allowed extends number,
-  Counter extends readonly 0[] = [],
+  Counter extends readonly 0[] = readonly [],
 > = [Counter['length']] extends [Allowed]
-  ? CountContiguousUintUnion<Allowed, [...Counter, 0]>
+  ? CountContiguousUintUnion<Allowed, readonly [...Counter, 0]>
   : PreviousLength<Counter>;
 
 /** @internal The length `Counter` had one step earlier. */

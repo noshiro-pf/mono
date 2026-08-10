@@ -55,14 +55,14 @@ expectType<ConstrainedList.Reverse<readonly [1, 2, 3]>, readonly [3, 2, 1]>(
       FixedLengthTuple<3, 1 | 2 | 3> &
       LengthConstraintBrandOf<
         readonly number[] &
+          readonly [1, 2, 3] &
           TSTypeForgeInternals_BrandEncapsulated<
             Readonly<{
               MinLength: MinLengthTuple<2, 0>;
               MaxLength: IndexInclusive<5>;
             }>
           > &
-          MinLengthTuple<2, number> &
-          readonly [1, 2, 3]
+          MinLengthTuple<2, number>
       >
   >('=');
 

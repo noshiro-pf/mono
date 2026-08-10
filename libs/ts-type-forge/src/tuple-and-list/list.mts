@@ -82,7 +82,7 @@ export namespace List {
     ? readonly []
     : IsFixedLengthList<L> extends true
       ? Tuple.Reverse<L>
-      : L extends readonly [unknown, ...(readonly unknown[])]
+      : L extends readonly [unknown, ...unknown[]]
         ? readonly [...Reverse<Tail<L>>, Head<L>]
         : Readonly<L>;
 

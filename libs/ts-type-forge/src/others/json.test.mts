@@ -26,7 +26,7 @@ expectType<bigint, JsonPrimitive>('!<=');
 
 expectType<{}, JsonPrimitive>('!<=');
 
-expectType<[], JsonPrimitive>('!<=');
+expectType<readonly [], JsonPrimitive>('!<=');
 
 // MutableJsonValue
 expectType<string, MutableJsonValue>('<=');
@@ -39,25 +39,27 @@ expectType<null, MutableJsonValue>('<=');
 
 expectType<JsonPrimitive, MutableJsonValue>('<=');
 
-expectType<string[], MutableJsonValue>('<=');
+expectType<readonly string[], MutableJsonValue>('<=');
 
-expectType<number[], MutableJsonValue>('<=');
+expectType<readonly number[], MutableJsonValue>('<=');
 
-expectType<boolean[], MutableJsonValue>('<=');
+expectType<readonly boolean[], MutableJsonValue>('<=');
 
-expectType<null[], MutableJsonValue>('<=');
+expectType<readonly null[], MutableJsonValue>('<=');
 
-expectType<JsonPrimitive[], MutableJsonValue>('<=');
+expectType<readonly JsonPrimitive[], MutableJsonValue>('<=');
 
-expectType<{ a: string }, MutableJsonValue>('<=');
+expectType<Readonly<{ a: string }>, MutableJsonValue>('<=');
 
-expectType<{ a: number; b: boolean[] }, MutableJsonValue>('<=');
+expectType<Readonly<{ a: number; b: readonly boolean[] }>, MutableJsonValue>(
+  '<=',
+);
 
-expectType<{ a: { b: null } }, MutableJsonValue>('<=');
+expectType<Readonly<{ a: Readonly<{ b: null }> }>, MutableJsonValue>('<=');
 
-expectType<MutableJsonValue[], MutableJsonValue>('<=');
+expectType<readonly MutableJsonValue[], MutableJsonValue>('<=');
 
-expectType<{ [k: string]: MutableJsonValue }, MutableJsonValue>('<=');
+expectType<Readonly<{ [k: string]: MutableJsonValue }>, MutableJsonValue>('<=');
 
 expectType<Record<string, MutableJsonValue>, MutableJsonValue>('<=');
 
@@ -110,9 +112,9 @@ expectType<symbol, JsonValue>('!<=');
 
 expectType<bigint, JsonValue>('!<=');
 
-expectType<string[], JsonValue>('<='); // Mutable array IS assignable to readonly array
+expectType<readonly string[], JsonValue>('<='); // Mutable array IS assignable to readonly array
 
-expectType<{ a: string }, JsonValue>('<='); // Mutable object IS assignable to readonly object
+expectType<Readonly<{ a: string }>, JsonValue>('<='); // Mutable object IS assignable to readonly object
 
 expectType<MutableJsonValue, JsonValue>('<='); // MutableJsonValue IS assignable to JsonValue
 
@@ -141,18 +143,20 @@ expectType<bigint, JsonObject>('!<=');
 
 expectType<readonly string[], JsonObject>('!<='); // Array is not an object
 
-expectType<{ a: string }, JsonObject>('<='); // Mutable object IS assignable
+expectType<Readonly<{ a: string }>, JsonObject>('<='); // Mutable object IS assignable
 
 expectType<MutableJsonObject, JsonObject>('<='); // MutableJsonObject IS assignable
 
 expectType<JsonValue, JsonObject>('!<='); // JsonValue includes primitives/arrays
 
 // MutableJsonObject
-expectType<{ a: string }, MutableJsonObject>('<=');
+expectType<Readonly<{ a: string }>, MutableJsonObject>('<=');
 
-expectType<{ a: number; b: boolean[] }, MutableJsonObject>('<=');
+expectType<Readonly<{ a: number; b: readonly boolean[] }>, MutableJsonObject>(
+  '<=',
+);
 
-expectType<{ a: { b: null } }, MutableJsonObject>('<=');
+expectType<Readonly<{ a: Readonly<{ b: null }> }>, MutableJsonObject>('<=');
 
 expectType<Record<string, MutableJsonValue>, MutableJsonObject>('<=');
 
@@ -170,7 +174,7 @@ expectType<symbol, MutableJsonObject>('!<=');
 
 expectType<bigint, MutableJsonObject>('!<=');
 
-expectType<string[], MutableJsonObject>('!<='); // Array is not an object
+expectType<readonly string[], MutableJsonObject>('!<='); // Array is not an object
 
 expectType<readonly string[], MutableJsonObject>('!<=');
 

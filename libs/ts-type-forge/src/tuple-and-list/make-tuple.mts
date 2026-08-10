@@ -12,7 +12,11 @@
  * // type InvalidLength2 = MakeTuple<1.5, boolean>; // Error or unexpected result
  * ```
  */
-export type MakeTuple<N extends number, Elm> = MakeTupleImpl<Elm, `${N}`, []>;
+export type MakeTuple<N extends number, Elm> = MakeTupleImpl<
+  Elm,
+  `${N}`,
+  readonly []
+>;
 
 // https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
 
@@ -77,7 +81,7 @@ type MakeTupleImpl<
           MakeTupleImpl<
             Elm,
             Tail<N>,
-            readonly [...Tile<[Elm], U>, ...Tile<X, 10>]
+            readonly [...Tile<readonly [Elm], U>, ...Tile<X, 10>]
           >
         : never // Should not happen if N is derived from `${number}`
       : never; // Should not happen

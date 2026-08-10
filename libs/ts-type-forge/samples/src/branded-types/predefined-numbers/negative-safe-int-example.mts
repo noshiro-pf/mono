@@ -5,7 +5,8 @@ import { type NegativeSafeInt } from 'ts-type-forge';
 const isNegativeSafeInt = (x: number): x is NegativeSafeInt =>
   Number.isSafeInteger(x) && x < 0;
 
-const priority = (level: NegativeSafeInt) => ({ priority: Math.abs(level) });
+const priority = (level: NegativeSafeInt) =>
+  ({ priority: Math.abs(level) }) as const;
 
 // embed-sample-code-ignore-below
 export { isNegativeSafeInt, priority };

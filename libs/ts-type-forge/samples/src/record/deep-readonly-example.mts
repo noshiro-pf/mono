@@ -2,7 +2,10 @@ import { type DeepReadonly } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
+type Data = Readonly<{
+  a: number;
+  b: Readonly<{ c: readonly string[]; d: ReadonlyMap<number, boolean> }>;
+}>;
 type ReadonlyData = DeepReadonly<Data>;
 // Result: {
 //   readonly a: number;

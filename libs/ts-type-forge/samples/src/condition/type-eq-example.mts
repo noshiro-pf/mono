@@ -4,8 +4,8 @@ import { type TypeEq } from 'ts-type-forge';
 
 type T1 = TypeEq<string, string>; // true
 type T2 = TypeEq<string, number>; // false
-type T3 = TypeEq<{ a: number }, { a: number }>; // true
-type T4 = TypeEq<{ a: number }, { b: number }>; // false
+type T3 = TypeEq<Readonly<{ a: number }>, Readonly<{ a: number }>>; // true
+type T4 = TypeEq<Readonly<{ a: number }>, Readonly<{ b: number }>>; // false
 type T5 = TypeEq<any, string>; // false (usually, depends on TS version specifics)
 type T6 = TypeEq<never, never>; // true
 type T7 = TypeEq<string | number, number | string>; // true

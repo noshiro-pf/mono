@@ -48,7 +48,7 @@ export const reportTupleRewrites = <MessageIds extends string>(
   );
 
   for (const [index, { rewrite, target }] of resolved.entries()) {
-    const replacement = `${target.localName}<${rewrite.typeArgs}>`;
+    const replacement = `${target.localName}<${rewrite.typeArgs}>` as const;
 
     context.report({
       node: rewrite.node,

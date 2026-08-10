@@ -6,9 +6,9 @@ import {
 
 const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 
-type User = { id: UserId };
+type User = Readonly<{ id: UserId }>;
 
-type Product = { id: ProductId };
+type Product = Readonly<{ id: ProductId }>;
 // embed-sample-code-ignore-above
 
 /**

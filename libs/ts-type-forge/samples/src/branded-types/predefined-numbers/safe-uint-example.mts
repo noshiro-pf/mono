@@ -5,7 +5,7 @@ import { type SafeUint } from 'ts-type-forge';
 const isSafeUint = (x: number): x is SafeUint =>
   Number.isSafeInteger(x) && x >= 0;
 
-const fileSize = (bytes: SafeUint) => ({ bytes });
+const fileSize = (bytes: SafeUint) => ({ bytes }) as const;
 const timestamp = (): SafeUint => Date.now() as SafeUint;
 
 // embed-sample-code-ignore-below

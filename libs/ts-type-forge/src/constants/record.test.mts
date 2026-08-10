@@ -6,11 +6,11 @@ import { type UnknownRecord } from './record.mjs';
 expectType<UnknownRecord, ReadonlyRecord<string, unknown>>('=');
 
 // Test that UnknownRecord accepts various object structures
-expectType<{ name: string; age: number }, UnknownRecord>('<=');
+expectType<Readonly<{ name: string; age: number }>, UnknownRecord>('<=');
 
-expectType<{ [key: string]: any }, UnknownRecord>('<=');
+expectType<Readonly<{ [key: string]: any }>, UnknownRecord>('<=');
 
-expectType<{ a: 1; b: 'hello'; c: true }, UnknownRecord>('<=');
+expectType<Readonly<{ a: 1; b: 'hello'; c: true }>, UnknownRecord>('<=');
 
 expectType<{}, UnknownRecord>('<=');
 
@@ -27,7 +27,7 @@ expectType<null, UnknownRecord>('!=');
 
 expectType<undefined, UnknownRecord>('!=');
 
-expectType<[], UnknownRecord>('!=');
+expectType<readonly [], UnknownRecord>('!=');
 
 expectType<() => void, UnknownRecord>('!='); // function type
 

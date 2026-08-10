@@ -11,7 +11,11 @@ type ReadonlyUser = Readonly<{
 type MutableUser = Mutable<ReadonlyUser>;
 // Result: { id: number; name: string; email: string }
 
-const user: MutableUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
+const user: MutableUser = {
+  id: 1,
+  name: 'Alice',
+  email: 'alice@example.com',
+} as const;
 user.name = 'Alice Smith'; // ✓ allowed - property is mutable
 
 // Useful for creating editable versions of readonly data

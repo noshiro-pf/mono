@@ -9,7 +9,7 @@ const safeMath = {
     const result = a + b;
     return isSafeInt(result) ? result : undefined;
   },
-};
+} as const;
 
 // embed-sample-code-ignore-below
 export { isSafeInt, safeMath };

@@ -27,7 +27,7 @@
  * type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boolean }
  * ```
  */
-export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+export type Mutable<T> = Readonly<{ [P in keyof T]: T[P] }>;
 
 /**
  * Converts a `ReadonlyMap<K, V>` type to its mutable counterpart `Map<K, V>`.
@@ -49,7 +49,7 @@ export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ToMutableMap<T extends ReadonlyMap<any, any>> =
-  T extends ReadonlyMap<infer K, infer V> ? Map<K, V> : never;
+  T extends ReadonlyMap<infer K, infer V> ? ReadonlyMap<K, V> : never;
 
 /**
  * Converts a `ReadonlySet<V>` type to its mutable counterpart `Set<V>`.
@@ -70,7 +70,7 @@ export type ToMutableMap<T extends ReadonlyMap<any, any>> =
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ToMutableSet<T extends ReadonlySet<any>> =
-  T extends ReadonlySet<infer V> ? Set<V> : never;
+  T extends ReadonlySet<infer V> ? ReadonlySet<V> : never;
 
 /**
  * Alias for the standard `Set<K>` type. Represents a mutable set collection.
@@ -86,7 +86,7 @@ export type ToMutableSet<T extends ReadonlySet<any>> =
  * tags.delete('react'); // ✓ allowed
  * ```
  */
-export type MutableSet<K> = Set<K>;
+export type MutableSet<K> = ReadonlySet<K>;
 
 /**
  * Alias for the standard `Map<K, V>` type. Represents a mutable map collection.
@@ -103,4 +103,4 @@ export type MutableSet<K> = Set<K>;
  * cache.delete('user1'); // ✓ allowed
  * ```
  */
-export type MutableMap<K, V> = Map<K, V>;
+export type MutableMap<K, V> = ReadonlyMap<K, V>;

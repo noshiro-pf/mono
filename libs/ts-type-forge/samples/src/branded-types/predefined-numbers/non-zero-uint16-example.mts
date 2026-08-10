@@ -5,7 +5,7 @@ import { type NonZeroUint16 } from 'ts-type-forge';
 const isNonZeroUint16 = (x: number): x is NonZeroUint16 =>
   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 16 - 1;
 
-const networkId = (id: NonZeroUint16) => ({ networkId: id });
+const networkId = (id: NonZeroUint16) => ({ networkId: id }) as const;
 
 // embed-sample-code-ignore-below
 export { isNonZeroUint16, networkId };

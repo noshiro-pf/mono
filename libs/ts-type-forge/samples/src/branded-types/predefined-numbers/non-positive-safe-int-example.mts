@@ -5,7 +5,7 @@ import { type NonPositiveSafeInt } from 'ts-type-forge';
 const isNonPositiveSafeInt = (x: number): x is NonPositiveSafeInt =>
   Number.isSafeInteger(x) && x <= 0;
 
-const debt = (amount: NonPositiveSafeInt) => ({ debt: amount });
+const debt = (amount: NonPositiveSafeInt) => ({ debt: amount }) as const;
 
 // embed-sample-code-ignore-below
 export { debt, isNonPositiveSafeInt };

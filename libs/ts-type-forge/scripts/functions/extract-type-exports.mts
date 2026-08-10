@@ -203,6 +203,21 @@ const extractNamespaceTypes = (
 const isWordBoundary = (content: string, i: number): boolean =>
   i === 0 || /\W/u.test(content[i - 1] ?? ' ');
 
+/**
+ * `+1` for an opening delimiter, `-1` for a closing one, `0` otherwise.
+ *
+ * Kept as a function rather than an inline `if`/`else if` so the nesting-depth
+ * bookkeeping stays out of the scanning loops: an `if`/`else if` on the same
+ * character is rewritten to a `switch`, and a `switch` inside those loops then
+ * has to be extracted anyway.
+ */
+const depthDelta = (
+  ch: string | undefined,
+  openers: readonly string[],
+  closers: readonly string[],
+): number =>
+  Number(openers.includes(ch ?? '')) - Number(closers.includes(ch ?? ''));
+
 const skipQuoted = (content: string, startIdx: number): number => {
   const quote = content[startIdx];
 
@@ -239,13 +254,9 @@ const findMatchingBrace = (content: string, startIdx: number): number => {
       continue;
     }
 
-    if (ch === '{') mut_depth += 1;
+    mut_depth += depthDelta(ch, ['{'], ['}']);
 
-    if (ch === '}') {
-      mut_depth -= 1;
-
-      if (mut_depth === 0) return mut_i + 1;
-    }
+    if (ch === '}' && mut_depth === 0) return mut_i + 1;
 
     mut_i += 1;
   }
@@ -342,13 +353,9 @@ const findMatchingGt = (content: string, startIdx: number): number => {
       continue;
     }
 
-    if (ch === '<') mut_depth += 1;
+    mut_depth += depthDelta(ch, ['<'], ['>']);
 
-    if (ch === '>') {
-      mut_depth -= 1;
-
-      if (mut_depth === 0) return mut_i + 1;
-    }
+    if (ch === '>' && mut_depth === 0) return mut_i + 1;
 
     mut_i += 1;
   }
@@ -366,9 +373,7 @@ const extractParamNames = (generic: string): readonly string[] => {
   let mut_bal = 0;
 
   for (const ch of inner) {
-    if (ch === '<' || ch === '(' || ch === '[' || ch === '{') mut_bal += 1;
-
-    if (ch === '>' || ch === ')' || ch === ']' || ch === '}') mut_bal -= 1;
+    mut_bal += depthDelta(ch, ['<', '(', '[', '{'], ['>', ')', ']', '}']);
 
     if (ch === ',' && mut_bal === 0) {
       mut_params.push(mut_curr.trim());

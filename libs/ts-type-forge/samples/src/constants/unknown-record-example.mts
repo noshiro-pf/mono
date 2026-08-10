@@ -16,7 +16,7 @@ const config: UnknownRecord = {
   apiUrl: 'https://api.example.com',
   timeout: 5000,
   retries: 3,
-};
+} as const;
 
 // Unlike `any`, this requires type checking
 // const name = data.name; // Error without type guard

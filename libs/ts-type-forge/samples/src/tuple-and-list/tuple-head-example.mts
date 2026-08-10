@@ -2,9 +2,9 @@ import { type Tuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-type H1 = Tuple.Head<[1, 2, 3]>; // 1
-type H2 = Tuple.Head<[]>; // never
-type H3 = Tuple.Head<[], 'default'>; // 'default'
+type H1 = Tuple.Head<readonly [1, 2, 3]>; // 1
+type H2 = Tuple.Head<readonly []>; // never
+type H3 = Tuple.Head<readonly [], 'default'>; // 'default'
 type H4 = Tuple.Head<readonly string[]>; // string
 
 // embed-sample-code-ignore-below

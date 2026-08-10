@@ -10,7 +10,7 @@ type MutableUserMap = ToMutableMap<ReadOnlyUserMap>; // Map<string, User>
 // Useful when you need to convert readonly collections to mutable ones
 const convertToMutable = (
   readonlyMap: ReadonlyMap<string, number>,
-): Map<string, number> => new Map(readonlyMap);
+): ReadonlyMap<string, number> => new Map(readonlyMap);
 
 // embed-sample-code-ignore-below
 export { convertToMutable };

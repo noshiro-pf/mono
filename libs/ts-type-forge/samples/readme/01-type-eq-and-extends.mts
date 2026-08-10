@@ -4,9 +4,9 @@ import { type TypeEq, type TypeExtends } from 'ts-type-forge';
 // No import needed if using triple-slash directive
 // import type { TypeEq, TypeExtends } from 'ts-type-forge'; // if importing explicitly
 
-type User = { id: number; name: string };
+type User = Readonly<{ id: number; name: string }>;
 
-type Admin = { id: number; name: string; role: 'admin' };
+type Admin = Readonly<{ id: number; name: string; role: 'admin' }>;
 
 // Check exact type equality
 type IsExactMatch = TypeEq<User, Admin>; // false

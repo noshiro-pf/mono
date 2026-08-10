@@ -2,7 +2,10 @@ import { type DeepRequired } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-type PartialData = { a?: number; b?: { c?: string[] } };
+type PartialData = Readonly<{
+  a?: number;
+  b?: Readonly<{ c?: readonly string[] }>;
+}>;
 type RequiredData = DeepRequired<PartialData>;
 // Result: { a: number; b: { c: string[] } }
 

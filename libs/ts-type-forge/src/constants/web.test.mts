@@ -115,20 +115,20 @@ expectType<IsWriteMethod<'PUT'>, true>('=');
 expectType<IsWriteMethod<'GET'>, false>('=');
 
 // Test usage in interface definitions
-type RequestConfig = {
+type RequestConfig = Readonly<{
   method: HTTPRequestMethod;
   url: string;
   data?: unknown;
-};
+}>;
 
 // Test that the interface accepts valid methods
-const _validConfig1: RequestConfig = { method: 'GET', url: '/api' };
+const _validConfig1: RequestConfig = { method: 'GET', url: '/api' } as const;
 
 const _validConfig2: RequestConfig = {
   method: 'POST',
   url: '/api',
   data: { name: 'test' },
-};
+} as const;
 
 // These should be valid assignments (testing type compatibility)
 expectType<typeof _validConfig1.method, HTTPRequestMethod>('<=');

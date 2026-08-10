@@ -2,8 +2,8 @@ import { type BivariantHack } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-type Handler = (arg: { a: string }) => void;
-type SpecificHandler = (arg: { a: string; b: number }) => void;
+type Handler = (arg: Readonly<{ a: string }>) => void;
+type SpecificHandler = (arg: Readonly<{ a: string; b: number }>) => void;
 
 declare const specific: SpecificHandler;
 

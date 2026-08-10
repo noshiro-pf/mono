@@ -6,8 +6,17 @@ ignoreRandomStrings: true
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
-  - dist/**
-  - docs/**
+  - '**/dist/**'
+  - '**/docs/**'
+  - '**/node_modules/**'
+  - '**/coverage/**'
+  - '**/CHANGELOG.md'
+  - '**/test/**'
+  - apps/synstate-docs/public/**
+  - apps/synstate-docs/assets/**
+  - apps/synstate-docs/src/components/data-table-demo/sample-data.mts
+  - '**/prior-art-research.md'
+  - '**/prior-art-and-design-rationale.mdx'
   - agents/common/**
   # --- mono-specific ---
   # Zenn content: Japanese prose published via zenn.dev's GitHub integration.
@@ -22,10 +31,12 @@ words:
   - algo
   - alignat
   - amannn
+  - anthropics
   - apikey
   - argparse
   - asciz
   - astish
+  - astrojs
   - asyncgenerator
   - asynciterable
   - autofix
@@ -35,8 +46,10 @@ words:
   - backlink
   - backprop
   - bbox
+  - bivariance
   - bivariant
   - blueprintjs
+  - brandable
   - browserconfig
   - browserslist
   - buildw
@@ -46,6 +59,7 @@ words:
   - canonicalize
   - cantarell
   - catan
+  - chdir
   - chunkname
   - classnames
   - clsx
@@ -55,6 +69,7 @@ words:
   - codemod
   - compat
   - concat
+  - contravariance
   - cornercut
   - cornernotch
   - counterbore
@@ -64,6 +79,7 @@ words:
   - csstype
   - curr
   - darkgray
+  - darkred
   - datepicker
   - datetime
   - datetimes
@@ -79,6 +95,7 @@ words:
   - elementof
   - elementwise
   - endface
+  - envrc
   - eqeqeq
   - esbuild
   - eslintignore
@@ -86,6 +103,7 @@ words:
   - finishings
   - firestore
   - flaticon
+  - fnmatch
   - foldl
   - foldr
   - fontawesome
@@ -98,6 +116,7 @@ words:
   - fullscreen
   - funcs
   - gantt
+  - gcanti
   - gcloud
   - genindex
   - globl
@@ -120,10 +139,18 @@ words:
   - itemset
   - ituple
   - jamstack
+  - Jotai
+  - Katex
   - keyof
   - keyv
+  - klass
+  - leqc
+  - lerp
+  - lerps
+  - lilpi
   - linebreak
   - lintfix
+  - Maier
   - mathbf
   - mathematica
   - mathit
@@ -137,10 +164,13 @@ words:
   - millis
   - millisec
   - mindepth
+  - misrefactored
   - mnist
+  - mobx
   - monokai
   - monospace
   - msapplication
+  - myorg
   - namespacing
   - nand
   - nargs
@@ -157,7 +187,9 @@ words:
   - nonundoable
   - noprefix
   - noshiro
+  - noto
   - numpy
+  - nums
   - nwes
   - openapi
   - openapitools
@@ -171,6 +203,7 @@ words:
   - pgpassword
   - pguser
   - phantomic
+  - pikachu
   - pixi
   - postbuild
   - postgre
@@ -196,10 +229,15 @@ words:
   - reactapp
   - readonly
   - readonlyness
+  - recombinations
+  - recomputations
   - rectsize
   - recurser
   - redoable
+  - reduxjs
   - relu
+  - resvg
+  - rgba
   - rnjs
   - roboto
   - rocon
@@ -207,21 +245,28 @@ words:
   - rpdev
   - runtimeconfig
   - saas
+  - scanₘ
   - scikit
   - scriptsize
   - scroller
   - segoe
+  - seti
   - setin
+  - sfnt
   - sforall
   - showlog
+  - sindresorhus
   - Stackoverflow
+  - stageₙ
   - stdlib
   - stringification
+  - strs
   - struct
   - substack
   - succ
   - symb
   - syncflow
+  - synstate
   - tatekae
   - tdev
   - temurin
@@ -246,12 +291,21 @@ words:
   - ungroup
   - unist
   - unitcost
+  - unmemoized
   - unplugin
   - unresolve
   - unrs
+  - unshift
   - unshifted
+  - unstringifiable
+  - unstub
+  - unsub
+  - unsubs
+  - uppercased
   - uppercasing
   - uuidv
+  - valtio
+  - valueof
   - varchar
   - vite
   - vitest
@@ -260,10 +314,13 @@ words:
   - wantedly
   - weakref
   - webfonts
+  - whatwg
   - whitespaces
   - wirecut
   - wireit
   - wsrun
+  - xnor
   - ymdhm
   - ymdhms
   - zenn
+  - zustand

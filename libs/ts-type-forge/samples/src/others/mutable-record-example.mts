@@ -3,7 +3,7 @@ import { type MutableRecord } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 type Config = MutableRecord<string, string | number>;
-const settings: Config = { host: 'localhost', port: 3000 };
+const settings: Config = { host: 'localhost', port: 3000 } as const;
 settings['host'] = 'new-host'; // OK
 settings['timeout'] = 5000; // OK
 

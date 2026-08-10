@@ -59,9 +59,11 @@ export type Brand<
   TrueKeys extends string,
   FalseKeys extends string = never,
 > = T &
-  TSTypeForgeInternals_BrandEncapsulated<{
-    readonly [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
-  }>;
+  TSTypeForgeInternals_BrandEncapsulated<
+    Readonly<{
+      [key in FalseKeys | TrueKeys]: key extends TrueKeys ? true : false;
+    }>
+  >;
 
 /**
  * Extracts all keys marked as `true` from a branded type.
@@ -271,8 +273,10 @@ export type IntersectBrand<
  * ```
  */
 export type NormalizeBrandUnion<B extends UnknownBrand> = GetBrandValuePart<B> &
-  TSTypeForgeInternals_BrandEncapsulated<{
-    readonly [
-      key in StrictExclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>
-    ]: B[key];
-  }>;
+  TSTypeForgeInternals_BrandEncapsulated<
+    Readonly<{
+      [
+        key in StrictExclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>
+      ]: B[key];
+    }>
+  >;

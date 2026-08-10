@@ -275,12 +275,11 @@ type RecordUpdatedImplRecordCase<
 > = Path extends readonly [infer Head, ...infer Rest] // Deconstruct the path
   ? Head extends keyof R // Is the head a valid key?
     ? Rest extends RecordPaths<R[Head]> // Is the rest a valid path within the nested value?
-      ? {
-          // Map over the original record keys
-          readonly [Key in keyof R]: Key extends Head // If the key matches the path head
+      ? Readonly<{
+          [Key in keyof R]: Key extends Head // If the key matches the path head
             ? RecordUpdated<R[Head], Rest, ValueAfter> // Recurse to update the nested value
-            : R[Key]; // Otherwise, keep the original value type
-        }
+            : R[Key];
+        }>
       : never // Invalid rest path
     : never // Invalid head key
   : never; // Path should not be empty here (handled in RecordUpdated)
