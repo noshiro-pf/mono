@@ -1,0 +1,236 @@
+# [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
+
+### Bug Fixes
+
+- make CI pass after the pnpm update ([#173](https://github.com/noshiro-pf/github-settings-as-code/issues/173)) ([ea4b287](https://github.com/noshiro-pf/github-settings-as-code/commit/ea4b28730598381e35531fa5c3485422ec8d3a99))
+
+### Features
+
+- stop managing the retired release-bot client-id variables ([#172](https://github.com/noshiro-pf/github-settings-as-code/issues/172)) ([400d7f2](https://github.com/noshiro-pf/github-settings-as-code/commit/400d7f2a0e9f79dc3e129a7f0507df4c4aeb162f))
+
+## [2.0.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.0...v2.0.1) (2026-08-03)
+
+### Bug Fixes
+
+- add REPO_AUTOMATION_BOT_CLIENT_ID to variables ([#169](https://github.com/noshiro-pf/github-settings-as-code/issues/169)) ([05ddd51](https://github.com/noshiro-pf/github-settings-as-code/commit/05ddd51d3fc220a9484365e5ba8707eb3cc65a69))
+
+# [2.0.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.10...v2.0.0) (2026-08-03)
+
+- feat!: rework the CLI and manage Actions / Pages settings as code ([#167](https://github.com/noshiro-pf/github-settings-as-code/issues/167)) ([e6aa0ed](https://github.com/noshiro-pf/github-settings-as-code/commit/e6aa0ed11b42f7b21692e108290236352c49dd12)), closes [#apply-all](https://github.com/noshiro-pf/github-settings-as-code/issues/apply-all) [#backup-all](https://github.com/noshiro-pf/github-settings-as-code/issues/backup-all)
+
+### Bug Fixes
+
+- remove DEPENDABOT_AUTO_MERGE_BOT_CLIENT_ID from variables ([#168](https://github.com/noshiro-pf/github-settings-as-code/issues/168)) ([9ec1bdc](https://github.com/noshiro-pf/github-settings-as-code/commit/9ec1bdc6b61968bd0aa9159a3633231df30acca0))
+
+### BREAKING CHANGES
+
+- bin を 11 個から `repo-settings` 1 個に統合した。
+
+## [1.2.10](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.9...v1.2.10) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#159](https://github.com/noshiro-pf/github-settings-as-code/issues/159)) ([ed4b163](https://github.com/noshiro-pf/github-settings-as-code/commit/ed4b163d96b010eaa6c11da68348656a1d727cdb))
+
+## [1.2.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.8...v1.2.9) (2026-05-13)
+
+### Bug Fixes
+
+- fix dependencies ([#136](https://github.com/noshiro-pf/github-settings-as-code/issues/136)) ([4e39f6e](https://github.com/noshiro-pf/github-settings-as-code/commit/4e39f6e7bcbbc6c05429b86cd53fcd7621adc3d0))
+
+## [1.2.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.7...v1.2.8) (2026-05-10)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#134](https://github.com/noshiro-pf/github-settings-as-code/issues/134)) ([c7c5c0b](https://github.com/noshiro-pf/github-settings-as-code/commit/c7c5c0b13de094cf99e196ec884b94d524fcbe00))
+
+## [1.2.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.6...v1.2.7) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#132](https://github.com/noshiro-pf/github-settings-as-code/issues/132)) ([ef2f6ef](https://github.com/noshiro-pf/github-settings-as-code/commit/ef2f6ef9d05d1535c5e335d094ccf60f96dac0eb))
+
+## [1.2.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.5...v1.2.6) (2026-04-23)
+
+### Bug Fixes
+
+- update deps ([#122](https://github.com/noshiro-pf/github-settings-as-code/issues/122)) ([64e8966](https://github.com/noshiro-pf/github-settings-as-code/commit/64e8966c0a634cde558eff80872272045bb91c28))
+
+## [1.2.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.4...v1.2.5) (2026-04-23)
+
+### Bug Fixes
+
+- bump dotenv from 17.3.1 to 17.4.2 ([#117](https://github.com/noshiro-pf/github-settings-as-code/issues/117)) ([0bfc563](https://github.com/noshiro-pf/github-settings-as-code/commit/0bfc5633bc4ce5965de351a3e4713677359d7f87))
+
+## [1.2.4](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.3...v1.2.4) (2026-04-23)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.13 to 1.2.14 ([#116](https://github.com/noshiro-pf/github-settings-as-code/issues/116)) ([0afba3f](https://github.com/noshiro-pf/github-settings-as-code/commit/0afba3fb2b69eab711558c18b0b3209dd3956ccc))
+
+## [1.2.3](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.2...v1.2.3) (2026-04-13)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.8.0 to 6.9.0 ([#111](https://github.com/noshiro-pf/github-settings-as-code/issues/111)) ([d19c58c](https://github.com/noshiro-pf/github-settings-as-code/commit/d19c58c3d337a01aa7c99d38b6a5cd166609959d))
+
+## [1.2.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.1...v1.2.2) (2026-03-27)
+
+### Bug Fixes
+
+- fix ts-fortress version ([#101](https://github.com/noshiro-pf/github-settings-as-code/issues/101)) ([b458a77](https://github.com/noshiro-pf/github-settings-as-code/commit/b458a77dcc526734004a55649d232de9339a6141))
+
+## [1.2.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.0...v1.2.1) (2026-03-16)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.4.0 to 6.4.1 ([#90](https://github.com/noshiro-pf/github-settings-as-code/issues/90)) ([dda28e1](https://github.com/noshiro-pf/github-settings-as-code/commit/dda28e1f5112d684a7bfd2e76bdbb980a7331041))
+
+# [1.2.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.9...v1.2.0) (2026-03-02)
+
+### Features
+
+- support REPO_NAME env value ([#79](https://github.com/noshiro-pf/github-settings-as-code/issues/79)) ([fa22b34](https://github.com/noshiro-pf/github-settings-as-code/commit/fa22b34012e239e2b0a58eb8abfa15ba84cf3a1a))
+
+## [1.1.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.8...v1.1.9) (2026-02-23)
+
+### Bug Fixes
+
+- bump dotenv from 17.2.3 to 17.3.1 ([#74](https://github.com/noshiro-pf/github-settings-as-code/issues/74)) ([a0961e8](https://github.com/noshiro-pf/github-settings-as-code/commit/a0961e809b58a20fda19b9d3b384f917ddc5f1c7))
+
+## [1.1.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.7...v1.1.8) (2026-02-23)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.8 to 1.2.10 ([#73](https://github.com/noshiro-pf/github-settings-as-code/issues/73)) ([01c0dcc](https://github.com/noshiro-pf/github-settings-as-code/commit/01c0dcc7ddff93e94daf09d39663b0b528d086d1))
+
+## [1.1.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.6...v1.1.7) (2026-02-23)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.5 to 6.4.0 ([#70](https://github.com/noshiro-pf/github-settings-as-code/issues/70)) ([708339c](https://github.com/noshiro-pf/github-settings-as-code/commit/708339c535539f4caf38e764da5031627fafa536))
+
+## [1.1.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.5...v1.1.6) (2026-02-16)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.3.0 to 6.4.0 ([#68](https://github.com/noshiro-pf/github-settings-as-code/issues/68)) ([17c67d1](https://github.com/noshiro-pf/github-settings-as-code/commit/17c67d1c904e01fd4975c7fc9552937e5cbc3bd1))
+
+## [1.1.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.4...v1.1.5) (2026-02-16)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.4 to 6.2.5 ([#69](https://github.com/noshiro-pf/github-settings-as-code/issues/69)) ([897274f](https://github.com/noshiro-pf/github-settings-as-code/commit/897274ffd8bad85c60eff8b6c2f5ebfb4a7d944e))
+
+## [1.1.4](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.3...v1.1.4) (2026-02-10)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.7 to 1.2.8 ([#60](https://github.com/noshiro-pf/github-settings-as-code/issues/60)) ([8082b81](https://github.com/noshiro-pf/github-settings-as-code/commit/8082b81432756a9a07c4776e2331eb8150ea374b))
+
+## [1.1.3](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.2...v1.1.3) (2026-02-10)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.3 to 6.2.4 ([#58](https://github.com/noshiro-pf/github-settings-as-code/issues/58)) ([a9c11ca](https://github.com/noshiro-pf/github-settings-as-code/commit/a9c11ca3cecc1af6780c3f6e815dd1ff2a0b3d60))
+
+## [1.1.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.1...v1.1.2) (2026-02-03)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.2 to 6.2.3 ([#56](https://github.com/noshiro-pf/github-settings-as-code/issues/56)) ([d4bb318](https://github.com/noshiro-pf/github-settings-as-code/commit/d4bb318254195ff6704d00f957dbb0e8d02b2b24))
+
+## [1.1.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.0...v1.1.1) (2026-02-03)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.5 to 1.2.7 ([#54](https://github.com/noshiro-pf/github-settings-as-code/issues/54)) ([226bd84](https://github.com/noshiro-pf/github-settings-as-code/commit/226bd847c312435e8244656f19e5cd0f39463be1))
+
+# [1.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.12...v1.1.0) (2026-01-24)
+
+### Features
+
+- add a variable ([99575b6](https://github.com/noshiro-pf/github-settings-as-code/commit/99575b6719fd4c11bf3430e786c41ba4fe999bca))
+
+## [1.0.12](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.11...v1.0.12) (2026-01-23)
+
+### Bug Fixes
+
+- Change node version requirements ([#42](https://github.com/noshiro-pf/github-settings-as-code/issues/42)) ([6084383](https://github.com/noshiro-pf/github-settings-as-code/commit/608438359f1d2c50b485338ccd4af66c53bea8c1))
+
+## [1.0.11](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.10...v1.0.11) (2026-01-13)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.1.1 to 6.2.1 ([#37](https://github.com/noshiro-pf/github-settings-as-code/issues/37)) ([94d5fc7](https://github.com/noshiro-pf/github-settings-as-code/commit/94d5fc7fc7034f8801aec54a34d8db7e0a894859))
+
+## [1.0.10](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.9...v1.0.10) (2026-01-13)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.0 to 6.2.1 ([#36](https://github.com/noshiro-pf/github-settings-as-code/issues/36)) ([5edbaa1](https://github.com/noshiro-pf/github-settings-as-code/commit/5edbaa1083b6d9454bc4db8daa630c18c0c78b0e))
+
+## [1.0.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.8...v1.0.9) (2026-01-13)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.2 to 1.2.3 ([#35](https://github.com/noshiro-pf/github-settings-as-code/issues/35)) ([942bc04](https://github.com/noshiro-pf/github-settings-as-code/commit/942bc04f28578a4bf946164d9634b2ab39ff3d41))
+
+## [1.0.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.7...v1.0.8) (2026-01-13)
+
+### Bug Fixes
+
+- bump ts-repo-utils from 7.9.5 to 8.0.2 ([#33](https://github.com/noshiro-pf/github-settings-as-code/issues/33)) ([1a48960](https://github.com/noshiro-pf/github-settings-as-code/commit/1a48960f2bb18e2711a4fa1847cac6f684b90d1e))
+
+## [1.0.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.6...v1.0.7) (2025-12-31)
+
+### Bug Fixes
+
+- update dependencies ([267cf9c](https://github.com/noshiro-pf/github-settings-as-code/commit/267cf9c8ecaddc398763f6b424ab7d80571311f2))
+
+## [1.0.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.5...v1.0.6) (2025-11-16)
+
+### Bug Fixes
+
+- use env value for OWNER ([654325e](https://github.com/noshiro-pf/github-settings-as-code/commit/654325e14d8bd4cb7592af1d04e14d43e18836ad))
+- use env value for OWNER ([1d684e4](https://github.com/noshiro-pf/github-settings-as-code/commit/1d684e433a90d4d31e4f0a570e14ddef36649dff))
+
+## [1.0.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.4...v1.0.5) (2025-11-16)
+
+### Bug Fixes
+
+- fix scripts ([86bab71](https://github.com/noshiro-pf/github-settings-as-code/commit/86bab7141f1c0180f6831bcc7dc3b7880af256bc))
+
+## [1.0.4](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.3...v1.0.4) (2025-11-16)
+
+### Bug Fixes
+
+- fix dependencies ([0d4fa0f](https://github.com/noshiro-pf/github-settings-as-code/commit/0d4fa0f69c5485f29b92104da8c4c72ca5ce0c15))
+
+## [1.0.3](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.2...v1.0.3) (2025-11-16)
+
+### Bug Fixes
+
+- fix release config ([18ebe7e](https://github.com/noshiro-pf/github-settings-as-code/commit/18ebe7ee1d1326935e58d533b210269965690bc2))
+
+## [1.0.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.1...v1.0.2) (2025-11-15)
+
+### Bug Fixes
+
+- fix commands ([59d9ec2](https://github.com/noshiro-pf/github-settings-as-code/commit/59d9ec2df1609035fc015fc001c0ee6a2bba158d))
+
+## [1.0.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.0...v1.0.1) (2025-11-15)
+
+### Bug Fixes
+
+- fix scripts ([#9](https://github.com/noshiro-pf/github-settings-as-code/issues/9)) ([91f32e5](https://github.com/noshiro-pf/github-settings-as-code/commit/91f32e549ab33095b2c73bd92b149c72762ce6a2))
+
+# 1.0.0 (2025-11-11)
+
+### Bug Fixes
+
+- fix configs ([#8](https://github.com/noshiro-pf/github-settings-as-code/issues/8)) ([9ef553d](https://github.com/noshiro-pf/github-settings-as-code/commit/9ef553d2d503b78abad3a41232692000358537a8))
+
+### Features
+
+- initialize ([#7](https://github.com/noshiro-pf/github-settings-as-code/issues/7)) ([74c2258](https://github.com/noshiro-pf/github-settings-as-code/commit/74c225800f290dd6cc46f3dc95acc14f553f53a6))
