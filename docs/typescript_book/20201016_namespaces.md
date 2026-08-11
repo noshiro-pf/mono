@@ -4,14 +4,14 @@
 
 用語に関する注意：
 
--   TypeScript 1.5 では、命名法が変更されている
--   「内部モジュール」は「名前空間」になった
--   「外部モジュール」は、ECMAScript 2015 の用語に合わせて、単に「モジュール」になった（つまり、`module X {`は、現在推奨されている`namespace X {`と同等）。
+- TypeScript 1.5 では、命名法が変更されている
+- 「内部モジュール」は「名前空間」になった
+- 「外部モジュール」は、ECMAScript 2015 の用語に合わせて、単に「モジュール」になった（つまり、`module X {`は、現在推奨されている`namespace X {`と同等）。
 
 > This post outlines the various ways to organize your code using namespaces (previously "internal modules”) in TypeScript. As we alluded in our note about terminology, "internal modules” are now referred to as "namespaces”. Additionally, anywhere the `module` keyword was used when declaring an internal module, the `namespace` keyword can and should be used instead. This avoids confusing new users by overloading them with similarly named terms.
 
--   この投稿では、TypeScript で名前空間（以前の「内部モジュール」）を使用してコードを整理するさまざまな方法の概要を説明する。
--   内部モジュールを宣言するときに`module`キーワードが使用された場合は常に、`namespace`キーワードを代わりに使用できる。これにより、同じ名前の用語で新しいユーザーをオーバーロードすることで、新しいユーザーを混乱させることを回避できます。
+- この投稿では、TypeScript で名前空間（以前の「内部モジュール」）を使用してコードを整理するさまざまな方法の概要を説明する。
+- 内部モジュールを宣言するときに`module`キーワードが使用された場合は常に、`namespace`キーワードを代わりに使用できる。これにより、同じ名前の用語で新しいユーザーをオーバーロードすることで、新しいユーザーを混乱させることを回避できます。
 
 ## [First steps](https://www.typescriptlang.org/docs/handbook/namespaces.html#first-steps)
 
@@ -64,13 +64,13 @@ for (let s of strings) {
 
 > As we add more validators, we're going to want to have some kind of organization scheme so that we can keep track of our types and not worry about name collisions with other objects. Instead of putting lots of different names into the global namespace, let's wrap up our objects into a namespace.
 
--   バリデーターをさらに追加していく際、型を管理し名前の衝突を避けるための仕組みが必要
--   グローバル名前空間にたくさんの互いに異なる名前を定義する代わりに、これらのオブジェクトを名前空間に包むことを考える。
+- バリデーターをさらに追加していく際、型を管理し名前の衝突を避けるための仕組みが必要
+- グローバル名前空間にたくさんの互いに異なる名前を定義する代わりに、これらのオブジェクトを名前空間に包むことを考える。
 
 > In this example, we'll move all validator-related entities into a namespace called `Validation`. Because we want the interfaces and classes here to be visible outside the namespace, we preface them with `export`. Conversely, the variables `lettersRegexp` and `numberRegexp` are implementation details, so they are left unexported and will not be visible to code outside the namespace. In the test code at the bottom of the file, we now need to qualify the names of the types when used outside the namespace, e.g. `Validation.LettersOnlyValidator`.
 
--   この例では、`Validation`という名前空間にバリデーター関連のものをすべて移動する。
--   外から使える必要があるものは `export` する
+- この例では、`Validation`という名前空間にバリデーター関連のものをすべて移動する。
+- 外から使える必要があるものは `export` する
 
 ```ts
 namespace Validation {
@@ -124,9 +124,9 @@ for (let s of strings) {
 
 > Here, we'll split our `Validation` namespace across many files. Even though the files are separate, they can each contribute to the same namespace and can be consumed as if they were all defined in one place. Because there are dependencies between files, we'll add reference tags to tell the compiler about the relationships between the files. Our test code is otherwise unchanged.
 
--   `Validation`名前空間をいくつかのファイルに分割する
--   分割しても同じ名前空間にあるかのように使用できる
--   依存関係があるので reference tag を追加しコンパイラにファイル間の関係を教える必要がある
+- `Validation`名前空間をいくつかのファイルに分割する
+- 分割しても同じ名前空間にあるかのように使用できる
+- 依存関係があるので reference tag を追加しコンパイラにファイル間の関係を教える必要がある
 
 [Validation.ts](https://www.typescriptlang.org/docs/handbook/namespaces.html#validationts)
 
@@ -238,8 +238,8 @@ let sq = new polygons.Square(); // Same as 'new Shapes.Polygons.Square()'
 
 > Notice that we don't use the `require` keyword; instead we assign directly from the qualified name of the symbol we're importing. This is similar to using `var`, but also works on the type and namespace meanings of the imported symbol. Importantly, for values, `import` is a distinct reference from the original symbol, so changes to an aliased `var` will not be reflected in the original variable.
 
--   require キーワードを使用しない
--   `var` と似ているが、`import`は元のシンボルとは異なる参照であるためエイリアス変数への変更は元の変数に反映されないという点で異なる。
+- require キーワードを使用しない
+- `var` と似ているが、`import`は元のシンボルとは異なる参照であるためエイリアス変数への変更は元の変数に反映されないという点で異なる。
 
 ## [Working with Other JavaScript Libraries](https://www.typescriptlang.org/docs/handbook/namespaces.html#working-with-other-javascript-libraries)
 

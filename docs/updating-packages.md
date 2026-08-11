@@ -11,8 +11,8 @@ $  pnpm add -D -w  \
         prettier-plugin-packagejson@latest
 ```
 
--   latest recommended configuration: https://github.com/prettier/eslint-plugin-prettier#recommended-configuration
--   https://github.com/prettier/prettier/blob/554b15473dd4032a036d7db91a8f579e624c9822/docs/integrating-with-linters.md
+- latest recommended configuration: https://github.com/prettier/eslint-plugin-prettier#recommended-configuration
+- https://github.com/prettier/prettier/blob/554b15473dd4032a036d7db91a8f579e624c9822/docs/integrating-with-linters.md
 
 ## TypeScript
 

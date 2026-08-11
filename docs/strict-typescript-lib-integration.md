@@ -11,16 +11,16 @@
 
 ## 2 つのリポジトリの規模
 
-| | `mono` | `strict-typescript-lib` |
-| :--- | ---: | ---: |
-| 追跡ファイル | 7,951 | 8,972 |
-| うち生成物（`packages/v*/output*`） | — | 6,907（77%） |
-| コミット | 5,026 | 106 |
-| タグ | 555 | 14 |
-| GitHub Release | 550 | 11 |
-| Release あたりのアセット | 0 | 約 200 |
-| ワークスペースプロジェクト | 17（すべて publish 対象） | 33（**すべて `private: true`**） |
-| `.git` | 69MB | 24MB |
+|                                     |                    `mono` |          `strict-typescript-lib` |
+| :---------------------------------- | ------------------------: | -------------------------------: |
+| 追跡ファイル                        |                     7,951 |                            8,972 |
+| うち生成物（`packages/v*/output*`） |                         — |                     6,907（77%） |
+| コミット                            |                     5,026 |                              106 |
+| タグ                                |                       555 |                               14 |
+| GitHub Release                      |                       550 |                               11 |
+| Release あたりのアセット            |                         0 |                           約 200 |
+| ワークスペースプロジェクト          | 17（すべて publish 対象） | 33（**すべて `private: true`**） |
+| `.git`                              |                      69MB |                             24MB |
 
 `strict-typescript-lib` の中身は、手で書かれた 80 ファイル程度のスクリプトと、そこから生成される 6,907 ファイルの型定義でできている。TypeScript のマイナーバージョンごとに `packages/v5.0` … `packages/v6.0` の 12 系統があり、各系統が `output/`（通常）と `output-branded/`（branded number 版）を持つ。
 
@@ -30,16 +30,16 @@
 
 **現状の重複は実在する。** 両リポジトリのワークフローは同じ 8 本で、内訳は次のとおり。
 
-| ワークフロー | 差分 |
-| :--- | :--- |
-| `lint-pull-request.yml` | 完全一致 |
-| `sync-agent-config.yml` | 完全一致 |
-| `backup-repository-settings.yml` | 1 行 |
-| `release.yml` | 17 行 |
-| `node-version-compatibility.yml` | 18 行 |
-| `style-check.yml` | 21 行 |
-| `type-check.yml` | 44 行 |
-| `pnpm-update.yml` | 48 行 |
+| ワークフロー                     | 差分     |
+| :------------------------------- | :------- |
+| `lint-pull-request.yml`          | 完全一致 |
+| `sync-agent-config.yml`          | 完全一致 |
+| `backup-repository-settings.yml` | 1 行     |
+| `release.yml`                    | 17 行    |
+| `node-version-compatibility.yml` | 18 行    |
+| `style-check.yml`                | 21 行    |
+| `type-check.yml`                 | 44 行    |
+| `pnpm-update.yml`                | 48 行    |
 
 `CLAUDE.md` は完全一致。`agents/common-rules.md` は**既に差分がある** — `sync-agent-config` workflow が `common-agent-config` リポジトリから vendoring する仕組みがあるのに、同期が追いついていない状態。
 
@@ -93,12 +93,12 @@ mono の `libs/*` は「1 ディレクトリ = 1 npm パッケージ」。統合
 
 `strict-typescript-lib` は `oxfmt`、mono は `prettier` + `prettier-plugin-organize-imports` + `prettier-plugin-packagejson`。
 
-| | mono (`.prettierrc`) | strict-typescript-lib (`.oxfmtrc.json`) |
-| :--- | :--- | :--- |
-| `printWidth` | 既定（80） | 80 |
-| import 整列 | `prettier-plugin-organize-imports` | `sortImports` |
-| package.json 整列 | `prettier-plugin-packagejson` | `sortPackageJson` |
-| Markdown `tabWidth` | 4 | 対象外 |
+|                     | mono (`.prettierrc`)               | strict-typescript-lib (`.oxfmtrc.json`) |
+| :------------------ | :--------------------------------- | :-------------------------------------- |
+| `printWidth`        | 既定（80）                         | 80                                      |
+| import 整列         | `prettier-plugin-organize-imports` | `sortImports`                           |
+| package.json 整列   | `prettier-plugin-packagejson`      | `sortPackageJson`                       |
+| Markdown `tabWidth` | 4                                  | 対象外                                  |
 
 出力そのものは近いので、ディレクトリごとにフォーマッタを分ける運用は技術的には可能。ただし `fmt:full` / `style-check` / `assert-repo-is-clean` がすべて分岐を持つことになる。
 
@@ -113,10 +113,10 @@ mono に `.github/workflows/*.yml` を `on: workflow_call` 付きで置き、`st
 ```yaml
 # strict-typescript-lib/.github/workflows/style-check.yml
 jobs:
-  style-check:
-    uses: noshiro-pf/mono/.github/workflows/style-check-reusable.yml@main
-    with:
-      formatter: oxfmt
+    style-check:
+        uses: noshiro-pf/mono/.github/workflows/style-check-reusable.yml@main
+        with:
+            formatter: oxfmt
 ```
 
 差分が大きい `type-check.yml`（44 行）と `pnpm-update.yml`（48 行）は、差分の中身を見てから入力パラメータに落とすか、共通化を諦めるかを決める。完全一致の 2 本と 1 行差の 1 本は即座に共通化できる。
