@@ -122,11 +122,19 @@ const internal = (
   Object.entries(deps).filter(([name]) => names.has(name));
 
 /**
- * The edge set `ts-repo-utils` uses for `ws:build`: `dependencies`,
- * `devDependencies` and `peerDependencies` merged, matched by package name
- * regardless of the specifier.
+ * The edge set `ws:build` orders by: `dependencies` + `peerDependencies`, as
+ * passed to `runCmdInStagesAcrossWorkspaces` via `dependencyFields`. Shown
+ * alongside the graph that includes `devDependencies`, which has no
+ * topological order.
  */
 const buildEdges = (
+  pkg: PackageInfo,
+  names: ReadonlySet<string>,
+): readonly FixedLengthTuple<2, string>[] =>
+  internal({ ...pkg.runtime, ...pkg.peer }, names);
+
+/** Every declared edge, including development-only ones. */
+const allEdges = (
   pkg: PackageInfo,
   names: ReadonlySet<string>,
 ): readonly FixedLengthTuple<2, string>[] =>
@@ -213,16 +221,12 @@ const render = (
 ): string => {
   const rootInternal = internal({ ...root.runtime, ...root.dev }, names);
 
-  const runtimeStages = toStages(packages, (pkg) =>
-    internal({ ...pkg.runtime, ...pkg.peer }, names),
-  );
-
   const buildStages = toStages(packages, (pkg) => buildEdges(pkg, names));
 
+  const allStages = toStages(packages, (pkg) => allEdges(pkg, names));
+
   const linked = packages.filter((pkg) =>
-    internal({ ...pkg.runtime, ...pkg.dev, ...pkg.peer }, names).some(
-      ([, spec]) => spec.startsWith('workspace:'),
-    ),
+    allEdges(pkg, names).some(([, spec]) => spec.startsWith('workspace:')),
   );
 
   return [
@@ -247,14 +251,15 @@ const render = (
     '',
     '## ビルド順',
     '',
-    '`pnpm run ws:build`（`runCmdInStagesAcrossWorkspaces`）は',
-    '`dependencies` + `devDependencies` + `peerDependencies` を 1 つのグラフに',
-    '合成し、**指定子の種類に関わらずパッケージ名だけで**エッジを張る。',
-    'したがって内部パッケージへの devDependency もビルド順を拘束する。',
+    '`pnpm run ws:build` は `runCmdInStagesAcrossWorkspaces` に',
+    "`dependencyFields: ['dependencies', 'peerDependencies']` を渡す。",
+    'ビルドを走らせるのに必要なのは「公開されるソースが型として import する',
+    'パッケージ」だけで、devDependency が指す先（lint・テスト・スクリプトの',
+    'ツールチェーン）は全パッケージのビルドが終わってから使われるためである。',
     '',
-    ...stageTable('実行時依存だけから決まる段階', runtimeStages),
+    ...stageTable('`ws:build` が使う段階', buildStages),
     '',
-    ...stageTable('実際に `ws:build` が使う段階', buildStages),
+    ...stageTable('参考: devDependencies も含めた場合', allStages),
     '',
     '## `workspace:` プロトコルの状況',
     '',
@@ -302,57 +307,71 @@ const render = (
  * document is regenerated as a whole rather than hand-edited.
  */
 const cycleNotes: readonly string[] = [
-  '## なぜ一部だけ npm 版のままなのか',
+  '## 内部依存はすべて `workspace:` である',
   '',
-  'root の依存を `workspace:` にすると、そのパッケージは `dist/` を持つまで',
-  '解決できなくなる。したがって基準は 1 つ:',
+  '自作パッケージを npm の公開版で参照している箇所はもう無い。',
+  '`pnpm install` 直後（`dist/` がまだ 1 つも無い状態）から `pnpm run ws:build`',
+  'が通る。',
   '',
-  '> **`ws:build` より前に動くものが必要とするパッケージは、npm の公開版のまま。**',
+  'これを可能にしているのは 3 つの仕組み。',
   '',
-  '該当するのは 5 つ。',
+  '### 1. `tsx` の解決先をソースへ向ける',
   '',
-  '| パッケージ | `ws:build` より前に必要な理由 |',
-  '| :--- | :--- |',
-  '| `ts-data-forge` | 17 パッケージすべての `scripts/cmd/build.mts` が import する |',
-  '| `ts-repo-utils` | 同上。加えて `check-should-run-type-checks` / `assert-repo-is-clean` を CI がビルド前に実行する |',
-  '| `ts-type-forge` | 上 2 つの実行時依存 |',
-  '| `ts-codemod-lib` | `eslint-config-typed` のビルド中の `gen-rule-type` が実行する |',
-  '| `github-settings-as-code` | `backup-repository-settings` workflow が `repo-settings` をビルドせずに実行する |',
+  'ビルドスクリプトは `ts-repo-utils` や `ts-data-forge` を**実行**する。',
+  'パッケージ名で解決すると `dist/` が要り、`ts-type-forge`（第 1 段階）の',
+  'ビルドが `ts-data-forge`（第 2 段階）を必要とする循環になる。',
   '',
-  'lint ツールチェーン（`eslint-config-typed`、`eslint-plugin-ts-*`）はビルド後に',
-  'しか使わないので `workspace:` にできる。これでリポジトリは自分自身の lint 設定で',
-  'lint されるようになり、変更を publish せずに検証できる。',
+  '`tools/configs/tsconfig.tsx.json` がこれらの名前をソースへ写像し、',
+  'すべての `tsx` 起動が `--tsconfig` でそれを読む。`tsx` がその場で',
+  'トランスパイルするので `dist/` は不要で、import 文は変えずに済む。',
   '',
-  '### ステージランナーに見えない制約を消す',
+  '自作 CLI（`gen-index-ts` / `format-uncommitted` / `repo-settings` …）も',
+  '`node_modules/.bin` の実体ではなく CLI ソースを `tsx` 経由で呼ぶ。',
+  'ビルド前に走る CI ステップ（`check-should-run-type-checks` など）が',
+  'これに当たる。',
   '',
-  'lint ツールチェーンをリンクすると、ランナーが知り得ない順序制約が生まれる。',
-  '各パッケージの build は自分の `tsconfig.json` で型チェックするが、その対象に',
-  'lint 設定が含まれており、lint 設定は lint ツールチェーンを import するためだ。',
-  '`eslint-config-typed` は `ts-data-forge` に依存するので同じ段階以降にしか',
-  'ビルドされず、依存関係として宣言することもできない（宣言すると循環する）。',
+  '### 2. ビルドは公開するものだけを型チェックする',
   '',
-  '解決は「ビルドの型チェック対象から lint 設定を外す」こと。',
+  '`build` から全スコープの `tsc --noEmit` を外した。宣言生成',
+  '（`configs/tsconfig.build.json`、型チェック設定を継承している）が `src/` を',
+  '検証しており、外れるのは test・scripts・configs・lint 設定という',
+  '「後段のツールチェーンを import する support code」だけである。',
   '',
-  '- `eslint.config.mts` を各パッケージの `tsconfig.json` の `include` から除外した。',
-  '  17 パッケージ中 7 つは元々そうなっていた。root の `tsconfig.json` が',
-  '  `./**/eslint.config*.mts` を含むので、型チェック自体は失われない',
-  '- 残る 2 箇所（`ts-data-forge/configs/eslint/`、',
-  '  `eslint-config-typed/scripts/gen-eslint-rules/`）は型のみの import なので、',
-  '  `paths` でソースに解決させた',
-  '- `check-all` の `check:root` を `ws:build` の後ろへ移した',
+  'それらは全パッケージのビルド後に `pnpm run ws:type-check` が検証する',
+  '（`check-all` にも入れてある）。',
   '',
-  '### 各パッケージの devDependency をリンクしない理由',
+  '### 3. ビルド順は実行時依存だけで決める',
   '',
-  'ツールチェーンを root ではなく各パッケージの devDependency として',
-  '`workspace:*` にすると、`ws:build` の順序が決まらなくなる。ランナーが',
-  'devDependency もグラフに含めるため、`ts-data-forge` → `eslint-config-typed` →',
-  '`ts-data-forge` のような循環が必ずできるからだ。',
+  '各パッケージは自分が使うツールチェーンを devDependency として',
+  '`workspace:*` で宣言している。`eslint-config-typed` は `ts-data-forge` に',
+  '依存するので、これは必ず循環する。',
   '',
-  '取りうる手は 2 つ。いずれも未着手:',
+  '`runCmdInStagesAcrossWorkspaces` の `dependencyFields` で',
+  'ビルド順を `dependencies` + `peerDependencies` に限定することで、',
+  '循環した宣言のまま有効な順序が得られる。上の 2 つの段階表を比べると',
+  '効果が分かる。',
   '',
-  '1. `runCmdInStagesAcrossWorkspaces` に「ビルド順は `dependencies` +',
-  '   `peerDependencies` だけで決める」オプションを足す（`ts-repo-utils` 側の変更）',
-  '2. 現状どおり root にまとめておく',
+  'アプリのように**ビルドに必要**な workspace パッケージは、',
+  'devDependencies ではなく `dependencies` に置く必要がある',
+  '（`@synstate/docs` がこれに当たる）。',
+  '',
+  '## 依存を過不足なく宣言する',
+  '',
+  '各パッケージの `eslint.config.mts` は `packageDirs` に自分のディレクトリ',
+  'だけを渡す。root の `package.json` は含めないので、',
+  '`import-x/no-extraneous-dependencies` が「自分で宣言していない import」を',
+  'エラーにする。`scripts/**` と `configs/**` でこのルールを無効化していた',
+  'override も外してある。',
+  '',
+  '検証されない箇所が 1 つだけある: `eslint.config.mts` 自身は',
+  '`eslint-config-typed` が既定で ignore しているため lint されない。',
+  'そこから import する `eslint-config-typed` と `eslint-plugin-ts-*` は',
+  '規約として明示的に宣言している。',
+  '',
+  'バージョンは `pnpm-workspace.yaml` の `catalog:` が単一の情報源。',
+  '各パッケージは `"eslint": "catalog:"` と書く。公開パッケージの',
+  '`dependencies` / `peerDependencies` はそのパッケージの API なので',
+  'カタログ化せず、レンジをそのまま書く。',
   '',
 ];
 

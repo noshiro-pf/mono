@@ -4,17 +4,17 @@
 
 ## 結果
 
-| 項目 | 値 |
-| :--- | :--- |
-| 統合したリポジトリ | 9 |
-| `libs/` の npm パッケージ | 16（+ `apps/synstate-docs`） |
-| コミット | 5025 |
-| タグ | 555（すべて `<repo>/` prefix 付き） |
-| ミラーした GitHub Release | 550 |
-| 追跡ファイル | 7949 |
-| `.git` サイズ | 69MB |
-| 移植した未マージブランチ | 10 |
-| 移送した Issue | 7 |
+| 項目                      | 値                                  |
+| :------------------------ | :---------------------------------- |
+| 統合したリポジトリ        | 9                                   |
+| `libs/` の npm パッケージ | 16（+ `apps/synstate-docs`）        |
+| コミット                  | 5025                                |
+| タグ                      | 555（すべて `<repo>/` prefix 付き） |
+| ミラーした GitHub Release | 550                                 |
+| 追跡ファイル              | 7949                                |
+| `.git` サイズ             | 69MB                                |
+| 移植した未マージブランチ  | 10                                  |
+| 移送した Issue            | 7                                   |
 
 `articles/` `books/` は統合前（`2b25753`）から**差分ゼロ行**。Zenn の公開は無停止。
 
@@ -88,11 +88,11 @@ runtime 依存は `ts-type-forge` を根とする DAG なので安全に結線�
 
 プロトコルは公開時の semver レンジを変えないよう対応させた。`workspace:*` は publish 時に**厳密バージョン**へ展開されるため、一律に使うと公開レンジが狭まる。
 
-| 元の指定 | 変換後 | publish 時 |
-| :--- | :--- | :--- |
-| `^14.1.0` | `workspace:^` | `^14.1.0` |
-| `~9.1.3` | `workspace:~` | `~9.1.3` |
-| 厳密指定 | `workspace:*` | `14.1.0` |
+| 元の指定  | 変換後        | publish 時 |
+| :-------- | :------------ | :--------- |
+| `^14.1.0` | `workspace:^` | `^14.1.0`  |
+| `~9.1.3`  | `workspace:~` | `~9.1.3`   |
+| 厳密指定  | `workspace:*` | `14.1.0`   |
 
 兄弟パッケージへの devDependency は root へ集約した。`linkWorkspacePackages` は既定の `false` のままなので、明示的に `workspace:` と書いたものだけがローカルリンクされる。
 
@@ -147,7 +147,9 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 - [x] Release にパッケージ名の prefix が付いておらずバージョン名だけでは区別がつかないのでリネームする
 - [x] `configs/` `scripts/` を `tools/` へ移動する
 - [x] devDependency の内部依存も npm package 経由から `workspace:*` 指定へ。cycle の解消方法を検討する
-    - 結果は [package-dependencies.md](./package-dependencies.md) に記録した。依存関係の mermaid 図もそこにある
+    - 自作パッケージの npm 公開版への依存は全廃した。`dist/` が 1 つも無い状態から `pnpm run ws:build` が通る
+    - devDependencies は各パッケージへ移し、`packageDirs` から root を外して lint が過不足を検出するようにした。バージョンは `pnpm-workspace.yaml` の `catalog:` で一本化
+    - 結果と理由は [package-dependencies.md](./package-dependencies.md) に記録した。依存関係の mermaid 図もそこにある
 - [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
 
 ### step 2 — 新規対応
@@ -167,7 +169,9 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 ### その他の宿題
 
 - `libs/*/configs/` に残る `rollup.config.mts` / `vitest.config.mts` / `tsconfig/` を `tools/configs/` へ集約する（5 パッケージは `configs/tsconfig/` を自前で持ったまま）
-- 各パッケージの devDependency から、実際に import しているものだけを残す
+- root の `package.json` から、root 自身が使わなくなった devDependency（`rollup` 系・`typedoc` 系・`@vitest/*` など）を落とす。各パッケージ側の宣言は済んでいる
+- `eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない
+- `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
 - `ts-codemod-lib` の `peerDependencies.ts-repo-utils` が `8.1.0` 固定のまま（現行は 10.1.8）。公開レンジが変わるので changeset を切って直す
 - `synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している

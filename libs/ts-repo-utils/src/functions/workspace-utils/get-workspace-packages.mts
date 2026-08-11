@@ -15,7 +15,11 @@ import {
   type ReadonlyRecord,
 } from 'ts-type-forge';
 import { glob } from '../glob.mjs';
-import { type Package } from './types.mjs';
+import {
+  defaultDependencyFields,
+  type DependencyField,
+  type Package,
+} from './types.mjs';
 
 /**
  * Retrieves all workspace packages from a monorepo based on the workspace
@@ -23,11 +27,15 @@ import { type Package } from './types.mjs';
  *
  * @param rootPackageJsonDir - The directory containing the root package.json
  *   file
+ * @param dependencyFields - Which `package.json` fields contribute to each
+ *   package's `dependencies` map. Defaults to
+ *   {@link defaultDependencyFields}.
  * @returns A promise that resolves to an array of Package objects containing
  *   package metadata
  */
 export const getWorkspacePackages = async (
   rootPackageJsonDir: string,
+  dependencyFields: readonly DependencyField[] = defaultDependencyFields,
 ): Promise<readonly Package[]> => {
   // Read root package.json
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -82,11 +90,12 @@ export const getWorkspacePackages = async (
         name: getStrFromJsonValue(packageJson, 'name'),
         path: path.dirname(packagePath),
         packageJson,
-        dependencies: {
-          ...getKeyValueRecordFromJsonValue(packageJson, 'dependencies'),
-          ...getKeyValueRecordFromJsonValue(packageJson, 'devDependencies'),
-          ...getKeyValueRecordFromJsonValue(packageJson, 'peerDependencies'),
-        },
+        dependencies: Object.assign(
+          {},
+          ...dependencyFields.map((field) =>
+            getKeyValueRecordFromJsonValue(packageJson, field),
+          ),
+        ),
       }));
 
     return packageInfos;

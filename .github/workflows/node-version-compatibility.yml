@@ -46,7 +46,7 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        run: pnpm exec check-should-run-type-checks
+        run: pnpm run z:check-should-run-type-checks
 
       - name: Verify installation
         if: steps.check_diff_type.outputs.should_run == 'true'

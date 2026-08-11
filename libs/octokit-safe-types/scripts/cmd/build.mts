@@ -55,13 +55,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
       action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
       successMessage: 'Index files generated',
     });
-
-    await logStep({
-      startMessage: 'Running type checking',
-      action: () =>
-        runCmdStep(`node "${nativeTsc}" --noEmit`, 'Type checking failed'),
-      successMessage: 'Type checking passed',
-    });
   }
 
   await logStep({

@@ -53,13 +53,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
         runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
       successMessage: 'File extensions validated',
     });
-
-    await logStep({
-      startMessage: 'Running type checking',
-      action: () =>
-        runCmdStep(`node "${nativeTsc}" --noEmit`, 'Type checking failed'),
-      successMessage: 'Type checking passed',
-    });
   }
 
   await logStep({

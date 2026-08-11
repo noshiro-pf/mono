@@ -1,6 +1,7 @@
 import { isError } from '@sindresorhus/is';
 import { executeStages } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
+import { defaultDependencyFields, type DependencyField } from './types.mjs';
 
 /**
  * Executes a npm script command across all workspace packages in dependency
@@ -16,6 +17,10 @@ import { getWorkspacePackages } from './get-workspace-packages.mjs';
  *   simultaneously within each stage (default: 3)
  * @param options.filterWorkspacePattern - Optional function to filter packages
  *   by name
+ * @param options.dependencyFields - Which `package.json` fields the ordering
+ *   is derived from. Defaults to {@link defaultDependencyFields}; pass
+ *   `['dependencies', 'peerDependencies']` to order by what has to be built
+ *   first and ignore development-only edges.
  * @returns A promise that resolves when all stages have completed execution
  *   successfully, or rejects immediately on first failure
  */
@@ -24,14 +29,19 @@ export const runCmdInStagesAcrossWorkspaces = async ({
   cmd,
   concurrency = 3,
   filterWorkspacePattern,
+  dependencyFields = defaultDependencyFields,
 }: Readonly<{
   rootPackageJsonDir: string;
   cmd: string;
   concurrency?: number;
   filterWorkspacePattern?: (packageName: string) => boolean;
+  dependencyFields?: readonly DependencyField[];
 }>): Promise<void> => {
   try {
-    const packages = await getWorkspacePackages(rootPackageJsonDir);
+    const packages = await getWorkspacePackages(
+      rootPackageJsonDir,
+      dependencyFields,
+    );
 
     const filteredPackages =
       filterWorkspacePattern === undefined

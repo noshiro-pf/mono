@@ -8,7 +8,6 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
@@ -18,7 +17,7 @@ export default [
   ...eslintConfigForTypeScript({
     tsconfigRootDir: workspaceRootPath,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [workspaceRootPath, projectRootPath],
+    packageDirs: [workspaceRootPath],
   }),
 
   eslintPluginTsTypeForge.configs.recommended,
@@ -91,7 +90,6 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
-      'import-x/no-extraneous-dependencies': 'off',
       // ts-repo-utils' API surface still references `Result` as an ambient
       // type, so narrowing its return values reports as `any` here.
       '@typescript-eslint/no-unsafe-assignment': 'off',

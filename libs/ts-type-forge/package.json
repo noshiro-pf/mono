@@ -43,19 +43,19 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsx ./scripts/cmd/build.mts",
-    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
-    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
-    "doc": "tsx ./scripts/cmd/gen-docs.mts",
-    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
-    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
-    "fmt": "format-uncommitted --cwd .",
-    "fmt:diff": "format-diff-from origin/main --cwd .",
+    "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "gi": "run-s gi:src fmt",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts --exclude entry-point.mts",
+    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "run-p test:*",
@@ -66,8 +66,15 @@
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
   },
   "devDependencies": {
-    "typedoc": "0.28.20",
-    "typedoc-github-theme": "0.4.0"
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "prettier": "catalog:",
+    "ts-data-forge": "workspace:*",
+    "ts-repo-utils": "workspace:*",
+    "typedoc": "catalog:",
+    "typedoc-github-theme": "catalog:",
+    "vite": "catalog:"
   },
   "engines": {
     "node": ">=22.22.2",

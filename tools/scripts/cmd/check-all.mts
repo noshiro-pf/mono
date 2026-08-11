@@ -38,9 +38,17 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Build succeeded',
   });
 
-  // After the build: the root lints itself with the workspace copies of
-  // eslint-config-typed and the eslint-plugin-ts-* packages, which resolve to
-  // their `dist/`.
+  // A package's `build` only type-checks what it publishes; everything else
+  // (tests, scripts, configs, lint config) imports siblings that are built
+  // later, so it is checked here, once every `dist/` exists.
+  await logStep({
+    startMessage: 'Running type checking',
+    action: () => runCmdStep('pnpm run ws:type-check', 'Type checking failed'),
+    successMessage: 'Type checking passed',
+  });
+
+  // The root lints itself with the workspace copies of eslint-config-typed and
+  // the eslint-plugin-ts-* packages, which resolve to their `dist/`.
   await logStep({
     startMessage: 'Checking scripts and configs',
     action: () =>
