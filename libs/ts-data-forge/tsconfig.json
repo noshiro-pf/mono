@@ -1,20 +1,18 @@
 {
   "extends": [
-    "../../configs/tsconfig/tsconfig.type-check.json",
-    "../../configs/tsconfig/tsconfig.vite.json"
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
     "paths": {
-      "ts-data-forge": ["./src/entry-point.mts"]
+      "ts-data-forge": ["./src/entry-point.mts"],
+      // `configs/eslint/` imports a type from eslint-config-typed, which is
+      // workspace-linked and has no `dist/` yet while this package is being
+      // built (both are emitted in the same `ws:build` stage). Resolving it
+      // from source removes that ordering constraint.
+      "eslint-config-typed": ["../eslint-config-typed/src/entry-point.mts"]
     }
   },
-  "include": [
-    "./src",
-    "./test",
-    "./samples",
-    "./scripts",
-    "./configs",
-    "./eslint.config.mts"
-  ]
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
 }

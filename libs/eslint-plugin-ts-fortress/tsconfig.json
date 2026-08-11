@@ -1,7 +1,7 @@
 {
   "extends": [
-    "../../configs/tsconfig/tsconfig.type-check.json",
-    "../../configs/tsconfig/tsconfig.vite.json"
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "include": ["./src", "./scripts", "./configs", "./eslint.config.mts"]
+  "include": ["./src", "./scripts", "./configs"]
 }

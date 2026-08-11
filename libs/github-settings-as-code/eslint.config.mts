@@ -9,7 +9,7 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
+import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 
 const thisDir = import.meta.dirname;
 

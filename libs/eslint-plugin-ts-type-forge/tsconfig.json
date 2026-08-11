@@ -1,7 +1,7 @@
 {
   "extends": [
-    "../../configs/tsconfig/tsconfig.type-check.json",
-    "../../configs/tsconfig/tsconfig.vite.json"
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     // ts-type-forge asserts exact type equality against Node types (e.g.
@@ -12,5 +12,5 @@
       "ts-type-forge": ["../ts-type-forge/src/entry-point.mts"]
     }
   },
-  "include": ["./src", "./scripts", "./configs", "./eslint.config.mts"]
+  "include": ["./src", "./scripts", "./configs"]
 }

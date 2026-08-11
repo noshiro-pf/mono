@@ -7,7 +7,7 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from './scripts/project-root-path.mjs';
+import { projectRootPath } from './tools/scripts/project-root-path.mjs';
 
 export default [
   {
@@ -27,9 +27,9 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  eslintConfigForNodeJs(['scripts/**', 'configs/**']),
+  eslintConfigForNodeJs(['tools/**']),
   {
-    files: ['scripts/**', 'configs/**'],
+    files: ['tools/**'],
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'no-await-in-loop': 'off',

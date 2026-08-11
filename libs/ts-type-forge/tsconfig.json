@@ -1,5 +1,5 @@
 {
-  "extends": ["../../configs/tsconfig/tsconfig.type-check.json"],
+  "extends": ["../../tools/configs/tsconfig/tsconfig.type-check.json"],
   "compilerOptions": {
     // ts-type-forge asserts exact type equality against Node types (e.g.
     // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
@@ -10,12 +10,6 @@
       "ts-type-forge/global": ["./src/global.mts"]
     }
   },
-  "include": [
-    "./src",
-    "./samples",
-    "./scripts",
-    "./configs",
-    "./eslint.config.mts"
-  ],
+  "include": ["./src", "./samples", "./scripts", "./configs"],
   "exclude": ["src/global.mts"]
 }
