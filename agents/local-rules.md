@@ -75,6 +75,20 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
     - The one file this cannot check is `eslint.config.mts` itself, which
       `eslint-config-typed` ignores by default. Declare the packages it imports
       (`eslint-config-typed`, `eslint-plugin-ts-*`) by hand.
+- **`pnpm run knip` covers the other direction: a declared dependency nothing
+  imports.** It also sees imports ESLint does not, such as the ones in
+  `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to
+  `dependencies,unlisted,binaries`. Run `pnpm exec knip` without arguments for
+  the wider report (unused files and exports), which is not enforced.
+    - knip executes each package's vitest config, which imports workspace
+      siblings through their `exports` map, so it needs `pnpm run ws:build`
+      first.
+    - A dependency named as a *string* in a config file rather than imported is
+      invisible to knip. The Prettier plugins are the case here: each package
+      runs `fmt` with its own directory as cwd and resolves them from there,
+      even though only the root `.prettierrc` names them. Add such a dependency
+      to `ignoreDependencies` with the reason rather than deleting it — dropping
+      the Prettier plugins silently stopped import sorting in generated files.
 - **Versions of shared devDependencies live in the `catalog:` block of
   `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
   published package's `dependencies` and `peerDependencies` are its own API, so

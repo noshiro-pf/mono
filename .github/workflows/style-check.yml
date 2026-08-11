@@ -29,6 +29,7 @@ jobs:
           - cspell
           - ws:doc
           - ws:check:ext
+          - knip
 
     steps:
       - name: Checkout
@@ -53,12 +54,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ws:doc and ws:check:ext load each package's sources, which import their
-      # workspace siblings' dist/. Nothing is built yet on a clean checkout, so
-      # these two need the packages emitted first. The other matrix entries do
-      # not touch dist/, so they skip the build.
+      # ws:doc and ws:check:ext load each package's sources, and knip executes
+      # each vitest config; all of them import workspace siblings, which
+      # resolve through their `exports` map to dist/. Nothing is built yet on a
+      # clean checkout, so these need the packages emitted first. The other
+      # matrix entries do not touch dist/, so they skip the build.
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
+        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext' || matrix.command == 'knip'
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"

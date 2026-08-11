@@ -50,11 +50,8 @@
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "7.2.2",
-    "@reduxjs/toolkit": "catalog:",
-    "@types/argparse": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "19.2.4",
-    "argparse": "catalog:",
     "esbuild": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -62,10 +59,11 @@
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jotai": "catalog:",
     "mobx": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
     "rxjs": "catalog:",
     "ts-data-forge": "workspace:*",
-    "ts-repo-utils": "workspace:*",
-    "valtio": "catalog:",
-    "zustand": "catalog:"
+    "ts-repo-utils": "workspace:*"
   }
 }

@@ -70,6 +70,8 @@
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "typedoc": "catalog:",

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+
+  // ESLint (`import-x/no-extraneous-dependencies`, with `packageDirs` set to
+  // the package itself) fails on an import a package does not declare. knip
+  // covers the other direction — a declared dependency nothing imports — plus
+  // the imports ESLint cannot see, such as the ones in `samples/`.
+  //
+  // Run with `pnpm run knip`.
+
+  // Legacy monorepo contents, outside the pnpm workspace. Nothing here is
+  // installed, built or linted.
+  "ignore": ["experimental/**"],
+
+  "ignoreDependencies": [
+    // Used through `pnpm exec zenn preview` only; see the Zenn section of
+    // AGENTS.md.
+    "zenn-cli",
+    // Named as strings in the root `.prettierrc`. Every package runs `fmt`
+    // with its own directory as cwd, so each has to resolve them itself; knip
+    // only sees the root config.
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-packagejson",
+  ],
+
+  // Invoked by `libs/synstate/scripts/cmd/generate-sample-diffs.mts`. A system
+  // binary, not something to install.
+  "ignoreBinaries": ["diff"],
+
+  "workspaces": {
+    ".": {
+      "entry": ["tools/scripts/cmd/*.mts", "tools/configs/*.mts"],
+      "project": ["tools/**/*.mts"],
+    },
+
+    "libs/*": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+
+      // These live under `configs/`, not where each plugin looks by default.
+      "rollup": { "config": ["configs/rollup.config.mts"] },
+      "vitest": {
+        "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
+      },
+      "typedoc": { "config": ["configs/typedoc.config.mjs"] },
+    },
+
+    // Same as `libs/*` — knip replaces a workspace config rather than merging
+    // it, so the shared settings are repeated — plus one exception.
+    "libs/eslint-config-typed": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+      "rollup": { "config": ["configs/rollup.config.mts"] },
+      "vitest": {
+        "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
+      },
+      "typedoc": { "config": ["configs/typedoc.config.mjs"] },
+      "ignoreDependencies": [
+        // Its own `eslint.config.mts` lints the package with the config the
+        // package defines. knip does not follow that self-reference.
+        "eslint-config-typed",
+      ],
+    },
+
+    "apps/*": {
+      "entry": [
+        "src/pages/**/*.{astro,mts,ts,tsx}",
+        "scripts/**/*.mts",
+        "configs/*.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+    },
+  },
+}

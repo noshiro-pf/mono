@@ -150,6 +150,9 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
     - 自作パッケージの npm 公開版への依存は全廃した。`dist/` が 1 つも無い状態から `pnpm run ws:build` が通る
     - devDependencies は各パッケージへ移し、`packageDirs` から root を外して lint が過不足を検出するようにした。バージョンは `pnpm-workspace.yaml` の `catalog:` で一本化
     - 結果と理由は [package-dependencies.md](./package-dependencies.md) に記録した。依存関係の mermaid 図もそこにある
+- [x] knip を導入し、過剰宣言を検出できるようにする
+    - 検出された 59 件の未使用宣言を削除した（root の `rollup` / `typedoc` 系、各パッケージの `markdownlint` / `prettier-plugin-*` など）
+    - `eslint-config-typed` の公開 `dependencies` から `@types/eslint` と `typescript-eslint` も外した
 - [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
 
 ### step 2 — 新規対応
@@ -169,8 +172,8 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 ### その他の宿題
 
 - `libs/*/configs/` に残る `rollup.config.mts` / `vitest.config.mts` / `tsconfig/` を `tools/configs/` へ集約する（5 パッケージは `configs/tsconfig/` を自前で持ったまま）
-- root の `package.json` から、root 自身が使わなくなった devDependency（`rollup` 系・`typedoc` 系・`@vitest/*` など）を落とす。各パッケージ側の宣言は済んでいる
 - `eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない
+- knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
 - `ts-codemod-lib` の `peerDependencies.ts-repo-utils` が `8.1.0` 固定のまま（現行は 10.1.8）。公開レンジが変わるので changeset を切って直す
