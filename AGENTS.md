@@ -561,6 +561,10 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   under `libs/`.
 - `.changeset/` at the repository root is the single source of truth. Never
   create a nested `.changeset/` directory inside a package.
+- **A package's first publish is manual.** The release workflow authenticates
+  through npm trusted publishing, which has to be configured per package and
+  cannot be configured before the package exists on npm. See
+  [libs/first-release.md](../libs/first-release.md).
 - Tags for releases published from this repository are `<package-name>@<version>`.
   Tags prefixed with a repository name (`eslint-config-typed/v5.8.4`,
   `ts-data-forge/ts-data-forge@14.1.0`, …) are imported history from the
