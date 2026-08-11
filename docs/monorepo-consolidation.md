@@ -82,6 +82,8 @@ description を持っていた 2 件は mono 側で PR 化した（#1548, #1549�
 
 **runtime 依存のみ `workspace:` 化し、devDependency は published npm 版のままにした。**
 
+> この判断は統合直後のもので、その後撤回している。現在は devDependency も含めてすべて `workspace:` で、自作パッケージの npm 公開版への依存は残っていない。経緯と現在の規約は [package-dependencies.md](./package-dependencies.md) を参照。
+
 `ts-repo-utils` のステージランナー（`runCmdInStagesAcrossWorkspaces`）は `dependencies` + `devDependencies` + `peerDependencies` を 1 つのグラフに合成し、指定子の種別に関わらずパッケージ名だけでエッジを張る。ツールチェーンは `eslint-config-typed` ↔ `ts-fortress` ↔ `ts-codemod-lib` のように相互依存しており（`ts-repo-utils` は自分自身も devDep に持つ）、これらを workspace リンクすると `ws:build` のトポロジカル順が存在しなくなる。
 
 runtime 依存は `ts-type-forge` を根とする DAG なので安全に結線でき、5 段階のビルドに解決される。
@@ -136,6 +138,21 @@ root の `codemod:full` を取り込み直後のソース全体にかけた結�
 
 vitest browser mode は各テストファイルを Vite dev server 経由で取得するが、並列取得が競合して `Failed to fetch dynamically imported module` が起きる。統合以前から存在し（単体の synstate リポジトリでも再現、失敗ファイルは毎回異なる）、`retry` では解決しない — ファイル自体が読み込めず、再実行すべきテストが存在しないため。ファイルを 1 つずつ取得するよう変更した。
 
+### Release ワークフローが未公開バージョンを取りに行った
+
+`ts-repo-utils` を 10.2.0 へ上げる最初の changeset で、main の Release が `ci:version-packages` で落ちた。
+
+```text
+Package "ts-codemod-lib" must depend on the current version of "ts-repo-utils": "10.1.8" vs "8.1.0"
+[ERR_PNPM_NO_MATCHING_VERSION] No matching version found for ts-repo-utils@10.2.0
+```
+
+`ts-codemod-lib` の `peerDependencies.ts-repo-utils` が `8.1.0`、`devDependencies` が `10.1.8` という**リテラル指定**で残っていた（`workspace:` 化から漏れた唯一の箇所）。changesets はリテラル指定を新バージョンへ書き換えるので、`pnpm install` が未公開の 10.2.0 を npm から取得しようとした。
+
+`workspace:` プロトコルなら changesets は書き換えず、publish 時にレンジへ展開される。両方を `workspace:^` / `workspace:*` にして解消した。
+
+**教訓**: `workspace:` 化の監査は `dependencies` だけでなく `peerDependencies` も対象にする。lint も knip も「宣言の有無」しか見ないので、プロトコルの取り違えは検出できない。
+
 ### `ws:doc` がソースを空にした
 
 `ws:doc` を並列実行すると `libs/ts-data-forge/src/**` の 113 ファイルが 0 バイトになった。単独実行（`pnpm --filter ts-data-forge run doc`）では再現せず、並列時のみ起きる。
@@ -187,6 +204,6 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 - knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
-- `ts-codemod-lib` の `peerDependencies.ts-repo-utils` が `8.1.0` 固定のまま（現行は 10.1.8）。公開レンジが変わるので changeset を切って直す
+- `ts-repo-utils` を上げるたび `ts-codemod-lib` が major になる。changesets は「内部パッケージが peerDependencies に現れる場合、それが上がれば依存側は major」とみなすため。optional peer という現在の意図（CLI を使わない利用者に `ts-repo-utils` を入れさせない）を優先して受け入れている。churn が問題になったら `dependencies` へ移すか、changesets の `onlyUpdatePeerDependentsWhenOutOfRange` を検討する
 - `synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している
 - Codecov 設定を per-package flag つきの 1 本に統合する

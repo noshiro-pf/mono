@@ -1267,8 +1267,8 @@ importers:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
-        specifier: 10.1.8
-        version: 10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3)
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       tsx:
         specifier: 'catalog:'
         version: 4.23.4
@@ -7015,12 +7015,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-data-forge@14.1.0:
-    resolution: {integrity: sha512-0FC08qWgVPbXs4UsmyF08QZ5D0AnaEyyGO7CNp5t9Z+8RevZhTI02BFS/G7GamSLKhWZc7/qWwUhpOexzr6lBQ==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
   ts-declaration-location@1.0.7:
     resolution: {integrity: sha512-EDyGAwH1gO0Ausm9gV6T2nUvBgXT5kGoCMJPllOaooZ+4VvJiKBdZE7wK18N1deEowhcUptS+5GXZK8U/fvpwA==}
     peerDependencies:
@@ -7028,17 +7022,6 @@ packages:
 
   ts-morph@28.0.0:
     resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
-
-  ts-repo-utils@10.1.8:
-    resolution: {integrity: sha512-dbsUuCYCvcuk2zKx08O7GkcyxBBP6R3P5ernEnBopZAHupUuBT6vElvi+9bxzeLAv/Gc3QNJ1qTKGcFyV/PgXA==}
-    engines: {node: '>=22.22.2', pnpm: '>=8.0.0'}
-    hasBin: true
-    peerDependencies:
-      prettier: '>=3.0.0'
-
-  ts-type-forge@9.1.3:
-    resolution: {integrity: sha512-PyBGQTDM2WZezaO/WeWe5J/IeJSLfXdNNvfvNH23Jclxl2B9Z1c3wLFsIdXpx5dT25KkPMy/SWk9Lb2CRwnfHQ==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
@@ -13787,12 +13770,6 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  ts-data-forge@14.1.0(typescript@6.0.3):
-    dependencies:
-      '@sindresorhus/is': 8.1.0
-      ts-type-forge: 9.1.3
-      typescript: 6.0.3
-
   ts-declaration-location@1.0.7(typescript@6.0.3):
     dependencies:
       picomatch: 4.0.5
@@ -13802,24 +13779,6 @@ snapshots:
     dependencies:
       '@ts-morph/common': 0.29.0
       code-block-writer: 13.0.3
-
-  ts-repo-utils@10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3):
-    dependencies:
-      '@nodelib/fs.walk': 3.0.1
-      '@sindresorhus/is': 8.1.0
-      '@types/micromatch': 4.0.10
-      cmd-ts: 0.15.0(supports-color@7.2.0)
-      fast-glob: 3.3.3
-      micromatch: 4.0.8
-      prettier: 3.9.6
-      ts-data-forge: 14.1.0(typescript@6.0.3)
-      ts-type-forge: 9.1.3
-      tsx: 4.23.4
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  ts-type-forge@9.1.3: {}
 
   tslib@1.14.1: {}
 
