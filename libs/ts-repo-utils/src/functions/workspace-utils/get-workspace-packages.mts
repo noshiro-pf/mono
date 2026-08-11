@@ -90,10 +90,9 @@ export const getWorkspacePackages = async (
         name: getStrFromJsonValue(packageJson, 'name'),
         path: path.dirname(packagePath),
         packageJson,
-        dependencies: Object.assign(
-          {},
-          ...dependencyFields.map((field) =>
-            getKeyValueRecordFromJsonValue(packageJson, field),
+        dependencies: Object.fromEntries(
+          dependencyFields.flatMap((field) =>
+            Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
           ),
         ),
       }));

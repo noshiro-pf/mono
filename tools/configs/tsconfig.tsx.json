@@ -1,11 +1,16 @@
 {
-  // Resolution map used by `tsx` while running a package's **build**.
+  // Resolution map used by `tsx` while running a package's **build**, and by
+  // the root `z:*` scripts that run our own CLIs from source.
   //
   // The library sources import their siblings by package name, and those names
   // resolve to `dist/`, which does not exist yet during a build from a clean
   // checkout. Pointing them at the sources instead lets `tsx` transpile
   // everything on the fly, so `pnpm run ws:build` needs nothing built
   // beforehand and no published copy of our own packages.
+  //
+  // Every workspace package reachable from a source-run entry point needs an
+  // entry here — `z:repo-settings` runs `github-settings-as-code`'s `src/`,
+  // which reaches `ts-fortress` and `octokit-safe-types`.
   //
   // Passed explicitly: `tsx --tsconfig ../../tools/configs/tsconfig.tsx.json`.
   // Only affects that process; type-checking uses each package's own tsconfig.
@@ -15,7 +20,9 @@
       "ts-type-forge": ["libs/ts-type-forge/src/index.mts"],
       "ts-data-forge": ["libs/ts-data-forge/src/entry-point.mts"],
       "ts-repo-utils": ["libs/ts-repo-utils/src/entry-point.mts"],
-      "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"]
+      "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
+      "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
+      "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"]
     }
   }
 }
