@@ -64,6 +64,12 @@ git filter-repo --to-subdirectory-filter libs/<repo> --tag-rename ":<repo>/"
 
 `main` から到達できないブランチで切られた alpha プレリリース 3 件（`ts-codemod-lib/v1.4.0-alpha.1`・`.2`、`ts-repo-utils/v9.0.0-alpha.1`）はタグ自体が存在しないため作成していない。archive した旧リポジトリで引き続き参照できる。
 
+ミラー直後は Release のタイトルが元のまま（`v5.8.4` 等）で、550 件中 490 件がバージョン番号だけだった。1 リポジトリ 1 パッケージだった時代の semantic-release 由来のもので、mono の Releases 一覧ではどのパッケージのリリースか判別できない。**タイトルを changesets が発行するものと同じ `<package>@<version>` 形式に統一した。**
+
+パッケージ名はリポジトリ名から決め打ちせず、各リリースのタグが指す `libs/<repo>/package.json` の `name` を読んで解決した（`v*` タグの全期間で名前のブレはなかった）。
+
+タグ側は `<repo>/v5.8.4` のまま据え置いた。既に prefix で識別できており、リネームすると 490 本の作成と削除に加えて Release の紐付け直しが必要になる。旧リポジトリ由来であることが形式から分かる利点もある。
+
 ### 未マージブランチの移植
 
 当初の取り込みは `--single-branch --branch main` だったため他のブランチは入っていない。10 本を `migrate/<repo>--<branch>` として現在の `main` の上へパッチとして再生した。パスは新レイアウトへ写像し、`pnpm-lock.yaml` と `.cspell.config.yaml` は除外している（前者は再生成、後者は root が 9 リポジトリ分の統合辞書なので差分の文脈が一致しない）。17 コミット中 16 が適用でき、残る 1 件は辞書のみを変更するコミットだった。
@@ -140,7 +146,6 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 - `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
 - `strict-typescript-lib` を導入する
-- Release にパッケージ名の prefix が付いておらずバージョン名だけでは区別がつかないのでリネームする
 - `pnpm-update` workflow を更新する
     - `main` が進んだら追従、を日次で実行する
     - 週次実行時、先週の分がマージされていなかったら新規 PR を作成せずそれを更新する
