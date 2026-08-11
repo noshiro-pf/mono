@@ -14,6 +14,12 @@
       }
     },
     {
+      "files": ["articles/**/*.{md,mdx}"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
       "files": ["libs/eslint-config-typed/src/types/rules/*.mts"],
       "options": {
         "plugins": [

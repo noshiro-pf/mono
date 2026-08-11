@@ -86,7 +86,7 @@ Flat Config は config の拡張を行う際に eslint 独自の `extend` によ
 
 ESLint にはコードフォーマットに関するルールも含まれていますが、フォーマッティングに関するエラーがエディタに表示されるのは邪魔ですし [prettier](https://prettier.io/) で行った方が速いので [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier) でオフにします。
 
-prettier でフォーマットしたときに差分が出る部分に eslint で警告を出せる [eslint-plugin-prettier]() という plugin も存在しますが、これは現在公式で非推奨[^eslint-plugin-prettier]になっているので使いません。
+prettier でフォーマットしたときに差分が出る部分に eslint で警告を出せる [eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier) という plugin も存在しますが、これは現在公式で非推奨[^eslint-plugin-prettier]になっているので使いません。
 
 [^eslint-plugin-prettier]: https://prettier.io/docs/en/integrating-with-linters.html#notes
 

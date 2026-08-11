@@ -32,7 +32,7 @@ numeric input の設計を考える上で、まず React の **controlled compon
     return (
       <div>
         <div>{'controlled input'}</div>
-        <input type='text' value={str} onChange={onChange} />
+        <input type="text" value={str} onChange={onChange} />
         <div>{str}</div>
       </div>
     );
@@ -55,7 +55,7 @@ numeric input の設計を考える上で、まず React の **controlled compon
       <div>
         <div>
           <div>{'uncontrolled input'}</div>
-          <input type='text' ref={inputRef} defaultValue={''} />
+          <input type="text" ref={inputRef} defaultValue={''} />
         </div>
         <div>
           <button type={'submit'} onClick={submit}>
@@ -172,7 +172,7 @@ const NumericInputControlled = React.memo<Props>(({ value, onChange }) => {
     [],
   );
 
-  return <input type='number' value={value} onChange={handleChange} />;
+  return <input type="number" value={value} onChange={handleChange} />;
 });
 
 const App = () => {
@@ -396,8 +396,8 @@ https://playcode.io/2136118
 
     return (
       <input
-        type='number'
-        className='numeric-input'
+        type="number"
+        className="numeric-input"
         disabled={disabled}
         value={value}
         min={min}
