@@ -580,6 +580,15 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
     - The one file this cannot check is `eslint.config.mts` itself, which
       `eslint-config-typed` ignores by default. Declare the packages it imports
       (`eslint-config-typed`, `eslint-plugin-ts-*`) by hand.
+- **`pnpm run lint:published-deps` checks what the packages publish.** A module
+  under `src/` may only import what a consumer is given — `dependencies` and
+  `peerDependencies`, never a devDependency. `files` ships `src` alongside
+  `dist` so that "Go to Definition" lands in the original source, which makes
+  this true of type-only imports as well.
+    - Its blind spot is `@types/*`: nothing imports `@types/micromatch` by
+      name, so the rule cannot know that `micromatch` needs it. When a runtime
+      dependency carries no types of its own, put its `@types` package in
+      `dependencies` by hand.
 - **`pnpm run knip` covers the other direction: a declared dependency nothing
   imports.** It also sees imports ESLint does not, such as the ones in
   `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to

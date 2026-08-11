@@ -30,6 +30,7 @@ jobs:
           - ws:doc
           - ws:check:ext
           - knip
+          - lint:published-deps
 
     steps:
       - name: Checkout

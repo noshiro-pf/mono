@@ -193,6 +193,42 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 `pnpm run --recursive` は既定で 4 パッケージを同時実行し、その中で vitest がさらに並列化する。17 パッケージでは CPU を過剰購読し、`eslint-config-typed` の typed-lint テストが 20 秒のタイムアウトを超えた（単独実行では 2.7 秒）。workspace レベルを直列化した。実際の並列性は各パッケージ内の vitest が持っているため、コストはほぼない。
 
+### 型のみの依存をどちらに置くか
+
+`libs/*` の `package.json` は `files` に `dist` だけでなく **`src` も含めている**。
+`declarationMap` が有効なので、利用者のエディタで定義ジャンプすると
+`dist/*.d.mts.map` を辿って `node_modules/<pkg>/src/*.mts` が開く。ジャンプ先で
+元のソースが読めるようにするための意図的な設計。
+
+したがって公開面は 3 つある。
+
+| 公開面            | 何のために要るか   |
+| :---------------- | :----------------- |
+| `dist/**/*.mjs`   | 実行               |
+| `dist/**/*.d.mts` | 利用者の型チェック |
+| `src/**`          | 定義ジャンプ先     |
+
+3 番目があるので、判断基準はこうなる。
+
+> **`src/` が import するものは、値でも型でも `dependencies`（または
+> `peerDependencies`）に置く。** devDependencies は利用者にインストールされない
+> ので、ジャンプ先のソースで解決できなくなる。
+
+具体例:
+
+- `@types/estree`（`eslint-config-typed`）— 公開 `.d.mts` には露出しないが、
+  `src/plugins/ts-restrictions/rules/no-restricted-syntax.mts` が import する。
+  → `dependencies`
+- `@types/micromatch`（`ts-repo-utils`）— 同様。`src/functions/gen-index.mts` の
+  `import micromatch from 'micromatch'` に型を与える。→ `dependencies`
+- `tsx`（`ts-repo-utils`）— `src/` から一切参照されない。→ `devDependencies`
+- `ts-type-forge` — emit された `.d.mts` が `import("ts-type-forge").StrictOmit<…>`
+  の形で明示的に名前を出す。→ `dependencies` 必須
+
+`lint:published-deps` はこの基準をほぼ機械的に検査するが、**`@types/*` は盲点**。
+`import @types/micromatch` と書く箇所は存在せず、「`micromatch` が自前の型を
+持たない」という暗黙の関係なので、ルールからは見えない。実験して確認済み。
+
 ## 今後の作業予定
 
 ### step 1 — mono の初期整備

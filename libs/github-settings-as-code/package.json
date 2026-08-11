@@ -64,6 +64,7 @@
     "octokit-safe-types": "workspace:^",
     "ts-data-forge": "workspace:^",
     "ts-fortress": "workspace:^",
+    "ts-repo-utils": "workspace:^",
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
@@ -81,7 +82,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "ts-repo-utils": "workspace:*",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-native": "npm:typescript@7.0.2",

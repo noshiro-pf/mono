@@ -85,8 +85,10 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "@eslint/core": "^1.2.1",
     "@sindresorhus/is": "^8.1.0",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/estree": "^1.0.9",
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
     "@typescript-eslint/type-utils": "^8.65.0",
@@ -123,11 +125,9 @@
     "tsutils": "^3.21.0"
   },
   "devDependencies": {
-    "@eslint/core": "1.2.1",
     "@rollup/plugin-replace": "catalog:",
     "@rollup/plugin-strip": "catalog:",
     "@rollup/plugin-typescript": "catalog:",
-    "@types/estree": "1.0.9",
     "@types/is-glob": "4.0.4",
     "@types/json-schema": "7.0.15",
     "@types/micromatch": "4.0.10",
