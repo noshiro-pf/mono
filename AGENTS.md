@@ -498,16 +498,19 @@ In addition to the common instructions above (vendored into `agents/common-rules
 
 - `libs/*` — published npm packages, one directory per package.
 - `apps/*` — applications.
-- `tools/*` — internal tooling packages.
-- `configs/` — shared TypeScript / Vite / Rollup config used by the root and by packages.
-- `scripts/cmd/` — repository-level `tsx` commands (`check-all`, `ws-build-stages`, agent config sync, …).
+- `tools/` — repository-level tooling. Not published.
+    - `tools/configs/` — shared TypeScript / Vite config used by the root and by packages.
+    - `tools/scripts/cmd/` — repository-level `tsx` commands (`check-all`, `ws-build-stages`, agent config sync, …).
 - `github/` — declarative GitHub repository settings, applied via `github-settings-as-code`.
 - `articles/` — Zenn articles. **See "Zenn" below.**
 - `books/` — Zenn books. **See "Zenn" below.**
 - `docs/` — loose prose notes. Not linted, not part of the build.
 - `experimental/` — legacy code. **See "experimental/" below.**
 
-Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace members (`pnpm-workspace.yaml`).
+Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace globs
+(`pnpm-workspace.yaml`), and a directory only becomes a member if it has a
+`package.json`. `tools/configs/` and `tools/scripts/` deliberately have none —
+they are plain directories consumed by relative path, not packages.
 
 ### Zenn
 

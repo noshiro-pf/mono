@@ -1,7 +1,7 @@
 {
   "extends": [
-    "../../../configs/tsconfig/tsconfig.build.json",
-    "../../../configs/tsconfig/tsconfig.vite.json"
+    "../../../tools/configs/tsconfig/tsconfig.build.json",
+    "../../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "lib": ["ESNext"],

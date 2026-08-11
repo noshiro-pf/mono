@@ -1,5 +1,5 @@
 {
-  "extends": "../../../configs/tsconfig/tsconfig.build.json",
+  "extends": "../../../tools/configs/tsconfig/tsconfig.build.json",
   "compilerOptions": {
     // ts-type-forge asserts exact type equality against Node globals; the DOM
     // lib resolves them to the DOM shapes instead. Needed here as well as in

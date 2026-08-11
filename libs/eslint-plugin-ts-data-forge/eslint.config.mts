@@ -8,7 +8,7 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
+import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [

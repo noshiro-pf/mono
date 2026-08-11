@@ -10,7 +10,7 @@ import {
   type EslintTsDataForgeRules,
 } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
+import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 /**

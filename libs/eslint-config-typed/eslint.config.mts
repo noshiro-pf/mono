@@ -13,7 +13,7 @@ import {
   eslintPluginTsTypeForge,
   type EslintTsTypeForgeRules,
 } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
+import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 
 const thisDir = import.meta.dirname;
 
