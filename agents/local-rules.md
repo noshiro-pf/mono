@@ -15,6 +15,14 @@ In addition to the common instructions above (vendored into `agents/common-rules
 - `docs/` — loose prose notes. Not linted, not part of the build.
 - `experimental/` — legacy code. **See "experimental/" below.**
 
+**There is one `.gitignore`, at the repository root** (`experimental/` keeps its
+own, being outside the workspace). Do not add one to a package: Prettier reads
+`.gitignore` and `.prettierignore` from the root and nowhere else, so a pattern
+in a package-level file would keep git quiet while `fmt:full` went on
+reformatting the generated files anyway. Generated TypeDoc output is listed at
+the root per package, because `libs/eslint-config-typed/docs` and
+`libs/synstate/docs` hold hand-written prose and must stay tracked.
+
 Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace globs
 (`pnpm-workspace.yaml`), and a directory only becomes a member if it has a
 `package.json`. `tools/configs/` and `tools/scripts/` deliberately have none —
