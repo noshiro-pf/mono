@@ -1524,9 +1524,6 @@ importers:
       '@sindresorhus/is':
         specifier: ^8.1.0
         version: 8.1.0
-      '@types/micromatch':
-        specifier: ^4.0.10
-        version: 4.0.10
       cmd-ts:
         specifier: ^0.15.0
         version: 0.15.0(supports-color@7.2.0)
@@ -1542,9 +1539,6 @@ importers:
       ts-type-forge:
         specifier: workspace:^
         version: link:../ts-type-forge
-      tsx:
-        specifier: ^4.23.4
-        version: 4.23.4
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 'catalog:'
@@ -1552,6 +1546,9 @@ importers:
       '@rollup/plugin-strip':
         specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
+      '@types/micromatch':
+        specifier: 4.0.10
+        version: 4.0.10
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -1606,6 +1603,9 @@ importers:
       rollup-plugin-esbuild:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.4
       typedoc:
         specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)

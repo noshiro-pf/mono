@@ -88,17 +88,16 @@
   "dependencies": {
     "@nodelib/fs.walk": "^3.0.1",
     "@sindresorhus/is": "^8.1.0",
-    "@types/micromatch": "^4.0.10",
     "cmd-ts": "^0.15.0",
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
     "ts-data-forge": "workspace:^",
-    "ts-type-forge": "workspace:^",
-    "tsx": "^4.23.4"
+    "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "catalog:",
     "@rollup/plugin-strip": "catalog:",
+    "@types/micromatch": "4.0.10",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
@@ -117,6 +116,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-esbuild": "catalog:",
+    "tsx": "catalog:",
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
     "typescript": "catalog:",
