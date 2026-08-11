@@ -140,19 +140,33 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 
 `pnpm run --recursive` は既定で 4 パッケージを同時実行し、その中で vitest がさらに並列化する。17 パッケージでは CPU を過剰購読し、`eslint-config-typed` の typed-lint テストが 20 秒のタイムアウトを超えた（単独実行では 2.7 秒）。workspace レベルを直列化した。実際の並列性は各パッケージ内の vitest が持っているため、コストはほぼない。
 
-## 今後の作業予定（暫定）
+## 今後の作業予定
 
-- devDependency の内部依存も npm package 経由から `workspace:*` 指定へ。cycle の解消方法を検討する
-- `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
-    - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
-- `strict-typescript-lib` を導入する
-- `pnpm-update` workflow を更新する
+### step 1 — mono の初期整備
+
+- [x] Release にパッケージ名の prefix が付いておらずバージョン名だけでは区別がつかないのでリネームする
+- [x] `configs/` `scripts/` を `tools/` へ移動する
+- [x] devDependency の内部依存も npm package 経由から `workspace:*` 指定へ。cycle の解消方法を検討する
+    - 結果は [package-dependencies.md](./package-dependencies.md) に記録した。依存関係の mermaid 図もそこにある
+- [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
+
+### step 2 — 新規対応
+
+- [ ] `strict-typescript-lib` を導入する
+    - リポジトリ統合の可否は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) で検討した（結論: 統合しない）
+- [ ] `pnpm-update` workflow を更新する
     - `main` が進んだら追従、を日次で実行する
     - 週次実行時、先週の分がマージされていなかったら新規 PR を作成せずそれを更新する
+    - 現在の `pnpm-update.yml` は存在しない `update-packages` script を呼んでいる
+
+### step 3 — 旧 mono の復元
+
+- [ ] `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
+    - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
 
 ### その他の宿題
 
-- `libs/*/configs/` に残る `rollup.config.mts` / `vitest.config.mts` / `tsconfig/` を root へ集約する
+- `libs/*/configs/` に残る `rollup.config.mts` / `vitest.config.mts` / `tsconfig/` を `tools/configs/` へ集約する（5 パッケージは `configs/tsconfig/` を自前で持ったまま）
 - 各パッケージの devDependency から、実際に import しているものだけを残す
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
 - `ts-codemod-lib` の `peerDependencies.ts-repo-utils` が `8.1.0` 固定のまま（現行は 10.1.8）。公開レンジが変わるので changeset を切って直す
