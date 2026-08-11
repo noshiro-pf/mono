@@ -2,14 +2,14 @@
 
 [![npm version](https://img.shields.io/npm/v/ts-data-forge.svg)](https://www.npmjs.com/package/ts-data-forge)
 [![npm downloads](https://img.shields.io/npm/dm/ts-data-forge.svg)](https://www.npmjs.com/package/ts-data-forge)
-[![License](https://img.shields.io/npm/l/ts-data-forge.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/ts-data-forge/branch/main/graph/badge.svg?token=69TA40HACZ)](https://codecov.io/gh/noshiro-pf/ts-data-forge)
+[![License](https://img.shields.io/npm/l/ts-data-forge.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-data-forge/LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg)](https://codecov.io/gh/noshiro-pf/mono)
 
 **ts-data-forge** is a TypeScript utility library that provides type-safe functional programming utilities with zero runtime dependencies. It aims to enhance development robustness, maintainability, and correctness by leveraging TypeScript's powerful type system.
 
 ## Perfect Companion to ts-type-forge
 
-**ts-data-forge** is designed as the ideal runtime companion to [**ts-type-forge**](https://github.com/noshiro-pf/ts-type-forge), a powerful type utility library. While ts-type-forge provides compile-time type utilities for advanced TypeScript type manipulation, ts-data-forge complements it with runtime utilities that maintain the same level of type safety.
+**ts-data-forge** is designed as the ideal runtime companion to [**ts-type-forge**](https://github.com/noshiro-pf/mono/tree/main/libs/ts-type-forge), a powerful type utility library. While ts-type-forge provides compile-time type utilities for advanced TypeScript type manipulation, ts-data-forge complements it with runtime utilities that maintain the same level of type safety.
 
 Together, they form a complete TypeScript development toolkit:
 
@@ -76,7 +76,7 @@ ts-data-forge works best with strict TypeScript settings:
 
 ## Core Modules
 
-### 🎯 [Functional Programming](./documents/functional.md)
+### 🎯 [Functional Programming](https://noshiro-pf.github.io/ts-data-forge/)
 
 Essential FP utilities for cleaner, more reliable code.
 
@@ -108,7 +108,7 @@ Type-safe array and tuple utilities with functional programming patterns.
 - **Array Utils** - Comprehensive array manipulation functions
 - **Tuple Utils** - Type-safe tuple operations with compile-time guarantees
 
-### 📦 [Collections](./documents/collections.md)
+### 📦 [Collections](https://noshiro-pf.github.io/ts-data-forge/)
 
 Immutable data structures for safer state management.
 
@@ -677,8 +677,8 @@ export default defineConfig({
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/noshiro-pf/mono/blob/main/libs/ts-data-forge/CONTRIBUTING.md) for detailed guidelines on how to contribute to this project.
 
 ## License
 
-This project is licensed under the [Apache License 2.0](./LICENSE).
+This project is licensed under the [Apache License 2.0](https://github.com/noshiro-pf/mono/blob/main/libs/ts-data-forge/LICENSE).

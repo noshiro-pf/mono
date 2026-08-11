@@ -7,8 +7,8 @@
 - API reference: <https://noshiro-pf.github.io/ts-repo-utils/>
 
 [![npm downloads](https://img.shields.io/npm/dm/ts-repo-utils.svg)](https://www.npmjs.com/package/ts-repo-utils)
-[![License](https://img.shields.io/npm/l/ts-repo-utils.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/ts-repo-utils/graph/badge.svg?token=S4688Q0CX3)](https://codecov.io/gh/noshiro-pf/ts-repo-utils)
+[![License](https://img.shields.io/npm/l/ts-repo-utils.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-repo-utils/LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=S4688Q0CX3)](https://codecov.io/gh/noshiro-pf/mono)
 
 Utilities for TypeScript Repositories.
 

@@ -2,8 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
 [![npm downloads](https://img.shields.io/npm/dm/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
-[![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/ts-codemod-lib/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/ts-codemod-lib)
+[![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/mono)
 
 A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the [ts-morph](https://github.com/dsherret/ts-morph).
 
@@ -98,7 +98,7 @@ type User2 = Readonly<{
 }>;
 ```
 
-For more detailed transformation examples, see the [test file](./src/functions/ast-transformers/convert-to-readonly-type.test.mts) which covers various scenarios including complex types, nested structures, and DeepReadonly transformations.
+For more detailed transformation examples, see the [test file](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts) which covers various scenarios including complex types, nested structures, and DeepReadonly transformations.
 
 ### 3. `convertInterfaceToTypeTransformer`
 
@@ -140,7 +140,7 @@ const sortValues2 = (...args: readonly unknown[]): unknown =>
     (args as any).toSorted((a: any, b: any) => a - b);
 ```
 
-For more detailed transformation examples, see the [test file](./src/functions/ast-transformers/replace-any-with-unknown.test.mts) which covers various scenarios including function parameters, return types, and variable declarations.
+For more detailed transformation examples, see the [test file](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/replace-any-with-unknown.test.mts) which covers various scenarios including function parameters, return types, and variable declarations.
 
 ### 5. `replaceRecordWithUnknownRecordTransformer`
 
@@ -408,7 +408,7 @@ node codemod.mjs
 ### Local Setup
 
 ```sh
-git clone https://github.com/noshiro-pf/ts-codemod-lib.git
+git clone https://github.com/noshiro-pf/mono.git
 pnpm i
 ```
 

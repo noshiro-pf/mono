@@ -375,4 +375,4 @@ Other libraries handle cycles differently:
 - **RxJS** does not perform cycle detection. In practice, `pipe()` and `combineLatest()` follow a forward-only construction pattern — you can only reference Observables that already exist — so cycles rarely arise in normal usage. However, RxJS provides no explicit validation as a safety net, unlike SynState's construction-time DFS check.
 - **Jotai** does not detect cycles. Circular `atom` definitions (e.g., `atomA` reads `atomB`, `atomB` reads `atomA`) are silently accepted at definition time. The cycle only manifests when the atom is read, crashing with `Maximum call stack size exceeded` — a stack overflow rather than a clear diagnostic.
 
-These behaviors are verified in the [circular dependency comparison tests](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/circular-dependency-comparison.test.mts).
+These behaviors are verified in the [circular dependency comparison tests](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/circular-dependency-comparison.test.mts).

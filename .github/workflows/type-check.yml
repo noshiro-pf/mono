@@ -27,6 +27,7 @@ jobs:
           - ws:test:browser
           - ws:test:cov
           - codemod:full
+          - knip
 
     steps:
       - name: Checkout

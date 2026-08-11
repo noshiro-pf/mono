@@ -45,7 +45,7 @@ export default defineConfig({
         {
           icon: 'github',
           label: 'GitHub',
-          href: 'https://github.com/noshiro-pf/synstate',
+          href: 'https://github.com/noshiro-pf/mono/tree/main/libs/synstate',
         },
       ],
       components: {
