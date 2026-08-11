@@ -13,7 +13,6 @@ import {
   eslintPluginTsTypeForge,
   type EslintTsTypeForgeRules,
 } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -25,7 +24,7 @@ export default [
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
     // The monorepo root carries the shared toolchain devDependencies.
-    packageDirs: [thisDir, projectRootPath],
+    packageDirs: [thisDir],
   }),
 
   eslintConfigForVitest(),
@@ -118,7 +117,6 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
-      'import-x/no-extraneous-dependencies': 'off',
       // Code-generation scripts legitimately export helpers, await inside
       // codegen flows, break out of nested loops, and build dynamic strings.
       'unicorn/no-exports-in-scripts': 'off',

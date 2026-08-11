@@ -566,10 +566,9 @@ type GetBrandValuePart<B> =
  * ある key が true | false になる場合、その key を削除する
  */
 export type NormalizeBrandUnion<B> = GetBrandValuePart<B> & {
-  readonly [key in Exclude<
-    UnwrapBrandKey<B>,
-    UnwrapBrandBooleanKey<B>
-  >]: B[key];
+  readonly [
+    key in Exclude<UnwrapBrandKey<B>, UnwrapBrandBooleanKey<B>>
+  ]: B[key];
 };
 ```
 

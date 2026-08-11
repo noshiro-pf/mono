@@ -36,7 +36,6 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
-      'import-x/no-extraneous-dependencies': 'off',
     }),
   },
 ] satisfies readonly FlatConfig[];

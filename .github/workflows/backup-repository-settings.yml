@@ -50,10 +50,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Back up
-        run: pnpm exec repo-settings backup
+        run: pnpm run repo-settings:backup
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           OWNER: noshiro-pf
 
       - name: Check if there is no file diff
-        run: pnpm exec assert-repo-is-clean
+        run: pnpm run z:assert-repo-is-clean

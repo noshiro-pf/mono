@@ -1,3 +1,53 @@
+# Single source of truth for the versions of shared devDependencies.
+# A package writes `"eslint": "catalog:"` instead of a version, so the
+# declaration stays in the package that needs it while the version stays here.
+# Only devDependencies use the catalog: a published package's dependencies and
+# peerDependencies are its own API surface, so their ranges stay literal.
+catalog:
+  '@reduxjs/toolkit': 2.12.0
+  '@rollup/plugin-replace': 6.0.3
+  '@rollup/plugin-strip': 3.0.4
+  '@rollup/plugin-typescript': 12.3.0
+  '@types/argparse': 2.0.17
+  '@types/node': 26.2.0
+  '@types/react': 19.2.18
+  '@typescript-eslint/parser': 8.65.0
+  '@typescript-eslint/rule-tester': 8.65.0
+  '@vitest/browser-playwright': 4.1.10
+  '@vitest/coverage-v8': 4.1.10
+  '@vitest/ui': 4.1.10
+  argparse: 3.0.0
+  cspell: 10.0.1
+  dedent: 1.7.2
+  esbuild: 0.28.1
+  eslint: 10.8.0
+  fast-glob: 3.3.3
+  immer: 11.1.15
+  jiti: 2.7.0
+  jotai: 2.20.2
+  markdownlint: 0.41.1
+  markdownlint-cli2: 0.23.2
+  mobx: 7.0.0
+  npm-run-all2: 9.0.3
+  playwright: 1.62.1
+  preact: 10.29.8
+  prettier: 3.9.6
+  prettier-plugin-organize-imports: 4.3.0
+  prettier-plugin-packagejson: 3.0.2
+  react: 19.2.8
+  rollup: 4.62.4
+  rollup-plugin-esbuild: 6.2.1
+  rxjs: 7.8.2
+  tslib: 2.8.1
+  tsx: 4.23.4
+  typedoc: 0.28.20
+  typedoc-github-theme: 0.4.0
+  typescript: 6.0.3
+  valtio: 2.3.2
+  vite: 8.2.0
+  vitest: 4.1.10
+  zustand: 5.0.14
+
 packages:
   - libs/*
   - apps/*

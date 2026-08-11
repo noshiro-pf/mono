@@ -52,11 +52,10 @@ expectType<{ x: 1 } & { y: 2 }, { x: 1; y: 2 }>('>=');
 const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
     ? '<=' | '=' | '>=' | '~='
-    :
-        | '!='
-        | (TypeExtends<A, B> extends true
-            ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
-            : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
+    : | '!='
+      | (TypeExtends<A, B> extends true
+          ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
+          : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
 ): void => undefined;
 ```
 

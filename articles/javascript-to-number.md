@@ -118,7 +118,7 @@ const NumericInputExample = () => {
 
   return (
     <div>
-      <input type='number' value={num} onChange={onChange} />
+      <input type="number" value={num} onChange={onChange} />
       <div>{num}</div>
     </div>
   );

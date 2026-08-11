@@ -508,6 +508,14 @@ In addition to the common instructions above (vendored into `agents/common-rules
 - `docs/` — loose prose notes. Not linted, not part of the build.
 - `experimental/` — legacy code. **See "experimental/" below.**
 
+**There is one `.gitignore`, at the repository root** (`experimental/` keeps its
+own, being outside the workspace). Do not add one to a package: Prettier reads
+`.gitignore` and `.prettierignore` from the root and nowhere else, so a pattern
+in a package-level file would keep git quiet while `fmt:full` went on
+reformatting the generated files anyway. Generated TypeDoc output is listed at
+the root per package, because `libs/eslint-config-typed/docs` and
+`libs/synstate/docs` hold hand-written prose and must stay tracked.
+
 Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace globs
 (`pnpm-workspace.yaml`), and a directory only becomes a member if it has a
 `package.json`. `tools/configs/` and `tools/scripts/` deliberately have none —
@@ -558,31 +566,66 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   `ts-data-forge/ts-data-forge@14.1.0`, …) are imported history from the
   standalone repositories that were merged in; never create new tags in that form.
 
-### Cross-package dependencies
+### Dependencies
 
-- Runtime dependencies between packages in this repository use the `workspace:`
-  protocol. Match the protocol to the range you intend to publish:
-  `^x.y.z` → `workspace:^`, `~x.y.z` → `workspace:~`, an exact pin →
-  `workspace:*`. Using `workspace:*` where `workspace:^` was meant narrows the
-  published range to an exact version.
-- **A package under `libs/` must not devDepend on a sibling.** `ws:build`
-  derives its topological order from `dependencies` + `devDependencies` +
-  `peerDependencies` merged, so a devDependency on the toolchain
-  (`eslint-config-typed` → `ts-data-forge` → …) makes the order unsolvable.
-  The repository's own toolchain lives in the **root** `package.json`, which is
-  not a workspace member and therefore not part of that graph.
-- In the root `package.json`, a workspace package may be `workspace:*` **only
-  if nothing that runs before `pnpm run ws:build` needs it.** `ts-data-forge`,
-  `ts-repo-utils`, `ts-type-forge`, `ts-codemod-lib` and
-  `github-settings-as-code` are executed by the build itself or by CI steps
-  that precede it, so they stay pinned to published npm versions. The lint
-  toolchain (`eslint-config-typed`, `eslint-plugin-ts-*`) is used only after
-  `dist/` exists and is workspace-linked.
-- **Do not add `eslint.config.mts` to a package's `tsconfig.json` `include`.**
-  It imports the workspace-linked lint toolchain, which has no `dist/` while
-  the package is being built. The root `tsconfig.json` type-checks
-  `./**/eslint.config*.mts` after the build instead.
+- **Every package declares what it imports.** `packageDirs` in a package's
+  `eslint.config.mts` lists only that package's own directory, so
+  `import-x/no-extraneous-dependencies` fails on anything not declared there.
+  Do not add the repository root back to `packageDirs`, and do not turn that
+  rule off for `scripts/**` or `configs/**`.
+    - The one file this cannot check is `eslint.config.mts` itself, which
+      `eslint-config-typed` ignores by default. Declare the packages it imports
+      (`eslint-config-typed`, `eslint-plugin-ts-*`) by hand.
+- **`pnpm run knip` covers the other direction: a declared dependency nothing
+  imports.** It also sees imports ESLint does not, such as the ones in
+  `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to
+  `dependencies,unlisted,binaries`. Run `pnpm exec knip` without arguments for
+  the wider report (unused files and exports), which is not enforced.
+    - knip executes each package's vitest config, which imports workspace
+      siblings through their `exports` map, so it needs `pnpm run ws:build`
+      first.
+    - A dependency named as a _string_ in a config file rather than imported is
+      invisible to knip. The Prettier plugins are the case here: each package
+      runs `fmt` with its own directory as cwd and resolves them from there,
+      even though only the root `.prettierrc` names them. Add such a dependency
+      to `ignoreDependencies` with the reason rather than deleting it — dropping
+      the Prettier plugins silently stopped import sorting in generated files.
+- **Versions of shared devDependencies live in the `catalog:` block of
+  `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
+  published package's `dependencies` and `peerDependencies` are its own API, so
+  their ranges stay literal and are not catalogued.
+- Dependencies between packages in this repository always use the `workspace:`
+  protocol — there is no dependency on a published copy of our own packages
+  anywhere. For `dependencies` and `peerDependencies`, match the protocol to
+  the range you intend to publish: `^x.y.z` → `workspace:^`,
+  `~x.y.z` → `workspace:~`, an exact pin → `workspace:*`. `devDependencies` use
+  `workspace:*`.
 - `linkWorkspacePackages` is left at its default (`false`). Only an explicit
   `workspace:` specifier links locally.
-- `pnpm run docs:deps` regenerates `docs/package-dependencies.md`, which holds
-  the current graph, the build stages and the reasoning above.
+
+### Building from a clean checkout
+
+`pnpm install && pnpm run ws:build` works with no `dist/` anywhere. Three rules
+keep it that way; breaking any one of them reintroduces a cycle.
+
+- **Run `tsx` with `--tsconfig <root>/tools/configs/tsconfig.tsx.json.`** That
+  config maps our package names to their sources, so a build script can import
+  `ts-repo-utils` before anything is built. Every `tsx` invocation in a
+  `package.json` script uses it. Our own CLIs are invoked the same way, through
+  their source under `libs/*/src/cmd/`, not through `node_modules/.bin` — CI
+  steps such as `check-should-run-type-checks` run before the build.
+- **A package's `build` only type-checks what it publishes.** Declaration emit
+  (`configs/tsconfig.build.json`) covers `src/`. Tests, `scripts/`, `configs/`
+  and `eslint.config.mts` import the toolchain, which is built later, so they
+  are checked afterwards by `pnpm run ws:type-check`. Do not add a full-scope
+  `tsc --noEmit` back into `build`, and do not add `eslint.config.mts` to a
+  package's `tsconfig.json` `include`.
+- **Build order comes from `dependencies` + `peerDependencies` only**, via the
+  `dependencyFields` option of `runCmdInStagesAcrossWorkspaces`. Packages
+  devDepend on the toolchain and the toolchain depends back on them, so
+  including `devDependencies` leaves no valid order. A consequence: anything a
+  package needs _in order to build_ — an app bundling a workspace library, for
+  example — belongs in `dependencies`, not `devDependencies`.
+
+`docs/package-dependencies.md` holds the current graph and stage tables;
+regenerate it with `pnpm run docs:deps`.

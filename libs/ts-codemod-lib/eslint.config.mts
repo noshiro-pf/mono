@@ -11,7 +11,6 @@ import {
   eslintPluginTsTypeForge,
   type EslintTsTypeForgeRules,
 } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -31,7 +30,7 @@ export default [
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
     // The monorepo root carries the shared toolchain devDependencies.
-    packageDirs: [thisDir, projectRootPath],
+    packageDirs: [thisDir],
   }),
 
   eslintPluginTsTypeForge.configs.recommended,
@@ -71,7 +70,6 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
-      'import-x/no-extraneous-dependencies': 'off',
     }),
   },
   {
@@ -99,7 +97,6 @@ export default [
   {
     files: ['samples/**'],
     rules: defineKnownRules({
-      'import-x/no-extraneous-dependencies': 'off',
       'import-x/no-internal-modules': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       'functional/immutable-data': 'off',

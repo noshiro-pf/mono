@@ -20,4 +20,5 @@ import { projectRootPath } from '../project-root-path.mjs';
 await runCmdInStagesAcrossWorkspaces({
   cmd: 'build:min',
   rootPackageJsonDir: projectRootPath,
+  dependencyFields: ['dependencies', 'peerDependencies'],
 });

@@ -52,8 +52,8 @@ t = s; // Type 'S' is not assignable to type 'T'.
 
 いくつか関連する issue も見つけたのですが、今回はこの原因を TypeScript のソースコードを読んでより詳しく探ってみることにします（といっても、自分は TypeScript のコンパイラ実装を読むのは初めてなので、断片的な理解しかできませんでしたが…）。
 
--   https://github.com/microsoft/TypeScript/issues/40803
--   https://github.com/microsoft/TypeScript/issues/43283
+- https://github.com/microsoft/TypeScript/issues/40803
+- https://github.com/microsoft/TypeScript/issues/43283
 
 ---
 
@@ -386,7 +386,7 @@ if (
 
 ## まとめ
 
--   TypeScript において、Union 型を内部に含むタプルやレコード型などを別の型に代入可能か判定するとき、 Union 型を内部に含まないように展開しなければ比較できないがそうすると要素数が 25 を超える Union 型になってしまう場合は、代入できるはずのところで代入できないと判定されることがある。これは型チェッカーのパフォーマンスを落とさないために設けられた意図的な制限である。
--   Union 型を展開しなくても比較可能な場面では、TypeScript が賢く Union 型の展開を回避している場合がある（このため、実用上この制限に遭遇することはあまりない）。
+- TypeScript において、Union 型を内部に含むタプルやレコード型などを別の型に代入可能か判定するとき、 Union 型を内部に含まないように展開しなければ比較できないがそうすると要素数が 25 を超える Union 型になってしまう場合は、代入できるはずのところで代入できないと判定されることがある。これは型チェッカーのパフォーマンスを落とさないために設けられた意図的な制限である。
+- Union 型を展開しなくても比較可能な場面では、TypeScript が賢く Union 型の展開を回避している場合がある（このため、実用上この制限に遭遇することはあまりない）。
 
 以上、 [noshiro](https://twitter.com/noshiro_piko) が書きました。

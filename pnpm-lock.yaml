@@ -4,6 +4,129 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@reduxjs/toolkit':
+      specifier: 2.12.0
+      version: 2.12.0
+    '@rollup/plugin-replace':
+      specifier: 6.0.3
+      version: 6.0.3
+    '@rollup/plugin-strip':
+      specifier: 3.0.4
+      version: 3.0.4
+    '@rollup/plugin-typescript':
+      specifier: 12.3.0
+      version: 12.3.0
+    '@types/node':
+      specifier: 26.2.0
+      version: 26.2.0
+    '@types/react':
+      specifier: 19.2.18
+      version: 19.2.18
+    '@typescript-eslint/parser':
+      specifier: 8.65.0
+      version: 8.65.0
+    '@typescript-eslint/rule-tester':
+      specifier: 8.65.0
+      version: 8.65.0
+    '@vitest/browser-playwright':
+      specifier: 4.1.10
+      version: 4.1.10
+    '@vitest/coverage-v8':
+      specifier: 4.1.10
+      version: 4.1.10
+    '@vitest/ui':
+      specifier: 4.1.10
+      version: 4.1.10
+    argparse:
+      specifier: 3.0.0
+      version: 3.0.0
+    cspell:
+      specifier: 10.0.1
+      version: 10.0.1
+    dedent:
+      specifier: 1.7.2
+      version: 1.7.2
+    esbuild:
+      specifier: 0.28.1
+      version: 0.28.1
+    eslint:
+      specifier: 10.8.0
+      version: 10.8.0
+    immer:
+      specifier: 11.1.15
+      version: 11.1.15
+    jiti:
+      specifier: 2.7.0
+      version: 2.7.0
+    jotai:
+      specifier: 2.20.2
+      version: 2.20.2
+    markdownlint:
+      specifier: 0.41.1
+      version: 0.41.1
+    markdownlint-cli2:
+      specifier: 0.23.2
+      version: 0.23.2
+    mobx:
+      specifier: 7.0.0
+      version: 7.0.0
+    npm-run-all2:
+      specifier: 9.0.3
+      version: 9.0.3
+    playwright:
+      specifier: 1.62.1
+      version: 1.62.1
+    preact:
+      specifier: 10.29.8
+      version: 10.29.8
+    prettier:
+      specifier: 3.9.6
+      version: 3.9.6
+    prettier-plugin-organize-imports:
+      specifier: 4.3.0
+      version: 4.3.0
+    prettier-plugin-packagejson:
+      specifier: 3.0.2
+      version: 3.0.2
+    react:
+      specifier: 19.2.8
+      version: 19.2.8
+    rollup:
+      specifier: 4.62.4
+      version: 4.62.4
+    rollup-plugin-esbuild:
+      specifier: 6.2.1
+      version: 6.2.1
+    rxjs:
+      specifier: 7.8.2
+      version: 7.8.2
+    tsx:
+      specifier: 4.23.4
+      version: 4.23.4
+    typedoc:
+      specifier: 0.28.20
+      version: 0.28.20
+    typedoc-github-theme:
+      specifier: 0.4.0
+      version: 0.4.0
+    typescript:
+      specifier: 6.0.3
+      version: 6.0.3
+    valtio:
+      specifier: 2.3.2
+      version: 2.3.2
+    vite:
+      specifier: 8.2.0
+      version: 8.2.0
+    vitest:
+      specifier: 4.1.10
+      version: 4.1.10
+    zustand:
+      specifier: 5.0.14
+      version: 5.0.14
+
 importers:
 
   .:
@@ -11,44 +134,26 @@ importers:
       '@changesets/cli':
         specifier: 2.31.1
         version: 2.31.1(@types/node@26.2.0)
-      '@rollup/plugin-json':
-        specifier: 6.1.0
-        version: 6.1.0(rollup@4.62.4)
-      '@rollup/plugin-replace':
-        specifier: 6.0.3
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 3.0.4
-        version: 3.0.4(rollup@4.62.4)
-      '@rollup/plugin-typescript':
-        specifier: 12.3.0
-        version: 12.3.0(rollup@4.62.4)(tslib@2.8.1)(typescript@6.0.3)
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@vitest/browser-playwright':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
-      conventional-changelog-conventionalcommits:
-        specifier: 10.2.1
-        version: 10.2.1
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
-      dedent:
-        specifier: 1.7.2
-        version: 1.7.2(babel-plugin-macros@3.1.0)
       esbuild:
-        specifier: 0.28.1
+        specifier: 'catalog:'
         version: 0.28.1
       eslint:
-        specifier: 10.8.0
+        specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
       eslint-config-typed:
         specifier: workspace:*
@@ -62,80 +167,56 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:libs/eslint-plugin-ts-type-forge
-      github-settings-as-code:
-        specifier: 2.1.0
-        version: 2.1.0(typescript@6.0.3)
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
+      knip:
+        specifier: 6.31.0
+        version: 6.31.0
       markdownlint:
-        specifier: 0.41.1
+        specifier: 'catalog:'
         version: 0.41.1(supports-color@7.2.0)
       markdownlint-cli2:
-        specifier: 0.23.2
+        specifier: 'catalog:'
         version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
       playwright:
-        specifier: 1.62.1
+        specifier: 'catalog:'
         version: 1.62.1
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 4.62.4
-        version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 6.2.1
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
-      ts-codemod-lib:
-        specifier: 2.2.5
-        version: 2.2.5(dedent@1.7.2(babel-plugin-macros@3.1.0))(ts-repo-utils@10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3))(typescript@6.0.3)
       ts-data-forge:
-        specifier: 14.2.0
-        version: 14.2.0(typescript@6.0.3)
-      ts-fortress:
         specifier: workspace:*
-        version: link:libs/ts-fortress
+        version: link:libs/ts-data-forge
       ts-repo-utils:
-        specifier: 10.1.8
-        version: 10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3)
+        specifier: workspace:*
+        version: link:libs/ts-repo-utils
       ts-type-forge:
-        specifier: 9.2.0
-        version: 9.2.0
-      tslib:
-        specifier: 2.8.1
-        version: 2.8.1
+        specifier: workspace:*
+        version: link:libs/ts-type-forge
       tsx:
-        specifier: 4.23.4
+        specifier: 'catalog:'
         version: 4.23.4
-      typedoc:
-        specifier: 0.28.20
-        version: 0.28.20(typescript@6.0.3)
-      typedoc-github-theme:
-        specifier: 0.4.0
-        version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
-      typedoc-plugin-markdown:
-        specifier: 4.12.0
-        version: 4.12.0(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vite:
-        specifier: 8.2.0
+        specifier: 'catalog:'
         version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
       zenn-cli:
         specifier: ^0.1.153
@@ -182,37 +263,6 @@ importers:
       satori:
         specifier: ^0.29.0
         version: 0.29.0
-    devDependencies:
-      '@astrojs/markdown-remark':
-        specifier: 7.2.2
-        version: 7.2.2(supports-color@7.2.0)
-      '@reduxjs/toolkit':
-        specifier: 2.12.0
-        version: 2.12.0(react@19.2.8)
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
-      '@types/react':
-        specifier: 19.2.18
-        version: 19.2.18
-      '@types/react-dom':
-        specifier: 19.2.4
-        version: 19.2.4(@types/react@19.2.18)
-      argparse:
-        specifier: 3.0.0
-        version: 3.0.0
-      esbuild:
-        specifier: 0.28.1
-        version: 0.28.1
-      jotai:
-        specifier: 2.20.2
-        version: 2.20.2(@babel/core@7.29.7(supports-color@7.2.0))(@babel/template@7.29.7)(@types/react@19.2.18)(react@19.2.8)
-      mobx:
-        specifier: 7.0.0
-        version: 7.0.0
-      rxjs:
-        specifier: 7.8.2
-        version: 7.8.2
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
@@ -225,12 +275,55 @@ importers:
       synstate-react-hooks:
         specifier: workspace:*
         version: link:../../libs/synstate-react-hooks
-      valtio:
-        specifier: 2.3.2
-        version: 2.3.2(@types/react@19.2.18)(react@19.2.8)
-      zustand:
-        specifier: 5.0.14
-        version: 5.0.14(@types/react@19.2.18)(immer@11.1.15)(react@19.2.8)
+    devDependencies:
+      '@astrojs/markdown-remark':
+        specifier: 7.2.2
+        version: 7.2.2(supports-color@7.2.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: 19.2.4
+        version: 19.2.4(@types/react@19.2.18)
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.1
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      jotai:
+        specifier: 'catalog:'
+        version: 2.20.2(@babel/core@7.29.7(supports-color@7.2.0))(@babel/template@7.29.7)(@types/react@19.2.18)(react@19.2.8)
+      mobx:
+        specifier: 'catalog:'
+        version: 7.0.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rxjs:
+        specifier: 'catalog:'
+        version: 7.8.2
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../../libs/ts-repo-utils
 
   libs/eslint-config-typed:
     dependencies:
@@ -240,9 +333,6 @@ importers:
       '@stylistic/eslint-plugin':
         specifier: ^5.10.0
         version: 5.10.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))
-      '@types/eslint':
-        specifier: ^9.6.1
-        version: 9.6.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.65.0
         version: 8.65.0(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -345,21 +435,18 @@ importers:
       tsutils:
         specifier: ^3.21.0
         version: 3.21.0(typescript@6.0.3)
-      typescript-eslint:
-        specifier: ^8.65.0
-        version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
     devDependencies:
       '@eslint/core':
         specifier: 1.2.1
         version: 1.2.1
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(rollup@4.62.4)
       '@rollup/plugin-strip':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
       '@rollup/plugin-typescript':
-        specifier: 12.3.0
+        specifier: 'catalog:'
         version: 12.3.0(rollup@4.62.4)(tslib@2.8.1)(typescript@6.0.3)
       '@types/estree':
         specifier: 1.0.9
@@ -374,34 +461,43 @@ importers:
         specifier: 4.0.10
         version: 4.0.10
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@types/react':
-        specifier: 19.2.18
+        specifier: 'catalog:'
         version: 19.2.18
       '@typescript-eslint/rule-tester':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
-      fast-glob:
-        specifier: 3.3.3
-        version: 3.3.3
+      eslint-config-typed:
+        specifier: workspace:*
+        version: 'link:'
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       immer:
-        specifier: 11.1.15
+        specifier: 'catalog:'
         version: 11.1.15
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
       json-schema:
         specifier: 0.4.0
@@ -409,47 +505,41 @@ importers:
       json-schema-to-typescript:
         specifier: 15.0.4
         version: 15.0.4
-      markdownlint:
-        specifier: 0.41.1
-        version: 0.41.1(supports-color@7.2.0)
-      markdownlint-cli2:
-        specifier: 0.23.2
-        version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
       react:
-        specifier: 19.2.8
+        specifier: 'catalog:'
         version: 19.2.8
       rollup:
-        specifier: 4.62.4
+        specifier: 'catalog:'
         version: 4.62.4
-      ts-morph:
-        specifier: 28.0.0
-        version: 28.0.0
-      tslib:
-        specifier: 2.8.1
-        version: 2.8.1
+      ts-codemod-lib:
+        specifier: workspace:*
+        version: link:../ts-codemod-lib
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       tsx:
-        specifier: 4.23.4
+        specifier: 'catalog:'
         version: 4.23.4
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
 
   libs/eslint-plugin-ts-data-forge:
@@ -470,15 +560,48 @@ importers:
         specifier: '>=5.0.0'
         version: 6.0.3
     devDependencies:
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@typescript-eslint/parser':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@typescript-eslint/rule-tester':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/eslint-plugin-ts-fortress:
     dependencies:
@@ -499,14 +622,41 @@ importers:
         version: 6.0.3
     devDependencies:
       '@typescript-eslint/parser':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@typescript-eslint/rule-tester':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/eslint-plugin-ts-type-forge:
     dependencies:
@@ -527,14 +677,41 @@ importers:
         version: 6.0.3
     devDependencies:
       '@typescript-eslint/parser':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@typescript-eslint/rule-tester':
-        specifier: 8.65.0
+        specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/github-settings-as-code:
     dependencies:
@@ -558,61 +735,61 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
       eslint:
-        specifier: 10.8.0
+        specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
-      markdownlint:
-        specifier: 0.41.1
-        version: 0.41.1(supports-color@7.2.0)
-      markdownlint-cli2:
-        specifier: 0.23.2
-        version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
-      playwright:
-        specifier: 1.62.1
-        version: 1.62.1
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       tsx:
-        specifier: 4.23.4
+        specifier: 'catalog:'
         version: 4.23.4
-      typedoc:
-        specifier: 0.28.20
-        version: 0.28.20(typescript@6.0.3)
-      typedoc-github-theme:
-        specifier: 0.4.0
-        version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
 
   libs/octokit-safe-types:
@@ -634,76 +811,82 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(rollup@4.62.4)
       '@rollup/plugin-strip':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@vitest/browser-playwright':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
       esbuild:
-        specifier: 0.28.1
+        specifier: 'catalog:'
         version: 0.28.1
       eslint:
-        specifier: 10.8.0
+        specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
-      fast-glob:
-        specifier: 3.3.3
-        version: 3.3.3
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
-      markdownlint:
-        specifier: 0.41.1
-        version: 0.41.1(supports-color@7.2.0)
-      markdownlint-cli2:
-        specifier: 0.23.2
-        version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
       playwright:
-        specifier: 1.62.1
+        specifier: 'catalog:'
         version: 1.62.1
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
       rollup:
-        specifier: 4.62.4
+        specifier: 'catalog:'
         version: 4.62.4
       rollup-plugin-esbuild:
-        specifier: 6.2.1
+        specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       tsx:
-        specifier: 4.23.4
+        specifier: 'catalog:'
         version: 4.23.4
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
 
   libs/synstate:
@@ -716,34 +899,73 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@reduxjs/toolkit':
-        specifier: 2.12.0
+        specifier: 'catalog:'
         version: 2.12.0(react@19.2.8)
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@types/react':
-        specifier: 19.2.18
+        specifier: 'catalog:'
         version: 19.2.18
       argparse:
-        specifier: 3.0.0
+        specifier: 'catalog:'
         version: 3.0.0
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       jotai:
-        specifier: 2.20.2
+        specifier: 'catalog:'
         version: 2.20.2(@babel/core@7.29.7(supports-color@7.2.0))(@babel/template@7.29.7)(@types/react@19.2.18)(react@19.2.8)
       mobx:
-        specifier: 7.0.0
+        specifier: 'catalog:'
         version: 7.0.0
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
       react:
-        specifier: 19.2.8
+        specifier: 'catalog:'
         version: 19.2.8
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       rxjs:
-        specifier: 7.8.2
+        specifier: 'catalog:'
         version: 7.8.2
+      synstate-react-hooks:
+        specifier: workspace:*
+        version: link:../synstate-react-hooks
+      synstate-react-hooks-compat:
+        specifier: workspace:*
+        version: link:../synstate-react-hooks-compat
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       valtio:
-        specifier: 2.3.2
+        specifier: 'catalog:'
         version: 2.3.2(@types/react@19.2.18)(react@19.2.8)
       zustand:
-        specifier: 5.0.14
+        specifier: 'catalog:'
         version: 5.0.14(@types/react@19.2.18)(immer@11.1.15)(react@19.2.8)
 
   libs/synstate-preact-hooks:
@@ -758,15 +980,45 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
-      argparse:
-        specifier: 3.0.0
-        version: 3.0.0
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       preact:
-        specifier: 10.29.8
+        specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.7.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/synstate-preact-signals:
     dependencies:
@@ -783,15 +1035,45 @@ importers:
       '@preact/signals':
         specifier: 2.10.1
         version: 2.10.1(preact@10.29.8)
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
-      argparse:
-        specifier: 3.0.0
-        version: 3.0.0
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       preact:
-        specifier: 10.29.8
+        specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.7.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/synstate-react-hooks:
     dependencies:
@@ -805,18 +1087,48 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@types/react':
-        specifier: 19.2.18
+        specifier: 'catalog:'
         version: 19.2.18
-      argparse:
-        specifier: 3.0.0
-        version: 3.0.0
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
       react:
-        specifier: 19.2.8
+        specifier: 'catalog:'
         version: 19.2.8
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/synstate-react-hooks-compat:
     dependencies:
@@ -830,18 +1142,48 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@types/argparse':
-        specifier: 2.0.17
-        version: 2.0.17
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@types/react':
-        specifier: 19.2.18
+        specifier: 'catalog:'
         version: 19.2.18
-      argparse:
-        specifier: 3.0.0
-        version: 3.0.0
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
       react:
-        specifier: 19.2.8
+        specifier: 'catalog:'
         version: 19.2.8
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
 
   libs/ts-codemod-lib:
     dependencies:
@@ -856,91 +1198,97 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(rollup@4.62.4)
       '@rollup/plugin-strip':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@vitest/browser-playwright':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
       cmd-ts:
         specifier: 0.15.0
         version: 0.15.0(supports-color@7.2.0)
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
       esbuild:
-        specifier: 0.28.1
+        specifier: 'catalog:'
         version: 0.28.1
       eslint:
-        specifier: 10.8.0
+        specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
-      markdownlint:
-        specifier: 0.41.1
-        version: 0.41.1(supports-color@7.2.0)
-      markdownlint-cli2:
-        specifier: 0.23.2
-        version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
       playwright:
-        specifier: 1.62.1
+        specifier: 'catalog:'
         version: 1.62.1
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
       rollup:
-        specifier: 4.62.4
+        specifier: 'catalog:'
         version: 4.62.4
       rollup-plugin-esbuild:
-        specifier: 6.2.1
+        specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: 10.1.8
         version: 10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3)
       tsx:
-        specifier: 4.23.4
+        specifier: 'catalog:'
         version: 4.23.4
       typedoc:
-        specifier: 0.28.20
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-github-theme:
-        specifier: 0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vite:
-        specifier: 8.2.0
+        specifier: 'catalog:'
         version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
 
   libs/ts-data-forge:
@@ -964,21 +1312,63 @@ importers:
       '@mui/material':
         specifier: 9.2.0
         version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@types/react':
-        specifier: 19.2.18
+        specifier: 'catalog:'
         version: 19.2.18
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       immer:
-        specifier: 11.1.15
+        specifier: 'catalog:'
         version: 11.1.15
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
       react:
-        specifier: 19.2.8
+        specifier: 'catalog:'
         version: 19.2.8
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       typedoc:
-        specifier: 0.28.20
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-github-theme:
-        specifier: 0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
 
   libs/ts-fortress:
     dependencies:
@@ -993,32 +1383,59 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(rollup@4.62.4)
       '@rollup/plugin-strip':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
       '@vitest/browser-playwright':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
-      fast-glob:
-        specifier: 3.3.3
-        version: 3.3.3
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       fp-ts:
         specifier: 2.16.11
         version: 2.16.11
       io-ts:
         specifier: 2.2.22
         version: 2.2.22(fp-ts@2.16.11)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       typedoc:
-        specifier: 0.28.20
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-github-theme:
-        specifier: 0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -1054,86 +1471,119 @@ importers:
         version: 4.23.4
     devDependencies:
       '@rollup/plugin-replace':
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3(rollup@4.62.4)
       '@rollup/plugin-strip':
-        specifier: 3.0.4
+        specifier: 'catalog:'
         version: 3.0.4(rollup@4.62.4)
       '@types/node':
-        specifier: 26.2.0
+        specifier: 'catalog:'
         version: 26.2.0
       '@vitest/coverage-v8':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       '@vitest/ui':
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
       cspell:
-        specifier: 10.0.1
+        specifier: 'catalog:'
         version: 10.0.1
       dedent:
-        specifier: 1.7.2
+        specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
       esbuild:
-        specifier: 0.28.1
+        specifier: 'catalog:'
         version: 0.28.1
       eslint:
-        specifier: 10.8.0
+        specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
       jiti:
-        specifier: 2.7.0
+        specifier: 'catalog:'
         version: 2.7.0
-      markdownlint:
-        specifier: 0.41.1
-        version: 0.41.1(supports-color@7.2.0)
-      markdownlint-cli2:
-        specifier: 0.23.2
-        version: 0.23.2(supports-color@7.2.0)
       npm-run-all2:
-        specifier: 9.0.3
+        specifier: 'catalog:'
         version: 9.0.3
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-organize-imports:
-        specifier: 4.3.0
+        specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
       prettier-plugin-packagejson:
-        specifier: 3.0.2
+        specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
       rollup:
-        specifier: 4.62.4
+        specifier: 'catalog:'
         version: 4.62.4
       rollup-plugin-esbuild:
-        specifier: 6.2.1
+        specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       typedoc:
-        specifier: 0.28.20
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-github-theme:
-        specifier: 0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: 6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vite:
-        specifier: 8.2.0
+        specifier: 'catalog:'
         version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
       vitest:
-        specifier: 4.1.10
+        specifier: 'catalog:'
         version: 4.1.10(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.10)(@vitest/ui@4.1.10)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))
 
   libs/ts-type-forge:
     devDependencies:
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
       typedoc:
-        specifier: 0.28.20
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-github-theme:
-        specifier: 0.4.0
+        specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0)
 
 packages:
 
@@ -1492,10 +1942,6 @@ packages:
     resolution: {integrity: sha512-y7/yvZ2TPAnR9+jnc00klvNNLkJiXFFrQA/hlLCcxA9a2A4zQIOimyFQ9XfwYKiGD1fb5GY8vbKIIgO8d5Tb2A==}
     engines: {node: '>= 20.12.0'}
 
-  '@conventional-changelog/template@1.2.1':
-    resolution: {integrity: sha512-TzlTVpKPjaqW6qOYjQcYUDuGsLCNsvFHVBXkYGTAnf5V37jCWrE5haKNXzz0WZUtVHjrpV76L1buANjwXMfT8w==}
-    engines: {node: '>=22'}
-
   '@cspell/cspell-bundled-dicts@10.0.1':
     resolution: {integrity: sha512-WvkSDNX4Uyyj/ZgbPO6L38iFNMfK1EqsH1FteRiI2qLz6QZMXRFrIt12OqiWIplzZDDaVpBH9FCJOPJll0fjCQ==}
     engines: {node: '>=22.18.0'}
@@ -1739,6 +2185,9 @@ packages:
 
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
+
+  '@emnapi/core@1.11.2':
+    resolution: {integrity: sha512-TC8MkTuZUtcTSiFeuC0ksCh9QIJ5+F21MvZ4Wn4ORfYaFJ/0dsiudv5tVkejgwZlwQ39jL9WWDe2lz8x0WglOA==}
 
   '@emnapi/core@2.0.0-alpha.3':
     resolution: {integrity: sha512-AZypUeJ/yByuxyS7BlSNRDOMLMlROYtjYdIAuBmJssVz1UJDSeYxLrdizhXCFYhedC5bqd/ASy8EuNXbVVXp9g==}
@@ -2396,8 +2845,238 @@ packages:
   '@oslojs/encoding@1.1.0':
     resolution: {integrity: sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==}
 
+  '@oxc-parser/binding-android-arm-eabi@0.142.0':
+    resolution: {integrity: sha512-ZiRGDutGsv1G6bL/ozy/koC0Sv39T1DqyoC4KD1DOy9ZoACm1O5UWhEK2c02Qdk+4lfLVkvFa/mQ0fm/4h1BtQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [android]
+
+  '@oxc-parser/binding-android-arm64@0.142.0':
+    resolution: {integrity: sha512-WZkvGRLNQTz8lR9zP5nLjUdlroRCopBu3g9zF1p/laE6DzT1UbQo8Rdz5MWhaJUPYg/6gp+jo7HUgsyKaN1FtQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [android]
+
+  '@oxc-parser/binding-darwin-arm64@0.142.0':
+    resolution: {integrity: sha512-l4khS8LQOOVYsGRVARo1gSaCT/aBSceUVXgtovWc2+drnxVuDr082WA3OCHVdVzIz5JIrP/y9CWsSKxBDNmYGg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxc-parser/binding-darwin-x64@0.142.0':
+    resolution: {integrity: sha512-QBsNF3nqlXmcH2B1YOPqQYmCJoy4HuIjUxGbBO/k5JAJUl68ghU2psRY2zPk+RyBaWqKP/qfL4oaFgEMCdwskA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxc-parser/binding-freebsd-x64@0.142.0':
+    resolution: {integrity: sha512-b7Q7m4Cqc6XqNhri3R+QhU+GVy646Pn+bkdhrDdWym/Fdi0ZUa+d73H9dm5H91JtbtAQ/z1d8XKMW3oOV8a4tQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxc-parser/binding-linux-arm-gnueabihf@0.142.0':
+    resolution: {integrity: sha512-3riVS5IhdH3uCZj1Y9ftDQlR0dvLsIlw/edrRqk8JhgNd5K0XSs+UBtgh50N13CAlW9/TXj6sVGXaKNBocd0Yg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-arm-musleabihf@0.142.0':
+    resolution: {integrity: sha512-NmXUOpgpTSkhl795TiXmWppTwmSJ92RC1qvD6e4XOF+slgmo3e6Ah+kEu+6AN8s7NAOEwqGmir58MgSQSWmBSA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.142.0':
+    resolution: {integrity: sha512-gc0EXsKtXgerujmU2Bql3u1L1HsSQ2774R83idq/FoNMPVV/RY/1ErFsvnit7KoiP/sLvzQixeUo4Ut0ic0wmw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-arm64-musl@0.142.0':
+    resolution: {integrity: sha512-F2XvmWSE0uWpie+jHKKIFgdVOe9ypGhkEZxKx5DuW215K6cbAC274yYaPkcM7EqY4Df3Weyhpcz3lsURyH2LVg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-linux-ppc64-gnu@0.142.0':
+    resolution: {integrity: sha512-wLMbT21U/QxknQsk+VvNF0b9D2/aGWhcaQQQ+VYlE8FwD5+GoWZIPPXNzyHmkYyhm0KB3itL+TBavjMatqNnYA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-riscv64-gnu@0.142.0':
+    resolution: {integrity: sha512-+G8F/4ckwT7FCJV4H2bt09xEzJbjNCfuL4Sp1AYNaFtFMVtgIGMuJlteT82U+K0UIZ/DzAR/LDlMFnEuajG7Kw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-riscv64-musl@0.142.0':
+    resolution: {integrity: sha512-hTsHtTLxMAfCo+rpF5K3qZJKW2NpPN/CHd4mYB3y7XlSdspHkd2gehDIofP64AacA9nWQw2tY3O7wR6UY8IVOA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-linux-s390x-gnu@0.142.0':
+    resolution: {integrity: sha512-6y7qYY3TCUDYjqswImdTGl92y+KA/80twALegQPN27kfY+bG7Ib1+L3jbmrCZQx6wrVnai9IPsEZp07I0hx7JQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-x64-gnu@0.142.0':
+    resolution: {integrity: sha512-i69kAWU+2LgoH5bR+zWiiu+UzAw7Oxkwv7COeJTeY19pn4e70nKQcr9Pm6cL2Z0Z54d+gl9qADlK/0yyuCPiBA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-x64-musl@0.142.0':
+    resolution: {integrity: sha512-4SQs678MmjYVrmhAgCWD4o0vpaFszXw9xLX5p2Z9MMFcltxiLkA88wQjh80YHjPrXtpyZ2CWI5m+1yNKM0m2Pw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-openharmony-arm64@0.142.0':
+    resolution: {integrity: sha512-YHpx9N7Ln3a++Tc8rv+H7mrK1zyJQOAwCFg8LZ3lTs1T5afGWeZrLPhPT9HLnIwSjCyJqPWVMIrMxbjcmBr2oQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxc-parser/binding-wasm32-wasi@0.142.0':
+    resolution: {integrity: sha512-3pLDyY3+oogW73RM5uehNgAiR/Xfb7fvO2Q1Z1gIqZ2+50XDVQmBVlRkHXZTU4gKnQHpwETNsYQVsJ3joVB2iA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [wasm32]
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.142.0':
+    resolution: {integrity: sha512-Had/VeVY28Oyb0K+Q4FV8KCzoBycIh93oDK6pCbya9lkzdq+ikMHMgBubsdqqlybjJmQRawCQRrnBRHyQwYvcQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxc-parser/binding-win32-ia32-msvc@0.142.0':
+    resolution: {integrity: sha512-GGi3+YphVHavvgs6gum2UXoNCqzHAmPt/nXkn8ZQZstV2Q1qZD1Mn8fz/nWrDkefHQtrG/+1/XrbMxsBTo6Svw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ia32]
+    os: [win32]
+
+  '@oxc-parser/binding-win32-x64-msvc@0.142.0':
+    resolution: {integrity: sha512-Ny/Wv4Us1LGC/ljwNTp+Hx3r/pH15EFfeDF0p+n898gt+TtRd6C9SccHcuUhDiNTb8s5tt7jdeAMDRQZ4Vq6hg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [win32]
+
   '@oxc-project/types@0.142.0':
     resolution: {integrity: sha512-7W+2q5AKQVU36fkaryontrHn3YDt1RyUYXatw9i5H8ocYe2sPKSFB6eS8WNPeRKiN1qAWWZUPm7gwFzJGrccqQ==}
+
+  '@oxc-resolver/binding-android-arm-eabi@11.24.2':
+    resolution: {integrity: sha512-y09e0L0SRI2OA2tUIrjBgoV3eH5hvUKXNkJqXmNo5V2WxIjyC7I7aJfRLMEVpA8yi95f90gFDvO0VMgrDw+vwA==}
+    cpu: [arm]
+    os: [android]
+
+  '@oxc-resolver/binding-android-arm64@11.24.2':
+    resolution: {integrity: sha512-cl4icWaZFnLdg8m6qtnh5rBMuGbxc/ptStFHLeCNwr+2cZjkjNwQu/jYRS0CHlnPecOJMpuS5M6/BH+0J/YkEg==}
+    cpu: [arm64]
+    os: [android]
+
+  '@oxc-resolver/binding-darwin-arm64@11.24.2':
+    resolution: {integrity: sha512-At29QEMF6HajbQvgY8K6OXnHD1x9rad74xBEfmCB6ZqCGsdq75aK7tOYcTbOanMy8qdIBrfL3SMr3p/lfSlb9w==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxc-resolver/binding-darwin-x64@11.24.2':
+    resolution: {integrity: sha512-A5Kqr1EUj4oIL5CF4WRssq/o5P0Y11cwoFouMRmQ7YnC/A8V93nv1nb7aSU8HwcgmXropjLNkVTl4MN87cu28Q==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxc-resolver/binding-freebsd-x64@11.24.2':
+    resolution: {integrity: sha512-R5xkRBRRz7ceH/P5Jrc6G7FmdUdgpLYyESFAUDVTNQ9K0sGPxcp4ljiwEwEqsvNcQ4sYbMRrWcHHBCu7ksAJVw==}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxc-resolver/binding-linux-arm-gnueabihf@11.24.2':
+    resolution: {integrity: sha512-k/RuYL4L/R58IBn3wT5ma3Wh4k62bp1eYCFRWCmMsasUOqL+H6sW0VGFadEzKWXFFlz+2uIMoeMk9ySSZJHgbg==}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-resolver/binding-linux-arm-musleabihf@11.24.2':
+    resolution: {integrity: sha512-bnHAak3ujYfH5pKk4NieFNbvYvernfoQDgwLddbZ3OtMYrem87/qjlA+u+aKG0oZcqSLGCful/6/CEA+aeAgaA==}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-resolver/binding-linux-arm64-gnu@11.24.2':
+    resolution: {integrity: sha512-vDT3KHgzYp47gmtNOqL2VNhCyl5Zv643eyxm//A68J8DeUGXrvD1pZFiaT4jSfe+RInfnn1R2yVHye4enx6RnA==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-arm64-musl@11.24.2':
+    resolution: {integrity: sha512-+kMlQvbzfyEYtu5FcjE4p+ttBLpKW4d/AsAsuE69BxV6V4twZJeIQZFfD8gh/wqglY0MkPSezWXQH0jBV13MUw==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-linux-ppc64-gnu@11.24.2':
+    resolution: {integrity: sha512-shjfMhmZ3gq9fv/w7bi3PnZlgOPG+2QAOFf0BJF0EgBSIGZ6PMLN2zbGEblTUYB/NKVDRyYhE2ff3dJ1QqNPkA==}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-riscv64-gnu@11.24.2':
+    resolution: {integrity: sha512-zGelwFR5oRo+b69k8Lrzun86DyUHzfKN6cnjbR9l7Z7NIRznOE/2ZvPa1IUKqAL2PzAXOdwkfVqNvO1H2RlpAw==}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-riscv64-musl@11.24.2':
+    resolution: {integrity: sha512-qxZ1SWCXJY0eyhAlP6Lmo9F2Nrtx7EkYj9oCgL8apDPCwXwCEDA2U697bbT81JIc2IrVjxO4KX6WU2N+oN9Z4w==}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-linux-s390x-gnu@11.24.2':
+    resolution: {integrity: sha512-sGCecF3cx2DFlH4t/z7ApnOnXqN48p5p5mlHDEnHTAukQa2P+qMVE4CwyWE9W+q/m3QJ7kKfGrIjax31f44oFQ==}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-x64-gnu@11.24.2':
+    resolution: {integrity: sha512-k/VlMMcSzMlahb3/fENM4rTlsJ0s3fFROA0KXPBmKggqmTSaE383sl8F3KCOXPLmVsYfW6hCitMhXCEtNeZxxg==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-x64-musl@11.24.2':
+    resolution: {integrity: sha512-8hbnZyNi97b/8wapYaIF9+t9GmZKBW2vunaOc3h9HGJptH7b7XpvZqOTBSm/MpTjr7H497BlgOaSfLUdhmy2bw==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-openharmony-arm64@11.24.2':
+    resolution: {integrity: sha512-MvyGik3a6pVgZ0t/kWlbmFxFLmXQJwgLsY2eYFHLpy0wGwRbfzeIGgDwQ3kXqE30z+kSXennRkCrT7TUvkptNg==}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxc-resolver/binding-wasm32-wasi@11.24.2':
+    resolution: {integrity: sha512-vHcssMPwO08RTvj/c0iOBz90attxyG3wQJ0dTcyEQK43LRpcdLWZlV5feBhv6Isn6ahbQIzHbCgfa81+RiML0Q==}
+    engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
+
+  '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
+    resolution: {integrity: sha512-uokJqro2iBqkFvJdKQLP7d8/BUmFwESQFVmIJUQKj1Xn1a/LysJoe1vmeECLF5b3jsV8CAL5sEMJXX6SdK9Nhg==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxc-resolver/binding-win32-x64-msvc@11.24.2':
+    resolution: {integrity: sha512-UqGPmo56KDfLlfXFAFIrNflHT8tFxWGEivWg3Zeyp4Uy2NlKN1FGPr6/BxcLGG3+kZ6Wp14g5Uj+n71boqZfiw==}
+    cpu: [x64]
+    os: [win32]
 
   '@pagefind/darwin-arm64@1.5.2':
     resolution: {integrity: sha512-MXpI+7HsAdPkvJ0gk9xj9g541BCqBZOBbdwj9g6lB5LCj6kSV6nqDSjzcAJwvOsfu0fjwvC8hQU+ecfhp+MpiQ==}
@@ -2665,15 +3344,6 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@rollup/plugin-json@6.1.0':
-    resolution: {integrity: sha512-EGI2te5ENk1coGeADSIwZ7G2Q8CJS2sF120T7jLw4xFw9n7wIOXHo+kIYRAoVpJAN+kmqZSoO3Fp4JtoNF4ReA==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
   '@rollup/plugin-replace@6.0.3':
     resolution: {integrity: sha512-J4RZarRvQAm5IF0/LwUUg+obsm+xZhYnbMXmXROyoSE1ATJe3oXSb9L5MMppdxP2ylNSjv6zFBwKYjcKMucVfA==}
     engines: {node: '>=14.0.0'}
@@ -2930,9 +3600,6 @@ packages:
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
 
-  '@types/argparse@2.0.17':
-    resolution: {integrity: sha512-fueJssTf+4dW4HODshEGkIZbkLKHzgu1FvCI4cTc/MKum/534Euo3SrN+ilq8xgyHnOjtmg33/hee8iXLRg1XA==}
-
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
 
@@ -2956,9 +3623,6 @@ packages:
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
-
-  '@types/eslint@9.6.1':
-    resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
 
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
@@ -3737,10 +4401,6 @@ packages:
     resolution: {integrity: sha512-j/O/d7GcZCyNl7/hwZAb606rzqkyvaDctLmckbxLzHvFBzTJHuGEdodATcP3yIRoDrLHkIATJuvzbFlp/ki2cQ==}
     engines: {node: '>=18'}
 
-  conventional-changelog-conventionalcommits@10.2.1:
-    resolution: {integrity: sha512-n4Kr1HFMTf3iMbES0TMxKIcYtUUv4rKqyQQp2JwfOEfFCOfGT3Tq4mCyJ8S9/YPyWhydjfKrrvnyl+gCjA+mJQ==}
-    engines: {node: '>=22'}
-
   convert-hrtime@5.0.0:
     resolution: {integrity: sha512-lOETlkIeYSJWcbbcvjRKGxVMXJR+8+OQb/mTPbA4ObPMytYIsUbuOE0Jzy60hjARYszq1id0j8KgVhC+WGZVTg==}
     engines: {node: '>=12'}
@@ -4402,6 +5062,9 @@ packages:
   fastq@1.20.1:
     resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
 
+  fd-package-json@2.0.0:
+    resolution: {integrity: sha512-jKmm9YtsNXN789RS/0mSzOC1NUq9mkVd65vbSSVsKdjGvYXBuE4oWe2QOEoFeRmJg+lPuZxpmrfFclNhoRMneQ==}
+
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
@@ -4461,6 +5124,11 @@ packages:
   for-each@0.3.5:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
     engines: {node: '>= 0.4'}
+
+  formatly@0.3.0:
+    resolution: {integrity: sha512-9XNj/o4wrRFyhSMJOvsuyMwy8aUfBaZ1VrqHVfohyXf0Sw0e+yfKG+xZaY3arGCOMdwFsqObtzVOc1gU9KiT9w==}
+    engines: {node: '>=18.3.0'}
+    hasBin: true
 
   fp-ts@2.16.11:
     resolution: {integrity: sha512-LaI+KaX2NFkfn1ZGHoKCmcfv7yrZsC3b8NtWsTVQeHkq4F27vI5igUuO53sxqDEa2gNQMHFPmpojDw/1zmUK7w==}
@@ -4525,6 +5193,9 @@ packages:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
 
+  get-tsconfig@4.14.0:
+    resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
+
   get-tsconfig@4.14.1:
     resolution: {integrity: sha512-Dz/6HxkrxgNehhxLVeyv8sad9UzF2xBVeaKBQNDfJ5XiSXmp2gTR0eO0RWiT2NCKS5aGP9jjkOMggTN90qU50A==}
 
@@ -4534,11 +5205,6 @@ packages:
 
   git-hooks-list@4.2.1:
     resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
-
-  github-settings-as-code@2.1.0:
-    resolution: {integrity: sha512-LK+IY1dweFlSfkF2tUSuuUegQd5sjtKXNMVIogQV+MEOYE2znG5wb/WRE+AjFSz6+DgM6YBMMWU1/JnIMvmdxA==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-    hasBin: true
 
   github-slugger@2.0.0:
     resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
@@ -5071,6 +5737,11 @@ packages:
     resolution: {integrity: sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==}
     engines: {node: '>= 8'}
 
+  knip@6.31.0:
+    resolution: {integrity: sha512-NbeIEmUS2VUMjAkbiSNOKPJeV9wpCsr0660sUyKyMQbk4Iom0++nTLInVp4MJ+LfR4kORnw67bDi5tvO7YLnzA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+
   kolorist@1.8.0:
     resolution: {integrity: sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==}
 
@@ -5552,10 +6223,6 @@ packages:
     resolution: {integrity: sha512-4a+OsYv9UktOJKE+l1A4OufDgdRF9PifWj+tJnHURo/P+WOxpG4GzUFL9qCalmWauao6ogiG+QvnCovwPoyAWA==}
     engines: {node: '>=12.20.0'}
 
-  octokit-safe-types@1.2.24:
-    resolution: {integrity: sha512-xgL6IjcPlKmK1rDYIrQnDGScNRrdbFWucep611B8alxixK8Hz296eKAvBNw+p6uHK1vdrafTT7JALoox5IpB5w==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-
   ofetch@1.5.1:
     resolution: {integrity: sha512-2W4oUZlVaqAPAil6FUg/difl6YhqhUR7x2eZY4bQCko22UXg3hptq9KLQdqFClV+Wu85UX7hNtdGTngi/1BxcA==}
 
@@ -5578,6 +6245,13 @@ packages:
   own-keys@1.0.2:
     resolution: {integrity: sha512-19YVAg7T+WTrxggPukVq7DjTv6+PJ867TmhCvBsYwmbFCsZd344rq2Ld1p0wo8f8Qrrhgp82c6FJRqdXWtSEhg==}
     engines: {node: '>= 0.4'}
+
+  oxc-parser@0.142.0:
+    resolution: {integrity: sha512-kKR+jPiRJYJDexVoziIg/FVGvr1fT1FZSSJOk6tVoMKKSlsf1Cso+cgGCJkOEDWOP174vRntCPFKg+AS7InWvw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+
+  oxc-resolver@11.24.2:
+    resolution: {integrity: sha512-FY91FiDBj7ls5MsFS9jN3tjz2o0/zsdSsymlakySaBwVJZorHhkWyICLZMKxlu1R9vYo+sd3z1jwb4J8x7bNDw==}
 
   p-event@6.0.1:
     resolution: {integrity: sha512-Q6Bekk5wpzW5qIyUP4gdMEujObYstZl6DMMOSenwBvV0BlE5LkDwkjs5yHbZmdCEq2o4RJx4tE1vwxFVf2FG1w==}
@@ -6257,6 +6931,10 @@ packages:
     resolution: {integrity: sha512-SlyRoSkdh1dYP0PzclLE7r0M9sgbFKKMFXpFRUMNuKhQSbC6VQIGzq3E0qsfvGJaUFJPGv6Ws1NZ/haTAjfbMA==}
     engines: {node: '>=12'}
 
+  strip-json-comments@5.0.3:
+    resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
+    engines: {node: '>=14.16'}
+
   style-to-js@1.1.21:
     resolution: {integrity: sha512-RjQetxJrrUJLQPHbLku6U/ocGtzyjbJMP9lCNK7Ag0CNh690nSH8woqWH9u16nMjYBAok+i7JO1NP2pOy8IsPQ==}
 
@@ -6337,30 +7015,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-codemod-lib@2.2.5:
-    resolution: {integrity: sha512-TLK52cTyGresMFR2fZ7EbcmLNY4EAIbMTYuExp6K9jpfariA+cZBPq9LZpQ4hHKbdumvatJk9VNidH5seczHEw==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-    hasBin: true
-    peerDependencies:
-      cmd-ts: 0.14.3
-      dedent: 1.7.2
-      ts-repo-utils: 8.1.0
-    peerDependenciesMeta:
-      cmd-ts:
-        optional: true
-      dedent:
-        optional: true
-      ts-repo-utils:
-        optional: true
-
   ts-data-forge@14.1.0:
     resolution: {integrity: sha512-0FC08qWgVPbXs4UsmyF08QZ5D0AnaEyyGO7CNp5t9Z+8RevZhTI02BFS/G7GamSLKhWZc7/qWwUhpOexzr6lBQ==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
-  ts-data-forge@14.2.0:
-    resolution: {integrity: sha512-eBr5fk8JCvfxrKpEnjBZN6CG05Sa+BxUFc8/C9PhJWM+eWFZ0wi/+6007raIgZ1UQ6Mqs+39RgMHEQsP4lQ0Pw==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
     peerDependencies:
       typescript: '>=4.8'
@@ -6369,10 +7025,6 @@ packages:
     resolution: {integrity: sha512-EDyGAwH1gO0Ausm9gV6T2nUvBgXT5kGoCMJPllOaooZ+4VvJiKBdZE7wK18N1deEowhcUptS+5GXZK8U/fvpwA==}
     peerDependencies:
       typescript: '>=4.0.0'
-
-  ts-fortress@12.0.0:
-    resolution: {integrity: sha512-hlJ2QYkMT1dyDkaJUtnqNO+xDlt8qiXN11jWAM6EuhbJRPKTkRXtCdHYLRrik05GwhclIDCQmB6HnDL6DNMcIA==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   ts-morph@28.0.0:
     resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
@@ -6386,10 +7038,6 @@ packages:
 
   ts-type-forge@9.1.3:
     resolution: {integrity: sha512-PyBGQTDM2WZezaO/WeWe5J/IeJSLfXdNNvfvNH23Jclxl2B9Z1c3wLFsIdXpx5dT25KkPMy/SWk9Lb2CRwnfHQ==}
-    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
-
-  ts-type-forge@9.2.0:
-    resolution: {integrity: sha512-ugBVJC4XKdc9ANcYCLo2kp5U7lyKBzNf6NY47ZZX2iU4AqbJDaCXwzUQua/Fkp1BynbeSXBvcc2QK2SO/Y69jQ==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
@@ -6439,25 +7087,12 @@ packages:
     peerDependencies:
       typedoc: ~0.28.0
 
-  typedoc-plugin-markdown@4.12.0:
-    resolution: {integrity: sha512-eJDEMAfxCmede22c/Jw7d0FA13ggAQv+KkwQYKYCdqI02cin6Rc9QRwbG/7XvvHWinuFejySnZVUWDtvGk3Vbg==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      typedoc: 0.28.x
-
   typedoc@0.28.20:
     resolution: {integrity: sha512-uSKqkh8Cr48vllnEy+jdaAgOeR6Y+QCBW7usgUsKj7gJEfR7stw9U/fE49LBnj2tPRKPY0c0EBJSWe9Appmplg==}
     engines: {node: '>= 18', pnpm: '>= 10'}
     hasBin: true
     peerDependencies:
       typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x || 6.0.x
-
-  typescript-eslint@8.65.0:
-    resolution: {integrity: sha512-/ggrHAwyjENDusvyxbuqxAC2dTnZg/Z8F+fgQtYIz+L6n/9HfSlEZcFGV/NsMNa6CkGk0xUjUAFwC0vHOflvIA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: '>=4.8.4 <6.1.0'
 
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
@@ -6477,6 +7112,10 @@ packages:
 
   ultrahtml@1.7.0:
     resolution: {integrity: sha512-2xRd0VHoAQE4M+vF/DvFFB7pUV0ZxTW1TLi7lHQWnF/Sb5TPeEUV/l+hxcNnGO00ZXGnR0voCMmYRKQf+rvJ2g==}
+
+  unbash@4.0.6:
+    resolution: {integrity: sha512-YGBMSVG/WrA2vgaZbXVvxrGgoMcWZecyyS4foGt8clbtY7s1nIKNmt7Z9LR74XE6FkYTSqDmKk2lIOhOjIvmrw==}
+    engines: {node: '>=14'}
 
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
@@ -6749,6 +7388,10 @@ packages:
 
   vscode-uri@3.1.0:
     resolution: {integrity: sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ==}
+
+  walk-up-path@4.0.0:
+    resolution: {integrity: sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A==}
+    engines: {node: 20 || >=22}
 
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
@@ -7442,8 +8085,6 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
-  '@conventional-changelog/template@1.2.1': {}
-
   '@cspell/cspell-bundled-dicts@10.0.1':
     dependencies:
       '@cspell/dict-ada': 4.1.1
@@ -7675,6 +8316,12 @@ snapshots:
     optional: true
 
   '@emnapi/core@1.11.1':
+    dependencies:
+      '@emnapi/wasi-threads': 1.2.2
+      tslib: 2.8.1
+    optional: true
+
+  '@emnapi/core@1.11.2':
     dependencies:
       '@emnapi/wasi-threads': 1.2.2
       tslib: 2.8.1
@@ -8245,6 +8892,13 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
+  '@napi-rs/wasm-runtime@1.2.2(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
   '@napi-rs/wasm-runtime@1.2.2(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)':
     dependencies:
       '@emnapi/core': 2.0.0-alpha.3
@@ -8320,7 +8974,132 @@ snapshots:
 
   '@oslojs/encoding@1.1.0': {}
 
+  '@oxc-parser/binding-android-arm-eabi@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-android-arm64@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-darwin-arm64@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-darwin-x64@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-freebsd-x64@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm-gnueabihf@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm-musleabihf@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-musl@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-ppc64-gnu@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-riscv64-gnu@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-riscv64-musl@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-s390x-gnu@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-gnu@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-musl@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-openharmony-arm64@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-wasm32-wasi@0.142.0':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
+      '@napi-rs/wasm-runtime': 1.2.2(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
+    optional: true
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-win32-ia32-msvc@0.142.0':
+    optional: true
+
+  '@oxc-parser/binding-win32-x64-msvc@0.142.0':
+    optional: true
+
   '@oxc-project/types@0.142.0': {}
+
+  '@oxc-resolver/binding-android-arm-eabi@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-android-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-darwin-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-darwin-x64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-freebsd-x64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm-gnueabihf@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm-musleabihf@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-ppc64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-riscv64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-riscv64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-s390x-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-x64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-x64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-openharmony-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-wasm32-wasi@11.24.2':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
+      '@napi-rs/wasm-runtime': 1.2.2(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
+    optional: true
+
+  '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-win32-x64-msvc@11.24.2':
+    optional: true
 
   '@pagefind/darwin-arm64@1.5.2':
     optional: true
@@ -8509,12 +9288,6 @@ snapshots:
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
   '@rolldown/pluginutils@1.0.1': {}
-
-  '@rollup/plugin-json@6.1.0(rollup@4.62.4)':
-    dependencies:
-      '@rollup/pluginutils': 5.4.0(rollup@4.62.4)
-    optionalDependencies:
-      rollup: 4.62.4
 
   '@rollup/plugin-replace@6.0.3(rollup@4.62.4)':
     dependencies:
@@ -8720,8 +9493,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/argparse@2.0.17': {}
-
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.29.8
@@ -8755,11 +9526,6 @@ snapshots:
       '@types/ms': 2.1.0
 
   '@types/deep-eql@4.0.2': {}
-
-  '@types/eslint@9.6.1':
-    dependencies:
-      '@types/estree': 1.0.9
-      '@types/json-schema': 7.0.15
 
   '@types/esrecurse@4.3.1': {}
 
@@ -9565,10 +10331,6 @@ snapshots:
   concat-map@0.0.1: {}
 
   content-type@2.0.0: {}
-
-  conventional-changelog-conventionalcommits@10.2.1:
-    dependencies:
-      '@conventional-changelog/template': 1.2.1
 
   convert-hrtime@5.0.0: {}
 
@@ -10442,6 +11204,10 @@ snapshots:
     dependencies:
       reusify: 1.1.0
 
+  fd-package-json@2.0.0:
+    dependencies:
+      walk-up-path: 4.0.0
+
   fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
       picomatch: 4.0.5
@@ -10492,6 +11258,10 @@ snapshots:
   for-each@0.3.5:
     dependencies:
       is-callable: 1.2.7
+
+  formatly@0.3.0:
+    dependencies:
+      fd-package-json: 2.0.0
 
   fp-ts@2.16.11: {}
 
@@ -10563,6 +11333,10 @@ snapshots:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
 
+  get-tsconfig@4.14.0:
+    dependencies:
+      resolve-pkg-maps: 1.0.0
+
   get-tsconfig@4.14.1:
     dependencies:
       resolve-pkg-maps: 1.0.0
@@ -10572,17 +11346,6 @@ snapshots:
       resolve-pkg-maps: 1.0.0
 
   git-hooks-list@4.2.1: {}
-
-  github-settings-as-code@2.1.0(typescript@6.0.3):
-    dependencies:
-      '@octokit/core': 7.0.7
-      dotenv: 17.4.2
-      octokit-safe-types: 1.2.24(typescript@6.0.3)
-      ts-data-forge: 14.2.0(typescript@6.0.3)
-      ts-fortress: 12.0.0(typescript@6.0.3)
-      ts-type-forge: 9.2.0
-    transitivePeerDependencies:
-      - typescript
 
   github-slugger@2.0.0: {}
 
@@ -11210,6 +11973,22 @@ snapshots:
       json-buffer: 3.0.1
 
   klona@2.0.6: {}
+
+  knip@6.31.0:
+    dependencies:
+      fdir: 6.5.0(picomatch@4.0.5)
+      formatly: 0.3.0
+      get-tsconfig: 4.14.0
+      jiti: 2.7.0
+      oxc-parser: 0.142.0
+      oxc-resolver: 11.24.2
+      picomatch: 4.0.5
+      smol-toml: 1.7.1
+      strip-json-comments: 5.0.3
+      tinyglobby: 0.2.17
+      unbash: 4.0.6
+      yaml: 2.9.0
+      zod: 4.4.3
 
   kolorist@1.8.0: {}
 
@@ -11986,16 +12765,6 @@ snapshots:
 
   obug@2.1.4: {}
 
-  octokit-safe-types@1.2.24(typescript@6.0.3):
-    dependencies:
-      '@octokit/openapi-types': 28.0.0
-      '@octokit/types': 17.0.0
-      ts-data-forge: 14.2.0(typescript@6.0.3)
-      ts-fortress: 12.0.0(typescript@6.0.3)
-      ts-type-forge: 9.2.0
-    transitivePeerDependencies:
-      - typescript
-
   ofetch@1.5.1:
     dependencies:
       destr: 2.0.5
@@ -12029,6 +12798,53 @@ snapshots:
       get-intrinsic: 1.3.0
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
+
+  oxc-parser@0.142.0:
+    dependencies:
+      '@oxc-project/types': 0.142.0
+    optionalDependencies:
+      '@oxc-parser/binding-android-arm-eabi': 0.142.0
+      '@oxc-parser/binding-android-arm64': 0.142.0
+      '@oxc-parser/binding-darwin-arm64': 0.142.0
+      '@oxc-parser/binding-darwin-x64': 0.142.0
+      '@oxc-parser/binding-freebsd-x64': 0.142.0
+      '@oxc-parser/binding-linux-arm-gnueabihf': 0.142.0
+      '@oxc-parser/binding-linux-arm-musleabihf': 0.142.0
+      '@oxc-parser/binding-linux-arm64-gnu': 0.142.0
+      '@oxc-parser/binding-linux-arm64-musl': 0.142.0
+      '@oxc-parser/binding-linux-ppc64-gnu': 0.142.0
+      '@oxc-parser/binding-linux-riscv64-gnu': 0.142.0
+      '@oxc-parser/binding-linux-riscv64-musl': 0.142.0
+      '@oxc-parser/binding-linux-s390x-gnu': 0.142.0
+      '@oxc-parser/binding-linux-x64-gnu': 0.142.0
+      '@oxc-parser/binding-linux-x64-musl': 0.142.0
+      '@oxc-parser/binding-openharmony-arm64': 0.142.0
+      '@oxc-parser/binding-wasm32-wasi': 0.142.0
+      '@oxc-parser/binding-win32-arm64-msvc': 0.142.0
+      '@oxc-parser/binding-win32-ia32-msvc': 0.142.0
+      '@oxc-parser/binding-win32-x64-msvc': 0.142.0
+
+  oxc-resolver@11.24.2:
+    optionalDependencies:
+      '@oxc-resolver/binding-android-arm-eabi': 11.24.2
+      '@oxc-resolver/binding-android-arm64': 11.24.2
+      '@oxc-resolver/binding-darwin-arm64': 11.24.2
+      '@oxc-resolver/binding-darwin-x64': 11.24.2
+      '@oxc-resolver/binding-freebsd-x64': 11.24.2
+      '@oxc-resolver/binding-linux-arm-gnueabihf': 11.24.2
+      '@oxc-resolver/binding-linux-arm-musleabihf': 11.24.2
+      '@oxc-resolver/binding-linux-arm64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-arm64-musl': 11.24.2
+      '@oxc-resolver/binding-linux-ppc64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-riscv64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-riscv64-musl': 11.24.2
+      '@oxc-resolver/binding-linux-s390x-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-x64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-x64-musl': 11.24.2
+      '@oxc-resolver/binding-openharmony-arm64': 11.24.2
+      '@oxc-resolver/binding-wasm32-wasi': 11.24.2
+      '@oxc-resolver/binding-win32-arm64-msvc': 11.24.2
+      '@oxc-resolver/binding-win32-x64-msvc': 11.24.2
 
   p-event@6.0.1:
     dependencies:
@@ -12900,6 +13716,8 @@ snapshots:
 
   strip-indent@4.1.1: {}
 
+  strip-json-comments@5.0.3: {}
+
   style-to-js@1.1.21:
     dependencies:
       style-to-object: 1.0.14
@@ -12969,24 +13787,7 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  ts-codemod-lib@2.2.5(dedent@1.7.2(babel-plugin-macros@3.1.0))(ts-repo-utils@10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3))(typescript@6.0.3):
-    dependencies:
-      ts-data-forge: 14.2.0(typescript@6.0.3)
-      ts-morph: 28.0.0
-      ts-type-forge: 9.2.0
-    optionalDependencies:
-      dedent: 1.7.2(babel-plugin-macros@3.1.0)
-      ts-repo-utils: 10.1.8(prettier@3.9.6)(supports-color@7.2.0)(typescript@6.0.3)
-    transitivePeerDependencies:
-      - typescript
-
   ts-data-forge@14.1.0(typescript@6.0.3):
-    dependencies:
-      '@sindresorhus/is': 8.1.0
-      ts-type-forge: 9.1.3
-      typescript: 6.0.3
-
-  ts-data-forge@14.2.0(typescript@6.0.3):
     dependencies:
       '@sindresorhus/is': 8.1.0
       ts-type-forge: 9.1.3
@@ -12996,14 +13797,6 @@ snapshots:
     dependencies:
       picomatch: 4.0.5
       typescript: 6.0.3
-
-  ts-fortress@12.0.0(typescript@6.0.3):
-    dependencies:
-      '@sindresorhus/is': 8.1.0
-      ts-data-forge: 14.1.0(typescript@6.0.3)
-      ts-type-forge: 9.1.3
-    transitivePeerDependencies:
-      - typescript
 
   ts-morph@28.0.0:
     dependencies:
@@ -13027,8 +13820,6 @@ snapshots:
       - typescript
 
   ts-type-forge@9.1.3: {}
-
-  ts-type-forge@9.2.0: {}
 
   tslib@1.14.1: {}
 
@@ -13088,10 +13879,6 @@ snapshots:
     dependencies:
       typedoc: 0.28.20(typescript@6.0.3)
 
-  typedoc-plugin-markdown@4.12.0(typedoc@0.28.20(typescript@6.0.3)):
-    dependencies:
-      typedoc: 0.28.20(typescript@6.0.3)
-
   typedoc@0.28.20(typescript@6.0.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
@@ -13100,17 +13887,6 @@ snapshots:
       minimatch: 10.2.6
       typescript: 6.0.3
       yaml: 2.9.0
-
-  typescript-eslint@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3):
-    dependencies:
-      '@typescript-eslint/eslint-plugin': 8.65.0(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      '@typescript-eslint/parser': 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      '@typescript-eslint/typescript-estree': 8.65.0(supports-color@7.2.0)(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      eslint: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
-      typescript: 6.0.3
-    transitivePeerDependencies:
-      - supports-color
 
   typescript@6.0.3: {}
 
@@ -13142,6 +13918,8 @@ snapshots:
   ufo@1.6.4: {}
 
   ultrahtml@1.7.0: {}
+
+  unbash@4.0.6: {}
 
   unbox-primitive@1.1.0:
     dependencies:
@@ -13370,6 +14148,8 @@ snapshots:
   vscode-languageserver-textdocument@1.0.12: {}
 
   vscode-uri@3.1.0: {}
+
+  walk-up-path@4.0.0: {}
 
   web-namespaces@2.0.1: {}
 

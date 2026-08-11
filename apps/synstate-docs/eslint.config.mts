@@ -10,13 +10,12 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from '../../tools/scripts/project-root-path.mjs';
 
 export default [
   ...eslintConfigForTypeScript({
     tsconfigRootDir: import.meta.dirname,
     tsconfigFileName: 'tsconfig.json',
-    packageDirs: [import.meta.dirname, projectRootPath],
+    packageDirs: [import.meta.dirname],
   }),
 
   eslintPluginTsTypeForge.configs.recommended,
@@ -60,7 +59,6 @@ export default [
       'import-x/no-unassigned-import': 'off',
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
-      'import-x/no-extraneous-dependencies': 'off',
     }),
   },
 ] satisfies readonly FlatConfig[];

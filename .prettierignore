@@ -1,15 +1,6 @@
 pnpm-lock.yaml
 .prettierignore
 agents
-**/docs
-
-# --- mono-specific ---
-
-# Zenn content. Published via zenn.dev's GitHub integration, which reads
-# articles/ and books/ from the repository root. Left unformatted on purpose:
-# a Prettier version bump must never rewrite 21 published articles.
-articles
-books
 
 # Legacy monorepo contents, excluded from the pnpm workspace.
 experimental
