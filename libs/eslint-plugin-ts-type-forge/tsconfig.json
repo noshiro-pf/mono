@@ -12,5 +12,5 @@
       "ts-type-forge": ["../ts-type-forge/src/entry-point.mts"]
     }
   },
-  "include": ["./src", "./scripts", "./configs", "./eslint.config.mts"]
+  "include": ["./src", "./scripts", "./configs"]
 }

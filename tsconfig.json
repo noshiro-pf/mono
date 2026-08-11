@@ -5,7 +5,7 @@
   ],
   "include": [
     "./tools/**/*",
-    "./**/eslint.config.mts",
+    "./**/eslint.config*.mts",
     "./**/configs/**/*.mts",
     "./**/configs/**/*.ts",
     "./**/vite.config.mts",

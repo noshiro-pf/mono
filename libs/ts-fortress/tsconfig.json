@@ -8,12 +8,5 @@
       "ts-fortress": ["./src/entry-point.mts"]
     }
   },
-  "include": [
-    "./src",
-    "./test",
-    "./samples",
-    "./scripts",
-    "./configs",
-    "./eslint.config.mts"
-  ]
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
 }

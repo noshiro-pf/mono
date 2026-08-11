@@ -72,10 +72,24 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   `^x.y.z` → `workspace:^`, `~x.y.z` → `workspace:~`, an exact pin →
   `workspace:*`. Using `workspace:*` where `workspace:^` was meant narrows the
   published range to an exact version.
-- **devDependencies on sibling packages stay on their published npm versions.**
-  The toolchain packages depend on each other cyclically
-  (`eslint-config-typed` ↔ `ts-fortress` ↔ `ts-codemod-lib` …), so linking them
-  through the workspace would leave `pnpm run ws:build` without a valid
-  topological order.
-- `linkWorkspacePackages` is left at its default (`false`) for this reason. Only
-  an explicit `workspace:` specifier links locally.
+- **A package under `libs/` must not devDepend on a sibling.** `ws:build`
+  derives its topological order from `dependencies` + `devDependencies` +
+  `peerDependencies` merged, so a devDependency on the toolchain
+  (`eslint-config-typed` → `ts-data-forge` → …) makes the order unsolvable.
+  The repository's own toolchain lives in the **root** `package.json`, which is
+  not a workspace member and therefore not part of that graph.
+- In the root `package.json`, a workspace package may be `workspace:*` **only
+  if nothing that runs before `pnpm run ws:build` needs it.** `ts-data-forge`,
+  `ts-repo-utils`, `ts-type-forge`, `ts-codemod-lib` and
+  `github-settings-as-code` are executed by the build itself or by CI steps
+  that precede it, so they stay pinned to published npm versions. The lint
+  toolchain (`eslint-config-typed`, `eslint-plugin-ts-*`) is used only after
+  `dist/` exists and is workspace-linked.
+- **Do not add `eslint.config.mts` to a package's `tsconfig.json` `include`.**
+  It imports the workspace-linked lint toolchain, which has no `dist/` while
+  the package is being built. The root `tsconfig.json` type-checks
+  `./**/eslint.config*.mts` after the build instead.
+- `linkWorkspacePackages` is left at its default (`false`). Only an explicit
+  `workspace:` specifier links locally.
+- `pnpm run docs:deps` regenerates `docs/package-dependencies.md`, which holds
+  the current graph, the build stages and the reasoning above.

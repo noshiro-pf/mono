@@ -5,7 +5,14 @@
   ],
   "compilerOptions": {
     "paths": {
-      "eslint-config-typed": ["./src/entry-point.mts"]
+      "eslint-config-typed": ["./src/entry-point.mts"],
+      // `scripts/gen-eslint-rules/` imports the plugin, which is
+      // workspace-linked and has no `dist/` yet while this package is being
+      // built (both are emitted in the same `ws:build` stage). Resolving it
+      // from source removes that ordering constraint.
+      "eslint-plugin-ts-type-forge": [
+        "../eslint-plugin-ts-type-forge/src/index.mts"
+      ]
     }
   },
   "include": [
@@ -14,8 +21,6 @@
     "./samples",
     "./scripts",
     "./configs",
-    "./eslint.config.mts",
-    "./release.config.js",
     "./.markdownlint-cli2.mjs",
     "vitest-globals.d.ts"
   ]

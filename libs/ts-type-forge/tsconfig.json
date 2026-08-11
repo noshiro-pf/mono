@@ -10,12 +10,6 @@
       "ts-type-forge/global": ["./src/global.mts"]
     }
   },
-  "include": [
-    "./src",
-    "./samples",
-    "./scripts",
-    "./configs",
-    "./eslint.config.mts"
-  ],
+  "include": ["./src", "./samples", "./scripts", "./configs"],
   "exclude": ["src/global.mts"]
 }

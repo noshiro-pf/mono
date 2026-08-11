@@ -33,16 +33,19 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Building project',
+    action: () => runCmdStep('pnpm run ws:build', 'Build failed'),
+    successMessage: 'Build succeeded',
+  });
+
+  // After the build: the root lints itself with the workspace copies of
+  // eslint-config-typed and the eslint-plugin-ts-* packages, which resolve to
+  // their `dist/`.
+  await logStep({
     startMessage: 'Checking scripts and configs',
     action: () =>
       runCmdStep('pnpm run check:root', 'Checking scripts and configs failed'),
     successMessage: 'Scripts and configs validated',
-  });
-
-  await logStep({
-    startMessage: 'Building project',
-    action: () => runCmdStep('pnpm run ws:build', 'Build failed'),
-    successMessage: 'Build succeeded',
   });
 
   await logStep({
