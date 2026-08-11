@@ -1,8 +1,7 @@
-/* eslint-disable no-await-in-loop */
-
 import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { transformSourceCode, type TsMorphTransformer } from 'ts-codemod-lib';
 import { Arr, expectType, Result, unknownToString } from 'ts-data-forge';
 import {
   getDiffFrom,
@@ -11,10 +10,6 @@ import {
   getUntrackedFiles,
   glob,
 } from 'ts-repo-utils';
-import {
-  transformSourceCode,
-  type TsMorphTransformer,
-} from '../functions/index.mjs';
 
 type GetFilesOptions = Readonly<{
   baseDir: string;

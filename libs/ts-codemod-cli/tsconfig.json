@@ -1,0 +1,4 @@
+{
+  "extends": ["./configs/tsconfig/tsconfig.type-check.json"],
+  "include": ["./src", "./scripts", "./configs"]
+}

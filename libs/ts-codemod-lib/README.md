@@ -15,7 +15,6 @@ A TypeScript library for code transformations using AST (Abstract Syntax Tree) t
 
 - **AST-based Transformations**: Leverage TypeScript Compiler API for reliable type-aware code transformations
 - **Ready-to-use Transformers**: Append `as const`, convert to readonly types, replace `any` with `unknown`, and more
-- **Ready-to-use CLI Tools**: Convert interfaces to types, add readonly modifiers, and more
 - **Extensible API**: Build custom transformers using the provided utilities
 - **Type-safe**: Written in TypeScript with strict type checking
 - **Selective Transformation**: Support for ignoring specific lines or entire files via comments
@@ -33,10 +32,10 @@ pnpm add ts-codemod-lib
 yarn add ts-codemod-lib
 ```
 
-For CLI usage:
+The command line tools live in a separate package:
 
 ```bash
-npm add -D ts-codemod-lib cmd-ts dedent ts-repo-utils
+npm add -D ts-codemod-cli
 ```
 
 ## Available Transformers
@@ -209,57 +208,19 @@ type Data2 = { value: any };
 const items2 = [1, 2, 3];
 ```
 
-## CLI Tools
+## Command Line Tools
 
-This package provides command-line tools for common TypeScript transformations:
-
-### append-as-const
-
-Appends `as const` to array literals and object literals to make them readonly constants.
+The transformers are also available as commands, published separately as
+[`ts-codemod-cli`](https://www.npmjs.com/package/ts-codemod-cli):
 
 ```bash
-npx append-as-const <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
+npm add -D ts-codemod-cli
+npx convert-to-readonly 'src/**/*.mts'
 ```
 
-### convert-interface-to-type
-
-Converts TypeScript interface declarations to type aliases.
-
-```bash
-npx convert-interface-to-type <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### convert-to-readonly
-
-Adds `readonly` modifiers to type definitions throughout your codebase.
-
-```bash
-npx convert-to-readonly <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### replace-any-with-unknown
-
-Replaces `any` type annotations with `unknown` for improved type safety.
-
-```bash
-npx replace-any-with-unknown <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### replace-record-with-unknown-record
-
-Replaces `Record<string, unknown>` with `UnknownRecord` for better type safety.
-
-```bash
-npx replace-record-with-unknown-record <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-**Common Options:**
-
-- `baseDir`: Base directory to scan for TypeScript files
-- `--exclude`: Glob patterns to exclude (e.g., `"src/generated/**/*.mts"`)
-- `--uncommitted`: Transform only uncommitted files (untracked, modified, and staged), intersected with `baseDir`
-- `--diff-from <base>`: Transform only files that differ from the given base branch or commit hash (e.g., `origin/main`), intersected with `baseDir`
-- `--silent`: Suppress output messages
+They are in their own package because they need `cmd-ts`, `dedent` and
+`ts-repo-utils` — dependencies this library does not otherwise carry. See that
+package's README for the full command list and options.
 
 ## Programmatic Usage
 

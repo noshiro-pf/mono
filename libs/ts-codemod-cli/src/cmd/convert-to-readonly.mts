@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
+import { convertToReadonlyTransformer } from 'ts-codemod-lib';
 import { Arr, Result } from 'ts-data-forge';
-import { convertToReadonlyTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
 const transformer = convertToReadonlyTransformer();
 
 const cmdDef = cmd.command({
   name: transformer.name,
-  version: '2.2.5',
+  version: '1.0.0',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

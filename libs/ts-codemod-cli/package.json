@@ -1,0 +1,95 @@
+{
+  "name": "ts-codemod-cli",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Command line interface for ts-codemod-lib.",
+  "keywords": [
+    "typescript",
+    "codemod",
+    "cli",
+    "readonly",
+    "immutable"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/ts-codemod-cli"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": [
+    "./dist/cmd/*.mjs"
+  ],
+  "type": "module",
+  "bin": {
+    "append-as-const": "./dist/cmd/append-as-const.mjs",
+    "convert-interface-to-type": "./dist/cmd/convert-interface-to-type.mjs",
+    "convert-to-readonly": "./dist/cmd/convert-to-readonly.mjs",
+    "replace-any-with-unknown": "./dist/cmd/replace-any-with-unknown.mjs",
+    "replace-record-with-unknown-record": "./dist/cmd/replace-record-with-unknown-record.mjs"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "clean": "pnpm run /clean:.*/",
+    "clean:logs": "npx rimraf ./*.log",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
+    "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare-release": "run-s sync-cli-versions fmt build",
+    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "cmd-ts": "^0.15.0",
+    "dedent": "^1.7.2",
+    "ts-codemod-lib": "workspace:^",
+    "ts-data-forge": "workspace:^",
+    "ts-repo-utils": "workspace:^"
+  },
+  "devDependencies": {
+    "@rollup/plugin-replace": "catalog:",
+    "@rollup/plugin-strip": "catalog:",
+    "@types/node": "catalog:",
+    "cspell": "catalog:",
+    "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "jiti": "catalog:",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-esbuild": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "typescript-native": "npm:typescript@7.0.2"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

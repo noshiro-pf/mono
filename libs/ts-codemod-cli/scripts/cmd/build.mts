@@ -1,0 +1,148 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { rollup } from 'rollup';
+import { Arr, unknownToString, type UnknownResult } from 'ts-data-forge';
+import { $, Result } from 'ts-repo-utils';
+import { projectRootPath } from '../project-root-path.mjs';
+
+const distDir = path.resolve(projectRootPath, './dist');
+
+/**
+ * The native TypeScript compiler (TypeScript >= 7). It is installed under the
+ * alias "typescript-native" because the "typescript" package must stay on 6.x
+ * for tools that require the JS compiler API (typescript-eslint, typedoc,
+ * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
+ * provides. Invoked via an explicit path because both packages declare a
+ * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
+ * guaranteed.
+ */
+const nativeTsc = path.resolve(
+  projectRootPath,
+  './node_modules/typescript-native/bin/tsc',
+);
+
+/**
+ * Builds the CLI entry points.
+ *
+ * This package ships executables only — no `exports` map, no declarations for
+ * consumers — so the steps that give a library its public surface
+ * (`dist/types.d.mts`, `dist/tsconfig.json`, the `test/dist_` smoke test) have
+ * no counterpart here. The declaration pass is kept purely as the type-check.
+ */
+const build = async (skipCheck: boolean): Promise<void> => {
+  console.info('Starting build process...\n');
+
+  if (!skipCheck) {
+    await logStep({
+      startMessage: 'Checking file extensions',
+      action: () =>
+        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+      successMessage: 'File extensions validated',
+    });
+
+    await logStep({
+      startMessage: 'Cleaning dist directory',
+      action: () =>
+        runStep(
+          Result.fromPromise(
+            fs.rm(distDir, {
+              recursive: true,
+              force: true,
+            }),
+          ),
+          'Failed to clean dist directory',
+        ),
+      successMessage: 'Cleaned dist directory',
+    });
+  }
+
+  await logStep({
+    startMessage: 'Building with Rollup',
+    action: async () => {
+      // The config is imported directly (tsx transpiles it) instead of going
+      // through `rollup --config --configPlugin typescript`, because
+      // `@rollup/plugin-typescript` requires the TypeScript JS compiler API
+      // that TypeScript 7 no longer provides.
+      const { default: rollupConfig } =
+        await import('../../configs/rollup.config.mjs');
+
+      await runStep(
+        Result.fromPromise(
+          (async () => {
+            await using bundle = await rollup(rollupConfig);
+
+            const outputs =
+              rollupConfig.output === undefined
+                ? ([] as const)
+                : Arr.isArray(rollupConfig.output)
+                  ? rollupConfig.output
+                  : ([rollupConfig.output] as const);
+
+            for (const output of outputs) {
+              await bundle.write(output);
+            }
+          })(),
+        ),
+        'Rollup build failed',
+      );
+    },
+    successMessage: 'Rollup build completed',
+  });
+
+  await logStep({
+    startMessage: 'Type-checking the sources',
+    action: () =>
+      runCmdStep(
+        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
+        'Type check failed',
+      ),
+    successMessage: 'Sources type-checked',
+  });
+
+  console.info('✅ Build completed successfully!\n');
+};
+
+const mut_step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  console.info(`${mut_step.current}. ${startMessage}...`);
+
+  await action();
+
+  console.info(`✓ ${successMessage}.\n`);
+
+  mut_step.current += 1;
+};
+
+const runStep = async (
+  promise: Promise<UnknownResult>,
+  errorMsg: string,
+): Promise<void> => {
+  const result = await promise;
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
+    process.exit(1);
+  }
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${result.value.message}`);
+
+    process.exit(1);
+  }
+};
+
+await build(process.argv.includes('--skip-check'));

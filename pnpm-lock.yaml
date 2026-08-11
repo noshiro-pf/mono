@@ -1185,6 +1185,85 @@ importers:
         specifier: workspace:*
         version: link:../ts-repo-utils
 
+  libs/ts-codemod-cli:
+    dependencies:
+      cmd-ts:
+        specifier: ^0.15.0
+        version: 0.15.0(supports-color@7.2.0)
+      dedent:
+        specifier: ^1.7.2
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      ts-codemod-lib:
+        specifier: workspace:^
+        version: link:../ts-codemod-lib
+      ts-data-forge:
+        specifier: workspace:^
+        version: link:../ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:^
+        version: link:../ts-repo-utils
+    devDependencies:
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.2.0
+      cspell:
+        specifier: 'catalog:'
+        version: 10.0.1
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.1
+      eslint:
+        specifier: 'catalog:'
+        version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      jiti:
+        specifier: 'catalog:'
+        version: 2.7.0
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.4
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      typescript-native:
+        specifier: npm:typescript@7.0.2
+        version: typescript@7.0.2
+
   libs/ts-codemod-lib:
     dependencies:
       ts-data-forge:
@@ -1215,9 +1294,6 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
-      cmd-ts:
-        specifier: 0.15.0
-        version: 0.15.0(supports-color@7.2.0)
       cspell:
         specifier: 'catalog:'
         version: 10.0.1

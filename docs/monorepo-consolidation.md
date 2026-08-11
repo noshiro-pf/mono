@@ -151,7 +151,32 @@ Package "ts-codemod-lib" must depend on the current version of "ts-repo-utils": 
 
 `workspace:` プロトコルなら changesets は書き換えず、publish 時にレンジへ展開される。両方を `workspace:^` / `workspace:*` にして解消した。
 
+これで install は通ったが、今度は `ts-codemod-lib` が patch の changeset に対して **major**（2.2.5 → 3.0.0）になった。changesets は「内部パッケージが `peerDependencies` に現れる場合、それが上がれば依存側は major」とみなすため、宣言レンジに新バージョンが収まっていても関係なく major になる。
+
+ここで peerDependencies の使い方そのものを見直したところ、より深刻な問題が見つかった（下記）。CLI を別パッケージへ分離して内部 peer をゼロにしたため、この major も起きなくなった。
+
 **教訓**: `workspace:` 化の監査は `dependencies` だけでなく `peerDependencies` も対象にする。lint も knip も「宣言の有無」しか見ないので、プロトコルの取り違えは検出できない。
+
+### 公開していた CLI が動かなかった
+
+上の peer 依存を調べる過程で、`ts-codemod-lib` が公開していた 5 つの CLI が**利用者の環境で 1 つも起動しない**ことが分かった。クリーンなプロジェクトで検証した結果:
+
+```text
+$ npm i -D ts-codemod-lib && npx convert-to-readonly --help
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'cmd-ts'
+```
+
+CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependenciesMeta` で `optional: true` にされていた。optional peer は npm がインストールもエラーも出さないので、失敗は実行時まで表面化しない。ライブラリ API（トランスフォーマ）の import は正常だった。
+
+意図自体は妥当だった。`ts-repo-utils` は `tsx`（= esbuild、12MB）を依存に持つので、通常の `dependencies` にすればトランスフォーマだけを使う利用者にもそれが入る。
+
+**CLI を `ts-codemod-cli` として別パッケージに分離**し、`cmd-ts` / `dedent` / `ts-repo-utils` をそちらの通常の `dependencies` にした。`ts-codemod-lib` はトランスフォーマだけを公開する。
+
+- CLI 利用者: `npm i -D ts-codemod-cli` だけで動く（クリーン環境で変換まで確認）
+- ライブラリ利用者: インストール内容は変わらない
+- 副作用として内部 peer がリポジトリから消え、changesets の major 問題も一緒に解消した
+
+**教訓**: optional peer は「入れなくても動く」ときにだけ使う。実行に必須なら optional にしてはいけない。公開物の検証は `pnpm pack` してクリーンな環境で実際に動かすのが確実。
 
 ### `ws:doc` がソースを空にした
 
@@ -204,6 +229,5 @@ Package "ts-codemod-lib" must depend on the current version of "ts-repo-utils": 
 - knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
-- `ts-repo-utils` を上げるたび `ts-codemod-lib` が major になる。changesets は「内部パッケージが peerDependencies に現れる場合、それが上がれば依存側は major」とみなすため。optional peer という現在の意図（CLI を使わない利用者に `ts-repo-utils` を入れさせない）を優先して受け入れている。churn が問題になったら `dependencies` へ移すか、changesets の `onlyUpdatePeerDependentsWhenOutOfRange` を検討する
 - `synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している
 - Codecov 設定を per-package flag つきの 1 本に統合する
