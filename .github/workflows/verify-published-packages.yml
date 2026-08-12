@@ -1,0 +1,76 @@
+name: Verify Published Packages
+
+# Installs the pinned published version of every package from npm and runs a
+# small program against each.
+#
+# The pins live in `verify-npm-packages/published/packages/*/package.json` and
+# move only when `pnpm-update` refreshes them, so this has something new to say
+# exactly when they change — which is what it runs on. Tracking `latest`
+# instead would mean starting to fail the moment a release goes out, on a
+# branch that changed nothing.
+#
+# The local half of the check — tarballs packed from the branch — runs on every
+# branch as part of type-check.yml. This one does not need a build: it installs
+# from the registry.
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+
+  workflow_dispatch:
+
+jobs:
+  verify-published:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch main
+        run: git fetch origin main
+
+      - name: Check whether the pins changed
+        id: pins
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
+            echo 'changed=true' >>"${GITHUB_OUTPUT}"
+          else
+            if [ "${GITHUB_REF_NAME}" = 'main' ]; then
+              base="${BEFORE}"
+              case "${base}" in
+                ''|0000000000000000000000000000000000000000) base='origin/main' ;;
+              esac
+            else
+              base='origin/main'
+            fi
+            if git diff --name-only "${base}" -- verify-npm-packages/published | grep -q .; then
+              echo 'changed=true' >>"${GITHUB_OUTPUT}"
+            else
+              echo 'The published pins did not change; nothing to verify.'
+            fi
+          fi
+
+      - name: Install pnpm
+        if: steps.pins.outputs.changed == 'true'
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Set up Node.js
+        if: steps.pins.outputs.changed == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.pins.outputs.changed == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify the published packages
+        if: steps.pins.outputs.changed == 'true'
+        run: pnpm run verify:npm-packages:published

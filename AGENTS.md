@@ -214,6 +214,27 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       name, so the rule cannot know that `micromatch` needs it. When a runtime
       dependency carries no types of its own, put its `@types` package in
       `dependencies` by hand.
+- **`verify-npm-packages/` checks the artifact rather than the source.** It
+  installs what the packages publish and runs a small program against each.
+  `pnpm run verify:npm-packages` uses tarballs packed from the checkout — what
+  the next release will be — and runs on every branch;
+  `pnpm run verify:npm-packages:published` uses versions pinned in
+  `verify-npm-packages/published/packages/*/package.json`, and runs only when
+  those pins change. `pnpm-update` moves them, so a release arrives as a diff
+  rather than as an unrelated branch starting to fail. Only the local half
+  needs `pnpm run ws:build`. See `verify-npm-packages/README.md`.
+    - Edit the checks in `verify-npm-packages/smoke/`. Everything under
+      `local/` and `published/` is generated from it and committed, so the
+      repository-is-clean check fails if they drift.
+    - Three things keep an undeclared dependency from resolving anyway: one
+      project per package, `hoist: false`, and a resolve hook that refuses
+      anything outside the space. The last matters most — these projects sit
+      inside the monorepo, so without it Node walks up into the repository's
+      own `node_modules` and finds our libraries there, built from source.
+    - The space's `node_modules` is deleted before each install. The tarballs
+      are packed under names without versions in them, and pnpm keys a `file:`
+      dependency on its path, so it otherwise reuses the previous tarball —
+      neither `--force` nor deleting the lockfile is enough.
 - **`pnpm run knip` covers the other direction: a declared dependency nothing
   imports.** It also sees imports ESLint does not, such as the ones in
   `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to

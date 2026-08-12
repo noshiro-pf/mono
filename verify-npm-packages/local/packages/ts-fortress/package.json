@@ -1,0 +1,9 @@
+{
+  "name": "verify-ts-fortress",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-fortress": "file:../../../.tarballs/ts-fortress.tgz"
+  }
+}

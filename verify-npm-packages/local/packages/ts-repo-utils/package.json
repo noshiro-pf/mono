@@ -1,0 +1,9 @@
+{
+  "name": "verify-ts-repo-utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-repo-utils": "file:../../../.tarballs/ts-repo-utils.tgz"
+  }
+}

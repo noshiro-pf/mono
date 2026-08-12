@@ -1,0 +1,9 @@
+{
+  "name": "verify-ts-codemod-cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-codemod-cli": "file:../../../.tarballs/ts-codemod-cli.tgz"
+  }
+}

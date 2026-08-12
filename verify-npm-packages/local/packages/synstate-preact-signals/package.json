@@ -1,0 +1,9 @@
+{
+  "name": "verify-synstate-preact-signals",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "synstate-preact-signals": "file:../../../.tarballs/synstate-preact-signals.tgz"
+  }
+}

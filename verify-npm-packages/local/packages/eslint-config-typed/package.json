@@ -1,0 +1,9 @@
+{
+  "name": "verify-eslint-config-typed",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "eslint-config-typed": "file:../../../.tarballs/eslint-config-typed.tgz"
+  }
+}

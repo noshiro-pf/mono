@@ -97,6 +97,7 @@ words:
   - endface
   - envrc
   - eqeqeq
+  - esac
   - esbuild
   - eslintignore
   - faunadb

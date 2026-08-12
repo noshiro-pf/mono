@@ -259,8 +259,13 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
     - 抑止対象は `pnpm-workspace.yaml` の `update.ignoreDeps` が単一の情報源。`typescript` はエイリアス `typescript-native` も含めて守られることを実測で確認した
 - npm package のテスト
-    - [ ] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
-    - [ ] pnpm publish された最新バージョンを install して動作するかチェックするテスト workspace を追加する
+    - [x] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
+        - `pnpm run verify:npm-packages`（`tools/scripts/cmd/verify-npm-packages.mts`）。17 パッケージを pack し、`verify-npm-packages/local/` にパッケージごとの project として install して、それぞれに対して小さなプログラムを実行する。`main` / `module` / `types` / `exports` / `bin` が指すパスが tarball に実在するかも検査する。type-check.yml の matrix に追加済み
+        - 過去に実際に出荷した 2 種類の不具合を再現して検出できることを確認した（synstate の存在しない `module` / `types`、bin が使う依存を devDependencies に置いた場合の `Cannot find package`）
+        - **消費側の install は `hoist: false` が必須。** pnpm 既定の hoisting だと、依存を宣言し忘れたパッケージでも `node_modules/.pnpm/node_modules` 経由で解決できてしまい、検査が素通りする（実測で確認）
+    - [x] pnpm publish された最新バージョンを install して動作するかチェックするテスト workspace を追加する
+        - `verify-npm-packages/` に常駐の workspace を 2 つ置いた。`local/` は pack した tarball、`published/` は npm の `latest` を install する。チェック本体は `smoke/<pkg>.mjs` の 1 箇所だけで、両空間の中身はそこから生成してコミットしている
+        - `published/` は `local/` より古いことがあるため PR のゲートにはせず、日次の workflow で回す
 
 ### step 3 — 旧 mono の復元
 

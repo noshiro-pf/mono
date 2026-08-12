@@ -201,3 +201,12 @@ rollup.config-*.mjs
 **/playwright-report/
 **/blob-report/
 **/playwright/.cache/
+
+# `verify-npm-packages/` installs real packages; only the checks are tracked.
+verify-npm-packages/.tarballs/
+verify-npm-packages/*/node_modules/
+verify-npm-packages/*/packages/*/node_modules/
+verify-npm-packages/*/pnpm-lock.yaml
+# pnpm writes `allowBuilds` and `minimumReleaseAgeExclude` back into this file
+# as it installs, so it is generated state rather than a tracked file.
+verify-npm-packages/*/pnpm-workspace.yaml

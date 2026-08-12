@@ -32,6 +32,7 @@ jobs:
           - codemod:full
           - knip
           - lint:published-deps
+          - verify:npm-packages
 
     steps:
       - name: Checkout

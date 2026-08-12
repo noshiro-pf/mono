@@ -1,0 +1,10 @@
+{
+  "name": "verify-ts-type-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-type-forge": "file:../../../.tarballs/ts-type-forge.tgz",
+    "typescript": "latest"
+  }
+}
