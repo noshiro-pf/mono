@@ -1,7 +1,7 @@
 {
   "extends": [
-    "./tsconfig/tsconfig.build.json",
-    "./tsconfig/tsconfig.vite.json"
+    "../../../tools/configs/tsconfig/tsconfig.build.json",
+    "../../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "module": "NodeNext",
