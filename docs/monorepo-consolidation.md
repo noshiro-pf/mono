@@ -275,4 +275,6 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
 - ~~`synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している~~ → 対応済み。実際に食い違っていたのは `exports` ではなく legacy な `module` / `types` フィールドで、ビルドが一度も出力していないファイルを指していた（publint で確認）。`engines` / `publishConfig` も他パッケージに合わせた
-- Codecov 設定を per-package flag つきの 1 本に統合する
+- ~~Codecov 設定を per-package flag つきの 1 本に統合する~~ → `codecov.yml` に component を 15 個定義して対応。flag ではなく component を使ったのは、flag はアップロード時に付けるものでパッケージごとに 1 回ずつアップロードする必要があるのに対し、component は `codecov.yml` だけで path で切り分けられるため（[Codecov docs](https://docs.codecov.com/docs/components)）。README のバッジも `?component=<pkg>` を指すようにした
+- **Codecov のパス解決が同名ファイルを取り違えている。** `synstate-react-hooks` / `synstate-preact-hooks` / `synstate-react-hooks-compat` は同じ相対パス（`src/create-boolean-state.mts` など）を持つが、Codecov 上には `synstate-react-hooks` の分しか存在しない（[API](https://api.codecov.io/api/v2/github/noshiro-pf/repos/mono/report/) で確認）。lcov の `SF:` はパッケージ相対なので、1 回のアップロードで全パッケージ分をまとめて渡すと、同名パスがどれか 1 つに畳まれてしまう。component は path で切るので、この取り違えは component では直せない。パッケージごとに `directory` を指定してアップロードを分けるか、lcov のパスをリポジトリルート相対に直すかの選択になる
+    - 現状の実害は小さい。畳まれている 3 パッケージはいずれもテストが 0 件で、係数自体に意味が無い

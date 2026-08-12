@@ -9,7 +9,7 @@
 [![npm version](https://img.shields.io/npm/v/synstate.svg)](https://www.npmjs.com/package/synstate)
 [![npm downloads](https://img.shields.io/npm/dm/synstate.svg)](https://www.npmjs.com/package/synstate)
 [![License](https://img.shields.io/npm/l/synstate.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg)](https://codecov.io/gh/noshiro-pf/mono)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?component=synstate)](https://codecov.io/gh/noshiro-pf/mono)
 
 </p>
 

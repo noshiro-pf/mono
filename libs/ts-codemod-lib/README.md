@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
 [![npm downloads](https://img.shields.io/npm/dm/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
 [![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/mono)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?component=ts-codemod-lib)](https://codecov.io/gh/noshiro-pf/mono)
 
 A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the [ts-morph](https://github.com/dsherret/ts-morph).
 
