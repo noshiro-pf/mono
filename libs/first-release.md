@@ -77,6 +77,32 @@ GitHub Actions を選び、次を登録する。
 | Workflow filename   | `release.yml` |
 | Environment         | 空欄          |
 
+**この手順を飛ばすと、Release は次のように落ちる。**
+
+```text
+🦋 error an error occurred while publishing ts-codemod-cli: E404 undefined
+🦋 error     "message": "404 Not Found - PUT https://registry.npmjs.org/ts-codemod-cli - Not found"
+```
+
+**404 はパッケージが無いという意味ではない。** npm はパッケージの存在を秘匿する
+ため、認証に失敗した publish へ 403 ではなく 404 を返す。手動 publish 済みの
+パッケージでこれが出たら、まず trusted publisher の設定を疑う
+（`ts-codemod-cli@1.0.0` の 15 分後に `1.0.1` がこれで落ちた実績がある）。
+
+同じジョブの他のパッケージが publish できているかどうかが切り分けになる。
+できているならワークフロー側の OIDC は正常で、そのパッケージ個別の設定だけが
+欠けている。
+
+失敗したら、設定を入れてからジョブを再実行すればよい。
+
+```sh
+gh run rerun <run-id> --repo noshiro-pf/mono --failed
+```
+
+`changeset publish` は publish 前に npm を照会するので、既に上がっている
+パッケージは "already published" としてスキップされる。二重 publish にはならず、
+git タグも失敗したパッケージの分だけが作られる。
+
 ### 5. Release PR をマージして自動化に戻す
 
 以降は changesets が OIDC で publish する。provenance も自動で付く。
@@ -109,7 +135,7 @@ GitHub Actions を選び、次を登録する。
 - [ ] `repository.directory` がパッケージのパスを指している
 - [ ] Release PR をマージする**前**に手動 publish した
 - [ ] `pnpm publish`（`npm publish` ではない）を使った
-- [ ] trusted publisher を設定した
+- [ ] trusted publisher を設定した（飛ばすと Release が 404 で落ちる）
 - [ ] 公開後、まっさらなディレクトリで実際にインストールして動かした
 
 最後の項目は省略しないこと。`ts-codemod-lib` の CLI は

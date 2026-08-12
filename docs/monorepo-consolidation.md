@@ -243,6 +243,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 検出された 59 件の未使用宣言を削除した（root の `rollup` / `typedoc` 系、各パッケージの `markdownlint` / `prettier-plugin-*` など）
     - `eslint-config-typed` の公開 `dependencies` から `@types/eslint` と `typescript-eslint` も外した
 - [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
+- [x] 旧リポジトリの URL を参照している箇所が無いかチェック。 synstate の logo のパスが死んでいるのを発見済み。
+- [ ] `github/` を `repo-settings/` にリネーム（ github-settings-as-code の破壊的修正）
+- [ ] agents/ のルールをルートの AGENTS.md に集約し内容を整理、 AGENTS.md 自動生成スクリプトも削除。元々 many-repo で管理していた時代に AGENTS.md を自動で同期するための仕組みの名残だったが、 mono-repo 化により不要になった。
 
 ### step 2 — 新規対応
 
@@ -252,6 +255,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - `main` が進んだら追従、を日次で実行する
     - 週次実行時、先週の分がマージされていなかったら新規 PR を作成せずそれを更新する
     - 現在の `pnpm-update.yml` は存在しない `update-packages` script を呼んでいる
+- npm package のテスト
+    - [ ] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
+    - [ ] pnpm publish された最新バージョンを install して動作するかチェックするテスト workspace を追加する
 
 ### step 3 — 旧 mono の復元
 
