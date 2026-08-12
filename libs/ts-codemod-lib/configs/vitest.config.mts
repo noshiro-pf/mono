@@ -1,3 +1,4 @@
+import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
@@ -18,6 +19,7 @@ export default defineViteConfig({
     ],
   },
   browser: {
+    provider: playwright(),
     // This package kept `retry` rather than the serialized fetch that the
     // other browser projects use. Left as it was.
     retry: 2,

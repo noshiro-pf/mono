@@ -1,3 +1,4 @@
+import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
@@ -17,6 +18,7 @@ export default defineViteConfig({
     testTimeout: 30_000,
   },
   browser: {
+    provider: playwright(),
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     testTimeout: 30_000,

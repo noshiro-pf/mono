@@ -68,6 +68,7 @@
   "devDependencies": {
     "@reduxjs/toolkit": "catalog:",
     "@types/react": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
     "argparse": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -75,6 +76,7 @@
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jotai": "catalog:",
     "mobx": "catalog:",
+    "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

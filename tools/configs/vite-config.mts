@@ -1,4 +1,3 @@
-import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { castMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
@@ -7,6 +6,11 @@ import {
   type ViteUserConfig,
 } from 'vitest/config';
 import { type InlineConfig, type ProjectConfig } from 'vitest/node';
+
+/** The value of `browser.provider`, e.g. `playwright()`. */
+type BrowserProvider = NonNullable<
+  NonNullable<ProjectConfig['browser']>['provider']
+>;
 
 type ProjectOverrides = DeepReadonly<{
   includeSource?: readonly string[];
@@ -46,6 +50,12 @@ export const defineViteConfig = ({
   browser?:
     | false
     | (ProjectOverrides & {
+        /**
+         * The browser provider, e.g. `playwright()`. Passed in rather than
+         * chosen here so that a package testing in a browser declares the
+         * driver it needs, instead of inheriting it from this directory.
+         */
+        provider: BrowserProvider;
         optimizeDepsInclude?: readonly string[];
         retry?: number;
         /**
@@ -87,7 +97,7 @@ export const defineViteConfig = ({
               enabled: true,
               headless: true,
               screenshotFailures: false,
-              provider: playwright(),
+              provider: castMutable(browser.provider),
               instances: [{ browser: 'chromium' as const }],
             },
           },

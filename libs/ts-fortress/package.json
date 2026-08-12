@@ -69,12 +69,14 @@
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
+    "@vitest/browser-playwright": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "fp-ts": "2.16.11",
     "io-ts": "2.2.22",
+    "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

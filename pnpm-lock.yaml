@@ -816,9 +816,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
-      '@vitest/browser-playwright':
-        specifier: 'catalog:'
-        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
@@ -849,9 +846,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.3
-      playwright:
-        specifier: 'catalog:'
-        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -895,6 +889,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       argparse:
         specifier: 'catalog:'
         version: 3.0.0
@@ -916,6 +913,9 @@ importers:
       mobx:
         specifier: 'catalog:'
         version: 7.0.0
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -962,6 +962,9 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -974,6 +977,9 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../eslint-plugin-ts-type-forge
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.7.0)
@@ -1008,6 +1014,9 @@ importers:
       '@preact/signals':
         specifier: 2.10.1
         version: 2.10.1(preact@10.29.8)
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -1020,6 +1029,9 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../eslint-plugin-ts-type-forge
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.7.0)
@@ -1054,6 +1066,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -1066,6 +1081,9 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../eslint-plugin-ts-type-forge
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -1100,6 +1118,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -1112,6 +1133,9 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../eslint-plugin-ts-type-forge
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -1316,6 +1340,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       dedent:
         specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
@@ -1331,6 +1358,9 @@ importers:
       immer:
         specifier: 'catalog:'
         version: 11.1.15
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
@@ -1371,6 +1401,9 @@ importers:
         specifier: workspace:~
         version: link:../ts-type-forge
     devDependencies:
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
@@ -1389,6 +1422,9 @@ importers:
       io-ts:
         specifier: 2.2.22
         version: 2.2.22(fp-ts@2.16.11)
+      playwright:
+        specifier: 'catalog:'
+        version: 1.62.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
