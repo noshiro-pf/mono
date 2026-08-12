@@ -93,6 +93,7 @@ words:
   - dlim
   - elementof
   - elementwise
+  - elif
   - endface
   - envrc
   - eqeqeq
