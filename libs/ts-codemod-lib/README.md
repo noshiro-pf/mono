@@ -2,8 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
 [![npm downloads](https://img.shields.io/npm/dm/ts-codemod-lib.svg)](https://www.npmjs.com/package/ts-codemod-lib)
-[![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/ts-codemod-lib/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/ts-codemod-lib)
+[![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/mono)
 
 A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the [ts-morph](https://github.com/dsherret/ts-morph).
 
@@ -15,7 +15,6 @@ A TypeScript library for code transformations using AST (Abstract Syntax Tree) t
 
 - **AST-based Transformations**: Leverage TypeScript Compiler API for reliable type-aware code transformations
 - **Ready-to-use Transformers**: Append `as const`, convert to readonly types, replace `any` with `unknown`, and more
-- **Ready-to-use CLI Tools**: Convert interfaces to types, add readonly modifiers, and more
 - **Extensible API**: Build custom transformers using the provided utilities
 - **Type-safe**: Written in TypeScript with strict type checking
 - **Selective Transformation**: Support for ignoring specific lines or entire files via comments
@@ -33,10 +32,10 @@ pnpm add ts-codemod-lib
 yarn add ts-codemod-lib
 ```
 
-For CLI usage:
+The command line tools live in a separate package:
 
 ```bash
-npm add -D ts-codemod-lib cmd-ts dedent ts-repo-utils
+npm add -D ts-codemod-cli
 ```
 
 ## Available Transformers
@@ -99,7 +98,7 @@ type User2 = Readonly<{
 }>;
 ```
 
-For more detailed transformation examples, see the [test file](./src/functions/ast-transformers/convert-to-readonly-type.test.mts) which covers various scenarios including complex types, nested structures, and DeepReadonly transformations.
+For more detailed transformation examples, see the [test file](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts) which covers various scenarios including complex types, nested structures, and DeepReadonly transformations.
 
 ### 3. `convertInterfaceToTypeTransformer`
 
@@ -141,7 +140,7 @@ const sortValues2 = (...args: readonly unknown[]): unknown =>
     (args as any).toSorted((a: any, b: any) => a - b);
 ```
 
-For more detailed transformation examples, see the [test file](./src/functions/ast-transformers/replace-any-with-unknown.test.mts) which covers various scenarios including function parameters, return types, and variable declarations.
+For more detailed transformation examples, see the [test file](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/replace-any-with-unknown.test.mts) which covers various scenarios including function parameters, return types, and variable declarations.
 
 ### 5. `replaceRecordWithUnknownRecordTransformer`
 
@@ -209,57 +208,19 @@ type Data2 = { value: any };
 const items2 = [1, 2, 3];
 ```
 
-## CLI Tools
+## Command Line Tools
 
-This package provides command-line tools for common TypeScript transformations:
-
-### append-as-const
-
-Appends `as const` to array literals and object literals to make them readonly constants.
+The transformers are also available as commands, published separately as
+[`ts-codemod-cli`](https://www.npmjs.com/package/ts-codemod-cli):
 
 ```bash
-npx append-as-const <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
+npm add -D ts-codemod-cli
+npx convert-to-readonly 'src/**/*.mts'
 ```
 
-### convert-interface-to-type
-
-Converts TypeScript interface declarations to type aliases.
-
-```bash
-npx convert-interface-to-type <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### convert-to-readonly
-
-Adds `readonly` modifiers to type definitions throughout your codebase.
-
-```bash
-npx convert-to-readonly <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### replace-any-with-unknown
-
-Replaces `any` type annotations with `unknown` for improved type safety.
-
-```bash
-npx replace-any-with-unknown <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-### replace-record-with-unknown-record
-
-Replaces `Record<string, unknown>` with `UnknownRecord` for better type safety.
-
-```bash
-npx replace-record-with-unknown-record <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
-```
-
-**Common Options:**
-
-- `baseDir`: Base directory to scan for TypeScript files
-- `--exclude`: Glob patterns to exclude (e.g., `"src/generated/**/*.mts"`)
-- `--uncommitted`: Transform only uncommitted files (untracked, modified, and staged), intersected with `baseDir`
-- `--diff-from <base>`: Transform only files that differ from the given base branch or commit hash (e.g., `origin/main`), intersected with `baseDir`
-- `--silent`: Suppress output messages
+They are in their own package because they need `cmd-ts`, `dedent` and
+`ts-repo-utils` — dependencies this library does not otherwise carry. See that
+package's README for the full command list and options.
 
 ## Programmatic Usage
 
@@ -447,7 +408,7 @@ node codemod.mjs
 ### Local Setup
 
 ```sh
-git clone https://github.com/noshiro-pf/ts-codemod-lib.git
+git clone https://github.com/noshiro-pf/mono.git
 pnpm i
 ```
 

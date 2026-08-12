@@ -125,7 +125,7 @@ const jaRefDir = path.resolve(
 );
 
 const githubBaseUrl =
-  'https://github.com/noshiro-pf/synstate/blob/main/packages/synstate';
+  'https://github.com/noshiro-pf/mono/blob/main/libs/synstate';
 
 const placeholderStart = '{/* jsdoc-description */}';
 

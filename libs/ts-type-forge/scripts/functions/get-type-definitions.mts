@@ -9,6 +9,14 @@ const srcDir = path.resolve(workspaceRootPath, './src');
 
 const readmePath = path.resolve(workspaceRootPath, './README.md');
 
+/**
+ * Absolute, because npmjs.com rewrites a relative README link against the
+ * repository root and ignores `repository.directory` — `./src/…` would resolve
+ * to `mono/src/…`, which does not exist.
+ */
+const sourceUrlBase =
+  'https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge';
+
 const markers = {
   start: '<!-- AUTO-GENERATED TYPES START -->',
   end: '<!-- AUTO-GENERATED TYPES END -->',
@@ -89,7 +97,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
       Arr.toUnshifted(`- ${relativePath}`)(
         types.map(
           ({ line, typeName }) =>
-            `  - [${typeName}](./${relativePath}#L${line})`,
+            `  - [${typeName}](${sourceUrlBase}/${relativePath}#L${line})`,
         ),
       ),
     )

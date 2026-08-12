@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
+import { appendAsConstTransformer } from 'ts-codemod-lib';
 import { Arr, Result } from 'ts-data-forge';
-import { replaceAnyWithUnknownTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
-const transformer = replaceAnyWithUnknownTransformer();
+const transformer = appendAsConstTransformer();
 
 const cmdDef = cmd.command({
   name: transformer.name,
-  version: '2.2.5',
+  version: '1.0.0',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

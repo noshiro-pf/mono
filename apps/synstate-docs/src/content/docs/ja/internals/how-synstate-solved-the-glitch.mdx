@@ -375,4 +375,4 @@ a child observable cannot be its own ancestor.
 - **RxJS** は循環検出を行いません。実際には、`pipe()` と `combineLatest()` は前方のみの構築パターンに従います — 既に存在する Observable のみを参照できるため、通常の使用では循環はほとんど発生しません。しかし、SynState の構築時 DFS チェックとは異なり、RxJS はセーフティネットとしての明示的な検証を提供しません。
 - **Jotai** は循環を検出しません。循環的な `atom` 定義（例： `atomA` が `atomB` を読み、`atomB` が `atomA` を読む）は定義時にエラーなく受け入れられます。循環は atom が読まれたときにのみ顕在化し、明確なエラーメッセージではなく `Maximum call stack size exceeded`（スタックオーバーフロー）でクラッシュします。
 
-これらの動作は[循環依存の比較テスト](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/circular-dependency-comparison.test.mts)で検証されています。
+これらの動作は[循環依存の比較テスト](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/class/circular-dependency-comparison.test.mts)で検証されています。

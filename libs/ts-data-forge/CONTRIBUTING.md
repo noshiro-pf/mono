@@ -15,7 +15,7 @@ Thank you for your interest in contributing to `ts-data-forge`! We welcome contr
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](https://github.com/noshiro-pf/ts-data-forge/blob/main/CODE_OF_CONDUCT.md). Please be respectful and constructive in all interactions.
+By participating in this project, you agree to abide by our [Code of Conduct](https://github.com/noshiro-pf/mono/blob/main/libs/ts-data-forge/CODE_OF_CONDUCT.md). Please be respectful and constructive in all interactions.
 
 ## Getting Started
 

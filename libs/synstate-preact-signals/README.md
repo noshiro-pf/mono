@@ -1,6 +1,6 @@
 # synstate-preact-signals
 
-[Preact Signals](https://preactjs.com/guide/v10/signals/) integration for [SynState](https://github.com/noshiro-pf/synstate).
+[Preact Signals](https://preactjs.com/guide/v10/signals/) integration for [SynState](https://github.com/noshiro-pf/mono/tree/main/libs/synstate).
 
 Provides a bidirectional bridge between synstate observables and `@preact/signals`, enabling fine-grained DOM updates without component re-renders.
 

@@ -17,7 +17,7 @@ const config = {
   out: outDir,
   gitRevision: 'main',
   sourceLinkTemplate:
-    'https://github.com/noshiro-pf/ts-fortress/blob/{gitRevision}/{path}#L{line}',
+    'https://github.com/noshiro-pf/mono/blob/{gitRevision}/{path}#L{line}',
   headings: {
     document: true,
     readme: false,

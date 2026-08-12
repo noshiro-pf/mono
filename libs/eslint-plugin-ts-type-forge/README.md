@@ -217,4 +217,4 @@ Either way, if the file already imports the target type from `ts-type-forge`
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-plugin-ts-type-forge/LICENSE)

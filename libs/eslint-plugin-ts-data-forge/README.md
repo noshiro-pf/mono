@@ -84,4 +84,4 @@ export default [
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-plugin-ts-data-forge/LICENSE)

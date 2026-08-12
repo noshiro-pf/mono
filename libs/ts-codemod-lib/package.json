@@ -16,9 +16,6 @@
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": [
-    "./dist/cmd/*.mjs"
-  ],
   "type": "module",
   "exports": {
     ".": {
@@ -34,13 +31,6 @@
   },
   "module": "./dist/entry-point.mjs",
   "types": "./dist/types.d.mts",
-  "bin": {
-    "append-as-const": "./dist/cmd/append-as-const.mjs",
-    "convert-interface-to-type": "./dist/cmd/convert-interface-to-type.mjs",
-    "convert-to-readonly": "./dist/cmd/convert-to-readonly.mjs",
-    "replace-any-with-unknown": "./dist/cmd/replace-any-with-unknown.mjs",
-    "replace-record-with-unknown-record": "./dist/cmd/replace-record-with-unknown-record.mjs"
-  },
   "files": [
     "src",
     "dist",
@@ -56,22 +46,22 @@
     "clean:logs": "npx rimraf ./*.log",
     "codemod": "run-s codemod:uncommitted:* fmt",
     "codemod:diff": "run-s codemod:diff:* fmt",
-    "codemod:diff:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-any-with-unknown.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:diff:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/append-as-const.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:diff:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-interface-to-type.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:diff:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-to-readonly.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:diff:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-record-with-unknown-record.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-any-with-unknown.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/append-as-const.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-interface-to-type.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-to-readonly.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:diff:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-record-with-unknown-record.mts --diff-from origin/main '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:full": "run-s codemod:full:* fmt",
-    "codemod:full:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-any-with-unknown.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:full:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/append-as-const.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:full:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-interface-to-type.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:full:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-to-readonly.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:full:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-record-with-unknown-record.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-any-with-unknown.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/append-as-const.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-interface-to-type.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-to-readonly.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/replace-record-with-unknown-record.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-any-with-unknown.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/append-as-const.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-interface-to-type.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-to-readonly.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:full:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-record-with-unknown-record.mts '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:any-to-unknown": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-any-with-unknown.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:as-const": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/append-as-const.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:interface-to-type": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-interface-to-type.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:readonly": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/convert-to-readonly.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:unknown-record": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../ts-codemod-cli/src/cmd/replace-record-with-unknown-record.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
@@ -81,13 +71,11 @@
     "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "prettier --write .",
     "gi": "run-s gi:src fmt",
-    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude cmd",
+    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prepare-release": "run-s sync-cli-versions fmt build doc",
-    "run:cmd": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./src/cmd/convert-to-readonly.mts ./test/sample1.mts",
+    "prepare-release": "run-s fmt build doc",
     "run:test": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/test-code/transform-test-code.mts",
-    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts",
     "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
     "test:cov": "pnpm run z:vitest:node run --coverage",
@@ -112,7 +100,6 @@
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "cmd-ts": "0.15.0",
     "cspell": "catalog:",
     "dedent": "catalog:",
     "esbuild": "catalog:",
@@ -137,22 +124,6 @@
     "typescript-native": "npm:typescript@7.0.2",
     "vite": "catalog:",
     "vitest": "catalog:"
-  },
-  "peerDependencies": {
-    "cmd-ts": "0.14.3",
-    "dedent": "1.7.2",
-    "ts-repo-utils": "workspace:^"
-  },
-  "peerDependenciesMeta": {
-    "cmd-ts": {
-      "optional": true
-    },
-    "dedent": {
-      "optional": true
-    },
-    "ts-repo-utils": {
-      "optional": true
-    }
   },
   "packageManager": "pnpm@11.20.0",
   "engines": {

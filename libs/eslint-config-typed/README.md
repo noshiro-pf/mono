@@ -2,8 +2,8 @@
 
 [![npm version](https://img.shields.io/npm/v/eslint-config-typed.svg)](https://www.npmjs.com/package/eslint-config-typed)
 [![npm downloads](https://img.shields.io/npm/dm/eslint-config-typed.svg)](https://www.npmjs.com/package/eslint-config-typed)
-[![License](https://img.shields.io/npm/l/eslint-config-typed.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/eslint-config-typed/graph/badge.svg?token=MJ5ZUDVEAF)](https://codecov.io/gh/noshiro-pf/eslint-config-typed)
+[![License](https://img.shields.io/npm/l/eslint-config-typed.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-config-typed/LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=MJ5ZUDVEAF)](https://codecov.io/gh/noshiro-pf/mono)
 
 A comprehensive ESLint configuration package with strongly-typed rule definitions and pre-configured setups for TypeScript, React, testing frameworks, and more.
 
@@ -669,7 +669,7 @@ This type definition provides overridden `Chai.Assert` type:
 
 #### ts-data-forge
 
-**`eslintPluginTsDataForge`** - Custom ESLint plugin for [`ts-data-forge`](https://github.com/noshiro-pf/ts-data-forge).
+**`eslintPluginTsDataForge`** - Custom ESLint plugin for [`ts-data-forge`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge).
 
 ### Type Definitions
 
@@ -964,7 +964,7 @@ With this configuration, you can run eslint and receive actionable diagnostic in
 
 ## Contributing
 
-Contributions are welcome! Please check our [GitHub repository](https://github.com/noshiro-pf/eslint-config-typed) for:
+Contributions are welcome! Please check our [GitHub repository](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-config-typed) for:
 
 - Issue reporting
 - Feature requests
@@ -972,4 +972,4 @@ Contributions are welcome! Please check our [GitHub repository](https://github.c
 
 ## License
 
-This project is licensed under the [Apache License 2.0](./LICENSE).
+This project is licensed under the [Apache License 2.0](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-config-typed/LICENSE).

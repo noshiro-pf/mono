@@ -24,7 +24,7 @@ const config = {
   // GitHub remote URL). This matches the URL TypeDoc derives from the GitHub
   // origin in CI.
   sourceLinkTemplate:
-    'https://github.com/noshiro-pf/ts-type-forge/blob/{gitRevision}/{path}#L{line}',
+    'https://github.com/noshiro-pf/mono/blob/{gitRevision}/{path}#L{line}',
   headings: {
     document: true,
     readme: false,
