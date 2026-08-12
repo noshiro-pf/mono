@@ -269,11 +269,12 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
-- `libs/*/configs/` に残る `vitest.config.mts` を `tools/configs/` へ集約する
+- ~~`libs/*/configs/` に残る `vitest.config.mts` を `tools/configs/` へ集約する~~ → 対応済み
     - `tsconfig/` は対応済み。自前のコピーを持っていたのは 6 パッケージで、共有側が先に進んでいたため中身が古くなっていた（`importHelpers` が消えている、`jsx` が増えている等）。すべて `tools/configs/tsconfig/` を extends する形にし、`tsc --showConfig` の差分で解決後の設定が変わらないことを確認した
     - node 専用パッケージの `lib` を `["ESNext"]` に絞る指定は `tools/configs/tsconfig/tsconfig.node-only.json` に切り出した（3 パッケージが extends）
     - `rollup.config.mts` も対応済み。15 本中 14 本が同一の内容だったので `tools/configs/rollup-config.mts` に集約し、各パッケージは 7 行になった。生成物 1519 ファイルの md5 が前後で全て一致することを確認済み。`@rollup/plugin-replace` / `@rollup/plugin-strip` / `rollup-plugin-esbuild` の宣言も 38 箇所から root の 1 回になった。`eslint-config-typed` だけは `@rollup/plugin-typescript` を使う別物なので据え置き
-    - 残る `vitest.config.mts` はパッケージ固有の要素（browser project、`optimizeDeps`、coverage 除外）が本体なので、オプションを取るファクトリを切り出す作業になる
+    - `vitest.config.mts` も対応済み。自前で書いていた 10 パッケージを `tools/configs/vite-config.mts` に寄せ、757 行 → 344 行 + 共有 146 行になった。各 config を import して解決後のオブジェクトを比較し、6 個は完全一致、残り 9 個の差分が意図した 3 種類だけであることを確認した（`includeSource` の `[]` 明示、`fileParallelism` の `true` 明示、synstate 5 個の typecheck tsconfig パス修正）。`ws:test` のファイル数・テスト数も前後で一致
+    - パッケージごとの `include` / `includeSource` の食い違い（15 パッケージで 6 通り / 4 通り）はそのまま残した。揃えるとテスト対象が変わるので、置き場所の統一とは別の判断になる
 - **`libs/*/configs/tsconfig.build.json` にコメントを書いてはいけない。** 各パッケージの `configs/rollup.config.mts` が `import tsconfig from './tsconfig.build.json' with { type: 'json' }` で読んでおり、JSON import は strict JSON なので esbuild が `JSON does not support comments` で落ちる。共有側の `tools/configs/tsconfig/*.json` は extends されるだけなのでコメントを書ける
 - `eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない
 - knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
