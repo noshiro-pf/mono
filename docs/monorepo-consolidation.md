@@ -251,10 +251,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 - [ ] `strict-typescript-lib` を導入する
     - リポジトリ統合の可否は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) で検討した（結論: 統合しない）
-- [ ] `pnpm-update` workflow を更新する
-    - `main` が進んだら追従、を日次で実行する
-    - 週次実行時、先週の分がマージされていなかったら新規 PR を作成せずそれを更新する
-    - 現在の `pnpm-update.yml` は存在しない `update-packages` script を呼んでいる
+- [x] `pnpm-update` workflow を更新する
+    - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
+    - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
+    - 抑止対象は `pnpm-workspace.yaml` の `update.ignoreDeps` が単一の情報源。`typescript` はエイリアス `typescript-native` も含めて守られることを実測で確認した
 - npm package のテスト
     - [ ] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
     - [ ] pnpm publish された最新バージョンを install して動作するかチェックするテスト workspace を追加する
