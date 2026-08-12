@@ -16,8 +16,9 @@ name: Verify Published Packages
 on:
   push:
     branches-ignore:
-      - 'develop'
-      - 'develop*'
+      # `archive/**` holds frozen snapshots of retired work. They are never
+      # merged back, so every check on them is wasted CI.
+      - 'archive/**'
 
   workflow_dispatch:
 
