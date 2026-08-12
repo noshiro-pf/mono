@@ -74,7 +74,6 @@
     "@emotion/styled": "11.14.1",
     "@mui/material": "9.2.0",
     "@types/react": "catalog:",
-    "@vitest/browser-playwright": "catalog:",
     "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",

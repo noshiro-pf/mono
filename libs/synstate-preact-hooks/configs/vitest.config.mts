@@ -4,9 +4,14 @@ import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
-  workspaceRootPath,
+  packageRoot: workspaceRootPath,
   alias: {
     'synstate-preact-hooks': path.resolve(workspaceRootPath, './src/index.mts'),
     synstate: path.resolve(workspaceRootPath, '../synstate/src/index.mts'),
+  },
+  passWithNoTests: true,
+  browser: {
+    includeSource: ['src/**/*.mts'],
+    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
   },
 });

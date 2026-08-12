@@ -69,7 +69,6 @@
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
-    "@vitest/browser-playwright": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",

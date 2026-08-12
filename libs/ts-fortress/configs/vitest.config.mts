@@ -1,88 +1,28 @@
-import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
-import { type ViteUserConfig } from 'vitest/config';
-import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
-const aliasMap = {
-  'ts-fortress': path.resolve(workspaceRootPath, './src/entry-point.mts'),
-};
-
-// https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
-const config = () =>
-  ({
-    test: {
-      coverage: coverageSettings(),
-
-      projects: [
-        {
-          test: {
-            name: 'Node.js',
-            environment: 'node',
-            alias: aliasMap,
-            ...projectConfig(),
-            typecheck: {
-              tsconfig: path.resolve(
-                workspaceRootPath,
-                './configs/tsconfig.test.json',
-              ),
-            },
-          },
-        },
-        {
-          test: {
-            name: 'Browser',
-            alias: aliasMap,
-            ...projectConfig(),
-            // Browser mode fetches each test file over the Vite dev server.
-            // Requesting them concurrently intermittently fails with "Failed to
-            // fetch dynamically imported module" for an arbitrary file, and
-            // vitest's `retry` cannot help: the file never loads, so there is no
-            // test to retry. Requesting them one at a time removes the race.
-            fileParallelism: false,
-            // https://vitest.dev/config/browser/playwright
-            browser: {
-              enabled: true,
-              headless: true,
-              screenshotFailures: false,
-              provider: playwright(),
-              instances: [{ browser: 'chromium' }],
-            },
-          },
-          optimizeDeps: {
-            include: ['ts-data-forge', 'io-ts', 'zod', 'io-ts/PathReporter'],
-          },
-        },
-      ],
-    },
-  }) as const satisfies ViteUserConfig;
-
-const projectConfig = (
-  options?: Readonly<{
-    additionalExcludes?: readonly string[];
-  }>,
-) =>
-  ({
-    dir: workspaceRootPath,
-    globals: true,
-    restoreMocks: true,
-    hideSkippedTests: true,
+export default defineViteConfig({
+  packageRoot: workspaceRootPath,
+  alias: {
+    'ts-fortress': path.resolve(workspaceRootPath, './src/entry-point.mts'),
+  },
+  coverage: {
+    include: ['src/**/*.{mts,tsx}'],
+  },
+  node: {
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
-    exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
-      'src/entry-point.mts',
-      ...(options?.additionalExcludes ?? []),
+  },
+  browser: {
+    includeSource: ['src/**/*.mts'],
+    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    optimizeDepsInclude: [
+      'ts-data-forge',
+      'io-ts',
+      'zod',
+      'io-ts/PathReporter',
     ],
-  }) as const satisfies ProjectConfig;
-
-const coverageSettings = () =>
-  ({
-    provider: 'v8',
-    reporter: ['html', 'lcov', 'text'],
-    include: ['src/**/*.{mts,tsx}'],
-    exclude: ['**/index.mts', 'src/entry-point.mts'],
-  }) as const satisfies CoverageOptions;
-
-export default config();
+  },
+});
