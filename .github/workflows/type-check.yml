@@ -57,7 +57,24 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        run: pnpm run z:check-should-run-type-checks
+        # `check-should-run-type-checks` diffs against origin/main. On a push
+        # to main that is a diff against HEAD itself, which comes back empty
+        # and reads as "nothing relevant changed" — so every step below skips,
+        # the coverage upload among them, and the job still reports success.
+        # Compare with what main pointed at before the push instead.
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${GITHUB_REF_NAME}" != 'main' ]; then
+            pnpm run z:check-should-run-type-checks
+          elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
+            git fetch --depth=1 origin "${BEFORE}"
+            pnpm run z:check-should-run-type-checks --base-branch "${BEFORE}"
+          else
+            # A manual run, or the first push to the branch: there is nothing
+            # to compare against, so run everything rather than skip it.
+            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
+          fi
 
       # `run: exit 0` ends the step, not the job — every step below has to
       # carry the condition itself. See node-version-compatibility.yml, which
