@@ -5,6 +5,9 @@ on:
     branches-ignore:
       - 'develop'
       - 'develop*'
+      # `archive/**` holds frozen snapshots of retired work. They are never
+      # merged back, so every check on them is wasted CI.
+      - 'archive/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
