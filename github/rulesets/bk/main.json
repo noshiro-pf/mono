@@ -78,6 +78,26 @@
             "integration_id": 15368
           },
           {
+            "context": "type-check (ws:test:cov)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:test:browser)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (knip)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (lint:published-deps)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (verify:npm-packages)",
+            "integration_id": 15368
+          },
+          {
             "context": "test-node-versions (22.22.2)",
             "integration_id": 15368
           },
@@ -87,6 +107,18 @@
           },
           {
             "context": "test-node-versions (26.3.1)",
+            "integration_id": 15368
+          },
+          {
+            "context": "verify-published",
+            "integration_id": 15368
+          },
+          {
+            "context": "backup-repository-settings",
+            "integration_id": 15368
+          },
+          {
+            "context": "Validate PR title",
             "integration_id": 15368
           }
         ]
