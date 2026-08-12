@@ -134,6 +134,12 @@ importers:
       '@changesets/cli':
         specifier: 2.31.1
         version: 2.31.1(@types/node@26.2.0)
+      '@rollup/plugin-replace':
+        specifier: 'catalog:'
+        version: 6.0.3(rollup@4.62.4)
+      '@rollup/plugin-strip':
+        specifier: 'catalog:'
+        version: 3.0.4(rollup@4.62.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -200,6 +206,12 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.62.4
+      rollup-plugin-esbuild:
+        specifier: 'catalog:'
+        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-data-forge:
         specifier: workspace:*
         version: link:libs/ts-data-forge
@@ -566,12 +578,6 @@ importers:
         specifier: '>=5.0.0'
         version: 6.0.3
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@typescript-eslint/parser':
         specifier: 'catalog:'
         version: 8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -602,9 +608,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -657,9 +660,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -712,9 +712,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -816,12 +813,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -837,9 +828,6 @@ importers:
       cspell:
         specifier: 'catalog:'
         version: 10.0.1
-      esbuild:
-        specifier: 'catalog:'
-        version: 0.28.1
       eslint:
         specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -876,9 +864,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -907,12 +892,6 @@ importers:
       '@reduxjs/toolkit':
         specifier: 'catalog:'
         version: 2.12.0(react@19.2.8)
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -952,9 +931,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
@@ -986,12 +962,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -1019,9 +989,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1041,12 +1008,6 @@ importers:
       '@preact/signals':
         specifier: 2.10.1
         version: 2.10.1(preact@10.29.8)
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -1074,9 +1035,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1093,12 +1051,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1129,9 +1081,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1148,12 +1097,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1184,9 +1127,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1209,21 +1149,12 @@ importers:
         specifier: workspace:^
         version: link:../ts-repo-utils
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
       cspell:
         specifier: 'catalog:'
         version: 10.0.1
-      esbuild:
-        specifier: 'catalog:'
-        version: 0.28.1
       eslint:
         specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -1257,9 +1188,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       tsx:
         specifier: 'catalog:'
         version: 4.23.4
@@ -1282,12 +1210,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -1345,9 +1267,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1394,12 +1313,6 @@ importers:
       '@mui/material':
         specifier: 9.2.0
         version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1436,9 +1349,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1464,12 +1374,6 @@ importers:
         specifier: workspace:~
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.0(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.4)(yaml@2.9.0))(vitest@4.1.10)
@@ -1503,9 +1407,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1549,12 +1450,6 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.62.4)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.62.4)
       '@types/node':
         specifier: 'catalog:'
         version: 26.2.0
@@ -1606,9 +1501,6 @@ importers:
       rollup:
         specifier: 'catalog:'
         version: 4.62.4
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.1)(rollup@4.62.4)(supports-color@7.2.0)
       tsx:
         specifier: 'catalog:'
         version: 4.23.4

@@ -228,6 +228,14 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       even though only the root `.prettierrc` names them. Add such a dependency
       to `ignoreDependencies` with the reason rather than deleting it — dropping
       the Prettier plugins silently stopped import sorting in generated files.
+- **Build tooling that only `tools/configs/` imports is declared at the root.**
+  Fourteen packages build through `tools/configs/rollup-config.mts`, so
+  `@rollup/plugin-replace`, `@rollup/plugin-strip` and `rollup-plugin-esbuild`
+  are root devDependencies rather than repeated in each package. A package
+  still declares `rollup` itself, because its own `scripts/cmd/build.mts`
+  imports it. `import-x/no-relative-packages` objects to the relative import of
+  a shared config across the package boundary; disable it on the line, as the
+  vitest configs already do.
 - **Versions of shared devDependencies live in the `catalog:` block of
   `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
   published package's `dependencies` and `peerDependencies` are its own API, so
