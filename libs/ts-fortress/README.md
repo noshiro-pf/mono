@@ -9,7 +9,7 @@ TypeScript-first schema validation library with static type inference.
 [![npm version](https://img.shields.io/npm/v/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
 [![npm downloads](https://img.shields.io/npm/dm/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
 [![License](https://img.shields.io/npm/l/ts-fortress.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-fortress/LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?token=Y522SWQTPB)](https://codecov.io/gh/noshiro-pf/mono)
+[![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?component=ts-fortress)](https://codecov.io/gh/noshiro-pf/mono)
 
 **ts-fortress** is a runtime validation library similar to [io-ts](https://github.com/gcanti/io-ts) and [Zod](https://zod.dev/), designed to provide type-safe schema validation with excellent TypeScript integration and static type inference.
 

@@ -14,6 +14,58 @@ coverage:
 
 # Comment settings (optional)
 comment:
-  layout: 'reach, diff, flags, files'
+  layout: 'reach, diff, flags, components, files'
   behavior: default
   require_changes: false
+
+# One component per package, so that a repository-wide number is not the only
+# thing on offer. `pnpm run ws:test:cov` writes a coverage report per package
+# and the workflow uploads them in a single step; components split that back
+# apart by path, which flags could not do without one upload per package.
+#
+# The paths below assume Codecov sees `libs/<pkg>/src/...`. It does: each
+# lcov.info records paths relative to its own package, and the uploader
+# prefixes them with the directory it found the report in.
+#
+# A package added here also wants a badge in its README
+# (`badge.svg?component=<component_id>`); a package missing from this list
+# still counts towards the repository total, it just has no view of its own.
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        informational: true
+      - type: patch
+        informational: true
+
+  individual_components:
+    - component_id: eslint-config-typed
+      paths: ['libs/eslint-config-typed/**']
+    - component_id: eslint-plugin-ts-data-forge
+      paths: ['libs/eslint-plugin-ts-data-forge/**']
+    - component_id: eslint-plugin-ts-fortress
+      paths: ['libs/eslint-plugin-ts-fortress/**']
+    - component_id: eslint-plugin-ts-type-forge
+      paths: ['libs/eslint-plugin-ts-type-forge/**']
+    - component_id: github-settings-as-code
+      paths: ['libs/github-settings-as-code/**']
+    - component_id: octokit-safe-types
+      paths: ['libs/octokit-safe-types/**']
+    - component_id: synstate
+      paths: ['libs/synstate/**']
+    - component_id: synstate-preact-hooks
+      paths: ['libs/synstate-preact-hooks/**']
+    - component_id: synstate-preact-signals
+      paths: ['libs/synstate-preact-signals/**']
+    - component_id: synstate-react-hooks
+      paths: ['libs/synstate-react-hooks/**']
+    - component_id: synstate-react-hooks-compat
+      paths: ['libs/synstate-react-hooks-compat/**']
+    - component_id: ts-codemod-lib
+      paths: ['libs/ts-codemod-lib/**']
+    - component_id: ts-data-forge
+      paths: ['libs/ts-data-forge/**']
+    - component_id: ts-fortress
+      paths: ['libs/ts-fortress/**']
+    - component_id: ts-repo-utils
+      paths: ['libs/ts-repo-utils/**']
