@@ -1,0 +1,23 @@
+{
+  "id": 20754469,
+  "name": "restrict-deletion",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "refs/heads/archive/**/*",
+        "refs/heads/develop",
+        "refs/heads/develop-**",
+        "refs/heads/migrate/**/*"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    }
+  ]
+}
