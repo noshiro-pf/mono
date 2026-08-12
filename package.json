@@ -73,6 +73,8 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.31.1",
+    "@rollup/plugin-replace": "catalog:",
+    "@rollup/plugin-strip": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
@@ -95,6 +97,8 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "rollup": "catalog:",
+    "rollup-plugin-esbuild": "catalog:",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "ts-type-forge": "workspace:*",

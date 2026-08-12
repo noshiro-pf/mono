@@ -67,8 +67,6 @@
   },
   "devDependencies": {
     "@reduxjs/toolkit": "catalog:",
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@types/react": "catalog:",
     "argparse": "catalog:",
     "eslint-config-typed": "workspace:*",
@@ -82,7 +80,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "rxjs": "catalog:",
     "synstate-react-hooks": "workspace:*",
     "synstate-react-hooks-compat": "workspace:*",

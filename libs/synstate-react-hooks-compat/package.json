@@ -64,8 +64,6 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@types/react": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -76,7 +74,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

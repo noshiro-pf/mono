@@ -59,8 +59,6 @@
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "@typescript-eslint/rule-tester": "catalog:",
     "dedent": "catalog:",
@@ -71,7 +69,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

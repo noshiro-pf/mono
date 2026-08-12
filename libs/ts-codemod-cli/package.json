@@ -59,11 +59,8 @@
     "ts-repo-utils": "workspace:^"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@types/node": "catalog:",
     "cspell": "catalog:",
-    "esbuild": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -75,7 +72,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-native": "npm:typescript@7.0.2"

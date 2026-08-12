@@ -94,8 +94,6 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -115,7 +113,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "ts-repo-utils": "workspace:*",
     "tsx": "catalog:",
     "typedoc": "catalog:",

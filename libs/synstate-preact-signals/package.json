@@ -65,8 +65,6 @@
   },
   "devDependencies": {
     "@preact/signals": "2.10.1",
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
@@ -76,7 +74,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

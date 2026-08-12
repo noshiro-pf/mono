@@ -69,8 +69,6 @@
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/ui": "catalog:",
     "eslint-config-typed": "workspace:*",
@@ -82,7 +80,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
-    "rollup-plugin-esbuild": "catalog:",
     "ts-repo-utils": "workspace:*",
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
