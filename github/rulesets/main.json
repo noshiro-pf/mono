@@ -21,9 +21,6 @@
       "type": "deletion"
     },
     {
-      "type": "non_fast_forward"
-    },
-    {
       "type": "required_linear_history"
     },
     {
@@ -49,14 +46,6 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (fmt:full)",
-            "integration_id": 15368
-          },
-          {
-            "context": "style-check (lint:published-deps)",
-            "integration_id": 15368
-          },
-          {
             "context": "style-check (md)",
             "integration_id": 15368
           },
@@ -66,6 +55,26 @@
           },
           {
             "context": "style-check (ws:doc)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (fmt:full)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (check:root)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:lint:fix)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:type-check)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (codemod:full)",
             "integration_id": 15368
           },
           {
@@ -79,36 +88,12 @@
           {
             "context": "test-node-versions (26.3.1)",
             "integration_id": 15368
-          },
-          {
-            "context": "type-check (check:root)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (codemod:full)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (knip)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:lint:fix)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:type-check)",
-            "integration_id": 15368
           }
         ]
       }
     },
     {
-      "type": "copilot_code_review",
-      "parameters": {
-        "review_on_push": false,
-        "review_draft_pull_requests": false
-      }
+      "type": "non_fast_forward"
     }
   ]
 }
