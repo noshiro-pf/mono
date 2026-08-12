@@ -269,11 +269,12 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
-- `libs/*/configs/` に残る `vitest.config.mts` を `tools/configs/` へ集約する
+- ~~`libs/*/configs/` に残る `vitest.config.mts` を `tools/configs/` へ集約する~~ → 対応済み
     - `tsconfig/` は対応済み。自前のコピーを持っていたのは 6 パッケージで、共有側が先に進んでいたため中身が古くなっていた（`importHelpers` が消えている、`jsx` が増えている等）。すべて `tools/configs/tsconfig/` を extends する形にし、`tsc --showConfig` の差分で解決後の設定が変わらないことを確認した
     - node 専用パッケージの `lib` を `["ESNext"]` に絞る指定は `tools/configs/tsconfig/tsconfig.node-only.json` に切り出した（3 パッケージが extends）
     - `rollup.config.mts` も対応済み。15 本中 14 本が同一の内容だったので `tools/configs/rollup-config.mts` に集約し、各パッケージは 7 行になった。生成物 1519 ファイルの md5 が前後で全て一致することを確認済み。`@rollup/plugin-replace` / `@rollup/plugin-strip` / `rollup-plugin-esbuild` の宣言も 38 箇所から root の 1 回になった。`eslint-config-typed` だけは `@rollup/plugin-typescript` を使う別物なので据え置き
-    - 残る `vitest.config.mts` はパッケージ固有の要素（browser project、`optimizeDeps`、coverage 除外）が本体なので、オプションを取るファクトリを切り出す作業になる
+    - `vitest.config.mts` も対応済み。自前で書いていた 10 パッケージを `tools/configs/vite-config.mts` に寄せ、757 行 → 344 行 + 共有 146 行になった。各 config を import して解決後のオブジェクトを比較し、6 個は完全一致、残り 9 個の差分が意図した 3 種類だけであることを確認した（`includeSource` の `[]` 明示、`fileParallelism` の `true` 明示、synstate 5 個の typecheck tsconfig パス修正）。`ws:test` のファイル数・テスト数も前後で一致
+    - パッケージごとの `include` / `includeSource` の食い違い（15 パッケージで 6 通り / 4 通り）はそのまま残した。揃えるとテスト対象が変わるので、置き場所の統一とは別の判断になる
 - **`libs/*/configs/tsconfig.build.json` にコメントを書いてはいけない。** 各パッケージの `configs/rollup.config.mts` が `import tsconfig from './tsconfig.build.json' with { type: 'json' }` で読んでおり、JSON import は strict JSON なので esbuild が `JSON does not support comments` で落ちる。共有側の `tools/configs/tsconfig/*.json` は extends されるだけなのでコメントを書ける
 - `eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない
 - knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
@@ -283,5 +284,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - ~~Codecov 設定を per-package flag つきの 1 本に統合する~~ → `codecov.yml` に component を 15 個定義して対応。flag ではなく component を使ったのは、flag はアップロード時に付けるものでパッケージごとに 1 回ずつアップロードする必要があるのに対し、component は `codecov.yml` だけで path で切り分けられるため（[Codecov docs](https://docs.codecov.com/docs/components)）。README のバッジも `?component=<pkg>` を指すようにした
 - **`should-run-type-check` ゲートが main への push で全ステップをスキップさせていた（修正済み）。** ゲートは `origin/main` との diff を見るが、main への push では HEAD 自身との比較になり diff が空になる。空の diff は「関係する変更なし」と解釈されるため、type-check.yml と node-version-compatibility.yml の全ステップがスキップされ、しかもジョブは success を返していた。ゲート導入（8/12 06:00 UTC 頃）以降、main では型チェックも lint も knip も coverage upload も一度も走っていなかった。main では push 前の commit（`github.event.before`）と比較するようにした
     - Codecov のダッシュボードで component 別 coverage が空だったのはこれが原因。component の設定自体は正しく動いており、PR ブランチでは per-package の値が出ている（`components/?branch=<branch>` で確認）
+- **browser テストが実質走っていないパッケージが 4 つある。** `test:browser` を持つ 8 パッケージのうち、`synstate-preact-hooks` / `synstate-preact-signals` / `synstate-react-hooks` / `synstate-react-hooks-compat` はテストファイルが 1 つも無く、`passWithNoTests: true` により `No test files found, exiting with code 0` で成功扱いになる。node 側も同様にテストが無い。browser testing の設定自体は有効なので、テストを書けばそのまま走る
+- **`synstate` の browser テストが不安定。** `Failed to fetch dynamically imported module` で 1 ファイルが落ちることがある（落ちるファイルは毎回異なる）。共有 config の `fileParallelism: false` はこの race への対策だが、synstate では効いていない。CI は `nick-fields/retry` の 2 回試行で通しており、実際に 1 回目が落ちて 2 回目で通った実績がある（run 31615975133）
 - **Codecov のパス解決が同名ファイルを取り違えている。** `synstate-react-hooks` / `synstate-preact-hooks` / `synstate-react-hooks-compat` は同じ相対パス（`src/create-boolean-state.mts` など）を持つが、Codecov 上には `synstate-react-hooks` の分しか存在しない（[API](https://api.codecov.io/api/v2/github/noshiro-pf/repos/mono/report/) で確認）。lcov の `SF:` はパッケージ相対なので、1 回のアップロードで全パッケージ分をまとめて渡すと、同名パスがどれか 1 つに畳まれてしまう。component は path で切るので、この取り違えは component では直せない。パッケージごとに `directory` を指定してアップロードを分けるか、lcov のパスをリポジトリルート相対に直すかの選択になる
     - 現状の実害は小さい。畳まれている 3 パッケージはいずれもテストが 0 件で、係数自体に意味が無い

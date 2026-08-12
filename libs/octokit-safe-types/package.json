@@ -81,7 +81,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
     "cspell": "catalog:",
@@ -92,7 +91,6 @@
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jiti": "catalog:",
     "npm-run-all2": "catalog:",
-    "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

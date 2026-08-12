@@ -80,6 +80,7 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "immer": "catalog:",
+    "playwright": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

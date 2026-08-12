@@ -65,10 +65,12 @@
   },
   "devDependencies": {
     "@preact/signals": "2.10.1",
+    "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
+    "playwright": "catalog:",
     "preact": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
