@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "types": ["eslint-config-typed/vitest-globals", "vitest/importMeta", "node"]
-  }
-}

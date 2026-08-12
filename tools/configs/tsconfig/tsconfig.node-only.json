@@ -1,0 +1,10 @@
+{
+  // For packages that only ever run under node. The base "lib" includes "DOM"
+  // for the packages that render; without this, a browser global would
+  // type-check in code that has no browser to run in.
+  //
+  // Extend this after the base, so that its "lib" is the one that wins.
+  "compilerOptions": {
+    "lib": ["ESNext"]
+  }
+}
