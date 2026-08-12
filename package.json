@@ -49,6 +49,7 @@
     "md": "markdownlint-cli2",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
+    "update-packages": "pnpm update --latest --recursive",
     "ws:build": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/ws-build-stages.mts",
     "ws:build:min": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/ws-build-min-stages.mts",
     "ws:check:ext": "pnpm run --recursive --if-present check:ext",

@@ -1,10 +1,12 @@
-name: Weekly pnpm update
+name: pnpm update
 
-# Runs this repository's own `update-packages` script (which encodes the
-# skip rules such as `!eslint` / `!typescript`) together with `pnpm
+# Runs this repository's own `update-packages` script together with `pnpm
 # self-update`, and opens a single bundled pull request that auto-merges once
-# CI passes. This replaces Dependabot's npm updates; GitHub Actions updates
-# stay with Dependabot (see .github/dependabot.yml).
+# CI passes. It runs daily and always rebuilds from main, so the pull request
+# follows main rather than accumulating a new one per run.
+#
+# This replaces Dependabot's npm updates; GitHub Actions updates stay with
+# Dependabot (see .github/dependabot.yml).
 #
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
@@ -12,14 +14,22 @@ name: Weekly pnpm update
 # the classification that dependabot-changeset.yml used, so the Changesets
 # release flow publishes those packages once the PR merges.
 #
+# What is held back is declared in pnpm-workspace.yaml under `update.ignoreDeps`
+# — currently `typescript`, which also covers the `typescript-native` alias
+# since pnpm matches the resolved package. `update.githubActions: true` there
+# is what lets this touch the workflow files.
+#
 # Authenticates with a GitHub App installation token (the same App used by
 # sync-agent-config.yml) so that the push triggers the push-based CI workflows
 # and the repository owner (a ruleset bypass actor) can auto-merge.
 
 on:
   schedule:
-    # Weekly, Saturday 06:07 JST (Friday 21:07 UTC) — lands before the weekend.
-    - cron: '7 21 * * 5'
+    # Daily, 06:07 JST (21:07 UTC the day before). `minimumReleaseAge` holds
+    # releases for a week, so most days find nothing and exit without pushing;
+    # the days that do find something also pick up whatever landed on main,
+    # which is what keeps the open pull request from going stale.
+    - cron: '7 21 * * *'
 
   workflow_dispatch:
 
@@ -97,9 +107,13 @@ jobs:
             }
           };
           const changed = [];
-          for (const dirent of fs.readdirSync('packages', { withFileTypes: true })) {
-            if (!dirent.isDirectory()) continue;
-            const file = path.join('packages', dirent.name, 'package.json');
+          const workspaceDirs = ['libs', 'apps'].flatMap((group) =>
+            fs.readdirSync(group, { withFileTypes: true })
+              .filter((d) => d.isDirectory())
+              .map((d) => path.join(group, d.name)),
+          );
+          for (const dir of workspaceDirs) {
+            const file = path.join(dir, 'package.json');
             if (!fs.existsSync(file)) continue;
             const cur = JSON.parse(fs.readFileSync(file, 'utf8'));
             if (typeof cur.name !== 'string' || cur.private === true) continue;
@@ -121,7 +135,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          branch="chore/pnpm-update-${DATESTR}"
+          # A fixed branch name, not one carrying the date: every run starts from
+          # a fresh checkout of main, so force-pushing here both refreshes the
+          # open pull request and rebases it, instead of leaving last week's
+          # behind and opening another one.
+          branch="chore/pnpm-update"
           git switch -c "$branch"
           git add -A
           git commit -m "chore: update dependencies"
@@ -136,6 +154,6 @@ jobs:
               --base main \
               --head "$branch" \
               --title "chore: update dependencies" \
-              --body "Automated weekly dependency update via \`pnpm run update-packages\` + \`pnpm self-update\`. A patch changeset is added for publishable packages whose runtime dependencies changed. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm self-update\`. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
