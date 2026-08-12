@@ -19,8 +19,8 @@
       }
     }
   },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "src",
     "dist",
@@ -82,5 +82,13 @@
   "peerDependencies": {
     "@preact/signals": ">=1.0.0",
     "preact": ">=10.0.0"
+  },
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

@@ -19,8 +19,8 @@
       }
     }
   },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "src",
     "dist",
@@ -89,5 +89,13 @@
     "ts-repo-utils": "workspace:*",
     "valtio": "catalog:",
     "zustand": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
