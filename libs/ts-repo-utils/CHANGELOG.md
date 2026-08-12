@@ -1,5 +1,30 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.2.0
+
+### Minor Changes
+
+- 5e2a339: Add a `dependencyFields` option to `runCmdInStagesAcrossWorkspaces` and
+  `getWorkspacePackages`, selecting which `package.json` fields the staging order
+  is derived from. It defaults to what it did before (`dependencies` +
+  `devDependencies` + `peerDependencies`), so existing callers are unaffected.
+
+    Pass `['dependencies', 'peerDependencies']` when development-only edges should
+    not constrain the order. In a repository whose toolchain is itself a workspace
+    package, those edges point back from the toolchain to the packages it serves
+    and leave the graph with no valid topological order.
+
+### Patch Changes
+
+- 3d6bca7: Move `tsx` out of `dependencies`. Nothing this package ships uses it — every
+  executable runs compiled `.mjs` under `node`, and `tsx` appears only in the
+  package's own build scripts. It pulled esbuild along with it, so installing
+  `ts-repo-utils` fetched roughly 11MB of platform binaries that nothing would
+  ever execute: 64MB installed before, 53MB after.
+- Updated dependencies [3d6bca7]
+    - ts-data-forge@14.2.1
+    - ts-type-forge@9.2.1
+
 ### Bug Fixes
 
 - update dependencies ([#442](https://github.com/noshiro-pf/ts-repo-utils/issues/442)) ([795c3de](https://github.com/noshiro-pf/ts-repo-utils/commit/795c3de0f6f2644013fd00b5c3689e0c70f405c2))

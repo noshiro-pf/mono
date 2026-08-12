@@ -1,5 +1,28 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 2.1.1
+
+### Patch Changes
+
+- 3d6bca7: Declare `ts-repo-utils` as a dependency. Fourteen shipped modules import it,
+  but it was only a devDependency, so `repo-settings` crashed as soon as it did
+  any work:
+
+    ```text
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'ts-repo-utils'
+      imported from .../github-settings-as-code/dist/github/resolve-target-repo.mjs
+    ```
+
+    `--help` printed fine, which is why this went unnoticed.
+
+- Updated dependencies [3d6bca7]
+- Updated dependencies [3d6bca7]
+- Updated dependencies [5e2a339]
+    - ts-data-forge@14.2.1
+    - ts-fortress@12.0.1
+    - ts-type-forge@9.2.1
+    - ts-repo-utils@10.2.0
+
 ### Bug Fixes
 
 - make CI pass after the pnpm update ([#173](https://github.com/noshiro-pf/github-settings-as-code/issues/173)) ([ea4b287](https://github.com/noshiro-pf/github-settings-as-code/commit/ea4b28730598381e35531fa5c3485422ec8d3a99))

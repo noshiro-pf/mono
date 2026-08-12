@@ -1,5 +1,22 @@
 # synstate-preact-signals
 
+## 1.0.1
+
+### Patch Changes
+
+- 3d6bca7: Fix the links in the README. They were relative, and npm rewrites a relative
+  link against the repository root without regard for `repository.directory`, so
+  publishing from the monorepo would have pointed them at paths that do not
+  exist — `synstate`'s logo among them. They are absolute now. The links that
+  still named one of the repositories this package was merged from now name
+  `mono`, and a handful that had gone stale independently (a file that moved, one
+  that was renamed, three documents that became pages on the docs site) point
+  where those things actually are.
+- Updated dependencies [3d6bca7]
+    - synstate@2.0.1
+    - ts-data-forge@14.2.1
+    - ts-type-forge@9.2.1
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,14 @@
 # synstate-react-hooks-compat
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [3d6bca7]
+    - synstate@2.0.1
+    - ts-data-forge@14.2.1
+    - ts-type-forge@9.2.1
+
 ## 2.0.0
 
 ### Major Changes

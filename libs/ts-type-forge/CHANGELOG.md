@@ -1,5 +1,18 @@
 ## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
 
+## 9.2.1
+
+### Patch Changes
+
+- 3d6bca7: Fix the links in the README. They were relative, and npm rewrites a relative
+  link against the repository root without regard for `repository.directory`, so
+  publishing from the monorepo would have pointed them at paths that do not
+  exist — `synstate`'s logo among them. They are absolute now. The links that
+  still named one of the repositories this package was merged from now name
+  `mono`, and a handful that had gone stale independently (a file that moved, one
+  that was renamed, three documents that became pages on the docs site) point
+  where those things actually are.
+
 ## 9.2.0
 
 ### Minor Changes
