@@ -13,11 +13,10 @@ pnpm install
 
 - `libs/*` — 公開している npm パッケージ。1 ディレクトリ 1 パッケージ。
 - `apps/*` — アプリケーション。
-- `tools/*` — リポジトリ内部向けのツール。
-- `configs/` — root と各パッケージが共有する TypeScript / Vite / Rollup 設定。
-- `scripts/cmd/` — リポジトリ全体のコマンド (`check-all`, `ws-build-stages` など)。
-- `agents/` — `AGENTS.md` の生成元 (`common-rules.md` + `local-rules.md`)。
-- `github/` — [github-settings-as-code](https://github.com/noshiro-pf/github-settings-as-code) で適用する GitHub リポジトリ設定。
+- `tools/` — リポジトリ内部向けのツール。
+    - `tools/configs/` — root と各パッケージが共有する TypeScript / Vite / Rollup 設定。
+    - `tools/scripts/cmd/` — リポジトリ全体のコマンド (`check-all`, `ws-build-stages` など)。
+- `github/` — [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code) で適用する GitHub リポジトリ設定。
 - `articles/`, `books/` — Zenn のコンテンツ。[Zenn](#zenn) を参照。
 - `docs/` — 雑多なメモ。lint 対象外。
 - `experimental/` — 旧 monorepo のコード。[experimental/](#experimental) を参照。

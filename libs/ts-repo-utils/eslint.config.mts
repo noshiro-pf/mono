@@ -15,7 +15,6 @@ export default [
   {
     ignores: [
       'docs/**',
-      'agents/**',
       // test/dist_/ has its own tsconfig and type-checks the built dist/
       // output (see scripts/cmd/build.mts); it is excluded from the root
       // tsconfig, so the typed-linter cannot parse it.

@@ -17,7 +17,6 @@ ignorePaths:
   - apps/synstate-docs/src/components/data-table-demo/sample-data.mts
   - '**/prior-art-research.md'
   - '**/prior-art-and-design-rationale.mdx'
-  - agents/common/**
   # --- mono-specific ---
   # Zenn content: Japanese prose published via zenn.dev's GitHub integration.
   # Must never be a CI gate.

@@ -1,6 +1,5 @@
 pnpm-lock.yaml
 .prettierignore
-agents
 
 # Legacy monorepo contents, excluded from the pnpm workspace.
 experimental

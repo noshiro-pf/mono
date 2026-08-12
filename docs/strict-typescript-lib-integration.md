@@ -125,6 +125,12 @@ jobs:
 
 仕組みは既にある。`sync-agent-config` workflow を両リポジトリで走らせて追いつかせる。
 
+> **追記（2026-08-12）**: mono 側はこの案を採らなかった。9 リポジトリが 1 つに
+> なった時点で mono の中に共有相手が居なくなったため、vendoring をやめて
+> `agents/` を root の `AGENTS.md` へ畳み、`sync-agent-config` workflow と生成
+> スクリプトを削除した。`common-agent-config` は strict-typescript-lib など他の
+> リポジトリのために存続するが、mono はもう追従しない。
+
 ### 3. mono への strict lib 導入時に、ローカル解決の口を用意する
 
 step 2 の「`strict-typescript-lib` を導入」を進めるときに、`@typescript/lib-*` の指定を「リリース URL」と「ローカルチェックアウトの生成物ディレクトリ」で切り替えられるようにする。これで型定義変更の即時検証という利点は回収できる。

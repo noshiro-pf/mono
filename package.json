@@ -21,8 +21,6 @@
     "tools/*"
   ],
   "scripts": {
-    "agents:gen": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/gen-agents-md.mts",
-    "agents:sync": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/sync-agent-config.mts",
     "check:root": "pnpm run '/check:root:.*/'",
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",

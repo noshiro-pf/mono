@@ -13,9 +13,6 @@ import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 const thisDir = import.meta.dirname;
 
 export default [
-  {
-    ignores: ['agents/**'],
-  },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
