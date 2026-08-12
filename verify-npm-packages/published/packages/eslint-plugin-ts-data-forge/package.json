@@ -1,0 +1,9 @@
+{
+  "name": "verify-eslint-plugin-ts-data-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "eslint-plugin-ts-data-forge": "0.4.4"
+  }
+}

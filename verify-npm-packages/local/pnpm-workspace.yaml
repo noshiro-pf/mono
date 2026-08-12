@@ -1,0 +1,19 @@
+packages:
+  - 'packages/*'
+
+# Without this, pnpm fills `node_modules/.pnpm/node_modules` and puts it
+# on the resolution path, so a package that forgot to declare a
+# dependency still finds it as long as something else depends on it —
+# which is exactly the fault these checks look for.
+hoist: false
+
+# What is under test is the packages, not whether someone else’s
+# postinstall script is on pnpm’s allow list.
+strictDepBuilds: false
+
+# The repository holds new releases back for a week. Here that would
+# mean "published" quietly meaning "published a week ago".
+minimumReleaseAge: 0
+
+allowBuilds:
+  unrs-resolver: set this to true or false

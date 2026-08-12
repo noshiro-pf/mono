@@ -68,6 +68,16 @@ jobs:
           pnpm run update-packages
           pnpm install --no-frozen-lockfile
 
+      # The published half of `verify-npm-packages` pins exact versions, and
+      # this is where they move — a release shows up as a reviewable diff
+      # rather than as an unrelated branch starting to fail. `continue-on-error`
+      # because the step also runs the checks: a package that is broken on npm
+      # should not stop the dependency update, and verify-published-packages.yml
+      # reports it on the resulting pull request anyway.
+      - name: Refresh the published-package pins
+        continue-on-error: true
+        run: pnpm run verify:npm-packages:published:update
+
       # 依存更新が終わってからトークンを発行する。許可済みビルドスクリプトが
       # 動く前に鍵を job へ持ち込まないため。
       - name: Generate Token

@@ -1,0 +1,9 @@
+{
+  "name": "verify-synstate-preact-hooks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "synstate-preact-hooks": "file:../../../.tarballs/synstate-preact-hooks.tgz"
+  }
+}

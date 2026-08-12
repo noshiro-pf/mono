@@ -1,0 +1,9 @@
+{
+  "name": "verify-github-settings-as-code",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "github-settings-as-code": "file:../../../.tarballs/github-settings-as-code.tgz"
+  }
+}

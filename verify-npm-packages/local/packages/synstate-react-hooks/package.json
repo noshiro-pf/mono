@@ -1,0 +1,9 @@
+{
+  "name": "verify-synstate-react-hooks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "synstate-react-hooks": "file:../../../.tarballs/synstate-react-hooks.tgz"
+  }
+}

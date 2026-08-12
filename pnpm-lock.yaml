@@ -575,7 +575,7 @@ importers:
         specifier: workspace:~
         version: link:../ts-type-forge
       typescript:
-        specifier: '>=5.0.0'
+        specifier: '>=5.0.0 <7.0.0'
         version: 6.0.3
     devDependencies:
       '@typescript-eslint/parser':

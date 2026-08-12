@@ -91,7 +91,8 @@ const { values, positionals } = util.parseArgs({
 if (values.help === true || Arr.isEmpty(positionals)) {
   console.info(HELP);
 
-  process.exit(Arr.isEmpty(positionals) ? 1 : 0);
+  // Asking for help is not an error, even though being given no command is.
+  process.exit(values.help === true ? 0 : 1);
 }
 
 const [commandArg, targetArg = 'all'] = positionals;

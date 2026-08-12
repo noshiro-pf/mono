@@ -1,0 +1,9 @@
+{
+  "name": "verify-ts-data-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-data-forge": "file:../../../.tarballs/ts-data-forge.tgz"
+  }
+}

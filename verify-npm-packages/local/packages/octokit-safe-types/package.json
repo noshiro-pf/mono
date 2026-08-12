@@ -1,0 +1,9 @@
+{
+  "name": "verify-octokit-safe-types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "octokit-safe-types": "file:../../../.tarballs/octokit-safe-types.tgz"
+  }
+}

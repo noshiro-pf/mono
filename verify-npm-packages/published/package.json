@@ -1,0 +1,6 @@
+{
+  "name": "verify-npm-packages-published",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module"
+}
