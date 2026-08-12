@@ -53,6 +53,14 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # No `check-should-run-type-checks` gate here. Every entry in this
+      # matrix can be affected by a change the gate ignores: three of them
+      # check markdown, `ws:doc` regenerates the package READMEs, and
+      # `ws:check:ext` globs *every* file under the directories it is given —
+      # `libs/ts-data-forge/scripts` accepts `.md`, and a `.md` under any
+      # `src` is a failure — so the gate would skip it exactly when it should
+      # fail.
+
       # ws:doc and ws:check:ext load each package's sources, which import
       # workspace siblings and resolve through their `exports` map to dist/.
       # Nothing is built yet on a clean checkout, so these two need the
