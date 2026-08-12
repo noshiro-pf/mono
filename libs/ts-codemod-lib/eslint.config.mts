@@ -18,7 +18,6 @@ export default [
   {
     ignores: [
       'docs/**',
-      'agents/**',
       'test-code/**',
       // test/dist_/ has its own tsconfig and type-checks the built dist/
       // output (see scripts/cmd/build.mts); it is excluded from the root

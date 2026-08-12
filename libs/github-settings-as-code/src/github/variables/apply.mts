@@ -17,9 +17,9 @@ export const applyVariables = async (): Promise<void> => {
     },
     {
       // noshiro-repo-automation-bot (App ID: 4478721)
-      // Contents / Pull requests / Issues 権限。PR を作る自動化（ pnpm-update /
-      // sync-agent-config ）と release で共用する。実際に使う権限は各
-      // ワークフローの permission-* 入力で絞る。
+      // Contents / Pull requests / Issues 権限。PR を作る自動化（ pnpm-update ）と
+      // release で共用する。実際に使う権限は各ワークフローの permission-* 入力で
+      // 絞る。
       name: 'REPO_AUTOMATION_BOT_CLIENT_ID',
       value: 'Iv23lilpiDh0twq2PErv',
     },

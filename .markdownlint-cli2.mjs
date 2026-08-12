@@ -4,7 +4,6 @@ const config = {
     '!**/node_modules',
     '!**/dist/**/*',
     '!**/docs/**/*',
-    '!agents/**/*',
     '!**/CHANGELOG.md',
     // --- mono-specific ---
     // Zenn content. Zenn's front matter and Markdown dialect do not match
