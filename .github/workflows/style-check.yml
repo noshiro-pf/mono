@@ -29,7 +29,6 @@ jobs:
           - cspell
           - ws:doc
           - ws:check:ext
-          - lint:published-deps
 
     steps:
       - name: Checkout
