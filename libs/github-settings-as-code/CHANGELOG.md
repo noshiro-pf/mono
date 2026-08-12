@@ -1,5 +1,14 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 2.1.2
+
+### Patch Changes
+
+- 141ff02: `repo-settings --help` exits 0. It printed the help and then exited 1, because
+  the exit code was chosen by whether a command was given rather than by whether
+  help was asked for. Running it with no arguments at all still exits 1, which is
+  the usage error it was meant to report.
+
 ## 2.1.1
 
 ### Patch Changes
