@@ -59,24 +59,24 @@ jobs:
         id: check_diff_type
         run: pnpm run z:check-should-run-type-checks
 
-      - name: Exit if no relevant changes
-        if: steps.check_diff_type.outputs.should_run != 'true'
-        run: exit 0
-
+      # `run: exit 0` ends the step, not the job — every step below has to
+      # carry the condition itself. See node-version-compatibility.yml, which
+      # has always done it this way.
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         run: pnpm exec playwright install chromium
 
       - name: Build all packages
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
-        if: matrix.command != 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command != 'ws:test:browser'
         run: pnpm run ${{ matrix.command }}
 
       # Source - https://stackoverflow.com/a/71583518
       - name: Run 'ws:test:browser' with retry
-        if: matrix.command == 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 10
@@ -84,8 +84,9 @@ jobs:
           command: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run z:assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
-        if: matrix.command == 'ws:test:cov'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0

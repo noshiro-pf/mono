@@ -53,16 +53,32 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # ws:check:ext only looks at source file extensions, so a change that
+      # touches none of them cannot affect it. The other entries are either
+      # cheap or, in ws:doc's case, checking markdown themselves — the
+      # generated package READMEs — which is exactly what a documentation-only
+      # change can break.
+      # ws:check:ext only looks at source file extensions, so a change that
+      # touches none of them cannot affect it. The other entries stay
+      # unconditional: three of them check markdown, and ws:doc regenerates
+      # the package READMEs, which is exactly what a documentation-only change
+      # can break.
+      - name: Check diff
+        id: check_diff
+        if: matrix.command == 'ws:check:ext'
+        run: pnpm run z:check-should-run-type-checks
+
       # ws:doc and ws:check:ext load each package's sources, which import
       # workspace siblings and resolve through their `exports` map to dist/.
       # Nothing is built yet on a clean checkout, so these two need the
       # packages emitted first. The other matrix entries do not touch dist/,
       # so they skip the build.
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
+        if: matrix.command == 'ws:doc' || (matrix.command == 'ws:check:ext' && steps.check_diff.outputs.should_run == 'true')
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
+        if: matrix.command != 'ws:check:ext' || steps.check_diff.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
