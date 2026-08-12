@@ -4,6 +4,13 @@ on:
   pull_request_target:
     branches:
       - 'main'
+      # `archive/**` holds frozen snapshots of retired work. They are never
+      # merged back, so every check on them is wasted CI — the same reason
+      # the push-triggered workflows list them under `branches-ignore`.
+      # `main` above already excludes them; the negation states the intent
+      # explicitly so that widening the filter later does not quietly pull
+      # them back in.
+      - '!archive/**'
     types:
       - opened
       - edited
