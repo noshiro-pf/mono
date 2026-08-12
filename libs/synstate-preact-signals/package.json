@@ -1,6 +1,6 @@
 {
   "name": "synstate-preact-signals",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Preact Signals integration for SynState - bridge between synstate observables and @preact/signals",
   "repository": {
     "type": "git",
