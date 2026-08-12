@@ -1,5 +1,23 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.8.5
+
+### Patch Changes
+
+- 3d6bca7: Declare `@eslint/core` and `@types/estree` as dependencies. Both are imported
+  by modules this package publishes while being declared only as
+  devDependencies. `@eslint/core` is the more serious of the two: the published
+  `flat-config.d.mts` imports a type from it, so it resolved for consumers only
+  when their package manager happened to hoist it out of `eslint` — under pnpm it
+  does not, and type-checking against this config failed.
+- 5e2a339: Drop the unused `@types/eslint` and `typescript-eslint` dependencies. ESLint 10
+  ships its own type definitions, and the `typescript-eslint` meta-package was
+  never imported — this config depends on `@typescript-eslint/parser`,
+  `@typescript-eslint/utils` and the individual plugins directly.
+- Updated dependencies [3d6bca7]
+    - ts-data-forge@14.2.1
+    - ts-type-forge@9.2.1
+
 ### Bug Fixes
 
 - turn off unicorn/no-unreadable-for-of-expression ([#408](https://github.com/noshiro-pf/eslint-config-typed/issues/408)) ([016ead5](https://github.com/noshiro-pf/eslint-config-typed/commit/016ead54b20ee984b5a477a1b809d4e12c78e2c3))
