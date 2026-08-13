@@ -466,6 +466,52 @@ key が素の `string` になれば union ではなくなり、`Partial` も付�
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
 測り直す必要がある。残る課題として重いのは lint 21 件の方針決定（前節）のほう。
 
+### `ts-data-forge` で分かったこと（2026-08-14）
+
+最初の 1 パッケージとして着手し、**11 件のうち 9 件は直せたが 2 件は外部要因で止まった。**
+
+**配布物には影響しない、ただし条件つき。** 標準 lib と strict lib で emit した
+`.d.mts` 181 ファイルはバイト単位で同一だった。これは `libReplacement` の性質では
+なく、**このリポジトリが `@typescript-eslint/explicit-function-return-type` を
+強制していること**に支えられている。戻り値型を推論に任せると漏れる。
+
+```ts
+export const keysInferred = (o: UnknownRecord) => Object.keys(o);
+// 標準: (o: UnknownRecord) => string[]
+// strict: (o: UnknownRecord) => StrictLibInternals.ToObjectKeys<UnknownRecord>[]
+```
+
+漏れる `StrictLibInternals` は**消費者の環境に存在しない名前**なので、宣言が解決
+不能になる。関数以外の export（`export const ks = Object.keys(rec)`）は lint 規約の
+対象外なので、規約を守っていても漏れ得る。**パッケージごとの opt-in では毎回
+`.d.mts` の差分がゼロであることを確認する。**
+
+**`src` は配布物なので、lib の形に依存する記述を書けない。** `files` が `src` を
+含む（Go to Definition が元ソースに飛ぶため）ので、strict lib でしか成立しない
+`expectType` や `@ts-expect-error` を書くと、**消費者がエディタでソースを開いたとき
+に赤が出る**。実測で 4 件出た。したがって:
+
+- lib の形を固定する `expectType` は書かない（コメントとして残す）
+- `@ts-expect-error` は使わない。抑制が不要な側で「未使用」エラーになるため
+
+この 2 つは**当時の制約であって、現在の方針ではない**。前掲の「方針決定が要る」は
+その後「消費者のエディタに赤が出ることを受け入れる」に決着している。コメントとして
+残した `expectType` は strict lib の形に書き戻してよい。このブランチはそれをせず、
+どちらの lib でも同じに読める形のまま置いてある — 書き戻す必要が無いなら、
+そちらのほうが良い状態だからである。
+
+**止まっている 2 件。**
+
+1. **`class X extends Map` / `extends Set` が strict lib で通らない。** `MapConstructor`
+   の `prototype` が `Map<never, never>` になっており、どんな部分クラスの prototype も
+   代入不可。generics を外しても匿名クラスでも同じ。ごく普通の JavaScript が書けない
+   ので、**strict lib 側の不具合として直すのが筋**
+2. **`@eslint/plugin-kit` が strict lib で落ちる。** `dist/cjs/types.cts` は `.d.cts`
+   ではなく**ソース**として配られているため `skipLibCheck` が効かない。
+   `eslint-config-typed` を `paths` で source 解決していることで入ってくる
+
+この 2 つが片付くまで `ts-data-forge` の opt-in はできない。
+
 ## 依存宣言を 1 件にまとめる（2026-08-21 実測）
 
 root の `package.json` は 236 行のうち 107 行が `@typescript/lib-*` の URL だった。
