@@ -1,5 +1,25 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.9.0
+
+### Minor Changes
+
+- f883ac1: Support eslint-plugin-unicorn v73.
+
+    Five rules are new in v73 and the exported rule map has to name all of them.
+    `no-unsafe-sqlite-interpolation` is on; `no-barrel-files` is off, because
+    barrel files are how this repository is organized; the other three are off as
+    stylistic, `single-line-block-comment-style` among them — its fix rewrites
+    one-line JSDoc comments into three lines without the leading asterisk.
+
+    `prefer-single-call` and `no-array-fill-with-reference-type` stopped reporting
+    on code they used to flag, so the `eslint-disable` comments naming them are no
+    longer needed and have gone.
+
+### Patch Changes
+
+- 4f8d4e3: Update dependencies
+
 ## 5.8.6
 
 ### Patch Changes
