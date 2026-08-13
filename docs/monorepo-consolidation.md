@@ -261,6 +261,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
     - 抑止対象は `pnpm-workspace.yaml` の `update.ignoreDeps` が単一の情報源。`typescript` はエイリアス `typescript-native` も含めて守られることを実測で確認した
+    - **その後 1 回だけ動いて失敗した**（run 31644690884）。`update.githubActions: true` が `.github/workflows/` の action ピンも書き換えるため、App トークンに `workflows` 権限が無く push が拒否されていた。#1583 で付与済み
+    - さらに、成功していたとしても 2 回目以降は必ず落ちる作りだった。`git push --force-with-lease` を値なしで使っているが、比較先の remote-tracking ref は `actions/checkout` が既定ブランチの分しか作らないため存在せず、既存ブランチへの push が `stale info` で拒否される（手元で再現・修正後に 3 連続実行が通ることも確認）。期待値を明示する形に変えた
+    - `gh pr view <branch>` は merge 済みの PR も拾うため、1 回目がマージされた翌日は「PR 作成をスキップ→閉じた PR に auto-merge を付けようとして失敗」になる。state が `OPEN` のものだけを見るようにした
 - npm package のテスト
     - [x] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
         - `pnpm run verify:npm-packages`（`tools/scripts/cmd/verify-npm-packages.mts`）。17 パッケージを pack し、`verify-npm-packages/local/` にパッケージごとの project として install して、それぞれに対して小さなプログラムを実行する。`main` / `module` / `types` / `exports` / `bin` が指すパスが tarball に実在するかも検査する。type-check.yml の matrix に追加済み

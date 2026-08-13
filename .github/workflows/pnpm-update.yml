@@ -165,11 +165,30 @@ jobs:
           git commit -m "chore: update dependencies"
 
           # Authenticate the push inline so the PAT is never written to git config.
-          git push --force-with-lease \
-            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+          remote_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          # `--force-with-lease` with no value compares against the
+          # remote-tracking ref, and `actions/checkout` configures a fetch
+          # refspec for the default branch alone — so this branch has none, and
+          # the push is rejected with "stale info" every run after the one that
+          # creates it. Naming the expected value restores the protection: an
+          # empty value means "expect it not to exist", which is what the first
+          # run wants.
+          # Two steps rather than a pipeline, so that a failed `ls-remote` stops
+          # the job instead of yielding an empty lease and force-pushing anyway
+          # — a pipeline would report `cut`'s exit status, which is always 0.
+          remote_ref="$(git ls-remote "$remote_url" "refs/heads/${branch}")"
+          expected="$(printf '%s' "$remote_ref" | cut -f1)"
+
+          git push --force-with-lease="refs/heads/${branch}:${expected}" \
+            "$remote_url" \
             "HEAD:refs/heads/${branch}"
 
-          if ! gh pr view "$branch" >/dev/null 2>&1; then
+          # By branch name alone `gh pr view` also finds a merged pull request,
+          # and the branch is recreated every run — so once the first one
+          # merges, this would skip creating the next and then fail trying to
+          # auto-merge a closed pull request. Ask for an open one.
+          if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
             gh pr create \
               --base main \
               --head "$branch" \
