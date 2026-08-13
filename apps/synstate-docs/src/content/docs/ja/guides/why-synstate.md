@@ -7,7 +7,7 @@ sidebar:
 
 ## シンプルに始められ、必要に応じてパワフルに
 
-SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `combine` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/synstate/ja/examples/react/#global-counter-state)はわずか数行で実装できます：
+SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `combine` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#global-counter-state)はわずか数行で実装できます：
 
 ```tsx
 import { createState } from 'synstate-react-hooks';
@@ -20,7 +20,7 @@ const Counter = () => {
 };
 ```
 
-要件がより複雑になっても、SynState は対応できます。シンプルな[ダークモード切替](/synstate/ja/examples/react/#boolean-state-dark-mode)から[自動キャンセル付きデバウンス検索パイプライン](/synstate/ja/examples/advanced/#search-with-debounce)まで、すべてを統一された API で記述できます。
+要件がより複雑になっても、SynState は対応できます。シンプルな[ダークモード切替](/mono/synstate/ja/examples/react/#boolean-state-dark-mode)から[自動キャンセル付きデバウンス検索パイプライン](/mono/synstate/ja/examples/advanced/#search-with-debounce)まで、すべてを統一された API で記述できます。
 
 ## なぜ Observable ベースなのか？
 
@@ -28,7 +28,7 @@ const Counter = () => {
 
 SynState は Observable パターンの上に構築されています。状態を、合成・変換・結合できる値のストリームとしてモデル化するパターンです。これにより、RxJS のような別のライブラリを必要とせず、豊富なオペレーター（`debounce`、`throttle`、`switchMap`、`mergeMap` 等）を利用できます。
 
-実際にどのように機能するか、命令的なコードとの比較については[宣言的な状態管理](/synstate/ja/guides/declarative-state-management/)を参照してください。
+実際にどのように機能するか、命令的なコードとの比較については[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/)を参照してください。
 
 ## 高パフォーマンス、グリッチフリー
 
@@ -43,7 +43,7 @@ SynState はこれを**深さ順伝播**アルゴリズムで解決していま�
 | **`InitializedObservable`** | なし — 最初の emission まで値がない場合がある                                           | 組み込み — 常に値を保持し、状態の表現に最適                                    |
 | **設計の焦点**              | 汎用的な非同期イベント処理                                                              | 状態管理が第一、非同期オペレーター（`debounce`、`switchMap` 等）も完全サポート |
 
-詳細な説明は [SynState はグリッチをどう解決したか](/synstate/ja/internals/how-synstate-solved-the-glitch/)を参照してください。
+詳細な説明は [SynState はグリッチをどう解決したか](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)を参照してください。
 
 ## React Compiler と完全互換
 
@@ -67,8 +67,8 @@ MobX の `observer()` HOC はレンダリング中に observable へのアクセ
 
 ## 次のステップ
 
-- [宣言的な状態管理](/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
-- [React 連携](/synstate/ja/guides/react-integration/) — SynState を React で使う。
-- [ライブラリ比較](/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
-- [パフォーマンスベンチマーク](/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。
-- [インタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/) — 違いを体感する。
+- [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
+- [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState を React で使う。
+- [ライブラリ比較](/mono/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
+- [パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。
+- [インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/) — 違いを体感する。

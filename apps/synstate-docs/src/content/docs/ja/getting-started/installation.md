@@ -37,7 +37,7 @@ React 16.8–17（`useSyncExternalStore` なし）の場合は、compat パッ�
 npm add synstate-react-hooks-compat
 ```
 
-API は `synstate-react-hooks` と同一です。詳細は [React 連携](/synstate/ja/guides/react-integration/#react-v17-以前)を参照してください。
+API は `synstate-react-hooks` と同一です。詳細は [React 連携](/mono/synstate/ja/guides/react-integration/#react-v17-以前)を参照してください。
 
 ### Preact Hooks
 

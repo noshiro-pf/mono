@@ -21,6 +21,7 @@
     "tools/*"
   ],
   "scripts": {
+    "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
     "check:root": "pnpm run '/check:root:.*/'",
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",

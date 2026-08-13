@@ -144,7 +144,7 @@ assert.deepStrictEqual(result, [0, 10, 1010, 1020, 2020, 2030, 3030]);
 
 `TableSliced` への3つの入力 — `ItemsPerPage`、`TableFiltered`、`CurrentPage` — は**複数の重なり合うダイヤモンド**を形成しています。例えば、`TableFiltered` は `TableSliced` への直接の入力であると同時に、`CurrentPage` の間接的な祖先でもあります（`PageLength` 経由）。同様に、`ItemsPerPage` は `PageLength`（`CurrentPage` に影響する）と `TableSliced` の両方に直接入力されます。フィルター入力または `ItemsPerPageInput` が変化するたびに、`TableSliced` の複数の入力が共通の祖先を共有しており、`TableSliced` を整合的に評価する前にすべてが解決される必要があります。
 
-RxJS のようなプッシュ型ライブラリでは、`combineLatest` が一部の入力はすでに更新されているが他はまだ古い値を保持している中間状態を発行してしまいます。これが目に見えるバグを引き起こすかどうかはアプリケーションによりますが、不整合は常に存在し、グラフの拡大に伴って悪化します。`combineLatest` への $N$ 個の入力がある場合、単一のソース更新で 1 回ではなく **$N+1$ 回の発行**が生じ、[ディープチェーンデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で示されるように **$O(N^2)$ の急激な性能劣化**を引き起こします。
+RxJS のようなプッシュ型ライブラリでは、`combineLatest` が一部の入力はすでに更新されているが他はまだ古い値を保持している中間状態を発行してしまいます。これが目に見えるバグを引き起こすかどうかはアプリケーションによりますが、不整合は常に存在し、グラフの拡大に伴って悪化します。`combineLatest` への $N$ 個の入力がある場合、単一のソース更新で 1 回ではなく **$N+1$ 回の発行**が生じ、[ディープチェーンデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で示されるように **$O(N^2)$ の急激な性能劣化**を引き起こします。
 
 ## グリッチをどのように排除できるか?
 
@@ -208,7 +208,7 @@ RxJS の深さ優先伝搬はこのオーバーヘッドを回避します — �
 
 これは `mousemove` や `pointermove` イベント、アニメーションフレーム、または毎秒数十回から数百回更新が発生する高頻度ストリームなど、パフォーマンスに敏感なシナリオで重要になります。優先度キューアプローチの繰り返されるヒープ操作は蓄積され、ダイヤモンドグラフにおける RxJS の冗長な評価はさらに悪化します。
 
-SynState は両方の問題を解決します。**$O(n)$ でのグリッチフリー伝搬**を実現します。これは RxJS のツリートラバーサルと同じ漸近的コストですが、グリッチがなく、指数的な最悪ケースもありません（$D$ = ダイアモンド1段あたりのファンアウト）。この速度低下は[ディープ依存関係チェーンデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で実際に観察できます。チェーンの深さが増加するにつれて RxJS のスループットが急激に低下する一方、SynState は安定したままです。
+SynState は両方の問題を解決します。**$O(n)$ でのグリッチフリー伝搬**を実現します。これは RxJS のツリートラバーサルと同じ漸近的コストですが、グリッチがなく、指数的な最悪ケースもありません（$D$ = ダイアモンド1段あたりのファンアウト）。この速度低下は[ディープ依存関係チェーンデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で実際に観察できます。チェーンの深さが増加するにつれて RxJS のスループットが急激に低下する一方、SynState は安定したままです。
 
 ## SynState で起こること（グリッチフリー、_O(n)_）
 
@@ -238,7 +238,7 @@ startUpdate(nextValue) {
 
 これは RxJS との重要なアーキテクチャの違いです。RxJS では、各 Observable が自身の値を更新し子に伝搬する責任を持ちます — 伝搬はグラフ全体に分散しています。SynState では、**マネージャー Observable** がすべての子孫の更新を単一のループで中央集権的に管理します。この集中管理方式が、優先度キューなしでの深さ順伝搬を可能にしています。
 
-SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`AsyncChildObservable` です。このうち、`RootObservable` と `AsyncChildObservable` がマネージャーとして機能します。`RootObservable` はグラフのエントリーポイントであり、`AsyncChildObservable` は [`debounce`](/synstate/ja/reference/debounce/) のような時間シフト演算子によって作成されます。その発行は非同期であり上流のルートによって調整できないため、自身の下流サブグラフのマネージャーとして引き継ぎます。
+SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`AsyncChildObservable` です。このうち、`RootObservable` と `AsyncChildObservable` がマネージャーとして機能します。`RootObservable` はグラフのエントリーポイントであり、`AsyncChildObservable` は [`debounce`](/mono/synstate/ja/reference/debounce/) のような時間シフト演算子によって作成されます。その発行は非同期であり上流のルートによって調整できないため、自身の下流サブグラフのマネージャーとして引き継ぎます。
 
 配列は深さでソートされているため、すべての親がその子のいずれよりも先に更新されることが保証されます。これは優先度キューアプローチと同じ正確性の保証ですが、**$O(n)$ の伝搬コスト**で**ランタイムアロケーションがゼロ**です。かかるコストは構築時の $O(\log n)$ 二分探索挿入のみで、これは一回限りの操作です。
 

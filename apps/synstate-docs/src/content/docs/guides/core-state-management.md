@@ -5,7 +5,7 @@ sidebar:
     order: 3
 ---
 
-The [Quick Example](/synstate/getting-started/introduction/#quick-example) showed that `createState` returns a 3-element tuple. This page covers the third element in detail, along with key design differences from React's `useState`.
+The [Quick Example](/mono/synstate/getting-started/introduction/#quick-example) showed that `createState` returns a 3-element tuple. This page covers the third element in detail, along with key design differences from React's `useState`.
 
 ## The Third Element
 
@@ -93,7 +93,7 @@ dispatch({ type: 'increment' }); // state is now 1
 
 Like `createState`, `dispatch` executes synchronously and returns the new state. The returned `state` is an `InitializedObservable` that you can subscribe to or derive from with operators.
 
-See the [API reference for `createReducer`](/synstate/reference/create-reducer/) for a full example.
+See the [API reference for `createReducer`](/mono/synstate/reference/create-reducer/) for a full example.
 
 ## `createBooleanState` — Toggle State
 
@@ -110,4 +110,4 @@ toggle(); // isOpen$ emits true
 
 The returned methods (`setTrue`, `setFalse`, `toggle`) have stable references and can be passed directly as event handler callbacks.
 
-See the [API reference for `createBooleanState`](/synstate/reference/create-boolean-state/) for a full example with React integration.
+See the [API reference for `createBooleanState`](/mono/synstate/reference/create-boolean-state/) for a full example with React integration.

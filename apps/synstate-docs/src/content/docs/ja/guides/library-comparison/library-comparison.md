@@ -23,12 +23,12 @@ sidebar:
 :::note[プッシュ型 vs プル型のグリッチフリー]
 SynState はこのリストの中で、**プッシュ型トポロジカルソート**によるグリッチフリー伝搬を実現する唯一のライブラリです。派生値は依存関係の順序で即座に更新されるため、subscriber はプルすることなく常に整合的な値を受け取ります。
 
-MobX、Jotai、Recoil は**プル型（遅延）評価**によってグリッチを回避します。派生値は即座にプッシュされず、subscriber やコンポーネントによる読み取り時にオンデマンドで再計算されるため、不整合な中間状態を自然に回避します。詳細な説明は [SynState がグリッチを解決した方法](/synstate/ja/internals/how-synstate-solved-the-glitch/) を参照してください。
+MobX、Jotai、Recoil は**プル型（遅延）評価**によってグリッチを回避します。派生値は即座にプッシュされず、subscriber やコンポーネントによる読み取り時にオンデマンドで再計算されるため、不整合な中間状態を自然に回避します。詳細な説明は [SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/) を参照してください。
 :::
 
 ## ベンチマーク対象ライブラリ
 
-以下のライブラリは SynState の[パフォーマンスベンチマーク](/synstate/ja/guides/library-comparison/benchmark/)に含まれています。各セクションではライブラリの特性と理想的なユースケースを強調しています。
+以下のライブラリは SynState の[パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/)に含まれています。各セクションではライブラリの特性と理想的なユースケースを強調しています。
 
 ### SynState
 
@@ -55,7 +55,7 @@ RxJS は ReactiveX Observable 仕様のリファレンス実装です。非同�
 
 **トレードオフ:**
 
-- 同期派生値を組み合わせる際に[グリッチ問題](/synstate/ja/internals/how-synstate-solved-the-glitch/)が発生する。
+- 同期派生値を組み合わせる際に[グリッチ問題](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)が発生する。
 - リアクティブストリームという独自のパラダイムへの転換が必要 — 非同期データフローの時間的振る舞いの理解、Cold/Hot Observable の区別、類似する演算子の使い分け（`switchMap` vs `mergeMap` vs `concatMap` など）が求められ、習熟に時間がかかる。
 - 状態管理のために特別に設計されていない。
 
@@ -215,4 +215,4 @@ TanStack Query（旧 React Query）は、サーバーデータの取得、キャ
 
 ## パフォーマンス比較
 
-ライブラリ間の伝搬速度を比較する詳細なベンチマーク結果については、[パフォーマンスベンチマーク](/synstate/ja/guides/library-comparison/benchmark/)ページを参照してください。
+ライブラリ間の伝搬速度を比較する詳細なベンチマーク結果については、[パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/)ページを参照してください。

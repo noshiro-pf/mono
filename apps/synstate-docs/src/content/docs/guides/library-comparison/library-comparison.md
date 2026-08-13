@@ -23,12 +23,12 @@ This page provides an objective comparison of SynState with popular state manage
 :::note[Push-based vs Pull-based Glitch-Free]
 SynState is the only library in this list that achieves glitch-free propagation through **push-based topological sorting** — derived values are eagerly updated in dependency order, so subscribers always receive consistent values without needing to pull.
 
-MobX, Jotai, and Recoil avoid glitches through **pull-based (lazy) evaluation** — derived values are not eagerly pushed; instead, they are recomputed on-demand when read by a subscriber or component, which naturally avoids seeing inconsistent intermediate states. See [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/) for a detailed explanation.
+MobX, Jotai, and Recoil avoid glitches through **pull-based (lazy) evaluation** — derived values are not eagerly pushed; instead, they are recomputed on-demand when read by a subscriber or component, which naturally avoids seeing inconsistent intermediate states. See [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) for a detailed explanation.
 :::
 
 ## Benchmarked Libraries
 
-The following libraries are included in SynState's [performance benchmark](/synstate/guides/library-comparison/benchmark/). Each section highlights the library's characteristics and ideal use cases.
+The following libraries are included in SynState's [performance benchmark](/mono/synstate/guides/library-comparison/benchmark/). Each section highlights the library's characteristics and ideal use cases.
 
 ### SynState
 
@@ -55,7 +55,7 @@ RxJS is the reference implementation of the ReactiveX Observable specification. 
 
 **Trade-offs:**
 
-- Suffers from the [glitch problem](/synstate/internals/how-synstate-solved-the-glitch/) when combining synchronous derived values.
+- Suffers from the [glitch problem](/mono/synstate/internals/how-synstate-solved-the-glitch/) when combining synchronous derived values.
 - Reactive stream programming requires a paradigm shift from imperative thinking — developers must reason about asynchronous data flows over time, understand the distinction between Cold and Hot Observables, and choose carefully among similar operators (e.g. `switchMap` vs `mergeMap` vs `concatMap`).
 - Not designed specifically for state management.
 
@@ -215,4 +215,4 @@ TanStack Query (formerly React Query) is a server-state management library focus
 
 ## Performance Comparison
 
-For detailed benchmark results comparing propagation speed across libraries, see the [Performance Benchmark](/synstate/guides/library-comparison/benchmark/) page.
+For detailed benchmark results comparing propagation speed across libraries, see the [Performance Benchmark](/mono/synstate/guides/library-comparison/benchmark/) page.

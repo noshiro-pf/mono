@@ -5,7 +5,7 @@ export const RxjsGlitchSlides = React.memo(() => (
   <SvgSlideshow
     alt={`RxJS glitch animation`}
     numSlides={13}
-    slidesPath={'/synstate/rxjs-glitch-slides'}
+    slidesPath={'/mono/synstate/rxjs-glitch-slides'}
   />
 ));
 

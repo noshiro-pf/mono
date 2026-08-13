@@ -333,11 +333,11 @@ Every problem from the imperative version is resolved:
 
 Now that you understand the declarative model, the next step is to use it in practice:
 
-- [createState in Depth](/synstate/guides/core-state-management/) — learn more about `createState`, `createReducer`, and `createBooleanState`.
-- [React Integration](/synstate/guides/react-integration/) — connect SynState Observables to React components.
+- [createState in Depth](/mono/synstate/guides/core-state-management/) — learn more about `createState`, `createReducer`, and `createBooleanState`.
+- [React Integration](/mono/synstate/guides/react-integration/) — connect SynState Observables to React components.
 
-One challenge with dependency graphs like this is ensuring **consistency** — when a source changes, all derived values should update atomically, without emitting intermediate states where some values are stale. This is called the [**glitch problem**](/synstate/internals/how-synstate-solved-the-glitch/), and it is one of the key issues SynState solves. To learn more:
+One challenge with dependency graphs like this is ensuring **consistency** — when a source changes, all derived values should update atomically, without emitting intermediate states where some values are stale. This is called the [**glitch problem**](/mono/synstate/internals/how-synstate-solved-the-glitch/), and it is one of the key issues SynState solves. To learn more:
 
-- [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/) — deep dive into glitch-free propagation.
-- [Library Comparison](/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
-- [Performance Benchmark](/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.
+- [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/) — deep dive into glitch-free propagation.
+- [Library Comparison](/mono/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
+- [Performance Benchmark](/mono/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.

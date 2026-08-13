@@ -8,7 +8,9 @@ import remarkMath from 'remark-math';
 
 export default defineConfig({
   site: 'https://noshiro-pf.github.io',
-  base: '/synstate/',
+  // Served from this repository's Pages now, not the archived `synstate`
+  // repository, so the site sits one level deeper.
+  base: '/mono/synstate/',
   markdown: {
     processor: unified({
       gfm: true,
@@ -80,7 +82,7 @@ export default defineConfig({
             rel: 'icon',
             type: 'image/png',
             sizes: '32x32',
-            href: '/synstate/favicon/favicon-32x32.png',
+            href: '/mono/synstate/favicon/favicon-32x32.png',
           },
         },
         {
@@ -89,7 +91,7 @@ export default defineConfig({
             rel: 'icon',
             type: 'image/png',
             sizes: '16x16',
-            href: '/synstate/favicon/favicon-16x16.png',
+            href: '/mono/synstate/favicon/favicon-16x16.png',
           },
         },
         {
@@ -97,7 +99,7 @@ export default defineConfig({
           attrs: {
             rel: 'apple-touch-icon',
             sizes: '180x180',
-            href: '/synstate/favicon/apple-icon-180x180.png',
+            href: '/mono/synstate/favicon/apple-icon-180x180.png',
           },
         },
       ],

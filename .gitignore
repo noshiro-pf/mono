@@ -210,3 +210,6 @@ verify-npm-packages/*/pnpm-lock.yaml
 # pnpm writes `allowBuilds` and `minimumReleaseAgeExclude` back into this file
 # as it installs, so it is generated state rather than a tracked file.
 verify-npm-packages/*/pnpm-workspace.yaml
+
+# GitHub Pages への集約時に生成する。
+_site/

@@ -144,7 +144,7 @@ The interactive table below is a typical data-browsing UI: a list of records wit
 
 The three inputs to `TableSliced` — `ItemsPerPage`, `TableFiltered`, and `CurrentPage` — form **multiple overlapping diamonds**. For example, `TableFiltered` is both a direct input to `TableSliced` and an indirect ancestor of `CurrentPage` (via `PageLength`). Similarly, `ItemsPerPage` feeds into both `PageLength` (which influences `CurrentPage`) and `TableSliced` directly. Whenever a filter input or `ItemsPerPageInput` changes, several of `TableSliced`'s inputs share a common ancestor and must all be resolved before `TableSliced` can be evaluated consistently.
 
-In a push-based library like RxJS, `combineLatest` would emit intermediate states where some inputs have already updated while others still hold stale values. Whether this causes a visible bug depends on the application, but the inconsistency is always there — and it scales: with $N$ inputs to `combineLatest`, a single source update produces **$N+1$ emissions** instead of 1, leading to the **$O(N^2)$ performance cliff** demonstrated in the [deep chain demo](/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load).
+In a push-based library like RxJS, `combineLatest` would emit intermediate states where some inputs have already updated while others still hold stale values. Whether this causes a visible bug depends on the application, but the inconsistency is always there — and it scales: with $N$ inputs to `combineLatest`, a single source update produces **$N+1$ emissions** instead of 1, leading to the **$O(N^2)$ performance cliff** demonstrated in the [deep chain demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load).
 
 ## How Can We Eliminate Glitches?
 
@@ -208,7 +208,7 @@ For graphs without diamond dependencies, RxJS is faster by a $\log n$ factor. Bu
 
 This matters in performance-sensitive scenarios such as `mousemove` or `pointermove` events, animation frames, or any high-frequency stream where updates fire dozens or hundreds of times per second. The repeated heap operations of the priority queue approach add up, and RxJS's redundant evaluations in diamond graphs scale even worse.
 
-SynState solves both problems: it achieves **glitch-free propagation in $O(n)$** — the same asymptotic cost as RxJS's tree traversal, but without glitches and without the exponential worst case ($D$ = fan-out per diamond). You can observe the slowdown in practice in the [deep dependency chain demo](/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load), where RxJS's throughput collapses as the chain depth increases while SynState remains flat.
+SynState solves both problems: it achieves **glitch-free propagation in $O(n)$** — the same asymptotic cost as RxJS's tree traversal, but without glitches and without the exponential worst case ($D$ = fan-out per diamond). You can observe the slowdown in practice in the [deep dependency chain demo](/mono/synstate/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load), where RxJS's throughput collapses as the chain depth increases while SynState remains flat.
 
 ## What Happens in SynState (Glitch-Free, _O(n)_)
 
@@ -238,7 +238,7 @@ startUpdate(nextValue) {
 
 This is a key architectural difference from RxJS. In RxJS, each observable is responsible for updating its own value and propagating to its children — propagation is distributed across the graph. In SynState, a **manager observable** centrally manages the update of all its descendants in a single loop. This centralized control is what makes depth-ordered propagation possible without a priority queue.
 
-SynState's Observable types are `RootObservable`, `SyncChildObservable`, and `AsyncChildObservable`. Of these, `RootObservable` and `AsyncChildObservable` act as managers. A `RootObservable` is the entry point of a graph, while an `AsyncChildObservable` is created by time-shifting operators such as [`debounce`](/synstate/reference/debounce/) — since their emissions are asynchronous and cannot be coordinated by the upstream root, they take over as managers for their own downstream subgraph.
+SynState's Observable types are `RootObservable`, `SyncChildObservable`, and `AsyncChildObservable`. Of these, `RootObservable` and `AsyncChildObservable` act as managers. A `RootObservable` is the entry point of a graph, while an `AsyncChildObservable` is created by time-shifting operators such as [`debounce`](/mono/synstate/reference/debounce/) — since their emissions are asynchronous and cannot be coordinated by the upstream root, they take over as managers for their own downstream subgraph.
 
 Because the array is sorted by depth, every parent is guaranteed to have been updated before any of its children — the same correctness guarantee as the priority queue approach, but with **$O(n)$ propagation cost** and **zero runtime allocation**. The only cost paid is at construction time ($O(\log n)$ binary search insertion), which is a one-time operation.
 

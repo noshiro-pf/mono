@@ -1,0 +1,89 @@
+name: Deploy Pages
+
+# Publishes the documentation for everything this repository ships to
+# https://noshiro-pf.github.io/mono/.
+#
+# Each library used to build and serve its own documentation from its own
+# repository. Those repositories are archived: their pages still answer, but
+# nothing rebuilds them, so the documentation froze at the consolidation. This
+# rebuilds all of it from the current sources on every push to main.
+#
+# Pages has to be enabled with GitHub Actions as its source before the deploy
+# step can work. That is declared in `repo-settings/pages/settings.json` and
+# applied by `pnpm run repo-settings:apply`, not by this workflow.
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+# Only the deploy job needs these; the build job runs with the defaults.
+permissions:
+  contents: read
+
+concurrency:
+  # One deployment at a time, and let a newer commit supersede an older one
+  # that has not deployed yet. Not `cancel-in-progress` on the deploy itself —
+  # a half-uploaded site is worse than a stale one.
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # TypeDoc reads each package's sources, which import workspace siblings
+      # through their `exports` map and resolve to `dist/`.
+      - name: Build all packages
+        run: pnpm run ws:build
+
+      - name: Generate the API documentation
+        run: pnpm run ws:doc
+
+      - name: Build the documentation site
+        run: pnpm --filter @synstate/docs run build:astro
+
+      - name: Assemble the site
+        run: pnpm run build:pages-site
+
+      - name: Upload the artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: ./_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      pages: write # to publish
+      id-token: write # to prove the artifact came from this workflow
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

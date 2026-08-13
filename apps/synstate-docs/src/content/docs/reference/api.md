@@ -117,7 +117,7 @@ These re-export core `createState` / `createReducer` / `createBooleanState` but 
 
 ### Preact Signals (`synstate-preact-signals`)
 
-Bridges synstate observables with [Preact Signals](https://preactjs.com/guide/v10/signals/) for fine-grained DOM updates without component re-renders. See the [interactive demo](/synstate/preact-signals/demo/) to compare with the hooks approach.
+Bridges synstate observables with [Preact Signals](https://preactjs.com/guide/v10/signals/) for fine-grained DOM updates without component re-renders. See the [interactive demo](/mono/synstate/preact-signals/demo/) to compare with the hooks approach.
 
 #### Bridge Functions
 

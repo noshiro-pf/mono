@@ -333,11 +333,11 @@ fetchError.subscribe((err) => {
 
 宣言的なモデルを理解したところで、次は実際に使ってみましょう：
 
-- [createState 詳説](/synstate/ja/guides/core-state-management/) — `createState`、`createReducer`、`createBooleanState` についてさらに詳しく。
-- [React 連携](/synstate/ja/guides/react-integration/) — SynState の Observable を React コンポーネントに接続する。
+- [createState 詳説](/mono/synstate/ja/guides/core-state-management/) — `createState`、`createReducer`、`createBooleanState` についてさらに詳しく。
+- [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState の Observable を React コンポーネントに接続する。
 
-このような依存グラフで重要な課題の1つは**一貫性の確保**です。ソースが変化したとき、すべての派生値が原子的に更新され、一部が古い値のままの中間状態を発行してはなりません。これは[**グリッチ問題**](/synstate/ja/internals/how-synstate-solved-the-glitch/)と呼ばれ、SynState が解決する重要な課題の1つです。さらに詳しく知りたい場合：
+このような依存グラフで重要な課題の1つは**一貫性の確保**です。ソースが変化したとき、すべての派生値が原子的に更新され、一部が古い値のままの中間状態を発行してはなりません。これは[**グリッチ問題**](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)と呼ばれ、SynState が解決する重要な課題の1つです。さらに詳しく知りたい場合：
 
-- [SynState はグリッチをどう解決したか](/synstate/ja/internals/how-synstate-solved-the-glitch/) — グリッチフリー伝播の詳細。
-- [ライブラリ比較](/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
-- [パフォーマンスベンチマーク](/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。
+- [SynState はグリッチをどう解決したか](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/) — グリッチフリー伝播の詳細。
+- [ライブラリ比較](/mono/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
+- [パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。

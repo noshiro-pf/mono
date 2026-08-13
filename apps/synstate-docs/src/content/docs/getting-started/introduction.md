@@ -6,21 +6,21 @@ sidebar:
 ---
 
 <p align="center">
-  <img src="/synstate/synstate-logo.png" alt="SynState Logo" width="400" />
+  <img src="/mono/synstate/synstate-logo.png" alt="SynState Logo" width="400" />
 </p>
 
 **SynState** is a lightweight, high-performance state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in `debounce`, `switchMap`, and more. Fully compatible with React Compiler.
 
-"SynState" is named after "Synchronized + State." Derived values are always kept in sync through glitch-free propagation — no inconsistent intermediate states. (Details: [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/))
+"SynState" is named after "Synchronized + State." Derived values are always kept in sync through glitch-free propagation — no inconsistent intermediate states. (Details: [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/))
 
 ## Features
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React `useState`/`useReducer`, but for global state.
-- ⚡ **High Performance**: Glitch-free $O(n)$ propagation — up to 30× faster than Jotai and 16× faster than Redux. See [benchmarks](/synstate/guides/library-comparison/benchmark/).
+- ⚡ **High Performance**: Glitch-free $O(n)$ propagation — up to 30× faster than Jotai and 16× faster than Redux. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
 - 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.4 kB min+gzip<!-- /bundle-size:synstate --> with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge)).
 - 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
 - ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.
-- 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders.
+- 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/mono/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders.
 
 ## Quick Example
 
@@ -104,7 +104,7 @@ setCount(2);
 setCount(3);
 ```
 
-For a deeper understanding of how this declarative model works — and why it is better than managing state imperatively — see [Declarative State Management](/synstate/guides/declarative-state-management/).
+For a deeper understanding of how this declarative model works — and why it is better than managing state imperatively — see [Declarative State Management](/mono/synstate/guides/declarative-state-management/).
 
 ## Using with React
 
@@ -140,11 +140,11 @@ const UserProfile = (): React.JSX.Element => {
 };
 ```
 
-For more details, see [React Integration](/synstate/guides/react-integration/).
+For more details, see [React Integration](/mono/synstate/guides/react-integration/).
 
 ## Next Steps
 
-- [Installation](/synstate/getting-started/installation/) — Install SynState and optional companion packages.
-- [Why SynState?](/synstate/guides/why-synstate/) — Design philosophy, glitch-free guarantees, and use cases.
-- [Declarative State Management](/synstate/guides/declarative-state-management/) — Understand the reactive programming model with concrete examples.
-- [React Integration](/synstate/guides/react-integration/) — Use SynState with React.
+- [Installation](/mono/synstate/getting-started/installation/) — Install SynState and optional companion packages.
+- [Why SynState?](/mono/synstate/guides/why-synstate/) — Design philosophy, glitch-free guarantees, and use cases.
+- [Declarative State Management](/mono/synstate/guides/declarative-state-management/) — Understand the reactive programming model with concrete examples.
+- [React Integration](/mono/synstate/guides/react-integration/) — Use SynState with React.
