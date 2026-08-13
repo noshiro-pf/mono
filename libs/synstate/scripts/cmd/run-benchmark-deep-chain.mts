@@ -3,7 +3,7 @@ import { type SafeUint } from 'ts-type-forge';
  * Deep Chain Throughput Benchmark
  *
  * Reuses the exact same adapter code as the interactive throughput demo
- * (packages/docs/src/components/throughput-demo/adapters/) to ensure
+ * (apps/synstate-docs/src/components/throughput-demo/adapters/) to ensure
  * the benchmark measures the same reactive chain topology.
  */
 import * as fs from 'node:fs/promises';
@@ -33,9 +33,11 @@ const PARAMS: readonly (readonly [k: number, depth: number])[] = [
 
 // --- Import adapters from the docs throughput demo ---
 
+// A path rather than an import: the documentation site is an application, and
+// a library must not depend on one. `workspaceRootPath` is `libs/synstate`.
 const docsAdaptersDir = path.resolve(
   workspaceRootPath,
-  '../docs/src/components/throughput-demo/adapters/index.mjs',
+  '../../apps/synstate-docs/src/components/throughput-demo/adapters/index.mjs',
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
