@@ -1,5 +1,14 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 3.0.0
+
+### Major Changes
+
+- 69274da: BREAKING CHANGE: 設定ファイルの読み込み元を `github/` から `repo-settings/` に変更した。
+
+    `github/` は `.github/` の別名に見えるため、workflow もそこにあるという誤解を招いていた。
+    移行は `git mv github repo-settings` のみ。ファイルの中身は変わらない。
+
 ## 2.1.2
 
 ### Patch Changes
