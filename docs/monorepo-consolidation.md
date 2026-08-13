@@ -242,9 +242,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - [x] knip を導入し、過剰宣言を検出できるようにする
     - 検出された 59 件の未使用宣言を削除した（root の `rollup` / `typedoc` 系、各パッケージの `markdownlint` / `prettier-plugin-*` など）
     - `eslint-config-typed` の公開 `dependencies` から `@types/eslint` と `typescript-eslint` も外した
-- [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する — **残り 1 パッケージ**
-    - npm 上の各パッケージの `repository` を調べたところ、**17 件中 16 件は既に mono から publish 済み**だった（`repository.url` が `noshiro-pf/mono`、`repository.directory` が `libs/<pkg>`）。統合後のリリースが一巡している
-    - 残るのは `octokit-safe-types` の 1 件だけで、最新版 1.2.25 の metadata が archive 済みの `noshiro-pf/octokit-safe-types` を指したままだった。patch の changeset を置いたので、マージすれば mono から publish される
+- [x] 依存関係を最新化した状態で全パッケージを 1 回 publish する
+    - npm 上の各パッケージの `repository` を調べたところ、**17 件中 16 件は既に mono から publish 済み**だった（`repository.url` が `noshiro-pf/mono`、`repository.directory` が `libs/<pkg>`）。統合後のリリースが一巡していた
+    - 残っていた `octokit-safe-types` は 1.2.26 で mono から publish 済み。npm 上の `repository.url` が `noshiro-pf/mono` になったことを確認した。これで 17 件すべてが揃った
     - 依存の最新化そのものは `pnpm-update` の PR が担う
 - [x] 旧リポジトリの URL を参照している箇所が無いかチェック。 synstate の logo のパスが死んでいるのを発見済み。
 - [x] `github/` を `repo-settings/` にリネーム（ github-settings-as-code の破壊的修正）
@@ -257,9 +257,11 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### step 2 — 新規対応
 
-- [ ] `strict-typescript-lib` を導入する — **他リポジトリ待ちで着手できない**
+- [ ] `strict-typescript-lib` を導入する — **前提が揃ったので着手できる**
     - リポジトリ統合の可否は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) で検討した（結論: 統合しない）
-    - 導入に着手して、前提が満たされていないことが分かった。strict lib の最新ビルドは v6.0（peer range は `typescript >=6.0.0 <6.1.0`）で、mono の型チェックは 18 プロジェクト中 17 が TypeScript 7（`typescript-native`）。`strict-typescript-lib` が v7.0 を出すまで mono 側で進められる作業は無い。詳細は同じドキュメントの末尾
+    - 一度着手して前提不足で止めていた。当時の最新ビルドは v6.0（peer range は `typescript >=6.0.0 <6.1.0`）で、mono の型チェックを担う `typescript-native` は TypeScript 7 だったため
+    - **2026-08-13 に `dist-v7.0-0.0.0` が出た。** peer range は `typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）と一致する。107 個の `@typescript/lib-*` を dependencies に持つメタパッケージを devDependency として入れる形
+    - 導入すると `Array.prototype.at` の戻り値などが厳しくなるので、**型エラーが一度に出る種類の変更**になる。影響範囲を測ってから進める
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる

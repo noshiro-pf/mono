@@ -146,7 +146,7 @@ step 2 の「`strict-typescript-lib` を導入」を進めるときに、`@types
 
 現時点で満たしているものはない。
 
-## 導入の前提が今は満たされていない（2026-08-13 調査）
+## 導入の前提（2026-08-13 調査、同日解消）
 
 step 2 の「`strict-typescript-lib` を導入する」に着手して、着手できないことが分かった。
 **mono の型チェックを担っているコンパイラ向けのビルドが存在しない。**
@@ -181,14 +181,14 @@ TypeScript の `libReplacement` に乗る。
 | mono の型チェック                    | 18 プロジェクト中 17 が `typescript-native`（= `npm:typescript@7.0.2`） |
 | 残る 1 つ                            | `apps/synstate-docs` のみ `tsc`（`typescript` 6.0.3）                   |
 
-つまり、リポジトリのゲートを通しているコンパイラは TypeScript 7 で、strict lib は
-TypeScript 6.0 系にしか対応していない。導入するには次のどちらかが要る。
+つまり調査時点では、リポジトリのゲートを通しているコンパイラは TypeScript 7 なのに、
+strict lib は TypeScript 6.0 系にしか対応していなかった。
 
-- `strict-typescript-lib` が v7.0 のビルドを出す
-- mono が型チェックを TypeScript 6 に戻す（TypeScript 7 への移行を巻き戻すことになる）
-
-前者を待つのが妥当。**この項目は他リポジトリの対応待ちであり、mono 側で進められる
-作業は無い。**
+**同日中に `dist-v7.0-0.0.0` が出て解消した。** peer range は
+`typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）
+と一致する。メタパッケージ `strict-ts-lib-v7.0` は 107 個の `@typescript/lib-*` を
+dependencies に持ち、README の指示は「これを devDependency に入れれば TypeScript が
+自動的に拾う」というもの。
 
 ### 出せるようになったときのために
 
