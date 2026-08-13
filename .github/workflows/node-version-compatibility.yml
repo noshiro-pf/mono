@@ -6,8 +6,9 @@ on:
       # `archive/**` holds frozen snapshots of retired work. They are never
       # merged back, so every check on them is wasted CI.
       - 'archive/**'
-    paths-ignore:
-      - '.gitignore'
+    # No `paths-ignore` here — see the note in style-check.yml. `.gitignore`
+    # was the only entry, and the `Check diff` step below already ignores it:
+    # it is in `check-should-run-type-checks`' default list.
 
   workflow_dispatch:
 

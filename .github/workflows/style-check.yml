@@ -6,9 +6,11 @@ on:
       # `archive/**` holds frozen snapshots of retired work. They are never
       # merged back, so every check on them is wasted CI.
       - 'archive/**'
-    paths-ignore:
-      - '**.png'
-      - '**.jpg'
+    # No `paths-ignore` here. Every job in this matrix is a required status
+    # check, and a workflow that a path filter skips never reports one — so a
+    # pull request changing only the filtered files waits on checks that will
+    # never arrive. The same reason type-check.yml gates its steps rather than
+    # its trigger.
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
