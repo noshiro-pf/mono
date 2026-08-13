@@ -263,6 +263,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **2026-08-13 に `dist-v7.0-0.0.0` が出た。** peer range は `typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）と一致する。107 個の `@typescript/lib-*` を dependencies に持つメタパッケージを devDependency として入れる形
     - 導入手順は実測して [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の末尾に書いた。`libReplacement` が TypeScript 7 では既定 `false` であること、メタパッケージ 1 つでは pnpm が install を拒むこと、素朴に数えたエラー数（21,629 件）はビルド失敗の連鎖で実態は各パッケージ十数件であること
     - 土台（107 個の依存宣言と knip の ignore）は入れた。`libReplacement` はまだどこでも有効にしていないので挙動は変わらない
+    - **導入コストは型エラーの件数では測れない。** strict lib の `@deprecated` が `@typescript-eslint/no-deprecated` に拾われ、`ts-fortress` では型エラー 4 件を直したあとに lint が 21 件残った。さらに `lint:fix` が strict lib 前提のコードに書き換えてしまい、`src` を配るパッケージでは消費者のエディタに赤が出る。方針決定が要る
     - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する。次は `ts-data-forge`（11 件）
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった

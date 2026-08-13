@@ -250,3 +250,55 @@ tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケ�
 `ts-data-forge` の 11 件は `Object.keys` の戻り、`setTimeout` の引数、`Map` を
 継承したクラスの静的側など、いずれも strict lib の狙いどおりの指摘で、キャストで
 潰さずに直す必要がある。
+
+### 型チェック以外への影響（2026-08-14 実測）
+
+`ts-fortress` で opt-in を試して分かった。**導入コストは型エラーの件数では測れない。**
+
+**1. strict lib の `@deprecated` が lint エラーになる。** strict lib は `String`
+コンストラクタなどに `@deprecated` を付けており、`@typescript-eslint/no-deprecated`
+がこれを拾う。
+
+```text
+/** @deprecated Don't use String constructor */
+(value?: unknown): string;
+```
+
+`ts-fortress` では型エラー 4 件を直したあとに **lint が 21 件**残った（opt-in 前は
+0 件）。パッケージごとの見積りには lint の件数も要る。
+
+**2. `lint:fix` が strict lib 前提のコードに書き換える。** `key-value-record.mts`
+では、strict lib 下で不要になった型アサーションと `eslint-disable` を `lint:fix` が
+自動削除した。strict lib 下では正しいが、**標準 lib に戻すと型エラーになる**。
+
+```text
+標準 lib: src/record/key-value-record.mts(99,5): error TS2322
+```
+
+`src` を配るパッケージでは、これが**消費者のエディタに赤として現れる**。`expectType`
+のときは自分で書き換えを止められたが、`lint:fix` は自動なので止められない。
+
+**したがって `src` を配るパッケージの opt-in には、次のどれかの方針決定が要る。**
+
+- `files` から `src` を外す（Go to Definition が dist に飛ぶようになる）
+- `no-deprecated` を strict lib 由来のものに限って緩める
+- 消費者のエディタに赤が出ることを受け入れる
+
+`ts-type-forge` のように `files` が `["dist", …]` のパッケージにはこの制約が無い。
+
+### 繰り返し出るパターン: `Object.fromEntries` が `Partial` を返す
+
+strict lib の `Object.fromEntries` は `Partial<...>` を返す。entries が key の union
+を網羅している保証が無いためで、指摘としては正しい。ただし「key が元の record から
+来ている」ケースでは常に網羅しているので、実害のない不一致になる。
+
+`ts-fortress` の 4 件はすべてこれで、`ts-repo-utils` にも 1 件ある。直し方は
+`fromEntries` をやめて明示的に組み立てること。標準 lib でも通る。
+
+```ts
+const mut_shape: MutableRecord<string, UnknownShape[string]> = {};
+
+for (const [k, v] of Object.entries(shape)) {
+    mut_shape[k] = keysToBeOptional.has(k) ? optional(v) : v;
+}
+```
