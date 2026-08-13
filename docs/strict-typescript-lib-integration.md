@@ -250,3 +250,26 @@ tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケ�
 `ts-data-forge` の 11 件は `Object.keys` の戻り、`setTimeout` の引数、`Map` を
 継承したクラスの静的側など、いずれも strict lib の狙いどおりの指摘で、キャストで
 潰さずに直す必要がある。
+
+### パッケージごとの件数（2026-08-14 実測）
+
+ビルドが通っている状態で 1 パッケージずつ有効にして数えた。連鎖を含まない実数。
+
+| パッケージ           | 件数 | 状態                               |
+| :------------------- | ---: | :--------------------------------- |
+| `octokit-safe-types` |    0 | **opt-in 済み**                    |
+| `ts-repo-utils`      |    2 | 公開型の変更を伴う。後述           |
+| `ts-fortress`        |    4 | 未着手                             |
+| `ts-type-forge`      |    6 | 未着手                             |
+| `ts-data-forge`      |   11 | 9 件対応済み、2 件が外部要因で保留 |
+
+`ts-repo-utils` の 2 件は、strict lib の `Object.fromEntries` が `Partial<...>` を
+返すこと（entries が key の union を網羅しているとは限らないため。正しい厳しさ）と、
+`String.prototype.replaceAll` のコールバックのキャプチャ群が `unknown` になること。
+前者は `Package['dependencies']` の型を実態に合わせる話になり、**公開型が変わる**ので
+changeset が要る。
+
+### opt-in のたびに確認すること
+
+`.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
+`octokit-safe-types` では 15 ファイルすべて同一だった。
