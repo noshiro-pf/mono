@@ -202,14 +202,22 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   `import-x/no-extraneous-dependencies` fails on anything not declared there.
   Do not add the repository root back to `packageDirs`, and do not turn that
   rule off for `scripts/**` or `configs/**`.
-    - The one file this cannot check is `eslint.config.mts` itself, which
-      `eslint-config-typed` ignores by default. Declare the packages it imports
-      (`eslint-config-typed`, `eslint-plugin-ts-*`) by hand.
-- **`pnpm run lint:published-deps` checks what the packages publish.** A module
-  under `src/` may only import what a consumer is given — `dependencies` and
-  `peerDependencies`, never a devDependency. `files` ships `src` alongside
-  `dist` so that "Go to Definition" lands in the original source, which makes
-  this true of type-only imports as well.
+    - The one file this pass cannot check is `eslint.config.mts` itself, which
+      `eslint-config-typed` ignores by default. `lint:published-deps` covers it
+      instead — see below.
+- **`pnpm run lint:published-deps` runs the two dependency checks the
+  repository-wide pass cannot.** Both live in
+  `tools/configs/eslint.published-deps.mts`.
+    - **What a package publishes may import.** A module under `src/` may only
+      import what a consumer is given — `dependencies` and `peerDependencies`,
+      never a devDependency. `files` ships `src` alongside `dist` so that "Go
+      to Definition" lands in the original source, which makes this true of
+      type-only imports as well.
+    - **What `eslint.config.mts` imports**, with devDependencies allowed. The
+      root's own config is covered only for packages outside the workspace: a
+      workspace sibling resolves to a path inside the root's own tree, and the
+      rule treats anything there as internal. From a package it resolves
+      outside that package, so there the check is complete.
     - Its blind spot is `@types/*`: nothing imports `@types/micromatch` by
       name, so the rule cannot know that `micromatch` needs it. When a runtime
       dependency carries no types of its own, put its `@types` package in

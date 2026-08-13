@@ -283,7 +283,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - `vitest.config.mts` も対応済み。自前で書いていた 10 パッケージを `tools/configs/vite-config.mts` に寄せ、757 行 → 344 行 + 共有 146 行になった。各 config を import して解決後のオブジェクトを比較し、6 個は完全一致、残り 9 個の差分が意図した 3 種類だけであることを確認した（`includeSource` の `[]` 明示、`fileParallelism` の `true` 明示、synstate 5 個の typecheck tsconfig パス修正）。`ws:test` のファイル数・テスト数も前後で一致
     - パッケージごとの `include` / `includeSource` の食い違い（15 パッケージで 6 通り / 4 通り）はそのまま残した。揃えるとテスト対象が変わるので、置き場所の統一とは別の判断になる
 - **`libs/*/configs/tsconfig.build.json` にコメントを書いてはいけない。** 各パッケージの `configs/rollup.config.mts` が `import tsconfig from './tsconfig.build.json' with { type: 'json' }` で読んでおり、JSON import は strict JSON なので esbuild が `JSON does not support comments` で落ちる。共有側の `tools/configs/tsconfig/*.json` は extends されるだけなのでコメントを書ける
-- `eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない
+- ~~`eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない~~ → 対応済み。`lint:published-deps` の pass（`tools/configs/eslint.published-deps.mts`）に 19 ファイル分の config object を足して、`import-x/no-extraneous-dependencies` を devDependencies 許可で掛けるようにした
+    - 新しい job を作らず既存の pass に相乗りさせたのは、job 名が増えると ruleset の required status checks を更新する必要があり、更新前に旧名が消えると全 PR がマージ不能になるため（統合時に一度踏んでいる）
+    - 効くことは実測で確認した。`libs/synstate/package.json` から `eslint-plugin-ts-fortress` を消すと `libs/synstate/eslint.config.mts` の import が落ちる
+    - **root の `eslint.config.mts` だけは workspace パッケージの import を検出できない。** シンボリックリンクを解決した先が root 自身の配下（`libs/*`）になるため、rule が内部モジュールと見なして飛ばす。パッケージ配下からは自分の外に解決されるので検出できる。root からの外部パッケージの import は検出できる（`import 'dedent'` を足して確認）
 - knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）

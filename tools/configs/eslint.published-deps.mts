@@ -1,6 +1,6 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
 import { type FlatConfig } from 'eslint-config-typed';
-import { hasKey, isRecord } from 'ts-data-forge';
+import { Arr, hasKey, isRecord } from 'ts-data-forge';
 /* eslint-disable-next-line import-x/no-rename-default */
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import * as fs from 'node:fs';
@@ -8,15 +8,24 @@ import * as path from 'node:path';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 /**
- * A second, narrow ESLint pass over what the packages actually publish.
+ * A second, narrow ESLint pass, for the two dependency questions the
+ * repository-wide config cannot answer.
  *
- * The repository-wide config allows a file to import anything the package
- * declares, in any group. That is right for tests and scripts, but it lets a
- * module under `src/` import a devDependency — which resolves during
- * development and then fails for consumers, who never install it. Two packages
- * shipped that way before this check existed: `github-settings-as-code`
- * imported `ts-repo-utils` from fourteen modules, and `eslint-config-typed`
- * imported a type from `@eslint/core`.
+ * **What a package publishes may import.** The repository-wide config allows a
+ * file to import anything the package declares, in any group. That is right
+ * for tests and scripts, but it lets a module under `src/` import a
+ * devDependency — which resolves during development and then fails for
+ * consumers, who never install it. Two packages shipped that way before this
+ * check existed: `github-settings-as-code` imported `ts-repo-utils` from
+ * fourteen modules, and `eslint-config-typed` imported a type from
+ * `@eslint/core`.
+ *
+ * **What `eslint.config.mts` imports.** `eslint-config-typed` ignores those
+ * files by default, so the repository-wide pass never sees them and the
+ * packages they import — `eslint-config-typed` itself, the `eslint-plugin-ts-*`
+ * trio — were declared by hand and checked by nobody. Here they are covered
+ * like any other file, with devDependencies allowed, because that is what a
+ * lint config legitimately reaches for.
  *
  * `packageDir` has to name one package, otherwise a dependency declared by any
  * package would satisfy every other, so the config is generated per package.
@@ -43,7 +52,7 @@ const isPublishedPackage = (dir: string): boolean => {
   );
 };
 
-const publishedPackageDirs = ['libs', 'apps'].flatMap((group) => {
+const workspacePackageDirs = ['libs', 'apps'].flatMap((group) => {
   const groupDir = path.resolve(projectRootPath, group);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -51,9 +60,15 @@ const publishedPackageDirs = ['libs', 'apps'].flatMap((group) => {
 
   return entries
     .filter((entry) => entry.isDirectory())
-    .map((entry) => path.resolve(groupDir, entry.name))
-    .filter(isPublishedPackage);
+    .map((entry) => path.resolve(groupDir, entry.name));
 });
+
+const publishedPackageDirs = workspacePackageDirs.filter(isPublishedPackage);
+
+// The root has an `eslint.config.mts` of its own, and it is a package
+// directory for this purpose even though nothing publishes it.
+const eslintConfigPackageDirs =
+  Arr.toUnshifted(projectRootPath)(workspacePackageDirs);
 
 export default [
   {
@@ -100,4 +115,30 @@ export default [
         },
       }) as const satisfies FlatConfig,
   ),
+
+  ...eslintConfigPackageDirs.map((dir) => {
+    const relativeDir = path.relative(projectRootPath, dir);
+
+    return {
+      files: [
+        relativeDir === ''
+          ? 'eslint.config.mts'
+          : `${relativeDir}/eslint.config.mts`,
+      ],
+      rules: {
+        'import-x/no-extraneous-dependencies': [
+          'error',
+          {
+            packageDir: [dir],
+            // A lint config is development tooling, so unlike `src/` above it
+            // may import a devDependency — it just has to declare it.
+            devDependencies: true,
+            optionalDependencies: false,
+            peerDependencies: true,
+            includeTypes: true,
+          },
+        ],
+      },
+    } as const satisfies FlatConfig;
+  }),
 ] as const satisfies readonly FlatConfig[];
