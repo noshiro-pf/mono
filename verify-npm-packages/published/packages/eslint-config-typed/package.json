@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-config-typed": "5.8.6"
+    "eslint-config-typed": "5.9.0"
   }
 }

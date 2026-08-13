@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-fortress": "1.0.1"
+    "eslint-plugin-ts-fortress": "1.0.2"
   }
 }
