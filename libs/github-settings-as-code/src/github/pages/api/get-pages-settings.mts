@@ -19,7 +19,6 @@ export const getPagesSettings = async (): Promise<
       { owner: OWNER, repo: REPO, headers: octokitHeaders },
     );
 
-    // eslint-disable-next-line unicorn/no-array-fill-with-reference-type
     return PagesSettings.fill({ build_type: response.data.build_type });
   } catch (error) {
     if (isRecord(error) && hasKey(error, 'status') && error.status === 404) {
