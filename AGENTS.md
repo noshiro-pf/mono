@@ -118,7 +118,9 @@ commands run those across every workspace member that defines them, and the
 - `pnpm run lint:published-deps` — imports that a published package does not
   declare. See "Dependencies".
 - `pnpm run check-all` — everything above plus the build, the codemods and
-  formatting, in the order CI needs. Slow; this is the pre-push check.
+  formatting, in the order CI needs. Slow; this is the pre-push check. It
+  covers every job in CI except `ws:test:browser`, which needs Playwright's
+  browsers installed.
 
 **Formatting:**
 
