@@ -11,7 +11,11 @@ export const debounce = <Args extends readonly unknown[]>(
   func: (...args: Args) => void,
   waitMilliseconds: number,
 ): ((...args: Args) => void) => {
-  let mut_timeoutId: ReturnType<typeof setTimeout> | undefined;
+  // Not `ReturnType<typeof setTimeout>`: with both the DOM and Node
+  // declarations in scope that resolves to `unknown`, which `clearTimeout`
+  // will not take. Naming what `clearTimeout` accepts says the same thing and
+  // stays true in either environment.
+  let mut_timeoutId: Parameters<typeof clearTimeout>[0];
 
   return (...args: Args): void => {
     clearTimeout(mut_timeoutId);
