@@ -81,26 +81,24 @@ jobs:
       # `run: exit 0` ends the step, not the job — every step below has to
       # carry the condition itself. See node-version-compatibility.yml, which
       # has always done it this way.
+      # `ws:test:cov` needs a browser too: the synstate adapters' hooks only
+      # run in one, so their coverage would otherwise be reported as zero.
       - name: Install Playwright Browsers
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && (matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov')
         run: pnpm exec playwright install chromium
 
       - name: Build all packages
         if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ws:build
 
+      # The browser tests used to be wrapped in a two-attempt retry, because
+      # one file at a time would fail to load. The cause was Vite optimizing a
+      # dependency mid-run and reloading the page; naming those dependencies in
+      # each package's `optimizeDepsInclude` removed it, so a failure here is
+      # now a failure rather than something to try again.
       - name: Run "${{ matrix.command }}"
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command != 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
-
-      # Source - https://stackoverflow.com/a/71583518
-      - name: Run 'ws:test:browser' with retry
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
-        with:
-          timeout_minutes: 10
-          max_attempts: 2
-          command: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
         if: steps.check_diff_type.outputs.should_run == 'true'

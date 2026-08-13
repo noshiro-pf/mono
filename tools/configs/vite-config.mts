@@ -56,8 +56,27 @@ export const defineViteConfig = ({
          * driver it needs, instead of inheriting it from this directory.
          */
         provider: BrowserProvider;
+        /**
+         * Every third-party module the browser tests reach, named up front.
+         *
+         * Vite pre-bundles dependencies by scanning the test files. Anything
+         * the scan misses is optimized on first import instead, and that
+         * reloads the page mid-run — which surfaces as "Failed to fetch
+         * dynamically imported module" for whichever file was loading at the
+         * time. The scan misses two kinds of module here: one imported by a
+         * workspace sibling rather than by a test file, and one imported by a
+         * test file the scan has not reached yet.
+         *
+         * A module the package does not itself depend on has to be named
+         * through the sibling that does — `'ts-data-forge > @sindresorhus/is'`
+         * — because a bare name is resolved from the package root, where pnpm
+         * has not put it.
+         *
+         * Measured on `synstate`, deleting its `node_modules/.vite` before
+         * each run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
+         * Warm, it passes either way — which is why this failed only in CI.
+         */
         optimizeDepsInclude?: readonly string[];
-        retry?: number;
         /**
          * Defaults to `false` — see the comment on the emitted option. Pass
          * `true` to opt out and run the browser tests in parallel.
@@ -85,13 +104,11 @@ export const defineViteConfig = ({
             name: 'Browser',
             alias: castMutable(alias),
             ...projectConfig(packageRoot, browser),
-            // Browser mode fetches each test file over the Vite dev server.
-            // Requesting them concurrently intermittently fails with "Failed
-            // to fetch dynamically imported module" for an arbitrary file, and
-            // vitest's `retry` cannot help: the file never loads, so there is
-            // no test to retry. Requesting them one at a time removes the race.
+            // Browser mode fetches each test file over the Vite dev server,
+            // and requesting them one at a time narrows the window in which a
+            // mid-run reload can catch a file in flight. `optimizeDepsInclude`
+            // is what removes the reload itself; see the comment there.
             fileParallelism: browser.fileParallelism ?? false,
-            ...(browser.retry === undefined ? {} : { retry: browser.retry }),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,

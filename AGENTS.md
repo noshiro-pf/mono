@@ -309,6 +309,15 @@ regenerate it with `pnpm run docs:deps`.
 - Maintain meaningful coverage; exclude simple re-export files.
 - Run tests locally with `pnpm run test` during development.
 - `vitest/globals` are enabled. Do not import `test`, `expect`, `assert`, or `describe` explicitly.
+- A package with a browser project runs the same files in both projects. A test
+  that needs a DOM goes in `test/browser/`, which the Node.js project's
+  `include` leaves out.
+- **A browser project must name every third-party module its tests reach in
+  `optimizeDepsInclude`.** Anything Vite has to optimize on first import
+  reloads the page mid-run, and whichever test file was loading then fails with
+  `Failed to fetch dynamically imported module`. Delete `node_modules/.vite`
+  before checking — warm, it passes either way. See the comment on the option
+  in `tools/configs/vite-config.mts`.
 
 ### Test-Driven Development (TDD)
 

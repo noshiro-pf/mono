@@ -47,7 +47,7 @@
     "lint:fix": "eslint . --fix",
     "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
-    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov": "pnpm run z:vitest run --coverage",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
     "testw": "pnpm run z:vitest:node watch",
@@ -64,7 +64,10 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@testing-library/dom": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -75,6 +78,7 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "rollup": "catalog:",
     "ts-repo-utils": "workspace:*"
   },

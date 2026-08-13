@@ -20,9 +20,10 @@ export default defineViteConfig({
   },
   browser: {
     provider: playwright(),
-    // This package kept `retry` rather than the serialized fetch that the
-    // other browser projects use. Left as it was.
-    retry: 2,
+    // This package fetches its test files in parallel rather than one at a
+    // time, as the other browser projects do: with `optimizeDepsInclude`
+    // complete there is no reload to race against, and its 8 files are slow
+    // enough that serializing them is worth avoiding.
     fileParallelism: true,
     includeSource: ['src/functions/**/*.mts', 'samples/**/*.mts'],
     include: ['src/functions/**/*.test.mts', 'samples/**/*.mts'],
@@ -38,6 +39,7 @@ export default defineViteConfig({
       'ts-morph',
       'ts-data-forge',
       'prettier/parser-typescript',
+      'prettier/plugins/typescript',
       'prettier/plugins/babel',
       'prettier/plugins/estree',
       'prettier/standalone',
