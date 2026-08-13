@@ -81,8 +81,12 @@ export const verifyNpmPackages = async (
 
   await fs.rm(path.resolve(spaceDir, 'pnpm-lock.yaml'), { force: true });
 
+  // `1>&2` because pnpm reports the fault — `ERR_PNPM_NO_MATCHING_VERSION`,
+  // and which package asked for what — on stdout, while Node puts only stderr
+  // into the error it hands back. Without the redirect a failed install
+  // reached CI as "Command failed: pnpm install" and nothing else.
   const installed = await $(
-    `pnpm --dir ${spaceDir} install --no-frozen-lockfile`,
+    `pnpm --dir ${spaceDir} install --no-frozen-lockfile 1>&2`,
     { silent: true },
   );
 
@@ -302,6 +306,7 @@ const generateSpace = async (
       '# mean "published" quietly meaning "published a week ago".',
       'minimumReleaseAge: 0',
       '',
+      ...(target === 'local' ? siblingOverrides(spaceDir, packages) : []),
     ].join('\n'),
   );
 
@@ -379,6 +384,36 @@ const generateSpace = async (
     ? Result.err(`Failed to format the generated files in ${spaceDir}.`)
     : Result.ok(undefined);
 };
+
+/**
+ * The packages in this repository depend on each other, and `pnpm pack`
+ * resolves `workspace:^` to the version in the checkout — so the tarball of
+ * `github-settings-as-code` asks for `octokit-safe-types@^1.2.26` while npm
+ * still has 1.2.25. Nearly every package here has a dependent, so without
+ * these overrides a `chore: version packages` branch fails to install at all
+ * — `ERR_PNPM_NO_MATCHING_VERSION`, until the release it exists to make goes
+ * out.
+ *
+ * Off a version branch the range did resolve, but to the sibling on npm,
+ * which is the older one. The `local` space is meant to be what the next
+ * release will be, and the packages in it are released together, so the
+ * sibling it installs should come from this checkout either way. That the
+ * declared range matches what is published is the `published` space's
+ * question, not this one's.
+ */
+const siblingOverrides = (
+  spaceDir: string,
+  packages: readonly PackageToCheck[],
+): readonly string[] => [
+  '# Depend on the sibling packed from this checkout, not the older one on',
+  '# npm — on a version branch the bumped version is not published at all.',
+  'overrides:',
+  ...packages.map(
+    (pkg) =>
+      `  '${pkg.name}': 'file:${path.relative(spaceDir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
+  ),
+  '',
+];
 
 /**
  * The published space pins an exact version, committed, rather than tracking

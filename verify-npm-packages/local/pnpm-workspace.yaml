@@ -15,5 +15,26 @@ strictDepBuilds: false
 # mean "published" quietly meaning "published a week ago".
 minimumReleaseAge: 0
 
+# Depend on the sibling packed from this checkout, not the older one on
+# npm — on a version branch the bumped version is not published at all.
+overrides:
+  'eslint-config-typed': 'file:../.tarballs/eslint-config-typed.tgz'
+  'eslint-plugin-ts-data-forge': 'file:../.tarballs/eslint-plugin-ts-data-forge.tgz'
+  'eslint-plugin-ts-fortress': 'file:../.tarballs/eslint-plugin-ts-fortress.tgz'
+  'eslint-plugin-ts-type-forge': 'file:../.tarballs/eslint-plugin-ts-type-forge.tgz'
+  'github-settings-as-code': 'file:../.tarballs/github-settings-as-code.tgz'
+  'octokit-safe-types': 'file:../.tarballs/octokit-safe-types.tgz'
+  'synstate': 'file:../.tarballs/synstate.tgz'
+  'synstate-preact-hooks': 'file:../.tarballs/synstate-preact-hooks.tgz'
+  'synstate-preact-signals': 'file:../.tarballs/synstate-preact-signals.tgz'
+  'synstate-react-hooks': 'file:../.tarballs/synstate-react-hooks.tgz'
+  'synstate-react-hooks-compat': 'file:../.tarballs/synstate-react-hooks-compat.tgz'
+  'ts-codemod-cli': 'file:../.tarballs/ts-codemod-cli.tgz'
+  'ts-codemod-lib': 'file:../.tarballs/ts-codemod-lib.tgz'
+  'ts-data-forge': 'file:../.tarballs/ts-data-forge.tgz'
+  'ts-fortress': 'file:../.tarballs/ts-fortress.tgz'
+  'ts-repo-utils': 'file:../.tarballs/ts-repo-utils.tgz'
+  'ts-type-forge': 'file:../.tarballs/ts-type-forge.tgz'
+
 allowBuilds:
   unrs-resolver: set this to true or false
