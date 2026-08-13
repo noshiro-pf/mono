@@ -5,8 +5,10 @@ name: pnpm update
 # CI passes. It runs daily and always rebuilds from main, so the pull request
 # follows main rather than accumulating a new one per run.
 #
-# This replaces Dependabot's npm updates; GitHub Actions updates stay with
-# Dependabot (see .github/dependabot.yml).
+# This replaces Dependabot entirely: the npm dependencies come from
+# `update-packages`, and the action pins in `.github/workflows/` come from
+# pnpm's own `update.githubActions` (see below). There is no
+# .github/dependabot.yml any more.
 #
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
@@ -17,11 +19,15 @@ name: pnpm update
 # What is held back is declared in pnpm-workspace.yaml under `update.ignoreDeps`
 # — currently `typescript`, which also covers the `typescript-native` alias
 # since pnpm matches the resolved package. `update.githubActions: true` there
-# is what lets this touch the workflow files.
+# is what lets this touch the workflow files; because it does, the token below
+# has to carry the `workflows` permission as well, or the push is rejected the
+# moment an action pin under .github/workflows/ moves.
 #
 # Authenticates with a GitHub App installation token (the same App used by
 # release.yml) so that the push triggers the push-based CI workflows
-# and the repository owner (a ruleset bypass actor) can auto-merge.
+# and the repository owner (a ruleset bypass actor) can auto-merge. The App's
+# installation must be granted Workflows: write; the `permission-*` inputs can
+# only narrow what the App already holds, never widen it.
 
 on:
   schedule:
@@ -88,6 +94,10 @@ jobs:
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
           permission-contents: write # ブランチの push
           permission-pull-requests: write # PR の作成と auto-merge の有効化
+          # `update.githubActions: true` により .github/workflows/ の action ピンも
+          # 更新されるため、これが無いと push が
+          # 「refusing to allow a GitHub App to create or update workflow ...」で拒否される。
+          permission-workflows: write # workflow ファイルを含むコミットの push
 
       - name: Open auto-merge PR if anything changed
         env:
