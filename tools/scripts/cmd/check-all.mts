@@ -56,10 +56,46 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Scripts and configs validated',
   });
 
+  // Both need `dist/`: knip executes each package's vitest config, which
+  // imports siblings through their `exports` map.
+  await logStep({
+    startMessage: 'Checking for unused dependencies',
+    action: () => runCmdStep('pnpm run knip', 'knip found unused declarations'),
+    successMessage: 'No unused declarations',
+  });
+
+  await logStep({
+    startMessage: 'Checking what the packages publish',
+    action: () =>
+      runCmdStep(
+        'pnpm run lint:published-deps',
+        'A published module imports something consumers do not get',
+      ),
+    successMessage: 'Published imports validated',
+  });
+
+  await logStep({
+    startMessage: 'Regenerating the package documentation',
+    action: () => runCmdStep('pnpm run ws:doc', 'Document generation failed'),
+    successMessage: 'Documentation regenerated',
+  });
+
   await logStep({
     startMessage: 'Running tests',
     action: () => runCmdStep('pnpm run ws:test:cov', 'Tests failed'),
     successMessage: 'Tests passed',
+  });
+
+  // Packs every package and installs it into `verify-npm-packages/local`, so
+  // it needs the build above. Slow, and the last thing CI would tell you.
+  await logStep({
+    startMessage: 'Installing and running the packed packages',
+    action: () =>
+      runCmdStep(
+        'pnpm run verify:npm-packages',
+        'A packed package does not install or run',
+      ),
+    successMessage: 'Packed packages install and run',
   });
 
   await logStep({
@@ -80,6 +116,8 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Code formatted',
   });
 
+  // `ws:test:browser` is deliberately not here: it needs Playwright's browsers
+  // installed, which `pnpm install` does not do. Run it directly, or let CI.
   console.info('✅ All checks completed successfully!\n');
 };
 
