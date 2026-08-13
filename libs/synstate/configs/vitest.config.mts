@@ -21,6 +21,7 @@ export default defineViteConfig({
     provider: playwright(),
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    optimizeDepsInclude: ['jotai', 'rxjs', 'ts-data-forge > @sindresorhus/is'],
     testTimeout: 30_000,
   },
 });
