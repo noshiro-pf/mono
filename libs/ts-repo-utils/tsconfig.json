@@ -5,6 +5,13 @@
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. TypeScript 7 defaults
+    // `libReplacement` to false, so the `@typescript/lib-*` packages declared
+    // at the root do nothing without it. Set per package while the repository
+    // migrates one at a time; it moves to the shared config once every package
+    // passes. See docs/strict-typescript-lib-integration.md.
+    "libReplacement": true,
+
     "paths": {
       // The strict standard library. Every built-in library lives inside the
       // one `strict-ts-lib-v7.0` package, so this wildcard is what points

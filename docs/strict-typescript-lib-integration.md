@@ -422,9 +422,13 @@ key が素の `string` になれば union ではなくなり、`Partial` も付�
 測り直すこと。
 
 なお `dependencies` を組み立てているこの `Object.fromEntries` は、#1642 で移行した
-`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（84 行目、複数フィールドの
-record を 1 つにまとめている箇所）。record を 1 つにまとめる用途なので `Obj.merge` が
-候補になるが、まだ手を付けていない。
+`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（複数フィールドの record を
+1 つにまとめている箇所）。`Obj.merge` は候補にならなかった。あちらは静的に長さの分かる
+タプルを受ける可変長引数で、返り値も `MergeAll<Records>` という「どの record が来たか」に
+依存した型である。ここでまとめるのは `dependencyFields` の長さぶんの**実行時に決まる配列**
+なので、その形に乗らない。加えて `Obj.merge` 自身も内部は `Object.fromEntries` + `as never`
+なので、`Partial` が消えるのは表明を図書館側に移したからにすぎない。下の節のとおり、
+明示的なループで組み立てた。
 
 **見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
@@ -638,7 +642,37 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 
 ### 残っていること
 
-`libReplacement: true` はまだ `octokit-safe-types` だけ。残りの opt-in は従来の
-順序（`ts-repo-utils` → `ts-fortress` → `ts-type-forge` → `ts-data-forge`）で進める。
-`paths` は全パッケージに入っているので、各パッケージで足すのは
-`"libReplacement": true` の 1 行だけになった。
+`libReplacement: true` は `octokit-safe-types` と、この PR で足す
+`ts-repo-utils` の 2 つ。残りの opt-in は従来の順序（`ts-fortress` →
+`ts-type-forge` → `ts-data-forge`）で進める。`paths` は全パッケージに入って
+いるので、各パッケージで足すのは `"libReplacement": true` の 1 行だけになった。
+
+## `ts-repo-utils` の opt-in（2026-08-14 実測）
+
+型 2 件・lint 7 件。**どちらも、標準 lib でも通る形に直せた**ので、この
+パッケージには「どちらの lib を前提にするか」の分岐が残っていない。
+
+| 指摘                                          | 直し方                                           |
+| :-------------------------------------------- | :----------------------------------------------- |
+| `Object.fromEntries` が `Partial<...>` を返す | `fromEntries` をやめて明示的に組み立てる         |
+| `replaceAll` のキャプチャ群が `unknown`       | 可変長引数で受けて `isString` で絞る             |
+| `String` が `@deprecated`（lint 7 件）        | `unknownToString`（`ts-data-forge`）に置き換える |
+
+3 つ目は元々このリポジトリの慣例で、`gen-docs.mts` などは既に
+`unknownToString` を使っていた。strict lib の `@deprecated` は、その慣例が
+徹底されていない箇所を挙げてくれたことになる。`String(x)` と違って
+`[object Object]` にならないので、置き換えは実質的な改善でもある。
+
+2 つ目は strict lib の言い分が正しい。省略可能なグループは不参加のとき
+`undefined` になるので、`string` と決めつけられない。ここでは 3 つとも必須なので
+絞り込みが実際に落ちることはないが、型の上では書く必要がある。
+
+### 確認したこと
+
+opt-in のたびに、次の 2 つを確認する。
+
+- **標準 lib でも型チェックが通る**こと（`libReplacement` を一時的に `false` に
+  して `tsc --noEmit`）。`src` を配るパッケージでは、これが崩れると消費者の
+  エディタが赤くなる
+- **`dist` が変わらない**こと。両方の lib でビルドして `diff -r` を取る。
+  `ts-repo-utils` では差分なしだった

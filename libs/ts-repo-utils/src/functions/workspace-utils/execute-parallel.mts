@@ -9,6 +9,7 @@ import {
   isRecord,
   pipe,
   Result,
+  unknownToString,
 } from 'ts-data-forge';
 import { type Package } from './types.mjs';
 
@@ -168,7 +169,9 @@ export const executeStages = async (
       );
     } catch (error) {
       // executeParallel will throw immediately on any failure (fail-fast)
-      const errorMessage = isError(error) ? error.message : String(error);
+      const errorMessage = isError(error)
+        ? error.message
+        : unknownToString(error);
 
       console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
 
