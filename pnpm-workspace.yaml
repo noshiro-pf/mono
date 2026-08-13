@@ -94,6 +94,12 @@ minimumReleaseAgeExclude:
   - 'strict-ts-lib-*'
 
 allowBuilds:
+  # Both arrive with `firebase`, which apps/poll-discord-app depends on.
+  # Neither install script is needed for what happens here — the app is
+  # type-checked and transpiled, never run — and this list is an allowlist on
+  # purpose, so they stay off. Whoever deploys the app decides separately.
+  '@firebase/util': false
   esbuild: true
+  protobufjs: false
   sharp: true # apps/synstate-docs (Astro)
   unrs-resolver: true

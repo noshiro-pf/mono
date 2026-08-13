@@ -305,6 +305,11 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
+    - **1 つ目として `poll-discord-app` を `apps/` に復元した**（2026-08-14）。3 候補のうちこれを選んだのは、アプリなので `apps/` 以外の置き場が無く、**公開するかどうかの判断が要らない**ため。`lambda-calculus-interpreter-core` は旧 `package.json` が `private: false` で、`libs/`（＝公開 npm パッケージ）に置くのか公開せず置くのかを決める必要がある
+        - 置換は機械的だった。`@noshiro/io-ts` → `ts-fortress`、`@noshiro/ts-utils` / `ts-utils-additional` → `ts-data-forge`。ただし **API のずれは残る**（`ISet.new` → `create`、`Obj.set` / `Obj.update` → スプレッド、`IMap.get` が `Optional` を返す、`t.simpleBrandedString(name, default)` が options 引数に変わった、など）
+        - **暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
+        - **後継が無いものはアプリ内に移植した** → `apps/poll-discord-app/src/utils`。`match`・`mapOptional`・`noop`・`DateUtils` の 5 関数・曜日とアルファベットの定数。それぞれ出自をコメントに書いてある
+        - `firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくるので、`allowBuilds` に**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない
 
 ### その他の宿題
 

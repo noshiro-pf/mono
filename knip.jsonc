@@ -124,5 +124,12 @@
       ],
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
     },
+
+    // Not an Astro site like the entry above assumes: a Node program with a
+    // single entry point.
+    "apps/poll-discord-app": {
+      "entry": ["src/index.mts", "scripts/**/*.mts"],
+      "project": ["**/*.mts"],
+    },
   },
 }
