@@ -2,6 +2,12 @@
 
 GitHub の repository 設定を JSON ファイルで管理するための CLI。
 
+設定ファイルは repository root の `repo-settings/` から読む。
+
+> **v3.0.0 での破壊的変更**: 読み込み元が `github/` から `repo-settings/` に
+> 変わった。`git mv github repo-settings` で移行する。旧名は `.github/` の
+> 別名に見えて、workflow もここにあると誤解させるものだった。
+
 ## Usage
 
 ```sh
@@ -13,14 +19,14 @@ repo-settings <command> [target] [options]
 | `apply`  | ローカルの設定ファイルを GitHub に反映する   |
 | `backup` | GitHub の現在値をローカルの `bk/` に保存する |
 
-| Target        | 対応するファイル                           | `apply` | `backup` |
-| ------------- | ------------------------------------------ | ------- | -------- |
-| `all`（既定） | すべて                                     | ✅      | ✅       |
-| `repository`  | `github/repository-settings/settings.json` | ✅      | ✅       |
-| `rulesets`    | `github/rulesets/*.json`                   | ✅      | ✅       |
-| `variables`   | repository variables                       | ✅      | —        |
-| `actions`     | `github/actions-settings/settings.json`    | ✅      | ✅       |
-| `pages`       | `github/pages/settings.json`               | ✅      | ✅       |
+| Target        | 対応するファイル                                  | `apply` | `backup` |
+| ------------- | ------------------------------------------------- | ------- | -------- |
+| `all`（既定） | すべて                                            | ✅      | ✅       |
+| `repository`  | `repo-settings/repository-settings/settings.json` | ✅      | ✅       |
+| `rulesets`    | `repo-settings/rulesets/*.json`                   | ✅      | ✅       |
+| `variables`   | repository variables                              | ✅      | —        |
+| `actions`     | `repo-settings/actions-settings/settings.json`    | ✅      | ✅       |
+| `pages`       | `repo-settings/pages/settings.json`               | ✅      | ✅       |
 
 ```sh
 repo-settings apply
@@ -51,12 +57,12 @@ CI では GitHub App の installation token を `GH_TOKEN` に渡す。 reposito
 
 ## 管理できる設定
 
-| ファイル                                   | GitHub 上の場所                         |
-| ------------------------------------------ | --------------------------------------- |
-| `github/repository-settings/settings.json` | Settings > General                      |
-| `github/rulesets/*.json`                   | Settings > Rules > Rulesets             |
-| `github/actions-settings/settings.json`    | Settings > Actions > General            |
-| `github/pages/settings.json`               | Settings > Pages > Build and deployment |
+| ファイル                                          | GitHub 上の場所                         |
+| ------------------------------------------------- | --------------------------------------- |
+| `repo-settings/repository-settings/settings.json` | Settings > General                      |
+| `repo-settings/rulesets/*.json`                   | Settings > Rules > Rulesets             |
+| `repo-settings/actions-settings/settings.json`    | Settings > Actions > General            |
+| `repo-settings/pages/settings.json`               | Settings > Pages > Build and deployment |
 
-`github/pages/settings.json` を置いていない repository では Pages の操作を行わない
+`repo-settings/pages/settings.json` を置いていない repository では Pages の操作を行わない
 （ Pages を使わない repository で誤って有効化しないため ）。

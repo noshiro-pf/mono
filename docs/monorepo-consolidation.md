@@ -244,7 +244,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - `eslint-config-typed` の公開 `dependencies` から `@types/eslint` と `typescript-eslint` も外した
 - [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
 - [x] 旧リポジトリの URL を参照している箇所が無いかチェック。 synstate の logo のパスが死んでいるのを発見済み。
-- [ ] `github/` を `repo-settings/` にリネーム（ github-settings-as-code の破壊的修正）
+- [x] `github/` を `repo-settings/` にリネーム（ github-settings-as-code の破壊的修正）
+    - `github/` は `.github/` の別名に見え、workflow もそこにあるという誤解を招いていた。読み込み元は `libs/github-settings-as-code/src/github/constants.mts` の 1 箇所だけがハードコードしていたので、そことディレクトリ本体・ヘルプ・README を書き換えた
+    - 消費側の移行は `git mv github repo-settings` のみ。major の changeset を置いた
 - [x] agents/ のルールをルートの AGENTS.md に集約し内容を整理、 AGENTS.md 自動生成スクリプトも削除。元々 many-repo で管理していた時代に AGENTS.md を自動で同期するための仕組みの名残だったが、 mono-repo 化により不要になった。
     - `agents/common-rules.md` + `agents/local-rules.md` を `AGENTS.md` へ畳み、生成スクリプト・`agents:gen` / `agents:sync` script・`sync-agent-config` workflow を削除した
     - 内容の整理で消えた食い違い: 冒頭が「submodule で共有しているので中央リポジトリを直せ」と指示していた（mono では偽）、コマンド一覧が単一パッケージ前提で `ws:*` を知らなかった、レイアウト説明が旧 `configs/` `scripts/` を指したまま root の `docs/` とパッケージの `docs/` を混同していた、`semantic-release` 前提のコミット規約が残っていた、`eslint-config-typed` へのリンクが旧リポジトリを指していた

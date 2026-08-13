@@ -1,7 +1,7 @@
 import * as t from 'ts-fortress';
 
 /**
- * `github/actions-settings/settings.json` の型。
+ * `repo-settings/actions-settings/settings.json` の型。
  *
  * Settings > Actions > General に対応する。 2 つの API をまとめて 1 ファイルで
  * 管理する:
