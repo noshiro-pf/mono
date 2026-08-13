@@ -254,8 +254,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### step 2 — 新規対応
 
-- [ ] `strict-typescript-lib` を導入する
+- [ ] `strict-typescript-lib` を導入する — **他リポジトリ待ちで着手できない**
     - リポジトリ統合の可否は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) で検討した（結論: 統合しない）
+    - 導入に着手して、前提が満たされていないことが分かった。strict lib の最新ビルドは v6.0（peer range は `typescript >=6.0.0 <6.1.0`）で、mono の型チェックは 18 プロジェクト中 17 が TypeScript 7（`typescript-native`）。`strict-typescript-lib` が v7.0 を出すまで mono 側で進められる作業は無い。詳細は同じドキュメントの末尾
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
