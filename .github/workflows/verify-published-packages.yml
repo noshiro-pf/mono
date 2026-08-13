@@ -30,9 +30,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Fetch main
-        run: git fetch origin main
+        with:
+          # The gate below resolves `github.event.before` and a merge base,
+          # neither of which exists in the default shallow clone. It also
+          # brings every branch in as `refs/remotes/origin/*`, which is why
+          # nothing below fetches `main` explicitly.
+          fetch-depth: 0
 
       - name: Check whether the pins changed
         id: pins
@@ -41,20 +44,30 @@ jobs:
         run: |
           if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
             echo 'changed=true' >>"${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [ "${GITHUB_REF_NAME}" = 'main' ]; then
+            base="${BEFORE}"
+            case "${base}" in
+              ''|0000000000000000000000000000000000000000) base='origin/main' ;;
+            esac
           else
-            if [ "${GITHUB_REF_NAME}" = 'main' ]; then
-              base="${BEFORE}"
-              case "${base}" in
-                ''|0000000000000000000000000000000000000000) base='origin/main' ;;
-              esac
-            else
-              base='origin/main'
-            fi
-            if git diff --name-only "${base}" -- verify-npm-packages/published | grep -q .; then
-              echo 'changed=true' >>"${GITHUB_OUTPUT}"
-            else
-              echo 'The published pins did not change; nothing to verify.'
-            fi
+            # The merge base, not main's tip: once `pnpm-update` moves the pins
+            # on main, a two-dot diff calls that a change made here and runs
+            # this against the branch's older pins.
+            base="$(git merge-base origin/main HEAD)"
+          fi
+
+          # Assigned rather than piped into `grep -q`, which reports grep's
+          # status: `git diff` failing on an unresolvable base came back as
+          # "nothing changed" and the check quietly never ran.
+          changed_files="$(git diff --name-only "${base}" -- verify-npm-packages/published)"
+
+          if [ -n "${changed_files}" ]; then
+            echo 'changed=true' >>"${GITHUB_OUTPUT}"
+          else
+            echo 'The published pins did not change; nothing to verify.'
           fi
 
       - name: Install pnpm

@@ -285,6 +285,11 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
+- **published パッケージの検査が main で一度も走っていなかった（修正済み）。** `verify-published-packages` は `github.event.before` と比較してピンの変更を判定するが、checkout が浅いためその commit がリポジトリに存在せず、`git diff` が `fatal: bad object` で落ちていた。判定は `git diff … | grep -q .` の形で、パイプラインの終了ステータスは `grep` のものになるため、**失敗が「変更なし」として素通り**していた（run 31685428368 のログに残っている）。`should-run-type-check` と同じ壊れ方
+    - `fetch-depth: 0` にして、判定を変数への代入に変えた。代入なら `set -e` で止まる。ブランチ側の比較も merge base にした
+- **リポジトリ設定のバックアップ照合を、関係のないブランチで走らせないようにした。** `backup-repository-settings` は GitHub の現在の設定とコミット済みバックアップを突き合わせるが、これはブランチではなくリポジトリの性質で、ブランチ側からは変えようがない。全ブランチで走らせていたため、web UI で設定を 1 つ変えると**開いている全 PR が赤くなる**（8/13 に ruleset から `migrate/**` を外したときに実際に起きた）。main では常に、それ以外のブランチでは `repo-settings/` に差分があるときだけ走るようにした
+    - 差分は main の先端ではなく merge base と比較する。先端と比較すると、branch が fork した後に main のバックアップが動いた場合に「このブランチが触った」と誤判定し、古いファイルで照合して落ちる。実測すると、`7586d80d9` で fork したブランチは 2 点間 diff では 10 ファイル、merge base 比較では 0 ファイルになる
+
 - ~~`libs/*/configs/` に残る `vitest.config.mts` を `tools/configs/` へ集約する~~ → 対応済み
     - `tsconfig/` は対応済み。自前のコピーを持っていたのは 6 パッケージで、共有側が先に進んでいたため中身が古くなっていた（`importHelpers` が消えている、`jsx` が増えている等）。すべて `tools/configs/tsconfig/` を extends する形にし、`tsc --showConfig` の差分で解決後の設定が変わらないことを確認した
     - node 専用パッケージの `lib` を `["ESNext"]` に絞る指定は `tools/configs/tsconfig/tsconfig.node-only.json` に切り出した（3 パッケージが extends）
