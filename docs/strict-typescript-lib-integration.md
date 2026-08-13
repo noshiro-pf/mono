@@ -145,3 +145,57 @@ step 2 の「`strict-typescript-lib` を導入」を進めるときに、`@types
 - ワークフローの共通化を試して、再利用可能ワークフローでは吸収しきれないと分かる（統合の動機が強まる）
 
 現時点で満たしているものはない。
+
+## 導入の前提が今は満たされていない（2026-08-13 調査）
+
+step 2 の「`strict-typescript-lib` を導入する」に着手して、着手できないことが分かった。
+**mono の型チェックを担っているコンパイラ向けのビルドが存在しない。**
+
+### 配布物の形
+
+まず仕組みを確認した。配布されるのは `@typescript/lib-*` を差し替える形で、
+TypeScript の `libReplacement` に乗る。
+
+```jsonc
+// strict-ts-lib-v6.0 の package.json（抜粋）
+{
+    "dependencies": {
+        "@typescript/lib-es5": "https://github.com/.../strict-ts-lib-v6.0-es5-0.0.0.tgz",
+        "@typescript/lib-esnext": "https://github.com/.../strict-ts-lib-v6.0-esnext-0.0.0.tgz",
+        // …計 100 以上
+    },
+    "peerDependencies": { "typescript": ">=6.0.0 <6.1.0" },
+}
+```
+
+個々の lib パッケージは `types: "./index.d.ts"` を持つだけの型定義パッケージで、
+`ts-type-forge@^7` に依存する（`parseInt` の `radix` が `UintRange<2, 37>` になる、
+といった記述のため）。
+
+### 何が足りないか
+
+|                                      |                                                                         |
+| :----------------------------------- | :---------------------------------------------------------------------- |
+| `strict-typescript-lib` の最新ビルド | `dist-v6.0-0.0.0`（2026-07-28）。**v7.0 は無い**                        |
+| その peer range                      | `typescript >=6.0.0 <6.1.0`                                             |
+| mono の型チェック                    | 18 プロジェクト中 17 が `typescript-native`（= `npm:typescript@7.0.2`） |
+| 残る 1 つ                            | `apps/synstate-docs` のみ `tsc`（`typescript` 6.0.3）                   |
+
+つまり、リポジトリのゲートを通しているコンパイラは TypeScript 7 で、strict lib は
+TypeScript 6.0 系にしか対応していない。導入するには次のどちらかが要る。
+
+- `strict-typescript-lib` が v7.0 のビルドを出す
+- mono が型チェックを TypeScript 6 に戻す（TypeScript 7 への移行を巻き戻すことになる）
+
+前者を待つのが妥当。**この項目は他リポジトリの対応待ちであり、mono 側で進められる
+作業は無い。**
+
+### 出せるようになったときのために
+
+- 参照の切り替え先（リリース URL ↔ ローカルチェックアウト）は、依存指定が tarball の
+  URL なので `pnpm-workspace.yaml` の `overrides` で `@typescript/lib-*` を
+  ローカルパスへ向けるのが素直。パッケージごとに書く必要は無い
+- `typescript` は `update.ignoreDeps` に入っているため、pnpm-update が勝手に
+  マイナーを上げて peer range から外れる心配は無い
+- 導入の影響範囲は事前に測っておくとよい。strict lib は `Array.prototype.at` などの
+  戻り値を厳しくするので、17 パッケージ分の型エラーが一度に出る種類の変更になる
