@@ -242,7 +242,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - [x] knip を導入し、過剰宣言を検出できるようにする
     - 検出された 59 件の未使用宣言を削除した（root の `rollup` / `typedoc` 系、各パッケージの `markdownlint` / `prettier-plugin-*` など）
     - `eslint-config-typed` の公開 `dependencies` から `@types/eslint` と `typescript-eslint` も外した
-- [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する
+- [ ] 依存関係を最新化した状態で全パッケージを 1 回 publish する — **残り 1 パッケージ**
+    - npm 上の各パッケージの `repository` を調べたところ、**17 件中 16 件は既に mono から publish 済み**だった（`repository.url` が `noshiro-pf/mono`、`repository.directory` が `libs/<pkg>`）。統合後のリリースが一巡している
+    - 残るのは `octokit-safe-types` の 1 件だけで、最新版 1.2.25 の metadata が archive 済みの `noshiro-pf/octokit-safe-types` を指したままだった。patch の changeset を置いたので、マージすれば mono から publish される
+    - 依存の最新化そのものは `pnpm-update` の PR が担う
 - [x] 旧リポジトリの URL を参照している箇所が無いかチェック。 synstate の logo のパスが死んでいるのを発見済み。
 - [x] `github/` を `repo-settings/` にリネーム（ github-settings-as-code の破壊的修正）
     - `github/` は `.github/` の別名に見え、workflow もそこにあるという誤解を招いていた。読み込み元は `libs/github-settings-as-code/src/github/constants.mts` の 1 箇所だけがハードコードしていたので、そことディレクトリ本体・ヘルプ・README を書き換えた
