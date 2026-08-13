@@ -255,9 +255,13 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       this one's.
 - **`pnpm run knip` covers the other direction: a declared dependency nothing
   imports.** It also sees imports ESLint does not, such as the ones in
-  `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to
-  `dependencies,unlisted,binaries`. Run `pnpm exec knip` without arguments for
-  the wider report (unused files and exports), which is not enforced.
+  `samples/`, and reports files nothing reaches and catalog entries no package
+  uses. Configuration is in `knip.jsonc`. The gate takes only the issue types
+  about what a package declares. Whether code is reachable — `files`,
+  `exports`, `types`, `duplicates` — stays out of it, because an export nothing
+  imports yet is what unfinished work looks like, and because knip cannot see a
+  dynamic import built from a computed path. The reasons are at the top of that
+  file; `pnpm exec knip` without arguments reports them.
     - knip executes each package's vitest config, which imports workspace
       siblings through their `exports` map, so it needs `pnpm run ws:build`
       first.

@@ -8,9 +8,32 @@
   //
   // Run with `pnpm run knip`.
 
-  // Legacy monorepo contents, outside the pnpm workspace. Nothing here is
-  // installed, built or linted.
-  "ignore": ["experimental/**"],
+  // The CI gate is `dependencies,unlisted,binaries,unresolved,catalog,
+  // catalogReferences` — the issue types that are about what a package
+  // declares. Everything about whether code is reachable stays out of it;
+  // `pnpm exec knip` with no arguments reports those.
+  //
+  // - `files` and `exports`: an export nothing imports yet is what unfinished
+  //   work looks like, and failing CI for it makes the check something to work
+  //   around. knip also cannot see every use: `run-benchmark-deep-chain.mts`
+  //   reaches the throughput adapters through `await import(<computed path>)`
+  //   assigned to `any`, so `createRxJSThroughputAdapter` reads as unused
+  //   while being the RxJS row of that benchmark.
+  // - `duplicates`: 21 hits, every one an alias this repository publishes on
+  //   purpose (`combine`/`combineLatest`, `foldl`/`reduce`, …).
+  // - `types`: the hits are types a `types.mts` exports as the vocabulary of
+  //   its directory — `AdapterCallbacks` is the parameter type of
+  //   `Adapter.setup`, so anyone writing an adapter wants to name it. Removing
+  //   the `export` to satisfy the report would make the code worse.
+
+  "ignore": [
+    // Legacy monorepo contents, outside the pnpm workspace. Nothing here is
+    // installed, built or linted.
+    "experimental/**",
+    // Fixtures the codemod reads through `fs.glob('test-code/**')` at run
+    // time, so nothing imports them by name.
+    "libs/ts-codemod-lib/test-code/**",
+  ],
 
   "ignoreDependencies": [
     // Used through `pnpm exec zenn preview` only; see the Zenn section of

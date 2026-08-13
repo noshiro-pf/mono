@@ -309,7 +309,13 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 新しい job を作らず既存の pass に相乗りさせたのは、job 名が増えると ruleset の required status checks を更新する必要があり、更新前に旧名が消えると全 PR がマージ不能になるため（統合時に一度踏んでいる）
     - 効くことは実測で確認した。`libs/synstate/package.json` から `eslint-plugin-ts-fortress` を消すと `libs/synstate/eslint.config.mts` の import が落ちる
     - **root の `eslint.config.mts` だけは workspace パッケージの import を検出できない。** シンボリックリンクを解決した先が root 自身の配下（`libs/*`）になるため、rule が内部モジュールと見なして飛ばす。パッケージ配下からは自分の外に解決されるので検出できる。root からの外部パッケージの import は検出できる（`import 'dedent'` を足して確認）
-- knip の unused files / unused exports は CI ゲートに入れていない（`samples/` や codemod のフィクスチャ、意図的な export エイリアスが大量に出るため）。`pnpm exec knip` で確認できる
+- ~~knip の unused files / unused exports は CI ゲートに入れていない~~ → 一部をゲートに入れた。「大量に出る」と書いていたが、実際に全件を見たら unused files 5 件・unused exports 1 件・unused exported types 8 件・duplicate exports 21 件・unused catalog entries 3 件で、選別できる量だった
+    - ゲートを `dependencies,unlisted,binaries` から `dependencies,unlisted,binaries,unresolved,catalog,catalogReferences` に広げた。**宣言に関する指摘だけ**をゲートにし、到達可能性に関する指摘（`files` / `exports` / `types` / `duplicates`）は入れていない。job 名は `knip` のままなので ruleset の required checks は変わらない
+    - 死んでいた catalog entry を 3 件消した。`@types/argparse`（argparse は自前で型を持つ）・`fast-glob`（`ts-repo-utils` が dependencies にリテラル指定で持つ）・`tslib`（`importHelpers` の削除と一緒に消えるはずだった）
+    - `libs/ts-codemod-lib/test-code/**` は `fs.glob('test-code/**')` で実行時に読むフィクスチャなので ignore に理由付きで追加した
+    - **`files` と `exports` をゲートに入れないのは、まだ使われていない export が「実装途中」の姿だから。** これで CI が落ちると、チェックが「回避するもの」になってしまう
+    - **加えて knip には見えない参照がある。** `libs/synstate/scripts/cmd/run-benchmark-deep-chain.mts` は throughput デモの adapter を `await import(<計算されたパス>)` で読み、結果を `any` として使う。そのため `createRxJSThroughputAdapter` は unused と報告されるが、実際はそのベンチマークの RxJS 行そのものだった。一度これを信じて削除しかけている
+        - ただしこのスクリプトは**現在動かない**。統合で docs が `apps/synstate-docs` へ移ったのにパスが旧レイアウトの `packages/docs` 前提のままで、`ERR_MODULE_NOT_FOUND` になる（別途修正が要る）
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
 - ~~`synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している~~ → 対応済み。実際に食い違っていたのは `exports` ではなく legacy な `module` / `types` フィールドで、ビルドが一度も出力していないファイルを指していた（publint で確認）。`engines` / `publishConfig` も他パッケージに合わせた
