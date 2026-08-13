@@ -261,7 +261,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - リポジトリ統合の可否は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) で検討した（結論: 統合しない）
     - 一度着手して前提不足で止めていた。当時の最新ビルドは v6.0（peer range は `typescript >=6.0.0 <6.1.0`）で、mono の型チェックを担う `typescript-native` は TypeScript 7 だったため
     - **2026-08-13 に `dist-v7.0-0.0.0` が出た。** peer range は `typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）と一致する。107 個の `@typescript/lib-*` を dependencies に持つメタパッケージを devDependency として入れる形
-    - 導入すると `Array.prototype.at` の戻り値などが厳しくなるので、**型エラーが一度に出る種類の変更**になる。影響範囲を測ってから進める
+    - 導入手順は実測して [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の末尾に書いた。`libReplacement` が TypeScript 7 では既定 `false` であること、メタパッケージ 1 つでは pnpm が install を拒むこと、素朴に数えたエラー数（21,629 件）はビルド失敗の連鎖で実態は各パッケージ十数件であること
+    - 土台（107 個の依存宣言と knip の ignore）は入れた。`libReplacement` はまだどこでも有効にしていないので挙動は変わらない
+    - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する。次は `ts-data-forge`（11 件）
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる

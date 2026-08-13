@@ -36,6 +36,11 @@
   ],
 
   "ignoreDependencies": [
+    // The strict standard library: TypeScript resolves `@typescript/lib-*` by
+    // itself when `libReplacement` is on, so nothing imports them by name.
+    // Declared at the root rather than through the `strict-ts-lib-v7.0` meta
+    // package, which pnpm refuses as a source of URL subdependencies.
+    "@typescript/lib-*",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
     // AGENTS.md.
     "zenn-cli",
