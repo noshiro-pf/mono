@@ -24,12 +24,54 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # NOTE: To keep this workflow in the branch protection rule status check,
+      # skip each step instead of skipping the whole workflow with `paths`.
+      #
+      # What this compares is the committed backup against GitHub's current
+      # settings, which is a property of the repository rather than of a
+      # branch: no branch can change them. Running it everywhere meant a
+      # setting changed in the web UI turned every open pull request red, for
+      # something its author neither caused nor could fix from that branch —
+      # which is what happened on 13 Aug when `migrate/**` was dropped from the
+      # deletion ruleset.
+      #
+      # So: always on main, and on a branch only when it touches
+      # `repo-settings/` — the case where the backup itself was edited by hand
+      # and is worth checking against reality.
+      - name: Decide whether to check
+        id: should_run
+        run: |
+          if [ "${GITHUB_REF_NAME}" = 'main' ] || [ "${GITHUB_EVENT_NAME}" != 'push' ]; then
+            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          # Against the merge base, not against main's tip: if main's backup
+          # moved after this branch forked, a two-dot diff would call that a
+          # change made here, run the check against this branch's older files
+          # and fail it — the very thing this gate exists to stop.
+          #
+          # `origin/main` is already here: `fetch-depth: 0` makes the checkout
+          # fetch `+refs/heads/*:refs/remotes/origin/*`, so every branch is
+          # present with its full history.
+          base="$(git merge-base origin/main HEAD)"
+
+          if [ -n "$(git diff --name-only "$base" -- repo-settings)" ]; then
+            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
+          else
+            echo 'should_run=false' >>"${GITHUB_OUTPUT}"
+            echo 'No change under repo-settings/; the repository-wide check runs on main.'
+          fi
 
       # GITHUB_TOKEN の permissions に administration は存在せず、リポジトリ設定や
       # ruleset を読めないため GitHub App の installation token を使う。
       # read では merge 関連設定と ruleset の bypass_actors が API から返らない。
       - name: Generate Token
         id: app-token
+        if: steps.should_run.outputs.should_run == 'true'
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.REPO_SETTINGS_BOT_CLIENT_ID }}
@@ -39,9 +81,11 @@ jobs:
           permission-pages: read
 
       - name: Install pnpm
+        if: steps.should_run.outputs.should_run == 'true'
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
       - name: Set up Node.js
+        if: steps.should_run.outputs.should_run == 'true'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         id: setup_node_id
         with:
@@ -49,13 +93,16 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: steps.should_run.outputs.should_run == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Back up
+        if: steps.should_run.outputs.should_run == 'true'
         run: pnpm run repo-settings:backup
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           OWNER: noshiro-pf
 
       - name: Check if there is no file diff
+        if: steps.should_run.outputs.should_run == 'true'
         run: pnpm run z:assert-repo-is-clean
