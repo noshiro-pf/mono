@@ -1,5 +1,11 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.9.1
+
+### Patch Changes
+
+- 7fa151b: Update dependencies
+
 ## 5.9.0
 
 ### Minor Changes
