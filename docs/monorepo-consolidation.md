@@ -341,6 +341,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         | `resize-observer-react-hooks`      |   55 | #1632 |
         | `react-utils-styled`               |  347 | #1633 |
         | `react-blueprintjs-utils`          | 4432 | #1634 |
+        - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
+        - **`firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくる。** `allowBuilds` は意図的な許可リストなので、**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない。デプロイ時の判断は別途になる
 
     - **`event-schedule-app` 本体（21136 行・314 ファイル）は作業中。** ブランチ `feat/restore-event-schedule-app` に置いてある。型エラーは 3567 件から 0 件になり、lint が 130 件残っている段階
         - 作業の中身は「移植」ではなく「書き換え」だった。`globals.d.ts` の 10 行が**約 90 個の識別子を import 無しで使えるようにしており**、21136 行がその前提で書かれていた。撤廃すると 3567 件になる
