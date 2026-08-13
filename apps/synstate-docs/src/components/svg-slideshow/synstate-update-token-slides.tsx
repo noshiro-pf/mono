@@ -5,7 +5,7 @@ export const SynStateUpdateTokenSlides = React.memo(() => (
   <SvgSlideshow
     alt={`SynState Update Token animation`}
     numSlides={14}
-    slidesPath={'/synstate/synstate-update-token-slides'}
+    slidesPath={'/mono/synstate/synstate-update-token-slides'}
   />
 ));
 

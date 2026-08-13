@@ -7,7 +7,7 @@ sidebar:
 
 ## Simple to Start, Powerful When You Need It
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/synstate/examples/react/#global-counter-state) can be implemented in just a few lines:
+SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter-state) can be implemented in just a few lines:
 
 ```tsx
 import { createState } from 'synstate-react-hooks';
@@ -20,7 +20,7 @@ const Counter = () => {
 };
 ```
 
-When your requirements grow more complex, SynState scales with you. You can describe everything from a simple [Dark Mode toggle](/synstate/examples/react/#boolean-state-dark-mode) to a [debounced search pipeline with auto-cancellation](/synstate/examples/advanced/#search-with-debounce) in a single, unified API.
+When your requirements grow more complex, SynState scales with you. You can describe everything from a simple [Dark Mode toggle](/mono/synstate/examples/react/#boolean-state-dark-mode) to a [debounced search pipeline with auto-cancellation](/mono/synstate/examples/advanced/#search-with-debounce) in a single, unified API.
 
 ## Why Observable-Based?
 
@@ -28,7 +28,7 @@ Real-world state management involves more than simple get/set. Filter inputs nee
 
 SynState is built on the Observable pattern — a model where state is represented as streams of values that can be composed, transformed, and combined. This gives you access to a rich set of operators (`debounce`, `throttle`, `switchMap`, `mergeMap`, etc.) without requiring a separate library like RxJS.
 
-To see how this works in practice — and how it compares to imperative code — see [Declarative State Management](/synstate/guides/declarative-state-management/).
+To see how this works in practice — and how it compares to imperative code — see [Declarative State Management](/mono/synstate/guides/declarative-state-management/).
 
 ## High Performance, Glitch-Free
 
@@ -43,7 +43,7 @@ SynState solves this with a **depth-ordered propagation** algorithm that guarant
 | **`InitializedObservable`** | Not available — values may be absent until first emission                        | Built-in — always holds a value, ideal for representing state                            |
 | **Design focus**            | General-purpose asynchronous event processing                                    | State management first, with full async operator support (`debounce`, `switchMap`, etc.) |
 
-For a detailed explanation, see [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/).
+For a detailed explanation, see [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/).
 
 ## Fully Compatible with React Compiler
 
@@ -67,8 +67,8 @@ MobX's `observer()` HOC tracks observable access during rendering, which conflic
 
 ## Next Steps
 
-- [Declarative State Management](/synstate/guides/declarative-state-management/) — understand the reactive programming model with concrete examples.
-- [React Integration](/synstate/guides/react-integration/) — use SynState with React.
-- [Library Comparison](/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
-- [Performance Benchmark](/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.
-- [Interactive Demos](/synstate/guides/library-comparison/interactive-demo/) — see the differences in action.
+- [Declarative State Management](/mono/synstate/guides/declarative-state-management/) — understand the reactive programming model with concrete examples.
+- [React Integration](/mono/synstate/guides/react-integration/) — use SynState with React.
+- [Library Comparison](/mono/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
+- [Performance Benchmark](/mono/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.
+- [Interactive Demos](/mono/synstate/guides/library-comparison/interactive-demo/) — see the differences in action.

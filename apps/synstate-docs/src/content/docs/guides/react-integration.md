@@ -88,7 +88,7 @@ const UserProfile = (): React.JSX.Element => {
 
 ## Additional Utilities: Third Element
 
-`synstate-react-hooks`'s `createState` also returns a 3-element tuple, just like the core package. The third element includes the same utilities (`updateState`, `resetState`, `getSnapshot`, `initialState`) described in [createState in Depth](/synstate/guides/core-state-management/), plus `state` — the underlying Observable:
+`synstate-react-hooks`'s `createState` also returns a 3-element tuple, just like the core package. The third element includes the same utilities (`updateState`, `resetState`, `getSnapshot`, `initialState`) described in [createState in Depth](/mono/synstate/guides/core-state-management/), plus `state` — the underlying Observable:
 
 ```tsx
 import type * as React from 'react';
@@ -136,7 +136,7 @@ console.log('current count:', getCountSnapshot());
 | Property       | Type                              | Description                                                                                                                                         |
 | :------------- | :-------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `state`        | `InitializedObservable<S>`        | The same Observable that the core `synstate` package's `createState` returns as its first element. Use it with `pipe`, `combine`, `subscribe`, etc. |
-| `updateState`  | `(updateFn: (prev: S) => S) => S` | Update the state using a function of the previous value (see [createState in Depth](/synstate/guides/core-state-management/))                       |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | Update the state using a function of the previous value (see [createState in Depth](/mono/synstate/guides/core-state-management/))                  |
 | `resetState`   | `() => S`                         | Reset the state to its initial value                                                                                                                |
 | `getSnapshot`  | `() => S`                         | Read the current value synchronously without subscribing                                                                                            |
 | `initialState` | `S`                               | The initial value passed to `createState`                                                                                                           |

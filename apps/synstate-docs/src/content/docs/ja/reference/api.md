@@ -117,7 +117,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 
 ### Preact Signals (`synstate-preact-signals`)
 
-synstateのObservableと[Preact Signals](https://preactjs.com/guide/v10/signals/)を橋渡しし、コンポーネントの再レンダリングなしにきめ細かいDOM更新を実現します。hooksアプローチとの比較は[インタラクティブデモ](/synstate/ja/preact-signals/demo/)を参照してください。
+synstateのObservableと[Preact Signals](https://preactjs.com/guide/v10/signals/)を橋渡しし、コンポーネントの再レンダリングなしにきめ細かいDOM更新を実現します。hooksアプローチとの比較は[インタラクティブデモ](/mono/synstate/ja/preact-signals/demo/)を参照してください。
 
 #### ブリッジ関数
 

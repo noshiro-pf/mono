@@ -317,7 +317,11 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **加えて knip には見えない参照がある。** `libs/synstate/scripts/cmd/run-benchmark-deep-chain.mts` は throughput デモの adapter を `await import(<計算されたパス>)` で読み、結果を `any` として使う。そのため `createRxJSThroughputAdapter` は unused と報告されるが、実際はそのベンチマークの RxJS 行そのものだった。一度これを信じて削除しかけている
         - ただしこのスクリプトは**現在動かない**。統合で docs が `apps/synstate-docs` へ移ったのにパスが旧レイアウトの `packages/docs` 前提のままで、`ERR_MODULE_NOT_FOUND` になる（別途修正が要る）
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
-- typedoc 出力を mono の GitHub Pages にサブパスで集約する（旧 6 リポジトリの Pages は配信継続・ビルド停止の状態）
+- ~~typedoc 出力を mono の GitHub Pages にサブパスで集約する~~ → 実装した。旧 6 リポジトリの Pages は配信継続・ビルド停止で、統合以降のドキュメントの変更がどこにも出ていない状態だった
+    - `noshiro-pf.github.io/mono/` 配下に、typedoc 5 パッケージ（ts-codemod-lib / ts-data-forge / ts-fortress / ts-repo-utils / ts-type-forge）と Astro の docs サイト（synstate）を並べる。生きている旧 Pages 6 件とちょうど同じ顔ぶれ
+    - `tools/scripts/cmd/build-pages-site.mts` が各パッケージのビルド済み出力を `_site/` に集めて索引を作る。typedoc を持つパッケージは `configs/typedoc.config.mjs` の有無で見つけるので、増えても直さなくてよい
+    - `apps/synstate-docs` の `base` が `/synstate/` → `/mono/synstate/` に変わる。**コンテンツ側に `/synstate/` 直書きのリンクが 210 箇所あり**、そのままだと全部 404 になるので併せて書き換えた（favicon の 3 箇所は `astro.config.mjs` 側）
+    - **Pages の有効化は別作業。** `repo-settings/pages/settings.json` に `build_type: workflow` を宣言してあるので、`pnpm run repo-settings:apply` の実行が要る。それまで deploy job は失敗する
 - ~~`synstate` 配下 5 パッケージの `exports` が `dist/index.js` + `.d.ts`（他は `.mjs` + `.d.mts`）、`engines` / `publishConfig` も欠落している~~ → 対応済み。実際に食い違っていたのは `exports` ではなく legacy な `module` / `types` フィールドで、ビルドが一度も出力していないファイルを指していた（publint で確認）。`engines` / `publishConfig` も他パッケージに合わせた
 - ~~Codecov 設定を per-package flag つきの 1 本に統合する~~ → `codecov.yml` に component を 15 個定義して対応。flag ではなく component を使ったのは、flag はアップロード時に付けるものでパッケージごとに 1 回ずつアップロードする必要があるのに対し、component は `codecov.yml` だけで path で切り分けられるため（[Codecov docs](https://docs.codecov.com/docs/components)）。README のバッジも `?component=<pkg>` を指すようにした
 - **`paths-ignore` で workflow ごと skip していた 2 本が、特定の PR をマージ不能にする状態だった（修正済み）。** `style-check` は `**.png` / `**.jpg`、`node-version-compatibility` は `.gitignore` を trigger 段階で除外していた。GitHub は path filter で skip された workflow の job を報告しないので、その job が required status check になっていると **PR は永久に checks を待ち続ける**。ruleset が要求する 20 件のうち `style-check (*)` が 5 件、`test-node-versions (*)` が 3 件で、画像だけを変更する PR（追跡している png / jpg は 355 件）と `.gitignore` だけを変更する PR がこれに該当した

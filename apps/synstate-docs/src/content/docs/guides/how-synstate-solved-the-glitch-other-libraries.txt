@@ -229,7 +229,7 @@ This is where glitches are avoided: when `sumAtom` is recomputed, its `read` fun
 
 ##### Why This Approach Is Significantly Slower
 
-In the [performance benchmark](/synstate/guides/benchmark/), the Derived Chain scenario (100,000 synchronous `store.set()` calls through a 3-atom chain) shows Jotai at ~390ms, while RxJS achieves ~3ms and SynState ~13ms. The overhead comes from several compounding factors:
+In the [performance benchmark](/mono/synstate/guides/benchmark/), the Derived Chain scenario (100,000 synchronous `store.set()` calls through a 3-atom chain) shows Jotai at ~390ms, while RxJS achieves ~3ms and SynState ~13ms. The overhead comes from several compounding factors:
 
 **1. WeakMap Lookups Per Update (~30–40 times)**
 

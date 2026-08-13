@@ -20,6 +20,8 @@ share, so the pieces were folded together here and the generator removed.
       `ws-build-stages`, the dependency-graph generator, …).
 - `repo-settings/` — declarative GitHub repository settings, applied via
   [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
+  `pages/settings.json` there is what enables Pages; the deploy workflow does
+  not enable it.
 - `articles/` — Zenn articles. **See "Zenn" below.**
 - `books/` — Zenn books. **See "Zenn" below.**
 - `docs/` — prose notes about the repository itself. Markdown only; not built,

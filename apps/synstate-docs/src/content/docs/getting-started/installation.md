@@ -37,7 +37,7 @@ For React 16.8–17 (without `useSyncExternalStore`), use the compat package ins
 npm add synstate-react-hooks-compat
 ```
 
-The API is identical to `synstate-react-hooks`. See [React Integration](/synstate/guides/react-integration/#react-v17-or-earlier) for details.
+The API is identical to `synstate-react-hooks`. See [React Integration](/mono/synstate/guides/react-integration/#react-v17-or-earlier) for details.
 
 ### Preact Hooks
 

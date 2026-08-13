@@ -6,21 +6,21 @@ sidebar:
 ---
 
 <p align="center">
-  <img src="/synstate/synstate-logo.png" alt="SynState ロゴ" width="400" />
+  <img src="/mono/synstate/synstate-logo.png" alt="SynState ロゴ" width="400" />
 </p>
 
 **SynState** は TypeScript/JavaScript 向けの軽量・高性能な状態管理ライブラリです。シンプルなグローバル状態から、`debounce` や `switchMap` を使った複雑な非同期パイプラインまで統一 API で記述できます。React Compiler と完全互換。
 
-「SynState」は「Synchronized + State」に由来します。グリッチフリーな伝搬により、派生値は常に一貫した状態に保たれます — 不整合な中間状態は発生しません。（詳細： [SynState がグリッチを解決した方法](/synstate/ja/internals/how-synstate-solved-the-glitch/)）
+「SynState」は「Synchronized + State」に由来します。グリッチフリーな伝搬により、派生値は常に一貫した状態に保たれます — 不整合な中間状態は発生しません。（詳細： [SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）
 
 ## 特徴
 
 - 🎯 **シンプルな状態管理**： React の `useState`/`useReducer` に似た使いやすい `createState` と `createReducer`（グローバル状態向け）。
-- ⚡ **高パフォーマンス**： グリッチフリー $O(n)$ 伝搬 — Jotai の約30倍、Redux の約16倍高速。[ベンチマーク結果](/synstate/ja/guides/library-comparison/benchmark/)を参照。
+- ⚡ **高パフォーマンス**： グリッチフリー $O(n)$ 伝搬 — Jotai の約30倍、Redux の約16倍高速。[ベンチマーク結果](/mono/synstate/ja/guides/library-comparison/benchmark/)を参照。
 - 🚀 **軽量**： <!-- bundle-size:synstate -->~4.4 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) のみ。
 - 🔧 **非同期オペレーター内蔵**： `debounce`、`throttle`、`switchMap` など — 複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
 - ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
-- 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。
+- 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。
 
 ## 簡単な例
 
@@ -104,7 +104,7 @@ setCount(2);
 setCount(3);
 ```
 
-この宣言的なモデルがどのように機能するか、なぜ命令的に状態を管理するよりも優れているかについては、[宣言的な状態管理](/synstate/ja/guides/declarative-state-management/)を参照してください。
+この宣言的なモデルがどのように機能するか、なぜ命令的に状態を管理するよりも優れているかについては、[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/)を参照してください。
 
 ## React で使う
 
@@ -140,11 +140,11 @@ const UserProfile = (): React.JSX.Element => {
 };
 ```
 
-詳細は [React 連携](/synstate/ja/guides/react-integration/)を参照してください。
+詳細は [React 連携](/mono/synstate/ja/guides/react-integration/)を参照してください。
 
 ## 次のステップ
 
-- [インストール](/synstate/ja/getting-started/installation/) — SynState とオプションのコンパニオンパッケージをインストール。
-- [SynState の強み](/synstate/ja/guides/why-synstate/) — 設計思想、グリッチフリー保証、ユースケース。
-- [宣言的な状態管理](/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
-- [React 連携](/synstate/ja/guides/react-integration/) — SynState を React で使う。
+- [インストール](/mono/synstate/ja/getting-started/installation/) — SynState とオプションのコンパニオンパッケージをインストール。
+- [SynState の強み](/mono/synstate/ja/guides/why-synstate/) — 設計思想、グリッチフリー保証、ユースケース。
+- [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
+- [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState を React で使う。

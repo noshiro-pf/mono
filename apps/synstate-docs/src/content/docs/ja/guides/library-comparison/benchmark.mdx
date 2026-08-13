@@ -46,7 +46,7 @@ import ConditionalFanOutChart from '../../../../../components/benchmark-chart/co
 :::caution[数値の読み方について]
 この単純なチェーンのシナリオでは、RxJS・Zustand・Valtio が SynState と同程度かより高速に見えます。しかし、線形チェーンでの生スループットだけでは全体像は分かりません。
 
-- **RxJS** がここで高速なのは、グラフにダイアモンド依存がないためです。ダイアモンドが存在すると `combineLatest` は冗長な中間値を発行し、ワイドダイアモンドで $O(N^2)$、**カスケードダイアモンドでは指数関数的**（一般に $O(D^N)$、$D$ = 1段あたりのファンアウト）に劣化します（[ダイアモンドシナリオ](#シナリオ：-ダイヤモンド依存関係)および[インタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/)を参照）。さらに RxJS は[グリッチ](/synstate/ja/internals/how-synstate-solved-the-glitch/)（不整合な中間状態）の問題を抱えており、SynState はこれを排除しています。
+- **RxJS** がここで高速なのは、グラフにダイアモンド依存がないためです。ダイアモンドが存在すると `combineLatest` は冗長な中間値を発行し、ワイドダイアモンドで $O(N^2)$、**カスケードダイアモンドでは指数関数的**（一般に $O(D^N)$、$D$ = 1段あたりのファンアウト）に劣化します（[ダイアモンドシナリオ](#シナリオ：-ダイヤモンド依存関係)および[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/)を参照）。さらに RxJS は[グリッチ](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)（不整合な中間状態）の問題を抱えており、SynState はこれを排除しています。
 - **Zustand** と **Valtio** の高速さは、派生値を**セレクターやコールバック内でインライン計算**（`counter * 2 * 2`）していることに由来します。独立した派生値を定義して結合する仕組みがないため、**ダイアモンド依存シナリオからは除外**されています。実際のアプリケーションで複数の派生ソースの結合が必要なケース（フォームバリデーション、算出スタイル、集約ダッシュボードなど）は、これらのライブラリのバニラ API だけでは手動の調整なしに表現できません。
 
 **グリッチフリーかつダイアモンド依存をサポートし、すべてのケースで $O(n)$ の伝播を維持**しているのは SynState だけです。
@@ -277,7 +277,7 @@ export const runBenchmark = (n: number): number => {
 - Zustand は独立した派生値を組み合わせるメカニズムがないため除外。
 
 :::caution[RxJS グリッチ]
-RxJS の `combineLatest` はこのダイヤモンドグラフで**更新ごとに subscriber を2回**呼び出します（1回は古い値で、1回は正しい値で）。この2倍の作業はベンチマーク結果に反映されています。詳細は [SynState がグリッチを解決した方法](/synstate/ja/internals/how-synstate-solved-the-glitch/) を参照してください。
+RxJS の `combineLatest` はこのダイヤモンドグラフで**更新ごとに subscriber を2回**呼び出します（1回は古い値で、1回は正しい値で）。この2倍の作業はベンチマーク結果に反映されています。詳細は [SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/) を参照してください。
 :::
 
 ### 結果
@@ -469,7 +469,7 @@ export const runBenchmark = (n: number): number => {
 
 ## シナリオ： ディープチェーンスループット
 
-最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
+最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
 
 以下の図は $M = 3$ の場合のグラフ構造です。実際のベンチマークでは $M$ は $50$〜$200$ です：
 
@@ -510,7 +510,7 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 ### 主な観察結果
 
 - **SynState** は $K$ と $M$ の両方に対して線形に増加します。$K=1000$, $M=200$ でも **5.6 ms** で完了し、プッシュベースの直接関数呼び出しによるステージあたりのオーバーヘッドはごくわずかです。
-- **RxJS** は $K=1000$, $M=200$ で **678 ms** — SynState の**約121倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
+- **RxJS** は $K=1000$, $M=200$ で **678 ms** — SynState の**約121倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
 - **Jotai** は $K=1000$, $M=200$ で **399 ms** — SynState の**約71倍**です。`selectAtom` の更新ごとのオーバーヘッド（エポックベースの再計算と動的依存関係追跡）に起因します。
 - **MobX** は $K=1000$, $M=200$ で **575 ms** — SynState の**約103倍**です。このシナリオは `scan`（ステートフルな累積：各ステージが自身の前回値と新しい入力を必要とする）を使用します。MobX の `computed` は純粋な派生であり、自身の前回出力にアクセスする手段を持たないため、ここでは使えません。`observable.box` + `reaction`（push-based）を使う必要があり、プロキシ追跡・依存通知・`autorun` の再読み取りによるステージごとのオーバーヘッドが発生します。対照的に、[カスケードダイアモンドシナリオ](#シナリオ：-カスケードダイアモンド)はステートレスな派生のため `computed` の遅延評価で高効率に処理できます。
 - $K=500$, $M=100$（60fps アニメーションで中程度のグラフ複雑度を想定）の場合、SynState（**1.6 ms**）は 16ms のフレーム時間内に余裕で収まりますが、RxJS（67 ms）、Jotai（90 ms）、MobX（150 ms）はいずれも大幅に超過します。
@@ -804,7 +804,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 - **Redux**： デフォルトのミドルウェア（thunk、シリアライザブルチェック、イミュータビリティチェック）は `middleware: () => new Tuple()` で無効化されています。これらは本番ビルドでは tree-shaking で除去される開発時チェックです。
 - **Zustand**（派生チェーンのみ）： Zustand には独立した派生値プリミティブがないため、派生値はセレクター内でインラインに計算されます（`counter * 2 * 2`）。同じ理由で、ダイヤモンド依存関係シナリオからも除外されています — 独立した派生値を定義して組み合わせるメカニズムがありません。
 - **Valtio**（派生チェーンのみ）： Zustand と同様に、Valtio のバニラ API には組み込みの派生値プリミティブがないため（`derive` は別パッケージ）、派生値は `subscribe` コールバック内でインラインに計算されます（`state.counter * 2 * 2`）。第3引数の `true` は同期通知を有効にし、subscriber がすべてのミューテーションで呼び出されるようにします（Valtio はデフォルトで非同期にバッチ処理します）。同じ理由でダイヤモンド依存関係シナリオからも除外されています。
-- **RxJS**（ダイヤモンド依存関係）： `combineLatest` は[グリッチ問題](/synstate/ja/internals/how-synstate-solved-the-glitch/)により、ソース更新ごとに subscriber を2回発火させます。ベンチマークはこの追加作業を含むウォールクロック時間を測定しており、RxJS におけるダイヤモンド依存関係の実際のコストを反映しています。
+- **RxJS**（ダイヤモンド依存関係）： `combineLatest` は[グリッチ問題](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)により、ソース更新ごとに subscriber を2回発火させます。ベンチマークはこの追加作業を含むウォールクロック時間を測定しており、RxJS におけるダイヤモンド依存関係の実際のコストを反映しています。
 - **MobX**： 他のライブラリの subscribe-and-record パターンに合わせるため、`autorun` ではなく `reaction` を使用しています。MobX の strict mode で要求されるとおり、`runInAction` で各ミューテーションをラップしています。
 - **Jotai**： `store.sub()` はコールバックに現在の値を渡さないため、リスナー内で追加の `store.get()` 呼び出しが必要です。初期値もsubscribe前に `store.get()` で読み取られます。
 - すべてのライブラリは、ベンチマーク関数内でステート、派生値、およびsubscriptionを作成します。セットアップコストは測定に含まれています。
@@ -837,7 +837,7 @@ Jotai はグリッチフリーのセマンティクスを持ちながら、両�
 
 ベンチマークのループは更新ごとの差を測定可能にするために100,000回の更新を実行しています。しかし、この定数倍のコストは高頻度イベントを扱う実際のアプリケーションでも問題になります。
 
-例えば、`mousemove` や `pointermove` イベントは1秒間に数十回発火します。各イベントがリアクティブパイプラインを駆動する場合（ドラッグ&ドロップ、ツールチップの位置計算、キャンバスアニメーションなど）、更新ごとのオーバーヘッドがイベント発生頻度に比例して増大します。チェーンの深さが増すと差は劇的になります： [スループットデモ](/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)（depth-100 チェーン、フレームあたり500回更新）では、Jotai では ms/frame が 16ms を超えて目に見えるカクつきが生じる一方、SynState は16ms以内で安定して描画できます。
+例えば、`mousemove` や `pointermove` イベントは1秒間に数十回発火します。各イベントがリアクティブパイプラインを駆動する場合（ドラッグ&ドロップ、ツールチップの位置計算、キャンバスアニメーションなど）、更新ごとのオーバーヘッドがイベント発生頻度に比例して増大します。チェーンの深さが増すと差は劇的になります： [スループットデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)（depth-100 チェーン、フレームあたり500回更新）では、Jotai では ms/frame が 16ms を超えて目に見えるカクつきが生じる一方、SynState は16ms以内で安定して描画できます。
 
 更新ごとの差が生じる根本原因：
 

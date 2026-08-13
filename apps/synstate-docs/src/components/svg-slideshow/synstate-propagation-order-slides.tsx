@@ -5,7 +5,7 @@ export const SynStatePropagationOrderSlides = React.memo(() => (
   <SvgSlideshow
     alt={`SynState Propagation Order animation`}
     numSlides={5}
-    slidesPath={'/synstate/synstate-propagation-order-slides'}
+    slidesPath={'/mono/synstate/synstate-propagation-order-slides'}
   />
 ));
 

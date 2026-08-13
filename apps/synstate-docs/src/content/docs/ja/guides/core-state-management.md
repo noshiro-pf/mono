@@ -5,7 +5,7 @@ sidebar:
     order: 3
 ---
 
-[クイックサンプル](/synstate/ja/getting-started/introduction/#クイックサンプル)で、`createState` が3要素のタプルを返すことを紹介しました。このページでは3番目の要素の詳細と、React の `useState` との設計上の違いについて説明します。
+[クイックサンプル](/mono/synstate/ja/getting-started/introduction/#クイックサンプル)で、`createState` が3要素のタプルを返すことを紹介しました。このページでは3番目の要素の詳細と、React の `useState` との設計上の違いについて説明します。
 
 ## 3番目の要素
 
@@ -93,7 +93,7 @@ dispatch({ type: 'increment' }); // state は 1 になる
 
 `createState` と同様に、`dispatch` は同期的に実行され、新しい状態を返します。返される `state` は `InitializedObservable` であり、subscribe やオペレーターによる派生が可能です。
 
-完全な例は [`createReducer` の API リファレンス](/synstate/ja/reference/create-reducer/)を参照してください。
+完全な例は [`createReducer` の API リファレンス](/mono/synstate/ja/reference/create-reducer/)を参照してください。
 
 ## `createBooleanState` — トグル状態
 
@@ -110,4 +110,4 @@ toggle(); // isOpen$ は true を発行
 
 返されるメソッド（`setTrue`、`setFalse`、`toggle`）は安定した参照を持ち、イベントハンドラのコールバックとして直接渡せます。
 
-React 連携を含む完全な例は [`createBooleanState` の API リファレンス](/synstate/ja/reference/create-boolean-state/)を参照してください。
+React 連携を含む完全な例は [`createBooleanState` の API リファレンス](/mono/synstate/ja/reference/create-boolean-state/)を参照してください。
