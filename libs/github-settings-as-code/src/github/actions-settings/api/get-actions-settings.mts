@@ -21,7 +21,6 @@ export const getActionsSettings = async (): Promise<ActionsSettings> => {
     { owner: OWNER, repo: REPO, headers: octokitHeaders },
   );
 
-  // eslint-disable-next-line unicorn/no-array-fill-with-reference-type
   return ActionsSettings.fill({
     enabled: permissions.data.enabled,
     allowed_actions: permissions.data.allowed_actions,

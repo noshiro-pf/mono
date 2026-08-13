@@ -59,10 +59,8 @@ describe('Stack test', () => {
 
     stack.push('first');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('second');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('third');
 
     expect(stack.size).toBe(3);
@@ -130,14 +128,12 @@ describe('Stack test', () => {
 
     stack.push('a');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('b');
 
     expect(Optional.unwrap(stack.pop())).toBe('b');
 
     stack.push('c');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('d');
 
     expect(Optional.unwrap(stack.pop())).toBe('d');
@@ -160,7 +156,6 @@ describe('Stack test', () => {
 
     stack.push(item1);
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(item2);
 
     assert.deepStrictEqual(Optional.unwrap(stack.pop()), item2);
@@ -221,13 +216,10 @@ describe('Stack test', () => {
 
     stack.push('value');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(null);
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(undefined);
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('another');
 
     expect(Optional.unwrap(stack.pop())).toBe('another');

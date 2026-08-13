@@ -12,7 +12,9 @@ export const eslintUnicornRules = {
 
   'unicorn/catch-error-name': withDefaultOption('error'),
 
-  /** Enforce consistent usage of destructuring. */
+  /**
+  Enforce consistent usage of destructuring.
+  */
   'unicorn/consistent-destructuring': 'error',
 
   'unicorn/consistent-function-scoping': withDefaultOption('error'),
@@ -22,7 +24,9 @@ export const eslintUnicornRules = {
   'unicorn/expiring-todo-comments': withDefaultOption('error'),
   'unicorn/explicit-length-check': 'off',
 
-  /** Enforce consistent file naming */
+  /**
+  Enforce consistent file naming
+  */
   'unicorn/filename-case': [
     'error',
     {
@@ -505,4 +509,26 @@ export const eslintUnicornRules = {
   'unicorn/no-instanceof-array': 0,
   'unicorn/no-length-as-slice-end': 0,
   'unicorn/prevent-abbreviations': 0,
+
+  // Added in v73.
+
+  /**
+   * Barrel files are the convention here — `pnpm run gi` generates an
+   * `index.mts` for every directory, and other directories import through it.
+   */
+  'unicorn/no-barrel-files': 'off',
+
+  /** Interpolation into `node:sqlite` queries. Nothing here uses it yet. */
+  'unicorn/no-unsafe-sqlite-interpolation': 'error',
+
+  /**
+   * Off, though the plugin recommends it. Its fix rewrites a one-line JSDoc
+   * comment into three lines and drops the leading asterisk, which is not the
+   * style used here; turning it on rewrote 223 files.
+   */
+  'unicorn/single-line-block-comment-style': 'off',
+
+  /** Stylistic, and not recommended by the plugin. */
+  'unicorn/consistent-arrow-return-style': 'off',
+  'unicorn/iteration-fallback-style': 'off',
 } as const satisfies EslintUnicornRules;

@@ -51,7 +51,6 @@ export type Stack<T> = Readonly<{
    *
    * stack.push('first');
    *
-   * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.isFalse(stack.isEmpty);
@@ -87,7 +86,6 @@ export type Stack<T> = Readonly<{
    *
    * stack.push('first');
    *
-   * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.isFalse(stack.isEmpty);
@@ -123,7 +121,6 @@ export type Stack<T> = Readonly<{
    *
    * stack.push('first');
    *
-   * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.isFalse(stack.isEmpty);
@@ -162,7 +159,6 @@ export type Stack<T> = Readonly<{
    *
    * stack.push('first');
    *
-   * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.isFalse(stack.isEmpty);
@@ -363,7 +359,6 @@ class StackClass<T> implements Stack<T> {
  *
  * stack.push('first');
  *
- * // eslint-disable-next-line unicorn/prefer-single-call
  * stack.push('second');
  *
  * assert.isFalse(stack.isEmpty);

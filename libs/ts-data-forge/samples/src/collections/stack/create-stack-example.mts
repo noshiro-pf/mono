@@ -12,7 +12,6 @@ if (import.meta.vitest !== undefined) {
 
     stack.push('first');
 
-    // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('second');
 
     assert.isFalse(stack.isEmpty);
