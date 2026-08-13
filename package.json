@@ -49,6 +49,7 @@
     "md": "markdownlint-cli2",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
+    "update-actions": "pnpm update --recursive --include-github-actions \"*/*\"",
     "update-packages": "pnpm update --latest --recursive",
     "verify:npm-packages": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/verify-npm-packages.mts",
     "verify:npm-packages:published": "pnpm run verify:npm-packages --published",

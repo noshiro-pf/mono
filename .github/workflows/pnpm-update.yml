@@ -1,14 +1,13 @@
 name: pnpm update
 
-# Runs this repository's own `update-packages` script together with `pnpm
-# self-update`, and opens a single bundled pull request that auto-merges once
-# CI passes. It runs daily and always rebuilds from main, so the pull request
-# follows main rather than accumulating a new one per run.
+# Runs this repository's own `update-packages` and `update-actions` scripts
+# together with `pnpm self-update`, and opens a single bundled pull request that
+# auto-merges once CI passes. It runs daily and always rebuilds from main, so
+# the pull request follows main rather than accumulating a new one per run.
 #
 # This replaces Dependabot entirely: the npm dependencies come from
 # `update-packages`, and the action pins in `.github/workflows/` come from
-# pnpm's own `update.githubActions` (see below). There is no
-# .github/dependabot.yml any more.
+# `update-actions` (see below). There is no .github/dependabot.yml any more.
 #
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
@@ -18,10 +17,21 @@ name: pnpm update
 #
 # What is held back is declared in pnpm-workspace.yaml under `update.ignoreDeps`
 # — currently `typescript`, which also covers the `typescript-native` alias
-# since pnpm matches the resolved package. `update.githubActions: true` there
-# is what lets this touch the workflow files; because it does, the token below
-# has to carry the `workflows` permission as well, or the push is rejected the
-# moment an action pin under .github/workflows/ moves.
+# since pnpm matches the resolved package.
+#
+# The action pins move in a second, separate step. `update.githubActions` is
+# deliberately `false`, so `update-packages` — which carries `--latest` — leaves
+# them alone, and `update-actions` turns the check back on per-invocation with
+# `--include-github-actions`. That second command has no `--latest`, so an
+# action only moves within `^current`: a major stays put until a human takes it.
+# `changesets/action` v2 is why. It requires Changesets CLI v3 and renamed every
+# input, so the major landing unattended broke release.yml on main, and neither
+# `minimumReleaseAge` nor `ignoreDeps` applies to actions (pnpm reads their
+# versions from `git ls-remote` refs, which carry no publication date).
+#
+# Because this step still rewrites files under .github/workflows/, the token
+# below has to carry the `workflows` permission, or the push is rejected the
+# moment an action pin moves.
 #
 # Authenticates with a GitHub App installation token (the same App used by
 # release.yml) so that the push triggers the push-based CI workflows
@@ -72,6 +82,7 @@ jobs:
       - name: Update dependencies
         run: |
           pnpm run update-packages
+          pnpm run update-actions
           pnpm install --no-frozen-lockfile
 
       # The published half of `verify-npm-packages` pins exact versions, and
@@ -94,7 +105,7 @@ jobs:
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
           permission-contents: write # ブランチの push
           permission-pull-requests: write # PR の作成と auto-merge の有効化
-          # `update.githubActions: true` により .github/workflows/ の action ピンも
+          # `update-actions` により .github/workflows/ の action ピンも
           # 更新されるため、これが無いと push が
           # 「refusing to allow a GitHub App to create or update workflow ...」で拒否される。
           permission-workflows: write # workflow ファイルを含むコミットの push
@@ -193,6 +204,6 @@ jobs:
               --base main \
               --head "$branch" \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm self-update\`. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"

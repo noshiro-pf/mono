@@ -61,7 +61,16 @@ packages:
 # type-checked.
 
 update:
-  githubActions: true
+  # GitHub Actions のピンは `update-packages` ではなく `update-actions` が動かす。
+  # ここを true にすると `--latest` の付いた `update-packages` が actions も
+  # メジャー更新してしまい、`changesets/action` v1 → v2 のような、設定の書き換えを
+  # 伴う更新が無人でマージされる。`update-actions` は `--latest` を付けないので
+  # `^current` の範囲に留まり、メジャー更新は人間が判断することになる。
+  #
+  # `minimumReleaseAge` は actions には効かない。pnpm は actions のバージョンを
+  # `git ls-remote` の ref 一覧から取っており、タグの作成日時を持たないため。
+  # 同じ理由で下の `ignoreDeps` も actions には適用されない。
+  githubActions: false
   ignoreDeps:
     - typescript
 
