@@ -70,6 +70,20 @@ pack しているため、**中身が変わってもパスが変わらない**�
 `node_modules` を削除しないと再展開されない（実測）。そのため毎回削除してから
 install している。
 
+## リポジトリ内パッケージ同士の依存
+
+`pnpm pack` は `workspace:^` を**チェックアウト時点のバージョン**に解決する。
+`chore: version packages` ブランチでは、`github-settings-as-code` の tarball が
+`octokit-safe-types@^1.2.26` を要求する一方 npm にはまだ 1.2.25 しか無い、という状態に
+必ずなる。素直に install すると `ERR_PNPM_NO_MATCHING_VERSION` で落ちる。
+リリースするためのブランチでこそ通らないチェックになってしまう。
+
+`local/pnpm-workspace.yaml` の `overrides` で、リポジトリ内のパッケージはすべて
+このチェックアウトから pack した tarball に向けている。バージョンブランチ以外でも
+解決先は npm 上の**古い方**の sibling だったので、「次のリリース」を見るという
+`local/` の目的にはこちらが正しい。ここに入っているパッケージは同時にリリースされる。
+宣言した範囲が公開済みのものと合っているかは `published/` 側の問い。
+
 ## 効いていることの確認方法
 
 3 つの不具合を再現して、それぞれ検出されることを確認できる。

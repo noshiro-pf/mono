@@ -245,6 +245,14 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       are packed under names without versions in them, and pnpm keys a `file:`
       dependency on its path, so it otherwise reuses the previous tarball —
       neither `--force` nor deleting the lockfile is enough.
+    - The local space `overrides` every package in this repository to the
+      tarball packed here, because `pnpm pack` resolves `workspace:^` to the
+      version in the checkout. On a `chore: version packages` branch the
+      sibling it asks for is the bumped version, which npm does not have until
+      the release goes out — the check would fail on the one branch whose
+      purpose is to be released. Elsewhere it resolved, but to the older
+      sibling on npm, which is the `published` space's question rather than
+      this one's.
 - **`pnpm run knip` covers the other direction: a declared dependency nothing
   imports.** It also sees imports ESLint does not, such as the ones in
   `samples/`. Configuration is in `knip.jsonc`; the CI gate is scoped to
