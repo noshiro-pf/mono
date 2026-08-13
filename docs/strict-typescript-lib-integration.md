@@ -241,8 +241,11 @@ GitHub Release の URL で、pnpm 11 は既定でこれを拒否する。
 tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケージのエラーを直して
 から次へ進む。全部通ったところで共有 tsconfig へ移す。
 
-1 本目の PR に含めるもの: 107 個の依存宣言、knip の ignore、`ts-data-forge` の
-opt-in とその 11 件の修正。以降は 1 パッケージ 1 PR。
+1 本目の PR は**土台だけ**にした。107 個の依存宣言と knip の ignore で、
+`libReplacement` はどこでも有効にしていない。入れただけでは何も変わらないので CI は
+緑のまま入り、以降の PR が 1 パッケージずつ opt-in できる。
+
+2 本目以降は 1 パッケージ 1 PR。`ts-data-forge` の 11 件が最初になる。
 
 `ts-data-forge` の 11 件は `Object.keys` の戻り、`setTimeout` の引数、`Map` を
 継承したクラスの静的側など、いずれも strict lib の狙いどおりの指摘で、キャストで
