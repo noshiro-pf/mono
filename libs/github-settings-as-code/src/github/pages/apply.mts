@@ -14,7 +14,7 @@ import { getPagesSettings, setPagesSettings } from './api/index.mjs';
 import { PagesSettings } from './constants.mjs';
 
 /**
- * `github/pages/settings.json` を Settings > Pages に反映する。
+ * `repo-settings/pages/settings.json` を Settings > Pages に反映する。
  *
  * 設定ファイルを置いていない repository では何もしない（ Pages を使わない
  * repository で誤って Pages を有効化しないため）。

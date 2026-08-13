@@ -1,7 +1,7 @@
 import * as t from 'ts-fortress';
 
 /**
- * `github/pages/settings.json` の型。
+ * `repo-settings/pages/settings.json` の型。
  *
  * Settings > Pages > Build and deployment > Source に対応する。
  * `workflow` が GUI 上の「 GitHub Actions 」、 `legacy` が「 Deploy from a branch 」。

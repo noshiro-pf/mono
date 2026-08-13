@@ -13,7 +13,7 @@ import { getActionsSettings, setActionsSettings } from './api/index.mjs';
 import { backupActionsSettings } from './backup.mjs';
 import { ActionsSettings } from './constants.mjs';
 
-/** `github/actions-settings/settings.json` を Settings > Actions > General に反映する。 */
+/** `repo-settings/actions-settings/settings.json` を Settings > Actions > General に反映する。 */
 export const applyActionsSettings = async (): Promise<void> => {
   await backupActionsSettings(false);
 

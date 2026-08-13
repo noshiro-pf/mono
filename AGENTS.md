@@ -18,7 +18,7 @@ share, so the pieces were folded together here and the generator removed.
       packages.
     - `tools/scripts/cmd/` — repository-level `tsx` commands (`check-all`,
       `ws-build-stages`, the dependency-graph generator, …).
-- `github/` — declarative GitHub repository settings, applied via
+- `repo-settings/` — declarative GitHub repository settings, applied via
   [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
 - `articles/` — Zenn articles. **See "Zenn" below.**
 - `books/` — Zenn books. **See "Zenn" below.**
