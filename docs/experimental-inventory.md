@@ -1,0 +1,156 @@
+# `experimental/` の棚卸し
+
+`experimental/packages` に 74 個のワークスペースプロジェクトがある。step 3 の
+「utils・apps を依存のトポロジカル順に 1 つずつ復元する」を始める前に、**そもそも
+何を復元するのか**を決められる形に並べたもの。
+
+分類は 3 つ。
+
+| 分類       |  数 | 意味                                                   |
+| :--------- | --: | :----------------------------------------------------- |
+| 後継あり   |  27 | 現行パッケージに置き換わっている。復元しない           |
+| 判断が要る |  38 | 後継が無い。復元するかは使うかどうかで決まる           |
+| 中身が無い |   9 | src が空、またはテンプレート。復元する対象が存在しない |
+
+行数は `src/` 配下の `.ts` / `.tsx` / `.mts` の合計。最終更新日は載せていない —
+統合時に全パスが書き換わっており、`git log` から個別の履歴は追えないため。
+
+各 app が「連れてくる」依存は、`package.json` の `dependencies` から後継のある
+ものと `global-*` を除いて機械的に出した実測値であって、見立てではない。
+
+## 後継あり（復元しない）
+
+現行パッケージが同じ役割を担っている。復元は「戻す」ではなく「二重化する」ことに
+なる。
+
+| experimental                  |  行数 | 後継                               |
+| :---------------------------- | ----: | :--------------------------------- |
+| `eslint-configs`              | 57659 | `eslint-config-typed`              |
+| `utils/ts-utils`              | 10213 | `ts-data-forge`                    |
+| `utils/io-ts`                 |  4463 | `ts-fortress`                      |
+| `utils/syncflow`              |  3186 | `synstate`                         |
+| `tools/eslint-custom-rules`   |  2628 | `eslint-plugin-ts-*` の 3 つ       |
+| `utils/ts-utils-additional`   |  2311 | `ts-data-forge`                    |
+| `ts-type-utils`               |  1652 | `ts-type-forge`                    |
+| `utils/syncflow-react-hooks`  |   368 | `synstate-react-hooks`             |
+| `utils/syncflow-preact-hooks` |   369 | `synstate-preact-hooks`            |
+| `utils/io-ts-types`           |   352 | `ts-fortress`                      |
+| `utils/deep-object-diff`      |    16 | `ts-data-forge`                    |
+| `utils/fast-deep-equal`       |     4 | `ts-data-forge` の `fastDeepEqual` |
+| `utils/global-*`（14 個）     |  1328 | **撤廃方針**。明示 import に直す   |
+| `others/template`             |     1 | —                                  |
+| `utils/template`              |     1 | —                                  |
+
+`global-*` は「明示 import を省略するための shim」で、統合レポートが撤廃すると
+決めている。中身は再 export と `declare global` だけなので、利用側を書き換えれば
+消える。
+
+## 判断が要る（後継が無い）
+
+### apps（19 個）
+
+**app を 1 つ選べば、連れてくる utils は決まる。** 下の「連れてくる utils」は
+`dependencies` から実測したもので、後継のあるもの（ts-utils → ts-data-forge 等）と
+`global-*` は除いてある。
+
+| app                                  |  行数 | 連れてくる utils                                                                                                                                              |
+| :----------------------------------- | ----: | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `event-schedule-app`                 | 21136 | event-schedule-app-shared, numeric-input-utils, react-blueprintjs-utils, react-utils, tiny-router-observable, tiny-router-react-hooks, better-react-use-state |
+| `event-schedule-app-shared`          |  5203 | **なし**                                                                                                                                                      |
+| `algo-app`                           |  5033 | goober, preact-utils, resize-observer-preact-hooks, tiny-router-observable, tiny-router-preact-hooks, better-preact-use-state                                 |
+| `mahjong-calculator-app`             |  2428 | goober, preact-utils, tiny-router-preact-hooks, better-preact-use-state                                                                                       |
+| `poll-discord-app`                   |  2008 | **なし**                                                                                                                                                      |
+| `annotation-tool`                    |  2006 | react-utils, tiny-router-react-hooks, better-react-use-state                                                                                                  |
+| `blueprintjs-playground-styled`      |  1701 | blueprint-css, react-utils, tiny-router-react-hooks, better-react-use-state                                                                                   |
+| `my-portfolio-app-preact`            |  1244 | goober, preact-utils, resize-observer-preact-hooks, tiny-router-observable, tiny-router-preact-hooks, better-preact-use-state                                 |
+| `housing-loan-calculator-app`        |  1143 | numeric-input-utils, react-blueprintjs-utils, react-utils, tiny-router-observable, tiny-router-react-hooks, better-react-use-state                            |
+| `color-demo-app`                     |  1097 | react-mui-utils, react-utils, better-react-use-state                                                                                                          |
+| `lambda-calculus-interpreter-core`   |   750 | **なし**                                                                                                                                                      |
+| `cant-stop-probability-app`          |   653 | react-blueprintjs-utils, react-utils, better-react-use-state                                                                                                  |
+| `catan-dice-app`                     |   471 | react-utils, better-react-use-state                                                                                                                           |
+| `lambda-calculus-interpreter-react`  |   196 | 上の core, react-utils, better-react-use-state                                                                                                                |
+| `lambda-calculus-interpreter-preact` |   190 | 上の core, goober, preact-utils, better-preact-use-state                                                                                                      |
+| `blueprintjs-playground`             |    92 | react-utils, tiny-router-react-hooks, better-react-use-state                                                                                                  |
+| `slack-app`                          |    42 | goober, preact-utils, resize-observer-preact-hooks, tiny-router-observable, tiny-router-preact-hooks, better-preact-use-state                                 |
+| `template-react-app-vite`            |    97 | テンプレート                                                                                                                                                  |
+| `template-preact-app-vite`           |    89 | テンプレート                                                                                                                                                  |
+
+`lambda-calculus-interpreter-*` は core がロジック、react / preact が同じものの
+UI 違い。復元するなら core + どちらか 1 つ。
+
+### utils（13 個）
+
+app に連れられて来るもの。単体で復元する理由は薄い。
+
+| util                           | 行数 | 用途                        |
+| :----------------------------- | ---: | :-------------------------- |
+| `react-blueprintjs-utils`      | 4432 | Blueprint.js の薄いラッパ   |
+| `react-utils`                  |  487 | React hooks 詰め合わせ      |
+| `preact-utils`                 |  472 | 同上の Preact 版            |
+| `react-utils-styled`           |  347 | styled 版                   |
+| `numeric-input-utils`          |  287 | 数値入力の状態管理          |
+| `react-mui-utils`              |  245 | MUI ラッパ                  |
+| `tiny-router-observable`       |  185 | 自作ルータ（syncflow 依存） |
+| `tiny-router-react-hooks`      |  140 | 同上                        |
+| `tiny-router-preact-hooks`     |  140 | 同上                        |
+| `better-react-use-state`       |   75 | `useState` の readonly 版   |
+| `better-preact-use-state`      |   74 | 同上                        |
+| `resize-observer-react-hooks`  |   55 | ResizeObserver hook         |
+| `resize-observer-preact-hooks` |   55 | 同上                        |
+
+`tiny-router-*` は `syncflow` に依存しているので、復元するなら `synstate` へ
+書き換えることになる。`react-utils-styled` はどの app からも参照されていない。
+
+### others / slides（6 個）
+
+| もの                           | 行数 | 中身                                |
+| :----------------------------- | ---: | :---------------------------------- |
+| `others/slack-archive-tools`   |  952 | Slack エクスポートの整形            |
+| `others/mahjong-scoring-tool`  |  276 | 点数計算                            |
+| `others/ts_playground`         |  104 | 型の実験場                          |
+| `others/implement-react-hooks` |   56 | hooks の自作実装（学習用）          |
+| `slides/dezero_06_to_16`       |    — | reveal.js のスライド（HTML 直書き） |
+| `slides/chain_rule`            |    — | 同上                                |
+
+## 中身が無い（復元する対象が存在しない）
+
+| もの                                             | 実体                          |
+| :----------------------------------------------- | :---------------------------- |
+| `utils/blueprint-css`                            | ベンダの CSS ファイルのみ     |
+| `utils/goober`                                   | `dist/` と `index.d.mts` のみ |
+| `others/marked`                                  | `convert.js` 1 本             |
+| `others/create-json-schema-from-typescript`      | スクリプト 2 本               |
+| `others/create-typescript-type-from-json-schema` | 同上                          |
+| `slides/template`                                | テンプレート                  |
+| `apps/template-*-app-vite`（2 個）               | テンプレート                  |
+
+`blueprint-css` と `goober` は名前こそ utils だが、実体はベンダのファイルを置いた
+だけの箱。復元するなら npm の本家（`@blueprintjs/core`、`goober`）を直接使う。
+
+テンプレート類は、現行リポジトリの規約（`libs/*` は 1 ディレクトリ 1 npm パッケージ、
+共有 config は `tools/configs/`）とは別物なので、復元ではなく作り直しになる。
+
+## 進め方の提案
+
+置換は機械的に決まる。
+
+```text
+ts-utils / ts-utils-additional → ts-data-forge
+ts-type-utils                  → ts-type-forge
+io-ts / io-ts-types            → ts-fortress
+syncflow / syncflow-*-hooks    → synstate / synstate-*-hooks
+eslint-configs                 → eslint-config-typed
+global-*                       → 明示 import
+```
+
+**最初の 1 つは、連れてくる utils が「なし」の 3 つから選ぶのがよい。** 置換だけで
+済み、utils の復元と app の復元を同時にやらずに済む。
+
+| 候補                               | 行数 | 性格                                          |
+| :--------------------------------- | ---: | :-------------------------------------------- |
+| `lambda-calculus-interpreter-core` |  750 | 純粋なロジック。UI 無し。依存は ts-utils のみ |
+| `poll-discord-app`                 | 2008 | サーバ側。io-ts と ts-utils のみ              |
+| `event-schedule-app-shared`        | 5203 | 型定義中心。ただし単体では動かない            |
+
+`event-schedule-app` は 21136 行あり、Blueprint.js・Firebase・自作ルータに依存する
+ので最後に回すのが妥当。

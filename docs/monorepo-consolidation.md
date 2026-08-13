@@ -280,6 +280,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 - [ ] `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
+    - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
+    - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
 
 ### その他の宿題
 
