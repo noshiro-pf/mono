@@ -199,3 +199,51 @@ TypeScript 6.0 系にしか対応していない。導入するには次のど�
   マイナーを上げて peer range から外れる心配は無い
 - 導入の影響範囲は事前に測っておくとよい。strict lib は `Array.prototype.at` などの
   戻り値を厳しくするので、17 パッケージ分の型エラーが一度に出る種類の変更になる
+
+## 導入手順（2026-08-14 実測）
+
+v7.0 が出たので実際に入れて測った。**導入は可能だが、1 つの PR では収まらない。**
+
+### 分かった前提 3 つ
+
+**1. `libReplacement` は TypeScript 7 では既定 `false`。** strict lib の README は「4.5
+以降は自動で拾う」と書いているが、v7 には当てはまらない。無指定だと
+`@typescript/lib-*` を一度も探さない（`--traceResolution` で 0 件）。
+`tools/configs/tsconfig/tsconfig.type-check.json` に `"libReplacement": true` を
+足して初めて効く。
+
+**2. メタパッケージ 1 つでは足りない。** `strict-ts-lib-v7.0` の依存 107 個はすべて
+GitHub Release の URL で、pnpm 11 は既定でこれを拒否する。
+
+```text
+[ERR_PNPM_EXOTIC_SUBDEP] Exotic dependency "@typescript/lib-es2015-proxy"
+(resolved via url) is not allowed in subdependencies when blockExoticSubdeps is enabled
+```
+
+`blockExoticSubdeps: false` で回避できるが、**リポジトリ全体で URL 依存の禁止を
+解く**ことになる。`pnpm update` の PR は auto-merge されるので、無審査で URL 依存が
+入る経路ができる。107 個を root に直接宣言すれば防御は維持できる（実測で
+`node_modules/@typescript` に 107 個が並び、置き換えが効くことを確認した）。
+
+**3. `@typescript/lib-*` は誰も import しないので knip が unused と報告する。**
+理由付きで `ignoreDependencies` に入れる必要がある。
+
+### エラーの数え方に注意
+
+素朴に全パッケージで型チェックすると 21,629 件出るが、**大半はビルド失敗の連鎖**。
+`ts-data-forge` が strict lib で 11 件落ちる → `.d.mts` が生成されない → 依存側が
+生の `.mjs` を型チェックして implicit any が数千件、という形。実際の指摘は各
+パッケージ十数件規模。
+
+### 進め方
+
+**依存のトポロジカル順に、1 パッケージずつ opt-in する。** `libReplacement` は共有
+tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケージのエラーを直して
+から次へ進む。全部通ったところで共有 tsconfig へ移す。
+
+1 本目の PR に含めるもの: 107 個の依存宣言、knip の ignore、`ts-data-forge` の
+opt-in とその 11 件の修正。以降は 1 パッケージ 1 PR。
+
+`ts-data-forge` の 11 件は `Object.keys` の戻り、`setTimeout` の引数、`Map` を
+継承したクラスの静的側など、いずれも strict lib の狙いどおりの指摘で、キャストで
+潰さずに直す必要がある。
