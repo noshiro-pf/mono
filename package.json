@@ -43,7 +43,7 @@
     "fmt": "pnpm run z:format-uncommitted",
     "fmt:diff": "pnpm run z:format-diff-from origin/main",
     "fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",
-    "knip": "knip --no-progress --no-config-hints --include dependencies,unlisted,binaries",
+    "knip": "knip --no-progress --no-config-hints --include dependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
     "lint:published-deps": "pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' --quiet",
     "md": "markdownlint-cli2",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
