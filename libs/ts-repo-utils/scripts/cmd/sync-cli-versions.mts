@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Result } from 'ts-data-forge';
+import { isString, Result, unknownToString } from 'ts-data-forge';
 import { glob } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -30,7 +30,7 @@ const syncCliVersions = async (): Promise<void> => {
 
   if (Result.isErr(cliFilesResult)) {
     console.info(
-      `❌ Failed to find CLI files: ${String(cliFilesResult.value)}`,
+      `❌ Failed to find CLI files: ${unknownToString(cliFilesResult.value)}`,
     );
 
     process.exit(1);
@@ -63,7 +63,17 @@ const syncCliVersions = async (): Promise<void> => {
 
       const updatedContent = content.replaceAll(
         versionRegex,
-        (match, prefix: string, currentVersion: string, suffix: string) => {
+        (match, ...groups) => {
+          const [prefix, currentVersion, suffix] = groups;
+
+          if (
+            !isString(prefix) ||
+            !isString(currentVersion) ||
+            !isString(suffix)
+          ) {
+            return match;
+          }
+
           if (currentVersion !== targetVersion) {
             mut_hasUpdates = true;
 
@@ -89,7 +99,9 @@ const syncCliVersions = async (): Promise<void> => {
         );
       }
     } catch (error) {
-      console.info(`  ❌ Failed to update ${relativePath}: ${String(error)}`);
+      console.info(
+        `  ❌ Failed to update ${relativePath}: ${unknownToString(error)}`,
+      );
 
       process.exit(1);
     }

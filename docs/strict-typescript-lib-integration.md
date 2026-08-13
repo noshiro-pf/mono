@@ -438,13 +438,20 @@ ReadonlyRecord<string, string>; }>[]'.
 後者の型に `string | (string & {})` がそのまま出ている。これが #117 で消す arm で、
 key が素の `string` になれば union ではなくなり、`Partial` も付かない。**つまりこの
 1 件は `Package['dependencies']` の公開型を変えなくても消える。** 前掲の「公開型が
-変わるので changeset が要る」は #117 前の判断なので、新しい release が届いたら
-測り直すこと。
+変わるので changeset が要る」は #117 前の判断である。
+
+**`dist-v7.0-0.1.0`（2026-08-20）で実際にそうなった。** 測り直したところ、
+`Object.fromEntries` をそのまま書いても通る。したがってこの 1 件のために書いていた
+回避は不要になり、下の節のとおり素直な形に戻した。
 
 なお `dependencies` を組み立てているこの `Object.fromEntries` は、#1642 で移行した
-`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（84 行目、複数フィールドの
-record を 1 つにまとめている箇所）。record を 1 つにまとめる用途なので `Obj.merge` が
-候補になるが、まだ手を付けていない。
+`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（複数フィールドの record を
+1 つにまとめている箇所）。`Obj.merge` は候補にならなかった。あちらは静的に長さの分かる
+タプルを受ける可変長引数で、返り値も `MergeAll<Records>` という「どの record が来たか」に
+依存した型である。ここでまとめるのは `dependencyFields` の長さぶんの**実行時に決まる配列**
+なので、その形に乗らない。加えて `Obj.merge` 自身も内部は `Object.fromEntries` + `as never`
+なので、`Partial` が消えるのは表明を図書館側に移したからにすぎない。**lib 側が直った今は
+どちらも要らず、`Object.fromEntries` をそのまま書けばよい。**
 
 **見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
@@ -1219,3 +1226,67 @@ converter 側の `RelaxedExclude` 回避 3 箇所は削除した。
 （`gen` は gitignore 対象の `temp/codemod-fixed` を再利用し、`gen:full` は
 ネットワーク取得から始まる）。リリース経路が `gen:packages` しか回さないので
 誰も気づいていなかった。
+
+## `ts-repo-utils` の opt-in（2026-08-14 計測、2026-08-24 再測）
+
+型 2 件・lint 7 件。**どちらも、標準 lib でも通る形に直せた**ので、この
+パッケージには「どちらの lib を前提にするか」の分岐が残っていない。
+
+**うち 1 件は lib 側が直したので、こちらでは何もしないのが正解になった**
+（`dist-v7.0-0.1.0`）。回避として書いていた明示的なループは取り消し、
+`Object.fromEntries` に戻してある。残る 1 件と lint 7 件は下表のとおり
+こちら側の修正である。
+
+| 指摘                                          | 直し方                                           |
+| :-------------------------------------------- | :----------------------------------------------- |
+| `Object.fromEntries` が `Partial<...>` を返す | lib 側の不具合。`dist-v7.0-0.1.0` で解消         |
+| `replaceAll` のキャプチャ群が `unknown`       | 可変長引数で受けて `isString` で絞る             |
+| `String` が `@deprecated`（lint 7 件）        | `unknownToString`（`ts-data-forge`）に置き換える |
+
+3 つ目は元々このリポジトリの慣例で、`gen-docs.mts` などは既に
+`unknownToString` を使っていた。strict lib の `@deprecated` は、その慣例が
+徹底されていない箇所を挙げてくれたことになる。`String(x)` と違って
+`[object Object]` にならないので、置き換えは実質的な改善でもある。
+
+2 つ目は strict lib の言い分が正しい。省略可能なグループは不参加のとき
+`undefined` になるので、`string` と決めつけられない。ここでは 3 つとも必須なので
+絞り込みが実際に落ちることはないが、型の上では書く必要がある。
+
+### 測り直しで変わったこと（2026-08-24）
+
+このブランチは長く開いていたあいだに 3 つの前提の上に書かれ、そのうち 3 つとも
+「lint と型チェックで同じ lib を見せる」（前章）で失効した。**ESLint も TypeDoc も
+`typescript` 6.0.3 で走るので、リンカが名前を生やしたいま、両方とも strict lib を
+見る。**
+
+| このブランチが書いていたこと                                                     | 再測（2026-08-24）                                                                                                                                             |
+| :------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| lint 7 件は bundle 移行後は出ないので、置き換えは慣例に沿っただけの変更          | **出る。** `String` の `@deprecated` は再び指摘される。置き換えは慣例どおりであると同時に、opt-in に必要でもある                                               |
+| `no-unsafe-assignment` の `eslint-disable` は opt-in 後も要る                    | **要らない。** ESLint からも `JSON.parse` は `JsonValue` に見えるので、残すと「Unused eslint-disable directive」で落ちる。削除した                             |
+| TypeDoc は `configs/tsconfig.build.json` を見せないと probe の `TS2578` で落ちる | **落ちない。** probe が通るようになったので、`typedoc.config.mjs` の `tsconfig` 上書きは取り消し、main のままにした。`test/` の型エラーは引き続き `doc` が拾う |
+
+`ts-fortress`（#1657）で見積もっていた lint 21 件も、同じ理由で**また起きうる**。
+opt-in の見積りは型エラーだけでよい、という前節の結論は取り消しである。
+
+### 確認したこと
+
+opt-in のたびに、次の 2 つを確認する。
+
+- **標準 lib でも型チェックが通る**こと（`libReplacement` を一時的に `false` に
+  して `tsc --noEmit`）。`src` を配るパッケージでは、これが崩れると消費者の
+  エディタが赤くなる。`ts-repo-utils` では probe の `TS2578` だけが出た
+- **`dist` が変わらない**こと。両方の lib でビルドして `diff -r` を取る。
+  `ts-repo-utils` では差分なしだった
+
+**2026-08-25 追記: 後者は構造的に保証されていた。** `diff -r` が毎回差分なしに
+なるのは偶然ではない。opt-in は各パッケージの `tsconfig.json` に `libReplacement`
+を書くが、宣言を emit する `configs/tsconfig.build.json` は**その `tsconfig.json` を
+`extends` していない**（`tools/configs/tsconfig/` の共有 config 3 つを直接
+`extends` している）。共有 config のどれも `libReplacement` を設定していないので、
+**`build` は常に素の lib で走る**。実際 `libs/*/dist` を全走査しても
+`StrictLibInternals` は 1 件も出てこない。
+
+したがって「opt-in が `dist` を変えていないか」を PR ごとに測る必要は無い。壊れる
+としたら経路は 1 つだけで、**共有 config か `configs/tsconfig.build.json` の側に
+`libReplacement: true` が入ったとき**である。逆に言えば、宣言を strict lib で
+emit したくなった日には、この構造ごと考え直すことになる。
