@@ -1,5 +1,16 @@
 ## [1.2.25](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.24...v1.2.25) (2026-08-09)
 
+## 1.2.26
+
+### Patch Changes
+
+- 24306f3: Publish from the monorepo.
+
+    This is the one package whose latest release on npm still came from the
+    standalone `noshiro-pf/octokit-safe-types` repository, so its metadata points
+    at a repository that is now archived. Everything else about it — the source,
+    the build, the manifest — has been here since the consolidation.
+
 ### Bug Fixes
 
 - remove overrides in pnpm-workspace.yaml ([#256](https://github.com/noshiro-pf/octokit-safe-types/issues/256)) ([0220d8f](https://github.com/noshiro-pf/octokit-safe-types/commit/0220d8f07da5705931e93e37451645e56c04b3bf))
