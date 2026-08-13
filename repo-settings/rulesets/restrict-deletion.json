@@ -7,7 +7,7 @@
   "conditions": {
     "ref_name": {
       "exclude": [],
-      "include": ["refs/heads/archive/**/*", "refs/heads/migrate/**/*"]
+      "include": ["refs/heads/archive/**/*"]
     }
   },
   "rules": [
