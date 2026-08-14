@@ -184,6 +184,11 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/numeric-input-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
     "apps/tiny-router-observable": {
       "entry": ["src/index.mts"],
       "project": ["**/*.mts"],
