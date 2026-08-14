@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // `better-react-use-state` is private and has no build output.
+    "paths": {
+      "better-react-use-state": ["../better-react-use-state/src/index.mts"]
+    }
+  },
+  "include": ["./src"]
+}
