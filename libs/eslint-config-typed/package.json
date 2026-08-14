@@ -94,7 +94,7 @@
     "@typescript-eslint/type-utils": "^8.66.0",
     "@typescript-eslint/utils": "^8.66.0",
     "@vitest/eslint-plugin": "^1.6.26",
-    "eslint": "^10.8.0",
+    "eslint": "^10.8.1",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-array-func": "^5.1.1",
     "eslint-plugin-cypress": "^7.0.0",
