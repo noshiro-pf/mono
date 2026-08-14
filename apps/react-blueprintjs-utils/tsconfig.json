@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // Resolved from source rather than from build output: the private
+    // packages here have none, and `better-react-use-state` is mapped the
+    // same way `apps/react-utils` maps it.
+    "paths": {
+      "better-react-use-state": [
+        "../../libs/better-react-use-state/src/index.mts"
+      ],
+      "ts-fortress-types": ["../ts-fortress-types/src/index.mts"],
+      "react-utils": ["../react-utils/src/index.mts"],
+      "react-utils-styled": ["../react-utils-styled/src/index.mts"],
+      "resize-observer-react-hooks": [
+        "../resize-observer-react-hooks/src/index.mts"
+      ]
+    }
+  },
+  "include": ["./src"]
+}

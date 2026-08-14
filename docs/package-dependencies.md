@@ -16,6 +16,7 @@ graph LR
   lambda_calculus_interpreter_core["lambda-calculus-interpreter-core"]
   numeric_input_utils["numeric-input-utils"]
   poll_discord_app["poll-discord-app"]
+  react_blueprintjs_utils["react-blueprintjs-utils"]
   react_utils["react-utils"]
   react_utils_styled["react-utils-styled"]
   resize_observer_react_hooks["resize-observer-react-hooks"]
@@ -49,6 +50,12 @@ graph LR
   numeric_input_utils --> ts_data_forge
   poll_discord_app --> ts_data_forge
   poll_discord_app --> ts_fortress
+  react_blueprintjs_utils --> better_react_use_state
+  react_blueprintjs_utils --> react_utils
+  react_blueprintjs_utils --> synstate
+  react_blueprintjs_utils --> synstate_react_hooks
+  react_blueprintjs_utils --> ts_data_forge
+  react_blueprintjs_utils --> ts_fortress_types
   react_utils --> better_react_use_state
   react_utils --> synstate
   react_utils --> ts_data_forge
@@ -125,7 +132,7 @@ graph LR
 |    2 | `ts-data-forge`                                                                                                                                                                                                                                                                          |
 |    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
 |    4 | `poll-discord-app`, `react-utils`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                      |
-|    5 | `event-schedule-app-shared`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                           |
+|    5 | `event-schedule-app-shared`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                |
 
 ### 参考: devDependencies も含めた場合
 
@@ -143,6 +150,8 @@ graph LR
 | `numeric-input-utils`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                          |
 | `poll-discord-app`                 | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
 | `poll-discord-app`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                            |
+| `react-blueprintjs-utils`          | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                             |
+| `react-blueprintjs-utils`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `react-utils`                      | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                        |
 | `react-utils`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                          |
 | `react-utils-styled`               | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`resize-observer-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                 |

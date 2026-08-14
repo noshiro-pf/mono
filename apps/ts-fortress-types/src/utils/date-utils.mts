@@ -68,6 +68,49 @@ export namespace DateUtils {
     return isMinutes(minutes) ? minutes : 0;
   };
 
+  /** Parses whatever `new Date(…)` accepts. */
+  export const from = (value: number | string): Date => new Date(value);
+
+  /** The instant as a `Date`; the identity here, kept for the call sites. */
+  export const toDate = (date: Date): Date => date;
+
+  /** `YYYY-MM-DD` in local time. */
+  export const toLocaleYMD = (date: Date, separator = '-'): string =>
+    [
+      getLocaleYear(date),
+      getLocaleMonth(date).toString().padStart(2, '0'),
+      getLocaleDate(date).toString().padStart(2, '0'),
+    ].join(separator);
+
+  /** `HH:MM` in local time. */
+  export const toLocaleHM = (date: Date, separator = ':'): string =>
+    [
+      getLocaleHours(date).toString().padStart(2, '0'),
+      getLocaleMinutes(date).toString().padStart(2, '0'),
+    ].join(separator);
+
+  /** A copy with the month replaced, taking 1-12. */
+  export const setLocaleMonth =
+    (month: MonthEnum) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setMonth(month - 1);
+
+      return next;
+    };
+
+  /** A copy with the year replaced by `updater`'s result. */
+  export const updateLocaleYear =
+    (updater: (year: SafeUint) => SafeUint) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setFullYear(updater(getLocaleYear(date)));
+
+      return next;
+    };
+
   /** Builds a `Date` from local-time parts, taking the month as 1-12. */
   export const create = (
     year: SafeUint,
