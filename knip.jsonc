@@ -124,5 +124,12 @@
       ],
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
     },
+
+    // Not an Astro site like the entry above assumes: plain TypeScript with a
+    // single entry point.
+    "apps/lambda-calculus-interpreter-core": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
   },
 }

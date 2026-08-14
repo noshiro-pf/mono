@@ -305,6 +305,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
+    - **`lambda-calculus-interpreter-core` を `apps/` に復元した**（2026-08-14）。旧 `package.json` は `private: false` だったが **npm には存在しない**（404）ので、公開するかどうかの判断は不要だった。旧レイアウトでも `packages/apps/` 配下だったため `apps/` に private で戻している
+        - 型は `@noshiro/ts-utils` → `ts-data-forge`、グローバルだった `SafeUint` / `DeepReadonly` / `LowerAlphabet` は `ts-type-forge` からの明示 import に
+        - `Arr.isArrayOfLength3` 系は後継が無いので `hasLength` / `hasMinLength` をアプリ内に置いた。`Arr.last` が `Optional` を返すようになった点、`toUint32` / `toSafeUint` が `asUint32` / `asSafeUint` になった点も追随した
+        - **`Variable = LowerAlphabet` が未解決のまま先に進むと、`expectType` の判定がすべて通ってしまう。** 型が error type になり何にでも代入可能になるため。型 import を入れた時点で 6 件の偽陰性が顕在化した
 
 ### その他の宿題
 
