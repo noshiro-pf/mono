@@ -351,6 +351,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
+- **`prefer-canonical-length-constrained-tuple` の autofix が再帰型を壊していた（修正済み）。** タプルリテラルは TypeScript が `type T = readonly [T, T]` を解決できる理由そのもので、同じ循環を `FixedLengthTuple` 経由にすると alias が error type になり、**その型のすべての使用箇所が黙って `any` として通る**。`tsc` は alias 1 箇所を報告するだけだが、typed linter は使用箇所ごとに報告するので 47 件出た（`experimental/` から復元した lambda 計算機のコードで踏んだ）
+    - 循環は間接であることが多い。`LambdaApplication = readonly [LambdaTerm, LambdaTerm]` 単体は無害に見え、`LambdaTerm` の union が `LambdaApplication` を含むために循環する。そのため同一ファイル内の他の alias を辿って判定している。import をまたぐ循環は見えないので検出できない
+    - **同じ欠陥が姉妹ルールにもあるかを確認したが、無かった。** `Readonly<Record<string, T>>` は書き換え前から `TS2456` で落ちる（再帰的な record は元々この書き方ができない）ので、`prefer-readonly-or-mutable-record` は状況を悪化させていない。`StrictOmit` も再帰下で解決できた。**タプルリテラルだけが TypeScript の遅延解決の対象**で、だから書き換えで失われるものがある
+
 - **published パッケージの検査が main で一度も走っていなかった（修正済み）。** `verify-published-packages` は `github.event.before` と比較してピンの変更を判定するが、checkout が浅いためその commit がリポジトリに存在せず、`git diff` が `fatal: bad object` で落ちていた。判定は `git diff … | grep -q .` の形で、パイプラインの終了ステータスは `grep` のものになるため、**失敗が「変更なし」として素通り**していた（run 31685428368 のログに残っている）。`should-run-type-check` と同じ壊れ方
     - `fetch-depth: 0` にして、判定を変数への代入に変えた。代入なら `set -e` で止まる。ブランチ側の比較も merge base にした
 - **リポジトリ設定のバックアップ照合を、関係のないブランチで走らせないようにした。** `backup-repository-settings` は GitHub の現在の設定とコミット済みバックアップを突き合わせるが、これはブランチではなくリポジトリの性質で、ブランチ側からは変えようがない。全ブランチで走らせていたため、web UI で設定を 1 つ変えると**開いている全 PR が赤くなる**（8/13 に ruleset から `migrate/**` を外したときに実際に起きた）。main では常に、それ以外のブランチでは `repo-settings/` に差分があるときだけ走るようにした

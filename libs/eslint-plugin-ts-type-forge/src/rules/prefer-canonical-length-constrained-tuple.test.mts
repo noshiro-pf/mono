@@ -42,6 +42,32 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           code: 'type T = readonly [...string[]];',
         },
         {
+          name: 'ignores a tuple that defines a directly recursive alias',
+          code: 'type T = readonly [T, T];',
+        },
+        {
+          name: 'ignores a tuple whose alias recurses through another alias',
+          code: dedent`
+            type LambdaTerm = string | LambdaApplication;
+            type LambdaApplication = readonly [LambdaTerm, LambdaTerm];
+          `,
+        },
+        {
+          name: 'ignores a tuple whose alias recurses through a chain of aliases',
+          code: dedent`
+            type A = readonly [B, B];
+            type B = C;
+            type C = A | string;
+          `,
+        },
+        {
+          name: 'still ignores nothing when the cycle does not reach the tuple',
+          code: dedent`
+            type Loop = readonly Loop[];
+            type Unrelated = string;
+          `,
+        },
+        {
           name: 'ignores plain arrays',
           code: 'type T = readonly string[];',
         },
