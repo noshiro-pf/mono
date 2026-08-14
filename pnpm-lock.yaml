@@ -322,6 +322,46 @@ importers:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.4.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
+  apps/numeric-input-utils:
+    dependencies:
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      eslint:
+        specifier: 'catalog:'
+        version: 10.8.1(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.12
+
   apps/poll-discord-app:
     dependencies:
       discord.js:
@@ -383,8 +423,11 @@ importers:
         specifier: 'catalog:'
         version: 4.23.12
 
-  apps/numeric-input-utils:
+  apps/resize-observer-react-hooks:
     dependencies:
+      better-react-use-state:
+        specifier: workspace:*
+        version: link:../../libs/better-react-use-state
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
