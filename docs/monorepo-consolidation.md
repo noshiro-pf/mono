@@ -263,9 +263,22 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **2026-08-13 に `dist-v7.0-0.0.0` が出た。** peer range は `typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）と一致する。107 個の `@typescript/lib-*` を dependencies に持つメタパッケージを devDependency として入れる形
     - 導入手順は実測して [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の末尾に書いた。`libReplacement` が TypeScript 7 では既定 `false` であること、メタパッケージ 1 つでは pnpm が install を拒むこと、素朴に数えたエラー数（21,629 件）はビルド失敗の連鎖で実態は各パッケージ十数件であること
     - 土台（107 個の依存宣言と knip の ignore）は入れた。`libReplacement` はまだどこでも有効にしていないので挙動は変わらない
-    - **導入コストは型エラーの件数では測れない。** strict lib の `@deprecated` が `@typescript-eslint/no-deprecated` に拾われ、`ts-fortress` では型エラー 4 件を直したあとに lint が 21 件残った。さらに `lint:fix` が strict lib 前提のコードに書き換えてしまい、`src` を配るパッケージでは消費者のエディタに赤が出る。方針決定が要る
+    - **導入コストは型エラーの件数では測れない。** strict lib の `@deprecated` が `@typescript-eslint/no-deprecated` に拾われ、`ts-fortress` では型エラー 4 件を直したあとに lint が 21 件残った。さらに `lint:fix` が strict lib 前提のコードに書き換えてしまい、`src` を配るパッケージでは消費者のエディタに赤が出る
+    - **`src` を配るパッケージの方針は決まった（2026-08-15）。** strict lib 前提で書かれた `src` が、strict lib を使わない消費者の環境で一部型エラーになることは**許容する**。このリポジトリは関数の入出力に明示的な型注釈を強制しており、推論に頼る箇所が少ないため影響が小さい。`files` から `src` を外す案・`no-deprecated` を緩める案は採らない
+        - 影響の実測は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の「型チェック以外への影響」にある。`ts-fortress` では型 4 件を直した後に `no-deprecated` が 21 件残った
+        - **この判断は #1613 で保留した箇所にも及ぶ。** `ts-data-forge` の `array-utils-search.mts` で、strict lib の形に書くと消費者側で赤が出るという理由からコメントアウトした `expectType` が 2 箇所ある。許容する方針になったので、strict lib の形に書き戻してよい
     - **繰り返し出ていた `Object.fromEntries` の `Partial` は解消した。** 半分は strict lib 側のバグで、キーの種類にかかわらず `string & {}` を足していたため `Record<string, V>` のキーまで union 扱いになっていた（[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117) で修正）。残り半分は entries 配列を経由する書き方そのものの限界なので、`Obj.map`（#1638）と `Obj.filter` / `Obj.filterMap`（#1642）を `ts-data-forge` に足して呼び出し側を移行した。標準 lib でも通るので opt-in を待たずに済ませられる。ただし #117 は mono が指す `dist-v7.0-0.0.0` より後の変更なので、新しい release が出て URL を貼り替えるまで lib 側の修正は届かない
-    - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する。`octokit-safe-types`（0 件）は opt-in 済み。残りの件数は `ts-repo-utils` 2 / `ts-fortress` 4 / `ts-type-forge` 6。次は `ts-data-forge`（11 件）
+    - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する
+        - **opt-in 済み**: `octokit-safe-types`（型 0 件、#1614）
+        - **PR 提出済み・未マージ**: `ts-repo-utils`（型 2 件・lint 7 件、#1618）。`ts-data-forge` は「どちらの lib でも同じに読める」形に揃えた #1613 があるが、opt-in 自体はまだ
+        - **残りの件数**: `ts-fortress` 4 / `ts-type-forge` 6 / `ts-data-forge` 11
+    - **`ts-data-forge` の opt-in は外部要因待ち。** `class X extends Map/Set` が strict lib 下でコンパイルできない（strict lib 側の型定義の問題）。**別スレッドで修正対応中で、リリースされたら連絡が来る**。それまで着手しない
+        - もう 1 つ、`@eslint/plugin-kit` が `types.cts` をソースのまま配っているため `skipLibCheck` でも覆えない問題がある
+    - 次に着手するのは `ts-fortress`（型 4 件は `feat/strict-ts-lib-fortress` に保全済み）→ `ts-type-forge`（6 件）→ 残り
+- [ ] `libReplacement` のオンオフで `dist` が変わらないことを検査するスクリプトを `tools/scripts/` に追加する
+    - opt-in のたびに手作業で確認している。`libs/*` の各パッケージについて、`libReplacement` を `true` / `false` にして `build` し、生成された `dist` に差分が無いことを検査する
+    - **これが成り立つのは `@typescript-eslint/explicit-function-return-type` のおかげ**で、自動的に保証されるものではない。戻り値の型注釈が無い関数があると、`StrictLibInternals.ToObjectKeys<R>` のような strict lib 内部の型が `.d.mts` に漏れる。実測で確認済み（[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md)）
+    - つまりこの検査は「消費者に配るものが lib の選択に依存していない」ことの回帰テストになる
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
@@ -305,6 +318,29 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
+    - **12 パッケージを復元し、いずれも `apps/` に private で置いた**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
+
+        | パッケージ                         | 行数 | PR    |
+        | :--------------------------------- | ---: | :---- |
+        | `poll-discord-app`                 | 2008 | #1620 |
+        | `lambda-calculus-interpreter-core` |  750 | #1621 |
+        | `io-ts-types`                      |  352 | #1624 |
+        | `event-schedule-app-shared`        | 5203 | #1625 |
+        | `better-react-use-state`           |   75 | #1627 |
+        | `tiny-router-observable`           |  185 | #1628 |
+        | `tiny-router-react-hooks`          |  140 | #1629 |
+        | `numeric-input-utils`              |  287 | #1630 |
+        | `react-utils`                      |  487 | #1631 |
+        | `resize-observer-react-hooks`      |   55 | #1632 |
+        | `react-utils-styled`               |  347 | #1633 |
+        | `react-blueprintjs-utils`          | 4432 | #1634 |
+
+    - **`event-schedule-app` 本体（21136 行・314 ファイル）は作業中。** ブランチ `feat/restore-event-schedule-app` に置いてある。型エラーは 3567 件から 0 件になり、lint が 130 件残っている段階
+        - 作業の中身は「移植」ではなく「書き換え」だった。`globals.d.ts` の 10 行が**約 90 個の識別子を import 無しで使えるようにしており**、21136 行がその前提で書かれていた。撤廃すると 3567 件になる
+        - `.ts` / `.tsx` から `.mts` への改名が 190 ファイル、相対 import への拡張子付与が 220 ファイル
+    - **`syncflow` → `synstate` で最も手間だったのは `createState` の扱い。** 3 段階で前提が誤っていた — ①パッケージの選択はファイル単位で決まる（誤）→ ②呼び出しごとに決まる（不十分）→ ③**同一ファイルが同じ関数名で両方の版を必要とする**（正）。`synstate` は observable を、`synstate-react-hooks` は hook を返す
+    - **`ts-data-forge` の API 変更で繰り返し当たったもの**: 参照系が `Optional` を返す（`IMap.get` / `Arr.first` / `Arr.last` / `Arr.maxBy`）、非破壊操作が `to…` 形に改名（`toSortedBy` / `toUpdated`）、`NonEmptyArray` と `FixedLengthArray` が brand 付きになった（分解する側は `FixedLengthTuple` が正解）
+    - **後継が無く移植したもの**は各パッケージの `src/utils` にある。`match` / `mapOptional` / `noop` / `DateUtils` / `Obj.set` 系 / `Paths` / `hasKeyValue` / `createTinyObservable` / 曜日・月名の定数など
 
 ### その他の宿題
 
