@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 17 個。
+このリポジトリの workspace パッケージは 19 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -12,6 +12,7 @@
 
 ```mermaid
 graph LR
+  io_ts_types["io-ts-types"]
   _synstate_docs["@synstate/docs"]
   eslint_config_typed["eslint-config-typed"]
   eslint_plugin_ts_data_forge["eslint-plugin-ts-data-forge"]
@@ -24,11 +25,14 @@ graph LR
   synstate_preact_signals["synstate-preact-signals"]
   synstate_react_hooks["synstate-react-hooks"]
   synstate_react_hooks_compat["synstate-react-hooks-compat"]
+  ts_codemod_cli["ts-codemod-cli"]
   ts_codemod_lib["ts-codemod-lib"]
   ts_data_forge["ts-data-forge"]
   ts_fortress["ts-fortress"]
   ts_repo_utils["ts-repo-utils"]
   ts_type_forge["ts-type-forge"]
+  io_ts_types --> ts_data_forge
+  io_ts_types --> ts_fortress
   _synstate_docs --> synstate
   _synstate_docs --> synstate_preact_hooks
   _synstate_docs --> synstate_preact_signals
@@ -44,6 +48,7 @@ graph LR
   github_settings_as_code --> octokit_safe_types
   github_settings_as_code --> ts_data_forge
   github_settings_as_code --> ts_fortress
+  github_settings_as_code --> ts_repo_utils
   github_settings_as_code --> ts_type_forge
   octokit_safe_types --> ts_data_forge
   octokit_safe_types --> ts_fortress
@@ -62,9 +67,11 @@ graph LR
   synstate_react_hooks_compat --> synstate
   synstate_react_hooks_compat --> ts_data_forge
   synstate_react_hooks_compat --> ts_type_forge
+  ts_codemod_cli --> ts_codemod_lib
+  ts_codemod_cli --> ts_data_forge
+  ts_codemod_cli --> ts_repo_utils
   ts_codemod_lib --> ts_data_forge
   ts_codemod_lib --> ts_type_forge
-  ts_codemod_lib --> ts_repo_utils
   ts_data_forge --> ts_type_forge
   ts_fortress --> ts_data_forge
   ts_fortress --> ts_type_forge
@@ -82,13 +89,13 @@ graph LR
 
 ### `ws:build` が使う段階
 
-| 段階 | パッケージ                                                                                                                                                   |
-| ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    1 | `ts-type-forge`                                                                                                                                              |
-|    2 | `ts-data-forge`                                                                                                                                              |
-|    3 | `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-fortress`, `ts-repo-utils` |
-|    4 | `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-lib`            |
-|    5 | `@synstate/docs`, `github-settings-as-code`                                                                                                                  |
+| 段階 | パッケージ                                                                                                                                                                     |
+| ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    1 | `ts-type-forge`                                                                                                                                                                |
+|    2 | `ts-data-forge`                                                                                                                                                                |
+|    3 | `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
+|    4 | `io-ts-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`               |
+|    5 | `@synstate/docs`, `github-settings-as-code`                                                                                                                                    |
 
 ### 参考: devDependencies も含めた場合
 
@@ -96,44 +103,47 @@ graph LR
 
 ## `workspace:` プロトコルの状況
 
-| パッケージ                    | 種別 | 内部依存                                                                                                                                                                                                                                                                        |
-| :---------------------------- | :--- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@synstate/docs`              | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-signals`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`                                                                                                        |
-| `@synstate/docs`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`  |
-| `eslint-config-typed`         | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                        |
-| `eslint-config-typed`         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-codemod-lib`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*` |
-| `eslint-plugin-ts-data-forge` | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                        |
-| `eslint-plugin-ts-data-forge` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                            |
-| `eslint-plugin-ts-fortress`   | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                        |
-| `eslint-plugin-ts-fortress`   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                          |
-| `eslint-plugin-ts-type-forge` | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                        |
-| `eslint-plugin-ts-type-forge` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                            |
-| `github-settings-as-code`     | dep  | `octokit-safe-types`&nbsp;`workspace:^`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                         |
-| `github-settings-as-code`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `octokit-safe-types`          | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                    |
-| `octokit-safe-types`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `synstate`                    | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                        |
-| `synstate`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `synstate-preact-hooks`       | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                       |
-| `synstate-preact-hooks`       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `synstate-preact-signals`     | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                       |
-| `synstate-preact-signals`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `synstate-react-hooks`        | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                       |
-| `synstate-react-hooks`        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `synstate-react-hooks-compat` | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                       |
-| `synstate-react-hooks-compat` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                        |
-| `ts-codemod-lib`              | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                        |
-| `ts-codemod-lib`              | peer | `ts-repo-utils`&nbsp;`8.1.0`                                                                                                                                                                                                                                                    |
-| `ts-codemod-lib`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`10.1.8`                                             |
-| `ts-data-forge`               | dep  | `ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                              |
-| `ts-data-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                            |
-| `ts-fortress`                 | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                        |
-| `ts-fortress`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                          |
-| `ts-repo-utils`               | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                        |
-| `ts-repo-utils`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                              |
-| `ts-type-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                      |
+| パッケージ                    | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                  |
+| :---------------------------- | :--- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `io-ts-types`                 | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
+| `io-ts-types`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
+| `@synstate/docs`              | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-signals`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`                                                                                                                                                                  |
+| `@synstate/docs`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                            |
+| `eslint-config-typed`         | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
+| `eslint-config-typed`         | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-codemod-lib`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                           |
+| `eslint-plugin-ts-data-forge` | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                  |
+| `eslint-plugin-ts-data-forge` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                      |
+| `eslint-plugin-ts-fortress`   | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                  |
+| `eslint-plugin-ts-fortress`   | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                    |
+| `eslint-plugin-ts-type-forge` | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                  |
+| `eslint-plugin-ts-type-forge` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                      |
+| `github-settings-as-code`     | dep  | `octokit-safe-types`&nbsp;`workspace:^`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`<br>`ts-repo-utils`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                             |
+| `github-settings-as-code`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
+| `octokit-safe-types`          | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                              |
+| `octokit-safe-types`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `synstate`                    | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
+| `synstate`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`synstate-react-hooks-compat`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*` |
+| `synstate-preact-hooks`       | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                 |
+| `synstate-preact-hooks`       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `synstate-preact-signals`     | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                 |
+| `synstate-preact-signals`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `synstate-react-hooks`        | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                 |
+| `synstate-react-hooks`        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `synstate-react-hooks-compat` | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                 |
+| `synstate-react-hooks-compat` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `ts-codemod-cli`              | dep  | `ts-codemod-lib`&nbsp;`workspace:^`<br>`ts-data-forge`&nbsp;`workspace:^`<br>`ts-repo-utils`&nbsp;`workspace:^`                                                                                                                                                                                                                           |
+| `ts-codemod-cli`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
+| `ts-codemod-lib`              | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
+| `ts-codemod-lib`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                  |
+| `ts-data-forge`               | dep  | `ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                                                        |
+| `ts-data-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                      |
+| `ts-fortress`                 | dep  | `ts-data-forge`&nbsp;`workspace:~`<br>`ts-type-forge`&nbsp;`workspace:~`                                                                                                                                                                                                                                                                  |
+| `ts-fortress`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                    |
+| `ts-repo-utils`               | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
+| `ts-repo-utils`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
+| `ts-type-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                |
 
-17 / 17 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+19 / 19 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
@@ -146,10 +156,7 @@ root はワークスペースメンバーではないので、上のビルド順
 | `eslint-plugin-ts-data-forge` | `workspace:*` |
 | `eslint-plugin-ts-fortress`   | `workspace:*` |
 | `eslint-plugin-ts-type-forge` | `workspace:*` |
-| `github-settings-as-code`     | `workspace:*` |
-| `ts-codemod-lib`              | `workspace:*` |
 | `ts-data-forge`               | `workspace:*` |
-| `ts-fortress`                 | `workspace:*` |
 | `ts-repo-utils`               | `workspace:*` |
 | `ts-type-forge`               | `workspace:*` |
 
