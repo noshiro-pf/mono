@@ -1,3 +1,4 @@
+// cspell:ignore foldl
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
 
@@ -42,7 +43,7 @@
     // package, which pnpm refuses as a source of URL subdependencies.
     "@typescript/lib-*",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
-    // AGENTS.md.
+    // CLAUDE.md.
     "zenn-cli",
     // Named as strings in the root `.prettierrc`. Every package runs `fmt`
     // with its own directory as cwd, so each has to resolve them itself; knip
@@ -106,6 +107,13 @@
         // package defines. knip does not follow that self-reference.
         "eslint-config-typed",
       ],
+    },
+
+    // Not an Astro site like the entry below assumes: plain TypeScript with a
+    // single entry point.
+    "apps/io-ts-types": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
     },
 
     // Not an Astro site like the entry below assumes: a React hook library with
