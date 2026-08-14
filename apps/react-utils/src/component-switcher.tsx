@@ -1,3 +1,6 @@
+/** @jsxImportSource react */
+// This file is also compiled by consumers that set `jsxImportSource` to
+// Emotion; it uses no `css` prop, so it says which runtime it needs.
 import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{

@@ -1,0 +1,62 @@
+{
+  "name": "event-schedule-app",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/event-schedule-app"
+  },
+  "license": "MIT",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^6.18.0",
+    "@blueprintjs/datetime": "^6.2.4",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "better-react-use-state": "workspace:*",
+    "event-schedule-app-shared": "workspace:*",
+    "firebase": "^12.17.1",
+    "html2canvas": "^1.4.1",
+    "numeric-input-utils": "workspace:*",
+    "react-blueprintjs-utils": "workspace:*",
+    "react-utils": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-react-hooks": "workspace:*",
+    "tiny-router-observable": "workspace:*",
+    "tiny-router-react-hooks": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*",
+    "ts-fortress-types": "workspace:*",
+    "url-regex": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "ts-type-forge": "workspace:*",
+    "tsx": "catalog:"
+  }
+}

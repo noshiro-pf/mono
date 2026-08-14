@@ -1,0 +1,14 @@
+import { Json, Result } from 'ts-data-forge';
+import { HoursMinutes } from 'ts-fortress-types';
+import { type Brand } from 'ts-type-forge';
+
+export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
+
+export const timeRangeToMapKey = (
+  timeRange: HoursMinutes,
+): HoursMinutesMapKey =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  Result.unwrapThrow(Json.stringify(timeRange)) as HoursMinutesMapKey;
+
+export const timeRangeFromMapKey = (key: HoursMinutesMapKey): HoursMinutes =>
+  HoursMinutes.fill(Result.unwrapThrow(Json.parse(key)));

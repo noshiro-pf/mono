@@ -5,6 +5,6 @@ version: '0.2'
 import:
   - '../../.cspell.config.yaml'
 words:
-  # Year-Month-Date-Hours-Minutes, the abbreviation this package's date types
-  # are named after. Five files here use it; nothing outside does.
-  - ymdhm
+  # The identity function, defined in `src/utils-ported/calendar.mts` and
+  # named the way the `@noshiro/ts-utils` it came from named it.
+  - idfn

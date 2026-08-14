@@ -1,0 +1,313 @@
+import { EventSchedule, UserId, UserName } from 'event-schedule-app-shared';
+import {
+  type InitializedObservable,
+  combine,
+  createState,
+  map,
+} from 'synstate';
+import { Arr, pipe } from 'ts-data-forge';
+import {
+  answerDeadlineInitialValue,
+  datetimeRangeListInitialValue,
+  eventScheduleInitialValue,
+  notificationSettingsInitialValue,
+} from '../../constants/index.mjs';
+import {
+  normalizeEventSchedule,
+  validateEventSchedule,
+  validateEventScheduleAll,
+} from '../../functions/index.mjs';
+import {
+  type EventScheduleSettingCommonState,
+  type EventScheduleSettingCommonStateHandler,
+  type EventScheduleValidation,
+  type NotificationSettingsWithEmail,
+} from '../../types/index.mjs';
+import { mapOptional, omitKeys } from '../../utils-ported/index.mjs';
+import { mapNoneToUndefined } from '../../utils/index.mjs';
+import { Auth } from '../auth.mjs';
+import { createToggleSectionState } from '../utils/index.mjs';
+
+type ReturnValues = Readonly<{
+  commonState$: InitializedObservable<EventScheduleSettingCommonState>;
+  commonStateHandlers: EventScheduleSettingCommonStateHandler;
+}>;
+
+export const createEventScheduleSettingStore = (): ReturnValues => {
+  const [title$, setTitle, { resetState: resetTitle }] = createState<string>(
+    eventScheduleInitialValue.title,
+  );
+
+  const [notes$, setNotes, { resetState: resetNotes }] = createState<string>(
+    eventScheduleInitialValue.notes,
+  );
+
+  const [
+    datetimeSpecification$,
+    setDatetimeSpecification,
+    { resetState: resetDatetimeSpecification },
+  ] = createState<DatetimeSpecificationEnumType>(
+    eventScheduleInitialValue.datetimeSpecification,
+  );
+
+  const [
+    datetimeRangeList$,
+    setDatetimeRangeList,
+    { resetState: resetDatetimeRangeList },
+  ] = createState<readonly DatetimeRange[]>(
+    eventScheduleInitialValue.datetimeRangeList,
+  );
+
+  const {
+    toggleState$: useAnswerDeadline$,
+    toggle: toggleAnswerDeadlineSection_,
+    value$: answerDeadline$,
+    setValue: setAnswerDeadline,
+    resetState: resetAnswerDeadlineSection,
+    turnOff: turnOffAnswerDeadlineSection_,
+    turnOn: turnOnAnswerDeadlineSection,
+  } = createToggleSectionState<Ymdhm | undefined>({
+    initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
+    initialState: mapNoneToUndefined(eventScheduleInitialValue.answerDeadline),
+    valueToBeSetWhenTurnedOff: () => undefined,
+    valueToBeSetWhenTurnedOn: () => answerDeadlineInitialValue,
+  });
+
+  const [answerIcons$, setAnswerIcons, { resetState: resetAnswerIcons }] =
+    createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
+
+  const initialNotificationSettingsWithEmailFilled$ = combine([
+    Auth.fireAuthUser$,
+    answerDeadline$,
+  ]).pipe(
+    map(([user, answerDeadline]) => ({
+      ...notificationSettingsInitialValue,
+      email: user?.email ?? '',
+      notifyAfterAnswerDeadline: answerDeadline !== undefined,
+      notify00daysBeforeAnswerDeadline: answerDeadline !== undefined,
+    })),
+  );
+
+  const {
+    toggleState$: useNotification$,
+    toggle: toggleNotificationSection,
+    value$: notificationSettingsWithEmail$,
+    setValue: setNotificationSettingsWithEmail,
+    updateValue: updateNotificationSettingsWithEmail,
+    resetState: resetNotificationSettingsSection,
+    turnOff: turnOffNotificationSection,
+    turnOn: turnOnNotificationSection,
+  } = createToggleSectionState<NotificationSettingsWithEmail | undefined>({
+    initialToggleState:
+      eventScheduleInitialValue.notificationSettings !== 'none',
+    initialState: pipe(
+      mapNoneToUndefined(eventScheduleInitialValue.notificationSettings),
+    ).map((__v) => mapOptional(__v, (a) => ({ ...a, email: '' }))).value,
+    valueToBeSetWhenTurnedOff: () => undefined,
+    valueToBeSetWhenTurnedOn: () =>
+      initialNotificationSettingsWithEmailFilled$.getSnapshot().value,
+  });
+
+  // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+  const toggleAnswerDeadlineSection = (): void => {
+    toggleAnswerDeadlineSection_();
+
+    if (!useAnswerDeadline$.getSnapshot().value) {
+      updateNotificationSettingsWithEmail((prev) =>
+        prev === undefined
+          ? prev
+          : {
+              email: prev.email,
+              notifyOnAnswerChange: prev.notifyOnAnswerChange,
+              notifyAfterAnswerDeadline: false,
+              notify00daysBeforeAnswerDeadline: false,
+              notify01daysBeforeAnswerDeadline: false,
+              notify03daysBeforeAnswerDeadline: false,
+              notify07daysBeforeAnswerDeadline: false,
+              notify14daysBeforeAnswerDeadline: false,
+              notify28daysBeforeAnswerDeadline: false,
+            },
+      );
+    }
+  };
+
+  // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+  const turnOffAnswerDeadlineSection = (): void => {
+    turnOffAnswerDeadlineSection_();
+
+    updateNotificationSettingsWithEmail((prev) =>
+      prev === undefined
+        ? prev
+        : {
+            email: prev.email,
+            notifyOnAnswerChange: prev.notifyOnAnswerChange,
+            notifyAfterAnswerDeadline: false,
+            notify00daysBeforeAnswerDeadline: false,
+            notify01daysBeforeAnswerDeadline: false,
+            notify03daysBeforeAnswerDeadline: false,
+            notify07daysBeforeAnswerDeadline: false,
+            notify14daysBeforeAnswerDeadline: false,
+            notify28daysBeforeAnswerDeadline: false,
+          },
+    );
+  };
+
+  const setNotificationSettings = (a: NotificationSettings): void => {
+    updateNotificationSettingsWithEmail((b) => ({
+      ...a,
+      email: b?.email ?? '',
+    }));
+  };
+
+  const eventScheduleNormalized$: InitializedObservable<EventSchedule> =
+    combine([
+      title$,
+      notes$,
+      datetimeSpecification$,
+      datetimeRangeList$,
+      answerDeadline$,
+      answerIcons$,
+      notificationSettingsWithEmail$,
+      Auth.fireAuthUser$,
+    ]).pipe(
+      map(
+        ([
+          title,
+          notes,
+          datetimeSpecification,
+          datetimeRangeList,
+          answerDeadline,
+          answerIcons,
+          notificationSettingsWithEmail,
+          fireAuthUser,
+        ]) =>
+          normalizeEventSchedule({
+            title,
+            notes,
+            datetimeSpecification,
+            datetimeRangeList: Arr.isNonEmpty(datetimeRangeList)
+              ? datetimeRangeList
+              : datetimeRangeListInitialValue,
+            answerDeadline: answerDeadline ?? 'none',
+            answerIcons,
+            notificationSettings:
+              notificationSettingsWithEmail === undefined
+                ? 'none'
+                : omitKeys(notificationSettingsWithEmail, ['email']),
+            timezoneOffsetMinutes:
+              EventSchedule.defaultValue.timezoneOffsetMinutes,
+            author: {
+              id: mapOptional(fireAuthUser?.uid, UserId.cast) ?? null,
+              name: UserName.cast(fireAuthUser?.displayName ?? ''),
+            },
+            archivedBy: [],
+          }),
+      ),
+    );
+
+  const eventScheduleValidation$: InitializedObservable<EventScheduleValidation> =
+    combine([
+      title$,
+      datetimeRangeList$,
+      answerIcons$,
+      notificationSettingsWithEmail$,
+    ]).pipe(
+      map(
+        ([
+          title,
+          datetimeRangeList,
+          answerIcons,
+          notificationSettingsWithEmail,
+        ]) =>
+          validateEventSchedule({
+            title,
+            datetimeRangeList,
+            answerIcons,
+            notificationSettingsWithEmail:
+              notificationSettingsWithEmail ?? 'none',
+          }),
+      ),
+    );
+
+  const eventScheduleValidationOk$ = eventScheduleValidation$.pipe(
+    map(validateEventScheduleAll),
+  );
+
+  const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
+    combine([
+      title$,
+      notes$,
+      datetimeSpecification$,
+      datetimeRangeList$,
+      useAnswerDeadline$,
+      answerDeadline$,
+      answerIcons$,
+      useNotification$,
+      notificationSettingsWithEmail$,
+      eventScheduleValidation$,
+      eventScheduleNormalized$,
+      eventScheduleValidationOk$,
+    ]).pipe(
+      map(
+        ([
+          title,
+          notes,
+          datetimeSpecification,
+          datetimeRangeList,
+          useAnswerDeadline,
+          answerDeadline,
+          answerIcons,
+          useNotification,
+          notificationSettingsWithEmail,
+          eventScheduleValidation,
+          eventScheduleNormalized,
+          eventScheduleValidationOk,
+        ]) => ({
+          title,
+          notes,
+          datetimeSpecification,
+          datetimeRangeList,
+          useAnswerDeadline,
+          answerDeadline,
+          answerIcons,
+          useNotification,
+          notificationSettingsWithEmail,
+          eventScheduleValidation,
+          eventScheduleNormalized,
+          eventScheduleValidationOk,
+        }),
+      ),
+    );
+
+  const commonStateHandlers: EventScheduleSettingCommonStateHandler = {
+    setTitle,
+    resetTitle,
+
+    setNotes,
+    resetNotes,
+
+    setDatetimeSpecification,
+    resetDatetimeSpecification,
+
+    setDatetimeRangeList,
+    resetDatetimeRangeList,
+
+    toggleAnswerDeadlineSection,
+    setAnswerDeadline,
+    resetAnswerDeadlineSection,
+    turnOffAnswerDeadlineSection,
+    turnOnAnswerDeadlineSection,
+
+    setAnswerIcons,
+    resetAnswerIcons,
+
+    toggleNotificationSection,
+    setNotificationSettings,
+    setNotificationSettingsWithEmail,
+    resetNotificationSettingsSection,
+    turnOffNotificationSection,
+    turnOnNotificationSection,
+  } as const;
+
+  return { commonState$, commonStateHandlers };
+};

@@ -1,0 +1,37 @@
+import { useBoolState } from 'better-react-use-state';
+import * as React from 'react';
+
+export const useFormError = <T,>(
+  value: T,
+  valueIsInvalid: (v: T) => boolean,
+  onValueChange: (v: T) => void,
+): readonly [boolean, (v: T) => void, () => void] => {
+  const [showError, { setTrue: show, setFalse: hide }] = useBoolState(false);
+
+  const onBlur = React.useCallback(() => {
+    if (valueIsInvalid(value)) {
+      show();
+    }
+  }, [value, valueIsInvalid, show]);
+
+  React.useEffect(() => {
+    if (!valueIsInvalid(value)) {
+      hide();
+    }
+  }, [value, valueIsInvalid, hide]);
+
+  const onChangeLocal = React.useCallback(
+    (v: T) => {
+      onValueChange(v);
+
+      if (valueIsInvalid(v)) {
+        show();
+      } else {
+        hide();
+      }
+    },
+    [onValueChange, valueIsInvalid, hide, show],
+  );
+
+  return [showError, onChangeLocal, onBlur];
+};

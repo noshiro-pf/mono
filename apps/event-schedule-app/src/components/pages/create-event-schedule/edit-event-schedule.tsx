@@ -1,0 +1,35 @@
+import { Spinner } from '@blueprintjs/core';
+import { memoNamed } from 'react-utils';
+import { useObservableValue } from 'synstate-react-hooks';
+import { Result } from 'ts-data-forge';
+import { EventScheduleStore, Router } from '../../../store/index.mjs';
+import { Header } from '../../organisms/index.mjs';
+import { NotFoundPage } from '../not-found-page.js';
+import { EditEventScheduleOk } from './edit-event-schedule-ok.js';
+import { FetchEventScheduleError } from './error.js';
+
+const dc = dict.eventSettingsPage;
+
+export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
+  const eventId = useObservableValue(Router.eventId$);
+
+  const eventScheduleResult = EventScheduleStore.useEventScheduleResult();
+
+  return eventScheduleResult !== undefined &&
+    Result.isErr(eventScheduleResult) &&
+    eventScheduleResult.value.type === 'not-found' ? (
+    <NotFoundPage />
+  ) : (
+    <div data-e2e={'edit-event-schedule-page'}>
+      <Header title={dc.title} />
+      {eventScheduleResult !== undefined &&
+      Result.isErr(eventScheduleResult) ? (
+        <FetchEventScheduleError errorType={eventScheduleResult.value.type} />
+      ) : eventId === undefined || eventScheduleResult === undefined ? (
+        <Spinner />
+      ) : (
+        <EditEventScheduleOk eventScheduleFromDb={eventScheduleResult.value} />
+      )}
+    </div>
+  );
+});

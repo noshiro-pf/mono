@@ -1,0 +1,31 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "better-react-use-state": [
+        "../../libs/better-react-use-state/src/index.mts"
+      ],
+      "event-schedule-app-shared": [
+        "../event-schedule-app-shared/src/index.mts"
+      ],
+      "ts-fortress-types": ["../ts-fortress-types/src/index.mts"],
+      "numeric-input-utils": ["../numeric-input-utils/src/index.mts"],
+      "react-blueprintjs-utils": ["../react-blueprintjs-utils/src/index.mts"],
+      "react-utils": ["../react-utils/src/index.mts"],
+      "react-utils-styled": ["../react-utils-styled/src/index.mts"],
+      "resize-observer-react-hooks": [
+        "../resize-observer-react-hooks/src/index.mts"
+      ],
+      "tiny-router-observable": ["../tiny-router-observable/src/index.mts"],
+      "tiny-router-react-hooks": ["../tiny-router-react-hooks/src/index.mts"],
+      "synstate": ["../../libs/synstate/src/entry-point.mts"],
+      "synstate-react-hooks": ["../../libs/synstate-react-hooks/src/index.mts"]
+    }
+  },
+  "include": ["./src"]
+}
