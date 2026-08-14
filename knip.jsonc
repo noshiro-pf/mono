@@ -116,6 +116,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: a React hook library with
+    // a single entry point.
+    "apps/better-react-use-state": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
     "apps/*": {
       "entry": [
         "src/pages/**/*.{astro,mts,ts,tsx}",
