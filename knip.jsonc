@@ -111,6 +111,11 @@
 
     // Not an Astro site like the entry below assumes: plain TypeScript with a
     // single entry point.
+    "apps/event-schedule-app-shared": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
     "apps/io-ts-types": {
       "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
       "project": ["**/*.mts"],
