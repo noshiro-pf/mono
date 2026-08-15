@@ -957,9 +957,15 @@ const transformMappedTypeNode = (
       t === '?' ? '?' : t === '-' ? '-?' : t === '+' ? '+?' : undefined,
     ).value ?? '';
 
+  // Key remapping (`as` clause). It is part of the key set the mapped type
+  // produces, so dropping it would silently change the type.
+  const nameTypeText = pipe(node.getNameTypeNode()?.getFullText()).mapNullable(
+    (t) => ` as ${t.trim()}`,
+  ).value;
+
   const result: string = pipe(
     // remove readonlyToken
-    `{ [${node.getTypeParameter().getFullText()}]${questionTokenText}: ${node.getTypeNode()?.getFullText()} }`,
+    `{ [${node.getTypeParameter().getFullText()}${nameTypeText ?? ''}]${questionTokenText}: ${node.getTypeNode()?.getFullText()} }`,
   ).map((mpt) =>
     match(readonlyContext.type, {
       // Don't wrap with Readonly if already readonly or unnecessary

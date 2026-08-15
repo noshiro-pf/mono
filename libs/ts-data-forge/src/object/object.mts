@@ -687,9 +687,9 @@ declare namespace TsDataForgeInternals {
    * optional modifiers and index signatures are preserved; the key remapping
    * drops the symbol keys that `Object.entries` would not have visited.
    */
-  export type MappedRecord<R, V2> = {
-    readonly [K in keyof R as K extends symbol ? never : K]: V2;
-  };
+  export type MappedRecord<R, V2> = Readonly<{
+    [K in keyof R as K extends symbol ? never : K]: V2;
+  }>;
 
   /**
    * Merges two object types where keys in B override keys in A, preserving optional modifiers.

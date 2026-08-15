@@ -198,7 +198,10 @@ describe('map', () => {
   });
 
   test('should keep a record with an index signature total', () => {
-    const scores: ReadonlyRecord<string, number> = { alice: 1, bob: 2 };
+    const scores: ReadonlyRecord<string, number> = {
+      alice: 1,
+      bob: 2,
+    } as const;
 
     const result = Obj.map(scores, (value) => value > 1);
 
@@ -208,7 +211,9 @@ describe('map', () => {
   });
 
   test('should preserve optional property modifiers', () => {
-    const config: Readonly<{ host: string; port?: number }> = { host: 'a' };
+    const config: Readonly<{ host: string; port?: number }> = {
+      host: 'a',
+    } as const;
 
     const result = Obj.map(config, (value) => value === undefined);
 
