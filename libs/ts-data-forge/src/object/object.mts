@@ -12,6 +12,7 @@ import {
   type RelaxedPick,
   type StrictOmit,
   type StrictPick,
+  type ToString,
   type TypeEq,
   type UnknownRecord,
 } from 'ts-type-forge';
@@ -327,6 +328,76 @@ export namespace Obj {
     Object.fromEntries(entries) as never;
 
   /**
+   * Transforms every value of a record, leaving the key set untouched.
+   *
+   * **Type Behavior**: the result is a mapped type over `keyof R`, so the keys
+   * — and their optional modifiers — survive verbatim:
+   * `{ a: number; b?: number }` maps to `{ a: V2; b?: V2 }`, and a record with
+   * an index signature stays total rather than becoming `Partial`.
+   *
+   * This is what `Object.fromEntries(Object.entries(record).map(...))` cannot
+   * express: an entries array carries no evidence that it still covers every
+   * key of the record it came from, so its element type is all the return type
+   * can be built from. Going through a mapped type instead states the
+   * invariant that a value-only transform preserves the key set.
+   *
+   * **Key handling**: keys reach the callback the way `Object.entries` yields
+   * them, so a numeric key `1` arrives as `'1'`. Symbol-keyed properties are
+   * not enumerated by `Object.entries`; they are dropped from both the result
+   * and its type.
+   *
+   * @example
+   *
+   * <!-- doc:embed:jsdoc:example:./samples/src/object/map-example.mts -->
+   *
+   * ```ts
+   * const scores = { alice: 1, bob: 2 } as const;
+   *
+   * const doubled = Obj.map(scores, (value) => value * 2);
+   *
+   * assert.deepStrictEqual(doubled, { alice: 2, bob: 4 });
+   *
+   * // The key is available as the second argument.
+   * const labelled = Obj.map(scores, (value, key) => `${key}=${value}`);
+   *
+   * assert.deepStrictEqual(labelled, { alice: 'alice=1', bob: 'bob=2' });
+   * ```
+   *
+   * <!-- /doc:embed:jsdoc:example:./samples/src/object/map-example.mts -->
+   *
+   * @template R - The type of the source record
+   * @template V2 - The type the callback returns for every key
+   * @param record - The record whose values are transformed
+   * @param mapFn - Called once per own enumerable string key, with the value
+   *   and the key
+   * @returns A new record with the same keys as `record` and the mapped values
+   */
+  export const map = <const R extends UnknownRecord, V2>(
+    record: R,
+    mapFn: (
+      value: R[keyof R],
+      key: TsDataForgeInternals.MappedRecordKey<R>,
+    ) => V2,
+  ): TsDataForgeInternals.MappedRecord<R, V2> => {
+    // `Object.entries` erases both the key and the value type of `R`, so the
+    // callback is widened once here instead of asserting on every entry.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const mapFnWidened = mapFn as (value: unknown, key: string) => V2;
+
+    return (
+      // `Object.entries` enumerates exactly the own enumerable string keys of
+      // `record`, and nothing here adds or removes an entry, so the result has
+      // the key set `MappedRecord` claims.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Object.fromEntries(
+        Object.entries(record).map(
+          ([k, v]) => [k, mapFnWidened(v, k)] as const,
+        ),
+      ) as never
+    );
+  };
+
+  /**
    * Merges multiple records into a single record using `Object.assign`.
    * Later records override properties from earlier records with the same key.
    *
@@ -604,6 +675,21 @@ declare namespace TsDataForgeInternals {
 
   export type PartialIfKeyIsUnion<K, T> =
     IsUnion<K> extends true ? Partial<T> : T;
+
+  /**
+   * The keys `Object.entries` yields for `R`: symbol keys are not enumerated,
+   * and a numeric key `1` arrives as the string `'1'`.
+   */
+  export type MappedRecordKey<R> = ToString<RelaxedExclude<keyof R, symbol>>;
+
+  /**
+   * `R` with every value replaced by `V2`. Homomorphic over `keyof R`, so
+   * optional modifiers and index signatures are preserved; the key remapping
+   * drops the symbol keys that `Object.entries` would not have visited.
+   */
+  export type MappedRecord<R, V2> = {
+    readonly [K in keyof R as K extends symbol ? never : K]: V2;
+  };
 
   /**
    * Merges two object types where keys in B override keys in A, preserving optional modifiers.
