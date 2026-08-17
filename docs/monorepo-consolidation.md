@@ -272,6 +272,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - さらに、成功していたとしても 2 回目以降は必ず落ちる作りだった。`git push --force-with-lease` を値なしで使っているが、比較先の remote-tracking ref は `actions/checkout` が既定ブランチの分しか作らないため存在せず、既存ブランチへの push が `stale info` で拒否される（手元で再現・修正後に 3 連続実行が通ることも確認）。期待値を明示する形に変えた
     - `gh pr view <branch>` は merge 済みの PR も拾うため、1 回目がマージされた翌日は「PR 作成をスキップ→閉じた PR に auto-merge を付けようとして失敗」になる。state が `OPEN` のものだけを見るようにした
 - [x] `chore/pnpm-update` がエラーになったら自動で Claude を起動して修正する workflow を追加する — **`auto-fix-pnpm-update.yml` を追加した。ただし secret を入れるまでは何もしない**
+    - **その後 `auto-fix-pnpm-update.yml` は削除した。** `CLAUDE_CODE_OAUTH_TOKEN` を入れないまま何も動かない状態が続いたため。以下は当時の検討の記録
     - 依存更新そのものは自動化できたが、**追随作業は人が要る**ことが分かっている。実例として `eslint-plugin-unicorn` v73 の major 更新は新ルールを 5 つ追加し、`eslint-config-typed` のルール表が `satisfies` を満たせずビルドが落ちて、PR の 20 チェック中 14 件が失敗した。修正内容は「新ルールに設定を与える」という定型作業
     - 起動条件は `workflow_run`（`pnpm update` の完了、または `chore/pnpm-update` に対する CI の失敗）が素直。どちらを見るかは、失敗が「workflow 自身の失敗」か「作られた PR の CI 失敗」かで分かれるので両方拾う必要がある
     - 検討が要る点

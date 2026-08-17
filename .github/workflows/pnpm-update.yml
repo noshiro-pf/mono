@@ -6,18 +6,19 @@ name: pnpm update
 # the pull request follows main rather than accumulating a new one per run.
 #
 # This replaces Dependabot entirely: the npm dependencies come from
-# `update-packages`, and the action pins in `.github/workflows/` come from
-# `update-actions` (see below). There is no .github/dependabot.yml any more.
+# `update-packages` (whose skip rules — `update.ignoreDeps`,
+# `minimumReleaseAge` — live in pnpm-workspace.yaml), and the action pins in
+# `.github/workflows/` come from `update-actions`. There is no
+# .github/dependabot.yml.
+#
+# `update.ignoreDeps` currently holds back `typescript`, which also covers the
+# `typescript-native` alias since pnpm matches the resolved package.
 #
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
 # (dependencies / peerDependencies / optionalDependencies) changed, mirroring
 # the classification that dependabot-changeset.yml used, so the Changesets
 # release flow publishes those packages once the PR merges.
-#
-# What is held back is declared in pnpm-workspace.yaml under `update.ignoreDeps`
-# — currently `typescript`, which also covers the `typescript-native` alias
-# since pnpm matches the resolved package.
 #
 # The action pins move in a second, separate step. `update.githubActions` is
 # deliberately `false`, so `update-packages` — which carries `--latest` — leaves
@@ -29,15 +30,25 @@ name: pnpm update
 # `minimumReleaseAge` nor `ignoreDeps` applies to actions (pnpm reads their
 # versions from `git ls-remote` refs, which carry no publication date).
 #
-# Because this step still rewrites files under .github/workflows/, the token
-# below has to carry the `workflows` permission, or the push is rejected the
-# moment an action pin moves.
+# Because that step rewrites files under .github/workflows/, the token below has
+# to carry the `workflows` permission, or the push is rejected the moment an
+# action pin moves.
 #
 # Authenticates with a GitHub App installation token (the same App used by
-# release.yml) so that the push triggers the push-based CI workflows
-# and the repository owner (a ruleset bypass actor) can auto-merge. The App's
+# release.yml) so that the push triggers the push-based CI workflows and the
+# repository owner (a ruleset bypass actor) can auto-merge. The App's
 # installation must be granted Workflows: write; the `permission-*` inputs can
 # only narrow what the App already holds, never widen it.
+#
+# ## One branch, reused
+#
+# The branch is `chore/pnpm-update` with no date in it, and every run rebuilds
+# it from a fresh checkout of main and force-pushes. A run that lands no update
+# therefore does not leave a stale pull request behind for the next one to sit
+# beside — there is only ever one open, and it is always rebased onto main.
+#
+# Reusing the name is what makes the two details below matter; with a new dated
+# branch each run neither could bite, because the branch never already existed.
 
 on:
   schedule:
@@ -168,7 +179,7 @@ jobs:
 
           # A fixed branch name, not one carrying the date: every run starts from
           # a fresh checkout of main, so force-pushing here both refreshes the
-          # open pull request and rebases it, instead of leaving last week's
+          # open pull request and rebases it, instead of leaving yesterday's
           # behind and opening another one.
           branch="chore/pnpm-update"
           git switch -c "$branch"
