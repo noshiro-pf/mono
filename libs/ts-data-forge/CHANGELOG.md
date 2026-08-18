@@ -1,5 +1,14 @@
 # ts-data-forge
 
+## 14.3.0
+
+### Minor Changes
+
+- 9810036: Add `Obj.map`, which transforms every value of a record while keeping its key
+  set. Unlike `Object.fromEntries(Object.entries(record).map(...))`, the result is
+  a mapped type over `keyof R`, so keys, their optional modifiers and index
+  signatures survive instead of collapsing into `Partial<...>`.
+
 ## 14.2.1
 
 ### Patch Changes
