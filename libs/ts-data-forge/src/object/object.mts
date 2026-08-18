@@ -432,7 +432,7 @@ export namespace Obj {
    * assert.deepStrictEqual(notAlice, { bob: 2 });
    *
    * // A type guard narrows the value type of the result.
-   * const mixed: UnknownRecord = { a: 1, b: 'x' };
+   * const mixed: UnknownRecord = { a: 1, b: 'x' } as const;
    *
    * const strings = Obj.filter(mixed, isString);
    *
