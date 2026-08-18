@@ -1,5 +1,16 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.0.1
+
+### Patch Changes
+
+- 9810036: `convert-to-readonly` no longer drops the key remapping (`as` clause) of a
+  mapped type. `{ readonly [K in keyof R as K extends symbol ? never : K]: V }`
+  was rewritten to `Readonly<{ [K in keyof R]: V }>`, silently widening the key
+  set the type produces.
+- Updated dependencies [9810036]
+    - ts-data-forge@14.3.0
+
 ## 3.0.0
 
 ### Major Changes
