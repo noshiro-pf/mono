@@ -14,15 +14,15 @@ catalog:
   '@types/node': 26.2.0
   '@types/react': 19.2.18
   '@types/react-dom': 19.2.4
-  '@typescript-eslint/parser': 8.66.0
-  '@typescript-eslint/rule-tester': 8.66.0
+  '@typescript-eslint/parser': 8.67.0
+  '@typescript-eslint/rule-tester': 8.67.0
   '@vitest/browser-playwright': 4.1.10
   '@vitest/coverage-v8': 4.1.10
   '@vitest/ui': 4.1.10
   argparse: 3.0.0
   cspell: 10.0.1
   dedent: 1.7.2
-  esbuild: 0.28.1
+  esbuild: 0.28.2
   eslint: 10.8.1
   immer: 11.1.16
   jiti: 2.7.0
@@ -41,7 +41,7 @@ catalog:
   rollup: 4.62.4
   rollup-plugin-esbuild: 6.2.1
   rxjs: 7.8.2
-  tsx: 4.23.11
+  tsx: 4.23.12
   typedoc: 0.28.20
   typedoc-github-theme: 0.4.0
   typescript: 6.0.3

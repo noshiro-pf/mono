@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-data-forge": "0.4.6"
+    "eslint-plugin-ts-data-forge": "0.4.7"
   }
 }
