@@ -292,13 +292,88 @@ strict lib の `Object.fromEntries` は `Partial<...>` を返す。entries が k
 を網羅している保証が無いためで、指摘としては正しい。ただし「key が元の record から
 来ている」ケースでは常に網羅しているので、実害のない不一致になる。
 
-`ts-fortress` の 4 件はすべてこれで、`ts-repo-utils` にも 1 件ある。直し方は
-`fromEntries` をやめて明示的に組み立てること。標準 lib でも通る。
+`ts-fortress` の 4 件はすべてこれで、`ts-repo-utils` にも 1 件ある。
+
+**2026-08-20 追記: この見立ては半分外れていた。** index signature の record
+（`Record<string, V>`）に `Partial` が付いていたのは strict lib 側のバグで、修正済み。
+リテラルキーの record に付くほうは正しい挙動で、変わらない。直し方も変わった。当時の
+結論は「`fromEntries` をやめて `mut_` 変数と for ループで明示的に組み立てる」だったが、
+いまは `ts-data-forge` の record 用ユーティリティを使う。以下 2 節が現在の内容。
+
+#### 半分は strict lib 側のバグだった
+
+`ToObjectKeys` / `ToObjectEntries` は、リテラルの union を「補完を残したまま任意の
+文字列も受け付ける」形に開くための `string & {}` を、**キーの種類にかかわらず**
+足していた。既に `string` を含むキー型に足すと `string | (string & {})` になる。
+これは意味としては単なる `string` だが、`Object.fromEntries` の
+`PartialIfKeyIsUnion` から見ると **union** なので、`Record<string, V>` にまで
+`Partial` が付いていた。つまり「entries が網羅している保証が無い」ではなく、
+網羅すべきキーが最初から 1 つも無い record にまで誤爆していた。
+
+[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117)
+で、この arm を「実際に広がるときだけ」足すようにした（`WithOpenString`）。
+`PartialIfKeyIsUnion` 自体は変更していない。
+
+| entries の元            | 修正前         | 修正後              |
+| :---------------------- | :------------- | :------------------ |
+| `Record<string, V>`     | `Partial<...>` | 総 (total)          |
+| `{ a: 1; b: 2 }`        | `Partial<...>` | `Partial<...>` 維持 |
+| `Record<'a' \| 'b', V>` | `Partial<...>` | `Partial<...>` 維持 |
+
+**mono にはまだ届いていない。** root の 107 個の URL は `dist-v7.0-0.0.0`
+（2026-08-13 公開）を指しており、#117 はそれより後。新しい `dist-v7.0-*` が出て
+URL を貼り替えるまでは、この誤爆は従来どおり出る。
+
+#### 残り半分は lib 側では直せないので、record 用の変換を足した
+
+`Object.fromEntries(Object.entries(record).map(...))` は、標準 lib でも strict lib
+でも「その entries が元の record を今も表している」という情報を型に残せない。返り値型
+は要素型からしか組み立てられないので、リテラルキーの record が `Partial` になるのは
+正しく、lib 側では直しようがない。entries 配列を経由するのをやめるしかない。
+
+そこで record 用の変換を `ts-data-forge` に足した。いずれも `keyof R` に対する mapped
+type を直接書くことで不変条件を型で表明する。**標準 lib でも strict lib でも同じ
+ように通る**ので、opt-in を待たずに使える。
+
+| 追加            | 用途                                         | 版     | PR                                                    |
+| :-------------- | :------------------------------------------- | :----- | :---------------------------------------------------- |
+| `Obj.map`       | 値だけ書き換える（キー集合は不変）           | 14.3.0 | [#1638](https://github.com/noshiro-pf/mono/pull/1638) |
+| `Obj.filter`    | エントリを落とす。型ガードなら値型も絞る     | 14.4.0 | [#1642](https://github.com/noshiro-pf/mono/pull/1642) |
+| `Obj.filterMap` | 変換と除去を同時に（除去は `Optional.none`） | 14.4.0 | [#1642](https://github.com/noshiro-pf/mono/pull/1642) |
 
 ```ts
-const mut_shape: MutableRecord<string, UnknownShape[string]> = {};
+// 旧: entries 配列を経由するので Partial<...> になる
+const partialShape = Object.fromEntries(
+    Object.entries(shape).map(
+        ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
+    ),
+);
 
-for (const [k, v] of Object.entries(shape)) {
-    mut_shape[k] = keysToBeOptional.has(k) ? optional(v) : v;
-}
+// 新: キー集合が変わらないことが型に出る
+const partialShape = Obj.map(shape, (v, k) =>
+    keysToBeOptional.has(k) ? optional(v) : v,
+);
 ```
+
+`Obj.filter` / `Obj.filterMap` は index signature の record を**総のまま**返す。網羅
+すべき具体的なキーが無く、`noUncheckedIndexedAccess` により添字アクセスの時点で
+`undefined` が付くので、`Partial` を付けても情報は増えず、元の record 型に代入し直せ
+なくなるだけだからである。この判断は #117 が strict lib 側で採った判断と同じ。
+
+このレポートが数えた箇所のうち、entries 配列を経由していたものは #1642 で移行済み。
+
+| ファイル                                     | 変更                                                      |
+| :------------------------------------------- | :-------------------------------------------------------- |
+| `ts-repo-utils` `get-workspace-packages.mts` | 手書きのタプル型ガードごと `Obj.filter(obj, isString)` に |
+| `ts-fortress` `record/key-value-record.mts`  | `fill` → `Obj.filter`、`prune` → `Obj.filterMap`          |
+| `ts-fortress` `record/record.mts`            | `prune` の `flatMap` → `Obj.filterMap`                    |
+| `ts-fortress` `compose/intersection.mts`     | `mergePruned` を `Obj.map` / `Obj.filter` に              |
+| `tools/scripts/cmd/gen-dependency-graph.mts` | `stringRecord` が 8 行 → 2 行                             |
+
+上のコード例に出した `ts-fortress` の `record/partial.mts` にはまだ旧い形が残って
+いる。`Obj.map` に置き換えられる形だが、#1642 では触っていない。
+
+**見積りへの影響。** この種の指摘は strict lib の opt-in を待たずに消せるので、
+パッケージごとの型エラー件数は opt-in の直前に測り直す必要がある。ここに書いた
+`ts-fortress` 4 件 / `ts-repo-utils` 1 件はもう当てにならない。lint 21 件の方針決定
+（前節）のほうが残る課題として重い。
