@@ -267,9 +267,160 @@ tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケ�
 返すこと（entries が key の union を網羅しているとは限らないため。正しい厳しさ）と、
 `String.prototype.replaceAll` のコールバックのキャプチャ群が `unknown` になること。
 前者は `Package['dependencies']` の型を実態に合わせる話になり、**公開型が変わる**ので
-changeset が要る。
+changeset が要る。**ただしこの判断は後述の strict-typescript-lib#117 より前のもの。**
+2026-08-20 に測り直した結果は「繰り返し出るパターン」の節に書いた。
 
 ### opt-in のたびに確認すること
 
 `.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
 `octokit-safe-types` では 15 ファイルすべて同一だった。
+
+### 型チェック以外への影響（2026-08-14 実測）
+
+`ts-fortress` で opt-in を試して分かった。**導入コストは型エラーの件数では測れない。**
+
+**1. strict lib の `@deprecated` が lint エラーになる。** strict lib は `String`
+コンストラクタなどに `@deprecated` を付けており、`@typescript-eslint/no-deprecated`
+がこれを拾う。
+
+```text
+/** @deprecated Don't use String constructor */
+(value?: unknown): string;
+```
+
+`ts-fortress` では型エラー 4 件を直したあとに **lint が 21 件**残った（opt-in 前は
+0 件）。パッケージごとの見積りには lint の件数も要る。
+
+**2. `lint:fix` が strict lib 前提のコードに書き換える。** `key-value-record.mts`
+では、strict lib 下で不要になった型アサーションと `eslint-disable` を `lint:fix` が
+自動削除した。strict lib 下では正しいが、**標準 lib に戻すと型エラーになる**。
+
+```text
+標準 lib: src/record/key-value-record.mts(99,5): error TS2322
+```
+
+`src` を配るパッケージでは、これが**消費者のエディタに赤として現れる**。`expectType`
+のときは自分で書き換えを止められたが、`lint:fix` は自動なので止められない。
+
+**したがって `src` を配るパッケージの opt-in には、次のどれかの方針決定が要る。**
+
+- `files` から `src` を外す（Go to Definition が dist に飛ぶようになる）
+- `no-deprecated` を strict lib 由来のものに限って緩める
+- 消費者のエディタに赤が出ることを受け入れる
+
+`ts-type-forge` のように `files` が `["dist", …]` のパッケージにはこの制約が無い。
+
+### 繰り返し出るパターン: `Object.fromEntries` が `Partial` を返す
+
+strict lib の `Object.fromEntries` は `Partial<...>` を返す。entries が key の union
+を網羅している保証が無いためで、指摘としては正しい。ただし「key が元の record から
+来ている」ケースでは常に網羅しているので、実害のない不一致になる。
+
+`ts-fortress` の 4 件はすべてこれで、`ts-repo-utils` にも 1 件ある。
+
+**2026-08-20 追記: この見立ては半分外れていた。** index signature の record
+（`Record<string, V>`）に `Partial` が付いていたのは strict lib 側のバグで、修正済み。
+リテラルキーの record に付くほうは正しい挙動で、変わらない。直し方も変わった。当時の
+結論は「`fromEntries` をやめて `mut_` 変数と for ループで明示的に組み立てる」だったが、
+いまは `ts-data-forge` の record 用ユーティリティを使う。以下 2 節が現在の内容。
+
+#### 半分は strict lib 側のバグだった
+
+`ToObjectKeys` / `ToObjectEntries` は、リテラルの union を「補完を残したまま任意の
+文字列も受け付ける」形に開くための `string & {}` を、**キーの種類にかかわらず**
+足していた。既に `string` を含むキー型に足すと `string | (string & {})` になる。
+これは意味としては単なる `string` だが、`Object.fromEntries` の
+`PartialIfKeyIsUnion` から見ると **union** なので、`Record<string, V>` にまで
+`Partial` が付いていた。つまり「entries が網羅している保証が無い」ではなく、
+網羅すべきキーが最初から 1 つも無い record にまで誤爆していた。
+
+[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117)
+で、この arm を「実際に広がるときだけ」足すようにした（`WithOpenString`）。
+`PartialIfKeyIsUnion` 自体は変更していない。
+
+| entries の元            | 修正前         | 修正後              |
+| :---------------------- | :------------- | :------------------ |
+| `Record<string, V>`     | `Partial<...>` | 総 (total)          |
+| `{ a: 1; b: 2 }`        | `Partial<...>` | `Partial<...>` 維持 |
+| `Record<'a' \| 'b', V>` | `Partial<...>` | `Partial<...>` 維持 |
+
+**mono にはまだ届いていない。** root の 107 個の URL は `dist-v7.0-0.0.0`
+（2026-08-13 公開）を指しており、#117 はそれより後。新しい `dist-v7.0-*` が出て
+URL を貼り替えるまでは、この誤爆は従来どおり出る。
+
+#### 残り半分は lib 側では直せないので、record 用の変換を足した
+
+`Object.fromEntries(Object.entries(record).map(...))` は、標準 lib でも strict lib
+でも「その entries が元の record を今も表している」という情報を型に残せない。返り値型
+は要素型からしか組み立てられないので、リテラルキーの record が `Partial` になるのは
+正しく、lib 側では直しようがない。entries 配列を経由するのをやめるしかない。
+
+そこで record 用の変換を `ts-data-forge` に足した。いずれも `keyof R` に対する mapped
+type を直接書くことで不変条件を型で表明する。**標準 lib でも strict lib でも同じ
+ように通る**ので、opt-in を待たずに使える。
+
+| 追加            | 用途                                         | 版     | PR                                                    |
+| :-------------- | :------------------------------------------- | :----- | :---------------------------------------------------- |
+| `Obj.map`       | 値だけ書き換える（キー集合は不変）           | 14.3.0 | [#1638](https://github.com/noshiro-pf/mono/pull/1638) |
+| `Obj.filter`    | エントリを落とす。型ガードなら値型も絞る     | 14.4.0 | [#1642](https://github.com/noshiro-pf/mono/pull/1642) |
+| `Obj.filterMap` | 変換と除去を同時に（除去は `Optional.none`） | 14.4.0 | [#1642](https://github.com/noshiro-pf/mono/pull/1642) |
+
+```ts
+// 旧: entries 配列を経由するので Partial<...> になる
+const partialShape = Object.fromEntries(
+    Object.entries(shape).map(
+        ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
+    ),
+);
+
+// 新: キー集合が変わらないことが型に出る
+const partialShape = Obj.map(shape, (v, k) =>
+    keysToBeOptional.has(k) ? optional(v) : v,
+);
+```
+
+`Obj.filter` / `Obj.filterMap` は index signature の record を**総のまま**返す。網羅
+すべき具体的なキーが無く、`noUncheckedIndexedAccess` により添字アクセスの時点で
+`undefined` が付くので、`Partial` を付けても情報は増えず、元の record 型に代入し直せ
+なくなるだけだからである。この判断は #117 が strict lib 側で採った判断と同じ。
+
+このレポートが数えた箇所のうち、entries 配列を経由していたものは #1642 で移行済み。
+
+| ファイル                                     | 変更                                                      |
+| :------------------------------------------- | :-------------------------------------------------------- |
+| `ts-repo-utils` `get-workspace-packages.mts` | 手書きのタプル型ガードごと `Obj.filter(obj, isString)` に |
+| `ts-fortress` `record/key-value-record.mts`  | `fill` → `Obj.filter`、`prune` → `Obj.filterMap`          |
+| `ts-fortress` `record/record.mts`            | `prune` の `flatMap` → `Obj.filterMap`                    |
+| `ts-fortress` `compose/intersection.mts`     | `mergePruned` を `Obj.map` / `Obj.filter` に              |
+| `tools/scripts/cmd/gen-dependency-graph.mts` | `stringRecord` が 8 行 → 2 行                             |
+
+上のコード例に出した `ts-fortress` の `record/partial.mts` にはまだ旧い形が残って
+いる。`Obj.map` に置き換えられる形だが、#1642 では触っていない。
+
+#### `ts-repo-utils` の 2 件を測り直した（2026-08-20 実測）
+
+`libReplacement` を一時的に有効にして型チェックした。`dist-v7.0-0.0.0`（#117 前）の
+ままなので、件数は 2 件で変わっていない。
+
+```text
+scripts/cmd/sync-cli-versions.mts(66,9): error TS2769: No overload matches this call.
+src/functions/workspace-utils/get-workspace-packages.mts(84,11): error TS2322: Type
+'{ …; dependencies: Partial<MutableRecord<string | (string & {}), string>>; }[]'
+is not assignable to type 'readonly Readonly<{ …; dependencies:
+ReadonlyRecord<string, string>; }>[]'.
+```
+
+後者の型に `string | (string & {})` がそのまま出ている。これが #117 で消す arm で、
+key が素の `string` になれば union ではなくなり、`Partial` も付かない。**つまりこの
+1 件は `Package['dependencies']` の公開型を変えなくても消える。** 前掲の「公開型が
+変わるので changeset が要る」は #117 前の判断なので、新しい release が届いたら
+測り直すこと。
+
+なお `dependencies` を組み立てているこの `Object.fromEntries` は、#1642 で移行した
+`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（84 行目、複数フィールドの
+record を 1 つにまとめている箇所）。record を 1 つにまとめる用途なので `Obj.merge` が
+候補になるが、まだ手を付けていない。
+
+**見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
+潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
+測り直す必要がある。残る課題として重いのは lint 21 件の方針決定（前節）のほう。
