@@ -161,9 +161,55 @@ npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .
 - `--min-depth` - Minimum depth to start generating index files (default: 0)
 - `--silent` - Suppress output messages (optional)
 
+### `check-should-run`
+
+Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the `--paths-ignore` patterns, so a step can be skipped when nothing it checks has changed.
+
+Prefer this over a workflow-level `paths-ignore` trigger filter: a workflow that a path filter skips never reports a status check, so a pull request that changed only the filtered paths waits forever on a required check that never arrives. Gating the individual steps keeps the workflow running — and reporting — while doing no work.
+
+```bash
+# Skip when the diff only touches a directory nothing checks
+npm exec -- check-should-run --paths-ignore 'experimental/'
+
+# Several patterns, and a custom base branch
+npm exec -- check-should-run \
+  --paths-ignore 'experimental/' \
+  --paths-ignore 'docs/' \
+  --paths-ignore '**.md' \
+  --base-branch origin/develop
+```
+
+```yaml
+# Example in GitHub Actions
+- name: Check diff
+  id: check_diff
+  run: npm exec -- check-should-run --paths-ignore 'experimental/'
+
+- name: Run the checks
+  if: steps.check_diff.outputs.should_run == 'true'
+  run: npm run check
+```
+
+**Options:**
+
+- `--paths-ignore` - Patterns whose files do not affect the gated step (optional, can be specified multiple times). Matched with [micromatch](https://github.com/micromatch/micromatch) (with `dot: true`) against paths relative to the repository root, with one shorthand: a pattern ending with `/` is a directory prefix.
+    - Exact file matches: `.editorconfig`
+    - Directory prefixes: `docs/` (the same as `docs/**`)
+    - Globs: `**.md`, `libs/*/samples/**`
+    - Default: `[]` — nothing is ignored, so the step always runs when anything changed
+- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
+
+An empty diff reads as "nothing changed", so it reports `should_run=false`. On a push to the base branch itself the diff against that branch is empty for that reason; pass the commit the branch pointed at before the push as `--base-branch` there.
+
+**GitHub Actions Integration:**
+
+When running in GitHub Actions, the command appends `should_run=true` or `should_run=false` to the file named by the `GITHUB_OUTPUT` environment variable, which can be used in subsequent steps.
+
 ### `check-should-run-type-checks`
 
 Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed. The determination of "non-TypeScript files" is based on configurable ignore patterns, which can be specified using the `--paths-ignore` option.
+
+This is [`check-should-run`](#check-should-run) with a default ignore list of the files a TypeScript project typically has but never type-checks. For a step that is not a type check, use `check-should-run` and state its paths.
 
 ```bash
 # Basic usage (compares against origin/main)
@@ -193,11 +239,11 @@ npm exec -- check-should-run-type-checks \
 
 **Options:**
 
-- `--paths-ignore` - Patterns to ignore when checking if type checks should run (optional, can be specified multiple times)
+- `--paths-ignore` - Patterns to ignore when checking if type checks should run (optional, can be specified multiple times). Matched as described for [`check-should-run`](#check-should-run); passing it replaces the default list rather than adding to it.
     - Supports exact file matches: `.cspell.config.yaml`
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
 - `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
 
 **GitHub Actions Integration:**
@@ -498,13 +544,27 @@ type Ret = Result<
 
 #### Build Optimization Utilities
 
+##### `checkShouldRun(options?): Promise<boolean>`
+
+Checks whether a CI step should run, based on which files differ from the base branch. Reports `false` when every changed file matches one of the ignored patterns.
+(Function version of the `check-should-run` command)
+
 ##### `checkShouldRunTypeChecks(options?): Promise<boolean>`
 
-Checks whether TypeScript type checks should run based on file changes from the base branch. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
+`checkShouldRun` with a default ignore list of the files a TypeScript project typically has but never type-checks. Optimizes CI/CD pipelines by skipping type checks when only non-TypeScript files have changed.
 (Function version of the `check-should-run-type-checks` command)
 
 ```tsx
-import { $, checkShouldRunTypeChecks } from 'ts-repo-utils';
+import { $, checkShouldRun, checkShouldRunTypeChecks } from 'ts-repo-utils';
+
+// Gate any step on the paths it cares about
+const shouldRunStyleChecks = await checkShouldRun({
+    pathsIgnore: ['experimental/'],
+});
+
+if (shouldRunStyleChecks) {
+    await $('npm run fmt:check');
+}
 
 // Use default settings (compare against origin/main)
 const shouldRun = await checkShouldRunTypeChecks();
@@ -520,14 +580,16 @@ const shouldRun2 = await checkShouldRunTypeChecks({
 });
 ```
 
-**Options:**
+**Options (both functions):**
 
-- `pathsIgnore?` - Patterns to ignore when checking if type checks should run:
+- `pathsIgnore?` - Patterns whose files do not affect the gated step. Matched with [micromatch](https://github.com/micromatch/micromatch) (with `dot: true`) against paths relative to the repository root, with a trailing `/` as the shorthand for a directory:
     - Exact file matches: `.cspell.config.yaml`
-    - Directory prefixes: `docs/` (matches any file in docs directory)
-    - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Directory prefixes: `docs/` (the same as `docs/**`)
+    - Globs: `**.md` (matches any markdown file), `libs/*/samples/**`
+    - Default: `[]` for `checkShouldRun`; for `checkShouldRunTypeChecks`, `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']` — passing the option replaces that list rather than adding to it
 - `baseBranch?` - Base branch to compare against (default: `origin/main`)
+
+Both return whether the step should run, and, in GitHub Actions, append `should_run=<result>` to the file named by `GITHUB_OUTPUT`. An empty diff reads as "nothing changed" and so returns `false`.
 
 ### Code Formatting Utilities
 

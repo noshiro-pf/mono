@@ -1,4 +1,13 @@
-import { $, checkShouldRunTypeChecks } from 'ts-repo-utils';
+import { $, checkShouldRun, checkShouldRunTypeChecks } from 'ts-repo-utils';
+
+// Gate any step on the paths it cares about
+const shouldRunStyleChecks = await checkShouldRun({
+  pathsIgnore: ['experimental/'],
+});
+
+if (shouldRunStyleChecks) {
+  await $('npm run fmt:check');
+}
 
 // Use default settings (compare against origin/main)
 const shouldRun = await checkShouldRunTypeChecks();
