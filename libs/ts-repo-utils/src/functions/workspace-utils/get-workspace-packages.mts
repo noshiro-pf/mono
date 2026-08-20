@@ -7,13 +7,10 @@ import {
   isRecord,
   isString,
   Json,
+  Obj,
   Result,
 } from 'ts-data-forge';
-import {
-  type JsonValue,
-  type MutableFixedLengthTuple,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
+import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
 import { glob } from '../glob.mjs';
 import {
   defaultDependencyFields,
@@ -137,9 +134,5 @@ const getKeyValueRecordFromJsonValue = (
     return {};
   }
 
-  const entries = Object.entries(obj).filter(
-    (entry): entry is MutableFixedLengthTuple<2, string> => isString(entry[1]),
-  );
-
-  return Object.fromEntries(entries);
+  return Obj.filter(obj, isString);
 };

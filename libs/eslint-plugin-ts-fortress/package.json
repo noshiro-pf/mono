@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-fortress",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "private": false,
   "description": "ESLint rules that steer schema definitions toward ts-fortress idioms.",
   "keywords": [
@@ -54,7 +54,7 @@
     "z:vitest": "vitest --config ./configs/vitest.config.mts"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "8.66.0",
+    "@typescript-eslint/utils": "8.67.0",
     "ts-data-forge": "workspace:~",
     "ts-type-forge": "workspace:~"
   },

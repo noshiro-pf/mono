@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, isRecord, unknownToString } from 'ts-data-forge';
+import { Arr, isRecord, isString, Obj, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -106,13 +106,7 @@ const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
 };
 
 const stringRecord = (value: unknown): ReadonlyRecord<string, string> =>
-  !isRecord(value)
-    ? {}
-    : Object.fromEntries(
-        Object.entries(value).flatMap(([key, spec]) =>
-          typeof spec === 'string' ? [[key, spec] as const] : [],
-        ),
-      );
+  isRecord(value) ? Obj.filter(value, isString) : {};
 
 /** Keeps only the entries that name a package in this repository. */
 const internal = (

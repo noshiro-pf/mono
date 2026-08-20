@@ -140,7 +140,7 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 
 ### Release ワークフローが未公開バージョンを取りに行った
 
-`ts-repo-utils` を 10.2.0 へ上げる最初の changeset で、main の Release が `ci:version-packages` で落ちた。
+`ts-repo-utils` を 10.2.0 へ上げる最初の changeset で、main の Release が `changeset:version-packages` で落ちた。
 
 ```text
 Package "ts-codemod-lib" must depend on the current version of "ts-repo-utils": "10.1.8" vs "8.1.0"
@@ -273,7 +273,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **その後 1 回だけ動いて失敗した**（run 31644690884）。`update.githubActions: true` が `.github/workflows/` の action ピンも書き換えるため、App トークンに `workflows` 権限が無く push が拒否されていた。#1583 で付与済み
     - さらに、成功していたとしても 2 回目以降は必ず落ちる作りだった。`git push --force-with-lease` を値なしで使っているが、比較先の remote-tracking ref は `actions/checkout` が既定ブランチの分しか作らないため存在せず、既存ブランチへの push が `stale info` で拒否される（手元で再現・修正後に 3 連続実行が通ることも確認）。期待値を明示する形に変えた
     - `gh pr view <branch>` は merge 済みの PR も拾うため、1 回目がマージされた翌日は「PR 作成をスキップ→閉じた PR に auto-merge を付けようとして失敗」になる。state が `OPEN` のものだけを見るようにした
-- [ ] `chore/pnpm-update` がエラーになったら自動で Claude を起動して修正する workflow を追加する
+- [x] `chore/pnpm-update` がエラーになったら自動で Claude を起動して修正する workflow を追加する — **`auto-fix-pnpm-update.yml` を追加した。ただし secret を入れるまでは何もしない**
+    - **その後 `auto-fix-pnpm-update.yml` は削除した。** `CLAUDE_CODE_OAUTH_TOKEN` を入れないまま何も動かない状態が続いたため。以下は当時の検討の記録
     - 依存更新そのものは自動化できたが、**追随作業は人が要る**ことが分かっている。実例として `eslint-plugin-unicorn` v73 の major 更新は新ルールを 5 つ追加し、`eslint-config-typed` のルール表が `satisfies` を満たせずビルドが落ちて、PR の 20 チェック中 14 件が失敗した。修正内容は「新ルールに設定を与える」という定型作業
     - 起動条件は `workflow_run`（`pnpm update` の完了、または `chore/pnpm-update` に対する CI の失敗）が素直。どちらを見るかは、失敗が「workflow 自身の失敗」か「作られた PR の CI 失敗」かで分かれるので両方拾う必要がある
     - 検討が要る点
@@ -281,6 +282,14 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **暴走防止**: 同じ失敗で無限に起動しないよう、1 回の失敗につき 1 回まで。修正 commit が既に載っているブランチでは起動しない
         - **判断が要る修正は止める**: 上の unicorn の例では「どのルールを有効にするか」に判断が入った。機械的に直せない場合は PR にコメントを残して人に渡す
         - 失敗の内容を渡す手段（ログの取得と要約）
+    - 実装した形。上の 4 点はいずれも設計に落とした
+        - job は 2 つに分けた。**CI が `chore/pnpm-update` で失敗した場合**はそのブランチに commit を push する（既存 PR の auto-merge がそのまま効く）。**`pnpm update` 自身が失敗した場合**はブランチが無いことがあり原因も workflow 側なので、別 PR を作らせる
+        - **暴走防止は commit 数で数える。** `fix(deps): ` で始まる commit を `origin/main..HEAD` から数え、2 回で打ち切る。`pnpm update` は毎日 main からブランチを作り直すので、カウンタは放っておいてもリセットされる
+        - **push は App トークンで行う。** `GITHUB_TOKEN` の push は後続の workflow を起動しないため、修正しても CI が再実行されず PR は赤のままになる
+        - ログの取得は `additional_permissions: actions: read` と App の `permission-actions: read`
+        - **`CLAUDE_CODE_OAUTH_TOKEN` を入れるまで、この workflow は何もしない。** 最初の step が secret の有無を見て、無ければ run summary にその旨を書いて残りを skip する。CI は緑のまま
+        - 認証は `claude_code_oauth_token`。**subscription 契約で課金される**のはこちらで、`anthropic_api_key` は API 側の課金になる
+        - **長命トークンを secrets に置かない形は、subscription では今のところ取れない。** action は workload identity federation（`anthropic_federation_rule_id` + `anthropic_organization_id`）に対応しており、GitHub の OIDC トークンを交換するので secrets に鍵を残さずに済むが、これは Anthropic の **organization**（＝ API 側）に対する認証で、subscription には指す先の rule が無い
 - npm package のテスト
     - [x] 現在のリポジトリのソースコードをローカルに npm pack して動作するかチェックするテストを追加する
         - `pnpm run verify:npm-packages`（`tools/scripts/cmd/verify-npm-packages.mts`）。17 パッケージを pack し、`verify-npm-packages/local/` にパッケージごとの project として install して、それぞれに対して小さなプログラムを実行する。`main` / `module` / `types` / `exports` / `bin` が指すパスが tarball に実在するかも検査する。type-check.yml の matrix に追加済み

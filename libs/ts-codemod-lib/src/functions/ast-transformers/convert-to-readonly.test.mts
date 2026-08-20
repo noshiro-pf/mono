@@ -2203,6 +2203,50 @@ describe(convertToReadonlyTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('Mapped type key remapping', () => {
+    test.each([
+      {
+        name: 'Keeps the `as` clause when wrapping with Readonly',
+        source: dedent`
+          type DropSymbolKeys<R, V> = {
+            [K in keyof R as K extends symbol ? never : K]: V;
+          };
+        `,
+        expected: dedent`
+          type DropSymbolKeys<R, V> = Readonly<{
+            [K in keyof R as K extends symbol ? never : K]: V;
+          }>;
+        `,
+      },
+      {
+        name: 'Keeps the `as` clause when the readonly modifier is removed',
+        source: dedent`
+          type Renamed<R> = {
+            readonly [K in keyof R as \`get\${Capitalize<K & string>}\`]: R[K];
+          };
+        `,
+        expected: dedent`
+          type Renamed<R> = Readonly<{
+            [K in keyof R as \`get\${Capitalize<K & string>}\`]: R[K];
+          }>;
+        `,
+      },
+      {
+        name: 'Keeps the `as` clause alongside an optional modifier',
+        source: dedent`
+          type PartialRenamed<R> = {
+            [K in keyof R as K extends symbol ? never : K]?: R[K];
+          };
+        `,
+        expected: dedent`
+          type PartialRenamed<R> = Readonly<{
+            [K in keyof R as K extends symbol ? never : K]?: R[K];
+          }>;
+        `,
+      },
+    ])('$name', testFn);
+  });
+
   describe('Primitive and keyword types', () => {
     test.each([
       {

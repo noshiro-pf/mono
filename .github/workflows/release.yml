@@ -53,16 +53,16 @@ jobs:
 
       - name: Create Release Pull Request or Publish
         id: changesets
-        # v1 系に留めること。v2 は Changesets CLI v3 専用で、CLI v2 を検出すると
-        # 即エラーになる。入力名も全て改名されている
-        # （publish → publish-script, version → version-script,
-        #   title → pr-title, commit → commit-message）。
-        # 上げるなら @changesets/cli の v3 移行と下の with: の書き換えを同時に行う。
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
-          publish: pnpm run ci:publish
-          version: pnpm run ci:version-packages
-          title: 'chore: version packages'
-          commit: 'chore: version packages'
+          github-token: ${{ steps.app-token.outputs.token }}
+          publish-script: pnpm run changeset:publish
+          version-script: pnpm run changeset:version-packages
+          pr-title: 'chore: version packages'
+          commit-message: 'chore: version packages'
+          create-github-releases: true
+          push-git-tags: true
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          # Used by the `gh` CLI in `dist:github-release` to create/upload the
+          # tarball GitHub Release.
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

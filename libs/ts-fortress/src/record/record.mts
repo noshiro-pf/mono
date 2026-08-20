@@ -4,6 +4,8 @@ import {
   hasKey,
   isRecord,
   memoizeFunction,
+  Obj,
+  Optional,
   Result,
   tp,
 } from 'ts-data-forge';
@@ -182,24 +184,22 @@ export const record = <
     // prune keeps only the value paths represented by the shape;
     // unlike fill, it never fills in missing keys with default values
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Object.fromEntries(
-      Object.entries(shape).flatMap(([k, v]) => {
-        // Only optional keys can be absent in the input; required keys are
-        // statically guaranteed to be present.
-        if (v.optional === true) {
-          if (!hasKey(rec, k)) {
-            return [];
-          }
-
-          // For optional fields, if the value is undefined, keep it as undefined
-          if (rec[k] === undefined) {
-            return [tp(k, undefined)];
-          }
+    return Obj.filterMap(shape, (v, k) => {
+      // Only optional keys can be absent in the input; required keys are
+      // statically guaranteed to be present.
+      if (v.optional === true) {
+        if (!hasKey(rec, k)) {
+          return Optional.none;
         }
 
-        return [tp(k, v.prune(rec[k]))];
-      }),
-    ) as V;
+        // For optional fields, if the value is undefined, keep it as undefined
+        if (rec[k] === undefined) {
+          return Optional.some(undefined);
+        }
+      }
+
+      return Optional.some(v.prune(rec[k]));
+    }) as V;
   };
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

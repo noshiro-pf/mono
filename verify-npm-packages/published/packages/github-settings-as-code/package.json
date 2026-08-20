@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "github-settings-as-code": "2.1.2"
+    "github-settings-as-code": "3.0.0"
   }
 }

@@ -1,5 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+import { literal } from '../other-types/index.mjs';
 import { number, string } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
@@ -224,6 +225,21 @@ describe(keyValueRecord, () => {
       } as const;
 
       assert.isFalse(strNumRecord.is(x));
+    });
+  });
+
+  describe('prune', () => {
+    test('keeps every entry when all keys match the key type', () => {
+      assert.deepStrictEqual(strNumRecord.prune({ year: 2000, month: 12 }), {
+        year: 2000,
+        month: 12,
+      });
+    });
+
+    test('drops the entries whose key does not match the key type', () => {
+      const onlyA = keyValueRecord(literal('a'), number());
+
+      assert.deepStrictEqual(onlyA.prune({ a: 1, b: 2 }), { a: 1 });
     });
   });
 });
