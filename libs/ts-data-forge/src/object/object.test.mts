@@ -5,7 +5,8 @@ import {
   type UnknownRecord,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
-import { pipe } from '../functional/index.mjs';
+import { Optional, pipe } from '../functional/index.mjs';
+import { isString } from '../guard/index.mjs';
 import { Obj } from './object.mjs';
 
 describe('shallowEq', () => {
@@ -282,6 +283,124 @@ describe('map', () => {
     assert.deepStrictEqual(source, { a: 1, b: 2 });
 
     assert.notStrictEqual<UnknownRecord>(result, source);
+  });
+});
+
+describe('filter', () => {
+  test('should keep the entries the predicate accepts', () => {
+    const result = Obj.filter({ a: 1, b: 2 }, (value) => value > 1);
+
+    expectType<typeof result, Readonly<{ a?: 1; b?: 2 }>>('=');
+
+    assert.deepStrictEqual(result, { b: 2 });
+  });
+
+  test('should keep a record with an index signature total', () => {
+    const scores: ReadonlyRecord<string, number> = {
+      alice: 1,
+      bob: 2,
+    } as const;
+
+    const result = Obj.filter(scores, (value) => value > 1);
+
+    expectType<typeof result, ReadonlyRecord<string, number>>('=');
+
+    assert.deepStrictEqual(result, { bob: 2 });
+  });
+
+  test('should pass the key as the second argument', () => {
+    const result = Obj.filter({ a: 1, b: 2 }, (_value, key) => {
+      expectType<typeof key, 'a' | 'b'>('=');
+
+      return key === 'a';
+    });
+
+    assert.deepStrictEqual(result, { a: 1 });
+  });
+
+  test('should narrow the value type through a type guard', () => {
+    const mixed: UnknownRecord = { a: 1, b: 'x' } as const;
+
+    const result = Obj.filter(mixed, isString);
+
+    expectType<typeof result, ReadonlyRecord<string, string>>('=');
+
+    assert.deepStrictEqual(result, { b: 'x' });
+  });
+
+  test('should drop symbol keys, as Object.entries does', () => {
+    const sym = Symbol('s');
+
+    const result = Obj.filter({ a: 1, [sym]: 2 }, () => true);
+
+    expectType<typeof result, Readonly<{ a?: 1 }>>('=');
+
+    assert.deepStrictEqual(result, { a: 1 });
+  });
+
+  test('should handle an empty record', () => {
+    const result = Obj.filter({}, () => true);
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('should not mutate the source record', () => {
+    const source = { a: 1, b: 2 } as const;
+
+    Obj.filter(source, (value) => value > 1);
+
+    assert.deepStrictEqual(source, { a: 1, b: 2 });
+  });
+});
+
+describe('filterMap', () => {
+  test('should keep Optional.some and drop Optional.none', () => {
+    const result = Obj.filterMap({ a: 1, b: 2 }, (value) =>
+      value > 1 ? Optional.some(value * 10) : Optional.none,
+    );
+
+    expectType<typeof result, Readonly<{ a?: number; b?: number }>>('=');
+
+    assert.deepStrictEqual(result, { b: 20 });
+  });
+
+  test('should keep a record with an index signature total', () => {
+    const scores: ReadonlyRecord<string, number> = {
+      alice: 1,
+      bob: 2,
+    } as const;
+
+    const result = Obj.filterMap(scores, (value) =>
+      value > 1 ? Optional.some(value * 10) : Optional.none,
+    );
+
+    expectType<typeof result, ReadonlyRecord<string, number>>('=');
+
+    assert.deepStrictEqual(result, { bob: 20 });
+  });
+
+  test('should pass the key as the second argument', () => {
+    const result = Obj.filterMap({ a: 1, b: 2 }, (value, key) => {
+      expectType<typeof key, 'a' | 'b'>('=');
+
+      return key === 'a' ? Optional.some(value) : Optional.none;
+    });
+
+    assert.deepStrictEqual(result, { a: 1 });
+  });
+
+  test('should handle an empty record', () => {
+    const result = Obj.filterMap({}, () => Optional.none);
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('should not mutate the source record', () => {
+    const source = { a: 1, b: 2 } as const;
+
+    Obj.filterMap(source, (value) => Optional.some(value * 2));
+
+    assert.deepStrictEqual(source, { a: 1, b: 2 });
   });
 });
 

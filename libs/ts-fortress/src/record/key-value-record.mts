@@ -1,4 +1,4 @@
-import { Arr, isRecord, Result, tp } from 'ts-data-forge';
+import { Arr, isRecord, Obj, Optional, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type AnyType, type Type, type TypeOf } from '../type.mjs';
 import {
@@ -98,20 +98,14 @@ export const keyValueRecord = <K extends Type<string>, V extends AnyType>(
   const fill: Type<T>['fill'] = (a) =>
     isRecord(a)
       ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        (Object.fromEntries(
-          Object.entries(a).filter(
-            ([k, v]) => keyType.is(k) && valueType.is(v),
-          ),
-        ) as T)
+        (Obj.filter(a, (v, k) => keyType.is(k) && valueType.is(v)) as T)
       : defaultValue;
 
   // Keys not matching keyType are excess paths; values are pruned recursively.
   const prune = (a: T): T =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    Object.fromEntries(
-      Object.entries(a)
-        .filter(([k]) => keyType.is(k))
-        .map(([k, v]) => tp(k, valueType.prune(v))),
+    Obj.filterMap(a, (v, k) =>
+      keyType.is(k) ? Optional.some(valueType.prune(v)) : Optional.none,
     ) as T;
 
   return {

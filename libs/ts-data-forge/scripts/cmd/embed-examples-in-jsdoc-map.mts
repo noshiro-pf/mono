@@ -817,6 +817,8 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/object/omit-example.mts',
       'samples/src/object/from-entries-example.mts',
       'samples/src/object/map-example.mts',
+      'samples/src/object/filter-example.mts',
+      'samples/src/object/filter-map-example.mts',
       'samples/src/object/merge-example.mts',
       'samples/src/object/deep-pick-example.mts',
       'samples/src/object/deep-omit-example.mts',

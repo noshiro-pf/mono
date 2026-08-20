@@ -17,6 +17,7 @@ import {
   type UnknownRecord,
 } from 'ts-type-forge';
 import { Arr } from '../array/index.mjs';
+import { Optional } from '../functional/index.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 
 /**
@@ -398,6 +399,171 @@ export namespace Obj {
   };
 
   /**
+   * Keeps the entries whose value the predicate accepts, leaving the values
+   * themselves untouched.
+   *
+   * **Type Behavior**: the surviving keys are the keys of the source record,
+   * made optional — the predicate may reject any of them. A record keyed by an
+   * index signature stays total instead, because it names no specific key that
+   * could go missing.
+   *
+   * Passing a type guard narrows the value type of the result, which is what
+   * `Object.fromEntries(Object.entries(record).filter(guard))` loses.
+   *
+   * **Key handling**: keys reach the callback the way `Object.entries` yields
+   * them, so a numeric key `1` arrives as `'1'`. Symbol-keyed properties are
+   * not enumerated by `Object.entries`; they are dropped from both the result
+   * and its type.
+   *
+   * @example
+   *
+   * <!-- doc:embed:jsdoc:example:./samples/src/object/filter-example.mts -->
+   *
+   * ```ts
+   * const scores = { alice: 1, bob: 2 } as const;
+   *
+   * const passing = Obj.filter(scores, (value) => value > 1);
+   *
+   * assert.deepStrictEqual(passing, { bob: 2 });
+   *
+   * // The key is available as the second argument.
+   * const notAlice = Obj.filter(scores, (_value, key) => key !== 'alice');
+   *
+   * assert.deepStrictEqual(notAlice, { bob: 2 });
+   *
+   * // A type guard narrows the value type of the result.
+   * const mixed: UnknownRecord = { a: 1, b: 'x' } as const;
+   *
+   * const strings = Obj.filter(mixed, isString);
+   *
+   * assert.deepStrictEqual(strings, { b: 'x' });
+   * ```
+   *
+   * <!-- /doc:embed:jsdoc:example:./samples/src/object/filter-example.mts -->
+   *
+   * @template R - The type of the source record
+   * @template V2 - The type the guard narrows values to
+   * @param record - The record whose entries are filtered
+   * @param predicate - Called once per own enumerable string key, with the
+   *   value and the key
+   * @returns A new record holding only the accepted entries
+   */
+  export function filter<const R extends UnknownRecord, V2 extends R[keyof R]>(
+    record: R,
+    predicate: (
+      value: R[keyof R],
+      key: TsDataForgeInternals.MappedRecordKey<R>,
+    ) => value is V2,
+  ): TsDataForgeInternals.FilteredRecord<
+    TsDataForgeInternals.MappedRecord<R, V2>
+  >;
+
+  export function filter<const R extends UnknownRecord>(
+    record: R,
+    predicate: (
+      value: R[keyof R],
+      key: TsDataForgeInternals.MappedRecordKey<R>,
+    ) => boolean,
+  ): TsDataForgeInternals.FilteredRecord<R>;
+
+  export function filter<const R extends UnknownRecord>(
+    record: R,
+    predicate: (
+      value: R[keyof R],
+      key: TsDataForgeInternals.MappedRecordKey<R>,
+    ) => boolean,
+  ): TsDataForgeInternals.FilteredRecord<R> {
+    // `Object.entries` erases both the key and the value type of `R`, so the
+    // callback is widened once here instead of asserting on every entry.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const predicateWidened = predicate as (
+      value: unknown,
+      key: string,
+    ) => boolean;
+
+    return (
+      // `Object.entries` enumerates exactly the own enumerable string keys of
+      // `record`, and filtering only ever removes entries, so the result has a
+      // subset of those keys — which is what `FilteredRecord` claims.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Object.fromEntries(
+        Object.entries(record).filter(([k, v]) => predicateWidened(v, k)),
+      ) as never
+    );
+  }
+
+  /**
+   * Transforms and drops entries in one pass: the callback returns
+   * `Optional.some(value)` to keep an entry with a new value, or
+   * `Optional.none` to drop it.
+   *
+   * **Type Behavior**: as with {@link filter}, the surviving keys are the keys
+   * of the source record made optional, and a record keyed by an index
+   * signature stays total. Unlike {@link filter}, every kept value takes the
+   * type the callback returns.
+   *
+   * `Optional` rather than `undefined` marks the dropped entries, so a record
+   * whose values are legitimately `undefined` stays expressible.
+   *
+   * **Key handling**: keys reach the callback the way `Object.entries` yields
+   * them, so a numeric key `1` arrives as `'1'`. Symbol-keyed properties are
+   * not enumerated by `Object.entries`; they are dropped from both the result
+   * and its type.
+   *
+   * @example
+   *
+   * <!-- doc:embed:jsdoc:example:./samples/src/object/filter-map-example.mts -->
+   *
+   * ```ts
+   * const scores = { alice: 1, bob: 2 } as const;
+   *
+   * // `Optional.some` keeps an entry with a new value, `Optional.none` drops it.
+   * const labelled = Obj.filterMap(scores, (value, key) =>
+   *   value > 1 ? Optional.some(`${key}=${value}`) : Optional.none,
+   * );
+   *
+   * assert.deepStrictEqual(labelled, { bob: 'bob=2' });
+   * ```
+   *
+   * <!-- /doc:embed:jsdoc:example:./samples/src/object/filter-map-example.mts -->
+   *
+   * @template R - The type of the source record
+   * @template V2 - The type the callback returns for the entries it keeps
+   * @param record - The record whose entries are transformed and filtered
+   * @param mapFn - Called once per own enumerable string key, with the value
+   *   and the key
+   * @returns A new record holding only the kept entries, with mapped values
+   */
+  export const filterMap = <const R extends UnknownRecord, V2>(
+    record: R,
+    mapFn: (
+      value: R[keyof R],
+      key: TsDataForgeInternals.MappedRecordKey<R>,
+    ) => Optional<V2>,
+  ): TsDataForgeInternals.FilteredRecord<
+    TsDataForgeInternals.MappedRecord<R, V2>
+  > => {
+    // `Object.entries` erases both the key and the value type of `R`, so the
+    // callback is widened once here instead of asserting on every entry.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const mapFnWidened = mapFn as (value: unknown, key: string) => Optional<V2>;
+
+    return (
+      // `Object.entries` enumerates exactly the own enumerable string keys of
+      // `record`, and this only ever drops entries or replaces their values, so
+      // the result has a subset of those keys with `V2` values.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Object.fromEntries(
+        Object.entries(record).flatMap(([k, v]) => {
+          const mapped = mapFnWidened(v, k);
+
+          return Optional.isSome(mapped) ? [[k, mapped.value] as const] : [];
+        }),
+      ) as never
+    );
+  };
+
+  /**
    * Merges multiple records into a single record using `Object.assign`.
    * Later records override properties from earlier records with the same key.
    *
@@ -690,6 +856,27 @@ declare namespace TsDataForgeInternals {
   export type MappedRecord<R, V2> = Readonly<{
     [K in keyof R as K extends symbol ? never : K]: V2;
   }>;
+
+  /** `R` without the symbol keys `Object.entries` never visits. */
+  type StringKeyedRecord<R> = Readonly<{
+    [K in keyof R as K extends symbol ? never : K]: R[K];
+  }>;
+
+  /**
+   * The result of dropping entries from `R`: symbol keys go away, and the
+   * remaining keys become optional because a predicate may reject any of them.
+   *
+   * A record keyed by an index signature stays total instead. It names no
+   * specific key that could go missing, and `noUncheckedIndexedAccess` already
+   * adds `| undefined` on access, so making it `Partial` would add nothing and
+   * would only stop the result from being assignable back to the record type it
+   * came from.
+   */
+  export type FilteredRecord<R> = string extends keyof R
+    ? StringKeyedRecord<R>
+    : number extends keyof R
+      ? StringKeyedRecord<R>
+      : Readonly<{ [K in keyof R as K extends symbol ? never : K]?: R[K] }>;
 
   /**
    * Merges two object types where keys in B override keys in A, preserving optional modifiers.

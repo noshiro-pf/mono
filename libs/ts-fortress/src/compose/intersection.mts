@@ -1,4 +1,4 @@
-import { Arr, expectType, hasKey, isRecord, Result, tp } from 'ts-data-forge';
+import { Arr, expectType, hasKey, isRecord, Obj, Result } from 'ts-data-forge';
 import { type Intersection, type NonEmptyTuple } from 'ts-type-forge';
 import {
   hasRecordInternals,
@@ -118,15 +118,11 @@ export const intersection = <const Types extends NonEmptyTuple<AnyType>>(
  */
 const mergePruned = (x: unknown, y: unknown): unknown => {
   if (isRecord(x) && isRecord(y)) {
-    const xMergedWithY = Object.fromEntries(
-      Object.entries(x).map(([k, xv]) =>
-        tp(k, hasKey(y, k) ? mergePruned(xv, y[k]) : xv),
-      ),
+    const xMergedWithY = Obj.map(x, (xv, k) =>
+      hasKey(y, k) ? mergePruned(xv, y[k]) : xv,
     );
 
-    const yOnly = Object.fromEntries(
-      Object.entries(y).filter(([k]) => !hasKey(x, k)),
-    );
+    const yOnly = Obj.filter(y, (_yv, k) => !hasKey(x, k));
 
     return { ...xMergedWithY, ...yOnly };
   }
