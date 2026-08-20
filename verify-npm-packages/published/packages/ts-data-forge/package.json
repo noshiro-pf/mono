@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-data-forge": "14.3.0"
+    "ts-data-forge": "14.4.0"
   }
 }
