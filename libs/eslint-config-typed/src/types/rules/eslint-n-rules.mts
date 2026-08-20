@@ -1085,7 +1085,7 @@ namespace NoNewRequire {
 }
 
 /**
- * @description disallow string concatenation with `__dirname` and `__filename`
+ * @description disallow string concatenation with `__dirname`, `__filename`, and `import.meta` paths
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-path-concat.md
  *
  *  ```md
@@ -7510,6 +7510,22 @@ namespace PreferGlobalTimers {
 }
 
 /**
+ * @description enforce using `node:assert/strict` instead of `node:assert`.
+ * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-import/assert-strict.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferImportAssertStrict {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description enforce using the `node:` protocol when importing Node.js builtin modules.
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-node-protocol.md
  *
@@ -7523,6 +7539,46 @@ namespace PreferGlobalTimers {
  *  ```
  */
 namespace PreferNodeProtocol {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "version": {
+   *         "type": "string"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    version?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using `process.getBuiltinModule()` to load Node.js built-in modules
+ * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-process-get-builtin-module.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferProcessGetBuiltinModule {
   /**
    * ### schema
    *
@@ -7946,7 +8002,9 @@ export type EslintNRules = Readonly<{
   'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.RuleEntry;
   'n/prefer-global/url': PreferGlobalUrl.RuleEntry;
   'n/prefer-global/timers': PreferGlobalTimers.RuleEntry;
+  'n/prefer-import/assert-strict': PreferImportAssertStrict.RuleEntry;
   'n/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
+  'n/prefer-process-get-builtin-module': PreferProcessGetBuiltinModule.RuleEntry;
   'n/prefer-promises/dns': PreferPromisesDns.RuleEntry;
   'n/prefer-promises/fs': PreferPromisesFs.RuleEntry;
   'n/process-exit-as-throw': ProcessExitAsThrow.RuleEntry;
@@ -7992,5 +8050,6 @@ export type EslintNRulesOption = Readonly<{
   'n/prefer-global/url': PreferGlobalUrl.Options;
   'n/prefer-global/timers': PreferGlobalTimers.Options;
   'n/prefer-node-protocol': PreferNodeProtocol.Options;
+  'n/prefer-process-get-builtin-module': PreferProcessGetBuiltinModule.Options;
   'n/hashbang': Hashbang.Options;
 }>;

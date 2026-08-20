@@ -36,7 +36,13 @@ export const eslintNRules = {
   'n/prefer-global/text-encoder': 'off',
   'n/prefer-global/url-search-params': 'off',
   'n/prefer-global/url': 'off',
+  // Nothing here imports `node:assert`, and the strict entry point is the
+  // one worth landing on, so this costs nothing to keep on.
+  'n/prefer-import/assert-strict': 'error',
   'n/prefer-node-protocol': ['error', { version: '>=18.0.0' }],
+  // `process.getBuiltinModule()` only earns its keep where a builtin may be
+  // absent at runtime; the convention here is a static `node:` import.
+  'n/prefer-process-get-builtin-module': 'off',
   'n/prefer-promises/dns': 'off',
   'n/prefer-promises/fs': 'off',
   'n/process-exit-as-throw': 'off',
