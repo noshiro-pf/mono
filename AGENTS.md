@@ -83,6 +83,8 @@ dependency updates cannot break it.
 
 - Do not add `experimental/` to `pnpm-workspace.yaml`.
 - Do not "fix" code in `experimental/` as part of unrelated work.
+- A branch whose diff touches nothing but `experimental/` skips the work in
+  every check workflow — see "CI diff gates".
 - To revive something, move that one package to `libs/` or `apps/`, migrate its
   dependencies to the current libraries (`@noshiro/ts-utils` → `ts-data-forge`,
   `@noshiro/ts-type-utils` → `ts-type-forge`, `@noshiro/io-ts` → `ts-fortress`),
@@ -138,6 +140,45 @@ commands run those across every workspace member that defines them, and the
   document (e.g. `README.md`) named in the package's
   `scripts/cmd/embed-examples.mts`.
 - `pnpm run docs:deps` — regenerate `docs/package-dependencies.md`.
+
+## CI diff gates
+
+The push-triggered workflows carry no `paths-ignore`. A workflow that a path
+filter skips never reports a status check, and most of these jobs are required
+ones, so a pull request that changed only the filtered paths would wait forever
+on a check that never arrives. Each job instead starts with a `Check diff` step
+and every later step carries
+`if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
+does no work.
+
+The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
+two lists in the root `package.json`, one per kind of check:
+
+- `z:check-should-run:code-checks` — `type-check.yml` and
+  `node-version-compatibility.yml`. Ignores `experimental/`, the root `docs/`,
+  `**.md`, `**.txt`, `LICENSE`, and the style tools' own configuration
+  (`.prettierrc`, `.cspell.config.yaml`, …).
+- `z:check-should-run:style-checks` — `style-check.yml`. Ignores
+  `experimental/` and nothing else. The rest of that matrix reads markdown,
+  regenerates READMEs, or globs every file under a package directory, so the
+  wider list would skip those checks exactly when they should fail.
+
+Add a path to a list only when **no** command that workflow runs reads it.
+`experimental/` qualifies for both: it is outside the pnpm workspace and
+excluded from ESLint, tsc, knip, Prettier, cspell and markdownlint alike.
+`articles/` and `books/` do not qualify for the style list — Prettier formats
+them.
+
+Two things to keep in mind when editing a gated workflow:
+
+- `run: exit 0` ends a step, not the job, so a step added to a gated job has to
+  carry the `if:` itself.
+- On a push to `main`, diffing against `origin/main` is a diff against `HEAD`,
+  which is empty and reads as "nothing changed" — every step would skip. Each
+  gate therefore compares against `github.event.before` on `main`.
+
+`verify-published-packages.yml` gates itself on the same principle but in
+shell, because its gate runs before Node.js is installed.
 
 ## Important Instructions
 
@@ -323,7 +364,7 @@ keep it that way; breaking any one of them reintroduces a cycle.
   `ts-repo-utils` before anything is built. Every `tsx` invocation in a
   `package.json` script uses it. Our own CLIs are invoked the same way, through
   their source under `libs/*/src/cmd/`, not through `node_modules/.bin` — CI
-  steps such as `check-should-run-type-checks` run before the build.
+  steps such as the `check-should-run` diff gate run before the build.
 - **A package's `build` only type-checks what it publishes.** Declaration emit
   (`configs/tsconfig.build.json`) covers `src/`. Tests, `scripts/`, `configs/`
   and `eslint.config.mts` import the toolchain, which is built later, so they

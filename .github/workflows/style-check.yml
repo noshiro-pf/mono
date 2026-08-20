@@ -9,8 +9,9 @@ on:
     # No `paths-ignore` here. Every job in this matrix is a required status
     # check, and a workflow that a path filter skips never reports one — so a
     # pull request changing only the filtered files waits on checks that will
-    # never arrive. The same reason type-check.yml gates its steps rather than
-    # its trigger.
+    # never arrive. Paths that do not concern this workflow are skipped a step
+    # at a time by the `Check diff` gate below, the same way type-check.yml
+    # does it.
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -56,25 +57,57 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # No `check-should-run-type-checks` gate here. Every entry in this
-      # matrix can be affected by a change the gate ignores: three of them
-      # check markdown, `ws:doc` regenerates the package READMEs, and
-      # `ws:check:ext` globs *every* file under the directories it is given —
-      # `libs/ts-data-forge/scripts` accepts `.md`, and a `.md` under any
-      # `src` is a failure — so the gate would skip it exactly when it should
-      # fail.
+      # NOTE: To include this workflow in the branch protection rule status
+      # check, skip each step instead of skipping the entire workflow with
+      # paths-ignore.
+      - name: Check diff
+        id: check_diff_style
+        # A much narrower list than type-check.yml's: `experimental/` and
+        # nothing else. Every entry in this matrix can be affected by a
+        # change the code-check gate ignores — three of them check markdown,
+        # `ws:doc` regenerates the package READMEs, and `ws:check:ext` globs
+        # *every* file under the directories it is given (`.md` is accepted
+        # under `libs/ts-data-forge/scripts` and a failure under any `src`) —
+        # so that gate would skip this exactly when it should fail.
+        # `experimental/` is different in kind: it is excluded from
+        # Prettier's, cspell's and markdownlint's globs and is outside the
+        # pnpm workspace, so no command here reads a byte of it.
+        #
+        # On a push to main, diffing against origin/main is a diff against
+        # HEAD itself, which comes back empty and reads as "nothing relevant
+        # changed" — so every step below would skip and the job would still
+        # report success. Compare with what main pointed at before the push
+        # instead.
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${GITHUB_REF_NAME}" != 'main' ]; then
+            pnpm run z:check-should-run:style-checks
+          elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
+            git fetch --depth=1 origin "${BEFORE}"
+            pnpm run z:check-should-run:style-checks --base-branch "${BEFORE}"
+          else
+            # A manual run, or the first push to the branch: there is nothing
+            # to compare against, so run everything rather than skip it.
+            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
+          fi
 
+      # `run: exit 0` ends the step, not the job — every step below has to
+      # carry the condition itself, as type-check.yml's do.
+      #
       # ws:doc and ws:check:ext load each package's sources, which import
       # workspace siblings and resolve through their `exports` map to dist/.
       # Nothing is built yet on a clean checkout, so these two need the
       # packages emitted first. The other matrix entries do not touch dist/,
       # so they skip the build.
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
+        if: steps.check_diff_style.outputs.should_run == 'true' && (matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext')
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
+        if: steps.check_diff_style.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
+        if: steps.check_diff_style.outputs.should_run == 'true'
         run: pnpm run z:assert-repo-is-clean
