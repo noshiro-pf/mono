@@ -333,6 +333,15 @@ changeset が要る。**ただしこの判断は後述の strict-typescript-lib#
 - `no-deprecated` を strict lib 由来のものに限って緩める
 - 消費者のエディタに赤が出ることを受け入れる
 
+**2026-08-15、3 つ目に決まった。** 消費者の環境で `src` に赤が出ることは許容する。
+このリポジトリは `@typescript-eslint/explicit-function-return-type` で関数の入出力に
+型注釈を強制しているため、推論に委ねられている箇所が少なく、lib の違いが波及する
+範囲がそもそも狭い。上の 2 つは、それぞれ Go to Definition の価値と lint の一貫性を
+失う代わりに得るものが小さい。
+
+この決定で、opt-in を止めていた条件は無くなった。以降のパッケージは
+`no-deprecated` の件数だけを見て進めてよい。
+
 `ts-type-forge` のように `files` が `["dist", …]` のパッケージにはこの制約が無い。
 
 ### 繰り返し出るパターン: `Object.fromEntries` が `Partial` を返す
