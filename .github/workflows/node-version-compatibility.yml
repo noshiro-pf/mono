@@ -8,7 +8,7 @@ on:
       - 'archive/**'
     # No `paths-ignore` here — see the note in style-check.yml. `.gitignore`
     # was the only entry, and the `Check diff` step below already ignores it:
-    # it is in `check-should-run-type-checks`' default list.
+    # it is in the `z:check-should-run:code-checks` list.
 
   workflow_dispatch:
 
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Fetch main
-        run: git fetch origin main # To allow check-should-run-type-checks to get the diff from main
+        run: git fetch origin main # To allow the diff gate below to get the diff from main
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -48,19 +48,26 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        # `check-should-run-type-checks` diffs against origin/main. On a push
-        # to main that is a diff against HEAD itself, which comes back empty
-        # and reads as "nothing relevant changed" — so every step below skips,
-        # the coverage upload among them, and the job still reports success.
-        # Compare with what main pointed at before the push instead.
+        # `z:check-should-run:code-checks` names the paths that neither this
+        # workflow nor type-check.yml looks at — `experimental/`, prose, and
+        # the style tools' own configuration — and reports
+        # `should_run=false` when the diff touches nothing else. The list
+        # lives in the root package.json so that the two workflows cannot
+        # drift apart.
+        #
+        # It diffs against origin/main. On a push to main that is a diff
+        # against HEAD itself, which comes back empty and reads as "nothing
+        # relevant changed" — so every step below skips and the job still
+        # reports success. Compare with what main pointed at before the push
+        # instead.
         env:
           BEFORE: ${{ github.event.before }}
         run: |
           if [ "${GITHUB_REF_NAME}" != 'main' ]; then
-            pnpm run z:check-should-run-type-checks
+            pnpm run z:check-should-run:code-checks
           elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
             git fetch --depth=1 origin "${BEFORE}"
-            pnpm run z:check-should-run-type-checks --base-branch "${BEFORE}"
+            pnpm run z:check-should-run:code-checks --base-branch "${BEFORE}"
           else
             # A manual run, or the first push to the branch: there is nothing
             # to compare against, so run everything rather than skip it.

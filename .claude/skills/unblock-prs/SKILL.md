@@ -170,9 +170,11 @@ push to the branch, and go back to watching. Auto-merge survives the push, so a
 green result merges the PR without another command. Do not re-rebase for a fix
 unless `main` has moved.
 
-`type-check` jobs gate on `z:check-should-run-type-checks`, which diffs against
-`origin/main`. A job that reports green having skipped its steps is expected on a
-docs-only branch, not a problem to chase.
+`type-check` and `node-version-compatibility` jobs gate on
+`z:check-should-run:code-checks`, and `style-check` jobs on
+`z:check-should-run:style-checks`; both diff against `origin/main`. A job that
+reports green having skipped its steps is expected on a docs-only branch (or,
+for every workflow, an `experimental/`-only one), not a problem to chase.
 
 ## 5. It merged — then go round again
 

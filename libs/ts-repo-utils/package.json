@@ -30,6 +30,7 @@
   "types": "./dist/types.d.mts",
   "bin": {
     "assert-repo-is-clean": "./dist/cmd/assert-repo-is-clean.mjs",
+    "check-should-run": "./dist/cmd/check-should-run.mjs",
     "check-should-run-type-checks": "./dist/cmd/check-should-run-type-checks.mjs",
     "format-diff-from": "./dist/cmd/format-diff-from.mjs",
     "format-uncommitted": "./dist/cmd/format-uncommitted.mjs",

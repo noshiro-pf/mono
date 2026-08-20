@@ -55,7 +55,7 @@ const documents: DeepReadonly<
       '011-repo-is-dirty.mts',
       '012-assert-repo-is-clean.mts',
       '013-get-diff-from-type.mts',
-      '014-check-should-run-type-checks.mts',
+      '014-check-should-run.mts',
       '015-format-files-glob.mts',
       '016-format-uncommitted-files.mts',
       '017-format-uncommitted-files-type.mts',
