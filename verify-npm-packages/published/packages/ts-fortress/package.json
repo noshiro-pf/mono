@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-fortress": "12.0.2"
+    "ts-fortress": "12.0.3"
   }
 }
