@@ -140,7 +140,7 @@ vitest browser mode は各テストファイルを Vite dev server 経由で取�
 
 ### Release ワークフローが未公開バージョンを取りに行った
 
-`ts-repo-utils` を 10.2.0 へ上げる最初の changeset で、main の Release が `ci:version-packages` で落ちた。
+`ts-repo-utils` を 10.2.0 へ上げる最初の changeset で、main の Release が `changeset:version-packages` で落ちた。
 
 ```text
 Package "ts-codemod-lib" must depend on the current version of "ts-repo-utils": "10.1.8" vs "8.1.0"
