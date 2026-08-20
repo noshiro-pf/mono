@@ -194,4 +194,4 @@ const defaultTypeCheckPathsIgnore = [
  * micromatch needs. Every other pattern is already one.
  */
 const toMatchPattern = (pattern: string): string =>
-  pattern.endsWith('/') ? `${pattern}**` : pattern;
+  pattern.endsWith('/') ? (`${pattern}**` as const) : pattern;
