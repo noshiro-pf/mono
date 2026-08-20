@@ -1,5 +1,13 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.9.3
+
+### Patch Changes
+
+- 332fd6b: Update dependencies
+- Updated dependencies [1fe0b59]
+    - ts-data-forge@14.4.0
+
 ## 5.9.2
 
 ### Patch Changes
