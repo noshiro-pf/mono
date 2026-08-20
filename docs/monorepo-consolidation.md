@@ -274,7 +274,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **残りの件数**: `ts-fortress` 4 / `ts-type-forge` 6 / `ts-data-forge` 11
     - **`ts-data-forge` の opt-in は外部要因待ち。** `class X extends Map/Set` が strict lib 下でコンパイルできない（strict lib 側の型定義の問題）。**別スレッドで修正対応中で、リリースされたら連絡が来る**。それまで着手しない
         - もう 1 つ、`@eslint/plugin-kit` が `types.cts` をソースのまま配っているため `skipLibCheck` でも覆えない問題がある
-    - 次に着手するのは `ts-fortress`（型 4 件は `feat/strict-ts-lib-fortress` に保全済み）→ `ts-type-forge`（6 件）→ 残り
+    - 次に着手するのは `ts-fortress` → `ts-type-forge` → 残り
+        - `feat/strict-ts-lib-fortress` は**ブランチを作っただけで commit していない**。型 4 件を直した内容は残っていないので、着手時に測り直すことになる。何が出たかは [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の「型チェック以外への影響」に書いてある
 - [ ] `libReplacement` のオンオフで `dist` が変わらないことを検査するスクリプトを `tools/scripts/` に追加する
     - opt-in のたびに手作業で確認している。`libs/*` の各パッケージについて、`libReplacement` を `true` / `false` にして `build` し、生成された `dist` に差分が無いことを検査する
     - **これが成り立つのは `@typescript-eslint/explicit-function-return-type` のおかげ**で、自動的に保証されるものではない。戻り値の型注釈が無い関数があると、`StrictLibInternals.ToObjectKeys<R>` のような strict lib 内部の型が `.d.mts` に漏れる。実測で確認済み（[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md)）
