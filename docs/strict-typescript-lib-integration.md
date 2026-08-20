@@ -251,6 +251,30 @@ tsconfig ではなく各パッケージの tsconfig に入れ、そのパッケ�
 継承したクラスの静的側など、いずれも strict lib の狙いどおりの指摘で、キャストで
 潰さずに直す必要がある。
 
+### パッケージごとの件数（2026-08-14 実測）
+
+ビルドが通っている状態で 1 パッケージずつ有効にして数えた。連鎖を含まない実数。
+
+| パッケージ           | 件数 | 状態                               |
+| :------------------- | ---: | :--------------------------------- |
+| `octokit-safe-types` |    0 | **opt-in 済み**                    |
+| `ts-repo-utils`      |    2 | 公開型の変更を伴う。後述           |
+| `ts-fortress`        |    4 | 未着手                             |
+| `ts-type-forge`      |    6 | 未着手                             |
+| `ts-data-forge`      |   11 | 9 件対応済み、2 件が外部要因で保留 |
+
+`ts-repo-utils` の 2 件は、strict lib の `Object.fromEntries` が `Partial<...>` を
+返すこと（entries が key の union を網羅しているとは限らないため。正しい厳しさ）と、
+`String.prototype.replaceAll` のコールバックのキャプチャ群が `unknown` になること。
+前者は `Package['dependencies']` の型を実態に合わせる話になり、**公開型が変わる**ので
+changeset が要る。**ただしこの判断は後述の strict-typescript-lib#117 より前のもの。**
+2026-08-20 に測り直した結果は「繰り返し出るパターン」の節に書いた。
+
+### opt-in のたびに確認すること
+
+`.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
+`octokit-safe-types` では 15 ファイルすべて同一だった。
+
 ### 型チェック以外への影響（2026-08-14 実測）
 
 `ts-fortress` で opt-in を試して分かった。**導入コストは型エラーの件数では測れない。**
@@ -373,7 +397,30 @@ const partialShape = Obj.map(shape, (v, k) =>
 上のコード例に出した `ts-fortress` の `record/partial.mts` にはまだ旧い形が残って
 いる。`Obj.map` に置き換えられる形だが、#1642 では触っていない。
 
-**見積りへの影響。** この種の指摘は strict lib の opt-in を待たずに消せるので、
-パッケージごとの型エラー件数は opt-in の直前に測り直す必要がある。ここに書いた
-`ts-fortress` 4 件 / `ts-repo-utils` 1 件はもう当てにならない。lint 21 件の方針決定
-（前節）のほうが残る課題として重い。
+#### `ts-repo-utils` の 2 件を測り直した（2026-08-20 実測）
+
+`libReplacement` を一時的に有効にして型チェックした。`dist-v7.0-0.0.0`（#117 前）の
+ままなので、件数は 2 件で変わっていない。
+
+```text
+scripts/cmd/sync-cli-versions.mts(66,9): error TS2769: No overload matches this call.
+src/functions/workspace-utils/get-workspace-packages.mts(84,11): error TS2322: Type
+'{ …; dependencies: Partial<MutableRecord<string | (string & {}), string>>; }[]'
+is not assignable to type 'readonly Readonly<{ …; dependencies:
+ReadonlyRecord<string, string>; }>[]'.
+```
+
+後者の型に `string | (string & {})` がそのまま出ている。これが #117 で消す arm で、
+key が素の `string` になれば union ではなくなり、`Partial` も付かない。**つまりこの
+1 件は `Package['dependencies']` の公開型を変えなくても消える。** 前掲の「公開型が
+変わるので changeset が要る」は #117 前の判断なので、新しい release が届いたら
+測り直すこと。
+
+なお `dependencies` を組み立てているこの `Object.fromEntries` は、#1642 で移行した
+`getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（84 行目、複数フィールドの
+record を 1 つにまとめている箇所）。record を 1 つにまとめる用途なので `Obj.merge` が
+候補になるが、まだ手を付けていない。
+
+**見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
+潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
+測り直す必要がある。残る課題として重いのは lint 21 件の方針決定（前節）のほう。
