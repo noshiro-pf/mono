@@ -1,3 +1,5 @@
+<!-- cspell:ignore Marp tsgolint -->
+
 # LLM × ESLint：ハーネスエンジニアリングで AI 出力精度を底上げする
 
 > スライド本編（Marp）に入る前の骨子・素材まとめ。各セクションがスライド 1〜2 枚に相当する想定。
@@ -20,8 +22,8 @@
 
 - LLM への「こう書いて」「これは禁止」は **その会話内でしか効かない**。次のセッション、別の人間のセッションでは消える。
 - CLAUDE.md / agents.md に規約を積んでも、量が増えるほど追従精度が落ち、しかも**「守ったかどうか」を機械的に検証する手段がない**。
-  - 守れていないことに気付くのはレビューワー or 本番。
-  - レビューワーが毎回同じ指摘を入れる → 時間とトークンを溶かす。
+    - 守れていないことに気付くのはレビューワー or 本番。
+    - レビューワーが毎回同じ指摘を入れる → 時間とトークンを溶かす。
 - **ふんわりした規律は LLM 駆動開発のスケールに耐えない**。
 
 → 解：規律は**機械可読な形（lint ルール）**に落とす。LLM は lint エラー駆動で動かす。
@@ -33,10 +35,10 @@
 - **ハーネス** = LLM の自由出力を、望ましい方向に矯正する治具・検査ライン。
 - 「自由作文 → 人間レビュー」ではなく、「自由作文 → 自動検査 → 自動修正 or LLM 再書き → 人間レビューは設計判断のみ」のループを作る。
 - ハーネスを構成する主要な要素（既存スタックで揃うもの）：
-  - 型システム（TypeScript strict / `noUncheckedIndexedAccess`）
-  - **lint ルール ← 本資料の主役**
-  - テスト（型レベル / 振る舞い両方）
-  - フォーマッタ、generated index、cspell など
+    - 型システム（TypeScript strict / `noUncheckedIndexedAccess`）
+    - **lint ルール ← 本資料の主役**
+    - テスト（型レベル / 振る舞い両方）
+    - フォーマッタ、generated index、cspell など
 - lint は **AST 単位で対象を絞れる**ため、「型では表現しにくいが、組織のローカル規約として強制したい」ものに最適。
 
 ```
@@ -56,29 +58,27 @@
 - カスタムルールは TypeScript で 1 ファイル数十〜200 行程度で書ける。
 - 構造（最小例）：
 
-  ```ts
-  export const myRule: Rule.RuleModule = {
-    meta: {
-      type: "problem",
-      docs: { description: "..." },
-      messages: { violate: "..." },
-      schema: [
-        /* options の JSON Schema */
-      ],
-      fixable: "code",
-    },
-    create(context) {
-      return {
-        ImportDeclaration(node) {
-          // node を見て context.report({...}) を呼ぶと違反になる
+    ```ts
+    export const myRule: Rule.RuleModule = {
+        meta: {
+            type: 'problem',
+            docs: { description: '...' },
+            messages: { violate: '...' },
+            schema: [/* options の JSON Schema */],
+            fixable: 'code',
         },
-      };
-    },
-  };
-  ```
+        create(context) {
+            return {
+                ImportDeclaration(node) {
+                    // node を見て context.report({...}) を呼ぶと違反になる
+                },
+            };
+        },
+    };
+    ```
 
 - `fixable: 'code'` を付け `fix: (fixer) => fixer.replaceText(...)` を返すと **`eslint --fix` で自動修正**される。
-  - これが LLM 駆動ループとの相性が抜群。
+    - これが LLM 駆動ループとの相性が抜群。
 - 型情報を使った高度なルール（型 X を持つ式は禁止、など）も `@typescript-eslint/parser` の services 経由で書ける。
 
 ---
@@ -105,7 +105,7 @@
 
 ## 5. 事例 A：リポジトリ専用ローカル plugin
 
-**場所**：`AutowareEvaluationDashboard/configs/eslint/plugins/`
+**場所**：`<private-repo>/configs/eslint/plugins/`
 
 このリポジトリの個別事情を AST レベルで強制する例。汎用 npm パッケージ化までする必要はないが、リポジトリ内に置いておくだけで十分価値が出る。
 
@@ -113,8 +113,8 @@
 
 - **やること**：`src/components/shared` のような特定ディレクトリ配下を相対 import で参照していたら、**barrel 経由の alias `~/components/shared` に矯正**する。
 - **なぜ必要**：
-  - LLM はリポジトリ全体のパス構造を覚えていられず、`../../../shared/...` のような fragile な相対 import を生成しがち。
-  - 移動・リネームで壊れる、レイヤ境界が読みづらくなる、import 行を見ても依存層が判らない。
+    - LLM はリポジトリ全体のパス構造を覚えていられず、`../../../shared/...` のような fragile な相対 import を生成しがち。
+    - 移動・リネームで壊れる、レイヤ境界が読みづらくなる、import 行を見ても依存層が判らない。
 - **ポリシー**：`tsconfig` の `paths` には barrel alias のみ登録、サブパス alias は許さない → ルール側もサブパスに連結せず alias 文字列そのものに置換。
 - **効用**：barrel 経由しか公開しないアーキテクチャを **AST レベルで保証**。自然言語で繰り返し言わなくて済む。
 - 規模感：**約 170 行 TS**。LLM に「こういう仕様で plugin 書いて」と依頼すれば 1 セッションで生成可能。
@@ -124,17 +124,17 @@
 - **やること**：レイヤー（依存階層）を線形配列で宣言し、**より高層から低層への import のみ許可**、逆方向（低層が高層に依存）を違反として報告する。
 - 設定例：
 
-  ```
-  layers: [
-    'src/utils',
-    'src/core',
-    'src/constants',
-    ...
-    'src/components/common',
-    'src/components/shared',
-    'src/components',
-  ]
-  ```
+    ```
+    layers: [
+      'src/utils',
+      'src/core',
+      'src/constants',
+      ...
+      'src/components/common',
+      'src/components/shared',
+      'src/components',
+    ]
+    ```
 
 - 各ファイルは「prefix が最も長く一致するレイヤー」に所属、その index で大小比較。
 - **なぜ必要**：LLM は雑に書くとレイヤー反転（utils → components など）を紛れ込ませる。レビューで気付いてから直すと手戻りが大きい。
@@ -167,8 +167,8 @@
 - AI が出す React コードは「業界の平均的な書き方」になる。リポジトリ固有の流儀（memo 必須、props の型位置、import 形式等）からは**静かにズレる**。
 - ルール化しておけば、生成直後に `eslint --fix` で**強制的に流儀に寄せられる**。
 - ルールごとに `.test.mts` が併設されており、**ルール本体に対して TDD が回せる**：
-  - LLM がルールを書く → テストが落ちる → LLM が直す、というループ。
-  - 「コードを書くハーネス」自体を「テストというハーネス」で管理している構造。
+    - LLM がルールを書く → テストが落ちる → LLM が直す、というループ。
+    - 「コードを書くハーネス」自体を「テストというハーネス」で管理している構造。
 
 ---
 
@@ -181,10 +181,10 @@ ESLint plugin と並んで、もうひとつ重要なハーネスが **codemod**
 ### 6.5.1 何をする codemod か
 
 - TypeScript の型定義中の **mutable な型を Readonly 系に自動変換**するトランスフォーマ。
-  - `T[]` → `readonly T[]`
-  - `[A, B]` → `readonly [A, B]`
-  - `{ x: number }` → `Readonly<{ x: number }>` または `DeepReadonly<{ ... }>`
-  - union/intersection を貫通して内側も Readonly 化
+    - `T[]` → `readonly T[]`
+    - `[A, B]` → `readonly [A, B]`
+    - `{ x: number }` → `Readonly<{ x: number }>` または `DeepReadonly<{ ... }>`
+    - union/intersection を貫通して内側も Readonly 化
 - 実装は `ts-morph` ベース。`DeepReadonly` の type 名、`applyLevel`、`ignorePrefixes`（`mut_` 始まりは除外）、行コメントによる disable など、実運用で必要な escape hatch が一通り入っている。
 
 ### 6.5.2 なぜこれを書いたか（バグ予防の観点）
@@ -195,33 +195,33 @@ ESLint plugin と並んで、もうひとつ重要なハーネスが **codemod**
 
 ### 6.5.3 規模感と「LLM 効きにくさ」の正直な話
 
-| 区分 | 行数 | コメント |
-|---|---|---|
-| 本体 `convert-to-readonly.mts` | **1,482 行** | union/intersection の正規化、parens 取り扱い、generic 再帰、行 disable コメント検出 …  AST 周りの細かい条件分岐が多い |
-| テスト `convert-to-readonly.test.mts` | **3,959 行** | Before/After ペアを大量に並べたケースベーステスト |
-| helpers (`readonly-transformer-helpers/`) | 約 250 行 | union のグルーピング、context、定数 |
+| 区分                                      | 行数         | コメント                                                                                                             |
+| ----------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| 本体 `convert-to-readonly.mts`            | **1,482 行** | union/intersection の正規化、parens 取り扱い、generic 再帰、行 disable コメント検出 … AST 周りの細かい条件分岐が多い |
+| テスト `convert-to-readonly.test.mts`     | **3,959 行** | Before/After ペアを大量に並べたケースベーステスト                                                                    |
+| helpers (`readonly-transformer-helpers/`) | 約 250 行    | union のグルーピング、context、定数                                                                                  |
 
 - 一方、§5 の **ESLint plugin（`use-alias-import` ≒ 170 行、`import-layer-order` ≒ 200 行）は LLM 駆動でほぼ手動 0、1 セッションで動くものが出た**。
 - この **codemod は LLM 駆動 100% では収束しなかった**。主な理由（推察）：
-  - `ts-morph` の API 表面が広く、ノードの種類ごとに「親 parens を残すべきか取るべきか」「DeepReadonly に包むべきか中で readonly に落とすべきか」など**意味論を伴う判断**が連鎖する。
-  - union/intersection の正規化、tuple と array の差、generic 引数の伝播など、**1 ファイル内に局所化されない不変条件**が多く、リファクタごとに既存ケースを壊しやすい。
-  - ESLint のように「ノードに対する独立した検査 + 自動修正」という**疎結合な単位**に分解できず、トランスフォーマ全体の状態（`ReadonlyContext`）が効いてくる。
+    - `ts-morph` の API 表面が広く、ノードの種類ごとに「親 parens を残すべきか取るべきか」「DeepReadonly に包むべきか中で readonly に落とすべきか」など**意味論を伴う判断**が連鎖する。
+    - union/intersection の正規化、tuple と array の差、generic 引数の伝播など、**1 ファイル内に局所化されない不変条件**が多く、リファクタごとに既存ケースを壊しやすい。
+    - ESLint のように「ノードに対する独立した検査 + 自動修正」という**疎結合な単位**に分解できず、トランスフォーマ全体の状態（`ReadonlyContext`）が効いてくる。
 - 結果として、本体ロジックは手動実装が大半。**ただしテストケース生成は LLM が大いに効いた** — 「こういう Before/After のペアを 30 個出して」という指示に、Readonly のあらゆる組み合わせを網羅したケースを生成させられた。
 
 ### 6.5.4 教訓（実体験ベース）
 
 - **LLM 駆動が効きやすいタスク**：
-  - 単一ノードに閉じた検査（ESLint rule）
-  - 規約が明確で、テストケースで Before/After が定義しやすい
-  - 状態が小さい・無い
+    - 単一ノードに閉じた検査（ESLint rule）
+    - 規約が明確で、テストケースで Before/After が定義しやすい
+    - 状態が小さい・無い
 - **LLM 駆動が苦手なタスク**：
-  - AST 全体に渡る意味論的整合性が必要な変換
-  - 既存ケースを壊さずに新ケースを足す（リグレッション制御）
-  - `ts-morph` のように API 表面が広く、選択肢が多いライブラリ
+    - AST 全体に渡る意味論的整合性が必要な変換
+    - 既存ケースを壊さずに新ケースを足す（リグレッション制御）
+    - `ts-morph` のように API 表面が広く、選択肢が多いライブラリ
 - **タスクの種類によらず効くこと**：
-  - **テストケース生成**（網羅性を出す）
-  - 小さなヘルパー関数や型定義の generation
-  - ドキュメント・コメント生成
+    - **テストケース生成**（網羅性を出す）
+    - 小さなヘルパー関数や型定義の generation
+    - ドキュメント・コメント生成
 
 → 投資する順序：**まず lint plugin から増やす**、codemod は「**自分が骨格を書いて LLM にテストを大量に書かせる**」ハイブリッドが現実的。
 
@@ -253,10 +253,10 @@ ESLint plugin と並んで、もうひとつ重要なハーネスが **codemod**
 - ESLint で覆えない領域（Python, Rust, YAML, Protobuf, SQL, 社内 DSL …）も、AST パーサさえあれば自前 linter / codemod を構築可能。
 - 「ゼロから lint ツールを書く」は従来は重い投資だったが、LLM 駆動なら**週末プロジェクト規模**に降りてきた。
 - 想定される自前ツール例：
-  - 社内シナリオ DSL（YAML 等）の静的検証ツール
-  - 旧 API → 新 API の自動移行 codemod
-  - リポジトリ横断の禁止 import スキャナ
-  - protobuf スキーマの後方互換チェッカ
+    - 社内シナリオ DSL（YAML 等）の静的検証ツール
+    - 旧 API → 新 API の自動移行 codemod
+    - リポジトリ横断の禁止 import スキャナ
+    - protobuf スキーマの後方互換チェッカ
 - **静的検証の自前増殖力こそが、LLM 駆動開発のスケーラビリティを決める**。
 - ただし §6.5 のとおり、**書き換え系（codemod）はまだ人間の手が要るタスク**。投資配分は「lint plugin を量で増やす + codemod は骨格人間 / テスト LLM のハイブリッド」が現実解。
 
@@ -294,9 +294,9 @@ ESLint plugin と並んで、もうひとつ重要なハーネスが **codemod**
 
 ## 付録 B：本編で使う想定のコード抜粋（参考リンク）
 
-- `AutowareEvaluationDashboard/configs/eslint/plugins/use-alias-import.mts`
-- `AutowareEvaluationDashboard/configs/eslint/plugins/import-layer-order.mts`
-- `AutowareEvaluationDashboard/configs/eslint/plugins/local-plugin.mts`
+- `<private-repo>/configs/eslint/plugins/use-alias-import.mts`
+- `<private-repo>/configs/eslint/plugins/import-layer-order.mts`
+- `<private-repo>/configs/eslint/plugins/local-plugin.mts`
 - `noshiro-pf/eslint-config-typed/src/plugins/react-coding-style/rules/rules.mts`
 - `noshiro-pf/eslint-config-typed/src/plugins/react-coding-style/rules/display-name.mts`
 - `noshiro-pf/eslint-config-typed/src/plugins/react-coding-style/rules/props-type-annotation-style.mts`

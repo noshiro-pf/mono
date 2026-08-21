@@ -96,6 +96,8 @@ style: |
     .accent { color: #b91c1c; font-weight: bold; }
 ---
 
+<!-- cspell:ignore atrule hljs Marp monokai tsgolint -->
+
 <!-- _class: title -->
 
 # LLM × ESLint
@@ -195,9 +197,7 @@ export const myRule: Rule.RuleModule = {
         type: 'problem',
         fixable: 'code',
         messages: { violate: '...' },
-        schema: [
-            /* JSON Schema for options */
-        ],
+        schema: [/* JSON Schema for options */],
     },
     create(context) {
         return {
@@ -252,7 +252,7 @@ export const myRule: Rule.RuleModule = {
 
 ## リポジトリ専用ローカル plugin
 
-[`AutowareEvaluationDashboard/configs/eslint/plugins/`](https://github.com/tier4/AutowareEvaluationDashboard/tree/trunk/configs/eslint/plugins)
+[`<private-repo>/configs/eslint/plugins/`](https://github.com/tier4/<private-repo>/tree/trunk/configs/eslint/plugins)
 
 ---
 
@@ -325,7 +325,7 @@ import { Bar } from '~/components/shared';
 
 ## コーディングスタイル系の汎用ルール
 
-[`eslint-config-typed/src/plugins/react-coding-style/`](https://github.com/noshiro-pf/eslint-config-typed/tree/main/src/plugins/react-coding-style)
+[`eslint-config-typed/src/plugins/react-coding-style/`](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-config-typed/src/plugins/react-coding-style)
 
 ---
 
@@ -392,7 +392,7 @@ MyComponent.displayName = 'MyComponent';
 
 ## LLM が手こずった例：codemod
 
-[`ts-codemod-lib/.../convert-to-readonly.mts`](https://github.com/noshiro-pf/ts-codemod-lib/blob/main/src/functions/ast-transformers/convert-to-readonly.mts)
+[`ts-codemod-lib/.../convert-to-readonly.mts`](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.mts)
 
 ---
 
@@ -605,12 +605,11 @@ f(r[1]);
 
 <br>
 
-**参考リポジトリ**
+**参照リポジトリ**
 
 <div class="refs">
 
-- `AutowareEvaluationDashboard/configs/eslint/plugins/`
-- `noshiro-pf/eslint-config-typed/src/plugins/react-coding-style/`
-- `noshiro-pf/ts-codemod-lib/src/functions/ast-transformers/`
+- `noshiro-pf/mono/libs/eslint-config-typed/src/plugins/react-coding-style/`
+- `noshiro-pf/mono/libs/ts-codemod-lib/src/functions/ast-transformers/`
 
 </div>

@@ -23,7 +23,7 @@ branch back to `BEHIND`. A batch rebase therefore runs a full CI matrix per
 branch and throws all but the first away. Never rebase a second PR while one is
 still in flight.
 
-Invoking this skill is the explicit instruction `AGENTS.md` asks for before
+Invoking this skill is the explicit instruction `CLAUDE.md` asks for before
 pushing: for one PR at a time, you may push to that PR's branch, force-pushing
 with `--force-with-lease`. Nothing on `main`, and no merges.
 
@@ -163,7 +163,7 @@ Two things about reproducing the rest:
   with a dirty tree afterwards is still a failure.
 
 Reproduce locally before pushing — a speculative fix costs another full matrix,
-which is the cost this whole loop exists to avoid. Fix the cause: `AGENTS.md`
+which is the cost this whole loop exists to avoid. Fix the cause: `CLAUDE.md`
 rules hold, so no file-level `eslint-disable`, no loosening `eslint.config.mts`,
 no `as any`. Then `pnpm run fmt`, commit with a Conventional Commits message,
 push to the branch, and go back to watching. Auto-merge survives the push, so a

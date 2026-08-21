@@ -1,3 +1,5 @@
+<!-- cspell:ignore println -->
+
 # 6 Enum とパターンマッチング
 
 ## 6.1 [Enum を定義する](https://doc.rust-jp.rs/book-ja/ch06-01-defining-an-enum.html#enum%E3%82%92%E5%AE%9A%E7%BE%A9%E3%81%99%E3%82%8B)

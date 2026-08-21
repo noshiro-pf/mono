@@ -1,3 +1,5 @@
+<!-- cspell:ignore catan dezero -->
+
 # `experimental/` の棚卸し
 
 `experimental/packages` に 74 個のワークスペースプロジェクトがある。step 3 の

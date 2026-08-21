@@ -6,6 +6,8 @@ topics: ['typescript', 'codemod', 'tsmorph', 'ast', 'compiler']
 published: true
 ---
 
+<!-- cspell:ignore jscodeshift tsmorph tsnode -->
+
 ## 更新履歴
 
 - (2025-05-15) ts-morph の API で躓いたポイントの具体例を追記

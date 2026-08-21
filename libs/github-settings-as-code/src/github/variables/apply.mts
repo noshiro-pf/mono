@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+
+// cspell:ignore lilpi
 import 'dotenv/config';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import {

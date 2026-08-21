@@ -1,3 +1,5 @@
+// cspell:ignore nargs
+
 import { ArgumentParser } from 'argparse';
 import { Arr, Num, asUint32 } from 'ts-data-forge';
 import { type DeepReadonly, type SafeUint, type Uint32 } from 'ts-type-forge';

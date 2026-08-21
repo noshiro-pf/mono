@@ -1,4 +1,4 @@
-// cspell-ignore-file
+// cspell:ignore Toooooooooooooooooooooooo
 /* transformer-ignore convert-to-readonly  */
 
 import * as React from 'react';

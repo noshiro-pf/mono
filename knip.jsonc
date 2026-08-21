@@ -1,3 +1,4 @@
+// cspell:ignore foldl
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
 
@@ -42,7 +43,7 @@
     // package, which pnpm refuses as a source of URL subdependencies.
     "@typescript/lib-*",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
-    // AGENTS.md.
+    // CLAUDE.md.
     "zenn-cli",
     // Named as strings in the root `.prettierrc`. Every package runs `fmt`
     // with its own directory as cwd, so each has to resolve them itself; knip

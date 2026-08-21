@@ -6,6 +6,8 @@ topics: ['javascript', 'typescript', 'react', 'frontend', 'spa']
 published: false
 ---
 
+<!-- cspell:ignore Dioxus HTMX Katz Qwik Resumability Yehuda -->
+
 :::message
 なるべく気を付けますが、自分はいずれのフレームワークについてもその開発者レベルで実装の詳細を熟知しているわけではありませんので、不正確になりうる点はご了承ください。誤りがあればぜひコメント欄でご指摘ください。
 :::
