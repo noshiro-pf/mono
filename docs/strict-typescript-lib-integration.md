@@ -505,3 +505,99 @@ pnpm 自身のチェックより網羅的でもある。直接依存も見るし
 
 `.pnpm/` の下を直接 `paths` で指す案は不可。ディレクトリ名が URL エンコードを含み
 （`strict-ts-lib-v7.0-es5@https+++github.com+…tgz`）、リリースごとに変わる。
+
+## リリース戦略の再設計（2026-08-21 議論）
+
+上の「残る選択肢: 上流で 1 tarball 化する」を、配布側の制約を確認したうえで詰めた。
+**結論は「per-lib 分割をやめて 1 パッケージに集約する」で、配置先（npm か GitHub
+Release か）は二次的な選択**になる。
+
+### 分割していた理由と、それが失効した経緯
+
+per-lib に分けていたのは、**推移的依存として自動解決させるため**だった。消費側は
+メタパッケージ 1 件を入れるだけでよく、tsconfig の `paths` も要らない。これは
+**GitHub Packages を使う社内環境で実証されていた**もので、設計としては筋が通って
+いた。
+
+崩れたのは配置先が変わったときである。npm registry への publish がレート制限で
+失敗し、GitHub Release のアセットに移した。この時点で依存は URL になり、pnpm は
+URL の**推移的**依存を拒否する（`blockExoticSubdeps`）。回避には
+`blockExoticSubdeps: false` に加えて `publicHoistPattern` も要る — つまり
+**「設定なしで pnpm install 一発」という分割の唯一の利点は、GitHub Release へ移した
+時点で既に失われていた**。残ったのはリリースコストだけ、というのが現状の正確な
+評価になる。
+
+### 配布側の制約（確定事項）
+
+|                 |                                              |
+| :-------------- | -------------------------------------------: |
+| TypeScript 系統 |                            12（v5.0 … v7.0） |
+| flavor          |                    2（非 branded / branded） |
+| パッケージ数    |               約 107 / flavor（v7.0 で実測） |
+| 生成物サイズ    | v7.0 で 4.7MB（branded 4.8MB）、全系統 163MB |
+
+生成スクリプトの共通定義を変更すると全系統にパッチが波及するため、最悪ケースの
+publish 数は **12 × 2 × 約 107 ≒ 2,400**。1 バージョン分（214）でもレート制限に
+当たった実績があるので、**per-lib × npm registry は恒久的に不可能**。GitHub Packages
+は公開パッケージでも読み取りに認証が要るため、外部利用者に PAT を要求することに
+なり、これも採らない。
+
+### 分割に消費者価値は無い
+
+`libReplacement` は `lib` 設定の**閉包**を要求する。`lib: ["ESNext", "DOM"]` なら
+数十個が芋づるで必要になるので、「`@typescript/lib-es2015-proxy` だけ入れる」は
+成立しない。実際、README のペーストブロックも mono の 107 行も all-or-nothing
+だった。粒度を保つ対価（1 リリース約 200 アセット、差分アップロード判定、バッチと
+リトライ、107 エントリのリリースノート）は、誰の役にも立たないまま払われていた。
+
+### 集約すると、URL 配布のままでも消費側の設定が消える
+
+見落としやすい点。`blockExoticSubdeps` が禁じるのは **subdependency** の URL 依存
+だけで、**直接依存の URL は常に許可される**（pnpm 11.22.0 の
+`resolveDependencies.js` は `options.currentDepth > 0` を条件にしている。実測でも
+一致）。
+
+したがって 107 個を内包した tarball を GitHub Release に置くだけで、消費側の URL は
+直接依存 1 件になり、`blockExoticSubdeps: false` も `publicHoistPattern` も不要に
+なる。
+
+| 配布形                            | 消費側 pnpm 設定                                   | 消費側 tsconfig |
+| :-------------------------------- | :------------------------------------------------- | :-------------- |
+| per-lib × URL（#1652 時点の現状） | `blockExoticSubdeps: false` + `publicHoistPattern` | 不要            |
+| **bundle × URL**                  | **なし**                                           | `paths` 1 行    |
+| **bundle × npm**                  | **なし**                                           | `paths` 1 行    |
+| per-lib × npm                     | `publicHoistPattern` のみ                          | 不要            |
+
+per-lib × npm が消費側には最も楽（`npm:` エイリアス経由のレジストリ依存は exotic
+ではないことを実測で確認済み）だが、上のとおり配布側が不可能なので選べない。
+
+### 推奨
+
+1. **集約する。** これは配置先と独立に正しい
+2. 配置先は **npm を第一候補**にする。publish 数が 12 × 2 = 24 に落ちるので、共通
+   定義の変更でも changesets が捌ける規模になる。まず v7.0 の 2 個で試して、制限に
+   当たらないことを確認してから残りへ広げる
+3. npm が通れば、名前を系統ごとに増やすのをやめて **「flavor = パッケージ名、
+   TypeScript マイナー = バージョンの major.minor」** に寄せる案がある
+   （`strict-ts-lib@~7.0.1`）。`@types/node` が Node のメジャーに追随するのと同じ
+   流儀。名前が 12 個から 2 個に減り、`~7.0` で系統内の修正だけ受け取れる
+4. npm が通らなければ、同じ bundle 形を GitHub Release に置く。消費側の差分は
+   「`npm:` 指定か URL 指定か」の 1 行だけで、集約という判断は無駄にならない
+
+### 静かに失敗する経路への対策
+
+`paths` を書き忘れた、あるいは子の tsconfig が `paths` を上書きした場合、**エラーも
+警告も出ないまま置き換えだけが起きない**。mono は 18 プロジェクト中 15 が自前の
+`paths` を持つので、移行時にはこの二段構えを入れる。
+
+1. **構文レベル** — `paths` を持つ tsconfig に `@typescript/lib-*` の項があることを
+   `check:root` で検査する（`check:root:lockfile` と同規模のスクリプト）
+2. **意味レベル** — strict lib 下でのみ型エラーになるフィクスチャ（`parseInt('10', 1)`
+   など）を用意し、opt-in 済みパッケージで**それが落ちること**を検査する。置き換えが
+   実際に効いていることを直接測る唯一の方法で、配布形が今後変わっても効く
+
+### mono 側の受け入れ作業（上流が bundle を出した後）
+
+1 PR で収まる見込み。依存 1 行の差し替え、15 ファイルへの `paths` 追加、
+`blockExoticSubdeps` と `publicHoistPattern` の削除、`check:root:lockfile` を
+「`tarball:` は 0 件」への強化、上記の検査 1〜2 本。
