@@ -156,10 +156,11 @@ commands run those across every workspace member that defines them, and the
 The push-triggered workflows carry no `paths-ignore`. A workflow that a path
 filter skips never reports a status check, and most of these jobs are required
 ones, so a pull request that changed only the filtered paths would wait forever
-on a check that never arrives. Each job instead starts with a `Check diff` step
-and every later step carries
+on a check that never arrives. Each job instead carries a `Check diff` step and
+every later step carries
 `if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
-does no work.
+does no work. A second gate sits in front of that one — see "Draft pull
+requests".
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -186,9 +187,51 @@ Two things to keep in mind when editing a gated workflow:
 - On a push to `main`, diffing against `origin/main` is a diff against `HEAD`,
   which is empty and reads as "nothing changed" — every step would skip. Each
   gate therefore compares against `github.event.before` on `main`.
+- A step added _before_ the `Check diff` step carries the draft condition
+  instead, `if: steps.check_draft.outputs.is_draft != 'true'`; one added after
+  it needs nothing new, because the diff gate is itself skipped on a draft.
 
 `verify-published-packages.yml` gates itself on the same principle but in
 shell, because its gate runs before Node.js is installed.
+
+## Draft pull requests
+
+A push to a branch whose open pull request is a draft does no work. The five
+push-triggered check workflows — `type-check.yml`, `style-check.yml`,
+`node-version-compatibility.yml`, `verify-published-packages.yml` and
+`backup-repository-settings.yml` — open with a `Check for a draft pull request`
+step, and the checkout, the install and the diff gate itself carry
+`if: steps.check_draft.outputs.is_draft != 'true'`. A `push` event knows only
+the branch it was pushed to, so that step asks the API (`gh pr list --head`)
+whether the open pull requests for that branch are drafts.
+
+The steps _after_ the diff gate need no new condition. They already hang off
+`steps.<gate-id>.outputs.should_run == 'true'`, and a step that was skipped has
+no outputs, so skipping the gate skips everything downstream of it.
+
+Three things keep this from becoming a hole in the required status checks:
+
+- **A workflow that skips on a draft also triggers on
+  `pull_request: types: [ready_for_review]`.** The job still runs and still
+  reports success while the pull request is a draft — a job that never reports
+  is exactly what `paths-ignore` would do, and leaves the pull request waiting
+  forever — so those green checks stand for work that did not happen. Marking
+  the pull request ready for review is not a push, so without that trigger
+  nothing would replace them and the branch would be mergeable having been
+  checked by nothing. Its checkout takes
+  `ref: github.event.pull_request.head.sha` so the run sees the branch tip
+  rather than the merge commit GitHub synthesises for the event, which is what
+  a push would have seen.
+- **A branch with no open pull request runs everything.** Opening one is not a
+  push either, so a branch skipped on the strength of a pull request that does
+  not exist yet would never be checked.
+- **The lookup fails open.** A pull request the token cannot read is treated as
+  not a draft: running the checks needlessly is the harmless half of being
+  wrong.
+
+`main` never reaches the lookup, and neither does a `workflow_dispatch` run —
+asking for the checks by hand is asking for them regardless of the pull
+request's state.
 
 ## Spell checking
 
