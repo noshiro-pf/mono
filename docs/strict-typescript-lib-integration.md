@@ -469,4 +469,20 @@ export const keysInferred = (o: UnknownRecord) => Object.keys(o);
    ではなく**ソース**として配られているため `skipLibCheck` が効かない。
    `eslint-config-typed` を `paths` で source 解決していることで入ってくる
 
-この 2 つが片付くまで `ts-data-forge` の opt-in はできない。
+**2026-08-21 追記: 1 は片付いた。** `dist-v7.0-0.1.0` で `class X extends Map` /
+`extends Set` が通るようになった。その状態で `libReplacement` を有効にして測り直すと、
+**残る型エラーは 2 の 1 件だけ**である。
+
+2 のほうは動いていない。`@eslint/plugin-kit` は 0.7.2 が最新のままで、
+`dist/cjs/types.cts` はソースのまま配られている。**`paths` を dist に向けても消えない**
+ことを実測した — `skipLibCheck` が飛ばすのは `.d.ts` であって、`.cts` はどう辿り着いても
+ソースとして型検査されるためである。
+
+この 1 件を踏むのは `ts-data-forge` だけである。`configs/eslint/` から
+`eslint-config-typed` の型を import しているのがこのパッケージだけで、`configs/` は
+type-check の対象に入っている。他パッケージが `eslint-config-typed` を使うのは
+`eslint.config.mts` の中で、そちらは tsconfig の `include` から外れている。
+
+したがって選択肢は「上流が `.d.cts` を配るのを待つ」か「この型 import を type-check の
+対象外へ動かす」のどちらかで、**`ts-data-forge` の opt-in は今回のリリースでは
+完了しない**。
