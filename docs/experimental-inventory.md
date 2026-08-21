@@ -156,3 +156,57 @@ global-*                       → 明示 import
 
 `event-schedule-app` は 21136 行あり、Blueprint.js・Firebase・自作ルータに依存する
 ので最後に回すのが妥当。
+
+### 「連れてくる utils」は 6 つでは済まない
+
+上の表の 6 つは `event-schedule-app` の `dependencies` を直接読んだもので、**その
+先は数えていない**。実際に復元して分かった連鎖はこう。
+
+```text
+event-schedule-app
+└─ react-blueprintjs-utils (4432)
+   ├─ react-utils-styled (347)
+   │  └─ resize-observer-react-hooks (55)   ← 復元済み
+   ├─ syncflow-react-hooks                  ← libs/synstate-react-hooks が後継、復元不要
+   ├─ @blueprintjs/{core,datetime,datetime2,icons}
+   └─ @emotion/{react,styled}
+```
+
+`resize-observer-react-hooks` と `react-utils-styled` は表に載っていない。
+`syncflow-react-hooks` だけは既に `libs/synstate-react-hooks` があるので復元不要。
+
+### Blueprint は v6 以外に選択肢が無い
+
+`react-blueprintjs-utils` の依存は `@blueprintjs/core@^5` で、npm の最新は 6.18.0。
+当初は「v5 のまま入れるか v6 へ上げるか」の判断だと考えたが、peer dependency を見た
+ら選択の余地は無かった。
+
+|                            | react peer              |
+| :------------------------- | :---------------------- |
+| `@blueprintjs/core@5.16.2` | `^16.8 \|\| 17 \|\| 18` |
+| `@blueprintjs/core@6.18.0` | `18 \|\| 19`            |
+
+**このリポジトリの catalog は `react: 19.2.8`。** v5 は React 19 を peer に持たない
+ので、そのまま入れると peer の不整合になる。**v6 一択**で、4432 行のラッパに対する
+移行がそのまま作業になる。
+
+移行の範囲は測れる。アプリ側が `@blueprintjs/core` から使っている識別子は 21 個
+（`Button` / `Card` / `Popover` / `OverlayToaster` / `HTMLSelect` など）、import 箇所
+は 52。加えて `@blueprintjs/datetime` が 1 箇所。ラッパ側は `core` 14 / `datetime` 4
+/ `datetime2` 3。
+
+### `event-schedule-app` 本体の実測
+
+| 項目       | 値                                               |
+| :--------- | :----------------------------------------------- |
+| 行数       | 21136                                            |
+| ファイル数 | 314（`.ts` 192・`.tsx` 114・`.svg` 7・`.css` 1） |
+| 直接の依存 | 26（うち自作 14）                                |
+
+**拡張子が `.ts` / `.tsx` で、このリポジトリの `.mts` 規約と違う。** 復元時に 192
+ファイルの改名と、それに伴う import の書き換えが要る。
+
+宣言された自作依存のうち 2 つは、復元しなくてよい。
+
+- `@noshiro/fast-deep-equal` → `ts-data-forge` の `fastDeepEqual` が後継
+- `@noshiro/deep-object-diff` → **`src` から 1 回も import されていない**（宣言のみ）
