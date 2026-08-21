@@ -79,10 +79,17 @@ const findImpl = <E,>(
     predicate as () => boolean,
   );
 
-  expectType<
-    Parameters<typeof array.findIndex>[0],
-    (value: E, index: number, arr: readonly E[]) => unknown
-  >('=');
+  // Left as a comment rather than asserted. This pinned the shape of the
+  // standard library's `findIndex`, and the shape differs between the stock
+  // library and the strict one — `(value, index, obj: this) => boolean` there
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
+  // to consumers so that "Go to Definition" reaches it, so an assertion that
+  // only holds under one of them shows up as an error in their editor.
+  //
+  // expectType<
+  //   Parameters<typeof array.findIndex>[0],
+  //   (value: E, index: number, arr: readonly E[]) => unknown
+  // >('=');
 
   expectType<
     typeof predicate,
@@ -162,10 +169,17 @@ const findLastImpl = <E,>(
     predicate as () => boolean,
   );
 
-  expectType<
-    Parameters<typeof array.findIndex>[0],
-    (value: E, index: number, arr: readonly E[]) => unknown
-  >('=');
+  // Left as a comment rather than asserted. This pinned the shape of the
+  // standard library's `findIndex`, and the shape differs between the stock
+  // library and the strict one — `(value, index, obj: this) => boolean` there
+  // against `(value, index, arr: readonly E[]) => unknown` here. `src` ships
+  // to consumers so that "Go to Definition" reaches it, so an assertion that
+  // only holds under one of them shows up as an error in their editor.
+  //
+  // expectType<
+  //   Parameters<typeof array.findIndex>[0],
+  //   (value: E, index: number, arr: readonly E[]) => unknown
+  // >('=');
 
   expectType<
     typeof predicate,

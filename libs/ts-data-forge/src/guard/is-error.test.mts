@@ -1,4 +1,3 @@
-/* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-class-inheritance */
 /* eslint-disable unicorn/error-message */
 import { isError as isErrorBySindreSorhus } from '@sindresorhus/is';
@@ -129,14 +128,15 @@ describe('isError from @sindresorhus/is', () => {
   });
 
   test('should return false for errors created with Object.create', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const protoError = Object.create(Error.prototype);
+    // Built and then re-pointed rather than `Object.create(Error.prototype)`,
+    // which the strict standard library types as `unknown` — correctly, since
+    // it knows nothing about the resulting shape. The object under test is the
+    // same: Error.prototype in its chain, never constructed as an Error.
+    const mut_protoError = { message: 'proto error', name: 'ProtoError' };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    protoError.message = 'proto error';
+    Object.setPrototypeOf(mut_protoError, Error.prototype);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    protoError.name = 'ProtoError';
+    const protoError = mut_protoError;
 
     assert.isFalse(isErrorBySindreSorhus(protoError));
   });

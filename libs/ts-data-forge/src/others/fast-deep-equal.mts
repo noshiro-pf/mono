@@ -94,6 +94,13 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
     );
   }
 
-  // true if both NaN, false otherwise
-  return Number.isNaN(a) && Number.isNaN(b);
+  // true if both NaN, false otherwise. `Number.isNaN` takes a number: called
+  // with anything else it is always false, so the check belongs behind a
+  // `typeof` guard rather than relying on that.
+  return (
+    typeof a === 'number' &&
+    typeof b === 'number' &&
+    Number.isNaN(a) &&
+    Number.isNaN(b)
+  );
 };
