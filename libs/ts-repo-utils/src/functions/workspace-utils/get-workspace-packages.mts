@@ -10,11 +10,7 @@ import {
   Obj,
   Result,
 } from 'ts-data-forge';
-import {
-  type JsonValue,
-  type MutableRecord,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
+import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
 import { glob } from '../glob.mjs';
 import {
   defaultDependencyFields,
@@ -104,29 +100,16 @@ export const getWorkspacePackages = async (
   return finalPackages;
 };
 
-/**
- * Merges the named `package.json` fields into a single dependency map.
- *
- * Built by hand rather than with `Object.fromEntries`, whose strict-library
- * signature returns `Partial<...>` — entries are not known to cover the key
- * type. Here they do, and the explicit loop says so without an assertion.
- */
+/** Merges the named `package.json` fields into a single dependency map. */
 const mergeDependencyFields = (
   packageJson: JsonValue,
   dependencyFields: readonly DependencyField[],
-): ReadonlyRecord<string, string> => {
-  const mut_merged: MutableRecord<string, string> = {};
-
-  for (const field of dependencyFields) {
-    for (const [name, version] of Object.entries(
-      getKeyValueRecordFromJsonValue(packageJson, field),
-    )) {
-      mut_merged[name] = version;
-    }
-  }
-
-  return mut_merged;
-};
+): ReadonlyRecord<string, string> =>
+  Object.fromEntries(
+    dependencyFields.flatMap((field) =>
+      Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
+    ),
+  );
 
 const getStrFromJsonValue = (value: JsonValue, key: string): string =>
   isRecord(value) && hasKey(value, key) && isString(value[key])

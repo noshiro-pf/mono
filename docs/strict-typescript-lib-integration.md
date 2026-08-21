@@ -418,8 +418,11 @@ ReadonlyRecord<string, string>; }>[]'.
 後者の型に `string | (string & {})` がそのまま出ている。これが #117 で消す arm で、
 key が素の `string` になれば union ではなくなり、`Partial` も付かない。**つまりこの
 1 件は `Package['dependencies']` の公開型を変えなくても消える。** 前掲の「公開型が
-変わるので changeset が要る」は #117 前の判断なので、新しい release が届いたら
-測り直すこと。
+変わるので changeset が要る」は #117 前の判断である。
+
+**`dist-v7.0-0.1.0`（2026-08-20）で実際にそうなった。** 測り直したところ、
+`Object.fromEntries` をそのまま書いても通る。したがってこの 1 件のために書いていた
+回避は不要になり、下の節のとおり素直な形に戻した。
 
 なお `dependencies` を組み立てているこの `Object.fromEntries` は、#1642 で移行した
 `getKeyValueRecordFromJsonValue` とは**別の呼び出し**である（複数フィールドの record を
@@ -427,8 +430,8 @@ key が素の `string` になれば union ではなくなり、`Partial` も付�
 タプルを受ける可変長引数で、返り値も `MergeAll<Records>` という「どの record が来たか」に
 依存した型である。ここでまとめるのは `dependencyFields` の長さぶんの**実行時に決まる配列**
 なので、その形に乗らない。加えて `Obj.merge` 自身も内部は `Object.fromEntries` + `as never`
-なので、`Partial` が消えるのは表明を図書館側に移したからにすぎない。下の節のとおり、
-明示的なループで組み立てた。
+なので、`Partial` が消えるのは表明を図書館側に移したからにすぎない。**lib 側が直った今は
+どちらも要らず、`Object.fromEntries` をそのまま書けばよい。**
 
 **見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
@@ -652,9 +655,14 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 型 2 件・lint 7 件。**どちらも、標準 lib でも通る形に直せた**ので、この
 パッケージには「どちらの lib を前提にするか」の分岐が残っていない。
 
+**うち 1 件は lib 側が直したので、こちらでは何もしないのが正解になった**
+（`dist-v7.0-0.1.0`）。回避として書いていた明示的なループは取り消し、
+`Object.fromEntries` に戻してある。残る 1 件と lint 7 件は下表のとおり
+こちら側の修正である。
+
 | 指摘                                          | 直し方                                           |
 | :-------------------------------------------- | :----------------------------------------------- |
-| `Object.fromEntries` が `Partial<...>` を返す | `fromEntries` をやめて明示的に組み立てる         |
+| `Object.fromEntries` が `Partial<...>` を返す | lib 側の不具合。`dist-v7.0-0.1.0` で解消         |
 | `replaceAll` のキャプチャ群が `unknown`       | 可変長引数で受けて `isString` で絞る             |
 | `String` が `@deprecated`（lint 7 件）        | `unknownToString`（`ts-data-forge`）に置き換える |
 
