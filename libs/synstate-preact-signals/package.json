@@ -64,7 +64,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
-    "@preact/signals": "2.11.0",
+    "@preact/signals": "2.11.1",
     "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
