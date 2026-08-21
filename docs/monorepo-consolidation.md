@@ -271,10 +271,13 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **繰り返し出ていた `Object.fromEntries` の `Partial` は解消した。** 半分は strict lib 側のバグで、キーの種類にかかわらず `string & {}` を足していたため `Record<string, V>` のキーまで union 扱いになっていた（[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117) で修正）。残り半分は entries 配列を経由する書き方そのものの限界なので、`Obj.map`（#1638）と `Obj.filter` / `Obj.filterMap`（#1642）を `ts-data-forge` に足して呼び出し側を移行した。標準 lib でも通るので opt-in を待たずに済ませられる。ただし #117 は mono が指す `dist-v7.0-0.0.0` より後の変更なので、新しい release が出て URL を貼り替えるまで lib 側の修正は届かない
     - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する
         - **opt-in 済み**: `octokit-safe-types`（型 0 件、#1614）
-        - **PR 提出済み・未マージ**: `ts-repo-utils`（型 2 件・lint 7 件、#1618）。`ts-data-forge` は「どちらの lib でも同じに読める」形に揃えた #1613 があるが、opt-in 自体はまだ
+        - **PR 提出済み・未マージ**: `ts-repo-utils`（#1618）。`ts-data-forge` は「どちらの lib でも同じに読める」形に揃えた #1613 があるが、opt-in 自体はまだ
+            - `ts-repo-utils` の型 2 件は**実質 1 件になった**。`Object.fromEntries` の件は lib 側の不具合だったので、回避として書いていた明示的なループは #1618 で取り消してある
         - **残りの件数**: `ts-fortress` 4 / `ts-type-forge` 6 / `ts-data-forge` 11
-    - **`ts-data-forge` の opt-in は外部要因待ち。** `class X extends Map/Set` が strict lib 下でコンパイルできない（strict lib 側の型定義の問題）。**別スレッドで修正対応中で、リリースされたら連絡が来る**。それまで着手しない
-        - もう 1 つ、`@eslint/plugin-kit` が `types.cts` をソースのまま配っているため `skipLibCheck` でも覆えない問題がある
+    - **`ts-data-forge` の opt-in を止めていた 2 件のうち 1 件は解消した（2026-08-21）。** strict lib の `dist-v7.0-0.1.0` で `class X extends Map/Set` が通るようになり、`Object.fromEntries` が `Record<string, V>` を `Partial` にする件も直った。URL の貼り替えは #1651
+        - **残るのは `@eslint/plugin-kit` の 1 件だけ。** `dist/cjs/types.cts` を `.d.cts` ではなくソースとして配っているため `skipLibCheck` が効かない。`paths` を dist に向けても消えないことを実測した（`skipLibCheck` が飛ばすのは `.d.ts` で、`.cts` はどう辿り着いてもソースとして検査される）。上流は 0.7.2 が最新のまま
+        - **踏むのは `ts-data-forge` だけ。** `configs/eslint/` から `eslint-config-typed` の型を import しているのがこのパッケージだけで、`configs/` は type-check の対象に入っている。他は `eslint.config.mts` の中で使っていて、そちらは `include` の外
+        - 選べるのは「上流が `.d.cts` を配るのを待つ」か「この型 import を type-check の対象外へ動かす」のどちらか
     - 次に着手するのは `ts-fortress` → `ts-type-forge` → 残り
         - `feat/strict-ts-lib-fortress` は**ブランチを作っただけで commit していない**。型 4 件を直した内容は残っていないので、着手時に測り直すことになる。何が出たかは [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の「型チェック以外への影響」に書いてある
 - [ ] `libReplacement` のオンオフで `dist` が変わらないことを検査するスクリプトを `tools/scripts/` に追加する
