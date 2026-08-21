@@ -1,4 +1,3 @@
-// cspell:ignore foldl
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
 
@@ -43,7 +42,7 @@
     // package, which pnpm refuses as a source of URL subdependencies.
     "@typescript/lib-*",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
-    // CLAUDE.md.
+    // AGENTS.md.
     "zenn-cli",
     // Named as strings in the root `.prettierrc`. Every package runs `fmt`
     // with its own directory as cwd, so each has to resolve them itself; knip
@@ -109,13 +108,6 @@
       ],
     },
 
-    // Not an Astro site like the entry below assumes: plain TypeScript with a
-    // single entry point.
-    "apps/io-ts-types": {
-      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
-      "project": ["**/*.mts"],
-    },
-
     // Not an Astro site like the entry below assumes: a React hook library with
     // a single entry point.
     "apps/better-react-use-state": {
@@ -124,9 +116,21 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-utils-styled": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/resize-observer-react-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
     },
 
     "apps/*": {
