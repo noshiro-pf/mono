@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 23 個。
+このリポジトリの workspace パッケージは 24 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -14,6 +14,7 @@
 graph LR
   better_react_use_state["better-react-use-state"]
   io_ts_types["io-ts-types"]
+  react_blueprintjs_utils["react-blueprintjs-utils"]
   react_utils["react-utils"]
   react_utils_styled["react-utils-styled"]
   resize_observer_react_hooks["resize-observer-react-hooks"]
@@ -37,6 +38,10 @@ graph LR
   ts_type_forge["ts-type-forge"]
   io_ts_types --> ts_data_forge
   io_ts_types --> ts_fortress
+  react_blueprintjs_utils --> better_react_use_state
+  react_blueprintjs_utils --> io_ts_types
+  react_blueprintjs_utils --> react_utils
+  react_blueprintjs_utils --> ts_data_forge
   react_utils --> better_react_use_state
   react_utils --> ts_data_forge
   react_utils_styled --> better_react_use_state
@@ -107,7 +112,7 @@ graph LR
 |    2 | `ts-data-forge`                                                                                                                                                                                                              |
 |    3 | `react-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
 |    4 | `io-ts-types`, `react-utils-styled`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                       |
-|    5 | `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                  |
+|    5 | `react-blueprintjs-utils`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                       |
 
 ### 参考: devDependencies も含めた場合
 
@@ -120,6 +125,8 @@ graph LR
 | `better-react-use-state`      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                          |
 | `io-ts-types`                 | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
 | `io-ts-types`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
+| `react-blueprintjs-utils`     | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`io-ts-types`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                 |
+| `react-blueprintjs-utils`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `react-utils`                 | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                         |
 | `react-utils`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `react-utils-styled`          | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`resize-observer-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                 |
@@ -162,7 +169,7 @@ graph LR
 | `ts-repo-utils`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
 | `ts-type-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                |
 
-23 / 23 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+24 / 24 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

@@ -124,6 +124,12 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-blueprintjs-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,ts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-utils-styled": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],

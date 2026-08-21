@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // The private packages here have no build output, so their types come
+    // straight from their sources.
+    "paths": {
+      "better-react-use-state": ["../better-react-use-state/src/index.mts"],
+      "io-ts-types": ["../io-ts-types/src/index.mts"],
+      "react-utils": ["../react-utils/src/index.mts"],
+      "react-utils-styled": ["../react-utils-styled/src/index.mts"],
+      "resize-observer-react-hooks": [
+        "../resize-observer-react-hooks/src/index.mts"
+      ]
+    }
+  },
+  "include": ["./src"]
+}
