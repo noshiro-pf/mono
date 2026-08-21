@@ -109,6 +109,13 @@
       ],
     },
 
+    // Not an Astro site like the entry below assumes: plain TypeScript with a
+    // single entry point.
+    "apps/io-ts-types": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
     "apps/*": {
       "entry": [
         "src/pages/**/*.{astro,mts,ts,tsx}",
