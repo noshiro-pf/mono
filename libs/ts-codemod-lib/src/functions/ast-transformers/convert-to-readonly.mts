@@ -1280,6 +1280,26 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 };
 
 const unionToString = ({
+  types: typesRaw,
+  op,
+  wrapWithReadonly,
+}: Readonly<{
+  types: readonly string[];
+  op: '&' | '|';
+  wrapWithReadonly: boolean | string;
+}>): string => {
+  // The members arrive as `getFullText()`, which carries the whitespace in
+  // front of each one, and they are joined with a separator that supplies its
+  // own space. Left alone, that whitespace accumulates: every run of the
+  // transformer adds one more space before every member but the first, so a
+  // file never reaches a fixed point. Comments live in the same trivia and are
+  // not whitespace, so trimming keeps them.
+  const types = typesRaw.map((s) => s.trim());
+
+  return unionToStringImpl({ types, op, wrapWithReadonly });
+};
+
+const unionToStringImpl = ({
   types,
   op,
   wrapWithReadonly,
