@@ -6,6 +6,13 @@
   ],
   "compilerOptions": {
     "paths": {
+      // The strict standard library. Every built-in library lives inside the
+      // one `strict-ts-lib-v7.0` package, so this wildcard is what points
+      // `libReplacement` at it. `paths` is replaced — not merged — by a config
+      // that `extends` another, so a package defining any `paths` of its own
+      // has to repeat this one; `check:root:tsconfig-lib-paths` enforces that,
+      // because a missing entry disables the replacement with no diagnostic.
+      "@typescript/lib-*": ["../../node_modules/strict-ts-lib-v7.0/libs/*"],
       "ts-repo-utils": ["./src/entry-point.mts"]
     }
   },

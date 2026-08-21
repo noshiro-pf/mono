@@ -443,18 +443,23 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   `workspace:*`.
 - `linkWorkspacePackages` is left at its default (`false`). Only an explicit
   `workspace:` specifier links locally.
-- **The strict standard library is the one URL dependency, and it arrives
-  through a single declaration.** `strict-ts-lib-v7.0` is a devDependency at the
-  root; its own 107 `@typescript/lib-*` dependencies are GitHub Release URLs, so
-  two settings in `pnpm-workspace.yaml` carry them the rest of the way:
-  `blockExoticSubdeps: false` lets pnpm resolve them at all, and
-  `publicHoistPattern` puts them in the root `node_modules` where
-  `libReplacement` looks. Neither works without the other. Do not re-declare the
-  107 packages, and do not drop either setting.
-    - `blockExoticSubdeps` is repository-wide and takes no allow list, so
-      `pnpm run check:root:lockfile` stands in for it: every `tarball:` in
-      `pnpm-lock.yaml` has to point at the strict standard library's releases.
-      Install anything else from the registry. See
+- **The strict standard library is one ordinary registry dependency.**
+  `strict-ts-lib-v7.0` is a devDependency at the root, and every built-in
+  library ships inside it under `libs/`. Nothing in `pnpm-workspace.yaml`
+  supports it any more: the URL layout that needed `blockExoticSubdeps: false`
+  and `publicHoistPattern` is gone, and neither setting should come back.
+    - **What connects it to TypeScript is `paths`, and that fails silently.**
+      `"@typescript/lib-*": [".../strict-ts-lib-v7.0/libs/*"]` is in the shared
+      type-check config, but `paths` is replaced — not merged — by a config that
+      `extends` another, so each of the 15 packages defining their own `paths`
+      repeats it. `pnpm run check:root:tsconfig-lib-paths` enforces that; a
+      package that opts in also carries a `@ts-expect-error` probe (see
+      `libs/octokit-safe-types/test/strict-lib-active.mts`) so that a
+      replacement which stops happening breaks the type check instead of
+      passing quietly.
+    - `pnpm run check:root:lockfile` keeps URL dependencies out entirely: pnpm
+      blocks them as subdependencies, but a direct one is always allowed and
+      `pnpm-update` auto-merges. See
       `docs/strict-typescript-lib-integration.md`.
 
 ## Building from a clean checkout

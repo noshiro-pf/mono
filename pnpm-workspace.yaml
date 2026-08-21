@@ -97,24 +97,3 @@ allowBuilds:
   esbuild: true
   sharp: true # apps/synstate-docs (Astro)
   unrs-resolver: true
-
-# 厳格版標準ライブラリは、107 個の `@typescript/lib-*` を個別に宣言するのではなく
-# メタパッケージ `strict-ts-lib-v7.0` 1 件だけを devDependency に持つ。その 2 つの
-# 設定がここにある。どちらか一方だけでは効かない。
-#
-# `blockExoticSubdeps`: メタパッケージの依存 107 個はすべて GitHub Release の URL
-# で、pnpm は既定でこれを推移的依存として拒否する（ERR_PNPM_EXOTIC_SUBDEP）。
-# 許可リストは無く boolean だけなので、リポジトリ全体で解くことになる。代わりに
-# `check:root:lockfile` が pnpm-lock.yaml の `tarball:` を全件検査し、
-# strict-typescript-lib 以外の URL 依存が入ったら落とす。pnpm 自身のチェックは
-# ロックファイル由来の解決をスキップするので、こちらのほうが網羅的でもある。
-#
-# `publicHoistPattern`: 推移的依存は `node_modules/.pnpm/` の下に入るだけで、
-# root の `node_modules/@typescript/` には並ばない。TypeScript の `libReplacement`
-# は tsconfig のあるディレクトリから上へ node_modules を辿るだけなので、ホイスト
-# しないと 107 個を一度も見つけられない。既定値は `[]` なので、ここで指定しても
-# 潰れる既定は無い。
-blockExoticSubdeps: false
-
-publicHoistPattern:
-  - '@typescript/lib-*'

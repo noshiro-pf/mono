@@ -5,21 +5,18 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when `pnpm-lock.yaml` resolves a package from a URL outside the strict
- * standard library's releases.
+ * Fails when `pnpm-lock.yaml` resolves any package from a URL.
  *
  * pnpm blocks URL dependencies in subdependencies by itself
- * (`ERR_PNPM_EXOTIC_SUBDEP`), but the strict standard library is delivered that
- * way: one `strict-ts-lib-v7.0` tarball whose own 107 `@typescript/lib-*`
- * dependencies are release URLs. Allowing it means `blockExoticSubdeps: false`
- * in `pnpm-workspace.yaml`, and that setting is repository-wide — pnpm takes a
- * boolean, not an allow list. `pnpm-update` opens auto-merged pull requests, so
- * without something in its place a URL dependency could arrive without review.
+ * (`ERR_PNPM_EXOTIC_SUBDEP`, on by default), but a **direct** URL dependency is
+ * always allowed — and `pnpm-update` opens auto-merged pull requests, so
+ * without something in its place one could arrive without review.
  *
- * This is that something, and it is stricter than what it replaces in two ways:
- * it covers direct dependencies as well as subdependencies, and it reads the
- * lockfile rather than the resolution pass, which pnpm skips whenever a
- * resolution is already recorded there.
+ * The strict standard library used to be the exception here: ~107
+ * `@typescript/lib-*` release URLs, which forced `blockExoticSubdeps: false`
+ * repository-wide and left this check to allow that one host. It ships as a
+ * single package on the registry now, so the exception is gone and the rule is
+ * the simple one: nothing is installed from a URL.
  */
 export const checkLockfileTarballs = async (): Promise<
   Result<number, string>
@@ -37,29 +34,24 @@ export const checkLockfileTarballs = async (): Promise<
     );
   }
 
-  const tarballs = collectTarballs(lockfile.value);
-
-  const offenders = tarballs.filter(
-    ({ url }) => !url.startsWith(ALLOWED_TARBALL_PREFIX),
-  );
+  const offenders = collectTarballs(lockfile.value);
 
   if (!Arr.isNonEmpty(offenders)) {
-    return Result.ok(tarballs.length);
+    return Result.ok(0);
   }
 
   return Result.err(
     [
-      `${LOCKFILE_NAME} resolves ${offenders.length} package(s) from a URL outside`,
-      `${ALLOWED_TARBALL_PREFIX}:`,
+      `${LOCKFILE_NAME} resolves ${offenders.length} package(s) from a URL:`,
       '',
       ...offenders.map(
         ({ lineNumber, url }) => `  ${LOCKFILE_NAME}:${lineNumber}  ${url}`,
       ),
       '',
       'A URL dependency skips the registry, the version range and',
-      "`minimumReleaseAge`. If the addition is deliberate, widen this check's",
-      'allow list in the same pull request; otherwise install the package from',
-      'the registry instead.',
+      '`minimumReleaseAge`. Install the package from the registry instead; if',
+      'a URL is genuinely the only channel, add the exception to this check in',
+      'the same pull request.',
     ].join('\n'),
   );
 };
@@ -70,14 +62,6 @@ type Tarball = Readonly<{
 }>;
 
 const LOCKFILE_NAME = 'pnpm-lock.yaml';
-
-/**
- * The strict standard library is published as GitHub Release assets rather than
- * to npm, which rate-limits bulk publishing of new package names. See
- * `docs/strict-typescript-lib-integration.md`.
- */
-const ALLOWED_TARBALL_PREFIX =
-  'https://github.com/noshiro-pf/strict-typescript-lib/releases/download/';
 
 /**
  * Every URL-resolved package in the lockfile, with the line it sits on.
@@ -106,9 +90,5 @@ if (isDirectlyExecuted(import.meta.url)) {
     process.exit(1);
   }
 
-  console.info(
-    result.value === 0
-      ? `${LOCKFILE_NAME} resolves every package from the registry.`
-      : `${LOCKFILE_NAME} resolves ${result.value} package(s) from a URL, all from the strict standard library's releases.`,
-  );
+  console.info(`${LOCKFILE_NAME} resolves every package from the registry.`);
 }

@@ -601,3 +601,44 @@ per-lib × npm が消費側には最も楽（`npm:` エイリアス経由のレ�
 1 PR で収まる見込み。依存 1 行の差し替え、15 ファイルへの `paths` 追加、
 `blockExoticSubdeps` と `publicHoistPattern` の削除、`check:root:lockfile` を
 「`tarball:` は 0 件」への強化、上記の検査 1〜2 本。
+
+## 移行完了（2026-08-21）
+
+上流が bundle 形へ移り、**全系統が npm に公開された**ので、予定していた受け入れを
+行った。`strict-ts-lib-v7.0` は URL ではなく **npm のレンジ依存**（`^0.2.0`）になり、
+`pnpm-workspace.yaml` の 2 設定は削除した。
+
+### 何が変わったか
+
+|                             | 移行前                                     | 移行後                                           |
+| :-------------------------- | :----------------------------------------- | :----------------------------------------------- |
+| root の宣言                 | GitHub Release の URL（旧 umbrella 0.1.0） | `"strict-ts-lib-v7.0": "^0.2.0"`                 |
+| `blockExoticSubdeps: false` | 必要                                       | **削除**（既定の `true` に戻った）               |
+| `publicHoistPattern`        | 必要                                       | **削除**                                         |
+| `node_modules`              | root に `@typescript/lib-*` が 107 個      | `strict-ts-lib-v7.0/libs/**` のみ                |
+| lockfile の `tarball:`      | 108 件                                     | **0 件**                                         |
+| tsconfig                    | 変更不要                                   | `@typescript/lib-*` → `libs/*` の `paths` が要る |
+
+lib の解決数は移行前後で変わらない（`--traceResolution` で 88/88、失敗 0）。
+per-lib パッケージのうち名前で引かれていたのは約 15 個だけで、残りはグループ
+パッケージの中に入れ子で同梱されていたため、**実効的な厳しさは同じ**である。
+`octokit-safe-types` の型チェックも移行前と同じくエラー 0 件で通る。
+
+### 静かな失敗への対策（両方入れた）
+
+1. **構文レベル** — `pnpm run check:root:tsconfig-lib-paths`。`paths` を定義する
+   tsconfig に `@typescript/lib-*` の項が無ければ落とす。`check:root` の一部なので
+   `check-all` と CI の `type-check (check:root)` が拾う。エントリを 1 つ外して
+   落ちることを確認済み
+2. **意味レベル** — `libs/octokit-safe-types/test/strict-lib-active.mts`。
+   strict lib でのみエラーになる式（`parseInt('10', 1)`）に `@ts-expect-error` を
+   付けてあるので、**置き換えが起きなくなった瞬間に型チェックが落ちる**
+   （`libReplacement: false` にすると `TS2578: Unused '@ts-expect-error' directive`
+   で落ちることを確認済み）。opt-in するパッケージごとに 1 つ置く
+
+### 残っていること
+
+`libReplacement: true` はまだ `octokit-safe-types` だけ。残りの opt-in は従来の
+順序（`ts-repo-utils` → `ts-fortress` → `ts-type-forge` → `ts-data-forge`）で進める。
+`paths` は全パッケージに入っているので、各パッケージで足すのは
+`"libReplacement": true` の 1 行だけになった。
