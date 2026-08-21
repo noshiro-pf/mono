@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 19 個。
+このリポジトリの workspace パッケージは 20 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -12,6 +12,7 @@
 
 ```mermaid
 graph LR
+  better_react_use_state["better-react-use-state"]
   io_ts_types["io-ts-types"]
   _synstate_docs["@synstate/docs"]
   eslint_config_typed["eslint-config-typed"]
@@ -91,7 +92,7 @@ graph LR
 
 | 段階 | パッケージ                                                                                                                                                                     |
 | ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    1 | `ts-type-forge`                                                                                                                                                                |
+|    1 | `better-react-use-state`, `ts-type-forge`                                                                                                                                      |
 |    2 | `ts-data-forge`                                                                                                                                                                |
 |    3 | `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
 |    4 | `io-ts-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`               |
@@ -105,6 +106,7 @@ graph LR
 
 | パッケージ                    | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                  |
 | :---------------------------- | :--- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `better-react-use-state`      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                          |
 | `io-ts-types`                 | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
 | `io-ts-types`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
 | `@synstate/docs`              | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-signals`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`                                                                                                                                                                  |
@@ -143,7 +145,7 @@ graph LR
 | `ts-repo-utils`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
 | `ts-type-forge`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                |
 
-19 / 19 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+20 / 20 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
