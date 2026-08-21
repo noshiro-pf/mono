@@ -1,3 +1,5 @@
+<!-- cspell:ignore hoge -->
+
 <!-- # TypeScript v4.3 の機能を使って immutable ライブラリの型付けを頑張る -->
 
 ## 目標

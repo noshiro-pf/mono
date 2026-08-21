@@ -1,3 +1,5 @@
+<!-- cspell:ignore Arnaud auvred corsa johnsoncodehk rslint Rstack tsgolint tsslint -->
+
 # 高速 TypeScript Linter への移行適性 調査レポート
 
 > 対象: `eslint-config-typed`（主要 ESLint プラグインの設定済み config + 独自カスタムルール実装を提供するライブラリ）

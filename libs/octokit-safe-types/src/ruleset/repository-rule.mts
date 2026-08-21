@@ -1,3 +1,5 @@
+// cspell:ignore fnmatch
+
 import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';

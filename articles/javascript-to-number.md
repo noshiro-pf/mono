@@ -6,6 +6,8 @@ topics: ['javascript', 'frontend']
 published: true
 ---
 
+<!-- cspell:ignore mathrm -->
+
 ## JavaScript で文字列を数値に変換する方法の例
 
 - `parseInt(x, 10)` = `Number.parseInt(x, 10)`

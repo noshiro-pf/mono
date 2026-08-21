@@ -1,3 +1,5 @@
+<!-- cspell:ignore Marp -->
+
 # llm-eslint-harness-slides
 
 Marp slides (and the outline they were written from) for the talk

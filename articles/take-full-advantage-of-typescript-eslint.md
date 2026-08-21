@@ -6,6 +6,8 @@ topics: ['typescript', 'eslint']
 published: true
 ---
 
+<!-- cspell:ignore looooooooooooooooooooooooong -->
+
 # 前書き
 
 ESLint は JavaScript, TypeScript のための静的検証ツールです。
