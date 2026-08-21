@@ -37,11 +37,11 @@
   ],
 
   "ignoreDependencies": [
-    // The strict standard library: TypeScript resolves `@typescript/lib-*` by
-    // itself when `libReplacement` is on, so nothing imports them by name.
-    // Declared at the root rather than through the `strict-ts-lib-v7.0` meta
-    // package, which pnpm refuses as a source of URL subdependencies.
-    "@typescript/lib-*",
+    // The strict standard library: the meta package pulls in the 107
+    // `@typescript/lib-*` packages, `publicHoistPattern` puts them in the root
+    // `node_modules`, and TypeScript resolves them by itself when
+    // `libReplacement` is on — so nothing imports any of it by name.
+    "strict-ts-lib-v7.0",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
     // CLAUDE.md.
     "zenn-cli",

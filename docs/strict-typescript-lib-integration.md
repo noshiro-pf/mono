@@ -225,6 +225,11 @@ GitHub Release の URL で、pnpm 11 は既定でこれを拒否する。
 入る経路ができる。107 個を root に直接宣言すれば防御は維持できる（実測で
 `node_modules/@typescript` に 107 個が並び、置き換えが効くことを確認した）。
 
+> **追記（2026-08-21）**: この「1 つでは足りない」は**半分だけ正しかった**。
+> `blockExoticSubdeps` の他にもう 1 つ設定が要り、それを入れればメタパッケージ 1 件
+> で足りる。防御は pnpm ではなくロックファイル側の自前チェックで維持する。
+> 「依存宣言を 1 件にまとめる」の節を参照。
+
 **3. `@typescript/lib-*` は誰も import しないので knip が unused と報告する。**
 理由付きで `ignoreDependencies` に入れる必要がある。
 
@@ -424,3 +429,79 @@ record を 1 つにまとめている箇所）。record を 1 つにまとめる
 **見積り全体について。** entries 配列を経由する書き方は、このように opt-in を待たずに
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
 測り直す必要がある。残る課題として重いのは lint 21 件の方針決定（前節）のほう。
+
+## 依存宣言を 1 件にまとめる（2026-08-21 実測）
+
+root の `package.json` は 236 行のうち 107 行が `@typescript/lib-*` の URL だった。
+これをメタパッケージ `strict-ts-lib-v7.0` 1 件に畳んだ。**pnpm の設定が 2 つ要る。
+どちらか一方だけでは効かない。**
+
+| 制約                                                                                           | 効く設定                                    |
+| :--------------------------------------------------------------------------------------------- | :------------------------------------------ |
+| メタパッケージの依存 107 個がすべて URL → `ERR_PNPM_EXOTIC_SUBDEP`                             | `blockExoticSubdeps: false`                 |
+| 推移的依存は `node_modules/.pnpm/` に入るだけで root の `node_modules/@typescript/` に並ばない | `publicHoistPattern: ['@typescript/lib-*']` |
+
+上の「メタパッケージ 1 つでは足りない」で見ていたのは 1 行目だけだった。2 行目が
+**「pnpm だと推移的に解決できない」の正体**である。`libReplacement` の解決は
+tsconfig のあるディレクトリから上へ `node_modules` を辿るだけなので、pnpm の既定の
+隔離レイアウトでは推移的依存を一度も見つけられない。`publicHoistPattern` は
+エイリアス（キー名 `@typescript/lib-es5` ↔ 実体名 `strict-ts-lib-v7.0-es5`）越しでも
+キー名でホイストするので、root の `node_modules/@typescript/` に 107 個が並ぶ。
+
+`publicHoistPattern` の既定値は pnpm 11 でも `[]` なので、ここで指定しても潰れる
+既定は無い。
+
+### 実測
+
+```text
+$ pnpm install                    # 依存宣言は strict-ts-lib-v7.0 の 1 件だけ
+$ ls node_modules/@typescript | wc -l
+107
+$ cd libs/octokit-safe-types && pnpm run type-check   # opt-in 済みパッケージ
+（エラー 0 件）
+```
+
+置き換えが本当に効いていることは、strict lib でしか出ないエラーで確認した。
+
+```text
+$ echo "export const n = parseInt('10', 1);" > libs/octokit-safe-types/src/probe.mts
+$ pnpm run type-check
+src/probe.mts(1,33): error TS2345: Argument of type '1' is not assignable to
+  parameter of type '2 | 3 | … | 36 | undefined'.
+```
+
+### `blockExoticSubdeps: false` は恒久設定になる
+
+「一度だけ CLI フラグで解決してロックファイルに焼き、設定は既定のまま」を試した。
+pnpm のチェックはロックファイル由来の解決をスキップする（`resolveDependencies.js`
+のコメントどおり）ので `--frozen-lockfile` は通るが、**package.json に無関係な依存を
+1 つ足しただけで再解決が走って落ちる**。mono は `pnpm-update` と changesets で
+package.json が頻繁に動くので、この道は無い。`blockExoticSubdeps` は boolean だけで、
+ホスト単位の許可リストは pnpm 11.22.0 に存在しない。
+
+### 代わりの防御: `check:root:lockfile`
+
+`pnpm-lock.yaml` の `tarball:` を全件読み、strict-typescript-lib の releases 以外を
+指すものがあれば落とす（`tools/scripts/cmd/check-lockfile-tarballs.mts`）。
+`check:root` の一部なので、`check-all` と type-check workflow の `check:root` ジョブが
+そのまま拾う。ruleset の required status check は増えない。
+
+pnpm 自身のチェックより網羅的でもある。直接依存も見るし、pnpm がスキップする
+「ロックファイルに既にある解決」も見る。
+
+### 残る選択肢: 上流で 1 tarball 化する（未着手）
+
+`strict-typescript-lib` 側が「107 個の lib ディレクトリを内包した tarball 1 個」を
+出せば、URL の推移的依存自体が消えて `blockExoticSubdeps` を触らずに済む。消費側は
+`paths` で向ける。**`libReplacement` の解決が `paths` を尊重することは実測済み**
+（TypeScript 7.0.2）。ワイルドカード指定でも、`extends` 元の共有 config に書いた
+場合でも効く。
+
+ただし `paths` は `extends` でマージされず子が丸ごと上書きするので、共有 config に
+1 行書くだけでは済まない。mono は 18 プロジェクト中 **15 が自前の `paths` を持って
+いる**ため、15 ファイルに同じ行を足すことになる。ホイスト方式は tsconfig を一切
+触らないので、まずはそちらを採った。上流が 1 tarball 化したときの消費側の変更は
+「URL 1 行の差し替えと `paths` の追加」で、この節の作業は捨て石にならない。
+
+`.pnpm/` の下を直接 `paths` で指す案は不可。ディレクトリ名が URL エンコードを含み
+（`strict-ts-lib-v7.0-es5@https+++github.com+…tgz`）、リリースごとに変わる。

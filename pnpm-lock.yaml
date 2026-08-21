@@ -161,327 +161,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: 'catalog:'
         version: 8.67.0(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
-      '@typescript/lib-decorators':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-0.1.0.tgz
-        version: strict-ts-lib-v7.0-decorators@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-decorators-legacy':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-legacy-0.1.0.tgz
-        version: strict-ts-lib-v7.0-decorators-legacy@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-legacy-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-dom':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-0.1.0.tgz
-        version: strict-ts-lib-v7.0-dom@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-dom-asynciterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-asynciterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-dom-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-asynciterable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-dom-iterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-iterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-dom-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-iterable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-collection':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-collection-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-collection-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-core':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-core-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-core@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-core-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-generator':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-generator-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-generator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-generator-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-iterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-iterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-iterable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-proxy':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-proxy-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-proxy@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-proxy-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-reflect':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-reflect-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-reflect@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-reflect-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-symbol':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-symbol@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2015-symbol-wellknown':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-wellknown-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2015-symbol-wellknown@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-wellknown-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2016':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2016@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2016-array-include':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-array-include-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2016-array-include@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-array-include-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2016-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2016-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2016-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2016-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-arraybuffer':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-arraybuffer-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-arraybuffer@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-arraybuffer-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-date':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-date-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-date-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-object':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-object-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-object-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-sharedmemory':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-sharedmemory-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-sharedmemory-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2017-typedarrays':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-typedarrays-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2017-typedarrays@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-typedarrays-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-asyncgenerator':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asyncgenerator-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-asyncgenerator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asyncgenerator-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-asynciterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asynciterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asynciterable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2018-regexp':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-regexp-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2018-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-regexp-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-array':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-array-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-array-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-object':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-object-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-object-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2019-symbol':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-symbol-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2019-symbol@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-symbol-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-bigint':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-bigint-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-bigint@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-bigint-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-date':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-date-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-date-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-number':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-number-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-number@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-number-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-sharedmemory':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-sharedmemory-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-sharedmemory-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2020-symbol-wellknown':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-symbol-wellknown-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2020-symbol-wellknown@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-symbol-wellknown-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2021-weakref':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-weakref-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2021-weakref@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-weakref-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-array':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-array-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-array-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-error':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-error-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-error@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-error-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-object':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-object-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-object-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-regexp':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-regexp-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-regexp-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2022-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2022-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2023':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2023@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2023-array':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-array-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2023-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-array-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2023-collection':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-collection-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2023-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-collection-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2023-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2023-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2023-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2023-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-arraybuffer':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-arraybuffer-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-arraybuffer@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-arraybuffer-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-collection':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-collection-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-collection-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-object':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-object-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-object-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-regexp':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-regexp-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-regexp-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-sharedmemory':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-sharedmemory-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-sharedmemory-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2024-string':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-string-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2024-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-string-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-collection':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-collection-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-collection-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-float16':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-float16-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-float16@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-float16-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-iterator':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-iterator-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-iterator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-iterator-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-promise':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-promise-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-promise-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es2025-regexp':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-regexp-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es2025-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-regexp-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es5':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es5-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es5@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es5-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-es6':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es6-0.1.0.tgz
-        version: strict-ts-lib-v7.0-es6@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es6-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-array':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-array-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-array-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-collection':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-collection-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-collection-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-date':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-date-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-date-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-decorators':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-decorators-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-decorators@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-decorators-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-disposable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-disposable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-disposable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-disposable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-error':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-error-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-error@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-error-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-full':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-full-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-full-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-intl':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-intl-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-intl-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-sharedmemory':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-sharedmemory-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-sharedmemory-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-temporal':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-temporal-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-temporal@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-temporal-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-esnext-typedarrays':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-typedarrays-0.1.0.tgz
-        version: strict-ts-lib-v7.0-esnext-typedarrays@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-typedarrays-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-scripthost':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-scripthost-0.1.0.tgz
-        version: strict-ts-lib-v7.0-scripthost@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-scripthost-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-webworker':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-0.1.0.tgz
-        version: strict-ts-lib-v7.0-webworker@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-webworker-asynciterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-asynciterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-webworker-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-asynciterable-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-webworker-importscripts':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-importscripts-0.1.0.tgz
-        version: strict-ts-lib-v7.0-webworker-importscripts@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-importscripts-0.1.0.tgz(typescript@6.0.3)
-      '@typescript/lib-webworker-iterable':
-        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-iterable-0.1.0.tgz
-        version: strict-ts-lib-v7.0-webworker-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-iterable-0.1.0.tgz(typescript@6.0.3)
       '@vitest/browser-playwright':
         specifier: 'catalog:'
         version: 4.1.10(playwright@1.62.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(vitest@4.1.10)
@@ -548,6 +227,9 @@ importers:
       rollup-plugin-esbuild:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.2)(rollup@4.62.4)(supports-color@7.2.0)
+      strict-ts-lib-v7.0:
+        specifier: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-0.1.0.tgz
+        version: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-0.1.0.tgz(typescript@6.0.3)
       ts-data-forge:
         specifier: workspace:*
         version: link:libs/ts-data-forge
@@ -7977,6 +7659,12 @@ packages:
     peerDependencies:
       typescript: '>=7.0.0 <7.1.0'
 
+  strict-ts-lib-v7.0@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-0.1.0.tgz:
+    resolution: {integrity: sha512-U4JRwWz0igcwY7diuXMm4pVvesiLYfaEflZ1P1x4IT9UopJg6ffSxbGCeUswRT8fd9l4HtymkoRuE4CagmE2gg==, tarball: https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-0.1.0.tgz}
+    version: 0.1.0
+    peerDependencies:
+      typescript: '>=7.0.0 <7.1.0'
+
   string-width@8.2.1:
     resolution: {integrity: sha512-IIaP0g3iy9Cyy18w3M9YcaDudujEAVHKt3a3QJg1+sr/oX96TbaGUubG0hJyCjCBThFH+tFpcIyoUHUn1ogaLA==}
     engines: {node: '>=20'}
@@ -15264,6 +14952,117 @@ snapshots:
   strict-ts-lib-v7.0-webworker@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-0.1.0.tgz(typescript@6.0.3):
     dependencies:
       ts-type-forge: 9.2.1
+      typescript: 6.0.3
+
+  strict-ts-lib-v7.0@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-0.1.0.tgz(typescript@6.0.3):
+    dependencies:
+      '@typescript/lib-decorators': strict-ts-lib-v7.0-decorators@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-decorators-legacy': strict-ts-lib-v7.0-decorators-legacy@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-decorators-legacy-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-dom': strict-ts-lib-v7.0-dom@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-dom-asynciterable': strict-ts-lib-v7.0-dom-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-asynciterable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-dom-iterable': strict-ts-lib-v7.0-dom-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-dom-iterable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015': strict-ts-lib-v7.0-es2015@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-collection': strict-ts-lib-v7.0-es2015-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-collection-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-core': strict-ts-lib-v7.0-es2015-core@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-core-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-generator': strict-ts-lib-v7.0-es2015-generator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-generator-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-iterable': strict-ts-lib-v7.0-es2015-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-iterable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-promise': strict-ts-lib-v7.0-es2015-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-proxy': strict-ts-lib-v7.0-es2015-proxy@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-proxy-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-reflect': strict-ts-lib-v7.0-es2015-reflect@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-reflect-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-symbol': strict-ts-lib-v7.0-es2015-symbol@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2015-symbol-wellknown': strict-ts-lib-v7.0-es2015-symbol-wellknown@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2015-symbol-wellknown-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2016': strict-ts-lib-v7.0-es2016@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2016-array-include': strict-ts-lib-v7.0-es2016-array-include@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-array-include-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2016-full': strict-ts-lib-v7.0-es2016-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2016-intl': strict-ts-lib-v7.0-es2016-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2016-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017': strict-ts-lib-v7.0-es2017@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-arraybuffer': strict-ts-lib-v7.0-es2017-arraybuffer@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-arraybuffer-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-date': strict-ts-lib-v7.0-es2017-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-date-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-full': strict-ts-lib-v7.0-es2017-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-intl': strict-ts-lib-v7.0-es2017-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-object': strict-ts-lib-v7.0-es2017-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-object-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-sharedmemory': strict-ts-lib-v7.0-es2017-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-sharedmemory-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-string': strict-ts-lib-v7.0-es2017-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2017-typedarrays': strict-ts-lib-v7.0-es2017-typedarrays@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2017-typedarrays-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018': strict-ts-lib-v7.0-es2018@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-asyncgenerator': strict-ts-lib-v7.0-es2018-asyncgenerator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asyncgenerator-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-asynciterable': strict-ts-lib-v7.0-es2018-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-asynciterable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-full': strict-ts-lib-v7.0-es2018-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-intl': strict-ts-lib-v7.0-es2018-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-promise': strict-ts-lib-v7.0-es2018-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2018-regexp': strict-ts-lib-v7.0-es2018-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2018-regexp-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019': strict-ts-lib-v7.0-es2019@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-array': strict-ts-lib-v7.0-es2019-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-array-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-full': strict-ts-lib-v7.0-es2019-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-intl': strict-ts-lib-v7.0-es2019-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-object': strict-ts-lib-v7.0-es2019-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-object-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-string': strict-ts-lib-v7.0-es2019-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2019-symbol': strict-ts-lib-v7.0-es2019-symbol@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2019-symbol-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020': strict-ts-lib-v7.0-es2020@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-bigint': strict-ts-lib-v7.0-es2020-bigint@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-bigint-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-date': strict-ts-lib-v7.0-es2020-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-date-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-full': strict-ts-lib-v7.0-es2020-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-intl': strict-ts-lib-v7.0-es2020-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-number': strict-ts-lib-v7.0-es2020-number@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-number-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-promise': strict-ts-lib-v7.0-es2020-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-sharedmemory': strict-ts-lib-v7.0-es2020-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-sharedmemory-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-string': strict-ts-lib-v7.0-es2020-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2020-symbol-wellknown': strict-ts-lib-v7.0-es2020-symbol-wellknown@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2020-symbol-wellknown-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021': strict-ts-lib-v7.0-es2021@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021-full': strict-ts-lib-v7.0-es2021-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021-intl': strict-ts-lib-v7.0-es2021-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021-promise': strict-ts-lib-v7.0-es2021-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021-string': strict-ts-lib-v7.0-es2021-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2021-weakref': strict-ts-lib-v7.0-es2021-weakref@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2021-weakref-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022': strict-ts-lib-v7.0-es2022@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-array': strict-ts-lib-v7.0-es2022-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-array-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-error': strict-ts-lib-v7.0-es2022-error@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-error-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-full': strict-ts-lib-v7.0-es2022-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-intl': strict-ts-lib-v7.0-es2022-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-object': strict-ts-lib-v7.0-es2022-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-object-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-regexp': strict-ts-lib-v7.0-es2022-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-regexp-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2022-string': strict-ts-lib-v7.0-es2022-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2022-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2023': strict-ts-lib-v7.0-es2023@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2023-array': strict-ts-lib-v7.0-es2023-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-array-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2023-collection': strict-ts-lib-v7.0-es2023-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-collection-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2023-full': strict-ts-lib-v7.0-es2023-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2023-intl': strict-ts-lib-v7.0-es2023-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2023-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024': strict-ts-lib-v7.0-es2024@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-arraybuffer': strict-ts-lib-v7.0-es2024-arraybuffer@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-arraybuffer-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-collection': strict-ts-lib-v7.0-es2024-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-collection-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-full': strict-ts-lib-v7.0-es2024-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-object': strict-ts-lib-v7.0-es2024-object@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-object-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-promise': strict-ts-lib-v7.0-es2024-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-regexp': strict-ts-lib-v7.0-es2024-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-regexp-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-sharedmemory': strict-ts-lib-v7.0-es2024-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-sharedmemory-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2024-string': strict-ts-lib-v7.0-es2024-string@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2024-string-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025': strict-ts-lib-v7.0-es2025@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-collection': strict-ts-lib-v7.0-es2025-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-collection-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-float16': strict-ts-lib-v7.0-es2025-float16@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-float16-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-full': strict-ts-lib-v7.0-es2025-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-intl': strict-ts-lib-v7.0-es2025-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-iterator': strict-ts-lib-v7.0-es2025-iterator@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-iterator-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-promise': strict-ts-lib-v7.0-es2025-promise@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-promise-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es2025-regexp': strict-ts-lib-v7.0-es2025-regexp@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es2025-regexp-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es5': strict-ts-lib-v7.0-es5@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es5-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-es6': strict-ts-lib-v7.0-es6@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-es6-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext': strict-ts-lib-v7.0-esnext@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-array': strict-ts-lib-v7.0-esnext-array@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-array-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-collection': strict-ts-lib-v7.0-esnext-collection@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-collection-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-date': strict-ts-lib-v7.0-esnext-date@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-date-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-decorators': strict-ts-lib-v7.0-esnext-decorators@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-decorators-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-disposable': strict-ts-lib-v7.0-esnext-disposable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-disposable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-error': strict-ts-lib-v7.0-esnext-error@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-error-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-full': strict-ts-lib-v7.0-esnext-full@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-full-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-intl': strict-ts-lib-v7.0-esnext-intl@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-intl-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-sharedmemory': strict-ts-lib-v7.0-esnext-sharedmemory@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-sharedmemory-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-temporal': strict-ts-lib-v7.0-esnext-temporal@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-temporal-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-esnext-typedarrays': strict-ts-lib-v7.0-esnext-typedarrays@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-esnext-typedarrays-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-scripthost': strict-ts-lib-v7.0-scripthost@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-scripthost-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-webworker': strict-ts-lib-v7.0-webworker@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-webworker-asynciterable': strict-ts-lib-v7.0-webworker-asynciterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-asynciterable-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-webworker-importscripts': strict-ts-lib-v7.0-webworker-importscripts@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-importscripts-0.1.0.tgz(typescript@6.0.3)
+      '@typescript/lib-webworker-iterable': strict-ts-lib-v7.0-webworker-iterable@https://github.com/noshiro-pf/strict-typescript-lib/releases/download/dist-v7.0-0.1.0/strict-ts-lib-v7.0-webworker-iterable-0.1.0.tgz(typescript@6.0.3)
       typescript: 6.0.3
 
   string-width@8.2.1:
