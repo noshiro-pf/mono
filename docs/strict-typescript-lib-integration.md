@@ -666,13 +666,13 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 
 ### 決めたこと
 
-| #   | 決定                                                                                                                                                    |
-| :-- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **`ts-type-forge` は strict lib を使わない。** 相互依存を作らない                                                                                       |
-| 2   | **配置は新設の `strict-lib/`。** prettier の対象外にし、そこだけ oxfmt で回す                                                                           |
-| 3   | **全系統のバージョンを統一する**                                                                                                                        |
-| 4 | **GitHub Release を廃止し npm publish に一本化。** dist の生成方法だけ引き継ぎ、リリースは mono の changesets に統合する |
-| 5 | **branded / 非 branded を 1 パッケージにまとめる。** 24 → 12 パッケージ。利用者は `paths` の指す先で選ぶ |
+| #   | 決定                                                                                                                     |
+| :-- | :----------------------------------------------------------------------------------------------------------------------- |
+| 1   | **`ts-type-forge` は strict lib を使わない。** 相互依存を作らない                                                        |
+| 2   | **配置は新設の `strict-lib/`。** prettier の対象外にし、そこだけ oxfmt で回す                                            |
+| 3   | **全系統のバージョンを統一する**                                                                                         |
+| 4   | **GitHub Release を廃止し npm publish に一本化。** dist の生成方法だけ引き継ぎ、リリースは mono の changesets に統合する |
+| 5   | **branded / 非 branded を 1 パッケージにまとめる。** 24 → 12 パッケージ。利用者は `paths` の指す先で選ぶ                 |
 
 ### 決定 1: `ts-type-forge` は strict lib を使わない
 
@@ -796,11 +796,11 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 「代表 1 件だけ」を指定するオプションは無い。素直に移すと 1 publish で 24 タグに
 なる。検討した 3 案は次のとおりで、**(a) を採る**。
 
-| 案 | タグ数/publish | 評価 |
-| :-- | --: | :-- |
-| **(a) flavor を 1 パッケージにまとめる** | 12 | **採用** |
-| (b) そのまま受け入れる | 24 | 一番単純だが、24 パッケージの維持コストが残る |
-| (c) `push-git-tags: false` にして代表タグ 1 件を自前で打つ | 1 | 後述の理由で単独では採らない |
+| 案                                                         | タグ数/publish | 評価                                          |
+| :--------------------------------------------------------- | -------------: | :-------------------------------------------- |
+| **(a) flavor を 1 パッケージにまとめる**                   |             12 | **採用**                                      |
+| (b) そのまま受け入れる                                     |             24 | 一番単純だが、24 パッケージの維持コストが残る |
+| (c) `push-git-tags: false` にして代表タグ 1 件を自前で打つ |              1 | 後述の理由で単独では採らない                  |
 
 `strict-ts-lib-v7.0` が `libs/`（非 branded）と `libs-branded/` の両方を持ち、
 利用者は `paths` の指す先で選ぶ。
@@ -844,10 +844,10 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 
 そして**公開済みバージョンは 1 パッケージにつき 1 件しかない**（2026-08-22 実測）。
 
-| パッケージ | 公開済み |
-| :-- | :-- |
+| パッケージ                                     | 公開済み     |
+| :--------------------------------------------- | :----------- |
 | `strict-ts-lib-v5.0` 〜 `v5.9`（± `-branded`） | `0.4.0` のみ |
-| `strict-ts-lib-v6.0` / `v7.0`（± `-branded`） | `0.2.0` のみ |
+| `strict-ts-lib-v6.0` / `v7.0`（± `-branded`）  | `0.2.0` のみ |
 
 この 2 つを重ねると、**package 全体の unpublish は「唯一のバージョンの削除」と同義**で、
 必ず 24 時間ブロックに当たる。npm 自身も
@@ -855,10 +855,10 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 
 **したがって unpublish はしない。** 代わりに:
 
-| 対象 | 操作 |
-| :-- | :-- |
-| **残す 12 名**（`strict-ts-lib-vX.Y`） | 統一バージョンを publish する。旧 `0.2.0` / `0.4.0` はそのまま残す |
-| **畳む 12 名**（`strict-ts-lib-vX.Y-branded`） | `npm deprecate` で統合先を案内する。unpublish しない |
+| 対象                                           | 操作                                                               |
+| :--------------------------------------------- | :----------------------------------------------------------------- |
+| **残す 12 名**（`strict-ts-lib-vX.Y`）         | 統一バージョンを publish する。旧 `0.2.0` / `0.4.0` はそのまま残す |
+| **畳む 12 名**（`strict-ts-lib-vX.Y-branded`） | `npm deprecate` で統合先を案内する。unpublish しない               |
 
 `deprecate` は npm 自身が勧めている道でもある。
 
@@ -878,15 +878,14 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 影響を受けるのは `-branded` 名を使っていた利用者だけで、そちらは deprecate の
 メッセージで移行先を案内する。
 
-
 ### 移行前にやる掃除 — 削るのは `output` の中だけ
 
-| 対象 | ファイル数 | 扱い | 状態 |
-| :-- | --: | :-- | :-- |
-| `output(-branded)/packages/**/package.json` のうち参照の無い分 | **1,955** | **削除**。per-lib publish をやめた時点で死んでいる | **完了**（strict-typescript-lib#130） |
-| 同 group 単位の分 | 199 | **残す**。各 harness が `file:output/packages/<group>` で devDepend しており、`lib-check` の名前解決に要る | — |
-| `output(-branded)/packages/` → `libs/` / `libs-branded/` | — | リネーム。pack 時のステージングを削る。決定 2 の必須条件であり、決定 5 の形でもある | 移植と同時 |
-| バージョン統一 | — | 決定 3。`0.5.0` へ | 未 |
+| 対象                                                           | ファイル数 | 扱い                                                                                                       | 状態                                  |
+| :------------------------------------------------------------- | ---------: | :--------------------------------------------------------------------------------------------------------- | :------------------------------------ |
+| `output(-branded)/packages/**/package.json` のうち参照の無い分 |  **1,955** | **削除**。per-lib publish をやめた時点で死んでいる                                                         | **完了**（strict-typescript-lib#130） |
+| 同 group 単位の分                                              |        199 | **残す**。各 harness が `file:output/packages/<group>` で devDepend しており、`lib-check` の名前解決に要る | —                                     |
+| `output(-branded)/packages/` → `libs/` / `libs-branded/`       |          — | リネーム。pack 時のステージングを削る。決定 2 の必須条件であり、決定 5 の形でもある                        | 移植と同時                            |
+| バージョン統一                                                 |          — | 決定 3。`0.5.0` へ                                                                                         | 未                                    |
 
 上流の追跡ファイルは 9,866 → **7,911**（#130 時点）。
 
@@ -898,11 +897,11 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 
 `gen-version-diff.mts` が読む先を見れば依存関係がはっきりする。
 
-| 差分の種類 | 入力 | 出力 |
-| :-- | :-- | :-- |
-| `official` | `temp/copied`（TypeScript 本体からのコピー原本） | `diff-from-prev/official/` |
-| `converted` | `output/lib-files` | `diff-from-prev/converted/` |
-| `converted-branded` | `output-branded/lib-files` | `diff-from-prev/converted-branded/` |
+| 差分の種類          | 入力                                             | 出力                                |
+| :------------------ | :----------------------------------------------- | :---------------------------------- |
+| `official`          | `temp/copied`（TypeScript 本体からのコピー原本） | `diff-from-prev/official/`          |
+| `converted`         | `output/lib-files`                               | `diff-from-prev/converted/`         |
+| `converted-branded` | `output-branded/lib-files`                       | `diff-from-prev/converted-branded/` |
 
 つまり `temp/copied` は**入力**であり、追跡をやめると `official` 差分が取れなくなる。
 「TypeScript 側が何を変えたか」が見えなくなるということで、それは converter を追随
@@ -913,19 +912,17 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 だけを見て入力と生成物を区別していなかった。削ってよいのは `output` の中の、
 誰も解決しない manifest だけである。
 
-
 ### 手順
 
-| Phase | 内容 | 状態 |
-| :-- | :-- | :-- |
-| 0 | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`） | **完了**（両方 check-all 通過・CI 緑、マージ待ち） |
-| 1 | `ts-type-forge` の opt-out を明示（決定 1） | **完了**（`feat/ts-type-forge-no-lib-replacement`） |
-| 2 | 上流の掃除（死んだ `package.json`） | **完了**（strict-typescript-lib#130） |
-| 3 | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | 次にやる |
-| 4 | リリースを changesets へ。上流ワークフローと publish スクリプトを削除 | |
-| 5 | `0.5.0` を publish し、`-branded` の 12 名を deprecate。旧リポジトリを archive | |
-| 6 | 残りの opt-in を再開（`ts-data-forge` ほか） | |
-
+| Phase | 内容                                                                                                                                  | 状態                                                |
+| :---- | :------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
+| 0     | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`）                                                                 | **完了**（両方 check-all 通過・CI 緑、マージ待ち）  |
+| 1     | `ts-type-forge` の opt-out を明示（決定 1）                                                                                           | **完了**（`feat/ts-type-forge-no-lib-replacement`） |
+| 2     | 上流の掃除（死んだ `package.json`）                                                                                                   | **完了**（strict-typescript-lib#130）               |
+| 3     | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | 次にやる                                            |
+| 4     | リリースを changesets へ。上流ワークフローと publish スクリプトを削除                                                                 |                                                     |
+| 5     | `0.5.0` を publish し、`-branded` の 12 名を deprecate。旧リポジトリを archive                                                        |                                                     |
+| 6     | 残りの opt-in を再開（`ts-data-forge` ほか）                                                                                          |                                                     |
 
 ### 移行時に必ず確認すること
 
