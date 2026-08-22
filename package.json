@@ -110,7 +110,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-esbuild": "catalog:",
-    "strict-ts-lib-v7.0": "^0.2.0",
+    "strict-ts-lib-v7.0": "^0.5.0",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "ts-type-forge": "workspace:*",
