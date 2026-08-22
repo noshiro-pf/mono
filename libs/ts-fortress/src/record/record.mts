@@ -52,7 +52,11 @@ export const record = <
 ): Type<RecordTypeFromShape<S>> => {
   type V = RecordTypeFromShape<S>;
 
-  const sourceKeys = new Set(Object.keys(shape));
+  // Annotated rather than inferred: the strict standard library types
+  // `Object.keys` as the record's own key union, which would make `has` reject
+  // the plain `string` keys read back off the value being validated. The
+  // membership test is the point here, so the wider element type is correct.
+  const sourceKeys: ReadonlySet<string> = new Set(Object.keys(shape));
 
   const typeNameFilled: string =
     options?.typeName ??
