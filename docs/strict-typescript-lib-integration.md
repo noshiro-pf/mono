@@ -664,12 +664,16 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 | :-------------------------------------------- | :----------------------------------------------- |
 | `Object.fromEntries` が `Partial<...>` を返す | lib 側の不具合。`dist-v7.0-0.1.0` で解消         |
 | `replaceAll` のキャプチャ群が `unknown`       | 可変長引数で受けて `isString` で絞る             |
-| `String` が `@deprecated`（lint 7 件）        | `unknownToString`（`ts-data-forge`）に置き換える |
+| `String` が `@deprecated`（lint 7 件、下記）   | `unknownToString`（`ts-data-forge`）に置き換える |
 
 3 つ目は元々このリポジトリの慣例で、`gen-docs.mts` などは既に
 `unknownToString` を使っていた。strict lib の `@deprecated` は、その慣例が
 徹底されていない箇所を挙げてくれたことになる。`String(x)` と違って
 `[object Object]` にならないので、置き換えは実質的な改善でもある。
+
+**ただし、この 7 件が lint に出たのは旧レイアウトでの測定である。** bundle へ
+移ったいま ESLint は strict lib を見ておらず（次節）、この指摘はもう出ない。
+置き換え自体は慣例どおりなので残した。
 
 2 つ目は strict lib の言い分が正しい。省略可能なグループは不参加のとき
 `undefined` になるので、`string` と決めつけられない。ここでは 3 つとも必須なので
@@ -684,3 +688,42 @@ opt-in のたびに、次の 2 つを確認する。
   エディタが赤くなる
 - **`dist` が変わらない**こと。両方の lib でビルドして `diff -r` を取る。
   `ts-repo-utils` では差分なしだった
+
+### ESLint は strict lib を見ていない（2026-08-22 実測）
+
+**`tsc` と ESLint が別のライブラリを見る。** 型チェックは
+`typescript-native`（TypeScript 7）で走り、`paths` 経由で strict lib を読む。
+ESLint の型情報は `typescript`（6.0.3）が作るプログラムから来るが、**こちらの
+lib 置き換えは `paths` を見ない**。`--traceResolution` がそう言っている。
+
+```text
+======== Resolving module '@typescript/lib-es2020' from '…/__lib_node_modules_lookup_lib.es2020.d.ts__.ts'. ========
+Explicitly specified module resolution kind: 'Node10'.
+Loading module '@typescript/lib-es2020' from 'node_modules' folder, …
+======== Module name '@typescript/lib-es2020' was not resolved. ========
+```
+
+`Node10` 固定の node_modules 探索で、`paths` を参照する経路が無い。107 個を
+個別パッケージとして配っていた頃は `publicHoistPattern` で
+`node_modules/@typescript/` に並んでいたので**名前で**引けていた。bundle は
+`paths` でしか届かないので、ESLint からは見えなくなった。
+
+結果として:
+
+- **型チェックは strict lib、lint は素の lib** で走る。同じコードに対して
+  `tsc` は `JSON.parse` を `JsonValue`、ESLint は `any` と見る
+- したがって `@typescript-eslint/no-unsafe-assignment` の
+  `eslint-disable` は **opt-in 後も要る**。消すと lint が落ちる
+  （`get-workspace-packages.mts` で実測）
+- 逆に、**「型チェック以外への影響」節の lint 21 件（`ts-fortress`）はもう
+  起きない**。`@typescript-eslint/no-deprecated` が strict lib の
+  `@deprecated` を読めないため。opt-in の見積りは型エラーだけでよくなった
+- `lint:fix` が strict lib 前提のコードに書き換えることも、同じ理由で起きない
+
+**どちらの lib でも通る形に書く**という方針は、この差のぶんだけ実際に必要に
+なる。`src` を配るパッケージでは元々そうすべきで、方針は変わらない。
+
+揃えたいなら方法は 2 つあるが、どちらも今は採らない。`node_modules/@typescript/`
+へ実体を並べ直すのは URL 配布時代の `publicHoistPattern` に戻ることになるし、
+TypeScript 6 側が lib 置き換えで `paths` を見るようになるのを待つ手もあるが、
+待つ理由が弱い。
