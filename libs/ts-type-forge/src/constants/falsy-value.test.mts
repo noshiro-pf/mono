@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type RelaxedExclude } from '../others/index.mjs';
 import { type FalsyValue } from './falsy-value.mjs';
 
 // Test that all expected falsy values are part of FalsyValue
@@ -62,7 +63,9 @@ expectType<IsFalsy<{}>, false>('=');
 expectType<IsFalsy<[]>, false>('=');
 
 // Test exclusion from union types
-type TruthyOnly<T> = Exclude<T, FalsyValue>;
+// `RelaxedExclude`, not `Exclude`: the strict standard library declares
+// `Exclude<T, U extends T>`, which a free `T` cannot satisfy.
+type TruthyOnly<T> = RelaxedExclude<T, FalsyValue>;
 
 expectType<TruthyOnly<boolean>, true>('=');
 
@@ -75,6 +78,6 @@ expectType<TruthyOnly<bigint>, Exclude<bigint, 0n>>('=');
 // Test filtering out falsy values from union types
 type TestUnion = 0 | 1 | '' | 'hello' | false | true | null | undefined;
 
-type TruthyValues = Exclude<TestUnion, FalsyValue>;
+type TruthyValues = RelaxedExclude<TestUnion, FalsyValue>;
 
 expectType<TruthyValues, 1 | 'hello' | true>('=');

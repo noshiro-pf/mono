@@ -1,8 +1,12 @@
-import { type MonthEnum, type MonthIndexEnum } from 'ts-type-forge';
+import {
+  type DateEnum,
+  type MonthEnum,
+  type MonthIndexEnum,
+} from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-const createDate = (year: number, month: MonthIndexEnum, day: number) =>
+const createDate = (year: number, month: MonthIndexEnum, day: DateEnum) =>
   new Date(year, month, day);
 
 const januaryDate = createDate(2024, 0, 1); // January 1, 2024

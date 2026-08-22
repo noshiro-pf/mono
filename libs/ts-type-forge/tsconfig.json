@@ -1,6 +1,13 @@
 {
   "extends": ["../../tools/configs/tsconfig/tsconfig.type-check.json"],
   "compilerOptions": {
+    // Opted into the strict standard library. TypeScript 7 defaults
+    // `libReplacement` to false, so the `paths` entry below does nothing
+    // without it. Set per package while the repository migrates one at a
+    // time; it moves to the shared config once every package passes. See
+    // docs/strict-typescript-lib-integration.md.
+    "libReplacement": true,
+
     // ts-type-forge asserts exact type equality against Node types (e.g.
     // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
     // DOM shapes instead and breaks the assertions.
@@ -17,6 +24,9 @@
       "ts-type-forge/global": ["./src/global.mts"]
     }
   },
-  "include": ["./src", "./samples", "./scripts", "./configs"],
-  "exclude": ["src/global.mts"]
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"],
+  // `test/dist_/` carries its own tsconfigs (named/ and ambient/) and
+  // type-checks the built `dist/` output; ESLint ignores it for the same
+  // reason. The rest of `test/` belongs to this program.
+  "exclude": ["src/global.mts", "test/dist_"]
 }

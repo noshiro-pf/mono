@@ -631,14 +631,100 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
    `check-all` と CI の `type-check (check:root)` が拾う。エントリを 1 つ外して
    落ちることを確認済み
 2. **意味レベル** — `libs/octokit-safe-types/test/strict-lib-active.mts`。
-   strict lib でのみエラーになる式（`parseInt('10', 1)`）に `@ts-expect-error` を
+   strict lib でのみエラーになる式（`Number.isFinite('1')`）に `@ts-expect-error` を
    付けてあるので、**置き換えが起きなくなった瞬間に型チェックが落ちる**
    （`libReplacement: false` にすると `TS2578: Unused '@ts-expect-error' directive`
    で落ちることを確認済み）。opt-in するパッケージごとに 1 つ置く
 
 ### 残っていること
 
-`libReplacement: true` はまだ `octokit-safe-types` だけ。残りの opt-in は従来の
-順序（`ts-repo-utils` → `ts-fortress` → `ts-type-forge` → `ts-data-forge`）で進める。
-`paths` は全パッケージに入っているので、各パッケージで足すのは
-`"libReplacement": true` の 1 行だけになった。
+`libReplacement: true` は `octokit-safe-types` と、この PR で足す `ts-type-forge`。
+`ts-repo-utils`（#1618）と `ts-fortress`（#1657）も並行して進んでいる。残りは
+`ts-data-forge` と、まだ数えていない `eslint-*` / `synstate*` / `ts-codemod-*` /
+`github-settings-as-code`。`paths` は全パッケージに入っているので、各パッケージで
+足すのは `"libReplacement": true` の 1 行だけになった。
+
+## `ts-type-forge` の opt-in（2026-08-22 実測）
+
+**型エラー 6 件、lint 0 件**（見積り 6 件と一致）。内訳は 4 種類。
+
+### 1. `Exclude<T, U>` に制約が付いた（3 件）
+
+strict lib の宣言は `type Exclude<T, U extends T>` で、素の lib より狭い。
+
+```ts
+type TruthyOnly<T> = Exclude<T, FalsyValue>; // T は自由変数なので通らない
+```
+
+`ts-type-forge` 自身の `RelaxedExclude<T, U>`（制約なし）に置き換えた。意味は
+変わらず、どちらの lib でも通る。**この用途のために元からある型**なので、置き換えは
+自然な形になる。
+
+### 2. `Record` が readonly になった（1 件）
+
+strict lib の `Record<K, T>` は `{ readonly [P in K]: T }`。
+
+```ts
+expectType<MutableRecord<string, number>, Record<string, number>>('=');
+```
+
+これは素の lib でしか成り立たない。`{ [x: string]: number }` と直接比べる形に
+書き換えた。どちらの lib でも成り立つ。
+
+### 3. `Date` の日付引数が `DateEnum` になった（1 件）
+
+サンプルの `createDate(year, month, day: number)` を `day: DateEnum` に直した。
+`DateEnum` は `ts-type-forge` 自身が持っている型なので、サンプルとしてもこちらが
+正しい。
+
+### 4. `Math.abs` が branded 型をそのまま返す（1 件）
+
+これだけは**性質が違う**ので詳しく書く。strict lib の宣言はこうなっている。
+
+```ts
+abs<N extends number>(x: N): import('ts-type-forge').AbsoluteValue<N>;
+abs(x: number): number;
+```
+
+`AbsoluteValue<N>` は**数値リテラル型のための型**で（TSDoc にそう書いてある）、
+リテラルでない `N` はそのまま返す。したがって strict lib では
+`Math.abs(x: NegativeNumber)` の型が **`NegativeNumber` のまま**になり、
+`as PositiveNumber` が「重なりが無い」として弾かれる。
+
+**`AbsoluteValue` 側は直せない。** `ts-data-forge` の `Int8.abs` が
+
+```ts
+const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
+  Math.abs(x) as unknown as AbsoluteValue<N>;
+```
+
+という形でこの「branded をそのまま返す」挙動に乗っており、非リテラルで `number` に
+広げると `Int8.abs` の戻り型が公開 API として退化する。つまり現在の挙動は意図的で、
+使われている。
+
+サンプル側で `number` を経由する形にした。
+
+```ts
+const magnitude: number = Math.abs(x);
+
+return magnitude as PositiveNumber;
+```
+
+branded → branded の横断ではなく `number` からの絞り込みになるので、どちらの lib
+でも通る。単項マイナス（`-x`）は `@typescript-eslint/no-unsafe-unary-minus` が
+branded 型を弾くので使えない。
+
+**ただし「`Math.abs` の戻り型が branded 負数に対して誤っている」こと自体は残る。**
+直すなら strict-typescript-lib 側で、`abs` の generic overload をリテラルに限定するか、
+`AbsoluteValue` を brand を見る形にするかの判断が要る。`ts-data-forge` の公開 API に
+影響するので、opt-in のついでに決める話ではない。
+
+### probe の置き場所
+
+`ts-type-forge` の `tsconfig.json` は `./test` を include していなかったので、
+probe を置いても**型チェックされず、ESLint はパースできずに落ちる**。
+`./test` を include に足し、`test/dist_`（独自 tsconfig で `dist/` を検査する）を
+exclude した。ESLint 側は元から `test/dist_/**` を無視している。
+
+`tsconfig.json` の `include` は opt-in のたびに確認すること。probe が黙って
+効かないのでは、probe を置く意味が無い。

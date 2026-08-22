@@ -529,7 +529,7 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [NonNegativeNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L121)
     - [PositiveNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L140)
     - [NonPositiveNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L160)
-    - [NegativeNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L179)
+    - [NegativeNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L189)
 - src/branded-types/predefined-numbers/finite-number.mts
     - [FiniteNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/finite-number.mts#L30)
     - [InfiniteNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/finite-number.mts#L50)
@@ -651,7 +651,7 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [UpperAlphabet](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/alphabet.mts#L48)
     - [Alphabet](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/alphabet.mts#L74)
 - src/constants/falsy-value.mts
-    - [FalsyValue](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/falsy-value.mts#L43)
+    - [FalsyValue](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/falsy-value.mts#L46)
 - src/constants/int-enum.mts
     - [Uint8](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L23)
     - [Uint9](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L40)

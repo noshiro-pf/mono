@@ -29,8 +29,11 @@
  * checkFalsy(1); // false
  *
  * // Type guard for filtering out falsy values
+ * // `RelaxedExclude`, not `Exclude`: the strict standard library constrains
+ * // `Exclude<T, U extends T>`, and `FalsyValue` covers falsy values this array
+ * // does not contain.
  * const truthyValues = [0, 1, '', 'hello', false, true, null].filter(
- *   (value): value is Exclude<typeof value, FalsyValue> => Boolean(value),
+ *   (value): value is RelaxedExclude<typeof value, FalsyValue> => Boolean(value),
  * ); // [1, 'hello', true]
  *
  * // Conditional logic based on falsy values

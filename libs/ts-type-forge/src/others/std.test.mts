@@ -119,7 +119,10 @@ type Base = { a: number; b: string; c: boolean };
 
 // --- MutableRecord ---
 {
-  expectType<MutableRecord<string, number>, Record<string, number>>('=');
+  // Spelled out rather than compared against `Record`: the strict standard
+  // library declares `Record` readonly, so that comparison holds under one
+  // library and not the other. This form holds under both.
+  expectType<MutableRecord<string, number>, { [x: string]: number }>('=');
 
   expectType<MutableRecord<'a' | 'b', boolean>, { a: boolean; b: boolean }>(
     '=',

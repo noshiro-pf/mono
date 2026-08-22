@@ -136,7 +136,7 @@ export type MonthEnum = StrictExclude<Index<13>, 0>;
  *
  * @example
  * ```ts
- * const createDate = (year: number, month: MonthIndexEnum, day: number) =>
+ * const createDate = (year: number, month: MonthIndexEnum, day: DateEnum) =>
  *   new Date(year, month, day);
  *
  * const januaryDate = createDate(2024, 0, 1); // January 1, 2024
