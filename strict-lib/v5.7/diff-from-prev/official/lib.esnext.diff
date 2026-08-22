@@ -1,0 +1,20 @@
+diff --git a/packages/v5.6/temp/copied/lib.esnext.d.ts b/packages/v5.7/temp/copied/lib.esnext.d.ts
+index ec4117c..d469d8a 100644
+--- a/packages/v5.6/temp/copied/lib.esnext.d.ts
++++ b/packages/v5.7/temp/copied/lib.esnext.d.ts
+@@ -15,14 +15,10 @@ and limitations under the License.
+ 
+ /// <reference no-default-lib="true"/>
+ 
+-/// <reference lib="es2023" />
++/// <reference lib="es2024" />
+ /// <reference lib="esnext.intl" />
+ /// <reference lib="esnext.decorators" />
+ /// <reference lib="esnext.disposable" />
+-/// <reference lib="esnext.promise" />
+-/// <reference lib="esnext.object" />
+ /// <reference lib="esnext.collection" />
+ /// <reference lib="esnext.array" />
+-/// <reference lib="esnext.regexp" />
+-/// <reference lib="esnext.string" />
+ /// <reference lib="esnext.iterator" />

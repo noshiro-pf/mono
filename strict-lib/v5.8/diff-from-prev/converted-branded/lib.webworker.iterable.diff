@@ -1,0 +1,45 @@
+diff --git a/packages/v5.7/output-branded/lib-files/lib.webworker.iterable.d.ts b/packages/v5.8/output-branded/lib-files/lib.webworker.iterable.d.ts
+index 741d961..02b82c4 100644
+--- a/packages/v5.7/output-branded/lib-files/lib.webworker.iterable.d.ts
++++ b/packages/v5.8/output-branded/lib-files/lib.webworker.iterable.d.ts
+@@ -5,11 +5,6 @@
+ /// Worker Iterable APIs
+ /////////////////////////////
+ 
+-interface AbortSignal {
+-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
+-  any(signals: Iterable<AbortSignal>): AbortSignal;
+-}
+-
+ interface CSSNumericArray {
+   [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
+   entries(): ArrayIterator<readonly [number, CSSNumericValue]>;
+@@ -126,6 +121,10 @@ interface IDBObjectStore {
+   ): IDBIndex;
+ }
+ 
++interface ImageTrackList {
++  [Symbol.iterator](): ArrayIterator<ImageTrack>;
++}
++
+ interface MessageEvent<T = unknown> {
+   /** @deprecated */
+   initMessageEvent(
+@@ -179,7 +178,7 @@ interface SubtleCrypto {
+   ): Promise<CryptoKey>;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
+   generateKey(
+-    algorithm: 'Ed25519',
++    algorithm: 'Ed25519' | { readonly name: 'Ed25519' },
+     extractable: boolean,
+     keyUsages: ReadonlyArray<'sign' | 'verify'>,
+   ): Promise<CryptoKeyPair>;
+@@ -504,7 +503,7 @@ interface WebGL2RenderingContextOverloads {
+     srcOffset?: number,
+     srcLength?: GLuint,
+   ): void;
+-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+   uniformMatrix2fv(
+     location: WebGLUniformLocation | null,
+     transpose: GLboolean,

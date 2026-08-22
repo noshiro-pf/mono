@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2015.reflect.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2015.reflect.d.ts
+index 4413bc0c..398cb35c 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2015.reflect.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2015.reflect.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ declare namespace Reflect {
+   /**
+    * Calls the function with the specified object as the this value

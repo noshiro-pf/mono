@@ -1,0 +1,19 @@
+Cross-version diff: v5.2 -> v5.3
+
+[official] (temp/copied) — 4 changed file(s):
+  lib.dom.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.webworker.d.ts
+
+[converted] (output/lib-files) — 4 changed file(s):
+  lib.dom.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.webworker.d.ts
+
+[converted-branded] (output-branded/lib-files) — 4 changed file(s):
+  lib.dom.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.webworker.d.ts

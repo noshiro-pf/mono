@@ -1,0 +1,11 @@
+{
+  "semi": true,
+  "endOfLine": "lf",
+  "singleQuote": true,
+  "printWidth": 80,
+  "sortPackageJson": true,
+  "sortImports": {
+    "newlinesBetween": false
+  },
+  "jsdoc": false
+}

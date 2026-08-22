@@ -1,0 +1,114 @@
+diff --git a/packages/v5.7/output-branded/lib-files/lib.es2020.bigint.d.ts b/packages/v5.8/output-branded/lib-files/lib.es2020.bigint.d.ts
+index 46945ff..6072191 100644
+--- a/packages/v5.7/output-branded/lib-files/lib.es2020.bigint.d.ts
++++ b/packages/v5.8/output-branded/lib-files/lib.es2020.bigint.d.ts
+@@ -495,6 +495,11 @@ interface BigInt64ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+     length?: NumberType.TypedArraySize,
+   ): BigInt64Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
++  ): BigInt64Array<ArrayBuffer>;
+   new (array: ArrayLike<BigInt64> | ArrayBuffer): BigInt64Array<ArrayBuffer>;
+ 
+   /** The size in bytes of each element in the array. */
+@@ -508,14 +513,13 @@ interface BigInt64ArrayConstructor {
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
+-   * @param mapfn A mapping function to call on every element of the array.
+-   * @param thisArg Value of 'this' used to invoke the mapfn.
++   * @param arrayLike An array-like object to convert to an array.
+    */
+   from(arrayLike: ArrayLike<BigInt64>): BigInt64Array<ArrayBuffer>;
++
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
++   * @param arrayLike An array-like object to convert to an array.
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+@@ -524,6 +528,24 @@ interface BigInt64ArrayConstructor {
+     mapfn: (v: U, k: NumberType.TypedArraySize) => BigInt64,
+     thisArg?: unknown,
+   ): BigInt64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   */
++  from(elements: Iterable<BigInt64>): BigInt64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   * @param mapfn A mapping function to call on every element of the array.
++   * @param thisArg Value of 'this' used to invoke the mapfn.
++   */
++  from<T>(
++    elements: Iterable<T>,
++    mapfn?: (v: T, k: NumberType.TypedArraySize) => BigInt64,
++    thisArg?: unknown,
++  ): BigInt64Array<ArrayBuffer>;
+ }
+ declare const BigInt64Array: BigInt64ArrayConstructor;
+ 
+@@ -892,6 +914,11 @@ interface BigUint64ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+     length?: NumberType.TypedArraySize,
+   ): BigUint64Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
++  ): BigUint64Array<ArrayBuffer>;
+   new (array: ArrayLike<BigUint64> | ArrayBuffer): BigUint64Array<ArrayBuffer>;
+ 
+   /** The size in bytes of each element in the array. */
+@@ -905,16 +932,39 @@ interface BigUint64ArrayConstructor {
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
++   * @param arrayLike An array-like object to convert to an array.
++   */
++  from(arrayLike: ArrayLike<BigUint64>): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param arrayLike An array-like object to convert to an array.
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: ArrayLike<BigUint64>): BigUint64Array;
+   from<U>(
+     arrayLike: ArrayLike<U>,
+     mapfn: (v: U, k: NumberType.TypedArraySize) => BigUint64,
+     thisArg?: unknown,
+-  ): BigUint64Array;
++  ): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   */
++  from(elements: Iterable<BigUint64>): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   * @param mapfn A mapping function to call on every element of the array.
++   * @param thisArg Value of 'this' used to invoke the mapfn.
++   */
++  from<T>(
++    elements: Iterable<T>,
++    mapfn?: (v: T, k: NumberType.TypedArraySize) => BigUint64,
++    thisArg?: unknown,
++  ): BigUint64Array<ArrayBuffer>;
+ }
+ declare const BigUint64Array: BigUint64ArrayConstructor;
+ 

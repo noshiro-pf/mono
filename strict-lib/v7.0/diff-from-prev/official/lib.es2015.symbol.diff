@@ -1,0 +1,13 @@
+diff --git a/packages/v6.0/temp/copied/lib.es2015.symbol.d.ts b/packages/v7.0/temp/copied/lib.es2015.symbol.d.ts
+index c1830167..b50a39c9 100644
+--- a/packages/v6.0/temp/copied/lib.es2015.symbol.d.ts
++++ b/packages/v7.0/temp/copied/lib.es2015.symbol.d.ts
+@@ -34,7 +34,7 @@ interface SymbolConstructor {
+ 
+   /**
+    * Returns a key from the global symbol registry matching the given Symbol if found.
+-   * Otherwise, returns a undefined.
++   * Otherwise, returns undefined.
+    * @param sym Symbol to find the key for.
+    */
+   keyFor(sym: symbol): string | undefined;

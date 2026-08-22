@@ -1,0 +1,17 @@
+diff --git a/packages/v5.7/output/lib-files/lib.es2024.d.ts b/packages/v5.7/output/lib-files/lib.es2024.d.ts
+new file mode 100644
+index 0000000..e4d5e78
+--- /dev/null
++++ b/packages/v5.7/output/lib-files/lib.es2024.d.ts
+@@ -0,0 +1,11 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++/// <reference path="./lib.es2023.d.ts" />
++/// <reference path="./lib.es2024.arraybuffer.d.ts" />
++/// <reference path="./lib.es2024.collection.d.ts" />
++/// <reference path="./lib.es2024.object.d.ts" />
++/// <reference path="./lib.es2024.promise.d.ts" />
++/// <reference path="./lib.es2024.regexp.d.ts" />
++/// <reference path="./lib.es2024.sharedmemory.d.ts" />
++/// <reference path="./lib.es2024.string.d.ts" />

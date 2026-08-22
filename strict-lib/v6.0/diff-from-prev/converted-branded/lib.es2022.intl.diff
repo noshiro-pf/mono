@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2022.intl.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2022.intl.d.ts
+index a8032deb..699d2040 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2022.intl.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2022.intl.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ declare namespace Intl {
+   /**
+    * An object with some or all properties of the `Intl.Segmenter` constructor `options` parameter.

@@ -1,0 +1,25 @@
+diff --git a/packages/v5.5/output/lib-files/lib.es2020.symbol.wellknown.d.ts b/packages/v5.6/output/lib-files/lib.es2020.symbol.wellknown.d.ts
+index fb081cb..68e1310 100644
+--- a/packages/v5.5/output/lib-files/lib.es2020.symbol.wellknown.d.ts
++++ b/packages/v5.6/output/lib-files/lib.es2020.symbol.wellknown.d.ts
+@@ -12,11 +12,19 @@ interface SymbolConstructor {
+   readonly matchAll: unique symbol;
+ }
+ 
++interface RegExpStringIterator<T> extends IteratorObject<
++  T,
++  BuiltinIteratorReturn,
++  unknown
++> {
++  [Symbol.iterator](): RegExpStringIterator<T>;
++}
++
+ interface RegExp {
+   /**
+    * Matches a string with this regular expression, and returns an iterable of matches
+    * containing the results of that search.
+    * @param string A string to search within.
+    */
+-  [Symbol.matchAll](str: string): IterableIterator<RegExpMatchArray>;
++  [Symbol.matchAll](str: string): RegExpStringIterator<RegExpMatchArray>;
+ }

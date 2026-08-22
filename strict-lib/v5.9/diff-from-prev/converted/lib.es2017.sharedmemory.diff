@@ -1,0 +1,19 @@
+diff --git a/packages/v5.8/output/lib-files/lib.es2017.sharedmemory.d.ts b/packages/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
+index 451e076..b8ff879 100644
+--- a/packages/v5.8/output/lib-files/lib.es2017.sharedmemory.d.ts
++++ b/packages/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
+@@ -14,13 +14,13 @@ interface SharedArrayBuffer {
+    * Returns a section of an SharedArrayBuffer.
+    */
+   slice(begin?: number, end?: number): SharedArrayBuffer;
+-  readonly [Symbol.species]: SharedArrayBuffer;
+   readonly [Symbol.toStringTag]: 'SharedArrayBuffer';
+ }
+ 
+ interface SharedArrayBufferConstructor {
+   readonly prototype: SharedArrayBuffer;
+   new (byteLength?: number): SharedArrayBuffer;
++  readonly [Symbol.species]: SharedArrayBufferConstructor;
+ }
+ declare const SharedArrayBuffer: SharedArrayBufferConstructor;
+ 

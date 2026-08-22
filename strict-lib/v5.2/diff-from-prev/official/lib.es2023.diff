@@ -1,0 +1,9 @@
+diff --git a/packages/v5.1/temp/copied/lib.es2023.d.ts b/packages/v5.2/temp/copied/lib.es2023.d.ts
+index cb3bdd6..e3dcb73 100644
+--- a/packages/v5.1/temp/copied/lib.es2023.d.ts
++++ b/packages/v5.2/temp/copied/lib.es2023.d.ts
+@@ -17,3 +17,4 @@ and limitations under the License.
+ 
+ /// <reference lib="es2022" />
+ /// <reference lib="es2023.array" />
++/// <reference lib="es2023.collection" />

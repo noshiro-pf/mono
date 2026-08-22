@@ -1,0 +1,86 @@
+diff --git a/packages/v5.3/temp/copied/lib.es5.d.ts b/packages/v5.4/temp/copied/lib.es5.d.ts
+index 4bb23e9..65c6045 100644
+--- a/packages/v5.3/temp/copied/lib.es5.d.ts
++++ b/packages/v5.4/temp/copied/lib.es5.d.ts
+@@ -696,6 +696,7 @@ interface ImportCallOptions {
+ 
+ /**
+  * The type for the `assert` property of the optional second argument to `import()`.
++ * @deprecated
+  */
+ interface ImportAssertions {
+   [key: string]: string;
+@@ -1912,6 +1913,11 @@ type Capitalize<S extends string> = intrinsic;
+  */
+ type Uncapitalize<S extends string> = intrinsic;
+ 
++/**
++ * Marker for non-inference type position
++ */
++type NoInfer<T> = intrinsic;
++
+ /**
+  * Marker for contextual 'this' type
+  */
+@@ -5385,14 +5391,17 @@ declare namespace Intl {
+     compare(x: string, y: string): number;
+     resolvedOptions(): ResolvedCollatorOptions;
+   }
+-  var Collator: {
++
++  interface CollatorConstructor {
+     new (locales?: string | string[], options?: CollatorOptions): Collator;
+     (locales?: string | string[], options?: CollatorOptions): Collator;
+     supportedLocalesOf(
+       locales: string | string[],
+       options?: CollatorOptions,
+     ): string[];
+-  };
++  }
++
++  var Collator: CollatorConstructor;
+ 
+   interface NumberFormatOptions {
+     localeMatcher?: string | undefined;
+@@ -5424,7 +5433,8 @@ declare namespace Intl {
+     format(value: number): string;
+     resolvedOptions(): ResolvedNumberFormatOptions;
+   }
+-  var NumberFormat: {
++
++  interface NumberFormatConstructor {
+     new (
+       locales?: string | string[],
+       options?: NumberFormatOptions,
+@@ -5435,7 +5445,9 @@ declare namespace Intl {
+       options?: NumberFormatOptions,
+     ): string[];
+     readonly prototype: NumberFormat;
+-  };
++  }
++
++  var NumberFormat: NumberFormatConstructor;
+ 
+   interface DateTimeFormatOptions {
+     localeMatcher?: 'best fit' | 'lookup' | undefined;
+@@ -5481,7 +5493,8 @@ declare namespace Intl {
+     format(date?: Date | number): string;
+     resolvedOptions(): ResolvedDateTimeFormatOptions;
+   }
+-  var DateTimeFormat: {
++
++  interface DateTimeFormatConstructor {
+     new (
+       locales?: string | string[],
+       options?: DateTimeFormatOptions,
+@@ -5495,7 +5508,9 @@ declare namespace Intl {
+       options?: DateTimeFormatOptions,
+     ): string[];
+     readonly prototype: DateTimeFormat;
+-  };
++  }
++
++  var DateTimeFormat: DateTimeFormatConstructor;
+ }
+ 
+ interface String {

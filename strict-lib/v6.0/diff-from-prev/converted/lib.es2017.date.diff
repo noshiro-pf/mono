@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2017.date.d.ts b/packages/v6.0/output/lib-files/lib.es2017.date.d.ts
+index 4802ccc4..7b10a10c 100644
+--- a/packages/v5.9/output/lib-files/lib.es2017.date.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2017.date.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface DateConstructor {
+   /**
+    * Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.

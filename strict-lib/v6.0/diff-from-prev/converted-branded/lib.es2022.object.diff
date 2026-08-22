@@ -1,0 +1,11 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2022.object.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2022.object.d.ts
+index 22a4649b..db9b103a 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2022.object.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2022.object.d.ts
+@@ -1,6 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-/// <reference lib="es5" />
+-
+ /**
+  * @internal
+  * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、

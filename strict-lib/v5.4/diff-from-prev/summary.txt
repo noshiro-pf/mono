@@ -1,0 +1,85 @@
+Cross-version diff: v5.3 -> v5.4
+
+[official] (temp/copied) — 26 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2016.d.ts
+  lib.es2016.intl.d.ts
+  lib.es2018.full.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.full.d.ts
+  lib.es2020.full.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2020.string.d.ts
+  lib.es2021.full.d.ts
+  lib.es2021.intl.d.ts
+  lib.es2022.full.d.ts
+  lib.es2022.intl.d.ts
+  lib.es2023.full.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.disposable.d.ts
+  lib.esnext.full.d.ts
+  lib.esnext.object.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted] (output/lib-files) — 26 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2016.d.ts
+  lib.es2016.intl.d.ts
+  lib.es2018.full.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.full.d.ts
+  lib.es2020.full.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2020.string.d.ts
+  lib.es2021.full.d.ts
+  lib.es2021.intl.d.ts
+  lib.es2022.full.d.ts
+  lib.es2022.intl.d.ts
+  lib.es2023.full.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.disposable.d.ts
+  lib.esnext.full.d.ts
+  lib.esnext.object.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted-branded] (output-branded/lib-files) — 26 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2016.d.ts
+  lib.es2016.intl.d.ts
+  lib.es2018.full.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.full.d.ts
+  lib.es2020.full.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2020.string.d.ts
+  lib.es2021.full.d.ts
+  lib.es2021.intl.d.ts
+  lib.es2022.full.d.ts
+  lib.es2022.intl.d.ts
+  lib.es2023.full.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.disposable.d.ts
+  lib.esnext.full.d.ts
+  lib.esnext.object.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts

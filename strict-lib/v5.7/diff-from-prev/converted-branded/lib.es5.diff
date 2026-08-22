@@ -1,0 +1,2070 @@
+diff --git a/packages/v5.6/output-branded/lib-files/lib.es5.d.ts b/packages/v5.7/output-branded/lib-files/lib.es5.d.ts
+index 1ea19ec..4201b31 100644
+--- a/packages/v5.6/output-branded/lib-files/lib.es5.d.ts
++++ b/packages/v5.7/output-branded/lib-files/lib.es5.d.ts
+@@ -2105,11 +2105,13 @@ interface ArrayBufferConstructor {
+ }
+ declare const ArrayBuffer: ArrayBufferConstructor;
+ 
+-interface ArrayBufferView {
++interface ArrayBufferView<
++  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
++> {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2122,8 +2124,8 @@ interface ArrayBufferView {
+   readonly byteOffset: NumberType.TypedArraySize;
+ }
+ 
+-interface DataView {
+-  readonly buffer: ArrayBuffer;
++interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
++  readonly buffer: TArrayBuffer;
+   readonly byteLength: NumberType.TypedArraySize;
+   readonly byteOffset: NumberType.TypedArraySize;
+   /**
+@@ -2291,14 +2293,17 @@ interface DataView {
+     littleEndian?: boolean,
+   ): void;
+ }
+-
+ interface DataViewConstructor {
+-  readonly prototype: DataView;
+-  new (
+-    buffer: ArrayBufferLike & { readonly BYTES_PER_ELEMENT?: never },
++  readonly prototype: DataView<ArrayBufferLike>;
++  new <
++    TArrayBuffer extends ArrayBufferLike & {
++      readonly BYTES_PER_ELEMENT?: never;
++    },
++  >(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     byteLength?: NumberType.TypedArraySize,
+-  ): DataView;
++  ): DataView<TArrayBuffer>;
+ }
+ declare const DataView: DataViewConstructor;
+ 
+@@ -2306,7 +2311,7 @@ declare const DataView: DataViewConstructor;
+  * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested
+  * number of bytes could not be allocated an exception is raised.
+  */
+-interface Int8Array {
++interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -2315,7 +2320,7 @@ interface Int8Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2354,7 +2359,7 @@ interface Int8Array {
+     predicate: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2384,10 +2389,10 @@ interface Int8Array {
+     predicate: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -2402,7 +2407,7 @@ interface Int8Array {
+     predicate: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      obj: Int8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Int8 | undefined;
+@@ -2420,7 +2425,7 @@ interface Int8Array {
+     predicate: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      obj: Int8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -2436,7 +2441,7 @@ interface Int8Array {
+     callbackfn: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -2487,10 +2492,10 @@ interface Int8Array {
+     callbackfn: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => Int8,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -2507,7 +2512,7 @@ interface Int8Array {
+       previousValue: Int8,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => Int8,
+   ): Int8;
+   reduce(
+@@ -2515,7 +2520,7 @@ interface Int8Array {
+       previousValue: Int8,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => Int8,
+     initialValue: Int8,
+   ): Int8;
+@@ -2535,7 +2540,7 @@ interface Int8Array {
+       previousValue: U,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2555,7 +2560,7 @@ interface Int8Array {
+       previousValue: Int8,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => Int8,
+   ): Int8;
+   reduceRight(
+@@ -2563,7 +2568,7 @@ interface Int8Array {
+       previousValue: Int8,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => Int8,
+     initialValue: Int8,
+   ): Int8;
+@@ -2583,7 +2588,7 @@ interface Int8Array {
+       previousValue: U,
+       currentValue: Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2591,7 +2596,7 @@ interface Int8Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int8Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -2611,7 +2616,7 @@ interface Int8Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -2625,7 +2630,7 @@ interface Int8Array {
+     predicate: (
+       value: Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2650,7 +2655,7 @@ interface Int8Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int8Array;
++  ): Int8Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -2663,19 +2668,20 @@ interface Int8Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int8Array;
++  valueOf(): this;
+ 
+   [index: number]: Int8;
+ }
+ interface Int8ArrayConstructor {
+-  readonly prototype: Int8Array;
+-  new (length: NumberType.TypedArraySize): Int8Array;
+-  new (array: ArrayLike<Int8> | ArrayBufferLike): Int8Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Int8Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int8Array<ArrayBuffer>;
++  new (array: ArrayLike<Int8>): Int8Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int8Array;
++  ): Int8Array<TArrayBuffer>;
++  new (array: ArrayLike<Int8> | ArrayBuffer): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -2686,13 +2692,13 @@ interface Int8ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Int8[]): Int8Array;
++  of(...items: readonly Int8[]): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Int8>): Int8Array;
++  from(arrayLike: ArrayLike<Int8>): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -2704,7 +2710,7 @@ interface Int8ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Int8,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ }
+ declare const Int8Array: Int8ArrayConstructor;
+ 
+@@ -2712,7 +2718,7 @@ declare const Int8Array: Int8ArrayConstructor;
+  * A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint8Array {
++interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -2721,7 +2727,7 @@ interface Uint8Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2760,7 +2766,7 @@ interface Uint8Array {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2790,10 +2796,10 @@ interface Uint8Array {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -2808,7 +2814,7 @@ interface Uint8Array {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Uint8 | undefined;
+@@ -2826,7 +2832,7 @@ interface Uint8Array {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -2842,7 +2848,7 @@ interface Uint8Array {
+     callbackfn: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -2893,10 +2899,10 @@ interface Uint8Array {
+     callbackfn: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => Uint8,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -2913,7 +2919,7 @@ interface Uint8Array {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => Uint8,
+   ): Uint8;
+   reduce(
+@@ -2921,7 +2927,7 @@ interface Uint8Array {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => Uint8,
+     initialValue: Uint8,
+   ): Uint8;
+@@ -2941,7 +2947,7 @@ interface Uint8Array {
+       previousValue: U,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2961,7 +2967,7 @@ interface Uint8Array {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => Uint8,
+   ): Uint8;
+   reduceRight(
+@@ -2969,7 +2975,7 @@ interface Uint8Array {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => Uint8,
+     initialValue: Uint8,
+   ): Uint8;
+@@ -2989,7 +2995,7 @@ interface Uint8Array {
+       previousValue: U,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2997,7 +3003,7 @@ interface Uint8Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint8Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3017,7 +3023,7 @@ interface Uint8Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3031,7 +3037,7 @@ interface Uint8Array {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3056,7 +3062,7 @@ interface Uint8Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8Array;
++  ): Uint8Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3069,20 +3075,20 @@ interface Uint8Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint8Array;
++  valueOf(): this;
+ 
+   [index: number]: Uint8;
+ }
+-
+ interface Uint8ArrayConstructor {
+-  readonly prototype: Uint8Array;
+-  new (length: NumberType.TypedArraySize): Uint8Array;
+-  new (array: ArrayLike<Uint8> | ArrayBufferLike): Uint8Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Uint8Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint8Array<ArrayBuffer>;
++  new (array: ArrayLike<Uint8>): Uint8Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint8Array;
++  ): Uint8Array<TArrayBuffer>;
++  new (array: ArrayLike<Uint8> | ArrayBuffer): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3093,13 +3099,13 @@ interface Uint8ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Uint8[]): Uint8Array;
++  of(...items: readonly Uint8[]): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Uint8>): Uint8Array;
++  from(arrayLike: ArrayLike<Uint8>): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -3111,7 +3117,7 @@ interface Uint8ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Uint8,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ }
+ declare const Uint8Array: Uint8ArrayConstructor;
+ 
+@@ -3119,7 +3125,9 @@ declare const Uint8Array: Uint8ArrayConstructor;
+  * A typed array of 8-bit unsigned integer (clamped) values. The contents are initialized to 0.
+  * If the requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint8ClampedArray {
++interface Uint8ClampedArray<
++  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
++> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -3128,7 +3136,7 @@ interface Uint8ClampedArray {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -3167,7 +3175,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3197,10 +3205,10 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -3215,7 +3223,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8ClampedArray,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Uint8 | undefined;
+@@ -3233,7 +3241,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8ClampedArray,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -3249,7 +3257,7 @@ interface Uint8ClampedArray {
+     callbackfn: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -3300,10 +3308,10 @@ interface Uint8ClampedArray {
+     callbackfn: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => Uint8,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -3320,7 +3328,7 @@ interface Uint8ClampedArray {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => Uint8,
+   ): Uint8;
+   reduce(
+@@ -3328,7 +3336,7 @@ interface Uint8ClampedArray {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => Uint8,
+     initialValue: Uint8,
+   ): Uint8;
+@@ -3348,7 +3356,7 @@ interface Uint8ClampedArray {
+       previousValue: U,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3368,7 +3376,7 @@ interface Uint8ClampedArray {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => Uint8,
+   ): Uint8;
+   reduceRight(
+@@ -3376,7 +3384,7 @@ interface Uint8ClampedArray {
+       previousValue: Uint8,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => Uint8,
+     initialValue: Uint8,
+   ): Uint8;
+@@ -3396,7 +3404,7 @@ interface Uint8ClampedArray {
+       previousValue: U,
+       currentValue: Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3404,7 +3412,7 @@ interface Uint8ClampedArray {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint8ClampedArray;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3424,7 +3432,7 @@ interface Uint8ClampedArray {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3438,7 +3446,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3463,7 +3471,7 @@ interface Uint8ClampedArray {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3476,20 +3484,20 @@ interface Uint8ClampedArray {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint8ClampedArray;
++  valueOf(): this;
+ 
+   [index: number]: Uint8;
+ }
+-
+ interface Uint8ClampedArrayConstructor {
+-  readonly prototype: Uint8ClampedArray;
+-  new (length: NumberType.TypedArraySize): Uint8ClampedArray;
+-  new (array: ArrayLike<Uint8> | ArrayBufferLike): Uint8ClampedArray;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Uint8ClampedArray<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint8ClampedArray<ArrayBuffer>;
++  new (array: ArrayLike<Uint8>): Uint8ClampedArray<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<TArrayBuffer>;
++  new (array: ArrayLike<Uint8> | ArrayBuffer): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3500,13 +3508,13 @@ interface Uint8ClampedArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Uint8[]): Uint8ClampedArray;
++  of(...items: readonly Uint8[]): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Uint8>): Uint8ClampedArray;
++  from(arrayLike: ArrayLike<Uint8>): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -3518,7 +3526,7 @@ interface Uint8ClampedArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Uint8,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ }
+ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
+ 
+@@ -3526,7 +3534,7 @@ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
+  * A typed array of 16-bit signed integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Int16Array {
++interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -3535,7 +3543,7 @@ interface Int16Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -3574,7 +3582,7 @@ interface Int16Array {
+     predicate: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3604,10 +3612,10 @@ interface Int16Array {
+     predicate: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -3622,7 +3630,7 @@ interface Int16Array {
+     predicate: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      obj: Int16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Int16 | undefined;
+@@ -3640,7 +3648,7 @@ interface Int16Array {
+     predicate: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      obj: Int16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -3656,7 +3664,7 @@ interface Int16Array {
+     callbackfn: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -3707,10 +3715,10 @@ interface Int16Array {
+     callbackfn: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => Int16,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -3727,7 +3735,7 @@ interface Int16Array {
+       previousValue: Int16,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => Int16,
+   ): Int16;
+   reduce(
+@@ -3735,7 +3743,7 @@ interface Int16Array {
+       previousValue: Int16,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => Int16,
+     initialValue: Int16,
+   ): Int16;
+@@ -3755,7 +3763,7 @@ interface Int16Array {
+       previousValue: U,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3775,7 +3783,7 @@ interface Int16Array {
+       previousValue: Int16,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => Int16,
+   ): Int16;
+   reduceRight(
+@@ -3783,7 +3791,7 @@ interface Int16Array {
+       previousValue: Int16,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => Int16,
+     initialValue: Int16,
+   ): Int16;
+@@ -3803,7 +3811,7 @@ interface Int16Array {
+       previousValue: U,
+       currentValue: Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3811,7 +3819,7 @@ interface Int16Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int16Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3831,7 +3839,7 @@ interface Int16Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3845,7 +3853,7 @@ interface Int16Array {
+     predicate: (
+       value: Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3870,7 +3878,7 @@ interface Int16Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int16Array;
++  ): Int16Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3883,20 +3891,20 @@ interface Int16Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int16Array;
++  valueOf(): this;
+ 
+   [index: number]: Int16;
+ }
+-
+ interface Int16ArrayConstructor {
+-  readonly prototype: Int16Array;
+-  new (length: NumberType.TypedArraySize): Int16Array;
+-  new (array: ArrayLike<Int16> | ArrayBufferLike): Int16Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Int16Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int16Array<ArrayBuffer>;
++  new (array: ArrayLike<Int16>): Int16Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int16Array;
++  ): Int16Array<TArrayBuffer>;
++  new (array: ArrayLike<Int16> | ArrayBuffer): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3907,13 +3915,13 @@ interface Int16ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Int16[]): Int16Array;
++  of(...items: readonly Int16[]): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Int16>): Int16Array;
++  from(arrayLike: ArrayLike<Int16>): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -3925,7 +3933,7 @@ interface Int16ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Int16,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ }
+ declare const Int16Array: Int16ArrayConstructor;
+ 
+@@ -3933,7 +3941,7 @@ declare const Int16Array: Int16ArrayConstructor;
+  * A typed array of 16-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint16Array {
++interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -3942,7 +3950,7 @@ interface Uint16Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -3981,7 +3989,7 @@ interface Uint16Array {
+     predicate: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4011,10 +4019,10 @@ interface Uint16Array {
+     predicate: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4029,7 +4037,7 @@ interface Uint16Array {
+     predicate: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      obj: Uint16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Uint16 | undefined;
+@@ -4047,7 +4055,7 @@ interface Uint16Array {
+     predicate: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      obj: Uint16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4063,7 +4071,7 @@ interface Uint16Array {
+     callbackfn: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -4114,10 +4122,10 @@ interface Uint16Array {
+     callbackfn: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => Uint16,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -4134,7 +4142,7 @@ interface Uint16Array {
+       previousValue: Uint16,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => Uint16,
+   ): Uint16;
+   reduce(
+@@ -4142,7 +4150,7 @@ interface Uint16Array {
+       previousValue: Uint16,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => Uint16,
+     initialValue: Uint16,
+   ): Uint16;
+@@ -4162,7 +4170,7 @@ interface Uint16Array {
+       previousValue: U,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4182,7 +4190,7 @@ interface Uint16Array {
+       previousValue: Uint16,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => Uint16,
+   ): Uint16;
+   reduceRight(
+@@ -4190,7 +4198,7 @@ interface Uint16Array {
+       previousValue: Uint16,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => Uint16,
+     initialValue: Uint16,
+   ): Uint16;
+@@ -4210,7 +4218,7 @@ interface Uint16Array {
+       previousValue: U,
+       currentValue: Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4218,7 +4226,7 @@ interface Uint16Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint16Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -4238,7 +4246,7 @@ interface Uint16Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -4252,7 +4260,7 @@ interface Uint16Array {
+     predicate: (
+       value: Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4277,7 +4285,7 @@ interface Uint16Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint16Array;
++  ): Uint16Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -4290,20 +4298,20 @@ interface Uint16Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint16Array;
++  valueOf(): this;
+ 
+   [index: number]: Uint16;
+ }
+-
+ interface Uint16ArrayConstructor {
+-  readonly prototype: Uint16Array;
+-  new (length: NumberType.TypedArraySize): Uint16Array;
+-  new (array: ArrayLike<Uint16> | ArrayBufferLike): Uint16Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Uint16Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint16Array<ArrayBuffer>;
++  new (array: ArrayLike<Uint16>): Uint16Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint16Array;
++  ): Uint16Array<TArrayBuffer>;
++  new (array: ArrayLike<Uint16> | ArrayBuffer): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -4314,13 +4322,13 @@ interface Uint16ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Uint16[]): Uint16Array;
++  of(...items: readonly Uint16[]): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Uint16>): Uint16Array;
++  from(arrayLike: ArrayLike<Uint16>): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -4332,14 +4340,14 @@ interface Uint16ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Uint16,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ }
+ declare const Uint16Array: Uint16ArrayConstructor;
+ /**
+  * A typed array of 32-bit signed integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Int32Array {
++interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -4348,7 +4356,7 @@ interface Int32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -4387,7 +4395,7 @@ interface Int32Array {
+     predicate: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4417,10 +4425,10 @@ interface Int32Array {
+     predicate: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4435,7 +4443,7 @@ interface Int32Array {
+     predicate: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      obj: Int32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Int32 | undefined;
+@@ -4453,7 +4461,7 @@ interface Int32Array {
+     predicate: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      obj: Int32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4469,7 +4477,7 @@ interface Int32Array {
+     callbackfn: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -4520,10 +4528,10 @@ interface Int32Array {
+     callbackfn: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => Int32,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -4540,7 +4548,7 @@ interface Int32Array {
+       previousValue: Int32,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => Int32,
+   ): Int32;
+   reduce(
+@@ -4548,7 +4556,7 @@ interface Int32Array {
+       previousValue: Int32,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => Int32,
+     initialValue: Int32,
+   ): Int32;
+@@ -4568,7 +4576,7 @@ interface Int32Array {
+       previousValue: U,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4588,7 +4596,7 @@ interface Int32Array {
+       previousValue: Int32,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => Int32,
+   ): Int32;
+   reduceRight(
+@@ -4596,7 +4604,7 @@ interface Int32Array {
+       previousValue: Int32,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => Int32,
+     initialValue: Int32,
+   ): Int32;
+@@ -4616,7 +4624,7 @@ interface Int32Array {
+       previousValue: U,
+       currentValue: Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4624,7 +4632,7 @@ interface Int32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -4644,7 +4652,7 @@ interface Int32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -4658,7 +4666,7 @@ interface Int32Array {
+     predicate: (
+       value: Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4683,7 +4691,7 @@ interface Int32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int32Array;
++  ): Int32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -4696,20 +4704,20 @@ interface Int32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int32Array;
++  valueOf(): this;
+ 
+   [index: number]: Int32;
+ }
+-
+ interface Int32ArrayConstructor {
+-  readonly prototype: Int32Array;
+-  new (length: NumberType.TypedArraySize): Int32Array;
+-  new (array: ArrayLike<Int32> | ArrayBufferLike): Int32Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Int32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int32Array<ArrayBuffer>;
++  new (array: ArrayLike<Int32>): Int32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int32Array;
++  ): Int32Array<TArrayBuffer>;
++  new (array: ArrayLike<Int32> | ArrayBuffer): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -4720,13 +4728,13 @@ interface Int32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Int32[]): Int32Array;
++  of(...items: readonly Int32[]): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Int32>): Int32Array;
++  from(arrayLike: ArrayLike<Int32>): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -4738,7 +4746,7 @@ interface Int32ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Int32,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ }
+ declare const Int32Array: Int32ArrayConstructor;
+ 
+@@ -4746,7 +4754,7 @@ declare const Int32Array: Int32ArrayConstructor;
+  * A typed array of 32-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint32Array {
++interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -4755,7 +4763,7 @@ interface Uint32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -4794,7 +4802,7 @@ interface Uint32Array {
+     predicate: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4824,10 +4832,10 @@ interface Uint32Array {
+     predicate: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4842,7 +4850,7 @@ interface Uint32Array {
+     predicate: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      obj: Uint32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Uint32 | undefined;
+@@ -4860,7 +4868,7 @@ interface Uint32Array {
+     predicate: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      obj: Uint32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4876,7 +4884,7 @@ interface Uint32Array {
+     callbackfn: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -4927,10 +4935,10 @@ interface Uint32Array {
+     callbackfn: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => Uint32,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -4947,7 +4955,7 @@ interface Uint32Array {
+       previousValue: Uint32,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => Uint32,
+   ): Uint32;
+   reduce(
+@@ -4955,7 +4963,7 @@ interface Uint32Array {
+       previousValue: Uint32,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => Uint32,
+     initialValue: Uint32,
+   ): Uint32;
+@@ -4975,7 +4983,7 @@ interface Uint32Array {
+       previousValue: U,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4995,7 +5003,7 @@ interface Uint32Array {
+       previousValue: Uint32,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => Uint32,
+   ): Uint32;
+   reduceRight(
+@@ -5003,7 +5011,7 @@ interface Uint32Array {
+       previousValue: Uint32,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => Uint32,
+     initialValue: Uint32,
+   ): Uint32;
+@@ -5023,7 +5031,7 @@ interface Uint32Array {
+       previousValue: U,
+       currentValue: Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5031,7 +5039,7 @@ interface Uint32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5051,7 +5059,7 @@ interface Uint32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -5065,7 +5073,7 @@ interface Uint32Array {
+     predicate: (
+       value: Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5090,7 +5098,7 @@ interface Uint32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint32Array;
++  ): Uint32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -5103,20 +5111,20 @@ interface Uint32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint32Array;
++  valueOf(): this;
+ 
+   [index: number]: Uint32;
+ }
+-
+ interface Uint32ArrayConstructor {
+-  readonly prototype: Uint32Array;
+-  new (length: NumberType.TypedArraySize): Uint32Array;
+-  new (array: ArrayLike<Uint32> | ArrayBufferLike): Uint32Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Uint32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint32Array<ArrayBuffer>;
++  new (array: ArrayLike<Uint32>): Uint32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint32Array;
++  ): Uint32Array<TArrayBuffer>;
++  new (array: ArrayLike<Uint32> | ArrayBuffer): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -5127,13 +5135,13 @@ interface Uint32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Uint32[]): Uint32Array;
++  of(...items: readonly Uint32[]): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Uint32>): Uint32Array;
++  from(arrayLike: ArrayLike<Uint32>): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -5145,7 +5153,7 @@ interface Uint32ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Uint32,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ }
+ declare const Uint32Array: Uint32ArrayConstructor;
+ 
+@@ -5153,7 +5161,7 @@ declare const Uint32Array: Uint32ArrayConstructor;
+  * A typed array of 32-bit float values. The contents are initialized to 0. If the requested number
+  * of bytes could not be allocated an exception is raised.
+  */
+-interface Float32Array {
++interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -5162,7 +5170,7 @@ interface Float32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -5201,7 +5209,7 @@ interface Float32Array {
+     predicate: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5231,10 +5239,10 @@ interface Float32Array {
+     predicate: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -5249,7 +5257,7 @@ interface Float32Array {
+     predicate: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      obj: Float32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Float32 | undefined;
+@@ -5267,7 +5275,7 @@ interface Float32Array {
+     predicate: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      obj: Float32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -5283,7 +5291,7 @@ interface Float32Array {
+     callbackfn: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -5334,10 +5342,10 @@ interface Float32Array {
+     callbackfn: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => Float32,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -5354,7 +5362,7 @@ interface Float32Array {
+       previousValue: Float32,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => Float32,
+   ): Float32;
+   reduce(
+@@ -5362,7 +5370,7 @@ interface Float32Array {
+       previousValue: Float32,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => Float32,
+     initialValue: Float32,
+   ): Float32;
+@@ -5382,7 +5390,7 @@ interface Float32Array {
+       previousValue: U,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5402,7 +5410,7 @@ interface Float32Array {
+       previousValue: Float32,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => Float32,
+   ): Float32;
+   reduceRight(
+@@ -5410,7 +5418,7 @@ interface Float32Array {
+       previousValue: Float32,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => Float32,
+     initialValue: Float32,
+   ): Float32;
+@@ -5430,7 +5438,7 @@ interface Float32Array {
+       previousValue: U,
+       currentValue: Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5438,7 +5446,7 @@ interface Float32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Float32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5458,7 +5466,7 @@ interface Float32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -5472,7 +5480,7 @@ interface Float32Array {
+     predicate: (
+       value: Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5497,7 +5505,7 @@ interface Float32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float32Array;
++  ): Float32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -5510,20 +5518,20 @@ interface Float32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Float32Array;
++  valueOf(): this;
+ 
+   [index: number]: Float32;
+ }
+-
+ interface Float32ArrayConstructor {
+-  readonly prototype: Float32Array;
+-  new (length: NumberType.TypedArraySize): Float32Array;
+-  new (array: ArrayLike<Float32> | ArrayBufferLike): Float32Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Float32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Float32Array<ArrayBuffer>;
++  new (array: ArrayLike<Float32>): Float32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Float32Array;
++  ): Float32Array<TArrayBuffer>;
++  new (array: ArrayLike<Float32> | ArrayBuffer): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -5534,13 +5542,13 @@ interface Float32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Float32[]): Float32Array;
++  of(...items: readonly Float32[]): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Float32>): Float32Array;
++  from(arrayLike: ArrayLike<Float32>): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -5552,7 +5560,7 @@ interface Float32ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Float32,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ }
+ declare const Float32Array: Float32ArrayConstructor;
+ 
+@@ -5560,7 +5568,7 @@ declare const Float32Array: Float32ArrayConstructor;
+  * A typed array of 64-bit float values. The contents are initialized to 0. If the requested
+  * number of bytes could not be allocated an exception is raised.
+  */
+-interface Float64Array {
++interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -5569,7 +5577,7 @@ interface Float64Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -5608,7 +5616,7 @@ interface Float64Array {
+     predicate: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5638,10 +5646,10 @@ interface Float64Array {
+     predicate: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -5656,7 +5664,7 @@ interface Float64Array {
+     predicate: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      obj: Float64Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): Float64 | undefined;
+@@ -5674,7 +5682,7 @@ interface Float64Array {
+     predicate: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      obj: Float64Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -5690,7 +5698,7 @@ interface Float64Array {
+     callbackfn: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -5741,10 +5749,10 @@ interface Float64Array {
+     callbackfn: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => Float64,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -5761,7 +5769,7 @@ interface Float64Array {
+       previousValue: Float64,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => Float64,
+   ): Float64;
+   reduce(
+@@ -5769,7 +5777,7 @@ interface Float64Array {
+       previousValue: Float64,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => Float64,
+     initialValue: Float64,
+   ): Float64;
+@@ -5789,7 +5797,7 @@ interface Float64Array {
+       previousValue: U,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5809,7 +5817,7 @@ interface Float64Array {
+       previousValue: Float64,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => Float64,
+   ): Float64;
+   reduceRight(
+@@ -5817,7 +5825,7 @@ interface Float64Array {
+       previousValue: Float64,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => Float64,
+     initialValue: Float64,
+   ): Float64;
+@@ -5837,7 +5845,7 @@ interface Float64Array {
+       previousValue: U,
+       currentValue: Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5845,7 +5853,7 @@ interface Float64Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Float64Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5865,7 +5873,7 @@ interface Float64Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -5879,7 +5887,7 @@ interface Float64Array {
+     predicate: (
+       value: Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5904,7 +5912,7 @@ interface Float64Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float64Array;
++  ): Float64Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -5917,20 +5925,20 @@ interface Float64Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Float64Array;
++  valueOf(): this;
+ 
+   [index: number]: Float64;
+ }
+-
+ interface Float64ArrayConstructor {
+-  readonly prototype: Float64Array;
+-  new (length: NumberType.TypedArraySize): Float64Array;
+-  new (array: ArrayLike<Float64> | ArrayBufferLike): Float64Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Float64Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Float64Array<ArrayBuffer>;
++  new (array: ArrayLike<Float64>): Float64Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Float64Array;
++  ): Float64Array<TArrayBuffer>;
++  new (array: ArrayLike<Float64> | ArrayBuffer): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -5941,13 +5949,13 @@ interface Float64ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly Float64[]): Float64Array;
++  of(...items: readonly Float64[]): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<Float64>): Float64Array;
++  from(arrayLike: ArrayLike<Float64>): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -5959,7 +5967,7 @@ interface Float64ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => Float64,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ }
+ declare const Float64Array: Float64ArrayConstructor;
+ 

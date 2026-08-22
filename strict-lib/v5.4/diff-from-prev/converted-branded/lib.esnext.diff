@@ -1,0 +1,11 @@
+diff --git a/packages/v5.3/output-branded/lib-files/lib.esnext.d.ts b/packages/v5.4/output-branded/lib-files/lib.esnext.d.ts
+index e0231e1..016c3d8 100644
+--- a/packages/v5.3/output-branded/lib-files/lib.esnext.d.ts
++++ b/packages/v5.4/output-branded/lib-files/lib.esnext.d.ts
+@@ -5,3 +5,6 @@
+ /// <reference path="./lib.esnext.intl.d.ts" />
+ /// <reference path="./lib.esnext.decorators.d.ts" />
+ /// <reference path="./lib.esnext.disposable.d.ts" />
++/// <reference path="./lib.esnext.promise.d.ts" />
++/// <reference path="./lib.esnext.object.d.ts" />
++/// <reference path="./lib.esnext.collection.d.ts" />

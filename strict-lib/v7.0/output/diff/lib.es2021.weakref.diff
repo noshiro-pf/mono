@@ -1,0 +1,54 @@
+@@ -1,19 +1,4 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABILITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+-/// <reference lib="es2015.symbol.wellknown" />
++/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
+ 
+ interface WeakRef<T extends WeakKey> {
+   readonly [Symbol.toStringTag]: 'WeakRef';
+@@ -27,7 +12,7 @@ interface WeakRef<T extends WeakKey> {
+ }
+ 
+ interface WeakRefConstructor {
+-  readonly prototype: WeakRef<any>;
++  readonly prototype: WeakRef<object>;
+ 
+   /**
+    * Creates a WeakRef instance for the given target value.
+@@ -37,7 +22,7 @@ interface WeakRefConstructor {
+   new <T extends WeakKey>(target: T): WeakRef<T>;
+ }
+ 
+-declare var WeakRef: WeakRefConstructor;
++declare const WeakRef: WeakRefConstructor;
+ 
+ interface FinalizationRegistry<T> {
+   readonly [Symbol.toStringTag]: 'FinalizationRegistry';
+@@ -63,7 +48,7 @@ interface FinalizationRegistry<T> {
+ }
+ 
+ interface FinalizationRegistryConstructor {
+-  readonly prototype: FinalizationRegistry<any>;
++  readonly prototype: FinalizationRegistry<unknown>;
+ 
+   /**
+    * Creates a finalization registry with an associated cleanup callback
+@@ -72,4 +57,4 @@ interface FinalizationRegistryConstructor {
+   new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
+ }
+ 
+-declare var FinalizationRegistry: FinalizationRegistryConstructor;
++declare const FinalizationRegistry: FinalizationRegistryConstructor;

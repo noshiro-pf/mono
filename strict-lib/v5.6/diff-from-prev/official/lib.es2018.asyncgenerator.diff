@@ -1,0 +1,18 @@
+diff --git a/packages/v5.5/temp/copied/lib.es2018.asyncgenerator.d.ts b/packages/v5.6/temp/copied/lib.es2018.asyncgenerator.d.ts
+index 8b2f9d9..17169cc 100644
+--- a/packages/v5.5/temp/copied/lib.es2018.asyncgenerator.d.ts
++++ b/packages/v5.6/temp/copied/lib.es2018.asyncgenerator.d.ts
+@@ -20,10 +20,10 @@ and limitations under the License.
+ interface AsyncGenerator<
+   T = unknown,
+   TReturn = any,
+-  TNext = unknown,
+-> extends AsyncIterator<T, TReturn, TNext> {
++  TNext = any,
++> extends AsyncIteratorObject<T, TReturn, TNext> {
+   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+-  next(...args: [] | [TNext]): Promise<IteratorResult<T, TReturn>>;
++  next(...[value]: [] | [TNext]): Promise<IteratorResult<T, TReturn>>;
+   return(
+     value: TReturn | PromiseLike<TReturn>,
+   ): Promise<IteratorResult<T, TReturn>>;

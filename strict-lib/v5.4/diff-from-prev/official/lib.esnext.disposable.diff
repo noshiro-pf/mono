@@ -1,0 +1,13 @@
+diff --git a/packages/v5.3/temp/copied/lib.esnext.disposable.d.ts b/packages/v5.4/temp/copied/lib.esnext.disposable.d.ts
+index 1594dcd..8cc9d42 100644
+--- a/packages/v5.3/temp/copied/lib.esnext.disposable.d.ts
++++ b/packages/v5.4/temp/copied/lib.esnext.disposable.d.ts
+@@ -42,7 +42,7 @@ interface SuppressedError extends Error {
+   suppressed: any;
+ }
+ 
+-interface SuppressedErrorConstructor extends ErrorConstructor {
++interface SuppressedErrorConstructor {
+   new (error: any, suppressed: any, message?: string): SuppressedError;
+   (error: any, suppressed: any, message?: string): SuppressedError;
+   readonly prototype: SuppressedError;

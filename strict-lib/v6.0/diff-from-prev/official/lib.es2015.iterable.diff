@@ -1,0 +1,31 @@
+diff --git a/packages/v5.9/temp/copied/lib.es2015.iterable.d.ts b/packages/v6.0/temp/copied/lib.es2015.iterable.d.ts
+index 06d85bee..fd14a21d 100644
+--- a/packages/v5.9/temp/copied/lib.es2015.iterable.d.ts
++++ b/packages/v6.0/temp/copied/lib.es2015.iterable.d.ts
+@@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference lib="es2015.symbol" />
+ 
+ interface SymbolConstructor {
+@@ -207,8 +205,8 @@ interface MapConstructor {
+ interface WeakMap<K extends WeakKey, V> {}
+ 
+ interface WeakMapConstructor {
+-  new <K extends WeakKey, V>(
+-    iterable: Iterable<readonly [K, V]>,
++  new <K extends WeakKey = WeakKey, V = any>(
++    iterable?: Iterable<readonly [K, V]> | null,
+   ): WeakMap<K, V>;
+ }
+ 

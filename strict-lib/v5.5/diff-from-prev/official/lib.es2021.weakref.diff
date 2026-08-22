@@ -1,0 +1,13 @@
+diff --git a/packages/v5.4/temp/copied/lib.es2021.weakref.d.ts b/packages/v5.5/temp/copied/lib.es2021.weakref.d.ts
+index eb554fc..8339b1f 100644
+--- a/packages/v5.4/temp/copied/lib.es2021.weakref.d.ts
++++ b/packages/v5.5/temp/copied/lib.es2021.weakref.d.ts
+@@ -59,7 +59,7 @@ interface FinalizationRegistry<T> {
+    * @param unregisterToken The token that was used as the unregisterToken argument when calling
+    * register to register the target value.
+    */
+-  unregister(unregisterToken: WeakKey): void;
++  unregister(unregisterToken: WeakKey): boolean;
+ }
+ 
+ interface FinalizationRegistryConstructor {

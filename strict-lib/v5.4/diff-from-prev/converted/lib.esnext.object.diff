@@ -1,0 +1,20 @@
+diff --git a/packages/v5.4/output/lib-files/lib.esnext.object.d.ts b/packages/v5.4/output/lib-files/lib.esnext.object.d.ts
+new file mode 100644
+index 0000000..92e8669
+--- /dev/null
++++ b/packages/v5.4/output/lib-files/lib.esnext.object.d.ts
+@@ -0,0 +1,14 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++interface ObjectConstructor {
++  /**
++   * Groups members of an iterable according to the return value of the passed callback.
++   * @param items An iterable.
++   * @param keySelector A callback which will be invoked for each item in items.
++   */
++  groupBy<K extends PropertyKey, T>(
++    items: Iterable<T>,
++    keySelector: (item: T, index: number) => K,
++  ): Partial<MutableRecord<K, T[]>>;
++}

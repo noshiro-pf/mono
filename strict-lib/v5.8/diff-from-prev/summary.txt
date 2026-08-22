@@ -1,0 +1,43 @@
+Cross-version diff: v5.7 -> v5.8
+
+[official] (temp/copied) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.iterable.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.iterator.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted] (output/lib-files) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.iterable.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.iterator.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted-branded] (output-branded/lib-files) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.iterable.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2023.array.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.iterator.d.ts
+  lib.esnext.promise.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts

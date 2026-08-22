@@ -1,0 +1,21 @@
+{
+  "name": "strict-ts-lib-v5.8-es2015",
+  "version": "0.5.0",
+  "private": false,
+  "description": "Strict TypeScript lib",
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noshiro-pf/strict-typescript-lib.git"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "types": "./index.d.ts",
+  "dependencies": {
+    "ts-type-forge": "^9.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.8.0 <5.9.0"
+  }
+}

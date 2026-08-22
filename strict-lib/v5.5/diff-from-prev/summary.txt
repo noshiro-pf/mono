@@ -1,0 +1,76 @@
+Cross-version diff: v5.4 -> v5.5
+
+[official] (temp/copied) — 23 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.core.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.intl.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2021.weakref.d.ts
+  lib.es2022.regexp.d.ts
+  lib.es2023.d.ts
+  lib.es2023.array.d.ts
+  lib.es2023.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.array.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.intl.d.ts
+  lib.esnext.regexp.d.ts
+  lib.esnext.string.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted] (output/lib-files) — 23 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.core.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.intl.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2021.weakref.d.ts
+  lib.es2022.regexp.d.ts
+  lib.es2023.d.ts
+  lib.es2023.array.d.ts
+  lib.es2023.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.array.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.intl.d.ts
+  lib.esnext.regexp.d.ts
+  lib.esnext.string.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted-branded] (output-branded/lib-files) — 23 changed file(s):
+  lib.dom.d.ts
+  lib.dom.asynciterable.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.core.d.ts
+  lib.es2018.intl.d.ts
+  lib.es2019.intl.d.ts
+  lib.es2020.bigint.d.ts
+  lib.es2020.intl.d.ts
+  lib.es2021.weakref.d.ts
+  lib.es2022.regexp.d.ts
+  lib.es2023.d.ts
+  lib.es2023.array.d.ts
+  lib.es2023.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.array.d.ts
+  lib.esnext.collection.d.ts
+  lib.esnext.intl.d.ts
+  lib.esnext.regexp.d.ts
+  lib.esnext.string.d.ts
+  lib.webworker.d.ts
+  lib.webworker.asynciterable.d.ts
+  lib.webworker.iterable.d.ts

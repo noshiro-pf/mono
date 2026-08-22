@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.esnext.array.d.ts b/packages/v6.0/output-branded/lib-files/lib.esnext.array.d.ts
+index 8abaeb04..8682c23b 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.esnext.array.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.esnext.array.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface ArrayConstructor {
+   /**
+    * Creates an array from an async iterator or iterable object.

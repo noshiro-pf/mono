@@ -1,0 +1,137 @@
+diff --git a/packages/v5.1/temp/copied/lib.es5.d.ts b/packages/v5.2/temp/copied/lib.es5.d.ts
+index 4ff861f..d26a2c3 100644
+--- a/packages/v5.1/temp/copied/lib.es5.d.ts
++++ b/packages/v5.2/temp/copied/lib.es5.d.ts
+@@ -1909,6 +1909,15 @@ type Uncapitalize<S extends string> = intrinsic;
+  */
+ interface ThisType<T> {}
+ 
++/**
++ * Stores types to be used with WeakSet, WeakMap, WeakRef, and FinalizationRegistry
++ */
++interface WeakKeyTypes {
++  object: object;
++}
++
++type WeakKey = WeakKeyTypes[keyof WeakKeyTypes];
++
+ /**
+  * Represents a raw buffer of binary data, which is used to store data for the
+  * different typed arrays. ArrayBuffers cannot be read from or written to directly,
+@@ -2128,10 +2137,10 @@ interface Int8Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -2483,10 +2492,10 @@ interface Uint8Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -2839,10 +2848,10 @@ interface Uint8ClampedArray {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -3219,10 +3228,10 @@ interface Int16Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -3574,10 +3583,10 @@ interface Uint16Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -3929,10 +3938,10 @@ interface Int32Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -4285,10 +4294,10 @@ interface Uint32Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -4640,10 +4649,10 @@ interface Float32Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -4996,10 +5005,10 @@ interface Float64Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end. If start is omitted, `0` is used.
++   * is treated as length+end.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start?: number, end?: number): this;
++  copyWithin(target: number, start: number, end?: number): this;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.

@@ -1,0 +1,56 @@
+diff --git a/packages/v5.9/temp/copied/lib.es2020.bigint.d.ts b/packages/v6.0/temp/copied/lib.es2020.bigint.d.ts
+index e6ca05cc..efe608a2 100644
+--- a/packages/v5.9/temp/copied/lib.es2020.bigint.d.ts
++++ b/packages/v6.0/temp/copied/lib.es2020.bigint.d.ts
+@@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference lib="es2020.intl" />
+ 
+ interface BigIntToLocaleStringOptions {
+@@ -385,7 +383,7 @@ interface BigInt64Array<
+   includes(searchElement: bigint, fromIndex?: number): boolean;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -403,7 +401,7 @@ interface BigInt64Array<
+   keys(): ArrayIterator<number>;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -776,7 +774,7 @@ interface BigUint64Array<
+   includes(searchElement: bigint, fromIndex?: number): boolean;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -794,7 +792,7 @@ interface BigUint64Array<
+   keys(): ArrayIterator<number>;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.

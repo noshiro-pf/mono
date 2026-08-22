@@ -1,0 +1,17 @@
+diff --git a/packages/v5.0/output/lib-files/lib.es2015.core.d.ts b/packages/v5.1/output/lib-files/lib.es2015.core.d.ts
+index 264e9e2..28809c9 100644
+--- a/packages/v5.0/output/lib-files/lib.es2015.core.d.ts
++++ b/packages/v5.1/output/lib-files/lib.es2015.core.d.ts
+@@ -50,10 +50,10 @@ interface Array<T> {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end.
++   * is treated as length+end. If start is omitted, `0` is used.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+-  copyWithin(target: number, start: number, end?: number): this;
++  copyWithin(target: number, start?: number, end?: number): this;
+ }
+ 
+ interface ArrayConstructor {

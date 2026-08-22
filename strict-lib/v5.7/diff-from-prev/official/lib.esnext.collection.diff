@@ -1,0 +1,23 @@
+diff --git a/packages/v5.6/temp/copied/lib.esnext.collection.d.ts b/packages/v5.7/temp/copied/lib.esnext.collection.d.ts
+index aa04e0c..6c91e27 100644
+--- a/packages/v5.6/temp/copied/lib.esnext.collection.d.ts
++++ b/packages/v5.7/temp/copied/lib.esnext.collection.d.ts
+@@ -15,17 +15,7 @@ and limitations under the License.
+ 
+ /// <reference no-default-lib="true"/>
+ 
+-interface MapConstructor {
+-  /**
+-   * Groups members of an iterable according to the return value of the passed callback.
+-   * @param items An iterable.
+-   * @param keySelector A callback which will be invoked for each item in items.
+-   */
+-  groupBy<K, T>(
+-    items: Iterable<T>,
+-    keySelector: (item: T, index: number) => K,
+-  ): Map<K, T[]>;
+-}
++/// <reference lib="es2024.collection" />
+ 
+ interface ReadonlySetLike<T> {
+   /**

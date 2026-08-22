@@ -1,0 +1,10 @@
+diff --git a/packages/v5.8/output/lib-files/lib.esnext.d.ts b/packages/v5.9/output/lib-files/lib.esnext.d.ts
+index 15eec7f..bcd6da1 100644
+--- a/packages/v5.8/output/lib-files/lib.esnext.d.ts
++++ b/packages/v5.9/output/lib-files/lib.esnext.d.ts
+@@ -10,3 +10,5 @@
+ /// <reference path="./lib.esnext.iterator.d.ts" />
+ /// <reference path="./lib.esnext.promise.d.ts" />
+ /// <reference path="./lib.esnext.float16.d.ts" />
++/// <reference path="./lib.esnext.error.d.ts" />
++/// <reference path="./lib.esnext.sharedmemory.d.ts" />

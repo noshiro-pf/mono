@@ -27,6 +27,15 @@ ignorePaths:
   - experimental/**
   - '**/*.svg'
   - '**/firebase-emulator-exports/**'
+  # strict-lib: generated declarations and the diffs taken over them.
+  - strict-lib/v*/temp/**
+  - strict-lib/v*/output/lib-files/**
+  - strict-lib/v*/output/lib/libs/**
+  - strict-lib/v*/output/lib/libs-branded/**
+  - strict-lib/v*/output/diff/**
+  - strict-lib/v*/diff-from-prev/**
+  - strict-lib/v*/output-branded/lib-files/**
+  - strict-lib/v*/output-branded/diff/**
 # Only words that occur across more than one package or top-level directory
 # belong here. A word confined to one package goes in that package's
 # `cspell.config.yaml`; a word confined to one file goes in a

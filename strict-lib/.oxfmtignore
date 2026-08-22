@@ -1,0 +1,11 @@
+# Paths oxfmt must never format, beyond what .gitignore already covers.
+#
+# Two consumers pass this file via --ignore-path:
+#   1. The gen pipeline's `formatDir` passes ONLY this file, so it can still
+#      format the git-ignored `temp/` and the generated `output*/` dirs by their
+#      explicit paths (none of which are listed here).
+#   2. The repo-wide `fmt` script passes `.gitignore` AND this file, so it skips
+#      the usual build artifacts plus the tracked paths below.
+node_modules/
+pnpm-lock.yaml
+docs/

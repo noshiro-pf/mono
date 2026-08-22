@@ -1,0 +1,20 @@
+diff --git a/packages/v5.6/output-branded/lib-files/lib.esnext.d.ts b/packages/v5.7/output-branded/lib-files/lib.esnext.d.ts
+index c88d3b8..bfe4d1e 100644
+--- a/packages/v5.6/output-branded/lib-files/lib.esnext.d.ts
++++ b/packages/v5.7/output-branded/lib-files/lib.esnext.d.ts
+@@ -1,14 +1,10 @@
+ /// <reference no-default-lib="true"/>
+ /// <reference types="ts-type-forge/global" />
+ 
+-/// <reference path="./lib.es2023.d.ts" />
++/// <reference path="./lib.es2024.d.ts" />
+ /// <reference path="./lib.esnext.intl.d.ts" />
+ /// <reference path="./lib.esnext.decorators.d.ts" />
+ /// <reference path="./lib.esnext.disposable.d.ts" />
+-/// <reference path="./lib.esnext.promise.d.ts" />
+-/// <reference path="./lib.esnext.object.d.ts" />
+ /// <reference path="./lib.esnext.collection.d.ts" />
+ /// <reference path="./lib.esnext.array.d.ts" />
+-/// <reference path="./lib.esnext.regexp.d.ts" />
+-/// <reference path="./lib.esnext.string.d.ts" />
+ /// <reference path="./lib.esnext.iterator.d.ts" />

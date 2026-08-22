@@ -1,0 +1,29 @@
+diff --git a/packages/v5.3/output/lib-files/lib.es2018.intl.d.ts b/packages/v5.4/output/lib-files/lib.es2018.intl.d.ts
+index 1af7c1b..a2ff009 100644
+--- a/packages/v5.3/output/lib-files/lib.es2018.intl.d.ts
++++ b/packages/v5.4/output/lib-files/lib.es2018.intl.d.ts
+@@ -32,7 +32,7 @@ declare namespace Intl {
+     select(n: number): LDMLPluralRule;
+   }
+ 
+-  const PluralRules: {
++  interface PluralRulesConstructor {
+     new (
+       locales?: string | readonly string[],
+       options?: PluralRulesOptions,
+@@ -41,12 +41,13 @@ declare namespace Intl {
+       locales?: string | readonly string[],
+       options?: PluralRulesOptions,
+     ): PluralRules;
+-
+     supportedLocalesOf(
+       locales: string | readonly string[],
+       options?: { readonly localeMatcher?: 'lookup' | 'best fit' },
+     ): string[];
+-  };
++  }
++
++  const PluralRules: PluralRulesConstructor;
+ 
+   // We can only have one definition for 'type' in TypeScript, and so you can learn where the keys come from here:
+   type ES2018NumberFormatPartType =
