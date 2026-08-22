@@ -722,13 +722,18 @@ node_modules/.pnpm/strict-ts-lib-v7.0@0.2.0_typescript@6.0.3/node_modules/ts-typ
 strict-lib/
   scripts/                    生成スクリプト（旧 packages/scripts-common ＋ 旧 scripts/）
   v7.0/
-    package.json              publish されるパッケージ
-    libs/<lib>/index.d.ts     ← 公開時の配置そのまま
-    lib-files/                生成中間物
-    temp/                     TypeScript 本体からのコピー原本
-    diff-from-prev/           前バージョンとの差分（レビュー用）
+    package.json              publish されるパッケージ（flavor 統合後は 1 系統 1 件）
+    libs/<lib>/index.d.ts         ← 公開時の配置そのまま（非 branded）
+    libs-branded/<lib>/index.d.ts ← 同上（branded・決定 5）
+    lib-files/                生成中間物。差分の入力でもある
+    temp/copied/              TypeScript 本体からのコピー原本。差分の入力
+    diff/                     変換前後の差分
+    diff-from-prev/           前バージョンとの差分。converter 更新要否の判断材料
   v6.0/ …
 ```
+
+`lib-files/`・`temp/`・`diff/`・`diff-from-prev/` は publish されないが**開発環境の
+一部**なので、そのまま持ってくる（後述）。
 
 **「公開時の配置そのまま」が移行の必須条件である。** `paths` が指す
 `node_modules/strict-ts-lib-v7.0/libs/*` は、workspace 化すると
@@ -874,19 +879,40 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 メッセージで移行先を案内する。
 
 
-### 移行前にやる掃除
-
-移動するかに関わらず効くので先に片付ける。
+### 移行前にやる掃除 — 削るのは `output` の中だけ
 
 | 対象 | ファイル数 | 扱い | 状態 |
 | :-- | --: | :-- | :-- |
-| `output(-branded)/packages/**/package.json` | **2,154** | **削除**。per-lib publish をやめた時点で死んでいる。workspace のグロブは `packages/v*/output` までで、`pack-bundle.mts` は `**/index.d.ts` しか読まない | **完了**（strict-typescript-lib#130） |
-| `output(-branded)/packages/` → `libs/` / `libs-branded/` | — | リネーム。pack 時のステージングを削る。決定 2 の必須条件でもあり、決定 5 の形でもある | 移植と同時 |
-| `temp/**` | 1,089 | 追跡をやめるか判断。`diff-from-prev` があるので差分レビューは維持できる | 未 |
-| バージョン統一 | — | 決定 3。1.0.0 から | 未 |
+| `output(-branded)/packages/**/package.json` のうち参照の無い分 | **1,955** | **削除**。per-lib publish をやめた時点で死んでいる | **完了**（strict-typescript-lib#130） |
+| 同 group 単位の分 | 199 | **残す**。各 harness が `file:output/packages/<group>` で devDepend しており、`lib-check` の名前解決に要る | — |
+| `output(-branded)/packages/` → `libs/` / `libs-branded/` | — | リネーム。pack 時のステージングを削る。決定 2 の必須条件であり、決定 5 の形でもある | 移植と同時 |
+| バージョン統一 | — | 決定 3。`0.5.0` へ | 未 |
 
-上流の追跡ファイルは 9,866 だった。#130 で 7,712 になり、`temp/` も外せば 6,600 前後。
-mono は現在 8,109 なので、移行後は 15,000 弱になる。
+上流の追跡ファイルは 9,866 → **7,911**（#130 時点）。
+
+#### 差分の機構は開発環境の一部であって、負債ではない
+
+**`temp/`・`diff-from-prev/`・`lib-files/`・`output/diff/` は残す。** 連続バージョン間の
+差分は、**converter script の更新が要るかどうかを判断するための機構**として置かれて
+いる。publish されるアセットには含まれないが、開発には要る。
+
+`gen-version-diff.mts` が読む先を見れば依存関係がはっきりする。
+
+| 差分の種類 | 入力 | 出力 |
+| :-- | :-- | :-- |
+| `official` | `temp/copied`（TypeScript 本体からのコピー原本） | `diff-from-prev/official/` |
+| `converted` | `output/lib-files` | `diff-from-prev/converted/` |
+| `converted-branded` | `output-branded/lib-files` | `diff-from-prev/converted-branded/` |
+
+つまり `temp/copied` は**入力**であり、追跡をやめると `official` 差分が取れなくなる。
+「TypeScript 側が何を変えたか」が見えなくなるということで、それは converter を追随
+させるかどうかの一次情報である。`output/diff/`（変換前後の差分、108 ファイル）も
+同じ性質のものとして残す。
+
+**この文書の初版は `temp/**` の追跡をやめる案を挙げていたが、誤りである。** ファイル数
+だけを見て入力と生成物を区別していなかった。削ってよいのは `output` の中の、
+誰も解決しない manifest だけである。
+
 
 ### 手順
 
