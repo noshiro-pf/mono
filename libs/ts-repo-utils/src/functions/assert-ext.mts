@@ -1,5 +1,11 @@
 import * as path from 'node:path';
-import { Arr, type IMap, isString, Result } from 'ts-data-forge';
+import {
+  Arr,
+  type IMap,
+  isString,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { createResultAssert } from './create-result-assert.mjs';
@@ -50,7 +56,9 @@ export const checkExt = async (
           ignorePatterns,
         );
       } catch (error) {
-        console.error(`Failed to check directory ${dir}: ${String(error)}`);
+        console.error(
+          `Failed to check directory ${dir}: ${unknownToString(error)}`,
+        );
 
         return [];
       }
@@ -127,7 +135,7 @@ const getFilesWithIncorrectExtension = async (
 
   if (Result.isErr(filesResult)) {
     throw new Error(
-      `Failed to glob files in ${dir}: ${String(filesResult.value)}`,
+      `Failed to glob files in ${dir}: ${unknownToString(filesResult.value)}`,
     );
   }
 

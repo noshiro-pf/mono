@@ -35,6 +35,11 @@ export const getWorkspacePackages = async (
   dependencyFields: readonly DependencyField[] = defaultDependencyFields,
 ): Promise<readonly Package[]> => {
   // Read root package.json
+  // `JSON.parse` returns `JsonValue` under the strict standard library, but the
+  // typed linter does not see it: ESLint runs on `typescript`, whose lib
+  // replacement resolves `@typescript/lib-*` with a fixed Node10 lookup that
+  // ignores `paths` — the bundle is only reachable through `paths`. So this
+  // stays `any` to ESLint even though `tsc` types it.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const rootPackageJson: JsonValue = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -87,11 +92,7 @@ export const getWorkspacePackages = async (
         name: getStrFromJsonValue(packageJson, 'name'),
         path: path.dirname(packagePath),
         packageJson,
-        dependencies: Object.fromEntries(
-          dependencyFields.flatMap((field) =>
-            Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
-          ),
-        ),
+        dependencies: mergeDependencyFields(packageJson, dependencyFields),
       }));
 
     return packageInfos;
@@ -103,6 +104,17 @@ export const getWorkspacePackages = async (
 
   return finalPackages;
 };
+
+/** Merges the named `package.json` fields into a single dependency map. */
+const mergeDependencyFields = (
+  packageJson: JsonValue,
+  dependencyFields: readonly DependencyField[],
+): ReadonlyRecord<string, string> =>
+  Object.fromEntries(
+    dependencyFields.flatMap((field) =>
+      Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
+    ),
+  );
 
 const getStrFromJsonValue = (value: JsonValue, key: string): string =>
   isRecord(value) && hasKey(value, key) && isString(value[key])
