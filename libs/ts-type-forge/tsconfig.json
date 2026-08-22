@@ -5,14 +5,26 @@
     // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
     // DOM shapes instead and breaks the assertions.
     "lib": ["ESNext"],
+
+    // Deliberately opted OUT of the strict standard library, and stated here
+    // rather than left to the default so that moving `libReplacement` into the
+    // shared config does not quietly opt this package in.
+    //
+    // The strict library depends on this package: 18 of its 107 declaration
+    // files import `ts-type-forge`, for roughly 25 types. Opting in would make
+    // that dependency mutual. Worse, it would not even be this copy — pnpm
+    // resolves the strict library's `ts-type-forge` from the registry, so the
+    // package would be type-checked against a published snapshot of itself.
+    //
+    // `Math.abs` is what that looks like in practice: the strict library
+    // declares it `abs<N extends number>(x: N): AbsoluteValue<N>`, and
+    // `AbsoluteValue` is defined over number *literals*, so a branded
+    // `NegativeNumber` comes back still typed negative. It cannot be fixed in
+    // `AbsoluteValue` either — `ts-data-forge`'s `Int8.abs` depends on that
+    // pass-through. See docs/strict-typescript-lib-integration.md.
+    "libReplacement": false,
+
     "paths": {
-      // The strict standard library. Every built-in library lives inside the
-      // one `strict-ts-lib-v7.0` package, so this wildcard is what points
-      // `libReplacement` at it. `paths` is replaced — not merged — by a config
-      // that `extends` another, so a package defining any `paths` of its own
-      // has to repeat this one; `check:root:tsconfig-lib-paths` enforces that,
-      // because a missing entry disables the replacement with no diagnostic.
-      "@typescript/lib-*": ["../../node_modules/strict-ts-lib-v7.0/libs/*"],
       "ts-type-forge": ["./src/entry-point.mts"],
       "ts-type-forge/global": ["./src/global.mts"]
     }

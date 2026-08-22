@@ -12,13 +12,21 @@ import { projectRootPath } from '../project-root-path.mjs';
  * through `"@typescript/lib-*": [".../strict-ts-lib-v7.0/libs/*"]`. The shared
  * config carries that mapping — but `paths` is **replaced, not merged**, by a
  * config that `extends` another, so any package that sets `paths` of its own
- * drops it. Fifteen of them do.
+ * drops it. Most of them do.
  *
  * Nothing reports that. TypeScript looks the libraries up, does not find them,
  * and silently keeps its own declarations: the package stops being checked
  * against the strict library while still looking opted in. This check is what
  * turns that into a failure, and it holds for packages that have not opted in
  * yet too, so the mapping is already right when they do.
+ *
+ * A package that says `"libReplacement": false` is exempt, because it has
+ * stated the opposite intent in the one place that decides it. `ts-type-forge`
+ * is the case: the strict library's declarations import it, so opting it in
+ * would make the dependency mutual — see
+ * `docs/strict-typescript-lib-integration.md`. Leaving the mapping in such a
+ * package would be misleading rather than harmless, since it reads as an
+ * opt-in that never happens.
  */
 export const checkTsconfigLibPaths = async (): Promise<
   Result<number, string>
@@ -40,7 +48,12 @@ export const checkTsconfigLibPaths = async (): Promise<
   );
 
   const offenders = contents
-    .filter(({ text }) => text.includes(PATHS_KEY) && !text.includes(LIB_KEY))
+    .filter(
+      ({ text }) =>
+        text.includes(PATHS_KEY) &&
+        !text.includes(LIB_KEY) &&
+        !text.includes(OPT_OUT_KEY),
+    )
     .map(({ file }) => path.relative(projectRootPath, file));
 
   if (!Arr.isNonEmpty(offenders)) {
@@ -60,7 +73,8 @@ export const checkTsconfigLibPaths = async (): Promise<
       `  ${LIB_KEY}: ["../../node_modules/${BUNDLE_NAME}/libs/*"]`,
       '',
       "Without it the package keeps TypeScript's own declarations, with no",
-      'diagnostic to say so.',
+      'diagnostic to say so. If the package is meant to stay on the stock',
+      `library, say so with ${OPT_OUT_KEY} instead — and write down why.`,
     ].join('\n'),
   );
 };
@@ -69,6 +83,9 @@ export const checkTsconfigLibPaths = async (): Promise<
 const BUNDLE_NAME = 'strict-ts-lib-v7.0';
 
 const PATHS_KEY = '"paths"';
+
+/** A package that states this has opted out on purpose; see the doc comment. */
+const OPT_OUT_KEY = '"libReplacement": false';
 
 const LIB_KEY = '"@typescript/lib-*"';
 
