@@ -759,7 +759,9 @@ strict lib のどのバージョンを取ればよいか分からない**とい�
 `strict-ts-lib-v7.1@1.4.0` と `strict-ts-lib-v7.0@1.4.0` が同じ世代だと名前で分かる。
 
 changesets の `fixed` グループに入れれば自動で揃う（`.changeset/config.json`）。
-最初の 1 回だけ、全系統を同じバージョンに手で合わせる必要がある。
+最初の 1 回だけ、全系統を同じバージョンに手で合わせる必要がある。**揃える先は
+`0.5.0`** — 全名を通じた最大バージョン `0.4.0` の 1 段上で、どの名前にも存在しない。
+根拠は後述の「npm 上の既存パッケージをどう畳むか」。
 
 ### 決定 4: リリースは changesets に一本化
 
@@ -826,7 +828,7 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 **(a) と (c) は排他ではない。** (a) で 12 タグまで落としたうえで、それでも気になれば
 (c) を重ねればよい。順序として (a) が先である。
 
-### npm 上の既存パッケージをどう畳むか
+### npm 上の既存パッケージをどう畳むか — unpublish しない
 
 **確認した事実**（npm 10.9.7 同梱のドキュメント）。
 
@@ -835,22 +837,41 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 > must use a new version number. If you unpublish the entire package, you may
 > not publish any new versions of that package until 24 hours have passed.
 
-CLI 自身も `Refusing to delete the last version of the package. It will block
-from republishing a new version for 24 hours.` と警告する。
+そして**公開済みバージョンは 1 パッケージにつき 1 件しかない**（2026-08-22 実測）。
 
-（unpublish の適格条件 — 72 時間以内・ダウンロード数・依存の有無 — が書かれた
-policy ページはこの環境の egress proxy に阻まれて読めなかった。publish が
-2026-08-21 なので 72 時間枠には入っているはずだが、**そこは未確認**。）
+| パッケージ | 公開済み |
+| :-- | :-- |
+| `strict-ts-lib-v5.0` 〜 `v5.9`（± `-branded`） | `0.4.0` のみ |
+| `strict-ts-lib-v6.0` / `v7.0`（± `-branded`） | `0.2.0` のみ |
 
-したがって「全部消して作り直す」は 1 箇所だけ危険で、扱いを分ける。
+この 2 つを重ねると、**package 全体の unpublish は「唯一のバージョンの削除」と同義**で、
+必ず 24 時間ブロックに当たる。npm 自身も
+`Refusing to delete the last version of the package.` と拒否し、`--force` を要求する。
 
-| 対象 | 操作 | 理由 |
-| :-- | :-- | :-- |
-| **再利用する 12 名**（`strict-ts-lib-vX.Y`） | **package 全体は消さない。** 1.0.0 を publish した後で旧バージョンだけ個別に unpublish するか deprecate する | 全体を消すとその名前で **24 時間 publish できず**、作り直しが 1 日止まる |
-| **捨てる 12 名**（`strict-ts-lib-vX.Y-branded`） | `npm unpublish <name> --force` で全体削除してよい | 二度と publish しないので 24 時間ブロックは無害。deprecate で残す選択もある |
+**したがって unpublish はしない。** 代わりに:
 
-旧 0.2.0 / 0.4.0 は二度と使えないので、**作り直しは 1.0.0 から**。バージョン統一
-（決定 3）とも噛み合う。
+| 対象 | 操作 |
+| :-- | :-- |
+| **残す 12 名**（`strict-ts-lib-vX.Y`） | 統一バージョンを publish する。旧 `0.2.0` / `0.4.0` はそのまま残す |
+| **畳む 12 名**（`strict-ts-lib-vX.Y-branded`） | `npm deprecate` で統合先を案内する。unpublish しない |
+
+`deprecate` は npm 自身が勧めている道でもある。
+
+> Consider using the `deprecate` command instead, if your intent is to encourage
+> users to upgrade, or if you no longer want to maintain a package.
+
+これなら 24 時間ブロックも、unpublish の適格条件（72 時間以内・ダウンロード数・依存の
+有無。policy ページはこの環境の egress proxy に阻まれて読めなかった）も一切関係なくなる。
+
+#### 統一バージョンは `0.5.0`
+
+**全名を通じた最大バージョンを 1 段上げる。** 現在の最大は `0.4.0`（v5 系）なので
+`0.5.0`。全 24 名のいずれにも存在しないので、publish が衝突しない。
+
+`1.0.0` にしないのは、**flavor 統合が既存利用者にとって破壊的ではない**ため。
+`strict-ts-lib-v7.0` は `libs/` をそのまま保ち、`libs-branded/` が増えるだけである。
+影響を受けるのは `-branded` 名を使っていた利用者だけで、そちらは deprecate の
+メッセージで移行先を案内する。
 
 
 ### 移行前にやる掃除
@@ -876,7 +897,7 @@ mono は現在 8,109 なので、移行後は 15,000 弱になる。
 | 2 | 上流の掃除（死んだ `package.json`） | **完了**（strict-typescript-lib#130） |
 | 3 | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | 次にやる |
 | 4 | リリースを changesets へ。上流ワークフローと publish スクリプトを削除 | |
-| 5 | npm 上の既存パッケージを畳み、1.0.0 を publish。旧リポジトリを archive | |
+| 5 | `0.5.0` を publish し、`-branded` の 12 名を deprecate。旧リポジトリを archive | |
 | 6 | 残りの opt-in を再開（`ts-data-forge` ほか） | |
 
 
