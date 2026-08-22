@@ -1,0 +1,15 @@
+diff --git a/packages/v5.4/temp/copied/lib.webworker.asynciterable.d.ts b/packages/v5.5/temp/copied/lib.webworker.asynciterable.d.ts
+index 5d86250..39c04f7 100644
+--- a/packages/v5.4/temp/copied/lib.webworker.asynciterable.d.ts
++++ b/packages/v5.5/temp/copied/lib.webworker.asynciterable.d.ts
+@@ -25,3 +25,10 @@ interface FileSystemDirectoryHandle {
+   keys(): AsyncIterableIterator<string>;
+   values(): AsyncIterableIterator<FileSystemHandle>;
+ }
++
++interface ReadableStream<R = any> {
++  [Symbol.asyncIterator](
++    options?: ReadableStreamIteratorOptions,
++  ): AsyncIterableIterator<R>;
++  values(options?: ReadableStreamIteratorOptions): AsyncIterableIterator<R>;
++}

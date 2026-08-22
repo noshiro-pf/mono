@@ -1,0 +1,21 @@
+diff --git a/packages/v5.4/output-branded/lib-files/lib.esnext.intl.d.ts b/packages/v5.5/output-branded/lib-files/lib.esnext.intl.d.ts
+index a9c51f0..3a17505 100644
+--- a/packages/v5.4/output-branded/lib-files/lib.esnext.intl.d.ts
++++ b/packages/v5.5/output-branded/lib-files/lib.esnext.intl.d.ts
+@@ -2,15 +2,5 @@
+ /// <reference types="ts-type-forge/global" />
+ 
+ declare namespace Intl {
+-  interface NumberRangeFormatPart extends NumberFormatPart {
+-    readonly source: 'startRange' | 'endRange' | 'shared';
+-  }
+-
+-  interface NumberFormat {
+-    formatRange(start: number | bigint, end: number | bigint): string;
+-    formatRangeToParts(
+-      start: number | bigint,
+-      end: number | bigint,
+-    ): readonly NumberRangeFormatPart[];
+-  }
++  // Empty
+ }

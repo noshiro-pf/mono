@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2019.array.d.ts b/packages/v6.0/output/lib-files/lib.es2019.array.d.ts
+index b75d09d6..df8bfbf4 100644
+--- a/packages/v5.9/output/lib-files/lib.es2019.array.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2019.array.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ type FlatArray<Arr, Depth extends number> = {
+   readonly done: Arr;
+   readonly recur: Arr extends ReadonlyArray<infer InnerArr>

@@ -1,0 +1,23 @@
+diff --git a/packages/v5.6/output-branded/lib-files/lib.esnext.collection.d.ts b/packages/v5.7/output-branded/lib-files/lib.esnext.collection.d.ts
+index 9a351d7..d53cb82 100644
+--- a/packages/v5.6/output-branded/lib-files/lib.esnext.collection.d.ts
++++ b/packages/v5.7/output-branded/lib-files/lib.esnext.collection.d.ts
+@@ -1,17 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ /// <reference types="ts-type-forge/global" />
+ 
+-interface MapConstructor {
+-  /**
+-   * Groups members of an iterable according to the return value of the passed callback.
+-   * @param items An iterable.
+-   * @param keySelector A callback which will be invoked for each item in items.
+-   */
+-  groupBy<K, T>(
+-    items: Iterable<T>,
+-    keySelector: (item: T, index: NumberType.ArraySize) => K,
+-  ): ReadonlyMap<K, readonly T[]>;
+-}
++/// <reference path="./lib.es2024.collection.d.ts" />
+ 
+ interface ReadonlySetLike<T> {
+   /**

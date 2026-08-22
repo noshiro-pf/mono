@@ -1,0 +1,72 @@
+diff --git a/packages/v5.4/output/lib-files/lib.es2020.intl.d.ts b/packages/v5.5/output/lib-files/lib.es2020.intl.d.ts
+index f6f701e..b05734f 100644
+--- a/packages/v5.4/output/lib-files/lib.es2020.intl.d.ts
++++ b/packages/v5.5/output/lib-files/lib.es2020.intl.d.ts
+@@ -233,7 +233,26 @@ declare namespace Intl {
+     ): UnicodeBCP47LocaleIdentifier[];
+   };
+ 
++  interface NumberFormatOptionsStyleRegistry {
++    readonly unit: never;
++  }
++
++  interface NumberFormatOptionsCurrencyDisplayRegistry {
++    readonly narrowSymbol: never;
++  }
++
++  interface NumberFormatOptionsSignDisplayRegistry {
++    readonly auto: never;
++    readonly never: never;
++    readonly always: never;
++    readonly exceptZero: never;
++  }
++
++  type NumberFormatOptionsSignDisplay =
++    keyof NumberFormatOptionsSignDisplayRegistry;
++
+   interface NumberFormatOptions {
++    readonly numberingSystem?: string | undefined;
+     readonly compactDisplay?: 'short' | 'long' | undefined;
+     readonly notation?:
+       | 'standard'
+@@ -241,26 +260,28 @@ declare namespace Intl {
+       | 'engineering'
+       | 'compact'
+       | undefined;
+-    readonly signDisplay?:
+-      | 'auto'
+-      | 'never'
+-      | 'always'
+-      | 'exceptZero'
+-      | undefined;
++    readonly signDisplay?: NumberFormatOptionsSignDisplay | undefined;
+     readonly unit?: string | undefined;
+     readonly unitDisplay?: 'short' | 'long' | 'narrow' | undefined;
+-    readonly currencyDisplay?: string | undefined;
+-    readonly currencySign?: string | undefined;
++    readonly currencySign?: 'standard' | 'accounting' | undefined;
+   }
+ 
+   interface ResolvedNumberFormatOptions {
+     readonly compactDisplay?: 'short' | 'long';
+-    readonly notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
+-    readonly signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero';
++    readonly notation: 'standard' | 'scientific' | 'engineering' | 'compact';
++    readonly signDisplay: NumberFormatOptionsSignDisplay;
+     readonly unit?: string;
+     readonly unitDisplay?: 'short' | 'long' | 'narrow';
+-    readonly currencyDisplay?: string;
+-    readonly currencySign?: string;
++    readonly currencySign?: 'standard' | 'accounting';
++  }
++
++  interface NumberFormatPartTypeRegistry {
++    readonly compact: never;
++    readonly exponentInteger: never;
++    readonly exponentMinusSign: never;
++    readonly exponentSeparator: never;
++    readonly unit: never;
++    readonly unknown: never;
+   }
+ 
+   interface DateTimeFormatOptions {

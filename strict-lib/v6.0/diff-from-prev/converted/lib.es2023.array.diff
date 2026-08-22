@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2023.array.d.ts b/packages/v6.0/output/lib-files/lib.es2023.array.d.ts
+index aa163082..fceda792 100644
+--- a/packages/v5.9/output/lib-files/lib.es2023.array.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2023.array.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface Array<T> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined

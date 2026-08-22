@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2023.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2023.d.ts
+index ab4f866d..5a6f5eb3 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2023.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2023.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2022.d.ts" />
+ /// <reference path="./lib.es2023.array.d.ts" />
+ /// <reference path="./lib.es2023.collection.d.ts" />

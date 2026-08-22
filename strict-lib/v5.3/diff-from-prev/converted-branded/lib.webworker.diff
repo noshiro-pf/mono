@@ -1,0 +1,21 @@
+diff --git a/packages/v5.2/output-branded/lib-files/lib.webworker.d.ts b/packages/v5.3/output-branded/lib-files/lib.webworker.d.ts
+index 64bc1b5..06d7023 100644
+--- a/packages/v5.2/output-branded/lib-files/lib.webworker.d.ts
++++ b/packages/v5.3/output-branded/lib-files/lib.webworker.d.ts
+@@ -6243,7 +6243,16 @@ interface SubtleCrypto {
+     format: Exclude<KeyFormat, 'jwk'>,
+     key: CryptoKey,
+   ): Promise<ArrayBuffer>;
++  exportKey(
++    format: KeyFormat,
++    key: CryptoKey,
++  ): Promise<ArrayBuffer | JsonWebKey>;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
++  generateKey(
++    algorithm: 'Ed25519',
++    extractable: boolean,
++    keyUsages: ReadonlyArray<'sign' | 'verify'>,
++  ): Promise<CryptoKeyPair>;
+   generateKey(
+     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
+     extractable: boolean,

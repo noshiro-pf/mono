@@ -1,0 +1,49 @@
+diff --git a/packages/v5.5/output/lib-files/lib.dom.asynciterable.d.ts b/packages/v5.6/output/lib-files/lib.dom.asynciterable.d.ts
+index b142586..94bca6f 100644
+--- a/packages/v5.5/output/lib-files/lib.dom.asynciterable.d.ts
++++ b/packages/v5.6/output/lib-files/lib.dom.asynciterable.d.ts
+@@ -5,18 +5,38 @@
+ /// Window Async Iterable APIs
+ /////////////////////////////
+ 
++interface FileSystemDirectoryHandleAsyncIterator<T> extends AsyncIteratorObject<
++  T,
++  BuiltinIteratorReturn,
++  unknown
++> {
++  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<T>;
++}
++
+ interface FileSystemDirectoryHandle {
+-  [Symbol.asyncIterator](): AsyncIterableIterator<
++  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<
++    readonly [string, FileSystemHandle]
++  >;
++  entries(): FileSystemDirectoryHandleAsyncIterator<
+     readonly [string, FileSystemHandle]
+   >;
+-  entries(): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
+-  keys(): AsyncIterableIterator<string>;
+-  values(): AsyncIterableIterator<FileSystemHandle>;
++  keys(): FileSystemDirectoryHandleAsyncIterator<string>;
++  values(): FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>;
++}
++
++interface ReadableStreamAsyncIterator<T> extends AsyncIteratorObject<
++  T,
++  BuiltinIteratorReturn,
++  unknown
++> {
++  [Symbol.asyncIterator](): ReadableStreamAsyncIterator<T>;
+ }
+ 
+ interface ReadableStream<R = unknown> {
+   [Symbol.asyncIterator](
+     options?: ReadableStreamIteratorOptions,
+-  ): AsyncIterableIterator<R>;
+-  values(options?: ReadableStreamIteratorOptions): AsyncIterableIterator<R>;
++  ): ReadableStreamAsyncIterator<R>;
++  values(
++    options?: ReadableStreamIteratorOptions,
++  ): ReadableStreamAsyncIterator<R>;
+ }

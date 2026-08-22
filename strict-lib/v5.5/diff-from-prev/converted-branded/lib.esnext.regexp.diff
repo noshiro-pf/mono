@@ -1,0 +1,16 @@
+diff --git a/packages/v5.5/output-branded/lib-files/lib.esnext.regexp.d.ts b/packages/v5.5/output-branded/lib-files/lib.esnext.regexp.d.ts
+new file mode 100644
+index 0000000..a37a72b
+--- /dev/null
++++ b/packages/v5.5/output-branded/lib-files/lib.esnext.regexp.d.ts
+@@ -0,0 +1,10 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++interface RegExp {
++  /**
++   * Returns a Boolean value indicating the state of the unicodeSets flag (v) used with a regular expression.
++   * Default is false. Read-only.
++   */
++  readonly unicodeSets: boolean;
++}

@@ -1,0 +1,13 @@
+diff --git a/packages/v6.0/output/lib-files/lib.es2015.core.d.ts b/packages/v7.0/output/lib-files/lib.es2015.core.d.ts
+index cd0ff3b6..94ac5b20 100644
+--- a/packages/v6.0/output/lib-files/lib.es2015.core.d.ts
++++ b/packages/v7.0/output/lib-files/lib.es2015.core.d.ts
+@@ -110,7 +110,7 @@ interface Math {
+   imul(x: number, y: number): number;
+ 
+   /**
+-   * Returns the sign of the x, indicating whether x is positive, negative or zero.
++   * Returns the sign of x, indicating whether x is positive, negative, or zero.
+    * @param x The numeric expression to test
+    */
+   sign(x: number): number;

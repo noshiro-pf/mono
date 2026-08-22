@@ -1,0 +1,9 @@
+diff --git a/packages/v5.1/temp/copied/lib.es2017.d.ts b/packages/v5.2/temp/copied/lib.es2017.d.ts
+index dd47d07..b23a122 100644
+--- a/packages/v5.1/temp/copied/lib.es2017.d.ts
++++ b/packages/v5.2/temp/copied/lib.es2017.d.ts
+@@ -21,3 +21,4 @@ and limitations under the License.
+ /// <reference lib="es2017.string" />
+ /// <reference lib="es2017.intl" />
+ /// <reference lib="es2017.typedarrays" />
++/// <reference lib="es2017.date" />

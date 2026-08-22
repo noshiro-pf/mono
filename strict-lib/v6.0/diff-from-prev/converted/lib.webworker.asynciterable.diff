@@ -1,0 +1,48 @@
+diff --git a/packages/v5.9/output/lib-files/lib.webworker.asynciterable.d.ts b/packages/v6.0/output/lib-files/lib.webworker.asynciterable.d.ts
+index be99ebad..3b3e55b7 100644
+--- a/packages/v5.9/output/lib-files/lib.webworker.asynciterable.d.ts
++++ b/packages/v6.0/output/lib-files/lib.webworker.asynciterable.d.ts
+@@ -1,41 +1,2 @@
+-/// <reference no-default-lib="true"/>
+-
+-/////////////////////////////
+-/// Worker Async Iterable APIs
+-/////////////////////////////
+-
+-interface FileSystemDirectoryHandleAsyncIterator<T> extends AsyncIteratorObject<
+-  T,
+-  BuiltinIteratorReturn,
+-  unknown
+-> {
+-  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<T>;
+-}
+-
+-interface FileSystemDirectoryHandle {
+-  [Symbol.asyncIterator](): FileSystemDirectoryHandleAsyncIterator<
+-    readonly [string, FileSystemHandle]
+-  >;
+-  entries(): FileSystemDirectoryHandleAsyncIterator<
+-    readonly [string, FileSystemHandle]
+-  >;
+-  keys(): FileSystemDirectoryHandleAsyncIterator<string>;
+-  values(): FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>;
+-}
+-
+-interface ReadableStreamAsyncIterator<T> extends AsyncIteratorObject<
+-  T,
+-  BuiltinIteratorReturn,
+-  unknown
+-> {
+-  [Symbol.asyncIterator](): ReadableStreamAsyncIterator<T>;
+-}
+-
+-interface ReadableStream<R = unknown> {
+-  [Symbol.asyncIterator](
+-    options?: ReadableStreamIteratorOptions,
+-  ): ReadableStreamAsyncIterator<R>;
+-  values(
+-    options?: ReadableStreamIteratorOptions,
+-  ): ReadableStreamAsyncIterator<R>;
+-}
++// This file's contents are now included in the main types file.
++// The file has been left for backward compatibility.

@@ -1,0 +1,12 @@
+diff --git a/packages/v5.4/output/lib-files/lib.es2019.intl.d.ts b/packages/v5.5/output/lib-files/lib.es2019.intl.d.ts
+index f007918..d50b381 100644
+--- a/packages/v5.4/output/lib-files/lib.es2019.intl.d.ts
++++ b/packages/v5.5/output/lib-files/lib.es2019.intl.d.ts
+@@ -3,6 +3,6 @@
+ 
+ declare namespace Intl {
+   interface DateTimeFormatPartTypesRegistry {
+-    readonly unknown: unknown;
++    readonly unknown: never;
+   }
+ }

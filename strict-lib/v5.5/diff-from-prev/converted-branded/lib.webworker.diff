@@ -1,0 +1,62 @@
+diff --git a/packages/v5.4/output-branded/lib-files/lib.webworker.d.ts b/packages/v5.5/output-branded/lib-files/lib.webworker.d.ts
+index 9d304ec..effa004 100644
+--- a/packages/v5.4/output-branded/lib-files/lib.webworker.d.ts
++++ b/packages/v5.5/output-branded/lib-files/lib.webworker.d.ts
+@@ -534,6 +534,17 @@ interface ReadableStreamGetReaderOptions {
+   mode?: ReadableStreamReaderMode;
+ }
+ 
++interface ReadableStreamIteratorOptions {
++  /**
++   * Asynchronously iterates over the chunks in the stream's internal queue.
++   *
++   * Asynchronously iterating over the stream will lock it, preventing any other consumer from acquiring a reader. The lock will be released if the async iterator's return() method is called, e.g. by breaking out of the loop.
++   *
++   * By default, calling the async iterator's return() method will also cancel the stream. To prevent this, use the stream's values() method, passing true for the preventCancel option.
++   */
++  preventCancel?: boolean;
++}
++
+ interface ReadableStreamReadDoneResult<T> {
+   done: true;
+   value?: T;
+@@ -631,16 +642,16 @@ interface RsaPssParams extends Algorithm {
+ interface SecurityPolicyViolationEventInit extends EventInit {
+   blockedURI?: string;
+   columnNumber?: number;
+-  disposition: SecurityPolicyViolationEventDisposition;
+-  documentURI: string;
+-  effectiveDirective: string;
++  disposition?: SecurityPolicyViolationEventDisposition;
++  documentURI?: string;
++  effectiveDirective?: string;
+   lineNumber?: number;
+-  originalPolicy: string;
++  originalPolicy?: string;
+   referrer?: string;
+   sample?: string;
+   sourceFile?: string;
+-  statusCode: number;
+-  violatedDirective: string;
++  statusCode?: number;
++  violatedDirective?: string;
+ }
+ 
+ interface StorageEstimate {
+@@ -984,6 +995,8 @@ declare const AbortSignal: {
+   new (): AbortSignal;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
+   abort(reason?: unknown): AbortSignal;
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
++  any(signals: readonly AbortSignal[]): AbortSignal;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
+   timeout(milliseconds: number): AbortSignal;
+ };
+@@ -5986,6 +5999,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
+ 
+ /**
+  * This ServiceWorker API interface represents the global execution context of a service worker.
++ * Available only in secure contexts.
+  *
+  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope)
+  */

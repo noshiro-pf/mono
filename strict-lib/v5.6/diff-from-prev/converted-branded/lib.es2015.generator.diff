@@ -1,0 +1,16 @@
+diff --git a/packages/v5.5/output-branded/lib-files/lib.es2015.generator.d.ts b/packages/v5.6/output-branded/lib-files/lib.es2015.generator.d.ts
+index d62356a..84170cc 100644
+--- a/packages/v5.5/output-branded/lib-files/lib.es2015.generator.d.ts
++++ b/packages/v5.6/output-branded/lib-files/lib.es2015.generator.d.ts
+@@ -7,9 +7,9 @@ interface Generator<
+   T = unknown,
+   TReturn = any,
+   TNext = unknown,
+-> extends Iterator<T, TReturn, TNext> {
++> extends IteratorObject<T, TReturn, TNext> {
+   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+-  next(...args: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
++  next(...[value]: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;
+   return(value: TReturn): IteratorResult<T, TReturn>;
+   throw(e: unknown): IteratorResult<T, TReturn>;
+   [Symbol.iterator](): Generator<T, TReturn, TNext>;

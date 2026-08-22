@@ -1,0 +1,16 @@
+diff --git a/packages/v5.4/temp/copied/lib.webworker.iterable.d.ts b/packages/v5.5/temp/copied/lib.webworker.iterable.d.ts
+index 67cc45a..847d9ce 100644
+--- a/packages/v5.4/temp/copied/lib.webworker.iterable.d.ts
++++ b/packages/v5.5/temp/copied/lib.webworker.iterable.d.ts
+@@ -19,6 +19,11 @@ and limitations under the License.
+ /// Worker Iterable APIs
+ /////////////////////////////
+ 
++interface AbortSignal {
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
++  any(signals: Iterable<AbortSignal>): AbortSignal;
++}
++
+ interface CSSNumericArray {
+   [Symbol.iterator](): IterableIterator<CSSNumericValue>;
+   entries(): IterableIterator<[number, CSSNumericValue]>;

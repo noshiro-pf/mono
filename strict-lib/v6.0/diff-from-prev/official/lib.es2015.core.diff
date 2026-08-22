@@ -1,0 +1,29 @@
+diff --git a/packages/v5.9/temp/copied/lib.es2015.core.d.ts b/packages/v6.0/temp/copied/lib.es2015.core.d.ts
+index 9d91dddb..9ab7e037 100644
+--- a/packages/v5.9/temp/copied/lib.es2015.core.d.ts
++++ b/packages/v6.0/temp/copied/lib.es2015.core.d.ts
+@@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
+-/// <reference no-default-lib="true"/>
+-
+ interface Array<T> {
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -206,7 +204,7 @@ interface Math {
+   hypot(...values: number[]): number;
+ 
+   /**
+-   * Returns the integral part of the a numeric expression, x, removing any fractional digits.
++   * Returns the integral part of the numeric expression x, removing any fractional digits.
+    * If x is already an integer, the result is x.
+    * @param x A numeric expression.
+    */

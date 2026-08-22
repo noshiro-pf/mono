@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2015.proxy.d.ts b/packages/v6.0/output/lib-files/lib.es2015.proxy.d.ts
+index 1ff1b266..5b81f4ad 100644
+--- a/packages/v5.9/output/lib-files/lib.es2015.proxy.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2015.proxy.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface ProxyHandler<T extends object> {
+   /**
+    * A trap method for a function call.

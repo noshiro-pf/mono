@@ -1,0 +1,20 @@
+diff --git a/packages/v5.9/temp/copied/lib.es2023.d.ts b/packages/v6.0/temp/copied/lib.es2023.d.ts
+index eed7333d..52fb8af5 100644
+--- a/packages/v5.9/temp/copied/lib.es2023.d.ts
++++ b/packages/v6.0/temp/copied/lib.es2023.d.ts
+@@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference lib="es2022" />
+ /// <reference lib="es2023.array" />
+ /// <reference lib="es2023.collection" />

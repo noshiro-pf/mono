@@ -1,0 +1,54 @@
+diff --git a/packages/v5.7/output/lib-files/lib.dom.iterable.d.ts b/packages/v5.8/output/lib-files/lib.dom.iterable.d.ts
+index 94aa8de..98a4d15 100644
+--- a/packages/v5.7/output/lib-files/lib.dom.iterable.d.ts
++++ b/packages/v5.8/output/lib-files/lib.dom.iterable.d.ts
+@@ -5,11 +5,6 @@
+ /// Window Iterable APIs
+ /////////////////////////////
+ 
+-interface AbortSignal {
+-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
+-  any(signals: Iterable<AbortSignal>): AbortSignal;
+-}
+-
+ interface AudioParam {
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime) */
+   setValueCurveAtTime(
+@@ -206,6 +201,10 @@ interface IDBObjectStore {
+   ): IDBIndex;
+ }
+ 
++interface ImageTrackList {
++  [Symbol.iterator](): ArrayIterator<ImageTrack>;
++}
++
+ interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
+ 
+ interface MIDIOutput {
+@@ -382,7 +381,7 @@ interface SubtleCrypto {
+   ): Promise<CryptoKey>;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
+   generateKey(
+-    algorithm: 'Ed25519',
++    algorithm: 'Ed25519' | { readonly name: 'Ed25519' },
+     extractable: boolean,
+     keyUsages: ReadonlyArray<'sign' | 'verify'>,
+   ): Promise<CryptoKeyPair>;
+@@ -478,6 +477,8 @@ interface URLSearchParams {
+   values(): URLSearchParamsIterator<string>;
+ }
+ 
++interface ViewTransitionTypeSet extends Set<string> {}
++
+ interface WEBGL_draw_buffers {
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_draw_buffers/drawBuffersWEBGL) */
+   drawBuffersWEBGL(buffers: Iterable<GLenum>): void;
+@@ -719,7 +720,7 @@ interface WebGL2RenderingContextOverloads {
+     srcOffset?: number,
+     srcLength?: GLuint,
+   ): void;
+-  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
+   uniformMatrix2fv(
+     location: WebGLUniformLocation | null,
+     transpose: GLboolean,

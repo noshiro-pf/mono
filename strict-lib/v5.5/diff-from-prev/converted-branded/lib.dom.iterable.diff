@@ -1,0 +1,25 @@
+diff --git a/packages/v5.4/output-branded/lib-files/lib.dom.iterable.d.ts b/packages/v5.5/output-branded/lib-files/lib.dom.iterable.d.ts
+index 2d1e932..604e13d 100644
+--- a/packages/v5.4/output-branded/lib-files/lib.dom.iterable.d.ts
++++ b/packages/v5.5/output-branded/lib-files/lib.dom.iterable.d.ts
+@@ -5,6 +5,11 @@
+ /// Window Iterable APIs
+ /////////////////////////////
+ 
++interface AbortSignal {
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static) */
++  any(signals: Iterable<AbortSignal>): AbortSignal;
++}
++
+ interface AudioParam {
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime) */
+   setValueCurveAtTime(
+@@ -88,6 +93,8 @@ interface CanvasPathDrawingStyles {
+   setLineDash(segments: Iterable<number>): void;
+ }
+ 
++interface CustomStateSet extends Set<string> {}
++
+ interface DOMRectList {
+   [Symbol.iterator](): IterableIterator<DOMRect>;
+ }

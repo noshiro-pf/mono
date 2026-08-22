@@ -1,0 +1,12 @@
+diff --git a/packages/v6.0/output-branded/lib-files/lib.es2025.full.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2025.full.d.ts
+new file mode 100644
+index 00000000..368b4311
+--- /dev/null
++++ b/packages/v6.0/output-branded/lib-files/lib.es2025.full.d.ts
+@@ -0,0 +1,6 @@
++/// <reference path="./lib.es2025.d.ts" />
++/// <reference path="./lib.dom.d.ts" />
++/// <reference path="./lib.webworker.importscripts.d.ts" />
++/// <reference path="./lib.scripthost.d.ts" />
++/// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />

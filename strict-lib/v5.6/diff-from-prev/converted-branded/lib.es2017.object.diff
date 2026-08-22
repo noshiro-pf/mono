@@ -1,0 +1,36 @@
+diff --git a/packages/v5.5/output-branded/lib-files/lib.es2017.object.d.ts b/packages/v5.6/output-branded/lib-files/lib.es2017.object.d.ts
+index f9a3a39..e54f6f0 100644
+--- a/packages/v5.5/output-branded/lib-files/lib.es2017.object.d.ts
++++ b/packages/v5.6/output-branded/lib-files/lib.es2017.object.d.ts
+@@ -33,19 +33,19 @@ declare namespace StrictLibInternals {
+ 
+ interface ObjectConstructor {
+   /**
+-   * Returns an array of values of the enumerable properties of an object
++   * Returns an array of values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+    */
+   values<T>(o: { readonly [s: string]: T } | ArrayLike<T>): readonly T[];
+ 
+   /**
+-   * Returns an array of values of the enumerable properties of an object
++   * Returns an array of values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+    */
+   values(o: {}): readonly unknown[];
+ 
+   /**
+-   * Returns an array of key/values of the enumerable properties of an object
++   * Returns an array of key/values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+    *
+    * ```ts
+@@ -77,7 +77,7 @@ interface ObjectConstructor {
+   ): readonly (readonly [string, T])[];
+ 
+   /**
+-   * Returns an array of key/values of the enumerable properties of an object
++   * Returns an array of key/values of the enumerable own properties of an object
+    * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
+    */
+   entries(o: {}): readonly (readonly [string, unknown])[];

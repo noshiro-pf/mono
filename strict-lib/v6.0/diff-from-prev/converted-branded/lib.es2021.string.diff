@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2021.string.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2021.string.d.ts
+index d4f5972c..2984f73a 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2021.string.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2021.string.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface String {
+   /**
+    * Replace all instances of a substring in a string, using a regular expression or search string.

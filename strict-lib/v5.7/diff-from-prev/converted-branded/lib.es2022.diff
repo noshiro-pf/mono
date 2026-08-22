@@ -1,0 +1,12 @@
+diff --git a/packages/v5.6/output-branded/lib-files/lib.es2022.d.ts b/packages/v5.7/output-branded/lib-files/lib.es2022.d.ts
+index 6fd02cc..b8bf34a 100644
+--- a/packages/v5.6/output-branded/lib-files/lib.es2022.d.ts
++++ b/packages/v5.7/output-branded/lib-files/lib.es2022.d.ts
+@@ -6,6 +6,5 @@
+ /// <reference path="./lib.es2022.error.d.ts" />
+ /// <reference path="./lib.es2022.intl.d.ts" />
+ /// <reference path="./lib.es2022.object.d.ts" />
+-/// <reference path="./lib.es2022.sharedmemory.d.ts" />
+-/// <reference path="./lib.es2022.string.d.ts" />
+ /// <reference path="./lib.es2022.regexp.d.ts" />
++/// <reference path="./lib.es2022.string.d.ts" />

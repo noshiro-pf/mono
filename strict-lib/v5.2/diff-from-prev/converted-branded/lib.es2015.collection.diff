@@ -1,0 +1,62 @@
+diff --git a/packages/v5.1/output-branded/lib-files/lib.es2015.collection.d.ts b/packages/v5.2/output-branded/lib-files/lib.es2015.collection.d.ts
+index 3dac1e5..0289c29 100644
+--- a/packages/v5.1/output-branded/lib-files/lib.es2015.collection.d.ts
++++ b/packages/v5.2/output-branded/lib-files/lib.es2015.collection.d.ts
+@@ -50,7 +50,7 @@ interface ReadonlyMap<K, V> {
+   readonly size: NumberType.ArraySize;
+ }
+ 
+-interface WeakMap<K extends object, V> {
++interface WeakMap<K extends WeakKey, V> {
+   /**
+    * Removes the specified element from the WeakMap.
+    * @returns true if the element was successfully removed, or false if it was not present.
+@@ -66,16 +66,16 @@ interface WeakMap<K extends object, V> {
+   has(key: K | (WidenLiteral<K> & {})): boolean;
+   /**
+    * Adds a new element with a specified key and value.
+-   * @param key Must be an object.
++   * @param key Must be an object or symbol.
+    */
+   set(key: K, value: V): this;
+ }
+ 
+ interface WeakMapConstructor {
+-  new <K extends object = object, V = unknown>(
++  new <K extends WeakKey = WeakKey, V = unknown>(
+     entries?: readonly (readonly [K, V])[] | null,
+   ): WeakMap<K, V>;
+-  readonly prototype: WeakMap<object, unknown>;
++  readonly prototype: WeakMap<WeakKey, unknown>;
+ }
+ declare const WeakMap: WeakMapConstructor;
+ 
+@@ -123,9 +123,9 @@ interface ReadonlySet<T> {
+   readonly size: NumberType.ArraySize;
+ }
+ 
+-interface WeakSet<T extends object> {
++interface WeakSet<T extends WeakKey> {
+   /**
+-   * Appends a new object to the end of the WeakSet.
++   * Appends a new value to the end of the WeakSet.
+    */
+   add(value: T): this;
+   /**
+@@ -134,13 +134,13 @@ interface WeakSet<T extends object> {
+    */
+   delete(value: T): boolean;
+   /**
+-   * @returns a boolean indicating whether an object exists in the WeakSet or not.
++   * @returns a boolean indicating whether a value exists in the WeakSet or not.
+    */
+   has(value: T | (WidenLiteral<T> & {})): boolean;
+ }
+ 
+ interface WeakSetConstructor {
+-  new <T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
+-  readonly prototype: WeakSet<object>;
++  new <T extends WeakKey = WeakKey>(values?: readonly T[] | null): WeakSet<T>;
++  readonly prototype: WeakSet<WeakKey>;
+ }
+ declare const WeakSet: WeakSetConstructor;

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "skipLibCheck": false,
+    "noEmit": true,
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "types": [],
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./lib-files"],
+  "exclude": ["./lib-files/lib.webworker.d.ts"]
+}

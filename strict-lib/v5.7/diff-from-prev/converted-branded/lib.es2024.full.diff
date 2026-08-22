@@ -1,0 +1,15 @@
+diff --git a/packages/v5.7/output-branded/lib-files/lib.es2024.full.d.ts b/packages/v5.7/output-branded/lib-files/lib.es2024.full.d.ts
+new file mode 100644
+index 0000000..d8b4643
+--- /dev/null
++++ b/packages/v5.7/output-branded/lib-files/lib.es2024.full.d.ts
+@@ -0,0 +1,9 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++/// <reference path="./lib.es2024.d.ts" />
++/// <reference path="./lib.dom.d.ts" />
++/// <reference path="./lib.webworker.importscripts.d.ts" />
++/// <reference path="./lib.scripthost.d.ts" />
++/// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />

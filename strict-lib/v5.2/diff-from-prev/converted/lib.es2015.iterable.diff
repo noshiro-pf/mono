@@ -1,0 +1,32 @@
+diff --git a/packages/v5.1/output/lib-files/lib.es2015.iterable.d.ts b/packages/v5.2/output/lib-files/lib.es2015.iterable.d.ts
+index 942e069..be1a671 100644
+--- a/packages/v5.1/output/lib-files/lib.es2015.iterable.d.ts
++++ b/packages/v5.2/output/lib-files/lib.es2015.iterable.d.ts
+@@ -150,10 +150,12 @@ interface MapConstructor {
+   new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
+ }
+ 
+-interface WeakMap<K extends object, V> {}
++interface WeakMap<K extends WeakKey, V> {}
+ 
+ interface WeakMapConstructor {
+-  new <K extends object, V>(iterable: Iterable<readonly [K, V]>): WeakMap<K, V>;
++  new <K extends WeakKey, V>(
++    iterable: Iterable<readonly [K, V]>,
++  ): WeakMap<K, V>;
+ }
+ 
+ interface Set<T> {
+@@ -199,10 +201,10 @@ interface SetConstructor {
+   new <T>(iterable?: Iterable<T> | null): Set<T>;
+ }
+ 
+-interface WeakSet<T extends object> {}
++interface WeakSet<T extends WeakKey> {}
+ 
+ interface WeakSetConstructor {
+-  new <T extends object = object>(iterable: Iterable<T>): WeakSet<T>;
++  new <T extends WeakKey = WeakKey>(iterable: Iterable<T>): WeakSet<T>;
+ }
+ 
+ interface Promise<T> {}

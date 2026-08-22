@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2023.collection.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2023.collection.d.ts
+index e2365b13..92fd6e8e 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2023.collection.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2023.collection.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface WeakKeyTypes {
+   readonly symbol: symbol;
+ }

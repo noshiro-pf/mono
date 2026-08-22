@@ -1,0 +1,43 @@
+Cross-version diff: v5.8 -> v5.9
+
+[official] (temp/copied) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.symbol.wellknown.d.ts
+  lib.es2017.sharedmemory.d.ts
+  lib.es2022.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.error.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.sharedmemory.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted] (output/lib-files) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.symbol.wellknown.d.ts
+  lib.es2017.sharedmemory.d.ts
+  lib.es2022.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.error.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.sharedmemory.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts
+
+[converted-branded] (output-branded/lib-files) — 12 changed file(s):
+  lib.dom.d.ts
+  lib.dom.iterable.d.ts
+  lib.es2015.symbol.wellknown.d.ts
+  lib.es2017.sharedmemory.d.ts
+  lib.es2022.intl.d.ts
+  lib.es5.d.ts
+  lib.esnext.d.ts
+  lib.esnext.error.d.ts
+  lib.esnext.float16.d.ts
+  lib.esnext.sharedmemory.d.ts
+  lib.webworker.d.ts
+  lib.webworker.iterable.d.ts

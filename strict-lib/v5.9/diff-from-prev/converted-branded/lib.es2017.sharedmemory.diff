@@ -1,0 +1,19 @@
+diff --git a/packages/v5.8/output-branded/lib-files/lib.es2017.sharedmemory.d.ts b/packages/v5.9/output-branded/lib-files/lib.es2017.sharedmemory.d.ts
+index 6650917..c985f7e 100644
+--- a/packages/v5.8/output-branded/lib-files/lib.es2017.sharedmemory.d.ts
++++ b/packages/v5.9/output-branded/lib-files/lib.es2017.sharedmemory.d.ts
+@@ -17,13 +17,13 @@ interface SharedArrayBuffer {
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+   ): SharedArrayBuffer;
+-  readonly [Symbol.species]: SharedArrayBuffer;
+   readonly [Symbol.toStringTag]: 'SharedArrayBuffer';
+ }
+ 
+ interface SharedArrayBufferConstructor {
+   readonly prototype: SharedArrayBuffer;
+   new (byteLength?: NumberType.TypedArraySizeArgNonNegative): SharedArrayBuffer;
++  readonly [Symbol.species]: SharedArrayBufferConstructor;
+ }
+ declare const SharedArrayBuffer: SharedArrayBufferConstructor;
+ 

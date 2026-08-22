@@ -1,0 +1,22 @@
+diff --git a/packages/v5.1/output-branded/lib-files/lib.es2015.symbol.wellknown.d.ts b/packages/v5.2/output-branded/lib-files/lib.es2015.symbol.wellknown.d.ts
+index 5ce3d16..f140cc5 100644
+--- a/packages/v5.1/output-branded/lib-files/lib.es2015.symbol.wellknown.d.ts
++++ b/packages/v5.2/output-branded/lib-files/lib.es2015.symbol.wellknown.d.ts
+@@ -122,7 +122,7 @@ interface Map<K, V> {
+   readonly [Symbol.toStringTag]: string;
+ }
+ 
+-interface WeakMap<K extends object, V> {
++interface WeakMap<K extends WeakKey, V> {
+   readonly [Symbol.toStringTag]: string;
+ }
+ 
+@@ -130,7 +130,7 @@ interface Set<T> {
+   readonly [Symbol.toStringTag]: string;
+ }
+ 
+-interface WeakSet<T extends object> {
++interface WeakSet<T extends WeakKey> {
+   readonly [Symbol.toStringTag]: string;
+ }
+ 

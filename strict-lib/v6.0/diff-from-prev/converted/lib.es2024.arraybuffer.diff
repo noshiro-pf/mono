@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts b/packages/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
+index ca86575f..0d451b7c 100644
+--- a/packages/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface ArrayBuffer {
+   /**
+    * If this ArrayBuffer is resizable, returns the maximum byte length given during construction; returns the byte length if not.

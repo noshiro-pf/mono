@@ -1,0 +1,22 @@
+diff --git a/packages/v5.0/output/lib-files/lib.es2020.bigint.d.ts b/packages/v5.1/output/lib-files/lib.es2020.bigint.d.ts
+index 3fa6031..aca3c44 100644
+--- a/packages/v5.0/output/lib-files/lib.es2020.bigint.d.ts
++++ b/packages/v5.1/output/lib-files/lib.es2020.bigint.d.ts
+@@ -153,7 +153,7 @@ interface BigInt64Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end.
++   * is treated as length+end. If start is omitted, `0` is used.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+   copyWithin(target: number, start: number, end?: number): this;
+@@ -484,7 +484,7 @@ interface BigUint64Array {
+    * @param target If target is negative, it is treated as length+target where length is the
+    * length of the array.
+    * @param start If start is negative, it is treated as length+start. If end is negative, it
+-   * is treated as length+end.
++   * is treated as length+end. If start is omitted, `0` is used.
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+   copyWithin(target: number, start: number, end?: number): this;

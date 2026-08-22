@@ -1,0 +1,15 @@
+diff --git a/packages/v5.9/output/lib-files/lib.esnext.error.d.ts b/packages/v5.9/output/lib-files/lib.esnext.error.d.ts
+new file mode 100644
+index 0000000..75200d5
+--- /dev/null
++++ b/packages/v5.9/output/lib-files/lib.esnext.error.d.ts
+@@ -0,0 +1,9 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++interface ErrorConstructor {
++  /**
++   * Indicates whether the argument provided is a built-in Error instance or not.
++   */
++  isError(error: unknown): error is Error;
++}

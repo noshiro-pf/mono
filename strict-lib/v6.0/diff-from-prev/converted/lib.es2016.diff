@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2016.d.ts b/packages/v6.0/output/lib-files/lib.es2016.d.ts
+index 09d2179d..411d2d15 100644
+--- a/packages/v5.9/output/lib-files/lib.es2016.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2016.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2015.d.ts" />
+ /// <reference path="./lib.es2016.array.include.d.ts" />
+ /// <reference path="./lib.es2016.intl.d.ts" />

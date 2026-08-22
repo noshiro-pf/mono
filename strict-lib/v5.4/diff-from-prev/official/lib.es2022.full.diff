@@ -1,0 +1,9 @@
+diff --git a/packages/v5.3/temp/copied/lib.es2022.full.d.ts b/packages/v5.4/temp/copied/lib.es2022.full.d.ts
+index 8f5d3d2..a818a4f 100644
+--- a/packages/v5.3/temp/copied/lib.es2022.full.d.ts
++++ b/packages/v5.4/temp/copied/lib.es2022.full.d.ts
+@@ -20,3 +20,4 @@ and limitations under the License.
+ /// <reference lib="webworker.importscripts" />
+ /// <reference lib="scripthost" />
+ /// <reference lib="dom.iterable" />
++/// <reference lib="dom.asynciterable" />

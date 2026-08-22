@@ -1,0 +1,17 @@
+diff --git a/packages/v5.6/temp/copied/lib.es2017.d.ts b/packages/v5.7/temp/copied/lib.es2017.d.ts
+index b23a122..04d1b21 100644
+--- a/packages/v5.6/temp/copied/lib.es2017.d.ts
++++ b/packages/v5.7/temp/copied/lib.es2017.d.ts
+@@ -16,9 +16,10 @@ and limitations under the License.
+ /// <reference no-default-lib="true"/>
+ 
+ /// <reference lib="es2016" />
++/// <reference lib="es2017.arraybuffer" />
++/// <reference lib="es2017.date" />
++/// <reference lib="es2017.intl" />
+ /// <reference lib="es2017.object" />
+ /// <reference lib="es2017.sharedmemory" />
+ /// <reference lib="es2017.string" />
+-/// <reference lib="es2017.intl" />
+ /// <reference lib="es2017.typedarrays" />
+-/// <reference lib="es2017.date" />
