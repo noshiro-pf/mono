@@ -664,7 +664,7 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 | :-------------------------------------------- | :----------------------------------------------- |
 | `Object.fromEntries` が `Partial<...>` を返す | lib 側の不具合。`dist-v7.0-0.1.0` で解消         |
 | `replaceAll` のキャプチャ群が `unknown`       | 可変長引数で受けて `isString` で絞る             |
-| `String` が `@deprecated`（lint 7 件、下記）   | `unknownToString`（`ts-data-forge`）に置き換える |
+| `String` が `@deprecated`（lint 7 件、下記）  | `unknownToString`（`ts-data-forge`）に置き換える |
 
 3 つ目は元々このリポジトリの慣例で、`gen-docs.mts` などは既に
 `unknownToString` を使っていた。strict lib の `@deprecated` は、その慣例が
