@@ -1,13 +1,21 @@
 # `strict-typescript-lib` を mono に統合するか
 
-## 結論（提案）
+## 結論
 
-**統合しない。** 代わりに、統合したい理由として挙がっていた 2 点をそれぞれ別の手段で解決する。
+**統合する（2026-08-22 決定）。** 2026-08-13 時点の結論は「統合しない」だった。決め手は
+フォーマッタの違いではなく**配布経路** — npm に何も publish しておらず、GitHub Release の
+URL が利用者の唯一のインストール手段だったこと — で、**その前提が失効した**。
 
-- ワークフローの重複 → mono 側に再利用可能ワークフロー（`on: workflow_call`）を置き、`strict-typescript-lib` から呼ぶ
-- 型定義変更の即時検証 → mono が strict lib を**導入**する際に、開発時だけローカルチェックアウトを向く仕組みを用意する
+反転させたのは 3 つの出来事である。
 
-統合を避ける決め手は、フォーマッタの違いではなく**配布経路**にある。詳細は後述。
+| #   | 何が起きたか                                                                         | 何が変わったか                                                                       |
+| :-- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------- |
+| 1   | per-lib 分割をやめ、1 系統 1 パッケージに集約（strict-typescript-lib#123）           | publish 数が約 2,400 → 24。npm のレート制限を踏まなくなった                          |
+| 2   | 全 24 パッケージを npm に publish し trusted publishing を設定（#125 / #127 / #129） | **正の配布経路が URL から npm に移った**。「URL にリポジトリ名が埋まる」問題が消えた |
+| 3   | mono 側が URL 依存をやめ `paths` 1 行で解決する形に（mono#1656）                     | 消費側の設定が `blockExoticSubdeps` 込みの 2 設定から `paths` 1 行になった           |
+
+以下は当時の調査記録である。節ごとに現在の扱いを注記した。**実際の移行手順は末尾の
+「移行方針（2026-08-22 決定）」にある。**
 
 ## 2 つのリポジトリの規模
 
@@ -52,6 +60,16 @@
 導入後であれば、開発時に `@typescript/lib-*` の解決先をローカルチェックアウトへ向けるだけで同じ効果が得られる。strict lib 側は既に全 lib を生成しているので、生成物のディレクトリを指す指定を書き出すスクリプトを足せばよい。統合しなければ得られない、というほどの差ではない。
 
 ## 統合を避ける理由
+
+> **この節は 2026-08-13 時点の記録である。** 現在の扱いは次のとおり。
+>
+> | 理由                                            | 当時   | 現在                                                                   |
+> | :---------------------------------------------- | :----- | :--------------------------------------------------------------------- |
+> | **A-1** インストール URL にリポジトリ名が埋まる | 決め手 | **失効**。正の入口は npm になった                                      |
+> | **A-2** Releases 一覧とタグが混在する           | 決め手 | **設計で解く**。GitHub Release は廃止、タグは後述                      |
+> | **B** ディレクトリ規約が合わない                | 中     | **受け入れる**。`libs/` ではなく `strict-lib/` を新設する              |
+> | **C** 生成物がツリーに載る                      | 中     | **縮めてから移す**。死んだ生成物が 2,000 件以上ある（後述）            |
+> | **D** フォーマッタの違い                        | 弱     | **住み分ける**。`strict-lib/` を prettier の対象外にし、そこだけ oxfmt |
 
 ### A. 配布経路が根本的に違う（決め手）
 
@@ -638,7 +656,185 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 
 ### 残っていること
 
-`libReplacement: true` はまだ `octokit-safe-types` だけ。残りの opt-in は従来の
-順序（`ts-repo-utils` → `ts-fortress` → `ts-type-forge` → `ts-data-forge`）で進める。
-`paths` は全パッケージに入っているので、各パッケージで足すのは
-`"libReplacement": true` の 1 行だけになった。
+`libReplacement: true` は `octokit-safe-types`・`ts-repo-utils`（#1618）・
+`ts-fortress`（#1657）。**`ts-type-forge` は opt-in しない**（次章の決定 1）。
+残りは `ts-data-forge` と、まだ数えていない `eslint-*` / `synstate*` /
+`ts-codemod-*` / `github-settings-as-code`。`paths` は全パッケージに入っているので、
+各パッケージで足すのは `"libReplacement": true` の 1 行だけになった。
+
+## 移行方針（2026-08-22 決定）
+
+### 決めたこと
+
+| #   | 決定                                                                                                                                                    |
+| :-- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **`ts-type-forge` は strict lib を使わない。** 相互依存を作らない                                                                                       |
+| 2   | **配置は新設の `strict-lib/`。** prettier の対象外にし、そこだけ oxfmt で回す                                                                           |
+| 3   | **全系統のバージョンを統一する**                                                                                                                        |
+| 4   | **GitHub Release を廃止し npm publish に一本化。** dist の生成方法だけ引き継ぎ、リリースは mono の changesets に統合。独自 publish スクリプトは持たない |
+
+### 決定 1: `ts-type-forge` は strict lib を使わない
+
+依存は**既に片方向にある**。strict lib の宣言が `ts-type-forge` を参照する側で、
+`ts-type-forge` は依存ゼロのパッケージである。
+
+| 項目                                    | 実測値（2026-08-22）                                           |
+| :-------------------------------------- | :------------------------------------------------------------- |
+| `strict-ts-lib-v7.0` の `dependencies`  | `ts-type-forge: ^9.0.0`                                        |
+| `ts-type-forge` を参照する lib ファイル | 107 中 **18**                                                  |
+| 参照している型                          | 約 25 種（`Uint8` 130 箇所、`Int8` 75、`UintRange` 37 が大半） |
+| `ts-type-forge` 自身の依存              | `dependencies`・`peerDependencies` とも空                      |
+
+`ts-type-forge` を opt-in すると、この向きが両方向になる。しかも実体としては
+**自分自身の publish 済みスナップショットで自分を型チェックする**ことになる。
+`pnpm` は strict lib の依存を npm から取るので、mono の `node_modules` には
+workspace 版とは別に `ts-type-forge@9.2.1` が入っている。
+
+```
+node_modules/.pnpm/strict-ts-lib-v7.0@0.2.0_typescript@6.0.3/node_modules/ts-type-forge
+```
+
+いまは偶然どちらも 9.2.1 だが、ローカルで型を変えた瞬間にずれる。
+
+**実害は既に観測している。** strict lib の `Math.abs` は
+`abs<N extends number>(x: N): AbsoluteValue<N>` と宣言されており、`AbsoluteValue` は
+数値リテラル型のための型なので branded 型をそのまま返す。結果 `Math.abs` した
+`NegativeNumber` が `NegativeNumber` のままになる。`AbsoluteValue` 側は直せない
+（`ts-data-forge` の `Int8.abs` がこの挙動に乗っており、広げると公開 API が退化する）。
+**opt-in をやめれば問題ごと消える。**
+
+やることは 3 つ。
+
+1. `libs/ts-type-forge/tsconfig.json` に `"libReplacement": false` を**明示**する。
+   将来 shared config へ移したときに巻き込まれないため。理由をコメントに書く
+2. `check:root:tsconfig-lib-paths` で「意図的な opt-out」を許容する
+3. 検証用に push した `feat/strict-ts-lib-type-forge` は破棄する。サンプルの
+   `day: DateEnum` 修正だけは lib と無関係な改善なので、拾うなら別 PR に切り出す
+
+### 決定 2: 配置は `strict-lib/`
+
+`libs/*` は「1 ディレクトリ = 1 npm パッケージ」で、9 リポジトリ統合のときに確定した
+規約である。生成物と生成スクリプトが同居する strict lib はこれに入らないので、
+トップレベルに区画を作る。
+
+```
+strict-lib/
+  scripts/                    生成スクリプト（旧 packages/scripts-common ＋ 旧 scripts/）
+  v7.0/
+    package.json              publish されるパッケージ
+    libs/<lib>/index.d.ts     ← 公開時の配置そのまま
+    lib-files/                生成中間物
+    temp/                     TypeScript 本体からのコピー原本
+    diff-from-prev/           前バージョンとの差分（レビュー用）
+  v6.0/ …
+```
+
+**「公開時の配置そのまま」が移行の必須条件である。** `paths` が指す
+`node_modules/strict-ts-lib-v7.0/libs/*` は、workspace 化すると
+`strict-lib/v7.0` へのシンボリックリンクになる。tarball ではなくディスク上の
+ディレクトリを直接読むので、**いま pack 時にやっている
+`output/packages/` → `libs/` の並べ替えが成立しなくなる**。並べ替えを消し、
+最初から `libs/` に生成する。
+
+フォーマッタは住み分ける。`.prettierignore` に `strict-lib` を足し、
+`strict-lib/` 配下だけ oxfmt で回す。生成物が数千ファイルあるので、
+**prettier を通さないこと自体が `fmt:full` の高速化になる**。
+`style-check` と `assert-repo-is-clean` は分岐を持つことになる。
+
+`experimental/` と同じく、**ここも独自の `.gitignore` は置かない**（リポジトリ
+ルートに 1 つという規約）。
+
+### 決定 3: 全系統のバージョンを統一する
+
+現状は系統ごとにばらばらである。
+
+| 系統         | 現在のバージョン |
+| :----------- | :--------------- |
+| v7.0 / v6.0  | 0.2.0            |
+| v5.0 〜 v5.9 | 0.4.0            |
+
+揃える利点は運用側だけの話ではない。**利用者が TypeScript を上げたとき、対応する
+strict lib のどのバージョンを取ればよいか分からない**という問題が消える。
+`strict-ts-lib-v7.1@1.4.0` と `strict-ts-lib-v7.0@1.4.0` が同じ世代だと名前で分かる。
+
+changesets の `fixed` グループに入れれば自動で揃う（`.changeset/config.json`）。
+最初の 1 回だけ、全系統を同じバージョンに手で合わせる必要がある。
+
+### 決定 4: リリースは changesets に一本化
+
+| 廃止するもの                              | 置き換え                                                                              |
+| :---------------------------------------- | :------------------------------------------------------------------------------------ |
+| `scripts/cmd/dist-github-release.mts`     | なし（GitHub Release をやめる）                                                       |
+| `scripts/cmd/dist-npm-publish.mts`        | changesets の publish                                                                 |
+| `.github/workflows/release.yml`（上流の） | mono の `release.yml`                                                                 |
+| `docs/first-release.md` の手順            | 初回 publish だけは残る（後述）                                                       |
+| 引き継ぐもの                              | **dist の生成方法のみ** — `ws:gen:packages` と `pack-bundle` の「何を libs に置くか」 |
+
+GitHub Release をやめてよい根拠は、npm が正の経路になったこと。URL 配布は
+「レジストリを通したくない人向けの補助」でしかなく、その補助のために 1 publish
+あたり 12 リリース・24 タグを作るのは釣り合わない。
+
+**初回 publish の手作業だけは残る。** npm の trusted publisher はパッケージごとに
+設定するもので、そのパッケージが npm に存在しないと設定できない。新しい TypeScript
+系統（v7.1 …）を足すときだけ、上流の `docs/first-release.md` と同じ手順が要る。
+移行時にこの文書も mono へ持ってくる。
+
+**README の更新も移行に含める。** インストール手順の URL 例を消し、npm を正として
+書き直す。リポジトリへのリンクも `noshiro-pf/mono` に向け直す。
+
+### タグをどう減らすか（要判断が 1 つ残っている）
+
+changesets は**リリースしたパッケージごとにタグを打つ**（`push-git-tags: true`）。
+「代表 1 件だけ」を指定するオプションは無い。素直に移すと **1 publish で 24 タグ**に
+なる。
+
+減らす手は 3 つある。
+
+| 案                                                    | タグ数/publish | 評価                                                                                                                           |
+| :---------------------------------------------------- | -------------: | :----------------------------------------------------------------------------------------------------------------------------- |
+| **(a) flavor を 1 パッケージにまとめる**              |             12 | **推奨。** `libs/` と `libs-branded/` を同じパッケージに入れ、利用者は `paths` の指す先で選ぶ。bundle 化で既に可能になっている |
+| (b) そのまま受け入れる                                |             24 | 一番単純。バージョンが揃っているので「1 世代 = 24 タグ」と読める                                                               |
+| (c) `push-git-tags: false` にして自前で代表タグを打つ |              1 | mono の他パッケージのタグも自前で押すことになる。「独自スクリプトを無くす」方針と逆行する                                      |
+
+(a) の実サイズ根拠: 1 系統あたり非 branded 4.7MB＋branded 4.8MB＝約 9.5MB
+（展開時、`.d.ts` なので圧縮は良く効く）。全系統を 1 パッケージにまとめる案は
+82MB になるので採らない。
+
+**(a) を採るかは公開パッケージの形が変わる判断なので、実装前に確認する。**
+
+### 移行前にやる掃除
+
+移動するかに関わらず効くので先に片付ける。
+
+| 対象                                        | ファイル数 | 扱い                                                                                                                                                    |
+| :------------------------------------------ | ---------: | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `output(-branded)/packages/**/package.json` |  **2,154** | **削除**。per-lib publish をやめた時点で死んでいる。workspace のグロブは `packages/v*/output` までで、`pack-bundle.mts` は `**/index.d.ts` しか読まない |
+| `output(-branded)/packages/` → `libs/`      |          — | リネーム。pack 時のステージングを削る                                                                                                                   |
+| `temp/**`                                   |      1,089 | 追跡をやめるか判断。`diff-from-prev` があるので差分レビューは維持できる                                                                                 |
+| バージョン統一                              |          — | 決定 3                                                                                                                                                  |
+
+上流の追跡ファイルは 9,801。この掃除で概算 5,500 前後まで落ちる。mono は現在 8,109 なので、
+移行後は約 13,600 になる。
+
+### 手順
+
+| Phase | 内容                                                                                          | 状態                       |
+| :---- | :-------------------------------------------------------------------------------------------- | :------------------------- |
+| 0     | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`）                         | 両方 check-all 通過・CI 緑 |
+| 1     | `ts-type-forge` の opt-out を明示（決定 1）                                                   | 次にやる                   |
+| 2     | 上流の掃除（死んだ `package.json` 削除・`libs/` リネーム・バージョン統一）                    |                            |
+| 3     | `strict-lib/` へ移動。`.prettierignore`・oxfmt・workspace グロブ・`paths`・README             |                            |
+| 4     | リリースを changesets へ。上流ワークフローと publish スクリプトを削除、旧リポジトリを archive |                            |
+| 5     | 残りの opt-in を再開（`ts-data-forge` ほか）                                                  |                            |
+
+### 移行時に必ず確認すること
+
+- **`paths` が実体に届いているか。** `node_modules/strict-ts-lib-v7.0/libs/*` が
+  workspace のシンボリックリンク越しに解決すること。`--traceResolution` で
+  `was successfully resolved` を数える（v7.0 なら 88/88）
+- **probe が生きているか。** opt-in 済みパッケージの `strict-lib-active.mts` が
+  `libReplacement: false` で `TS2578` になること。`tsconfig.json` の `include` に
+  `test/` が入っていない罠がある（`ts-type-forge` で踏んだ）
+- **ビルド順。** strict lib のパッケージが `ts-type-forge` を `workspace:^` で
+  参照するので、`ws:build` のステージがそこに依存する。`dependencies` に入れる
+- **`check:root:lockfile` が 0 件のままか。** URL 依存が戻っていないこと
