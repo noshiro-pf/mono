@@ -671,7 +671,8 @@ per-lib パッケージのうち名前で引かれていたのは約 15 個だ�
 | 1   | **`ts-type-forge` は strict lib を使わない。** 相互依存を作らない                                                                                       |
 | 2   | **配置は新設の `strict-lib/`。** prettier の対象外にし、そこだけ oxfmt で回す                                                                           |
 | 3   | **全系統のバージョンを統一する**                                                                                                                        |
-| 4   | **GitHub Release を廃止し npm publish に一本化。** dist の生成方法だけ引き継ぎ、リリースは mono の changesets に統合。独自 publish スクリプトは持たない |
+| 4 | **GitHub Release を廃止し npm publish に一本化。** dist の生成方法だけ引き継ぎ、リリースは mono の changesets に統合する |
+| 5 | **branded / 非 branded を 1 パッケージにまとめる。** 24 → 12 パッケージ。利用者は `paths` の指す先で選ぶ |
 
 ### 決定 1: `ts-type-forge` は strict lib を使わない
 
@@ -782,50 +783,102 @@ GitHub Release をやめてよい根拠は、npm が正の経路になったこ�
 **README の更新も移行に含める。** インストール手順の URL 例を消し、npm を正として
 書き直す。リポジトリへのリンクも `noshiro-pf/mono` に向け直す。
 
-### タグをどう減らすか（要判断が 1 つ残っている）
+### 決定 5: flavor を 1 パッケージにまとめる（タグ削減）
 
-changesets は**リリースしたパッケージごとにタグを打つ**（`push-git-tags: true`）。
-「代表 1 件だけ」を指定するオプションは無い。素直に移すと **1 publish で 24 タグ**に
-なる。
+changesets は**リリースしたパッケージごとにタグを打ち**（`push-git-tags: true`）、
+「代表 1 件だけ」を指定するオプションは無い。素直に移すと 1 publish で 24 タグに
+なる。検討した 3 案は次のとおりで、**(a) を採る**。
 
-減らす手は 3 つある。
+| 案 | タグ数/publish | 評価 |
+| :-- | --: | :-- |
+| **(a) flavor を 1 パッケージにまとめる** | 12 | **採用** |
+| (b) そのまま受け入れる | 24 | 一番単純だが、24 パッケージの維持コストが残る |
+| (c) `push-git-tags: false` にして代表タグ 1 件を自前で打つ | 1 | 後述の理由で単独では採らない |
 
-| 案                                                    | タグ数/publish | 評価                                                                                                                           |
-| :---------------------------------------------------- | -------------: | :----------------------------------------------------------------------------------------------------------------------------- |
-| **(a) flavor を 1 パッケージにまとめる**              |             12 | **推奨。** `libs/` と `libs-branded/` を同じパッケージに入れ、利用者は `paths` の指す先で選ぶ。bundle 化で既に可能になっている |
-| (b) そのまま受け入れる                                |             24 | 一番単純。バージョンが揃っているので「1 世代 = 24 タグ」と読める                                                               |
-| (c) `push-git-tags: false` にして自前で代表タグを打つ |              1 | mono の他パッケージのタグも自前で押すことになる。「独自スクリプトを無くす」方針と逆行する                                      |
+`strict-ts-lib-v7.0` が `libs/`（非 branded）と `libs-branded/` の両方を持ち、
+利用者は `paths` の指す先で選ぶ。
 
-(a) の実サイズ根拠: 1 系統あたり非 branded 4.7MB＋branded 4.8MB＝約 9.5MB
-（展開時、`.d.ts` なので圧縮は良く効く）。全系統を 1 パッケージにまとめる案は
-82MB になるので採らない。
+```jsonc
+// 非 branded
+"@typescript/lib-*": ["./node_modules/strict-ts-lib-v7.0/libs/*"]
+// branded
+"@typescript/lib-*": ["./node_modules/strict-ts-lib-v7.0/libs-branded/*"]
+```
 
-**(a) を採るかは公開パッケージの形が変わる判断なので、実装前に確認する。**
+**利用者の手間は増えない。** `paths` は元々書く必要があり、選択がパッケージ名から
+その 1 行に移るだけである。コストは両 flavor をダウンロードすること（1 系統あたり
+展開時 4.7MB＋4.8MB＝約 9.5MB。`.d.ts` なので packed はずっと小さい）。全系統を
+1 パッケージにまとめる案は 82MB になるので採らない。
+
+#### (c) を単独で採らない理由
+
+タグ 1 件は魅力的だが、(a) と比べて 3 つ不利がある。
+
+1. **`push-git-tags: false` の影響範囲がリポジトリ全体。** これはワークフロー入力
+   なので、mono 自身の 17 パッケージのタグも changesets が押さなくなる。代替の
+   自前ステップが `<package>@<version>` タグ全部を押す責任を負い、**リリース経路に
+   単一障害点を作る**。得られるのはタグ数の見た目だけである
+2. **24 パッケージが残る。** 新しい TypeScript マイナーが出るたび、初回 publish と
+   trusted publisher 設定が 2 回必要なまま。(a) なら 1 回
+3. **代表タグのバージョンを自前で組み立てる必要がある。** changesets は作らないので、
+   ステップが代表パッケージの `package.json` を読むことになる
+
+**(a) と (c) は排他ではない。** (a) で 12 タグまで落としたうえで、それでも気になれば
+(c) を重ねればよい。順序として (a) が先である。
+
+### npm 上の既存パッケージをどう畳むか
+
+**確認した事実**（npm 10.9.7 同梱のドキュメント）。
+
+> Even if you unpublish a package version, that specific name and version
+> combination can never be reused. In order to publish the package again, you
+> must use a new version number. If you unpublish the entire package, you may
+> not publish any new versions of that package until 24 hours have passed.
+
+CLI 自身も `Refusing to delete the last version of the package. It will block
+from republishing a new version for 24 hours.` と警告する。
+
+（unpublish の適格条件 — 72 時間以内・ダウンロード数・依存の有無 — が書かれた
+policy ページはこの環境の egress proxy に阻まれて読めなかった。publish が
+2026-08-21 なので 72 時間枠には入っているはずだが、**そこは未確認**。）
+
+したがって「全部消して作り直す」は 1 箇所だけ危険で、扱いを分ける。
+
+| 対象 | 操作 | 理由 |
+| :-- | :-- | :-- |
+| **再利用する 12 名**（`strict-ts-lib-vX.Y`） | **package 全体は消さない。** 1.0.0 を publish した後で旧バージョンだけ個別に unpublish するか deprecate する | 全体を消すとその名前で **24 時間 publish できず**、作り直しが 1 日止まる |
+| **捨てる 12 名**（`strict-ts-lib-vX.Y-branded`） | `npm unpublish <name> --force` で全体削除してよい | 二度と publish しないので 24 時間ブロックは無害。deprecate で残す選択もある |
+
+旧 0.2.0 / 0.4.0 は二度と使えないので、**作り直しは 1.0.0 から**。バージョン統一
+（決定 3）とも噛み合う。
+
 
 ### 移行前にやる掃除
 
 移動するかに関わらず効くので先に片付ける。
 
-| 対象                                        | ファイル数 | 扱い                                                                                                                                                    |
-| :------------------------------------------ | ---------: | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `output(-branded)/packages/**/package.json` |  **2,154** | **削除**。per-lib publish をやめた時点で死んでいる。workspace のグロブは `packages/v*/output` までで、`pack-bundle.mts` は `**/index.d.ts` しか読まない |
-| `output(-branded)/packages/` → `libs/`      |          — | リネーム。pack 時のステージングを削る                                                                                                                   |
-| `temp/**`                                   |      1,089 | 追跡をやめるか判断。`diff-from-prev` があるので差分レビューは維持できる                                                                                 |
-| バージョン統一                              |          — | 決定 3                                                                                                                                                  |
+| 対象 | ファイル数 | 扱い | 状態 |
+| :-- | --: | :-- | :-- |
+| `output(-branded)/packages/**/package.json` | **2,154** | **削除**。per-lib publish をやめた時点で死んでいる。workspace のグロブは `packages/v*/output` までで、`pack-bundle.mts` は `**/index.d.ts` しか読まない | **完了**（strict-typescript-lib#130） |
+| `output(-branded)/packages/` → `libs/` / `libs-branded/` | — | リネーム。pack 時のステージングを削る。決定 2 の必須条件でもあり、決定 5 の形でもある | 移植と同時 |
+| `temp/**` | 1,089 | 追跡をやめるか判断。`diff-from-prev` があるので差分レビューは維持できる | 未 |
+| バージョン統一 | — | 決定 3。1.0.0 から | 未 |
 
-上流の追跡ファイルは 9,801。この掃除で概算 5,500 前後まで落ちる。mono は現在 8,109 なので、
-移行後は約 13,600 になる。
+上流の追跡ファイルは 9,866 だった。#130 で 7,712 になり、`temp/` も外せば 6,600 前後。
+mono は現在 8,109 なので、移行後は 15,000 弱になる。
 
 ### 手順
 
-| Phase | 内容                                                                                          | 状態                       |
-| :---- | :-------------------------------------------------------------------------------------------- | :------------------------- |
-| 0     | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`）                         | 両方 check-all 通過・CI 緑 |
-| 1     | `ts-type-forge` の opt-out を明示（決定 1）                                                   | 次にやる                   |
-| 2     | 上流の掃除（死んだ `package.json` 削除・`libs/` リネーム・バージョン統一）                    |                            |
-| 3     | `strict-lib/` へ移動。`.prettierignore`・oxfmt・workspace グロブ・`paths`・README             |                            |
-| 4     | リリースを changesets へ。上流ワークフローと publish スクリプトを削除、旧リポジトリを archive |                            |
-| 5     | 残りの opt-in を再開（`ts-data-forge` ほか）                                                  |                            |
+| Phase | 内容 | 状態 |
+| :-- | :-- | :-- |
+| 0 | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`） | **完了**（両方 check-all 通過・CI 緑、マージ待ち） |
+| 1 | `ts-type-forge` の opt-out を明示（決定 1） | **完了**（`feat/ts-type-forge-no-lib-replacement`） |
+| 2 | 上流の掃除（死んだ `package.json`） | **完了**（strict-typescript-lib#130） |
+| 3 | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | 次にやる |
+| 4 | リリースを changesets へ。上流ワークフローと publish スクリプトを削除 | |
+| 5 | npm 上の既存パッケージを畳み、1.0.0 を publish。旧リポジトリを archive | |
+| 6 | 残りの opt-in を再開（`ts-data-forge` ほか） | |
+
 
 ### 移行時に必ず確認すること
 
