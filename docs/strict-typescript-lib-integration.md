@@ -1386,3 +1386,29 @@ opt-in のたびに、次の 2 つを確認する。
 としたら経路は 1 つだけで、**共有 config か `configs/tsconfig.build.json` の側に
 `libReplacement: true` が入ったとき**である。逆に言えば、宣言を strict lib で
 emit したくなった日には、この構造ごと考え直すことになる。
+
+## `ts-fortress` の opt-in（2026-08-22 実測）
+
+**型エラー 1 件、lint 0 件。** 2026-08-14 の見積り（型 4 件・lint 21 件）から
+大きく減った。型のほうは strict-typescript-lib#117 が lib 側を直したぶん、lint の
+ほうは ESLint が strict lib を見なくなったぶん（前節）である。
+
+残った 1 件は `record.mts` の
+
+```ts
+const sourceKeys = new Set(Object.keys(shape));
+```
+
+で、strict lib の `Object.keys` は「その record 自身のキーの union」を返すため
+`Set<ToStr<keyof S>>` に推論される。あとで `Object.keys(a)`（検証対象の値のキー、
+ただの `string`）で `has` を呼ぶので、そこが落ちる。
+
+**注釈を付けて広げるのが正しい。** ここでやりたいのは所属判定なので、要素型は
+`string` でよい。
+
+```ts
+const sourceKeys: ReadonlySet<string> = new Set(Object.keys(shape));
+```
+
+`Object.keys` の戻りが狭いこと自体は strict lib の狙いどおりで、キャストで
+潰すべきものではない。素の lib でもこの注釈は通る。
