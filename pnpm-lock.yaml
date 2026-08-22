@@ -228,8 +228,8 @@ importers:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.2)(rollup@4.62.4)(supports-color@7.2.0)
       strict-ts-lib-v7.0:
-        specifier: ^0.2.0
-        version: 0.2.0(typescript@6.0.3)
+        specifier: ^0.5.0
+        version: 0.5.0(typescript@6.0.3)
       ts-data-forge:
         specifier: workspace:*
         version: link:libs/ts-data-forge
@@ -4801,8 +4801,8 @@ packages:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
 
-  electron-to-chromium@1.5.406:
-    resolution: {integrity: sha512-hWH5ORBi3d0IipnMh7BN5GDTaAmrSSSWmznwt2zltdiRNEWoEQyTwF0FFSBxzHO7hLSRT6loQu3IQGV0wg/Tvg==}
+  electron-to-chromium@1.5.407:
+    resolution: {integrity: sha512-4R8XgQOdfxexCd/u63lRm6wCHjECwI45MV9wxAs2ggtfWe2hwlo1ql97jKsju2IcJ+jFSTwBssyYoiWhh7mauQ==}
 
   emoji-regex-xs@2.0.1:
     resolution: {integrity: sha512-1QFuh8l7LqUcKe24LsPUNzjrzJQ7pgRwp1QMcZ5MX6mFplk2zQ08NVCM84++1cveaUUYtcCYHmeFEuNg16sU4g==}
@@ -6980,8 +6980,8 @@ packages:
   stream-replace-string@2.0.0:
     resolution: {integrity: sha512-TlnjJ1C0QrmxRNrON00JvaFFlNh5TTG00APw23j74ET7gkQpTASi6/L2fuiav8pzK715HXtUeClpBTw2NPSn6w==}
 
-  strict-ts-lib-v7.0@0.2.0:
-    resolution: {integrity: sha512-9myS7PEIbz2gEcK2pKZWLSj/Tz8q/20MI3pvkcjAVNaJvlQ90bR2WeQbohOyq0N2LR29NTwc3rnyPDKTtgZrhg==}
+  strict-ts-lib-v7.0@0.5.0:
+    resolution: {integrity: sha512-vPlEJWv3NL0WFfgpb0ZWt78b2ehrt8ujlPq9Pemmhc9U/vnK5KGyD+jPbjlwp8IGm/+AIjX5ZYeiElus77rHFQ==}
     peerDependencies:
       typescript: '>=7.0.0 <7.1.0'
 
@@ -10289,7 +10289,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.11.14
       caniuse-lite: 1.0.30001809
-      electron-to-chromium: 1.5.406
+      electron-to-chromium: 1.5.407
       node-releases: 2.0.53
       update-browserslist-db: 1.3.1(browserslist@4.28.8)
 
@@ -10706,7 +10706,7 @@ snapshots:
       es-errors: 1.3.0
       gopd: 1.2.0
 
-  electron-to-chromium@1.5.406: {}
+  electron-to-chromium@1.5.407: {}
 
   emoji-regex-xs@2.0.1: {}
 
@@ -13688,7 +13688,7 @@ snapshots:
 
   stream-replace-string@2.0.0: {}
 
-  strict-ts-lib-v7.0@0.2.0(typescript@6.0.3):
+  strict-ts-lib-v7.0@0.5.0(typescript@6.0.3):
     dependencies:
       ts-type-forge: 9.2.1
       typescript: 6.0.3
