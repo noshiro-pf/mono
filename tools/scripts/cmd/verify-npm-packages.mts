@@ -1,6 +1,6 @@
-import { Num, Arr, isRecord, isString, Json, Result  } from 'ts-data-forge';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr, isRecord, isString, Json, Num, Result } from 'ts-data-forge';
 import {
   $,
   formatFilesGlob,
@@ -553,7 +553,9 @@ const strictLibTypeScriptMajor = (packageName: string): number | undefined => {
 
   const major = matched?.[1];
 
-  return major === undefined ? undefined : Result.unwrapOkOr(Num.safeParseInt(major), Number.NaN);
+  return major === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(major), undefined);
 };
 
 const runChecks = async (
@@ -626,15 +628,23 @@ const readPublishablePackages = async (): Promise<
 > => {
   const packages = await getWorkspacePackages(projectRootPath);
 
-  return packages
-    .filter((pkg) =>
-      isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
-    )
-    .map((pkg) => ({
-      name: pkg.name,
-      path: pkg.path,
-      manifest: pkg.packageJson,
-    }));
+  return (
+    packages
+      .filter((pkg) =>
+        isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
+      )
+      .map((pkg) => ({
+        name: pkg.name,
+        path: pkg.path,
+        manifest: pkg.packageJson,
+      }))
+      // Sorted because the generated files are committed and CI checks the
+      // working tree is clean. `getWorkspacePackages` reads the directories
+      // concurrently and hands them back in whatever order they finished, so
+      // without this the `overrides` block of the generated `pnpm-workspace.yaml`
+      // is shuffled on every run and the repository never looks clean twice.
+      .toSorted((a, b) => a.name.localeCompare(b.name))
+  );
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
