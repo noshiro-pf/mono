@@ -46,7 +46,7 @@ directory that wildcard points at:
 // tsconfig.json
 {
     "compilerOptions": {
-        "libReplacement": true, // TypeScript 6.0 and later; see below
+        "libReplacement": true, // see the version note below
         "paths": {
             "@typescript/lib-*": ["./node_modules/strict-ts-lib-v7.0/libs/*"],
             // …or "libs-branded/*" for the branded flavor
@@ -55,8 +55,8 @@ directory that wildcard points at:
 }
 ```
 
-Two things to watch, because both fail **silently** — the replacement simply
-does not happen, with no error and no warning:
+Three things to watch, because all of them fail **silently** — the replacement
+simply does not happen, with no error and no warning:
 
 - **`paths` is replaced, not merged, by a config that `extends` another.** A
   package whose own `tsconfig.json` sets `paths` for anything else needs this
@@ -64,6 +64,9 @@ does not happen, with no error and no warning:
   enough.
 - **The path is relative to the config that contains it.** From a package in a
   monorepo that is usually `../../node_modules/strict-ts-lib-v7.0/libs/*`.
+- **Only TypeScript 7 reads `paths` for a lib replacement.** TypeScript 6 and
+  earlier resolve `@typescript/lib-*` as ordinary package names, through a
+  fixed Node10 lookup that ignores `paths` — see the version note below.
 
 To confirm it took effect, compile something that only the strict library
 rejects:
@@ -78,12 +81,17 @@ it prints should end in `was successfully resolved`.
 
 ### TypeScript version support
 
-- **`>=5.0 <=7.0`** — Supported (v5.0–v7.0 published, on npm and as GitHub
-  Release assets). Use the `strict-ts-lib-vX.Y` matching your minor; the
-  package's `peerDependencies` pins the range it was generated for. On
-  TypeScript 6.0 and later, set `"libReplacement": true` in your
-  `tsconfig.json` `compilerOptions` — it no longer defaults to on, and the
-  `paths` entry above does nothing without it.
+- **`7.0`** — Supported. `strict-ts-lib-v7.0` on npm, wired up with the `paths`
+  entry above; `libReplacement` no longer defaults to on, so it has to be set
+  explicitly and the `paths` entry does nothing without it.
+- **`>=5.0 <7.0`** — Generated here, one package per minor, and type-checked
+  against its own pinned TypeScript — but **not consumable from npm as it
+  stands**. Those TypeScript versions look `@typescript/lib-*` up by name
+  rather than through `paths`, and one package shipping every lib as a
+  subdirectory has no name for them to find. What would answer that lookup is a
+  package per lib group per minor — 16 or so names each — which is the layout
+  this repository moved away from. Until there is a route that does not
+  reintroduce it, treat those versions as source rather than as releases.
 - **`<5.0`** — Not supported.
 - **`>7.0`** — No matching version yet; use the closest published minor.
 
