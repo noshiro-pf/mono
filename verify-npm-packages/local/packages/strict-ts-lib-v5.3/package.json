@@ -1,0 +1,10 @@
+{
+  "name": "verify-strict-ts-lib-v5.3",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "strict-ts-lib-v5.3": "file:../../../.tarballs/strict-ts-lib-v5.3.tgz",
+    "typescript": ">=5.3.0 <5.4.0"
+  }
+}

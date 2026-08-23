@@ -12,33 +12,30 @@ Every built-in library ships inside this one package, in two flavors:
 - `libs/` — plain `number`
 - `libs-branded/` — branded number types (`Uint8`, `SafeUint`, …)
 
-Pick one with `paths` in your `tsconfig.json`:
+TypeScript 5.5 resolves `@typescript/lib-*` as ordinary
+package names, through a fixed Node10 lookup — it does not read `paths`
+for this. Run the linker this package ships to supply those names. It
+creates one symlink per lib group under `node_modules/@typescript/`:
+
+```sh
+npx strict-ts-lib-v5.5-link             # plain `number`
+npx strict-ts-lib-v5.5-link --branded   # branded number types
+```
+
+Add it to your own `package.json` so that a reinstall restores the links:
 
 ```jsonc
 {
-    "compilerOptions": {
-        "libReplacement": true,
-        "paths": {
-            "@typescript/lib-*": ["./node_modules/strict-ts-lib-v5.5/libs/*"],
-        },
+    "scripts": {
+        "prepare": "strict-ts-lib-v5.5-link",
     },
 }
 ```
 
-**This needs TypeScript 7.** TypeScript 6 and earlier resolve a lib
-replacement by looking `@typescript/lib-*` up as ordinary package names —
-a fixed Node10 lookup that ignores `paths` — which a single package
-shipping every lib as a subdirectory cannot answer. On those versions the
-replacement does not happen.
+Nothing goes in `tsconfig.json`: the lookup is unconditional at
+TypeScript 5.5, where `libReplacement` is not yet a known
+option — setting it is an error.
 
-Three things to watch, because all of them fail silently — the
-replacement simply does not happen, with no error:
-
-- **`paths` is replaced, not merged, by a config that `extends` another**,
-  so it has to be written in whichever config TypeScript actually loads.
-- **The path is relative to the config that contains it**, which in a
-  monorepo package is usually `../../node_modules/…`.
-- **`libReplacement` is a no-op on TypeScript 6 and earlier here**, per
-  the note above.
+`--unlink` removes the links again.
 
 See <https://github.com/noshiro-pf/mono> for usage and version support.

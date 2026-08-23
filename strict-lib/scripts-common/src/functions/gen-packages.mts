@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Json, Result, pipe } from 'ts-data-forge';
+import { Json, Num, Result, pipe } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { makeEmptyDir, pathExists } from 'ts-repo-utils';
 import { type Context } from '../context.mjs';
@@ -8,6 +8,13 @@ import { type ConverterConfig } from '../convert-dts/common.mjs';
 import { typeUtilsName } from '../convert-dts/constants.mjs';
 import { formatDir } from './utils/format.mjs';
 import { replaceWithNoMatchCheck } from './utils/node-utils.mjs';
+
+/**
+ * Copied verbatim into every bundle from `scripts-common/assets/`. It is
+ * plain JavaScript because it runs from inside a consumer's `node_modules`,
+ * where nothing of ours is available to it.
+ */
+const LINKER_FILE = 'link-libs.mjs';
 
 /** The subset of `package.json` fields this generator reads. */
 const packageJsonType = t.record({
@@ -262,15 +269,18 @@ const genBundlePackage = async (
       author: 'noshiro-pf <noshiro.pf@gmail.com>',
       sideEffects: false,
       type: 'module',
-      // Assembled at pack time from `output*/packages`; see `pack-bundle.mts`.
       // The per-group `package.json` files under `libs/` are excluded: they
-      // exist so that this repository's own harnesses — and a workspace that
-      // vendors this directory — can resolve `@typescript/lib-<group>` by
-      // name, which is the only way TypeScript 6 and earlier find a
-      // replacement (their lib resolution is a fixed Node10 lookup that
-      // ignores `paths`). A consumer installing the tarball cannot use them:
-      // they would have to point a `file:` dependency inside `node_modules`.
-      files: ['libs', 'libs-branded', '!libs/**/package.json'],
+      // exist so that this repository's own harnesses can resolve
+      // `@typescript/lib-<group>` by name, which is the only way TypeScript 6
+      // and earlier find a replacement (their lib resolution is a fixed Node10
+      // lookup that ignores `paths`). Publishing them would not help a
+      // consumer — reaching them by name means a dependency on a directory
+      // inside `node_modules`, which pnpm refuses. `link-libs.mjs` answers
+      // that lookup instead, with a symlink per group.
+      files: ['libs', 'libs-branded', '!libs/**/package.json', LINKER_FILE],
+      // Named after the package so that two of these installed side by side
+      // do not fight over one command.
+      bin: { [`${libName}-link`]: `./${LINKER_FILE}` },
       // ts-type-forge is a real runtime-resolvable dependency: the generated
       // lib references its types via `import('ts-type-forge')`, so consumers
       // must have it installed (not merely provide it). Declaring it here
@@ -283,6 +293,11 @@ const genBundlePackage = async (
         typescript: versionConfig.typescriptVersionRange,
       },
     }),
+  );
+
+  await fs.copyFile(
+    path.resolve(import.meta.dirname, '../../assets', LINKER_FILE),
+    path.resolve(bundleDir, LINKER_FILE),
   );
 
   const repoUrl = versionConfig.repo.replace(/\.git$/u, '');
@@ -304,35 +319,7 @@ const genBundlePackage = async (
       '- `libs/` — plain `number`',
       '- `libs-branded/` — branded number types (`Uint8`, `SafeUint`, …)',
       '',
-      'Pick one with `paths` in your `tsconfig.json`:',
-      '',
-      '```jsonc',
-      '{',
-      '    "compilerOptions": {',
-      '        "libReplacement": true,',
-      '        "paths": {',
-      `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
-      '        },',
-      '    },',
-      '}',
-      '```',
-      '',
-      '**This needs TypeScript 7.** TypeScript 6 and earlier resolve a lib',
-      'replacement by looking `@typescript/lib-*` up as ordinary package names —',
-      'a fixed Node10 lookup that ignores `paths` — which a single package',
-      'shipping every lib as a subdirectory cannot answer. On those versions the',
-      'replacement does not happen.',
-      '',
-      'Three things to watch, because all of them fail silently — the',
-      'replacement simply does not happen, with no error:',
-      '',
-      '- **`paths` is replaced, not merged, by a config that `extends` another**,',
-      '  so it has to be written in whichever config TypeScript actually loads.',
-      '- **The path is relative to the config that contains it**, which in a',
-      '  monorepo package is usually `../../node_modules/…`.',
-      '- **`libReplacement` is a no-op on TypeScript 6 and earlier here**, per',
-      '  the note above.',
-      '',
+      ...setupSection(libName, versionConfig.typescriptVersion),
       `See <${repoUrl}> for usage and version support.`,
       '',
     ].join('\n'),
@@ -355,6 +342,106 @@ const genBundlePackage = async (
   console.info(`${bundleDir} (bundle package) generated.`);
 
   return Result.ok(undefined);
+};
+
+/**
+ * How a consumer points TypeScript at the flavor they chose — which differs by
+ * TypeScript version, so each package documents only its own.
+ *
+ * TypeScript resolves a lib replacement in one of two ways, and they are
+ * exclusive. Measured, package against its own TypeScript:
+ *
+ * | TypeScript | route          | `libReplacement`                     |
+ * | :--------- | :------------- | :----------------------------------- |
+ * | 5.0 – 5.7  | name lookup    | not a known option; setting it errors |
+ * | 5.8 – 5.9  | name lookup    | defaults to on                        |
+ * | 6.x        | name lookup    | defaults to **off**; must be set      |
+ * | 7.x        | `paths`        | defaults to **off**; must be set      |
+ */
+const setupSection = (
+  libName: string,
+  typescriptVersion: string,
+): readonly string[] => {
+  const [major = 0, minor = 0] = typescriptVersion
+    .split('.')
+    .map((part) => Result.unwrapOkOr(Num.safeParseInt(part), 0));
+
+  if (major >= 7) {
+    return [
+      'Point `paths` at the one you want, in your `tsconfig.json`:',
+      '',
+      '```jsonc',
+      '{',
+      '    "compilerOptions": {',
+      '        "libReplacement": true,',
+      '        "paths": {',
+      `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
+      '        },',
+      '    },',
+      '}',
+      '```',
+      '',
+      'Two things to watch, because both fail silently — the replacement simply',
+      'does not happen, with no error:',
+      '',
+      '- **`paths` is replaced, not merged, by a config that `extends` another**,',
+      '  so it has to be written in whichever config TypeScript actually loads.',
+      '- **The path is relative to the config that contains it**, which in a',
+      '  monorepo package is usually `../../node_modules/…`.',
+      '',
+    ];
+  }
+
+  return [
+    `TypeScript ${major}.${minor} resolves \`@typescript/lib-*\` as ordinary`,
+    'package names, through a fixed Node10 lookup — it does not read `paths`',
+    'for this. Run the linker this package ships to supply those names. It',
+    'creates one symlink per lib group under `node_modules/@typescript/`:',
+    '',
+    '```sh',
+    `npx ${libName}-link             # plain \`number\``,
+    `npx ${libName}-link --branded   # branded number types`,
+    '```',
+    '',
+    'Add it to your own `package.json` so that a reinstall restores the links:',
+    '',
+    '```jsonc',
+    '{',
+    '    "scripts": {',
+    `        "prepare": "${libName}-link",`,
+    '    },',
+    '}',
+    '```',
+    '',
+    ...(major >= 6
+      ? [
+          'Then set `libReplacement` — it defaults to off from TypeScript 6, and',
+          'the lookup does not happen without it:',
+          '',
+          '```jsonc',
+          '{',
+          '    "compilerOptions": {',
+          '        "libReplacement": true,',
+          '    },',
+          '}',
+          '```',
+          '',
+        ]
+      : minor >= 8
+        ? [
+            'Nothing goes in `tsconfig.json`: `libReplacement` defaults to on at',
+            `TypeScript ${major}.${minor}. Just do not turn it off.`,
+            '',
+          ]
+        : [
+            'Nothing goes in `tsconfig.json`: the lookup is unconditional at',
+            `TypeScript ${major}.${minor}, where \`libReplacement\` is not yet a known`,
+            'option — setting it is an error.',
+            '',
+          ]),
+    '`--unlink` removes the links again.',
+    '',
+  ];
 };
 
 const getPackageDirListFromLibFiles = async (

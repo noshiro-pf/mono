@@ -9,10 +9,14 @@
     "type": "git",
     "url": "https://github.com/noshiro-pf/mono.git"
   },
+  "bin": {
+    "strict-ts-lib-v5.3-link": "./link-libs.mjs"
+  },
   "files": [
     "libs",
     "libs-branded",
-    "!libs/**/package.json"
+    "!libs/**/package.json",
+    "link-libs.mjs"
   ],
   "type": "module",
   "sideEffects": false,
