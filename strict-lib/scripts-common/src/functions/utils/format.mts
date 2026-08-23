@@ -6,7 +6,7 @@ import { $ } from 'ts-repo-utils';
 // (strict-lib/scripts-common/src/functions/utils/format.mts). oxfmt formats
 // this subtree and nothing else — Prettier ignores it, and everything outside
 // it is Prettier's.
-const strictLibRoot = path.resolve(import.meta.dirname, '../../../../..');
+const strictLibRoot = path.resolve(import.meta.dirname, '../../../..');
 
 // The pnpm workspace root, one level up, where the shared `node_modules` is.
 const workspaceRoot = path.resolve(strictLibRoot, '..');

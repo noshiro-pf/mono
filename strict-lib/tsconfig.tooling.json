@@ -1,9 +1,7 @@
 {
   "extends": "./configs/tsconfig/tsconfig.type-check.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
   "include": [
     "./scripts/**/*",
