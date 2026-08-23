@@ -120,9 +120,6 @@ catalogs:
     rxjs:
       specifier: 7.8.2
       version: 7.8.2
-    tslib:
-      specifier: 2.8.1
-      version: 2.8.1
     tsx:
       specifier: 4.23.12
       version: 4.23.12
@@ -179,9 +176,6 @@ importers:
       cspell:
         specifier: 'catalog:'
         version: 10.0.1
-      dedent:
-        specifier: 'catalog:'
-        version: 1.7.2(babel-plugin-macros@3.1.0)
       esbuild:
         specifier: 'catalog:'
         version: 0.28.2
@@ -245,15 +239,15 @@ importers:
       ts-data-forge:
         specifier: workspace:*
         version: link:libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:libs/ts-fortress
       ts-repo-utils:
         specifier: workspace:*
         version: link:libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:libs/ts-type-forge
-      tslib:
-        specifier: 'catalog:'
-        version: 2.8.1
       tsx:
         specifier: 'catalog:'
         version: 4.23.12
@@ -1706,6 +1700,9 @@ importers:
 
   strict-lib/scripts-common:
     dependencies:
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -1777,12 +1774,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.0-webworker@file:strict-lib/v5.0/output/lib/libs/webworker(typescript@5.0.4)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -1871,12 +1862,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.1-webworker@file:strict-lib/v5.1/output/lib/libs/webworker(typescript@5.1.6)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -1965,12 +1950,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.2-webworker@file:strict-lib/v5.2/output/lib/libs/webworker(typescript@5.2.2)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2059,12 +2038,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.3-webworker@file:strict-lib/v5.3/output/lib/libs/webworker(typescript@5.3.3)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2153,12 +2126,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.4-webworker@file:strict-lib/v5.4/output/lib/libs/webworker(typescript@5.4.5)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2247,12 +2214,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.5-webworker@file:strict-lib/v5.5/output/lib/libs/webworker(typescript@5.5.4)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2341,12 +2302,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.6-webworker@file:strict-lib/v5.6/output/lib/libs/webworker(typescript@5.6.3)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2432,12 +2387,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.7-webworker@file:strict-lib/v5.7/output/lib/libs/webworker(typescript@5.7.2)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2523,12 +2472,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.8-webworker@file:strict-lib/v5.8/output/lib/libs/webworker(typescript@5.8.3)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2614,12 +2557,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.9-webworker@file:strict-lib/v5.9/output/lib/libs/webworker(typescript@5.9.3)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2708,12 +2645,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v6.0-webworker@file:strict-lib/v6.0/output/lib/libs/webworker(typescript@6.0.3)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2790,12 +2721,6 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v7.0-webworker@file:strict-lib/v7.0/output/lib/libs/webworker(typescript@7.0.2)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
-      ts-repo-utils:
-        specifier: workspace:*
-        version: link:../../libs/ts-repo-utils
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge

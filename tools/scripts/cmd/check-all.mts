@@ -56,6 +56,26 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Scripts and configs validated',
   });
 
+  // `strict-lib/` is a directory rather than a workspace member, so the `ws:*`
+  // commands never reach its generator and scripts. It carries its own ESLint
+  // config and tooling tsconfig; these run them.
+  await logStep({
+    startMessage: 'Checking the strict standard library tooling',
+    action: () =>
+      runCmdStep(
+        'pnpm run strict-lib:type-check',
+        'Type checking strict-lib failed',
+      ),
+    successMessage: 'strict-lib types validated',
+  });
+
+  await logStep({
+    startMessage: 'Linting the strict standard library tooling',
+    action: () =>
+      runCmdStep('pnpm run strict-lib:lint', 'Linting strict-lib failed'),
+    successMessage: 'strict-lib lint passed',
+  });
+
   // Both need `dist/`: knip executes each package's vitest config, which
   // imports siblings through their `exports` map.
   await logStep({
