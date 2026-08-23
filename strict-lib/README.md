@@ -1,10 +1,12 @@
-# strict-typescript-lib
+# strict-lib
 
-<!--
-[![npm version](https://img.shields.io/npm/v/strict-typescript-lib.svg)](https://www.npmjs.com/package/strict-typescript-lib)
-[![npm downloads](https://img.shields.io/npm/dm/strict-typescript-lib.svg)](https://www.npmjs.com/package/strict-typescript-lib)
-[![License](https://img.shields.io/npm/l/strict-typescript-lib.svg)](./LICENSE)
- -->
+A strict rewrite of TypeScript's built-in standard library declarations, one
+package per TypeScript minor.
+
+This lived in its own repository (`noshiro-pf/strict-typescript-lib`) until
+2026-08. It moved here once npm became its only distribution channel, which is
+what the separate repository had existed to work around — see
+[docs/strict-typescript-lib-integration.md](../docs/strict-typescript-lib-integration.md).
 
 ## Usage
 

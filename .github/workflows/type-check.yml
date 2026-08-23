@@ -32,6 +32,10 @@ jobs:
       matrix:
         command:
           - check:root
+          # `strict-lib/` is a directory, not a workspace member, so the `ws:*`
+          # entries never reach its generator or scripts.
+          - strict-lib:type-check
+          - strict-lib:lint
           - ws:type-check
           - ws:lint:fix
           - ws:test:browser

@@ -33,4 +33,4 @@ does not happen, with no error:
 - **The path is relative to the config that contains it**, which in a
   monorepo package is usually `../../node_modules/…`.
 
-See <https://github.com/noshiro-pf/strict-typescript-lib> for usage and version support.
+See <https://github.com/noshiro-pf/mono> for usage and version support.
