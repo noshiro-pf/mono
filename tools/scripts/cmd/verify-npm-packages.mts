@@ -1,6 +1,6 @@
+import { Num, Arr, isRecord, isString, Json, Result  } from 'ts-data-forge';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, isRecord, isString, Json, Result } from 'ts-data-forge';
 import {
   $,
   formatFilesGlob,
@@ -311,6 +311,8 @@ const generateSpace = async (
   );
 
   for (const pkg of packages) {
+    if (!hasSpaceCheck(pkg.name)) continue;
+
     const dir = path.resolve(spaceDir, 'packages', pkg.name);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -339,11 +341,11 @@ const generateSpace = async (
       dependencies: {
         [pkg.name]: spec,
         // A types-only package is checked by compiling against it.
-        ...(typesOnlyPackages.has(pkg.name) ? { typescript: 'latest' } : {}),
+        ...(isTypesOnly(pkg.name) ? { typescript: typescriptSpec(pkg) } : {}),
       },
     });
 
-    const source = path.resolve(smokeDir, smokeFileName(pkg.name));
+    const source = path.resolve(smokeDir, smokeSourceName(pkg.name));
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = await fs.readFile(source, 'utf8').catch(() => undefined);
@@ -354,7 +356,7 @@ const generateSpace = async (
 
     await writeFile(path.resolve(dir, smokeFileName(pkg.name)), content);
 
-    if (typesOnlyPackages.has(pkg.name)) {
+    if (isTypesOnly(pkg.name)) {
       await writeJson(path.resolve(dir, 'tsconfig.json'), {
         compilerOptions: {
           strict: true,
@@ -364,6 +366,18 @@ const generateSpace = async (
           moduleResolution: 'nodenext',
           noEmit: true,
           skipLibCheck: false,
+          // What the strict library check exists to verify: that pointing
+          // `paths` into the installed tarball is enough for TypeScript to
+          // replace its own declarations. The smoke file then fails to
+          // compile if the replacement did not happen.
+          ...(isStrictLibPackage(pkg.name)
+            ? {
+                libReplacement: true,
+                paths: {
+                  '@typescript/lib-*': [`./node_modules/${pkg.name}/libs/*`],
+                },
+              }
+            : {}),
         },
         include: [smokeFileName(pkg.name)],
       });
@@ -468,11 +482,79 @@ const readPinnedVersion = async (
  * as `.mts`, and the presence of that file is what selects the mode.
  */
 const smokeFileName = (packageName: string): string =>
-  typesOnlyPackages.has(packageName)
-    ? `${packageName}.mts`
-    : `${packageName}.mjs`;
+  isTypesOnly(packageName) ? `${packageName}.mts` : `${packageName}.mjs`;
+
+/**
+ * The strict standard library packages all share one check, because they only
+ * differ by the TypeScript minor they were generated from — and what is being
+ * verified is the same for each: that the published tarball's `libs/` layout
+ * is what `libReplacement` asks for.
+ */
+const smokeSourceName = (packageName: string): string =>
+  isStrictLibPackage(packageName)
+    ? 'strict-ts-lib.mts'
+    : smokeFileName(packageName);
+
+const isTypesOnly = (packageName: string): boolean =>
+  typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set(['ts-type-forge']);
+
+/**
+ * The TypeScript a package is compiled against. A strict standard library
+ * replaces the declarations of one TypeScript minor and says so in its peer
+ * range, so checking it against anything else checks nothing: TypeScript 7
+ * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory`
+ * — which those declarations reference — no longer exists upstream.
+ */
+const typescriptSpec = (pkg: PackageToCheck): string => {
+  const { manifest } = pkg;
+
+  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
+
+  const declared = isRecord(peers) ? peers['typescript'] : undefined;
+
+  return isString(declared) ? declared : 'latest';
+};
+
+/**
+ * Whether the space can check this package at all.
+ *
+ * Every strict standard library package is packed and its tarball inspected,
+ * but only the ones for TypeScript 7 and later get a project in the space.
+ * The two TypeScript versions resolve a lib replacement differently, and only
+ * one of them can be expressed here:
+ *
+ * - **TypeScript 7** reads `paths`, so a project pointing
+ *   `@typescript/lib-*` into the installed tarball is exactly what the README
+ *   tells a consumer to write.
+ * - **TypeScript 6 and earlier** ignore `paths` for this and resolve
+ *   `@typescript/lib-*` as ordinary package names. Installing them that way
+ *   means a dependency on a directory inside `node_modules`, which pnpm
+ *   refuses — the directory does not exist when it resolves the graph
+ *   (`ERR_PNPM_LINKED_PKG_DIR_NOT_FOUND`).
+ *
+ * Those versions are not left unchecked: `pnpm run strict-lib:type-check`
+ * type-checks each one against its own pinned TypeScript with
+ * `skipLibCheck: false`, over the whole library rather than one probe.
+ */
+const hasSpaceCheck = (packageName: string): boolean => {
+  const major = strictLibTypeScriptMajor(packageName);
+
+  return major === undefined || major >= 7;
+};
+
+const isStrictLibPackage = (packageName: string): boolean =>
+  strictLibTypeScriptMajor(packageName) !== undefined;
+
+/** `strict-ts-lib-v7.0` and its eleven siblings, one per TypeScript minor. */
+const strictLibTypeScriptMajor = (packageName: string): number | undefined => {
+  const matched = /^strict-ts-lib-v(\d+)\.\d+$/u.exec(packageName);
+
+  const major = matched?.[1];
+
+  return major === undefined ? undefined : Result.unwrapOkOr(Num.safeParseInt(major), Number.NaN);
+};
 
 const runChecks = async (
   spaceDir: string,
@@ -483,6 +565,12 @@ const runChecks = async (
   const mut_failures: string[] = [];
 
   for (const pkg of packages) {
+    if (!hasSpaceCheck(pkg.name)) {
+      console.info(`  - ${pkg.name} (checked by \`strict-lib:type-check\`)`);
+
+      continue;
+    }
+
     const dir = path.resolve(spaceDir, 'packages', pkg.name);
 
     const file = smokeFileName(pkg.name);

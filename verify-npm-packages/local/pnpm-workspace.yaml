@@ -35,6 +35,18 @@ overrides:
   'ts-fortress': 'file:../.tarballs/ts-fortress.tgz'
   'ts-repo-utils': 'file:../.tarballs/ts-repo-utils.tgz'
   'ts-type-forge': 'file:../.tarballs/ts-type-forge.tgz'
+  'strict-ts-lib-v5.0': 'file:../.tarballs/strict-ts-lib-v5.0.tgz'
+  'strict-ts-lib-v5.2': 'file:../.tarballs/strict-ts-lib-v5.2.tgz'
+  'strict-ts-lib-v5.1': 'file:../.tarballs/strict-ts-lib-v5.1.tgz'
+  'strict-ts-lib-v5.4': 'file:../.tarballs/strict-ts-lib-v5.4.tgz'
+  'strict-ts-lib-v5.5': 'file:../.tarballs/strict-ts-lib-v5.5.tgz'
+  'strict-ts-lib-v5.3': 'file:../.tarballs/strict-ts-lib-v5.3.tgz'
+  'strict-ts-lib-v5.6': 'file:../.tarballs/strict-ts-lib-v5.6.tgz'
+  'strict-ts-lib-v5.7': 'file:../.tarballs/strict-ts-lib-v5.7.tgz'
+  'strict-ts-lib-v5.8': 'file:../.tarballs/strict-ts-lib-v5.8.tgz'
+  'strict-ts-lib-v5.9': 'file:../.tarballs/strict-ts-lib-v5.9.tgz'
+  'strict-ts-lib-v6.0': 'file:../.tarballs/strict-ts-lib-v6.0.tgz'
+  'strict-ts-lib-v7.0': 'file:../.tarballs/strict-ts-lib-v7.0.tgz'
 
 allowBuilds:
   unrs-resolver: set this to true or false
