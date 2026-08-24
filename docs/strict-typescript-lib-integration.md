@@ -1035,3 +1035,54 @@ tsc が space の外まで歩いてリポジトリ自身の `@types/node` を拾
 ### 決めていないこと
 
 無し。`>=5.0 <7.0` の 11 名も publish 対象として残す。
+
+## lint と型チェックで同じ lib を見せる（2026-08-24 実測）
+
+#1657 で「ESLint は TS v6 で動いており `libReplacement` が有効でないのでエラーが消えた」と
+書いた件の解消。
+
+### 何が起きていたか
+
+2 つのパスは**別の TypeScript を実行している**。
+
+| パス       | 実体                                         | バージョン | lib 置き換えの経路 |
+| :--------- | :------------------------------------------- | :--------- | :----------------- |
+| 型チェック | `node_modules/typescript-native/bin/tsc`     | 7.0.2      | `paths`            |
+| lint       | typescript-eslint が `require('typescript')` | 6.0.3      | 名前解決           |
+
+`libs/octokit-safe-types` は lint も型チェックも**同じ `tsconfig.json`** を使う。そこには
+`libReplacement: true` と `paths` が書いてあるが、**TypeScript 6 は lib 置き換えで `paths` を
+読まない**。名前で `@typescript/lib-*` を引き、それが無いので黙って stock lib に落ちる。
+`--listFiles` で数えると **stock 88 件 / strict 0 件**だった。
+
+### 解決
+
+`strict-ts-lib-v6.0` を root の devDependency にし、#1662 で同梱したリンカを root の
+`prepare` で走らせて `node_modules/@typescript/lib-*` を作る。tsconfig は 1 行も変えない。
+
+- 同じ tsconfig・同じ TypeScript 6.0.3 で測り直すと **strict 88 件 / stock 0 件**。型チェック側
+  （TS 7 + `paths`）の 88/88 と一致する
+- `strict-ts-lib-v7.0` は使えない。`peerDependencies` が `>=7.0.0 <7.1.0` なので npm が
+  インストールを拒否するし、その宣言が参照する lib 名は TypeScript 6 に無い
+
+### 2 つの lib を併用してよい理由（実測）
+
+v6.0 と v7.0 は同じコンバータの出力で、**型としては同一**。`diff-from-prev` で数えると:
+
+- 変化したファイル 6 件・177 行
+- そのうち**コメントでない行は 4 行だけ**で、全部 `padStart` / `padEnd` の仮引数名
+  （`maxLength`→`targetLength`、`fillString`→`padString`）。仮引数名は型チェックに影響しない
+
+つまり lint と型チェックが見る型は一致する。native TS による型チェックの高速化を捨てて
+TypeScript を 6 に統一する必要はない。
+
+### 静かな失敗への対策
+
+`paths` と同じで、リンクが無くなっても**エラーにならず lint が緩くなるだけ**。
+`pnpm run check:root:strict-lib-links` が 18 本のリンクの解決を確認して落とす
+（`check:root` の一部なので `check-all` と CI が拾う）。リンクを 1 本消して落ちることは確認済み。
+
+### 影響範囲
+
+`libReplacement` は 6.x でも 7.x でも既定 off なので、名前が生えても**明示的に opt-in した
+パッケージ以外は何も変わらない**。現状 `libs/octokit-safe-types` のみ。
