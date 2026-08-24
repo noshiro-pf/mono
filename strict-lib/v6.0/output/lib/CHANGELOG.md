@@ -1,5 +1,11 @@
 # strict-ts-lib-v6.0
 
+## 0.5.1
+
+### Patch Changes
+
+- strict-ts-lib-scripts-common@0.0.1
+
 ## 0.2.0
 
 ### Minor Changes

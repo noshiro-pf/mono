@@ -1,5 +1,27 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.3.1
+
+### Patch Changes
+
+- 7e70001: `format` now reports skipped files as a count rather than a line each. A
+  repository can hand it thousands of files it will not touch — a subtree
+  formatted by another tool, or a first diff that contains a whole imported
+  directory — and naming every one is both unreadable and enough output to
+  overflow the stdout buffer of a parent process capturing the run.
+- ecd86c2: Give ESLint the same standard library the type check uses.
+
+    Linting and type checking run different TypeScript versions — typescript-eslint
+    imports the `typescript` module (6.x), while the type check runs
+    `typescript-native` (7.x) — and the two resolve a lib replacement by opposite
+    routes. TypeScript 7 reads `paths`; TypeScript 6 ignores it there and looks
+    `@typescript/lib-*` up by name. So the `paths` entry that opts a package into
+    the strict library did nothing for lint, which quietly kept TypeScript's own
+    declarations and enforced less than the type check did.
+
+    `strict-ts-lib-v6.0` is now a root devDependency, and its linker runs from the
+    root `prepare` script to supply those names.
+
 ## 10.3.0
 
 ### Minor Changes
