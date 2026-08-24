@@ -66,6 +66,11 @@ export default [
       // gen-entry-point.mts) and must re-export from './index.mjs' by
       // design, which conflicts with the no-restricted-imports rule.
       'src/entry-point.mts',
+      // configs/minimal-lib.d.mts is excluded from the package tsconfig (it
+      // belongs to the `lib: []` build program only), so the typed-linter
+      // cannot parse it. It mirrors lib.es5/es2015 declarations verbatim —
+      // `any` included — so the lint rules must not rewrite it anyway.
+      'configs/minimal-lib.d.mts',
     ],
   },
   ...eslintConfigForTypeScript({
