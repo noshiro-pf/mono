@@ -16,7 +16,8 @@
     "libs",
     "libs-branded",
     "!libs/**/package.json",
-    "link-libs.mjs"
+    "link-libs.mjs",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,

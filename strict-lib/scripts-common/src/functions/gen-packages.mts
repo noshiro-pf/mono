@@ -16,6 +16,17 @@ import { replaceWithNoMatchCheck } from './utils/node-utils.mjs';
  */
 const LINKER_FILE = 'link-libs.mjs';
 
+/**
+ * The published package needs one of its own. `changeset publish` releases
+ * this package — it is not private — and the changesets action reads the
+ * changelog of every package whose version moved, to build the release notes.
+ * The version moves here on every release, because `changeset:version-packages`
+ * regenerates these manifests after `changeset version` has bumped the
+ * harnesses. Without the file the release fails outright, before publishing
+ * anything: `ENOENT: ... strict-lib/v5.0/output/lib/CHANGELOG.md`.
+ */
+const CHANGELOG_FILE = 'CHANGELOG.md';
+
 /** The subset of `package.json` fields this generator reads. */
 const packageJsonType = t.record({
   name: t.optional(t.string()),
@@ -277,7 +288,13 @@ const genBundlePackage = async (
       // consumer — reaching them by name means a dependency on a directory
       // inside `node_modules`, which pnpm refuses. `link-libs.mjs` answers
       // that lookup instead, with a symlink per group.
-      files: ['libs', 'libs-branded', '!libs/**/package.json', LINKER_FILE],
+      files: [
+        'libs',
+        'libs-branded',
+        '!libs/**/package.json',
+        LINKER_FILE,
+        CHANGELOG_FILE,
+      ],
       // Named after the package so that two of these installed side by side
       // do not fight over one command.
       bin: { [`${libName}-link`]: `./${LINKER_FILE}` },
@@ -308,6 +325,11 @@ const genBundlePackage = async (
   // 644 — and the working tree flips between them, which is a dirty
   // repository as far as CI is concerned.
   await fs.chmod(linkerPath, 0o755);
+
+  await fs.writeFile(
+    path.resolve(bundleDir, CHANGELOG_FILE),
+    await bundleChangelog(paths.strictTsLib.$, libName),
+  );
 
   const repoUrl = versionConfig.repo.replace(/\.git$/u, '');
 
@@ -451,6 +473,39 @@ const setupSection = (
     '`--unlink` removes the links again.',
     '',
   ];
+};
+
+/**
+ * The bundle's changelog, taken from the harness that changesets actually
+ * manages. The two share a version — the `fixed` group keeps every harness on
+ * one, and this package's `version` is written from it — so their entries are
+ * the same. Only the heading differs: the harness is named `…-source`, and a
+ * consumer reading this on npm wants the name they installed.
+ *
+ * `changeset version` rewrites the harness changelog before
+ * `strict-lib:gen:packages` runs, so the entry for the new version is already
+ * there by the time this copies it.
+ */
+const bundleChangelog = async (
+  harnessDir: string,
+  libName: string,
+): Promise<string> => {
+  const harnessChangelog = await fs
+    .readFile(path.resolve(harnessDir, CHANGELOG_FILE), 'utf8')
+    .catch(() => undefined);
+
+  // Before the first release there is nothing to carry over, and the file
+  // still has to exist: the changesets action reads it either way.
+  if (harnessChangelog === undefined) return `# ${libName}\n`;
+
+  const [heading, ...rest] = harnessChangelog.split('\n');
+
+  // Swap the harness's `# …-source` heading for the published name, and keep
+  // everything below it. A harness that somehow has no heading keeps its whole
+  // text, under a heading of ours.
+  return heading?.startsWith('# ') === true
+    ? `# ${libName}\n${rest.join('\n')}`
+    : `# ${libName}\n\n${harnessChangelog}`;
 };
 
 const getPackageDirListFromLibFiles = async (
