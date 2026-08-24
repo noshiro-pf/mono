@@ -1,5 +1,30 @@
 # strict-ts-lib-v5.0-source
 
+## 0.5.1
+
+### Patch Changes
+
+- efdba4e: Generate a `CHANGELOG.md` for each published strict standard library bundle.
+
+    The bundles are not private, so `changeset publish` releases them, and the
+    changesets action reads the changelog of every package whose version moved to
+    build the release notes. Their versions move on every release — the generator
+    rewrites those manifests after `changeset version` has bumped the harnesses —
+    but nothing ever wrote them a changelog, so the release failed before
+    publishing anything.
+
+- 7e70001: Ship a linker with every strict standard library bundle, so the packages for
+  TypeScript 6 and earlier can be used at all.
+
+    Those versions resolve `@typescript/lib-*` as ordinary package names, through
+    a fixed Node10 lookup that ignores `paths` — and a single package shipping
+    every lib as a subdirectory has no name for them to find. `npx <package>-link`
+    supplies the names, as one symlink per lib group under
+    `node_modules/@typescript/`. TypeScript 7 is unchanged: it reads `paths` and
+    no longer does the name lookup.
+
+- strict-ts-lib-scripts-common@0.0.1
+
 ## 0.4.0
 
 ### Minor Changes

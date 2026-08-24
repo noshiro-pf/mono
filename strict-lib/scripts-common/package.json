@@ -1,6 +1,6 @@
 {
   "name": "strict-ts-lib-scripts-common",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Shared scripts for generating strict-ts-lib-vX.Y-* packages",
   "type": "module",
