@@ -295,10 +295,19 @@ const genBundlePackage = async (
     }),
   );
 
+  const linkerPath = path.resolve(bundleDir, LINKER_FILE);
+
   await fs.copyFile(
     path.resolve(import.meta.dirname, '../../assets', LINKER_FILE),
-    path.resolve(bundleDir, LINKER_FILE),
+    linkerPath,
   );
+
+  // Explicitly, rather than inheriting the asset's mode: this is a `bin`, and
+  // a package manager installing the package sets the bit itself. Without this
+  // the two disagree — `pnpm install` writes 755, regeneration writes back
+  // 644 — and the working tree flips between them, which is a dirty
+  // repository as far as CI is concerned.
+  await fs.chmod(linkerPath, 0o755);
 
   const repoUrl = versionConfig.repo.replace(/\.git$/u, '');
 
