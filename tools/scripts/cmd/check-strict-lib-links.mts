@@ -5,29 +5,19 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when the `@typescript/lib-*` links that give **ESLint** the strict
- * standard library are missing or point somewhere else.
+ * Fails when the `@typescript/lib-*` links that supply the strict standard
+ * library are missing or point somewhere else.
  *
- * Type checking and linting reach the same library by opposite routes, because
- * they run different TypeScript versions:
+ * Both routes into the compiler go through these names. Type checking runs
+ * `typescript-native` (7.x) and linting runs the `typescript` module (6.x),
+ * because that is what typescript-eslint imports — and both resolve a lib
+ * replacement as an ordinary package-name lookup once `libReplacement` is on.
+ * `strict-ts-lib-v7.0`'s linker, run by the root `prepare` script, writes one
+ * symlink per lib group so that lookup finds the strict declarations.
  *
- * - **Type checking** runs `typescript-native` (7.x), which resolves a lib
- *   replacement through `paths` — that is what
- *   `check:root:tsconfig-lib-paths` guards.
- * - **Linting** runs the `typescript` module (6.x), because that is what
- *   typescript-eslint imports. TypeScript 6 ignores `paths` here and resolves
- *   `@typescript/lib-*` as ordinary package names, so `paths` does nothing for
- *   it. The names come from `strict-ts-lib-v6.0`'s own linker, run by the
- *   root `prepare` script.
- *
- * Without the links, lint quietly falls back to TypeScript's own declarations
- * and stops enforcing what the type check enforces — no error, just a weaker
- * lint. That is the failure this check exists to make loud.
- *
- * The two libraries are the same rewrite generated from adjacent TypeScript
- * minors. Their generated declarations differ in four lines, all parameter
- * names on `padStart` / `padEnd`, which do not affect checking; see
- * `strict-lib/v7.0/diff-from-prev/`.
+ * Without the links both quietly fall back to TypeScript's own declarations
+ * and stop enforcing anything — no error, just a weaker check. That is the
+ * failure this exists to make loud.
  */
 export const checkStrictLibLinks = async (): Promise<
   Result<number, string>
@@ -82,11 +72,11 @@ export const checkStrictLibLinks = async (): Promise<
 };
 
 /**
- * The bundle linting resolves by name. Not `strict-ts-lib-v7.0`: that one
- * declares `typescript >=7.0.0 <7.1.0`, and its declarations reference lib
- * names TypeScript 6 does not have.
+ * One bundle serves both compilers. TypeScript 6.0.3 compiles this lib set
+ * with `skipLibCheck: false` and no errors, which is why the package declares
+ * `typescript >=6.0.0 <8.0.0` and why there is no second bundle here.
  */
-const BUNDLE_NAME = 'strict-ts-lib-v6.0';
+const BUNDLE_NAME = 'strict-ts-lib-v7.0';
 
 const SCOPE = '@typescript';
 
