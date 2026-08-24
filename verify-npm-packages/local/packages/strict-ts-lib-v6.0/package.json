@@ -1,0 +1,10 @@
+{
+  "name": "verify-strict-ts-lib-v6.0",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "strict-ts-lib-v6.0": "file:../../../.tarballs/strict-ts-lib-v6.0.tgz",
+    "typescript": ">=6.0.0 <6.1.0"
+  }
+}

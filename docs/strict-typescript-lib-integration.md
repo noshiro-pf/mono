@@ -977,18 +977,61 @@ lib グループごとに要る。bundle の中の `libs/es2022/package.json` �
 その `node_modules` 配下はまだ存在しない）。残るのは「minor ごとに 16 名ずつ
 publish する」形で、それは決定 5 で畳んだレイアウトそのものに戻ることになる。
 
-### この PR での扱い
+### 解決: リンカを同梱する（2026-08-23）
 
-- **publish 範囲は変えていない。** 初回 publish は手作業（`libs/first-release.md`）
-  なので、この事実を踏まえて後から決められる
-- `verify:npm-packages` は v7.0 のみ space で検査し、11 名は「`strict-lib:type-check`
-  が見ている」と表示してスキップする。あちらは自分の pinned TypeScript で
-  `skipLibCheck: false`・ライブラリ全体を通すので、probe 1 件より強い
-- README（bundle 側・`strict-lib/` 側の両方）に **「`paths` は TypeScript 7 のみ」**
-  と明記した。以前は「TypeScript 6.0 and later」と書いてあり、これは誤り
+**npm パッケージも git tag も 1 件も増やさずに解決できた。** 各 bundle に依存ゼロの
+`link-libs.mjs` を `bin` として同梱し、消費側の `node_modules/@typescript/lib-<group>`
+を lib グループごとのシンボリックリンクにする。名前解決が要求するのはディレクトリで
+あって依存グラフ上のパッケージではないので、これで足りる。group ごとの
+`package.json` すら要らない（Node10 解決が `index.d.ts` にフォールバックする）。
+
+```sh
+npx strict-ts-lib-v6.0-link             # plain number
+npx strict-ts-lib-v6.0-link --branded   # branded
+npx strict-ts-lib-v6.0-link --unlink    # 取り消し
+```
+
+消費側は自分の `package.json` の `prepare` に 1 行足すだけ。自分のスクリプトなので
+pnpm の postinstall 許可リストは関係ない。
+
+比較した他案と、その却下理由:
+
+| 案                              | 追加 npm | 追加 tag | 却下理由                                                    |
+| :------------------------------ | -------: | -------: | :---------------------------------------------------------- |
+| group 別パッケージを全 minor 分 |     ~176 |     ~176 | trusted publishing はパッケージごとの設定。176 件は非現実的 |
+| 代表 1 minor だけ group 別      |       16 |       16 | どの minor を代表にするかが恣意的                           |
+| npm 限定で `file:` 依存を案内   |        0 |        0 | pnpm で `ERR_PNPM_LINKED_PKG_DIR_NOT_FOUND`                 |
+| v7 のみサポート                 |        0 |        0 | 11 名を捨てることになる                                     |
+
+### `libReplacement` の要否は版で違う（実測）
+
+パッケージを自分の TypeScript と組み合わせて全件測った。
+
+| TypeScript | 経路     | `libReplacement`                     |
+| :--------- | :------- | :----------------------------------- |
+| 5.0 – 5.7  | 名前解決 | 未知のオプション。書くとエラーになる |
+| 5.8 – 5.9  | 名前解決 | 既定 on                              |
+| 6.x        | 名前解決 | 既定 **off**。`true` が要る          |
+| 7.x        | `paths`  | 既定 **off**。`true` が要る          |
+
+`libReplacement` が入ったのは 5.8（5.7.3 では `TS5023: Unknown compiler option`）。
+既定が off になったのは 6.0 で、7.0 からではない。
+
+**もう 1 つの罠: TypeScript 5.0 は `@typescript/lib-*` をカレントディレクトリ基準で
+解決する**（設定ファイルの位置ではなく）。別ディレクトリから
+`tsc -p path/to/tsconfig.json` を叩くと、黙って stock lib になる。`verify:npm-packages`
+が各プロジェクトを cwd にして走るのはこのため。
+
+### 検査
+
+`verify:npm-packages` が 12 名すべてを space で検査するようになった。各パッケージの
+README が指示する手順そのまま — v7.0 は `paths`、それ以外は同梱リンカを実行してから
+probe をコンパイルする。**リンカ自体が検査対象に入る。**
+
+`skipLibCheck: false` と古い TypeScript の組み合わせでは `types: []` が要る。無いと
+tsc が space の外まで歩いてリポジトリ自身の `@types/node` を拾い、
+`TS2451: Cannot redeclare block-scoped variable` で検査が埋まる。
 
 ### 決めていないこと
 
-`>=5.0 <7.0` の 11 名を publish するのか、`private: true` にして生成物
-（harness・diff・lib-check）としてだけ持つのか。決定 3（全系統のバージョン統一）は
-publish を前提にしていたので、ここは改めて判断が要る。
+無し。`>=5.0 <7.0` の 11 名も publish 対象として残す。
