@@ -368,6 +368,13 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   through npm trusted publishing, which has to be configured per package and
   cannot be configured before the package exists on npm. See
   [libs/first-release.md](./libs/first-release.md).
+- **`changeset:version-packages` formats `strict-lib/` before regenerating the
+  bundles.** `changeset version` writes each bumped package a `CHANGELOG.md`
+  entry indented its own way, and `strict-lib` is in `.prettierignore` — oxfmt
+  owns it — so the harness changelogs land unformatted and `style-check
+(strict-lib:fmt)` fails on the `chore: version packages` branch. The format
+  pass runs before `strict-lib:gen:packages` so that each bundle's changelog is
+  derived from the formatted text.
 - Tags for releases published from this repository are `<package-name>@<version>`.
   Tags prefixed with a repository name (`eslint-config-typed/v5.8.4`,
   `ts-data-forge/ts-data-forge@14.1.0`, …) are imported history from the
