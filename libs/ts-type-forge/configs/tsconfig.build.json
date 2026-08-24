@@ -1,11 +1,14 @@
 {
   "extends": "../../../tools/configs/tsconfig/tsconfig.build.json",
   "compilerOptions": {
-    // ts-type-forge asserts exact type equality against Node globals; the DOM
-    // lib resolves them to the DOM shapes instead. Needed here as well as in
-    // ../tsconfig.json: tsconfig.build.json extends the shared type-check
-    // config, so the build path never sees that override.
-    "lib": ["ESNext"],
+    // The published declarations must not depend on any standard library:
+    // `strict-ts-lib-v*` imports ts-type-forge, so this package is the root
+    // of that type dependency graph and must not depend on a lib back (and
+    // certainly not on the DOM shapes the shared config would pull in). With
+    // no lib files loaded, ./minimal-lib.d.mts (in `include` below) supplies
+    // the global types the compiler requires and the lib utility types the
+    // source references — see the header comment there.
+    "lib": [],
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
@@ -13,6 +16,6 @@
     "declarationDir": "../dist",
     "rootDir": "../src"
   },
-  "include": ["../src"],
+  "include": ["../src", "./minimal-lib.d.mts"],
   "exclude": ["../src/**/*.test.mts"]
 }

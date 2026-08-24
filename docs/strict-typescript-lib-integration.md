@@ -712,7 +712,15 @@ node_modules/.pnpm/strict-ts-lib-v7.0@0.2.0_typescript@6.0.3/node_modules/ts-typ
 3. 検証用に push した `feat/strict-ts-lib-type-forge` は破棄する。サンプルの
    `day: DateEnum` 修正だけは lib と無関係な改善なので、拾うなら別 PR に切り出す
 
-### 決定 2: 配置は `strict-lib/`
+**追記（2026-08-24）: opt-out を一段進め、ビルドを標準 lib ごと外した。**
+`configs/tsconfig.build.json` を `"lib": []` にし、コンパイラが必須とする
+グローバル型（`Array`・`Function` など）と src が名前で参照する lib 型
+（`Readonly`・`Record`・`ReadonlyMap` など）だけを
+`configs/minimal-lib.d.mts`（stock lib の逐語コピー、publish されない）で
+供給する。これで `ts-type-forge` の公開型はどの標準 lib のスナップショットにも
+依存せず、strict lib → `ts-type-forge` の依存グラフの root になる。
+dist はバイト単位で変化なし。dev 側の `tsconfig.json`（型テスト・samples・
+scripts）は `URL` 等の実 lib 型へのアサーションを含むので `ESNext` のまま。
 
 `libs/*` は「1 ディレクトリ = 1 npm パッケージ」で、9 リポジトリ統合のときに確定した
 規約である。生成物と生成スクリプトが同居する strict lib はこれに入らないので、

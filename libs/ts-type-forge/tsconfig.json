@@ -1,9 +1,15 @@
 {
   "extends": ["../../tools/configs/tsconfig/tsconfig.type-check.json"],
   "compilerOptions": {
-    // ts-type-forge asserts exact type equality against Node types (e.g.
-    // DeepReadonly<URL>); pulling in the DOM lib resolves those globals to the
-    // DOM shapes instead and breaks the assertions.
+    // This is the dev-side program only (type tests, samples, scripts); what
+    // the package publishes is checked by configs/tsconfig.build.json, which
+    // sets `lib: []` so the published declarations depend on no standard
+    // library at all — see the comment there and configs/minimal-lib.d.mts.
+    //
+    // Here a real lib is needed: the type tests assert against Node globals
+    // (e.g. DeepReadonly<URL>) and the scripts run under Node. It is ESNext
+    // without DOM because pulling in the DOM lib resolves those globals to
+    // the DOM shapes instead and breaks the assertions.
     "lib": ["ESNext"],
 
     // Deliberately opted OUT of the strict standard library, and stated here
@@ -30,5 +36,8 @@
     }
   },
   "include": ["./src", "./samples", "./scripts", "./configs"],
-  "exclude": ["src/global.mts"]
+  // configs/minimal-lib.d.mts belongs to the `lib: []` build program only:
+  // its type aliases (Readonly, Record, ...) would be duplicate identifiers
+  // against the real lib this program loads.
+  "exclude": ["src/global.mts", "configs/minimal-lib.d.mts"]
 }
