@@ -233,6 +233,9 @@ importers:
       rollup-plugin-esbuild:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.2)(rollup@4.62.4)(supports-color@7.2.0)
+      strict-ts-lib-v6.0:
+        specifier: workspace:*
+        version: link:strict-lib/v6.0/output/lib
       strict-ts-lib-v7.0:
         specifier: workspace:*
         version: link:strict-lib/v7.0/output/lib
