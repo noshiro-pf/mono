@@ -1,0 +1,10 @@
+{
+  "name": "verify-strict-ts-lib-v5.8",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "strict-ts-lib-v5.8": "0.5.1",
+    "typescript": ">=5.8.0 <5.9.0"
+  }
+}

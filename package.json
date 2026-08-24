@@ -140,7 +140,7 @@
     "vitest": "catalog:",
     "zenn-cli": "^0.5.2"
   },
-  "packageManager": "pnpm@11.22.0",
+  "packageManager": "pnpm@11.23.0",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"

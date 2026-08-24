@@ -22,7 +22,7 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "ts-type-forge": "^9.0.0"
+    "ts-type-forge": "^9.2.1"
   },
   "peerDependencies": {
     "typescript": ">=5.5.0 <5.6.0"
