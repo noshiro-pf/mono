@@ -1387,13 +1387,20 @@ opt-in のたびに、次の 2 つを確認する。
 `libReplacement: true` が入ったとき**である。逆に言えば、宣言を strict lib で
 emit したくなった日には、この構造ごと考え直すことになる。
 
-## `ts-fortress` の opt-in（2026-08-22 実測）
+## `ts-fortress` の opt-in（2026-08-22 計測、2026-08-24 再測）
 
-**型エラー 1 件、lint 0 件。** 2026-08-14 の見積り（型 4 件・lint 21 件）から
-大きく減った。型のほうは strict-typescript-lib#117 が lib 側を直したぶん、lint の
-ほうは ESLint が strict lib を見なくなったぶん（前節）である。
+**型エラー 1 件、lint 21 件。** 2026-08-14 の見積り（型 4 件・lint 21 件）に対し、
+型は減り、**lint は見積りどおりに戻った**。
 
-残った 1 件は `record.mts` の
+型が減ったのは strict-typescript-lib#117 が lib 側を直したぶん。lint は
+2026-08-22 の計測時点では 0 件で、「ESLint が strict lib を見なくなったから
+もう起きない」と書いていたが、**それは誤りだった**。「lint と型チェックで同じ
+lib を見せる」（前章）でリンカを入れたいま、ESLint も strict lib を読むので
+`@typescript-eslint/no-deprecated` は当初の見積りどおり 21 件を挙げる。
+
+### 型エラー 1 件
+
+`record.mts` の
 
 ```ts
 const sourceKeys = new Set(Object.keys(shape));
@@ -1412,3 +1419,36 @@ const sourceKeys: ReadonlySet<string> = new Set(Object.keys(shape));
 
 `Object.keys` の戻りが狭いこと自体は strict lib の狙いどおりで、キャストで
 潰すべきものではない。素の lib でもこの注釈は通る。
+
+### lint 21 件
+
+全部 `String` の `@deprecated` である。内訳と直し方:
+
+| 箇所                                      | 件数 | 直し方                                     |
+| :---------------------------------------- | ---: | :----------------------------------------- |
+| `src/primitives/number.mts`               |   10 | `String(x)` → `x.toString()`               |
+| `src/primitives/bigint.mts`               |   10 | 同上                                       |
+| `scripts/cmd/embed-examples-in-jsdoc.mts` |    1 | `String(error)` → `unknownToString(error)` |
+
+前者 20 件は制約違反を報告するときの `value` を作っている箇所で、引数はすべて
+`number` / `bigint` に絞り込み済みなので `toString()` でよい。`literal.mts` や
+`validation-error.mts` は既にそう書いていたので、慣例に揃えたことにもなる。
+出力される文字列は `String(x)` と同一なので、**公開 API にも実行時挙動にも
+変化は無い**（`-0` も `NaN` も同じ）。
+
+最後の 1 件は引数が `unknown` なので `ts-data-forge` の `unknownToString`。
+`ts-repo-utils`（#1618）と同じ形である。
+
+### TypeDoc の回避策は要らなくなった
+
+#1618 と同様、`configs/typedoc.config.mjs` を `configs/tsconfig.build.json` に
+向ける変更は取り消した。TypeDoc も `typescript` 6.0.3 で走るので、リンカが
+名前を生やしたいま `test/strict-lib-active.mts` の probe が通る。パッケージの
+`tsconfig.json` を見せたままにしておけば、`test/` の型エラーも引き続き `doc` が
+拾う。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも通り、テスト 1666 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる。つまり
+  `src` はどちらの lib でも同じに読める
