@@ -28,7 +28,7 @@
   "scripts": {
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
     "changeset:publish": "pnpm run ws:build && pnpm changeset publish",
-    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile",
+    "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile",
     "check:root": "pnpm run '/check:root:.*/'",
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
