@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2021.promise.d.ts b/packages/v6.0/output/lib-files/lib.es2021.promise.d.ts
+index 36e10c58..fb003093 100644
+--- a/packages/v5.9/output/lib-files/lib.es2021.promise.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2021.promise.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface AggregateError extends Error {
+   readonly errors: readonly unknown[];
+ }

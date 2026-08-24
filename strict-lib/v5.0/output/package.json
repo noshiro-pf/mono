@@ -1,0 +1,14 @@
+{
+  "name": "strict-ts-lib-v5.0-output",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Type-check harness for generated strict-ts-lib-v5.0-* (non-branded)",
+  "type": "module",
+  "scripts": {
+    "type-check": "tsc -p ./tsconfig.json"
+  },
+  "dependencies": {
+    "ts-type-forge": "workspace:*",
+    "typescript": "5.0.4"
+  }
+}

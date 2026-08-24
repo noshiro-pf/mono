@@ -30,6 +30,8 @@ instruction file.
 - `docs/` — prose notes about the repository itself, plus a few verbatim
   reference texts. Not built, not type-checked, and outside ESLint's and
   markdownlint's globs — but Prettier formats it and cspell reads it.
+- `strict-lib/` — the strict standard library: its generator and its generated
+  output. **See "strict-lib/" below.**
 - `experimental/` — legacy code. **See "experimental/" below.**
 
 **There is one `.gitignore`, at the repository root** (`experimental/` keeps its
@@ -83,6 +85,47 @@ Consequently:
   vocabulary around it; suppress that per file rather than by re-excluding the
   directory — see "Spell checking".
 - `zenn-cli` is a root devDependency for local preview (`pnpm exec zenn preview`).
+
+### `strict-lib/`
+
+The strict rewrite of TypeScript's built-in library declarations, one package
+per TypeScript minor. It has a top level of its own rather than living in
+`libs/*`, because the generator and the ~7,800 generated files it produces sit
+together and do not fit "one directory, one npm package".
+
+```text
+strict-lib/
+  scripts-common/   the converter, shared by every version
+  scripts/          repository-level commands (generation, publishing)
+  configs/          tsconfig bases for the self-checks
+  v7.0/ v6.0/ …     one directory per TypeScript minor
+    output/lib/     the published package: package.json, README.md,
+                    libs/ (plain number) and libs-branded/ (branded)
+    output/lib-files/, output/diff/, temp/copied/, diff-from-prev/
+```
+
+- **`strict-lib/v*/output/lib` is the published package, laid out as it ships.**
+  Nothing is rearranged at pack time, because `paths` resolves
+  `node_modules/strict-ts-lib-v7.0/libs/*` through a workspace symlink to that
+  directory. A layout assembled while packing would exist only in the tarball.
+- **oxfmt formats this subtree; Prettier ignores it** (`.prettierignore` lists
+  `strict-lib`). With thousands of generated declarations, not walking them is
+  most of what keeps the repository-wide format pass quick. Run
+  `pnpm run strict-lib:fmt`.
+- **`temp/copied/`, `output*/lib-files/`, `output/diff/` and `diff-from-prev/`
+  are tooling, not debt.** The version-to-version diffs are how anyone decides
+  whether the converter has to follow an upstream TypeScript change, and
+  `temp/copied` is the _input_ to the `official` one. Do not untrack them.
+- **The per-group `package.json` under `libs/` are not published** and are not
+  spare either: each harness devDepends on `file:output/lib/libs/<group>` so
+  that its `lib-check` can resolve `@typescript/lib-<group>` **by name**. That
+  is the only way TypeScript 6 and earlier find a replacement — their lib
+  resolution is a fixed Node10 lookup that ignores `paths`.
+- Every TypeScript minor **shares one version number**, kept together by the
+  `fixed` group in `.changeset/config.json`.
+
+Generation runs through `strict-lib:gen*` at the root; see
+`docs/strict-typescript-lib-integration.md`.
 
 ### `experimental/`
 

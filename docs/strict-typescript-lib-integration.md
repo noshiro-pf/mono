@@ -927,8 +927,8 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 | 0     | 作業中の opt-in を完了（#1618 `ts-repo-utils` / #1657 `ts-fortress`）                                                                 | **完了**（両方 check-all 通過・CI 緑、マージ待ち）  |
 | 1     | `ts-type-forge` の opt-out を明示（決定 1）                                                                                           | **完了**（`feat/ts-type-forge-no-lib-replacement`） |
 | 2     | 上流の掃除（死んだ `package.json`）                                                                                                   | **完了**（strict-typescript-lib#130）               |
-| 3     | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | 次にやる                                            |
-| 4     | リリースを changesets へ。上流ワークフローと publish スクリプトを削除                                                                 |                                                     |
+| 3     | `strict-lib/` へ移植。`libs/` + `libs-branded/` の 12 パッケージに再構成、`.prettierignore`・oxfmt・workspace グロブ・`paths`・README | **完了**（`feat/strict-lib-into-mono`）             |
+| 4     | リリースを changesets へ。上流ワークフローと publish スクリプトを削除                                                                 | **完了**（同上）                                    |
 | 5     | `0.5.0` を publish し、`-branded` の 12 名を deprecate。旧リポジトリを archive                                                        |                                                     |
 | 6     | 残りの opt-in を再開（`ts-data-forge` ほか）                                                                                          |                                                     |
 
@@ -943,3 +943,95 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 - **ビルド順。** strict lib のパッケージが `ts-type-forge` を `workspace:^` で
   参照するので、`ws:build` のステージがそこに依存する。`dependencies` に入れる
 - **`check:root:lockfile` が 0 件のままか。** URL 依存が戻っていないこと
+
+## 移植後に分かったこと: v7.0 以外の bundle は消費できない（2026-08-23 実測）
+
+`verify:npm-packages` に strict lib の smoke check を足したところ、**12 名のうち
+`strict-ts-lib-v7.0` だけが通り、残る 11 名は通らなかった**。理由は tarball の
+不備ではなく、TypeScript 側の解決方式が 7.0 を境に変わっていることにある。
+
+### 実測（probe は `Number.isFinite('1')` に `@ts-expect-error`）
+
+| 消費側 TypeScript | `paths` 経由 | 名前解決経由（`@typescript/lib-*`） |
+| :---------------- | :----------- | :---------------------------------- |
+| 5.6.3             | **効かない** | 効く                                |
+| 7.0.2             | 効く         | **効かない**                        |
+
+- 5.6.3 + `paths` → `TS2578: Unused '@ts-expect-error' directive`（置き換えが
+  起きていない）
+- 7.0.2 + 名前解決 → 同じく `TS2578`
+- 5.6.3 + 名前解決（`@typescript/lib-<group>` を 16 件 `file:` で入れる）→ probe が
+  正しくエラーになる。**published と同じ形の tarball**（`libs/**/package.json` を
+  含めたもの）で確認済み
+
+つまり両者は排他で、どちらか一方しか使えない。bundle 1 パッケージという形は
+`paths` 前提なので、**`>=5.0 <7.0` 向けの 11 名は npm から入れても置き換えが
+起きない**。
+
+### なぜ名前解決に寄せられないか
+
+名前で引かせるには `@typescript/lib-es2022` のような**名前を持つパッケージ**が
+lib グループごとに要る。bundle の中の `libs/es2022/package.json` を publish して
+`file:./node_modules/<pkg>/libs/es2022` を指す手は、npm では通るが **pnpm では
+通らない**（`ERR_PNPM_LINKED_PKG_DIR_NOT_FOUND` — 依存グラフを解決する時点で
+その `node_modules` 配下はまだ存在しない）。残るのは「minor ごとに 16 名ずつ
+publish する」形で、それは決定 5 で畳んだレイアウトそのものに戻ることになる。
+
+### 解決: リンカを同梱する（2026-08-23）
+
+**npm パッケージも git tag も 1 件も増やさずに解決できた。** 各 bundle に依存ゼロの
+`link-libs.mjs` を `bin` として同梱し、消費側の `node_modules/@typescript/lib-<group>`
+を lib グループごとのシンボリックリンクにする。名前解決が要求するのはディレクトリで
+あって依存グラフ上のパッケージではないので、これで足りる。group ごとの
+`package.json` すら要らない（Node10 解決が `index.d.ts` にフォールバックする）。
+
+```sh
+npx strict-ts-lib-v6.0-link             # plain number
+npx strict-ts-lib-v6.0-link --branded   # branded
+npx strict-ts-lib-v6.0-link --unlink    # 取り消し
+```
+
+消費側は自分の `package.json` の `prepare` に 1 行足すだけ。自分のスクリプトなので
+pnpm の postinstall 許可リストは関係ない。
+
+比較した他案と、その却下理由:
+
+| 案                              | 追加 npm | 追加 tag | 却下理由                                                    |
+| :------------------------------ | -------: | -------: | :---------------------------------------------------------- |
+| group 別パッケージを全 minor 分 |     ~176 |     ~176 | trusted publishing はパッケージごとの設定。176 件は非現実的 |
+| 代表 1 minor だけ group 別      |       16 |       16 | どの minor を代表にするかが恣意的                           |
+| npm 限定で `file:` 依存を案内   |        0 |        0 | pnpm で `ERR_PNPM_LINKED_PKG_DIR_NOT_FOUND`                 |
+| v7 のみサポート                 |        0 |        0 | 11 名を捨てることになる                                     |
+
+### `libReplacement` の要否は版で違う（実測）
+
+パッケージを自分の TypeScript と組み合わせて全件測った。
+
+| TypeScript | 経路     | `libReplacement`                     |
+| :--------- | :------- | :----------------------------------- |
+| 5.0 – 5.7  | 名前解決 | 未知のオプション。書くとエラーになる |
+| 5.8 – 5.9  | 名前解決 | 既定 on                              |
+| 6.x        | 名前解決 | 既定 **off**。`true` が要る          |
+| 7.x        | `paths`  | 既定 **off**。`true` が要る          |
+
+`libReplacement` が入ったのは 5.8（5.7.3 では `TS5023: Unknown compiler option`）。
+既定が off になったのは 6.0 で、7.0 からではない。
+
+**もう 1 つの罠: TypeScript 5.0 は `@typescript/lib-*` をカレントディレクトリ基準で
+解決する**（設定ファイルの位置ではなく）。別ディレクトリから
+`tsc -p path/to/tsconfig.json` を叩くと、黙って stock lib になる。`verify:npm-packages`
+が各プロジェクトを cwd にして走るのはこのため。
+
+### 検査
+
+`verify:npm-packages` が 12 名すべてを space で検査するようになった。各パッケージの
+README が指示する手順そのまま — v7.0 は `paths`、それ以外は同梱リンカを実行してから
+probe をコンパイルする。**リンカ自体が検査対象に入る。**
+
+`skipLibCheck: false` と古い TypeScript の組み合わせでは `types: []` が要る。無いと
+tsc が space の外まで歩いてリポジトリ自身の `@types/node` を拾い、
+`TS2451: Cannot redeclare block-scoped variable` で検査が埋まる。
+
+### 決めていないこと
+
+無し。`>=5.0 <7.0` の 11 名も publish 対象として残す。

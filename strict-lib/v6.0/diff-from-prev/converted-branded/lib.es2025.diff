@@ -1,0 +1,13 @@
+diff --git a/packages/v6.0/output-branded/lib-files/lib.es2025.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2025.d.ts
+new file mode 100644
+index 00000000..b8778a1a
+--- /dev/null
++++ b/packages/v6.0/output-branded/lib-files/lib.es2025.d.ts
+@@ -0,0 +1,7 @@
++/// <reference path="./lib.es2024.d.ts" />
++/// <reference path="./lib.es2025.collection.d.ts" />
++/// <reference path="./lib.es2025.float16.d.ts" />
++/// <reference path="./lib.es2025.intl.d.ts" />
++/// <reference path="./lib.es2025.iterator.d.ts" />
++/// <reference path="./lib.es2025.promise.d.ts" />
++/// <reference path="./lib.es2025.regexp.d.ts" />

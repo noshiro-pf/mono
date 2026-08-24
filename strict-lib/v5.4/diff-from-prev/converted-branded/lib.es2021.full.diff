@@ -1,0 +1,9 @@
+diff --git a/packages/v5.3/output-branded/lib-files/lib.es2021.full.d.ts b/packages/v5.4/output-branded/lib-files/lib.es2021.full.d.ts
+index 07665c1..1dbc5d1 100644
+--- a/packages/v5.3/output-branded/lib-files/lib.es2021.full.d.ts
++++ b/packages/v5.4/output-branded/lib-files/lib.es2021.full.d.ts
+@@ -6,3 +6,4 @@
+ /// <reference path="./lib.webworker.importscripts.d.ts" />
+ /// <reference path="./lib.scripthost.d.ts" />
+ /// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />

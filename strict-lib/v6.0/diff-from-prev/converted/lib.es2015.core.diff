@@ -1,0 +1,19 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2015.core.d.ts b/packages/v6.0/output/lib-files/lib.es2015.core.d.ts
+index 5100c37c..cd0ff3b6 100644
+--- a/packages/v5.9/output/lib-files/lib.es2015.core.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2015.core.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface Array<T> {
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -191,7 +189,7 @@ interface Math {
+   hypot(...values: readonly number[]): number;
+ 
+   /**
+-   * Returns the integral part of the a numeric expression, x, removing any fractional digits.
++   * Returns the integral part of the numeric expression x, removing any fractional digits.
+    * If x is already an integer, the result is x.
+    * @param x A numeric expression.
+    */

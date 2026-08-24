@@ -1,0 +1,71 @@
+diff --git a/packages/v5.1/output/lib-files/lib.decorators.d.ts b/packages/v5.2/output/lib-files/lib.decorators.d.ts
+index e643954..79aa328 100644
+--- a/packages/v5.1/output/lib-files/lib.decorators.d.ts
++++ b/packages/v5.2/output/lib-files/lib.decorators.d.ts
+@@ -16,6 +16,14 @@ type ClassMemberDecoratorContext =
+  */
+ type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
+ 
++type DecoratorMetadataObject = Record<PropertyKey, unknown> & object;
++
++type DecoratorMetadata = typeof globalThis extends {
++  readonly Symbol: { readonly metadata: symbol };
++}
++  ? DecoratorMetadataObject
++  : DecoratorMetadataObject | undefined;
++
+ /**
+  * Context provided to a class decorator.
+  * @template Class The type of the decorated class associated with this context.
+@@ -48,6 +56,8 @@ interface ClassDecoratorContext<
+    * ```
+    */
+   addInitializer(initializer: (this: Class) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }
+ 
+ /**
+@@ -115,6 +125,8 @@ interface ClassMethodDecoratorContext<
+    * ```
+    */
+   addInitializer(initializer: (this: This) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }
+ 
+ /**
+@@ -157,6 +169,8 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
+    * decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }
+ 
+ /**
+@@ -199,6 +213,8 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
+    * decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }
+ 
+ /**
+@@ -250,6 +266,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
+    * decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }
+ 
+ /**
+@@ -342,4 +360,6 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
+    * decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
++
++  readonly metadata: DecoratorMetadata;
+ }

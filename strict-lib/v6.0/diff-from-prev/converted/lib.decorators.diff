@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.decorators.d.ts b/packages/v6.0/output/lib-files/lib.decorators.d.ts
+index 823f8ce7..e129d1df 100644
+--- a/packages/v5.9/output/lib-files/lib.decorators.d.ts
++++ b/packages/v6.0/output/lib-files/lib.decorators.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /**
+  * The decorator context types provided to class element decorators.
+  */

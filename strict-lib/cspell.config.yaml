@@ -1,0 +1,19 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../.cspell.config.yaml'
+words:
+  # npm error codes quoted in the publish script and the release docs.
+  - eotp
+  - epublishconflict
+  - npmjs
+  # Reproduced verbatim from TypeScript's own lib files, typo and all.
+  - merchantablity
+  # Vocabulary of the converter and its notes.
+  - parenthesization
+  - retarget
+  - strictify
+  - unbumped
+  - untokenized

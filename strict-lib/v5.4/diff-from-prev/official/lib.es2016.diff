@@ -1,0 +1,9 @@
+diff --git a/packages/v5.3/temp/copied/lib.es2016.d.ts b/packages/v5.4/temp/copied/lib.es2016.d.ts
+index 6c1a9c5..6bb5e28 100644
+--- a/packages/v5.3/temp/copied/lib.es2016.d.ts
++++ b/packages/v5.4/temp/copied/lib.es2016.d.ts
+@@ -17,3 +17,4 @@ and limitations under the License.
+ 
+ /// <reference lib="es2015" />
+ /// <reference lib="es2016.array.include" />
++/// <reference lib="es2016.intl" />

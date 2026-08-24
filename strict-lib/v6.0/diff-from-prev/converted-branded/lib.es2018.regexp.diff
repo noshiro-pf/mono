@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2018.regexp.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2018.regexp.d.ts
+index 32d58bf5..bca64594 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2018.regexp.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2018.regexp.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface RegExpMatchArray {
+   readonly groups?: {
+     readonly [key: string]: string;

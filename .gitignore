@@ -213,3 +213,9 @@ verify-npm-packages/*/pnpm-workspace.yaml
 
 # GitHub Pages への集約時に生成する。
 _site/
+
+# strict-lib generated temp dirs. `temp/copied` is deliberately NOT here: it is
+# the input to the `official` diff, which is how anyone decides whether the
+# converter has to follow an upstream change.
+strict-lib/v*/temp/codemod-fixed
+strict-lib/v*/temp/copied-for-diff

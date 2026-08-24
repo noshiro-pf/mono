@@ -1,0 +1,22 @@
+diff --git a/packages/v5.5/output-branded/lib-files/lib.es2020.string.d.ts b/packages/v5.6/output-branded/lib-files/lib.es2020.string.d.ts
+index d9fc0fa..57da266 100644
+--- a/packages/v5.5/output-branded/lib-files/lib.es2020.string.d.ts
++++ b/packages/v5.6/output-branded/lib-files/lib.es2020.string.d.ts
+@@ -1,7 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ /// <reference types="ts-type-forge/global" />
+ 
+-/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
+ 
+ interface String {
+   /**
+@@ -9,7 +9,7 @@ interface String {
+    * containing the results of that search.
+    * @param regexp A variable name or string literal containing the regular expression pattern and flags.
+    */
+-  matchAll(regexp: RegExp): IterableIterator<RegExpExecArray>;
++  matchAll(regexp: RegExp): RegExpStringIterator<RegExpExecArray>;
+ 
+   /** Converts all alphabetic characters to lowercase, taking into account the host environment's current locale. */
+   toLocaleLowerCase(locales?: Intl.LocalesArgument): string;

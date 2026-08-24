@@ -1,0 +1,17 @@
+diff --git a/packages/v5.6/output/lib-files/lib.es2017.d.ts b/packages/v5.7/output/lib-files/lib.es2017.d.ts
+index dddae9a..db63701 100644
+--- a/packages/v5.6/output/lib-files/lib.es2017.d.ts
++++ b/packages/v5.7/output/lib-files/lib.es2017.d.ts
+@@ -2,9 +2,10 @@
+ /// <reference types="ts-type-forge/global" />
+ 
+ /// <reference path="./lib.es2016.d.ts" />
++/// <reference path="./lib.es2017.arraybuffer.d.ts" />
++/// <reference path="./lib.es2017.date.d.ts" />
++/// <reference path="./lib.es2017.intl.d.ts" />
+ /// <reference path="./lib.es2017.object.d.ts" />
+ /// <reference path="./lib.es2017.sharedmemory.d.ts" />
+ /// <reference path="./lib.es2017.string.d.ts" />
+-/// <reference path="./lib.es2017.intl.d.ts" />
+ /// <reference path="./lib.es2017.typedarrays.d.ts" />
+-/// <reference path="./lib.es2017.date.d.ts" />

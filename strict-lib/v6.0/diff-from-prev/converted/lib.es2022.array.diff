@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2022.array.d.ts b/packages/v6.0/output/lib-files/lib.es2022.array.d.ts
+index 6589528b..6c6d7a8a 100644
+--- a/packages/v5.9/output/lib-files/lib.es2022.array.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2022.array.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface Array<T> {
+   /**
+    * Returns the item located at the specified index.

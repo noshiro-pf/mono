@@ -37,11 +37,34 @@
   ],
 
   "ignoreDependencies": [
-    // The strict standard library: the meta package pulls in the 107
-    // `@typescript/lib-*` packages, `publicHoistPattern` puts them in the root
-    // `node_modules`, and TypeScript resolves them by itself when
-    // `libReplacement` is on — so nothing imports any of it by name.
+    // The strict standard library. Nothing imports it: TypeScript finds it
+    // through the `@typescript/lib-*` entry in `paths` when `libReplacement`
+    // is on.
     "strict-ts-lib-v7.0",
+    // The same, from the other side. Each `strict-lib/vX.Y` harness declares
+    // `file:output/lib/libs/<group>` under the name TypeScript asks for, so
+    // that its own `lib-check` resolves the generated library **by name** —
+    // the only way TypeScript 6 and earlier find a replacement, their lib
+    // resolution being a fixed Node10 lookup that ignores `paths`. tsc reads
+    // these; no source file imports them.
+    "@typescript/lib-decorators",
+    "@typescript/lib-dom",
+    "@typescript/lib-es2015",
+    "@typescript/lib-es2016",
+    "@typescript/lib-es2017",
+    "@typescript/lib-es2018",
+    "@typescript/lib-es2019",
+    "@typescript/lib-es2020",
+    "@typescript/lib-es2021",
+    "@typescript/lib-es2022",
+    "@typescript/lib-es2023",
+    "@typescript/lib-es2024",
+    "@typescript/lib-es2025",
+    "@typescript/lib-es5",
+    "@typescript/lib-es6",
+    "@typescript/lib-esnext",
+    "@typescript/lib-scripthost",
+    "@typescript/lib-webworker",
     // Used through `pnpm exec zenn preview` only; see the Zenn section of
     // CLAUDE.md.
     "zenn-cli",
@@ -57,9 +80,48 @@
   "ignoreBinaries": ["diff"],
 
   "workspaces": {
+    // The strict standard library's generator. Its entry points are the
+    // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;
+    // `output*/` holds generated declarations that nothing imports by path.
+    "strict-lib/scripts-common": {
+      "entry": ["src/**/*.mts"],
+      "project": ["src/**/*.mts"],
+    },
+
+    "strict-lib/v*": {
+      "entry": ["scripts/**/*.mts"],
+      "project": ["scripts/**/*.mts"],
+
+      // Declared for tsc, not for a source file. `lib-check` type-checks the
+      // generated declarations, which reference `import('ts-type-forge')`, and
+      // `getTsTypeForgeRange` reads this very declaration to write the range
+      // the published package carries.
+      "ignoreDependencies": ["ts-type-forge"],
+    },
+
+    // Type-check harnesses over the generated declarations. No sources of
+    // their own.
+    "strict-lib/v*/output": {},
+    "strict-lib/v*/output-branded": {},
+
+    "strict-lib/v*/output/lib": {
+      // The published package. Its `.d.ts` files reference
+      // `import('ts-type-forge')`, so a consumer must have it installed — but
+      // they are generated output, not part of any knip project.
+      "ignoreDependencies": ["ts-type-forge"],
+    },
+
     ".": {
-      "entry": ["tools/scripts/cmd/*.mts", "tools/configs/*.mts"],
-      "project": ["tools/**/*.mts"],
+      // `strict-lib/scripts/` and its ESLint config are not a package, so what
+      // they import is declared by the root manifest and belongs to the root
+      // project.
+      "entry": [
+        "tools/scripts/cmd/*.mts",
+        "tools/configs/*.mts",
+        "strict-lib/scripts/cmd/*.mts",
+        "strict-lib/eslint.config.mts",
+      ],
+      "project": ["tools/**/*.mts", "strict-lib/{scripts,configs}/**/*.mts"],
     },
 
     "libs/*": {

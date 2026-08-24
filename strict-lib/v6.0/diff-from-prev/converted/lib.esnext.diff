@@ -1,0 +1,23 @@
+diff --git a/packages/v5.9/output/lib-files/lib.esnext.d.ts b/packages/v6.0/output/lib-files/lib.esnext.d.ts
+index 7d8fb5d9..f3d6e4e7 100644
+--- a/packages/v5.9/output/lib-files/lib.esnext.d.ts
++++ b/packages/v6.0/output/lib-files/lib.esnext.d.ts
+@@ -1,13 +1,11 @@
+-/// <reference no-default-lib="true"/>
+-
+-/// <reference path="./lib.es2024.d.ts" />
++/// <reference path="./lib.es2025.d.ts" />
+ /// <reference path="./lib.esnext.intl.d.ts" />
++/// <reference path="./lib.esnext.collection.d.ts" />
+ /// <reference path="./lib.esnext.decorators.d.ts" />
+ /// <reference path="./lib.esnext.disposable.d.ts" />
+-/// <reference path="./lib.esnext.collection.d.ts" />
+ /// <reference path="./lib.esnext.array.d.ts" />
+-/// <reference path="./lib.esnext.iterator.d.ts" />
+-/// <reference path="./lib.esnext.promise.d.ts" />
+-/// <reference path="./lib.esnext.float16.d.ts" />
+ /// <reference path="./lib.esnext.error.d.ts" />
+ /// <reference path="./lib.esnext.sharedmemory.d.ts" />
++/// <reference path="./lib.esnext.typedarrays.d.ts" />
++/// <reference path="./lib.esnext.temporal.d.ts" />
++/// <reference path="./lib.esnext.date.d.ts" />

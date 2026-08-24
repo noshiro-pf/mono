@@ -1,0 +1,25 @@
+{
+  "name": "strict-ts-lib-scripts-common",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared scripts for generating strict-ts-lib-vX.Y-* packages",
+  "type": "module",
+  "exports": {
+    "./commands/gen": "./src/commands/gen.mts",
+    "./commands/gen-full": "./src/commands/gen-full.mts",
+    "./commands/gen-lib-files": "./src/commands/gen-lib-files.mts",
+    "./commands/gen-packages": "./src/commands/gen-packages.mts",
+    "./commands/gen-with-codemod-fixed": "./src/commands/gen-with-codemod-fixed.mts",
+    "./context": "./src/context.mts"
+  },
+  "dependencies": {
+    "dedent": "catalog:",
+    "ts-data-forge": "workspace:*",
+    "ts-repo-utils": "workspace:*",
+    "ts-type-forge": "workspace:*",
+    "typescript": "6.0.3"
+  },
+  "devDependencies": {
+    "ts-fortress": "workspace:*"
+  }
+}

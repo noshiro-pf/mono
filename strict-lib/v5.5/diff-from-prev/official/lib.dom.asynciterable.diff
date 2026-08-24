@@ -1,0 +1,15 @@
+diff --git a/packages/v5.4/temp/copied/lib.dom.asynciterable.d.ts b/packages/v5.5/temp/copied/lib.dom.asynciterable.d.ts
+index d7e7a53..db3dfb4 100644
+--- a/packages/v5.4/temp/copied/lib.dom.asynciterable.d.ts
++++ b/packages/v5.5/temp/copied/lib.dom.asynciterable.d.ts
+@@ -25,3 +25,10 @@ interface FileSystemDirectoryHandle {
+   keys(): AsyncIterableIterator<string>;
+   values(): AsyncIterableIterator<FileSystemHandle>;
+ }
++
++interface ReadableStream<R = any> {
++  [Symbol.asyncIterator](
++    options?: ReadableStreamIteratorOptions,
++  ): AsyncIterableIterator<R>;
++  values(options?: ReadableStreamIteratorOptions): AsyncIterableIterator<R>;
++}

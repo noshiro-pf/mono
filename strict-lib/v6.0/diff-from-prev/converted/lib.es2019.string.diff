@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2019.string.d.ts b/packages/v6.0/output/lib-files/lib.es2019.string.d.ts
+index 1ad44d01..07f27230 100644
+--- a/packages/v5.9/output/lib-files/lib.es2019.string.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2019.string.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface String {
+   /** Removes the trailing white space and line terminator characters from a string. */
+   trimEnd(): string;

@@ -38,6 +38,9 @@ jobs:
       matrix:
         command:
           - fmt:full
+          # oxfmt owns `strict-lib/`; Prettier ignores it. The repository-clean
+          # step after this one is what makes the check an idempotence check.
+          - strict-lib:fmt
           - md
           - cspell
           - ws:doc

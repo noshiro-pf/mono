@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2021.d.ts b/packages/v6.0/output/lib-files/lib.es2021.d.ts
+index 6f059fb3..15890a85 100644
+--- a/packages/v5.9/output/lib-files/lib.es2021.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2021.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2020.d.ts" />
+ /// <reference path="./lib.es2021.promise.d.ts" />
+ /// <reference path="./lib.es2021.string.d.ts" />

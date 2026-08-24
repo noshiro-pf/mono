@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2016.array.include.d.ts b/packages/v6.0/output/lib-files/lib.es2016.array.include.d.ts
+index a3791afd..82c44c97 100644
+--- a/packages/v5.9/output/lib-files/lib.es2016.array.include.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2016.array.include.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface Array<T> {
+   /**
+    * Determines whether an array includes a certain element, returning true or false as appropriate.

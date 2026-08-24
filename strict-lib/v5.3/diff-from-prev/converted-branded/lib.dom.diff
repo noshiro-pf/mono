@@ -1,0 +1,37 @@
+diff --git a/packages/v5.2/output-branded/lib-files/lib.dom.d.ts b/packages/v5.3/output-branded/lib-files/lib.dom.d.ts
+index 270a156..af02e47 100644
+--- a/packages/v5.2/output-branded/lib-files/lib.dom.d.ts
++++ b/packages/v5.3/output-branded/lib-files/lib.dom.d.ts
+@@ -1424,6 +1424,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
+   keyFramesDecoded?: number;
+   kind: string;
+   lastPacketReceivedTimestamp?: DOMHighResTimeStamp;
++  mid?: string;
+   nackCount?: number;
+   packetsDiscarded?: number;
+   pliCount?: number;
+@@ -1438,6 +1439,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
+   totalSamplesDuration?: number;
+   totalSamplesReceived?: number;
+   totalSquaredInterFrameDelay?: number;
++  trackIdentifier: string;
+ }
+ 
+ interface RTCLocalSessionDescriptionInit {
+@@ -26814,7 +26816,16 @@ interface SubtleCrypto {
+     format: Exclude<KeyFormat, 'jwk'>,
+     key: CryptoKey,
+   ): Promise<ArrayBuffer>;
++  exportKey(
++    format: KeyFormat,
++    key: CryptoKey,
++  ): Promise<ArrayBuffer | JsonWebKey>;
+   /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
++  generateKey(
++    algorithm: 'Ed25519',
++    extractable: boolean,
++    keyUsages: ReadonlyArray<'sign' | 'verify'>,
++  ): Promise<CryptoKeyPair>;
+   generateKey(
+     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
+     extractable: boolean,

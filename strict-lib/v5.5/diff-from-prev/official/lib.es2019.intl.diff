@@ -1,0 +1,12 @@
+diff --git a/packages/v5.4/temp/copied/lib.es2019.intl.d.ts b/packages/v5.5/temp/copied/lib.es2019.intl.d.ts
+index e49d078..e58e6db 100644
+--- a/packages/v5.4/temp/copied/lib.es2019.intl.d.ts
++++ b/packages/v5.5/temp/copied/lib.es2019.intl.d.ts
+@@ -17,6 +17,6 @@ and limitations under the License.
+ 
+ declare namespace Intl {
+   interface DateTimeFormatPartTypesRegistry {
+-    unknown: any;
++    unknown: never;
+   }
+ }

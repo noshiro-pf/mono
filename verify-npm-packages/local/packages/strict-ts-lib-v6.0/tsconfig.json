@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "skipLibCheck": false,
+    "types": [],
+    "libReplacement": true
+  },
+  "include": ["strict-ts-lib-v6.0.mts"]
+}

@@ -1,0 +1,95 @@
+diff --git a/packages/v5.4/temp/copied/lib.es2015.core.d.ts b/packages/v5.5/temp/copied/lib.es2015.core.d.ts
+index 68aaca5..ce8c9de 100644
+--- a/packages/v5.4/temp/copied/lib.es2015.core.d.ts
++++ b/packages/v5.5/temp/copied/lib.es2015.core.d.ts
+@@ -68,6 +68,11 @@ interface Array<T> {
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+   copyWithin(target: number, start: number, end?: number): this;
++
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
++  ): string;
+ }
+ 
+ interface ArrayConstructor {
+@@ -386,6 +391,11 @@ interface ReadonlyArray<T> {
+     predicate: (value: T, index: number, obj: readonly T[]) => unknown,
+     thisArg?: any,
+   ): number;
++
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
++  ): string;
+ }
+ 
+ interface RegExp {
+@@ -584,3 +594,66 @@ interface StringConstructor {
+     ...substitutions: any[]
+   ): string;
+ }
++
++interface Int8Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint8Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint8ClampedArray {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Int16Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint16Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Int32Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint32Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Float32Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Float64Array {
++  toLocaleString(
++    locales: string | string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}

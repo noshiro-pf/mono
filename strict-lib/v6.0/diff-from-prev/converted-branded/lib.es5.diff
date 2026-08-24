@@ -1,0 +1,198 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es5.d.ts b/packages/v6.0/output-branded/lib-files/lib.es5.d.ts
+index ba045ba5..7d7ac9cd 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es5.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es5.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.decorators.d.ts" />
+ /// <reference path="./lib.decorators.legacy.d.ts" />
+ 
+@@ -496,7 +494,7 @@ interface String {
+   concat(...strings: readonly string[]): string;
+ 
+   /**
+-   * Returns the position of the first occurrence of a substring.
++   * Returns the position of the first occurrence of a substring, or -1 if it is not present.
+    * @param searchString The substring to search for in the string
+    * @param position The index at which to begin searching the String object. If omitted, search starts at the beginning of the string.
+    */
+@@ -506,7 +504,7 @@ interface String {
+   ): NumberType.StringSearchResult;
+ 
+   /**
+-   * Returns the last occurrence of a substring in the string.
++   * Returns the last occurrence of a substring in the string, or -1 if it is not present.
+    * @param searchString The substring to search for.
+    * @param position The index at which to begin searching. If omitted, the search begins at the end of the string.
+    */
+@@ -2506,7 +2504,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -2524,7 +2522,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -2927,7 +2925,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -2945,7 +2943,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -3357,7 +3355,7 @@ interface Uint8ClampedArray<
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -3375,7 +3373,7 @@ interface Uint8ClampedArray<
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -3785,7 +3783,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -3803,7 +3801,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -4213,7 +4211,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -4231,7 +4229,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -4640,7 +4638,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -4658,7 +4656,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5068,7 +5066,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5086,7 +5084,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5496,7 +5494,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5514,7 +5512,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5924,7 +5922,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   ): void;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -5942,7 +5940,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   join(separator?: string): string;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -6226,6 +6224,7 @@ declare namespace Intl {
+     readonly collation?:
+       | 'big5han'
+       | 'compat'
++      | 'default'
+       | 'dict'
+       | 'direct'
+       | 'ducet'

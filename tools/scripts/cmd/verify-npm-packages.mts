@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, isRecord, isString, Json, Result } from 'ts-data-forge';
+import { Arr, isRecord, isString, Json, Num, Result } from 'ts-data-forge';
 import {
   $,
   formatFilesGlob,
@@ -339,11 +339,11 @@ const generateSpace = async (
       dependencies: {
         [pkg.name]: spec,
         // A types-only package is checked by compiling against it.
-        ...(typesOnlyPackages.has(pkg.name) ? { typescript: 'latest' } : {}),
+        ...(isTypesOnly(pkg.name) ? { typescript: typescriptSpec(pkg) } : {}),
       },
     });
 
-    const source = path.resolve(smokeDir, smokeFileName(pkg.name));
+    const source = path.resolve(smokeDir, smokeSourceName(pkg.name));
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = await fs.readFile(source, 'utf8').catch(() => undefined);
@@ -354,7 +354,7 @@ const generateSpace = async (
 
     await writeFile(path.resolve(dir, smokeFileName(pkg.name)), content);
 
-    if (typesOnlyPackages.has(pkg.name)) {
+    if (isTypesOnly(pkg.name)) {
       await writeJson(path.resolve(dir, 'tsconfig.json'), {
         compilerOptions: {
           strict: true,
@@ -364,6 +364,11 @@ const generateSpace = async (
           moduleResolution: 'nodenext',
           noEmit: true,
           skipLibCheck: false,
+          // What the strict library check exists to verify: that the recipe
+          // in the package's own README is enough for TypeScript to replace
+          // its own declarations. Which recipe that is depends on the
+          // version — see `strictLibCompilerOptions`.
+          ...strictLibCompilerOptions(pkg.name),
         },
         include: [smokeFileName(pkg.name)],
       });
@@ -468,11 +473,101 @@ const readPinnedVersion = async (
  * as `.mts`, and the presence of that file is what selects the mode.
  */
 const smokeFileName = (packageName: string): string =>
-  typesOnlyPackages.has(packageName)
-    ? `${packageName}.mts`
-    : `${packageName}.mjs`;
+  isTypesOnly(packageName) ? `${packageName}.mts` : `${packageName}.mjs`;
+
+/**
+ * The strict standard library packages all share one check, because they only
+ * differ by the TypeScript minor they were generated from — and what is being
+ * verified is the same for each: that the published tarball's `libs/` layout
+ * is what `libReplacement` asks for.
+ */
+const smokeSourceName = (packageName: string): string =>
+  isStrictLibPackage(packageName)
+    ? 'strict-ts-lib.mts'
+    : smokeFileName(packageName);
+
+const isTypesOnly = (packageName: string): boolean =>
+  typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set(['ts-type-forge']);
+
+/**
+ * The TypeScript a package is compiled against. A strict standard library
+ * replaces the declarations of one TypeScript minor and says so in its peer
+ * range, so checking it against anything else checks nothing: TypeScript 7
+ * rejects `strict-ts-lib-v5.6` outright, because `lib.es2022.sharedmemory`
+ * — which those declarations reference — no longer exists upstream.
+ */
+const typescriptSpec = (pkg: PackageToCheck): string => {
+  const { manifest } = pkg;
+
+  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
+
+  const declared = isRecord(peers) ? peers['typescript'] : undefined;
+
+  return isString(declared) ? declared : 'latest';
+};
+
+/**
+ * The `compilerOptions` a strict standard library package's own README tells
+ * a consumer to write. Nothing for a package that is not one.
+ *
+ * The two routes are exclusive, and which applies is the TypeScript version:
+ *
+ * - **TypeScript 7** reads `paths` and no longer looks `@typescript/lib-*` up
+ *   by name.
+ * - **TypeScript 6 and earlier** do the opposite — a fixed Node10 lookup that
+ *   ignores `paths`. Those names come from the linker the package ships; see
+ *   `needsLinker`. `libReplacement` stops defaulting to on at TypeScript 6,
+ *   and is not a known option at all before 5.8, so it is set only where it
+ *   is both valid and needed.
+ */
+const strictLibCompilerOptions = (
+  packageName: string,
+): ReadonlyRecord<string, JsonValue> => {
+  const major = strictLibTypeScriptMajor(packageName);
+
+  if (major === undefined) return {};
+
+  return {
+    // What is under test is the standard library. Without this, tsc walks up
+    // out of the space and finds the repository's own `@types/*`, and with
+    // `skipLibCheck: false` a modern `@types/node` against an old TypeScript
+    // buries the check in `TS2451: Cannot redeclare block-scoped variable`.
+    types: [],
+    ...(major >= 7
+      ? {
+          libReplacement: true,
+          paths: {
+            '@typescript/lib-*': [`./node_modules/${packageName}/libs/*`],
+          },
+        }
+      : major >= 6
+        ? { libReplacement: true }
+        : {}),
+  };
+};
+
+/** Every strict standard library package except the TypeScript 7 one. */
+const needsLinker = (packageName: string): boolean => {
+  const major = strictLibTypeScriptMajor(packageName);
+
+  return major !== undefined && major < 7;
+};
+
+const isStrictLibPackage = (packageName: string): boolean =>
+  strictLibTypeScriptMajor(packageName) !== undefined;
+
+/** `strict-ts-lib-v7.0` and its eleven siblings, one per TypeScript minor. */
+const strictLibTypeScriptMajor = (packageName: string): number | undefined => {
+  const matched = /^strict-ts-lib-v(\d+)\.\d+$/u.exec(packageName);
+
+  const major = matched?.[1];
+
+  return major === undefined
+    ? undefined
+    : Result.unwrapOkOr(Num.safeParseInt(major), undefined);
+};
 
 const runChecks = async (
   spaceDir: string,
@@ -496,11 +591,27 @@ const runChecks = async (
     // into that child process too.
     const isolation = `VERIFY_SPACE_ROOT=${spaceDir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'`;
 
+    // The packages whose TypeScript resolves `@typescript/lib-*` by name are
+    // set up by the linker they ship, exactly as their README instructs —
+    // which makes the linker itself part of what is under test.
+    // `--dir` because the linker is run from the repository root rather than
+    // from the project, and under pnpm it cannot tell where it was installed
+    // from its own path — a consumer running `npx` in their project needs
+    // neither.
+    const link = needsLinker(pkg.name)
+      ? `${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir} && `
+      : '';
+
     const cmd = file.endsWith('.mts')
-      ? `${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, 'tsconfig.json')}`
+      ? `${link}${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, 'tsconfig.json')}`
       : `${isolation} node ${path.resolve(dir, file)}`;
 
-    const result = await $(cmd, { silent: true });
+    // From the project directory, which is where a consumer runs their own
+    // build. It is not cosmetic: TypeScript 5.0 resolves `@typescript/lib-*`
+    // relative to the current directory rather than to the config that asked
+    // for it, so run from anywhere else the replacement silently does not
+    // happen and the probe stops erroring.
+    const result = await $(cmd, { silent: true, cwd: dir });
 
     if (Result.isErr(result)) {
       mut_failures.push(pkg.name);
@@ -538,15 +649,23 @@ const readPublishablePackages = async (): Promise<
 > => {
   const packages = await getWorkspacePackages(projectRootPath);
 
-  return packages
-    .filter((pkg) =>
-      isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
-    )
-    .map((pkg) => ({
-      name: pkg.name,
-      path: pkg.path,
-      manifest: pkg.packageJson,
-    }));
+  return (
+    packages
+      .filter((pkg) =>
+        isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
+      )
+      .map((pkg) => ({
+        name: pkg.name,
+        path: pkg.path,
+        manifest: pkg.packageJson,
+      }))
+      // Sorted because the generated files are committed and CI checks the
+      // working tree is clean. `getWorkspacePackages` reads the directories
+      // concurrently and hands them back in whatever order they finished, so
+      // without this the `overrides` block of the generated `pnpm-workspace.yaml`
+      // is shuffled on every run and the repository never looks clean twice.
+      .toSorted((a, b) => a.name.localeCompare(b.name))
+  );
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

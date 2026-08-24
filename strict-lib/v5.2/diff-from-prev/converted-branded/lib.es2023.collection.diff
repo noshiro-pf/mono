@@ -1,0 +1,12 @@
+diff --git a/packages/v5.2/output-branded/lib-files/lib.es2023.collection.d.ts b/packages/v5.2/output-branded/lib-files/lib.es2023.collection.d.ts
+new file mode 100644
+index 0000000..e34bd5d
+--- /dev/null
++++ b/packages/v5.2/output-branded/lib-files/lib.es2023.collection.d.ts
+@@ -0,0 +1,6 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++interface WeakKeyTypes {
++  readonly symbol: symbol;
++}

@@ -1,0 +1,4 @@
+{
+  "extends": "../configs/tsconfig/tsconfig.lib-check.webworker.json",
+  "files": ["../configs/tsconfig/lib-check-entry.ts"]
+}

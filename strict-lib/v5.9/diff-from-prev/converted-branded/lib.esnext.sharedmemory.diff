@@ -1,0 +1,16 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.esnext.sharedmemory.d.ts b/packages/v5.9/output-branded/lib-files/lib.esnext.sharedmemory.d.ts
+new file mode 100644
+index 0000000..7f76439
+--- /dev/null
++++ b/packages/v5.9/output-branded/lib-files/lib.esnext.sharedmemory.d.ts
+@@ -0,0 +1,10 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++interface Atomics {
++  /**
++   * Performs a finite-time microwait by signaling to the operating system or
++   * CPU that the current executing code is in a spin-wait loop.
++   */
++  pause(n?: number): void;
++}

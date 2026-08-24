@@ -1,0 +1,28 @@
+diff --git a/packages/v5.3/temp/copied/lib.es2022.intl.d.ts b/packages/v5.4/temp/copied/lib.es2022.intl.d.ts
+index def51cd..2a652f0 100644
+--- a/packages/v5.3/temp/copied/lib.es2022.intl.d.ts
++++ b/packages/v5.4/temp/copied/lib.es2022.intl.d.ts
+@@ -88,10 +88,7 @@ declare namespace Intl {
+      *
+      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter).
+      */
+-    new (
+-      locales?: BCP47LanguageTag | BCP47LanguageTag[],
+-      options?: SegmenterOptions,
+-    ): Segmenter;
++    new (locales?: LocalesArgument, options?: SegmenterOptions): Segmenter;
+ 
+     /**
+      * Returns an array containing those of the provided locales that are supported without having to fall back to the runtime's default locale.
+@@ -106,9 +103,9 @@ declare namespace Intl {
+      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/supportedLocalesOf)
+      */
+     supportedLocalesOf(
+-      locales: BCP47LanguageTag | BCP47LanguageTag[],
++      locales: LocalesArgument,
+       options?: Pick<SegmenterOptions, 'localeMatcher'>,
+-    ): BCP47LanguageTag[];
++    ): UnicodeBCP47LocaleIdentifier[];
+   };
+ 
+   /**

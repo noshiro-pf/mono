@@ -1,0 +1,19 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2022.regexp.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2022.regexp.d.ts
+index 6fd74f87..8a0c6a3e 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2022.regexp.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2022.regexp.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface RegExpMatchArray {
+   readonly indices?: RegExpIndicesArray;
+ }
+@@ -9,7 +7,7 @@ interface RegExpExecArray {
+ }
+ 
+ interface RegExpIndicesArray extends Array<
+-  readonly [NumberType.ArraySize, NumberType.ArraySize]
++  readonly [NumberType.ArraySize, NumberType.ArraySize] | undefined
+ > {
+   readonly groups?: {
+     readonly [key: string]: readonly [

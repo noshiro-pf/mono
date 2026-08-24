@@ -1,0 +1,13 @@
+diff --git a/packages/v6.0/output-branded/lib-files/lib.es2015.core.d.ts b/packages/v7.0/output-branded/lib-files/lib.es2015.core.d.ts
+index a4478f5e..baffd593 100644
+--- a/packages/v6.0/output-branded/lib-files/lib.es2015.core.d.ts
++++ b/packages/v7.0/output-branded/lib-files/lib.es2015.core.d.ts
+@@ -133,7 +133,7 @@ interface Math {
+   ): import('ts-type-forge').Int32;
+ 
+   /**
+-   * Returns the sign of the x, indicating whether x is positive, negative or zero.
++   * Returns the sign of x, indicating whether x is positive, negative, or zero.
+    * @param x The numeric expression to test
+    */
+   sign(x: number): -1 | 0 | -0 | 1 | import('ts-type-forge').NaNType;

@@ -1,0 +1,46 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2020.bigint.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2020.bigint.d.ts
+index 727fa1f8..5312106b 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2020.bigint.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2020.bigint.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2020.intl.d.ts" />
+ 
+ interface BigIntToLocaleStringOptions {
+@@ -278,7 +276,7 @@ interface BigInt64Array<
+   ): boolean;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -299,7 +297,7 @@ interface BigInt64Array<
+   keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -720,7 +718,7 @@ interface BigUint64Array<
+   ): boolean;
+ 
+   /**
+-   * Returns the index of the first occurrence of a value in an array.
++   * Returns the index of the first occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.
+@@ -741,7 +739,7 @@ interface BigUint64Array<
+   keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+-   * Returns the index of the last occurrence of a value in an array.
++   * Returns the index of the last occurrence of a value in an array, or -1 if it is not present.
+    * @param searchElement The value to locate in the array.
+    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
+    * search starts at index 0.

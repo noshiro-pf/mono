@@ -1,0 +1,311 @@
+@@ -1,21 +1,6 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABILITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+-/// <reference lib="es2015.symbol.wellknown" />
+-/// <reference lib="es2020.intl" />
+-/// <reference lib="es2025.intl" />
++/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
++/// <reference path="./lib.es2020.intl.d.ts" />
++/// <reference path="./lib.es2025.intl.d.ts" />
+ 
+ declare namespace Temporal {
+   type CalendarLike =
+@@ -51,48 +36,53 @@ declare namespace Temporal {
+   type ZonedDateTimeLike = ZonedDateTime | ZonedDateTimeLikeObject | string;
+ 
+   type PartialTemporalLike<T extends object> = {
+-    [P in Exclude<keyof T, 'calendar' | 'timeZone'>]?: T[P] | undefined;
++    readonly [
++      P in import('ts-type-forge').RelaxedExclude<
++        keyof T,
++        'calendar' | 'timeZone'
++      >
++    ]?: T[P] | undefined;
+   };
+ 
+   interface DateLikeObject {
+-    year?: number | undefined;
+-    era?: string | undefined;
+-    eraYear?: number | undefined;
+-    month?: number | undefined;
+-    monthCode?: string | undefined;
+-    day: number;
+-    calendar?: string | undefined;
++    readonly year?: number | undefined;
++    readonly era?: string | undefined;
++    readonly eraYear?: number | undefined;
++    readonly month?: number | undefined;
++    readonly monthCode?: string | undefined;
++    readonly day: number;
++    readonly calendar?: string | undefined;
+   }
+ 
+   interface DateTimeLikeObject extends DateLikeObject, TimeLikeObject {}
+ 
+   interface DurationLikeObject {
+-    years?: number | undefined;
+-    months?: number | undefined;
+-    weeks?: number | undefined;
+-    days?: number | undefined;
+-    hours?: number | undefined;
+-    minutes?: number | undefined;
+-    seconds?: number | undefined;
+-    milliseconds?: number | undefined;
+-    microseconds?: number | undefined;
+-    nanoseconds?: number | undefined;
++    readonly years?: number | undefined;
++    readonly months?: number | undefined;
++    readonly weeks?: number | undefined;
++    readonly days?: number | undefined;
++    readonly hours?: number | undefined;
++    readonly minutes?: number | undefined;
++    readonly seconds?: number | undefined;
++    readonly milliseconds?: number | undefined;
++    readonly microseconds?: number | undefined;
++    readonly nanoseconds?: number | undefined;
+   }
+ 
+   interface TimeLikeObject {
+-    hour?: number | undefined;
+-    minute?: number | undefined;
+-    second?: number | undefined;
+-    millisecond?: number | undefined;
+-    microsecond?: number | undefined;
+-    nanosecond?: number | undefined;
++    readonly hour?: number | undefined;
++    readonly minute?: number | undefined;
++    readonly second?: number | undefined;
++    readonly millisecond?: number | undefined;
++    readonly microsecond?: number | undefined;
++    readonly nanosecond?: number | undefined;
+   }
+ 
+   interface YearMonthLikeObject extends Omit<DateLikeObject, 'day'> {}
+ 
+   interface ZonedDateTimeLikeObject extends DateTimeLikeObject {
+-    timeZone: TimeZoneLike;
+-    offset?: string | undefined;
++    readonly timeZone: TimeZoneLike;
++    readonly offset?: string | undefined;
+   }
+ 
+   type DateUnit = 'year' | 'month' | 'week' | 'day';
+@@ -106,34 +96,39 @@ declare namespace Temporal {
+   type PluralizeUnit<T extends DateUnit | TimeUnit> =
+     | T
+     | {
+-        year: 'years';
+-        month: 'months';
+-        week: 'weeks';
+-        day: 'days';
+-        hour: 'hours';
+-        minute: 'minutes';
+-        second: 'seconds';
+-        millisecond: 'milliseconds';
+-        microsecond: 'microseconds';
+-        nanosecond: 'nanoseconds';
++        readonly year: 'years';
++        readonly month: 'months';
++        readonly week: 'weeks';
++        readonly day: 'days';
++        readonly hour: 'hours';
++        readonly minute: 'minutes';
++        readonly second: 'seconds';
++        readonly millisecond: 'milliseconds';
++        readonly microsecond: 'microseconds';
++        readonly nanosecond: 'nanoseconds';
+       }[T];
+ 
+   interface DisambiguationOptions {
+-    disambiguation?: 'compatible' | 'earlier' | 'later' | 'reject' | undefined;
++    readonly disambiguation?:
++      | 'compatible'
++      | 'earlier'
++      | 'later'
++      | 'reject'
++      | undefined;
+   }
+ 
+   interface OverflowOptions {
+-    overflow?: 'constrain' | 'reject' | undefined;
++    readonly overflow?: 'constrain' | 'reject' | undefined;
+   }
+ 
+   interface TransitionOptions {
+-    direction: 'next' | 'previous';
++    readonly direction: 'next' | 'previous';
+   }
+ 
+   interface RoundingOptions<Units extends DateUnit | TimeUnit> {
+-    smallestUnit?: PluralizeUnit<Units> | undefined;
+-    roundingIncrement?: number | undefined;
+-    roundingMode?:
++    readonly smallestUnit?: PluralizeUnit<Units> | undefined;
++    readonly roundingIncrement?: number | undefined;
++    readonly roundingMode?:
+       | 'ceil'
+       | 'floor'
+       | 'expand'
+@@ -149,7 +144,7 @@ declare namespace Temporal {
+   interface RoundingOptionsWithLargestUnit<
+     Units extends DateUnit | TimeUnit,
+   > extends RoundingOptions<Units> {
+-    largestUnit?: 'auto' | PluralizeUnit<Units> | undefined;
++    readonly largestUnit?: 'auto' | PluralizeUnit<Units> | undefined;
+   }
+ 
+   interface ToStringRoundingOptions<
+@@ -159,7 +154,7 @@ declare namespace Temporal {
+   interface ToStringRoundingOptionsWithFractionalSeconds<
+     Units extends DateUnit | TimeUnit,
+   > extends ToStringRoundingOptions<Units> {
+-    fractionalSecondDigits?:
++    readonly fractionalSecondDigits?:
+       | 'auto'
+       | 0
+       | 1
+@@ -184,12 +179,17 @@ declare namespace Temporal {
+   }
+ 
+   interface PlainDateToStringOptions {
+-    calendarName?: 'auto' | 'always' | 'never' | 'critical' | undefined;
++    readonly calendarName?:
++      | 'auto'
++      | 'always'
++      | 'never'
++      | 'critical'
++      | undefined;
+   }
+ 
+   interface PlainDateToZonedDateTimeOptions {
+-    plainTime?: PlainTimeLike | undefined;
+-    timeZone: TimeZoneLike;
++    readonly plainTime?: PlainTimeLike | undefined;
++    readonly timeZone: TimeZoneLike;
+   }
+ 
+   interface PlainDate {
+@@ -251,7 +251,7 @@ declare namespace Temporal {
+     from(item: PlainDateLike, options?: OverflowOptions): PlainDate;
+     compare(one: PlainDateLike, two: PlainDateLike): number;
+   }
+-  var PlainDate: PlainDateConstructor;
++  const PlainDate: PlainDateConstructor;
+ 
+   interface PlainTimeToStringOptions extends ToStringRoundingOptionsWithFractionalSeconds<
+     Exclude<TimeUnit, 'hour'>
+@@ -304,7 +304,7 @@ declare namespace Temporal {
+     from(item: PlainTimeLike, options?: OverflowOptions): PlainTime;
+     compare(one: PlainTimeLike, two: PlainTimeLike): number;
+   }
+-  var PlainTime: PlainTimeConstructor;
++  const PlainTime: PlainTimeConstructor;
+ 
+   interface PlainDateTimeToStringOptions
+     extends PlainDateToStringOptions, PlainTimeToStringOptions {}
+@@ -384,16 +384,16 @@ declare namespace Temporal {
+     from(item: PlainDateTimeLike, options?: OverflowOptions): PlainDateTime;
+     compare(one: PlainDateTimeLike, two: PlainDateTimeLike): number;
+   }
+-  var PlainDateTime: PlainDateTimeConstructor;
++  const PlainDateTime: PlainDateTimeConstructor;
+ 
+   interface ZonedDateTimeToStringOptions extends PlainDateTimeToStringOptions {
+-    offset?: 'auto' | 'never' | undefined;
+-    timeZoneName?: 'auto' | 'never' | 'critical' | undefined;
++    readonly offset?: 'auto' | 'never' | undefined;
++    readonly timeZoneName?: 'auto' | 'never' | 'critical' | undefined;
+   }
+ 
+   interface ZonedDateTimeFromOptions
+     extends OverflowOptions, DisambiguationOptions {
+-    offset?: 'use' | 'ignore' | 'prefer' | 'reject' | undefined;
++    readonly offset?: 'use' | 'ignore' | 'prefer' | 'reject' | undefined;
+   }
+ 
+   interface ZonedDateTime {
+@@ -475,10 +475,10 @@ declare namespace Temporal {
+     ): ZonedDateTime;
+     compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike): number;
+   }
+-  var ZonedDateTime: ZonedDateTimeConstructor;
++  const ZonedDateTime: ZonedDateTimeConstructor;
+ 
+   interface DurationRelativeToOptions {
+-    relativeTo?: ZonedDateTimeLike | PlainDateLike | undefined;
++    readonly relativeTo?: ZonedDateTimeLike | PlainDateLike | undefined;
+   }
+ 
+   interface DurationRoundingOptions
+@@ -491,7 +491,7 @@ declare namespace Temporal {
+   > {}
+ 
+   interface DurationTotalOptions extends DurationRelativeToOptions {
+-    unit: PluralizeUnit<DateUnit | TimeUnit>;
++    readonly unit: PluralizeUnit<DateUnit | TimeUnit>;
+   }
+ 
+   interface Duration {
+@@ -547,10 +547,10 @@ declare namespace Temporal {
+       options?: DurationRelativeToOptions,
+     ): number;
+   }
+-  var Duration: DurationConstructor;
++  const Duration: DurationConstructor;
+ 
+   interface InstantToStringOptions extends PlainTimeToStringOptions {
+-    timeZone?: TimeZoneLike | undefined;
++    readonly timeZone?: TimeZoneLike | undefined;
+   }
+ 
+   interface Instant {
+@@ -588,10 +588,10 @@ declare namespace Temporal {
+     fromEpochNanoseconds(epochNanoseconds: bigint): Instant;
+     compare(one: InstantLike, two: InstantLike): number;
+   }
+-  var Instant: InstantConstructor;
++  const Instant: InstantConstructor;
+ 
+   interface PlainYearMonthToPlainDateOptions {
+-    day: number;
++    readonly day: number;
+   }
+ 
+   interface PlainYearMonth {
+@@ -642,12 +642,12 @@ declare namespace Temporal {
+     from(item: PlainYearMonthLike, options?: OverflowOptions): PlainYearMonth;
+     compare(one: PlainYearMonthLike, two: PlainYearMonthLike): number;
+   }
+-  var PlainYearMonth: PlainYearMonthConstructor;
++  const PlainYearMonth: PlainYearMonthConstructor;
+ 
+   interface PlainMonthDayToPlainDateOptions {
+-    era?: string | undefined;
+-    eraYear?: number | undefined;
+-    year?: number | undefined;
++    readonly era?: string | undefined;
++    readonly eraYear?: number | undefined;
++    readonly year?: number | undefined;
+   }
+ 
+   interface PlainMonthDay {
+@@ -680,5 +680,5 @@ declare namespace Temporal {
+     readonly prototype: PlainMonthDay;
+     from(item: PlainMonthDayLike, options?: OverflowOptions): PlainMonthDay;
+   }
+-  var PlainMonthDay: PlainMonthDayConstructor;
++  const PlainMonthDay: PlainMonthDayConstructor;
+ }

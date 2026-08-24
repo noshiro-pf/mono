@@ -1,0 +1,10 @@
+{
+  "extends": "../configs/tsconfig/tsconfig.lib-check.webworker.json",
+  // TypeScript 5.8 introduced `libReplacement`, and 6.0 flipped its default to
+  // `false`. Set it explicitly on every harness whose tsc understands it, so
+  // this check never silently falls back to the stock lib — the generated lib
+  // is the only thing it exists to check. Harnesses on tsc < 5.8 must NOT set
+  // it (TS5023: unknown compiler option); there the behavior is always on.
+  "compilerOptions": { "libReplacement": true },
+  "files": ["../configs/tsconfig/lib-check-entry.ts"]
+}

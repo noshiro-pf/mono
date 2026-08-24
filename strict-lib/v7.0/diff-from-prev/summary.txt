@@ -1,0 +1,25 @@
+Cross-version diff: v6.0 -> v7.0
+
+[official] (temp/copied) — 6 changed file(s):
+  lib.es2015.collection.d.ts
+  lib.es2015.core.d.ts
+  lib.es2015.symbol.d.ts
+  lib.es2017.string.d.ts
+  lib.es2020.intl.d.ts
+  lib.es5.d.ts
+
+[converted] (output/lib-files) — 6 changed file(s):
+  lib.es2015.collection.d.ts
+  lib.es2015.core.d.ts
+  lib.es2015.symbol.d.ts
+  lib.es2017.string.d.ts
+  lib.es2020.intl.d.ts
+  lib.es5.d.ts
+
+[converted-branded] (output-branded/lib-files) — 6 changed file(s):
+  lib.es2015.collection.d.ts
+  lib.es2015.core.d.ts
+  lib.es2015.symbol.d.ts
+  lib.es2017.string.d.ts
+  lib.es2020.intl.d.ts
+  lib.es5.d.ts

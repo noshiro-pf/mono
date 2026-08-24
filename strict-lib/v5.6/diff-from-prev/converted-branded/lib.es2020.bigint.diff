@@ -1,0 +1,64 @@
+diff --git a/packages/v5.5/output-branded/lib-files/lib.es2020.bigint.d.ts b/packages/v5.6/output-branded/lib-files/lib.es2020.bigint.d.ts
+index 3526e67..065247f 100644
+--- a/packages/v5.5/output-branded/lib-files/lib.es2020.bigint.d.ts
++++ b/packages/v5.6/output-branded/lib-files/lib.es2020.bigint.d.ts
+@@ -163,7 +163,7 @@ interface BigInt64Array {
+   ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
++  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigInt64]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -293,7 +293,7 @@ interface BigInt64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<NumberType.TypedArraySize>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -474,9 +474,9 @@ interface BigInt64Array {
+   valueOf(): BigInt64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<BigInt64>;
++  values(): ArrayIterator<BigInt64>;
+ 
+-  [Symbol.iterator](): IterableIterator<BigInt64>;
++  [Symbol.iterator](): ArrayIterator<BigInt64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigInt64Array';
+ 
+@@ -551,7 +551,7 @@ interface BigUint64Array {
+   ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
++  entries(): ArrayIterator<readonly [NumberType.TypedArraySize, BigUint64]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -681,7 +681,7 @@ interface BigUint64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<NumberType.TypedArraySize>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -862,9 +862,9 @@ interface BigUint64Array {
+   valueOf(): BigUint64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<BigUint64>;
++  values(): ArrayIterator<BigUint64>;
+ 
+-  [Symbol.iterator](): IterableIterator<BigUint64>;
++  [Symbol.iterator](): ArrayIterator<BigUint64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigUint64Array';
+ 

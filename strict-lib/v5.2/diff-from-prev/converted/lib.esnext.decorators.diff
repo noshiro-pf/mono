@@ -1,0 +1,19 @@
+diff --git a/packages/v5.2/output/lib-files/lib.esnext.decorators.d.ts b/packages/v5.2/output/lib-files/lib.esnext.decorators.d.ts
+new file mode 100644
+index 0000000..ac5b06b
+--- /dev/null
++++ b/packages/v5.2/output/lib-files/lib.esnext.decorators.d.ts
+@@ -0,0 +1,13 @@
++/// <reference no-default-lib="true"/>
++/// <reference types="ts-type-forge/global" />
++
++/// <reference path="./lib.es2015.symbol.d.ts" />
++/// <reference path="./lib.decorators.d.ts" />
++
++interface SymbolConstructor {
++  readonly metadata: unique symbol;
++}
++
++interface Function {
++  readonly [Symbol.metadata]: DecoratorMetadata | null;
++}

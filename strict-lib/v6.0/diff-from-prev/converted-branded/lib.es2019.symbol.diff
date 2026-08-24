@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2019.symbol.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2019.symbol.d.ts
+index d1c4feb9..0e86ffdb 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2019.symbol.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2019.symbol.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface Symbol {
+   /**
+    * Expose the [[Description]] internal slot of a symbol directly.

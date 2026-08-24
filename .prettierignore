@@ -3,3 +3,7 @@ pnpm-lock.yaml
 
 # Legacy monorepo contents, excluded from the pnpm workspace.
 experimental
+# Formatted by oxfmt instead — see `strict-lib:fmt`. Thousands of generated
+# declarations live here, and not walking them is most of what makes the
+# repository-wide format pass quick.
+strict-lib

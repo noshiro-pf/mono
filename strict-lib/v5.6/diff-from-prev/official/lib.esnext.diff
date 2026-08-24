@@ -1,0 +1,9 @@
+diff --git a/packages/v5.5/temp/copied/lib.esnext.d.ts b/packages/v5.6/temp/copied/lib.esnext.d.ts
+index 16a8a48..ec4117c 100644
+--- a/packages/v5.5/temp/copied/lib.esnext.d.ts
++++ b/packages/v5.6/temp/copied/lib.esnext.d.ts
+@@ -25,3 +25,4 @@ and limitations under the License.
+ /// <reference lib="esnext.array" />
+ /// <reference lib="esnext.regexp" />
+ /// <reference lib="esnext.string" />
++/// <reference lib="esnext.iterator" />

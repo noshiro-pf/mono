@@ -1,0 +1,64 @@
+diff --git a/packages/v5.5/output/lib-files/lib.es2020.bigint.d.ts b/packages/v5.6/output/lib-files/lib.es2020.bigint.d.ts
+index 92e8755..19e0ce6 100644
+--- a/packages/v5.5/output/lib-files/lib.es2020.bigint.d.ts
++++ b/packages/v5.6/output/lib-files/lib.es2020.bigint.d.ts
+@@ -159,7 +159,7 @@ interface BigInt64Array {
+   copyWithin(target: number, start: number, end?: number): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<readonly [number, bigint]>;
++  entries(): ArrayIterator<readonly [number, bigint]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -259,7 +259,7 @@ interface BigInt64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<number>;
++  keys(): ArrayIterator<number>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -420,9 +420,9 @@ interface BigInt64Array {
+   valueOf(): BigInt64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<bigint>;
++  values(): ArrayIterator<bigint>;
+ 
+-  [Symbol.iterator](): IterableIterator<bigint>;
++  [Symbol.iterator](): ArrayIterator<bigint>;
+ 
+   readonly [Symbol.toStringTag]: 'BigInt64Array';
+ 
+@@ -493,7 +493,7 @@ interface BigUint64Array {
+   copyWithin(target: number, start: number, end?: number): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<readonly [number, bigint]>;
++  entries(): ArrayIterator<readonly [number, bigint]>;
+ 
+   /**
+    * Determines whether all the members of an array satisfy the specified test.
+@@ -593,7 +593,7 @@ interface BigUint64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<number>;
++  keys(): ArrayIterator<number>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -754,9 +754,9 @@ interface BigUint64Array {
+   valueOf(): BigUint64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<bigint>;
++  values(): ArrayIterator<bigint>;
+ 
+-  [Symbol.iterator](): IterableIterator<bigint>;
++  [Symbol.iterator](): ArrayIterator<bigint>;
+ 
+   readonly [Symbol.toStringTag]: 'BigUint64Array';
+ 

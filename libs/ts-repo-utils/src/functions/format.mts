@@ -56,6 +56,13 @@ export const formatFiles = async (
     return relativePath.startsWith('..') ? filePath : relativePath;
   };
 
+  // Skips are counted rather than named. A repository can hand this function
+  // thousands of files it will not touch — a subtree formatted by another tool,
+  // or a first diff that contains a whole imported directory — and a line each
+  // is both unreadable and enough output to overflow the stdout buffer of a
+  // parent process capturing this run.
+  const mut_skipped = { nonExistent: 0, ignored: 0, noParser: 0 };
+
   // Format each file
   const results: readonly PromiseSettledResult<Result<undefined, unknown>>[] =
     // NOTE: Using Promise.allSettled to ensure all files are processed even if some fail
@@ -64,17 +71,13 @@ export const formatFiles = async (
         try {
           // Check if file exists first
           if (!(await pathExists(filePath))) {
-            conditionalEcho(
-              `Skipping non-existent file: ${getDisplayPath(filePath)}`,
-            );
+            mut_skipped.nonExistent += 1;
 
             return Result.ok(undefined);
           }
 
           if (!noIgnore && (options?.ignore ?? defaultIgnoreFn)(filePath)) {
-            conditionalEcho(
-              `Skipping ignored file: ${getDisplayPath(filePath)}`,
-            );
+            mut_skipped.ignored += 1;
 
             return Result.ok(undefined);
           }
@@ -85,9 +88,7 @@ export const formatFiles = async (
           });
 
           if (!noIgnore && fileInfo.ignored) {
-            conditionalEcho(
-              `Skipping ignored file: ${getDisplayPath(filePath)}`,
-            );
+            mut_skipped.ignored += 1;
 
             return Result.ok(undefined);
           }
@@ -97,10 +98,7 @@ export const formatFiles = async (
             (options?.ignoreUnknown ?? true) &&
             fileInfo.inferredParser === null
           ) {
-            // Silently skip files with no parser
-            conditionalEcho(
-              `Skipping file (no parser): ${getDisplayPath(filePath)}`,
-            );
+            mut_skipped.noParser += 1;
 
             return Result.ok(undefined);
           }
@@ -141,6 +139,18 @@ export const formatFiles = async (
         }
       }),
     );
+
+  const skipReport = [
+    mut_skipped.ignored === 0 ? '' : `${mut_skipped.ignored} ignored`,
+    mut_skipped.noParser === 0 ? '' : `${mut_skipped.noParser} with no parser`,
+    mut_skipped.nonExistent === 0
+      ? ''
+      : `${mut_skipped.nonExistent} non-existent`,
+  ].filter((part) => part !== '');
+
+  if (Arr.isNonEmpty(skipReport)) {
+    conditionalEcho(`Skipped ${skipReport.join(', ')}.`);
+  }
 
   if (results.every((r) => r.status === 'fulfilled')) {
     const fulfilled = results.map((r) => r.value);

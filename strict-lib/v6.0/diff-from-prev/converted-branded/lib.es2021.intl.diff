@@ -1,0 +1,10 @@
+diff --git a/packages/v5.9/output-branded/lib-files/lib.es2021.intl.d.ts b/packages/v6.0/output-branded/lib-files/lib.es2021.intl.d.ts
+index d39190e5..7f2774dc 100644
+--- a/packages/v5.9/output-branded/lib-files/lib.es2021.intl.d.ts
++++ b/packages/v6.0/output-branded/lib-files/lib.es2021.intl.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ declare namespace Intl {
+   interface DateTimeFormatPartTypesRegistry {
+     readonly fractionalSecond: unknown;

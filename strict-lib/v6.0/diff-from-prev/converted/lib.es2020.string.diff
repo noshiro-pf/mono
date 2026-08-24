@@ -1,0 +1,19 @@
+diff --git a/packages/v5.9/output/lib-files/lib.es2020.string.d.ts b/packages/v6.0/output/lib-files/lib.es2020.string.d.ts
+index 639df38f..726c6df5 100644
+--- a/packages/v5.9/output/lib-files/lib.es2020.string.d.ts
++++ b/packages/v6.0/output/lib-files/lib.es2020.string.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2015.iterable.d.ts" />
+ /// <reference path="./lib.es2020.intl.d.ts" />
+ /// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
+@@ -8,7 +6,7 @@ interface String {
+   /**
+    * Matches a string with a regular expression, and returns an iterable of matches
+    * containing the results of that search.
+-   * @param regexp A variable name or string literal containing the regular expression pattern and flags.
++   * @param regexp A regular expression
+    */
+   matchAll(regexp: RegExp): RegExpStringIterator<RegExpExecArray>;
+ 

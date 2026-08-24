@@ -1,0 +1,473 @@
+@@ -1,21 +1,6 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+ /// <reference no-default-lib="true"/>
+ 
+-/// <reference lib="es2015.symbol" />
++/// <reference path="./lib.es2015.symbol.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+@@ -26,34 +11,34 @@ interface SymbolConstructor {
+ }
+ 
+ interface IteratorYieldResult<TYield> {
+-  done?: false;
+-  value: TYield;
++  readonly done?: false;
++  readonly value: TYield;
+ }
+ 
+ interface IteratorReturnResult<TReturn> {
+-  done: true;
+-  value: TReturn;
++  readonly done: true;
++  readonly value: TReturn;
+ }
+ 
+ type IteratorResult<T, TReturn = any> =
+   | IteratorYieldResult<T>
+   | IteratorReturnResult<TReturn>;
+ 
+-interface Iterator<T, TReturn = any, TNext = any> {
++interface Iterator<T, TReturn = any, TNext = unknown> {
+   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
+   next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>;
+   return?(value?: TReturn): IteratorResult<T, TReturn>;
+-  throw?(e?: any): IteratorResult<T, TReturn>;
++  throw?(e?: unknown): IteratorResult<T, TReturn>;
+ }
+ 
+-interface Iterable<T, TReturn = any, TNext = any> {
++interface Iterable<T, TReturn = any, TNext = unknown> {
+   [Symbol.iterator](): Iterator<T, TReturn, TNext>;
+ }
+ 
+ /**
+  * Describes a user-defined {@link Iterator} that is also iterable.
+  */
+-interface IterableIterator<T, TReturn = any, TNext = any> extends Iterator<
++interface IterableIterator<T, TReturn = any, TNext = unknown> extends Iterator<
+   T,
+   TReturn,
+   TNext
+@@ -64,11 +49,11 @@ interface IterableIterator<T, TReturn = any, TNext = any> extends Iterator<
+ /**
+  * Describes an {@link Iterator} produced by the runtime that inherits from the intrinsic `Iterator.prototype`.
+  */
+-interface IteratorObject<
++interface IteratorObject<T, TReturn = any, TNext = unknown> extends Iterator<
+   T,
+-  TReturn = unknown,
+-  TNext = unknown,
+-> extends Iterator<T, TReturn, TNext> {
++  TReturn,
++  TNext
++> {
+   [Symbol.iterator](): IteratorObject<T, TReturn, TNext>;
+ }
+ 
+@@ -93,7 +78,7 @@ interface Array<T> {
+   /**
+    * Returns an iterable of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, T]>;
++  entries(): ArrayIterator<readonly [number, T]>;
+ 
+   /**
+    * Returns an iterable of keys in the array
+@@ -122,7 +107,7 @@ interface ArrayConstructor {
+   from<T, U>(
+     iterable: Iterable<T> | ArrayLike<T>,
+     mapfn: (v: T, k: number) => U,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): U[];
+ }
+ 
+@@ -133,7 +118,7 @@ interface ReadonlyArray<T> {
+   /**
+    * Returns an iterable of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, T]>;
++  entries(): ArrayIterator<readonly [number, T]>;
+ 
+   /**
+    * Returns an iterable of keys in the array
+@@ -148,7 +133,7 @@ interface ReadonlyArray<T> {
+ 
+ interface IArguments {
+   /** Iterator */
+-  [Symbol.iterator](): ArrayIterator<any>;
++  [Symbol.iterator](): ArrayIterator<unknown>;
+ }
+ 
+ interface MapIterator<T> extends IteratorObject<
+@@ -161,12 +146,12 @@ interface MapIterator<T> extends IteratorObject<
+ 
+ interface Map<K, V> {
+   /** Returns an iterable of entries in the map. */
+-  [Symbol.iterator](): MapIterator<[K, V]>;
++  [Symbol.iterator](): MapIterator<readonly [K, V]>;
+ 
+   /**
+    * Returns an iterable of key, value pairs for every entry in the map.
+    */
+-  entries(): MapIterator<[K, V]>;
++  entries(): MapIterator<readonly [K, V]>;
+ 
+   /**
+    * Returns an iterable of keys in the map
+@@ -181,12 +166,12 @@ interface Map<K, V> {
+ 
+ interface ReadonlyMap<K, V> {
+   /** Returns an iterable of entries in the map. */
+-  [Symbol.iterator](): MapIterator<[K, V]>;
++  [Symbol.iterator](): MapIterator<readonly [K, V]>;
+ 
+   /**
+    * Returns an iterable of key, value pairs for every entry in the map.
+    */
+-  entries(): MapIterator<[K, V]>;
++  entries(): MapIterator<readonly [K, V]>;
+ 
+   /**
+    * Returns an iterable of keys in the map
+@@ -200,8 +185,8 @@ interface ReadonlyMap<K, V> {
+ }
+ 
+ interface MapConstructor {
+-  new (): Map<any, any>;
+-  new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
++  new (): Map<never, never>;
++  new <K, V>(iterable?: Iterable<readonly [K, V]>): Map<K, V>;
+ }
+ 
+ interface WeakMap<K extends WeakKey, V> {}
+@@ -226,7 +211,7 @@ interface Set<T> {
+   /**
+    * Returns an iterable of [v,v] pairs for every value `v` in the set.
+    */
+-  entries(): SetIterator<[T, T]>;
++  entries(): SetIterator<readonly [T, T]>;
+   /**
+    * Despite its name, returns an iterable of the values in the set.
+    */
+@@ -245,7 +230,7 @@ interface ReadonlySet<T> {
+   /**
+    * Returns an iterable of [v,v] pairs for every value `v` in the set.
+    */
+-  entries(): SetIterator<[T, T]>;
++  entries(): SetIterator<readonly [T, T]>;
+ 
+   /**
+    * Despite its name, returns an iterable of the values in the set.
+@@ -259,7 +244,8 @@ interface ReadonlySet<T> {
+ }
+ 
+ interface SetConstructor {
+-  new <T>(iterable?: Iterable<T> | null): Set<T>;
++  new (): Set<never>;
++  new <T>(iterable?: Iterable<T>): Set<T>;
+ }
+ 
+ interface WeakSet<T extends WeakKey> {}
+@@ -302,11 +288,11 @@ interface String {
+ }
+ 
+ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+-  [Symbol.iterator](): ArrayIterator<number>;
++  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Int8>;
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, import('ts-type-forge').Int8]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -314,7 +300,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an list of values in the array
+    */
+-  values(): ArrayIterator<number>;
++  values(): ArrayIterator<import('ts-type-forge').Int8>;
+ }
+ 
+ interface Int8ArrayConstructor {
+@@ -326,7 +312,7 @@ interface Int8ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Int8Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Int8Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -335,17 +321,17 @@ interface Int8ArrayConstructor {
+    */
+   from<T>(
+     arrayLike: Iterable<T>,
+-    mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    mapfn?: (v: T, k: number) => import('ts-type-forge').Int8,
++    thisArg?: unknown,
+   ): Int8Array<ArrayBuffer>;
+ }
+ 
+ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+-  [Symbol.iterator](): ArrayIterator<number>;
++  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, import('ts-type-forge').Uint8]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -353,7 +339,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an list of values in the array
+    */
+-  values(): ArrayIterator<number>;
++  values(): ArrayIterator<import('ts-type-forge').Uint8>;
+ }
+ 
+ interface Uint8ArrayConstructor {
+@@ -365,7 +351,7 @@ interface Uint8ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Uint8Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Uint8Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -374,17 +360,17 @@ interface Uint8ArrayConstructor {
+    */
+   from<T>(
+     arrayLike: Iterable<T>,
+-    mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    mapfn?: (v: T, k: number) => import('ts-type-forge').Uint8,
++    thisArg?: unknown,
+   ): Uint8Array<ArrayBuffer>;
+ }
+ 
+ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+-  [Symbol.iterator](): ArrayIterator<number>;
++  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, import('ts-type-forge').Uint8]>;
+ 
+   /**
+    * Returns an list of keys in the array
+@@ -394,7 +380,7 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an list of values in the array
+    */
+-  values(): ArrayIterator<number>;
++  values(): ArrayIterator<import('ts-type-forge').Uint8>;
+ }
+ 
+ interface Uint8ClampedArrayConstructor {
+@@ -406,7 +392,9 @@ interface Uint8ClampedArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Uint8ClampedArray<ArrayBuffer>;
++  from<T extends number>(
++    arrayLike: Iterable<T>,
++  ): Uint8ClampedArray<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -415,8 +403,8 @@ interface Uint8ClampedArrayConstructor {
+    */
+   from<T>(
+     arrayLike: Iterable<T>,
+-    mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    mapfn?: (v: T, k: number) => import('ts-type-forge').Uint8,
++    thisArg?: unknown,
+   ): Uint8ClampedArray<ArrayBuffer>;
+ }
+ 
+@@ -425,7 +413,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+ 
+   /**
+    * Returns an list of keys in the array
+@@ -447,7 +435,7 @@ interface Int16ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Int16Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Int16Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -457,7 +445,7 @@ interface Int16ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Int16Array<ArrayBuffer>;
+ }
+ 
+@@ -466,7 +454,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -486,7 +474,7 @@ interface Uint16ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Uint16Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Uint16Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -496,7 +484,7 @@ interface Uint16ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Uint16Array<ArrayBuffer>;
+ }
+ 
+@@ -505,7 +493,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -525,7 +513,7 @@ interface Int32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Int32Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Int32Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -535,7 +523,7 @@ interface Int32ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Int32Array<ArrayBuffer>;
+ }
+ 
+@@ -544,7 +532,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -564,7 +552,7 @@ interface Uint32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Uint32Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Uint32Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -574,7 +562,7 @@ interface Uint32ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Uint32Array<ArrayBuffer>;
+ }
+ 
+@@ -583,7 +571,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -603,7 +591,7 @@ interface Float32ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Float32Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Float32Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -613,7 +601,7 @@ interface Float32ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Float32Array<ArrayBuffer>;
+ }
+ 
+@@ -622,7 +610,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns an array of key, value pairs for every entry in the array
+    */
+-  entries(): ArrayIterator<[number, number]>;
++  entries(): ArrayIterator<readonly [number, number]>;
+   /**
+    * Returns an list of keys in the array
+    */
+@@ -642,7 +630,7 @@ interface Float64ArrayConstructor {
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: Iterable<number>): Float64Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Float64Array<ArrayBuffer>;
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+@@ -652,6 +640,6 @@ interface Float64ArrayConstructor {
+   from<T>(
+     arrayLike: Iterable<T>,
+     mapfn?: (v: T, k: number) => number,
+-    thisArg?: any,
++    thisArg?: unknown,
+   ): Float64Array<ArrayBuffer>;
+ }

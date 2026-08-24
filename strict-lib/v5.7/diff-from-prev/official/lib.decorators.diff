@@ -1,0 +1,67 @@
+diff --git a/packages/v5.6/temp/copied/lib.decorators.d.ts b/packages/v5.7/temp/copied/lib.decorators.d.ts
+index 1705900..66cab50 100644
+--- a/packages/v5.6/temp/copied/lib.decorators.d.ts
++++ b/packages/v5.7/temp/copied/lib.decorators.d.ts
+@@ -116,9 +116,9 @@ interface ClassMethodDecoratorContext<
+   };
+ 
+   /**
+-   * Adds a callback to be invoked either before static initializers are run (when
+-   * decorating a `static` element), or before instance initializers are run (when
+-   * decorating a non-`static` element).
++   * Adds a callback to be invoked either after static methods are defined but before
++   * static initializers are run (when decorating a `static` element), or before instance
++   * initializers are run (when decorating a non-`static` element).
+    *
+    * @example
+    * ```ts
+@@ -179,9 +179,9 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
+   };
+ 
+   /**
+-   * Adds a callback to be invoked either before static initializers are run (when
+-   * decorating a `static` element), or before instance initializers are run (when
+-   * decorating a non-`static` element).
++   * Adds a callback to be invoked either after static methods are defined but before
++   * static initializers are run (when decorating a `static` element), or before instance
++   * initializers are run (when decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
+ 
+@@ -223,9 +223,9 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
+   };
+ 
+   /**
+-   * Adds a callback to be invoked either before static initializers are run (when
+-   * decorating a `static` element), or before instance initializers are run (when
+-   * decorating a non-`static` element).
++   * Adds a callback to be invoked either after static methods are defined but before
++   * static initializers are run (when decorating a `static` element), or before instance
++   * initializers are run (when decorating a non-`static` element).
+    */
+   addInitializer(initializer: (this: This) => void): void;
+ 
+@@ -276,9 +276,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
+   };
+ 
+   /**
+-   * Adds a callback to be invoked either before static initializers are run (when
+-   * decorating a `static` element), or before instance initializers are run (when
+-   * decorating a non-`static` element).
++   * Adds a callback to be invoked immediately after the auto `accessor` being
++   * decorated is initialized (regardless if the `accessor` is `static` or not).
+    */
+   addInitializer(initializer: (this: This) => void): void;
+ 
+@@ -370,9 +369,8 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
+   };
+ 
+   /**
+-   * Adds a callback to be invoked either before static initializers are run (when
+-   * decorating a `static` element), or before instance initializers are run (when
+-   * decorating a non-`static` element).
++   * Adds a callback to be invoked immediately after the field being decorated
++   * is initialized (regardless if the field is `static` or not).
+    */
+   addInitializer(initializer: (this: This) => void): void;
+ 
