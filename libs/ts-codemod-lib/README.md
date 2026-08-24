@@ -75,6 +75,7 @@ Options:
 
 - `ignorePrefixes`: Array of string prefixes for identifiers that should not be made readonly (default: `['mut_', '#mut_', '_mut_', 'draft']`)
 - `DeepReadonly.typeName`: Custom name for the DeepReadonly type utility (default: `"DeepReadonly"`)
+- `recordStyle`: Output style used when making `Record<K, V>` readonly (default: `"Readonly<Record>"`). `"Readonly<Record>"` uses only built-in utility types (`Readonly<Record<K, V>>`), while `"ReadonlyRecord"` uses the `ReadonlyRecord` type utility provided by `ts-type-forge` (no import statement is added, so it has to be available in the transformed code, e.g. globally via `ts-type-forge`'s `global.d.mts`). Whichever style is selected, `Record<K, V>`, `Readonly<Record<K, V>>`, `ReadonlyRecord<K, V>`, and redundant wrappers such as `Readonly<ReadonlyRecord<K, V>>` are all unified to that style.
 
 Example:
 

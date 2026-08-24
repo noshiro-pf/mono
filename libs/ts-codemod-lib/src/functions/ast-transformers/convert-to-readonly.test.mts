@@ -210,6 +210,230 @@ describe(convertToReadonlyTransformer, () => {
       ])('$name', testFn);
     });
 
+    describe('Records', () => {
+      describe('recordStyle: "Readonly<Record>" (default)', () => {
+        test.each([
+          {
+            name: 'Type alias',
+            source: dedent`
+              type Foo = Record<string, number>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+          },
+          {
+            name: 'Readonly<Record<K, V>> is unchanged',
+            source: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+          },
+          {
+            name: 'ReadonlyRecord<K, V> is unified to Readonly<Record<K, V>>',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+          },
+          {
+            name: 'Redundant Readonly<ReadonlyRecord<K, V>> is normalized',
+            source: dedent`
+              type Foo = Readonly<ReadonlyRecord<string, number>>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+          },
+          {
+            name: 'Value type is converted recursively',
+            source: dedent`
+              type Foo = Record<string, number[]>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, readonly number[]>>
+            `,
+          },
+          {
+            name: 'Value type inside Readonly<Record<K, V>> is converted recursively',
+            source: dedent`
+              type Foo = Readonly<Record<string, number[]>>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, readonly number[]>>
+            `,
+          },
+          {
+            name: 'In type literal member',
+            source: dedent`
+              type Foo = { a: Record<string, number> }
+            `,
+            expected: dedent`
+              type Foo = Readonly<{ a: Readonly<Record<string, number>> }>
+            `,
+          },
+          {
+            name: 'In function args',
+            source: dedent`
+              function foo(a: Record<string, number>, b: Promise<Record<string, number>>) {}
+            `,
+            expected: dedent`
+              function foo(a: Readonly<Record<string, number>>, b: Promise<Readonly<Record<string, number>>>) {}
+            `,
+          },
+          {
+            name: 'DeepReadonly<Record<K, V>> is unchanged',
+            source: dedent`
+              type Foo = DeepReadonly<Record<string, number[]>>
+            `,
+            expected: dedent`
+              type Foo = DeepReadonly<Record<string, number[]>>
+            `,
+          },
+          {
+            name: 'DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>',
+            source: dedent`
+              type Foo = DeepReadonly<ReadonlyRecord<string, number>>
+            `,
+            expected: dedent`
+              type Foo = DeepReadonly<Record<string, number>>
+            `,
+          },
+          {
+            name: 'Record<K, V> under indexed access is kept as is',
+            source: dedent`
+              type Foo = Record<string, number>[string]
+            `,
+            expected: dedent`
+              type Foo = Record<string, number>[string]
+            `,
+          },
+          {
+            name: 'ReadonlyRecord<K, V> under indexed access -> Record<K, V>',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number>[string]
+            `,
+            expected: dedent`
+              type Foo = Record<string, number>[string]
+            `,
+          },
+        ])('$name', testFn);
+      });
+
+      describe('recordStyle: "ReadonlyRecord"', () => {
+        const options = {
+          recordStyle: 'ReadonlyRecord',
+        } as const satisfies ReadonlyTransformerOptions;
+
+        test.each([
+          {
+            name: 'Type alias',
+            source: dedent`
+              type Foo = Record<string, number>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            options,
+          },
+          {
+            name: 'ReadonlyRecord<K, V> is unchanged',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            options,
+          },
+          {
+            name: 'Readonly<Record<K, V>> is unified to ReadonlyRecord<K, V>',
+            source: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            options,
+          },
+          {
+            name: 'Redundant Readonly<ReadonlyRecord<K, V>> is normalized',
+            source: dedent`
+              type Foo = Readonly<ReadonlyRecord<string, number>>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+            options,
+          },
+          {
+            name: 'Value type is converted recursively',
+            source: dedent`
+              type Foo = Record<string, number[]>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, readonly number[]>
+            `,
+            options,
+          },
+          {
+            name: 'Value type inside ReadonlyRecord<K, V> is converted recursively',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number[]>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, readonly number[]>
+            `,
+            options,
+          },
+          {
+            name: 'In type literal member',
+            source: dedent`
+              type Foo = { a: Record<string, number> }
+            `,
+            expected: dedent`
+              type Foo = Readonly<{ a: ReadonlyRecord<string, number> }>
+            `,
+            options,
+          },
+          {
+            name: 'DeepReadonly<Record<K, V>> is unchanged',
+            source: dedent`
+              type Foo = DeepReadonly<Record<string, number[]>>
+            `,
+            expected: dedent`
+              type Foo = DeepReadonly<Record<string, number[]>>
+            `,
+            options,
+          },
+          {
+            name: 'DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>',
+            source: dedent`
+              type Foo = DeepReadonly<ReadonlyRecord<string, number>>
+            `,
+            expected: dedent`
+              type Foo = DeepReadonly<Record<string, number>>
+            `,
+            options,
+          },
+          {
+            name: 'ReadonlyRecord<K, V> under indexed access -> Record<K, V>',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number>[string]
+            `,
+            expected: dedent`
+              type Foo = Record<string, number>[string]
+            `,
+            options,
+          },
+        ])('$name', testFn);
+      });
+    });
+
     describe('Normalize `Readonly` wrappers', () => {
       test.each([
         {

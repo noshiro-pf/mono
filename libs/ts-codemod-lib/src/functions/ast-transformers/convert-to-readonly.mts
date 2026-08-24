@@ -65,6 +65,7 @@ export const convertToReadonlyTransformer = (
     },
     ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
     ignoredPrefixes: ignorePrefixes,
+    recordStyle: options?.recordStyle ?? 'Readonly<Record>',
     debugPrint: options?.debug === true ? console.debug : () => {},
     replaceNode:
       options?.debug === true
@@ -137,6 +138,25 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    */
   ignorePrefixes?: string[];
 
+  /**
+   * The output style used when making `Record<K, V>` readonly.
+   *
+   * - `"Readonly<Record>"`: Uses only built-in utility types
+   *   (`Readonly<Record<K, V>>`). Occurrences of `ReadonlyRecord<K, V>` are
+   *   also unified to `Readonly<Record<K, V>>`.
+   * - `"ReadonlyRecord"`: Uses the `ReadonlyRecord` type utility provided by
+   *   `ts-type-forge`. Occurrences of `Readonly<Record<K, V>>` are also
+   *   unified to `ReadonlyRecord<K, V>`. Note that no import statement is
+   *   added, so `ReadonlyRecord` has to be available in the transformed code
+   *   (e.g. globally via `ts-type-forge`'s `global.d.mts`).
+   *
+   * Whichever style is selected, redundant wrappers such as
+   * `Readonly<ReadonlyRecord<K, V>>` are normalized to that style as well.
+   *
+   * @default 'Readonly<Record>'
+   */
+  recordStyle?: 'Readonly<Record>' | 'ReadonlyRecord';
+
   debug?: boolean;
 }>;
 
@@ -151,6 +171,8 @@ type ReadonlyTransformerOptionsInternal = Readonly<{
   ignoreEmptyObjectTypes: boolean;
 
   ignoredPrefixes: ISet<string>;
+
+  recordStyle: 'Readonly<Record>' | 'ReadonlyRecord';
 
   debugPrint: (...args: readonly unknown[]) => void;
   replaceNode: (node: tsm.Node, newNodeText: string) => void;
@@ -398,6 +420,10 @@ const transformNode = (
  * - `tr(Readonly<readonly E[]>) |-> readonly tr(E)[]`
  * - `tr(Readonly<readonly [E1, E2, E3]>) |-> readonly [tr(E1), tr(E2), tr(E3)]`
  * - `tr(Readonly<A | readonly E[]>) |-> Readonly<tr(A)> | readonly tr(E)[]>`
+ * - `tr(Record<K, V>) |-> Readonly<Record<tr(K), tr(V)>>` (or
+ *   `ReadonlyRecord<tr(K), tr(V)>`, depending on the `recordStyle` option;
+ *   `Readonly<Record<K, V>>`, `ReadonlyRecord<K, V>` and
+ *   `Readonly<ReadonlyRecord<K, V>>` are unified to the same style)
  */
 const transformTypeReferenceNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -501,6 +527,93 @@ const transformTypeReferenceNode = (
     return;
   }
 
+  // Record<K, V> to ReadonlyRecord<K, V> / Readonly<Record<K, V>>
+  if (typeNameStr === 'Record') {
+    if (!Arr.isFixedLengthArray(2, typeArguments)) {
+      throw new Error(
+        `Unexpected number of type arguments "${typeArguments.length}" for Record.`,
+      );
+    }
+
+    const nextReadonlyContextValue = nextReadonlyContext({
+      currentReadonlyContext: readonlyContext,
+      nextReadonlyContextType: 'none',
+      indexedAccessDepthChange: 'keep',
+    });
+
+    // Recursive processing
+    for (const t of typeArguments) {
+      transformNode(t, nextReadonlyContextValue, options);
+    }
+
+    // The bare Record is kept as is in the following cases:
+    // - DeepReadonly<Record<K, V>> already applies readonly recursively.
+    // - Readonly<Record<K, V>> is unified to the configured record style by
+    //   the surrounding `Readonly` handler.
+    // - Record<K, V>[I] does not need readonly, just like
+    //   `Readonly<{ ... }>[I] -> { ... }[I]`.
+    if (
+      readonlyContext.type === 'none' &&
+      readonlyContext.indexedAccessDepth === 0
+    ) {
+      const [K, V] = node.getTypeArguments();
+
+      options.replaceNode(
+        node,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        readonlyRecordText(K!.getFullText(), V!.getFullText(), options),
+      );
+    }
+
+    return;
+  }
+
+  // Unify ReadonlyRecord<K, V> to the configured record style
+  if (typeNameStr === 'ReadonlyRecord') {
+    if (!Arr.isFixedLengthArray(2, typeArguments)) {
+      throw new Error(
+        `Unexpected number of type arguments "${typeArguments.length}" for ReadonlyRecord.`,
+      );
+    }
+
+    const nextReadonlyContextValue = nextReadonlyContext({
+      currentReadonlyContext: readonlyContext,
+      nextReadonlyContextType: 'none',
+      indexedAccessDepthChange: 'keep',
+    });
+
+    // Recursive processing
+    for (const t of typeArguments) {
+      transformNode(t, nextReadonlyContextValue, options);
+    }
+
+    const [K, V] = node.getTypeArguments();
+
+    const bareRecordText =
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      `Record<${K!.getFullText()}, ${V!.getFullText()}>` as const;
+
+    // DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>
+    // Readonly<ReadonlyRecord<K, V>> -> Readonly<Record<K, V>>
+    //   (the surrounding `Readonly` handler then unifies it to the configured
+    //   record style)
+    // ReadonlyRecord<K, V>[I] -> Record<K, V>[I]
+    if (
+      readonlyContext.type !== 'none' ||
+      readonlyContext.indexedAccessDepth > 0
+    ) {
+      options.replaceNode(node, bareRecordText);
+
+      return;
+    }
+
+    if (options.recordStyle === 'Readonly<Record>') {
+      options.replaceNode(node, `Readonly<${bareRecordText}>`);
+    }
+
+    return;
+  }
+
   // remove unnecessary `Readonly` wrapper or convert to readonly operator
   if (typeNameStr === 'Readonly') {
     if (!Arr.isFixedLengthArray(1, typeArguments)) {
@@ -549,6 +662,28 @@ const transformTypeReferenceNode = (
       options.replaceNode(node, T.getFullText());
 
       return;
+    }
+
+    // Readonly<Record<K, V>> -> the configured record style
+    // (`ReadonlyRecord<K, V>` or `Readonly<Record<K, V>>` as is)
+    if (
+      T.isKind(tsm.SyntaxKind.TypeReference) &&
+      T.getTypeName().getText() === 'Record'
+    ) {
+      const recordTypeArguments = T.getTypeArguments();
+
+      if (Arr.isFixedLengthArray(2, recordTypeArguments)) {
+        options.replaceNode(
+          node,
+          readonlyRecordText(
+            recordTypeArguments[0].getFullText(),
+            recordTypeArguments[1].getFullText(),
+            options,
+          ),
+        );
+
+        return;
+      }
     }
 
     // T = E[]
@@ -684,6 +819,16 @@ const transformTypeReferenceNode = (
     }
   }
 };
+
+/** Renders a readonly `Record<K, V>` in the configured record style. */
+const readonlyRecordText = (
+  keyText: string,
+  valueText: string,
+  options: ReadonlyTransformerOptionsInternal,
+): string =>
+  options.recordStyle === 'ReadonlyRecord'
+    ? `ReadonlyRecord<${keyText}, ${valueText}>`
+    : `Readonly<Record<${keyText}, ${valueText}>>`;
 
 /** `tr(E[]) |-> tr(E)[]` */
 const transformArrayTypeNode = (

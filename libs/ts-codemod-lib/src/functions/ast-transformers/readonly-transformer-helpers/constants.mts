@@ -9,4 +9,6 @@ export const invalidDeepReadonlyTypeName = ISet.create([
   'Map',
   'ReadonlySet',
   'ReadonlyMap',
+  'Record',
+  'ReadonlyRecord',
 ]);
