@@ -36,12 +36,9 @@ declare namespace Temporal {
   type ZonedDateTimeLike = ZonedDateTime | ZonedDateTimeLikeObject | string;
 
   type PartialTemporalLike<T extends object> = {
-    readonly [
-      P in import('ts-type-forge').RelaxedExclude<
-        keyof T,
-        'calendar' | 'timeZone'
-      >
-    ]?: T[P] | undefined;
+    readonly [P in Exclude<keyof T, 'calendar' | 'timeZone'>]?:
+      | T[P]
+      | undefined;
   };
 
   interface DateLikeObject {

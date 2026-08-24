@@ -33,9 +33,5 @@ export const convertLibDom =
             '// readonly className: unknown;',
           ),
         }),
-        replaceWithNoMatchCheck(
-          'Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>',
-          'RelaxedExclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>',
-        ),
       ),
     ).value;

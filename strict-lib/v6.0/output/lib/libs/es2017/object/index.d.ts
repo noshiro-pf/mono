@@ -44,8 +44,7 @@ declare namespace StrictLibInternals {
                 ToStr<keyof PickByValue<R, R[K]>>,
                 R[K],
               ];
-              // eslint-disable-next-line @typescript-eslint/no-restricted-types
-            }[import('ts-type-forge').RelaxedExclude<keyof R, symbol>]
+            }[Exclude<keyof R, symbol>]
         )[]
       : never;
 }

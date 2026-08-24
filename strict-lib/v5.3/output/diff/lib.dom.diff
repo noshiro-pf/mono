@@ -13500,15 +13500,8 @@
    video: HTMLVideoElement;
    wbr: HTMLElement;
  }
-@@ -33176,16 +33502,19 @@ interface MathMLElementTagNameMap {
- type ElementTagNameMap = HTMLElementTagNameMap &
-   Pick<
-     SVGElementTagNameMap,
--    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
-+    import('ts-type-forge').RelaxedExclude<
-+      keyof SVGElementTagNameMap,
-+      keyof HTMLElementTagNameMap
-+    >
+@@ -33179,13 +33505,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+     Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
 -declare var Audio: {
@@ -13524,7 +13517,7 @@
    new (
      text?: string,
      value?: string,
-@@ -33198,112 +33527,114 @@ declare var Option: {
+@@ -33198,112 +33524,114 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -13667,7 +13660,7 @@
  /**
   * Refers to either the parent WindowProxy, or itself.
   *
-@@ -33311,63 +33642,63 @@ declare var pageYOffset: number;
+@@ -33311,63 +33639,63 @@ declare var pageYOffset: number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/parent)
   */
@@ -13750,7 +13743,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/blur) */
  declare function blur(): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
-@@ -33425,12 +33756,12 @@ declare function open(
+@@ -33425,12 +33753,12 @@ declare function open(
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
  declare function postMessage(
@@ -13766,7 +13759,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/print) */
-@@ -33482,175 +33813,177 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
+@@ -33482,175 +33810,177 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event)
   */
@@ -13984,7 +13977,7 @@
  /**
   * Fires when the user presses an alphanumeric key.
   * @param ev The event.
-@@ -33658,45 +33991,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
+@@ -33658,45 +33988,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keypress_event)
   */
@@ -14038,7 +14031,7 @@
    | null;
  /**
   * Fires when the user clicks the object with either mouse button.
-@@ -33704,113 +34037,127 @@ declare var onlostpointercapture:
+@@ -33704,113 +34034,127 @@ declare var onlostpointercapture:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/mousedown_event)
   */
@@ -14193,7 +14186,7 @@
    | null;
  /**
   * Occurs when the seek operation ends.
-@@ -33818,87 +34165,87 @@ declare var onsecuritypolicyviolation:
+@@ -33818,87 +34162,87 @@ declare var onsecuritypolicyviolation:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/seeked_event)
   */
@@ -14308,7 +14301,7 @@
    | null;
  /**
   * Occurs when the volume is changed, or playback is muted or unmuted.
-@@ -33906,108 +34253,122 @@ declare var ontransitionstart:
+@@ -33906,108 +34250,122 @@ declare var ontransitionstart:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/volumechange_event)
   */
@@ -14470,7 +14463,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/btoa) */
-@@ -34037,29 +34398,29 @@ declare function fetch(
+@@ -34037,29 +34395,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
@@ -14506,7 +14499,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -34069,7 +34430,7 @@ declare function addEventListener(
+@@ -34069,7 +34427,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -14515,7 +14508,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -34104,16 +34465,19 @@ type CanvasImageSource =
+@@ -34104,16 +34462,19 @@ type CanvasImageSource =
    | OffscreenCanvas
    | VideoFrame;
  type ClipboardItemData = Promise<string | Blob>;
@@ -14538,7 +14531,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -34130,10 +34494,18 @@ type GLuint64 = number;
+@@ -34130,10 +34491,18 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -14560,7 +14553,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -34148,7 +34520,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
+@@ -34148,7 +34517,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
@@ -14569,7 +14562,7 @@
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -34163,7 +34535,7 @@ type RenderingContext =
+@@ -34163,7 +34532,7 @@ type RenderingContext =
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
    | WebGL2RenderingContext;
@@ -14578,7 +14571,7 @@
  type RequestInfo = Request | string;
  type TexImageSource =
    | ImageBitmap
-@@ -34183,8 +34555,8 @@ type Transferable =
+@@ -34183,8 +34552,8 @@ type Transferable =
    | TransformStream
    | VideoFrame
    | ArrayBuffer;

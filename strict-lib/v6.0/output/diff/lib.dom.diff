@@ -15006,15 +15006,8 @@
    video: HTMLVideoElement;
    wbr: HTMLElement;
  }
-@@ -49770,16 +50116,19 @@ interface MathMLElementTagNameMap {
- type ElementTagNameMap = HTMLElementTagNameMap &
-   Pick<
-     SVGElementTagNameMap,
--    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
-+    import('ts-type-forge').RelaxedExclude<
-+      keyof SVGElementTagNameMap,
-+      keyof HTMLElementTagNameMap
-+    >
+@@ -49773,13 +50119,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+     Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
 -declare var Audio: {
@@ -15030,7 +15023,7 @@
    new (
      text?: string,
      value?: string,
-@@ -49792,105 +50141,105 @@ declare var Option: {
+@@ -49792,105 +50138,105 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -15153,7 +15146,7 @@
  /**
   * The **`Window.name`** property gets/sets the name of the window's browsing context.
   *
-@@ -49903,193 +50252,195 @@ declare const name: void;
+@@ -49903,193 +50249,195 @@ declare const name: void;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigation)
   */
@@ -15384,7 +15377,7 @@
  /**
   * The **`Window.blur()`** method does nothing.
   * @deprecated
-@@ -50177,12 +50528,12 @@ declare function open(
+@@ -50177,12 +50525,12 @@ declare function open(
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
  declare function postMessage(
@@ -15400,7 +15393,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /**
-@@ -50264,341 +50615,377 @@ declare function cancelAnimationFrame(handle: number): void;
+@@ -50264,341 +50612,377 @@ declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event) */
@@ -15928,7 +15921,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -50628,29 +51015,29 @@ declare function fetch(
+@@ -50628,29 +51012,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/reportError) */
@@ -15964,7 +15957,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -50660,7 +51047,7 @@ declare function addEventListener(
+@@ -50660,7 +51044,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -15973,7 +15966,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -50697,21 +51084,24 @@ type CanvasImageSource =
+@@ -50697,21 +51081,24 @@ type CanvasImageSource =
    | OffscreenCanvas
    | VideoFrame;
  type ClipboardItemData = Promise<string | Blob>;
@@ -16002,7 +15995,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -50734,7 +51124,7 @@ type GPUBindingResource =
+@@ -50734,7 +51121,7 @@ type GPUBindingResource =
    | GPUExternalTexture;
  type GPUBufferDynamicOffset = number;
  type GPUBufferUsageFlags = number;
@@ -16011,7 +16004,7 @@
  type GPUColorWriteFlags = number;
  type GPUCopyExternalImageSource =
    | ImageBitmap
-@@ -50745,14 +51135,14 @@ type GPUCopyExternalImageSource =
+@@ -50745,14 +51132,14 @@ type GPUCopyExternalImageSource =
    | HTMLCanvasElement
    | OffscreenCanvas;
  type GPUDepthBias = number;
@@ -16029,7 +16022,7 @@
  type GPUPipelineConstantValue = number;
  type GPUSampleMask = number;
  type GPUShaderStageFlags = number;
-@@ -50766,12 +51156,20 @@ type GPUTextureUsageFlags = number;
+@@ -50766,12 +51153,20 @@ type GPUTextureUsageFlags = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -16053,7 +16046,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -50787,7 +51185,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
+@@ -50787,7 +51182,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
@@ -16062,7 +16055,7 @@
  type PublicKeyCredentialClientCapabilities = Record<string, boolean>;
  type RTCRtpReceiverTransform = RTCRtpScriptTransform;
  type RTCRtpSenderTransform = RTCRtpScriptTransform;
-@@ -50806,7 +51204,7 @@ type RenderingContext =
+@@ -50806,7 +51201,7 @@ type RenderingContext =
    | WebGLRenderingContext
    | WebGL2RenderingContext
    | GPUCanvasContext;
@@ -16071,7 +16064,7 @@
  type RequestInfo = Request | string;
  type SanitizerAttribute = string | SanitizerAttributeNamespace;
  type SanitizerElement = string | SanitizerElementNamespace;
-@@ -50836,8 +51234,8 @@ type Transferable =
+@@ -50836,8 +51231,8 @@ type Transferable =
    | RTCDataChannel
    | ArrayBuffer;
  type URLPatternInput = string | URLPatternInit;
@@ -16082,7 +16075,7 @@
  type WindowProxy = Window;
  type XMLHttpRequestBodyInit =
    | Blob
-@@ -51704,7 +52102,7 @@ interface CSSKeyframesRule {
+@@ -51704,7 +52099,7 @@ interface CSSKeyframesRule {
  
  interface CSSNumericArray {
    [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
@@ -16091,7 +16084,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSNumericValue>;
  }
-@@ -51719,14 +52117,14 @@ interface CSSStyleDeclaration {
+@@ -51719,14 +52114,14 @@ interface CSSStyleDeclaration {
  
  interface CSSTransformValue {
    [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
@@ -16108,7 +16101,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSUnparsedSegment>;
  }
-@@ -51783,7 +52181,7 @@ interface DOMStringList {
+@@ -51783,7 +52178,7 @@ interface DOMStringList {
  
  interface DOMTokenList {
    [Symbol.iterator](): ArrayIterator<string>;
@@ -16117,7 +16110,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<string>;
  }
-@@ -52013,13 +52411,13 @@ interface MediaList {
+@@ -52013,13 +52408,13 @@ interface MediaList {
    [Symbol.iterator](): ArrayIterator<string>;
  }
  
@@ -16133,7 +16126,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -52057,7 +52455,7 @@ interface Navigator {
+@@ -52057,7 +52452,7 @@ interface Navigator {
  interface NodeList {
    [Symbol.iterator](): ArrayIterator<Node>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -16142,7 +16135,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -52067,7 +52465,7 @@ interface NodeList {
+@@ -52067,7 +52462,7 @@ interface NodeList {
  interface NodeListOf<TNode extends Node> {
    [Symbol.iterator](): ArrayIterator<TNode>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -16151,7 +16144,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -52091,7 +52489,7 @@ interface RTCRtpTransceiver {
+@@ -52091,7 +52486,7 @@ interface RTCRtpTransceiver {
    setCodecPreferences(codecs: Iterable<RTCRtpCodec>): void;
  }
  
@@ -16160,7 +16153,7 @@
  
  interface SVGLengthList {
    [Symbol.iterator](): ArrayIterator<SVGLength>;
-@@ -52388,7 +52786,7 @@ interface WebGL2RenderingContextBase {
+@@ -52388,7 +52783,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,
@@ -16169,7 +16162,7 @@
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getUniformIndices) */
    getUniformIndices(
      program: WebGLProgram,
-@@ -52657,7 +53055,7 @@ interface ReadableStreamAsyncIterator<T> extends AsyncIteratorObject<
+@@ -52657,7 +53052,7 @@ interface ReadableStreamAsyncIterator<T> extends AsyncIteratorObject<
    [Symbol.asyncIterator](): ReadableStreamAsyncIterator<T>;
  }
  

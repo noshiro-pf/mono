@@ -23,17 +23,14 @@
  
  declare namespace Temporal {
    type CalendarLike =
-@@ -51,48 +36,53 @@ declare namespace Temporal {
+@@ -51,48 +36,50 @@ declare namespace Temporal {
    type ZonedDateTimeLike = ZonedDateTime | ZonedDateTimeLikeObject | string;
  
    type PartialTemporalLike<T extends object> = {
 -    [P in Exclude<keyof T, 'calendar' | 'timeZone'>]?: T[P] | undefined;
-+    readonly [
-+      P in import('ts-type-forge').RelaxedExclude<
-+        keyof T,
-+        'calendar' | 'timeZone'
-+      >
-+    ]?: T[P] | undefined;
++    readonly [P in Exclude<keyof T, 'calendar' | 'timeZone'>]?:
++      | T[P]
++      | undefined;
    };
  
    interface DateLikeObject {
@@ -103,7 +100,7 @@
    }
  
    type DateUnit = 'year' | 'month' | 'week' | 'day';
-@@ -106,34 +96,39 @@ declare namespace Temporal {
+@@ -106,34 +93,39 @@ declare namespace Temporal {
    type PluralizeUnit<T extends DateUnit | TimeUnit> =
      | T
      | {
@@ -159,7 +156,7 @@
        | 'ceil'
        | 'floor'
        | 'expand'
-@@ -149,7 +144,7 @@ declare namespace Temporal {
+@@ -149,7 +141,7 @@ declare namespace Temporal {
    interface RoundingOptionsWithLargestUnit<
      Units extends DateUnit | TimeUnit,
    > extends RoundingOptions<Units> {
@@ -168,7 +165,7 @@
    }
  
    interface ToStringRoundingOptions<
-@@ -159,7 +154,7 @@ declare namespace Temporal {
+@@ -159,7 +151,7 @@ declare namespace Temporal {
    interface ToStringRoundingOptionsWithFractionalSeconds<
      Units extends DateUnit | TimeUnit,
    > extends ToStringRoundingOptions<Units> {
@@ -177,7 +174,7 @@
        | 'auto'
        | 0
        | 1
-@@ -184,12 +179,17 @@ declare namespace Temporal {
+@@ -184,12 +176,17 @@ declare namespace Temporal {
    }
  
    interface PlainDateToStringOptions {
@@ -198,7 +195,7 @@
    }
  
    interface PlainDate {
-@@ -251,7 +251,7 @@ declare namespace Temporal {
+@@ -251,7 +248,7 @@ declare namespace Temporal {
      from(item: PlainDateLike, options?: OverflowOptions): PlainDate;
      compare(one: PlainDateLike, two: PlainDateLike): number;
    }
@@ -207,7 +204,7 @@
  
    interface PlainTimeToStringOptions extends ToStringRoundingOptionsWithFractionalSeconds<
      Exclude<TimeUnit, 'hour'>
-@@ -304,7 +304,7 @@ declare namespace Temporal {
+@@ -304,7 +301,7 @@ declare namespace Temporal {
      from(item: PlainTimeLike, options?: OverflowOptions): PlainTime;
      compare(one: PlainTimeLike, two: PlainTimeLike): number;
    }
@@ -216,7 +213,7 @@
  
    interface PlainDateTimeToStringOptions
      extends PlainDateToStringOptions, PlainTimeToStringOptions {}
-@@ -384,16 +384,16 @@ declare namespace Temporal {
+@@ -384,16 +381,16 @@ declare namespace Temporal {
      from(item: PlainDateTimeLike, options?: OverflowOptions): PlainDateTime;
      compare(one: PlainDateTimeLike, two: PlainDateTimeLike): number;
    }
@@ -237,7 +234,7 @@
    }
  
    interface ZonedDateTime {
-@@ -475,10 +475,10 @@ declare namespace Temporal {
+@@ -475,10 +472,10 @@ declare namespace Temporal {
      ): ZonedDateTime;
      compare(one: ZonedDateTimeLike, two: ZonedDateTimeLike): number;
    }
@@ -250,7 +247,7 @@
    }
  
    interface DurationRoundingOptions
-@@ -491,7 +491,7 @@ declare namespace Temporal {
+@@ -491,7 +488,7 @@ declare namespace Temporal {
    > {}
  
    interface DurationTotalOptions extends DurationRelativeToOptions {
@@ -259,7 +256,7 @@
    }
  
    interface Duration {
-@@ -547,10 +547,10 @@ declare namespace Temporal {
+@@ -547,10 +544,10 @@ declare namespace Temporal {
        options?: DurationRelativeToOptions,
      ): number;
    }
@@ -272,7 +269,7 @@
    }
  
    interface Instant {
-@@ -588,10 +588,10 @@ declare namespace Temporal {
+@@ -588,10 +585,10 @@ declare namespace Temporal {
      fromEpochNanoseconds(epochNanoseconds: bigint): Instant;
      compare(one: InstantLike, two: InstantLike): number;
    }
@@ -285,7 +282,7 @@
    }
  
    interface PlainYearMonth {
-@@ -642,12 +642,12 @@ declare namespace Temporal {
+@@ -642,12 +639,12 @@ declare namespace Temporal {
      from(item: PlainYearMonthLike, options?: OverflowOptions): PlainYearMonth;
      compare(one: PlainYearMonthLike, two: PlainYearMonthLike): number;
    }
@@ -302,7 +299,7 @@
    }
  
    interface PlainMonthDay {
-@@ -680,5 +680,5 @@ declare namespace Temporal {
+@@ -680,5 +677,5 @@ declare namespace Temporal {
      readonly prototype: PlainMonthDay;
      from(item: PlainMonthDayLike, options?: OverflowOptions): PlainMonthDay;
    }

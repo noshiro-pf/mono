@@ -57,8 +57,7 @@ export const convertLibEs2017Object =
                           ToStr<keyof PickByValue<R, R[K]>>,
                           R[K],
                         ];
-                        // eslint-disable-next-line @typescript-eslint/no-restricted-types
-                      }[RelaxedExclude<keyof R, symbol>]
+                      }[Exclude<keyof R, symbol>]
                   )[]
                 : never;
             }

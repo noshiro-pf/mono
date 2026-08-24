@@ -424,21 +424,6 @@ export const convert = (
               case 'lib.esnext.iterator.d.ts':
                 return convertLibEsNextIterator(options);
 
-              case 'lib.esnext.temporal.d.ts':
-                // This lib narrows `Exclude<T, U>` to `Exclude<T, U extends T>`,
-                // and upstream's `PartialTemporalLike` subtracts a literal key
-                // union from a still-generic `keyof T` — which the narrowed
-                // constraint rejects (TS2344), since TypeScript cannot prove the
-                // union is a subset of a `keyof T` it has not resolved yet.
-                // ts-type-forge's `RelaxedExclude` is the unconstrained form, so
-                // it expresses the same type and satisfies nothing extra.
-                // (`rewrite-ts-type-forge-refs.mts` turns the bare reference
-                // into an `import('ts-type-forge')` one.)
-                return replaceWithNoMatchCheck(
-                  `[P in Exclude<keyof T, 'calendar' | 'timeZone'>]?:`,
-                  `[P in RelaxedExclude<keyof T, 'calendar' | 'timeZone'>]?:`,
-                );
-
               case 'lib.esnext.array.d.ts':
                 // TS 5.7 added an `index: number` parameter to `Array.fromAsync`'s
                 // mapFn; pre-5.7 lib has no index parameter so this rule is a no-op

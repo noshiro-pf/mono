@@ -12374,15 +12374,8 @@
    video: HTMLVideoElement;
    wbr: HTMLElement;
  }
-@@ -23949,16 +24269,19 @@ interface MathMLElementTagNameMap {
- type ElementTagNameMap = HTMLElementTagNameMap &
-   Pick<
-     SVGElementTagNameMap,
--    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
-+    import('ts-type-forge').RelaxedExclude<
-+      keyof SVGElementTagNameMap,
-+      keyof HTMLElementTagNameMap
-+    >
+@@ -23952,13 +24272,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+     Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
 -declare var Audio: {
@@ -12398,7 +12391,7 @@
    new (
      text?: string,
      value?: string,
-@@ -23967,79 +24290,81 @@ declare var Option: {
+@@ -23967,79 +24287,81 @@ declare var Option: {
    ): HTMLOptionElement;
  };
  /** @deprecated This is a legacy alias of `navigator`. */
@@ -12527,7 +12520,7 @@
  declare function blur(): void;
  declare function cancelIdleCallback(handle: number): void;
  /** @deprecated */
-@@ -24074,12 +24399,12 @@ declare function open(
+@@ -24074,12 +24396,12 @@ declare function open(
   * Throws a "DataCloneError" DOMException if transfer array contains duplicate objects or if message could not be cloned.
   */
  declare function postMessage(
@@ -12543,7 +12536,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  declare function print(): void;
-@@ -24109,352 +24434,382 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
+@@ -24109,352 +24431,382 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
   * Fires when the user aborts the download.
   * @param ev The event.
   */
@@ -13066,7 +13059,7 @@
  declare function atob(data: string): string;
  declare function btoa(data: string): string;
  declare function clearInterval(id: number | undefined): void;
-@@ -24476,25 +24831,25 @@ declare function fetch(
+@@ -24476,25 +24828,25 @@ declare function fetch(
    init?: RequestInit,
  ): Promise<Response>;
  declare function queueMicrotask(callback: VoidFunction): void;
@@ -13099,7 +13092,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -24504,7 +24859,7 @@ declare function addEventListener(
+@@ -24504,7 +24856,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -13108,7 +13101,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -24527,15 +24882,18 @@ type CanvasImageSource =
+@@ -24527,15 +24879,18 @@ type CanvasImageSource =
    | ImageBitmap
    | OffscreenCanvas;
  type ClipboardItemData = Promise<string | Blob>;
@@ -13130,7 +13123,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -24552,10 +24910,18 @@ type GLuint64 = number;
+@@ -24552,10 +24907,18 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -13152,7 +13145,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -24568,7 +24934,7 @@ type OffscreenRenderingContext =
+@@ -24568,7 +24931,7 @@ type OffscreenRenderingContext =
    | WebGL2RenderingContext;
  type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -13161,7 +13154,7 @@
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -24600,8 +24966,8 @@ type Transferable =
+@@ -24600,8 +24963,8 @@ type Transferable =
    | WritableStream
    | TransformStream
    | ArrayBuffer;

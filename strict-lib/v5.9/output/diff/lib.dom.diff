@@ -14108,15 +14108,8 @@
    video: HTMLVideoElement;
    wbr: HTMLElement;
  }
-@@ -44563,16 +44909,19 @@ interface MathMLElementTagNameMap {
- type ElementTagNameMap = HTMLElementTagNameMap &
-   Pick<
-     SVGElementTagNameMap,
--    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
-+    import('ts-type-forge').RelaxedExclude<
-+      keyof SVGElementTagNameMap,
-+      keyof HTMLElementTagNameMap
-+    >
+@@ -44566,13 +44912,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+     Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
 -declare var Audio: {
@@ -14132,7 +14125,7 @@
    new (
      text?: string,
      value?: string,
-@@ -44585,105 +44934,105 @@ declare var Option: {
+@@ -44585,105 +44931,105 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -14255,7 +14248,7 @@
  /**
   * The `Window.name` property gets/sets the name of the window's browsing context.
   *
-@@ -44696,187 +45045,189 @@ declare const name: void;
+@@ -44696,187 +45042,189 @@ declare const name: void;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -14479,7 +14472,7 @@
  /**
   * The **`Window.blur()`** method does nothing.
   * @deprecated
-@@ -44964,12 +45315,12 @@ declare function open(
+@@ -44964,12 +45312,12 @@ declare function open(
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
  declare function postMessage(
@@ -14495,7 +14488,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /**
-@@ -45051,337 +45402,373 @@ declare function cancelAnimationFrame(handle: number): void;
+@@ -45051,337 +45399,373 @@ declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event) */
@@ -15017,7 +15010,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -45411,29 +45798,29 @@ declare function fetch(
+@@ -45411,29 +45795,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/reportError) */
@@ -15053,7 +15046,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -45443,7 +45830,7 @@ declare function addEventListener(
+@@ -45443,7 +45827,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -15062,7 +15055,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -45480,17 +45867,20 @@ type CanvasImageSource =
+@@ -45480,17 +45864,20 @@ type CanvasImageSource =
    | OffscreenCanvas
    | VideoFrame;
  type ClipboardItemData = Promise<string | Blob>;
@@ -15087,7 +15080,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -45507,12 +45897,20 @@ type GLuint64 = number;
+@@ -45507,12 +45894,20 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -15111,7 +15104,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -45527,9 +45925,9 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
+@@ -45527,9 +45922,9 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
@@ -15123,7 +15116,7 @@
  type RTCRtpTransform = RTCRtpScriptTransform;
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -45545,7 +45943,7 @@ type RenderingContext =
+@@ -45545,7 +45940,7 @@ type RenderingContext =
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
    | WebGL2RenderingContext;
@@ -15132,7 +15125,7 @@
  type RequestInfo = Request | string;
  type TexImageSource =
    | ImageBitmap
-@@ -45568,8 +45966,8 @@ type Transferable =
+@@ -45568,8 +45963,8 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;

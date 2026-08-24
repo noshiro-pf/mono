@@ -13677,15 +13677,8 @@
    video: HTMLVideoElement;
    wbr: HTMLElement;
  }
-@@ -33074,16 +33404,19 @@ interface MathMLElementTagNameMap {
- type ElementTagNameMap = HTMLElementTagNameMap &
-   Pick<
-     SVGElementTagNameMap,
--    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
-+    import('ts-type-forge').RelaxedExclude<
-+      keyof SVGElementTagNameMap,
-+      keyof HTMLElementTagNameMap
-+    >
+@@ -33077,13 +33407,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+     Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
 -declare var Audio: {
@@ -13701,7 +13694,7 @@
    new (
      text?: string,
      value?: string,
-@@ -33096,120 +33429,122 @@ declare var Option: {
+@@ -33096,120 +33426,122 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -13854,7 +13847,7 @@
  /**
   * Refers to either the parent WindowProxy, or itself.
   *
-@@ -33217,63 +33552,63 @@ declare var pageYOffset: number;
+@@ -33217,63 +33549,63 @@ declare var pageYOffset: number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/parent)
   */
@@ -13937,7 +13930,7 @@
  /**
   * @deprecated
   *
-@@ -33335,12 +33670,12 @@ declare function open(
+@@ -33335,12 +33667,12 @@ declare function open(
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
  declare function postMessage(
@@ -13953,7 +13946,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/print) */
-@@ -33394,181 +33729,183 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
+@@ -33394,181 +33726,183 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event)
   */
@@ -14180,7 +14173,7 @@
  /**
   * Fires when the user presses an alphanumeric key.
   * @param ev The event.
-@@ -33576,45 +33913,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
+@@ -33576,45 +33910,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keypress_event)
   */
@@ -14234,7 +14227,7 @@
    | null;
  /**
   * Fires when the user clicks the object with either mouse button.
-@@ -33622,113 +33959,127 @@ declare var onlostpointercapture:
+@@ -33622,113 +33956,127 @@ declare var onlostpointercapture:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/mousedown_event)
   */
@@ -14389,7 +14382,7 @@
    | null;
  /**
   * Occurs when the seek operation ends.
-@@ -33736,87 +34087,87 @@ declare var onsecuritypolicyviolation:
+@@ -33736,87 +34084,87 @@ declare var onsecuritypolicyviolation:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/seeked_event)
   */
@@ -14504,7 +14497,7 @@
    | null;
  /**
   * Occurs when the volume is changed, or playback is muted or unmuted.
-@@ -33824,112 +34175,126 @@ declare var ontransitionstart:
+@@ -33824,112 +34172,126 @@ declare var ontransitionstart:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/volumechange_event)
   */
@@ -14670,7 +14663,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -33959,29 +34324,29 @@ declare function fetch(
+@@ -33959,29 +34321,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
@@ -14706,7 +14699,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -33991,7 +34356,7 @@ declare function addEventListener(
+@@ -33991,7 +34353,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -14715,7 +14708,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -34026,16 +34391,19 @@ type CanvasImageSource =
+@@ -34026,16 +34388,19 @@ type CanvasImageSource =
    | OffscreenCanvas
    | VideoFrame;
  type ClipboardItemData = Promise<string | Blob>;
@@ -14738,7 +14731,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -34052,10 +34420,18 @@ type GLuint64 = number;
+@@ -34052,10 +34417,18 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -14760,7 +14753,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -34070,7 +34446,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
+@@ -34070,7 +34443,7 @@ type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
@@ -14769,7 +14762,7 @@
  type RTCRtpTransform = RTCRtpScriptTransform;
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -34086,7 +34462,7 @@ type RenderingContext =
+@@ -34086,7 +34459,7 @@ type RenderingContext =
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
    | WebGL2RenderingContext;
@@ -14778,7 +14771,7 @@
  type RequestInfo = Request | string;
  type TexImageSource =
    | ImageBitmap
-@@ -34107,8 +34483,8 @@ type Transferable =
+@@ -34107,8 +34480,8 @@ type Transferable =
    | TransformStream
    | VideoFrame
    | ArrayBuffer;
