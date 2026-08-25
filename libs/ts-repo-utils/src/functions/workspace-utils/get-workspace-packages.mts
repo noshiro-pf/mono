@@ -35,7 +35,6 @@ export const getWorkspacePackages = async (
   dependencyFields: readonly DependencyField[] = defaultDependencyFields,
 ): Promise<readonly Package[]> => {
   // Read root package.json
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const rootPackageJson: JsonValue = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.readFile(path.join(rootPackageJsonDir, 'package.json'), 'utf8'),
@@ -87,11 +86,7 @@ export const getWorkspacePackages = async (
         name: getStrFromJsonValue(packageJson, 'name'),
         path: path.dirname(packagePath),
         packageJson,
-        dependencies: Object.fromEntries(
-          dependencyFields.flatMap((field) =>
-            Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
-          ),
-        ),
+        dependencies: mergeDependencyFields(packageJson, dependencyFields),
       }));
 
     return packageInfos;
@@ -103,6 +98,17 @@ export const getWorkspacePackages = async (
 
   return finalPackages;
 };
+
+/** Merges the named `package.json` fields into a single dependency map. */
+const mergeDependencyFields = (
+  packageJson: JsonValue,
+  dependencyFields: readonly DependencyField[],
+): ReadonlyRecord<string, string> =>
+  Object.fromEntries(
+    dependencyFields.flatMap((field) =>
+      Object.entries(getKeyValueRecordFromJsonValue(packageJson, field)),
+    ),
+  );
 
 const getStrFromJsonValue = (value: JsonValue, key: string): string =>
   isRecord(value) && hasKey(value, key) && isString(value[key])

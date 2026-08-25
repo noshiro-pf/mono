@@ -1,7 +1,14 @@
 import micromatch from 'micromatch';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, ISet, isString, pipe, Result } from 'ts-data-forge';
+import {
+  Arr,
+  ISet,
+  isString,
+  pipe,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { $ } from './exec-async.mjs';
@@ -135,7 +142,7 @@ export const genIndex = async (
 
     return Result.ok(undefined);
   } catch (error) {
-    conditionalEcho(`❌ Index generation failed: ${String(error)}\n`);
+    conditionalEcho(`❌ Index generation failed: ${unknownToString(error)}\n`);
 
     return Result.err(error);
   }
@@ -285,7 +292,7 @@ const generateIndexFileForDir = async (
     }
   } catch (error) {
     throw new Error(
-      `Failed to generate index for directory ${dirPath}: ${String(error)}`,
+      `Failed to generate index for directory ${dirPath}: ${unknownToString(error)}`,
       { cause: error },
     );
   }
