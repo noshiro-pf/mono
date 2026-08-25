@@ -466,6 +466,93 @@ key が素の `string` になれば union ではなくなり、`Partial` も付�
 潰せるものと、lib 側の修正待ちのものが混ざる。パッケージごとの件数は opt-in の直前に
 測り直す必要がある。残る課題として重いのは lint 21 件の方針決定（前節）のほう。
 
+### `ts-data-forge` で分かったこと（2026-08-14）
+
+最初の 1 パッケージとして着手し、**11 件のうち 9 件は直せたが 2 件は外部要因で止まった。**
+
+**配布物には影響しない、ただし条件つき。** 標準 lib と strict lib で emit した
+`.d.mts` 181 ファイルはバイト単位で同一だった。これは `libReplacement` の性質では
+なく、**このリポジトリが `@typescript-eslint/explicit-function-return-type` を
+強制していること**に支えられている。戻り値型を推論に任せると漏れる。
+
+```ts
+export const keysInferred = (o: UnknownRecord) => Object.keys(o);
+// 標準: (o: UnknownRecord) => string[]
+// strict: (o: UnknownRecord) => StrictLibInternals.ToObjectKeys<UnknownRecord>[]
+```
+
+漏れる `StrictLibInternals` は**消費者の環境に存在しない名前**なので、宣言が解決
+不能になる。関数以外の export（`export const ks = Object.keys(rec)`）は lint 規約の
+対象外なので、規約を守っていても漏れ得る。**パッケージごとの opt-in では毎回
+`.d.mts` の差分がゼロであることを確認する。**
+
+**`src` は配布物なので、lib の形に依存する記述を書けない。** `files` が `src` を
+含む（Go to Definition が元ソースに飛ぶため）ので、strict lib でしか成立しない
+`expectType` や `@ts-expect-error` を書くと、**消費者がエディタでソースを開いたとき
+に赤が出る**。実測で 4 件出た。したがって:
+
+- lib の形を固定する `expectType` は書かない（コメントとして残す）
+- `@ts-expect-error` は使わない。抑制が不要な側で「未使用」エラーになるため
+
+この 2 つは**当時の制約であって、現在の方針ではない**。前掲の「方針決定が要る」は
+その後「消費者のエディタに赤が出ることを受け入れる」に決着している。コメントとして
+残した `expectType` は strict lib の形に書き戻してよい。このブランチはそれをせず、
+どちらの lib でも同じに読める形のまま置いてある — 書き戻す必要が無いなら、
+そちらのほうが良い状態だからである。
+
+**止まっている 2 件。**
+
+1. **`class X extends Map` / `extends Set` が strict lib で通らない。** `MapConstructor`
+   の `prototype` が `Map<never, never>` になっており、どんな部分クラスの prototype も
+   代入不可。generics を外しても匿名クラスでも同じ。ごく普通の JavaScript が書けない
+   ので、**strict lib 側の不具合として直すのが筋**
+2. **`@eslint/plugin-kit` が strict lib で落ちる。** `dist/cjs/types.cts` は `.d.cts`
+   ではなく**ソース**として配られているため `skipLibCheck` が効かない。
+   `eslint-config-typed` を `paths` で source 解決していることで入ってくる
+
+**2026-08-21 追記: 1 は片付いた。** `dist-v7.0-0.1.0` で `class X extends Map` /
+`extends Set` が通るようになった。その状態で `libReplacement` を有効にして測り直すと、
+**残る型エラーは 2 の 1 件だけ**である。
+
+2 のほうは動いていない。`@eslint/plugin-kit` は 0.7.2 が最新のままで、
+`dist/cjs/types.cts` はソースのまま配られている。**`paths` を dist に向けても消えない**
+ことを実測した — `skipLibCheck` が飛ばすのは `.d.ts` であって、`.cts` はどう辿り着いても
+ソースとして型検査されるためである。
+
+この 1 件を踏むのは `ts-data-forge` だけである。`configs/eslint/` から
+`eslint-config-typed` の型を import しているのがこのパッケージだけで、`configs/` は
+type-check の対象に入っている。他パッケージが `eslint-config-typed` を使うのは
+`eslint.config.mts` の中で、そちらは tsconfig の `include` から外れている。
+
+したがって選択肢は「上流が `.d.cts` を配るのを待つ」か「この型 import を type-check の
+対象外へ動かす」のどちらかで、**`ts-data-forge` の opt-in は今回のリリースでは
+完了しない**。
+
+**2026-08-25 追記: 2 も片付いた。上流を待つ必要は無くなった。** `strict-ts-lib` 0.6.0
+で `Extract` / `Pick` / `Exclude` / `Omit` の制約を upstream に戻したため、
+`@eslint/plugin-kit` の `dist/cjs/types.cts` に入っている `Omit` が strict lib の
+狭い `K extends keyof T` と衝突しなくなった。`.cts` がソースとして型検査される事実は
+そのままだが、**その中身がもう型エラーにならない**。
+
+その状態で測り直した結果（`libs/ts-data-forge/tsconfig.json` に
+`"libReplacement": true` を足しただけ、他は無改変）:
+
+|              | 素の lib                 | strict lib                    |
+| :----------- | :----------------------- | :---------------------------- |
+| `type-check` | エラー 0 件              | **エラー 0 件**               |
+| `lint`       | エラー 0 件 / 警告 15 件 | エラー **23 件** / 警告 17 件 |
+
+**型チェックは 1 件も残っていない。**「止まっている 2 件」は両方とも解消済みで、
+`ts-data-forge` の opt-in を妨げるものはもう無い。
+
+残るのは lint 23 件で、内訳は `@typescript-eslint/no-deprecated` 20 件
+（`String` 13 / `Number` 3 / `Boolean` 3 / `charAt` 1）と
+`@typescript-eslint/no-unnecessary-type-assertion` 3 件である。**strict lib が
+`@deprecated` を付けている分を lint が読むようになったというだけ**で、`ts-fortress`
+で 21 件出たのと同じ性質のもの。`ts-repo-utils`（#1618）や `ts-fortress`（#1657）と
+同じく、opt-in はそれ専用の PR で入れる。**このブランチは引き続き「どちらの lib でも
+同じに読めるソースにする」ところまで**で、`libReplacement` は有効にしない。
+
 ## 依存宣言を 1 件にまとめる（2026-08-21 実測）
 
 root の `package.json` は 236 行のうち 107 行が `@typescript/lib-*` の URL だった。
