@@ -10,6 +10,7 @@
 export const tsTypeForgeImportedTypes = [
   'DeepReadonly',
   'UnknownRecord',
+  'ReadonlyRecord',
   'FixedLengthTuple',
   'NonEmptyTuple',
   'MinLengthTuple',

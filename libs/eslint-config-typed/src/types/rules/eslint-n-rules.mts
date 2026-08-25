@@ -3,6 +3,7 @@ import { type Linter } from 'eslint';
 import {
   type FixedLengthTuple,
   type NonEmptyTuple,
+  type ReadonlyRecord,
   type UnknownRecord,
 } from 'ts-type-forge';
 
@@ -137,7 +138,7 @@ namespace FileExtensionInImport {
    */
   export type Options0 = 'always' | 'never';
 
-  export type Options1 = Readonly<Record<string, 'always' | 'never'>>;
+  export type Options1 = ReadonlyRecord<string, 'always' | 'never'>;
 
   export type RuleEntry =
     | 'off'
@@ -628,7 +629,7 @@ namespace NoExtraneousImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -767,7 +768,7 @@ namespace NoExtraneousRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -1520,7 +1521,7 @@ namespace NoTopLevelAwait {
   export type Options = Readonly<{
     ignoreBin?: boolean;
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -1627,7 +1628,7 @@ namespace NoUnpublishedBin {
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -1772,7 +1773,7 @@ namespace NoUnpublishedImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -1924,7 +1925,7 @@ namespace NoUnpublishedRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -7759,7 +7760,7 @@ namespace Hashbang {
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
       | NonEmptyTuple<
           Readonly<{
             /**
@@ -7776,7 +7777,7 @@ namespace Hashbang {
         >;
     ignoreUnpublished?: boolean;
     additionalExecutables?: readonly string[];
-    executableMap?: Readonly<Record<string, string>>;
+    executableMap?: ReadonlyRecord<string, string>;
   }>;
 
   export type RuleEntry =

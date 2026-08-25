@@ -3,6 +3,7 @@ import { type Linter } from 'eslint';
 import {
   type FixedLengthTuple,
   type NonEmptyTuple,
+  type ReadonlyRecord,
   type UnknownRecord,
 } from 'ts-type-forge';
 
@@ -227,16 +228,14 @@ namespace CommentContent {
     /**
      * Custom comment content replacements.
      */
-    replacements?: Readonly<
-      Record<
-        string,
-        | false
-        | string
-        | Readonly<{
-            replacement: string;
-            caseSensitive?: boolean;
-          }>
-      >
+    replacements?: ReadonlyRecord<
+      string,
+      | false
+      | string
+      | Readonly<{
+          replacement: string;
+          caseSensitive?: boolean;
+        }>
     >;
   }>;
 
@@ -406,11 +405,11 @@ namespace ConsistentBooleanName {
     /**
      * Boolean name prefixes to allow or disallow.
      */
-    prefixes?: Readonly<Record<string, boolean>>;
+    prefixes?: ReadonlyRecord<string, boolean>;
     /**
      * Wrapper type names and their boolean-like value members.
      */
-    wrappers?: Readonly<Record<string, string>>;
+    wrappers?: ReadonlyRecord<string, string>;
     /**
      * Patterns to ignore.
      */
@@ -649,12 +648,12 @@ namespace ConsistentCompoundWords {
   /**
    * Custom compound word replacements.
    */
-  export type Replacements = Readonly<Record<string, false | string>>;
+  export type Replacements = ReadonlyRecord<string, false | string>;
 
   /**
    * Custom allow list of names.
    */
-  export type TrueObject = Readonly<Record<string, true>>;
+  export type TrueObject = ReadonlyRecord<string, true>;
 
   export type RuleEntry =
     | 'off'
@@ -1810,7 +1809,7 @@ namespace ImportStyle {
   /**
    * Module import styles.
    */
-  export type ModuleStyles = Readonly<Record<string, Styles>>;
+  export type ModuleStyles = ReadonlyRecord<string, Styles>;
 
   export type BooleanObject = Readonly<{
     default?: boolean;
@@ -1899,8 +1898,9 @@ namespace IsolatedFunctions {
     /**
      * Override which global variables are allowed inside isolated scopes.
      */
-    overrideGlobals?: Readonly<
-      Record<string, boolean | ('readonly' | 'writable' | 'writeable' | 'off')>
+    overrideGlobals?: ReadonlyRecord<
+      string,
+      boolean | ('readonly' | 'writable' | 'writeable' | 'off')
     >;
     /**
      * Function names that mark a scope as isolated.
@@ -2252,14 +2252,14 @@ namespace NameReplacements {
   /**
    * Custom name replacements.
    */
-  export type NameReplacements1 = Readonly<Record<string, Replacements>>;
+  export type NameReplacements1 = ReadonlyRecord<string, Replacements>;
 
-  export type BooleanObject = Readonly<Record<string, boolean>>;
+  export type BooleanObject = ReadonlyRecord<string, boolean>;
 
   /**
    * Custom allow list of names.
    */
-  export type BooleanObject1 = Readonly<Record<string, boolean>>;
+  export type BooleanObject1 = ReadonlyRecord<string, boolean>;
 
   export type RuleEntry =
     | 'off'
@@ -3348,16 +3348,14 @@ namespace NoInvalidArgumentCount {
   /**
    * Additional call and constructor patterns to check.
    */
-  export type Options = Readonly<
-    Record<
-      string,
-      | number
-      | NonEmptyTuple<number>
-      | Readonly<{
-          min?: number;
-          max?: number;
-        }>
-    >
+  export type Options = ReadonlyRecord<
+    string,
+    | number
+    | NonEmptyTuple<number>
+    | Readonly<{
+        min?: number;
+        max?: number;
+      }>
   >;
 
   export type RuleEntry =
@@ -8994,17 +8992,15 @@ namespace StringContent {
     /**
      * Patterns to replace in string content.
      */
-    patterns?: Readonly<
-      Record<
-        string,
-        | string
-        | Readonly<{
-            suggest: string;
-            fix?: boolean;
-            caseSensitive?: boolean;
-            message?: string;
-          }>
-      >
+    patterns?: ReadonlyRecord<
+      string,
+      | string
+      | Readonly<{
+          suggest: string;
+          fix?: boolean;
+          caseSensitive?: boolean;
+          message?: string;
+        }>
     >;
     /**
      * AST selectors for string nodes to check.

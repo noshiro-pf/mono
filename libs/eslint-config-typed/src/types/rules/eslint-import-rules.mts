@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type NonEmptyTuple, type UnknownRecord } from 'ts-type-forge';
+import {
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -468,8 +472,9 @@ namespace Extensions {
     | readonly [
         'always' | 'ignorePackages' | 'never',
         Readonly<{
-          pattern?: Readonly<
-            Record<string, 'always' | 'ignorePackages' | 'never'>
+          pattern?: ReadonlyRecord<
+            string,
+            'always' | 'ignorePackages' | 'never'
           >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
@@ -484,8 +489,9 @@ namespace Extensions {
       ]
     | readonly [
         Readonly<{
-          pattern?: Readonly<
-            Record<string, 'always' | 'ignorePackages' | 'never'>
+          pattern?: ReadonlyRecord<
+            string,
+            'always' | 'ignorePackages' | 'never'
           >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
@@ -500,11 +506,9 @@ namespace Extensions {
       ]
     | readonly [
         'always' | 'ignorePackages' | 'never',
-        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
+        ReadonlyRecord<string, 'always' | 'ignorePackages' | 'never'>,
       ]
-    | readonly [
-        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
-      ];
+    | readonly [ReadonlyRecord<string, 'always' | 'ignorePackages' | 'never'>];
 
   export type RuleEntry =
     | 'off'

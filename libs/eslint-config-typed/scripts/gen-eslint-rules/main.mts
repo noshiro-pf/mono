@@ -62,6 +62,25 @@ export const generateRulesType = async (
 
     await fmt(targetFileNames);
   }
+
+  {
+    // `@typescript-eslint/consistent-indexed-object-style` rewrites index
+    // signatures into the built-in `Record` during `eslint --fix`, which
+    // re-introduces `Readonly<Record<...>>` after the codemod above has
+    // already run. Run the codemod once more so the generated files end up in
+    // the codemod's record style (`ReadonlyRecord`) and regeneration stays a
+    // fixed point of `codemod:full`.
+    console.info('running codemod (post `lint --fix`)...');
+
+    await applyTypeTransformationsForTargets(targetFileNames);
+
+    // The codemod can introduce ts-type-forge type usages of its own (e.g.
+    // `ReadonlyRecord`), so restore the import again before organize-imports
+    // prunes it for the last time.
+    await restoreTsTypeForgeImport(targetFileNames);
+
+    await fmt(targetFileNames);
+  }
 };
 
 /** 生成ファイルの ts-type-forge の import 文を、全型を含む形に戻す */
