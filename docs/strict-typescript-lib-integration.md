@@ -528,6 +528,31 @@ type-check の対象に入っている。他パッケージが `eslint-config-ty
 対象外へ動かす」のどちらかで、**`ts-data-forge` の opt-in は今回のリリースでは
 完了しない**。
 
+**2026-08-25 追記: 2 も片付いた。上流を待つ必要は無くなった。** `strict-ts-lib` 0.6.0
+で `Extract` / `Pick` / `Exclude` / `Omit` の制約を upstream に戻したため、
+`@eslint/plugin-kit` の `dist/cjs/types.cts` に入っている `Omit` が strict lib の
+狭い `K extends keyof T` と衝突しなくなった。`.cts` がソースとして型検査される事実は
+そのままだが、**その中身がもう型エラーにならない**。
+
+その状態で測り直した結果（`libs/ts-data-forge/tsconfig.json` に
+`"libReplacement": true` を足しただけ、他は無改変）:
+
+|              | 素の lib                 | strict lib                    |
+| :----------- | :----------------------- | :---------------------------- |
+| `type-check` | エラー 0 件              | **エラー 0 件**               |
+| `lint`       | エラー 0 件 / 警告 15 件 | エラー **23 件** / 警告 17 件 |
+
+**型チェックは 1 件も残っていない。**「止まっている 2 件」は両方とも解消済みで、
+`ts-data-forge` の opt-in を妨げるものはもう無い。
+
+残るのは lint 23 件で、内訳は `@typescript-eslint/no-deprecated` 20 件
+（`String` 13 / `Number` 3 / `Boolean` 3 / `charAt` 1）と
+`@typescript-eslint/no-unnecessary-type-assertion` 3 件である。**strict lib が
+`@deprecated` を付けている分を lint が読むようになったというだけ**で、`ts-fortress`
+で 21 件出たのと同じ性質のもの。`ts-repo-utils`（#1618）や `ts-fortress`（#1657）と
+同じく、opt-in はそれ専用の PR で入れる。**このブランチは引き続き「どちらの lib でも
+同じに読めるソースにする」ところまで**で、`libReplacement` は有効にしない。
+
 ## 依存宣言を 1 件にまとめる（2026-08-21 実測）
 
 root の `package.json` は 236 行のうち 107 行が `@typescript/lib-*` の URL だった。
