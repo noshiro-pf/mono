@@ -1,0 +1,83 @@
+.repository-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+:root {
+  --section-max-width: 850px;
+}
+
+.github-section,
+.readme-section {
+  width: 100%;
+  max-width: var(--section-max-width);
+  margin: 0 auto;
+}
+
+.github-section {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--border-radius-large);
+  padding: var(--padding-large);
+  border: var(--border-width) solid var(--color-border-primary);
+  box-shadow: var(--shadow-light);
+}
+
+.readme-section {
+  background-color: transparent;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+}
+
+.github-section h2,
+.readme-section h2 {
+  margin: 0 0 var(--margin-medium) 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding-bottom: var(--padding-small);
+  border-bottom: var(--border-width) solid var(--color-border-primary);
+}
+
+.loading,
+.no-readme-package {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .github-section,
+  .readme-section {
+    max-width: 95%;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .repository-viewer {
+    gap: 1rem;
+  }
+
+  .github-section,
+  .readme-section {
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .github-section {
+    padding: 1rem;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+  .github-section {
+    padding: var(--padding-medium);
+  }
+}

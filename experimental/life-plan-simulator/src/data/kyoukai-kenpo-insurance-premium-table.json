@@ -1,0 +1,1226 @@
+[
+  {
+    "grade": "1",
+    "standardMonthlyRemuneration": 58000,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": 63000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 5788.4,
+      "half": 2894.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 6716.4,
+      "half": 3358.2
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "2",
+    "standardMonthlyRemuneration": 68000,
+    "remunerationRangeFrom": 63000,
+    "remunerationRangeTo": 73000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 6786.4,
+      "half": 3393.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 7874.4,
+      "half": 3937.2
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "3",
+    "standardMonthlyRemuneration": 78000,
+    "remunerationRangeFrom": 73000,
+    "remunerationRangeTo": 83000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 7784.4,
+      "half": 3892.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 9032.4,
+      "half": 4516.2
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "4",
+    "standardMonthlyRemuneration": 88000,
+    "remunerationRangeFrom": 83000,
+    "remunerationRangeTo": 93000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 8782.4,
+      "half": 4391.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 10190.4,
+      "half": 5095.2
+    },
+    "welfarePension": {
+      "total": 16104,
+      "half": 8052
+    }
+  },
+  {
+    "grade": "5",
+    "standardMonthlyRemuneration": 98000,
+    "remunerationRangeFrom": 93000,
+    "remunerationRangeTo": 101000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 9780.4,
+      "half": 4890.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 11348.4,
+      "half": 5674.2
+    },
+    "welfarePension": {
+      "total": 17934,
+      "half": 8967
+    }
+  },
+  {
+    "grade": "6",
+    "standardMonthlyRemuneration": 104000,
+    "remunerationRangeFrom": 101000,
+    "remunerationRangeTo": 107000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 10379.2,
+      "half": 5189.6
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 12043.2,
+      "half": 6021.6
+    },
+    "welfarePension": {
+      "total": 19032,
+      "half": 9516
+    }
+  },
+  {
+    "grade": "7",
+    "standardMonthlyRemuneration": 110000,
+    "remunerationRangeFrom": 107000,
+    "remunerationRangeTo": 114000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 10978,
+      "half": 5489
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 12738,
+      "half": 6369
+    },
+    "welfarePension": {
+      "total": 20130,
+      "half": 10065
+    }
+  },
+  {
+    "grade": "8",
+    "standardMonthlyRemuneration": 118000,
+    "remunerationRangeFrom": 114000,
+    "remunerationRangeTo": 122000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 11776.4,
+      "half": 5888.2
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 13664.4,
+      "half": 6832.2
+    },
+    "welfarePension": {
+      "total": 21594,
+      "half": 10797
+    }
+  },
+  {
+    "grade": "9",
+    "standardMonthlyRemuneration": 126000,
+    "remunerationRangeFrom": 122000,
+    "remunerationRangeTo": 130000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 12574.8,
+      "half": 6287.4
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 14590.8,
+      "half": 7295.4
+    },
+    "welfarePension": {
+      "total": 23058,
+      "half": 11529
+    }
+  },
+  {
+    "grade": "10",
+    "standardMonthlyRemuneration": 134000,
+    "remunerationRangeFrom": 130000,
+    "remunerationRangeTo": 138000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 13373.2,
+      "half": 6686.6
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 15517.2,
+      "half": 7758.6
+    },
+    "welfarePension": {
+      "total": 24522,
+      "half": 12261
+    }
+  },
+  {
+    "grade": "11",
+    "standardMonthlyRemuneration": 142000,
+    "remunerationRangeFrom": 138000,
+    "remunerationRangeTo": 146000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 14171.6,
+      "half": 7085.8
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 16443.6,
+      "half": 8221.8
+    },
+    "welfarePension": {
+      "total": 25986,
+      "half": 12993
+    }
+  },
+  {
+    "grade": "12",
+    "standardMonthlyRemuneration": 150000,
+    "remunerationRangeFrom": 146000,
+    "remunerationRangeTo": 155000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 14970,
+      "half": 7485
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 17370,
+      "half": 8685
+    },
+    "welfarePension": {
+      "total": 27450,
+      "half": 13725
+    }
+  },
+  {
+    "grade": "13",
+    "standardMonthlyRemuneration": 160000,
+    "remunerationRangeFrom": 155000,
+    "remunerationRangeTo": 165000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 15968,
+      "half": 7984
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 18528,
+      "half": 9264
+    },
+    "welfarePension": {
+      "total": 29280,
+      "half": 14640
+    }
+  },
+  {
+    "grade": "14",
+    "standardMonthlyRemuneration": 170000,
+    "remunerationRangeFrom": 165000,
+    "remunerationRangeTo": 175000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 16966,
+      "half": 8483
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 19686,
+      "half": 9843
+    },
+    "welfarePension": {
+      "total": 31110,
+      "half": 15555
+    }
+  },
+  {
+    "grade": "15",
+    "standardMonthlyRemuneration": 180000,
+    "remunerationRangeFrom": 175000,
+    "remunerationRangeTo": 185000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 17964,
+      "half": 8982
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 20844,
+      "half": 10422
+    },
+    "welfarePension": {
+      "total": 32940,
+      "half": 16470
+    }
+  },
+  {
+    "grade": "16",
+    "standardMonthlyRemuneration": 190000,
+    "remunerationRangeFrom": 185000,
+    "remunerationRangeTo": 195000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 18962,
+      "half": 9481
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 22002,
+      "half": 11001
+    },
+    "welfarePension": {
+      "total": 34770,
+      "half": 17385
+    }
+  },
+  {
+    "grade": "17",
+    "standardMonthlyRemuneration": 200000,
+    "remunerationRangeFrom": 195000,
+    "remunerationRangeTo": 210000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 19960,
+      "half": 9980
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 23160,
+      "half": 11580
+    },
+    "welfarePension": {
+      "total": 36600,
+      "half": 18300
+    }
+  },
+  {
+    "grade": "18",
+    "standardMonthlyRemuneration": 220000,
+    "remunerationRangeFrom": 210000,
+    "remunerationRangeTo": 230000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 21956,
+      "half": 10978
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 25476,
+      "half": 12738
+    },
+    "welfarePension": {
+      "total": 40260,
+      "half": 20130
+    }
+  },
+  {
+    "grade": "19",
+    "standardMonthlyRemuneration": 240000,
+    "remunerationRangeFrom": 230000,
+    "remunerationRangeTo": 250000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 23952,
+      "half": 11976
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 27792,
+      "half": 13896
+    },
+    "welfarePension": {
+      "total": 43920,
+      "half": 21960
+    }
+  },
+  {
+    "grade": "20",
+    "standardMonthlyRemuneration": 260000,
+    "remunerationRangeFrom": 250000,
+    "remunerationRangeTo": 270000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 25948,
+      "half": 12974
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 30108,
+      "half": 15054
+    },
+    "welfarePension": {
+      "total": 47580,
+      "half": 23790
+    }
+  },
+  {
+    "grade": "21",
+    "standardMonthlyRemuneration": 280000,
+    "remunerationRangeFrom": 270000,
+    "remunerationRangeTo": 290000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 27944,
+      "half": 13972
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 32424,
+      "half": 16212
+    },
+    "welfarePension": {
+      "total": 51240,
+      "half": 25620
+    }
+  },
+  {
+    "grade": "22",
+    "standardMonthlyRemuneration": 300000,
+    "remunerationRangeFrom": 290000,
+    "remunerationRangeTo": 310000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 29940,
+      "half": 14970
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 34740,
+      "half": 17370
+    },
+    "welfarePension": {
+      "total": 54900,
+      "half": 27450
+    }
+  },
+  {
+    "grade": "23",
+    "standardMonthlyRemuneration": 320000,
+    "remunerationRangeFrom": 310000,
+    "remunerationRangeTo": 330000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 31936,
+      "half": 15968
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 37056,
+      "half": 18528
+    },
+    "welfarePension": {
+      "total": 58560,
+      "half": 29280
+    }
+  },
+  {
+    "grade": "24",
+    "standardMonthlyRemuneration": 340000,
+    "remunerationRangeFrom": 330000,
+    "remunerationRangeTo": 350000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 33932,
+      "half": 16966
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 39372,
+      "half": 19686
+    },
+    "welfarePension": {
+      "total": 62220,
+      "half": 31110
+    }
+  },
+  {
+    "grade": "25",
+    "standardMonthlyRemuneration": 360000,
+    "remunerationRangeFrom": 350000,
+    "remunerationRangeTo": 370000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 35928,
+      "half": 17964
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 41688,
+      "half": 20844
+    },
+    "welfarePension": {
+      "total": 65880,
+      "half": 32940
+    }
+  },
+  {
+    "grade": "26",
+    "standardMonthlyRemuneration": 380000,
+    "remunerationRangeFrom": 370000,
+    "remunerationRangeTo": 395000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 37924,
+      "half": 18962
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 44004,
+      "half": 22002
+    },
+    "welfarePension": {
+      "total": 69540,
+      "half": 34770
+    }
+  },
+  {
+    "grade": "27",
+    "standardMonthlyRemuneration": 410000,
+    "remunerationRangeFrom": 395000,
+    "remunerationRangeTo": 425000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 40918,
+      "half": 20459
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 47478,
+      "half": 23739
+    },
+    "welfarePension": {
+      "total": 75030,
+      "half": 37515
+    }
+  },
+  {
+    "grade": "28",
+    "standardMonthlyRemuneration": 440000,
+    "remunerationRangeFrom": 425000,
+    "remunerationRangeTo": 455000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 43912,
+      "half": 21956
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 50952,
+      "half": 25476
+    },
+    "welfarePension": {
+      "total": 80520,
+      "half": 40260
+    }
+  },
+  {
+    "grade": "29",
+    "standardMonthlyRemuneration": 470000,
+    "remunerationRangeFrom": 455000,
+    "remunerationRangeTo": 485000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 46906,
+      "half": 23453
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 54426,
+      "half": 27213
+    },
+    "welfarePension": {
+      "total": 86010,
+      "half": 43005
+    }
+  },
+  {
+    "grade": "30",
+    "standardMonthlyRemuneration": 500000,
+    "remunerationRangeFrom": 485000,
+    "remunerationRangeTo": 515000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 49900,
+      "half": 24950
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 57900,
+      "half": 28950
+    },
+    "welfarePension": {
+      "total": 91500,
+      "half": 45750
+    }
+  },
+  {
+    "grade": "31",
+    "standardMonthlyRemuneration": 530000,
+    "remunerationRangeFrom": 515000,
+    "remunerationRangeTo": 545000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 52894,
+      "half": 26447
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 61374,
+      "half": 30687
+    },
+    "welfarePension": {
+      "total": 96990,
+      "half": 48495
+    }
+  },
+  {
+    "grade": "32",
+    "standardMonthlyRemuneration": 560000,
+    "remunerationRangeFrom": 545000,
+    "remunerationRangeTo": 575000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 55888,
+      "half": 27944
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 64848,
+      "half": 32424
+    },
+    "welfarePension": {
+      "total": 102480,
+      "half": 51240
+    }
+  },
+  {
+    "grade": "33",
+    "standardMonthlyRemuneration": 590000,
+    "remunerationRangeFrom": 575000,
+    "remunerationRangeTo": 605000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 58882,
+      "half": 29441
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 68322,
+      "half": 34161
+    },
+    "welfarePension": {
+      "total": 107970,
+      "half": 53985
+    }
+  },
+  {
+    "grade": "34",
+    "standardMonthlyRemuneration": 620000,
+    "remunerationRangeFrom": 605000,
+    "remunerationRangeTo": 635000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 61876,
+      "half": 30938
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 71796,
+      "half": 35898
+    },
+    "welfarePension": {
+      "total": 113460,
+      "half": 56730
+    }
+  },
+  {
+    "grade": "35",
+    "standardMonthlyRemuneration": 650000,
+    "remunerationRangeFrom": 635000,
+    "remunerationRangeTo": 665000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 64870,
+      "half": 32435
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 75270,
+      "half": 37635
+    },
+    "welfarePension": {
+      "total": 118950,
+      "half": 59475
+    }
+  },
+  {
+    "grade": "36",
+    "standardMonthlyRemuneration": 680000,
+    "remunerationRangeFrom": 665000,
+    "remunerationRangeTo": 695000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 67864,
+      "half": 33932
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 78744,
+      "half": 39372
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "37",
+    "standardMonthlyRemuneration": 710000,
+    "remunerationRangeFrom": 695000,
+    "remunerationRangeTo": 730000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 70858,
+      "half": 35429
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 82218,
+      "half": 41109
+    },
+    "welfarePension": {
+      "total": "※厚生年金基金に加入している方の",
+      "half": null
+    }
+  },
+  {
+    "grade": "38",
+    "standardMonthlyRemuneration": 750000,
+    "remunerationRangeFrom": 730000,
+    "remunerationRangeTo": 770000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 74850,
+      "half": 37425
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 86850,
+      "half": 43425
+    },
+    "welfarePension": {
+      "total": "　 厚生年金保険料率は、基金ごとに",
+      "half": null
+    }
+  },
+  {
+    "grade": "39",
+    "standardMonthlyRemuneration": 790000,
+    "remunerationRangeFrom": 770000,
+    "remunerationRangeTo": 810000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 78842,
+      "half": 39421
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 91482,
+      "half": 45741
+    },
+    "welfarePension": {
+      "total": "　 定められている免除保険料率",
+      "half": null
+    }
+  },
+  {
+    "grade": "40",
+    "standardMonthlyRemuneration": 830000,
+    "remunerationRangeFrom": 810000,
+    "remunerationRangeTo": 855000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 82834,
+      "half": 41417
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 96114,
+      "half": 48057
+    },
+    "welfarePension": {
+      "total": "   （2.4％～5.0％）を控除した率となり",
+      "half": null
+    }
+  },
+  {
+    "grade": "41",
+    "standardMonthlyRemuneration": 880000,
+    "remunerationRangeFrom": 855000,
+    "remunerationRangeTo": 905000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 87824,
+      "half": 43912
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 101904,
+      "half": 50952
+    },
+    "welfarePension": {
+      "total": "   ます。",
+      "half": null
+    }
+  },
+  {
+    "grade": "42",
+    "standardMonthlyRemuneration": 930000,
+    "remunerationRangeFrom": 905000,
+    "remunerationRangeTo": 955000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 92814,
+      "half": 46407
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 107694,
+      "half": 53847
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "43",
+    "standardMonthlyRemuneration": 980000,
+    "remunerationRangeFrom": 955000,
+    "remunerationRangeTo": 1005000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 97804,
+      "half": 48902
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 113484,
+      "half": 56742
+    },
+    "welfarePension": {
+      "total": "　 加入する基金ごとに異なりますの",
+      "half": null
+    }
+  },
+  {
+    "grade": "44",
+    "standardMonthlyRemuneration": 1030000,
+    "remunerationRangeFrom": 1005000,
+    "remunerationRangeTo": 1055000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 102794,
+      "half": 51397
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 119274,
+      "half": 59637
+    },
+    "welfarePension": {
+      "total": "　 で、免除保険料率および厚生年金",
+      "half": null
+    }
+  },
+  {
+    "grade": "45",
+    "standardMonthlyRemuneration": 1090000,
+    "remunerationRangeFrom": 1055000,
+    "remunerationRangeTo": 1115000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 108782,
+      "half": 54391
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 126222,
+      "half": 63111
+    },
+    "welfarePension": {
+      "total": "　 基金の掛金については、加入する",
+      "half": null
+    }
+  },
+  {
+    "grade": "46",
+    "standardMonthlyRemuneration": 1150000,
+    "remunerationRangeFrom": 1115000,
+    "remunerationRangeTo": 1175000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 114770,
+      "half": 57385
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 133170,
+      "half": 66585
+    },
+    "welfarePension": {
+      "total": "　 厚生年金基金にお問い合わせ",
+      "half": null
+    }
+  },
+  {
+    "grade": "47",
+    "standardMonthlyRemuneration": 1210000,
+    "remunerationRangeFrom": 1175000,
+    "remunerationRangeTo": 1235000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 120758,
+      "half": 60379
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 140118,
+      "half": 70059
+    },
+    "welfarePension": {
+      "total": "　 ください。",
+      "half": null
+    }
+  },
+  {
+    "grade": "48",
+    "standardMonthlyRemuneration": 1270000,
+    "remunerationRangeFrom": 1235000,
+    "remunerationRangeTo": 1295000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 126746,
+      "half": 63373
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 147066,
+      "half": 73533
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "49",
+    "standardMonthlyRemuneration": 1330000,
+    "remunerationRangeFrom": 1295000,
+    "remunerationRangeTo": 1355000,
+    "healthInsuranceNoLongTermCare": {
+      "total": 132734,
+      "half": 66367
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 154014,
+      "half": 77007
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "50",
+    "standardMonthlyRemuneration": 1390000,
+    "remunerationRangeFrom": 1355000,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": 138722,
+      "half": 69361
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": 160962,
+      "half": 80481
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "◆介護保険第２号被保険者は、40歳から64歳までの方であり、健康保険料率が加わります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "◆等級欄の内の数字は、厚生年金保険の標準報酬月額等級です。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "4等級の「報酬月額」欄は、厚生年金保険の場合「93,000円未満」と読み替えてください。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "35等級の「報酬月額」欄は、厚生年金保険の場合「635,000円以上」と読み替えてください。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "◆令和6年度における全国健康保険協会の任意継続被保険者について、標準報酬月額の上限は、300,000円です。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "○被保険者負担分に円未満の端数がある場合",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "①事業主が、給与から被保険者負担分を控除する場合、被保険者負担分の端数が50銭以下の場合は切り捨て、50銭を超える場合は切り上げて1円となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "②被保険者が、被保険者負担分を事業主へ現金で支払う場合、被保険者負担分の端数が50銭未満の場合は切り捨て、50銭以上の場合は切り上げて1円となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "①、②にかかわらず、事業主と被保険者間で特約がある場合には、特約に基づき端数処理をすることができます。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "○納入告知書の保険料額",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "納入告知書の保険料額は、被保険者個々の保険料額を合算した金額になります。ただし、合算した金額に円未満の端数がある場合は、その端数を切り捨てた額となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "○賞与にかかる保険料額",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "賞与に係る保険料額は、賞与額から1,000円未満の端数を切り捨てた額に、保険料率を乗じた額となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "また、標準賞与額の上限は、健康保険は年間573万円となり、厚生年金保険と子ども・子育て拠出金の場合は",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "月間150万円となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "○子ども・子育て拠出金",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "事業主の方は、児童手当の支給に要する費用等の一部として、子ども・子育て拠出金を負担いただくことになります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  },
+  {
+    "grade": "この子ども・子育て拠出金の額は、被保険者個々の厚生年金保険の標準報酬月額および標準賞与額に、拠出金率を乗じて得た額の総額となります。",
+    "standardMonthlyRemuneration": null,
+    "remunerationRangeFrom": null,
+    "remunerationRangeTo": null,
+    "healthInsuranceNoLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "healthInsuranceWithLongTermCare": {
+      "total": null,
+      "half": null
+    },
+    "welfarePension": {
+      "total": null,
+      "half": null
+    }
+  }
+]

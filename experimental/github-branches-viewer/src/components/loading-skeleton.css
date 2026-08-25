@@ -1,0 +1,143 @@
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200px 0;
+  }
+  100% {
+    background-position: -200px 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f6f8fa 25%, #e1e4e8 50%, #f6f8fa 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 2s infinite;
+}
+
+.skeleton-count {
+  width: 80px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.skeleton-branch-name {
+  width: 120px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-badge {
+  width: 50px;
+  height: 16px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.skeleton-date {
+  width: 80px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-stats {
+  width: 60px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-pr {
+  width: 40px;
+  height: 16px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-button {
+  width: 120px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.skeleton-title {
+  width: 140px;
+  height: 20px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.skeleton-icon-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeleton-button-small {
+  width: 80px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.branch-actions-col .skeleton-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  margin-left: 4px;
+}
+
+.branch-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Fix for CSS @extend not working in regular CSS */
+.skeleton-count,
+.skeleton-icon,
+.skeleton-branch-name,
+.skeleton-badge,
+.skeleton-date,
+.skeleton-stats,
+.skeleton-pr,
+.skeleton-button,
+.skeleton-title,
+.skeleton-icon-button,
+.skeleton-button-small {
+  background: linear-gradient(90deg, #f6f8fa 25%, #e1e4e8 50%, #f6f8fa 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 2s infinite;
+}
+
+/* Dark mode styles */
+.dark .skeleton-count,
+.dark .skeleton-icon,
+.dark .skeleton-branch-name,
+.dark .skeleton-badge,
+.dark .skeleton-date,
+.dark .skeleton-stats,
+.dark .skeleton-pr,
+.dark .skeleton-button,
+.dark .skeleton-title,
+.dark .skeleton-icon-button,
+.dark .skeleton-button-small {
+  background: linear-gradient(90deg, #21262d 25%, #30363d 50%, #21262d 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 2s infinite;
+}

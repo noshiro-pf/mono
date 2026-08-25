@@ -1,0 +1,50 @@
+/*
+ * Z-Index Management
+ *
+ * This file centralizes all z-index values used throughout the application
+ * to prevent conflicts and maintain a clear stacking hierarchy.
+ *
+ * Z-Index Layers (from lowest to highest):
+ * - Base (auto, 1): Default page content
+ * - Content (5): Section headers and content areas
+ * - Navigation (100): Sticky navigation and tab headers
+ * - Overlay (1000): Tooltips, status indicators
+ * - Modal (10000+): Dropdown menus, modals
+ */
+
+:root {
+  /* Base layer - page content */
+  --z-index-base: 1;
+  --z-index-auto: auto;
+
+  /* Content layer - section headers */
+  --z-index-content-header: 5;
+
+  /* Navigation layer - sticky elements */
+  --z-index-navigation: 100;
+
+  /* Overlay layer - floating elements */
+  --z-index-overlay: 1000;
+
+  /* Floating UI layer - TOC, tooltips */
+  --z-index-floating-ui: 5000;
+
+  /* Modal layer - dropdown menus and modals */
+  --z-index-dropdown: 10000;
+  --z-index-dropdown-active: 10001;
+  --z-index-dropdown-nested: 10002;
+}
+
+/*
+ * Z-Index Usage Guide:
+ *
+ * --z-index-base (1): Basic container elements
+ * --z-index-auto (auto): Container elements that don't need stacking
+ * --z-index-content-header (5): GitHub section headers
+ * --z-index-navigation (100): Tab navigation, sticky headers
+ * --z-index-overlay (1000): Rate limit status, check status tooltips
+ * --z-index-floating-ui (5000): Table of contents, floating panels
+ * --z-index-dropdown (10000): Dropdown menu base
+ * --z-index-dropdown-active (10001): Dropdown menu when active/focused
+ * --z-index-dropdown-nested (10002): Nested dropdown elements
+ */

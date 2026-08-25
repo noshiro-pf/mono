@@ -51,9 +51,16 @@ Zenn の仕様上、この 2 ディレクトリはリポジトリ直下になけ
 ## experimental/
 
 `experimental/` には 2026 年以前の monorepo の内容（旧 `packages/`, `configs/`,
-`scripts/`）が入っている。pnpm workspace の glob から意図的に外してあるため、
-install・ビルド・lint・型チェックのいずれの対象にもならず、依存アップデートの
-影響を受けない。
+`scripts/`）と、削除する単独リポジトリから内容を取り込んだスナップショット
+（`github-branches-viewer`, `life-plan-simulator`）が入っている。pnpm workspace の
+glob から意図的に外してあるため、install・ビルド・lint・型チェックのいずれの対象にも
+ならず、依存アップデートの影響を受けない。
+
+取り込んだリポジトリは動く checkout ではなくスナップショットで、元の config 類が
+残っていてもここでは一切動かない（実行されるのは root の `.github/workflows/` だけ）。
+取得元・取得コミット・取り込まなかったものは、それぞれの `README.md` に記録して
+ある。取り込むときは、default branch ではなく**作業が乗っているブランチ**から取る
+こと（上の 2 つとも、残す価値のある内容は `main` に無かった）。
 
 復活させる場合は、対象のパッケージだけを `libs/` または `apps/` へ移し、依存を
 現行のライブラリへ移行する（`@noshiro/ts-utils` → `ts-data-forge`、
