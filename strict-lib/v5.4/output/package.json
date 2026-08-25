@@ -7,7 +7,7 @@
   "scripts": {
     "type-check": "tsc -p ./tsconfig.json"
   },
-  "dependencies": {
+  "devDependencies": {
     "ts-type-forge": "workspace:*",
     "typescript": "5.4.5"
   }

@@ -136,6 +136,24 @@ strict-lib/
       a changeset's text reaches only the packages it names; the rest get a
       bare version heading with nothing under it. Anything in
       `scripts-common/` affects every series equally, so list every series.
+- **Everything the harnesses need in order to generate is a devDependency, and
+  has to stay one.** `strict-ts-lib-scripts-common` in a `-source` harness, and
+  `ts-type-forge` / `typescript` in an `output` or `output-branded` harness, are
+  all generation-time tools of packages that are `private: true` and never
+  published, so `dependencies` buys nothing — and it costs a release.
+    - changesets bumps a dependent through `dependencies` and
+      `peerDependencies`, never through `devDependencies`. With the edge in
+      `dependencies` the chain ran `ts-repo-utils` → `scripts-common` → all
+      twelve harnesses → (via `gen:packages` stamping the harness version) all
+      twelve published bundles. Measured: one `ts-repo-utils` patch bumped 15
+      packages instead of 3. Bundle `0.5.1` is what that looks like shipped —
+      its entire changelog entry is `- strict-ts-lib-scripts-common@0.0.1`.
+    - Ordering is not a reason to move one back. The `dependencyFields` option
+      on the `strict-lib:gen*` stage runners is there to keep the toolchain's
+      cyclic devDependencies out of the graph, nothing more:
+      `scripts-common` has no `scripts` block at all and exports its `.mts`
+      sources directly, so it never appears in a stage, and the harnesses are
+      independent of one another.
 
 Generation runs through `strict-lib:gen*` at the root; see
 `docs/strict-typescript-lib-integration.md`.
