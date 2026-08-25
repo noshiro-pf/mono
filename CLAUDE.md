@@ -105,9 +105,10 @@ strict-lib/
 ```
 
 - **`strict-lib/v*/output/lib` is the published package, laid out as it ships.**
-  Nothing is rearranged at pack time, because `paths` resolves
-  `node_modules/strict-ts-lib-v7.0/libs/*` through a workspace symlink to that
-  directory. A layout assembled while packing would exist only in the tarball.
+  Nothing is rearranged at pack time, because the `@typescript/lib-*` links
+  resolve into `node_modules/strict-ts-lib-v7.0/libs/*`, which is a workspace
+  symlink to this very directory. A layout assembled while packing would exist
+  only in the tarball.
 - **oxfmt formats this subtree; Prettier ignores it** (`.prettierignore` lists
   `strict-lib`). With thousands of generated declarations, not walking them is
   most of what keeps the repository-wide format pass quick. Run
@@ -498,15 +499,28 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   library ships inside it under `libs/`. Nothing in `pnpm-workspace.yaml`
   supports it any more: the URL layout that needed `blockExoticSubdeps: false`
   and `publicHoistPattern` is gone, and neither setting should come back.
-    - **What connects it to TypeScript is `paths`, and that fails silently.**
-      `"@typescript/lib-*": [".../strict-ts-lib-v7.0/libs/*"]` is in the shared
-      type-check config, but `paths` is replaced — not merged — by a config that
-      `extends` another, so each of the 15 packages defining their own `paths`
-      repeats it. `pnpm run check:root:tsconfig-lib-paths` enforces that; a
-      package that opts in also carries a `@ts-expect-error` probe (see
-      `libs/octokit-safe-types/test/strict-lib-active.mts`) so that a
-      replacement which stops happening breaks the type check instead of
+    - **What connects it to TypeScript is a name, not `paths`.** The root
+      `prepare` script runs the bundle's own linker, which writes one symlink
+      per lib group into `node_modules/@typescript/`. Both compilers find it
+      there: the type check runs `typescript-native` (7.x) and the lint runs
+      the `typescript` module (6.x, what typescript-eslint loads), and each
+      resolves a lib replacement as an ordinary package-name lookup once
+      `libReplacement` is on — which both default to off, so nothing changes
+      for a package that has not opted in. Do not reintroduce the
+      `@typescript/lib-*` entry in `paths`: one mechanism is the point, and a
+      second one that silently disagrees is what the removed
+      `check:root:tsconfig-lib-paths` existed to police.
+    - **It fails silently, so two guards stand in for a diagnostic.**
+      `pnpm run check:root:strict-lib-links` fails when the 18 links stop
+      resolving, and a package that opts in carries a `@ts-expect-error` probe
+      (see `libs/octokit-safe-types/test/strict-lib-active.mts`) so that a
+      replacement which stops happening breaks the type check rather than
       passing quietly.
+    - **Never leave the links in place while running an older TypeScript.**
+      5.0–5.7 have no `libReplacement` option and do the lookup
+      unconditionally, so a check meant to reproduce what a consumer sees has
+      to run `pnpm exec strict-ts-lib-v7.0-link --unlink` first, or it fails on
+      the strict declarations themselves rather than on the code under test.
     - `pnpm run check:root:lockfile` keeps URL dependencies out entirely: pnpm
       blocks them as subdependencies, but a direct one is always allowed and
       `pnpm-update` auto-merges. See

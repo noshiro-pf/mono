@@ -54,14 +54,6 @@
 
     "lib": ["ESNext", "DOM"],
 
-    // The strict standard library, for packages that define no `paths` of
-    // their own. `paths` in an extended config resolves relative to the config
-    // that contains it — this file — and a package that sets `paths` replaces
-    // this whole object, so it has to repeat the entry.
-    "paths": {
-      "@typescript/lib-*": ["../../../node_modules/strict-ts-lib-v7.0/libs/*"]
-    },
-
     // Completeness
     "skipLibCheck": true
   }

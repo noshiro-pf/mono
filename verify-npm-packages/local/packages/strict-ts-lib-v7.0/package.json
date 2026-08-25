@@ -5,6 +5,6 @@
   "type": "module",
   "dependencies": {
     "strict-ts-lib-v7.0": "file:../../../.tarballs/strict-ts-lib-v7.0.tgz",
-    "typescript": ">=7.0.0 <7.1.0"
+    "typescript": ">=6.0.0 <8.0.0"
   }
 }

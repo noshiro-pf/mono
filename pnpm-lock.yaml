@@ -233,9 +233,6 @@ importers:
       rollup-plugin-esbuild:
         specifier: 'catalog:'
         version: 6.2.1(esbuild@0.28.2)(rollup@4.62.4)(supports-color@7.2.0)
-      strict-ts-lib-v6.0:
-        specifier: workspace:*
-        version: link:strict-lib/v6.0/output/lib
       strict-ts-lib-v7.0:
         specifier: workspace:*
         version: link:strict-lib/v7.0/output/lib
@@ -2737,7 +2734,7 @@ importers:
         specifier: ^9.2.1
         version: 9.2.1
       typescript:
-        specifier: '>=7.0.0 <7.1.0'
+        specifier: '>=6.0.0 <8.0.0'
         version: 7.0.2
 
 packages:
@@ -9074,92 +9071,92 @@ packages:
   strict-ts-lib-v7.0-decorators@file:strict-lib/v7.0/output/lib/libs/decorators:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/decorators, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-dom@file:strict-lib/v7.0/output/lib/libs/dom:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/dom, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2015@file:strict-lib/v7.0/output/lib/libs/es2015:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2015, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2016@file:strict-lib/v7.0/output/lib/libs/es2016:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2016, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2017@file:strict-lib/v7.0/output/lib/libs/es2017:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2017, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2018@file:strict-lib/v7.0/output/lib/libs/es2018:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2018, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2019@file:strict-lib/v7.0/output/lib/libs/es2019:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2019, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2020@file:strict-lib/v7.0/output/lib/libs/es2020:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2020, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2021@file:strict-lib/v7.0/output/lib/libs/es2021:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2021, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2022@file:strict-lib/v7.0/output/lib/libs/es2022:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2022, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2023@file:strict-lib/v7.0/output/lib/libs/es2023:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2023, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2024@file:strict-lib/v7.0/output/lib/libs/es2024:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2024, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es2025@file:strict-lib/v7.0/output/lib/libs/es2025:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es2025, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es5@file:strict-lib/v7.0/output/lib/libs/es5:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es5, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-es6@file:strict-lib/v7.0/output/lib/libs/es6:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/es6, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-esnext@file:strict-lib/v7.0/output/lib/libs/esnext:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/esnext, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-scripthost@file:strict-lib/v7.0/output/lib/libs/scripthost:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/scripthost, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   strict-ts-lib-v7.0-webworker@file:strict-lib/v7.0/output/lib/libs/webworker:
     resolution: {directory: strict-lib/v7.0/output/lib/libs/webworker, type: directory}
     peerDependencies:
-      typescript: '>=7.0.0 <7.1.0'
+      typescript: '>=6.0.0 <8.0.0'
 
   string-width@8.2.1:
     resolution: {integrity: sha512-IIaP0g3iy9Cyy18w3M9YcaDudujEAVHKt3a3QJg1+sr/oX96TbaGUubG0hJyCjCBThFH+tFpcIyoUHUn1ogaLA==}

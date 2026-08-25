@@ -37,15 +37,12 @@
   ],
 
   "ignoreDependencies": [
-    // The strict standard library. Nothing imports it: TypeScript finds it
-    // through the `@typescript/lib-*` entry in `paths` when `libReplacement`
-    // is on.
+    // The strict standard library. Nothing imports it: both the type check
+    // (`typescript-native`, 7.x) and the lint (the `typescript` module, 6.x,
+    // which is what typescript-eslint imports) find it by resolving
+    // `@typescript/lib-*` as package names, and the root `prepare` script runs
+    // this package's linker to supply those names.
     "strict-ts-lib-v7.0",
-    // The same library for the TypeScript that *lints*. typescript-eslint
-    // imports the `typescript` module (6.x), which ignores `paths` here and
-    // resolves `@typescript/lib-*` by name, so the root `prepare` script runs
-    // this package's linker to supply those names. Nothing imports it either.
-    "strict-ts-lib-v6.0",
     // The same, from the other side. Each `strict-lib/vX.Y` harness declares
     // `file:output/lib/libs/<group>` under the name TypeScript asks for, so
     // that its own `lib-check` resolves the generated library **by name** —

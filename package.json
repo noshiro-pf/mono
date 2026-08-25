@@ -33,7 +33,6 @@
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
-    "check:root:tsconfig-lib-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-lib-paths.mts",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
@@ -95,7 +94,7 @@
     "z:eslint": "NODE_OPTIONS='--max-old-space-size=6144' TIMING=1 eslint",
     "z:format-diff-from": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
-    "z:link-strict-lib": "strict-ts-lib-v6.0-link",
+    "z:link-strict-lib": "strict-ts-lib-v7.0-link",
     "z:repo-settings": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/github-settings-as-code/src/cmd/repo-settings.mts"
   },
   "devDependencies": {
@@ -127,7 +126,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-esbuild": "catalog:",
-    "strict-ts-lib-v6.0": "workspace:*",
     "strict-ts-lib-v7.0": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
