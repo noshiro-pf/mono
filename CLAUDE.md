@@ -509,8 +509,23 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   published package's `dependencies` and `peerDependencies` are its own API, so
   their ranges stay literal and are not catalogued.
     - What dependency updates hold back also lives there, in `update.ignoreDeps`.
-      That is the single source of truth for it; do not add exclusion arguments
-      to the `update-packages` script.
+      That is the single source of truth for _which dependency_ stops moving; do
+      not name a package in the `update-packages` script instead.
+- **`update-packages` writes to every workspace member except the generated
+  bundle manifests.** The script carries
+  `--filter '!./strict-lib/v*/output/lib'`. Those twelve `package.json` are
+  written by `strict-lib:gen:packages`, which derives their `ts-type-forge`
+  range from the harness as `^<major>.0.0` deliberately, so that a consumer is
+  not pinned to whatever version happened to be current when the library was
+  generated. Without the filter `pnpm update --latest` rewrites all twelve to
+  that exact current version and the next generation puts them back: twelve
+  meaningless lines on every dependency-update pull request, reverted by every
+  release.
+    - `ignoreDeps` cannot express this. It names a dependency, so it would stop
+      `ts-type-forge` moving everywhere else too. The filter is the other axis —
+      which _project_ the update may write to — and generated output is the only
+      thing that belongs on it, because a generated file's generator is its
+      single source of truth.
 - **GitHub Action pins are updated by `update-actions`, not by
   `update-packages`.** `update.githubActions` is `false` so that
   `update-packages`, which carries `--latest`, leaves the workflow files alone;

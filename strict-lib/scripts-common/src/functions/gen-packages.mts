@@ -608,6 +608,8 @@ const getTsTypeForgeRange = async (
 
   // Relax the peer range to a major-version match (e.g. "7.2.1" -> "^7.0.0"),
   // so consumers are not pinned to the exact ts-type-forge version the lib was
-  // generated with.
+  // generated with. This is why `update-packages` filters the generated
+  // bundles out: `pnpm update --latest` would write the exact current version
+  // into all twelve manifests and the next run of this generator would undo it.
   return major === undefined ? undefined : `^${major}.0.0`;
 };
