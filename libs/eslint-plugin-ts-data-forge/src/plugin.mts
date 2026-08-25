@@ -22,6 +22,7 @@ const recommendedRules = {
   'ts-data-forge/prefer-num-safe-parse-float': 'error',
   'ts-data-forge/no-unnecessary-type-guard': 'error',
   'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
+  'ts-data-forge/prefer-obj-over-entries-round-trip': 'error',
 } as const satisfies ReadonlyRecord<
   `ts-data-forge/${keyof typeof tsDataForgeRules}`,
   'error'

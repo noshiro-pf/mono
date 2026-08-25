@@ -1,4 +1,4 @@
-import { expectType } from 'ts-data-forge';
+import { Obj, expectType } from 'ts-data-forge';
 import {
   type ArrayElement,
   type NonEmptyTuple,
@@ -59,10 +59,8 @@ export const partial = <
     options?.keysToBeOptional ?? Object.keys(shape),
   );
 
-  const partialShape = Object.fromEntries(
-    Object.entries(shape).map(
-      ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
-    ),
+  const partialShape = Obj.map(shape, (v, k) =>
+    keysToBeOptional.has(k) ? optional(v) : v,
   ) satisfies UnknownShape;
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
