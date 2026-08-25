@@ -143,12 +143,28 @@ Generation runs through `strict-lib:gen*` at the root; see
 ### `experimental/`
 
 `experimental/` holds the contents of the pre-2026 monorepo (the old `packages/`,
-`configs/` and `scripts/`). It is deliberately **outside** the pnpm workspace
+`configs/` and `scripts/`), plus standalone repositories imported before their
+deletion so that their content survives — `github-branches-viewer` and
+`life-plan-simulator` so far. It is deliberately **outside** the pnpm workspace
 globs, so nothing in it is installed, built, linted or type-checked, and
 dependency updates cannot break it.
 
 - Do not add `experimental/` to `pnpm-workspace.yaml`.
 - Do not "fix" code in `experimental/` as part of unrelated work.
+- **An imported repository is a snapshot, not a checkout.** Whatever tooling
+  config came with it is inert here: only the root `.github/workflows/` runs,
+  and only workspace members are installed. A `README.md` at the top of each
+  records the source repository, the commit it was taken at, and what was left
+  behind.
+- **Check every branch before importing one, and say which one you took.** Both
+  imports so far turned on this: `github-branches-viewer` did its work on
+  `develop`, whose React rewrite left `main` holding a superseded static page,
+  and `life-plan-simulator` has nothing of its own on `main` at all — what is
+  worth keeping sits on an open pull request's branch. Import the branch the
+  work is on, not the default one.
+- **Import what is worth keeping, not the whole tree.** A repository generated
+  from a template carries a copy of that template; where the template still
+  exists, take only the files that do not, and list the omissions in the README.
 - A branch whose diff touches nothing but `experimental/` skips the work in
   every check workflow — see "CI diff gates".
 - To revive something, move that one package to `libs/` or `apps/`, migrate its

@@ -1,0 +1,165 @@
+.rate-limit-status {
+  --rate-limit-total: 1;
+  --rate-limit-remaining: 0;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: var(--z-index-overlay);
+}
+
+.rate-limit-toggle {
+  background-color: white;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(27, 31, 35, 0.12);
+  transition: all 0.2s ease;
+}
+
+.rate-limit-toggle:hover {
+  box-shadow: 0 3px 6px rgba(27, 31, 35, 0.15);
+}
+
+.rate-indicator {
+  font-weight: 600;
+}
+
+.rate-indicator.normal {
+  color: #28a745;
+}
+
+.rate-indicator.low {
+  color: #ffa500;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.rate-limit-details {
+  position: absolute;
+  bottom: 50px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #d1d5da;
+  border-radius: 6px;
+  padding: 1rem;
+  min-width: 300px;
+  box-shadow: 0 3px 12px rgba(27, 31, 35, 0.15);
+}
+
+.rate-limit-details h3 {
+  margin: 0 0 1rem 0;
+  font-size: 14px;
+  color: #24292e;
+}
+
+.rate-info {
+  font-size: 13px;
+  color: #586069;
+}
+
+.rate-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e1e4e8;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.rate-bar-fill {
+  height: 100%;
+  background-color: #28a745;
+  transition: width 0.3s ease;
+  width: calc((var(--rate-limit-remaining) / var(--rate-limit-total)) * 100%);
+}
+
+.reset-time {
+  font-size: 12px;
+  color: #6a737d;
+  margin-top: 0.5rem;
+}
+
+.rate-warning {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #fffbdd;
+  border: 1px solid #ffdf5d;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #735c0f;
+}
+
+.rate-warning small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #6a737d;
+}
+
+/* Dark mode styles */
+.dark .rate-limit-toggle {
+  background-color: #21262d;
+  border-color: #30363d;
+  color: #c9d1d9;
+  box-shadow: 0 1px 3px rgba(1, 4, 9, 0.12);
+}
+
+.dark .rate-limit-toggle:hover {
+  box-shadow: 0 3px 6px rgba(1, 4, 9, 0.25);
+}
+
+.dark .rate-indicator.normal {
+  color: #3fb950;
+}
+
+.dark .rate-indicator.low {
+  color: #d29922;
+}
+
+.dark .rate-limit-details {
+  background-color: #161b22;
+  border-color: #30363d;
+  box-shadow: 0 3px 12px rgba(1, 4, 9, 0.25);
+}
+
+.dark .rate-limit-details h3 {
+  color: #c9d1d9;
+}
+
+.dark .rate-info {
+  color: #8b949e;
+}
+
+.dark .rate-bar {
+  background-color: #30363d;
+}
+
+.dark .rate-bar-fill {
+  background-color: #3fb950;
+}
+
+.dark .reset-time {
+  color: #8b949e;
+}
+
+.dark .rate-warning {
+  background-color: #1c2128;
+  border-color: #d29922;
+  color: #d29922;
+}
+
+.dark .rate-warning small {
+  color: #8b949e;
+}

@@ -1,0 +1,427 @@
+.readme-package-info {
+  width: 100%;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--border-radius-large);
+  padding: var(--padding-large);
+  border: var(--border-width) solid var(--color-border-primary);
+  box-shadow: var(--shadow-light);
+}
+
+.readme-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--margin-medium);
+  padding-bottom: var(--padding-medium);
+  border-bottom: var(--border-width) solid var(--color-border-primary);
+}
+
+.readme-section-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.readme-title-link {
+  color: var(--color-text-link);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0969da;
+  text-decoration: none;
+}
+
+.readme-title-link:hover {
+  color: var(--color-text-link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.readme-description {
+  margin: 0 0 1rem 0;
+  color: #586069;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.readme-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+}
+
+.meta-label {
+  font-weight: 600;
+  color: #24292e;
+  min-width: 100px;
+}
+
+.meta-value {
+  color: #586069;
+}
+
+.meta-link {
+  color: #0366d6;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.meta-link:hover {
+  text-decoration: underline;
+}
+
+.readme-keywords {
+  margin: 1rem 0;
+}
+
+.keywords-label {
+  display: block;
+  font-weight: 600;
+  color: #24292e;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.keyword-tag {
+  background-color: #f1f8ff;
+  color: #0366d6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #c8e1ff;
+}
+
+.readme-install {
+  background-color: #f6f8fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.install-label {
+  display: block;
+  font-weight: 600;
+  color: #24292e;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.install-command {
+  display: block;
+  background-color: #24292e;
+  color: #f6f8fa;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-family:
+    'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New',
+    monospace;
+  font-size: 13px;
+  user-select: all;
+  overflow-x: auto;
+}
+
+.readme-dependencies,
+.readme-readme {
+  margin-top: 1rem;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.readme-dependencies summary,
+.readme-readme summary {
+  padding: 0.75rem 1rem;
+  background-color: #f6f8fa;
+  font-weight: 600;
+  font-size: 14px;
+  color: #24292e;
+  cursor: pointer;
+  user-select: none;
+}
+
+.readme-dependencies summary:hover,
+.readme-readme summary:hover {
+  background-color: #e1e4e8;
+}
+
+.readme-dependencies[open] summary,
+.readme-readme[open] summary {
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.dependency-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dependency-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #f6f8fa;
+  font-size: 13px;
+}
+
+.dependency-list li:last-child {
+  border-bottom: none;
+}
+
+.dependency-list a {
+  color: #0366d6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.dependency-list a:hover {
+  text-decoration: underline;
+}
+
+.dependency-version {
+  color: #6a737d;
+  font-family:
+    'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New',
+    monospace;
+  font-size: 12px;
+}
+
+.readme-loading,
+.readme-error,
+.readme-not-found,
+.no-readme {
+  padding: 2rem;
+  text-align: center;
+  color: #586069;
+  font-style: italic;
+}
+
+.readme-error {
+  color: #cb2431;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .readme-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .meta-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .meta-label {
+    min-width: auto;
+  }
+}
+
+/* README content styles - minimal overrides for github-markdown-css */
+.readme-content {
+  padding: 1rem 0;
+  background-color: transparent;
+  /* Let github-markdown-css handle typography */
+}
+
+/* Let github-markdown-css handle all heading styles */
+
+/* Let github-markdown-css handle paragraph styles */
+
+/* Let github-markdown-css handle link styles */
+
+/* Let github-markdown-css handle inline code styles */
+
+/* Let github-markdown-css handle pre styles */
+
+/* GitHub-generated HTML styling adjustments */
+.readme-content {
+  /* Let github-markdown-css handle all styling */
+}
+
+/* Ensure external links open in new tab (if needed via JavaScript) */
+.readme-content a[href^='http']:not([href*='github.com']) {
+  /* External link styling handled by github-markdown-css */
+}
+
+/* Starry-night syntax highlighting styles - GitHub compatible */
+.readme-content .starry-night {
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo,
+    monospace;
+}
+
+/* Light theme syntax highlighting */
+.readme-content .pl-c {
+  color: #6a737d;
+} /* comment */
+.readme-content .pl-c1 {
+  color: #005cc5;
+} /* constant */
+.readme-content .pl-e {
+  color: #6f42c1;
+} /* entity */
+.readme-content .pl-en {
+  color: #6f42c1;
+} /* entity name */
+.readme-content .pl-k {
+  color: #d73a49;
+} /* keyword */
+.readme-content .pl-s {
+  color: #032f62;
+} /* string */
+.readme-content .pl-v {
+  color: #e36209;
+} /* variable */
+.readme-content .pl-smi {
+  color: #24292e;
+} /* storage modifier import */
+.readme-content .pl-pds {
+  color: #032f62;
+} /* punctuation definition string */
+.readme-content .pl-mi {
+  color: #005cc5;
+} /* markup italic */
+.readme-content .pl-mb {
+  color: #24292e;
+} /* markup bold */
+.readme-content .pl-mc {
+  color: #e36209;
+} /* markup changed */
+.readme-content .pl-mh {
+  color: #005cc5;
+} /* markup heading */
+.readme-content .pl-ms {
+  color: #005cc5;
+} /* markup subheading */
+
+/* Dark theme syntax highlighting */
+.dark .readme-content .pl-c {
+  color: #8b949e;
+} /* comment */
+.dark .readme-content .pl-c1 {
+  color: var(--color-text-link-hover);
+} /* constant */
+.dark .readme-content .pl-e {
+  color: #d2a8ff;
+} /* entity */
+.dark .readme-content .pl-en {
+  color: #d2a8ff;
+} /* entity name */
+.dark .readme-content .pl-k {
+  color: #ff7b72;
+} /* keyword */
+.dark .readme-content .pl-s {
+  color: #a5d6ff;
+} /* string */
+.dark .readme-content .pl-v {
+  color: #ffa657;
+} /* variable */
+.dark .readme-content .pl-smi {
+  color: #f0f6fc;
+} /* storage modifier import */
+.dark .readme-content .pl-pds {
+  color: #a5d6ff;
+} /* punctuation definition string */
+.dark .readme-content .pl-mi {
+  color: var(--color-text-link-hover);
+} /* markup italic */
+.dark .readme-content .pl-mb {
+  color: #f0f6fc;
+} /* markup bold */
+.dark .readme-content .pl-mc {
+  color: #ffa657;
+} /* markup changed */
+.dark .readme-content .pl-mh {
+  color: var(--color-text-link-hover);
+} /* markup heading */
+.dark .readme-content .pl-ms {
+  color: var(--color-text-link-hover);
+} /* markup subheading */
+
+/* Let github-markdown-css handle blockquote styles */
+
+/* Let github-markdown-css handle list styles */
+
+/* Let github-markdown-css handle table styles */
+
+/* Let github-markdown-css handle image styles */
+
+/* Let github-markdown-css handle hr styles */
+
+/* Refresh button styles */
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-small);
+  background: none;
+  border: var(--border-width) solid var(--color-border-secondary);
+  border-radius: var(--border-radius-medium);
+  padding: 6px 12px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-primary);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.refresh-btn svg.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* No README message */
+.no-readme {
+  color: var(--color-text-secondary);
+}
+
+/* Dark mode README title link */
+.dark .readme-title-link {
+  color: var(--color-text-link);
+}
+
+.dark .readme-title-link:hover {
+  color: #539bf5;
+}
