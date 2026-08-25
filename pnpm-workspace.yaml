@@ -16,9 +16,9 @@ catalog:
   '@types/react-dom': 19.2.5
   '@typescript-eslint/parser': 8.67.0
   '@typescript-eslint/rule-tester': 8.67.0
-  '@vitest/browser-playwright': 4.1.10
-  '@vitest/coverage-v8': 4.1.10
-  '@vitest/ui': 4.1.10
+  '@vitest/browser-playwright': 4.1.11
+  '@vitest/coverage-v8': 4.1.11
+  '@vitest/ui': 4.1.11
   argparse: 3.0.0
   cspell: 10.0.1
   dedent: 1.7.2
@@ -31,7 +31,7 @@ catalog:
   markdownlint-cli2: 0.23.2
   mobx: 7.0.0
   npm-run-all2: 9.0.3
-  oxfmt: 0.63.0
+  oxfmt: 0.64.0
   playwright: 1.62.1
   preact: 10.29.8
   prettier: 3.9.6
@@ -48,7 +48,7 @@ catalog:
   typescript: 6.0.3
   valtio: 2.3.2
   vite: 8.2.1
-  vitest: 4.1.10
+  vitest: 4.1.11
   zustand: 5.0.15
 
 packages:
