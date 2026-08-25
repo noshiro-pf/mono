@@ -1,5 +1,11 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.9.5
+
+### Patch Changes
+
+- a26e6e6: Regenerate the rule option types with the record style unified to `ts-type-forge`'s `ReadonlyRecord<K, V>` (semantically identical to the previous `Readonly<Record<K, V>>` spelling). The rule-type generator now runs the codemod once more after `eslint --fix`, since `@typescript-eslint/consistent-indexed-object-style` used to re-introduce `Readonly<Record<...>>` after the codemod had already run.
+
 ## 5.9.4
 
 ### Patch Changes

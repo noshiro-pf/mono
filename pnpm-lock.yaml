@@ -1802,7 +1802,7 @@ importers:
   strict-lib/v5.0/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.0.0 <5.1.0'
@@ -1890,7 +1890,7 @@ importers:
   strict-lib/v5.1/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.1.0 <5.2.0'
@@ -1978,7 +1978,7 @@ importers:
   strict-lib/v5.2/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.2.0 <5.3.0'
@@ -2066,7 +2066,7 @@ importers:
   strict-lib/v5.3/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.3.0 <5.4.0'
@@ -2154,7 +2154,7 @@ importers:
   strict-lib/v5.4/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.4.0 <5.5.0'
@@ -2242,7 +2242,7 @@ importers:
   strict-lib/v5.5/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.5.0 <5.6.0'
@@ -2324,7 +2324,7 @@ importers:
   strict-lib/v5.6/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.6.0 <5.7.0'
@@ -2409,7 +2409,7 @@ importers:
   strict-lib/v5.7/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.7.0 <5.8.0'
@@ -2494,7 +2494,7 @@ importers:
   strict-lib/v5.8/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.8.0 <5.9.0'
@@ -2579,7 +2579,7 @@ importers:
   strict-lib/v5.9/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=5.9.0 <6.0.0'
@@ -2655,7 +2655,7 @@ importers:
   strict-lib/v6.0/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=6.0.0 <6.1.0'
@@ -2731,7 +2731,7 @@ importers:
   strict-lib/v7.0/output/lib:
     dependencies:
       ts-type-forge:
-        specifier: ^9.2.1
+        specifier: ^9.0.0
         version: 9.2.1
       typescript:
         specifier: '>=6.0.0 <8.0.0'

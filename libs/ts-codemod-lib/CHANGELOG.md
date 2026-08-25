@@ -1,5 +1,11 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.1.0
+
+### Minor Changes
+
+- a26e6e6: Add a `recordStyle` option to `convertToReadonlyTransformer` for making `Record<K, V>` readonly. `"ReadonlyRecord"` (default) converts `Record<K, V>` to `ts-type-forge`'s `ReadonlyRecord<K, V>` (no import statement is added), while `"Readonly<Record>"` converts it to `Readonly<Record<K, V>>` using only built-in utility types. Whichever style is selected, `Readonly<Record<K, V>>` and `ReadonlyRecord<K, V>` are unified to that style, and redundant wrappers such as `Readonly<ReadonlyRecord<K, V>>` are normalized as well. With `"Readonly<Record>"`, the `ReadonlyRecord` name is additionally eliminated under `DeepReadonly` and indexed accesses (`DeepReadonly<ReadonlyRecord<K, V>>` becomes `DeepReadonly<Record<K, V>>`, matching the existing `Readonly` normalization); with `"ReadonlyRecord"`, it is kept there so that the bare built-in `Record` never appears in the output (which would conflict with the `ts-type-forge/prefer-readonly-or-mutable-record` ESLint rule).
+
 ## 3.0.1
 
 ### Patch Changes
