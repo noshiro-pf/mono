@@ -209,14 +209,14 @@ commands run those across every workspace member that defines them, and the
 
 ## CI diff gates
 
-The push-triggered workflows carry no `paths-ignore`. A workflow that a path
-filter skips never reports a status check, and most of these jobs are required
-ones, so a pull request that changed only the filtered paths would wait forever
-on a check that never arrives. Each job instead carries a `Check diff` step and
+The check workflows carry no `paths` filter. A workflow that a path filter
+skips never reports a status check, and most of these jobs are required ones,
+so a pull request that changed only the filtered paths would wait forever on a
+check that never arrives. Each job instead carries a `Check diff` step and
 every later step carries
 `if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
-does no work. A second gate sits in front of that one — see "Draft pull
-requests".
+does no work. A second gate sits in front of the whole job — see "Check
+triggers and draft pull requests".
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -243,51 +243,64 @@ Two things to keep in mind when editing a gated workflow:
 - On a push to `main`, diffing against `origin/main` is a diff against `HEAD`,
   which is empty and reads as "nothing changed" — every step would skip. Each
   gate therefore compares against `github.event.before` on `main`.
-- A step added _before_ the `Check diff` step carries the draft condition
-  instead, `if: steps.check_draft.outputs.is_draft != 'true'`; one added after
-  it needs nothing new, because the diff gate is itself skipped on a draft.
+- A step added _before_ the `Check diff` step needs no condition of its own —
+  the draft gate is the job-level `if`, not a step; one added _after_ it
+  carries `should_run` like the rest.
 
 `verify-published-packages.yml` gates itself on the same principle but in
 shell, because its gate runs before Node.js is installed.
 
-## Draft pull requests
+## Check triggers and draft pull requests
 
-A push to a branch whose open pull request is a draft does no work. The five
-push-triggered check workflows — `type-check.yml`, `style-check.yml`,
+The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
-`backup-repository-settings.yml` — open with a `Check for a draft pull request`
-step, and the checkout, the install and the diff gate itself carry
-`if: steps.check_draft.outputs.is_draft != 'true'`. A `push` event knows only
-the branch it was pushed to, so that step asks the API (`gh pr list --head`)
-whether the open pull requests for that branch are drafts.
+`backup-repository-settings.yml` — trigger on
+`pull_request: types: [opened, synchronize, reopened, ready_for_review]`, and
+on `push` only for `main`. One event kind per commit is what keeps the checks
+list at one entry per job: triggering on `push` for branches as well would put
+a push run and a `pull_request` run side by side on every pull request.
+Nothing is lost by leaving `push` out — `synchronize` fires on every push to a
+branch with an open pull request, `opened` covers the pushes made before it
+existed, and a branch that never gets a pull request has nothing to protect,
+because the `main` ruleset accepts changes through pull requests only. The
+`push` runs on `main` re-check what actually landed, a squash merge being a
+new commit that no pull request run has seen.
 
-The steps _after_ the diff gate need no new condition. They already hang off
-`steps.<gate-id>.outputs.should_run == 'true'`, and a step that was skipped has
-no outputs, so skipping the gate skips everything downstream of it.
+Draft pull requests run nothing: every job carries
 
-Three things keep this from becoming a hole in the required status checks:
+```yaml
+if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+```
 
-- **A workflow that skips on a draft also triggers on
-  `pull_request: types: [ready_for_review]`.** The job still runs and still
-  reports success while the pull request is a draft — a job that never reports
-  is exactly what `paths-ignore` would do, and leaves the pull request waiting
-  forever — so those green checks stand for work that did not happen. Marking
-  the pull request ready for review is not a push, so without that trigger
-  nothing would replace them and the branch would be mergeable having been
-  checked by nothing. Its checkout takes
-  `ref: github.event.pull_request.head.sha` so the run sees the branch tip
-  rather than the merge commit GitHub synthesises for the event, which is what
-  a push would have seen.
-- **A branch with no open pull request runs everything.** Opening one is not a
-  push either, so a branch skipped on the strength of a pull request that does
-  not exist yet would never be checked.
-- **The lookup fails open.** A pull request the token cannot read is treated as
-  not a draft: running the checks needlessly is the harmless half of being
-  wrong.
+The draft flag arrives in the event payload, so there is no API lookup, and a
+job-level `if` is evaluated by GitHub itself, so no runner is booted — the
+checks just report `skipped`. Three things to know about that state:
 
-`main` never reaches the lookup, and neither does a `workflow_dispatch` run —
-asking for the checks by hand is asking for them regardless of the pull
-request's state.
+- **A skipped job satisfies a required status check.** What blocks merging a
+  draft is the draft itself, which GitHub refuses to merge natively. Marking
+  the pull request ready for review fires `ready_for_review`, and the real
+  run's checks take over; for the few seconds before they register, the
+  required checks read as satisfied. Auto-merge cannot be armed on a draft, so
+  closing that window was judged not worth the alternative — a gate job that
+  cancels its own run on every draft push, costing a runner boot each time.
+- **Do not make a draft report success instead.** The previous design gated
+  every step on an API lookup and let the job report green while a draft:
+  green checks that stood for work that never happened, one booted runner per
+  matrix entry per push, and a doubled checks list, since the `push` and
+  `ready_for_review` runs sat side by side.
+- **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
+  only `pull_request` events; asking for the checks by hand is asking for them
+  regardless of the pull request's state.
+
+The design leans on the `main` ruleset
+(`repo-settings/rulesets/main.json`): merging into `main` requires a pull
+request, and the admin's bypass is `bypass_mode: "pull_request"` — usable
+inside a pull request flow only, so a direct push to `main` is refused even
+for the repository admin. The escape hatch for a wedged required check is to
+merge a pull request with the bypass, not to push. Do not widen it back to
+`"always"`: checks arrive only through pull requests now, so an unchecked
+direct push would reach `main` with nothing but the after-the-fact `push` run
+having seen it.
 
 ## Spell checking
 
