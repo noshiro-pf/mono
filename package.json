@@ -67,7 +67,7 @@
     "strict-lib:publish": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/dist-npm-publish.mts",
     "strict-lib:type-check": "tsc -p ./strict-lib/tsconfig.tooling.json --noEmit",
     "update-actions": "pnpm update --recursive --include-github-actions \"*/*\"",
-    "update-packages": "pnpm update --latest --recursive",
+    "update-packages": "pnpm update --latest --recursive --filter '!./strict-lib/v*/output/lib'",
     "verify:npm-packages": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/verify-npm-packages.mts",
     "verify:npm-packages:published": "pnpm run verify:npm-packages --published",
     "verify:npm-packages:published:update": "pnpm run verify:npm-packages --published --update",
