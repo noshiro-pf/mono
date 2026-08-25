@@ -124,14 +124,18 @@ strict-lib/
   resolution is a fixed Node10 lookup that ignores `paths`.
 - Every TypeScript minor **shares one version number**, kept together by the
   `fixed` group in `.changeset/config.json`.
-- **A changeset for the strict standard library names a `-source` harness, not
-  a bundle**, and one of them is enough — the `fixed` group carries the bump to
-  all twelve. Naming a bundle (`strict-ts-lib-v7.0`) looks right and does
-  nothing: `changeset version` bumps that manifest, then
-  `strict-lib:gen:packages` runs next in `changeset:version-packages` and
-  stamps each bundle with its harness's version, putting the old number back.
-  Nothing errors — the release just silently does not happen, and the changeset
-  is consumed. It cost #1672 and #1673 their release.
+- **A changeset for the strict standard library names the `-source` harnesses,
+  not the bundles — and names all twelve of them.**
+    - Naming a bundle (`strict-ts-lib-v7.0`) looks right and does nothing:
+      `changeset version` bumps that manifest, then `strict-lib:gen:packages`
+      runs next in `changeset:version-packages` and stamps each bundle with its
+      harness's version, putting the old number back. Nothing errors — the
+      release just silently does not happen, and the changeset is consumed. It
+      cost #1672 and #1673 their release.
+    - The `fixed` group aligns the twelve **versions** from a single name, but
+      a changeset's text reaches only the packages it names; the rest get a
+      bare version heading with nothing under it. Anything in
+      `scripts-common/` affects every series equally, so list every series.
 
 Generation runs through `strict-lib:gen*` at the root; see
 `docs/strict-typescript-lib-integration.md`.
