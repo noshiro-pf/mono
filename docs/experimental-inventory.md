@@ -1,4 +1,4 @@
-<!-- cspell:ignore catan dezero -->
+<!-- cspell:ignore catan dezero Ymdhm -->
 
 # `experimental/` の棚卸し
 
@@ -134,7 +134,7 @@ app に連れられて来るもの。単体で復元する理由は薄い。
 
 ## 進め方の提案
 
-置換は機械的に決まる。
+置換の**行き先**は機械的に決まる。
 
 ```text
 ts-utils / ts-utils-additional → ts-data-forge
@@ -145,14 +145,69 @@ eslint-configs                 → eslint-config-typed
 global-*                       → 明示 import
 ```
 
+**ただし「行き先がある」と「同じものがある」は別。** 2 つ復元して実測したところ、
+後継パッケージに対応物が無い API がその都度出てきた。移植先はアプリ内の
+`src/utils/` で、出自をコメントに書いて残している。
+
+| 無かったもの                                      | どこで要った                         |
+| :------------------------------------------------ | :----------------------------------- |
+| `match` / `mapOptional` / `noop`                  | poll-discord-app                     |
+| `DateUtils`（5 関数）・曜日とアルファベットの定数 | poll-discord-app                     |
+| `Arr.isArrayOfLength3` などの長さ別 guard         | lambda-calculus-interpreter-core     |
+| `Obj.set` / `Obj.update`                          | poll-discord-app（スプレッドに置換） |
+
+**API 名も動いている。** `ISet.new` → `create`、`Str.from` → `unknownToString`、
+`toUint32` / `toSafeUint` → `asUint32` / `asSafeUint`、`pipe().chain()` →
+`.map()`、`t.simpleBrandedString(name, default)` → options 引数。`IMap.get` と
+`Arr.last` は `Optional` を返すようになった。
+
 **最初の 1 つは、連れてくる utils が「なし」の 3 つから選ぶのがよい。** 置換だけで
 済み、utils の復元と app の復元を同時にやらずに済む。
 
-| 候補                               | 行数 | 性格                                          |
-| :--------------------------------- | ---: | :-------------------------------------------- |
-| `lambda-calculus-interpreter-core` |  750 | 純粋なロジック。UI 無し。依存は ts-utils のみ |
-| `poll-discord-app`                 | 2008 | サーバ側。io-ts と ts-utils のみ              |
-| `event-schedule-app-shared`        | 5203 | 型定義中心。ただし単体では動かない            |
+| 候補                               | 行数 | 性格                                          | 状況                            |
+| :--------------------------------- | ---: | :-------------------------------------------- | :------------------------------ |
+| `lambda-calculus-interpreter-core` |  750 | 純粋なロジック。UI 無し。依存は ts-utils のみ | 復元済み（#1621、レビュー待ち） |
+| `poll-discord-app`                 | 2008 | サーバ側。io-ts と ts-utils のみ              | 復元済み（#1620、レビュー待ち） |
+| `event-schedule-app-shared`        | 5203 | 型定義中心。ただし単体では動かない            | 復元済み（#1625、レビュー待ち） |
+
+### 置き場は npm の公開状況で決まった
+
+`libs/*` は公開 npm パッケージ、`apps/*` は非公開、というのが現行の規約。
+実測すると事情が 3 通りに分かれたが、**公開済みのものも `apps/` に private で戻す
+方針**とした（npm 上の既存版はそのまま残り、以降のリリースは行わない）。
+
+| パッケージ                         | 旧 `private` | npm                   | 結論                                                 |
+| :--------------------------------- | :----------- | :-------------------- | :--------------------------------------------------- |
+| `poll-discord-app`                 | `true`       | —                     | `apps/` に private。判断不要                         |
+| `lambda-calculus-interpreter-core` | `false`      | **404（未公開）**     | `apps/` に private。公開されたことが無いので判断不要 |
+| `event-schedule-app-shared`        | `false`      | **9.0.0（公開済み）** | `apps/` に private。npm の既存版は残る               |
+| `io-ts-types`                      | `false`      | **1.0.0（公開済み）** | 同上                                                 |
+
+前 2 つは旧レイアウトでも `packages/apps/` 配下だったので、`apps/` に戻すのが
+位置としても忠実だった。
+
+### `event-schedule-app-shared` は「utils なし」ではなかった
+
+上の表の「なし」は、**後継が無い utils を連れてこない**という意味で、依存が無いと
+いう意味ではなかった。実際の `dependencies` は `io-ts` / `io-ts-types` /
+`ts-utils` / `ts-utils-additional` の 4 つで、このうち **`io-ts-types` は
+`ts-fortress` では代替できない**。
+
+- `DatetimeRange` と `Ymdhm` は `io-ts-types` の**ドメイン型**で、`ts-fortress`
+  にあるはずのないもの。352 行 14 ファイルを別途復元する必要がある
+- **`t.*` の API 自体は `ts-fortress` で全部まかなえる。** `t.enumType` はそのまま
+  あり、`t.stringLiteral` は `literal` に改名されている。`t.safeUint` /
+  `t.createPrimitiveType` / `t.nonEmptyArray` / `t.optional` / `t.keyof` /
+  `t.record` / `t.array` / `t.union` もある
+
+つまりこれは**「app 1 つ」ではなく「utils 1 つ + app 1 つ」**の作業で、183
+ファイル・5203 行に `io-ts-types` の分が乗る。
+
+**2026-08-25 追記: その `io-ts-types` は復元済みで、main に入っている**（#1624）。
+`apps/io-ts-types` に `private: true` で置いた — 上の表の方針どおりである。16
+ファイル・468 行で、見積りの「352 行 14 ファイル」よりやや大きかった。したがって
+`event-schedule-app-shared`（#1625）の前提はもう揃っており、「公開済みの 2
+パッケージをどう扱うか」も決着している。
 
 `event-schedule-app` は 21136 行あり、Blueprint.js・Firebase・自作ルータに依存する
 ので最後に回すのが妥当。
