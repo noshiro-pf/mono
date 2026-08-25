@@ -14,81 +14,42 @@ name: Verify Published Packages
 # from the registry.
 
 on:
+  # Only main — pull request branches are covered by the `pull_request` events
+  # below; see the note in type-check.yml.
   push:
-    branches-ignore:
-      # `archive/**` holds frozen snapshots of retired work. They are never
-      # merged back, so every check on them is wasted CI.
-      - 'archive/**'
+    branches:
+      - main
 
-  # `Check for a draft pull request` below skips the work while the pull
-  # request is a draft, and the job still reports — so without this trigger the
-  # required checks would sit green on a branch nothing has checked, and
-  # marking the pull request ready for review, which is not a push, would not
-  # re-run them. This is what runs them for real.
+  # `synchronize` fires on every push to the pull request's branch, so these
+  # four types cover the pull request's whole life. While it is a draft the
+  # job-level `if` below skips the run; `ready_for_review` is what runs the
+  # checks for real once it stops being one.
   pull_request:
     types:
+      - opened
+      - synchronize
+      - reopened
       - ready_for_review
 
   workflow_dispatch:
 
 jobs:
   verify-published:
+    # Skip the whole job while the pull request is a draft — see the note in
+    # type-check.yml.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
-      # A draft pull request is work in progress, so everything below is
-      # skipped until it is marked ready for review. A `push` event carries no
-      # pull request context — the branch is all it knows — so ask the API
-      # whether the open pull request for that branch is a draft.
-      #
-      # This runs first, before the checkout: every other step hangs off it, so
-      # a push to a draft costs one API call rather than an install and a
-      # build. The job itself still runs and still reports, for the same reason
-      # nothing here uses `paths-ignore` — these are required status checks,
-      # and a job that never reports leaves the pull request waiting on a check
-      # that will never arrive.
-      - name: Check for a draft pull request
-        id: check_draft
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EVENT_NAME: ${{ github.event_name }}
-        run: |
-          # `workflow_dispatch` is someone asking for the checks explicitly,
-          # and `pull_request` only fires here on `ready_for_review`, which is
-          # the moment the draft stopped being one.
-          if [ "${EVENT_NAME}" != 'push' ] || [ "${GITHUB_REF_NAME}" = 'main' ]; then
-            exit 0
-          fi
-
-          # Every open pull request whose head is this branch has to be a
-          # draft. `none` — no pull request yet — runs the checks: the branch
-          # may never get one, and nothing would re-run them if it did, since
-          # opening a pull request is not a push.
-          jq_filter='if length == 0 then "none" elif all(.[]; .isDraft) then "true" else "false" end'
-
-          # Fail open. A pull request that cannot be read is not a draft as far
-          # as this gate is concerned; running the checks anyway is the
-          # harmless half of being wrong.
-          if ! is_draft="$(gh pr list --repo "${GITHUB_REPOSITORY}" \
-            --head "${GITHUB_REF_NAME}" --state open --json isDraft \
-            --jq "${jq_filter}")"; then
-            echo 'Could not read the pull requests for this branch; running the checks.'
-            exit 0
-          fi
-
-          if [ "${is_draft}" = 'true' ]; then
-            echo 'is_draft=true' >>"${GITHUB_OUTPUT}"
-            echo 'This branch has a draft pull request; skipping. Mark it ready for review to run the checks.'
-          fi
-
       - name: Checkout
-        if: steps.check_draft.outputs.is_draft != 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The branch tip, not the merge commit GitHub synthesises for a
-          # `pull_request` event, so a `ready_for_review` run checks exactly
-          # what a push to this branch would have.
+          # `pull_request` event: these checks assert properties of the branch
+          # itself, and the merge ref does not even exist while the pull
+          # request has a conflict. On a push event this falls back to the
+          # pushed commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # The gate below resolves `github.event.before` and a merge base,
           # neither of which exists in the default shallow clone. It also
@@ -98,7 +59,6 @@ jobs:
 
       - name: Check whether the pins changed
         id: pins
-        if: steps.check_draft.outputs.is_draft != 'true'
         env:
           BEFORE: ${{ github.event.before }}
         run: |
