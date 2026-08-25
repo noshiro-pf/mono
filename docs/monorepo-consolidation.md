@@ -263,27 +263,28 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **2026-08-13 に `dist-v7.0-0.0.0` が出た。** peer range は `typescript >=7.0.0 <7.1.0` で、mono の `typescript-native`（`npm:typescript@7.0.2`）と一致する。107 個の `@typescript/lib-*` を dependencies に持つメタパッケージを devDependency として入れる形
     - 導入手順は実測して [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の末尾に書いた。`libReplacement` が TypeScript 7 では既定 `false` であること、メタパッケージ 1 つでは pnpm が install を拒むこと、素朴に数えたエラー数（21,629 件）はビルド失敗の連鎖で実態は各パッケージ十数件であること
     - 土台（107 個の依存宣言と knip の ignore）は入れた。`libReplacement` はまだどこでも有効にしていないので挙動は変わらない
-    - **2026-08-21 に依存宣言をメタパッケージ 1 件へ畳んだ。** `blockExoticSubdeps: false` に加えて `publicHoistPattern: ['@typescript/lib-*']` が要る。後者が無いと推移的依存が root の `node_modules/@typescript/` に並ばず、`libReplacement` が一度も見つけられない。URL 依存の防御は pnpm の代わりに `check:root:lockfile` が担う
+    - **2026-08-21 に依存宣言をメタパッケージ 1 件へ畳んだ。** 当時は URL 配布だったので `blockExoticSubdeps: false` と `publicHoistPattern: ['@typescript/lib-*']` の 2 つが要った
+        - **2026-08-25 追記: どちらも撤去済み。** strict lib は npm の普通の registry 依存（`strict-ts-lib-v7.0`）になり、lib グループは 1 つのパッケージの中に入った。root の `prepare` が同梱のリンカを走らせて `node_modules/@typescript/` に 18 本のシンボリックリンクを張り、TypeScript 6 も 7 も**それを普通のパッケージ名として引く**。`paths` は使わない。URL 依存を締め出す `check:root:lockfile` だけは残してある
     - **導入コストは型エラーの件数では測れない。** strict lib の `@deprecated` が `@typescript-eslint/no-deprecated` に拾われ、`ts-fortress` では型エラー 4 件を直したあとに lint が 21 件残った。さらに `lint:fix` が strict lib 前提のコードに書き換えてしまい、`src` を配るパッケージでは消費者のエディタに赤が出る
     - **`src` を配るパッケージの方針は決まった（2026-08-15）。** strict lib 前提で書かれた `src` が、strict lib を使わない消費者の環境で一部型エラーになることは**許容する**。このリポジトリは関数の入出力に明示的な型注釈を強制しており、推論に頼る箇所が少ないため影響が小さい。`files` から `src` を外す案・`no-deprecated` を緩める案は採らない
         - 影響の実測は [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の「型チェック以外への影響」にある。`ts-fortress` では型 4 件を直した後に `no-deprecated` が 21 件残った
         - **この判断は #1613 で保留した箇所にも及ぶ。** `ts-data-forge` の `array-utils-search.mts` で、strict lib の形に書くと消費者側で赤が出るという理由からコメントアウトした `expectType` が 2 箇所ある。許容する方針になったので、strict lib の形に書き戻してよい
-    - **繰り返し出ていた `Object.fromEntries` の `Partial` は解消した。** 半分は strict lib 側のバグで、キーの種類にかかわらず `string & {}` を足していたため `Record<string, V>` のキーまで union 扱いになっていた（[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117) で修正）。残り半分は entries 配列を経由する書き方そのものの限界なので、`Obj.map`（#1638）と `Obj.filter` / `Obj.filterMap`（#1642）を `ts-data-forge` に足して呼び出し側を移行した。標準 lib でも通るので opt-in を待たずに済ませられる。ただし #117 は mono が指す `dist-v7.0-0.0.0` より後の変更なので、新しい release が出て URL を貼り替えるまで lib 側の修正は届かない
+    - **繰り返し出ていた `Object.fromEntries` の `Partial` は解消した。** 半分は strict lib 側のバグで、キーの種類にかかわらず `string & {}` を足していたため `Record<string, V>` のキーまで union 扱いになっていた（[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117) で修正）。残り半分は entries 配列を経由する書き方そのものの限界なので、`Obj.map`（#1638）と `Obj.filter` / `Obj.filterMap`（#1642）を `ts-data-forge` に足して呼び出し側を移行した。標準 lib でも通るので opt-in を待たずに済ませられる。#117 は当時 mono が指していた `dist-v7.0-0.0.0` より後の変更だったが、その後のリリースで届いている
     - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する
         - **opt-in 済み**: `octokit-safe-types`（型 0 件、#1614）
         - **PR 提出済み・未マージ**: `ts-repo-utils`（#1618）。`ts-data-forge` は「どちらの lib でも同じに読める」形に揃えた #1613 があるが、opt-in 自体はまだ
             - `ts-repo-utils` の型 2 件は**実質 1 件になった**。`Object.fromEntries` の件は lib 側の不具合だったので、回避として書いていた明示的なループは #1618 で取り消してある
-        - **残りの件数**: `ts-fortress` 4 / `ts-type-forge` 6 / `ts-data-forge` 11
-    - **`ts-data-forge` の opt-in を止めていた 2 件のうち 1 件は解消した（2026-08-21）。** strict lib の `dist-v7.0-0.1.0` で `class X extends Map/Set` が通るようになり、`Object.fromEntries` が `Record<string, V>` を `Partial` にする件も直った。URL の貼り替えは #1651
-        - **残るのは `@eslint/plugin-kit` の 1 件だけ。** `dist/cjs/types.cts` を `.d.cts` ではなくソースとして配っているため `skipLibCheck` が効かない。`paths` を dist に向けても消えないことを実測した（`skipLibCheck` が飛ばすのは `.d.ts` で、`.cts` はどう辿り着いてもソースとして検査される）。上流は 0.7.2 が最新のまま
-        - **踏むのは `ts-data-forge` だけ。** `configs/eslint/` から `eslint-config-typed` の型を import しているのがこのパッケージだけで、`configs/` は type-check の対象に入っている。他は `eslint.config.mts` の中で使っていて、そちらは `include` の外
-        - 選べるのは「上流が `.d.cts` を配るのを待つ」か「この型 import を type-check の対象外へ動かす」のどちらか
-    - 次に着手するのは `ts-fortress` → `ts-type-forge` → 残り
-        - `feat/strict-ts-lib-fortress` は**ブランチを作っただけで commit していない**。型 4 件を直した内容は残っていないので、着手時に測り直すことになる。何が出たかは [strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の「型チェック以外への影響」に書いてある
-- [ ] `libReplacement` のオンオフで `dist` が変わらないことを検査するスクリプトを `tools/scripts/` に追加する
-    - opt-in のたびに手作業で確認している。`libs/*` の各パッケージについて、`libReplacement` を `true` / `false` にして `build` し、生成された `dist` に差分が無いことを検査する
-    - **これが成り立つのは `@typescript-eslint/explicit-function-return-type` のおかげ**で、自動的に保証されるものではない。戻り値の型注釈が無い関数があると、`StrictLibInternals.ToObjectKeys<R>` のような strict lib 内部の型が `.d.mts` に漏れる。実測で確認済み（[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md)）
-    - つまりこの検査は「消費者に配るものが lib の選択に依存していない」ことの回帰テストになる
+        - **残りの件数（2026-08-25 実測）**: `ts-fortress` は型 1 件・lint 21 件で #1657 に入っている。`ts-data-forge` は**型 0 件・lint 23 件**。`ts-type-forge` は未計測（[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の決定 1 のとおり、そもそも strict lib を使わない方針）
+    - **`ts-data-forge` の opt-in を止めていた 2 件は、2 件とも解消した。**
+        - **1 件目（`class X extends Map/Set` が通らない）は 2026-08-21 に解消。** strict lib の `dist-v7.0-0.1.0` で通るようになり、`Object.fromEntries` が `Record<string, V>` を `Partial` にする件も同時に直った
+        - **2 件目（`@eslint/plugin-kit`）は 2026-08-25 に解消。** `dist/cjs/types.cts` を `.d.cts` ではなくソースとして配っている点は上流のままだが（0.7.2 が最新）、`strict-ts-lib` 0.6.0 で `Extract` / `Pick` / `Exclude` / `Omit` の制約を upstream に戻したので、**その中の `Omit` がもう型エラーにならない**。ファイルがソースとして検査される事実は変わらず、中身だけが通るようになった
+        - 実測すると `ts-data-forge` は `libReplacement: true` で**型エラー 0 件**である。残っているのは lint 23 件（`no-deprecated` 20 + `no-unnecessary-type-assertion` 3）だけで、`ts-fortress` の 21 件と同じ性質のもの
+    - 次に着手するのは `ts-data-forge` の opt-in（`libReplacement: true` の 1 行 + lint 23 件）
+        - `ts-fortress` は #1657 に入っている。「ブランチを作っただけ」ではなくなった
+- [x] `libReplacement` のオンオフで `dist` が変わらないことを検査する — **スクリプトは要らなかった（2026-08-25）**
+    - opt-in のたびに手で `diff -r` していたが、**その差分は原理的に出ない**。宣言を emit するのは各パッケージの `configs/tsconfig.build.json` で、これは `tools/configs/tsconfig/` の共有 config を直接 `extends` しており、**パッケージ自身の `tsconfig.json` を `extends` していない**。`libReplacement` を書くのはその `tsconfig.json` のほうなので、`build` は常に素の lib で走る
+    - 実際 `libs/*/dist` を全走査しても `StrictLibInternals` は 1 件も出てこない
+    - **壊れる経路は 1 つだけ**で、共有 config か `configs/tsconfig.build.json` に `libReplacement: true` が入ったとき。以前ここに書いていた「`explicit-function-return-type` のおかげ」は理由として正しくなかった（あの規約は `dist` に漏れる型の量を減らすが、`build` が strict lib を見ない事実のほうが効いている）
 - [x] `pnpm-update` workflow を更新する
     - 一度も動いていなかった。`update-packages` script が存在せず、changeset 生成が旧レイアウトの `packages/` を走査し、ブランチ名に日付が入っていて毎回別 PR になる構造だった
     - 日次実行にし、毎回 main から作り直す固定ブランチにした。これで「main への追従」と「既存 PR の更新」が同時に満たされる
@@ -323,7 +324,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
-    - **12 パッケージを復元し、いずれも `apps/` に private で置いた**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
+    - **12 パッケージぶんの復元 PR を出し、いずれも `apps/` に private で置く形にした**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
+        - **2026-08-25 時点で main に入っているのは `io-ts-types`（#1624）だけ**で、残る 11 本はまだレビュー待ちのドラフトである。下表の PR 番号がその一覧
 
         | パッケージ                         | 行数 | PR    |
         | :--------------------------------- | ---: | :---- |
