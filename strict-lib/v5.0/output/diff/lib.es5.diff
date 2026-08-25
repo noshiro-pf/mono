@@ -1324,7 +1324,7 @@
  
  /**
   * Make all properties in T readonly
-@@ -1854,21 +1878,19 @@ type Readonly<T> = {
+@@ -1854,15 +1878,13 @@ type Readonly<T> = {
  /**
   * From T, pick a set of properties whose keys are in the union K
   */
@@ -1343,19 +1343,12 @@
  };
  
  /**
-  * Exclude from T those types that are assignable to U
-  */
--type Exclude<T, U> = T extends U ? never : T;
-+type Exclude<T, U extends T> = T extends U ? never : T;
- 
- /**
-  * Extract from T those types that are assignable to U
 @@ -1878,7 +1900,7 @@ type Extract<T, U> = T extends U ? T : never;
  /**
   * Construct a type with the properties of T except for those in type K.
   */
 -type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
-+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
++type Omit<T, K extends PropertyKey> = Pick<T, Exclude<keyof T, K>>;
  
  /**
   * Exclude null and undefined from T

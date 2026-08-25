@@ -33498,10 +33498,7 @@ interface MathMLElementTagNameMap {
 type ElementTagNameMap = HTMLElementTagNameMap &
   Pick<
     SVGElementTagNameMap,
-    import('ts-type-forge').RelaxedExclude<
-      keyof SVGElementTagNameMap,
-      keyof HTMLElementTagNameMap
-    >
+    Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
   >;
 
 declare const Audio: {

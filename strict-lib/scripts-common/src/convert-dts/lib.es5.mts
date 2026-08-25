@@ -76,16 +76,23 @@ export const convertLibEs5 =
           'POSITIVE_INFINITY: number;',
           `POSITIVE_INFINITY: ${options.brandedNumber.POSITIVE_INFINITY};`,
         ),
+        // `Exclude`, `Extract`, `Omit` and `Pick` keep upstream's constraints.
+        // Narrowing the second argument — `Exclude<T, U extends T>`,
+        // `Omit<T, K extends keyof T>` — used to be done here, but it makes the
+        // choice on the caller's behalf and the wrong half of the time: both
+        // the subset reading and the unconstrained one are legitimate, and
+        // upstream declarations rely on the unconstrained one. Making it
+        // explicit is `eslint-plugin-ts-type-forge`'s job instead
+        // (`prefer-strict-or-relaxed-utility-type` points at `StrictOmit` /
+        // `RelaxedOmit` and the rest), and that reaches the caller's own code
+        // rather than every declaration that happens to pass through here.
         replaceWithNoMatchCheck(
-          // Type utils
-          'type Exclude<T, U> = T extends U ? never : T;',
-          'type Exclude<T, U extends T> = T extends U ? never : T;',
-        ),
-        replaceWithNoMatchCheck(
-          // `keyof any` -> `keyof unknown` (any->unknown codemod); tighten the
-          // constraint to `keyof T`.
+          // `keyof any` -> `keyof unknown` (any->unknown codemod). `keyof
+          // unknown` is `never`, so restore the intended key constraint —
+          // `PropertyKey` is what `keyof any` means. The constraint is left as
+          // wide as upstream's on purpose; see the note on `Exclude` above.
           'type Omit<T, K extends keyof unknown> = Pick<T, Exclude<keyof T, K>>;',
-          'type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;',
+          'type Omit<T, K extends PropertyKey> = Pick<T, Exclude<keyof T, K>>;',
         ),
         replaceWithNoMatchCheck(
           // `keyof any` -> `keyof unknown` (any->unknown codemod). `keyof unknown`

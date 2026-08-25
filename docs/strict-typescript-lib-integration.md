@@ -1,3 +1,5 @@
+<!-- cspell:ignore ENOENT -->
+
 # `strict-typescript-lib` を mono に統合するか
 
 ## 結論
@@ -1152,3 +1154,68 @@ TypeScript 5.x はそうではない。テンプレートリポジトリの互�
 同じ理由で、**リンクを張ったまま古い TypeScript を走らせてはいけない**。
 TypeScript 5.0–5.7 は `libReplacement` を持たず名前解決を無条件に行うので、
 消費者視点を再現する種類の検査は、その前にリンクを外す必要がある。
+
+## `Exclude` / `Omit` の制約を upstream に戻す（2026-08-24）
+
+この lib は 4 つのユーティリティ型のうち 2 つで、第 2 引数の制約を upstream より
+狭めていた。それをやめる。
+
+| type      | upstream                       | これまで                     | これから |
+| :-------- | :----------------------------- | :--------------------------- | :------- |
+| `Exclude` | `Exclude<T, U>`                | `Exclude<T, U extends T>`    | upstream |
+| `Omit`    | `Omit<T, K extends keyof any>` | `Omit<T, K extends keyof T>` | upstream |
+| `Extract` | `Extract<T, U>`                | 同じ                         | 同じ     |
+| `Pick`    | `Pick<T, K extends keyof T>`   | 同じ                         | 同じ     |
+
+`Extract` と `Pick` は upstream がもともと同形なので、実際に変えたのは 2 つである。
+`keyof any` は `PropertyKey` と同値で、生成物では後者で書く（any→unknown codemod が
+`keyof any` を `keyof unknown`＝`never` にしてしまうため、どのみち書き直しが要る）。
+
+### なぜやめるか
+
+**狭めることは、呼び出し側の判断を lib が代わりに下すことである。** しかも 2 つの
+読みのうち片方しか当たらない。「持っていないかもしれないキーを引く」は正当な記述で、
+upstream 自身の宣言もサードパーティのコードもそう書く。狭い制約の下ではそれが
+`TS2344` になり、**宣言が依存パッケージの中にある場合は手の打ちようがない**。
+
+実例を 2 つ踏んだ:
+
+- `@eslint/plugin-kit` は型を `dist/cjs/types.cts`（宣言ファイルではなく実装ファイル
+  なので `skipLibCheck` が効かない）で配り、その中で
+  `Omit<CustomRuleTypeDefinitions, keyof Options>` と書いている。テンプレート
+  リポジトリではこれ 1 件のために `eslint.config.mts` だけ素の lib に分ける
+  tsconfig を用意する羽目になった
+- upstream の `lib.esnext.temporal.d.ts` と `lib.dom.d.ts` は、この lib 自身の
+  変換過程で `TS2344` になっていた。回避のため `RelaxedExclude` へ差し替える置換を
+  converter に 3 箇所入れていた（`ToObjectEntries` の生成コードを含む）。**自分で
+  狭めた制約を自分で回避していた**ことになる
+
+明示化は呼び出し側のコードでやるほうが筋がよく、そのための lint が既にある。
+`eslint-plugin-ts-type-forge` の `prefer-strict-or-relaxed-utility-type` が
+`Exclude` / `Extract` / `Omit` / `Pick` を `ts-type-forge` の `Strict*` / `Relaxed*` に
+向けさせる。ルールの説明どおり「**チェックされない第 2 引数を明示的な選択にする**」
+のが目的で、そちらなら意図が書き残るし、依存パッケージの宣言を巻き込まない。
+
+### 影響
+
+**受け入れる範囲が広がるだけなので、これまで通っていたものは通り続ける**（minor）。
+converter 側の `RelaxedExclude` 回避 3 箇所は削除した。
+
+### 確認
+
+- 12 系統すべてを `gen:with-codemod-fixed` で再生成
+- lib-check を全数実行して型エラー 0 件。v5.0〜v5.9 は plain / branded の
+  20 harness をそれぞれ自前の TypeScript・`skipLibCheck: false` で、v6.0 と v7.0 は
+  `tsconfig.lib-check.json` と `tsconfig.lib-check.webworker.json` で
+
+### 余談: 生成の入口が 2 つ壊れていた
+
+この作業で判明した。`ws-gen-stages.mts` は 4 つの stage runner のうち唯一
+`rootPackageJsonDir` に `strict-lib/`（`package.json` が無い）を渡しており、
+`strict-lib:gen` は `ENOENT` で即死していた。直すと今度は `dependencyFields` も
+唯一欠けていて `Circular dependency detected` になった。さらに
+`ws-gen-with-codemod-fixed-stages.mts` にはスクリプトが 1 つも向いていなかった。
+**このリポジトリのチェックアウトで実際に必要な入口はそれ**である
+（`gen` は gitignore 対象の `temp/codemod-fixed` を再利用し、`gen:full` は
+ネットワーク取得から始まる）。リリース経路が `gen:packages` しか回さないので
+誰も気づいていなかった。

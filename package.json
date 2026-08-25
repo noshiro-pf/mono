@@ -62,6 +62,7 @@
     "strict-lib:gen:full": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/ws-gen-full-stages.mts",
     "strict-lib:gen:packages": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/ws-gen-packages-stages.mts",
     "strict-lib:gen:version-diff": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/gen-version-diff.mts",
+    "strict-lib:gen:with-codemod-fixed": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/ws-gen-with-codemod-fixed-stages.mts",
     "strict-lib:lint": "pnpm run z:eslint --config ./strict-lib/eslint.config.mts './strict-lib/**/*.mts'",
     "strict-lib:publish": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/dist-npm-publish.mts",
     "strict-lib:type-check": "tsc -p ./strict-lib/tsconfig.tooling.json --noEmit",
