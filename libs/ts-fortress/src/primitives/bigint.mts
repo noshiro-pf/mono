@@ -201,27 +201,27 @@ const createConstraintsPredicate =
     }
 
     if (gt !== undefined && !(value > gt)) {
-      return Result.err({ constraint: 'gt', value: String(gt) } as const);
+      return Result.err({ constraint: 'gt', value: gt.toString() } as const);
     }
 
     if (gte !== undefined && !(value >= gte)) {
-      return Result.err({ constraint: 'gte', value: String(gte) } as const);
+      return Result.err({ constraint: 'gte', value: gte.toString() } as const);
     }
 
     if (min !== undefined && !(value >= min)) {
-      return Result.err({ constraint: 'min', value: String(min) } as const);
+      return Result.err({ constraint: 'min', value: min.toString() } as const);
     }
 
     if (lt !== undefined && !(value < lt)) {
-      return Result.err({ constraint: 'lt', value: String(lt) } as const);
+      return Result.err({ constraint: 'lt', value: lt.toString() } as const);
     }
 
     if (lte !== undefined && !(value <= lte)) {
-      return Result.err({ constraint: 'lte', value: String(lte) } as const);
+      return Result.err({ constraint: 'lte', value: lte.toString() } as const);
     }
 
     if (max !== undefined && !(value <= max)) {
-      return Result.err({ constraint: 'max', value: String(max) } as const);
+      return Result.err({ constraint: 'max', value: max.toString() } as const);
     }
 
     // `value % 0n` throws a RangeError, so the zero divisor is handled
@@ -231,13 +231,13 @@ const createConstraintsPredicate =
         if (value !== 0n) {
           return Result.err({
             constraint: 'multipleOf',
-            value: String(multipleOf),
+            value: multipleOf.toString(),
           } as const);
         }
       } else if (value % multipleOf !== 0n) {
         return Result.err({
           constraint: 'multipleOf',
-          value: String(multipleOf),
+          value: multipleOf.toString(),
         } as const);
       }
     }
@@ -247,11 +247,14 @@ const createConstraintsPredicate =
         if (value !== 0n) {
           return Result.err({
             constraint: 'step',
-            value: String(step),
+            value: step.toString(),
           } as const);
         }
       } else if (value % step !== 0n) {
-        return Result.err({ constraint: 'step', value: String(step) } as const);
+        return Result.err({
+          constraint: 'step',
+          value: step.toString(),
+        } as const);
       }
     }
 
