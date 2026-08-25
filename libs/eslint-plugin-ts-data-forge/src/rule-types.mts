@@ -250,6 +250,21 @@ namespace PreferComparisonOverNullishGuard {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Replace an `Object.fromEntries(Object.entries(record).map/filter/flatMap(...))` round trip with `Obj.map` / `Obj.filter` / `Obj.filterMap` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferObjOverEntriesRoundTrip {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
   'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
@@ -264,6 +279,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-num-safe-parse-float': PreferNumSafeParseFloat.RuleEntry;
   'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
   'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
+  'ts-data-forge/prefer-obj-over-entries-round-trip': PreferObjOverEntriesRoundTrip.RuleEntry;
 }>;
 
 export type EslintTsDataForgeRulesOption = Readonly<{
