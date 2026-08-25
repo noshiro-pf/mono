@@ -1,5 +1,16 @@
 ---
 'strict-ts-lib-v5.0-source': minor
+'strict-ts-lib-v5.1-source': minor
+'strict-ts-lib-v5.2-source': minor
+'strict-ts-lib-v5.3-source': minor
+'strict-ts-lib-v5.4-source': minor
+'strict-ts-lib-v5.5-source': minor
+'strict-ts-lib-v5.6-source': minor
+'strict-ts-lib-v5.7-source': minor
+'strict-ts-lib-v5.8-source': minor
+'strict-ts-lib-v5.9-source': minor
+'strict-ts-lib-v6.0-source': minor
+'strict-ts-lib-v7.0-source': minor
 ---
 
 Leave `Exclude`, `Extract`, `Omit` and `Pick` with the constraints TypeScript
@@ -14,8 +25,11 @@ each bundle with its harness's version — wrote 0.5.1 straight back over them,
 the harnesses never having been bumped at all. Nothing errored; the version
 simply did not move.
 
-Naming one harness is enough: the `fixed` group in `.changeset/config.json`
-carries the bump to all twelve.
+All twelve harnesses are named. The `fixed` group in `.changeset/config.json`
+would align the versions from a single name, but a changeset's text reaches
+only the packages it names — the rest get a bare version heading with nothing
+under it. A change to the shared converter affects every series equally, so
+every series' changelog should say so.
 
 ### `Exclude` and `Omit`
 
