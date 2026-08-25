@@ -308,6 +308,14 @@ checks just report `skipped`. Three things to know about that state:
   only `pull_request` events; asking for the checks by hand is asking for them
   regardless of the pull request's state.
 
+A draft can still get one full CI result without being marked ready:
+commenting `/run-checks` on the pull request (write access required) runs
+`run-checks.yml`, which dispatches all five workflows for the pull request's
+branch through that `workflow_dispatch` exemption. The runs attach their check
+runs to the branch's head commit, so the results appear on the pull request.
+Being an `issue_comment` workflow, the copy of `run-checks.yml` on `main` is
+what runs — edits to it take effect only once merged.
+
 The design leans on the `main` ruleset
 (`repo-settings/rulesets/main.json`): merging into `main` requires a pull
 request, and the admin's bypass is `bypass_mode: "pull_request"` — usable
