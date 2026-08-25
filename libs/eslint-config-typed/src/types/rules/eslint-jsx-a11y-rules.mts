@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type NonEmptyTuple, type UnknownRecord } from 'ts-type-forge';
+import {
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -1382,7 +1386,7 @@ namespace NoInteractiveElementToNoninteractiveRole {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, readonly string[]>>;
+  export type Options = ReadonlyRecord<string, readonly string[]>;
 
   export type RuleEntry =
     | 'off'
@@ -1462,7 +1466,7 @@ namespace NoNoninteractiveElementToInteractiveRole {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, readonly string[]>>;
+  export type Options = ReadonlyRecord<string, readonly string[]>;
 
   export type RuleEntry =
     | 'off'
@@ -1585,7 +1589,7 @@ namespace NoRedundantRoles {
    * ]
    * ```
    */
-  export type Options = Readonly<Record<string, readonly string[]>>;
+  export type Options = ReadonlyRecord<string, readonly string[]>;
 
   export type RuleEntry =
     | 'off'

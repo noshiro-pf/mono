@@ -211,7 +211,7 @@ describe(convertToReadonlyTransformer, () => {
     });
 
     describe('Records', () => {
-      describe('recordStyle: "Readonly<Record>" (default)', () => {
+      describe('recordStyle: "ReadonlyRecord" (default)', () => {
         test.each([
           {
             name: 'Type alias',
@@ -219,25 +219,25 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Record<string, number>
             `,
             expected: dedent`
-              type Foo = Readonly<Record<string, number>>
+              type Foo = ReadonlyRecord<string, number>
             `,
           },
           {
-            name: 'Readonly<Record<K, V>> is unchanged',
-            source: dedent`
-              type Foo = Readonly<Record<string, number>>
-            `,
-            expected: dedent`
-              type Foo = Readonly<Record<string, number>>
-            `,
-          },
-          {
-            name: 'ReadonlyRecord<K, V> is unified to Readonly<Record<K, V>>',
+            name: 'ReadonlyRecord<K, V> is unchanged',
             source: dedent`
               type Foo = ReadonlyRecord<string, number>
             `,
             expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
+            `,
+          },
+          {
+            name: 'Readonly<Record<K, V>> is unified to ReadonlyRecord<K, V>',
+            source: dedent`
               type Foo = Readonly<Record<string, number>>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, number>
             `,
           },
           {
@@ -246,7 +246,7 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Readonly<ReadonlyRecord<string, number>>
             `,
             expected: dedent`
-              type Foo = Readonly<Record<string, number>>
+              type Foo = ReadonlyRecord<string, number>
             `,
           },
           {
@@ -255,7 +255,7 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Record<string, number[]>
             `,
             expected: dedent`
-              type Foo = Readonly<Record<string, readonly number[]>>
+              type Foo = ReadonlyRecord<string, readonly number[]>
             `,
           },
           {
@@ -264,7 +264,16 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Readonly<Record<string, number[]>>
             `,
             expected: dedent`
-              type Foo = Readonly<Record<string, readonly number[]>>
+              type Foo = ReadonlyRecord<string, readonly number[]>
+            `,
+          },
+          {
+            name: 'Value type inside ReadonlyRecord<K, V> is converted recursively',
+            source: dedent`
+              type Foo = ReadonlyRecord<string, number[]>
+            `,
+            expected: dedent`
+              type Foo = ReadonlyRecord<string, readonly number[]>
             `,
           },
           {
@@ -273,7 +282,7 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = { a: Record<string, number> }
             `,
             expected: dedent`
-              type Foo = Readonly<{ a: Readonly<Record<string, number>> }>
+              type Foo = Readonly<{ a: ReadonlyRecord<string, number> }>
             `,
           },
           {
@@ -282,7 +291,7 @@ describe(convertToReadonlyTransformer, () => {
               function foo(a: Record<string, number>, b: Promise<Record<string, number>>) {}
             `,
             expected: dedent`
-              function foo(a: Readonly<Record<string, number>>, b: Promise<Readonly<Record<string, number>>>) {}
+              function foo(a: ReadonlyRecord<string, number>, b: Promise<ReadonlyRecord<string, number>>) {}
             `,
           },
           {
@@ -295,12 +304,12 @@ describe(convertToReadonlyTransformer, () => {
             `,
           },
           {
-            name: 'DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>',
+            name: 'DeepReadonly<ReadonlyRecord<K, V>> is unchanged',
             source: dedent`
               type Foo = DeepReadonly<ReadonlyRecord<string, number>>
             `,
             expected: dedent`
-              type Foo = DeepReadonly<Record<string, number>>
+              type Foo = DeepReadonly<ReadonlyRecord<string, number>>
             `,
           },
           {
@@ -313,20 +322,20 @@ describe(convertToReadonlyTransformer, () => {
             `,
           },
           {
-            name: 'ReadonlyRecord<K, V> under indexed access -> Record<K, V>',
+            name: 'ReadonlyRecord<K, V> under indexed access is unchanged',
             source: dedent`
               type Foo = ReadonlyRecord<string, number>[string]
             `,
             expected: dedent`
-              type Foo = Record<string, number>[string]
+              type Foo = ReadonlyRecord<string, number>[string]
             `,
           },
         ])('$name', testFn);
       });
 
-      describe('recordStyle: "ReadonlyRecord"', () => {
+      describe('recordStyle: "Readonly<Record>"', () => {
         const options = {
-          recordStyle: 'ReadonlyRecord',
+          recordStyle: 'Readonly<Record>',
         } as const satisfies ReadonlyTransformerOptions;
 
         test.each([
@@ -336,27 +345,27 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Record<string, number>
             `,
             expected: dedent`
-              type Foo = ReadonlyRecord<string, number>
+              type Foo = Readonly<Record<string, number>>
             `,
             options,
           },
           {
-            name: 'ReadonlyRecord<K, V> is unchanged',
-            source: dedent`
-              type Foo = ReadonlyRecord<string, number>
-            `,
-            expected: dedent`
-              type Foo = ReadonlyRecord<string, number>
-            `,
-            options,
-          },
-          {
-            name: 'Readonly<Record<K, V>> is unified to ReadonlyRecord<K, V>',
+            name: 'Readonly<Record<K, V>> is unchanged',
             source: dedent`
               type Foo = Readonly<Record<string, number>>
             `,
             expected: dedent`
+              type Foo = Readonly<Record<string, number>>
+            `,
+            options,
+          },
+          {
+            name: 'ReadonlyRecord<K, V> is unified to Readonly<Record<K, V>>',
+            source: dedent`
               type Foo = ReadonlyRecord<string, number>
+            `,
+            expected: dedent`
+              type Foo = Readonly<Record<string, number>>
             `,
             options,
           },
@@ -366,27 +375,27 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = Readonly<ReadonlyRecord<string, number>>
             `,
             expected: dedent`
-              type Foo = ReadonlyRecord<string, number>
+              type Foo = Readonly<Record<string, number>>
             `,
             options,
           },
           {
             name: 'Value type is converted recursively',
             source: dedent`
-              type Foo = Record<string, number[]>
+              type Foo = Record<string, string[]>
             `,
             expected: dedent`
-              type Foo = ReadonlyRecord<string, readonly number[]>
+              type Foo = Readonly<Record<string, readonly string[]>>
             `,
             options,
           },
           {
-            name: 'Value type inside ReadonlyRecord<K, V> is converted recursively',
+            name: 'Value type inside Readonly<Record<K, V>> is converted recursively',
             source: dedent`
-              type Foo = ReadonlyRecord<string, number[]>
+              type Foo = Readonly<Record<string, number[]>>
             `,
             expected: dedent`
-              type Foo = ReadonlyRecord<string, readonly number[]>
+              type Foo = Readonly<Record<string, readonly number[]>>
             `,
             options,
           },
@@ -396,7 +405,7 @@ describe(convertToReadonlyTransformer, () => {
               type Foo = { a: Record<string, number> }
             `,
             expected: dedent`
-              type Foo = Readonly<{ a: ReadonlyRecord<string, number> }>
+              type Foo = Readonly<{ a: Readonly<Record<string, number>> }>
             `,
             options,
           },

@@ -65,7 +65,7 @@ export const convertToReadonlyTransformer = (
     },
     ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
     ignoredPrefixes: ignorePrefixes,
-    recordStyle: options?.recordStyle ?? 'Readonly<Record>',
+    recordStyle: options?.recordStyle ?? 'ReadonlyRecord',
     debugPrint: options?.debug === true ? console.debug : () => {},
     replaceNode:
       options?.debug === true
@@ -141,19 +141,20 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
   /**
    * The output style used when making `Record<K, V>` readonly.
    *
-   * - `"Readonly<Record>"`: Uses only built-in utility types
-   *   (`Readonly<Record<K, V>>`). Occurrences of `ReadonlyRecord<K, V>` are
-   *   also unified to `Readonly<Record<K, V>>`.
    * - `"ReadonlyRecord"`: Uses the `ReadonlyRecord` type utility provided by
-   *   `ts-type-forge`. Occurrences of `Readonly<Record<K, V>>` are also
+   *   `ts-type-forge` (as the `ts-type-forge/prefer-readonly-or-mutable-record`
+   *   ESLint rule suggests). Occurrences of `Readonly<Record<K, V>>` are also
    *   unified to `ReadonlyRecord<K, V>`. Note that no import statement is
    *   added, so `ReadonlyRecord` has to be available in the transformed code
    *   (e.g. globally via `ts-type-forge`'s `global.d.mts`).
+   * - `"Readonly<Record>"`: Uses only built-in utility types
+   *   (`Readonly<Record<K, V>>`). Occurrences of `ReadonlyRecord<K, V>` are
+   *   also unified to `Readonly<Record<K, V>>`.
    *
    * Whichever style is selected, redundant wrappers such as
    * `Readonly<ReadonlyRecord<K, V>>` are normalized to that style as well.
    *
-   * @default 'Readonly<Record>'
+   * @default 'ReadonlyRecord'
    */
   recordStyle?: 'Readonly<Record>' | 'ReadonlyRecord';
 
@@ -593,14 +594,12 @@ const transformTypeReferenceNode = (
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       `Record<${K!.getFullText()}, ${V!.getFullText()}>` as const;
 
-    // DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>
     // Readonly<ReadonlyRecord<K, V>> -> Readonly<Record<K, V>>
     //   (the surrounding `Readonly` handler then unifies it to the configured
-    //   record style)
-    // ReadonlyRecord<K, V>[I] -> Record<K, V>[I]
+    //   record style, so the bare Record never survives into the output)
     if (
-      readonlyContext.type !== 'none' ||
-      readonlyContext.indexedAccessDepth > 0
+      readonlyContext.type === 'Readonly' &&
+      readonlyContext.indexedAccessDepth === 0
     ) {
       options.replaceNode(node, bareRecordText);
 
@@ -608,9 +607,30 @@ const transformTypeReferenceNode = (
     }
 
     if (options.recordStyle === 'Readonly<Record>') {
+      // The ReadonlyRecord name is eliminated everywhere:
+      // - DeepReadonly<ReadonlyRecord<K, V>> -> DeepReadonly<Record<K, V>>
+      // - ReadonlyRecord<K, V>[I] -> Record<K, V>[I]
+      //   (readonly is unnecessary under indexed access, as with
+      //   Readonly<{ ... }>[I] -> { ... }[I])
+      if (
+        readonlyContext.type !== 'none' ||
+        readonlyContext.indexedAccessDepth > 0
+      ) {
+        options.replaceNode(node, bareRecordText);
+
+        return;
+      }
+
       options.replaceNode(node, `Readonly<${bareRecordText}>`);
+
+      return;
     }
 
+    // With `recordStyle: "ReadonlyRecord"`, ReadonlyRecord is already the
+    // configured style. It is deliberately kept even under DeepReadonly or an
+    // indexed access — stripping it to the bare built-in `Record` there would
+    // conflict with the `ts-type-forge/prefer-readonly-or-mutable-record`
+    // ESLint rule.
     return;
   }
 
@@ -827,8 +847,8 @@ const readonlyRecordText = (
   options: ReadonlyTransformerOptionsInternal,
 ): string =>
   options.recordStyle === 'ReadonlyRecord'
-    ? `ReadonlyRecord<${keyText}, ${valueText}>`
-    : `Readonly<Record<${keyText}, ${valueText}>>`;
+    ? (`ReadonlyRecord<${keyText}, ${valueText}>` as const)
+    : (`Readonly<Record<${keyText}, ${valueText}>>` as const);
 
 /** `tr(E[]) |-> tr(E)[]` */
 const transformArrayTypeNode = (

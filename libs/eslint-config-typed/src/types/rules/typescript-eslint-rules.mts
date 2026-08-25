@@ -1,6 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type NonEmptyTuple } from 'ts-type-forge';
+import { type NonEmptyTuple, type ReadonlyRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -6697,7 +6697,7 @@ namespace NoRestrictedTypes {
     /**
      * An object whose keys are the types you want to ban, and the values are error messages.
      */
-    types?: Readonly<Record<string, BanConfig>>;
+    types?: ReadonlyRecord<string, BanConfig>;
   }>;
 
   export type RuleEntry =

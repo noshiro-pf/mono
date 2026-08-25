@@ -23,10 +23,13 @@ type Data2 = UnknownRecord;
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
   test('replace-record-with-unknown-record-example', () => {
+    // transformer-ignore-next-line convert-to-readonly
     expectType<Config, Record<string, unknown>>('=');
 
+    // transformer-ignore-next-line convert-to-readonly
     expectType<ReadonlyConfig, Readonly<Record<string, unknown>>>('=');
 
+    // transformer-ignore-next-line convert-to-readonly
     expectType<Data, Record<string, unknown>>('=');
 
     expectType<Config2, UnknownRecord>('=');

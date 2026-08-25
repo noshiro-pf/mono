@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type MinLengthTuple, type NonEmptyTuple } from 'ts-type-forge';
+import {
+  type MinLengthTuple,
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -620,7 +624,7 @@ namespace CommaStyle {
   export type Options0 = 'first' | 'last';
 
   export type Options1 = Readonly<{
-    exceptions?: Readonly<Record<string, boolean>>;
+    exceptions?: ReadonlyRecord<string, boolean>;
   }>;
 
   export type RuleEntry =
@@ -7101,7 +7105,7 @@ namespace NoMultiSpaces {
    * ```
    */
   export type Options = Readonly<{
-    exceptions?: Readonly<Record<string, boolean>>;
+    exceptions?: ReadonlyRecord<string, boolean>;
     ignoreEOLComments?: boolean;
     includeTabs?: boolean;
   }>;
@@ -7972,9 +7976,7 @@ namespace OperatorLinebreak {
   export type Options0 = ('after' | 'before' | 'none') | null;
 
   export type Options1 = Readonly<{
-    overrides?: Readonly<
-      Record<string, 'after' | 'before' | 'none' | 'ignore'>
-    >;
+    overrides?: ReadonlyRecord<string, 'after' | 'before' | 'none' | 'ignore'>;
   }>;
 
   export type RuleEntry =
@@ -9031,7 +9033,7 @@ namespace SpaceUnaryOps {
   export type Options = Readonly<{
     words?: boolean;
     nonwords?: boolean;
-    overrides?: Readonly<Record<string, boolean>>;
+    overrides?: ReadonlyRecord<string, boolean>;
   }>;
 
   export type RuleEntry =
