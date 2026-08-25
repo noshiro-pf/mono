@@ -1452,3 +1452,8 @@ const sourceKeys: ReadonlySet<string> = new Set(Object.keys(shape));
 - `libReplacement: true` で type-check・lint とも通り、テスト 1666 件も通る
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる。つまり
   `src` はどちらの lib でも同じに読める
+
+**2026-08-25 追記: 0.6.0 でも件数は変わらない。** `Extract` / `Pick` / `Exclude` /
+`Omit` の制約を upstream に戻した版で測り直したが、このブランチの修正を main の
+ソースに戻して opt-in だけ有効にすると、**型エラー 1 件（`record.mts`）と lint
+21 件**がそのまま出る。上の 4 つの型はここで踏んでいないので、緩和の影響を受けない。
