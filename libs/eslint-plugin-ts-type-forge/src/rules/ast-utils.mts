@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { Arr, isNonNullObject } from 'ts-data-forge';
+import { Arr, hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -44,8 +44,6 @@ export const analyzeUniformTuple = (
   sourceCode: TSESLint.SourceCode,
 ): UniformTupleShape | undefined => {
   if (isInConditionalTypeExtendsClause(tuple)) return undefined;
-
-  if (definesRecursiveTypeAlias(tuple)) return undefined;
 
   const { parent } = tuple;
 
@@ -93,17 +91,24 @@ export const analyzeUniformTuple = (
     ...(restElementType === undefined ? [] : [restElementType]),
   ];
 
-  return others.every(
-    (element) => normalizeWhitespace(sourceCode.getText(element)) === expected,
-  )
-    ? {
+  if (
+    others.some(
+      (element) =>
+        normalizeWhitespace(sourceCode.getText(element)) !== expected,
+    )
+  ) {
+    return undefined;
+  }
+
+  return definesRecursiveTypeAlias(tuple, sourceCode)
+    ? undefined
+    : {
         node: isReadonly ? parent : tuple,
         isReadonly,
         elementText,
         fixedCount: leading.length,
         hasRest,
-      }
-    : undefined;
+      };
 };
 
 /**
@@ -147,21 +152,42 @@ const isInConditionalTypeExtendsClause = (node: TSESTree.Node): boolean => {
  * the other aliases in the file rather than looking for the enclosing name in
  * the element text.
  *
+ * **Any cycle counts, which leaves some rewritable tuples alone.** Not every
+ * cycle actually breaks: TypeScript resolves an object type, an array, a tuple
+ * and a function type without resolving what is inside them, so `type Pair =
+ * FixedLengthTuple<2, Foo>` alongside `type Foo = { p: Pair }` compiles, and so
+ * does `type Tree = { kids: FixedLengthTuple<2, Tree> }`. Skipping those
+ * constructs while following references was tried and does not hold up — the
+ * deferral is undone by anything that asks for the structure, and that can sit
+ * anywhere in the file:
+ *
+ * ```ts
+ * type Pair = readonly [Foo, Foo]; // rewriting this breaks Pair and Foo
+ * type Foo = Wrapper[number]; // …because of the indexed access here
+ * type Wrapper = readonly Pair[];
+ * ```
+ *
+ * Deciding it properly means knowing every use of every alias, which no
+ * syntactic rule can do — so a cycle of any shape suppresses the rewrite. The
+ * cost is a tuple left spelled out; the alternative is an autofix that turns a
+ * type into `any`.
+ *
  * A cycle closed through an `import` is not visible here and is not detected.
  */
-const definesRecursiveTypeAlias = (tuple: TSESTree.TSTupleType): boolean => {
+const definesRecursiveTypeAlias = (
+  tuple: TSESTree.TSTupleType,
+  sourceCode: TSESLint.SourceCode,
+): boolean => {
   const alias = enclosingTypeAlias(tuple);
 
   if (alias === undefined) return false;
 
-  const aliasesInFile = new Map<string, TSESTree.TSTypeAliasDeclaration>(
-    collectTypeAliases(alias).map((a) => [a.id.name, a]),
-  );
+  const references = aliasReferenceGraph(programOf(alias), sourceCode);
 
   const mut_seen = new Set<string>();
 
   const mut_queue: string[] = tuple.elementTypes.flatMap((element) =>
-    Array.from(referencedTypeNames(element)),
+    Array.from(referencedTypeNames(element, sourceCode)),
   );
 
   while (true) {
@@ -175,10 +201,10 @@ const definesRecursiveTypeAlias = (tuple: TSESTree.TSTupleType): boolean => {
 
     mut_seen.add(next);
 
-    const referenced = aliasesInFile.get(next);
+    const referenced = references.get(next);
 
     if (referenced !== undefined) {
-      mut_queue.push(...referencedTypeNames(referenced.typeAnnotation));
+      mut_queue.push(...referenced);
     }
   }
 };
@@ -194,29 +220,53 @@ const enclosingTypeAlias = (
   return enclosingTypeAlias(node.parent);
 };
 
-/** Every `type X = …` declaration in the file `node` belongs to. */
-const collectTypeAliases = (
-  node: TSESTree.Node,
-): readonly TSESTree.TSTypeAliasDeclaration[] => {
-  const mut_found: TSESTree.TSTypeAliasDeclaration[] = [];
+/**
+ * Which other type names each `type X = …` in the file refers to, keyed by `X`.
+ *
+ * Built once per file and cached on the `Program` node: the search below runs
+ * per candidate tuple, and rebuilding this for each of them made the rule cost
+ * `O(tuples × file size)` — a full second on the largest generated files here.
+ */
+const aliasReferenceGraph = (
+  program: TSESTree.Program,
+  sourceCode: TSESLint.SourceCode,
+): ReadonlyMap<string, ReadonlySet<string>> => {
+  const cached = aliasReferenceGraphCache.get(program);
 
-  walk(programOf(node), (visited) => {
+  if (cached !== undefined) return cached;
+
+  const mut_graph = new Map<string, ReadonlySet<string>>();
+
+  walk(program, sourceCode, (visited) => {
     if (visited.type === AST_NODE_TYPES.TSTypeAliasDeclaration) {
-      mut_found.push(visited);
+      mut_graph.set(
+        visited.id.name,
+        referencedTypeNames(visited.typeAnnotation, sourceCode),
+      );
     }
   });
 
-  return mut_found;
+  aliasReferenceGraphCache.set(program, mut_graph);
+
+  return mut_graph;
 };
 
-const programOf = (node: TSESTree.Node): TSESTree.Node =>
+const aliasReferenceGraphCache = new WeakMap<
+  TSESTree.Program,
+  ReadonlyMap<string, ReadonlySet<string>>
+>();
+
+const programOf = (node: TSESTree.Node): TSESTree.Program =>
   node.type === AST_NODE_TYPES.Program ? node : programOf(node.parent);
 
 /** The names every `X` / `X<…>` reference in the subtree points at. */
-const referencedTypeNames = (node: TSESTree.Node): ReadonlySet<string> => {
+const referencedTypeNames = (
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+): ReadonlySet<string> => {
   const mut_names = new Set<string>();
 
-  walk(node, (visited) => {
+  walk(node, sourceCode, (visited) => {
     if (
       visited.type === AST_NODE_TYPES.TSTypeReference &&
       visited.typeName.type === AST_NODE_TYPES.Identifier
@@ -231,25 +281,34 @@ const referencedTypeNames = (node: TSESTree.Node): ReadonlySet<string> => {
 /**
  * Visits `node` and its descendants.
  *
- * Children are found by inspecting the node's own properties, so this needs no
- * table of visitor keys. `parent` is skipped — following it would walk back up
- * and never terminate.
+ * Children are found through the parser's visitor keys, so only the properties
+ * that actually hold one are read. Reading every own property instead works
+ * too, and is the fallback for a parser that declares no keys for a node type,
+ * but it allocates an entry pair per property and walks `loc` / `range` as
+ * well — on the generated rule-type files that alone was most of the cost.
  */
 const walk = (
   node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
   visit: (visited: TSESTree.Node) => void,
 ): void => {
   visit(node);
 
-  for (const [key, value] of Object.entries(node)) {
-    if (key === 'parent') continue;
+  if (!isRecord(node)) return;
+
+  const keys =
+    sourceCode.visitorKeys[node.type] ??
+    Object.keys(node).filter((key) => key !== 'parent');
+
+  for (const key of keys) {
+    const value: unknown = hasKey(node, key) ? node[key] : undefined;
 
     if (Arr.isArray(value)) {
       for (const element of value) {
-        if (isNode(element)) walk(element, visit);
+        if (isNode(element)) walk(element, sourceCode, visit);
       }
     } else if (isNode(value)) {
-      walk(value, visit);
+      walk(value, sourceCode, visit);
     }
   }
 };

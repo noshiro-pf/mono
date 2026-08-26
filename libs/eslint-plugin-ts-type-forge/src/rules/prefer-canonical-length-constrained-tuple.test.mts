@@ -61,6 +61,51 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           `,
         },
         {
+          name: 'ignores a tuple whose alias recurses through an intersection',
+          code: dedent`
+            type Pair = readonly [Foo, Foo];
+            type Foo = Pair & { readonly tag: string };
+          `,
+        },
+        {
+          name: 'ignores a tuple whose alias recurses through a type argument',
+          code: dedent`
+            type Pair = readonly [Box<Pair>, Box<Pair>];
+            type Box<T> = { readonly v: T };
+          `,
+        },
+        {
+          name: 'ignores a tuple whose alias recurses through an indexed access',
+          code: dedent`
+            type Pair = readonly [Foo, Foo];
+            type Foo = Wrapper[number];
+            type Wrapper = readonly Pair[];
+          `,
+        },
+        {
+          // Both of these compile either way: TypeScript resolves an object
+          // type without resolving its members, so the rewritten form is fine
+          // here. The rule suppresses them all the same — see the note on
+          // `definesRecursiveTypeAlias` for why the exception cannot be made
+          // safely.
+          name: 'conservatively ignores a cycle closed through an object type',
+          code: dedent`
+            type Pair = readonly [Foo, Foo];
+            type Foo = { readonly p: Pair };
+          `,
+        },
+        {
+          name: 'conservatively ignores a cycle closed through an array',
+          code: dedent`
+            type Pair = readonly [Foo, Foo];
+            type Foo = readonly Pair[];
+          `,
+        },
+        {
+          name: 'conservatively ignores a tuple nested in its own alias',
+          code: 'type Tree = { readonly kids: readonly [Tree, Tree] };',
+        },
+        {
           name: 'still ignores nothing when the cycle does not reach the tuple',
           code: dedent`
             type Loop = readonly Loop[];

@@ -8,3 +8,8 @@ resolve `type T = readonly [T, T]`; routing the same cycle through
 `FixedLengthTuple` makes the alias an error type, and every use of it then
 reads as `any`. Cycles closed through another alias in the same file are
 detected too, and those are the common case.
+
+A cycle of any shape suppresses the rewrite, including the ones that would
+have compiled — `type Foo = { p: Pair }` closes a cycle that TypeScript
+resolves fine. Telling the two apart needs every use of every alias, so the
+rule leaves the tuple spelled out instead.
