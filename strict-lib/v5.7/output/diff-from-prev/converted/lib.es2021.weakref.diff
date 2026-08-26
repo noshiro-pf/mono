@@ -1,0 +1,12 @@
+diff --git a/v5.6/output/lib-files/lib.es2021.weakref.d.ts b/v5.7/output/lib-files/lib.es2021.weakref.d.ts
+index 48a16d0b7..f02bb0a08 100644
+--- a/v5.6/output/lib-files/lib.es2021.weakref.d.ts
++++ b/v5.7/output/lib-files/lib.es2021.weakref.d.ts
+@@ -1,5 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
++
+ interface WeakRef<T extends WeakKey> {
+   readonly [Symbol.toStringTag]: 'WeakRef';
+ 

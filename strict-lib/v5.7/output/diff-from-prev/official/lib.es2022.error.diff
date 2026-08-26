@@ -1,0 +1,13 @@
+diff --git a/v5.6/temp/copied/lib.es2022.error.d.ts b/v5.7/temp/copied/lib.es2022.error.d.ts
+index 3c5ae0442..53d3a284c 100644
+--- a/v5.6/temp/copied/lib.es2022.error.d.ts
++++ b/v5.7/temp/copied/lib.es2022.error.d.ts
+@@ -15,6 +15,8 @@ and limitations under the License.
+ 
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference lib="es2021.promise" />
++
+ interface ErrorOptions {
+   cause?: unknown;
+ }

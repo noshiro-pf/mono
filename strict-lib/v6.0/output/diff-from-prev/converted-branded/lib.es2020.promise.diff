@@ -1,0 +1,10 @@
+diff --git a/v5.9/output/lib-files-branded/lib.es2020.promise.d.ts b/v6.0/output/lib-files-branded/lib.es2020.promise.d.ts
+index 97f009861..964539b79 100644
+--- a/v5.9/output/lib-files-branded/lib.es2020.promise.d.ts
++++ b/v6.0/output/lib-files-branded/lib.es2020.promise.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface PromiseFulfilledResult<T> {
+   readonly status: 'fulfilled';
+   readonly value: T;

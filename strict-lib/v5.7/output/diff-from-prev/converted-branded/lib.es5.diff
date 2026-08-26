@@ -1,0 +1,2148 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es5.d.ts b/v5.7/output/lib-files-branded/lib.es5.d.ts
+index f39fe42b5..90d8cde58 100644
+--- a/v5.6/output/lib-files-branded/lib.es5.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es5.d.ts
+@@ -2147,11 +2147,13 @@ interface ArrayBufferConstructor {
+ }
+ declare const ArrayBuffer: ArrayBufferConstructor;
+ 
+-interface ArrayBufferView {
++interface ArrayBufferView<
++  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
++> {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2164,8 +2166,8 @@ interface ArrayBufferView {
+   readonly byteOffset: NumberType.TypedArraySize;
+ }
+ 
+-interface DataView {
+-  readonly buffer: ArrayBuffer;
++interface DataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
++  readonly buffer: TArrayBuffer;
+   readonly byteLength: NumberType.TypedArraySize;
+   readonly byteOffset: NumberType.TypedArraySize;
+   /**
+@@ -2343,14 +2345,17 @@ interface DataView {
+     littleEndian?: boolean,
+   ): void;
+ }
+-
+ interface DataViewConstructor {
+-  readonly prototype: DataView;
+-  new (
+-    buffer: ArrayBufferLike & { readonly BYTES_PER_ELEMENT?: never },
++  readonly prototype: DataView<ArrayBufferLike>;
++  new <
++    TArrayBuffer extends ArrayBufferLike & {
++      readonly BYTES_PER_ELEMENT?: never;
++    },
++  >(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     byteLength?: NumberType.TypedArraySize,
+-  ): DataView;
++  ): DataView<TArrayBuffer>;
+ }
+ declare const DataView: DataViewConstructor;
+ 
+@@ -2358,7 +2363,7 @@ declare const DataView: DataViewConstructor;
+  * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested
+  * number of bytes could not be allocated an exception is raised.
+  */
+-interface Int8Array {
++interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -2367,7 +2372,7 @@ interface Int8Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2406,7 +2411,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2436,10 +2441,10 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -2454,7 +2459,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      obj: Int8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int8 | undefined;
+@@ -2472,7 +2477,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      obj: Int8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -2488,7 +2493,7 @@ interface Int8Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -2539,10 +2544,10 @@ interface Int8Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => import('ts-type-forge').Int8,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -2559,7 +2564,7 @@ interface Int8Array {
+       previousValue: import('ts-type-forge').Int8,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => import('ts-type-forge').Int8,
+   ): import('ts-type-forge').Int8;
+   reduce(
+@@ -2567,7 +2572,7 @@ interface Int8Array {
+       previousValue: import('ts-type-forge').Int8,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => import('ts-type-forge').Int8,
+     initialValue: import('ts-type-forge').Int8,
+   ): import('ts-type-forge').Int8;
+@@ -2587,7 +2592,7 @@ interface Int8Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2607,7 +2612,7 @@ interface Int8Array {
+       previousValue: import('ts-type-forge').Int8,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => import('ts-type-forge').Int8,
+   ): import('ts-type-forge').Int8;
+   reduceRight(
+@@ -2615,7 +2620,7 @@ interface Int8Array {
+       previousValue: import('ts-type-forge').Int8,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => import('ts-type-forge').Int8,
+     initialValue: import('ts-type-forge').Int8,
+   ): import('ts-type-forge').Int8;
+@@ -2635,7 +2640,7 @@ interface Int8Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -2643,7 +2648,7 @@ interface Int8Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int8Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -2663,7 +2668,7 @@ interface Int8Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -2677,7 +2682,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2707,7 +2712,7 @@ interface Int8Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int8Array;
++  ): Int8Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -2720,21 +2725,22 @@ interface Int8Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int8Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Int8;
+ }
+ interface Int8ArrayConstructor {
+-  readonly prototype: Int8Array;
+-  new (length: NumberType.TypedArraySize): Int8Array;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Int8> | ArrayBufferLike,
+-  ): Int8Array;
+-  new (
+-    buffer: ArrayBufferLike,
++  readonly prototype: Int8Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int8Array<ArrayBuffer>;
++  new (array: ArrayLike<import('ts-type-forge').Int8>): Int8Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int8Array;
++  ): Int8Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Int8> | ArrayBuffer,
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -2745,13 +2751,15 @@ interface Int8ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Int8[]): Int8Array;
++  of(...items: readonly import('ts-type-forge').Int8[]): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Int8>): Int8Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Int8>,
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -2763,7 +2771,7 @@ interface Int8ArrayConstructor {
+     arrayLike: ArrayLike<T>,
+     mapfn: (v: T, k: NumberType.TypedArraySize) => import('ts-type-forge').Int8,
+     thisArg?: unknown,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ }
+ declare const Int8Array: Int8ArrayConstructor;
+ 
+@@ -2771,7 +2779,7 @@ declare const Int8Array: Int8ArrayConstructor;
+  * A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint8Array {
++interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -2780,7 +2788,7 @@ interface Uint8Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -2819,7 +2827,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -2849,10 +2857,10 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -2867,7 +2875,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -2885,7 +2893,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -2901,7 +2909,7 @@ interface Uint8Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -2952,10 +2960,10 @@ interface Uint8Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -2972,7 +2980,7 @@ interface Uint8Array {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+   reduce(
+@@ -2980,7 +2988,7 @@ interface Uint8Array {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     initialValue: import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+@@ -3000,7 +3008,7 @@ interface Uint8Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3020,7 +3028,7 @@ interface Uint8Array {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+   reduceRight(
+@@ -3028,7 +3036,7 @@ interface Uint8Array {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     initialValue: import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+@@ -3048,7 +3056,7 @@ interface Uint8Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3056,7 +3064,7 @@ interface Uint8Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint8Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3076,7 +3084,7 @@ interface Uint8Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3090,7 +3098,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3120,7 +3128,7 @@ interface Uint8Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8Array;
++  ): Uint8Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3133,22 +3141,24 @@ interface Uint8Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint8Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Uint8;
+ }
+-
+ interface Uint8ArrayConstructor {
+-  readonly prototype: Uint8Array;
+-  new (length: NumberType.TypedArraySize): Uint8Array;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBufferLike,
+-  ): Uint8Array;
++  readonly prototype: Uint8Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint8Array<ArrayBuffer>;
+   new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Uint8>,
++  ): Uint8Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint8Array;
++  ): Uint8Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBuffer,
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3159,13 +3169,17 @@ interface Uint8ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Uint8[]): Uint8Array;
++  of(
++    ...items: readonly import('ts-type-forge').Uint8[]
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Uint8>): Uint8Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Uint8>,
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -3180,7 +3194,7 @@ interface Uint8ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Uint8,
+     thisArg?: unknown,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ }
+ declare const Uint8Array: Uint8ArrayConstructor;
+ 
+@@ -3188,7 +3202,9 @@ declare const Uint8Array: Uint8ArrayConstructor;
+  * A typed array of 8-bit unsigned integer (clamped) values. The contents are initialized to 0.
+  * If the requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint8ClampedArray {
++interface Uint8ClampedArray<
++  TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
++> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -3197,7 +3213,7 @@ interface Uint8ClampedArray {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -3236,7 +3252,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3266,10 +3282,10 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -3284,7 +3300,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8ClampedArray,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -3302,7 +3318,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      obj: Uint8ClampedArray,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -3318,7 +3334,7 @@ interface Uint8ClampedArray {
+     callbackfn: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -3369,10 +3385,10 @@ interface Uint8ClampedArray {
+     callbackfn: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -3389,7 +3405,7 @@ interface Uint8ClampedArray {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+   reduce(
+@@ -3397,7 +3413,7 @@ interface Uint8ClampedArray {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     initialValue: import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+@@ -3417,7 +3433,7 @@ interface Uint8ClampedArray {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3437,7 +3453,7 @@ interface Uint8ClampedArray {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+   reduceRight(
+@@ -3445,7 +3461,7 @@ interface Uint8ClampedArray {
+       previousValue: import('ts-type-forge').Uint8,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => import('ts-type-forge').Uint8,
+     initialValue: import('ts-type-forge').Uint8,
+   ): import('ts-type-forge').Uint8;
+@@ -3465,7 +3481,7 @@ interface Uint8ClampedArray {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint8,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3473,7 +3489,7 @@ interface Uint8ClampedArray {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint8ClampedArray;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3493,7 +3509,7 @@ interface Uint8ClampedArray {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3507,7 +3523,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3537,7 +3553,7 @@ interface Uint8ClampedArray {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3550,22 +3566,24 @@ interface Uint8ClampedArray {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint8ClampedArray;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Uint8;
+ }
+-
+ interface Uint8ClampedArrayConstructor {
+-  readonly prototype: Uint8ClampedArray;
+-  new (length: NumberType.TypedArraySize): Uint8ClampedArray;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBufferLike,
+-  ): Uint8ClampedArray;
++  readonly prototype: Uint8ClampedArray<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint8ClampedArray<ArrayBuffer>;
+   new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Uint8>,
++  ): Uint8ClampedArray<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBuffer,
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3576,13 +3594,17 @@ interface Uint8ClampedArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Uint8[]): Uint8ClampedArray;
++  of(
++    ...items: readonly import('ts-type-forge').Uint8[]
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Uint8>): Uint8ClampedArray;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Uint8>,
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -3597,7 +3619,7 @@ interface Uint8ClampedArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Uint8,
+     thisArg?: unknown,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ }
+ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
+ 
+@@ -3605,7 +3627,7 @@ declare const Uint8ClampedArray: Uint8ClampedArrayConstructor;
+  * A typed array of 16-bit signed integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Int16Array {
++interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -3614,7 +3636,7 @@ interface Int16Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -3653,7 +3675,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3683,10 +3705,10 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -3701,7 +3723,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      obj: Int16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int16 | undefined;
+@@ -3719,7 +3741,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      obj: Int16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -3735,7 +3757,7 @@ interface Int16Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -3786,10 +3808,10 @@ interface Int16Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => import('ts-type-forge').Int16,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -3806,7 +3828,7 @@ interface Int16Array {
+       previousValue: import('ts-type-forge').Int16,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => import('ts-type-forge').Int16,
+   ): import('ts-type-forge').Int16;
+   reduce(
+@@ -3814,7 +3836,7 @@ interface Int16Array {
+       previousValue: import('ts-type-forge').Int16,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => import('ts-type-forge').Int16,
+     initialValue: import('ts-type-forge').Int16,
+   ): import('ts-type-forge').Int16;
+@@ -3834,7 +3856,7 @@ interface Int16Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3854,7 +3876,7 @@ interface Int16Array {
+       previousValue: import('ts-type-forge').Int16,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => import('ts-type-forge').Int16,
+   ): import('ts-type-forge').Int16;
+   reduceRight(
+@@ -3862,7 +3884,7 @@ interface Int16Array {
+       previousValue: import('ts-type-forge').Int16,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => import('ts-type-forge').Int16,
+     initialValue: import('ts-type-forge').Int16,
+   ): import('ts-type-forge').Int16;
+@@ -3882,7 +3904,7 @@ interface Int16Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -3890,7 +3912,7 @@ interface Int16Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int16Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -3910,7 +3932,7 @@ interface Int16Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -3924,7 +3946,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -3954,7 +3976,7 @@ interface Int16Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int16Array;
++  ): Int16Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -3967,22 +3989,24 @@ interface Int16Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int16Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Int16;
+ }
+-
+ interface Int16ArrayConstructor {
+-  readonly prototype: Int16Array;
+-  new (length: NumberType.TypedArraySize): Int16Array;
++  readonly prototype: Int16Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int16Array<ArrayBuffer>;
+   new (
+-    array: ArrayLike<import('ts-type-forge').Int16> | ArrayBufferLike,
+-  ): Int16Array;
+-  new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Int16>,
++  ): Int16Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int16Array;
++  ): Int16Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Int16> | ArrayBuffer,
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -3993,13 +4017,17 @@ interface Int16ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Int16[]): Int16Array;
++  of(
++    ...items: readonly import('ts-type-forge').Int16[]
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Int16>): Int16Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Int16>,
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -4014,7 +4042,7 @@ interface Int16ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Int16,
+     thisArg?: unknown,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ }
+ declare const Int16Array: Int16ArrayConstructor;
+ 
+@@ -4022,7 +4050,7 @@ declare const Int16Array: Int16ArrayConstructor;
+  * A typed array of 16-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint16Array {
++interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -4031,7 +4059,7 @@ interface Uint16Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -4070,7 +4098,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4100,10 +4128,10 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4118,7 +4146,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      obj: Uint16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint16 | undefined;
+@@ -4136,7 +4164,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      obj: Uint16Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4152,7 +4180,7 @@ interface Uint16Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -4203,10 +4231,10 @@ interface Uint16Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => import('ts-type-forge').Uint16,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -4223,7 +4251,7 @@ interface Uint16Array {
+       previousValue: import('ts-type-forge').Uint16,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => import('ts-type-forge').Uint16,
+   ): import('ts-type-forge').Uint16;
+   reduce(
+@@ -4231,7 +4259,7 @@ interface Uint16Array {
+       previousValue: import('ts-type-forge').Uint16,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => import('ts-type-forge').Uint16,
+     initialValue: import('ts-type-forge').Uint16,
+   ): import('ts-type-forge').Uint16;
+@@ -4251,7 +4279,7 @@ interface Uint16Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4271,7 +4299,7 @@ interface Uint16Array {
+       previousValue: import('ts-type-forge').Uint16,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => import('ts-type-forge').Uint16,
+   ): import('ts-type-forge').Uint16;
+   reduceRight(
+@@ -4279,7 +4307,7 @@ interface Uint16Array {
+       previousValue: import('ts-type-forge').Uint16,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => import('ts-type-forge').Uint16,
+     initialValue: import('ts-type-forge').Uint16,
+   ): import('ts-type-forge').Uint16;
+@@ -4299,7 +4327,7 @@ interface Uint16Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint16,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4307,7 +4335,7 @@ interface Uint16Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint16Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -4327,7 +4355,7 @@ interface Uint16Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -4341,7 +4369,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4371,7 +4399,7 @@ interface Uint16Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint16Array;
++  ): Uint16Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -4384,22 +4412,24 @@ interface Uint16Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint16Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Uint16;
+ }
+-
+ interface Uint16ArrayConstructor {
+-  readonly prototype: Uint16Array;
+-  new (length: NumberType.TypedArraySize): Uint16Array;
++  readonly prototype: Uint16Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint16Array<ArrayBuffer>;
+   new (
+-    array: ArrayLike<import('ts-type-forge').Uint16> | ArrayBufferLike,
+-  ): Uint16Array;
+-  new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Uint16>,
++  ): Uint16Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint16Array;
++  ): Uint16Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Uint16> | ArrayBuffer,
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -4410,13 +4440,17 @@ interface Uint16ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Uint16[]): Uint16Array;
++  of(
++    ...items: readonly import('ts-type-forge').Uint16[]
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Uint16>): Uint16Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Uint16>,
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -4431,14 +4465,14 @@ interface Uint16ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Uint16,
+     thisArg?: unknown,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ }
+ declare const Uint16Array: Uint16ArrayConstructor;
+ /**
+  * A typed array of 32-bit signed integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Int32Array {
++interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -4447,7 +4481,7 @@ interface Int32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -4486,7 +4520,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4516,10 +4550,10 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4534,7 +4568,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      obj: Int32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int32 | undefined;
+@@ -4552,7 +4586,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      obj: Int32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4568,7 +4602,7 @@ interface Int32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -4619,10 +4653,10 @@ interface Int32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => import('ts-type-forge').Int32,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -4639,7 +4673,7 @@ interface Int32Array {
+       previousValue: import('ts-type-forge').Int32,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => import('ts-type-forge').Int32,
+   ): import('ts-type-forge').Int32;
+   reduce(
+@@ -4647,7 +4681,7 @@ interface Int32Array {
+       previousValue: import('ts-type-forge').Int32,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => import('ts-type-forge').Int32,
+     initialValue: import('ts-type-forge').Int32,
+   ): import('ts-type-forge').Int32;
+@@ -4667,7 +4701,7 @@ interface Int32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4687,7 +4721,7 @@ interface Int32Array {
+       previousValue: import('ts-type-forge').Int32,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => import('ts-type-forge').Int32,
+   ): import('ts-type-forge').Int32;
+   reduceRight(
+@@ -4695,7 +4729,7 @@ interface Int32Array {
+       previousValue: import('ts-type-forge').Int32,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => import('ts-type-forge').Int32,
+     initialValue: import('ts-type-forge').Int32,
+   ): import('ts-type-forge').Int32;
+@@ -4715,7 +4749,7 @@ interface Int32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Int32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -4723,7 +4757,7 @@ interface Int32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Int32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -4743,7 +4777,7 @@ interface Int32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -4757,7 +4791,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4787,7 +4821,7 @@ interface Int32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Int32Array;
++  ): Int32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -4800,22 +4834,24 @@ interface Int32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Int32Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Int32;
+ }
+-
+ interface Int32ArrayConstructor {
+-  readonly prototype: Int32Array;
+-  new (length: NumberType.TypedArraySize): Int32Array;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Int32> | ArrayBufferLike,
+-  ): Int32Array;
++  readonly prototype: Int32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Int32Array<ArrayBuffer>;
+   new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Int32>,
++  ): Int32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Int32Array;
++  ): Int32Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Int32> | ArrayBuffer,
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -4826,13 +4862,17 @@ interface Int32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Int32[]): Int32Array;
++  of(
++    ...items: readonly import('ts-type-forge').Int32[]
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Int32>): Int32Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Int32>,
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -4847,7 +4887,7 @@ interface Int32ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Int32,
+     thisArg?: unknown,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ }
+ declare const Int32Array: Int32ArrayConstructor;
+ 
+@@ -4855,7 +4895,7 @@ declare const Int32Array: Int32ArrayConstructor;
+  * A typed array of 32-bit unsigned integer values. The contents are initialized to 0. If the
+  * requested number of bytes could not be allocated an exception is raised.
+  */
+-interface Uint32Array {
++interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -4864,7 +4904,7 @@ interface Uint32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -4903,7 +4943,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -4933,10 +4973,10 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -4951,7 +4991,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      obj: Uint32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint32 | undefined;
+@@ -4969,7 +5009,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      obj: Uint32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -4985,7 +5025,7 @@ interface Uint32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -5036,10 +5076,10 @@ interface Uint32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => import('ts-type-forge').Uint32,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -5056,7 +5096,7 @@ interface Uint32Array {
+       previousValue: import('ts-type-forge').Uint32,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => import('ts-type-forge').Uint32,
+   ): import('ts-type-forge').Uint32;
+   reduce(
+@@ -5064,7 +5104,7 @@ interface Uint32Array {
+       previousValue: import('ts-type-forge').Uint32,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => import('ts-type-forge').Uint32,
+     initialValue: import('ts-type-forge').Uint32,
+   ): import('ts-type-forge').Uint32;
+@@ -5084,7 +5124,7 @@ interface Uint32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5104,7 +5144,7 @@ interface Uint32Array {
+       previousValue: import('ts-type-forge').Uint32,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => import('ts-type-forge').Uint32,
+   ): import('ts-type-forge').Uint32;
+   reduceRight(
+@@ -5112,7 +5152,7 @@ interface Uint32Array {
+       previousValue: import('ts-type-forge').Uint32,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => import('ts-type-forge').Uint32,
+     initialValue: import('ts-type-forge').Uint32,
+   ): import('ts-type-forge').Uint32;
+@@ -5132,7 +5172,7 @@ interface Uint32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Uint32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5140,7 +5180,7 @@ interface Uint32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Uint32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5160,7 +5200,7 @@ interface Uint32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -5174,7 +5214,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5204,7 +5244,7 @@ interface Uint32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Uint32Array;
++  ): Uint32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -5217,22 +5257,24 @@ interface Uint32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Uint32Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Uint32;
+ }
+-
+ interface Uint32ArrayConstructor {
+-  readonly prototype: Uint32Array;
+-  new (length: NumberType.TypedArraySize): Uint32Array;
++  readonly prototype: Uint32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Uint32Array<ArrayBuffer>;
+   new (
+-    array: ArrayLike<import('ts-type-forge').Uint32> | ArrayBufferLike,
+-  ): Uint32Array;
+-  new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Uint32>,
++  ): Uint32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Uint32Array;
++  ): Uint32Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Uint32> | ArrayBuffer,
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -5243,13 +5285,17 @@ interface Uint32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Uint32[]): Uint32Array;
++  of(
++    ...items: readonly import('ts-type-forge').Uint32[]
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Uint32>): Uint32Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Uint32>,
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -5264,7 +5310,7 @@ interface Uint32ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Uint32,
+     thisArg?: unknown,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ }
+ declare const Uint32Array: Uint32ArrayConstructor;
+ 
+@@ -5272,7 +5318,7 @@ declare const Uint32Array: Uint32ArrayConstructor;
+  * A typed array of 32-bit float values. The contents are initialized to 0. If the requested number
+  * of bytes could not be allocated an exception is raised.
+  */
+-interface Float32Array {
++interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -5281,7 +5327,7 @@ interface Float32Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -5320,7 +5366,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5350,10 +5396,10 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -5368,7 +5414,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      obj: Float32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Float32 | undefined;
+@@ -5386,7 +5432,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      obj: Float32Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -5402,7 +5448,7 @@ interface Float32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -5453,10 +5499,10 @@ interface Float32Array {
+     callbackfn: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => import('ts-type-forge').Float32,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -5473,7 +5519,7 @@ interface Float32Array {
+       previousValue: import('ts-type-forge').Float32,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => import('ts-type-forge').Float32,
+   ): import('ts-type-forge').Float32;
+   reduce(
+@@ -5481,7 +5527,7 @@ interface Float32Array {
+       previousValue: import('ts-type-forge').Float32,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => import('ts-type-forge').Float32,
+     initialValue: import('ts-type-forge').Float32,
+   ): import('ts-type-forge').Float32;
+@@ -5501,7 +5547,7 @@ interface Float32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5521,7 +5567,7 @@ interface Float32Array {
+       previousValue: import('ts-type-forge').Float32,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => import('ts-type-forge').Float32,
+   ): import('ts-type-forge').Float32;
+   reduceRight(
+@@ -5529,7 +5575,7 @@ interface Float32Array {
+       previousValue: import('ts-type-forge').Float32,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => import('ts-type-forge').Float32,
+     initialValue: import('ts-type-forge').Float32,
+   ): import('ts-type-forge').Float32;
+@@ -5549,7 +5595,7 @@ interface Float32Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Float32,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5557,7 +5603,7 @@ interface Float32Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Float32Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5577,7 +5623,7 @@ interface Float32Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -5591,7 +5637,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5621,7 +5667,7 @@ interface Float32Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float32Array;
++  ): Float32Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -5634,22 +5680,24 @@ interface Float32Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Float32Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Float32;
+ }
+-
+ interface Float32ArrayConstructor {
+-  readonly prototype: Float32Array;
+-  new (length: NumberType.TypedArraySize): Float32Array;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Float32> | ArrayBufferLike,
+-  ): Float32Array;
++  readonly prototype: Float32Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Float32Array<ArrayBuffer>;
+   new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Float32>,
++  ): Float32Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Float32Array;
++  ): Float32Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Float32> | ArrayBuffer,
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -5660,13 +5708,17 @@ interface Float32ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Float32[]): Float32Array;
++  of(
++    ...items: readonly import('ts-type-forge').Float32[]
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Float32>): Float32Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Float32>,
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -5681,7 +5733,7 @@ interface Float32ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Float32,
+     thisArg?: unknown,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ }
+ declare const Float32Array: Float32ArrayConstructor;
+ 
+@@ -5689,7 +5741,7 @@ declare const Float32Array: Float32ArrayConstructor;
+  * A typed array of 64-bit float values. The contents are initialized to 0. If the requested
+  * number of bytes could not be allocated an exception is raised.
+  */
+-interface Float64Array {
++interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+   /**
+    * The size in bytes of each element in the array.
+    */
+@@ -5698,7 +5750,7 @@ interface Float64Array {
+   /**
+    * The ArrayBuffer instance referenced by the array.
+    */
+-  readonly buffer: ArrayBufferLike;
++  readonly buffer: TArrayBuffer;
+ 
+   /**
+    * The length in bytes of the array.
+@@ -5737,7 +5789,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -5767,10 +5819,10 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns the value of the first element in the array where predicate is true, and undefined
+@@ -5785,7 +5837,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      obj: Float64Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Float64 | undefined;
+@@ -5803,7 +5855,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      obj: Float64Array,
++      obj: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -5819,7 +5871,7 @@ interface Float64Array {
+     callbackfn: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => void,
+     thisArg?: unknown,
+   ): void;
+@@ -5870,10 +5922,10 @@ interface Float64Array {
+     callbackfn: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => import('ts-type-forge').Float64,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Calls the specified callback function for all the elements in an array. The return value of
+@@ -5890,7 +5942,7 @@ interface Float64Array {
+       previousValue: import('ts-type-forge').Float64,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => import('ts-type-forge').Float64,
+   ): import('ts-type-forge').Float64;
+   reduce(
+@@ -5898,7 +5950,7 @@ interface Float64Array {
+       previousValue: import('ts-type-forge').Float64,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => import('ts-type-forge').Float64,
+     initialValue: import('ts-type-forge').Float64,
+   ): import('ts-type-forge').Float64;
+@@ -5918,7 +5970,7 @@ interface Float64Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5938,7 +5990,7 @@ interface Float64Array {
+       previousValue: import('ts-type-forge').Float64,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => import('ts-type-forge').Float64,
+   ): import('ts-type-forge').Float64;
+   reduceRight(
+@@ -5946,7 +5998,7 @@ interface Float64Array {
+       previousValue: import('ts-type-forge').Float64,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => import('ts-type-forge').Float64,
+     initialValue: import('ts-type-forge').Float64,
+   ): import('ts-type-forge').Float64;
+@@ -5966,7 +6018,7 @@ interface Float64Array {
+       previousValue: U,
+       currentValue: import('ts-type-forge').Float64,
+       currentIndex: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => U,
+     initialValue: U,
+   ): U;
+@@ -5974,7 +6026,7 @@ interface Float64Array {
+   /**
+    * Reverses the elements in an Array.
+    */
+-  reverse(): Float64Array;
++  reverse(): this;
+ 
+   /**
+    * Sets a value or an array of values.
+@@ -5994,7 +6046,7 @@ interface Float64Array {
+   slice(
+     start?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Determines whether the specified callback function returns true for any element of an array.
+@@ -6008,7 +6060,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): boolean;
+@@ -6038,7 +6090,7 @@ interface Float64Array {
+   subarray(
+     begin?: NumberType.TypedArraySizeArg,
+     end?: NumberType.TypedArraySizeArg,
+-  ): Float64Array;
++  ): Float64Array<TArrayBuffer>;
+ 
+   /**
+    * Converts a number to a string by using the current locale.
+@@ -6051,22 +6103,24 @@ interface Float64Array {
+   toString(): string;
+ 
+   /** Returns the primitive value of the specified object. */
+-  valueOf(): Float64Array;
++  valueOf(): this;
+ 
+   [index: number]: import('ts-type-forge').Float64;
+ }
+-
+ interface Float64ArrayConstructor {
+-  readonly prototype: Float64Array;
+-  new (length: NumberType.TypedArraySize): Float64Array;
+-  new (
+-    array: ArrayLike<import('ts-type-forge').Float64> | ArrayBufferLike,
+-  ): Float64Array;
++  readonly prototype: Float64Array<ArrayBufferLike>;
++  new (length: NumberType.TypedArraySize): Float64Array<ArrayBuffer>;
+   new (
+-    buffer: ArrayBufferLike,
++    array: ArrayLike<import('ts-type-forge').Float64>,
++  ): Float64Array<ArrayBuffer>;
++  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
++    buffer: TArrayBuffer,
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+-  ): Float64Array;
++  ): Float64Array<TArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Float64> | ArrayBuffer,
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.
+@@ -6077,13 +6131,17 @@ interface Float64ArrayConstructor {
+    * Returns a new array from a set of elements.
+    * @param items A set of elements to include in the new array object.
+    */
+-  of(...items: readonly import('ts-type-forge').Float64[]): Float64Array;
++  of(
++    ...items: readonly import('ts-type-forge').Float64[]
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+    * @param arrayLike An array-like or iterable object to convert to an array.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').Float64>): Float64Array;
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').Float64>,
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+@@ -6098,7 +6156,7 @@ interface Float64ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').Float64,
+     thisArg?: unknown,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ }
+ declare const Float64Array: Float64ArrayConstructor;
+ 

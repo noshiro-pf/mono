@@ -1,0 +1,95 @@
+diff --git a/v5.4/output/lib-files/lib.es2015.core.d.ts b/v5.5/output/lib-files/lib.es2015.core.d.ts
+index 3a61d8968..00a036101 100644
+--- a/v5.4/output/lib-files/lib.es2015.core.d.ts
++++ b/v5.5/output/lib-files/lib.es2015.core.d.ts
+@@ -53,6 +53,11 @@ interface Array<T> {
+    * @param end If not specified, length of the this object is used as its default value.
+    */
+   copyWithin(target: number, start: number, end?: number): this;
++
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
++  ): string;
+ }
+ 
+ interface ArrayConstructor {
+@@ -374,6 +379,11 @@ interface ReadonlyArray<T> {
+     predicate: (value: T, index: number, obj: readonly T[]) => boolean,
+     thisArg?: unknown,
+   ): number;
++
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
++  ): string;
+ }
+ 
+ interface RegExp {
+@@ -572,3 +582,66 @@ interface StringConstructor {
+     ...substitutions: readonly unknown[]
+   ): string;
+ }
++
++interface Int8Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint8Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint8ClampedArray {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Int16Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint16Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Int32Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Uint32Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Float32Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}
++
++interface Float64Array {
++  toLocaleString(
++    locales: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
++}

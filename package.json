@@ -21,9 +21,7 @@
     "tools/*",
     "strict-lib/scripts-common",
     "strict-lib/v*",
-    "strict-lib/v*/output/lib",
-    "strict-lib/v*/output",
-    "strict-lib/v*/output-branded"
+    "strict-lib/v*/output/lib"
   ],
   "scripts": {
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",

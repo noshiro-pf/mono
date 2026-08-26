@@ -57,17 +57,13 @@ packages:
   - tools/*
   # The strict standard library. Its generator and its generated output live
   # together, so it does not fit `libs/*` (one directory, one npm package) and
-  # gets a top level of its own. `v*/output` and `v*/output-branded` are the
-  # per-flavor type-check harnesses that older TypeScript series carry.
+  # gets a top level of its own.
   - strict-lib/scripts-common
   - strict-lib/v*
   # The published package of each TypeScript minor. A member because `paths`
   # has to resolve `node_modules/strict-ts-lib-vX.Y/libs/*` through a symlink
   # to this directory, and because changesets can only version what it can see.
   - strict-lib/v*/output/lib
-  # Per-flavor type-check harnesses, which the older series carry.
-  - strict-lib/v*/output
-  - strict-lib/v*/output-branded
 
 # NOTE: experimental/ is intentionally excluded. It holds the pre-2026 monorepo
 # contents (packages/, configs/, scripts/), kept for reference and revived

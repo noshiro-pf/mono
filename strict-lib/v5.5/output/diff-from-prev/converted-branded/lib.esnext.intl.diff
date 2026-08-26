@@ -1,0 +1,21 @@
+diff --git a/v5.4/output/lib-files-branded/lib.esnext.intl.d.ts b/v5.5/output/lib-files-branded/lib.esnext.intl.d.ts
+index 682fed947..a12fc86f3 100644
+--- a/v5.4/output/lib-files-branded/lib.esnext.intl.d.ts
++++ b/v5.5/output/lib-files-branded/lib.esnext.intl.d.ts
+@@ -1,15 +1,5 @@
+ /// <reference no-default-lib="true"/>
+ 
+ declare namespace Intl {
+-  interface NumberRangeFormatPart extends NumberFormatPart {
+-    readonly source: 'startRange' | 'endRange' | 'shared';
+-  }
+-
+-  interface NumberFormat {
+-    formatRange(start: number | bigint, end: number | bigint): string;
+-    formatRangeToParts(
+-      start: number | bigint,
+-      end: number | bigint,
+-    ): readonly NumberRangeFormatPart[];
+-  }
++  // Empty
+ }

@@ -1,0 +1,10 @@
+diff --git a/v5.1/temp/copied/lib.esnext.d.ts b/v5.2/temp/copied/lib.esnext.d.ts
+index 0827c597b..60742cc03 100644
+--- a/v5.1/temp/copied/lib.esnext.d.ts
++++ b/v5.2/temp/copied/lib.esnext.d.ts
+@@ -17,3 +17,5 @@ and limitations under the License.
+ 
+ /// <reference lib="es2023" />
+ /// <reference lib="esnext.intl" />
++/// <reference lib="esnext.decorators" />
++/// <reference lib="esnext.disposable" />

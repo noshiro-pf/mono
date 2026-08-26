@@ -1,0 +1,19 @@
+diff --git a/v5.6/output/lib-files-branded/lib.esnext.d.ts b/v5.7/output/lib-files-branded/lib.esnext.d.ts
+index 159ddbb01..e129aeef4 100644
+--- a/v5.6/output/lib-files-branded/lib.esnext.d.ts
++++ b/v5.7/output/lib-files-branded/lib.esnext.d.ts
+@@ -1,13 +1,9 @@
+ /// <reference no-default-lib="true"/>
+ 
+-/// <reference path="./lib.es2023.d.ts" />
++/// <reference path="./lib.es2024.d.ts" />
+ /// <reference path="./lib.esnext.intl.d.ts" />
+ /// <reference path="./lib.esnext.decorators.d.ts" />
+ /// <reference path="./lib.esnext.disposable.d.ts" />
+-/// <reference path="./lib.esnext.promise.d.ts" />
+-/// <reference path="./lib.esnext.object.d.ts" />
+ /// <reference path="./lib.esnext.collection.d.ts" />
+ /// <reference path="./lib.esnext.array.d.ts" />
+-/// <reference path="./lib.esnext.regexp.d.ts" />
+-/// <reference path="./lib.esnext.string.d.ts" />
+ /// <reference path="./lib.esnext.iterator.d.ts" />

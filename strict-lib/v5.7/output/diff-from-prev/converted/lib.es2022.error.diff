@@ -1,0 +1,12 @@
+diff --git a/v5.6/output/lib-files/lib.es2022.error.d.ts b/v5.7/output/lib-files/lib.es2022.error.d.ts
+index 13ba8cefc..4da9ab24a 100644
+--- a/v5.6/output/lib-files/lib.es2022.error.d.ts
++++ b/v5.7/output/lib-files/lib.es2022.error.d.ts
+@@ -1,5 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference path="./lib.es2021.promise.d.ts" />
++
+ interface ErrorOptions {
+   readonly cause?: unknown;
+ }

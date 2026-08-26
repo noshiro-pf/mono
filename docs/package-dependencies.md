@@ -157,6 +157,7 @@ root はワークスペースメンバーではないので、上のビルド順
 | `eslint-plugin-ts-fortress`   | `workspace:*` |
 | `eslint-plugin-ts-type-forge` | `workspace:*` |
 | `ts-data-forge`               | `workspace:*` |
+| `ts-fortress`                 | `workspace:*` |
 | `ts-repo-utils`               | `workspace:*` |
 | `ts-type-forge`               | `workspace:*` |
 

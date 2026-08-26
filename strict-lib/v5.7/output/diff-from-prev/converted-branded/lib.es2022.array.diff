@@ -1,0 +1,103 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es2022.array.d.ts b/v5.7/output/lib-files-branded/lib.es2022.array.d.ts
+index 2f33ef764..44745a2ab 100644
+--- a/v5.6/output/lib-files-branded/lib.es2022.array.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es2022.array.d.ts
+@@ -16,7 +16,7 @@ interface ReadonlyArray<T> {
+   at(index: NumberType.ArraySizeArg): T | undefined;
+ }
+ 
+-interface Int8Array {
++interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -26,7 +26,7 @@ interface Int8Array {
+   ): import('ts-type-forge').Int8 | undefined;
+ }
+ 
+-interface Uint8Array {
++interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -36,7 +36,7 @@ interface Uint8Array {
+   ): import('ts-type-forge').Uint8 | undefined;
+ }
+ 
+-interface Uint8ClampedArray {
++interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -46,7 +46,7 @@ interface Uint8ClampedArray {
+   ): import('ts-type-forge').Uint8 | undefined;
+ }
+ 
+-interface Int16Array {
++interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -56,7 +56,7 @@ interface Int16Array {
+   ): import('ts-type-forge').Int16 | undefined;
+ }
+ 
+-interface Uint16Array {
++interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -66,7 +66,7 @@ interface Uint16Array {
+   ): import('ts-type-forge').Uint16 | undefined;
+ }
+ 
+-interface Int32Array {
++interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -76,7 +76,7 @@ interface Int32Array {
+   ): import('ts-type-forge').Int32 | undefined;
+ }
+ 
+-interface Uint32Array {
++interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -86,7 +86,7 @@ interface Uint32Array {
+   ): import('ts-type-forge').Uint32 | undefined;
+ }
+ 
+-interface Float32Array {
++interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -96,7 +96,7 @@ interface Float32Array {
+   ): import('ts-type-forge').Float32 | undefined;
+ }
+ 
+-interface Float64Array {
++interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -106,7 +106,7 @@ interface Float64Array {
+   ): import('ts-type-forge').Float64 | undefined;
+ }
+ 
+-interface BigInt64Array {
++interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
+@@ -116,7 +116,7 @@ interface BigInt64Array {
+   ): import('ts-type-forge').BigInt64 | undefined;
+ }
+ 
+-interface BigUint64Array {
++interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the item located at the specified index.
+    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.

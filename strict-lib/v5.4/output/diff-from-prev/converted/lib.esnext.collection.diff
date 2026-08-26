@@ -1,0 +1,19 @@
+diff --git a/v5.4/output/lib-files/lib.esnext.collection.d.ts b/v5.4/output/lib-files/lib.esnext.collection.d.ts
+new file mode 100644
+index 000000000..956f3bc2a
+--- /dev/null
++++ b/v5.4/output/lib-files/lib.esnext.collection.d.ts
+@@ -0,0 +1,13 @@
++/// <reference no-default-lib="true"/>
++
++interface MapConstructor {
++  /**
++   * Groups members of an iterable according to the return value of the passed callback.
++   * @param items An iterable.
++   * @param keySelector A callback which will be invoked for each item in items.
++   */
++  groupBy<K, T>(
++    items: Iterable<T>,
++    keySelector: (item: T, index: number) => K,
++  ): Map<K, T[]>;
++}

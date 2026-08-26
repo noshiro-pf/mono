@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 
 /**
- * Generates cross-version diffs for each `packages/v5.x` package, writing them
- * into `packages/v5.x/diff-from-prev/`.
+ * Generates cross-version diffs for each `strict-lib/vX.Y` series, writing them
+ * into `strict-lib/vX.Y/output/diff-from-prev/`.
  *
- * For every consecutive version pair `v5.(x-1)` -> `v5.x` two sets of diffs are
+ * For every consecutive version pair `vX.(Y-1)` -> `vX.Y` three sets of diffs are
  * produced:
  *
  * - `official/<name>.diff` — diff between the upstream TypeScript lib files
@@ -14,7 +14,7 @@
  *   (`output/lib-files/<name>.d.ts`) of the two versions. Shows what changed in
  *   this repo's generated output between the two releases.
  * - `converted-branded/<name>.diff` — same as `converted` but for the branded
- *   output (`output-branded/lib-files/<name>.d.ts`), where the per-method
+ *   output (`output/lib-files-branded/<name>.d.ts`), where the per-method
  *   number-branding transforms live. A new upstream API that the conversion
  *   script doesn't know about shows up here as a raw `number` standing out
  *   against its branded siblings — the clearest omission signal.
@@ -27,7 +27,7 @@
  * Only files that actually differ are written; identical files are skipped. A
  * `summary.txt` per version lists the changed files for quick review.
  *
- * Prerequisite: every `v5.x` package must have been generated already (so that
+ * Prerequisite: every `vX.Y` series must have been generated already (so that
  * both `temp/copied` and `output/lib-files` are populated). Run `pnpm ws:gen`
  * first if unsure.
  */
@@ -49,11 +49,11 @@ const diffKinds = [
   { name: 'converted', subDir: path.join('output', 'lib-files') },
   {
     name: 'converted-branded',
-    subDir: path.join('output-branded', 'lib-files'),
+    subDir: path.join('output', 'lib-files-branded'),
   },
 ] as const;
 
-const outputDirName = 'diff-from-prev';
+const outputDirName = path.join('output', 'diff-from-prev');
 
 type Version = Readonly<{ dir: string; major: number; minor: number }>;
 

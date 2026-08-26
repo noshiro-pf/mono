@@ -10,7 +10,7 @@ import {
 import { convert } from '../convert-dts/convert-main.mjs';
 import { rewriteTsTypeForgeRefs } from './codemod/rewrite-ts-type-forge-refs.mjs';
 
-/** Generate files to `output/lib-files` and `output-branded/lib-files` */
+/** Generate files to `output/lib-files` and `output/lib-files-branded` */
 export const genLibFiles = async (
   ctx: Context,
 ): Promise<Result<undefined, unknown>> => {
@@ -18,7 +18,7 @@ export const genLibFiles = async (
 
   await Promise.all([
     makeEmptyDir(ctx.paths.strictTsLib.output.libFiles.$),
-    makeEmptyDir(ctx.paths.strictTsLib.outputBranded.libFiles.$),
+    makeEmptyDir(ctx.paths.strictTsLib.output.libFilesBranded.$),
   ]);
 
   await Promise.all(
@@ -38,8 +38,9 @@ const createDtsFiles = async (
   );
 
   const outDir =
-    ctx.paths.strictTsLib[config.useBrandedNumber ? 'outputBranded' : 'output']
-      .libFiles.$;
+    ctx.paths.strictTsLib.output[
+      config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
+    ].$;
 
   await Promise.all(
     srcFileList.map(async ({ content, filename }) => {

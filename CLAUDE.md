@@ -101,7 +101,8 @@ strict-lib/
   v7.0/ v6.0/ …     one directory per TypeScript minor
     output/lib/     the published package: package.json, README.md,
                     libs/ (plain number) and libs-branded/ (branded)
-    output/lib-files/, output/diff/, temp/copied/, diff-from-prev/
+    output/lib-files/, output/lib-files-branded/,
+    output/diff-from-official/, output/diff-from-prev/, temp/copied/
 ```
 
 - **`strict-lib/v*/output/lib` is the published package, laid out as it ships.**
@@ -113,8 +114,8 @@ strict-lib/
   `strict-lib`). With thousands of generated declarations, not walking them is
   most of what keeps the repository-wide format pass quick. Run
   `pnpm run strict-lib:fmt`.
-- **`temp/copied/`, `output*/lib-files/`, `output/diff/` and `diff-from-prev/`
-  are tooling, not debt.** The version-to-version diffs are how anyone decides
+- **`temp/copied/`, `output/lib-files*/` and `output/diff-from-*/` are
+  tooling, not debt.** The version-to-version diffs are how anyone decides
   whether the converter has to follow an upstream TypeScript change, and
   `temp/copied` is the _input_ to the `official` one. Do not untrack them.
 - **The per-group `package.json` under `libs/` are not published** and are not
@@ -152,15 +153,17 @@ strict-lib/
       `scripts-common` has no `scripts` block at all and exports its `.mts`
       sources directly, so it never appears in a stage, and the harnesses are
       independent of one another.
-    - **This does not carry over to the other harnesses.** `ts-type-forge`
-      stays in `dependencies` of the `output` and `output-branded` harnesses:
-      the generated declarations carry real `import('ts-type-forge')` types, so
-      it is a dependency of the content those harnesses compile rather than a
-      tool they run — the published bundles declare it for the same reason.
-      Nothing declares a dependency on an `-output` harness either, so a bump
-      there stops where it starts and reaches no published package. The
-      cascade is what makes the `-source` edge worth changing; absent one,
-      classify by what the thing actually is.
+    - **The same reasoning holds for every private manifest under
+      `strict-lib/`**: `scripts-common` and the `-source` harnesses declare
+      everything in `devDependencies`, so a toolchain patch bumps nothing it
+      does not change. The separate `-output` / `-output-branded` harness
+      packages the v5.x series once carried held `ts-type-forge` in
+      `dependencies`, and one `ts-type-forge` patch put a meaningless version
+      bump and changelog into all twenty of them (#1683); they were removed,
+      and their `noLib` checks now run from each `-source` harness via
+      `tsconfig.lib-files-check*.json`. `ts-type-forge` stays in
+      `dependencies` only where it is part of what ships: the published
+      bundles, whose declarations carry real `import('ts-type-forge')` types.
 
 Generation runs through `strict-lib:gen*` at the root; see
 `docs/strict-typescript-lib-integration.md`.

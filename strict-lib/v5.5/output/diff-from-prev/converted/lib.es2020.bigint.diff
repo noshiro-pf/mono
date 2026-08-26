@@ -1,0 +1,35 @@
+diff --git a/v5.4/output/lib-files/lib.es2020.bigint.d.ts b/v5.5/output/lib-files/lib.es2020.bigint.d.ts
+index 3df0263e5..507a7797b 100644
+--- a/v5.4/output/lib-files/lib.es2020.bigint.d.ts
++++ b/v5.5/output/lib-files/lib.es2020.bigint.d.ts
+@@ -407,7 +407,10 @@ interface BigInt64Array {
+   subarray(begin?: number, end?: number): BigInt64Array;
+ 
+   /** Converts the array to a string by using the current locale. */
+-  toLocaleString(): string;
++  toLocaleString(
++    locales?: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
+ 
+   /** Returns a string representation of the array. */
+   toString(): string;
+@@ -738,7 +741,10 @@ interface BigUint64Array {
+   subarray(begin?: number, end?: number): BigUint64Array;
+ 
+   /** Converts the array to a string by using the current locale. */
+-  toLocaleString(): string;
++  toLocaleString(
++    locales?: string | readonly string[],
++    options?: Intl.NumberFormatOptions,
++  ): string;
+ 
+   /** Returns a string representation of the array. */
+   toString(): string;
+@@ -828,6 +834,5 @@ interface DataView {
+ declare namespace Intl {
+   interface NumberFormat {
+     format(value: number | bigint): string;
+-    resolvedOptions(): ResolvedNumberFormatOptions;
+   }
+ }

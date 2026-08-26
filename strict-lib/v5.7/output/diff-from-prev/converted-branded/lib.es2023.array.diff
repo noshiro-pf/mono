@@ -1,0 +1,766 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es2023.array.d.ts b/v5.7/output/lib-files-branded/lib.es2023.array.d.ts
+index 6ca9de765..4273c4c05 100644
+--- a/v5.6/output/lib-files-branded/lib.es2023.array.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es2023.array.d.ts
+@@ -194,7 +194,7 @@ interface ReadonlyArray<T> {
+   with(index: NumberType.ArraySizeArg, value: T): readonly T[];
+ }
+ 
+-interface Int8Array {
++interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -208,7 +208,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -216,7 +216,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int8 | undefined;
+@@ -234,7 +234,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: NumberType.TypedArraySize,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -242,7 +242,7 @@ interface Int8Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int8Array;
++  toReversed(): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -250,8 +250,8 @@ interface Int8Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int8Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int8Array(4) [1, 2, 11, 22]
++   * const myNums = Int8Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int8Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -259,7 +259,7 @@ interface Int8Array {
+       a: import('ts-type-forge').Int8,
+       b: import('ts-type-forge').Int8,
+     ) => number,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -273,10 +273,10 @@ interface Int8Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Int8,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ }
+ 
+-interface Uint8Array {
++interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -290,7 +290,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -298,7 +298,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -316,7 +316,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -324,7 +324,7 @@ interface Uint8Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint8Array;
++  toReversed(): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -332,8 +332,8 @@ interface Uint8Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint8Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint8Array(4) [1, 2, 11, 22]
++   * const myNums = Uint8Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint8Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -341,7 +341,7 @@ interface Uint8Array {
+       a: import('ts-type-forge').Uint8,
+       b: import('ts-type-forge').Uint8,
+     ) => number,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -355,10 +355,10 @@ interface Uint8Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Uint8,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ }
+ 
+-interface Uint8ClampedArray {
++interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -372,7 +372,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -380,7 +380,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -398,7 +398,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: NumberType.TypedArraySize,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -406,7 +406,7 @@ interface Uint8ClampedArray {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint8ClampedArray;
++  toReversed(): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -414,8 +414,8 @@ interface Uint8ClampedArray {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint8ClampedArray.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint8ClampedArray(4) [1, 2, 11, 22]
++   * const myNums = Uint8ClampedArray<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint8ClampedArray<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -423,7 +423,7 @@ interface Uint8ClampedArray {
+       a: import('ts-type-forge').Uint8,
+       b: import('ts-type-forge').Uint8,
+     ) => number,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -437,10 +437,10 @@ interface Uint8ClampedArray {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Uint8,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ }
+ 
+-interface Int16Array {
++interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -454,7 +454,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -462,7 +462,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int16 | undefined;
+@@ -480,7 +480,7 @@ interface Int16Array {
+     predicate: (
+       value: import('ts-type-forge').Int16,
+       index: NumberType.TypedArraySize,
+-      array: Int16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -488,7 +488,7 @@ interface Int16Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int16Array;
++  toReversed(): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -496,8 +496,8 @@ interface Int16Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int16Array.from([11, 2, -22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int16Array(4) [-22, 1, 2, 11]
++   * const myNums = Int16Array<Buffer>.from([11, 2, -22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int16Array<Buffer>(4) [-22, 1, 2, 11]
+    * ```
+    */
+   toSorted(
+@@ -505,7 +505,7 @@ interface Int16Array {
+       a: import('ts-type-forge').Int16,
+       b: import('ts-type-forge').Int16,
+     ) => number,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -519,10 +519,10 @@ interface Int16Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Int16,
+-  ): Int16Array;
++  ): Int16Array<ArrayBuffer>;
+ }
+ 
+-interface Uint16Array {
++interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -536,7 +536,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -544,7 +544,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint16 | undefined;
+@@ -562,7 +562,7 @@ interface Uint16Array {
+     predicate: (
+       value: import('ts-type-forge').Uint16,
+       index: NumberType.TypedArraySize,
+-      array: Uint16Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -570,7 +570,7 @@ interface Uint16Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint16Array;
++  toReversed(): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -578,8 +578,8 @@ interface Uint16Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint16Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint16Array(4) [1, 2, 11, 22]
++   * const myNums = Uint16Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint16Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -587,7 +587,7 @@ interface Uint16Array {
+       a: import('ts-type-forge').Uint16,
+       b: import('ts-type-forge').Uint16,
+     ) => number,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -601,10 +601,10 @@ interface Uint16Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Uint16,
+-  ): Uint16Array;
++  ): Uint16Array<ArrayBuffer>;
+ }
+ 
+-interface Int32Array {
++interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -618,7 +618,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -626,7 +626,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int32 | undefined;
+@@ -644,7 +644,7 @@ interface Int32Array {
+     predicate: (
+       value: import('ts-type-forge').Int32,
+       index: NumberType.TypedArraySize,
+-      array: Int32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -652,7 +652,7 @@ interface Int32Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int32Array;
++  toReversed(): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -660,8 +660,8 @@ interface Int32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int32Array.from([11, 2, -22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int32Array(4) [-22, 1, 2, 11]
++   * const myNums = Int32Array<Buffer>.from([11, 2, -22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int32Array<Buffer>(4) [-22, 1, 2, 11]
+    * ```
+    */
+   toSorted(
+@@ -669,7 +669,7 @@ interface Int32Array {
+       a: import('ts-type-forge').Int32,
+       b: import('ts-type-forge').Int32,
+     ) => number,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -683,10 +683,10 @@ interface Int32Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Int32,
+-  ): Int32Array;
++  ): Int32Array<ArrayBuffer>;
+ }
+ 
+-interface Uint32Array {
++interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -700,7 +700,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -708,7 +708,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint32 | undefined;
+@@ -726,7 +726,7 @@ interface Uint32Array {
+     predicate: (
+       value: import('ts-type-forge').Uint32,
+       index: NumberType.TypedArraySize,
+-      array: Uint32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -734,7 +734,7 @@ interface Uint32Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint32Array;
++  toReversed(): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -742,8 +742,8 @@ interface Uint32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint32Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint32Array(4) [1, 2, 11, 22]
++   * const myNums = Uint32Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint32Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -751,7 +751,7 @@ interface Uint32Array {
+       a: import('ts-type-forge').Uint32,
+       b: import('ts-type-forge').Uint32,
+     ) => number,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -765,10 +765,10 @@ interface Uint32Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Uint32,
+-  ): Uint32Array;
++  ): Uint32Array<ArrayBuffer>;
+ }
+ 
+-interface Float32Array {
++interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -782,7 +782,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -790,7 +790,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Float32 | undefined;
+@@ -808,7 +808,7 @@ interface Float32Array {
+     predicate: (
+       value: import('ts-type-forge').Float32,
+       index: NumberType.TypedArraySize,
+-      array: Float32Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -816,7 +816,7 @@ interface Float32Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Float32Array;
++  toReversed(): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -824,8 +824,8 @@ interface Float32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Float32Array.from([11.25, 2, -22.5, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Float32Array(4) [-22.5, 1, 2, 11.5]
++   * const myNums = Float32Array<Buffer>.from([11.25, 2, -22.5, 1]);
++   * myNums.toSorted((a, b) => a - b) // Float32Array<Buffer>(4) [-22.5, 1, 2, 11.5]
+    * ```
+    */
+   toSorted(
+@@ -833,7 +833,7 @@ interface Float32Array {
+       a: import('ts-type-forge').Float32,
+       b: import('ts-type-forge').Float32,
+     ) => number,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -847,10 +847,10 @@ interface Float32Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Float32,
+-  ): Float32Array;
++  ): Float32Array<ArrayBuffer>;
+ }
+ 
+-interface Float64Array {
++interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -864,7 +864,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -872,7 +872,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Float64 | undefined;
+@@ -890,7 +890,7 @@ interface Float64Array {
+     predicate: (
+       value: import('ts-type-forge').Float64,
+       index: NumberType.TypedArraySize,
+-      array: Float64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -898,7 +898,7 @@ interface Float64Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Float64Array;
++  toReversed(): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -906,8 +906,8 @@ interface Float64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Float64Array.from([11.25, 2, -22.5, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Float64Array(4) [-22.5, 1, 2, 11.5]
++   * const myNums = Float64Array<Buffer>.from([11.25, 2, -22.5, 1]);
++   * myNums.toSorted((a, b) => a - b) // Float64Array<Buffer>(4) [-22.5, 1, 2, 11.5]
+    * ```
+    */
+   toSorted(
+@@ -915,7 +915,7 @@ interface Float64Array {
+       a: import('ts-type-forge').Float64,
+       b: import('ts-type-forge').Float64,
+     ) => number,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -929,10 +929,10 @@ interface Float64Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Float64,
+-  ): Float64Array;
++  ): Float64Array<ArrayBuffer>;
+ }
+ 
+-interface BigInt64Array {
++interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -946,7 +946,7 @@ interface BigInt64Array {
+     predicate: (
+       value: import('ts-type-forge').BigInt64,
+       index: NumberType.TypedArraySize,
+-      array: BigInt64Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -954,7 +954,7 @@ interface BigInt64Array {
+     predicate: (
+       value: import('ts-type-forge').BigInt64,
+       index: NumberType.TypedArraySize,
+-      array: BigInt64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').BigInt64 | undefined;
+@@ -972,7 +972,7 @@ interface BigInt64Array {
+     predicate: (
+       value: import('ts-type-forge').BigInt64,
+       index: NumberType.TypedArraySize,
+-      array: BigInt64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -980,7 +980,7 @@ interface BigInt64Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): BigInt64Array;
++  toReversed(): BigInt64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -988,8 +988,8 @@ interface BigInt64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = BigInt64Array.from([11n, 2n, -22n, 1n]);
+-   * myNums.toSorted((a, b) => Number(a - b)) // BigInt64Array(4) [-22n, 1n, 2n, 11n]
++   * const myNums = BigInt64Array<Buffer>.from([11n, 2n, -22n, 1n]);
++   * myNums.toSorted((a, b) => Number(a - b)) // BigInt64Array<Buffer>(4) [-22n, 1n, 2n, 11n]
+    * ```
+    */
+   toSorted(
+@@ -997,7 +997,7 @@ interface BigInt64Array {
+       a: import('ts-type-forge').BigInt64,
+       b: import('ts-type-forge').BigInt64,
+     ) => number,
+-  ): BigInt64Array;
++  ): BigInt64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -1011,10 +1011,10 @@ interface BigInt64Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').BigInt64,
+-  ): BigInt64Array;
++  ): BigInt64Array<ArrayBuffer>;
+ }
+ 
+-interface BigUint64Array {
++interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -1028,7 +1028,7 @@ interface BigUint64Array {
+     predicate: (
+       value: import('ts-type-forge').BigUint64,
+       index: NumberType.TypedArraySize,
+-      array: BigUint64Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -1036,7 +1036,7 @@ interface BigUint64Array {
+     predicate: (
+       value: import('ts-type-forge').BigUint64,
+       index: NumberType.TypedArraySize,
+-      array: BigUint64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').BigUint64 | undefined;
+@@ -1054,7 +1054,7 @@ interface BigUint64Array {
+     predicate: (
+       value: import('ts-type-forge').BigUint64,
+       index: NumberType.TypedArraySize,
+-      array: BigUint64Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): NumberType.TypedArraySearchResult;
+@@ -1062,7 +1062,7 @@ interface BigUint64Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): BigUint64Array;
++  toReversed(): BigUint64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -1070,8 +1070,8 @@ interface BigUint64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = BigUint64Array.from([11n, 2n, 22n, 1n]);
+-   * myNums.toSorted((a, b) => Number(a - b)) // BigUint64Array(4) [1n, 2n, 11n, 22n]
++   * const myNums = BigUint64Array<Buffer>.from([11n, 2n, 22n, 1n]);
++   * myNums.toSorted((a, b) => Number(a - b)) // BigUint64Array<Buffer>(4) [1n, 2n, 11n, 22n]
+    * ```
+    */
+   toSorted(
+@@ -1079,7 +1079,7 @@ interface BigUint64Array {
+       a: import('ts-type-forge').BigUint64,
+       b: import('ts-type-forge').BigUint64,
+     ) => number,
+-  ): BigUint64Array;
++  ): BigUint64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -1093,5 +1093,5 @@ interface BigUint64Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').BigUint64,
+-  ): BigUint64Array;
++  ): BigUint64Array<ArrayBuffer>;
+ }

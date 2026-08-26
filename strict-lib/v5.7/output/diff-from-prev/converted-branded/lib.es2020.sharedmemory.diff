@@ -1,0 +1,30 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
+index bd305cae9..a74f7c064 100644
+--- a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
+@@ -1,5 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference path="./lib.es2020.bigint.d.ts" />
++
+ interface Atomics {
+   /**
+    * Adds a value to the value at the given position in the array, returning the original value.
+@@ -134,7 +136,7 @@ interface Atomics {
+    * `"not-equal"`.
+    */
+   wait(
+-    typedArray: BigInt64Array,
++    typedArray: BigInt64Array<ArrayBufferLike>,
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').BigInt64,
+     timeout?: number,
+@@ -148,7 +150,7 @@ interface Atomics {
+    * @param count The number of sleeping agents to notify. Defaults to +Infinity.
+    */
+   notify(
+-    typedArray: BigInt64Array,
++    typedArray: BigInt64Array<ArrayBufferLike>,
+     index: NumberType.TypedArraySizeArg,
+     count?: import('ts-type-forge').SafeUint,
+   ): import('ts-type-forge').SafeUint;

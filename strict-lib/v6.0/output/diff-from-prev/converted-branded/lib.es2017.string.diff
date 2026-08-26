@@ -1,0 +1,10 @@
+diff --git a/v5.9/output/lib-files-branded/lib.es2017.string.d.ts b/v6.0/output/lib-files-branded/lib.es2017.string.d.ts
+index ce499b0fe..fd102d3fc 100644
+--- a/v5.9/output/lib-files-branded/lib.es2017.string.d.ts
++++ b/v6.0/output/lib-files-branded/lib.es2017.string.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface String {
+   /**
+    * Pads the current string with a given string (possibly repeated) so that the resulting string reaches a given length.

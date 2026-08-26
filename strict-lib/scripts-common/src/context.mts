@@ -56,8 +56,8 @@ const buildPaths = (packageRoot: string) =>
       output: pipe(`${root}/output` as const).map((output) => ({
         $: output,
 
-        diff: {
-          $: `${output}/diff` as const,
+        diffFromOfficial: {
+          $: `${output}/diff-from-official` as const,
         },
         /**
          * The published package, laid out on disk exactly as it ships.
@@ -82,21 +82,13 @@ const buildPaths = (packageRoot: string) =>
         libFiles: {
           $: `${output}/lib-files` as const,
         },
-      })).value,
-
-      /**
-       * Branded intermediates. The declarations end up in
-       * `output/lib/libs-branded`, so there is no `lib` or `packages` here —
-       * only what feeds them, and the diffs.
-       */
-      outputBranded: pipe(`${root}/output-branded` as const).map((output) => ({
-        $: output,
-
-        diff: {
-          $: `${output}/diff` as const,
-        },
-        libFiles: {
-          $: `${output}/lib-files` as const,
+        /**
+         * Branded flat intermediates, mirroring `lib-files`. The declarations
+         * a consumer sees end up in `output/lib/libs-branded`; this is what
+         * feeds them, and the input of the branded cross-version diffs.
+         */
+        libFilesBranded: {
+          $: `${output}/lib-files-branded` as const,
         },
       })).value,
 

@@ -1,0 +1,19 @@
+diff --git a/v5.7/output/lib-files-branded/lib.es2024.string.d.ts b/v5.7/output/lib-files-branded/lib.es2024.string.d.ts
+new file mode 100644
+index 000000000..62dcbcd47
+--- /dev/null
++++ b/v5.7/output/lib-files-branded/lib.es2024.string.d.ts
+@@ -0,0 +1,13 @@
++/// <reference no-default-lib="true"/>
++
++interface String {
++  /**
++   * Returns true if all leading surrogates and trailing surrogates appear paired and in order.
++   */
++  isWellFormed(): boolean;
++
++  /**
++   * Returns a string where all lone or out-of-order surrogates have been replaced by the Unicode replacement character (U+FFFD).
++   */
++  toWellFormed(): string;
++}

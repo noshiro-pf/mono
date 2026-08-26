@@ -1,0 +1,9 @@
+diff --git a/v5.1/output/lib-files/lib.es2017.d.ts b/v5.2/output/lib-files/lib.es2017.d.ts
+index c51fbf082..0f2aaeb71 100644
+--- a/v5.1/output/lib-files/lib.es2017.d.ts
++++ b/v5.2/output/lib-files/lib.es2017.d.ts
+@@ -6,3 +6,4 @@
+ /// <reference path="./lib.es2017.string.d.ts" />
+ /// <reference path="./lib.es2017.intl.d.ts" />
+ /// <reference path="./lib.es2017.typedarrays.d.ts" />
++/// <reference path="./lib.es2017.date.d.ts" />

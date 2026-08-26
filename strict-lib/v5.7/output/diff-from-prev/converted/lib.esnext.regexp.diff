@@ -1,0 +1,15 @@
+diff --git a/v5.6/output/lib-files/lib.esnext.regexp.d.ts b/v5.6/output/lib-files/lib.esnext.regexp.d.ts
+deleted file mode 100644
+index f85fdba98..000000000
+--- a/v5.6/output/lib-files/lib.esnext.regexp.d.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/// <reference no-default-lib="true"/>
+-
+-interface RegExp {
+-  /**
+-   * Returns a Boolean value indicating the state of the unicodeSets flag (v) used with a regular expression.
+-   * Default is false. Read-only.
+-   */
+-  readonly unicodeSets: boolean;
+-}

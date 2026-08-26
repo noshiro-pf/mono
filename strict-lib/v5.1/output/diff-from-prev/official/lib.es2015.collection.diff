@@ -1,0 +1,13 @@
+diff --git a/v5.0/temp/copied/lib.es2015.collection.d.ts b/v5.1/temp/copied/lib.es2015.collection.d.ts
+index 758d015c4..e3851bf3b 100644
+--- a/v5.0/temp/copied/lib.es2015.collection.d.ts
++++ b/v5.1/temp/copied/lib.es2015.collection.d.ts
+@@ -87,7 +87,7 @@ interface WeakMap<K extends object, V> {
+ 
+ interface WeakMapConstructor {
+   new <K extends object = object, V = any>(
+-    entries?: readonly [K, V][] | null,
++    entries?: readonly (readonly [K, V])[] | null,
+   ): WeakMap<K, V>;
+   readonly prototype: WeakMap<object, any>;
+ }

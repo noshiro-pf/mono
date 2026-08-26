@@ -1,0 +1,727 @@
+diff --git a/v5.6/output/lib-files/lib.es2023.array.d.ts b/v5.7/output/lib-files/lib.es2023.array.d.ts
+index 4a8f2f0e3..8d5873b6a 100644
+--- a/v5.6/output/lib-files/lib.es2023.array.d.ts
++++ b/v5.7/output/lib-files/lib.es2023.array.d.ts
+@@ -156,7 +156,7 @@ interface ReadonlyArray<T> {
+   with(index: number, value: T): T[];
+ }
+ 
+-interface Int8Array {
++interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -170,7 +170,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: number,
+-      array: Int8Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -178,7 +178,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: number,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Int8 | undefined;
+@@ -196,7 +196,7 @@ interface Int8Array {
+     predicate: (
+       value: import('ts-type-forge').Int8,
+       index: number,
+-      array: Int8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): number;
+@@ -204,7 +204,7 @@ interface Int8Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int8Array;
++  toReversed(): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -212,8 +212,8 @@ interface Int8Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int8Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int8Array(4) [1, 2, 11, 22]
++   * const myNums = Int8Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int8Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -221,7 +221,7 @@ interface Int8Array {
+       a: import('ts-type-forge').Int8,
+       b: import('ts-type-forge').Int8,
+     ) => number,
+-  ): Int8Array;
++  ): Int8Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -232,10 +232,13 @@ interface Int8Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: import('ts-type-forge').Int8): Int8Array;
++  with(
++    index: number,
++    value: import('ts-type-forge').Int8,
++  ): Int8Array<ArrayBuffer>;
+ }
+ 
+-interface Uint8Array {
++interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -249,7 +252,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8Array,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -257,7 +260,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -275,7 +278,7 @@ interface Uint8Array {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8Array,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): number;
+@@ -283,7 +286,7 @@ interface Uint8Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint8Array;
++  toReversed(): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -291,8 +294,8 @@ interface Uint8Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint8Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint8Array(4) [1, 2, 11, 22]
++   * const myNums = Uint8Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint8Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -300,7 +303,7 @@ interface Uint8Array {
+       a: import('ts-type-forge').Uint8,
+       b: import('ts-type-forge').Uint8,
+     ) => number,
+-  ): Uint8Array;
++  ): Uint8Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -311,10 +314,13 @@ interface Uint8Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: import('ts-type-forge').Uint8): Uint8Array;
++  with(
++    index: number,
++    value: import('ts-type-forge').Uint8,
++  ): Uint8Array<ArrayBuffer>;
+ }
+ 
+-interface Uint8ClampedArray {
++interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -328,7 +334,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+@@ -336,7 +342,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): import('ts-type-forge').Uint8 | undefined;
+@@ -354,7 +360,7 @@ interface Uint8ClampedArray {
+     predicate: (
+       value: import('ts-type-forge').Uint8,
+       index: number,
+-      array: Uint8ClampedArray,
++      array: this,
+     ) => boolean,
+     thisArg?: unknown,
+   ): number;
+@@ -362,7 +368,7 @@ interface Uint8ClampedArray {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint8ClampedArray;
++  toReversed(): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -370,8 +376,8 @@ interface Uint8ClampedArray {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint8ClampedArray.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint8ClampedArray(4) [1, 2, 11, 22]
++   * const myNums = Uint8ClampedArray<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint8ClampedArray<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -379,7 +385,7 @@ interface Uint8ClampedArray {
+       a: import('ts-type-forge').Uint8,
+       b: import('ts-type-forge').Uint8,
+     ) => number,
+-  ): Uint8ClampedArray;
++  ): Uint8ClampedArray<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -390,10 +396,13 @@ interface Uint8ClampedArray {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: import('ts-type-forge').Uint8): Uint8ClampedArray;
++  with(
++    index: number,
++    value: import('ts-type-forge').Uint8,
++  ): Uint8ClampedArray<ArrayBuffer>;
+ }
+ 
+-interface Int16Array {
++interface Int16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -404,11 +413,11 @@ interface Int16Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (value: number, index: number, array: Int16Array) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Int16Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -422,14 +431,14 @@ interface Int16Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Int16Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int16Array;
++  toReversed(): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -437,11 +446,13 @@ interface Int16Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int16Array.from([11, 2, -22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int16Array(4) [-22, 1, 2, 11]
++   * const myNums = Int16Array<Buffer>.from([11, 2, -22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int16Array<Buffer>(4) [-22, 1, 2, 11]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Int16Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Int16Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -452,10 +463,10 @@ interface Int16Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Int16Array;
++  with(index: number, value: number): Int16Array<ArrayBuffer>;
+ }
+ 
+-interface Uint16Array {
++interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -466,11 +477,11 @@ interface Uint16Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (value: number, index: number, array: Uint16Array) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Uint16Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -484,14 +495,14 @@ interface Uint16Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Uint16Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint16Array;
++  toReversed(): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -499,11 +510,13 @@ interface Uint16Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint16Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint16Array(4) [1, 2, 11, 22]
++   * const myNums = Uint16Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint16Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Uint16Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Uint16Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -514,10 +527,10 @@ interface Uint16Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Uint16Array;
++  with(index: number, value: number): Uint16Array<ArrayBuffer>;
+ }
+ 
+-interface Int32Array {
++interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -528,11 +541,11 @@ interface Int32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (value: number, index: number, array: Int32Array) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Int32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -546,14 +559,14 @@ interface Int32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Int32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Int32Array;
++  toReversed(): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -561,11 +574,13 @@ interface Int32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Int32Array.from([11, 2, -22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Int32Array(4) [-22, 1, 2, 11]
++   * const myNums = Int32Array<Buffer>.from([11, 2, -22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int32Array<Buffer>(4) [-22, 1, 2, 11]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Int32Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Int32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -576,10 +591,10 @@ interface Int32Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Int32Array;
++  with(index: number, value: number): Int32Array<ArrayBuffer>;
+ }
+ 
+-interface Uint32Array {
++interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -590,11 +605,11 @@ interface Uint32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (value: number, index: number, array: Uint32Array) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Uint32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -608,14 +623,14 @@ interface Uint32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Uint32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint32Array;
++  toReversed(): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -623,11 +638,13 @@ interface Uint32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint32Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint32Array(4) [1, 2, 11, 22]
++   * const myNums = Uint32Array<Buffer>.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Uint32Array<Buffer>(4) [1, 2, 11, 22]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Uint32Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Uint32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -638,10 +655,10 @@ interface Uint32Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Uint32Array;
++  with(index: number, value: number): Uint32Array<ArrayBuffer>;
+ }
+ 
+-interface Float32Array {
++interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -652,15 +669,11 @@ interface Float32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (
+-      value: number,
+-      index: number,
+-      array: Float32Array,
+-    ) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Float32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -674,14 +687,14 @@ interface Float32Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Float32Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Float32Array;
++  toReversed(): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -689,11 +702,13 @@ interface Float32Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Float32Array.from([11.25, 2, -22.5, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Float32Array(4) [-22.5, 1, 2, 11.5]
++   * const myNums = Float32Array<Buffer>.from([11.25, 2, -22.5, 1]);
++   * myNums.toSorted((a, b) => a - b) // Float32Array<Buffer>(4) [-22.5, 1, 2, 11.5]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Float32Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Float32Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -704,10 +719,10 @@ interface Float32Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Float32Array;
++  with(index: number, value: number): Float32Array<ArrayBuffer>;
+ }
+ 
+-interface Float64Array {
++interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -718,15 +733,11 @@ interface Float64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends number>(
+-    predicate: (
+-      value: number,
+-      index: number,
+-      array: Float64Array,
+-    ) => value is S,
++    predicate: (value: number, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: number, index: number, array: Float64Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number | undefined;
+ 
+@@ -740,14 +751,14 @@ interface Float64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: number, index: number, array: Float64Array) => boolean,
++    predicate: (value: number, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Float64Array;
++  toReversed(): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -755,11 +766,13 @@ interface Float64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Float64Array.from([11.25, 2, -22.5, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Float64Array(4) [-22.5, 1, 2, 11.5]
++   * const myNums = Float64Array<Buffer>.from([11.25, 2, -22.5, 1]);
++   * myNums.toSorted((a, b) => a - b) // Float64Array<Buffer>(4) [-22.5, 1, 2, 11.5]
+    * ```
+    */
+-  toSorted(compareFn?: (a: number, b: number) => number): Float64Array;
++  toSorted(
++    compareFn?: (a: number, b: number) => number,
++  ): Float64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -770,10 +783,10 @@ interface Float64Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: number): Float64Array;
++  with(index: number, value: number): Float64Array<ArrayBuffer>;
+ }
+ 
+-interface BigInt64Array {
++interface BigInt64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -784,15 +797,11 @@ interface BigInt64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends bigint>(
+-    predicate: (
+-      value: bigint,
+-      index: number,
+-      array: BigInt64Array,
+-    ) => value is S,
++    predicate: (value: bigint, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
++    predicate: (value: bigint, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): bigint | undefined;
+ 
+@@ -806,14 +815,14 @@ interface BigInt64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
++    predicate: (value: bigint, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): BigInt64Array;
++  toReversed(): BigInt64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -821,11 +830,13 @@ interface BigInt64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = BigInt64Array.from([11n, 2n, -22n, 1n]);
+-   * myNums.toSorted((a, b) => Number(a - b)) // BigInt64Array(4) [-22n, 1n, 2n, 11n]
++   * const myNums = BigInt64Array<Buffer>.from([11n, 2n, -22n, 1n]);
++   * myNums.toSorted((a, b) => Number(a - b)) // BigInt64Array<Buffer>(4) [-22n, 1n, 2n, 11n]
+    * ```
+    */
+-  toSorted(compareFn?: (a: bigint, b: bigint) => number): BigInt64Array;
++  toSorted(
++    compareFn?: (a: bigint, b: bigint) => number,
++  ): BigInt64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -836,10 +847,10 @@ interface BigInt64Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: bigint): BigInt64Array;
++  with(index: number, value: bigint): BigInt64Array<ArrayBuffer>;
+ }
+ 
+-interface BigUint64Array {
++interface BigUint64Array<TArrayBuffer extends ArrayBufferLike> {
+   /**
+    * Returns the value of the last element in the array where predicate is true, and undefined
+    * otherwise.
+@@ -850,15 +861,11 @@ interface BigUint64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLast<S extends bigint>(
+-    predicate: (
+-      value: bigint,
+-      index: number,
+-      array: BigUint64Array,
+-    ) => value is S,
++    predicate: (value: bigint, index: number, array: this) => value is S,
+     thisArg?: unknown,
+   ): S | undefined;
+   findLast(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
++    predicate: (value: bigint, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): bigint | undefined;
+ 
+@@ -872,14 +879,14 @@ interface BigUint64Array {
+    * predicate. If it is not provided, undefined is used instead.
+    */
+   findLastIndex(
+-    predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
++    predicate: (value: bigint, index: number, array: this) => boolean,
+     thisArg?: unknown,
+   ): number;
+ 
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): BigUint64Array;
++  toReversed(): BigUint64Array<ArrayBuffer>;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -887,11 +894,13 @@ interface BigUint64Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = BigUint64Array.from([11n, 2n, 22n, 1n]);
+-   * myNums.toSorted((a, b) => Number(a - b)) // BigUint64Array(4) [1n, 2n, 11n, 22n]
++   * const myNums = BigUint64Array<Buffer>.from([11n, 2n, 22n, 1n]);
++   * myNums.toSorted((a, b) => Number(a - b)) // BigUint64Array<Buffer>(4) [1n, 2n, 11n, 22n]
+    * ```
+    */
+-  toSorted(compareFn?: (a: bigint, b: bigint) => number): BigUint64Array;
++  toSorted(
++    compareFn?: (a: bigint, b: bigint) => number,
++  ): BigUint64Array<ArrayBuffer>;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -902,5 +911,5 @@ interface BigUint64Array {
+    * @param value The value to write into the copied array.
+    * @returns The copied array with the updated value.
+    */
+-  with(index: number, value: bigint): BigUint64Array;
++  with(index: number, value: bigint): BigUint64Array<ArrayBuffer>;
+ }

@@ -1,0 +1,9 @@
+diff --git a/v5.3/output/lib-files/lib.es2016.d.ts b/v5.4/output/lib-files/lib.es2016.d.ts
+index ccd1e1324..09d2179d8 100644
+--- a/v5.3/output/lib-files/lib.es2016.d.ts
++++ b/v5.4/output/lib-files/lib.es2016.d.ts
+@@ -2,3 +2,4 @@
+ 
+ /// <reference path="./lib.es2015.d.ts" />
+ /// <reference path="./lib.es2016.array.include.d.ts" />
++/// <reference path="./lib.es2016.intl.d.ts" />

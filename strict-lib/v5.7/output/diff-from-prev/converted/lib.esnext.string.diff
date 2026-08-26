@@ -1,0 +1,19 @@
+diff --git a/v5.6/output/lib-files/lib.esnext.string.d.ts b/v5.6/output/lib-files/lib.esnext.string.d.ts
+deleted file mode 100644
+index 62dcbcd47..000000000
+--- a/v5.6/output/lib-files/lib.esnext.string.d.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/// <reference no-default-lib="true"/>
+-
+-interface String {
+-  /**
+-   * Returns true if all leading surrogates and trailing surrogates appear paired and in order.
+-   */
+-  isWellFormed(): boolean;
+-
+-  /**
+-   * Returns a string where all lone or out-of-order surrogates have been replaced by the Unicode replacement character (U+FFFD).
+-   */
+-  toWellFormed(): string;
+-}

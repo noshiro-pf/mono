@@ -1,0 +1,9 @@
+diff --git a/v5.3/output/lib-files/lib.es2023.full.d.ts b/v5.4/output/lib-files/lib.es2023.full.d.ts
+index e552990d7..dcf6524e5 100644
+--- a/v5.3/output/lib-files/lib.es2023.full.d.ts
++++ b/v5.4/output/lib-files/lib.es2023.full.d.ts
+@@ -5,3 +5,4 @@
+ /// <reference path="./lib.webworker.importscripts.d.ts" />
+ /// <reference path="./lib.scripthost.d.ts" />
+ /// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />

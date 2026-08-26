@@ -1,0 +1,15 @@
+diff --git a/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts b/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts
+new file mode 100644
+index 000000000..f85fdba98
+--- /dev/null
++++ b/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts
+@@ -0,0 +1,9 @@
++/// <reference no-default-lib="true"/>
++
++interface RegExp {
++  /**
++   * Returns a Boolean value indicating the state of the unicodeSets flag (v) used with a regular expression.
++   * Default is false. Read-only.
++   */
++  readonly unicodeSets: boolean;
++}

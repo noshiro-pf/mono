@@ -1,0 +1,11 @@
+diff --git a/v5.7/output/lib-files-branded/lib.es2017.arraybuffer.d.ts b/v5.7/output/lib-files-branded/lib.es2017.arraybuffer.d.ts
+new file mode 100644
+index 000000000..881c99744
+--- /dev/null
++++ b/v5.7/output/lib-files-branded/lib.es2017.arraybuffer.d.ts
+@@ -0,0 +1,5 @@
++/// <reference no-default-lib="true"/>
++
++interface ArrayBufferConstructor {
++  new (): ArrayBuffer;
++}

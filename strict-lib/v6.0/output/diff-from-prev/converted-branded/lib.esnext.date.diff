@@ -1,0 +1,11 @@
+diff --git a/v6.0/output/lib-files-branded/lib.esnext.date.d.ts b/v6.0/output/lib-files-branded/lib.esnext.date.d.ts
+new file mode 100644
+index 000000000..c9be44eeb
+--- /dev/null
++++ b/v6.0/output/lib-files-branded/lib.esnext.date.d.ts
+@@ -0,0 +1,5 @@
++/// <reference path="./lib.esnext.temporal.d.ts" />
++
++interface Date {
++  toTemporalInstant(): Temporal.Instant;
++}

@@ -1,0 +1,85 @@
+diff --git a/v5.4/output/lib-files-branded/lib.esnext.collection.d.ts b/v5.5/output/lib-files-branded/lib.esnext.collection.d.ts
+index 7fa07f66f..8229d9f96 100644
+--- a/v5.4/output/lib-files-branded/lib.esnext.collection.d.ts
++++ b/v5.5/output/lib-files-branded/lib.esnext.collection.d.ts
+@@ -11,3 +11,80 @@ interface MapConstructor {
+     keySelector: (item: T, index: NumberType.ArraySize) => K,
+   ): ReadonlyMap<K, readonly T[]>;
+ }
++
++interface ReadonlySetLike<T> {
++  /**
++   * Despite its name, returns an iterator of the values in the set-like.
++   */
++  keys(): Iterator<T>;
++  /**
++   * @returns a boolean indicating whether an element with the specified value exists in the set-like or not.
++   */
++  has(value: T): boolean;
++  /**
++   * @returns the number of (unique) elements in the set-like.
++   */
++  readonly size: number;
++}
++
++interface Set<T> {
++  /**
++   * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
++   */
++  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
++  /**
++   * @returns a new Set containing all the elements which are both in this Set and in the argument.
++   */
++  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
++  /**
++   * @returns a new Set containing all the elements in this Set which are not also in the argument.
++   */
++  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
++  /**
++   * @returns a new Set containing all the elements which are in either this Set or in the argument, but not in both.
++   */
++  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
++  /**
++   * @returns a boolean indicating whether all the elements in this Set are also in the argument.
++   */
++  isSubsetOf(other: ReadonlySetLike<unknown>): boolean;
++  /**
++   * @returns a boolean indicating whether all the elements in the argument are also in this Set.
++   */
++  isSupersetOf(other: ReadonlySetLike<unknown>): boolean;
++  /**
++   * @returns a boolean indicating whether this Set has no elements in common with the argument.
++   */
++  isDisjointFrom(other: ReadonlySetLike<unknown>): boolean;
++}
++
++interface ReadonlySet<T> {
++  /**
++   * @returns a new Set containing all the elements in this Set and also all the elements in the argument.
++   */
++  union<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
++  /**
++   * @returns a new Set containing all the elements which are both in this Set and in the argument.
++   */
++  intersection<U>(other: ReadonlySetLike<U>): ReadonlySet<T & U>;
++  /**
++   * @returns a new Set containing all the elements in this Set which are not also in the argument.
++   */
++  difference<U>(other: ReadonlySetLike<U>): ReadonlySet<T>;
++  /**
++   * @returns a new Set containing all the elements which are in either this Set or in the argument, but not in both.
++   */
++  symmetricDifference<U>(other: ReadonlySetLike<U>): ReadonlySet<T | U>;
++  /**
++   * @returns a boolean indicating whether all the elements in this Set are also in the argument.
++   */
++  isSubsetOf(other: ReadonlySetLike<unknown>): boolean;
++  /**
++   * @returns a boolean indicating whether all the elements in the argument are also in this Set.
++   */
++  isSupersetOf(other: ReadonlySetLike<unknown>): boolean;
++  /**
++   * @returns a boolean indicating whether this Set has no elements in common with the argument.
++   */
++  isDisjointFrom(other: ReadonlySetLike<unknown>): boolean;
++}

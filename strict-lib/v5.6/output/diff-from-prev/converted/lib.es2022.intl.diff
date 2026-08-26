@@ -1,0 +1,28 @@
+diff --git a/v5.5/output/lib-files/lib.es2022.intl.d.ts b/v5.6/output/lib-files/lib.es2022.intl.d.ts
+index 480e65796..814d11100 100644
+--- a/v5.5/output/lib-files/lib.es2022.intl.d.ts
++++ b/v5.6/output/lib-files/lib.es2022.intl.d.ts
+@@ -30,6 +30,14 @@ declare namespace Intl {
+     readonly granularity: 'grapheme' | 'word' | 'sentence';
+   }
+ 
++  interface SegmentIterator<T> extends IteratorObject<
++    T,
++    BuiltinIteratorReturn,
++    unknown
++  > {
++    [Symbol.iterator](): SegmentIterator<T>;
++  }
++
+   interface Segments {
+     /**
+      * Returns an object describing the segment in the original string that includes the code unit at a specified index.
+@@ -39,7 +47,7 @@ declare namespace Intl {
+     containing(codeUnitIndex?: number): SegmentData;
+ 
+     /** Returns an iterator to iterate over the segments. */
+-    [Symbol.iterator](): IterableIterator<SegmentData>;
++    [Symbol.iterator](): SegmentIterator<SegmentData>;
+   }
+ 
+   interface SegmentData {

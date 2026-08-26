@@ -1,0 +1,5 @@
+{
+  "extends": "../configs/tsconfig/tsconfig.lib-files-check.json",
+  "include": ["./output/lib-files-branded"],
+  "exclude": ["./output/lib-files-branded/lib.webworker.d.ts"]
+}

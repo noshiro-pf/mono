@@ -1,0 +1,42 @@
+diff --git a/v5.4/output/lib-files-branded/lib.es2023.array.d.ts b/v5.5/output/lib-files-branded/lib.es2023.array.d.ts
+index 49ebbb401..6ca9de765 100644
+--- a/v5.4/output/lib-files-branded/lib.es2023.array.d.ts
++++ b/v5.5/output/lib-files-branded/lib.es2023.array.d.ts
+@@ -242,7 +242,7 @@ interface Int8Array {
+   /**
+    * Returns a copy of an array with its elements reversed.
+    */
+-  toReversed(): Uint8Array;
++  toReversed(): Int8Array;
+ 
+   /**
+    * Returns a copy of an array with its elements sorted.
+@@ -250,8 +250,8 @@ interface Int8Array {
+    * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
+    * value otherwise. If omitted, the elements are sorted in ascending order.
+    * ```ts
+-   * const myNums = Uint8Array.from([11, 2, 22, 1]);
+-   * myNums.toSorted((a, b) => a - b) // Uint8Array(4) [1, 2, 11, 22]
++   * const myNums = Int8Array.from([11, 2, 22, 1]);
++   * myNums.toSorted((a, b) => a - b) // Int8Array(4) [1, 2, 11, 22]
+    * ```
+    */
+   toSorted(
+@@ -259,7 +259,7 @@ interface Int8Array {
+       a: import('ts-type-forge').Int8,
+       b: import('ts-type-forge').Int8,
+     ) => number,
+-  ): Uint8Array;
++  ): Int8Array;
+ 
+   /**
+    * Copies an array, then overwrites the value at the provided index with the
+@@ -273,7 +273,7 @@ interface Int8Array {
+   with(
+     index: NumberType.TypedArraySizeArg,
+     value: import('ts-type-forge').Int8,
+-  ): Uint8Array;
++  ): Int8Array;
+ }
+ 
+ interface Uint8Array {

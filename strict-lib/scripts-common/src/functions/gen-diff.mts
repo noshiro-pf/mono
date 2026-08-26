@@ -32,14 +32,14 @@ export const prepareCopiedForDiff = async (
 
 /**
  * Compare `source/temp/copied-for-diff/*` and `output/lib-files/*` and generate
- * `.diff` files to `output/diff`
+ * `.diff` files to `output/diff-from-official`
  */
 export const genDiff = async (
   ctx: Context,
 ): Promise<Result<undefined, unknown>> => {
   const { copiedForDiff } = ctx.paths.strictTsLib.source.temp;
 
-  const { diff, libFiles } = ctx.paths.strictTsLib.output;
+  const { diffFromOfficial, libFiles } = ctx.paths.strictTsLib.output;
 
   const files = await glob(`${copiedForDiff.$}/*`);
 
@@ -47,7 +47,7 @@ export const genDiff = async (
     return files;
   }
 
-  await makeEmptyDir(diff.$);
+  await makeEmptyDir(diffFromOfficial.$);
 
   for (const file of files.value) {
     const filename = path.basename(file);
@@ -73,7 +73,7 @@ export const genDiff = async (
     const output = result.value.stdout;
 
     await fs.writeFile(
-      path.resolve(diff.$, `${name}.diff`),
+      path.resolve(diffFromOfficial.$, `${name}.diff`),
       Arr.skip(output.split('\n'), 4).join('\n'),
     );
   }

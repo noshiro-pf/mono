@@ -1,0 +1,21 @@
+{
+  // Compiles every flat `lib-files` declaration as one `noLib` program, so the
+  // whole set — including the aggregate `full` files, `scripthost` and the
+  // legacy decorators lib, which the `lib-check` entry never reaches through
+  // its `lib` graph — is checked with `skipLibCheck: false`. Each version's
+  // `tsconfig.lib-files-check*.json` extends this with the `include` paths,
+  // excluding `lib.webworker.d.ts` whose globals collide with the DOM's in a
+  // single program (the webworker flavor is covered by
+  // `tsconfig.lib-check.webworker.json` instead).
+  "compilerOptions": {
+    "noLib": true,
+    "skipLibCheck": false,
+    "noEmit": true,
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "types": [],
+    "forceConsistentCasingInFileNames": true
+  }
+}

@@ -1,0 +1,21 @@
+diff --git a/v5.5/output/lib-files/lib.esnext.disposable.d.ts b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
+index 4c7b74f3d..1c549f93a 100644
+--- a/v5.5/output/lib-files/lib.esnext.disposable.d.ts
++++ b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
+@@ -1,6 +1,8 @@
+ /// <reference no-default-lib="true"/>
+ 
+ /// <reference path="./lib.es2015.symbol.d.ts" />
++/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2018.asynciterable.d.ts" />
+ 
+ interface SymbolConstructor {
+   /**
+@@ -167,3 +169,7 @@ interface AsyncDisposableStackConstructor {
+   readonly prototype: AsyncDisposableStack;
+ }
+ declare const AsyncDisposableStack: AsyncDisposableStackConstructor;
++
++interface IteratorObject<T, TReturn, TNext> extends Disposable {}
++
++interface AsyncIteratorObject<T, TReturn, TNext> extends AsyncDisposable {}

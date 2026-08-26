@@ -1,0 +1,10 @@
+diff --git a/v5.9/output/lib-files/lib.decorators.legacy.d.ts b/v6.0/output/lib-files/lib.decorators.legacy.d.ts
+index 91a9dca66..e7364ff99 100644
+--- a/v5.9/output/lib-files/lib.decorators.legacy.d.ts
++++ b/v6.0/output/lib-files/lib.decorators.legacy.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ declare type ClassDecorator = <TFunction extends Function>(
+   target: TFunction,
+ ) => TFunction | void;

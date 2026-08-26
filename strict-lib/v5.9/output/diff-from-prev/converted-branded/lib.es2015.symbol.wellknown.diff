@@ -1,0 +1,13 @@
+diff --git a/v5.8/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts b/v5.9/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
+index 11f1f28c8..62d659b88 100644
+--- a/v5.8/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
++++ b/v5.9/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
+@@ -279,7 +279,7 @@ interface String {
+ }
+ 
+ interface ArrayBuffer {
+-  readonly [Symbol.toStringTag]: string;
++  readonly [Symbol.toStringTag]: 'ArrayBuffer';
+ }
+ 
+ interface DataView<TArrayBuffer extends ArrayBufferLike> {
