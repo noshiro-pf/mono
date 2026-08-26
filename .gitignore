@@ -219,3 +219,5 @@ _site/
 # converter has to follow an upstream change.
 strict-lib/v*/temp/codemod-fixed
 strict-lib/v*/temp/copied-for-diff
+
+.claude/worktrees
