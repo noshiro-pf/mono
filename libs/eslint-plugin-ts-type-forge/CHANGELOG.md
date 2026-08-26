@@ -1,5 +1,39 @@
 # eslint-plugin-ts-type-forge
 
+## 0.7.0
+
+### Minor Changes
+
+- 255d850: Add the `prefer-canonical-mutable-record` rule, which normalizes
+  `Mutable<Record<K, V>>` to the canonical ts-type-forge `MutableRecord<K, V>`.
+  `Mutable` strips the `readonly` modifier from every property, so applied to a
+  record utility it spells in two steps what `MutableRecord` says in one;
+  `Mutable<ReadonlyRecord<K, V>>` and the redundant
+  `Mutable<MutableRecord<K, V>>` collapse to the same type and are normalized the
+  same way. The rewrite is exactly type-preserving, so the rule ships an autofix,
+  which follows the configured `importStyle` and reuses an existing ts-type-forge
+  import (aliases included). Qualified names and files that bind `Mutable` /
+  `Record` / … themselves are left alone.
+
+    The rule is part of the `recommended` config.
+
+### Patch Changes
+
+- 5eec163: `prefer-canonical-length-constrained-tuple` no longer rewrites a tuple that
+  spells out a recursive type alias. A tuple literal is what lets TypeScript
+  resolve `type T = readonly [T, T]`; routing the same cycle through
+  `FixedLengthTuple` makes the alias an error type, and every use of it then
+  reads as `any`. Cycles closed through another alias in the same file are
+  detected too, and those are the common case.
+
+    A cycle of any shape suppresses the rewrite, including the ones that would
+    have compiled — `type Foo = { p: Pair }` closes a cycle that TypeScript
+    resolves fine. Telling the two apart needs every use of every alias, so the
+    rule leaves the tuple spelled out instead.
+
+- Updated dependencies [698b13e]
+    - ts-type-forge@9.2.2
+
 ## 0.6.6
 
 ### Patch Changes

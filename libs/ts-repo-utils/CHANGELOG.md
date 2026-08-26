@@ -1,5 +1,14 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.3.2
+
+### Patch Changes
+
+- 83f8e36: Report non-`Error` throwables with `unknownToString` instead of `String`, so a
+  thrown object reads as its contents rather than as `[object Object]`.
+- Updated dependencies [698b13e]
+    - ts-type-forge@9.2.2
+
 ## 10.3.1
 
 ### Patch Changes
