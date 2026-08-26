@@ -351,6 +351,21 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
+- **`prefer-canonical-length-constrained-tuple` の autofix が再帰型を壊していた（修正済み）。** タプルリテラルは TypeScript が `type T = readonly [T, T]` を解決できる理由そのもので、同じ循環を `FixedLengthTuple` 経由にすると alias が error type になり、**その型のすべての使用箇所が黙って `any` として通る**。`tsc` は alias 1 箇所を報告するだけだが、typed linter は使用箇所ごとに報告するので 47 件出た（`experimental/` から復元した lambda 計算機のコードで踏んだ）
+    - 循環は間接であることが多い。`LambdaApplication = readonly [LambdaTerm, LambdaTerm]` 単体は無害に見え、`LambdaTerm` の union が `LambdaApplication` を含むために循環する。そのため同一ファイル内の他の alias を辿って判定している。import をまたぐ循環は見えないので検出できない
+    - **同じ欠陥が姉妹ルールにもあるかを確認したが、無かった。** `Readonly<Record<string, T>>` は書き換え前から `TS2456` で落ちる（再帰的な record は元々この書き方ができない）ので、`prefer-readonly-or-mutable-record` は状況を悪化させていない。`StrictOmit` も再帰下で解決できた。**タプルリテラルだけが TypeScript の遅延解決の対象**で、だから書き換えで失われるものがある
+    - **判定は「循環があれば書き換えない」で、書き換えても壊れない循環まで抑制している。** object type / 配列 / タプル / 関数型は中身を解決せずに型が作れるので、`type Pair = FixedLengthTuple<2, Foo>` と `type Foo = { p: Pair }` は両立するし、`type Tree = { kids: FixedLengthTuple<2, Tree> }` も通る。**これらを辿らないようにする案は成立しない** — 遅延はファイル内のどこか 1 箇所が構造を要求すれば解けてしまうため。下の 3 行は書き換えると `Pair` と `Foo` の両方が `TS2456` になるが、壊しているのは 2 行目の indexed access で、タプルからは見えない
+
+        ```ts
+        type Pair = readonly [Foo, Foo];
+        type Foo = Wrapper[number];
+        type Wrapper = readonly Pair[];
+        ```
+
+        正しく判定するには alias のすべての使用箇所を知る必要があり、構文だけのルールでは届かない。**書き換え損ねはタプルが素のまま残るだけだが、判定を緩めた場合の代償は型が `any` になる autofix** なので、この非対称性を見て安全側に倒している（`valid` テストにこの 3 形を残してある）
+
+    - **このガードは 1 タプルごとにファイル全体を走査するので、置き場所とキャッシュが要る。** 均質性チェックより先に呼ぶと、非均質で即座に落ちるタプルにも全走査のコストがかかり、生成された `libs/eslint-config-typed/src/types/rules/*.mts`（最大 335KB・タプル 158 個）でルール単体が 1 ファイル 700〜1000ms になった。**ガードを最後に回し、alias の参照グラフを `Program` 単位でキャッシュし、走査を visitor keys 経由にして**ほぼ 0ms に戻している。実測ではこのパッケージの `eslint src/types/rules` が 5.7s → 10.5s → 5.9s
+
 - **published パッケージの検査が main で一度も走っていなかった（修正済み）。** `verify-published-packages` は `github.event.before` と比較してピンの変更を判定するが、checkout が浅いためその commit がリポジトリに存在せず、`git diff` が `fatal: bad object` で落ちていた。判定は `git diff … | grep -q .` の形で、パイプラインの終了ステータスは `grep` のものになるため、**失敗が「変更なし」として素通り**していた（run 31685428368 のログに残っている）。`should-run-type-check` と同じ壊れ方
     - `fetch-depth: 0` にして、判定を変数への代入に変えた。代入なら `set -e` で止まる。ブランチ側の比較も merge base にした
 - **リポジトリ設定のバックアップ照合を、関係のないブランチで走らせないようにした。** `backup-repository-settings` は GitHub の現在の設定とコミット済みバックアップを突き合わせるが、これはブランチではなくリポジトリの性質で、ブランチ側からは変えようがない。全ブランチで走らせていたため、web UI で設定を 1 つ変えると**開いている全 PR が赤くなる**（8/13 に ruleset から `migrate/**` を外したときに実際に起きた）。main では常に、それ以外のブランチでは `repo-settings/` に差分があるときだけ走るようにした
