@@ -178,6 +178,74 @@ type ReadonlyConfig2 = UnknownRecord;
 type Data2 = UnknownRecord;
 ```
 
+### 6. `enableNoUncheckedIndexedAccessTransformer`
+
+Appends `!` to the index accesses that turning on
+[`noUncheckedIndexedAccess`](https://www.typescriptlang.org/tsconfig/#noUncheckedIndexedAccess)
+would turn into type errors, as a stopgap while the option is being enabled on
+an existing codebase.
+
+The rewrite is driven by the type checker rather than by syntax: each file is
+checked twice, once with `noUncheckedIndexedAccess` off and once with it on,
+and `!` is appended only where the option is what added `undefined` to the
+expression's type. Consequently an index whose presence the type already
+guarantees is left untouched — `[T, T][1]`, `[T, T, ...T[]][0]` and
+`({ a: T })['a']` all keep their accesses as they are, as does an element type
+that contained `undefined` to begin with, and so does an access a preceding
+guard has already narrowed. `strictNullChecks` is turned on for both checks,
+because `noUncheckedIndexedAccess` does nothing without it.
+
+Both spellings of an index read are covered, because the option widens both:
+`rec['a']` and the dotted `rec.a` of a type carrying an index signature. A
+declared property is left alone either way, even on a type that also has an
+index signature.
+
+Options:
+
+- `applyLevel`: `'all'` or `'avoidWhereUndefinedIsAllowed'` (default: `'all'`)
+    - `'all'`: appends `!` to every read whose type the option widens with `undefined`, so that as few type errors as possible are left behind
+    - `'avoidWhereUndefinedIsAllowed'`: additionally leaves the access alone where its contextual type already accepts `undefined` (e.g. `const x: number | undefined = xs[0];`, or an argument of a `(x: number | undefined) => void` parameter), which produces fewer but only load-bearing assertions
+
+These positions are never rewritten, whichever level is selected:
+
+- **Assignment targets**, where `!` is not valid syntax: `xs[0] = 1`, `xs[0] ??= 1`, `xs[0]++`, `--xs[0]`, `delete rec['a']`, `[xs[0]] = ys`, `for (xs[0] of ys)`.
+- **Accesses that already account for `undefined`**: `xs[0]!`, `xs[0] as T`, `xs[0]?.foo`, `fns[0]?.()`, `xs[0] ?? d`, `xs[0] && d`.
+- **Positions that read the value precisely to find out whether it is there**: `typeof xs[0]`, `!xs[0]`, `xs[0] === undefined`, and the condition of `if` / `while` / `do` / `for` / `?:`, and the subject of `switch` — asserting there would defeat the check (`case undefined:` stops compiling against an asserted subject).
+
+Two things it cannot fix, which are left for a human to deal with:
+
+- **Destructuring**, since `!` has nowhere to go in `const [head] = xs;` or `const { a } = rec;`.
+- **Compound assignment**, `xs[0] += 1`, whose left-hand side is read as well as written.
+
+Two things to know before running it:
+
+- **Each file is transformed on its own**, as it is by every transformer in this library. A type that comes from another module does not resolve, and neither does a narrowing that depends on an imported type guard — `if (Arr.isNonEmpty(xs))` does not narrow `xs[0]` here. An unresolved type is never widened, so nothing is asserted there; a lost narrowing is the other way round, and produces an assertion the whole-program check does not need.
+- **Review the diff, and let ESLint clean up after it.** An assertion the compiler can prove unnecessary is reported by [`@typescript-eslint/no-unnecessary-type-assertion`](https://typescript-eslint.io/rules/no-unnecessary-type-assertion/), whose fixer removes it, so running `eslint --fix` over the transformed files takes most of the surplus back out. What no rule can see is an assertion that makes a later check dead — `const v = xs[0]!; if (v === undefined) …` — which is why this is a stopgap rather than a fix.
+
+Example:
+
+```ts
+const xs: readonly number[] = [1, 2, 3];
+
+const pair: readonly [number, string] = [1, 'a'];
+
+const rec: ReadonlyRecord<string, number> = { a: 1 };
+
+// Before (with `noUncheckedIndexedAccess` on, only `pair[1]` is known to be there)
+const first: number | undefined = xs[0];
+
+const entry: number | undefined = rec['a'];
+
+const second: string = pair[1];
+
+// After (the two unchecked reads are asserted, the guaranteed index is left alone)
+const first2: number = xs[0]!;
+
+const entry2: number = rec['a']!;
+
+const second2: string = pair[1];
+```
+
 ### Disabling Transformers
 
 - Nodes on the line immediately following a `// transformer-ignore-next-line` comment will be skipped.

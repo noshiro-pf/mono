@@ -14,6 +14,7 @@ One command, `ts-codemod`, applies the transformers named by `--transformer`
 | `append-as-const`                    | appends `as const` to object literals     |
 | `convert-interface-to-type`          | rewrites `interface` as a type alias      |
 | `convert-to-readonly`                | makes types readonly                      |
+| `enable-no-unchecked-indexed-access` | appends `!` to unchecked index accesses   |
 | `replace-any-with-unknown`           | replaces `any` with `unknown`             |
 | `replace-record-with-unknown-record` | replaces `Record<…>` with `UnknownRecord` |
 
