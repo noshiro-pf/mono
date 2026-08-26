@@ -256,8 +256,8 @@ so a pull request that changed only the filtered paths would wait forever on a
 check that never arrives. Each job instead carries a `Check diff` step and
 every later step carries
 `if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
-does no work. A second gate sits in front of the whole job — see "Check
-triggers and draft pull requests".
+does no work. Two more gates sit in front of the whole job — see "Check
+triggers, drafts and out-of-date branches".
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -285,13 +285,13 @@ Two things to keep in mind when editing a gated workflow:
   which is empty and reads as "nothing changed" — every step would skip. Each
   gate therefore compares against `github.event.before` on `main`.
 - A step added _before_ the `Check diff` step needs no condition of its own —
-  the draft gate is the job-level `if`, not a step; one added _after_ it
-  carries `should_run` like the rest.
+  the draft and out-of-date gates are job-level `if`s, not steps; one added
+  _after_ it carries `should_run` like the rest.
 
 `verify-published-packages.yml` gates itself on the same principle but in
 shell, because its gate runs before Node.js is installed.
 
-## Check triggers and draft pull requests
+## Check triggers, drafts and out-of-date branches
 
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
@@ -313,9 +313,11 @@ Draft pull requests run nothing: every job carries
 if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
 ```
 
-The draft flag arrives in the event payload, so there is no API lookup, and a
-job-level `if` is evaluated by GitHub itself, so no runner is booted — the
-checks just report `skipped`. Three things to know about that state:
+— the `branch-up-to-date` gate below as it stands, the jobs that wait on it as
+one clause of a longer condition. The draft flag arrives in the event payload,
+so there is no API lookup, and a job-level `if` is evaluated by GitHub itself,
+so no runner is booted — the checks just report `skipped`. Three things to
+know about that state:
 
 - **A skipped job satisfies a required status check.** What blocks merging a
   draft is the draft itself, which GitHub refuses to merge natively. Marking
@@ -333,11 +335,69 @@ checks just report `skipped`. Three things to know about that state:
   only `pull_request` events; asking for the checks by hand is asking for them
   regardless of the pull request's state.
 
-A draft can still get one full CI result without being marked ready:
-commenting `/run-checks` on the pull request (write access required) runs
-`run-checks.yml`, which dispatches all five workflows for the pull request's
-branch through that `workflow_dispatch` exemption. The runs attach their check
-runs to the branch's head commit, so the results appear on the pull request.
+A branch behind `main` runs nothing either — the state the pull request page
+calls "This branch is out-of-date with the base branch". The ruleset sets
+`strict_required_status_checks_policy`, so the required checks have to pass on
+a head that already contains main's tip: the branch cannot merge as it stands,
+and the update that clears it fires `synchronize` and runs everything again on
+the commit that will actually be merged. The run before that update produces a
+result nothing can use, which is the draft argument exactly, down to the
+`skipped` conclusion and to what holds the merge meanwhile being something
+other than the checks.
+
+Being behind is not in the event payload — `mergeable_state` arrives as
+`unknown` on the `synchronize` that triggered the run — and a job-level `if`
+cannot make an API call. So each check workflow opens with one small job that
+can, `branch-up-to-date.yml` through `workflow_call`, and every other job in
+the workflow waits on its answer:
+
+```yaml
+jobs:
+    branch-up-to-date:
+        if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+        uses: ./.github/workflows/branch-up-to-date.yml
+
+    type-check:
+        needs: branch-up-to-date
+        if: >-
+            !cancelled() &&
+            (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+            needs.branch-up-to-date.outputs.should_run != 'false'
+```
+
+What that shape is for:
+
+- **One job, not a step in each job.** A step cannot skip the job it is in, so
+  a step-level gate would boot every runner in the matrix — eleven of them in
+  `type-check.yml` — to decide it had nothing to do. The gate job costs one
+  boot per workflow run and skips the rest before they start. The draft note
+  above rules a gate job out for drafts, but that is a case where the answer
+  is free; this one has no free way to ask.
+- **A reusable workflow, not the same shell copied five times.** One answer,
+  one place to change it — the same reason the diff gate's path lists live in
+  the root `package.json`. The price is one more entry in the checks list per
+  workflow, `branch-up-to-date / check`, which is also where the reason for a
+  skipped matrix is written down.
+- **`!cancelled()` and `!= 'false'`, never `== 'true'`.** A gate that fails to
+  answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
+  jobs from being skipped along with it. Failing open costs a CI run; failing
+  closed would skip every check on the pull request while reporting the
+  required ones as satisfied. The draft clause is repeated in the longer
+  condition because `!cancelled()` also lifts the automatic skip that a
+  skipped dependency would otherwise give.
+- **Only the default branch.** The gate compares against
+  `github.event.pull_request.base.ref` and skips only when it is the
+  repository's default branch. Nowhere else does being behind block a merge,
+  so nowhere else does an update that re-runs the checks have to come.
+- **`push` and `workflow_dispatch` are exempt**, as they are from the draft
+  gate, and for the same reason.
+
+A pull request that either gate skips can still get one full CI result as it
+is — without being marked ready for review, and without updating its branch:
+commenting `/run-checks` on it (write access required) runs `run-checks.yml`,
+which dispatches all five workflows for the pull request's branch through that
+`workflow_dispatch` exemption. The runs attach their check runs to the
+branch's head commit, so the results appear on the pull request.
 Being an `issue_comment` workflow, the copy of `run-checks.yml` on `main` is
 what runs — edits to it take effect only once merged.
 
