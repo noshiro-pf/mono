@@ -77,7 +77,7 @@ describe('Arr transformations', () => {
         boxes: T,
       ): Readonly<{ [K in keyof T]: unknown }> => map(boxes, (b) => b.v);
 
-      const result = mapValues([{ v: 1 }, { v: 'a' }] as const);
+      const result = mapValues([{ v: 1 }, { v: 'a' }]);
 
       expectType<typeof result, FixedLengthTuple<2, unknown>>('=');
 

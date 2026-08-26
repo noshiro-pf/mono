@@ -267,7 +267,7 @@ describe('Arr shape invariants', () => {
     );
 
     assert.deepStrictEqual<readonly string[]>(
-      toSortedNonNumberInGenericContext(['c', 'a', 'b'] as const),
+      toSortedNonNumberInGenericContext(['c', 'a', 'b']),
       ['a', 'b', 'c'],
     );
 
@@ -313,12 +313,12 @@ describe('Arr shape invariants', () => {
     );
 
     assert.deepStrictEqual<readonly number[]>(
-      uniqInGenericContext([1, 1, 2] as const),
+      uniqInGenericContext([1, 1, 2]),
       [1, 2],
     );
 
     assert.deepStrictEqual<readonly number[]>(
-      uniqByInGenericContext([1, 1, 2] as const),
+      uniqByInGenericContext([1, 1, 2]),
       [1, 2],
     );
   });

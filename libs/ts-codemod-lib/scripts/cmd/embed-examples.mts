@@ -38,6 +38,7 @@ const documents: DeepReadonly<
     samplesDir: path.resolve(projectRootPath, 'samples/readme'),
     sampleCodeFiles: [
       'append-as-const-example.mts',
+      'remove-as-const-for-const-type-parameters-example.mts',
       'convert-to-readonly-example.mts',
       'convert-interface-to-type-example.mts',
       'replace-any-with-unknown-example.mts',
