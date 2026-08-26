@@ -137,13 +137,26 @@ const build = async (skipCheck: boolean): Promise<void> => {
 
     await logStep({
       startMessage:
-        'Type-checking the dist output through the package exports map (ambient global)',
+        'Type-checking the dist output through the package exports map (ambient global, triple-slash directive)',
       action: () =>
         runCmdStep(
           `node "${nativeTsc}" -p ./test/dist_/ambient/tsconfig.json`,
-          'dist output type check (ambient global) failed',
+          'dist output type check (ambient global, triple-slash directive) failed',
         ),
-      successMessage: 'dist output type check (ambient global) passed',
+      successMessage:
+        'dist output type check (ambient global, triple-slash directive) passed',
+    });
+
+    await logStep({
+      startMessage:
+        'Type-checking the dist output through the package exports map (ambient global, compilerOptions.types)',
+      action: () =>
+        runCmdStep(
+          `node "${nativeTsc}" -p ./test/dist_/ambient-types-option/tsconfig.json`,
+          'dist output type check (ambient global, compilerOptions.types) failed',
+        ),
+      successMessage:
+        'dist output type check (ambient global, compilerOptions.types) passed',
     });
   }
 
