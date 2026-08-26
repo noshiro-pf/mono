@@ -19,25 +19,20 @@ on:
       - reopened
       - ready_for_review
 
+  # The merge queue's runs — see the note in type-check.yml.
+  merge_group:
+    types:
+      - checks_requested
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # Whether the branch is behind `main` — see the note in type-check.yml.
-  branch-up-to-date:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    uses: ./.github/workflows/branch-up-to-date.yml
-
   backup-repository-settings:
-    needs: branch-up-to-date
-    # Skip the whole job while the pull request is a draft, or while its
-    # branch is behind `main` and cannot be merged as it stands — see the
-    # notes in type-check.yml.
-    if: >-
-      !cancelled() &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+    # Skip the whole job while the pull request is a draft — see the note in
+    # type-check.yml.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -51,8 +46,9 @@ jobs:
           # The branch tip, not the merge commit GitHub synthesises for a
           # `pull_request` event: these checks assert properties of the branch
           # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a push event this falls back to the
-          # pushed commit.
+          # request has a conflict. On a push or `merge_group` event this
+          # falls back to `github.sha` — the pushed commit, or the queue's
+          # merge-group commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       # NOTE: To keep this workflow in the branch protection rule status check,

@@ -227,4 +227,8 @@ jobs:
               --title "chore: update dependencies" \
               --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
-          gh pr merge --auto --squash "$branch"
+          # With a merge queue on main the queue's merge_method decides, and a
+          # method flag conflicts with it; without one, gh demands a method
+          # flag when run non-interactively. Try the queue form first so this
+          # line keeps working whether the queue is on or off.
+          gh pr merge --auto "$branch" || gh pr merge --auto --squash "$branch"

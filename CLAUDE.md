@@ -259,8 +259,8 @@ so a pull request that changed only the filtered paths would wait forever on a
 check that never arrives. Each job instead carries a `Check diff` step and
 every later step carries
 `if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
-does no work. Two more gates sit in front of the whole job — see "Check
-triggers, drafts and out-of-date branches".
+does no work. One more gate sits in front of the whole job — see "Check
+triggers, drafts and the merge queue".
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -286,133 +286,114 @@ Two things to keep in mind when editing a gated workflow:
   carry the `if:` itself.
 - On a push to `main`, diffing against `origin/main` is a diff against `HEAD`,
   which is empty and reads as "nothing changed" — every step would skip. Each
-  gate therefore compares against `github.event.before` on `main`.
+  gate therefore compares against `github.event.before` on `main`. On a
+  `merge_group` ref, whose parent is main's tip, the same diff yields the
+  union of the queued pull requests' changes, which is the right thing to
+  gate the group's checks on.
 - A step added _before_ the `Check diff` step needs no condition of its own —
-  the draft and out-of-date gates are job-level `if`s, not steps; one added
-  _after_ it carries `should_run` like the rest.
+  the draft gate is the job-level `if`, not a step; one added _after_ it
+  carries `should_run` like the rest.
 
 `verify-published-packages.yml` gates itself on the same principle but in
 shell, because its gate runs before Node.js is installed.
 
-## Check triggers, drafts and out-of-date branches
+## Check triggers, drafts and the merge queue
 
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
 `backup-repository-settings.yml` — trigger on
-`pull_request: types: [opened, synchronize, reopened, ready_for_review]`, and
-on `push` only for `main`. One event kind per commit is what keeps the checks
-list at one entry per job: triggering on `push` for branches as well would put
-a push run and a `pull_request` run side by side on every pull request.
-Nothing is lost by leaving `push` out — `synchronize` fires on every push to a
-branch with an open pull request, `opened` covers the pushes made before it
-existed, and a branch that never gets a pull request has nothing to protect,
-because the `main` ruleset accepts changes through pull requests only. The
-`push` runs on `main` re-check what actually landed, a squash merge being a
-new commit that no pull request run has seen.
+`pull_request: types: [opened, synchronize, reopened, ready_for_review]`, on
+`merge_group: types: [checks_requested]`, and on `push` only for `main`. One
+event kind per commit is what keeps the checks list at one entry per job:
+triggering on `push` for branches as well would put a push run and a
+`pull_request` run side by side on every pull request. Nothing is lost by
+leaving `push` out — `synchronize` fires on every push to a branch with an
+open pull request, `opened` covers the pushes made before it existed, and a
+branch that never gets a pull request has nothing to protect, because the
+`main` ruleset accepts changes through the merge queue only.
 
-Draft pull requests run nothing: every job carries
+Merging goes through the **merge queue** (`merge_queue` rule in the `main`
+ruleset). The division of labour:
+
+- **The `pull_request` runs are the entry credential.** "Merge when ready" —
+  the auto-merge button, `gh pr merge --auto`, nothing new — queues the pull
+  request once its required checks pass on its own head, as pushed. Being
+  behind `main` neither blocks anything nor triggers anything: no
+  branch-updating, no re-run treadmill.
+  `strict_required_status_checks_policy` is `false` accordingly — its job,
+  proving the checks against main's tip, is the queue's job now, done on the
+  commit that actually lands.
+- **The `merge_group` runs are the enforced gate.** The queue combines main's
+  tip, any queued pull requests ahead, and this one into a commit on a
+  `gh-readonly-queue/main/*` ref using the squash method, and every required
+  check must pass on it before it is pushed to main — byte-for-byte the
+  commit being tested. A required check whose workflow lacks the
+  `merge_group` trigger never reports there and the entry times out
+  (`check_response_timeout_minutes`), which is why `lint-pull-request.yml`
+  carries the trigger with a step that reports success without running the
+  action: the title was validated on the pull request, and the queue only
+  needs the context to report. On a merge-group failure the pull request is
+  ejected from the queue and its auto-merge is disarmed; fixing whatever
+  failed and re-arming is what `.claude/skills/unblock-prs` is for.
+- **The `push` runs on `main` are belt-and-braces** — the queue already
+  tested the exact commit that landed. They are also what uploads coverage
+  for main, what runs the repository-wide settings backup, and what anchors
+  `github.event.before` for the next push's diff gate.
+
+The queue's parameters live in the ruleset next to it: SQUASH matches the
+squash-only `pull_request` rule and `required_linear_history`; ALLGREEN tests
+every entry's own combination so a failure names its culprit;
+`max_entries_to_build: 2` because one entry's build is ~23 jobs against the
+~20-runner concurrency cap; the 90-minute check timeout covers the 30-minute
+node-version matrix plus runner contention.
+
+Draft pull requests run nothing — a draft cannot be queued, so the reasoning
+below is unchanged by the queue. Every job carries
 
 ```yaml
 if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
 ```
 
-— the `branch-up-to-date` gate below as it stands, the jobs that wait on it as
-one clause of a longer condition. The draft flag arrives in the event payload,
-so there is no API lookup, and a job-level `if` is evaluated by GitHub itself,
-so no runner is booted — the checks just report `skipped`. Three things to
-know about that state:
+The draft flag arrives in the event payload, so there is no API lookup, and a
+job-level `if` is evaluated by GitHub itself, so no runner is booted — the
+checks just report `skipped`. Three things to know about that state:
 
 - **A skipped job satisfies a required status check.** What blocks merging a
-  draft is the draft itself, which GitHub refuses to merge natively. Marking
-  the pull request ready for review fires `ready_for_review`, and the real
-  run's checks take over; for the few seconds before they register, the
-  required checks read as satisfied. Auto-merge cannot be armed on a draft, so
-  closing that window was judged not worth the alternative — a gate job that
-  cancels its own run on every draft push, costing a runner boot each time.
+  draft is the draft itself, which GitHub refuses to merge or queue natively.
+  Marking the pull request ready for review fires `ready_for_review`, and the
+  real run's checks take over; for the few seconds before they register, the
+  required checks read as satisfied — a window the merge-group run now
+  backstops in any case.
 - **Do not make a draft report success instead.** The previous design gated
   every step on an API lookup and let the job report green while a draft:
   green checks that stood for work that never happened, one booted runner per
   matrix entry per push, and a doubled checks list, since the `push` and
   `ready_for_review` runs sat side by side.
-- **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
-  only `pull_request` events; asking for the checks by hand is asking for them
+- **`push`, `merge_group` and `workflow_dispatch` runs are exempt.** The
+  condition constrains only `pull_request` events; the queue's runs must
+  always happen, and asking for the checks by hand is asking for them
   regardless of the pull request's state.
 
-A branch behind `main` runs nothing either — the state the pull request page
-calls "This branch is out-of-date with the base branch". The ruleset sets
-`strict_required_status_checks_policy`, so the required checks have to pass on
-a head that already contains main's tip: the branch cannot merge as it stands,
-and the update that clears it fires `synchronize` and runs everything again on
-the commit that will actually be merged. The run before that update produces a
-result nothing can use, which is the draft argument exactly, down to the
-`skipped` conclusion and to what holds the merge meanwhile being something
-other than the checks.
-
-Being behind is not in the event payload — `mergeable_state` arrives as
-`unknown` on the `synchronize` that triggered the run — and a job-level `if`
-cannot make an API call. So each check workflow opens with one small job that
-can, `branch-up-to-date.yml` through `workflow_call`, and every other job in
-the workflow waits on its answer:
-
-```yaml
-jobs:
-    branch-up-to-date:
-        if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-        uses: ./.github/workflows/branch-up-to-date.yml
-
-    type-check:
-        needs: branch-up-to-date
-        if: >-
-            !cancelled() &&
-            (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-            needs.branch-up-to-date.outputs.should_run != 'false'
-```
-
-What that shape is for:
-
-- **One job, not a step in each job.** A step cannot skip the job it is in, so
-  a step-level gate would boot every runner in the matrix — eleven of them in
-  `type-check.yml` — to decide it had nothing to do. The gate job costs one
-  boot per workflow run and skips the rest before they start. The draft note
-  above rules a gate job out for drafts, but that is a case where the answer
-  is free; this one has no free way to ask.
-- **A reusable workflow, not the same shell copied five times.** One answer,
-  one place to change it — the same reason the diff gate's path lists live in
-  the root `package.json`. The price is one more entry in the checks list per
-  workflow, `branch-up-to-date / check`, which is also where the reason for a
-  skipped matrix is written down.
-- **`!cancelled()` and `!= 'false'`, never `== 'true'`.** A gate that fails to
-  answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
-  jobs from being skipped along with it. Failing open costs a CI run; failing
-  closed would skip every check on the pull request while reporting the
-  required ones as satisfied. The draft clause is repeated in the longer
-  condition because `!cancelled()` also lifts the automatic skip that a
-  skipped dependency would otherwise give.
-- **Only the default branch.** The gate compares against
-  `github.event.pull_request.base.ref` and skips only when it is the
-  repository's default branch. Nowhere else does being behind block a merge,
-  so nowhere else does an update that re-runs the checks have to come.
-- **`push` and `workflow_dispatch` are exempt**, as they are from the draft
-  gate, and for the same reason.
-
-A pull request that either gate skips can still get one full CI result as it
-is — without being marked ready for review, and without updating its branch:
-commenting `/run-checks` on it (write access required) runs `run-checks.yml`,
-which dispatches all five workflows for the pull request's branch through that
-`workflow_dispatch` exemption. The runs attach their check runs to the
-branch's head commit, so the results appear on the pull request.
+A draft can still get one full CI result without being marked ready:
+commenting `/run-checks` on the pull request (write access required) runs
+`run-checks.yml`, which dispatches all five workflows for the pull request's
+branch through that `workflow_dispatch` exemption. The runs attach their check
+runs to the branch's head commit, so the results appear on the pull request.
 Being an `issue_comment` workflow, the copy of `run-checks.yml` on `main` is
 what runs — edits to it take effect only once merged.
 
 The design leans on the `main` ruleset
 (`repo-settings/rulesets/main.json`): merging into `main` requires a pull
-request, and the admin's bypass is `bypass_mode: "pull_request"` — usable
-inside a pull request flow only, so a direct push to `main` is refused even
-for the repository admin. The escape hatch for a wedged required check is to
-merge a pull request with the bypass, not to push. Do not widen it back to
-`"always"`: checks arrive only through pull requests now, so an unchecked
-direct push would reach `main` with nothing but the after-the-fact `push` run
-having seen it.
+request through the queue, and the admin's bypass is
+`bypass_mode: "pull_request"` — usable inside a pull request flow only (with
+the queue on, that includes merging without waiting for it), so a direct push
+to `main` is refused even for the repository admin. The escape hatch for a
+wedged required check is to merge a pull request with the bypass, not to
+push. Do not widen it back to `"always"`: checks arrive only through pull
+requests and the queue now, so an unchecked direct push would reach `main`
+with nothing but the after-the-fact `push` run having seen it. The queue is
+configured there and applied with `pnpm run repo-settings:apply rulesets`,
+not in the web UI, like every other repository setting.
 
 ## Spell checking
 

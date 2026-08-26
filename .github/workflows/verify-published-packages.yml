@@ -31,23 +31,18 @@ on:
       - reopened
       - ready_for_review
 
+  # The merge queue's runs — see the note in type-check.yml.
+  merge_group:
+    types:
+      - checks_requested
+
   workflow_dispatch:
 
 jobs:
-  # Whether the branch is behind `main` — see the note in type-check.yml.
-  branch-up-to-date:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    uses: ./.github/workflows/branch-up-to-date.yml
-
   verify-published:
-    needs: branch-up-to-date
-    # Skip the whole job while the pull request is a draft, or while its
-    # branch is behind `main` and cannot be merged as it stands — see the
-    # notes in type-check.yml.
-    if: >-
-      !cancelled() &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+    # Skip the whole job while the pull request is a draft — see the note in
+    # type-check.yml.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -58,8 +53,9 @@ jobs:
           # The branch tip, not the merge commit GitHub synthesises for a
           # `pull_request` event: these checks assert properties of the branch
           # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a push event this falls back to the
-          # pushed commit.
+          # request has a conflict. On a push or `merge_group` event this
+          # falls back to `github.sha` — the pushed commit, or the queue's
+          # merge-group commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # The gate below resolves `github.event.before` and a merge base,
           # neither of which exists in the default shallow clone. It also

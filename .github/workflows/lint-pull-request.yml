@@ -16,6 +16,17 @@ on:
       - edited
       - synchronize
 
+  # `Validate PR title` is a required status check, and the merge queue
+  # demands every required check on its merge-group commit —
+  # `pull_request_target` never fires there, so without this trigger every
+  # queue entry would sit until the check timed out. There is nothing to
+  # validate on a merge group (the title was checked on the pull request,
+  # and the squash commit title is taken from it), so the job just reports
+  # success — see the step conditions below.
+  merge_group:
+    types:
+      - checks_requested
+
 permissions:
   pull-requests: read
 
@@ -25,6 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Nothing to validate on a merge group
+        if: github.event_name == 'merge_group'
+        run: echo 'The title was validated on the pull request; the queue only needs this check to report here.'
+
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        if: github.event_name != 'merge_group'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

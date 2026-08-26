@@ -3,10 +3,11 @@ name: Type Check
 on:
   # Only main. Pull request branches are covered by the `pull_request` events
   # below — running both event kinds would list every check twice on the pull
-  # request. What this run adds is a check on what actually landed: a squash
-  # merge makes a new commit that no pull request run has seen. (The `main`
-  # ruleset allows no other way onto the branch, so a push to main and a merge
-  # are the same event.)
+  # request. The merge queue tested the exact commit that lands, so this run
+  # is a belt-and-braces re-check of main's actual state; it is also what
+  # uploads coverage for main and what anchors `github.event.before` for the
+  # next push's diff gate. (The `main` ruleset allows no other way onto the
+  # branch, so a push to main and a queue merge are the same event.)
   push:
     branches:
       - main
@@ -23,47 +24,27 @@ on:
       - reopened
       - ready_for_review
 
+  # The merge queue's runs. The queue builds a `gh-readonly-queue/main/*`
+  # commit — main's tip plus the queued pull requests, combined with the
+  # squash method — and every required check has to pass on it before it is
+  # pushed to main. A workflow without this trigger never reports there, and
+  # the queue entry would time out waiting.
+  merge_group:
+    types:
+      - checks_requested
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  # Is the branch up to date with `main`? A job of its own because the answer
-  # takes an API call, which a job-level `if` cannot make, and because a step
-  # cannot skip the job it is in — see branch-up-to-date.yml. It carries the
-  # draft condition as well, so a draft still costs no runner anywhere: this
-  # job is skipped, and the one below it with it.
-  branch-up-to-date:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    uses: ./.github/workflows/branch-up-to-date.yml
-
   type-check:
-    needs: branch-up-to-date
-    # Two states are not worth a CI run, and both skip the whole job before a
-    # runner is even booted — a job-level `if` is evaluated by GitHub itself.
-    #
-    # - A draft pull request is work in progress. The flag arrives in the
-    #   event payload, so this costs nothing, and marking the pull request
-    #   ready for review fires the `ready_for_review` run above, whose checks
-    #   take over.
-    # - A branch behind `main` is the "This branch is out-of-date with the
-    #   base branch" state: it cannot be merged, and the update that clears it
-    #   fires `synchronize` and runs everything again — on the commit that
-    #   will actually be merged, which this one is not.
-    #
-    # The skipped conclusion satisfies a required status check in both cases.
-    # In both cases something else holds the merge: the draft flag, and the
-    # ruleset's `strict_required_status_checks_policy`.
-    #
-    # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
-    # that failed to answer leaves `should_run` empty: failing open costs a CI
-    # run, failing closed would skip every check on the pull request while
-    # reporting the required ones as satisfied. The draft condition is
-    # repeated here because `!cancelled()` also lifts the automatic skip that
-    # a skipped dependency would otherwise give us.
-    if: >-
-      !cancelled() &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+    # A draft pull request is work in progress: skip the whole job, before a
+    # runner is even booted — a job-level `if` is evaluated by GitHub itself,
+    # and the draft flag arrives in the event payload, so this costs nothing.
+    # The skipped conclusion would satisfy a required status check, but a
+    # draft cannot be merged or queued anyway, and marking it ready for review
+    # fires the `ready_for_review` run above, whose checks take over.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -95,8 +76,9 @@ jobs:
           # The branch tip, not the merge commit GitHub synthesises for a
           # `pull_request` event: these checks assert properties of the branch
           # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a push event this falls back to the
-          # pushed commit.
+          # request has a conflict. On a push or `merge_group` event this
+          # falls back to `github.sha` — the pushed commit, or the queue's
+          # merge-group commit, which is exactly what has to be checked there.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Fetch main
@@ -130,11 +112,13 @@ jobs:
         # drift apart. Anything a check here *does* look at — a source file,
         # a lockfile, a workflow — is absent from that list, so it runs.
         #
-        # It diffs against origin/main. On a push to main that is a diff
-        # against HEAD itself, which comes back empty and reads as "nothing
-        # relevant changed" — so every step below skips, the coverage upload
-        # among them, and the job still reports success. Compare with what
-        # main pointed at before the push instead.
+        # It diffs against origin/main. On a merge-group ref, whose parent is
+        # main's tip, that is the union of the queued pull requests' changes —
+        # the right thing to gate the group's checks on. On a push to main it
+        # is a diff against HEAD itself, which comes back empty and reads as
+        # "nothing relevant changed" — so every step below skips, the coverage
+        # upload among them, and the job still reports success. Compare with
+        # what main pointed at before the push instead.
         env:
           BEFORE: ${{ github.event.before }}
         run: |
