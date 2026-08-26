@@ -71,9 +71,7 @@ const obj2 = { a: 1, b: 2 } as const;
 Example (`removeAsConstForConstTypeParameters`):
 
 ```ts
-function f<const T>(x: T): T {
-    return x;
-}
+const f = <const T>(x: T): T => x;
 
 // Before
 const a = f([1, 2] as const);
