@@ -1,0 +1,10 @@
+diff --git a/v5.9/output/lib-files/lib.es2015.symbol.d.ts b/v6.0/output/lib-files/lib.es2015.symbol.d.ts
+index 343dd252d..663725be3 100644
+--- a/v5.9/output/lib-files/lib.es2015.symbol.d.ts
++++ b/v6.0/output/lib-files/lib.es2015.symbol.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ interface SymbolConstructor {
+   /**
+    * A reference to the prototype.

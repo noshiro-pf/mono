@@ -1,0 +1,13 @@
+diff --git a/v5.6/output/lib-files/lib.esnext.array.d.ts b/v5.7/output/lib-files/lib.esnext.array.d.ts
+index 67b0196ef..9b08357d1 100644
+--- a/v5.6/output/lib-files/lib.esnext.array.d.ts
++++ b/v5.7/output/lib-files/lib.esnext.array.d.ts
+@@ -22,7 +22,7 @@ interface ArrayConstructor {
+    */
+   fromAsync<T, U>(
+     iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,
+-    mapFn: (value: Awaited<T>) => U,
++    mapFn: (value: Awaited<T>, index: number) => U,
+     thisArg?: unknown,
+   ): Promise<readonly Awaited<U>[]>;
+ }

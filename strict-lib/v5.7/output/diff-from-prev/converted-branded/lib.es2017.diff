@@ -1,0 +1,17 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es2017.d.ts b/v5.7/output/lib-files-branded/lib.es2017.d.ts
+index 0f2aaeb71..5c1fe67f3 100644
+--- a/v5.6/output/lib-files-branded/lib.es2017.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es2017.d.ts
+@@ -1,9 +1,10 @@
+ /// <reference no-default-lib="true"/>
+ 
+ /// <reference path="./lib.es2016.d.ts" />
++/// <reference path="./lib.es2017.arraybuffer.d.ts" />
++/// <reference path="./lib.es2017.date.d.ts" />
++/// <reference path="./lib.es2017.intl.d.ts" />
+ /// <reference path="./lib.es2017.object.d.ts" />
+ /// <reference path="./lib.es2017.sharedmemory.d.ts" />
+ /// <reference path="./lib.es2017.string.d.ts" />
+-/// <reference path="./lib.es2017.intl.d.ts" />
+ /// <reference path="./lib.es2017.typedarrays.d.ts" />
+-/// <reference path="./lib.es2017.date.d.ts" />

@@ -1,0 +1,64 @@
+diff --git a/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts
+index bc23c89b8..1ae975396 100644
+--- a/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts
++++ b/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts
+@@ -162,7 +162,7 @@ interface BigInt64Array {
+   ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<
++  entries(): ArrayIterator<
+     readonly [NumberType.TypedArraySize, import('ts-type-forge').BigInt64]
+   >;
+ 
+@@ -294,7 +294,7 @@ interface BigInt64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<NumberType.TypedArraySize>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -480,9 +480,9 @@ interface BigInt64Array {
+   valueOf(): BigInt64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<import('ts-type-forge').BigInt64>;
++  values(): ArrayIterator<import('ts-type-forge').BigInt64>;
+ 
+-  [Symbol.iterator](): IterableIterator<import('ts-type-forge').BigInt64>;
++  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').BigInt64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigInt64Array';
+ 
+@@ -560,7 +560,7 @@ interface BigUint64Array {
+   ): this;
+ 
+   /** Yields index, value pairs for every entry in the array. */
+-  entries(): IterableIterator<
++  entries(): ArrayIterator<
+     readonly [NumberType.TypedArraySize, import('ts-type-forge').BigUint64]
+   >;
+ 
+@@ -692,7 +692,7 @@ interface BigUint64Array {
+   join(separator?: string): string;
+ 
+   /** Yields each index in the array. */
+-  keys(): IterableIterator<NumberType.TypedArraySize>;
++  keys(): ArrayIterator<NumberType.TypedArraySize>;
+ 
+   /**
+    * Returns the index of the last occurrence of a value in an array.
+@@ -878,9 +878,9 @@ interface BigUint64Array {
+   valueOf(): BigUint64Array;
+ 
+   /** Yields each value in the array. */
+-  values(): IterableIterator<import('ts-type-forge').BigUint64>;
++  values(): ArrayIterator<import('ts-type-forge').BigUint64>;
+ 
+-  [Symbol.iterator](): IterableIterator<import('ts-type-forge').BigUint64>;
++  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').BigUint64>;
+ 
+   readonly [Symbol.toStringTag]: 'BigUint64Array';
+ 

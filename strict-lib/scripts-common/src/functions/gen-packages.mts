@@ -137,9 +137,9 @@ const createPackages = async (
 
         const content = await fs.readFile(
           path.resolve(
-            paths.strictTsLib[
-              config.useBrandedNumber ? 'outputBranded' : 'output'
-            ].libFiles.$,
+            paths.strictTsLib.output[
+              config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
+            ].$,
             filename,
           ),
           { encoding: 'utf8' },
@@ -515,8 +515,9 @@ const getPackageDirListFromLibFiles = async (
   readonly Readonly<{ filename: string; packageRelativePath: string }>[]
 > => {
   const libFilesDir =
-    ctx.paths.strictTsLib[config.useBrandedNumber ? 'outputBranded' : 'output']
-      .libFiles.$;
+    ctx.paths.strictTsLib.output[
+      config.useBrandedNumber ? 'libFilesBranded' : 'libFiles'
+    ].$;
 
   const filenames = await fs.readdir(libFilesDir);
 

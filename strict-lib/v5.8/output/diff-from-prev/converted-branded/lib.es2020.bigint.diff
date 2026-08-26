@@ -1,0 +1,131 @@
+diff --git a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
+index a1b13e2b1..727fa1f87 100644
+--- a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts
++++ b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
+@@ -503,6 +503,11 @@ interface BigInt64ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+     length?: NumberType.TypedArraySize,
+   ): BigInt64Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
++  ): BigInt64Array<ArrayBuffer>;
+   new (
+     array: ArrayLike<import('ts-type-forge').BigInt64> | ArrayBuffer,
+   ): BigInt64Array<ArrayBuffer>;
+@@ -520,16 +525,15 @@ interface BigInt64ArrayConstructor {
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
+-   * @param mapfn A mapping function to call on every element of the array.
+-   * @param thisArg Value of 'this' used to invoke the mapfn.
++   * @param arrayLike An array-like object to convert to an array.
+    */
+   from(
+     arrayLike: ArrayLike<import('ts-type-forge').BigInt64>,
+   ): BigInt64Array<ArrayBuffer>;
++
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
++   * @param arrayLike An array-like object to convert to an array.
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+@@ -541,6 +545,29 @@ interface BigInt64ArrayConstructor {
+     ) => import('ts-type-forge').BigInt64,
+     thisArg?: unknown,
+   ): BigInt64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   */
++  from(
++    elements: Iterable<import('ts-type-forge').BigInt64>,
++  ): BigInt64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   * @param mapfn A mapping function to call on every element of the array.
++   * @param thisArg Value of 'this' used to invoke the mapfn.
++   */
++  from<T>(
++    elements: Iterable<T>,
++    mapfn?: (
++      v: T,
++      k: NumberType.TypedArraySize,
++    ) => import('ts-type-forge').BigInt64,
++    thisArg?: unknown,
++  ): BigInt64Array<ArrayBuffer>;
+ }
+ declare const BigInt64Array: BigInt64ArrayConstructor;
+ 
+@@ -918,6 +945,11 @@ interface BigUint64ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+     length?: NumberType.TypedArraySize,
+   ): BigUint64Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySize,
++  ): BigUint64Array<ArrayBuffer>;
+   new (
+     array: ArrayLike<import('ts-type-forge').BigUint64> | ArrayBuffer,
+   ): BigUint64Array<ArrayBuffer>;
+@@ -935,11 +967,18 @@ interface BigUint64ArrayConstructor {
+ 
+   /**
+    * Creates an array from an array-like or iterable object.
+-   * @param arrayLike An array-like or iterable object to convert to an array.
++   * @param arrayLike An array-like object to convert to an array.
++   */
++  from(
++    arrayLike: ArrayLike<import('ts-type-forge').BigUint64>,
++  ): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param arrayLike An array-like object to convert to an array.
+    * @param mapfn A mapping function to call on every element of the array.
+    * @param thisArg Value of 'this' used to invoke the mapfn.
+    */
+-  from(arrayLike: ArrayLike<import('ts-type-forge').BigUint64>): BigUint64Array;
+   from<U>(
+     arrayLike: ArrayLike<U>,
+     mapfn: (
+@@ -947,7 +986,30 @@ interface BigUint64ArrayConstructor {
+       k: NumberType.TypedArraySize,
+     ) => import('ts-type-forge').BigUint64,
+     thisArg?: unknown,
+-  ): BigUint64Array;
++  ): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   */
++  from(
++    elements: Iterable<import('ts-type-forge').BigUint64>,
++  ): BigUint64Array<ArrayBuffer>;
++
++  /**
++   * Creates an array from an array-like or iterable object.
++   * @param elements An iterable object to convert to an array.
++   * @param mapfn A mapping function to call on every element of the array.
++   * @param thisArg Value of 'this' used to invoke the mapfn.
++   */
++  from<T>(
++    elements: Iterable<T>,
++    mapfn?: (
++      v: T,
++      k: NumberType.TypedArraySize,
++    ) => import('ts-type-forge').BigUint64,
++    thisArg?: unknown,
++  ): BigUint64Array<ArrayBuffer>;
+ }
+ declare const BigUint64Array: BigUint64ArrayConstructor;
+ 

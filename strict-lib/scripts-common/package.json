@@ -12,14 +12,12 @@
     "./commands/gen-with-codemod-fixed": "./src/commands/gen-with-codemod-fixed.mts",
     "./context": "./src/context.mts"
   },
-  "dependencies": {
+  "devDependencies": {
     "dedent": "catalog:",
     "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "ts-type-forge": "workspace:*",
     "typescript": "6.0.3"
-  },
-  "devDependencies": {
-    "ts-fortress": "workspace:*"
   }
 }

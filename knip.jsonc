@@ -101,11 +101,6 @@
       "ignoreDependencies": ["ts-type-forge"],
     },
 
-    // Type-check harnesses over the generated declarations. No sources of
-    // their own.
-    "strict-lib/v*/output": {},
-    "strict-lib/v*/output-branded": {},
-
     "strict-lib/v*/output/lib": {
       // The published package. Its `.d.ts` files reference
       // `import('ts-type-forge')`, so a consumer must have it installed — but

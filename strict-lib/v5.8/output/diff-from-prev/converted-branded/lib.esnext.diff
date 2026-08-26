@@ -1,0 +1,10 @@
+diff --git a/v5.7/output/lib-files-branded/lib.esnext.d.ts b/v5.8/output/lib-files-branded/lib.esnext.d.ts
+index e129aeef4..f120c1225 100644
+--- a/v5.7/output/lib-files-branded/lib.esnext.d.ts
++++ b/v5.8/output/lib-files-branded/lib.esnext.d.ts
+@@ -7,3 +7,5 @@
+ /// <reference path="./lib.esnext.collection.d.ts" />
+ /// <reference path="./lib.esnext.array.d.ts" />
+ /// <reference path="./lib.esnext.iterator.d.ts" />
++/// <reference path="./lib.esnext.promise.d.ts" />
++/// <reference path="./lib.esnext.float16.d.ts" />

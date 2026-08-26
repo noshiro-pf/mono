@@ -1,0 +1,20 @@
+diff --git a/v5.4/output/lib-files/lib.webworker.asynciterable.d.ts b/v5.4/output/lib-files/lib.webworker.asynciterable.d.ts
+new file mode 100644
+index 000000000..8a28f6465
+--- /dev/null
++++ b/v5.4/output/lib-files/lib.webworker.asynciterable.d.ts
+@@ -0,0 +1,14 @@
++/// <reference no-default-lib="true"/>
++
++/////////////////////////////
++/// Worker Async Iterable APIs
++/////////////////////////////
++
++interface FileSystemDirectoryHandle {
++  [Symbol.asyncIterator](): AsyncIterableIterator<
++    readonly [string, FileSystemHandle]
++  >;
++  entries(): AsyncIterableIterator<readonly [string, FileSystemHandle]>;
++  keys(): AsyncIterableIterator<string>;
++  values(): AsyncIterableIterator<FileSystemHandle>;
++}

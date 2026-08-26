@@ -1,0 +1,17 @@
+diff --git a/v5.8/temp/copied/lib.esnext.float16.d.ts b/v5.9/temp/copied/lib.esnext.float16.d.ts
+index 891930003..48c235934 100644
+--- a/v5.8/temp/copied/lib.esnext.float16.d.ts
++++ b/v5.9/temp/copied/lib.esnext.float16.d.ts
+@@ -437,6 +437,12 @@ interface Float16ArrayConstructor {
+     byteOffset?: number,
+     length?: number,
+   ): Float16Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: number,
++    length?: number,
++  ): Float16Array<ArrayBuffer>;
++  new (array: ArrayLike<number> | ArrayBuffer): Float16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.

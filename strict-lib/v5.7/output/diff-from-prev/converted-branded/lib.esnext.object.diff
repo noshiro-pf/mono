@@ -1,0 +1,19 @@
+diff --git a/v5.6/output/lib-files-branded/lib.esnext.object.d.ts b/v5.6/output/lib-files-branded/lib.esnext.object.d.ts
+deleted file mode 100644
+index 14e43f298..000000000
+--- a/v5.6/output/lib-files-branded/lib.esnext.object.d.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/// <reference no-default-lib="true"/>
+-
+-interface ObjectConstructor {
+-  /**
+-   * Groups members of an iterable according to the return value of the passed callback.
+-   * @param items An iterable.
+-   * @param keySelector A callback which will be invoked for each item in items.
+-   */
+-  groupBy<K extends PropertyKey, T>(
+-    items: Iterable<T>,
+-    keySelector: (item: T, index: NumberType.ArraySize) => K,
+-  ): Partial<Record<K, readonly T[]>>;
+-}

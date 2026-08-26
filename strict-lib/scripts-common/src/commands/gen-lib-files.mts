@@ -5,7 +5,7 @@ import { buildGenSteps, findStepIndex } from './gen-steps.mjs';
 
 /**
  * Run only the lib-file generation slice: `genLibFiles` plus the subsequent
- * format steps on `output/lib-files` and `output-branded/lib-files`.
+ * format steps on `output/lib-files` and `output/lib-files-branded`.
  */
 export const runGenLibFiles = async (
   options: CreateContextOptions,
@@ -16,7 +16,7 @@ export const runGenLibFiles = async (
 
   const start = findStepIndex(steps, 'genLibFiles');
 
-  const end = findStepIndex(steps, 'format output-branded/lib-files') + 1;
+  const end = findStepIndex(steps, 'format output/lib-files-branded') + 1;
 
   for (const { name, fn } of steps.slice(start, end)) {
     await wrapStartEnd(fn, name).then(exitIfErr);

@@ -1,0 +1,27 @@
+diff --git a/v5.3/output/lib-files/lib.es2021.intl.d.ts b/v5.4/output/lib-files/lib.es2021.intl.d.ts
+index d3c2c8e07..851d042eb 100644
+--- a/v5.3/output/lib-files/lib.es2021.intl.d.ts
++++ b/v5.4/output/lib-files/lib.es2021.intl.d.ts
+@@ -135,10 +135,7 @@ declare namespace Intl {
+      *
+      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat).
+      */
+-    new (
+-      locales?: BCP47LanguageTag | readonly BCP47LanguageTag[],
+-      options?: ListFormatOptions,
+-    ): ListFormat;
++    new (locales?: LocalesArgument, options?: ListFormatOptions): ListFormat;
+ 
+     /**
+      * Returns an array containing those of the provided locales that are
+@@ -157,8 +154,8 @@ declare namespace Intl {
+      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf).
+      */
+     supportedLocalesOf(
+-      locales: BCP47LanguageTag | readonly BCP47LanguageTag[],
++      locales: LocalesArgument,
+       options?: Pick<ListFormatOptions, 'localeMatcher'>,
+-    ): BCP47LanguageTag[];
++    ): UnicodeBCP47LocaleIdentifier[];
+   };
+ }

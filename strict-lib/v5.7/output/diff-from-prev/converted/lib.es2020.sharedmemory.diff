@@ -1,0 +1,136 @@
+diff --git a/v5.6/output/lib-files/lib.es2020.sharedmemory.d.ts b/v5.7/output/lib-files/lib.es2020.sharedmemory.d.ts
+index 5f2fe1cff..efc974b8f 100644
+--- a/v5.6/output/lib-files/lib.es2020.sharedmemory.d.ts
++++ b/v5.7/output/lib-files/lib.es2020.sharedmemory.d.ts
+@@ -1,5 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference path="./lib.es2020.bigint.d.ts" />
++
+ interface Atomics {
+   /**
+    * Adds a value to the value at the given position in the array, returning the original value.
+@@ -7,7 +9,9 @@ interface Atomics {
+    * will block.
+    */
+   add(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -18,7 +22,9 @@ interface Atomics {
+    * write operation against the array will block.
+    */
+   and(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -29,7 +35,9 @@ interface Atomics {
+    * other read or write operation against the array will block.
+    */
+   compareExchange(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     expectedValue: bigint,
+     replacementValue: bigint,
+@@ -41,7 +49,9 @@ interface Atomics {
+    * block.
+    */
+   exchange(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -50,7 +60,12 @@ interface Atomics {
+    * Returns the value at the given position in the array. Until this atomic operation completes,
+    * any other read or write operation against the array will block.
+    */
+-  load(typedArray: BigInt64Array | BigUint64Array, index: number): bigint;
++  load(
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
++    index: number,
++  ): bigint;
+ 
+   /**
+    * Stores the bitwise OR of a value with the value at the given position in the array,
+@@ -58,7 +73,9 @@ interface Atomics {
+    * operation against the array will block.
+    */
+   or(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -68,7 +85,9 @@ interface Atomics {
+    * atomic operation completes, any other read or write operation against the array will block.
+    */
+   store(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -79,7 +98,9 @@ interface Atomics {
+    * array will block.
+    */
+   sub(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;
+@@ -91,7 +112,7 @@ interface Atomics {
+    * `"not-equal"`.
+    */
+   wait(
+-    typedArray: BigInt64Array,
++    typedArray: BigInt64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+     timeout?: number,
+@@ -104,7 +125,11 @@ interface Atomics {
+    * @param index The position in the typedArray to wake up on.
+    * @param count The number of sleeping agents to notify. Defaults to +Infinity.
+    */
+-  notify(typedArray: BigInt64Array, index: number, count?: number): number;
++  notify(
++    typedArray: BigInt64Array<ArrayBufferLike>,
++    index: number,
++    count?: number,
++  ): number;
+ 
+   /**
+    * Stores the bitwise XOR of a value with the value at the given position in the array,
+@@ -112,7 +137,9 @@ interface Atomics {
+    * operation against the array will block.
+    */
+   xor(
+-    typedArray: BigInt64Array | BigUint64Array,
++    typedArray:
++      | BigInt64Array<ArrayBufferLike>
++      | BigUint64Array<ArrayBufferLike>,
+     index: number,
+     value: bigint,
+   ): bigint;

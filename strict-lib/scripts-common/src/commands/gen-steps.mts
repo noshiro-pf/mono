@@ -37,8 +37,8 @@ export const buildGenSteps = (ctx: Context): readonly GenStep[] =>
       fn: () => formatDir(ctx.paths.strictTsLib.output.libFiles.$),
     },
     {
-      name: 'format output-branded/lib-files',
-      fn: () => formatDir(ctx.paths.strictTsLib.outputBranded.libFiles.$),
+      name: 'format output/lib-files-branded',
+      fn: () => formatDir(ctx.paths.strictTsLib.output.libFilesBranded.$),
     },
     {
       name: 'prepareCopiedForDiff',

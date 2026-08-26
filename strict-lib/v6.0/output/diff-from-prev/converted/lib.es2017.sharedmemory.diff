@@ -1,0 +1,10 @@
+diff --git a/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts b/v6.0/output/lib-files/lib.es2017.sharedmemory.d.ts
+index 6dc54bb77..00fbc2fa2 100644
+--- a/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
++++ b/v6.0/output/lib-files/lib.es2017.sharedmemory.d.ts
+@@ -1,5 +1,3 @@
+-/// <reference no-default-lib="true"/>
+-
+ /// <reference path="./lib.es2015.symbol.d.ts" />
+ /// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
+ 

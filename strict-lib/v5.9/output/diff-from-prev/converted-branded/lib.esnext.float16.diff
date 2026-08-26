@@ -1,0 +1,19 @@
+diff --git a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
+index cc295f769..61b14ec7e 100644
+--- a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
++++ b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
+@@ -505,6 +505,14 @@ interface Float16ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySize,
+   ): Float16Array<TArrayBuffer>;
++  new (
++    buffer: ArrayBuffer,
++    byteOffset?: NumberType.TypedArraySize,
++    length?: NumberType.TypedArraySize,
++  ): Float16Array<ArrayBuffer>;
++  new (
++    array: ArrayLike<import('ts-type-forge').Float16> | ArrayBuffer,
++  ): Float16Array<ArrayBuffer>;
+ 
+   /**
+    * The size in bytes of each element in the array.

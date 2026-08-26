@@ -1,0 +1,19 @@
+diff --git a/v5.7/output/lib-files-branded/lib.es2024.object.d.ts b/v5.7/output/lib-files-branded/lib.es2024.object.d.ts
+new file mode 100644
+index 000000000..14e43f298
+--- /dev/null
++++ b/v5.7/output/lib-files-branded/lib.es2024.object.d.ts
+@@ -0,0 +1,13 @@
++/// <reference no-default-lib="true"/>
++
++interface ObjectConstructor {
++  /**
++   * Groups members of an iterable according to the return value of the passed callback.
++   * @param items An iterable.
++   * @param keySelector A callback which will be invoked for each item in items.
++   */
++  groupBy<K extends PropertyKey, T>(
++    items: Iterable<T>,
++    keySelector: (item: T, index: NumberType.ArraySize) => K,
++  ): Partial<Record<K, readonly T[]>>;
++}

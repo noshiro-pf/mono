@@ -57,12 +57,7 @@ const toolingFiles = [
  */
 const config: readonly FlatConfig[] = [
   {
-    ignores: [
-      '**/temp/**',
-      '**/output/**',
-      '**/output-branded/**',
-      'strict-lib/v*/output*/**',
-    ],
+    ignores: ['**/temp/**', '**/output/**', 'strict-lib/v*/output/**'],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: strictLibDir,

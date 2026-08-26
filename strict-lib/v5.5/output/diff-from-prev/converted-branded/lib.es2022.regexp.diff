@@ -1,0 +1,13 @@
+diff --git a/v5.4/output/lib-files-branded/lib.es2022.regexp.d.ts b/v5.5/output/lib-files-branded/lib.es2022.regexp.d.ts
+index 0f2d3dd71..6fd74f871 100644
+--- a/v5.4/output/lib-files-branded/lib.es2022.regexp.d.ts
++++ b/v5.5/output/lib-files-branded/lib.es2022.regexp.d.ts
+@@ -21,7 +21,7 @@ interface RegExpIndicesArray extends Array<
+ 
+ interface RegExp {
+   /**
+-   * Returns a Boolean value indicating the state of the hasIndices flag (d) used with with a regular expression.
++   * Returns a Boolean value indicating the state of the hasIndices flag (d) used with a regular expression.
+    * Default is false. Read-only.
+    */
+   readonly hasIndices: boolean;

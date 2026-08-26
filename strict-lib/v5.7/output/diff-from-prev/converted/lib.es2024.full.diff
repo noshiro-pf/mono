@@ -1,0 +1,14 @@
+diff --git a/v5.7/output/lib-files/lib.es2024.full.d.ts b/v5.7/output/lib-files/lib.es2024.full.d.ts
+new file mode 100644
+index 000000000..2da81c45d
+--- /dev/null
++++ b/v5.7/output/lib-files/lib.es2024.full.d.ts
+@@ -0,0 +1,8 @@
++/// <reference no-default-lib="true"/>
++
++/// <reference path="./lib.es2024.d.ts" />
++/// <reference path="./lib.dom.d.ts" />
++/// <reference path="./lib.webworker.importscripts.d.ts" />
++/// <reference path="./lib.scripthost.d.ts" />
++/// <reference path="./lib.dom.iterable.d.ts" />
++/// <reference path="./lib.dom.asynciterable.d.ts" />

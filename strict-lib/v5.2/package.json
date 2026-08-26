@@ -10,7 +10,7 @@
     "gen:lib-files": "tsx ./scripts/gen-lib-files.mts",
     "gen:packages": "tsx ./scripts/gen-packages.mts",
     "gen:with-codemod-fixed": "tsx ./scripts/gen-with-codemod-fixed.mts",
-    "type-check": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json"
+    "type-check": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json && tsc -p tsconfig.lib-files-check.json && tsc -p tsconfig.lib-files-check.branded.json"
   },
   "devDependencies": {
     "@typescript/lib-decorators": "file:output/lib/libs/decorators",

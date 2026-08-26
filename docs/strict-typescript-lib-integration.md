@@ -1004,22 +1004,24 @@ changesets は**リリースしたパッケージごとにタグを打ち**（`p
 
 #### 差分の機構は開発環境の一部であって、負債ではない
 
-**`temp/`・`diff-from-prev/`・`lib-files/`・`output/diff/` は残す。** 連続バージョン間の
-差分は、**converter script の更新が要るかどうかを判断するための機構**として置かれて
-いる。publish されるアセットには含まれないが、開発には要る。
+**`temp/`・`output/diff-from-prev/`・`output/lib-files*/`・`output/diff-from-official/`
+は残す。** 連続バージョン間の差分は、**converter script の更新が要るかどうかを判断
+するための機構**として置かれている。publish されるアセットには含まれないが、開発には
+要る。（2026-08 の整理でパスを揃えた: `diff-from-prev/` と `output-branded/lib-files/`
+は `output/` 直下へ移り、`output/diff/` は `output/diff-from-official/` になった。）
 
 `gen-version-diff.mts` が読む先を見れば依存関係がはっきりする。
 
-| 差分の種類          | 入力                                             | 出力                                |
-| :------------------ | :----------------------------------------------- | :---------------------------------- |
-| `official`          | `temp/copied`（TypeScript 本体からのコピー原本） | `diff-from-prev/official/`          |
-| `converted`         | `output/lib-files`                               | `diff-from-prev/converted/`         |
-| `converted-branded` | `output-branded/lib-files`                       | `diff-from-prev/converted-branded/` |
+| 差分の種類          | 入力                                             | 出力                                       |
+| :------------------ | :----------------------------------------------- | :----------------------------------------- |
+| `official`          | `temp/copied`（TypeScript 本体からのコピー原本） | `output/diff-from-prev/official/`          |
+| `converted`         | `output/lib-files`                               | `output/diff-from-prev/converted/`         |
+| `converted-branded` | `output/lib-files-branded`                       | `output/diff-from-prev/converted-branded/` |
 
 つまり `temp/copied` は**入力**であり、追跡をやめると `official` 差分が取れなくなる。
 「TypeScript 側が何を変えたか」が見えなくなるということで、それは converter を追随
-させるかどうかの一次情報である。`output/diff/`（変換前後の差分、108 ファイル）も
-同じ性質のものとして残す。
+させるかどうかの一次情報である。`output/diff-from-official/`（変換前後の差分、108
+ファイル）も同じ性質のものとして残す。
 
 **この文書の初版は `temp/**` の追跡をやめる案を挙げていたが、誤りである。** ファイル数
 だけを見て入力と生成物を区別していなかった。削ってよいのは `output` の中の、

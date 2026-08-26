@@ -1,0 +1,12 @@
+diff --git a/v5.6/output/lib-files-branded/lib.es2020.string.d.ts b/v5.7/output/lib-files-branded/lib.es2020.string.d.ts
+index 5af055197..639df38fb 100644
+--- a/v5.6/output/lib-files-branded/lib.es2020.string.d.ts
++++ b/v5.7/output/lib-files-branded/lib.es2020.string.d.ts
+@@ -1,5 +1,7 @@
+ /// <reference no-default-lib="true"/>
+ 
++/// <reference path="./lib.es2015.iterable.d.ts" />
++/// <reference path="./lib.es2020.intl.d.ts" />
+ /// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
+ 
+ interface String {

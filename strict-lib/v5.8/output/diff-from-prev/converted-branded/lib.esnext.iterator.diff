@@ -1,0 +1,13 @@
+diff --git a/v5.7/output/lib-files-branded/lib.esnext.iterator.d.ts b/v5.8/output/lib-files-branded/lib.esnext.iterator.d.ts
+index 3abf8049b..9f6e1bf1f 100644
+--- a/v5.7/output/lib-files-branded/lib.esnext.iterator.d.ts
++++ b/v5.8/output/lib-files-branded/lib.esnext.iterator.d.ts
+@@ -125,7 +125,7 @@ declare global {
+ 
+     /**
+      * Performs the specified action for each element in the iterator.
+-     * @param callbackfn  A function that accepts up to two arguments. forEach calls the callbackfn function one time for each element in the iterator.
++     * @param callbackfn A function that accepts up to two arguments. forEach calls the callbackfn function one time for each element in the iterator.
+      */
+     forEach(callbackfn: (value: T, index: NumberType.ArraySize) => void): void;
+ 

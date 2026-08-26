@@ -1,0 +1,28 @@
+diff --git a/v5.2/output/lib-files/lib.es5.d.ts b/v5.3/output/lib-files/lib.es5.d.ts
+index fe0021383..31bd8a325 100644
+--- a/v5.2/output/lib-files/lib.es5.d.ts
++++ b/v5.3/output/lib-files/lib.es5.d.ts
+@@ -711,7 +711,8 @@ interface ImportMeta {}
+  * augmented via interface merging.
+  */
+ interface ImportCallOptions {
+-  readonly assert?: ImportAssertions;
++  /** @deprecated*/ readonly assert?: ImportAssertions;
++  readonly with?: ImportAttributes;
+ }
+ 
+ /**
+@@ -721,6 +722,13 @@ interface ImportAssertions {
+   readonly [key: string]: string;
+ }
+ 
++/**
++ * The type for the `with` property of the optional second argument to `import()`.
++ */
++interface ImportAttributes {
++  readonly [key: string]: string;
++}
++
+ interface Math {
+   /** The mathematical constant e. This is Euler's number, the base of natural logarithms. */
+   readonly E: number;
