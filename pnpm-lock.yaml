@@ -1721,10 +1721,6 @@ importers:
         version: link:../../libs/ts-fortress
 
   strict-lib/v5.0:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -1774,6 +1770,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.0-webworker@file:strict-lib/v5.0/output/lib/libs/webworker(typescript@5.0.4)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -1809,10 +1808,6 @@ importers:
         version: 5.0.4
 
   strict-lib/v5.1:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -1862,6 +1857,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.1-webworker@file:strict-lib/v5.1/output/lib/libs/webworker(typescript@5.1.6)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -1897,10 +1895,6 @@ importers:
         version: 5.1.6
 
   strict-lib/v5.2:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -1950,6 +1944,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.2-webworker@file:strict-lib/v5.2/output/lib/libs/webworker(typescript@5.2.2)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -1985,10 +1982,6 @@ importers:
         version: 5.2.2
 
   strict-lib/v5.3:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2038,6 +2031,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.3-webworker@file:strict-lib/v5.3/output/lib/libs/webworker(typescript@5.3.3)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2073,10 +2069,6 @@ importers:
         version: 5.3.3
 
   strict-lib/v5.4:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2126,6 +2118,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.4-webworker@file:strict-lib/v5.4/output/lib/libs/webworker(typescript@5.4.5)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2161,10 +2156,6 @@ importers:
         version: 5.4.5
 
   strict-lib/v5.5:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2214,6 +2205,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.5-webworker@file:strict-lib/v5.5/output/lib/libs/webworker(typescript@5.5.4)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2249,10 +2243,6 @@ importers:
         version: 5.5.4
 
   strict-lib/v5.6:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2302,6 +2292,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.6-webworker@file:strict-lib/v5.6/output/lib/libs/webworker(typescript@5.6.3)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2331,10 +2324,6 @@ importers:
         version: 5.6.3
 
   strict-lib/v5.7:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2387,6 +2376,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.7-webworker@file:strict-lib/v5.7/output/lib/libs/webworker(typescript@5.7.2)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2416,10 +2408,6 @@ importers:
         version: 5.7.2
 
   strict-lib/v5.8:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2472,6 +2460,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.8-webworker@file:strict-lib/v5.8/output/lib/libs/webworker(typescript@5.8.3)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2501,10 +2492,6 @@ importers:
         version: 5.8.3
 
   strict-lib/v5.9:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2557,6 +2544,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v5.9-webworker@file:strict-lib/v5.9/output/lib/libs/webworker(typescript@5.9.3)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2586,10 +2576,6 @@ importers:
         version: 5.9.3
 
   strict-lib/v6.0:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2645,6 +2631,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v6.0-webworker@file:strict-lib/v6.0/output/lib/libs/webworker(typescript@6.0.3)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -2662,10 +2651,6 @@ importers:
         version: 6.0.3
 
   strict-lib/v7.0:
-    dependencies:
-      strict-ts-lib-scripts-common:
-        specifier: workspace:*
-        version: link:../scripts-common
     devDependencies:
       '@typescript/lib-decorators':
         specifier: file:output/lib/libs/decorators
@@ -2721,6 +2706,9 @@ importers:
       '@typescript/lib-webworker':
         specifier: file:output/lib/libs/webworker
         version: strict-ts-lib-v7.0-webworker@file:strict-lib/v7.0/output/lib/libs/webworker(typescript@7.0.2)
+      strict-ts-lib-scripts-common:
+        specifier: workspace:*
+        version: link:../scripts-common
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge

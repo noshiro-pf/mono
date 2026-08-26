@@ -12,9 +12,6 @@
     "gen:with-codemod-fixed": "tsx ./scripts/gen-with-codemod-fixed.mts",
     "type-check": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json"
   },
-  "dependencies": {
-    "strict-ts-lib-scripts-common": "workspace:*"
-  },
   "devDependencies": {
     "@typescript/lib-decorators": "file:output/lib/libs/decorators",
     "@typescript/lib-dom": "file:output/lib/libs/dom",
@@ -32,6 +29,7 @@
     "@typescript/lib-esnext": "file:output/lib/libs/esnext",
     "@typescript/lib-scripthost": "file:output/lib/libs/scripthost",
     "@typescript/lib-webworker": "file:output/lib/libs/webworker",
+    "strict-ts-lib-scripts-common": "workspace:*",
     "ts-type-forge": "workspace:*",
     "typescript": "5.0.4"
   }
