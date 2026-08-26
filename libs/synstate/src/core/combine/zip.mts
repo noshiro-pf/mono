@@ -176,7 +176,7 @@ if (import.meta.vitest !== undefined) {
   const _zi = zip([
     r1.pipe(withInitialValue(0)),
     r2.pipe(withInitialValue('0')),
-  ] as const);
+  ]);
 
   expectType<typeof _z, SyncChildObservable<readonly [number, string]>>('<=');
 

@@ -20,6 +20,8 @@ export const appendAsConstTransformer = (
   const optionsInternal: AppendAsConstTransformerOptionsInternal = {
     applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
     ignoredPrefixes: ignorePrefixes,
+    removeAsConstForConstTypeParameters:
+      options?.removeAsConstForConstTypeParameters ?? true,
 
     debugPrint: options?.debug === true ? console.debug : () => {},
     replaceNode:
@@ -43,6 +45,10 @@ export const appendAsConstTransformer = (
           optionsInternal,
         );
       }
+
+      if (optionsInternal.removeAsConstForConstTypeParameters) {
+        removeAsConstInConstTypeParameterArgs(sourceAst, optionsInternal);
+      }
     },
   };
 };
@@ -62,8 +68,22 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
    */
   ignorePrefixes?: string[];
 
-  // TODO
-  // ignoreConstTypeParameter?: boolean;
+  /**
+   * Whether to remove redundant `as const` assertions from call arguments
+   * whose corresponding parameter type is exactly a `const`-modified type
+   * parameter.
+   *
+   * (e.g. `f([1, 2] as const)` becomes `f([1, 2])` for
+   * `function f<const T>(x: T): T`, because the `const` type parameter
+   * already makes TypeScript infer the argument as if it were annotated
+   * with `as const`.)
+   *
+   * Only applies when the callee resolves to a single call signature within
+   * the transformed file itself; imported callees are left as they are.
+   *
+   * @default true
+   */
+  removeAsConstForConstTypeParameters?: boolean;
 
   debug?: boolean;
 }>;
@@ -71,6 +91,7 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
 type AppendAsConstTransformerOptionsInternal = DeepReadonly<{
   applyLevel: 'all' | 'avoidInFunctionArgs';
   ignoredPrefixes: ISet<string>;
+  removeAsConstForConstTypeParameters: boolean;
 
   debugPrint: (...args: readonly unknown[]) => void;
   replaceNode: (node: tsm.Node, newNodeText: string) => void;
@@ -363,4 +384,232 @@ const transformNode = (
 
     // return;
   }
+};
+
+/**
+ * Removes redundant `as const` assertions from call arguments whose
+ * corresponding parameter type is exactly a `const`-modified type parameter
+ * (e.g. `f([1, 2] as const)` for `function f<const T>(x: T): T`).
+ *
+ * A `const` type parameter makes TypeScript treat every inference candidate
+ * as if it were annotated with `as const`, so when the parameter type is the
+ * bare type parameter itself, removing the assertion cannot change the
+ * inferred type. Conservative bail-outs (the `as const` is kept) when:
+ *
+ * - the callee does not resolve to exactly one call signature (unresolved
+ *   imports resolve to none, since each file is transformed in an isolated
+ *   single-file project; overloaded functions resolve to several),
+ * - the call has explicit type arguments (inference is not involved),
+ * - the argument is a spread argument or follows one (its parameter position
+ *   is not statically known),
+ * - the parameter type is not the bare type parameter (e.g. `readonly T[]`).
+ */
+const removeAsConstInConstTypeParameterArgs = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceAst: tsm.SourceFile,
+  options: AppendAsConstTransformerOptionsInternal,
+): void => {
+  // Reversed so that calls nested inside another call's arguments are
+  // processed before the outer call replaces (and thereby forgets) them.
+  for (const call of sourceAst
+    .getDescendantsOfKind(tsm.SyntaxKind.CallExpression)
+    .toReversed()) {
+    if (call.wasForgotten()) {
+      continue;
+    }
+
+    const args = call.getArguments();
+
+    // Cheap syntactic pre-check before touching the type checker
+    if (!args.some(isAsConstNode)) {
+      continue;
+    }
+
+    if (hasDisableNextLineComment(call, TRANSFORMER_NAME)) {
+      continue;
+    }
+
+    const variableStatement = call.getFirstAncestorByKind(
+      tsm.SyntaxKind.VariableStatement,
+    );
+
+    if (
+      variableStatement !== undefined &&
+      hasDisableNextLineComment(variableStatement, TRANSFORMER_NAME)
+    ) {
+      continue;
+    }
+
+    // With explicit type arguments no inference happens, so the `as const`
+    // may be load-bearing for assignability.
+    if (!Arr.isEmpty(call.getTypeArguments())) {
+      continue;
+    }
+
+    const callTarget = resolveSingleSignatureCallTarget(call);
+
+    if (callTarget === undefined) {
+      continue;
+    }
+
+    removeAsConstArgsOfCall(args, callTarget, options);
+  }
+};
+
+const removeAsConstArgsOfCall = (
+  args: readonly tsm.Node[],
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  callTarget: ResolvedCallTarget,
+  options: AppendAsConstTransformerOptionsInternal,
+): void => {
+  // Argument positions at or after a spread argument cannot be mapped to a
+  // parameter statically.
+  const firstSpreadIndex = args.findIndex((a) =>
+    a.isKind(tsm.SyntaxKind.SpreadElement),
+  );
+
+  const mappableArgCount =
+    firstSpreadIndex === -1 ? args.length : firstSpreadIndex;
+
+  for (const [argumentIndex, argument] of args.entries()) {
+    if (argumentIndex >= mappableArgCount) {
+      return;
+    }
+
+    if (argument.wasForgotten() || !isAsConstNode(argument)) {
+      continue;
+    }
+
+    if (hasDisableNextLineComment(argument, TRANSFORMER_NAME)) {
+      continue;
+    }
+
+    const parameter = getMatchedParameter(callTarget.parameters, argumentIndex);
+
+    if (
+      parameter === undefined ||
+      !isBareConstTypeParameterReference(
+        parameter,
+        callTarget.constTypeParameterNames,
+      )
+    ) {
+      continue;
+    }
+
+    options.debugPrint(
+      'removing redundant as const in const type parameter argument',
+      argument.getText(),
+    );
+
+    options.replaceNode(argument, argument.getExpression().getText());
+  }
+};
+
+type ResolvedCallTarget = Readonly<{
+  parameters: readonly tsm.ParameterDeclaration[];
+  constTypeParameterNames: ISet<string>;
+}>;
+
+/**
+ * Resolves the callee of a call expression to the declaration of its single
+ * call signature, and collects the names of that declaration's
+ * `const`-modified type parameters.
+ *
+ * Returns `undefined` when the callee does not resolve to exactly one call
+ * signature, the resolved declaration has no parameters or type parameters,
+ * or none of the type parameters carry the `const` modifier.
+ */
+const resolveSingleSignatureCallTarget = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  call: tsm.CallExpression,
+): ResolvedCallTarget | undefined => {
+  // 0 signatures: the callee is unresolved (e.g. imported, since each file
+  // is transformed in an isolated single-file project).
+  // 2+ signatures: overloads, where removing `as const` could change which
+  // overload is selected.
+  if (
+    !Arr.isFixedLengthArray(
+      1,
+      call.getExpression().getType().getCallSignatures(),
+    )
+  ) {
+    return undefined;
+  }
+
+  const declaration = call
+    .getProject()
+    .getTypeChecker()
+    .getResolvedSignature(call)
+    ?.getDeclaration();
+
+  if (
+    declaration === undefined ||
+    !tsm.Node.isParametered(declaration) ||
+    !tsm.Node.isTypeParametered(declaration)
+  ) {
+    return undefined;
+  }
+
+  // Only type parameters declared on the call's own signature are inferred
+  // at the call site; a `const` type parameter of an enclosing declaration
+  // (e.g. a generic class containing this method) is already fixed there.
+  const constTypeParameterNames = ISet.create(
+    declaration
+      .getTypeParameters()
+      .filter((tp) => tp.hasModifier(tsm.SyntaxKind.ConstKeyword))
+      .map((tp) => tp.getName()),
+  );
+
+  if (constTypeParameterNames.size === 0) {
+    return undefined;
+  }
+
+  return {
+    parameters: declaration.getParameters(),
+    constTypeParameterNames,
+  } as const;
+};
+
+const getMatchedParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  parameters: readonly tsm.ParameterDeclaration[],
+  argumentIndex: number,
+): tsm.ParameterDeclaration | undefined => {
+  if (argumentIndex < parameters.length) {
+    return parameters[argumentIndex];
+  }
+
+  const lastParameter = parameters.at(-1);
+
+  return lastParameter?.isRestParameter() === true ? lastParameter : undefined;
+};
+
+/**
+ * Whether the parameter's declared type is exactly a bare reference to one of
+ * the given `const`-modified type parameters (i.e. `x: T`, not `x: readonly
+ * T[]` or `x: Wrapper<T>` — there the argument expression's own type is still
+ * observable, so the `as const` is kept).
+ */
+const isBareConstTypeParameterReference = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  parameter: tsm.ParameterDeclaration,
+  constTypeParameterNames: ISet<string>,
+): boolean => {
+  const typeNode = parameter.getTypeNode();
+
+  if (typeNode === undefined) {
+    return false;
+  }
+
+  if (!typeNode.isKind(tsm.SyntaxKind.TypeReference)) {
+    return false;
+  }
+
+  const typeName = typeNode.getTypeName();
+
+  return (
+    typeName.isKind(tsm.SyntaxKind.Identifier) &&
+    Arr.isEmpty(typeNode.getTypeArguments()) &&
+    constTypeParameterNames.has(typeName.getText())
+  );
 };

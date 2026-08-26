@@ -11,10 +11,12 @@ import { transformSourceCode } from './transform-source-code.mjs';
 const testFn = async ({
   source,
   expected,
+  options,
   debug,
 }: Readonly<{
   source: string;
   expected: string;
+  options?: Parameters<typeof appendAsConstTransformer>[0];
   debug?: boolean;
 }>): Promise<void> => {
   if (debug !== true) {
@@ -26,7 +28,9 @@ const testFn = async ({
   }
 
   const transformed = await formatter(
-    transformSourceCode(source, false, [appendAsConstTransformer({ debug })]),
+    transformSourceCode(source, false, [
+      appendAsConstTransformer({ ...options, debug }),
+    ]),
   );
 
   const expectedFormatted = await formatter(expected);
@@ -694,6 +698,174 @@ describe(appendAsConstTransformer, () => {
           const b = [4, 5, 6] as const;
           const c = [7, 8, 9] as const;
         `,
+      },
+    ])('$name', testFn);
+  });
+
+  describe('Redundant as const in const type parameter arguments', () => {
+    test.each([
+      {
+        name: 'const type parameter (function declaration) should remove as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2] as const);
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2]);
+        `,
+      },
+      {
+        name: 'const type parameter (expression statement call) should remove as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          f({ x: 1 } as const);
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          f({ x: 1 });
+        `,
+      },
+      {
+        name: 'const type parameter (arrow function) should remove as const',
+        source: dedent`
+          const f = <const S,>(x: S): S => x;
+          const a = f([1, 2] as const);
+        `,
+        expected: dedent`
+          const f = <const S,>(x: S): S => x;
+          const a = f([1, 2]);
+        `,
+      },
+      {
+        name: 'const type parameter (object literal method) should remove as const',
+        source: dedent`
+          const Obj = { m: <const U,>(x: U): U => x } as const;
+          const a = Obj.m([1] as const);
+        `,
+        expected: dedent`
+          const Obj = { m: <const U,>(x: U): U => x } as const;
+          const a = Obj.m([1]);
+        `,
+      },
+      {
+        name: 'const rest type parameter should remove as const',
+        source: dedent`
+          function rest<const T extends readonly unknown[]>(...xs: T): T { return xs; }
+          const r = rest(1 as const, [2, 3] as const);
+        `,
+        expected: dedent`
+          function rest<const T extends readonly unknown[]>(...xs: T): T { return xs; }
+          const r = rest(1, [2, 3]);
+        `,
+      },
+      {
+        name: 'mixed const and non-const type parameters should only remove for const ones',
+        source: dedent`
+          function h<const A, B>(a: A, b: B): A { return a; }
+          const m = h([1] as const, [2] as const);
+        `,
+        expected: dedent`
+          function h<const A, B>(a: A, b: B): A { return a; }
+          const m = h([1], [2] as const);
+        `,
+      },
+      {
+        name: 'non-const type parameter should keep as const',
+        source: dedent`
+          function g<T>(x: T): T { return x; }
+          const b = g([1, 2] as const);
+        `,
+        expected: dedent`
+          function g<T>(x: T): T { return x; }
+          const b = g([1, 2] as const);
+        `,
+      },
+      {
+        name: 'imported callee should keep as const',
+        source: dedent`
+          import { f } from './other.mjs';
+          const a = f([1, 2] as const);
+        `,
+        expected: dedent`
+          import { f } from './other.mjs';
+          const a = f([1, 2] as const);
+        `,
+      },
+      {
+        name: 'overloaded function should keep as const',
+        source: dedent`
+          function ov<const T>(x: T): T;
+          function ov(x: number): number;
+          function ov(x: unknown): unknown { return x; }
+          const e = ov([1] as const);
+        `,
+        expected: dedent`
+          function ov<const T>(x: T): T;
+          function ov(x: number): number;
+          function ov(x: unknown): unknown { return x; }
+          const e = ov([1] as const);
+        `,
+      },
+      {
+        name: 'explicit type arguments should keep as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          const j = f<readonly [1, 2]>([1, 2] as const);
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          const j = f<readonly [1, 2]>([1, 2] as const);
+        `,
+      },
+      {
+        name: 'non-bare type parameter reference (readonly T[]) should keep as const',
+        source: dedent`
+          function ro<const T>(xs: readonly T[]): T { return xs[0] as T; }
+          const o = ro([1, 2] as const);
+        `,
+        expected: dedent`
+          function ro<const T>(xs: readonly T[]): T { return xs[0] as T; }
+          const o = ro([1, 2] as const);
+        `,
+      },
+      {
+        name: 'argument after spread argument should keep as const',
+        source: dedent`
+          function f<const T>(a: T, b: T): T { return a; }
+          const xs = [1, 2] as const;
+          const s = f(...xs, [3] as const);
+        `,
+        expected: dedent`
+          function f<const T>(a: T, b: T): T { return a; }
+          const xs = [1, 2] as const;
+          const s = f(...xs, [3] as const);
+        `,
+      },
+      {
+        name: 'transformer-ignore-next-line should keep as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          // transformer-ignore-next-line
+          const a = f([1, 2] as const);
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          // transformer-ignore-next-line
+          const a = f([1, 2] as const);
+        `,
+      },
+      {
+        name: 'removeAsConstForConstTypeParameters: false should keep as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2] as const);
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2] as const);
+        `,
+        options: { removeAsConstForConstTypeParameters: false },
       },
     ])('$name', testFn);
   });

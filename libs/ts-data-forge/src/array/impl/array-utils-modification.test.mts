@@ -257,7 +257,7 @@ describe('Arr modifications', () => {
         xs: T,
       ): Readonly<{ [K in keyof T]: 0 }> => toFilled(xs, 0);
 
-      const result = blank([1, 2, 3] as const);
+      const result = blank([1, 2, 3]);
 
       expectType<typeof result, FixedLengthTuple<3, 0>>('=');
 
@@ -269,7 +269,7 @@ describe('Arr modifications', () => {
         xs: T,
       ): Readonly<{ [K in keyof T]: 0 }> => toFilled(0)(xs);
 
-      const result = blank([1, 2] as const);
+      const result = blank([1, 2]);
 
       expectType<typeof result, FixedLengthTuple<2, 0>>('=');
 
@@ -319,7 +319,7 @@ describe('Arr modifications', () => {
         xs: T,
       ): Readonly<{ [K in keyof T]: number }> => toRangeFilled(xs, 0, [1, 2]);
 
-      const result = blankMiddle([1, 2, 3] as const);
+      const result = blankMiddle([1, 2, 3]);
 
       expectType<typeof result, FixedLengthTuple<3, number>>('=');
 

@@ -52,6 +52,7 @@ Options:
     - `'avoidInFunctionArgs'`: Avoids adding `as const` inside function call arguments
     - `'all'`: Applies `as const` everywhere
 - `ignorePrefixes`: Array of string prefixes for identifiers that should not have `as const` added (default: `['mut_', '#mut_', '_mut_', 'draft']`)
+- `removeAsConstForConstTypeParameters`: Whether to remove redundant `as const` assertions from call arguments whose corresponding parameter type is exactly a `const`-modified type parameter (default: `true`). Only applies when the callee resolves to a single call signature within the transformed file itself; imported callees, overloads, calls with explicit type arguments and spread arguments are left as they are.
 
 Example:
 
@@ -65,6 +66,20 @@ const obj = { a: 1, b: 2 };
 const arr2 = [1, 2, 3] as const;
 
 const obj2 = { a: 1, b: 2 } as const;
+```
+
+Example (`removeAsConstForConstTypeParameters`):
+
+```ts
+function f<const T>(x: T): T {
+    return x;
+}
+
+// Before
+const a = f([1, 2] as const);
+
+// After (the `const` type parameter already infers `readonly [1, 2]`)
+const a2 = f([1, 2]);
 ```
 
 ### 2. `convertToReadonlyTransformer`
