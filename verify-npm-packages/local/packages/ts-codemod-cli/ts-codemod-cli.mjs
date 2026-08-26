@@ -13,21 +13,32 @@ const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ts-codemod-cli-'));
 
 const file = path.join(dir, 'target.mts');
 
-fs.writeFileSync(file, 'export const xs: string[] = [];\n');
+// Two transformers in one run: `convert-to-readonly` on the annotation and
+// `append-as-const` on the literal. The single command taking a `--transformer`
+// per transformer is what replaced the one-command-per-transformer bins.
+fs.writeFileSync(
+  file,
+  'export const xs: string[] = [];\nexport const o = { a: 1 };\n',
+);
 
-execFileSync(bin('convert-to-readonly'), [file], { stdio: 'inherit' });
+execFileSync(
+  bin('ts-codemod'),
+  [
+    '--transformer',
+    'append-as-const',
+    '--transformer',
+    'convert-to-readonly',
+    file,
+  ],
+  { stdio: 'inherit' },
+);
 
-assert.match(fs.readFileSync(file, 'utf8'), /readonly\s+string\[\]/u);
+const transformed = fs.readFileSync(file, 'utf8');
 
-for (const name of [
-  'append-as-const',
-  'convert-interface-to-type',
-  'convert-to-readonly',
-  'replace-any-with-unknown',
-  'replace-record-with-unknown-record',
-]) {
-  execFileSync(bin(name), ['--help'], { stdio: 'ignore' });
-}
+assert.match(transformed, /readonly\s+string\[\]/u);
+assert.match(transformed, /as const/u);
+
+execFileSync(bin('ts-codemod'), ['--help'], { stdio: 'ignore' });
 
 fs.rmSync(dir, { recursive: true, force: true });
 
