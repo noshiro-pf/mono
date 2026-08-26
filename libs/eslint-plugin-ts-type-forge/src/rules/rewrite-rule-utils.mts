@@ -5,7 +5,8 @@ import { buildTypeImportFix } from './import-utils.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
-export type TupleRewrite = Readonly<{
+/** One deterministic replacement of a type node by a named ts-type-forge type. */
+export type TypeRewrite = Readonly<{
   node: TSESTree.Node;
   canonicalName: string;
   /** Text inside the `<...>` of the replacement, e.g. `'2, string'`. */
@@ -21,9 +22,9 @@ export type TupleRewrite = Readonly<{
  * span — so spreading them across reports makes the fixes conflict and only one
  * survives per pass.
  */
-export const reportTupleRewrites = <MessageIds extends string>(
+export const reportTypeRewrites = <MessageIds extends string>(
   context: TSESLint.RuleContext<MessageIds, readonly unknown[]>,
-  rewrites: readonly TupleRewrite[],
+  rewrites: readonly TypeRewrite[],
   messageId: MessageIds,
   importStyle: ImportStyle,
 ): void => {

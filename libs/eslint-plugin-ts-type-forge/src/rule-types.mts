@@ -77,6 +77,50 @@ namespace PreferCanonicalLengthConstrainedTuple {
 }
 
 /**
+ * @description Replace `Mutable<Record<K, V>>` (and `Mutable` applied to `ReadonlyRecord` / `MutableRecord`) with the canonical ts-type-forge `MutableRecord<K, V>`.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferCanonicalMutableRecord {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "importStyle": {
+   *         "type": "string",
+   *         "enum": [
+   *           "global",
+   *           "named"
+   *         ],
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = NonNullable<
+    RuleOptionsOf<'prefer-canonical-mutable-record'>[0]
+  >;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Replace the built-in `Record` with the ts-type-forge `ReadonlyRecord` or `MutableRecord`, so that the mutability of the record is stated rather than implied.
  *
  *  ```md
@@ -166,12 +210,14 @@ namespace PreferStrictOrRelaxedUtilityType {
 
 export type EslintTsTypeForgeRules = Readonly<{
   'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.RuleEntry;
+  'ts-type-forge/prefer-canonical-mutable-record': PreferCanonicalMutableRecord.RuleEntry;
   'ts-type-forge/prefer-readonly-or-mutable-record': PreferReadonlyOrMutableRecord.RuleEntry;
   'ts-type-forge/prefer-strict-or-relaxed-utility-type': PreferStrictOrRelaxedUtilityType.RuleEntry;
 }>;
 
 export type EslintTsTypeForgeRulesOption = Readonly<{
   'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.Options;
+  'ts-type-forge/prefer-canonical-mutable-record': PreferCanonicalMutableRecord.Options;
   'ts-type-forge/prefer-readonly-or-mutable-record': PreferReadonlyOrMutableRecord.Options;
   'ts-type-forge/prefer-strict-or-relaxed-utility-type': PreferStrictOrRelaxedUtilityType.Options;
 }>;

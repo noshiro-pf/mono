@@ -75,6 +75,7 @@ export default [
 | Rule                                        | Fix        | Description                                                                               |
 | :------------------------------------------ | :--------- | :---------------------------------------------------------------------------------------- |
 | `prefer-canonical-length-constrained-tuple` | autofix    | Replace hand-rolled uniform tuple spellings with the canonical ts-type-forge tuple type.  |
+| `prefer-canonical-mutable-record`           | autofix    | Replace `Mutable<Record<K, V>>` with the canonical `MutableRecord<K, V>`.                 |
 | `prefer-strict-or-relaxed-utility-type`     | suggestion | Replace `Exclude` / `Extract` / `Omit` / `Pick` with the `Strict*` or `Relaxed*` variant. |
 | `prefer-readonly-or-mutable-record`         | suggestion | Replace `Record` with `ReadonlyRecord` or `MutableRecord`.                                |
 
@@ -126,6 +127,28 @@ better as-is than `FixedLengthTuple<1, V>`.
 - optional members (`readonly [V, V?]`) and rest-only tuples (`[...V[]]`);
 - files that already bind the target name to something else (a local alias, or
   an import from another module).
+
+### `prefer-canonical-mutable-record`
+
+`Mutable` strips the `readonly` modifier from every property, so applied to a
+record utility it spells in two steps what `MutableRecord` says in one. The
+rewrite is exactly type-preserving, so this rule is an autofix. `Mutable`
+applied to `ReadonlyRecord` or (redundantly) to `MutableRecord` collapses to
+the same type and is normalized the same way.
+
+```ts
+// ❌
+type Counters = Mutable<Record<string, number>>;
+type Draft = Mutable<ReadonlyRecord<string, Item>>;
+
+// ✅
+type Counters = MutableRecord<string, number>;
+type Draft = MutableRecord<string, Item>;
+```
+
+Qualified names (`Utils.Mutable<…>`) and files that declare or import their own
+`Mutable` / `Record` / … are left alone — those spellings do not denote the
+ts-type-forge (or standard-library) types this rule reasons about.
 
 ### `prefer-strict-or-relaxed-utility-type`
 

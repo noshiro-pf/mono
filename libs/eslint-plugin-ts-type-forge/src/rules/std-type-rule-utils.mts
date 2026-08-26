@@ -1,10 +1,10 @@
 import {
   AST_NODE_TYPES,
-  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { isLocallyBound } from './ast-utils.mjs';
 import { resolveTypeName, type ImportStyle } from './import-style.mjs';
 import { buildTypeImportFix } from './import-utils.mjs';
 
@@ -81,23 +81,3 @@ export const reportStdTypeReference = <MessageIds extends string>(
 /** `['StrictPick', 'RelaxedPick']` → `` '`StrictPick` or `RelaxedPick`' ``. */
 const formatAlternatives = (candidates: readonly string[]): string =>
   candidates.map((candidate) => `\`${candidate}\``).join(' or ');
-
-/**
- * Whether `name` resolves to a declaration in this file (a type alias, an
- * interface, a class, an import, …) rather than to the ambient standard-library
- * type of the same name.
- *
- * The `defs` check is what separates the two: ESLint materializes an *implicit*
- * global variable for every unresolved reference, so `findVariable` also
- * succeeds for `Exclude` in a file that never declares it. Only a variable with
- * at least one definition was actually written down somewhere in this file.
- */
-const isLocallyBound = (
-  sourceCode: TSESLint.SourceCode,
-  node: TSESTree.Node,
-  name: string,
-): boolean => {
-  const variable = ASTUtils.findVariable(sourceCode.getScope(node), name);
-
-  return variable !== null && Arr.isNonEmpty(variable.defs);
-};

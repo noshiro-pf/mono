@@ -13,7 +13,7 @@ import {
   DEFAULT_IMPORT_STYLE,
   IMPORT_STYLE_SCHEMA_PROPERTY,
 } from './import-style.mjs';
-import { reportTupleRewrites, type TupleRewrite } from './tuple-rule-utils.mjs';
+import { reportTypeRewrites, type TypeRewrite } from './rewrite-rule-utils.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -75,7 +75,7 @@ export const preferCanonicalLengthConstrainedTuple: TSESLint.RuleModule<
 
     const maxLength = options?.maxLength ?? DEFAULT_MAX_TUPLE_LENGTH;
 
-    const mut_rewrites: TupleRewrite[] = [];
+    const mut_rewrites: TypeRewrite[] = [];
 
     return {
       TSTupleType: (node) => {
@@ -97,7 +97,7 @@ export const preferCanonicalLengthConstrainedTuple: TSESLint.RuleModule<
         });
       },
       'Program:exit': () => {
-        reportTupleRewrites(
+        reportTypeRewrites(
           context,
           mut_rewrites,
           'useCanonicalTuple',
