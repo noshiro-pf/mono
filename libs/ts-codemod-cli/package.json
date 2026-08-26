@@ -22,11 +22,7 @@
   ],
   "type": "module",
   "bin": {
-    "append-as-const": "./dist/cmd/append-as-const.mjs",
-    "convert-interface-to-type": "./dist/cmd/convert-interface-to-type.mjs",
-    "convert-to-readonly": "./dist/cmd/convert-to-readonly.mjs",
-    "replace-any-with-unknown": "./dist/cmd/replace-any-with-unknown.mjs",
-    "replace-record-with-unknown-record": "./dist/cmd/replace-record-with-unknown-record.mjs"
+    "ts-codemod": "./dist/cmd/ts-codemod.mjs"
   },
   "files": [
     "src",

@@ -145,5 +145,5 @@ git タグも失敗したパッケージの分だけが作られる。
 ```sh
 mkdir /tmp/verify && cd /tmp/verify && npm init -y
 npm i -D ts-codemod-cli
-npx convert-to-readonly --help
+npx ts-codemod --help
 ```
