@@ -21,7 +21,7 @@ This library offers a comprehensive suite of type-level utilities, including:
 - **Array and Tuple Utilities**: Type-safe operations with `List` and `Tuple` namespaces for complex array manipulations.
 - **Record Manipulation**: Deep operations like `DeepReadonly`, `DeepPartial`, and advanced path-based record updates.
 - **Type-Level Arithmetic**: Integer operations, ranges (`UintRange`), and mathematical type computations.
-- **Global Type Availability**: **No need for import statements** when using Triple-Slash Directives.
+- **Global Type Availability**: **No need for import statements** when the ambient globals are loaded, through either `compilerOptions.types` or a Triple-Slash Directive.
 - **Zero Runtime Cost**: Pure type-level operations with no runtime dependencies.
 - **Comprehensive Testing**: Thoroughly tested for type correctness with custom type-testing utilities.
 
@@ -77,8 +77,29 @@ There are two ways to use the types provided by `ts-type-forge`:
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```
 
-2. **Triple-Slash Directive (opt-in to ambient access):**
-   When you prefer ambient access, add `/// <reference types="ts-type-forge/global" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file included in the tsconfig.json). This makes every type provided by `ts-type-forge` globally available throughout your project — useful for prototyping or for projects that already rely on ambient typings.
+2. **Ambient Access (opt-in):**
+   When you prefer ambient access, load the `ts-type-forge/global` subpath. This makes every type provided by `ts-type-forge` globally available throughout your project — useful for prototyping or for projects that already rely on ambient typings. There are two ways to load it, and they are equivalent: `ts-type-forge/global` is resolved as a type reference either way.
+
+    **a. `compilerOptions.types` in tsconfig.json** — a single entry, with no source file to add:
+
+    ```json
+    {
+        "compilerOptions": {
+            "moduleResolution": "nodenext",
+            "types": ["ts-type-forge/global"]
+        }
+    }
+    ```
+
+    ```ts
+    // src/types/dice.ts
+    // No import needed
+    export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
+    ```
+
+    Note that `types` replaces TypeScript's automatic `@types` inclusion with exactly what you list, so keep the other ambient packages your project relies on in the array — for example `"types": ["node", "ts-type-forge/global"]`.
+
+    **b. Triple-slash directive** — add `/// <reference types="ts-type-forge/global" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file included in the tsconfig.json). Reach for this when the opt-in should be visible in the source, or when the tsconfig is out of your hands.
 
     ```ts
     // src/globals.d.ts or any other .ts file
@@ -88,6 +109,8 @@ There are two ways to use the types provided by `ts-type-forge`:
     // No import needed
     export type DiceValue = UintRange<1, 7>; // 1 | 2 | 3 | 4 | 5 | 6
     ```
+
+    Either form needs a `moduleResolution` that reads the package's `exports` map — `node16`, `nodenext` or `bundler`. The legacy `node` (`node10`) resolution does not see the `./global` subpath and reports `TS2688: Cannot find type definition file for 'ts-type-forge/global'`.
 
 ## Core Modules
 
@@ -832,7 +855,7 @@ For detailed information on all types, see the [Full API Reference](https://nosh
 
 - This library is **type-level only** with zero runtime dependencies and no runtime cost.
 - All types are designed to work seamlessly with TypeScript's strict mode settings.
-- The library supports both explicit imports and global type availability via triple-slash directives.
+- The library supports both explicit imports and global type availability via the `ts-type-forge/global` subpath (`compilerOptions.types` or a triple-slash directive).
 - Custom type-testing utilities ensure all operations work correctly at compile time.
 
 ## Runtime Type Guards with ts-data-forge

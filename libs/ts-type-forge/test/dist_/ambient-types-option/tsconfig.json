@@ -1,25 +1,26 @@
 {
   // Type-checks the built `dist/global.d.mts` output through the real
-  // package.json `exports['./global']` entry, referenced the way the README
-  // instructs consumers to load the ambient globals from a source file
-  // (`/// <reference types="ts-type-forge/global" />`); the other form the
-  // README documents — naming the subpath in `compilerOptions.types` — is
-  // covered by ../ambient-types-option/.
+  // package.json `exports['./global']` entry, loaded the second way the README
+  // instructs consumers to opt in to the ambient globals: naming the subpath in
+  // `compilerOptions.types` instead of writing a triple-slash directive (see
+  // ../ambient/, which covers that form). Both go through the same type
+  // reference resolution, so this program asserts the tsconfig-only form
+  // really does reach the same declarations — no source file involved.
+  //
   // `scripts/cmd/build.mts` materializes a minimal
   // `test/dist_/node_modules/ts-type-forge` package (package.json + dist), so
-  // the reference resolves exactly like an external consumer's.
+  // the entry resolves exactly like an external consumer's.
   //
   // Kept strictly separate from ../named/ (own tsconfig, own directory): the
   // ambient globals loaded here would break the "non-imported names are not
   // reachable" assertions of the named-import program.
   //
   // Deliberately self-contained (no `extends`, no test-library dependencies)
-  // and conservative, so that older TypeScript versions can run it in the
-  // compatibility matrix
-  // (.github/workflows/typescript-version-compatibility.yml).
-  // `types: []` prevents auto-inclusion of node_modules/@types: the
+  // and conservative, so that older TypeScript versions can run it.
+  // Listing `ts-type-forge/global` also prevents auto-inclusion of
+  // node_modules/@types (`types` is an allowlist, not an addition): the
   // repository's @types/node requires a recent TypeScript and would produce
-  // unrelated lib-conflict errors on the older compilers in the matrix.
+  // unrelated lib-conflict errors on older compilers.
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
@@ -27,7 +28,7 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "types": [],
+    "types": ["ts-type-forge/global"],
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false
   },
