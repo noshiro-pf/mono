@@ -4352,3 +4352,29 @@ const toUnionAndIntersectionTestCase = ({
     name: title(op === '&' ? 'Intersection' : 'Union'),
     ...testCase(op),
   }));
+
+describe('idempotency', () => {
+  test('a union whose members carry leading whitespace reaches a fixed point', () => {
+    // The members are read with `getFullText()`, which includes the whitespace
+    // in front of each one, and joined with a separator that adds its own. Left
+    // alone the two compound, and a file with `// prettier-ignore` on a long
+    // union grows by one space per member on every run — nothing downstream
+    // normalizes it back.
+    const code = [
+      '// prettier-ignore',
+      'export type P = ',
+      '    (0 |  0.1 |  0.2 |  0.3);',
+      '',
+    ].join('\n');
+
+    const once = transformSourceCode(code, false, [
+      convertToReadonlyTransformer(),
+    ]);
+
+    const twice = transformSourceCode(once, false, [
+      convertToReadonlyTransformer(),
+    ]);
+
+    expect(twice).toBe(once);
+  });
+});
