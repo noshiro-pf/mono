@@ -1,5 +1,20 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.1.1
+
+### Patch Changes
+
+- 02d1a37: `convertToReadonlyTransformer` no longer adds a space before every union or
+  intersection member each time it runs. The members are read with
+  `getFullText()`, which carries the whitespace in front of each one, and were
+  joined with a separator that supplied its own — so the two compounded and the
+  transformer never reached a fixed point. A file that Prettier is told to leave
+  alone, such as a long single-line union under `// prettier-ignore`, grew on
+  every run and could not be brought to a state that `codemod:full` would leave
+  clean.
+- Updated dependencies [698b13e]
+    - ts-type-forge@9.2.2
+
 ## 3.1.0
 
 ### Minor Changes
