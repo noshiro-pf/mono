@@ -1,0 +1,115 @@
+name: Branch Up To Date
+
+# The second half of the gate the five check workflows put in front of their
+# jobs, next to the draft one: is the pull request's branch up to date with the
+# base branch, or is it in the state the pull request page calls "This branch
+# is out-of-date with the base branch"?
+#
+# A branch in that state cannot be merged. `main`'s ruleset sets
+# `strict_required_status_checks_policy`, so the required checks have to pass
+# on a head that already contains main's tip; updating the branch fires
+# `synchronize` and runs every check again on the commit that will actually be
+# merged. The run happening before that update is therefore a run whose result
+# nothing can use — the same reasoning that skips a draft, and the same
+# outcome: the jobs report `skipped`, which satisfies a required status check,
+# and what keeps the pull request from merging meanwhile is the out-of-date
+# state itself.
+#
+# Why a workflow of its own:
+#
+# - A job-level `if` is the only thing that skips a job before a runner boots,
+#   and it cannot call an API. Being behind the base branch is not in the event
+#   payload — `mergeable_state` arrives as `unknown` on the `synchronize` that
+#   triggered the run — so one small job answers the question once per workflow
+#   run and its caller skips a whole matrix, 11 runners in type-check.yml,
+#   before any of them boot.
+# - `workflow_call` rather than the same shell copied into five workflows:
+#   there is one answer to give and one place to change it.
+#
+# Callers fail open — see the note on the `if` in type-check.yml.
+
+on:
+  workflow_call:
+    outputs:
+      should_run:
+        description: >-
+          `false` when the pull request's branch is behind its base branch and
+          the caller's checks should be skipped, `true` otherwise. Empty if
+          this workflow failed to reach an answer, which the callers read as
+          `true`.
+        value: ${{ jobs.check.outputs.should_run }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # Everything below is one public API call; nothing here needs a token that
+    # can write. `gh` needs one to be set at all, hence `github.token`.
+    permissions:
+      contents: read
+
+    outputs:
+      should_run: ${{ steps.branch_state.outputs.should_run }}
+
+    steps:
+      - name: Check whether the branch is behind the base branch
+        id: branch_state
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # Every event that reaches here carries the repository, so the
+          # fallback is only there because an empty value would turn this gate
+          # off without saying so: no base branch would ever match it.
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+        run: |
+          run_the_checks() {
+            echo "${1}"
+            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
+            exit 0
+          }
+
+          # `push` and `workflow_dispatch` are exempt, exactly as they are from
+          # the draft gate: there is no pull request to be behind anything, and
+          # asking for the checks by hand is asking for them regardless of the
+          # branch's state — which is what `/run-checks` does.
+          if [ "${GITHUB_EVENT_NAME}" != 'pull_request' ]; then
+            run_the_checks "Not a pull request event (${GITHUB_EVENT_NAME}): there is no base branch to be behind."
+          fi
+
+          # Only the default branch carries the strict policy, so only there
+          # does being behind block the merge and guarantee another run. A pull
+          # request onto any other branch is checked as it is: skipping it
+          # would wait for an update that nothing requires and may never come.
+          if [ "${BASE_REF}" != "${DEFAULT_BRANCH}" ]; then
+            run_the_checks "The base branch is ${BASE_REF}, not ${DEFAULT_BRANCH}: being behind it blocks nothing, so the checks run."
+          fi
+
+          # `behind_by` is what the pull request page turns into "This branch is
+          # out-of-date with the base branch": commits reachable from the base
+          # branch's tip but not from the head. Compared against the base
+          # branch by name, so the answer is about its tip right now rather
+          # than about `base.sha`, which is only as fresh as this event; and
+          # against the head by SHA, so a fork needs no special case — a pull
+          # request's head commit is readable from the base repository, its
+          # branch is not.
+          if ! behind_by="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${HEAD_SHA}" --jq '.behind_by' 2>&1)"; then
+            run_the_checks "Could not compare ${BASE_REF} with ${HEAD_SHA}, so the checks run: ${behind_by}"
+          fi
+
+          case "${behind_by}" in
+            '' | *[!0-9]*)
+              run_the_checks "The compare API answered \"${behind_by}\", which is not a commit count, so the checks run."
+              ;;
+          esac
+
+          if [ "${behind_by}" -eq 0 ]; then
+            run_the_checks "The branch is up to date with ${BASE_REF}."
+          fi
+
+          echo 'should_run=false' >>"${GITHUB_OUTPUT}"
+
+          summary="The branch is ${behind_by} commit(s) behind ${BASE_REF} — \"out-of-date with the base branch\", which cannot be merged. Update the branch: the run after the update is the one whose result counts."
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"

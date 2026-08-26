@@ -24,10 +24,20 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  backup-repository-settings:
-    # Skip the whole job while the pull request is a draft — see the note in
-    # type-check.yml.
+  # Whether the branch is behind `main` — see the note in type-check.yml.
+  branch-up-to-date:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    uses: ./.github/workflows/branch-up-to-date.yml
+
+  backup-repository-settings:
+    needs: branch-up-to-date
+    # Skip the whole job while the pull request is a draft, or while its
+    # branch is behind `main` and cannot be merged as it stands — see the
+    # notes in type-check.yml.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      needs.branch-up-to-date.outputs.should_run != 'false'
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 10

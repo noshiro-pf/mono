@@ -27,14 +27,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  type-check:
-    # A draft pull request is work in progress: skip the whole job, before a
-    # runner is even booted — a job-level `if` is evaluated by GitHub itself,
-    # and the draft flag arrives in the event payload, so this costs nothing.
-    # The skipped conclusion would satisfy a required status check, but a
-    # draft cannot be merged anyway, and marking it ready for review fires the
-    # `ready_for_review` run above, whose checks take over.
+  # Is the branch up to date with `main`? A job of its own because the answer
+  # takes an API call, which a job-level `if` cannot make, and because a step
+  # cannot skip the job it is in — see branch-up-to-date.yml. It carries the
+  # draft condition as well, so a draft still costs no runner anywhere: this
+  # job is skipped, and the one below it with it.
+  branch-up-to-date:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    uses: ./.github/workflows/branch-up-to-date.yml
+
+  type-check:
+    needs: branch-up-to-date
+    # Two states are not worth a CI run, and both skip the whole job before a
+    # runner is even booted — a job-level `if` is evaluated by GitHub itself.
+    #
+    # - A draft pull request is work in progress. The flag arrives in the
+    #   event payload, so this costs nothing, and marking the pull request
+    #   ready for review fires the `ready_for_review` run above, whose checks
+    #   take over.
+    # - A branch behind `main` is the "This branch is out-of-date with the
+    #   base branch" state: it cannot be merged, and the update that clears it
+    #   fires `synchronize` and runs everything again — on the commit that
+    #   will actually be merged, which this one is not.
+    #
+    # The skipped conclusion satisfies a required status check in both cases.
+    # In both cases something else holds the merge: the draft flag, and the
+    # ruleset's `strict_required_status_checks_policy`.
+    #
+    # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
+    # that failed to answer leaves `should_run` empty: failing open costs a CI
+    # run, failing closed would skip every check on the pull request while
+    # reporting the required ones as satisfied. The draft condition is
+    # repeated here because `!cancelled()` also lifts the automatic skip that
+    # a skipped dependency would otherwise give us.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 

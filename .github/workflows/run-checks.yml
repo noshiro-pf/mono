@@ -1,11 +1,13 @@
 name: Run Checks
 
 # `/run-checks` commented on a pull request dispatches the five check
-# workflows for its branch, draft or not. Those workflows skip draft pull
-# requests at the job level but exempt `workflow_dispatch` — asking for the
-# checks by hand is asking for them regardless of the pull request's state —
-# and this makes that exemption reachable from the pull request page: one full
-# CI result mid-draft, without marking the pull request ready for review.
+# workflows for its branch, whatever state it is in. Those workflows skip a
+# draft pull request, and one whose branch is behind `main`, at the job level
+# — but they exempt `workflow_dispatch`, because asking for the checks by hand
+# is asking for them regardless of the pull request's state. This makes that
+# exemption reachable from the pull request page: one full CI result mid-draft
+# or mid-rebase, without marking the pull request ready for review or updating
+# the branch first.
 #
 # Two things follow from `issue_comment` being a default-branch event:
 #

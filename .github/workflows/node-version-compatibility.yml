@@ -22,10 +22,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-node-versions:
-    # Skip the whole job while the pull request is a draft — see the note in
-    # type-check.yml.
+  # Whether the branch is behind `main` — see the note in type-check.yml.
+  branch-up-to-date:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    uses: ./.github/workflows/branch-up-to-date.yml
+
+  test-node-versions:
+    needs: branch-up-to-date
+    # Skip the whole job while the pull request is a draft, or while its
+    # branch is behind `main` and cannot be merged as it stands — see the
+    # notes in type-check.yml.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     # install + ws:build + ws:test across 17 packages, per Node version.
     # The 10 minutes this was set to when the repository held two packages
