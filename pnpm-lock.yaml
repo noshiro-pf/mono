@@ -1781,7 +1781,7 @@ importers:
         version: 5.0.4
 
   strict-lib/v5.0/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -1790,7 +1790,7 @@ importers:
         version: 5.0.4
 
   strict-lib/v5.0/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -1868,7 +1868,7 @@ importers:
         version: 5.1.6
 
   strict-lib/v5.1/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -1877,7 +1877,7 @@ importers:
         version: 5.1.6
 
   strict-lib/v5.1/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -1955,7 +1955,7 @@ importers:
         version: 5.2.2
 
   strict-lib/v5.2/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -1964,7 +1964,7 @@ importers:
         version: 5.2.2
 
   strict-lib/v5.2/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2042,7 +2042,7 @@ importers:
         version: 5.3.3
 
   strict-lib/v5.3/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2051,7 +2051,7 @@ importers:
         version: 5.3.3
 
   strict-lib/v5.3/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2129,7 +2129,7 @@ importers:
         version: 5.4.5
 
   strict-lib/v5.4/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2138,7 +2138,7 @@ importers:
         version: 5.4.5
 
   strict-lib/v5.4/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2216,7 +2216,7 @@ importers:
         version: 5.5.4
 
   strict-lib/v5.5/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2225,7 +2225,7 @@ importers:
         version: 5.5.4
 
   strict-lib/v5.5/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2303,13 +2303,13 @@ importers:
         version: 5.6.3
 
   strict-lib/v5.6/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
 
   strict-lib/v5.6/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2387,13 +2387,13 @@ importers:
         version: 5.7.2
 
   strict-lib/v5.7/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
 
   strict-lib/v5.7/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2471,13 +2471,13 @@ importers:
         version: 5.8.3
 
   strict-lib/v5.8/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
 
   strict-lib/v5.8/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
@@ -2555,13 +2555,13 @@ importers:
         version: 5.9.3
 
   strict-lib/v5.9/output:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
 
   strict-lib/v5.9/output-branded:
-    devDependencies:
+    dependencies:
       ts-type-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-type-forge
