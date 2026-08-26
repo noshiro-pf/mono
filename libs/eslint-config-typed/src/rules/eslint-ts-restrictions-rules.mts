@@ -11,6 +11,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
   'ts-restrictions/prefer-curried-call': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
+  'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),
 } as const satisfies EslintTsRestrictionsRules;
