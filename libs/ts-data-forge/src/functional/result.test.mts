@@ -1066,6 +1066,24 @@ describe('Result test', () => {
 
       assert.deepStrictEqual(matcher(Result.err('oops')), 4);
     });
+
+    test('curried version should compose with Array.map and pipe', () => {
+      const matcher = Result.match({
+        ok: (value: number) => `ok:${value}`,
+        err: (error: string) => `err:${error}`,
+      });
+
+      const results: readonly Result<number, string>[] = [
+        Result.ok(1),
+        Result.err('bad'),
+      ] as const;
+
+      assert.deepStrictEqual(results.map(matcher), ['ok:1', 'err:bad']);
+
+      const single: Result<number, string> = Result.ok(3);
+
+      assert.deepStrictEqual(pipe(single).map(matcher).value, 'ok:3');
+    });
   });
 
   describe('fromOptional', () => {
@@ -1083,6 +1101,16 @@ describe('Result test', () => {
       assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, 'missing');
+    });
+
+    test('should convert Some(undefined) to Ok(undefined), not Err', () => {
+      const makeOptional = (): Optional<undefined> => Optional.some(undefined);
+
+      const result = Result.fromOptional(makeOptional(), 'missing');
+
+      assert.isTrue(Result.isOk(result));
+
+      assert.deepStrictEqual(result.value, undefined);
     });
 
     test('should support Optional union inputs', () => {
@@ -1226,6 +1254,48 @@ describe('Result test', () => {
       assert.deepStrictEqual(result, Result.err('boom'));
     });
 
+    test('should propagate an exception thrown by the body', () => {
+      expect(() =>
+        Result.safeTry(function* () {
+          const x = yield* Result.safeUnwrap(Result.ok(1));
+
+          throw new Error(`boom: ${x}`);
+        }),
+      ).toThrow('boom: 1');
+    });
+
+    test('async generator should reject on an exception thrown by the body', async () => {
+      await expect(
+        Result.safeTry(async function* () {
+          const x = yield* Result.safeUnwrap(
+            await Promise.resolve(Result.ok(1)),
+          );
+
+          throw new Error(`boom: ${x}`);
+        }),
+      ).rejects.toThrow('boom: 1');
+    });
+
+    test('should propagate through a delegating helper generator', () => {
+      const makeSource = (): Result<number, 'e1'> => Result.err('e1');
+
+      const doubled = function* (): Generator<Err<'e1'>, number, unknown> {
+        const x = yield* Result.safeUnwrap(makeSource());
+
+        return x * 2;
+      };
+
+      const result = Result.safeTry(function* () {
+        const y = yield* doubled();
+
+        return Result.ok(y);
+      });
+
+      expectType<typeof result, Result<number, 'e1'>>('=');
+
+      assert.deepStrictEqual(result, Result.err('e1'));
+    });
+
     test('async generator should run pending `finally` blocks too', async () => {
       const makeFailing = (): Promise<Result<number, string>> =>
         Promise.resolve(Result.err('boom'));
@@ -1245,6 +1315,37 @@ describe('Result test', () => {
       assert.isTrue(mut_cleanedUp);
 
       assert.deepStrictEqual(result, Result.err('boom'));
+    });
+  });
+
+  describe('safeUnwrap', () => {
+    test('should return the value without yielding for an Ok', () => {
+      const generator = Result.safeUnwrap(Result.ok(7));
+
+      assert.deepStrictEqual(generator.next(), { done: true, value: 7 });
+    });
+
+    test('should yield the Err itself for an Err', () => {
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      const generator = Result.safeUnwrap(makeFailing());
+
+      assert.deepStrictEqual(generator.next(), {
+        done: false,
+        value: Result.err('boom'),
+      });
+    });
+
+    test('should throw if resumed after yielding an Err', () => {
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      const generator = Result.safeUnwrap(makeFailing());
+
+      generator.next();
+
+      expect(() => generator.next()).toThrow(
+        'it must only be used via `yield*` inside `safeTry()`',
+      );
     });
   });
 });

@@ -849,5 +849,34 @@ describe('Optional test', () => {
 
       assert.deepStrictEqual(matcher(Optional.none), 'none');
     });
+
+    test('curried version should compose with Array.map and pipe', () => {
+      const matcher = Optional.match({
+        some: (value: number) => `some:${value}`,
+        none: () => 'none',
+      });
+
+      const optionals: readonly Optional<number>[] = [
+        Optional.some(1),
+        Optional.none,
+      ] as const;
+
+      assert.deepStrictEqual(optionals.map(matcher), ['some:1', 'none']);
+
+      const single: Optional<number> = Optional.some(3);
+
+      assert.deepStrictEqual(pipe(single).map(matcher).value, 'some:3');
+    });
+
+    test('should apply the some case for Some(undefined)', () => {
+      const makeOptional = (): Optional<undefined> => Optional.some(undefined);
+
+      const result = Optional.match(makeOptional(), {
+        some: (value) => `some: ${String(value)}`,
+        none: () => 'none',
+      });
+
+      assert.deepStrictEqual(result, 'some: undefined');
+    });
   });
 });
