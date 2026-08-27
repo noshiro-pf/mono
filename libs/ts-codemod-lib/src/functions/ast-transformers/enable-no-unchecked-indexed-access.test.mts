@@ -12,8 +12,12 @@ import { transformSourceCode } from './transform-source-code.mjs';
  * Declarations every case is prefixed with, so that each `source` can be a
  * single expression statement. `declare const` keeps them free of index
  * accesses of their own.
+ *
+ * `console` is among them because {@link project} loads only the libraries
+ * these cases need, and the one that declares `console` is not one of them.
  */
 const preamble = dedent`
+  declare const console: { log: (...args: readonly unknown[]) => void };
   declare const xs: readonly number[];
   declare const mut_ys: number[];
   declare const pair: readonly [number, number];
@@ -47,15 +51,61 @@ const testFn = async ({
   }
 
   const transformed = await formatter(
-    transformSourceCode(`${preamble}\n\n${source}`, false, [
-      enableNoUncheckedIndexedAccessTransformer({ ...options, debug }),
-    ]),
+    transformInProject(`${preamble}\n\n${source}`, { ...options, debug }),
   );
 
   const expectedFormatted = await formatter(`${preamble}\n\n${expected}`);
 
   expect(transformed).toBe(expectedFormatted);
 };
+
+/**
+ * Runs the transformer over `code` in {@link project}, and returns what it
+ * made of it.
+ */
+const transformInProject = (
+  code: string,
+  options?: Parameters<typeof enableNoUncheckedIndexedAccessTransformer>[0],
+): string => {
+  const sourceAst = project.createSourceFile('source.ts', code, {
+    overwrite: true,
+  });
+
+  enableNoUncheckedIndexedAccessTransformer(options).transform(sourceAst);
+
+  return sourceAst.getFullText();
+};
+
+/**
+ * The one project every case is checked in, rather than one project per case.
+ *
+ * `transformSourceCode` builds a project per call, and this transformer checks
+ * the file twice — once with `noUncheckedIndexedAccess` on and once with it
+ * off. A case that went through it therefore paid for the whole default
+ * library, `lib.esnext.full.d.ts` with the DOM inside it, being parsed and
+ * checked from scratch: ~300 ms a case, of which the file under test was a
+ * fraction of a millisecond. Sixty of those took `test:cov` past Vitest's
+ * timeout on CI.
+ *
+ * Reusing the project is half of the answer and the smaller half — measured,
+ * it takes a case from ~300 ms to ~260 ms, because what an edit invalidates is
+ * the program, not the parsed library behind it. Naming the libraries the
+ * cases actually need is the rest: together they bring a case to ~25 ms.
+ *
+ * What that leaves out — `transformSourceCode` itself, and the transformer
+ * against the full library — is what the tests at the bottom of this file
+ * still cover.
+ */
+const project = new tsm.Project({
+  useInMemoryFileSystem: true,
+  compilerOptions: {
+    target: tsm.ts.ScriptTarget.ESNext,
+    module: tsm.ts.ModuleKind.ESNext,
+    // `es2015` rather than `es5` for `Symbol.iterator`, which the spread and
+    // `for-of` cases need at this target.
+    lib: ['lib.es2015.d.ts'],
+  },
+});
 
 const formatter = (code: string): Promise<string> =>
   prettier.format(code, {
@@ -456,6 +506,8 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
 
   test('the errors the option introduces are gone from the result', () => {
     const source = dedent`
+      declare const console: { log: (...args: readonly unknown[]) => void };
+
       const parseRoute = (path: string): string => {
         const parts = path.split('/');
 
@@ -484,11 +536,7 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
     expect(diagnosticsUnderTheOption(source).length).toBeGreaterThan(0);
 
     assert.deepStrictEqual(
-      diagnosticsUnderTheOption(
-        transformSourceCode(source, false, [
-          enableNoUncheckedIndexedAccessTransformer(),
-        ]),
-      ),
+      diagnosticsUnderTheOption(transformInProject(source)),
       [],
     );
   });
@@ -542,19 +590,9 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
 });
 
 /** The compiler's own verdict on the code, with the option this transformer prepares for turned on. */
-const diagnosticsUnderTheOption = (code: string): readonly string[] => {
-  const project = new tsm.Project({
-    useInMemoryFileSystem: true,
-    compilerOptions: {
-      target: tsm.ts.ScriptTarget.ESNext,
-      module: tsm.ts.ModuleKind.ESNext,
-      strict: true,
-      noUncheckedIndexedAccess: true,
-    },
-  });
-
-  return project
-    .createSourceFile('source.ts', code)
+const diagnosticsUnderTheOption = (code: string): readonly string[] =>
+  diagnosticsProject
+    .createSourceFile('source.ts', code, { overwrite: true })
     .getPreEmitDiagnostics()
     .map((diagnostic) => diagnostic.getMessageText())
     .map((messageText) =>
@@ -562,4 +600,20 @@ const diagnosticsUnderTheOption = (code: string): readonly string[] => {
         ? messageText
         : messageText.getMessageText(),
     );
-};
+
+/**
+ * A second project, because {@link project} has to start with the option off,
+ * and reused for the reason that one is. `getPreEmitDiagnostics` checks the
+ * whole program rather than one expression, so the library it is pointed at
+ * costs more here than anywhere else in this file.
+ */
+const diagnosticsProject = new tsm.Project({
+  useInMemoryFileSystem: true,
+  compilerOptions: {
+    target: tsm.ts.ScriptTarget.ESNext,
+    module: tsm.ts.ModuleKind.ESNext,
+    lib: ['lib.es2015.d.ts'],
+    strict: true,
+    noUncheckedIndexedAccess: true,
+  },
+});
