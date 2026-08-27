@@ -32,9 +32,10 @@ import { type InitializedRootObservable } from '../types/index.mjs';
  * ```
  */
 export const just = <const A,>(value: A): InitializedRootObservable<A> => {
-  const obs = createRootObservable<A>({
-    initialValue: Optional.some(value),
-  });
+  const obs = createRootObservable<A>(
+    { initialValue: Optional.some(value) },
+    () => ({}),
+  );
 
   obs.complete();
 

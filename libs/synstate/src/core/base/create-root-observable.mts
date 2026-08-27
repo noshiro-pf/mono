@@ -53,7 +53,7 @@ export const createRootObservable = <
   >,
 >(
   { initialValue, onComplete }: RootObservableConfig<A>,
-  init?: (tools: RootObservableTools<A>) => Extension,
+  init: (tools: RootObservableTools<A>) => Extension,
 ): Extension & RootObservable<A> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
@@ -71,7 +71,7 @@ export const createRootObservable = <
     }
   };
 
-  const extension = init?.({
+  const extension: Extension = init({
     startUpdate,
     isCompleted: handle.isCompleted,
     complete,
@@ -85,8 +85,7 @@ export const createRootObservable = <
     tryComplete,
     complete,
     extra: {
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      ...(extension ?? ({} as Extension)),
+      ...extension,
       addDescendant,
     },
   });
@@ -96,9 +95,7 @@ if (import.meta.vitest !== undefined) {
   test('isRootObservable', () => {
     assert.isTrue(
       isRootObservable(
-        createRootObservable({
-          initialValue: Optional.some(0),
-        }),
+        createRootObservable({ initialValue: Optional.some(0) }, () => ({})),
       ),
     );
   });

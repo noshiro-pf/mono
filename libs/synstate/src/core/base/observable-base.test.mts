@@ -61,9 +61,10 @@ expectType<Observable<1>, Observable<number>>('<=');
 
 expectType<Observable<number>, Observable<1>>('!<=');
 
-const root = createRootObservable({
-  initialValue: Optional.some(0),
-});
+const root = createRootObservable(
+  { initialValue: Optional.some(0) },
+  () => ({}),
+);
 
 expectType<typeof root, RootObservable<number>>('<=');
 

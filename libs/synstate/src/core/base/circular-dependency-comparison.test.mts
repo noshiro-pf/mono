@@ -21,9 +21,10 @@ import { createRootObservable } from './create-root-observable.mjs';
 describe('circular dependency comparison', () => {
   describe('SynState', () => {
     test('detects cycle at construction time with a clear error message', () => {
-      const root = createRootObservable({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
       const childA = createSyncChildObservable(
         {
