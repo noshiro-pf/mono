@@ -800,4 +800,83 @@ describe('Optional test', () => {
       expect(Optional.unwrap(inner)).toBe(42);
     });
   });
+
+  describe('match', () => {
+    test('should apply the some case for Some', () => {
+      const result = Optional.match(Optional.some(21), {
+        some: (value) => value * 2,
+        none: () => 0,
+      });
+
+      expectType<typeof result, number>('=');
+
+      assert.deepStrictEqual(result, 42);
+    });
+
+    test('should apply the none case for None', () => {
+      const result = Optional.match(Optional.none, {
+        some: () => 'some',
+        none: () => 'none',
+      });
+
+      assert.deepStrictEqual(result, 'none');
+    });
+
+    test('should support Optional union inputs', () => {
+      const optional: Optional<number> = Optional.some(3);
+
+      const result = Optional.match(optional, {
+        some: (value) => `value: ${value}`,
+        none: () => 'none',
+      });
+
+      expectType<typeof result, string>('=');
+
+      assert.deepStrictEqual(result, 'value: 3');
+    });
+
+    test('curried version should work', () => {
+      const matcher = Optional.match({
+        some: (value: number) => `value: ${value}`,
+        none: () => 'none',
+      });
+
+      const result = matcher(Optional.some(3));
+
+      expectType<typeof result, string>('=');
+
+      assert.deepStrictEqual(result, 'value: 3');
+
+      assert.deepStrictEqual(matcher(Optional.none), 'none');
+    });
+
+    test('curried version should compose with Array.map and pipe', () => {
+      const matcher = Optional.match({
+        some: (value: number) => `some:${value}`,
+        none: () => 'none',
+      });
+
+      const optionals: readonly Optional<number>[] = [
+        Optional.some(1),
+        Optional.none,
+      ] as const;
+
+      assert.deepStrictEqual(optionals.map(matcher), ['some:1', 'none']);
+
+      const single: Optional<number> = Optional.some(3);
+
+      assert.deepStrictEqual(pipe(single).map(matcher).value, 'some:3');
+    });
+
+    test('should apply the some case for Some(undefined)', () => {
+      const makeOptional = (): Optional<undefined> => Optional.some(undefined);
+
+      const result = Optional.match(makeOptional(), {
+        some: (value) => `some: ${String(value)}`,
+        none: () => 'none',
+      });
+
+      assert.deepStrictEqual(result, 'some: undefined');
+    });
+  });
 });

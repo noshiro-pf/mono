@@ -1017,4 +1017,335 @@ describe('Result test', () => {
       >();
     });
   });
+
+  describe('match', () => {
+    test('should apply the ok case for Ok', () => {
+      const result = Result.match(Result.ok(21), {
+        ok: (value) => value * 2,
+        err: () => 0,
+      });
+
+      expectType<typeof result, number>('=');
+
+      assert.deepStrictEqual(result, 42);
+    });
+
+    test('should apply the err case for Err', () => {
+      const result = Result.match(Result.err('failure'), {
+        ok: () => 'ok',
+        err: (error) => `error: ${error}`,
+      });
+
+      assert.deepStrictEqual(result, 'error: failure');
+    });
+
+    test('should support Result union inputs', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Ok side.
+      const makeResult = (): Result<number, string> => Result.ok(2);
+
+      const result = makeResult();
+
+      const folded = Result.match(result, {
+        ok: (value) => value + 1,
+        err: (error) => error.length,
+      });
+
+      expectType<typeof folded, number>('=');
+
+      assert.deepStrictEqual(folded, 3);
+    });
+
+    test('curried version should work', () => {
+      const matcher = Result.match({
+        ok: (value: number) => value + 1,
+        err: (error: string) => error.length,
+      });
+
+      assert.deepStrictEqual(matcher(Result.ok(1)), 2);
+
+      assert.deepStrictEqual(matcher(Result.err('oops')), 4);
+    });
+
+    test('curried version should compose with Array.map and pipe', () => {
+      const matcher = Result.match({
+        ok: (value: number) => `ok:${value}`,
+        err: (error: string) => `err:${error}`,
+      });
+
+      const results: readonly Result<number, string>[] = [
+        Result.ok(1),
+        Result.err('bad'),
+      ] as const;
+
+      assert.deepStrictEqual(results.map(matcher), ['ok:1', 'err:bad']);
+
+      const single: Result<number, string> = Result.ok(3);
+
+      assert.deepStrictEqual(pipe(single).map(matcher).value, 'ok:3');
+    });
+  });
+
+  describe('fromOptional', () => {
+    test('should convert Some to Ok', () => {
+      const result = Result.fromOptional(Optional.some(42), 'missing');
+
+      expectType<typeof result, Result<42, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(42));
+    });
+
+    test('should convert None to Err with the provided error', () => {
+      const result = Result.fromOptional(Optional.none, 'missing');
+
+      assert.isTrue(Result.isErr(result));
+
+      assert.deepStrictEqual(result.value, 'missing');
+    });
+
+    test('should convert Some(undefined) to Ok(undefined), not Err', () => {
+      const makeOptional = (): Optional<undefined> => Optional.some(undefined);
+
+      const result = Result.fromOptional(makeOptional(), 'missing');
+
+      assert.isTrue(Result.isOk(result));
+
+      assert.deepStrictEqual(result.value, undefined);
+    });
+
+    test('should support Optional union inputs', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Some side.
+      const makeOptional = (): Optional<number> => Optional.some(2);
+
+      const result = Result.fromOptional(makeOptional(), 'missing');
+
+      expectType<typeof result, Result<number, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(2));
+    });
+
+    test('curried version should work', () => {
+      const withMissingError = Result.fromOptional('missing');
+
+      const result = withMissingError(Optional.some(1));
+
+      expectType<typeof result, Result<1, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(1));
+
+      assert.deepStrictEqual(
+        withMissingError(Optional.none),
+        Result.err('missing'),
+      );
+    });
+  });
+
+  describe('safeTry', () => {
+    test('should return the body result when every yielded Result is Ok', () => {
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(Result.ok(2));
+
+        const y = yield* Result.safeUnwrap(Result.ok(3));
+
+        return Result.ok(x + y);
+      });
+
+      expectType<typeof result, Result<number, never>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(5));
+    });
+
+    test('should short-circuit on the first Err', () => {
+      const makeFailing = (): Result<number, string> =>
+        Result.err('first error');
+
+      const failing = makeFailing();
+
+      let mut_reached = false;
+
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(failing);
+
+        mut_reached = true;
+
+        return Result.ok(x);
+      });
+
+      assert.isFalse(mut_reached);
+
+      assert.deepStrictEqual(result, Result.err('first error'));
+    });
+
+    test('should collect error types from yields and the return', () => {
+      const makeSource = (): Result<number, 'e1'> => Result.ok(1);
+
+      const source = makeSource();
+
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(source);
+
+        if (x > 0) {
+          return Result.err('e2');
+        }
+
+        return Result.ok(x);
+      });
+
+      expectType<typeof result, Result<number, 'e1' | 'e2'>>('=');
+
+      assert.deepStrictEqual(result, Result.err('e2'));
+    });
+
+    test('async generator should return a Promise of the body result', async () => {
+      const result = await Result.safeTry(async function* () {
+        const x = yield* Result.safeUnwrap(
+          await Result.fromPromise(Promise.resolve(10)),
+        );
+
+        return Result.ok(x + 1);
+      });
+
+      assert.deepStrictEqual(result, Result.ok(11));
+    });
+
+    test('async generator should short-circuit on Err', async () => {
+      const makeFailing = (): Promise<Result<number, string>> =>
+        Promise.resolve(Result.err('async error'));
+
+      let mut_reached = false;
+
+      const promise = Result.safeTry(async function* () {
+        const x = yield* Result.safeUnwrap(await makeFailing());
+
+        mut_reached = true;
+
+        return Result.ok(x);
+      });
+
+      expectType<typeof promise, Promise<Result<number, string>>>('=');
+
+      const result = await promise;
+
+      assert.isFalse(mut_reached);
+
+      assert.deepStrictEqual(result, Result.err('async error'));
+    });
+
+    test('should run pending `finally` blocks when short-circuiting', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Err side.
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      let mut_cleanedUp = false;
+
+      const result = Result.safeTry(function* () {
+        try {
+          const x = yield* Result.safeUnwrap(makeFailing());
+
+          return Result.ok(x);
+        } finally {
+          mut_cleanedUp = true;
+        }
+      });
+
+      assert.isTrue(mut_cleanedUp);
+
+      assert.deepStrictEqual(result, Result.err('boom'));
+    });
+
+    test('should propagate an exception thrown by the body', () => {
+      expect(() =>
+        Result.safeTry(function* () {
+          const x = yield* Result.safeUnwrap(Result.ok(1));
+
+          throw new Error(`boom: ${x}`);
+        }),
+      ).toThrow('boom: 1');
+    });
+
+    test('async generator should reject on an exception thrown by the body', async () => {
+      await expect(
+        Result.safeTry(async function* () {
+          const x = yield* Result.safeUnwrap(
+            await Promise.resolve(Result.ok(1)),
+          );
+
+          throw new Error(`boom: ${x}`);
+        }),
+      ).rejects.toThrow('boom: 1');
+    });
+
+    test('should propagate through a delegating helper generator', () => {
+      const makeSource = (): Result<number, 'e1'> => Result.err('e1');
+
+      const doubled = function* (): Generator<Err<'e1'>, number, unknown> {
+        const x = yield* Result.safeUnwrap(makeSource());
+
+        return x * 2;
+      };
+
+      const result = Result.safeTry(function* () {
+        const y = yield* doubled();
+
+        return Result.ok(y);
+      });
+
+      expectType<typeof result, Result<number, 'e1'>>('=');
+
+      assert.deepStrictEqual(result, Result.err('e1'));
+    });
+
+    test('async generator should run pending `finally` blocks too', async () => {
+      const makeFailing = (): Promise<Result<number, string>> =>
+        Promise.resolve(Result.err('boom'));
+
+      let mut_cleanedUp = false;
+
+      const result = await Result.safeTry(async function* () {
+        try {
+          const x = yield* Result.safeUnwrap(await makeFailing());
+
+          return Result.ok(x);
+        } finally {
+          mut_cleanedUp = true;
+        }
+      });
+
+      assert.isTrue(mut_cleanedUp);
+
+      assert.deepStrictEqual(result, Result.err('boom'));
+    });
+  });
+
+  describe('safeUnwrap', () => {
+    test('should return the value without yielding for an Ok', () => {
+      const generator = Result.safeUnwrap(Result.ok(7));
+
+      assert.deepStrictEqual(generator.next(), { done: true, value: 7 });
+    });
+
+    test('should yield the Err itself for an Err', () => {
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      const generator = Result.safeUnwrap(makeFailing());
+
+      assert.deepStrictEqual(generator.next(), {
+        done: false,
+        value: Result.err('boom'),
+      });
+    });
+
+    test('should throw if resumed after yielding an Err', () => {
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      const generator = Result.safeUnwrap(makeFailing());
+
+      generator.next();
+
+      expect(() => generator.next()).toThrow(
+        'it must only be used via `yield*` inside `safeTry()`',
+      );
+    });
+  });
 });

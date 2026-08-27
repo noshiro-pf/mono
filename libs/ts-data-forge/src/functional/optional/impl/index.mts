@@ -6,6 +6,7 @@ export * from './optional-is-none.mjs';
 export * from './optional-is-optional.mjs';
 export * from './optional-is-some.mjs';
 export * from './optional-map.mjs';
+export * from './optional-match.mjs';
 export * from './optional-none.mjs';
 export * from './optional-or-else.mjs';
 export * from './optional-some.mjs';
