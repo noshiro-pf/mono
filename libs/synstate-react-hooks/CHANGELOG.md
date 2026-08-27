@@ -1,5 +1,33 @@
 # synstate-react-hooks
 
+## 3.0.0
+
+### Major Changes
+
+- 394ded1: Rewrite the observable core without classes and remove the class exports.
+
+    The internal implementation of every observable is now built from closure-based
+    factory functions (`src/core/base/`) instead of a class hierarchy. The public
+    API — `source`, `timer`, the operator factories, `pipe`, the structural
+    `Observable` interfaces and the `kind` tags — is unchanged, and all existing
+    behavior is preserved.
+
+    BREAKING CHANGE: the implementation classes `ObservableBaseClass`,
+    `RootObservableClass`, `SyncChildObservableClass`, `AsyncChildObservableClass`
+    and `InitializedSyncChildObservableClass` are no longer exported from
+    `synstate`, and consequently no longer re-exported from `synstate-react-hooks`,
+    `synstate-react-hooks-compat`, `synstate-preact-hooks` and
+    `synstate-preact-signals`. Code that extended or instantiated these classes
+    should build observables through the factory functions and the structural
+    `Observable` types instead.
+
+### Patch Changes
+
+- Updated dependencies [4a69cc8]
+- Updated dependencies [394ded1]
+    - ts-data-forge@14.5.0
+    - synstate@3.0.0
+
 ## 2.0.2
 
 ### Patch Changes
