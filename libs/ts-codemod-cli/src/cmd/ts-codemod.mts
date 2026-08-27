@@ -5,6 +5,7 @@ import {
   appendAsConstTransformer,
   convertInterfaceToTypeTransformer,
   convertToReadonlyTransformer,
+  enableNoUncheckedIndexedAccessTransformer,
   replaceAnyWithUnknownTransformer,
   replaceRecordWithUnknownRecordTransformer,
 } from 'ts-codemod-lib';
@@ -16,6 +17,8 @@ const transformerFactories = {
   'append-as-const': appendAsConstTransformer,
   'convert-interface-to-type': convertInterfaceToTypeTransformer,
   'convert-to-readonly': convertToReadonlyTransformer,
+  'enable-no-unchecked-indexed-access':
+    enableNoUncheckedIndexedAccessTransformer,
   'replace-any-with-unknown': replaceAnyWithUnknownTransformer,
   'replace-record-with-unknown-record':
     replaceRecordWithUnknownRecordTransformer,
@@ -31,6 +34,7 @@ const transformerNames = [
   'append-as-const',
   'convert-interface-to-type',
   'convert-to-readonly',
+  'enable-no-unchecked-indexed-access',
   'replace-any-with-unknown',
   'replace-record-with-unknown-record',
 ] as const satisfies readonly (keyof typeof transformerFactories)[];

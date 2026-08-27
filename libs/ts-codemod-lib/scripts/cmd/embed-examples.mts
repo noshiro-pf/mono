@@ -43,6 +43,7 @@ const documents: DeepReadonly<
       'convert-interface-to-type-example.mts',
       'replace-any-with-unknown-example.mts',
       'replace-record-with-unknown-record-example.mts',
+      'enable-no-unchecked-indexed-access-example.mts',
       'transformer-ignore-next-line-example.mts',
       'transformer-ignore-file-example.mts',
       'programmatic-usage.mts',
