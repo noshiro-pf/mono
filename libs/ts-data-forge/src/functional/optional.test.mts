@@ -800,4 +800,50 @@ describe('Optional test', () => {
       expect(Optional.unwrap(inner)).toBe(42);
     });
   });
+
+  describe('match', () => {
+    test('should apply the some case for Some', () => {
+      const result = Optional.match(Optional.some(21), {
+        some: (value) => value * 2,
+        none: () => 0,
+      });
+
+      expectType<typeof result, number>('=');
+
+      assert.deepStrictEqual(result, 42);
+    });
+
+    test('should apply the none case for None', () => {
+      const result = Optional.match(Optional.none, {
+        some: () => 'some',
+        none: () => 'none',
+      });
+
+      assert.deepStrictEqual(result, 'none');
+    });
+
+    test('should support Optional union inputs', () => {
+      const optional: Optional<number> = Optional.some(3);
+
+      const result = Optional.match(optional, {
+        some: (value) => `value: ${value}`,
+        none: () => 'none',
+      });
+
+      expectType<typeof result, string>('=');
+
+      assert.deepStrictEqual(result, 'value: 3');
+    });
+
+    test('curried version should work', () => {
+      const matcher = Optional.match({
+        some: (value: number) => `value: ${value}`,
+        none: () => 'none',
+      });
+
+      assert.deepStrictEqual(matcher(Optional.some(3)), 'value: 3');
+
+      assert.deepStrictEqual(matcher(Optional.none), 'none');
+    });
+  });
 });

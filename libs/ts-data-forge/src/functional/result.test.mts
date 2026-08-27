@@ -1017,4 +1017,164 @@ describe('Result test', () => {
       >();
     });
   });
+
+  describe('match', () => {
+    test('should apply the ok case for Ok', () => {
+      const result = Result.match(Result.ok(21), {
+        ok: (value) => value * 2,
+        err: () => 0,
+      });
+
+      expectType<typeof result, number>('=');
+
+      assert.deepStrictEqual(result, 42);
+    });
+
+    test('should apply the err case for Err', () => {
+      const result = Result.match(Result.err('failure'), {
+        ok: () => 'ok',
+        err: (error) => `error: ${error}`,
+      });
+
+      assert.deepStrictEqual(result, 'error: failure');
+    });
+
+    test('should support Result union inputs', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Ok side.
+      const makeResult = (): Result<number, string> => Result.ok(2);
+
+      const result = makeResult();
+
+      const folded = Result.match(result, {
+        ok: (value) => value + 1,
+        err: (error) => error.length,
+      });
+
+      expectType<typeof folded, number>('=');
+
+      assert.deepStrictEqual(folded, 3);
+    });
+
+    test('curried version should work', () => {
+      const matcher = Result.match({
+        ok: (value: number) => value + 1,
+        err: (error: string) => error.length,
+      });
+
+      assert.deepStrictEqual(matcher(Result.ok(1)), 2);
+
+      assert.deepStrictEqual(matcher(Result.err('oops')), 4);
+    });
+  });
+
+  describe('fromOptional', () => {
+    test('should convert Some to Ok', () => {
+      const result = Result.fromOptional(Optional.some(42), 'missing');
+
+      expectType<typeof result, Result<42, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(42));
+    });
+
+    test('should convert None to Err with the provided error', () => {
+      const result = Result.fromOptional(Optional.none, 'missing');
+
+      assert.isTrue(Result.isErr(result));
+
+      assert.deepStrictEqual(result.value, 'missing');
+    });
+
+    test('curried version should work', () => {
+      const withMissingError = Result.fromOptional('missing');
+
+      assert.deepStrictEqual(withMissingError(Optional.some(1)), Result.ok(1));
+
+      assert.deepStrictEqual(
+        withMissingError(Optional.none),
+        Result.err('missing'),
+      );
+    });
+  });
+
+  describe('safeTry', () => {
+    test('should return the body result when every yielded Result is Ok', () => {
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(Result.ok(2));
+
+        const y = yield* Result.safeUnwrap(Result.ok(3));
+
+        return Result.ok(x + y);
+      });
+
+      expectType<typeof result, Result<number, never>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(5));
+    });
+
+    test('should short-circuit on the first Err', () => {
+      const makeFailing = (): Result<number, string> =>
+        Result.err('first error');
+
+      const failing = makeFailing();
+
+      let mut_reached = false;
+
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(failing);
+
+        mut_reached = true;
+
+        return Result.ok(x);
+      });
+
+      assert.isFalse(mut_reached);
+
+      assert.deepStrictEqual(result, Result.err('first error'));
+    });
+
+    test('should collect error types from yields and the return', () => {
+      const makeSource = (): Result<number, 'e1'> => Result.ok(1);
+
+      const source = makeSource();
+
+      const result = Result.safeTry(function* () {
+        const x = yield* Result.safeUnwrap(source);
+
+        if (x > 0) {
+          return Result.err('e2');
+        }
+
+        return Result.ok(x);
+      });
+
+      expectType<typeof result, Result<number, 'e1' | 'e2'>>('=');
+
+      assert.deepStrictEqual(result, Result.err('e2'));
+    });
+
+    test('async generator should return a Promise of the body result', async () => {
+      const result = await Result.safeTry(async function* () {
+        const x = yield* Result.safeUnwrap(
+          await Result.fromPromise(Promise.resolve(10)),
+        );
+
+        return Result.ok(x + 1);
+      });
+
+      assert.deepStrictEqual(result, Result.ok(11));
+    });
+
+    test('async generator should short-circuit on Err', async () => {
+      const result = await Result.safeTry(async function* () {
+        const x = yield* Result.safeUnwrap(
+          await Result.fromPromise(Promise.reject(new Error('rejected'))),
+        );
+
+        return Result.ok(x);
+      });
+
+      assert.isTrue(Result.isErr(result));
+    });
+  });
 });
