@@ -1,9 +1,8 @@
 import { Arr, Optional, pipe } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type KeepInitialValueOperator,
   type Observable,
-  type UpdateToken,
   type WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -66,7 +65,7 @@ export const withBufferedFrom = <A, B>(
 ): KeepInitialValueOperator<A, readonly [A, readonly B[]]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    new WithBufferedFromObservableClass(
+    createWithBufferedFromObservable(
       parentObservable,
       observable,
     )) as KeepInitialValueOperator<A, readonly [A, readonly B[]]>;
@@ -77,14 +76,21 @@ export const withBufferedFrom = <A, B>(
  */
 export const withBuffered = withBufferedFrom;
 
-class WithBufferedFromObservableClass<A, B>
-  extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>
-  implements WithBufferedFromOperatorObservable<A, B>
-{
-  #mut_bufferedValues: readonly B[] = [];
+const createWithBufferedFromObservable = <A, B>(
+  parentObservable: Observable<A>,
+  observable: Observable<B>,
+): WithBufferedFromOperatorObservable<A, B> => {
+  let mut_bufferedValues: readonly B[] = [];
 
-  constructor(parentObservable: Observable<A>, observable: Observable<B>) {
-    super({
+  const clearBuffer = (): void => {
+    mut_bufferedValues = [];
+  };
+
+  const result = createSyncChildObservable<
+    readonly [A, readonly B[]],
+    readonly [A]
+  >(
+    {
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
@@ -98,28 +104,27 @@ class WithBufferedFromObservableClass<A, B>
               Optional.isNone(me) ? [] : [me.value],
             ] as const),
       ).value,
-    });
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        const sn = parentObservable.getSnapshot();
 
-    observable.subscribe((value) => {
-      this.#mut_bufferedValues = Arr.toPushed(this.#mut_bufferedValues, value);
-    });
-  }
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
 
-  #clearBuffer(): void {
-    this.#mut_bufferedValues = [];
-  }
+        setNext([sn.value, mut_bufferedValues], updateToken);
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        clearBuffer();
+      },
+  );
 
-    const sn = par.getSnapshot();
+  observable.subscribe((value) => {
+    mut_bufferedValues = Arr.toPushed(mut_bufferedValues, value);
+  });
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
-
-    this.#clearBuffer();
-  }
-}
+  return result;
+};

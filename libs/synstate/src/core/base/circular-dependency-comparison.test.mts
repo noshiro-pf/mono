@@ -8,32 +8,39 @@
  *   only at read time as a `Maximum call stack size exceeded` error.
  */
 /* eslint-disable functional/immutable-data */
-/* eslint-disable no-new */
 import { type Atom, atom, createStore } from 'jotai';
 import { BehaviorSubject, combineLatest, map as rxMap } from 'rxjs';
 import { Optional } from 'ts-data-forge';
 import { combine } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
-import { SyncChildObservableClass } from './child-observable-class.mjs';
-import { RootObservableClass } from './root-observable-class.mjs';
+import { createSyncChildObservable } from './create-child-observable.mjs';
+import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
+import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency comparison', () => {
   describe('SynState', () => {
     test('detects cycle at construction time with a clear error message', () => {
-      const root = new RootObservableClass({
-        initialValue: Optional.some(0),
-      });
+      const root = createRootObservable(
+        { initialValue: Optional.some(0) },
+        () => ({}),
+      );
 
-      const childA = new SyncChildObservableClass({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = new SyncChildObservableClass({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Simulate a cycle: childA → childB → childA
       // In normal usage this is impossible — the check runs in every
@@ -45,10 +52,13 @@ describe('circular dependency comparison', () => {
       });
 
       expect(() => {
-        new SyncChildObservableClass({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );

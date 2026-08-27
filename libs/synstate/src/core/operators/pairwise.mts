@@ -1,11 +1,10 @@
 import { Optional } from 'ts-data-forge';
 import { type FixedLengthTuple } from 'ts-type-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type DropInitialValueOperator,
   type Observable,
   type PairwiseOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -69,43 +68,41 @@ export const pairwise = <A,>(): DropInitialValueOperator<
 const f = <A,>(
   parentObservable: Observable<A>,
 ): Observable<FixedLengthTuple<2, A>> =>
-  new PairwiseObservableClass(parentObservable);
+  createPairwiseObservable(parentObservable);
 
-class PairwiseObservableClass<A>
-  extends SyncChildObservableClass<FixedLengthTuple<2, A>, readonly [A]>
-  implements PairwiseOperatorObservable<A>
-{
-  #mut_previousValue: Optional<A>;
-
-  constructor(parentObservable: Observable<A>) {
-    super({
+const createPairwiseObservable = <A,>(
+  parentObservable: Observable<A>,
+): PairwiseOperatorObservable<A> =>
+  createSyncChildObservable<FixedLengthTuple<2, A>, readonly [A]>(
+    {
       parents: [parentObservable],
       initialValue: Optional.none,
-    });
+    },
+    ({ setNext }) => {
+      // parentObservable.snapshot has value
+      // if parentObservable is InitializedObservable
+      let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
 
-    // parentObservable.snapshot has value
-    // if parentObservable is InitializedObservable
-    this.#mut_previousValue = parentObservable.getSnapshot();
-  }
+      return (updateToken) => {
+        const sn = parentObservable.getSnapshot();
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
 
-    const sn = par.getSnapshot();
+        const prev = mut_previousValue;
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
+        const cond = !Optional.isNone(prev);
 
-    const prev = this.#mut_previousValue;
+        // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
+        mut_previousValue = parentObservable.getSnapshot();
 
-    const cond = !Optional.isNone(prev);
-
-    // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-    this.#mut_previousValue = par.getSnapshot();
-
-    if (cond) {
-      this.setNext([prev.value, sn.value], updateToken);
-    }
-  }
-}
+        if (cond) {
+          setNext([prev.value, sn.value], updateToken);
+        }
+      };
+    },
+  );

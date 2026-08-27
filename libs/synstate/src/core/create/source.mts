@@ -1,5 +1,5 @@
 import { Arr, Optional } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import {
   type InitializedSourceObservable,
   type SourceObservable,
@@ -51,24 +51,18 @@ export function source<const A>(
 export function source<const A>(): SourceObservable<A>;
 
 export function source<const A>(...args: readonly A[]): SourceObservable<A> {
-  return new SourceObservableClass<A>(...args);
-}
-
-class SourceObservableClass<A>
-  extends RootObservableClass<A>
-  implements SourceObservable<A>
-{
-  constructor(...args: readonly A[]) {
-    super({
+  return createRootObservable<A, Readonly<{ next: (nextValue: A) => void }>>(
+    {
       initialValue: Arr.isNonEmpty(args)
         ? Optional.some(args[0])
         : Optional.none,
-    });
-  }
+    },
+    ({ startUpdate, isCompleted }) => ({
+      next: (nextValue: A) => {
+        if (isCompleted()) return;
 
-  next(nextValue: A): void {
-    if (this.isCompleted) return;
-
-    this.startUpdate(nextValue);
-  }
+        startUpdate(nextValue);
+      },
+    }),
+  );
 }

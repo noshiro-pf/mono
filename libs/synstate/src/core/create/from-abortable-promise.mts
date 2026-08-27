@@ -1,5 +1,5 @@
 import { Optional, Result } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import { type FromPromiseObservable } from '../types/index.mjs';
 
 /**
@@ -31,53 +31,46 @@ import { type FromPromiseObservable } from '../types/index.mjs';
 export const fromAbortablePromise = <A, E = unknown>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   factory: (signal: AbortSignal) => Promise<A>,
-): FromPromiseObservable<A, E> =>
-  new FromAbortablePromiseObservableClass(factory);
+): FromPromiseObservable<A, E> => {
+  const abortController = new AbortController();
 
-class FromAbortablePromiseObservableClass<A, E = unknown>
-  extends RootObservableClass<Result<A, E>>
-  implements FromPromiseObservable<A, E>
-{
-  readonly #abortController: AbortController;
+  return createRootObservable<Result<A, E>>(
+    {
+      initialValue: Optional.none,
+      onComplete: () => {
+        abortController.abort();
+      },
+    },
+    ({ startUpdate, isCompleted, complete }) => {
+      const promise = factory(abortController.signal);
 
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  constructor(factory: (signal: AbortSignal) => Promise<A>) {
-    super({ initialValue: Optional.none });
+      promise
+        .then((value) => {
+          if (isCompleted()) return;
 
-    this.#abortController = new AbortController();
+          startUpdate(Result.ok(value));
+        })
+        .catch((error: unknown) => {
+          if (isCompleted()) return;
 
-    const promise = factory(this.#abortController.signal);
+          // Silently ignore AbortError — it means the observable was
+          // intentionally completed (e.g., by switchMap).
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return;
+          }
 
-    promise
-      .then((value) => {
-        if (this.isCompleted) return;
+          startUpdate(
+            Result.err(
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              error as E,
+            ),
+          );
+        })
+        .finally(() => {
+          complete();
+        });
 
-        this.startUpdate(Result.ok(value));
-      })
-      .catch((error: unknown) => {
-        if (this.isCompleted) return;
-
-        // Silently ignore AbortError — it means the observable was
-        // intentionally completed (e.g., by switchMap).
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-
-        this.startUpdate(
-          Result.err(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            error as E,
-          ),
-        );
-      })
-      .finally(() => {
-        this.complete();
-      });
-  }
-
-  override complete(): void {
-    this.#abortController.abort();
-
-    super.complete();
-  }
-}
+      return {};
+    },
+  );
+};

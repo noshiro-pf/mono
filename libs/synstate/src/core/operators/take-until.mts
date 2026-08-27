@@ -1,10 +1,9 @@
 import { Optional } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type KeepInitialValueOperator,
   type Observable,
   type TakeUntilOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -60,40 +59,43 @@ export const takeUntil = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    new TakeUntilObservableClass(
+    createTakeUntilObservable(
       parentObservable,
       notifier,
     )) as KeepInitialValueOperator<A, A>;
 
-class TakeUntilObservableClass<A>
-  extends SyncChildObservableClass<A, readonly [A]>
-  implements TakeUntilOperatorObservable<A>
-{
-  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
-    super({
+const createTakeUntilObservable = <A,>(
+  parentObservable: Observable<A>,
+  notifier: Observable<unknown>,
+): TakeUntilOperatorObservable<A> => {
+  const observable = createSyncChildObservable<A, readonly [A]>(
+    {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    });
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        const sn = parentObservable.getSnapshot();
 
-    notifier.subscribe(
-      () => {
-        this.complete();
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
+
+        setNext(sn.value, updateToken);
       },
-      () => {
-        this.complete();
-      },
-    );
-  }
+  );
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+  notifier.subscribe(
+    () => {
+      observable.complete();
+    },
+    () => {
+      observable.complete();
+    },
+  );
 
-    const sn = par.getSnapshot();
-
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.setNext(sn.value, updateToken);
-  }
-}
+  return observable;
+};

@@ -1,10 +1,9 @@
 import { Optional } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type KeepInitialValueOperator,
   type Observable,
   type SkipIfNoChangeOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -73,7 +72,7 @@ export const skipIfNoChange = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    new SkipIfNoChangeObservableClass(
+    createSkipIfNoChangeObservable(
       parentObservable,
       eq,
     )) as KeepInitialValueOperator<A, A>;
@@ -84,44 +83,40 @@ export const skipIfNoChange = <A,>(
  */
 export const distinctUntilChanged = skipIfNoChange;
 
-class SkipIfNoChangeObservableClass<A>
-  extends SyncChildObservableClass<A, readonly [A]>
-  implements SkipIfNoChangeOperatorObservable<A>
-{
-  readonly #eq: (x: A, y: A) => boolean;
-  #mut_previousValue: Optional<A>;
-
-  constructor(parentObservable: Observable<A>, eq: (x: A, y: A) => boolean) {
-    super({
+const createSkipIfNoChangeObservable = <A,>(
+  parentObservable: Observable<A>,
+  eq: (x: A, y: A) => boolean,
+): SkipIfNoChangeOperatorObservable<A> =>
+  createSyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    });
+    },
+    ({ setNext }) => {
+      // parentObservable.snapshot has value
+      // if parentObservable is InitializedObservable
+      let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
 
-    // parentObservable.snapshot has value
-    // if parentObservable is InitializedObservable
-    this.#mut_previousValue = parentObservable.getSnapshot();
+      return (updateToken) => {
+        const sn = parentObservable.getSnapshot();
 
-    this.#eq = eq;
-  }
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        const prev = mut_previousValue;
 
-    const sn = par.getSnapshot();
+        const cond = Optional.isNone(prev) || !eq(prev.value, sn.value);
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
+        // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
+        mut_previousValue = sn;
 
-    const prev = this.#mut_previousValue;
-
-    const cond = Optional.isNone(prev) || !this.#eq(prev.value, sn.value);
-
-    // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-    this.#mut_previousValue = sn;
-
-    if (cond) {
-      this.setNext(sn.value, updateToken);
-    }
-  }
-}
+        if (cond) {
+          setNext(sn.value, updateToken);
+        }
+      };
+    },
+  );

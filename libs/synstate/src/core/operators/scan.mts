@@ -1,9 +1,8 @@
 import { Optional } from 'ts-data-forge';
-import { InitializedSyncChildObservableClass } from '../class/index.mjs';
+import { createInitializedSyncChildObservable } from '../base/index.mjs';
 import {
   type Observable,
   type ScanOperatorObservable,
-  type UpdateToken,
   type WithInitialValueOperator,
 } from '../types/index.mjs';
 
@@ -62,42 +61,32 @@ export const scan =
     initialValue: B,
   ): WithInitialValueOperator<A, B> =>
   (parentObservable) =>
-    new ScanObservableClass(parentObservable, reducer, initialValue);
+    createScanObservable(parentObservable, reducer, initialValue);
 
-class ScanObservableClass<A, B>
-  extends InitializedSyncChildObservableClass<B, readonly [A]>
-  implements ScanOperatorObservable<A, B>
-{
-  readonly #reducer: (acc: B, curr: A) => B;
-
-  constructor(
-    parentObservable: Observable<A>,
-    reducer: (acc: B, curr: A) => B,
-    initialValue: B,
-  ) {
-    super({
+const createScanObservable = <A, B>(
+  parentObservable: Observable<A>,
+  reducer: (acc: B, curr: A) => B,
+  initialValue: B,
+): ScanOperatorObservable<A, B> =>
+  createInitializedSyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    });
+    },
+    ({ setNext, getSnapshot }) =>
+      (updateToken) => {
+        const psn = parentObservable.getSnapshot();
 
-    this.#reducer = reducer;
-  }
+        const sn = getSnapshot();
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(psn) ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
 
-    const psn = par.getSnapshot();
-
-    const sn = this.getSnapshot();
-
-    if (
-      par.updateToken !== updateToken ||
-      Optional.isNone(psn) ||
-      Optional.isNone(sn)
-    ) {
-      return; // skip update
-    }
-
-    this.setNext(this.#reducer(sn.value, psn.value), updateToken);
-  }
-}
+        setNext(reducer(sn.value, psn.value), updateToken);
+      },
+  );

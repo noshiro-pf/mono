@@ -8,10 +8,11 @@ import {
   type SyncChildObservable,
 } from '../types/index.mjs';
 import {
-  AsyncChildObservableClass,
-  SyncChildObservableClass,
-} from './child-observable-class.mjs';
-import { RootObservableClass } from './root-observable-class.mjs';
+  createAsyncChildObservable,
+  createSyncChildObservable,
+} from './create-child-observable.mjs';
+import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
+import { createRootObservable } from './create-root-observable.mjs';
 
 /**
  * Inheritance
@@ -60,30 +61,37 @@ expectType<Observable<1>, Observable<number>>('<=');
 
 expectType<Observable<number>, Observable<1>>('!<=');
 
-const root = new RootObservableClass({
-  initialValue: Optional.some(0),
-});
+const root = createRootObservable(
+  { initialValue: Optional.some(0) },
+  () => ({}),
+);
 
 expectType<typeof root, RootObservable<number>>('<=');
 
-const syncChild = new SyncChildObservableClass({
-  parents: [root],
-  initialValue: Optional.some(0),
-});
+const syncChild = createSyncChildObservable(
+  {
+    parents: [root],
+    initialValue: Optional.some(0),
+  },
+  createTryUpdateNotImplemented,
+);
 
 expectType<typeof syncChild, SyncChildObservable<number>>('<=');
 
-const asyncChild = new AsyncChildObservableClass({
-  parents: [root],
-  initialValue: Optional.some(0),
-});
+const asyncChild = createAsyncChildObservable(
+  {
+    parents: [root],
+    initialValue: Optional.some(0),
+  },
+  createTryUpdateNotImplemented,
+);
 
 expectType<typeof asyncChild, AsyncChildObservable<number>>('<=');
 
-test('SyncChildObservableClass', () => {
+test('createSyncChildObservable', () => {
   expect(syncChild.depth).toBe(1);
 });
 
-test('AsyncChildObservableClass', () => {
+test('createAsyncChildObservable', () => {
   expect(asyncChild.depth).toBe(1);
 });

@@ -5,14 +5,13 @@ import {
   pipe,
   SafeUint,
 } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import {
   type DropInitialValueOperator,
   type FilterOperatorObservable,
   type InitializedObservable,
   type Observable,
-  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -77,21 +76,15 @@ export function filter<A>(
   predicate: (value: A, index: SafeUint | -1) => boolean,
 ): DropInitialValueOperator<A, A> {
   return (parentObservable) =>
-    new FilterObservableClass(parentObservable, predicate);
+    createFilterObservable(parentObservable, predicate);
 }
 
-class FilterObservableClass<A>
-  extends SyncChildObservableClass<A, readonly [A]>
-  implements FilterOperatorObservable<A>
-{
-  readonly #predicate: (x: A, index: SafeUint | -1) => boolean;
-  #mut_index: SafeUint | -1;
-
-  constructor(
-    parentObservable: Observable<A>,
-    predicate: (x: A, index: SafeUint | -1) => boolean,
-  ) {
-    super({
+const createFilterObservable = <A,>(
+  parentObservable: Observable<A>,
+  predicate: (x: A, index: SafeUint | -1) => boolean,
+): FilterOperatorObservable<A> =>
+  createSyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
         Optional.isNone(sn)
@@ -100,30 +93,29 @@ class FilterObservableClass<A>
             ? sn
             : Optional.none,
       ).value,
-    });
+    },
+    ({ setNext }) => {
+      let mut_index: SafeUint | -1 = -1;
 
-    this.#mut_index = -1;
+      return (updateToken) => {
+        const sn = parentObservable.getSnapshot();
 
-    this.#predicate = predicate;
-  }
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        mut_index =
+          mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, mut_index);
 
-    const sn = par.getSnapshot();
-
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
-
-    if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updateToken);
-    }
-  }
-}
+        if (predicate(sn.value, mut_index)) {
+          setNext(sn.value, updateToken);
+        }
+      };
+    },
+  );
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

@@ -19,6 +19,6 @@ setCount(3);
 assert.deepStrictEqual(mut_seen, [2, 4, 6]);
 
 // The snapshot is an Optional from ts-data-forge, not a bare value.
-assert.deepStrictEqual(doubled.getCurrentValue().value, 6);
+assert.deepStrictEqual(doubled.getSnapshot().value, 6);
 
 console.info('synstate ok');
