@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-type-forge": "0.6.6"
+    "eslint-plugin-ts-type-forge": "0.7.0"
   }
 }

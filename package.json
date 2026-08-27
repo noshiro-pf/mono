@@ -90,7 +90,7 @@
     "z:ts-codemod": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-codemod-cli/src/cmd/ts-codemod.mts"
   },
   "devDependencies": {
-    "@changesets/cli": "3.0.0",
+    "@changesets/cli": "3.0.1",
     "@rollup/plugin-replace": "catalog:",
     "@rollup/plugin-strip": "catalog:",
     "@types/node": "catalog:",

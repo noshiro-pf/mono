@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-codemod-cli": "1.0.1"
+    "ts-codemod-cli": "2.0.0"
   }
 }
