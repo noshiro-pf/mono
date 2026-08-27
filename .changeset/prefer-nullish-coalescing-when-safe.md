@@ -14,7 +14,7 @@ case is impossible or unobservable, so the fix is applied by `--fix`:
   `null` / `undefined` (an object or array type, `1 | 2 | undefined`,
   `'a' | 'b' | null`, a symbol, …) — any right-hand side qualifies; or
 - the left-hand side's only possible falsy non-nullish value (`''` for
-  strings, `false` for booleans, `0n` for bigints, a literal `0`) is exactly
+  strings, `false` for booleans, `0n` for `bigint`, a literal `0`) is exactly
   what the side-effect-free right-hand side evaluates to, so both operators
   produce the same value either way.
 
@@ -22,7 +22,7 @@ When the same falsy-case condition holds but the left-hand side can _never_
 be nullish, `??` would never take its right-hand side at all, so the rule
 instead removes the redundant `|| <fallback>` entirely — `<string> || ''`
 becomes just the string, `<1 | 2> || 3` just the union; in the no-falsy-value
-case even an effectful fallback may be dropped, because it was never
+case even a fallback with side effects may be dropped, because it was never
 evaluated.
 
 For `||=`, when the falsy case is reachable the target must additionally be a

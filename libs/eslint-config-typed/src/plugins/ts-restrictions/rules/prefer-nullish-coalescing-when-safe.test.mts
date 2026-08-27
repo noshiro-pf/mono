@@ -46,7 +46,7 @@ describe('prefer-nullish-coalescing-when-safe', () => {
           `,
         },
         {
-          name: 'non-nullable string whose falsy case would run an effectful right-hand side',
+          name: 'non-nullable string whose falsy case would evaluate a right-hand side with side effects',
           code: dedent`
             declare const x: string;
             declare const f: () => '';
@@ -413,7 +413,7 @@ describe('prefer-nullish-coalescing-when-safe', () => {
           errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
         },
         {
-          name: 'never-falsy left-hand side allows dropping even an effectful default (it was never evaluated)',
+          name: 'never-falsy left-hand side allows dropping even a default with side effects (it was never evaluated)',
           code: dedent`
             declare const x: { readonly a: number };
             declare const f: () => '';

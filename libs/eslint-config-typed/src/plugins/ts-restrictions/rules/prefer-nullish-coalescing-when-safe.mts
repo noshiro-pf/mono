@@ -51,7 +51,7 @@ type TypeSummary = Readonly<{
  *   side is then fine — it is even evaluated under exactly the same
  *   conditions as before.
  * - The type of `a` has exactly one possible falsy non-nullish value (`""`
- *   for strings, `false` for booleans, `0n` for bigints, a literal `0`), and
+ *   for strings, `false` for booleans, `0n` for `bigint`, a literal `0`), and
  *   the right-hand side is a side-effect-free expression of exactly that
  *   literal type. When `a` holds that value, `||` returns the right-hand side
  *   and `??` returns `a` — the same value either way.
@@ -60,8 +60,9 @@ type TypeSummary = Readonly<{
  * be nullish, `??` would never take its right-hand side at all, so instead of
  * rewriting the operator the rule removes the redundant `|| <fallback>`
  * entirely: `<string> || ''` → `<string>`, `<1 | 2> || 3` → `<1 | 2>`. In the
- * no-falsy-value case the right-hand side was never evaluated (so even an
- * effectful one may be dropped); in the singleton-match case it was evaluated
+ * no-falsy-value case the right-hand side was never evaluated (so even one
+ * with side effects may be dropped); in the singleton-match case it was
+ * evaluated
  * but is side-effect-free and equal to the left-hand side.
  *
  * `x ||= y` is handled the same way, except that when the falsy case is
