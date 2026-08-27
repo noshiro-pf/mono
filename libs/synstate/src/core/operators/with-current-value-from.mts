@@ -95,11 +95,12 @@ const createWithCurrentValueFromObservable = <A, B>(
     },
     ({ setNext }) =>
       (updateToken) => {
-        const par = parentObservable;
+        const ps = parentObservable.getSnapshot();
 
-        const ps = par.getSnapshot();
-
-        if (par.updateToken !== updateToken || Optional.isNone(ps)) {
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(ps)
+        ) {
           return; // skip update
         }
 

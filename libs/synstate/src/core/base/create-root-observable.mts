@@ -1,14 +1,9 @@
-import { Arr, Optional } from 'ts-data-forge';
-import { type MutableSet, type ReadonlyRecord } from 'ts-type-forge';
-import {
-  isRootObservable,
-  type ChildObservable,
-  type ObservableId,
-  type RootObservable,
-} from '../types/index.mjs';
-import { binarySearch, issueUpdateToken } from '../utils/index.mjs';
+import { Optional } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
+import { isRootObservable, type RootObservable } from '../types/index.mjs';
 import {
   assembleObservable,
+  createManagerObservableParts,
   createObservableBaseHandle,
   createTryUpdateNotImplemented,
 } from './create-observable-base.mjs';
@@ -62,36 +57,7 @@ export const createRootObservable = <
 ): Extension & RootObservable<A> => {
   const handle = createObservableBaseHandle<A>(initialValue);
 
-  let mut_propagationOrder: readonly ChildObservable<unknown>[] = [];
-
-  const mut_descendantsIdSet: MutableSet<ObservableId> = new Set();
-
-  const addDescendant = <B,>(child: ChildObservable<B>): void => {
-    if (mut_descendantsIdSet.has(child.id)) return;
-
-    mut_descendantsIdSet.add(child.id);
-
-    const insertPos = binarySearch(
-      mut_propagationOrder.map((a) => a.depth),
-      child.depth,
-    );
-
-    mut_propagationOrder = Arr.toInserted(
-      mut_propagationOrder,
-      insertPos,
-      child,
-    );
-  };
-
-  const startUpdate = (nextValue: A): void => {
-    const updateToken = issueUpdateToken();
-
-    handle.setNext(nextValue, updateToken);
-
-    for (const p of mut_propagationOrder) {
-      p.tryUpdate(updateToken);
-    }
-  };
+  const { addDescendant, startUpdate } = createManagerObservableParts(handle);
 
   const complete = (): void => {
     onComplete?.();

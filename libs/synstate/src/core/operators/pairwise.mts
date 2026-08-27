@@ -84,11 +84,12 @@ const createPairwiseObservable = <A,>(
       let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
 
       return (updateToken) => {
-        const par = parentObservable;
+        const sn = parentObservable.getSnapshot();
 
-        const sn = par.getSnapshot();
-
-        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
           return; // skip update
         }
 
@@ -97,7 +98,7 @@ const createPairwiseObservable = <A,>(
         const cond = !Optional.isNone(prev);
 
         // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
-        mut_previousValue = par.getSnapshot();
+        mut_previousValue = parentObservable.getSnapshot();
 
         if (cond) {
           setNext([prev.value, sn.value], updateToken);

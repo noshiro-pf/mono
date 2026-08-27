@@ -1,5 +1,9 @@
 import { Arr, Optional } from 'ts-data-forge';
-import { type MutableMap, type ReadonlyRecord } from 'ts-type-forge';
+import {
+  type MutableMap,
+  type MutableSet,
+  type ReadonlyRecord,
+} from 'ts-type-forge';
 import {
   type ChildObservable,
   type InitializedObservable,
@@ -15,6 +19,7 @@ import {
   type WithInitialValueOperator,
 } from '../types/index.mjs';
 import {
+  binarySearch,
   issueObservableId,
   issueSubscriberId,
   issueUpdateToken,
@@ -186,6 +191,61 @@ export const createObservableBaseHandle = <A,>(
     setNext,
     completeBase,
   };
+};
+
+/**
+ * The extra members every manager observable — a root or an async child — owns:
+ * the depth-ordered descendant list and the update propagation that walks it.
+ */
+export type ManagerObservableParts<A> = Readonly<{
+  addDescendant: <B>(child: ChildObservable<B>) => void;
+
+  /** Emits `nextValue` and propagates the update to all descendants. */
+  startUpdate: (nextValue: A) => void;
+}>;
+
+/**
+ * Builds the manager half of a root or async-child observable. Both start their
+ * own update propagation, so both keep a descendant set and a depth-ordered
+ * propagation list; this is the single implementation of that pair (the class
+ * version duplicated it across `RootObservableClass` and
+ * `AsyncChildObservableClass`).
+ */
+export const createManagerObservableParts = <A,>(
+  handle: ObservableBaseHandle<A>,
+): ManagerObservableParts<A> => {
+  let mut_propagationOrder: readonly ChildObservable<unknown>[] = [];
+
+  const mut_descendantsIdSet: MutableSet<ObservableId> = new Set();
+
+  const addDescendant = <B,>(child: ChildObservable<B>): void => {
+    if (mut_descendantsIdSet.has(child.id)) return;
+
+    mut_descendantsIdSet.add(child.id);
+
+    const insertPos = binarySearch(
+      mut_propagationOrder.map((a) => a.depth),
+      child.depth,
+    );
+
+    mut_propagationOrder = Arr.toInserted(
+      mut_propagationOrder,
+      insertPos,
+      child,
+    );
+  };
+
+  const startUpdate = (nextValue: A): void => {
+    const updateToken = issueUpdateToken();
+
+    handle.setNext(nextValue, updateToken);
+
+    for (const p of mut_propagationOrder) {
+      p.tryUpdate(updateToken);
+    }
+  };
+
+  return { addDescendant, startUpdate };
 };
 
 /** Default `tryUpdate` for observables that never receive parent updates. */

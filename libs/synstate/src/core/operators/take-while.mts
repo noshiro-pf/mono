@@ -98,11 +98,12 @@ const createTakeWhileObservable = <A,>(
       let mut_index: SafeUint | -1 = -1;
 
       return (updateToken) => {
-        const par = parentObservable;
+        const sn = parentObservable.getSnapshot();
 
-        const sn = par.getSnapshot();
-
-        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
           return; // skip update
         }
 

@@ -98,11 +98,12 @@ const createSkipIfNoChangeObservable = <A,>(
       let mut_previousValue: Optional<A> = parentObservable.getSnapshot();
 
       return (updateToken) => {
-        const par = parentObservable;
+        const sn = parentObservable.getSnapshot();
 
-        const sn = par.getSnapshot();
-
-        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+        if (
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
           return; // skip update
         }
 

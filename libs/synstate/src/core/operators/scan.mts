@@ -75,14 +75,12 @@ const createScanObservable = <A, B>(
     },
     ({ setNext, getSnapshot }) =>
       (updateToken) => {
-        const par = parentObservable;
-
-        const psn = par.getSnapshot();
+        const psn = parentObservable.getSnapshot();
 
         const sn = getSnapshot();
 
         if (
-          par.updateToken !== updateToken ||
+          parentObservable.updateToken !== updateToken ||
           Optional.isNone(psn) ||
           Optional.isNone(sn)
         ) {

@@ -133,12 +133,10 @@ const createAuditObservable = <A,>(
     },
     ({ startUpdate }) =>
       (updateToken) => {
-        const par = parentObservable;
-
         if (
           mut_isSkipping ||
-          par.updateToken !== updateToken ||
-          Optional.isNone(par.getSnapshot())
+          parentObservable.updateToken !== updateToken ||
+          Optional.isNone(parentObservable.getSnapshot())
         ) {
           return; // skip update
         }
@@ -147,7 +145,7 @@ const createAuditObservable = <A,>(
         mut_isSkipping = true;
 
         mut_timerId = setTimeout(() => {
-          const sn = par.getSnapshot();
+          const sn = parentObservable.getSnapshot();
 
           if (Optional.isNone(sn)) return;
 

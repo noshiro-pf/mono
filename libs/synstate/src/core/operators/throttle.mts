@@ -117,13 +117,11 @@ const createThrottleObservable = <A,>(
     },
     ({ setNext }) =>
       (updateToken) => {
-        const par = parentObservable;
-
-        const sn = par.getSnapshot();
+        const sn = parentObservable.getSnapshot();
 
         if (
           mut_isSkipping ||
-          par.updateToken !== updateToken ||
+          parentObservable.updateToken !== updateToken ||
           Optional.isNone(sn)
         ) {
           return; // skip update
