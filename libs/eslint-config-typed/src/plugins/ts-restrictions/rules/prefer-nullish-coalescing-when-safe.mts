@@ -12,7 +12,9 @@ import * as ts from 'typescript';
 type Options = readonly [];
 
 type MessageIds =
-  'preferNullishCoalescing' | 'preferNullishCoalescingAssignment';
+  | 'preferNullishCoalescing'
+  | 'preferNullishCoalescingAssignment'
+  | 'removeUnnecessaryLogicalOr';
 
 /**
  * The falsy values other than `null` / `undefined` that a type may hold at
@@ -54,10 +56,20 @@ type TypeSummary = Readonly<{
  *   literal type. When `a` holds that value, `||` returns the right-hand side
  *   and `??` returns `a` — the same value either way.
  *
+ * When the same falsy-case condition holds but the left-hand side can *never*
+ * be nullish, `??` would never take its right-hand side at all, so instead of
+ * rewriting the operator the rule removes the redundant `|| <fallback>`
+ * entirely: `<string> || ''` → `<string>`, `<1 | 2> || 3` → `<1 | 2>`. In the
+ * no-falsy-value case the right-hand side was never evaluated (so even an
+ * effectful one may be dropped); in the singleton-match case it was evaluated
+ * but is side-effect-free and equal to the left-hand side.
+ *
  * `x ||= y` is handled the same way, except that when the falsy case is
  * reachable (the singleton-match case) the target must be a plain identifier:
  * on a property, `||=` performs an assignment where `??=` performs none, which
- * is observable through setters, `Proxy` traps, or a frozen receiver.
+ * is observable through setters, `Proxy` traps, or a frozen receiver. A
+ * never-nullish `||=` target is left alone — the equivalent cleanup would be
+ * deleting the whole statement, which is out of this rule's scope.
  *
  * Known deliberate imprecisions, matching what `===` (SameValueZero) can
  * observe and what typescript-eslint's own type-aware rules assume:
@@ -78,7 +90,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Enforce `??` over `||` (and `??=` over `||=`) for defaulting when the operand types prove the replacement cannot change the behavior (e.g. `<string | undefined> || ""`)',
+        'Enforce `??` over `||` (and `??=` over `||=`) for defaulting when the operand types prove the replacement cannot change the behavior (e.g. `<string | undefined> || ""`), and remove `|| <fallback>` entirely when a never-nullish left-hand side makes it redundant (e.g. `<string> || ""`)',
     },
     fixable: 'code',
     schema: [],
@@ -87,6 +99,8 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         'Replace `||` with `??`. With these operand types the two operators always produce the same result, and `??` makes it explicit that only `null` / `undefined` are defaulted.',
       preferNullishCoalescingAssignment:
         'Replace `||=` with `??=`. With these operand types the two operators always behave the same, and `??=` makes it explicit that only `null` / `undefined` are defaulted.',
+      removeUnnecessaryLogicalOr:
+        'This `|| …` is unnecessary: the left-hand side can never be nullish, and any falsy value it can hold equals the right-hand side value, so the expression always evaluates to the left-hand side. Remove the `|| …`.',
     },
   },
 
@@ -313,18 +327,18 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
     };
 
     /**
-     * Decides whether replacing this `||` / `||=` with `??` / `??=` provably
-     * preserves the behavior (see the rule-level doc comment for the proof).
-     * Only nullable left-hand sides are considered: on a non-nullable one both
-     * spellings are dead defaulting and `||` is no worse.
+     * Decides whether the falsy non-nullish case of the left-hand side is
+     * harmless (see the rule-level doc comment for the proof): it either
+     * cannot happen at all, or it yields exactly the right-hand side value
+     * with no skippable side effect. This is the shared precondition of both
+     * rewrites — `||` → `??` on a nullable left-hand side, and removing
+     * `|| <fallback>` on a never-nullish one.
      */
-    const replacementIsSafe = (
+    const falsyCaseIsHarmless = (
       summary: TypeSummary,
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       right: TSESTree.Expression,
     ): boolean => {
-      if (!summary.nullable) return false;
-
       if (summary.falsyValues.size === 0) return true;
 
       if (summary.falsyValues.size > 1) return false;
@@ -338,11 +352,56 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       LogicalExpression: (node) => {
         if (node.operator !== '||') return;
 
+        const summary = summarizeExpressionType(node.left);
+
+        if (summary === 'unsafe') return;
+
+        if (!falsyCaseIsHarmless(summary, node.right)) return;
+
+        if (!summary.nullable) {
+          // A never-nullish left-hand side makes the whole `|| <fallback>`
+          // redundant: `??` would never take its right-hand side, so the
+          // expression is just the left-hand side — remove the tail instead
+          // of rewriting the operator. (In the singleton-match case the old
+          // code did evaluate the side-effect-free right-hand side and
+          // returned that equal value; in the no-falsy-value case it never
+          // evaluated it at all, so any right-hand side may be dropped.)
+          context.report({
+            node,
+            messageId: 'removeUnnecessaryLogicalOr',
+            fix: (fixer) => {
+              const operatorToken = context.sourceCode.getFirstTokenBetween(
+                node.left,
+                node.right,
+                (token) => token.value === '||',
+              );
+
+              if (operatorToken === null) return null;
+
+              const tokenBeforeOperator =
+                context.sourceCode.getTokenBefore(operatorToken);
+
+              if (tokenBeforeOperator === null) return null;
+
+              // Remove from the end of the left operand's last token (its
+              // closing parenthesis included, so `(a, b) || ''` keeps its
+              // parentheses) to the end of the whole expression.
+              return fixer.removeRange([
+                tokenBeforeOperator.range[1],
+                node.range[1],
+              ]);
+            },
+          });
+
+          return;
+        }
+
         // `??` cannot be mixed with `&&` / `||` without parentheses, so an
         // unparenthesized `||` directly inside another logical expression
         // (e.g. the inner `a || b` of `a || b || c`) cannot be rewritten in
         // place. The outer expression is still handled, parenthesizing this
-        // one as its operand.
+        // one as its operand. (The removal branch above has no such
+        // constraint: dropping `|| <fallback>` is valid in any context.)
         const { parent } = node;
 
         if (
@@ -352,12 +411,6 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         ) {
           return;
         }
-
-        const summary = summarizeExpressionType(node.left);
-
-        if (summary === 'unsafe') return;
-
-        if (!replacementIsSafe(summary, node.right)) return;
 
         context.report({
           node,
@@ -402,7 +455,12 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
         if (summary === 'unsafe') return;
 
-        if (!replacementIsSafe(summary, node.right)) return;
+        // Only a nullable target is rewritten. On a never-nullish one the
+        // equivalent cleanup would be deleting the whole statement, which is
+        // out of this rule's scope.
+        if (!summary.nullable) return;
+
+        if (!falsyCaseIsHarmless(summary, node.right)) return;
 
         // When the falsy non-nullish case is reachable (the singleton-match
         // case), `||=` assigns where `??=` does not. On a property that

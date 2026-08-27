@@ -24,10 +24,33 @@ describe('prefer-nullish-coalescing-when-safe', () => {
     {
       valid: [
         {
-          name: 'non-nullable left-hand side',
+          name: 'non-nullable left-hand side with a non-matching default',
           code: dedent`
             declare const x: string;
             const y = x || 'a';
+          `,
+        },
+        {
+          name: 'non-nullable number (may hold NaN or -0)',
+          code: dedent`
+            declare const x: number;
+            const y = x || 0;
+          `,
+        },
+        {
+          name: 'ordinary boolean logic is not a removable default',
+          code: dedent`
+            declare const a: boolean;
+            declare const b: boolean;
+            const y = a || b;
+          `,
+        },
+        {
+          name: 'non-nullable string whose falsy case would run an effectful right-hand side',
+          code: dedent`
+            declare const x: string;
+            declare const f: () => '';
+            const y = x || f();
           `,
         },
         {
@@ -340,6 +363,96 @@ describe('prefer-nullish-coalescing-when-safe', () => {
             const y = (b ?? '') ?? 'x';
           `,
           errors: [{ messageId: 'preferNullishCoalescing' }],
+        },
+        {
+          name: 'non-nullable string defaulted with the empty string is just the string',
+          code: dedent`
+            declare const x: string;
+            const y = x || '';
+          `,
+          output: dedent`
+            declare const x: string;
+            const y = x;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'non-nullable boolean defaulted with false is just the boolean',
+          code: dedent`
+            declare const x: boolean;
+            const y = x || false;
+          `,
+          output: dedent`
+            declare const x: boolean;
+            const y = x;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'non-nullable bigint defaulted with 0n is just the bigint',
+          code: dedent`
+            declare const x: bigint;
+            const y = x || 0n;
+          `,
+          output: dedent`
+            declare const x: bigint;
+            const y = x;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'never-falsy non-nullable left-hand side makes any default dead code',
+          code: dedent`
+            declare const x: 1 | 2;
+            const y = x || 3;
+          `,
+          output: dedent`
+            declare const x: 1 | 2;
+            const y = x;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'never-falsy left-hand side allows dropping even an effectful default (it was never evaluated)',
+          code: dedent`
+            declare const x: { readonly a: number };
+            declare const f: () => '';
+            const y = x || f();
+          `,
+          output: dedent`
+            declare const x: { readonly a: number };
+            declare const f: () => '';
+            const y = x;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'removal applies to the outer || of a non-nullable chain',
+          code: dedent`
+            declare const a: string;
+            declare const b: string;
+            const y = a || b || '';
+          `,
+          output: dedent`
+            declare const a: string;
+            declare const b: string;
+            const y = a || b;
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
+        },
+        {
+          name: 'removal keeps the parentheses around a parenthesized left operand',
+          code: dedent`
+            declare const a: string;
+            declare const b: string;
+            const y = (a && b) || '';
+          `,
+          output: dedent`
+            declare const a: string;
+            declare const b: string;
+            const y = (a && b);
+          `,
+          errors: [{ messageId: 'removeUnnecessaryLogicalOr' }],
         },
         {
           name: '||= on an identifier whose only falsy value matches the default',

@@ -310,7 +310,7 @@ namespace PreferNonMutatingArrayMethod {
 }
 
 /**
- * @description Enforce `??` over `||` (and `??=` over `||=`) for defaulting when the operand types prove the replacement cannot change the behavior (e.g. `<string | undefined> || ""`)
+ * @description Enforce `??` over `||` (and `??=` over `||=`) for defaulting when the operand types prove the replacement cannot change the behavior (e.g. `<string | undefined> || ""`), and remove `|| <fallback>` entirely when a never-nullish left-hand side makes it redundant (e.g. `<string> || ""`)
  *
  *  ```md
  *  | key        | value      |

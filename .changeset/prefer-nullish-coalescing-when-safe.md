@@ -18,6 +18,13 @@ case is impossible or unobservable, so the fix is applied by `--fix`:
   what the side-effect-free right-hand side evaluates to, so both operators
   produce the same value either way.
 
+When the same falsy-case condition holds but the left-hand side can _never_
+be nullish, `??` would never take its right-hand side at all, so the rule
+instead removes the redundant `|| <fallback>` entirely — `<string> || ''`
+becomes just the string, `<1 | 2> || 3` just the union; in the no-falsy-value
+case even an effectful fallback may be dropped, because it was never
+evaluated.
+
 For `||=`, when the falsy case is reachable the target must additionally be a
 plain identifier, because on a property `||=` performs an assignment where
 `??=` performs none — observable through setters, `Proxy` traps, or a frozen
