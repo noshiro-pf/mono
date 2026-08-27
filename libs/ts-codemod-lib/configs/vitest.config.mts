@@ -9,7 +9,16 @@ export default defineViteConfig({
   alias: {
     'ts-codemod-lib': path.resolve(projectRootPath, './src/entry-point.mts'),
   },
+  /*
+   * Every transformer here is driven by the type checker, and
+   * `enableNoUncheckedIndexedAccess` checks the file twice — once with the
+   * option on and once with it off — so a single case costs a second or so.
+   * V8 coverage instrumentation multiplies that by roughly five, which took
+   * the default 5 s timeout out from under `test:cov` on CI while `test` and
+   * `test:browser` stayed green.
+   */
   node: {
+    testTimeout: 30_000,
     includeSource: ['src/functions/**/*.mts', 'samples/**/*.mts'],
     include: ['src/functions/**/*.test.mts', 'samples/**/*.mts'],
     exclude: [
@@ -19,6 +28,7 @@ export default defineViteConfig({
     ],
   },
   browser: {
+    testTimeout: 30_000,
     provider: playwright(),
     // This package fetches its test files in parallel rather than one at a
     // time, as the other browser projects do: with `optimizeDepsInclude`
