@@ -7,7 +7,7 @@
 
 ## `subscribe()` の動作仕様
 
-`ObservableBaseClass.subscribe` (observable-base-class.mts L147-161) の動作:
+`subscribe` (src/core/base/create-observable-base.mts) の動作:
 
 1. snapshot があれば `onNext(value)` を即座に呼ぶ
 2. `isCompleted` なら `onComplete()` を呼んで return（subscriber 登録しない）
@@ -42,9 +42,9 @@ auth$.pipe(
 
 意図通りの動作。
 
-## constructor と `complete()` の間にコードが差し込まれるリスク
+## 生成と `complete()` の間にコードが差し込まれるリスク
 
-`just()` は同期的に `new RootObservableClass()` → `obs.complete()` → `return` を実行するため、
+`just()` は同期的に `createRootObservable()` → `obs.complete()` → `return` を実行するため、
 ユーザーコードが間に入る余地はない。
 
 ## `source(value)` との違い
@@ -54,9 +54,9 @@ auth$.pipe(
 
 ## `complete()` による subscriber clear の影響
 
-`complete()` は subscriber map を clear する (observable-base-class.mts L130)。
+`complete()` は subscriber map を clear する (create-observable-base.mts の `completeBase`)。
 `just` の場合は初期値が snapshot として保持されているため、
-completed 後に `.pipe()` で子を繋いでも子の constructor が snapshot を読める。
+completed 後に `.pipe()` で子を繋いでも子の factory が snapshot を読める。
 
 ## 結論
 

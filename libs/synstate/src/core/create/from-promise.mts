@@ -1,5 +1,5 @@
 import { Optional, Result } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import { type FromPromiseObservable } from '../types/index.mjs';
 
 /**
@@ -51,33 +51,30 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  */
 export const fromPromise = <A, E = unknown>(
   promise: Promise<A>,
-): FromPromiseObservable<A, E> => new FromPromiseObservableClass(promise);
+): FromPromiseObservable<A, E> =>
+  createRootObservable<Result<A, E>>(
+    { initialValue: Optional.none },
+    ({ startUpdate, isCompleted, complete }) => {
+      promise
+        .then((value) => {
+          if (isCompleted()) return;
 
-class FromPromiseObservableClass<A, E = unknown>
-  extends RootObservableClass<Result<A, E>>
-  implements FromPromiseObservable<A, E>
-{
-  constructor(promise: Promise<A>) {
-    super({ initialValue: Optional.none });
+          startUpdate(Result.ok(value));
+        })
+        .catch((error: unknown) => {
+          if (isCompleted()) return;
 
-    promise
-      .then((value) => {
-        if (this.isCompleted) return;
+          startUpdate(
+            Result.err(
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              error as E,
+            ),
+          );
+        })
+        .finally(() => {
+          complete();
+        });
 
-        this.startUpdate(Result.ok(value));
-      })
-      .catch((error: unknown) => {
-        if (this.isCompleted) return;
-
-        this.startUpdate(
-          Result.err(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            error as E,
-          ),
-        );
-      })
-      .finally(() => {
-        this.complete();
-      });
-  }
-}
+      return {};
+    },
+  );

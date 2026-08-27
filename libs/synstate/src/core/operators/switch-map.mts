@@ -1,11 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { AsyncChildObservableClass } from '../class/index.mjs';
+import { createAsyncChildObservable } from '../base/index.mjs';
 import {
   type DropInitialValueOperator,
   type Observable,
   type Subscription,
   type SwitchMapOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -106,61 +105,49 @@ export const switchMap =
     mapToObservable: (curr: A) => Observable<B>,
   ): DropInitialValueOperator<A, B> =>
   (parentObservable) =>
-    new SwitchMapObservableClass(parentObservable, mapToObservable);
+    createSwitchMapObservable(parentObservable, mapToObservable);
 
-class SwitchMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, readonly [A]>
-  implements SwitchMapOperatorObservable<A, B>
-{
-  readonly #mapToObservable: (curr: A) => Observable<B>;
-  #mut_observable: Observable<B> | undefined;
-  #mut_subscription: Subscription | undefined;
+const createSwitchMapObservable = <A, B>(
+  parentObservable: Observable<A>,
+  mapToObservable: (curr: A) => Observable<B>,
+): SwitchMapOperatorObservable<A, B> => {
+  let mut_observable: Observable<B> | undefined = undefined;
 
-  constructor(
-    parentObservable: Observable<A>,
-    mapToObservable: (curr: A) => Observable<B>,
-  ) {
-    super({
+  let mut_subscription: Subscription | undefined = undefined;
+
+  return createAsyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: Optional.none,
-    });
+      onComplete: () => {
+        mut_subscription?.unsubscribe();
 
-    this.#mapToObservable = mapToObservable;
+        mut_observable?.complete();
+      },
+    },
+    ({ startUpdate }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#mut_observable = undefined;
+        const sn = par.getSnapshot();
 
-    this.#mut_subscription = undefined;
-  }
+        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        mut_observable?.complete();
 
-    const sn = par.getSnapshot();
+        mut_subscription?.unsubscribe();
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
+        const observable = mapToObservable(sn.value);
 
-    this.#mut_observable?.complete();
+        mut_observable = observable;
 
-    this.#mut_subscription?.unsubscribe();
+        const subscription = observable.subscribe((curr) => {
+          startUpdate(curr);
+        });
 
-    const observable = this.#mapToObservable(sn.value);
-
-    this.#mut_observable = observable;
-
-    const subscription = observable.subscribe((curr) => {
-      this.startUpdate(curr);
-    });
-
-    this.#mut_subscription = subscription;
-  }
-
-  override complete(): void {
-    this.#mut_subscription?.unsubscribe();
-
-    this.#mut_observable?.complete();
-
-    super.complete();
-  }
-}
+        mut_subscription = subscription;
+      },
+  );
+};

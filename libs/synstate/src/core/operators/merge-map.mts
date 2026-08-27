@@ -1,11 +1,10 @@
 import { Arr, Optional } from 'ts-data-forge';
-import { AsyncChildObservableClass } from '../class/index.mjs';
+import { createAsyncChildObservable } from '../base/index.mjs';
 import {
   type DropInitialValueOperator,
   type MergeMapOperatorObservable,
   type Observable,
   type Subscription,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -108,7 +107,7 @@ export const mergeMap =
     mapToObservable: (curr: A) => Observable<B>,
   ): DropInitialValueOperator<A, B> =>
   (parentObservable) =>
-    new MergeMapObservableClass(parentObservable, mapToObservable);
+    createMergeMapObservable(parentObservable, mapToObservable);
 
 /**
  * Alias for `mergeMap`.
@@ -116,62 +115,47 @@ export const mergeMap =
  */
 export const flatMap = mergeMap;
 
-class MergeMapObservableClass<A, B>
-  extends AsyncChildObservableClass<B, readonly [A]>
-  implements MergeMapOperatorObservable<A, B>
-{
-  readonly #mapToObservable: (curr: A) => Observable<B>;
-  #mut_observables: readonly Observable<B>[];
-  #mut_subscriptions: readonly Subscription[];
+const createMergeMapObservable = <A, B>(
+  parentObservable: Observable<A>,
+  mapToObservable: (curr: A) => Observable<B>,
+): MergeMapOperatorObservable<A, B> => {
+  let mut_observables: readonly Observable<B>[] = [];
 
-  constructor(
-    parentObservable: Observable<A>,
-    mapToObservable: (curr: A) => Observable<B>,
-  ) {
-    super({
+  let mut_subscriptions: readonly Subscription[] = [];
+
+  return createAsyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: Optional.none,
-    });
+      onComplete: () => {
+        for (const s of mut_subscriptions) {
+          s.unsubscribe();
+        }
 
-    this.#mapToObservable = mapToObservable;
+        for (const o of mut_observables) {
+          o.complete();
+        }
+      },
+    },
+    ({ startUpdate }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#mut_observables = [];
+        const sn = par.getSnapshot();
 
-    this.#mut_subscriptions = [];
-  }
+        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        const observable = mapToObservable(sn.value);
 
-    const sn = par.getSnapshot();
+        mut_observables = Arr.toPushed(mut_observables, observable);
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
+        const subscription = observable.subscribe((curr) => {
+          startUpdate(curr);
+        });
 
-    const observable = this.#mapToObservable(sn.value);
-
-    this.#mut_observables = Arr.toPushed(this.#mut_observables, observable);
-
-    const subscription = observable.subscribe((curr) => {
-      this.startUpdate(curr);
-    });
-
-    this.#mut_subscriptions = Arr.toPushed(
-      this.#mut_subscriptions,
-      subscription,
-    );
-  }
-
-  override complete(): void {
-    for (const s of this.#mut_subscriptions) {
-      s.unsubscribe();
-    }
-
-    for (const o of this.#mut_observables) {
-      o.complete();
-    }
-
-    super.complete();
-  }
-}
+        mut_subscriptions = Arr.toPushed(mut_subscriptions, subscription);
+      },
+  );
+};

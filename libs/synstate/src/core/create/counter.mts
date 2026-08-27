@@ -1,5 +1,5 @@
 import { asSafeUint, Optional, SafeUint } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import { type CounterObservable, type TimerId } from '../types/index.mjs';
 
 /**
@@ -50,79 +50,62 @@ export const counter = (
   options?: Readonly<{
     startManually?: boolean;
   }>,
-): CounterObservable =>
-  new CounterObservableClass(
-    intervalMilliSeconds,
-    options?.startManually ?? false,
+): CounterObservable => {
+  let mut_counter: SafeUint = asSafeUint(0);
+
+  let mut_timerId0: TimerId | undefined = undefined;
+
+  let mut_timerId: TimerId | undefined = undefined;
+
+  let mut_isStarted = false;
+
+  const resetTimer = (): void => {
+    if (mut_timerId0 === undefined || mut_timerId === undefined) {
+      return;
+    }
+
+    clearInterval(mut_timerId0);
+
+    clearInterval(mut_timerId);
+  };
+
+  const observable = createRootObservable<
+    SafeUint,
+    Readonly<{ start: () => void }>
+  >(
+    { initialValue: Optional.none, onComplete: resetTimer },
+    ({ startUpdate, isCompleted }) => ({
+      start: () => {
+        if (mut_isStarted) {
+          console.warn('cannot start twice');
+
+          return;
+        }
+
+        mut_isStarted = true;
+
+        if (isCompleted()) {
+          console.warn('cannot restart stopped CounterObservable');
+
+          return;
+        }
+
+        mut_timerId0 = setTimeout(() => {
+          startUpdate(mut_counter);
+        }, 0);
+
+        mut_timerId = setInterval(() => {
+          mut_counter = SafeUint.add(1, mut_counter);
+
+          startUpdate(mut_counter);
+        }, intervalMilliSeconds);
+      },
+    }),
   );
 
-class CounterObservableClass
-  extends RootObservableClass<SafeUint>
-  implements CounterObservable
-{
-  readonly #intervalMilliSeconds: number;
-  #mut_counter: SafeUint;
-  #mut_timerId0: TimerId | undefined;
-  #mut_timerId: TimerId | undefined;
-  #mut_isStarted: boolean;
-
-  constructor(intervalMilliSeconds: number, startManually: boolean) {
-    super({ initialValue: Optional.none });
-
-    this.#intervalMilliSeconds = intervalMilliSeconds;
-
-    this.#mut_counter = asSafeUint(0);
-
-    this.#mut_timerId0 = undefined;
-
-    this.#mut_timerId = undefined;
-
-    this.#mut_isStarted = false;
-
-    if (!startManually) {
-      this.start();
-    }
+  if (!(options?.startManually ?? false)) {
+    observable.start();
   }
 
-  #resetTimer(): void {
-    if (this.#mut_timerId0 === undefined || this.#mut_timerId === undefined) {
-      return;
-    }
-
-    clearInterval(this.#mut_timerId0);
-
-    clearInterval(this.#mut_timerId);
-  }
-
-  start(): void {
-    if (this.#mut_isStarted) {
-      console.warn('cannot start twice');
-
-      return;
-    }
-
-    this.#mut_isStarted = true;
-
-    if (this.isCompleted) {
-      console.warn('cannot restart stopped CounterObservable');
-
-      return;
-    }
-
-    this.#mut_timerId0 = setTimeout(() => {
-      this.startUpdate(this.#mut_counter);
-    }, 0);
-
-    this.#mut_timerId = setInterval(() => {
-      this.#mut_counter = SafeUint.add(1, this.#mut_counter);
-
-      this.startUpdate(this.#mut_counter);
-    }, this.#intervalMilliSeconds);
-  }
-
-  override complete(): void {
-    this.#resetTimer();
-
-    super.complete();
-  }
-}
+  return observable;
+};

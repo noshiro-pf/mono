@@ -1,9 +1,4 @@
 export {
-  AsyncChildObservableClass,
-  InitializedSyncChildObservableClass,
-  ObservableBaseClass,
-  RootObservableClass,
-  SyncChildObservableClass,
   attachIndex,
   audit,
   collectToArray,

@@ -1,10 +1,9 @@
 import { Optional } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type DropInitialValueOperator,
   type Observable,
   type SkipUntilOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -60,45 +59,45 @@ import {
 export const skipUntil =
   <A,>(notifier: Observable<unknown>): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    new SkipUntilObservableClass(parentObservable, notifier);
+    createSkipUntilObservable(parentObservable, notifier);
 
-class SkipUntilObservableClass<A>
-  extends SyncChildObservableClass<A, readonly [A]>
-  implements SkipUntilOperatorObservable<A>
-{
-  #mut_isSkipping: boolean;
+const createSkipUntilObservable = <A,>(
+  parentObservable: Observable<A>,
+  notifier: Observable<unknown>,
+): SkipUntilOperatorObservable<A> => {
+  let mut_isSkipping = true;
 
-  constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
-    super({
+  const observable = createSyncChildObservable<A, readonly [A]>(
+    {
       parents: [parentObservable],
       initialValue: Optional.none,
-    });
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#mut_isSkipping = true;
+        const sn = par.getSnapshot();
 
-    notifier.subscribe(
-      () => {
-        this.#mut_isSkipping = false;
+        if (
+          mut_isSkipping ||
+          par.updateToken !== updateToken ||
+          Optional.isNone(sn)
+        ) {
+          return; // skip update
+        }
+
+        setNext(sn.value, updateToken);
       },
-      () => {
-        this.#mut_isSkipping = false;
-      },
-    );
-  }
+  );
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+  notifier.subscribe(
+    () => {
+      mut_isSkipping = false;
+    },
+    () => {
+      mut_isSkipping = false;
+    },
+  );
 
-    const sn = par.getSnapshot();
-
-    if (
-      par.updateToken !== updateToken ||
-      Optional.isNone(sn) ||
-      this.#mut_isSkipping
-    ) {
-      return; // skip update
-    }
-
-    this.setNext(sn.value, updateToken);
-  }
-}
+  return observable;
+};

@@ -1,10 +1,9 @@
 import { expectType, Optional } from 'ts-data-forge';
-import { InitializedSyncChildObservableClass } from '../class/index.mjs';
+import { createInitializedSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import {
   type InitializedObservable,
   type Observable,
-  type UpdateToken,
   type WithInitialValueOperator,
   type WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
@@ -57,31 +56,30 @@ import {
 export const withInitialValue =
   <A, I = A>(initialValue: I): WithInitialValueOperator<A, A | I> =>
   (parentObservable) =>
-    new WithInitialValueObservableClass(parentObservable, initialValue);
+    createWithInitialValueObservable(parentObservable, initialValue);
 
-class WithInitialValueObservableClass<A, I>
-  extends InitializedSyncChildObservableClass<A | I, readonly [A]>
-  implements WithInitialValueOperatorObservable<A, I>
-{
-  constructor(parentObservable: Observable<A>, initialValue: I) {
-    super({
+const createWithInitialValueObservable = <A, I>(
+  parentObservable: Observable<A>,
+  initialValue: I,
+): WithInitialValueOperatorObservable<A, I> =>
+  createInitializedSyncChildObservable<A | I, readonly [A]>(
+    {
       parents: [parentObservable],
       initialValue: Optional.some(initialValue),
-    });
-  }
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        const sn = par.getSnapshot();
 
-    const sn = par.getSnapshot();
+        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.setNext(sn.value, updateToken);
-  }
-}
+        setNext(sn.value, updateToken);
+      },
+  );
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

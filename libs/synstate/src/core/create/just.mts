@@ -1,5 +1,5 @@
 import { Optional } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import { type InitializedRootObservable } from '../types/index.mjs';
 
 /**
@@ -32,7 +32,7 @@ import { type InitializedRootObservable } from '../types/index.mjs';
  * ```
  */
 export const just = <const A,>(value: A): InitializedRootObservable<A> => {
-  const obs = new RootObservableClass<A>({
+  const obs = createRootObservable<A>({
     initialValue: Optional.some(value),
   });
 

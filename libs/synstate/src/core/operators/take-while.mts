@@ -5,14 +5,13 @@ import {
   expectType,
   pipe,
 } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import {
   type DropInitialValueOperator,
   type InitializedObservable,
   type Observable,
   type TakeWhileOperatorObservable,
-  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -76,22 +75,16 @@ export const takeWhile =
     predicate: (value: A, index: SafeUint | -1) => boolean,
   ): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
-    new TakeWhileObservableClass(parentObservable, predicate);
+    createTakeWhileObservable(parentObservable, predicate);
 
 /* implementation */
 
-class TakeWhileObservableClass<A>
-  extends SyncChildObservableClass<A, readonly [A]>
-  implements TakeWhileOperatorObservable<A>
-{
-  readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
-  #mut_index: SafeUint | -1;
-
-  constructor(
-    parentObservable: Observable<A>,
-    predicate: (value: A, index: SafeUint | -1) => boolean,
-  ) {
-    super({
+const createTakeWhileObservable = <A,>(
+  parentObservable: Observable<A>,
+  predicate: (value: A, index: SafeUint | -1) => boolean,
+): TakeWhileOperatorObservable<A> =>
+  createSyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: pipe(parentObservable.getSnapshot()).map((par) =>
         Optional.isNone(par)
@@ -100,32 +93,30 @@ class TakeWhileObservableClass<A>
             ? par
             : Optional.none,
       ).value,
-    });
+    },
+    ({ setNext, complete }) => {
+      let mut_index: SafeUint | -1 = -1;
 
-    this.#mut_index = -1;
+      return (updateToken) => {
+        const par = parentObservable;
 
-    this.#predicate = predicate;
-  }
+        const sn = par.getSnapshot();
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
 
-    const sn = par.getSnapshot();
+        mut_index =
+          mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, mut_index);
 
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.#mut_index =
-      this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
-
-    if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updateToken);
-    } else {
-      this.complete();
-    }
-  }
-}
+        if (predicate(sn.value, mut_index)) {
+          setNext(sn.value, updateToken);
+        } else {
+          complete();
+        }
+      };
+    },
+  );
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

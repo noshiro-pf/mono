@@ -1,6 +1,6 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
 import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import {
@@ -10,7 +10,6 @@ import {
   type Observable,
   type SyncChildObservable,
   type TupleToQueueTuple,
-  type UpdateToken,
   type Wrap,
   type ZipObservable,
   type ZipObservableRefined,
@@ -69,63 +68,60 @@ export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  new ZipObservableClass(parents) as unknown as ZipObservableRefined<OS>;
+  createZipObservable(parents) as unknown as ZipObservableRefined<OS>;
 
-class ZipObservableClass<const A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, A>
-  implements ZipObservable<A>
-{
-  readonly #queues: TupleToQueueTuple<A>;
+const createZipObservable = <const A extends NonEmptyUnknownList>(
+  parents: Wrap<A>,
+): ZipObservable<A> => {
+  const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+    parents,
+    (p) => p.getSnapshot(),
+  );
 
-  constructor(parents: Wrap<A>) {
-    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      parents,
-      (p) => p.getSnapshot(),
-    );
+  // The annotation on `initialValue` is what replaces the type assertion.
+  // `Arr.map` carries a single result element type, so it reports `A[number]`
+  // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+  // — is *not* assignable back to `A`. The positional
+  // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+  // uniform result into it because the two mapped types share `keyof A`. So
+  // it is the annotation, not an assertion, that records the position-wise
+  // fact the checker cannot derive on its own.
+  const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> = Arr.every(
+    parentsValues,
+    Optional.isSome,
+  )
+    ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+    : Optional.none;
 
-    // The annotation on `initialValue` is what replaces the type assertion.
-    // `Arr.map` carries a single result element type, so it reports `A[number]`
-    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
-    // — is *not* assignable back to `A`. The positional
-    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
-    // uniform result into it because the two mapped types share `keyof A`. So
-    // it is the annotation, not an assertion, that records the position-wise
-    // fact the checker cannot derive on its own.
-    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
-      Arr.every(parentsValues, Optional.isSome)
-        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
-        : Optional.none;
+  const queues: TupleToQueueTuple<A> = Arr.map(parents, () => createQueue());
 
-    super({
+  return createSyncChildObservable<A, A>(
+    {
       parents,
       initialValue,
-    });
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        for (const [index, par] of parents.entries()) {
+          const sn = par.getSnapshot();
 
-    this.#queues = Arr.map(parents, () => createQueue());
-  }
+          if (par.updateToken === updateToken && Optional.isSome(sn)) {
+            queues[index]?.enqueue(sn.value);
+          }
+        }
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const queues = this.#queues;
+        if (queues.every((list) => !list.isEmpty)) {
+          const nextValue =
+            // `Arr.map` has a single result element type, so it reports
+            // `A[number] | undefined` per position rather than `A[P]`.
+            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
-    for (const [index, par] of this.parents.entries()) {
-      const sn = par.getSnapshot();
-
-      if (par.updateToken === updateToken && Optional.isSome(sn)) {
-        queues[index]?.enqueue(sn.value);
-      }
-    }
-
-    if (queues.every((list) => !list.isEmpty)) {
-      const nextValue =
-        // `Arr.map` has a single result element type, so it reports
-        // `A[number] | undefined` per position rather than `A[P]`.
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
-
-      this.setNext(nextValue, updateToken);
-    }
-  }
-}
+          setNext(nextValue, updateToken);
+        }
+      },
+  );
+};
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

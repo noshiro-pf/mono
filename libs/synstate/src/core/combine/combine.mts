@@ -1,6 +1,6 @@
 import { Arr, expectType, Optional } from 'ts-data-forge';
 import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import {
@@ -11,7 +11,6 @@ import {
   type NonEmptyUnknownList,
   type Observable,
   type SyncChildObservable,
-  type UpdateToken,
   type Wrap,
 } from '../types/index.mjs';
 
@@ -76,9 +75,7 @@ export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  new CombineObservableClass(
-    parents,
-  ) as unknown as CombineObservableRefined<OS>;
+  createCombineObservable(parents) as unknown as CombineObservableRefined<OS>;
 
 /**
  * Alias for `combine`.
@@ -86,56 +83,57 @@ export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
  */
 export const combineLatest = combine;
 
-class CombineObservableClass<const A extends NonEmptyUnknownList>
-  extends SyncChildObservableClass<A, A>
-  implements CombineObservable<A>
-{
-  constructor(parents: Wrap<A>) {
-    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      parents,
-      (p) => p.getSnapshot(),
-    );
+const createCombineObservable = <const A extends NonEmptyUnknownList>(
+  parents: Wrap<A>,
+): CombineObservable<A> => {
+  const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+    parents,
+    (p) => p.getSnapshot(),
+  );
 
-    // The annotation on `initialValue` is what replaces the type assertion.
-    // `Arr.map` carries a single result element type, so it reports `A[number]`
-    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
-    // — is *not* assignable back to `A`. The positional
-    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
-    // uniform result into it because the two mapped types share `keyof A`. So
-    // it is the annotation, not an assertion, that records the position-wise
-    // fact the checker cannot derive on its own.
-    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
-      Arr.every(parentsValues, Optional.isSome)
-        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
-        : Optional.none;
+  // The annotation on `initialValue` is what replaces the type assertion.
+  // `Arr.map` carries a single result element type, so it reports `A[number]`
+  // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+  // — is *not* assignable back to `A`. The positional
+  // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+  // uniform result into it because the two mapped types share `keyof A`. So
+  // it is the annotation, not an assertion, that records the position-wise
+  // fact the checker cannot derive on its own.
+  const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> = Arr.every(
+    parentsValues,
+    Optional.isSome,
+  )
+    ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+    : Optional.none;
 
-    super({
+  return createSyncChildObservable<A, A>(
+    {
       parents,
       initialValue,
-    });
-  }
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        if (parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    if (this.parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
+        // Same shape-preserving chain as the initial value: `Arr.map` (not the
+        // native one, which drops the tuple shape) into the uniform
+        // `Tuple.MapTo`, then a positional annotation to get back to `A`.
+        const parentValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+          parents,
+          (a) => a.getSnapshot(),
+        );
 
-    // Same shape-preserving chain as the constructor: `Arr.map` (not the
-    // native one, which drops the tuple shape) into the uniform
-    // `Tuple.MapTo`, then a positional annotation to get back to `A`.
-    const parentValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
-      this.parents,
-      (a) => a.getSnapshot(),
-    );
+        if (Arr.every(parentValues, Optional.isSome)) {
+          const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
+            parentValues,
+            (a) => a.value,
+          );
 
-    if (Arr.every(parentValues, Optional.isSome)) {
-      const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
-        parentValues,
-        (a) => a.value,
-      );
-
-      this.setNext(nextValue, updateToken);
-    }
-  }
-}
+          setNext(nextValue, updateToken);
+        }
+      },
+  );
+};
 
 if (import.meta.vitest !== undefined) {
   test('type test', () => {

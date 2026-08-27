@@ -1,28 +1,27 @@
 /* eslint-disable functional/immutable-data */
-/* eslint-disable no-new */
 import { Optional } from 'ts-data-forge';
 import { combine, merge } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
 import {
-  AsyncChildObservableClass,
-  SyncChildObservableClass,
-} from './child-observable-class.mjs';
-import { RootObservableClass } from './root-observable-class.mjs';
+  createAsyncChildObservable,
+  createSyncChildObservable,
+} from './create-child-observable.mjs';
+import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency detection', () => {
   describe('cycle in ancestor graph', () => {
     test('should throw when parent chain contains a cycle (A -> B -> A)', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const childA = new SyncChildObservableClass({
+      const childA = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
-      const childB = new SyncChildObservableClass({
+      const childB = createSyncChildObservable({
         parents: [childA],
         initialValue: Optional.some(0),
       });
@@ -35,7 +34,7 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [childA],
           initialValue: Optional.some(0),
         });
@@ -45,16 +44,16 @@ describe('circular dependency detection', () => {
     });
 
     test('should throw when AsyncChildObservable parent chain contains a cycle', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const childA = new AsyncChildObservableClass({
+      const childA = createAsyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
-      const childB = new SyncChildObservableClass({
+      const childB = createSyncChildObservable({
         parents: [childA],
         initialValue: Optional.some(0),
       });
@@ -67,7 +66,7 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        new AsyncChildObservableClass({
+        createAsyncChildObservable({
           parents: [childA],
           initialValue: Optional.some(0),
         });
@@ -77,21 +76,21 @@ describe('circular dependency detection', () => {
     });
 
     test('should throw when a cycle exists through a chain of 3 observables', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const childA = new SyncChildObservableClass({
+      const childA = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
-      const childB = new SyncChildObservableClass({
+      const childB = createSyncChildObservable({
         parents: [childA],
         initialValue: Optional.some(0),
       });
 
-      const childC = new SyncChildObservableClass({
+      const childC = createSyncChildObservable({
         parents: [childB],
         initialValue: Optional.some(0),
       });
@@ -104,7 +103,7 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [childA],
           initialValue: Optional.some(0),
         });
@@ -114,11 +113,11 @@ describe('circular dependency detection', () => {
     });
 
     test('should throw when the new child itself appears as an ancestor', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const childA = new SyncChildObservableClass({
+      const childA = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
@@ -131,7 +130,7 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [childA],
           initialValue: Optional.some(0),
         });
@@ -143,23 +142,23 @@ describe('circular dependency detection', () => {
 
   describe('valid DAG patterns should not throw', () => {
     test('diamond dependency is not a cycle', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const left = new SyncChildObservableClass({
+      const left = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
-      const right = new SyncChildObservableClass({
+      const right = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
       // Diamond: root -> left -> combined, root -> right -> combined
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [left, right],
           initialValue: Optional.some(0),
         });
@@ -167,22 +166,22 @@ describe('circular dependency detection', () => {
     });
 
     test('linear chain is not a cycle', () => {
-      const root = new RootObservableClass({
+      const root = createRootObservable({
         initialValue: Optional.some(0),
       });
 
-      const a = new SyncChildObservableClass({
+      const a = createSyncChildObservable({
         parents: [root],
         initialValue: Optional.some(0),
       });
 
-      const b = new SyncChildObservableClass({
+      const b = createSyncChildObservable({
         parents: [a],
         initialValue: Optional.some(0),
       });
 
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [b],
           initialValue: Optional.some(0),
         });
@@ -190,26 +189,26 @@ describe('circular dependency detection', () => {
     });
 
     test('multiple roots converging is not a cycle', () => {
-      const root1 = new RootObservableClass({
+      const root1 = createRootObservable({
         initialValue: Optional.some(1),
       });
 
-      const root2 = new RootObservableClass({
+      const root2 = createRootObservable({
         initialValue: Optional.some(2),
       });
 
-      const child1 = new SyncChildObservableClass({
+      const child1 = createSyncChildObservable({
         parents: [root1],
         initialValue: Optional.some(0),
       });
 
-      const child2 = new SyncChildObservableClass({
+      const child2 = createSyncChildObservable({
         parents: [root2],
         initialValue: Optional.some(0),
       });
 
       expect(() => {
-        new SyncChildObservableClass({
+        createSyncChildObservable({
           parents: [child1, child2],
           initialValue: Optional.some(0),
         });

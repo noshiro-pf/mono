@@ -1,11 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { AsyncChildObservableClass } from '../class/index.mjs';
+import { createAsyncChildObservable } from '../base/index.mjs';
 import {
   type AuditOperatorObservable,
   type KeepInitialValueOperator,
   type Observable,
   type TimerId,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -107,66 +106,55 @@ export const audit = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    new AuditObservableClass(
+    createAuditObservable(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-class AuditObservableClass<A>
-  extends AsyncChildObservableClass<A, readonly [A]>
-  implements AuditOperatorObservable<A>
-{
-  readonly #milliSeconds: number;
-  #mut_timerId: TimerId | undefined;
-  #mut_isSkipping: boolean;
+const createAuditObservable = <A,>(
+  parentObservable: Observable<A>,
+  milliSeconds: number,
+): AuditOperatorObservable<A> => {
+  let mut_timerId: TimerId | undefined = undefined;
 
-  constructor(parentObservable: Observable<A>, milliSeconds: number) {
-    super({
+  let mut_isSkipping = false;
+
+  const resetTimer = (): void => {
+    if (mut_timerId !== undefined) {
+      clearTimeout(mut_timerId);
+    }
+  };
+
+  return createAsyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    });
+      onComplete: resetTimer,
+    },
+    ({ startUpdate }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#mut_isSkipping = false;
+        if (
+          mut_isSkipping ||
+          par.updateToken !== updateToken ||
+          Optional.isNone(par.getSnapshot())
+        ) {
+          return; // skip update
+        }
 
-    this.#mut_timerId = undefined;
+        // set timer
+        mut_isSkipping = true;
 
-    this.#milliSeconds = milliSeconds;
-  }
+        mut_timerId = setTimeout(() => {
+          const sn = par.getSnapshot();
 
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
-  }
+          if (Optional.isNone(sn)) return;
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+          startUpdate(sn.value);
 
-    if (
-      par.updateToken !== updateToken ||
-      Optional.isNone(par.getSnapshot()) ||
-      this.#mut_isSkipping
-    ) {
-      return; // skip update
-    }
-
-    // set timer
-    this.#mut_isSkipping = true;
-
-    this.#mut_timerId = setTimeout(() => {
-      const sn = par.getSnapshot();
-
-      if (Optional.isNone(sn)) return;
-
-      this.startUpdate(sn.value);
-
-      this.#mut_isSkipping = false;
-    }, this.#milliSeconds);
-  }
-
-  override complete(): void {
-    this.#resetTimer();
-
-    super.complete();
-  }
-}
+          mut_isSkipping = false;
+        }, milliSeconds);
+      },
+  );
+};

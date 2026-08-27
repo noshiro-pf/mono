@@ -1,11 +1,10 @@
 import { Optional } from 'ts-data-forge';
-import { AsyncChildObservableClass } from '../class/index.mjs';
+import { createAsyncChildObservable } from '../base/index.mjs';
 import {
   type DebounceOperatorObservable,
   type KeepInitialValueOperator,
   type Observable,
   type TimerId,
-  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -98,57 +97,47 @@ export const debounce = <A,>(
 ): KeepInitialValueOperator<A, A> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
-    new DebounceObservableClass(
+    createDebounceObservable(
       parentObservable,
       milliSeconds,
     )) as KeepInitialValueOperator<A, A>;
 
-class DebounceObservableClass<A>
-  extends AsyncChildObservableClass<A, readonly [A]>
-  implements DebounceOperatorObservable<A>
-{
-  readonly #milliSeconds: number;
-  #mut_timerId: TimerId | undefined;
+const createDebounceObservable = <A,>(
+  parentObservable: Observable<A>,
+  milliSeconds: number,
+): DebounceOperatorObservable<A> => {
+  let mut_timerId: TimerId | undefined = undefined;
 
-  constructor(parentObservable: Observable<A>, milliSeconds: number) {
-    super({
+  const resetTimer = (): void => {
+    if (mut_timerId !== undefined) {
+      clearTimeout(mut_timerId);
+    }
+  };
+
+  return createAsyncChildObservable(
+    {
       parents: [parentObservable],
       initialValue: parentObservable.getSnapshot(),
-    });
+      onComplete: resetTimer,
+    },
+    ({ startUpdate }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#mut_timerId = undefined;
+        const sn = par.getSnapshot();
 
-    this.#milliSeconds = milliSeconds;
-  }
+        if (par.updateToken !== updateToken || Optional.isNone(sn)) {
+          return; // skip update
+        }
 
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
-  }
+        resetTimer();
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        // set timer
+        mut_timerId = setTimeout(() => {
+          if (Optional.isNone(sn)) return;
 
-    const sn = par.getSnapshot();
-
-    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
-      return; // skip update
-    }
-
-    this.#resetTimer();
-
-    // set timer
-    this.#mut_timerId = setTimeout(() => {
-      if (Optional.isNone(sn)) return;
-
-      this.startUpdate(sn.value);
-    }, this.#milliSeconds);
-  }
-
-  override complete(): void {
-    this.#resetTimer();
-
-    super.complete();
-  }
-}
+          startUpdate(sn.value);
+        }, milliSeconds);
+      },
+  );
+};

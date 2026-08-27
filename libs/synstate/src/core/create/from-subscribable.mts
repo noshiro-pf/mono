@@ -1,5 +1,5 @@
 import { Optional, Result } from 'ts-data-forge';
-import { RootObservableClass } from '../class/index.mjs';
+import { createRootObservable } from '../base/index.mjs';
 import {
   type FromSubscribableObservable,
   type Subscribable,
@@ -66,30 +66,26 @@ import {
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
 ): FromSubscribableObservable<A, E> =>
-  new FromSubscribableObservableClass(subscribable);
+  createRootObservable<Result<A, E>>(
+    { initialValue: Optional.none },
+    ({ startUpdate, complete }) => {
+      subscribable.subscribe(
+        (nextValue) => {
+          startUpdate(Result.ok(nextValue));
+        },
+        (error?: unknown) => {
+          startUpdate(
+            Result.err(
+              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              error as E,
+            ),
+          );
+        },
+        () => {
+          complete();
+        },
+      );
 
-class FromSubscribableObservableClass<A, E = unknown>
-  extends RootObservableClass<Result<A, E>>
-  implements FromSubscribableObservable<A, E>
-{
-  constructor(subscribable: Subscribable<A>) {
-    super({ initialValue: Optional.none });
-
-    subscribable.subscribe(
-      (nextValue) => {
-        this.startUpdate(Result.ok(nextValue));
-      },
-      (error?: unknown) => {
-        this.startUpdate(
-          Result.err(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            error as E,
-          ),
-        );
-      },
-      () => {
-        this.complete();
-      },
-    );
-  }
-}
+      return {};
+    },
+  );

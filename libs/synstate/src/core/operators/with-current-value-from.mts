@@ -1,9 +1,8 @@
 import { Optional, pipe } from 'ts-data-forge';
-import { SyncChildObservableClass } from '../class/index.mjs';
+import { createSyncChildObservable } from '../base/index.mjs';
 import {
   type DropInitialValueOperator,
   type Observable,
-  type UpdateToken,
   type WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -69,7 +68,7 @@ export const withCurrentValueFrom =
     observable: Observable<B>,
   ): DropInitialValueOperator<A, readonly [A, B]> =>
   (parentObservable) =>
-    new WithCurrentValueFromObservableClass(parentObservable, observable);
+    createWithCurrentValueFromObservable(parentObservable, observable);
 
 /**
  * Alias for `withCurrentValueFrom`.
@@ -77,14 +76,12 @@ export const withCurrentValueFrom =
  */
 export const withLatestFrom = withCurrentValueFrom;
 
-class WithCurrentValueFromObservableClass<A, B>
-  extends SyncChildObservableClass<readonly [A, B], readonly [A]>
-  implements WithCurrentValueFromOperatorObservable<A, B>
-{
-  readonly #observable: Observable<B>;
-
-  constructor(parentObservable: Observable<A>, observable: Observable<B>) {
-    super({
+const createWithCurrentValueFromObservable = <A, B>(
+  parentObservable: Observable<A>,
+  observable: Observable<B>,
+): WithCurrentValueFromOperatorObservable<A, B> =>
+  createSyncChildObservable<readonly [A, B], readonly [A]>(
+    {
       parents: [parentObservable],
       depth: 1 + maxDepth([parentObservable, observable]),
       initialValue: pipe({
@@ -95,24 +92,21 @@ class WithCurrentValueFromObservableClass<A, B>
           ? Optional.none
           : Optional.some([par.value, me.value] as const),
       ).value,
-    });
+    },
+    ({ setNext }) =>
+      (updateToken) => {
+        const par = parentObservable;
 
-    this.#observable = observable;
-  }
+        const ps = par.getSnapshot();
 
-  override tryUpdate(updateToken: UpdateToken): void {
-    const par = this.parents[0];
+        if (par.updateToken !== updateToken || Optional.isNone(ps)) {
+          return; // skip update
+        }
 
-    const ps = par.getSnapshot();
+        const curr = observable.getSnapshot();
 
-    if (par.updateToken !== updateToken || Optional.isNone(ps)) {
-      return; // skip update
-    }
+        if (Optional.isNone(curr)) return; // skip update
 
-    const curr = this.#observable.getSnapshot();
-
-    if (Optional.isNone(curr)) return; // skip update
-
-    this.setNext([ps.value, curr.value], updateToken);
-  }
-}
+        setNext([ps.value, curr.value], updateToken);
+      },
+  );
