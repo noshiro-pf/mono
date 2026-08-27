@@ -4,11 +4,14 @@ import { expectType } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
-const xs: readonly number[] = [1, 2, 3] as const;
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const
+const xs: readonly number[] = [1, 2, 3];
 
-const pair: readonly [number, string] = [1, 'a'] as const;
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const
+const pair: readonly [number, string] = [1, 'a'];
 
-const rec: ReadonlyRecord<string, number> = { a: 1 } as const;
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const
+const rec: ReadonlyRecord<string, number> = { a: 1 };
 
 // Before (with `noUncheckedIndexedAccess` on, only `pair[1]` is known to be there)
 const first: number | undefined = xs[0];
