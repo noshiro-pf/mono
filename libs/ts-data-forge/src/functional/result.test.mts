@@ -1085,10 +1085,26 @@ describe('Result test', () => {
       assert.deepStrictEqual(result.value, 'missing');
     });
 
+    test('should support Optional union inputs', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Some side.
+      const makeOptional = (): Optional<number> => Optional.some(2);
+
+      const result = Result.fromOptional(makeOptional(), 'missing');
+
+      expectType<typeof result, Result<number, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(2));
+    });
+
     test('curried version should work', () => {
       const withMissingError = Result.fromOptional('missing');
 
-      assert.deepStrictEqual(withMissingError(Optional.some(1)), Result.ok(1));
+      const result = withMissingError(Optional.some(1));
+
+      expectType<typeof result, Result<1, 'missing'>>('=');
+
+      assert.deepStrictEqual(result, Result.ok(1));
 
       assert.deepStrictEqual(
         withMissingError(Optional.none),
@@ -1166,15 +1182,69 @@ describe('Result test', () => {
     });
 
     test('async generator should short-circuit on Err', async () => {
-      const result = await Result.safeTry(async function* () {
-        const x = yield* Result.safeUnwrap(
-          await Result.fromPromise(Promise.reject(new Error('rejected'))),
-        );
+      const makeFailing = (): Promise<Result<number, string>> =>
+        Promise.resolve(Result.err('async error'));
+
+      let mut_reached = false;
+
+      const promise = Result.safeTry(async function* () {
+        const x = yield* Result.safeUnwrap(await makeFailing());
+
+        mut_reached = true;
 
         return Result.ok(x);
       });
 
-      assert.isTrue(Result.isErr(result));
+      expectType<typeof promise, Promise<Result<number, string>>>('=');
+
+      const result = await promise;
+
+      assert.isFalse(mut_reached);
+
+      assert.deepStrictEqual(result, Result.err('async error'));
+    });
+
+    test('should run pending `finally` blocks when short-circuiting', () => {
+      // Created through a function so that the const is not flow-narrowed to
+      // the Err side.
+      const makeFailing = (): Result<number, string> => Result.err('boom');
+
+      let mut_cleanedUp = false;
+
+      const result = Result.safeTry(function* () {
+        try {
+          const x = yield* Result.safeUnwrap(makeFailing());
+
+          return Result.ok(x);
+        } finally {
+          mut_cleanedUp = true;
+        }
+      });
+
+      assert.isTrue(mut_cleanedUp);
+
+      assert.deepStrictEqual(result, Result.err('boom'));
+    });
+
+    test('async generator should run pending `finally` blocks too', async () => {
+      const makeFailing = (): Promise<Result<number, string>> =>
+        Promise.resolve(Result.err('boom'));
+
+      let mut_cleanedUp = false;
+
+      const result = await Result.safeTry(async function* () {
+        try {
+          const x = yield* Result.safeUnwrap(await makeFailing());
+
+          return Result.ok(x);
+        } finally {
+          mut_cleanedUp = true;
+        }
+      });
+
+      assert.isTrue(mut_cleanedUp);
+
+      assert.deepStrictEqual(result, Result.err('boom'));
     });
   });
 });

@@ -27,7 +27,10 @@ import { ok } from './result-ok.mjs';
  *
  * assert.deepStrictEqual(withMissingError(Optional.some(1)), Result.ok(1));
  *
- * assert.deepStrictEqual(withMissingError(Optional.none), Result.err('missing'));
+ * assert.deepStrictEqual(
+ *   withMissingError(Optional.none),
+ *   Result.err('missing'),
+ * );
  * ```
  *
  * @template O The input `UnknownOptional` type.

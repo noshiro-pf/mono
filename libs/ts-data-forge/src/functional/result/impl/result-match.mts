@@ -1,4 +1,4 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { type UnwrapErr, type UnwrapOk } from './types.mjs';
 
@@ -47,12 +47,20 @@ export function match<R extends UnknownResult, S2, E2>(
 ): E2 | S2;
 
 // Curried version
+//
+// The returned function is generic over the *whole* result, mirroring the
+// direct overload above; see the comment on the curried overload of
+// `Result.map` for why the parameter is a conditional type instead of a plain
+// `Result<S, E>`. Both sides have to be checked here, hence the nested
+// conditional.
 export function match<S, E, S2, E2>(
   cases: Readonly<{
     ok: (value: S) => S2;
     err: (error: E) => E2;
   }>,
-): (result: Result<S, E>) => E2 | S2;
+): <R extends UnknownResult>(
+  result: UnwrapOk<R> extends S ? (UnwrapErr<R> extends E ? R : never) : never,
+) => E2 | S2;
 
 export function match<R extends UnknownResult, S2, E2>(
   ...args:

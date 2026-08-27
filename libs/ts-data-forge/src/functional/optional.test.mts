@@ -841,7 +841,11 @@ describe('Optional test', () => {
         none: () => 'none',
       });
 
-      assert.deepStrictEqual(matcher(Optional.some(3)), 'value: 3');
+      const result = matcher(Optional.some(3));
+
+      expectType<typeof result, string>('=');
+
+      assert.deepStrictEqual(result, 'value: 3');
 
       assert.deepStrictEqual(matcher(Optional.none), 'none');
     });

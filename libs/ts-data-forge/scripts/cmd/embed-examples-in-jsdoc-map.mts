@@ -508,6 +508,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/functional/optional/map-example.mts'],
   },
   {
+    sourcePath: 'src/functional/optional/impl/optional-match.mts',
+    sampleFiles: ['samples/src/functional/optional/match-example.mts'],
+  },
+  {
     sourcePath: 'src/functional/optional/impl/optional-none.mts',
     sampleFiles: ['samples/src/functional/optional/some-example.mts'],
   },
@@ -634,6 +638,22 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/functional/result/impl/result-zip.mts',
     sampleFiles: ['samples/src/functional/result/zip-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-match.mts',
+    sampleFiles: ['samples/src/functional/result/match-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-from-optional.mts',
+    sampleFiles: ['samples/src/functional/result/from-optional-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-safe-try.mts',
+    sampleFiles: ['samples/src/functional/result/safe-try-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-safe-unwrap.mts',
+    sampleFiles: ['samples/src/functional/result/safe-unwrap-example.mts'],
   },
   {
     sourcePath: 'src/guard/has-key.mts',
