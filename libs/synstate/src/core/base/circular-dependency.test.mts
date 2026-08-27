@@ -7,6 +7,7 @@ import {
   createAsyncChildObservable,
   createSyncChildObservable,
 } from './create-child-observable.mjs';
+import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
 import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency detection', () => {
@@ -16,15 +17,21 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const childA = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = createSyncChildObservable({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Mutate childA.parents to create a cycle: childA -> childB -> childA
       Object.defineProperty(childA, 'parents', {
@@ -34,10 +41,13 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
@@ -48,15 +58,21 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const childA = createAsyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createAsyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = createSyncChildObservable({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Create cycle: childA -> childB -> childA
       Object.defineProperty(childA, 'parents', {
@@ -66,10 +82,13 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        createAsyncChildObservable({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createAsyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
@@ -80,20 +99,29 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const childA = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = createSyncChildObservable({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childC = createSyncChildObservable({
-        parents: [childB],
-        initialValue: Optional.some(0),
-      });
+      const childC = createSyncChildObservable(
+        {
+          parents: [childB],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Create cycle: childA -> childC -> childB -> childA
       Object.defineProperty(childA, 'parents', {
@@ -103,10 +131,13 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
@@ -117,10 +148,13 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const childA = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Make childA's parents reference childA itself (self-loop)
       Object.defineProperty(childA, 'parents', {
@@ -130,10 +164,13 @@ describe('circular dependency detection', () => {
       });
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
@@ -146,22 +183,31 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const left = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const left = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const right = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const right = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Diamond: root -> left -> combined, root -> right -> combined
       expect(() => {
-        createSyncChildObservable({
-          parents: [left, right],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [left, right],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 
@@ -170,21 +216,30 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(0),
       });
 
-      const a = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const a = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const b = createSyncChildObservable({
-        parents: [a],
-        initialValue: Optional.some(0),
-      });
+      const b = createSyncChildObservable(
+        {
+          parents: [a],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [b],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [b],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 
@@ -197,21 +252,30 @@ describe('circular dependency detection', () => {
         initialValue: Optional.some(2),
       });
 
-      const child1 = createSyncChildObservable({
-        parents: [root1],
-        initialValue: Optional.some(0),
-      });
+      const child1 = createSyncChildObservable(
+        {
+          parents: [root1],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const child2 = createSyncChildObservable({
-        parents: [root2],
-        initialValue: Optional.some(0),
-      });
+      const child2 = createSyncChildObservable(
+        {
+          parents: [root2],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [child1, child2],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [child1, child2],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).not.toThrow();
     });
 

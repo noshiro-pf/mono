@@ -15,6 +15,7 @@ import { combine } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { map } from '../operators/index.mjs';
 import { createSyncChildObservable } from './create-child-observable.mjs';
+import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
 import { createRootObservable } from './create-root-observable.mjs';
 
 describe('circular dependency comparison', () => {
@@ -24,15 +25,21 @@ describe('circular dependency comparison', () => {
         initialValue: Optional.some(0),
       });
 
-      const childA = createSyncChildObservable({
-        parents: [root],
-        initialValue: Optional.some(0),
-      });
+      const childA = createSyncChildObservable(
+        {
+          parents: [root],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
-      const childB = createSyncChildObservable({
-        parents: [childA],
-        initialValue: Optional.some(0),
-      });
+      const childB = createSyncChildObservable(
+        {
+          parents: [childA],
+          initialValue: Optional.some(0),
+        },
+        createTryUpdateNotImplemented,
+      );
 
       // Simulate a cycle: childA → childB → childA
       // In normal usage this is impossible — the check runs in every
@@ -44,10 +51,13 @@ describe('circular dependency comparison', () => {
       });
 
       expect(() => {
-        createSyncChildObservable({
-          parents: [childA],
-          initialValue: Optional.some(0),
-        });
+        createSyncChildObservable(
+          {
+            parents: [childA],
+            initialValue: Optional.some(0),
+          },
+          createTryUpdateNotImplemented,
+        );
       }).toThrow(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );

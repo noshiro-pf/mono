@@ -17,7 +17,6 @@ import { binarySearch, issueUpdateToken, maxDepth } from '../utils/index.mjs';
 import {
   assembleObservable,
   createObservableBaseHandle,
-  tryUpdateNotImplemented,
 } from './create-observable-base.mjs';
 
 /**
@@ -45,12 +44,10 @@ export type AsyncChildObservableTools<A> = Readonly<{
 }> &
   SyncChildObservableTools<A>;
 
-export type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
+type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   depth?: number;
-
-  initialValue: Optional<A>;
 
   /**
    * Leaf teardown (clear timers, unsubscribe inner observables, …), run at
@@ -59,6 +56,22 @@ export type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
    */
   onComplete?: () => void;
 }>;
+
+export type ChildObservableConfig<
+  A,
+  P extends NonEmptyUnknownList,
+> = ChildObservableConfigBase<P> &
+  Readonly<{
+    initialValue: Optional<A>;
+  }>;
+
+export type InitializedChildObservableConfig<
+  A,
+  P extends NonEmptyUnknownList,
+> = ChildObservableConfigBase<P> &
+  Readonly<{
+    initialValue: Some<A>;
+  }>;
 
 /**
  * Creates a sync-child observable — the classless replacement for extending
@@ -77,7 +90,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     initialValue,
     onComplete,
   }: ChildObservableConfig<A, P>,
-  createTryUpdate?: (
+  createTryUpdate: (
     tools: SyncChildObservableTools<A>,
   ) => (updateToken: UpdateToken) => void,
 ): SyncChildObservable<A, P> => {
@@ -103,12 +116,11 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     });
   };
 
-  const tryUpdate =
-    createTryUpdate?.({
-      setNext: handle.setNext,
-      getSnapshot: handle.getSnapshot,
-      complete,
-    }) ?? tryUpdateNotImplemented;
+  const tryUpdate = createTryUpdate({
+    setNext: handle.setNext,
+    getSnapshot: handle.getSnapshot,
+    complete,
+  });
 
   const observable: SyncChildObservable<A, P> = assembleObservable({
     kind: 'sync child',
@@ -136,16 +148,8 @@ export const createInitializedSyncChildObservable = <
   A,
   P extends NonEmptyUnknownList,
 >(
-  config: Readonly<{
-    parents: Wrap<P>;
-
-    depth?: number;
-
-    initialValue: Some<A>;
-
-    onComplete?: () => void;
-  }>,
-  createTryUpdate?: (
+  config: InitializedChildObservableConfig<A, P>,
+  createTryUpdate: (
     tools: SyncChildObservableTools<A>,
   ) => (updateToken: UpdateToken) => void,
 ): InitializedSyncChildObservable<A, P> => {
@@ -171,7 +175,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     initialValue,
     onComplete,
   }: ChildObservableConfig<A, P>,
-  createTryUpdate?: (
+  createTryUpdate: (
     tools: AsyncChildObservableTools<A>,
   ) => (updateToken: UpdateToken) => void,
 ): AsyncChildObservable<A, P> => {
@@ -228,13 +232,12 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     });
   };
 
-  const tryUpdate =
-    createTryUpdate?.({
-      setNext: handle.setNext,
-      getSnapshot: handle.getSnapshot,
-      complete,
-      startUpdate,
-    }) ?? tryUpdateNotImplemented;
+  const tryUpdate = createTryUpdate({
+    setNext: handle.setNext,
+    getSnapshot: handle.getSnapshot,
+    complete,
+    startUpdate,
+  });
 
   const observable: AsyncChildObservable<A, P> = assembleObservable({
     kind: 'async child',

@@ -10,7 +10,7 @@ import { binarySearch, issueUpdateToken } from '../utils/index.mjs';
 import {
   assembleObservable,
   createObservableBaseHandle,
-  tryUpdateNotImplemented,
+  createTryUpdateNotImplemented,
 } from './create-observable-base.mjs';
 
 /**
@@ -115,7 +115,7 @@ export const createRootObservable = <
     kind: 'root',
     depth: 0,
     handle,
-    tryUpdate: tryUpdateNotImplemented,
+    tryUpdate: createTryUpdateNotImplemented,
     tryComplete,
     complete,
     extra: {

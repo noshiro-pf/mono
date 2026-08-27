@@ -189,7 +189,11 @@ export const createObservableBaseHandle = <A,>(
 };
 
 /** Default `tryUpdate` for observables that never receive parent updates. */
-export const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
+export const createTryUpdateNotImplemented = (): ((
+  _updateToken: UpdateToken,
+) => void) => tryUpdateNotImplemented;
+
+const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
   throw new Error('not implemented');
 };
 

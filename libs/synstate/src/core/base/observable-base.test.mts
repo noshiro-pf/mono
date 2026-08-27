@@ -11,6 +11,7 @@ import {
   createAsyncChildObservable,
   createSyncChildObservable,
 } from './create-child-observable.mjs';
+import { createTryUpdateNotImplemented } from './create-observable-base.mjs';
 import { createRootObservable } from './create-root-observable.mjs';
 
 /**
@@ -66,17 +67,23 @@ const root = createRootObservable({
 
 expectType<typeof root, RootObservable<number>>('<=');
 
-const syncChild = createSyncChildObservable({
-  parents: [root],
-  initialValue: Optional.some(0),
-});
+const syncChild = createSyncChildObservable(
+  {
+    parents: [root],
+    initialValue: Optional.some(0),
+  },
+  createTryUpdateNotImplemented,
+);
 
 expectType<typeof syncChild, SyncChildObservable<number>>('<=');
 
-const asyncChild = createAsyncChildObservable({
-  parents: [root],
-  initialValue: Optional.some(0),
-});
+const asyncChild = createAsyncChildObservable(
+  {
+    parents: [root],
+    initialValue: Optional.some(0),
+  },
+  createTryUpdateNotImplemented,
+);
 
 expectType<typeof asyncChild, AsyncChildObservable<number>>('<=');
 
