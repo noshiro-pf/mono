@@ -309,6 +309,21 @@ namespace PreferNonMutatingArrayMethod {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Enforce `??` over `||` (and `??=` over `||=`) for defaulting when the operand types prove the replacement cannot change the behavior (e.g. `<string | undefined> || ""`), and remove `|| <fallback>` entirely when a never-nullish left-hand side makes it redundant (e.g. `<string> || ""`)
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferNullishCoalescingWhenSafe {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
@@ -318,6 +333,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
+  'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{

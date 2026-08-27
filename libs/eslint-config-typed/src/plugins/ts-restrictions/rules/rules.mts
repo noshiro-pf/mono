@@ -7,6 +7,7 @@ import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
 import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
 import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
+import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-when-safe.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
@@ -17,4 +18,5 @@ export const tsRestrictionsRules = {
   'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
   'prefer-curried-call': preferCurriedCall,
   'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
+  'prefer-nullish-coalescing-when-safe': preferNullishCoalescingWhenSafe,
 } as const satisfies ESLintPlugin['rules'];
