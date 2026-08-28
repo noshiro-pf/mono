@@ -1,0 +1,103 @@
+{
+  "name": "ts-std-forge",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Safe wrappers for throwing / null-returning standard library APIs, returning Result and Optional from ts-data-forge",
+  "keywords": [
+    "typescript",
+    "result",
+    "optional",
+    "stdlib",
+    "error-handling",
+    "functional"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/ts-std-forge"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
+      },
+      "default": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
+      }
+    }
+  },
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/types.d.mts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
+    "codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --uncommitted --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "codemod:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --diff-from origin/main --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "codemod:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
+    "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
+    "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gi": "pnpm run gi:src && pnpm run fmt",
+    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "ts-data-forge": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "cspell": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "jiti": "catalog:",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "rollup": "catalog:",
+    "ts-repo-utils": "workspace:*",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "typescript-native": "npm:typescript@7.0.2",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

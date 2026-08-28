@@ -41,6 +41,7 @@ ignorePaths:
 # `cspell:ignore` comment in that file.
 words:
   - bivariant
+  - tsubu
   - blueprintjs
   - nand
   - noshiro
