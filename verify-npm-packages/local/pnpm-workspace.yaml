@@ -18,6 +18,7 @@ minimumReleaseAge: 0
 # Depend on the sibling packed from this checkout, not the older one on
 # npm — on a version branch the bumped version is not published at all.
 overrides:
+  'better-react-use-state': 'file:../.tarballs/better-react-use-state.tgz'
   'eslint-config-typed': 'file:../.tarballs/eslint-config-typed.tgz'
   'eslint-plugin-ts-data-forge': 'file:../.tarballs/eslint-plugin-ts-data-forge.tgz'
   'eslint-plugin-ts-fortress': 'file:../.tarballs/eslint-plugin-ts-fortress.tgz'
