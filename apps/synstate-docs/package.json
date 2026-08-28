@@ -42,7 +42,7 @@
     "react-dom": "^19.2.8",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
-    "satori": "^0.29.1",
+    "satori": "^0.33.0",
     "synstate": "workspace:*",
     "synstate-preact-hooks": "workspace:*",
     "synstate-preact-signals": "workspace:*",

@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate-preact-signals": "1.0.2"
+    "synstate-preact-signals": "2.0.0"
   }
 }
