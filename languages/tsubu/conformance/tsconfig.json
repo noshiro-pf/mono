@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "../../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  // `fixtures/` is deliberately NOT included: invalid fixtures contain code
+  // that violates the language rules (and sometimes the repository's own
+  // compiler settings) on purpose. The runner reads them as text.
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}
