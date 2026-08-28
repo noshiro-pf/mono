@@ -183,6 +183,12 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/tiny-router-observable": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
     "apps/*": {
       "entry": [
         "src/pages/**/*.{astro,mts,ts,tsx}",
