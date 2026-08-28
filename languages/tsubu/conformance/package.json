@@ -1,0 +1,55 @@
+{
+  "name": "tsubu-conformance",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Tsubu). See docs/tsubu/conformance-corpus.md.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "languages/tsubu/conformance"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "codemod": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --uncommitted --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "codemod:full": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../../ --no-progress",
+    "fmt": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fmt:diff": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gi": "pnpm run gi:src && pnpm run fmt",
+    "gi:src": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
+    "type-check": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "cspell": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "jiti": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "typescript-native": "npm:typescript@7.0.2",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.3.1"
+  }
+}

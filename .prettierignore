@@ -7,3 +7,7 @@ experimental
 # declarations live here, and not walking them is most of what makes the
 # repository-wide format pass quick.
 strict-lib
+# Conformance fixtures are the code under test and must be preserved
+# byte-for-byte (a formatter rewrite would erase what a fixture checks, e.g.
+# a `<T,>` trailing comma). See docs/tsubu/decisions.md (D-9).
+languages/tsubu/conformance/fixtures

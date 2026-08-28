@@ -82,6 +82,14 @@
   "ignoreBinaries": ["diff"],
 
   "workspaces": {
+    // The conformance corpus of the tsubu language project. `fixtures/`
+    // holds deliberate rule violations that the runner reads as text — not
+    // project files.
+    "languages/tsubu/conformance": {
+      "entry": ["test/**/*.test.mts"],
+      "project": ["src/**/*.mts", "test/**/*.mts"],
+    },
+
     // The strict standard library's generator. Its entry points are the
     // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;
     // `output*/` holds generated declarations that nothing imports by path.

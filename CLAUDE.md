@@ -32,6 +32,14 @@ instruction file.
   markdownlint's globs — but Prettier formats it and cspell reads it.
 - `strict-lib/` — the strict standard library: its generator and its generated
   output. **See "strict-lib/" below.**
+- `languages/` — programming-language development: one directory per language,
+  with that language's development packages below it (workspace glob
+  `languages/*/*`). Currently `languages/tsubu/` (the Tsubu
+  language), whose specification lives in `docs/tsubu/`. Nothing here is published — a
+  language's publishable tooling moves to `libs/` when it materializes. The
+  conformance corpus's `fixtures/` hold deliberate rule violations and are
+  excluded from Prettier (see below), from the package's own tsconfig/ESLint,
+  and from knip's project globs.
 - `experimental/` — legacy code. **See "experimental/" below.**
 
 **There is one `.gitignore`, at the repository root** (`experimental/` keeps its
@@ -42,8 +50,18 @@ reformatting the generated files anyway. Generated TypeDoc output is listed at
 the root per package, because `libs/eslint-config-typed/docs` and
 `libs/synstate/docs` hold hand-written prose and must stay tracked.
 
-Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace globs
-(`pnpm-workspace.yaml`), and a directory only becomes a member if it has a
+- **One deliberate exception**: `languages/tsubu/conformance/` carries its
+  own `.prettierignore` for `fixtures/` **in addition to** the root entry for
+  the same directory. The per-package `fmt` scripts run Prettier with the
+  package as cwd, and `prettier.getFileInfo` resolves its `ignorePath` from
+  the cwd — so the root file alone would not stop a package-local format pass
+  from rewriting fixtures, which must stay byte-for-byte (a reformat would
+  erase what a fixture checks, e.g. a `<T,>` trailing comma). The root entry
+  still covers repository-wide passes; keep the two in sync.
+
+Only `libs/*`, `apps/*`, `tools/*` and `languages/*/*` are pnpm workspace
+globs (`pnpm-workspace.yaml`, plus the explicit `strict-lib/*` entries — see
+"strict-lib/"), and a directory only becomes a member if it has a
 `package.json`. `tools/configs/` and `tools/scripts/` deliberately have none —
 they are plain directories consumed by relative path, not packages.
 

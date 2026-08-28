@@ -55,6 +55,11 @@ packages:
   - libs/*
   - apps/*
   - tools/*
+  # Language development. One directory per language under languages/, with
+  # that language's development packages (the conformance corpus for now)
+  # below it. Not published, and fits none of libs (npm packages) / apps /
+  # tools (repository tooling). See docs/tsubu/decisions.md (D-8).
+  - languages/*/*
   # The strict standard library. Its generator and its generated output live
   # together, so it does not fit `libs/*` (one directory, one npm package) and
   # gets a top level of its own.
