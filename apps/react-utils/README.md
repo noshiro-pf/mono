@@ -1,9 +1,10 @@
 # react-utils
 
 A drawer of React hooks: debouncing, intervals, previous values, promise state,
-key-event listeners, a 2D canvas context, an async reducer, a tiny observable
-bridge, and two small components (`ToggleWithoutDestroy`, `ComponentSwitcher`)
-that hide a subtree without unmounting it.
+key-event listeners, a 2D canvas context, an async reducer, a `synstate` source
+tied to a component's lifetime, and two small components
+(`ToggleWithoutDestroy`, `ComponentSwitcher`) that hide a subtree without
+unmounting it.
 
 Restored from `experimental/` — see
 [docs/monorepo-consolidation.md](../../docs/monorepo-consolidation.md). One of
@@ -30,6 +31,13 @@ React 19 and the React Compiler rules account for most of it.
   `ReactNode` is no longer a `ReactNode`.
 - `React.Reducer` was removed from React's types; `useAsyncReducer` declares the
   one line it was.
-- `createTinyObservable`, `getPlatform` and `PromiseState` have no successor in
-  `ts-data-forge`; [`src/utils`](./src/utils) carries them, each with a note on
-  where it came from.
+- `getPlatform` and `PromiseState` have no successor in `ts-data-forge`;
+  [`src/utils`](./src/utils) carries them, each with a note on where it came
+  from.
+- **`createTinyObservable` is gone: the observable is `synstate`'s.** The port
+  was a 37-line multicast callback list, and `source()` is that list with a
+  value and a graph around it — more than the hooks asked for, but not a
+  different thing. Two of the three hooks went with it, being
+  `useObservableEffect` and `useObservableValue` in `synstate-react-hooks`
+  already; what is left is `useObservable`, which holds a `source` for as long
+  as the component lives.

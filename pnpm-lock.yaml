@@ -480,6 +480,9 @@ importers:
       better-react-use-state:
         specifier: workspace:*
         version: link:../../libs/better-react-use-state
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -514,9 +517,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
-      ts-type-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.12

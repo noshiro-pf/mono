@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "better-react-use-state": "workspace:*",
+    "synstate": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
@@ -40,7 +41,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "ts-type-forge": "workspace:*",
     "tsx": "catalog:"
   },
   "peerDependencies": {
