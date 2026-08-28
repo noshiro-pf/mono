@@ -46,6 +46,7 @@ overrides:
   'ts-data-forge': 'file:../.tarballs/ts-data-forge.tgz'
   'ts-fortress': 'file:../.tarballs/ts-fortress.tgz'
   'ts-repo-utils': 'file:../.tarballs/ts-repo-utils.tgz'
+  'ts-std-forge': 'file:../.tarballs/ts-std-forge.tgz'
   'ts-type-forge': 'file:../.tarballs/ts-type-forge.tgz'
 
 allowBuilds:
