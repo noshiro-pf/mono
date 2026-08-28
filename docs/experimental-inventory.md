@@ -209,6 +209,11 @@ global-*                       → 明示 import
 `event-schedule-app-shared`（#1625）の前提はもう揃っており、「公開済みの 2
 パッケージをどう扱うか」も決着している。
 
+**その後 `apps/ts-fortress-types` に改名した。** 旧名は `@noshiro/io-ts` に
+由来するもので、その `io-ts` はもう無く、パッケージが依存しているのは
+`ts-fortress` だけである。以降この文書で `io-ts-types` と書いてあるのは
+`experimental/` にある旧パッケージのことで、main にあるものではない。
+
 `event-schedule-app` は 21136 行あり、Blueprint.js・Firebase・自作ルータに依存する
 ので最後に回すのが妥当。
 

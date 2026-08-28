@@ -1,4 +1,4 @@
-# io-ts-types
+# ts-fortress-types
 
 Runtime types for dates and times, built on `ts-fortress`: `Ymdhm`,
 `YearMonthDate`, `HoursMinutes`, `TimeRange`, `DatetimeRange`, `DayType`, and
@@ -12,6 +12,9 @@ what `event-schedule-app-shared` needs, so it comes back first.
 the domain types here — those are the package. It was published as
 `@noshiro/io-ts-types@1.0.0`; that version stays on npm, and this copy is
 private.
+
+The name follows suit: the original was named after `@noshiro/io-ts`, so this
+copy is named after what replaced it. Nothing here refers to `io-ts` any more.
 
 ## What changed on the way back
 
