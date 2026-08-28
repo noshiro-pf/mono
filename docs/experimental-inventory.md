@@ -211,3 +211,26 @@ global-*                       → 明示 import
 
 `event-schedule-app` は 21136 行あり、Blueprint.js・Firebase・自作ルータに依存する
 ので最後に回すのが妥当。
+
+### 「連れてくる utils」は 6 つでは済まない
+
+上の表の 6 つは `event-schedule-app` の `dependencies` を直接読んだもので、**その
+先は数えていない**。実際に復元して分かった連鎖はこう。
+
+```text
+event-schedule-app
+└─ react-blueprintjs-utils (4432)
+   ├─ react-utils-styled (347)
+   │  └─ resize-observer-react-hooks (55)   ← 復元済み
+   ├─ syncflow-react-hooks                  ← libs/synstate-react-hooks が後継、復元不要
+   ├─ @blueprintjs/{core,datetime,datetime2,icons}
+   └─ @emotion/{react,styled}
+```
+
+`resize-observer-react-hooks` と `react-utils-styled` は表に載っていない。
+`syncflow-react-hooks` だけは既に `libs/synstate-react-hooks` があるので復元不要。
+
+**`react-blueprintjs-utils` には判断が要る。** 依存が `@blueprintjs/core@^5` だが
+npm の最新は 6.18.0 で、**メジャーが 1 つ空いている**。v5 のまま復元すると、
+`pnpm update` が最新に追随するこのリポジトリに、追随しない依存が 1 つ増える。v6 へ
+上げるなら 4432 行のラッパに対する移行がそのまま乗る。
