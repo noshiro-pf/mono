@@ -159,6 +159,7 @@ dist
 
 # Build output of the legacy code parked under experimental/
 experimental/**/build
+apps/poll-discord-app/build
 experimental/**/lib
 experimental/**/esm
 experimental/**/cjs
