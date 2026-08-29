@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, isString, Obj, unknownToString } from 'ts-data-forge';
-import { glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { formatFiles, glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -43,6 +43,18 @@ export const genDependencyGraph = async (): Promise<
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(outputPath, output, 'utf8');
+
+    // The tables are rendered without padding the cells, so the file has to be
+    // formatted before it matches what is committed. Without this the output
+    // differs from the checked-in file on every run, which makes regeneration
+    // useless as a drift check.
+    const formatted = await formatFiles([outputPath], { silent: true });
+
+    if (Result.isErr(formatted)) {
+      return Result.err(
+        `❌ Failed to format ${path.relative(projectRootPath, outputPath)}.`,
+      );
+    }
 
     console.info(
       `Successfully generated ${path.relative(projectRootPath, outputPath)}.`,
