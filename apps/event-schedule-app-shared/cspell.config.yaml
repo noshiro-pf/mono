@@ -1,0 +1,10 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # Year-Month-Date-Hours-Minutes, the abbreviation the date types are named
+  # after. Used throughout this package's three schema versions.
+  - ymdhm

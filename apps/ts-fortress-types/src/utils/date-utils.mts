@@ -23,6 +23,16 @@ import {
  * provided.
  */
 export namespace DateUtils {
+  /** The current instant, as a `Date`. */
+  export const today = (): Date => new Date();
+
+  /** The current instant, in milliseconds since the epoch. */
+  export const now = (): SafeUint => {
+    const ms = Date.now();
+
+    return isSafeUint(ms) ? ms : asSafeUint(0);
+  };
+
   /** The year. */
   export const getLocaleYear = (date: Date): SafeUint => {
     const year = date.getFullYear();

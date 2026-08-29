@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json",
+    "../../tools/configs/tsconfig/tsconfig.node-only.json"
+  ],
+  "compilerOptions": {
+    // `ts-fortress-types` is private and has no build output, so its types come
+    // straight from its source.
+    "paths": {
+      "ts-fortress-types": ["../ts-fortress-types/src/index.mts"]
+    }
+  },
+  "include": ["./src", "./scripts", "./configs"]
+}
