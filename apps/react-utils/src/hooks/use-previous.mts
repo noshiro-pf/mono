@@ -1,0 +1,29 @@
+import * as React from 'react';
+
+/**
+ * The value this hook was last called with, before the current one.
+ *
+ * The usual spelling of this keeps the value in a ref and writes it from an
+ * effect, but the React Compiler rejects reading a ref during render. State
+ * says the same thing and is allowed. One difference follows from that: the
+ * ref version returned the value from the previous *render*, this returns the
+ * previous *distinct* value, so a render that changed nothing no longer makes
+ * the two equal.
+ */
+export const usePrevious = <T,>(value: T): T | undefined => {
+  const [current, setCurrent] = React.useState(value);
+
+  // The type argument is unavoidable — the state starts empty, so there is
+  // nothing to infer from — and the React Compiler rule reads a hook call that
+  // carries one as a reference to the hook rather than a call to it.
+  // eslint-disable-next-line react-hooks/hooks
+  const [previous, setPrevious] = React.useState<T | undefined>(undefined);
+
+  if (current !== value) {
+    setPrevious(current);
+
+    setCurrent(value);
+  }
+
+  return previous;
+};
