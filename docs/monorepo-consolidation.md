@@ -325,33 +325,36 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
     - **12 パッケージぶんの復元 PR を出し、いずれも `apps/` に private で置く形にした**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
-        - **2026-08-29 時点で 12 本中 10 本が main に入っており、残るのは
-          `react-utils-styled`（#1633）と `react-blueprintjs-utils`（#1634）の
-          2 本である。** どちらも main の上に rebase 済みで conflict は無く、
-          ドラフトを外せばマージできる状態にある。#1634 は #1633 を base にした
-          スタックなので、#1633 が main に入ってから #1634 を main へ付け替える
+        - **2026-08-30 時点で 12 本中 11 本が main に入っており、残るのは
+          `react-blueprintjs-utils`（#1634）だけである。** main の上に rebase 済みで
+          conflict は無く、ドラフトを外せばマージできる
 
-        | パッケージ                         | 行数 | PR    | 状態                 |
-        | :--------------------------------- | ---: | :---- | :------------------- |
-        | `poll-discord-app`                 | 2008 | #1620 | main                 |
-        | `lambda-calculus-interpreter-core` |  750 | #1621 | main                 |
-        | `ts-fortress-types`                |  352 | #1624 | main                 |
-        | `event-schedule-app-shared`        | 5203 | #1625 | main                 |
-        | `better-react-use-state`           |   75 | #1627 | main                 |
-        | `tiny-router-observable`           |  185 | #1628 | main                 |
-        | `tiny-router-react-hooks`          |  140 | #1629 | main                 |
-        | `numeric-input-utils`              |  287 | #1630 | main                 |
-        | `react-utils`                      |  487 | #1631 | main                 |
-        | `resize-observer-react-hooks`      |   55 | #1632 | main                 |
-        | `react-utils-styled`               |  347 | #1633 | ドラフト（main 上）  |
-        | `react-blueprintjs-utils`          | 4432 | #1634 | ドラフト（#1633 上） |
+        | パッケージ                         | 行数 | PR    | 状態                |
+        | :--------------------------------- | ---: | :---- | :------------------ |
+        | `poll-discord-app`                 | 2008 | #1620 | main                |
+        | `lambda-calculus-interpreter-core` |  750 | #1621 | main                |
+        | `ts-fortress-types`                |  352 | #1624 | main                |
+        | `event-schedule-app-shared`        | 5203 | #1625 | main                |
+        | `better-react-use-state`           |   75 | #1627 | main                |
+        | `tiny-router-observable`           |  185 | #1628 | main                |
+        | `tiny-router-react-hooks`          |  140 | #1629 | main                |
+        | `numeric-input-utils`              |  287 | #1630 | main                |
+        | `react-utils`                      |  487 | #1631 | main                |
+        | `resize-observer-react-hooks`      |   55 | #1632 | main                |
+        | `react-utils-styled`               |  347 | #1633 | main                |
+        | `react-blueprintjs-utils`          | 4432 | #1634 | ドラフト（main 上） |
         - **ドラフトの間 CI は 1 つも走らない**（ジョブごとの `if` が
-          `pull_request.draft == false` を見ている）。この 2 本はまだ一度も CI に
-          かかっていないので、#1634 の先端でローカルに一通り回した — `ws:build` /
-          `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` / `md` /
-          `check:root` / `lint:published-deps` / `codemod:diff` がいずれも通り、
-          `ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean である
-          （`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
+          `pull_request.draft == false` を見ている）。#1634 と #1714 はまだ一度も
+          CI にかかっていないので、それぞれの先端でローカルに一通り回した —
+          `ws:build` / `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` /
+          `md` / `check:root` / `lint:published-deps` / `codemod:diff` がいずれも
+          通り、`ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean で
+          ある（`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
+        - **`codemod:diff` は `fmt` / `lint` / `type-check` が全部通る状態でも
+          30 ファイルを書き換えた**（#1714）。`readonly [T, …]` 化・
+          `asserts e is Readonly<{…}>` 化・`as const` 付与で、CI の
+          `codemod:full` ジョブが見るのはこれである。ドラフトのまま
+          `fmt` と `lint` だけで判断すると取りこぼす
         - `io-ts-types` は復元後に **`ts-fortress-types` へ改名した**（#1710）。
           上の表はその後の名前で書いてある
         - **スタックした PR は、下の PR が squash merge されるたびに rebase が要る。**
@@ -365,11 +368,52 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **未解決の型は `expectType` を黙って通す。** `lambda-calculus-interpreter-core`（#1621）で `Variable = LowerAlphabet` の `LowerAlphabet` が解決できず error type になり、何にでも代入可能になっていた。`expectType` の判定 6 件が「通って」おり、型 import を入れた時点で 6 件とも偽陰性として顕在化した。**移行作業中は、型エラーを消すまで型テストの結果を信用できない**
         - **`better-react-use-state`（#1627）だけは `libs/` に移した。** 「いずれも `apps/` に private」の唯一の例外である。`event-schedule-app` が連れてくる 6 utils のうち 4 つがこれに依存し、復元の残り全部がこの上に乗る。それだけ土台になるものを private のままにしておく理由が無いので、Apache-2.0 で公開する側に置いた。**初回 publish は手作業**である（[libs/first-release.md](../libs/first-release.md)）
 
-    - **`event-schedule-app` 本体（21136 行・314 ファイル）は作業中。** ブランチ `feat/restore-event-schedule-app` に置いてある。型エラーは 3567 件から 0 件になり、lint が 130 件残っている段階
-        - **2026-08-29 時点で origin には無く、ローカルにしかない。** merge base は
-          #1624 で、以降 main に入った 9 本の復元 PR ぶん behind している。上の 12
-          本すべて（とくに #1633 / #1634）が main に入ってから rebase するのが
-          手戻りが少ない — この app が連れてくる utils がまさにそれらだからである
+    - **`event-schedule-app` 本体（21136 行・314 ファイル）は #1714。** 型エラーは 3567 件から、lint は 127 件から、いずれも 0 になった
+        - **2026-08-30 に #1634 の上へ載せ直し、#1714 として出した。**
+          元のブランチは merge base が #1624 のままで、兄弟の復元ブランチを
+          merge commit で取り込んだ履歴だったので、rebase ではなく
+          `apps/event-schedule-app` の中身だけを現在のスタック先端へ持ってきて
+          1 コミットに畳んでいる
+        - **載せ直しで出た差分は、間に入った 3 つの変更に由来する**
+            - `io-ts-types` → `ts-fortress-types` の改名（#1710）。import 30 箇所と
+              `paths`
+            - #1631 が tiny observable を synstate に置き換えたこと。
+              `useTinyObservable` → `useObservable`、`TinyObservable` →
+              `synstate` の `Observable`。DOM のグローバル `Observable` と衝突する
+              ので `SynstateObservable` に別名を付けている
+            - `apps/ts-fortress-types` の `DateUtils` に、#1634 が Blueprint のぶんだけ
+              足していたこと。この app はさらに `getLocaleDayOfWeek` /
+              `toTimestamp` / `toMidnight` / `setLocaleHours` / `setLocaleMinutes` /
+              `updateLocaleDate` / `updateLocaleMonth` を要る
+        - **`react-utils` の `.tsx` 2 つには `/** @jsxImportSource react */` が要る。**
+          この app は `jsxImportSource` を `@emotion/react` にしており、`react-utils`
+          は `paths` でソース解決されるので、その設定を一緒に浴びる。`@emotion/react`
+          は app 側の依存で、pnpm の isolated layout では `apps/react-utils` から
+          辿れない。元のブランチには入っていたが #1631 で落ちていた
+        - **lint は 0 件になった**（127 件から）。判断が要ったのは 3 つ
+            - `unicorn/prefer-temporal` は `apps/ts-fortress-types` と同じ理由で
+              この app の `src/**` にも off にした。`Temporal` は `engines` の
+              下限である Node 22 に無い
+            - `react/sort-comp` と `unicorn/consistent-class-member-order` は
+              React の class component に対して両立しない。前者は lifecycle を
+              先に、後者は private field を先に置けと言う。React の順を採り、
+              後者を 1 行だけ無効化した
+            - `Promise` の `resolve` や ambient module の `export default` のように
+              **型が外から決まっている箇所**は行単位で無効化した。
+              `libs/ts-repo-utils` などが既にそうしている
+        - **`unicorn/prefer-iterator-to-array-at-end` は `ts-data-forge` の
+          コレクションに対して誤検出する。** ルールは構文だけを見て
+          `X.toArray().map(f)` を `X.map(f).toArray()` に直そうとするが、
+          `ISetMapped.map` は `K → K` を取ってコレクションを返すので、
+          その書き換えは型が合わないうえ重複を落とす。`ts-data-forge` 自身は
+          `collections/*.mts` の先頭でこのルールをファイル単位で無効化している
+          が、利用側は配列を一度 const に束ねれば済む
+        - **`no-deprecated` 40 件は片付いた。** `minimal` / `outlined` / `small` は `variant` と
+          `size` へ、`Popover` は `PopoverNext` へ。後者は popper から floating-ui に
+          変わっており、`position` → `placement`、`modifiers` → `middleware`、
+          `minimal` は `arrow={false}` に対応する。`minimal` と `outlined` を併記して
+          いた 4 箇所は v5 では両方のクラスが付いていたが v6 の `variant` は単一値
+          なので、枠線を持つ `outlined` を採った
         - 作業の中身は「移植」ではなく「書き換え」だった。`globals.d.ts` の 10 行が**約 90 個の識別子を import 無しで使えるようにしており**、21136 行がその前提で書かれていた。撤廃すると 3567 件になる
         - `.ts` / `.tsx` から `.mts` への改名が 190 ファイル、相対 import への拡張子付与が 220 ファイル
     - **`syncflow` → `synstate` で最も手間だったのは `createState` の扱い。** 3 段階で前提が誤っていた — ①パッケージの選択はファイル単位で決まる（誤）→ ②呼び出しごとに決まる（不十分）→ ③**同一ファイルが同じ関数名で両方の版を必要とする**（正）。`synstate` は observable を、`synstate-react-hooks` は hook を返す
