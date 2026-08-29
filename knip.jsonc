@@ -206,6 +206,12 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-utils-styled": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],
