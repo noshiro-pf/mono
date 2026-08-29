@@ -345,6 +345,13 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         | `resize-observer-react-hooks`      |   55 | #1632 | main                 |
         | `react-utils-styled`               |  347 | #1633 | ドラフト（main 上）  |
         | `react-blueprintjs-utils`          | 4432 | #1634 | ドラフト（#1633 上） |
+        - **ドラフトの間 CI は 1 つも走らない**（ジョブごとの `if` が
+          `pull_request.draft == false` を見ている）。この 2 本はまだ一度も CI に
+          かかっていないので、#1634 の先端でローカルに一通り回した — `ws:build` /
+          `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` / `md` /
+          `check:root` / `lint:published-deps` / `codemod:diff` がいずれも通り、
+          `ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean である
+          （`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
         - `io-ts-types` は復元後に **`ts-fortress-types` へ改名した**（#1710）。
           上の表はその後の名前で書いてある
         - **スタックした PR は、下の PR が squash merge されるたびに rebase が要る。**
