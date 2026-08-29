@@ -1,0 +1,9 @@
+{
+  "name": "verify-ts-std-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-std-forge": "file:../../../.tarballs/ts-std-forge.tgz"
+  }
+}
