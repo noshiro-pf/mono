@@ -441,6 +441,30 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### その他の宿題
 
+- **`pnpm run ws:gi` は現状 main で 4 パッケージを壊す（未修正）。** 3 通りの
+  壊れ方がある。CLAUDE.md が「`pnpm run gi` で自動生成せよ」と書いているので、
+  **指示に従った人が壊す**
+    - **`apps/poll-discord-app/src/index.mts` は実行可能なエントリポイント**で、
+      `#!/usr/bin/env node` と `main()` の呼び出しが書いてある。`gi` はこれを
+      barrel で上書きしてプログラムを消す。`gi:src` の `--exclude index.mts` は
+      「index.mts を export 対象から外す」であって「index.mts を書かない」では
+      ないため効かない
+    - **`apps/event-schedule-app-shared/src/v*/index.mts` は手で選んだ export
+      一覧**で、意図的にコメントアウトされた行まである。`gi` は 8 ファイル・
+      632 行を `export * from …` に潰す
+    - **`apps/react-utils` と `apps/react-utils-styled` では解決できない指定子を
+      書く。** `gen-index-ts` は `--export-ext` の値を全ファイルに一律で使うが、
+      正しい指定子はソースの拡張子で決まる — `.mts` は `.mjs`、`.tsx` は
+      （`.js` にコンパイルされるので）`.js` である。両パッケージの `gi:src` は
+      `--target-ext .tsx --export-ext .mjs` なので、再生成すると
+      `./component-switcher.mjs` になる。型エラーは react-utils で 2 件、
+      react-utils-styled で 8 件。**リポジトリ内の呼び出しは 20 箇所すべてが
+      `--export-ext .mjs`** なので、`.tsx` → `.mjs` を望んでいる利用者はいない
+    - **したがって「生成器を直して `ws:gi` を CI に足す」では済まない。**
+      `docs:deps`（#1715）と同じ穴が空いてはいるが、こちらは先に
+      「どのパッケージの index が生成物で、どれが手書きか」を決める必要がある。
+      前者 2 つはそもそも `gi` スクリプトを持つべきでない可能性が高い
+
 - **`prefer-canonical-length-constrained-tuple` の autofix が再帰型を壊していた（修正済み）。** タプルリテラルは TypeScript が `type T = readonly [T, T]` を解決できる理由そのもので、同じ循環を `FixedLengthTuple` 経由にすると alias が error type になり、**その型のすべての使用箇所が黙って `any` として通る**。`tsc` は alias 1 箇所を報告するだけだが、typed linter は使用箇所ごとに報告するので 47 件出た（`experimental/` から復元した lambda 計算機のコードで踏んだ）
     - 循環は間接であることが多い。`LambdaApplication = readonly [LambdaTerm, LambdaTerm]` 単体は無害に見え、`LambdaTerm` の union が `LambdaApplication` を含むために循環する。そのため同一ファイル内の他の alias を辿って判定している。import をまたぐ循環は見えないので検出できない
     - **同じ欠陥が姉妹ルールにもあるかを確認したが、無かった。** `Readonly<Record<string, T>>` は書き換え前から `TS2456` で落ちる（再帰的な record は元々この書き方ができない）ので、`prefer-readonly-or-mutable-record` は状況を悪化させていない。`StrictOmit` も再帰下で解決できた。**タプルリテラルだけが TypeScript の遅延解決の対象**で、だから書き換えで失われるものがある
