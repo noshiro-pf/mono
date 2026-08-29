@@ -369,7 +369,7 @@ export const eslintRules = {
   'no-undef-init': 'off', // disabled
   'no-undefined': 'off', // disabled
   'no-underscore-dangle': 'off', // disabled
-  'no-unmodified-loop-condition': 'error',
+  'no-unmodified-loop-condition': withDefaultOption('error'),
   'no-unneeded-ternary': ['error', { defaultAssignment: false }],
   'no-unreachable-loop': withDefaultOption('error'),
   'no-unsafe-finally': 'error',
