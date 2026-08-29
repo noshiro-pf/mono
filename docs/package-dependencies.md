@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 26 個。
+このリポジトリの workspace パッケージは 27 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -12,6 +12,7 @@
 
 ```mermaid
 graph LR
+  event_schedule_app_shared["event-schedule-app-shared"]
   lambda_calculus_interpreter_core["lambda-calculus-interpreter-core"]
   numeric_input_utils["numeric-input-utils"]
   poll_discord_app["poll-discord-app"]
@@ -38,6 +39,9 @@ graph LR
   ts_fortress["ts-fortress"]
   ts_repo_utils["ts-repo-utils"]
   ts_type_forge["ts-type-forge"]
+  event_schedule_app_shared --> ts_data_forge
+  event_schedule_app_shared --> ts_fortress
+  event_schedule_app_shared --> ts_fortress_types
   lambda_calculus_interpreter_core --> ts_data_forge
   numeric_input_utils --> ts_data_forge
   poll_discord_app --> ts_data_forge
@@ -110,7 +114,7 @@ graph LR
 |    2 | `ts-data-forge`                                                                                                                                                                                                                                                          |
 |    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
 |    4 | `poll-discord-app`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                     |
-|    5 | `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                                                              |
+|    5 | `event-schedule-app-shared`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                                 |
 
 ### 参考: devDependencies も含めた場合
 
@@ -120,6 +124,8 @@ graph LR
 
 | パッケージ                         | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                  |
 | :--------------------------------- | :--- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `event-schedule-app-shared`        | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                          |
+| `event-schedule-app-shared`        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
 | `lambda-calculus-interpreter-core` | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
 | `lambda-calculus-interpreter-core` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `numeric-input-utils`              | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
@@ -170,7 +176,7 @@ graph LR
 | `ts-repo-utils`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
 | `ts-type-forge`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                |
 
-26 / 26 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+27 / 27 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
