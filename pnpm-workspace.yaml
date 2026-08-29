@@ -55,6 +55,11 @@ packages:
   - libs/*
   - apps/*
   - tools/*
+  # Language development. One directory per language under languages/, with
+  # that language's development packages (the conformance corpus for now)
+  # below it. Not published, and fits none of libs (npm packages) / apps /
+  # tools (repository tooling). See docs/tsubu/decisions.md (D-8).
+  - languages/*/*
   # The strict standard library. Its generator and its generated output live
   # together, so it does not fit `libs/*` (one directory, one npm package) and
   # gets a top level of its own.
@@ -104,6 +109,12 @@ minimumReleaseAgeExclude:
   - 'strict-ts-lib-*'
 
 allowBuilds:
+  # Both arrive with `firebase`, which apps/poll-discord-app depends on.
+  # Neither install script is needed for what happens here — the app is
+  # type-checked and transpiled, never run — and this list is an allowlist on
+  # purpose, so they stay off. Whoever deploys the app decides separately.
+  '@firebase/util': false
   esbuild: true
+  protobufjs: false
   sharp: true # apps/synstate-docs (Astro)
   unrs-resolver: true

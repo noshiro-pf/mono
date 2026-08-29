@@ -325,24 +325,51 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
     - **12 パッケージぶんの復元 PR を出し、いずれも `apps/` に private で置く形にした**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
-        - **2026-08-25 時点で main に入っているのは `io-ts-types`（#1624）だけ**で、残る 11 本はまだレビュー待ちのドラフトである。下表の PR 番号がその一覧
+        - **2026-08-29 時点で 12 本中 10 本が main に入っており、残るのは
+          `react-utils-styled`（#1633）と `react-blueprintjs-utils`（#1634）の
+          2 本である。** どちらも main の上に rebase 済みで conflict は無く、
+          ドラフトを外せばマージできる状態にある。#1634 は #1633 を base にした
+          スタックなので、#1633 が main に入ってから #1634 を main へ付け替える
 
-        | パッケージ                         | 行数 | PR    |
-        | :--------------------------------- | ---: | :---- |
-        | `poll-discord-app`                 | 2008 | #1620 |
-        | `lambda-calculus-interpreter-core` |  750 | #1621 |
-        | `io-ts-types`                      |  352 | #1624 |
-        | `event-schedule-app-shared`        | 5203 | #1625 |
-        | `better-react-use-state`           |   75 | #1627 |
-        | `tiny-router-observable`           |  185 | #1628 |
-        | `tiny-router-react-hooks`          |  140 | #1629 |
-        | `numeric-input-utils`              |  287 | #1630 |
-        | `react-utils`                      |  487 | #1631 |
-        | `resize-observer-react-hooks`      |   55 | #1632 |
-        | `react-utils-styled`               |  347 | #1633 |
-        | `react-blueprintjs-utils`          | 4432 | #1634 |
+        | パッケージ                         | 行数 | PR    | 状態                 |
+        | :--------------------------------- | ---: | :---- | :------------------- |
+        | `poll-discord-app`                 | 2008 | #1620 | main                 |
+        | `lambda-calculus-interpreter-core` |  750 | #1621 | main                 |
+        | `ts-fortress-types`                |  352 | #1624 | main                 |
+        | `event-schedule-app-shared`        | 5203 | #1625 | main                 |
+        | `better-react-use-state`           |   75 | #1627 | main                 |
+        | `tiny-router-observable`           |  185 | #1628 | main                 |
+        | `tiny-router-react-hooks`          |  140 | #1629 | main                 |
+        | `numeric-input-utils`              |  287 | #1630 | main                 |
+        | `react-utils`                      |  487 | #1631 | main                 |
+        | `resize-observer-react-hooks`      |   55 | #1632 | main                 |
+        | `react-utils-styled`               |  347 | #1633 | ドラフト（main 上）  |
+        | `react-blueprintjs-utils`          | 4432 | #1634 | ドラフト（#1633 上） |
+        - **ドラフトの間 CI は 1 つも走らない**（ジョブごとの `if` が
+          `pull_request.draft == false` を見ている）。この 2 本はまだ一度も CI に
+          かかっていないので、#1634 の先端でローカルに一通り回した — `ws:build` /
+          `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` / `md` /
+          `check:root` / `lint:published-deps` / `codemod:diff` がいずれも通り、
+          `ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean である
+          （`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
+        - `io-ts-types` は復元後に **`ts-fortress-types` へ改名した**（#1710）。
+          上の表はその後の名前で書いてある
+        - **スタックした PR は、下の PR が squash merge されるたびに rebase が要る。**
+          `--onto` で下の PR のコミットを落として付け替えるのが確実で、
+          `docs/package-dependencies.md` と `pnpm-lock.yaml` は生成物なので
+          conflict は base 側を取って `pnpm install` / `pnpm run docs:deps` で
+          作り直す。knip の per-package entry だけは手で書くものなので、
+          落とすと `apps/*` の Astro 前提の glob に落ちて黙って通る
+        - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
+        - **`firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくる。** `allowBuilds` は意図的な許可リストなので、**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない。デプロイ時の判断は別途になる
+        - **未解決の型は `expectType` を黙って通す。** `lambda-calculus-interpreter-core`（#1621）で `Variable = LowerAlphabet` の `LowerAlphabet` が解決できず error type になり、何にでも代入可能になっていた。`expectType` の判定 6 件が「通って」おり、型 import を入れた時点で 6 件とも偽陰性として顕在化した。**移行作業中は、型エラーを消すまで型テストの結果を信用できない**
+        - **`better-react-use-state`（#1627）だけは `libs/` に移した。** 「いずれも `apps/` に private」の唯一の例外である。`event-schedule-app` が連れてくる 6 utils のうち 4 つがこれに依存し、復元の残り全部がこの上に乗る。それだけ土台になるものを private のままにしておく理由が無いので、Apache-2.0 で公開する側に置いた。**初回 publish は手作業**である（[libs/first-release.md](../libs/first-release.md)）
 
     - **`event-schedule-app` 本体（21136 行・314 ファイル）は作業中。** ブランチ `feat/restore-event-schedule-app` に置いてある。型エラーは 3567 件から 0 件になり、lint が 130 件残っている段階
+        - **2026-08-29 時点で origin には無く、ローカルにしかない。** merge base は
+          #1624 で、以降 main に入った 9 本の復元 PR ぶん behind している。上の 12
+          本すべて（とくに #1633 / #1634）が main に入ってから rebase するのが
+          手戻りが少ない — この app が連れてくる utils がまさにそれらだからである
         - 作業の中身は「移植」ではなく「書き換え」だった。`globals.d.ts` の 10 行が**約 90 個の識別子を import 無しで使えるようにしており**、21136 行がその前提で書かれていた。撤廃すると 3567 件になる
         - `.ts` / `.tsx` から `.mts` への改名が 190 ファイル、相対 import への拡張子付与が 220 ファイル
     - **`syncflow` → `synstate` で最も手間だったのは `createState` の扱い。** 3 段階で前提が誤っていた — ①パッケージの選択はファイル単位で決まる（誤）→ ②呼び出しごとに決まる（不十分）→ ③**同一ファイルが同じ関数名で両方の版を必要とする**（正）。`synstate` は observable を、`synstate-react-hooks` は hook を返す

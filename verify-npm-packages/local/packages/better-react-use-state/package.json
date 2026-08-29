@@ -1,0 +1,9 @@
+{
+  "name": "verify-better-react-use-state",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "better-react-use-state": "file:../../../.tarballs/better-react-use-state.tgz"
+  }
+}

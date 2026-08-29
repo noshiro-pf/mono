@@ -1,0 +1,38 @@
+import { type UpperAlphabet } from 'ts-type-forge';
+
+/**
+ * The 26 capital letters, in order.
+ *
+ * Ported from the `@noshiro/ts-utils-additional` this app used before the
+ * monorepo consolidation; `ts-data-forge` has no successor for it. The original
+ * took a `'lower' | 'upper'` argument; only the upper case is used here, and
+ * writing the letters out keeps the return type exact without an assertion.
+ */
+export const upperAlphabets: readonly UpperAlphabet[] = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+] as const;

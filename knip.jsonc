@@ -82,6 +82,14 @@
   "ignoreBinaries": ["diff"],
 
   "workspaces": {
+    // The conformance corpus of the tsubu language project. `fixtures/`
+    // holds deliberate rule violations that the runner reads as text — not
+    // project files.
+    "languages/tsubu/conformance": {
+      "entry": ["test/**/*.test.mts"],
+      "project": ["src/**/*.mts", "test/**/*.mts"],
+    },
+
     // The strict standard library's generator. Its entry points are the
     // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;
     // `output*/` holds generated declarations that nothing imports by path.
@@ -170,7 +178,48 @@
 
     // Not an Astro site like the entry below assumes: plain TypeScript with a
     // single entry point.
-    "apps/io-ts-types": {
+    "apps/event-schedule-app-shared": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/numeric-input-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    "apps/tiny-router-observable": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/resize-observer-react-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    "apps/tiny-router-react-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-utils-styled": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: plain TypeScript with a
+    // single entry point.
+    "apps/ts-fortress-types": {
       "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
       "project": ["**/*.mts"],
     },
@@ -182,6 +231,20 @@
         "configs/*.mts",
       ],
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: plain TypeScript with a
+    // single entry point.
+    "apps/lambda-calculus-interpreter-core": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Node program with a
+    // single entry point.
+    "apps/poll-discord-app": {
+      "entry": ["src/index.mts", "scripts/**/*.mts"],
+      "project": ["**/*.mts"],
     },
   },
 }

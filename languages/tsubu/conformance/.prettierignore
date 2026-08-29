@@ -1,0 +1,6 @@
+# Counterpart of the `tsubu/conformance/fixtures` entry in the ROOT
+# .prettierignore (which covers repository-wide format passes). This file
+# exists because the per-package `fmt` scripts run Prettier with this
+# directory as cwd, and `prettier.getFileInfo` resolves its ignorePath from
+# the cwd — the root file is not consulted there. Keep the two in sync.
+fixtures
