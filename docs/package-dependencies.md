@@ -12,7 +12,6 @@
 
 ```mermaid
 graph LR
-  io_ts_types["io-ts-types"]
   lambda_calculus_interpreter_core["lambda-calculus-interpreter-core"]
   numeric_input_utils["numeric-input-utils"]
   poll_discord_app["poll-discord-app"]
@@ -20,6 +19,7 @@ graph LR
   _synstate_docs["@synstate/docs"]
   tiny_router_observable["tiny-router-observable"]
   tiny_router_react_hooks["tiny-router-react-hooks"]
+  ts_fortress_types["ts-fortress-types"]
   better_react_use_state["better-react-use-state"]
   eslint_config_typed["eslint-config-typed"]
   eslint_plugin_ts_data_forge["eslint-plugin-ts-data-forge"]
@@ -38,8 +38,6 @@ graph LR
   ts_fortress["ts-fortress"]
   ts_repo_utils["ts-repo-utils"]
   ts_type_forge["ts-type-forge"]
-  io_ts_types --> ts_data_forge
-  io_ts_types --> ts_fortress
   lambda_calculus_interpreter_core --> ts_data_forge
   numeric_input_utils --> ts_data_forge
   poll_discord_app --> ts_data_forge
@@ -52,6 +50,8 @@ graph LR
   _synstate_docs --> synstate_react_hooks
   tiny_router_observable --> synstate
   tiny_router_observable --> ts_data_forge
+  ts_fortress_types --> ts_data_forge
+  ts_fortress_types --> ts_fortress
   eslint_config_typed --> ts_data_forge
   eslint_config_typed --> ts_type_forge
   eslint_plugin_ts_data_forge --> ts_data_forge
@@ -109,7 +109,7 @@ graph LR
 |    1 | `tiny-router-react-hooks`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                     |
 |    2 | `ts-data-forge`                                                                                                                                                                                                                                                          |
 |    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
-|    4 | `io-ts-types`, `poll-discord-app`, `tiny-router-observable`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                           |
+|    4 | `poll-discord-app`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                     |
 |    5 | `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                                                              |
 
 ### 参考: devDependencies も含めた場合
@@ -120,8 +120,6 @@ graph LR
 
 | パッケージ                         | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                  |
 | :--------------------------------- | :--- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `io-ts-types`                      | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
-| `io-ts-types`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
 | `lambda-calculus-interpreter-core` | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
 | `lambda-calculus-interpreter-core` | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `numeric-input-utils`              | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
@@ -135,6 +133,8 @@ graph LR
 | `tiny-router-observable`           | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                       |
 | `tiny-router-observable`           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                    |
 | `tiny-router-react-hooks`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                          |
+| `ts-fortress-types`                | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                    |
+| `ts-fortress-types`                | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                  |
 | `better-react-use-state`           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                              |
 | `eslint-config-typed`              | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
 | `eslint-config-typed`              | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-codemod-lib`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                           |

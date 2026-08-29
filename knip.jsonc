@@ -176,13 +176,6 @@
       ],
     },
 
-    // Not an Astro site like the entry below assumes: plain TypeScript with a
-    // single entry point.
-    "apps/io-ts-types": {
-      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
-      "project": ["**/*.mts"],
-    },
-
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/numeric-input-utils": {
       "entry": ["src/index.mts"],
@@ -202,6 +195,13 @@
 
     "apps/tiny-router-react-hooks": {
       "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry below assumes: plain TypeScript with a
+    // single entry point.
+    "apps/ts-fortress-types": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
       "project": ["**/*.mts"],
     },
 
