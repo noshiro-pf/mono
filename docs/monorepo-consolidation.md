@@ -368,8 +368,20 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
           がその行だけを落とした 3 本のブランチができた — conflict マーカーは
           出ず、`fmt` も `lint` も通る。**しかもこのファイルを再生成して差分を
           見る CI ジョブは無い**（`docs:deps` はどの workflow からも呼ばれて
-          いない）ので、気付かなければそのまま main に入る。rebase のたびに
-          `pnpm run docs:deps` を回すのが唯一の防波堤である
+          いない）ので、気付かなければそのまま main に入る。**実際 main の
+          ファイルは #1709 の時点で古くなっていた** — 3 本のブランチで見つけた
+          欠落は、その古い版を rebase したときに出たものだった
+        - **その CI チェックは #1715 で入れた。** `style-check` は各コマンドの後に
+          リポジトリが clean かを確認する作りなので、`docs:deps` をマトリクスに
+          足すだけで drift チェックになる。ただし**生成器がテーブルを整形せずに
+          書いていた**ため、そのままでは毎回差分が出て使いものにならなかった。
+          `formatFiles` で自分の出力を整形するようにしてある
+            - **`style-check (docs:deps)` を required にするのは別作業。**
+              `repo-settings/rulesets/main.json` に足したうえで
+              `pnpm run repo-settings:apply` を回す必要がある。同じ PR に入れると
+              `backup-repository-settings` が落ちる — あれは
+              `repo-settings:backup` で実際の設定を書き出してから clean かを
+              見るので、apply 前の宣言は「実態と違う」と判定される
         - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
         - **`firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくる。** `allowBuilds` は意図的な許可リストなので、**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない。デプロイ時の判断は別途になる
         - **未解決の型は `expectType` を黙って通す。** `lambda-calculus-interpreter-core`（#1621）で `Variable = LowerAlphabet` の `LowerAlphabet` が解決できず error type になり、何にでも代入可能になっていた。`expectType` の判定 6 件が「通って」おり、型 import を入れた時点で 6 件とも偽陰性として顕在化した。**移行作業中は、型エラーを消すまで型テストの結果を信用できない**
