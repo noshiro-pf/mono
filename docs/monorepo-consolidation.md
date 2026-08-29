@@ -363,6 +363,13 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
           conflict は base 側を取って `pnpm install` / `pnpm run docs:deps` で
           作り直す。knip の per-package entry だけは手で書くものなので、
           落とすと `apps/*` の Astro 前提の glob に落ちて黙って通る
+        - **`docs/package-dependencies.md` は、conflict にならなくても壊れる。**
+          #1709 が `ts-std-forge` を足した後で rebase したところ、git の自動マージ
+          がその行だけを落とした 3 本のブランチができた — conflict マーカーは
+          出ず、`fmt` も `lint` も通る。**しかもこのファイルを再生成して差分を
+          見る CI ジョブは無い**（`docs:deps` はどの workflow からも呼ばれて
+          いない）ので、気付かなければそのまま main に入る。rebase のたびに
+          `pnpm run docs:deps` を回すのが唯一の防波堤である
         - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
         - **`firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくる。** `allowBuilds` は意図的な許可リストなので、**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない。デプロイ時の判断は別途になる
         - **未解決の型は `expectType` を黙って通す。** `lambda-calculus-interpreter-core`（#1621）で `Variable = LowerAlphabet` の `LowerAlphabet` が解決できず error type になり、何にでも代入可能になっていた。`expectType` の判定 6 件が「通って」おり、型 import を入れた時点で 6 件とも偽陰性として顕在化した。**移行作業中は、型エラーを消すまで型テストの結果を信用できない**
