@@ -255,6 +255,38 @@ event-schedule-app
 は 52。加えて `@blueprintjs/datetime` が 1 箇所。ラッパ側は `core` 14 / `datetime` 4
 / `datetime2` 3。
 
+### `event-schedule-app` の復元は「移植」ではなく「書き換え」になる
+
+utils を全部揃えたあと、本体の復元を機械的な範囲まで進めて規模を測った。
+
+| 作業                                     |           量 |
+| :--------------------------------------- | -----------: |
+| `.ts` → `.mts` の改名                    | 190 ファイル |
+| パッケージ名の置換                       |      14 種類 |
+| **暗黙グローバルの撤廃後に残る型エラー** |  **3567 件** |
+| 撤廃対象の識別子                         | **約 90 個** |
+
+**3567 件のほとんどは「宣言されていない識別子」で、原因は `globals.d.ts` の 10 行**。
+
+```text
+/// <reference types="@noshiro/global-react" />
+/// <reference types="@noshiro/global-syncflow" />
+/// <reference types="@noshiro/global-ts-utils" />
+…（全 10 個）
+```
+
+`useMemo` / `useCallback` / `styled` / `css` / `pipe` / `Result` / `Obj` /
+`memoNamed` といった**約 90 個の識別子が import 無しで使える前提**で 21136 行が
+書かれている。多い順に `Obj` 143・`Result` 139・`styled` 119・`memoNamed` 111・
+`css` 96・`map` 90。
+
+これは poll-discord-app（24 個・39 ファイル）で通った道の 4 倍規模で、**同じ機械的な
+手順で進められる**。ただし置換後に API のずれ（`syncflow` → `synstate`、`ts-utils`
+→ `ts-data-forge`）が表に出るので、そこからは 1 件ずつになる。
+
+後継が無いものも既に 2 つ見えている。`createVoidEventEmitter` と `setInitialValue`
+は `synstate` に無く、旧 `syncflow` から移植が要る（7 ファイルで使用）。
+
 ### `event-schedule-app` 本体の実測
 
 | 項目       | 値                                               |
