@@ -463,7 +463,7 @@ const siblingOverrides = (
  * leave the check. Delete the entry once the package has been published; from
  * then on it is verified like any other.
  */
-const notYetPublished: ReadonlySet<string> = new Set(['ts-std-forge']);
+const notYetPublished: ReadonlySet<string> = new Set();
 
 /**
  * The published space pins an exact version, committed, rather than tracking
