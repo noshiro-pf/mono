@@ -267,6 +267,109 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2
 
+  apps/event-schedule-app:
+    dependencies:
+      '@blueprintjs/core':
+        specifier: ^6.18.0
+        version: 6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@blueprintjs/datetime':
+        specifier: ^6.2.4
+        version: 6.2.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@emotion/react':
+        specifier: ^11.14.0
+        version: 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
+      '@emotion/styled':
+        specifier: ^11.14.1
+        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0))(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
+      better-react-use-state:
+        specifier: workspace:*
+        version: link:../../libs/better-react-use-state
+      event-schedule-app-shared:
+        specifier: workspace:*
+        version: link:../event-schedule-app-shared
+      firebase:
+        specifier: ^12.17.1
+        version: 12.18.0
+      html2canvas:
+        specifier: ^1.4.1
+        version: 1.4.1
+      numeric-input-utils:
+        specifier: workspace:*
+        version: link:../numeric-input-utils
+      react-blueprintjs-utils:
+        specifier: workspace:*
+        version: link:../react-blueprintjs-utils
+      react-utils:
+        specifier: workspace:*
+        version: link:../react-utils
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
+      synstate-react-hooks:
+        specifier: workspace:*
+        version: link:../../libs/synstate-react-hooks
+      tiny-router-observable:
+        specifier: workspace:*
+        version: link:../tiny-router-observable
+      tiny-router-react-hooks:
+        specifier: workspace:*
+        version: link:../tiny-router-react-hooks
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/ts-fortress
+      ts-fortress-types:
+        specifier: workspace:*
+        version: link:../ts-fortress-types
+      url-regex:
+        specifier: ^5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.18
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.5(@types/react@19.2.18)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.9.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.12
+
   apps/event-schedule-app-shared:
     dependencies:
       ts-data-forge:
@@ -6449,6 +6552,10 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
+  base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
+
   base64-js@0.0.8:
     resolution: {integrity: sha512-3XSA2cR/h/73EzlXXdU6YNycmYI7+kicTxks4eJg2g39biHR84slg2+des+p7iHYhbRg/udIS4TD53WabcOUkw==}
     engines: {node: '>= 0.4'}
@@ -6729,6 +6836,9 @@ packages:
   css-gradient-parser@0.0.17:
     resolution: {integrity: sha512-w2Xy9UMMwlKtou0vlRnXvWglPAceXCTtcmVSo8ZBUvqCV5aXEFP/PC6d+I464810I9FT++UACwTD5511bmGPUg==}
     engines: {node: '>=16'}
+
+  css-line-break@2.1.0:
+    resolution: {integrity: sha512-FHcKFCZcAha3LwfVBhCQbW2nCNbkZXn7KVUJcsT5/P8YmfsVja0FMPJr0B903j/E69HUphKiV9iQArX8SDYA4w==}
 
   css-select@5.2.2:
     resolution: {integrity: sha512-TizTzUddG/xYLA3NXodFM0fSbNizXjOKhqiQQwvhlspadZokn1KDy0NZFS0wuEubIYAV5/c1/lAr0TaaFXEXzw==}
@@ -7656,6 +7766,10 @@ packages:
   html-whitespace-sensitive-tag-names@3.0.1:
     resolution: {integrity: sha512-q+310vW8zmymYHALr1da4HyXUQ0zgiIwIicEfotYPWGN0OJVEN/58IJ3A4GBYcEq3LGAZqKb+ugvP0GNB9CEAA==}
 
+  html2canvas@1.4.1:
+    resolution: {integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==}
+    engines: {node: '>=8.0.0'}
+
   http-cache-semantics@4.2.0:
     resolution: {integrity: sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==}
 
@@ -7726,6 +7840,10 @@ packages:
     resolution: {integrity: sha512-FHCCztTkHoV9mdBsHpocLpdTAfh956ZQcIkWQxxS0U5HT53vtrcuYdQneEJKH6xILaLNzXVl2Cvwtoy8XNN0AA==}
     peerDependencies:
       fp-ts: ^2.5.0
+
+  ip-regex@4.3.0:
+    resolution: {integrity: sha512-B9ZWJxHHOHUhUjCPrMpLD4xEq35bUTClHM1S6CBU5ixQnkZmwipwgc96vAd7AAGM9TGHvJR+Uss+/Ak6UphK+Q==}
+    engines: {node: '>=8'}
 
   iron-webcrypto@1.2.1:
     resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
@@ -10312,6 +10430,9 @@ packages:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
     engines: {node: '>=6'}
 
+  text-segmentation@1.0.3:
+    resolution: {integrity: sha512-iOiPUo/BGnZ6+54OsWxZidGCsdU8YbE4PSpdPinp7DeMtUJNJBoJ/ouUSTJjHkh1KntHaltHl/gDs2FC4i5+Nw==}
+
   time-span@5.1.0:
     resolution: {integrity: sha512-75voc/9G4rDIJleOo4jPvN4/YC4GRZrY8yy1uU4lwrB3XEQbWve8zXoO5No4eFrGcTAMYyoY67p8jRQdtA1HbA==}
     engines: {node: '>=12'}
@@ -10341,6 +10462,10 @@ packages:
   tinyrainbow@3.1.1:
     resolution: {integrity: sha512-yau8yJdTt989Mm0Bd/236QnzEiPf2xLLTqUZRUJOo/3CB078LSwzei343DgtJVmfJKJE3TMINY1u42SQsP6mXw==}
     engines: {node: '>=14.0.0'}
+
+  tlds@1.261.0:
+    resolution: {integrity: sha512-QXqwfEl9ddlGBaRFXIvNKK6OhipSiLXuRuLJX5DErz0o0Q0rYxulWLdFryTkV5PkdZct5iMInwYEGe/eR++1AA==}
+    hasBin: true
 
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
@@ -10666,8 +10791,15 @@ packages:
     resolution: {integrity: sha512-8tzwTeXFPuX/5PHuCDQE5Dd9Ts4rwoq2t9aIT+HS4iAVpmj5l4Ao7Q+BuuFjvWRqrLswBhQDk8O96ZicgCqQqw==}
     engines: {node: '>=20'}
 
+  url-regex@5.0.0:
+    resolution: {integrity: sha512-O08GjTiAFNsSlrUWfqF1jH0H1W3m35ZyadHrGv5krdnmPPoxP27oDTqux/579PtaroiSGm5yma6KT1mHFH6Y/g==}
+    engines: {node: '>=8'}
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  utrie@1.0.2:
+    resolution: {integrity: sha512-1MLa5ouZiOmQzUbjbu9VmjLzn1QLXBhwpUa7kdLUQK+KQ5KA9I1vk5U4YHe/X2Ch7PYnJfWuWT+VbuxbGwljhw==}
 
   valtio@2.3.2:
     resolution: {integrity: sha512-YXhWQei9IN/ZDce9rhL3trCq9+vVq8M1gWmKVdP3YSZ2gxsmmNWVbxXwf9yG6ffu/dAvAD91nevg8xirGr4Dhg==}
@@ -11352,6 +11484,22 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
+  '@blueprintjs/core@6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@blueprintjs/colors': 5.1.16
+      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@floating-ui/react': 0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@popperjs/core': 2.11.8
+      classnames: 2.5.1
+      normalize.css: 8.0.1
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      react-transition-group: 4.4.5(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.2.18
+
   '@blueprintjs/datetime@6.2.4(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
@@ -11368,12 +11516,38 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
+  '@blueprintjs/datetime@6.2.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@blueprintjs/select': 6.3.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      classnames: 2.5.1
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.1(date-fns@2.30.0)
+      react: 19.2.8
+      react-day-picker: 8.10.2(date-fns@2.30.0)(react@19.2.8)
+      react-dom: 19.2.8(react@19.2.8)
+      react-innertext: 1.1.5(@types/react@19.2.18)(react@19.2.8)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.2.18
+
   '@blueprintjs/icons@6.13.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
     dependencies:
       change-case: 4.1.2
       classnames: 2.5.1
       react: 19.2.8
       react-dom: 18.3.1(react@19.2.8)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.2.18
+
+  '@blueprintjs/icons@6.13.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      change-case: 4.1.2
+      classnames: 2.5.1
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
       tslib: 2.6.3
     optionalDependencies:
       '@types/react': 19.2.18
@@ -11386,6 +11560,18 @@ snapshots:
       classnames: 2.5.1
       react: 19.2.8
       react-dom: 18.3.1(react@19.2.8)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.2.18
+
+  '@blueprintjs/select@6.3.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@blueprintjs/colors': 5.1.16
+      '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      classnames: 2.5.1
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
       tslib: 2.6.3
     optionalDependencies:
       '@types/react': 19.2.18
@@ -12447,12 +12633,26 @@ snapshots:
       react: 19.2.8
       react-dom: 18.3.1(react@19.2.8)
 
+  '@floating-ui/react-dom@2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+
   '@floating-ui/react@0.27.20(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@floating-ui/react-dom': 2.1.9(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
       '@floating-ui/utils': 0.2.12
       react: 19.2.8
       react-dom: 18.3.1(react@19.2.8)
+      tabbable: 6.5.0
+
+  '@floating-ui/react@0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@floating-ui/utils': 0.2.12
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
       tabbable: 6.5.0
 
   '@floating-ui/utils@0.2.12': {}
@@ -14199,6 +14399,8 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
+  base64-arraybuffer@1.0.2: {}
+
   base64-js@0.0.8: {}
 
   baseline-browser-mapping@2.11.18: {}
@@ -14513,6 +14715,10 @@ snapshots:
   css-color-keywords@1.0.0: {}
 
   css-gradient-parser@0.0.17: {}
+
+  css-line-break@2.1.0:
+    dependencies:
+      utrie: 1.0.2
 
   css-select@5.2.2:
     dependencies:
@@ -15799,6 +16005,11 @@ snapshots:
 
   html-whitespace-sensitive-tag-names@3.0.1: {}
 
+  html2canvas@1.4.1:
+    dependencies:
+      css-line-break: 2.1.0
+      text-segmentation: 1.0.3
+
   http-cache-semantics@4.2.0: {}
 
   http-parser-js@0.5.10: {}
@@ -15847,6 +16058,8 @@ snapshots:
   io-ts@2.2.22(fp-ts@2.16.11):
     dependencies:
       fp-ts: 2.16.11
+
+  ip-regex@4.3.0: {}
 
   iron-webcrypto@1.2.1: {}
 
@@ -17300,6 +17513,14 @@ snapshots:
       '@popperjs/core': 2.11.8
       react: 19.2.8
       react-dom: 18.3.1(react@19.2.8)
+      react-fast-compare: 3.2.2
+      warning: 4.0.3
+
+  react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      '@popperjs/core': 2.11.8
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
       react-fast-compare: 3.2.2
       warning: 4.0.3
 
@@ -19025,6 +19246,10 @@ snapshots:
 
   tapable@2.3.3: {}
 
+  text-segmentation@1.0.3:
+    dependencies:
+      utrie: 1.0.2
+
   time-span@5.1.0:
     dependencies:
       convert-hrtime: 5.0.0
@@ -19045,6 +19270,8 @@ snapshots:
   tinypool@2.1.0: {}
 
   tinyrainbow@3.1.1: {}
+
+  tlds@1.261.0: {}
 
   to-regex-range@5.0.1:
     dependencies:
@@ -19349,7 +19576,16 @@ snapshots:
 
   url-extras@0.1.0: {}
 
+  url-regex@5.0.0:
+    dependencies:
+      ip-regex: 4.3.0
+      tlds: 1.261.0
+
   util-deprecate@1.0.2: {}
+
+  utrie@1.0.2:
+    dependencies:
+      base64-arraybuffer: 1.0.2
 
   valtio@2.3.2(@types/react@19.2.18)(react@19.2.8):
     dependencies:

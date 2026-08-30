@@ -1,0 +1,54 @@
+{
+  "hosting": {
+    "site": "event-schedule-app",
+    "public": "build",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "source": "functions",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ]
+  },
+  "emulators": {
+    "auth": {
+      "host": "localhost",
+      "port": 9099
+    },
+    "functions": {
+      "host": "localhost",
+      "port": 5001
+    },
+    "firestore": {
+      "host": "localhost",
+      "port": 5002
+    },
+    "hosting": {
+      "host": "localhost",
+      "port": 5000
+    },
+    "ui": {
+      "enabled": true,
+      "host": "localhost",
+      "port": 4000
+    },
+    "pubsub": {
+      "port": 8085
+    },
+    "singleProjectMode": true
+  }
+}

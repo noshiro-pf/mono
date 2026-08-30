@@ -1,0 +1,144 @@
+import { Arr, hasKey, Obj as ObjBase } from 'ts-data-forge';
+import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+import { type Paths, type RecordValueAtPath } from './paths.mjs';
+
+/**
+ * Whether `record` has `key`, and its value satisfies `guard`.
+ *
+ * Ported from `Obj.hasKeyValue`; `ts-data-forge` has `hasKey` but nothing that
+ * checks the value at the same time.
+ */
+export function hasKeyValue<
+  const R extends UnknownRecord,
+  const K extends PropertyKey,
+  V,
+>(
+  record: R,
+  key: K,
+  guard: (value: unknown) => value is V,
+): record is R & ReadonlyRecord<K, V>;
+
+export function hasKeyValue<const K extends PropertyKey, V>(
+  record: ReadonlyRecord<PropertyKey, unknown>,
+  key: K,
+  guard: (value: unknown) => value is V,
+): boolean {
+  return hasKey(record, key) && guard(record[key]);
+}
+
+/**
+ * The `Obj` this app was written against.
+ *
+ * `ts-data-forge`'s `Obj` does not have the immutable updates — `set`,
+ * `update`, `setIn`, `updateIn` — that 54 call sites here use, so those are
+ * ported from the `@noshiro/ts-utils` of before the monorepo consolidation.
+ * Everything else this app asks of `Obj` is re-exported unchanged; anything
+ * `ts-data-forge` grows later has to be named here to reach those call sites.
+ */
+export namespace Obj {
+  export const { shallowEq, fromEntries, merge } = ObjBase;
+
+  /** A copy with one key replaced. */
+  export const set = <const R extends UnknownRecord, const K extends keyof R>(
+    record: R,
+    key: K,
+    newValue: R[K],
+  ): R => ({ ...record, [key]: newValue }) as const;
+
+  /** A copy with one key replaced by `updater`'s result. */
+  export const update = <
+    const R extends UnknownRecord,
+    const K extends keyof R,
+  >(
+    record: R,
+    key: K,
+    updater: (prev: R[K]) => R[K],
+  ): R => ({ ...record, [key]: updater(record[key]) }) as const;
+
+  /** The value at `keyPath`, or `undefined` where the path does not exist. */
+  export const getIn = <
+    const R extends UnknownRecord,
+    const Path extends Paths<R>,
+  >(
+    record: R,
+    keyPath: Path,
+  ): RecordValueAtPath<R, Path> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    keyPath.reduce<unknown>(
+      (acc, key) =>
+        acc === null || acc === undefined
+          ? undefined
+          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+            (acc as UnknownRecord)[key as string],
+      record,
+    ) as RecordValueAtPath<R, Path>;
+
+  /** A copy with the value at `keyPath` replaced. */
+  export const setIn = <const R extends UnknownRecord>(
+    record: R,
+    keyPath: readonly (number | string)[],
+    newValue: unknown,
+  ): R =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    updateInImpl(record, keyPath, 0, () => newValue) as R;
+
+  /** A copy with the value at `keyPath` replaced by `updater`'s result. */
+  export const updateIn = <
+    const R extends UnknownRecord,
+    const Path extends Paths<R>,
+  >(
+    record: R,
+    keyPath: Path,
+    updater: (prev: RecordValueAtPath<R, Path>) => RecordValueAtPath<R, Path>,
+  ): R => {
+    const updated = updateInImpl(
+      record,
+      keyPath,
+      0,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      updater as (prev: unknown) => unknown,
+    );
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return updated as R;
+  };
+}
+
+/**
+ * Walks `keyPath` and rebuilds the containers along the way.
+ *
+ * Untyped on purpose: the types the callers carry cannot be expressed through
+ * a recursive walk, so they are re-applied by the assertion at each entry
+ * point above.
+ */
+const updateInImpl = (
+  obj: UnknownRecord | readonly unknown[],
+  keyPath: readonly (number | string)[],
+  index: number,
+  updater: (prev: unknown) => unknown,
+): unknown => {
+  const key = keyPath[index];
+
+  if (key === undefined || index >= keyPath.length) return updater(obj);
+
+  if (Arr.isArray(obj)) {
+    return obj.map((v: unknown, i) =>
+      i === key
+        ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          updateInImpl(v as UnknownRecord, keyPath, index + 1, updater)
+        : v,
+    );
+  }
+
+  return {
+    ...obj,
+
+    [key]: updateInImpl(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      obj[key] as UnknownRecord,
+      keyPath,
+      index + 1,
+      updater,
+    ),
+  };
+};

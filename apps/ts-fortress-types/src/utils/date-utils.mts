@@ -1,6 +1,7 @@
 import { asSafeUint } from 'ts-data-forge';
 import {
   type DateEnum,
+  type DayOfWeekIndex,
   type HoursEnum,
   type MinutesEnum,
   type MonthEnum,
@@ -111,6 +112,69 @@ export namespace DateUtils {
       return next;
     };
 
+  /** The day of the week, 0-6, Sunday first. */
+  export const getLocaleDayOfWeek = (date: Date): DayOfWeekIndex => {
+    const day = date.getDay();
+
+    return isDayOfWeek(day) ? day : 0;
+  };
+
+  /** Milliseconds since the epoch. */
+  export const toTimestamp = (date: Date): number => date.getTime();
+
+  /** A copy with the time of day set to 00:00:00.000. */
+  export const toMidnight = (date: Date): Date => {
+    const next = new Date(date);
+
+    next.setHours(0, 0, 0, 0);
+
+    return next;
+  };
+
+  /** A copy with the hour replaced. */
+  export const setLocaleHours =
+    (hours: HoursEnum) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setHours(hours);
+
+      return next;
+    };
+
+  /** A copy with the minute replaced. */
+  export const setLocaleMinutes =
+    (minutes: MinutesEnum) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setMinutes(minutes);
+
+      return next;
+    };
+
+  /** A copy with the day of the month replaced by `updater`'s result. */
+  export const updateLocaleDate =
+    (updater: (date: DateEnum) => DateEnum) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setDate(updater(getLocaleDate(date)));
+
+      return next;
+    };
+
+  /** A copy with the month replaced by `updater`'s result, taking 1-12. */
+  export const updateLocaleMonth =
+    (updater: (month: MonthEnum) => MonthEnum) =>
+    (date: Date): Date => {
+      const next = new Date(date);
+
+      next.setMonth(updater(getLocaleMonth(date)) - 1);
+
+      return next;
+    };
+
   /** Builds a `Date` from local-time parts, taking the month as 1-12. */
   export const create = (
     year: SafeUint,
@@ -134,3 +198,5 @@ const isDayOfMonth = (n: number): n is DateEnum => isInteger(n, 1, 31);
 const isHours = (n: number): n is HoursEnum => isInteger(n, 0, 23);
 
 const isMinutes = (n: number): n is MinutesEnum => isInteger(n, 0, 59);
+
+const isDayOfWeek = (n: number): n is DayOfWeekIndex => isInteger(n, 0, 6);

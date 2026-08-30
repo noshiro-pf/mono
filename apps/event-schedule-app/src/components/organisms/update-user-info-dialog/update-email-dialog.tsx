@@ -1,0 +1,130 @@
+import { Button, FormGroup } from '@blueprintjs/core';
+import { css } from '@emotion/react';
+import * as React from 'react';
+import { BpInput } from 'react-blueprintjs-utils';
+import { memoNamed } from 'react-utils';
+import { useObservableValue } from 'synstate-react-hooks';
+import {
+  UpdateEmailPageStore,
+  UpdateUserInfoDialogStore,
+} from '../../../store/index.mjs';
+import { Label } from '../../atoms/index.mjs';
+import { LockButton } from '../../molecules/index.mjs';
+import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
+
+const dc = dict.accountSettings;
+
+type Props = Readonly<{ dialogIsOpen: boolean; currentEmail: string | null }>;
+
+export const UpdateEmailDialog = memoNamed<Props>(
+  'UpdateEmailDialog',
+  ({ dialogIsOpen, currentEmail }) => {
+    const {
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    } = useObservableValue(UpdateEmailPageStore.state);
+
+    const passwordLockButton = React.useMemo(
+      () => (
+        <LockButton
+          disabled={formState.isWaitingResponse}
+          passwordIsOpen={passwordIsOpen}
+          onLockClick={UpdateEmailPageStore.togglePasswordLock}
+        />
+      ),
+      [formState.isWaitingResponse, passwordIsOpen],
+    );
+
+    const body = React.useMemo(
+      () => (
+        <div
+          css={css`
+            width: 300px;
+            height: 200px;
+          `}
+        >
+          <FormGroup intent={'none'} label={currentEmailInputLabel}>
+            <div>{currentEmail ?? ''}</div>
+          </FormGroup>
+          <FormGroup
+            helperText={formState.email.error}
+            intent={emailFormIntent}
+            label={newEmailInputLabel}
+          >
+            <BpInput
+              autoComplete={'username'}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              disabled={formState.isWaitingResponse}
+              intent={emailFormIntent}
+              type={'email'}
+              value={formState.email.inputValue}
+              onValueChange={UpdateEmailPageStore.inputEmailHandler}
+            />
+          </FormGroup>
+          <FormGroup
+            helperText={formState.password.error}
+            intent={passwordFormIntent}
+            label={passwordInputLabel}
+          >
+            <BpInput
+              autoComplete={'current-password'}
+              disabled={formState.isWaitingResponse}
+              intent={passwordFormIntent}
+              rightElement={passwordLockButton}
+              type={passwordIsOpen ? 'text' : 'password'}
+              value={formState.password.inputValue}
+              onValueChange={UpdateEmailPageStore.inputPasswordHandler}
+            />
+          </FormGroup>
+        </div>
+      ),
+      [
+        currentEmail,
+        emailFormIntent,
+        formState.email.error,
+        formState.email.inputValue,
+        formState.isWaitingResponse,
+        formState.password.error,
+        formState.password.inputValue,
+        passwordFormIntent,
+        passwordIsOpen,
+        passwordLockButton,
+      ],
+    );
+
+    const submitButton = React.useMemo(
+      () => (
+        <Button
+          disabled={enterButtonDisabled}
+          intent={'primary'}
+          loading={formState.isWaitingResponse}
+          onClick={UpdateEmailPageStore.enterClickHandler}
+        >
+          {dc.button.update}
+        </Button>
+      ),
+      [enterButtonDisabled, formState.isWaitingResponse],
+    );
+
+    return (
+      <UpdateUserInfoDialogTemplate
+        body={body}
+        closeDialog={UpdateUserInfoDialogStore.closeDialog}
+        dialogIsOpen={dialogIsOpen}
+        isWaitingResponse={formState.isWaitingResponse}
+        submitButton={submitButton}
+        title={dc.updateEmail.title}
+      />
+    );
+  },
+);
+
+const passwordInputLabel = <Label>{dc.reauthenticate.password}</Label>;
+
+const currentEmailInputLabel = <Label>{dc.updateEmail.currentEmail}</Label>;
+
+const newEmailInputLabel = <Label>{dc.updateEmail.newEmail}</Label>;
