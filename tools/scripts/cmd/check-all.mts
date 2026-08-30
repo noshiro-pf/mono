@@ -101,6 +101,13 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Regenerating the dependency graph',
+    action: () =>
+      runCmdStep('pnpm run docs:deps', 'Dependency graph generation failed'),
+    successMessage: 'Dependency graph regenerated',
+  });
+
+  await logStep({
     startMessage: 'Running tests',
     action: () => runCmdStep('pnpm run ws:test:cov', 'Tests failed'),
     successMessage: 'Tests passed',

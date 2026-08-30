@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 29 個。
+このリポジトリの workspace パッケージは 30 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -40,6 +40,7 @@ graph LR
   ts_data_forge["ts-data-forge"]
   ts_fortress["ts-fortress"]
   ts_repo_utils["ts-repo-utils"]
+  ts_std_forge["ts-std-forge"]
   ts_type_forge["ts-type-forge"]
   event_schedule_app_shared --> ts_data_forge
   event_schedule_app_shared --> ts_fortress
@@ -105,6 +106,7 @@ graph LR
   ts_fortress --> ts_type_forge
   ts_repo_utils --> ts_data_forge
   ts_repo_utils --> ts_type_forge
+  ts_std_forge --> ts_data_forge
 ```
 
 ## ビルド順
@@ -117,13 +119,13 @@ graph LR
 
 ### `ws:build` が使う段階
 
-| 段階 | パッケージ                                                                                                                                                                                                                                                               |
-| ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    1 | `tiny-router-react-hooks`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                     |
-|    2 | `ts-data-forge`                                                                                                                                                                                                                                                          |
-|    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
-|    4 | `poll-discord-app`, `react-utils`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                      |
-|    5 | `event-schedule-app-shared`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                           |
+| 段階 | パッケージ                                                                                                                                                                                                                                                                               |
+| ---: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    1 | `tiny-router-react-hooks`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                     |
+|    2 | `ts-data-forge`                                                                                                                                                                                                                                                                          |
+|    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
+|    4 | `poll-discord-app`, `react-utils`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                      |
+|    5 | `event-schedule-app-shared`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                                                                                                                                           |
 
 ### 参考: devDependencies も含めた場合
 
@@ -187,9 +189,11 @@ graph LR
 | `ts-fortress`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                    |
 | `ts-repo-utils`                    | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                  |
 | `ts-repo-utils`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                        |
+| `ts-std-forge`                     | dep  | `ts-data-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                        |
+| `ts-std-forge`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                        |
 | `ts-type-forge`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                |
 
-29 / 29 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+30 / 30 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
