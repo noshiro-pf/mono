@@ -62,6 +62,10 @@ export const verifyNpmPackages = async (
 
   if (Result.isErr(generated)) return generated;
 
+  // What the space actually contains, which in the published space is not
+  // every publishable package — see `generateSpace`.
+  const included = generated.value;
+
   console.info(
     `Installing into ${path.relative(projectRootPath, spaceDir)} ...`,
   );
@@ -96,7 +100,7 @@ export const verifyNpmPackages = async (
 
   console.info('ok\n');
 
-  return runChecks(spaceDir, packages);
+  return runChecks(spaceDir, included);
 };
 
 export type Target = 'local' | 'published';
@@ -276,7 +280,7 @@ const generateSpace = async (
   spaceDir: string,
   packages: readonly PackageToCheck[],
   options: Readonly<{ updatePins: boolean }>,
-): Promise<Result<undefined, string>> => {
+): Promise<Result<readonly PackageToCheck[], string>> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.mkdir(path.resolve(spaceDir, 'packages'), { recursive: true });
 
@@ -310,22 +314,37 @@ const generateSpace = async (
     ].join('\n'),
   );
 
+  const mut_included: PackageToCheck[] = [];
+
+  const mut_skipped: string[] = [];
+
   for (const pkg of packages) {
     const dir = path.resolve(spaceDir, 'packages', pkg.name);
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.mkdir(dir, { recursive: true });
-
-    const spec =
+    const pin =
       target === 'local'
-        ? `file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}`
+        ? Result.ok<string | undefined>(
+            `file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}`,
+          )
         : await publishedVersionPin(dir, pkg.name, options.updatePins);
 
+    if (Result.isErr(pin)) return pin;
+
+    const spec = pin.value;
+
+    // Not on the registry at all: the state a package is in between the pull
+    // request that adds it and its first manual publish. Leaving it out is
+    // what lets that window exist — see the note on `publishedVersionPin`.
     if (spec === undefined) {
-      return Result.err(
-        `Could not determine a published version for ${pkg.name}.`,
-      );
+      mut_skipped.push(pkg.name);
+
+      continue;
     }
+
+    mut_included.push(pkg);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(dir, { recursive: true });
 
     await writeJson(path.resolve(dir, 'package.json'), {
       name: `verify-${pkg.name}`,
@@ -385,9 +404,17 @@ const generateSpace = async (
     },
   );
 
-  return Result.isErr(formatted)
-    ? Result.err(`Failed to format the generated files in ${spaceDir}.`)
-    : Result.ok(undefined);
+  if (Result.isErr(formatted)) {
+    return Result.err(`Failed to format the generated files in ${spaceDir}.`);
+  }
+
+  if (Arr.isNonEmpty(mut_skipped)) {
+    console.info(
+      `Not yet published, so left out of the ${target} space: ${mut_skipped.join(', ')}.\n`,
+    );
+  }
+
+  return Result.ok(mut_included);
 };
 
 /**
@@ -426,22 +453,51 @@ const siblingOverrides = (
  * pin moves, and it cannot start failing on its own the moment a release goes
  * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
  * version bump arrives as a reviewable diff like any other dependency.
+ *
+ * Returns `undefined` when the registry has never heard of the package. A
+ * package's first publish is manual (`libs/first-release.md`), because npm's
+ * trusted publishing is configured per package and cannot be configured before
+ * the package exists — so between the pull request that adds a package and
+ * that first publish there is nothing to pin, and nothing for a consumer to
+ * install either. The published space leaves such a package out rather than
+ * failing, which is what keeps that window from blocking every pull request
+ * that moves the pins.
  */
 const publishedVersionPin = async (
   dir: string,
   packageName: string,
   updatePins: boolean,
-): Promise<string | undefined> => {
+): Promise<Result<string | undefined, string>> => {
   const existing = updatePins
     ? undefined
     : await readPinnedVersion(dir, packageName);
 
-  if (existing !== undefined) return existing;
+  if (existing !== undefined) return Result.ok(existing);
 
   const latest = await $(`npm view ${packageName} version`, { silent: true });
 
-  return Result.isErr(latest) ? undefined : latest.value.stdout.trim();
+  if (Result.isOk(latest)) return Result.ok(latest.value.stdout.trim());
+
+  // Only "the registry has never heard of this package" is a skip. Every
+  // other failure — a network fault, a registry outage, an auth error — is
+  // reported, because treating those as "not published" would quietly drop
+  // packages from the check at exactly the moment it cannot be trusted.
+  return npmSaysNotFound(latest.value.message)
+    ? Result.ok(undefined)
+    : Result.err(
+        `Could not look up the published version of ${packageName}: ${latest.value.message}`,
+      );
 };
+
+/**
+ * npm reports an unknown package as `E404`, on stderr, which `exec` folds into
+ * the error's message. Matched on the code rather than on the prose so that a
+ * reworded message does not turn a missing package into a hard failure — and
+ * narrowly enough that a 404 from somewhere else in the output does not read
+ * as one.
+ */
+const npmSaysNotFound = (message: string): boolean =>
+  message.includes('E404') || message.includes('is not in this registry');
 
 const readPinnedVersion = async (
   dir: string,
