@@ -3,13 +3,18 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
+  hasKey,
   ISet,
   isString,
   pipe,
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+import {
+  type DeepReadonly,
+  type ReadonlyRecord,
+  type StrictOmit,
+} from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { $ } from './exec-async.mjs';
 
@@ -372,6 +377,60 @@ if (import.meta.vitest !== undefined) {
 }
 
 /**
+ * The extension a module specifier needs for a source file with this
+ * extension.
+ *
+ * TypeScript resolves a specifier by the name the file *emits*, so the answer
+ * follows the source's own extension rather than one configured value: `.mts`
+ * emits `.mjs`, while `.tsx` — like `.ts` — emits `.js`. A directory holding
+ * both therefore needs two different extensions, which is why
+ * `exportStatementExtension` cannot decide this on its own; it is the fallback
+ * for extensions with no known emit.
+ */
+const specifierExtension = (
+  sourceExtension: string,
+  fallback: `.${string}`,
+): `.${string}` =>
+  hasKey(emittedExtensions, sourceExtension)
+    ? emittedExtensions[sourceExtension]
+    : fallback;
+
+const emittedExtensions = {
+  '.cjs': '.cjs',
+  '.cts': '.cjs',
+  '.js': '.js',
+  '.jsx': '.js',
+  '.mjs': '.mjs',
+  '.mts': '.mjs',
+  '.ts': '.js',
+  '.tsx': '.js',
+} as const satisfies ReadonlyRecord<string, `.${string}`>;
+
+if (import.meta.vitest !== undefined) {
+  describe('specifierExtension', () => {
+    test.each([
+      // A directory holding both needs two different extensions, whatever
+      // `exportStatementExtension` says: this is what `--export-ext .mjs`
+      // together with `--target-ext .tsx` used to get wrong.
+      ['./a.mts', '.mjs' as const, '.mjs'],
+      ['./a.tsx', '.mjs' as const, '.js'],
+      ['./a.ts', '.mjs' as const, '.js'],
+      ['./a.cts', '.mjs' as const, '.cjs'],
+      // An extension with no known emit keeps the configured value.
+      ['./a.vue', '.mjs' as const, '.mjs'],
+      ['./a', '.js' as const, '.js'],
+    ] as const)(
+      'specifierExtension($0, $1) to be $2',
+      (filePath, fallback, expected) => {
+        expect(specifierExtension(path.extname(filePath), fallback)).toBe(
+          expected,
+        );
+      },
+    );
+  });
+}
+
+/**
  * Generates the content for an index file.
  *
  * @param subDirectories - Array of subdirectory names.
@@ -388,14 +447,20 @@ const generateIndexContent = (
     ...subDirectories.map((subDir) =>
       config.exportStatementExtension === 'none'
         ? `export * from "./${subDir}";`
-        : `export * from "./${subDir}/index${config.exportStatementExtension}";`,
+        : `export * from "./${subDir}/index${specifierExtension(
+            config.indexFileExtension,
+            config.exportStatementExtension,
+          )}";`,
     ),
     ...filesToExport.map((file) => {
       const fileNameWithoutExt = path.basename(file, path.extname(file));
 
       return config.exportStatementExtension === 'none'
         ? `export * from "./${fileNameWithoutExt}";`
-        : `export * from "./${fileNameWithoutExt}${config.exportStatementExtension}";`;
+        : `export * from "./${fileNameWithoutExt}${specifierExtension(
+            path.extname(file),
+            config.exportStatementExtension,
+          )}";`;
     }),
   ] as const;
 
