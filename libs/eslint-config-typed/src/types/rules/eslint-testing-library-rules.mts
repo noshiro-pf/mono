@@ -1,6 +1,5 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type NonEmptyTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -215,7 +214,10 @@ namespace NoAwaitSyncEvents {
      *
      * @minItems 1
      */
-    eventModules?: NonEmptyTuple<'fire-event' | 'user-event'>;
+    eventModules?: readonly [
+      'fire-event' | 'user-event',
+      ...('fire-event' | 'user-event')[],
+    ];
   }>;
 
   export type RuleEntry =

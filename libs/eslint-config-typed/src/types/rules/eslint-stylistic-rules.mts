@@ -1,10 +1,5 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import {
-  type MinLengthTuple,
-  type NonEmptyTuple,
-  type ReadonlyRecord,
-} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -220,7 +215,6 @@ namespace ArrayElementNewline {
             ArrayPattern?: BasicConfig;
           }>,
       ];
-
   export type BasicConfig =
     | ('always' | 'never' | 'consistent')
     | Readonly<{
@@ -524,10 +518,8 @@ namespace CommaDangle {
             tuples?: ValueWithIgnore;
           }>,
       ];
-
   export type Value =
     'always-multiline' | 'always' | 'never' | 'only-multiline';
-
   export type ValueWithIgnore =
     'always-multiline' | 'always' | 'never' | 'only-multiline' | 'ignore';
 
@@ -624,7 +616,9 @@ namespace CommaStyle {
   export type Options0 = 'first' | 'last';
 
   export type Options1 = Readonly<{
-    exceptions?: ReadonlyRecord<string, boolean>;
+    exceptions?: Readonly<{
+      [k: string]: boolean;
+    }>;
   }>;
 
   export type RuleEntry =
@@ -1646,6 +1640,7 @@ namespace FunctionCallSpacing {
   export type Options =
     | readonly []
     | readonly ['never']
+    | readonly []
     | readonly ['always']
     | readonly [
         'always',
@@ -5766,13 +5761,18 @@ namespace LinesBetweenClassMembers {
         /**
          * @minItems 1
          */
-        enforce: NonEmptyTuple<
+        enforce: readonly [
           Readonly<{
             blankLine: 'always' | 'never';
             prev: 'method' | 'field' | '*';
             next: 'method' | 'field' | '*';
-          }>
-        >;
+          }>,
+          ...Readonly<{
+            blankLine: 'always' | 'never';
+            prev: 'method' | 'field' | '*';
+            next: 'method' | 'field' | '*';
+          }>[],
+        ];
       }>
     | ('always' | 'never');
 
@@ -5997,16 +5997,13 @@ namespace ExpListStyle {
       TSTypeParameterInstantiation?: OverrideConfig;
     }>;
   }>;
-
   export type SingleLineConfig = Readonly<{
     spacing?: 'always' | 'never';
     maxItems?: number;
   }>;
-
   export type MultiLineConfig = Readonly<{
     minItems?: number;
   }>;
-
   export type BaseConfig = Readonly<{
     singleLine?: SingleLineConfig;
     multiline?: MultiLineConfig;
@@ -6436,7 +6433,6 @@ namespace MemberDelimiterStyle {
    * ```
    */
   export type MultiLineOption = 'none' | 'semi' | 'comma';
-
   export type SingleLineOption = 'semi' | 'comma';
 
   export type Options = Readonly<{
@@ -6454,7 +6450,6 @@ namespace MemberDelimiterStyle {
     }>;
     multilineDetection?: 'brackets' | 'last-member';
   }>;
-
   export type DelimiterConfig = Readonly<{
     multiline?: Readonly<{
       delimiter?: MultiLineOption;
@@ -6537,6 +6532,7 @@ namespace MultilineCommentStyle {
   export type Options =
     | readonly []
     | readonly ['starred-block' | 'bare-block']
+    | readonly []
     | readonly ['separate-lines']
     | readonly [
         'separate-lines',
@@ -6849,6 +6845,7 @@ namespace NoExtraParens {
   export type Options =
     | readonly []
     | readonly ['functions']
+    | readonly []
     | readonly ['all']
     | readonly [
         'all',
@@ -6982,36 +6979,96 @@ namespace NoMixedOperators {
    * ```
    */
   export type Options = Readonly<{
-    groups?: readonly MinLengthTuple<
-      2,
-      | '+'
-      | '-'
-      | '*'
-      | '/'
-      | '%'
-      | '**'
-      | '&'
-      | '|'
-      | '^'
-      | '~'
-      | '<<'
-      | '>>'
-      | '>>>'
-      | '=='
-      | '!='
-      | '==='
-      | '!=='
-      | '>'
-      | '>='
-      | '<'
-      | '<='
-      | '&&'
-      | '||'
-      | 'in'
-      | 'instanceof'
-      | '?:'
-      | '??'
-    >[];
+    groups?: readonly (readonly [
+      (
+        | '+'
+        | '-'
+        | '*'
+        | '/'
+        | '%'
+        | '**'
+        | '&'
+        | '|'
+        | '^'
+        | '~'
+        | '<<'
+        | '>>'
+        | '>>>'
+        | '=='
+        | '!='
+        | '==='
+        | '!=='
+        | '>'
+        | '>='
+        | '<'
+        | '<='
+        | '&&'
+        | '||'
+        | 'in'
+        | 'instanceof'
+        | '?:'
+        | '??'
+      ),
+
+      (
+        | '+'
+        | '-'
+        | '*'
+        | '/'
+        | '%'
+        | '**'
+        | '&'
+        | '|'
+        | '^'
+        | '~'
+        | '<<'
+        | '>>'
+        | '>>>'
+        | '=='
+        | '!='
+        | '==='
+        | '!=='
+        | '>'
+        | '>='
+        | '<'
+        | '<='
+        | '&&'
+        | '||'
+        | 'in'
+        | 'instanceof'
+        | '?:'
+        | '??'
+      ),
+      ...(
+        | '+'
+        | '-'
+        | '*'
+        | '/'
+        | '%'
+        | '**'
+        | '&'
+        | '|'
+        | '^'
+        | '~'
+        | '<<'
+        | '>>'
+        | '>>>'
+        | '=='
+        | '!='
+        | '==='
+        | '!=='
+        | '>'
+        | '>='
+        | '<'
+        | '<='
+        | '&&'
+        | '||'
+        | 'in'
+        | 'instanceof'
+        | '?:'
+        | '??'
+      )[],
+    ])[];
     allowSamePrecedence?: boolean;
   }>;
 
@@ -7105,7 +7162,9 @@ namespace NoMultiSpaces {
    * ```
    */
   export type Options = Readonly<{
-    exceptions?: ReadonlyRecord<string, boolean>;
+    exceptions?: Readonly<{
+      [k: string]: boolean;
+    }>;
     ignoreEOLComments?: boolean;
     includeTabs?: boolean;
   }>;
@@ -7976,7 +8035,9 @@ namespace OperatorLinebreak {
   export type Options0 = ('after' | 'before' | 'none') | null;
 
   export type Options1 = Readonly<{
-    overrides?: ReadonlyRecord<string, 'after' | 'before' | 'none' | 'ignore'>;
+    overrides?: Readonly<{
+      [k: string]: 'after' | 'before' | 'none' | 'ignore';
+    }>;
   }>;
 
   export type RuleEntry =
@@ -8246,12 +8307,9 @@ namespace PaddingLineBetweenStatements {
    * ```
    */
   export type PaddingType = 'any' | 'never' | 'always';
-
   export type StatementOption =
-    StatementMatcher | NonEmptyTuple<StatementMatcher>;
-
+    StatementMatcher | readonly [StatementMatcher, ...StatementMatcher[]];
   export type StatementMatcher = StatementType | SelectorOption;
-
   export type StatementType =
     | '*'
     | 'exports'
@@ -8309,7 +8367,6 @@ namespace PaddingLineBetweenStatements {
     | 'type'
     | 'singleline-type'
     | 'multiline-type';
-
   export type Options = readonly Readonly<{
     blankLine: PaddingType;
     prev: StatementOption;
@@ -8400,6 +8457,8 @@ namespace QuoteProps {
    * ```
    */
   export type Options =
+    | readonly []
+    | readonly ['always' | 'as-needed' | 'consistent' | 'consistent-as-needed']
     | readonly []
     | readonly ['always' | 'as-needed' | 'consistent' | 'consistent-as-needed']
     | readonly [
@@ -8622,6 +8681,7 @@ namespace Semi {
           beforeStatementContinuationChars?: 'always' | 'any' | 'never';
         }>,
       ]
+    | readonly []
     | readonly ['always']
     | readonly [
         'always',
@@ -9033,7 +9093,9 @@ namespace SpaceUnaryOps {
   export type Options = Readonly<{
     words?: boolean;
     nonwords?: boolean;
-    overrides?: ReadonlyRecord<string, boolean>;
+    overrides?: Readonly<{
+      [k: string]: boolean;
+    }>;
   }>;
 
   export type RuleEntry =
@@ -9359,7 +9421,6 @@ namespace TypeAnnotationSpacing {
       returnType?: SpacingConfig;
     }>;
   }>;
-
   export type SpacingConfig = Readonly<{
     before?: boolean;
     after?: boolean;

@@ -1,10 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import {
-  type NonEmptyTuple,
-  type ReadonlyRecord,
-  type UnknownRecord,
-} from 'ts-type-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -263,7 +259,10 @@ namespace AnchorIsValid {
     /**
      * @minItems 1
      */
-    aspects?: NonEmptyTuple<'noHref' | 'invalidHref' | 'preferButton'>;
+    aspects?: readonly [
+      'noHref' | 'invalidHref' | 'preferButton',
+      ...('noHref' | 'invalidHref' | 'preferButton')[],
+    ];
     [k: string]: unknown;
   }>;
 
@@ -1386,7 +1385,9 @@ namespace NoInteractiveElementToNoninteractiveRole {
    * ]
    * ```
    */
-  export type Options = ReadonlyRecord<string, readonly string[]>;
+  export type Options = Readonly<{
+    [k: string]: readonly string[];
+  }>;
 
   export type RuleEntry =
     | 'off'
@@ -1466,7 +1467,9 @@ namespace NoNoninteractiveElementToInteractiveRole {
    * ]
    * ```
    */
-  export type Options = ReadonlyRecord<string, readonly string[]>;
+  export type Options = Readonly<{
+    [k: string]: readonly string[];
+  }>;
 
   export type RuleEntry =
     | 'off'
@@ -1589,7 +1592,9 @@ namespace NoRedundantRoles {
    * ]
    * ```
    */
-  export type Options = ReadonlyRecord<string, readonly string[]>;
+  export type Options = Readonly<{
+    [k: string]: readonly string[];
+  }>;
 
   export type RuleEntry =
     | 'off'

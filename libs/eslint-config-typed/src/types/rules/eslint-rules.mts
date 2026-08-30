@@ -1,10 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import {
-  type FixedLengthTuple,
-  type NonEmptyTuple,
-  type UnknownRecord,
-} from 'ts-type-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -353,6 +349,7 @@ namespace ArrowBodyStyle {
   export type Options =
     | readonly []
     | readonly ['always' | 'never']
+    | readonly []
     | readonly ['as-needed']
     | readonly [
         'as-needed',
@@ -1220,6 +1217,7 @@ namespace Curly {
   export type Options =
     | readonly []
     | readonly ['all']
+    | readonly []
     | readonly ['multi' | 'multi-line' | 'multi-or-nest']
     | readonly ['multi' | 'multi-line' | 'multi-or-nest', 'consistent'];
 
@@ -1482,6 +1480,7 @@ namespace Eqeqeq {
           null?: 'always' | 'never' | 'ignore';
         }>,
       ]
+    | readonly []
     | readonly ['smart' | 'allow-null'];
 
   export type RuleEntry =
@@ -1645,6 +1644,7 @@ namespace FuncNameMatching {
           includeCommonJSModuleExports?: boolean;
         }>,
       ]
+    | readonly []
     | readonly [
         Readonly<{
           considerPropertyDescriptor?: boolean;
@@ -1715,7 +1715,6 @@ namespace FuncNames {
           generators?: Value;
         }>,
       ];
-
   export type Value = 'always' | 'as-needed' | 'never';
 
   export type RuleEntry =
@@ -2878,6 +2877,7 @@ namespace InitDeclarations {
   export type Options =
     | readonly []
     | readonly ['always']
+    | readonly []
     | readonly ['never']
     | readonly [
         'never',
@@ -5660,7 +5660,7 @@ namespace NoConsole {
     /**
      * @minItems 1
      */
-    allow?: NonEmptyTuple<string>;
+    allow?: readonly [string, ...string[]];
   }>;
 
   export type RuleEntry =
@@ -8695,7 +8695,8 @@ namespace NoRestrictedImports {
                 allowTypeImports?: boolean;
               }>
           )[];
-          patterns?: readonly string[] | readonly UnknownRecord[];
+          patterns?:
+            readonly string[] | readonly (UnknownRecord | UnknownRecord)[];
         }>,
       ];
 
@@ -10510,7 +10511,7 @@ namespace NoWarningComments {
     /**
      * @minItems 1
      */
-    decoration?: NonEmptyTuple<string>;
+    decoration?: readonly [string, ...string[]];
   }>;
 
   export type RuleEntry =
@@ -12531,10 +12532,12 @@ namespace SortImports {
      * @minItems 4
      * @maxItems 4
      */
-    memberSyntaxSortOrder?: FixedLengthTuple<
-      4,
-      'none' | 'all' | 'multiple' | 'single'
-    >;
+    memberSyntaxSortOrder?: readonly [
+      'none' | 'all' | 'multiple' | 'single',
+      'none' | 'all' | 'multiple' | 'single',
+      'none' | 'all' | 'multiple' | 'single',
+      'none' | 'all' | 'multiple' | 'single',
+    ];
     ignoreDeclarationSort?: boolean;
     ignoreMemberSort?: boolean;
     allowSeparatedGroups?: boolean;

@@ -1,6 +1,5 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type NonEmptyTuple, type ReadonlyRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -1226,6 +1225,7 @@ namespace InitDeclarations {
   export type Options =
     | readonly []
     | readonly ['always']
+    | readonly []
     | readonly ['never']
     | readonly [
         'never',
@@ -1817,16 +1817,13 @@ namespace MemberOrdering {
     | 'private-instance-static-initialization'
     | '#private-static-static-initialization'
     | '#private-instance-static-initialization';
-
   export type OptionalityOrderOptions = 'optional-first' | 'required-first';
-
   export type OrderOptions =
     | 'alphabetically'
     | 'alphabetically-case-insensitive'
     | 'as-written'
     | 'natural'
     | 'natural-case-insensitive';
-
   export type TypeItems =
     | 'readonly-signature'
     | 'signature'
@@ -3860,7 +3857,6 @@ namespace NamingConvention {
    * ```
    */
   export type FormatOptionsConfig = readonly PredefinedFormats[] | null;
-
   export type PredefinedFormats =
     | 'camelCase'
     | 'strictCamelCase'
@@ -3868,7 +3864,6 @@ namespace NamingConvention {
     | 'StrictPascalCase'
     | 'snake_case'
     | 'UPPER_CASE';
-
   export type UnderscoreOptions =
     | 'forbid'
     | 'allow'
@@ -3876,12 +3871,9 @@ namespace NamingConvention {
     | 'requireDouble'
     | 'allowDouble'
     | 'allowSingleOrDouble';
-
   export type PrefixSuffixConfig = readonly string[];
-
   export type TypeModifiers =
     'boolean' | 'string' | 'number' | 'function' | 'array';
-
   export type Options = readonly Readonly<
     | {
         custom?: MatchRegexConfig;
@@ -4693,16 +4685,16 @@ namespace NoDeprecated {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -5413,16 +5405,16 @@ namespace NoFloatingPromises {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -5435,16 +5427,16 @@ namespace NoFloatingPromises {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -5667,7 +5659,7 @@ namespace NoInvalidVoidType {
     /**
      * Whether `void` can be used as a valid value for generic type parameters.
      */
-    allowInGenericTypeArguments?: boolean | NonEmptyTuple<string>;
+    allowInGenericTypeArguments?: boolean | readonly [string, ...string[]];
   }>;
 
   export type RuleEntry =
@@ -6145,16 +6137,16 @@ namespace NoMisusedSpread {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -6697,7 +6689,9 @@ namespace NoRestrictedTypes {
     /**
      * An object whose keys are the types you want to ban, and the values are error messages.
      */
-    types?: ReadonlyRecord<string, BanConfig>;
+    types?: Readonly<{
+      [k: string]: BanConfig;
+    }>;
   }>;
 
   export type RuleEntry =
@@ -8108,16 +8102,16 @@ namespace OnlyThrowError {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -8912,16 +8906,16 @@ namespace PreferPromiseRejectErrors {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -9150,16 +9144,16 @@ namespace PreferReadonlyParameterTypes {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >
@@ -9758,16 +9752,16 @@ namespace RestrictTemplateExpressions {
       | Readonly<
           | {
               from: 'file';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
             }
           | {
               from: 'package';
-              name: string | NonEmptyTuple<string>;
+              name: string | readonly [string, ...string[]];
               package: string;
             }
         >

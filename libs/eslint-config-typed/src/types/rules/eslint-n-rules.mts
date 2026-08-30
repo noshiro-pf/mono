@@ -1,11 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import {
-  type FixedLengthTuple,
-  type NonEmptyTuple,
-  type ReadonlyRecord,
-  type UnknownRecord,
-} from 'ts-type-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -138,7 +133,9 @@ namespace FileExtensionInImport {
    */
   export type Options0 = 'always' | 'never';
 
-  export type Options1 = ReadonlyRecord<string, 'always' | 'never'>;
+  export type Options1 = Readonly<{
+    [k: string]: 'always' | 'never';
+  }>;
 
   export type RuleEntry =
     | 'off'
@@ -629,21 +626,35 @@ namespace NoExtraneousImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
   }>;
@@ -768,21 +779,35 @@ namespace NoExtraneousRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -1521,21 +1546,35 @@ namespace NoTopLevelAwait {
   export type Options = Readonly<{
     ignoreBin?: boolean;
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
   }>;
 
   export type RuleEntry =
@@ -1628,21 +1667,35 @@ namespace NoUnpublishedBin {
    */
   export type Options = Readonly<{
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
   }>;
 
   export type RuleEntry =
@@ -1773,21 +1826,35 @@ namespace NoUnpublishedImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -1925,21 +1992,35 @@ namespace NoUnpublishedRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -7760,24 +7841,40 @@ namespace Hashbang {
    */
   export type Options = Readonly<{
     convertPath?:
-      | ReadonlyRecord<string, FixedLengthTuple<2, string>>
-      | NonEmptyTuple<
+      | Readonly<{
+          [k: string]: readonly [string, string];
+        }>
+      | readonly [
           Readonly<{
             /**
              * @minItems 1
              */
-            include: NonEmptyTuple<string>;
+            include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: FixedLengthTuple<2, string>;
-          }>
-        >;
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
+            /**
+             * @minItems 1
+             */
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
+            /**
+             * @minItems 2
+             * @maxItems 2
+             */
+            replace: readonly [string, string];
+          }>[],
+        ];
     ignoreUnpublished?: boolean;
     additionalExecutables?: readonly string[];
-    executableMap?: ReadonlyRecord<string, string>;
+    executableMap?: Readonly<{
+      [k: string]: string;
+    }>;
   }>;
 
   export type RuleEntry =

@@ -1,6 +1,5 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -530,7 +529,9 @@ namespace NoLargeSnapshots {
   export type Options = Readonly<{
     maxSize?: number;
     inlineMaxSize?: number;
-    allowedSnapshots?: ReadonlyRecord<string, readonly unknown[]>;
+    allowedSnapshots?: Readonly<{
+      [k: string]: readonly unknown[];
+    }>;
   }>;
 
   export type RuleEntry =
@@ -583,7 +584,9 @@ namespace NoRestrictedJestMethods {
    * ]
    * ```
    */
-  export type Options = ReadonlyRecord<string, string | null>;
+  export type Options = Readonly<{
+    [k: string]: string | null;
+  }>;
 
   export type RuleEntry =
     | 'off'
@@ -620,7 +623,9 @@ namespace NoRestrictedMatchers {
    * ]
    * ```
    */
-  export type Options = ReadonlyRecord<string, string | null>;
+  export type Options = Readonly<{
+    [k: string]: string | null;
+  }>;
 
   export type RuleEntry =
     | 'off'
@@ -1833,9 +1838,8 @@ namespace ValidTitle {
         test?: PatternOrPatternArray;
         it?: PatternOrPatternArray;
       }>;
-
   export type PatternOrPatternArray =
-    string | readonly [string] | FixedLengthTuple<2, string>;
+    string | readonly [string] | readonly [string, string];
 
   export type Options = Readonly<{
     /**
