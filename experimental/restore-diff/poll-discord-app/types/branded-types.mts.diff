@@ -1,0 +1,73 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/branded-types.mts apps/poll-discord-app/src/types/branded-types.mts
+index a5120d666..ab5fc8074 100644
+--- experimental/packages/apps/poll-discord-app/src/types/branded-types.mts
++++ apps/poll-discord-app/src/types/branded-types.mts
+@@ -1,42 +1,55 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
++import { DateUtils } from '../utils/index.mjs';
+ 
+-export const commandMessageIdType = t.simpleBrandedString(
+-  'CommandMessageId',
+-  '',
+-);
++export const commandMessageIdType = t.brandedString({
++  typeName: 'CommandMessageId',
++  defaultValue: '',
++});
+ 
+ export const toCommandMessageId = commandMessageIdType.cast;
+ 
+ export type CommandMessageId = t.TypeOf<typeof commandMessageIdType>;
+ 
+-export const dateOptionIdType = t.simpleBrandedString('DateOptionId', '');
++export const dateOptionIdType = t.brandedString({
++  typeName: 'DateOptionId',
++  defaultValue: '',
++});
+ 
+ export const toDateOptionId = dateOptionIdType.cast;
+ 
+ export type DateOptionId = t.TypeOf<typeof dateOptionIdType>;
+ 
+-export const pollIdType = t.simpleBrandedString('PollId', '');
++export const pollIdType = t.brandedString({
++  typeName: 'PollId',
++  defaultValue: '',
++});
+ 
+ export const toPollId = pollIdType.cast;
+ 
+ export type PollId = t.TypeOf<typeof pollIdType>;
+ 
+-export const timestampType = t.simpleBrandedNumber(
+-  'Timestamp',
+-  DateUtils.now(),
+-);
++export const timestampType = t.brandedNumber({
++  typeName: 'Timestamp',
++  defaultValue: DateUtils.now(),
++});
+ 
+ export const toTimestamp = timestampType.cast;
+ 
+ export type Timestamp = t.TypeOf<typeof timestampType>;
+ 
+-export const titleMessageIdType = t.simpleBrandedString('TitleMessageId', '');
++export const titleMessageIdType = t.brandedString({
++  typeName: 'TitleMessageId',
++  defaultValue: '',
++});
+ 
+ export const toTitleMessageId = titleMessageIdType.cast;
+ 
+ export type TitleMessageId = t.TypeOf<typeof titleMessageIdType>;
+ 
+-export const userIdType = t.simpleBrandedString('UserId', '');
++export const userIdType = t.brandedString({
++  typeName: 'UserId',
++  defaultValue: '',
++});
+ 
+ export const toUserId = userIdType.cast;
+ 

@@ -1,0 +1,50 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/time-range-reducer.ts apps/event-schedule-app/src/functions/select-datetimes-component/time-range-reducer.mts
+index 1ede528ee..c1e686727 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/time-range-reducer.ts
++++ apps/event-schedule-app/src/functions/select-datetimes-component/time-range-reducer.mts
+@@ -1,14 +1,10 @@
+-import { compareHm } from '@noshiro/io-ts-types';
++import { pipe } from 'ts-data-forge';
++import { compareHm } from 'ts-fortress-types';
++import { Obj, type Reducer } from '../../utils-ported/index.mjs';
+ 
+ type Action = Readonly<
+-  | {
+-      type: 'end' | 'start';
+-      hm: HoursMinutes;
+-    }
+-  | {
+-      type: 'init';
+-      timeRange: TimeRange;
+-    }
++  | { type: 'end' | 'start'; hm: HoursMinutes }
++  | { type: 'init'; timeRange: TimeRange }
+ >;
+ 
+ type State = TimeRange;
+@@ -20,9 +16,10 @@ export const timeRangeReducer: Reducer<State, Action> = (state, action) => {
+ 
+     case 'start': {
+       const newStart = action.hm;
++
+       return pipe(state)
+-        .chain((r) => Obj.set(r, 'start', newStart))
+-        .chain((r) =>
++        .map((r) => ({ ...r, start: newStart }))
++        .map((r) =>
+           Obj.update(r, 'end', (e) =>
+             compareHm(newStart, e) <= 0 ? e : newStart,
+           ),
+@@ -31,9 +28,10 @@ export const timeRangeReducer: Reducer<State, Action> = (state, action) => {
+ 
+     case 'end': {
+       const newEnd = action.hm;
++
+       return pipe(state)
+-        .chain((r) => Obj.set(r, 'end', newEnd))
+-        .chain((r) =>
++        .map((r) => ({ ...r, end: newEnd }))
++        .map((r) =>
+           Obj.update(r, 'start', (s) =>
+             compareHm(s, newEnd) <= 0 ? s : newEnd,
+           ),

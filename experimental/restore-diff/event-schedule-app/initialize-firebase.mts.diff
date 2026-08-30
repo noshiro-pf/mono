@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/event-schedule-app/src/initialize-firebase.ts apps/event-schedule-app/src/initialize-firebase.mts
+index 5d756685b..450fe27e9 100644
+--- experimental/packages/apps/event-schedule-app/src/initialize-firebase.ts
++++ apps/event-schedule-app/src/initialize-firebase.mts
+@@ -1,7 +1,4 @@
+-import {
+-  firebaseConfig,
+-  firestorePaths,
+-} from '@noshiro/event-schedule-app-shared';
++import { firebaseConfig, firestorePaths } from 'event-schedule-app-shared';
+ import { initializeApp } from 'firebase/app';
+ import { GoogleAuthProvider, getAuth } from 'firebase/auth';
+ import {
+@@ -10,9 +7,9 @@ import {
+   initializeFirestore,
+ } from 'firebase/firestore';
+ import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
+-import firebaseJson from '../firebase.json';
+-import { isDevelopment, useEmulators } from './env';
+-import { clog } from './utils';
++import firebaseJson from '../firebase.json' with { type: 'json' };
++import { isDevelopment, useEmulators } from './env.mjs';
++import { clog } from './utils/index.mjs';
+ 
+ const fbApp = initializeApp(firebaseConfig);
+ 
+@@ -21,8 +18,7 @@ clog('firebase.initializeApp done.');
+ const firestore = initializeFirestore(fbApp, {
+   ignoreUndefinedProperties: true,
+ });
+-// if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+-//   const host = 'localhost';
++// if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') { //   const host = 'localhost';
+ //   const port = firebaseJson.emulators.firestore.port;
+ //   // db.useEmulator(host, port);
+ //   db.settings({ host: `${host}:${port}`, ssl: false });

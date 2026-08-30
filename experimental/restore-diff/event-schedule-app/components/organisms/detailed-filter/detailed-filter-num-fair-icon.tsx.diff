@@ -1,0 +1,14 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-fair-icon.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-fair-icon.tsx
+index 17765da3d..8c59440d6 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-fair-icon.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-fair-icon.tsx
+@@ -1,5 +1,7 @@
+-import { AnswerFilterAndSortStore } from '../../../store';
+-import { DetailedFilterNumIcon } from './detailed-filter-num-icon';
++import { memoNamed } from 'react-utils';
++import { type SafeUint } from 'ts-type-forge';
++import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
++import { DetailedFilterNumIcon } from './detailed-filter-num-icon.js';
+ 
+ type Props = Readonly<{
+   enabled: boolean;

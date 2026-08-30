@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/time-range.mts apps/event-schedule-app-shared/src/v7/types/record/time-range.mts
+index 3ca96e487..9893fdcfc 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/time-range.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/time-range.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { compareHm, hoursMinutesTypeDef } from './base/index.mjs';
+ 
+ export const timeRangeTypeDef = t.record({
+@@ -16,8 +16,12 @@ export const fillTimeRange = timeRangeTypeDef.fill;
+ 
+ export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
+   const compareStartHmResult = compareHm(a.start, b.start);
++
+   if (compareStartHmResult !== 0) return compareStartHmResult;
++
+   const compareEndHmResult = compareHm(a.end, b.end);
++
+   if (compareEndHmResult !== 0) return compareEndHmResult;
++
+   return 0;
+ };

@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/for-non-logged-in-user-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/for-non-logged-in-user-button.tsx
+index 156b764f3..a9817d698 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/for-non-logged-in-user-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/for-non-logged-in-user-button.tsx
+@@ -1,13 +1,13 @@
+-import { AlertWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
+-import { introductionUrl, Routes } from '../../../constants';
+-import { Router } from '../../../store';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { introductionUrl, Routes } from '../../../constants/index.mjs';
++import { Router } from '../../../store/index.mjs';
+ 
+ const dc = dict.forNonLoggedInUser;
+ 
+-type Props = Readonly<{
+-  isOpen: boolean;
+-  cancel: () => void;
+-}>;
++type Props = Readonly<{ isOpen: boolean; cancel: () => void }>;
+ 
+ const onConfirmClick = (): void => {
+   Router.push(Routes.routes.signInPage);
+@@ -17,8 +17,8 @@ export const ForNonLoggedInUserDialog = memoNamed<Props>(
+   'ForNonLoggedInUserDialog',
+   ({ isOpen, cancel }) => (
+     <AlertWithMaxWidth
+-      canEscapeKeyCancel={true}
+-      canOutsideClickCancel={true}
++      canEscapeKeyCancel
++      canOutsideClickCancel
+       cancelButtonText={dict.common.buttonText.cancel}
+       confirmButtonText={dc.confirmButton}
+       icon={'lock'}

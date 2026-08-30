@@ -1,0 +1,35 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/time-range.test.mts apps/ts-fortress-types/src/date-time/time-range.test.mts
+index 21fd1fe7f..84f8f51d4 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/time-range.test.mts
++++ apps/ts-fortress-types/src/date-time/time-range.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { HoursMinutes } from './hours-minutes.mjs';
+ import { TimeRange } from './time-range.mjs';
+ 
+@@ -15,19 +15,20 @@ describe('TimeRange', () => {
+     const defaultValue: TimeRange = {
+       start: HoursMinutes.defaultValue,
+       end: HoursMinutes.defaultValue,
+-    };
+-    expect(TimeRange.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(TimeRange.defaultValue, defaultValue);
+   });
+ 
+   describe('isTimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(TimeRange.is(TimeRange.defaultValue)).toBe(true);
++      assert.isTrue(TimeRange.is(TimeRange.defaultValue));
+     });
+   });
+ 
+   describe('fillTimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(TimeRange.fill({})).toStrictEqual(TimeRange.defaultValue);
++      assert.deepStrictEqual(TimeRange.fill({}), TimeRange.defaultValue);
+     });
+   });
+ });

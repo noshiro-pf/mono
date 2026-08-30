@@ -1,0 +1,61 @@
+diff --git experimental/packages/utils/better-react-use-state/src/use-bool-state.mts libs/better-react-use-state/src/use-bool-state.mts
+index ff31002cc..10f3d19f6 100644
+--- experimental/packages/utils/better-react-use-state/src/use-bool-state.mts
++++ libs/better-react-use-state/src/use-bool-state.mts
+@@ -1,12 +1,11 @@
+-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import * as React from 'react';
+ import { useState } from './use-state.mjs';
+ 
+ export const useBoolState = (
+   initialState: boolean,
+-): [
++): readonly [
+   state: boolean,
+-  Readonly<{
++  setters: Readonly<{
+     setState: (next: boolean) => void;
+     setTrue: () => void;
+     setFalse: () => void;
+@@ -15,33 +14,25 @@ export const useBoolState = (
+     updateState: (updateFn: (v: boolean) => boolean) => void;
+   }>,
+ ] => {
+-  const [state, setState, { resetState, updateState }] =
+-    useState<boolean>(initialState);
++  // No explicit type argument: `initialState` gives it, and the React Compiler
++  // rule reads `useState<boolean>(…)` on a custom hook as a reference to the
++  // hook rather than a call to it.
++  const [state, setState, { resetState, updateState }] = useState(initialState);
+ 
+   const setTrue = React.useCallback(() => {
+     setState(true);
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, []);
++  }, [setState]);
+ 
+   const setFalse = React.useCallback(() => {
+     setState(false);
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, []);
++  }, [setState]);
+ 
+   const toggleState = React.useCallback(() => {
+     updateState((b) => !b);
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, []);
++  }, [updateState]);
+ 
+   return [
+     state,
+-    {
+-      setState,
+-      updateState,
+-      setTrue,
+-      setFalse,
+-      toggleState,
+-      resetState,
+-    },
++    { setState, setTrue, setFalse, resetState, toggleState, updateState },
+   ];
+ };

@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/icon-setting-row.tsx apps/event-schedule-app/src/components/organisms/icon-settings/icon-setting-row.tsx
+index 122380b19..5834da7d7 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/icon-setting-row.tsx
++++ apps/event-schedule-app/src/components/organisms/icon-settings/icon-setting-row.tsx
+@@ -1,10 +1,13 @@
+-import { BpInput } from '@noshiro/react-blueprintjs-utils';
+-import { CustomIcon } from '../../atoms';
++import { css } from '@emotion/react';
++import { BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { match } from '../../../utils-ported/index.mjs';
++import { CustomIcon } from '../../atoms/index.mjs';
+ import {
+   AnswerIconFairPointInput,
+   AnswerIconGoodPoint,
+   AnswerIconPoorPoint,
+-} from '../../molecules';
++} from '../../molecules/index.mjs';
+ 
+ type Props = Readonly<{
+   iconId: AnswerIconId;

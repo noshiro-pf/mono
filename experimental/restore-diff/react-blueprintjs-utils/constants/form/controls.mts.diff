@@ -1,0 +1,20 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/constants/form/controls.mts apps/react-blueprintjs-utils/src/constants/form/controls.mts
+index 5c6c885dc..f97dd091b 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/constants/form/controls.mts
++++ apps/react-blueprintjs-utils/src/constants/form/controls.mts
+@@ -1,7 +1,9 @@
+ import { buttonIntents } from '../button/index.mjs';
+ 
+ export const controlCheckedBackgroundColor = buttonIntents.primary[0];
++
+ export const controlCheckedBackgroundColorHover = buttonIntents.primary[1];
++
+ export const controlCheckedBackgroundColorActive = buttonIntents.primary[2];
+ 
+ // export const controlIndicatorSizePx = ptIconSizeStandardPx;
+@@ -15,4 +17,5 @@ export {
+   darkButtonBackgroundColorActive as darkControlBackgroundColorActive,
+   darkButtonBackgroundColorHover as darkControlBackgroundColorHover,
+ } from '../button/index.mjs';
++
+ export { ptGridSizePx as controlIndicatorSpacingPx } from '../common/index.mjs';

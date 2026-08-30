@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/event-list-page-state/index.ts apps/event-schedule-app/src/store/event-list-page-state/index.mts
+index ca0249b44..77e173d32 100644
+--- experimental/packages/apps/event-schedule-app/src/store/event-list-page-state/index.ts
++++ apps/event-schedule-app/src/store/event-list-page-state/index.mts
+@@ -1 +1 @@
+-export * from './filter-state';
++export * from './filter-state.mjs';

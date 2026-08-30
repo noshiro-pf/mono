@@ -1,0 +1,49 @@
+diff --git experimental/packages/apps/poll-discord-app/src/discord/reaction.mts apps/poll-discord-app/src/discord/reaction.mts
+index 67a1402d9..e0de0613f 100644
+--- experimental/packages/apps/poll-discord-app/src/discord/reaction.mts
++++ apps/poll-discord-app/src/discord/reaction.mts
+@@ -1,5 +1,6 @@
+ import type * as Discord from 'discord.js';
+ import { ChannelType } from 'discord.js';
++import { Result } from 'ts-data-forge';
+ import { emojis } from '../constants.mjs';
+ import { firestoreApi } from '../firebase/index.mjs';
+ import {
+@@ -13,6 +14,7 @@ import {
+   toUserId,
+   type AnswerType,
+ } from '../types/index.mjs';
++import { match } from '../utils/index.mjs';
+ import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
+ 
+ const onRefreshClick = async (
+@@ -61,18 +63,21 @@ const onMessageReactCommon = async (
+   user: Discord.PartialUser | Discord.User,
+ ): Promise<Result<undefined, unknown>> => {
+   if (user.bot) return Result.ok(undefined);
++
+   if (action.value === undefined) return Result.ok(undefined);
+ 
+   if (action.value === 'refresh') {
+     if (action.type === 'add') {
+       return onRefreshClick(reaction);
+     }
++
+     return Result.ok(undefined);
+   }
+ 
+   const dateOptionId = toDateOptionId(reaction.message.id);
+ 
+   const channel = reaction.message.channel;
++
+   if (channel.type !== ChannelType.GuildText) {
+     return Result.err(
+       `This channel type "${channel.type}" is not supported. ("GuildText" only)`,
+@@ -128,6 +133,7 @@ const onMessageReactCommon = async (
+   if (Result.isErr(resultPollResult)) {
+     return resultPollResult;
+   }
++
+   const resultPoll = resultPollResult.value;
+ 
+   if (resultPoll === undefined) {

@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/types/answer-selection-value.ts apps/event-schedule-app/src/types/answer-selection-value.mts
+index 731c040ce..fc9d3dc8f 100644
+--- experimental/packages/apps/event-schedule-app/src/types/answer-selection-value.ts
++++ apps/event-schedule-app/src/types/answer-selection-value.mts
+@@ -1,4 +1,6 @@
+-export type AnswerSelectionValue = Pick<
++import { type StrictPick } from 'ts-type-forge';
++
++export type AnswerSelectionValue = StrictPick<
+   AnswerSelection,
+   'comment' | 'iconId' | 'point'
+ >;

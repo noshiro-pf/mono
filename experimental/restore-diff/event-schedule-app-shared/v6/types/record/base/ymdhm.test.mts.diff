@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/ymdhm.test.mts apps/event-schedule-app-shared/src/v6/types/record/base/ymdhm.test.mts
+index d5e01d2c1..e5ee06b9b 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/ymdhm.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/ymdhm.test.mts
+@@ -2,12 +2,12 @@ import { fillYmdhm, isYmdhm, ymdhmDefaultValue } from './ymdhm.mjs';
+ 
+ describe('isYmdhm', () => {
+   test('defaultValue should be true', () => {
+-    expect(isYmdhm(ymdhmDefaultValue)).toBe(true);
++    assert.isTrue(isYmdhm(ymdhmDefaultValue));
+   });
+ });
+ 
+ describe('fillYmdhm', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillYmdhm({})).toStrictEqual(ymdhmDefaultValue);
++    assert.deepStrictEqual(fillYmdhm({}), ymdhmDefaultValue);
+   });
+ });

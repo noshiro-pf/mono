@@ -1,0 +1,18 @@
+diff --git experimental/packages/utils/better-react-use-state/src/use-state.mts libs/better-react-use-state/src/use-state.mts
+index 008d25292..98ca9c8ac 100644
+--- experimental/packages/utils/better-react-use-state/src/use-state.mts
++++ libs/better-react-use-state/src/use-state.mts
+@@ -1,4 +1,3 @@
+-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import * as React from 'react';
+ 
+ export const useState = <T,>(
+@@ -6,7 +5,7 @@ export const useState = <T,>(
+ ): readonly [
+   state: T,
+   setState: (next: T) => void,
+-  Readonly<{
++  setters: Readonly<{
+     updateState: (updateFn: (v: T) => T) => void;
+     resetState: () => void;
+   }>,

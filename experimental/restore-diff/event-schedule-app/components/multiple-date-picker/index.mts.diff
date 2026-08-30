@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/index.ts apps/event-schedule-app/src/components/multiple-date-picker/index.mts
+index 6d80e1bdd..0708dcbe4 100644
+--- experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/index.ts
++++ apps/event-schedule-app/src/components/multiple-date-picker/index.mts
+@@ -1,5 +1,5 @@
+-export * from './date-picker-day';
+-export * from './multiple-date-picker';
+-export * from './navigation';
+-export * from './week';
+-export * from './weekdays-header';
++export * from './date-picker-day.js';
++export * from './multiple-date-picker.js';
++export * from './navigation.js';
++export * from './week.js';
++export * from './weekdays-header.js';

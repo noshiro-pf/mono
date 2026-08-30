@@ -1,0 +1,7 @@
+diff --git apps/react-utils-styled/src/utils/index.mts apps/react-utils-styled/src/utils/index.mts
+new file mode 100644
+index 000000000..1f83fbe2f
+--- /dev/null
++++ apps/react-utils-styled/src/utils/index.mts
+@@ -0,0 +1 @@
++export * from './rect.mjs';

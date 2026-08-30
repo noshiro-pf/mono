@@ -1,0 +1,22 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-button.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-button.tsx
+index 2bc3c5bdc..9a16ff0d8 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-button.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-button.tsx
+@@ -1,6 +1,6 @@
+ import { Button } from '@blueprintjs/core';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useMemo } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
+ 
+ export type BpButtonProps = ButtonPropsOriginal &
+   Readonly<{ nowrap?: boolean }>;
+@@ -10,7 +10,7 @@ type ButtonPropsOriginal = React.ComponentProps<typeof Button>;
+ export const BpButton = memoNamed<BpButtonProps>(
+   'BpButton',
+   ({ nowrap, ...props }) => {
+-    const style = useMemo<React.CSSProperties>(
++    const style = React.useMemo<React.CSSProperties>(
+       () => ({
+         ...props.style,
+         outline: 'none',

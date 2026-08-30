@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/answer-page-state/index.ts apps/event-schedule-app/src/store/answer-page-state/index.mts
+index 13780cf7a..695831796 100644
+--- experimental/packages/apps/event-schedule-app/src/store/answer-page-state/index.ts
++++ apps/event-schedule-app/src/store/answer-page-state/index.mts
+@@ -1,4 +1,4 @@
+-export * from './answer-filter-query-param';
+-export * from './answer-filter-sort-state';
+-export * from './answer-page-state';
+-export * from './answer-table-state';
++export * from './answer-filter-query-param.mjs';
++export * from './answer-filter-sort-state.mjs';
++export * from './answer-page-state.mjs';
++export * from './answer-table-state.mjs';

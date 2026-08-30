@@ -1,0 +1,201 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/create-event-schedule-page/event-schedule-setting-common.ts apps/event-schedule-app/src/store/create-event-schedule-page/event-schedule-setting-common.mts
+index acfb08654..c49474dd1 100644
+--- experimental/packages/apps/event-schedule-app/src/store/create-event-schedule-page/event-schedule-setting-common.ts
++++ apps/event-schedule-app/src/store/create-event-schedule-page/event-schedule-setting-common.mts
+@@ -1,28 +1,32 @@
++import { EventSchedule, UserId, UserName } from 'event-schedule-app-shared';
+ import {
+-  EventSchedule,
+-  UserId,
+-  UserName,
+-} from '@noshiro/event-schedule-app-shared';
++  type InitializedObservable,
++  combine,
++  createState,
++  map,
++} from 'synstate';
++import { Arr, pipe } from 'ts-data-forge';
+ import {
+   answerDeadlineInitialValue,
+   datetimeRangeListInitialValue,
+   eventScheduleInitialValue,
+   notificationSettingsInitialValue,
+-} from '../../constants';
++} from '../../constants/index.mjs';
+ import {
+   normalizeEventSchedule,
+   validateEventSchedule,
+   validateEventScheduleAll,
+-} from '../../functions';
++} from '../../functions/index.mjs';
+ import {
+   type EventScheduleSettingCommonState,
+   type EventScheduleSettingCommonStateHandler,
+   type EventScheduleValidation,
+   type NotificationSettingsWithEmail,
+-} from '../../types';
+-import { mapNoneToUndefined } from '../../utils';
+-import { Auth } from '../auth';
+-import { createToggleSectionState } from '../utils';
++} from '../../types/index.mjs';
++import { mapOptional, omitKeys } from '../../utils-ported/index.mjs';
++import { mapNoneToUndefined } from '../../utils/index.mjs';
++import { Auth } from '../auth.mjs';
++import { createToggleSectionState } from '../utils/index.mjs';
+ 
+ type ReturnValues = Readonly<{
+   commonState$: InitializedObservable<EventScheduleSettingCommonState>;
+@@ -30,31 +34,27 @@ type ReturnValues = Readonly<{
+ }>;
+ 
+ export const createEventScheduleSettingStore = (): ReturnValues => {
+-  const {
+-    state: title$,
+-    setState: setTitle,
+-    resetState: resetTitle,
+-  } = createState<string>(eventScheduleInitialValue.title);
++  const [title$, setTitle, { resetState: resetTitle }] = createState<string>(
++    eventScheduleInitialValue.title,
++  );
+ 
+-  const {
+-    state: notes$,
+-    setState: setNotes,
+-    resetState: resetNotes,
+-  } = createState<string>(eventScheduleInitialValue.notes);
++  const [notes$, setNotes, { resetState: resetNotes }] = createState<string>(
++    eventScheduleInitialValue.notes,
++  );
+ 
+-  const {
+-    state: datetimeSpecification$,
+-    setState: setDatetimeSpecification,
+-    resetState: resetDatetimeSpecification,
+-  } = createState<DatetimeSpecificationEnumType>(
++  const [
++    datetimeSpecification$,
++    setDatetimeSpecification,
++    { resetState: resetDatetimeSpecification },
++  ] = createState<DatetimeSpecificationEnumType>(
+     eventScheduleInitialValue.datetimeSpecification,
+   );
+ 
+-  const {
+-    state: datetimeRangeList$,
+-    setState: setDatetimeRangeList,
+-    resetState: resetDatetimeRangeList,
+-  } = createState<readonly DatetimeRange[]>(
++  const [
++    datetimeRangeList$,
++    setDatetimeRangeList,
++    { resetState: resetDatetimeRangeList },
++  ] = createState<readonly DatetimeRange[]>(
+     eventScheduleInitialValue.datetimeRangeList,
+   );
+ 
+@@ -73,16 +73,13 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+     valueToBeSetWhenTurnedOn: () => answerDeadlineInitialValue,
+   });
+ 
+-  const {
+-    state: answerIcons$,
+-    setState: setAnswerIcons,
+-    resetState: resetAnswerIcons,
+-  } = createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
++  const [answerIcons$, setAnswerIcons, { resetState: resetAnswerIcons }] =
++    createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
+ 
+   const initialNotificationSettingsWithEmailFilled$ = combine([
+     Auth.fireAuthUser$,
+     answerDeadline$,
+-  ]).chain(
++  ]).pipe(
+     map(([user, answerDeadline]) => ({
+       ...notificationSettingsInitialValue,
+       email: user?.email ?? '',
+@@ -105,10 +102,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+       eventScheduleInitialValue.notificationSettings !== 'none',
+     initialState: pipe(
+       mapNoneToUndefined(eventScheduleInitialValue.notificationSettings),
+-    ).chainOptional((a) => ({
+-      ...a,
+-      email: '',
+-    })).value,
++    ).map((__v) => mapOptional(__v, (a) => ({ ...a, email: '' }))).value,
+     valueToBeSetWhenTurnedOff: () => undefined,
+     valueToBeSetWhenTurnedOn: () =>
+       initialNotificationSettingsWithEmailFilled$.getSnapshot().value,
+@@ -117,6 +111,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+   const toggleAnswerDeadlineSection = (): void => {
+     toggleAnswerDeadlineSection_();
++
+     if (!useAnswerDeadline$.getSnapshot().value) {
+       updateNotificationSettingsWithEmail((prev) =>
+         prev === undefined
+@@ -139,6 +134,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
+   const turnOffAnswerDeadlineSection = (): void => {
+     turnOffAnswerDeadlineSection_();
++
+     updateNotificationSettingsWithEmail((prev) =>
+       prev === undefined
+         ? prev
+@@ -173,7 +169,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+       answerIcons$,
+       notificationSettingsWithEmail$,
+       Auth.fireAuthUser$,
+-    ]).chain(
++    ]).pipe(
+       map(
+         ([
+           title,
+@@ -197,7 +193,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+             notificationSettings:
+               notificationSettingsWithEmail === undefined
+                 ? 'none'
+-                : Obj.omit(notificationSettingsWithEmail, ['email']),
++                : omitKeys(notificationSettingsWithEmail, ['email']),
+             timezoneOffsetMinutes:
+               EventSchedule.defaultValue.timezoneOffsetMinutes,
+             author: {
+@@ -215,7 +211,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+       datetimeRangeList$,
+       answerIcons$,
+       notificationSettingsWithEmail$,
+-    ]).chain(
++    ]).pipe(
+       map(
+         ([
+           title,
+@@ -233,7 +229,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+       ),
+     );
+ 
+-  const eventScheduleValidationOk$ = eventScheduleValidation$.chain(
++  const eventScheduleValidationOk$ = eventScheduleValidation$.pipe(
+     map(validateEventScheduleAll),
+   );
+ 
+@@ -251,7 +247,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+       eventScheduleValidation$,
+       eventScheduleNormalized$,
+       eventScheduleValidationOk$,
+-    ]).chain(
++    ]).pipe(
+       map(
+         ([
+           title,
+@@ -311,10 +307,7 @@ export const createEventScheduleSettingStore = (): ReturnValues => {
+     resetNotificationSettingsSection,
+     turnOffNotificationSection,
+     turnOnNotificationSection,
+-  };
++  } as const;
+ 
+-  return {
+-    commonState$,
+-    commonStateHandlers,
+-  };
++  return { commonState$, commonStateHandlers };
+ };

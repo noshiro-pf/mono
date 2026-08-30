@@ -1,0 +1,14 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-user-info-dialog-template.tsx apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-user-info-dialog-template.tsx
+index af42c0291..2f6658218 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-user-info-dialog-template.tsx
++++ apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-user-info-dialog-template.tsx
+@@ -1,6 +1,7 @@
+ import { Button, Classes } from '@blueprintjs/core';
+-import { DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
+-import { ButtonsWrapperAlignEnd } from '../../styled';
++import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
+ 
+ type Props = Readonly<{
+   body: React.ReactNode;

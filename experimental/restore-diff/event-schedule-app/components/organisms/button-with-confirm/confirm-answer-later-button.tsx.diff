@@ -1,0 +1,26 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-answer-later-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-answer-later-button.tsx
+index fce44f71f..9c6b27ded 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-answer-later-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-answer-later-button.tsx
+@@ -1,14 +1,13 @@
+-import { ButtonNowrapStyled } from '@noshiro/react-blueprintjs-utils';
+-import { AnswerPageStore } from '../../../store';
+-import { ButtonWithConfirm } from './button-with-confirm';
+-import { ForNonLoggedInUserDialog } from './for-non-logged-in-user-button';
++import { useBoolState } from 'better-react-use-state';
++import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { AnswerPageStore } from '../../../store/index.mjs';
++import { ButtonWithConfirm } from './button-with-confirm.js';
++import { ForNonLoggedInUserDialog } from './for-non-logged-in-user-button.js';
+ 
+ const dc = dict.answerPage.answerLater;
+ 
+-type Props = Readonly<{
+-  loading: boolean;
+-  loggedIn: boolean;
+-}>;
++type Props = Readonly<{ loading: boolean; loggedIn: boolean }>;
+ 
+ const buttonConfig = {
+   icon: 'saved',

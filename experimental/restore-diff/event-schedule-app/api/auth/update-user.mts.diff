@@ -1,0 +1,84 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/update-user.ts apps/event-schedule-app/src/api/auth/update-user.mts
+index a0df69e88..d154bf840 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/update-user.ts
++++ apps/event-schedule-app/src/api/auth/update-user.mts
+@@ -5,19 +5,19 @@ import {
+   updatePassword as updatePassword_,
+   updateProfile,
+ } from 'firebase/auth';
+-import { assertIsCredentialError } from '../../types';
++import { Result, castDeepMutable, castMutable } from 'ts-data-forge';
++import { assertIsCredentialError } from '../../types/index.mjs';
+ 
+ export const updateDisplayName = (
+   user: FireAuthUser,
+   displayName: string,
+ ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+   Result.fromPromise(
+-    updateProfile(castDeepMutable(user), {
+-      displayName,
+-    }),
+-  ).then((a) =>
+-    Result.mapErr(a, (error) => {
++    updateProfile(castDeepMutable(user), { displayName }),
++  ).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );
+@@ -26,9 +26,10 @@ export const updateEmail = (
+   user: FireAuthUser,
+   email: string,
+ ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+-  Result.fromPromise(updateEmail_(castDeepMutable(user), email)).then((a) =>
+-    Result.mapErr(a, (error) => {
++  Result.fromPromise(updateEmail_(castDeepMutable(user), email)).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );
+@@ -38,19 +39,20 @@ export const updatePassword = (
+   password: string,
+ ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+   Result.fromPromise(updatePassword_(castDeepMutable(user), password)).then(
+-    (a) =>
+-      Result.mapErr(a, (error) => {
+-        assertIsCredentialError(error);
+-        return error;
+-      }),
++    Result.mapErr((error) => {
++      assertIsCredentialError(error);
++
++      return error;
++    }),
+   );
+ 
+ export const deleteUser = (
+   user: FireAuthUser,
+ ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+-  Result.fromPromise(deleteUser_(castDeepMutable(user))).then((a) =>
+-    Result.mapErr(a, (error) => {
++  Result.fromPromise(deleteUser_(castDeepMutable(user))).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );
+@@ -66,9 +68,10 @@ export const reauthenticateWithCredential = (
+       castDeepMutable(user),
+       castMutable(authCredential),
+     ),
+-  ).then((a) =>
+-    Result.mapErr(a, (error) => {
++  ).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );

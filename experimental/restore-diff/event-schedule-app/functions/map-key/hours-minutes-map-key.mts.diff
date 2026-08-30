@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/map-key/hours-minutes-map-key.ts apps/event-schedule-app/src/functions/map-key/hours-minutes-map-key.mts
+index 3083ed63e..64733c7c8 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/map-key/hours-minutes-map-key.ts
++++ apps/event-schedule-app/src/functions/map-key/hours-minutes-map-key.mts
+@@ -1,4 +1,6 @@
+-import { HoursMinutes } from '@noshiro/io-ts-types';
++import { Json, Result } from 'ts-data-forge';
++import { HoursMinutes } from 'ts-fortress-types';
++import { type Brand } from 'ts-type-forge';
+ 
+ export type HoursMinutesMapKey = Brand<string, 'HoursMinutesMapKey'>;
+ 

@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/custom-icon-button.tsx apps/event-schedule-app/src/components/molecules/custom-icon-button.tsx
+index f41fc1f4e..3babaf478 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/custom-icon-button.tsx
++++ apps/event-schedule-app/src/components/molecules/custom-icon-button.tsx
+@@ -1,5 +1,7 @@
+ import { Button } from '@blueprintjs/core';
+-import { CustomIcon } from '../atoms';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { CustomIcon } from '../atoms/index.mjs';
+ 
+ type Props = Readonly<{
+   active?: boolean;
+@@ -14,7 +16,7 @@ type Props = Readonly<{
+ export const CustomIconButton = memoNamed<Props>(
+   'CustomIconButton',
+   (props) => {
+-    const icon = useMemo(
++    const icon = React.useMemo(
+       () => <CustomIcon color={props.iconColor} iconName={props.iconName} />,
+       [props.iconColor, props.iconName],
+     );
+@@ -24,9 +26,8 @@ export const CustomIconButton = memoNamed<Props>(
+         active={props.active}
+         data-e2e={props['data-e2e']}
+         icon={icon}
+-        minimal={true}
+-        outlined={props.outlined}
+         title={props.title}
++        variant={props.outlined === true ? 'outlined' : 'minimal'}
+         onClick={props.onClick}
+       />
+     );

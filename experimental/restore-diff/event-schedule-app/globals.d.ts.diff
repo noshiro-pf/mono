@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/event-schedule-app/src/globals.d.ts experimental/packages/apps/event-schedule-app/src/globals.d.ts
+deleted file mode 100644
+index d77c040d1..000000000
+--- experimental/packages/apps/event-schedule-app/src/globals.d.ts
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/// <reference types="@noshiro/global-better-react-use-state" />
+-/// <reference types="@noshiro/global-emotion-react" />
+-/// <reference types="@noshiro/global-emotion-styled" />
+-/// <reference types="@noshiro/global-react" />
+-/// <reference types="@noshiro/global-react-utils" />
+-/// <reference types="@noshiro/global-syncflow" />
+-/// <reference types="@noshiro/global-syncflow-react-hooks" />
+-/// <reference types="@noshiro/global-tiny-router-observable" />
+-/// <reference types="@noshiro/global-tiny-router-react-hooks" />
+-/// <reference types="@noshiro/global-ts-utils" />

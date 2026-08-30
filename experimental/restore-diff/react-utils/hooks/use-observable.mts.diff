@@ -1,0 +1,66 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-tiny-observable-hooks.mts apps/react-utils/src/hooks/use-observable.mts
+index 363c544b6..c9b5b45b4 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-tiny-observable-hooks.mts
++++ apps/react-utils/src/hooks/use-observable.mts
+@@ -1,48 +1,13 @@
+-import {
+-  createTinyObservable,
+-  type TinyObservable,
+-  type TinyObservableSource,
+-} from '@noshiro/ts-utils';
+-import { useState } from 'better-react-use-state';
+-import { useEffect, useRef } from 'react';
+-
+-export const useTinyObservable = <T,>(): TinyObservableSource<T> => {
+-  const ref = useRef(createTinyObservable<T>());
+-  return ref.current;
+-};
+-
+-export const useTinyObservableEffect = <T,>(
+-  observable$: TinyObservable<T>,
+-  subscriptionFn: (v: T) => void,
+-): void => {
+-  const ref = useRef({ observable$, subscriptionFn });
+-  useEffect(() => {
+-    const s = ref.current.observable$.subscribe(ref.current.subscriptionFn);
+-    return () => {
+-      s.unsubscribe();
+-    };
+-  }, []);
+-};
+-
+-// Wraps the value with an object to avoid setState's update behavior when T is function type.
+-export function useTinyObservableValue<T>(
+-  observable$: TinyObservable<T>,
+-  initialValue: T,
+-): T;
+-export function useTinyObservableValue<T>(
+-  observable$: TinyObservable<T>,
+-): T | undefined;
+-export function useTinyObservableValue<T>(
+-  observable$: TinyObservable<T>,
+-  initialValue?: T,
+-): T | undefined {
+-  const [state, setState] = useState<{ value: T | undefined }>({
+-    value: initialValue,
+-  });
+-
+-  useTinyObservableEffect(observable$, (value) => {
+-    setState({ value });
+-  });
+-
+-  return state.value ?? initialValue;
+-}
++import * as React from 'react';
++import { source, type SourceObservable } from 'synstate';
++
++/**
++ * A `synstate` source that lives as long as the component that made it.
++ *
++ * The two hooks that used to sit beside this one — subscribe for an effect,
++ * read the latest value — are `useObservableEffect` and `useObservableValue` in
++ * `synstate-react-hooks`. Creating the source is the only one of the three with
++ * no counterpart there.
++ */
++export const useObservable = <T,>(): SourceObservable<T> =>
++  React.useMemo<SourceObservable<T>>(source, []);

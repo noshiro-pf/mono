@@ -1,0 +1,26 @@
+diff --git experimental/packages/apps/poll-discord-app/src/main.mts apps/poll-discord-app/src/main.mts
+index 5ba712f64..3e2b0ea8e 100644
+--- experimental/packages/apps/poll-discord-app/src/main.mts
++++ apps/poll-discord-app/src/main.mts
+@@ -1,17 +1,21 @@
++import { Result } from 'ts-data-forge';
+ import { initDiscordClient, startDiscordListener } from './discord/index.mjs';
+ 
+ export const main = async (): Promise<Result<unknown, unknown>> => {
+   console.log('Starting...');
+ 
+   console.log('Initializing DiscordClient...');
++
+   const discordClientResult = await initDiscordClient();
+ 
+   if (Result.isErr(discordClientResult)) {
+     console.error('initDiscordClient failed.', discordClientResult.value);
++
+     return discordClientResult;
+   }
+ 
+   const discordClient = discordClientResult.value;
++
+   console.log('Discord client is ready!');
+ 
+   startDiscordListener(discordClient);

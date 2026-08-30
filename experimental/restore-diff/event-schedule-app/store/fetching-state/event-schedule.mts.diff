@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/fetching-state/event-schedule.ts apps/event-schedule-app/src/store/fetching-state/event-schedule.mts
+index 2e61f44ac..8f6d514fb 100644
+--- experimental/packages/apps/event-schedule-app/src/store/fetching-state/event-schedule.ts
++++ apps/event-schedule-app/src/store/fetching-state/event-schedule.mts
+@@ -1,18 +1,30 @@
+-import { api } from '../../api';
+-import { fetchThrottleTime } from '../../constants';
+-import { Router } from '../router';
++import {
++  type InitializedObservable,
++  combine,
++  createEventEmitter,
++  filter,
++  throttle,
++  unwrapResultOk,
++  withInitialValue,
++} from 'synstate';
++import { createState } from 'synstate-react-hooks';
++import { Result, isNotUndefined } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { fetchThrottleTime } from '../../constants/index.mjs';
++import { noop } from '../../utils-ported/index.mjs';
++import { Router } from '../router.mjs';
+ 
+-const [fetchEventSchedule$, fetchEventSchedule] = createVoidEventEmitter();
++const [fetchEventSchedule$, fetchEventSchedule] = createEventEmitter();
+ 
+-const fetchEventScheduleThrottled$ = fetchEventSchedule$.chain(
+-  throttleTime(fetchThrottleTime),
++const fetchEventScheduleThrottled$ = fetchEventSchedule$.pipe(
++  throttle(fetchThrottleTime),
+ );
+ 
+-const {
+-  state: eventScheduleResult$,
+-  useCurrentValue: useEventScheduleResult,
+-  setState: setEventScheduleResult,
+-} = createState<
++const [
++  useEventScheduleResult,
++  setEventScheduleResult,
++  { state: eventScheduleResult$ },
++] = createState<
+   | Result<
+       EventSchedule,
+       Readonly<{ type: 'not-found' | 'others'; message: string }>
+@@ -44,9 +56,9 @@ result$.subscribe((e) => {
+ 
+ export const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
+   result$
+-    .chain(filter(isNotUndefined))
+-    .chain(unwrapResultOk())
+-    .chain(setInitialValue(undefined));
++    .pipe(filter(isNotUndefined))
++    .pipe(unwrapResultOk())
++    .pipe(withInitialValue(undefined));
+ 
+ export const EventScheduleStore = {
+   result$,

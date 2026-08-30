@@ -1,0 +1,62 @@
+diff --git experimental/packages/utils/resize-observer-react-hooks/src/resize-observer.mts apps/resize-observer-react-hooks/src/resize-observer.mts
+index 1afb2700d..e5270b4d5 100644
+--- experimental/packages/utils/resize-observer-react-hooks/src/resize-observer.mts
++++ apps/resize-observer-react-hooks/src/resize-observer.mts
+@@ -1,7 +1,6 @@
+-import { Arr } from '@noshiro/ts-utils';
+ import { useState } from 'better-react-use-state';
+-import { useEffect, useMemo, useRef } from 'react';
+-import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
++import * as React from 'react';
++import { Arr } from 'ts-data-forge';
+ 
+ type Size = Readonly<{
+   height: number;
+@@ -12,10 +11,12 @@ type Size = Readonly<{
+ 
+ export const useResizeObserverRef = <E extends Element = Element>(
+   setSize: (v: Size) => void,
+-): React.RefObject<E> => {
+-  const rootResizeObserver = useMemo(
++): React.RefObject<E | null> => {
++  // The `resize-observer` polyfill this used is no longer needed: every
++  // browser this app targets ships `ResizeObserver`, and `lib.dom` types it.
++  const rootResizeObserver = React.useMemo(
+     () =>
+-      new CustomResizeObserver((entries) => {
++      new ResizeObserver((entries) => {
+         if (Arr.isNonEmpty(entries)) {
+           setSize(entries[0].contentRect);
+         }
+@@ -23,17 +24,20 @@ export const useResizeObserverRef = <E extends Element = Element>(
+     [setSize],
+   );
+ 
+-  const targetElRef = useRef<E>(null);
++  const targetElRef = React.useRef<E>(null);
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     const el = targetElRef.current;
++
+     if (el !== null) {
+       rootResizeObserver.observe(el);
+     }
++
+     return () => {
+       if (el !== null) {
+         rootResizeObserver.unobserve(el);
+       }
++
+       rootResizeObserver.disconnect();
+     };
+   }, [targetElRef, rootResizeObserver]);
+@@ -43,7 +47,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
+ 
+ export const useResizeObserver = <E extends Element = Element>(
+   defaultSize?: Size,
+-): [Size, React.RefObject<E>] => {
++): readonly [size: Size, ref: React.RefObject<E | null>] => {
+   const [size, setSize] = useState<Size>(
+     defaultSize ?? { width: 0, height: 0, left: 0, top: 0 },
+   );

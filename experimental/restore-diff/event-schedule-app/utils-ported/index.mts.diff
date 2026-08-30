@@ -1,0 +1,52 @@
+diff --git apps/event-schedule-app/src/utils-ported/index.mts apps/event-schedule-app/src/utils-ported/index.mts
+new file mode 100644
+index 000000000..650795d38
+--- /dev/null
++++ apps/event-schedule-app/src/utils-ported/index.mts
+@@ -0,0 +1,46 @@
++import { hasKey } from 'ts-data-forge';
++import { type ReadonlyRecord } from 'ts-type-forge';
++
++export * from './calendar.mjs';
++export * from './obj.mjs';
++export * from './paths.mjs';
++export * from './tuple-guards.mjs';
++
++/**
++ * What `ts-data-forge` has no successor for, ported from the
++ * `@noshiro/ts-utils` this app used before the monorepo consolidation.
++ */
++
++/** Does nothing. */
++export const noop = (): undefined => undefined;
++
++/** Applies `fn` unless the value is absent. */
++export const mapOptional = <A, B>(
++  value: A | null | undefined,
++  fn: (v: A) => B,
++): B | undefined => (value == null ? undefined : fn(value));
++
++/** Looks a value up in a table of cases. */
++export function match<const Case extends PropertyKey, const V>(
++  target: Case,
++  cases: ReadonlyRecord<Case, V>,
++): IsLiteralKey<Case> extends true ? V : V | undefined;
++
++export function match<const V>(
++  target: PropertyKey,
++  cases: Partial<ReadonlyRecord<PropertyKey, V>>,
++): V | undefined {
++  return hasKey(cases, target) ? cases[target] : undefined;
++}
++
++/** Whether `T` is a literal rather than one of the wide key types. */
++type IsLiteralKey<T extends PropertyKey> = string extends T
++  ? false
++  : number extends T
++    ? false
++    : symbol extends T
++      ? false
++      : true;
++
++/** React 19 dropped `React.Reducer`; it was only ever this. */
++export type Reducer<S, A> = (prev: S, action: A) => S;

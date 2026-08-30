@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/macro/plus.mts apps/lambda-calculus-interpreter-core/src/functions/parser/macro/plus.mts
+index e75f8f6ee..d0cb297c9 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/macro/plus.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/macro/plus.mts
+@@ -25,4 +25,4 @@ export const PLUS: LambdaTerm = [
+       ],
+     ],
+   ],
+-];
++] as const;

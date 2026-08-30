@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/event-schedule-diff.tsx apps/event-schedule-app/src/components/organisms/event-schedule-diff.tsx
+index 50b4ead90..fe7225290 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/event-schedule-diff.tsx
++++ apps/event-schedule-app/src/components/organisms/event-schedule-diff.tsx
+@@ -1,8 +1,9 @@
+-import { type EventSettingsPageDiffResult } from '../../functions';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { type EventSettingsPageDiffResult } from '../../functions/index.mjs';
++import { mapOptional } from '../../utils-ported/index.mjs';
+ 
+-type Props = Readonly<{
+-  diff: EventSettingsPageDiffResult;
+-}>;
++type Props = Readonly<{ diff: EventSettingsPageDiffResult }>;
+ 
+ const list1 = [
+   'title',

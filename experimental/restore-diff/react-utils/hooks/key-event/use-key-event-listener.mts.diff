@@ -1,0 +1,29 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/key-event/use-key-event-listener.mts apps/react-utils/src/hooks/key-event/use-key-event-listener.mts
+index f87b8beb5..b7ea172f3 100644
+--- experimental/packages/utils/react-utils/src/hooks/key-event/use-key-event-listener.mts
++++ apps/react-utils/src/hooks/key-event/use-key-event-listener.mts
+@@ -1,15 +1,18 @@
+-import { useEffect } from 'react';
++import * as React from 'react';
+ 
+ export const useKeyEventListener = (
+   onKeyDown: (ev: KeyboardEvent) => void,
+   onKeyUp: (ev: KeyboardEvent) => void,
+ ): void => {
+-  useEffect(() => {
+-    globalThis.addEventListener('keydown', onKeyDown);
+-    globalThis.addEventListener('keyup', onKeyUp);
++  React.useEffect(() => {
++    addEventListener('keydown', onKeyDown);
++
++    addEventListener('keyup', onKeyUp);
++
+     return () => {
+-      globalThis.removeEventListener('keydown', onKeyDown);
+-      globalThis.removeEventListener('keyup', onKeyUp);
++      removeEventListener('keydown', onKeyDown);
++
++      removeEventListener('keyup', onKeyUp);
+     };
+   }, [onKeyDown, onKeyUp]);
+ };

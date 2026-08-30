@@ -1,0 +1,209 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/notification-settings.tsx apps/event-schedule-app/src/components/organisms/notification-settings.tsx
+index f62578545..75a04c007 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/notification-settings.tsx
++++ apps/event-schedule-app/src/components/organisms/notification-settings.tsx
+@@ -1,9 +1,14 @@
+ import { FormGroup } from '@blueprintjs/core';
+-import { BpCheckbox, BpInput } from '@noshiro/react-blueprintjs-utils';
+-import { isEmailString } from '@noshiro/ts-utils-additional';
+-import { type NotificationSettingsWithEmail } from '../../types';
+-import { now, ymdhmDateDiff } from '../../utils';
+-import { WidthRestrictedInputWrapper } from '../styled';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type Observable as SynstateObservable } from 'synstate';
++import { type NotificationSettingsWithEmail } from '../../types/index.mjs';
++import { isEmailString } from '../../utils-ported/index.mjs';
++import { now, ymdhmDateDiff } from '../../utils/index.mjs';
++import { WidthRestrictedInputWrapper } from '../styled/index.mjs';
+ 
+ const dc = dict.eventSettingsPage.section3;
+ 
+@@ -15,7 +20,7 @@ type Props = Readonly<{
+   disabled: boolean;
+   useAnswerDeadline: boolean;
+   answerDeadline: Ymdhm | undefined;
+-  focusEmailInput$: TinyObservable<undefined>;
++  focusEmailInput$: SynstateObservable<undefined>;
+ }>;
+ 
+ export const NotificationSettingsComponent = memoNamed<Props>(
+@@ -28,116 +33,97 @@ export const NotificationSettingsComponent = memoNamed<Props>(
+     answerDeadline,
+     focusEmailInput$,
+   }) => {
+-    const onEmailChange = useCallback(
++    const onEmailChange = React.useCallback(
+       (email: string) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(notificationSettingsWithEmail, 'email', email),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          email,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+ 
+-    const onNotifyOnAnswerChangeCheck = useCallback(
++    const onNotifyOnAnswerChangeCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notifyOnAnswerChange',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notifyOnAnswerChange: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+ 
+-    const onNotifyAfterAnswerDeadlineCheck = useCallback(
++    const onNotifyAfterAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notifyAfterAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notifyAfterAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+ 
+-    const onNotify00daysBeforeAnswerDeadlineCheck = useCallback(
++    const onNotify00daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify00daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify00daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+ 
+-    const onNotify01daysBeforeAnswerDeadlineCheck = useCallback(
++    const onNotify01daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify01daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify01daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+-    const onNotify03daysBeforeAnswerDeadlineCheck = useCallback(
++
++    const onNotify03daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify03daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify03daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+-    const onNotify07daysBeforeAnswerDeadlineCheck = useCallback(
++
++    const onNotify07daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify07daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify07daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+-    const onNotify14daysBeforeAnswerDeadlineCheck = useCallback(
++
++    const onNotify14daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify14daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify14daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+-    const onNotify28daysBeforeAnswerDeadlineCheck = useCallback(
++
++    const onNotify28daysBeforeAnswerDeadlineCheck = React.useCallback(
+       (checked: boolean) => {
+-        onNotificationSettingsWithEmailChange(
+-          Obj.set(
+-            notificationSettingsWithEmail,
+-            'notify28daysBeforeAnswerDeadline',
+-            checked,
+-          ),
+-        );
++        onNotificationSettingsWithEmailChange({
++          ...notificationSettingsWithEmail,
++          notify28daysBeforeAnswerDeadline: checked,
++        });
+       },
+       [notificationSettingsWithEmail, onNotificationSettingsWithEmailChange],
+     );
+ 
+-    const disabledDetail = useMemo(
++    const disabledDetail = React.useMemo(
+       () => ({
+         notifyAfterAnswerDeadline:
+           disabled ||
+@@ -193,7 +179,7 @@ export const NotificationSettingsComponent = memoNamed<Props>(
+           >
+             <BpInput
+               // eslint-disable-next-line jsx-a11y/no-autofocus
+-              autoFocus={true}
++              autoFocus
+               disabled={disabled}
+               focus$={focusEmailInput$}
+               intent={invalidEmail ? 'danger' : 'primary'}

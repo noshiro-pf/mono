@@ -1,0 +1,85 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/confirm-email-dialog-state.ts apps/event-schedule-app/src/functions/reducers/confirm-email-dialog-state.mts
+index ac297101f..bc1478399 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/confirm-email-dialog-state.ts
++++ apps/event-schedule-app/src/functions/reducers/confirm-email-dialog-state.mts
+@@ -1,9 +1,12 @@
++import { pipe } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
++import { Obj, type Reducer } from '../../utils-ported/index.mjs';
+ import {
+   emailInputHasError,
+   emailInputInitialState,
+   emailInputStateReducer,
+   type EmailInputState,
+-} from './input-state';
++} from './input-state/index.mjs';
+ 
+ export type ConfirmEmailDialogFormState = DeepReadonly<{
+   email: EmailInputState;
+@@ -37,18 +40,17 @@ export const confirmEmailDialogFormStateReducer: Reducer<
+ > = (state, action) => {
+   switch (action.type) {
+     case 'inputEmail':
+-      return Obj.set(
+-        state,
+-        'email',
+-        emailInputStateReducer(state.email, {
++      return {
++        ...state,
++        email: emailInputStateReducer(state.email, {
+           type: 'input',
+           payload: action.payload,
+         }),
+-      );
++      };
+ 
+     case 'setEmailDoesNotMatchError':
+       return pipe(state)
+-        .chain((draft) =>
++        .map((draft) =>
+           Obj.update(draft, 'email', (email) =>
+             emailInputStateReducer(email, {
+               type: 'setError',
+@@ -58,12 +60,12 @@ export const confirmEmailDialogFormStateReducer: Reducer<
+             }),
+           ),
+         )
+-        .chain((draft) => Obj.set(draft, 'isWaitingResponse', false)).value;
++        .map((draft) => ({ ...draft, isWaitingResponse: false })).value;
+ 
+     case 'setOtherError':
+       return pipe(state)
+-        .chain((draft) => Obj.set(draft, 'otherErrors', action.payload))
+-        .chain((draft) => Obj.set(draft, 'isWaitingResponse', false)).value;
++        .map((draft) => ({ ...draft, otherErrors: action.payload }))
++        .map((draft) => ({ ...draft, isWaitingResponse: false })).value;
+ 
+     case 'submit': {
+       const emailNextState = emailInputStateReducer(state.email, {
+@@ -71,19 +73,16 @@ export const confirmEmailDialogFormStateReducer: Reducer<
+       });
+ 
+       return pipe(state)
+-        .chain((draft) => Obj.set(draft, 'email', emailNextState))
+-        .chain((draft) => Obj.set(draft, 'otherErrors', undefined))
+-        .chain((draft) =>
+-          Obj.set(
+-            draft,
+-            'isWaitingResponse',
+-            !emailInputHasError(emailNextState),
+-          ),
+-        ).value;
++        .map((draft) => ({ ...draft, email: emailNextState }))
++        .map((draft) => ({ ...draft, otherErrors: undefined }))
++        .map((draft) => ({
++          ...draft,
++          isWaitingResponse: !emailInputHasError(emailNextState),
++        })).value;
+     }
+ 
+     case 'done':
+-      return Obj.set(state, 'isWaitingResponse', false);
++      return { ...state, isWaitingResponse: false };
+ 
+     case 'reset':
+       return confirmEmailDialogFormInitialState;

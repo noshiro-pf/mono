@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-user-info-dialog-state.ts apps/event-schedule-app/src/store/update-user-info-page-state/update-user-info-dialog-state.mts
+index 5179133a5..d4237d54b 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-user-info-dialog-state.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/update-user-info-dialog-state.mts
+@@ -1,9 +1,10 @@
+-const {
+-  useCurrentValue: useOpeningDialogType,
+-  state: openingDialogType$,
+-  setState: setOpeningDialogType,
+-  resetState: closeDialog,
+-} = createState<
++import { createState } from 'synstate-react-hooks';
++
++const [
++  useOpeningDialogType,
++  setOpeningDialogType,
++  { state: openingDialogType$, resetState: closeDialog },
++] = createState<
+   | 'deleteAccount'
+   | 'deleteAccountCreatedWithGoogle'
+   | 'updateDisplayName'

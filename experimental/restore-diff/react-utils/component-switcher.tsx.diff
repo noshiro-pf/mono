@@ -1,0 +1,20 @@
+diff --git experimental/packages/utils/react-utils/src/component-switcher.tsx apps/react-utils/src/component-switcher.tsx
+index 309fa2686..75c45767d 100644
+--- experimental/packages/utils/react-utils/src/component-switcher.tsx
++++ apps/react-utils/src/component-switcher.tsx
+@@ -1,3 +1,6 @@
++/** @jsxImportSource react */
++// This file is also compiled by consumers that set `jsxImportSource` to
++// Emotion; it uses no `css` prop, so it says which runtime it needs.
+ import { memoNamed } from './memo-named.mjs';
+ 
+ type Props = Readonly<{
+@@ -5,7 +8,7 @@ type Props = Readonly<{
+   index: number;
+ }>;
+ 
+-const displayNoneStyle = { display: 'none' };
++const displayNoneStyle = { display: 'none' } as const;
+ 
+ export const ComponentSwitcher = memoNamed<Readonly<Props>>(
+   'ComponentSwitcher',

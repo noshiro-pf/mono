@@ -1,0 +1,18 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/key-event/is-ctrl-key.mts apps/react-utils/src/hooks/key-event/is-ctrl-key.mts
+index ac5da46d2..c40283079 100644
+--- experimental/packages/utils/react-utils/src/hooks/key-event/is-ctrl-key.mts
++++ apps/react-utils/src/hooks/key-event/is-ctrl-key.mts
+@@ -1,4 +1,4 @@
+-import { getPlatform } from '@noshiro/ts-utils-additional';
++import { getPlatform } from '../../utils/index.mjs';
+ import { type KeyboardEventType } from './key-event-type.mjs';
+ 
+ export const isCtrlKey = <T = Element,>(
+@@ -6,6 +6,7 @@ export const isCtrlKey = <T = Element,>(
+   keyEvent: KeyboardEventType<T>,
+ ): boolean => {
+   const os = getPlatform();
++
+   switch (os) {
+     case 'mac':
+       return keyEvent.metaKey;

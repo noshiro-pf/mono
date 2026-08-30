@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/hooks/index.ts apps/event-schedule-app/src/hooks/index.mts
+index 35373733d..e2ce8d7c3 100644
+--- experimental/packages/apps/event-schedule-app/src/hooks/index.ts
++++ apps/event-schedule-app/src/hooks/index.mts
+@@ -1,3 +1,3 @@
+-export * from './multiple-date-picker-hooks';
+-export * from './select-datetimes-component';
+-export * from './use-form-error-hook';
++export * from './multiple-date-picker-hooks.mjs';
++export * from './select-datetimes-component/index.mjs';
++export * from './use-form-error-hook.mjs';

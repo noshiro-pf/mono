@@ -1,0 +1,78 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-email-dialog.tsx apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-email-dialog.tsx
+index 263ca4e04..7319dd60a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-email-dialog.tsx
++++ apps/event-schedule-app/src/components/organisms/update-user-info-dialog/update-email-dialog.tsx
+@@ -1,19 +1,20 @@
+ import { Button, FormGroup } from '@blueprintjs/core';
+-import { BpInput } from '@noshiro/react-blueprintjs-utils';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
+ import {
+   UpdateEmailPageStore,
+   UpdateUserInfoDialogStore,
+-} from '../../../store';
+-import { Label } from '../../atoms';
+-import { LockButton } from '../../molecules';
+-import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template';
++} from '../../../store/index.mjs';
++import { Label } from '../../atoms/index.mjs';
++import { LockButton } from '../../molecules/index.mjs';
++import { UpdateUserInfoDialogTemplate } from './update-user-info-dialog-template.js';
+ 
+ const dc = dict.accountSettings;
+ 
+-type Props = Readonly<{
+-  dialogIsOpen: boolean;
+-  currentEmail: string | null;
+-}>;
++type Props = Readonly<{ dialogIsOpen: boolean; currentEmail: string | null }>;
+ 
+ export const UpdateEmailDialog = memoNamed<Props>(
+   'UpdateEmailDialog',
+@@ -26,7 +27,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
+       passwordIsOpen,
+     } = useObservableValue(UpdateEmailPageStore.state);
+ 
+-    const passwordLockButton = useMemo(
++    const passwordLockButton = React.useMemo(
+       () => (
+         <LockButton
+           disabled={formState.isWaitingResponse}
+@@ -37,7 +38,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
+       [formState.isWaitingResponse, passwordIsOpen],
+     );
+ 
+-    const body = useMemo(
++    const body = React.useMemo(
+       () => (
+         <div
+           css={css`
+@@ -56,7 +57,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
+             <BpInput
+               autoComplete={'username'}
+               // eslint-disable-next-line jsx-a11y/no-autofocus
+-              autoFocus={true}
++              autoFocus
+               disabled={formState.isWaitingResponse}
+               intent={emailFormIntent}
+               type={'email'}
+@@ -95,7 +96,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
+       ],
+     );
+ 
+-    const submitButton = useMemo(
++    const submitButton = React.useMemo(
+       () => (
+         <Button
+           disabled={enterButtonDisabled}
+@@ -123,5 +124,7 @@ export const UpdateEmailDialog = memoNamed<Props>(
+ );
+ 
+ const passwordInputLabel = <Label>{dc.reauthenticate.password}</Label>;
++
+ const currentEmailInputLabel = <Label>{dc.updateEmail.currentEmail}</Label>;
++
+ const newEmailInputLabel = <Label>{dc.updateEmail.newEmail}</Label>;

@@ -1,0 +1,96 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/navigation.tsx apps/event-schedule-app/src/components/multiple-date-picker/navigation.tsx
+index ba1605d3d..f83fc5de6 100644
+--- experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/navigation.tsx
++++ apps/event-schedule-app/src/components/multiple-date-picker/navigation.tsx
+@@ -1,23 +1,31 @@
+ import { Button } from '@blueprintjs/core';
+-import { BpSelect } from '@noshiro/react-blueprintjs-utils';
+-import { monthsList } from '@noshiro/ts-utils-additional';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { BpSelect } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Arr, asSafeUint, Num, SafeUint } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type MonthEnum } from 'ts-type-forge';
++import { mapOptional, monthsList } from '../../utils-ported/index.mjs';
++
++const thisYear = asSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
+ 
+-const thisYear = toSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
+ const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
+ 
+-const yearOption: readonly YearEnum[] = Arr.range(
+-  SafeUint.sub(thisYear, toSafeUint(100)),
+-  SafeUint.add(thisYear, toSafeUint(100)),
++const yearOption: readonly SafeUint[] = Arr.range(
++  SafeUint.sub(thisYear, asSafeUint(100)),
++  SafeUint.add(thisYear, asSafeUint(100)),
+ );
++
+ const monthOption: readonly OptionProps[] = monthsList.en.map((e) => ({
+   value: e.value,
+   label: e.name,
+ }));
+ 
+ type Props = Readonly<{
+-  year: YearEnum;
++  year: SafeUint;
+   month: MonthEnum;
+-  onYearChange: (year: YearEnum) => void;
++  onYearChange: (year: SafeUint) => void;
+   onMonthChange: (month: MonthEnum) => void;
+   onPrevMonthClick: () => void;
+   onNextMonthClick: () => void;
+@@ -33,19 +41,19 @@ export const DatepickerNav = memoNamed<Props>(
+     onPrevMonthClick,
+     onNextMonthClick,
+   }) => {
+-    const onYearChangeHandler = useCallback(
++    const onYearChangeHandler = React.useCallback(
+       (value: string) => {
+         onYearChange(
+           mapOptional(
+             Num.from(value),
+-            (a) => toSafeUint(a) satisfies YearEnum,
++            (a) => asSafeUint(a) satisfies SafeUint,
+           ) ?? thisYear,
+         );
+       },
+       [onYearChange],
+     );
+ 
+-    const onMonthChangeHandler = useCallback(
++    const onMonthChangeHandler = React.useCallback(
+       (value: string) => {
+         onMonthChange(
+           mapOptional(
+@@ -69,24 +77,24 @@ export const DatepickerNav = memoNamed<Props>(
+       >
+         <Button
+           icon={'chevron-left'}
+-          minimal={true}
++          variant={'minimal'}
+           onClick={onPrevMonthClick}
+         />
+         <BpSelect
+-          minimal={true}
++          minimal
+           options={yearOption}
+           value={year}
+           onValueChange={onYearChangeHandler}
+         />
+         <BpSelect
+-          minimal={true}
++          minimal
+           options={monthOption}
+           value={month}
+           onValueChange={onMonthChangeHandler}
+         />
+         <Button
+           icon={'chevron-right'}
+-          minimal={true}
++          variant={'minimal'}
+           onClick={onNextMonthClick}
+         />
+       </div>

@@ -1,0 +1,57 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/answer-icon-point-input/fair-point-input.tsx apps/event-schedule-app/src/components/molecules/answer-icon-point-input/fair-point-input.tsx
+index 2fda30972..1f8b34b07 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/answer-icon-point-input/fair-point-input.tsx
++++ apps/event-schedule-app/src/components/molecules/answer-icon-point-input/fair-point-input.tsx
+@@ -1,9 +1,12 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
+ import {
+   answerIconPointConfig,
+   clampAndRoundAnswerFairIconPoint,
+-} from '../../../constants';
++} from '../../../constants/index.mjs';
+ 
+ type Props = Readonly<{
+   value: AnswerIconPoint;
+@@ -29,28 +32,26 @@ export const AnswerIconFairPointInput = memoNamed<Props>(
+     } = useNumericInputWithStepState<AnswerIconPoint>({
+       onValueChange,
+       normalize: clampAndRoundAnswerFairIconPoint,
+-      decode: (s) => clampAndRoundAnswerFairIconPoint(Number(s)),
++      decode: (s) =>
++        clampAndRoundAnswerFairIconPoint(
++          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
++        ),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
+-      () => ({
+-        min,
+-        max,
+-        step,
+-        onKeyDown,
+-      }),
++    const inputProps = React.useMemo(
++      () => ({ min, max, step, onKeyDown }),
+       [onKeyDown],
+     );
+ 
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

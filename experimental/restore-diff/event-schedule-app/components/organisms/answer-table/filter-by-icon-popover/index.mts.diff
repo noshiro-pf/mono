@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/index.ts apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/index.mts
+index c227a5c08..76434821b 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/index.ts
++++ apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/index.mts
+@@ -1,2 +1,2 @@
+-export * from './filter-by-icon-popover';
+-export * from './filter-by-icon-popover-content';
++export * from './filter-by-icon-popover-content.js';
++export * from './filter-by-icon-popover.js';

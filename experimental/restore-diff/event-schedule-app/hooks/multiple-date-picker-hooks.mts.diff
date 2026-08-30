@@ -1,0 +1,180 @@
+diff --git experimental/packages/apps/event-schedule-app/src/hooks/multiple-date-picker-hooks.ts apps/event-schedule-app/src/hooks/multiple-date-picker-hooks.mts
+index 4804b38e8..03e3ee6d1 100644
+--- experimental/packages/apps/event-schedule-app/src/hooks/multiple-date-picker-hooks.ts
++++ apps/event-schedule-app/src/hooks/multiple-date-picker-hooks.mts
+@@ -1,23 +1,40 @@
+-import { compareYearMonthDate } from '@noshiro/io-ts-types';
+-import { fromArray } from '@noshiro/syncflow';
+-import { yearMonthDateInitialValue } from '../constants';
++import * as React from 'react';
++import { type Observable as SynstateObservable, source } from 'synstate';
++import { useObservableEffect } from 'synstate-react-hooks';
+ import {
++  type IMapMapped,
++  ISetMapped,
++  Optional,
++  asSafeUint,
++} from 'ts-data-forge';
++import { compareYearMonthDate } from 'ts-fortress-types';
++import {
++  type DayOfWeekIndex,
++  type DeepReadonly,
++  type MonthEnum,
++  type SafeUint,
++} from 'ts-type-forge';
++import { yearMonthDateInitialValue } from '../constants/index.mjs';
++import {
++  type CalendarCurrentPageReducerState,
++  type SelectedDatesReducerAction,
+   calendarCurrentPageInitialState,
+   calendarCurrentPageReducer,
+   generateCalendar,
+   selectedDatesReducer,
+   ymdFromKey,
+   ymdToKey,
+-  type CalendarCurrentPageReducerState,
+-  type SelectedDatesReducerAction,
+-} from '../functions';
+-import { ymd2day } from '../utils';
++} from '../functions/index.mjs';
++import { mapOptional } from '../utils-ported/index.mjs';
++import { ymd2day } from '../utils/index.mjs';
++
++const neverEmits$ = source<CalendarCurrentPageReducerState>();
+ 
+ type MultipleDatePickerState = DeepReadonly<{
+   calendarCurrentPage: CalendarCurrentPageReducerState;
+   onPrevMonthClick: () => void;
+   onNextMonthClick: () => void;
+-  onYearChange: (year: YearEnum) => void;
++  onYearChange: (year: SafeUint) => void;
+   onMonthChange: (month: MonthEnum) => void;
+   calendarCells: {
+     index: SafeUint;
+@@ -37,37 +54,35 @@ type MultipleDatePickerState = DeepReadonly<{
+ export const useMultipleDatePickerState = (
+   selectedDates: readonly YearMonthDate[],
+   onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void,
+-  setYearMonth$?: Observable<CalendarCurrentPageReducerState>,
++  setYearMonth$?: SynstateObservable<CalendarCurrentPageReducerState>,
+   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>,
+ ): MultipleDatePickerState => {
+   /* states */
+ 
+-  const [calendarCurrentPage, calendarCurrentPageDispatch] = useReducer(
++  const [calendarCurrentPage, calendarCurrentPageDispatch] = React.useReducer(
+     calendarCurrentPageReducer,
+     calendarCurrentPageInitialState(),
+   );
+ 
+-  useObservableEffect(setYearMonth$ ?? fromArray([]), ({ year, month }) => {
+-    calendarCurrentPageDispatch({
+-      type: 'set-year-month',
+-      year,
+-      month,
+-    });
++  // `source<A>()` with no arguments never emits, which is what the old
++  // `fromArray([])` was for: a stand-in when no observable was passed.
++  useObservableEffect(setYearMonth$ ?? neverEmits$, ({ year, month }) => {
++    calendarCurrentPageDispatch({ type: 'set-year-month', year, month });
+   });
+ 
+   /* values */
+ 
+-  const selectedDatesSet = useMemo<ISetMapped<YearMonthDate, YmdKey>>(
+-    () => ISetMapped.new(selectedDates, ymdToKey, ymdFromKey),
++  const selectedDatesSet = React.useMemo<ISetMapped<YearMonthDate, YmdKey>>(
++    () => ISetMapped.create(selectedDates, ymdToKey, ymdFromKey),
+     [selectedDates],
+   );
+ 
+-  const dates = useMemo<DeepReadonly<YearMonthDate[][]>>(
++  const dates = React.useMemo<DeepReadonly<YearMonthDate[][]>>(
+     () => generateCalendar(calendarCurrentPage.year, calendarCurrentPage.month),
+     [calendarCurrentPage],
+   );
+ 
+-  const calendarCells = useMemo<
++  const calendarCells = React.useMemo<
+     DeepReadonly<
+       {
+         week: {
+@@ -82,10 +97,13 @@ export const useMultipleDatePickerState = (
+     >
+   >(
+     () =>
+-      dates.map((week, index) => ({
+-        index,
++      dates.map((week, indexRaw) => ({
++        // `Array.prototype.map` hands back a plain number; the row carries the
++        // branded index.
++        index: asSafeUint(indexRaw),
+         week: week.map((ymd) => {
+           const dayValue: DayOfWeekIndex = ymd2day(ymd);
++
+           return {
+             ymd,
+             selected: selectedDatesSet.has(ymd),
+@@ -98,7 +116,9 @@ export const useMultipleDatePickerState = (
+                   : dayValue === 6
+                     ? 'Saturday'
+                     : 'normal',
+-            holidayJpName: holidaysJpDefinition?.get(ymd),
++            holidayJpName: mapOptional(holidaysJpDefinition, (__m) =>
++              Optional.toNullable(__m.get(ymd)),
++            ),
+           };
+         }),
+       })),
+@@ -107,27 +127,27 @@ export const useMultipleDatePickerState = (
+ 
+   /* handlers */
+ 
+-  const onPrevMonthClick = useCallback(() => {
++  const onPrevMonthClick = React.useCallback(() => {
+     calendarCurrentPageDispatch({ type: 'prev-month' });
+   }, []);
+ 
+-  const onNextMonthClick = useCallback(() => {
++  const onNextMonthClick = React.useCallback(() => {
+     calendarCurrentPageDispatch({ type: 'next-month' });
+   }, []);
+ 
+-  const onYearChange = useCallback((year: YearEnum) => {
++  const onYearChange = React.useCallback((year: SafeUint) => {
+     calendarCurrentPageDispatch({ type: 'set-year', year });
+   }, []);
+ 
+-  const onMonthChange = useCallback((month: MonthEnum) => {
++  const onMonthChange = React.useCallback((month: MonthEnum) => {
+     calendarCurrentPageDispatch({ type: 'set-month', month });
+   }, []);
+ 
+-  const onTodayClick = useCallback(() => {
++  const onTodayClick = React.useCallback(() => {
+     calendarCurrentPageDispatch({ type: 'today' });
+   }, []);
+ 
+-  const selectedDatesDispatch = useMemo(
++  const selectedDatesDispatch = React.useMemo(
+     () =>
+       mapOptional(
+         onSelectedDatesChange,
+@@ -142,7 +162,7 @@ export const useMultipleDatePickerState = (
+     [selectedDatesSet, onSelectedDatesChange],
+   );
+ 
+-  const onDateClick = useMemo(
++  const onDateClick = React.useMemo(
+     () =>
+       mapOptional(selectedDatesDispatch, (f) => (ymd: YearMonthDate) => {
+         f({ type: 'flip', dateToFlip: ymd });
+@@ -150,7 +170,7 @@ export const useMultipleDatePickerState = (
+     [selectedDatesDispatch],
+   );
+ 
+-  const onWeekdaysHeaderCellClick = useMemo(
++  const onWeekdaysHeaderCellClick = React.useMemo(
+     () =>
+       mapOptional(selectedDatesDispatch, (f) => (w: DayOfWeekIndex) => {
+         f({

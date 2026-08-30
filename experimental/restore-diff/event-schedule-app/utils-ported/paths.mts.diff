@@ -1,0 +1,68 @@
+diff --git apps/event-schedule-app/src/utils-ported/paths.mts apps/event-schedule-app/src/utils-ported/paths.mts
+new file mode 100644
+index 000000000..ef64fbd69
+--- /dev/null
++++ apps/event-schedule-app/src/utils-ported/paths.mts
+@@ -0,0 +1,62 @@
++import { type IsNotFixedLengthList, type UnknownRecord } from 'ts-type-forge';
++
++/**
++ * Every key path into `R`, and the type of the value each one points at.
++ *
++ * Ported from the `@noshiro/ts-type-utils` of before the monorepo
++ * consolidation; `ts-type-forge` has no counterpart. Only the record and
++ * fixed-length-tuple cases this app needs are kept — the original also handled
++ * index signatures and variable-length arrays.
++ */
++export type Paths<R> = Prefixes<LeafPaths<R>>;
++
++/** The value `Path` points at within `R`. */
++export type RecordValueAtPath<
++  R,
++  Path extends Paths<R>,
++> = Path extends readonly [infer Head, ...infer Rest]
++  ? Head extends keyof R
++    ? Rest extends Paths<R[Head]>
++      ? RecordValueAtPath<R[Head], Rest>
++      : never
++    : never
++  : R;
++
++type Prefixes<L extends readonly unknown[]> = L extends readonly [
++  infer Head,
++  ...infer Rest,
++]
++  ? readonly [] | readonly [Head, ...Prefixes<Rest>]
++  : readonly [];
++
++type LeafPaths<R> = R extends readonly unknown[]
++  ? LeafPathsListCase<R, keyof R>
++  : R extends UnknownRecord
++    ? LeafPathsRecordCase<R, keyof R>
++    : readonly [];
++
++type LeafPathsListCase<
++  T extends readonly unknown[],
++  PathHead extends keyof T,
++> = T extends readonly []
++  ? readonly []
++  : IsNotFixedLengthList<T> extends true
++    ? readonly []
++    : PathHead extends keyof T
++      ? PathHead extends `${number}`
++        ? readonly [ToNumber<PathHead>, ...LeafPaths<T[PathHead]>]
++        : never
++      : never;
++
++type LeafPathsRecordCase<
++  R extends UnknownRecord,
++  PathHead extends keyof R,
++> = string extends PathHead
++  ? readonly []
++  : PathHead extends keyof R
++    ? readonly [PathHead, ...LeafPaths<R[PathHead]>]
++    : never;
++
++type ToNumber<S extends string> = S extends `${infer N extends number}`
++  ? N
++  : never;

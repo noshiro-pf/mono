@@ -1,0 +1,80 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/confirm-email-dialog.tsx apps/event-schedule-app/src/components/organisms/confirm-email-dialog.tsx
+index 65cc5c983..002448203 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/confirm-email-dialog.tsx
++++ apps/event-schedule-app/src/components/organisms/confirm-email-dialog.tsx
+@@ -1,28 +1,32 @@
+ import { Button, Classes, FormGroup } from '@blueprintjs/core';
+-import { BpInput, DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
+-import { useKeyEventListener } from '@noshiro/react-utils';
+-import { Auth, ConfirmEmailDialogStore } from '../../store';
+-import { ButtonsWrapperAlignEnd } from '../styled';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { BpInput, DialogWithMaxWidth } from 'react-blueprintjs-utils';
++import { memoNamed, useKeyEventListener } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { isString, pipe } from 'ts-data-forge';
++import { Auth, ConfirmEmailDialogStore } from '../../store/index.mjs';
++import { mapOptional, noop } from '../../utils-ported/index.mjs';
++import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
+ 
+ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
+ 
+-type ConfirmEmailDialogProps = Readonly<{
+-  isOpen: boolean;
+-}>;
++type ConfirmEmailDialogProps = Readonly<{ isOpen: boolean }>;
+ 
+ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
+   'ConfirmEmailDialog',
+   ({ isOpen }) => {
+     const state = useObservableValue(ConfirmEmailDialogStore.state);
+ 
+-    const helperText = useMemo(
++    const helperText = React.useMemo(
+       () =>
+-        pipe(state.formState.email.error).chainOptional((s) => <div>{s}</div>)
+-          .value,
++        pipe(state.formState.email.error).map((__v) =>
++          mapOptional(__v, (s) => <div>{s}</div>),
++        ).value,
+       [state.formState.email.error],
+     );
+ 
+-    const onKeyDown = useCallback((ev: KeyboardEvent) => {
++    const onKeyDown = React.useCallback((ev: KeyboardEvent) => {
+       if (ev.key === 'Enter') {
+         ConfirmEmailDialogStore.enterClickHandler();
+       }
+@@ -33,10 +37,12 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
+     const fireAuthUser = Auth.useFireAuthUser();
+ 
+     /** ログイン済みならemailを自動入力してsubmit */
+-    useEffect(() => {
++    React.useEffect(() => {
+       const email = fireAuthUser?.email;
++
+       if (isString(email)) {
+         ConfirmEmailDialogStore.inputEmailHandler(email);
++
+         ConfirmEmailDialogStore.enterClickHandler();
+       }
+     }, [fireAuthUser?.email]);
+@@ -60,7 +66,7 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
+             >
+               <BpInput
+                 // eslint-disable-next-line jsx-a11y/no-autofocus
+-                autoFocus={true}
++                autoFocus
+                 intent={state.emailFormIntent}
+                 rightElement={resetInputButton}
+                 type={'email'}
+@@ -100,7 +106,7 @@ const InputWrapperWithMinHeight = styled('div')`
+ const resetInputButton = (
+   <Button
+     icon={'cross'}
+-    minimal={true}
++    variant={'minimal'}
+     onClick={ConfirmEmailDialogStore.resetInput}
+   />
+ );

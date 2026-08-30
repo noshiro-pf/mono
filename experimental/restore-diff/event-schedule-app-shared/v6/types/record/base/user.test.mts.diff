@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/user.test.mts apps/event-schedule-app-shared/src/v6/types/record/base/user.test.mts
+index a6d4b5c47..0128eff0f 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/user.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/user.test.mts
+@@ -2,12 +2,12 @@ import { fillUser, isUser, userDefaultValue } from './user.mjs';
+ 
+ describe('isUser', () => {
+   test('defaultValue should be true', () => {
+-    expect(isUser(userDefaultValue)).toBe(true);
++    assert.isTrue(isUser(userDefaultValue));
+   });
+ });
+ 
+ describe('fillUser', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillUser({})).toStrictEqual(userDefaultValue);
++    assert.deepStrictEqual(fillUser({}), userDefaultValue);
+   });
+ });

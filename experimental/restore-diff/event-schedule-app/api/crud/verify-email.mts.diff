@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/verify-email.ts apps/event-schedule-app/src/api/crud/verify-email.mts
+index c8b7344f8..76e2e68aa 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/verify-email.ts
++++ apps/event-schedule-app/src/api/crud/verify-email.mts
+@@ -1,5 +1,7 @@
+ import { httpsCallable } from 'firebase/functions';
+-import { fbFunctions } from '../../initialize-firebase';
++import { Result, isRecord, isString, unknownToString } from 'ts-data-forge';
++import { fbFunctions } from '../../initialize-firebase.mjs';
++import { hasKeyValue } from '../../utils-ported/index.mjs';
+ 
+ const fbVerifyEmail = httpsCallable(fbFunctions, 'verifyEmail');
+ 
+@@ -12,18 +14,13 @@ export const verifyEmail = async (
+     Readonly<{ type: 'not-found' | 'others' | 'type-error'; message: string }>
+   >
+ > =>
+-  Result.fromPromise(
+-    fbVerifyEmail({
+-      eventId,
+-      email,
+-    }),
+-  ).then((result) => {
++  Result.fromPromise(fbVerifyEmail({ eventId, email })).then((result) => {
+     if (Result.isErr(result)) {
+       const err = result.value;
+ 
+       if (
+         isRecord(err) &&
+-        Obj.hasKeyValue(err, 'code', isString) &&
++        hasKeyValue(err, 'code', isString) &&
+         err.code === 'functions/not-found'
+       ) {
+         return Result.err({
+@@ -34,7 +31,7 @@ export const verifyEmail = async (
+ 
+       return Result.err({
+         type: 'others' as const,
+-        message: Str.from(err),
++        message: unknownToString(err),
+       });
+     }
+ 
+@@ -42,10 +39,10 @@ export const verifyEmail = async (
+ 
+     if (response === 'ok' || response === 'ng') {
+       return Result.ok<'ng' | 'ok'>(response);
+-    } else {
+-      return Result.err({
+-        type: 'type-error' as const,
+-        message: "response should be 'ok' or 'ng'.",
+-      });
+     }
++
++    return Result.err({
++      type: 'type-error' as const,
++      message: "response should be 'ok' or 'ng'.",
++    });
+   });

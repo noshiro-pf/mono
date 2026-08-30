@@ -1,0 +1,41 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/selected-dates-reducer.ts apps/event-schedule-app/src/functions/multiple-date-picker/selected-dates-reducer.mts
+index 39a4f155e..2a5a3d368 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/selected-dates-reducer.ts
++++ apps/event-schedule-app/src/functions/multiple-date-picker/selected-dates-reducer.mts
+@@ -1,4 +1,6 @@
+-import { ymdFromKey, ymdToKey } from '../map-key';
++import { Arr, ISetMapped } from 'ts-data-forge';
++import { type Reducer } from '../../utils-ported/index.mjs';
++import { ymdFromKey, ymdToKey } from '../map-key/index.mjs';
+ 
+ export type SelectedDatesReducerAction = Readonly<
+   | { type: 'fill-column'; dates: readonly YearMonthDate[] }
+@@ -8,7 +10,7 @@ export type SelectedDatesReducerAction = Readonly<
+ export type SelectedDatesReducerState = ISetMapped<YearMonthDate, YmdKey>;
+ 
+ export const selectedDatesReducerInitialState: SelectedDatesReducerState =
+-  ISetMapped.new([], ymdToKey, ymdFromKey);
++  ISetMapped.create([], ymdToKey, ymdFromKey);
+ 
+ export const selectedDatesReducer: Reducer<
+   SelectedDatesReducerState,
+@@ -20,12 +22,12 @@ export const selectedDatesReducer: Reducer<
+         ? state.delete(action.dateToFlip)
+         : state.add(action.dateToFlip);
+ 
+-    case 'fill-column':
+-      return Arr.isSubset(
+-        action.dates.map(ymdToKey),
+-        state.toArray().map(ymdToKey),
+-      )
+-        ? state.subtract(ISetMapped.new(action.dates, ymdToKey, ymdFromKey))
+-        : state.union(ISetMapped.new(action.dates, ymdToKey, ymdFromKey));
++    case 'fill-column': {
++      const selected = state.toArray();
++
++      return Arr.isSubset(action.dates.map(ymdToKey), selected.map(ymdToKey))
++        ? state.subtract(ISetMapped.create(action.dates, ymdToKey, ymdFromKey))
++        : state.union(ISetMapped.create(action.dates, ymdToKey, ymdFromKey));
++    }
+   }
+ };

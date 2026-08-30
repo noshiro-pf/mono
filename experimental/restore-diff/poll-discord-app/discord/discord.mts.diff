@@ -1,0 +1,34 @@
+diff --git experimental/packages/apps/poll-discord-app/src/discord/discord.mts apps/poll-discord-app/src/discord/discord.mts
+index c9561a703..69aebc8ee 100644
+--- experimental/packages/apps/poll-discord-app/src/discord/discord.mts
++++ apps/poll-discord-app/src/discord/discord.mts
+@@ -6,6 +6,7 @@ import {
+   type Message as DiscordMessage,
+   type MessageReaction as DiscordMessageReaction,
+ } from 'discord.js';
++import { Result } from 'ts-data-forge';
+ import { triggerCommand } from '../constants.mjs';
+ import { DISCORD_TOKEN } from '../env.mjs';
+ import { onMessageReactionAdd, onMessageReactionRemove } from './reaction.mjs';
+@@ -22,7 +23,7 @@ export const initDiscordClient = async (): Promise<
+         GatewayIntentBits.GuildMessages,
+         GatewayIntentBits.MessageContent,
+         GatewayIntentBits.GuildMessageReactions,
+-        GatewayIntentBits.GuildEmojisAndStickers,
++        GatewayIntentBits.GuildExpressions,
+       ],
+       partials: [
+         DiscordPartials.Message,
+@@ -95,9 +96,9 @@ export const startDiscordListener = (discordClient: DiscordClient): void => {
+ 
+   discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
+     (async () => {
+-      const newMessageFilled: DiscordMessage<boolean> = newMessage.partial
+-        ? await newMessage.fetch()
+-        : newMessage;
++      // `messageUpdate` delivers a complete message here, so there is
++      // nothing to fetch — the type says `partial` is always false.
++      const newMessageFilled: DiscordMessage<boolean> = newMessage;
+ 
+       const result = await updatePollTitle(newMessageFilled);
+ 

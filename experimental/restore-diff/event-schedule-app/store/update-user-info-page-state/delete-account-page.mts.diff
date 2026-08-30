@@ -1,0 +1,134 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page.ts apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page.mts
+index e7a2638be..f422fdf4f 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page.mts
+@@ -1,41 +1,47 @@
+ import { EmailAuthProvider } from 'firebase/auth';
+-import { api } from '../../api';
++import { type InitializedObservable, combine, map } from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
+ import {
+   createToaster,
+   deleteAccountPageHasError,
+   deleteAccountPageInitialState,
+   deleteAccountPageStateReducer,
+   showToast,
+-} from '../../functions';
+-import { Auth } from '../auth';
+-import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
++} from '../../functions/index.mjs';
++import { Auth } from '../auth.mjs';
++import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
+ 
+ const dc = dict.accountSettings;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   deleteAccountPageStateReducer,
+   deleteAccountPageInitialState,
+ );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || deleteAccountPageHasError(st)),
+ );
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const {
+-  state: passwordIsOpenState$,
+-  setFalse: hidePassword,
+-  toggle: togglePasswordLock,
+-} = createBooleanState(false);
++const [
++  ,
++  {
++    state: passwordIsOpenState$,
++    setFalse: hidePassword,
++    toggle: togglePasswordLock,
++  },
++] = createBooleanState(false);
+ 
+ const state = combine([
+   formState$,
+@@ -43,7 +49,7 @@ const state = combine([
+   emailFormIntent$,
+   passwordFormIntent$,
+   passwordIsOpenState$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       formState,
+@@ -80,6 +86,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+           type: 'setPasswordError',
+           payload: dc.reauthenticate.message.wrongPassword,
+         });
++
+         break;
+ 
+       default:
+@@ -98,8 +105,10 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+           message: dc.reauthenticate.message.error,
+           intent: 'danger',
+         });
++
+         break;
+     }
++
+     return;
+   }
+ 
+@@ -121,6 +130,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       message: dc.deleteAccount.message.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+@@ -137,6 +147,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+ 
+ const enterClickHandler = (): void => {
+   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
++
+   const fireAuthUser = Auth.getFireAuthUserSnapshot();
+ 
+   if (enterButtonDisabled || fireAuthUser === undefined) return;
+@@ -146,21 +157,16 @@ const enterClickHandler = (): void => {
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputEmail',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputEmail', payload: value });
+ };
+ 
+ const inputPasswordHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputPassword',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputPassword', payload: value });
+ };
+ 
+ const resetAllDialogState = (): void => {
+   dispatch({ type: 'reset' });
++
+   hidePassword();
+ };
+ 

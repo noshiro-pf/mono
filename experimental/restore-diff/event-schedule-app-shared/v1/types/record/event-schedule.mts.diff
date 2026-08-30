@@ -1,0 +1,66 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/event-schedule.mts apps/event-schedule-app-shared/src/v1/types/record/event-schedule.mts
+index 8f531231e..ea80f1f2a 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/event-schedule.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/event-schedule.mts
+@@ -1,4 +1,5 @@
+-import { DateUtils } from '@noshiro/ts-utils';
++import { DateUtils } from 'ts-fortress-types';
++import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+ import { type DatetimeSpecificationEnumType } from '../enum/index.mjs';
+ import {
+   defaultNotificationSettings,
+@@ -37,7 +38,7 @@ export type EventSchedule = Readonly<{
+ 
+ export type PartialEventSchedule = Partial<
+   MergeIntersection<
+-    Pick<
++    StrictPick<
+       EventSchedule,
+       | 'customizeSymbolSettings'
+       | 'datetimeSpecification'
+@@ -71,23 +72,25 @@ export const defaultEventSchedule = {
+ } as const satisfies EventSchedule;
+ 
+ const d = defaultEventSchedule;
+-export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({
+-  title: p?.title ?? d.title,
+-  notes: p?.notes ?? d.notes,
+-  datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
+-  datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
+-    fillDatetimeRange,
+-  ),
+-  useAnswerDeadline: p?.useAnswerDeadline ?? d.useAnswerDeadline,
+-  answerDeadline: fillYmdhm(p?.answerDeadline ?? d.answerDeadline),
+-  customizeSymbolSettings:
+-    p?.customizeSymbolSettings ?? d.customizeSymbolSettings,
+-  answerSymbolList: (p?.answerSymbolList ?? d.answerSymbolList).map(
+-    fillAnswerSymbol,
+-  ),
+-  useNotification: p?.useNotification ?? d.useNotification,
+-  notificationSettings: fillNotificationSettings(
+-    p?.notificationSettings ?? d.notificationSettings,
+-  ),
+-  timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
+-});
++
++export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule =>
++  ({
++    title: p?.title ?? d.title,
++    notes: p?.notes ?? d.notes,
++    datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
++    datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
++      fillDatetimeRange,
++    ),
++    useAnswerDeadline: p?.useAnswerDeadline ?? d.useAnswerDeadline,
++    answerDeadline: fillYmdhm(p?.answerDeadline ?? d.answerDeadline),
++    customizeSymbolSettings:
++      p?.customizeSymbolSettings ?? d.customizeSymbolSettings,
++    answerSymbolList: (p?.answerSymbolList ?? d.answerSymbolList).map(
++      fillAnswerSymbol,
++    ),
++    useNotification: p?.useNotification ?? d.useNotification,
++    notificationSettings: fillNotificationSettings(
++      p?.notificationSettings ?? d.notificationSettings,
++    ),
++    timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
++  }) as const;

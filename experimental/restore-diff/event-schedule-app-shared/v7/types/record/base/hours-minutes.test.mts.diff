@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/hours-minutes.test.mts apps/event-schedule-app-shared/src/v7/types/record/base/hours-minutes.test.mts
+index 18d5a1ae3..7b558e193 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/hours-minutes.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/hours-minutes.test.mts
+@@ -1,4 +1,5 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
+ import {
+   fillHoursMinutes,
+   hoursMinutesDefaultValue,
+@@ -19,19 +20,20 @@ describe('HoursMinutes', () => {
+     const defaultValue: HoursMinutes = {
+       hours: 0,
+       minutes: 0,
+-    };
+-    expect(hoursMinutesDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(hoursMinutesDefaultValue, defaultValue);
+   });
+ 
+   describe('isHoursMinutes', () => {
+     test('defaultValue should be true', () => {
+-      expect(isHoursMinutes(hoursMinutesDefaultValue)).toBe(true);
++      assert.isTrue(isHoursMinutes(hoursMinutesDefaultValue));
+     });
+   });
+ 
+   describe('fillHoursMinutes', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillHoursMinutes({})).toStrictEqual(hoursMinutesDefaultValue);
++      assert.deepStrictEqual(fillHoursMinutes({}), hoursMinutesDefaultValue);
+     });
+   });
+ });

@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/api.ts apps/event-schedule-app/src/api/api.mts
+index f2f9ab708..89b23d6c7 100644
+--- experimental/packages/apps/event-schedule-app/src/api/api.ts
++++ apps/event-schedule-app/src/api/api.mts
+@@ -9,7 +9,7 @@ import {
+   updateDisplayName,
+   updateEmail,
+   updatePassword,
+-} from './auth';
++} from './auth/index.mjs';
+ import {
+   addAnswer,
+   addEventSchedule,
+@@ -24,7 +24,7 @@ import {
+   updateAnswer,
+   updateEventSchedule,
+   verifyEmail,
+-} from './crud';
++} from './crud/index.mjs';
+ 
+ export const api = {
+   auth: {
+@@ -56,8 +56,6 @@ export const api = {
+     update: updateAnswer,
+     delete: deleteAnswer,
+   },
+-  eventList: {
+-    fetch: fetchEventListOfUser,
+-  },
++  eventList: { fetch: fetchEventListOfUser },
+   sendReport,
+ } as const;

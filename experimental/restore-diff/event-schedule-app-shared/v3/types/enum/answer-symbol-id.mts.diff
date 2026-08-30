@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v3/types/enum/answer-symbol-id.mts apps/event-schedule-app-shared/src/v3/types/enum/answer-symbol-id.mts
+index eea5269f2..2c6086548 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v3/types/enum/answer-symbol-id.mts
++++ apps/event-schedule-app-shared/src/v3/types/enum/answer-symbol-id.mts
+@@ -1,2 +1,3 @@
+ export type AnswerSymbolId = 'fair' | 'good' | 'poor';
++
+ export type AnswerSymbolIdWithNone = AnswerSymbolId | 'none';

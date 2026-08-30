@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/index.ts apps/event-schedule-app/src/api/crud/index.mts
+index 8fd9dcacd..77ff25703 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/index.ts
++++ apps/event-schedule-app/src/api/crud/index.mts
+@@ -1,12 +1,12 @@
+-export * from './add-answer';
+-export * from './add-event-schedule';
+-export * from './archive-event-schedule';
+-export * from './delete-answer';
+-export * from './fetch-answers';
+-export * from './fetch-event-list';
+-export * from './fetch-event-schedule';
+-export * from './send-report';
+-export * from './set-authors-email';
+-export * from './update-answer';
+-export * from './update-event-schedule';
+-export * from './verify-email';
++export * from './add-answer.mjs';
++export * from './add-event-schedule.mjs';
++export * from './archive-event-schedule.mjs';
++export * from './delete-answer.mjs';
++export * from './fetch-answers.mjs';
++export * from './fetch-event-list.mjs';
++export * from './fetch-event-schedule.mjs';
++export * from './send-report.mjs';
++export * from './set-authors-email.mjs';
++export * from './update-answer.mjs';
++export * from './update-event-schedule.mjs';
++export * from './verify-email.mjs';

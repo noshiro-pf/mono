@@ -1,0 +1,97 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover.tsx apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover.tsx
+index 658a84efb..0beb19da9 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover.tsx
+@@ -1,13 +1,15 @@
+-import { Popover } from '@blueprintjs/core';
+-import { AnswerFilterAndSortStore } from '../../../../store';
+-import { CustomIconButton } from '../../../molecules';
+-import { FilterByIconPopoverContent } from './filter-by-icon-popover-content';
++import { PopoverNext } from '@blueprintjs/core';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type SafeUint } from 'ts-type-forge';
++import { AnswerFilterAndSortStore } from '../../../../store/index.mjs';
++import { CustomIconButton } from '../../../molecules/index.mjs';
++import { FilterByIconPopoverContent } from './filter-by-icon-popover-content.js';
+ 
+ const dc = dict.answerPage.answers;
+ 
+-type Props = Readonly<{
+-  answerIconId: AnswerIconId;
+-}>;
++type Props = Readonly<{ answerIconId: AnswerIconId }>;
+ 
+ export const FilterByIconPopover = memoNamed<Props>(
+   'FilterByIconPopover',
+@@ -15,35 +17,37 @@ export const FilterByIconPopover = memoNamed<Props>(
+     const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+       useBoolState(false);
+ 
+-    const turnOnFilteringEnabled = useCallback(() => {
++    const turnOnFilteringEnabled = React.useCallback(() => {
+       AnswerFilterAndSortStore.enableFilteringByIcon(answerIconId);
+     }, [answerIconId]);
+ 
+-    const turnOffFilteringEnabled = useCallback(() => {
++    const turnOffFilteringEnabled = React.useCallback(() => {
+       AnswerFilterAndSortStore.disableFilteringByIcon(answerIconId);
++
+       AnswerFilterAndSortStore.disableFilteringByIcon(answerIconId);
+     }, [answerIconId]);
+ 
+     const filterState = AnswerFilterAndSortStore.useFilterState();
+ 
+     const state = filterState.iconState[answerIconId];
++
+     const upperLimit = filterState.iconState.upperLimit;
+ 
+-    const onMinChange = useCallback(
++    const onMinChange = React.useCallback(
+       (value: SafeUint) => {
+         AnswerFilterAndSortStore.setMinCountOfIcon(answerIconId, value);
+       },
+       [answerIconId],
+     );
+ 
+-    const onMaxChange = useCallback(
++    const onMaxChange = React.useCallback(
+       (value: SafeUint) => {
+         AnswerFilterAndSortStore.setMaxCountOfIcon(answerIconId, value);
+       },
+       [answerIconId],
+     );
+ 
+-    const popoverContent = useMemo(
++    const popoverContent = React.useMemo(
+       () => (
+         <FilterByIconPopoverContent
+           disableFiltering={turnOffFilteringEnabled}
+@@ -67,22 +71,21 @@ export const FilterByIconPopover = memoNamed<Props>(
+     );
+ 
+     return (
+-      <Popover
+-        canEscapeKeyClose={true}
++      <PopoverNext
++        canEscapeKeyClose
+         content={popoverContent}
+         isOpen={isOpen}
+-        minimal={false}
+         placement={'bottom'}
+         onClose={handleClose}
+       >
+         <CustomIconButton
+           active={state.enabled}
+           iconName={answerIconId}
+-          outlined={true}
++          outlined
+           title={dc.iconHeaderFilter[answerIconId].title}
+           onClick={handleOpen}
+         />
+-      </Popover>
++      </PopoverNext>
+     );
+   },
+ );

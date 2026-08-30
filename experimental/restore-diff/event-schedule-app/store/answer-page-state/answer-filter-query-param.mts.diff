@@ -1,0 +1,306 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.ts apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.mts
+index 3cd8f505d..c284db2fc 100644
+--- experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.ts
++++ apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.mts
+@@ -1,16 +1,26 @@
+-import { YearMonthDate } from '@noshiro/io-ts-types';
+-import { Routes } from '../../constants';
++import {
++  ISet,
++  Num,
++  Result,
++  asSafeUint,
++  expectType,
++  pipe,
++  tp,
++} from 'ts-data-forge';
++import { YearMonthDate } from 'ts-fortress-types';
++import { Routes } from '../../constants/index.mjs';
+ import {
+   type AnswerFilterState,
+   type AnswerFilterStateAction,
+-} from '../../functions';
++} from '../../functions/index.mjs';
+ import {
+   isAnswerRank,
+   isAnswersScore,
+   type AnswerRank,
+   type AnswersScore,
+-} from '../../types';
+-import { Router } from '../router';
++} from '../../types/index.mjs';
++import { hasLength, mapOptional } from '../../utils-ported/index.mjs';
++import { Router } from '../router.mjs';
+ 
+ const keyDef = Routes.queryParamKey.answerTableState;
+ 
+@@ -25,11 +35,13 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
+       } else {
+         urlSearchParams.set(keyDef.sortBy, sortKey);
+       }
++
+       if (sortOrder === 'asc') {
+         urlSearchParams.delete(keyDef.sortOrder);
+       } else {
+         urlSearchParams.set(keyDef.sortOrder, sortOrder);
+       }
++
+       return urlSearchParams;
+     },
+     { method: 'replaceState' },
+@@ -40,18 +52,18 @@ const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
+ 
+ // for query params
+ const ymd2str = ({ year, month, date }: YearMonthDate): string =>
+-  `${year}-${month}-${date}`;
++  `${year}-${month}-${date}` as const;
+ 
+ const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
+   const res = ymdStr.split('-');
+ 
+-  if (!Arr.isArrayOfLength3(res)) return undefined;
++  if (!hasLength(res, 3)) return undefined;
+ 
+   const ret = {
+     year: Num.from(res[0]),
+     month: Num.from(res[1]),
+     date: Num.from(res[2]),
+-  };
++  } as const;
+ 
+   return YearMonthDate.is(ret) ? ret : undefined;
+ };
+@@ -84,7 +96,7 @@ const dayOfWeekFromStr = (
+   Fri: boolean;
+   Sat: boolean;
+ }> => {
+-  const set = ISet.new(str.split(Routes.queryParamValue.dayElementDelim));
++  const set = ISet.create(str.split(Routes.queryParamValue.dayElementDelim));
+ 
+   return {
+     Sun: set.has(Routes.queryParamValue.dayAbbrDef.Sun),
+@@ -98,13 +110,14 @@ const dayOfWeekFromStr = (
+ };
+ 
+ const range2str = (a: string, b: string): string =>
+-  `${a}${Routes.queryParamValue.rangeDelim}${b}`;
++  `${a}${Routes.queryParamValue.rangeDelim}${b}` as const;
+ 
+ const rangeFromStr = (
+   rangeStr: string,
+ ): Readonly<{ a: string; b: string }> | undefined => {
+   const res = rangeStr.split(Routes.queryParamValue.rangeDelim);
+-  return Arr.isArrayOfLength2(res) ? { a: res[0], b: res[1] } : undefined;
++
++  return hasLength(res, 2) ? { a: res[0], b: res[1] } : undefined;
+ };
+ 
+ const filledDateOnlyToStr = (value: boolean): string =>
+@@ -130,8 +143,8 @@ const saveFilterStateToQueryParams = ({
+     (urlSearchParams) => {
+       if (
+         dateRange.enabled &&
+-        isNotUndefined(dateRange.value.start) &&
+-        isNotUndefined(dateRange.value.end)
++        dateRange.value.start !== undefined &&
++        dateRange.value.end !== undefined
+       ) {
+         urlSearchParams.set(
+           keyDef.date,
+@@ -254,93 +267,128 @@ const restoreFromQueryParams = (
+ 
+   const parseRank = (s: string): AnswerRank | undefined =>
+     pipe(s)
+-      .chain(Num.from)
+-      .chain((a) => (isAnswerRank(a) ? a : undefined)).value;
++      .map(Num.from)
++      .map((a) => (isAnswerRank(a) ? a : undefined)).value;
+ 
+   const parseScore = (s: string): AnswersScore | undefined =>
+     pipe(s)
+-      .chain(Num.from)
+-      .chain((a) => (isAnswersScore(a) ? a : undefined)).value;
++      .map(Num.from)
++      .map((a) => (isAnswersScore(a) ? a : undefined)).value;
+ 
+   filterStateDispatch({
+     type: 'setFromUrlQueryParams',
+     values: {
+       dateRange: pipe(queryParams.get(keyDef.date))
+-        .chainOptional(rangeFromStr)
+-        .chainOptional((range) => ({
+-          start: ymdFromStr(range.a),
+-          end: ymdFromStr(range.b),
+-        })).value ?? {
+-        start: undefined,
+-        end: undefined,
+-      },
+-
+-      dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).chainOptional(
+-        dayOfWeekFromStr,
++        .map((__v) => mapOptional(__v, rangeFromStr))
++        .map((__v) =>
++          mapOptional(__v, (range) => ({
++            start: ymdFromStr(range.a),
++            end: ymdFromStr(range.b),
++          })),
++        ).value ?? { start: undefined, end: undefined },
++
++      dayOfWeek: pipe(queryParams.get(keyDef.dayOfWeek)).map((__v) =>
++        mapOptional(__v, dayOfWeekFromStr),
+       ).value,
+ 
+-      rank: pipe(queryParams.get(keyDef.rank)).chainOptional(parseRank).value,
++      rank: pipe(queryParams.get(keyDef.rank)).map((__v) =>
++        mapOptional(__v, parseRank),
++      ).value,
+ 
+       scoreRange: pipe(queryParams.get(keyDef.score))
+-        .chainOptional(rangeFromStr)
+-        .chainOptional((range) => ({
+-          min: parseScore(range.a),
+-          max: parseScore(range.b),
+-        })).value ?? {
+-        min: undefined,
+-        max: undefined,
+-      },
+-
+-      filledDateOnly: pipe(
+-        queryParams.get(keyDef.filledDateOnly),
+-      ).chainOptional(filledDateOnlyFromStr).value,
++        .map((__v) => mapOptional(__v, rangeFromStr))
++        .map((__v) =>
++          mapOptional(__v, (range) => ({
++            min: parseScore(range.a),
++            max: parseScore(range.b),
++          })),
++        ).value ?? { min: undefined, max: undefined },
++
++      filledDateOnly: pipe(queryParams.get(keyDef.filledDateOnly)).map((__v) =>
++        mapOptional(__v, filledDateOnlyFromStr),
++      ).value,
+ 
+       iconState: {
+         good: pipe(queryParams.get(keyDef.good))
+-          .chainOptional(rangeFromStr)
+-          .chainOptional((range) => ({
+-            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+-            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
+-          })).value ?? {
+-          min: undefined,
+-          max: undefined,
+-        },
++          .map((__v) => mapOptional(__v, rangeFromStr))
++          .map((__v) =>
++            mapOptional(__v, (range) => ({
++              min: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
++                ),
++              ),
++              max: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
++                ),
++              ),
++            })),
++          ).value ?? { min: undefined, max: undefined },
+         fair: pipe(queryParams.get(keyDef.fair))
+-          .chainOptional(rangeFromStr)
+-          .chainOptional((range) => ({
+-            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+-            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
+-          })).value ?? {
+-          min: undefined,
+-          max: undefined,
+-        },
++          .map((__v) => mapOptional(__v, rangeFromStr))
++          .map((__v) =>
++            mapOptional(__v, (range) => ({
++              min: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
++                ),
++              ),
++              max: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
++                ),
++              ),
++            })),
++          ).value ?? { min: undefined, max: undefined },
+         poor: pipe(queryParams.get(keyDef.poor))
+-          .chainOptional(rangeFromStr)
+-          .chainOptional((range) => ({
+-            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+-            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
+-          })).value ?? {
+-          min: undefined,
+-          max: undefined,
+-        },
++          .map((__v) => mapOptional(__v, rangeFromStr))
++          .map((__v) =>
++            mapOptional(__v, (range) => ({
++              min: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
++                ),
++              ),
++              max: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
++                ),
++              ),
++            })),
++          ).value ?? { min: undefined, max: undefined },
+         goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
+-          .chainOptional(rangeFromStr)
+-          .chainOptional((range) => ({
+-            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+-            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
+-          })).value ?? {
+-          min: undefined,
+-          max: undefined,
+-        },
++          .map((__v) => mapOptional(__v, rangeFromStr))
++          .map((__v) =>
++            mapOptional(__v, (range) => ({
++              min: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
++                ),
++              ),
++              max: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
++                ),
++              ),
++            })),
++          ).value ?? { min: undefined, max: undefined },
+         fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
+-          .chainOptional(rangeFromStr)
+-          .chainOptional((range) => ({
+-            min: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.a, 10))),
+-            max: Num.mapNaN2Undefined(toSafeUint(Number.parseInt(range.b, 10))),
+-          })).value ?? {
+-          min: undefined,
+-          max: undefined,
+-        },
++          .map((__v) => mapOptional(__v, rangeFromStr))
++          .map((__v) =>
++            mapOptional(__v, (range) => ({
++              min: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
++                ),
++              ),
++              max: Num.mapNaN2Undefined(
++                asSafeUint(
++                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
++                ),
++              ),
++            })),
++          ).value ?? { min: undefined, max: undefined },
+       },
+     },
+   });

@@ -1,0 +1,17 @@
+diff --git apps/react-utils-styled/src/utils/rect.mts apps/react-utils-styled/src/utils/rect.mts
+new file mode 100644
+index 000000000..61180195c
+--- /dev/null
++++ apps/react-utils-styled/src/utils/rect.mts
+@@ -0,0 +1,11 @@
++/**
++ * A rectangle, as `getBoundingClientRect` and `ResizeObserver` report one.
++ *
++ * Ported from `@noshiro/ts-utils-additional`; `ts-data-forge` has no successor.
++ */
++export type Rect = Readonly<{
++  top: number;
++  left: number;
++  height: number;
++  width: number;
++}>;

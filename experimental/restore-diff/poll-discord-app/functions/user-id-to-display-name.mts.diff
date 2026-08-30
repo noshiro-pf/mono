@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/user-id-to-display-name.mts apps/poll-discord-app/src/functions/user-id-to-display-name.mts
+index 148dcdc57..0fe9e056b 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/user-id-to-display-name.mts
++++ apps/poll-discord-app/src/functions/user-id-to-display-name.mts
+@@ -1,4 +1,6 @@
+ import type * as Discord from 'discord.js';
++import { IMap, Result, castMutable, unknownToString } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
+ import { toUserId, type UserId } from '../types/index.mjs';
+ import { quoteIfSpaceIncluded } from './quote-if-space-included.mjs';
+ 
+@@ -20,7 +22,7 @@ export const createUserIdToDisplayNameMap = async (
+   );
+ 
+   if (Result.isErr(guildMembersResult)) {
+-    return Result.err(Str.from(guildMembersResult.value));
++    return Result.err(unknownToString(guildMembersResult.value));
+   }
+ 
+   const guildMembers = guildMembersResult.value;
+@@ -36,7 +38,7 @@ export const createUserIdToDisplayNameMap = async (
+   }));
+ 
+   return Result.ok(
+-    IMap.new<UserId, string>(
++    IMap.create<UserId, string>(
+       displayNameList.map(({ userId, displayName }) => [userId, displayName]),
+     ),
+   );

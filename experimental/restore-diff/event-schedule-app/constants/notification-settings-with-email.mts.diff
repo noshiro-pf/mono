@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/notification-settings-with-email.ts apps/event-schedule-app/src/constants/notification-settings-with-email.mts
+index 22d342320..296ca6644 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/notification-settings-with-email.ts
++++ apps/event-schedule-app/src/constants/notification-settings-with-email.mts
+@@ -1,8 +1,5 @@
+-import { NotificationSettings } from '@noshiro/event-schedule-app-shared';
+-import { type NotificationSettingsWithEmail } from '../types';
++import { NotificationSettings } from 'event-schedule-app-shared';
++import { type NotificationSettingsWithEmail } from '../types/index.mjs';
+ 
+ export const notificationSettingsWithEmailDefaultValue: NotificationSettingsWithEmail =
+-  {
+-    ...NotificationSettings.defaultValue,
+-    email: '',
+-  };
++  { ...NotificationSettings.defaultValue, email: '' } as const;

@@ -1,0 +1,55 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/calendar-reducer.ts apps/event-schedule-app/src/functions/multiple-date-picker/calendar-reducer.mts
+index 7f617a5d8..aa8e844e6 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/calendar-reducer.ts
++++ apps/event-schedule-app/src/functions/multiple-date-picker/calendar-reducer.mts
+@@ -1,5 +1,10 @@
++import { Num, asSafeUint } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type MonthEnum, type SafeUint } from 'ts-type-forge';
++import { type Reducer } from '../../utils-ported/index.mjs';
++
+ export type CalendarCurrentPageReducerState = Readonly<{
+-  year: YearEnum;
++  year: SafeUint;
+   month: MonthEnum;
+ }>;
+ 
+@@ -7,16 +12,17 @@ export type CalendarCurrentPageReducerAction = Readonly<
+   | { type: 'next-month' }
+   | { type: 'prev-month' }
+   | { type: 'set-month'; month: MonthEnum }
+-  | { type: 'set-year-month'; year: YearEnum; month: MonthEnum }
+-  | { type: 'set-year'; year: YearEnum }
++  | { type: 'set-year-month'; year: SafeUint; month: MonthEnum }
++  | { type: 'set-year'; year: SafeUint }
+   | { type: 'today' }
+ >;
+ 
+ export const calendarCurrentPageInitialState =
+-  (): CalendarCurrentPageReducerState => ({
+-    year: DateUtils.getLocaleYear(DateUtils.today()),
+-    month: DateUtils.getLocaleMonth(DateUtils.today()),
+-  });
++  (): CalendarCurrentPageReducerState =>
++    ({
++      year: DateUtils.getLocaleYear(DateUtils.today()),
++      month: DateUtils.getLocaleMonth(DateUtils.today()),
++    }) as const;
+ 
+ export const calendarCurrentPageReducer: Reducer<
+   CalendarCurrentPageReducerState,
+@@ -25,12 +31,12 @@ export const calendarCurrentPageReducer: Reducer<
+   switch (action.type) {
+     case 'prev-month':
+       return month === 1
+-        ? { year: toSafeUint(year - 1) satisfies YearEnum, month: 12 }
++        ? { year: asSafeUint(year - 1) satisfies SafeUint, month: 12 }
+         : { year, month: Num.decrement(month) satisfies MonthEnum };
+ 
+     case 'next-month':
+       return month === 12
+-        ? { year: toSafeUint(year + 1) satisfies YearEnum, month: 1 }
++        ? { year: asSafeUint(year + 1) satisfies SafeUint, month: 1 }
+         : { year, month: Num.increment(month) satisfies MonthEnum };
+ 
+     case 'set-month':

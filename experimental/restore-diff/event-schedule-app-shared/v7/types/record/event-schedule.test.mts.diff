@@ -1,0 +1,46 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-schedule.test.mts apps/event-schedule-app-shared/src/v7/types/record/event-schedule.test.mts
+index 630db2e17..6ab2bc4bb 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-schedule.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/event-schedule.test.mts
+@@ -1,4 +1,6 @@
+-import { DateUtils, expectType } from '@noshiro/ts-utils';
++import { Arr, expectType } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type NonEmptyArray } from 'ts-type-forge';
+ import { type DatetimeSpecificationEnumType } from '../enum/index.mjs';
+ import { type AnswerIconSettings } from './answer-icon-settings.mjs';
+ import {
+@@ -41,7 +43,7 @@ describe('EventSchedule', () => {
+       title: '',
+       notes: '',
+       datetimeSpecification: 'noStartEndSpecified',
+-      datetimeRangeList: [datetimeRangeDefaultValue],
++      datetimeRangeList: Arr.asNonEmptyArray([datetimeRangeDefaultValue]),
+       answerDeadline: 'none',
+       answerIcons: {
+         good: answerIconSettingTypeDef(10).defaultValue,
+@@ -52,20 +54,20 @@ describe('EventSchedule', () => {
+       timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
+       author: userDefaultValue,
+       archivedBy: [],
+-    };
++    } as const;
+ 
+-    expect(eventScheduleDefaultValue).toStrictEqual(defaultValue);
++    assert.deepStrictEqual(eventScheduleDefaultValue, defaultValue);
+   });
+ 
+   describe('isEventSchedule', () => {
+     test('defaultValue should be true', () => {
+-      expect(isEventSchedule(eventScheduleDefaultValue)).toBe(true);
++      assert.isTrue(isEventSchedule(eventScheduleDefaultValue));
+     });
+   });
+ 
+   describe('fillEventSchedule', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillEventSchedule({})).toStrictEqual(eventScheduleDefaultValue);
++      assert.deepStrictEqual(fillEventSchedule({}), eventScheduleDefaultValue);
+     });
+   });
+ });

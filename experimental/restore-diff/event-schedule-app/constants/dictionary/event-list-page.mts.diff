@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/event-list-page.ts apps/event-schedule-app/src/constants/dictionary/event-list-page.mts
+index 42af74386..4db8ad37e 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/event-list-page.ts
++++ apps/event-schedule-app/src/constants/dictionary/event-list-page.mts
+@@ -1,3 +1,5 @@
++import { type SafeUint } from 'ts-type-forge';
++
+ export const eventListPageDictionary = {
+   title: '日程調整一覧',
+   listItem: {

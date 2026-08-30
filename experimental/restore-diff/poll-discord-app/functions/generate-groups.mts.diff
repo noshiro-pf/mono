@@ -1,0 +1,45 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/generate-groups.mts apps/poll-discord-app/src/functions/generate-groups.mts
+index 7d01f4fe5..dad955d77 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/generate-groups.mts
++++ apps/poll-discord-app/src/functions/generate-groups.mts
+@@ -1,5 +1,7 @@
+-import { getAlphabets } from '@noshiro/ts-utils-additional';
++import { Arr, Num, pipe, tp } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
+ import { type Group, type NumGroups } from '../types/index.mjs';
++import { upperAlphabets } from '../utils/index.mjs';
+ 
+ export const generateGroups = (
+   numGroups: NumGroups,
+@@ -8,17 +10,17 @@ export const generateGroups = (
+   const nameListWithRand: DeepReadonly<[string, number, number][]> = pipe(
+     nameList,
+   )
+-    .chain((list) => Tpl.map(list, (n, i) => tp(n, i, Math.random())))
+-    .chain((list) =>
++    .map((list) => list.map((n, i) => tp(n, i, Math.random())))
++    .map((list) =>
+       list.toSorted(([_n1, _i1, r1], [_n2, _i2, r2]) => r1 - r2),
+     ).value;
+ 
+-  return getAlphabets('upper')
++  return upperAlphabets
+     .filter((_, i) => i < numGroups)
+     .map((al, idx) => ({
+       no: al,
+       nameList: pipe(nameListWithRand)
+-        .chain((list) =>
++        .map((list) =>
+           list.filter((_, i) =>
+             Num.isInRange(
+               Math.floor(nameList.length * (idx / numGroups)),
+@@ -26,7 +28,7 @@ export const generateGroups = (
+             )(i),
+           ),
+         )
+-        .chain((list) => Arr.sortedBy(list, ([_, i]) => i))
+-        .chain((list) => Tpl.map(list, ([n]) => n)).value,
++        .map((list) => Arr.toSortedBy(list, ([_, i]) => i))
++        .map((list) => list.map(([n]) => n)).value,
+     }));
+ };

@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/styled/sign-in-page-style.ts apps/event-schedule-app/src/components/styled/sign-in-page-style.mts
+index 0aa8d1a40..99dc71d9a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/styled/sign-in-page-style.ts
++++ apps/event-schedule-app/src/components/styled/sign-in-page-style.mts
+@@ -1,4 +1,5 @@
+ import { Button } from '@blueprintjs/core';
++import styled from '@emotion/styled';
+ 
+ const Wrapper = styled.div`
+   flex: 1;

@@ -1,0 +1,67 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-email-input-group.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-email-input-group.tsx
+index b324a362d..f1f46990a 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-email-input-group.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-email-input-group.tsx
+@@ -1,9 +1,9 @@
+ import { FormGroup } from '@blueprintjs/core';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { type TinyObservable } from '@noshiro/ts-utils';
+-import { isEmailString } from '@noshiro/ts-utils-additional';
+ import { useBoolState } from 'better-react-use-state';
+-import { useCallback, useMemo } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type Observable as SynstateObservable } from 'synstate';
++import { isEmailString } from '../../utils/index.mjs';
+ import { BpInput, type BpInputProps } from './bp-input.js';
+ 
+ export type BpEmailInputProps = BpInputProps &
+@@ -14,7 +14,7 @@ export type BpEmailInputProps = BpInputProps &
+     showOtherErrorMessages?: boolean;
+     otherErrorMessages?: readonly string[];
+     autoFocus?: boolean;
+-    focus$?: TinyObservable<undefined>;
++    focus$?: SynstateObservable<undefined>;
+   }>;
+ 
+ export const BpEmailInput = memoNamed<BpEmailInputProps>(
+@@ -40,25 +40,28 @@ export const BpEmailInput = memoNamed<BpEmailInputProps>(
+       { setTrue: hideErrors, setFalse: showErrorsIfExists },
+     ] = useBoolState(true);
+ 
+-    const blurHandler: React.FocusEventHandler<HTMLInputElement> = useCallback(
+-      (ev) => {
+-        if (onBlur !== undefined) {
+-          onBlur(ev);
+-        }
+-        showErrorsIfExists();
+-      },
+-      [onBlur, showErrorsIfExists],
+-    );
++    const blurHandler: React.FocusEventHandler<HTMLInputElement> =
++      React.useCallback(
++        (ev) => {
++          if (onBlur !== undefined) {
++            onBlur(ev);
++          }
+ 
+-    const valueChangeHandler = useCallback(
++          showErrorsIfExists();
++        },
++        [onBlur, showErrorsIfExists],
++      );
++
++    const valueChangeHandler = React.useCallback(
+       (str: string) => {
+         onValueChange(str);
++
+         hideErrors();
+       },
+       [onValueChange, hideErrors],
+     );
+ 
+-    const helperText = useMemo(
++    const helperText = React.useMemo(
+       () =>
+         errorsAreHidden || disabled ? undefined : (
+           <div>

@@ -1,0 +1,26 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-debounce-fn.mts apps/react-utils/src/hooks/use-debounce-fn.mts
+index 35da437bf..bd1313355 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-debounce-fn.mts
++++ apps/react-utils/src/hooks/use-debounce-fn.mts
+@@ -1,16 +1,16 @@
+-import { useCallback, useEffect, useRef } from 'react';
++import * as React from 'react';
+ 
+ export const useTimerRef = (): readonly [
+-  React.MutableRefObject<number | undefined>,
++  React.RefObject<number | undefined>,
+   () => void,
+ ] => {
+-  const timerRef = useRef<number | undefined>(undefined);
++  const timerRef = React.useRef<number | undefined>(undefined);
+ 
+-  const clearTimer = useCallback(() => {
++  const clearTimer = React.useCallback(() => {
+     clearTimeout(timerRef.current);
+   }, []);
+ 
+-  useEffect(() => clearTimer, [clearTimer]);
++  React.useEffect(() => clearTimer, [clearTimer]);
+ 
+   return [timerRef, clearTimer];
+ };

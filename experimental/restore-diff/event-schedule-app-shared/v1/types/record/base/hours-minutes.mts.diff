@@ -1,0 +1,47 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/hours-minutes.mts apps/event-schedule-app-shared/src/v1/types/record/base/hours-minutes.mts
+index 8bd65b25a..da875733a 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/hours-minutes.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/base/hours-minutes.mts
+@@ -1,4 +1,5 @@
+-import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
++import { DateUtils } from 'ts-fortress-types';
++import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
+ 
+ export type HoursMinutes = Readonly<{
+   hours: HoursEnum;
+@@ -13,20 +14,23 @@ export const defaultHoursMinutes = {
+ } as const satisfies HoursMinutes;
+ 
+ const d = defaultHoursMinutes;
+-export const fillHoursMinutes = (a?: PartialHoursMinutes): HoursMinutes => ({
+-  hours: a?.hours ?? d.hours,
+-  minutes: a?.minutes ?? d.minutes,
+-});
+ 
+-export const hmFromDate = (date: DateType): HoursMinutes => ({
+-  hours: DateUtils.getLocaleHours(date),
+-  minutes: DateUtils.getLocaleMinutes(date),
+-});
++export const fillHoursMinutes = (a?: PartialHoursMinutes): HoursMinutes =>
++  ({
++    hours: a?.hours ?? d.hours,
++    minutes: a?.minutes ?? d.minutes,
++  }) as const;
++
++export const hmFromDate = (date: Date): HoursMinutes =>
++  ({
++    hours: DateUtils.getLocaleHours(date),
++    minutes: DateUtils.getLocaleMinutes(date),
++  }) as const;
+ 
+ export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
+-  if (a.hours !== b.hours)
+-    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+-  if (a.minutes !== b.minutes)
+-    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
++  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
++
++  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
++
+   return 0;
+ };

@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/index.ts apps/event-schedule-app/src/store/update-user-info-page-state/index.mts
+index 836314130..e438e5466 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/index.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/index.mts
+@@ -1,6 +1,6 @@
+-export * from './delete-account-page';
+-export * from './delete-account-page-google';
+-export * from './update-display-name-page';
+-export * from './update-email-page';
+-export * from './update-password-page';
+-export * from './update-user-info-dialog-state';
++export * from './delete-account-page-google.mjs';
++export * from './delete-account-page.mjs';
++export * from './update-display-name-page.mjs';
++export * from './update-email-page.mjs';
++export * from './update-password-page.mjs';
++export * from './update-user-info-dialog-state.mjs';

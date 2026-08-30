@@ -1,0 +1,50 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/view/numeric-input-view.tsx apps/react-blueprintjs-utils/src/components/view/numeric-input-view.tsx
+index c49e49000..65cf4d908 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/view/numeric-input-view.tsx
++++ apps/react-blueprintjs-utils/src/components/view/numeric-input-view.tsx
+@@ -1,7 +1,8 @@
+ import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useCallback, useRef } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type StrictOmit } from 'ts-type-forge';
+ import {
+   ptButton,
+   ptButtonBase,
+@@ -13,7 +14,7 @@ import {
+ 
+ type Props = Partial<
+   Readonly<{
+-    inputProps: Omit<
++    inputProps: StrictOmit<
+       React.DetailedHTMLProps<
+         React.InputHTMLAttributes<HTMLInputElement>,
+         HTMLInputElement
+@@ -64,20 +65,22 @@ export const NumericInputView = memoNamed<Props>(
+     selectOnFocus,
+   }) => {
+     const inputValueChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+-      useCallback(
++      React.useCallback(
+         (ev) => {
+           onInputStringChange?.(ev.currentTarget.value);
++
+           onInputChange?.(ev);
+         },
+         [onInputStringChange, onInputChange],
+       );
+ 
+-    const inputRef = useRef<HTMLInputElement>(null);
++    const inputRef = React.useRef<HTMLInputElement>(null);
+ 
+     const inputFocusHandler: React.FocusEventHandler<HTMLInputElement> =
+-      useCallback(
++      React.useCallback(
+         (ev) => {
+           onInputFocus?.(ev);
++
+           if (selectOnFocus === true) {
+             inputRef.current?.select();
+           }

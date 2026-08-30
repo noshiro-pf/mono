@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/datetime-range.mts apps/event-schedule-app-shared/src/v1/types/record/datetime-range.mts
+index 3f86ffaf7..5068c5152 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/datetime-range.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/datetime-range.mts
+@@ -31,18 +31,24 @@ export const defaultDatetimeRange = {
+ } as const satisfies DatetimeRange;
+ 
+ const d = defaultDatetimeRange;
+-export const fillDatetimeRange = (p?: PartialDatetimeRange): DatetimeRange => ({
+-  ymd: fillYearMonthDate(p?.ymd ?? d.ymd),
+-  timeRange: fillTimeRange(p?.timeRange ?? d.timeRange),
+-});
++
++export const fillDatetimeRange = (p?: PartialDatetimeRange): DatetimeRange =>
++  ({
++    ymd: fillYearMonthDate(p?.ymd ?? d.ymd),
++    timeRange: fillTimeRange(p?.timeRange ?? d.timeRange),
++  }) as const;
+ 
+ export const compareDatetimeRange = (
+   a: DatetimeRange,
+   b: DatetimeRange,
+ ): number => {
+   const compareYmdResult = compareYmd(a.ymd, b.ymd);
++
+   if (compareYmdResult !== 0) return compareYmdResult;
++
+   const compareTimeRangeResult = compareTimeRange(a.timeRange, b.timeRange);
++
+   if (compareTimeRangeResult !== 0) return compareTimeRangeResult;
++
+   return 0;
+ };

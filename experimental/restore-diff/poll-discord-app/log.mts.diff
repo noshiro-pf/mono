@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/poll-discord-app/src/log.mts apps/poll-discord-app/src/log.mts
+index e772cdd5c..bb0ac5afa 100644
+--- experimental/packages/apps/poll-discord-app/src/log.mts
++++ apps/poll-discord-app/src/log.mts
+@@ -1,3 +1,6 @@
++import { Json, Result } from 'ts-data-forge';
++import { type JsonValue } from 'ts-type-forge';
++
+ export const log = (value: JsonValue, prettyPrint: boolean = true): void => {
+   console.log(
+     Result.unwrapThrow(

@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/icons/index.ts apps/event-schedule-app/src/components/atoms/icons/index.mts
+index 013add8fd..cf8b24e95 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/icons/index.ts
++++ apps/event-schedule-app/src/components/atoms/icons/index.mts
+@@ -1,8 +1,8 @@
+-export * from './calendar';
+-export * from './circle';
+-export * from './close';
+-export * from './comment';
+-export * from './delete';
+-export * from './edit';
+-export * from './google-icon';
+-export * from './triangle';
++export * from './calendar.js';
++export * from './circle.js';
++export * from './close.js';
++export * from './comment.js';
++export * from './delete.js';
++export * from './edit.js';
++export * from './google-icon.js';
++export * from './triangle.js';

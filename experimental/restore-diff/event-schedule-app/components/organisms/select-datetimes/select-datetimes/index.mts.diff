@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/index.ts apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/index.mts
+index dd5d5c068..e99fb5cee 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/index.ts
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/index.mts
+@@ -1,2 +1,2 @@
+-export * from './select-datetimes';
+-export * from './selected-datetime-row';
++export * from './select-datetimes.js';
++export * from './selected-datetime-row.js';

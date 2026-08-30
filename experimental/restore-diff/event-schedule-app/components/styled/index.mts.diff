@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/styled/index.ts apps/event-schedule-app/src/components/styled/index.mts
+index dd5e92852..34da0c10d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/styled/index.ts
++++ apps/event-schedule-app/src/components/styled/index.mts
+@@ -1,4 +1,4 @@
+-export * from './buttons-wrapper';
+-export * from './buttons-wrapper-for-event-settings-page';
+-export * from './sign-in-page-style';
+-export * from './width-restricted-input-wrapper';
++export * from './buttons-wrapper-for-event-settings-page.mjs';
++export * from './buttons-wrapper.js';
++export * from './sign-in-page-style.mjs';
++export * from './width-restricted-input-wrapper.js';

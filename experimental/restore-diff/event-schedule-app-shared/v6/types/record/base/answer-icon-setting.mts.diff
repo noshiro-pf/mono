@@ -1,0 +1,37 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/answer-icon-setting.mts apps/event-schedule-app-shared/src/v6/types/record/base/answer-icon-setting.mts
+index 8ad2e9bdd..3b3c1e0d4 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/answer-icon-setting.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/answer-icon-setting.mts
+@@ -1,4 +1,5 @@
+-import { Obj, isRecord, isString } from '@noshiro/ts-utils';
++import { isRecord, isString } from 'ts-data-forge';
++import { hasKeyValue } from '../../../../utils/index.mjs';
+ import { isAnswerIconPoint, type AnswerIconPoint } from '../../enum/index.mjs';
+ 
+ export type AnswerIconSetting = Readonly<{
+@@ -13,19 +14,17 @@ export const answerIconSettingDefaultValue = {
+ 
+ export const isAnswerIconSetting = (a: unknown): a is AnswerIconSetting =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'description', isString) &&
+-  Obj.hasKeyValue(a, 'point', isAnswerIconPoint);
++  hasKeyValue(a, 'description', isString) &&
++  hasKeyValue(a, 'point', isAnswerIconPoint);
+ 
+ const d = answerIconSettingDefaultValue;
+ 
+ export const fillAnswerIconSetting = (a?: unknown): AnswerIconSetting =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        description: Obj.hasKeyValue(a, 'description', isString)
++    : ({
++        description: hasKeyValue(a, 'description', isString)
+           ? a.description
+           : d.description,
+-        point: Obj.hasKeyValue(a, 'point', isAnswerIconPoint)
+-          ? a.point
+-          : d.point,
+-      };
++        point: hasKeyValue(a, 'point', isAnswerIconPoint) ? a.point : d.point,
++      } as const);

@@ -1,0 +1,149 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-summary.ts apps/event-schedule-app/src/functions/answers-page/create-answer-summary.mts
+index a973d98ae..48ac52b45 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-summary.ts
++++ apps/event-schedule-app/src/functions/answers-page/create-answer-summary.mts
+@@ -1,5 +1,18 @@
+-import { answerIconPointConfig } from '../../constants';
+-import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
++import {
++  Arr,
++  type IMap,
++  IMapMapped,
++  Num,
++  Optional,
++  pipe,
++  tp,
++} from 'ts-data-forge';
++import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
++import { answerIconPointConfig } from '../../constants/index.mjs';
++import {
++  datetimeRangeFromMapKey,
++  datetimeRangeToMapKey,
++} from '../map-key/index.mjs';
+ 
+ export const createAnswerSummary = (
+   datetimeRangeList: readonly DatetimeRange[],
+@@ -10,8 +23,12 @@ export const createAnswerSummary = (
+     >,
+     DatetimeRangeMapKey
+   >,
+-): IMapMapped<DatetimeRange, ArrayOfLength<3, number>, DatetimeRangeMapKey> =>
+-  IMapMapped.new(
++): IMapMapped<
++  DatetimeRange,
++  FixedLengthTuple<3, number>,
++  DatetimeRangeMapKey
++> =>
++  IMapMapped.create(
+     datetimeRangeList.map((datetimeRange) => {
+       const answersForThisDatetimeRange:
+         | DeepReadonly<
+@@ -21,7 +38,7 @@ export const createAnswerSummary = (
+               comment: string,
+             ][]
+           >
+-        | undefined = answerTable.get(datetimeRange);
++        | undefined = Optional.toNullable(answerTable.get(datetimeRange));
+ 
+       if (answersForThisDatetimeRange === undefined) {
+         return tp(datetimeRange, tp(0, 0, 0));
+@@ -30,13 +47,13 @@ export const createAnswerSummary = (
+       const answerGroups: IMap<AnswerIconIdWithNone, number> = pipe(
+         answersForThisDatetimeRange.map(([iconId, _point]) => iconId),
+       )
+-        .chain((list) => Arr.groupBy(list, (x) => x))
+-        .chain((groups) => groups.map((v) => v.length)).value;
++        .map(Arr.groupBy((x) => x))
++        .map((groups) => groups.map((v) => v.length)).value;
+ 
+       const counts = tp(
+-        answerGroups.get('good') ?? 0,
+-        answerGroups.get('fair') ?? 0,
+-        answerGroups.get('poor') ?? 0,
++        Optional.toNullable(answerGroups.get('good')) ?? 0,
++        Optional.toNullable(answerGroups.get('fair')) ?? 0,
++        Optional.toNullable(answerGroups.get('poor')) ?? 0,
+       );
+ 
+       return tp(datetimeRange, counts);
+@@ -50,17 +67,18 @@ const calcScoreSum = (
+   answerWeightList: readonly Weight[],
+   isRequiredParticipantsList: readonly boolean[],
+ ): number => {
+-  const someRequiredParticipantsScoreIs0: boolean = pipe(
+-    Arr.zip(isRequiredParticipantsList, answerPointList),
+-  ).chain((list) =>
+-    list.some(([required, score]) => required && score === 0),
+-  ).value;
++  // Indexed rather than zipped: `Arr.zip` over these branded element types
++  // produces a union the checker cannot represent (TS2590), and the lists are
++  // parallel by construction anyway.
++  const someRequiredParticipantsScoreIs0 = isRequiredParticipantsList.some(
++    (required, i) => required && answerPointList[i] === 0,
++  );
+ 
+   return someRequiredParticipantsScoreIs0
+     ? 0
+-    : pipe(Arr.zip(answerPointList, answerWeightList))
+-        .chain((list) => list.map(([score, weight]) => score * weight))
+-        .chain(Arr.sum).value;
++    : Arr.sum(
++        answerPointList.map((score, i) => score * (answerWeightList[i] ?? 0)),
++      );
+ };
+ 
+ const calcScoreSumMax = (answerWeightList: readonly Weight[]): number =>
+@@ -70,7 +88,7 @@ export const createScore = (
+   datetimeRangeList: readonly DatetimeRange[],
+   answerSummary: IMapMapped<
+     DatetimeRange,
+-    ArrayOfLength<3, number>,
++    FixedLengthTuple<3, number>,
+     DatetimeRangeMapKey
+   >,
+   answerTable: IMapMapped<
+@@ -82,14 +100,16 @@ export const createScore = (
+   >,
+   answers: readonly Answer[],
+ ): IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> =>
+-  IMapMapped.new(
++  IMapMapped.create(
+     datetimeRangeList.map((datetimeRange) => {
+-      const summaryForThisDatetimeRange: ArrayOfLength<3, number> | undefined =
+-        answerSummary.get(datetimeRange);
++      const summaryForThisDatetimeRange:
++        FixedLengthTuple<3, number> | undefined = Optional.toNullable(
++        answerSummary.get(datetimeRange),
++      );
+ 
+-      const answerPointList = answerTable
+-        .get(datetimeRange)
+-        ?.map(([_iconId, point]) => point);
++      const answerPointList = Optional.toNullable(
++        answerTable.get(datetimeRange),
++      )?.map(([_iconId, point]) => point);
+ 
+       if (
+         summaryForThisDatetimeRange === undefined ||
+@@ -99,6 +119,7 @@ export const createScore = (
+       }
+ 
+       const weightList = answers.map((a) => a.weight);
++
+       const isRequiredParticipantsList = answers.map(
+         (a) => a.isRequiredParticipants,
+       );
+@@ -108,11 +129,12 @@ export const createScore = (
+         weightList,
+         isRequiredParticipantsList,
+       );
++
+       const scoreMax: number = calcScoreSumMax(weightList);
+ 
+       return [
+         datetimeRange,
+-        answers.length === 0 || !Num.isPositive(scoreMax)
++        Arr.isEmpty(answers) || !Num.isPositive(scoreMax)
+           ? 0
+           : Num.div(scoreSum, scoreMax),
+       ];

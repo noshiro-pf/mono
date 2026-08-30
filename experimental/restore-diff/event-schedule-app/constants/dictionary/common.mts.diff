@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/common.ts apps/event-schedule-app/src/constants/dictionary/common.mts
+index ee7faf8d6..36b2a1788 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/common.ts
++++ apps/event-schedule-app/src/constants/dictionary/common.mts
+@@ -1,22 +1,13 @@
+ export const commonDictionary = {
+   date: {
+     dayList: ['日', '月', '火', '水', '木', '金', '土'],
+-    dayWrapperBrace: {
+-      start: '（',
+-      end: '）',
+-    },
++    dayWrapperBrace: { start: '（', end: '）' },
+     timeRangeTilde: '～',
+   },
+   colon: '：',
+   tilde: '～',
+-  brace: {
+-    start: '(',
+-    end: ')',
+-  },
+-  braceJp: {
+-    start: '（',
+-    end: '）',
+-  },
++  brace: { start: '(', end: ')' },
++  braceJp: { start: '（', end: '）' },
+   buttonText: {
+     decide: '決定',
+     cancel: 'キャンセル',

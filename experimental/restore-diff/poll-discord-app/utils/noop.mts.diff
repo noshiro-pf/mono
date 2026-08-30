@@ -1,0 +1,8 @@
+diff --git apps/poll-discord-app/src/utils/noop.mts apps/poll-discord-app/src/utils/noop.mts
+new file mode 100644
+index 000000000..94fd21a53
+--- /dev/null
++++ apps/poll-discord-app/src/utils/noop.mts
+@@ -0,0 +1,2 @@
++/** Does nothing. Used where a callback is required but has nothing to do. */
++export const noop = (): undefined => undefined;

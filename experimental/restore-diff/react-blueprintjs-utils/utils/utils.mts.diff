@@ -1,0 +1,19 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/utils/utils.mts apps/react-blueprintjs-utils/src/utils/utils.mts
+index 9d33e8484..fe76ba5e0 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/utils/utils.mts
++++ apps/react-blueprintjs-utils/src/utils/utils.mts
+@@ -1,11 +1,11 @@
+-import { hexToRgb } from '@noshiro/ts-utils-additional';
++import { hexToRgb } from './ported.mjs';
+ 
+ export const hexToRgba = (
+   hex: string,
+   alpha: number,
+ ): `rgba(${string}, ${number})` =>
+-  `rgba(${hexToRgb(hex).join(', ')}, ${alpha})`;
++  `rgba(${hexToRgb(hex).join(', ')}, ${alpha})` as const;
+ 
+ /** Join lines with `${lines.join(', \n')};` */
+ export const joinCssStr = (...lines: readonly string[]): string =>
+-  `${lines.join(', \n')};`;
++  `${lines.join(', \n')};` as const;

@@ -1,0 +1,25 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/set-authors-email.ts apps/event-schedule-app/src/api/crud/set-authors-email.mts
+index 3be127eab..595981c0b 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/set-authors-email.ts
++++ apps/event-schedule-app/src/api/crud/set-authors-email.mts
+@@ -1,6 +1,7 @@
+-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
++import { firestorePaths } from 'event-schedule-app-shared';
+ import { doc, setDoc } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ export const setAuthorsEmail = (
+   eventId: string,
+@@ -14,8 +15,6 @@ export const setAuthorsEmail = (
+         firestorePaths.internal,
+         firestorePaths.values,
+       ),
+-      {
+-        [firestorePaths.email]: email,
+-      },
++      { [firestorePaths.email]: email },
+     ),
+-  ).then((a) => Result.fold(a, () => undefined, Str.from));
++  ).then(Result.fold(() => undefined, unknownToString));

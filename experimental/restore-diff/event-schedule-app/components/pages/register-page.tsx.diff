@@ -1,0 +1,75 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/register-page.tsx apps/event-schedule-app/src/components/pages/register-page.tsx
+index 68e8627ed..4279ff93c 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/register-page.tsx
++++ apps/event-schedule-app/src/components/pages/register-page.tsx
+@@ -1,10 +1,14 @@
+ import { Button, FormGroup } from '@blueprintjs/core';
+-import { BpInput } from '@noshiro/react-blueprintjs-utils';
+-import { GoogleSignInStore, RegisterPageStore } from '../../store';
+-import { GoogleIcon, Label } from '../atoms';
+-import { LockButton } from '../molecules';
+-import { NavBar } from '../organisms';
+-import { SignInStyled } from '../styled';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { GoogleSignInStore, RegisterPageStore } from '../../store/index.mjs';
++import { GoogleIcon, Label } from '../atoms/index.mjs';
++import { LockButton } from '../molecules/index.mjs';
++import { NavBar } from '../organisms/index.mjs';
++import { SignInStyled } from '../styled/index.mjs';
+ 
+ const dc = dict.register;
+ 
+@@ -23,7 +27,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
+     passwordIsOpen,
+   } = useObservableValue(RegisterPageStore.state);
+ 
+-  const passwordLockButton = useMemo(
++  const passwordLockButton = React.useMemo(
+     () => (
+       <LockButton
+         disabled={formState.isWaitingResponse}
+@@ -49,7 +53,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
+               >
+                 <BpInput
+                   // eslint-disable-next-line jsx-a11y/no-autofocus
+-                  autoFocus={true}
++                  autoFocus
+                   disabled={formState.isWaitingResponse}
+                   intent={usernameFormIntent}
+                   type={'text'}
+@@ -110,7 +114,7 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
+             <SignInStyled.ButtonWrapper>
+               <Button
+                 disabled={enterButtonDisabled}
+-                fill={true}
++                fill
+                 intent={'primary'}
+                 loading={formState.isWaitingResponse}
+                 onClick={RegisterPageStore.enterClickHandler}
+@@ -134,10 +138,9 @@ export const RegisterPage = memoNamed('RegisterPage', () => {
+               <SignInStyled.ButtonWrapper>
+                 <SignInStyled.GoogleButton
+                   disabled={googleSignInButtonDisabled}
+-                  fill={true}
++                  fill
+                   intent={'none'}
+-                  minimal={true}
+-                  outlined={true}
++                  variant={'outlined'}
+                   onClick={GoogleSignInStore.googleSignInClickHandler}
+                 >
+                   <SignInStyled.GoogleButtonContentWrapper>
+@@ -163,6 +166,9 @@ const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`
+ `;
+ 
+ const usernameInputLabel = <Label>{dc.username}</Label>;
++
+ const emailInputLabel = <Label>{dc.email}</Label>;
++
+ const newPasswordInputLabel = <Label>{dc.password}</Label>;
++
+ const verifyPasswordInputLabel = <Label>{dc.verifyPassword}</Label>;

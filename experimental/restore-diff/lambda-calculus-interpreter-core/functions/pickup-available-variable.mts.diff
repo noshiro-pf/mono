@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/pickup-available-variable.mts apps/lambda-calculus-interpreter-core/src/functions/pickup-available-variable.mts
+index 0bcf19bfc..8c6b456d7 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/pickup-available-variable.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/pickup-available-variable.mts
+@@ -1,4 +1,4 @@
+-import { Arr } from '@noshiro/ts-utils';
++import { Arr } from 'ts-data-forge';
+ import { ALPHABETS } from '../constants/index.mjs';
+ import { type Variable } from '../types/index.mjs';
+ 
+@@ -8,9 +8,10 @@ export const pickUpAvailableVariable = (
+   const availableVariables = ALPHABETS.filter(
+     (e) => !freeVariables.includes(e),
+   );
+-  if (Arr.isArrayOfLength1OrMore(availableVariables)) {
++
++  if (Arr.isNonEmpty(availableVariables)) {
+     return availableVariables[0]; // pick up one available
+-  } else {
+-    throw new Error('alphabets exhausted');
+   }
++
++  throw new Error('alphabets exhausted');
+ };

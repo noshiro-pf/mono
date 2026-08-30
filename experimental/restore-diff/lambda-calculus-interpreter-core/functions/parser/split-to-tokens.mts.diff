@@ -1,0 +1,60 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/split-to-tokens.mts apps/lambda-calculus-interpreter-core/src/functions/parser/split-to-tokens.mts
+index 4fbcd6313..e2d900188 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/split-to-tokens.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/split-to-tokens.mts
+@@ -1,31 +1,30 @@
+-import { range } from '@noshiro/ts-utils';
+-
+ export const splitToTokens = (input: string): readonly string[] => {
+   let mut_spaceInserted = '';
+-  for (const i of range(0, input.length)) {
+-    const char = input.at(i);
+-    switch (char) {
+-      case '(':
+-      case ')':
+-      case '.':
+-      case '+':
+-      case '-':
+-      case '*':
+-      case '\\':
+-        mut_spaceInserted += ` ${char} `;
+-        break;
+-
+-      case '\t':
+-      case '\n':
+-        mut_spaceInserted += ' ';
+-        break;
+-      case undefined:
+-        break;
+ 
+-      default:
+-        mut_spaceInserted += char;
+-        break;
+-    }
++  for (const char of input) {
++    mut_spaceInserted += separate(char);
+   }
++
+   return mut_spaceInserted.split(' ').filter((e) => e.length > 0 && e !== ' ');
+ };
++
++/** Surrounds the characters that are tokens on their own with spaces. */
++const separate = (char: string): string => {
++  switch (char) {
++    case '(':
++    case ')':
++    case '.':
++    case '+':
++    case '-':
++    case '*':
++    case '\\':
++      return ` ${char} `;
++
++    case '\t':
++    case '\n':
++      return ' ';
++
++    default:
++      return char;
++  }
++};

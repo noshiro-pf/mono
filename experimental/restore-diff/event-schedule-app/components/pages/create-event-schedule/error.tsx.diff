@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/error.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/error.tsx
+index 8ed094c94..b58a2f102 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/error.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/error.tsx
+@@ -1,11 +1,11 @@
+-import { errorFontColor } from '../../../constants';
+-import { Description } from '../../atoms';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { errorFontColor } from '../../../constants/index.mjs';
++import { Description } from '../../atoms/index.mjs';
+ 
+ const dc = dict.errorMessages;
+ 
+-type Props = Readonly<{
+-  errorType: 'not-found' | 'others';
+-}>;
++type Props = Readonly<{ errorType: 'not-found' | 'others' }>;
+ 
+ export const FetchEventScheduleError = memoNamed<Props>(
+   'AnswerPageError',

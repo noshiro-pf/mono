@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/index.ts apps/event-schedule-app/src/store/sign-in-and-register-page-state/index.mts
+index e6666a3af..437f91b52 100644
+--- experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/index.ts
++++ apps/event-schedule-app/src/store/sign-in-and-register-page-state/index.mts
+@@ -1,4 +1,4 @@
+-export * from './google-sign-in-state';
+-export * from './register-page';
+-export * from './reset-password-page';
+-export * from './sign-in-page';
++export * from './google-sign-in-state.mjs';
++export * from './register-page.mjs';
++export * from './reset-password-page.mjs';
++export * from './sign-in-page.mjs';

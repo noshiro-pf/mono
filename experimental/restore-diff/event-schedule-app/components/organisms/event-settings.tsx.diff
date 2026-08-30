@@ -1,0 +1,62 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/event-settings.tsx apps/event-schedule-app/src/components/organisms/event-settings.tsx
+index 1a50c5580..6a0ac174e 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/event-settings.tsx
++++ apps/event-schedule-app/src/components/organisms/event-settings.tsx
+@@ -1,9 +1,13 @@
+-import { notificationSettingsWithEmailDefaultValue } from '../../constants';
+-import { type NotificationSettingsWithEmail } from '../../types';
+-import { AnswerDeadlineDatepicker } from './answer-deadline';
+-import { AnswerIconSettingsComponent } from './icon-settings';
+-import { NotificationSettingsComponent } from './notification-settings';
+-import { ParagraphWithSwitch } from './paragraph-with-switch';
++import { css } from '@emotion/react';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { memoNamed, useObservable } from 'react-utils';
++import { notificationSettingsWithEmailDefaultValue } from '../../constants/index.mjs';
++import { type NotificationSettingsWithEmail } from '../../types/index.mjs';
++import { AnswerDeadlineDatepicker } from './answer-deadline.js';
++import { AnswerIconSettingsComponent } from './icon-settings/index.mjs';
++import { NotificationSettingsComponent } from './notification-settings.js';
++import { ParagraphWithSwitch } from './paragraph-with-switch.js';
+ 
+ const dc = dict.eventSettingsPage.section3;
+ 
+@@ -36,23 +40,24 @@ export const EventSettings = memoNamed<Props>(
+     notificationSettingsWithEmail,
+     onNotificationSettingsWithEmailChange,
+   }) => {
+-    const focusEmailInput$ = useTinyObservable<undefined>();
++    const focusEmailInput$ = useObservable<undefined>();
+ 
+     const [clickedMoreThanOnce, { setTrue: setClickedMoreThanOnce }] =
+       useBoolState(false);
+ 
+-    const onToggleUseNotificationLocal = useCallback(() => {
++    const onToggleUseNotificationLocal = React.useCallback(() => {
+       onToggleUseNotification();
++
+       setClickedMoreThanOnce();
+     }, [onToggleUseNotification, setClickedMoreThanOnce]);
+ 
+-    useEffect(() => {
++    React.useEffect(() => {
+       if (useNotification && clickedMoreThanOnce) {
+         focusEmailInput$.next(undefined);
+       }
+     }, [useNotification, focusEmailInput$, clickedMoreThanOnce]);
+ 
+-    const answerDeadlineDatepicker = useMemo(
++    const answerDeadlineDatepicker = React.useMemo(
+       () => (
+         <AnswerDeadlineDatepicker
+           answerDeadline={answerDeadline}
+@@ -63,7 +68,7 @@ export const EventSettings = memoNamed<Props>(
+       [answerDeadline, onAnswerDeadlineChange, useAnswerDeadline],
+     );
+ 
+-    const notificationSettingsComponent = useMemo(
++    const notificationSettingsComponent = React.useMemo(
+       () => (
+         <NotificationSettingsComponent
+           answerDeadline={answerDeadline}

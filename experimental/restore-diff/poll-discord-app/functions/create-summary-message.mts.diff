@@ -1,0 +1,45 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/create-summary-message.mts apps/poll-discord-app/src/functions/create-summary-message.mts
+index 39e4f2ff8..28ebe44a5 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/create-summary-message.mts
++++ apps/poll-discord-app/src/functions/create-summary-message.mts
+@@ -1,4 +1,5 @@
+ import { EmbedBuilder, type EmbedField } from 'discord.js';
++import { type IMap, castMutable } from 'ts-data-forge';
+ import { embedMessageColor, footerText } from '../constants.mjs';
+ import { type Group, type Poll, type UserId } from '../types/index.mjs';
+ import {
+@@ -9,13 +10,16 @@ import {
+ export const rpCreateSummaryMessage = (
+   poll: Poll,
+   userIdToDisplayName: IMap<UserId, string>,
+-): EmbedBuilder =>
+-  new EmbedBuilder()
++): EmbedBuilder => {
++  const builder = new EmbedBuilder();
++
++  return builder
+     .setColor(embedMessageColor)
+     .setTitle(`Collected Results for "${poll.title}"`)
+     .addFields(castMutable(rpCreateSummaryFields(poll, userIdToDisplayName)))
+     .setFooter({ text: footerText })
+     .setTimestamp();
++};
+ 
+ const rpCreateSummaryFields = (
+   poll: Poll,
+@@ -27,10 +31,13 @@ const rpCreateSummaryFields = (
+ 
+ export const gpCreateSummaryMessage = (
+   groups: readonly Group[],
+-): EmbedBuilder =>
+-  new EmbedBuilder()
++): EmbedBuilder => {
++  const builder = new EmbedBuilder();
++
++  return builder
+     .setColor(embedMessageColor)
+     .addFields(castMutable(gpCreateFields(groups)));
++};
+ 
+ const gpCreateFields = (groups: readonly Group[]): readonly EmbedField[] =>
+   groups.map(gpCreateSummaryField);

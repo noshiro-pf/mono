@@ -1,0 +1,48 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-icon-settings.test.mts apps/event-schedule-app-shared/src/v7/types/record/answer-icon-settings.test.mts
+index 7facb78cb..f700a6d1c 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-icon-settings.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/answer-icon-settings.test.mts
+@@ -1,4 +1,5 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { type ReadonlyRecord } from 'ts-type-forge';
+ import { type AnswerIconId } from '../enum/index.mjs';
+ import {
+   answerIconSettingsDefaultValue,
+@@ -9,26 +10,31 @@ import {
+ import { type AnswerIconSetting } from './base/index.mjs';
+ 
+ describe('AnswerIconSettings', () => {
+-  expectType<AnswerIconSettings, Record<AnswerIconId, AnswerIconSetting>>('=');
++  expectType<
++    AnswerIconSettings,
++    ReadonlyRecord<AnswerIconId, AnswerIconSetting>
++  >('=');
+ 
+   test('defaultValue', () => {
+     const defaultValue: AnswerIconSettings = {
+       good: { description: '', point: 10 },
+       fair: { description: '', point: 6 },
+       poor: { description: '', point: 0 },
+-    };
+-    expect(answerIconSettingsDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(answerIconSettingsDefaultValue, defaultValue);
+   });
+ 
+   describe('isAnswerIconSettings', () => {
+     test('defaultValue should be true', () => {
+-      expect(isAnswerIconSettings(answerIconSettingsDefaultValue)).toBe(true);
++      assert.isTrue(isAnswerIconSettings(answerIconSettingsDefaultValue));
+     });
+   });
+ 
+   describe('fillAnswerIconSettings', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillAnswerIconSettings({})).toStrictEqual(
++      assert.deepStrictEqual(
++        fillAnswerIconSettings({}),
+         answerIconSettingsDefaultValue,
+       );
+     });

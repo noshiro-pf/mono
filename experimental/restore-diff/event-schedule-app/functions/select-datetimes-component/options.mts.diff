@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/options.ts apps/event-schedule-app/src/functions/select-datetimes-component/options.mts
+index e5b1ab953..173f75a10 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/options.ts
++++ apps/event-schedule-app/src/functions/select-datetimes-component/options.mts
+@@ -1,4 +1,4 @@
+-import { datetimeSpecificationOptions } from '@noshiro/event-schedule-app-shared';
++import { datetimeSpecificationOptions } from 'event-schedule-app-shared';
+ 
+ const dc = dict.eventSettingsPage.section2;
+ 

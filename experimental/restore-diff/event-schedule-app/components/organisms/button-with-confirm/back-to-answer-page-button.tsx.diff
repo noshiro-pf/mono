@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/back-to-answer-page-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/back-to-answer-page-button.tsx
+index b2752b96e..ba61a3ed8 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/back-to-answer-page-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/back-to-answer-page-button.tsx
+@@ -1,5 +1,6 @@
+ import { Button } from '@blueprintjs/core';
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { memoNamed } from 'react-utils';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.eventSettingsPage.backToAnswerPageButton;
+ 
+@@ -9,9 +10,7 @@ type Props = Readonly<{
+   disabled?: boolean;
+ }>;
+ 
+-const buttonConfig = {
+-  name: dc.name,
+-} as const;
++const buttonConfig = { name: dc.name } as const;
+ 
+ const dialogConfig = {
+   intent: 'danger',
+@@ -21,10 +20,7 @@ const dialogConfig = {
+   confirmButtonText: dc.name,
+ } as const;
+ 
+-const toastConfig = {
+-  message: dc.resetResultMessage,
+-  intent: 'none',
+-} as const;
++const toastConfig = { message: dc.resetResultMessage, intent: 'none' } as const;
+ 
+ export const BackToAnswerPageButton = memoNamed<Props>(
+   'BackToAnswerPageButton',

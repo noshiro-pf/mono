@@ -1,0 +1,54 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/toaster.tsx apps/event-schedule-app/src/functions/toaster.tsx
+index 19197220d..ca6a921c1 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/toaster.tsx
++++ apps/event-schedule-app/src/functions/toaster.tsx
+@@ -1,14 +1,20 @@
+ import { OverlayToaster, type OverlayToasterProps } from '@blueprintjs/core';
+ import { createRoot } from 'react-dom/client';
++import { match } from '../utils-ported/index.mjs';
+ 
+ // export const createToaster = (): IToaster =>
+ //   Toaster.create({ canEscapeKeyClear: true, position: 'top' });
+ 
+ const callback =
+   (
++    // Both signatures are dictated from outside: `resolve` is the one the
++    // `Promise` constructor hands over, and the callback below is what
++    // `OverlayToaster.create`'s ref parameter is called with.
++    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+     resolve: (value: OverlayToaster | PromiseLike<OverlayToaster>) => void,
+     reject: (reason?: unknown) => void,
+   ) =>
++  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   (instance: OverlayToaster | null) => {
+     if (instance === null) {
+       reject(new Error('[Blueprint] Unable to create toaster.'));
+@@ -18,7 +24,9 @@ const callback =
+   };
+ 
+ export const createToaster = (
+-  props?: DeepReadonly<OverlayToasterProps>,
++  // `Readonly`, not `DeepReadonly`: these props carry `ReactNode`, and a
++  // deeply-readonly `ReactNode` is no longer a `ReactNode`.
++  props?: Readonly<OverlayToasterProps>,
+   container = document.body,
+ ): Promise<OverlayToaster> => {
+   const containerElement = document.createElement('div');
+@@ -30,7 +38,7 @@ export const createToaster = (
+   return new Promise<OverlayToaster>((resolve, reject) => {
+     root.render(
+       <OverlayToaster
+-        canEscapeKeyClear={true}
++        canEscapeKeyClear
+         position={'top'}
+         usePortal={false}
+         // eslint-disable-next-line react/jsx-props-no-spreading
+@@ -47,7 +55,7 @@ export const showToast = ({
+   message,
+   intent,
+   icon,
+-}: DeepReadonly<{
++}: Readonly<{
+   isCloseButtonShown?: boolean;
+   toast: Promise<Toaster>;
+   message: React.ReactNode;

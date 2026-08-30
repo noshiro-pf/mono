@@ -1,0 +1,43 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-debounce.mts apps/react-utils/src/hooks/use-debounce.mts
+index 989237932..4e37c029f 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-debounce.mts
++++ apps/react-utils/src/hooks/use-debounce.mts
+@@ -1,27 +1,33 @@
+ import { useState } from 'better-react-use-state';
+-import { useCallback, useEffect, useRef } from 'react';
++import * as React from 'react';
++
++/** What `setTimeout` returns and `clearTimeout` takes; a global in the old
++ * `@noshiro/ts-type-utils`, and right under both Node and the browser here. */
++type TimerId = Parameters<typeof clearTimeout>[0];
+ 
+ export const useDebounce = <ResultValue,>(
+   fn: () => ResultValue,
+   deps: readonly unknown[],
+   bufferMilliSec: number = 300,
+ ): ResultValue => {
+-  const timerId = useRef<TimerId | undefined>(undefined);
++  const timerId = React.useRef<TimerId | undefined>(undefined);
+ 
+-  const [value, setValue] = useState<ResultValue>(fn());
++  const [value, setValue] = useState(fn());
+ 
+-  const clearTimer = useCallback(() => {
++  const clearTimer = React.useCallback(() => {
+     if (timerId.current !== undefined) {
+       clearTimeout(timerId.current);
+     }
+   }, []);
+ 
+-  useEffect(
++  React.useEffect(
+     () => {
+       clearTimer();
++
+       timerId.current = setTimeout(() => {
+         setValue(fn());
+       }, bufferMilliSec);
++
+       return clearTimer;
+     },
+     deps, // eslint-disable-line react-hooks/exhaustive-deps

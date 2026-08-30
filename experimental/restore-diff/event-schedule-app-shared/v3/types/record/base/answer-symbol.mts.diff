@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/base/answer-symbol.mts apps/event-schedule-app-shared/src/v3/types/record/base/answer-symbol.mts
+index f19e6c74f..a88c21487 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/base/answer-symbol.mts
++++ apps/event-schedule-app-shared/src/v3/types/record/base/answer-symbol.mts
+@@ -13,7 +13,9 @@ export const defaultSymbolSetting = {
+ } as const satisfies SymbolSetting;
+ 
+ const d = defaultSymbolSetting;
+-export const fillSymbolSetting = (a: PartialSymbolSetting): SymbolSetting => ({
+-  description: a.description ?? d.description,
+-  point: a.point ?? d.point,
+-});
++
++export const fillSymbolSetting = (a: PartialSymbolSetting): SymbolSetting =>
++  ({
++    description: a.description ?? d.description,
++    point: a.point ?? d.point,
++  }) as const;

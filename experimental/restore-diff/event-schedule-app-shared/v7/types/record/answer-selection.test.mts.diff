@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-selection.test.mts apps/event-schedule-app-shared/src/v7/types/record/answer-selection.test.mts
+index 0865a9360..463b1ac41 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-selection.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/answer-selection.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import {
+   type AnswerIconIdWithNone,
+   type AnswerIconPoint,
+@@ -31,19 +31,21 @@ describe('AnswerSelection', () => {
+       iconId: 'none',
+       point: 0,
+       comment: '',
+-    };
+-    expect(answerSelectionDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(answerSelectionDefaultValue, defaultValue);
+   });
+ 
+   describe('isAnswerSelection', () => {
+     test('defaultValue should be true', () => {
+-      expect(isAnswerSelection(answerSelectionDefaultValue)).toBe(true);
++      assert.isTrue(isAnswerSelection(answerSelectionDefaultValue));
+     });
+   });
+ 
+   describe('fillAnswerSelection', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillAnswerSelection({})).toStrictEqual(
++      assert.deepStrictEqual(
++        fillAnswerSelection({}),
+         answerSelectionDefaultValue,
+       );
+     });

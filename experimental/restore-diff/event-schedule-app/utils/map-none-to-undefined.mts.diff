@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/map-none-to-undefined.ts apps/event-schedule-app/src/utils/map-none-to-undefined.mts
+index 9c8f27ece..cb389f1ba 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/map-none-to-undefined.ts
++++ apps/event-schedule-app/src/utils/map-none-to-undefined.mts
+@@ -1,2 +1,2 @@
+-export const mapNoneToUndefined = <T>(value: T | 'none'): T | undefined =>
++export const mapNoneToUndefined = <T,>(value: T | 'none'): T | undefined =>
+   value === 'none' ? undefined : value;

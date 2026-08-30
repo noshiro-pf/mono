@@ -1,0 +1,20 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/delete-answer.ts apps/event-schedule-app/src/api/crud/delete-answer.mts
+index 2ce431bda..25a56cae3 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/delete-answer.ts
++++ apps/event-schedule-app/src/api/crud/delete-answer.mts
+@@ -1,6 +1,7 @@
+-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
++import { firestorePaths } from 'event-schedule-app-shared';
+ import { deleteDoc, doc } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ export const deleteAnswer = (
+   eventId: string,
+@@ -8,4 +9,4 @@ export const deleteAnswer = (
+ ): Promise<Result<void, string>> =>
+   Result.fromPromise(
+     deleteDoc(doc(firestoreEvents, eventId, firestorePaths.answers, answerId)),
+-  ).then((a) => Result.fold(a, () => undefined, Str.from));
++  ).then(Result.fold(() => undefined, unknownToString));

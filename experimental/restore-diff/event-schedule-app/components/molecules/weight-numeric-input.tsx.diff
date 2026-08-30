@@ -1,0 +1,51 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/weight-numeric-input.tsx apps/event-schedule-app/src/components/molecules/weight-numeric-input.tsx
+index 028e06541..7616c7cc6 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/weight-numeric-input.tsx
++++ apps/event-schedule-app/src/components/molecules/weight-numeric-input.tsx
+@@ -1,9 +1,12 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
+ import {
+   clampAndRoundAnswerWeight,
+   weightNumericInputConfig,
+-} from '../../constants';
++} from '../../constants/index.mjs';
+ 
+ type Props = Readonly<{
+   weight: Weight;
+@@ -30,13 +33,16 @@ export const WeightNumericInput = memoNamed<Props>(
+     } = useNumericInputWithStepState<Weight>({
+       onValueChange,
+       normalize: clampAndRoundAnswerWeight,
+-      decode: (s) => clampAndRoundAnswerWeight(Number(s)),
++      decode: (s) =>
++        clampAndRoundAnswerWeight(
++          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
++        ),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
++    const inputProps = React.useMemo(
+       () => ({ min, max, step, onKeyDown }),
+       [onKeyDown],
+     );
+@@ -44,9 +50,9 @@ export const WeightNumericInput = memoNamed<Props>(
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

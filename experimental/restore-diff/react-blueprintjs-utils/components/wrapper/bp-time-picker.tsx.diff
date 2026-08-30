@@ -1,0 +1,40 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-time-picker.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-time-picker.tsx
+index c9d8e636e..a09f5fdfc 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-time-picker.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-time-picker.tsx
+@@ -1,8 +1,8 @@
+ import { TimePicker } from '@blueprintjs/datetime';
+-import { type HoursMinutes } from '@noshiro/io-ts-types';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { DateUtils, pipe } from '@noshiro/ts-utils';
+-import { useCallback, useMemo } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { pipe } from 'ts-data-forge';
++import { DateUtils, type HoursMinutes } from 'ts-fortress-types';
+ 
+ export type BpTimePickerProps = Readonly<{
+   time: HoursMinutes;
+@@ -15,8 +15,8 @@ type TimePickerPropsOriginal = React.ComponentProps<typeof TimePicker>;
+ export const BpTimePicker = memoNamed<BpTimePickerProps>(
+   'BpTimePicker',
+   ({ time, onTimeChange, ...props }) => {
+-    const onChangeHandler = useCallback(
+-      (date: RawDateType) => {
++    const onChangeHandler = React.useCallback(
++      (date: Date) => {
+         onTimeChange({
+           hours: DateUtils.getLocaleHours(date),
+           minutes: DateUtils.getLocaleMinutes(date),
+@@ -25,9 +25,9 @@ export const BpTimePicker = memoNamed<BpTimePickerProps>(
+       [onTimeChange],
+     );
+ 
+-    const dateObj = useMemo<RawDateType>(
++    const dateObj = React.useMemo<Date>(
+       () =>
+-        pipe(DateUtils.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).chain(
++        pipe(DateUtils.from(`1970/1/1 ${time.hours}:${time.minutes}:11`)).map(
+           DateUtils.toDate,
+         ).value,
+       [time],

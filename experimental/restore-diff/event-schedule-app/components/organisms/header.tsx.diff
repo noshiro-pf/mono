@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/header.tsx apps/event-schedule-app/src/components/organisms/header.tsx
+index af5a614f0..6d4b9e367 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/header.tsx
++++ apps/event-schedule-app/src/components/organisms/header.tsx
+@@ -1,9 +1,10 @@
+ import { Icon } from '@blueprintjs/core';
+-import { NavBar } from './navbar';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { memoNamed } from 'react-utils';
++import { NavBar } from './navbar.js';
+ 
+-type Props = Readonly<{
+-  title: string;
+-}>;
++type Props = Readonly<{ title: string }>;
+ 
+ export const Header = memoNamed<Props>('Header', ({ title }) => (
+   <div>

@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/media.ts apps/event-schedule-app/src/store/media.mts
+index d408442f0..7b3a28f2c 100644
+--- experimental/packages/apps/event-schedule-app/src/store/media.ts
++++ apps/event-schedule-app/src/store/media.mts
+@@ -1,7 +1,8 @@
+-const mql = globalThis.matchMedia('(max-width: 600px)');
++import { createBooleanState } from 'synstate-react-hooks';
+ 
+-const { useCurrentValue: useIsMobile, setState: setIsMobile } =
+-  createBooleanState(false);
++const mql = matchMedia('(max-width: 600px)');
++
++const [useIsMobile, { setState: setIsMobile }] = createBooleanState(false);
+ 
+ mql.addEventListener('change', (a) => {
+   setIsMobile(a.matches);

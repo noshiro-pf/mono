@@ -1,0 +1,21 @@
+diff --git experimental/packages/utils/react-utils/src/memo-named.mts apps/react-utils/src/memo-named.mts
+index 5dee54605..f409cdbec 100644
+--- experimental/packages/utils/react-utils/src/memo-named.mts
++++ apps/react-utils/src/memo-named.mts
+@@ -1,12 +1,13 @@
+-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+-import { memo } from 'react';
++import * as React from 'react';
+ 
+ export const memoNamed = <Props,>(
+   displayName: string,
+ 
+   fc: React.FC<Readonly<Props>>,
+ ): React.NamedExoticComponent<Readonly<Props>> => {
+-  const mut_memoizedComponent = memo(fc);
++  const mut_memoizedComponent = React.memo<Readonly<Props>>(fc);
++
+   mut_memoizedComponent.displayName = displayName;
++
+   return mut_memoizedComponent;
+ };

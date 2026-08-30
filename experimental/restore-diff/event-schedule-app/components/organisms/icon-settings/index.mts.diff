@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/index.ts apps/event-schedule-app/src/components/organisms/icon-settings/index.mts
+index 02bd15328..fd0c3798d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/index.ts
++++ apps/event-schedule-app/src/components/organisms/icon-settings/index.mts
+@@ -1,2 +1,2 @@
+-export * from './icon-setting-row';
+-export * from './icon-settings';
++export * from './icon-setting-row.js';
++export * from './icon-settings.js';

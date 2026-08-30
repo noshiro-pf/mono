@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/update-event-schedule.ts apps/event-schedule-app/src/api/crud/update-event-schedule.mts
+index 7219a2fdc..277ca153a 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/update-event-schedule.ts
++++ apps/event-schedule-app/src/api/crud/update-event-schedule.mts
+@@ -1,10 +1,11 @@
+ import { doc, setDoc } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ export const updateEventSchedule = (
+   eventId: string,
+   ev: EventSchedule,
+ ): Promise<Result<void, string>> =>
+-  Result.fromPromise(setDoc(doc(firestoreEvents, eventId), ev)).then((a) =>
+-    Result.fold(a, () => undefined, Str.from),
++  Result.fromPromise(setDoc(doc(firestoreEvents, eventId), ev)).then(
++    Result.fold(() => undefined, unknownToString),
+   );

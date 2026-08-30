@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/index.ts apps/event-schedule-app/src/components/index.mts
+index ebbd904bd..6e5f3fad6 100644
+--- experimental/packages/apps/event-schedule-app/src/components/index.ts
++++ apps/event-schedule-app/src/components/index.mts
+@@ -1,6 +1,6 @@
+-export * from './atoms';
+-export * from './molecules';
+-export * from './multiple-date-picker';
+-export * from './organisms';
+-export * from './pages';
+-export * from './styled';
++export * from './atoms/index.mjs';
++export * from './molecules/index.mjs';
++export * from './multiple-date-picker/index.mjs';
++export * from './organisms/index.mjs';
++export * from './pages/index.mjs';
++export * from './styled/index.mjs';

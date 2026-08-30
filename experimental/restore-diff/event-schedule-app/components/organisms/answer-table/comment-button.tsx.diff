@@ -1,0 +1,71 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/comment-button.tsx apps/event-schedule-app/src/components/organisms/answer-table/comment-button.tsx
+index bb7da57ac..f82c6fc37 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/comment-button.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-table/comment-button.tsx
+@@ -1,10 +1,11 @@
+-import { Button, Icon, Popover } from '@blueprintjs/core';
+-import { ButtonsWrapperAlignEnd } from '../../styled';
++import { Button, Icon, PopoverNext } from '@blueprintjs/core';
++import { css } from '@emotion/react';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
+ 
+-type Props = Readonly<{
+-  comment: string;
+-  useSmallButton?: boolean;
+-}>;
++type Props = Readonly<{ comment: string; useSmallButton?: boolean }>;
+ 
+ export const CommentButton = memoNamed<Props>(
+   'CommentButton',
+@@ -12,7 +13,7 @@ export const CommentButton = memoNamed<Props>(
+     const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+       useBoolState(false);
+ 
+-    const popoverContent = useMemo(
++    const popoverContent = React.useMemo(
+       () => (
+         <div
+           css={css`
+@@ -42,11 +43,11 @@ export const CommentButton = memoNamed<Props>(
+     );
+ 
+     return (
+-      <Popover
+-        canEscapeKeyClose={true}
++      <PopoverNext
++        arrow={false}
++        canEscapeKeyClose
+         content={popoverContent}
+         isOpen={isOpen}
+-        minimal={true}
+         placement={'top'}
+         onClose={handleClose}
+       >
+@@ -57,19 +58,19 @@ export const CommentButton = memoNamed<Props>(
+               min-width: 16px !important;
+             `}
+             icon={icon}
+-            minimal={true}
+-            small={true}
++            size={'small'}
++            variant={'minimal'}
+             onClick={handleOpen}
+           />
+         ) : (
+           <Button
+             icon={'comment'}
+-            minimal={true}
+-            small={true}
++            size={'small'}
++            variant={'minimal'}
+             onClick={handleOpen}
+           />
+         )}
+-      </Popover>
++      </PopoverNext>
+     );
+   },
+ );

@@ -1,0 +1,10 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/day-type.mts apps/ts-fortress-types/src/date-time/day-type.mts
+index 12aa2c56d..ac3578c60 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/day-type.mts
++++ apps/ts-fortress-types/src/date-time/day-type.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ export const DayType = t.enumType(['holiday', 'normal', 'Saturday', 'Sunday'], {
+   defaultValue: 'normal',

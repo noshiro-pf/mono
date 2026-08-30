@@ -1,0 +1,83 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/answer-table.tsx apps/event-schedule-app/src/components/organisms/answer-table/answer-table.tsx
+index edd2f5480..d6ce17282 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/answer-table.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-table/answer-table.tsx
+@@ -1,15 +1,21 @@
+ import { Button } from '@blueprintjs/core';
+-import { HTMLTableBorderedStyled2 } from '@noshiro/react-blueprintjs-utils';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { HTMLTableBorderedStyled2 } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { type IMapMapped, Num } from 'ts-data-forge';
++import { type StrictPick } from 'ts-type-forge';
+ import {
+   AnswerFilterAndSortStore,
+   AnswerPageStore,
+   AnswerTableStore,
+-} from '../../../store';
+-import { CustomIcon, RequiredParticipantIcon } from '../../atoms';
+-import { CommentButton } from './comment-button';
+-import { DatetimeRangeCell } from './datetime-range-cell';
+-import { FilterByIconPopover } from './filter-by-icon-popover';
+-import { SortButton } from './sort-button';
++} from '../../../store/index.mjs';
++import { CustomIcon, RequiredParticipantIcon } from '../../atoms/index.mjs';
++import { CommentButton } from './comment-button.js';
++import { DatetimeRangeCell } from './datetime-range-cell.js';
++import { FilterByIconPopover } from './filter-by-icon-popover/index.mjs';
++import { SortButton } from './sort-button.js';
+ 
+ const dc = dict.answerPage.answers;
+ 
+@@ -28,8 +34,8 @@ export const AnswerTable = memoNamed<Props>(
+     editAnswerButtonIsDisabled,
+     holidaysJpDefinition,
+   }) => {
+-    const answersWithHandler = useMemo<
+-      readonly (Pick<
++    const answersWithHandler = React.useMemo<
++      readonly (StrictPick<
+         Answer,
+         'comment' | 'id' | 'isRequiredParticipants' | 'user' | 'weight'
+       > &
+@@ -120,8 +126,8 @@ export const AnswerTable = memoNamed<Props>(
+                   answer.user.name
+                 ) : (
+                   <BpButtonOverflowHidden
+-                    minimal={true}
+                     title={answer.user.name}
++                    variant={'minimal'}
+                     onClick={answer.onClick}
+                   >
+                     {answer.user.name}
+@@ -156,7 +162,7 @@ export const AnswerTable = memoNamed<Props>(
+                   />
+                 </td>
+                 <td>
+-                  <span>{Num.roundBy(2, score)}</span>
++                  <span>{Num.roundAt(score, 2)}</span>
+                 </td>
+                 {answerIconIsHidden ? undefined : (
+                   <>
+@@ -200,10 +206,7 @@ export const AnswerTable = memoNamed<Props>(
+                           </IconAndString>
+                           {comment === '' || tableMinimized ? undefined : (
+                             <CellCommentWrapper>
+-                              <CommentButton
+-                                comment={comment}
+-                                useSmallButton={true}
+-                              />
++                              <CommentButton comment={comment} useSmallButton />
+                             </CellCommentWrapper>
+                           )}
+                         </AnswerIconCell>
+@@ -253,6 +256,7 @@ export const AnswerTable = memoNamed<Props>(
+ );
+ 
+ const userNameWrapperWidth = 80;
++
+ const userNameWrapperThinWidth = 60;
+ 
+ const answerCellStyle = {

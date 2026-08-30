@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/day-type.mts apps/event-schedule-app-shared/src/v7/types/enum/day-type.mts
+index 40d27851b..6c55be09c 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/day-type.mts
++++ apps/event-schedule-app-shared/src/v7/types/enum/day-type.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ const dayTypeDef = t.enumType(['holiday', 'normal', 'Saturday', 'Sunday'], {
+   defaultValue: 'normal',

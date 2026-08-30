@@ -1,0 +1,31 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/time-enum.mts apps/event-schedule-app-shared/src/v7/types/enum/time-enum.mts
+index 04e97faa1..b1d931922 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/time-enum.mts
++++ apps/event-schedule-app-shared/src/v7/types/enum/time-enum.mts
+@@ -1,9 +1,9 @@
+-import * as t from '@noshiro/io-ts';
+-import { toSafeUint } from '@noshiro/ts-utils';
++import { asSafeUint } from 'ts-data-forge';
++import * as t from 'ts-fortress';
+ 
+ export const yearsTypeDef = t.safeUint(
+-  toSafeUint(1900),
+-  // pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value
++  asSafeUint(1900),
++  // pipe(DateUtils.today()).map(DateUtils.getLocaleYear).value
+ );
+ 
+ export const toYears = yearsTypeDef.fill;
+@@ -13,10 +13,10 @@ export const monthsTypeDef = t.uintRange({
+   end: 13,
+   defaultValue: 1,
+ });
+-// pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value
++// pipe(DateUtils.today()).map(DateUtils.getLocaleMonth).value
+ 
+ export const datesTypeDef = t.uintRange({ start: 1, end: 32, defaultValue: 1 });
+-// pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value
++// pipe(DateUtils.today()).map(DateUtils.getLocaleDate).value
+ 
+ export const hoursTypeDef = t.uintRange({ start: 0, end: 24, defaultValue: 0 });
+ 

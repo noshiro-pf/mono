@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/has-macro.mts apps/lambda-calculus-interpreter-core/src/functions/print/has-macro.mts
+index 257c8df75..02499fc65 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/has-macro.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/print/has-macro.mts
+@@ -5,7 +5,10 @@ import { isNumber, PLUS, SUCC } from '../parser/index.mjs';
+ export const hasMacro = (term: LambdaTerm): boolean => {
+   // ToDo
+   if (isAlphaEqual(term, PLUS)) return true;
++
+   if (isAlphaEqual(term, SUCC)) return true;
++
+   if (isNumber(term)) return true;
++
+   return false;
+ };

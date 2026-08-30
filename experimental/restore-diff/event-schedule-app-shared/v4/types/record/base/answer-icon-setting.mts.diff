@@ -1,0 +1,20 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v4/types/record/base/answer-icon-setting.mts apps/event-schedule-app-shared/src/v4/types/record/base/answer-icon-setting.mts
+index 3f03725d7..f5cad8bed 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v4/types/record/base/answer-icon-setting.mts
++++ apps/event-schedule-app-shared/src/v4/types/record/base/answer-icon-setting.mts
+@@ -13,9 +13,11 @@ export const defaultAnswerIconSetting = {
+ } as const satisfies AnswerIconSetting;
+ 
+ const d = defaultAnswerIconSetting;
++
+ export const fillAnswerIconSetting = (
+   a: PartialAnswerIconSetting,
+-): AnswerIconSetting => ({
+-  description: a.description ?? d.description,
+-  point: a.point ?? d.point,
+-});
++): AnswerIconSetting =>
++  ({
++    description: a.description ?? d.description,
++    point: a.point ?? d.point,
++  }) as const;

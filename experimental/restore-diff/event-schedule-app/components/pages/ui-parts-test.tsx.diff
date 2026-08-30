@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/ui-parts-test.tsx apps/event-schedule-app/src/components/pages/ui-parts-test.tsx
+index f8672c7d9..c1232e932 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/ui-parts-test.tsx
++++ apps/event-schedule-app/src/components/pages/ui-parts-test.tsx
+@@ -1,11 +1,16 @@
+ import { Button, TextArea } from '@blueprintjs/core';
++import styled from '@emotion/styled';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
+ import {
+   BpInput,
+   BpSelect,
+   BpSwitch,
+   BpTimePicker,
+-} from '@noshiro/react-blueprintjs-utils';
+-import { clog } from '../../utils';
++} from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { noop } from '../../utils-ported/index.mjs';
++import { clog } from '../../utils/index.mjs';
+ import {
+   CalendarIcon,
+   CircleIcon,
+@@ -14,18 +19,18 @@ import {
+   DeleteIcon,
+   EditIcon,
+   TriangleIcon,
+-} from '../atoms';
++} from '../atoms/index.mjs';
+ 
+-const size: React.CSSProperties = { width: '32px', height: '32px' };
++const size: React.CSSProperties = { width: '32px', height: '32px' } as const;
+ 
+ const options: Readonly<HTMLSelectProps['options']> = [
+   { value: '', label: 'select...' },
+   { value: 0, label: 'aaa' },
+   { value: 1, label: 'bbb' },
+-];
++] as const;
+ 
+ export const UiPartsTest = memoNamed('UiPartsTest', () => {
+-  const [inputValue, setInputValue] = useState<string>('');
++  const [inputValue, setInputValue] = React.useState<string>('');
+ 
+   const [bpSwitchState, { toggleState: onBpSwitchChangeHandler }] =
+     useBoolState(false);
+@@ -72,10 +77,10 @@ export const UiPartsTest = memoNamed('UiPartsTest', () => {
+         />
+       </PadWrapper>
+       <PadWrapper>
+-        <TextArea fill={true} value={'value'} />
++        <TextArea fill value={'value'} />
+       </PadWrapper>
+       <PadWrapper>
+-        <Button icon={'refresh'} rightIcon={'duplicate'}>
++        <Button endIcon={'duplicate'} icon={'refresh'}>
+           {'default'}
+         </Button>
+       </PadWrapper>

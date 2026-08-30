@@ -1,0 +1,223 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/create-event-schedule-page/edit-event-schedule.ts apps/event-schedule-app/src/store/create-event-schedule-page/edit-event-schedule.mts
+index 1dc9a5f72..f9107b3a1 100644
+--- experimental/packages/apps/event-schedule-app/src/store/create-event-schedule-page/edit-event-schedule.ts
++++ apps/event-schedule-app/src/store/create-event-schedule-page/edit-event-schedule.mts
+@@ -1,39 +1,50 @@
+-import { deepEqual } from '@noshiro/fast-deep-equal';
+-import { api } from '../../api';
+-import { eventScheduleInitialValue, Routes } from '../../constants';
++import {
++  combine,
++  createState as createStateBase,
++  map,
++  type InitializedObservable,
++} from 'synstate';
++import { createBooleanState, createState } from 'synstate-react-hooks';
++import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { eventScheduleInitialValue, Routes } from '../../constants/index.mjs';
+ import {
+   collectEventSettingsPageDiff,
+   createToaster,
+   showToast,
+   type EventSettingsPageDiffResult,
+-} from '../../functions';
+-import { AnswersStore, EventScheduleStore } from '../fetching-state';
+-import { Router } from '../router';
+-import { createEventScheduleSettingStore } from './event-schedule-setting-common';
++} from '../../functions/index.mjs';
++import { noop } from '../../utils-ported/index.mjs';
++import { AnswersStore, EventScheduleStore } from '../fetching-state/index.mjs';
++import { Router } from '../router.mjs';
++import { createEventScheduleSettingStore } from './event-schedule-setting-common.mjs';
+ 
+ const toast = createToaster();
+ 
+ const { commonState$, commonStateHandlers } = createEventScheduleSettingStore();
+ 
+-const {
+-  state: eventScheduleFromDatabase$,
+-  setState: setEventScheduleFromDatabase,
+-} = createState<EventSchedule | undefined>(undefined);
++const [eventScheduleFromDatabase$, setEventScheduleFromDatabase] =
++  createStateBase<EventSchedule | undefined>(undefined);
+ 
+-const {
+-  useCurrentValue: useEmailVerified,
+-  state: emailVerified$,
+-  setState: setEmailVerified,
+-  resetState: resetEmailVerified,
+-} = createState<string | undefined>(undefined);
++const [
++  useEmailVerified,
++  setEmailVerified,
++  { state: emailVerified$, resetState: resetEmailVerified },
++] = createState<string | undefined>(undefined);
+ 
+ const resetAllState = (): void => {
+   commonStateHandlers.resetTitle();
++
+   commonStateHandlers.resetNotes();
++
+   commonStateHandlers.resetDatetimeSpecification();
++
+   commonStateHandlers.resetDatetimeRangeList();
++
+   commonStateHandlers.resetAnswerDeadlineSection();
++
+   commonStateHandlers.resetNotificationSettingsSection();
++
+   commonStateHandlers.resetAnswerIcons();
+ };
+ 
+@@ -44,15 +55,20 @@ const setEventSchedule = (
+   setEventScheduleFromDatabase(ev);
+ 
+   commonStateHandlers.setTitle(ev.title);
++
+   commonStateHandlers.setNotes(ev.notes);
++
+   commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
++
+   commonStateHandlers.setDatetimeRangeList(ev.datetimeRangeList);
++
+   commonStateHandlers.setAnswerIcons(ev.answerIcons);
+ 
+   if (ev.answerDeadline === 'none') {
+     commonStateHandlers.turnOffAnswerDeadlineSection();
+   } else {
+     commonStateHandlers.turnOnAnswerDeadlineSection();
++
+     commonStateHandlers.setAnswerDeadline(ev.answerDeadline);
+   }
+ 
+@@ -60,6 +76,7 @@ const setEventSchedule = (
+     commonStateHandlers.turnOffNotificationSection();
+   } else {
+     commonStateHandlers.turnOnNotificationSection();
++
+     commonStateHandlers.setNotificationSettingsWithEmail(
+       Obj.merge(ev.notificationSettings, { email: emailVerified ?? '' }),
+     );
+@@ -70,7 +87,7 @@ const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
+   emailVerified$,
+   eventScheduleFromDatabase$,
+   commonState$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       emailVerified,
+@@ -86,7 +103,7 @@ const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
+   ),
+ );
+ 
+-const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.chain(
++const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.pipe(
+   map(
+     (diff) =>
+       diff.datetimeRangeList?.deleted !== undefined &&
+@@ -98,7 +115,7 @@ const hasNoChanges$: InitializedObservable<boolean> = combine([
+   emailVerified$,
+   eventScheduleFromDatabase$,
+   commonState$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       emailVerified,
+@@ -106,21 +123,23 @@ const hasNoChanges$: InitializedObservable<boolean> = combine([
+       { eventScheduleNormalized, notificationSettingsWithEmail },
+     ]) =>
+       emailVerified === notificationSettingsWithEmail?.email &&
+-      deepEqual(eventScheduleFromDatabase, eventScheduleNormalized),
++      fastDeepEqual(eventScheduleFromDatabase, eventScheduleNormalized),
+   ),
+ );
+ 
+-const answerPagePath$ = Router.eventId$.chain(
++const answerPagePath$ = Router.eventId$.pipe(
+   map((eventId) => Routes.routes.answerPage(eventId ?? '')),
+ );
+ 
+ const onBackToAnswerPage = (): void => {
+   const answerPagePath = answerPagePath$.getSnapshot().value;
++
+   Router.push(answerPagePath);
+ };
+ 
+ const saveToDatabase = async (): Promise<void> => {
+   const commonState = commonState$.getSnapshot().value;
++
+   const eventId = Router.eventId$.getSnapshot().value;
+ 
+   const {
+@@ -129,10 +148,10 @@ const saveToDatabase = async (): Promise<void> => {
+     notificationSettingsWithEmail,
+   } = commonState;
+ 
+-  const email = notificationSettingsWithEmail?.email ?? '';
+-
+   if (!eventScheduleValidationOk || eventId === undefined) return;
+ 
++  const email = notificationSettingsWithEmail?.email ?? '';
++
+   setIsLoadingTrue();
+ 
+   const res = await api.event.update(eventId, eventScheduleNormalized);
+@@ -144,21 +163,25 @@ const saveToDatabase = async (): Promise<void> => {
+ 
+   if (Result.isErr(res)) {
+     console.error('Error occurred on updating event schedule: ', res.value);
++
+     showToast({
+       toast,
+       message: dict.eventSettingsPage.editEventResultMessage.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+   if (res2 !== undefined && Result.isErr(res2)) {
+     console.error('Error occurred on updating email: ', res2.value);
++
+     showToast({
+       toast,
+       message: dict.eventSettingsPage.editEventResultMessage.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+@@ -167,21 +190,24 @@ const saveToDatabase = async (): Promise<void> => {
+     message: dict.eventSettingsPage.editEventResultMessage.success,
+     intent: 'success',
+   });
++
+   AnswersStore.fetchAnswers();
++
+   EventScheduleStore.fetchEventSchedule();
++
+   onBackToAnswerPage();
+ };
+ 
+ const onEditEventClickPromise = saveToDatabase;
++
+ const onEditEventClick = (): void => {
+   saveToDatabase().catch(noop);
+ };
+ 
+-const {
+-  useCurrentValue: useIsLoading,
+-  setTrue: setIsLoadingTrue,
+-  setFalse: setIsLoadingFalse,
+-} = createBooleanState(false);
++const [
++  useIsLoading,
++  { setTrue: setIsLoadingTrue, setFalse: setIsLoadingFalse },
++] = createBooleanState(false);
+ 
+ export const EditEventScheduleStore = {
+   commonState$,

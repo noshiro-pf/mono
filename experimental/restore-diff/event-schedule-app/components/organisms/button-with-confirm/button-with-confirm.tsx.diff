@@ -1,0 +1,62 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/button-with-confirm.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/button-with-confirm.tsx
+index 6b34d906f..bad9d44e5 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/button-with-confirm.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/button-with-confirm.tsx
+@@ -1,6 +1,10 @@
+-import { ButtonNowrapStyled } from '@noshiro/react-blueprintjs-utils';
+-import { createToaster, showToast } from '../../../functions';
+-import { ConfirmDialog } from './confirm-dialog';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
++import { memoNamed, useAlive } from 'react-utils';
++import { type DeepReadonly } from 'ts-type-forge';
++import { createToaster, showToast } from '../../../functions/index.mjs';
++import { ConfirmDialog } from './confirm-dialog.js';
+ 
+ type Props = DeepReadonly<{
+   onConfirmClick: (() => Promise<void>) | (() => void);
+@@ -45,8 +49,10 @@ export const ButtonWithConfirm = memoNamed<Props>(
+     ] = useBoolState(false);
+ 
+     const alive = useAlive();
+-    const onConfirm = useCallback(() => {
++
++    const onConfirm = React.useCallback(() => {
+       if (!alive.current) return;
++
+       const afterConfirm = (): void => {
+         if (toastConfig !== undefined) {
+           showToast({
+@@ -55,15 +61,20 @@ export const ButtonWithConfirm = memoNamed<Props>(
+             intent: toastConfig.intent,
+           });
+         }
++
+         handleClose();
+       };
+ 
+       const p = onConfirmClick();
+-      if (p instanceof Promise) {
++
++      if (p !== undefined) {
+         setTrueLoadingLocal();
++
+         p.then(() => {
+           if (!alive.current) return;
++
+           afterConfirm();
++
+           setFalseLoadingLocal();
+         }).catch(console.error);
+       } else {
+@@ -87,8 +98,8 @@ export const ButtonWithConfirm = memoNamed<Props>(
+           icon={buttonConfig.icon}
+           intent={buttonConfig.intent ?? 'none'}
+           loading={loading ?? loadingLocal}
+-          minimal={buttonConfig.minimal}
+           text={buttonConfig.name}
++          variant={buttonConfig.minimal === true ? 'minimal' : 'solid'}
+           onClick={handleOpen}
+         />
+         <ConfirmDialog

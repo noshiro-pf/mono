@@ -1,0 +1,97 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/router.ts apps/event-schedule-app/src/store/router.mts
+index c6bcb81a4..3ea2b876e 100644
+--- experimental/packages/apps/event-schedule-app/src/store/router.ts
++++ apps/event-schedule-app/src/store/router.mts
+@@ -1,11 +1,21 @@
+-import { Routes } from '../constants';
++import {
++  type InitializedObservable,
++  filter,
++  map,
++  pluck,
++  skipIfNoChange,
++} from 'synstate';
++import { useObservableValue } from 'synstate-react-hooks';
++import { createRouter } from 'tiny-router-observable';
++import { Optional } from 'ts-data-forge';
++import { Routes } from '../constants/index.mjs';
+ 
+ const router_ = createRouter();
+ 
+ const pathSegments$: InitializedObservable<readonly string[]> =
+-  router_.state.chain(map((state) => state.pathSegments));
++  router_.state.pipe(map((state) => state.pathSegments));
+ 
+-const pageToBack$ = router_.state.chain(pluck('pathname')).chain(
++const pageToBack$ = router_.state.pipe(pluck('pathname')).pipe(
+   filter((pathname) => {
+     const pathSegments = router_.utils.splitToPathSegments(pathname);
+ 
+@@ -24,27 +34,27 @@ export const Router = {
+ 
+   isRoute: {
+     createPage$: pathSegments$
+-      .chain(map(Routes.isRoute.createPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.createPage))
++      .pipe(skipIfNoChange()),
+     answerPage$: pathSegments$
+-      .chain(map(Routes.isRoute.answerPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.answerPage))
++      .pipe(skipIfNoChange()),
+     editPage$: pathSegments$
+-      .chain(map(Routes.isRoute.editPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.editPage))
++      .pipe(skipIfNoChange()),
+     eventListPage$: pathSegments$
+-      .chain(map(Routes.isRoute.eventListPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.eventListPage))
++      .pipe(skipIfNoChange()),
+     registerPage$: pathSegments$
+-      .chain(map(Routes.isRoute.registerPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.registerPage))
++      .pipe(skipIfNoChange()),
+     signInPage$: pathSegments$
+-      .chain(map(Routes.isRoute.signInPage))
+-      .chain(skipIfNoChange()),
++      .pipe(map(Routes.isRoute.signInPage))
++      .pipe(skipIfNoChange()),
+   },
+   eventId$: pathSegments$
+-    .chain(map(Routes.getEventIdFromPathname))
+-    .chain(skipIfNoChange()),
++    .pipe(map(Routes.getEventIdFromPathname))
++    .pipe(skipIfNoChange()),
+ 
+   useShowPage: (): Readonly<{
+     createPage: boolean;
+@@ -55,10 +65,15 @@ export const Router = {
+     signInPage: boolean;
+   }> => {
+     const createPage = useObservableValue(Router.isRoute.createPage$);
++
+     const answerPage = useObservableValue(Router.isRoute.answerPage$);
++
+     const editPage = useObservableValue(Router.isRoute.editPage$);
++
+     const eventListPage = useObservableValue(Router.isRoute.eventListPage$);
++
+     const registerPage = useObservableValue(Router.isRoute.registerPage$);
++
+     const signInPage = useObservableValue(Router.isRoute.signInPage$);
+ 
+     return {
+@@ -73,7 +88,8 @@ export const Router = {
+ } as const;
+ 
+ Router.state.subscribe(({ pathname }) => {
+-  const to = Routes.redirectRules.get(pathname);
++  const to = Optional.toNullable(Routes.redirectRules.get(pathname));
++
+   if (to !== undefined) {
+     Router.redirect(to);
+   }

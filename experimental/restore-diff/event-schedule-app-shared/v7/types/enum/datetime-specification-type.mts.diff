@@ -1,0 +1,20 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/datetime-specification-type.mts apps/event-schedule-app-shared/src/v7/types/enum/datetime-specification-type.mts
+index bc298ffed..9d45e404a 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/datetime-specification-type.mts
++++ apps/event-schedule-app-shared/src/v7/types/enum/datetime-specification-type.mts
+@@ -1,4 +1,5 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
++import { type ReadonlyRecord } from 'ts-type-forge';
+ 
+ export const datetimeSpecificationTypeDef = t.enumType(
+   [
+@@ -21,7 +22,7 @@ export const datetimeSpecificationOptions = {
+   startSpecified: 'startSpecified',
+   endSpecified: 'endSpecified',
+   startAndEndSpecified: 'startAndEndSpecified',
+-} as const satisfies Record<
++} as const satisfies ReadonlyRecord<
+   DatetimeSpecificationEnumType,
+   DatetimeSpecificationEnumType
+ >;

@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/account-settings.ts apps/event-schedule-app/src/constants/dictionary/account-settings.mts
+index 48933d6b1..5e5010f76 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/account-settings.ts
++++ apps/event-schedule-app/src/constants/dictionary/account-settings.mts
+@@ -1,10 +1,7 @@
+-import { headerDictionary } from './header';
++import { headerDictionary } from './header.mjs';
+ 
+ export const accountSettingsDictionary = {
+-  button: {
+-    update: '更新する',
+-    deleteAccount: 'アカウントを削除する',
+-  },
++  button: { update: '更新する', deleteAccount: 'アカウントを削除する' },
+   reauthenticate: {
+     password: 'パスワード（確認）',
+     message: {

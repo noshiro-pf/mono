@@ -1,0 +1,49 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/auth.ts apps/event-schedule-app/src/store/auth.mts
+index 598af58d7..05fe23eb0 100644
+--- experimental/packages/apps/event-schedule-app/src/store/auth.ts
++++ apps/event-schedule-app/src/store/auth.mts
+@@ -1,17 +1,18 @@
+-import { Routes } from '../constants';
+-import { fbAuth } from '../initialize-firebase';
+-import { clog } from '../utils';
+-import { Router } from './router';
+-
+-const {
+-  state: fireAuthUser$,
+-  setState: setFireAuthUser,
+-  getSnapshot: getFireAuthUserSnapshot,
+-  useCurrentValue: useFireAuthUser,
+-} = createState<FireAuthUser | undefined>(undefined);
++import { type InitializedObservable, map } from 'synstate';
++import { createState, useObservableValue } from 'synstate-react-hooks';
++import { Routes } from '../constants/index.mjs';
++import { fbAuth } from '../initialize-firebase.mjs';
++import { clog } from '../utils/index.mjs';
++import { Router } from './router.mjs';
++
++const [
++  useFireAuthUser,
++  setFireAuthUser,
++  { state: fireAuthUser$, getSnapshot: getFireAuthUserSnapshot },
++] = createState<FireAuthUser | undefined>(undefined);
+ 
+ const passwordProviderIncluded$: InitializedObservable<boolean> =
+-  fireAuthUser$.chain(
++  fireAuthUser$.pipe(
+     map(
+       (user) =>
+         user?.providerData.some((p) => p.providerId === 'password') ?? false,
+@@ -27,11 +28,13 @@ const emitAuthStateChange = (): void => {
+ 
+ fbAuth.onAuthStateChanged((user) => {
+   clog('onAuthStateChanged', user);
++
+   setFireAuthUser(user ?? undefined);
+ });
+ 
+ const signOut = async (): Promise<void> => {
+   await fbAuth.signOut();
++
+   Router.push(Routes.routes.signInPage);
+ };
+ 

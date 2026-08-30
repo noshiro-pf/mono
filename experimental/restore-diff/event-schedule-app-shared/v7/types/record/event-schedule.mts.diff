@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-schedule.mts apps/event-schedule-app-shared/src/v7/types/record/event-schedule.mts
+index 816bc5d33..b4bf6b431 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-schedule.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/event-schedule.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
+-import { DateUtils } from '@noshiro/ts-utils';
++import * as t from 'ts-fortress';
++import { DateUtils } from 'ts-fortress-types';
+ import { datetimeSpecificationTypeDef } from '../enum/index.mjs';
+ import { answerIconSettingsTypeDef } from './answer-icon-settings.mjs';
+ import {
+@@ -19,12 +19,12 @@ export const eventScheduleTypeDef = t.record({
+   datetimeRangeList: t.nonEmptyArray(datetimeRangeTypeDef, {
+     defaultValue: [datetimeRangeDefaultValue],
+   }),
+-  answerDeadline: t.union([t.stringLiteral('none'), ymdhmTypeDef]),
++  answerDeadline: t.union([t.literal('none'), ymdhmTypeDef]),
+   answerIcons: answerIconSettingsTypeDef,
+   notificationSettings: t.union(
+-    [t.stringLiteral('none'), notificationSettingsTypeDef],
++    [t.literal('none'), notificationSettingsTypeDef],
+     {
+-      defaultType: t.stringLiteral('none'),
++      defaultType: t.literal('none'),
+     },
+   ),
+   timezoneOffsetMinutes: t.number(DateUtils.today().getTimezoneOffset()),

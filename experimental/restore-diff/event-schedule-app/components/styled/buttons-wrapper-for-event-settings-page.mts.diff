@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/styled/buttons-wrapper-for-event-settings-page.ts apps/event-schedule-app/src/components/styled/buttons-wrapper-for-event-settings-page.mts
+index b924147d3..dc7602fc9 100644
+--- experimental/packages/apps/event-schedule-app/src/components/styled/buttons-wrapper-for-event-settings-page.ts
++++ apps/event-schedule-app/src/components/styled/buttons-wrapper-for-event-settings-page.mts
+@@ -1,4 +1,5 @@
+-import { ButtonsWrapperAlignEnd } from './buttons-wrapper';
++import styled from '@emotion/styled';
++import { ButtonsWrapperAlignEnd } from './buttons-wrapper.js';
+ 
+ export const ButtonsWrapperForEventSettingsPage = styled(
+   ButtonsWrapperAlignEnd,

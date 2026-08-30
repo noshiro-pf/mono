@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/datetime-range.test.mts apps/event-schedule-app-shared/src/v7/types/record/datetime-range.test.mts
+index 594bcc8c9..9f7b0c69e 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/datetime-range.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/datetime-range.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import {
+   yearMonthDateDefaultValue,
+   type YearMonthDate,
+@@ -24,19 +24,20 @@ describe('DatetimeRange', () => {
+     const defaultValue: DatetimeRange = {
+       ymd: yearMonthDateDefaultValue,
+       timeRange: timeRangeDefaultValue,
+-    };
+-    expect(datetimeRangeDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(datetimeRangeDefaultValue, defaultValue);
+   });
+ 
+   describe('isDatetimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(isDatetimeRange(datetimeRangeDefaultValue)).toBe(true);
++      assert.isTrue(isDatetimeRange(datetimeRangeDefaultValue));
+     });
+   });
+ 
+   describe('fillDatetimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillDatetimeRange({})).toStrictEqual(datetimeRangeDefaultValue);
++      assert.deepStrictEqual(fillDatetimeRange({}), datetimeRangeDefaultValue);
+     });
+   });
+ });

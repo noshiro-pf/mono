@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/lock-button.tsx apps/event-schedule-app/src/components/molecules/lock-button.tsx
+index cb8e7abf1..8b9267271 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/lock-button.tsx
++++ apps/event-schedule-app/src/components/molecules/lock-button.tsx
+@@ -1,4 +1,5 @@
+ import { Button, Tooltip } from '@blueprintjs/core';
++import { memoNamed } from 'react-utils';
+ 
+ export const LockButton = memoNamed<
+   Readonly<{
+@@ -15,7 +16,7 @@ export const LockButton = memoNamed<
+       disabled={disabled}
+       icon={passwordIsOpen ? 'unlock' : 'lock'}
+       intent={'warning'}
+-      minimal={true}
++      variant={'minimal'}
+       onClick={onLockClick}
+     />
+   </Tooltip>

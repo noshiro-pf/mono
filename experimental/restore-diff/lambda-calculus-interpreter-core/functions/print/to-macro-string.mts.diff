@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/to-macro-string.mts apps/lambda-calculus-interpreter-core/src/functions/print/to-macro-string.mts
+index 444a729ce..304f2cb70 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/to-macro-string.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/print/to-macro-string.mts
+@@ -4,7 +4,10 @@ import { isNumber, PLUS, SUCC, toNumber } from '../parser/index.mjs';
+ 
+ export const toMacroString = (term: LambdaTerm): string => {
+   if (isAlphaEqual(term, PLUS)) return '+';
++
+   if (isAlphaEqual(term, SUCC)) return 'SUCC';
++
+   if (isNumber(term)) return (toNumber(term) ?? 0).toString();
++
+   return '[ERROR]';
+ };

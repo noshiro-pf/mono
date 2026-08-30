@@ -1,0 +1,83 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/numeric-input-configs.ts apps/event-schedule-app/src/constants/numeric-input-configs.mts
+index aad2d8413..2bc4890f6 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/numeric-input-configs.ts
++++ apps/event-schedule-app/src/constants/numeric-input-configs.mts
+@@ -1,10 +1,12 @@
+-import { Weight } from '@noshiro/event-schedule-app-shared';
++import { Weight } from 'event-schedule-app-shared';
+ import {
+   type NumericTypeProperties,
+   clampAndRoundFn,
+-} from '@noshiro/numeric-input-utils';
+-import { type AnswerRank, type AnswersScore } from '../types';
+-import { defaultIconPoint } from './default-icon-point';
++} from 'numeric-input-utils';
++import { asSafeUint } from 'ts-data-forge';
++import { type SafeUint, type StrictPick } from 'ts-type-forge';
++import { type AnswerRank, type AnswersScore } from '../types/index.mjs';
++import { defaultIconPoint } from './default-icon-point.mjs';
+ 
+ type NumericInputConfigBase<N extends number> = Readonly<{
+   step: number;
+@@ -21,11 +23,11 @@ export const answerIconPointConfig = {
+     max: 9.9 satisfies AnswerIconPoint,
+     defaultValue: defaultIconPoint.fair satisfies AnswerIconPoint,
+   },
+-  digit: toSafeUint(1),
++  digit: asSafeUint(1),
+   defaultValue: 0 satisfies AnswerIconPoint,
+ } as const satisfies NumericInputConfigBase<AnswerIconPoint> &
+   Readonly<{
+-    fair: Pick<
++    fair: StrictPick<
+       NumericInputConfigBase<AnswerIconPoint>,
+       'defaultValue' | 'max' | 'min'
+     >;
+@@ -35,7 +37,7 @@ export const weightNumericInputConfig = {
+   step: Weight.cast(1),
+   min: Weight.cast(0.1),
+   max: Weight.cast(10),
+-  digit: toSafeUint(1),
++  digit: asSafeUint(1),
+   defaultValue: Weight.cast(1),
+ } as const satisfies NumericInputConfigBase<Weight>;
+ 
+@@ -43,7 +45,7 @@ export const iconFilterNumericInputConfig = {
+   step: 1,
+   min: 0,
+   max: Number.POSITIVE_INFINITY,
+-  digit: toSafeUint(0),
++  digit: asSafeUint(0),
+   defaultValue: 0,
+ } as const satisfies NumericInputConfigBase<number>;
+ 
+@@ -52,7 +54,7 @@ export const answersScoreNumericInputConfig = {
+   majorStep: 0.1 satisfies AnswersScore,
+   min: 0 satisfies AnswersScore,
+   max: 1 satisfies AnswersScore,
+-  digit: toSafeUint(2),
++  digit: asSafeUint(2),
+   defaultValue: 0 satisfies AnswersScore,
+ } as const satisfies NumericInputConfigBase<AnswersScore>;
+ 
+@@ -61,7 +63,7 @@ export const answerRankNumericInputConfig = {
+   majorStep: 1 satisfies AnswerRank,
+   min: 1 satisfies AnswerRank,
+   max: 10 satisfies AnswerRank,
+-  digit: toSafeUint(0),
++  digit: asSafeUint(0),
+   defaultValue: 3 satisfies AnswerRank,
+ } as const satisfies NumericInputConfigBase<AnswerRank>;
+ 
+@@ -80,9 +82,9 @@ export const clampAndRoundNumIcons = (
+   upperLimit: SafeUint,
+ ): SafeUint =>
+   clampAndRoundFn<SafeUint>({
+-    defaultValue: toSafeUint(iconFilterNumericInputConfig.defaultValue),
++    defaultValue: asSafeUint(iconFilterNumericInputConfig.defaultValue),
+     digit: iconFilterNumericInputConfig.digit,
+-    min: toSafeUint(iconFilterNumericInputConfig.min),
++    min: asSafeUint(iconFilterNumericInputConfig.min),
+     max: upperLimit,
+   })(x);
+ 

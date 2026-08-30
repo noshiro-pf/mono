@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app/src/main.tsx apps/event-schedule-app/src/main.tsx
+index d385adb8b..ec9a3b720 100644
+--- experimental/packages/apps/event-schedule-app/src/main.tsx
++++ apps/event-schedule-app/src/main.tsx
+@@ -1,11 +1,12 @@
+ import { createRoot } from 'react-dom/client';
+-import { App } from './app';
++import { App } from './app.js';
+ import './index.css';
+ 
+ const container = document.querySelector('#root');
+ 
+ if (container !== null) {
+   const root = createRoot(container);
++
+   root.render(<App />);
+ } else {
+   throw new Error('Could not find root element');

@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-icon.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-icon.tsx
+index 636a3ab24..f8e0da286 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-icon.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-num-icon.tsx
+@@ -1,14 +1,17 @@
+-import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
+-import { type DetailedFilterIcon } from '../../../types';
+-import { CustomIcon } from '../../atoms';
+-import { IconCountNumericInput } from '../../molecules';
++import { CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type SafeUint } from 'ts-type-forge';
++import { type DetailedFilterIcon } from '../../../types/index.mjs';
++import { match } from '../../../utils-ported/index.mjs';
++import { CustomIcon } from '../../atoms/index.mjs';
++import { IconCountNumericInput } from '../../molecules/index.mjs';
+ import {
+   CheckboxWrapper,
+   FilterItem,
+   IconCountNumericInputWrapper,
+   LessThanOrEqualTo,
+   Plus,
+-} from './styled';
++} from './styled.js';
+ 
+ type Props = Readonly<{
+   icon: DetailedFilterIcon;

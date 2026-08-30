@@ -1,0 +1,27 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-state-with-mapfn.mts apps/react-utils/src/hooks/use-state-with-mapfn.mts
+index 4fa1aed9c..3aa184bbe 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-state-with-mapfn.mts
++++ apps/react-utils/src/hooks/use-state-with-mapfn.mts
+@@ -1,17 +1,17 @@
+ import { useState } from 'better-react-use-state';
+-import { useCallback } from 'react';
++import * as React from 'react';
+ 
+ export const useStateWithMapFn = <T, S>(
+   init: T,
+   mapFn: (v: S) => T,
+-): [T, (value: S) => void] => {
+-  const [state, setState] = useState<T>(init);
++): readonly [T, (value: S) => void] => {
++  const [state, setState] = useState(init);
+ 
+-  const setter = useCallback(
++  const setter = React.useCallback(
+     (value: S) => {
+       setState(mapFn(value));
+     },
+-    [mapFn],
++    [mapFn, setState],
+   );
+ 
+   return [state, setter];

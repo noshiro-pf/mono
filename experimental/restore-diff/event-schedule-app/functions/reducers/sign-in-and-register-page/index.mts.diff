@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/sign-in-and-register-page/index.ts apps/event-schedule-app/src/functions/reducers/sign-in-and-register-page/index.mts
+index 5901094a0..fba5c3771 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/sign-in-and-register-page/index.ts
++++ apps/event-schedule-app/src/functions/reducers/sign-in-and-register-page/index.mts
+@@ -1,3 +1,3 @@
+-export * from './register-page-state';
+-export * from './reset-password-page-state';
+-export * from './sign-in-page-state';
++export * from './register-page-state.mjs';
++export * from './reset-password-page-state.mjs';
++export * from './sign-in-page-state.mjs';

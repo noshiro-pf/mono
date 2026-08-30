@@ -1,0 +1,12 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/utils/to-css-classnames.ts apps/react-blueprintjs-utils/src/utils/to-css-classnames.ts
+index c29a7e34e..ab93539ce 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/utils/to-css-classnames.ts
++++ apps/react-blueprintjs-utils/src/utils/to-css-classnames.ts
+@@ -1,4 +1,6 @@
+-export const toClassName = (flags: Record<string, boolean>): string =>
++import { type ReadonlyRecord } from 'ts-type-forge';
++
++export const toClassName = (flags: ReadonlyRecord<string, boolean>): string =>
+   Object.entries(flags)
+     .filter(([_k, v]) => v)
+     .map(([k, _v]) => k)

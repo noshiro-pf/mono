@@ -1,0 +1,90 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/create-summary-value.mts apps/poll-discord-app/src/functions/create-summary-value.mts
+index ed28764a4..d7e23ea77 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/create-summary-value.mts
++++ apps/poll-discord-app/src/functions/create-summary-value.mts
+@@ -1,4 +1,5 @@
+ import type * as Discord from 'discord.js';
++import { type IMap, ISet, isNotUndefined, Optional } from 'ts-data-forge';
+ import { emojis } from '../constants.mjs';
+ import {
+   type AnswerOfDate,
+@@ -15,20 +16,22 @@ export const rpCreateSummaryField = (
+   poll: Poll,
+   userIdToDisplayName: IMap<UserId, string>,
+ ): Discord.EmbedField => {
+-  const answerOfDate = poll.answers.get(dateOption.id);
++  const answerOfDate = Optional.toNullable(poll.answers.get(dateOption.id));
++
+   if (answerOfDate === undefined) {
+     return rpFormatEmbedField(
+       dateOption.label,
+-      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName),
++      rpToUserListString(ISet.create<UserId>([]), userIdToDisplayName),
+     );
+   }
++
+   if (
+     answerOfDate.good.size + answerOfDate.fair.size + answerOfDate.poor.size ===
+     0
+   ) {
+     return rpFormatEmbedField(
+       dateOption.label,
+-      rpToUserListString(ISet.new<UserId>([]), userIdToDisplayName),
++      rpToUserListString(ISet.create<UserId>([]), userIdToDisplayName),
+     );
+   }
+ 
+@@ -42,11 +45,12 @@ export const rpCreateSummaryField = (
+ const rpFormatEmbedField = (
+   pollName: string,
+   value: string,
+-): Discord.EmbedField => ({
+-  inline: false,
+-  name: `**${pollName}**`,
+-  value,
+-});
++): Discord.EmbedField =>
++  ({
++    inline: false,
++    name: `**${pollName}**`,
++    value,
++  }) as const;
+ 
+ const rpCreateSummaryFieldSub = (
+   pollName: string,
+@@ -84,7 +88,7 @@ export const rpCreateSummaryValueElement = (
+   `${emojis[answerType].name} :${rpToUserListString(
+     reactions,
+     userIdToDisplayName,
+-  )}`;
++  )}` as const;
+ 
+ const rpToUserListString = (
+   reactions: ISet<UserId>,
+@@ -93,7 +97,10 @@ const rpToUserListString = (
+   `\t(${reactions.size})\t${reactions
+     .toArray()
+     .toSorted((a, b) => a.localeCompare(b))
+-    .map((id) => userIdToDisplayName.get(id) ?? userIdToMention(id))
++    .map(
++      (id) =>
++        Optional.toNullable(userIdToDisplayName.get(id)) ?? userIdToMention(id),
++    )
+     .join(', ')}`.trimEnd();
+ 
+ export const gpCreateSummaryField = (group: Group): Discord.EmbedField =>
+@@ -102,8 +109,9 @@ export const gpCreateSummaryField = (group: Group): Discord.EmbedField =>
+ const gpFormatEmbedFieldData = (
+   groupName: string,
+   value: string,
+-): Discord.EmbedField => ({
+-  inline: true,
+-  name: `**${groupName}**`,
+-  value,
+-});
++): Discord.EmbedField =>
++  ({
++    inline: true,
++    name: `**${groupName}**`,
++    value,
++  }) as const;

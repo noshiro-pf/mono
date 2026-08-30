@@ -1,0 +1,112 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/answer-selection-reducer.ts apps/event-schedule-app/src/functions/reducers/answer-selection-reducer.mts
+index c5105442b..6a9334ede 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/answer-selection-reducer.ts
++++ apps/event-schedule-app/src/functions/reducers/answer-selection-reducer.mts
+@@ -1,5 +1,7 @@
+-import { defaultIconPoint } from '../../constants';
+-import { type AnswerSelectionValue } from '../../types';
++import { type IMapMapped, type ISetMapped, Optional } from 'ts-data-forge';
++import { defaultIconPoint } from '../../constants/index.mjs';
++import { type AnswerSelectionValue } from '../../types/index.mjs';
++import { type Reducer, match } from '../../utils-ported/index.mjs';
+ 
+ export type AnswerSelectionReducerAction = Readonly<
+   | {
+@@ -9,21 +11,9 @@ export type AnswerSelectionReducerAction = Readonly<
+       point: AnswerIconPoint;
+       checkboxState: ISetMapped<DatetimeRange, DatetimeRangeMapKey>;
+     }
+-  | {
+-      type: 'cell-comment';
+-      datetimeRange: DatetimeRange;
+-      comment: string;
+-    }
+-  | {
+-      type: 'cell-icon';
+-      datetimeRange: DatetimeRange;
+-      icon: AnswerIconId;
+-    }
+-  | {
+-      type: 'cell-point';
+-      datetimeRange: DatetimeRange;
+-      point: AnswerIconPoint;
+-    }
++  | { type: 'cell-comment'; datetimeRange: DatetimeRange; comment: string }
++  | { type: 'cell-icon'; datetimeRange: DatetimeRange; icon: AnswerIconId }
++  | { type: 'cell-point'; datetimeRange: DatetimeRange; point: AnswerIconPoint }
+   | {
+       type: 'header';
+       icon: AnswerIconId;
+@@ -48,6 +38,7 @@ export const answerSelectionReducer: Reducer<
+             action.datetimeRange,
+             ({ iconId: prevIcon, comment }) => {
+               const nextIcon = prevIcon === action.icon ? 'none' : action.icon;
++
+               return {
+                 iconId: nextIcon,
+                 point: match(nextIcon, defaultIconPoint),
+@@ -63,9 +54,10 @@ export const answerSelectionReducer: Reducer<
+ 
+     case 'cell-point':
+       return state.has(action.datetimeRange)
+-        ? state.update(action.datetimeRange, (prev) =>
+-            Obj.set(prev, 'point', action.point),
+-          )
++        ? state.update(action.datetimeRange, (prev) => ({
++            ...prev,
++            point: action.point,
++          }))
+         : state.set(action.datetimeRange, {
+             point: action.point,
+             iconId:
+@@ -79,9 +71,10 @@ export const answerSelectionReducer: Reducer<
+ 
+     case 'cell-comment':
+       return state.has(action.datetimeRange)
+-        ? state.update(action.datetimeRange, (prev) =>
+-            Obj.set(prev, 'comment', action.comment),
+-          )
++        ? state.update(action.datetimeRange, (prev) => ({
++            ...prev,
++            comment: action.comment,
++          }))
+         : state.set(action.datetimeRange, {
+             point: 0,
+             iconId: 'none',
+@@ -90,8 +83,9 @@ export const answerSelectionReducer: Reducer<
+ 
+     case 'header': {
+       const allSelected = action.datetimeRangeList.every(
+-        (d) => state.get(d)?.iconId === action.icon,
++        (d) => Optional.toNullable(state.get(d))?.iconId === action.icon,
+       );
++
+       return state.withMutations(
+         action.datetimeRangeList.map((d) => ({
+           type: 'set' as const,
+@@ -100,20 +94,22 @@ export const answerSelectionReducer: Reducer<
+             ? {
+                 iconId: 'none',
+                 point: 0,
+-                comment: state.get(d)?.comment ?? '',
++                comment: Optional.toNullable(state.get(d))?.comment ?? '',
+               }
+             : {
+                 iconId: action.icon,
+                 point: match(action.icon, defaultIconPoint),
+-                comment: state.get(d)?.comment ?? '',
++                comment: Optional.toNullable(state.get(d))?.comment ?? '',
+               },
+         })),
+       );
+     }
+ 
+     case 'batch-input': {
++      const checked = action.checkboxState.toArray();
++
+       return state.withMutations(
+-        action.checkboxState.toArray().map((d) => ({
++        checked.map((d) => ({
+           type: 'set' as const,
+           key: d,
+           value: {

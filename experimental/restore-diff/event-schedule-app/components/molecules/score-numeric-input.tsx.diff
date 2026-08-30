@@ -1,0 +1,65 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/score-numeric-input.tsx apps/event-schedule-app/src/components/molecules/score-numeric-input.tsx
+index 75b964f78..b64e4aed4 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/score-numeric-input.tsx
++++ apps/event-schedule-app/src/components/molecules/score-numeric-input.tsx
+@@ -1,10 +1,13 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
+ import {
+   answersScoreNumericInputConfig,
+   clampAndRoundAnswersScore,
+-} from '../../constants';
+-import { type AnswersScore } from '../../types';
++} from '../../constants/index.mjs';
++import { type AnswersScore } from '../../types/index.mjs';
+ 
+ type Props = Readonly<{
+   score: AnswersScore;
+@@ -25,9 +28,8 @@ export const ScoreNumericInput = memoNamed<Props>(
+     max = answersScoreNumericInputConfig.max,
+     onScoreChange: onValueChange,
+   }) => {
+-    const normalizeValue = useCallback(
+-      (value: number) =>
+-        clampAndRoundAnswersScore(Num.clamp<number>(min, max)(value)),
++    const normalizeValue = React.useCallback(
++      (value: number) => clampAndRoundAnswersScore(Num.clamp(value, min, max)),
+       [min, max],
+     );
+ 
+@@ -41,13 +43,16 @@ export const ScoreNumericInput = memoNamed<Props>(
+     } = useNumericInputWithStepState({
+       onValueChange,
+       normalize: normalizeValue,
+-      decode: (s) => clampAndRoundAnswersScore(Number(s)),
++      decode: (s) =>
++        clampAndRoundAnswersScore(
++          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
++        ),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
++    const inputProps = React.useMemo(
+       () => ({ min, max, step, onKeyDown }),
+       [min, max, onKeyDown],
+     );
+@@ -55,9 +60,9 @@ export const ScoreNumericInput = memoNamed<Props>(
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

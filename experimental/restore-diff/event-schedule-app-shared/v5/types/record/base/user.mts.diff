@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/base/user.mts apps/event-schedule-app-shared/src/v5/types/record/base/user.mts
+index f46896412..54cb0e7c2 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/base/user.mts
++++ apps/event-schedule-app-shared/src/v5/types/record/base/user.mts
+@@ -13,7 +13,9 @@ export const userDefaultValue = {
+ } as const satisfies User;
+ 
+ const d = userDefaultValue;
+-export const fillUser = (a: PartialUser): User => ({
+-  id: a.id ?? d.id,
+-  name: a.name ?? d.name,
+-});
++
++export const fillUser = (a: PartialUser): User =>
++  ({
++    id: a.id ?? d.id,
++    name: a.name ?? d.name,
++  }) as const;

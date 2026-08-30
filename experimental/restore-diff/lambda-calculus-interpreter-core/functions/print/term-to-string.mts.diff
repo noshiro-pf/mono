@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/term-to-string.mts apps/lambda-calculus-interpreter-core/src/functions/print/term-to-string.mts
+index d6a656c7b..a820c413d 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/print/term-to-string.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/print/term-to-string.mts
+@@ -6,12 +6,16 @@ import { toMacroString } from './to-macro-string.mjs';
+ 
+ export const termToString = (term: LambdaTerm): string => {
+   if (hasMacro(term)) return toMacroString(term);
++
+   if (isVariable(term)) return term;
++
+   if (isApplication(term)) {
+     return `(${termToString(term[0])} ${termToString(term[1])})`;
+   }
++
+   if (isAbstraction(term)) {
+     return `(λ${term[1]}.${termToString(term[2])})`;
+   }
++
+   return '';
+ };

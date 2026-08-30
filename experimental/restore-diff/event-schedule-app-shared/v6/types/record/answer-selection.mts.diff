@@ -1,0 +1,52 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-selection.mts apps/event-schedule-app-shared/src/v6/types/record/answer-selection.mts
+index 968d64c62..93581ee25 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-selection.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/answer-selection.mts
+@@ -1,4 +1,5 @@
+-import { isRecord, isString, Obj } from '@noshiro/ts-utils';
++import { hasKey, isRecord, isString } from 'ts-data-forge';
++import { hasKeyValue } from '../../../utils/index.mjs';
+ import {
+   isAnswerIconIdWithNone,
+   isAnswerIconPoint,
+@@ -28,30 +29,26 @@ export const answerSelectionDefaultValue = {
+ 
+ export const isAnswerSelection = (a: unknown): a is AnswerSelection =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'datetimeRange', isDatetimeRange) &&
+-  Obj.hasKeyValue(a, 'iconId', isAnswerIconIdWithNone) &&
+-  Obj.hasKeyValue(a, 'point', isAnswerIconPoint) &&
+-  Obj.hasKeyValue(a, 'comment', isString);
++  hasKeyValue(a, 'datetimeRange', isDatetimeRange) &&
++  hasKeyValue(a, 'iconId', isAnswerIconIdWithNone) &&
++  hasKeyValue(a, 'point', isAnswerIconPoint) &&
++  hasKeyValue(a, 'comment', isString);
+ 
+ const d = answerSelectionDefaultValue;
+ 
+ export const fillAnswerSelection = (a?: unknown): AnswerSelection =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        datetimeRange: Object.hasOwn(a, 'datetimeRange')
++    : ({
++        datetimeRange: hasKey(a, 'datetimeRange')
+           ? fillDatetimeRange(a.datetimeRange)
+           : d.datetimeRange,
+ 
+-        iconId: Obj.hasKeyValue(a, 'iconId', isAnswerIconIdWithNone)
++        iconId: hasKeyValue(a, 'iconId', isAnswerIconIdWithNone)
+           ? a.iconId
+           : d.iconId,
+ 
+-        point: Obj.hasKeyValue(a, 'point', isAnswerIconPoint)
+-          ? a.point
+-          : d.point,
++        point: hasKeyValue(a, 'point', isAnswerIconPoint) ? a.point : d.point,
+ 
+-        comment: Obj.hasKeyValue(a, 'comment', isString)
+-          ? a.comment
+-          : d.comment,
+-      };
++        comment: hasKeyValue(a, 'comment', isString) ? a.comment : d.comment,
++      } as const);

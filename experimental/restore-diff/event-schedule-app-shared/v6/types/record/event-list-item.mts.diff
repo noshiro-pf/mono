@@ -1,0 +1,109 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/event-list-item.mts apps/event-schedule-app-shared/src/v6/types/record/event-list-item.mts
+index 5c336fdd5..3c21aeac4 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/event-list-item.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/event-list-item.mts
+@@ -1,4 +1,5 @@
+-import { isRecord, isString, Obj } from '@noshiro/ts-utils';
++import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
++import { hasKeyValue } from '../../../utils/index.mjs';
+ import { fillAnswer, isAnswer, type Answer } from './answer.mjs';
+ import {
+   eventScheduleDefaultValue,
+@@ -38,23 +39,23 @@ const isEventScheduleMetadata = (
+   a: unknown,
+ ): a is EventListItem['eventScheduleMetadata'] =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'id', isString) &&
+-  Obj.hasKeyValue(a, 'createdAt', isString) &&
+-  Obj.hasKeyValue(a, 'updatedAt', isString);
++  hasKeyValue(a, 'id', isString) &&
++  hasKeyValue(a, 'createdAt', isString) &&
++  hasKeyValue(a, 'updatedAt', isString);
+ 
+ const isAnswersMetadata = (a: unknown): a is EventListItem['answersMetadata'] =>
+-  isRecord(a) && Obj.hasKeyValue(a, 'lastUpdate', isString);
++  isRecord(a) && hasKeyValue(a, 'lastUpdate', isString);
+ 
+ export const isEventListItem = (a: unknown): a is EventListItem =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'eventSchedule', isEventSchedule) &&
+-  Obj.hasKeyValue(a, 'eventScheduleMetadata', isEventScheduleMetadata) &&
+-  Obj.hasKeyValue(
++  hasKeyValue(a, 'eventSchedule', isEventSchedule) &&
++  hasKeyValue(a, 'eventScheduleMetadata', isEventScheduleMetadata) &&
++  hasKeyValue(
+     a,
+     'answers',
+-    (e: unknown): e is Answer[] => Array.isArray(e) && e.every(isAnswer),
++    (e: unknown): e is readonly Answer[] => Arr.isArray(e) && e.every(isAnswer),
+   ) &&
+-  Obj.hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
++  hasKeyValue(a, 'answersMetadata', isAnswersMetadata);
+ 
+ const d = eventListItemDefaultValue;
+ 
+@@ -63,48 +64,45 @@ const fillEventScheduleMetadata = (
+ ): EventListItem['eventScheduleMetadata'] =>
+   !isRecord(a)
+     ? d.eventScheduleMetadata
+-    : {
+-        id: Obj.hasKeyValue(a, 'id', isString)
+-          ? a.id
+-          : d.eventScheduleMetadata.id,
++    : ({
++        id: hasKeyValue(a, 'id', isString) ? a.id : d.eventScheduleMetadata.id,
+ 
+-        createdAt: Obj.hasKeyValue(a, 'createdAt', isString)
++        createdAt: hasKeyValue(a, 'createdAt', isString)
+           ? a.createdAt
+           : d.eventScheduleMetadata.createdAt,
+ 
+-        updatedAt: Obj.hasKeyValue(a, 'updatedAt', isString)
++        updatedAt: hasKeyValue(a, 'updatedAt', isString)
+           ? a.updatedAt
+           : d.eventScheduleMetadata.updatedAt,
+-      };
++      } as const);
+ 
+ const fillAnswersMetadata = (a: unknown): EventListItem['answersMetadata'] =>
+   !isRecord(a)
+     ? d.answersMetadata
+-    : {
+-        lastUpdate: Obj.hasKeyValue(a, 'lastUpdate', isString)
++    : ({
++        lastUpdate: hasKeyValue(a, 'lastUpdate', isString)
+           ? a.lastUpdate
+           : d.answersMetadata.lastUpdate,
+-      };
++      } as const);
+ 
+ export const fillEventListItem = (a?: unknown): EventListItem =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        eventSchedule: Object.hasOwn(a, 'eventSchedule')
++    : ({
++        eventSchedule: hasKey(a, 'eventSchedule')
+           ? fillEventSchedule(a.eventSchedule)
+           : d.eventSchedule,
+ 
+-        eventScheduleMetadata: Object.hasOwn(a, 'eventScheduleMetadata')
++        eventScheduleMetadata: hasKey(a, 'eventScheduleMetadata')
+           ? fillEventScheduleMetadata(a.eventScheduleMetadata)
+           : d.eventScheduleMetadata,
+ 
+-        answers: Object.hasOwn(a, 'answers')
+-          ? Array.isArray(a.answers)
++        answers:
++          hasKey(a, 'answers') && Arr.isArray(a.answers)
+             ? a.answers.map(fillAnswer)
+-            : d.answers
+-          : d.answers,
++            : d.answers,
+ 
+-        answersMetadata: Object.hasOwn(a, 'answersMetadata')
++        answersMetadata: hasKey(a, 'answersMetadata')
+           ? fillAnswersMetadata(a.answersMetadata)
+           : d.answersMetadata,
+-      };
++      } as const);

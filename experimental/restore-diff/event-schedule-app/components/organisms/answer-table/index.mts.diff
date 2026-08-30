@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/index.ts apps/event-schedule-app/src/components/organisms/answer-table/index.mts
+index eb8b7822c..aefabd2c0 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/index.ts
++++ apps/event-schedule-app/src/components/organisms/answer-table/index.mts
+@@ -1,5 +1,5 @@
+-export * from './answer-table';
+-export * from './comment-button';
+-export * from './datetime-range-cell';
+-export * from './filter-by-icon-popover';
+-export * from './sort-button';
++export * from './answer-table.js';
++export * from './comment-button.js';
++export * from './datetime-range-cell.js';
++export * from './filter-by-icon-popover/index.mjs';
++export * from './sort-button.js';

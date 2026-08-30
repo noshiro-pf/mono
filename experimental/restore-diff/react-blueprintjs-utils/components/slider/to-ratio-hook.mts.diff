@@ -1,0 +1,38 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/slider/to-ratio-hook.mts apps/react-blueprintjs-utils/src/components/slider/to-ratio-hook.mts
+index 36fed0cea..862f2c415 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/slider/to-ratio-hook.mts
++++ apps/react-blueprintjs-utils/src/components/slider/to-ratio-hook.mts
+@@ -1,5 +1,6 @@
+-import { Num, pipe } from '@noshiro/ts-utils';
+-import { useCallback, useMemo } from 'react';
++import * as React from 'react';
++import { Num, pipe } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
+ 
+ export const useRangeSliderRatios = ({
+   min,
+@@ -14,20 +15,20 @@ export const useRangeSliderRatios = ({
+   leftRatio: number;
+   rightRatio: number;
+ }> => {
+-  const toRatio = useCallback(
++  const toRatio = React.useCallback(
+     (x: number) =>
+-      pipe(max - min).chain((l) =>
++      pipe(max - min).map((l) =>
+         Num.isPositive(l) ? Num.div(x - min, l) : undefined,
+       ).value,
+     [min, max],
+   );
+ 
+-  const leftRatio: number = useMemo(
++  const leftRatio: number = React.useMemo(
+     () => toRatio(range.min) ?? 0,
+     [range, toRatio],
+   );
+ 
+-  const rightRatio: number = useMemo(
++  const rightRatio: number = React.useMemo(
+     () => toRatio(range.max) ?? 1,
+     [range, toRatio],
+   );

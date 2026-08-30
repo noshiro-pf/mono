@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/error.tsx apps/event-schedule-app/src/components/pages/answer-page/error.tsx
+index 83ec7cd81..41e0804f5 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/error.tsx
++++ apps/event-schedule-app/src/components/pages/answer-page/error.tsx
+@@ -1,5 +1,8 @@
+-import { errorFontColor } from '../../../constants';
+-import { Description } from '../../atoms';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly } from 'ts-type-forge';
++import { errorFontColor } from '../../../constants/index.mjs';
++import { Description } from '../../atoms/index.mjs';
+ 
+ const dc = dict.errorMessages;
+ 

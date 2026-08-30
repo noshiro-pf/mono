@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/input-state.ts apps/event-schedule-app/src/functions/reducers/input-state/input-state.mts
+index 444469818..defe5cd8e 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/input-state.ts
++++ apps/event-schedule-app/src/functions/reducers/input-state/input-state.mts
+@@ -1,3 +1,6 @@
++import { pipe } from 'ts-data-forge';
++import { type Reducer } from '../../../utils-ported/index.mjs';
++
+ export type InputState = Readonly<{
+   inputValue: string;
+   error: string | undefined;
+@@ -24,12 +27,11 @@ export const inputStateReducer: Reducer<InputState, InputStateAction> = (
+   switch (action.type) {
+     case 'input':
+       return pipe(state)
+-        .chain((draft) => Obj.set(draft, 'inputValue', action.payload))
+-        .chain((draft) => Obj.set(draft, 'error', inputInitialState.error))
+-        .value;
++        .map((draft) => ({ ...draft, inputValue: action.payload }))
++        .map((draft) => ({ ...draft, error: inputInitialState.error })).value;
+ 
+     case 'setError':
+-      return Obj.set(state, 'error', action.payload);
++      return { ...state, error: action.payload };
+ 
+     case 'reset':
+       return inputInitialState;

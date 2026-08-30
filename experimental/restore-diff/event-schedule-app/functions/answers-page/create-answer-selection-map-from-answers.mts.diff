@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-selection-map-from-answers.ts apps/event-schedule-app/src/functions/answers-page/create-answer-selection-map-from-answers.mts
+index 0c6ed93a1..65b870d7d 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-selection-map-from-answers.ts
++++ apps/event-schedule-app/src/functions/answers-page/create-answer-selection-map-from-answers.mts
+@@ -1,5 +1,9 @@
+-import { type AnswerTableCellPosition } from '../../types';
+-import { answerSelectionFromMapKey, answerSelectionToMapKey } from '../map-key';
++import { Arr, IMapMapped, tp } from 'ts-data-forge';
++import { type AnswerTableCellPosition } from '../../types/index.mjs';
++import {
++  answerSelectionFromMapKey,
++  answerSelectionToMapKey,
++} from '../map-key/index.mjs';
+ 
+ export const createAnswerSelectionMapFromAnswers = (
+   answers: readonly Answer[],
+@@ -12,13 +16,10 @@ export const createAnswerSelectionMapFromAnswers = (
+   ],
+   AnswerSelectionMapKey
+ > =>
+-  IMapMapped.new(
++  IMapMapped.create(
+     Arr.flatMap(answers, ({ id, selection }) =>
+       selection.map((s) => [
+-        {
+-          datetimeRange: s.datetimeRange,
+-          answerId: id,
+-        },
++        { datetimeRange: s.datetimeRange, answerId: id },
+         tp(s.iconId, s.point, s.comment),
+       ]),
+     ),

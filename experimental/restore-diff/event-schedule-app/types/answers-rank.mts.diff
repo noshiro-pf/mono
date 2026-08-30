@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/types/answers-rank.ts apps/event-schedule-app/src/types/answers-rank.mts
+index 296e765e1..395d9d64f 100644
+--- experimental/packages/apps/event-schedule-app/src/types/answers-rank.ts
++++ apps/event-schedule-app/src/types/answers-rank.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ const answerRankTypeDef = t.uintRange({
+   defaultValue: 3,

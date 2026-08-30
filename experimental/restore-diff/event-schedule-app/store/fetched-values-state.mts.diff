@@ -1,0 +1,81 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/fetched-values-state.ts apps/event-schedule-app/src/store/fetched-values-state.mts
+index b7f71ca75..d72941eed 100644
+--- experimental/packages/apps/event-schedule-app/src/store/fetched-values-state.ts
++++ apps/event-schedule-app/src/store/fetched-values-state.mts
+@@ -1,49 +1,53 @@
+-import { Auth } from './auth';
++import {
++  type InitializedObservable,
++  combine,
++  map,
++  skipIfNoChange,
++  withInitialValue,
++} from 'synstate';
++import { Result } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
++import { mapOptional } from '../utils-ported/index.mjs';
++import { Auth } from './auth.mjs';
+ import {
+   AnswersStore,
+   EventListStore,
+   EventScheduleStore,
+-} from './fetching-state';
+-import { Router } from './router';
++} from './fetching-state/index.mjs';
++import { Router } from './router.mjs';
+ 
+ export const errorType$: InitializedObservable<
+   DeepReadonly<
+-    | {
+-        data: 'answersResult';
+-        type: { type: 'others'; message: string };
+-      }
+-    | {
+-        data: 'eventScheduleResult';
+-        type: { type: 'not-found' | 'others'; message: string };
+-      }
++    | (
++        | { data: 'answersResult'; type: { type: 'others'; message: string } }
++        | {
++            data: 'eventScheduleResult';
++            type: { type: 'not-found' | 'others'; message: string };
++          }
++      )
+     | undefined
+   >
+ > = combine([EventScheduleStore.result$, AnswersStore.result$])
+-  .chain(
++  .pipe(
+     map(([esr, ar]) =>
+       esr !== undefined && Result.isErr(esr)
+-        ? ({
+-            data: 'eventScheduleResult' as const,
+-            type: esr.value,
+-          } as const)
++        ? ({ data: 'eventScheduleResult' as const, type: esr.value } as const)
+         : ar !== undefined && Result.isErr(ar)
+-          ? ({
+-              data: 'answersResult' as const,
+-              type: ar.value,
+-            } as const)
++          ? ({ data: 'answersResult' as const, type: ar.value } as const)
+           : undefined,
+     ),
+   )
+-  .chain(setInitialValue(undefined));
++  .pipe(withInitialValue(undefined));
+ 
+ Router.eventId$.subscribe(() => {
+   EventScheduleStore.fetchEventSchedule();
++
+   AnswersStore.fetchAnswers();
+ });
+ 
+ Auth.fireAuthUser$
+-  .chain(map((u) => mapOptional(u, (a) => a.uid)))
+-  .chain(skipIfNoChange())
++  .pipe(map((u) => mapOptional(u, (a) => a.uid)))
++  .pipe(skipIfNoChange())
+   .subscribe(() => {
+     EventListStore.fetchEventList();
+   });

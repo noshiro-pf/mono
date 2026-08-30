@@ -1,0 +1,38 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/datetime-range.test.mts apps/ts-fortress-types/src/date-time/datetime-range.test.mts
+index d43d7a6d3..bd34a15b4 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/datetime-range.test.mts
++++ apps/ts-fortress-types/src/date-time/datetime-range.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { DatetimeRange } from './datetime-range.mjs';
+ import { TimeRange } from './time-range.mjs';
+ import { YearMonthDate } from './year-month-date.mjs';
+@@ -16,19 +16,23 @@ describe('DatetimeRange', () => {
+     const defaultValue: DatetimeRange = {
+       ymd: YearMonthDate.defaultValue,
+       timeRange: TimeRange.defaultValue,
+-    };
+-    expect(DatetimeRange.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(DatetimeRange.defaultValue, defaultValue);
+   });
+ 
+   describe('isDatetimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(DatetimeRange.is(DatetimeRange.defaultValue)).toBe(true);
++      assert.isTrue(DatetimeRange.is(DatetimeRange.defaultValue));
+     });
+   });
+ 
+   describe('fillDatetimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(DatetimeRange.fill({})).toStrictEqual(DatetimeRange.defaultValue);
++      assert.deepStrictEqual(
++        DatetimeRange.fill({}),
++        DatetimeRange.defaultValue,
++      );
+     });
+   });
+ });

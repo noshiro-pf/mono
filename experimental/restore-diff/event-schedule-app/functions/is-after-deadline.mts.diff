@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/is-after-deadline.ts apps/event-schedule-app/src/functions/is-after-deadline.mts
+index 1136a3e3d..49ccc38d4 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/is-after-deadline.ts
++++ apps/event-schedule-app/src/functions/is-after-deadline.mts
+@@ -1,5 +1,5 @@
+-import { compareYmdhm } from '@noshiro/io-ts-types';
+-import { now } from '../utils';
++import { compareYmdhm } from 'ts-fortress-types';
++import { now } from '../utils/index.mjs';
+ 
+ export const eventIsAfterDeadline = (
+   eventSchedule: EventSchedule | undefined,

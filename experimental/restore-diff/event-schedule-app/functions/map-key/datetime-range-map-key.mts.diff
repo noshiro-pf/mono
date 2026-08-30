@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/map-key/datetime-range-map-key.ts apps/event-schedule-app/src/functions/map-key/datetime-range-map-key.mts
+index 3133b2bed..19f55d355 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/map-key/datetime-range-map-key.ts
++++ apps/event-schedule-app/src/functions/map-key/datetime-range-map-key.mts
+@@ -1,4 +1,6 @@
+-import { DatetimeRange } from '@noshiro/io-ts-types';
++import { Json, Result } from 'ts-data-forge';
++import { DatetimeRange } from 'ts-fortress-types';
++import { type Brand } from 'ts-type-forge';
+ 
+ export type DatetimeRangeMapKey = Brand<string, 'DatetimeRangeMapKey'>;
+ 

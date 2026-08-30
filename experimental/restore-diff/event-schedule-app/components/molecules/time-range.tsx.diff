@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/time-range.tsx apps/event-schedule-app/src/components/molecules/time-range.tsx
+index 00399c547..faf9f534a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/time-range.tsx
++++ apps/event-schedule-app/src/components/molecules/time-range.tsx
+@@ -1,4 +1,6 @@
+-import { BpTimePicker } from '@noshiro/react-blueprintjs-utils';
++import { css } from '@emotion/react';
++import { BpTimePicker } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
+ 
+ type Props = Readonly<{
+   datetimeSpecification: DatetimeSpecificationEnumType;

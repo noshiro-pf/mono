@@ -1,0 +1,25 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-dialog.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-dialog.tsx
+index 5bb83fbe5..5a29da74d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-dialog.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-dialog.tsx
+@@ -1,5 +1,7 @@
+-import { AlertWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
+-import { Description } from '../../atoms';
++import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { mapOptional } from '../../../utils-ported/index.mjs';
++import { Description } from '../../atoms/index.mjs';
+ 
+ type Props = Readonly<{
+   isOpen: boolean;
+@@ -29,8 +31,8 @@ export const ConfirmDialog = memoNamed<Props>(
+     loading,
+   }) => (
+     <AlertWithMaxWidth
+-      canEscapeKeyCancel={true}
+-      canOutsideClickCancel={true}
++      canEscapeKeyCancel
++      canOutsideClickCancel
+       cancelButtonText={cancelButtonText}
+       confirmButtonText={confirmButtonText}
+       icon={icon}

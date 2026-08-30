@@ -1,0 +1,89 @@
+diff --git experimental/packages/apps/poll-discord-app/src/discord/fix-answer.mts apps/poll-discord-app/src/discord/fix-answer.mts
+index 2ee82ae15..78b58fa21 100644
+--- experimental/packages/apps/poll-discord-app/src/discord/fix-answer.mts
++++ apps/poll-discord-app/src/discord/fix-answer.mts
+@@ -1,4 +1,6 @@
+ import type * as Discord from 'discord.js';
++import { ISet, Result, tp, unknownToString } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
+ import { emojis } from '../constants.mjs';
+ import { firestoreApi } from '../firebase/index.mjs';
+ import {
+@@ -16,7 +18,6 @@ import {
+ 
+ /** Reactions を取得して poll.answers を修復（データベースが壊れたときの保険） */
+ export const fixAnswerAndUpdateMessage = async (
+-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   mut_messages: Discord.Collection<string, Discord.Message>,
+   poll: Poll,
+ ): Promise<Result<undefined, string>> => {
+@@ -39,12 +40,12 @@ export const fixAnswerAndUpdateMessage = async (
+         mut_messages.find((m) => m.id === dateOption.id),
+       ),
+     )
+-    .filter((a): a is readonly [DateOptionId, Discord.Message] =>
+-      isNotUndefined(a[1]),
++    .filter(
++      (a): a is readonly [DateOptionId, Discord.Message] => a[1] !== undefined,
+     );
+ 
+-  const dateOptionMessagesFilled = await Promise.all(
+-    dateOptionMessages.map(([dateId, msg]) => tp(dateId, msg)),
++  const dateOptionMessagesFilled = dateOptionMessages.map(([dateId, msg]) =>
++    tp(dateId, msg),
+   );
+ 
+   // TODO: flatMapにする
+@@ -116,19 +117,20 @@ export const fixAnswerAndUpdateMessage = async (
+       ]
+     ]
+   */
+-  const newPollFilled: Poll = Obj.update(poll, 'answers', (answers) =>
+-    answers.withMutations(
++  const newPollFilled: Poll = {
++    ...poll,
++    answers: poll.answers.withMutations(
+       reactionsForThisPoll.map(([dateId, reactions]) => ({
+         type: 'set',
+         key: dateId,
+         value: {
+-          good: ISet.new(reactions.good ?? []),
+-          fair: ISet.new(reactions.fair ?? []),
+-          poor: ISet.new(reactions.poor ?? []),
++          good: ISet.create(reactions.good ?? []),
++          fair: ISet.create(reactions.fair ?? []),
++          poor: ISet.create(reactions.poor ?? []),
+         },
+       })),
+     ),
+-  );
++  } as const;
+ 
+   const userIdToDisplayNameResult = await createUserIdToDisplayNameMap(
+     pollMessage.guild,
+@@ -142,6 +144,7 @@ export const fixAnswerAndUpdateMessage = async (
+   const userIdToDisplayName = userIdToDisplayNameResult.value;
+ 
+   const setPollResult = await firestoreApi.setPoll(newPollFilled);
++
+   if (Result.isErr(setPollResult)) {
+     return setPollResult;
+   }
+@@ -156,7 +159,7 @@ export const fixAnswerAndUpdateMessage = async (
+ 
+   if (Result.isErr(editSummaryMessageResult)) {
+     return Result.err(
+-      `editSummaryMessage in fixAnswerAndUpdateMessage failed: ${Str.from(
++      `editSummaryMessage in fixAnswerAndUpdateMessage failed: ${unknownToString(
+         editSummaryMessageResult.value,
+       )}`,
+     );
+@@ -169,7 +172,7 @@ export const fixAnswerAndUpdateMessage = async (
+ 
+   if (Result.isErr(addEmojiResult)) {
+     return Result.err(
+-      `addEmoji in fixAnswerAndUpdateMessage failed: ${Str.from(
++      `addEmoji in fixAnswerAndUpdateMessage failed: ${unknownToString(
+         addEmojiResult.value,
+       )}`,
+     );

@@ -1,0 +1,13 @@
+diff --git experimental/packages/utils/react-utils-styled/src/cropped/img-cropped.tsx apps/react-utils-styled/src/cropped/img-cropped.tsx
+index 6b3d80b3f..5a15f293c 100644
+--- experimental/packages/utils/react-utils-styled/src/cropped/img-cropped.tsx
++++ apps/react-utils-styled/src/cropped/img-cropped.tsx
+@@ -1,6 +1,6 @@
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { type Rect } from '@noshiro/ts-utils-additional';
++import { memoNamed } from 'react-utils';
++import { type Rect } from '../utils/index.mjs';
+ import { DivCropped } from './div-cropped.js';
+ 
+ const Img = styled.img`

@@ -1,0 +1,31 @@
+diff --git experimental/packages/utils/react-utils/src/toggle-without-destroy.tsx apps/react-utils/src/toggle-without-destroy.tsx
+index 83eda32cb..489695357 100644
+--- experimental/packages/utils/react-utils/src/toggle-without-destroy.tsx
++++ apps/react-utils/src/toggle-without-destroy.tsx
+@@ -1,17 +1,22 @@
++/** @jsxImportSource react */
++// This file is also compiled by consumers that set `jsxImportSource` to
++// Emotion; it uses no `css` prop, so it says which runtime it needs.
+ import { memoNamed } from './memo-named.mjs';
+ 
+-type Props = DeepReadonly<{
++// `Readonly`, not `DeepReadonly`: a deeply-readonly `ReactNode` is no longer a
++// `ReactNode`, and React is the one consuming these.
++type Props = Readonly<{
+   condition: boolean;
+   childTrue: React.ReactNode;
+   childFalse: React.ReactNode;
+-  style?: React.CSSProperties;
++  style?: Readonly<React.CSSProperties>;
+ }>;
+ 
+-const displayNoneStyle = { display: 'none' };
++const displayNoneStyle = { display: 'none' } as const;
+ 
+ export const ToggleWithoutDestroy = memoNamed<Props>(
+   'ToggleWithoutDestroy',
+-  ({ condition, childTrue, childFalse, style }: Props) => (
++  ({ condition, childTrue, childFalse, style }: Readonly<Props>) => (
+     <>
+       <div style={condition ? style : displayNoneStyle}>{childTrue}</div>
+       <div style={condition ? displayNoneStyle : style}>{childFalse}</div>

@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/weight-setting.tsx apps/event-schedule-app/src/components/organisms/answer-being-edited/weight-setting.tsx
+index 5c0c781e2..e002b3d7c 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/weight-setting.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-being-edited/weight-setting.tsx
+@@ -1,4 +1,6 @@
+-import { WeightNumericInput } from '../../molecules';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { WeightNumericInput } from '../../molecules/index.mjs';
+ 
+ const dc = dict.answerPage.answerBeingEdited;
+ 

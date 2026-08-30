@@ -1,0 +1,54 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/poll.mts apps/poll-discord-app/src/types/poll.mts
+index c3422b91c..5aa417775 100644
+--- experimental/packages/apps/poll-discord-app/src/types/poll.mts
++++ apps/poll-discord-app/src/types/poll.mts
+@@ -1,4 +1,6 @@
+-import * as t from '@noshiro/io-ts';
++import { IMap, expectType, pipe } from 'ts-data-forge';
++import * as t from 'ts-fortress';
++import { type DeepReadonly, type JsonObject } from 'ts-type-forge';
+ import {
+   answerOfDateFromJson,
+   answerOfDateJsonType,
+@@ -42,13 +44,13 @@ expectType<PollJson, JsonObject>('<=');
+ 
+ export const pollFromJson = (p?: unknown): Poll =>
+   pipe(p)
+-    .chain(pollJsonType.fill)
+-    .chain((a) => ({
++    .map(pollJsonType.fill)
++    .map((a) => ({
+       id: a.id,
+       title: a.title,
+       updatedAt: a.updatedAt,
+       dateOptions: a.dateOptions,
+-      answers: IMap.new<DateOptionId, AnswerOfDate>(
++      answers: IMap.create<DateOptionId, AnswerOfDate>(
+         Object.entries(a.answers).map(([k, v]) => [
+           toDateOptionId(k),
+           answerOfDateFromJson(v),
+@@ -57,13 +59,14 @@ export const pollFromJson = (p?: unknown): Poll =>
+       titleMessageId: a.titleMessageId,
+     })).value;
+ 
+-export const pollToJson = (p: Poll): PollJson => ({
+-  id: p.id,
+-  title: p.title,
+-  updatedAt: p.updatedAt,
+-  dateOptions: p.dateOptions,
+-  answers: Object.fromEntries(
+-    p.answers.map(answerOfDateToJson).toEntriesArray(),
+-  ),
+-  titleMessageId: p.titleMessageId,
+-});
++export const pollToJson = (p: Poll): PollJson =>
++  ({
++    id: p.id,
++    title: p.title,
++    updatedAt: p.updatedAt,
++    dateOptions: p.dateOptions,
++    answers: Object.fromEntries(
++      p.answers.map(answerOfDateToJson).toEntriesArray(),
++    ),
++    titleMessageId: p.titleMessageId,
++  }) as const;

@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/types/number-term.test.mts apps/lambda-calculus-interpreter-core/src/types/number-term.test.mts
+index 245c6047b..4bb231970 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/types/number-term.test.mts
++++ apps/lambda-calculus-interpreter-core/src/types/number-term.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { type LambdaTerm } from './lambda-term.mjs';
+ import { type NumberTerm, type NumberTermBody } from './number-term.mjs';
+ 
+@@ -27,10 +27,19 @@ describe('test types', () => {
+   ] as const satisfies NumberTerm<'s', 'z'>;
+ 
+   expectType<NumberTerm<'s', 'z'>, LambdaTerm>('<=');
++
+   expectType<NumberTerm<'s', 'z'>, LambdaTerm>('<=');
+ 
+   expectType<'z', NumberTermBody<'s', 'z'>>('<=');
+-  expectType<['s', 'z'], NumberTermBody<'s', 'z'>>('<=');
+-  expectType<['s', ['s', 'z']], NumberTermBody<'s', 'z'>>('<=');
+-  expectType<['s', ['s', ['s', 'z']]], NumberTermBody<'s', 'z'>>('<=');
++
++  expectType<readonly ['s', 'z'], NumberTermBody<'s', 'z'>>('<=');
++
++  expectType<readonly ['s', readonly ['s', 'z']], NumberTermBody<'s', 'z'>>(
++    '<=',
++  );
++
++  expectType<
++    readonly ['s', readonly ['s', readonly ['s', 'z']]],
++    NumberTermBody<'s', 'z'>
++  >('<=');
+ });

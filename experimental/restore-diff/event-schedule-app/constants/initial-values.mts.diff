@@ -1,0 +1,79 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/initial-values.ts apps/event-schedule-app/src/constants/initial-values.mts
+index 556179aae..97e4bc6c4 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/initial-values.ts
++++ apps/event-schedule-app/src/constants/initial-values.mts
+@@ -2,25 +2,26 @@ import {
+   defaultAnswerDeadlineRemainingDays,
+   NotificationSettings,
+   UserName,
+-} from '@noshiro/event-schedule-app-shared';
+-import { TimeRange, YmdhmFromDate } from '@noshiro/io-ts-types';
+-import { defaultIconPoint } from './default-icon-point';
+-import { dict } from './dictionary';
++} from 'event-schedule-app-shared';
++import { Arr, pipe } from 'ts-data-forge';
++import { DateUtils, TimeRange, YmdhmFromDate } from 'ts-fortress-types';
++import { type DateEnum, type NonEmptyArray } from 'ts-type-forge';
++import { defaultIconPoint } from './default-icon-point.mjs';
++import { dict } from './dictionary/index.mjs';
+ 
+ export const yearMonthDateInitialValue: YearMonthDate = {
+   year: DateUtils.getLocaleYear(DateUtils.today()),
+   month: DateUtils.getLocaleMonth(DateUtils.today()),
+   date: DateUtils.getLocaleDate(DateUtils.today()),
+-};
++} as const;
+ 
+ export const datetimeRangeInitialValue: DatetimeRange = {
+   ymd: yearMonthDateInitialValue,
+   timeRange: TimeRange.defaultValue,
+-};
++} as const;
+ 
+-export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> = [
+-  datetimeRangeInitialValue,
+-];
++export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> =
++  Arr.asNonEmptyArray([datetimeRangeInitialValue]);
+ 
+ export const answerIconsInitialValue = {
+   good: {
+@@ -38,20 +39,20 @@ export const answerIconsInitialValue = {
+ } as const satisfies AnswerIconSettings;
+ 
+ export const answerDeadlineInitialValue: Ymdhm = pipe(DateUtils.today())
+-  .chain(
++  .map(
+     DateUtils.updateLocaleDate(
+       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+       (a) => (a + defaultAnswerDeadlineRemainingDays) as DateEnum,
+     ),
+   )
+-  .chain(DateUtils.setLocaleHours(23))
+-  .chain(DateUtils.setLocaleMinutes(59))
+-  .chain(DateUtils.toDate)
+-  .chain(YmdhmFromDate).value;
++  .map(DateUtils.setLocaleHours(23))
++  .map(DateUtils.setLocaleMinutes(59))
++  .map(DateUtils.toDate)
++  .map(YmdhmFromDate).value;
+ 
+ export const notificationSettingsInitialValue: NotificationSettings = pipe(
+   NotificationSettings.defaultValue,
+-).chain((o) => Obj.set(o, 'notifyOnAnswerChange', true)).value;
++).map((o) => ({ ...o, notifyOnAnswerChange: true })).value;
+ 
+ export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
+   'startSpecified';
+@@ -65,9 +66,6 @@ export const eventScheduleInitialValue: EventSchedule = {
+   answerIcons: answerIconsInitialValue,
+   notificationSettings: 'none',
+   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
+-  author: {
+-    id: null,
+-    name: UserName.cast(''),
+-  },
++  author: { id: null, name: UserName.cast('') },
+   archivedBy: [],
+-};
++} as const;

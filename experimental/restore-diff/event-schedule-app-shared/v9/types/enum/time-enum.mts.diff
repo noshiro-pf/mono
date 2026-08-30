@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/enum/time-enum.mts apps/event-schedule-app-shared/src/v9/types/enum/time-enum.mts
+index ae94cd87c..f2608200f 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/enum/time-enum.mts
++++ apps/event-schedule-app-shared/src/v9/types/enum/time-enum.mts
+@@ -1,7 +1,7 @@
+-import * as t from '@noshiro/io-ts';
+-import { toSafeUint } from '@noshiro/ts-utils';
++import { asSafeUint } from 'ts-data-forge';
++import * as t from 'ts-fortress';
+ 
+-export const YearsType = t.safeUint(toSafeUint(1900));
++export const YearsType = t.safeUint(asSafeUint(1900));
+ 
+ export const Months = t.uintRange({ start: 1, end: 13, defaultValue: 1 });
+ 

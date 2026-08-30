@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/event-schedule-setting-common.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/event-schedule-setting-common.tsx
+index b10fc3c96..8bd5b35b1 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/event-schedule-setting-common.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/event-schedule-setting-common.tsx
+@@ -1,14 +1,15 @@
++import { memoNamed } from 'react-utils';
+ import {
+   type EventScheduleSettingCommonState,
+   type EventScheduleSettingCommonStateHandler,
+-} from '../../../types';
+-import { Section } from '../../molecules';
++} from '../../../types/index.mjs';
++import { Section } from '../../molecules/index.mjs';
+ import {
+   EventSchedulePropertiesErrors,
+   EventSettings,
+   NameAndNotes,
+   SelectDatetimes,
+-} from '../../organisms';
++} from '../../organisms/index.mjs';
+ 
+ const dc = dict.eventSettingsPage;
+ 

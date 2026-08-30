@@ -1,0 +1,35 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/canvas-hooks.mts apps/react-utils/src/hooks/canvas-hooks.mts
+index 56bfd6eeb..220ceb5a2 100644
+--- experimental/packages/utils/react-utils/src/hooks/canvas-hooks.mts
++++ apps/react-utils/src/hooks/canvas-hooks.mts
+@@ -1,20 +1,24 @@
+ import { useState } from 'better-react-use-state';
+-import { useEffect, useRef } from 'react';
++import * as React from 'react';
+ 
+-export const useCanvasContext2d = (): [
+-  CanvasRenderingContext2D | undefined,
+-  React.RefObject<HTMLCanvasElement>,
++export const useCanvasContext2d = (): readonly [
++  context: CanvasRenderingContext2D | undefined,
++  // React 19 types `React.useRef<T>(null)` as `RefObject<T | null>`: the ref starts
++  // out empty and the caller has to say so.
++  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+ ] => {
+-  const canvasRef = useRef<HTMLCanvasElement>(null);
++  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+ 
+   const [ctx, setCtx] = useState<CanvasRenderingContext2D | undefined>(
+     undefined,
+   );
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     const canvasEl = canvasRef.current;
++
+     if (canvasEl !== null) {
+       const ctx2d = canvasEl.getContext('2d');
++
+       if (ctx2d !== null) {
+         setCtx(ctx2d);
+       }

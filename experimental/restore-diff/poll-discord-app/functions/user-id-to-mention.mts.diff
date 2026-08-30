@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/user-id-to-mention.mts apps/poll-discord-app/src/functions/user-id-to-mention.mts
+index 5f956d2f3..afed8418e 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/user-id-to-mention.mts
++++ apps/poll-discord-app/src/functions/user-id-to-mention.mts
+@@ -1,3 +1,4 @@
+ import { type UserId } from '../types/index.mjs';
+ 
+-export const userIdToMention = (userId: UserId): string => `<@!${userId}>`;
++export const userIdToMention = (userId: UserId): string =>
++  `<@!${userId}>` as const;

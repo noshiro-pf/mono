@@ -1,0 +1,25 @@
+diff --git experimental/packages/apps/poll-discord-app/src/constants.mts apps/poll-discord-app/src/constants.mts
+index e7c5286f6..048e73e33 100644
+--- experimental/packages/apps/poll-discord-app/src/constants.mts
++++ apps/poll-discord-app/src/constants.mts
+@@ -1,13 +1,13 @@
+ import { isDev } from './env.mjs';
+ 
+ export const triggerCommand = {
+-  rp: isDev ? '/rp-dev' : '/rp',
+-  rp30: isDev ? '/rp30-dev' : '/rp30',
+-  rp60: isDev ? '/rp60-dev' : '/rp60',
+-  rp30d: isDev ? '/rp30d-dev' : '/rp30d',
+-  rp60d: isDev ? '/rp60d-dev' : '/rp60d',
+-  gp: isDev ? '/gp-dev' : '/gp',
+-  rand: isDev ? '/rand-dev' : '/rand',
++  rp: isDev ? ('/rp-dev' as const) : ('/rp' as const),
++  rp30: isDev ? ('/rp30-dev' as const) : ('/rp30' as const),
++  rp60: isDev ? ('/rp60-dev' as const) : ('/rp60' as const),
++  rp30d: isDev ? ('/rp30d-dev' as const) : ('/rp30d' as const),
++  rp60d: isDev ? ('/rp60d-dev' as const) : ('/rp60d' as const),
++  gp: isDev ? ('/gp-dev' as const) : ('/gp' as const),
++  rand: isDev ? ('/rand-dev' as const) : ('/rand' as const),
+ } as const;
+ 
+ export const emojis = {

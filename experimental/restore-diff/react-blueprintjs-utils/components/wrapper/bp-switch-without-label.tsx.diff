@@ -1,0 +1,15 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-switch-without-label.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-switch-without-label.tsx
+index 23ee5156c..e56c44020 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-switch-without-label.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-switch-without-label.tsx
+@@ -1,7 +1,8 @@
+ import { Switch } from '@blueprintjs/core';
+-import { memoNamed } from '@noshiro/react-utils';
++import { memoNamed } from 'react-utils';
++import { type StrictOmit } from 'ts-type-forge';
+ 
+-export type BpSwitchWithoutLabelProps = Omit<
++export type BpSwitchWithoutLabelProps = StrictOmit<
+   SwitchPropsOriginal,
+   'label' | 'labelElement'
+ > &

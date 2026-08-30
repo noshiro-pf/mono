@@ -1,0 +1,38 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/notification-settings.test.mts apps/event-schedule-app-shared/src/v7/types/record/base/notification-settings.test.mts
+index 9d9993d5d..4d2180693 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/notification-settings.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/notification-settings.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import {
+   fillNotificationSettings,
+   isNotificationSettings,
+@@ -31,21 +31,21 @@ describe('NotificationSettings', () => {
+       notify07daysBeforeAnswerDeadline: false,
+       notify14daysBeforeAnswerDeadline: false,
+       notify28daysBeforeAnswerDeadline: false,
+-    };
+-    expect(notificationSettingsDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(notificationSettingsDefaultValue, defaultValue);
+   });
+ 
+   describe('isNotificationSettings', () => {
+     test('defaultValue should be true', () => {
+-      expect(isNotificationSettings(notificationSettingsDefaultValue)).toBe(
+-        true,
+-      );
++      assert.isTrue(isNotificationSettings(notificationSettingsDefaultValue));
+     });
+   });
+ 
+   describe('fillUser', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillNotificationSettings({})).toStrictEqual(
++      assert.deepStrictEqual(
++        fillNotificationSettings({}),
+         notificationSettingsDefaultValue,
+       );
+     });

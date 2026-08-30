@@ -1,0 +1,69 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/database.mts apps/poll-discord-app/src/types/database.mts
+index e98a2f5f2..49972b8c4 100644
+--- experimental/packages/apps/poll-discord-app/src/types/database.mts
++++ apps/poll-discord-app/src/types/database.mts
+@@ -1,4 +1,6 @@
+-import * as t from '@noshiro/io-ts';
++import { IMap, expectType, pipe } from 'ts-data-forge';
++import * as t from 'ts-fortress';
++import { type JsonObject } from 'ts-type-forge';
+ import {
+   commandMessageIdType,
+   dateOptionIdType,
+@@ -32,25 +34,25 @@ export type DatabaseJson = t.TypeOf<typeof databaseJsonType>;
+ expectType<DatabaseJson, JsonObject>('<=');
+ 
+ export const databaseDefaultValue = {
+-  polls: IMap.new<PollId, Poll>([]),
+-  dateToPollIdMap: IMap.new<DateOptionId, PollId>([]),
+-  commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>([]),
++  polls: IMap.create<PollId, Poll>([]),
++  dateToPollIdMap: IMap.create<DateOptionId, PollId>([]),
++  commandMessageIdToPollIdMap: IMap.create<CommandMessageId, PollId>([]),
+ } as const satisfies Database;
+ 
+ export const databaseFromJson = (o?: unknown): Database =>
+   pipe(o)
+-    .chain(databaseJsonType.fill)
+-    .chain((p) => ({
+-      polls: IMap.new<PollId, Poll>(
++    .map(databaseJsonType.fill)
++    .map((p) => ({
++      polls: IMap.create<PollId, Poll>(
+         Object.entries(p.polls).map(([k, v]) => [toPollId(k), pollFromJson(v)]),
+       ),
+-      dateToPollIdMap: IMap.new<DateOptionId, PollId>(
++      dateToPollIdMap: IMap.create<DateOptionId, PollId>(
+         Object.entries(p.dateToPollIdMap).map(([k, v]) => [
+           toDateOptionId(k),
+           toPollId(v satisfies PollId | string),
+         ]),
+       ),
+-      commandMessageIdToPollIdMap: IMap.new<CommandMessageId, PollId>(
++      commandMessageIdToPollIdMap: IMap.create<CommandMessageId, PollId>(
+         Object.entries(p.commandMessageIdToPollIdMap).map(([k, v]) => [
+           toCommandMessageId(k),
+           toPollId(v satisfies PollId | string),
+@@ -58,12 +60,13 @@ export const databaseFromJson = (o?: unknown): Database =>
+       ),
+     })).value;
+ 
+-export const databaseToJson = (database: Database): DatabaseJson => ({
+-  polls: Object.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
+-  dateToPollIdMap: Object.fromEntries(
+-    database.dateToPollIdMap.toEntriesArray(),
+-  ),
+-  commandMessageIdToPollIdMap: Object.fromEntries(
+-    database.commandMessageIdToPollIdMap.toEntriesArray(),
+-  ),
+-});
++export const databaseToJson = (database: Database): DatabaseJson =>
++  ({
++    polls: Object.fromEntries(database.polls.map(pollToJson).toEntriesArray()),
++    dateToPollIdMap: Object.fromEntries(
++      database.dateToPollIdMap.toEntriesArray(),
++    ),
++    commandMessageIdToPollIdMap: Object.fromEntries(
++      database.commandMessageIdToPollIdMap.toEntriesArray(),
++    ),
++  }) as const;

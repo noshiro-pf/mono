@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/notification-settings.mts apps/event-schedule-app-shared/src/v9/types/record/base/notification-settings.mts
+index 5c1b523c2..15e22e4f7 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/notification-settings.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/base/notification-settings.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ export const NotificationSettings = t.record({
+   notifyOnAnswerChange: t.boolean(false),

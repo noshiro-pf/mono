@@ -1,0 +1,50 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/answer-of-date.mts apps/poll-discord-app/src/types/answer-of-date.mts
+index c5b76e486..da393a163 100644
+--- experimental/packages/apps/poll-discord-app/src/types/answer-of-date.mts
++++ apps/poll-discord-app/src/types/answer-of-date.mts
+@@ -1,4 +1,6 @@
+-import * as t from '@noshiro/io-ts';
++import { ISet, expectType, pipe } from 'ts-data-forge';
++import * as t from 'ts-fortress';
++import { type JsonObject } from 'ts-type-forge';
+ import { userIdType, type UserId } from './branded-types.mjs';
+ 
+ export type AnswerOfDate = Readonly<{
+@@ -8,9 +10,9 @@ export type AnswerOfDate = Readonly<{
+ }>;
+ 
+ export const answerOfDateDefaultValue = {
+-  good: ISet.new<UserId>([]),
+-  fair: ISet.new<UserId>([]),
+-  poor: ISet.new<UserId>([]),
++  good: ISet.create<UserId>([]),
++  fair: ISet.create<UserId>([]),
++  poor: ISet.create<UserId>([]),
+ } as const satisfies AnswerOfDate;
+ 
+ export const answerOfDateJsonType = t.record({
+@@ -24,14 +26,15 @@ export type AnswerOfDateJson = t.TypeOf<typeof answerOfDateJsonType>;
+ expectType<AnswerOfDateJson, JsonObject>('<=');
+ 
+ export const answerOfDateFromJson = (p?: unknown): AnswerOfDate =>
+-  pipe(answerOfDateJsonType.fill(p)).chain((a) => ({
+-    good: ISet.new(a.good),
+-    fair: ISet.new(a.fair),
+-    poor: ISet.new(a.poor),
++  pipe(answerOfDateJsonType.fill(p)).map((a) => ({
++    good: ISet.create(a.good),
++    fair: ISet.create(a.fair),
++    poor: ISet.create(a.poor),
+   })).value;
+ 
+-export const answerOfDateToJson = (a: AnswerOfDate): AnswerOfDateJson => ({
+-  good: a.good.toArray(),
+-  fair: a.fair.toArray(),
+-  poor: a.poor.toArray(),
+-});
++export const answerOfDateToJson = (a: AnswerOfDate): AnswerOfDateJson =>
++  ({
++    good: a.good.toArray(),
++    fair: a.fair.toArray(),
++    poor: a.poor.toArray(),
++  }) as const;

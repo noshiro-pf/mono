@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/sign-in.ts apps/event-schedule-app/src/api/auth/sign-in.mts
+index aed16a7bf..1cc878e52 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/sign-in.ts
++++ apps/event-schedule-app/src/api/auth/sign-in.mts
+@@ -1,6 +1,7 @@
+ import { signInWithEmailAndPassword } from 'firebase/auth';
+-import { fbAuth } from '../../initialize-firebase';
+-import { assertIsCredentialError } from '../../types';
++import { Result } from 'ts-data-forge';
++import { fbAuth } from '../../initialize-firebase.mjs';
++import { assertIsCredentialError } from '../../types/index.mjs';
+ 
+ export const signIn = (
+   email: string,
+@@ -9,9 +10,9 @@ export const signIn = (
+   Result<UserCredential, Readonly<{ code: string; message: string }>>
+ > =>
+   Result.fromPromise(signInWithEmailAndPassword(fbAuth, email, password)).then(
+-    (a) =>
+-      Result.mapErr(a, (error) => {
+-        assertIsCredentialError(error);
+-        return error;
+-      }),
++    Result.mapErr((error) => {
++      assertIsCredentialError(error);
++
++      return error;
++    }),
+   );

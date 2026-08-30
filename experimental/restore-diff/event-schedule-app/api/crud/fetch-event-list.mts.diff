@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/fetch-event-list.ts apps/event-schedule-app/src/api/crud/fetch-event-list.mts
+index 406928263..8112ef229 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/fetch-event-list.ts
++++ apps/event-schedule-app/src/api/crud/fetch-event-list.mts
+@@ -1,6 +1,7 @@
+-import { EventListItem } from '@noshiro/event-schedule-app-shared';
++import { EventListItem } from 'event-schedule-app-shared';
+ import { httpsCallable } from 'firebase/functions';
+-import { fbFunctions } from '../../initialize-firebase';
++import { Arr, Result, unknownToString } from 'ts-data-forge';
++import { fbFunctions } from '../../initialize-firebase.mjs';
+ 
+ const fbFetchEventListOfUser = httpsCallable(
+   fbFunctions,
+@@ -34,13 +35,13 @@ export const fetchEventListOfUser = ({
+     if (Result.isErr(result)) {
+       return Result.err({
+         type: 'others' as const,
+-        message: Str.from(result.value),
++        message: unknownToString(result.value),
+       });
+     }
+ 
+     const response = result.value.data;
+ 
+-    if (!Array.isArray(response) || !response.every(EventListItem.is)) {
++    if (!Arr.isArray(response) || !response.every(EventListItem.is)) {
+       return Result.err({
+         type: 'wrong-type-response' as const,
+         message: `response should be an array of EventListItem.`,

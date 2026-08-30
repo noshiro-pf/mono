@@ -1,0 +1,130 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/event-list-page/event-list-item.tsx apps/event-schedule-app/src/components/pages/event-list-page/event-list-item.tsx
+index c1380fd05..701a9b450 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/event-list-page/event-list-item.tsx
++++ apps/event-schedule-app/src/components/pages/event-list-page/event-list-item.tsx
+@@ -1,15 +1,21 @@
+-import { type EventListItem } from '@noshiro/event-schedule-app-shared';
++import styled from '@emotion/styled';
++import { type EventListItem } from 'event-schedule-app-shared';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { Arr, Optional } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
+ import {
+   errorFontColor,
+   eventListItemTextColor,
+   Routes,
+   ymd2str,
+   ymdhm2strWithDay,
+-} from '../../../constants';
+-import { eventIsAfterDeadline } from '../../../functions';
+-import { Router } from '../../../store';
+-import { SectionTitle } from '../../atoms';
+-import { ArchiveEventButton } from '../../organisms';
++} from '../../../constants/index.mjs';
++import { eventIsAfterDeadline } from '../../../functions/index.mjs';
++import { Router } from '../../../store/index.mjs';
++import { match } from '../../../utils-ported/index.mjs';
++import { SectionTitle } from '../../atoms/index.mjs';
++import { ArchiveEventButton } from '../../organisms/index.mjs';
+ 
+ const dc = dict.eventListPage;
+ 
+@@ -26,20 +32,24 @@ export const EventListItemComponent = memoNamed<Props>(
+   ({
+     eventListItem: {
+       eventSchedule,
+-      eventScheduleMetadata: { id: eventId, updatedAt },
++      eventScheduleMetadata,
+       answers,
+-      answersMetadata: { lastUpdate },
++      answersMetadata,
+     },
+     fireAuthUser,
+     archiveOrUnArchive,
+     onConfirmArchiving,
+     onConfirmUnArchiving,
+   }) => {
+-    const onLinkClick = useCallback(() => {
++    const { id: eventId, updatedAt } = eventScheduleMetadata;
++
++    const { lastUpdate } = answersMetadata;
++
++    const onLinkClick = React.useCallback(() => {
+       Router.push(Routes.routes.answerPage(eventId));
+     }, [eventId]);
+ 
+-    const hasUnanswered = useMemo<boolean>(
++    const hasUnanswered = React.useMemo<boolean>(
+       () =>
+         fireAuthUser === undefined
+           ? false
+@@ -49,12 +59,12 @@ export const EventListItemComponent = memoNamed<Props>(
+       [answers, fireAuthUser],
+     );
+ 
+-    const afterDeadline = useMemo(
++    const afterDeadline = React.useMemo(
+       () => eventIsAfterDeadline(eventSchedule),
+       [eventSchedule],
+     );
+ 
+-    const authorName = useMemo<string>(
++    const authorName = React.useMemo<string>(
+       () =>
+         eventSchedule.author.name === ''
+           ? dc.listItem.anonymous
+@@ -62,16 +72,15 @@ export const EventListItemComponent = memoNamed<Props>(
+       [eventSchedule.author.name],
+     );
+ 
+-    const datetimeOptionsSummary = useMemo<string>(
++    const datetimeOptionsSummary = React.useMemo<string>(
+       () =>
+-        `${ymd2str(Arr.first(eventSchedule.datetimeRangeList).ymd)} ${
+-          dict.common.tilde
+-        } ${ymd2str(Arr.last(eventSchedule.datetimeRangeList).ymd)}`,
++        `${ymd2str(Optional.unwrapThrow(Arr.first(eventSchedule.datetimeRangeList)).ymd)} ${dict.common.tilde} ${ymd2str(Optional.unwrapThrow(Arr.last(eventSchedule.datetimeRangeList)).ymd)}`,
+       [eventSchedule.datetimeRangeList],
+     );
+ 
+-    const lastUpdateStr = useMemo<string>(() => {
++    const lastUpdateStr = React.useMemo<string>(() => {
+       const answerLastUpdate = DateUtils.from(lastUpdate);
++
+       const eventLastUpdate = DateUtils.from(updatedAt);
+ 
+       return lastUpdate === '' ||
+@@ -80,7 +89,7 @@ export const EventListItemComponent = memoNamed<Props>(
+         : answerLastUpdate.toLocaleString();
+     }, [lastUpdate, updatedAt]);
+ 
+-    const archiveEventButtonHandler = useMemo(
++    const archiveEventButtonHandler = React.useMemo(
+       () =>
+         match(archiveOrUnArchive, {
+           archive: onConfirmArchiving,
+@@ -256,9 +265,11 @@ const TableLabel = styled(TableCell)`
+ const TableLabel1 = styled(TableLabel)`
+   grid-area: label1;
+ `;
++
+ const TableLabel2 = styled(TableLabel)`
+   grid-area: label2;
+ `;
++
+ const TableLabel3 = styled(TableLabel)`
+   grid-area: label3;
+ `;
+@@ -274,9 +285,11 @@ const TableValue = styled(TableCell)`
+ const TableValue1 = styled(TableValue)`
+   grid-area: value1;
+ `;
++
+ const TableValue2 = styled(TableValue)`
+   grid-area: value2;
+ `;
++
+ const TableValue3 = styled(TableValue)`
+   grid-area: value3;
+ `;
