@@ -39,7 +39,22 @@ export const verifyNpmPackages = async (
 ): Promise<Result<undefined, string>> => {
   const spaceDir = path.resolve(verifyDir, target);
 
-  const packages = await readPublishablePackages();
+  const allPackages = await readPublishablePackages();
+
+  // A package's first publish is manual (see `libs/first-release.md`), so
+  // between the commit that adds it and that publish it is a non-private
+  // workspace member with nothing on npm behind it. The published space has no
+  // version to pin such a package to, and failing the run would wedge every
+  // pull request that moves the pins until someone publishes by hand. Leave it
+  // out instead, and name what was left out so the gap stays visible.
+  const packages =
+    target === 'published'
+      ? await withoutUnpublished(
+          spaceDir,
+          allPackages,
+          options?.updatePins ?? false,
+        )
+      : allPackages;
 
   console.info(`Verifying ${packages.length} packages against "${target}".\n`);
 
@@ -441,6 +456,37 @@ const publishedVersionPin = async (
   const latest = await $(`npm view ${packageName} version`, { silent: true });
 
   return Result.isErr(latest) ? undefined : latest.value.stdout.trim();
+};
+
+/** Drops the packages the published space has no version to install. */
+const withoutUnpublished = async (
+  spaceDir: string,
+  packages: readonly PackageToCheck[],
+  updatePins: boolean,
+): Promise<readonly PackageToCheck[]> => {
+  const mut_kept: PackageToCheck[] = [];
+
+  const mut_dropped: string[] = [];
+
+  for (const pkg of packages) {
+    const dir = path.resolve(spaceDir, 'packages', pkg.name);
+
+    const spec = await publishedVersionPin(dir, pkg.name, updatePins);
+
+    if (spec === undefined) {
+      mut_dropped.push(pkg.name);
+    } else {
+      mut_kept.push(pkg);
+    }
+  }
+
+  if (Arr.isNonEmpty(mut_dropped)) {
+    console.info(
+      `Not on npm yet, so not checked here: ${mut_dropped.join(', ')}.\n`,
+    );
+  }
+
+  return mut_kept;
 };
 
 const readPinnedVersion = async (
