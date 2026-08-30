@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type FixedLengthTuple, type ReadonlyRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -813,9 +814,7 @@ namespace NoLargeSnapshots {
     /**
      * A map of snapshot absolute file paths to arrays of snapshot names that are allowed to exceed the size limit. Snapshot names can be specified as regular expressions.
      */
-    allowedSnapshots?: Readonly<{
-      [k: string]: readonly unknown[];
-    }>;
+    allowedSnapshots?: ReadonlyRecord<string, readonly unknown[]>;
   }>;
 
   export type RuleEntry =
@@ -874,9 +873,7 @@ namespace NoRestrictedMatchers {
   /**
    * Restricted matcher chains mapped to optional custom messages.
    */
-  export type Options = Readonly<{
-    [k: string]: string | null;
-  }>;
+  export type Options = ReadonlyRecord<string, string | null>;
 
   export type RuleEntry =
     | 'off'
@@ -918,9 +915,7 @@ namespace NoRestrictedViMethods {
   /**
    * Restricted `vi` methods mapped to optional custom messages.
    */
-  export type Options = Readonly<{
-    [k: string]: string | null;
-  }>;
+  export type Options = ReadonlyRecord<string, string | null>;
 
   export type RuleEntry =
     | 'off'
@@ -2288,8 +2283,9 @@ namespace ValidTitle {
         test?: PatternOrPatternArray;
         it?: PatternOrPatternArray;
       }>;
+
   export type PatternOrPatternArray =
-    string | readonly [string] | readonly [string, string];
+    string | readonly [string] | FixedLengthTuple<2, string>;
 
   export type Options = Readonly<{
     /**

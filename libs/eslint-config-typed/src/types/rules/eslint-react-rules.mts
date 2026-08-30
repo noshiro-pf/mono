@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import {
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -59,7 +63,7 @@ namespace BooleanPropNaming {
     /**
      * @minItems 1
      */
-    propTypeNames?: readonly [string, ...string[]];
+    propTypeNames?: NonEmptyTuple<string>;
     /**
      * @default "^(is|has)[A-Z]([A-Za-z0-9]?)+"
      */
@@ -1335,6 +1339,7 @@ namespace JsxCurlySpacing {
           }>;
         }>,
       ];
+
   export type BasicConfigOrBoolean = BasicConfig | boolean;
 
   export type BasicConfig = Readonly<{
@@ -2368,16 +2373,17 @@ namespace JsxNoLiterals {
    * ```
    */
   export type Options = Readonly<{
-    elementOverrides?: Readonly<{
-      [k: string]: Readonly<{
+    elementOverrides?: ReadonlyRecord<
+      string,
+      Readonly<{
         applyToNestedElements?: boolean;
         noStrings?: boolean;
         allowedStrings?: readonly string[];
         ignoreProps?: boolean;
         noAttributeStrings?: boolean;
         [k: string]: unknown;
-      }>;
-    }>;
+      }>
+    >;
     noStrings?: boolean;
     allowedStrings?: readonly string[];
     ignoreProps?: boolean;
@@ -2486,7 +2492,6 @@ namespace JsxNoScriptUrl {
           [k: string]: unknown;
         }>,
       ]
-    | readonly []
     | readonly [
         Readonly<{
           includeFromSettings?: boolean;
@@ -4590,9 +4595,7 @@ namespace SortComp {
    */
   export type Options = Readonly<{
     order?: readonly string[];
-    groups?: Readonly<{
-      [k: string]: readonly string[];
-    }>;
+    groups?: ReadonlyRecord<string, readonly string[]>;
   }>;
 
   export type RuleEntry =

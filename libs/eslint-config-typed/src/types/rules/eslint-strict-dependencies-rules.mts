@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 namespace StrictDependencies {
   /**
@@ -69,9 +70,7 @@ namespace StrictDependencies {
 
   export type Options1 = Readonly<{
     resolveRelativeImport?: boolean;
-    pathIndexMap?: Readonly<{
-      [k: string]: number;
-    }>;
+    pathIndexMap?: ReadonlyRecord<string, number>;
   }>;
 
   export type RuleEntry =

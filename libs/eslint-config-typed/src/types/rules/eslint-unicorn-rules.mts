@@ -1,6 +1,11 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -223,15 +228,15 @@ namespace CommentContent {
     /**
      * Custom comment content replacements.
      */
-    replacements?: Readonly<{
-      [k: string]:
-        | false
-        | string
-        | Readonly<{
-            replacement: string;
-            caseSensitive?: boolean;
-          }>;
-    }>;
+    replacements?: ReadonlyRecord<
+      string,
+      | false
+      | string
+      | Readonly<{
+          replacement: string;
+          caseSensitive?: boolean;
+        }>
+    >;
   }>;
 
   export type RuleEntry =
@@ -400,15 +405,11 @@ namespace ConsistentBooleanName {
     /**
      * Boolean name prefixes to allow or disallow.
      */
-    prefixes?: Readonly<{
-      [k: string]: boolean;
-    }>;
+    prefixes?: ReadonlyRecord<string, boolean>;
     /**
      * Wrapper type names and their boolean-like value members.
      */
-    wrappers?: Readonly<{
-      [k: string]: string;
-    }>;
+    wrappers?: ReadonlyRecord<string, string>;
     /**
      * Patterns to ignore.
      */
@@ -476,95 +477,17 @@ namespace ConsistentClassMemberOrder {
      * @minItems 8
      * @maxItems 8
      */
-    order?: readonly [
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-
-      (
-        | 'static-field'
-        | 'static-block'
-        | 'static-method'
-        | 'private-field'
-        | 'public-field'
-        | 'constructor'
-        | 'private-method'
-        | 'public-method'
-      ),
-    ];
+    order?: FixedLengthTuple<
+      8,
+      | 'static-field'
+      | 'static-block'
+      | 'static-method'
+      | 'private-field'
+      | 'public-field'
+      | 'constructor'
+      | 'private-method'
+      | 'public-method'
+    >;
   }>;
 
   export type RuleEntry =
@@ -725,15 +648,12 @@ namespace ConsistentCompoundWords {
   /**
    * Custom compound word replacements.
    */
-  export type Replacements = Readonly<{
-    [k: string]: false | string;
-  }>;
+  export type Replacements = ReadonlyRecord<string, false | string>;
+
   /**
    * Custom allow list of names.
    */
-  export type TrueObject = Readonly<{
-    [k: string]: true;
-  }>;
+  export type TrueObject = ReadonlyRecord<string, true>;
 
   export type RuleEntry =
     | 'off'
@@ -1883,14 +1803,14 @@ namespace ImportStyle {
           styles?: ModuleStyles;
         }>,
       ];
+
   export type Styles = false | BooleanObject;
 
   /**
    * Module import styles.
    */
-  export type ModuleStyles = Readonly<{
-    [k: string]: Styles;
-  }>;
+  export type ModuleStyles = ReadonlyRecord<string, Styles>;
+
   export type BooleanObject = Readonly<{
     default?: boolean;
     named?: boolean;
@@ -1978,9 +1898,10 @@ namespace IsolatedFunctions {
     /**
      * Override which global variables are allowed inside isolated scopes.
      */
-    overrideGlobals?: Readonly<{
-      [k: string]: boolean | ('readonly' | 'writable' | 'writeable' | 'off');
-    }>;
+    overrideGlobals?: ReadonlyRecord<
+      string,
+      boolean | ('readonly' | 'writable' | 'writeable' | 'off')
+    >;
     /**
      * Function names that mark a scope as isolated.
      */
@@ -2325,23 +2246,20 @@ namespace NameReplacements {
           ignore?: readonly (string | UnknownRecord)[];
         }>,
       ];
+
   export type Replacements = false | BooleanObject;
 
   /**
    * Custom name replacements.
    */
-  export type NameReplacements1 = Readonly<{
-    [k: string]: Replacements;
-  }>;
-  export type BooleanObject = Readonly<{
-    [k: string]: boolean;
-  }>;
+  export type NameReplacements1 = ReadonlyRecord<string, Replacements>;
+
+  export type BooleanObject = ReadonlyRecord<string, boolean>;
+
   /**
    * Custom allow list of names.
    */
-  export type BooleanObject1 = Readonly<{
-    [k: string]: boolean;
-  }>;
+  export type BooleanObject1 = ReadonlyRecord<string, boolean>;
 
   export type RuleEntry =
     | 'off'
@@ -3430,15 +3348,15 @@ namespace NoInvalidArgumentCount {
   /**
    * Additional call and constructor patterns to check.
    */
-  export type Options = Readonly<{
-    [k: string]:
-      | number
-      | readonly [number, ...number[]]
-      | Readonly<{
-          min?: number;
-          max?: number;
-        }>;
-  }>;
+  export type Options = ReadonlyRecord<
+    string,
+    | number
+    | NonEmptyTuple<number>
+    | Readonly<{
+        min?: number;
+        max?: number;
+      }>
+  >;
 
   export type RuleEntry =
     | 'off'
@@ -9074,16 +8992,16 @@ namespace StringContent {
     /**
      * Patterns to replace in string content.
      */
-    patterns?: Readonly<{
-      [k: string]:
-        | string
-        | Readonly<{
-            suggest: string;
-            fix?: boolean;
-            caseSensitive?: boolean;
-            message?: string;
-          }>;
-    }>;
+    patterns?: ReadonlyRecord<
+      string,
+      | string
+      | Readonly<{
+          suggest: string;
+          fix?: boolean;
+          caseSensitive?: boolean;
+          message?: string;
+        }>
+    >;
     /**
      * AST selectors for string nodes to check.
      */

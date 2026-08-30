@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import {
+  type NonEmptyTuple,
+  type ReadonlyRecord,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -62,7 +66,7 @@ namespace NoUnresolved {
     /**
      * @minItems 1
      */
-    ignore?: readonly [unknown, ...unknown[]];
+    ignore?: NonEmptyTuple<unknown>;
     /**
      * @default true
      */
@@ -465,14 +469,13 @@ namespace Extensions {
   export type Options =
     | readonly []
     | readonly ['always' | 'ignorePackages' | 'never']
-    | readonly []
-    | readonly ['always' | 'ignorePackages' | 'never']
     | readonly [
         'always' | 'ignorePackages' | 'never',
         Readonly<{
-          pattern?: Readonly<{
-            [k: string]: 'always' | 'ignorePackages' | 'never';
-          }>;
+          pattern?: ReadonlyRecord<
+            string,
+            'always' | 'ignorePackages' | 'never'
+          >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
@@ -484,12 +487,12 @@ namespace Extensions {
           [k: string]: unknown;
         }>,
       ]
-    | readonly []
     | readonly [
         Readonly<{
-          pattern?: Readonly<{
-            [k: string]: 'always' | 'ignorePackages' | 'never';
-          }>;
+          pattern?: ReadonlyRecord<
+            string,
+            'always' | 'ignorePackages' | 'never'
+          >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
@@ -501,20 +504,11 @@ namespace Extensions {
           [k: string]: unknown;
         }>,
       ]
-    | readonly []
-    | readonly ['always' | 'ignorePackages' | 'never']
     | readonly [
         'always' | 'ignorePackages' | 'never',
-        Readonly<{
-          [k: string]: 'always' | 'ignorePackages' | 'never';
-        }>,
+        ReadonlyRecord<string, 'always' | 'ignorePackages' | 'never'>,
       ]
-    | readonly []
-    | readonly [
-        Readonly<{
-          [k: string]: 'always' | 'ignorePackages' | 'never';
-        }>,
-      ];
+    | readonly [ReadonlyRecord<string, 'always' | 'ignorePackages' | 'never'>];
 
   export type RuleEntry =
     | 'off'
@@ -605,20 +599,14 @@ namespace NoRestrictedPaths {
     /**
      * @minItems 1
      */
-    zones?: readonly [
+    zones?: NonEmptyTuple<
       Readonly<{
-        target?: string | readonly [string, ...string[]];
-        from?: string | readonly [string, ...string[]];
+        target?: string | NonEmptyTuple<string>;
+        from?: string | NonEmptyTuple<string>;
         except?: readonly string[];
         message?: string;
-      }>,
-      ...Readonly<{
-        target?: string | readonly [string, ...string[]];
-        from?: string | readonly [string, ...string[]];
-        except?: readonly string[];
-        message?: string;
-      }>[],
-    ];
+      }>
+    >;
     basePath?: string;
   }>;
 
@@ -754,7 +742,7 @@ namespace NoRelativePackages {
     /**
      * @minItems 1
      */
-    ignore?: readonly [unknown, ...unknown[]];
+    ignore?: NonEmptyTuple<unknown>;
   }>;
 
   export type RuleEntry =
@@ -810,7 +798,7 @@ namespace NoRelativeParentImports {
     /**
      * @minItems 1
      */
-    ignore?: readonly [unknown, ...unknown[]];
+    ignore?: NonEmptyTuple<unknown>;
   }>;
 
   export type RuleEntry =
@@ -944,7 +932,7 @@ namespace NoCycle {
     /**
      * @minItems 1
      */
-    ignore?: readonly [unknown, ...unknown[]];
+    ignore?: NonEmptyTuple<unknown>;
     maxDepth?: number | '∞';
     /**
      * ignore external modules
@@ -1261,7 +1249,7 @@ namespace NoUnusedModules {
           /**
            * @minItems 1
            */
-          src?: readonly [unknown, ...unknown[]];
+          src?: NonEmptyTuple<unknown>;
           [k: string]: unknown;
         }
       | {
@@ -1363,7 +1351,6 @@ namespace NoCommonjs {
   export type Options =
     | readonly []
     | readonly ['allow-primitive-modules']
-    | readonly []
     | readonly [
         Readonly<{
           allowPrimitiveModules?: boolean;
@@ -1652,7 +1639,7 @@ namespace NoAbsolutePath {
     /**
      * @minItems 1
      */
-    ignore?: readonly [unknown, ...unknown[]];
+    ignore?: NonEmptyTuple<unknown>;
   }>;
 
   export type RuleEntry =
