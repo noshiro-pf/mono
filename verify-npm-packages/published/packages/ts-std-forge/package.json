@@ -1,9 +1,9 @@
 {
-  "name": "verify-eslint-config-typed",
+  "name": "verify-ts-std-forge",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-config-typed": "5.10.1"
+    "ts-std-forge": "0.1.0"
   }
 }
