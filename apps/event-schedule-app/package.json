@@ -29,7 +29,7 @@
     "@emotion/styled": "^11.14.1",
     "better-react-use-state": "workspace:*",
     "event-schedule-app-shared": "workspace:*",
-    "firebase": "^12.17.1",
+    "firebase": "^12.18.0",
     "html2canvas": "^1.4.1",
     "numeric-input-utils": "workspace:*",
     "react-blueprintjs-utils": "workspace:*",
