@@ -20,10 +20,10 @@ catalog:
   '@vitest/coverage-v8': 4.1.11
   '@vitest/ui': 4.1.11
   argparse: 3.0.0
-  cspell: 10.0.1
+  cspell: 10.1.0
   dedent: 1.7.2
   esbuild: 0.28.2
-  eslint: 10.8.1
+  eslint: 10.9.0
   immer: 11.1.18
   jiti: 2.7.0
   jotai: 2.20.2
