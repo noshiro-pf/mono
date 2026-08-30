@@ -332,9 +332,8 @@ const generateSpace = async (
 
     const spec = pin.value;
 
-    // Not on the registry at all: the state a package is in between the pull
-    // request that adds it and its first manual publish. Leaving it out is
-    // what lets that window exist — see the note on `publishedVersionPin`.
+    // Named in `notYetPublished` and not on the registry, so there is nothing
+    // to install and nothing to check.
     if (spec === undefined) {
       mut_skipped.push(pkg.name);
 
@@ -410,7 +409,7 @@ const generateSpace = async (
 
   if (Arr.isNonEmpty(mut_skipped)) {
     console.info(
-      `Not yet published, so left out of the ${target} space: ${mut_skipped.join(', ')}.\n`,
+      `Not on npm yet, so left out of the ${target} space: ${mut_skipped.join(', ')}.\n`,
     );
   }
 
@@ -448,20 +447,35 @@ const siblingOverrides = (
 ];
 
 /**
+ * Packages that are in the workspace but not on npm yet, and so are left out
+ * of the published space.
+ *
+ * A package's first publish is manual (`libs/first-release.md`): npm's trusted
+ * publishing is configured per package and cannot be configured before the
+ * package exists, so between the pull request that adds a package and that
+ * first publish there is nothing to pin and nothing for a consumer to install.
+ * Without an entry here that window fails `verify-published` on every pull
+ * request that moves the pins.
+ *
+ * Naming them one by one rather than treating every `E404` as "not published
+ * yet" is deliberate: a package that stops resolving for any other reason — a
+ * rename, an unpublish, a typo in a manifest — has to fail rather than quietly
+ * leave the check. Delete the entry once the package has been published; from
+ * then on it is verified like any other.
+ */
+const notYetPublished: ReadonlySet<string> = new Set(['ts-std-forge']);
+
+/**
  * The published space pins an exact version, committed, rather than tracking
  * `latest`. Two reasons: the check then only has something new to say when the
  * pin moves, and it cannot start failing on its own the moment a release goes
  * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
  * version bump arrives as a reviewable diff like any other dependency.
  *
- * Returns `undefined` when the registry has never heard of the package. A
- * package's first publish is manual (`libs/first-release.md`), because npm's
- * trusted publishing is configured per package and cannot be configured before
- * the package exists — so between the pull request that adds a package and
- * that first publish there is nothing to pin, and nothing for a consumer to
- * install either. The published space leaves such a package out rather than
- * failing, which is what keeps that window from blocking every pull request
- * that moves the pins.
+ * Returns `undefined` for a package named in `notYetPublished` that the
+ * registry does not have. Any other package the registry does not have is an
+ * error: a package silently dropping out of the check is exactly what this
+ * would otherwise hide.
  */
 const publishedVersionPin = async (
   dir: string,
@@ -478,14 +492,19 @@ const publishedVersionPin = async (
 
   if (Result.isOk(latest)) return Result.ok(latest.value.stdout.trim());
 
-  // Only "the registry has never heard of this package" is a skip. Every
-  // other failure — a network fault, a registry outage, an auth error — is
-  // reported, because treating those as "not published" would quietly drop
-  // packages from the check at exactly the moment it cannot be trusted.
-  return npmSaysNotFound(latest.value.message)
+  // A network fault, a registry outage or an auth error is reported as-is:
+  // reading those as "not published" would drop packages from the check at
+  // exactly the moment it cannot be trusted.
+  if (!npmSaysNotFound(latest.value.message)) {
+    return Result.err(
+      `Could not look up the published version of ${packageName}: ${latest.value.message}`,
+    );
+  }
+
+  return notYetPublished.has(packageName)
     ? Result.ok(undefined)
     : Result.err(
-        `Could not look up the published version of ${packageName}: ${latest.value.message}`,
+        `${packageName} is not on the registry. If it is waiting for its first manual publish, add it to \`notYetPublished\` in this file; otherwise it has been renamed or unpublished.`,
       );
 };
 
