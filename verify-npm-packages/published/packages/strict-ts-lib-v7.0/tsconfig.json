@@ -10,12 +10,8 @@
     "types": [],
     "libReplacement": true,
     "paths": {
-      "@typescript/lib-*": [
-        "./node_modules/strict-ts-lib-v7.0/libs/*"
-      ]
+      "@typescript/lib-*": ["./node_modules/strict-ts-lib-v7.0/libs/*"]
     }
   },
-  "include": [
-    "strict-ts-lib-v7.0.mts"
-  ]
+  "include": ["strict-ts-lib-v7.0.mts"]
 }

@@ -10,7 +10,5 @@
     "types": [],
     "libReplacement": true
   },
-  "include": [
-    "strict-ts-lib-v6.0.mts"
-  ]
+  "include": ["strict-ts-lib-v6.0.mts"]
 }

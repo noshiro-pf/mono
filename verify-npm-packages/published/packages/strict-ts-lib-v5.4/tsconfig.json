@@ -9,7 +9,5 @@
     "skipLibCheck": false,
     "types": []
   },
-  "include": [
-    "strict-ts-lib-v5.4.mts"
-  ]
+  "include": ["strict-ts-lib-v5.4.mts"]
 }

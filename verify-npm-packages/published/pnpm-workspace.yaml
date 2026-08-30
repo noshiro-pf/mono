@@ -14,3 +14,6 @@ strictDepBuilds: false
 # The repository holds new releases back for a week. Here that would
 # mean "published" quietly meaning "published a week ago".
 minimumReleaseAge: 0
+
+allowBuilds:
+  unrs-resolver: set this to true or false
