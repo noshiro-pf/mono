@@ -61,6 +61,11 @@ jobs:
           - cspell
           - ws:doc
           - ws:check:ext
+          # `docs/package-dependencies.md` is generated from every
+          # `package.json`, so it goes stale whenever one changes and whenever a
+          # rebase drops a row from it. Regenerating it here and letting the
+          # repository-clean step below compare is the only thing that notices.
+          - docs:deps
 
     steps:
       - name: Checkout
