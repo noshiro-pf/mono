@@ -62,6 +62,10 @@ export const verifyNpmPackages = async (
 
   if (Result.isErr(generated)) return generated;
 
+  // What the space actually contains, which in the published space is not
+  // every publishable package — see `generateSpace`.
+  const included = generated.value;
+
   console.info(
     `Installing into ${path.relative(projectRootPath, spaceDir)} ...`,
   );
@@ -96,7 +100,7 @@ export const verifyNpmPackages = async (
 
   console.info('ok\n');
 
-  return runChecks(spaceDir, packages);
+  return runChecks(spaceDir, included);
 };
 
 export type Target = 'local' | 'published';
@@ -276,7 +280,7 @@ const generateSpace = async (
   spaceDir: string,
   packages: readonly PackageToCheck[],
   options: Readonly<{ updatePins: boolean }>,
-): Promise<Result<undefined, string>> => {
+): Promise<Result<readonly PackageToCheck[], string>> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.mkdir(path.resolve(spaceDir, 'packages'), { recursive: true });
 
@@ -310,22 +314,36 @@ const generateSpace = async (
     ].join('\n'),
   );
 
+  const mut_included: PackageToCheck[] = [];
+
+  const mut_skipped: string[] = [];
+
   for (const pkg of packages) {
     const dir = path.resolve(spaceDir, 'packages', pkg.name);
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.mkdir(dir, { recursive: true });
-
-    const spec =
+    const pin =
       target === 'local'
-        ? `file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}`
+        ? Result.ok<string | undefined>(
+            `file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}`,
+          )
         : await publishedVersionPin(dir, pkg.name, options.updatePins);
 
+    if (Result.isErr(pin)) return pin;
+
+    const spec = pin.value;
+
+    // Named in `notYetPublished` and not on the registry, so there is nothing
+    // to install and nothing to check.
     if (spec === undefined) {
-      return Result.err(
-        `Could not determine a published version for ${pkg.name}.`,
-      );
+      mut_skipped.push(pkg.name);
+
+      continue;
     }
+
+    mut_included.push(pkg);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(dir, { recursive: true });
 
     await writeJson(path.resolve(dir, 'package.json'), {
       name: `verify-${pkg.name}`,
@@ -385,9 +403,17 @@ const generateSpace = async (
     },
   );
 
-  return Result.isErr(formatted)
-    ? Result.err(`Failed to format the generated files in ${spaceDir}.`)
-    : Result.ok(undefined);
+  if (Result.isErr(formatted)) {
+    return Result.err(`Failed to format the generated files in ${spaceDir}.`);
+  }
+
+  if (Arr.isNonEmpty(mut_skipped)) {
+    console.info(
+      `Not on npm yet, so left out of the ${target} space: ${mut_skipped.join(', ')}.\n`,
+    );
+  }
+
+  return Result.ok(mut_included);
 };
 
 /**
@@ -421,27 +447,76 @@ const siblingOverrides = (
 ];
 
 /**
+ * Packages that are in the workspace but not on npm yet, and so are left out
+ * of the published space.
+ *
+ * A package's first publish is manual (`libs/first-release.md`): npm's trusted
+ * publishing is configured per package and cannot be configured before the
+ * package exists, so between the pull request that adds a package and that
+ * first publish there is nothing to pin and nothing for a consumer to install.
+ * Without an entry here that window fails `verify-published` on every pull
+ * request that moves the pins.
+ *
+ * Naming them one by one rather than treating every `E404` as "not published
+ * yet" is deliberate: a package that stops resolving for any other reason — a
+ * rename, an unpublish, a typo in a manifest — has to fail rather than quietly
+ * leave the check. Delete the entry once the package has been published; from
+ * then on it is verified like any other.
+ */
+const notYetPublished: ReadonlySet<string> = new Set(['ts-std-forge']);
+
+/**
  * The published space pins an exact version, committed, rather than tracking
  * `latest`. Two reasons: the check then only has something new to say when the
  * pin moves, and it cannot start failing on its own the moment a release goes
  * out. `--update` moves the pins, and `pnpm-update` is what runs it — a
  * version bump arrives as a reviewable diff like any other dependency.
+ *
+ * Returns `undefined` for a package named in `notYetPublished` that the
+ * registry does not have. Any other package the registry does not have is an
+ * error: a package silently dropping out of the check is exactly what this
+ * would otherwise hide.
  */
 const publishedVersionPin = async (
   dir: string,
   packageName: string,
   updatePins: boolean,
-): Promise<string | undefined> => {
+): Promise<Result<string | undefined, string>> => {
   const existing = updatePins
     ? undefined
     : await readPinnedVersion(dir, packageName);
 
-  if (existing !== undefined) return existing;
+  if (existing !== undefined) return Result.ok(existing);
 
   const latest = await $(`npm view ${packageName} version`, { silent: true });
 
-  return Result.isErr(latest) ? undefined : latest.value.stdout.trim();
+  if (Result.isOk(latest)) return Result.ok(latest.value.stdout.trim());
+
+  // A network fault, a registry outage or an auth error is reported as-is:
+  // reading those as "not published" would drop packages from the check at
+  // exactly the moment it cannot be trusted.
+  if (!npmSaysNotFound(latest.value.message)) {
+    return Result.err(
+      `Could not look up the published version of ${packageName}: ${latest.value.message}`,
+    );
+  }
+
+  return notYetPublished.has(packageName)
+    ? Result.ok(undefined)
+    : Result.err(
+        `${packageName} is not on the registry. If it is waiting for its first manual publish, add it to \`notYetPublished\` in this file; otherwise it has been renamed or unpublished.`,
+      );
 };
+
+/**
+ * npm reports an unknown package as `E404`, on stderr, which `exec` folds into
+ * the error's message. Matched on the code rather than on the prose so that a
+ * reworded message does not turn a missing package into a hard failure — and
+ * narrowly enough that a 404 from somewhere else in the output does not read
+ * as one.
+ */
+const npmSaysNotFound = (message: string): boolean =>
+  message.includes('E404') || message.includes('is not in this registry');
 
 const readPinnedVersion = async (
   dir: string,
