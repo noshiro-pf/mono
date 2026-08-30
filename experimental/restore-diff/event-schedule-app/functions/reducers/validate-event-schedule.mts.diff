@@ -1,0 +1,85 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/validate-event-schedule.ts apps/event-schedule-app/src/functions/reducers/validate-event-schedule.mts
+index f296dcf23..e46976907 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/validate-event-schedule.ts
++++ apps/event-schedule-app/src/functions/reducers/validate-event-schedule.mts
+@@ -1,16 +1,18 @@
+-import { isEmailString } from '@noshiro/ts-utils-additional';
+-import { answerIconPointConfig } from '../../constants';
++import { Arr, Num } from 'ts-data-forge';
++import { type StrictOmit } from 'ts-type-forge';
++import { answerIconPointConfig } from '../../constants/index.mjs';
+ import {
+   type EventScheduleValidation,
+   type NotificationSettingsWithEmail,
+-} from '../../types';
++} from '../../types/index.mjs';
++import { isEmailString } from '../../utils-ported/index.mjs';
+ 
+ export const validateEventSchedule = ({
+   title,
+   datetimeRangeList,
+   answerIcons,
+   notificationSettingsWithEmail,
+-}: Omit<
++}: StrictOmit<
+   EventSchedule,
+   | 'answerDeadline'
+   | 'archivedBy'
+@@ -24,31 +26,32 @@ export const validateEventSchedule = ({
+   Readonly<{
+     datetimeRangeList: readonly DatetimeRange[]; // allow an empty array
+     notificationSettingsWithEmail: NotificationSettingsWithEmail | 'none';
+-  }>): EventScheduleValidation => ({
+-  title: title !== '',
+-  datetimeRangeList: !Arr.isEmpty(datetimeRangeList),
+-  answerIcons:
+-    answerIcons.good.description === '' ||
+-    answerIcons.fair.description === '' ||
+-    answerIcons.poor.description === '' ||
+-    Num.isInRangeInclusive(
+-      answerIconPointConfig.fair.min,
+-      answerIconPointConfig.fair.max,
+-    )(answerIcons.fair.point),
+-  notificationEmail:
+-    notificationSettingsWithEmail === 'none' ||
+-    isEmailString(notificationSettingsWithEmail.email),
+-  notificationItems:
+-    notificationSettingsWithEmail === 'none' ||
+-    notificationSettingsWithEmail.notifyOnAnswerChange ||
+-    notificationSettingsWithEmail.notifyAfterAnswerDeadline ||
+-    notificationSettingsWithEmail.notify00daysBeforeAnswerDeadline ||
+-    notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline ||
+-    notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline ||
+-    notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline ||
+-    notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline ||
+-    notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline,
+-});
++  }>): EventScheduleValidation =>
++  ({
++    title: title !== '',
++    datetimeRangeList: !Arr.isEmpty(datetimeRangeList),
++    answerIcons:
++      answerIcons.good.description === '' ||
++      answerIcons.fair.description === '' ||
++      answerIcons.poor.description === '' ||
++      Num.isInRangeInclusive(
++        answerIconPointConfig.fair.min,
++        answerIconPointConfig.fair.max,
++      )(answerIcons.fair.point),
++    notificationEmail:
++      notificationSettingsWithEmail === 'none' ||
++      isEmailString(notificationSettingsWithEmail.email),
++    notificationItems:
++      notificationSettingsWithEmail === 'none' ||
++      notificationSettingsWithEmail.notifyOnAnswerChange ||
++      notificationSettingsWithEmail.notifyAfterAnswerDeadline ||
++      notificationSettingsWithEmail.notify00daysBeforeAnswerDeadline ||
++      notificationSettingsWithEmail.notify01daysBeforeAnswerDeadline ||
++      notificationSettingsWithEmail.notify03daysBeforeAnswerDeadline ||
++      notificationSettingsWithEmail.notify07daysBeforeAnswerDeadline ||
++      notificationSettingsWithEmail.notify14daysBeforeAnswerDeadline ||
++      notificationSettingsWithEmail.notify28daysBeforeAnswerDeadline,
++  }) as const;
+ 
+ export const validateEventScheduleAll = (
+   eventScheduleValidation: EventScheduleValidation,

@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/fetch-answers.ts apps/event-schedule-app/src/api/crud/fetch-answers.mts
+index 9b8c0d61e..6ebfa745a 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/fetch-answers.ts
++++ apps/event-schedule-app/src/api/crud/fetch-answers.mts
+@@ -2,9 +2,10 @@ import {
+   ANSWER_KEY_CREATED_AT,
+   Answer,
+   firestorePaths,
+-} from '@noshiro/event-schedule-app-shared';
++} from 'event-schedule-app-shared';
+ import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ export const fetchAnswers = (
+   eventId: string,
+@@ -18,11 +19,11 @@ export const fetchAnswers = (
+         orderBy(ANSWER_KEY_CREATED_AT, 'asc'),
+       ),
+     ),
+-  ).then((a) =>
++  ).then(
+     Result.fold(
+-      a,
+       (querySnapshot) =>
+         querySnapshot.docs.map((d) => Answer.fill({ ...d.data(), id: d.id })),
+-      (message) => ({ type: 'others', message: Str.from(message) }) as const,
++      (message) =>
++        ({ type: 'others', message: unknownToString(message) }) as const,
+     ),
+   );

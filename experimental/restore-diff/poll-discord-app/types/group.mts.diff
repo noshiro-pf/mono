@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/group.mts apps/poll-discord-app/src/types/group.mts
+index 6e2601798..549d35a12 100644
+--- experimental/packages/apps/poll-discord-app/src/types/group.mts
++++ apps/poll-discord-app/src/types/group.mts
+@@ -1,4 +1,5 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
++import { type DeepReadonly, type UpperAlphabet } from 'ts-type-forge';
+ 
+ export type Group = DeepReadonly<{
+   no: UpperAlphabet;

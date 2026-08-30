@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/errors.tsx apps/event-schedule-app/src/components/organisms/errors.tsx
+index d31998a10..c2e886f6d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/errors.tsx
++++ apps/event-schedule-app/src/components/organisms/errors.tsx
+@@ -1,12 +1,12 @@
+-import { errorFontColor } from '../../constants';
+-import { type EventScheduleValidation } from '../../types';
+-import { Description } from '../atoms';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { errorFontColor } from '../../constants/index.mjs';
++import { type EventScheduleValidation } from '../../types/index.mjs';
++import { Description } from '../atoms/index.mjs';
+ 
+ const dc = dict.eventSettingsPage;
+ 
+-type Props = Readonly<{
+-  eventScheduleValidation: EventScheduleValidation;
+-}>;
++type Props = Readonly<{ eventScheduleValidation: EventScheduleValidation }>;
+ 
+ export const EventSchedulePropertiesErrors = memoNamed<Props>(
+   'EventSchedulePropertiesErrors',

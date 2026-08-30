@@ -1,0 +1,55 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/year-month-date.test.mts apps/event-schedule-app-shared/src/v6/types/record/base/year-month-date.test.mts
+index 88f664755..4184ee5a3 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/year-month-date.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/year-month-date.test.mts
+@@ -9,39 +9,42 @@ import {
+ 
+ describe('isYearEnum', () => {
+   test('true case', () => {
+-    expect(isYearEnum(1970)).toBe(true);
++    assert.isTrue(isYearEnum(1970));
+   });
++
+   test('false case', () => {
+-    expect(isYearEnum(-3)).toBe(false);
++    assert.isFalse(isYearEnum(-3));
+   });
+ });
+ 
+ describe('isMonthEnum', () => {
+   test('true case', () => {
+-    expect(isMonthEnum(12)).toBe(true);
++    assert.isTrue(isMonthEnum(12));
+   });
++
+   test('false case', () => {
+-    expect(isMonthEnum(13)).toBe(false);
++    assert.isFalse(isMonthEnum(13));
+   });
+ });
+ 
+ describe('isDateEnum', () => {
+   test('true case', () => {
+-    expect(isDateEnum(31)).toBe(true);
++    assert.isTrue(isDateEnum(31));
+   });
++
+   test('false case', () => {
+-    expect(isDateEnum(32)).toBe(false);
++    assert.isFalse(isDateEnum(32));
+   });
+ });
+ 
+ describe('isYearMonthDate', () => {
+   test('defaultValue should be true', () => {
+-    expect(isYearMonthDate(yearMonthDateDefaultValue)).toBe(true);
++    assert.isTrue(isYearMonthDate(yearMonthDateDefaultValue));
+   });
+ });
+ 
+ describe('fillYearMonthDate', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillYearMonthDate({})).toStrictEqual(yearMonthDateDefaultValue);
++    assert.deepStrictEqual(fillYearMonthDate({}), yearMonthDateDefaultValue);
+   });
+ });

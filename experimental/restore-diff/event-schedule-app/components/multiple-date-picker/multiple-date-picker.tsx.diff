@@ -1,0 +1,39 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/multiple-date-picker.tsx apps/event-schedule-app/src/components/multiple-date-picker/multiple-date-picker.tsx
+index 082a4b173..cb40c5e6e 100644
+--- experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/multiple-date-picker.tsx
++++ apps/event-schedule-app/src/components/multiple-date-picker/multiple-date-picker.tsx
+@@ -1,23 +1,27 @@
+ import { Button } from '@blueprintjs/core';
++import { css } from '@emotion/react';
+ import {
+   DatePickerBodyStyled,
+   DatePickerMonthStyled,
+   DatePickerStyled,
+   DayPickerStyled,
+-} from '@noshiro/react-blueprintjs-utils';
++} from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type Observable as SynstateObservable } from 'synstate';
++import { type IMapMapped } from 'ts-data-forge';
+ import {
+   type CalendarCurrentPageReducerState,
+   type YmdKey,
+-} from '../../functions';
+-import { useMultipleDatePickerState } from '../../hooks';
+-import { DatepickerNav } from './navigation';
+-import { Week } from './week';
+-import { WeekdaysHeader } from './weekdays-header';
++} from '../../functions/index.mjs';
++import { useMultipleDatePickerState } from '../../hooks/index.mjs';
++import { DatepickerNav } from './navigation.js';
++import { Week } from './week.js';
++import { WeekdaysHeader } from './weekdays-header.js';
+ 
+ type Props = Readonly<{
+   selectedDates: readonly YearMonthDate[];
+   onSelectedDatesChange?: (value: readonly YearMonthDate[]) => void;
+-  setYearMonth$?: Observable<CalendarCurrentPageReducerState>;
++  setYearMonth$?: SynstateObservable<CalendarCurrentPageReducerState>;
+   holidaysJpDefinition?: IMapMapped<YearMonthDate, string, YmdKey>;
+   useOutlinedSelectedStyle?: boolean;
+ }>;

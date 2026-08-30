@@ -1,0 +1,72 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-numeric-input.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-numeric-input.tsx
+index 84287c011..6ee038d5d 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-numeric-input.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-numeric-input.tsx
+@@ -1,10 +1,14 @@
+ import { NumericInput } from '@blueprintjs/core';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { Num } from '@noshiro/ts-utils';
+ import { useState } from 'better-react-use-state';
+-import { useCallback, useEffect } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { Num } from 'ts-data-forge';
++import { type StrictOmit } from 'ts-type-forge';
+ 
+-export type BpNumericInputProps = Omit<NumericInputPropsOriginal, 'value'> &
++export type BpNumericInputProps = StrictOmit<
++  NumericInputPropsOriginal,
++  'value'
++> &
+   Readonly<{
+     value: number;
+     onValueChangeFiltered?: (valueAsNumber: number) => void;
+@@ -34,11 +38,11 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
+   }) => {
+     const [state, setState] = useState<string>(value.toString());
+ 
+-    useEffect(() => {
++    React.useEffect(() => {
+       setState(value.toString());
+     }, [value, setState]);
+ 
+-    const onValueChangeInternal = useCallback(
++    const onValueChangeInternal = React.useCallback(
+       (
+         valueAsNumber: number,
+         valueAsString: string,
+@@ -47,9 +51,11 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
+         if (onValueChange !== undefined) {
+           onValueChange(valueAsNumber, valueAsString, inputElement);
+         }
++
+         setState(valueAsString);
+ 
+         const parsed = parseNumericString(valueAsString);
++
+         if (parsed !== undefined && onValueChangeFiltered !== undefined) {
+           onValueChangeFiltered(parsed);
+         }
+@@ -57,7 +63,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
+       [onValueChange, onValueChangeFiltered, parseNumericString, setState],
+     );
+ 
+-    const onBlurInternal = useCallback<
++    const onBlurInternal = React.useCallback<
+       React.FocusEventHandler<HTMLInputElement>
+     >(
+       (ev) => {
+@@ -68,6 +74,7 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
+         if (onValueChangeFiltered === undefined) return;
+ 
+         const parsed = parseNumericString(state);
++
+         if (parsed === undefined) {
+           if (convertValueOnBlurAndEmit !== undefined) {
+             onValueChangeFiltered(
+@@ -109,4 +116,4 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
+ 
+ const style: React.CSSProperties = {
+   textAlign: 'right',
+-};
++} as const;

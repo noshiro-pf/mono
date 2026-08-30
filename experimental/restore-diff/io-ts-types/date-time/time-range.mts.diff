@@ -1,0 +1,23 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/time-range.mts apps/ts-fortress-types/src/date-time/time-range.mts
+index 7829402fe..3c4d15c26 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/time-range.mts
++++ apps/ts-fortress-types/src/date-time/time-range.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { compareHm, HoursMinutes } from './hours-minutes.mjs';
+ 
+ export const TimeRange = t.record({
+@@ -10,8 +10,12 @@ export type TimeRange = t.TypeOf<typeof TimeRange>;
+ 
+ export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
+   const compareStartHmResult = compareHm(a.start, b.start);
++
+   if (compareStartHmResult !== 0) return compareStartHmResult;
++
+   const compareEndHmResult = compareHm(a.end, b.end);
++
+   if (compareEndHmResult !== 0) return compareEndHmResult;
++
+   return 0;
+ };

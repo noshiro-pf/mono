@@ -1,0 +1,50 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-email-verified.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-email-verified.tsx
+index fc966aef4..e4cd09d22 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-email-verified.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-email-verified.tsx
+@@ -1,13 +1,17 @@
+-import { descriptionFontColor } from '../../../constants';
+-import { EditEventScheduleStore } from '../../../store';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { descriptionFontColor } from '../../../constants/index.mjs';
++import { EditEventScheduleStore } from '../../../store/index.mjs';
+ import {
+   BackToAnswerPageButton,
+   EventScheduleDiff,
+   ResetEditButton,
+   SubmitEditingEventButton,
+-} from '../../organisms';
+-import { ButtonsWrapperForEventSettingsPage } from '../../styled';
+-import { EventScheduleSettingCommon } from './event-schedule-setting-common';
++} from '../../organisms/index.mjs';
++import { ButtonsWrapperForEventSettingsPage } from '../../styled/index.mjs';
++import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
+ 
+ const dc = dict.eventSettingsPage;
+ 
+@@ -20,11 +24,12 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
+   'EditEventScheduleEmailVerified',
+   ({ eventScheduleFromDb, emailVerified }) => {
+     const commonState = useObservableValue(EditEventScheduleStore.commonState$);
++
+     const hasNoChanges = useObservableValue(
+       EditEventScheduleStore.hasNoChanges$,
+     );
+ 
+-    useEffect(() => {
++    React.useEffect(() => {
+       EditEventScheduleStore.setEventSchedule(
+         eventScheduleFromDb,
+         emailVerified,
+@@ -41,7 +46,7 @@ export const EditEventScheduleEmailVerified = memoNamed<Props>(
+ 
+     const { eventScheduleValidationOk } = commonState;
+ 
+-    const resetState = useCallback(() => {
++    const resetState = React.useCallback(() => {
+       EditEventScheduleStore.setEventSchedule(
+         eventScheduleFromDb,
+         emailVerified,

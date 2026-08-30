@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/ymd-to-day-in-week.ts apps/event-schedule-app/src/functions/ymd-to-day-in-week.mts
+index b2106a3a5..b6cc409e1 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/ymd-to-day-in-week.ts
++++ apps/event-schedule-app/src/functions/ymd-to-day-in-week.mts
+@@ -1,4 +1,5 @@
+-import { ymd2day } from '../utils';
++import { type DayOfWeekName } from 'ts-type-forge';
++import { ymd2day } from '../utils/index.mjs';
+ 
+ export const ymdToDayInWeek = (ymd: YearMonthDate): DayOfWeekName =>
+   (['Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'] as const)[ymd2day(ymd)];

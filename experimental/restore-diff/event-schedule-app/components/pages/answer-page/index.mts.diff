@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/index.ts apps/event-schedule-app/src/components/pages/answer-page/index.mts
+index 5e6c59088..c2dd7b70e 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/index.ts
++++ apps/event-schedule-app/src/components/pages/answer-page/index.mts
+@@ -1,2 +1,2 @@
+-export * from './answer-page';
+-export * from './error';
++export * from './answer-page.js';
++export * from './error.js';

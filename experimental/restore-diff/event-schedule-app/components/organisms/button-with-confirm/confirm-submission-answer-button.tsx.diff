@@ -1,0 +1,38 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-submission-answer-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-submission-answer-button.tsx
+index 77b848fa3..d2e7ff007 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-submission-answer-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/confirm-submission-answer-button.tsx
+@@ -1,6 +1,9 @@
+-import { ButtonNowrapStyled } from '@noshiro/react-blueprintjs-utils';
+-import { AnswerPageStore } from '../../../store';
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type StrictOmit } from 'ts-type-forge';
++import { AnswerPageStore } from '../../../store/index.mjs';
++import { match } from '../../../utils-ported/index.mjs';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.answerPage.answerBeingEdited;
+ 
+@@ -11,10 +14,7 @@ type Props = Readonly<{
+   mode: 'creating' | 'editing';
+ }>;
+ 
+-const buttonConfigBase = {
+-  icon: 'tick',
+-  intent: 'primary',
+-} as const;
++const buttonConfigBase = { icon: 'tick', intent: 'primary' } as const;
+ 
+ const buttonConfigCreating = {
+   ...buttonConfigBase,
+@@ -65,7 +65,7 @@ export const SubmitAnswerButtonWithConfirmation = memoNamed<Props>(
+     ),
+ );
+ 
+-const SubmitAnswerButton = memoNamed<Omit<Props, 'hasUnanswered'>>(
++const SubmitAnswerButton = memoNamed<StrictOmit<Props, 'hasUnanswered'>>(
+   'SubmitAnswerButton',
+   ({ loading, disabled, mode }) => (
+     <ButtonNowrapStyled

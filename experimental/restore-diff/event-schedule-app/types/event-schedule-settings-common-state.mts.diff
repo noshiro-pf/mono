@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/types/event-schedule-settings-common-state.ts apps/event-schedule-app/src/types/event-schedule-settings-common-state.mts
+index b779dd0c6..2469ef4ae 100644
+--- experimental/packages/apps/event-schedule-app/src/types/event-schedule-settings-common-state.ts
++++ apps/event-schedule-app/src/types/event-schedule-settings-common-state.mts
+@@ -1,5 +1,5 @@
+-import { type EventScheduleValidation } from './event-schedule-validation';
+-import { type NotificationSettingsWithEmail } from './notification-with-email';
++import { type EventScheduleValidation } from './event-schedule-validation.mjs';
++import { type NotificationSettingsWithEmail } from './notification-with-email.mjs';
+ 
+ export type EventScheduleSettingCommonState = Readonly<{
+   title: string;

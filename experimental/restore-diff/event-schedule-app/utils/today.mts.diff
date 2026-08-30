@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/today.ts apps/event-schedule-app/src/utils/today.mts
+index 2c6df319c..01a7aa6f3 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/today.ts
++++ apps/event-schedule-app/src/utils/today.mts
+@@ -1,5 +1,8 @@
++import { DateUtils } from 'ts-fortress-types';
++
+ export const now = (): Ymdhm => {
+   const nowDateObj = DateUtils.today();
++
+   return {
+     year: DateUtils.getLocaleYear(nowDateObj),
+     month: DateUtils.getLocaleMonth(nowDateObj),

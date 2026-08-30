@@ -1,0 +1,41 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-icon-of-specified-respondent.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-icon-of-specified-respondent.tsx
+index 9fe23ae7d..c85e78a4b 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-icon-of-specified-respondent.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-icon-of-specified-respondent.tsx
+@@ -1,13 +1,17 @@
+-import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
+-import { AnswerFilterAndSortStore } from '../../../store';
+-import { CustomIcon } from '../../atoms';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
++import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
++import { CustomIcon } from '../../atoms/index.mjs';
+ import {
+   CheckboxWithRightLabel,
+   CheckboxWrapper,
+   FilterItem,
+   FilterItemContent,
+   HorizontalCheckboxesWrapper,
+-} from './styled';
++} from './styled.js';
+ 
+ const dc = dict.answerPage.detailedFilter;
+ 
+@@ -20,12 +24,9 @@ type Props = DeepReadonly<{
+   checkState: {
+     key: string;
+     username: string;
+-    checkState: Record<
++    checkState: ReadonlyRecord<
+       AnswerIconIdWithNone,
+-      {
+-        checked: boolean;
+-        onCheck: (value: boolean) => void;
+-      }
++      { checked: boolean; onCheck: (value: boolean) => void }
+     >;
+   }[];
+ }>;

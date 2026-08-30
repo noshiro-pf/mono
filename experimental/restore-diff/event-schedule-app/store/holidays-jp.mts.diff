@@ -1,0 +1,44 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/holidays-jp.ts apps/event-schedule-app/src/store/holidays-jp.mts
+index 436db88e4..13838e6d7 100644
+--- experimental/packages/apps/event-schedule-app/src/store/holidays-jp.ts
++++ apps/event-schedule-app/src/store/holidays-jp.mts
+@@ -1,14 +1,27 @@
+-import { YearMonthDateFromDate } from '@noshiro/io-ts-types';
+-import { fetchHolidaysJson, ymdFromKey, ymdToKey } from '../functions';
++import {
++  type InitializedObservable,
++  filter,
++  fromPromise,
++  map,
++  unwrapResultOk,
++  withInitialValue,
++} from 'synstate';
++import { IMapMapped, isNotUndefined } from 'ts-data-forge';
++import { DateUtils, YearMonthDateFromDate } from 'ts-fortress-types';
++import {
++  fetchHolidaysJson,
++  ymdFromKey,
++  ymdToKey,
++} from '../functions/index.mjs';
+ 
+ export const holidaysJpDefinition$: InitializedObservable<
+   IMapMapped<YearMonthDate, string, YmdKey>
+ > = fromPromise(fetchHolidaysJson())
+-  .chain(unwrapResultOk())
+-  .chain(filter(isNotUndefined))
+-  .chain(
++  .pipe(unwrapResultOk())
++  .pipe(filter(isNotUndefined))
++  .pipe(
+     map((record) =>
+-      IMapMapped.new(
++      IMapMapped.create(
+         Object.entries(record).map(([key, value]) => [
+           YearMonthDateFromDate(DateUtils.from(key)),
+           value,
+@@ -18,4 +31,4 @@ export const holidaysJpDefinition$: InitializedObservable<
+       ),
+     ),
+   )
+-  .chain(setInitialValue(IMapMapped.new([], ymdToKey, ymdFromKey)));
++  .pipe(withInitialValue(IMapMapped.create([], ymdToKey, ymdFromKey)));

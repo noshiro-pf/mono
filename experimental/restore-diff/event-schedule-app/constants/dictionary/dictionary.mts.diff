@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/dictionary.ts apps/event-schedule-app/src/constants/dictionary/dictionary.mts
+index 2fa7a02ad..f457c0e55 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/dictionary.ts
++++ apps/event-schedule-app/src/constants/dictionary/dictionary.mts
+@@ -1,15 +1,15 @@
+-import { accountSettingsDictionary } from './account-settings';
+-import { answerPageDictionary } from './answer-page';
+-import { commonDictionary } from './common';
+-import { createEventResultDialogDictionary } from './create-event-result-dialog';
+-import { errorMessagesDictionary } from './error-messages';
+-import { eventListPageDictionary } from './event-list-page';
+-import { eventSettingsPageDictionary } from './event-settings-page';
+-import { forNonLoggedInUserDictionary } from './for-non-logged-in-user-dialog';
+-import { headerDictionary } from './header';
+-import { iconDescriptionDefaultDictionary } from './icon-description-default';
+-import { signInAndRegisterPageDictionary } from './register-page';
+-import { resultPageDictionary } from './result-page';
++import { accountSettingsDictionary } from './account-settings.mjs';
++import { answerPageDictionary } from './answer-page.mjs';
++import { commonDictionary } from './common.mjs';
++import { createEventResultDialogDictionary } from './create-event-result-dialog.mjs';
++import { errorMessagesDictionary } from './error-messages.mjs';
++import { eventListPageDictionary } from './event-list-page.mjs';
++import { eventSettingsPageDictionary } from './event-settings-page.mjs';
++import { forNonLoggedInUserDictionary } from './for-non-logged-in-user-dialog.mjs';
++import { headerDictionary } from './header.mjs';
++import { iconDescriptionDefaultDictionary } from './icon-description-default.mjs';
++import { signInAndRegisterPageDictionary } from './register-page.mjs';
++import { resultPageDictionary } from './result-page.mjs';
+ 
+ export const dict = {
+   aboutThisApp: 'このアプリについて',

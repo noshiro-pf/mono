@@ -1,0 +1,48 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/datetime.ts apps/event-schedule-app/src/constants/dictionary/datetime.mts
+index dbc3cd0f5..694a07011 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/datetime.ts
++++ apps/event-schedule-app/src/constants/dictionary/datetime.mts
+@@ -1,5 +1,5 @@
+-import { pad2, ymd2day } from '../../utils';
+-import { commonDictionary } from './common';
++import { pad2, ymd2day } from '../../utils/index.mjs';
++import { commonDictionary } from './common.mjs';
+ 
+ const { timeRangeTilde, dayList, dayWrapperBrace } = commonDictionary.date;
+ 
+@@ -9,6 +9,7 @@ const dayListWithBrace: readonly string[] = dayList.map(
+ 
+ export const ymd2str = (ymd: YearMonthDate): string => {
+   const { year, month, date } = ymd;
++
+   return `${year}/${pad2(month)}/${pad2(date)}`;
+ };
+ 
+@@ -16,21 +17,22 @@ export const ymd2dayStr = (ymd: YearMonthDate): string =>
+   dayListWithBrace[ymd2day(ymd)] ?? '';
+ 
+ export const ymd2strWithDay = (ymd: YearMonthDate): string =>
+-  `${ymd2str(ymd)}${ymd2dayStr(ymd)}`;
++  `${ymd2str(ymd)}${ymd2dayStr(ymd)}` as const;
+ 
+ export const hm2str = (hm: HoursMinutes): string => {
+   const { hours, minutes } = hm;
++
+   return `${pad2(hours)}:${pad2(minutes)}`;
+ };
+ 
+ export const ymdhm2str = (ymdhm: Ymdhm): string =>
+-  `${ymd2str(ymdhm)} ${hm2str(ymdhm)}`;
++  `${ymd2str(ymdhm)} ${hm2str(ymdhm)}` as const;
+ 
+ export const ymdhm2strWithDay = (ymdhm: Ymdhm): string =>
+-  `${ymd2strWithDay(ymdhm)} ${hm2str(ymdhm)}`;
++  `${ymd2strWithDay(ymdhm)} ${hm2str(ymdhm)}` as const;
+ 
+ export const timeRange2str = (timeRange: TimeRange): string =>
+-  `${hm2str(timeRange.start)}${timeRangeTilde}${hm2str(timeRange.end)}`;
++  `${hm2str(timeRange.start)}${timeRangeTilde}${hm2str(timeRange.end)}` as const;
+ 
+ export const datetimeRange2str = (datetimeRange: DatetimeRange): string =>
+-  `${ymd2str(datetimeRange.ymd)}--${timeRange2str(datetimeRange.timeRange)}`;
++  `${ymd2str(datetimeRange.ymd)}--${timeRange2str(datetimeRange.timeRange)}` as const;

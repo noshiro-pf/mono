@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/date-option.mts apps/poll-discord-app/src/types/date-option.mts
+index 63d6a3540..ee6cce6ea 100644
+--- experimental/packages/apps/poll-discord-app/src/types/date-option.mts
++++ apps/poll-discord-app/src/types/date-option.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { dateOptionIdType } from './branded-types.mjs';
+ 
+ export const dateOptionType = t.record({

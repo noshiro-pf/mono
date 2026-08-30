@@ -1,0 +1,20 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/update-answer.ts apps/event-schedule-app/src/api/crud/update-answer.mts
+index 44154938d..84a47693d 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/update-answer.ts
++++ apps/event-schedule-app/src/api/crud/update-answer.mts
+@@ -1,6 +1,7 @@
+-import { firestorePaths } from '@noshiro/event-schedule-app-shared';
++import { firestorePaths } from 'event-schedule-app-shared';
+ import { doc, setDoc } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ export const updateAnswer = (
+   eventId: string,
+@@ -12,4 +13,4 @@ export const updateAnswer = (
+       doc(firestoreEvents, eventId, firestorePaths.answers, answerId),
+       answer,
+     ),
+-  ).then((a) => Result.fold(a, () => undefined, Str.from));
++  ).then(Result.fold(() => undefined, unknownToString));

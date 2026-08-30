@@ -1,0 +1,105 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.ts apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.mts
+index b3321c84c..055b3ec6e 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.ts
++++ apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.mts
+@@ -1,3 +1,13 @@
++import { Arr, asUint32, Uint8 } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import {
++  type DateEnum,
++  type MonthEnum,
++  type MonthIndexEnum,
++  type SafeUint,
++  type StrictExtract,
++  type UintRange,
++} from 'ts-type-forge';
+ /**
+  * ```js
+  * rowsize = 5;
+@@ -16,12 +26,13 @@
+  */
+ 
+ export const generateCalendar = (
+-  year: YearEnum,
++  year: SafeUint,
+   month: MonthEnum,
+ ): readonly (readonly YearMonthDate[])[] => {
+   const numPrevMonthDates = DateUtils.getLocaleDayOfWeek(
+     getFirstDateOfMonth(year, month),
+   );
++
+   const numNextMonthDates =
+     7 -
+     DateUtils.getLocaleDayOfWeek(
+@@ -37,6 +48,7 @@ export const generateCalendar = (
+     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+     (month - 1) as MonthIndexEnum,
+   );
++
+   const lastDateNumberOfThisMonth = getLastDateNumberOfMonth(year, month);
+ 
+   const cells1d: readonly YearMonthDate[] = Arr.concat(
+@@ -64,12 +76,12 @@ export const generateCalendar = (
+   const rowSize = numWeeks(year, month);
+ 
+   return Arr.range(0, rowSize).map((i) =>
+-    cells1d.slice(toUint32(7 * i), toUint32(7 * (i + 1))),
++    cells1d.slice(asUint32(7 * i), asUint32(7 * (i + 1))),
+   );
+ };
+ 
+ const genYmdRangeList = (
+-  year: YearEnum,
++  year: SafeUint,
+   month: MonthEnum,
+   from: DateEnum,
+   to: DateEnum,
+@@ -78,37 +90,30 @@ const genYmdRangeList = (
+     from,
+     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+     Uint8.add(to, 1) as DateEnum | 32,
+-  ).map((n) => ({
+-    year,
+-    month,
+-    date: n,
+-  }));
++  ).map((n) => ({ year, month, date: n }));
+ 
+-const getFirstDateOfMonth = (year: YearEnum, month: MonthEnum): DateType =>
++const getFirstDateOfMonth = (year: SafeUint, month: MonthEnum): Date =>
+   new Date(
+     year,
+-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-    (month - 1) as MonthIndexEnum,
++
++    month - 1,
+     1,
+   );
+ 
+ const getLastDateNumberOfMonth = (
+-  year: YearEnum,
++  year: SafeUint,
+   month: UintRange<0, 14>, // 0 - 13
+-): 28 | 29 | 30 | 31 =>
++): 28 | 29 | 30 | 31 => {
+   // 翌月の0日目を取得することで、前月の最終日を取得できる
++  const lastDay = new Date(year, month, 0);
+ 
+   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-  new Date(
+-    year,
+-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-    month as MonthIndexEnum,
+-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-    0 as DateEnum,
+-  ).getDate() as Extract<DateEnum, 28 | 29 | 30 | 31>;
++  return lastDay.getDate() as StrictExtract<DateEnum, 28 | 29 | 30 | 31>;
++};
+ 
+-const numWeeks = (year: YearEnum, month: MonthEnum): 4 | 5 | 6 => {
++const numWeeks = (year: SafeUint, month: MonthEnum): 4 | 5 | 6 => {
+   const firstDate = getFirstDateOfMonth(year, month);
++
+   const lastDateNumber = getLastDateNumberOfMonth(year, month);
+ 
+   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

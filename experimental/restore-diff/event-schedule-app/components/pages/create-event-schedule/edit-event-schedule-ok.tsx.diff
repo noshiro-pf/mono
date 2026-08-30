@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-ok.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-ok.tsx
+index 2177ad98f..14cf25a0d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-ok.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule-ok.tsx
+@@ -1,13 +1,13 @@
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
+ import {
+   ConfirmEmailDialogStore,
+   EditEventScheduleStore,
+-} from '../../../store';
+-import { ConfirmEmailDialog } from '../../organisms';
+-import { EditEventScheduleEmailVerified } from './edit-event-schedule-email-verified';
++} from '../../../store/index.mjs';
++import { ConfirmEmailDialog } from '../../organisms/index.mjs';
++import { EditEventScheduleEmailVerified } from './edit-event-schedule-email-verified.js';
+ 
+-type Props = Readonly<{
+-  eventScheduleFromDb: EventSchedule;
+-}>;
++type Props = Readonly<{ eventScheduleFromDb: EventSchedule }>;
+ 
+ export const EditEventScheduleOk = memoNamed<Props>(
+   'EditEventScheduleOk',

@@ -1,0 +1,14 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/submit-editing-event-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/submit-editing-event-button.tsx
+index 3666911bc..877d674be 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/submit-editing-event-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/submit-editing-event-button.tsx
+@@ -1,6 +1,7 @@
+ import { Button } from '@blueprintjs/core';
+-import { EditEventScheduleStore } from '../../../store';
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { memoNamed } from 'react-utils';
++import { EditEventScheduleStore } from '../../../store/index.mjs';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.eventSettingsPage;
+ 

@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/create-title-string.mts apps/poll-discord-app/src/functions/create-title-string.mts
+index 17bdf3e66..6a4540bae 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/create-title-string.mts
++++ apps/poll-discord-app/src/functions/create-title-string.mts
+@@ -1 +1,2 @@
+-export const createTitleString = (title: string): string => `**${title}**`;
++export const createTitleString = (title: string): string =>
++  `**${title}**` as const;

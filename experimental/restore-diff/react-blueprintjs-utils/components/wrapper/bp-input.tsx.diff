@@ -1,0 +1,58 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-input.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-input.tsx
+index e57e5b80d..97593fb8e 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-input.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-input.tsx
+@@ -1,13 +1,14 @@
+ import { InputGroup } from '@blueprintjs/core';
+-import { memoNamed, useTinyObservableEffect } from '@noshiro/react-utils';
+-import { createTinyObservable, type TinyObservable } from '@noshiro/ts-utils';
+-import { useCallback, useEffect, useRef } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { source, type Observable as SynstateObservable } from 'synstate';
++import { useObservableEffect } from 'synstate-react-hooks';
+ 
+ export type BpInputProps = InputGroupPropsOriginal &
+   Readonly<{
+     onValueChange: (value: string) => void;
+     autoFocus?: boolean;
+-    focus$?: TinyObservable<undefined>;
++    focus$?: SynstateObservable<undefined>;
+   }>;
+ 
+ type InputGroupPropsOriginal = React.ComponentProps<typeof InputGroup>;
+@@ -16,29 +17,26 @@ export const BpInput = memoNamed<BpInputProps>(
+   'BpInput',
+   ({ value, onValueChange, autoFocus, focus$, ...props }) => {
+     const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+-      useCallback(
++      React.useCallback(
+         (ev) => {
+           onValueChange(ev.target.value);
+         },
+         [onValueChange],
+       );
+ 
+-    const inputRef = useRef<HTMLInputElement | null>(null);
++    const inputRef = React.useRef<HTMLInputElement | null>(null);
+ 
+-    const focusInput = useCallback(() => {
++    const focusInput = React.useCallback(() => {
+       inputRef.current?.focus();
+     }, []);
+ 
+-    useEffect(() => {
++    React.useEffect(() => {
+       if (autoFocus === true) {
+         focusInput();
+       }
+     }, [autoFocus, focusInput]);
+ 
+-    useTinyObservableEffect(
+-      focus$ ?? createTinyObservable<undefined>(),
+-      focusInput,
+-    );
++    useObservableEffect(focus$ ?? source<undefined>(), focusInput);
+ 
+     return (
+       <InputGroup

@@ -1,0 +1,44 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-display-name-page-state.ts apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-display-name-page-state.mts
+index faf6fa1b3..66c57d3ca 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-display-name-page-state.ts
++++ apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-display-name-page-state.mts
+@@ -1,9 +1,10 @@
++import { type Reducer } from '../../../utils-ported/index.mjs';
+ import {
+   inputHasError,
+   inputInitialState,
+   inputStateReducer,
+   type InputState,
+-} from '../input-state';
++} from '../input-state/index.mjs';
+ 
+ export type UpdateDisplayNamePageState = Readonly<{
+   displayName: InputState;
+@@ -37,14 +38,13 @@ export const updateDisplayNamePageStateReducer: Reducer<
+ > = (state, action) => {
+   switch (action.type) {
+     case 'inputDisplayName':
+-      return Obj.set(
+-        state,
+-        'displayName',
+-        inputStateReducer(state.displayName, {
++      return {
++        ...state,
++        displayName: inputStateReducer(state.displayName, {
+           type: 'input',
+           payload: action.payload,
+         }),
+-      );
++      };
+ 
+     case 'setDisplayNameError':
+       return {
+@@ -72,7 +72,7 @@ export const updateDisplayNamePageStateReducer: Reducer<
+     }
+ 
+     case 'done':
+-      return Obj.set(state, 'isWaitingResponse', false);
++      return { ...state, isWaitingResponse: false };
+ 
+     case 'reset':
+       return updateDisplayNamePageInitialState;

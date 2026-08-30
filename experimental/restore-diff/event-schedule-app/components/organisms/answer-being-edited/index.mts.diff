@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/index.ts apps/event-schedule-app/src/components/organisms/answer-being-edited/index.mts
+index 91894f007..961a295cd 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/index.ts
++++ apps/event-schedule-app/src/components/organisms/answer-being-edited/index.mts
+@@ -1,2 +1,2 @@
+-export * from './answer-being-edited';
+-export * from './weight-setting';
++export * from './answer-being-edited.js';
++export * from './weight-setting.js';

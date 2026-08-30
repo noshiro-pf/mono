@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/send-email-verification.ts apps/event-schedule-app/src/api/auth/send-email-verification.mts
+index f882218b4..618de214a 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/send-email-verification.ts
++++ apps/event-schedule-app/src/api/auth/send-email-verification.mts
+@@ -1,12 +1,14 @@
+ import { sendEmailVerification as sendEmailVerification_ } from 'firebase/auth';
+-import { assertIsCredentialError } from '../../types';
++import { Result, castDeepMutable } from 'ts-data-forge';
++import { assertIsCredentialError } from '../../types/index.mjs';
+ 
+ export const sendEmailVerification = (
+   user: FireAuthUser,
+ ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
+-  Result.fromPromise(sendEmailVerification_(castDeepMutable(user))).then((a) =>
+-    Result.mapErr(a, (error) => {
++  Result.fromPromise(sendEmailVerification_(castDeepMutable(user))).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );

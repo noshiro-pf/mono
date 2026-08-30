@@ -1,0 +1,155 @@
+diff --git experimental/packages/apps/event-schedule-app/src/error-handler/error-boundary.tsx apps/event-schedule-app/src/error-handler/error-boundary.tsx
+index 957ecb12c..7deb79575 100644
+--- experimental/packages/apps/event-schedule-app/src/error-handler/error-boundary.tsx
++++ apps/event-schedule-app/src/error-handler/error-boundary.tsx
+@@ -1,6 +1,14 @@
++import { css } from '@emotion/react';
++import {
++  Json,
++  Result,
++  hasKey,
++  isRecord,
++  isString,
++  unknownToString,
++} from 'ts-data-forge';
+ /* eslint-disable react/no-set-state */
+ /* eslint-disable react/destructuring-assignment */
+-
+ import {
+   Button,
+   Classes,
+@@ -9,24 +17,21 @@ import {
+   NonIdealState,
+   Pre,
+ } from '@blueprintjs/core';
+-import {
+-  BpTextArea,
+-  DialogWithMaxWidth,
+-} from '@noshiro/react-blueprintjs-utils';
+-import { Component } from 'react';
+-import { api } from '../api';
+-import { ButtonsWrapperAlignEnd } from '../components';
+-import { isProduction } from '../env';
+-import { createToaster, showToast } from '../functions';
++import * as React from 'react';
++import { BpTextArea, DialogWithMaxWidth } from 'react-blueprintjs-utils';
++import { api } from '../api/index.mjs';
++import { ButtonsWrapperAlignEnd } from '../components/index.mjs';
++import { isProduction } from '../env.mjs';
++import { createToaster, showToast } from '../functions/index.mjs';
+ 
+ if (isProduction) {
+-  // eslint-disable-next-line unicorn/prefer-global-this
+-  (window.onerror as Mutable<typeof window.onerror>) = (e: unknown) => {
+-    const errorString = Result.unwrapThrow(Json.stringify(e));
++  addEventListener('error', (ev) => {
++    const errorString = unknownToString(ev.error);
++
+     console.error(errorString);
+ 
+     api.sendReport({ error: errorString }).catch(console.error);
+-  };
++  });
+ }
+ 
+ type State = Readonly<{
+@@ -39,12 +44,10 @@ type State = Readonly<{
+   openedOnce: boolean;
+ }>;
+ 
+-type Props = Readonly<{
+-  children?: React.ReactNode;
+-}>;
++type Props = Readonly<{ children?: React.ReactNode }>;
+ 
+ // eslint-disable-next-line react/require-optimization, functional/no-class-inheritance
+-export class ErrorBoundary extends Component<Props, State> {
++export class ErrorBoundary extends React.Component<Props, State> {
+   static getDerivedStateFromError(error: unknown): State {
+     // Update state so the next render will show the fallback UI.
+     return {
+@@ -60,6 +63,7 @@ export class ErrorBoundary extends Component<Props, State> {
+ 
+   constructor(props: Props) {
+     super(props);
++
+     this.state = {
+       error: undefined,
+       errorInfo: undefined,
+@@ -85,6 +89,7 @@ export class ErrorBoundary extends Component<Props, State> {
+     }));
+   }
+ 
++  // eslint-disable-next-line unicorn/consistent-class-member-order
+   private readonly handleOpenClick = (): void => {
+     this.setState({ isOpen: true, openedOnce: true });
+   };
+@@ -98,13 +103,16 @@ export class ErrorBoundary extends Component<Props, State> {
+ 
+     api
+       .sendReport({
+-        error: Result.unwrapThrow(
+-          Json.stringify({
+-            error: Str.from(this.state.error),
+-            errorInfo: this.state.errorInfo,
+-            description: this.state.description,
+-          }),
+-        ),
++        // `Json.stringify` yields `string | undefined` — `undefined` is what
++        // `JSON.stringify` returns for a value it cannot represent.
++        error:
++          Result.unwrapThrow(
++            Json.stringify({
++              error: unknownToString(this.state.error),
++              errorInfo: this.state.errorInfo,
++              description: this.state.description,
++            }),
++          ) ?? '',
+       })
+       .then((res) => {
+         this.setState({ loading: false, isOpen: false });
+@@ -137,8 +145,8 @@ export class ErrorBoundary extends Component<Props, State> {
+ 
+   // eslint-disable-next-line react/no-unused-class-component-methods, @typescript-eslint/class-methods-use-this, @typescript-eslint/prefer-readonly-parameter-types
+   readonly onUnhandledRejection = (ev: PromiseRejectionEvent): void => {
+-    ev.promise.catch((error) => {
+-      showErrorToast(Str.from(error));
++    ev.promise.catch((error: unknown) => {
++      showErrorToast(unknownToString(error));
+     });
+   };
+ 
+@@ -188,9 +196,9 @@ export class ErrorBoundary extends Component<Props, State> {
+                   overflow-y: auto;
+                 `}
+               >
+-                {Str.from(error)}
++                {unknownToString(error)}
+                 {isRecord(errorInfo) &&
+-                Object.hasOwn(errorInfo, 'componentStack') &&
++                hasKey(errorInfo, 'componentStack') &&
+                 isString(errorInfo.componentStack)
+                   ? errorInfo.componentStack
+                   : undefined}
+@@ -204,7 +212,7 @@ export class ErrorBoundary extends Component<Props, State> {
+               labelInfo={dc.sendReport.description.labelInfo}
+             >
+               <BpTextArea
+-                fill={true}
++                fill
+                 id={'description-textarea'}
+                 intent={'primary'}
+                 maxLength={500}
+@@ -243,10 +251,6 @@ const dc = dict.errorMessages.errorHandler;
+ 
+ const toast = createToaster();
+ 
+-const showErrorToast = (error: DeepReadonly<React.ReactNode>): void => {
+-  showToast({
+-    toast,
+-    intent: 'danger',
+-    message: error,
+-  });
++const showErrorToast = (error: React.ReactNode): void => {
++  showToast({ toast, intent: 'danger', message: error });
+ };

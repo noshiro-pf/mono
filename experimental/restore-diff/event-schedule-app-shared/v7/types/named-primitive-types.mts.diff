@@ -1,0 +1,52 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/named-primitive-types.mts apps/event-schedule-app-shared/src/v7/types/named-primitive-types.mts
+index cf7c3413f..632af65b4 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/named-primitive-types.mts
++++ apps/event-schedule-app-shared/src/v7/types/named-primitive-types.mts
+@@ -1,6 +1,9 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+-export const answerIdTypeDef = t.simpleBrandedString('AnswerId', '');
++export const answerIdTypeDef = t.brandedString({
++  typeName: 'AnswerId',
++  defaultValue: '',
++});
+ 
+ export const toAnswerId = answerIdTypeDef.cast;
+ 
+@@ -8,7 +11,10 @@ export type AnswerId = t.TypeOf<typeof answerIdTypeDef>;
+ 
+ export const isAnswerId = answerIdTypeDef.is;
+ 
+-const nonNullUserIdTypeDef = t.simpleBrandedString('UserId', '');
++const nonNullUserIdTypeDef = t.brandedString({
++  typeName: 'UserId',
++  defaultValue: '',
++});
+ 
+ export const toUserId = nonNullUserIdTypeDef.cast;
+ 
+@@ -20,7 +26,10 @@ export type UserId = t.TypeOf<typeof userIdTypeDef>;
+ 
+ export const isUserId = userIdTypeDef.is;
+ 
+-export const userNameTypeDef = t.simpleBrandedString('UserName', '');
++export const userNameTypeDef = t.brandedString({
++  typeName: 'UserName',
++  defaultValue: '',
++});
+ 
+ export const toUserName = userNameTypeDef.cast;
+ 
+@@ -28,7 +37,10 @@ export type UserName = t.TypeOf<typeof userNameTypeDef>;
+ 
+ export const isUserName = userNameTypeDef.is;
+ 
+-export const weightTypeDef = t.simpleBrandedNumber('Weight', 1);
++export const weightTypeDef = t.brandedNumber({
++  typeName: 'Weight',
++  defaultValue: 1,
++});
+ 
+ export const toWeight = weightTypeDef.cast;
+ 

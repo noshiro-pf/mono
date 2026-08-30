@@ -1,0 +1,26 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/description.tsx apps/event-schedule-app/src/components/atoms/description.tsx
+index e18154960..4f325e782 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/description.tsx
++++ apps/event-schedule-app/src/components/atoms/description.tsx
+@@ -1,15 +1,14 @@
+-import { descriptionFontColor } from '../../constants';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { descriptionFontColor } from '../../constants/index.mjs';
+ 
+-type Props = Readonly<{
+-  text: string;
+-  error?: boolean;
+-  color?: string;
+-}>;
++type Props = Readonly<{ text: string; error?: boolean; color?: string }>;
+ 
+ export const Description = memoNamed<Props>(
+   'Description',
+   ({ text, error = false, color }) => {
+-    const style = useMemo(
++    const style = React.useMemo(
+       () => ({
+         color:
+           color ??

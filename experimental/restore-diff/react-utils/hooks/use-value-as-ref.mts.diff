@@ -1,0 +1,18 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-value-as-ref.mts apps/react-utils/src/hooks/use-value-as-ref.mts
+index 564f44e31..b33b8f296 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-value-as-ref.mts
++++ apps/react-utils/src/hooks/use-value-as-ref.mts
+@@ -1,8 +1,9 @@
+-import { useEffect, useRef } from 'react';
++import * as React from 'react';
+ 
+-export const useValueAsRef = <T,>(value: T): React.MutableRefObject<T> => {
+-  const ref = useRef<T>(value);
+-  useEffect(() => {
++export const useValueAsRef = <T,>(value: T): React.RefObject<T> => {
++  const ref = React.useRef(value);
++
++  React.useEffect(() => {
+     ref.current = value;
+   }, [value]);
+ 

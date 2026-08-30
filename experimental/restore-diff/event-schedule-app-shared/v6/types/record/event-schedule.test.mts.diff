@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/event-schedule.test.mts apps/event-schedule-app-shared/src/v6/types/record/event-schedule.test.mts
+index 285bc084f..235a0c70f 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/event-schedule.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/event-schedule.test.mts
+@@ -6,12 +6,12 @@ import {
+ 
+ describe('isEventSchedule', () => {
+   test('defaultValue should be true', () => {
+-    expect(isEventSchedule(eventScheduleDefaultValue)).toBe(true);
++    assert.isTrue(isEventSchedule(eventScheduleDefaultValue));
+   });
+ });
+ 
+ describe('fillEventSchedule', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillEventSchedule({})).toStrictEqual(eventScheduleDefaultValue);
++    assert.deepStrictEqual(fillEventSchedule({}), eventScheduleDefaultValue);
+   });
+ });

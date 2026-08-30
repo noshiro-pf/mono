@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/footer.tsx apps/event-schedule-app/src/components/organisms/footer.tsx
+index 88fa6b712..0e37924d4 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/footer.tsx
++++ apps/event-schedule-app/src/components/organisms/footer.tsx
+@@ -1,4 +1,6 @@
+-import { aboutThisAppUrl } from '../../constants';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { aboutThisAppUrl } from '../../constants/index.mjs';
+ 
+ export const Footer = memoNamed('Footer', () => (
+   <div

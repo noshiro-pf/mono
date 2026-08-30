@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/register-page.ts apps/event-schedule-app/src/constants/dictionary/register-page.mts
+index 780030871..960926275 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/register-page.ts
++++ apps/event-schedule-app/src/constants/dictionary/register-page.mts
+@@ -14,10 +14,7 @@ export const signInAndRegisterPageDictionary = {
+     submit: '再発行',
+   },
+   separator: 'OR',
+-  google: {
+-    register: 'Googleアカウントで登録',
+-    signIn: 'Googleでログイン',
+-  },
++  google: { register: 'Googleアカウントで登録', signIn: 'Googleでログイン' },
+   message: {
+     success: {
+       register: 'アカウントを作成しました。',

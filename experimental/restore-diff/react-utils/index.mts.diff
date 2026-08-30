@@ -1,0 +1,9 @@
+diff --git experimental/packages/utils/react-utils/src/index.mts apps/react-utils/src/index.mts
+index 23251b4d5..fe1f549c2 100644
+--- experimental/packages/utils/react-utils/src/index.mts
++++ apps/react-utils/src/index.mts
+@@ -2,3 +2,4 @@ export * from './component-switcher.js';
+ export * from './hooks/index.mjs';
+ export * from './memo-named.mjs';
+ export * from './toggle-without-destroy.js';
++export * from './utils/index.mjs';

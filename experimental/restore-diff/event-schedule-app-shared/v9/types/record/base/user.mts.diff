@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/user.mts apps/event-schedule-app-shared/src/v9/types/record/base/user.mts
+index 185d1faff..0954ea076 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/user.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/base/user.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { UserId, UserName } from '../../named-primitive-types.mjs';
+ 
+ export const User = t.record({

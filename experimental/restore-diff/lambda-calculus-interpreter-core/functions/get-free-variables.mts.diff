@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/get-free-variables.mts apps/lambda-calculus-interpreter-core/src/functions/get-free-variables.mts
+index 406124349..251e318b0 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/get-free-variables.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/get-free-variables.mts
+@@ -4,11 +4,14 @@ import { isVariable } from './is-variable.mjs';
+ 
+ export const getFreeVariables = (term: LambdaTerm): readonly Variable[] => {
+   if (isVariable(term)) return [term];
++
+   if (isAbstraction(term)) {
+     return getFreeVariables(term[2]).filter((ch) => ch !== term[1]);
+   }
++
+   if (isApplication(term)) {
+     return [...getFreeVariables(term[0]), ...getFreeVariables(term[1])];
+   }
++
+   return [];
+ };

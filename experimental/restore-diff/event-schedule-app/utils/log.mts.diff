@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/log.ts apps/event-schedule-app/src/utils/log.mts
+index bc725b40c..64128cc2b 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/log.ts
++++ apps/event-schedule-app/src/utils/log.mts
+@@ -1,6 +1,7 @@
+-import { isProduction } from '../env';
++import { isProduction } from '../env.mjs';
+ 
+ export const clog = (...args: readonly unknown[]): void => {
+   if (isProduction) return;
++
+   console.log(...args);
+ };

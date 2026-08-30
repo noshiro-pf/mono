@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/poll-discord-app/src/firebase/config.mts apps/poll-discord-app/src/firebase/config.mts
+index 4f4acb49f..56666762f 100644
+--- experimental/packages/apps/poll-discord-app/src/firebase/config.mts
++++ apps/poll-discord-app/src/firebase/config.mts
+@@ -2,6 +2,7 @@
+ // TODO: Add SDKs for Firebase products that you want to use
+ // https://firebase.google.com/docs/web/setup#available-libraries
+ 
++// cspell:ignore GRYPY -- part of an opaque Firebase measurement id
+ export const firebaseConfig = {
+   apiKey: 'AIzaSyDxi2hZUSS_fZlJ-0stv1kRxxDC-feuLYY',
+   authDomain: 'discord-app-350818.firebaseapp.com',

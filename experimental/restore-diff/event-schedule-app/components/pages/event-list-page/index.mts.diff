@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/event-list-page/index.ts apps/event-schedule-app/src/components/pages/event-list-page/index.mts
+index 12cf554c7..93cc8db80 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/event-list-page/index.ts
++++ apps/event-schedule-app/src/components/pages/event-list-page/index.mts
+@@ -1,2 +1,2 @@
+-export * from './event-list-item';
+-export * from './event-list-page';
++export * from './event-list-item.js';
++export * from './event-list-page.js';

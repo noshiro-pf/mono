@@ -1,0 +1,196 @@
+diff --git experimental/packages/apps/event-schedule-app/src/hooks/select-datetimes-component/select-datetimes-hooks.ts apps/event-schedule-app/src/hooks/select-datetimes-component/select-datetimes-hooks.mts
+index 93d55af5c..09cade923 100644
+--- experimental/packages/apps/event-schedule-app/src/hooks/select-datetimes-component/select-datetimes-hooks.ts
++++ apps/event-schedule-app/src/hooks/select-datetimes-component/select-datetimes-hooks.mts
+@@ -1,9 +1,16 @@
+-import { yearMonthDateInitialValue } from '../../constants';
++import * as React from 'react';
++import { asUint32, type SizeType } from 'ts-data-forge';
++import {
++  type DayOfWeekName,
++  type DeepReadonly,
++  type ReadonlyRecord,
++} from 'ts-type-forge';
++import { yearMonthDateInitialValue } from '../../constants/index.mjs';
+ import {
+   datetimeListReducer,
+   getMostFrequentTimeRange,
+   type DatetimeListReducerAction,
+-} from '../../functions';
++} from '../../functions/index.mjs';
+ 
+ type SelectDatetimesHooks = DeepReadonly<{
+   selectedDates: YearMonthDate[];
+@@ -23,7 +30,7 @@ type SelectDatetimesHooks = DeepReadonly<{
+   onSetTimesPopoverSubmit: (
+     state: Readonly<{
+       timeRange: TimeRange;
+-      checkboxState: Record<DayOfWeekName, boolean>;
++      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+     }>,
+   ) => void;
+   onSortClick: () => void;
+@@ -33,61 +40,61 @@ export const useSelectDatetimesHooks = (
+   datetimeList: readonly DatetimeRange[],
+   onDatetimeListChange: (list: readonly DatetimeRange[]) => void,
+ ): SelectDatetimesHooks => {
+-  const dispatch = useCallback(
++  const dispatch = React.useCallback(
+     (action: DatetimeListReducerAction) => {
+       onDatetimeListChange(datetimeListReducer(datetimeList, action));
+     },
+     [datetimeList, onDatetimeListChange],
+   );
+ 
+-  const selectedDates = useMemo<readonly YearMonthDate[]>(
++  const selectedDates = React.useMemo<readonly YearMonthDate[]>(
+     () => datetimeList.map((e) => e.ymd),
+     [datetimeList],
+   );
+ 
+-  const mostFrequentTimeRange = useMemo<TimeRange>(
++  const mostFrequentTimeRange = React.useMemo<TimeRange>(
+     () => getMostFrequentTimeRange(datetimeList),
+     [datetimeList],
+   );
+ 
+   /* handlers */
+ 
+-  const onDatetimeRangeYmdChange = useCallback(
+-    (index: NumberType.ArraySize, ymd: YearMonthDate) => {
++  const onDatetimeRangeYmdChange = React.useCallback(
++    (index: SizeType.Arr, ymd: YearMonthDate) => {
+       dispatch({ type: 'ymd', index, ymd });
+     },
+     [dispatch],
+   );
+ 
+-  const onDatetimeRangeStartChange = useCallback(
+-    (index: NumberType.ArraySize, hm: HoursMinutes) => {
++  const onDatetimeRangeStartChange = React.useCallback(
++    (index: SizeType.Arr, hm: HoursMinutes) => {
+       dispatch({ type: 'start', index, hm });
+     },
+     [dispatch],
+   );
+ 
+-  const onDatetimeRangeEndChange = useCallback(
+-    (index: NumberType.ArraySize, hm: HoursMinutes) => {
++  const onDatetimeRangeEndChange = React.useCallback(
++    (index: SizeType.Arr, hm: HoursMinutes) => {
+       dispatch({ type: 'end', index, hm });
+     },
+     [dispatch],
+   );
+ 
+-  const onDeleteDatetimeClick = useCallback(
+-    (index: NumberType.ArraySize) => {
++  const onDeleteDatetimeClick = React.useCallback(
++    (index: SizeType.Arr) => {
+       dispatch({ type: 'delete', index });
+     },
+     [dispatch],
+   );
+ 
+-  const onDuplicateDatetimeClick = useCallback(
+-    (index: NumberType.ArraySize) => {
++  const onDuplicateDatetimeClick = React.useCallback(
++    (index: SizeType.Arr) => {
+       dispatch({ type: 'duplicate', index });
+     },
+     [dispatch],
+   );
+ 
+-  const onAddDatetimeClick = useCallback(() => {
++  const onAddDatetimeClick = React.useCallback(() => {
+     dispatch({
+       type: 'addClick',
+       datetimeRange: {
+@@ -97,28 +104,28 @@ export const useSelectDatetimesHooks = (
+     });
+   }, [mostFrequentTimeRange, dispatch]);
+ 
+-  const onConfirmDeleteAll = useCallback(() => {
++  const onConfirmDeleteAll = React.useCallback(() => {
+     dispatch({ type: 'deleteAll' });
+   }, [dispatch]);
+ 
+-  const onSetTimesAtOneTimeClick = useCallback(
++  const onSetTimesAtOneTimeClick = React.useCallback(
+     ({
+       checkboxState,
+       timeRange,
+     }: Readonly<{
+       timeRange: TimeRange;
+-      checkboxState: Record<DayOfWeekName, boolean>;
++      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+     }>) => {
+       dispatch({ type: 'setTimeAtOneTime', checkboxState, timeRange });
+     },
+     [dispatch],
+   );
+ 
+-  const onSortClick = useCallback(() => {
++  const onSortClick = React.useCallback(() => {
+     dispatch({ type: 'sort' });
+   }, [dispatch]);
+ 
+-  const onSelectedDatesChange = useCallback(
++  const onSelectedDatesChange = React.useCallback(
+     (list: readonly YearMonthDate[]) => {
+       dispatch({ type: 'fromCalendar', list, mostFrequentTimeRange });
+     },
+@@ -127,27 +134,33 @@ export const useSelectDatetimesHooks = (
+ 
+   /* view values */
+ 
+-  const datetimeListWithHandler = useMemo(
++  const datetimeListWithHandler = React.useMemo(
+     () =>
+-      datetimeList.map((datetimeRange, index) => ({
+-        id: index,
+-        datetimeRange,
+-        onYmdChange: (ymd: YearMonthDate | undefined) => {
+-          onDatetimeRangeYmdChange(index, ymd ?? yearMonthDateInitialValue);
+-        },
+-        onRangeStartChange: (hm: HoursMinutes) => {
+-          onDatetimeRangeStartChange(index, hm);
+-        },
+-        onRangeEndChange: (hm: HoursMinutes) => {
+-          onDatetimeRangeEndChange(index, hm);
+-        },
+-        onDuplicateClick: () => {
+-          onDuplicateDatetimeClick(index);
+-        },
+-        onDeleteClick: () => {
+-          onDeleteDatetimeClick(index);
+-        },
+-      })),
++      datetimeList.map((datetimeRange, indexRaw) => {
++        // `Array.prototype.map` hands back a plain number; the handlers below
++        // take the branded array index the store uses.
++        const index = asUint32(indexRaw);
++
++        return {
++          id: index,
++          datetimeRange,
++          onYmdChange: (ymd: YearMonthDate | undefined) => {
++            onDatetimeRangeYmdChange(index, ymd ?? yearMonthDateInitialValue);
++          },
++          onRangeStartChange: (hm: HoursMinutes) => {
++            onDatetimeRangeStartChange(index, hm);
++          },
++          onRangeEndChange: (hm: HoursMinutes) => {
++            onDatetimeRangeEndChange(index, hm);
++          },
++          onDuplicateClick: () => {
++            onDuplicateDatetimeClick(index);
++          },
++          onDeleteClick: () => {
++            onDeleteDatetimeClick(index);
++          },
++        };
++      }),
+     [
+       datetimeList,
+       onDatetimeRangeYmdChange,

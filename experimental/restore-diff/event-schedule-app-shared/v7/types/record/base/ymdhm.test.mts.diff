@@ -1,0 +1,51 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.test.mts apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.test.mts
+index b47e12702..5b64de3e4 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.test.mts
+@@ -1,4 +1,11 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import {
++  type DateEnum,
++  type HoursEnum,
++  type MinutesEnum,
++  type MonthEnum,
++  type SafeUint,
++} from 'ts-type-forge';
+ import { hoursMinutesDefaultValue } from './hours-minutes.mjs';
+ import { yearMonthDateDefaultValue } from './year-month-date.mjs';
+ import { fillYmdhm, isYmdhm, ymdhmDefaultValue, type Ymdhm } from './ymdhm.mjs';
+@@ -7,7 +14,7 @@ describe('Ymdhm', () => {
+   expectType<
+     Ymdhm,
+     Readonly<{
+-      year: YearEnum;
++      year: SafeUint;
+       month: MonthEnum;
+       date: DateEnum;
+       hours: HoursEnum;
+@@ -22,19 +29,20 @@ describe('Ymdhm', () => {
+       date: yearMonthDateDefaultValue.date,
+       hours: hoursMinutesDefaultValue.hours,
+       minutes: hoursMinutesDefaultValue.minutes,
+-    };
+-    expect(ymdhmDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(ymdhmDefaultValue, defaultValue);
+   });
+ 
+   describe('isYmdhm', () => {
+     test('defaultValue should be true', () => {
+-      expect(isYmdhm(ymdhmDefaultValue)).toBe(true);
++      assert.isTrue(isYmdhm(ymdhmDefaultValue));
+     });
+   });
+ 
+   describe('fillYmdhm', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillYmdhm({})).toStrictEqual(ymdhmDefaultValue);
++      assert.deepStrictEqual(fillYmdhm({}), ymdhmDefaultValue);
+     });
+   });
+ });

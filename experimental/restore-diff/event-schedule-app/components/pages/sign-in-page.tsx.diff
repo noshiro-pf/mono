@@ -1,0 +1,88 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/sign-in-page.tsx apps/event-schedule-app/src/components/pages/sign-in-page.tsx
+index da4bd5ace..c4580cf02 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/sign-in-page.tsx
++++ apps/event-schedule-app/src/components/pages/sign-in-page.tsx
+@@ -1,11 +1,16 @@
+ import { Button, FormGroup } from '@blueprintjs/core';
+-import { BpInput } from '@noshiro/react-blueprintjs-utils';
+-import { GoogleSignInStore, SignInPageStore } from '../../store';
+-import { GoogleIcon, Label } from '../atoms';
+-import { LockButton } from '../molecules';
+-import { NavBar } from '../organisms';
+-import { SignInStyled } from '../styled';
+-import { ResetPasswordPage } from './reset-password-page';
++import styled from '@emotion/styled';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { GoogleSignInStore, SignInPageStore } from '../../store/index.mjs';
++import { GoogleIcon, Label } from '../atoms/index.mjs';
++import { LockButton } from '../molecules/index.mjs';
++import { NavBar } from '../organisms/index.mjs';
++import { SignInStyled } from '../styled/index.mjs';
++import { ResetPasswordPage } from './reset-password-page.js';
+ 
+ const dc = dict.register;
+ 
+@@ -28,7 +33,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
+     { setTrue: passwordIsOpenResetForm, setFalse: hidePasswordResetForm },
+   ] = useBoolState(false);
+ 
+-  const lockPasswordButton = useMemo(
++  const lockPasswordButton = React.useMemo(
+     () => (
+       <LockButton
+         disabled={formState.isWaitingResponse}
+@@ -58,9 +63,9 @@ export const SignInPage = memoNamed('SignInPage', () => {
+                   <BpInput
+                     autoComplete={'email'}
+                     // eslint-disable-next-line jsx-a11y/no-autofocus
+-                    autoFocus={true}
++                    autoFocus
+                     disabled={formState.isWaitingResponse}
+-                    fill={true}
++                    fill
+                     intent={emailFormIntent}
+                     placeholder={'sample@gmail.com'}
+                     type={'email'}
+@@ -77,7 +82,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
+                   <BpInput
+                     autoComplete={'current-password'}
+                     disabled={formState.isWaitingResponse}
+-                    fill={true}
++                    fill
+                     intent={passwordFormIntent}
+                     rightElement={lockPasswordButton}
+                     type={passwordIsOpen ? 'text' : 'password'}
+@@ -96,7 +101,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
+               <SignInStyled.ButtonWrapper>
+                 <Button
+                   disabled={enterButtonDisabled}
+-                  fill={true}
++                  fill
+                   intent={'primary'}
+                   loading={formState.isWaitingResponse}
+                   onClick={SignInPageStore.enterClickHandler}
+@@ -120,10 +125,9 @@ export const SignInPage = memoNamed('SignInPage', () => {
+                 <SignInStyled.ButtonWrapper>
+                   <SignInStyled.GoogleButton
+                     disabled={googleSignInButtonDisabled}
+-                    fill={true}
++                    fill
+                     intent={'none'}
+-                    minimal={true}
+-                    outlined={true}
++                    variant={'outlined'}
+                     onClick={GoogleSignInStore.googleSignInClickHandler}
+                   >
+                     <SignInStyled.GoogleButtonContentWrapper>
+@@ -146,6 +150,7 @@ export const SignInPage = memoNamed('SignInPage', () => {
+ });
+ 
+ const emailInputLabel = <Label>{dc.email}</Label>;
++
+ const passwordInputLabel = <Label>{dc.password}</Label>;
+ 
+ const FormRectWrapper = styled(SignInStyled.FormRectWrapperBase)`

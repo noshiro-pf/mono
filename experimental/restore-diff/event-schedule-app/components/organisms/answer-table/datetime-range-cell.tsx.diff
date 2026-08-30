@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/datetime-range-cell.tsx apps/event-schedule-app/src/components/organisms/answer-table/datetime-range-cell.tsx
+index dad753872..5e26eba29 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/datetime-range-cell.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-table/datetime-range-cell.tsx
+@@ -1,10 +1,14 @@
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type IMapMapped } from 'ts-data-forge';
+ import {
+   calendarDateColor,
+   hm2str,
+   ymd2dayStr,
+   ymd2str,
+-} from '../../../constants';
+-import { ymd2day } from '../../../utils';
++} from '../../../constants/index.mjs';
++import { match } from '../../../utils-ported/index.mjs';
++import { ymd2day } from '../../../utils/index.mjs';
+ 
+ const dc = dict.common.date;
+ 
+@@ -23,7 +27,7 @@ export const DatetimeRangeCell = memoNamed<Props>(
+     minimized,
+     holidaysJpDefinition,
+   }) => {
+-    const colored: React.CSSProperties = useMemo(() => {
++    const colored: React.CSSProperties = React.useMemo(() => {
+       const dayValue = ymd2day(datetimeRange.ymd);
+ 
+       return {

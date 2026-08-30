@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/macro/to-number.mts apps/lambda-calculus-interpreter-core/src/functions/parser/macro/to-number.mts
+index 287e60d46..705472281 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/macro/to-number.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/macro/to-number.mts
+@@ -11,8 +11,10 @@ const counter = (t: NumberTermBody<Variable, Variable>): number =>
+ 
+ export const toNumber = (term: LambdaTerm): number | undefined => {
+   if (!isNumber(term)) return undefined;
++
+   // const s = term[1];
+   // const z = term[2][1];
+   const body = term[2][2];
++
+   return counter(body);
+ };

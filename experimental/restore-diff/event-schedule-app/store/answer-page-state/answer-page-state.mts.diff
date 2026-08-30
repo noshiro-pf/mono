@@ -1,0 +1,604 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-page-state.ts apps/event-schedule-app/src/store/answer-page-state/answer-page-state.mts
+index 3371f5a03..86c549f26 100644
+--- experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-page-state.ts
++++ apps/event-schedule-app/src/store/answer-page-state/answer-page-state.mts
+@@ -1,7 +1,31 @@
+-import { Answer, UserId, UserName } from '@noshiro/event-schedule-app-shared';
+-import { deepEqual } from '@noshiro/fast-deep-equal';
+-import { api } from '../../api';
+-import { Routes, datetimeRange2str } from '../../constants';
++import { Answer, UserId, UserName } from 'event-schedule-app-shared';
++import {
++  combine,
++  createEventEmitter,
++  createState as createStateBase,
++  filter,
++  map,
++  pluck,
++  skipIfNoChange,
++  withInitialValue,
++  type InitializedObservable,
++  type Observable as SynstateObservable,
++} from 'synstate';
++import { createBooleanState, createState } from 'synstate-react-hooks';
++import {
++  Arr,
++  IMapMapped,
++  ISetMapped,
++  Optional,
++  Result,
++  fastDeepEqual,
++  isNotUndefined,
++  pipe,
++} from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
++import { api } from '../../api/index.mjs';
++import { Routes, datetimeRange2str } from '../../constants/index.mjs';
+ import {
+   answerSelectionReducer,
+   createToaster,
+@@ -11,43 +35,44 @@ import {
+   theNameIsAlreadyUsedFn,
+   type AnswerSelectionReducerAction,
+   type CalendarCurrentPageReducerState,
+-} from '../../functions';
+-import { type AnswerSelectionValue } from '../../types';
+-import { Auth } from '../auth';
+-import { AnswersStore, eventSchedule$ } from '../fetching-state';
+-import { Router } from '../router';
++} from '../../functions/index.mjs';
++import { type AnswerSelectionValue } from '../../types/index.mjs';
++import { Obj, mapOptional, noop } from '../../utils-ported/index.mjs';
++import { Auth } from '../auth.mjs';
++import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
++import { Router } from '../router.mjs';
+ 
+ const toast = createToaster();
+ 
+ /* states */
+ 
+-const { state: selectedAnswerSavedState$, setState: setSelectedAnswerSaved } =
+-  createState<Answer | undefined>(undefined);
+-
+-const {
+-  useCurrentValue: useSubmitButtonIsLoading,
+-  setState: setSubmitButtonIsLoading,
+-} = createBooleanState(false);
+-
+-const {
+-  useCurrentValue: useAlertOnAnswerClickIsOpen,
+-  setTrue: openAlertOnAnswerClick,
+-  setFalse: closeAlertOnAnswerClick,
+-} = createBooleanState(false);
+-
+-const {
+-  useCurrentValue: useAnswerBeingEditedSectionState,
+-  getSnapshot: getAnswerBeingEditedSectionStateSnapshot,
+-  setState: setAnswerBeingEditedSectionState_,
+-} = createState<'creating' | 'editing' | 'hidden'>('hidden');
+-
+-const {
+-  useCurrentValue: useAnswerBeingEdited,
+-  state: answerBeingEdited$,
+-  getSnapshot: getAnswerBeingEditedSnapshot,
+-  setState: setAnswerBeingEdited,
+-  updateState: updateAnswerBeingEdited,
+-} = createState(Answer.defaultValue);
++const [selectedAnswerSavedState$, setSelectedAnswerSaved] = createStateBase<
++  Answer | undefined
++>(undefined);
++
++const [useSubmitButtonIsLoading, { setState: setSubmitButtonIsLoading }] =
++  createBooleanState(false);
++
++const [
++  useAlertOnAnswerClickIsOpen,
++  { setTrue: openAlertOnAnswerClick, setFalse: closeAlertOnAnswerClick },
++] = createBooleanState(false);
++
++const [
++  useAnswerBeingEditedSectionState,
++  setAnswerBeingEditedSectionState_,
++  { getSnapshot: getAnswerBeingEditedSectionStateSnapshot },
++] = createState<'creating' | 'editing' | 'hidden'>('hidden');
++
++const [
++  useAnswerBeingEdited,
++  setAnswerBeingEdited,
++  {
++    state: answerBeingEdited$,
++    getSnapshot: getAnswerBeingEditedSnapshot,
++    updateState: updateAnswerBeingEdited,
++  },
++] = createState(Answer.defaultValue);
+ 
+ const setAnswerBeingEditedSectionState = (
+   nextState: 'creating' | 'editing' | 'hidden',
+@@ -58,98 +83,93 @@ const setAnswerBeingEditedSectionState = (
+   if (nextState === 'creating') {
+     const user = Auth.getFireAuthUserSnapshot();
+ 
+-    updateAnswerBeingEdited((ans) =>
+-      Obj.set(
+-        ans,
+-        'user',
+-        Obj.set(ans.user, 'id', mapOptional(user?.uid, UserId.cast) ?? null),
+-      ),
+-    );
++    updateAnswerBeingEdited((ans) => ({
++      ...ans,
++      user: { ...ans.user, id: mapOptional(user?.uid, UserId.cast) ?? null },
++    }));
+   }
+ };
+ 
+ const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =
+-  createVoidEventEmitter();
+-
+-const {
+-  getSnapshot: getCheckboxesStateSnapshot,
+-  useCurrentValue: useCheckboxesState,
+-  setState: setCheckboxesState,
+-  updateState: updateCheckboxesState,
+-  resetState: resetCheckboxesState,
+-} = createState(
+-  ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
++  createEventEmitter();
++
++const [
++  useCheckboxesState,
++  setCheckboxesState,
++  {
++    getSnapshot: getCheckboxesStateSnapshot,
++    updateState: updateCheckboxesState,
++    resetState: resetCheckboxesState,
++  },
++] = createState(
++  ISetMapped.create<DatetimeRange, DatetimeRangeMapKey>(
+     [],
+     datetimeRangeToMapKey,
+     datetimeRangeFromMapKey,
+   ),
+ );
+ 
+-const {
+-  useCurrentValue: useBatchInputFieldIsOpen,
+-  toggle: toggleBatchInputField_,
+-} = createBooleanState(false);
++const [useBatchInputFieldIsOpen, { toggle: toggleBatchInputField_ }] =
++  createBooleanState(false);
+ 
+ const toggleBatchInputField = (): void => {
+   toggleBatchInputField_();
++
+   resetCheckboxesState();
+ };
+ 
+ /* mapped values */
+ 
+-const selectedAnswerUserName$ = selectedAnswerSavedState$.chain(
++const selectedAnswerUserName$ = selectedAnswerSavedState$.pipe(
+   map((selectedAnswerSaved) => selectedAnswerSaved?.user.name),
+ );
+ 
+ const requiredParticipantsExist$: InitializedObservable<boolean> =
+-  AnswersStore.answers$.chain(
++  AnswersStore.answers$.pipe(
+     map((answers) => answers?.some((a) => a.isRequiredParticipants) === true),
+   );
+ 
+ const selectedDates$: InitializedObservable<readonly YearMonthDate[]> =
+-  eventSchedule$.chain(
++  eventSchedule$.pipe(
+     map(
+       (eventSchedule) =>
+         eventSchedule?.datetimeRangeList.map((d) => d.ymd) ?? [],
+     ),
+   );
+ 
+-const setYearMonth$: Observable<CalendarCurrentPageReducerState> =
++const setYearMonth$: SynstateObservable<CalendarCurrentPageReducerState> =
+   selectedDates$
+-    .chain(
++    .pipe(
+       map((selectedDates) =>
+         Arr.isNonEmpty(selectedDates) ? selectedDates[0] : undefined,
+       ),
+     )
+-    .chain(filter(isNotUndefined));
++    .pipe(filter(isNotUndefined));
+ 
+ const emptyAnswerSelection$: InitializedObservable<Answer> = eventSchedule$
+-  .chain(filter(isNotUndefined))
+-  .chain(
+-    map((e) =>
+-      Obj.set(
+-        Answer.defaultValue,
+-        'selection',
+-        e.datetimeRangeList.map(
+-          (d) =>
+-            ({
+-              datetimeRange: d,
+-              iconId: 'none',
+-              point: 0,
+-              comment: '',
+-            }) as const,
+-        ),
++  .pipe(filter(isNotUndefined))
++  .pipe(
++    map((e) => ({
++      ...Answer.defaultValue,
++      selection: e.datetimeRangeList.map(
++        (d) =>
++          ({
++            datetimeRange: d,
++            iconId: 'none',
++            point: 0,
++            comment: '',
++          }) as const,
+       ),
+-    ),
++    })),
+   )
+-  .chain(skipIfNoChange(deepEqual))
+-  .chain(setInitialValue(Answer.defaultValue));
++  .pipe(skipIfNoChange(fastDeepEqual))
++  .pipe(withInitialValue(Answer.defaultValue));
+ 
+ const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
+   AnswersStore.answers$,
+   answerBeingEdited$,
+   selectedAnswerUserName$,
+-]).chain(
++]).pipe(
+   map(([answers, answerBeingEdited, selectedAnswerUserName]) =>
+     theNameIsAlreadyUsedFn(
+       answerBeingEdited.user.name,
+@@ -163,11 +183,11 @@ const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
+   answerBeingEdited$,
+   selectedAnswerSavedState$,
+   theNameIsAlreadyUsed$,
+-]).chain(
++]).pipe(
+   map(
+     ([answerBeingEdited, selectedAnswerSaved, theNameIsAlreadyUsed]) =>
+       answerBeingEdited.user.name === '' ||
+-      deepEqual(selectedAnswerSaved, answerBeingEdited) ||
++      fastDeepEqual(selectedAnswerSaved, answerBeingEdited) ||
+       theNameIsAlreadyUsed,
+   ),
+ );
+@@ -177,10 +197,10 @@ const answerSelectionMap$: InitializedObservable<
+ > = combine([
+   answerBeingEdited$,
+   eventSchedule$
+-    .chain(filter(isNotUndefined))
+-    .chain(pluck('datetimeRangeList'))
+-    .chain(setInitialValue<readonly DatetimeRange[]>([])),
+-]).chain(
++    .pipe(filter(isNotUndefined))
++    .pipe(pluck('datetimeRangeList'))
++    .pipe(withInitialValue<readonly DatetimeRange[]>([])),
++]).pipe(
+   map(([{ selection }, datetimeRangeList]) => {
+     const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
+       Arr.concat(
+@@ -191,7 +211,7 @@ const answerSelectionMap$: InitializedObservable<
+         selection.map((s) => [s.datetimeRange, s]),
+       );
+ 
+-    return IMapMapped.new<
++    return IMapMapped.create<
+       DatetimeRange,
+       AnswerSelectionValue,
+       DatetimeRangeMapKey
+@@ -203,11 +223,13 @@ const answerSelectionMap$: InitializedObservable<
+ 
+ const clearAnswerBeingEditedFields = (): void => {
+   resetAnswerBeingEdited();
++
+   setSelectedAnswerSaved(undefined);
+ };
+ 
+ const onCancelEditingAnswer = (): void => {
+   clearAnswerBeingEditedFields();
++
+   setAnswerBeingEditedSectionState('hidden');
+ };
+ 
+@@ -218,15 +240,17 @@ const onUserNameChange = (userName: UserName): void => {
+ };
+ 
+ const onCommentChange = (comment: string): void => {
+-  updateAnswerBeingEdited((answerBeingEdited) =>
+-    Obj.set(answerBeingEdited, 'comment', comment),
+-  );
++  updateAnswerBeingEdited((answerBeingEdited) => ({
++    ...answerBeingEdited,
++    comment,
++  }));
+ };
+ 
+ const onWeightChange = (weight: Weight): void => {
+-  updateAnswerBeingEdited((answerBeingEdited) =>
+-    Obj.set(answerBeingEdited, 'weight', weight),
+-  );
++  updateAnswerBeingEdited((answerBeingEdited) => ({
++    ...answerBeingEdited,
++    weight,
++  }));
+ };
+ 
+ const toggleRequiredSection = (): void => {
+@@ -247,7 +271,9 @@ const onAnswerClickImpl = (
+     openAlertOnAnswerClick();
+   } else {
+     setAnswerBeingEditedSectionState('editing');
++
+     setAnswerBeingEdited(answer);
++
+     setSelectedAnswerSaved(answer);
+   }
+ };
+@@ -255,7 +281,9 @@ const onAnswerClickImpl = (
+ /* @internal */
+ const onAddAnswerButtonClickImpl = (user: FireAuthUser | undefined): void => {
+   clearAnswerBeingEditedFields();
++
+   setAnswerBeingEditedSectionState('creating');
++
+   // automatically set username with user.displayName
+   updateAnswerBeingEdited((prev) =>
+     Obj.setIn(prev, ['user', 'name'], UserName.cast(user?.displayName ?? '')),
+@@ -275,7 +303,7 @@ const onSubmitAnswerImpl = async (
+   switch (answerBeingEditedSection) {
+     case 'creating':
+       await api.answers
+-        .add(eventId, Obj.set(answerBeingEdited, 'createdAt', DateUtils.now()))
++        .add(eventId, { ...answerBeingEdited, createdAt: DateUtils.now() })
+         .then((res) => {
+           if (Result.isErr(res)) {
+             // TODO: use toast
+@@ -283,9 +311,13 @@ const onSubmitAnswerImpl = async (
+           }
+ 
+           setSubmitButtonIsLoading(false);
++
+           setAnswerBeingEditedSectionState('hidden');
++
+           AnswersStore.fetchAnswers();
++
+           clearAnswerBeingEditedFields();
++
+           showToast({
+             toast,
+             message:
+@@ -294,6 +326,7 @@ const onSubmitAnswerImpl = async (
+             intent: 'success',
+           });
+         });
++
+       break;
+ 
+     case 'editing':
+@@ -304,10 +337,15 @@ const onSubmitAnswerImpl = async (
+             // TODO: use toast
+             console.error(res.value);
+           }
++
+           setSubmitButtonIsLoading(false);
++
+           setAnswerBeingEditedSectionState('hidden');
++
+           AnswersStore.fetchAnswers();
++
+           clearAnswerBeingEditedFields();
++
+           showToast({
+             toast,
+             message:
+@@ -316,6 +354,7 @@ const onSubmitAnswerImpl = async (
+             intent: 'success',
+           });
+         });
++
+       break;
+     case 'hidden':
+       break;
+@@ -328,6 +367,7 @@ const onSubmitEmptyAnswerImpl = async (
+   fireAuthUser: FireAuthUser | undefined,
+ ): Promise<void> => {
+   if (eventId === undefined) return;
++
+   if (fireAuthUser === undefined) return;
+ 
+   setSubmitButtonIsLoading(true);
+@@ -336,13 +376,14 @@ const onSubmitEmptyAnswerImpl = async (
+     .add(
+       eventId,
+       pipe(Answer.defaultValue)
+-        .chain((a) => Obj.set(a, 'createdAt', DateUtils.now()))
+-        .chain((a) =>
+-          Obj.set(a, 'user', {
++        .map((a) => ({ ...a, createdAt: DateUtils.now() }))
++        .map((a) => ({
++          ...a,
++          user: {
+             id: UserId.cast(fireAuthUser.uid),
+             name: UserName.cast(fireAuthUser.displayName ?? ''),
+-          }),
+-        ).value,
++          },
++        })).value,
+     )
+     .then((res) => {
+       if (Result.isErr(res)) {
+@@ -351,9 +392,13 @@ const onSubmitEmptyAnswerImpl = async (
+       }
+ 
+       setSubmitButtonIsLoading(false);
++
+       setAnswerBeingEditedSectionState('hidden');
++
+       AnswersStore.fetchAnswers();
++
+       clearAnswerBeingEditedFields();
++
+       showToast({
+         toast,
+         message: dict.answerPage.answerLater.result.success,
+@@ -376,9 +421,13 @@ const onDeleteAnswerImpl = async (
+       // TODO: use toast
+       console.error(res.value);
+     }
++
+     setSubmitButtonIsLoading(false);
++
+     setAnswerBeingEditedSectionState('hidden');
++
+     AnswersStore.fetchAnswers();
++
+     clearAnswerBeingEditedFields();
+   });
+ };
+@@ -394,44 +443,38 @@ const onEditButtonClickImpl = (eventId: string | undefined): void => {
+ const answerBeingEditedDispatch = (
+   action: AnswerSelectionReducerAction,
+ ): void => {
+-  updateAnswerBeingEdited((answerBeingEdited) =>
+-    Obj.set(
+-      answerBeingEdited,
+-      'selection',
+-      answerSelectionReducer(
+-        IMapMapped.new<
+-          DatetimeRange,
+-          AnswerSelectionValue,
+-          DatetimeRangeMapKey
+-        >(
+-          answerBeingEdited.selection.map((s) => [s.datetimeRange, s]),
+-          datetimeRangeToMapKey,
+-          datetimeRangeFromMapKey,
+-        ),
+-        action,
+-      )
+-        .map((s, d) => ({ datetimeRange: d, ...s }))
+-        .toValuesArray(),
+-    ),
+-  );
++  updateAnswerBeingEdited((answerBeingEdited) => ({
++    ...answerBeingEdited,
++    selection: answerSelectionReducer(
++      IMapMapped.create<
++        DatetimeRange,
++        AnswerSelectionValue,
++        DatetimeRangeMapKey
++      >(
++        answerBeingEdited.selection.map((s) => [s.datetimeRange, s]),
++        datetimeRangeToMapKey,
++        datetimeRangeFromMapKey,
++      ),
++      action,
++    )
++      .map((s, d) => ({ datetimeRange: d, ...s }))
++      .toValuesArray(),
++  }));
+ };
+ 
+ const toggleProtectedSectionImpl = (user: FireAuthUser | undefined): void => {
+-  updateAnswerBeingEdited((ans) =>
+-    Obj.set(
+-      ans,
+-      'user',
+-      Obj.update(ans.user, 'id', (uid) =>
+-        uid === null ? (mapOptional(user?.uid, UserId.cast) ?? null) : null,
+-      ),
++  updateAnswerBeingEdited((ans) => ({
++    ...ans,
++    user: Obj.update(ans.user, 'id', (uid) =>
++      uid === null ? (mapOptional(user?.uid, UserId.cast) ?? null) : null,
+     ),
+-  );
++  }));
+ };
+ 
+ /* subscriptions */
+ 
+ combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$])
+-  .chain(map(([x, _]) => x))
++  .pipe(map(([x, _]) => x))
+   .subscribe(setAnswerBeingEdited);
+ 
+ /* callbacks using subscribed values */
+@@ -501,16 +544,13 @@ const applyBatchInput = ({
+ 
+ const iconHeader$: InitializedObservable<
+   | DeepReadonly<
+-      Record<
++      ReadonlyRecord<
+         AnswerIconId,
+-        {
+-          iconDescription: string;
+-          onClick: () => void;
+-        }
++        { iconDescription: string; onClick: () => void }
+       >
+     >
+   | undefined
+-> = eventSchedule$.chain(
++> = eventSchedule$.pipe(
+   map((e) =>
+     mapOptional(e, (eventSchedule) => ({
+       good: {
+@@ -553,19 +593,16 @@ const answerBeingEditedList$: InitializedObservable<
+       key: string;
+       datetimeRange: DatetimeRange;
+       answerSelectionValue: AnswerSelectionValue;
+-      buttons: Record<
++      buttons: ReadonlyRecord<
+         AnswerIconId,
+-        {
+-          description: string;
+-          onClick: () => void;
+-        }
++        { description: string; onClick: () => void }
+       >;
+       onPointChange: (point: AnswerIconPoint) => void;
+       onCommentChange: (comment: string) => void;
+       onCheck: (checked: boolean) => void;
+     }[]
+   >
+-> = combine([eventSchedule$, answerSelectionMap$]).chain(
++> = combine([eventSchedule$, answerSelectionMap$]).pipe(
+   map(
+     ([e, answerSelectionMap]) =>
+       mapOptional(e, (eventSchedule) =>
+@@ -574,7 +611,9 @@ const answerBeingEditedList$: InitializedObservable<
+             ({
+               key: datetimeRange2str(d),
+               datetimeRange: d,
+-              answerSelectionValue: answerSelectionMap.get(d) ?? {
++              answerSelectionValue: Optional.toNullable(
++                answerSelectionMap.get(d),
++              ) ?? {
+                 iconId: 'none',
+                 point: 0,
+                 comment: '',
+@@ -641,7 +680,7 @@ const onCheckAll = (checked: boolean): void => {
+ 
+   if (checked) {
+     setCheckboxesState(
+-      ISetMapped.new<DatetimeRange, DatetimeRangeMapKey>(
++      ISetMapped.create<DatetimeRange, DatetimeRangeMapKey>(
+         dates,
+         datetimeRangeToMapKey,
+         datetimeRangeFromMapKey,
+@@ -653,7 +692,7 @@ const onCheckAll = (checked: boolean): void => {
+ };
+ 
+ const hasUnanswered$: InitializedObservable<boolean> =
+-  answerBeingEditedList$.chain(
++  answerBeingEditedList$.pipe(
+     map((answerBeingEditedList) =>
+       answerBeingEditedList.some(
+         (a) => a.answerSelectionValue.iconId === 'none',

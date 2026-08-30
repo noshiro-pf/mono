@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/datetime-range.test.mts apps/event-schedule-app-shared/src/v6/types/record/datetime-range.test.mts
+index 7f8a4138a..2f1b6860f 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/datetime-range.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/datetime-range.test.mts
+@@ -6,12 +6,12 @@ import {
+ 
+ describe('isDatetimeRange', () => {
+   test('defaultValue should be true', () => {
+-    expect(isDatetimeRange(datetimeRangeDefaultValue)).toBe(true);
++    assert.isTrue(isDatetimeRange(datetimeRangeDefaultValue));
+   });
+ });
+ 
+ describe('fillDatetimeRange', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillDatetimeRange({})).toStrictEqual(datetimeRangeDefaultValue);
++    assert.deepStrictEqual(fillDatetimeRange({}), datetimeRangeDefaultValue);
+   });
+ });

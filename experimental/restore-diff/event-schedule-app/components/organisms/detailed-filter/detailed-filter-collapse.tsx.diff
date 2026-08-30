@@ -1,0 +1,57 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-collapse.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-collapse.tsx
+index 6a05c1baf..3efd77746 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-collapse.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-collapse.tsx
+@@ -1,22 +1,25 @@
+ import { Collapse } from '@blueprintjs/core';
+-import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
+-import { AnswerFilterAndSortStore } from '../../../store';
+-import { DetailedFilterDateRange } from './detailed-filter-date-range';
+-import { DetailedFilterDayOfWeek } from './detailed-filter-day-of-week';
+-import { DetailedFilterFilledDateOnly } from './detailed-filter-filled-date-only';
+-import { DetailedFilterIconOfSpecifiedRespondent } from './detailed-filter-icon-of-specified-respondent';
+-import { DetailedFilterNumFairIcon } from './detailed-filter-num-fair-icon';
+-import { DetailedFilterNumFairPlusPoorIcon } from './detailed-filter-num-fair-plus-poor-icon';
+-import { DetailedFilterNumGoodIcon } from './detailed-filter-num-good-icon';
+-import { DetailedFilterNumGoodPlusFairIcon } from './detailed-filter-num-good-plus-fair-icon';
+-import { DetailedFilterNumPoorIcon } from './detailed-filter-num-poor-icon';
+-import { DetailedFilterRank } from './detailed-filter-rank';
+-import { DetailedFilterScoreRange } from './detailed-filter-score-range';
+-import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled';
+-
+-type Props = DeepReadonly<{
+-  isOpen: boolean;
+-}>;
++import { css } from '@emotion/react';
++import { CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { expectType } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
++import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
++import { DetailedFilterDateRange } from './detailed-filter-date-range.js';
++import { DetailedFilterDayOfWeek } from './detailed-filter-day-of-week.js';
++import { DetailedFilterFilledDateOnly } from './detailed-filter-filled-date-only.js';
++import { DetailedFilterIconOfSpecifiedRespondent } from './detailed-filter-icon-of-specified-respondent.js';
++import { DetailedFilterNumFairIcon } from './detailed-filter-num-fair-icon.js';
++import { DetailedFilterNumFairPlusPoorIcon } from './detailed-filter-num-fair-plus-poor-icon.js';
++import { DetailedFilterNumGoodIcon } from './detailed-filter-num-good-icon.js';
++import { DetailedFilterNumGoodPlusFairIcon } from './detailed-filter-num-good-plus-fair-icon.js';
++import { DetailedFilterNumPoorIcon } from './detailed-filter-num-poor-icon.js';
++import { DetailedFilterRank } from './detailed-filter-rank.js';
++import { DetailedFilterScoreRange } from './detailed-filter-score-range.js';
++import { CheckboxWrapper, FilterItem, FilterItemContent } from './styled.js';
++
++type Props = DeepReadonly<{ isOpen: boolean }>;
+ 
+ export const DetailedFilterCollapse = memoNamed<Props>(
+   'DetailedFilterCollapse',
+@@ -161,7 +164,7 @@ export const DetailedFilterCollapse = memoNamed<Props>(
+             </FilterItem>
+             <FilterItemContent>
+               {filteredRespondentCheckState.map(
+-                ({ username, checkState }, index) => (
++                ({ username, checkState, key: _key }, index) => (
+                   <div
+                     // eslint-disable-next-line react/no-array-index-key
+                     key={index}

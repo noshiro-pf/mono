@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/index.ts apps/event-schedule-app/src/functions/index.mts
+index 1dd2e992d..57309420b 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/index.ts
++++ apps/event-schedule-app/src/functions/index.mts
+@@ -1,14 +1,14 @@
+-export * from './answers-page';
+-export * from './event-settings-page-diff';
+-export * from './fetch-holidays';
+-export * from './is-after-deadline';
+-export * from './local-storage';
+-export * from './map-key';
+-export * from './multiple-date-picker';
+-export * from './normalize-event-schedule';
+-export * from './reducers';
+-export * from './select-datetimes-component';
+-export * from './the-name-is-already-used';
+-export * from './toaster';
+-export * from './ymd-to-day-in-week';
+-export * from './ymdhm-date-diff';
++export * from './answers-page/index.mjs';
++export * from './event-settings-page-diff.mjs';
++export * from './fetch-holidays.mjs';
++export * from './is-after-deadline.mjs';
++export * from './local-storage.mjs';
++export * from './map-key/index.mjs';
++export * from './multiple-date-picker/index.mjs';
++export * from './normalize-event-schedule.mjs';
++export * from './reducers/index.mjs';
++export * from './select-datetimes-component/index.mjs';
++export * from './the-name-is-already-used.mjs';
++export * from './toaster.js';
++export * from './ymd-to-day-in-week.mjs';
++export * from './ymdhm-date-diff.mjs';

@@ -1,0 +1,169 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-email-page.ts apps/event-schedule-app/src/store/update-user-info-page-state/update-email-page.mts
+index b2b03ab05..c249ec07c 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-email-page.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/update-email-page.mts
+@@ -1,41 +1,52 @@
+ import { EmailAuthProvider } from 'firebase/auth';
+-import { api } from '../../api';
++import {
++  type InitializedObservable,
++  combine,
++  map,
++  withCurrentValueFrom,
++} from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
+ import {
+   createToaster,
+   showToast,
+   updateEmailPageHasError,
+   updateEmailPageInitialState,
+   updateEmailPageStateReducer,
+-} from '../../functions';
+-import { Auth } from '../auth';
+-import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
++} from '../../functions/index.mjs';
++import { Auth } from '../auth.mjs';
++import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
+ 
+ const dc = dict.accountSettings;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   updateEmailPageStateReducer,
+   updateEmailPageInitialState,
+ );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || updateEmailPageHasError(st)),
+ );
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const {
+-  state: passwordIsOpen$,
+-  setFalse: hidePassword,
+-  toggle: togglePasswordLock,
+-} = createBooleanState(false);
++const [
++  ,
++  {
++    state: passwordIsOpen$,
++    setFalse: hidePassword,
++    toggle: togglePasswordLock,
++  },
++] = createBooleanState(false);
+ 
+ const state = combine([
+   formState$,
+@@ -43,7 +54,7 @@ const state = combine([
+   emailFormIntent$,
+   passwordFormIntent$,
+   passwordIsOpen$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       formState,
+@@ -82,6 +93,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+           type: 'setPasswordError',
+           payload: dc.reauthenticate.message.wrongPassword,
+         });
++
+         break;
+ 
+       default:
+@@ -100,8 +112,10 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+           message: dc.reauthenticate.message.error,
+           intent: 'danger',
+         });
++
+         break;
+     }
++
+     return;
+   }
+ 
+@@ -123,6 +137,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       message: dc.updateEmail.message.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+@@ -139,6 +154,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+ 
+ const enterClickHandler = (): void => {
+   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
++
+   const fireAuthUser = Auth.getFireAuthUserSnapshot();
+ 
+   if (enterButtonDisabled || fireAuthUser === undefined) return;
+@@ -148,34 +164,40 @@ const enterClickHandler = (): void => {
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputEmail',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputEmail', payload: value });
+ };
+ 
+ const inputPasswordHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputPassword',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputPassword', payload: value });
+ };
+ 
+ const resetAllDialogState = (): void => {
+   dispatch({ type: 'reset' });
++
+   hidePassword();
+ };
+ 
+ /* subscriptions */
+ 
+ UpdateUserInfoDialogStore.openingDialogType$
+-  .chain(withCurrentValueFrom(Auth.fireAuthUser$))
++  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
+   .subscribe(([openingDialog, user]) => {
+-    if (openingDialog === undefined) {
+-      resetAllDialogState();
+-    }
+-    if (openingDialog === 'updateEmail') {
+-      dispatch({ type: 'inputEmail', payload: user?.email ?? '' });
++    switch (openingDialog) {
++      case undefined:
++        resetAllDialogState();
++
++        break;
++
++      case 'updateEmail':
++        dispatch({ type: 'inputEmail', payload: user?.email ?? '' });
++
++        break;
++
++      case 'deleteAccount':
++      case 'deleteAccountCreatedWithGoogle':
++      case 'updateDisplayName':
++      case 'updatePassword':
++        break;
+     }
+   });
+ 

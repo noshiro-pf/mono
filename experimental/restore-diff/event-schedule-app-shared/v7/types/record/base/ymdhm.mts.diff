@@ -1,0 +1,63 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.mts apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.mts
+index be373b1e4..eeb7f6d73 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/ymdhm.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
+-import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
++import * as t from 'ts-fortress';
++import { DateUtils } from 'ts-fortress-types';
+ import {
+   datesTypeDef,
+   hoursTypeDef,
+@@ -24,15 +24,16 @@ export const isYmdhm = ymdhmTypeDef.is;
+ 
+ export const fillYmdhm = ymdhmTypeDef.fill;
+ 
+-export const ymdhmFromDate = (date: RawDateType): Ymdhm => ({
+-  year: DateUtils.getLocaleYear(date),
+-  month: DateUtils.getLocaleMonth(date),
+-  date: DateUtils.getLocaleDate(date),
+-  hours: DateUtils.getLocaleHours(date),
+-  minutes: DateUtils.getLocaleMinutes(date),
+-});
++export const ymdhmFromDate = (date: Date): Ymdhm =>
++  ({
++    year: DateUtils.getLocaleYear(date),
++    month: DateUtils.getLocaleMonth(date),
++    date: DateUtils.getLocaleDate(date),
++    hours: DateUtils.getLocaleHours(date),
++    minutes: DateUtils.getLocaleMinutes(date),
++  }) as const;
+ 
+-export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
++export const ymdhm2Date = (ymdhm: Ymdhm): Date =>
+   DateUtils.create(
+     ymdhm.year,
+     ymdhm.month,
+@@ -42,15 +43,15 @@ export const ymdhm2Date = (ymdhm: Ymdhm): DateType =>
+   );
+ 
+ export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
+-  if (a.year !== b.year)
+-    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+-  if (a.month !== b.month)
+-    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+-  if (a.date !== b.date)
+-    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
+-  if (a.hours !== b.hours)
+-    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+-  if (a.minutes !== b.minutes)
+-    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
++  if (a.year !== b.year) return a.year < b.year ? -1 : 1;
++
++  if (a.month !== b.month) return a.month < b.month ? -1 : 1;
++
++  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
++
++  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
++
++  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
++
+   return 0;
+ };

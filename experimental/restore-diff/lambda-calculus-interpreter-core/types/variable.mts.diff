@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/types/variable.mts apps/lambda-calculus-interpreter-core/src/types/variable.mts
+index 59e758e78..8a9d091b5 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/types/variable.mts
++++ apps/lambda-calculus-interpreter-core/src/types/variable.mts
+@@ -1 +1,3 @@
++import { type LowerAlphabet } from 'ts-type-forge';
++
+ export type Variable = LowerAlphabet;

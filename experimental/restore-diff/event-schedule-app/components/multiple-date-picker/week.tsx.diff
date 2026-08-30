@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/week.tsx apps/event-schedule-app/src/components/multiple-date-picker/week.tsx
+index 2f1e3f0fa..3908626c5 100644
+--- experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/week.tsx
++++ apps/event-schedule-app/src/components/multiple-date-picker/week.tsx
+@@ -1,5 +1,8 @@
+-import { DatePickerWeekStyled } from '@noshiro/react-blueprintjs-utils';
+-import { DatePickerDate } from './date-picker-day';
++import * as React from 'react';
++import { DatePickerWeekStyled } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { mapOptional } from '../../utils-ported/index.mjs';
++import { DatePickerDate } from './date-picker-day.js';
+ 
+ type Props = Readonly<{
+   week: readonly Readonly<{
+@@ -16,7 +19,7 @@ type Props = Readonly<{
+ export const Week = memoNamed<Props>(
+   'Week',
+   ({ week, useOutlinedSelectedStyle, onClick }) => {
+-    const listWithHandler = useMemo(
++    const listWithHandler = React.useMemo(
+       () =>
+         week.map((d, index) => ({
+           value: d,

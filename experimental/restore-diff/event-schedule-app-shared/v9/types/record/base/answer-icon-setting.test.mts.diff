@@ -1,0 +1,42 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/answer-icon-setting.test.mts apps/event-schedule-app-shared/src/v9/types/record/base/answer-icon-setting.test.mts
+index 4d95859d2..169990190 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/answer-icon-setting.test.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/base/answer-icon-setting.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { type AnswerIconPoint } from '../../enum/index.mjs';
+ import { AnswerIconSetting } from './answer-icon-setting.mjs';
+ 
+@@ -15,24 +15,26 @@ describe('AnswerIconSetting', () => {
+     const defaultValue: AnswerIconSetting = {
+       description: '',
+       point: 0,
+-    };
+-    expect(AnswerIconSetting.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(AnswerIconSetting.defaultValue, defaultValue);
+   });
+ 
+   describe('is', () => {
+     test('defaultValue should be true', () => {
+-      expect(
++      assert.isTrue(
+         AnswerIconSetting.is({
+           description: '',
+           point: 0,
+         }),
+-      ).toBe(true);
++      );
+     });
+   });
+ 
+   describe('fill', () => {
+     test('fill result should be the defaultValue', () => {
+-      expect(AnswerIconSetting.fill({})).toStrictEqual(
++      assert.deepStrictEqual(
++        AnswerIconSetting.fill({}),
+         AnswerIconSetting.defaultValue,
+       );
+     });

@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/name-and-note.tsx apps/event-schedule-app/src/components/organisms/name-and-note.tsx
+index 6e0d39139..5aba46131 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/name-and-note.tsx
++++ apps/event-schedule-app/src/components/organisms/name-and-note.tsx
+@@ -1,7 +1,9 @@
+ import { FormGroup } from '@blueprintjs/core';
+-import { BpInput, BpTextArea } from '@noshiro/react-blueprintjs-utils';
+-import { useFormError } from '../../hooks';
+-import { WidthRestrictedInputWrapper } from '../styled';
++import { css } from '@emotion/react';
++import { BpInput, BpTextArea } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useFormError } from '../../hooks/index.mjs';
++import { WidthRestrictedInputWrapper } from '../styled/index.mjs';
+ 
+ const dc = dict.eventSettingsPage.section1;
+ 
+@@ -47,9 +49,9 @@ export const NameAndNotes = memoNamed<Props>(
+         </FormGroup>
+         <FormGroup intent={'primary'} label={dc.notes}>
+           <BpTextArea
+-            autoResize={true}
++            autoResize
+             data-e2e={'note'}
+-            fill={true}
++            fill
+             placeholder={dc.notesPlaceholder}
+             value={notes}
+             onValueChange={onNotesChange}

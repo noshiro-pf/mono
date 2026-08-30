@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-abstraction.test.mts apps/lambda-calculus-interpreter-core/src/functions/is-abstraction.test.mts
+index 2ec44449e..465f9be3d 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-abstraction.test.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/is-abstraction.test.mts
+@@ -1,18 +1,18 @@
+ import { isAbstraction } from './is-lambda-term.mjs';
+ 
+ test('isAbstraction 1', () => {
+-  expect(isAbstraction('x')).toBe(false);
++  assert.isFalse(isAbstraction('x'));
+ });
+ 
+ test('isAbstraction 2', () => {
+-  expect(
++  assert.isFalse(
+     isAbstraction([
+       ['x', ['y', 'y']],
+       ['x', ['y', 'y']],
+     ]),
+-  ).toBe(false);
++  );
+ });
+ 
+ test('isAbstraction 3', () => {
+-  expect(isAbstraction(['lambda', 'x', ['x', ['y', 'y']]])).toBe(true);
++  assert.isTrue(isAbstraction(['lambda', 'x', ['x', ['y', 'y']]]));
+ });

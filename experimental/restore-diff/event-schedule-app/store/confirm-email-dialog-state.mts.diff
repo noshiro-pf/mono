@@ -1,0 +1,148 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/confirm-email-dialog-state.ts apps/event-schedule-app/src/store/confirm-email-dialog-state.mts
+index 5fc696498..5098a1b2f 100644
+--- experimental/packages/apps/event-schedule-app/src/store/confirm-email-dialog-state.ts
++++ apps/event-schedule-app/src/store/confirm-email-dialog-state.mts
+@@ -1,39 +1,42 @@
+-import { api } from '../api';
++import { type InitializedObservable, combine, map } from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { api } from '../api/index.mjs';
+ import {
+   confirmEmailDialogFormInitialState,
+   confirmEmailDialogFormStateReducer,
+   confirmEmailDialogHasError,
+   createToaster,
+   showToast,
+-} from '../functions';
+-import { EditEventScheduleStore } from './create-event-schedule-page';
+-import { eventSchedule$ } from './fetching-state';
+-import { Router } from './router';
++} from '../functions/index.mjs';
++import { EditEventScheduleStore } from './create-event-schedule-page/index.mjs';
++import { eventSchedule$ } from './fetching-state/index.mjs';
++import { Router } from './router.mjs';
+ 
+ const dc = dict.answerPage.eventInfo.verifyEmailDialog;
+ 
+ const toast = createToaster();
+ 
+-const {
+-  state: formState$,
+-  dispatch,
+-  getSnapshot: getFormStateSnapshot,
+-} = createReducer(
+-  confirmEmailDialogFormStateReducer,
+-  confirmEmailDialogFormInitialState,
+-);
++const [, dispatch, { state: formState$, getSnapshot: getFormStateSnapshot }] =
++  createReducer(
++    confirmEmailDialogFormStateReducer,
++    confirmEmailDialogFormInitialState,
++  );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || confirmEmailDialogHasError(st)),
+ );
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const emailIsVerified = createBooleanState(false);
++// `createBooleanState` returns `[useCurrentValue, utils]`; only the utils are
++// wanted here, and they carry the `state` / `setTrue` / `resetState` this file
++// already used.
++const [, emailIsVerified] = createBooleanState(false);
+ 
+-const isOpen$ = combine([emailIsVerified.state, eventSchedule$]).chain(
++const isOpen$ = combine([emailIsVerified.state, eventSchedule$]).pipe(
+   map(
+     ([verified, eventSchedule]) =>
+       eventSchedule?.notificationSettings !== 'none' && !verified,
+@@ -44,7 +47,7 @@ const state = combine([
+   formState$,
+   enterButtonDisabled$,
+   emailFormIntent$,
+-]).chain(
++]).pipe(
+   map(([formState, enterButtonDisabled, emailFormIntent]) => ({
+     formState,
+     enterButtonDisabled,
+@@ -61,24 +64,21 @@ const submit = async (eventId: string, email: string): Promise<void> => {
+ 
+   if (Result.isErr(verifyEmailResult)) {
+     console.error(verifyEmailResult.value);
++
+     dispatch({
+       type: 'setOtherError',
+       payload: verifyEmailResult.value.message,
+     });
+ 
+-    showToast({
+-      toast,
+-      message: dc.error,
+-      intent: 'danger',
+-    });
++    showToast({ toast, message: dc.error, intent: 'danger' });
++
+     return;
+   }
+ 
+   switch (verifyEmailResult.value) {
+     case 'ng':
+-      dispatch({
+-        type: 'setEmailDoesNotMatchError',
+-      });
++      dispatch({ type: 'setEmailDoesNotMatchError' });
++
+       break;
+ 
+     case 'ok':
+@@ -86,20 +86,19 @@ const submit = async (eventId: string, email: string): Promise<void> => {
+ 
+       EditEventScheduleStore.setEmailVerified(email);
+ 
+-      showToast({
+-        toast,
+-        message: dc.success,
+-        intent: 'success',
+-      });
++      showToast({ toast, message: dc.success, intent: 'success' });
+ 
+       emailIsVerified.setTrue();
++
+       break;
+   }
+ };
+ 
+ const enterClickHandler = (): void => {
+   const eventId = Router.eventId$.getSnapshot().value;
++
+   const formState = getFormStateSnapshot();
++
+   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
+ 
+   if (enterButtonDisabled) return;
+@@ -119,10 +118,7 @@ const cancelClickHandler = (): void => {
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputEmail',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputEmail', payload: value });
+ };
+ 
+ const resetInput = (): void => {
+@@ -131,6 +127,7 @@ const resetInput = (): void => {
+ 
+ const resetAllState = (): void => {
+   resetInput();
++
+   emailIsVerified.resetState();
+ };
+ 

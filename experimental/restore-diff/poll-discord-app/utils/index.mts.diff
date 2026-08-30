@@ -1,0 +1,12 @@
+diff --git apps/poll-discord-app/src/utils/index.mts apps/poll-discord-app/src/utils/index.mts
+new file mode 100644
+index 000000000..9216920cf
+--- /dev/null
++++ apps/poll-discord-app/src/utils/index.mts
+@@ -0,0 +1,6 @@
++export * from './date-utils.mjs';
++export * from './days-of-week.mjs';
++export * from './map-optional.mjs';
++export * from './match.mjs';
++export * from './noop.mjs';
++export * from './upper-alphabets.mjs';

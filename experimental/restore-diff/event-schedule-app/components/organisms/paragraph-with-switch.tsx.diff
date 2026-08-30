@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/paragraph-with-switch.tsx apps/event-schedule-app/src/components/organisms/paragraph-with-switch.tsx
+index 16ecf99ad..82c957ac5 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/paragraph-with-switch.tsx
++++ apps/event-schedule-app/src/components/organisms/paragraph-with-switch.tsx
+@@ -1,5 +1,8 @@
+-import { SwitchWithoutLabelStyled } from '@noshiro/react-blueprintjs-utils';
+-import { Description } from '../atoms';
++import { css } from '@emotion/react';
++import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { mapOptional } from '../../utils-ported/index.mjs';
++import { Description } from '../atoms/index.mjs';
+ 
+ type Props = Readonly<{
+   title: string;
+@@ -34,7 +37,7 @@ export const ParagraphWithSwitch = memoNamed<Props>(
+         <div>{title}</div>
+         <SwitchWithoutLabelStyled
+           checked={toggleState}
+-          inline={true}
++          inline
+           onChange={onToggle}
+         />
+       </div>

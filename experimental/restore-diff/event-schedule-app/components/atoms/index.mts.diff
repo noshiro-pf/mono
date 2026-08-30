@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/index.ts apps/event-schedule-app/src/components/atoms/index.mts
+index 88b42f2a6..c41c956ec 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/index.ts
++++ apps/event-schedule-app/src/components/atoms/index.mts
+@@ -1,7 +1,7 @@
+-export * from './description';
+-export * from './form-label';
+-export * from './icon';
+-export * from './icons';
+-export * from './nowrap-span';
+-export * from './required-participant-icon';
+-export * from './section-title';
++export * from './description.js';
++export * from './form-label.js';
++export * from './icon.js';
++export * from './icons/index.mjs';
++export * from './nowrap-span.js';
++export * from './required-participant-icon.js';
++export * from './section-title.js';

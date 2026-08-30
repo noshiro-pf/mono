@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/styled/width-restricted-input-wrapper.tsx apps/event-schedule-app/src/components/styled/width-restricted-input-wrapper.tsx
+index a88a0a43b..bf45782f8 100644
+--- experimental/packages/apps/event-schedule-app/src/components/styled/width-restricted-input-wrapper.tsx
++++ apps/event-schedule-app/src/components/styled/width-restricted-input-wrapper.tsx
+@@ -1,3 +1,5 @@
++import styled from '@emotion/styled';
++
+ export const WidthRestrictedInputWrapper = styled.div`
+   max-width: 400px;
+ `;

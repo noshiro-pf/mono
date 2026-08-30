@@ -1,0 +1,61 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/google-sign-in-state.ts apps/event-schedule-app/src/store/sign-in-and-register-page-state/google-sign-in-state.mts
+index 896672fe6..5480ea33d 100644
+--- experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/google-sign-in-state.ts
++++ apps/event-schedule-app/src/store/sign-in-and-register-page-state/google-sign-in-state.mts
+@@ -1,19 +1,23 @@
+-import { api } from '../../api';
+-import { Routes } from '../../constants';
+-import { createToaster, showToast } from '../../functions';
+-import { Router } from '../router';
++import { createBooleanState } from 'synstate-react-hooks';
++import { Optional, Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { Routes } from '../../constants/index.mjs';
++import { createToaster, showToast } from '../../functions/index.mjs';
++import { Router } from '../router.mjs';
+ 
+ const dc = dict.register;
+ 
+ const toast = createToaster();
+ 
+-const {
+-  useCurrentValue: useGoogleSignInButtonDisabled,
+-  getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
+-  state: googleSignInButtonDisabledState,
+-  setTrue: disableGoogleSignInButton,
+-  setFalse: enableGoogleSignInButton,
+-} = createBooleanState(false);
++const [
++  useGoogleSignInButtonDisabled,
++  {
++    getSnapshot: getGoogleSignInButtonDisabledStateSnapshot,
++    state: googleSignInButtonDisabledState,
++    setTrue: disableGoogleSignInButton,
++    setFalse: enableGoogleSignInButton,
++  },
++] = createBooleanState(false);
+ 
+ const googleSignInSubmit = async (
+   pageToBack: string | undefined,
+@@ -31,11 +35,7 @@ const googleSignInSubmit = async (
+       intent: 'danger',
+     });
+   } else {
+-    showToast({
+-      toast,
+-      message: dc.message.success.signIn,
+-      intent: 'success',
+-    });
++    showToast({ toast, message: dc.message.success.signIn, intent: 'success' });
+ 
+     if (pageToBack !== undefined) {
+       Router.redirect(pageToBack);
+@@ -49,7 +49,7 @@ const googleSignInClickHandler = (): void => {
+   if (getGoogleSignInButtonDisabledStateSnapshot()) return;
+ 
+   // TODO: use toast
+-  googleSignInSubmit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(
++  googleSignInSubmit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(
+     console.error,
+   );
+ };

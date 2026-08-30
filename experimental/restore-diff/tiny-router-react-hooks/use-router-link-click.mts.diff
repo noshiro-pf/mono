@@ -1,0 +1,102 @@
+diff --git experimental/packages/utils/tiny-router-react-hooks/src/use-router-link-click.mts apps/tiny-router-react-hooks/src/use-router-link-click.mts
+index 1f6b39960..20d3a7693 100644
+--- experimental/packages/utils/tiny-router-react-hooks/src/use-router-link-click.mts
++++ apps/tiny-router-react-hooks/src/use-router-link-click.mts
+@@ -1,7 +1,8 @@
+-import { useCallback } from 'react';
++import * as React from 'react';
++import { type ReadonlyRecord } from 'ts-type-forge';
+ 
+ const isModifiedEvent = (
+-  ev: Record<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
++  ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
+ ): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
+ 
+ type Path = Readonly<{
+@@ -50,52 +51,7 @@ const createPath = ({
+         ? hash
+         : `#${hash}`
+       : ''
+-  }`;
+-
+-export const useRouterLinkClick = ({
+-  replace: replaceProp,
+-  redirectFn,
+-  pushFn,
+-}: Readonly<{
+-  replace?: boolean;
+-  redirectFn: (path: string) => void;
+-  pushFn: (path: string) => void;
+-}>): React.MouseEventHandler<HTMLElement> =>
+-  useCallback(
+-    (ev) => {
+-      const el = ev.target;
+-      if (!(el instanceof HTMLAnchorElement)) {
+-        console.warn(
+-          'useRouterLinkClick should be used for HTMLAnchorElement.',
+-        );
+-        return;
+-      }
+-
+-      const href = el.href;
+-
+-      if (
+-        !ev.defaultPrevented &&
+-        ev.button === 0 && // Ignore everything but left clicks
+-        (el.target === '' || el.target === '_self') && // Let browser handle "target=_blank" etc.
+-        !isModifiedEvent(ev) // Ignore clicks with modifier keys
+-      ) {
+-        ev.preventDefault();
+-
+-        // If the URL hasn't changed, a regular <a> will do a replace instead of
+-        // a push, so do the same here.
+-        const replace =
+-          // eslint-disable-next-line unicorn/prefer-global-this
+-          replaceProp === true || createPath(window.location) === href;
+-
+-        if (replace) {
+-          redirectFn(href);
+-        } else {
+-          pushFn(href);
+-        }
+-      }
+-    },
+-    [replaceProp, pushFn, redirectFn],
+-  );
++  }` as const;
+ 
+ export const createRouterLinkClickHandler =
+   ({
+@@ -109,8 +65,10 @@ export const createRouterLinkClickHandler =
+   }>): React.MouseEventHandler<HTMLElement> =>
+   (ev) => {
+     const el = ev.target;
++
+     if (!(el instanceof HTMLAnchorElement)) {
+       console.warn('useRouterLinkClick should be used for HTMLAnchorElement.');
++
+       return;
+     }
+ 
+@@ -137,3 +95,21 @@ export const createRouterLinkClickHandler =
+       }
+     }
+   };
++
++/** {@link createRouterLinkClickHandler}, memoized. */
++export const useRouterLinkClick = (
++  props: Readonly<{
++    replace?: boolean;
++    redirectFn: (path: string) => void;
++    pushFn: (path: string) => void;
++  }>,
++): React.MouseEventHandler<HTMLElement> => {
++  const { replace, redirectFn, pushFn } = props;
++
++  return React.useCallback(
++    (ev) => {
++      createRouterLinkClickHandler({ replace, redirectFn, pushFn })(ev);
++    },
++    [replace, redirectFn, pushFn],
++  );
++};

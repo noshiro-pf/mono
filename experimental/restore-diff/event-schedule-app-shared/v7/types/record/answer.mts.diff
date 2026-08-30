@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer.mts apps/event-schedule-app-shared/src/v7/types/record/answer.mts
+index 544635922..6589b5d71 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/answer.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { answerIdTypeDef, weightTypeDef } from '../named-primitive-types.mjs';
+ import { answerSelectionTypeDef } from './answer-selection.mjs';
+ import { userTypeDef } from './base/index.mjs';

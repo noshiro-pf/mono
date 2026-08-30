@@ -1,0 +1,7 @@
+diff --git apps/lambda-calculus-interpreter-core/src/utils/index.mts apps/lambda-calculus-interpreter-core/src/utils/index.mts
+new file mode 100644
+index 000000000..9667b47f2
+--- /dev/null
++++ apps/lambda-calculus-interpreter-core/src/utils/index.mts
+@@ -0,0 +1 @@
++export * from './tuple-guards.mjs';

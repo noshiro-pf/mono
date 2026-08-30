@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/index.ts apps/event-schedule-app/src/functions/select-datetimes-component/index.mts
+index 80b83299f..bb1a2d60e 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/index.ts
++++ apps/event-schedule-app/src/functions/select-datetimes-component/index.mts
+@@ -1,4 +1,4 @@
+-export * from './get-most-frequent-time-range';
+-export * from './options';
+-export * from './select-datetimes-reducer';
+-export * from './time-range-reducer';
++export * from './get-most-frequent-time-range.mjs';
++export * from './options.mjs';
++export * from './select-datetimes-reducer.mjs';
++export * from './time-range-reducer.mjs';

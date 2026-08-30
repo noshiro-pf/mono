@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-deadline.tsx apps/event-schedule-app/src/components/organisms/answer-deadline.tsx
+index 713657975..21e713f10 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-deadline.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-deadline.tsx
+@@ -1,7 +1,8 @@
+ import { FormGroup } from '@blueprintjs/core';
+-import { BpDatetimePicker } from '@noshiro/react-blueprintjs-utils';
+-import { answerDeadlineShortcuts } from '../../constants';
+-import { useIsMobile } from '../../store';
++import { BpDatetimePicker } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { answerDeadlineShortcuts } from '../../constants/index.mjs';
++import { useIsMobile } from '../../store/index.mjs';
+ 
+ type Props = Readonly<{
+   useAnswerDeadline: boolean;

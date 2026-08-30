@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-variable.mts apps/lambda-calculus-interpreter-core/src/functions/is-variable.mts
+index b1113abf9..dc97a623b 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-variable.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/is-variable.mts
+@@ -3,5 +3,6 @@ import { type Variable } from '../types/index.mjs';
+ export const isVariable = (term: unknown): term is Variable => {
+   /* "x" -> true, ["lambda", "x", "x"] -> false */
+   if (typeof term !== 'string' || term.length !== 1) return false;
++
+   return /[a-z]/u.test(term);
+ };

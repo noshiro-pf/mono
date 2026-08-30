@@ -1,0 +1,7 @@
+diff --git experimental/packages/utils/io-ts-types/src/index.mts apps/ts-fortress-types/src/index.mts
+index 50d549688..73095002d 100644
+--- experimental/packages/utils/io-ts-types/src/index.mts
++++ apps/ts-fortress-types/src/index.mts
+@@ -1 +1,2 @@
+ export * from './date-time/index.mjs';
++export * from './utils/index.mjs';

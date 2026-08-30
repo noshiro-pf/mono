@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/time-range.test.mts apps/event-schedule-app-shared/src/v7/types/record/time-range.test.mts
+index 40e7e87ba..7d52f96ba 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/time-range.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/time-range.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { hoursMinutesDefaultValue, type HoursMinutes } from './base/index.mjs';
+ import {
+   fillTimeRange,
+@@ -20,19 +20,20 @@ describe('TimeRange', () => {
+     const defaultValue: TimeRange = {
+       start: hoursMinutesDefaultValue,
+       end: hoursMinutesDefaultValue,
+-    };
+-    expect(timeRangeDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(timeRangeDefaultValue, defaultValue);
+   });
+ 
+   describe('isTimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(isTimeRange(timeRangeDefaultValue)).toBe(true);
++      assert.isTrue(isTimeRange(timeRangeDefaultValue));
+     });
+   });
+ 
+   describe('fillTimeRange', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillTimeRange({})).toStrictEqual(timeRangeDefaultValue);
++      assert.deepStrictEqual(fillTimeRange({}), timeRangeDefaultValue);
+     });
+   });
+ });

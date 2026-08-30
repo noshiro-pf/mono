@@ -1,0 +1,45 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/time-range.mts apps/event-schedule-app-shared/src/v6/types/record/time-range.mts
+index 7266df3d5..036879776 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/time-range.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/time-range.mts
+@@ -1,4 +1,5 @@
+-import { isRecord, Obj } from '@noshiro/ts-utils';
++import { hasKey, isRecord } from 'ts-data-forge';
++import { hasKeyValue } from '../../../utils/index.mjs';
+ import {
+   compareHm,
+   fillHoursMinutes,
+@@ -19,23 +20,27 @@ export const timeRangeDefaultValue = {
+ 
+ export const isTimeRange = (a: unknown): a is TimeRange =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'start', isHoursMinutes) &&
+-  Obj.hasKeyValue(a, 'end', isHoursMinutes);
++  hasKeyValue(a, 'start', isHoursMinutes) &&
++  hasKeyValue(a, 'end', isHoursMinutes);
+ 
+ const d = timeRangeDefaultValue;
+ 
+ export const fillTimeRange = (a?: unknown): TimeRange =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        start: Object.hasOwn(a, 'start') ? fillHoursMinutes(a.start) : d.start,
+-        end: Object.hasOwn(a, 'end') ? fillHoursMinutes(a.end) : d.end,
+-      };
++    : ({
++        start: hasKey(a, 'start') ? fillHoursMinutes(a.start) : d.start,
++        end: hasKey(a, 'end') ? fillHoursMinutes(a.end) : d.end,
++      } as const);
+ 
+ export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
+   const compareStartHmResult = compareHm(a.start, b.start);
++
+   if (compareStartHmResult !== 0) return compareStartHmResult;
++
+   const compareEndHmResult = compareHm(a.end, b.end);
++
+   if (compareEndHmResult !== 0) return compareEndHmResult;
++
+   return 0;
+ };

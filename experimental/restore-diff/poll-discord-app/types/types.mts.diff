@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/poll-discord-app/src/types/types.mts apps/poll-discord-app/src/types/types.mts
+index 45a7d9b95..4ea5172aa 100644
+--- experimental/packages/apps/poll-discord-app/src/types/types.mts
++++ apps/poll-discord-app/src/types/types.mts
+@@ -3,4 +3,5 @@ import { type Database } from './database.mjs';
+ export type AnswerType = 'fair' | 'good' | 'poor';
+ 
+ export type DatabaseRef = Readonly<{ db: Database }>;
+-export type DatabaseMutRef = { db: Database };
++
++export type DatabaseMutRef = Readonly<{ db: Database }>;

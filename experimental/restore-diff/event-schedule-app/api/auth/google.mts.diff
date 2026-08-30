@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/google.ts apps/event-schedule-app/src/api/auth/google.mts
+index bbe02db9a..c8bb4f9cb 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/google.ts
++++ apps/event-schedule-app/src/api/auth/google.mts
+@@ -1,13 +1,13 @@
+ import { type FirebaseError } from 'firebase/app';
+ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+-import { fbAuth, googleAuthProvider } from '../../initialize-firebase';
++import { Result, castDeepMutable } from 'ts-data-forge';
++import { fbAuth, googleAuthProvider } from '../../initialize-firebase.mjs';
+ 
+ export const googleSignInWithPopup = (): Promise<
+   Result<OAuthCredential | undefined, OAuthCredential | undefined>
+ > =>
+-  Result.fromPromise(signInWithPopup(fbAuth, googleAuthProvider)).then((a) =>
++  Result.fromPromise(signInWithPopup(fbAuth, googleAuthProvider)).then(
+     Result.fold(
+-      a,
+       (result: UserCredential) =>
+         // This gives you a Google Access Token. You can use it to access the Google API.
+         GoogleAuthProvider.credentialFromResult(castDeepMutable(result)) ??

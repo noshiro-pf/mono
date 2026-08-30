@@ -1,0 +1,48 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/year-month-date.test.mts apps/ts-fortress-types/src/date-time/year-month-date.test.mts
+index eb84ab55f..676c972e0 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/year-month-date.test.mts
++++ apps/ts-fortress-types/src/date-time/year-month-date.test.mts
+@@ -1,4 +1,5 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { type DateEnum, type MonthEnum, type SafeUint } from 'ts-type-forge';
+ import { Years } from './time-enum.mjs';
+ import { YearMonthDate } from './year-month-date.mjs';
+ 
+@@ -6,7 +7,7 @@ describe('YearMonthDate', () => {
+   expectType<
+     YearMonthDate,
+     Readonly<{
+-      year: YearEnum;
++      year: SafeUint;
+       month: MonthEnum;
+       date: DateEnum;
+     }>
+@@ -17,19 +18,23 @@ describe('YearMonthDate', () => {
+       year: Years.fill(1900),
+       month: 1,
+       date: 1,
+-    };
+-    expect(YearMonthDate.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(YearMonthDate.defaultValue, defaultValue);
+   });
+ 
+   describe('isYearMonthDate', () => {
+     test('defaultValue should be true', () => {
+-      expect(YearMonthDate.is(YearMonthDate.defaultValue)).toBe(true);
++      assert.isTrue(YearMonthDate.is(YearMonthDate.defaultValue));
+     });
+   });
+ 
+   describe('fillYearMonthDate', () => {
+     test('defaultValue should be true', () => {
+-      expect(YearMonthDate.fill({})).toStrictEqual(YearMonthDate.defaultValue);
++      assert.deepStrictEqual(
++        YearMonthDate.fill({}),
++        YearMonthDate.defaultValue,
++      );
+     });
+   });
+ });

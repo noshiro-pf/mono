@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/utils/index.ts apps/event-schedule-app/src/store/utils/index.mts
+index f60c93c29..4c7d359f5 100644
+--- experimental/packages/apps/event-schedule-app/src/store/utils/index.ts
++++ apps/event-schedule-app/src/store/utils/index.mts
+@@ -1,2 +1,2 @@
+-export * from './create-form-error-state';
+-export * from './create-toggle-section-state';
++export * from './create-form-error-state.mjs';
++export * from './create-toggle-section-state.mjs';

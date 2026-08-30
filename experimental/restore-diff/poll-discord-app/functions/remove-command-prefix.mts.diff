@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/remove-command-prefix.mts apps/poll-discord-app/src/functions/remove-command-prefix.mts
+index d8168e3ee..081d2345b 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/remove-command-prefix.mts
++++ apps/poll-discord-app/src/functions/remove-command-prefix.mts
+@@ -1,3 +1,4 @@
++import { type ValueOf } from 'ts-type-forge';
+ import { type triggerCommand } from '../constants.mjs';
+ 
+ export const removeCommandPrefix = (

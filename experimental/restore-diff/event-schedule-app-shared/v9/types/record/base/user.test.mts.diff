@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/user.test.mts apps/event-schedule-app-shared/src/v9/types/record/base/user.test.mts
+index a03f268c0..743e4bc3c 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/base/user.test.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/base/user.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import { UserName, type UserId } from '../../named-primitive-types.mjs';
+ import { User } from './user.mjs';
+ 
+@@ -15,19 +15,20 @@ describe('User', () => {
+     const defaultValue: User = {
+       id: null,
+       name: UserName.cast(''),
+-    };
+-    expect(User.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(User.defaultValue, defaultValue);
+   });
+ 
+   describe('is', () => {
+     test('defaultValue should be true', () => {
+-      expect(User.is(User.defaultValue)).toBe(true);
++      assert.isTrue(User.is(User.defaultValue));
+     });
+   });
+ 
+   describe('fill', () => {
+     test('fill result should be the defaultValue', () => {
+-      expect(User.fill({})).toStrictEqual(User.defaultValue);
++      assert.deepStrictEqual(User.fill({}), User.defaultValue);
+     });
+   });
+ });

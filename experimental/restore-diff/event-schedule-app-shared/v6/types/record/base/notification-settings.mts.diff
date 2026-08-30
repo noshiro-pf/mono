@@ -1,0 +1,89 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/notification-settings.mts apps/event-schedule-app-shared/src/v6/types/record/base/notification-settings.mts
+index 578aa736d..02f6f4520 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/notification-settings.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/notification-settings.mts
+@@ -1,4 +1,5 @@
+-import { isBoolean, isRecord, isString, Obj } from '@noshiro/ts-utils';
++import { isBoolean, isRecord, isString } from 'ts-data-forge';
++import { hasKeyValue } from '../../../../utils/index.mjs';
+ 
+ export type NotificationSettings = Readonly<{
+   email: string;
+@@ -22,61 +23,57 @@ export const notificationSettingsDefaultValue = {
+ 
+ export const isNotificationSettings = (a: unknown): a is NotificationSettings =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'email', isString) &&
+-  Obj.hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
+-  Obj.hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
+-  Obj.hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
+-  Obj.hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
+-  Obj.hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
+-  Obj.hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
++  hasKeyValue(a, 'email', isString) &&
++  hasKeyValue(a, 'notifyOnAnswerChange', isBoolean) &&
++  hasKeyValue(a, 'notify01daysBeforeAnswerDeadline', isBoolean) &&
++  hasKeyValue(a, 'notify03daysBeforeAnswerDeadline', isBoolean) &&
++  hasKeyValue(a, 'notify07daysBeforeAnswerDeadline', isBoolean) &&
++  hasKeyValue(a, 'notify14daysBeforeAnswerDeadline', isBoolean) &&
++  hasKeyValue(a, 'notify28daysBeforeAnswerDeadline', isBoolean);
+ 
+ const d = notificationSettingsDefaultValue;
+ 
+ export const fillNotificationSettings = (a?: unknown): NotificationSettings =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        email: Obj.hasKeyValue(a, 'email', isString) ? a.email : d.email,
+-        notifyOnAnswerChange: Obj.hasKeyValue(
+-          a,
+-          'notifyOnAnswerChange',
+-          isBoolean,
+-        )
++    : ({
++        email: hasKeyValue(a, 'email', isString) ? a.email : d.email,
++        notifyOnAnswerChange: hasKeyValue(a, 'notifyOnAnswerChange', isBoolean)
+           ? a.notifyOnAnswerChange
+           : d.notifyOnAnswerChange,
+-        notify01daysBeforeAnswerDeadline: Obj.hasKeyValue(
++        notify01daysBeforeAnswerDeadline: hasKeyValue(
+           a,
+           'notify01daysBeforeAnswerDeadline',
+           isBoolean,
+         )
+           ? a.notify01daysBeforeAnswerDeadline
+           : d.notify01daysBeforeAnswerDeadline,
+-        notify03daysBeforeAnswerDeadline: Obj.hasKeyValue(
++        notify03daysBeforeAnswerDeadline: hasKeyValue(
+           a,
+           'notify03daysBeforeAnswerDeadline',
+           isBoolean,
+         )
+           ? a.notify03daysBeforeAnswerDeadline
+           : d.notify03daysBeforeAnswerDeadline,
+-        notify07daysBeforeAnswerDeadline: Obj.hasKeyValue(
++        notify07daysBeforeAnswerDeadline: hasKeyValue(
+           a,
+           'notify07daysBeforeAnswerDeadline',
+           isBoolean,
+         )
+           ? a.notify07daysBeforeAnswerDeadline
+           : d.notify07daysBeforeAnswerDeadline,
+-        notify14daysBeforeAnswerDeadline: Obj.hasKeyValue(
++        notify14daysBeforeAnswerDeadline: hasKeyValue(
+           a,
+           'notify14daysBeforeAnswerDeadline',
+           isBoolean,
+         )
+           ? a.notify14daysBeforeAnswerDeadline
+           : d.notify14daysBeforeAnswerDeadline,
+-        notify28daysBeforeAnswerDeadline: Obj.hasKeyValue(
++        notify28daysBeforeAnswerDeadline: hasKeyValue(
+           a,
+           'notify28daysBeforeAnswerDeadline',
+           isBoolean,
+         )
+           ? a.notify28daysBeforeAnswerDeadline
+           : d.notify28daysBeforeAnswerDeadline,
+-      };
++      } as const);

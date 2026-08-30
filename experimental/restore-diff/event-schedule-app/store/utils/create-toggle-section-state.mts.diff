@@ -1,0 +1,54 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/utils/create-toggle-section-state.ts apps/event-schedule-app/src/store/utils/create-toggle-section-state.mts
+index 9e7c8c042..af897ba04 100644
+--- experimental/packages/apps/event-schedule-app/src/store/utils/create-toggle-section-state.ts
++++ apps/event-schedule-app/src/store/utils/create-toggle-section-state.mts
+@@ -1,3 +1,6 @@
++import { type InitializedObservable, createState } from 'synstate';
++import { createBooleanState } from 'synstate-react-hooks';
++
+ export type ToggleSectionState<A> = Readonly<{
+   toggleState$: InitializedObservable<boolean>;
+   toggle: () => void;
+@@ -9,7 +12,7 @@ export type ToggleSectionState<A> = Readonly<{
+   resetState: () => void;
+ }>;
+ 
+-export const createToggleSectionState = <A>({
++export const createToggleSectionState = <A,>({
+   initialToggleState,
+   initialState,
+   valueToBeSetWhenTurnedOff,
+@@ -20,13 +23,10 @@ export const createToggleSectionState = <A>({
+   valueToBeSetWhenTurnedOff: () => A;
+   valueToBeSetWhenTurnedOn?: () => A;
+ }>): ToggleSectionState<A> => {
+-  const toggleState = createBooleanState(initialToggleState);
++  const [, toggleState] = createBooleanState(initialToggleState);
+ 
+-  const {
+-    state: value$,
+-    setState: setValue,
+-    updateState: updateValue,
+-  } = createState<A>(initialState);
++  const [value$, setValue, { updateState: updateValue }] =
++    createState<A>(initialState);
+ 
+   const { toggle, resetState, turnOff, turnOn } =
+     createToggleSectionStateManager<A>({
+@@ -56,7 +56,7 @@ type ToggleSectionManagerState = Readonly<{
+   resetState: () => void;
+ }>;
+ 
+-const createToggleSectionStateManager = <A>({
++const createToggleSectionStateManager = <A,>({
+   toggleState,
+   initialState,
+   valueToBeSetWhenTurnedOff,
+@@ -88,6 +88,7 @@ const createToggleSectionStateManager = <A>({
+ 
+   const resetState = (): void => {
+     toggleState.resetState();
++
+     setValue(initialState);
+   };
+ 

@@ -1,0 +1,26 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-select.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-select.tsx
+index 28156dcfa..35722a0aa 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-select.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-select.tsx
+@@ -1,8 +1,9 @@
+ import { HTMLSelect } from '@blueprintjs/core';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useCallback } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type StrictOmit } from 'ts-type-forge';
+ 
+-export type BpSelectProps = Omit<HTMLSelectPropsOriginal, 'options'> &
++export type BpSelectProps = StrictOmit<HTMLSelectPropsOriginal, 'options'> &
+   Readonly<{
+     onValueChange: (value: string) => void;
+     options: Readonly<HTMLSelectPropsOriginal['options']>;
+@@ -13,7 +14,7 @@ type HTMLSelectPropsOriginal = React.ComponentProps<typeof HTMLSelect>;
+ export const BpSelect = memoNamed<BpSelectProps>(
+   'BpSelect',
+   ({ value, onValueChange, options, ...props }) => {
+-    const onChangeHandler = useCallback(
++    const onChangeHandler = React.useCallback(
+       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+       (ev: React.ChangeEvent<HTMLSelectElement>) => {
+         onValueChange(ev.target.value);

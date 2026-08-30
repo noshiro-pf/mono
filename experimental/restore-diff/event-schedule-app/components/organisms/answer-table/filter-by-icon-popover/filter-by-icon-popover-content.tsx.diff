@@ -1,0 +1,34 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover-content.tsx apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover-content.tsx
+index 7d2b7ed56..9770e1cca 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover-content.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-table/filter-by-icon-popover/filter-by-icon-popover-content.tsx
+@@ -1,7 +1,12 @@
+ import { Button } from '@blueprintjs/core';
+-import { SwitchWithoutLabelStyled } from '@noshiro/react-blueprintjs-utils';
+-import { type NumIconFilterState } from '../../../../types';
+-import { IconCountNumericInput } from '../../../molecules';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { SwitchWithoutLabelStyled } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type SafeUint } from 'ts-type-forge';
++import { type NumIconFilterState } from '../../../../types/index.mjs';
++import { IconCountNumericInput } from '../../../molecules/index.mjs';
+ 
+ const dc = dict.answerPage.answers.iconHeaderFilter;
+ 
+@@ -26,9 +31,12 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
+     enableFiltering,
+     disableFiltering,
+   }) => {
+-    const switchHandler = useCallback<React.FormEventHandler<HTMLInputElement>>(
++    const switchHandler = React.useCallback<
++      React.ChangeEventHandler<HTMLInputElement>
++    >(
+       (ev) => {
+         if (!(ev.target instanceof HTMLInputElement)) return;
++
+         if (ev.target.checked) {
+           enableFiltering();
+         } else {

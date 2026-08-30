@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/answer-selection.mts apps/event-schedule-app-shared/src/v9/types/record/answer-selection.mts
+index fb9579cd0..34e404881 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/answer-selection.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/answer-selection.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
+-import { DatetimeRange } from '@noshiro/io-ts-types';
++import * as t from 'ts-fortress';
++import { DatetimeRange } from 'ts-fortress-types';
+ import {
+   AnswerIconIdWithNone,
+   createAnswerIconPointType,

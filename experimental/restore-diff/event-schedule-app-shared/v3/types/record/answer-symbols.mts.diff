@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/answer-symbols.mts apps/event-schedule-app-shared/src/v3/types/record/answer-symbols.mts
+index 4bfb37bdb..4bd7e9020 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/answer-symbols.mts
++++ apps/event-schedule-app-shared/src/v3/types/record/answer-symbols.mts
+@@ -1,7 +1,8 @@
++import { type DeepPartial, type ReadonlyRecord } from 'ts-type-forge';
+ import { type AnswerSymbolId } from '../enum/index.mjs';
+ import { fillSymbolSetting, type SymbolSetting } from './base/index.mjs';
+ 
+-export type SymbolSettings = Record<AnswerSymbolId, SymbolSetting>;
++export type SymbolSettings = ReadonlyRecord<AnswerSymbolId, SymbolSetting>;
+ 
+ export type PartialSymbolSettings = DeepPartial<SymbolSettings>;
+ 
+@@ -12,10 +13,10 @@ const defaultSymbolSettings = {
+ } as const satisfies SymbolSettings;
+ 
+ const d = defaultSymbolSettings;
+-export const fillSymbolSettings = (
+-  p?: PartialSymbolSettings,
+-): SymbolSettings => ({
+-  good: fillSymbolSetting(p?.good ?? d.good),
+-  fair: fillSymbolSetting(p?.fair ?? d.fair),
+-  poor: fillSymbolSetting(p?.poor ?? d.poor),
+-});
++
++export const fillSymbolSettings = (p?: PartialSymbolSettings): SymbolSettings =>
++  ({
++    good: fillSymbolSetting(p?.good ?? d.good),
++    fair: fillSymbolSetting(p?.fair ?? d.fair),
++    poor: fillSymbolSetting(p?.poor ?? d.poor),
++  }) as const;

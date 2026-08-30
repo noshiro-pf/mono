@@ -1,0 +1,14 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/styled/table.tsx apps/react-blueprintjs-utils/src/components/styled/table.tsx
+index 1c3535f6e..8d6bb1f32 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/styled/table.tsx
++++ apps/react-blueprintjs-utils/src/components/styled/table.tsx
+@@ -9,7 +9,9 @@ import {
+ } from '../../constants/index.mjs';
+ 
+ const tableRowHeightPx = ptGridSizePx * 4;
++
+ const tableBorderWidthPx = 1;
++
+ const tableBorderColor = ptDividerBlack;
+ 
+ const HTMLTableStyledBase = styled.table`

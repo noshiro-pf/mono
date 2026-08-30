@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/event-schedule-app/src/types/index.ts apps/event-schedule-app/src/types/index.mts
+index e72efe8b9..2f66e69c7 100644
+--- experimental/packages/apps/event-schedule-app/src/types/index.ts
++++ apps/event-schedule-app/src/types/index.mts
+@@ -1,12 +1,12 @@
+-export * from './answer-selection-value';
+-export * from './answer-table-cell';
+-export * from './answer-table-cell-position';
+-export * from './answers-rank';
+-export * from './answers-score';
+-export * from './assert-is-credential-error';
+-export * from './detailed-filter-icon';
+-export * from './event-schedule-settings-common-state';
+-export * from './event-schedule-validation';
+-export * from './firebase-types-wrapper';
+-export * from './notification-with-email';
+-export * from './num-icon-filter-state';
++export * from './answer-selection-value.mjs';
++export * from './answer-table-cell-position.mjs';
++export * from './answer-table-cell.mjs';
++export * from './answers-rank.mjs';
++export * from './answers-score.mjs';
++export * from './assert-is-credential-error.mjs';
++export * from './detailed-filter-icon.mjs';
++export * from './event-schedule-settings-common-state.mjs';
++export * from './event-schedule-validation.mjs';
++export * from './firebase-types-wrapper.mjs';
++export * from './notification-with-email.mjs';
++export * from './num-icon-filter-state.mjs';

@@ -1,0 +1,268 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/answer-page.tsx apps/event-schedule-app/src/components/pages/answer-page/answer-page.tsx
+index d2426ce5b..b97a3b083 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/answer-page/answer-page.tsx
++++ apps/event-schedule-app/src/components/pages/answer-page/answer-page.tsx
+@@ -5,9 +5,15 @@ import {
+   TagInput,
+   type TagProps,
+ } from '@blueprintjs/core';
+-import { AlertWithMaxWidth, BpSwitch } from '@noshiro/react-blueprintjs-utils';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
+ import html2canvas from 'html2canvas';
+-import { eventIsAfterDeadline } from '../../../functions';
++import * as React from 'react';
++import { AlertWithMaxWidth, BpSwitch } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { castMutable } from 'ts-data-forge';
++import { eventIsAfterDeadline } from '../../../functions/index.mjs';
+ import {
+   AnswerFilterAndSortStore,
+   AnswerPageStore,
+@@ -20,11 +26,16 @@ import {
+   errorType$,
+   eventSchedule$,
+   holidaysJpDefinition$,
+-} from '../../../store';
+-import { toClassName } from '../../../utils';
+-import { CustomIcon, Description, RequiredParticipantIcon } from '../../atoms';
+-import { CustomScrollbarWrapper, Section } from '../../molecules';
+-import { MultipleDatePicker } from '../../multiple-date-picker';
++} from '../../../store/index.mjs';
++import { match } from '../../../utils-ported/index.mjs';
++import { toClassName } from '../../../utils/index.mjs';
++import {
++  CustomIcon,
++  Description,
++  RequiredParticipantIcon,
++} from '../../atoms/index.mjs';
++import { CustomScrollbarWrapper, Section } from '../../molecules/index.mjs';
++import { MultipleDatePicker } from '../../multiple-date-picker/index.mjs';
+ import {
+   AnswerBeingEdited,
+   AnswerLaterButtonWithConfirmation,
+@@ -32,10 +43,13 @@ import {
+   AnswerTable,
+   DetailedFilterCollapse,
+   Header,
+-} from '../../organisms';
+-import { ButtonsWrapperAlignEnd, ButtonsWrapperNowrap } from '../../styled';
+-import { NotFoundPage } from '../not-found-page';
+-import { AnswerPageError } from './error';
++} from '../../organisms/index.mjs';
++import {
++  ButtonsWrapperAlignEnd,
++  ButtonsWrapperNowrap,
++} from '../../styled/index.mjs';
++import { NotFoundPage } from '../not-found-page.js';
++import { AnswerPageError } from './error.js';
+ 
+ const dc = dict.answerPage;
+ 
+@@ -66,31 +80,44 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+ 
+   const alertOnAnswerClickIsOpen =
+     AnswerPageStore.useAlertOnAnswerClickIsOpen();
++
+   const answerBeingEdited = AnswerPageStore.useAnswerBeingEdited();
++
+   const answerBeingEditedSectionState =
+     AnswerPageStore.useAnswerBeingEditedSectionState();
++
+   const answers = useObservableValue(answersFiltered$);
++
+   const errorType = useObservableValue(errorType$);
++
+   const eventId = useObservableValue(Router.eventId$);
++
+   const eventSchedule = useObservableValue(eventSchedule$);
++
+   const refreshButtonIsDisabled = AnswersStore.useRefreshButtonIsDisabled();
++
+   const refreshButtonIsLoading = AnswersStore.useRefreshButtonIsLoading();
++
+   const requiredParticipantsExist = useObservableValue(
+     AnswerPageStore.requiredParticipantsExist$,
+   );
++
+   const selectedAnswerUserName = useObservableValue(
+     AnswerPageStore.selectedAnswerUserName$,
+   );
++
+   const selectedDates = useObservableValue(AnswerPageStore.selectedDates$);
++
+   const submitButtonIsDisabled = useObservableValue(
+     AnswerPageStore.submitButtonIsDisabled$,
+   );
++
+   const submitButtonIsLoading = AnswerPageStore.useSubmitButtonIsLoading();
+ 
+   const detailedFilterDialogIsDisplayed =
+     AnswerTableStore.useDetailedFilterIsOpen();
+ 
+-  const afterDeadline = useMemo(
++  const afterDeadline = React.useMemo(
+     () => eventIsAfterDeadline(eventSchedule),
+     [eventSchedule],
+   );
+@@ -98,19 +125,22 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+   /* effect */
+ 
+   // fetch once on the first load
+-  useEffect(() => {
++  React.useEffect(() => {
+     EventScheduleStore.fetchEventSchedule();
++
+     AnswersStore.fetchAnswers();
++
+     AnswerFilterAndSortStore.restoreFromQueryParams();
+   }, []);
+ 
+-  const answerSectionRef = useRef<HTMLDivElement>(null);
++  const answerSectionRef = React.useRef<HTMLDivElement>(null);
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     switch (answerBeingEditedSectionState) {
+       case 'creating':
+       case 'editing':
+         answerSectionRef.current?.scrollIntoView();
++
+         break;
+       case 'hidden':
+         break;
+@@ -127,20 +157,19 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+ 
+   // 「後で回答」ボタンを表示するかどうか。
+   // ログイン済み & 回答済みの場合のみ非表示、それ以外の場合は表示。
+-  const showAnswerLaterButton = useMemo<boolean>(
++  const showAnswerLaterButton = React.useMemo<boolean>(
+     () =>
+       !afterDeadline &&
+-      !(
+-        fireAuthUser?.uid !== undefined &&
+-        answers?.some((ans) => ans.user.id === fireAuthUser.uid) === true
+-      ),
++      (fireAuthUser?.uid === undefined ||
++        answers?.some((ans) => ans.user.id === fireAuthUser.uid) !== true),
+     [afterDeadline, fireAuthUser, answers],
+   );
+ 
+-  const screenShotAreaRef = useRef<HTMLDivElement>(null);
+-  const tableWrapperRef = useRef<HTMLDivElement>(null);
++  const screenShotAreaRef = React.useRef<HTMLDivElement>(null);
++
++  const tableWrapperRef = React.useRef<HTMLDivElement>(null);
+ 
+-  const saveScreenShot = useCallback(() => {
++  const saveScreenShot = React.useCallback(() => {
+     const el = screenShotAreaRef.current;
+ 
+     if (el !== null) {
+@@ -165,7 +194,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+ 
+   const tableIsMinimized = AnswerTableStore.useTableIsMinimized();
+ 
+-  return errorType !== undefined && errorType.type.type === 'not-found' ? (
++  return errorType?.type.type === 'not-found' ? (
+     <NotFoundPage />
+   ) : (
+     <div data-e2e={'answer-page'}>
+@@ -206,7 +235,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                 holidaysJpDefinition={holidaysJpDefinition}
+                 selectedDates={selectedDates}
+                 setYearMonth$={AnswerPageStore.setYearMonth$}
+-                useOutlinedSelectedStyle={true}
++                useOutlinedSelectedStyle
+               />
+             </CalendarWrapper>
+ 
+@@ -242,9 +271,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                       leftIcon={'filter-list'}
+                       rightElement={clearTagsButton}
+                       tagProps={
+-                        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                         tagProps as (
+-                          value: DeepReadonly<React.ReactNode>,
++                          value: React.ReactNode,
+                           index: number,
+                         ) => TagProps
+                       }
+@@ -254,7 +282,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                     <FilterButtonsWrapper>
+                       <Button
+                         intent={'primary'}
+-                        small={true}
++                        size={'small'}
+                         onClick={
+                           AnswerFilterAndSortStore.displayOnlyCandidateDatesOfRank1to3
+                         }
+@@ -263,7 +291,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                       </Button>
+                       <Button
+                         intent={'primary'}
+-                        small={true}
++                        size={'small'}
+                         onClick={
+                           AnswerFilterAndSortStore.displayOnlyCandidateDatesWithZeroPoorIcon
+                         }
+@@ -300,7 +328,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                       label={
+                         dict.answerPage.answers.toggleDateStringIsMinimized
+                       }
+-                      noMargin={true}
++                      noMargin
+                       onToggle={AnswerTableStore.toggleDateStringIsMinimized}
+                     />
+                   </div>
+@@ -308,7 +336,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                     <BpSwitch
+                       checked={answerIconIsHidden}
+                       label={dict.answerPage.answers.toggleAnswerIconIsHidden}
+-                      noMargin={true}
++                      noMargin
+                       onToggle={AnswerTableStore.toggleAnswerIconIsHidden}
+                     />
+                   </div>
+@@ -316,7 +344,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                     <BpSwitch
+                       checked={tableIsMinimized}
+                       label={dict.answerPage.answers.toggleMinimizedTable}
+-                      noMargin={true}
++                      noMargin
+                       onToggle={AnswerTableStore.toggleTableIsMinimized}
+                     />
+                   </div>
+@@ -334,8 +362,8 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+                   />
+ 
+                   <AlertWithMaxWidth
+-                    canEscapeKeyCancel={true}
+-                    canOutsideClickCancel={true}
++                    canEscapeKeyCancel
++                    canOutsideClickCancel
+                     icon={'disable'}
+                     intent={'danger'}
+                     isOpen={alertOnAnswerClickIsOpen}
+@@ -427,10 +455,7 @@ export const AnswerPage = memoNamed('AnswerPage', () => {
+ });
+ 
+ const IconDescriptionRow = memoNamed<
+-  Readonly<{
+-    iconName: AnswerIconId;
+-    answerIcons: AnswerIconSettings;
+-  }>
++  Readonly<{ iconName: AnswerIconId; answerIcons: AnswerIconSettings }>
+ >('IconDescriptionRow', ({ iconName, answerIcons }) => (
+   <tr>
+     <th>
+@@ -449,7 +474,7 @@ const IconDescriptionRow = memoNamed<
+ const clearTagsButton = (
+   <Button
+     icon={'cross'}
+-    minimal={true}
++    variant={'minimal'}
+     onClick={AnswerFilterAndSortStore.clearTags}
+   />
+ );

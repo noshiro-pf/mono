@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/section.tsx apps/event-schedule-app/src/components/molecules/section.tsx
+index 0281489af..36a2fbfb0 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/section.tsx
++++ apps/event-schedule-app/src/components/molecules/section.tsx
+@@ -1,10 +1,11 @@
+ import { Button, Card } from '@blueprintjs/core';
+-import { SectionTitle } from '../atoms';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { memoNamed } from 'react-utils';
++import { mapOptional } from '../../utils-ported/index.mjs';
++import { SectionTitle } from '../atoms/index.mjs';
+ 
+-type Props = Readonly<{
+-  sectionTitle?: string;
+-  onCloseClick?: () => void;
+-}>;
++type Props = Readonly<{ sectionTitle?: string; onCloseClick?: () => void }>;
+ 
+ export const Section = memoNamed<React.PropsWithChildren<Props>>(
+   'Section',
+@@ -21,7 +22,7 @@ export const Section = memoNamed<React.PropsWithChildren<Props>>(
+             <SectionTitle>{s}</SectionTitle>
+           ))}
+           {mapOptional(onCloseClick, (f) => (
+-            <Button icon={'cross'} minimal={true} onClick={f} />
++            <Button icon={'cross'} variant={'minimal'} onClick={f} />
+           ))}
+         </Header>
+         {children}

@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-application.test.mts apps/lambda-calculus-interpreter-core/src/functions/is-application.test.mts
+index e1296b9b1..4b86e3d37 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-application.test.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/is-application.test.mts
+@@ -1,18 +1,18 @@
+ import { isApplication } from './is-lambda-term.mjs';
+ 
+ test('isApplication 1', () => {
+-  expect(isApplication('x')).toBe(false);
++  assert.isFalse(isApplication('x'));
+ });
+ 
+ test('isApplication 2', () => {
+-  expect(
++  assert.isTrue(
+     isApplication([
+       ['x', ['y', 'y']],
+       ['x', ['y', 'y']],
+     ]),
+-  ).toBe(true);
++  );
+ });
+ 
+ test('isApplication 3', () => {
+-  expect(isApplication(['lambda', 'x', ['x', ['y', 'y']]])).toBe(false);
++  assert.isFalse(isApplication(['lambda', 'x', ['x', ['y', 'y']]]));
+ });

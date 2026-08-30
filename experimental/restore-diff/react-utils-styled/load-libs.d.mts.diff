@@ -1,0 +1,7 @@
+diff --git experimental/packages/utils/react-utils-styled/src/load-libs.d.mts experimental/packages/utils/react-utils-styled/src/load-libs.d.mts
+deleted file mode 100644
+index 203c850d9..000000000
+--- experimental/packages/utils/react-utils-styled/src/load-libs.d.mts
++++ /dev/null
+@@ -1 +0,0 @@
+-/// <reference types="react" />

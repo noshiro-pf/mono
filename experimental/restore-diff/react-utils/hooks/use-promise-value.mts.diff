@@ -1,0 +1,38 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-promise-value.mts apps/react-utils/src/hooks/use-promise-value.mts
+index d0e377f42..263db791a 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-promise-value.mts
++++ apps/react-utils/src/hooks/use-promise-value.mts
+@@ -1,11 +1,11 @@
+-import { type PromiseState } from '@noshiro/ts-utils-additional';
+ import { useState } from 'better-react-use-state';
+-import { useEffect, useRef } from 'react';
++import * as React from 'react';
++import { type PromiseState } from '../utils/index.mjs';
+ 
+ export const usePromiseValue = <T,>(
+   promise: Readonly<Promise<T>>,
+ ): PromiseState<undefined, unknown, T> => {
+-  const promiseMemoized = useRef(promise);
++  const promiseMemoized = React.useRef(promise);
+ 
+   const [settledValue, setSettledValue] = useState<
+     PromiseState<undefined, unknown, T>
+@@ -14,8 +14,9 @@ export const usePromiseValue = <T,>(
+     value: undefined,
+   });
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     let mut_alive = true;
++
+     promiseMemoized.current
+       .then((v) => {
+         if (mut_alive) {
+@@ -27,6 +28,7 @@ export const usePromiseValue = <T,>(
+           setSettledValue({ status: 'error', value: error });
+         }
+       });
++
+     return () => {
+       mut_alive = false;
+     };

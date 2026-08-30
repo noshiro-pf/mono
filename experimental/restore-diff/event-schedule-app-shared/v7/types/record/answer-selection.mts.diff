@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-selection.mts apps/event-schedule-app-shared/src/v7/types/record/answer-selection.mts
+index d04df3cf1..07854bdf9 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer-selection.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/answer-selection.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import {
+   answerIconIdWithNoneTypeDef,
+   answerIconPointTypeDef,

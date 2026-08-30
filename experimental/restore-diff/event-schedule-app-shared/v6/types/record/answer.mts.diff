@@ -1,0 +1,96 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer.mts apps/event-schedule-app-shared/src/v6/types/record/answer.mts
+index 41124cda5..74ab8bcff 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/answer.mts
+@@ -1,11 +1,13 @@
+ import {
+-  DateUtils,
++  Arr,
++  hasKey,
+   isBoolean,
+   isNumber,
+   isRecord,
+   isString,
+-  Obj,
+-} from '@noshiro/ts-utils';
++} from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { hasKeyValue } from '../../../utils/index.mjs';
+ import {
+   isAnswerId,
+   isWeight,
+@@ -48,54 +50,47 @@ export const answerDefaultValue = {
+ 
+ export const isAnswer = (a: unknown): a is Answer =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'id', isAnswerId) &&
+-  Obj.hasKeyValue(a, 'user', isUser) &&
+-  Obj.hasKeyValue(a, 'comment', isString) &&
+-  Obj.hasKeyValue(
++  hasKeyValue(a, 'id', isAnswerId) &&
++  hasKeyValue(a, 'user', isUser) &&
++  hasKeyValue(a, 'comment', isString) &&
++  hasKeyValue(
+     a,
+     'selection',
+-    (e: unknown): e is AnswerSelection[] =>
+-      Array.isArray(e) && e.every(isAnswerSelection),
++    (e: unknown): e is readonly AnswerSelection[] =>
++      Arr.isArray(e) && e.every(isAnswerSelection),
+   ) &&
+-  Obj.hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
+-  Obj.hasKeyValue(a, 'weight', isWeight) &&
+-  Obj.hasKeyValue(a, 'isRequiredParticipants', isBoolean);
++  hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber) &&
++  hasKeyValue(a, 'weight', isWeight) &&
++  hasKeyValue(a, 'isRequiredParticipants', isBoolean);
+ 
+ const d = answerDefaultValue;
+ 
+ export const fillAnswer = (a?: unknown): Answer =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        id: Obj.hasKeyValue(a, 'id', isAnswerId) ? a.id : d.id,
++    : ({
++        id: hasKeyValue(a, 'id', isAnswerId) ? a.id : d.id,
+ 
+-        user: Object.hasOwn(a, 'user') ? fillUser(a.user) : d.user,
++        user: hasKey(a, 'user') ? fillUser(a.user) : d.user,
+ 
+-        comment: Obj.hasKeyValue(a, 'comment', isString)
+-          ? a.comment
+-          : d.comment,
++        comment: hasKeyValue(a, 'comment', isString) ? a.comment : d.comment,
+ 
+-        selection: Object.hasOwn(a, 'selection')
+-          ? Array.isArray(a.selection)
++        selection:
++          hasKey(a, 'selection') && Arr.isArray(a.selection)
+             ? a.selection.map(fillAnswerSelection)
+-            : d.selection
+-          : d.selection,
++            : d.selection,
+ 
+-        [ANSWER_KEY_CREATED_AT]: Obj.hasKeyValue(
+-          a,
+-          ANSWER_KEY_CREATED_AT,
+-          isNumber,
+-        )
++        [ANSWER_KEY_CREATED_AT]: hasKeyValue(a, ANSWER_KEY_CREATED_AT, isNumber)
+           ? a[ANSWER_KEY_CREATED_AT]
+           : d[ANSWER_KEY_CREATED_AT],
+ 
+-        weight: Obj.hasKeyValue(a, 'weight', isWeight) ? a.weight : d.weight,
++        weight: hasKeyValue(a, 'weight', isWeight) ? a.weight : d.weight,
+ 
+-        isRequiredParticipants: Obj.hasKeyValue(
++        isRequiredParticipants: hasKeyValue(
+           a,
+           'isRequiredParticipants',
+           isBoolean,
+         )
+           ? a.isRequiredParticipants
+           : d.isRequiredParticipants,
+-      };
++      } as const);

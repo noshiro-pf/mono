@@ -1,0 +1,49 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/evaluator/substitute.mts apps/lambda-calculus-interpreter-core/src/functions/evaluator/substitute.mts
+index aee7b0984..278120a39 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/evaluator/substitute.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/evaluator/substitute.mts
+@@ -1,4 +1,4 @@
+-import { Json, Result } from '@noshiro/ts-utils';
++import { Json, Result } from 'ts-data-forge';
+ import { type LambdaTerm, type Variable } from '../../types/index.mjs';
+ import { getFreeVariables } from '../get-free-variables.mjs';
+ import { isAbstraction, isApplication } from '../is-lambda-term.mjs';
+@@ -27,27 +27,34 @@ export const substitute = (
+   if (isVariable(term)) {
+     return term === from ? to : term;
+   }
++
+   if (isApplication(term)) {
+     return [substitute(to, from, term[0]), substitute(to, from, term[1])];
+   }
++
+   if (isAbstraction(term)) {
+     const [, arg, body] = term;
+ 
+     if (arg === from) return term;
+ 
+     const freeVariables = getFreeVariables(to);
++
+     if (!freeVariables.includes(arg)) {
+       return ['lambda', arg, substitute(to, from, body)];
+-    } else {
+-      const v = pickUpAvailableVariable(freeVariables);
+-      const converted = alphaConversion(v, term);
+-      return substitute(to, from, converted);
+     }
++
++    const v = pickUpAvailableVariable(freeVariables);
++
++    const converted = alphaConversion(v, term);
++
++    return substitute(to, from, converted);
+   }
++
+   console.error(
+     `Syntax error: "${Result.unwrapThrow(
+       Json.stringify(term),
+     )}" is not lambda term.`,
+   );
++
+   return term;
+ };

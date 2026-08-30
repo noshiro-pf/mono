@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/types/answers-score.ts apps/event-schedule-app/src/types/answers-score.mts
+index fca5835fd..1ad7e5eed 100644
+--- experimental/packages/apps/event-schedule-app/src/types/answers-score.ts
++++ apps/event-schedule-app/src/types/answers-score.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ // prettier-ignore
+ const answersScoreTypeDef = t.enumType(

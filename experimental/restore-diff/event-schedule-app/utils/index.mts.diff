@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/index.ts apps/event-schedule-app/src/utils/index.mts
+index 835d9a82d..a814382d6 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/index.ts
++++ apps/event-schedule-app/src/utils/index.mts
+@@ -1,8 +1,8 @@
+-export * from './log';
+-export * from './map-none-to-undefined';
+-export * from './pad2';
+-export * from './split-string-by-whitespace';
+-export * from './to-css-classnames';
+-export * from './today';
+-export * from './ymd2day';
+-export * from './ymdhm-date-diff';
++export * from './log.mjs';
++export * from './map-none-to-undefined.mjs';
++export * from './pad2.mjs';
++export * from './split-string-by-whitespace.mjs';
++export * from './to-css-classnames.mjs';
++export * from './today.mjs';
++export * from './ymd2day.mjs';
++export * from './ymdhm-date-diff.mjs';

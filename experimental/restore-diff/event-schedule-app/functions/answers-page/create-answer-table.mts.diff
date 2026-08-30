@@ -1,0 +1,50 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-table.ts apps/event-schedule-app/src/functions/answers-page/create-answer-table.mts
+index 74a365977..7101196a8 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/answers-page/create-answer-table.ts
++++ apps/event-schedule-app/src/functions/answers-page/create-answer-table.mts
+@@ -1,4 +1,8 @@
+-import { datetimeRangeFromMapKey, datetimeRangeToMapKey } from '../map-key';
++import { IMapMapped, tp } from 'ts-data-forge';
++import {
++  datetimeRangeFromMapKey,
++  datetimeRangeToMapKey,
++} from '../map-key/index.mjs';
+ 
+ export const createAnswerTable = (
+   answerSelectionMapFn: (
+@@ -13,16 +17,30 @@ export const createAnswerTable = (
+   answers: readonly Answer[],
+ ): IMapMapped<
+   DatetimeRange,
+-  DeepReadonly<
+-    [iconId: AnswerIconIdWithNone, point: AnswerIconPoint, comment: string][]
+-  >,
++  // `readonly …[]` rather than `DeepReadonly<…[]>`: the map is built from
++  // tuples that are already readonly, and the deep form makes a different
++  // type that `IMapMapped.create` does not produce.
++  readonly (readonly [
++    iconId: AnswerIconIdWithNone,
++    point: AnswerIconPoint,
++    comment: string,
++  ])[],
+   DatetimeRangeMapKey
+ > =>
+-  IMapMapped.new(
++  IMapMapped.create(
+     datetimeRangeList.map((datetimeRange) =>
+       tp(
+         datetimeRange,
+-        answers.map((answer) => answerSelectionMapFn(datetimeRange, answer.id)),
++        // Annotated so the map's value type matches the declared return type:
++        // `IMapMapped` is invariant in its value, and `.map` on its own infers
++        // the mutable array.
++        answers.map((answer) =>
++          answerSelectionMapFn(datetimeRange, answer.id),
++        ) as readonly (readonly [
++          iconId: AnswerIconIdWithNone,
++          point: AnswerIconPoint,
++          comment: string,
++        ])[],
+       ),
+     ),
+     datetimeRangeToMapKey,

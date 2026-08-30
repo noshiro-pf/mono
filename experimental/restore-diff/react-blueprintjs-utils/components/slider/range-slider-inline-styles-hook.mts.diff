@@ -1,0 +1,54 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider-inline-styles-hook.mts apps/react-blueprintjs-utils/src/components/slider/range-slider-inline-styles-hook.mts
+index 806395de5..5997b7919 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider-inline-styles-hook.mts
++++ apps/react-blueprintjs-utils/src/components/slider/range-slider-inline-styles-hook.mts
+@@ -1,4 +1,4 @@
+-import { useMemo } from 'react';
++import * as React from 'react';
+ import { formatPercentage } from './utils.mjs';
+ 
+ const handleSize = { width: '8px' } as const;
+@@ -13,7 +13,7 @@ export const useRangeSliderInlineStyles = (
+   leftHandleStyle: React.CSSProperties;
+   rightHandleStyle: React.CSSProperties;
+ }> => {
+-  const progressStartStyle: React.CSSProperties = useMemo(
++  const progressStartStyle: React.CSSProperties = React.useMemo(
+     () => ({
+       left: formatPercentage(0),
+       right: formatPercentage(1 - leftRatio),
+@@ -22,7 +22,7 @@ export const useRangeSliderInlineStyles = (
+     [leftRatio],
+   );
+ 
+-  const progressMidStyle: React.CSSProperties = useMemo(
++  const progressMidStyle: React.CSSProperties = React.useMemo(
+     () => ({
+       left: formatPercentage(leftRatio),
+       right: formatPercentage(1 - rightRatio),
+@@ -31,7 +31,7 @@ export const useRangeSliderInlineStyles = (
+     [leftRatio, rightRatio],
+   );
+ 
+-  const progressEndStyle: React.CSSProperties = useMemo(
++  const progressEndStyle: React.CSSProperties = React.useMemo(
+     () => ({
+       left: formatPercentage(rightRatio),
+       right: formatPercentage(0),
+@@ -40,14 +40,14 @@ export const useRangeSliderInlineStyles = (
+     [rightRatio],
+   );
+ 
+-  const leftHandleStyle: React.CSSProperties = useMemo(
++  const leftHandleStyle: React.CSSProperties = React.useMemo(
+     () => ({
+       left: `calc(${formatPercentage(leftRatio)} - ${handleSize.width})`,
+     }),
+     [leftRatio],
+   );
+ 
+-  const rightHandleStyle: React.CSSProperties = useMemo(
++  const rightHandleStyle: React.CSSProperties = React.useMemo(
+     () => ({
+       left: `calc(${formatPercentage(rightRatio)} - ${handleSize.width})`,
+     }),

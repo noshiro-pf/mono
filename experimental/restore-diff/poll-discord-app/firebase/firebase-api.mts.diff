@@ -1,0 +1,125 @@
+diff --git experimental/packages/apps/poll-discord-app/src/firebase/firebase-api.mts apps/poll-discord-app/src/firebase/firebase-api.mts
+index 6b569c871..bfbf3e017 100644
+--- experimental/packages/apps/poll-discord-app/src/firebase/firebase-api.mts
++++ apps/poll-discord-app/src/firebase/firebase-api.mts
+@@ -1,5 +1,6 @@
+-import * as t from '@noshiro/io-ts';
+ import * as firestore from 'firebase/firestore';
++import { Result, pipe, unknownToString } from 'ts-data-forge';
++import * as t from 'ts-fortress';
+ import {
+   pollFromJson,
+   pollToJson,
+@@ -12,6 +13,7 @@ import {
+   type PollId,
+   type UserId,
+ } from '../types/index.mjs';
++import { DateUtils, mapOptional, match, noop } from '../utils/index.mjs';
+ import { firestoreApp } from './initialize-firebase.mjs';
+ 
+ const pollsCollection = firestore.collection(firestoreApp, 'polls');
+@@ -41,15 +43,14 @@ const getPollIdByCommandMessageId = (
+         firestore.doc(commandMessageIdToPollIdMapCollection, commandMessageId),
+       )
+       .then((d) => d.data()),
+-  ).then((result) =>
++  ).then(
+     Result.fold(
+-      result,
+       (data) =>
+         pipe(data)
+-          .chain(valueType.fill)
+-          .chain((o) => o.value)
+-          .chainOptional(toPollId).value,
+-      Str.from,
++          .map(valueType.fill)
++          .map((o) => o.value)
++          .map((v) => mapOptional(v, toPollId)).value,
++      unknownToString,
+     ),
+   );
+ 
+@@ -64,7 +65,7 @@ const setPollIdForCommandMessageId = (
+         value: pollId,
+       },
+     ),
+-  ).then((result) => Result.fold(result, noop, Str.from));
++  ).then(Result.fold(noop, unknownToString));
+ 
+ const getPollIdByDateOptionId = (
+   dateOptionId: DateOptionId,
+@@ -73,15 +74,14 @@ const getPollIdByDateOptionId = (
+     firestore
+       .getDoc(firestore.doc(dateToPollIdMapCollection, dateOptionId))
+       .then((d) => d.data()),
+-  ).then((result) =>
++  ).then(
+     Result.fold(
+-      result,
+       (data) =>
+         pipe(data)
+-          .chain(valueType.fill)
+-          .chain((o) => o.value)
+-          .chainOptional(toPollId).value,
+-      Str.from,
++          .map(valueType.fill)
++          .map((o) => o.value)
++          .map((v) => mapOptional(v, toPollId)).value,
++      unknownToString,
+     ),
+   );
+ 
+@@ -102,14 +102,14 @@ const setPollIdForDateOptionIds = async (
+ 
+     return Result.ok(undefined);
+   } catch (error) {
+-    return Result.err(Str.from(error));
++    return Result.err(unknownToString(error));
+   }
+ };
+ 
+ const setPoll = (poll: Poll): Promise<Result<void, string>> =>
+   Result.fromPromise(
+     firestore.setDoc(firestore.doc(pollsCollection, poll.id), pollToJson(poll)),
+-  ).then((result) => Result.fold(result, noop, Str.from));
++  ).then(Result.fold(noop, unknownToString));
+ 
+ const getPollById = (
+   pollId: PollId,
+@@ -118,9 +118,7 @@ const getPollById = (
+     firestore
+       .getDoc(firestore.doc(pollsCollection, pollId))
+       .then((d) => d.data()),
+-  ).then((result) =>
+-    Result.fold(result, (d) => mapOptional(d, pollFromJson), Str.from),
+-  );
++  ).then(Result.fold((d) => mapOptional(d, pollFromJson), unknownToString));
+ 
+ const updatePollTitle = (
+   pollId: PollId,
+@@ -128,14 +126,14 @@ const updatePollTitle = (
+ ): Promise<Result<void, string>> =>
+   Result.fromPromise(
+     firestore.updateDoc(firestore.doc(pollsCollection, pollId), { title }),
+-  ).then((a) => Result.fold(a, noop, Str.from));
++  ).then(Result.fold(noop, unknownToString));
+ 
+ const updatePollUpdatedAt = (pollId: PollId): Promise<Result<void, string>> =>
+   Result.fromPromise(
+     firestore.updateDoc(firestore.doc(pollsCollection, pollId), {
+       updatedAt: toTimestamp(DateUtils.now()),
+     }),
+-  ).then((a) => Result.fold(a, noop, Str.from));
++  ).then(Result.fold(noop, unknownToString));
+ 
+ const updateMessageReaction = (
+   pollId: PollId,
+@@ -151,7 +149,7 @@ const updateMessageReaction = (
+         remove: firestore.arrayRemove(userId),
+       }),
+     }),
+-  ).then((a) => Result.fold(a, noop, Str.from));
++  ).then(Result.fold(noop, unknownToString));
+ 
+ export const firestoreApi = {
+   getPollIdByCommandMessageId,

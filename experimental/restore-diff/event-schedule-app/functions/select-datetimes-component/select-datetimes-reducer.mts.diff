@@ -1,0 +1,121 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/select-datetimes-reducer.ts apps/event-schedule-app/src/functions/select-datetimes-component/select-datetimes-reducer.mts
+index 67486ecb6..6d6671bb2 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/select-datetimes-reducer.ts
++++ apps/event-schedule-app/src/functions/select-datetimes-component/select-datetimes-reducer.mts
+@@ -1,8 +1,11 @@
+-import { compareDatetimeRange, TimeRange } from '@noshiro/io-ts-types';
+-import { datetimeRangeInitialValue } from '../../constants';
+-import { ymdFromKey, ymdToKey } from '../map-key';
+-import { ymdToDayInWeek } from '../ymd-to-day-in-week';
+-import { timeRangeReducer } from './time-range-reducer';
++import { Arr, ISetMapped, pipe, type SizeType } from 'ts-data-forge';
++import { compareDatetimeRange, TimeRange } from 'ts-fortress-types';
++import { type DayOfWeekName, type ReadonlyRecord } from 'ts-type-forge';
++import { datetimeRangeInitialValue } from '../../constants/index.mjs';
++import { Obj, type Reducer } from '../../utils-ported/index.mjs';
++import { ymdFromKey, ymdToKey } from '../map-key/index.mjs';
++import { ymdToDayInWeek } from '../ymd-to-day-in-week.mjs';
++import { timeRangeReducer } from './time-range-reducer.mjs';
+ 
+ export type DatetimeListReducerAction = Readonly<
+   | {
+@@ -13,14 +16,14 @@ export type DatetimeListReducerAction = Readonly<
+   | {
+       type: 'setTimeAtOneTime';
+       timeRange: TimeRange;
+-      checkboxState: Record<DayOfWeekName, boolean>;
++      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+     }
+   | { type: 'addClick'; datetimeRange: DatetimeRange }
+-  | { type: 'delete'; index: NumberType.ArraySize }
++  | { type: 'delete'; index: SizeType.Arr }
+   | { type: 'deleteAll' | 'sort' }
+-  | { type: 'duplicate'; index: NumberType.ArraySize }
+-  | { type: 'end' | 'start'; index: NumberType.ArraySize; hm: HoursMinutes }
+-  | { type: 'ymd'; index: NumberType.ArraySize; ymd: YearMonthDate }
++  | { type: 'duplicate'; index: SizeType.Arr }
++  | { type: 'end' | 'start'; index: SizeType.Arr; hm: HoursMinutes }
++  | { type: 'ymd'; index: SizeType.Arr; ymd: YearMonthDate }
+ >;
+ 
+ export type DatetimeListReducerState = readonly DatetimeRange[];
+@@ -34,51 +37,56 @@ export const datetimeListReducer: Reducer<
+       /* [note]
+       カレンダーから追加された要素は時刻 00:00 でリストに追加する。
+       カレンダーから削除された要素はリストからも削除する。 */
+-      const datetimeSet: ISetMapped<YearMonthDate, YmdKey> = ISetMapped.new(
++      const datetimeSet: ISetMapped<YearMonthDate, YmdKey> = ISetMapped.create(
+         state.map((e) => e.ymd),
+         ymdToKey,
+         ymdFromKey,
+       );
++
+       const dateSetFromCalendar: ISetMapped<YearMonthDate, YmdKey> =
+-        ISetMapped.new(action.list, ymdToKey, ymdFromKey);
++        ISetMapped.create(action.list, ymdToKey, ymdFromKey);
++
+       const removed = datetimeSet.subtract(dateSetFromCalendar);
+-      const added = dateSetFromCalendar.subtract(datetimeSet);
++
++      const addedList = dateSetFromCalendar.subtract(datetimeSet).toArray();
++
+       return pipe(state)
+-        .chain((list) => Arr.filterNot(list, (e) => removed.has(e.ymd)))
+-        .chain((list) =>
++        .map(Arr.filterNot((e) => removed.has(e.ymd)))
++        .map((list) =>
+           Arr.concat(
+             list,
+-            added
+-              .toArray()
+-              .map((ymd) => ({ ymd, timeRange: TimeRange.defaultValue })),
++            addedList.map((ymd) => ({
++              ymd,
++              timeRange: TimeRange.defaultValue,
++            })),
+           ),
+         )
+-        .chain((list) => list.toSorted(compareDatetimeRange)).value;
++        .map((list) => list.toSorted(compareDatetimeRange)).value;
+     }
+ 
+     case 'ymd':
+-      return Arr.update(state, action.index, (val) =>
++      return Arr.toUpdated(state, action.index, (val) =>
+         Obj.set(val, action.type, action.ymd),
+       );
+ 
+     case 'start':
+     case 'end':
+-      return Arr.update(state, action.index, (val) =>
++      return Arr.toUpdated(state, action.index, (val) =>
+         Obj.update(val, 'timeRange', (v) => timeRangeReducer(v, action)),
+       );
+ 
+     case 'duplicate':
+-      return Arr.inserted(
++      return Arr.toInserted(
+         state,
+         action.index,
+         state[action.index] ?? datetimeRangeInitialValue,
+       );
+ 
+     case 'delete':
+-      return Arr.removed(state, action.index);
++      return Arr.toRemoved(state, action.index);
+ 
+     case 'addClick':
+-      return Arr.pushed(state, action.datetimeRange);
++      return Arr.toPushed(state, action.datetimeRange);
+ 
+     case 'deleteAll':
+       return [];
+@@ -86,7 +94,7 @@ export const datetimeListReducer: Reducer<
+     case 'setTimeAtOneTime':
+       return state.map((el) =>
+         action.checkboxState[ymdToDayInWeek(el.ymd)]
+-          ? Obj.set(el, 'timeRange', action.timeRange)
++          ? { ...el, timeRange: action.timeRange }
+           : el,
+       );
+ 

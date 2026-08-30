@@ -1,0 +1,17 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/reactive/use-prop-to-update-state.mts apps/react-utils/src/hooks/reactive/use-prop-to-update-state.mts
+index 90b262da2..7bc131f78 100644
+--- experimental/packages/utils/react-utils/src/hooks/reactive/use-prop-to-update-state.mts
++++ apps/react-utils/src/hooks/reactive/use-prop-to-update-state.mts
+@@ -1,10 +1,10 @@
+-import { useEffect } from 'react';
++import * as React from 'react';
+ 
+ export const usePropToUpdateState = <S, P extends S>(
+   prop: P,
+   setState: (value: S) => void,
+ ): void => {
+-  useEffect(() => {
++  React.useEffect(() => {
+     setState(prop);
+   }, [setState, prop]);
+ };

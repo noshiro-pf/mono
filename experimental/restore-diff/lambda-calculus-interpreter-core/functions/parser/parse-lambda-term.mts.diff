@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/parse-lambda-term.mts apps/lambda-calculus-interpreter-core/src/functions/parser/parse-lambda-term.mts
+index f739844c2..00a07376b 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/parse-lambda-term.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/parse-lambda-term.mts
+@@ -6,8 +6,12 @@ import { tokensRepresentsLambdaTerm } from './token-list-is-lambda-term.mjs';
+ 
+ export const parseLambdaTerm = (input: string): LambdaTerm | undefined => {
+   if (input.length === 0) return undefined;
++
+   const tokens = splitToTokens(input);
++
+   const converted = expandShortcuts(tokens);
++
+   if (!tokensRepresentsLambdaTerm(converted)) return undefined;
++
+   return getParseTree(converted);
+ };

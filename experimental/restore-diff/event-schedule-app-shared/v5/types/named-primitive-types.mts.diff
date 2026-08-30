@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v5/types/named-primitive-types.mts apps/event-schedule-app-shared/src/v5/types/named-primitive-types.mts
+index 572f64fb9..372fa96ef 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v5/types/named-primitive-types.mts
++++ apps/event-schedule-app-shared/src/v5/types/named-primitive-types.mts
+@@ -1,6 +1,7 @@
+ export type AnswerId = string;
+ 
+ export type UserId = string | null;
++
+ export type UserName = string;
+ 
+ export type Weight = number;

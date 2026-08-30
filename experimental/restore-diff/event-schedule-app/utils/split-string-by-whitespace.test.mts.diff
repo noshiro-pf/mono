@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/split-string-by-whitespace.test.ts apps/event-schedule-app/src/utils/split-string-by-whitespace.test.mts
+index 351e23b5c..84b94790b 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/split-string-by-whitespace.test.ts
++++ apps/event-schedule-app/src/utils/split-string-by-whitespace.test.mts
+@@ -1,4 +1,4 @@
+-import { splitStringByWhitespace } from './split-string-by-whitespace';
++import { splitStringByWhitespace } from './split-string-by-whitespace.mjs';
+ 
+ describe('splitStringByWhitespace', () => {
+   test('1 whitespace', () => {
+@@ -22,9 +22,9 @@ describe('splitStringByWhitespace', () => {
+   test('2 sequential whitespaces', () => {
+     expect(splitStringByWhitespace('aaa     bbb    ccc')).toStrictEqual([
+       'aaa',
+-      '     ',
++      ' '.repeat(5),
+       'bbb',
+-      '    ',
++      ' '.repeat(4),
+       'ccc',
+     ]);
+   });

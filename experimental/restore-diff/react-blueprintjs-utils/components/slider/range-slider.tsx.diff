@@ -1,0 +1,31 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider.tsx apps/react-blueprintjs-utils/src/components/slider/range-slider.tsx
+index 86e48cc67..c6a4ae62e 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider.tsx
++++ apps/react-blueprintjs-utils/src/components/slider/range-slider.tsx
+@@ -1,5 +1,6 @@
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useRef } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly, type UintRange } from 'ts-type-forge';
+ import { useNormalizedRangeSliderProps } from './normalize-range-slider-props-hook.mjs';
+ import { useOnRangeChangeHandlerHook } from './on-range-change-handler-hook.mjs';
+ import { RangeSliderView } from './range-slider-view.js';
+@@ -13,7 +14,7 @@ type Props = DeepReadonly<{
+   stepSize: number;
+   labelStepSize?: number;
+   labelFractionDigits?: UintRange<0, 21>;
+-  customLabelValues?: readonly number[];
++  customLabelValues?: number[];
+   onChange?: (value: Readonly<{ min: number; max: number }>) => void;
+   onRelease?: (value: Readonly<{ min: number; max: number }>) => void;
+   onRangeMinChange?: (value: number) => void;
+@@ -52,7 +53,7 @@ export const BpRangeSlider = memoNamed<Props>(
+ 
+     const handlers = useOnRangeChangeHandlerHook(range, onChange, onRelease);
+ 
+-    const trackElementRef = useRef<HTMLDivElement>(null);
++    const trackElementRef = React.useRef<HTMLDivElement>(null);
+ 
+     const leftHandle = useSliderHandleStateManager({
+       trackElementRef,

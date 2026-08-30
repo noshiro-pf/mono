@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/event-schedule-app/src/app.tsx apps/event-schedule-app/src/app.tsx
+index 707b734f5..5c67e6f95 100644
+--- experimental/packages/apps/event-schedule-app/src/app.tsx
++++ apps/event-schedule-app/src/app.tsx
+@@ -1,3 +1,5 @@
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
+ import {
+   AnswerPage,
+   CreateEventSchedule,
+@@ -7,9 +9,9 @@ import {
+   NotFoundPage,
+   RegisterPage,
+   SignInPage,
+-} from './components';
+-import { ErrorBoundary } from './error-handler';
+-import { Router } from './store';
++} from './components/index.mjs';
++import { ErrorBoundary } from './error-handler/index.mjs';
++import { Router } from './store/index.mjs';
+ 
+ export const App = memoNamed('App', () => {
+   const show = Router.useShowPage();

@@ -1,0 +1,65 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-email-page-state.ts apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-email-page-state.mts
+index 8e6b232cb..b9b7ead3e 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-email-page-state.ts
++++ apps/event-schedule-app/src/functions/reducers/update-user-info-dialog-state/update-email-page-state.mts
+@@ -1,3 +1,4 @@
++import { type Reducer } from '../../../utils-ported/index.mjs';
+ import {
+   emailInputHasError,
+   emailInputInitialState,
+@@ -7,7 +8,7 @@ import {
+   inputStateReducer,
+   type EmailInputState,
+   type InputState,
+-} from '../input-state';
++} from '../input-state/index.mjs';
+ 
+ export type UpdateEmailPageState = Readonly<{
+   email: EmailInputState;
+@@ -45,14 +46,13 @@ export const updateEmailPageStateReducer: Reducer<
+ > = (state, action) => {
+   switch (action.type) {
+     case 'inputEmail':
+-      return Obj.set(
+-        state,
+-        'email',
+-        emailInputStateReducer(state.email, {
++      return {
++        ...state,
++        email: emailInputStateReducer(state.email, {
+           type: 'input',
+           payload: action.payload,
+         }),
+-      );
++      };
+ 
+     case 'setEmailError':
+       return {
+@@ -66,14 +66,13 @@ export const updateEmailPageStateReducer: Reducer<
+       };
+ 
+     case 'inputPassword':
+-      return Obj.set(
+-        state,
+-        'password',
+-        inputStateReducer(state.password, {
++      return {
++        ...state,
++        password: inputStateReducer(state.password, {
+           type: 'input',
+           payload: action.payload,
+         }),
+-      );
++      };
+ 
+     case 'setPasswordError':
+       return {
+@@ -109,7 +108,7 @@ export const updateEmailPageStateReducer: Reducer<
+     }
+ 
+     case 'done':
+-      return Obj.set(state, 'isWaitingResponse', false);
++      return { ...state, isWaitingResponse: false };
+ 
+     case 'reset':
+       return updateEmailPageInitialState;

@@ -1,0 +1,38 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/answer-deadline-shortcuts.ts apps/event-schedule-app/src/constants/answer-deadline-shortcuts.mts
+index a252218a4..92b4ac8bb 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/answer-deadline-shortcuts.ts
++++ apps/event-schedule-app/src/constants/answer-deadline-shortcuts.mts
+@@ -1,16 +1,17 @@
+-const createDate = (modifier: (d: DateType) => DateType): RawDateType =>
++import { pipe } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type DateEnum, type MonthEnum } from 'ts-type-forge';
++import { idfn } from '../utils-ported/index.mjs';
++
++const createDate = (modifier: (d: Date) => Date): Date =>
+   pipe(DateUtils.today())
+-    .chain(modifier)
+-    .chain(DateUtils.setLocaleHours(23))
+-    .chain(DateUtils.setLocaleMinutes(59))
+-    .chain(DateUtils.toDate).value;
++    .map(modifier)
++    .map(DateUtils.setLocaleHours(23))
++    .map(DateUtils.setLocaleMinutes(59))
++    .map(DateUtils.toDate).value;
+ 
+ export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
+-  {
+-    date: createDate(idfn),
+-    label: 'Today',
+-    includeTime: true,
+-  },
++  { date: createDate(idfn), label: 'Today', includeTime: true },
+   {
+     date: createDate(
+       DateUtils.updateLocaleDate(
+@@ -55,4 +56,4 @@ export const answerDeadlineShortcuts: readonly DatePickerShortcut[] = [
+     label: '1 month later',
+     includeTime: true,
+   },
+-];
++] as const;

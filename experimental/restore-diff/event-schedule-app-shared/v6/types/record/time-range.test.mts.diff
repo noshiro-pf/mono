@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/time-range.test.mts apps/event-schedule-app-shared/src/v6/types/record/time-range.test.mts
+index e048c7812..577e92718 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/time-range.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/time-range.test.mts
+@@ -6,12 +6,12 @@ import {
+ 
+ describe('isTimeRange', () => {
+   test('defaultValue should be true', () => {
+-    expect(isTimeRange(timeRangeDefaultValue)).toBe(true);
++    assert.isTrue(isTimeRange(timeRangeDefaultValue));
+   });
+ });
+ 
+ describe('fillTimeRange', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillTimeRange({})).toStrictEqual(timeRangeDefaultValue);
++    assert.deepStrictEqual(fillTimeRange({}), timeRangeDefaultValue);
+   });
+ });

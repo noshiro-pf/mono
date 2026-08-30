@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/index.ts apps/event-schedule-app/src/components/molecules/index.mts
+index 25e22f465..2caa1700c 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/index.ts
++++ apps/event-schedule-app/src/components/molecules/index.mts
+@@ -1,11 +1,11 @@
+-export * from './add-element-button';
+-export * from './answer-icon-point-input';
+-export * from './custom-icon-button';
+-export * from './custom-scrollbar-wrapper';
+-export * from './icon-count-numeric-input';
+-export * from './lock-button';
+-export * from './rank-numeric-input';
+-export * from './score-numeric-input';
+-export * from './section';
+-export * from './time-range';
+-export * from './weight-numeric-input';
++export * from './add-element-button.js';
++export * from './answer-icon-point-input/index.mjs';
++export * from './custom-icon-button.js';
++export * from './custom-scrollbar-wrapper.js';
++export * from './icon-count-numeric-input.js';
++export * from './lock-button.js';
++export * from './rank-numeric-input.js';
++export * from './score-numeric-input.js';
++export * from './section.js';
++export * from './time-range.js';
++export * from './weight-numeric-input.js';

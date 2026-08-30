@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/enum/answer-symbol-icon.mts apps/event-schedule-app-shared/src/v1/types/enum/answer-symbol-icon.mts
+index 69f5008d3..aaf4be86e 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/enum/answer-symbol-icon.mts
++++ apps/event-schedule-app-shared/src/v1/types/enum/answer-symbol-icon.mts
+@@ -1,4 +1,2 @@
+ export type AnswerSymbolIconId =
+-  | 'handmade-circle'
+-  | 'handmade-cross'
+-  | 'handmade-triangle';
++  'handmade-circle' | 'handmade-cross' | 'handmade-triangle';

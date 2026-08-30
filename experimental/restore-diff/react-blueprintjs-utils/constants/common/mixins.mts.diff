@@ -1,0 +1,22 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/constants/common/mixins.mts apps/react-blueprintjs-utils/src/constants/common/mixins.mts
+index 75c0c265a..c6ccb0f64 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/constants/common/mixins.mts
++++ apps/react-blueprintjs-utils/src/constants/common/mixins.mts
+@@ -44,7 +44,7 @@ export const ptDarkIntentTextColors = {
+ } as const;
+ 
+ export const intentColor = (intentName: IntentKey): string =>
+-  `color: ${ptIntentColors[intentName]});`;
++  `color: ${ptIntentColors[intentName]});` as const;
+ 
+ export const positionAll = (position: string, value: string) =>
+   ({
+@@ -96,7 +96,7 @@ export const borderShadow = (
+   alpha: number,
+   colorHex: string = black,
+   sizePx = 1,
+-): string => `0 0 0 ${sizePx}px ${hexToRgba(colorHex, alpha)}`;
++): string => `0 0 0 ${sizePx}px ${hexToRgba(colorHex, alpha)}` as const;
+ 
+ // returns the padding necessary to center text in a container of the given height.
+ // default line-height is that of base typography, 18px assuming 14px font-size.

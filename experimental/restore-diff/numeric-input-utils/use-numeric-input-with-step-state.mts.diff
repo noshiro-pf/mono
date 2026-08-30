@@ -1,0 +1,76 @@
+diff --git experimental/packages/utils/numeric-input-utils/src/use-numeric-input-with-step-state.mts apps/numeric-input-utils/src/use-numeric-input-with-step-state.mts
+index 669820f07..6a1388e1c 100644
+--- experimental/packages/utils/numeric-input-utils/src/use-numeric-input-with-step-state.mts
++++ apps/numeric-input-utils/src/use-numeric-input-with-step-state.mts
+@@ -1,7 +1,15 @@
+-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import * as React from 'react';
+ 
++/**
++ * What `setTimeout` hands back and `clearTimeout` takes — `number` in the
++ * browser, `Timeout` under Node. `@noshiro/ts-type-utils` had a global
++ * `TimerId` for this; `ts-type-forge` does not, and asking the standard library
++ * keeps it right in both.
++ */
++type TimerId = Parameters<typeof clearTimeout>[0];
++
+ export const numericInputContinuousChangeDelay = 400;
++
+ export const numericInputContinuousChangeInterval = 40;
+ 
+ export const useNumericInputWithStepState = <N extends number>({
+@@ -66,6 +74,7 @@ export const useNumericInputWithStepState = <N extends number>({
+       const nextNumericState = constants.current.normalize(
+         updateStateFn(decoded, action),
+       );
++
+       const nextStringState = constants.current.encode(nextNumericState);
+ 
+       setState(nextStringState);
+@@ -90,12 +99,14 @@ export const useNumericInputWithStepState = <N extends number>({
+   }, [commonCallbackFn]);
+ 
+   const delayTimerRef = React.useRef<TimerId | undefined>(undefined);
++
+   const intervalTimerRef = React.useRef<TimerId | undefined>(undefined);
+ 
+   const clearTimers = React.useCallback(() => {
+     if (delayTimerRef.current !== undefined) {
+       clearTimeout(delayTimerRef.current);
+     }
++
+     if (intervalTimerRef.current !== undefined) {
+       clearInterval(intervalTimerRef.current);
+     }
+@@ -127,10 +138,14 @@ export const useNumericInputWithStepState = <N extends number>({
+ 
+   React.useEffect(() => {
+     document.addEventListener('mouseup', clearTimers);
++
+     document.addEventListener('keyup', clearTimers);
++
+     return () => {
+       document.removeEventListener('mouseup', clearTimers);
++
+       document.removeEventListener('keyup', clearTimers);
++
+       clearTimers();
+     };
+   }, [clearTimers]);
+@@ -141,12 +156,16 @@ export const useNumericInputWithStepState = <N extends number>({
+       switch (ev.key) {
+         case 'ArrowUp':
+           startLoop(increment);
++
+           ev.stopPropagation();
++
+           break;
+ 
+         case 'ArrowDown':
+           startLoop(decrement);
++
+           ev.stopPropagation();
++
+           break;
+ 
+         default:

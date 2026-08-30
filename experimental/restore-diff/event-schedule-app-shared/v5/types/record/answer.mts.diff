@@ -1,0 +1,58 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/answer.mts apps/event-schedule-app-shared/src/v5/types/record/answer.mts
+index 4892cdab1..19294d148 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/answer.mts
++++ apps/event-schedule-app-shared/src/v5/types/record/answer.mts
+@@ -1,4 +1,6 @@
+-import { DateUtils, expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+ import {
+   ANSWER_KEY_CREATED_AT,
+   fillAnswerSelection,
+@@ -25,7 +27,7 @@ export type Answer = Readonly<{
+ 
+ export type PartialAnswer = Partial<
+   MergeIntersection<
+-    Pick<Answer, 'comment' | 'id' | 'isRequiredParticipants' | 'weight'> &
++    StrictPick<Answer, 'comment' | 'id' | 'isRequiredParticipants' | 'weight'> &
+       Readonly<{
+         user: PartialUser;
+         selection: readonly PartialAnswerSelection[];
+@@ -35,6 +37,7 @@ export type PartialAnswer = Partial<
+ >;
+ 
+ expectType<keyof Answer, keyof PartialAnswer>('=');
++
+ expectType<Answer, PartialAnswer>('<=');
+ 
+ export const answerDefaultValue = {
+@@ -48,14 +51,17 @@ export const answerDefaultValue = {
+ } as const satisfies Answer;
+ 
+ const d = answerDefaultValue;
+-export const fillAnswer = (p?: PartialAnswer): Answer => ({
+-  id: p?.id ?? d.id,
+-  user: fillUser(p?.user ?? d.user),
+-  comment: p?.comment ?? d.comment,
+-  selection: (p?.selection ?? d.selection).map(fillAnswerSelection),
+-  [ANSWER_KEY_CREATED_AT]:
+-    (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
+-    d[ANSWER_KEY_CREATED_AT],
+-  weight: p?.weight ?? d.weight,
+-  isRequiredParticipants: p?.isRequiredParticipants ?? d.isRequiredParticipants,
+-});
++
++export const fillAnswer = (p?: PartialAnswer): Answer =>
++  ({
++    id: p?.id ?? d.id,
++    user: fillUser(p?.user ?? d.user),
++    comment: p?.comment ?? d.comment,
++    selection: (p?.selection ?? d.selection).map(fillAnswerSelection),
++    [ANSWER_KEY_CREATED_AT]:
++      (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
++      d[ANSWER_KEY_CREATED_AT],
++    weight: p?.weight ?? d.weight,
++    isRequiredParticipants:
++      p?.isRequiredParticipants ?? d.isRequiredParticipants,
++  }) as const;

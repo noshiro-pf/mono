@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-answer-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-answer-button.tsx
+index 63211c425..0a7e57e5a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-answer-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-answer-button.tsx
+@@ -1,4 +1,5 @@
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { memoNamed } from 'react-utils';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.answerPage.answerBeingEdited.deleteButton;
+ 

@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/event-schedule-app/src/index.css apps/event-schedule-app/src/index.css
+index 042de566a..c9a716d18 100644
+--- experimental/packages/apps/event-schedule-app/src/index.css
++++ apps/event-schedule-app/src/index.css
+@@ -9,9 +9,9 @@
+ 
+ body {
+   margin: 0;
+-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+-    sans-serif;
++  font-family:
++    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
++    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-text-size-adjust: 100%;
+@@ -21,8 +21,8 @@ body {
+ }
+ 
+ code {
+-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+-    monospace;
++  font-family:
++    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+ }
+ 
+ * {

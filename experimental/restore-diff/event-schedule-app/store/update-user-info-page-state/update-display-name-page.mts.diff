@@ -1,0 +1,122 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-display-name-page.ts apps/event-schedule-app/src/store/update-user-info-page-state/update-display-name-page.mts
+index 0273631e6..fc4f46c34 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/update-display-name-page.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/update-display-name-page.mts
+@@ -1,28 +1,36 @@
+-import { api } from '../../api';
++import {
++  type InitializedObservable,
++  combine,
++  map,
++  withCurrentValueFrom,
++} from 'synstate';
++import { createReducer } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
+ import {
+   createToaster,
+   showToast,
+   updateDisplayNamePageHasError,
+   updateDisplayNamePageInitialState,
+   updateDisplayNamePageStateReducer,
+-} from '../../functions';
+-import { Auth } from '../auth';
+-import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
++} from '../../functions/index.mjs';
++import { Auth } from '../auth.mjs';
++import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
+ 
+ const dc = dict.accountSettings;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   updateDisplayNamePageStateReducer,
+   updateDisplayNamePageInitialState,
+ );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || updateDisplayNamePageHasError(st)),
+ );
+ 
+-const displayNameFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const displayNameFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.displayName.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+@@ -30,7 +38,7 @@ const state = combine([
+   formState$,
+   enterButtonDisabled$,
+   displayNameFormIntent$,
+-]).chain(
++]).pipe(
+   map(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
+     formState,
+     enterButtonDisabled,
+@@ -61,6 +69,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       message: dc.updateDisplayName.message.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+@@ -79,6 +88,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+ 
+ const enterClickHandler = (): void => {
+   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
++
+   const fireAuthUser = Auth.getFireAuthUserSnapshot();
+ 
+   if (enterButtonDisabled || fireAuthUser === undefined) return;
+@@ -88,10 +98,7 @@ const enterClickHandler = (): void => {
+ };
+ 
+ const inputDisplayNameHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputDisplayName',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputDisplayName', payload: value });
+ };
+ 
+ const resetAllDialogState = (): void => {
+@@ -101,16 +108,27 @@ const resetAllDialogState = (): void => {
+ /* subscriptions */
+ 
+ UpdateUserInfoDialogStore.openingDialogType$
+-  .chain(withCurrentValueFrom(Auth.fireAuthUser$))
++  .pipe(withCurrentValueFrom(Auth.fireAuthUser$))
+   .subscribe(([openingDialog, fireAuthUser]) => {
+-    if (openingDialog === undefined) {
+-      resetAllDialogState();
+-    }
+-    if (openingDialog === 'updateDisplayName') {
+-      dispatch({
+-        type: 'inputDisplayName',
+-        payload: fireAuthUser?.displayName ?? '',
+-      });
++    switch (openingDialog) {
++      case undefined:
++        resetAllDialogState();
++
++        break;
++
++      case 'updateDisplayName':
++        dispatch({
++          type: 'inputDisplayName',
++          payload: fireAuthUser?.displayName ?? '',
++        });
++
++        break;
++
++      case 'deleteAccount':
++      case 'deleteAccountCreatedWithGoogle':
++      case 'updateEmail':
++      case 'updatePassword':
++        break;
+     }
+   });
+ 

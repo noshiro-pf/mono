@@ -302,3 +302,66 @@ utils を全部揃えたあと、本体の復元を機械的な範囲まで進�
 
 - `@noshiro/fast-deep-equal` → `ts-data-forge` の `fastDeepEqual` が後継
 - `@noshiro/deep-object-diff` → **`src` から 1 回も import されていない**（宣言のみ）
+
+## 復元が終わった時点で残っているもの（2026-08-31）
+
+step 3 で復元したのは **13 パッケージ**で、内訳は上の「判断が要る」38 のうち
+apps 4 / utils 8 と、「後継あり」に入れていた `io-ts-types` である。
+**`io-ts-types` の分類は誤っていた** — `ts-fortress` が後継なのは `t.*` の API
+だけで、`DatetimeRange` / `Ymdhm` というドメイン型に後継は無い（上節）。
+
+「判断が要る」の残りは 26。
+
+| 分類           |  元 | 復元した | 残り |
+| :------------- | --: | -------: | ---: |
+| apps           |  19 |        4 |   15 |
+| utils          |  13 |        8 |    5 |
+| others・slides |   6 |        0 |    6 |
+
+apps の残り 15 のうち 2 つ（`template-react-app-vite` /
+`template-preact-app-vite`）はテンプレートなので、実体があるのは 13。
+
+**残りに手を付けていないのは、復元する理由が無いからであって、詰まったからでは
+ない。** 使うと決めたときのために、依存の状況だけ記録しておく。
+
+### React 側の apps 7 つは、連れてくる utils が全部揃っている
+
+| app                                 | 行数 | 追加で要る utils |
+| :---------------------------------- | ---: | :--------------- |
+| `annotation-tool`                   | 2006 | **なし**         |
+| `blueprintjs-playground-styled`     | 1701 | **なし**         |
+| `housing-loan-calculator-app`       | 1143 | **なし**         |
+| `cant-stop-probability-app`         |  653 | **なし**         |
+| `catan-dice-app`                    |  471 | **なし**         |
+| `lambda-calculus-interpreter-react` |  196 | **なし**         |
+| `blueprintjs-playground`            |   92 | **なし**         |
+
+`blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
+`@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
+step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
+
+`color-demo-app`（1097 行）だけは `react-mui-utils`（245 行）が要る。
+
+### Preact 側は utils 4 つが前提になる
+
+`algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
+（1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
+`preact-utils`（472）・`tiny-router-preact-hooks`（140）・`better-preact-use-state`
+（74）・`resize-observer-preact-hooks`（55）が先に要る。合計 741 行で、いずれも
+React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
+
+### 復元前後の差分は書き出してある
+
+13 パッケージについて、`src/` の 1 ファイルにつき 1 つの `.diff` を
+`experimental/restore-diff/` に置いた。復元前 703 ファイル・復元後 723 ファイルで、
+**変更 555 / 同一 143 / 追加 25 / 削除 5**。
+
+- **同一 143 のうち 77 は `index.mts` の barrel。** `pnpm run gi` の生成物で
+  中身は `export * from './x.mjs'` の並びだけなので、周りが全部書き換わっても
+  ファイルとしては変わらない
+- `event-schedule-app` の同一 25 は、`assets/icon_svg/*.svg` 7 件と、
+  **`.ts` → `.mts` に改名されただけで中身が 1 文字も変わらなかった 18 件**
+  （`constants/color` などの定数と、import を持たない型 alias）
+- 追加 25 のほとんどは、後継の無い API を移した先（`src/utils/` ・
+  `apps/event-schedule-app/src/utils-ported/`）。削除 5 は暗黙グローバルの
+  shim（`globals.d.ts` ・ `load-libs.d.mts`）である

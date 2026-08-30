@@ -1,0 +1,102 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/navbar.tsx apps/event-schedule-app/src/components/organisms/navbar.tsx
+index b83d29be5..62bc412f2 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/navbar.tsx
++++ apps/event-schedule-app/src/components/organisms/navbar.tsx
+@@ -1,22 +1,34 @@
+-import { AnchorButton, Icon, Menu, MenuItem, Popover } from '@blueprintjs/core';
+-import { Routes, aboutThisAppUrl, feedbackUrl } from '../../constants';
+-import { Auth, Router, UpdateUserInfoDialogStore } from '../../store';
+-import { NoWrapSpan } from '../atoms';
+-import { ForNonLoggedInUserDialog } from './button-with-confirm';
++import {
++  AnchorButton,
++  Icon,
++  Menu,
++  MenuItem,
++  PopoverNext,
++} from '@blueprintjs/core';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { useRouterLinkClick } from 'tiny-router-react-hooks';
++import {
++  Routes,
++  aboutThisAppUrl,
++  feedbackUrl,
++} from '../../constants/index.mjs';
++import { Auth, Router, UpdateUserInfoDialogStore } from '../../store/index.mjs';
++import { NoWrapSpan } from '../atoms/index.mjs';
++import { ForNonLoggedInUserDialog } from './button-with-confirm/index.mjs';
+ import {
+   DeleteAccountCreatedWithGoogleDialog,
+   DeleteAccountDialog,
+   UpdateDisplayNameDialog,
+   UpdateEmailDialog,
+   UpdatePasswordDialog,
+-} from './update-user-info-dialog';
++} from './update-user-info-dialog/index.mjs';
+ 
+ const dc = dict.header;
+ 
+-const popoverModifiers = {
+-  arrow: undefined,
+-} as const;
+-
+ export const NavBar = memoNamed('NavBar', () => {
+   const fireAuthUser = Auth.useFireAuthUser();
+ 
+@@ -32,7 +44,7 @@ export const NavBar = memoNamed('NavBar', () => {
+ 
+   const forNonLoggedInUserDialogState = useBoolState(false);
+ 
+-  const popoverContent = useMemo(
++  const popoverContent = React.useMemo(
+     () => (
+       <Menu>
+         <MenuItem text={dc.auth.menu.accountSettings}>
+@@ -134,15 +146,14 @@ export const NavBar = memoNamed('NavBar', () => {
+               </ItemAnchor>
+               <Item>
+                 <span>{dc.auth.userName.prefix}</span>
+-                <Popover
++                <PopoverNext
++                  arrow={false}
+                   content={popoverContent}
+-                  minimal={true}
+-                  modifiers={popoverModifiers}
+-                  position={'bottom-left'}
++                  placement={'bottom-start'}
+                   transitionDuration={50}
+                 >
+                   <Anchor>{fireAuthUser.displayName}</Anchor>
+-                </Popover>
++                </PopoverNext>
+                 <span>{dc.auth.userName.suffix}</span>
+               </Item>
+ 
+@@ -178,10 +189,10 @@ export const NavBar = memoNamed('NavBar', () => {
+             <AnchorButton
+               href={feedbackUrl}
+               icon={sendFeedbackIcon}
+-              minimal={true}
+               rel={'noopener noreferrer'}
+               target={'_blank'}
+               title={dc.feedback}
++              variant={'minimal'}
+             />
+           </Item>
+ 
+@@ -189,10 +200,10 @@ export const NavBar = memoNamed('NavBar', () => {
+             <AnchorButton
+               href={aboutThisAppUrl}
+               icon={helpIcon}
+-              minimal={true}
+               rel={'noopener noreferrer'}
+               target={'_blank'}
+               title={dc.help}
++              variant={'minimal'}
+             />
+           </Item>
+         </div>

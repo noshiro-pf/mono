@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/create-user.ts apps/event-schedule-app/src/api/auth/create-user.mts
+index b6b60dde7..83a397fab 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/create-user.ts
++++ apps/event-schedule-app/src/api/auth/create-user.mts
+@@ -1,6 +1,7 @@
+ import { createUserWithEmailAndPassword } from 'firebase/auth';
+-import { fbAuth } from '../../initialize-firebase';
+-import { assertIsCredentialError } from '../../types';
++import { Result } from 'ts-data-forge';
++import { fbAuth } from '../../initialize-firebase.mjs';
++import { assertIsCredentialError } from '../../types/index.mjs';
+ 
+ export const createUser = (
+   email: string,
+@@ -10,9 +11,10 @@ export const createUser = (
+ > =>
+   Result.fromPromise(
+     createUserWithEmailAndPassword(fbAuth, email, password),
+-  ).then((a) =>
+-    Result.mapErr(a, (error) => {
++  ).then(
++    Result.mapErr((error) => {
+       assertIsCredentialError(error);
++
+       return error;
+     }),
+   );

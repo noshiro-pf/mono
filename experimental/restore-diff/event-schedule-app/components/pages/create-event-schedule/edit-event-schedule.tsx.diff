@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule.tsx
+index 85c9d5aa3..2f818c437 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/edit-event-schedule.tsx
+@@ -1,14 +1,18 @@
+ import { Spinner } from '@blueprintjs/core';
+-import { EventScheduleStore, Router } from '../../../store';
+-import { Header } from '../../organisms';
+-import { NotFoundPage } from '../not-found-page';
+-import { EditEventScheduleOk } from './edit-event-schedule-ok';
+-import { FetchEventScheduleError } from './error';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { EventScheduleStore, Router } from '../../../store/index.mjs';
++import { Header } from '../../organisms/index.mjs';
++import { NotFoundPage } from '../not-found-page.js';
++import { EditEventScheduleOk } from './edit-event-schedule-ok.js';
++import { FetchEventScheduleError } from './error.js';
+ 
+ const dc = dict.eventSettingsPage;
+ 
+ export const EditEventSchedule = memoNamed('EditEventSchedule', () => {
+   const eventId = useObservableValue(Router.eventId$);
++
+   const eventScheduleResult = EventScheduleStore.useEventScheduleResult();
+ 
+   return eventScheduleResult !== undefined &&

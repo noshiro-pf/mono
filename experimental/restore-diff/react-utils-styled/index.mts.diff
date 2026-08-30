@@ -1,0 +1,9 @@
+diff --git experimental/packages/utils/react-utils-styled/src/index.mts apps/react-utils-styled/src/index.mts
+index bf3bfd63c..9c3d004eb 100644
+--- experimental/packages/utils/react-utils-styled/src/index.mts
++++ apps/react-utils-styled/src/index.mts
+@@ -3,3 +3,4 @@ export * from './centering-wrapper.js';
+ export * from './cropped/index.mjs';
+ export * from './image-element-renderer.js';
+ export * from './img-with-preview.js';
++export * from './utils/index.mjs';

@@ -1,0 +1,123 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/constants/button/common.mts apps/react-blueprintjs-utils/src/constants/button/common.mts
+index f02e826d3..923440a24 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/constants/button/common.mts
++++ apps/react-blueprintjs-utils/src/constants/button/common.mts
+@@ -35,14 +35,18 @@ import {
+ } from '../common/index.mjs';
+ 
+ export const buttonBorderWidthPx = 1;
+-export const buttonPadding = `${ptGridSizePx / 2}px ${ptGridSizePx}px`;
+ 
+-export const buttonPaddingSmall = `0 ${ptGridSizePx * 0.7}px`;
++export const buttonPadding = `${ptGridSizePx / 2}px ${ptGridSizePx}px` as const;
++
++export const buttonPaddingSmall = `0 ${ptGridSizePx * 0.7}px` as const;
++
+ export const buttonPaddingLarge = `${ptGridSizePx / 2}px ${
+   ptGridSizePx * 1.5
+-}px`;
++}px` as const;
++
+ export const buttonIconSpacingPx =
+   (ptButtonHeightPx - ptIconSizeStandardPx) / 2;
++
+ export const buttonIconSpacingLargePx =
+   (ptButtonHeightLargePx - ptIconSizeLargePx) / 2;
+ 
+@@ -59,14 +63,17 @@ export const buttonBoxShadow = joinCssStr(
+   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
+   `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.1)}`,
+ );
++
+ export const buttonBoxShadowActive = joinCssStr(
+   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.2)}`,
+   `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
+ );
++
+ export const buttonIntentBoxShadow = joinCssStr(
+   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
+   `inset 0 ${-buttonBorderWidthPx}px 0 ${hexToRgba(black, 0.2)}`,
+ );
++
+ export const buttonIntentBoxShadowActive = joinCssStr(
+   `inset 0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
+   `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
+@@ -91,13 +98,16 @@ export const buttonBoxShadowOverlayActive = joinCssStr(
+ export const darkButtonBoxShadow = joinCssStr(
+   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
+ );
++
+ export const darkButtonBoxShadowActive = joinCssStr(
+   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.6)}`,
+   `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
+ );
++
+ export const darkButtonIntentBoxShadow = joinCssStr(
+   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
+ );
++
+ export const darkButtonIntentBoxShadowActive = joinCssStr(
+   `0 0 0 ${buttonBorderWidthPx}px ${hexToRgba(black, 0.4)}`,
+   `inset 0 1px 2px ${hexToRgba(black, 0.2)}`,
+@@ -109,12 +119,14 @@ export const buttonGradient = joinCssStr(
+     0,
+   )})`,
+ );
++
+ export const buttonIntentGradient = joinCssStr(
+   `linear-gradient(to bottom, ${hexToRgba(white, 0.1)}, ${hexToRgba(
+     white,
+     0,
+   )})`,
+ );
++
+ export const darkButtonGradient = joinCssStr(
+   `linear-gradient(to bottom, ${hexToRgba(white, 0.05)}, ${hexToRgba(
+     white,
+@@ -123,30 +135,46 @@ export const darkButtonGradient = joinCssStr(
+ );
+ 
+ export const buttonColorDisabled = ptTextColorDisabled;
++
+ export const buttonBackgroundColor = lightGray5;
++
+ export const buttonBackgroundColorHover = lightGray4;
++
+ export const buttonBackgroundColorActive = lightGray2;
++
+ export const buttonBackgroundColorDisabled = hexToRgba(lightGray1, 0.5);
++
+ export const buttonBackgroundColorActiveDisabled = hexToRgba(lightGray1, 0.7);
++
+ export const buttonIntentColorDisabled = hexToRgba(white, 0.6);
+ 
+ export const darkButtonBackgroundColorDisabled = hexToRgba(darkGray5, 0.5);
++
+ export const darkButtonBackgroundColorActiveDisabled = hexToRgba(
+   darkGray5,
+   0.7,
+ );
++
+ export const darkButtonIntentColorDisabled = hexToRgba(white, 0.3);
+ 
+ export const minimalButtonDividerWidthPx = 1;
++
+ export const minimalButtonBackgroundColor = 'none';
++
+ export const minimalButtonBackgroundColorHover = hexToRgba(gray4, 0.3);
++
+ export const minimalButtonBackgroundColorActive = hexToRgba(gray2, 0.3);
++
+ export const darkMinimalButtonBackgroundColor = 'none';
++
+ export const darkMinimalButtonBackgroundColorHover = hexToRgba(gray3, 0.15);
++
+ export const darkMinimalButtonBackgroundColorActive = hexToRgba(gray3, 0.3);
+ 
+ export const buttonOutlinedWidthPx = 1;
++
+ export const buttonOutlinedBorderIntentOpacity = 0.6;
++
+ export const buttonOutlinedBorderDisabledIntentOpacity = 0.2;
+ 
+ // "intent": (default, hover, active colors)

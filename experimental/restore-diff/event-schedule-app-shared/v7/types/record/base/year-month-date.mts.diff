@@ -1,0 +1,43 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.mts apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.mts
+index a7b6f9cb9..b7f3012a1 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
+-import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
++import * as t from 'ts-fortress';
++import { DateUtils } from 'ts-fortress-types';
+ import {
+   datesTypeDef,
+   monthsTypeDef,
+@@ -20,18 +20,19 @@ export const isYearMonthDate = yearMonthDateTypeDef.is;
+ 
+ export const fillYearMonthDate = yearMonthDateTypeDef.fill;
+ 
+-export const ymdFromDate = (date: DateType): YearMonthDate => ({
+-  year: DateUtils.getLocaleYear(date),
+-  month: DateUtils.getLocaleMonth(date),
+-  date: DateUtils.getLocaleDate(date),
+-});
++export const ymdFromDate = (date: Date): YearMonthDate =>
++  ({
++    year: DateUtils.getLocaleYear(date),
++    month: DateUtils.getLocaleMonth(date),
++    date: DateUtils.getLocaleDate(date),
++  }) as const;
+ 
+ export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
+-  if (a.year !== b.year)
+-    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+-  if (a.month !== b.month)
+-    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+-  if (a.date !== b.date)
+-    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
++  if (a.year !== b.year) return a.year < b.year ? -1 : 1;
++
++  if (a.month !== b.month) return a.month < b.month ? -1 : 1;
++
++  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
++
+   return 0;
+ };

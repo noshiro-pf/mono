@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/index.ts apps/event-schedule-app/src/components/organisms/update-user-info-dialog/index.mts
+index b88972c37..006352cfc 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/update-user-info-dialog/index.ts
++++ apps/event-schedule-app/src/components/organisms/update-user-info-dialog/index.mts
+@@ -1,6 +1,6 @@
+-export * from './delete-account-dialog';
+-export * from './delete-account-dialog-google';
+-export * from './update-display-name-dialog';
+-export * from './update-email-dialog';
+-export * from './update-password-dialog';
+-export * from './update-user-info-dialog-template';
++export * from './delete-account-dialog-google.js';
++export * from './delete-account-dialog.js';
++export * from './update-display-name-dialog.js';
++export * from './update-email-dialog.js';
++export * from './update-password-dialog.js';
++export * from './update-user-info-dialog-template.js';

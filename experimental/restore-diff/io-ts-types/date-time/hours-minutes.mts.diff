@@ -1,0 +1,37 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/hours-minutes.mts apps/ts-fortress-types/src/date-time/hours-minutes.mts
+index 36188a24d..1e26f7562 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/hours-minutes.mts
++++ apps/ts-fortress-types/src/date-time/hours-minutes.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
+-import { DateUtils, Num, type DateType } from '@noshiro/ts-utils';
++import * as t from 'ts-fortress';
++import { DateUtils } from '../utils/index.mjs';
+ import { Hours, Minutes } from './time-enum.mjs';
+ 
+ export const HoursMinutes = t.record({
+@@ -9,15 +9,16 @@ export const HoursMinutes = t.record({
+ 
+ export type HoursMinutes = t.TypeOf<typeof HoursMinutes>;
+ 
+-export const HoursMinutesFromDate = (date: DateType): HoursMinutes => ({
+-  hours: DateUtils.getLocaleHours(date),
+-  minutes: DateUtils.getLocaleMinutes(date),
+-});
++export const HoursMinutesFromDate = (date: Date): HoursMinutes =>
++  ({
++    hours: DateUtils.getLocaleHours(date),
++    minutes: DateUtils.getLocaleMinutes(date),
++  }) as const;
+ 
+ export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
+-  if (a.hours !== b.hours)
+-    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+-  if (a.minutes !== b.minutes)
+-    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
++  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
++
++  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
++
+   return 0;
+ };

@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/index.ts apps/event-schedule-app/src/components/organisms/detailed-filter/index.mts
+index c612ed4bd..64dca0d2f 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/index.ts
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/index.mts
+@@ -1,14 +1,14 @@
+-export * from './detailed-filter-collapse';
+-export * from './detailed-filter-date-range';
+-export * from './detailed-filter-day-of-week';
+-export * from './detailed-filter-filled-date-only';
+-export * from './detailed-filter-icon-of-specified-respondent';
+-export * from './detailed-filter-num-fair-icon';
+-export * from './detailed-filter-num-fair-plus-poor-icon';
+-export * from './detailed-filter-num-good-icon';
+-export * from './detailed-filter-num-good-plus-fair-icon';
+-export * from './detailed-filter-num-icon';
+-export * from './detailed-filter-num-poor-icon';
+-export * from './detailed-filter-rank';
+-export * from './detailed-filter-score-range';
+-export * from './styled';
++export * from './detailed-filter-collapse.js';
++export * from './detailed-filter-date-range.js';
++export * from './detailed-filter-day-of-week.js';
++export * from './detailed-filter-filled-date-only.js';
++export * from './detailed-filter-icon-of-specified-respondent.js';
++export * from './detailed-filter-num-fair-icon.js';
++export * from './detailed-filter-num-fair-plus-poor-icon.js';
++export * from './detailed-filter-num-good-icon.js';
++export * from './detailed-filter-num-good-plus-fair-icon.js';
++export * from './detailed-filter-num-icon.js';
++export * from './detailed-filter-num-poor-icon.js';
++export * from './detailed-filter-rank.js';
++export * from './detailed-filter-score-range.js';
++export * from './styled.js';

@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/utils/ymd2day.ts apps/event-schedule-app/src/utils/ymd2day.mts
+index 59e741c5f..09dca88dc 100644
+--- experimental/packages/apps/event-schedule-app/src/utils/ymd2day.ts
++++ apps/event-schedule-app/src/utils/ymd2day.mts
+@@ -1,2 +1,5 @@
++import { DateUtils } from 'ts-fortress-types';
++import { type DayOfWeekIndex } from 'ts-type-forge';
++
+ export const ymd2day = (ymd: YearMonthDate): DayOfWeekIndex =>
+   DateUtils.getLocaleDayOfWeek(DateUtils.create(ymd.year, ymd.month, ymd.date));

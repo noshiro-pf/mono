@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/rank-numeric-input.tsx apps/event-schedule-app/src/components/molecules/rank-numeric-input.tsx
+index 5cdf3d499..7f45b1c79 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/rank-numeric-input.tsx
++++ apps/event-schedule-app/src/components/molecules/rank-numeric-input.tsx
+@@ -1,10 +1,13 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
+ import {
+   answerRankNumericInputConfig,
+   clampAndRoundAnswerRank,
+-} from '../../constants';
+-import { type AnswerRank } from '../../types';
++} from '../../constants/index.mjs';
++import { type AnswerRank } from '../../types/index.mjs';
+ 
+ type Props = Readonly<{
+   value: AnswerRank;
+@@ -27,28 +30,26 @@ export const RankNumericInput = memoNamed<Props>(
+     } = useNumericInputWithStepState({
+       onValueChange,
+       normalize: clampAndRoundAnswerRank,
+-      decode: (s) => clampAndRoundAnswerRank(Number(s)),
++      decode: (s) =>
++        clampAndRoundAnswerRank(
++          Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN),
++        ),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
+-      () => ({
+-        min,
+-        max,
+-        step,
+-        onKeyDown,
+-      }),
++    const inputProps = React.useMemo(
++      () => ({ min, max, step, onKeyDown }),
+       [onKeyDown],
+     );
+ 
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

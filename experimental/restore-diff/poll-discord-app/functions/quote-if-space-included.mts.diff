@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/quote-if-space-included.mts apps/poll-discord-app/src/functions/quote-if-space-included.mts
+index 6b92f3447..e4ebab307 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/quote-if-space-included.mts
++++ apps/poll-discord-app/src/functions/quote-if-space-included.mts
+@@ -1,2 +1,2 @@
+ export const quoteIfSpaceIncluded = (str: string): string =>
+-  /\s/gu.test(str) ? `"${str}"` : str;
++  /\s/gu.test(str) ? (`"${str}"` as const) : str;

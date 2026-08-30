@@ -1,0 +1,26 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/map-key/answer-selection-map-key.ts apps/event-schedule-app/src/functions/map-key/answer-selection-map-key.mts
+index c1f323979..ab23cdf3d 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/map-key/answer-selection-map-key.ts
++++ apps/event-schedule-app/src/functions/map-key/answer-selection-map-key.mts
+@@ -1,4 +1,6 @@
+-import { DatetimeRange } from '@noshiro/io-ts-types';
++import { Json, Result } from 'ts-data-forge';
++import { DatetimeRange } from 'ts-fortress-types';
++import { type Brand } from 'ts-type-forge';
+ 
+ export type AnswerSelectionMapKey = Brand<string, 'AnswerSelectionMapKey'>;
+ 
+@@ -18,10 +20,11 @@ export const answerSelectionFromMapKey = (
+ ): AnswerSelectionData => {
+   const parsed =
+     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-    Result.unwrapThrow(Json.parse(key)) as {
++    Result.unwrapThrow(Json.parse(key)) as Readonly<{
+       answerId: AnswerId;
+       datetimeRange: DatetimeRange;
+-    };
++    }>;
++
+   return {
+     answerId: parsed.answerId,
+     datetimeRange: DatetimeRange.fill(parsed.datetimeRange),

@@ -320,36 +320,47 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 ### step 3 — 旧 mono の復元
 
-- [ ] `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
+- [x] `experimental/` から utils・apps を依存のトポロジカル順に 1 つずつ復元する
     - 明示 import を省略するための `global-*` 系 utils は撤廃し、明示 import に書き換える
     - 何を復元するかを決められるように、74 プロジェクトを「後継あり / 判断が要る / 中身が無い」に分類した → [experimental-inventory.md](./experimental-inventory.md)
     - 各 app が連れてくる utils は `dependencies` から実測してある。**連れてくる utils が「なし」の 3 つ**（`lambda-calculus-interpreter-core` 750 行、`poll-discord-app` 2008 行、`event-schedule-app-shared` 5203 行）から始めれば、置換だけで済む
     - **12 パッケージぶんの復元 PR を出し、いずれも `apps/` に private で置く形にした**（2026-08-14〜15）。置き場は npm の公開状況で決めた。詳細と、その過程で分かったことは [experimental-inventory.md](./experimental-inventory.md) にある
-        - **2026-08-30 時点で 12 本中 11 本が main に入っており、残るのは
-          `react-blueprintjs-utils`（#1634）だけである。** main の上に rebase 済みで
-          conflict は無く、ドラフトを外せばマージできる
+        - **2026-08-31 時点で 12 本すべてが main に入っている。** 最後まで
+          ドラフトで残っていた `react-blueprintjs-utils`（#1634）と、その上に
+          載っていた `event-schedule-app`（#1714）が 8/30 にマージされ、
+          **step 3 の復元はこれで完了した**
+        - **「判断が要る」38 のうち復元したのは 12 で、残る 26 は「復元しないと
+          決めた」のではなく「復元する理由がまだ無い」だけである。** どれを次に
+          取るかを決められるように、残りの依存状況を
+          [experimental-inventory.md](./experimental-inventory.md) に書いた。
+          **React 側の 7 app は連れてくる utils が全部揃っており**、Preact 側の
+          5 app は utils 4 つ（計 741 行）が前提になる
 
-        | パッケージ                         | 行数 | PR    | 状態                |
-        | :--------------------------------- | ---: | :---- | :------------------ |
-        | `poll-discord-app`                 | 2008 | #1620 | main                |
-        | `lambda-calculus-interpreter-core` |  750 | #1621 | main                |
-        | `ts-fortress-types`                |  352 | #1624 | main                |
-        | `event-schedule-app-shared`        | 5203 | #1625 | main                |
-        | `better-react-use-state`           |   75 | #1627 | main                |
-        | `tiny-router-observable`           |  185 | #1628 | main                |
-        | `tiny-router-react-hooks`          |  140 | #1629 | main                |
-        | `numeric-input-utils`              |  287 | #1630 | main                |
-        | `react-utils`                      |  487 | #1631 | main                |
-        | `resize-observer-react-hooks`      |   55 | #1632 | main                |
-        | `react-utils-styled`               |  347 | #1633 | main                |
-        | `react-blueprintjs-utils`          | 4432 | #1634 | ドラフト（main 上） |
+        | パッケージ                         | 行数 | PR    | 状態 |
+        | :--------------------------------- | ---: | :---- | :--- |
+        | `poll-discord-app`                 | 2008 | #1620 | main |
+        | `lambda-calculus-interpreter-core` |  750 | #1621 | main |
+        | `ts-fortress-types`                |  352 | #1624 | main |
+        | `event-schedule-app-shared`        | 5203 | #1625 | main |
+        | `better-react-use-state`           |   75 | #1627 | main |
+        | `tiny-router-observable`           |  185 | #1628 | main |
+        | `tiny-router-react-hooks`          |  140 | #1629 | main |
+        | `numeric-input-utils`              |  287 | #1630 | main |
+        | `react-utils`                      |  487 | #1631 | main |
+        | `resize-observer-react-hooks`      |   55 | #1632 | main |
+        | `react-utils-styled`               |  347 | #1633 | main |
+        | `react-blueprintjs-utils`          | 4432 | #1634 | main |
         - **ドラフトの間 CI は 1 つも走らない**（ジョブごとの `if` が
-          `pull_request.draft == false` を見ている）。#1634 と #1714 はまだ一度も
-          CI にかかっていないので、それぞれの先端でローカルに一通り回した —
+          `pull_request.draft == false` を見ている）。#1634 と #1714 は一度も
+          CI にかかっていなかったので、それぞれの先端でローカルに一通り回した —
           `ws:build` / `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` /
           `md` / `check:root` / `lint:published-deps` / `codemod:diff` がいずれも
           通り、`ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean で
           ある（`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
+            - **マージ後の main の push 実行で裏が取れた。** `7763c23c7`
+              （#1714 のマージコミット）に対する Type Check / Style Check /
+              Node.js Version Compatibility / Verify Published Packages /
+              Deploy Pages がすべて success で、ローカルの結果と食い違わなかった
         - **`codemod:diff` は `fmt` / `lint` / `type-check` が全部通る状態でも
           30 ファイルを書き換えた**（#1714）。`readonly [T, …]` 化・
           `asserts e is Readonly<{…}>` 化・`as const` 付与で、CI の
@@ -438,6 +449,20 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **`syncflow` → `synstate` で最も手間だったのは `createState` の扱い。** 3 段階で前提が誤っていた — ①パッケージの選択はファイル単位で決まる（誤）→ ②呼び出しごとに決まる（不十分）→ ③**同一ファイルが同じ関数名で両方の版を必要とする**（正）。`synstate` は observable を、`synstate-react-hooks` は hook を返す
     - **`ts-data-forge` の API 変更で繰り返し当たったもの**: 参照系が `Optional` を返す（`IMap.get` / `Arr.first` / `Arr.last` / `Arr.maxBy`）、非破壊操作が `to…` 形に改名（`toSortedBy` / `toUpdated`）、`NonEmptyArray` と `FixedLengthArray` が brand 付きになった（分解する側は `FixedLengthTuple` が正解）
     - **後継が無く移植したもの**は各パッケージの `src/utils` にある。`match` / `mapOptional` / `noop` / `DateUtils` / `Obj.set` 系 / `Paths` / `hasKeyValue` / `createTinyObservable` / 曜日・月名の定数など
+    - **復元前後の差分は `experimental/restore-diff/` に書き出してある。** 13
+      パッケージぶん、`src/` の 1 ファイルにつき 1 つの `.diff`。何がどう
+      書き換わったかを見るのに、`experimental/` の元ファイルと `apps/` の
+      現ファイルを都度突き合わせる必要はない
+        - **対応付けは「拡張子を除いた相対パス」で行っている。**
+          `event-schedule-app` の `.ts` → `.mts` 190 件はこれで繋がる。それ以外の
+          改名は生成器の `RENAMES` に手で書く — 現在 1 件で、#1631 が
+          `use-tiny-observable-hooks.mts` を `use-observable.mts` にしたもの
+        - 内容が同一のファイル（703 中 143）には `.diff` を作っていない。
+          全ファイルの一覧は各パッケージの `_index.md` にあり、そこに
+          `identical` として載る
+        - **生成器（`scripts/gen-restore-diff.mjs`）も同じディレクトリに置いた。**
+          `experimental/` は Prettier・cspell・ESLint・markdownlint のいずれからも
+          除外されているので、3.2MB の生成物を置いてもチェックには掛からない
 
 ### その他の宿題
 

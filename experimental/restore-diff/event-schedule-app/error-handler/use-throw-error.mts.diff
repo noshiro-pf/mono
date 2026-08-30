@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app/src/error-handler/use-throw-error.ts apps/event-schedule-app/src/error-handler/use-throw-error.mts
+index a84d361d8..6cb953b51 100644
+--- experimental/packages/apps/event-schedule-app/src/error-handler/use-throw-error.ts
++++ apps/event-schedule-app/src/error-handler/use-throw-error.mts
+@@ -1,8 +1,11 @@
++import * as React from 'react';
++import { noop } from '../utils-ported/index.mjs';
++
+ /** @link https://github.com/facebook/react/issues/14981#issuecomment-468460187 */
+ export const useThrowError = (): ((errorMessage: string) => void) => {
+-  const [_, dummySetState] = useState(noop);
++  const [_, dummySetState] = React.useState(noop);
+ 
+-  const throwError = useCallback((errorMessage: string) => {
++  const throwError = React.useCallback((errorMessage: string) => {
+     dummySetState(() => {
+       throw new Error(errorMessage);
+     });

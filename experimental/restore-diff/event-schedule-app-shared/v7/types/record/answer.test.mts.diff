@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer.test.mts apps/event-schedule-app-shared/src/v7/types/record/answer.test.mts
+index 142b6d44a..9d5e38144 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/answer.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/answer.test.mts
+@@ -1,4 +1,4 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
+ import {
+   toAnswerId,
+   toWeight,
+@@ -38,19 +38,20 @@ describe('Answer', () => {
+       [ANSWER_KEY_CREATED_AT]: 0,
+       weight: toWeight(1),
+       isRequiredParticipants: false,
+-    };
+-    expect(answerDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(answerDefaultValue, defaultValue);
+   });
+ 
+   describe('isAnswer', () => {
+     test('defaultValue should be true', () => {
+-      expect(isAnswer(answerDefaultValue)).toBe(true);
++      assert.isTrue(isAnswer(answerDefaultValue));
+     });
+   });
+ 
+   describe('fillAnswer', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillAnswer({})).toStrictEqual(answerDefaultValue);
++      assert.deepStrictEqual(fillAnswer({}), answerDefaultValue);
+     });
+   });
+ });

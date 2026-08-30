@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/poll-discord-app/src/discord/update-poll-title.mts apps/poll-discord-app/src/discord/update-poll-title.mts
+index fc16ac7c3..2cfce2901 100644
+--- experimental/packages/apps/poll-discord-app/src/discord/update-poll-title.mts
++++ apps/poll-discord-app/src/discord/update-poll-title.mts
+@@ -1,5 +1,6 @@
+ import type * as Discord from 'discord.js';
+ import { ChannelType } from 'discord.js';
++import { type IMap, Result } from 'ts-data-forge';
+ import { triggerCommand } from '../constants.mjs';
+ import { firestoreApi } from '../firebase/index.mjs';
+ import {
+@@ -44,6 +45,7 @@ export const updatePollTitle = async (
+   if (Result.isErr(pollResult)) return pollResult;
+ 
+   const poll = pollResult.value;
++
+   if (poll === undefined) return Result.ok(undefined);
+ 
+   const channel = message.channel;
+@@ -73,7 +75,7 @@ export const updatePollTitle = async (
+ 
+   const userIdToDisplayName = userIdToDisplayNameResult.value;
+ 
+-  const newPoll = Obj.set(poll, 'title', title);
++  const newPoll = { ...poll, title } as const;
+ 
+   const [updateSummaryMessageResult, updateTitleMessageResult] =
+     await Promise.all([
+@@ -94,6 +96,7 @@ export const updatePollTitle = async (
+   if (Result.isErr(updateSummaryMessageResult)) {
+     return updateSummaryMessageResult;
+   }
++
+   if (Result.isErr(updateTitleMessageResult)) {
+     return updateTitleMessageResult;
+   }

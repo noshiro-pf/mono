@@ -1,0 +1,70 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover.tsx apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover.tsx
+index b41256a57..94c338dea 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover.tsx
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover.tsx
+@@ -1,5 +1,9 @@
+-import { Button, Popover } from '@blueprintjs/core';
+-import { SetTimesPopoverContent } from './set-times-popover-content';
++import { Button, PopoverNext } from '@blueprintjs/core';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type DayOfWeekName, type ReadonlyRecord } from 'ts-type-forge';
++import { SetTimesPopoverContent } from './set-times-popover-content.js';
+ 
+ const dc = dict.eventSettingsPage.section2;
+ 
+@@ -9,7 +13,7 @@ type Props = Readonly<{
+   onSetTimesSubmit: (
+     state: Readonly<{
+       timeRange: TimeRange;
+-      checkboxState: Record<DayOfWeekName, boolean>;
++      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+     }>,
+   ) => void;
+ }>;
+@@ -20,20 +24,21 @@ export const SetTimesPopover = memoNamed<Props>(
+     const [isOpen, { setTrue: handleOpen, setFalse: handleClose }] =
+       useBoolState(false);
+ 
+-    const onOkClick = useCallback(
++    const onOkClick = React.useCallback(
+       (
+         state: Readonly<{
+           timeRange: TimeRange;
+-          checkboxState: Record<DayOfWeekName, boolean>;
++          checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+         }>,
+       ) => {
+         onSetTimesSubmit(state);
++
+         handleClose();
+       },
+       [onSetTimesSubmit, handleClose],
+     );
+ 
+-    const popoverContent = useMemo(
++    const popoverContent = React.useMemo(
+       () => (
+         <SetTimesPopoverContent
+           datetimeSpecification={datetimeSpecification}
+@@ -46,8 +51,8 @@ export const SetTimesPopover = memoNamed<Props>(
+     );
+ 
+     return (
+-      <Popover
+-        canEscapeKeyClose={true}
++      <PopoverNext
++        canEscapeKeyClose
+         content={popoverContent}
+         isOpen={isOpen}
+         onClose={handleClose}
+@@ -57,7 +62,7 @@ export const SetTimesPopover = memoNamed<Props>(
+           text={dc.setTimesAtOneTime}
+           onClick={handleOpen}
+         />
+-      </Popover>
++      </PopoverNext>
+     );
+   },
+ );

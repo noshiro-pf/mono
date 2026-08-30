@@ -1,0 +1,67 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/icon-settings.tsx apps/event-schedule-app/src/components/organisms/icon-settings/icon-settings.tsx
+index 94ccf362b..b78700451 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/icon-settings/icon-settings.tsx
++++ apps/event-schedule-app/src/components/organisms/icon-settings/icon-settings.tsx
+@@ -1,9 +1,13 @@
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
+ import {
+   iconListReducer,
+   type IconListReducerAction,
+-} from '../../../functions';
+-import { Description } from '../../atoms';
+-import { AnswerIconRow } from './icon-setting-row';
++} from '../../../functions/index.mjs';
++import { noop } from '../../../utils-ported/index.mjs';
++import { Description } from '../../atoms/index.mjs';
++import { AnswerIconRow } from './icon-setting-row.js';
+ 
+ const dc = dict.eventSettingsPage.section3.iconSettings;
+ 
+@@ -15,39 +19,35 @@ type Props = Readonly<{
+ export const AnswerIconSettingsComponent = memoNamed<Props>(
+   'AnswerIconSettings',
+   ({ answerIcons, onAnswerIconsChange }) => {
+-    const dispatch = useCallback(
++    const dispatch = React.useCallback(
+       (action: IconListReducerAction) => {
+         onAnswerIconsChange(iconListReducer(answerIcons, action));
+       },
+       [answerIcons, onAnswerIconsChange],
+     );
+ 
+-    const onOkDescriptionChange = useCallback(
++    const onOkDescriptionChange = React.useCallback(
+       (description: string) => {
+         dispatch({ type: 'update-description', iconId: 'good', description });
+       },
+       [dispatch],
+     );
+ 
+-    const onNeitherDescriptionChange = useCallback(
++    const onNeitherDescriptionChange = React.useCallback(
+       (description: string) => {
+-        dispatch({
+-          type: 'update-description',
+-          iconId: 'fair',
+-          description,
+-        });
++        dispatch({ type: 'update-description', iconId: 'fair', description });
+       },
+       [dispatch],
+     );
+ 
+-    const onNeitherPointChange = useCallback(
++    const onNeitherPointChange = React.useCallback(
+       (point: AnswerIconPoint) => {
+         dispatch({ type: 'update-point', iconId: 'fair', point });
+       },
+       [dispatch],
+     );
+ 
+-    const onNgDescriptionChange = useCallback(
++    const onNgDescriptionChange = React.useCallback(
+       (description: string) => {
+         dispatch({ type: 'update-description', iconId: 'poor', description });
+       },

@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/weekdays-header.tsx apps/event-schedule-app/src/components/multiple-date-picker/weekdays-header.tsx
+index 03242dd0c..56ae45483 100644
+--- experimental/packages/apps/event-schedule-app/src/components/multiple-date-picker/weekdays-header.tsx
++++ apps/event-schedule-app/src/components/multiple-date-picker/weekdays-header.tsx
+@@ -1,19 +1,21 @@
++import { css } from '@emotion/react';
++import * as React from 'react';
+ import {
+   DatePickerWeekdayReadonlyStyled,
+   DatePickerWeekdaysRowStyled,
+   DatePickerWeekdaysStyled,
+   DatePickerWeekdayStyled,
+-} from '@noshiro/react-blueprintjs-utils';
+-import { daysOfWeekList } from '@noshiro/ts-utils-additional';
++} from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type DayOfWeekIndex } from 'ts-type-forge';
++import { daysOfWeekList, mapOptional } from '../../utils-ported/index.mjs';
+ 
+-type Props = Readonly<{
+-  onClick?: (w: DayOfWeekIndex) => void;
+-}>;
++type Props = Readonly<{ onClick?: (w: DayOfWeekIndex) => void }>;
+ 
+ export const WeekdaysHeader = memoNamed<Props>(
+   'WeekdaysHeader',
+   ({ onClick }) => {
+-    const listWithHandler = useMemo(
++    const listWithHandler = React.useMemo(
+       () =>
+         daysOfWeekList.en.map((w, idx) => ({
+           ...w,

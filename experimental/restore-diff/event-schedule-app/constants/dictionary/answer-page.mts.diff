@@ -1,0 +1,129 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/answer-page.ts apps/event-schedule-app/src/constants/dictionary/answer-page.mts
+index 2f07367db..e2ba4790e 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/answer-page.ts
++++ apps/event-schedule-app/src/constants/dictionary/answer-page.mts
+@@ -1,12 +1,15 @@
+-import { type AnswerRank } from '../../types';
+-import { commonDictionary } from './common';
+-import { ymd2str } from './datetime';
+-import { detailedFilterDictionary } from './detailed-filter-dialog';
++import { Arr } from 'ts-data-forge';
++import { type FixedLengthTuple } from 'ts-type-forge';
++import { type AnswerRank } from '../../types/index.mjs';
++import { match } from '../../utils-ported/index.mjs';
++import { commonDictionary } from './common.mjs';
++import { ymd2str } from './datetime.mjs';
++import { detailedFilterDictionary } from './detailed-filter-dialog.mjs';
+ 
+ const genTagName = (
+   icon: '△' | '✕' | '〇',
+ ): ((min: number, max: number) => string) => {
+-  const commonText = `${icon}の個数`;
++  const commonText = `${icon}の個数` as const;
+ 
+   return (min: number, max: number): string =>
+     min === max
+@@ -23,7 +26,7 @@ const genTagName = (
+ const genTagNameAdded = (
+   ...[icon1, icon2]: readonly ['△', '✕'] | readonly ['〇', '△']
+ ): ((min: number, max: number) => string) => {
+-  const commonText = `${icon1}の個数+${icon2}の個数`;
++  const commonText = `${icon1}の個数+${icon2}の個数` as const;
+ 
+   return (min: number, max: number): string =>
+     min === max
+@@ -48,9 +51,7 @@ export const answerPageDictionary = {
+       'また、仮登録によりこの日程調整とアカウントが紐づくことで、日程調整一覧に表示されるようになります。',
+       '各日程の回答は空欄で登録されるので、後で回答を埋めるのを忘れないようにしてください。',
+     ].join(''),
+-    result: {
+-      success: '仮登録しました。',
+-    },
++    result: { success: '仮登録しました。' },
+   },
+ 
+   eventInfo: {
+@@ -83,13 +84,10 @@ export const answerPageDictionary = {
+ 
+     tagInput: {
+       sort: (sortKey: 'date' | 'score', sortOrder: 'asc' | 'desc') =>
+-        `${match(sortKey, {
+-          date: '日時',
+-          score: 'スコア',
+-        })}${match(sortOrder, {
+-          asc: '昇順',
+-          desc: '降順',
+-        })}で並べ替え`,
++        `${match(sortKey, { date: '日時', score: 'スコア' })}${match(
++          sortOrder,
++          { asc: '昇順', desc: '降順' },
++        )}で並べ替え`,
+ 
+       good: genTagName('〇'),
+       fair: genTagName('△'),
+@@ -101,8 +99,8 @@ export const answerPageDictionary = {
+ 
+       scoreRange: ({ min, max }: Readonly<{ min: number; max: number }>) =>
+         min === max
+-          ? `スコア = ${min.toFixed(2)}`
+-          : `${min.toFixed(2)} ≦ スコア ≦ ${max.toFixed(2)}`,
++          ? (`スコア = ${min.toFixed(2)}` as const)
++          : (`${min.toFixed(2)} ≦ スコア ≦ ${max.toFixed(2)}` as const),
+ 
+       dateRange: (start: YearMonthDate, end: YearMonthDate) =>
+         `日程：${ymd2str(start)} ～ ${ymd2str(end)}`,
+@@ -135,6 +133,7 @@ export const answerPageDictionary = {
+         );
+ 
+         if (numChecked === 0) return '曜日：なし';
++
+         if (numChecked === 7) return '曜日：すべて';
+ 
+         return numChecked <= 3
+@@ -171,15 +170,9 @@ export const answerPageDictionary = {
+       ge: '個以上',
+       le: '個以下',
+       enableFilteringSwitchLabel: '絞り込み',
+-      good: {
+-        title: '〇の個数でフィルタ',
+-      },
+-      fair: {
+-        title: '△の個数でフィルタ',
+-      },
+-      poor: {
+-        title: '✕の個数でフィルタ',
+-      },
++      good: { title: '〇の個数でフィルタ' },
++      fair: { title: '△の個数でフィルタ' },
++      poor: { title: '✕の個数でフィルタ' },
+     },
+ 
+     toggleAnswerIconIsHidden: '〇△✕列を隠す',
+@@ -190,7 +183,7 @@ export const answerPageDictionary = {
+     '（必須参加者が✕を付けている日のスコアは0点になります。）',
+   noteForPointOfFair: (
+     defaultPoint: AnswerIconPoint,
+-  ): readonly [string, string] => [
++  ): FixedLengthTuple<2, string> => [
+     '回答者が個別に△の点数を設定している場合があります。',
+     `デフォルトの点数（＝${defaultPoint}点）から変更されている場合は、△の右隣に括弧付きでその点数が表示されています。`,
+   ],
+@@ -199,16 +192,8 @@ export const answerPageDictionary = {
+     'この回答は作成者により保護されているため、本人のアカウントでログイン中のみ編集できます。',
+ 
+   answerBeingEdited: {
+-    title: {
+-      create: '回答追加',
+-      update: '回答編集',
+-    },
+-    table: {
+-      header: {
+-        score: 'スコア',
+-        comment: 'コメント',
+-      },
+-    },
++    title: { create: '回答追加', update: '回答編集' },
++    table: { header: { score: 'スコア', comment: 'コメント' } },
+     yourName: 'あなたの名前：',
+     batchInput: {
+       openButton: '一括入力',

@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/auth/index.ts apps/event-schedule-app/src/api/auth/index.mts
+index 6c00137ca..7f7ecfddb 100644
+--- experimental/packages/apps/event-schedule-app/src/api/auth/index.ts
++++ apps/event-schedule-app/src/api/auth/index.mts
+@@ -1,6 +1,6 @@
+-export * from './create-user';
+-export * from './google';
+-export * from './send-email-verification';
+-export * from './send-password-reset-email';
+-export * from './sign-in';
+-export * from './update-user';
++export * from './create-user.mjs';
++export * from './google.mjs';
++export * from './send-email-verification.mjs';
++export * from './send-password-reset-email.mjs';
++export * from './sign-in.mjs';
++export * from './update-user.mjs';

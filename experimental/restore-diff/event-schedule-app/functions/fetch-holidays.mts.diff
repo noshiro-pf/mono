@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/fetch-holidays.ts apps/event-schedule-app/src/functions/fetch-holidays.mts
+index 3ec263414..de99db343 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/fetch-holidays.ts
++++ apps/event-schedule-app/src/functions/fetch-holidays.mts
+@@ -1,14 +1,14 @@
+-export const fetchHolidaysJson = (): Promise<Record<string, string>> =>
++import { type ReadonlyRecord } from 'ts-type-forge';
++
++export const fetchHolidaysJson = (): Promise<ReadonlyRecord<string, string>> =>
+   fetch('https://holidays-jp.github.io/api/v1/date.json').then(
+-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+-    (res) => res.json() as Promise<Record<string, string>>,
++    (res) => res.json() as Promise<ReadonlyRecord<string, string>>,
+   );
+ 
+ /*
+  * result example:
+ 
+-{
+-    "2019-01-01": "元日",
++{ "2019-01-01": "元日",
+     "2019-01-14": "成人の日",
+     "2019-02-11": "建国記念の日",
+     "2019-03-21": "春分の日",
+@@ -64,6 +64,5 @@ export const fetchHolidaysJson = (): Promise<Record<string, string>> =>
+     "2021-09-20": "敬老の日",
+     "2021-09-23": "秋分の日",
+     "2021-11-03": "文化の日",
+-    "2021-11-23": "勤労感謝の日"
+-}
++    "2021-11-23": "勤労感謝の日" }
+ */

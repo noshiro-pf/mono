@@ -1,0 +1,138 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page-google.ts apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page-google.mts
+index 6c0d30616..92b24a0fd 100644
+--- experimental/packages/apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page-google.ts
++++ apps/event-schedule-app/src/store/update-user-info-page-state/delete-account-page-google.mts
+@@ -1,36 +1,42 @@
+-import { api } from '../../api';
++import { type InitializedObservable, combine, map } from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
+ import {
+   createToaster,
+   emailInputHasError,
+   emailInputInitialState,
+   emailInputStateReducer,
+   showToast,
+-} from '../../functions';
+-import { Auth } from '../auth';
+-import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state';
++} from '../../functions/index.mjs';
++import { Auth } from '../auth.mjs';
++import { UpdateUserInfoDialogStore } from './update-user-info-dialog-state.mjs';
+ 
+ const dc = dict.accountSettings;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   emailInputStateReducer,
+   emailInputInitialState,
+ );
+ 
+-const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).chain(
++const enterButtonDisabled$ = combine([formState$, Auth.fireAuthUser$]).pipe(
+   map(
+     ([formState, fireAuthUser]) => formState.inputValue !== fireAuthUser?.email,
+   ),
+ );
+ 
+-const {
+-  state: isWaitingResponseState,
+-  setFalse: setFalseIsWaitingResponse,
+-  setTrue: setTrueIsWaitingResponse,
+-} = createBooleanState(false);
++const [
++  ,
++  {
++    state: isWaitingResponseState,
++    setFalse: setFalseIsWaitingResponse,
++    setTrue: setTrueIsWaitingResponse,
++  },
++] = createBooleanState(false);
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+@@ -39,7 +45,7 @@ const state = combine([
+   enterButtonDisabled$,
+   isWaitingResponseState,
+   emailFormIntent$,
+-]).chain(
++]).pipe(
+   map(
+     ([formState, enterButtonDisabled, isWaitingResponse, emailFormIntent]) => ({
+       formState,
+@@ -65,6 +71,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       'error occurred on googleSignInWithPopup:',
+       signInResult.value,
+     );
++
+     return;
+   }
+ 
+@@ -82,6 +89,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+     );
+ 
+     setFalseIsWaitingResponse();
++
+     UpdateUserInfoDialogStore.closeDialog();
+ 
+     showToast({
+@@ -89,6 +97,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       message: dc.reauthenticate.message.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+@@ -102,6 +111,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+     );
+ 
+     setFalseIsWaitingResponse();
++
+     UpdateUserInfoDialogStore.closeDialog();
+ 
+     showToast({
+@@ -109,10 +119,12 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+       message: dc.deleteAccount.message.error,
+       intent: 'danger',
+     });
++
+     return;
+   }
+ 
+   setFalseIsWaitingResponse();
++
+   UpdateUserInfoDialogStore.closeDialog();
+ 
+   showToast({
+@@ -124,6 +136,7 @@ const submit = async (user: FireAuthUser): Promise<void> => {
+ 
+ const enterClickHandler = (): void => {
+   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
++
+   const fireAuthUser = Auth.getFireAuthUserSnapshot();
+ 
+   if (enterButtonDisabled || fireAuthUser === undefined) return;
+@@ -133,14 +146,12 @@ const enterClickHandler = (): void => {
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'input',
+-    payload: value,
+-  });
++  dispatch({ type: 'input', payload: value });
+ };
+ 
+ const resetAllDialogState = (): void => {
+   dispatch({ type: 'reset' });
++
+   setFalseIsWaitingResponse();
+ };
+ 

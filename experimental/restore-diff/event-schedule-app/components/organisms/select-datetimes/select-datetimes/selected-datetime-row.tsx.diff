@@ -1,0 +1,39 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/selected-datetime-row.tsx apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/selected-datetime-row.tsx
+index eef211d9d..b3a227139 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/selected-datetime-row.tsx
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/selected-datetime-row.tsx
+@@ -1,6 +1,8 @@
+ import { Button } from '@blueprintjs/core';
+-import { BpDatePicker } from '@noshiro/react-blueprintjs-utils';
+-import { TimeRangeView } from '../../../molecules';
++import { css } from '@emotion/react';
++import { BpDatePicker } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { TimeRangeView } from '../../../molecules/index.mjs';
+ 
+ type Props = Readonly<{
+   datetimeSpecification: DatetimeSpecificationEnumType;
+@@ -47,7 +49,7 @@ export const SelectedDatetimeRow = memoNamed<Props>(
+           `}
+         >
+           <BpDatePicker
+-            closeOnSelection={true}
++            closeOnSelection
+             ymd={datetimeRange.ymd}
+             onYmdChange={onYmdChange}
+           />
+@@ -73,8 +75,12 @@ export const SelectedDatetimeRow = memoNamed<Props>(
+           margin-left: 5px;
+         `}
+       >
+-        <Button icon={'duplicate'} minimal={true} onClick={onDuplicateClick} />
+-        <Button icon={'trash'} minimal={true} onClick={onDeleteClick} />
++        <Button
++          icon={'duplicate'}
++          variant={'minimal'}
++          onClick={onDuplicateClick}
++        />
++        <Button icon={'trash'} variant={'minimal'} onClick={onDeleteClick} />
+       </div>
+     </div>
+   ),

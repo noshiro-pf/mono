@@ -1,0 +1,87 @@
+diff --git experimental/packages/utils/react-utils-styled/src/aspect-ratio-limiter.tsx apps/react-utils-styled/src/aspect-ratio-limiter.tsx
+index 71db26250..780663dfe 100644
+--- experimental/packages/utils/react-utils-styled/src/aspect-ratio-limiter.tsx
++++ apps/react-utils-styled/src/aspect-ratio-limiter.tsx
+@@ -1,12 +1,12 @@
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useResizeObserver } from '@noshiro/resize-observer-react-hooks';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { useResizeObserver } from 'resize-observer-react-hooks';
+ import {
+   Num,
+-  toNonZeroFiniteNumber,
+-  toPositiveFiniteNumber,
+-} from '@noshiro/ts-utils';
+-import { useMemo } from 'react';
++  asNonZeroFiniteNumber,
++  asPositiveFiniteNumber,
++} from 'ts-data-forge';
+ 
+ const Root = styled.div`
+   width: 100%;
+@@ -17,7 +17,9 @@ const Root = styled.div`
+   justify-content: center;
+ `;
+ 
+-type Props = DeepReadonly<{
++// `Readonly`, not `DeepReadonly`: a deeply-readonly `ReactNode` is no longer
++// a `ReactNode`, and React is the one consuming these.
++type Props = Readonly<{
+   children: React.ReactNode;
+   maxWidthPerHeight?: number;
+   minWidthPerHeight?: number;
+@@ -28,7 +30,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
+   ({ children, maxWidthPerHeight, minWidthPerHeight }: Props) => {
+     const [wrapperSize, ref] = useResizeObserver<HTMLDivElement>();
+ 
+-    const padding = useMemo(() => {
++    const padding = React.useMemo(() => {
+       const { width, height } = wrapperSize;
+ 
+       if (
+@@ -37,8 +39,9 @@ export const AspectRatioLimiter = memoNamed<Props>(
+       ) {
+         // 制約条件より縦長な場合 => 上下に余白を作る
+         const pad =
+-          (height - Num.div(width, toPositiveFiniteNumber(minWidthPerHeight))) /
++          (height - Num.div(width, asPositiveFiniteNumber(minWidthPerHeight))) /
+           2;
++
+         return {
+           top: pad,
+           left: 0,
+@@ -46,12 +49,14 @@ export const AspectRatioLimiter = memoNamed<Props>(
+           bottom: pad,
+         };
+       }
++
+       if (
+         maxWidthPerHeight !== undefined &&
+-        Num.div(width, toNonZeroFiniteNumber(height)) > maxWidthPerHeight
++        Num.div(width, asNonZeroFiniteNumber(height)) > maxWidthPerHeight
+       ) {
+         // 制約条件より横長な場合 => 左右に余白を作る
+         const pad = (width - height * maxWidthPerHeight) / 2;
++
+         return {
+           top: 0,
+           left: pad,
+@@ -59,6 +64,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
+           bottom: 0,
+         };
+       }
++
+       return {
+         top: 0,
+         left: 0,
+@@ -67,7 +73,7 @@ export const AspectRatioLimiter = memoNamed<Props>(
+       };
+     }, [maxWidthPerHeight, minWidthPerHeight, wrapperSize]);
+ 
+-    const wrapperStyle = useMemo<React.CSSProperties>(
++    const wrapperStyle = React.useMemo<React.CSSProperties>(
+       () => ({
+         paddingTop: `${padding.top}px`,
+         paddingLeft: `${padding.left}px`,

@@ -1,0 +1,40 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider-view.tsx apps/react-blueprintjs-utils/src/components/slider/range-slider-view.tsx
+index 21c308ed5..78353c76c 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/slider/range-slider-view.tsx
++++ apps/react-blueprintjs-utils/src/components/slider/range-slider-view.tsx
+@@ -1,5 +1,6 @@
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
++import { memoNamed } from 'react-utils';
++import { type UintRange } from 'ts-type-forge';
+ import { toClassName } from '../../utils/index.mjs';
+ import { SliderHandle } from './handle.js';
+ import { SliderProgressStyled, SliderTrackStyled } from './progress-styled.mjs';
+@@ -14,7 +15,7 @@ import {
+ import { useRangeSliderRatios } from './to-ratio-hook.mjs';
+ 
+ type Props = Readonly<{
+-  trackElementRef: React.RefObject<HTMLDivElement>;
++  trackElementRef: React.RefObject<HTMLDivElement | null>;
+   disabled: boolean;
+   min: number;
+   max: number;
+@@ -78,11 +79,13 @@ export const RangeSliderView = memoNamed<Props>(
+         <div>
+           <SliderLabelMinStyled>{minLabel}</SliderLabelMinStyled>
+           <SliderLabelMaxStyled>{maxLabel}</SliderLabelMaxStyled>
+-          {customLabelValuesWithRatio.map(({ value, cssStyle }) => (
+-            <SliderLabelStyled key={value} style={cssStyle}>
+-              {value}
+-            </SliderLabelStyled>
+-          ))}
++          {customLabelValuesWithRatio.map(
++            ({ value, cssStyle, ratio: _ratio }) => (
++              <SliderLabelStyled key={value} style={cssStyle}>
++                {value}
++              </SliderLabelStyled>
++            ),
++          )}
+         </div>
+ 
+         <SliderHandle

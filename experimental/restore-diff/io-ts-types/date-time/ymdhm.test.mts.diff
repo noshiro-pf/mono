@@ -1,0 +1,51 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/ymdhm.test.mts apps/ts-fortress-types/src/date-time/ymdhm.test.mts
+index 0bf862e1d..2575e69c9 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/ymdhm.test.mts
++++ apps/ts-fortress-types/src/date-time/ymdhm.test.mts
+@@ -1,4 +1,11 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import {
++  type DateEnum,
++  type HoursEnum,
++  type MinutesEnum,
++  type MonthEnum,
++  type SafeUint,
++} from 'ts-type-forge';
+ import { HoursMinutes } from './hours-minutes.mjs';
+ import { YearMonthDate } from './year-month-date.mjs';
+ import { Ymdhm } from './ymdhm.mjs';
+@@ -7,7 +14,7 @@ describe('Ymdhm', () => {
+   expectType<
+     Ymdhm,
+     Readonly<{
+-      year: YearEnum;
++      year: SafeUint;
+       month: MonthEnum;
+       date: DateEnum;
+       hours: HoursEnum;
+@@ -22,19 +29,20 @@ describe('Ymdhm', () => {
+       date: YearMonthDate.defaultValue.date,
+       hours: HoursMinutes.defaultValue.hours,
+       minutes: HoursMinutes.defaultValue.minutes,
+-    };
+-    expect(Ymdhm.defaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(Ymdhm.defaultValue, defaultValue);
+   });
+ 
+   describe('isYmdhm', () => {
+     test('defaultValue should be true', () => {
+-      expect(Ymdhm.is(Ymdhm.defaultValue)).toBe(true);
++      assert.isTrue(Ymdhm.is(Ymdhm.defaultValue));
+     });
+   });
+ 
+   describe('fillYmdhm', () => {
+     test('defaultValue should be true', () => {
+-      expect(Ymdhm.fill({})).toStrictEqual(Ymdhm.defaultValue);
++      assert.deepStrictEqual(Ymdhm.fill({}), Ymdhm.defaultValue);
+     });
+   });
+ });

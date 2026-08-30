@@ -1,0 +1,77 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/event-schedule.mts apps/event-schedule-app-shared/src/v5/types/record/event-schedule.mts
+index 31efb9121..057f99bac 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v5/types/record/event-schedule.mts
++++ apps/event-schedule-app-shared/src/v5/types/record/event-schedule.mts
+@@ -1,4 +1,6 @@
+-import { DateUtils, expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+ import {
+   defaultAnswerIconSetting,
+   defaultNotificationSettings,
+@@ -33,7 +35,7 @@ export type EventSchedule = Readonly<{
+ 
+ export type PartialEventSchedule = Partial<
+   MergeIntersection<
+-    Pick<
++    StrictPick<
+       EventSchedule,
+       | 'author'
+       | 'datetimeSpecification'
+@@ -51,6 +53,7 @@ export type PartialEventSchedule = Partial<
+ >;
+ 
+ expectType<keyof EventSchedule, keyof PartialEventSchedule>('=');
++
+ expectType<EventSchedule, PartialEventSchedule>('<=');
+ 
+ export const eventScheduleDefaultValue = {
+@@ -70,24 +73,26 @@ export const eventScheduleDefaultValue = {
+ } as const satisfies EventSchedule;
+ 
+ const d = eventScheduleDefaultValue;
+-export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule => ({
+-  title: p?.title ?? d.title,
+-  notes: p?.notes ?? d.notes,
+-  datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
+-  datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
+-    fillDatetimeRange,
+-  ),
+-  answerDeadline:
+-    p?.answerDeadline === 'none'
+-      ? 'none'
+-      : fillYmdhm(p?.answerDeadline ?? defaultYmdhm),
+-  answerIcons: fillAnswerIconSettings(p?.answerIcons ?? d.answerIcons),
+-  notificationSettings:
+-    p?.notificationSettings === 'none'
+-      ? 'none'
+-      : fillNotificationSettings(
+-          p?.notificationSettings ?? defaultNotificationSettings,
+-        ),
+-  timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
+-  author: fillUser(p?.author ?? userDefaultValue),
+-});
++
++export const fillEventSchedule = (p?: PartialEventSchedule): EventSchedule =>
++  ({
++    title: p?.title ?? d.title,
++    notes: p?.notes ?? d.notes,
++    datetimeSpecification: p?.datetimeSpecification ?? d.datetimeSpecification,
++    datetimeRangeList: (p?.datetimeRangeList ?? d.datetimeRangeList).map(
++      fillDatetimeRange,
++    ),
++    answerDeadline:
++      p?.answerDeadline === 'none'
++        ? ('none' as const)
++        : fillYmdhm(p?.answerDeadline ?? defaultYmdhm),
++    answerIcons: fillAnswerIconSettings(p?.answerIcons ?? d.answerIcons),
++    notificationSettings:
++      p?.notificationSettings === 'none'
++        ? ('none' as const)
++        : fillNotificationSettings(
++            p?.notificationSettings ?? defaultNotificationSettings,
++          ),
++    timezoneOffsetMinutes: p?.timezoneOffsetMinutes ?? d.timezoneOffsetMinutes,
++    author: fillUser(p?.author ?? userDefaultValue),
++  }) as const;

@@ -1,0 +1,23 @@
+diff --git experimental/packages/utils/react-utils-styled/src/img-with-preview.tsx apps/react-utils-styled/src/img-with-preview.tsx
+index 4d69b6901..08d2d49ff 100644
+--- experimental/packages/utils/react-utils-styled/src/img-with-preview.tsx
++++ apps/react-utils-styled/src/img-with-preview.tsx
+@@ -1,7 +1,7 @@
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+ import { useBoolState } from 'better-react-use-state';
+-import { useMemo } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
+ 
+ const RelativeWrapper = styled.div`
+   width: 100%;
+@@ -47,7 +47,7 @@ export const ImgWithPreview = memoNamed<Props>(
+     const [loaded, { setTrue: onLoad, setFalse: onLoadStart }] =
+       useBoolState(false);
+ 
+-    const imgStyle = useMemo<React.CSSProperties>(
++    const imgStyle = React.useMemo<React.CSSProperties>(
+       () => ({ opacity: loaded ? 1 : 0 }),
+       [loaded],
+     );

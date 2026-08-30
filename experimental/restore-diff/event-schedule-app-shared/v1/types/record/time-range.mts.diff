@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/time-range.mts apps/event-schedule-app-shared/src/v1/types/record/time-range.mts
+index 8c253ac9f..6a183a85f 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/time-range.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/time-range.mts
+@@ -24,15 +24,21 @@ export const defaultTimeRange = {
+ } as const satisfies TimeRange;
+ 
+ const d = defaultTimeRange;
+-export const fillTimeRange = (p?: PartialTimeRange): TimeRange => ({
+-  start: fillHoursMinutes(p?.start ?? d.start),
+-  end: fillHoursMinutes(p?.end ?? d.end),
+-});
++
++export const fillTimeRange = (p?: PartialTimeRange): TimeRange =>
++  ({
++    start: fillHoursMinutes(p?.start ?? d.start),
++    end: fillHoursMinutes(p?.end ?? d.end),
++  }) as const;
+ 
+ export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
+   const compareStartHmResult = compareHm(a.start, b.start);
++
+   if (compareStartHmResult !== 0) return compareStartHmResult;
++
+   const compareEndHmResult = compareHm(a.end, b.end);
++
+   if (compareEndHmResult !== 0) return compareEndHmResult;
++
+   return 0;
+ };

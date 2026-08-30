@@ -1,0 +1,49 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v4/types/record/answer.mts apps/event-schedule-app-shared/src/v4/types/record/answer.mts
+index 358325986..97f006c1a 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v4/types/record/answer.mts
++++ apps/event-schedule-app-shared/src/v4/types/record/answer.mts
+@@ -1,4 +1,5 @@
+-import { DateUtils } from '@noshiro/ts-utils';
++import { DateUtils } from 'ts-fortress-types';
++import { type MergeIntersection, type StrictPick } from 'ts-type-forge';
+ import {
+   ANSWER_KEY_CREATED_AT,
+   createAnswerId,
+@@ -26,7 +27,7 @@ export type Answer = Readonly<{
+ 
+ export type PartialAnswer = Partial<
+   MergeIntersection<
+-    Pick<
++    StrictPick<
+       Answer,
+       'comment' | 'id' | 'isRequiredParticipants' | 'userName' | 'weight'
+     > &
+@@ -48,14 +49,17 @@ export const defaultAnswer = {
+ } as const satisfies Answer;
+ 
+ const d = defaultAnswer;
+-export const fillAnswer = (p?: PartialAnswer): Answer => ({
+-  id: p?.id ?? d.id,
+-  userName: p?.userName ?? d.userName,
+-  comment: p?.comment ?? d.comment,
+-  selection: (p?.selection ?? d.selection).map(fillAnswerSelection),
+-  [ANSWER_KEY_CREATED_AT]:
+-    (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
+-    d[ANSWER_KEY_CREATED_AT],
+-  weight: p?.weight ?? d.weight,
+-  isRequiredParticipants: p?.isRequiredParticipants ?? d.isRequiredParticipants,
+-});
++
++export const fillAnswer = (p?: PartialAnswer): Answer =>
++  ({
++    id: p?.id ?? d.id,
++    userName: p?.userName ?? d.userName,
++    comment: p?.comment ?? d.comment,
++    selection: (p?.selection ?? d.selection).map(fillAnswerSelection),
++    [ANSWER_KEY_CREATED_AT]:
++      (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
++      d[ANSWER_KEY_CREATED_AT],
++    weight: p?.weight ?? d.weight,
++    isRequiredParticipants:
++      p?.isRequiredParticipants ?? d.isRequiredParticipants,
++  }) as const;

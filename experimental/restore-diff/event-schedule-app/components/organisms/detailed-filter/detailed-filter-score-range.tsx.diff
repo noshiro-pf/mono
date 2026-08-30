@@ -1,0 +1,50 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-score-range.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-score-range.tsx
+index 6aea3b98e..089c40f11 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-score-range.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-score-range.tsx
+@@ -1,33 +1,34 @@
+-import { BpRangeSlider, CheckboxView } from '@noshiro/react-blueprintjs-utils';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { BpRangeSlider, CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly } from 'ts-type-forge';
+ import {
+   answersScoreNumericInputConfig,
+   clampAndRoundAnswersScore,
+-} from '../../../constants';
+-import { AnswerFilterAndSortStore } from '../../../store';
+-import { type AnswersScore } from '../../../types';
+-import { ScoreNumericInput } from '../../molecules';
++} from '../../../constants/index.mjs';
++import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
++import { type AnswersScore } from '../../../types/index.mjs';
++import { ScoreNumericInput } from '../../molecules/index.mjs';
+ import {
+   CheckboxWrapper,
+   FilterItem,
+   FilterItemContent,
+   RangeSliderWrapper,
+-} from './styled';
++} from './styled.js';
+ 
+ const dc = dict.answerPage.detailedFilter;
+ 
+ type Props = DeepReadonly<{
+   enabled: boolean;
+-  range: {
+-    min: AnswersScore;
+-    max: AnswersScore;
+-  };
++  range: { min: AnswersScore; max: AnswersScore };
+ }>;
+ 
+ /* スコアで絞り込み */
+ export const DetailedFilterScoreRange = memoNamed<Props>(
+   'DetailedFilterScoreRange',
+   ({ enabled, range }) => {
+-    const sliderStateNormalized = useMemo(
++    const sliderStateNormalized = React.useMemo(
+       () => ({
+         min: clampAndRoundAnswersScore(range.min),
+         max: clampAndRoundAnswersScore(range.max),

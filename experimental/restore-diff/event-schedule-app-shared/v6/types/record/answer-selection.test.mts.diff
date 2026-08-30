@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-selection.test.mts apps/event-schedule-app-shared/src/v6/types/record/answer-selection.test.mts
+index 58e2ee962..fcf094e51 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-selection.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/answer-selection.test.mts
+@@ -6,12 +6,15 @@ import {
+ 
+ describe('isAnswerSelection', () => {
+   test('defaultValue should be true', () => {
+-    expect(isAnswerSelection(answerSelectionDefaultValue)).toBe(true);
++    assert.isTrue(isAnswerSelection(answerSelectionDefaultValue));
+   });
+ });
+ 
+ describe('fillAnswerSelection', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillAnswerSelection({})).toStrictEqual(answerSelectionDefaultValue);
++    assert.deepStrictEqual(
++      fillAnswerSelection({}),
++      answerSelectionDefaultValue,
++    );
+   });
+ });

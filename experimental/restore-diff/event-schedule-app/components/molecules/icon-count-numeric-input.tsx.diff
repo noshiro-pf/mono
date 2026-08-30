@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/icon-count-numeric-input.tsx apps/event-schedule-app/src/components/molecules/icon-count-numeric-input.tsx
+index f13fc188a..13d4f03bf 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/icon-count-numeric-input.tsx
++++ apps/event-schedule-app/src/components/molecules/icon-count-numeric-input.tsx
+@@ -1,9 +1,13 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
++import { type SafeUint } from 'ts-type-forge';
+ import {
+   clampAndRoundNumIcons,
+   iconFilterNumericInputConfig,
+-} from '../../constants';
++} from '../../constants/index.mjs';
+ 
+ type Props = Readonly<{
+   count: SafeUint;
+@@ -15,7 +19,7 @@ type Props = Readonly<{
+ export const IconCountNumericInput = memoNamed<Props>(
+   'IconCountNumericInput',
+   ({ count: valueFromProps, max, disabled = false, onCountChange }) => {
+-    const normalizeValue = useCallback(
++    const normalizeValue = React.useCallback(
+       (value: number): SafeUint => clampAndRoundNumIcons(value, max),
+       [max],
+     );
+@@ -30,13 +34,14 @@ export const IconCountNumericInput = memoNamed<Props>(
+     } = useNumericInputWithStepState<SafeUint>({
+       onValueChange: onCountChange,
+       normalize: normalizeValue,
+-      decode: (s) => normalizeValue(Number(s)),
++      decode: (s) =>
++        normalizeValue(Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN)),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step: iconFilterNumericInputConfig.step,
+     });
+ 
+-    const inputProps = useMemo(
++    const inputProps = React.useMemo(
+       () => ({ min: 0, max, onKeyDown }),
+       [max, onKeyDown],
+     );
+@@ -44,9 +49,9 @@ export const IconCountNumericInput = memoNamed<Props>(
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

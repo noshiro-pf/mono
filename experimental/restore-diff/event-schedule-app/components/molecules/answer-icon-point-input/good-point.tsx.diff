@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/molecules/answer-icon-point-input/good-point.tsx apps/event-schedule-app/src/components/molecules/answer-icon-point-input/good-point.tsx
+index 73e43601e..1dca9de62 100644
+--- experimental/packages/apps/event-schedule-app/src/components/molecules/answer-icon-point-input/good-point.tsx
++++ apps/event-schedule-app/src/components/molecules/answer-icon-point-input/good-point.tsx
+@@ -1,4 +1,6 @@
+-import { defaultIconPoint } from '../../../constants';
++import { css } from '@emotion/react';
++import { memoNamed } from 'react-utils';
++import { defaultIconPoint } from '../../../constants/index.mjs';
+ 
+ const s = defaultIconPoint.good.toString();
+ 

@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/form-label.tsx apps/event-schedule-app/src/components/atoms/form-label.tsx
+index a379f6661..2b5260530 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/form-label.tsx
++++ apps/event-schedule-app/src/components/atoms/form-label.tsx
+@@ -1,3 +1,5 @@
++import styled from '@emotion/styled';
++
+ export const Label = styled.div`
+   color: #757575;
+   font-size: 12px;

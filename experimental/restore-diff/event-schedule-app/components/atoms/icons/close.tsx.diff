@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/icons/close.tsx apps/event-schedule-app/src/components/atoms/icons/close.tsx
+index 61a955eec..aad4b344f 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/icons/close.tsx
++++ apps/event-schedule-app/src/components/atoms/icons/close.tsx
+@@ -1,3 +1,5 @@
++import { memoNamed } from 'react-utils';
++
+ type Props = Readonly<{
+   size?: number;
+   color?: string;

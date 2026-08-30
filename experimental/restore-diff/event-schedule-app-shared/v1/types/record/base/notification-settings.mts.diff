@@ -1,0 +1,40 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/notification-settings.mts apps/event-schedule-app-shared/src/v1/types/record/base/notification-settings.mts
+index 17dc43747..cf7429045 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/notification-settings.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/base/notification-settings.mts
+@@ -23,19 +23,21 @@ export const defaultNotificationSettings = {
+ } as const satisfies NotificationSettings;
+ 
+ const d = defaultNotificationSettings;
++
+ export const fillNotificationSettings = (
+   a?: PartialNotificationSettings,
+-): NotificationSettings => ({
+-  email: a?.email ?? d.email,
+-  notifyOnAnswerChange: a?.notifyOnAnswerChange ?? d.notifyOnAnswerChange,
+-  notify01daysBeforeAnswerDeadline:
+-    a?.notify01daysBeforeAnswerDeadline ?? d.notify01daysBeforeAnswerDeadline,
+-  notify03daysBeforeAnswerDeadline:
+-    a?.notify03daysBeforeAnswerDeadline ?? d.notify03daysBeforeAnswerDeadline,
+-  notify07daysBeforeAnswerDeadline:
+-    a?.notify07daysBeforeAnswerDeadline ?? d.notify07daysBeforeAnswerDeadline,
+-  notify14daysBeforeAnswerDeadline:
+-    a?.notify14daysBeforeAnswerDeadline ?? d.notify14daysBeforeAnswerDeadline,
+-  notify28daysBeforeAnswerDeadline:
+-    a?.notify28daysBeforeAnswerDeadline ?? d.notify28daysBeforeAnswerDeadline,
+-});
++): NotificationSettings =>
++  ({
++    email: a?.email ?? d.email,
++    notifyOnAnswerChange: a?.notifyOnAnswerChange ?? d.notifyOnAnswerChange,
++    notify01daysBeforeAnswerDeadline:
++      a?.notify01daysBeforeAnswerDeadline ?? d.notify01daysBeforeAnswerDeadline,
++    notify03daysBeforeAnswerDeadline:
++      a?.notify03daysBeforeAnswerDeadline ?? d.notify03daysBeforeAnswerDeadline,
++    notify07daysBeforeAnswerDeadline:
++      a?.notify07daysBeforeAnswerDeadline ?? d.notify07daysBeforeAnswerDeadline,
++    notify14daysBeforeAnswerDeadline:
++      a?.notify14daysBeforeAnswerDeadline ?? d.notify14daysBeforeAnswerDeadline,
++    notify28daysBeforeAnswerDeadline:
++      a?.notify28daysBeforeAnswerDeadline ?? d.notify28daysBeforeAnswerDeadline,
++  }) as const;

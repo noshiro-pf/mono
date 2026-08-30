@@ -1,0 +1,138 @@
+diff --git experimental/packages/utils/tiny-router-observable/src/router.mts apps/tiny-router-observable/src/router.mts
+index c9a7b5df0..91a551129 100644
+--- experimental/packages/utils/tiny-router-observable/src/router.mts
++++ apps/tiny-router-observable/src/router.mts
+@@ -1,10 +1,7 @@
+ /* eslint-disable unicorn/prefer-global-this */
+-import {
+-  createState,
+-  map,
+-  type InitializedObservable,
+-} from '@noshiro/syncflow';
+-import { castMutable, pipe } from '@noshiro/ts-utils';
++import { createState, map, type InitializedObservable } from 'synstate';
++import { castMutable, pipe } from 'ts-data-forge';
++import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
+ 
+ /**
+  * @param sortParams - Sort query params by key. Default is true.
+@@ -18,7 +15,7 @@ export type UpdateQueryParamsOptions = Partial<
+ >;
+ 
+ export type ReadonlyURLSearchParams = DeepReadonly<
+-  Omit<URLSearchParams, 'append' | 'delete' | 'set' | 'sort'>
++  StrictOmit<URLSearchParams, 'append' | 'delete' | 'set' | 'sort'>
+ >;
+ 
+ export type RouterState = Readonly<{
+@@ -56,10 +53,10 @@ export type Router = Readonly<{
+ 
+   removeListener: () => void;
+ 
+-  utils: {
++  utils: Readonly<{
+     splitToPathSegments: (pathname: string) => readonly string[];
+     withSlash: (path: string) => string;
+-  };
++  }>;
+ }>;
+ 
+ /**
+@@ -69,9 +66,9 @@ export type Router = Readonly<{
+ export const createRouter = (): Router => {
+   const getCurrentUrl = (): URL => new URL(window.location.href);
+ 
+-  const { state: url$, setState: setUrl } = createState<URL>(getCurrentUrl());
++  const [url$, setUrl] = createState<URL>(getCurrentUrl());
+ 
+-  const state = url$.chain(
++  const state = url$.pipe(
+     map((a) => ({
+       pathname: a.pathname,
+       searchParams: a.searchParams,
+@@ -94,16 +91,17 @@ export const createRouter = (): Router => {
+     const prev = mut_url.searchParams.toString();
+ 
+     const nextSearchParams = pipe(mut_url.searchParams)
+-      .chain(recipe)
+-      .chain(
++      .map(recipe)
++      .map(
+         sortParams
+           ? (a) => {
+               a.sort();
++
+               return a;
+             }
+           : (a) => a,
+       )
+-      .chain((a) => a.toString()).value;
++      .map((a) => a.toString()).value;
+ 
+     if (nextSearchParams === prev) return;
+ 
+@@ -112,10 +110,12 @@ export const createRouter = (): Router => {
+     switch (method) {
+       case 'pushState':
+         push(mut_url.toString());
++
+         break;
+ 
+       case 'replaceState':
+         redirect(mut_url.toString());
++
+         break;
+     }
+   };
+@@ -126,6 +126,7 @@ export const createRouter = (): Router => {
+       '',
+       appendSlash ? withSlash(nextUrl) : nextUrl,
+     );
++
+     updateState();
+   };
+ 
+@@ -135,21 +136,25 @@ export const createRouter = (): Router => {
+       '',
+       appendSlash ? withSlash(nextUrl) : nextUrl,
+     );
++
+     updateState();
+   };
+ 
+   const go = (delta?: number): void => {
+     window.history.go(delta);
++
+     updateState();
+   };
+ 
+   const forward = (): void => {
+     window.history.forward();
++
+     updateState();
+   };
+ 
+   const back = (): void => {
+     window.history.back();
++
+     updateState();
+   };
+ 
+@@ -172,13 +177,11 @@ export const createRouter = (): Router => {
+ };
+ 
+ const withSlash = (path: string): string =>
+-  path.endsWith('/')
++  path.endsWith('/') || path.includes('/?')
+     ? path
+-    : path.includes('/?')
+-      ? path
+-      : path.includes('?')
+-        ? path.split('?').join('/?')
+-        : `${path}/`;
++    : path.includes('?')
++      ? path.replaceAll('?', '/?')
++      : (`${path}/` as const);
+ 
+ const splitToPathSegments = (pathname: string): readonly string[] =>
+   pathname.split('/').filter((s) => s !== '');

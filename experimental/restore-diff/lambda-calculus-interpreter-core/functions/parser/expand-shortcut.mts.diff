@@ -1,0 +1,78 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/expand-shortcut.mts apps/lambda-calculus-interpreter-core/src/functions/parser/expand-shortcut.mts
+index 63fc48daa..e05958c94 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/expand-shortcut.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/expand-shortcut.mts
+@@ -1,38 +1,42 @@
+-import { Num } from '@noshiro/ts-utils';
++import { isSafeUint, Num, Result } from 'ts-data-forge';
+ import { numberLambdaTerm, PLUStokens, SUCCtokens } from './macro/index.mjs';
+ 
+-export const expandShortcuts = (tokens: readonly string[]): string[] => {
++export const expandShortcuts = (
++  tokens: readonly string[],
++): readonly string[] => {
+   const mut_expanded: string[] = [];
++
+   for (const token of tokens) {
+-    const parsedAsNumber = Number.parseInt(token, 10);
+-    if (
+-      !Number.isNaN(parsedAsNumber) &&
+-      Num.isNonNegative(parsedAsNumber) &&
+-      Number.isSafeInteger(parsedAsNumber)
+-    ) {
+-      /* 3 => (lambda s. (lambda z. (s(s(s z))))) */
+-      mut_expanded.push(...numberLambdaTerm(parsedAsNumber));
+-      continue;
+-    }
+-    switch (token) {
+-      case 'SUCC':
+-        mut_expanded.push(...SUCCtokens);
+-        break;
+-
+-      case 'PLUS':
+-      case '+':
+-        mut_expanded.push(...PLUStokens);
+-        break;
+-
+-      case '\\':
+-      case 'λ':
+-        mut_expanded.push('lambda');
+-        break;
+-
+-      default:
+-        mut_expanded.push(token);
+-        break;
+-    }
++    const parsedAsNumber = Result.unwrapOkOr(
++      Num.safeParseInt(token),
++      Number.NaN,
++    );
++
++    /* 3 => (lambda s. (lambda z. (s(s(s z))))) */
++    mut_expanded.push(
++      ...(isSafeUint(parsedAsNumber)
++        ? numberLambdaTerm(parsedAsNumber)
++        : expandToken(token)),
++    );
+   }
++
+   return mut_expanded;
+ };
++
++const expandToken = (token: string): readonly string[] => {
++  switch (token) {
++    case 'SUCC':
++      return SUCCtokens;
++
++    case 'PLUS':
++    case '+':
++      return PLUStokens;
++
++    case '\\':
++    case 'λ':
++      return ['lambda'];
++
++    default:
++      return [token];
++  }
++};

@@ -1,0 +1,33 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-page-event-info.tsx apps/event-schedule-app/src/components/organisms/answer-page-event-info.tsx
+index 34e020f13..fd83f58d6 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-page-event-info.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-page-event-info.tsx
+@@ -1,18 +1,20 @@
+-import { ymdhm2strWithDay } from '../../constants';
+-import { eventIsAfterDeadline } from '../../functions';
+-import { Description } from '../atoms';
+-import { AnswerPageNotes } from './answer-page-notes';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { ymdhm2strWithDay } from '../../constants/index.mjs';
++import { eventIsAfterDeadline } from '../../functions/index.mjs';
++import { Description } from '../atoms/index.mjs';
++import { AnswerPageNotes } from './answer-page-notes.js';
+ 
+ const dc = dict.answerPage;
+ 
+-type Props = Readonly<{
+-  eventSchedule: EventSchedule;
+-}>;
++type Props = Readonly<{ eventSchedule: EventSchedule }>;
+ 
+ export const AnswerPageEventInfo = memoNamed<Props>(
+   'AnswerPageEventInfo',
+   ({ eventSchedule }) => {
+-    const afterDeadline = useMemo(
++    const afterDeadline = React.useMemo(
+       () => eventIsAfterDeadline(eventSchedule),
+       [eventSchedule],
+     );

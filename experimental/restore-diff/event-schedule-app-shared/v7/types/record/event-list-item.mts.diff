@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-list-item.mts apps/event-schedule-app-shared/src/v7/types/record/event-list-item.mts
+index c341dda6f..79f9165a8 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/event-list-item.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/event-list-item.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { answerTypeDef } from './answer.mjs';
+ import { eventScheduleTypeDef } from './event-schedule.mjs';
+ 

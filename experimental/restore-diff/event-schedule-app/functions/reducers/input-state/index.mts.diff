@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/index.ts apps/event-schedule-app/src/functions/reducers/input-state/index.mts
+index 5640544b5..5af45d0f5 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/index.ts
++++ apps/event-schedule-app/src/functions/reducers/input-state/index.mts
+@@ -1,3 +1,3 @@
+-export * from './email-input-state';
+-export * from './input-state';
+-export * from './password-confirmation-input-state';
++export * from './email-input-state.mjs';
++export * from './input-state.mjs';
++export * from './password-confirmation-input-state.mjs';

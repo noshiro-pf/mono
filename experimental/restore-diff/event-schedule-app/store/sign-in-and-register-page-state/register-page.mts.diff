@@ -1,0 +1,184 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/register-page.ts apps/event-schedule-app/src/store/sign-in-and-register-page-state/register-page.mts
+index 826a87ff3..93e519c5b 100644
+--- experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/register-page.ts
++++ apps/event-schedule-app/src/store/sign-in-and-register-page-state/register-page.mts
+@@ -1,37 +1,40 @@
+-import { api } from '../../api';
+-import { Routes } from '../../constants';
++import { type InitializedObservable, combine, map } from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Optional, Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { Routes } from '../../constants/index.mjs';
+ import {
+   createToaster,
+   registerPageHasError,
+   registerPageInitialState,
+   registerPageStateReducer,
+   showToast,
+-} from '../../functions';
+-import { Router } from '../router';
+-import { GoogleSignInStore } from './google-sign-in-state';
++} from '../../functions/index.mjs';
++import { Router } from '../router.mjs';
++import { GoogleSignInStore } from './google-sign-in-state.mjs';
+ 
+ const dc = dict.register;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   registerPageStateReducer,
+   registerPageInitialState,
+ );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || registerPageHasError(st)),
+ );
+ 
+-const usernameFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const usernameFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.username.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) =>
+     st.password.password.error === undefined &&
+     st.password.passwordConfirmation.error === undefined
+@@ -40,11 +43,14 @@ const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
+   ),
+ );
+ 
+-const {
+-  state: passwordIsOpen$,
+-  setFalse: hidePassword,
+-  toggle: togglePasswordLock,
+-} = createBooleanState(false);
++const [
++  ,
++  {
++    state: passwordIsOpen$,
++    setFalse: hidePassword,
++    toggle: togglePasswordLock,
++  },
++] = createBooleanState(false);
+ 
+ const state = combine([
+   formState$,
+@@ -53,7 +59,7 @@ const state = combine([
+   emailFormIntent$,
+   passwordFormIntent$,
+   passwordIsOpen$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       formState,
+@@ -90,6 +96,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           type: 'setEmailError',
+           payload: dc.message.error.invalidEmail,
+         });
++
+         return;
+ 
+       case 'auth/email-already-in-use':
+@@ -97,6 +104,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           type: 'setEmailError',
+           payload: dc.message.error.emailAlreadyInUse,
+         });
++
+         return;
+ 
+       case 'auth/weak-password':
+@@ -120,6 +128,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           message: dc.message.error.unknownErrorOnRegister,
+           intent: 'danger',
+         });
++
+         return;
+     }
+   }
+@@ -134,20 +143,18 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+   if (Result.isErr(updateProfileResult)) {
+     // TODO: use toast
+     console.error(updateProfileResult.value);
++
+     dispatch({
+       type: 'setUsernameError',
+       payload: updateProfileResult.value.message,
+     });
++
+     return;
+   }
+ 
+   dispatch({ type: 'done' });
+ 
+-  showToast({
+-    toast,
+-    message: dc.message.success.register,
+-    intent: 'success',
+-  });
++  showToast({ toast, message: dc.message.success.register, intent: 'success' });
+ 
+   if (pageToBack !== undefined) {
+     Router.redirect(pageToBack);
+@@ -157,31 +164,19 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+ };
+ 
+ const inputUsernameHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputUsername',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputUsername', payload: value });
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputEmail',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputEmail', payload: value });
+ };
+ 
+ const inputPasswordHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputPassword',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputPassword', payload: value });
+ };
+ 
+ const inputPasswordConfirmationHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputPasswordConfirmation',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputPasswordConfirmation', payload: value });
+ };
+ 
+ const enterClickHandler = (): void => {
+@@ -192,11 +187,14 @@ const enterClickHandler = (): void => {
+     return;
+ 
+   // TODO: use toast
+-  submit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(console.error);
++  submit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(
++    console.error,
++  );
+ };
+ 
+ const resetAllState = (): void => {
+   dispatch({ type: 'reset' });
++
+   hidePassword();
+ };
+ 

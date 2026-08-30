@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/index.ts apps/event-schedule-app/src/components/organisms/select-datetimes/index.mts
+index 5a3aea7b8..f662e3ad8 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/index.ts
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/index.mts
+@@ -1,2 +1,2 @@
+-export * from './select-datetimes';
+-export * from './set-times-popover';
++export * from './select-datetimes/index.mjs';
++export * from './set-times-popover/index.mjs';

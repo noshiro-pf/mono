@@ -1,0 +1,22 @@
+diff --git experimental/packages/utils/react-utils-styled/src/centering-wrapper.tsx apps/react-utils-styled/src/centering-wrapper.tsx
+index c77c9e980..4485e132d 100644
+--- experimental/packages/utils/react-utils-styled/src/centering-wrapper.tsx
++++ apps/react-utils-styled/src/centering-wrapper.tsx
+@@ -1,6 +1,6 @@
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useMemo } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
+ 
+ type Props = Readonly<{
+   direction: 'column' | 'row';
+@@ -9,7 +9,7 @@ type Props = Readonly<{
+ export const CenteringWrapper = memoNamed<Props>(
+   'CenteringWrapper',
+   (props) => {
+-    const style = useMemo(
++    const style = React.useMemo(
+       () => ({ flexDirection: props.direction }),
+       [props.direction],
+     );

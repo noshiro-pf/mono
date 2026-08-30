@@ -1,0 +1,44 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/token-list-is-lambda-term.mts apps/lambda-calculus-interpreter-core/src/functions/parser/token-list-is-lambda-term.mts
+index b3d7ed2dc..274cc2452 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/parser/token-list-is-lambda-term.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/parser/token-list-is-lambda-term.mts
+@@ -1,4 +1,4 @@
+-import { Arr, range, toUint32, Uint32 } from '@noshiro/ts-utils';
++import { Arr, asUint32, Optional, range, Uint32 } from 'ts-data-forge';
+ import { isVariable } from '../is-variable.mjs';
+ 
+ export const tokensRepresentsLambdaTerm = (
+@@ -8,7 +8,7 @@ export const tokensRepresentsLambdaTerm = (
+   if (tokens.length < 1) return false;
+ 
+   /* x? */
+-  if (tokens.length === 1) return isVariable(tokens[0]);
++  if (Arr.isFixedLengthArray(1, tokens)) return isVariable(tokens[0]);
+ 
+   /* (lambda x.e)? */
+   if (
+@@ -17,19 +17,20 @@ export const tokensRepresentsLambdaTerm = (
+     isVariable(tokens[2]) &&
+     tokens[3] === '.' &&
+     tokensRepresentsLambdaTerm(tokens.slice(4, -1)) &&
+-    Arr.last(tokens) === ')'
++    Optional.toNullable(Arr.last(tokens)) === ')'
+   )
+     return true;
+ 
+   /* (e e)? */
+-  if (tokens[0] === '(' && Arr.last(tokens) === ')') {
++  if (tokens[0] === '(' && Optional.toNullable(Arr.last(tokens)) === ')') {
+     for (const sep of range(1, Uint32.sub(Arr.length(tokens), 1))) {
+       if (
+-        tokensRepresentsLambdaTerm(tokens.slice(1, toUint32(sep))) &&
+-        tokensRepresentsLambdaTerm(tokens.slice(toUint32(sep), -1))
++        tokensRepresentsLambdaTerm(tokens.slice(1, asUint32(sep))) &&
++        tokensRepresentsLambdaTerm(tokens.slice(asUint32(sep), -1))
+       )
+         return true;
+     }
++
+     return false;
+   }
+ 

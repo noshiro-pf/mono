@@ -1,0 +1,17 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/use-alive.mts apps/react-utils/src/hooks/use-alive.mts
+index 71bde17b6..ec79baf27 100644
+--- experimental/packages/utils/react-utils/src/hooks/use-alive.mts
++++ apps/react-utils/src/hooks/use-alive.mts
+@@ -1,10 +1,10 @@
+ import { useBoolState } from 'better-react-use-state';
+-import { useEffect } from 'react';
++import * as React from 'react';
+ 
+ export const useAlive = (): Readonly<{ current: boolean }> => {
+   const [alive, { setFalse: kill }] = useBoolState(true);
+ 
+-  useEffect(() => kill, [kill]);
++  React.useEffect(() => kill, [kill]);
+ 
+   return { current: alive };
+ };

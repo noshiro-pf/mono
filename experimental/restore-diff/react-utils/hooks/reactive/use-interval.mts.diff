@@ -1,0 +1,35 @@
+diff --git experimental/packages/utils/react-utils/src/hooks/reactive/use-interval.mts apps/react-utils/src/hooks/reactive/use-interval.mts
+index 7bb19ae43..5c33da95c 100644
+--- experimental/packages/utils/react-utils/src/hooks/reactive/use-interval.mts
++++ apps/react-utils/src/hooks/reactive/use-interval.mts
+@@ -1,14 +1,19 @@
+ import { useState } from 'better-react-use-state';
+-import { useEffect } from 'react';
++import * as React from 'react';
++
++/** What `setTimeout` returns and `clearTimeout` takes; a global in the old
++ * `@noshiro/ts-type-utils`, and right under both Node and the browser here. */
++type TimerId = Parameters<typeof clearTimeout>[0];
+ 
+ export const useInterval = (
+   milliSec: number,
+   delayMilliSec: number = 0,
+ ): number => {
+-  const [counter, _, { updateState: updateCounter }] = useState<number>(0);
++  const [counter, _, { updateState: updateCounter }] = useState(0);
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     let mut_intervalTimer: TimerId | undefined = undefined;
++
+     const delayTimer = setTimeout(() => {
+       mut_intervalTimer = setInterval(() => {
+         updateCounter((i) => i + 1);
+@@ -19,6 +24,7 @@ export const useInterval = (
+       if (mut_intervalTimer !== undefined) {
+         clearInterval(mut_intervalTimer);
+       }
++
+       clearInterval(delayTimer);
+     };
+     // eslint-disable-next-line react-hooks/exhaustive-deps

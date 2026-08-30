@@ -1,0 +1,17 @@
+diff --git apps/react-utils/src/utils/promise-state.mts apps/react-utils/src/utils/promise-state.mts
+new file mode 100644
+index 000000000..6af0f4c94
+--- /dev/null
++++ apps/react-utils/src/utils/promise-state.mts
+@@ -0,0 +1,11 @@
++/**
++ * A promise's progress as a value: pending, rejected, or resolved.
++ *
++ * Ported from `@noshiro/ts-utils-additional`; `ts-data-forge` has `Result`, but
++ * nothing that carries the pending case.
++ */
++export type PromiseState<P, E, S> = Readonly<
++  | { status: 'pending'; value: P }
++  | { status: 'error'; value: E }
++  | { status: 'success'; value: S }
++>;

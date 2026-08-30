@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/reset-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/reset-button.tsx
+index 6ca54697b..cb1d86493 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/reset-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/reset-button.tsx
+@@ -1,15 +1,11 @@
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { memoNamed } from 'react-utils';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.eventSettingsPage.resetButton;
+ 
+-type Props = Readonly<{
+-  onConfirmClick: () => void;
+-  disabled?: boolean;
+-}>;
++type Props = Readonly<{ onConfirmClick: () => void; disabled?: boolean }>;
+ 
+-const buttonConfig = {
+-  name: dc.name,
+-} as const;
++const buttonConfig = { name: dc.name } as const;
+ 
+ const dialogConfig = {
+   intent: 'danger',

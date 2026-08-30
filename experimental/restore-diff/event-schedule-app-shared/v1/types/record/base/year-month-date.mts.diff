@@ -1,0 +1,70 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/year-month-date.mts apps/event-schedule-app-shared/src/v1/types/record/base/year-month-date.mts
+index 8ab7e8a0a..d0a9ef3af 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v1/types/record/base/year-month-date.mts
++++ apps/event-schedule-app-shared/src/v1/types/record/base/year-month-date.mts
+@@ -1,7 +1,9 @@
+-import { DateUtils, Num, pipe, type DateType } from '@noshiro/ts-utils';
++import { pipe } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type DateEnum, type MonthEnum, type SafeUint } from 'ts-type-forge';
+ 
+ export type YearMonthDate = Readonly<{
+-  year: YearEnum;
++  year: SafeUint;
+   month: MonthEnum;
+   date: DateEnum;
+ }>;
+@@ -9,30 +11,33 @@ export type YearMonthDate = Readonly<{
+ export type PartialYearMonthDate = Partial<YearMonthDate>;
+ 
+ export const defaultYearMonthDate = {
+-  year: pipe(DateUtils.today()).chain(DateUtils.getLocaleYear).value,
+-  month: pipe(DateUtils.today()).chain(DateUtils.getLocaleMonth).value,
+-  date: pipe(DateUtils.today()).chain(DateUtils.getLocaleDate).value,
++  year: pipe(DateUtils.today()).map(DateUtils.getLocaleYear).value,
++  month: pipe(DateUtils.today()).map(DateUtils.getLocaleMonth).value,
++  date: pipe(DateUtils.today()).map(DateUtils.getLocaleDate).value,
+ } as const satisfies YearMonthDate;
+ 
+ const d = defaultYearMonthDate;
+-export const fillYearMonthDate = (a?: PartialYearMonthDate): YearMonthDate => ({
+-  year: a?.year ?? d.year,
+-  month: a?.month ?? d.month,
+-  date: a?.date ?? d.date,
+-});
+-
+-export const ymdFromDate = (date: DateType): YearMonthDate => ({
+-  year: DateUtils.getLocaleYear(date),
+-  month: DateUtils.getLocaleMonth(date),
+-  date: DateUtils.getLocaleDate(date),
+-});
++
++export const fillYearMonthDate = (a?: PartialYearMonthDate): YearMonthDate =>
++  ({
++    year: a?.year ?? d.year,
++    month: a?.month ?? d.month,
++    date: a?.date ?? d.date,
++  }) as const;
++
++export const ymdFromDate = (date: Date): YearMonthDate =>
++  ({
++    year: DateUtils.getLocaleYear(date),
++    month: DateUtils.getLocaleMonth(date),
++    date: DateUtils.getLocaleDate(date),
++  }) as const;
+ 
+ export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
+-  if (a.year !== b.year)
+-    return Num.mapNaN2Undefined(Math.sign(a.year - b.year)) ?? 0;
+-  if (a.month !== b.month)
+-    return Num.mapNaN2Undefined(Math.sign(a.month - b.month)) ?? 0;
+-  if (a.date !== b.date)
+-    return Num.mapNaN2Undefined(Math.sign(a.date - b.date)) ?? 0;
++  if (a.year !== b.year) return a.year < b.year ? -1 : 1;
++
++  if (a.month !== b.month) return a.month < b.month ? -1 : 1;
++
++  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
++
+   return 0;
+ };

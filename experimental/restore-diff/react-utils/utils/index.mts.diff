@@ -1,0 +1,8 @@
+diff --git apps/react-utils/src/utils/index.mts apps/react-utils/src/utils/index.mts
+new file mode 100644
+index 000000000..f46c71d10
+--- /dev/null
++++ apps/react-utils/src/utils/index.mts
+@@ -0,0 +1,2 @@
++export * from './get-platform.mjs';
++export * from './promise-state.mjs';

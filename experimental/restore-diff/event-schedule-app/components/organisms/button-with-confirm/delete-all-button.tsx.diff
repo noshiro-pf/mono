@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-all-button.tsx apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-all-button.tsx
+index 30d5381da..f4c274426 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-all-button.tsx
++++ apps/event-schedule-app/src/components/organisms/button-with-confirm/delete-all-button.tsx
+@@ -1,10 +1,9 @@
+-import { ButtonWithConfirm } from './button-with-confirm';
++import { memoNamed } from 'react-utils';
++import { ButtonWithConfirm } from './button-with-confirm.js';
+ 
+ const dc = dict.eventSettingsPage.section2;
+ 
+-type Props = Readonly<{
+-  onConfirmDeleteAll: () => void;
+-}>;
++type Props = Readonly<{ onConfirmDeleteAll: () => void }>;
+ 
+ const buttonConfig = {
+   name: dc.removeAllDates,

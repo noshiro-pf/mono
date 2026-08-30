@@ -1,0 +1,103 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-date-picker.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-date-picker.tsx
+index 640ec66a5..b03e014fb 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-date-picker.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-date-picker.tsx
+@@ -1,18 +1,13 @@
+ import { type HTMLInputProps, type InputGroupProps } from '@blueprintjs/core';
+-import { type DatePickerShortcut } from '@blueprintjs/datetime';
+-import { DateInput3 } from '@blueprintjs/datetime2';
+-import { type YearMonthDate } from '@noshiro/io-ts-types';
+-import { memoNamed } from '@noshiro/react-utils';
+-import {
+-  DateUtils,
+-  castMutable,
+-  mapOptional,
+-  pipe,
+-  toSafeUint,
+-} from '@noshiro/ts-utils';
+-import { useCallback, useMemo } from 'react';
++import { DateInput, type DatePickerShortcut } from '@blueprintjs/datetime';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { asSafeUint, castMutable, pipe } from 'ts-data-forge';
++import { DateUtils, type YearMonthDate } from 'ts-fortress-types';
++import { type SafeUint, type StrictOmit } from 'ts-type-forge';
++import { mapOptional } from '../../utils/index.mjs';
+ 
+-export type BpDatePickerProps = Omit<
++export type BpDatePickerProps = StrictOmit<
+   DateInputPropsOriginal,
+   'formatDate' | 'parseDate' | 'shortcuts' | 'timePrecision'
+ > &
+@@ -22,7 +17,7 @@ export type BpDatePickerProps = Omit<
+     shortcuts?: boolean | readonly DatePickerShortcut[];
+   }>;
+ 
+-type DateInputPropsOriginal = React.ComponentProps<typeof DateInput3>;
++type DateInputPropsOriginal = React.ComponentProps<typeof DateInput>;
+ 
+ export const BpDatePicker = memoNamed<BpDatePickerProps>(
+   'BpDatePicker',
+@@ -37,14 +32,18 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
+     maxDate = tenYearsLater,
+     ...props
+   }) => {
+-    const onChangeHandler = useCallback(
++    const onChangeHandler = React.useCallback(
+       (dateStr: string | null, isUserChange?: boolean) => {
+         if (dateStr == null) {
+           onYmdChange(undefined);
++
+           return;
+         }
++
+         if (isUserChange !== true) return;
++
+         const dt = decodeDate(dateStr);
++
+         onYmdChange({
+           year: DateUtils.getLocaleYear(dt),
+           month: DateUtils.getLocaleMonth(dt),
+@@ -54,7 +53,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
+       [onYmdChange],
+     );
+ 
+-    const date = useMemo<string | undefined>(
++    const date = React.useMemo<string | undefined>(
+       () =>
+         mapOptional(ymd, (a) =>
+           DateUtils.from(
+@@ -65,7 +64,7 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
+     );
+ 
+     return (
+-      <DateInput3
++      <DateInput
+         // eslint-disable-next-line react/jsx-props-no-spreading
+         {...props}
+         canClearSelection={canClearSelection}
+@@ -85,18 +84,16 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
+   },
+ );
+ 
+-const encodeDate = (date: RawDateType): string => date.toLocaleDateString();
++const encodeDate = (date: Date): string => date.toLocaleDateString();
+ 
+-const decodeDate = (str: string): RawDateType =>
+-  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
++const decodeDate = (str: string): Date =>
++  pipe(DateUtils.from(str)).map(DateUtils.toDate).value;
+ 
+ const inputProps: HTMLInputProps & InputGroupProps = {
+   style: { width: '90px' },
+ } as const;
+ 
+ const tenYearsLater = pipe(DateUtils.today())
+-  .chain(
+-    DateUtils.updateLocaleYear((y) => toSafeUint(y + 99) satisfies YearEnum),
+-  )
+-  .chain(DateUtils.setLocaleMonth(12))
+-  .chain(DateUtils.toDate).value;
++  .map(DateUtils.updateLocaleYear((y) => asSafeUint(y + 99) satisfies SafeUint))
++  .map(DateUtils.setLocaleMonth(12))
++  .map(DateUtils.toDate).value;

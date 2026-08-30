@@ -1,0 +1,45 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.test.mts apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.test.mts
+index a311e7297..c97e7b08e 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.test.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/year-month-date.test.mts
+@@ -1,4 +1,5 @@
+-import { expectType } from '@noshiro/ts-utils';
++import { expectType } from 'ts-data-forge';
++import { type DateEnum, type MonthEnum, type SafeUint } from 'ts-type-forge';
+ import { toYears } from '../../enum/index.mjs';
+ import {
+   fillYearMonthDate,
+@@ -11,7 +12,7 @@ describe('YearMonthDate', () => {
+   expectType<
+     YearMonthDate,
+     Readonly<{
+-      year: YearEnum;
++      year: SafeUint;
+       month: MonthEnum;
+       date: DateEnum;
+     }>
+@@ -22,19 +23,20 @@ describe('YearMonthDate', () => {
+       year: toYears(1900),
+       month: 1,
+       date: 1,
+-    };
+-    expect(yearMonthDateDefaultValue).toStrictEqual(defaultValue);
++    } as const;
++
++    assert.deepStrictEqual(yearMonthDateDefaultValue, defaultValue);
+   });
+ 
+   describe('isYearMonthDate', () => {
+     test('defaultValue should be true', () => {
+-      expect(isYearMonthDate(yearMonthDateDefaultValue)).toBe(true);
++      assert.isTrue(isYearMonthDate(yearMonthDateDefaultValue));
+     });
+   });
+ 
+   describe('fillYearMonthDate', () => {
+     test('defaultValue should be true', () => {
+-      expect(fillYearMonthDate({})).toStrictEqual(yearMonthDateDefaultValue);
++      assert.deepStrictEqual(fillYearMonthDate({}), yearMonthDateDefaultValue);
+     });
+   });
+ });

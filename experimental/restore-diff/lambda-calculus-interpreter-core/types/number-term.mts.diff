@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/types/number-term.mts apps/lambda-calculus-interpreter-core/src/types/number-term.mts
+index d6f57b7a9..d4397497a 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/types/number-term.mts
++++ apps/lambda-calculus-interpreter-core/src/types/number-term.mts
+@@ -7,5 +7,4 @@ export type NumberTerm<S extends Variable, Z extends Variable> = readonly [
+ ];
+ 
+ export type NumberTermBody<S extends Variable, Z extends Variable> =
+-  | Z
+-  | readonly [S, NumberTermBody<S, Z>];
++  Z | readonly [S, NumberTermBody<S, Z>];

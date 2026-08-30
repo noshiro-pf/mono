@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/poll-discord-app/src/index.mts apps/poll-discord-app/src/index.mts
+index 532139c9f..2ac7cf195 100644
+--- experimental/packages/apps/poll-discord-app/src/index.mts
++++ apps/poll-discord-app/src/index.mts
+@@ -1,13 +1,10 @@
+ #!/usr/bin/env node
+-
+-/// <reference path="./globals.d.ts" />
++import { Result } from 'ts-data-forge';
+ 
+ import { main } from './main.mjs';
+ 
+-main()
+-  .then((res) => {
+-    if (Result.isErr(res)) {
+-      process.exit(1);
+-    }
+-  })
+-  .catch(() => undefined);
++const result = await main();
++
++if (Result.isErr(result)) {
++  process.exit(1);
++}

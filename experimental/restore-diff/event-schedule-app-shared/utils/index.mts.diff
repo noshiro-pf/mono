@@ -1,0 +1,7 @@
+diff --git apps/event-schedule-app-shared/src/utils/index.mts apps/event-schedule-app-shared/src/utils/index.mts
+new file mode 100644
+index 000000000..5b6b2ea7e
+--- /dev/null
++++ apps/event-schedule-app-shared/src/utils/index.mts
+@@ -0,0 +1 @@
++export * from './has-key-value.mjs';

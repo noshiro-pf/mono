@@ -1,0 +1,463 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-sort-state.ts apps/event-schedule-app/src/store/answer-page-state/answer-filter-sort-state.mts
+index f8410230f..6410d7aee 100644
+--- experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-sort-state.ts
++++ apps/event-schedule-app/src/store/answer-page-state/answer-filter-sort-state.mts
+@@ -1,25 +1,43 @@
+ import { type TagProps } from '@blueprintjs/core';
+-import { deepEqual } from '@noshiro/fast-deep-equal';
+-import { AnswerFilterState } from '../../functions';
++import {
++  type InitializedObservable,
++  combine,
++  createState,
++  filter,
++  map,
++  skipIfNoChange,
++} from 'synstate';
++import { createReducer } from 'synstate-react-hooks';
++import {
++  Arr,
++  Optional,
++  asSafeUint,
++  expectType,
++  fastDeepEqual,
++  isNotUndefined,
++} from 'ts-data-forge';
++import {
++  type DeepReadonly,
++  type ReadonlyRecord,
++  type SafeUint,
++} from 'ts-type-forge';
++import { AnswerFilterState } from '../../functions/index.mjs';
+ import {
+   type AnswerRank,
+   type AnswersScore,
+   type DetailedFilterIcon,
+-} from '../../types';
+-import { AnswersStore, eventSchedule$ } from '../fetching-state';
+-import { AnswerFilterQueryParam } from './answer-filter-query-param';
+-
+-const {
+-  state: sortKeyAndOrder$,
+-  setState: setSortOrderAndKey,
+-  resetState: resetSortOrderAndKey_,
+-} = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
+-
+-const {
+-  useCurrentValue: useFilterState,
+-  state: filterState$,
+-  dispatch: filterStateDispatch,
+-} = createReducer(AnswerFilterState.reducer, AnswerFilterState.initialState);
++} from '../../types/index.mjs';
++import { AnswersStore, eventSchedule$ } from '../fetching-state/index.mjs';
++import { AnswerFilterQueryParam } from './answer-filter-query-param.mjs';
++
++const [
++  sortKeyAndOrder$,
++  setSortOrderAndKey,
++  { resetState: resetSortOrderAndKey_ },
++] = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
++
++const [useFilterState, filterStateDispatch, { state: filterState$ }] =
++  createReducer(AnswerFilterState.reducer, AnswerFilterState.initialState);
+ 
+ const resetSortOrderAndKey = (): void => {
+   AnswerFilterQueryParam.saveSortStateToQueryParams(resetSortOrderAndKey_());
+@@ -47,10 +65,7 @@ const disableFilteringByIcon = (iconId: DetailedFilterIcon): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+       type: 'icon',
+-      action: {
+-        type: 'disableFiltering',
+-        iconId,
+-      },
++      action: { type: 'disableFiltering', iconId },
+     }),
+   );
+ };
+@@ -59,10 +74,7 @@ const enableFilteringByIcon = (iconId: DetailedFilterIcon): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+       type: 'icon',
+-      action: {
+-        type: 'enableFiltering',
+-        iconId,
+-      },
++      action: { type: 'enableFiltering', iconId },
+     }),
+   );
+ };
+@@ -74,11 +86,7 @@ const setMinCountOfIcon = (
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+       type: 'icon',
+-      action: {
+-        type: 'setMin',
+-        iconId,
+-        value,
+-      },
++      action: { type: 'setMin', iconId, value },
+     }),
+   );
+ };
+@@ -90,11 +98,7 @@ const setMaxCountOfIcon = (
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+       type: 'icon',
+-      action: {
+-        type: 'setMax',
+-        iconId,
+-        value,
+-      },
++      action: { type: 'setMax', iconId, value },
+     }),
+   );
+ };
+@@ -102,15 +106,19 @@ const setMaxCountOfIcon = (
+ const setMinCountOfGoodIcon = (value: SafeUint): void => {
+   setMinCountOfIcon('good', value);
+ };
++
+ const setMinCountOfFairIcon = (value: SafeUint): void => {
+   setMinCountOfIcon('fair', value);
+ };
++
+ const setMinCountOfPoorIcon = (value: SafeUint): void => {
+   setMinCountOfIcon('poor', value);
+ };
++
+ const setGoodPlusFairMin = (value: SafeUint): void => {
+   setMinCountOfIcon('goodPlusFair', value);
+ };
++
+ const setFairPlusPoorMin = (value: SafeUint): void => {
+   setMinCountOfIcon('fairPlusPoor', value);
+ };
+@@ -118,15 +126,19 @@ const setFairPlusPoorMin = (value: SafeUint): void => {
+ const setMaxCountOfGoodIcon = (value: SafeUint): void => {
+   setMaxCountOfIcon('good', value);
+ };
++
+ const setMaxCountOfFairIcon = (value: SafeUint): void => {
+   setMaxCountOfIcon('fair', value);
+ };
++
+ const setMaxCountOfPoorIcon = (value: SafeUint): void => {
+   setMaxCountOfIcon('poor', value);
+ };
++
+ const setGoodPlusFairMax = (value: SafeUint): void => {
+   setMaxCountOfIcon('goodPlusFair', value);
+ };
++
+ const setFairPlusPoorMax = (value: SafeUint): void => {
+   setMaxCountOfIcon('fairPlusPoor', value);
+ };
+@@ -138,6 +150,7 @@ const setEnabledFilteringByGoodIcon = (value: boolean): void => {
+     disableFilteringByIcon('good');
+   }
+ };
++
+ const setEnabledFilteringByFairIcon = (value: boolean): void => {
+   if (value) {
+     enableFilteringByIcon('fair');
+@@ -145,6 +158,7 @@ const setEnabledFilteringByFairIcon = (value: boolean): void => {
+     disableFilteringByIcon('fair');
+   }
+ };
++
+ const setEnabledFilteringByPoorIcon = (value: boolean): void => {
+   if (value) {
+     enableFilteringByIcon('poor');
+@@ -152,6 +166,7 @@ const setEnabledFilteringByPoorIcon = (value: boolean): void => {
+     disableFilteringByIcon('poor');
+   }
+ };
++
+ const setEnabledFilteringByGoodPlusFair = (value: boolean): void => {
+   if (value) {
+     enableFilteringByIcon('goodPlusFair');
+@@ -159,6 +174,7 @@ const setEnabledFilteringByGoodPlusFair = (value: boolean): void => {
+     disableFilteringByIcon('goodPlusFair');
+   }
+ };
++
+ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
+   if (value) {
+     enableFilteringByIcon('fairPlusPoor');
+@@ -168,12 +184,14 @@ const setEnabledFilteringByFairPlusPoor = (value: boolean): void => {
+ };
+ 
+ const displayOnlyCandidateDatesWithZeroPoorIcon = (): void => {
+-  setMaxCountOfPoorIcon(toSafeUint(0));
++  setMaxCountOfPoorIcon(asSafeUint(0));
++
+   setEnabledFilteringByPoorIcon(true);
+ };
+ 
+ const displayOnlyCandidateDatesOfRank1to3 = (): void => {
+   setRank(3);
++
+   setEnabledFilteringByRank(true);
+ };
+ 
+@@ -182,16 +200,13 @@ const iconOfSpecifiedRespondentCheckState$: InitializedObservable<
+     {
+       key: string;
+       username: string;
+-      checkState: Record<
++      checkState: ReadonlyRecord<
+         AnswerIconIdWithNone,
+-        {
+-          checked: boolean;
+-          onCheck: (value: boolean) => void;
+-        }
++        { checked: boolean; onCheck: (value: boolean) => void }
+       >;
+     }[]
+   >
+-> = combine([AnswersStore.answers$, filterState$]).chain(
++> = combine([AnswersStore.answers$, filterState$]).pipe(
+   map(
+     ([answers, filterState]) =>
+       answers?.map((ans) => ({
+@@ -260,13 +275,10 @@ const respondentCheckState$: InitializedObservable<
+     {
+       key: string;
+       username: string;
+-      checkState: {
+-        checked: boolean;
+-        onCheck: (value: boolean) => void;
+-      };
++      checkState: { checked: boolean; onCheck: (value: boolean) => void };
+     }[]
+   >
+-> = combine([AnswersStore.answers$, filterState$]).chain(
++> = combine([AnswersStore.answers$, filterState$]).pipe(
+   map(
+     ([answers, filterState]) =>
+       answers?.map((ans) => ({
+@@ -290,10 +302,7 @@ const setOnlyFilledDate = (checked: boolean): void => {
+ 
+ const setEnabledFilteringByRank = (value: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+-    filterStateDispatch({
+-      type: 'set-enabled-filtering-by-rank',
+-      value,
+-    }),
++    filterStateDispatch({ type: 'set-enabled-filtering-by-rank', value }),
+   );
+ };
+ 
+@@ -305,10 +314,7 @@ const setRank = (rank: AnswerRank): void => {
+ 
+ const setEnabledFilteringByScoreRange = (value: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+-    filterStateDispatch({
+-      type: 'set-enabled-filtering-by-scoreRange',
+-      value,
+-    }),
++    filterStateDispatch({ type: 'set-enabled-filtering-by-scoreRange', value }),
+   );
+ };
+ 
+@@ -353,6 +359,7 @@ const setSundayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setMondayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -361,6 +368,7 @@ const setMondayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setTuesdayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -369,6 +377,7 @@ const setTuesdayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setWednesdayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -377,6 +386,7 @@ const setWednesdayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setThursdayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -385,6 +395,7 @@ const setThursdayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setFridayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -393,6 +404,7 @@ const setFridayCheck = (checked: boolean): void => {
+     }),
+   );
+ };
++
+ const setSaturdayCheck = (checked: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+     filterStateDispatch({
+@@ -432,10 +444,7 @@ const setEnabledFilteringByIconOfSpecifiedRespondent = (
+ 
+ const setEnabledFilteringByRespondent = (value: boolean): void => {
+   AnswerFilterQueryParam.saveFilterStateToQueryParams(
+-    filterStateDispatch({
+-      type: 'set-enabled-filtering-by-respondent',
+-      value,
+-    }),
++    filterStateDispatch({ type: 'set-enabled-filtering-by-respondent', value }),
+   );
+ };
+ 
+@@ -455,11 +464,7 @@ const setIconOfSpecifiedRespondentCheckState = (
+ 
+ const setRespondentCheckState = (username: UserName, value: boolean): void => {
+   // don't call AnswerFilterQueryParam.saveFilterStateToQueryParams
+-  filterStateDispatch({
+-    type: 'set-respondent',
+-    value,
+-    username,
+-  });
++  filterStateDispatch({ type: 'set-respondent', value, username });
+ };
+ 
+ const restoreFromQueryParams = (): void => {
+@@ -473,9 +478,17 @@ const restoreFromQueryParams = (): void => {
+ 
+ const dc = dict.answerPage.answers.tagInput;
+ 
+-const tags$: InitializedObservable<
+-  DeepReadonly<{ value: string; props: TagProps }[]>
+-> = combine([sortKeyAndOrder$, filterState$]).chain(
++/**
++ * Named rather than written inline: `DeepReadonly` over Blueprint's `TagProps`
++ * expands into something the checker cannot carry through the operators
++ * downstream (TS2589).
++ */
++type FilterTag = Readonly<{ value: string; props: TagProps }>;
++
++const tags$: InitializedObservable<readonly FilterTag[]> = combine([
++  sortKeyAndOrder$,
++  filterState$,
++]).pipe(
+   map(
+     ([
+       sortKeyAndOrder,
+@@ -496,15 +509,12 @@ const tags$: InitializedObservable<
+       return [
+         {
+           value: dc.sort(...sortKeyAndOrder),
+-          props: {
+-            intent: 'success' as const,
+-            onRemove: resetSortOrderAndKey,
+-          },
++          props: { intent: 'success' as const, onRemove: resetSortOrderAndKey },
+         },
+ 
+         dateRange.enabled &&
+-        isNotUndefined(dateRange.value.start) &&
+-        isNotUndefined(dateRange.value.end)
++        dateRange.value.start !== undefined &&
++        dateRange.value.end !== undefined
+           ? {
+               value: dc.dateRange(dateRange.value.start, dateRange.value.end),
+               props: {
+@@ -654,19 +664,22 @@ const tags$: InitializedObservable<
+   ),
+ );
+ 
+-const tagValues$: InitializedObservable<readonly string[]> = tags$.chain(
++const tagValues$: InitializedObservable<readonly string[]> = tags$.pipe(
+   map((tags) => tags.map((t) => t.value)),
+ );
+ 
+-const tagProps$: InitializedObservable<
+-  (
+-    value: DeepReadonly<React.ReactNode>,
+-    index: number,
+-  ) => DeepReadonly<TagProps>
+-> = tags$.chain(
++// `DeepReadonly` over `ReactNode` and Blueprint's `TagProps` expands into
++// something the checker gives up on (TS2589) once it goes through an operator.
++// Blueprint takes these props as they are, so `Readonly` is what they need.
++type TagPropsGetter = (
++  value: React.ReactNode,
++  index: number,
++) => Readonly<TagProps>;
++
++const tagProps$: InitializedObservable<TagPropsGetter> = tags$.pipe(
+   map(
+-    (tags) =>
+-      (value: DeepReadonly<React.ReactNode>): DeepReadonly<TagProps> =>
++    (tags): TagPropsGetter =>
++      (value) =>
+         tags.find((t) => t.value === value)?.props ?? {
+           intent: 'none' as const,
+         },
+@@ -675,6 +688,7 @@ const tagProps$: InitializedObservable<
+ 
+ const clearTags = (): void => {
+   resetSortOrderAndKey();
++
+   resetState();
+ };
+ 
+@@ -683,35 +697,33 @@ const clearTags = (): void => {
+ export const answersFiltered$ = combine([
+   AnswersStore.answers$,
+   filterState$,
+-]).chain(
++]).pipe(
+   map(([answers, filterState]) =>
+     answers?.filter((a) => !filterState.respondent.falseKeys.has(a.user.name)),
+   ),
+ );
+ 
+ answersFiltered$
+-  .chain(filter(isNotUndefined))
+-  .chain(map((answers) => answers.length))
+-  .chain(skipIfNoChange())
++  .pipe(filter(isNotUndefined))
++  .pipe(map((answers) => answers.length))
++  .pipe(skipIfNoChange())
+   .subscribe((numAnswers) => {
+     filterStateDispatch({
+       type: 'icon',
+-      action: {
+-        type: 'setUpperLimit',
+-        upperLimit: toSafeUint(numAnswers),
+-      },
++      action: { type: 'setUpperLimit', upperLimit: asSafeUint(numAnswers) },
+     });
+   });
+ 
+ eventSchedule$
+-  .chain(filter(isNotUndefined))
+-  .chain(
++  .pipe(filter(isNotUndefined))
++  .pipe(
+     map((eventSchedule) => ({
+-      start: Arr.first(eventSchedule.datetimeRangeList).ymd,
+-      end: Arr.last(eventSchedule.datetimeRangeList).ymd,
++      start: Optional.unwrapThrow(Arr.first(eventSchedule.datetimeRangeList))
++        .ymd,
++      end: Optional.unwrapThrow(Arr.last(eventSchedule.datetimeRangeList)).ymd,
+     })),
+   )
+-  .chain(skipIfNoChange(deepEqual))
++  .pipe(skipIfNoChange(fastDeepEqual))
+   .subscribe((range) => {
+     setDateRangeDefaultValue(range);
+   });

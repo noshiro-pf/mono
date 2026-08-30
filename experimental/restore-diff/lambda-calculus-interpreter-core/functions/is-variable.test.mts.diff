@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-variable.test.mts apps/lambda-calculus-interpreter-core/src/functions/is-variable.test.mts
+index 18c4fd951..8e69901d0 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-core/src/functions/is-variable.test.mts
++++ apps/lambda-calculus-interpreter-core/src/functions/is-variable.test.mts
+@@ -1,18 +1,18 @@
+ import { isVariable } from './is-variable.mjs';
+ 
+ test('isVariable 1', () => {
+-  expect(isVariable('x')).toBe(true);
++  assert.isTrue(isVariable('x'));
+ });
+ 
+ test('isVariable 2', () => {
+-  expect(
++  assert.isFalse(
+     isVariable([
+       ['x', ['y', 'y']],
+       ['x', ['y', 'y']],
+     ]),
+-  ).toBe(false);
++  );
+ });
+ 
+ test('isVariable 3', () => {
+-  expect(isVariable(['lambda', 'x', ['x', ['y', 'y']]])).toBe(false);
++  assert.isFalse(isVariable(['lambda', 'x', ['x', ['y', 'y']]]));
+ });

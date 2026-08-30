@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/answer-icon-settings.mts apps/event-schedule-app-shared/src/v9/types/record/answer-icon-settings.mts
+index 2615dc00a..7f8f7d8f2 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v9/types/record/answer-icon-settings.mts
++++ apps/event-schedule-app-shared/src/v9/types/record/answer-icon-settings.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import { createAnswerIconSettingType } from './base/index.mjs';
+ 
+ export const AnswerIconSettings = t.record({

@@ -1,0 +1,41 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/crud/archive-event-schedule.ts apps/event-schedule-app/src/api/crud/archive-event-schedule.mts
+index 83409094f..507e8b1c8 100644
+--- experimental/packages/apps/event-schedule-app/src/api/crud/archive-event-schedule.ts
++++ apps/event-schedule-app/src/api/crud/archive-event-schedule.mts
+@@ -1,10 +1,13 @@
+ import { arrayRemove, arrayUnion, doc, updateDoc } from 'firebase/firestore';
+-import { firestoreEvents } from '../../initialize-firebase';
++import { Result, expectType, unknownToString } from 'ts-data-forge';
++import { firestoreEvents } from '../../initialize-firebase.mjs';
+ 
+ type KeyT = 'archivedBy';
++
+ const key: KeyT = 'archivedBy';
+ 
+ expectType<KeyT, keyof EventSchedule>('<=');
++
+ expectType<User, EventSchedule[KeyT][number]>('=');
+ 
+ export const archiveEventSchedule = (
+@@ -12,17 +15,13 @@ export const archiveEventSchedule = (
+   user: User,
+ ): Promise<Result<void, string>> =>
+   Result.fromPromise(
+-    updateDoc(doc(firestoreEvents, eventId), {
+-      [key]: arrayUnion(user),
+-    }),
+-  ).then((a) => Result.fold(a, () => undefined, Str.from));
++    updateDoc(doc(firestoreEvents, eventId), { [key]: arrayUnion(user) }),
++  ).then(Result.fold(() => undefined, unknownToString));
+ 
+ export const unarchiveEventSchedule = (
+   eventId: string,
+   user: User,
+ ): Promise<Result<void, string>> =>
+   Result.fromPromise(
+-    updateDoc(doc(firestoreEvents, eventId), {
+-      archivedBy: arrayRemove(user),
+-    }),
+-  ).then((a) => Result.fold(a, () => undefined, Str.from));
++    updateDoc(doc(firestoreEvents, eventId), { archivedBy: arrayRemove(user) }),
++  ).then(Result.fold(() => undefined, unknownToString));

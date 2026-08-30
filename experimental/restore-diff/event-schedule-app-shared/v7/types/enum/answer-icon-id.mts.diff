@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/answer-icon-id.mts apps/event-schedule-app-shared/src/v7/types/enum/answer-icon-id.mts
+index 265d74bed..dca79b663 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/enum/answer-icon-id.mts
++++ apps/event-schedule-app-shared/src/v7/types/enum/answer-icon-id.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ export const answerIconIdTypeDef = t.enumType(['poor', 'fair', 'good']);
+ 

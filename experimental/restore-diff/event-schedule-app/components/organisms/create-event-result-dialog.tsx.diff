@@ -1,0 +1,59 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/create-event-result-dialog.tsx apps/event-schedule-app/src/components/organisms/create-event-result-dialog.tsx
+index e323420a1..9ecc5f00e 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/create-event-result-dialog.tsx
++++ apps/event-schedule-app/src/components/organisms/create-event-result-dialog.tsx
+@@ -5,33 +5,33 @@ import {
+   Spinner,
+   Tooltip,
+ } from '@blueprintjs/core';
+-import { DialogWithMaxWidth } from '@noshiro/react-blueprintjs-utils';
+-import { CreateEventScheduleStore } from '../../store';
+-import { ButtonsWrapperAlignEnd } from '../styled';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { CreateEventScheduleStore } from '../../store/index.mjs';
++import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
+ 
+ const dc = dict.createEventResultDialog;
+ 
+-type Props = Readonly<{
+-  isOpen: boolean;
+-  url: string;
+-  isLoading: boolean;
+-}>;
++type Props = Readonly<{ isOpen: boolean; url: string; isLoading: boolean }>;
+ 
+ export const CreateEventResultDialog = memoNamed<Props>(
+   'CreateEventResultDialog',
+   ({ isLoading, isOpen, url }) => {
+-    const [linkIsUsed, setLinkIsUsed] = useState<boolean>(false);
++    const [linkIsUsed, setLinkIsUsed] = React.useState<boolean>(false);
+ 
+-    const onClipboardButtonClick = useCallback(() => {
++    const onClipboardButtonClick = React.useCallback(() => {
+       setLinkIsUsed(true);
++
+       CreateEventScheduleStore.onClipboardButtonClick();
+     }, [setLinkIsUsed]);
+ 
+-    const onLinkClick = useCallback(() => {
++    const onLinkClick = React.useCallback(() => {
+       setLinkIsUsed(true);
+     }, [setLinkIsUsed]);
+ 
+-    useEffect(() => {
++    React.useEffect(() => {
+       if (!isOpen) {
+         setLinkIsUsed(false);
+       }
+@@ -90,7 +90,7 @@ export const CreateEventResultDialog = memoNamed<Props>(
+                     <Button
+                       data-e2e={'clipboard-button'}
+                       icon={'clipboard'}
+-                      minimal={true}
++                      variant={'minimal'}
+                       onClick={onClipboardButtonClick}
+                     />
+                   </Tooltip>

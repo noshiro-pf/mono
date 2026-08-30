@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/event-schedule-app/src/api/index.ts apps/event-schedule-app/src/api/index.mts
+index 05bd20f80..148d8dd79 100644
+--- experimental/packages/apps/event-schedule-app/src/api/index.ts
++++ apps/event-schedule-app/src/api/index.mts
+@@ -1,3 +1,3 @@
+-export * from './api';
+-export * from './auth';
+-export * from './crud';
++export * from './api.mjs';
++export * from './auth/index.mjs';
++export * from './crud/index.mjs';

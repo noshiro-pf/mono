@@ -1,0 +1,40 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/get-most-frequent-time-range.ts apps/event-schedule-app/src/functions/select-datetimes-component/get-most-frequent-time-range.mts
+index e0f526c98..b3d1bc30e 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/select-datetimes-component/get-most-frequent-time-range.ts
++++ apps/event-schedule-app/src/functions/select-datetimes-component/get-most-frequent-time-range.mts
+@@ -1,24 +1,21 @@
+-import { HoursMinutes } from '@noshiro/io-ts-types';
+-import { timeRangeToMapKey } from '../map-key';
++import { Arr, Optional, pipe } from 'ts-data-forge';
++import { HoursMinutes } from 'ts-fortress-types';
++import { timeRangeToMapKey } from '../map-key/index.mjs';
+ 
+ export const getMostFrequentTimeRange = (
+   datetimeList: readonly DatetimeRange[],
+ ): TimeRange => {
+   const startMaxFreq = pipe(datetimeList)
+-    .chain((list) =>
+-      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.start)),
+-    )
+-    .chain((groups) => groups.toValuesArray())
+-    .chain((list) => Arr.maxBy(list, (g) => g.length))
+-    .chain((list) => list?.[0]?.timeRange.start).value;
++    .map(Arr.groupBy((e) => timeRangeToMapKey(e.timeRange.start)))
++    .map((groups) => groups.toValuesArray())
++    .map((list) => Arr.maxBy(list, (g) => g.length))
++    .map((list) => Optional.toNullable(list)?.[0]?.timeRange.start).value;
+ 
+   const endMaxFreq = pipe(datetimeList)
+-    .chain((list) =>
+-      Arr.groupBy(list, (e) => timeRangeToMapKey(e.timeRange.end)),
+-    )
+-    .chain((groups) => groups.toValuesArray())
+-    .chain((list) => Arr.maxBy(list, (g) => g.length))
+-    .chain((list) => list?.[0]?.timeRange.end).value;
++    .map(Arr.groupBy((e) => timeRangeToMapKey(e.timeRange.end)))
++    .map((groups) => groups.toValuesArray())
++    .map((list) => Arr.maxBy(list, (g) => g.length))
++    .map((list) => Optional.toNullable(list)?.[0]?.timeRange.end).value;
+ 
+   return {
+     start: startMaxFreq ?? HoursMinutes.defaultValue,

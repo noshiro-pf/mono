@@ -1,0 +1,110 @@
+diff --git experimental/packages/apps/poll-discord-app/src/functions/parse-command.mts apps/poll-discord-app/src/functions/parse-command.mts
+index 6d5ebfc60..19ff4da84 100644
+--- experimental/packages/apps/poll-discord-app/src/functions/parse-command.mts
++++ apps/poll-discord-app/src/functions/parse-command.mts
+@@ -1,11 +1,13 @@
+-import * as t from '@noshiro/io-ts';
++import { Num, Result } from 'ts-data-forge';
++import * as t from 'ts-fortress';
++import { type FixedLengthTuple } from 'ts-type-forge';
+ import { isNumGroups, type NumGroups } from '../types/index.mjs';
+ 
+ export const rpParseCommand = (command: string): readonly string[] =>
+   command
+     .split('"')
+     .filter((_, i) => i % 2 === 1)
+-    .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' '));
++    .map((s) => s.replaceAll(/[\n\t]/gu, ' '));
+ 
+ const hoursType = t.uintRange({ start: 0, end: 31, defaultValue: 0 });
+ 
+@@ -25,18 +27,20 @@ export const rp3060ParseCommand = (
+     'title and begin/end hour arguments should be passed.',
+   ].join('');
+ 
+-  if (isUndefined(regexResult)) {
++  if (regexResult === undefined) {
+     return Result.err(parseErrorMessage);
+   }
+ 
+   const { title, begin, end } = regexResult;
+ 
+-  if (isUndefined(title) || isUndefined(begin) || isUndefined(end)) {
++  if (title === undefined || begin === undefined || end === undefined) {
+     return Result.err(parseErrorMessage);
+   }
+ 
+-  const arg1AsNumber = Number.parseInt(begin, 10);
+-  const arg2AsNumber = Number.parseInt(end, 10);
++  const arg1AsNumber = Result.unwrapOkOr(Num.safeParseInt(begin), Number.NaN);
++
++  const arg2AsNumber = Result.unwrapOkOr(Num.safeParseInt(end), Number.NaN);
++
+   if (!hoursType.is(arg1AsNumber) || !hoursType.is(arg2AsNumber)) {
+     return Result.err(
+       [
+@@ -52,7 +56,7 @@ export const rp3060ParseCommand = (
+ export const rp3060dParseCommand = (
+   commandArguments: string, // "9月4日 (土)" 15  25
+   functionName: 'convertRp30dArgsToRpArgs' | 'convertRp60dArgsToRpArgs',
+-): Result<readonly [Hours, Hours], string> => {
++): Result<FixedLengthTuple<2, Hours>, string> => {
+   const regexResult =
+     /\s*"?(?<begin>[0-9]{1,2})"?\s+"?(?<end>[0-9]{1,2})"?/u.exec(
+       commandArguments,
+@@ -63,18 +67,20 @@ export const rp3060dParseCommand = (
+     'begin/end hour arguments should be passed.',
+   ].join('');
+ 
+-  if (isUndefined(regexResult)) {
++  if (regexResult === undefined) {
+     return Result.err(parseErrorMessage);
+   }
+ 
+   const { begin, end } = regexResult;
+ 
+-  if (isUndefined(begin) || isUndefined(end)) {
++  if (begin === undefined || end === undefined) {
+     return Result.err(parseErrorMessage);
+   }
+ 
+-  const arg1AsNumber = Number.parseInt(begin, 10);
+-  const arg2AsNumber = Number.parseInt(end, 10);
++  const arg1AsNumber = Result.unwrapOkOr(Num.safeParseInt(begin), Number.NaN);
++
++  const arg2AsNumber = Result.unwrapOkOr(Num.safeParseInt(end), Number.NaN);
++
+   if (!hoursType.is(arg1AsNumber) || !hoursType.is(arg2AsNumber)) {
+     return Result.err(
+       [
+@@ -90,7 +96,11 @@ export const rp3060dParseCommand = (
+ export const gpParseGroupingCommandArgument = (
+   commandArguments: string,
+ ): Result<readonly [NumGroups, readonly string[]], undefined> => {
+-  const numGroups = Number.parseInt(commandArguments, 10);
++  const numGroups = Result.unwrapOkOr(
++    Num.safeParseInt(commandArguments),
++    Number.NaN,
++  );
++
+   if (!isNumGroups(numGroups)) return Result.err(undefined);
+ 
+   return Result.ok([
+@@ -98,14 +108,15 @@ export const gpParseGroupingCommandArgument = (
+     commandArguments
+       .split('"')
+       .filter((_, i) => i % 2 === 1)
+-      .map((s) => s.replaceAll('\n', ' ').replaceAll('\t', ' ')),
++      .map((s) => s.replaceAll(/[\n\t]/gu, ' ')),
+   ]);
+ };
+ 
+ export const gpParseRandCommandArgument = (
+   commandArguments: string,
+ ): Result<number, undefined> => {
+-  const n = Number.parseInt(commandArguments, 10);
++  const n = Result.unwrapOkOr(Num.safeParseInt(commandArguments), Number.NaN);
++
+   if (!Number.isSafeInteger(n) || n < 2) return Result.err(undefined);
+ 
+   return Result.ok(n);

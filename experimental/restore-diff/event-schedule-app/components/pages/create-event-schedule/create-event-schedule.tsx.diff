@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/create-event-schedule.tsx apps/event-schedule-app/src/components/pages/create-event-schedule/create-event-schedule.tsx
+index dd86e004b..76815283a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/pages/create-event-schedule/create-event-schedule.tsx
++++ apps/event-schedule-app/src/components/pages/create-event-schedule/create-event-schedule.tsx
+@@ -1,15 +1,22 @@
+ import { Button } from '@blueprintjs/core';
+-import { CreateEventScheduleStore } from '../../../store';
+-import { CreateEventResultDialog, Header, ResetButton } from '../../organisms';
+-import { ButtonsWrapperForEventSettingsPage } from '../../styled';
+-import { EventScheduleSettingCommon } from './event-schedule-setting-common';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { CreateEventScheduleStore } from '../../../store/index.mjs';
++import {
++  CreateEventResultDialog,
++  Header,
++  ResetButton,
++} from '../../organisms/index.mjs';
++import { ButtonsWrapperForEventSettingsPage } from '../../styled/index.mjs';
++import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
+ 
+ const dc = dict.eventSettingsPage;
+ 
+ export const CreateEventSchedule = memoNamed('CreateEventSchedule', () => {
+   const commonState = useObservableValue(CreateEventScheduleStore.commonState$);
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     CreateEventScheduleStore.restoreFromLocalStorage();
+   }, []);
+ 

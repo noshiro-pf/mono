@@ -1,0 +1,35 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/view/checkbox-view.tsx apps/react-blueprintjs-utils/src/components/view/checkbox-view.tsx
+index 2b587664a..d25482a57 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/view/checkbox-view.tsx
++++ apps/react-blueprintjs-utils/src/components/view/checkbox-view.tsx
+@@ -1,5 +1,7 @@
++// cspell:ignore csvg cpath -- percent-encoded `<svg>` / `<path>` in a data URI
+ import styled from '@emotion/styled';
+-import { useCallback, useEffect, useRef } from 'react';
++import * as React from 'react';
++import { type DeepReadonly, type Mutable } from 'ts-type-forge';
+ 
+ type Props = DeepReadonly<{
+   state: 'checked' | 'indeterminate' | 'none';
+@@ -15,17 +17,18 @@ export const CheckboxView = ({
+   onChange,
+ }: Props): React.JSX.Element => {
+   const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+-    useCallback(
++    React.useCallback(
+       (ev) => {
+         onCheck?.(ev.target.checked);
++
+         onChange?.(ev);
+       },
+       [onCheck, onChange],
+     );
+ 
+-  const inputRef = useRef<Mutable<HTMLInputElement>>(null);
++  const inputRef = React.useRef<Mutable<HTMLInputElement>>(null);
+ 
+-  useEffect(() => {
++  React.useEffect(() => {
+     if (inputRef.current !== null) {
+       inputRef.current.indeterminate = state === 'indeterminate';
+     }

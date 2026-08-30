@@ -1,0 +1,15 @@
+diff --git experimental/packages/utils/io-ts-types/src/date-time/time-enum.mts apps/ts-fortress-types/src/date-time/time-enum.mts
+index 374f86850..ff1d9fd03 100644
+--- experimental/packages/utils/io-ts-types/src/date-time/time-enum.mts
++++ apps/ts-fortress-types/src/date-time/time-enum.mts
+@@ -1,7 +1,7 @@
+-import * as t from '@noshiro/io-ts';
+-import { toSafeUint } from '@noshiro/ts-utils';
++import { asSafeUint } from 'ts-data-forge';
++import * as t from 'ts-fortress';
+ 
+-export const Years = t.safeUint(toSafeUint(1900));
++export const Years = t.safeUint(asSafeUint(1900));
+ 
+ export const Months = t.uintRange({
+   start: 1,

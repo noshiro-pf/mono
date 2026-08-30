@@ -1,0 +1,146 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/sign-in-page.ts apps/event-schedule-app/src/store/sign-in-and-register-page-state/sign-in-page.mts
+index 78695b518..3113520ae 100644
+--- experimental/packages/apps/event-schedule-app/src/store/sign-in-and-register-page-state/sign-in-page.ts
++++ apps/event-schedule-app/src/store/sign-in-and-register-page-state/sign-in-page.mts
+@@ -1,41 +1,47 @@
+-import { api } from '../../api';
+-import { Routes } from '../../constants';
++import { type InitializedObservable, combine, map } from 'synstate';
++import { createBooleanState, createReducer } from 'synstate-react-hooks';
++import { Optional, Result } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { Routes } from '../../constants/index.mjs';
+ import {
+   createToaster,
+   showToast,
+   signInPageHasError,
+   signInPageInitialState,
+   signInPageStateReducer,
+-} from '../../functions';
+-import { Router } from '../router';
+-import { GoogleSignInStore } from './google-sign-in-state';
++} from '../../functions/index.mjs';
++import { Router } from '../router.mjs';
++import { GoogleSignInStore } from './google-sign-in-state.mjs';
+ 
+ const dc = dict.register;
+ 
+ const toast = createToaster();
+ 
+-const { state: formState$, dispatch } = createReducer(
++const [, dispatch, { state: formState$ }] = createReducer(
+   signInPageStateReducer,
+   signInPageInitialState,
+ );
+ 
+-const enterButtonDisabled$ = formState$.chain(
++const enterButtonDisabled$ = formState$.pipe(
+   map((st) => st.isWaitingResponse || signInPageHasError(st)),
+ );
+ 
+-const emailFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const emailFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const passwordFormIntent$: InitializedObservable<Intent> = formState$.chain(
++const passwordFormIntent$: InitializedObservable<Intent> = formState$.pipe(
+   map((st) => (st.password.error === undefined ? 'primary' : 'danger')),
+ );
+ 
+-const {
+-  state: passwordIsOpen$,
+-  setFalse: hidePassword,
+-  toggle: togglePasswordLock,
+-} = createBooleanState(false);
++const [
++  ,
++  {
++    state: passwordIsOpen$,
++    setFalse: hidePassword,
++    toggle: togglePasswordLock,
++  },
++] = createBooleanState(false);
+ 
+ const state = combine([
+   formState$,
+@@ -43,7 +49,7 @@ const state = combine([
+   emailFormIntent$,
+   passwordFormIntent$,
+   passwordIsOpen$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       formState,
+@@ -78,6 +84,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           type: 'setEmailError',
+           payload: dict.register.message.error.userNotFound,
+         });
++
+         break;
+ 
+       case 'auth/wrong-password':
+@@ -85,6 +92,7 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           type: 'setPasswordError',
+           payload: dict.register.message.error.wrongPassword,
+         });
++
+         break;
+ 
+       default:
+@@ -100,16 +108,13 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+           message: dc.message.error.unknownErrorOnSignIn,
+           intent: 'danger',
+         });
++
+         break;
+     }
+   } else {
+     dispatch({ type: 'done' });
+ 
+-    showToast({
+-      toast,
+-      message: dc.message.success.signIn,
+-      intent: 'success',
+-    });
++    showToast({ toast, message: dc.message.success.signIn, intent: 'success' });
+ 
+     if (pageToBack !== undefined) {
+       Router.redirect(pageToBack);
+@@ -120,17 +125,11 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
+ };
+ 
+ const inputEmailHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputEmail',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputEmail', payload: value });
+ };
+ 
+ const inputPasswordHandler = (value: string): void => {
+-  dispatch({
+-    type: 'inputPassword',
+-    payload: value,
+-  });
++  dispatch({ type: 'inputPassword', payload: value });
+ };
+ 
+ const enterClickHandler = (): void => {
+@@ -141,11 +140,14 @@ const enterClickHandler = (): void => {
+     return;
+ 
+   // TODO: use toast
+-  submit(Maybe.unwrap(Router.pageToBack$.getSnapshot())).catch(console.error);
++  submit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(
++    console.error,
++  );
+ };
+ 
+ const resetAllState = (): void => {
+   dispatch({ type: 'reset' });
++
+   hidePassword();
+ };
+ 

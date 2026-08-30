@@ -1,0 +1,21 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-icon-settings.test.mts apps/event-schedule-app-shared/src/v6/types/record/answer-icon-settings.test.mts
+index b37682828..412e65760 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/answer-icon-settings.test.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/answer-icon-settings.test.mts
+@@ -6,13 +6,14 @@ import {
+ 
+ describe('isAnswerIconSettings', () => {
+   test('defaultValue should be true', () => {
+-    expect(isAnswerIconSettings(answerIconSettingsDefaultValue)).toBe(true);
++    assert.isTrue(isAnswerIconSettings(answerIconSettingsDefaultValue));
+   });
+ });
+ 
+ describe('fillAnswerIconSettings', () => {
+   test('defaultValue should be true', () => {
+-    expect(fillAnswerIconSettings({})).toStrictEqual(
++    assert.deepStrictEqual(
++      fillAnswerIconSettings({}),
+       answerIconSettingsDefaultValue,
+     );
+   });

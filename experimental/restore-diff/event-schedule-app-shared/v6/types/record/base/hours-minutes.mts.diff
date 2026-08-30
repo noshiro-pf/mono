@@ -1,0 +1,75 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/hours-minutes.mts apps/event-schedule-app-shared/src/v6/types/record/base/hours-minutes.mts
+index 6631a8de4..ea8073f4e 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v6/types/record/base/hours-minutes.mts
++++ apps/event-schedule-app-shared/src/v6/types/record/base/hours-minutes.mts
+@@ -1,11 +1,7 @@
+-import {
+-  DateUtils,
+-  Num,
+-  Obj,
+-  isNumber,
+-  isRecord,
+-  type DateType,
+-} from '@noshiro/ts-utils';
++import { Num, isNumber, isRecord } from 'ts-data-forge';
++import { DateUtils } from 'ts-fortress-types';
++import { type HoursEnum, type MinutesEnum } from 'ts-type-forge';
++import { hasKeyValue } from '../../../../utils/index.mjs';
+ 
+ export type HoursMinutes = Readonly<{
+   hours: HoursEnum;
+@@ -18,37 +14,38 @@ export const hoursMinutesDefaultValue = {
+ } as const satisfies HoursMinutes;
+ 
+ export const isHoursEnum = (a: unknown): a is HoursEnum =>
+-  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(0, 23)(a);
++  isNumber(a) && Number.isSafeInteger(a) && Num.isInRangeInclusive(0, 23)(a);
+ 
+ export const isMinutesEnum = (a: unknown): a is MinutesEnum =>
+-  isNumber(a) && Number.isInteger(a) && Num.isInRangeInclusive(0, 59)(a);
++  isNumber(a) && Number.isSafeInteger(a) && Num.isInRangeInclusive(0, 59)(a);
+ 
+ export const isHoursMinutes = (a: unknown): a is HoursMinutes =>
+   isRecord(a) &&
+-  Obj.hasKeyValue(a, 'hours', isHoursEnum) &&
+-  Obj.hasKeyValue(a, 'minutes', isMinutesEnum);
++  hasKeyValue(a, 'hours', isHoursEnum) &&
++  hasKeyValue(a, 'minutes', isMinutesEnum);
+ 
+ const d = hoursMinutesDefaultValue;
+ 
+ export const fillHoursMinutes = (a?: unknown): HoursMinutes =>
+   a === undefined || !isRecord(a)
+     ? d
+-    : {
+-        hours: Obj.hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
+-        minutes: Obj.hasKeyValue(a, 'minutes', isMinutesEnum)
++    : ({
++        hours: hasKeyValue(a, 'hours', isHoursEnum) ? a.hours : d.hours,
++        minutes: hasKeyValue(a, 'minutes', isMinutesEnum)
+           ? a.minutes
+           : d.minutes,
+-      };
++      } as const);
+ 
+-export const hmFromDate = (date: DateType): HoursMinutes => ({
+-  hours: DateUtils.getLocaleHours(date),
+-  minutes: DateUtils.getLocaleMinutes(date),
+-});
++export const hmFromDate = (date: Date): HoursMinutes =>
++  ({
++    hours: DateUtils.getLocaleHours(date),
++    minutes: DateUtils.getLocaleMinutes(date),
++  }) as const;
+ 
+ export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
+-  if (a.hours !== b.hours)
+-    return Num.mapNaN2Undefined(Math.sign(a.hours - b.hours)) ?? 0;
+-  if (a.minutes !== b.minutes)
+-    return Num.mapNaN2Undefined(Math.sign(a.minutes - b.minutes)) ?? 0;
++  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
++
++  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
++
+   return 0;
+ };

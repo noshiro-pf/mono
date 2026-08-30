@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/answer-icon-setting.mts apps/event-schedule-app-shared/src/v7/types/record/base/answer-icon-setting.mts
+index 7e1fbced8..a699bd19b 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v7/types/record/base/answer-icon-setting.mts
++++ apps/event-schedule-app-shared/src/v7/types/record/base/answer-icon-setting.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ import {
+   answerIconPointTypeDef,
+   type AnswerIconPoint,

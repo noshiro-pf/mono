@@ -1,0 +1,40 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/email-input-state.ts apps/event-schedule-app/src/functions/reducers/input-state/email-input-state.mts
+index 4f5b76675..1102a23bf 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/input-state/email-input-state.ts
++++ apps/event-schedule-app/src/functions/reducers/input-state/email-input-state.mts
+@@ -1,4 +1,5 @@
+-import { isEmailString } from '@noshiro/ts-utils-additional';
++import { pipe } from 'ts-data-forge';
++import { type Reducer, isEmailString } from '../../../utils-ported/index.mjs';
+ 
+ export type EmailInputState = Readonly<{
+   inputValue: string;
+@@ -27,21 +28,20 @@ export const emailInputStateReducer: Reducer<
+   switch (action.type) {
+     case 'input':
+       return pipe(state)
+-        .chain((draft) => Obj.set(draft, 'inputValue', action.payload))
+-        .chain((draft) => Obj.set(draft, 'error', emailInputInitialState.error))
++        .map((draft) => ({ ...draft, inputValue: action.payload }))
++        .map((draft) => ({ ...draft, error: emailInputInitialState.error }))
+         .value;
+ 
+     case 'setError':
+-      return Obj.set(state, 'error', action.payload);
++      return { ...state, error: action.payload };
+ 
+     case 'submit':
+-      return Obj.set(
+-        state,
+-        'error',
+-        !isEmailString(state.inputValue)
++      return {
++        ...state,
++        error: !isEmailString(state.inputValue)
+           ? dict.common.error.invalidEmail
+           : undefined,
+-      );
++      };
+ 
+     case 'reset':
+       return emailInputInitialState;

@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-rank.tsx apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-rank.tsx
+index 0d908cb48..42735d88c 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-rank.tsx
++++ apps/event-schedule-app/src/components/organisms/detailed-filter/detailed-filter-rank.tsx
+@@ -1,15 +1,16 @@
+-import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
+-import { AnswerFilterAndSortStore } from '../../../store';
+-import { type AnswerRank } from '../../../types';
+-import { RankNumericInput } from '../../molecules';
+-import { CheckboxWrapper, FilterItem } from './styled';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly } from 'ts-type-forge';
++import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
++import { type AnswerRank } from '../../../types/index.mjs';
++import { RankNumericInput } from '../../molecules/index.mjs';
++import { CheckboxWrapper, FilterItem } from './styled.js';
+ 
+ const dc = dict.answerPage.detailedFilter;
+ 
+-type Props = DeepReadonly<{
+-  enabled: boolean;
+-  rank: AnswerRank;
+-}>;
++type Props = DeepReadonly<{ enabled: boolean; rank: AnswerRank }>;
+ 
+ export const DetailedFilterRank = memoNamed<Props>(
+   'DetailedFilterRank',

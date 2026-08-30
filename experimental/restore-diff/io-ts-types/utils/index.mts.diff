@@ -1,0 +1,7 @@
+diff --git apps/ts-fortress-types/src/utils/index.mts apps/ts-fortress-types/src/utils/index.mts
+new file mode 100644
+index 000000000..7fb0c9bb0
+--- /dev/null
++++ apps/ts-fortress-types/src/utils/index.mts
+@@ -0,0 +1 @@
++export * from './date-utils.mjs';

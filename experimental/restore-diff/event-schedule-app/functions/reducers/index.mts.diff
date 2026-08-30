@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/reducers/index.ts apps/event-schedule-app/src/functions/reducers/index.mts
+index a282f1766..941627f81 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/reducers/index.ts
++++ apps/event-schedule-app/src/functions/reducers/index.mts
+@@ -1,9 +1,9 @@
+-export * from './answer-filter-state';
+-export * from './answer-icon-filter-state';
+-export * from './answer-selection-reducer';
+-export * from './confirm-email-dialog-state';
+-export * from './icon-list-reducer';
+-export * from './input-state';
+-export * from './sign-in-and-register-page';
+-export * from './update-user-info-dialog-state';
+-export * from './validate-event-schedule';
++export * from './answer-filter-state.mjs';
++export * from './answer-icon-filter-state.mjs';
++export * from './answer-selection-reducer.mjs';
++export * from './confirm-email-dialog-state.mjs';
++export * from './icon-list-reducer.mjs';
++export * from './input-state/index.mjs';
++export * from './sign-in-and-register-page/index.mjs';
++export * from './update-user-info-dialog-state/index.mjs';
++export * from './validate-event-schedule.mjs';

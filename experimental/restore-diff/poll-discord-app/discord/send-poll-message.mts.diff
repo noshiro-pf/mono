@@ -1,0 +1,180 @@
+diff --git experimental/packages/apps/poll-discord-app/src/discord/send-poll-message.mts apps/poll-discord-app/src/discord/send-poll-message.mts
+index 821807a2f..edc054d85 100644
+--- experimental/packages/apps/poll-discord-app/src/discord/send-poll-message.mts
++++ apps/poll-discord-app/src/discord/send-poll-message.mts
+@@ -1,5 +1,6 @@
+ import type * as Discord from 'discord.js';
+ import { ChannelType } from 'discord.js';
++import { Arr, IMap, Result, tp } from 'ts-data-forge';
+ import { emojis, triggerCommand } from '../constants.mjs';
+ import { firestoreApi } from '../firebase/index.mjs';
+ import {
+@@ -32,9 +33,9 @@ import {
+   type TitleMessageId,
+   type UserId,
+ } from '../types/index.mjs';
++import { DateUtils } from '../utils/index.mjs';
+ 
+ const rpSendPollMessageSub = async (
+-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
+   title: string,
+   args: readonly string[],
+@@ -56,6 +57,7 @@ const rpSendPollMessageSub = async (
+   }
+ 
+   const titleMessage = await messageChannel.send(createTitleString(title));
++
+   const titleMessageId = toTitleMessageId(titleMessage.id);
+ 
+   const mut_dateOptionAndMessageListTemp: (readonly [
+@@ -68,6 +70,7 @@ const rpSendPollMessageSub = async (
+     const result = await Result.fromPromise(messageChannel.send(el));
+ 
+     if (Result.isErr(result)) return result;
++
+     mut_dateOptionAndMessageListTemp.push([
+       {
+         label: el,
+@@ -80,6 +83,7 @@ const rpSendPollMessageSub = async (
+   const dateOptionMessageList = mut_dateOptionAndMessageListTemp.map(
+     ([, a]) => a,
+   );
++
+   const dateOptions = mut_dateOptionAndMessageListTemp.map(([a]) => a);
+ 
+   const summaryMessageEmbed = rpCreateSummaryMessage(
+@@ -88,12 +92,12 @@ const rpSendPollMessageSub = async (
+       updatedAt: toTimestamp(DateUtils.now()),
+       title,
+       dateOptions,
+-      answers: IMap.new<DateOptionId, AnswerOfDate>(
++      answers: IMap.create<DateOptionId, AnswerOfDate>(
+         dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue)),
+       ),
+       titleMessageId,
+     },
+-    IMap.new<UserId, string>([]),
++    IMap.create<UserId, string>([]),
+   );
+ 
+   const summaryMessageInitResult = await Result.fromPromise(
+@@ -101,6 +105,7 @@ const rpSendPollMessageSub = async (
+   );
+ 
+   if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
++
+   const summaryMessageInit = summaryMessageInitResult.value;
+ 
+   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
+@@ -128,21 +133,23 @@ const rpSendPollMessageSub = async (
+ };
+ 
+ const rpSendPollMessage = async (
+-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   discordChannel: Discord.Message['channel'],
+   messageId: CommandMessageId,
+   title: string | undefined,
+   pollOptions: readonly string[],
+ ): Promise<Result<undefined, unknown>> => {
+   if (title === undefined) return Result.ok(undefined);
+-  if (pollOptions.length === 0) return Result.ok(undefined);
++
++  if (Arr.isEmpty(pollOptions)) return Result.ok(undefined);
+ 
+   const replySubResult = await rpSendPollMessageSub(
+     discordChannel,
+     title,
+     pollOptions,
+   );
++
+   if (Result.isErr(replySubResult)) return replySubResult;
++
+   const { summaryMessage, dateOptions, dateOptionMessageList, titleMessageId } =
+     replySubResult.value;
+ 
+@@ -151,11 +158,11 @@ const rpSendPollMessage = async (
+     updatedAt: toTimestamp(summaryMessage.createdTimestamp),
+     title,
+     dateOptions,
+-    answers: IMap.new<DateOptionId, AnswerOfDate>(
++    answers: IMap.create<DateOptionId, AnswerOfDate>(
+       dateOptions.map((d) => tp(d.id, answerOfDateDefaultValue)),
+     ),
+     titleMessageId,
+-  };
++  } as const;
+ 
+   const [
+     setPollResult,
+@@ -173,9 +180,11 @@ const rpSendPollMessage = async (
+   if (Result.isErr(setPollResult)) {
+     return setPollResult;
+   }
++
+   if (Result.isErr(setPollIdForCommandMessageIdResult)) {
+     return setPollIdForCommandMessageIdResult;
+   }
++
+   if (Result.isErr(setPollIdForDateOptionIdsResult)) {
+     return setPollIdForDateOptionIdsResult;
+   }
+@@ -183,9 +192,11 @@ const rpSendPollMessage = async (
+   await Promise.all(
+     dateOptionMessageList.map((msg) => msg.react(emojis.good.unicode)),
+   );
++
+   await Promise.all(
+     dateOptionMessageList.map((msg) => msg.react(emojis.fair.unicode)),
+   );
++
+   await Promise.all(
+     dateOptionMessageList.map((msg) => msg.react(emojis.poor.unicode)),
+   );
+@@ -194,7 +205,6 @@ const rpSendPollMessage = async (
+ };
+ 
+ const gpSendGroupingMessageSub = async (
+-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
+   groups: readonly Group[],
+ ): Promise<Result<undefined, unknown>> => {
+@@ -212,7 +222,6 @@ const gpSendGroupingMessageSub = async (
+ };
+ 
+ const gpSendRandMessageSub = async (
+-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+   messageChannel: Discord.GuildTextBasedChannel | Discord.TextBasedChannel,
+   n: number,
+ ): Promise<Result<undefined, unknown>> => {
+@@ -235,10 +244,13 @@ const gpSendGroupingMessage = async (
+   const parseResult = gpParseGroupingCommandArgument(
+     removeCommandPrefix(messageFilled.content, triggerCommand.gp),
+   );
++
+   if (Result.isErr(parseResult)) return Result.ok(undefined);
++
+   const [numGroups, nameList] = parseResult.value;
+ 
+-  if (nameList.length === 0) return Result.ok(undefined);
++  if (Arr.isEmpty(nameList)) return Result.ok(undefined);
++
+   if (nameList.length < numGroups) return Result.ok(undefined);
+ 
+   const replySubResult = await gpSendGroupingMessageSub(
+@@ -257,6 +269,7 @@ const gpSendRandMessage = async (
+   );
+ 
+   if (Result.isErr(parseResult)) return Result.ok(undefined);
++
+   const n = parseResult.value;
+ 
+   const replySubResult = await gpSendRandMessageSub(messageFilled.channel, n);
+@@ -279,6 +292,7 @@ export const sendMessageMain = async (
+ 
+   if (message.content.startsWith(`${triggerCommand.rp} `)) {
+     const [title, ...args] = rpParseCommand(message.content);
++
+     return rpSendPollMessage(
+       message.channel,
+       toCommandMessageId(message.id),

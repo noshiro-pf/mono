@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/dictionary/index.ts apps/event-schedule-app/src/constants/dictionary/index.mts
+index 04de01704..2b751503b 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/dictionary/index.ts
++++ apps/event-schedule-app/src/constants/dictionary/index.mts
+@@ -1,15 +1,15 @@
+-export * from './account-settings';
+-export * from './answer-page';
+-export * from './common';
+-export * from './create-event-result-dialog';
+-export * from './datetime';
+-export * from './detailed-filter-dialog';
+-export * from './dictionary';
+-export * from './error-messages';
+-export * from './event-list-page';
+-export * from './event-settings-page';
+-export * from './for-non-logged-in-user-dialog';
+-export * from './header';
+-export * from './icon-description-default';
+-export * from './register-page';
+-export * from './result-page';
++export * from './account-settings.mjs';
++export * from './answer-page.mjs';
++export * from './common.mjs';
++export * from './create-event-result-dialog.mjs';
++export * from './datetime.mjs';
++export * from './detailed-filter-dialog.mjs';
++export * from './dictionary.mjs';
++export * from './error-messages.mjs';
++export * from './event-list-page.mjs';
++export * from './event-settings-page.mjs';
++export * from './for-non-logged-in-user-dialog.mjs';
++export * from './header.mjs';
++export * from './icon-description-default.mjs';
++export * from './register-page.mjs';
++export * from './result-page.mjs';

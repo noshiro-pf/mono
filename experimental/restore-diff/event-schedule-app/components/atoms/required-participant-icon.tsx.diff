@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/atoms/required-participant-icon.tsx apps/event-schedule-app/src/components/atoms/required-participant-icon.tsx
+index 42a853451..ae4f42c9a 100644
+--- experimental/packages/apps/event-schedule-app/src/components/atoms/required-participant-icon.tsx
++++ apps/event-schedule-app/src/components/atoms/required-participant-icon.tsx
+@@ -1,4 +1,5 @@
+ import { Icon } from '@blueprintjs/core';
++import { memoNamed } from 'react-utils';
+ 
+ const iconSize = 12;
+ 

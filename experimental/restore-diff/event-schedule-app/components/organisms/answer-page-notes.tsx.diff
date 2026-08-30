@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-page-notes.tsx apps/event-schedule-app/src/components/organisms/answer-page-notes.tsx
+index 15365a962..b2d16e20e 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-page-notes.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-page-notes.tsx
+@@ -1,9 +1,8 @@
++import { memoNamed } from 'react-utils';
+ import urlRegex from 'url-regex';
+-import { splitStringByWhitespace } from '../../utils';
++import { splitStringByWhitespace } from '../../utils/index.mjs';
+ 
+-type Props = Readonly<{
+-  notes: string;
+-}>;
++type Props = Readonly<{ notes: string }>;
+ 
+ export const AnswerPageNotes = memoNamed<Props>(
+   'AnswerPageNotes',

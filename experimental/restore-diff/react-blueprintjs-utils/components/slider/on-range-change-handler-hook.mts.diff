@@ -1,0 +1,65 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/slider/on-range-change-handler-hook.mts apps/react-blueprintjs-utils/src/components/slider/on-range-change-handler-hook.mts
+index 62be0ba82..43caf2440 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/slider/on-range-change-handler-hook.mts
++++ apps/react-blueprintjs-utils/src/components/slider/on-range-change-handler-hook.mts
+@@ -1,5 +1,5 @@
+-import { useValueAsRef } from '@noshiro/react-utils';
+-import { useCallback } from 'react';
++import * as React from 'react';
++import { useValueAsRef } from 'react-utils';
+ 
+ export const useOnRangeChangeHandlerHook = (
+   range: Readonly<{ min: number; max: number }>,
+@@ -13,44 +13,40 @@ export const useOnRangeChangeHandlerHook = (
+ }> => {
+   const rangeRef = useValueAsRef(range);
+ 
+-  const onRangeMinChange = useCallback(
++  const onRangeMinChange = React.useCallback(
+     (value: number) =>
+       onChange?.({
+         min: value,
+         max: rangeRef.current.max,
+       }),
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-    [onChange],
++    [onChange, rangeRef],
+   );
+ 
+-  const onRangeMaxChange = useCallback(
++  const onRangeMaxChange = React.useCallback(
+     (value: number) =>
+       onChange?.({
+         min: rangeRef.current.min,
+         max: value,
+       }),
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-    [onChange],
++    [onChange, rangeRef],
+   );
+ 
+-  const onRangeMinRelease = useCallback(
++  const onRangeMinRelease = React.useCallback(
+     (value: number) =>
+       onRelease?.({
+         min: value,
+         max: rangeRef.current.max,
+       }),
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-    [onRelease],
++    [onRelease, rangeRef],
+   );
+ 
+-  const onRangeMaxRelease = useCallback(
++  const onRangeMaxRelease = React.useCallback(
+     (value: number) =>
+       onRelease?.({
+         min: rangeRef.current.min,
+         max: value,
+       }),
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-    [onRelease],
++    [onRelease, rangeRef],
+   );
+ 
+   return {

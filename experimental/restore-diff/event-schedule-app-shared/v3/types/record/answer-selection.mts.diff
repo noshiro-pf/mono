@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/answer-selection.mts apps/event-schedule-app-shared/src/v3/types/record/answer-selection.mts
+index 0003a3d39..96d895575 100644
+--- experimental/packages/apps/event-schedule-app-shared/src/v3/types/record/answer-selection.mts
++++ apps/event-schedule-app-shared/src/v3/types/record/answer-selection.mts
+@@ -30,10 +30,12 @@ const defaultAnswerSelection = {
+ } as const satisfies AnswerSelection;
+ 
+ const d = defaultAnswerSelection;
++
+ export const fillAnswerSelection = (
+   p?: PartialAnswerSelection,
+-): AnswerSelection => ({
+-  datetimeRange: fillDatetimeRange(p?.datetimeRange ?? d.datetimeRange),
+-  iconId: p?.iconId ?? d.iconId,
+-  point: p?.point ?? d.point,
+-});
++): AnswerSelection =>
++  ({
++    datetimeRange: fillDatetimeRange(p?.datetimeRange ?? d.datetimeRange),
++    iconId: p?.iconId ?? d.iconId,
++    point: p?.point ?? d.point,
++  }) as const;

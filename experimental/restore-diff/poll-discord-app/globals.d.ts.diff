@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/poll-discord-app/src/globals.d.ts experimental/packages/apps/poll-discord-app/src/globals.d.ts
+deleted file mode 100644
+index 02c82b22a..000000000
+--- experimental/packages/apps/poll-discord-app/src/globals.d.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-/// <reference types="@noshiro/global-ts-utils" />

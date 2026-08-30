@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/select-datetimes.tsx apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/select-datetimes.tsx
+index 72ce255df..6f7928ba9 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/select-datetimes.tsx
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/select-datetimes/select-datetimes.tsx
+@@ -1,14 +1,20 @@
+ import { Button } from '@blueprintjs/core';
+-import { BpSelect } from '@noshiro/react-blueprintjs-utils';
+-import { selectorOptions } from '../../../../functions';
+-import { useSelectDatetimesHooks } from '../../../../hooks';
+-import { AnswerPageStore, holidaysJpDefinition$ } from '../../../../store';
+-import { AddElementButton } from '../../../molecules';
+-import { MultipleDatePicker } from '../../../multiple-date-picker';
+-import { ButtonsWrapper } from '../../../styled';
+-import { DeleteAllButton } from '../../button-with-confirm';
+-import { SetTimesPopover } from '../set-times-popover';
+-import { SelectedDatetimeRow } from './selected-datetime-row';
++import { css } from '@emotion/react';
++import { BpSelect } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { selectorOptions } from '../../../../functions/index.mjs';
++import { useSelectDatetimesHooks } from '../../../../hooks/index.mjs';
++import {
++  AnswerPageStore,
++  holidaysJpDefinition$,
++} from '../../../../store/index.mjs';
++import { AddElementButton } from '../../../molecules/index.mjs';
++import { MultipleDatePicker } from '../../../multiple-date-picker/index.mjs';
++import { ButtonsWrapper } from '../../../styled/index.mjs';
++import { DeleteAllButton } from '../../button-with-confirm/index.mjs';
++import { SetTimesPopover } from '../set-times-popover/index.mjs';
++import { SelectedDatetimeRow } from './selected-datetime-row.js';
+ 
+ const dc = dict.eventSettingsPage.section2;
+ 

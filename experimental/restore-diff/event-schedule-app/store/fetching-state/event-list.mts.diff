@@ -1,0 +1,128 @@
+diff --git experimental/packages/apps/event-schedule-app/src/store/fetching-state/event-list.ts apps/event-schedule-app/src/store/fetching-state/event-list.mts
+index a34e73c86..4bbfd571d 100644
+--- experimental/packages/apps/event-schedule-app/src/store/fetching-state/event-list.ts
++++ apps/event-schedule-app/src/store/fetching-state/event-list.mts
+@@ -1,16 +1,31 @@
+-import { type EventListItem } from '@noshiro/event-schedule-app-shared';
+-import { api } from '../../api';
+-import { fetchThrottleTime } from '../../constants';
+-import { Auth } from '../auth';
+-import { EventListPageFilterStore } from '../event-list-page-state';
+-
+-const [fetchEventList$, fetchEventList] = createVoidEventEmitter();
+-
+-const fetchEventListThrottled$ = fetchEventList$.chain(
+-  throttleTime(fetchThrottleTime),
++import { type EventListItem } from 'event-schedule-app-shared';
++import {
++  combine,
++  createEventEmitter,
++  createState,
++  filter,
++  map,
++  throttle,
++  unwrapResultOk,
++  withCurrentValueFrom,
++  withInitialValue,
++  type InitializedObservable,
++} from 'synstate';
++import { createBooleanState } from 'synstate-react-hooks';
++import { Result, isNotUndefined, tp } from 'ts-data-forge';
++import { api } from '../../api/index.mjs';
++import { fetchThrottleTime } from '../../constants/index.mjs';
++import { noop, type TimerId } from '../../utils-ported/index.mjs';
++import { Auth } from '../auth.mjs';
++import { EventListPageFilterStore } from '../event-list-page-state/index.mjs';
++
++const [fetchEventList$, fetchEventList] = createEventEmitter();
++
++const fetchEventListThrottled$ = fetchEventList$.pipe(
++  throttle(fetchThrottleTime),
+ );
+ 
+-const { state: eventListResult$, setState: setEventListResult } = createState<
++const [eventListResult$, setEventListResult] = createState<
+   | Result<
+       readonly EventListItem[] | undefined,
+       Readonly<{ type: 'others' | 'wrong-type-response'; message: string }>
+@@ -20,18 +35,15 @@ const { state: eventListResult$, setState: setEventListResult } = createState<
+ 
+ const result$ = eventListResult$;
+ 
+-const {
+-  useCurrentValue: useRefreshButtonIsLoading,
+-  setState: setRefreshButtonIsLoading,
+-} = createBooleanState(false);
++const [useRefreshButtonIsLoading, { setState: setRefreshButtonIsLoading }] =
++  createBooleanState(false);
+ 
+-const {
+-  useCurrentValue: useRefreshButtonIsDisabled,
+-  setState: setRefreshButtonIsDisabled,
+-} = createBooleanState(false);
++const [useRefreshButtonIsDisabled, { setState: setRefreshButtonIsDisabled }] =
++  createBooleanState(false);
+ 
+ const refreshEventList = (): void => {
+   fetchEventList();
++
+   setRefreshButtonIsLoading(true);
+ };
+ 
+@@ -43,9 +55,9 @@ combine(
+     Auth.fireAuthUser$,
+ 
+     EventListPageFilterStore.filterByText$
+-      .chain(setInitialValue(undefined))
+-      .chain(withCurrentValueFrom(EventListPageFilterStore.filterText$))
+-      .chain(map(([_, filterText]) => filterText)),
++      .pipe(withInitialValue(undefined))
++      .pipe(withCurrentValueFrom(EventListPageFilterStore.filterText$))
++      .pipe(map(([_, filterText]) => filterText)),
+     EventListPageFilterStore.filterOptionState$,
+     EventListPageFilterStore.showAllPastDaysEvent$,
+     EventListPageFilterStore.showOnlyEventSchedulesICreated$,
+@@ -61,6 +73,7 @@ combine(
+   ]) => {
+     if (fireAuthUser?.uid === undefined) {
+       setEventListResult(Result.ok(undefined));
++
+       return;
+     }
+ 
+@@ -75,6 +88,7 @@ combine(
+       })
+       .then((result) => {
+         setEventListResult(result);
++
+         setRefreshButtonIsLoading(false);
+       })
+       .catch(noop);
+@@ -90,11 +104,14 @@ result$.subscribe((e) => {
+ 
+ {
+   let mut_timer: TimerId | undefined = undefined;
++
+   fetchEventListThrottled$.subscribe(() => {
+     if (mut_timer !== undefined) {
+       clearTimeout(mut_timer);
+     }
++
+     setRefreshButtonIsDisabled(true);
++
+     mut_timer = setTimeout(() => {
+       setRefreshButtonIsDisabled(false);
+     }, fetchThrottleTime);
+@@ -104,9 +121,9 @@ result$.subscribe((e) => {
+ export const eventList$: InitializedObservable<
+   readonly EventListItem[] | undefined
+ > = result$
+-  .chain(filter(isNotUndefined))
+-  .chain(unwrapResultOk())
+-  .chain(setInitialValue(undefined));
++  .pipe(filter(isNotUndefined))
++  .pipe(unwrapResultOk())
++  .pipe(withInitialValue(undefined));
+ 
+ export const EventListStore = {
+   fetchEventList,

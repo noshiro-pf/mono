@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/event-schedule-app/src/hooks/select-datetimes-component/index.ts apps/event-schedule-app/src/hooks/select-datetimes-component/index.mts
+index da87ce714..db112c372 100644
+--- experimental/packages/apps/event-schedule-app/src/hooks/select-datetimes-component/index.ts
++++ apps/event-schedule-app/src/hooks/select-datetimes-component/index.mts
+@@ -1 +1 @@
+-export * from './select-datetimes-hooks';
++export * from './select-datetimes-hooks.mjs';

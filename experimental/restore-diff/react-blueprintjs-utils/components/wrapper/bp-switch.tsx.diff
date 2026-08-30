@@ -1,0 +1,27 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-switch.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-switch.tsx
+index 97cc7d699..c4f91c561 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-switch.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-switch.tsx
+@@ -1,9 +1,10 @@
+ import { Switch } from '@blueprintjs/core';
+ import styled from '@emotion/styled';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { useCallback } from 'react';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { type StrictOmit } from 'ts-type-forge';
+ 
+-export type BpSwitchProps = Omit<SwitchPropsOriginal, 'onChange'> &
++export type BpSwitchProps = StrictOmit<SwitchPropsOriginal, 'onChange'> &
+   Readonly<{
+     onToggle: () => void;
+     noMargin?: boolean;
+@@ -14,7 +15,7 @@ type SwitchPropsOriginal = React.ComponentProps<typeof Switch>;
+ export const BpSwitch = memoNamed<BpSwitchProps>(
+   'BpSwitch',
+   ({ checked, noMargin, onToggle, ...props }) => {
+-    const onChangeHandler = useCallback(() => {
++    const onChangeHandler = React.useCallback(() => {
+       onToggle();
+     }, [onToggle]);
+ 

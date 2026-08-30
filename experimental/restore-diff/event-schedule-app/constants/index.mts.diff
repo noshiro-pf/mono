@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/constants/index.ts apps/event-schedule-app/src/constants/index.mts
+index 2c799d050..bcb6772f8 100644
+--- experimental/packages/apps/event-schedule-app/src/constants/index.ts
++++ apps/event-schedule-app/src/constants/index.mts
+@@ -1,11 +1,11 @@
+-export * from './about-this-app-url';
+-export * from './answer-deadline-shortcuts';
+-export * from './answer-table-color';
+-export * from './color';
+-export * from './default-icon-point';
+-export * from './dictionary';
+-export * from './fetch-throttle-time';
+-export * from './initial-values';
+-export * from './notification-settings-with-email';
+-export * from './numeric-input-configs';
+-export * from './routes';
++export * from './about-this-app-url.mjs';
++export * from './answer-deadline-shortcuts.mjs';
++export * from './answer-table-color.mjs';
++export * from './color.mjs';
++export * from './default-icon-point.mjs';
++export * from './dictionary/index.mjs';
++export * from './fetch-throttle-time.mjs';
++export * from './initial-values.mjs';
++export * from './notification-settings-with-email.mjs';
++export * from './numeric-input-configs.mjs';
++export * from './routes.mjs';

@@ -1,0 +1,178 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover-content.tsx apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover-content.tsx
+index 306873f43..69fdf7a6d 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover-content.tsx
++++ apps/event-schedule-app/src/components/organisms/select-datetimes/set-times-popover/set-times-popover-content.tsx
+@@ -1,13 +1,19 @@
+ import { Button } from '@blueprintjs/core';
+-import { TimeRange } from '@noshiro/io-ts-types';
+-import { CheckboxView } from '@noshiro/react-blueprintjs-utils';
+-import { timeRangeReducer } from '../../../../functions';
+-import { TimeRangeView } from '../../../molecules';
+-import { ButtonsWrapperAlignEnd } from '../../../styled';
++import { css } from '@emotion/react';
++import * as React from 'react';
++import { CheckboxView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { createReducer } from 'synstate-react-hooks';
++import { TimeRange } from 'ts-fortress-types';
++import { type DayOfWeekName, type ReadonlyRecord } from 'ts-type-forge';
++import { timeRangeReducer } from '../../../../functions/index.mjs';
++import { Obj, type Reducer } from '../../../../utils-ported/index.mjs';
++import { TimeRangeView } from '../../../molecules/index.mjs';
++import { ButtonsWrapperAlignEnd } from '../../../styled/index.mjs';
+ import {
+   CheckboxWithBottomLabel,
+   VerticalCheckboxesWrapper,
+-} from '../../detailed-filter';
++} from '../../detailed-filter/index.mjs';
+ 
+ type Props = Readonly<{
+   initialValue: TimeRange;
+@@ -16,7 +22,7 @@ type Props = Readonly<{
+   onOkClick: (
+     state: Readonly<{
+       timeRange: TimeRange;
+-      checkboxState: Record<DayOfWeekName, boolean>;
++      checkboxState: ReadonlyRecord<DayOfWeekName, boolean>;
+     }>,
+   ) => void;
+ }>;
+@@ -26,7 +32,7 @@ const dc = dict.eventSettingsPage.section2;
+ export const SetTimesPopoverContent = memoNamed<Props>(
+   'SetTimesPopoverContent',
+   ({ initialValue, datetimeSpecification, onCancelClick, onOkClick }) => {
+-    useEffect(() => {
++    React.useEffect(() => {
+       dispatch({ type: 'init', timeRange: initialValue });
+     }, [initialValue]);
+ 
+@@ -34,7 +40,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
+ 
+     const checkboxState = useCheckboxState();
+ 
+-    const onOkClickHandler = useCallback(() => {
++    const onOkClickHandler = React.useCallback(() => {
+       onOkClick({ timeRange, checkboxState });
+     }, [onOkClick, timeRange, checkboxState]);
+ 
+@@ -152,8 +158,8 @@ export const SetTimesPopoverContent = memoNamed<Props>(
+               <Button
+                 icon={'automatic-updates'}
+                 intent={'none'}
+-                minimal={true}
+                 text={dc.setTimesAtOneTimeForDay.flipAll}
++                variant={'minimal'}
+                 onClick={flipAll}
+               />
+             </div>
+@@ -176,7 +182,7 @@ export const SetTimesPopoverContent = memoNamed<Props>(
+   },
+ );
+ 
+-const { useCurrentValue: useTimeRange, dispatch } = createReducer(
++const [useTimeRange, dispatch] = createReducer(
+   timeRangeReducer,
+   TimeRange.defaultValue,
+ );
+@@ -190,17 +196,11 @@ const onRangeEndChange = (hm: HoursMinutes): void => {
+ };
+ 
+ const dayCheckboxReducer: Reducer<
+-  Record<DayOfWeekName, boolean>,
+-  Readonly<
+-    | {
+-        key: DayOfWeekName | 'All';
+-        checked: boolean;
+-      }
+-    | { key: 'flip' }
+-  >
++  ReadonlyRecord<DayOfWeekName, boolean>,
++  Readonly<{ key: DayOfWeekName | 'All'; checked: boolean } | { key: 'flip' }>
+ > = (state, action) =>
+   action.key === 'All'
+-    ? {
++    ? ({
+         Sun: action.checked,
+         Mon: action.checked,
+         Tue: action.checked,
+@@ -208,9 +208,9 @@ const dayCheckboxReducer: Reducer<
+         Thr: action.checked,
+         Fri: action.checked,
+         Sat: action.checked,
+-      }
++      } as const)
+     : action.key === 'flip'
+-      ? {
++      ? ({
+           Sun: !state.Sun,
+           Mon: !state.Mon,
+           Tue: !state.Tue,
+@@ -218,11 +218,12 @@ const dayCheckboxReducer: Reducer<
+           Thr: !state.Thr,
+           Fri: !state.Fri,
+           Sat: !state.Sat,
+-        }
++        } as const)
+       : Obj.set(state, action.key, action.checked);
+ 
+-const { useCurrentValue: useCheckboxState, dispatch: checkboxStateDispatch } =
+-  createReducer(dayCheckboxReducer, {
++const [useCheckboxState, checkboxStateDispatch] = createReducer(
++  dayCheckboxReducer,
++  {
+     Sun: true,
+     Mon: true,
+     Tue: true,
+@@ -230,32 +231,41 @@ const { useCurrentValue: useCheckboxState, dispatch: checkboxStateDispatch } =
+     Thr: true,
+     Fri: true,
+     Sat: true,
+-  });
++  },
++);
+ 
+ const setSundayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Sun', checked });
+ };
++
+ const setMondayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Mon', checked });
+ };
++
+ const setTuesdayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Tue', checked });
+ };
++
+ const setWednesdayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Wed', checked });
+ };
++
+ const setThursdayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Thr', checked });
+ };
++
+ const setFridayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Fri', checked });
+ };
++
+ const setSaturdayCheck = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'Sat', checked });
+ };
++
+ const checkAll = (checked: boolean): void => {
+   checkboxStateDispatch({ key: 'All', checked });
+ };
++
+ const flipAll = (): void => {
+   checkboxStateDispatch({ key: 'flip' });
+ };
+@@ -268,7 +278,8 @@ const checkAllCheckboxState = ({
+   Thr,
+   Fri,
+   Sat,
+-}: Record<DayOfWeekName, boolean>): 'checked' | 'indeterminate' | 'none' =>
++}: ReadonlyRecord<DayOfWeekName, boolean>):
++  'checked' | 'indeterminate' | 'none' =>
+   Sun && Mon && Tue && Wed && Thr && Fri && Sat
+     ? 'checked'
+     : Sun || Mon || Tue || Wed || Thr || Fri || Sat

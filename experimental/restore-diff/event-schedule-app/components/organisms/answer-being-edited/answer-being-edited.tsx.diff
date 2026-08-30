@@ -1,0 +1,89 @@
+diff --git experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/answer-being-edited.tsx apps/event-schedule-app/src/components/organisms/answer-being-edited/answer-being-edited.tsx
+index 911880ef5..9aa66c7e1 100644
+--- experimental/packages/apps/event-schedule-app/src/components/organisms/answer-being-edited/answer-being-edited.tsx
++++ apps/event-schedule-app/src/components/organisms/answer-being-edited/answer-being-edited.tsx
+@@ -1,35 +1,43 @@
+ import { FormGroup } from '@blueprintjs/core';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { useBoolState } from 'better-react-use-state';
++import * as React from 'react';
+ import {
+   BpInput,
+   BpTextArea,
+   ButtonNowrapStyled,
+   CheckboxView,
+   HTMLTableBorderedStyled2,
+-} from '@noshiro/react-blueprintjs-utils';
+-import { theNameIsAlreadyUsedFn } from '../../../functions';
+-import { useFormError } from '../../../hooks';
+-import { AnswerPageStore, Auth } from '../../../store';
+-import { Description } from '../../atoms';
++} from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { type IMapMapped } from 'ts-data-forge';
++import { theNameIsAlreadyUsedFn } from '../../../functions/index.mjs';
++import { useFormError } from '../../../hooks/index.mjs';
++import { AnswerPageStore, Auth } from '../../../store/index.mjs';
++import { mapOptional, match } from '../../../utils-ported/index.mjs';
++import { Description } from '../../atoms/index.mjs';
+ import {
+   AnswerIconFairPointInput,
+   AnswerIconGoodPoint,
+   AnswerIconPoorPoint,
+   CustomIconButton,
+   CustomScrollbarWrapper,
+-} from '../../molecules';
++} from '../../molecules/index.mjs';
+ import {
+   ButtonsWrapperAlignEnd,
+   WidthRestrictedInputWrapper,
+-} from '../../styled';
+-import { DatetimeRangeCell } from '../answer-table';
+-import { BatchInputAnswerForm } from '../batch-input-field';
++} from '../../styled/index.mjs';
++import { DatetimeRangeCell } from '../answer-table/index.mjs';
++import { BatchInputAnswerForm } from '../batch-input-field.js';
+ import {
+   DeleteAnswerButton,
+   ForNonLoggedInUserDialog,
+   SubmitAnswerButtonWithConfirmation,
+-} from '../button-with-confirm';
+-import { ParagraphWithSwitch } from '../paragraph-with-switch';
+-import { WeightSetting } from './weight-setting';
++} from '../button-with-confirm/index.mjs';
++import { ParagraphWithSwitch } from '../paragraph-with-switch.js';
++import { WeightSetting } from './weight-setting.js';
+ 
+ const dc = dict.answerPage.answerBeingEdited;
+ 
+@@ -85,7 +93,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
+ 
+     const checkboxesState = AnswerPageStore.useCheckboxesState();
+ 
+-    const helperText = useMemo(
++    const helperText = React.useMemo(
+       () =>
+         showUserNameError ? (
+           theNameIsAlreadyUsed ? (
+@@ -113,7 +121,7 @@ export const AnswerBeingEdited = memoNamed<Props>(
+           >
+             <BpInput
+               // eslint-disable-next-line jsx-a11y/no-autofocus
+-              autoFocus={true}
++              autoFocus
+               data-e2e={'username'}
+               intent={showUserNameError ? 'danger' : 'primary'}
+               value={answerBeingEdited.user.name}
+@@ -287,8 +295,8 @@ export const AnswerBeingEdited = memoNamed<Props>(
+         <WidthRestrictedInputWrapper>
+           <FormGroup label={dc.comments}>
+             <BpTextArea
+-              autoResize={true}
+-              fill={true}
++              autoResize
++              fill
+               value={answerBeingEdited.comment}
+               onValueChange={AnswerPageStore.onCommentChange}
+             />

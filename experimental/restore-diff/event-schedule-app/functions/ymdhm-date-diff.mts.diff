@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/event-schedule-app/src/functions/ymdhm-date-diff.ts apps/event-schedule-app/src/functions/ymdhm-date-diff.mts
+index 012ca780a..57df0f839 100644
+--- experimental/packages/apps/event-schedule-app/src/functions/ymdhm-date-diff.ts
++++ apps/event-schedule-app/src/functions/ymdhm-date-diff.mts
+@@ -1,14 +1,12 @@
+-import { Ymdhm2Date } from '@noshiro/io-ts-types';
++import { Num, asPositiveSafeInt, pipe } from 'ts-data-forge';
++import { DateUtils, Ymdhm2Date } from 'ts-fortress-types';
+ 
+ export const ymdhmDateDiff = (a: Ymdhm, b: Ymdhm): number => {
+   const diff =
+-    pipe(a)
+-      .chain(Ymdhm2Date)
+-      .chain(DateUtils.toMidnight)
+-      .chain(DateUtils.toTimestamp).value -
+-    pipe(b)
+-      .chain(Ymdhm2Date)
+-      .chain(DateUtils.toMidnight)
+-      .chain(DateUtils.toTimestamp).value;
+-  return Math.round(Num.div(diff, toPositiveSafeInt(24 * 60 * 60 * 1000)));
++    pipe(a).map(Ymdhm2Date).map(DateUtils.toMidnight).map(DateUtils.toTimestamp)
++      .value -
++    pipe(b).map(Ymdhm2Date).map(DateUtils.toMidnight).map(DateUtils.toTimestamp)
++      .value;
++
++  return Math.round(Num.div(diff, asPositiveSafeInt(24 * 60 * 60 * 1000)));
+ };

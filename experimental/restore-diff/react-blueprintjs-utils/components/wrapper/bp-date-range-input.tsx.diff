@@ -1,0 +1,177 @@
+diff --git experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-date-range-input.tsx apps/react-blueprintjs-utils/src/components/wrapper/bp-date-range-input.tsx
+index edf6704cc..91494abe4 100644
+--- experimental/packages/utils/react-blueprintjs-utils/src/components/wrapper/bp-date-range-input.tsx
++++ apps/react-blueprintjs-utils/src/components/wrapper/bp-date-range-input.tsx
+@@ -1,13 +1,15 @@
+-import { type DateRange } from '@blueprintjs/datetime';
+-import { DateRangeInput3 } from '@blueprintjs/datetime2';
++import { DateRangeInput, type DateRange } from '@blueprintjs/datetime';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { castMutable, pipe, tp } from 'ts-data-forge';
+ import {
++  DateUtils,
+   Ymdhm2Date,
+   YmdhmFromDate,
+   type YearMonthDate,
+-} from '@noshiro/io-ts-types';
+-import { memoNamed } from '@noshiro/react-utils';
+-import { DateUtils, castMutable, pipe, tp } from '@noshiro/ts-utils';
+-import { useCallback, useMemo } from 'react';
++} from 'ts-fortress-types';
++import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
++import { mapOptional } from '../../utils/index.mjs';
+ 
+ export type BpDateRangeInputProps = DeepReadonly<{
+   dateRange: {
+@@ -24,7 +26,7 @@ export type BpDateRangeInputProps = DeepReadonly<{
+     }>,
+   ) => void;
+ }> &
+-  Omit<
++  StrictOmit<
+     DateRangeInputPropsOriginal,
+     | 'defaultValue'
+     | 'formatDate'
+@@ -35,7 +37,7 @@ export type BpDateRangeInputProps = DeepReadonly<{
+     | 'value'
+   >;
+ 
+-type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput3>;
++type DateRangeInputPropsOriginal = React.ComponentProps<typeof DateRangeInput>;
+ 
+ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
+   'BpDateRangeInput',
+@@ -47,27 +49,31 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
+     maxDate: _maxDate,
+     ...props
+   }) => {
+-    const value = useMemo(
++    const value = React.useMemo(
+       () =>
+         castMutable(
+           tp(
+-            pipe(dateRange.start).chainOptional((d) =>
+-              DateUtils.toDate(
+-                Ymdhm2Date({
+-                  ...d,
+-                  hours: 0,
+-                  minutes: 0,
+-                }),
++            pipe(dateRange.start).map((__v) =>
++              mapOptional(__v, (d) =>
++                DateUtils.toDate(
++                  Ymdhm2Date({
++                    ...d,
++                    hours: 0,
++                    minutes: 0,
++                  }),
++                ),
+               ),
+             ).value ?? null,
+ 
+-            pipe(dateRange.end).chainOptional((d) =>
+-              DateUtils.toDate(
+-                Ymdhm2Date({
+-                  ...d,
+-                  hours: 0,
+-                  minutes: 0,
+-                }),
++            pipe(dateRange.end).map((__v) =>
++              mapOptional(__v, (d) =>
++                DateUtils.toDate(
++                  Ymdhm2Date({
++                    ...d,
++                    hours: 0,
++                    minutes: 0,
++                  }),
++                ),
+               ),
+             ).value ?? null,
+           ),
+@@ -75,50 +81,54 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
+       [dateRange],
+     );
+ 
+-    const minDate: RawDateMutType | undefined = useMemo(
++    const minDate: Date | undefined = React.useMemo(
+       () =>
+         castMutable(
+-          pipe(_minDate).chainOptional((d) =>
+-            DateUtils.toDate(
+-              Ymdhm2Date({
+-                ...d,
+-                hours: 0,
+-                minutes: 0,
+-              }),
++          pipe(_minDate).map((__v) =>
++            mapOptional(__v, (d) =>
++              DateUtils.toDate(
++                Ymdhm2Date({
++                  ...d,
++                  hours: 0,
++                  minutes: 0,
++                }),
++              ),
+             ),
+           ).value,
+         ),
+       [_minDate],
+     );
+ 
+-    const maxDate: RawDateMutType | undefined = useMemo(
++    const maxDate: Date | undefined = React.useMemo(
+       () =>
+         castMutable(
+-          pipe(_maxDate).chainOptional((d) =>
+-            DateUtils.toDate(
+-              Ymdhm2Date({
+-                ...d,
+-                hours: 0,
+-                minutes: 0,
+-              }),
++          pipe(_maxDate).map((__v) =>
++            mapOptional(__v, (d) =>
++              DateUtils.toDate(
++                Ymdhm2Date({
++                  ...d,
++                  hours: 0,
++                  minutes: 0,
++                }),
++              ),
+             ),
+           ).value,
+         ),
+       [_maxDate],
+     );
+ 
+-    const onChange = useCallback(
++    const onChange = React.useCallback(
+       ([start, end]: Readonly<DateRange>) => {
+         onDateRangeChange({
+-          start: pipe(start).chainOptional(YmdhmFromDate).value ?? undefined,
+-          end: pipe(end).chainOptional(YmdhmFromDate).value ?? undefined,
++          start: pipe(start).map((v) => mapOptional(v, YmdhmFromDate)).value,
++          end: pipe(end).map((v) => mapOptional(v, YmdhmFromDate)).value,
+         });
+       },
+       [onDateRangeChange],
+     );
+ 
+     return (
+-      <DateRangeInput3
++      <DateRangeInput
+         // eslint-disable-next-line react/jsx-props-no-spreading
+         {...props}
+         disabled={disabled}
+@@ -133,7 +143,7 @@ export const BpDateRangeInput = memoNamed<BpDateRangeInputProps>(
+   },
+ );
+ 
+-const encodeDate = (date: RawDateType): string => date.toLocaleDateString();
++const encodeDate = (date: Date): string => date.toLocaleDateString();
+ 
+-const decodeDate = (str: string): RawDateType =>
+-  pipe(DateUtils.from(str)).chain(DateUtils.toDate).value;
++const decodeDate = (str: string): Date =>
++  pipe(DateUtils.from(str)).map(DateUtils.toDate).value;

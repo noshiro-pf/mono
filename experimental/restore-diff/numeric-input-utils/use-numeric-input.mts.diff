@@ -1,0 +1,68 @@
+diff --git experimental/packages/utils/numeric-input-utils/src/use-numeric-input.mts apps/numeric-input-utils/src/use-numeric-input.mts
+index 3df6bbbb7..5fdb3a4c1 100644
+--- experimental/packages/utils/numeric-input-utils/src/use-numeric-input.mts
++++ apps/numeric-input-utils/src/use-numeric-input.mts
+@@ -1,4 +1,3 @@
+-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import * as React from 'react';
+ 
+ export const useNumericInputState = <N extends number>({
+@@ -17,35 +16,38 @@ export const useNumericInputState = <N extends number>({
+   setState: (value: string) => void;
+   submit: () => void;
+ }> => {
+-  const constants = React.useRef({
+-    onValueChange,
+-    encode,
+-    decode,
+-  });
++  // No explicit type argument: `encode` gives it, and the React Compiler rule
++  // reads `useState<string>(…)` as a reference to the hook rather than a call.
++  const [state, setState] = React.useState(encode(valueFromProps));
+ 
+-  const [state, setState] = React.useState<string>(encode(valueFromProps));
++  // `encode`, `decode` and `onValueChange` used to be held in a ref so that a
++  // caller passing them inline did not re-run the effect that reset the text.
++  // Reading a ref during render is what the React Compiler rejects, and the
++  // ref bought little — see the reset below, which no longer is an effect.
++  const dirty = state !== encode(valueFromProps);
+ 
+-  const dirty = React.useMemo(
+-    () => state !== constants.current.encode(valueFromProps),
+-    [state, valueFromProps],
+-  );
++  // When the value arrives changed from outside, the text is reset to match.
++  // Written as React's "adjusting state when a prop changes" recipe rather
++  // than an effect: an effect would render once with the stale text and then
++  // again with the new one, and the React Compiler rejects deriving state from
++  // props that way.
++  const [previousValue, setPreviousValue] = React.useState(valueFromProps);
+ 
+-  React.useEffect(() => {
+-    setState(constants.current.encode(valueFromProps));
+-  }, [valueFromProps]);
++  if (previousValue !== valueFromProps) {
++    setPreviousValue(valueFromProps);
+ 
+-  const submit = React.useCallback(() => {
+-    const decoded = constants.current.decode(state);
++    setState(encode(valueFromProps));
++  }
+ 
+-    const nextNumericState = decoded;
+-    const nextStringState = constants.current.encode(nextNumericState);
++  const submit = React.useCallback(() => {
++    const nextNumericState = decode(state);
+ 
+-    setState(nextStringState);
++    setState(encode(nextNumericState));
+ 
+     if (valueFromProps !== nextNumericState) {
+-      constants.current.onValueChange(nextNumericState);
++      onValueChange(nextNumericState);
+     }
+-  }, [state, valueFromProps]);
++  }, [state, valueFromProps, encode, decode, onValueChange]);
+ 
+   return {
+     state,
