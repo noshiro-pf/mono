@@ -9645,7 +9645,31 @@ namespace NoUnexpectedMultiline {
  *  ```
  */
 namespace NoUnmodifiedLoopCondition {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checkConditionalExpressions": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    checkConditionalExpressions?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -13806,6 +13830,7 @@ export type EslintRulesOption = Readonly<{
   'no-shadow-restricted-names': NoShadowRestrictedNames.Options;
   'no-undef': NoUndef.Options;
   'no-underscore-dangle': NoUnderscoreDangle.Options;
+  'no-unmodified-loop-condition': NoUnmodifiedLoopCondition.Options;
   'no-unneeded-ternary': NoUnneededTernary.Options;
   'no-unreachable-loop': NoUnreachableLoop.Options;
   'no-unsafe-negation': NoUnsafeNegation.Options;
