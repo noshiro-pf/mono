@@ -1,10 +1,12 @@
-import { getShuffled } from '@noshiro/ts-utils-additional';
+import { type FixedLengthTuple } from 'ts-type-forge';
 import { createPointMap } from './create-point-converter-map.mjs';
-import { type ArrayOfLength4, type Pair } from './types.mjs';
+import { getShuffled } from './shuffled.mjs';
+import { type Pair } from './types.mjs';
 import { sum } from './utils.mjs';
 
 describe('createPointMap', () => {
   const oka = 30_000;
+
   const uma = [15, 5, -5, -15] as const;
 
   test.each([
@@ -109,11 +111,11 @@ describe('createPointMap', () => {
         [10_000, -25],
       ],
     },
-  ] as const satisfies {
+  ] as const satisfies readonly Readonly<{
     case: string;
-    input: ArrayOfLength4<number>;
-    output: Pair[];
-  }[])('$case', ({ input, output }) => {
+    input: FixedLengthTuple<4, number>;
+    output: readonly Pair[];
+  }>[])('$case', ({ input, output }) => {
     const result = createPointMap(getShuffled(input), oka, uma);
 
     expect(sum(input)).toBe(100_000);
@@ -121,6 +123,6 @@ describe('createPointMap', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(sum(input.map((x) => result.get(x)!))).toBe(0);
 
-    expect(Array.from(result.entries())).toStrictEqual(output);
+    expect(Array.from(result)).toStrictEqual(output);
   });
 });
