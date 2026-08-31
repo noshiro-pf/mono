@@ -9,7 +9,6 @@ ignorePaths:
   - '**/dist/**'
   - '**/node_modules/**'
   - '**/coverage/**'
-  - '**/CHANGELOG.md'
   # - '**/test/**'
   - 'libs/**/docs/**'
   - 'docs/**/*.html'
@@ -40,6 +39,7 @@ ignorePaths:
 # `cspell.config.yaml`; a word confined to one file goes in a
 # `cspell:ignore` comment in that file.
 words:
+  - anthropics
   - bivariant
   - tsubu
   - blueprintjs

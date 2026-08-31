@@ -436,8 +436,9 @@ having seen it.
 
 `pnpm run cspell` covers the whole repository apart from `experimental/`, the
 verbatim IETF RFCs under `docs/json-spec/`, and the rest of `ignorePaths` in
-the root `.cspell.config.yaml`. Six packages under `libs/` also run cspell
-themselves, with the package directory as cwd.
+the root `.cspell.config.yaml`. Seven packages under `libs/` also run cspell
+themselves, with the package directory as cwd. `.changeset/` is checked
+separately — see below.
 
 cspell walks up from each file looking for a configuration and merges what it
 finds, so a word can be declared at the scope it actually belongs to. Use the
@@ -448,7 +449,8 @@ narrowest one that covers every occurrence:
   `<!-- cspell:ignore … -->` in Markdown. It applies to the whole file wherever
   it sits; keep it at the top, below the front matter or a shebang.
 - **One package or one top-level directory** — a `cspell.config.yaml` there.
-  Seven exist: `.github/`, `apps/synstate-docs/`, and five under `libs/`.
+  Thirteen exist: `.github/`, `strict-lib/`, six under `apps/` and five under
+  `libs/`.
 - **More than one of those** — the `words` list in the root
   `.cspell.config.yaml`. It is meant to stay short.
 
@@ -468,6 +470,50 @@ entry once the last occurrence goes. To find entries that have gone dead, empty
 `words`, run `pnpm run cspell`, and restore only what it reports: doing that
 once retired 240 of the 300 words the root list had accumulated, nearly all of
 them left over from packages that now live in `experimental/`.
+
+### `.changeset/`
+
+**A changeset's text does not stay where it is written, so it is not checked
+where it is written.** `pnpm run cspell:changeset` handles `.changeset/`, and
+the root `cspell` script runs it after the repository-wide pass.
+
+`changeset version` copies a changeset's body into the `CHANGELOG.md` of every
+package its front matter names, and those are checked like any other file —
+`**/CHANGELOG.md` is deliberately **not** in `ignorePaths`. So the same text is
+checked twice in its life, in two places that disagree in both directions: as
+`.changeset/<name>.md` at the repository root, where only the root config
+applies, and as `libs/<pkg>/CHANGELOG.md`, where that package's own config
+does. A word `libs/ts-data-forge/cspell.config.yaml` allows would fail while
+the changeset exists; a word only the root allows would pass then and fail at
+release, on the `chore: version packages` branch, after the changeset that
+would have explained it is gone.
+
+`tools/scripts/cmd/cspell-changeset.mts` settles that in favour of the
+destination. It reads each changeset's front matter, resolves every named
+package to its directory, walks up from there for the config cspell itself
+would find, and runs cspell once per config.
+
+- **A changeset must pass under _every_ config it names, not just one.** The
+  one body is copied into every named package's changelog, so a word is safe
+  only if all of those configs accept it. A changeset for the strict standard
+  library names twelve harnesses, which all resolve to the single
+  `strict-lib/cspell.config.yaml`.
+- **A word used in a changeset belongs in the named package's config** — the
+  scope it will need anyway once the text is in that package's changelog, and
+  one that goes away with the package rather than outliving the changeset.
+- **`.changeset` must not go into `ignorePaths`.** Those globs resolve against
+  the config that declares them and every package config imports the root one,
+  so a root entry would also silence the per-package runs that are the point.
+  It is kept out of the repository-wide pass by being absent from that script's
+  glob instead — `**` does not match a dot directory, which is why the glob
+  used to name `.changeset/**/*` explicitly.
+- Files in `.changeset/` with no front matter — `README.md`, `config.json`, a
+  `pre.json` during a pre-release — have no destination and are checked under
+  the root config, which is where the repository-wide pass would have taken
+  them.
+
+The check also fails on a changeset naming a package that does not exist:
+`changeset version` fails on it, and until then it releases nothing.
 
 ## Important Instructions
 
