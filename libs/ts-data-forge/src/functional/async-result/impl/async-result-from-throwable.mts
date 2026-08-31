@@ -23,7 +23,7 @@ import { type AsyncResult } from '../async-result.mjs';
  *   (): Promise<number> => {
  *     throw new Error('boom');
  *   },
- *   (error) => (Error.isError(error) ? error.message : 'unknown'),
+ *   (error) => (isError(error) ? error.message : 'unknown'),
  * );
  *
  * assert.deepStrictEqual(success, Result.ok(2));

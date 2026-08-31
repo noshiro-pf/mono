@@ -21,7 +21,7 @@ import { type AsyncResult } from '../async-result.mjs';
  *
  * const rejected = await AsyncResult.fromPromise(
  *   Promise.reject(new Error('boom')),
- *   (error) => (Error.isError(error) ? error.message : 'unknown'),
+ *   (error) => (isError(error) ? error.message : 'unknown'),
  * );
  *
  * assert.deepStrictEqual(resolved, Result.ok('ok'));

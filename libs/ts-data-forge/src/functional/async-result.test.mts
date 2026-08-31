@@ -1,3 +1,4 @@
+import { isError } from '@sindresorhus/is';
 import { AsyncResult as AsyncResultFromEntryPoint } from '../entry-point.mjs';
 import { expectType } from '../expect-type.mjs';
 import { AsyncResult } from './async-result/index.mjs';
@@ -27,7 +28,7 @@ describe('AsyncResult test', () => {
     test('rejected promise becomes Err with mapError applied', async () => {
       const result = await AsyncResult.fromPromise(
         Promise.reject(new Error('boom')),
-        (error) => (Error.isError(error) ? error.message : 'unknown'),
+        (error) => (isError(error) ? error.message : 'unknown'),
       );
 
       assert.isTrue(Result.isErr(result));
@@ -73,7 +74,7 @@ describe('AsyncResult test', () => {
         (): Promise<number> => {
           throw new Error('sync failure');
         },
-        (error) => (Error.isError(error) ? error.message : 'unknown'),
+        (error) => (isError(error) ? error.message : 'unknown'),
       );
 
       assert.isTrue(Result.isErr(result));
@@ -84,7 +85,7 @@ describe('AsyncResult test', () => {
     test('async rejection becomes Err with mapError applied', async () => {
       const result = await AsyncResult.fromThrowable(
         () => Promise.reject(new Error('async failure')),
-        (error) => (Error.isError(error) ? error.message : 'unknown'),
+        (error) => (isError(error) ? error.message : 'unknown'),
       );
 
       assert.isTrue(Result.isErr(result));
