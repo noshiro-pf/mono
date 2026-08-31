@@ -47,27 +47,42 @@ interface BigIntToLocaleStringOptions {
   /**
    * The minimum number of integer digits to use. Possible values are from 1 to 21; the default is 1.
    */
-  readonly minimumIntegerDigits?: import('ts-type-forge').UintRange<1, 22>;
+  readonly minimumIntegerDigits?: import('ts-type-forge').UintRangeInclusive<
+    1,
+    21
+  >;
 
   /**
    * The minimum number of fraction digits to use. Possible values are from 0 to 20; the default for plain number and percent formatting is 0; the default for currency formatting is the number of minor unit digits provided by the {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list} (2 if the list doesn't provide that information).
    */
-  readonly minimumFractionDigits?: import('ts-type-forge').UintRange<0, 21>;
+  readonly minimumFractionDigits?: import('ts-type-forge').UintRangeInclusive<
+    0,
+    20
+  >;
 
   /**
    * The maximum number of fraction digits to use. Possible values are from 0 to 20; the default for plain number formatting is the larger of minimumFractionDigits and 3; the default for currency formatting is the larger of minimumFractionDigits and the number of minor unit digits provided by the {@link http://www.currency-iso.org/en/home/tables/table-a1.html ISO 4217 currency codes list} (2 if the list doesn't provide that information); the default for percent formatting is the larger of minimumFractionDigits and 0.
    */
-  readonly maximumFractionDigits?: import('ts-type-forge').UintRange<0, 21>;
+  readonly maximumFractionDigits?: import('ts-type-forge').UintRangeInclusive<
+    0,
+    20
+  >;
 
   /**
    * The minimum number of significant digits to use. Possible values are from 1 to 21; the default is 1.
    */
-  readonly minimumSignificantDigits?: import('ts-type-forge').UintRange<1, 22>;
+  readonly minimumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
+    1,
+    21
+  >;
 
   /**
    * The maximum number of significant digits to use. Possible values are from 1 to 21; the default is 21.
    */
-  readonly maximumSignificantDigits?: import('ts-type-forge').UintRange<1, 22>;
+  readonly maximumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
+    1,
+    21
+  >;
 
   /**
    * The formatting that should be displayed for the number, the defaults is "standard"
@@ -93,7 +108,7 @@ interface BigInt {
    * Returns a string representation of an object.
    * @param radix Specifies a radix for converting numeric values to strings.
    */
-  toString(radix?: import('ts-type-forge').UintRange<2, 37>): string;
+  toString(radix?: import('ts-type-forge').UintRangeInclusive<2, 36>): string;
 
   /** Returns a string representation appropriate to the host environment's current locale. */
   toLocaleString(
@@ -117,14 +132,20 @@ interface BigIntConstructor {
    * @param bits The number of low bits to use
    * @param int The BigInt whose bits to extract
    */
-  asIntN(bits: import('ts-type-forge').UintRange<0, 65>, int: bigint): bigint;
+  asIntN(
+    bits: import('ts-type-forge').UintRangeInclusive<0, 64>,
+    int: bigint,
+  ): bigint;
   /**
    * Interprets the low bits of a BigInt as an unsigned integer.
    * All higher bits are discarded.
    * @param bits The number of low bits to use
    * @param int The BigInt whose bits to extract
    */
-  asUintN(bits: import('ts-type-forge').UintRange<0, 65>, int: bigint): bigint;
+  asUintN(
+    bits: import('ts-type-forge').UintRangeInclusive<0, 64>,
+    int: bigint,
+  ): bigint;
 }
 
 declare const BigInt: BigIntConstructor;

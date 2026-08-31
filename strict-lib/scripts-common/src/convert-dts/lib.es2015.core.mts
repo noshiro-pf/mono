@@ -83,7 +83,7 @@ export const convertLibEs2015Core =
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'clz32(x: number): number;',
-              'clz32(x: number): UintRange<0, 33>;',
+              'clz32(x: number): UintRangeInclusive<0, 32>;',
             ),
             replaceWithNoMatchCheck(
               'imul(x: number, y: number): number;',
@@ -170,7 +170,7 @@ export const convertLibEs2015Core =
               : idFn,
             replaceWithNoMatchCheck(
               'parseInt(string: string, radix?: number): number;',
-              `parseInt(string: string, radix?: UintRange<2, 37>): ${useBrandedNumber ? `${brandedNumber.Int} | ${brandedNumber.NaNType}` : 'number'};`,
+              `parseInt(string: string, radix?: UintRangeInclusive<2, 36>): ${useBrandedNumber ? `${brandedNumber.Int} | ${brandedNumber.NaNType}` : 'number'};`,
             ),
           ),
         }),

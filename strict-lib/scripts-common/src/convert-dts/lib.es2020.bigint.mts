@@ -26,23 +26,23 @@ export const convertLibEs2020Bigint =
         convertTypedArrayCommon(config),
         replaceWithNoMatchCheck(
           'minimumIntegerDigits?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;',
-          'minimumIntegerDigits?: UintRange<1, 22>;',
+          'minimumIntegerDigits?: UintRangeInclusive<1, 21>;',
         ),
         replaceWithNoMatchCheck(
           'minimumFractionDigits?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;',
-          'minimumFractionDigits?: UintRange<0, 21>;',
+          'minimumFractionDigits?: UintRangeInclusive<0, 20>;',
         ),
         replaceWithNoMatchCheck(
           'maximumFractionDigits?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;',
-          'maximumFractionDigits?: UintRange<0, 21>;',
+          'maximumFractionDigits?: UintRangeInclusive<0, 20>;',
         ),
         replaceWithNoMatchCheck(
           'minimumSignificantDigits?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;',
-          'minimumSignificantDigits?: UintRange<1, 22>;',
+          'minimumSignificantDigits?: UintRangeInclusive<1, 21>;',
         ),
         replaceWithNoMatchCheck(
           'maximumSignificantDigits?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;',
-          'maximumSignificantDigits?: UintRange<1, 22>;',
+          'maximumSignificantDigits?: UintRangeInclusive<1, 21>;',
         ),
         replaceWithNoMatchCheck(
           'readonly byteOffset: number',
@@ -80,17 +80,17 @@ export const convertLibEs2020Bigint =
         replaceWithNoMatchCheck(
           // BigInt
           'asIntN(bits: number, int: bigint): bigint;',
-          'asIntN(bits: UintRange<0, 65>, int: bigint): bigint;',
+          'asIntN(bits: UintRangeInclusive<0, 64>, int: bigint): bigint;',
         ),
         replaceWithNoMatchCheck(
           // BigInt
           'asUintN(bits: number, int: bigint): bigint;',
-          'asUintN(bits: UintRange<0, 65>, int: bigint): bigint;',
+          'asUintN(bits: UintRangeInclusive<0, 64>, int: bigint): bigint;',
         ),
         replaceWithNoMatchCheck(
           //
           'radix?: number',
-          'radix?: UintRange<2, 37>',
+          'radix?: UintRangeInclusive<2, 36>',
           {
             onNotFound: 'off',
             onNoChange: 'off',

@@ -16,19 +16,19 @@ export const convertLibEs5_Number: MonoTypeFunction<string> = (src) =>
         mapFn: composeMonoTypeFns(
           replaceWithNoMatchCheck(
             'toString(radix?: number): string;',
-            'toString(radix?: UintRange<2, 37>): string;',
+            'toString(radix?: UintRangeInclusive<2, 36>): string;',
           ),
           replaceWithNoMatchCheck(
             'toFixed(fractionDigits?: number): string;',
-            'toFixed(fractionDigits?: UintRange<0, 101>): string;',
+            'toFixed(fractionDigits?: UintRangeInclusive<0, 100>): string;',
           ),
           replaceWithNoMatchCheck(
             'toExponential(fractionDigits?: number): string;',
-            'toExponential(fractionDigits?: UintRange<1, 101>): string;',
+            'toExponential(fractionDigits?: UintRangeInclusive<1, 100>): string;',
           ),
           replaceWithNoMatchCheck(
             'toPrecision(precision?: number): string;',
-            'toPrecision(precision?: UintRange<1, 101>): string;',
+            'toPrecision(precision?: UintRangeInclusive<1, 100>): string;',
           ),
         ),
       }),
