@@ -4,6 +4,13 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Set per package while the
+    // repository migrates one at a time; it moves to the shared config once
+    // every package passes. See docs/strict-typescript-lib-integration.md.
+    "libReplacement": true,
+
     "paths": {
       "ts-codemod-lib": ["./src/entry-point.mts"]
     }
