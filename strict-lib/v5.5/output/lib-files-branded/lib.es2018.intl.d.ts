@@ -9,19 +9,19 @@ declare namespace Intl {
     readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
     readonly type?: PluralRuleType | undefined;
     readonly minimumIntegerDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
     readonly minimumFractionDigits?:
-      | import('ts-type-forge').UintRange<0, 21>
+      | import('ts-type-forge').UintRangeInclusive<0, 20>
       | undefined;
     readonly maximumFractionDigits?:
-      | import('ts-type-forge').UintRange<0, 21>
+      | import('ts-type-forge').UintRangeInclusive<0, 20>
       | undefined;
     readonly minimumSignificantDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
     readonly maximumSignificantDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
   }
 
@@ -29,16 +29,25 @@ declare namespace Intl {
     readonly locale: string;
     readonly pluralCategories: readonly LDMLPluralRule[];
     readonly type: PluralRuleType;
-    readonly minimumIntegerDigits: import('ts-type-forge').UintRange<1, 22>;
-    readonly minimumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-    readonly maximumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-    readonly minimumSignificantDigits?: import('ts-type-forge').UintRange<
+    readonly minimumIntegerDigits: import('ts-type-forge').UintRangeInclusive<
       1,
-      22
+      21
     >;
-    readonly maximumSignificantDigits?: import('ts-type-forge').UintRange<
+    readonly minimumFractionDigits: import('ts-type-forge').UintRangeInclusive<
+      0,
+      20
+    >;
+    readonly maximumFractionDigits: import('ts-type-forge').UintRangeInclusive<
+      0,
+      20
+    >;
+    readonly minimumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
       1,
-      22
+      21
+    >;
+    readonly maximumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
+      1,
+      21
     >;
   }
 

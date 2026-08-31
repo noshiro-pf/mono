@@ -67,7 +67,7 @@
     * @param x A numeric expression.
     */
 -  clz32(x: number): number;
-+  clz32(x: number): import('ts-type-forge').UintRange<0, 33>;
++  clz32(x: number): import('ts-type-forge').UintRangeInclusive<0, 32>;
  
    /**
     * Returns the result of 32-bit multiplication of two numbers.
@@ -119,7 +119,7 @@
 -  parseInt(string: string, radix?: number): number;
 +  parseInt(
 +    string: string,
-+    radix?: import('ts-type-forge').UintRange<2, 37>,
++    radix?: import('ts-type-forge').UintRangeInclusive<2, 36>,
 +  ): number;
  }
  

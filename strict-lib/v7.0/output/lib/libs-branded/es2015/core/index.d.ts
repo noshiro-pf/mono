@@ -120,7 +120,7 @@ interface Math {
    * Returns the number of leading zero bits in the 32-bit binary representation of a number.
    * @param x A numeric expression.
    */
-  clz32(x: number): import('ts-type-forge').UintRange<0, 33>;
+  clz32(x: number): import('ts-type-forge').UintRangeInclusive<0, 32>;
 
   /**
    * Returns the result of 32-bit multiplication of two numbers.
@@ -313,7 +313,7 @@ interface NumberConstructor {
    */
   parseInt(
     string: string,
-    radix?: import('ts-type-forge').UintRange<2, 37>,
+    radix?: import('ts-type-forge').UintRangeInclusive<2, 36>,
   ): import('ts-type-forge').Int | import('ts-type-forge').NaNType;
 }
 

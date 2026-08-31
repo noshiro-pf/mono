@@ -47,7 +47,7 @@ export const convertLibEs5 =
         convertLibEs5_TypedArray(options),
         replaceWithNoMatchCheck(
           'declare function parseInt(string: string, radix?: number): number;',
-          `declare function parseInt(string: string, radix?: UintRange<2, 37>): ${options.config.useBrandedNumber ? `${options.brandedNumber.Int} | ${options.brandedNumber.NaNType}` : 'number'};`,
+          `declare function parseInt(string: string, radix?: UintRangeInclusive<2, 36>): ${options.config.useBrandedNumber ? `${options.brandedNumber.Int} | ${options.brandedNumber.NaNType}` : 'number'};`,
         ),
         !options.config.useBrandedNumber
           ? idFn

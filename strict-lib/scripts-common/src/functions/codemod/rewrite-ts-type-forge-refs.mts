@@ -55,6 +55,7 @@ const tsTypeForgeTypeNames: ReadonlySet<string> = new Set([
   'Int8',
   'Uint8',
   'UintRange',
+  'UintRangeInclusive',
   'AbsoluteValue',
   'RelaxedExclude',
   'HTTPRequestMethod',

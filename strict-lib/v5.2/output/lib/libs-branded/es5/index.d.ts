@@ -26,7 +26,7 @@ declare function eval(x: string): unknown;
  */
 declare function parseInt(
   string: string,
-  radix?: import('ts-type-forge').UintRange<2, 37>,
+  radix?: import('ts-type-forge').UintRangeInclusive<2, 36>,
 ): import('ts-type-forge').Int | import('ts-type-forge').NaNType;
 
 /**
@@ -652,27 +652,31 @@ interface Number {
    * Returns a string representation of an object.
    * @param radix Specifies a radix for converting numeric values to strings. This value is only used for numbers.
    */
-  toString(radix?: import('ts-type-forge').UintRange<2, 37>): string;
+  toString(radix?: import('ts-type-forge').UintRangeInclusive<2, 36>): string;
 
   /**
    * Returns a string representing a number in fixed-point notation.
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
-  toFixed(fractionDigits?: import('ts-type-forge').UintRange<0, 101>): string;
+  toFixed(
+    fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
+  ): string;
 
   /**
    * Returns a string containing a number represented in exponential notation.
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   toExponential(
-    fractionDigits?: import('ts-type-forge').UintRange<1, 101>,
+    fractionDigits?: import('ts-type-forge').UintRangeInclusive<1, 100>,
   ): string;
 
   /**
    * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
    * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
    */
-  toPrecision(precision?: import('ts-type-forge').UintRange<1, 101>): string;
+  toPrecision(
+    precision?: import('ts-type-forge').UintRangeInclusive<1, 100>,
+  ): string;
 
   /** Returns the primitive value of the specified object. */
   valueOf(): number;
@@ -1315,7 +1319,7 @@ interface JSON {
   stringify(
     value: unknown,
     replacer?: (this: unknown, key: string, value: unknown) => unknown,
-    space?: string | import('ts-type-forge').UintRange<1, 11>,
+    space?: string | import('ts-type-forge').UintRangeInclusive<1, 10>,
   ): string;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -1326,7 +1330,7 @@ interface JSON {
   stringify(
     value: unknown,
     replacer?: readonly (number | string)[] | null,
-    space?: string | import('ts-type-forge').UintRange<1, 11>,
+    space?: string | import('ts-type-forge').UintRangeInclusive<1, 10>,
   ): string;
 }
 
@@ -6154,19 +6158,19 @@ declare namespace Intl {
     readonly currencySign?: string | undefined;
     readonly useGrouping?: boolean | undefined;
     readonly minimumIntegerDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
     readonly minimumFractionDigits?:
-      | import('ts-type-forge').UintRange<0, 21>
+      | import('ts-type-forge').UintRangeInclusive<0, 20>
       | undefined;
     readonly maximumFractionDigits?:
-      | import('ts-type-forge').UintRange<0, 21>
+      | import('ts-type-forge').UintRangeInclusive<0, 20>
       | undefined;
     readonly minimumSignificantDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
     readonly maximumSignificantDigits?:
-      | import('ts-type-forge').UintRange<1, 22>
+      | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
   }
 
@@ -6175,16 +6179,25 @@ declare namespace Intl {
     readonly numberingSystem: string;
     readonly style: string;
     readonly currency?: string;
-    readonly minimumIntegerDigits: import('ts-type-forge').UintRange<1, 22>;
-    readonly minimumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-    readonly maximumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-    readonly minimumSignificantDigits?: import('ts-type-forge').UintRange<
+    readonly minimumIntegerDigits: import('ts-type-forge').UintRangeInclusive<
       1,
-      22
+      21
     >;
-    readonly maximumSignificantDigits?: import('ts-type-forge').UintRange<
+    readonly minimumFractionDigits: import('ts-type-forge').UintRangeInclusive<
+      0,
+      20
+    >;
+    readonly maximumFractionDigits: import('ts-type-forge').UintRangeInclusive<
+      0,
+      20
+    >;
+    readonly minimumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
       1,
-      22
+      21
+    >;
+    readonly maximumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
+      1,
+      21
     >;
     readonly useGrouping: boolean;
   }

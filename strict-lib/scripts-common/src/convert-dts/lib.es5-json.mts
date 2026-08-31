@@ -23,7 +23,7 @@ export const convertLibEs5_Json =
             ),
             replaceWithNoMatchCheck(
               'space?: string | number',
-              'space?: string | UintRange<1, 11>',
+              'space?: string | UintRangeInclusive<1, 10>',
             ),
           ),
         }),

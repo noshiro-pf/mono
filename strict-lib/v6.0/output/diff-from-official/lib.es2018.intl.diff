@@ -1,4 +1,4 @@
-@@ -1,42 +1,43 @@
+@@ -1,42 +1,52 @@
 -/*! *****************************************************************************
 -Copyright (c) Microsoft Corporation. All rights reserved.
 -Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -30,19 +30,19 @@
 +    readonly localeMatcher?: 'lookup' | 'best fit' | undefined;
 +    readonly type?: PluralRuleType | undefined;
 +    readonly minimumIntegerDigits?:
-+      | import('ts-type-forge').UintRange<1, 22>
++      | import('ts-type-forge').UintRangeInclusive<1, 21>
 +      | undefined;
 +    readonly minimumFractionDigits?:
-+      | import('ts-type-forge').UintRange<0, 21>
++      | import('ts-type-forge').UintRangeInclusive<0, 20>
 +      | undefined;
 +    readonly maximumFractionDigits?:
-+      | import('ts-type-forge').UintRange<0, 21>
++      | import('ts-type-forge').UintRangeInclusive<0, 20>
 +      | undefined;
 +    readonly minimumSignificantDigits?:
-+      | import('ts-type-forge').UintRange<1, 22>
++      | import('ts-type-forge').UintRangeInclusive<1, 21>
 +      | undefined;
 +    readonly maximumSignificantDigits?:
-+      | import('ts-type-forge').UintRange<1, 22>
++      | import('ts-type-forge').UintRangeInclusive<1, 21>
 +      | undefined;
    }
  
@@ -58,21 +58,30 @@
 +    readonly locale: string;
 +    readonly pluralCategories: readonly LDMLPluralRule[];
 +    readonly type: PluralRuleType;
-+    readonly minimumIntegerDigits: import('ts-type-forge').UintRange<1, 22>;
-+    readonly minimumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-+    readonly maximumFractionDigits: import('ts-type-forge').UintRange<0, 21>;
-+    readonly minimumSignificantDigits?: import('ts-type-forge').UintRange<
++    readonly minimumIntegerDigits: import('ts-type-forge').UintRangeInclusive<
 +      1,
-+      22
++      21
 +    >;
-+    readonly maximumSignificantDigits?: import('ts-type-forge').UintRange<
++    readonly minimumFractionDigits: import('ts-type-forge').UintRangeInclusive<
++      0,
++      20
++    >;
++    readonly maximumFractionDigits: import('ts-type-forge').UintRangeInclusive<
++      0,
++      20
++    >;
++    readonly minimumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
 +      1,
-+      22
++      21
++    >;
++    readonly maximumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
++      1,
++      21
 +    >;
    }
  
    interface PluralRules {
-@@ -55,32 +56,32 @@ declare namespace Intl {
+@@ -55,32 +65,32 @@ declare namespace Intl {
      ): PluralRules;
      supportedLocalesOf(
        locales: string | readonly string[],

@@ -10,54 +10,54 @@ export const convertReturnTypeToUintRange: MonoTypeFunction<string> = (src) =>
     composeMonoTypeFns(
       replaceWithNoMatchCheck(
         'minimumIntegerDigits?: number | undefined',
-        'minimumIntegerDigits?: UintRange<1, 22> | undefined',
+        'minimumIntegerDigits?: UintRangeInclusive<1, 21> | undefined',
       ),
       replaceWithNoMatchCheck(
         'minimumIntegerDigits: number;',
-        'minimumIntegerDigits: UintRange<1, 22>;',
+        'minimumIntegerDigits: UintRangeInclusive<1, 21>;',
       ),
       replaceWithNoMatchCheck(
         'minimumSignificantDigits?: number | undefined',
-        'minimumSignificantDigits?: UintRange<1, 22> | undefined',
+        'minimumSignificantDigits?: UintRangeInclusive<1, 21> | undefined',
       ),
       replaceWithNoMatchCheck(
         'minimumSignificantDigits?: number;',
-        'minimumSignificantDigits?: UintRange<1, 22>;',
+        'minimumSignificantDigits?: UintRangeInclusive<1, 21>;',
       ),
       replaceWithNoMatchCheck(
         'maximumSignificantDigits?: number | undefined',
-        'maximumSignificantDigits?: UintRange<1, 22> | undefined',
+        'maximumSignificantDigits?: UintRangeInclusive<1, 21> | undefined',
       ),
       replaceWithNoMatchCheck(
         'maximumSignificantDigits?: number;',
-        'maximumSignificantDigits?: UintRange<1, 22>;',
+        'maximumSignificantDigits?: UintRangeInclusive<1, 21>;',
       ),
       replaceWithNoMatchCheck(
         'minimumFractionDigits?: number | undefined',
-        'minimumFractionDigits?: UintRange<0, 21> | undefined',
+        'minimumFractionDigits?: UintRangeInclusive<0, 20> | undefined',
       ),
       replaceWithNoMatchCheck(
         'minimumFractionDigits?: number;',
-        'minimumFractionDigits?: UintRange<0, 21>;',
+        'minimumFractionDigits?: UintRangeInclusive<0, 20>;',
         { onNotFound: 'off' },
       ),
       replaceWithNoMatchCheck(
         'minimumFractionDigits: number;',
-        'minimumFractionDigits: UintRange<0, 21>;',
+        'minimumFractionDigits: UintRangeInclusive<0, 20>;',
         { onNotFound: 'off' },
       ),
       replaceWithNoMatchCheck(
         'maximumFractionDigits?: number | undefined',
-        'maximumFractionDigits?: UintRange<0, 21> | undefined',
+        'maximumFractionDigits?: UintRangeInclusive<0, 20> | undefined',
       ),
       replaceWithNoMatchCheck(
         'maximumFractionDigits?: number;',
-        'maximumFractionDigits?: UintRange<0, 21>;',
+        'maximumFractionDigits?: UintRangeInclusive<0, 20>;',
         { onNotFound: 'off' },
       ),
       replaceWithNoMatchCheck(
         'maximumFractionDigits: number;',
-        'maximumFractionDigits: UintRange<0, 21>;',
+        'maximumFractionDigits: UintRangeInclusive<0, 20>;',
         { onNotFound: 'off' },
       ),
     ),
