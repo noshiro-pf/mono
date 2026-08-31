@@ -24,7 +24,7 @@ export const convertLibEs5_Number: MonoTypeFunction<string> = (src) =>
           ),
           replaceWithNoMatchCheck(
             'toExponential(fractionDigits?: number): string;',
-            'toExponential(fractionDigits?: UintRangeInclusive<1, 100>): string;',
+            'toExponential(fractionDigits?: UintRangeInclusive<0, 100>): string;',
           ),
           replaceWithNoMatchCheck(
             'toPrecision(precision?: number): string;',

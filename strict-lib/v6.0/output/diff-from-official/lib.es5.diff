@@ -485,7 +485,7 @@
     */
 -  toExponential(fractionDigits?: number): string;
 +  toExponential(
-+    fractionDigits?: import('ts-type-forge').UintRangeInclusive<1, 100>,
++    fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
 +  ): string;
  
    /**

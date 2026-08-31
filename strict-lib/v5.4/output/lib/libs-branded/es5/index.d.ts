@@ -667,7 +667,7 @@ interface Number {
    * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
    */
   toExponential(
-    fractionDigits?: import('ts-type-forge').UintRangeInclusive<1, 100>,
+    fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
   ): string;
 
   /**
