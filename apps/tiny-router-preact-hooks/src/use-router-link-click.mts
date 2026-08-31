@@ -1,7 +1,9 @@
-import { useCallback } from 'preact/hooks';
+import { type MouseEventHandler } from 'preact';
+import * as Preact from 'preact/hooks';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 const isModifiedEvent = (
-  ev: Record<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
+  ev: ReadonlyRecord<'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey', boolean>,
 ): boolean => ev.metaKey || ev.altKey || ev.ctrlKey || ev.shiftKey;
 
 type Path = Readonly<{
@@ -50,52 +52,7 @@ const createPath = ({
         ? hash
         : `#${hash}`
       : ''
-  }`;
-
-export const useRouterLinkClick = ({
-  replace: replaceProp,
-  redirectFn,
-  pushFn,
-}: Readonly<{
-  replace?: boolean;
-  redirectFn: (path: string) => void;
-  pushFn: (path: string) => void;
-}>): ((ev: MouseEvent) => void) =>
-  useCallback(
-    (ev) => {
-      const el = ev.target;
-      if (!(el instanceof HTMLAnchorElement)) {
-        console.warn(
-          'useRouterLinkClick should be used for HTMLAnchorElement.',
-        );
-        return;
-      }
-
-      const href = el.href;
-
-      if (
-        !ev.defaultPrevented &&
-        ev.button === 0 && // Ignore everything but left clicks
-        (el.target === '' || el.target === '_self') && // Let browser handle "target=_blank" etc.
-        !isModifiedEvent(ev) // Ignore clicks with modifier keys
-      ) {
-        ev.preventDefault();
-
-        // If the URL hasn't changed, a regular <a> will do a replace instead of
-        // a push, so do the same here.
-        const replace =
-          // eslint-disable-next-line unicorn/prefer-global-this
-          replaceProp === true || createPath(window.location) === href;
-
-        if (replace) {
-          redirectFn(href);
-        } else {
-          pushFn(href);
-        }
-      }
-    },
-    [replaceProp, pushFn, redirectFn],
-  );
+  }` as const;
 
 export const createRouterLinkClickHandler =
   ({
@@ -106,11 +63,13 @@ export const createRouterLinkClickHandler =
     replace?: boolean;
     redirectFn: (path: string) => void;
     pushFn: (path: string) => void;
-  }>): ((ev: MouseEvent) => void) =>
+  }>): MouseEventHandler<HTMLElement> =>
   (ev) => {
     const el = ev.target;
+
     if (!(el instanceof HTMLAnchorElement)) {
       console.warn('useRouterLinkClick should be used for HTMLAnchorElement.');
+
       return;
     }
 
@@ -137,3 +96,21 @@ export const createRouterLinkClickHandler =
       }
     }
   };
+
+/** {@link createRouterLinkClickHandler}, memoized. */
+export const useRouterLinkClick = (
+  props: Readonly<{
+    replace?: boolean;
+    redirectFn: (path: string) => void;
+    pushFn: (path: string) => void;
+  }>,
+): MouseEventHandler<HTMLElement> => {
+  const { replace, redirectFn, pushFn } = props;
+
+  return Preact.useCallback(
+    (ev) => {
+      createRouterLinkClickHandler({ replace, redirectFn, pushFn })(ev);
+    },
+    [replace, redirectFn, pushFn],
+  );
+};
