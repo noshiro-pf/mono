@@ -3,6 +3,21 @@
 import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as prettier from 'prettier';
+
+/**
+ * The generated Markdown goes through Prettier so that regenerating never
+ * produces a diff of nothing but table padding. `.prettierignore` covers
+ * `experimental/`, which is right for the 585 `.diff` files — they are patch
+ * text and must stay byte-for-byte — so the repository-wide pass does not
+ * reach these indexes and they have to format themselves. Prettier's API on a
+ * string does not consult the ignore file.
+ */
+const formatMarkdown = async (text) =>
+  prettier.format(text, {
+    ...(await prettier.resolveConfig('README.md')),
+    parser: 'markdown',
+  });
 
 const repoRoot = process.argv[2];
 const outRoot = path.join(repoRoot, 'experimental', 'restore-diff');
@@ -268,9 +283,10 @@ for (const s of summary) {
   }
 
   fs.mkdirSync(path.join(outRoot, s.pkgName), { recursive: true });
+
   fs.writeFileSync(
     path.join(outRoot, s.pkgName, '_index.md'),
-    `${lines.join('\n')}\n`,
+    await formatMarkdown(`${lines.join('\n')}\n`),
   );
 }
 
@@ -311,7 +327,7 @@ const readme = [
   '',
 ].join('\n');
 
-fs.writeFileSync(path.join(outRoot, 'README.md'), `${readme}\n`);
+fs.writeFileSync(path.join(outRoot, 'README.md'), await formatMarkdown(`${readme}\n`));
 
 console.log(
   summary

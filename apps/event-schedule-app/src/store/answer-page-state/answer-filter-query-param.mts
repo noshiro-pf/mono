@@ -2,10 +2,11 @@ import {
   ISet,
   Num,
   Result,
-  asSafeUint,
   expectType,
+  isSafeUint,
   pipe,
   tp,
+  type SafeUint,
 } from 'ts-data-forge';
 import { YearMonthDate } from 'ts-fortress-types';
 import { Routes } from '../../constants/index.mjs';
@@ -275,6 +276,16 @@ const restoreFromQueryParams = (
       .map(Num.from)
       .map((a) => (isAnswersScore(a) ? a : undefined)).value;
 
+  // `asSafeUint` throws on anything that is not a non-negative safe integer,
+  // `NaN` included, so it cannot be the inner call: a query parameter someone
+  // typed by hand would take the whole page down rather than be ignored.
+  // Guard first, cast second.
+  const parseSafeUint = (s: string): SafeUint | undefined => {
+    const parsed = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+
+    return isSafeUint(parsed) ? parsed : undefined;
+  };
+
   filterStateDispatch({
     type: 'setFromUrlQueryParams',
     values: {
@@ -313,80 +324,40 @@ const restoreFromQueryParams = (
           .map((__v) => mapOptional(__v, rangeFromStr))
           .map((__v) =>
             mapOptional(__v, (range) => ({
-              min: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-                ),
-              ),
-              max: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-                ),
-              ),
+              min: parseSafeUint(range.a),
+              max: parseSafeUint(range.b),
             })),
           ).value ?? { min: undefined, max: undefined },
         fair: pipe(queryParams.get(keyDef.fair))
           .map((__v) => mapOptional(__v, rangeFromStr))
           .map((__v) =>
             mapOptional(__v, (range) => ({
-              min: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-                ),
-              ),
-              max: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-                ),
-              ),
+              min: parseSafeUint(range.a),
+              max: parseSafeUint(range.b),
             })),
           ).value ?? { min: undefined, max: undefined },
         poor: pipe(queryParams.get(keyDef.poor))
           .map((__v) => mapOptional(__v, rangeFromStr))
           .map((__v) =>
             mapOptional(__v, (range) => ({
-              min: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-                ),
-              ),
-              max: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-                ),
-              ),
+              min: parseSafeUint(range.a),
+              max: parseSafeUint(range.b),
             })),
           ).value ?? { min: undefined, max: undefined },
         goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
           .map((__v) => mapOptional(__v, rangeFromStr))
           .map((__v) =>
             mapOptional(__v, (range) => ({
-              min: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-                ),
-              ),
-              max: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-                ),
-              ),
+              min: parseSafeUint(range.a),
+              max: parseSafeUint(range.b),
             })),
           ).value ?? { min: undefined, max: undefined },
         fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
           .map((__v) => mapOptional(__v, rangeFromStr))
           .map((__v) =>
             mapOptional(__v, (range) => ({
-              min: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-                ),
-              ),
-              max: Num.mapNaN2Undefined(
-                asSafeUint(
-                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-                ),
-              ),
+              min: parseSafeUint(range.a),
+              max: parseSafeUint(range.b),
             })),
           ).value ?? { min: undefined, max: undefined },
       },

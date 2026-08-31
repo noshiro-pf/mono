@@ -1,18 +1,19 @@
 diff --git experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.ts apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.mts
-index 3cd8f505d..c284db2fc 100644
+index 3cd8f505d..857e0e587 100644
 --- experimental/packages/apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.ts
 +++ apps/event-schedule-app/src/store/answer-page-state/answer-filter-query-param.mts
-@@ -1,16 +1,26 @@
+@@ -1,16 +1,27 @@
 -import { YearMonthDate } from '@noshiro/io-ts-types';
 -import { Routes } from '../../constants';
 +import {
 +  ISet,
 +  Num,
 +  Result,
-+  asSafeUint,
 +  expectType,
++  isSafeUint,
 +  pipe,
 +  tp,
++  type SafeUint,
 +} from 'ts-data-forge';
 +import { YearMonthDate } from 'ts-fortress-types';
 +import { Routes } from '../../constants/index.mjs';
@@ -34,7 +35,7 @@ index 3cd8f505d..c284db2fc 100644
  
  const keyDef = Routes.queryParamKey.answerTableState;
  
-@@ -25,11 +35,13 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
+@@ -25,11 +36,13 @@ const saveSortStateToQueryParams = ([sortKey, sortOrder]: readonly [
        } else {
          urlSearchParams.set(keyDef.sortBy, sortKey);
        }
@@ -48,7 +49,7 @@ index 3cd8f505d..c284db2fc 100644
        return urlSearchParams;
      },
      { method: 'replaceState' },
-@@ -40,18 +52,18 @@ const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
+@@ -40,18 +53,18 @@ const num2str = (n: number): string => Num.roundAt(n, 2).toString(10);
  
  // for query params
  const ymd2str = ({ year, month, date }: YearMonthDate): string =>
@@ -70,7 +71,7 @@ index 3cd8f505d..c284db2fc 100644
  
    return YearMonthDate.is(ret) ? ret : undefined;
  };
-@@ -84,7 +96,7 @@ const dayOfWeekFromStr = (
+@@ -84,7 +97,7 @@ const dayOfWeekFromStr = (
    Fri: boolean;
    Sat: boolean;
  }> => {
@@ -79,7 +80,7 @@ index 3cd8f505d..c284db2fc 100644
  
    return {
      Sun: set.has(Routes.queryParamValue.dayAbbrDef.Sun),
-@@ -98,13 +110,14 @@ const dayOfWeekFromStr = (
+@@ -98,13 +111,14 @@ const dayOfWeekFromStr = (
  };
  
  const range2str = (a: string, b: string): string =>
@@ -96,7 +97,7 @@ index 3cd8f505d..c284db2fc 100644
  };
  
  const filledDateOnlyToStr = (value: boolean): string =>
-@@ -130,8 +143,8 @@ const saveFilterStateToQueryParams = ({
+@@ -130,8 +144,8 @@ const saveFilterStateToQueryParams = ({
      (urlSearchParams) => {
        if (
          dateRange.enabled &&
@@ -107,7 +108,7 @@ index 3cd8f505d..c284db2fc 100644
        ) {
          urlSearchParams.set(
            keyDef.date,
-@@ -254,93 +267,128 @@ const restoreFromQueryParams = (
+@@ -254,93 +268,98 @@ const restoreFromQueryParams = (
  
    const parseRank = (s: string): AnswerRank | undefined =>
      pipe(s)
@@ -122,6 +123,16 @@ index 3cd8f505d..c284db2fc 100644
 -      .chain((a) => (isAnswersScore(a) ? a : undefined)).value;
 +      .map(Num.from)
 +      .map((a) => (isAnswersScore(a) ? a : undefined)).value;
++
++  // `asSafeUint` throws on anything that is not a non-negative safe integer,
++  // `NaN` included, so it cannot be the inner call: a query parameter someone
++  // typed by hand would take the whole page down rather than be ignored.
++  // Guard first, cast second.
++  const parseSafeUint = (s: string): SafeUint | undefined => {
++    const parsed = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
++
++    return isSafeUint(parsed) ? parsed : undefined;
++  };
  
    filterStateDispatch({
      type: 'setFromUrlQueryParams',
@@ -193,16 +204,8 @@ index 3cd8f505d..c284db2fc 100644
 +          .map((__v) => mapOptional(__v, rangeFromStr))
 +          .map((__v) =>
 +            mapOptional(__v, (range) => ({
-+              min: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-+                ),
-+              ),
-+              max: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-+                ),
-+              ),
++              min: parseSafeUint(range.a),
++              max: parseSafeUint(range.b),
 +            })),
 +          ).value ?? { min: undefined, max: undefined },
          fair: pipe(queryParams.get(keyDef.fair))
@@ -217,16 +220,8 @@ index 3cd8f505d..c284db2fc 100644
 +          .map((__v) => mapOptional(__v, rangeFromStr))
 +          .map((__v) =>
 +            mapOptional(__v, (range) => ({
-+              min: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-+                ),
-+              ),
-+              max: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-+                ),
-+              ),
++              min: parseSafeUint(range.a),
++              max: parseSafeUint(range.b),
 +            })),
 +          ).value ?? { min: undefined, max: undefined },
          poor: pipe(queryParams.get(keyDef.poor))
@@ -241,16 +236,8 @@ index 3cd8f505d..c284db2fc 100644
 +          .map((__v) => mapOptional(__v, rangeFromStr))
 +          .map((__v) =>
 +            mapOptional(__v, (range) => ({
-+              min: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-+                ),
-+              ),
-+              max: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-+                ),
-+              ),
++              min: parseSafeUint(range.a),
++              max: parseSafeUint(range.b),
 +            })),
 +          ).value ?? { min: undefined, max: undefined },
          goodPlusFair: pipe(queryParams.get(keyDef.goodPlusFair))
@@ -265,16 +252,8 @@ index 3cd8f505d..c284db2fc 100644
 +          .map((__v) => mapOptional(__v, rangeFromStr))
 +          .map((__v) =>
 +            mapOptional(__v, (range) => ({
-+              min: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-+                ),
-+              ),
-+              max: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-+                ),
-+              ),
++              min: parseSafeUint(range.a),
++              max: parseSafeUint(range.b),
 +            })),
 +          ).value ?? { min: undefined, max: undefined },
          fairPlusPoor: pipe(queryParams.get(keyDef.fairPlusPoor))
@@ -289,16 +268,8 @@ index 3cd8f505d..c284db2fc 100644
 +          .map((__v) => mapOptional(__v, rangeFromStr))
 +          .map((__v) =>
 +            mapOptional(__v, (range) => ({
-+              min: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.a), Number.NaN),
-+                ),
-+              ),
-+              max: Num.mapNaN2Undefined(
-+                asSafeUint(
-+                  Result.unwrapOkOr(Num.safeParseInt(range.b), Number.NaN),
-+                ),
-+              ),
++              min: parseSafeUint(range.a),
++              max: parseSafeUint(range.b),
 +            })),
 +          ).value ?? { min: undefined, max: undefined },
        },

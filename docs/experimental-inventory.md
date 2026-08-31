@@ -365,3 +365,13 @@ React 版が `apps/` にある。`goober` も箱だけなので npm の `goober`
 - 追加 25 のほとんどは、後継の無い API を移した先（`src/utils/` ・
   `apps/event-schedule-app/src/utils-ported/`）。削除 5 は暗黙グローバルの
   shim（`globals.d.ts` ・ `load-libs.d.mts`）である
+
+**この差分を読み直して、動作が変わっている箇所が 3 つ見つかった**（partial
+message の fetch 落ち・`asSafeUint(NaN)` の例外・`instanceof Promise` の緩和）。
+内訳と直し方は [monorepo-consolidation.md](./monorepo-consolidation.md) の step 3
+にある。**3 件とも `fmt` / `lint` / `type-check` / `test` が通る状態で残っていた**
+ので、型検査に通ったことは移植が等価であることの証明にならない。
+
+`DateUtils` の移植には 1 件だけ元と違う既定値がある。`toLocaleYMD` の区切り文字が
+`'/'` から `'-'` になっており、**唯一の呼び出し箇所が区切り文字を明示している**ため
+現状は影響しない。

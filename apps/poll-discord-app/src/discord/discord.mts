@@ -6,7 +6,7 @@ import {
   type Message as DiscordMessage,
   type MessageReaction as DiscordMessageReaction,
 } from 'discord.js';
-import { Result } from 'ts-data-forge';
+import { Result, hasKey, isRecord } from 'ts-data-forge';
 import { triggerCommand } from '../constants.mjs';
 import { DISCORD_TOKEN } from '../env.mjs';
 import { onMessageReactionAdd, onMessageReactionRemove } from './reaction.mjs';
@@ -96,9 +96,9 @@ export const startDiscordListener = (discordClient: DiscordClient): void => {
 
   discordClient.on('messageUpdate', (_oldMessage, newMessage) => {
     (async () => {
-      // `messageUpdate` delivers a complete message here, so there is
-      // nothing to fetch — the type says `partial` is always false.
-      const newMessageFilled: DiscordMessage<boolean> = newMessage;
+      const newMessageFilled: DiscordMessage<boolean> = isPartial(newMessage)
+        ? await newMessage.fetch()
+        : newMessage;
 
       const result = await updatePollTitle(newMessageFilled);
 
@@ -118,3 +118,18 @@ export const startDiscordListener = (discordClient: DiscordClient): void => {
     })().catch(() => {});
   });
 };
+
+/**
+ * Whether discord.js handed over a partial rather than a complete object.
+ *
+ * Takes `unknown` on purpose. discord.js types `messageUpdate`'s `newMessage`
+ * as a complete `Message` whose `partial` is the literal `false`, which holds
+ * only for a client that does not ask for `Partials.Message`. This one does,
+ * so `MessageUpdateAction` hands an uncached message over as a partial —
+ * `content` is `null` there, and `updatePollTitle` reads `content`. A guard
+ * declared over the discord.js types would narrow the argument to `never`
+ * (`Message['partial']` is `false`, `PartialMessage['partial']` is `true`);
+ * returning a plain `boolean` leaves both branches typed as `Message`.
+ */
+const isPartial = (value: unknown): boolean =>
+  isRecord(value) && hasKey(value, 'partial') && value.partial === true;
