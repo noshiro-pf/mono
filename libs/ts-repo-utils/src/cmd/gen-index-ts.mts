@@ -108,6 +108,12 @@ const cmdDef = cmd.command({
       type: cmd.optional(cmd.number),
       description: 'Minimum depth to start generating index files (default: 0)',
     }),
+    preserve: cmd.multioption({
+      long: 'preserve',
+      type: cmd.optional(cmd.array(cmd.string)),
+      description:
+        'Glob patterns of index files to leave untouched, matched against the path relative to the target directory (e.g., "index.mts", "v*/index.mts")',
+    }),
   },
   handler: (args) => {
     expectType<typeof args.targetDirectory, string>('=');
@@ -126,6 +132,8 @@ const cmdDef = cmd.command({
 
     expectType<typeof args.minDepth, number | undefined>('=');
 
+    expectType<typeof args.preserve, string[] | undefined>('=');
+
     main(args).catch((error: unknown) => {
       console.error('An error occurred:', error);
 
@@ -143,6 +151,7 @@ const main = async ({
   formatCommand,
   silent,
   minDepth,
+  preserve,
 }: Readonly<{
   targetDirectory: string;
   targetExtensions: readonly Ext[];
@@ -152,6 +161,7 @@ const main = async ({
   formatCommand?: string | undefined;
   silent?: boolean | undefined;
   minDepth?: number | undefined;
+  preserve?: readonly string[] | undefined;
 }>): Promise<void> => {
   await genIndex({
     targetDirectory: targetDirectory.includes(',')
@@ -164,6 +174,7 @@ const main = async ({
     formatCommand,
     silent,
     minDepth,
+    preserve,
   });
 };
 

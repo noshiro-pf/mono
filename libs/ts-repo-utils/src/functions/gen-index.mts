@@ -55,6 +55,24 @@ export type GenIndexConfig = DeepReadonly<{
 
   /** Minimum depth to start generating index files (default: 0) */
   minDepth?: number;
+
+  /**
+   * Glob patterns of index files to leave untouched, matched against the
+   * index file's own path relative to the target directory (POSIX
+   * separators), e.g. `'index.mts'` for the one at the root of the walk and
+   * `'v*\/index.mts'` for a whole generation of them.
+   *
+   * This is what protects a hand-written index file — an executable entry
+   * point, or a curated list of named re-exports — from being overwritten
+   * with a barrel. `exclude` cannot express it: it says what an index file
+   * may not *export*, and is matched against a bare file name as well as a
+   * relative path, so `'index.mts'` there would name every index file in the
+   * tree rather than one of them.
+   *
+   * A preserved directory is still walked, so index files below it are still
+   * generated, and its parent still re-exports it. (default: none)
+   */
+  preserve?: string[];
 }>;
 
 const defaultConfig = {
@@ -64,6 +82,7 @@ const defaultConfig = {
   exportStatementExtension: '.js', // For ESM imports, .mts resolves to .mjs
   silent: false,
   minDepth: 0,
+  preserve: [],
 } as const satisfies Required<
   StrictOmit<GenIndexConfig, 'targetDirectory' | 'formatCommand'>
 >;
@@ -83,6 +102,7 @@ type GenIndexConfigInternal = DeepReadonly<{
   exportStatementExtension: `.${string}` | 'none';
   silent: boolean;
   minDepth: number;
+  preserve: string[];
 }>;
 
 /**
@@ -209,6 +229,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
     exportStatementExtension: exportExtension,
     silent: config.silent ?? defaultConfig.silent,
     minDepth: config.minDepth ?? defaultConfig.minDepth,
+    preserve: config.preserve ?? defaultConfig.preserve,
   };
 };
 
@@ -282,18 +303,31 @@ const generateIndexFileForDir = async (
     }
 
     if (currentDepth >= config.minDepth) {
-      const indexContent = generateIndexContent(
-        mut_subDirectories,
-        mut_filesToExport,
-        config,
-      );
-
       const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(indexPath, indexContent);
+      if (
+        isPreservedIndex(
+          path.relative(actualBaseDir, indexPath),
+          config.preserve,
+        )
+      ) {
+        conditionalEcho(
+          `Preserved: ${path.relative(process.cwd(), indexPath)}`,
+        );
+      } else {
+        const indexContent = generateIndexContent(
+          mut_subDirectories,
+          mut_filesToExport,
+          config,
+        );
 
-      conditionalEcho(`Generated: ${path.relative(process.cwd(), indexPath)}`);
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(indexPath, indexContent);
+
+        conditionalEcho(
+          `Generated: ${path.relative(process.cwd(), indexPath)}`,
+        );
+      }
     }
   } catch (error) {
     throw new Error(
@@ -302,6 +336,55 @@ const generateIndexFileForDir = async (
     );
   }
 };
+
+/**
+ * Whether the index file about to be written is one the caller asked to keep.
+ *
+ * Matched against the path relative to the target directory alone, never
+ * against the bare file name — every index file in the tree shares that name,
+ * so `'index.mts'` would otherwise mean "generate nothing anywhere" instead of
+ * naming the one at the root of the walk.
+ *
+ * @param indexRelativePath - The index file's path relative to the target
+ *   directory, in this platform's separators.
+ * @param preserve - Glob patterns, in POSIX separators.
+ * @returns True if the file must be left as it is on disk.
+ */
+const isPreservedIndex = (
+  indexRelativePath: string,
+  preserve: readonly string[],
+): boolean => {
+  const normalized = indexRelativePath.split(path.sep).join('/');
+
+  return preserve.some((pattern) => micromatch.isMatch(normalized, pattern));
+};
+
+if (import.meta.vitest !== undefined) {
+  describe('isPreservedIndex', () => {
+    test.each([
+      // Nothing is preserved by default.
+      ['index.mts', [], false],
+      // `'index.mts'` names the index at the root of the walk, and only it —
+      // this is what `exclude` could not express.
+      ['index.mts', ['index.mts'], true],
+      ['utils/index.mts', ['index.mts'], false],
+      ['v2/index.mts', ['index.mts'], false],
+      // A whole generation of hand-written index files.
+      ['v2/index.mts', ['v*/index.mts'], true],
+      ['v2/index.mts', ['v[2-8]/index.mts'], true],
+      ['v9/index.mts', ['v[2-8]/index.mts'], false],
+      // A pattern matches at its own depth, not below it.
+      ['v2/types/index.mts', ['v*/index.mts'], false],
+      // Any one pattern matching is enough.
+      ['index.mts', ['v*/index.mts', 'index.mts'], true],
+    ] as const)(
+      'isPreservedIndex($0, $1) to be $2',
+      (indexRelativePath, preserve, expected) => {
+        expect(isPreservedIndex(indexRelativePath, preserve)).toBe(expected);
+      },
+    );
+  });
+}
 
 const indexRegex = /^index\.[cm]?[jt]s[x]?$/u;
 
