@@ -979,3 +979,50 @@ Preact 側 utils 4 つのうち 3 つ目。**`better-preact-use-state` を使う
 ただし `slack-app` は復元しない。`app.tsx` が
 `<div data-e2e={'root'}>{'root'}</div>` を返すだけの**空の雛形**で、
 `dict` もテンプレート残骸である。中身が無い。
+
+## `lambda-calculus-interpreter-preact` の復元（2026-09-01）
+
+Preact 側 app の 1 つ目。**`preact-utils` を使うので #1770 の上に積んである**
+（#1770 は #1748 の上）。
+
+### インベントリより依存が少ない
+
+インベントリは utils 4 つ（`preact-utils` ・ `better-preact-use-state` ほか）が
+要ると書いているが、**実際に必要なのは `preact-utils` の `memoNamed` だけ**で
+ある。`better-preact-use-state` は `preact-utils` 経由で解決に要るだけなので、
+`paths` に書いて `dependencies` には入れていない。
+
+`state.mts` は React 版（#1746、マージ済み）と**1 文字も違わなかった**ので、
+そちらの書き換えをそのまま使った。
+
+| 移植元                                | 復元後                         |
+| :------------------------------------ | :----------------------------- |
+| `createState` のオブジェクト分割代入  | タプル ＋ `useObservableValue` |
+| `.chain(debounceTime(200))`           | `.pipe(debounce(200))`         |
+| `pipe().chain()` / `.chainOptional()` | `.map()` / `.mapNullable()`    |
+| `@noshiro/goober`                     | npm の `goober`                |
+
+### `goober` を足した理由
+
+インベントリが**そう指示している** — 「`blueprint-css` と `goober` は名前こそ
+utils だが、実体はベンダのファイルを置いただけの箱。復元するなら npm の本家
+（`@blueprintjs/core`、`goober`）を直接使う」。
+
+`@mui/material` や `pixi.js-legacy` とはここが違う。あちらはインベントリが
+「その app が依存している」と記録しているだけで、**採用してよいとは書いて
+いない**。goober は後継が名指しされている。
+
+### `onChange` の型
+
+React 版は `React.ChangeEventHandler<HTMLTextAreaElement>` を使っていた。
+Preact の同名の型は `JSX` 名前空間側が `@deprecated`（#1750 の
+`MouseEventHandler` と同じ）なので、`ev.target` を `EventTarget | null` で
+受けて `instanceof HTMLTextAreaElement` で絞る形にした。**型としても
+そのほうが正確**である — `target` は本当に他の要素でもあり得る。
+
+### 残りの Preact app
+
+utils が 4 つとも揃ったので、`algo-app`（5033）・`mahjong-calculator-app`
+（2428）・`my-portfolio-app-preact`（1244）が着手可能になる。ただし
+`my-portfolio-app-preact` は `preact-media-hook` という別の npm 依存も要る。
+`slack-app` は中身が無いので復元しない（#1770）。
