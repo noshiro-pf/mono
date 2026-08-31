@@ -56,6 +56,13 @@ export default [
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
+    /* `strict-lib-active.mts` sits under `test/` but is not a test: it holds
+       one `@ts-expect-error` that stops compiling if the strict standard
+       library stops being applied, and the `export` is what keeps that
+       declaration from being an unused local. The no-export rule below is
+       about test files, so it — and the loosened rules beside it — do not
+       apply here. */
+    ignores: ['test/strict-lib-active.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

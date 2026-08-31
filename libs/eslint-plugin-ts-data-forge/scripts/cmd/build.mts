@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { rollup } from 'rollup';
-import { type UnknownResult } from 'ts-data-forge';
+import { type UnknownResult, unknownToString } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
@@ -146,7 +146,7 @@ const runStep = async (
   const result = await promise;
 
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
 
     console.error('❌ Build failed');
 
