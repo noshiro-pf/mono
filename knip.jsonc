@@ -260,6 +260,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry above assumes: a Vite React app whose
+    // entry is the module `index.html` would load, as `event-schedule-app` is.
+    "apps/lambda-calculus-interpreter-react": {
+      "entry": ["src/main.tsx"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry above assumes: a Node program with a
     // single entry point.
     "apps/poll-discord-app": {

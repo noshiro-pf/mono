@@ -1,0 +1,47 @@
+{
+  "name": "lambda-calculus-interpreter-react",
+  "version": "0.0.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/lambda-calculus-interpreter-react"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "lambda-calculus-interpreter-core": "workspace:*",
+    "react-utils": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-react-hooks": "workspace:*",
+    "ts-data-forge": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsx": "catalog:"
+  }
+}
