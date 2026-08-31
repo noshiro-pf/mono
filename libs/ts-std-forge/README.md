@@ -21,10 +21,15 @@ error messages, whose wording ECMAScript leaves unspecified.
   check. The type is the contract: a caller holding a plain `number` narrows
   it first (truncating explicitly with `Math.trunc` if it may be
   fractional); one that defeats the type system gets the raw throw.
-- **Validate-first, tagged**: when the domain is not expressible as a type
-  (`fromCodePoint`'s 0–0x10FFFF, `Date` validity), the wrapper checks the
-  spec-defined condition before calling and reports it as a plain tagged
-  error (`{ kind: 'invalid-code-point', codePoint, index }`).
+  Refinement stops at literal ranges: **branded number types (`SafeUint`
+  etc.) are deliberately not used** — demanding a brand cast at ordinary
+  call sites would be a detour for callers, and busywork a native integer
+  type (Tsubu v2) would later obsolete.
+- **Validate-first, tagged**: when the domain is not expressible as a
+  literal range (`fromCodePoint`'s 0–0x10FFFF, `repeat`'s count, `Date`
+  validity), the parameter stays a plain `number` / `Date` and the wrapper
+  checks the spec-defined condition before calling, reporting it as a plain
+  tagged error (`{ kind: 'invalid-code-point', codePoint, index }`).
 - **Conservative fallback**: only spec-mandated, known error conditions get
   a specific `kind`; everything else the engine throws — including
   implementation-defined limits such as `repeat`'s maximum string length —
@@ -41,7 +46,7 @@ error messages, whose wording ECMAScript leaves unspecified.
 - `SafeNumber.toStringWithRadix(value, radix)` — `radix: UintRangeInclusive<2, 36>`; total, returns `string`.
 - `SafeString.fromCodePoint(...codePoints)` — `String.fromCodePoint` without throwing (`Err<{ kind: 'invalid-code-point', codePoint, index }>`).
 - `SafeString.normalize(value, form?)` — `form` is typed as the `'NFC' | 'NFD' | 'NFKC' | 'NFKD'` union; total, returns `string`.
-- `SafeString.repeat(value, count)` — `count: SafeUint | SmallUint` (literals up to 39 need no cast, larger counts via ts-data-forge's `asSafeUint`); the only remaining failure is the engine string-length limit, surfaced as `'unexpected'`.
+- `SafeString.repeat(value, count)` — `String.prototype.repeat` without throwing (`Err<{ kind: 'invalid-count' }>`; an engine length-limit overflow surfaces as `'unexpected'`).
 
 Functions that can still fail export their failure type alongside
 (`SafeString.FromCodePointError`, `Regex.CreateError`, …), and the shared

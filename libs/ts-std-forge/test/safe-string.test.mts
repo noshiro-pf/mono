@@ -1,5 +1,5 @@
 // cspell:ignore ababab
-import { asSafeUint, Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import { SafeString } from '../src/index.mjs';
 
 /**
@@ -120,7 +120,7 @@ describe('SafeString.normalize', () => {
 });
 
 describe('SafeString.repeat', () => {
-  test('returns Ok for a small literal count (no cast needed)', () => {
+  test('returns Ok for a non-negative count', () => {
     const result = SafeString.repeat('ab', 3);
 
     assert.isTrue(Result.isOk(result));
@@ -136,37 +136,66 @@ describe('SafeString.repeat', () => {
     assert.deepStrictEqual(result.value, '');
   });
 
-  test('returns Ok for a large count via asSafeUint', () => {
-    const result = SafeString.repeat('ab', asSafeUint(1000));
+  test('returns a tagged Err for a negative count', () => {
+    const result = SafeString.repeat('ab', -1);
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.deepStrictEqual(result.value, { kind: 'invalid-count', count: -1 });
+  });
+
+  test('returns a tagged Err for an infinite count', () => {
+    const result = SafeString.repeat('ab', Number.POSITIVE_INFINITY);
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.deepStrictEqual(result.value, {
+      kind: 'invalid-count',
+      count: Number.POSITIVE_INFINITY,
+    });
+  });
+
+  test('truncates the count like ToIntegerOrInfinity (-0.5 is legal and yields the empty string)', () => {
+    const result = SafeString.repeat('ab', -0.5);
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, 'ab'.repeat(1000));
+    assert.deepStrictEqual(result.value, '');
   });
 
   test('returns the unexpected fallback when the result would exceed the engine string-length limit', () => {
     // 2^30 repetitions of a 2-char string exceed every engine's limit while
-    // being a perfectly legal count — the implementation-defined residue the
-    // fromThrowable backstop exists for.
-    const result = SafeString.repeat('ab', asSafeUint(2 ** 30));
+    // being perfectly legal per the ECMAScript range check — the
+    // implementation-defined residue the fromThrowable backstop exists for.
+    const result = SafeString.repeat('ab', 2 ** 30);
 
     assert.isTrue(Result.isErr(result));
 
     assert.deepStrictEqual(result.value.kind, 'unexpected');
   });
 
-  test('a type-bypassed negative count is still caught by the backstop', () => {
-    // Unlike the fully type-refined functions, repeat keeps its fromThrowable
-    // backstop for the length-limit residue, so a count smuggled past the
-    // type system comes back as 'unexpected' rather than a raw throw.
-    const result = SafeString.repeat(
-      'ab',
-      // @ts-expect-error -- deliberately passing a negative count
-      -1,
+  test.each([
+    { count: 0 },
+    { count: 1 },
+    { count: 3 },
+    { count: -1 },
+    { count: -0.5 },
+    { count: 2.5 },
+    { count: Number.NaN },
+    { count: Number.POSITIVE_INFINITY },
+    { count: Number.NEGATIVE_INFINITY },
+  ])('repeat("ab", $count) classifies exactly the raw throws', ({ count }) => {
+    const thrown = throwsError(() => 'ab'.repeat(count));
+
+    const result = SafeString.repeat('ab', count);
+
+    assert.deepStrictEqual(Result.isErr(result), thrown);
+
+    // Every engine throw must be classified in advance — 'unexpected' never
+    // appears for a spec-defined condition.
+    assert.deepStrictEqual(
+      Result.isErr(result) && result.value.kind !== 'unexpected',
+      thrown,
     );
-
-    assert.isTrue(Result.isErr(result));
-
-    assert.deepStrictEqual(result.value.kind, 'unexpected');
   });
 });

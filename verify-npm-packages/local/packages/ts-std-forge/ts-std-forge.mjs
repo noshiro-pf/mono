@@ -47,8 +47,9 @@ assert.deepEqual(SafeString.fromCodePoint(0x110000).value, {
 // is total and returns the string directly.
 assert.equal(SafeString.normalize('\u00C5', 'NFD'), 'A\u030A');
 assert.equal(SafeString.repeat('ab', 3).value, 'ababab');
-// A count smuggled past the type system is still caught by the
-// fromThrowable backstop (kept for the engine string-length limit).
-assert.equal(SafeString.repeat('ab', -1).value.kind, 'unexpected');
+assert.deepEqual(SafeString.repeat('ab', -1).value, {
+  kind: 'invalid-count',
+  count: -1,
+});
 
 console.info('ts-std-forge ok');
