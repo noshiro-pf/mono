@@ -1,0 +1,31 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "numeric-input-utils": ["../numeric-input-utils/src/index.mts"],
+      "react-blueprintjs-utils": ["../react-blueprintjs-utils/src/index.mts"],
+      "react-utils": ["../react-utils/src/index.mts"],
+      "tiny-router-observable": ["../tiny-router-observable/src/index.mts"],
+      "synstate": ["../../libs/synstate/src/entry-point.mts"],
+      "synstate-react-hooks": ["../../libs/synstate-react-hooks/src/index.mts"],
+      // Reached through `react-blueprintjs-utils`, which is itself resolved
+      // from source. Not this package's dependencies — nothing here imports
+      // them — so they are mapped for resolution only and stay out of
+      // `package.json`, which is what knip checks.
+      "ts-fortress-types": ["../ts-fortress-types/src/index.mts"],
+      "better-react-use-state": [
+        "../../libs/better-react-use-state/src/index.mts"
+      ],
+      "react-utils-styled": ["../react-utils-styled/src/index.mts"],
+      "resize-observer-react-hooks": [
+        "../resize-observer-react-hooks/src/index.mts"
+      ]
+    }
+  },
+  "include": ["./src", "./scripts", "./configs"]
+}

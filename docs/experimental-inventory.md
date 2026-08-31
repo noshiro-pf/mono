@@ -350,7 +350,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | :---------------------------------- | ---: | :--------------- |
 | `annotation-tool`                   | 2006 | **なし**         |
 | `blueprintjs-playground-styled`     | 1701 | **なし**         |
-| `housing-loan-calculator-app`       | 1143 | **なし**         |
+| ~~`housing-loan-calculator-app`~~   | 1143 | 復元済み（下節） |
 | ~~`cant-stop-probability-app`~~     |  653 | 復元済み（下節） |
 | `catan-dice-app`                    |  471 | **なし**         |
 | `lambda-calculus-interpreter-react` |  196 | **なし**         |
@@ -640,3 +640,68 @@ Blueprint 6 で `minimal` が `@deprecated` になっており、`event-schedule
 `resize-observer-react-hooks` も解決できる必要がある。ただし**このパッケージ自身は
 どれも import していない**ので、`paths` にだけ書いて `dependencies` には入れない。
 knip がこれを正しく指摘する。
+
+## `housing-loan-calculator-app` の復元（2026-09-01）
+
+React 側 7 app のうち 2 つ目。45 ファイル・1178 行で、ここまでで最大。追加の
+npm 依存は要らない。
+
+### 45 ファイルは手書きせず機械変換した
+
+1 つずつ書き直すには大きすぎるので、`src` をコピーしてから順に機械変換し、
+**残りは type-check に列挙させた**。
+
+1. `.ts` → `.mts` に改名（`.tsx` はそのまま）
+2. 相対 import に拡張子を付与（ディレクトリは `/index.mjs`、`.tsx` は `.js`、
+   `.mts` は `.mjs`）。`@noshiro/*` はパッケージ名を置換
+3. 関数名の一括置換（下表）
+4. ファイルごとに使われている名前を見て import 行を挿入
+
+この時点で型エラーは 158 → 43 → 0 と落ちた。**4 の推測は完全ではなく**、
+`.map(` を `map` の使用と読むなどして余計な import を 4 件足したが、
+`TS6133`（未使用）で全部挙がるので取り除けばよい。
+
+| 移植元                            | 復元後                                      |
+| :-------------------------------- | :------------------------------------------ |
+| `toUint32` / `toSafeUint`         | `asUint32` / `asSafeUint`                   |
+| `toNonZeroFiniteNumber`           | `asNonZeroFiniteNumber`                     |
+| `toPositiveFiniteNumber`          | `asPositiveFiniteNumber`                    |
+| `toPositiveSafeInt`               | `asPositiveSafeInt`                         |
+| `createVoidEventEmitter`          | `createEventEmitter`                        |
+| `debounceTime`                    | `debounce`                                  |
+| `setInitialValue`                 | `withInitialValue`                          |
+| `.chain(`                         | `.pipe(`                                    |
+| `t.simpleBrandedNumber('Yen', 0)` | `brandedNumber({ typeName, defaultValue })` |
+| `mapOptional(x, f)`               | `pipe(x).mapNullable(f).value`              |
+| `ArrayOfLength`                   | `FixedLengthTuple`                          |
+
+`simpleBrandedNumber` は `ts-fortress` にあるが `@deprecated`（`brandedNumber`
+を使え）で、**引数もオプションオブジェクトに変わっている**。
+
+### `withSlash` を `tiny-router-observable` から export した
+
+`uriWithQueryParams` は `Router.utils.withSlash` しか使っていないのに、
+`Router` を import するために `createRouter()` が走り、**import しただけで
+`window.location` を読む**。付属のテストは Node で動かないので落ちる。
+
+`withSlash` は純粋な文字列変換で、`Router.utils` として既に公開されている。
+**module-private だったのを export しただけ**で、新しい API ではない。これで
+`uriWithQueryParams` は router に依存しなくなり、テスト 5 件が Node で通る。
+
+### 財務計算は実測で等価性を確かめた
+
+`ith-borrowing-balance-in-pier.mts` の `q ** (-1 * n)` は、`lint:fix` が
+`q ** -n` に書き換え、そこを `@typescript-eslint/no-unsafe-unary-minus` が
+「branded な整数に単項マイナスを付けるな」と拒否する — **2 つの規則が互いを
+打ち消す**。`const numPayments: number = n;` と広げてから負号を付けて解いた。
+
+指数の書き換えなので、丸めが変わっていないことを確かめる必要がある。移植元と
+復元後を素の JavaScript に写し、期間 6 通り × 金利 6 通り × 元本 4 通り ×
+支払い回数 4 通りの **576 ケースで `Object.is` 一致**（最大絶対差 0）。
+
+### `useMemo` は名前空間経由で
+
+`react-coding-style/import-style` が `import * as React from 'react'` を要求
+するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
+した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
+変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
