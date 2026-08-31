@@ -10,7 +10,7 @@
  */
 import { asUint32, range } from 'ts-data-forge';
 
-const parenDepthDelta = (char: string): number => {
+const parenDepthDelta = (char: string | undefined): number => {
   switch (char) {
     case '(':
       return 1;
@@ -18,6 +18,9 @@ const parenDepthDelta = (char: string): number => {
     case ')':
       return -1;
 
+    // `at` returns `undefined` past the end of the string. The loop below
+    // never asks for such an index, but the type says it can.
+    case undefined:
     default:
       return 0;
   }
@@ -35,7 +38,7 @@ const isWrappedWithParentheses = (str: string): boolean => {
   let mut_depth = 0;
 
   for (const mut_i of range(0, asUint32(trimmed.length))) {
-    mut_depth += parenDepthDelta(trimmed.charAt(mut_i));
+    mut_depth += parenDepthDelta(trimmed.at(mut_i));
 
     // If we reach depth 0 before the end, the outer parentheses don't wrap everything
     if (mut_depth === 0 && mut_i < trimmed.length - 1) {

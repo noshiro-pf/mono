@@ -1459,3 +1459,65 @@ const sourceKeys: ReadonlySet<string> = new Set(Object.keys(shape));
 `Omit` の制約を upstream に戻した版で測り直したが、このブランチの修正を main の
 ソースに戻して opt-in だけ有効にすると、**型エラー 1 件（`record.mts`）と lint
 21 件**がそのまま出る。上の 4 つの型はここで踏んでいないので、緩和の影響を受けない。
+
+## `ts-codemod-lib` の opt-in（2026-09-01 実測）
+
+**型エラー 1 件・lint 1 件。** これまでで最も安い。どちらも**素の lib でも通る形**
+に直せたので、`ts-repo-utils` と同じく「どちらの lib を前提にするか」の分岐は
+残っていない。
+
+### なぜ `ts-std-forge` ではなくこちらを選んだか
+
+依存の順序でいえば `ts-std-forge`（依存は `ts-data-forge` だけ）が先だが、
+`libReplacement` を有効にして出る 4 件は
+`src/safe-number/impl/` の `toFixed` / `toExponential` / `toPrecision` /
+`toString` に集中しており、**strict lib がこれらの引数を桁数・基数の
+リテラル union に絞っている**ことによる。これは
+[#1741](https://github.com/noshiro-pf/mono/pull/1741) が
+`UintRangeInclusive` へ寄せる作業でまさに触っている 3 ファイルと重なるので、
+そちらが入ってから測り直すのが正しい。
+
+`ts-std-forge` の 4 件は「安全な標準ライブラリのラッパ」を名乗るパッケージが
+`toFixed(101)` の `RangeError` を型で止められていない、という指摘であって、
+opt-in を待つ理由にはならない。**#1741 のあとに 1 件として起こす。**
+
+### 型エラー 1 件 — `replaceAll` のキャプチャ群
+
+`ts-repo-utils`（#1618）で既に出ていたパターンの再演で、
+`convert-to-readonly.test.mts` の
+
+```ts
+(_match, comment: string) => `${comment}${placeholder}`;
+```
+
+が落ちる。strict lib は省略可能なグループが不参加のとき `undefined` になる
+ことを理由にキャプチャ群を `unknown` と型付けるので、`string` と決めつけられない。
+
+**直し方は #1618 と同じ**（可変長引数で受けて `isString` で絞る）。ここの
+グループは省略可能ではないので絞り込みが実際に落ちることはないが、型の上では
+書く必要がある。
+
+なお、このコールバックはキャプチャを定数に連結しているだけなので、置換文字列
+`` `$1${placeholder}` `` で書けば**コールバックごと消せる**。実際に試したが
+`unicorn/no-unsafe-string-replacement` が「置換値がリテラルでない」として
+弾くので、コールバックのまま残した。
+
+### lint 1 件 — `charAt`
+
+`wrap-with-parentheses.mts` の `trimmed.charAt(mut_i)`。strict lib が
+`charAt` に `@deprecated`（`String#at` を使え）を付けている。
+
+`at` は範囲外で `undefined` を返すので、**`parenDepthDelta` の引数を
+`string | undefined` に広げた**。この関数はもともと括弧以外をすべて
+`default: return 0` に落としており、「そこに文字が無い」ときの深さの変化も
+同じ 0 である。`?? ''` で空文字を作るより、型が実態に合う。
+
+`@typescript-eslint/switch-exhaustiveness-check` は `default` があっても
+union の全メンバを要求するので、`case undefined:` を明示してある。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 663 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 33 個が true / false で完全一致
+- `pnpm run doc` も通る
