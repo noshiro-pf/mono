@@ -17,6 +17,11 @@ type UnwrapPromise<P extends Promise<unknown>> =
  * input Promise rejects, the `Result` will be `Err` with the rejection
  * reason.
  *
+ * The error channel is `unknown`, since the rejection reason is carried
+ * through untouched. For a concrete error type, use `AsyncResult.fromPromise`
+ * with a `mapError` function; called without one it behaves exactly as this
+ * function does.
+ *
  * @example
  *
  * ```ts
