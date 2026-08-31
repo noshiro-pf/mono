@@ -2458,6 +2458,9 @@ importers:
       ts-data-forge:
         specifier: workspace:^
         version: link:../ts-data-forge
+      ts-type-forge:
+        specifier: workspace:~
+        version: link:../ts-type-forge
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

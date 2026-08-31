@@ -10,11 +10,11 @@ describe('SafeDate.toISOString', () => {
     assert.deepStrictEqual(result.value, '1970-01-01T00:00:00.000Z');
   });
 
-  test('returns Err for an invalid date', () => {
+  test('returns a tagged Err for an invalid date', () => {
     const result = SafeDate.toISOString(new Date(Number.NaN));
 
     assert.isTrue(Result.isErr(result));
 
-    assert.deepStrictEqual(result.value.name, 'RangeError');
+    assert.deepStrictEqual(result.value, { kind: 'invalid-date' });
   });
 });

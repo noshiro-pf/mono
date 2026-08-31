@@ -1,38 +1,29 @@
-import { Result } from 'ts-data-forge';
-
 /**
- * The Unicode normalization forms accepted by
- * `String.prototype.normalize`.
+ * The Unicode normalization forms accepted by `String.prototype.normalize`.
  */
 export type NormalizationForm = 'NFC' | 'NFD' | 'NFKC' | 'NFKD';
 
 /**
- * Normalizes a string to a Unicode normalization form without throwing.
+ * Normalizes a string to a Unicode normalization form.
  *
- * `String.prototype.normalize` throws a `RangeError` when `form` is not one
- * of `'NFC'`, `'NFD'`, `'NFKC'`, `'NFKD'`. The `form` parameter is
- * deliberately typed as that union rather than `string`: the only failure
- * mode is an invalid form, so the union makes the error unrepresentable at
- * compile time, and a caller holding a dynamic string should narrow it to
- * `NormalizationForm` first (making the validation explicit) rather than
- * have this wrapper accept arbitrary strings. The `Result` return type is
- * kept for API consistency and as a runtime safety net for callers that
- * bypass the type system.
+ * `String.prototype.normalize` throws a `RangeError` only when `form` is not
+ * one of `'NFC'`, `'NFD'`, `'NFKC'`, `'NFKD'`. With `form` typed as that
+ * union the failure is unrepresentable at compile time, so the function is
+ * total and returns the string directly — wrapping it in a `Result` would
+ * force every caller to unwrap an error that cannot occur. A caller holding
+ * a dynamic string must narrow it to {@link NormalizationForm} first; one
+ * that defeats the type system gets the raw `RangeError`, by design.
  *
  * @example
  *
  * ```ts
- * const okResult = SafeString.normalize('Å', 'NFD');
- *
- * assert.isTrue(Result.isOk(okResult));
+ * // NFD decomposes U+00C5 into U+0041 + U+030A.
+ * assert.deepStrictEqual(SafeString.normalize('\u{C5}', 'NFD'), 'A\u{30A}');
  * ```
  *
  * @param value The string to normalize.
  * @param form The normalization form. Defaults to `'NFC'`.
- * @returns `Ok<string>` with the normalized string, `Err<Error>` if `form`
- *   is invalid at runtime.
+ * @returns The normalized string.
  */
-export const normalize = (
-  value: string,
-  form?: NormalizationForm,
-): Result<string, Error> => Result.fromThrowable(() => value.normalize(form));
+export const normalize = (value: string, form?: NormalizationForm): string =>
+  value.normalize(form);

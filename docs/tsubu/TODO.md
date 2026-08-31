@@ -25,10 +25,10 @@
 
 - [ ] ts-std-forge: Tier 2(BigInt、`Iterator.take/drop`、`structuredClone`、toLocaleString 系)、Tier 3(TypedArray/DataView/Atomics、Intl)、Temporal family(D-23)。(Tier 1 は [#1725](https://github.com/noshiro-pf/mono/pull/1725) で完了)
 - [ ] ts-std-forge: null / 番兵値 API の Optional ラッパー(棚卸しは [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) の「次の調査枠」)。
-- [ ] ts-std-forge の初回手動 publish(公開前が名称変更の最終機会。未公開のまま published pins が動くと verify ジョブが止まる点に注意)。
 
 ## 仕様の未着手領域(フェーズ非依存)
 
+- [ ] `as` キャストの嘘への対策(D-26 残課題): キャストの正しさをランタイム検証する言語機能、または ts-fortress のような validator ライブラリの使用強制(`as` が紛れ込みうるコード文脈を言語として限定する)の検討。型 refine で全域化した API(ts-std-forge、strict-ts-lib)の前提を守る仕組み。v3 候補。
 - [ ] 型システムの残る不健全性のカタログ(`any` の伝播、配列共変性、型アサーション)— 型レベル機能は「TS の表現力維持」方針の下で健全性を損なう機能だけ洗い出す。
 - [ ] numeric 型の安全化の続き([spec/future-syntax.md](./spec/future-syntax.md) 候補 7 / v3)。
 - [ ] getter/setter の粒度の深掘り(plain object の遅延評価 — [spec/banned-syntax.md](./spec/banned-syntax.md))。

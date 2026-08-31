@@ -1,32 +1,29 @@
-import { Result } from 'ts-data-forge';
+import { type UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Formats a number in fixed-point notation without throwing.
+ * Formats a number in fixed-point notation, made total by its parameter
+ * type.
  *
- * `Number.prototype.toFixed` throws a `RangeError` when `fractionDigits` is
- * outside the range 0–100, which is reachable whenever the digit count comes
- * from a variable. This wrapper returns the failure as a `Result` instead.
+ * `Number.prototype.toFixed` throws a `RangeError` only when
+ * `fractionDigits` is outside 0–100. With `fractionDigits` typed as the
+ * `0 | 1 | ... | 100` literal range (the same refinement the strict TS lib
+ * applies), that failure is unrepresentable at compile time, so the function
+ * returns the string directly. A caller holding a plain `number` narrows it
+ * first (truncating explicitly with `Math.trunc` if it may be fractional);
+ * one that defeats the type system gets the raw `RangeError`, by design.
  *
  * @example
  *
  * ```ts
- * const okResult = SafeNumber.toFixed(1.005, 2);
- *
- * assert.isTrue(Result.isOk(okResult));
- *
- * const errResult = SafeNumber.toFixed(1, 101);
- *
- * assert.isTrue(Result.isErr(errResult));
+ * assert.deepStrictEqual(SafeNumber.toFixed(1.005, 2), '1.00');
  * ```
  *
  * @param value The number to format.
- * @param fractionDigits The number of digits after the decimal point
- *   (0–100 inclusive).
- * @returns `Ok<string>` with the fixed-point representation, `Err<Error>` if
- *   `fractionDigits` is out of range.
+ * @param fractionDigits The number of digits after the decimal point (0–100
+ *   inclusive).
+ * @returns The fixed-point representation.
  */
 export const toFixed = (
   value: number,
-  fractionDigits: number,
-): Result<string, Error> =>
-  Result.fromThrowable(() => value.toFixed(fractionDigits));
+  fractionDigits: UintRangeInclusive<0, 100>,
+): string => value.toFixed(fractionDigits);

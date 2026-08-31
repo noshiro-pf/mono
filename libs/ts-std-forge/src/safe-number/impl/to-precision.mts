@@ -1,33 +1,26 @@
-import { Result } from 'ts-data-forge';
+import { type UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Formats a number to a given precision without throwing.
+ * Formats a number to a given precision, made total by its parameter type.
  *
- * `Number.prototype.toPrecision` throws a `RangeError` when `precision` is
- * outside the range 1–100, which is reachable whenever the precision comes
- * from a variable. This wrapper returns the failure as a `Result` instead.
- * (The zero-argument form of `toPrecision` is equivalent to `toString` and
- * never throws, so it is not wrapped here.)
+ * `Number.prototype.toPrecision` throws a `RangeError` only when `precision`
+ * is outside 1–100 (and `value` is finite). With `precision` typed as the
+ * `1 | 2 | ... | 100` literal range, that failure is unrepresentable at
+ * compile time, so the function returns the string directly. A caller
+ * holding a plain `number` narrows it first; one that defeats the type
+ * system gets the raw `RangeError`, by design.
  *
  * @example
  *
  * ```ts
- * const okResult = SafeNumber.toPrecision(123.456, 4);
- *
- * assert.isTrue(Result.isOk(okResult));
- *
- * const errResult = SafeNumber.toPrecision(1, 101);
- *
- * assert.isTrue(Result.isErr(errResult));
+ * assert.deepStrictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
  * ```
  *
  * @param value The number to format.
  * @param precision The number of significant digits (1–100 inclusive).
- * @returns `Ok<string>` with the formatted representation, `Err<Error>` if
- *   `precision` is out of range.
+ * @returns The formatted representation.
  */
 export const toPrecision = (
   value: number,
-  precision: number,
-): Result<string, Error> =>
-  Result.fromThrowable(() => value.toPrecision(precision));
+  precision: UintRangeInclusive<1, 100>,
+): string => value.toPrecision(precision);
