@@ -1,4 +1,6 @@
-import { type ChangeEventHandler } from 'react';
+import { styled } from 'goober';
+import { memoNamed } from 'preact-utils';
+import * as Preact from 'preact/hooks';
 
 export const CodeArea = memoNamed(
   'CodeArea',
@@ -15,14 +17,16 @@ export const CodeArea = memoNamed(
     maxHeightPx: number;
     cyId: string;
   }>) => {
-    const onChange = useCallback<ChangeEventHandler<HTMLTextAreaElement>>(
-      (ev) => {
-        valueChange(ev.target.value);
+    const onChange = Preact.useCallback(
+      (ev: Readonly<{ target: EventTarget | null }>) => {
+        if (ev.target instanceof HTMLTextAreaElement) {
+          valueChange(ev.target.value);
+        }
       },
       [valueChange],
     );
 
-    const style = useMemo<preact.JSX.CSSProperties>(
+    const style = Preact.useMemo(
       () => ({
         minHeight: `${minHeightPx}px`,
         maxHeight: `${maxHeightPx}px`,

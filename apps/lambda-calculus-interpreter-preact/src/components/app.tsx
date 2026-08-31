@@ -1,12 +1,16 @@
+import { styled } from 'goober';
+import { memoNamed } from 'preact-utils';
+import { useObservableValue } from 'synstate-preact-hooks';
 import {
+  inputAreaString$,
   outputAreaString$,
   setInputAreaString,
-  useInputAreaString,
-} from '../state';
-import { CodeArea } from './code-area';
+} from '../state.mjs';
+import { CodeArea } from './code-area.js';
 
 export const App = memoNamed('App', () => {
-  const inputAreaString = useInputAreaString();
+  const inputAreaString = useObservableValue(inputAreaString$);
+
   const outputAreaString = useObservableValue(outputAreaString$);
 
   return (
