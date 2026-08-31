@@ -269,6 +269,8 @@
     // Not an Astro site like the entry above assumes: a Vite React app whose
     // entry is the module `index.html` would load, as `event-schedule-app` is.
     "apps/lambda-calculus-interpreter-react": {
+
+    "apps/blueprintjs-playground-styled": {
       "entry": ["src/main.tsx"],
       "project": ["**/*.{mts,tsx}"],
     },
