@@ -1,3 +1,4 @@
+/* transformer-ignore */
 import { isNumber } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
