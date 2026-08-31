@@ -123,7 +123,7 @@ describe('parse', () => {
 
     expect(() => Json.parse('null null')).not.toThrow();
 
-    expect(() => Json.parse(String(undefined))).not.toThrow();
+    expect(() => Json.parse('undefined')).not.toThrow();
   });
 
   test('should use reviver function to transform values', () => {

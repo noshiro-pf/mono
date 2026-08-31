@@ -1,5 +1,6 @@
 import { expectType } from '../expect-type.mjs';
 import { Num } from '../number/index.mjs';
+import { unknownToString } from '../others/index.mjs';
 import { type None, type Some } from '../types.mjs';
 import { Optional, type UnknownOptional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
@@ -872,7 +873,7 @@ describe('Optional test', () => {
       const makeOptional = (): Optional<undefined> => Optional.some(undefined);
 
       const result = Optional.match(makeOptional(), {
-        some: (value) => `some: ${String(value)}`,
+        some: (value) => `some: ${unknownToString(value)}`,
         none: () => 'none',
       });
 

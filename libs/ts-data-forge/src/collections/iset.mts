@@ -753,7 +753,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   has(key: K | (WidenLiteral<K> & {})): boolean {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion -- unnecessary only under the strict standard library; the stock one types `has` as taking exactly `K`
     return this.#set.has(key as K);
   }
 

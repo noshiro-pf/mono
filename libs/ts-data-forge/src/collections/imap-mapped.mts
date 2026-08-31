@@ -2,7 +2,7 @@
 import { type WidenLiteral } from 'ts-type-forge';
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
-import { tp } from '../others/index.mjs';
+import { tp, unknownToString } from '../others/index.mjs';
 import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
@@ -1051,7 +1051,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         console.warn(
-          `IMapMapped.delete: key not found: ${String(this.#toKey(key))}`,
+          `IMapMapped.delete: key not found: ${unknownToString(this.#toKey(key))}`,
         );
       }
 
@@ -1103,7 +1103,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
     if (Optional.isNone(curr)) {
       if (this.#showNotFoundMessage) {
         console.warn(
-          `IMapMapped.update: key not found: ${String(this.#toKey(key))}`,
+          `IMapMapped.update: key not found: ${unknownToString(this.#toKey(key))}`,
         );
       }
 
@@ -1160,7 +1160,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
           if (curr === undefined || !mut_result.has(key)) {
             if (this.#showNotFoundMessage) {
               console.warn(
-                `IMapMapped.withMutations::update: key not found: ${String(key)}`,
+                `IMapMapped.withMutations::update: key not found: ${unknownToString(key)}`,
               );
             }
 

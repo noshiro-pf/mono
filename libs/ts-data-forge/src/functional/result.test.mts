@@ -963,14 +963,12 @@ describe('Result test', () => {
 
       const invalidJson = '{invalid json}';
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       const validResult = Result.fromThrowable(() => JSON.parse(validJson));
 
       assert.isTrue(Result.isOk(validResult));
 
       assert.deepStrictEqual(Result.unwrapOk(validResult), { key: 'value' });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       const invalidResult = Result.fromThrowable(() => JSON.parse(invalidJson));
 
       assert.isTrue(Result.isErr(invalidResult));

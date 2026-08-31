@@ -61,7 +61,7 @@ describe(isNonEmptyString, () => {
       // TypeScript knows it's a string
       expect(value.length).toBeGreaterThan(0);
 
-      expect(value.charAt(0)).toBe('t');
+      expect(value.at(0)).toBe('t');
     }
   });
 
@@ -109,7 +109,7 @@ describe(isNonEmptyString, () => {
 
   test('should not accept String objects', () => {
     // @ts-expect-error Testing non-string types
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isNonEmptyString(new String('hello') as unknown));
   });
 });

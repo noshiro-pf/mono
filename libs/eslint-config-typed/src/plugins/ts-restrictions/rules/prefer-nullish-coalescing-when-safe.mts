@@ -531,15 +531,26 @@ const NULLABLE_SUMMARY: TypeSummary = {
 
 /** The no-information summary — the identity element for intersection. */
 const UNIVERSAL_SUMMARY: TypeSummary = {
-  falsyValues: new Set(['emptyString', 'false', 'zero', 'zeroBigInt']),
+  falsyValues: new Set<FalsyValueTag>([
+    'emptyString',
+    'false',
+    'zero',
+    'zeroBigInt',
+  ]),
   nullable: true,
 } as const;
 
 const SINGLE_FALSY_SUMMARY: ReadonlyRecord<FalsyValueTag, TypeSummary> = {
-  emptyString: { falsyValues: new Set(['emptyString']), nullable: false },
-  false: { falsyValues: new Set(['false']), nullable: false },
-  zero: { falsyValues: new Set(['zero']), nullable: false },
-  zeroBigInt: { falsyValues: new Set(['zeroBigInt']), nullable: false },
+  emptyString: {
+    falsyValues: new Set<FalsyValueTag>(['emptyString']),
+    nullable: false,
+  },
+  false: { falsyValues: new Set<FalsyValueTag>(['false']), nullable: false },
+  zero: { falsyValues: new Set<FalsyValueTag>(['zero']), nullable: false },
+  zeroBigInt: {
+    falsyValues: new Set<FalsyValueTag>(['zeroBigInt']),
+    nullable: false,
+  },
 } as const;
 
 const combineUnionSummaries = (

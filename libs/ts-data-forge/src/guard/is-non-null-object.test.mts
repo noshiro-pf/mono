@@ -43,13 +43,13 @@ describe(isNonNullObject, () => {
   });
 
   test('should return true for boxed primitives', () => {
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isTrue(isNonNullObject(new String('hello')));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isTrue(isNonNullObject(new Number(42)));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isTrue(isNonNullObject(new Boolean(true)));
   });
 

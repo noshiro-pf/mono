@@ -1,6 +1,7 @@
 import { isError } from '@sindresorhus/is';
 import { AsyncResult as AsyncResultFromEntryPoint } from '../entry-point.mjs';
 import { expectType } from '../expect-type.mjs';
+import { unknownToString } from '../others/index.mjs';
 import { AsyncResult } from './async-result/index.mjs';
 import { Result } from './result/index.mjs';
 
@@ -17,7 +18,7 @@ describe('AsyncResult test', () => {
     test('resolved promise becomes Ok', async () => {
       const result = await AsyncResult.fromPromise(
         Promise.resolve(42),
-        (error) => `mapped: ${String(error)}`,
+        (error) => `mapped: ${unknownToString(error)}`,
       );
 
       assert.isTrue(Result.isOk(result));
@@ -61,7 +62,7 @@ describe('AsyncResult test', () => {
     test('resolved async function becomes Ok', async () => {
       const result = await AsyncResult.fromThrowable(
         () => Promise.resolve('data'),
-        (error) => `mapped: ${String(error)}`,
+        (error) => `mapped: ${unknownToString(error)}`,
       );
 
       assert.isTrue(Result.isOk(result));
