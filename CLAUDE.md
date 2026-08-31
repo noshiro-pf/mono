@@ -79,7 +79,8 @@ they are plain directories consumed by relative path, not packages.
       its patterns also match a bare file name, so `--exclude index.mts` names
       every index file in the tree and therefore does nothing. `ws:gi` is in
       the `style-check` matrix, so a barrel that goes stale — or a hand-written
-      index that is not preserved and gets overwritten — fails there.
+      index that is not preserved and gets overwritten — fails there, and
+      `style-check (ws:gi)` is a required status check.
     - `src/cmd/` — CLI entry points, for packages that ship executables.
 - `test/` — tests not colocated with the source (Vitest, `.mts`). Coverage
   output goes to `coverage/`.

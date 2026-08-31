@@ -71,6 +71,10 @@
             "integration_id": 15368
           },
           {
+            "context": "style-check (ws:gi)",
+            "integration_id": 15368
+          },
+          {
             "context": "type-check (check:root)",
             "integration_id": 15368
           },
