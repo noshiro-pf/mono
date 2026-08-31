@@ -326,15 +326,15 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 
 ### React 側の apps 7 つは、連れてくる utils が全部揃っている
 
-| app                                 | 行数 | 追加で要る utils |
-| :---------------------------------- | ---: | :--------------- |
-| `annotation-tool`                   | 2006 | **なし**         |
-| `blueprintjs-playground-styled`     | 1701 | **なし**         |
-| `housing-loan-calculator-app`       | 1143 | **なし**         |
-| `cant-stop-probability-app`         |  653 | **なし**         |
-| `catan-dice-app`                    |  471 | **なし**         |
-| `lambda-calculus-interpreter-react` |  196 | **なし**         |
-| `blueprintjs-playground`            |   92 | **なし**         |
+| app                                     | 行数 | 追加で要る utils |
+| :-------------------------------------- | ---: | :--------------- |
+| `annotation-tool`                       | 2006 | **なし**         |
+| `blueprintjs-playground-styled`         | 1701 | **なし**         |
+| `housing-loan-calculator-app`           | 1143 | **なし**         |
+| `cant-stop-probability-app`             |  653 | **なし**         |
+| `catan-dice-app`                        |  471 | **なし**         |
+| ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節） |
+| `blueprintjs-playground`                |   92 | **なし**         |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
@@ -375,3 +375,60 @@ message の fetch 落ち・`asSafeUint(NaN)` の例外・`instanceof Promise` �
 `DateUtils` の移植には 1 件だけ元と違う既定値がある。`toLocaleYMD` の区切り文字が
 `'/'` から `'-'` になっており、**唯一の呼び出し箇所が区切り文字を明示している**ため
 現状は影響しない。
+
+## `lambda-calculus-interpreter-react` の復元（2026-09-01）
+
+上の表の 7 つのうち 1 つ目。**`apps/lambda-calculus-interpreter-core` が既に
+リポジトリにあり、その UI だから**という理由で先に選んだ。「追加で要る utils
+なし」は正しく、置換と書き換えだけで済んだ。
+
+### 暗黙グローバルは 9 つ
+
+`src/globals.d.ts` が並べていた `@noshiro/global-*` の 8 参照で、実際に使われて
+いたのは `styled` / `css` / `memoNamed` / `pipe` / `createState` /
+`InitializedObservable` / `debounceTime` / `map` / `useObservableValue` の 9 つ。
+すべて明示 import にした。
+
+### `syncflow` → `synstate` は署名が違う
+
+**移植ではなく書き換えになる。** 3 箇所:
+
+| 旧 (`syncflow`)                                                | 新 (`synstate`)                          |
+| :------------------------------------------------------------- | :--------------------------------------- |
+| `createState` が `{ state, useCurrentValue, setState }` を返す | タプル `[state, setState, utils]` を返す |
+| `.chain(op)`                                                   | `.pipe(op)`                              |
+| `debounceTime(ms)`                                             | `debounce(ms)`                           |
+
+`useCurrentValue` に対応するものは `synstate` の側に無いので、
+`synstate-react-hooks` の `useObservableValue` に置き換え、`state$` を
+export するようにした。`event-schedule-app` が `.pipe(debounce(500))` と
+書いているのと同じ形になる。
+
+`ts-data-forge` の `pipe` も名前が違う: `.chain` → `.map`、`.chainOptional` →
+`.mapNullable`（`parseLambdaTerm` が返すのは `Optional` ではなく
+`LambdaTerm | undefined` なので、`mapOptional` ではない）。
+
+### 捨てたもの
+
+- `src/globals.d.ts`・`src/vite-env.d.ts` — 暗黙グローバルの shim。step 3 で
+  削除した 5 件と同じ性格のもの
+- `src/constants/dictionary/` — 中身が `export const dict = {} as const;` と
+  「`typeof dict` が `'object'` である」ことだけを見るテストで、参照は
+  `vite-env.d.ts` の global 宣言だけ。テンプレート由来の残骸
+- `configs/`・`scripts/`・`e2e/`・firebase 一式・`index.html`・`public/` —
+  `event-schedule-app` と同じく、**このリポジトリではビルドしない**ため
+
+### `*.css` の宣言だけは残した
+
+`vite-env.d.ts` の `/// <reference types="vite/client" />` が唯一実仕事を
+していた部分で、`main.tsx` の `import './index.css'` がこれを要る。
+ビルドしないので `vite` は依存に入っておらず、`src/css.d.mts` に
+`declare module '*.css' {}` を 1 行置いた。`event-schedule-app` は同じ import を
+持ちながら宣言を持たないが、あちらは依存が多く、どこかの `.d.ts` から
+ambient に届いているだけである。自前で宣言するほうが壊れにくい。
+
+### knip
+
+`apps/*` の既定エントリは Astro サイトを仮定しているので、
+`event-schedule-app` と同じく `entry: ["src/main.tsx"]` を `knip.jsonc` に
+足した。足す前は依存 9 件が「未使用」と報告される。
