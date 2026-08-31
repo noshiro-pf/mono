@@ -1,7 +1,6 @@
-import { Arr } from '@noshiro/ts-utils';
 import { useState } from 'better-preact-use-state';
-import { useEffect, useMemo, useRef } from 'preact/hooks';
-import { ResizeObserver as CustomResizeObserver } from 'resize-observer';
+import * as Preact from 'preact/hooks';
+import { Arr } from 'ts-data-forge';
 
 type Size = Readonly<{
   height: number;
@@ -13,9 +12,11 @@ type Size = Readonly<{
 export const useResizeObserverRef = <E extends Element = Element>(
   setSize: (v: Size) => void,
 ): preact.RefObject<E> => {
-  const rootResizeObserver = useMemo(
+  // The `resize-observer` polyfill this used is no longer needed: every
+  // browser this app targets ships `ResizeObserver`, and `lib.dom` types it.
+  const rootResizeObserver = Preact.useMemo(
     () =>
-      new CustomResizeObserver((entries) => {
+      new ResizeObserver((entries) => {
         if (Arr.isNonEmpty(entries)) {
           setSize(entries[0].contentRect);
         }
@@ -23,17 +24,20 @@ export const useResizeObserverRef = <E extends Element = Element>(
     [setSize],
   );
 
-  const targetElRef = useRef<E>(null);
+  const targetElRef = Preact.useRef<E>(null);
 
-  useEffect(() => {
+  Preact.useEffect(() => {
     const el = targetElRef.current;
+
     if (el !== null) {
       rootResizeObserver.observe(el);
     }
+
     return () => {
       if (el !== null) {
         rootResizeObserver.unobserve(el);
       }
+
       rootResizeObserver.disconnect();
     };
   }, [targetElRef, rootResizeObserver]);
@@ -43,7 +47,7 @@ export const useResizeObserverRef = <E extends Element = Element>(
 
 export const useResizeObserver = <E extends Element = Element>(
   defaultSize?: Size,
-): [Size, preact.RefObject<E>] => {
+): readonly [size: Size, ref: preact.RefObject<E>] => {
   const [size, setSize] = useState<Size>(
     defaultSize ?? { width: 0, height: 0, left: 0, top: 0 },
   );

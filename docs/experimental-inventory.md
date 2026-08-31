@@ -347,7 +347,7 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 `algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
 （1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
 `preact-utils`（472）・`tiny-router-preact-hooks`（140）・~~`better-preact-use-state`
-（74）~~・`resize-observer-preact-hooks`（55）が先に要る。合計 741 行で、いずれも
+（74）~~・~~`resize-observer-preact-hooks`（55）~~ が先に要る。合計 741 行で、いずれも
 React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
 
 **`better-preact-use-state` は復元済み**（下節）。残る 3 つのうち
@@ -1079,3 +1079,49 @@ button-group 3 つで初めて露見した。
 しているコンポーネントが無い。**移植元でも同じ**なので、移植で落としたもの
 ではない。knip の entry に `src/services/index.mts` を並べて、dead code では
 なく入口として扱っている。
+
+## `resize-observer-preact-hooks` の復元（2026-09-01）
+
+Preact 側 utils の 4 つ目。これで 4 つとも揃う。
+
+**復元スタックの一番上に積み直した。** `better-preact-use-state` を使うので
+当初は #1748 の直上に置いたが、`algo-app` がこのパッケージと `goober`
+（#1772）の両方を必要とし、兄弟ブランチをまたぐ菱形になってしまう。
+#1773 の上に載せ替えて一直線にしてある。
+
+React 版（`apps/resize-observer-react-hooks`）が復元済みなので、そちらの
+判断をそのまま引き継いだ。
+
+| 移植元                                  | 復元後（React 版と同じ）                                               |
+| :-------------------------------------- | :--------------------------------------------------------------------- |
+| `resize-observer` の polyfill           | 使わない。今のブラウザは `ResizeObserver` を持ち、`lib.dom` が型を持つ |
+| `preact.RefObject<E>`                   | `preact.RefObject<E \| null>`                                          |
+| 戻り値 `[Size, Ref]`                    | `readonly [size: Size, ref: …]`（ラベル付き）                          |
+| `RefObject<E \| null>`（React 版の字面） | `preact.RefObject<E>` — 下記                                            |
+| `@noshiro/ts-utils` の `Arr`            | `ts-data-forge`                                                        |
+| `useState`（`better-preact-use-state`） | そのまま（#1748 で復元済み）                                           |
+
+`gi:src` に `--exclude index.mts` は付けていない。React 版は付けているが、
+[#1742](https://github.com/noshiro-pf/mono/pull/1742) のとおり no-op であり、
+同 PR が既存パッケージからも外している。
+
+**初回から type-check・lint とも 0 件**だったが、これは**利用者がまだ
+いなかったから**でもあった。
+
+### preact の `RefObject` は React 19 と意味が違う
+
+React 版に揃えて戻り値を `React.RefObject<E | null>` の字面どおり
+`preact.RefObject<E | null>` と書いていたが、これは誤りだった。
+
+| | `RefObject<T>` の定義 | null を含む書き方 |
+| :--- | :--- | :--- |
+| React 19 | `{ current: T }` | `RefObject<E \| null>` |
+| Preact 10 | `{ current: T \| null }` | `RefObject<E>` |
+
+preact では二重に null を付けたことになり、`<div ref={ref}>` が受け取らない。
+`my-portfolio-app-preact` がこのフックの最初の利用者になって露見した。
+`Preact.useRef<E>(null)` はオーバーロード
+`useRef<T>(initialValue: T | null): RefObject<T>` に当たるので、
+React 版の `React.useRef<E>(null)` とも形が揃う。
+
+**型の意味ではなく字面を写すと、こうなる。**
