@@ -321,6 +321,20 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry above assumes: a set of Node programs,
+    // each of which runs when imported, so there is no barrel to point at.
+    "apps/slack-archive-tools": {
+      "entry": [
+        "src/dump-keys-message.mts",
+        "src/dump-keys-message-sub-keys.mts",
+        "src/dump-keys-message-sub-array-keys.mts",
+        "src/recursive-download.mts",
+        "src/run-validator.mts",
+        "configs/*.mts",
+      ],
+      "project": ["**/*.mts"],
+    },
+
     // Not an Astro site like the entry above assumes: a Node program with a
     // single entry point.
     "apps/poll-discord-app": {
