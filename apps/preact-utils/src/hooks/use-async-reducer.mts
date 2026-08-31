@@ -1,7 +1,12 @@
 import { useState } from 'better-preact-use-state';
-import { useCallback, useEffect, useRef } from 'preact/hooks';
+import * as Preact from 'preact/hooks';
+import { unknownToString } from 'ts-data-forge';
+
+/** React 19 dropped `React.Reducer`; it was only ever this. */
+type Reducer<S, A> = (prev: S, action: A) => S;
 
 type AsyncDispatch<S, A> = (action: A) => Promise<S>;
+
 type UpdateStateFn<S> = (updateFn: (prevState: S) => S) => void;
 
 export const useAsyncDispatchFunction = <S, A>(
@@ -10,18 +15,19 @@ export const useAsyncDispatchFunction = <S, A>(
   updateState: UpdateStateFn<S>,
 ): AsyncDispatch<S, A> => {
   // hold resolution function for all setState calls still unresolved
-  const resolvers = useRef<((_state: S) => void)[]>([]);
+  const mut_resolvers = Preact.useRef<((_state: S) => void)[]>([]);
 
   // ensure resolvers are called once state updates have been applied
-  useEffect(() => {
-    for (const resolve of resolvers.current) {
+  Preact.useEffect(() => {
+    for (const resolve of mut_resolvers.current) {
       resolve(state);
     }
-    resolvers.current = [];
+
+    mut_resolvers.current = [];
   }, [state]);
 
   // make setState return a promise
-  return useCallback(
+  return Preact.useCallback(
     (action: A) =>
       new Promise<S>((resolve, reject) => {
         updateState((stateBefore) => {
@@ -34,13 +40,17 @@ export const useAsyncDispatchFunction = <S, A>(
             }
             // Else we queue resolution until next state change
             else {
-              resolvers.current.push(resolve);
+              mut_resolvers.current.push(resolve);
             }
+
             return stateAfter;
           } catch (error: unknown) {
-            reject(error);
+            reject(
+              Error.isError(error) ? error : new Error(unknownToString(error)),
+            );
+
             // FIXME
-            // eslint-disable-next-line @typescript-eslint/only-throw-error
+
             throw error;
           }
         });
@@ -52,7 +62,7 @@ export const useAsyncDispatchFunction = <S, A>(
 export const useAsyncReducer = <S, A>(
   reducer: Reducer<S, A>,
   init: S,
-): [S, AsyncDispatch<S, A>] => {
+): readonly [S, AsyncDispatch<S, A>] => {
   const [state, _, { updateState }] = useState(init);
 
   const dispatchAsync = useAsyncDispatchFunction(state, reducer, updateState);

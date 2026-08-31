@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'preact/hooks';
+import * as Preact from 'preact/hooks';
 
 export const useValueAsRef = <T,>(value: T): preact.Ref<T> => {
-  const ref = useRef<T>(value);
-  useEffect(() => {
+  const ref = Preact.useRef(value);
+
+  Preact.useEffect(() => {
     ref.current = value;
   }, [value]);
 
