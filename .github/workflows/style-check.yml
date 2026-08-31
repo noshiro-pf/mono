@@ -66,6 +66,10 @@ jobs:
           # rebase drops a row from it. Regenerating it here and letting the
           # repository-clean step below compare is the only thing that notices.
           - docs:deps
+          # The generated `index.mts` barrels. Nothing else notices when one
+          # goes stale — or when `gi` overwrites a hand-written index file,
+          # which is what `--preserve` in each package's `gi:src` now stops.
+          - ws:gi
 
     steps:
       - name: Checkout

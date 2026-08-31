@@ -133,6 +133,10 @@ npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js
 # Skip generating index files at the root level (depth 0), only generate from depth 1 onwards
 npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --min-depth 1
 
+# Leave hand-written index files alone: an executable entry point at ./src/index.mts,
+# and a curated list of named re-exports in every ./src/v*/index.mts
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --preserve index.mts --preserve 'v*/index.mts'
+
 # Example in npm scripts
 "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
 ```
@@ -159,7 +163,19 @@ npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .
 - `--exclude` - Glob patterns of files to exclude (optional, can be specified multiple times)
 - `--fmt` - Command to format after generating the index file (optional)
 - `--min-depth` - Minimum depth to start generating index files (default: 0)
+- `--preserve` - Glob patterns of index files to leave untouched (optional, can be specified multiple times)
 - `--silent` - Suppress output messages (optional)
+
+`--exclude` and `--preserve` answer different questions. `--exclude` says what an
+index file may not _export_, and its patterns are matched against a bare file
+name as well as a path relative to the target directory. `--preserve` says which
+index files must not be _written_, and matches on the relative path alone — so
+`--preserve index.mts` names the one at the root of the walk, where
+`--exclude index.mts` would name every index file in the tree (and, index files
+never being exported in the first place, does nothing at all).
+
+A preserved directory is still walked, so index files below it are still
+generated, and its parent still re-exports it.
 
 ### `check-should-run`
 
