@@ -1961,3 +1961,61 @@ metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== tr
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 168 個が true / false で完全一致（`dist/` を消して exit code も確認）
 - probe を置いてから lint を測った
+## `synstate-preact-hooks` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** 内容は #1752 で測ったとおり
+`scripts/cmd/embed-examples-in-jsdoc.mts` の `String(error)`（117 行 60 桁）
+1 件で、`unknownToString` に置き換えた。**リポジトリ内 9 件目**である。
+
+`.d.mts` 9 個が true / false で完全一致。#1757 を踏まえ、このパッケージの
+`build` が `configs/tsconfig.build.json`（`include` は `../src`）で宣言のみ
+emit することを先に確認したうえで、`dist/` を消して exit code を見る手順で
+測っている。
+
+## `synstate` 本体の opt-in は保留（2026-09-01 調査）
+
+**型エラー 12 件。うち 6 件は `src/`、6 件は `samples/docs-site/why-reactive/`。**
+`src/` の 6 件は直せたが、samples の 6 件は**ドキュメントの判断**になるので、
+ここでは opt-in していない。
+
+### `src/` の 6 件は `TimerId` 1 箇所に集約される
+
+`counter.mts` ・ `timer.mts` ・ `audit.mts` ・ `debounce.mts` ・ `throttle.mts` の
+`clearInterval` / `clearTimeout` 呼び出しがすべて落ちる。原因は
+
+```ts
+export type TimerId = ReturnType<typeof setTimeout>;
+```
+
+である。**DOM lib と `@types/node` の両方が `setTimeout` を宣言する**ので
+`typeof setTimeout` はオーバーロード集合になり、`ReturnType` は最後のシグネチャ
+だけを読む。strict lib 下ではその結果が `{} | null` になり、
+`clearInterval(id: number | undefined)` に渡せない。
+
+**「何が消せるか」で定義するほうが安定する。**
+
+```ts
+export type TimerId = NonNullable<Parameters<typeof clearTimeout>[0]>;
+```
+
+`clearTimeout` はどちらの lib でもシグネチャが 1 つなので `Parameters` は
+曖昧にならない。`NonNullable` は「消す側が許容するが handle ではない」
+`undefined` を落とすためのもの。この 1 行で `src/` の 6 件は消える（実測）。
+
+### samples の 6 件は直せるが、直すと docs が変わる
+
+`why-reactive/03-react-debounce-fetch.tsx` と `05-imperative-table.mts`
+（および `ja/` の対）は、**わざと素朴に書いた命令型のコード**で、
+`generate-sample-diffs.mts` がドキュメントへそのまま埋め込む。
+
+strict lib では `Response.json()` が `any` ではなく `unknown` を返すため、
+`setResults(data)` ・ `error.name` ・ `allRows = await …json()` が落ちる。
+**strict lib の言い分は正しい。** ただし直すには
+
+- 表示されるコードに型注釈やキャストを足す（読者に見えるものが変わる）か、
+- 型ガード／`ts-fortress` の検証を足す（サンプルの主題である debounce や
+  「命令型はつらい」から目を逸らさせる）
+
+のどちらかになる。これは型安全性ではなく**ドキュメントの判断**なので、
+勝手に決めずに残した。samples がそのままでよいと決まれば、`TimerId` の 1 行と
+合わせて opt-in できる。
