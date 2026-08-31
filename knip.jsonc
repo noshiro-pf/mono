@@ -238,9 +238,15 @@
     },
 
     // Not an Astro site like the entry above assumes: a single entry point.
-    "apps/preact-utils": {
+"apps/preact-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    "apps/resize-observer-preact-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
     },
 
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
