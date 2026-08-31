@@ -269,6 +269,37 @@ commands run those across every workspace member that defines them, and the
   `scripts/cmd/embed-examples.mts`.
 - `pnpm run docs:deps` — regenerate `docs/package-dependencies.md`.
 
+## Required status checks
+
+**Every matrix entry in the five check workflows is a required status check,
+and the list of them is maintained by hand** in the `required_status_checks`
+rule of `repo-settings/rulesets/main.json`. A matrix entry added without its
+context added there runs, reports, and blocks nothing — which is how
+`style-check (strict-lib:fmt)`, `style-check (docs:deps)`,
+`type-check (strict-lib:type-check)` and `type-check (strict-lib:lint)` sat
+unenforced. Three of those four run a command and then assert the tree is
+clean, so what an unenforced one lets through is generated output drifting
+from its generator, on `main`, with a green pull request.
+
+The context is the job's name with its matrix value in parentheses —
+`style-check (docs:deps)` — or the bare job name where there is no matrix
+(`verify-published`, `backup-repository-settings`), or the job's `name:` where
+it sets one (`Validate PR title`). So adding a matrix entry is two edits, not
+one.
+
+`branch-up-to-date / check` is deliberately **not** required. It is a gate
+that fails open — the jobs waiting on it use `!cancelled()` and
+`should_run != 'false'`, so an unanswered gate lets them run — and each of the
+five workflows contributes a context under the same name.
+
+**`repo-settings/` is a declaration, not a lever.** The root files under it
+are the desired state, applied only by `pnpm run repo-settings:apply` (it
+needs an admin token); `bk/` is a mirror of what GitHub currently has, written
+by `repo-settings:backup`. The `backup-repository-settings` check compares
+`bk/` against the live repository, so editing a root file passes CI while
+changing nothing — the settings take effect when someone runs `apply`, which
+rewrites both the root file and `bk/`.
+
 ## CI diff gates
 
 The check workflows carry no `paths` filter. A workflow that a path filter

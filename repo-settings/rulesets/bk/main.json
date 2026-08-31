@@ -63,7 +63,23 @@
             "integration_id": 15368
           },
           {
+            "context": "style-check (strict-lib:fmt)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (docs:deps)",
+            "integration_id": 15368
+          },
+          {
             "context": "type-check (check:root)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (strict-lib:type-check)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (strict-lib:lint)",
             "integration_id": 15368
           },
           {
