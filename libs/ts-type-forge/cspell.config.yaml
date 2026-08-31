@@ -6,4 +6,5 @@ import:
   - '../../.cspell.config.yaml'
 words:
   - gcanti
+  - unshift
   - xnor
