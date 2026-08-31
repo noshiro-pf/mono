@@ -1749,3 +1749,39 @@ return Result.err(`❌ Failed to embed JSDoc examples: ${String(error)}`);
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 9 個が true / false で完全一致
 - `pnpm run doc` も通る
+
+## `eslint-plugin-ts-type-forge` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 2 件。** #1763 で予告したとおり、`build.mts` と
+`gen-rule-types.mts` の `String` 2 件だけだった。3 つのプラグインのうち
+`prefer-canonical-*` 系の規則を持たないのはこれだけで、`includes` の件は
+出ない。
+
+これで `String(...)` の置き換えは **13〜14 件目**である。
+
+### opt-out されている `ts-type-forge` を巻き込む形になる
+
+このパッケージの `paths` は `ts-type-forge` をソースへ向けているので、
+**deliberately opted OUT のはずのパッケージの宣言が、ここでは
+`libReplacement: true` の下で型チェックされる**。`ts-data-forge` の opt-in
+（#1745）が `eslint-config-typed` を巻き込んだのと同じ経路である。
+
+**実測では型エラー 0 件だった。** `ts-type-forge` の opt-out は、その
+`tsconfig` で自分自身を検査するときの話（`AbsoluteValue` の pass-through と、
+strict lib 側が 107 宣言のうち 18 で `import('ts-type-forge')` を参照する
+循環）であって、**consumer 側のプログラムに引き込まれたときに壊れるという
+意味ではない**、と分かったことになる。
+
+ただしこれは「このパッケージが import する範囲では」という限定つきの観測で
+ある。`ts-type-forge` 自身の opt-in を検討するときの根拠にはならない。
+
+`lib` が `["ESNext"]` に絞られている（DOM を入れると `DeepReadonly<URL>` の
+厳密等価アサーションが壊れるため）点も効いている可能性がある。probe は通る
+ので、置き換え自体は効いている。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 77 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 16 個が true / false で完全一致
+- probe を置いてから lint を測った（#1762 の反省）
