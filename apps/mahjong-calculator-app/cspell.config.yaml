@@ -1,0 +1,42 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+# Mahjong terms, spelled the way the source names them. `zikaze`/`kokusi`
+# are alternative spellings the source also uses; both
+# forms appear, so both are listed rather than silently unified.
+words:
+  - akahai
+  - ankan
+  - ankantsu
+  - avenir
+  - bakaze
+  - chun
+  - haitei
+  - hatsu
+  - hyouji
+  - ippatsu
+  - jihai
+  - jikaze
+  - kakan
+  - kokushi
+  - kokusi
+  - kotsu
+  - manzu
+  - minkantsu
+  - modoshi
+  - pinzu
+  - shimocha
+  - shuntsu
+  - sozu
+  - syanten
+  - tegawari
+  - tehai
+  - tenho
+  - tiitoi
+  - toimen
+  - tsumo
+  - uradora
+  - zikaze
