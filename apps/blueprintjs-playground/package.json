@@ -1,0 +1,54 @@
+{
+  "name": "blueprintjs-playground",
+  "version": "0.0.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/blueprintjs-playground"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config ./configs/vite.config.mts",
+    "dev": "vite --config ./configs/vite.config.mts",
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview --config ./configs/vite.config.mts",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "^6.18.0",
+    "@blueprintjs/datetime": "^6.2.4",
+    "@blueprintjs/datetime2": "^3.2.4",
+    "@blueprintjs/icons": "^6.13.0",
+    "@blueprintjs/select": "^6.3.4",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "normalize.css": "^8.0.1",
+    "react-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsx": "catalog:",
+    "vite": "catalog:"
+  }
+}
