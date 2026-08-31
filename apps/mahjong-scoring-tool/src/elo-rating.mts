@@ -15,6 +15,7 @@ export const updateELO = (
   k: number,
 ): number => {
   let mut_diff = 0;
+
   for (const [i, other_elo] of other_elos[0].entries()) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const other_score = other_scores[0][i]!;
@@ -26,5 +27,6 @@ export const updateELO = (
 
     mut_diff += calcELODiff(self_elo, other_elo, win, k);
   }
+
   return self_elo + mut_diff;
 };
