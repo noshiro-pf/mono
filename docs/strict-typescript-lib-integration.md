@@ -1706,3 +1706,46 @@ probe の置き場である `test/` が無く、`include` にも入っていな�
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 3 個が true / false で完全一致
 - このパッケージに `doc` スクリプトは無い
+
+## `synstate-react-hooks` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** これまでで最も安い。
+
+### 3 パッケージまとめて測った
+
+同じ手順で 3 つ測り、いちばん意味のあるものを選んだ。
+
+| パッケージ                |  型 | lint | 内容                                            |
+| :------------------------ | --: | ---: | :---------------------------------------------- |
+| `github-settings-as-code` |   0 |    0 | **完全に無料**                                  |
+| `synstate-react-hooks`    |   0 |    1 | `String(error)` 1 件                            |
+| `better-react-use-state`  |   0 |    1 | `String(error)` 1 件。tsconfig の構造変更が要る |
+
+`better-react-use-state` の `tsconfig.json` には `compilerOptions` ブロック自体が
+無いので、opt-in するにはまずそれを足すことになる。残り 2 つはそのまま入る。
+
+**3 つとも入れる価値はある。** ここでは公開ライブラリで、かつ指摘が
+既知のパターンである `synstate-react-hooks` を選んだ。
+
+### lint 1 件 — `String(error)`
+
+`scripts/cmd/embed-examples-in-jsdoc.mts` の
+
+```ts
+return Result.err(`❌ Failed to embed JSDoc examples: ${String(error)}`);
+```
+
+で、`ts-fortress`（#1657）とファイル名まで同じである。引数が `unknown` なので
+`unknownToString` に置き換えた。
+
+**このファイルはリポジトリ内で 4 つ目の同じ箇所になる。** `ts-fortress` と
+`ts-repo-utils` は opt-in 時に直っており、`ts-data-forge` は #1745 で直した。
+`embed-examples-in-jsdoc.mts` を持つ他のパッケージにも同じ行が残っている
+可能性が高いので、opt-in のたびに 1 件ずつ出てくることになる。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 6 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 9 個が true / false で完全一致
+- `pnpm run doc` も通る
