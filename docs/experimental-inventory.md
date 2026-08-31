@@ -346,8 +346,8 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 
 `algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
 （1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
-`preact-utils`（472）・`tiny-router-preact-hooks`（140）・~~`better-preact-use-state`
-（74）~~・~~`resize-observer-preact-hooks`（55）~~ が先に要る。合計 741 行で、いずれも
+~~`preact-utils`~~（472）・~~`tiny-router-preact-hooks`~~（140）・~~`better-preact-use-state`~~
+（74）・~~`resize-observer-preact-hooks`~~（55）が先に要る。合計 741 行で、いずれも
 React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
 
 **`better-preact-use-state` は復元済み**（下節）。残る 3 つのうち
@@ -1125,3 +1125,43 @@ preact では二重に null を付けたことになり、`<div ref={ref}>` が�
 React 版の `React.useRef<E>(null)` とも形が揃う。
 
 **型の意味ではなく字面を写すと、こうなる。**
+
+## `tiny-router-preact-hooks` の復元（2026-09-01）
+
+Preact 側 utils 4 つのうち 2 つ目。`better-preact-use-state` を待たずに入れられる。
+
+### 宣言された依存 4 つのうち、実際に使っているのは 1 つ
+
+移植元の `dependencies` は `@noshiro/syncflow-preact-hooks` /
+`@noshiro/tiny-router-observable` / `@noshiro/ts-utils` / `preact` の 4 つだが、
+**ソースが import しているのは `preact/hooks` だけ**である。残り 3 つは
+過剰宣言なので持ち込まない。インベントリの「連れてくる utils」を数えるときは、
+`package.json` ではなく import を見る必要がある。
+
+### コピペされた実装を 1 つにまとめた
+
+移植元は `useRouterLinkClick` と `createRouterLinkClickHandler` が
+**同じ本体を 2 回書いている**（40 行ほどの重複）。React 版の
+`apps/tiny-router-react-hooks` は復元のときにこれを直しており、
+`createRouterLinkClickHandler` を定義して `useRouterLinkClick` はそれを
+`useCallback` で包むだけ、という形にしてある。同じ形に揃えた。
+
+React 版に合わせた点はほかに 2 つ:
+
+- `Record<...>` → `ReadonlyRecord<...>`（`ts-type-forge` のグローバル型）
+- `createPath` の戻りテンプレートに `as const`
+
+### 戻り値の型は Preact の `MouseEventHandler`
+
+React 版は `React.MouseEventHandler<HTMLElement>`。Preact にも同名の型があるが、
+**`JSX` 名前空間のほうは `@deprecated`** で、`@typescript-eslint/no-deprecated` が
+「Please import from the Preact namespace instead」と言う。`preact` のルートが
+`dom.d.ts` を `export *` しているので、
+
+```ts
+import { type MouseEventHandler } from 'preact';
+```
+
+が正しい。移植元は `(ev: MouseEvent) => void` と素の DOM 型で書いていたが、
+これは Preact が native event を渡すので間違いではない。ただ React 版と対を
+なす形にするほうが読みやすい。

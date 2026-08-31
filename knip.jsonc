@@ -237,8 +237,14 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/tiny-router-preact-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
     // Not an Astro site like the entry above assumes: a single entry point.
-"apps/preact-utils": {
+    "apps/preact-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],
     },
