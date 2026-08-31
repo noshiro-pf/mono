@@ -32,7 +32,7 @@ describe('map preserves length constraints', () => {
   test('a branded input keeps its constraint', () => {
     const input: MinLengthArray<3, number> = asMinLengthArray(3, [0, 1, 2, 3]);
 
-    const result = map(input, (value) => `#${String(value)}`);
+    const result = map(input, (value) => `#${value.toString()}`);
 
     expectType<typeof result, MinLengthArray<3, string>>('~=');
 
@@ -162,7 +162,7 @@ describe('other length-preserving utilities preserve length constraints', () => 
   test('toUpdated keeps the brand and widens only the element type', () => {
     const input: MinLengthArray<3, number> = asMinLengthArray(3, [0, 1, 2]);
 
-    const result = toUpdated(input, 1, (prev) => `#${String(prev)}`);
+    const result = toUpdated(input, 1, (prev) => `#${prev.toString()}`);
 
     expectType<typeof result, MinLengthArray<3, number | `#${string}`>>('~=');
 

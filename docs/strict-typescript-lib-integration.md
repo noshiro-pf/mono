@@ -1,4 +1,4 @@
-<!-- cspell:ignore ENOENT -->
+<!-- cspell:ignore ENOENT iset -->
 
 # `strict-typescript-lib` を mono に統合するか
 
@@ -1521,3 +1521,115 @@ union の全メンバを要求するので、`case undefined:` を明示して�
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 33 個が true / false で完全一致
 - `pnpm run doc` も通る
+
+## `ts-data-forge` の opt-in（2026-09-01 実測）
+
+**型エラー 5 件、lint 26 件。** 2026-08-25 の計測（型 0 件・lint 23 件）から
+どちらも増えているが、増えたぶんはいずれもその後に入ったコードによるもので、
+strict lib 側の後退ではない。
+
+### 型エラー 5 件はすべて `eslint-config-typed` の中
+
+`ts-data-forge` 自身の `src` は 0 件のままである。5 件は
+`prefer-nullish-coalescing-when-safe.mts`（#1697 で追加）にあり、
+**このパッケージだけがそこを型チェックの対象に引き込む**。`configs/eslint/` から
+`eslint-config-typed` の型を import しており、その解決先を `paths` でソースに
+向けているためで、他パッケージが `eslint-config-typed` を使うのは
+`eslint.config.mts` の中だけ、そちらは tsconfig の `include` の外にある。
+「止まっている 2 件」の 2 と同じ経路である。
+
+中身は 5 件とも同じ形で、型引数の無い `new Set([...])` である。
+
+```ts
+const SINGLE_FALSY_SUMMARY: ReadonlyRecord<FalsyValueTag, TypeSummary> = {
+    emptyString: { falsyValues: new Set(['emptyString']), nullable: false },
+    // …
+};
+```
+
+素の lib の `SetConstructor` は `new <T = any>(values?: readonly T[] | null)`
+だが、strict lib は既定型引数を落として
+`new <T = never>(): Set<T>` と `new <T>(values: readonly T[]): Set<T>` の
+2 つに割っている。結果として文脈型が要素リテラルまで流れず `Set<string>` に
+推論され、`ReadonlySet<FalsyValueTag>` に代入できない。
+
+**型引数を明示するのが正しい。** `new Set<FalsyValueTag>([...])` はどちらの lib
+でも同じに読め、意図も明示される。`EMPTY_FALSY_SET` のように const 自体へ注釈が
+付いている 1 件は元から通っており、そこと形が揃う。
+
+### lint 26 件
+
+`@typescript-eslint/no-deprecated` 23 件と
+`@typescript-eslint/no-unnecessary-type-assertion` 3 件。内訳と直し方:
+
+| 箇所                                                               | 件数 | 直し方                                                |
+| :----------------------------------------------------------------- | ---: | :---------------------------------------------------- |
+| `src/guard/*.test.mts`                                             |   10 | 既にある `unicorn/new-for-builtins` の disable に併記 |
+| `src/collections/imap-mapped.mts`, `iset-mapped.mts`               |    4 | `String(x)` → `unknownToString(x)`                    |
+| `src/functional/*.test.mts`                                        |    3 | 同上                                                  |
+| `src/array/impl/*.test.mts`, `src/collections/imap.test.mts`       |    3 | `String(x)` → `x.toString()`                          |
+| `src/json/json.test.mts`                                           |    1 | `String(undefined)` → `'undefined'`                   |
+| `src/guard/is-non-empty-string.test.mts`                           |    1 | `charAt(0)` → `at(0)`                                 |
+| `scripts/cmd/embed-examples-in-jsdoc.mts`                          |    1 | `String(error)` → `unknownToString(error)`            |
+| `src/collections/imap.mts`, `iset.mts`, `src/number/enum/int8.mts` |    3 | 表明は残し、disable に併記                            |
+
+**`unknownToString` に寄せた 4 件は、揃えたことにもなる。** `imap.mts` と
+`iset.mts` は同じ「key not found」警告を既に `unknownToString` で組み立てて
+おり、mapped 版 2 ファイルだけが `String(...)` だった。`MapSetKeyType` は
+`Primitive` なので `null` / `undefined` を取り得て `toString()` は使えない。
+bigint のキーで出力が `1` から `1n` に変わるが、`console.warn` の診断文字列
+だけで、テストもこの文言には触れていない。
+
+**boxed primitive を作る 10 件に disable を併記したのは、そこが主題だから。**
+`isPrimitive(new String('hello'))` が `false` を返すことを確かめる検査で、
+`new String` を消したらテストが消える。`Object('hello')` に逃げても strict lib
+は `ObjectConstructor` にも `@deprecated` を付けているので同じである。10 件とも
+**既に `unicorn/new-for-builtins` の disable が付いており**、そこへ規則名を
+足すだけで済んだ。
+
+### `src` を strict lib 専用にしてはいけない（このパッケージでは特に）
+
+`no-unnecessary-type-assertion` の 3 件は、表明を**消すと** strict lib でしか
+通らないソースになる。
+
+```text
+src/collections/imap.mts(756,26): error TS2345: Argument of type
+  'K | (WidenLiteral<K> & {})' is not assignable to parameter of type 'K'.
+src/number/enum/int8.mts(40,57): error TS2322: Type 'number' is not
+  assignable to type 'AbsoluteValue<N>'.
+```
+
+`ts-fortress` が置いた基準（`libReplacement: false` で **probe だけ**が落ちる）
+を満たさなくなるうえ、ここには実害もある。**`configs/tsconfig.build.json` は
+パッケージの `tsconfig.json` を extends していない**（共有 config を直接
+extends する）ので、`libReplacement` は宣言 emit に効かない。つまり
+`pnpm run build` は `src` を素の lib で型チェックしており、strict lib 専用の
+ソースは**ビルドを落とす**。
+
+したがって表明は残し、disable に `@typescript-eslint/no-unnecessary-type-assertion`
+を併記した。素の lib で必要・strict lib で不要という状態そのものを書き留めた形
+である。
+
+この構造は opt-in 済みの 3 パッケージと同じなので、**公開される `.d.mts` は
+opt-in の影響を受けない**。実際、`libReplacement` の true / false で 2 通り
+ビルドして 196 個の `.d.mts` を突き合わせ、全一致を確認した。
+
+### probe の置き場所
+
+`test/strict-lib-active.mts` は他の 3 パッケージと同じだが、このパッケージの
+`eslint.config.mts` には `test/**/*.mts` に対して「テストファイルは export して
+はならない」という `no-restricted-syntax` があり、probe の `export` と衝突する。
+export を外すと今度は `import-x/unambiguous` が「script として解釈できる」と言う。
+
+probe はテストではない（`@ts-expect-error` 1 個がファイルの全内容で、`export` は
+その宣言が未使用ローカルにならないためのもの）ので、**そのブロックの `ignores`
+に 1 件加えて対象外にした**。規則を緩めたわけではなく、適用範囲を実態に合わせた
+ものである。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 3340 件も通る
+  （lint の警告 15 件は opt-in 前と同じ `unicorn/prefer-temporal`）
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 196 個が true / false で完全一致
+- `pnpm run doc` も通る。#1618 / #1657 と同じく TypeDoc の回避策は要らない

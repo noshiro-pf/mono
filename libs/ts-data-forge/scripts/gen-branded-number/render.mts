@@ -239,7 +239,7 @@ const renderEnumWrappers = (
 
   const absConst = [
     `const abs = <N extends ${t}>(x: N): AbsoluteValue<N> =>`,
-    '  // eslint-disable-next-line total-functions/no-unsafe-type-assertion',
+    '  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion -- unnecessary only under the strict standard library; the stock one types `Math.abs` as returning `number`',
     '  Math.abs(x) as unknown as AbsoluteValue<N>;',
   ].join('\n');
 

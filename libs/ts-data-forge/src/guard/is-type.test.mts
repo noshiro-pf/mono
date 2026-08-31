@@ -136,7 +136,7 @@ describe(isString, () => {
 
     assert.isFalse(isString(undefined));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isString(new String('hello')));
   });
 
@@ -175,7 +175,7 @@ describe(isNumber, () => {
 
     assert.isFalse(isNumber(123n));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isNumber(new Number(42)));
   });
 
@@ -236,7 +236,7 @@ describe(isBoolean, () => {
 
     assert.isFalse(isBoolean(null));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isBoolean(new Boolean(true)));
   });
 

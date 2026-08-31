@@ -5,6 +5,7 @@ import {
   type WidenLiteral,
 } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
+import { unknownToString } from '../others/index.mjs';
 import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
@@ -1270,7 +1271,7 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         console.warn(
-          `ISetMapped.delete: key not found: ${String(this.#toKey(key))}`,
+          `ISetMapped.delete: key not found: ${unknownToString(this.#toKey(key))}`,
         );
       }
 

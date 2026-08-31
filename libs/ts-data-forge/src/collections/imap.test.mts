@@ -263,7 +263,7 @@ describe('IMap.has', () => {
 
     assert.isTrue(map.has('1'));
 
-    assert.isTrue(map.has(String(1)));
+    assert.isTrue(map.has((1).toString()));
   });
 });
 

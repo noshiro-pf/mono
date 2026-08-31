@@ -82,13 +82,13 @@ describe(isPrimitive, () => {
   });
 
   test('should return false for boxed primitives', () => {
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isPrimitive(new String('hello')));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isPrimitive(new Number(42)));
 
-    // eslint-disable-next-line unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins, @typescript-eslint/no-deprecated
     assert.isFalse(isPrimitive(new Boolean(true)));
   });
 
