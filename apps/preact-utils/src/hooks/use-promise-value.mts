@@ -1,11 +1,11 @@
-import { type PromiseState } from '@noshiro/ts-utils-additional';
 import { useState } from 'better-preact-use-state';
-import { useEffect, useRef } from 'preact/hooks';
+import * as Preact from 'preact/hooks';
+import { type PromiseState } from '../utils/index.mjs';
 
 export const usePromiseValue = <T,>(
   promise: Readonly<Promise<T>>,
 ): PromiseState<undefined, unknown, T> => {
-  const promiseMemoized = useRef(promise);
+  const promiseMemoized = Preact.useRef(promise);
 
   const [settledValue, setSettledValue] = useState<
     PromiseState<undefined, unknown, T>
@@ -14,8 +14,9 @@ export const usePromiseValue = <T,>(
     value: undefined,
   });
 
-  useEffect(() => {
+  Preact.useEffect(() => {
     let mut_alive = true;
+
     promiseMemoized.current
       .then((v) => {
         if (mut_alive) {
@@ -27,6 +28,7 @@ export const usePromiseValue = <T,>(
           setSettledValue({ status: 'error', value: error });
         }
       });
+
     return () => {
       mut_alive = false;
     };

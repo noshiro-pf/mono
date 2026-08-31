@@ -1,13 +1,13 @@
 import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{
-  children: readonly preact.VNode[];
+  children: readonly preact.ComponentChild[];
   index: number;
 }>;
 
-const displayNoneStyle = { display: 'none' };
+const displayNoneStyle = { display: 'none' } as const;
 
-export const ComponentSwitcher = memoNamed<Props>(
+export const ComponentSwitcher = memoNamed<Readonly<Props>>(
   'ComponentSwitcher',
   ({ children, index }) => (
     <>

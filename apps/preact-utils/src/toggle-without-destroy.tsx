@@ -1,15 +1,16 @@
+import { type CSSProperties } from 'preact';
 import { memoNamed } from './memo-named.mjs';
 
 type Props = Readonly<{
   condition: boolean;
-  childTrue: preact.VNode;
-  childFalse: preact.VNode;
-  style?: preact.JSX.CSSProperties;
+  childTrue: preact.ComponentChild;
+  childFalse: preact.ComponentChild;
+  style?: CSSProperties;
 }>;
 
-const displayNoneStyle = { display: 'none' };
+const displayNoneStyle = { display: 'none' } as const;
 
-export const ToggleWithoutDestroy = memoNamed<Props>(
+export const ToggleWithoutDestroy = memoNamed<Readonly<Props>>(
   'ToggleWithoutDestroy',
   ({ condition, childTrue, childFalse, style }) => (
     <>

@@ -1,0 +1,48 @@
+{
+  "name": "preact-utils",
+  "version": "0.0.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/preact-utils"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
+  },
+  "dependencies": {
+    "better-preact-use-state": "workspace:*",
+    "synstate": "workspace:*",
+    "ts-data-forge": "workspace:*"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "npm-run-all2": "catalog:",
+    "preact": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "tsx": "catalog:"
+  },
+  "peerDependencies": {
+    "preact": ">=10.0.0"
+  }
+}
