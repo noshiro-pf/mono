@@ -170,3 +170,11 @@
 - **判断**: D-22 のラッパー群は ts-data-forge に追加し続けるのではなく、新ライブラリ(仮名 **ts-std-forge**、`libs/`)に実装する。依存は **ts-std-forge → ts-data-forge の一方向のみ**。
 - **理由**: ts-data-forge は ADT コア(Result/Optional/pipe)とデータ構造の両方を持つため、分割時の相互依存が懸念されたが、「**ts-data-forge は境界の実装者として、自身の内部では素の stdlib を直接使ってよい**」と定義すれば wrapper への逆依存は構造的に発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面動かさず、新 lib の re-export facade で一択の入口を作る(実体移動は将来の major)。
 - **実施**: scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)(`Regex.create` / `SafeDate.toISOString` を TDD で実装済み)。パッケージ名は初回 publish(手動 — libs/first-release.md)まで仮。
+
+## D-25: v1 preset は `languages/tsubu/eslint-config`(パッケージ名 tsubu-eslint-config)、dogfood 第一対象は ts-std-forge
+
+- **ステータス**: 確定(2026-08-31)
+- **判断**:
+    - Phase 1 の subset ESLint preset(D-10 の独立パッケージ)は `languages/tsubu/eslint-config` に置き、パッケージ名は **tsubu-eslint-config**(仮名。非公開)とする。仕様に属する新規 lint ルール(enforcement-map の 🆕)も同パッケージに eslint-plugin として同梱する。
+    - dogfood の第一対象は **ts-std-forge**(最小・新規・こちらで完全に制御可能)。第二候補: octokit-safe-types(小規模で型付きルールの効きが見える)、synstate(class-less 化済みで言語の想定スタイルに最も近いが中規模)。
+- **理由**: 公開は当面しないため languages/ 配下(D-8 の区分どおり)。公開する段になれば libs/ へ移す(D-8 補足)。

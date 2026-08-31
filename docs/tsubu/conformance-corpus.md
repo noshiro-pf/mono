@@ -66,7 +66,7 @@ const b = a == c && n;
 2. 🆕(新規実装)項目 — 実装前にフィクスチャを書くこと自体が仕様の曖昧さ検出になる(TDD)。
 3. `提案`/`未定` 項目はフィクスチャを書かない(仕様確定を待つ)。
 
-enforcement-map.md に「コーパス整備済みか」の列を追加して進捗を追跡する(TODO)。
+整備状況の単一の真実は `languages/tsubu/conformance/src/rule-ids.mts`(登録された中立 ID = フィクスチャ整備済みルール)。enforcement-map への列追加は表の churn が大きいため採らない。
 
 ## 運用上の注意
 

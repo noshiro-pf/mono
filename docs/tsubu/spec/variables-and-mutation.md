@@ -60,4 +60,4 @@ let mut x = 0;    // 可変束縛(TS の let x に transpile。または let mut
 ## 未解決の論点
 
 - 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
-- **global 定義名の shadow は禁止に確定**(D-19 — `undefined` / `NaN` / 組み込みオブジェクト / global 型名を宣言名に使えない。[banned-syntax.md](./banned-syntax.md))。ユーザー変数同士の shadowing を禁止するかは引き続き未定。
+- **global 定義名の shadow は禁止に確定**(D-19 — `undefined` / `NaN` / 組み込みオブジェクト / global 型名を宣言名に使えない。[banned-syntax.md](./banned-syntax.md))。ユーザー変数同士の shadowing は、現行 config(`@typescript-eslint/no-shadow` の `hoist: 'all'`)が既に全面禁止していることが判明(2026-08-31)。現行運用の追認として**全面禁止を提案**へ昇格(ユーザー確認待ち)。

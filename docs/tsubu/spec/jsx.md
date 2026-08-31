@@ -13,6 +13,10 @@
 
 なし(`<T,>` は合法 TS であり、`.ts` でも valid)。
 
+## フォーマッタ互換(検証済み 2026-08-31)
+
+`const identity = <T,>(x: T): T => x;` を Prettier(`.mts` / `.tsx` の両方)と oxfmt に通し、**いずれも trailing comma を保持する**ことを実測確認した。`<T,>` 常時強制の成立条件はクリア。
+
 ## 未解決の論点
 
 - JSX の対象ランタイム(React 前提か、`jsx: react-jsx` を固定するか — [compiler-options.md](./compiler-options.md) は現状 `react-jsx`)。
