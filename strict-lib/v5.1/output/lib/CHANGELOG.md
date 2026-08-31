@@ -1,5 +1,11 @@
 # strict-ts-lib-v5.1
 
+## 0.6.1
+
+### Patch Changes
+
+- c5853e4: Spell numeric argument ranges with `UintRangeInclusive` instead of `UintRange`: `toFixed(fractionDigits?: UintRangeInclusive<0, 100>)` now names its bounds the way the docs do ("0 – 100, inclusive") rather than with an exclusive upper bound (`UintRange<0, 101>`). Applied to every converted range — `toString` radix, `toPrecision`, JSON `space`, `BigInt.asIntN/asUintN` bits, and the `Intl` digit options. The expanded literal-union types are unchanged; this is purely a notation change in the emitted declarations.
+
 ## 0.6.0
 
 ### Minor Changes
