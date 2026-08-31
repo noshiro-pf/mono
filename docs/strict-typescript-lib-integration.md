@@ -2045,3 +2045,31 @@ strict lib では `Response.json()` が `any` ではなく `unknown` を返す�
 のどちらかになる。これは型安全性ではなく**ドキュメントの判断**なので、
 勝手に決めずに残した。samples がそのままでよいと決まれば、`TimerId` の 1 行と
 合わせて opt-in できる。
+
+## `synstate-preact-signals` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** #1752 で測ったとおり、
+`scripts/cmd/embed-examples-in-jsdoc.mts` の 117 行 60 桁の `String(error)`
+1 件だけ。**15 件目**。
+
+残るのは `synstate-react-hooks-compat` の同じ 1 件で、これも同じ位置である。
+
+### `embed-examples-in-jsdoc.mts` の重複について
+
+このスクリプトを持つパッケージすべてに同じ行があり、opt-in のたびに 1 件ずつ
+出てくる。これまでに直したのは
+
+`ts-repo-utils` ・ `ts-fortress` ・ `ts-data-forge` ・ `synstate-react-hooks`
+・ `synstate-preact-hooks` ・ 本パッケージ
+
+の 6 つで、`synstate-react-hooks-compat` が残っている。**まとめて 1 つの PR で
+潰す価値はあるが、opt-in と混ぜないほうが読みやすい**ので、ここまでは
+opt-in のたびに 1 件ずつ直してきた。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 25 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 8 個が true / false で完全一致
+- `pnpm run doc` も通る
+- probe を置いてから lint を測った
