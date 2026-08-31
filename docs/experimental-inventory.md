@@ -931,3 +931,51 @@ observable の `.chain(op)` は `.pipe(op)`、`pipe()` の `.chain(f)` は `.map
   `Uint32.random` を使っているので、これが元の意図）。
 - `Arr.pushed` → `Arr.toPushed`、`Arr.asMut` → `castMutable`、
   `MutableArrayOfLength<N, T>` → `Mutable<FixedLengthTuple<N, T>>`。
+
+## `preact-utils` の復元（2026-09-01）
+
+Preact 側 utils 4 つのうち 3 つ目。**`better-preact-use-state` を使うので
+#1748 の上に積んである。**
+
+### React 版が答えを全部持っていた
+
+`apps/react-utils` は同じ 23 ファイルの React 版で、復元済み・lint 通過済み。
+ファイル一覧を突き合わせると差は 3 つだけで、**詰まった箇所はすべてあちらに
+解決済みの形があった**。
+
+| 詰まった点                                | `react-utils` の答え                                           |
+| :---------------------------------------- | :------------------------------------------------------------- |
+| `getPlatform` / `PromiseState` の後継無し | `src/utils/` に移植済み。そのままコピーした                    |
+| `TimerId` が未定義                        | `type TimerId = Parameters<typeof clearTimeout>[0];`           |
+| `Reducer` が未定義                        | `type Reducer<S, A> = (prev: S, action: A) => S;`              |
+| `createTinyObservable` の後継無し         | `synstate` の `source` を使う `use-observable.mts` に置換      |
+| `usePrevious` が render 中に ref を読む   | state で書き直す（前の _描画_ ではなく前の _異なる値_ になる） |
+| codemod が `resolvers` を readonly にする | `mut_resolvers` に改名                                         |
+
+**`TimerId` の形は #1761 で `synstate` に提案したものと同じだった。**
+あちらは独立に導いたものだが、リポジトリには既に前例があったことになる。
+
+### `preact.FunctionComponent` が props を広げる
+
+規則同士がぶつかる 4 例目。`memoNamed` の引数を
+`preact.FunctionComponent<Props>` と書くと、その型は `RenderableProps<Props>`
+＝ `Props` ＋ `children` ・ `ref` ・ `key` ・ `jsx` なので、
+`ts-restrictions/check-destructuring-completeness`（全プロパティを分割代入せよ）
+を**構造的に満たせない**。分割代入に `Readonly<Props>` の注釈を足すと、今度は
+`@typescript-eslint/prefer-readonly-parameter-types` が
+「`ComponentChild` は deeply readonly ではない」と言う。
+
+`memoNamed` の引数を素の関数型 `(props: Readonly<Props>) => preact.VNode | null`
+にすると両方消える。React 19 の `FC` も `children` を足さなくなっているので、
+**2 つのパッケージが揃うことにもなる**。
+
+### 依存の食い違い
+
+インベントリは 5 つの Preact app すべてが utils 4 つを要ると書いているが、
+**import を見ると違う**。`slack-app` と `lambda-calculus-interpreter-preact` は
+`goober` と `preact` しか import していない（#1750 の
+`tiny-router-preact-hooks` と同じ、manifest と import の食い違い）。
+
+ただし `slack-app` は復元しない。`app.tsx` が
+`<div data-e2e={'root'}>{'root'}</div>` を返すだけの**空の雛形**で、
+`dict` もテンプレート残骸である。中身が無い。

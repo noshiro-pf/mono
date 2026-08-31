@@ -226,6 +226,24 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+
+    "apps/react-blueprintjs-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,ts,tsx}"],
+    },
+
+    "apps/better-preact-use-state": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    "apps/preact-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-blueprintjs-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
