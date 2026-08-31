@@ -1,59 +1,26 @@
-import { Result } from 'ts-data-forge';
-import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
-import { toIntegerOrInfinity } from '../../internal/index.mjs';
+import { type UintRangeInclusive } from 'ts-type-forge';
 
 /**
- * Formats a number to a given precision without throwing.
+ * Formats a number to a given precision, made total by its parameter type.
  *
- * `Number.prototype.toPrecision` throws a `RangeError` when `precision` is
- * outside the range 1–100 (after ToIntegerOrInfinity truncation) — but only
- * for a finite `value`: the spec returns `"NaN"` / `"Infinity"` before it
- * reaches the range check. This wrapper validates the same condition in the
- * same order and returns the failure as a tagged `Err`.
+ * `Number.prototype.toPrecision` throws a `RangeError` only when `precision`
+ * is outside 1–100 (and `value` is finite). With `precision` typed as the
+ * `1 | 2 | ... | 100` literal range, that failure is unrepresentable at
+ * compile time, so the function returns the string directly. A caller
+ * holding a plain `number` narrows it first; one that defeats the type
+ * system gets the raw `RangeError`, by design.
  *
  * @example
  *
  * ```ts
- * const okResult = SafeNumber.toPrecision(123.456, 4);
- *
- * assert.isTrue(Result.isOk(okResult));
- *
- * const errResult = SafeNumber.toPrecision(1, 0);
- *
- * assert.isTrue(Result.isErr(errResult));
- *
- * assert.deepStrictEqual(errResult.value, {
- *   kind: 'precision-out-of-range',
- *   precision: 0,
- * });
+ * assert.deepStrictEqual(SafeNumber.toPrecision(123.456, 4), '123.5');
  * ```
  *
  * @param value The number to format.
- * @param precision The number of significant digits (1–100 inclusive after
- *   truncation).
- * @returns `Ok<string>` with the formatted representation, or a tagged
- *   `Err` — `'precision-out-of-range'` for the spec-defined failure,
- *   `'unexpected'` for anything the engine throws beyond it.
+ * @param precision The number of significant digits (1–100 inclusive).
+ * @returns The formatted representation.
  */
 export const toPrecision = (
   value: number,
-  precision: number,
-): Result<string, ToPrecisionError> => {
-  if (Number.isFinite(value)) {
-    const p = toIntegerOrInfinity(precision);
-
-    if (p < 1 || p > 100) {
-      return Result.err({ kind: 'precision-out-of-range', precision });
-    }
-  }
-
-  return Result.mapErr(
-    Result.fromThrowable(() => value.toPrecision(precision)),
-    toUnexpectedError,
-  );
-};
-
-/** The failure type of {@link toPrecision}. */
-export type ToPrecisionError =
-  | Readonly<{ kind: 'precision-out-of-range'; precision: number }>
-  | UnexpectedError;
+  precision: UintRangeInclusive<1, 100>,
+): string => value.toPrecision(precision);

@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
 
 /**
  * Creates a `RegExp` from a dynamic pattern without throwing.
@@ -6,10 +7,11 @@ import { Result } from 'ts-data-forge';
  * `new RegExp` throws a `SyntaxError` when the pattern or flags are invalid.
  * Pattern validity is the engine's own grammar check, so — unlike the range
  * conditions of the number and string wrappers — it cannot reasonably be
- * validated in advance; the failure is caught instead and returned as a
- * single tagged `Err` with the engine's `SyntaxError` attached as `cause`
- * (its message is the only description of what is wrong with the pattern,
- * but note that its wording is engine-specific).
+ * validated in advance; the failure is caught instead. Classification is
+ * conservative: only a caught `SyntaxError` (the error type the spec
+ * mandates for parse failures) becomes `'invalid-regexp'`, with the error
+ * attached as `cause`; anything else the engine throws surfaces as the
+ * `'unexpected'` fallback.
  *
  * @example
  *
@@ -27,9 +29,9 @@ import { Result } from 'ts-data-forge';
  *
  * @param pattern The regular expression pattern.
  * @param flags Optional flags string.
- * @returns `Ok<RegExp>` with the compiled expression, or a tagged
- *   `Err<{ kind: 'invalid-regexp'; cause: Error }>` when the pattern or
- *   flags are invalid.
+ * @returns `Ok<RegExp>` with the compiled expression, or a tagged `Err` —
+ *   `'invalid-regexp'` (with the `SyntaxError` as `cause`) when the pattern
+ *   or flags are invalid, `'unexpected'` for any other throw.
  */
 export const create = (
   pattern: string,
@@ -38,11 +40,13 @@ export const create = (
   Result.mapErr(
     // eslint-disable-next-line security/detect-non-literal-regexp
     Result.fromThrowable(() => new RegExp(pattern, flags)),
-    (cause) => ({ kind: 'invalid-regexp', cause }),
+    (cause) =>
+      cause.name === 'SyntaxError'
+        ? { kind: 'invalid-regexp', cause }
+        : toUnexpectedError(cause),
   );
 
 /** The failure type of {@link create}. */
-export type CreateError = Readonly<{
-  kind: 'invalid-regexp';
-  cause: Readonly<Error>;
-}>;
+export type CreateError =
+  | Readonly<{ kind: 'invalid-regexp'; cause: Readonly<Error> }>
+  | UnexpectedError;

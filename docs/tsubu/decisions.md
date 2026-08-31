@@ -179,12 +179,13 @@
     - dogfood の第一対象は **ts-std-forge**(最小・新規・こちらで完全に制御可能)。第二候補: octokit-safe-types(小規模で型付きルールの効きが見える)、synstate(class-less 化済みで言語の想定スタイルに最も近いが中規模)。
 - **理由**: 公開は当面しないため languages/ 配下(D-8 の区分どおり)。公開する段になれば libs/ へ移す(D-8 補足)。
 
-## D-26: ラッパーのエラーは検証ファーストの tagged union、Error は cause のみ
+## D-26: ラッパーの失敗は「型 refine で排除 → 検証ファースト tagged union → 保守的 fallback」の三段構え
 
-- **ステータス**: 確定(2026-09-01)
-- **判断**: ts-std-forge のラッパーは `Result<T, Error>`(catch した Error をそのまま返す)をやめ、次の設計に統一する。
-    - **検証ファースト**: ECMAScript 仕様が定める throw 条件(規範的)をラッパー自身が呼び出し前に検査し、関数ごとの **plain tagged union**(例: `{ kind: 'radix-out-of-range', radix: 37 }`)で返す。検査は仕様の強制変換・判定順序まで鏡写しにする(ToIntegerOrInfinity の切り捨て、`toExponential` / `toPrecision` の「有限性チェックが範囲チェックに先行する」順序)。テストは生 API との同値スイープ(入力境界で throw ↔ Err が一致し、仕様定義の失敗に `'unexpected'` が現れない)で固定する。
-    - **backstop**: 仕様が実装依存として残す throw(`repeat` の最大文字列長超過など)は `Result.fromThrowable` で受け、共通型 `UnexpectedError = { kind: 'unexpected', cause: Error }` に写す。事前検証できない失敗(`new RegExp` の文法エラー)は、その関数固有の kind に `cause` を添えて返す。
-    - **全域化できるものは Result を返さない**: 唯一の失敗が引数型で排除される API(`SafeString.normalize` の form union)は値を直接返す。型システムを迂回した呼び出しは生の throw を受ける(型が契約)。
-- **理由**: 仕様が固定するのは throw の**条件**であって**メッセージ**ではないため、catch 後の分類はエンジン依存のメッセージ解析にしかならず移植不能。事前検証だけが正確な分類手段で、分類済みケースでは関数が構成的に全域になる。exceptions.md のクラスレス・エラー方針(Err payload は plain tagged union がデフォルト、Error は境界・panic 用)とも一致し、エンジン生成メッセージ入りの `Err<Error>` はその基準で最も情報価値が低い形だった。
-- **却下した代替案**: catch した Error の message / name による分類(エンジン依存)。branded 引数型(`Num.div` 方式)によるコンパイル時全域化 — 呼び出しの書き味が変わるため v0 では見送り、将来のオーバーロード候補(v3 の精緻化型が本命)として記録。
+- **ステータス**: 確定(2026-09-01、引数型 refine はレビュー反映で同日改訂)
+- **判断**: ts-std-forge のラッパーは `Result<T, Error>`(catch した Error をそのまま返す)をやめ、次の優先順で設計する。
+    1. **引数型 refine による全域化**: throw 条件が有限の引数範囲なら、strict-ts-lib と同じリテラル範囲型(`toFixed` の `UintRange<0, 101>`、`toString` の `UintRange<2, 37>` 等)で仮引数を型付けし、素の値を返す。ランタイムチェックは置かない — 型が契約で、`normalize`(form union)の全域化と同じ扱い。`99.1` のような浮動小数点入力はユースケースとして考慮しない(呼び出し側が `Math.trunc` 等で明示的に丸めてから渡す)。`repeat` の count は `SafeUint | SmallUint`(`Num.div` の分母と同じ「branded | 小リテラル union」パターンで、小さいリテラルは無キャストで書ける)。
+    2. **検証ファースト tagged union**: 引数域が型で表現できない失敗(`fromCodePoint` の 0–0x10FFFF、`Date` の有効性)は、ECMAScript 仕様が定める throw 条件をラッパー自身が呼び出し前に検査し、関数ごとの plain tagged union(例: `{ kind: 'invalid-code-point', codePoint, index }`)で返す。検査は仕様の強制変換・判定順序まで鏡写しにする。
+    3. **保守的 fallback**: 既知の(仕様が規定する)エラー条件のみに固有 kind を振り、それ以外の throw はすべて `Result.fromThrowable` backstop で受けて共通型 `UnexpectedError = { kind: 'unexpected', cause: Error }` に写す。`new RegExp` は仕様上 parse 失敗を SyntaxError と規定するが、それ以外の throw(リソース系等)を排除できないため、catch した SyntaxError だけを `'invalid-regexp'` に分類し、他は `'unexpected'` に落とす。
+- **理由**: 仕様が固定するのは throw の**条件**であって**メッセージ**ではないため、catch 後の分類はエンジン依存のメッセージ解析にしかならず移植不能。型で排除できる失敗は排除するのが最も強く(コンパイル時)、できないものだけ事前検証で分類する。exceptions.md のクラスレス・エラー方針(Err payload は plain tagged union がデフォルト)とも一致する。
+- **残課題(言語側)**: 型 refine は `as` による嘘に対して無防備。`as` キャストの正しさをランタイム検証する言語機能、または ts-fortress のような validator ライブラリの使用強制(`as` が紛れ込みうるコード文脈を言語として限定する)を v3 の検討事項として TODO に記録。
+- **却下した代替案**: catch した Error の message / name による事前分類なしの推定(エンジン依存)。refine 済み引数へのランタイム二重チェック(全域化して素の値を返した経緯と不整合)。

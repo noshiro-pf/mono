@@ -20,7 +20,9 @@ describe('Regex.create', () => {
     assert.deepStrictEqual(result.value.kind, 'invalid-regexp');
 
     // Pattern validity is the engine's own grammar check, so it is not
-    // pre-validated; the engine's SyntaxError travels as the cause.
+    // pre-validated. Classification is conservative: only a caught
+    // SyntaxError (the spec-mandated type for parse failures) is labeled
+    // 'invalid-regexp'; any other throw would fall back to 'unexpected'.
     assert.deepStrictEqual(result.value.cause.name, 'SyntaxError');
   });
 

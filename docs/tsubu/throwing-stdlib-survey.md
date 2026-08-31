@@ -47,7 +47,7 @@ ECMAScript 組み込み全体で「throw する可能性がある」関数は膨
 
 ## エラー payload の設計(D-26)
 
-ラッパーの失敗は **検証ファーストの plain tagged union** で返す([decisions.md](./decisions.md) D-26)。仕様が固定するのは throw の条件でありメッセージではないため、catch 後の Error 分類はエンジン依存になる — 仕様条件をラッパー自身が事前検査し(強制変換・判定順序まで鏡写し)、関数ごとの kind で返す。実装依存の残余(`repeat` の最大文字列長超過など)は `fromThrowable` backstop で `{ kind: 'unexpected', cause }` に写し、唯一の失敗が引数型で排除される API(`normalize` の form union)は Result を返さず全域関数にする。生 API との同値スイープテストで throw ↔ Err の一致を固定している。
+ラッパーの失敗は三段構え([decisions.md](./decisions.md) D-26): ① throw 条件が有限の引数範囲なら **strict-ts-lib と同じリテラル範囲型で仮引数を refine** して全域化し素の値を返す(`toFixed` の `UintRange<0, 101>` 等。ランタイムチェックなし — 型が契約)。② 型で表現できない失敗(`fromCodePoint` の上限、`Date` の有効性)は**検証ファーストの plain tagged union**(仕様の強制変換・順序まで鏡写し)。③ 既知の仕様規定エラーのみに kind を振り、それ以外はすべて `fromThrowable` backstop で `{ kind: 'unexpected', cause }` に写す**保守的分類**(`new RegExp` は catch した SyntaxError だけを `'invalid-regexp'` にする)。生 API との同値テストで throw ↔ Err の一致を固定している。
 
 ## 実装優先順位(提案)
 
