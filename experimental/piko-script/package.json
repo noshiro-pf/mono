@@ -7,7 +7,7 @@
     "Programming Languages"
   ],
   "repository": {},
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "vsce package",
     "preinstall-extension": "yarn build",

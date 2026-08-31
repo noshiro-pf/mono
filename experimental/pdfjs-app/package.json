@@ -2,7 +2,7 @@
   "name": "@noshiro/pdfjs-app",
   "version": "0.1.0",
   "private": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "run-s build:bundle build:copy-public",
     "build:bundle": "wireit",

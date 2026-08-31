@@ -2,7 +2,7 @@
   "name": "better-react-use-state",
   "version": "1.0.3",
   "private": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",

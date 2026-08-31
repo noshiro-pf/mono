@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "private": false,
   "description": "Reactive Programming Library for TypeScript/JavaScript",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
