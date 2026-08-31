@@ -346,6 +346,16 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | `lambda-calculus-interpreter-react` |  196 | **なし**                     |
 | `blueprintjs-playground`            |   92 | **なし**                     |
 
+| app                                 | 行数 | 追加で要る utils |
+| :---------------------------------- | ---: | :--------------- |
+| `annotation-tool`                   | 2006 | **なし**         |
+| `blueprintjs-playground-styled`     | 1701 | **なし**         |
+| `housing-loan-calculator-app`       | 1143 | **なし**         |
+| ~~`cant-stop-probability-app`~~     |  653 | 復元済み（下節） |
+| `catan-dice-app`                    |  471 | **なし**         |
+| `lambda-calculus-interpreter-react` |  196 | **なし**         |
+| `blueprintjs-playground`            |   92 | **なし**         |
+
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
 step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
@@ -556,3 +566,77 @@ docs の方針（「テンプレートが既にあるなら、無いファイル
 「移植元のファイルの合計」であって「未復元の量」ではない。特に step 3 で
 utils 系を 8 つ復元しているので、それらを使う app は既に一部が入っている。
 着手前に突き合わせるほうがよい。
+
+## `cant-stop-probability-app` の復元（2026-09-01）
+
+React 側 7 app のうち 2 つ目。**追加の npm 依存が要らない**ことを理由に選んだ
+（下節）。
+
+### 「追加で要る utils なし」は npm 依存については何も言っていない
+
+上の表は**ワークスペース内の utils** を数えたもので、外部依存は別である。実際に
+7 app の import を調べると、そのままでは入らないものが混ざっている。
+
+| app                             | リポジトリに無い npm 依存                      |
+| :------------------------------ | :--------------------------------------------- |
+| `blueprintjs-playground`        | なし                                           |
+| `cant-stop-probability-app`     | **なし** ← 今回                                |
+| `blueprintjs-playground-styled` | なし（`ts-utils-additional` の後継確認は要る） |
+| `housing-loan-calculator-app`   | なし                                           |
+| `catan-dice-app`                | `@mui/material`                                |
+| `color-demo-app`                | `@mui/material`                                |
+| `annotation-tool`               | `pixi.js-legacy` / `uuid`                      |
+
+`@mui/material` と `pixi.js-legacy` はどちらも小さくない依存で、**入れるかどうかは
+復元とは別の判断**になる。先に「何も足さずに入るもの」から片付けるほうがよい。
+
+### API の対応
+
+| 移植元                                | 復元後                                         |
+| :------------------------------------ | :--------------------------------------------- |
+| `@noshiro/io-ts` の `t.uintRange`     | `ts-fortress` の `uintRange`（引数形は同じ）   |
+| `t.TypeOf`                            | `ts-fortress` の `TypeOf`                      |
+| `toSafeUint` / `toPositiveSafeInt`    | `asSafeUint` / `asPositiveSafeInt`             |
+| `ISet.new`                            | `ISet.create`                                  |
+| `ArrayOfLength<N, T>`                 | `FixedLengthTuple` / `MutableFixedLengthTuple` |
+| `Tpl.sorted`                          | 後継なし（不要だった。下節）                   |
+| `createState`（オブジェクト分割代入） | タプル + `useObservableValue`                  |
+| `pipe().chain()`                      | `pipe().map()`                                 |
+
+**ts-type-forge のグローバル型はこれらの app では効かない。** `event-schedule-app`
+が `import { type ReadonlyRecord } from 'ts-type-forge'` と明示 import している
+とおりで、`DeepReadonly` / `FixedLengthTuple` / `Mutable` / `UintRange` /
+`SafeUint` もすべて名前で import する必要がある。
+
+### 直した 2 箇所は、直さないと lint が通らなかった
+
+どちらも `unicorn/no-break-in-nested-loop`（入れ子ループの中で `continue` を
+使うな）に引っかかる。
+
+1. **`selected3List`** — 3 重ループで `y <= x` / `z <= y` を `continue` で飛ばし、
+   最後に `Tpl.sorted` していた。`values.slice(i + 1)` で「前より後ろから選ぶ」と
+   書けば**昇順は構成上保証される**ので、`Tpl.sorted` は元から何もしていない。
+   後継が無いことが問題にならなかった理由でもある
+2. **`countSuccess`** — 4 重ループの最内側で `continue` を 3 通りの分岐に使って
+   いた。最内側の本体を `progressFor`（`'noLine' | 'oneLine' | 'twoLine'` を返す）
+   に切り出し、ループは `mut_count[progressFor(...)] += 1` だけにした
+
+**等価性は型検査ではなく実測で確かめた。** 移植元の実装と復元後の実装を素の
+JavaScript に写して突き合わせ、`selected3List` は 165 組が順序まで一致、
+`countSuccess` は 165 組すべてで 1296 通りの出目の内訳が一致することを確認した。
+step 3 で「型検査に通ったことは移植が等価であることの証明にならない」と書いた
+とおりなので、**この 2 つにはテストも足した**（`toHaveLength(165)` / 昇順 /
+重複なし / 3 カウンタの和が 6^4 / 既知の 1 組）。
+
+### `variant={'minimal'}`
+
+Blueprint 6 で `minimal` が `@deprecated` になっており、`event-schedule-app` は
+既に `variant={'minimal'}` に移っている。同じ形にした。
+
+### `paths` にはあるが `dependencies` には無いもの
+
+`react-blueprintjs-utils` をソース解決すると、そこが import している
+`ts-fortress-types` / `better-react-use-state` / `react-utils-styled` /
+`resize-observer-react-hooks` も解決できる必要がある。ただし**このパッケージ自身は
+どれも import していない**ので、`paths` にだけ書いて `dependencies` には入れない。
+knip がこれを正しく指摘する。

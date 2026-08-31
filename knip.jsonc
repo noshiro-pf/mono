@@ -273,6 +273,11 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    "apps/cant-stop-probability-app": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     "apps/blueprintjs-playground-styled": {
       "entry": ["src/main.tsx"],
       "project": ["**/*.{mts,tsx}"],
