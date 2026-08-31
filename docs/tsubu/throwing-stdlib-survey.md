@@ -45,6 +45,10 @@ ECMAScript 組み込み全体で「throw する可能性がある」関数は膨
 - **全網羅でも family 込みで 100 前後**(Temporal 除く)。多いが有限で、family はバイナリ境界(TypedArray 系)・国際化境界(Intl)に局在するため、**境界モジュール単位で一括ラップ**できる。
 - 型システム・immutability・既存禁止による除外フィルタが効いており、「stdlib 全部」を恐れる規模ではない。
 
+## エラー payload の設計(D-26)
+
+ラッパーの失敗は **検証ファーストの plain tagged union** で返す([decisions.md](./decisions.md) D-26)。仕様が固定するのは throw の条件でありメッセージではないため、catch 後の Error 分類はエンジン依存になる — 仕様条件をラッパー自身が事前検査し(強制変換・判定順序まで鏡写し)、関数ごとの kind で返す。実装依存の残余(`repeat` の最大文字列長超過など)は `fromThrowable` backstop で `{ kind: 'unexpected', cause }` に写し、唯一の失敗が引数型で排除される API(`normalize` の form union)は Result を返さず全域関数にする。生 API との同値スイープテストで throw ↔ Err の一致を固定している。
+
 ## 実装優先順位(提案)
 
 1. **Tier 1(頻出・小粒)**: `RegExp` 生成、`Date.toISOString`、`Number.toFixed` / `toExponential` / `toPrecision` / `toString(radix)`、`String.fromCodePoint` / `normalize` / `repeat`、`Array.with`(Json は済)。

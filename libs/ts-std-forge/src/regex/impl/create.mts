@@ -3,10 +3,13 @@ import { Result } from 'ts-data-forge';
 /**
  * Creates a `RegExp` from a dynamic pattern without throwing.
  *
- * `new RegExp` throws a `SyntaxError` when the pattern or flags are invalid,
- * which is reachable whenever the pattern comes from a variable. This wrapper
- * returns the failure as a `Result` instead. For patterns known at compile
- * time, prefer a regex literal (`/…/u`), which is checked statically.
+ * `new RegExp` throws a `SyntaxError` when the pattern or flags are invalid.
+ * Pattern validity is the engine's own grammar check, so — unlike the range
+ * conditions of the number and string wrappers — it cannot reasonably be
+ * validated in advance; the failure is caught instead and returned as a
+ * single tagged `Err` with the engine's `SyntaxError` attached as `cause`
+ * (its message is the only description of what is wrong with the pattern,
+ * but note that its wording is engine-specific).
  *
  * @example
  *
@@ -18,15 +21,28 @@ import { Result } from 'ts-data-forge';
  * const errResult = Regex.create('(');
  *
  * assert.isTrue(Result.isErr(errResult));
+ *
+ * assert.deepStrictEqual(errResult.value.kind, 'invalid-regexp');
  * ```
  *
  * @param pattern The regular expression pattern.
- * @param flags Optional flags string (e.g. `'u'`, `'gi'`).
- * @returns `Ok<RegExp>` if the pattern compiles, `Err<Error>` otherwise.
+ * @param flags Optional flags string.
+ * @returns `Ok<RegExp>` with the compiled expression, or a tagged
+ *   `Err<{ kind: 'invalid-regexp'; cause: Error }>` when the pattern or
+ *   flags are invalid.
  */
 export const create = (
   pattern: string,
   flags?: string,
-): Result<RegExp, Error> =>
-  // eslint-disable-next-line security/detect-non-literal-regexp
-  Result.fromThrowable(() => new RegExp(pattern, flags));
+): Result<RegExp, CreateError> =>
+  Result.mapErr(
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    Result.fromThrowable(() => new RegExp(pattern, flags)),
+    (cause) => ({ kind: 'invalid-regexp', cause }),
+  );
+
+/** The failure type of {@link create}. */
+export type CreateError = Readonly<{
+  kind: 'invalid-regexp';
+  cause: Readonly<Error>;
+}>;
