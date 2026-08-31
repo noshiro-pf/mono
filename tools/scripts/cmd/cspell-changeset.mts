@@ -2,14 +2,13 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
-  hasKey,
   isNotUndefined,
-  isRecord,
   isString,
   Json,
   Result,
   unknownToString,
 } from 'ts-data-forge';
+import { array, record, string, validationErrorsToMessages } from 'ts-fortress';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -158,6 +157,18 @@ const CSPELL_CONFIG_FILENAMES = [
   'cspell.yml',
 ] as const;
 
+/**
+ * What `pnpm ls --recursive --depth -1 --json` returns, to the extent this
+ * script reads it. `record` allows excess properties, so the `version` and
+ * `private` fields it also carries need no mention.
+ */
+const PNPM_PROJECT_LIST = array(
+  record({
+    name: string(),
+    path: string(),
+  }),
+);
+
 /** Matches `'pkg': patch`, `"pkg": minor` or `pkg: major`. */
 const FRONT_MATTER_ENTRY =
   /^\s*['"]?(.+?)['"]?\s*:\s*(?:major|minor|patch)\s*$/u;
@@ -269,17 +280,13 @@ const ancestorsToRoot = (dir: string): readonly string[] => {
     return [projectRootPath];
   }
 
-  const segments = relative.split(path.sep);
-
-  return Arr.toPushed(
-    segments.map((_, index) =>
-      path.resolve(
-        projectRootPath,
-        ...segments.slice(0, segments.length - index),
-      ),
-    ),
+  // Descending — `[root, root/libs, root/libs/ts-data-forge]` — then reversed,
+  // because the nearest configuration is the one that wins.
+  return Arr.scan(
+    relative.split(path.sep),
+    (ancestor, segment) => path.resolve(ancestor, segment),
     projectRootPath,
-  );
+  ).toReversed();
 };
 
 /** Every workspace package, by name, mapped to its directory. */
@@ -305,26 +312,18 @@ const getWorkspacePackageDirs = async (): Promise<
     return Result.err(`\`pnpm ls\` returned no JSON: ${parsed.value}`);
   }
 
-  const projects = parsed.value;
+  const projects = PNPM_PROJECT_LIST.validate(parsed.value);
 
-  if (!Arr.isArray(projects)) {
-    return Result.err('`pnpm ls` returned something other than an array.');
+  if (Result.isErr(projects)) {
+    return Result.err(
+      Arr.toUnshifted(
+        '`pnpm ls` returned something other than a list of projects:',
+      )(validationErrorsToMessages(projects.value)).join('\n'),
+    );
   }
 
   return Result.ok(
-    new Map(
-      projects
-        .map((project) =>
-          isRecord(project) &&
-          hasKey(project, 'name') &&
-          isString(project.name) &&
-          hasKey(project, 'path') &&
-          isString(project.path)
-            ? ([project.name, project.path] as const)
-            : undefined,
-        )
-        .filter(isNotUndefined),
-    ),
+    new Map(projects.value.map(({ name, path: dir }) => [name, dir])),
   );
 };
 
