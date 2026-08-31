@@ -1,9 +1,6 @@
 ---
 'ts-std-forge': minor
 ---
-
-<!-- cspell:ignore NFKC NFKD -->
-
 Add `SafeNumber` and `SafeString` wrappers for the remaining Tier 1 throwing stdlib APIs:
 
 - `SafeNumber.toFixed(value, fractionDigits)` — `Number.prototype.toFixed` without the RangeError throw
