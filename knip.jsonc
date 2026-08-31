@@ -90,6 +90,13 @@
       "project": ["src/**/*.mts", "test/**/*.mts"],
     },
 
+    // The Tsubu v1 ESLint preset. Consumed by other packages'
+    // eslint.config.mts through the package entry point.
+    "languages/tsubu/eslint-config": {
+      "entry": ["src/entry-point.mts", "test/**/*.test.mts"],
+      "project": ["src/**/*.mts", "test/**/*.mts"],
+    },
+
     // The strict standard library's generator. Its entry points are the
     // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;
     // `output*/` holds generated declarations that nothing imports by path.

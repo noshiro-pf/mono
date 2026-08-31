@@ -9,8 +9,8 @@
 
 ## Phase 1(v1 実装の本体)
 
-- [ ] **preset パッケージ scaffold** — `languages/tsubu/eslint-config`、名称 tsubu-eslint-config(D-25)。まず enforcement-map の 🔧(オプション変更)+ ⏻(off → on)だけで構成した第一版(`提案` ステータスに依存しない範囲)。
 - [ ] **🆕 新規ルールの実装**(preset に eslint-plugin として同梱、各 1 ルール): 宣言への null 型禁止(型情報)/ 境界 `?? undefined` 強制(型情報・最難)/ オーバーロード条件付き `function` 宣言許可 / コンストラクタ静的呼び出し禁止 / デコレータ禁止 / `<T,>` 強制(フォーマッタ互換は検証済み)/ 型空間の global 型 shadow 検査 / `castMutable` 乱用レポート。
+- [ ] **preset 追補(`提案` 確定後)** — `import-x/no-unassigned-import` / `no-internal-modules` の allow リスト精査(modules 仕様の確定待ち)、`functional/no-try-statements`(try..catch 禁止提案の確定待ち)。
 - [ ] **readonly 強制の主課題** — `functional/prefer-immutable-types` / `type-declaration-immutability` の有効化実験(現行 config に TODO 付き下書き)。readonly-by-default 戦略(D-3)の成立条件。
 - [ ] **コーパス runner のエンジン接続** — 中立 ID → ESLint ルール名のマッピングを実装し、フィクスチャで preset を検証(同値性ゲートの稼働開始)。
 - [ ] **dogfood** — 第一対象 ts-std-forge(D-25)。違反件数と書き味を仕様へフィードバック。
