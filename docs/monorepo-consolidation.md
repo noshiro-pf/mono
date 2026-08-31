@@ -271,16 +271,23 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **この判断は #1613 で保留した箇所にも及ぶ。** `ts-data-forge` の `array-utils-search.mts` で、strict lib の形に書くと消費者側で赤が出るという理由からコメントアウトした `expectType` が 2 箇所ある。許容する方針になったので、strict lib の形に書き戻してよい
     - **繰り返し出ていた `Object.fromEntries` の `Partial` は解消した。** 半分は strict lib 側のバグで、キーの種類にかかわらず `string & {}` を足していたため `Record<string, V>` のキーまで union 扱いになっていた（[strict-typescript-lib#117](https://github.com/noshiro-pf/strict-typescript-lib/pull/117) で修正）。残り半分は entries 配列を経由する書き方そのものの限界なので、`Obj.map`（#1638）と `Obj.filter` / `Obj.filterMap`（#1642）を `ts-data-forge` に足して呼び出し側を移行した。標準 lib でも通るので opt-in を待たずに済ませられる。#117 は当時 mono が指していた `dist-v7.0-0.0.0` より後の変更だったが、その後のリリースで届いている
     - 残りは**依存のトポロジカル順に 1 パッケージずつ opt-in** する
-        - **opt-in 済み**: `octokit-safe-types`（型 0 件、#1614）
-        - **PR 提出済み・未マージ**: `ts-repo-utils`（#1618）。`ts-data-forge` は「どちらの lib でも同じに読める」形に揃えた #1613 があるが、opt-in 自体はまだ
+        - **opt-in 済みは 3 つ**（2026-08-31 時点で `tsconfig.json` に
+          `libReplacement: true` を持つもの）: `octokit-safe-types`（型 0 件、
+          #1614）・`ts-repo-utils`（#1618）・`ts-fortress`（#1657）。**#1618 と
+          #1657 は既に main に入っている**
             - `ts-repo-utils` の型 2 件は**実質 1 件になった**。`Object.fromEntries` の件は lib 側の不具合だったので、回避として書いていた明示的なループは #1618 で取り消してある
-        - **残りの件数（2026-08-25 実測）**: `ts-fortress` は型 1 件・lint 21 件で #1657 に入っている。`ts-data-forge` は**型 0 件・lint 23 件**。`ts-type-forge` は未計測（[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md) の決定 1 のとおり、そもそも strict lib を使わない方針）
+        - **明示的に opt-out しているのは `ts-type-forge` だけ**
+          （`libReplacement: false`）。[strict-typescript-lib-integration.md](./strict-typescript-lib-integration.md)
+          の決定 1 のとおり、そもそも strict lib を使わない方針
+        - **残りは 29 パッケージで、いずれも `libReplacement` を書いていない。**
+          次に着手するのは `ts-data-forge`（型 0 件・lint 23 件、`#1613` で
+          「どちらの lib でも同じに読める」形には揃えてある）。それ以外は未計測で、
+          `apps/*` 12 個は復元されたばかりなので当面は対象外でよい
     - **`ts-data-forge` の opt-in を止めていた 2 件は、2 件とも解消した。**
         - **1 件目（`class X extends Map/Set` が通らない）は 2026-08-21 に解消。** strict lib の `dist-v7.0-0.1.0` で通るようになり、`Object.fromEntries` が `Record<string, V>` を `Partial` にする件も同時に直った
         - **2 件目（`@eslint/plugin-kit`）は 2026-08-25 に解消。** `dist/cjs/types.cts` を `.d.cts` ではなくソースとして配っている点は上流のままだが（0.7.2 が最新）、`strict-ts-lib` 0.6.0 で `Extract` / `Pick` / `Exclude` / `Omit` の制約を upstream に戻したので、**その中の `Omit` がもう型エラーにならない**。ファイルがソースとして検査される事実は変わらず、中身だけが通るようになった
         - 実測すると `ts-data-forge` は `libReplacement: true` で**型エラー 0 件**である。残っているのは lint 23 件（`no-deprecated` 20 + `no-unnecessary-type-assertion` 3）だけで、`ts-fortress` の 21 件と同じ性質のもの
     - 次に着手するのは `ts-data-forge` の opt-in（`libReplacement: true` の 1 行 + lint 23 件）
-        - `ts-fortress` は #1657 に入っている。「ブランチを作っただけ」ではなくなった
 - [x] `libReplacement` のオンオフで `dist` が変わらないことを検査する — **スクリプトは要らなかった（2026-08-25）**
     - opt-in のたびに手で `diff -r` していたが、**その差分は原理的に出ない**。宣言を emit するのは各パッケージの `configs/tsconfig.build.json` で、これは `tools/configs/tsconfig/` の共有 config を直接 `extends` しており、**パッケージ自身の `tsconfig.json` を `extends` していない**。`libReplacement` を書くのはその `tsconfig.json` のほうなので、`build` は常に素の lib で走る
     - 実際 `libs/*/dist` を全走査しても `StrictLibInternals` は 1 件も出てこない
@@ -393,10 +400,17 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
               `backup-repository-settings` が落ちる — あれは
               `repo-settings:backup` で実際の設定を書き出してから clean かを
               見るので、apply 前の宣言は「実態と違う」と判定される
+                - **2026-08-31 時点でまだ入っていない。** ついでに数えると、
+                  `style-check` のマトリクスは 7 件あるのに required は 5 件で、
+                  **`docs:deps` と `strict-lib:fmt` の 2 件が漏れている**。
+                  どちらも「コマンドを回した後にツリーが clean か」を見る形なので、
+                  required でなければ生成物の drift がそのまま main に入る
         - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
         - **`firebase` が build script を持つ依存（`@firebase/util`・`protobufjs`）を連れてくる。** `allowBuilds` は意図的な許可リストなので、**明示的に `false`** で足した。CI では型チェックと transpile しかしないため実行に要らない。デプロイ時の判断は別途になる
         - **未解決の型は `expectType` を黙って通す。** `lambda-calculus-interpreter-core`（#1621）で `Variable = LowerAlphabet` の `LowerAlphabet` が解決できず error type になり、何にでも代入可能になっていた。`expectType` の判定 6 件が「通って」おり、型 import を入れた時点で 6 件とも偽陰性として顕在化した。**移行作業中は、型エラーを消すまで型テストの結果を信用できない**
         - **`better-react-use-state`（#1627）だけは `libs/` に移した。** 「いずれも `apps/` に private」の唯一の例外である。`event-schedule-app` が連れてくる 6 utils のうち 4 つがこれに依存し、復元の残り全部がこの上に乗る。それだけ土台になるものを private のままにしておく理由が無いので、Apache-2.0 で公開する側に置いた。**初回 publish は手作業**である（[libs/first-release.md](../libs/first-release.md)）
+            - **2026-08-31 時点で npm に `1.0.3` が出ている。** 初回 publish は
+              済んでおり、以降は changesets が動く
 
     - **`event-schedule-app` 本体（21136 行・314 ファイル）は #1714。** 型エラーは 3567 件から、lint は 127 件から、いずれも 0 になった
         - **2026-08-30 に #1634 の上へ載せ直し、#1714 として出した。**
@@ -462,7 +476,58 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
           `identical` として載る
         - **生成器（`scripts/gen-restore-diff.mjs`）も同じディレクトリに置いた。**
           `experimental/` は Prettier・cspell・ESLint・markdownlint のいずれからも
-          除外されているので、3.2MB の生成物を置いてもチェックには掛からない
+          除外されているので、3.2MB の生成物を置いてもチェックには掛からない。
+          **ただし `_index.md` と `README.md` だけは生成器が自分で Prettier に
+          かける** — 除外されているぶんリポジトリ全体の整形パスが届かず、素の
+          出力を書くと再生成のたびに表の桁揃えだけの差分が出るためである
+          （`.diff` 本体はパッチなので整形してはいけない）
+    - **その差分を読み直して、動作が変わっている箇所を 3 つ見つけた。**
+      いずれも `fmt` / `lint` / `type-check` / `test` が全部通る状態で残っていた
+      もので、**型検査で捕まらない書き換え**である
+        - **`poll-discord-app` が partial message の fetch を落としていた。**
+          `messageUpdate` の `newMessage.partial ? await newMessage.fetch() :
+newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型は
+          `newMessage` を完全な `Message` と書いているので**型としては正しい**が、
+          このクライアントは `partials: [Partials.Message, …]` で作られており、
+          `MessageUpdateAction` はキャッシュに無いメッセージを partial のまま
+          渡す。partial の `content` は `null` なので `updatePollTitle` の
+          `message.content.startsWith(…)` が投げ、その例外は
+          `.catch(() => {})` に飲まれる — **再起動より前に投稿されたコマンドを
+          編集してもタイトルが黙って更新されなくなる**。すぐ上の reaction 側は
+          `reaction.partial ? await reaction.fetch() : reaction` のままだった
+            - 型のほうを信じると直せない。`Message['partial']` は `false`、
+              `PartialMessage['partial']` は `true` なので、discord.js の型で
+              書いた型ガードは引数を `never` に絞ってしまう。`unknown` を取って
+              素の `boolean` を返す述語にすると、両方の枝が `Message` のままになる
+        - **`answer-filter-query-param` の 10 箇所が例外を投げる形だった。**
+          `Num.mapNaN2Undefined(asSafeUint(…))` は、`asSafeUint` が `NaN` に
+          `TypeError` を投げるので `mapNaN2Undefined` に到達しない。
+          **これは復元前からの潜在バグ**（旧 `toSafeUint` も同じく投げた）だが、
+          `Number.parseInt` → `Num.safeParseInt` で末尾ゴミを弾くようになったぶん
+          **投げる入力が広がっている** — `?good=5x-9` は前は通っていた。
+          先に `isSafeUint` で判定してから返す形に直した
+        - **`ButtonWithConfirm` の `p instanceof Promise` が `p !== undefined` に
+          なっていた。** `onConfirmClick` は `(() => Promise<void>) | (() => void)`
+          で、TypeScript の `void` 戻り値は実行時に任意の値を許すので、
+          `() => arr.push(x)` のようなハンドラを渡すと非 thenable に `.then` を
+          呼んで落ちる。現在の呼び出し 8 箇所はどれも該当しないので潜在的。
+          `instanceof` に戻すと `unicorn/no-instanceof-builtins` に当たる
+          （**これが書き換えの理由だったはず**）ので、thenable 判定にした
+        - **意図的な変更として記録されていたもの**は直していない。
+          `react-utils` の `usePrevious`（前の**レンダー**の値 → 前の**異なる**値、
+          利用箇所は 0）、`numeric-input-utils` の `useNumericInputState`
+          （`encode` / `decode` / `onValueChange` が初回レンダーの ref 固定から
+          最新へ）、`poll-discord-app/index.mts` の `.catch(() => undefined)` 撤去、
+          Blueprint の `minimal` + `outlined` → `variant={'outlined'}`、
+          数値パースの厳格化。いずれもファイル内のコメントか本書に理由が書いてある
+        - **ほぼ全部は等価だった。** `chain` → `map` / `chainOptional` →
+          `mapOptional`（`a == null` の扱いまで同じ）・`Obj.set` → スプレッド・
+          `isNotUndefined` → `!== undefined`・`Num.roundBy(digit, v)` →
+          `Num.roundAt(v, digit)`・`Arr.sortedBy` → `Arr.toSortedBy`・
+          `syncflow` の `throttleTime` → `synstate` の `throttle`（どちらも
+          leading edge）・`Maybe.unwrap` → `Optional.unwrap`（どちらも
+          `undefined` を返す）・`Popover minimal` → `PopoverNext arrow={false}`・
+          `position` → `placement` はすべて実装を突き合わせて確認した
 
 ### その他の宿題
 
@@ -470,14 +535,22 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
   あり、**うち 1 つ（拡張子）は #1716 で直した**。残る 2 つは未修正である。
   CLAUDE.md が「`pnpm run gi` で自動生成せよ」と書いているので、**指示に従った
   人が壊す**
+    - **2026-08-31 に両方とも再現することを確認した。** `apps/react-utils` と
+      `apps/react-utils-styled` は `gi` を回してもツリーが clean のままで、
+      #1716 の修正が効いている。残る 2 つは下記のとおり今も壊れる
     - **`apps/poll-discord-app/src/index.mts` は実行可能なエントリポイント**で、
       `#!/usr/bin/env node` と `main()` の呼び出しが書いてある。`gi` はこれを
       barrel で上書きしてプログラムを消す。`gi:src` の `--exclude index.mts` は
       「index.mts を export 対象から外す」であって「index.mts を書かない」では
       ないため効かない
+        - **ついでに `src/assets/index.mts` を新規に作る。** 中身は
+          `export {};` だけ — このディレクトリにあるのは `.png` と `.jpg` で、
+          `--target-ext .mts` に一致するファイルが 1 つも無いためである。
+          生成器は「対象 0 件のディレクトリには index を作らない」を知らない
     - **`apps/event-schedule-app-shared/src/v*/index.mts` は手で選んだ export
-      一覧**で、意図的にコメントアウトされた行まである。`gi` は 8 ファイル・
-      632 行を `export * from …` に潰す
+      一覧**である。`gi` は 8 ファイル・631 行を `export * from …` の
+      16 行に潰す（`v2`〜`v8` が 631 行、`v1` と `v9` は元から barrel）。
+      **潰れた側でも型は通る**ので、気付けるのは差分を見たときだけである
     - **`apps/react-utils` と `apps/react-utils-styled` では解決できない指定子を
       書いていた（#1716 で修正済み）。** `gen-index-ts` は `--export-ext` の値を全ファイルに一律で使うが、
       正しい指定子はソースの拡張子で決まる — `.mts` は `.mjs`、`.tsx` は
@@ -529,7 +602,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - `libs/ts-codemod-lib/test-code/**` は `fs.glob('test-code/**')` で実行時に読むフィクスチャなので ignore に理由付きで追加した
     - **`files` と `exports` をゲートに入れないのは、まだ使われていない export が「実装途中」の姿だから。** これで CI が落ちると、チェックが「回避するもの」になってしまう
     - **加えて knip には見えない参照がある。** `libs/synstate/scripts/cmd/run-benchmark-deep-chain.mts` は throughput デモの adapter を `await import(<計算されたパス>)` で読み、結果を `any` として使う。そのため `createRxJSThroughputAdapter` は unused と報告されるが、実際はそのベンチマークの RxJS 行そのものだった。一度これを信じて削除しかけている
-        - ただしこのスクリプトは**現在動かない**。統合で docs が `apps/synstate-docs` へ移ったのにパスが旧レイアウトの `packages/docs` 前提のままで、`ERR_MODULE_NOT_FOUND` になる（別途修正が要る）
+        - ~~ただしこのスクリプトは**現在動かない**。統合で docs が `apps/synstate-docs` へ移ったのにパスが旧レイアウトの `packages/docs` 前提のままで、`ERR_MODULE_NOT_FOUND` になる~~ → 対応済み。パスは `../../apps/synstate-docs/src/components/throughput-demo/adapters/index.mjs` を指しており、`createRxJSThroughputAdapter` もそこにある
 - `dist/` が無い状態の `pnpm install` は、自作 CLI の bin symlink を作れず警告を出す（ビルド後の再インストールで解消。実害はない）
 - ~~typedoc 出力を mono の GitHub Pages にサブパスで集約する~~ → 実装した。旧 6 リポジトリの Pages は配信継続・ビルド停止で、統合以降のドキュメントの変更がどこにも出ていない状態だった
     - `noshiro-pf.github.io/mono/` 配下に、typedoc 5 パッケージ（ts-codemod-lib / ts-data-forge / ts-fortress / ts-repo-utils / ts-type-forge）と Astro の docs サイト（synstate）を並べる。生きている旧 Pages 6 件とちょうど同じ顔ぶれ

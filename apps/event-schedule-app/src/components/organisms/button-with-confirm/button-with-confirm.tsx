@@ -2,6 +2,7 @@ import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
 import { memoNamed, useAlive } from 'react-utils';
+import { hasKey, isRecord } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import { createToaster, showToast } from '../../../functions/index.mjs';
 import { ConfirmDialog } from './confirm-dialog.js';
@@ -65,18 +66,27 @@ export const ButtonWithConfirm = memoNamed<Props>(
         handleClose();
       };
 
-      const p = onConfirmClick();
+      // `unknown`, not the declared `Promise<void> | void`: a `() => void`
+      // may return anything at runtime — TypeScript's `void` accepts any
+      // value — so `p !== undefined` would send a non-thenable down the
+      // `.then` branch. The pre-restoration code asked `p instanceof
+      // Promise`; asking whether it is thenable says the same thing without
+      // `unicorn/no-instanceof-builtins`, and also covers a promise from
+      // another realm.
+      const p: unknown = onConfirmClick();
 
-      if (p !== undefined) {
+      if (isPromiseLike(p)) {
         setTrueLoadingLocal();
 
-        p.then(() => {
-          if (!alive.current) return;
+        Promise.resolve(p)
+          .then(() => {
+            if (!alive.current) return;
 
-          afterConfirm();
+            afterConfirm();
 
-          setFalseLoadingLocal();
-        }).catch(console.error);
+            setFalseLoadingLocal();
+          })
+          .catch(console.error);
       } else {
         afterConfirm();
       }
@@ -118,3 +128,6 @@ export const ButtonWithConfirm = memoNamed<Props>(
     );
   },
 );
+
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
+  isRecord(value) && hasKey(value, 'then') && typeof value.then === 'function';
