@@ -25,7 +25,6 @@
 
 - [ ] ts-std-forge: Tier 2(BigInt、`Iterator.take/drop`、`structuredClone`、toLocaleString 系)、Tier 3(TypedArray/DataView/Atomics、Intl)、Temporal family(D-23)。(Tier 1 は [#1725](https://github.com/noshiro-pf/mono/pull/1725) で完了)
 - [ ] ts-std-forge: null / 番兵値 API の Optional ラッパー(棚卸しは [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) の「次の調査枠」)。
-- [ ] ts-std-forge の初回手動 publish(公開前が名称変更の最終機会。未公開のまま published pins が動くと verify ジョブが止まる点に注意)。
 
 ## 仕様の未着手領域(フェーズ非依存)
 
