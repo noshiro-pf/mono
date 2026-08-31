@@ -1,5 +1,13 @@
 # ts-data-forge
 
+## 14.6.1
+
+### Patch Changes
+
+- 7fa2b22: `IMapMapped` and `ISetMapped` now build their "key not found" warning with `unknownToString`, as `IMap` and `ISet` already did.
+
+    The mapped variants were the only four of the eight call sites still using `String(...)`, which cannot accept the `null` and `undefined` that `MapSetKeyType` admits. The message is a `console.warn` diagnostic emitted only when the collection was created with the not-found warning enabled; the one visible difference is that a `bigint` key now prints as `1n` rather than `1`.
+
 ## 14.6.0
 
 ### Minor Changes
