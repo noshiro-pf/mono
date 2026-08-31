@@ -243,6 +243,13 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
+    // entry is the module `index.html` would load.
+    "apps/lambda-calculus-interpreter-preact": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/react-blueprintjs-utils": {
       "entry": ["src/index.mts"],
