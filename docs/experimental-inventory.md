@@ -105,14 +105,14 @@ app に連れられて来るもの。単体で復元する理由は薄い。
 
 ### others / slides（6 個）
 
-| もの                           | 行数 | 中身                                |
-| :----------------------------- | ---: | :---------------------------------- |
-| `others/slack-archive-tools`   |  952 | Slack エクスポートの整形            |
-| `others/mahjong-scoring-tool`  |  276 | 点数計算                            |
-| `others/ts_playground`         |  104 | 型の実験場                          |
-| `others/implement-react-hooks` |   56 | hooks の自作実装（学習用）          |
-| `slides/dezero_06_to_16`       |    — | reveal.js のスライド（HTML 直書き） |
-| `slides/chain_rule`            |    — | 同上                                |
+| もの                              | 行数 | 中身                                       |
+| :-------------------------------- | ---: | :----------------------------------------- |
+| ~~`others/slack-archive-tools`~~  |  952 | Slack エクスポートの整形（復元済み・下節） |
+| ~~`others/mahjong-scoring-tool`~~ |  276 | 点数計算（復元済み・下節）                 |
+| `others/ts_playground`            |  104 | 型の実験場                                 |
+| `others/implement-react-hooks`    |   56 | hooks の自作実装（学習用）                 |
+| `slides/dezero_06_to_16`          |    — | reveal.js のスライド（HTML 直書き）        |
+| `slides/chain_rule`               |    — | 同上                                       |
 
 ## 中身が無い（復元する対象が存在しない）
 
@@ -771,14 +771,14 @@ bundler の関心事で、このリポジトリでは何もビルドしない。
 `apps` 側で「追加の npm 依存が要らないもの」を出し切ったので、`others` を
 1 つずつ見た。**6 つのうち復元する価値があるのは 2 つ**である。
 
-| もの                           | 判断                                                              |
-| :----------------------------- | :---------------------------------------------------------------- |
-| `others/mahjong-scoring-tool`  | **復元した**（下節）                                              |
-| `others/slack-archive-tools`   | 復元できる。`io-ts` → `ts-fortress`、`ts-utils` → `ts-data-forge` |
-| `others/implement-react-hooks` | **復元しない**。未完成の学習用スクラッチ                          |
-| `others/ts_playground`         | **復元しない**。TypeScript ハンドブックの写経                     |
-| `slides/dezero_06_to_16`       | HTML 直書きの reveal.js スライド。パッケージではない              |
-| `slides/chain_rule`            | 同上                                                              |
+| もの                           | 判断                                                 |
+| :----------------------------- | :--------------------------------------------------- |
+| `others/mahjong-scoring-tool`  | **復元した**（下節）                                 |
+| `others/slack-archive-tools`   | **復元した**（下節）                                 |
+| `others/implement-react-hooks` | **復元しない**。未完成の学習用スクラッチ             |
+| `others/ts_playground`         | **復元しない**。TypeScript ハンドブックの写経        |
+| `slides/dezero_06_to_16`       | HTML 直書きの reveal.js スライド。パッケージではない |
+| `slides/chain_rule`            | 同上                                                 |
 
 `implement-react-hooks` は `useState` が `initialState` をそのまま返し、
 `useEffect` が引数を `console.log` するだけの**書きかけ**で、トップレベルに
@@ -829,3 +829,54 @@ const map4 = <T, U>(
 **テスト 6 件が通ることで等価性を確認している。** そのうちの 1 つが
 `getShuffled` で順序を入れ替えて同じ結果になることを見ているので、
 `map4` の書き換えはそこで実際に効いている。
+
+## `slack-archive-tools` の復元（2026-09-01）
+
+`others/` の 2 つ目。952 行 10 ファイル。**これで `others/` は片付いた**
+（残り 4 つのうち 2 つは復元しない判断、2 つは reveal.js のスライド）。
+
+### `zx` の暗黙グローバルが 42 箇所
+
+`import 'zx/globals'` が `path` と `fs` をグローバルに生やしていた。型エラー
+68 件のうち 42 件がこれで、`node:path` と `node:fs/promises` の明示 import に
+置き換えた。**`node:fs` ではなく `node:fs/promises`** である — zx の `fs` は
+`fs-extra` で、`readFile` などが Promise を返す。
+
+| 移植元                               | 復元後                               |
+| :----------------------------------- | :----------------------------------- |
+| `@noshiro/io-ts`（`t.*` 12 種）      | `ts-fortress`（全部そろっている）    |
+| `@noshiro/ts-utils`                  | `ts-data-forge`                      |
+| `execAsync`（`@noshiro/mono-utils`） | `$`（`ts-repo-utils`）               |
+| `zx/globals` の `path` / `fs`        | `node:path` / `node:fs/promises`     |
+| `ISet.new` / `toUint32` / `.chain(`  | `ISet.create` / `asUint32` / `.map(` |
+
+io-ts の 12 種（`enumType` ・ `mergeRecords` ・ `nonEmptyArray` ・ `partial` ・
+`positiveSafeInt` ほか）は**すべて `ts-fortress` にある**。`export function` の
+オーバーロードなので `export const` で grep すると見つからない点に注意。
+
+### `Json.stringify` は `undefined` を返し得る
+
+`JSON.stringify` は `undefined` ・関数 ・ symbol に対して `undefined` を返す。
+`ts-data-forge` の `Json.stringify` はそれを型に書いているので、`Result` を
+剥がしたあとに `string | undefined` が残る。ここでは `Json.parse` の結果を
+書き戻すだけなので実際には起きないが、書かないと通らない。ガードを 1 つ足した。
+
+### 規則同士が打ち消し合う 3 例目
+
+`unicorn/no-break-in-nested-loop`（入れ子ループで `continue` を使うな）と
+`unicorn/prefer-continue`（ループ本体を丸ごと `if` で包むな）が正面から
+ぶつかる。#1756 の `-1 * n`、#1762 の `includes` / `some` に続く 3 例目。
+
+**前者の警告文が答えを書いている** — 「入れ子のループを関数に切り出せ」。
+`collectSubKeys` ・ `collectSubArrayKeys` ・ `collectRecordKeys` に切り出すと、
+`continue` はそれぞれの関数で最外周のループに属することになり、どちらの規則
+にも触れない。ネストが 1 段深いほうは 2 段階に分ける必要があった。
+
+### barrel は作らない
+
+10 モジュールのうち **5 つは import した時点で `await main()` が走る**道具で
+ある。`pnpm run gi` が生成した `index.mts` はそれらを再エクスポートするので、
+barrel を読むだけでツールが動いてしまう。ライブラリとしての面が無いので、
+`gi` スクリプトごと外した。knip には 5 つの入口を個別に登録している。
+
+（`main` という名前が 2 モジュールで衝突して `TS2308` になったことで気付いた。）

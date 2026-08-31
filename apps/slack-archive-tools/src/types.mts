@@ -1,5 +1,5 @@
-import * as t from '@noshiro/io-ts';
-import { expectType } from '@noshiro/ts-utils';
+import { expectType } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 
 const Users = t.nonEmptyArray(t.string());
 

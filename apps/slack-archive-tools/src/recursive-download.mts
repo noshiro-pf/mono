@@ -1,20 +1,23 @@
-import { execAsync } from '@noshiro/mono-utils';
+import type * as fsType from 'node:fs';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   Arr,
   ISet,
   Json,
   Result,
+  asUint32,
   isRecord,
   isString,
-  toUint32,
-} from '@noshiro/ts-utils';
-import type * as fsType from 'node:fs';
-import 'zx/globals';
+} from 'ts-data-forge';
+import { $ } from 'ts-repo-utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import { extractExt } from './extract-ext.mjs';
 import { getAllJsonFiles } from './get-all-json-files.mjs';
 import { validateJsonObject } from './validator.mjs';
 
 const thisDir = import.meta.dirname;
+
 const rootDir = path.resolve(thisDir, '..');
 
 const srcDir = path.resolve(
@@ -23,8 +26,8 @@ const srcDir = path.resolve(
   'Slack_export_Sep_23_2020_-_Aug_24_2024',
 );
 
-const maxFileDownloadCount = toUint32(20_000);
-// const maxFileDownloadCount = toUint32(200);
+const maxFileDownloadCount = asUint32(20_000);
+// const maxFileDownloadCount = asUint32(200);
 
 const downloadParallelSize = 10;
 
@@ -33,8 +36,9 @@ const reExportMessageFiles: boolean = Math.random() < 0;
 export const main = async (): Promise<void> => {
   const jsonFiles: readonly fsType.Dirent[] = await getAllJsonFiles(srcDir);
 
-  const distDir = `${srcDir}_dist`;
-  const fileDistDir = `${srcDir}_dist_file`;
+  const distDir = `${srcDir}_dist` as const;
+
+  const fileDistDir = `${srcDir}_dist_file` as const;
 
   if (reExportMessageFiles) {
     await fs.rm(distDir, { recursive: true, force: true });
@@ -48,16 +52,26 @@ export const main = async (): Promise<void> => {
   }
 
   for (const file of jsonFiles) {
-    const distSubDir = file.parentPath.replace(srcDir, distDir);
-    const fileDistSubDir = file.parentPath.replace(srcDir, fileDistDir);
+    // Re-rooting the path under a different directory. `replace` did this by
+    // swapping the prefix, which `unicorn/no-unsafe-string-replacement`
+    // rejects — a non-literal replacement can carry `$&` and friends. Saying
+    // it with `path` is both safe and clearer about the intent.
+    const subPath = path.relative(srcDir, file.parentPath);
+
+    const distSubDir = path.join(distDir, subPath);
+
+    const fileDistSubDir = path.join(fileDistDir, subPath);
+
     const srcFile = path.resolve(file.parentPath, file.name);
 
+    // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
     const contentString = await fs.readFile(srcFile, 'utf8');
 
     const content = Json.parse(contentString);
 
     if (Result.isErr(content)) {
       console.error(content.value);
+
       return;
     }
 
@@ -80,13 +94,24 @@ export const main = async (): Promise<void> => {
 
       if (Result.isErr(contentStr)) {
         console.error(contentStr.value);
+
         return;
       }
 
+      // `JSON.stringify` returns `undefined` for `undefined`, a function or a
+      // symbol, and `ts-data-forge`'s `Json.stringify` says so in its type.
+      // `value` came out of `Json.parse`, so it is never one of those — but
+      // there is nothing to write if it somehow is.
+      if (contentStr.value === undefined) {
+        return;
+      }
+
+      // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
       await fs.mkdir(distSubDir, { recursive: true });
 
       const distFile = path.resolve(distSubDir, file.name);
 
+      // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
       await fs.writeFile(distFile, contentStr.value);
     }
   }
@@ -96,7 +121,7 @@ export const main = async (): Promise<void> => {
   {
     // create folders
 
-    const dirnames = ISet.new(
+    const dirnames = ISet.create(
       downloadListSliced.map(({ outputFilePath }) =>
         path.dirname(outputFilePath),
       ),
@@ -105,6 +130,7 @@ export const main = async (): Promise<void> => {
     console.log(`Started creating ${dirnames.size} folders...`);
 
     for (const chunk of Arr.chunk(Array.from(dirnames), 10)) {
+      // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
       await Promise.all(chunk.map((dir) => fs.mkdir(dir, { recursive: true })));
     }
   }
@@ -119,9 +145,10 @@ export const main = async (): Promise<void> => {
       // for (const { url } of chunk) {
       //   console.log(`downloading ${url}`);
       // }
+      // eslint-disable-next-line no-await-in-loop
       await Promise.all(
         chunk.map(({ url, outputFilePath }) =>
-          execAsync(`wget ${url} -O ${outputFilePath}`),
+          $(`wget ${url} -O ${outputFilePath}`),
         ),
       );
 
@@ -134,7 +161,7 @@ export const main = async (): Promise<void> => {
   console.log('Done.');
 
   console.log({
-    unknownExtensions: Array.from(mut_unknownExtensions.values()),
+    unknownExtensions: Array.from(mut_unknownExtensions),
   });
 };
 
@@ -143,7 +170,7 @@ const listDownloadFileRecursively = (
   dir: string,
   prop: string,
 ): DeepReadonly<{ url: string; outputFilePath: string }[]> => {
-  if (Array.isArray(data)) {
+  if (Arr.isArray(data)) {
     return data.flatMap((el, i) =>
       listDownloadFileRecursively(el, path.resolve(dir, prop), i.toString()),
     );
@@ -157,6 +184,7 @@ const listDownloadFileRecursively = (
 
   if (isString(data) && matchFileURL(data)) {
     const ext = extractExt(data);
+
     if (knownExtensions.has(ext)) {
       return [
         {
@@ -164,19 +192,19 @@ const listDownloadFileRecursively = (
           outputFilePath: path.resolve(dir, `${prop}${ext}`),
         },
       ];
-    } else {
-      mut_unknownExtensions.add(ext);
-      return [];
     }
+
+    mut_unknownExtensions.add(ext);
+
+    return [];
   }
 
   return [];
 };
 
-// eslint-disable-next-line no-restricted-globals, @typescript-eslint/no-restricted-types
 const mut_unknownExtensions: Set<string> = new Set<string>();
 
-const knownExtensions = ISet.new<`.${string}`>([
+const knownExtensions = ISet.create<`.${string}`>([
   '.jpg',
   '.png',
   '.gif',
