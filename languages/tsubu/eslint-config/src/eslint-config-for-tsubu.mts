@@ -22,10 +22,11 @@ export const eslintConfigForTsubu = (
     files?: readonly string[];
     usingStrictTsLib?: boolean;
   }>,
-): readonly FlatConfig[] => [
-  ...eslintConfigForTypeScript(options),
-  eslintPluginTsDataForge.configs.recommended,
-  options.files === undefined
-    ? { rules: tsubuRules }
-    : { files: options.files, rules: tsubuRules },
-];
+): readonly FlatConfig[] =>
+  [
+    ...eslintConfigForTypeScript(options),
+    eslintPluginTsDataForge.configs.recommended,
+    options.files === undefined
+      ? ({ rules: tsubuRules } as const)
+      : ({ files: options.files, rules: tsubuRules } as const),
+  ] as const;
