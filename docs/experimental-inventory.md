@@ -1026,3 +1026,56 @@ utils が 4 つとも揃ったので、`algo-app`（5033）・`mahjong-calculato
 （2428）・`my-portfolio-app-preact`（1244）が着手可能になる。ただし
 `my-portfolio-app-preact` は `preact-media-hook` という別の npm 依存も要る。
 `slack-app` は中身が無いので復元しない（#1770）。
+
+## `mahjong-calculator-app` の復元（2026-09-01）
+
+Preact 側 app の 2 つ目。38 ファイル・3196 行。**#1772 の上に積んである**
+（`preact-utils` と `goober` を使うため）。
+
+### import だけを見ると依存を読み違える
+
+#1750 ・ #1770 ・ #1772 で「manifest ではなく import を見よ」と書いたが、
+**この app ではそれだけでは足りなかった**。explicit import には Preact utils が
+1 つも現れないのに、`memoNamed` を暗黙グローバルとして使っている。
+
+`globals.d.ts` が並べていた `@noshiro/global-*` の参照ぶんを足して初めて
+本当の依存が出る。**import ＋ globals.d.ts の両方を見る**のが正しい。
+
+### `dict` は本物だった
+
+`constants/dictionary/` を、#1746 ・ #1754 ・ #1758 ・ #1760 と同じ
+「テンプレート残骸」だと判断していったん削除したが、**この app のものは
+中身がある**（39 行の日本語ラベル）。コミット前に気付いて戻した。
+`dict = {} as const` かどうかを app ごとに見る必要がある。
+
+### 対応表
+
+| 移植元                                   | 復元後                                                       |
+| :--------------------------------------- | :----------------------------------------------------------- |
+| `Maybe.isNone` / `isSome`                | `Optional.isNone` / `isSome`                                 |
+| `Arr.pushed(a, x)` / `Arr.removed(a, i)` | `[...a, x]` / `a.toSpliced(i, 1)`（後継なし）                |
+| `Arr.asMut`                              | `castMutable`                                                |
+| `Arr.head`                               | 戻りが `Optional` になったので `=== undefined` では絞れない  |
+| `Tpl.map`                                | 後継なし。長さが要る場所は先頭 3 つを書き下す                |
+| `ArrayOfLength` / `ArrayAtLeastLen`      | `FixedLengthTuple` / `MinLengthTuple`                        |
+| `createBooleanState`                     | 戻りは `[state, utils]` の 2 要素（`createState` は 3 要素） |
+| `Record` / `Exclude` / `Extract`         | `ReadonlyRecord` / `StrictExclude` / `StrictExtract`         |
+
+`Json.stringify` が `string | undefined` を返す件（#1769）もここで出た。
+
+### `memoNamed` の戻り型が狭すぎた
+
+#1770 で `memoNamed` の引数を素の関数型にしたとき、戻りを
+`preact.VNode | null` と書いた。**`VNode` は props について不変**なので、
+`createElement` が返す `VNode<具体的なprops>` を代入できない。この app の
+button-group 3 つで初めて露見した。
+
+`preact.ComponentChildren` に直し、**#1770 側を修正して**このブランチを
+その上に rebase してある。#1770 単体でも直っている。
+
+### `src/services/` は UI から呼ばれていない
+
+`calculate` ・ `downloadProblemAsImage` ・ `downloadHmrFormatText` を import
+しているコンポーネントが無い。**移植元でも同じ**なので、移植で落としたもの
+ではない。knip の entry に `src/services/index.mts` を並べて、dead code では
+なく入口として扱っている。

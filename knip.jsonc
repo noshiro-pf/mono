@@ -245,6 +245,17 @@
 
     // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` would load.
+    // `src/services/` is listed alongside the page entry because nothing in the
+    // UI imports it — that is true of the pre-restoration source too, not
+    // something lost in the move. The operations are the app's, so they are
+    // entry points rather than dead code.
+    "apps/mahjong-calculator-app": {
+      "entry": ["src/main.tsx", "src/services/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
+    // entry is the module `index.html` would load.
     "apps/lambda-calculus-interpreter-preact": {
       "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
