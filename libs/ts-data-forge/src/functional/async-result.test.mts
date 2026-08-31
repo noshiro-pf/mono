@@ -1,4 +1,5 @@
 import { AsyncResult as AsyncResultFromEntryPoint } from '../entry-point.mjs';
+import { expectType } from '../expect-type.mjs';
 import { AsyncResult } from './async-result/index.mjs';
 import { Result } from './result/index.mjs';
 
@@ -32,6 +33,26 @@ describe('AsyncResult test', () => {
       assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result, Result.err('boom'));
+    });
+
+    test('resolved promise becomes Ok when mapError is omitted', async () => {
+      const result = await AsyncResult.fromPromise(Promise.resolve(42));
+
+      assert.deepStrictEqual(result, Result.ok(42));
+
+      expectType<typeof result, Result<number, unknown>>('=');
+    });
+
+    test('rejection reason is carried as-is when mapError is omitted', async () => {
+      const error = new Error('boom');
+
+      const result = await AsyncResult.fromPromise(
+        Promise.reject(error).then(() => 42),
+      );
+
+      assert.isTrue(Result.isErr(result));
+
+      assert.deepStrictEqual(result, Result.err(error));
     });
   });
 
@@ -69,6 +90,28 @@ describe('AsyncResult test', () => {
       assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result, Result.err('async failure'));
+    });
+
+    test('synchronous throw is carried as-is when mapError is omitted', async () => {
+      const error = new Error('sync failure');
+
+      const result = await AsyncResult.fromThrowable((): Promise<number> => {
+        throw error;
+      });
+
+      assert.deepStrictEqual(result, Result.err(error));
+
+      expectType<typeof result, Result<number, unknown>>('=');
+    });
+
+    test('async rejection is carried as-is when mapError is omitted', async () => {
+      const error = new Error('async failure');
+
+      const result = await AsyncResult.fromThrowable(() =>
+        Promise.reject(error).then(() => 42),
+      );
+
+      assert.deepStrictEqual(result, Result.err(error));
     });
   });
 

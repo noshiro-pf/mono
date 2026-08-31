@@ -7,8 +7,9 @@ import { type AsyncResult } from '../async-result.mjs';
  * Promise rejects, the rejection reason is passed through `mapError` and the
  * `AsyncResult` resolves to `Err` with the mapped error.
  *
- * Requiring `mapError` is what gives the error channel a concrete type `E`
- * instead of the `unknown` that `Result.fromPromise` produces.
+ * Passing `mapError` is what gives the error channel a concrete type `E`.
+ * Omitting it carries the rejection reason through untouched, leaving the
+ * error channel as `unknown` — the same contract as `Result.fromPromise`.
  *
  * @example
  *
@@ -26,17 +27,40 @@ import { type AsyncResult } from '../async-result.mjs';
  * assert.deepStrictEqual(resolved, Result.ok('ok'));
  *
  * assert.deepStrictEqual(rejected, Result.err('boom'));
+ *
+ * // Without `mapError`, the rejection reason is carried as-is.
+ * const untyped = await AsyncResult.fromPromise(
+ *   Promise.reject(new Error('boom')),
+ * );
+ *
+ * assert.isTrue(Result.isErr(untyped));
  * ```
  *
  * @template S The type of the success value.
  * @template E The type of the error value.
  * @param promise The Promise to convert.
  * @param mapError The function applied to the rejection reason to produce the
- *   error value.
+ *   error value. Omit it to carry the rejection reason as `unknown`.
  * @returns An `AsyncResult<S, E>` that never rejects for the input Promise's
  *   failure.
  */
-export const fromPromise = <S, E>(
+export function fromPromise<S>(promise: Promise<S>): AsyncResult<S, unknown>;
+
+export function fromPromise<S, E>(
+  promise: Promise<S>,
+  mapError: (error: unknown) => E,
+): AsyncResult<S, E>;
+
+export function fromPromise<S, E>(
+  promise: Promise<S>,
+  mapError?: (error: unknown) => E,
+): AsyncResult<S, E> | AsyncResult<S, unknown> {
+  return mapError === undefined
+    ? fromPromiseImpl(promise, (error: unknown) => error)
+    : fromPromiseImpl(promise, mapError);
+}
+
+const fromPromiseImpl = <S, E>(
   promise: Promise<S>,
   mapError: (error: unknown) => E,
 ): AsyncResult<S, E> =>

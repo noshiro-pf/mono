@@ -7,6 +7,10 @@ import { type AsyncResult } from '../async-result.mjs';
  * returned Promise are caught, passed through `mapError`, and carried as
  * `Err`.
  *
+ * Passing `mapError` is what gives the error channel a concrete type `E`.
+ * Omitting it carries the thrown value through untouched, leaving the error
+ * channel as `unknown`.
+ *
  * @example
  *
  * ```ts
@@ -25,6 +29,15 @@ import { type AsyncResult } from '../async-result.mjs';
  * assert.deepStrictEqual(success, Result.ok(2));
  *
  * assert.deepStrictEqual(failure, Result.err('boom'));
+ *
+ * // Without `mapError`, the thrown value is carried as-is.
+ * const untyped = await AsyncResult.fromThrowable(
+ *   (): Promise<number> => {
+ *     throw new Error('boom');
+ *   },
+ * );
+ *
+ * assert.isTrue(Result.isErr(untyped));
  * ```
  *
  * @template S The type of the success value.
@@ -32,11 +45,28 @@ import { type AsyncResult } from '../async-result.mjs';
  * @param fn The function to execute; it may throw synchronously or return a
  *   rejecting Promise.
  * @param mapError The function applied to the thrown value or rejection
- *   reason to produce the error value.
+ *   reason to produce the error value. Omit it to carry the thrown value as
+ *   `unknown`.
  * @returns An `AsyncResult<S, E>` containing either the resolved value or the
  *   mapped error.
  */
-export const fromThrowable = async <S, E>(
+export function fromThrowable<S>(fn: () => Promise<S>): AsyncResult<S, unknown>;
+
+export function fromThrowable<S, E>(
+  fn: () => Promise<S>,
+  mapError: (error: unknown) => E,
+): AsyncResult<S, E>;
+
+export function fromThrowable<S, E>(
+  fn: () => Promise<S>,
+  mapError?: (error: unknown) => E,
+): AsyncResult<S, E> | AsyncResult<S, unknown> {
+  return mapError === undefined
+    ? fromThrowableImpl(fn, (error: unknown) => error)
+    : fromThrowableImpl(fn, mapError);
+}
+
+const fromThrowableImpl = async <S, E>(
   fn: () => Promise<S>,
   mapError: (error: unknown) => E,
 ): AsyncResult<S, E> => {
