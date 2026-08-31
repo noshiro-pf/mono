@@ -2,7 +2,7 @@
   "name": "@noshiro/solid-styled-components",
   "version": "0.23.11",
   "description": "Styled Components for Solid (forked)",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro",
   "sideEffects": false,
   "type": "module",

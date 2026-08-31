@@ -1,7 +1,7 @@
 {
   "name": "@noshiro/global-styled-components",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro",
   "sideEffects": true,
   "main": "cjs/index.js",

@@ -7,7 +7,7 @@
     "url": "git+https://github.com/noshiro-pf/mono.git",
     "directory": "apps/ts-fortress-types"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {

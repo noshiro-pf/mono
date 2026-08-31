@@ -2,7 +2,7 @@
   "name": "@noshiro/bundle-size-test",
   "version": "0.1.0",
   "private": false,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "wireit",
     "clean": "run-p clean:**",
