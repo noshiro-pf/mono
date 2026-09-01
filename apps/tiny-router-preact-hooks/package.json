@@ -10,6 +10,7 @@
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
+  "exports": "./src/index.mts",
   "scripts": {
     "fmt": "pnpm run z:format-uncommitted --cwd .",
     "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",

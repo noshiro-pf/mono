@@ -1,0 +1,62 @@
+{
+  "name": "algo-app",
+  "version": "0.0.1",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/algo-app"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config ./configs/vite.config.mts",
+    "dev": "vite --config ./configs/vite.config.mts",
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview --config ./configs/vite.config.mts",
+    "test": "vitest --config ./configs/vitest.config.mts run",
+    "testw": "vitest --config ./configs/vitest.config.mts watch",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
+  },
+  "dependencies": {
+    "better-preact-use-state": "workspace:*",
+    "firebase": "^12.18.0",
+    "goober": "^2.1.16",
+    "immer": "^11.1.18",
+    "preact-utils": "workspace:*",
+    "resize-observer-preact-hooks": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-preact-hooks": "workspace:*",
+    "tiny-router-observable": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*",
+    "ts-utils-additional": "workspace:*"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "npm-run-all2": "catalog:",
+    "preact": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
+    "tsx": "catalog:",
+    "vite": "catalog:"
+  }
+}

@@ -1,0 +1,23 @@
+import { type Reducer } from 'ts-type-forge';
+import { type GameState, type GameStateAction } from '../../types/index.mjs';
+
+export const selectAnswerBalloonIsOpenReducer: Reducer<
+  GameState['selectAnswerBalloonIsOpen'],
+  GameStateAction
+> = (curr, action) => {
+  switch (action.type) {
+    case 'selectOpponentCard':
+      return true;
+    case 'selectAnswer':
+    case 'selectMyCard':
+    case 'cancelToss':
+    case 'submitToss':
+      return curr;
+    case 'showJudgeOnDecidedAnswer':
+    case 'hideDecidedAnswerBalloon':
+    case 'cancelAnswer':
+    case 'submitAnswer':
+    case 'goToNextTurn':
+      return false;
+  }
+};
