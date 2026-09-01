@@ -2412,3 +2412,37 @@ const monthToIndex = {
 
 `libReplacement` を `false` に戻すと probe の `TS2578` だけが出る。
 テストは 5 ファイル 15 件通過。
+
+## `react-blueprintjs-utils` の opt-in（2026-09-01）
+
+16 パッケージ目、`apps/` 側の 5 つ目。**#1784（`ts-fortress-types`）の上に
+積んである。**
+
+### `apps/` 側の型エラーは、ほぼ全部が依存のソースから来る
+
+残り 9 個を先に測ったところ、**自分のコードにエラーがあるのは 1 つだけ**だった。
+
+| パッケージ                             | 型エラー | 出どころ                                           |
+| :------------------------------------- | -------: | :------------------------------------------------- |
+| `react-utils-styled`                   |        0 | —                                                  |
+| `tiny-router-react-hooks`              |        0 | —                                                  |
+| `resize-observer-react-hooks`          |        0 | —                                                  |
+| `react-utils`                          |        0 | —                                                  |
+| `poll-discord-app`                     |        0 | —                                                  |
+| **`react-blueprintjs-utils`（本 PR）** |    **1** | `apps/ts-fortress-types`（#1784）                  |
+| `event-schedule-app-shared`            |        1 | `apps/ts-fortress-types`（#1784）                  |
+| `lambda-calculus-interpreter-react`    |        6 | `libs/synstate`（#1781）                           |
+| `synstate-docs`                        |        8 | 6 が `libs/synstate`、**2 が自前**（mobx adapter） |
+
+`apps/` は private でビルド成果物を持たないので、`tsconfig.json` の `paths` で
+依存を**ソースから**解決する。opt-in するとその依存のソースにも strict lib が
+適用されるため、**エラーの件数は「そのパッケージの仕事量」ではない**。
+
+先に測って出どころを見ておけば、直すべき PR の上に積むだけで済む。
+`synstate-docs` だけが自前の修正を要する。
+
+### 本 PR は積み替えただけ
+
+1 件のエラーは #1784 で直した `Date` の月引数の件で、そのまま
+`ts-fortress-types` の opt-in の上に載せると 0 件になる。**消費側から見て
+#1784 の修正が効いていることの裏取りにもなっている。**
