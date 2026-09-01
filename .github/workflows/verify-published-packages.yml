@@ -44,15 +44,21 @@ concurrency:
 
 jobs:
   # Whether the branch is behind `main`, and whether `[WIP]` is on the pull
-  # request — see the notes in type-check.yml.
-  branch-up-to-date:
+  # request — see the notes in type-check.yml. `diff-scope: none` because the
+  # one job below gates itself in shell, against a merge base and a single
+  # directory rather than against one of the root package.json's ignore
+  # lists: asking check-gates.yml for that answer would cost it a checkout
+  # and an install to save the one runner this workflow has.
+  gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, '[WIP]')
-    uses: ./.github/workflows/branch-up-to-date.yml
+    uses: ./.github/workflows/check-gates.yml
+    with:
+      diff-scope: none
 
   verify-published:
-    needs: branch-up-to-date
+    needs: gates
     # Skip the whole job while the pull request carries the `[WIP]` label, or
     # while its branch is behind `main` and cannot be merged as it stands —
     # see the notes in type-check.yml. Being a draft no longer skips
@@ -60,7 +66,7 @@ jobs:
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -140,12 +146,12 @@ jobs:
   # than red. See the note on `type-check-result` in type-check.yml.
   verify-published-result:
     needs:
-      - branch-up-to-date
+      - gates
       - verify-published
     if: >-
       always() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 

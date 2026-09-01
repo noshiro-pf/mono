@@ -38,31 +38,42 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # Whether the branch is behind `main`, and whether `[WIP]` is on the pull
-  # request — see the notes in type-check.yml.
-  branch-up-to-date:
+  # Whether the branch is behind `main`, whether the diff touches anything
+  # this workflow reads, and whether `[WIP]` is on the pull request — see the
+  # notes in type-check.yml and check-gates.yml.
+  gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, '[WIP]')
-    uses: ./.github/workflows/branch-up-to-date.yml
+    uses: ./.github/workflows/check-gates.yml
+    with:
+      # `style`, a much narrower ignore list than `code`: `experimental/` and
+      # nothing else. Every entry in this matrix can be affected by a change
+      # the code list ignores — three of them check markdown, `ws:doc`
+      # regenerates the package READMEs, and `ws:check:ext` globs *every* file
+      # under the directories it is given — so `code` would skip this workflow
+      # exactly when it should fail. See "CI diff gates" in CLAUDE.md.
+      diff-scope: style
 
   style-check:
-    needs: branch-up-to-date
-    # Skip the whole job while the pull request carries the `[WIP]` label, or
-    # while its branch is behind `main` and cannot be merged as it stands —
-    # see the notes in type-check.yml. Being a draft no longer skips
-    # anything.
+    needs: gates
+    # Skip the whole job while the pull request carries the `[WIP]` label,
+    # while its branch is behind `main` and cannot be merged as it stands, or
+    # when the diff touches nothing any command below reads — see the notes in
+    # type-check.yml. Being a draft no longer skips anything.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     strategy:
       # The matrix entries are independent checks. Letting one cancel the
-      # others hides their results and, since most of them are required
-      # status checks, blocks the pull request on an unrelated failure.
+      # others hides their results, and the aggregate below reports the
+      # cancelled ones as a failure, so the pull request is blocked on an
+      # unrelated failure with nothing to read.
       fail-fast: false
       matrix:
         command:
@@ -95,9 +106,6 @@ jobs:
           # pushed commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Fetch main
-        run: git fetch origin main
-
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
@@ -114,59 +122,19 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # NOTE: To include this workflow in the branch protection rule status
-      # check, skip each step instead of skipping the entire workflow with
-      # paths-ignore.
-      - name: Check diff
-        id: check_diff_style
-        # A much narrower list than type-check.yml's: `experimental/` and
-        # nothing else. Every entry in this matrix can be affected by a
-        # change the code-check gate ignores — three of them check markdown,
-        # `ws:doc` regenerates the package READMEs, and `ws:check:ext` globs
-        # *every* file under the directories it is given (`.md` is accepted
-        # under `libs/ts-data-forge/scripts` and a failure under any `src`) —
-        # so that gate would skip this exactly when it should fail.
-        # `experimental/` is different in kind: it is excluded from
-        # Prettier's, cspell's and markdownlint's globs and is outside the
-        # pnpm workspace, so no command here reads a byte of it.
-        #
-        # On a push to main, diffing against origin/main is a diff against
-        # HEAD itself, which comes back empty and reads as "nothing relevant
-        # changed" — so every step below would skip and the job would still
-        # report success. Compare with what main pointed at before the push
-        # instead.
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          if [ "${GITHUB_REF_NAME}" != 'main' ]; then
-            pnpm run z:check-should-run:style-checks
-          elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
-            git fetch --depth=1 origin "${BEFORE}"
-            pnpm run z:check-should-run:style-checks --base-branch "${BEFORE}"
-          else
-            # A manual run, or the first push to the branch: there is nothing
-            # to compare against, so run everything rather than skip it.
-            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
-          fi
-
-      # `run: exit 0` ends the step, not the job — every step below has to
-      # carry the condition itself, as type-check.yml's do.
-      #
       # ws:doc and ws:check:ext load each package's sources, which import
       # workspace siblings and resolve through their `exports` map to dist/.
       # Nothing is built yet on a clean checkout, so these two need the
       # packages emitted first. The other matrix entries do not touch dist/,
       # so they skip the build.
       - name: Build all packages
-        if: steps.check_diff_style.outputs.should_run == 'true' && (matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext')
+        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
-        if: steps.check_diff_style.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        if: steps.check_diff_style.outputs.should_run == 'true'
         run: pnpm run z:assert-repo-is-clean
 
   # The one required status check for this workflow: it reports whatever
@@ -177,12 +145,13 @@ jobs:
   # than red. See the note on `type-check-result` in type-check.yml.
   style-check-result:
     needs:
-      - branch-up-to-date
+      - gates
       - style-check
     if: >-
       always() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 

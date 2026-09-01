@@ -48,21 +48,24 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # Is the branch up to date with `main`? A job of its own because the answer
-  # takes an API call, which a job-level `if` cannot make, and because a step
-  # cannot skip the job it is in — see branch-up-to-date.yml. It carries the
+  # Is the branch up to date with `main`, and does the diff touch anything
+  # this workflow reads? A job of its own because both answers take work a
+  # job-level `if` cannot do — an API call and a `pnpm install` — and because
+  # a step cannot skip the job it is in. See check-gates.yml. It carries the
   # `[WIP]` condition as well, so a labelled pull request costs no runner
-  # anywhere: this job is skipped, and the one below it with it.
-  branch-up-to-date:
+  # anywhere: this job is skipped, and the ones below it with it.
+  gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, '[WIP]')
-    uses: ./.github/workflows/branch-up-to-date.yml
+    uses: ./.github/workflows/check-gates.yml
+    with:
+      diff-scope: code
 
   type-check:
-    needs: branch-up-to-date
-    # Two states are not worth a CI run, and both skip the whole job before a
-    # runner is even booted — a job-level `if` is evaluated by GitHub itself.
+    needs: gates
+    # Three states are not worth a CI run, and each skips the whole job before
+    # a runner is booted — a job-level `if` is evaluated by GitHub itself.
     #
     # - A `[WIP]` label on the pull request says its author does not want the
     #   checks yet. Labels arrive in the event payload, so this costs
@@ -73,13 +76,18 @@ jobs:
     #   base branch" state: it cannot be merged, and the update that clears it
     #   fires `synchronize` and runs everything again — on the commit that
     #   will actually be merged, which this one is not.
+    # - A diff that touches nothing any command below reads. This used to be a
+    #   step inside each job, which meant all eleven runners booted, checked
+    #   out and installed dependencies before finding out they had nothing to
+    #   do; the gate job pays that once. See "CI diff gates" in CLAUDE.md.
     #
-    # The skipped conclusion satisfies a required status check in both cases.
-    # For an out-of-date branch the ruleset's
-    # `strict_required_status_checks_policy` still holds the merge. `[WIP]`
-    # holds nothing — GitHub has no label-based merge block — so it is a
-    # label to take off before merging rather than a guard rail, which is the
-    # one thing it does less well than the draft flag it replaces.
+    # The skipped conclusion satisfies a required status check in every case,
+    # so each of the three needs something else to hold the merge — and each
+    # has one. Out of date: the ruleset's
+    # `strict_required_status_checks_policy`. `[WIP]`: the `no-wip-label`
+    # check in wip-label.yml, which fails for as long as the label is on.
+    # Nothing relevant in the diff: nothing here would have read those paths
+    # anyway, which is the one case where "not checked" is the right answer.
     #
     # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
     # that failed to answer leaves `should_run` empty: failing open costs a CI
@@ -90,14 +98,16 @@ jobs:
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
     strategy:
       # The matrix entries are independent checks. Letting one cancel the
-      # others hides their results and, since most of them are required
-      # status checks, blocks the pull request on an unrelated failure.
+      # others hides their results, and the aggregate below reports the
+      # cancelled ones as a failure, so the pull request is blocked on an
+      # unrelated failure with nothing to read.
       fail-fast: false
       matrix:
         command:
@@ -126,9 +136,6 @@ jobs:
           # pushed commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Fetch main
-        run: git fetch origin main # To allow the diff gate below to get the diff from main
-
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
@@ -145,48 +152,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # NOTE: To include this workflow in the branch protection rule status check,
-      # skip each step instead of skipping the entire workflow with paths-ignore.
-      - name: Check diff
-        id: check_diff_type
-        # `z:check-should-run:code-checks` names the paths that no check in
-        # this workflow looks at — `experimental/`, prose, and the style
-        # tools' own configuration — and reports `should_run=false` when the
-        # diff touches nothing else. The list lives in the root package.json
-        # so that this workflow and node-version-compatibility.yml cannot
-        # drift apart. Anything a check here *does* look at — a source file,
-        # a lockfile, a workflow — is absent from that list, so it runs.
-        #
-        # It diffs against origin/main. On a push to main that is a diff
-        # against HEAD itself, which comes back empty and reads as "nothing
-        # relevant changed" — so every step below skips, the coverage upload
-        # among them, and the job still reports success. Compare with what
-        # main pointed at before the push instead.
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          if [ "${GITHUB_REF_NAME}" != 'main' ]; then
-            pnpm run z:check-should-run:code-checks
-          elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
-            git fetch --depth=1 origin "${BEFORE}"
-            pnpm run z:check-should-run:code-checks --base-branch "${BEFORE}"
-          else
-            # A manual run, or the first push to the branch: there is nothing
-            # to compare against, so run everything rather than skip it.
-            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
-          fi
-
-      # `run: exit 0` ends the step, not the job — every step below has to
-      # carry the condition itself. See node-version-compatibility.yml, which
-      # has always done it this way.
       # `ws:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
       - name: Install Playwright Browsers
-        if: steps.check_diff_type.outputs.should_run == 'true' && (matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov')
+        if: matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov'
         run: pnpm exec playwright install chromium
 
       - name: Build all packages
-        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ws:build
 
       # The browser tests used to be wrapped in a two-attempt retry, because
@@ -195,15 +167,13 @@ jobs:
       # each package's `optimizeDepsInclude` removed it, so a failure here is
       # now a failure rather than something to try again.
       - name: Run "${{ matrix.command }}"
-        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
 
       - name: Check if there is no file diff
-        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run z:assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:cov'
+        if: matrix.command == 'ws:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
   # The one required status check for this workflow. Everything above still
@@ -243,12 +213,13 @@ jobs:
   #   commit that will actually be merged.
   type-check-result:
     needs:
-      - branch-up-to-date
+      - gates
       - type-check
     if: >-
       always() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-      needs.branch-up-to-date.outputs.should_run != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
