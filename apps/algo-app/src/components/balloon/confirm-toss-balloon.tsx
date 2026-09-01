@@ -1,0 +1,136 @@
+import { styled } from 'goober';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
+import { type RectSize } from 'ts-utils-additional';
+import { dictionary, outlineColorDef } from '../../constants/index.mjs';
+import { type ConfirmTossBalloonProps } from '../../types/index.mjs';
+import { Button } from '../bp/index.mjs';
+import { CardComponent } from '../card/index.mjs';
+import {
+  createBalloonBody,
+  createBalloonWithDownArrow,
+} from './balloon-base.js';
+import { calcBalloonPosition } from './calc-balloon-position.mjs';
+import { smallCardSize, smallestCardSize } from './small-card-size.mjs';
+
+type Props = ConfirmTossBalloonProps;
+
+const balloonPaddingPx = 5;
+
+const cardMarginPx = 2;
+
+const balloonSize: RectSize = {
+  width: balloonPaddingPx * 2 + 120 + smallCardSize.width,
+  height: 100,
+};
+
+const marginBetweenCardAndBalloon = 10;
+
+export const ConfirmTossBalloon = memoNamed<Props>(
+  'ConfirmTossBalloon',
+  ({ card, anchorCardRect, submit, cancel }) => {
+    const rootStyle = useMemo<preact.CSSProperties>(
+      () =>
+        calcBalloonPosition({
+          anchorCardRect,
+          arrowDirection: 'S',
+          balloonSize,
+          marginBetweenCardAndBalloon,
+        }),
+      [anchorCardRect],
+    );
+
+    const cardWithStyle = useMemo(
+      () =>
+        ({
+          number: card.number,
+          color: card.color,
+          visibilityFromMe: 'faceUp',
+          size: smallestCardSize,
+          isClickable: true,
+          float: 'never',
+          showOutline: 'never',
+          outlineColor: outlineColorDef.green,
+        }) as const,
+      [card],
+    );
+
+    return (
+      <BalloonWithDownArrowTranslated style={rootStyle}>
+        <BalloonContent>
+          <CardAndMessage>
+            <CardWrapper>
+              <CardComponent
+                color={cardWithStyle.color}
+                float={cardWithStyle.float}
+                isClickable={cardWithStyle.isClickable}
+                number={cardWithStyle.number}
+                outlineColor={cardWithStyle.outlineColor}
+                showOutline={cardWithStyle.showOutline}
+                size={cardWithStyle.size}
+                visibilityFromMe={cardWithStyle.visibilityFromMe}
+              />
+            </CardWrapper>
+            <Message>
+              <div>{dictionary.submitTossMessage[0]}</div>
+              <div>{dictionary.submitTossMessage[1]}</div>
+            </Message>
+          </CardAndMessage>
+          <Buttons>
+            <div>
+              <Button onClick={cancel}>{dictionary.cancel}</Button>
+            </div>
+            <div>
+              <Button onClick={submit}>{dictionary.submitToss}</Button>
+            </div>
+          </Buttons>
+        </BalloonContent>
+      </BalloonWithDownArrowTranslated>
+    );
+  },
+);
+
+const BalloonBody = createBalloonBody(balloonSize);
+
+const BalloonWithDownArrow = createBalloonWithDownArrow(BalloonBody);
+
+const BalloonWithDownArrowTranslated = styled(BalloonWithDownArrow)`
+  transform: translateY(-20px);
+`;
+
+const BalloonContent = styled('div')`
+  width: ${balloonSize.width}px;
+  height: ${balloonSize.height}px;
+  padding: ${balloonPaddingPx}px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CardAndMessage = styled('div')`
+  display: flex;
+  justify-content: space-around;
+`;
+
+const Message = styled('div')`
+  color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+`;
+
+const CardWrapper = styled('div')`
+  display: flex;
+  flex-wrap: wrap;
+  margin: ${cardMarginPx}px;
+`;
+
+const Buttons = styled('div')`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 5px;
+
+  & > * {
+    margin: ${cardMarginPx}px;
+  }
+`;
