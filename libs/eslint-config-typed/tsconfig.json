@@ -5,6 +5,8 @@
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
+
     // `samples/` imports this package by its own name, the way a consumer
     // does, and is embedded into the README verbatim. Mapped to the source so
     // that a sample is checked against the code being edited rather than

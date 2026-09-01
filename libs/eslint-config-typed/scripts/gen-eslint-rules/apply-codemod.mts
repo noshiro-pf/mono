@@ -8,7 +8,7 @@ import {
   replaceRecordWithUnknownRecordTransformer,
   transformSourceCode,
 } from 'ts-codemod-lib';
-import { Arr } from 'ts-data-forge';
+import { Arr, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -123,7 +123,9 @@ export const applyTransformationsToFile = async (
   } catch (error) {
     console.info(typeof error);
 
-    const errStr = Error.isError(error) ? error.message : String(error);
+    const errStr = Error.isError(error)
+      ? error.message
+      : unknownToString(error);
 
     console.error(`❌ ${fileName} - error: ${errStr}`);
 

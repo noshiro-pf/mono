@@ -273,7 +273,7 @@ const collectDestructuredPropNames = (
           if (typeof prop.key.value === 'string') {
             mut_names.add(prop.key.value);
           } else if (typeof prop.key.value === 'number') {
-            mut_names.add(String(prop.key.value));
+            mut_names.add(prop.key.value.toString());
           }
 
           break;
@@ -287,7 +287,7 @@ const collectDestructuredPropNames = (
       mut_names.add(
         typeof prop.key.value === 'string'
           ? prop.key.value
-          : String(prop.key.value),
+          : prop.key.value.toString(),
       );
     } else {
       // Dynamic computed key — cannot resolve statically

@@ -1932,3 +1932,32 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
   規則があり、probe の `export` に当たる。probe を置く前に lint を通して
   「0 件」と思い込むと、`ws:lint` で初めて落ちる。`#1745` と同じく、その
   ブロックの `ignores` に 1 件加えて対象外にした
+## `eslint-config-typed` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 5 件。** #1762 で「型 5 件」と測ったが、その 5 件は
+`ts-data-forge` の opt-in（#1745）が直したものだった。**#1745 がマージされた
+いま、実測で 0 件**である。
+
+`prefer-nullish-coalescing-when-safe.mts` の `new Set([...])` に型引数を足す
+修正で、`ts-data-forge` 側の opt-in から見つかったもの。**consumer の opt-in
+が別パッケージの型エラーを先に潰す**という順序があり得ることの実例になった。
+
+### lint 5 件 — `String` / `Boolean`
+
+| 箇所                                                                      | 直し方                                                  |
+| :------------------------------------------------------------------------ | :------------------------------------------------------ |
+| `scripts/gen-eslint-rules/apply-codemod.mts`                              | `String(error)` → `unknownToString`                     |
+| `scripts/.../print/meta-to-string.mts`                                    | `Boolean(x)` → `x === true`                             |
+| `src/plugins/react-coding-style/.../component-name.mts`                   | `String(pattern)` → `pattern.toString()`（`RegExp`）    |
+| `src/plugins/ts-restrictions/.../check-destructuring-completeness.mts` ×2 | `String(v)` → `v.toString()`（`number` に絞り込み済み） |
+
+`Boolean(x)` の 1 件だけは意味が変わり得る。読んでいるのは ESLint の rule
+metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== true` が
+意図どおりであり、truthy な非 boolean を true と扱わなくなるぶん厳しくなる。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 583 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 168 個が true / false で完全一致（`dist/` を消して exit code も確認）
+- probe を置いてから lint を測った
