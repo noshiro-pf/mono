@@ -2191,3 +2191,11 @@ opt-in のたびに 1 件ずつ直してきた。
 `apps/` 側でソース解決した依存が問題になったのは、結局
 `libs/synstate`（#1786 ・ #1789 ・ #1790）と
 `apps/ts-fortress-types`（#1788 ・ #1790）の 2 つだけだった。
+
+## `resize-observer-react-hooks` の opt-in（2026-09-01）
+
+22 パッケージ目、`apps/` 側の 11 個目。**型・lint とも初回から 0 件**。
+
+`ResizeObserver` と `DOMRect` を直接扱うパッケージだが、strict lib で
+落ちるところは無かった。`better-react-use-state` をソース解決している点は
+#1791 ・ #1793 と同じで、やはり待つ必要は無い。
