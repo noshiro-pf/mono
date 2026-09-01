@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json",
+    "../../tools/configs/tsconfig/tsconfig.node-only.json"
+  ],
+  "include": ["./src", "./scripts", "./configs"]
+}
