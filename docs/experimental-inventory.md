@@ -1506,3 +1506,69 @@ MUI を使う 3 app の 1 つ目。#1777（`react-mui-utils`）と #1778
 `dict = {}` の 1 行と、それを `typeof === 'object'` で確かめるだけのテスト、
 参照 0 箇所。#1776 と同じ形で、`mahjong-calculator-app` の 39 行とは違う。
 毎回中身を見るしかない。
+
+## `annotation-tool` の復元（2026-09-01）
+
+React 側 apps の最後の 1 つ。#1778 に `shape/` と `pickupHighContrastHues` を
+足した上に積んである。65 ファイル・2006 行。
+
+### PixiJS は宣言どおり v5 で入れた
+
+移植元は `pixi.js-legacy@^5.3.12` と `pixi.js@^8.4.1` の**両方**を宣言しているが、
+**import しているのは `pixi.js-legacy` だけ**（12 ファイル）。移行の途中で
+止まっていたものと思われる。
+
+`pixi.js-legacy` はその後 v7 で終わっていて（v8 で `-legacy` は廃止）、
+使っている API のうち
+
+| API                                            | v7 での状況                          |
+| :--------------------------------------------- | :----------------------------------- |
+| `InteractionManager`                           | **削除**（`EventSystem` に置き換え） |
+| `settings.SORTABLE_CHILDREN` ・ `ROUND_PIXELS` | 非推奨（v8 で削除）                  |
+
+の 2 つが失われている。どちらも `canvas/canvas-main.tsx` 1 ファイルに閉じて
+いるので移行自体は小さいが、**キャンバスの入力処理の挙動が変わる**うえ、
+ここでは実行して確かめられない。MUI で現行の v9 を入れたのとは事情が違うので、
+**宣言どおりの v5 で復元して、バージョンを上げる判断は package.json の 1 行と
+して残した**。
+
+### `Reducer` は `ts-type-forge` にあった — #1780 の訂正
+
+#1780（`catan-dice-app`）で「`Reducer` に後継が無いので移植した」と書いたが、
+**誤り**だった。`ts-type-forge` が `others/utils.mts` で
+`export type Reducer<S, A> = (state: S, action: A) => S;` を出していて、
+`synstate-react-hooks/src/create-reducer.mts` もそこから import している。
+本 PR では `ts-type-forge` から import している。**#1780 の移植版は消してよい。**
+
+### state 生成関数はオブジェクトからタプルになっている
+
+```ts
+// 移植元
+const { useCurrentValue, setTrue, setFalse } = createBooleanState(false);
+// 現行
+const [useCurrentValue, { setTrue, setFalse }] = createBooleanState(false);
+```
+
+`createState` ・ `createReducer` も同様（`synstate-react-hooks`）。
+
+### キャンバス層は lint と codemod の両方と噛み合わない
+
+PixiJS のシーングラフは**その場で書き換える**ものなので、
+
+- `@typescript-eslint/prefer-readonly-parameter-types` が 36 件出る
+- `codemod` の `convert-to-readonly` が型を書き換えて、通っていた
+  代入が全部落ちる（型 21 件・lint 42 件）
+
+前者はこのパッケージの `eslint.config.mts` で `src/canvas/**` にだけ off に
+した（`synstate` が `samples/**` に `functional/immutable-data` を off に
+しているのと同じ形）。後者は #1778 で見つけた
+`/* transformer-ignore convert-to-readonly */` を使った。
+
+**必要なファイルだけに付けるには 2 段階の探索が要った。** 最初は壊れた 9 つに
+付けたが通らず、**型を定義している側**（`canvas/types/*` と
+`canvas-state-type.mts`）にも要ると分かった。値を書き換える側だけでなく、
+その型を出している側も対象にしないと意味が無い。canvas 層 40 ファイル全部では
+なく 20 ファイルで済んでいる。
+
+なお **codemod は既に適用した変換を後から取り消さない**ので、
+directive を足したら一度 revert してから掛け直す必要がある。

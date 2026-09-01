@@ -312,6 +312,17 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry below assumes: a Vite React app whose
+    // entry is the module `index.html` would load.
+    "apps/annotation-tool": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+      // The icon font is loaded by `src/index.css` through CSS `@import`
+      // rather than by a module import, which knip does not follow.
+      // `@blueprintjs/core` is imported normally.
+      "ignoreDependencies": ["@blueprintjs/icons", "normalize.css"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/ts-utils-additional": {
       "entry": ["src/index.mts"],
