@@ -340,7 +340,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
 step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
 
-`color-demo-app`（1097 行）だけは `react-mui-utils`（245 行）が要る。
+`color-demo-app`（1097 行）だけは ~~`react-mui-utils`（245 行）~~が要る。
 
 ### Preact 側は utils 4 つが前提になる
 
@@ -1253,3 +1253,70 @@ preact が要る。しかし **top-level import を 1 つ書くとこのファ�
 条件は絞り切れていない（引数をオブジェクトリテラルから変数にしても、
 `preact/hooks` を名前空間 import にしても再現する）。
 初期値に型注釈を付ければ型引数は不要なので、**disable ではなく型引数を落とした**。
+
+`apps/*` の既定エントリは Astro サイトを仮定しているので、
+`event-schedule-app` と同じく `entry: ["src/main.tsx"]` を `knip.jsonc` に
+足した。足す前は依存 9 件が「未使用」と報告される。
+
+## `react-mui-utils` の復元（2026-09-01）
+
+MUI を使う 3 app（`catan-dice-app` ・ `color-demo-app` ・ `annotation-tool`）の
+うち `color-demo-app` の前提になる utils。6 ファイル 245 行。
+
+### 「MUI がいる」の内訳を数えた
+
+インベントリで MUI 待ちにしていた 4 つを実際に測ると、依存の重さは同じでは
+なかった。
+
+| パッケージ        | `@mui/*` を import するファイル |
+| :---------------- | :------------------------------ |
+| `react-mui-utils` | 4 / 5                           |
+| `color-demo-app`  | 3 / 36                          |
+| `catan-dice-app`  | 1 / 21                          |
+| `annotation-tool` | 0 / 65（PixiJS 待ち）           |
+| `algo-app`        | 0 / 122（firebase 待ち）        |
+
+`my-portfolio-app-preact` の `components/mui/` が **MUI を 1 つも import して
+いなかった**（goober 製の自作品）ことがあるので、名前ではなく import を数えた。
+ここは本物の MUI を使っている。
+
+### 実際に増えた npm 依存は `@mui/material` 1 つだけ
+
+`@emotion/styled` ・ `@emotion/react` は `react-utils-styled` が既に持って
+いる。使っているのは `Button` ・ `CircularProgress` ・ `Dialog` ・
+`DialogActions` ・ `DialogContent` ・ `Slider` ・ `Tab` ・ `Tabs` ・
+`Typography` の 9 つで、いずれも v5 から v9 まで残っている安定した部品。
+移植元の `^5.15.14` ではなく現行の v9 を入れた（リポジトリは React 19.2.8）。
+
+**`^9.4.0` ではなく `^9.3.1` で止めてある。** 9.4.0 は 2026-08-27 公開で
+`minimumReleaseAge` の締切に掛かり、`pnpm install` が
+`ERR_PNPM_NO_MATURE_MATCHING_VERSION` で落ちる。設定が意図どおり働いた形で、
+次の更新 PR が自然に上げる。
+
+### `@fontsource/roboto` は持ち込まなかった
+
+移植元は `index.mts` の先頭で Roboto の 4 ウェイトを副作用 import している。
+これは**復元してはいけない形**だった：
+
+1. `index.mts` は `pnpm run gi` の生成物である。実際に走らせると
+   副作用 import は 4 行とも消える — issue #1737 の 1 件目
+   （`poll-discord-app` の実行エントリが barrel に潰された）と同じ壊れ方で、
+   #1742 で CI に入った `style-check (ws:gi)` が落ちる。
+2. `import-x/extensions` は `never`（例外は `json` と `mjs`）なので、
+   `@fontsource/roboto/300.css` のようなパッケージ副パスの拡張子は通らない。
+   リポジトリ内の CSS import は `import './index.css'` の相対形しか前例が無い。
+
+フォントの読み込みはアプリの仕事なので、`color-demo-app` 側で入れる。
+**省いたものとして記録しておく。**
+
+### そのほか
+
+- React は `import * as React from 'react'`（`react-coding-style/import-style`）。
+  移植元は `useCallback` などを名前で import していた。
+- `src/load-libs.d.mts`（`/// <reference types="react" />` の 1 行）は削除した。
+  React を UMD グローバルとして見せるためのファイルで、明示 import にしたので
+  役目が無い。外しても type-check・lint とも 0 件。
+- 宣言だけで import されていない `@noshiro/ts-utils-additional` は持ち込まない。
+- `Number.parseInt` は `lint:fix` が
+  `Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN)` に書き換えた。
+  これで `ts-data-forge` が実依存になる。

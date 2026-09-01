@@ -1,6 +1,6 @@
 import { Slider } from '@mui/material';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import * as React from 'react';
+import { memoNamed } from 'react-utils';
 
 type Props = Readonly<{
   value: number;
@@ -14,7 +14,7 @@ type Props = Readonly<{
 export const MuiSlider = memoNamed<Props>(
   'MuiSlider',
   ({ value, onChange, ariaLabelledby, step, min, max }) => {
-    const sliderOnChange = useCallback(
+    const sliderOnChange = React.useCallback(
       (_: unknown, _value: number | readonly number[]) => {
         if (typeof _value === 'number') {
           onChange(_value);
@@ -30,7 +30,7 @@ export const MuiSlider = memoNamed<Props>(
     return (
       <Slider
         aria-labelledby={ariaLabelledby}
-        marks={true}
+        marks
         max={max}
         min={min}
         step={step}
