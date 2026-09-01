@@ -1,5 +1,11 @@
 # strict-ts-lib-v5.8
 
+## 0.6.2
+
+### Patch Changes
+
+- 68452d4: Allow `0` as `toExponential`'s `fractionDigits`: the parameter type becomes `UintRangeInclusive<0, 100>`. ECMA-262 accepts 0–100 — `(1).toExponential(0)` is legal and returns `'1e+0'` — so the previous lower bound of 1 rejected a valid call.
+
 ## 0.6.1
 
 ### Patch Changes
