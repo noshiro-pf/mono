@@ -1,3 +1,7 @@
+import { css } from '@emotion/react';
+import { memoNamed } from 'react-utils';
+import { Num } from 'ts-data-forge';
+
 type Props = Readonly<{
   xy: readonly (readonly [number, number])[];
   max: number;

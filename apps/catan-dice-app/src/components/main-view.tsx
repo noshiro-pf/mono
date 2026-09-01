@@ -1,3 +1,4 @@
+import { css } from '@emotion/react';
 import {
   Avatar,
   Button,
@@ -7,14 +8,17 @@ import {
   ListItemText,
   Paper,
 } from '@mui/material';
-import { DiceIcon, SumIcon } from '../assets';
-import { DiceNumber } from './dicer-number';
-import { Histogram } from './histogram';
+import { memoNamed } from 'react-utils';
+import { type SafeUint } from 'ts-data-forge';
+import { type FixedLengthTuple } from 'ts-type-forge';
+import { DiceIcon, SumIcon } from '../assets/index.mjs';
+import { DiceNumber } from './dicer-number.js';
+import { Histogram } from './histogram/index.mjs';
 
 type Props = Readonly<{
   diceValue1: number;
   diceValue2: number;
-  sumCount: ArrayOfLength<11, SafeUint>;
+  sumCount: FixedLengthTuple<11, SafeUint>;
   opacity: number;
   rollDices: () => void;
   undo: () => void;
