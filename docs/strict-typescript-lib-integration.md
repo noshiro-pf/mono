@@ -2546,3 +2546,16 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 `tsconfig.json` に `compilerOptions` はあった（`paths` のため）。
 `test/` は無いので probe 用に作って `include` に足してある。
 `libReplacement` を `false` に戻すと probe の `TS2578` だけが出る。
+
+## `lambda-calculus-interpreter-react` の opt-in（2026-09-01）
+
+24 パッケージ目、`apps/` 側の 13 個目。**#1781（`synstate`）の上に積んである。**
+
+`main` の上で opt-in すると型エラーが 6 件出るが、**6 件とも
+`libs/synstate/src/` の中**で、#1786（`tiny-router-observable`）と同じ
+`TimerId` の件だった。#1781 を土台にすると 0 件になる。自前の修正は無い。
+
+`paths` は `lambda-calculus-interpreter-core` ・ `react-utils` ・
+`synstate` ・ `synstate-react-hooks` の 4 つをソース解決しているが、
+問題が出たのは `synstate` だけ。前 3 者は #1787 ・ #1791 で 0 件と分かって
+いるので整合している。
