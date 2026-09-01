@@ -12,7 +12,11 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 export const createMobXSpringAdapter = (): SpringAdapter => {
   let mut_head: IObservableValue<Point> | undefined;
 
-  const mut_disposers: (() => void)[] = [];
+  // `let` + reassignment rather than `.length = 0` or `.splice(0)`: the strict
+  // standard library declares `Array.prototype.length` readonly, and
+  // `unicorn/no-unnecessary-splice` rejects `splice(0)` as the truncation
+  // idiom. Replacing the binding satisfies both.
+  let mut_disposers: (() => void)[] = [];
 
   let mut_stages: IObservableValue<Point>[] = [];
 
@@ -73,7 +77,7 @@ export const createMobXSpringAdapter = (): SpringAdapter => {
         dispose();
       }
 
-      mut_disposers.length = 0;
+      mut_disposers = [];
 
       mut_stages = [];
 

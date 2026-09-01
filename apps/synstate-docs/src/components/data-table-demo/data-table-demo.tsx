@@ -75,11 +75,11 @@ export const DataTableDemo = React.memo(() => {
             value={currentPage}
             onChange={State.handleCurrentPageChange}
           />
-          {` / ${String(pageLength)}`}
+          {` / ${pageLength.toString()}`}
         </label>
 
         <span style={rangeStyle}>
-          {`(${String(tableView.rangeStart)}–${String(tableView.rangeEnd)}) of ${String(tableView.totalFiltered)} items`}
+          {`(${tableView.rangeStart.toString()}–${tableView.rangeEnd.toString()}) of ${tableView.totalFiltered.toString()} items`}
         </span>
       </div>
 

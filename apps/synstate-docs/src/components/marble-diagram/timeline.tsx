@@ -9,7 +9,7 @@ export const Timeline = React.memo<Props>(({ def }) => (
   <svg
     role={'img'}
     style={timelineSvgStyle}
-    viewBox={`0 0 ${String(VIEWBOX_WIDTH)} ${String(VIEWBOX_HEIGHT)}`}
+    viewBox={`0 0 ${VIEWBOX_WIDTH.toString()} ${VIEWBOX_HEIGHT.toString()}`}
   >
     {/* Timeline line */}
     <title>Timeline of observable events</title>
@@ -25,7 +25,7 @@ export const Timeline = React.memo<Props>(({ def }) => (
     {/* Arrow */}
     <polygon
       fill={'var(--sl-color-gray-3, #6b7280)'}
-      points={`${String(ARROW_X)},${String(LINE_Y - 1.2)} ${String(ARROW_X + 2.5)},${String(LINE_Y)} ${String(ARROW_X)},${String(LINE_Y + 1.2)}`}
+      points={`${ARROW_X.toString()},${(LINE_Y - 1.2).toString()} ${(ARROW_X + 2.5).toString()},${LINE_Y.toString()} ${ARROW_X.toString()},${(LINE_Y + 1.2).toString()}`}
     />
 
     {/* Completion marker "|" */}
@@ -64,7 +64,7 @@ export const Timeline = React.memo<Props>(({ def }) => (
 
     {/* Marbles */}
     {def.marbles.map((m) => (
-      <g key={`${String(m.t)}-${m.label}`}>
+      <g key={`${m.t.toString()}-${m.label}`}>
         <circle
           cx={m.t}
           cy={LINE_Y}
