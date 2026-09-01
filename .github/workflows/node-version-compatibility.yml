@@ -8,33 +8,46 @@ on:
       - main
 
   # `synchronize` fires on every push to the pull request's branch, so these
-  # four types cover the pull request's whole life. While it is a draft the
-  # job-level `if` below skips the run; `ready_for_review` is what runs the
-  # checks for real once it stops being one. No `paths` filter here — see the
+  # types cover the pull request's whole life — a draft included. `labeled` /
+  # `unlabeled` are what let a `[WIP]` label stop and restart the checks; see
+  # the note in type-check.yml. No `paths` filter here — see the
   # note in style-check.yml.
   pull_request:
     types:
       - opened
       - synchronize
       - reopened
+      - labeled
+      - unlabeled
       - ready_for_review
 
   workflow_dispatch:
 
+# One run per pull request; a push cancels the run still going for the
+# previous one. `cancel-in-progress` is an expression rather than `true` so
+# that pushes to `main` run to completion — see the note in type-check.yml.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  # Whether the branch is behind `main` — see the note in type-check.yml.
+  # Whether the branch is behind `main`, and whether `[WIP]` is on the pull
+  # request — see the notes in type-check.yml.
   branch-up-to-date:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: >-
+      github.event_name != 'pull_request' ||
+      !contains(github.event.pull_request.labels.*.name, '[WIP]')
     uses: ./.github/workflows/branch-up-to-date.yml
 
   test-node-versions:
     needs: branch-up-to-date
-    # Skip the whole job while the pull request is a draft, or while its
-    # branch is behind `main` and cannot be merged as it stands — see the
-    # notes in type-check.yml.
+    # Skip the whole job while the pull request carries the `[WIP]` label, or
+    # while its branch is behind `main` and cannot be merged as it stands —
+    # see the notes in type-check.yml. Being a draft no longer skips
+    # anything.
     if: >-
       !cancelled() &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
       needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     # install + ws:build + ws:test across 17 packages, per Node version.
@@ -114,3 +127,35 @@ jobs:
       - name: Test
         if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ws:test
+
+  # The one required status check for this workflow: it reports whatever
+  # happened above, so that a skipped run cannot read as a passing one. See
+  # the note on `type-check-result` in type-check.yml.
+  test-node-versions-result:
+    needs:
+      - branch-up-to-date
+      - test-node-versions
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Require the checks above to have passed
+        env:
+          SHOULD_RUN: ${{ needs.branch-up-to-date.outputs.should_run }}
+          RESULT: ${{ needs.test-node-versions.result }}
+        run: |
+          if [ "${SHOULD_RUN}" = 'false' ]; then
+            echo 'The branch is behind the base branch, so the checks were skipped. They run again once it is updated.'
+            exit 0
+          fi
+
+          if [ "${RESULT}" = 'success' ]; then
+            echo 'The checks passed.'
+            exit 0
+          fi
+
+          summary="The checks did not pass on this commit (result: ${RESULT}). A \`[WIP]\` label skips them; take the label off to run them."
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+          exit 1

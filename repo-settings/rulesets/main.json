@@ -43,99 +43,27 @@
         "do_not_enforce_on_create": true,
         "required_status_checks": [
           {
-            "context": "style-check (cspell)",
+            "context": "type-check-result",
             "integration_id": 15368
           },
           {
-            "context": "style-check (md)",
+            "context": "style-check-result",
             "integration_id": 15368
           },
           {
-            "context": "style-check (ws:check:ext)",
+            "context": "test-node-versions-result",
             "integration_id": 15368
           },
           {
-            "context": "style-check (ws:doc)",
+            "context": "verify-published-result",
             "integration_id": 15368
           },
           {
-            "context": "style-check (fmt:full)",
+            "context": "backup-repository-settings-result",
             "integration_id": 15368
           },
           {
-            "context": "style-check (strict-lib:fmt)",
-            "integration_id": 15368
-          },
-          {
-            "context": "style-check (docs:deps)",
-            "integration_id": 15368
-          },
-          {
-            "context": "style-check (ws:gi)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (check:root)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (strict-lib:type-check)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (strict-lib:lint)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:lint:fix)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:type-check)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (codemod:full)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:test:cov)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (ws:test:browser)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (knip)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (lint:published-deps)",
-            "integration_id": 15368
-          },
-          {
-            "context": "type-check (verify:npm-packages)",
-            "integration_id": 15368
-          },
-          {
-            "context": "test-node-versions (22.22.2)",
-            "integration_id": 15368
-          },
-          {
-            "context": "test-node-versions (24.17.0)",
-            "integration_id": 15368
-          },
-          {
-            "context": "test-node-versions (26.3.1)",
-            "integration_id": 15368
-          },
-          {
-            "context": "verify-published",
-            "integration_id": 15368
-          },
-          {
-            "context": "backup-repository-settings",
+            "context": "no-wip-label",
             "integration_id": 15368
           },
           {

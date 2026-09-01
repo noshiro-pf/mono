@@ -12,28 +12,51 @@ on:
       - main
 
   # `synchronize` fires on every push to the pull request's branch, so these
-  # four types cover the pull request's whole life. While it is a draft the
-  # job-level `if` below skips the run; `ready_for_review` is what runs the
-  # checks for real once it stops being one. No `paths` filter here, for the
-  # same reason the steps are gated one at a time — see the `Check diff` step.
+  # types cover the pull request's whole life — a draft included. A draft is
+  # checked like anything else: work in progress is exactly where a CI result
+  # is worth having, and the two mechanisms below are what keep that from
+  # being expensive. `labeled` / `unlabeled` are here so that adding `[WIP]`
+  # stops the checks and taking it off starts them again; `ready_for_review`
+  # is kept as a re-run for a pull request that was opened as a draft before
+  # this arrangement existed. No `paths` filter here, for the same reason the
+  # steps are gated one at a time — see the `Check diff` step.
   pull_request:
     types:
       - opened
       - synchronize
       - reopened
+      - labeled
+      - unlabeled
       - ready_for_review
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# One run per pull request: a push cancels the run still going for the
+# previous one, which is what makes a branch pushed to five times in a row
+# cost one CI result rather than five. Nothing is lost by that on a pull
+# request branch — the `Check diff` gate below diffs against `origin/main`,
+# so the newer run covers every commit the cancelled one would have.
+#
+# `cancel-in-progress` is deliberately an expression rather than a bare
+# `true`. On `main` that same gate diffs against `github.event.before`, so
+# each push's run covers only that push: cancelling the run for X when Y
+# lands would leave the diff X introduced checked by nothing at all. Pushes
+# to `main` therefore run to completion.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Is the branch up to date with `main`? A job of its own because the answer
   # takes an API call, which a job-level `if` cannot make, and because a step
   # cannot skip the job it is in — see branch-up-to-date.yml. It carries the
-  # draft condition as well, so a draft still costs no runner anywhere: this
-  # job is skipped, and the one below it with it.
+  # `[WIP]` condition as well, so a labelled pull request costs no runner
+  # anywhere: this job is skipped, and the one below it with it.
   branch-up-to-date:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: >-
+      github.event_name != 'pull_request' ||
+      !contains(github.event.pull_request.labels.*.name, '[WIP]')
     uses: ./.github/workflows/branch-up-to-date.yml
 
   type-check:
@@ -41,28 +64,32 @@ jobs:
     # Two states are not worth a CI run, and both skip the whole job before a
     # runner is even booted — a job-level `if` is evaluated by GitHub itself.
     #
-    # - A draft pull request is work in progress. The flag arrives in the
-    #   event payload, so this costs nothing, and marking the pull request
-    #   ready for review fires the `ready_for_review` run above, whose checks
-    #   take over.
+    # - A `[WIP]` label on the pull request says its author does not want the
+    #   checks yet. Labels arrive in the event payload, so this costs
+    #   nothing, and taking the label off fires `unlabeled`, which runs
+    #   everything again. Being a draft is deliberately NOT one of these
+    #   states any more — a draft is where a CI result is most useful.
     # - A branch behind `main` is the "This branch is out-of-date with the
     #   base branch" state: it cannot be merged, and the update that clears it
     #   fires `synchronize` and runs everything again — on the commit that
     #   will actually be merged, which this one is not.
     #
     # The skipped conclusion satisfies a required status check in both cases.
-    # In both cases something else holds the merge: the draft flag, and the
-    # ruleset's `strict_required_status_checks_policy`.
+    # For an out-of-date branch the ruleset's
+    # `strict_required_status_checks_policy` still holds the merge. `[WIP]`
+    # holds nothing — GitHub has no label-based merge block — so it is a
+    # label to take off before merging rather than a guard rail, which is the
+    # one thing it does less well than the draft flag it replaces.
     #
     # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
     # that failed to answer leaves `should_run` empty: failing open costs a CI
     # run, failing closed would skip every check on the pull request while
-    # reporting the required ones as satisfied. The draft condition is
+    # reporting the required ones as satisfied. The `[WIP]` condition is
     # repeated here because `!cancelled()` also lifts the automatic skip that
     # a skipped dependency would otherwise give us.
     if: >-
       !cancelled() &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
       needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -178,3 +205,59 @@ jobs:
       - name: Upload coverage reports to Codecov
         if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+
+  # The one required status check for this workflow. Everything above still
+  # reports its own check run and is still worth reading, but none of them is
+  # required any more, because a required context can be satisfied by a run
+  # that never happened. Two ways, both measured on this repository:
+  #
+  # - A job GitHub skips produces exactly one check run, named after the
+  #   *job* (`type-check`) — never the matrix contexts
+  #   (`type-check (check:root)`, …). Those contexts are not superseded, so
+  #   they keep whatever they last said on that commit: a green from an
+  #   earlier run stays green, and the pull request reads as fully checked
+  #   while nothing ran.
+  # - A skipped job whose check run name *is* the required context — a job
+  #   with no matrix, as `verify-published` and `backup-repository-settings`
+  #   are — reports `skipped`, and GitHub counts a skipped required check as
+  #   satisfied.
+  #
+  # This job closes both. Its name does not depend on a matrix, so every run
+  # supersedes the last, and `if: always()` means it reports whatever
+  # happened above rather than being skipped along with it. "Skipped" cannot
+  # be read as "passed" here.
+  type-check-result:
+    needs:
+      - branch-up-to-date
+      - type-check
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Require the checks above to have passed
+        env:
+          # Empty when the gate was skipped (`[WIP]`) or failed to answer.
+          SHOULD_RUN: ${{ needs.branch-up-to-date.outputs.should_run }}
+          RESULT: ${{ needs.type-check.result }}
+        run: |
+          # The one skip that is not a failure. A branch behind `main` cannot
+          # be merged as it stands — `strict_required_status_checks_policy`
+          # holds it — and the update that clears it runs everything again on
+          # the commit that will actually be merged. Every other non-success,
+          # `[WIP]` included, means the checks did not run on this head and
+          # must not read as passing.
+          if [ "${SHOULD_RUN}" = 'false' ]; then
+            echo 'The branch is behind the base branch, so the checks were skipped. They run again once it is updated.'
+            exit 0
+          fi
+
+          if [ "${RESULT}" = 'success' ]; then
+            echo 'The checks passed.'
+            exit 0
+          fi
+
+          summary="The checks did not pass on this commit (result: ${RESULT}). A \`[WIP]\` label skips them; take the label off to run them."
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+          exit 1
