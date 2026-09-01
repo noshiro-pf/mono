@@ -2166,3 +2166,15 @@ opt-in のたびに 1 件ずつ直してきた。
 | `react-utils-styled` ・ `tiny-router-react-hooks` ・ `resize-observer-react-hooks` ・ `poll-discord-app` | 0 件（`main` の上でそのまま） |
 | `event-schedule-app-shared`                                                                              | 1 件、#1784 待ち              |
 | `lambda-calculus-interpreter-react`                                                                      | 6 件、#1781 待ち              |
+
+## `poll-discord-app` の opt-in（2026-09-01）
+
+20 パッケージ目、`apps/` 側の 9 つ目。**型・lint とも初回から 0 件**。
+
+`tsconfig.node-only.json` を継承する Node 側のアプリで、`discord.js` と
+`fs` / `path` を直接使うが、strict lib で落ちるところは無かった。
+**`apps/` で `paths` を一切持たない最初のパッケージ**でもあり、
+依存のソースを巻き込まないぶん測定は素直だった。
+
+`tsconfig.json` に `compilerOptions` が無かったのでブロックごと足し、
+`test/` を作って `include` に加えてある。`test` スクリプトは無い。
