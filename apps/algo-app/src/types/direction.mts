@@ -1,0 +1,8 @@
+import * as t from 'ts-fortress';
+
+export const NWESTypeDef = t.enumType(['N', 'W', 'E', 'S'], {
+  defaultValue: 'S',
+  typeName: 'NWES',
+});
+
+export type NWES = t.TypeOf<typeof NWESTypeDef>;

@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 51 個。
+このリポジトリの workspace パッケージは 52 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -12,6 +12,7 @@
 
 ```mermaid
 graph LR
+  algo_app["algo-app"]
   annotation_tool["annotation-tool"]
   blueprintjs_playground["blueprintjs-playground"]
   blueprintjs_playground_styled["blueprintjs-playground-styled"]
@@ -63,6 +64,15 @@ graph LR
   ts_repo_utils["ts-repo-utils"]
   ts_std_forge["ts-std-forge"]
   ts_type_forge["ts-type-forge"]
+  algo_app --> better_preact_use_state
+  algo_app --> preact_utils
+  algo_app --> resize_observer_preact_hooks
+  algo_app --> synstate
+  algo_app --> synstate_preact_hooks
+  algo_app --> tiny_router_observable
+  algo_app --> ts_data_forge
+  algo_app --> ts_fortress
+  algo_app --> ts_utils_additional
   annotation_tool --> better_react_use_state
   annotation_tool --> react_utils
   annotation_tool --> synstate
@@ -232,7 +242,7 @@ graph LR
 |    2 | `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                         |
 |    3 | `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
 |    4 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                              |
-|    5 | `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                |
+|    5 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                    |
 |    6 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                                    |
 |    7 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                                        |
 
@@ -244,6 +254,8 @@ graph LR
 
 | パッケージ                           | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :----------------------------------- | :--- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `algo-app`                           | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`resize-observer-preact-hooks`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                     |
+| `algo-app`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `annotation-tool`                    | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                |
 | `annotation-tool`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `blueprintjs-playground`             | dep  | `react-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -342,7 +354,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-51 / 51 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+52 / 52 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

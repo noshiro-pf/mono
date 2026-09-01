@@ -246,6 +246,85 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3(supports-color@7.2.0)
 
+  apps/algo-app:
+    dependencies:
+      better-preact-use-state:
+        specifier: workspace:*
+        version: link:../../libs/better-preact-use-state
+      firebase:
+        specifier: ^12.18.0
+        version: 12.18.0
+      goober:
+        specifier: ^2.1.16
+        version: 2.1.19(csstype@3.2.3)
+      immer:
+        specifier: ^11.1.18
+        version: 11.1.18
+      preact-utils:
+        specifier: workspace:*
+        version: link:../preact-utils
+      resize-observer-preact-hooks:
+        specifier: workspace:*
+        version: link:../resize-observer-preact-hooks
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
+      synstate-preact-hooks:
+        specifier: workspace:*
+        version: link:../../libs/synstate-preact-hooks
+      tiny-router-observable:
+        specifier: workspace:*
+        version: link:../tiny-router-observable
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/ts-fortress
+      ts-utils-additional:
+        specifier: workspace:*
+        version: link:../ts-utils-additional
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      preact:
+        specifier: 'catalog:'
+        version: 10.29.8(preact-render-to-string@6.7.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.12
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+
   apps/annotation-tool:
     dependencies:
       '@blueprintjs/core':

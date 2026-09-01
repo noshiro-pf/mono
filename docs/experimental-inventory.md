@@ -344,7 +344,7 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 
 ### Preact 側は utils 4 つが前提になる
 
-`algo-app`（5033）・~~`mahjong-calculator-app`（2428）~~・~~`my-portfolio-app-preact`
+~~`algo-app`（5033）~~・~~`mahjong-calculator-app`（2428）~~・~~`my-portfolio-app-preact`
 （1244）~~・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
 ~~`preact-utils`~~（472）・~~`tiny-router-preact-hooks`~~（140）・~~`better-preact-use-state`~~
 （74）・~~`resize-observer-preact-hooks`~~（55）が先に要る。合計 741 行で、いずれも
@@ -1022,7 +1022,7 @@ Preact の同名の型は `JSX` 名前空間側が `@deprecated`（#1750 の
 
 ### 残りの Preact app
 
-utils が 4 つとも揃ったので、`algo-app`（5033）・`mahjong-calculator-app`
+utils が 4 つとも揃ったので、~~`algo-app`（5033）~~・`mahjong-calculator-app`
 （2428）・`my-portfolio-app-preact`（1244）が着手可能になる。ただし
 `my-portfolio-app-preact` は `preact-media-hook` という別の npm 依存も要る。
 `slack-app` は中身が無いので復元しない（#1770）。
@@ -1572,3 +1572,69 @@ PixiJS のシーングラフは**その場で書き換える**ものなので、
 
 なお **codemod は既に適用した変換を後から取り消さない**ので、
 directive を足したら一度 revert してから掛け直す必要がある。
+
+## `algo-app` の復元（2026-09-01）
+
+`experimental/` からの復元の**最後の 1 つ**。122 ファイル・5033 行で、
+型エラーは **746 件**から始まった。#1778 に `getShuffled` と
+`PermutationString` を足した上に積んである。
+
+### firebase は障害ではなかった
+
+移植元は `firebase@^11.6.1` を宣言しているが、**使っているのは v9 で入った
+モジュラー API**（`initializeApp` ・ `getFirestore` ・ `collection` ・ `doc` ・
+`addDoc` ・ `updateDoc` ・ `onSnapshot` ・ `query` ・ `orderBy` ・
+`serverTimestamp` ・ `arrayUnion`）で、これは現行の v12 でもそのまま通る。
+PixiJS（#1782）とは違い MUI（#1777）と同じ扱いで、現行版をそのまま入れた。
+使用箇所も 5 ファイルに閉じている。
+
+### `.chain` の移行先は受け手で決まる
+
+#1780 で「observable は `.pipe`、`pipe()` は `.map`」と書いたが、このアプリは
+両方が混在していて、**一括置換すると 14 箇所が壊れた**。見分けは引数が
+synstate のオペレータ呼び出しかどうかで、それで機械的に直せる。
+
+### 後継が無かったもの
+
+| 移植元                           | 現行                                                    |
+| :------------------------------- | :------------------------------------------------------ |
+| `createEventEmitter<T>()`        | ペイロード無しになった。型付きは `source<T>()` + `next` |
+| `fromArray(xs)`                  | 後継無し                                                |
+| `match(0, {...})`                | `Case extends string` になり、数値キーは使えない        |
+| `validationErrorMessage(v, msg)` | `createPrimitiveValidationError({...})`                 |
+| `Type` を手書き                  | `prune` が必須になった。`createType` が補う             |
+
+`fromArray` は auto play で `zip(interval(…), fromArray(actions))` として
+使われていた。`counter → skip → take → scan → actions[i]` に書き換えて、
+同じ順序で同じ値を流すようにしてある（`skip` はタイマー自身の値をずらすので、
+添字は `scan` で別に数える必要がある）。
+
+`match` の数値キー 2 箇所のうち 1 つは、**4 つの分岐がすべて同じ式で
+マッチした値を代入しただけ**だったので 1 行に畳めた。もう 1 つは `switch`。
+
+### `Object.fromEntries` はキーの型を消す
+
+`Object.fromEntries(Arr.map(['N','W','E','S'], …))` の結果は index signature に
+なり、読み出しが全部 `| undefined` になる。キーごとに書けば型が残り、
+**4 件のエラーが一度に消えた**。
+
+### `lint:fix` がまた推論を壊した
+
+#1779 と同じ、`.map((list) => Arr.map(list, f))` → `.map(Arr.map(f))` の
+書き換え。今回は 2 ファイル。**ルールと戦うのではなく、書き換える対象が
+残らない形**（素の `Arr.map(xs, f)`）にしてある。
+
+### ルールが 2 つ噛み合わない箇所が 2 つあった
+
+- `preact.CSSProperties` を spread すると `no-misused-spread`（index signature
+  を iterable と見なす）。`Object.assign` に替えると今度は
+  `prefer-object-spread`。**具体的なオブジェクト型を定義**して両方を回避した。
+- goober の `StyledDiv` を受ける関数は `prefer-readonly-parameter-types` に
+  当たるが、`Readonly<StyledDiv>` を `styled()` は受け取らない。
+  #1782 と同じく、そのファイルだけ off にしてある。
+
+### 直したバグが 1 つ
+
+`firestoreTimestampTypeDef` の判定が**反転していた** — `a instanceof FieldValue`
+のときに `Result.err` を返し、それ以外を通していた。`validate` を書き直す際に
+明らかになったので直してある。

@@ -323,6 +323,13 @@
       "ignoreDependencies": ["@blueprintjs/icons", "normalize.css"],
     },
 
+    // Not an Astro site like the entry below assumes: a Vite Preact app whose
+    // entry is the module `index.html` would load.
+    "apps/algo-app": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/ts-utils-additional": {
       "entry": ["src/index.mts"],
