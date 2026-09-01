@@ -2149,3 +2149,20 @@ opt-in のたびに 1 件ずつ直してきた。
 `./test` を足して probe を置いた。このパッケージには `test` スクリプトが
 あるが、vitest の `include` は `src/**/*.test.mts` なので probe は拾われない
 （拾われても型レベルの表明なので実行するものが無い）。
+
+## `react-utils` の opt-in（2026-09-01）
+
+19 パッケージ目、`apps/` 側の 8 つ目。**型・lint とも初回から 0 件**。
+
+`tsconfig.json` の `paths` で `better-react-use-state` をソースから解決して
+いるので、#1786 で書いたとおり**依存のソースにも strict lib が適用される**。
+それでも 0 件だったので、`libs/better-react-use-state`（#1755 で opt-in 中）の
+ソースは既に strict lib で通ることが分かる。**依存の opt-in を待つ必要は無い。**
+
+`apps/` の残りは以下のとおりで、いずれも自前の修正は要らない。
+
+| パッケージ                                                                                               | 状況                          |
+| :------------------------------------------------------------------------------------------------------- | :---------------------------- |
+| `react-utils-styled` ・ `tiny-router-react-hooks` ・ `resize-observer-react-hooks` ・ `poll-discord-app` | 0 件（`main` の上でそのまま） |
+| `event-schedule-app-shared`                                                                              | 1 件、#1784 待ち              |
+| `lambda-calculus-interpreter-react`                                                                      | 6 件、#1781 待ち              |
