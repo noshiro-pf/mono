@@ -1,6 +1,7 @@
 import { Tab, Tabs } from '@mui/material';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import * as React from 'react';
+import { memoNamed } from 'react-utils';
+import { Num, Result } from 'ts-data-forge';
 
 type Props = Readonly<{
   tabIndex: number;
@@ -12,9 +13,10 @@ type Props = Readonly<{
 export const MuiTabs = memoNamed<Props>(
   'MyTabs',
   ({ tabIndex, tabIndexChange, labels, scrollable = false }) => {
-    const onChange = useCallback(
+    const onChange = React.useCallback(
       (_event: unknown, value: string) => {
-        const idx = Number.parseInt(value, 10);
+        const idx = Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN);
+
         if (!Number.isNaN(idx)) {
           tabIndexChange(idx);
         }
