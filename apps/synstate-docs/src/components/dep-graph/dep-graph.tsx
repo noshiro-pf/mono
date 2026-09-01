@@ -53,7 +53,7 @@ export const DepGraph = React.memo<Props>((props) => {
   const svgStyle = React.useMemo<React.CSSProperties>(
     () => ({
       width: '100%',
-      maxWidth: `${String(svgWidth + pad * 2)}px`,
+      maxWidth: `${(svgWidth + pad * 2).toString()}px`,
       height: 'auto',
     }),
     [svgWidth, pad],
@@ -63,7 +63,7 @@ export const DepGraph = React.memo<Props>((props) => {
     <svg
       role={'img'}
       style={svgStyle}
-      viewBox={`${String(-pad)} ${String(-pad)} ${String(svgWidth + pad * 2)} ${String(svgHeight + pad * 2)}`}
+      viewBox={`${(-pad).toString()} ${(-pad).toString()} ${(svgWidth + pad * 2).toString()} ${(svgHeight + pad * 2).toString()}`}
     >
       <defs>
         <marker
@@ -435,7 +435,7 @@ const buildEdgePath = (params: EdgeParams): string => {
   const { points, tangents, startAnchor } = resolveEdgeGeometry(params);
 
   const mut_parts: string[] = [
-    `M ${String(startAnchor.x)} ${String(startAnchor.y)}`,
+    `M ${startAnchor.x.toString()} ${startAnchor.y.toString()}`,
   ];
 
   for (const i of range(0, asSafeUint(points.length - 1))) {
@@ -460,7 +460,7 @@ const buildEdgePath = (params: EdgeParams): string => {
     );
 
     mut_parts.push(
-      `C ${String(cx1)} ${String(cy1)}, ${String(cx2)} ${String(cy2)}, ${String(p1.x)} ${String(p1.y)}`,
+      `C ${cx1.toString()} ${cy1.toString()}, ${cx2.toString()} ${cy2.toString()}, ${p1.x.toString()} ${p1.y.toString()}`,
     );
   }
 
