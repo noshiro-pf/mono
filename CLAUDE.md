@@ -282,21 +282,86 @@ commands run those across every workspace member that defines them, and the
 
 ## Required status checks
 
-**Every matrix entry in the five check workflows is a required status check,
-and the list of them is maintained by hand** in the `required_status_checks`
-rule of `repo-settings/rulesets/main.json`. A matrix entry added without its
-context added there runs, reports, and blocks nothing — which is how
-`style-check (strict-lib:fmt)`, `style-check (docs:deps)`,
-`type-check (strict-lib:type-check)` and `type-check (strict-lib:lint)` sat
-unenforced. Three of those four run a command and then assert the tree is
-clean, so what an unenforced one lets through is generated output drifting
-from its generator, on `main`, with a green pull request.
+**Seven contexts are required, and none of them is a job that does work.** The
+list lives in the `required_status_checks` rule of
+`repo-settings/rulesets/main.json`:
 
-The context is the job's name with its matrix value in parentheses —
-`style-check (docs:deps)` — or the bare job name where there is no matrix
-(`verify-published`, `backup-repository-settings`), or the job's `name:` where
-it sets one (`Validate PR title`). So adding a matrix entry is two edits, not
-one.
+| context                             | comes from                                            |
+| :---------------------------------- | :---------------------------------------------------- |
+| `type-check-result`                 | the aggregate job in `type-check.yml`                 |
+| `style-check-result`                | the aggregate job in `style-check.yml`                |
+| `test-node-versions-result`         | the aggregate job in `node-version-compatibility.yml` |
+| `verify-published-result`           | the aggregate job in `verify-published-packages.yml`  |
+| `backup-repository-settings-result` | the aggregate job in `backup-repository-settings.yml` |
+| `no-wip-label`                      | `wip-label.yml`                                       |
+| `Validate PR title`                 | `lint-pull-request.yml`                               |
+
+**A required context is a string matched exactly against the name of a check
+run on the pull request's head commit**, and nothing more — GitHub does not
+know which workflow is supposed to produce it. A name it does not find reads
+as "Expected — waiting for status to be reported" and blocks the merge;
+`success`, `skipped` and `neutral` all satisfy it; where a name appears more
+than once on the commit, the most recent one wins. What Actions names a check
+run is the job's `name:` where it sets one, else `<job id> (<matrix values>)`
+for a matrix job, else the bare job id — and `<caller job id> / <called job
+id>` for a reusable workflow.
+
+**The matrix entries used to be the required contexts, and that let a run that
+never happened satisfy them.** Both ways were measured on this repository:
+
+- **A skipped job does not expand its matrix.** A `type-check` job that a
+  job-level `if` skips produces one check run named `type-check` — not the
+  eleven `type-check (…)` contexts. Nothing supersedes those, so they keep
+  whatever they last said: a pull request that was green and then had `[WIP]`
+  added still had all 22 matrix contexts reading `success`, with every
+  required check satisfied.
+- **A skipped job with no matrix reports the required context itself.** Its
+  check run is named `verify-published`, which _is_ the context, with
+  conclusion `skipped` — which counts as satisfied.
+
+So each check workflow now ends with an aggregate job — `if: always()`,
+`needs:` the gate and the matrix job — whose only step asserts
+`needs.<job>.result == 'success'`. Having no matrix its name is stable, so
+every run supersedes the last; being `always()` it reports rather than being
+skipped along with the work. "Skipped" cannot read as "passed" there.
+
+Two cases are carved out, in the job-level `if` rather than in the step, so
+that the aggregate reports `skipped` for them — grey, and satisfying the
+required check — rather than red. A pull request nobody is checking yet
+should read grey, not broken. What holds the merge is a different check in
+each case:
+
+| carve-out                                               | what holds the merge instead                                                             |
+| :------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
+| `[WIP]` on the pull request                             | `no-wip-label` — see below                                                               |
+| `needs.branch-up-to-date.outputs.should_run` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything |
+
+**`no-wip-label` is therefore load-bearing, not decorative.** It is the only
+thing that stops a labelled pull request from merging. Deleting
+`wip-label.yml`, or dropping its context from `main.json`, leaves `[WIP]`
+skipping every check with nothing holding the merge — which is the exact hole
+the aggregates were added to close. The two are one mechanism. See the note on
+`type-check-result` in `type-check.yml`.
+
+Consequences worth knowing:
+
+- **Adding a matrix entry is now one edit, not two.** The old arrangement
+  needed the context added to `main.json` by hand as well, and an entry added
+  without it ran, reported, and blocked nothing — which is how
+  `style-check (strict-lib:fmt)`, `style-check (docs:deps)`,
+  `type-check (strict-lib:type-check)` and `type-check (strict-lib:lint)` sat
+  unenforced. Three of those four run a command and then assert the tree is
+  clean, so what an unenforced one let through was generated output drifting
+  from its generator, on `main`, with a green pull request. A new matrix entry
+  is covered the moment it exists.
+- **Adding a job is still two edits.** A new check workflow needs its
+  aggregate's context added to `main.json`, and so does any job that is not
+  behind an aggregate.
+- **A red aggregate does not name what failed.** The matrix contexts still
+  report and still appear on the pull request; they are simply not what the
+  ruleset reads. Open the run to see which entry went red.
+- **Keep the matrix jobs behind an aggregate.** A matrix job whose context was
+  made required directly would bring the first failure mode straight back.
 
 `branch-up-to-date / check` is deliberately **not** required. It is a gate
 that fails open — the jobs waiting on it use `!cancelled()` and
@@ -314,13 +379,13 @@ rewrites both the root file and `bk/`.
 ## CI diff gates
 
 The check workflows carry no `paths` filter. A workflow that a path filter
-skips never reports a status check, and most of these jobs are required ones,
-so a pull request that changed only the filtered paths would wait forever on a
-check that never arrives. Each job instead carries a `Check diff` step and
+skips never reports a status check, and each of these contributes a required
+one through its aggregate job, so a pull request that changed only the
+filtered paths would wait forever on a check that never arrives. Each job instead carries a `Check diff` step and
 every later step carries
 `if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
 does no work. Two more gates sit in front of the whole job — see "Check
-triggers, drafts and out-of-date branches".
+triggers, `[WIP]` and out-of-date branches".
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -348,94 +413,148 @@ Two things to keep in mind when editing a gated workflow:
   which is empty and reads as "nothing changed" — every step would skip. Each
   gate therefore compares against `github.event.before` on `main`.
 - A step added _before_ the `Check diff` step needs no condition of its own —
-  the draft and out-of-date gates are job-level `if`s, not steps; one added
+  the `[WIP]` and out-of-date gates are job-level `if`s, not steps; one added
   _after_ it carries `should_run` like the rest.
 
 `verify-published-packages.yml` gates itself on the same principle but in
 shell, because its gate runs before Node.js is installed.
 
-## Check triggers, drafts and out-of-date branches
+## Check triggers, `[WIP]` and out-of-date branches
 
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
-`backup-repository-settings.yml` — trigger on
-`pull_request: types: [opened, synchronize, reopened, ready_for_review]`, and
-on `push` only for `main`. One event kind per commit is what keeps the checks
-list at one entry per job: triggering on `push` for branches as well would put
-a push run and a `pull_request` run side by side on every pull request.
-Nothing is lost by leaving `push` out — `synchronize` fires on every push to a
-branch with an open pull request, `opened` covers the pushes made before it
-existed, and a branch that never gets a pull request has nothing to protect,
-because the `main` ruleset accepts changes through pull requests only. The
-`push` runs on `main` re-check what actually landed, a squash merge being a
-new commit that no pull request run has seen.
+`backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
+synchronize, reopened, labeled, unlabeled, ready_for_review]`, and on `push`
+only for `main`. One event kind per commit is what keeps the checks list at one
+entry per job: triggering on `push` for branches as well would put a push run
+and a `pull_request` run side by side on every pull request. Nothing is lost by
+leaving `push` out — `synchronize` fires on every push to a branch with an open
+pull request, `opened` covers the pushes made before it existed, and a branch
+that never gets a pull request has nothing to protect, because the `main`
+ruleset accepts changes through pull requests only. The `push` runs on `main`
+re-check what actually landed, a squash merge being a new commit that no pull
+request run has seen.
 
-Draft pull requests run nothing: every job carries
+`wip-label.yml` rides along with the same trigger list. It is not a check
+workflow — it runs nothing and reads nothing — but it is what makes the
+`[WIP]` label hold the merge; see below.
+
+**A draft pull request is checked like any other.** Work in progress is where a
+CI result is most useful, so being a draft skips nothing: the
+`github.event.pull_request.draft == false` clause every job used to carry is
+gone, and with it `/run-checks`, an `issue_comment` workflow whose only purpose
+was to reach a draft's checks by hand. `ready_for_review` stays in the trigger
+list as a re-run for pull requests opened as drafts before this arrangement
+existed. Two cheaper mechanisms took over the work of not spending CI on runs
+nobody will read.
+
+### A push cancels the run still going for the previous one
+
+Every check workflow carries
 
 ```yaml
-if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 ```
 
-— the `branch-up-to-date` gate below as it stands, the jobs that wait on it as
-one clause of a longer condition. The draft flag arrives in the event payload,
-so there is no API lookup, and a job-level `if` is evaluated by GitHub itself,
-so no runner is booted — the checks just report `skipped`. Three things to
-know about that state:
+so a branch pushed to five times in a row costs one CI result rather than five.
+Nothing is lost on a pull request branch: the `Check diff` gate diffs against
+`origin/main`, so the newer run covers every commit the cancelled one would
+have.
 
-- **A skipped job satisfies a required status check.** What blocks merging a
-  draft is the draft itself, which GitHub refuses to merge natively. Marking
-  the pull request ready for review fires `ready_for_review`, and the real
-  run's checks take over; for the few seconds before they register, the
-  required checks read as satisfied. Auto-merge cannot be armed on a draft, so
-  closing that window was judged not worth the alternative — a gate job that
-  cancels its own run on every draft push, costing a runner boot each time.
-- **Do not make a draft report success instead.** The previous design gated
-  every step on an API lookup and let the job report green while a draft:
-  green checks that stood for work that never happened, one booted runner per
-  matrix entry per push, and a doubled checks list, since the `push` and
-  `ready_for_review` runs sat side by side.
-- **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
-  only `pull_request` events; asking for the checks by hand is asking for them
-  regardless of the pull request's state.
+- **`cancel-in-progress` is an expression, not a bare `true`.** On `main` that
+  same gate diffs against `github.event.before`, so a push's run covers only
+  that push. Cancelling the run for X when Y lands would leave the diff X
+  introduced — possibly the only diff a given check had anything to say about —
+  read by nothing at all. Pushes to `main` therefore run to completion.
+- **The group keys on the pull request number** where there is one, so a
+  `workflow_dispatch` run asked for by hand lands in a different group from the
+  pull request's own runs and the two do not cancel each other.
 
-A branch behind `main` runs nothing either — the state the pull request page
-calls "This branch is out-of-date with the base branch". The ruleset sets
-`strict_required_status_checks_policy`, so the required checks have to pass on
-a head that already contains main's tip: the branch cannot merge as it stands,
-and the update that clears it fires `synchronize` and runs everything again on
-the commit that will actually be merged. The run before that update produces a
-result nothing can use, which is the draft argument exactly, down to the
-`skipped` conclusion and to what holds the merge meanwhile being something
-other than the checks.
+### A `[WIP]` label skips the checks; taking it off starts them again
 
-Being behind is not in the event payload — `mergeable_state` arrives as
-`unknown` on the `synchronize` that triggered the run — and a job-level `if`
-cannot make an API call. So each check workflow opens with one small job that
-can, `branch-up-to-date.yml` through `workflow_call`, and every other job in
-the workflow waits on its answer:
+Where the draft flag used to say "not yet", a label does — and says it on its
+own, rather than by borrowing a state GitHub attaches other meanings to:
 
 ```yaml
 jobs:
     branch-up-to-date:
-        if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+        if: >-
+            github.event_name != 'pull_request' ||
+            !contains(github.event.pull_request.labels.*.name, '[WIP]')
         uses: ./.github/workflows/branch-up-to-date.yml
 
     type-check:
         needs: branch-up-to-date
         if: >-
             !cancelled() &&
-            (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+            (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
             needs.branch-up-to-date.outputs.should_run != 'false'
 ```
+
+Labels arrive in the event payload, so there is no API lookup, and a job-level
+`if` is evaluated by GitHub itself, so no runner is booted — the checks just
+report `skipped`. What to know about that:
+
+- **`labeled` and `unlabeled` both have to be in the trigger list.** Adding the
+  label fires `labeled`, whose run skips; removing it fires `unlabeled`, and
+  that is the only thing that starts the checks again on a commit already
+  pushed. A list with `labeled` alone gives a label that goes on and never
+  comes off.
+- **The label does not hold the merge by itself; `wip-label.yml` does.**
+  GitHub refuses to merge a draft natively and has no equivalent for a label,
+  and a skipped job can satisfy a required status check — a pull request that
+  was green and then had `[WIP]` added was measured with all 22 matrix
+  contexts still reading `success`. So the label comes with a required check
+  of its own, `no-wip-label`, which runs only while the label is on and does
+  nothing but fail. With the label off the job is skipped, and having no
+  matrix its check run is named `no-wip-label` — the required context itself —
+  and reported `skipped`, which satisfies it at the cost of no runner at all.
+  A `no-wip-label` reading `skipped` therefore means "no label, nothing to
+  block", not "this check does nothing".
+- **It is the only thing that blocks a labelled pull request**, because the
+  `*-result` aggregates carve `[WIP]` out and report `skipped` for it rather
+  than red — see "Required status checks". One red check that names its
+  reason, rather than six that have to be interpreted.
+- **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
+  only `pull_request` events; asking for the checks by hand is asking for them
+  regardless of the pull request's state.
+- **Do not make a skipped state report success instead.** An older design gated
+  every step on an API lookup and let the job report green while a pull request
+  was a draft: green checks that stood for work that never happened, and one
+  booted runner per matrix entry per push.
+- **The label is not declared anywhere in this repository.**
+  `repo-settings/` covers repository settings, rulesets and Pages, not labels,
+  so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
+  turns the skipping off — though not the blocking, since `no-wip-label` reads
+  the same string and would simply stop matching too. The one place the string
+  is written down is the workflows; change it in all six or in none.
+
+### A branch behind `main` runs nothing either
+
+That is the state the pull request page calls "This branch is out-of-date with
+the base branch". The ruleset sets `strict_required_status_checks_policy`, so
+the required checks have to pass on a head that already contains main's tip:
+the branch cannot merge as it stands, and the update that clears it fires
+`synchronize` and runs everything again on the commit that will actually be
+merged. The run before that update produces a result nothing can use — and,
+unlike `[WIP]`, the thing that holds the merge meanwhile is the ruleset rather
+than a convention.
+
+Being behind is not in the event payload — `mergeable_state` arrives as
+`unknown` on the `synchronize` that triggered the run — and a job-level `if`
+cannot make an API call. So each check workflow opens with one small job that
+can, `branch-up-to-date.yml` through `workflow_call`, and every other job in
+the workflow waits on its answer (see the `needs:` in the snippet above).
 
 What that shape is for:
 
 - **One job, not a step in each job.** A step cannot skip the job it is in, so
   a step-level gate would boot every runner in the matrix — eleven of them in
   `type-check.yml` — to decide it had nothing to do. The gate job costs one
-  boot per workflow run and skips the rest before they start. The draft note
-  above rules a gate job out for drafts, but that is a case where the answer
-  is free; this one has no free way to ask.
+  boot per workflow run and skips the rest before they start. The `[WIP]` gate
+  needs no job of its own because its answer is free.
 - **A reusable workflow, not the same shell copied five times.** One answer,
   one place to change it — the same reason the diff gate's path lists live in
   the root `package.json`. The price is one more entry in the checks list per
@@ -445,24 +564,15 @@ What that shape is for:
   answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
   jobs from being skipped along with it. Failing open costs a CI run; failing
   closed would skip every check on the pull request while reporting the
-  required ones as satisfied. The draft clause is repeated in the longer
+  required ones as satisfied. The `[WIP]` clause is repeated in the longer
   condition because `!cancelled()` also lifts the automatic skip that a
   skipped dependency would otherwise give.
 - **Only the default branch.** The gate compares against
   `github.event.pull_request.base.ref` and skips only when it is the
   repository's default branch. Nowhere else does being behind block a merge,
   so nowhere else does an update that re-runs the checks have to come.
-- **`push` and `workflow_dispatch` are exempt**, as they are from the draft
+- **`push` and `workflow_dispatch` are exempt**, as they are from the `[WIP]`
   gate, and for the same reason.
-
-A pull request that either gate skips can still get one full CI result as it
-is — without being marked ready for review, and without updating its branch:
-commenting `/run-checks` on it (write access required) runs `run-checks.yml`,
-which dispatches all five workflows for the pull request's branch through that
-`workflow_dispatch` exemption. The runs attach their check runs to the
-branch's head commit, so the results appear on the pull request.
-Being an `issue_comment` workflow, the copy of `run-checks.yml` on `main` is
-what runs — edits to it take effect only once merged.
 
 The design leans on the `main` ruleset
 (`repo-settings/rulesets/main.json`): merging into `main` requires a pull

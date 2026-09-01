@@ -10,10 +10,13 @@ name: Branch Up To Date
 # on a head that already contains main's tip; updating the branch fires
 # `synchronize` and runs every check again on the commit that will actually be
 # merged. The run happening before that update is therefore a run whose result
-# nothing can use — the same reasoning that skips a draft, and the same
-# outcome: the jobs report `skipped`, which satisfies a required status check,
-# and what keeps the pull request from merging meanwhile is the out-of-date
-# state itself.
+# nothing can use: the jobs report `skipped`, which satisfies a required
+# status check, and what keeps the pull request from merging meanwhile is the
+# out-of-date state itself.
+#
+# This is the last of the gates that skip a whole run. The draft one is gone —
+# a draft is where a CI result is most useful — and the `[WIP]` label that
+# replaced it is a job-level `if` in each caller, needing no API call.
 #
 # Why a workflow of its own:
 #
@@ -70,10 +73,10 @@ jobs:
             exit 0
           }
 
-          # `push` and `workflow_dispatch` are exempt, exactly as they are from
-          # the draft gate: there is no pull request to be behind anything, and
-          # asking for the checks by hand is asking for them regardless of the
-          # branch's state — which is what `/run-checks` does.
+          # `push` and `workflow_dispatch` are exempt, exactly as they are
+          # from the `[WIP]` gate: there is no pull request to be behind
+          # anything, and asking for the checks by hand from the Actions tab
+          # is asking for them regardless of the branch's state.
           if [ "${GITHUB_EVENT_NAME}" != 'pull_request' ]; then
             run_the_checks "Not a pull request event (${GITHUB_EVENT_NAME}): there is no base branch to be behind."
           fi

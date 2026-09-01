@@ -1,0 +1,55 @@
+name: WIP Label
+
+# `[WIP]` on a pull request skips the five check workflows — see the note in
+# type-check.yml. GitHub has no label-based merge block, so on its own the
+# label would leave a pull request that nothing checked looking exactly like
+# one that passed. This is the block: a required status check that fails for
+# as long as the label is on.
+#
+# It is the *only* thing that blocks a labelled pull request. The `*-result`
+# aggregates in the check workflows deliberately report `skipped` rather than
+# red while the label is on — a pull request nobody is checking yet should
+# read grey, not broken — and a skipped required check is satisfied. So the
+# blocking is concentrated here, in one check that names its reason. Removing
+# this workflow, or its `no-wip-label` context from
+# `repo-settings/rulesets/main.json`, would leave `[WIP]` skipping every check
+# with nothing holding the merge at all.
+#
+# No `push` trigger: the required checks are evaluated when a pull request
+# merges, and the `main` ruleset accepts no other way onto the branch.
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+      - ready_for_review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+jobs:
+  no-wip-label:
+    # Runs only while the label is on, and does nothing but fail. Without the
+    # label the job is skipped — and because it has no matrix, the check run
+    # GitHub creates for a skipped job is named `no-wip-label`, which is the
+    # required context itself, reported as `skipped` and so satisfied. That
+    # is the same mechanism that makes a skipped `verify-published` read as
+    # passing; here it is what we want, and it costs no runner at all.
+    if: contains(github.event.pull_request.labels.*.name, '[WIP]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Refuse to merge while `[WIP]` is on the pull request
+        run: |
+          summary='The `[WIP]` label is on this pull request, so the checks were skipped. Take the label off: removing it fires `unlabeled` and runs them.'
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+          exit 1
