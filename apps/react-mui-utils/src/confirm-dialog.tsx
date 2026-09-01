@@ -5,8 +5,8 @@ import {
   DialogContent,
   Typography,
 } from '@mui/material';
-import { memoNamed } from '@noshiro/react-utils';
-import { useCallback } from 'react';
+import * as React from 'react';
+import { memoNamed } from 'react-utils';
 
 type Props = Readonly<{
   message: string;
@@ -18,15 +18,15 @@ type Props = Readonly<{
 export const ConfirmDialog = memoNamed<Props>(
   'ConfirmDialog',
   ({ message, isOpen, onClose }) => {
-    const onCloseDefault = useCallback(() => {
+    const onCloseDefault = React.useCallback(() => {
       onClose('no');
     }, [onClose]);
 
-    const cancelClicked = useCallback(() => {
+    const cancelClicked = React.useCallback(() => {
       onClose('no');
     }, [onClose]);
 
-    const okClicked = useCallback(() => {
+    const okClicked = React.useCallback(() => {
       onClose('yes');
     }, [onClose]);
 

@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 47 個。
+このリポジトリの workspace パッケージは 48 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -29,6 +29,7 @@ graph LR
   poll_discord_app["poll-discord-app"]
   preact_utils["preact-utils"]
   react_blueprintjs_utils["react-blueprintjs-utils"]
+  react_mui_utils["react-mui-utils"]
   react_utils["react-utils"]
   react_utils_styled["react-utils-styled"]
   resize_observer_preact_hooks["resize-observer-preact-hooks"]
@@ -130,6 +131,10 @@ graph LR
   react_blueprintjs_utils --> synstate_react_hooks
   react_blueprintjs_utils --> ts_data_forge
   react_blueprintjs_utils --> ts_fortress_types
+  react_mui_utils --> better_react_use_state
+  react_mui_utils --> react_utils
+  react_mui_utils --> react_utils_styled
+  react_mui_utils --> ts_data_forge
   react_utils --> better_react_use_state
   react_utils --> synstate
   react_utils --> ts_data_forge
@@ -213,7 +218,7 @@ graph LR
 |    3 | `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
 |    4 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                       |
 |    5 | `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                            |
-|    6 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`                                                                                                                                                                                                                                |
+|    6 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                             |
 
 ### 参考: devDependencies も含めた場合
 
@@ -257,6 +262,8 @@ graph LR
 | `preact-utils`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `react-blueprintjs-utils`            | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                  |
 | `react-blueprintjs-utils`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
+| `react-mui-utils`                    | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`react-utils-styled`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                               |
+| `react-mui-utils`                    | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `react-utils`                        | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `react-utils`                        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `react-utils-styled`                 | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`resize-observer-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                      |
@@ -313,7 +320,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-47 / 47 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+48 / 48 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
