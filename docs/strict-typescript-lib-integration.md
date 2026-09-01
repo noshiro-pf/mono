@@ -2362,3 +2362,53 @@ SVG 属性に数値を埋めるための `String(x)` が 55 箇所あった。
 `x.toString()`（単純な識別子・メンバ）と `(expr).toString()`（式）に機械変換。
 リポジトリ内で `String()` の非推奨を潰したのは #1774 ・ #1781 に続いて 3 度目で、
 **今回が最大**。
+
+## `ts-fortress-types` の opt-in（2026-09-01）
+
+12 パッケージ目。**`apps/` 側では最初の 1 つ。**
+
+### `apps/` はまだ 1 つも opt-in していなかった
+
+`libs/` に出した 12 本の PR で `libs/` 側はほぼ埋まったが、
+`libReplacement` を持たないパッケージを数え直すと **`apps/` 側 14 個が
+どの PR にも入っていなかった**。issue #1737 の「29 個が未宣言」には
+`apps/` も含まれている。
+
+### `tsconfig.json` に `compilerOptions` が無い場合がある
+
+このパッケージの `tsconfig.json` は `extends` と `include` だけで、
+`compilerOptions` を持っていなかった。`libs/` 側は全部持っていたので、
+`apps/` を進めるときは**ブロックごと足す**必要がある。
+
+### `Date` の月引数は 0 始まりで、strict lib はそれを型で言う
+
+型エラーは 1 件だけだった。
+
+```ts
+// month: MonthEnum（1–12）
+new Date(year, month - 1, date, hours, minutes);
+```
+
+strict lib は `Date` の第 2 引数を `Index<12>`（0–11）と宣言する。
+`month - 1` は `MonthEnum` に対しては必ず 0–11 だが、**減算は `number` に
+広がる**ので通らない。アサーションで潰さず、12 行の対応表
+
+```ts
+const monthToIndex = {
+    1: 0,
+    /* … */ 12: 11,
+} as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
+```
+
+を書いて `monthToIndex[month]` にした。**strict lib の言い分が正しく、
+移植元が「0 始まり」を減算で表現していたのを型で表現し直した**形になる。
+
+### probe の置き場が無いパッケージがある
+
+`test/` が無く、`include` も `./src` ・ `./scripts` ・ `./configs` だけだった。
+`test/strict-lib-active.mts` を置いて `include` に `./test` を足してある
+（probe を持つ既存 2 パッケージと同じ形）。`src/` に置くと barrel に載って
+しまうので避けた。
+
+`libReplacement` を `false` に戻すと probe の `TS2578` だけが出る。
+テストは 5 ファイル 15 件通過。
