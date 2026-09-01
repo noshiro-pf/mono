@@ -2246,3 +2246,77 @@ rebase 時に自然に落ちる。
 それは API を間違った側に合わせることになるので採らなかった。
 
 テストは 4 ファイル 72 件通過。
+
+## `synstate` の opt-in（2026-09-01）
+
+11 パッケージ目。#1761 で保留にしていた本体で、**残っていた 12 件のうち
+6 件が `src/`、6 件が `samples/docs-site/why-reactive/` にあった。**
+
+### `src/` の 6 件は `TimerId` の定義 1 つで消えた
+
+```ts
+// 修正前
+export type TimerId = ReturnType<typeof setTimeout>;
+// 修正後
+export type TimerId = NonNullable<Parameters<typeof clearTimeout>[0]>;
+```
+
+strict lib では `setTimeout` の戻り値が `{} | null` で、`clearTimeout` の
+引数は `number | undefined`。**両者は同じ型ではない**ので、
+「`setTimeout` が返すもの」で定義すると `clearTimeout` に渡せない。
+この型の用途はすべて `clearTimeout` / `clearInterval` に渡すことなので、
+**消費側で定義するのが正しい**。`counter` ・ `timer` ・ `audit` ・
+`debounce` ・ `throttle` の 6 件がこれ 1 つで通った。
+
+### samples は「読者に見える部分」を 1 文字も変えずに済んだ
+
+`why-reactive` の samples はわざと素朴に書いた命令型コードで、
+strict lib では `Response.json()` が `any` ではなく `unknown` を返すため
+`setResults(data)` ・ `error.name` ・ `allRows = await …json()` が落ちる。
+
+直すと**ドキュメントに埋め込まれるコードが変わってしまう**ため #1761 では
+保留にしたが、**埋め込みスクリプトに逃げ道があった**。
+`libs/synstate/scripts/cmd/embed-examples-utils.mts` は
+
+```ts
+const ignoreLineKeywords = [
+    '/* embed-sample-code-ignore-this-line */',
+    '// transformer-ignore-next-line',
+] as const;
+```
+
+で始まる行を**丸ごと落としてから**埋め込む。そこで
+
+```tsx
+/* embed-sample-code-ignore-this-line */ // @ts-expect-error …
+setResults(data);
+```
+
+と置いた。`pnpm run doc` を掛け直しても **`.md` は 1 バイトも変わらない**
+（変わるのは en↔ja の同期用に生成している `.diff` だけで、これは
+ドキュメントからは参照されていない保守用の生成物）。
+
+**サンプルをどう直すかという編集上の判断は、そのまま残してある。**
+今のコードは「strict lib はここを咎めるが、素朴なままにしてある」ことを
+記録しているだけなので、後から実際に直す判断をしても衝突しない。
+
+### tsconfig を分ける案は採れない
+
+`samples/` だけ strict lib の対象外にする案は、
+`eslint-config-typed` が `parserOptions.project` に**単一の tsconfig 名**を
+渡す（`projectService` ではない）ため、samples を `include` から外すと
+型情報つき lint が動かなくなる。samples は
+`files: ['samples/**']` で実際に lint されている。
+
+### lint は 44 件生えた — うち 41 件が `String()`
+
+型が 0 件になった後で lint を測ると 44 件だった（opt-in 前は 0 件）。
+41 件は `String(x)` の非推奨で、ベンチマークスクリプトに集中している。
+単純な識別子は `x.toString()`、catch した値は `unknownToString(error)`
+（リポジトリ内 10 件目）。
+
+残り 3 件は samples の `r.json() as Promise<readonly Row[]>` が
+`total-functions/no-unsafe-type-assertion` に当たるもの。
+strict lib では `unknown` からのキャストになるため。これも同じ
+ignore-this-line で抑えてある — 読者に見えるコードはキャストのままで、
+それが実際に読者が書くものだから。
