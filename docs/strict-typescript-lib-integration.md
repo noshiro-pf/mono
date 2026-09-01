@@ -2178,3 +2178,16 @@ opt-in のたびに 1 件ずつ直してきた。
 
 `tsconfig.json` に `compilerOptions` が無かったのでブロックごと足し、
 `test/` を作って `include` に加えてある。`test` スクリプトは無い。
+
+## `react-utils-styled` の opt-in（2026-09-01）
+
+21 パッケージ目、`apps/` 側の 10 個目。**型・lint とも初回から 0 件**。
+
+`paths` で `react-utils` ・ `resize-observer-react-hooks` ・
+`better-react-use-state` の**3 つをソースから解決している**が、それでも 0 件
+だった。#1791（`react-utils`）と同じで、**依存のソースを巻き込んでも
+エラーが出ないなら、その依存の opt-in を待つ必要は無い**。
+
+`apps/` 側でソース解決した依存が問題になったのは、結局
+`libs/synstate`（#1786 ・ #1789 ・ #1790）と
+`apps/ts-fortress-types`（#1788 ・ #1790）の 2 つだけだった。
