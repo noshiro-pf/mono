@@ -2512,3 +2512,37 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 `apps/ts-fortress-types` の 2 つだけだった。
 
 残るは `libs/ts-std-forge`（#1751 待ち）1 つ。
+
+## `tiny-router-observable` の opt-in（2026-09-01）
+
+14 パッケージ目、`apps/` 側の 3 つ目。**#1781（`synstate`）の上に積んである。**
+
+### 自分のコードにエラーは 1 件も無かった
+
+`main` の上で opt-in すると型エラーが 6 件出るが、**6 件とも
+`libs/synstate/src/` の中**だった。
+
+```
+../../libs/synstate/src/core/create/counter.mts(67,19): error TS2769
+../../libs/synstate/src/core/create/timer.mts(53,20):  error TS2769
+../../libs/synstate/src/core/operators/audit.mts(124,20): error TS2769
+…
+```
+
+このパッケージは `tsconfig.json` の `paths` で `synstate` を**ソースから**
+解決している（private で何もビルドしないため）。opt-in すると strict lib が
+自分のソースだけでなく**そこから辿れる依存のソースにも適用される**ので、
+`synstate` 側の `TimerId` の問題がそのまま出てくる。
+
+#1781 で直した 6 件と同一で、あの PR を土台にすると 0 件になる。
+
+### #1774 で書いたことの裏返し
+
+#1774 では「**利用者側の opt-in が、まだ opt-in していない依存の型エラーを
+先に消すことがある**」と書いた。今回はその逆で、**利用者側の opt-in が依存の
+型エラーを先に炙り出す**。どちらも `paths` によるソース解決の帰結で、
+`apps/` 側を進めるときは**依存の opt-in 状況を先に見ておく**とよい。
+
+`tsconfig.json` に `compilerOptions` はあった（`paths` のため）。
+`test/` は無いので probe 用に作って `include` に足してある。
+`libReplacement` を `false` に戻すと probe の `TS2578` だけが出る。
