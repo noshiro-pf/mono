@@ -1320,3 +1320,119 @@ MUI を使う 3 app（`catan-dice-app` ・ `color-demo-app` ・ `annotation-tool
 - `Number.parseInt` は `lint:fix` が
   `Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN)` に書き換えた。
   これで `ts-data-forge` が実依存になる。
+
+## `ts-utils-additional` の部分復元（2026-09-01）
+
+`color-demo-app` を復元しようとして、その依存で最も使われているのが
+`@noshiro/ts-utils-additional`（import 14 箇所）だと分かった。`ts-data-forge`
+に後継が無いので、パッケージとして復元する。
+
+### 全部は入れない
+
+移植元は 141 ファイル・1889 行あるが、復元済み／復元予定のパッケージが使う
+シンボルを数えると偏りが大きい。
+
+| 利用者                    | 使っているシンボル                            |
+| :------------------------ | :-------------------------------------------- |
+| `color-demo-app`          | 9（`color/` 8 + `variance`）                  |
+| `annotation-tool`         | 14（`color/` 7 + `shape/` 系 7）※ PixiJS 待ち |
+| `algo-app`                | 4（`getShuffled` ほか）※ firebase 待ち        |
+| `catan-dice-app`          | 0                                             |
+| `my-portfolio-app-preact` | 0                                             |
+
+CLAUDE.md の「Import what is worth keeping, not the whole tree」に従い、
+**今すぐ利用者がいるものだけ**を入れて、省いたものは
+`apps/ts-utils-additional/README.md` に表で残した。
+
+当初は `color/` ・ `array/math/variance` ・ `num/` の 54 ファイルだったが、
+`annotation-tool` が `shape/` と `pickupHighContrastHues` を必要とするので
+同じ PR で足した。`random/` と type-challenges 系は `algo-app` 待ちのまま。
+
+### `Tpl.map` には後継があった — 前言の訂正
+
+#1773 で「`Tpl.map` に後継は無い」と書いたが、これは不正確だった。
+あそこで詰まったのは `Array.prototype.map` がタプルを配列に広げることで、
+**`Arr.map` は入力の長さ制約を保つ**。`ts-data-forge` の
+
+```ts
+export function map<const Ar extends readonly unknown[], B>(
+    array: Ar,
+    mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
+): { readonly [K in keyof Ar]: B };
+```
+
+がそれで、`NonEmptyArray<T>` を渡せば `NonEmptyArray<B>` が返る。
+`Tpl.map(list, f)` → `Arr.map(list, f)` は素直な置換になる。
+
+ただし `const Ar` の推論は重く、`pipe().map()` を挟んで連鎖させると
+`TS2590: Expression produces a union type that is too complex to represent`
+になった。中間結果に型注釈を付けて連鎖をほどけば通る。
+
+### API の移行で当たったもの
+
+| 移植元                                | 現行                                                |
+| :------------------------------------ | :-------------------------------------------------- |
+| `Num.clamp<number>(lo, hi)`           | `Num.clamp(lo, hi)`（型引数は取らない）             |
+| `Uint8.clamp(v)` ・ `Uint16.clamp(v)` | `Uint8.fromNumber(v)`（total、範囲外は丸める）      |
+| `toFiniteNumber` ほか `to*`           | `asFiniteNumber` ほか `as*`                         |
+| `mapOptional(x, f)`                   | 後継無し。呼び出し側を total に書き換えた           |
+| `pipe(x).chain(f)`                    | `pipe(x).map(f)`                                    |
+| `Arr.scan<E, S>(…)`                   | 第 1 型引数が要素型から配列型になった。推論に任せる |
+| `Arr.first(nonEmpty)`                 | `Optional<T>` を返す。非空でも直接の要素ではない    |
+
+`hex-to-rgb.mts` は `mapOptional(Num.mapNaN2Undefined(parseInt(…)), Uint8.clamp)`
+に非 null アサーション 3 つが続く形だった。呼び出し前に
+`/^#[0-9a-fA-F]{6}$/` を確認済みなので、`Uint8.fromNumber` を使う total な
+関数に書き換えて **`eslint-disable` を 3 つ消した**。
+
+### ts-type-forge の型はグローバルではない
+
+CLAUDE.md には `DeepReadonly` などが `global.d.mts` で入ると書いてあるが、
+`tools/configs/tsconfig/tsconfig.type-check.json` は `"types": []` であり、
+`libs/` ・ `apps/` の各パッケージは `ts-type-forge` から明示 import している
+（`apps/lambda-calculus-interpreter-core` も同様）。グローバルが効くのは
+tsconfig で `ts-type-forge` を参照している 2 パッケージだけ。
+`Percent` ・ `NonEmptyArray` などはすべて明示 import にした。
+
+### `append-as-const` が型を爆発させた 2 ファイル
+
+パッケージ単体の `type-check` ・ `lint` ・ `test` が 3 つとも 0 件になった後で
+`pnpm run codemod` を掛けると、**型エラーが 4 件・lint エラーが 8 件生えた**。
+
+`hsl-to-str.mts` ・ `rgb-to-str.mts` のテンプレートリテラルに `as const` が
+付いたためで、`` `hsl(${h}, ${s}%, ${l}%)` `` の型が `Hue`（360 通り）と
+`Percent`（101 通り）2 つの直積 ≒ 370 万通りの文字列リテラル union になり、
+`TS2590: Expression produces a union type that is too complex to represent`
+で `tsc` が降りる。戻り値の宣言は `string` なので、リテラル型にしても得は無い。
+
+`/* transformer-ignore append-as-const */` を 2 ファイルの先頭に置いて回避した。
+**行コメントではなくブロックコメントでなければ効かない**
+（`transform-source-code.mts` の正規表現が `/\/\*\s*transformer-ignore\s*(.*?)\s*\*\//u`）。
+
+これは「パッケージのチェックが通っても codemod は通るとは限らない」の実例で、
+**コミット前に必ず codemod を掛けて、掛けた後にもう一度 3 つとも測る**必要がある。
+
+### `shape/` と `pickupHighContrastHues` の追加（`annotation-tool` 向け）
+
+`annotation-tool` が要求する 14 シンボルのうち、`color/` にあるもの以外を足した。
+型エラーは 42 件から始まったが、既知の移行ばかりで新しいものは 2 件だけだった。
+
+**`Number.isFinite` はブランド型に絞り込まない。**
+
+```ts
+// これでは FiniteNumber.div に渡せない
+if (!Number.isFinite(ow)) return outerRectSize;
+// ts-data-forge のガードなら絞り込む
+if (!isFiniteNumber(ow)) return outerRectSize;
+```
+
+`toInnerRectSizeKeepingAspectRatio` は `aspectRatio` にも同じ問題があり、
+`isFiniteNumber` → `Num.isPositive` の順に並べて
+`PositiveFiniteNumber` に絞っている。**組み込みのガードは値の範囲を確かめるが、
+ブランドは付けない**というのがここでの教訓。
+
+**`hues` の `as unknown as Seq<360>` は落とせた。** `Arr.seq(asUint16(360))` を
+`Arr.isNonEmpty` で絞り、`Arr.map(seq, toHue)` にした。`toHue` は 0–359 では
+恒等で、範囲外は投げるので、**アサーションが実行時チェックに変わっている**。
+`Seq<360>` を捨てたのは #1779 と同じ理由（`Arr.map` の `const` 型引数が
+360 要素タプルを再構成して TS2589/TS2590 になる）。
