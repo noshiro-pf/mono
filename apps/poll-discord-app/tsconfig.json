@@ -3,5 +3,8 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
-  "include": ["./src", "./scripts"]
+  "compilerOptions": {
+    "libReplacement": true
+  },
+  "include": ["./src", "./test", "./scripts"]
 }
