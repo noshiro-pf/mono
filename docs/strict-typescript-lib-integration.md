@@ -2199,3 +2199,22 @@ opt-in のたびに 1 件ずつ直してきた。
 `ResizeObserver` と `DOMRect` を直接扱うパッケージだが、strict lib で
 落ちるところは無かった。`better-react-use-state` をソース解決している点は
 #1791 ・ #1793 と同じで、やはり待つ必要は無い。
+
+## `tiny-router-react-hooks` の opt-in（2026-09-01）
+
+23 パッケージ目、`apps/` 側の 12 個目。**型・lint とも初回から 0 件**。
+
+### `apps/` 側で「自分の PR だけで完結する」ものはこれで終わり
+
+残り 3 つは**いずれも他の PR が入るのを待つ状態**で、自前の修正は無い。
+
+| パッケージ                          | 件数 | 待っている PR                   |
+| :---------------------------------- | ---: | :------------------------------ |
+| `event-schedule-app-shared`         |    1 | #1784（`ts-fortress-types`）    |
+| `lambda-calculus-interpreter-react` |    6 | #1781（`synstate`）             |
+| `libs/ts-std-forge`                 |    2 | #1751（`toExponential` の下限） |
+
+`apps/` 12 個のうち **10 個が初回から 0 件**、自前の修正が要ったのは
+`synstate-docs`（#1789）と `event-schedule-app`（#1790）の 2 つだけだった。
+`libs/` 側と違って `apps/` は**移行作業がほとんど不要**で、
+`paths` によるソース解決の連鎖だけが実質的な依存関係になっている。
