@@ -2446,3 +2446,44 @@ const monthToIndex = {
 1 件のエラーは #1784 で直した `Date` の月引数の件で、そのまま
 `ts-fortress-types` の opt-in の上に載せると 0 件になる。**消費側から見て
 #1784 の修正が効いていることの裏取りにもなっている。**
+
+## `event-schedule-app` の opt-in（2026-09-01）
+
+18 パッケージ目、`apps/` 側の 7 つ目。**#1781（`synstate`）と #1784
+（`ts-fortress-types`）の両方が要る**ので、2 つを一直線に積み直した上に載せた。
+
+型エラー 9 件のうち 6 件が `libs/synstate`、1 件が `ts-fortress-types`、
+**2 件が自前**だった。
+
+### `Date` の「0 日目」の慣用句が通らなくなる
+
+```ts
+// 翌月の 0 日目 = 前月の最終日
+const lastDay = new Date(year, month, 0);
+//                                    ^ Argument of type '0' is not assignable
+//                                      to parameter of type 'DateEnum | undefined'
+```
+
+strict lib は `Date` の**日引数を `DateEnum`（1-31）に絞る**ので、
+広く使われるこの書き方そのものが弾かれる。月引数も 0-11 なので、
+12 月を表す番号 12 も渡せない。
+
+**ECMA-262 は範囲外の値を繰り上げると明記しているので、元のコードは正しい。**
+strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
+（`no-unnecessary-splice`）と同じく「ライブラリの言い分が常に正しいとは
+限らない」ケースになる。
+
+ここでは `Date` を経由せず算術で書き直した。月ごとの日数は閏年の 2 月しか
+変わらないので `switch` 一つで済み、**既存の
+`as StrictExtract<DateEnum, 28 | 29 | 30 | 31>` も落とせた**。
+
+`getFirstDateOfMonth` のほうは `DateUtils.create`（#1784 で月を 1-12 で
+受けるようにしたもの）に置き換えるだけで済んだ。
+
+### `Response.json()` の `unknown` はここにも出る
+
+`fetch-holidays.mts` の `res.json() as Promise<…>` が
+`total-functions/no-unsafe-type-assertion` に当たる。#1781 の samples と
+同じ話だが、あちらと違ってドキュメントに埋め込まれるコードではないので、
+理由を書いた `eslint-disable-next-line` にしてある。検証を足すと
+想定外データでの挙動が変わるため。
