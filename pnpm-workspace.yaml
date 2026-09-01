@@ -14,8 +14,8 @@ catalog:
   '@types/node': 26.4.0
   '@types/react': 19.2.18
   '@types/react-dom': 19.2.5
-  '@typescript-eslint/parser': 8.67.0
-  '@typescript-eslint/rule-tester': 8.67.0
+  '@typescript-eslint/parser': 8.68.0
+  '@typescript-eslint/rule-tester': 8.68.0
   '@vitest/browser-playwright': 4.1.11
   '@vitest/coverage-v8': 4.1.11
   '@vitest/ui': 4.1.11
@@ -23,15 +23,15 @@ catalog:
   cspell: 10.1.0
   dedent: 1.7.2
   esbuild: 0.28.2
-  eslint: 10.9.0
+  eslint: 10.9.1
   immer: 11.1.18
   jiti: 2.7.0
-  jotai: 2.20.2
+  jotai: 2.20.3
   markdownlint: 0.41.1
   markdownlint-cli2: 0.23.2
   mobx: 7.0.3
   npm-run-all2: 9.0.3
-  oxfmt: 0.64.0
+  oxfmt: 0.65.0
   playwright: 1.62.1
   preact: 10.29.8
   prettier: 3.9.6

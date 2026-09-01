@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-std-forge": "0.1.0"
+    "ts-std-forge": "0.2.0"
   }
 }
