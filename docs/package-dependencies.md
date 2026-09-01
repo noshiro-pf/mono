@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 49 個。
+このリポジトリの workspace パッケージは 50 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -16,6 +16,7 @@ graph LR
   blueprintjs_playground_styled["blueprintjs-playground-styled"]
   cant_stop_probability_app["cant-stop-probability-app"]
   catan_dice_app["catan-dice-app"]
+  color_demo_app["color-demo-app"]
   event_schedule_app["event-schedule-app"]
   event_schedule_app_shared["event-schedule-app-shared"]
   housing_loan_calculator_app["housing-loan-calculator-app"]
@@ -74,6 +75,11 @@ graph LR
   catan_dice_app --> synstate
   catan_dice_app --> synstate_react_hooks
   catan_dice_app --> ts_data_forge
+  color_demo_app --> better_react_use_state
+  color_demo_app --> react_mui_utils
+  color_demo_app --> react_utils
+  color_demo_app --> ts_data_forge
+  color_demo_app --> ts_utils_additional
   event_schedule_app --> better_react_use_state
   event_schedule_app --> event_schedule_app_shared
   event_schedule_app --> numeric_input_utils
@@ -221,6 +227,7 @@ graph LR
 |    4 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                              |
 |    5 | `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                   |
 |    6 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                                    |
+|    7 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                                        |
 
 ### 参考: devDependencies も含めた場合
 
@@ -238,6 +245,8 @@ graph LR
 | `cant-stop-probability-app`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `catan-dice-app`                     | dep  | `react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                           |
 | `catan-dice-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `color-demo-app`                     | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`react-mui-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-utils-additional`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                      |
+| `color-demo-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `event-schedule-app`                 | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`event-schedule-app-shared`&nbsp;`workspace:*`<br>`numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`tiny-router-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*` |
 | `event-schedule-app`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `event-schedule-app-shared`          | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -324,7 +333,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-49 / 49 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+50 / 50 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
