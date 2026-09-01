@@ -1,0 +1,14 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # Bounding box — the annotation this tool draws, and the name of most of
+  # the canvas layer's types and functions.
+  - bbox
+  # North/east/south/west, the resize-handle directions on a bbox.
+  - nesw
+  # `uuid`'s v4 generator, imported as `v4 as uuidv4`.
+  - uuidv
