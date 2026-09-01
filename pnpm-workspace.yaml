@@ -118,3 +118,17 @@ allowBuilds:
   protobufjs: false
   sharp: true # apps/synstate-docs (Astro)
   unrs-resolver: true
+
+# pnpm 11.25 refuses to run a recursive script when the workspace's task graph
+# has a cycle. Every cycle it names here runs through `devDependencies` and is
+# deliberate: each package devDepends on the toolchain (`eslint-config-typed`,
+# `ts-repo-utils`, the ESLint plugins) and the toolchain devDepends back on the
+# libraries it is built from, so there is no order that satisfies all of them —
+# the same fact that makes `runCmdInStagesAcrossWorkspaces` derive build order
+# from `dependencies` + `peerDependencies` alone (see CLAUDE.md, "Building from
+# a clean checkout").
+#
+# The scripts this affects — `gi`, `lint`, `test`, `doc`, … — are per-package
+# and order-independent; only `build` needs an order, and it does not come from
+# here. So "arbitrary order" is the correct semantics, not a concession.
+ignoreWorkspaceCycles: true
