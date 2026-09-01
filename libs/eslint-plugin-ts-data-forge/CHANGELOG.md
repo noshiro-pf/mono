@@ -1,5 +1,12 @@
 # eslint-plugin-ts-data-forge
 
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [7fa2b22]
+    - ts-data-forge@14.6.1
+
 ## 0.5.2
 
 ### Patch Changes
