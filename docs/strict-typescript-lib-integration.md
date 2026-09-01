@@ -2120,3 +2120,32 @@ opt-in のたびに 1 件ずつ直してきた。
 **このパッケージには `test` スクリプトが無い**が、probe は型レベルの表明で
 `tsc` が見るものなので、ランナーは要らない。`libReplacement` を `false` に
 戻すと probe の `TS2578` だけが出ることは確認済み。
+
+## `lambda-calculus-interpreter-core` の opt-in（2026-09-01）
+
+15 パッケージ目、`apps/` 側の 4 つ目。44 ファイルあるが**型・lint とも初回から
+0 件**だった。テストは 5 ファイル 11 件通過。
+
+### `apps/` の残りをまとめて測っておいた
+
+#1786 で「依存の opt-in 状況を先に見ておくとよい」と書いたので、
+候補 5 つを先に測った。
+
+| パッケージ                         |                                        main の上での型エラー |
+| :--------------------------------- | -----------------------------------------------------------: |
+| `tiny-router-observable`           | 6（全部 `libs/synstate` の中 → #1786 で #1781 の上に積んだ） |
+| `resize-observer-react-hooks`      |                                                            0 |
+| `react-utils`                      |                                                            0 |
+| `poll-discord-app`                 |                                                            0 |
+| `lambda-calculus-interpreter-core` |                                                   0（本 PR） |
+
+**測ってから選ぶと、`synstate` 待ちの 1 つを先に見分けられる。**
+残る `apps/` のうち `event-schedule-app` ・ `event-schedule-app-styled` 系は
+まだ測っていない。
+
+### `test/` を作る対象がまた 1 つ
+
+`include` は `./src` ・ `./scripts` ・ `./configs` だけだったので、
+`./test` を足して probe を置いた。このパッケージには `test` スクリプトが
+あるが、vitest の `include` は `src/**/*.test.mts` なので probe は拾われない
+（拾われても型レベルの表明なので実行するものが無い）。
