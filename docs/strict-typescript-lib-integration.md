@@ -2320,3 +2320,45 @@ setResults(data);
 strict lib では `unknown` からのキャストになるため。これも同じ
 ignore-this-line で抑えてある — 読者に見えるコードはキャストのままで、
 それが実際に読者が書くものだから。
+
+## `synstate-docs` の opt-in（2026-09-01）
+
+17 パッケージ目、`apps/` 側の 6 つ目。**#1781（`synstate`）の上に積んである。**
+`apps/` の中で**自前の修正が要った唯一のパッケージ**（#1788 の表を参照）。
+
+### `Array.prototype.length` は readonly になる
+
+型エラーは 8 件のうち 6 件が `libs/synstate`（#1781 で解決済み）、
+残る 2 件が自前の mobx adapter 2 つで、どちらも同じ形だった。
+
+```ts
+mut_disposers.length = 0;
+//            ^^^^^^ Cannot assign to 'length' because it is a read-only property
+```
+
+**配列の切り詰めを代入で書く慣用句が通らなくなる。** strict lib の言い分は
+正しく、これは型で防げる変更のはずのもの。
+
+### ルールとライブラリが正面から衝突した
+
+`.splice(0)` に替えると **`unicorn/no-unnecessary-splice` が
+「`.length = 0` を使え」と言う** — strict lib が禁じたまさにその書き方を
+ルールが要求する。これまでに見つけたルール同士の衝突（#1756 ・ #1762 ・
+#1769 ・ #1770 ・ #1783）と違い、**ルール対ライブラリ**の衝突になる。
+
+`const` を `let` にして束縛ごと差し替えると両方を満たす。
+
+```ts
+let mut_disposers: (() => void)[] = [];
+// …
+mut_disposers = [];
+```
+
+`mut_` 接頭辞があるので `functional/no-let` も通る。
+
+### lint 55 件はすべて `String()`
+
+SVG 属性に数値を埋めるための `String(x)` が 55 箇所あった。
+`x.toString()`（単純な識別子・メンバ）と `(expr).toString()`（式）に機械変換。
+リポジトリ内で `String()` の非推奨を潰したのは #1774 ・ #1781 に続いて 3 度目で、
+**今回が最大**。
