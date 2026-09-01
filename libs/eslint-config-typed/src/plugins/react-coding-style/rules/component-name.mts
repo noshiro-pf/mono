@@ -88,7 +88,7 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
             node: node.id,
             messageId: 'componentNameDoesNotMatch',
             data: {
-              pattern: String(pattern),
+              pattern: pattern.toString(),
             },
           });
         }
