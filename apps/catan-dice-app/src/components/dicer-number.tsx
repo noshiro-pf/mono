@@ -1,7 +1,11 @@
+import { css } from '@emotion/react';
+import * as React from 'react';
+import { memoNamed } from 'react-utils';
+
 type Props = Readonly<{ n: number; opacity: number }>;
 
 export const DiceNumber = memoNamed<Props>('DiceNumber', ({ n, opacity }) => {
-  const style = useMemo(
+  const style = React.useMemo(
     () => ({ borderColor: `rgba(143, 186, 255, ${opacity})` }),
     [opacity],
   );
