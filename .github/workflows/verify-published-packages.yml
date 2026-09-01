@@ -133,33 +133,33 @@ jobs:
         run: pnpm run verify:npm-packages:published
 
   # The one required status check for this workflow: it reports whatever
-  # happened above, so that a skipped run cannot read as a passing one. See
-  # the note on `type-check-result` in type-check.yml.
+  # happened above, so that a skipped run cannot read as a passing one. The
+  # two clauses after `always()` are the skips that are not failures — a
+  # `[WIP]` label, held by `no-wip-label`, and a branch behind the base
+  # branch, held by the ruleset — for which this job reports `skipped` rather
+  # than red. See the note on `type-check-result` in type-check.yml.
   verify-published-result:
     needs:
       - branch-up-to-date
       - verify-published
-    if: always()
+    if: >-
+      always() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
       - name: Require the checks above to have passed
         env:
-          SHOULD_RUN: ${{ needs.branch-up-to-date.outputs.should_run }}
           RESULT: ${{ needs.verify-published.result }}
         run: |
-          if [ "${SHOULD_RUN}" = 'false' ]; then
-            echo 'The branch is behind the base branch, so the checks were skipped. They run again once it is updated.'
-            exit 0
-          fi
-
           if [ "${RESULT}" = 'success' ]; then
             echo 'The checks passed.'
             exit 0
           fi
 
-          summary="The checks did not pass on this commit (result: ${RESULT}). A \`[WIP]\` label skips them; take the label off to run them."
+          summary="The checks did not pass on this commit (result: ${RESULT})."
           echo "${summary}"
           echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
           exit 1

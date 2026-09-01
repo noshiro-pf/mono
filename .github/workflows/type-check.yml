@@ -223,41 +223,46 @@ jobs:
   #   satisfied.
   #
   # This job closes both. Its name does not depend on a matrix, so every run
-  # supersedes the last, and `if: always()` means it reports whatever
-  # happened above rather than being skipped along with it. "Skipped" cannot
-  # be read as "passed" here.
+  # supersedes the last, and `always()` means a failed or cancelled matrix
+  # still gets a verdict here rather than leaving this job skipped along with
+  # the work.
+  #
+  # The two clauses after `always()` are the two skips that are *not*
+  # failures, and they are job-level on purpose: this job then reports
+  # `skipped` for them — grey, and satisfying the required check — rather
+  # than red. Something else holds the merge in each case, and neither is
+  # this workflow's business:
+  #
+  # - `[WIP]`: `no-wip-label` in wip-label.yml fails for as long as the label
+  #   is on, and it is a required status check. **That check and its context
+  #   in the ruleset are what stop a labelled pull request from merging.**
+  #   Delete either and the hole this job exists to close reopens — the two
+  #   go together.
+  # - Behind the base branch: `strict_required_status_checks_policy` holds
+  #   the merge, and the update that clears it runs everything again on the
+  #   commit that will actually be merged.
   type-check-result:
     needs:
       - branch-up-to-date
       - type-check
-    if: always()
+    if: >-
+      always() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      needs.branch-up-to-date.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
       - name: Require the checks above to have passed
         env:
-          # Empty when the gate was skipped (`[WIP]`) or failed to answer.
-          SHOULD_RUN: ${{ needs.branch-up-to-date.outputs.should_run }}
           RESULT: ${{ needs.type-check.result }}
         run: |
-          # The one skip that is not a failure. A branch behind `main` cannot
-          # be merged as it stands — `strict_required_status_checks_policy`
-          # holds it — and the update that clears it runs everything again on
-          # the commit that will actually be merged. Every other non-success,
-          # `[WIP]` included, means the checks did not run on this head and
-          # must not read as passing.
-          if [ "${SHOULD_RUN}" = 'false' ]; then
-            echo 'The branch is behind the base branch, so the checks were skipped. They run again once it is updated.'
-            exit 0
-          fi
-
           if [ "${RESULT}" = 'success' ]; then
             echo 'The checks passed.'
             exit 0
           fi
 
-          summary="The checks did not pass on this commit (result: ${RESULT}). A \`[WIP]\` label skips them; take the label off to run them."
+          summary="The checks did not pass on this commit (result: ${RESULT})."
           echo "${summary}"
           echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
           exit 1

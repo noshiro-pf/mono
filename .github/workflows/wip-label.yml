@@ -6,10 +6,14 @@ name: WIP Label
 # one that passed. This is the block: a required status check that fails for
 # as long as the label is on.
 #
-# The `*-result` jobs in the check workflows already refuse to call a skipped
-# run a passing one, so a labelled pull request cannot merge on their account
-# either. This one says *why* in a single line on the pull request, instead of
-# leaving five red aggregates to be interpreted.
+# It is the *only* thing that blocks a labelled pull request. The `*-result`
+# aggregates in the check workflows deliberately report `skipped` rather than
+# red while the label is on — a pull request nobody is checking yet should
+# read grey, not broken — and a skipped required check is satisfied. So the
+# blocking is concentrated here, in one check that names its reason. Removing
+# this workflow, or its `no-wip-label` context from
+# `repo-settings/rulesets/main.json`, would leave `[WIP]` skipping every check
+# with nothing holding the merge at all.
 #
 # No `push` trigger: the required checks are evaluated when a pull request
 # merges, and the `main` ruleset accepts no other way onto the branch.

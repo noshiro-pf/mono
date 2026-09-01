@@ -323,12 +323,25 @@ So each check workflow now ends with an aggregate job — `if: always()`,
 `needs:` the gate and the matrix job — whose only step asserts
 `needs.<job>.result == 'success'`. Having no matrix its name is stable, so
 every run supersedes the last; being `always()` it reports rather than being
-skipped along with the work. "Skipped" cannot read as "passed" there. Its one
-exception is a branch behind the base branch, where
-`needs.branch-up-to-date.outputs.should_run` is `false`: the merge is held by
-`strict_required_status_checks_policy` and the update that clears it re-runs
-everything, so that skip passes. See the note on `type-check-result` in
-`type-check.yml`.
+skipped along with the work. "Skipped" cannot read as "passed" there.
+
+Two cases are carved out, in the job-level `if` rather than in the step, so
+that the aggregate reports `skipped` for them — grey, and satisfying the
+required check — rather than red. A pull request nobody is checking yet
+should read grey, not broken. What holds the merge is a different check in
+each case:
+
+| carve-out                                               | what holds the merge instead                                                             |
+| :------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
+| `[WIP]` on the pull request                             | `no-wip-label` — see below                                                               |
+| `needs.branch-up-to-date.outputs.should_run` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything |
+
+**`no-wip-label` is therefore load-bearing, not decorative.** It is the only
+thing that stops a labelled pull request from merging. Deleting
+`wip-label.yml`, or dropping its context from `main.json`, leaves `[WIP]`
+skipping every check with nothing holding the merge — which is the exact hole
+the aggregates were added to close. The two are one mechanism. See the note on
+`type-check-result` in `type-check.yml`.
 
 Consequences worth knowing:
 
@@ -495,14 +508,15 @@ report `skipped`. What to know about that:
   was green and then had `[WIP]` added was measured with all 22 matrix
   contexts still reading `success`. So the label comes with a required check
   of its own, `no-wip-label`, which runs only while the label is on and does
-  nothing but fail. The five `*-result` aggregates refuse the same pull
-  request independently, because a skipped run is not a passing one — see
-  "Required status checks". `no-wip-label` is what says _why_ on the pull
-  request instead of leaving five red aggregates to be interpreted.
-- **A labelled pull request therefore reads red, not grey.** That is the
-  intended trade: it cannot merge, and it should not look as though it could.
-  Taking the label off fires `unlabeled`, the checks run for real, and the
-  aggregates and `no-wip-label` all go green together.
+  nothing but fail. With the label off the job is skipped, and having no
+  matrix its check run is named `no-wip-label` — the required context itself —
+  and reported `skipped`, which satisfies it at the cost of no runner at all.
+  A `no-wip-label` reading `skipped` therefore means "no label, nothing to
+  block", not "this check does nothing".
+- **It is the only thing that blocks a labelled pull request**, because the
+  `*-result` aggregates carve `[WIP]` out and report `skipped` for it rather
+  than red — see "Required status checks". One red check that names its
+  reason, rather than six that have to be interpreted.
 - **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
   only `pull_request` events; asking for the checks by hand is asking for them
   regardless of the pull request's state.
