@@ -15,11 +15,6 @@ export function useObservableValue<A>(
 
 export function useObservableValue<A, B = A>(
   observable$: Observable<A>,
-  initialValue: B,
-): A | B;
-
-export function useObservableValue<A, B = A>(
-  observable$: Observable<A>,
   initialValue?: B,
 ): A | B | undefined {
   const value = React.useSyncExternalStore(

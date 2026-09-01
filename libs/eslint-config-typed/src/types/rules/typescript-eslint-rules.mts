@@ -10026,6 +10026,7 @@ namespace StrictBooleanExpressions {
  *  | :------------------- | :------ |
  *  | type                 | problem |
  *  | deprecated           | false   |
+ *  | hasSuggestions       | true    |
  *  | requiresTypeChecking | true    |
  *  ```
  */
