@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 46 個。
+このリポジトリの workspace パッケージは 47 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -24,6 +24,7 @@ graph LR
   lambda_calculus_interpreter_react["lambda-calculus-interpreter-react"]
   mahjong_calculator_app["mahjong-calculator-app"]
   mahjong_scoring_tool["mahjong-scoring-tool"]
+  my_portfolio_app_preact["my-portfolio-app-preact"]
   numeric_input_utils["numeric-input-utils"]
   poll_discord_app["poll-discord-app"]
   preact_utils["preact-utils"]
@@ -111,6 +112,12 @@ graph LR
   mahjong_calculator_app --> ts_data_forge
   mahjong_calculator_app --> ts_fortress
   mahjong_scoring_tool --> ts_data_forge
+  my_portfolio_app_preact --> better_preact_use_state
+  my_portfolio_app_preact --> preact_utils
+  my_portfolio_app_preact --> resize_observer_preact_hooks
+  my_portfolio_app_preact --> synstate_preact_hooks
+  my_portfolio_app_preact --> tiny_router_observable
+  my_portfolio_app_preact --> ts_data_forge
   numeric_input_utils --> ts_data_forge
   poll_discord_app --> ts_data_forge
   poll_discord_app --> ts_fortress
@@ -205,7 +212,7 @@ graph LR
 |    2 | `ts-data-forge`                                                                                                                                                                                                                                                                                                                                  |
 |    3 | `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
 |    4 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                       |
-|    5 | `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                       |
+|    5 | `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                            |
 |    6 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`                                                                                                                                                                                                                                |
 
 ### 参考: devDependencies も含めた場合
@@ -240,6 +247,8 @@ graph LR
 | `mahjong-calculator-app`             | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `mahjong-scoring-tool`               | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `mahjong-scoring-tool`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                         |
+| `my-portfolio-app-preact`            | dep  | `better-preact-use-state`&nbsp;`workspace:*`<br>`preact-utils`&nbsp;`workspace:*`<br>`resize-observer-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                      |
+| `my-portfolio-app-preact`            | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `numeric-input-utils`                | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `numeric-input-utils`                | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `poll-discord-app`                   | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -304,7 +313,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-46 / 46 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+47 / 47 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

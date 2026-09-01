@@ -344,8 +344,8 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 
 ### Preact 側は utils 4 つが前提になる
 
-`algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
-（1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
+`algo-app`（5033）・~~`mahjong-calculator-app`（2428）~~・~~`my-portfolio-app-preact`
+（1244）~~・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
 ~~`preact-utils`~~（472）・~~`tiny-router-preact-hooks`~~（140）・~~`better-preact-use-state`~~
 （74）・~~`resize-observer-preact-hooks`~~（55）が先に要る。合計 741 行で、いずれも
 React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
@@ -1092,14 +1092,14 @@ Preact 側 utils の 4 つ目。これで 4 つとも揃う。
 React 版（`apps/resize-observer-react-hooks`）が復元済みなので、そちらの
 判断をそのまま引き継いだ。
 
-| 移植元                                  | 復元後（React 版と同じ）                                               |
-| :-------------------------------------- | :--------------------------------------------------------------------- |
-| `resize-observer` の polyfill           | 使わない。今のブラウザは `ResizeObserver` を持ち、`lib.dom` が型を持つ |
-| `preact.RefObject<E>`                   | `preact.RefObject<E \| null>`                                          |
-| 戻り値 `[Size, Ref]`                    | `readonly [size: Size, ref: …]`（ラベル付き）                          |
-| `RefObject<E \| null>`（React 版の字面） | `preact.RefObject<E>` — 下記                                            |
-| `@noshiro/ts-utils` の `Arr`            | `ts-data-forge`                                                        |
-| `useState`（`better-preact-use-state`） | そのまま（#1748 で復元済み）                                           |
+| 移植元                                   | 復元後（React 版と同じ）                                               |
+| :--------------------------------------- | :--------------------------------------------------------------------- |
+| `resize-observer` の polyfill            | 使わない。今のブラウザは `ResizeObserver` を持ち、`lib.dom` が型を持つ |
+| `preact.RefObject<E>`                    | `preact.RefObject<E \| null>`                                          |
+| 戻り値 `[Size, Ref]`                     | `readonly [size: Size, ref: …]`（ラベル付き）                          |
+| `RefObject<E \| null>`（React 版の字面） | `preact.RefObject<E>` — 下記                                           |
+| `@noshiro/ts-utils` の `Arr`             | `ts-data-forge`                                                        |
+| `useState`（`better-preact-use-state`）  | そのまま（#1748 で復元済み）                                           |
 
 `gi:src` に `--exclude index.mts` は付けていない。React 版は付けているが、
 [#1742](https://github.com/noshiro-pf/mono/pull/1742) のとおり no-op であり、
@@ -1113,10 +1113,10 @@ React 版（`apps/resize-observer-react-hooks`）が復元済みなので、そ�
 React 版に揃えて戻り値を `React.RefObject<E | null>` の字面どおり
 `preact.RefObject<E | null>` と書いていたが、これは誤りだった。
 
-| | `RefObject<T>` の定義 | null を含む書き方 |
-| :--- | :--- | :--- |
-| React 19 | `{ current: T }` | `RefObject<E \| null>` |
-| Preact 10 | `{ current: T \| null }` | `RefObject<E>` |
+|           | `RefObject<T>` の定義    | null を含む書き方      |
+| :-------- | :----------------------- | :--------------------- |
+| React 19  | `{ current: T }`         | `RefObject<E \| null>` |
+| Preact 10 | `{ current: T \| null }` | `RefObject<E>`         |
 
 preact では二重に null を付けたことになり、`<div ref={ref}>` が受け取らない。
 `my-portfolio-app-preact` がこのフックの最初の利用者になって露見した。
@@ -1165,3 +1165,91 @@ import { type MouseEventHandler } from 'preact';
 が正しい。移植元は `(ev: MouseEvent) => void` と素の DOM 型で書いていたが、
 これは Preact が native event を渡すので間違いではない。ただ React 版と対を
 なす形にするほうが読みやすい。
+
+## `my-portfolio-app-preact` の復元（2026-09-01）
+
+Preact 側 5 app の 3 つ目。utils 4 つが揃ったので積める。
+
+### 新規依存はいらなかった
+
+行数（1244）は inventory の記載どおりだが、`src` 全体を `wc -l` すると 17493 行に
+なる。差の 16249 行は 12 枚の PNG（4.2 MB）で、テキストとして数えられているだけ。
+**行数は残作業量ではない**という #1768 の教訓がここでも当たった。
+
+`preact-media-hook` が要ると書いてあったが、実際には
+
+- 使っているのは `useMedia` 1 関数だけ、呼び出しは `mui-tabs.tsx` の 1 箇所
+- `components/mui/` は名前に反して `@mui/*` を一切 import していない。
+  goober で書いた MUI 風の自作コンポーネント
+
+だったので、**新しい npm 依存は 1 つも足していない**。`useMedia` は
+`src/hooks/use-media.mts` に移植した（`getPlatform` ・ `PromiseState` と同じ前例）。
+`matchMedia` の購読が wrapper の本体で、単に読むだけではブレークポイントを
+跨いだときに更新されない。
+
+### 型検査が通っても等価とは限らない — 今回の実例
+
+`IMap.get` は `Optional<string>` を返すようになっており、移植元の
+`zennArticleTitle.get(slug) ?? '既定のタイトル'` は 8 箇所ある。
+
+| 箇所                             | tsc       | ESLint  |
+| :------------------------------- | :-------- | :------ |
+| `title: get(…) ?? '…'`           | ✅        | ✅      |
+| ``title: `★ ${get(…) ?? '…'}` `` | ❌ 見逃す | ✅ 検出 |
+
+**テンプレートリテラルの中の 5 箇所を tsc は 1 件も報告しない。** 埋め込みは
+どんな値でも受けるからで、そのままなら `[object Object]` と表示されていた。
+`restrict-template-expressions` と `no-base-to-string` が拾った。
+**型検査の 0 件を根拠に「移植できた」と判断してはいけない**という前例がまた 1 つ増えた。
+
+### preact の `RefObject` は React 19 と意味が違う
+
+`useResizeObserver` の戻り値を `div` の `ref` に渡すと型エラーになった。
+
+|           | `RefObject<T>` の定義    | null を含む書き方      |
+| :-------- | :----------------------- | :--------------------- |
+| React 19  | `{ current: T }`         | `RefObject<E \| null>` |
+| Preact 10 | `{ current: T \| null }` | `RefObject<E>`         |
+
+`resize-observer-preact-hooks`（#1771）は React 版の**型の字面**をそのまま写して
+`preact.RefObject<E | null>` にしていた。preact では二重に null を付けたことになり、
+`ref` プロパティが受け取らない。**あの復元の時点では利用者がいなかったので気付けず、
+このアプリが最初の利用者になって露見した。** 直しは #1771 側に入れてある。
+
+### 双子のマニフェストを写すと過剰宣言になる
+
+`package.json` は `mahjong-calculator-app`（同じ Vite Preact + goober の構成）
+から起こしたが、そのまま持ってきた `synstate` ・ `ts-fortress` と、移植元が
+宣言していた `tiny-router-preact-hooks` の 3 つは**このアプリが 1 度も
+import していない**。knip が拾ったので落とした。#1750 で書いた
+「`package.json` ではなく import を見る」は、移植元だけでなく
+**手本にした側のマニフェストにも当てはまる**。
+
+`synstate` は tsconfig の `paths` にだけ残してある。`synstate-preact-hooks` が
+ソース解決で辿るためで、このパッケージの依存ではない（`mahjong-calculator-app`
+の `better-preact-use-state` と同じ扱い）。
+
+### 今回の `constants/dictionary/` はテンプレートの残骸だった
+
+#1773 で「`constants/dictionary/` は常にテンプレート残骸とは限らない」と
+訂正したばかりだが、**このアプリでは残骸だった**：`dict = {}` の 1 行、
+`typeof dict === 'object'` を確かめるだけのテスト、参照 0 箇所。
+mahjong 側は同じ場所に日本語ラベル 39 行が入っていた。
+つまり**どちらか一方に決め打ちできない**というのが結論で、毎回中身を見る。
+空の `utils/` ・ `functions/`（`export {};` と `.gitkeep` だけ）も一緒に落とした。
+
+### `assets.d.mts` は script のままにする必要がある
+
+`*.png` ・ `*.mdx` ・ `*.css` の宣言をまとめたファイルで、MDX コンポーネントの型に
+preact が要る。しかし **top-level import を 1 つ書くとこのファイルが module になり、
+ワイルドカード宣言が 3 つとも効かなくなる**（実測: 型エラー 0 → 15）。
+`import('preact')` を型注釈で使うほかなく、`consistent-type-imports` を
+その 1 行だけ disable した。理由はコメントに書いてある。
+
+### `react-hooks/hooks` が明示型引数に反応する
+
+`useState<MediaQueryState>({…})` が「Hooks may not be referenced as normal values」
+になる。`resize-observer-preact-hooks` の `useState<Size>(…)` は同じ形で通るので
+条件は絞り切れていない（引数をオブジェクトリテラルから変数にしても、
+`preact/hooks` を名前空間 import にしても再現する）。
+初期値に型注釈を付ければ型引数は不要なので、**disable ではなく型引数を落とした**。
