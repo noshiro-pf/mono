@@ -332,7 +332,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`blueprintjs-playground-styled`~~     | 1701 | 大半が復元済みだった（下節） |
 | ~~`housing-loan-calculator-app`~~       | 1143 | 復元済み（下節）             |
 | ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
-| `catan-dice-app`                        |  471 | **なし**                     |
+| ~~`catan-dice-app`~~                    |  471 | **なし**                     |
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
 | ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
 
@@ -880,3 +880,54 @@ barrel を読むだけでツールが動いてしまう。ライブラリとし�
 `gi` スクリプトごと外した。knip には 5 つの入口を個別に登録している。
 
 （`main` という名前が 2 モジュールで衝突して `TS2308` になったことで気付いた。）
+
+## `catan-dice-app` の復元（2026-09-01）
+
+MUI を使う 3 app の 2 つ目。**依存はすべて main にあるので、スタックに載せず
+`main` の直上に置いた。**
+
+### 宣言と実態がまた食い違っていた
+
+移植元の `dependencies` は `@mui/icons-material` と `better-react-use-state` を
+挙げているが、**ソースはどちらも import していない**（knip が検出）。
+実際に増えた npm 依存は `@mui/material` と emotion ・ `@fontsource/roboto`
+だけで、**アイコンパッケージは要らなかった**。
+
+「`package.json` ではなく import を見る」は #1750・#1778 で 2 度書いたが、
+MUI 待ちにしていた 4 つを数え直したときの表（#1777）で
+`catan-dice-app` を「1/21 ファイルが MUI」としたのも同じ話で、
+実際に必要だったのは `@mui/material` 1 つだった。
+
+### synstate に `interval` は無い — `counter` がそれ
+
+`syncflow` の `interval(50)` は `synstate` では `counter(50)`
+（`libs/synstate/src/core/create/counter.mts`）。
+一定間隔で増える整数を流すので、`interval(50).chain(take(11))` は
+`counter(50).pipe(take(11))` にそのまま置き換わる。
+
+observable の `.chain(op)` は `.pipe(op)`、`pipe()` の `.chain(f)` は `.map(f)`
+で、**同じ名前のメソッドが 2 つの別物に対応する**点に注意が要る。
+
+### `Reducer` はここでも移植した
+
+`@noshiro/react-utils` のグローバルにあった `Reducer<S, A>` に後継は無い。
+`apps/react-utils` が `src/utils/` に同じ 1 行を移植しているので、
+それに倣って利用箇所の隣に置いた。
+
+### 型の爆発は 11 要素でも起きる
+
+`Arr.zip(domain, sumCount)`（どちらも 11 要素タプル）で `TS2589` ・ `TS2590`
+になった。#1779 の 360 要素ほどでなくても、`const` 型引数で両方のタプル形状を
+再構成しようとすれば十分に重い。受け手が求めているのは
+`readonly (readonly [number, number])[]` なので、素の `.map` にした。
+
+### そのほか
+
+- `constants/dictionary/` は**今回も残骸**で、参照していたのは削除対象の
+  `vite-env.d.ts`（グローバル宣言）だけだった。`constants/` はこれしか
+  持っていなかったので、ディレクトリごと落ちている。
+- `@fontsource/roboto` は #1779 と同じく `src/index.css` の `@import`。
+- `NumberType.ArraySize` は `Uint32` に置き換えた（`Uint32.add` ・
+  `Uint32.random` を使っているので、これが元の意図）。
+- `Arr.pushed` → `Arr.toPushed`、`Arr.asMut` → `castMutable`、
+  `MutableArrayOfLength<N, T>` → `Mutable<FixedLengthTuple<N, T>>`。
