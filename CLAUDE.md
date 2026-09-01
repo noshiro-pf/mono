@@ -325,16 +325,17 @@ So each check workflow now ends with an aggregate job — `if: always()`,
 every run supersedes the last; being `always()` it reports rather than being
 skipped along with the work. "Skipped" cannot read as "passed" there.
 
-Two cases are carved out, in the job-level `if` rather than in the step, so
+Three cases are carved out, in the job-level `if` rather than in the step, so
 that the aggregate reports `skipped` for them — grey, and satisfying the
 required check — rather than red. A pull request nobody is checking yet
 should read grey, not broken. What holds the merge is a different check in
 each case:
 
-| carve-out                                               | what holds the merge instead                                                             |
-| :------------------------------------------------------ | :--------------------------------------------------------------------------------------- |
-| `[WIP]` on the pull request                             | `no-wip-label` — see below                                                               |
-| `needs.branch-up-to-date.outputs.should_run` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything |
+| carve-out                                          | what holds the merge instead                                                              |
+| :------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| `[WIP]` on the pull request                        | `no-wip-label` — see below                                                                |
+| `needs.gates.outputs.branch_up_to_date` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything  |
+| `needs.gates.outputs.should_run` is `false`        | nothing, and nothing needs to: no command in the workflow reads any path the diff touched |
 
 **`no-wip-label` is therefore load-bearing, not decorative.** It is the only
 thing that stops a labelled pull request from merging. Deleting
@@ -363,10 +364,10 @@ Consequences worth knowing:
 - **Keep the matrix jobs behind an aggregate.** A matrix job whose context was
   made required directly would bring the first failure mode straight back.
 
-`branch-up-to-date / check` is deliberately **not** required. It is a gate
-that fails open — the jobs waiting on it use `!cancelled()` and
-`should_run != 'false'`, so an unanswered gate lets them run — and each of the
-five workflows contributes a context under the same name.
+`gates / check` is deliberately **not** required. It is a gate that fails
+open — the jobs waiting on it use `!cancelled()` and `!= 'false'`, so an
+unanswered gate lets them run — and each of the five workflows contributes a
+context under the same name.
 
 **`repo-settings/` is a declaration, not a lever.** The root files under it
 are the desired state, applied only by `pnpm run repo-settings:apply` (it
@@ -381,11 +382,11 @@ rewrites both the root file and `bk/`.
 The check workflows carry no `paths` filter. A workflow that a path filter
 skips never reports a status check, and each of these contributes a required
 one through its aggregate job, so a pull request that changed only the
-filtered paths would wait forever on a check that never arrives. Each job instead carries a `Check diff` step and
-every later step carries
-`if: steps.<gate-id>.outputs.should_run == 'true'`: the job runs, reports, and
-does no work. Two more gates sit in front of the whole job — see "Check
-triggers, `[WIP]` and out-of-date branches".
+filtered paths would wait forever on a check that never arrives. The gate is
+a job-level `if` instead: `check-gates.yml` answers whether the diff touches
+anything the workflow reads, and the job is skipped when it does not — see
+"Check triggers, `[WIP]` and out-of-date branches" for the rest of what that
+one job answers.
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 two lists in the root `package.json`, one per kind of check:
@@ -405,19 +406,29 @@ excluded from ESLint, tsc, knip, Prettier, cspell and markdownlint alike.
 `articles/` and `books/` do not qualify for the style list — Prettier formats
 them.
 
-Two things to keep in mind when editing a gated workflow:
+Things to keep in mind when editing a gated workflow:
 
-- `run: exit 0` ends a step, not the job, so a step added to a gated job has to
-  carry the `if:` itself.
-- On a push to `main`, diffing against `origin/main` is a diff against `HEAD`,
-  which is empty and reads as "nothing changed" — every step would skip. Each
-  gate therefore compares against `github.event.before` on `main`.
-- A step added _before_ the `Check diff` step needs no condition of its own —
-  the `[WIP]` and out-of-date gates are job-level `if`s, not steps; one added
-  _after_ it carries `should_run` like the rest.
+- **A step needs no condition of its own.** Every gate is now a job-level
+  `if`, so a step added anywhere in a gated job simply runs when the job does.
+  This used to be the other way round — the gate was a `Check diff` step and
+  each later step carried `if: steps.<id>.outputs.should_run == 'true'` — and
+  a step added without it was a step that ran when nothing else did.
+- **On a push to `main`, diffing against `origin/main` is a diff against
+  `HEAD`**, which is empty and reads as "nothing changed" — every job would
+  skip. The gate therefore compares against `github.event.before` on `main`.
+- **The matrix jobs must stay behind an aggregate for this to be safe.** A
+  skipped matrix job produces one check run named after the job, never the
+  `type-check (…)` contexts. While those were the required status checks, a
+  job-level skip would have left them missing — "Expected", blocking forever —
+  which is why the gate had to be a step back then. See "Required status
+  checks".
 
-`verify-published-packages.yml` gates itself on the same principle but in
-shell, because its gate runs before Node.js is installed.
+`verify-published-packages.yml` and `backup-repository-settings.yml` gate
+themselves in shell, on the same principle but against a merge base and a
+single directory rather than an ignore list. They call `check-gates.yml` with
+`diff-scope: none`, which answers the branch question and skips the checkout:
+each has one job, so a gate that installs to save one runner would cost more
+than it saves.
 
 ## Check triggers, `[WIP]` and out-of-date branches
 
@@ -459,9 +470,9 @@ concurrency:
 ```
 
 so a branch pushed to five times in a row costs one CI result rather than five.
-Nothing is lost on a pull request branch: the `Check diff` gate diffs against
-`origin/main`, so the newer run covers every commit the cancelled one would
-have.
+Nothing is lost on a pull request branch: the diff gate in `check-gates.yml`
+diffs against `origin/main`, so the newer run covers every commit the
+cancelled one would have.
 
 - **`cancel-in-progress` is an expression, not a bare `true`.** On `main` that
   same gate diffs against `github.event.before`, so a push's run covers only
@@ -479,18 +490,21 @@ own, rather than by borrowing a state GitHub attaches other meanings to:
 
 ```yaml
 jobs:
-    branch-up-to-date:
+    gates:
         if: >-
             github.event_name != 'pull_request' ||
             !contains(github.event.pull_request.labels.*.name, '[WIP]')
-        uses: ./.github/workflows/branch-up-to-date.yml
+        uses: ./.github/workflows/check-gates.yml
+        with:
+            diff-scope: code
 
     type-check:
-        needs: branch-up-to-date
+        needs: gates
         if: >-
             !cancelled() &&
             (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
-            needs.branch-up-to-date.outputs.should_run != 'false'
+            needs.gates.outputs.branch_up_to_date != 'false' &&
+            needs.gates.outputs.should_run != 'false'
 ```
 
 Labels arrive in the event payload, so there is no API lookup, and a job-level
@@ -544,22 +558,27 @@ than a convention.
 
 Being behind is not in the event payload — `mergeable_state` arrives as
 `unknown` on the `synchronize` that triggered the run — and a job-level `if`
-cannot make an API call. So each check workflow opens with one small job that
-can, `branch-up-to-date.yml` through `workflow_call`, and every other job in
-the workflow waits on its answer (see the `needs:` in the snippet above).
+cannot make an API call, nor run `pnpm install`, which the diff gate needs. So
+each check workflow opens with one small job that can do both,
+`check-gates.yml` through `workflow_call`, and every other job in the workflow
+waits on its two outputs (see the `needs:` in the snippet above). It answers
+the branch question first and skips the checkout when the answer is `false`,
+so a branch behind `main` still costs the four seconds this gate cost when it
+answered only that.
 
 What that shape is for:
 
 - **One job, not a step in each job.** A step cannot skip the job it is in, so
-  a step-level gate would boot every runner in the matrix — eleven of them in
-  `type-check.yml` — to decide it had nothing to do. The gate job costs one
-  boot per workflow run and skips the rest before they start. The `[WIP]` gate
-  needs no job of its own because its answer is free.
+  a step-level gate boots every runner in the matrix — eleven of them in
+  `type-check.yml` — to decide it had nothing to do, and each of those eleven
+  checks out and installs dependencies first, about 45 seconds apiece. The
+  gate job costs one boot per workflow run and skips the rest before they
+  start. The `[WIP]` gate needs no job of its own because its answer is free.
 - **A reusable workflow, not the same shell copied five times.** One answer,
   one place to change it — the same reason the diff gate's path lists live in
   the root `package.json`. The price is one more entry in the checks list per
-  workflow, `branch-up-to-date / check`, which is also where the reason for a
-  skipped matrix is written down.
+  workflow, `gates / check`, which is also where the reason for a skipped
+  matrix is written down.
 - **`!cancelled()` and `!= 'false'`, never `== 'true'`.** A gate that fails to
   answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
   jobs from being skipped along with it. Failing open costs a CI run; failing
