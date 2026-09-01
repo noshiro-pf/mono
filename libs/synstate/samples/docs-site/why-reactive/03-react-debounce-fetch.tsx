@@ -26,9 +26,11 @@ import * as React from 'react';
         fetch(`/api/search?q=${query}`, { signal: controller.signal })
           .then((res) => res.json())
           .then((data) => {
+            /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
             setResults(data);
           })
           .catch((error) => {
+            /* embed-sample-code-ignore-this-line */ // @ts-expect-error the `catch` callback parameter is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
             if (error.name !== 'AbortError') throw error;
           });
       }, 300);

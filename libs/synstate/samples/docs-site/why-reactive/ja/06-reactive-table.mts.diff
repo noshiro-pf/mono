@@ -19,7 +19,7 @@
  const tableDataResult = fromPromise(
    fetch('/api/rows').then((r) => {
      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-@@ -35,7 +35,7 @@
+@@ -36,7 +36,7 @@
    }),
  );
  
@@ -28,7 +28,7 @@
  const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
    debounce(300),
  );
-@@ -43,7 +43,7 @@
+@@ -44,7 +44,7 @@
  const filteredRows = combine([headerValues, tableDataResult]).pipe(
    map(([filters, result]) =>
      Result.isErr(result)
@@ -37,7 +37,7 @@
        : result.value.filter(
            (row) =>
              row.name.includes(filters[0]) &&
-@@ -53,20 +53,20 @@
+@@ -54,20 +54,20 @@
    ),
  );
  
@@ -62,7 +62,7 @@
  const currentPage = merge([
    pageReset,
    combine([pageInput, pageLength]).pipe(
-@@ -74,7 +74,7 @@
+@@ -75,7 +75,7 @@
    ),
  ]);
  
@@ -71,7 +71,7 @@
  const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
    map(([rows, page, perPage]) => {
      const start = (page - 1) * perPage;
-@@ -82,10 +82,10 @@
+@@ -83,10 +83,10 @@
    }),
  );
  

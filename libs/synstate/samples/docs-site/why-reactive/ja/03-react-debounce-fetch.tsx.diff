@@ -18,7 +18,7 @@
          abortRef.current?.abort();
          const controller = new AbortController();
          abortRef.current = controller;
-@@ -35,7 +35,7 @@
+@@ -37,7 +37,7 @@
  
        return () => {
          clearTimeout(timerRef.current);
