@@ -1,24 +1,26 @@
 {
-  "name": "react-mui-utils",
+  "name": "color-demo-app",
   "version": "0.0.1",
   "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
-    "directory": "apps/react-mui-utils"
+    "directory": "apps/color-demo-app"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
-  "exports": "./src/index.mts",
   "scripts": {
+    "build": "vite build --config ./configs/vite.config.mts",
+    "dev": "vite --config ./configs/vite.config.mts",
     "fmt": "pnpm run z:format-uncommitted --cwd .",
     "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fmt:full": "prettier --write .",
     "gi": "run-s gi:src fmt",
-    "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx",
+    "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "preview": "vite preview --config ./configs/vite.config.mts",
     "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
@@ -27,28 +29,29 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@fontsource/roboto": "^5.2.8",
     "@mui/material": "^9.3.1",
     "better-react-use-state": "workspace:*",
+    "react-mui-utils": "workspace:*",
     "react-utils": "workspace:*",
-    "react-utils-styled": "workspace:*",
-    "ts-data-forge": "workspace:*"
+    "ts-data-forge": "workspace:*",
+    "ts-utils-additional": "workspace:*"
   },
   "devDependencies": {
-    "@emotion/react": "^11.14.0",
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
-    "eslint-plugin-ts-type-forge": "workspace:*",
     "npm-run-all2": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "tsx": "catalog:"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0"
+    "react-dom": "catalog:",
+    "tsx": "catalog:",
+    "vite": "catalog:"
   }
 }

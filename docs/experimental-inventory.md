@@ -340,7 +340,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
 step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
 
-`color-demo-app`（1097 行）だけは ~~`react-mui-utils`（245 行）~~が要る。
+~~`color-demo-app`（1097 行）~~だけは ~~`react-mui-utils`（245 行）~~が要る。
 
 ### Preact 側は utils 4 つが前提になる
 
@@ -1436,3 +1436,73 @@ if (!isFiniteNumber(ow)) return outerRectSize;
 恒等で、範囲外は投げるので、**アサーションが実行時チェックに変わっている**。
 `Seq<360>` を捨てたのは #1779 と同じ理由（`Arr.map` の `const` 型引数が
 360 要素タプルを再構成して TS2589/TS2590 になる）。
+
+## `color-demo-app` の復元（2026-09-01）
+
+MUI を使う 3 app の 1 つ目。#1777（`react-mui-utils`）と #1778
+（`ts-utils-additional`）の両方が要るので、2 つを一直線に積み直した上に載せた。
+
+### 型が爆発する — 360 要素タプルとの付き合い方
+
+このアプリの型検査は 278 件のエラーから始まったが、**難しかったのは移行 API より
+`Hue`（360 通りの union）を要素に持つ 360 要素タプル**だった。
+`ts-data-forge` の `Arr.map` ・ `Arr.scan` ・ `Arr.zip` は `const` 型引数で
+入力のタプル形状を保つので、`Seq<360>` や `FixedLengthTuple<360, Hsl>` が
+これらを通ると `TS2589` ・ `TS2590` になる。
+
+`huesDefault` の型を `Seq<360>` から `NonEmptyArray<number>` に落としたところ、
+**残り 15 件のうち 7 件が一度に消えた**。実行時は 360 要素の配列であることに
+変わりはなく、コードが実際に頼っているのは非空性だけ。同じ理由で
+`FixedLengthTuple<360, X>` の注釈も `NonEmptyArray<X>` にしてある。
+
+残った爆発は連鎖が原因で、中間結果に型注釈を付けて `pipe().map()` の連鎖を
+ほどくと通る。`Arr.rest` だけは注釈しても通らず、`.slice(1)` にした
+（末尾をタプルとして再構成しようとするため）。
+
+### `NonEmptyArray` はブランド型なので、リテラルでは作れない
+
+`NonEmptyArray<A>` は `MinLength` プロパティを持つブランド型で、
+`const xs: NonEmptyArray<number> = [0];` は**通らない**。
+`Arr.isNonEmpty` で絞るか、`Arr.seq` のように「引数が静的に正なら
+`NonEmptyArray` を返す」オーバーロードを使うしかない。
+
+`huesDefault` は `Arr.seq(asUint16(360))` で、`Uint16` は 0 を含むため後者に
+当たらない。**到達しない `throw` を伴うガード**で立てた。移植元は
+`as unknown as Seq<360>` を使っていたので、アサーションは 1 つ減っている。
+
+`Arr.zeros(n)` の結果は `LengthConstraintBrandOf<…>` を伴う型で、これを
+`castMutable` して `NonEmptyArray<Hue>` として返そうとすると通らない。
+素の `Hue[]` を作って最後に `Arr.isNonEmpty` で絞る形にした。
+
+### `lint:fix` が推論を壊した
+
+`type-check` 0 件・`lint` 44 件の状態で `lint:fix` を掛けたら lint は 7 件に
+減ったが、**型エラーが 7 件生えた**。
+
+```ts
+// 修正前
+.map((list) => Arr.map(list, (i) => Num.roundToInt(...)))
+// lint:fix 後
+.map(Arr.map((i) => Num.roundToInt(...)))
+```
+
+`Arr.map` にはカリー化オーバーロードがあるので構文的には正しいが、
+**配列を渡さないと要素型を推論できず** `'i' is of type 'unknown'` になる。
+該当箇所は素の `.map` に書き換えた。
+
+`codemod` と同じく **`lint:fix` の後も 3 つとも測り直す**必要がある。
+
+### `@fontsource/roboto` は CSS `@import` で読む
+
+#1777 で `react-mui-utils` から外したフォント読み込みを、こちらで入れた。
+移植元は `main.tsx` の先頭で 4 つ副作用 import していたが、
+`import-x/extensions` がパッケージ副パスの拡張子を許さない。
+`src/index.css` の `@import` にすると ESLint の対象外になり、バンドラの
+解決も同じ。knip はこれを追えないので `ignoreDependencies` に理由付きで
+入れてある。
+
+### `constants/dictionary/` は今回も残骸
+
+`dict = {}` の 1 行と、それを `typeof === 'object'` で確かめるだけのテスト、
+参照 0 箇所。#1776 と同じ形で、`mahjong-calculator-app` の 39 行とは違う。
+毎回中身を見るしかない。
