@@ -930,6 +930,15 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       the CI workflows run `ws:build` before any type check. See
       `docs/workspace-package-linking.md`, which also records why
       `customConditions` was measured and not adopted.
+    - **`pnpm run check:root:tsconfig-paths` enforces both halves of that**,
+      because TypeScript reports neither: a mapping for a sibling, and a
+      mapping whose target does not exist. It reads every `tsconfig*.json`
+      belonging to a package — the ones under `experimental/` and
+      `verify-npm-packages/` excepted, and `tools/configs/tsconfig.tsx.json`
+      out of scope by belonging to no package — and fails on a key that is
+      not the package's own name, or a target that is missing or outside the
+      package. A missing target names the entry file that _is_ there, which
+      is nearly always the `index.mts` / `entry-point.mts` mix-up.
     - `tools/configs/tsconfig.tsx.json` is separate: its `paths` are `tsx`'s
       runtime resolution for build scripts that run before any `dist/` exists.
       See "Building from a clean checkout".

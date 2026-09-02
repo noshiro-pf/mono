@@ -31,6 +31,7 @@
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
+    "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",

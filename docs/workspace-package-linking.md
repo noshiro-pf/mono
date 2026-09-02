@@ -193,6 +193,46 @@ matrix コマンドを実行する。
 - `apps/react-blueprintjs-utils/tsconfig.json` — 同上
 - `libs/synstate-preact-hooks/tsconfig.json` — 上記と重複
 
+## 再発防止 — `check:root:tsconfig-paths`
+
+整理しただけでは同じことが起きる。ここまでの 2 つの失敗はどちらも
+**TypeScript が何も言わない**のが原因なので、言う側をリポジトリに置いた。
+
+`tools/scripts/cmd/check-tsconfig-paths.mts` が、パッケージに属する
+`tsconfig*.json` をすべて読み、`compilerOptions.paths` の各エントリについて次を
+検査する。`check:root:*` の一員なので `pnpm run check:root` に自動的に入り、
+必須ステータスチェック `type-check-result` の下（`type-check (check:root)`）で
+走る。
+
+| 検査                             | 落ちる例                                                                |
+| :------------------------------- | :---------------------------------------------------------------------- |
+| キーが自分のパッケージ名か       | `apps/react-utils` が `"better-react-use-state"` を張る                 |
+| 指す先が実在するか               | `"synstate-react-hooks": ["./src/entry-point.mts"]`（正は `index.mts`） |
+| 指す先がパッケージの外に出ないか | `"ts-data-forge": ["../ts-data-forge/src/entry-point.mts"]`             |
+
+実在しないときは、**同じディレクトリに実際にある入口ファイルを名指しする**
+（`Did you mean \`index.mts\`?`）。取り違えの実例が
+`entry-point.mts`↔`index.mts` に集中していたため。
+
+読む範囲について。
+
+- JSONC は `ts.parseConfigFileTextToJson` で読む。tsc 自身がこれらの設定を読む
+  のと同じ関数なので、コメントや末尾カンマの扱いがコンパイラとずれない
+- 各ファイル**自身の** `paths` だけを見る。`paths` は `extends` でマージされず
+  子が丸ごと上書きするので、自前のブロックを持たない設定には責任が無い。
+  `baseUrl` も同じファイルから読む（共有ベースはどれも設定していない）
+- **`tools/configs/tsconfig.tsx.json` は対象外**。除外リストに入れているのでは
+  なく、最も近い `package.json` がリポジトリルートで、どのパッケージにも属さない
+  から自然に外れる。ここの `paths` は型検査ではなく `tsx` の実行時解決という別の
+  機構である
+- **`experimental/` と `verify-npm-packages/` は明示的に除外**。前者は pnpm
+  workspace の外、後者は tarball と npm からインストールする生成物であって解決
+  すべき workspace の兄弟が存在せず、その `@typescript/lib-*` は strict lib の
+  README が TypeScript 7 の利用者に書けと言っているものそのもの
+
+例外リストは意図的に持たせていない。正当な例外が出たらスクリプトを編集して理由を
+その場に書く。「どこかの ignore リストに 1 行足す」より、理由が残る。
+
 ## `paths` を足したくなったときに
 
 以下をすべて満たすときだけ足す。満たさないなら、足すべきものは `paths` ではなく
@@ -200,11 +240,12 @@ matrix コマンドを実行する。
 
 1. **自分自身のパッケージ名か。** 他パッケージを指すなら、それは依存であって
    解決の上書きではない。`dist` で足りるはずである（`check-all` は `ws:build` の
-   後に型検査する）
+   後に型検査する）— 上記のチェックが落とす
 2. **`samples/` など「利用者と同じ書き方」が要求される場所のためか。** テストや
-   スクリプトなら相対 import で足りる
-3. **指す先のファイルが実在するか。** 存在しない `paths` はエラーにならない。
-   足したら、そのエントリが実際に効いていることを 1 度は確認する
+   スクリプトなら相対 import で足りる。ここだけは機械には判定できない
+3. **指す先のファイルが実在するか。** 存在しない `paths` はエラーにならない
+   — 上記のチェックが落とす
 4. **理由を tsconfig にコメントとして書いたか。** 意図の書かれていない `paths`
    は、次に触る人（や coding agent）に「workspace パッケージはソース解決する
-   もの」と読まれて横展開される。実際にそうなった
+   もの」と読まれて横展開される。実際にそうなった。チェックが止められるのは
+   「規則に反しているか」までで、「なぜ要るのか」は書き残すしかない
