@@ -1785,3 +1785,35 @@ strict lib 側が 107 宣言のうち 18 で `import('ts-type-forge')` を参照
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 16 個が true / false で完全一致
 - probe を置いてから lint を測った（#1762 の反省）
+
+## `eslint-plugin-ts-fortress` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 3 件。** #1762 で予告したとおり、
+`eslint-plugin-ts-data-forge` と**同じ 3 種類が同じ形で出た**。
+
+| 箇所                                                     | 内容                                      |
+| :------------------------------------------------------- | :---------------------------------------- |
+| `src/rules/prefer-canonical-length-constrained-type.mts` | `includes` の型述語で `index` が `never`  |
+| `scripts/cmd/build.mts`                                  | `String(error)` → `unknownToString`       |
+| `scripts/cmd/gen-rule-types.mts`                         | `String(rule.deprecated)` → `.toString()` |
+
+**直し方も同じで通った** — `index` を使う 2 行を `includes` の guard の前へ
+動かすだけ。#1762 に書いた「同じ直し方が効くはず」という見込みが当たった形で、
+この 2 つのプラグインが同じ雛形から作られていることの裏付けでもある。
+
+`eslint-plugin-ts-type-forge` の残り 2 件も `build.mts` と
+`gen-rule-types.mts` の `String` なので、同じ 2 箇所だけのはずである。
+
+### 手順の修正が効いた
+
+#1762 では probe を置く前に lint を測って取りこぼしたので、今回は
+**probe を置いてから測った**。このパッケージには「テストファイルは export
+してはならない」規則が無く、追加の対処は要らなかったが、それは測って
+分かったことである。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 34 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 9 個が true / false で完全一致（`build` が `src` の宣言 emit のみで
+  あることを確認したうえで、`dist/` を消して exit code も確認）
