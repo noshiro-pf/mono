@@ -88,7 +88,13 @@ export {
 } from 'ts-data-forge';
 
 // --- Public types from type.mts ---
-export { type ExcessPropertyOption, type Type, type TypeOf } from './type.mjs';
+export {
+  type ExcessPropertyOption,
+  type Type,
+  type TypeOf,
+  type UnknownShape,
+  type WithShape,
+} from './type.mjs';
 
 // --- Public functions (re-export non-type exports via index modules) ---
 export * from './array/index.mjs';
@@ -96,6 +102,8 @@ export * from './array/index.mjs';
 export * from './brand/index.mjs';
 
 export * from './compose/index.mjs';
+
+export * from './constraints/index.mjs';
 
 export * from './enum/index.mjs';
 

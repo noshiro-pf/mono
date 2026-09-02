@@ -2,7 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import { type UnknownRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { number } from '../primitives/index.mjs';
-import { type Type, type TypeOf } from '../type.mjs';
+import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { optional } from './optional.mjs';
 import { record } from './record.mjs';
@@ -24,8 +24,8 @@ describe(record, () => {
   );
 
   expectType<
-    typeof ymd,
-    Type<Readonly<{ year: number; month: number; date: number }>>
+    TypeOf<typeof ymd>,
+    Readonly<{ year: number; month: number; date: number }>
   >('=');
 
   type Ymd = TypeOf<typeof ymd>;

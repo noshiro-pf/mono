@@ -45,6 +45,7 @@ const documents: DeepReadonly<
       'primitive-constraints/string-constraints.mts',
       'primitive-constraints/number-constraints.mts',
       'primitive-constraints/bigint-constraints.mts',
+      'primitive-constraints/reading-constraints.mts',
       'why-ts-fortress-over-zod-and-io-ts/migration-from-io-ts/io-ts.test.mts',
       'why-ts-fortress-over-zod-and-io-ts/migration-from-io-ts/ts-fortress.test.mts',
       'core-concepts/type-interface/type.test.mts',

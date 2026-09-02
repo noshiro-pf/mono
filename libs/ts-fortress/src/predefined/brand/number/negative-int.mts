@@ -2,16 +2,29 @@ import { isNegativeInt } from 'ts-data-forge';
 import { type NegativeInt } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import {
+  type ConstrainedType,
+  type NoConstraints,
+} from '../../../constraints/index.mjs';
+import {
   number,
+  type NumberConstraintsOf,
   type NumberRangeConstraints,
 } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
 
-export const negativeInt = (
+export function negativeInt(
+  defaultValue?: number,
+): ConstrainedType<NegativeInt, NumberConstraintsOf<NoConstraints>>;
+
+export function negativeInt<const C extends NumberRangeConstraints>(
+  defaultValue: number,
+  constraints: C,
+): ConstrainedType<NegativeInt, NumberConstraintsOf<C>>;
+
+export function negativeInt(
   defaultValue: number = -1,
   constraints?: NumberRangeConstraints,
-): Type<NegativeInt> =>
-  brand({
+): ConstrainedType<NegativeInt, NumberConstraintsOf<NumberRangeConstraints>> {
+  return brand({
     baseType: number(defaultValue, constraints ?? {}),
     is: isNegativeInt,
     defaultValue,
@@ -28,3 +41,4 @@ export const negativeInt = (
     brandFalseKeys: ['NaNValue', '>=0'],
     typeName: 'NegativeInt',
   });
+}

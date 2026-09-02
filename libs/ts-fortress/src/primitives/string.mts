@@ -1,37 +1,51 @@
 import { Arr, expectType, isString, PositiveInt, Result } from 'ts-data-forge';
 import {
+  type ArrayElement,
   type MaxLengthString,
   type MinLengthString,
   type NonEmptyString,
   type RelaxedExclude,
   type SupportedLength,
 } from 'ts-type-forge';
+import {
+  attachConstraints,
+  type ConstrainedType,
+  fillConstraints,
+  type FillConstraints,
+  type NoConstraints,
+} from '../constraints/index.mjs';
 import { refine } from '../other-types/index.mjs';
-import { type Type } from '../type.mjs';
 import {
   createPrimitiveType,
   type StringConstraintViolation,
 } from '../utils/index.mjs';
 
-export function string(defaultValue?: string): Type<string>;
+export function string(
+  defaultValue?: string,
+): ConstrainedType<string, StringConstraintsOf<NoConstraints>>;
 
 export function string<S extends string, const C extends RawConstraints>(
   defaultValue: S & DefaultValueType<S, C>,
   constraints: C,
-): Type<ConstraintsResultType<C>>;
+): ConstrainedType<ConstraintsResultType<C>, StringConstraintsOf<C>>;
 
-export function string<C extends RawConstraints>(
+export function string(
   defaultValue: string = '',
-  constraints?: C,
-): Type<string> {
+  constraints?: RawConstraints,
+): ConstrainedType<string, StringConstraintsOf<RawConstraints>> {
   const baseType = createPrimitiveType({
     typeName: 'string',
     defaultValue,
     is: isString,
   });
 
+  const constraintValues = fillConstraints<
+    Required<RawConstraints>,
+    RawConstraints
+  >(stringConstraintKeys, constraints);
+
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
-    return baseType;
+    return attachConstraints(baseType, constraintValues);
   }
 
   const constraintsResult = validateConstraints(constraints);
@@ -55,19 +69,22 @@ export function string<C extends RawConstraints>(
     );
   }
 
-  return refine({
-    baseType,
-    defaultValue,
-    is: (value): value is string => Result.isOk(constraintsPredicate(value)),
-    typeName: 'string',
-    getConstraintDetails: (value) => {
-      const result = constraintsPredicate(value);
+  return attachConstraints(
+    refine({
+      baseType,
+      defaultValue,
+      is: (value): value is string => Result.isOk(constraintsPredicate(value)),
+      typeName: 'string',
+      getConstraintDetails: (value) => {
+        const result = constraintsPredicate(value);
 
-      return Result.isErr(result)
-        ? { kind: 'string-constraint', violation: result.value }
-        : undefined;
-    },
-  });
+        return Result.isErr(result)
+          ? { kind: 'string-constraint', violation: result.value }
+          : undefined;
+      },
+    }),
+    constraintValues,
+  );
 }
 
 type RawConstraints = Partial<
@@ -111,6 +128,45 @@ export type StringTypeConstraints = RawConstraints;
  */
 export type StringConstraintsResultType<C extends StringTypeConstraints> =
   ConstraintsResultType<C>;
+
+/**
+ * The constraint values carried by a {@link string} type created with the
+ * constraints `C`: every key of {@link StringTypeConstraints}, taking the
+ * value `C` gives it and `undefined` for the keys `C` leaves out.
+ *
+ * @example
+ * ```ts
+ * import * as t from 'ts-fortress';
+ *
+ * const Name = t.string('a', { minLength: 1, maxLength: 32 });
+ *
+ * const maxLength: 32 = Name.constraints.maxLength;
+ *
+ * const regex: undefined = Name.constraints.regex;
+ * ```
+ */
+export type StringConstraintsOf<C extends StringTypeConstraints> =
+  FillConstraints<Required<RawConstraints>, C>;
+
+/**
+ * Every key of {@link RawConstraints}, in the order the runtime predicate
+ * checks them. The `expectType` below keeps it in step with the type.
+ */
+const stringConstraintKeys = [
+  'nonempty',
+  'minLength',
+  'maxLength',
+  'startsWith',
+  'endsWith',
+  'includes',
+  'uppercase',
+  'lowercase',
+  'regex',
+] as const satisfies readonly (keyof RawConstraints)[];
+
+expectType<ArrayElement<typeof stringConstraintKeys>, keyof RawConstraints>(
+  '=',
+);
 
 type DefaultValueType<
   S extends string,

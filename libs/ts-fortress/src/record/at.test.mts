@@ -25,7 +25,7 @@ describe(at, () => {
     test('extracts the Type at a key (spec example)', () => {
       const year = at(ymd, 'year');
 
-      expectType<typeof year, Type<number>>('=');
+      expectType<TypeOf<typeof year>, number>('=');
 
       assert.isTrue(year.is(2000));
 

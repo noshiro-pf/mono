@@ -162,7 +162,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(1n, { nonZero: true });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(-5n));
 
@@ -183,7 +183,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(-1n, { negative: true });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(-5n));
 
@@ -204,7 +204,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(0n, { nonNegative: true });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(5n));
 
@@ -225,7 +225,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(1n, { positive: true });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(10n));
 
@@ -246,7 +246,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(0n, { nonPositive: true });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(-5n));
 
@@ -267,7 +267,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(10n, { gt: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(6n));
 
@@ -285,7 +285,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(5n, { gte: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(5n));
 
@@ -303,7 +303,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(5n, { min: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(6n));
 
@@ -319,7 +319,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(4n, { lt: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(3n));
 
@@ -337,7 +337,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(5n, { lte: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(4n));
 
@@ -355,7 +355,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(5n, { max: 5n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(5n));
 
@@ -373,7 +373,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(6n, { multipleOf: 3n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(9n));
 
@@ -389,7 +389,7 @@ describe('bigint with constraints', () => {
     test('treats a zero divisor as accepting only zero', () => {
       const type = bigint(0n, { multipleOf: 0n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(0n));
 
@@ -403,7 +403,7 @@ describe('bigint with constraints', () => {
     test('accepts valid default value', () => {
       const type = bigint(8n, { step: 2n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(10n));
 
@@ -419,7 +419,7 @@ describe('bigint with constraints', () => {
     test('treats a zero divisor as accepting only zero', () => {
       const type = bigint(0n, { step: 0n });
 
-      expectType<typeof type, Type<bigint>>('=');
+      expectType<TypeOf<typeof type>, bigint>('=');
 
       assert.isTrue(type.is(0n));
 
@@ -434,7 +434,7 @@ describe('bigint with constraints', () => {
       test('accepts valid default value', () => {
         const type = bigint(5n, { gt: 1n, lt: 10n });
 
-        expectType<typeof type, Type<bigint>>('=');
+        expectType<TypeOf<typeof type>, bigint>('=');
 
         assert.isTrue(type.is(6n));
 
@@ -452,7 +452,7 @@ describe('bigint with constraints', () => {
       test('accepts valid default value', () => {
         const type = bigint(5n, { gte: 5n, lte: 10n });
 
-        expectType<typeof type, Type<bigint>>('=');
+        expectType<TypeOf<typeof type>, bigint>('=');
 
         assert.isTrue(type.is(5n));
 
@@ -472,7 +472,7 @@ describe('bigint with constraints', () => {
       test('accepts valid default value', () => {
         const type = bigint(6n, { positive: true, multipleOf: 3n });
 
-        expectType<typeof type, Type<bigint>>('=');
+        expectType<TypeOf<typeof type>, bigint>('=');
 
         assert.isTrue(type.is(9n));
 
@@ -498,7 +498,7 @@ describe('bigint with constraints', () => {
           step: 2n,
         });
 
-        expectType<typeof type, Type<bigint>>('=');
+        expectType<TypeOf<typeof type>, bigint>('=');
 
         assert.isTrue(type.is(10n));
 

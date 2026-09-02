@@ -1,8 +1,14 @@
 /* eslint-disable unicorn/no-negated-comparison */
 import { Arr, expectType, isBigint, Result } from 'ts-data-forge';
-import { type BoolAnd, type BoolNot } from 'ts-type-forge';
+import { type ArrayElement, type BoolAnd, type BoolNot } from 'ts-type-forge';
+import {
+  attachConstraints,
+  type ConstrainedType,
+  fillConstraints,
+  type FillConstraints,
+  type NoConstraints,
+} from '../constraints/index.mjs';
 import { refine } from '../other-types/index.mjs';
-import { type Type } from '../type.mjs';
 import {
   createPrimitiveType,
   type NumericConstraintViolation,
@@ -10,25 +16,32 @@ import {
 
 type NumberType = bigint;
 
-export function bigint(defaultValue?: NumberType): Type<NumberType>;
+export function bigint(
+  defaultValue?: NumberType,
+): ConstrainedType<NumberType, BigintConstraintsOf<NoConstraints>>;
 
 export function bigint<N extends NumberType, const C extends Constraints>(
   defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
-): Type<NumberType>;
+): ConstrainedType<NumberType, BigintConstraintsOf<C>>;
 
-export function bigint<C extends Constraints>(
+export function bigint(
   defaultValue: NumberType = 0n,
-  constraints?: C,
-): Type<NumberType> {
+  constraints?: Constraints,
+): ConstrainedType<NumberType, BigintConstraintsOf<Constraints>> {
   const baseType = createPrimitiveType({
     typeName: 'bigint',
     defaultValue,
     is: isBigint,
   });
 
+  const constraintValues = fillConstraints<Required<Constraints>, Constraints>(
+    bigintConstraintKeys,
+    constraints,
+  );
+
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
-    return baseType;
+    return attachConstraints(baseType, constraintValues);
   }
 
   const constraintsPredicate = createConstraintsPredicate(constraints);
@@ -44,24 +57,27 @@ export function bigint<C extends Constraints>(
     );
   }
 
-  return refine({
-    baseType,
-    defaultValue,
-    is: (value): value is NumberType =>
-      Result.isOk(constraintsPredicate(value)),
-    typeName: 'bigint',
-    getConstraintDetails: (value) => {
-      const result = constraintsPredicate(value);
+  return attachConstraints(
+    refine({
+      baseType,
+      defaultValue,
+      is: (value): value is NumberType =>
+        Result.isOk(constraintsPredicate(value)),
+      typeName: 'bigint',
+      getConstraintDetails: (value) => {
+        const result = constraintsPredicate(value);
 
-      return Result.isErr(result)
-        ? {
-            kind: 'numeric-constraint',
-            numericType: 'bigint',
-            violation: result.value,
-          }
-        : undefined;
-    },
-  });
+        return Result.isErr(result)
+          ? {
+              kind: 'numeric-constraint',
+              numericType: 'bigint',
+              violation: result.value,
+            }
+          : undefined;
+      },
+    }),
+    constraintValues,
+  );
 }
 
 type Constraints = Partial<
@@ -82,6 +98,41 @@ type Constraints = Partial<
     step: NumberType;
   }>
 >;
+
+/**
+ * The set of constraints accepted by {@link bigint}.
+ */
+export type BigintTypeConstraints = Constraints;
+
+/**
+ * The constraint values carried by a {@link bigint} type created with the
+ * constraints `C`: every key of {@link BigintTypeConstraints}, taking the
+ * value `C` gives it and `undefined` for the keys `C` leaves out.
+ */
+export type BigintConstraintsOf<C extends BigintTypeConstraints> =
+  FillConstraints<Required<Constraints>, C>;
+
+/**
+ * Every key of {@link Constraints}, in the order the runtime predicate checks
+ * them. The `expectType` below keeps it in step with the type.
+ */
+const bigintConstraintKeys = [
+  'nonZero',
+  'negative',
+  'nonNegative',
+  'positive',
+  'nonPositive',
+  'gt',
+  'gte',
+  'min',
+  'lt',
+  'lte',
+  'max',
+  'multipleOf',
+  'step',
+] as const satisfies readonly (keyof Constraints)[];
+
+expectType<ArrayElement<typeof bigintConstraintKeys>, keyof Constraints>('=');
 
 type DefaultValueType<
   N extends NumberType,

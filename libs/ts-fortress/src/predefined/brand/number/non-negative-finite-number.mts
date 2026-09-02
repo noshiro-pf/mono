@@ -2,16 +2,32 @@ import { isNonNegativeFiniteNumber } from 'ts-data-forge';
 import { type NonNegativeFiniteNumber } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import {
+  type ConstrainedType,
+  type NoConstraints,
+} from '../../../constraints/index.mjs';
+import {
   number,
+  type NumberConstraintsOf,
   type NumberRangeConstraints,
 } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
 
-export const nonNegativeFiniteNumber = (
+export function nonNegativeFiniteNumber(
+  defaultValue?: number,
+): ConstrainedType<NonNegativeFiniteNumber, NumberConstraintsOf<NoConstraints>>;
+
+export function nonNegativeFiniteNumber<const C extends NumberRangeConstraints>(
+  defaultValue: number,
+  constraints: C,
+): ConstrainedType<NonNegativeFiniteNumber, NumberConstraintsOf<C>>;
+
+export function nonNegativeFiniteNumber(
   defaultValue: number = 0,
   constraints?: NumberRangeConstraints,
-): Type<NonNegativeFiniteNumber> =>
-  brand({
+): ConstrainedType<
+  NonNegativeFiniteNumber,
+  NumberConstraintsOf<NumberRangeConstraints>
+> {
+  return brand({
     baseType: number(defaultValue, constraints ?? {}),
     is: isNonNegativeFiniteNumber,
     defaultValue,
@@ -19,3 +35,4 @@ export const nonNegativeFiniteNumber = (
     brandFalseKeys: ['NaNValue'],
     typeName: 'NonNegativeFiniteNumber',
   });
+}

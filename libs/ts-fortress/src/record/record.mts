@@ -21,6 +21,7 @@ import {
   type Type,
   type TypeOf,
   type UnknownShape,
+  type WithShape,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -49,7 +50,7 @@ export const record = <
       excessProperty: EP;
     }>
   >,
-): Type<RecordTypeFromShape<S>> => {
+): Type<RecordTypeFromShape<S>> & WithShape<S> => {
   type V = RecordTypeFromShape<S>;
 
   // Annotated rather than inferred: the strict standard library types
@@ -218,9 +219,11 @@ export const record = <
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
+    shape,
     shapeStructure: { kind: 'simple', shape } as const,
     excessProperty: ep,
-  } satisfies Type<V> & RecordTypeInternals as Type<V>;
+  } satisfies Type<V> & RecordTypeInternals & WithShape<S> as Type<V> &
+    WithShape<S>;
 };
 
 /**
@@ -230,7 +233,7 @@ export const record = <
 export const strictRecord = <const S extends UnknownShape>(
   shape: S,
   options?: Partial<Readonly<{ typeName: string }>>,
-): Type<RecordTypeFromShape<S>> =>
+): Type<RecordTypeFromShape<S>> & WithShape<S> =>
   record(shape, {
     typeName: options?.typeName,
     excessProperty: 'reject',

@@ -1,4 +1,5 @@
 import { type StrictOmit } from 'ts-type-forge';
+import { hasConstraints } from '../constraints/index.mjs';
 import { type AnyType, type Type } from '../type.mjs';
 
 /**
@@ -59,6 +60,14 @@ export const optional = <T extends AnyType>(
     prune: t.prune,
     validate: t.validate,
     typeName: t.typeName,
+
+    // `OptionalPropertyType<T>` is `T & { optional: true }`, so a constrained
+    // member type keeps promising its `constraints` — carry them over, or an
+    // optional record field would read `undefined` at runtime while typed
+    // otherwise. A blanket `...t` would do it, but that also reads
+    // `defaultValue`, which is a lazy getter on record types and must not be
+    // evaluated here (see `forceUndefinedDefault` below).
+    ...(hasConstraints(t) ? { constraints: t.constraints } : {}),
 
     defaultValue:
       options?.forceUndefinedDefault === true

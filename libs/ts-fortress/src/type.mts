@@ -91,8 +91,25 @@ export type TypeOf<A extends AnyType> = A['defaultValue'];
  */
 export type ExcessPropertyOption = 'allow' | 'reject';
 
-/** @internal */
+/**
+ * The shape a record type is built from: a record of property names to the
+ * {@link Type} validating each one.
+ *
+ * It is the bound of the `shape` argument of `record` / `strictRecord`, and
+ * the type argument of the {@link WithShape} those return, so naming it is
+ * what lets a caller write its own helper over a record type's shape.
+ */
 export type UnknownShape = ReadonlyRecord<string, AnyType>;
+
+/**
+ * The carrier of the shape a record type was built from.
+ *
+ * `record` and `strictRecord` expose the shape they were given, so that the
+ * member types — and the constraints they carry — stay reachable from the
+ * record type itself (`User.shape.age.constraints.max`, or the equivalent
+ * `at(User, 'age').constraints.max`).
+ */
+export type WithShape<S extends UnknownShape> = Readonly<{ shape: S }>;
 
 /** @internal Shape structure that can represent union and intersection */
 export type ShapeStructure = Readonly<

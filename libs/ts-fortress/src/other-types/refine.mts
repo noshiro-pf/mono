@@ -1,5 +1,10 @@
 import { pipe, Result } from 'ts-data-forge';
 import { type Primitive, type StrictExtract } from 'ts-type-forge';
+import {
+  type ConstraintsCarrier,
+  propagateConstraints,
+  type WithConstraints,
+} from '../constraints/index.mjs';
 import { type Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,
@@ -8,9 +13,19 @@ import {
   type ValidationErrorDetails,
 } from '../utils/index.mjs';
 
+/**
+ * Narrows a primitive type by a predicate.
+ *
+ * The constraint values the base type carries (see
+ * {@link WithConstraints}) are carried over to the refined type, so that
+ * `t.refine({ baseType: t.number(0, { min: 0, max: 10 }), ... }).constraints`
+ * still reads `min` and `max`. `C` is inferred from `baseType.constraints`;
+ * refining a base type that carries none adds no `constraints` property.
+ */
 export const refine = <
   Base extends StrictExtract<Primitive, string | boolean | bigint | number>,
   R extends Base,
+  const C = unknown,
 >({
   baseType,
   is,
@@ -18,7 +33,7 @@ export const refine = <
   typeName = `${baseType.typeName} refined`,
   getConstraintDetails,
 }: Readonly<{
-  baseType: Type<Base>;
+  baseType: Type<Base> & Partial<WithConstraints<C>>;
   is: (a: Base) => a is R;
   defaultValue: R;
   typeName?: string;
@@ -29,7 +44,7 @@ export const refine = <
    * user-defined refinements can omit it and fall back to a generic message.
    */
   getConstraintDetails?: (a: Base) => ValidationErrorDetails | undefined;
-}>): Type<R> => {
+}>): Type<R> & ConstraintsCarrier<C> => {
   const validate: Type<R>['validate'] = (a) =>
     pipe(a)
       .map(baseType.validate)
@@ -48,9 +63,12 @@ export const refine = <
               ]),
       ).value;
 
-  return createType({
-    typeName,
-    defaultValue,
-    validate,
-  });
+  return propagateConstraints(
+    createType({
+      typeName,
+      defaultValue,
+      validate,
+    }),
+    baseType,
+  );
 };
