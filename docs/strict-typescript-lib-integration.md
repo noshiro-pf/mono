@@ -1667,3 +1667,42 @@ opt-in のたびにこの確認をするなら、`build` が何をするパッ�
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 42 個が true / false で完全一致（上記の手順で）
 - `pnpm run doc` も通る
+
+## `better-react-use-state` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** 内容は
+[`synstate-react-hooks` の節](#synstate-react-hooks-の-opt-in2026-09-01-実測)で
+測った 3 つのうちの 1 つで、そこに書いたとおり `String(error)` 1 件である。
+
+### `tsconfig.json` に `compilerOptions` が無かった
+
+これまでの 6 パッケージと違い、このパッケージの `tsconfig.json` は
+`extends` と `include` だけで `compilerOptions` ブロックを持っていなかった。
+opt-in するにはまずそれを足すことになる。
+
+同じ形のものが他にもあるはずで、**「`compilerOptions` を足す」ぶんだけ
+diff が増えるパッケージが残っている**ということでもある。
+
+### `test/` も無かった
+
+probe の置き場である `test/` が無く、`include` にも入っていなかったので、両方
+足した。`files` は `["src", "dist", "README.md", "LICENSE"]` なので `test/` は
+公開されない。probe は `.test.mts` ではないため vitest も拾わない（このパッケージ
+には `test` スクリプト自体が無い）。
+
+### lint 1 件 — `String(error)`
+
+`scripts/cmd/build.mts` の `runStep` で、失敗したビルドステップのエラーを
+表示している箇所。引数は `catch` の `unknown` なので `unknownToString`。
+
+**これでリポジトリ内 5 つ目**である（`ts-repo-utils` / `ts-fortress` /
+`ts-data-forge` / `synstate-react-hooks` に続く）。前 4 つは
+`embed-examples-in-jsdoc.mts` だったが、今回は `build.mts` で、
+**同じ書き方が別のスクリプトにも広がっている**ことが分かった。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 3 個が true / false で完全一致
+- このパッケージに `doc` スクリプトは無い
