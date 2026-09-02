@@ -173,7 +173,7 @@ const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
 const generateMetaTable = (rule: RuleInfo): readonly string[] => {
   const rows = [
     ['type', rule.type],
-    ['deprecated', String(rule.deprecated)],
+    ['deprecated', rule.deprecated.toString()],
     ['fixable', rule.fixable],
   ] as const;
 
