@@ -1817,3 +1817,47 @@ strict lib 側が 107 宣言のうち 18 で `import('ts-type-forge')` を参照
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 9 個が true / false で完全一致（`build` が `src` の宣言 emit のみで
   あることを確認したうえで、`dist/` を消して exit code も確認）
+
+## `ts-codemod-cli` の opt-in（2026-09-01 実測）
+
+**型エラー 1 件・lint 2 件。** どちらも `scripts/cmd/sync-cli-versions.mts` の
+1 ファイルに集中しており、素の lib でも通る形に直せた。
+
+### 4 つ測って、直すところがあるものを選んだ
+
+| パッケージ                    |  型 | lint | 内容                        |
+| :---------------------------- | --: | ---: | :-------------------------- |
+| `synstate-preact-hooks`       |   0 |    1 | `String(error)`（117 行目） |
+| `synstate-preact-signals`     |   0 |    1 | 同上（**同じ行番号**）      |
+| `synstate-react-hooks-compat` |   0 |    1 | 同上（**同じ行番号**）      |
+| `ts-codemod-cli`              |   1 |    2 | 下記 ← 採用                 |
+
+上 3 つは `scripts/cmd/embed-examples-in-jsdoc.mts` の **117 行 60 桁**という
+同じ位置である。このスクリプトを持つパッケージすべてに同じ行があり、
+opt-in のたびに 1 件ずつ出てくる。
+
+### 型エラー 1 件 — `replaceAll` のキャプチャ群（3 度目）
+
+`ts-repo-utils`（#1618）・`ts-codemod-lib`（#1747）と同じパターン。ここは
+キャプチャが 3 つあるので、可変長引数で受けてから 3 つとも `isString` で
+絞り、1 つでも外れたらマッチした文字列をそのまま返す。3 つとも省略可能では
+ないので、この分岐は実際には通らない。
+
+### lint 2 件 — `String(...)`
+
+同じファイルの `String(error)` と `String(cliFilesResult.value)`。どちらも
+`unknown` なので `unknownToString`。
+
+**`String(...)` の置き換えはこれで 7 件目・8 件目になる。** リポジトリ全体では
+`embed-examples-in-jsdoc.mts` に少なくとも 7 箇所、`build.mts` に 1 箇所、
+`sync-cli-versions.mts` に 2 箇所残っていた計算になる。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 2 個が true / false で完全一致。このパッケージの `build` は
+  `configs/tsconfig.build.json`（`include` は `../src`）で宣言のみ emit し、
+  全スコープの type-check は走らせないので、`github-settings-as-code`
+  （#1757）で踏んだ罠には当たらない。それでも `dist/` を消して exit code を
+  見る手順で確認した

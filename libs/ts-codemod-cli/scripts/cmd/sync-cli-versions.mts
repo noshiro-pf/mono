@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Result } from 'ts-data-forge';
+import { isString, Result, unknownToString } from 'ts-data-forge';
 import { glob } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -30,7 +30,7 @@ const syncCliVersions = async (): Promise<void> => {
 
   if (Result.isErr(cliFilesResult)) {
     console.info(
-      `❌ Failed to find CLI files: ${String(cliFilesResult.value)}`,
+      `❌ Failed to find CLI files: ${unknownToString(cliFilesResult.value)}`,
     );
 
     process.exit(1);
@@ -63,12 +63,22 @@ const syncCliVersions = async (): Promise<void> => {
 
       const updatedContent = content.replaceAll(
         versionRegex,
-        (
-          match: string,
-          prefix: string,
-          currentVersion: string,
-          suffix: string,
-        ) => {
+        // The strict standard library types a capture group as `unknown`,
+        // because an optional group is `undefined` when it does not
+        // participate. None of these three is optional, so the narrowing never
+        // actually fails — it just has to be written. Same shape as #1618 and
+        // #1747.
+        (match: string, ...args: readonly unknown[]): string => {
+          const [prefix, currentVersion, suffix] = args;
+
+          if (
+            !isString(prefix) ||
+            !isString(currentVersion) ||
+            !isString(suffix)
+          ) {
+            return match;
+          }
+
           if (currentVersion !== targetVersion) {
             mut_hasUpdates = true;
 
@@ -94,7 +104,9 @@ const syncCliVersions = async (): Promise<void> => {
         );
       }
     } catch (error) {
-      console.info(`  ❌ Failed to update ${relativePath}: ${String(error)}`);
+      console.info(
+        `  ❌ Failed to update ${relativePath}: ${unknownToString(error)}`,
+      );
 
       process.exit(1);
     }
