@@ -13,7 +13,7 @@ type Options = readonly [
   }>?,
 ];
 
-type MessageIds = 'useNamespaceImport';
+type MessageIds = 'removeSideEffectImport' | 'useNamespaceImport';
 
 /** Local name the autofix gives the namespace import a file does not have yet. */
 const DEFAULT_NAMESPACE_NAME = 't';
@@ -27,11 +27,15 @@ type ReferenceRewrite = Readonly<{
 /** What the autofix has to do, once it is known to be safe. */
 type FixPlan = Readonly<{
   /**
-   * The namespace declaration to put in place of the first offending import,
-   * or `undefined` when the file already has one to merge into — the offending
-   * imports are then removed outright.
+   * The declaration that becomes the namespace import the file is missing, and
+   * the text it becomes. `undefined` when the file already has a namespace
+   * import to merge into, or when nothing is imported by name — every reported
+   * declaration is then removed outright.
    */
-  namespaceDeclaration: string | undefined;
+  replaced:
+    Readonly<{ node: TSESTree.ImportDeclaration; text: string }> | undefined;
+  /** Declarations deleted along with the rest of their line. */
+  removed: readonly TSESTree.ImportDeclaration[];
   rewrites: readonly ReferenceRewrite[];
 }>;
 
@@ -41,13 +45,15 @@ type FixPlan = Readonly<{
  * globals and with local declarations as soon as they are pulled into a file's
  * scope, and every schema in the wild is written as `t.string()`. This rule
  * makes that the only spelling, rewriting named and default imports — and every
- * reference to them — to member accesses on one namespace import.
+ * reference to them — to member accesses on one namespace import. A bare
+ * `import 'ts-fortress';` is deleted rather than rewritten: it binds no name,
+ * and the package declares `sideEffects: false`, so it does nothing at all.
  */
 export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: `Require \`${TS_FORTRESS_MODULE}\` to be imported as a namespace (\`import * as t from '${TS_FORTRESS_MODULE}';\` or \`import type * as t from '${TS_FORTRESS_MODULE}';\`) rather than through named or default imports.`,
+      description: `Require \`${TS_FORTRESS_MODULE}\` to be imported as a namespace (\`import * as t from '${TS_FORTRESS_MODULE}';\` or \`import type * as t from '${TS_FORTRESS_MODULE}';\`) rather than through named, default or bare side-effect imports.`,
     },
     fixable: 'code',
     schema: [
@@ -70,6 +76,7 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
     ],
     messages: {
       useNamespaceImport: `Import \`${TS_FORTRESS_MODULE}\` as a namespace (\`import * as {{namespaceName}} from '${TS_FORTRESS_MODULE}';\`) and reach its exports through it, rather than importing them by name.`,
+      removeSideEffectImport: `\`import '${TS_FORTRESS_MODULE}';\` binds no name, and \`${TS_FORTRESS_MODULE}\` declares \`sideEffects: false\`, so it does nothing. Remove it and import the namespace where its exports are needed.`,
     },
   },
 
@@ -86,9 +93,11 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
       'Program:exit': () => {
         const declarations = getTsFortressImports(sourceCode.ast);
 
-        const offending = declarations.filter(importsByName);
+        const reported = declarations.filter(
+          (declaration) => !isNamespaceOnly(declaration),
+        );
 
-        if (!Arr.isNonEmpty(offending)) return;
+        if (!Arr.isNonEmpty(reported)) return;
 
         const namespaceSpecifiers = declarations
           .flatMap((declaration) => declaration.specifiers)
@@ -100,17 +109,17 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
 
         const plan = buildFixPlan(
           sourceCode,
-          offending,
+          reported,
           namespaceSpecifiers,
           namespaceName,
         );
 
-        const [anchor, ...rest] = offending;
-
-        for (const [index, declaration] of offending.entries()) {
+        for (const [index, declaration] of reported.entries()) {
           context.report({
             node: declaration,
-            messageId: 'useNamespaceImport',
+            messageId: isBare(declaration)
+              ? 'removeSideEffectImport'
+              : 'useNamespaceImport',
             data: { namespaceName },
             // Every edit rides on a single report: ESLint merges the fixes of
             // one report into one edit span, so splitting them across the
@@ -120,10 +129,15 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
               plan === undefined || index > 0
                 ? undefined
                 : (fixer) => [
-                    plan.namespaceDeclaration === undefined
-                      ? removeStatement(fixer, sourceCode, anchor)
-                      : fixer.replaceText(anchor, plan.namespaceDeclaration),
-                    ...rest.map((removed) =>
+                    ...(plan.replaced === undefined
+                      ? []
+                      : [
+                          fixer.replaceText(
+                            plan.replaced.node,
+                            plan.replaced.text,
+                          ),
+                        ]),
+                    ...plan.removed.map((removed) =>
                       removeStatement(fixer, sourceCode, removed),
                     ),
                     ...plan.rewrites.map(({ identifier, text }) =>
@@ -141,11 +155,17 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
 /**
- * Whether a declaration brings ts-fortress exports in by name or as a default.
- * A bare `import 'ts-fortress';` has no specifiers, so it is left alone.
+ * Whether a declaration is already what the rule asks for: one or more
+ * namespace specifiers and nothing else. A bare `import 'ts-fortress';` has no
+ * specifiers, so it is not one of these — it is reported and deleted.
  */
-const importsByName = (declaration: TSESTree.ImportDeclaration): boolean =>
-  declaration.specifiers.some((specifier) => !isNamespaceSpecifier(specifier));
+const isNamespaceOnly = (declaration: TSESTree.ImportDeclaration): boolean =>
+  !Arr.isEmpty(declaration.specifiers) &&
+  declaration.specifiers.every(isNamespaceSpecifier);
+
+/** Whether a declaration binds no name — `import 'ts-fortress';`. */
+const isBare = (declaration: TSESTree.ImportDeclaration): boolean =>
+  Arr.isEmpty(declaration.specifiers);
 
 const isNamespaceSpecifier = (
   specifier: TSESTree.ImportClause,
@@ -154,14 +174,14 @@ const isNamespaceSpecifier = (
 
 /**
  * The edits that route every named and default ts-fortress import in the file
- * through one namespace, or `undefined` when some part of it cannot be
- * rewritten safely — the violation is then reported without a fix, because a
- * partial rewrite would leave the file referencing a binding that no longer
- * exists.
+ * through one namespace and delete the rest, or `undefined` when some part of
+ * it cannot be rewritten safely — the violations are then reported without a
+ * fix, because a partial rewrite would leave the file referencing a binding
+ * that no longer exists.
  */
 const buildFixPlan = (
   sourceCode: TSESLint.SourceCode,
-  offending: readonly TSESTree.ImportDeclaration[],
+  reported: readonly TSESTree.ImportDeclaration[],
   namespaceSpecifiers: readonly TSESTree.ImportNamespaceSpecifier[],
   namespaceName: string,
 ): FixPlan | undefined => {
@@ -172,12 +192,16 @@ const buildFixPlan = (
   // have to be taken apart rather than replaced or removed.
   if (
     namespaceSpecifiers.length > 1 ||
-    offending.some((declaration) =>
+    reported.some((declaration) =>
       declaration.specifiers.some(isNamespaceSpecifier),
     )
   ) {
     return undefined;
   }
+
+  // A bare import binds nothing to route anywhere, so it never decides what the
+  // namespace import looks like — it is only deleted.
+  const offending = reported.filter((declaration) => !isBare(declaration));
 
   const typeOnly = offending.every(
     (declaration) => declaration.importKind === 'type',
@@ -217,11 +241,21 @@ const buildFixPlan = (
     }
   }
 
+  const [anchor] = offending;
+
+  // With a namespace import already in the file, or nothing left that binds a
+  // name, there is none to create: everything reported just goes away.
+  const replaced =
+    reused === undefined && anchor !== undefined
+      ? {
+          node: anchor,
+          text: `import ${typeOnly ? 'type ' : ''}* as ${namespaceName} from '${TS_FORTRESS_MODULE}';`,
+        }
+      : undefined;
+
   return {
-    namespaceDeclaration:
-      reused === undefined
-        ? `import ${typeOnly ? 'type ' : ''}* as ${namespaceName} from '${TS_FORTRESS_MODULE}';`
-        : undefined,
+    replaced,
+    removed: reported.filter((declaration) => declaration !== replaced?.node),
     rewrites: mut_rewrites,
   };
 };

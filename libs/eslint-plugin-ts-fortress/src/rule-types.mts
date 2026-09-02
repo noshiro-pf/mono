@@ -43,7 +43,7 @@ namespace PreferCanonicalLengthConstrainedType {
 }
 
 /**
- * @description Require `ts-fortress` to be imported as a namespace (`import * as t from 'ts-fortress';` or `import type * as t from 'ts-fortress';`) rather than through named or default imports.
+ * @description Require `ts-fortress` to be imported as a namespace (`import * as t from 'ts-fortress';` or `import type * as t from 'ts-fortress';`) rather than through named, default or bare side-effect imports.
  *
  *  ```md
  *  | key        | value      |

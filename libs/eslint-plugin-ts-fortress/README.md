@@ -174,13 +174,16 @@ const User = t.record({ name: t.string() });
 ```
 
 `import type * as t from 'ts-fortress';` is accepted too, and is what the
-autofix writes when every offending import in the file is type-only. A bare
-`import 'ts-fortress';` brings in no name, so it is left alone, and a namespace
+autofix writes when every offending import in the file is type-only. A namespace
 import may carry any local name — the rule does not rename an existing one.
 
 A default import is reported as well, and its references become the namespace
 itself. `ts-fortress` has no default export, so such a file did not type-check
 to begin with — the rewrite is what it was reaching for.
+
+A bare `import 'ts-fortress';` is reported and **deleted**: it binds no name,
+and `ts-fortress` declares `sideEffects: false`, so importing it for its own
+sake does nothing.
 
 The autofix rewrites every reference along with the import: aliases resolve back
 to the canonical export (`import { nonEmptyArray as nea }` → `t.nonEmptyArray`),

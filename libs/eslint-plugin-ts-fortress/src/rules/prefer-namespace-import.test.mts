@@ -41,12 +41,6 @@ describe('prefer-namespace-import', () => {
         `,
       },
       {
-        name: 'accepts a bare side-effect import',
-        code: dedent`
-          import 'ts-fortress';
-        `,
-      },
-      {
         name: 'leaves named imports from other modules alone',
         code: dedent`
           import { string } from './my-schemas.mjs';
@@ -56,6 +50,47 @@ describe('prefer-namespace-import', () => {
       },
     ],
     invalid: [
+      {
+        name: 'removes a bare side-effect import',
+        code: dedent`
+          import 'ts-fortress';
+        `,
+        output: '',
+        errors: [{ messageId: 'removeSideEffectImport' }],
+      },
+      {
+        name: 'removes a bare import next to the namespace import',
+        code: dedent`
+          import * as t from 'ts-fortress';
+          import 'ts-fortress';
+
+          const T = t.string();
+        `,
+        output: dedent`
+          import * as t from 'ts-fortress';
+
+          const T = t.string();
+        `,
+        errors: [{ messageId: 'removeSideEffectImport' }],
+      },
+      {
+        name: 'folds a bare import into the namespace import it creates',
+        code: dedent`
+          import 'ts-fortress';
+          import { string } from 'ts-fortress';
+
+          const T = string();
+        `,
+        output: dedent`
+          import * as t from 'ts-fortress';
+
+          const T = t.string();
+        `,
+        errors: [
+          { messageId: 'removeSideEffectImport' },
+          { messageId: 'useNamespaceImport' },
+        ],
+      },
       {
         name: 'rewrites a named import and its references',
         code: dedent`
