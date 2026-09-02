@@ -1,3 +1,3 @@
-import { type UintRange } from 'ts-type-forge';
+import { type UintRangeInclusive } from 'ts-type-forge';
 
-export type DiceValue = UintRange<1, 7>;
+export type DiceValue = UintRangeInclusive<1, 6>;

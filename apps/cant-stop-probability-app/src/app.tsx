@@ -4,15 +4,7 @@ import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { createState } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
-import {
-  Arr,
-  ISet,
-  isNotUndefined,
-  Num,
-  pipe,
-  SafeUint,
-  tp,
-} from 'ts-data-forge';
+import { Arr, ISet, isNotUndefined, Num, SafeUint, tp } from 'ts-data-forge';
 import { DeadColumn, ProbabilityTable } from './components/index.mjs';
 import { denom, selected3List, separator } from './constants/index.mjs';
 import {
@@ -21,9 +13,9 @@ import {
   countSuccessForRemains,
 } from './functions/index.mjs';
 import {
+  asTwoDiceSumValue,
   isTwoDiceSumValue,
   type ResultRow,
-  toTwoDiceSumValue,
   type TwoDiceSumValue,
 } from './types/index.mjs';
 
@@ -42,9 +34,9 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
   };
 });
 
-const resultsSortedByProbability = pipe(Array.from(results)).map((list) =>
-  list.toSorted((a, b) => -(a.countSum - b.countSum)),
-).value;
+const resultsSortedByProbability = results.toSorted(
+  (a, b) => -(a.countSum - b.countSum),
+);
 
 const [sortBy$, setSortBy] = createState<'dice' | 'prob'>('prob');
 
@@ -113,7 +105,7 @@ export const App = memoNamed('App', () => {
   >(
     () =>
       columnsAlive.map((alive, index) => ({
-        columnId: toTwoDiceSumValue(index + 2),
+        columnId: asTwoDiceSumValue(index + 2),
         alive,
         toggle: () => {
           updateDeadColumns((prev) =>
