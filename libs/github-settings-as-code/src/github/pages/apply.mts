@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import {
   formatUncommittedFiles,
   isDirectlyExecuted,
@@ -61,7 +61,7 @@ const readSettings = async (settingsPath: string): Promise<PagesSettings> => {
 
   if (Result.isErr(validationResult)) {
     throw new Error(
-      validationErrorsToMessages(validationResult.value).join('\n'),
+      t.validationErrorsToMessages(validationResult.value).join('\n'),
     );
   }
 

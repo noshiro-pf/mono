@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Obj, Result } from 'ts-data-forge';
-import { validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import { RulesetPicked, rulesetKeysToPick } from './constants.mjs';
 
 /**
@@ -50,7 +50,7 @@ const outcomeOf = (
   result: ReturnType<typeof RulesetPicked.validate>,
 ): string =>
   Result.isErr(result)
-    ? (`${name}: ${validationErrorsToMessages(result.value).join('\n')}` as const)
+    ? (`${name}: ${t.validationErrorsToMessages(result.value).join('\n')}` as const)
     : name;
 
 const validRuleset = {
