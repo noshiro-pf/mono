@@ -1633,3 +1633,37 @@ probe はテストではない（`@ts-expect-error` 1 個がファイルの全�
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 196 個が true / false で完全一致
 - `pnpm run doc` も通る。#1618 / #1657 と同じく TypeDoc の回避策は要らない
+
+## `github-settings-as-code` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 0 件。** [`synstate-react-hooks` の節](#synstate-react-hooks-の-opt-in2026-09-01-実測)で
+測った 3 つの最後で、**唯一まったく直すところが無かった**。
+
+`better-react-use-state` と同じく `tsconfig.json` に `compilerOptions` ブロックが
+無かったので足している。`include` には既に `./test` があったので、そちらは
+そのまま。
+
+### `.d.mts` の比較でやり方を間違えた
+
+このパッケージの `build` は、宣言 emit の前に **`pnpm run type-check`（`test/` を
+含む全スコープ）を走らせる**。ここまでの 7 パッケージの `build` は `src` の
+宣言 emit だけだったので、同じ手順が通用しない。
+
+`libReplacement: false` にして 2 回目のビルドを走らせると、**probe 自身が
+`TS2578` で落ちてビルドが止まる**。`dist/` は 1 回目のまま残るので、そのまま
+突き合わせると「一致」と出てしまう — 実際には**同じ成果物を自分自身と比べて
+いる**だけである。
+
+正しくは probe を一時的に外し、`dist/` を毎回消してから両方ビルドする。そう
+すると 2 回とも exit 0 で 42 個の `.d.mts` を生成し、**全一致**する。
+
+**「一致した」だけでは足りない。ビルドが実際に走ったことも確かめる。**
+opt-in のたびにこの確認をするなら、`build` が何をするパッケージなのかを先に
+見ておく必要がある。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 7 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 42 個が true / false で完全一致（上記の手順で）
+- `pnpm run doc` も通る
