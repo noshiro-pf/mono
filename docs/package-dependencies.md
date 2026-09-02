@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 34 個。
+このリポジトリの workspace パッケージは 35 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -13,6 +13,7 @@
 ```mermaid
 graph LR
   better_preact_use_state["better-preact-use-state"]
+  blueprintjs_playground_styled["blueprintjs-playground-styled"]
   event_schedule_app["event-schedule-app"]
   event_schedule_app_shared["event-schedule-app-shared"]
   lambda_calculus_interpreter_core["lambda-calculus-interpreter-core"]
@@ -46,6 +47,8 @@ graph LR
   ts_repo_utils["ts-repo-utils"]
   ts_std_forge["ts-std-forge"]
   ts_type_forge["ts-type-forge"]
+  blueprintjs_playground_styled --> react_blueprintjs_utils
+  blueprintjs_playground_styled --> react_utils
   event_schedule_app --> better_react_use_state
   event_schedule_app --> event_schedule_app_shared
   event_schedule_app --> numeric_input_utils
@@ -154,7 +157,7 @@ graph LR
 |    3 | `lambda-calculus-interpreter-core`, `numeric-input-utils`, `resize-observer-react-hooks`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`, `ts-std-forge` |
 |    4 | `poll-discord-app`, `react-utils`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                      |
 |    5 | `event-schedule-app-shared`, `lambda-calculus-interpreter-react`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                                                                                                                           |
-|    6 | `event-schedule-app`                                                                                                                                                                                                                                                                     |
+|    6 | `blueprintjs-playground-styled`, `event-schedule-app`                                                                                                                                                                                                                                    |
 
 ### 参考: devDependencies も含めた場合
 
@@ -165,6 +168,8 @@ graph LR
 | パッケージ                          | 種別 | 内部依存                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :---------------------------------- | :--- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `better-preact-use-state`           | dev  | `eslint-config-typed`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `blueprintjs-playground-styled`     | dep  | `react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `blueprintjs-playground-styled`     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `event-schedule-app`                | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`event-schedule-app-shared`&nbsp;`workspace:*`<br>`numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`tiny-router-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*` |
 | `event-schedule-app`                | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `event-schedule-app-shared`         | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -229,7 +234,7 @@ graph LR
 | `ts-std-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `ts-type-forge`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-34 / 34 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+35 / 35 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

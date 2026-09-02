@@ -273,6 +273,11 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    "apps/blueprintjs-playground-styled": {
+      "entry": ["src/main.tsx"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry above assumes: a Node program with a
     // single entry point.
     "apps/poll-discord-app": {

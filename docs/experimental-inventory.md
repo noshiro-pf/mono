@@ -336,6 +336,16 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節） |
 | `blueprintjs-playground`                |   92 | **なし**         |
 
+| app                                 | 行数 | 追加で要る utils             |
+| :---------------------------------- | ---: | :--------------------------- |
+| `annotation-tool`                   | 2006 | **なし**                     |
+| ~~`blueprintjs-playground-styled`~~ | 1701 | 大半が復元済みだった（下節） |
+| `housing-loan-calculator-app`       | 1143 | **なし**                     |
+| `cant-stop-probability-app`         |  653 | **なし**                     |
+| `catan-dice-app`                    |  471 | **なし**                     |
+| `lambda-calculus-interpreter-react` |  196 | **なし**                     |
+| `blueprintjs-playground`            |   92 | **なし**                     |
+
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
 step 3 で `poll-discord-app` から始めたときと同じ性格の作業になる。
@@ -486,3 +496,63 @@ React 版の `better-react-use-state` が `libs/` にあるのは、あちらが
 `apps/*` の既定エントリは Astro サイトを仮定しているので、React 版と同じく
 `entry: ["src/index.mts"]` を `knip.jsonc` に足した。無くても現状は素通りする
 （報告すべき未使用依存が無いため）が、それは検査されていないだけである。
+
+## `blueprintjs-playground-styled` の復元（2026-09-01）
+
+**1701 行のうち、実際に未復元だったのは 100 行ほどだった。** 残りは
+`apps/react-blueprintjs-utils` に既に入っている。行数だけを見て見積もると
+14 倍ずれる。
+
+### 何が既に入っていたか
+
+| 移植元（`src/`）                                    | 既にある場所（`apps/react-blueprintjs-utils/src/`） |
+| :-------------------------------------------------- | :-------------------------------------------------- |
+| `style-definitions/common/` 6 ファイル              | `constants/common/`（差は空行のみ）                 |
+| `style-definitions/button/common.ts`                | `constants/button/common.mts`                       |
+| `style-definitions/form/common.ts` ・ `controls.ts` | `constants/form/`                                   |
+| `style-definitions/form/button-group.ts` ほか       | `components/styled/`（`Styled` 接尾辞付き）         |
+| `style-definitions/utils.ts`                        | `utils/utils.mts`                                   |
+| `components/numeric-input-view.tsx`                 | `components/view/numeric-input-view.tsx`（発展版）  |
+| `hexToRgb`（`@noshiro/ts-utils-additional`）        | `utils/ported.mts`                                  |
+
+差分は「復元時に付けた改良」だけである — 明示 import、`Styled` 接尾辞、
+`as const`。つまり **step 3 の `react-blueprintjs-utils` の復元が、この app の
+style 部分をまるごと連れてきていた**。
+
+### したがって、そのまま復元してはいけない
+
+docs の方針（「テンプレートが既にあるなら、無いファイルだけを取る」）どおり、
+**重複させずに `react-blueprintjs-utils` から import する**形にした。新しく
+入ったのは playground の外殻だけである。
+
+- `app.tsx`（デモページ）
+- `main.tsx`
+- `components/button.tsx`（19 行）・`components/input-group-view.tsx`（38 行）
+  — この 2 つだけは後継が無い
+- `index.css`
+
+`constants/dictionary/` は中身が `export const dict = {} as const;` の
+テンプレート残骸なので、[#1746](https://github.com/noshiro-pf/mono/pull/1746) ・
+[#1754](https://github.com/noshiro-pf/mono/pull/1754) と同じく持ち込んでいない。
+
+### `NumericInputView` の props は変わっている
+
+移植元は `<NumericInputView disabled fill value={0} />` だが、`react-blueprintjs-utils`
+側の同名コンポーネントは**発展していて** `fillSpace` / `valueAsStr` になっている。
+デモページは現行の API に合わせた。**同じ名前の古い実装を持ち込むより、
+現行のものを使うほうが playground の目的に合う。**
+
+### `check-destructuring-completeness`
+
+`InputGroupView` の props は移植元では
+`React.DetailedHTMLProps<React.InputHTMLAttributes<…>, …>` 全体だった。
+`ts-restrictions/check-destructuring-completeness` はこれを拒否する — 300 個
+ほどのプロパティのうち 4 つだけを分割代入すると、何を無視しているのかが
+隠れるためである。実際に転送している 4 つだけの型に絞った。
+
+### 残りの見積りへの含意
+
+**他の app にも同じことが起きている可能性がある。** インベントリの行数は
+「移植元のファイルの合計」であって「未復元の量」ではない。特に step 3 で
+utils 系を 8 つ復元しているので、それらを使う app は既に一部が入っている。
+着手前に突き合わせるほうがよい。
