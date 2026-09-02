@@ -1,4 +1,5 @@
 import { type ESLintPlugin } from '../types.mjs';
+import { noSideEffectImport } from './no-side-effect-import.mjs';
 import { noUnnecessaryTypeGuard } from './no-unnecessary-type-guard.mjs';
 import { preferArrIsArray } from './prefer-arr-is-array.mjs';
 import { preferArrSum } from './prefer-arr-sum.mjs';
@@ -26,6 +27,7 @@ export const tsDataForgeRules = {
   'prefer-is-record-and-has-key': preferIsRecordAndHasKey,
   'prefer-num-safe-parse-int': preferNumSafeParseInt,
   'prefer-num-safe-parse-float': preferNumSafeParseFloat,
+  'no-side-effect-import': noSideEffectImport,
   'no-unnecessary-type-guard': noUnnecessaryTypeGuard,
   'prefer-comparison-over-nullish-guard': preferComparisonOverNullishGuard,
   'prefer-obj-over-entries-round-trip': preferObjOverEntriesRoundTrip,

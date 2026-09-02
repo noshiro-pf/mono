@@ -8,6 +8,7 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
  * a rule without listing it here fails to type-check.
  */
 const recommendedRules = {
+  'ts-type-forge/no-side-effect-import': 'error',
   'ts-type-forge/prefer-canonical-length-constrained-tuple': 'error',
   'ts-type-forge/prefer-canonical-mutable-record': 'error',
   'ts-type-forge/prefer-readonly-or-mutable-record': 'error',

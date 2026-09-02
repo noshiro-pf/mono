@@ -193,6 +193,21 @@ namespace PreferNumSafeParseFloat {
 }
 
 /**
+ * @description Remove a side-effect-only `import 'ts-data-forge';`, which binds no name and, the package being `sideEffects: false`, does nothing.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoSideEffectImport {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Detect ts-data-forge type guard calls that perform no narrowing (the argument type already satisfies, or can never satisfy, the guard).
  *
  *  ```md
@@ -277,6 +292,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-is-record-and-has-key': PreferIsRecordAndHasKey.RuleEntry;
   'ts-data-forge/prefer-num-safe-parse-int': PreferNumSafeParseInt.RuleEntry;
   'ts-data-forge/prefer-num-safe-parse-float': PreferNumSafeParseFloat.RuleEntry;
+  'ts-data-forge/no-side-effect-import': NoSideEffectImport.RuleEntry;
   'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
   'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
   'ts-data-forge/prefer-obj-over-entries-round-trip': PreferObjOverEntriesRoundTrip.RuleEntry;

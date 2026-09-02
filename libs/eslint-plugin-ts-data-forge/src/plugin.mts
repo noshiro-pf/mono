@@ -20,6 +20,7 @@ const recommendedRules = {
   'ts-data-forge/prefer-is-record-and-has-key': 'error',
   'ts-data-forge/prefer-num-safe-parse-int': 'error',
   'ts-data-forge/prefer-num-safe-parse-float': 'error',
+  'ts-data-forge/no-side-effect-import': 'error',
   'ts-data-forge/no-unnecessary-type-guard': 'error',
   'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
   'ts-data-forge/prefer-obj-over-entries-round-trip': 'error',

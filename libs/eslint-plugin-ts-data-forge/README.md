@@ -82,6 +82,7 @@ export default [
 | `no-unnecessary-type-guard`            | Flag `ts-data-forge` type-guard calls that do no narrowing (type-aware).                                                                                                                                   |
 | `prefer-comparison-over-nullish-guard` | Prefer direct `=== null` / `!== undefined` over `isNull` / `isNotUndefined` calls.                                                                                                                         |
 | `prefer-obj-over-entries-round-trip`   | Replace an `Object.fromEntries(Object.entries(o).map/filter/flatMap(…))` round trip with `Obj.map` / `Obj.filter` / `Obj.filterMap`.                                                                       |
+| `no-side-effect-import`                | Remove a side-effect-only `import 'ts-data-forge';`; the package declares `sideEffects: false`, so it binds no name and does nothing.                                                                      |
 
 ## License
 
