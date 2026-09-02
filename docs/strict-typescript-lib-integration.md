@@ -1861,3 +1861,74 @@ opt-in のたびに 1 件ずつ出てくる。
   全スコープの type-check は走らせないので、`github-settings-as-code`
   （#1757）で踏んだ罠には当たらない。それでも `dist/` を消して exit code を
   見る手順で確認した
+
+## `eslint-plugin-ts-data-forge` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 4 件。** うち 3 件は既知の `String(...)` だが、
+**1 件はこれまでに出ていない指摘**だった。
+
+### 4 つ測って、内容の違うものを選んだ
+
+| パッケージ                    |  型 | lint | 内容                                       |
+| :---------------------------- | --: | ---: | :----------------------------------------- |
+| `eslint-config-typed`         |   5 |    5 | 型 5 件は #1745 が既に直しているものと同一 |
+| `eslint-plugin-ts-data-forge` |   0 |    4 | ← 採用                                     |
+| `eslint-plugin-ts-fortress`   |   0 |    3 | `String` 2 ＋ 下記の `never` 1             |
+| `eslint-plugin-ts-type-forge` |   0 |    2 | `String` 2                                 |
+
+`eslint-config-typed` の型 5 件は、`ts-data-forge` の opt-in（#1745）で
+`prefer-nullish-coalescing-when-safe.mts` に見つけたものと同じである。
+**#1745 が入れば消えるので、ここでは触っていない。**
+
+### `includes` の型述語が false 側も絞る
+
+`prefer-canonical-length-cast.mts` で
+
+```ts
+if (rewrite.keep.includes(index)) return [];
+const next = node.arguments[index + 1]; // index が never
+```
+
+strict lib は `includes` をこう宣言している。
+
+```ts
+includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchElement is T;
+```
+
+**型述語なので、TypeScript は false 側にも適用する。** `keep` は
+`readonly number[]`（`T = number`）で `index` も `number` なので、早期 return の
+あとの `index` は `Exclude<number, number>` = `never` になる。
+
+`includes` が `false` を返す意味は「**この配列に無い**」であって「この型で
+ない」ではないので、述語としては強すぎる。ただしこの宣言は
+`KEYS.includes(s)` でリテラル union に絞れるようにするためのもので、
+狙いは分かる。**上流に報告する価値のある挙動**である。
+
+**直し方: `index` を使う行を guard の前へ動かした。** `some` に置き換える手も
+あるが、今度は `unicorn/prefer-includes` が `includes` に戻せと言う — #1756 の
+`-1 * n` と同じ、規則同士が打ち消し合う形になる。読み書きの順序を変えるだけなら
+どちらの規則にも触れず、素の lib でも同じに読める。
+
+**`eslint-plugin-ts-fortress` にも同じ 1 件がある**（`prefer-canonical-length-constrained-type.mts`）。
+同じ直し方が効くはずである。
+
+### lint 3 件 — `String(...)`
+
+`build.mts` の `String(result.value)`（`unknown` → `unknownToString`）、
+`gen-rule-types.mts` の `String(rule.deprecated)`（`boolean` なので
+`.toString()`）、`prefer-range-for-loop.mts` の `String(stepNum)`
+（`typeof` で `number` に絞り込み済みなので `.toString()`）。
+**これで 10〜12 件目**になる。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 316 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 29 個が true / false で完全一致（`dist/` を消して exit code を確認）
+- `tsconfig.json` の `include` に `./test` が無かったので足した。`files` は
+  `src` と `dist` なので公開されない
+- **probe を足したあとに lint を測り直す。** このパッケージにも
+  `ts-data-forge`（#1745）と同じ「テストファイルは export してはならない」
+  規則があり、probe の `export` に当たる。probe を置く前に lint を通して
+  「0 件」と思い込むと、`ws:lint` で初めて落ちる。`#1745` と同じく、その
+  ブロックの `ignores` に 1 件加えて対象外にした

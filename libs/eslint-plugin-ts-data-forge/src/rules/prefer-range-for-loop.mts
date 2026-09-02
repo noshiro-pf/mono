@@ -110,7 +110,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
             // Only support positive integer steps
             if (typeof stepNum === 'number' && stepNum > 0) {
-              mut_step = stepNum === 1 ? undefined : String(stepNum);
+              mut_step = stepNum === 1 ? undefined : stepNum.toString();
             } else {
               return;
             }
