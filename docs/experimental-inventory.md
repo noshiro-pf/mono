@@ -346,9 +346,12 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 
 `algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
 （1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
-`preact-utils`（472）・`tiny-router-preact-hooks`（140）・`better-preact-use-state`
-（74）・`resize-observer-preact-hooks`（55）が先に要る。合計 741 行で、いずれも
+`preact-utils`（472）・`tiny-router-preact-hooks`（140）・~~`better-preact-use-state`
+（74）~~・`resize-observer-preact-hooks`（55）が先に要る。合計 741 行で、いずれも
 React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
+
+**`better-preact-use-state` は復元済み**（下節）。残る 3 つのうち
+`resize-observer-preact-hooks` はこれに依存するので、次はそこになる。
 
 ### 復元前後の差分は書き出してある
 
@@ -432,3 +435,54 @@ ambient に届いているだけである。自前で宣言するほうが壊れ
 `apps/*` の既定エントリは Astro サイトを仮定しているので、
 `event-schedule-app` と同じく `entry: ["src/main.tsx"]` を `knip.jsonc` に
 足した。足す前は依存 9 件が「未使用」と報告される。
+
+## `better-preact-use-state` の復元（2026-09-01）
+
+Preact 側 5 app の前提になる utils 4 つのうち 1 つ目。**依存が無い**（peer に
+`preact` があるだけ）ので最初に置ける。`resize-observer-preact-hooks` がこれを
+使うので、utils の中でも先に要る。
+
+### 置き場は `apps/`
+
+「置き場は npm の公開状況で決まった」の方針どおり private で `apps/` に置いた。
+React 版の `better-react-use-state` が `libs/` にあるのは、あちらが復元ではなく
+現役の公開パッケージだからで、対応させる必要は無い。
+
+### 直した点は React 版に揃えただけ
+
+移植元と `libs/better-react-use-state` を突き合わせると、差は 3 つとも
+**React 版の側が後で直したもの**だった。復元にあたって同じ形にしてある。
+
+| 移植元                                                        | 復元後                                |
+| :------------------------------------------------------------ | :------------------------------------ |
+| 戻り値のタプルが `[...]`（`useBoolState`）                    | `readonly [...]`                      |
+| タプル 3 要素目にラベルが無い                                 | `setters:` を付ける                   |
+| `useCallback` の deps を空にして `exhaustive-deps` を disable | `[setState]` / `[updateState]` を書く |
+
+3 つ目は disable が 3 つ消える。`setState` も `updateState` も
+`Preact.useCallback` で安定しているので、deps に書いても再生成されない。
+
+`useState<boolean>(...)` の明示型引数を落としてあるのも React 版に合わせたもので、
+理由（React Compiler の規則がカスタムフックへの `useState<T>(…)` を呼び出しでは
+なく参照と読む）はあちらのコメントに書いてある。
+
+`preact/hooks` の import は `libs/synstate-preact-hooks` と同じ
+`import * as Preact from 'preact/hooks'`。移植元が付けていた
+`@typescript-eslint/no-restricted-imports` の disable は、現行の設定では不要
+だったので落とした。
+
+### `--exclude index.mts` は付けなかった
+
+`gi:src` の雛形にした `apps/resize-observer-react-hooks` は付けているが、
+[#1742](https://github.com/noshiro-pf/mono/pull/1742) で調べたとおりこれは
+完全な no-op である（`exclude` は index ファイルが何を export してはいけないかを
+言うもので、index ファイルはそもそも export 対象から外れている）。同 PR が
+残り 10 パッケージから外すので、新しく足す側には最初から書かない。
+
+`pnpm run gi` が手書きの barrel と同じものを生成することは確認済み。
+
+### knip
+
+`apps/*` の既定エントリは Astro サイトを仮定しているので、React 版と同じく
+`entry: ["src/index.mts"]` を `knip.jsonc` に足した。無くても現状は素通りする
+（報告すべき未使用依存が無いため）が、それは検査されていないだけである。
