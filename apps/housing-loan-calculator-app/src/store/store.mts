@@ -6,13 +6,14 @@ import {
   map,
   withCurrentValueFrom,
 } from 'synstate';
-import { asUint32, Num, pipe, type Uint32 } from 'ts-data-forge';
+import { Num, pipe } from 'ts-data-forge';
 import { defaultValues, queryParamKey } from '../constants/index.mjs';
 import { Router } from '../router.mjs';
 import {
   PercentFloat,
   type RepaymentType,
   type Store,
+  Year,
   Yen,
 } from '../types/index.mjs';
 import { uriWithQueryParams } from '../utils/index.mjs';
@@ -52,11 +53,11 @@ const setPropertyPriceManYen = (value: Yen): void => {
 };
 
 // 借入期間（年）
-const [borrowingPeriodYear$, setBorrowingPeriodYear_] = createState<Uint32>(
-  asUint32(defaultValues.borrowingPeriodYear),
+const [borrowingPeriodYear$, setBorrowingPeriodYear_] = createState<Year>(
+  defaultValues.borrowingPeriodYear,
 );
 
-const setBorrowingPeriodYear = (value: Uint32): void => {
+const setBorrowingPeriodYear = (value: Year): void => {
   setBorrowingPeriodYear_(value);
 
   nextUserInput();
@@ -135,7 +136,7 @@ Router.state.subscribe(({ searchParams: query }) => {
   }
 
   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
-    setBorrowingPeriodYear_(asUint32(paramsAsNumber.borrowingPeriodMonth));
+    setBorrowingPeriodYear_(Year.cast(paramsAsNumber.borrowingPeriodMonth));
   }
 
   if (paramsAsNumber.interestRatePerMonth !== undefined) {

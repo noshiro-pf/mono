@@ -8,24 +8,27 @@ import { type PercentFloat } from '../../types/index.mjs';
  */
 export const ithBorrowingBalanceInPIER = ({
   total,
-  numPayments: n,
-  interestRate: r,
-  ith: i,
+  numPayments,
+  interestRate,
+  ith,
 }: Readonly<{
   total: number;
   numPayments: SafeUint;
   interestRate: PercentFloat;
   ith: SafeUint;
 }>): number => {
-  const q = 1 + r;
+  const q = 1 + interestRate;
 
   // Widened before negating: `no-unsafe-unary-minus` rejects a unary minus on
-  // a branded integer, and `lint:fix` rewrites the `-1 * n` the source used
-  // back into that unary form.
-  const numPayments: number = n;
+  // a branded integer, and `lint:fix` rewrites the `-1 * numPayments` the
+  // source used back into that unary form.
+  const exponent: number = numPayments;
 
   return (
     total *
-    Num.div(1 - q ** (i - n), asNonZeroFiniteNumber(1 - q ** -numPayments))
+    Num.div(
+      1 - q ** (ith - numPayments),
+      asNonZeroFiniteNumber(1 - q ** -exponent),
+    )
   );
 };

@@ -1,6 +1,6 @@
-import { type Uint32 } from 'ts-data-forge';
 import { type PercentFloat } from './percent-float.mjs';
 import { type RepaymentType } from './repayment-type.mjs';
+import { type Year } from './year.mjs';
 import { type Yen } from './yen.mjs';
 
 export type Store = Readonly<{
@@ -10,7 +10,7 @@ export type Store = Readonly<{
   /** 物件の金額（円） */
   propertyPriceManYen: Yen;
   /** 借入期間（年） */
-  borrowingPeriodYear: Uint32;
+  borrowingPeriodYear: Year;
   /** 年当たりの金利 */
   interestRatePercentPerYear: PercentFloat;
 }>;

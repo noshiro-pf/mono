@@ -8,11 +8,14 @@ import { type PercentFloat } from '../../types/index.mjs';
  */
 export const monthlyPaymentsInPIER = ({
   total,
-  numPayments: n,
-  interestRate: r,
+  numPayments,
+  interestRate,
 }: Readonly<{
   total: number;
   numPayments: SafeUint;
   interestRate: PercentFloat;
 }>): number =>
-  total * r * (1 + Num.div(1, asPositiveFiniteNumber((1 + r) ** n - 1)));
+  total *
+  interestRate *
+  (1 +
+    Num.div(1, asPositiveFiniteNumber((1 + interestRate) ** numPayments - 1)));

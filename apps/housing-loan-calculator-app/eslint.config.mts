@@ -1,5 +1,4 @@
 import {
-  defineKnownRules,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -22,13 +21,4 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   ...eslintConfigForReact(),
-
-  {
-    files: ['src/**'],
-    rules: defineKnownRules({
-      // Each component file exports the component together with the styled
-      // parts that belong to it, as the rest of the restored apps do.
-      'react-refresh/only-export-components': 'off',
-    }),
-  },
 ] satisfies readonly FlatConfig[];
