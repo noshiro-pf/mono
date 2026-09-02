@@ -235,43 +235,17 @@ const checkTarget = async ({
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const stat = await Result.fromPromise(fs.stat(resolved));
 
-  if (Result.isErr(stat) || !stat.value.isFile()) {
-    return [
-      {
-        file: relativeFile,
-        key,
-        detail: `points at \`${target}\`, which does not exist.`,
-        hint: `TypeScript falls back to ordinary resolution here without an error, so the mapping does nothing. ${await suggestEntryFile(path.dirname(resolved))}`,
-      },
-    ];
-  }
+  if (Result.isOk(stat) && stat.value.isFile()) return [];
 
-  return [];
+  return [
+    {
+      file: relativeFile,
+      key,
+      detail: `points at \`${target}\`, which is not a file.`,
+      hint: 'TypeScript falls back to ordinary resolution here without an error, so the mapping does nothing.',
+    },
+  ];
 };
-
-/**
- * The mix-up this catches is nearly always `index.mts` written as
- * `entry-point.mts` or the other way round, so name whichever one is actually
- * there rather than leaving the reader to look.
- */
-const suggestEntryFile = async (dir: string): Promise<string> => {
-  const candidates = await Promise.all(
-    entryFileNames.map(async (name) => {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const stat = await Result.fromPromise(fs.stat(path.resolve(dir, name)));
-
-      return Result.isOk(stat) && stat.value.isFile() ? name : undefined;
-    }),
-  );
-
-  const found = candidates.filter((name) => name !== undefined);
-
-  return Arr.isNonEmpty(found)
-    ? `Did you mean \`${found.join('` or `')}\`?`
-    : 'Point it at a file that exists.';
-};
-
-const entryFileNames = ['entry-point.mts', 'index.mts'] as const;
 
 /**
  * The `paths` block of one tsconfig, with the directory its entries resolve

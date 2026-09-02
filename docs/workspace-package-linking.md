@@ -210,9 +210,10 @@ matrix コマンドを実行する。
 | 指す先が実在するか               | `"synstate-react-hooks": ["./src/entry-point.mts"]`（正は `index.mts`） |
 | 指す先がパッケージの外に出ないか | `"ts-data-forge": ["../ts-data-forge/src/entry-point.mts"]`             |
 
-実在しないときは、**同じディレクトリに実際にある入口ファイルを名指しする**
-（`Did you mean \`index.mts\`?`）。取り違えの実例が
-`entry-point.mts`↔`index.mts` に集中していたため。
+指摘は「そのパスにファイルが無い」までに留めてある。実例が
+`entry-point.mts`↔`index.mts` に集中していたからといって、想定した綴りの候補を
+スクリプトに持たせると、思い付かなかった取り違え（`index.mts`↔`index.ts` など）
+だけ助言が外れる。パスを見れば分かることに、当てにならない推測を足す必要は無い。
 
 読む範囲について。
 
