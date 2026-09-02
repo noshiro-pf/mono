@@ -176,7 +176,15 @@ export const createRouter = (): Router => {
   };
 };
 
-const withSlash = (path: string): string =>
+/**
+ * Normalizes a path so it ends in a slash, moving a query string after it.
+ *
+ * Exported as well as reachable through `Router.utils`, so that a caller who
+ * only needs this pure transformation does not have to construct a router —
+ * `createRouter` reads `window.location` at call time, which a Node test
+ * cannot do.
+ */
+export const withSlash = (path: string): string =>
   path.endsWith('/') || path.includes('/?')
     ? path
     : path.includes('?')
