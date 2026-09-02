@@ -3,12 +3,5 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "compilerOptions": {
-    // `synstate` is resolved from source: this package is private and nothing
-    // here is built.
-    "paths": {
-      "synstate": ["../../libs/synstate/src/entry-point.mts"]
-    }
-  },
   "include": ["./src"]
 }

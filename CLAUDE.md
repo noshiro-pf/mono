@@ -912,6 +912,32 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       blocks them as subdependencies, but a direct one is always allowed and
       `pnpm-update` auto-merges. See
       `docs/strict-typescript-lib-integration.md`.
+- **A workspace sibling is reached through its `exports`, not through
+  `tsconfig` `paths`.** pnpm's part ends at the `node_modules/<name>` symlink;
+  what the name resolves _to_ is decided by the target's own `package.json`.
+  So a package that nothing can resolve is a package missing an `exports`
+  field, and the fix goes there — the ten private `apps/*` packages that
+  publish nothing still carry `"exports": "./src/index.mts"` for exactly this
+  reason.
+    - **The one legitimate `paths` entry is a package's own name**, so that
+      `samples/` — embedded verbatim into the README by `doc:embed` — can
+      import the way a consumer does while still being checked against the
+      source being edited. Twelve such entries remain, each with the reason
+      written next to it. Everything else resolves through `dist/`, which is
+      why `check-all` and the CI workflows run `ws:build` before any type
+      check.
+    - **That much is enforced rather than remembered.**
+      `pnpm run check:root:tsconfig-paths` fails on a `paths` key that is not
+      the package's own name and on a target that is not a file — the two
+      things TypeScript itself reports as nothing at all. What it cannot
+      judge is whether a self-reference is warranted in the first place; the
+      `samples/` case above is the only one so far. See
+      `docs/workspace-package-linking.md`, which also records what the check
+      leaves out and why `customConditions` was measured and not adopted.
+    - `tools/configs/tsconfig.tsx.json` is separate, and outside what that
+      check reads: its `paths` are `tsx`'s runtime resolution for build
+      scripts that run before any `dist/` exists. See "Building from a clean
+      checkout".
 
 ## Building from a clean checkout
 

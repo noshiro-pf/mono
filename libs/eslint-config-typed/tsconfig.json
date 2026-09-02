@@ -5,15 +5,12 @@
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
   "compilerOptions": {
+    // `samples/` imports this package by its own name, the way a consumer
+    // does, and is embedded into the README verbatim. Mapped to the source so
+    // that a sample is checked against the code being edited rather than
+    // against the last build. See docs/workspace-package-linking.md.
     "paths": {
-      "eslint-config-typed": ["./src/entry-point.mts"],
-      // `scripts/gen-eslint-rules/` imports the plugin, which is
-      // workspace-linked and has no `dist/` yet while this package is being
-      // built (both are emitted in the same `ws:build` stage). Resolving it
-      // from source removes that ordering constraint.
-      "eslint-plugin-ts-type-forge": [
-        "../eslint-plugin-ts-type-forge/src/index.mts"
-      ]
+      "eslint-config-typed": ["./src/entry-point.mts"]
     }
   },
   "include": [

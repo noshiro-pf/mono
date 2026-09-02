@@ -1,18 +1,9 @@
-import * as path from 'node:path';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
-  alias: {
-    // `ts-fortress-types` is private and has no build output, so both the type
-    // checker (see tsconfig.json `paths`) and the test run read its source.
-    'ts-fortress-types': path.resolve(
-      workspaceRootPath,
-      '../ts-fortress-types/src/index.mts',
-    ),
-  },
   coverage: {
     include: ['src/**/*.mts'],
   },

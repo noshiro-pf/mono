@@ -3,20 +3,5 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "compilerOptions": {
-    // Resolved from source rather than from build output: `react-utils` and
-    // `resize-observer-react-hooks` are private and have none, and
-    // `better-react-use-state` is mapped the same way `apps/react-utils`
-    // maps it.
-    "paths": {
-      "react-utils": ["../react-utils/src/index.mts"],
-      "resize-observer-react-hooks": [
-        "../resize-observer-react-hooks/src/index.mts"
-      ],
-      "better-react-use-state": [
-        "../../libs/better-react-use-state/src/index.mts"
-      ]
-    }
-  },
   "include": ["./src"]
 }
