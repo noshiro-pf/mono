@@ -9,11 +9,7 @@
     // `prepare` script writes do nothing without it. Set per package while the
     // repository migrates one at a time; it moves to the shared config once
     // every package passes. See docs/strict-typescript-lib-integration.md.
-    "libReplacement": true,
-
-    "paths": {
-      "ts-data-forge": ["../ts-data-forge/src/entry-point.mts"]
-    }
+    "libReplacement": true
   },
   // `./test` holds only `strict-lib-active.mts`, the probe that fails when the
   // replacement above stops happening. It is not published — `files` lists

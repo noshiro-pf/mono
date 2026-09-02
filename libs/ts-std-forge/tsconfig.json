@@ -3,10 +3,5 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "compilerOptions": {
-    "paths": {
-      "ts-std-forge": ["./src/entry-point.mts"]
-    }
-  },
   "include": ["./src", "./test", "./scripts", "./configs"]
 }

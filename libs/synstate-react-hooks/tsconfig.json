@@ -11,8 +11,12 @@
     // every package passes. See docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
+    // `samples/` imports this package by its own name, the way a consumer
+    // does, and is embedded into the README verbatim. Mapped to the source so
+    // that a sample is checked against the code being edited rather than
+    // against the last build. See docs/workspace-package-linking.md.
     "paths": {
-      "synstate-react-hooks": ["./src/entry-point.mts"]
+      "synstate-react-hooks": ["./src/index.mts"]
     }
   },
   "include": ["./samples", "./src", "./test", "./scripts", "./configs"]

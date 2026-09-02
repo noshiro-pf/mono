@@ -9,11 +9,7 @@
     // `prepare` script writes do nothing without it. Set per package while the
     // repository migrates one at a time; it moves to the shared config once
     // every package passes. See docs/strict-typescript-lib-integration.md.
-    "libReplacement": true,
-
-    "paths": {
-      "octokit-safe-types": ["./src/entry-point.mts"]
-    }
+    "libReplacement": true
   },
   "include": [
     "./src",

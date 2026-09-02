@@ -3,14 +3,5 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "compilerOptions": {
-    // `better-react-use-state` is resolved from source: this package is private
-    // and nothing here is built.
-    "paths": {
-      "better-react-use-state": [
-        "../../libs/better-react-use-state/src/index.mts"
-      ]
-    }
-  },
   "include": ["./src"]
 }

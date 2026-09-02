@@ -912,6 +912,27 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       blocks them as subdependencies, but a direct one is always allowed and
       `pnpm-update` auto-merges. See
       `docs/strict-typescript-lib-integration.md`.
+- **A workspace sibling is reached through its `exports`, not through
+  `tsconfig` `paths`.** pnpm's part ends at the `node_modules/<name>` symlink;
+  what the name resolves _to_ is decided by the target's own `package.json`.
+  So a package that nothing can resolve is a package missing an `exports`
+  field, and the fix goes there — the ten private `apps/*` packages that
+  publish nothing still carry `"exports": "./src/index.mts"` for exactly this
+  reason. Do not add a `paths` entry to work around it: `paths` bypasses the
+  dependency declaration, so `import-x/no-extraneous-dependencies` and knip
+  stop seeing the edge, and a mapping whose target does not exist falls back
+  to normal resolution with no error at all (four had been dead for months).
+    - **The one legitimate use is a package's own name**, so that `samples/` —
+      embedded verbatim into the README by `doc:embed` — can import the way a
+      consumer does while still being checked against the source being edited.
+      Twelve such entries remain, each with the reason written next to it.
+      Everything else resolves through `dist/`, which is why `check-all` and
+      the CI workflows run `ws:build` before any type check. See
+      `docs/workspace-package-linking.md`, which also records why
+      `customConditions` was measured and not adopted.
+    - `tools/configs/tsconfig.tsx.json` is separate: its `paths` are `tsx`'s
+      runtime resolution for build scripts that run before any `dist/` exists.
+      See "Building from a clean checkout".
 
 ## Building from a clean checkout
 

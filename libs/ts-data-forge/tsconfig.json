@@ -13,13 +13,12 @@
     // every package passes. See docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
+    // `samples/` imports this package by its own name, the way a consumer
+    // does, and is embedded into the README verbatim. Mapped to the source so
+    // that a sample is checked against the code being edited rather than
+    // against the last build. See docs/workspace-package-linking.md.
     "paths": {
-      "ts-data-forge": ["./src/entry-point.mts"],
-      // `configs/eslint/` imports a type from eslint-config-typed, which is
-      // workspace-linked and has no `dist/` yet while this package is being
-      // built (both are emitted in the same `ws:build` stage). Resolving it
-      // from source removes that ordering constraint.
-      "eslint-config-typed": ["../eslint-config-typed/src/entry-point.mts"]
+      "ts-data-forge": ["./src/entry-point.mts"]
     }
   },
   "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
