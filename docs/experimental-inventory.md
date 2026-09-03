@@ -326,35 +326,15 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 
 ### React 側の apps 7 つは、連れてくる utils が全部揃っている
 
-| app                                     | 行数 | 追加で要る utils |
-| :-------------------------------------- | ---: | :--------------- |
-| `annotation-tool`                       | 2006 | **なし**         |
-| `blueprintjs-playground-styled`         | 1701 | **なし**         |
-| `housing-loan-calculator-app`           | 1143 | **なし**         |
-| `cant-stop-probability-app`             |  653 | **なし**         |
-| `catan-dice-app`                        |  471 | **なし**         |
-| ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節） |
-| `blueprintjs-playground`                |   92 | **なし**         |
-
-| app                                 | 行数 | 追加で要る utils             |
-| :---------------------------------- | ---: | :--------------------------- |
-| `annotation-tool`                   | 2006 | **なし**                     |
-| ~~`blueprintjs-playground-styled`~~ | 1701 | 大半が復元済みだった（下節） |
-| `housing-loan-calculator-app`       | 1143 | **なし**                     |
-| `cant-stop-probability-app`         |  653 | **なし**                     |
-| `catan-dice-app`                    |  471 | **なし**                     |
-| `lambda-calculus-interpreter-react` |  196 | **なし**                     |
-| `blueprintjs-playground`            |   92 | **なし**                     |
-
-| app                                 | 行数 | 追加で要る utils |
-| :---------------------------------- | ---: | :--------------- |
-| `annotation-tool`                   | 2006 | **なし**         |
-| `blueprintjs-playground-styled`     | 1701 | **なし**         |
-| ~~`housing-loan-calculator-app`~~   | 1143 | 復元済み（下節） |
-| ~~`cant-stop-probability-app`~~     |  653 | 復元済み（下節） |
-| `catan-dice-app`                    |  471 | **なし**         |
-| `lambda-calculus-interpreter-react` |  196 | **なし**         |
-| `blueprintjs-playground`            |   92 | **なし**         |
+| app                                     | 行数 | 追加で要る utils             |
+| :-------------------------------------- | ---: | :--------------------------- |
+| `annotation-tool`                       | 2006 | **なし**                     |
+| ~~`blueprintjs-playground-styled`~~     | 1701 | 大半が復元済みだった（下節） |
+| ~~`housing-loan-calculator-app`~~       | 1143 | 復元済み（下節）             |
+| ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
+| `catan-dice-app`                        |  471 | **なし**                     |
+| ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
+| `blueprintjs-playground`                |   92 | **なし**                     |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
