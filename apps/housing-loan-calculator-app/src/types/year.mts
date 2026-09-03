@@ -1,5 +1,5 @@
-import { type TypeOf, uint32 } from 'ts-fortress';
+import * as t from 'ts-fortress';
 
-export const Year = uint32();
+export const Year = t.uint32();
 
-export type Year = TypeOf<typeof Year>;
+export type Year = t.TypeOf<typeof Year>;
