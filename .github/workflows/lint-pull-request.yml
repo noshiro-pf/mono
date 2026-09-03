@@ -15,8 +15,17 @@ on:
       - '!archive/**'
     types:
       - opened
+      # Title, body or base branch. A body edit re-runs both jobs as well,
+      # and has to: a job skipped on "the title did not change" would report
+      # `skipped` for a required context and supersede a red title check
+      # with a satisfied one.
       - edited
       - synchronize
+      # So that `[WIP]` skips these checks as it skips the five check
+      # workflows, and taking the label off runs them again — see the job
+      # `if`s below.
+      - labeled
+      - unlabeled
 
 # The title is edited and the branch pushed to in bursts; only the last state
 # is worth a run — see the note in type-check.yml.
@@ -44,8 +53,17 @@ env:
   LC_ALL: C.UTF-8
 
 jobs:
+  # Both jobs skip while the `[WIP]` label is on, as every check workflow
+  # does — see the note in type-check.yml. Each job's name is its required
+  # context and neither has a matrix, so the check run GitHub creates for
+  # the skipped job carries that very name, reported as `skipped`, which a
+  # required status check accepts; `no-wip-label` in wip-label.yml is what
+  # holds the merge meanwhile, and taking the label off fires `unlabeled`,
+  # which runs both again. Only `pull_request_target` reaches this workflow,
+  # so there is no other event to exempt.
   semantic-pull-request:
     name: Validate PR title
+    if: ${{ !contains(github.event.pull_request.labels.*.name, '[WIP]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -78,6 +96,7 @@ jobs:
 
   commit-messages:
     name: Validate commit messages
+    if: ${{ !contains(github.event.pull_request.labels.*.name, '[WIP]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

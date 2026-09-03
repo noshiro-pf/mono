@@ -85,7 +85,8 @@ jobs:
     # so each of the three needs something else to hold the merge — and each
     # has one. Out of date: the ruleset's
     # `strict_required_status_checks_policy`. `[WIP]`: the `no-wip-label`
-    # check in wip-label.yml, which fails for as long as the label is on.
+    # status written by wip-label.yml, which stays `pending` for as long as
+    # the label is on.
     # Nothing relevant in the diff: nothing here would have read those paths
     # anyway, which is the one case where "not checked" is the right answer.
     #
@@ -203,11 +204,11 @@ jobs:
   # than red. Something else holds the merge in each case, and neither is
   # this workflow's business:
   #
-  # - `[WIP]`: `no-wip-label` in wip-label.yml fails for as long as the label
-  #   is on, and it is a required status check. **That check and its context
-  #   in the ruleset are what stop a labelled pull request from merging.**
-  #   Delete either and the hole this job exists to close reopens — the two
-  #   go together.
+  # - `[WIP]`: the `no-wip-label` status wip-label.yml writes stays `pending`
+  #   for as long as the label is on, and it is required. **That status and
+  #   its context in the ruleset are what stop a labelled pull request from
+  #   merging.** Delete either and the hole this job exists to close reopens
+  #   — the two go together.
   # - Behind the base branch: `strict_required_status_checks_policy` holds
   #   the merge, and the update that clears it runs everything again on the
   #   commit that will actually be merged.
