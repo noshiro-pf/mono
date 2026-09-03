@@ -1,5 +1,12 @@
 # ts-fortress-types
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [55a322d]
+    - ts-fortress@12.1.0
+
 ## 0.0.3
 
 ### Patch Changes
