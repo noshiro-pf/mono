@@ -1,5 +1,13 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.10.5
+
+### Patch Changes
+
+- ce87449: Build with the native TypeScript compiler instead of Rollup. Each module in `dist/` is now emitted by `tsc` as written, with the type tests, in-source tests and identity casts removed afterwards, so `export` declarations appear inline rather than in a trailing `export { ... }` list. The declarations are unchanged and every module exports the same names as before.
+- Updated dependencies [ce87449]
+    - ts-data-forge@14.6.2
+
 ## 5.10.4
 
 ### Patch Changes
