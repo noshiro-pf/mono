@@ -1218,6 +1218,13 @@ Use `expectType<A, B>('=')` whenever possible. Avoid using `expectType<A, B>('<=
 - Use `assert.deepStrictEqual(A, B)` instead of `assert.deepEqual(A, B)`, `expect(A).toEqual(B)`, or `expect(A).toStrictEqual(B)` in Vitest tests (enforced by `vitest-coding-style/no-expect-to-strict-equal`).
 - Use `test()` instead of `it()` in Vitest tests.
 - Avoid overusing `await` for synchronous events and avoid `force`/`pause`; prefer screen API and user interaction simulation.
+- Write multi-line string fixtures and expectations with a `dedent` template
+  literal, not with an array joined by `'\n'` or a `lines(...)` helper. A
+  `dedent` literal reads like the text it stands for; a list of quoted lines
+  does not. `dedent` drops the blank lines at either end and the common
+  indentation, so when those matter to the assertion — a pass that keeps
+  line numbers, say — assert them separately (`text.split('\n').length`)
+  rather than giving up `dedent` for the whole test.
 
 ## Coding Style & Naming Conventions
 

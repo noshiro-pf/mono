@@ -15,117 +15,123 @@ const strip = (source: string): string => {
   return result.value;
 };
 
+const lineCount = (text: string): number => text.split('\n').length;
+
+/** Removes the blank lines at both ends, which `dedent` does not produce. */
+const trimBlankLines = (text: string): string =>
+  text.replace(/^\n+/u, '').replace(/\n+$/u, '');
+
 /**
- * Joins lines verbatim. `dedent` drops leading and trailing blank lines,
- * which is exactly what an expected output here is made of.
+ * Strips `source`, checks that the line count is unchanged, and returns the
+ * result without the blank lines at either end. Those lines stand where
+ * removed code was, and a `dedent` literal cannot express them, so a test
+ * compares what is left against a `dedent` literal.
  */
-const lines = (...xs: readonly string[]): string => xs.join('\n');
+const stripKeepingLines = (source: string): string => {
+  const stripped = strip(source);
+
+  assert.deepStrictEqual(lineCount(stripped), lineCount(source));
+
+  return trimBlankLines(stripped);
+};
 
 describe(stripDevOnlyCode, () => {
   test('removes an in-source test block and the imports only it used', () => {
-    const source = dedent`
-      import { source } from './source.mjs';
-      import { withInitialValue } from './with-initial-value.mjs';
-      export const f = (x) => x;
-      if (import.meta.vitest !== undefined) {
-        test('type test', () => {
-          expect(1).toBe(1);
-        });
-        {
-          const s = source();
-          const _d = s.pipe(withInitialValue(0));
-        }
-      }
-      // trailing comment
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        '',
-        '',
-        'export const f = (x) => x;',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '// trailing comment',
+      stripKeepingLines(
+        dedent`
+          import { source } from './source.mjs';
+          import { withInitialValue } from './with-initial-value.mjs';
+          export const f = (x) => x;
+          if (import.meta.vitest !== undefined) {
+            test('type test', () => {
+              expect(1).toBe(1);
+            });
+            {
+              const s = source();
+              const _d = s.pipe(withInitialValue(0));
+            }
+          }
+          // trailing comment
+        `,
       ),
+      dedent`
+        export const f = (x) => x;
+
+
+
+
+
+
+
+
+
+        // trailing comment
+      `,
     );
   });
 
   test('removes expectType statements and the block they emptied', () => {
-    const source = dedent`
-      import { expectType } from './expect-type.mjs';
-      import { g } from './g.mjs';
-      export const f = () => g();
-      // --- expectType assertions ---
-      {
-        expectType('=');
-        expectType('<=');
-      }
-      expectType('=');
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        '',
-        "import { g } from './g.mjs';",
-        'export const f = () => g();',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
+      stripKeepingLines(
+        dedent`
+          import { expectType } from './expect-type.mjs';
+          import { g } from './g.mjs';
+          export const f = () => g();
+          // --- expectType assertions ---
+          {
+            expectType('=');
+            expectType('<=');
+          }
+          expectType('=');
+        `,
       ),
+      dedent`
+        import { g } from './g.mjs';
+        export const f = () => g();
+      `,
     );
   });
 
   test('removes expectType inside a function body and keeps the rest', () => {
-    const source = dedent`
-      import { expectType } from 'ts-data-forge';
-      export const f = async () => {
-        const response = await fetch('x');
-        expectType('=');
-        return response;
-      };
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        '',
-        'export const f = async () => {',
-        "  const response = await fetch('x');",
-        '',
-        '  return response;',
-        '};',
+      stripKeepingLines(
+        dedent`
+          import { expectType } from 'ts-data-forge';
+          export const f = async () => {
+            const response = await fetch('x');
+            expectType('=');
+            return response;
+          };
+        `,
       ),
+      dedent`
+        export const f = async () => {
+          const response = await fetch('x');
+
+          return response;
+        };
+      `,
     );
   });
 
   test('removes a loop and an if whose bodies became empty', () => {
-    const source = dedent`
-      export const xs = [1, 2, 3];
-      for (const x of xs) {
-        expectType('=');
-      }
-      if (xs.length > 0) expectType('=');
-      label: for (;;) {
-        expectType('=');
-      }
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines('export const xs = [1, 2, 3];', '', '', '', '', '', '', ''),
+      stripKeepingLines(
+        dedent`
+          export const xs = [1, 2, 3];
+          for (const x of xs) {
+            expectType('=');
+          }
+          if (xs.length > 0) expectType('=');
+          label: for (;;) {
+            expectType('=');
+          }
+        `,
+      ),
+      dedent`
+        export const xs = [1, 2, 3];
+      `,
     );
   });
 
@@ -137,56 +143,56 @@ describe(stripDevOnlyCode, () => {
       };
     `;
 
-    assert.deepStrictEqual(strip(source), source);
+    assert.deepStrictEqual(stripKeepingLines(source), source);
   });
 
   test('empties the then-branch but keeps an if that has an else', () => {
-    const source = dedent`
-      export const f = (c) => {
-        if (c) {
-          expectType('=');
-        } else {
-          console.log(c);
-        }
-      };
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        'export const f = (c) => {',
-        '  if (c) {',
-        '',
-        '  } else {',
-        '    console.log(c);',
-        '  }',
-        '};',
+      stripKeepingLines(
+        dedent`
+          export const f = (c) => {
+            if (c) {
+              expectType('=');
+            } else {
+              console.log(c);
+            }
+          };
+        `,
       ),
+      dedent`
+        export const f = (c) => {
+          if (c) {
+
+          } else {
+            console.log(c);
+          }
+        };
+      `,
     );
   });
 
   test('unwraps identity casts, keeping the parentheses only where needed', () => {
-    const source = dedent`
-      import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
-      export const f = (a, b) => castMutable(a ?? b).x;
-      export const g = (xs) => Result.ok(castDeepMutable(xs));
-      export const h = (o) => castMutable(o.p[0]).q;
-      export const i = () => castMutable({ a: 1 });
-      export const j = (a, b) => castMutable((a ?? b));
-      export const k = () => castMutable(/* c */ [1, 2]);
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        "import { Result } from 'ts-data-forge';",
-        'export const f = (a, b) => (a ?? b).x;',
-        'export const g = (xs) => Result.ok(xs);',
-        'export const h = (o) => o.p[0].q;',
-        'export const i = () => ({ a: 1 });',
-        'export const j = (a, b) => (a ?? b);',
-        'export const k = () => [1, 2];',
+      stripKeepingLines(
+        dedent`
+          import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
+          export const f = (a, b) => castMutable(a ?? b).x;
+          export const g = (xs) => Result.ok(castDeepMutable(xs));
+          export const h = (o) => castMutable(o.p[0]).q;
+          export const i = () => castMutable({ a: 1 });
+          export const j = (a, b) => castMutable((a ?? b));
+          export const k = () => castMutable(/* c */ [1, 2]);
+        `,
       ),
+      dedent`
+        import { Result } from 'ts-data-forge';
+        export const f = (a, b) => (a ?? b).x;
+        export const g = (xs) => Result.ok(xs);
+        export const h = (o) => o.p[0].q;
+        export const i = () => ({ a: 1 });
+        export const j = (a, b) => (a ?? b);
+        export const k = () => [1, 2];
+      `,
     );
   });
 
@@ -199,48 +205,48 @@ describe(stripDevOnlyCode, () => {
       export const d = (xs) => xs.map(castMutable);
     `;
 
-    assert.deepStrictEqual(strip(source), source);
+    assert.deepStrictEqual(stripKeepingLines(source), source);
   });
 
   test('prunes a middle and a last import specifier', () => {
-    const source = dedent`
-      import { a, expectType, b } from 'x';
-      import { c, expectType as e } from 'y';
-      import def, { castMutable } from 'z';
-      export const f = () => [a, b, c, def];
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        "import { a, b } from 'x';",
-        "import { c } from 'y';",
-        "import def from 'z';",
-        'export const f = () => [a, b, c, def];',
+      stripKeepingLines(
+        dedent`
+          import { a, expectType, b } from 'x';
+          import { c, expectType as e } from 'y';
+          import def, { castMutable } from 'z';
+          export const f = () => [a, b, c, def];
+        `,
       ),
+      dedent`
+        import { a, b } from 'x';
+        import { c } from 'y';
+        import def from 'z';
+        export const f = () => [a, b, c, def];
+      `,
     );
   });
 
   test('prunes a specifier from a multi-line import list', () => {
-    const source = dedent`
-      import {
-        a,
-        expectType,
-        b,
-      } from 'x';
-      export const f = () => [a, b];
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines(
-        'import {',
-        '  a,',
-        '',
-        '  b,',
-        "} from 'x';",
-        'export const f = () => [a, b];',
+      stripKeepingLines(
+        dedent`
+          import {
+            a,
+            expectType,
+            b,
+          } from 'x';
+          export const f = () => [a, b];
+        `,
       ),
+      dedent`
+        import {
+          a,
+
+          b,
+        } from 'x';
+        export const f = () => [a, b];
+      `,
     );
   });
 
@@ -251,19 +257,23 @@ describe(stripDevOnlyCode, () => {
       export const o = { a };
     `;
 
-    assert.deepStrictEqual(strip(source), source);
+    assert.deepStrictEqual(stripKeepingLines(source), source);
   });
 
   test('keeps the file header when the first statement is removed', () => {
-    const source = dedent`
-      // cspell:ignore foo
-      expectType('=');
-      export const x = 1;
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines('// cspell:ignore foo', '', 'export const x = 1;'),
+      stripKeepingLines(
+        dedent`
+          // cspell:ignore foo
+          expectType('=');
+          export const x = 1;
+        `,
+      ),
+      dedent`
+        // cspell:ignore foo
+
+        export const x = 1;
+      `,
     );
   });
 
@@ -273,6 +283,20 @@ describe(stripDevOnlyCode, () => {
     `;
 
     assert.deepStrictEqual(strip(source), source);
+  });
+
+  test('keeps every line break, so the source map stays valid by line', () => {
+    assert.deepStrictEqual(
+      strip(
+        dedent`
+          import { expectType } from 'x';
+          export const a = 1;
+          expectType('=');
+          export const b = 2;
+        `,
+      ),
+      ['', 'export const a = 1;', '', 'export const b = 2;'].join('\n'),
+    );
   });
 
   test('fails on a removable call that is not a statement', () => {
@@ -320,19 +344,26 @@ describe(stripDevOnlyCode, () => {
 
     assert.isTrue(Result.isOk(result));
 
-    assert.deepStrictEqual(result.value, lines('', '', 'export const y = 1;'));
+    assert.deepStrictEqual(
+      trimBlankLines(result.value),
+      dedent`
+        export const y = 1;
+      `,
+    );
   });
 
   test('keeps positions right in text with astral characters', () => {
-    const source = dedent`
-      import { expectType } from 'x';
-      export const s = '😀';
-      expectType('=');
-    `;
-
     assert.deepStrictEqual(
-      strip(source),
-      lines('', "export const s = '😀';", ''),
+      stripKeepingLines(
+        dedent`
+          import { expectType } from 'x';
+          export const s = '😀';
+          expectType('=');
+        `,
+      ),
+      dedent`
+        export const s = '😀';
+      `,
     );
   });
 });

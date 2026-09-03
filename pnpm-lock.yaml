@@ -2613,6 +2613,9 @@ importers:
       ts-type-forge:
         specifier: workspace:^
         version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -2674,9 +2677,6 @@ importers:
       typedoc-github-theme:
         specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2

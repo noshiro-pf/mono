@@ -88,7 +88,8 @@
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
     "ts-data-forge": "workspace:^",
-    "ts-type-forge": "workspace:^"
+    "ts-type-forge": "workspace:^",
+    "typescript": ">=5.0.0 <7.0.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -111,14 +112,12 @@
     "tsx": "catalog:",
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
-    "typescript": "catalog:",
     "typescript-native": "npm:typescript@7.0.2",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "prettier": ">=3.0.0",
-    "typescript": ">=5.0.0 <7.0.0"
+    "prettier": ">=3.0.0"
   },
   "packageManager": "pnpm@11.20.0",
   "engines": {
