@@ -856,6 +856,20 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       even though only the root `.prettierrc` names them. Add such a dependency
       to `ignoreDependencies` with the reason rather than deleting it — dropping
       the Prettier plugins silently stopped import sorting in generated files.
+    - **A new workspace entry goes after the previous entry's closing `},`,
+      never after its `"entry"` line.** Most of the blocks in `knip.jsonc` are
+      byte-identical — five share
+      `{"entry": ["src/index.mts"], "project": ["**/*.mts"]}` alone — so an
+      edit anchored on `"entry"` or `"project"` has several equally good
+      matches and readily lands _inside_ the entry above, which then loses its
+      body. It happened three times running (#1758 / #1754 / #1756), in every
+      case to `apps/lambda-calculus-interpreter-react`. Git merges the
+      insertion without a conflict, so nothing objects until Prettier reports
+      a `SyntaxError` about formatting, minutes into CI, naming neither knip
+      nor the entry that was damaged — and when the braces happen to balance,
+      not even that: the file parses and the swallowed entry is silently off.
+      `pnpm run check:root:knip-config` is the guard for both shapes; run it
+      after editing the file by hand.
 - **Build tooling that only `tools/configs/` imports is declared at the root.**
   Fourteen packages build through `tools/configs/rollup-config.mts`, so
   `@rollup/plugin-replace`, `@rollup/plugin-strip` and `rollup-plugin-esbuild`

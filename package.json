@@ -28,6 +28,7 @@
     "changeset:publish": "pnpm run ws:build && pnpm changeset publish",
     "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile",
     "check:root": "pnpm run '/check:root:.*/'",
+    "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
