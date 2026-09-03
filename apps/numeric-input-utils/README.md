@@ -11,6 +11,14 @@ the six utilities `event-schedule-app` needs. Published as
 `@noshiro/numeric-input-utils@1.3.0`; that version stays on npm, and this copy
 is private.
 
+## Example
+
+<https://playcode.io/2208737>
+
+## Documents
+
+<https://zenn.dev/noshiro_piko/articles/numeric-input-interface>
+
 ## What changed on the way back
 
 - **The `useRef` holding the callbacks is gone.** It existed so that a caller
