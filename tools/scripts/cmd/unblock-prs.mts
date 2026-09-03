@@ -3,17 +3,7 @@ import * as path from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import * as util from 'node:util';
 import { Arr, isRecord, Json, Num, Result } from 'ts-data-forge';
-import {
-  array,
-  boolean,
-  number,
-  record,
-  string,
-  unknown,
-  validationErrorsToMessages,
-  type Type,
-  type TypeOf,
-} from 'ts-fortress';
+import * as t from 'ts-fortress';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -111,34 +101,34 @@ export const defaultOptions: Options = {
 };
 
 /** The fields read from `gh pr list` / `gh pr view`. */
-const PullRequestSchema = record({
-  number: number(),
-  title: string(),
-  state: string(),
-  headRefName: string(),
-  headRefOid: string(),
-  baseRefName: string(),
-  isDraft: boolean(),
-  mergeStateStatus: string(),
-  autoMergeRequest: unknown(),
-  labels: array(record({ name: string() })),
+const PullRequestSchema = t.record({
+  number: t.number(),
+  title: t.string(),
+  state: t.string(),
+  headRefName: t.string(),
+  headRefOid: t.string(),
+  baseRefName: t.string(),
+  isDraft: t.boolean(),
+  mergeStateStatus: t.string(),
+  autoMergeRequest: t.unknown(),
+  labels: t.array(t.record({ name: t.string() })),
 });
 
-type PullRequest = TypeOf<typeof PullRequestSchema>;
+type PullRequest = t.TypeOf<typeof PullRequestSchema>;
 
-const PullRequestListSchema = array(PullRequestSchema);
+const PullRequestListSchema = t.array(PullRequestSchema);
 
 /** The fields read from `gh pr checks --json`. */
-const CheckListSchema = array(
-  record({
-    name: string(),
+const CheckListSchema = t.array(
+  t.record({
+    name: t.string(),
     /** `pass` | `fail` | `pending` | `skipping` | `cancel` */
-    bucket: string(),
-    link: string(),
+    bucket: t.string(),
+    link: t.string(),
   }),
 );
 
-type Check = TypeOf<typeof CheckListSchema>[number];
+type Check = t.TypeOf<typeof CheckListSchema>[number];
 
 type SkipReason =
   | 'checks-failed'
@@ -997,7 +987,7 @@ const git = async (
 
 // --- utilities ---------------------------------------------------------------
 
-const parseJson = <A,>(text: string, schema: Type<A>): Result<A, string> => {
+const parseJson = <A,>(text: string, schema: t.Type<A>): Result<A, string> => {
   const parsed = Json.parse(text);
 
   if (Result.isErr(parsed)) return Result.err(`invalid JSON: ${parsed.value}`);
@@ -1005,7 +995,7 @@ const parseJson = <A,>(text: string, schema: Type<A>): Result<A, string> => {
   const validated = schema.validate(parsed.value);
 
   return Result.isErr(validated)
-    ? Result.err(validationErrorsToMessages(validated.value).join('\n'))
+    ? Result.err(t.validationErrorsToMessages(validated.value).join('\n'))
     : Result.ok(validated.value);
 };
 
