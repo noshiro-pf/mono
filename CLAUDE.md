@@ -827,6 +827,42 @@ dash, a curly quote or an accented name still passes.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
 - Make sure CI passes and `pnpm run check-all` completes without errors.
 
+### Opening a pull request: draft, with `[WIP]` on it
+
+**Implement the change, run the local checks, and only then open the pull
+request — as a draft, with the `[WIP]` label on it.** The two markers are
+addressed to different readers and both are wanted at that moment:
+
+- **Draft is addressed to people.** It says the branch is not asking for
+  review yet, and GitHub refuses to merge a draft natively.
+- **`[WIP]` is addressed to CI.** Every check workflow and both lint jobs skip
+  while it is on, and `no-wip-label` holds the merge with a pending status —
+  see "Check triggers, `[WIP]` and out-of-date branches". `unblock-prs` sets a
+  labelled pull request aside too, so the loop neither rebases nor watches it.
+
+`gh pr create --draft --label '[WIP]'` does both in the call that opens it.
+Adding the label afterwards works, but the `opened` event has already started
+a run by then, which the `labeled` event then cancels through the concurrency
+group — the runner minutes are spent either way.
+
+Consequences worth having in mind:
+
+- **While the label is on, the local checks are the only checks the branch
+  gets.** Nothing runs on the runners at all. `pnpm run check-all` before
+  opening is therefore not politeness but the whole verification, and a pull
+  request opened without it sits in the list looking exactly like one that
+  passed.
+- **Taking the label off is how CI is asked for.** `unlabeled` is in every
+  check workflow's trigger list, so removing it starts the whole matrix on the
+  commit already pushed — there is no need to push an empty commit to wake
+  anything up.
+- **The draft flag alone skips nothing.** A draft is checked like any other
+  pull request, so relying on it instead of the label spends a full matrix on
+  every push to work that is not ready to be read yet.
+- **The label is a pause, not a state to leave a branch in.** A pull request
+  that keeps it is one nothing will ever merge: no check runs, `no-wip-label`
+  stays pending, and `unblock-prs` skips it.
+
 ### Several pull requests from one session
 
 **When one session produces more than one pull request, chain the branches
