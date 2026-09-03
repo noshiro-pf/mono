@@ -83,13 +83,63 @@ namespace PreferNamespaceImport {
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
+/**
+ * @description Report a chain of hand-written type guards narrowing one value, once it is long enough to be a schema, and point at `ts-fortress`
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | false      |
+ *  ```
+ */
+namespace PreferSchemaOverGuardChain {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "threshold": {
+   *         "type": "integer",
+   *         "minimum": 2,
+   *         "description": "How many guards on one value a single chain may contain before it is reported. Defaults to 5."
+   *       },
+   *       "guards": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Names of the guard functions to count, replacing the default list. A member call is matched on its property name, so `Arr.isArray` is named `isArray`."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = NonNullable<
+    RuleOptionsOf<'prefer-schema-over-guard-chain'>[0]
+  >;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
 export type EslintTsFortressRules = Readonly<{
   'ts-fortress/prefer-canonical-length-constrained-type': PreferCanonicalLengthConstrainedType.RuleEntry;
   'ts-fortress/prefer-namespace-import': PreferNamespaceImport.RuleEntry;
+  'ts-fortress/prefer-schema-over-guard-chain': PreferSchemaOverGuardChain.RuleEntry;
 }>;
 
 export type EslintTsFortressRulesOption = Readonly<{
   'ts-fortress/prefer-namespace-import': PreferNamespaceImport.Options;
+  'ts-fortress/prefer-schema-over-guard-chain': PreferSchemaOverGuardChain.Options;
 }>;
 
 // If this assertion fails to type-check, this generated file has drifted from

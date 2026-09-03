@@ -67,10 +67,11 @@ export default [
 
 ## Rules
 
-| Rule                                       | Description                                                                                   |
-| :----------------------------------------- | :-------------------------------------------------------------------------------------------- |
-| `prefer-canonical-length-constrained-type` | Normalize a length-constrained array combinator with degenerate bounds to its canonical form. |
-| `prefer-namespace-import`                  | Require `ts-fortress` to be imported as a namespace rather than by name.                      |
+| Rule                                       | Description                                                                                    |
+| :----------------------------------------- | :--------------------------------------------------------------------------------------------- |
+| `prefer-canonical-length-constrained-type` | Normalize a length-constrained array combinator with degenerate bounds to its canonical form.  |
+| `prefer-namespace-import`                  | Require `ts-fortress` to be imported as a namespace rather than by name.                       |
+| `prefer-schema-over-guard-chain`           | Report a hand-written chain of type guards on one value once it is long enough to be a schema. |
 
 ### `prefer-canonical-length-constrained-type`
 
@@ -215,6 +216,84 @@ completed safely:
   carry it;
 - the file has two namespace imports of `ts-fortress`, or one declaration that
   mixes a namespace specifier with a named or default one.
+
+### `prefer-schema-over-guard-chain`
+
+A long chain of hand-written type guards is a shape declaration that cannot be
+read as one:
+
+```ts
+// ❌
+const isProject = (value: unknown): value is Project =>
+    isRecord(value) &&
+    hasKey(value, 'name') &&
+    isString(value.name) &&
+    hasKey(value, 'path') &&
+    isString(value.path);
+
+// ✅
+const PROJECT = t.record({ name: t.string(), path: t.string() });
+```
+
+The length is the least of it. What the chain cannot do is say what was wrong:
+it returns `false`, so the caller filtering on it drops the value silently, with
+nothing left of which field was missing or what type it turned out to be. The
+shape is declared and checked in the same breath, so it cannot be named, reused,
+or read on its own. `validate` returns structured `ValidationError`s, ready for
+`validationErrorsToMessages`.
+
+The rule reports; there is no fix. Writing the schema is the work, and it is not
+mechanical — the chain says what the value must _have_, never what it _is_, so
+an optional member, a union, and a member that is simply never checked are
+indistinguishable from the guards alone.
+
+#### What is counted
+
+Guards within one `&&` chain, or one `||` chain of negated guards — the
+early-return spelling of the same check — grouped by the identifier their first
+argument is rooted at, so `hasKey(a, 'b')` and `isString(a.b)` count together
+while guards on two different values do not add up.
+
+A whole function body is deliberately not the unit. The same value checked once
+per field across a `fill`-style function is a series of defaults rather than a
+shape check, and measuring both units over one repository showed those to be
+almost all of what a function-scoped count reports.
+
+#### Options
+
+```ts
+'ts-fortress/prefer-schema-over-guard-chain': ['error', { threshold: 4 }],
+```
+
+- `threshold` (default `5`) — how many guards on one value a single chain may
+  contain before it is reported.
+- `guards` (default: the `ts-data-forge` narrowing helpers — `hasKey`,
+  `isRecord`, `isString`, `isNumber`, `isBoolean`, `isBigint`, `isSymbol`,
+  `isArray`, `isNonEmpty`, `isNonNullish`, `isNotNull`, `isNotUndefined`,
+  `isPrimitive`) — the names to count, replacing the default list. A member call
+  is matched on its property name, so `Arr.isArray` is named `isArray`.
+
+The default threshold comes from a distribution rather than from taste. Counted
+over the 3420 files of the repository this rule was written in, as they stood
+before it was applied to them:
+
+| guards | chains |
+| -----: | -----: |
+|      1 |    103 |
+|      2 |     41 |
+|      3 |     17 |
+|      4 |      1 |
+|      5 |      1 |
+|     6+ |      0 |
+
+One and two are ordinary narrowing and reporting them would be noise; three is
+still common enough to be a style rather than a smell. Four and five have one
+chain each, and they differ in exactly the way the threshold has to: the chain
+of four narrows a value that is already typed, which is the case this rule is
+least interested in, while the chain of five narrows the result of a
+`JSON.parse` — the case it exists for. So the default sits between them, at the
+length of the chain that prompted the rule. That chain of five is the one site
+the rule reported when it was turned on, and it has since been rewritten.
 
 ## License
 

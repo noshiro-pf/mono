@@ -1,7 +1,7 @@
-import { hasKey, isNumber, isRecord, isString, Result } from 'ts-data-forge';
+import { hasKey, isNumber, isRecord, Result } from 'ts-data-forge';
 import { createResultAssert } from 'ts-repo-utils';
 
-type AppConfig = Readonly<{ port: number; host: string }>;
+type AppConfig = Readonly<{ port: number }>;
 
 const parseConfig = (
   raw: string,
@@ -14,24 +14,18 @@ const parseConfig = (
     }
   })();
 
-  if (
-    !isRecord(parsed) ||
-    !hasKey(parsed, 'port') ||
-    !hasKey(parsed, 'host') ||
-    !isNumber(parsed.port) ||
-    !isString(parsed.host)
-  ) {
+  if (!isRecord(parsed) || !hasKey(parsed, 'port') || !isNumber(parsed.port)) {
     return Promise.resolve(Result.err({ message: 'Invalid config shape' }));
   }
 
-  return Promise.resolve(Result.ok({ port: parsed.port, host: parsed.host }));
+  return Promise.resolve(Result.ok({ port: parsed.port }));
 };
 
 const assertValidConfig = createResultAssert({
   run: parseConfig,
   onSuccess: (config) => {
-    console.log(`✓ Config loaded: ${config.host}:${config.port}`);
+    console.log(`✓ Config loaded on port ${config.port}`);
   },
 });
 
-await assertValidConfig('{"port":3000,"host":"localhost"}');
+await assertValidConfig('{"port":3000}');
