@@ -420,6 +420,7 @@ Things to keep in mind when editing a gated workflow:
 - **On a push to `main`, diffing against `origin/main` is a diff against
   `HEAD`**, which is empty and reads as "nothing changed" — every job would
   skip. The gate therefore compares against `github.event.before` on `main`.
+  Only `type-check.yml` still asks it on a push, for `coverage-main`.
 - **The matrix jobs must stay behind an aggregate for this to be safe.** A
   skipped matrix job produces one check run named after the job, never the
   `type-check (…)` contexts. While those were the required status checks, a
@@ -439,16 +440,40 @@ than it saves.
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
 `backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
-synchronize, reopened, labeled, unlabeled]`, and on `push`
-only for `main`. One event kind per commit is what keeps the checks list at one
-entry per job: triggering on `push` for branches as well would put a push run
-and a `pull_request` run side by side on every pull request. Nothing is lost by
-leaving `push` out — `synchronize` fires on every push to a branch with an open
-pull request, `opened` covers the pushes made before it existed, and a branch
-that never gets a pull request has nothing to protect, because the `main`
-ruleset accepts changes through pull requests only. The `push` runs on `main`
-re-check what actually landed, a squash merge being a new commit that no pull
-request run has seen.
+synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
+keeps the checks list at one entry per job: triggering on `push` for branches
+as well would put a push run and a `pull_request` run side by side on every
+pull request. Nothing is lost by leaving `push` out — `synchronize` fires on
+every push to a branch with an open pull request, `opened` covers the pushes
+made before it existed, and a branch that never gets a pull request has
+nothing to protect, because the `main` ruleset accepts changes through pull
+requests only.
+
+**A push to `main` runs almost nothing either, and two jobs are the
+exception.** A push to `main` is a merge, and a merge is a squash (the only
+merge method enabled) of a branch that already contained `main`'s tip
+(`strict_required_status_checks_policy`), so the commit it makes has the same
+tree as the pull request's head — a tree every check has already run on. The
+check workflows used to run their whole matrix on it anyway, on the reasoning
+that a squash makes a commit no pull request run has seen; that is true of the
+commit and false of its contents, and it cost 108 runner-minutes per merge for
+`type-check.yml` alone, at fifty-odd merges a week. So three of the five have
+no `push` trigger at all, and the two that keep one run a single job on it:
+
+- `type-check.yml` runs `coverage-main`, which is the matrix's `ws:test:cov`
+  entry on its own. Codecov compares a pull request's coverage with the
+  report on its base commit, and the base commit is one on `main`, so the
+  report has to come from a run on `main`. It is gated on the diff like the
+  matrix, so a merge that touched nothing the tests read uploads nothing.
+- `backup-repository-settings.yml` compares `bk/` with the repository's live
+  settings, which no branch changes and no pull request run covers unless it
+  touched `repo-settings/`. A merge is simply the occasion on which that drift
+  is looked for.
+
+What this gives up is the after-the-fact check on a merge made with the
+admin's bypass, which is the one way a head that is behind `main`, or was
+never checked, can land. Run the check workflows by hand from the Actions tab
+(`workflow_dispatch`) after such a merge; nothing else will.
 
 `wip-label.yml` rides along with the same trigger list. It is not a check
 workflow — it checks nothing, and does one API call — but it is what makes
@@ -499,8 +524,9 @@ cancelled one would have.
 - **`cancel-in-progress` is an expression, not a bare `true`.** On `main` that
   same gate diffs against `github.event.before`, so a push's run covers only
   that push. Cancelling the run for X when Y lands would leave the diff X
-  introduced — possibly the only diff a given check had anything to say about —
-  read by nothing at all. Pushes to `main` therefore run to completion.
+  introduced — the coverage upload for it, in the one job that still runs on
+  `main` — read by nothing at all. Pushes to `main` therefore run to
+  completion, and so does a `workflow_dispatch` run.
 - **The group keys on the pull request number** where there is one, so a
   `workflow_dispatch` run asked for by hand lands in a different group from the
   pull request's own runs and the two do not cancel each other.
@@ -652,8 +678,10 @@ inside a pull request flow only, so a direct push to `main` is refused even
 for the repository admin. The escape hatch for a wedged required check is to
 merge a pull request with the bypass, not to push. Do not widen it back to
 `"always"`: checks arrive only through pull requests now, so an unchecked
-direct push would reach `main` with nothing but the after-the-fact `push` run
-having seen it.
+direct push would reach `main` with nothing having seen it at all — the
+check workflows no longer run their matrix on a push to `main`. The same goes
+for a bypass merge; see "Check triggers" for the `workflow_dispatch` that
+covers it.
 
 ## Spell checking
 

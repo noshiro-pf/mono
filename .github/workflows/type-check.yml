@@ -1,12 +1,23 @@
 name: Type Check
 
 on:
-  # Only main. Pull request branches are covered by the `pull_request` events
-  # below — running both event kinds would list every check twice on the pull
-  # request. What this run adds is a check on what actually landed: a squash
-  # merge makes a new commit that no pull request run has seen. (The `main`
-  # ruleset allows no other way onto the branch, so a push to main and a merge
-  # are the same event.)
+  # Only main, and on main only the `coverage-main` job below runs. Pull
+  # request branches are covered by the `pull_request` events — running both
+  # event kinds would list every check twice on the pull request.
+  #
+  # A push to main is a merge (the `main` ruleset allows no other way onto
+  # the branch), and a merge here is a squash of a branch that already
+  # contained main's tip (`strict_required_status_checks_policy`), so the
+  # commit it makes has the same tree as the pull request's head — a tree
+  # every check in this matrix has already run on. This workflow used to run
+  # the whole matrix on it anyway, at 108 runner-minutes per merge, to confirm
+  # what the pull request had confirmed. The other check workflows have no
+  # `push` trigger at all for the same reason.
+  #
+  # The one thing a pull request run cannot do is give Codecov its baseline:
+  # coverage is compared against the base commit's report, and the base
+  # commit is one on main. So `ws:test:cov` alone runs on main, in a job of
+  # its own, and uploads.
   push:
     branches:
       - main
@@ -96,8 +107,13 @@ jobs:
     # reporting the required ones as satisfied. The `[WIP]` condition is
     # repeated here because `!cancelled()` also lifts the automatic skip that
     # a skipped dependency would otherwise give us.
+    #
+    # Not on `push`: that is a merge of a tree this matrix has already run
+    # on — see the trigger note at the top. `coverage-main` below is what a
+    # push runs.
     if: >-
       !cancelled() &&
+      github.event_name != 'push' &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
@@ -177,6 +193,60 @@ jobs:
         if: matrix.command == 'ws:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
+  # What a push to main runs: the `ws:test:cov` entry of the matrix above and
+  # nothing else, so that Codecov has a report on the base commit to compare
+  # a pull request's against. See the trigger note at the top for why the
+  # rest of the matrix does not run here.
+  #
+  # A job of its own rather than a step condition inside the matrix job,
+  # because a matrix entry that boots a runner and skips every step still
+  # reports a green check run named after a command that did not run. The
+  # setup steps are the matrix job's, repeated; keep the two in step.
+  #
+  # Gated on the diff exactly as the matrix is — `gates` compares against
+  # `github.event.before` on main — so a merge that touched nothing the
+  # tests read uploads nothing, as it did not before either.
+  coverage-main:
+    needs: gates
+    if: >-
+      !cancelled() &&
+      github.event_name == 'push' &&
+      needs.gates.outputs.should_run != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@noshiro-pf'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install chromium
+
+      - name: Build all packages
+        run: pnpm run ws:build
+
+      - name: Run "ws:test:cov"
+        run: pnpm run ws:test:cov
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+
   # The one required status check for this workflow. Everything above still
   # reports its own check run and is still worth reading, but none of them is
   # required any more, because a required context can be satisfied by a run
@@ -212,12 +282,16 @@ jobs:
   # - Behind the base branch: `strict_required_status_checks_policy` holds
   #   the merge, and the update that clears it runs everything again on the
   #   commit that will actually be merged.
+  #
+  # Not on `push` either: the matrix does not run there (see `coverage-main`),
+  # and there is no pull request on main for a required check to hold.
   type-check-result:
     needs:
       - gates
       - type-check
     if: >-
       always() &&
+      github.event_name != 'push' &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
