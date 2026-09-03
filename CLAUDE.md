@@ -728,6 +728,35 @@ a changeset publishes nothing no matter what it is called.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
 - Make sure CI passes and `pnpm run check-all` completes without errors.
 
+### Several pull requests from one session
+
+**When one session produces more than one pull request, chain the branches
+instead of growing each one from `main`.** Branch B off A, C off B, and so on
+— `main <- A <- B <- C`, not `main <- A`, `main <- B`, `main <- C` in
+parallel.
+
+The reason is how they land: `pnpm run unblock-prs` and the `unblock-prs`
+skill rebase one out-of-date branch at a time and let auto-merge do the rest,
+and every merge moves `main` and puts every other open branch `BEHIND`. A
+chain rebases mechanically — once A lands, B already contains A, so its rebase
+is a no-op or close to it. Three branches grown independently from `main` each
+have to be rebased onto whatever the previous merge produced, and every one of
+those is a chance for a conflict nobody was expecting, in a loop that has to
+stop and ask a human about it.
+
+- **The exception is changes that plainly cannot collide** — different files,
+  different packages, nothing shared. Those may branch from `main` in
+  parallel. "Plainly" means you can point at the disjoint paths; if you are
+  weighing it up, chain them.
+- **Order the chain so the earlier links are the ones most likely to be
+  merged.** A branch stacked behind one that gets rejected has to be rebased
+  by hand, which is the cost the chain was avoiding.
+- **A stacked pull request targets `main`, not its parent branch.**
+  `unblock-prs` drops any pull request whose `baseRefName` is not `main`, and
+  the ruleset the required checks answer to is `main`'s. The child's diff
+  shows the parent's commits until the parent lands; that is the price, and it
+  costs less than a pull request the loop will not look at.
+
 ## Releases
 
 Releases are managed by **changesets** only. `semantic-release` was removed
