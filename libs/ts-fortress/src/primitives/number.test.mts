@@ -218,7 +218,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(1, { nonZero: true });
 
-      expectType<typeof type, Type<NonZeroNumber>>('=');
+      expectType<TypeOf<typeof type>, NonZeroNumber>('=');
 
       assert.isTrue(type.is(-5));
 
@@ -239,7 +239,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(-1, { negative: true });
 
-      expectType<typeof type, Type<NegativeNumber>>('=');
+      expectType<TypeOf<typeof type>, NegativeNumber>('=');
 
       assert.isTrue(type.is(-5));
 
@@ -260,7 +260,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(0, { nonNegative: true });
 
-      expectType<typeof type, Type<NonNegativeNumber>>('=');
+      expectType<TypeOf<typeof type>, NonNegativeNumber>('=');
 
       assert.isTrue(type.is(5));
 
@@ -281,7 +281,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(1, { positive: true });
 
-      expectType<typeof type, Type<PositiveNumber>>('=');
+      expectType<TypeOf<typeof type>, PositiveNumber>('=');
 
       assert.isTrue(type.is(10));
 
@@ -302,7 +302,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(0, { nonPositive: true });
 
-      expectType<typeof type, Type<NegativeInt>>('>=');
+      expectType<TypeOf<typeof type>, NegativeInt>('>=');
 
       assert.isTrue(type.is(-5));
 
@@ -323,7 +323,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(10, { gt: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(6));
 
@@ -341,7 +341,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(5, { gte: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(5));
 
@@ -359,7 +359,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(5, { min: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(7));
 
@@ -375,7 +375,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(4, { lt: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(3));
 
@@ -393,7 +393,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(5, { lte: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(4));
 
@@ -411,7 +411,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(5, { max: 5 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(5));
 
@@ -429,7 +429,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(6, { multipleOf: 3 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(9));
 
@@ -443,7 +443,7 @@ describe('number with constraints', () => {
     test('treats a zero divisor as accepting only zero', () => {
       const type = number(0, { multipleOf: 0 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(0));
 
@@ -457,7 +457,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(8, { step: 2 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(10));
 
@@ -471,7 +471,7 @@ describe('number with constraints', () => {
     test('treats a zero divisor as accepting only zero', () => {
       const type = number(0, { step: 0 });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<TypeOf<typeof type>, number>('=');
 
       assert.isTrue(type.is(0));
 
@@ -486,7 +486,7 @@ describe('number with constraints', () => {
       test('accepts valid default value', () => {
         const type = number(5, { gt: 1, lt: 10 });
 
-        expectType<typeof type, Type<number>>('=');
+        expectType<TypeOf<typeof type>, number>('=');
 
         assert.isTrue(type.is(6));
 
@@ -504,7 +504,7 @@ describe('number with constraints', () => {
       test('accepts valid default value', () => {
         const type = number(5, { gte: 5, lte: 10 });
 
-        expectType<typeof type, Type<number>>('=');
+        expectType<TypeOf<typeof type>, number>('=');
 
         assert.isTrue(type.is(5));
 
@@ -524,7 +524,7 @@ describe('number with constraints', () => {
       test('accepts valid default value', () => {
         const type = number(6, { positive: true, multipleOf: 3 });
 
-        expectType<typeof type, Type<PositiveNumber>>('=');
+        expectType<TypeOf<typeof type>, PositiveNumber>('=');
 
         assert.isTrue(type.is(9));
 
@@ -550,7 +550,7 @@ describe('number with constraints', () => {
           step: 2,
         });
 
-        expectType<typeof type, Type<NonNegativeNumber>>('=');
+        expectType<TypeOf<typeof type>, NonNegativeNumber>('=');
 
         assert.isTrue(type.is(10));
 

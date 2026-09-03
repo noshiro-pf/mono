@@ -335,6 +335,40 @@ PermissionsMask.is(0b10_1111n); // false (not divisible by 4)
 
 Bigint constraints mirror the numeric API but operate on `bigint` literals. When `multipleOf` or `step` is `0n`, only `0n` passes the check.
 
+### Reading constraints back
+
+A constrained type carries the constraints it was given on a `constraints` property, so the numbers a schema validates against can also drive the UI — an `<input>`'s `min` / `max` / `step`, a character counter — instead of being written down a second time and drifting.
+
+```tsx
+import * as t from 'ts-fortress';
+
+const SignupForm = t.record({
+    age: t.int(20, { min: 0, max: 120 }),
+    displayName: t.string('a', { minLength: 1, maxLength: 32 }),
+});
+
+// The values the schema validates against are readable back off it, so a form
+// control can be driven by the same numbers instead of a second copy of them.
+const age = t.at(SignupForm, 'age');
+
+const min: 0 = age.constraints.min;
+
+const max: 120 = age.constraints.max;
+
+// A constraint that was not specified is `undefined` — not `number | undefined`
+const step: undefined = age.constraints.step;
+
+// The record's shape reaches the same member type directly
+const maxLength: 32 = SignupForm.shape.displayName.constraints.maxLength;
+```
+
+What that gives you:
+
+- **Every constraint key is present**, so a constraint that _was_ specified is read without `?.` and at the literal type it was given (`age.constraints.max` is `120`, not `number | undefined`). One that was _not_ specified is typed `undefined`, so a typo or a missing constraint is a compile error rather than a silent `undefined` at runtime.
+- **Wrappers keep it.** `t.refine` and `t.brand` carry the base type's constraints over, and so do the branded constructors built on them — `t.int(0, { min: 0, max: 100 }).constraints.max` reads `100`. Branding or refining a type that carries no constraints adds no `constraints` property at all.
+- **Records reach it.** `t.record` and `t.strictRecord` expose the shape they were built from as `.shape`, and `t.at(SignupForm, 'age')` returns that very member type — constraints included. An optional member widens to `T | undefined` and still carries the member's constraints. Record types assembled at runtime — `t.pick`, `t.omit`, `t.partial`, `t.mergeRecords`, `t.keyValueRecord` — carry no shape, so `t.at` on one of those falls back to a plain `Type` as before.
+- `t.ConstraintsOf<typeof age>` names the constraint record of a type, for passing it around or picking fields out of.
+
 > **Tip:** If a default value violates its constraints, `ts-fortress` throws during construction. This guards against invalid schemas ever reaching production.
 
 ## Why ts-fortress over Zod and io-ts?
@@ -1059,6 +1093,7 @@ type ValidationError = Readonly<{
 - `t.pick(recordType, keys)` - Pick specific fields
 - `t.omit(recordType, keys)` - Omit specific fields
 - `t.keyof(recordType)` - Key of the record type.
+- `t.at(recordType, key)` - The member type stored at `key`. On a record built by `t.record` / `t.strictRecord` it returns the shape's own member type, constraints and all; those record types also expose `.shape` directly.
 
 ### Composition
 
@@ -1077,6 +1112,9 @@ type ValidationError = Readonly<{
 ### Utilities
 
 - `t.TypeOf<T>` - Extract TypeScript type from validator
+- `type.constraints` - The constraints a `t.string` / `t.number` / `t.bigint` type (or a `t.refine` / `t.brand` wrapper of one) was created with. Every constraint key is present; the unspecified ones are typed `undefined`. See [Reading constraints back](#reading-constraints-back)
+- `t.ConstraintsOf<T>` - The constraint record carried by a type
+- `t.attachConstraints(type, constraints)` - Attach constraint values to a type of your own
 - `t.enumType(values)` - Enum validation
 - `t.uintRange(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is exclusive)
 - `t.intRange(start, end, { defaultValue? })` - Integer range validation (`end` is exclusive)

@@ -1,5 +1,6 @@
 import { type StrictOmit } from 'ts-type-forge';
-import { type AnyType, type Type } from '../type.mjs';
+import { hasConstraints } from '../constraints/index.mjs';
+import { type Type, type UnknownType } from '../type.mjs';
 
 /**
  * Converts a Type to an optional property type.
@@ -37,7 +38,7 @@ import { type AnyType, type Type } from '../type.mjs';
  * );
  * ```
  */
-export const optional = <T extends AnyType>(
+export const optional = <T extends UnknownType>(
   t: T,
   options?: Partial<
     Readonly<{
@@ -60,6 +61,14 @@ export const optional = <T extends AnyType>(
     validate: t.validate,
     typeName: t.typeName,
 
+    // `OptionalPropertyType<T>` is `T & { optional: true }`, so a constrained
+    // member type keeps promising its `constraints` — carry them over, or an
+    // optional record field would read `undefined` at runtime while typed
+    // otherwise. A blanket `...t` would do it, but that also reads
+    // `defaultValue`, which is a lazy getter on record types and must not be
+    // evaluated here (see `forceUndefinedDefault` below).
+    ...(hasConstraints(t) ? { constraints: t.constraints } : {}),
+
     defaultValue:
       options?.forceUndefinedDefault === true
         ? // For recursive types: set defaultValue to undefined to avoid infinite loops
@@ -70,12 +79,12 @@ export const optional = <T extends AnyType>(
     optional: true,
   }) satisfies OptionalPropertyType<Type<unknown>> as OptionalPropertyType<T>;
 
-export type OptionalPropertyType<T extends AnyType> = T &
+export type OptionalPropertyType<T extends UnknownType> = T &
   Readonly<{ optional: true }>;
 
-export type RequiredPropertyType<T extends AnyType> =
+export type RequiredPropertyType<T extends UnknownType> =
   T extends OptionalPropertyType<T> ? StrictOmit<T, 'optional'> : T;
 
-export const isOptionalProperty = <T extends AnyType>(
+export const isOptionalProperty = <T extends UnknownType>(
   t: T,
 ): t is OptionalPropertyType<T> => t.optional === true;

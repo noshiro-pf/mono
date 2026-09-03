@@ -1,5 +1,10 @@
 import { pipe, Result } from 'ts-data-forge';
 import { type Brand, type Primitive, type StrictExtract } from 'ts-type-forge';
+import {
+  type ConstraintsCarrier,
+  propagateConstraints,
+  type WithConstraints,
+} from '../constraints/index.mjs';
 import { type Type } from '../type.mjs';
 import { createType, type ValidationError } from '../utils/index.mjs';
 
@@ -9,10 +14,20 @@ type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
   ? never
   : A[number];
 
+/**
+ * Brands a primitive type.
+ *
+ * The constraint values the base type carries (see {@link WithConstraints})
+ * are carried over to the branded type, so that
+ * `t.brand({ baseType: t.number(0, { min: 0, max: 10 }), ... }).constraints`
+ * still reads `min` and `max`. `C` is inferred from `baseType.constraints`;
+ * branding a base type that carries none adds no `constraints` property.
+ */
 export const brand = <
   const A extends StrictExtract<Primitive, string | number | bigint | boolean>,
   const BrandTrueKeys extends readonly string[],
   const BrandFalseKeys extends readonly string[] = readonly [],
+  const C = unknown,
 >({
   baseType,
   brandFalseKeys,
@@ -21,7 +36,7 @@ export const brand = <
   is: is_,
   typeName,
 }: Readonly<{
-  baseType: Type<A>;
+  baseType: Type<A> & Partial<WithConstraints<C>>;
   is?: (
     a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
@@ -29,9 +44,8 @@ export const brand = <
   typeName?: string;
   brandKeys: BrandTrueKeys;
   brandFalseKeys?: BrandFalseKeys;
-}>): Type<
-  Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>
-> => {
+}>): Type<Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>> &
+  ConstraintsCarrier<C> => {
   type T = Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
 
   const is: (a: A) => a is T = is_ ?? ((_a): _a is T => true);
@@ -77,9 +91,12 @@ export const brand = <
               ]),
       ).value;
 
-  return createType({
-    typeName: typeNameFilled,
-    defaultValue,
-    validate,
-  });
+  return propagateConstraints(
+    createType({
+      typeName: typeNameFilled,
+      defaultValue,
+      validate,
+    }),
+    baseType,
+  );
 };

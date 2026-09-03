@@ -53,32 +53,32 @@ export type Type<A> = Readonly<{
 }>;
 
 /**
- * A maximally-permissive `Type` for use in **constraint positions only** —
- * e.g. `<T extends AnyType>`, `UnknownShape`, and the element bounds of
- * `union` / `tuple` / `intersection`.
+ * @internal The bound used wherever a codec is accepted without caring which
+ * value type it validates — `<T extends UnknownType>`, {@link UnknownShape},
+ * and the element bounds of `union` / `tuple` / `intersection`.
  *
- * `Type<A>` is **not** covariant in `A`: `prune` accepts `<B extends A>`, which
- * puts `A` in a constraint position. TypeScript 5.x tolerated this, but the
- * native (Go) compiler / TypeScript 7 enforces the variance, so a concrete
- * `Type<SomeUnion>` is no longer assignable to `Type<unknown>` across a
- * declaration-file boundary. That broke every `Type<unknown>` bound
- * (`record`/`strictRecord`, `TypeOf`, `union`, `tuple`, `intersection`, ...)
- * for codecs imported from a built dependency.
+ * It is plainly `Type<unknown>`; no `any` is involved, so a value typed by it
+ * stays checked. It is not exported because it says nothing a caller cannot
+ * write themselves.
  *
- * Making `Type<A>` covariant is impossible without dropping `prune`'s
- * missing-key rejection (that check inherently needs `A` in a non-covariant
- * position). Instead we loosen only the **bound** to `Type<any>`: `any` makes
- * every concrete `Type<X>` assignable to it, so a codec from a built dependency
- * once again satisfies the shape / element / `TypeOf` constraints. The `any` is
- * confined to this constraint-only alias — it never appears in inferred or
- * public output types (those go through the concrete `Type<X>` / `TypeOf<X>`),
- * so consumer-facing types stay precise. `AnyType` still requires a real codec:
- * every `Type` member must be present.
+ * NOTE — one way to break this bound, worth knowing before it bites:
+ * `prune` is `<B extends A>(a: B) => A`, so relating it to
+ * `<B extends unknown>(a: B) => unknown` unifies the two type parameters and
+ * leaves the target's `B` unconstrained, which `B extends A` will not accept.
+ * Within a module that never matters, because `typeof someCodec` is still the
+ * `Type<A>` alias and the compiler compares the two instantiations directly.
+ * Declaration emit is where it shows: an *inferred* codec type is written out
+ * structurally, the alias is gone, and the structural form no longer satisfies
+ * this bound.
+ *
+ * In practice that means a module-scope `TypeOf<typeof someRecordConst>` fails
+ * the `.d.mts` type check once the declaration is emitted. Annotate the const
+ * (`const X: Type<Shape> = record({ ... })`) so the alias survives emit — see
+ * `predefined/brand/string/iso-8601.mts`. `test/dist_` is what catches it.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- confined to this constraint-only bound; see above
-export type AnyType = Type<any>;
+export type UnknownType = Type<unknown>;
 
-export type TypeOf<A extends AnyType> = A['defaultValue'];
+export type TypeOf<A extends UnknownType> = A['defaultValue'];
 
 /**
  * Controls how excess properties (keys not in shape) are handled.
@@ -91,8 +91,25 @@ export type TypeOf<A extends AnyType> = A['defaultValue'];
  */
 export type ExcessPropertyOption = 'allow' | 'reject';
 
-/** @internal */
-export type UnknownShape = ReadonlyRecord<string, AnyType>;
+/**
+ * The shape a record type is built from: a record of property names to the
+ * {@link Type} validating each one.
+ *
+ * It is the bound of the `shape` argument of `record` / `strictRecord`, and
+ * the type argument of the {@link WithShape} those return, so naming it is
+ * what lets a caller write its own helper over a record type's shape.
+ */
+export type UnknownShape = ReadonlyRecord<string, UnknownType>;
+
+/**
+ * The carrier of the shape a record type was built from.
+ *
+ * `record` and `strictRecord` expose the shape they were given, so that the
+ * member types — and the constraints they carry — stay reachable from the
+ * record type itself (`User.shape.age.constraints.max`, or the equivalent
+ * `at(User, 'age').constraints.max`).
+ */
+export type WithShape<S extends UnknownShape> = Readonly<{ shape: S }>;
 
 /** @internal Shape structure that can represent union and intersection */
 export type ShapeStructure = Readonly<
@@ -122,7 +139,7 @@ export type TupleTypeInternals = Readonly<{
  */
 export type UnionTypeInternals = Readonly<{
   /** The member types, with directly nested unions already flattened in. */
-  memberTypes: readonly AnyType[];
+  memberTypes: readonly UnknownType[];
 }>;
 
 /** @internal Helper to flatten ShapeStructure to a simple shape if possible */
@@ -222,7 +239,7 @@ export const getShape = (internals: RecordTypeInternals): UnknownShape => {
 };
 
 /** @internal Runtime check for record type internals. */
-export const hasRecordInternals = <T extends AnyType>(
+export const hasRecordInternals = <T extends UnknownType>(
   t: T,
 ): t is T & RecordTypeInternals => hasRecordInternalsImpl(t);
 
@@ -234,7 +251,7 @@ const hasRecordInternalsImpl = (t: unknown): t is RecordTypeInternals =>
   (t.excessProperty === 'allow' || t.excessProperty === 'reject');
 
 /** @internal Runtime check for tuple type internals. */
-export const hasTupleInternals = <T extends AnyType>(
+export const hasTupleInternals = <T extends UnknownType>(
   t: T,
 ): t is T & TupleTypeInternals => hasTupleInternalsImpl(t);
 
@@ -248,7 +265,7 @@ const hasTupleInternalsImpl = (t: unknown): t is TupleTypeInternals =>
  * only forwards the keys the base type already has), so a recursive member is
  * treated as an opaque type rather than being flattened.
  */
-export const hasUnionInternals = <T extends AnyType>(
+export const hasUnionInternals = <T extends UnknownType>(
   t: T,
 ): t is T & UnionTypeInternals => hasUnionInternalsImpl(t);
 

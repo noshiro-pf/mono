@@ -2,7 +2,7 @@ import { Result } from 'ts-data-forge';
 import { literal } from '../other-types/index.mjs';
 import { number, string } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
-import { type AnyType } from '../type.mjs';
+import { type UnknownType } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { union } from './union.mjs';
 
@@ -26,7 +26,7 @@ import { union } from './union.mjs';
 
 /** What a single member reports for `value`, as it would be shown to a user. */
 const memberReport = (
-  memberType: AnyType,
+  memberType: UnknownType,
   value: unknown,
 ): Readonly<{ typeName: string; errors: readonly string[] }> => {
   const result = memberType.validate(value);

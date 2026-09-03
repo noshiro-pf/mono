@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/no-negated-comparison */
 import { Arr, expectType, Int, isNumber, Result } from 'ts-data-forge';
 import {
+  type ArrayElement,
   type BoolAnd,
   type BoolNot,
   type Brand,
@@ -16,8 +17,14 @@ import {
   type StrictPick,
   type Uint,
 } from 'ts-type-forge';
+import {
+  attachConstraints,
+  type ConstrainedType,
+  fillConstraints,
+  type FillConstraints,
+  type NoConstraints,
+} from '../constraints/index.mjs';
 import { refine } from '../other-types/index.mjs';
-import { type Type } from '../type.mjs';
 import {
   createPrimitiveType,
   type NumericConstraintViolation,
@@ -25,25 +32,32 @@ import {
 
 type NumberType = number;
 
-export function number(defaultValue?: NumberType): Type<NumberType>;
+export function number(
+  defaultValue?: NumberType,
+): ConstrainedType<NumberType, NumberConstraintsOf<NoConstraints>>;
 
 export function number<N extends NumberType, const C extends Constraints>(
   defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
-): Type<ConstraintsToResultType<C>>;
+): ConstrainedType<ConstraintsToResultType<C>, NumberConstraintsOf<C>>;
 
-export function number<C extends Constraints>(
+export function number(
   defaultValue: NumberType = 0,
-  constraints?: C,
-): Type<NumberType> {
+  constraints?: Constraints,
+): ConstrainedType<NumberType, NumberConstraintsOf<Constraints>> {
   const baseType = createPrimitiveType({
     typeName: 'number',
     defaultValue,
     is: isNumber,
   });
 
+  const constraintValues = fillConstraints<Required<Constraints>, Constraints>(
+    numberConstraintKeys,
+    constraints,
+  );
+
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
-    return baseType;
+    return attachConstraints(baseType, constraintValues);
   }
 
   const constraintsPredicate = createConstraintsPredicate(constraints);
@@ -59,24 +73,27 @@ export function number<C extends Constraints>(
     );
   }
 
-  return refine({
-    baseType,
-    defaultValue,
-    is: (value): value is NumberType =>
-      Result.isOk(constraintsPredicate(value)),
-    typeName: 'number',
-    getConstraintDetails: (value) => {
-      const result = constraintsPredicate(value);
+  return attachConstraints(
+    refine({
+      baseType,
+      defaultValue,
+      is: (value): value is NumberType =>
+        Result.isOk(constraintsPredicate(value)),
+      typeName: 'number',
+      getConstraintDetails: (value) => {
+        const result = constraintsPredicate(value);
 
-      return Result.isErr(result)
-        ? {
-            kind: 'numeric-constraint',
-            numericType: 'number',
-            violation: result.value,
-          }
-        : undefined;
-    },
-  });
+        return Result.isErr(result)
+          ? {
+              kind: 'numeric-constraint',
+              numericType: 'number',
+              violation: result.value,
+            }
+          : undefined;
+      },
+    }),
+    constraintValues,
+  );
 }
 
 type Constraints = Partial<
@@ -118,6 +135,50 @@ export type NumberRangeConstraints = StrictPick<
   NumberTypeConstraints,
   'gt' | 'gte' | 'min' | 'lt' | 'lte' | 'max' | 'multipleOf' | 'step'
 >;
+
+/**
+ * The constraint values carried by a {@link number} type created with the
+ * constraints `C`: every key of {@link NumberTypeConstraints}, taking the
+ * value `C` gives it and `undefined` for the keys `C` leaves out.
+ *
+ * @example
+ * ```ts
+ * import * as t from 'ts-fortress';
+ *
+ * const Age = t.number(0, { int: true, min: 0, max: 120 });
+ *
+ * const max: 120 = Age.constraints.max;
+ *
+ * const step: undefined = Age.constraints.step;
+ * ```
+ */
+export type NumberConstraintsOf<C extends NumberTypeConstraints> =
+  FillConstraints<Required<Constraints>, C>;
+
+/**
+ * Every key of {@link Constraints}, in the order the runtime predicate checks
+ * them. The `expectType` below keeps it in step with the type.
+ */
+const numberConstraintKeys = [
+  'finite',
+  'int',
+  'safeInteger',
+  'nonZero',
+  'negative',
+  'nonNegative',
+  'positive',
+  'nonPositive',
+  'gt',
+  'gte',
+  'min',
+  'lt',
+  'lte',
+  'max',
+  'multipleOf',
+  'step',
+] as const satisfies readonly (keyof Constraints)[];
+
+expectType<ArrayElement<typeof numberConstraintKeys>, keyof Constraints>('=');
 
 type DefaultValueType<
   N extends NumberType,

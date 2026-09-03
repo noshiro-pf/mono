@@ -74,16 +74,22 @@ export const mergeRecords = <
 
   // If there's only one merged shape, return it directly
   if (Arr.isFixedLengthTuple(1, mergedShapes)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return record(mergedShapes[0], {
+    // The merged shape is assembled at runtime, so the `shape` carrier
+    // `record` returns cannot describe it; widen it away before casting to the
+    // computed result type.
+    const merged: Type<UnknownRecord> = record(mergedShapes[0], {
       typeName: typeNameFilled,
       excessProperty,
-    }) as MergeRecordsType<Types>;
+    });
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return merged as MergeRecordsType<Types>;
   }
 
   // If there are multiple variants, we need to return a union
-  const variants = Arr.map(mergedShapes, (shape) =>
-    record(shape, { excessProperty }),
+  const variants: readonly Type<UnknownRecord>[] = Arr.map(
+    mergedShapes,
+    (shape) => record(shape, { excessProperty }),
   );
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

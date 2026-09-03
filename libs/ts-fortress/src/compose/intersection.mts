@@ -2,10 +2,10 @@ import { Arr, expectType, hasKey, isRecord, Obj, Result } from 'ts-data-forge';
 import { type Intersection, type NonEmptyTuple } from 'ts-type-forge';
 import {
   hasRecordInternals,
-  type AnyType,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
+  type UnknownType,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -15,7 +15,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const intersection = <const Types extends NonEmptyTuple<AnyType>>(
+export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
   types: Types,
   defaultType: IntersectionType<Types>,
   options?: Partial<
@@ -96,7 +96,7 @@ export const intersection = <const Types extends NonEmptyTuple<AnyType>>(
       // see `mergePruned`). All members are record types here
       // (`hasRecordInternals`), so each pruned result is a record.
       prune: (a: T): T =>
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-return
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
       shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
         ? shapeStructures[0]
@@ -137,16 +137,17 @@ const mergePruned = (x: unknown, y: unknown): unknown => {
   return y;
 };
 
-type IntersectionType<Types extends NonEmptyTuple<AnyType>> = Type<
+type IntersectionType<Types extends NonEmptyTuple<UnknownType>> = Type<
   IntersectionTypeValue<Types>
 >;
 
-type IntersectionTypeValue<Types extends NonEmptyTuple<AnyType>> =
+type IntersectionTypeValue<Types extends NonEmptyTuple<UnknownType>> =
   TsFortressInternal.IntersectionTypeValueImpl<Types>;
 
 namespace TsFortressInternal {
-  export type IntersectionTypeValueImpl<Types extends NonEmptyTuple<AnyType>> =
-    Intersection<Cast0<UnwrapTypeList<Types>>>;
+  export type IntersectionTypeValueImpl<
+    Types extends NonEmptyTuple<UnknownType>,
+  > = Intersection<Cast0<UnwrapTypeList<Types>>>;
 
   type Cast0<T> = readonly [T] extends readonly [NonEmptyTuple<unknown>]
     ? T
@@ -179,7 +180,7 @@ expectType<
   >
 >('=');
 
-type UnwrapTypeList<Types extends readonly AnyType[]> =
+type UnwrapTypeList<Types extends readonly UnknownType[]> =
   TsFortressInternal.UnwrapTypeImpl<Types>;
 
 namespace TsFortressInternal {
@@ -190,7 +191,7 @@ namespace TsFortressInternal {
         ? readonly [TypeOf<Cast1<Head>>, ...UnwrapTypeImpl<Tail>]
         : never;
 
-  type Cast1<T> = [T] extends [AnyType] ? T : never;
+  type Cast1<T> = [T] extends [UnknownType] ? T : never;
 }
 
 expectType<

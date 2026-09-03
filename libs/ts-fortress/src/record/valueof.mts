@@ -35,14 +35,20 @@ export const valueof = <const R extends UnknownRecord>(
 
   const types = Object.values(shape);
 
+  // The shape is recovered from the runtime `shapeStructure`, which is typed
+  // only as `UnknownShape`, so the member types come back as `Type<unknown>`
+  // and the mapping to `ValueOf<R>` cannot be re-established statically. The
+  // two assertions below are that gap, and they are the whole of it.
   if (Arr.isMinLengthTuple(2, types)) {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
-    });
+    }) as ValueOfType<R>;
   }
 
   if (Arr.isNonEmpty(types)) {
-    return types[0];
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return types[0] as ValueOfType<R>;
   }
 
   // types is empty

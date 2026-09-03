@@ -1,6 +1,6 @@
 import { Arr, isRecord, Obj, Optional, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
-import { type AnyType, type Type, type TypeOf } from '../type.mjs';
+import { type Type, type TypeOf, type UnknownType } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -12,10 +12,10 @@ import {
 
 type RecordResultType<
   K extends Type<string>,
-  V extends AnyType,
+  V extends UnknownType,
 > = ReadonlyRecord<TypeOf<K>, TypeOf<V>>;
 
-export const keyValueRecord = <K extends Type<string>, V extends AnyType>(
+export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
   keyType: K,
   valueType: V,
   options?: Partial<

@@ -1,14 +1,54 @@
 import { Arr } from 'ts-data-forge';
 import { type IndexOfTuple, type UnknownRecord } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
+import {
+  attachConstraints,
+  type ConstraintsCarrierOf,
+  hasConstraints,
+} from '../constraints/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
   expandShapeStructure,
   hasRecordInternals,
   hasTupleInternals,
   type Type,
+  type TypeOf,
+  type UnknownShape,
+  type WithShape,
 } from '../type.mjs';
 import { isOptionalProperty } from './optional.mjs';
+
+/**
+ * Extracts the {@link Type} stored at a single key of a record type built by
+ * `record` or `strictRecord`.
+ *
+ * Those carry the shape they were built from, so what comes back is the very
+ * member type the shape holds — constraints included, which is what makes
+ * `at(User, 'age').constraints.max` read the same value the schema validates
+ * against. An optional member widens to `T | undefined`, as `R[K]` does, and
+ * still carries the member's constraints.
+ *
+ * @example
+ * ```ts
+ * import * as t from 'ts-fortress';
+ *
+ * const User = t.record({
+ *   age: t.number(0, { int: true, min: 0, max: 120 }),
+ * });
+ *
+ * const max: 120 = t.at(User, 'age').constraints.max;
+ *
+ * // equivalently, straight off the record type
+ * const sameMax: 120 = User.shape.age.constraints.max;
+ * ```
+ */
+export function at<
+  const S extends UnknownShape,
+  const K extends keyof S & string,
+>(
+  recordType: Type<UnknownRecord> & WithShape<S>,
+  key: K,
+): ShapeMemberType<S, K>;
 
 /**
  * Extracts the {@link Type} stored at a single key of a record type.
@@ -105,9 +145,20 @@ export function at(
     : memberTypes;
 
   if (Arr.isMinLengthTuple(2, collected)) {
-    return union(collected, {
+    const unionType = union(collected, {
       typeName: `${type.typeName}[${JSON.stringify(keyOrIndex)}]`,
     });
+
+    // A lone optional member widened with `undefined`: its constraints still
+    // describe the defined branch, so carry them over rather than losing them
+    // on the way through `union`.
+    const soleMember = Arr.isFixedLengthTuple(1, memberTypes)
+      ? memberTypes[0]
+      : undefined;
+
+    return soleMember !== undefined && hasConstraints(soleMember)
+      ? attachConstraints(unionType, soleMember.constraints)
+      : unionType;
   }
 
   if (Arr.isNonEmpty(collected)) {
@@ -118,3 +169,13 @@ export function at(
     `Key ${JSON.stringify(keyOrIndex)} does not exist on record type: ${type.typeName}`,
   );
 }
+
+/**
+ * The type {@link at} returns for a key of a shape-carrying record type: the
+ * shape's own member type, or — for an optional member — the `T | undefined`
+ * the runtime builds, still carrying the member's constraints.
+ */
+type ShapeMemberType<S extends UnknownShape, K extends keyof S> =
+  S[K] extends Readonly<{ optional: true }>
+    ? Type<TypeOf<S[K]> | undefined> & ConstraintsCarrierOf<S[K]>
+    : S[K];

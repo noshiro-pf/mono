@@ -2,16 +2,32 @@ import { isNonZeroSafeInt } from 'ts-data-forge';
 import { type NonZeroSafeInt } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import {
+  type ConstrainedType,
+  type NoConstraints,
+} from '../../../constraints/index.mjs';
+import {
   number,
+  type NumberConstraintsOf,
   type NumberRangeConstraints,
 } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
 
-export const nonZeroSafeInt = (
+export function nonZeroSafeInt(
+  defaultValue: number,
+): ConstrainedType<NonZeroSafeInt, NumberConstraintsOf<NoConstraints>>;
+
+export function nonZeroSafeInt<const C extends NumberRangeConstraints>(
+  defaultValue: number,
+  constraints: C,
+): ConstrainedType<NonZeroSafeInt, NumberConstraintsOf<C>>;
+
+export function nonZeroSafeInt(
   defaultValue: number,
   constraints?: NumberRangeConstraints,
-): Type<NonZeroSafeInt> =>
-  brand({
+): ConstrainedType<
+  NonZeroSafeInt,
+  NumberConstraintsOf<NumberRangeConstraints>
+> {
+  return brand({
     baseType: number(defaultValue, constraints ?? {}),
     is: isNonZeroSafeInt,
     defaultValue,
@@ -19,3 +35,4 @@ export const nonZeroSafeInt = (
     brandFalseKeys: ['NaNValue'],
     typeName: 'NonZeroSafeInt',
   });
+}

@@ -1,16 +1,29 @@
 import { SafeInt } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import {
+  type ConstrainedType,
+  type NoConstraints,
+} from '../../../constraints/index.mjs';
+import {
   number,
+  type NumberConstraintsOf,
   type NumberRangeConstraints,
 } from '../../../primitives/index.mjs';
-import { type Type } from '../../../type.mjs';
 
-export const safeInt = (
+export function safeInt(
+  defaultValue?: number,
+): ConstrainedType<SafeInt, NumberConstraintsOf<NoConstraints>>;
+
+export function safeInt<const C extends NumberRangeConstraints>(
+  defaultValue: number,
+  constraints: C,
+): ConstrainedType<SafeInt, NumberConstraintsOf<C>>;
+
+export function safeInt(
   defaultValue: number = 0,
   constraints?: NumberRangeConstraints,
-): Type<SafeInt> =>
-  brand({
+): ConstrainedType<SafeInt, NumberConstraintsOf<NumberRangeConstraints>> {
+  return brand({
     baseType: number(defaultValue, constraints ?? {}),
     is: SafeInt.is,
     defaultValue,
@@ -18,3 +31,4 @@ export const safeInt = (
     brandFalseKeys: ['NaNValue'],
     typeName: 'SafeInt',
   });
+}

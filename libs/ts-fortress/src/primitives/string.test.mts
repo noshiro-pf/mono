@@ -241,7 +241,7 @@ describe('string with constraints', () => {
   test('string without constraints', () => {
     const type = string();
 
-    expectType<typeof type, Type<string>>('=');
+    expectType<TypeOf<typeof type>, string>('=');
 
     assert.isTrue(type.is(''));
   });
@@ -250,7 +250,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('abcdefghi', { startsWith: 'ab' });
 
-      expectType<typeof type, Type<`ab${string}`>>('=');
+      expectType<TypeOf<typeof type>, `ab${string}`>('=');
 
       assert.isTrue(type.is('ab'));
 
@@ -331,7 +331,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('abcdefghi', { lowercase: true });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       assert.isTrue(type.is('abcde__'));
 
@@ -352,7 +352,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('ABCDEFGHI', { uppercase: true });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       assert.isTrue(type.is('ABC'));
 
@@ -373,7 +373,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('nonempty', { nonempty: true });
 
-      expectType<typeof type, Type<NonEmptyString>>('=');
+      expectType<TypeOf<typeof type>, NonEmptyString>('=');
 
       assert.isTrue(type.is('value'));
 
@@ -394,7 +394,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('minimum', { minLength: 3 });
 
-      expectType<typeof type, Type<MinLengthString<3>>>('=');
+      expectType<TypeOf<typeof type>, MinLengthString<3>>('=');
 
       assert.isTrue(type.is('hello'));
 
@@ -431,7 +431,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('short', { maxLength: 5 });
 
-      expectType<typeof type, Type<MaxLengthString<5>>>('=');
+      expectType<TypeOf<typeof type>, MaxLengthString<5>>('=');
 
       assert.isTrue(type.is('tiny'));
 
@@ -461,7 +461,7 @@ describe('string with constraints', () => {
 
       const type = string(longDefault, { minLength: 2048 });
 
-      expectType<typeof type, Type<MinLengthString<2048>>>('=');
+      expectType<TypeOf<typeof type>, MinLengthString<2048>>('=');
 
       assert.isTrue(type.is('x'.repeat(2048)));
 
@@ -473,7 +473,7 @@ describe('string with constraints', () => {
 
       const type = string(longDefault, { minLength: 2049 });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       // The runtime constraint still applies.
       assert.isTrue(type.is('x'.repeat(2049)));
@@ -484,7 +484,7 @@ describe('string with constraints', () => {
     test('a maxLength literal outside the range (>= 2049) falls back to plain string', () => {
       const type = string('', { maxLength: 2049 });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       assert.isTrue(type.is('x'.repeat(2049)));
 
@@ -506,7 +506,7 @@ describe('string with constraints', () => {
 
       const type = string('', { maxLength: getBound() });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       assert.isTrue(type.is('12345'));
 
@@ -531,7 +531,7 @@ describe('string with constraints', () => {
 
       const type = string('12345', { regex: numeric });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<TypeOf<typeof type>, string>('=');
 
       assert.isTrue(type.is('67890'));
 
@@ -626,7 +626,7 @@ describe('string with constraints', () => {
       test('accepts valid default value', () => {
         const type = string('1234', { uppercase: true, lowercase: true });
 
-        expectType<typeof type, Type<string>>('=');
+        expectType<TypeOf<typeof type>, string>('=');
 
         assert.isTrue(type.is('1234'));
 
@@ -654,8 +654,8 @@ describe('string with constraints', () => {
         });
 
         expectType<
-          typeof type,
-          Type<NonEmptyString & BoundedLengthString<3, 8>>
+          TypeOf<typeof type>,
+          NonEmptyString & BoundedLengthString<3, 8>
         >('=');
 
         assert.isTrue(type.is('value'));
@@ -703,7 +703,7 @@ describe('string with constraints', () => {
           regex: slug,
         });
 
-        expectType<typeof type, Type<`${string}feature${string}`>>('=');
+        expectType<TypeOf<typeof type>, `${string}feature${string}`>('=');
 
         assert.isTrue(type.is('feature-toggle'));
 
@@ -735,7 +735,7 @@ describe('string with constraints', () => {
           regex: digits,
         });
 
-        expectType<typeof type, Type<BoundedLengthString<4, 6>>>('=');
+        expectType<TypeOf<typeof type>, BoundedLengthString<4, 6>>('=');
 
         assert.isTrue(type.is('6789'));
 

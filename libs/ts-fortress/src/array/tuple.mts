@@ -1,9 +1,9 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
 import {
-  type AnyType,
   type TupleTypeInternals,
   type Type,
   type TypeOf,
+  type UnknownType,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -14,11 +14,11 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-type MapTuple<T extends readonly AnyType[]> = Readonly<{
+type MapTuple<T extends readonly UnknownType[]> = Readonly<{
   [K in keyof T]: TypeOf<T[K]>;
 }>;
 
-export const tuple = <const A extends readonly AnyType[]>(
+export const tuple = <const A extends readonly UnknownType[]>(
   types: A,
   options?: Partial<
     Readonly<{
@@ -31,9 +31,9 @@ export const tuple = <const A extends readonly AnyType[]>(
   const typeName = options?.typeName ?? 'tuple';
 
   const getDefaultValue = memoizeFunction(
-    // `types` is bound by `AnyType` (payload `any`), so element accessors are
+    // `types` is bound by `UnknownType` (payload `any`), so element accessors are
     // typed `any` inside this generic body; the outer signature keeps it precise.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     (): MapTuple<A> => Arr.map(types, (t) => t.defaultValue),
   );
 
@@ -86,12 +86,10 @@ export const tuple = <const A extends readonly AnyType[]>(
   const fill: Type<T>['fill'] = (a) =>
     !Arr.isArray(a)
       ? getDefaultValue()
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-return
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
-  const prune = (a: T): T =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    Arr.map(types, (t, i) => t.prune(a[i]));
+  const prune = (a: T): T => Arr.map(types, (t, i) => t.prune(a[i]));
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return {

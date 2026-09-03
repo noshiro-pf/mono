@@ -6,7 +6,7 @@ import {
 import { brand } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';
-import { type Type, type TypeOf } from '../../../type.mjs';
+import { type Type } from '../../../type.mjs';
 
 // A valid ISO 8601 string always begins with a 4-digit year, so `Iso8601` is
 // branded on top of `NonEmptyString` and is assignable to it.
@@ -30,7 +30,21 @@ export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
   });
 };
 
-const ISO8601ValidatorOption = record({
+type ISO8601ValidatorOption = Readonly<{
+  strict: boolean;
+  strictSeparator: boolean;
+  defaultValue: string;
+}>;
+
+// Annotated rather than inferred, so that declaration emit writes
+// `Type<ISO8601ValidatorOption>` instead of expanding the codec structurally —
+// around a hundred lines of it, for a const this module does not export.
+//
+// The `UnknownType` trap is handled by the hand-written type above rather than
+// by this annotation: deriving it as `TypeOf<typeof ISO8601ValidatorOption>` is
+// what failed the `.d.mts` check, because the structural form the emit produces
+// does not satisfy that bound (see the note on `UnknownType`).
+const ISO8601ValidatorOption: Type<ISO8601ValidatorOption> = record({
   /**
    *  If strict is true, date strings with invalid dates like 2009-02-29 will be invalid.
    */
@@ -47,8 +61,6 @@ const ISO8601ValidatorOption = record({
   // eslint-disable-next-line unicorn/no-unreadable-new-expression
   defaultValue: string(new Date().toISOString()),
 });
-
-type ISO8601ValidatorOption = TypeOf<typeof ISO8601ValidatorOption>;
 
 const isISO8601 =
   (options?: Partial<StrictOmit<ISO8601ValidatorOption, 'defaultValue'>>) =>
