@@ -1,5 +1,22 @@
 # eslint-plugin-ts-type-forge
 
+## 0.8.0
+
+### Minor Changes
+
+- 71a69a3: Add `no-side-effect-import`, which reports and deletes a side-effect-only
+  `import 'ts-type-forge';`. The package ships declarations and nothing else — its
+  `exports` map offers no runtime condition — so the import binds no name and
+  fails to resolve once the module graph is loaded, and a side-effect import is
+  the one kind TypeScript never elides. Only the bare specifier matches:
+  `ts-type-forge/global`, the ambient globals, is left alone.
+
+    The rule is part of the `recommended` preset.
+
+### Patch Changes
+
+- ts-type-forge@9.2.2
+
 ## 0.7.3
 
 ### Patch Changes
