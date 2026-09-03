@@ -12,12 +12,15 @@ import { castMutable, Result, unknownToString } from 'ts-data-forge';
 import { glob } from 'ts-repo-utils';
 
 /**
- * The Rollup configuration every library here builds with. A package's
- * `configs/rollup.config.mts` passes its own directory and the `outDir` from
- * its `tsconfig.build.json`, and that is the whole of the per-package part.
+ * The Rollup configuration the libraries not yet moved to the native `tsc`
+ * build with. A package's `configs/rollup.config.mts` passes its own
+ * directory and the `outDir` from its `tsconfig.build.json`, and that is the
+ * whole of the per-package part.
  *
- * `eslint-config-typed` is the exception: it still transpiles with
- * `@rollup/plugin-typescript` and so keeps a configuration of its own.
+ * A package that has moved (`ts-data-forge`, `eslint-config-typed`) has no
+ * Rollup configuration: its `scripts/cmd/build.mts` emits with the native
+ * `tsc` and then runs `stripDevOnlyCodeInDir` from `ts-repo-utils` over
+ * `dist/`, which removes what the plugins below removed.
  */
 export const defineLibraryRollupConfig = async ({
   configDir,

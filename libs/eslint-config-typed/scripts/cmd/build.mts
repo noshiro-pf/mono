@@ -1,10 +1,29 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString, type UnknownResult } from 'ts-data-forge';
-import { $, assertPathExists, Result } from 'ts-repo-utils';
+import { $, Result, stripDevOnlyCodeInDir } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
+
+/**
+ * The monorepo root, where the hoisted `node_modules` lives.
+ */
+const monorepoRootPath = path.resolve(projectRootPath, '../..');
+
+/**
+ * The native TypeScript compiler (TypeScript >= 7). It is installed under the
+ * alias "typescript-native" because the "typescript" package must stay on 6.x
+ * for tools that require the JS compiler API (typescript-eslint, typedoc,
+ * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
+ * provides. Invoked via an explicit path because both packages declare a
+ * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
+ * guaranteed. It is hoisted to the monorepo root's `node_modules`.
+ */
+const nativeTsc = path.resolve(
+  monorepoRootPath,
+  './node_modules/typescript-native/bin/tsc',
+);
 
 /**
  * Builds the entire project.
@@ -50,31 +69,26 @@ const build = async (skipCheck: boolean): Promise<void> => {
   }
 
   await logStep({
-    startMessage: 'Building with Rollup',
-    action: async () => {
-      const rollupConfig = path.resolve(
-        projectRootPath,
-        './configs/rollup.config.mts',
-      );
+    startMessage: 'Compiling with the native tsc',
+    action: () =>
+      runCmdStep(
+        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}"`,
+        'Compilation failed',
+      ),
+    successMessage: 'JavaScript and type declarations emitted',
+  });
 
-      await assertPathExists(rollupConfig, 'Rollup config');
-
-      await runCmdStep(
-        [
-          'rollup',
-          `--config ${rollupConfig}`,
-          // Rollup bundles the config file as ESM, so compile it with
-          // bundler-style module settings. Without this override, the root
-          // tsconfig's "moduleResolution": "NodeNext" conflicts with the
-          // "module" override Rollup applies when loading the config
-          // (TS5110).
-          `--configPlugin 'typescript={compilerOptions:{module:"esnext",moduleResolution:"bundler"}}'`,
-          '--configImportAttributesKey with',
-        ].join(' '),
-        'Rollup build failed',
-      );
-    },
-    successMessage: 'Rollup build completed',
+  // The compiler emits the type tests and the in-source tests as they are
+  // written. This is what a bundler's dead-code elimination used to remove;
+  // see `stripDevOnlyCode` for the list.
+  await logStep({
+    startMessage: 'Stripping development-only code from dist',
+    action: () =>
+      runStep(
+        stripDevOnlyCodeInDir(distDir),
+        'Stripping development-only code failed',
+      ),
+    successMessage: 'Development-only code stripped',
   });
 
   await logStep({
