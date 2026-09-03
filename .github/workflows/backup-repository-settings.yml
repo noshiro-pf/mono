@@ -3,7 +3,12 @@ name: Backup Repository Settings
 # Controls when the action will run.
 on:
   # Only main — pull request branches are covered by the `pull_request` events
-  # below; see the note in type-check.yml.
+  # below; see the note in type-check.yml. This is one of the two workflows
+  # that keep a `push` trigger, and the reason is different from
+  # type-check.yml's: the run on main compares `bk/` with the repository's
+  # *live* settings, which no branch can change and no pull request run
+  # covers — a pull request runs this only when it touched `repo-settings/`.
+  # A merge is simply the occasion on which that drift is looked for.
   push:
     branches:
       - main
@@ -19,7 +24,6 @@ on:
       - reopened
       - labeled
       - unlabeled
-      - ready_for_review
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

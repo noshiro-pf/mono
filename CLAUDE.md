@@ -293,13 +293,14 @@ list lives in the `required_status_checks` rule of
 | `test-node-versions-result`         | the aggregate job in `node-version-compatibility.yml` |
 | `verify-published-result`           | the aggregate job in `verify-published-packages.yml`  |
 | `backup-repository-settings-result` | the aggregate job in `backup-repository-settings.yml` |
-| `no-wip-label`                      | `wip-label.yml`                                       |
+| `no-wip-label`                      | a commit status written by `wip-label.yml`            |
 | `Validate PR title`                 | `lint-pull-request.yml`                               |
 | `Validate commit messages`          | `lint-pull-request.yml`                               |
 
 **A required context is a string matched exactly against the name of a check
-run on the pull request's head commit**, and nothing more — GitHub does not
-know which workflow is supposed to produce it. A name it does not find reads
+run — or the context of a commit status — on the pull request's head
+commit**, and nothing more — GitHub does not know which workflow is supposed
+to produce it. A name it does not find reads
 as "Expected — waiting for status to be reported" and blocks the merge;
 `success`, `skipped` and `neutral` all satisfy it; where a name appears more
 than once on the commit, the most recent one wins. What Actions names a check
@@ -343,7 +344,9 @@ thing that stops a labelled pull request from merging. Deleting
 `wip-label.yml`, or dropping its context from `main.json`, leaves `[WIP]`
 skipping every check with nothing holding the merge — which is the exact hole
 the aggregates were added to close. The two are one mechanism. See the note on
-`type-check-result` in `type-check.yml`.
+`type-check-result` in `type-check.yml`. It holds the merge by staying
+`pending`, not by failing — see "A `[WIP]` label skips the checks" below for
+why.
 
 Consequences worth knowing:
 
@@ -417,6 +420,7 @@ Things to keep in mind when editing a gated workflow:
 - **On a push to `main`, diffing against `origin/main` is a diff against
   `HEAD`**, which is empty and reads as "nothing changed" — every job would
   skip. The gate therefore compares against `github.event.before` on `main`.
+  Only `type-check.yml` still asks it on a push, for `coverage-main`.
 - **The matrix jobs must stay behind an aggregate for this to be safe.** A
   skipped matrix job produces one check run named after the job, never the
   `type-check (…)` contexts. While those were the required status checks, a
@@ -436,29 +440,71 @@ than it saves.
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
 `backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
-synchronize, reopened, labeled, unlabeled, ready_for_review]`, and on `push`
-only for `main`. One event kind per commit is what keeps the checks list at one
-entry per job: triggering on `push` for branches as well would put a push run
-and a `pull_request` run side by side on every pull request. Nothing is lost by
-leaving `push` out — `synchronize` fires on every push to a branch with an open
-pull request, `opened` covers the pushes made before it existed, and a branch
-that never gets a pull request has nothing to protect, because the `main`
-ruleset accepts changes through pull requests only. The `push` runs on `main`
-re-check what actually landed, a squash merge being a new commit that no pull
-request run has seen.
+synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
+keeps the checks list at one entry per job: triggering on `push` for branches
+as well would put a push run and a `pull_request` run side by side on every
+pull request. Nothing is lost by leaving `push` out — `synchronize` fires on
+every push to a branch with an open pull request, `opened` covers the pushes
+made before it existed, and a branch that never gets a pull request has
+nothing to protect, because the `main` ruleset accepts changes through pull
+requests only.
+
+**A push to `main` runs almost nothing either, and two jobs are the
+exception.** A push to `main` is a merge, and a merge is a squash (the only
+merge method enabled) of a branch that already contained `main`'s tip
+(`strict_required_status_checks_policy`), so the commit it makes has the same
+tree as the pull request's head — a tree every check has already run on. The
+check workflows used to run their whole matrix on it anyway, on the reasoning
+that a squash makes a commit no pull request run has seen; that is true of the
+commit and false of its contents, and it cost 108 runner-minutes per merge for
+`type-check.yml` alone, at fifty-odd merges a week. So three of the five have
+no `push` trigger at all, and the two that keep one run a single job on it:
+
+- `type-check.yml` runs `coverage-main`, which is the matrix's `ws:test:cov`
+  entry on its own. Codecov compares a pull request's coverage with the
+  report on its base commit, and the base commit is one on `main`, so the
+  report has to come from a run on `main`. It is gated on the diff like the
+  matrix, so a merge that touched nothing the tests read uploads nothing.
+- `backup-repository-settings.yml` compares `bk/` with the repository's live
+  settings, which no branch changes and no pull request run covers unless it
+  touched `repo-settings/`. A merge is simply the occasion on which that drift
+  is looked for.
+
+What this gives up is the after-the-fact check on a merge made with the
+admin's bypass, which is the one way a head that is behind `main`, or was
+never checked, can land. Run the check workflows by hand from the Actions tab
+(`workflow_dispatch`) after such a merge; nothing else will.
 
 `wip-label.yml` rides along with the same trigger list. It is not a check
-workflow — it runs nothing and reads nothing — but it is what makes the
-`[WIP]` label hold the merge; see below.
+workflow — it checks nothing, and does one API call — but it is what makes
+the `[WIP]` label hold the merge; see below. `lint-pull-request.yml` carries
+`labeled` and `unlabeled` too, next to its own `opened`, `edited` and
+`synchronize`, so that the label skips and restarts the title and commit
+message checks the same way.
+
+**Nothing but `lint-pull-request.yml` triggers on `edited`, and nothing at
+all on `issue_comment`.** Editing the description or commenting therefore
+starts no check run. `edited` fires for the title, the body and the base
+branch alike, with no finer filter, so a check workflow subscribed to it
+would produce a run for every description tweak — and such a run is not free
+even with every job skipped: it cancels the run in progress through the
+concurrency group, and its skipped `*-result` aggregate supersedes the last
+real verdict on the commit, reading as satisfied. The two lint jobs re-run on
+a body edit for the same reason in reverse: skipping them on "the title did
+not change" would supersede a red title check with a skipped one.
 
 **A draft pull request is checked like any other.** Work in progress is where a
 CI result is most useful, so being a draft skips nothing: the
 `github.event.pull_request.draft == false` clause every job used to carry is
 gone, and with it `/run-checks`, an `issue_comment` workflow whose only purpose
-was to reach a draft's checks by hand. `ready_for_review` stays in the trigger
-list as a re-run for pull requests opened as drafts before this arrangement
-existed. Two cheaper mechanisms took over the work of not spending CI on runs
-nobody will read.
+was to reach a draft's checks by hand. `ready_for_review` is not in the
+trigger list either: it stayed for a while as a re-run for pull requests
+opened as drafts before this arrangement existed, but a draft has been
+checked on every push since, so marking one ready changed nothing about its
+head and the run it fired re-checked the same commit with the same result —
+one full matrix per pull request, thrown away. It went once every open draft
+had check runs on its head. Two cheaper mechanisms took over the work of not
+spending CI on runs nobody will read.
 
 ### A push cancels the run still going for the previous one
 
@@ -478,8 +524,9 @@ cancelled one would have.
 - **`cancel-in-progress` is an expression, not a bare `true`.** On `main` that
   same gate diffs against `github.event.before`, so a push's run covers only
   that push. Cancelling the run for X when Y lands would leave the diff X
-  introduced — possibly the only diff a given check had anything to say about —
-  read by nothing at all. Pushes to `main` therefore run to completion.
+  introduced — the coverage upload for it, in the one job that still runs on
+  `main` — read by nothing at all. Pushes to `main` therefore run to
+  completion, and so does a `workflow_dispatch` run.
 - **The group keys on the pull request number** where there is one, so a
   `workflow_dispatch` run asked for by hand lands in a different group from the
   pull request's own runs and the two do not cancel each other.
@@ -522,15 +569,36 @@ report `skipped`. What to know about that:
   and a skipped job can satisfy a required status check — a pull request that
   was green and then had `[WIP]` added was measured with all 22 matrix
   contexts still reading `success`. So the label comes with a required check
-  of its own, `no-wip-label`, which runs only while the label is on and does
-  nothing but fail. With the label off the job is skipped, and having no
-  matrix its check run is named `no-wip-label` — the required context itself —
-  and reported `skipped`, which satisfies it at the cost of no runner at all.
-  A `no-wip-label` reading `skipped` therefore means "no label, nothing to
-  block", not "this check does nothing".
+  of its own, `no-wip-label`: a **commit status** that `wip-label.yml`
+  writes on the head commit at every event — `pending` while the label is
+  on, `success` once it is off — through the Status API rather than as the
+  check run of a job.
+    - **A status, because a job's check run cannot say "not yet".** A job
+      concludes success, failure, skipped or cancelled. Success and skipped
+      both satisfy a required check, so neither can hold the merge. Failure
+      held it, and did for a while, but it also said something false — a
+      pull request whose author has not asked for the checks yet is not
+      broken — and GitHub took it at its word: a red cross in the pull
+      request list, `fail` in `gh pr checks`, and a "workflow run failed"
+      e-mail on every push and every label event. A status can be written
+      `pending`, which is what is actually meant, blocks the merge exactly
+      as failure did, and notifies nobody.
+    - **It costs one runner per event, label or no label**, where the
+      failing job booted none without the label. A status has to be on
+      every head commit — one without it reads "Expected — waiting for
+      status to be reported" and blocks forever — so the job cannot be
+      skipped on the label-less case. `gates / check` already costs each
+      check workflow the same on the same events.
+    - **The job is named `wip-label`, not `no-wip-label`.** Its own check
+      run and the status it writes would otherwise share a name, and which
+      of the two the ruleset would read is not a thing to discover on a
+      merge.
+    - **Written with `GITHUB_TOKEN`**, so it is attributed to the GitHub
+      Actions app — the `integration_id` the ruleset pins the context to.
+      The job's `permissions` grant `statuses: write` and nothing else.
 - **It is the only thing that blocks a labelled pull request**, because the
   `*-result` aggregates carve `[WIP]` out and report `skipped` for it rather
-  than red — see "Required status checks". One red check that names its
+  than red — see "Required status checks". One pending check that names its
   reason, rather than six that have to be interpreted.
 - **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
   only `pull_request` events; asking for the checks by hand is asking for them
@@ -543,8 +611,17 @@ report `skipped`. What to know about that:
   `repo-settings/` covers repository settings, rulesets and Pages, not labels,
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
-  the same string and would simply stop matching too. The one place the string
-  is written down is the workflows; change it in all six or in none.
+  the same string and would simply stop matching too. The string is written
+  down in the workflows — the five check workflows, `wip-label.yml` and
+  `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs.mts`, which
+  sets a labelled pull request aside; change it everywhere or nowhere.
+- **Any label event re-runs the checks, not just `[WIP]`'s.** The trigger is
+  `labeled` / `unlabeled` and the condition reads only whether `[WIP]` is on,
+  so attaching `bug` to a pull request mid-run cancels that run and starts
+  another. Skipping on "not the `[WIP]` label" would not help: the run would
+  still exist, still cancel the one in progress, and its skipped aggregate
+  would supersede the last verdict. Put other labels on before pushing, or
+  after the checks have reported.
 
 ### A branch behind `main` runs nothing either
 
@@ -601,8 +678,10 @@ inside a pull request flow only, so a direct push to `main` is refused even
 for the repository admin. The escape hatch for a wedged required check is to
 merge a pull request with the bypass, not to push. Do not widen it back to
 `"always"`: checks arrive only through pull requests now, so an unchecked
-direct push would reach `main` with nothing but the after-the-fact `push` run
-having seen it.
+direct push would reach `main` with nothing having seen it at all — the
+check workflows no longer run their matrix on a push to `main`. The same goes
+for a bypass merge; see "Check triggers" for the `workflow_dispatch` that
+covers it.
 
 ## Spell checking
 
@@ -731,9 +810,11 @@ comment, an issue — is not covered: only what lands in the history is.
 
 `Validate commit messages` in `lint-pull-request.yml` enforces it, and
 `Validate PR title` enforces the same thing for the title. Both are required
-status checks. What they reject is Japanese specifically — kana, CJK
-ideographs, CJK punctuation and the fullwidth forms — rather than everything
-outside ASCII, so an em dash, a curly quote or an accented name still passes.
+status checks, and both skip while the `[WIP]` label is on, as the check
+workflows do — see "Check triggers, `[WIP]` and out-of-date branches". What
+they reject is Japanese specifically — kana, CJK ideographs, CJK punctuation
+and the fullwidth forms — rather than everything outside ASCII, so an em
+dash, a curly quote or an accented name still passes.
 
 ### Pull Requests
 

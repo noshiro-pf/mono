@@ -1,11 +1,11 @@
 name: Node.js Version Compatibility
 
 on:
-  # Only main — pull request branches are covered by the `pull_request` events
-  # below; see the note in type-check.yml.
-  push:
-    branches:
-      - main
+  # No `push`, not even for `main`. The `main` ruleset accepts changes through
+  # pull requests only and requires the branch to be up to date, so the squash
+  # commit a merge makes has the same tree as the pull request's head — a tree
+  # this workflow has already checked. See the note in type-check.yml, which
+  # keeps one job on `push` for a reason of its own.
 
   # `synchronize` fires on every push to the pull request's branch, so these
   # types cover the pull request's whole life — a draft included. `labeled` /
@@ -19,13 +19,13 @@ on:
       - reopened
       - labeled
       - unlabeled
-      - ready_for_review
 
   workflow_dispatch:
 
 # One run per pull request; a push cancels the run still going for the
 # previous one. `cancel-in-progress` is an expression rather than `true` so
-# that pushes to `main` run to completion — see the note in type-check.yml.
+# that a `workflow_dispatch` run is left alone — see the note in
+# type-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -73,8 +73,8 @@ jobs:
           # The branch tip, not the merge commit GitHub synthesises for a
           # `pull_request` event: these checks assert properties of the branch
           # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a push event this falls back to the
-          # pushed commit.
+          # request has a conflict. On a `workflow_dispatch` run this falls
+          # back to the dispatched commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install pnpm
