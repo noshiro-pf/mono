@@ -247,10 +247,10 @@ const buildFixPlan = (
   // name, there is none to create: everything reported just goes away.
   const replaced =
     reused === undefined && anchor !== undefined
-      ? {
+      ? ({
           node: anchor,
           text: `import ${typeOnly ? 'type ' : ''}* as ${namespaceName} from '${TS_FORTRESS_MODULE}';`,
-        }
+        } as const)
       : undefined;
 
   return {
@@ -270,10 +270,10 @@ const resolveMember = (
   specifier: TSESTree.ImportClause,
 ): Readonly<{ name: string | undefined }> | undefined =>
   specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier
-    ? { name: undefined }
+    ? ({ name: undefined } as const)
     : specifier.type === AST_NODE_TYPES.ImportSpecifier &&
         specifier.imported.type === AST_NODE_TYPES.Identifier
-      ? { name: specifier.imported.name }
+      ? ({ name: specifier.imported.name } as const)
       : undefined;
 
 /**
@@ -297,7 +297,9 @@ const buildReferenceRewrite = (
   }
 
   const target =
-    memberName === undefined ? namespaceName : `${namespaceName}.${memberName}`;
+    memberName === undefined
+      ? namespaceName
+      : (`${namespaceName}.${memberName}` as const);
 
   const parent = identifier.parent;
 
