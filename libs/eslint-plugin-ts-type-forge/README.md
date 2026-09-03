@@ -72,12 +72,13 @@ export default [
 
 ## Rules
 
-| Rule                                        | Fix        | Description                                                                               |
-| :------------------------------------------ | :--------- | :---------------------------------------------------------------------------------------- |
-| `prefer-canonical-length-constrained-tuple` | autofix    | Replace hand-rolled uniform tuple spellings with the canonical ts-type-forge tuple type.  |
-| `prefer-canonical-mutable-record`           | autofix    | Replace `Mutable<Record<K, V>>` with the canonical `MutableRecord<K, V>`.                 |
-| `prefer-strict-or-relaxed-utility-type`     | suggestion | Replace `Exclude` / `Extract` / `Omit` / `Pick` with the `Strict*` or `Relaxed*` variant. |
-| `prefer-readonly-or-mutable-record`         | suggestion | Replace `Record` with `ReadonlyRecord` or `MutableRecord`.                                |
+| Rule                                        | Fix        | Description                                                                                                            |
+| :------------------------------------------ | :--------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `prefer-canonical-length-constrained-tuple` | autofix    | Replace hand-rolled uniform tuple spellings with the canonical ts-type-forge tuple type.                               |
+| `prefer-canonical-mutable-record`           | autofix    | Replace `Mutable<Record<K, V>>` with the canonical `MutableRecord<K, V>`.                                              |
+| `prefer-strict-or-relaxed-utility-type`     | suggestion | Replace `Exclude` / `Extract` / `Omit` / `Pick` with the `Strict*` or `Relaxed*` variant.                              |
+| `prefer-readonly-or-mutable-record`         | suggestion | Replace `Record` with `ReadonlyRecord` or `MutableRecord`.                                                             |
+| `no-side-effect-import`                     | autofix    | Remove a side-effect-only `import 'ts-type-forge';`, which binds no name and has no runtime entry point to resolve to. |
 
 ### `prefer-canonical-length-constrained-tuple`
 
@@ -208,10 +209,32 @@ type Counters = MutableRecord<string, number>;
   these rules report **suggestions** rather than an autofix. Editors offer both
   replacements; `--fix` changes nothing.
 
+### `no-side-effect-import`
+
+`ts-type-forge` ships declarations and nothing else — its `exports` map offers
+no runtime condition — so `import 'ts-type-forge';` binds no name _and_ fails to
+resolve the moment the module graph is loaded. A side-effect import is the one
+kind TypeScript never elides, so the line survives compilation: a runtime error
+sitting in a file that type-checks.
+
+```ts
+// ❌
+import 'ts-type-forge';
+
+// ✅ types are reached by name
+import { type NonEmptyArray } from 'ts-type-forge';
+```
+
+The fix deletes the import along with its line. Only the bare specifier matches:
+`ts-type-forge/global` — the ambient globals, usually brought in through
+`compilerOptions.types` or `/// <reference types="ts-type-forge/global" />` — is
+left alone, as is every other module.
+
 ## Options
 
-`importStyle` is accepted by every rule; `maxLength` only by
-`prefer-canonical-length-constrained-tuple`.
+`importStyle` is accepted by every rule that rewrites a type; `maxLength` only
+by `prefer-canonical-length-constrained-tuple`. `no-side-effect-import` takes no
+options.
 
 | Option        | Type                  | Default   | Description                                                         |
 | :------------ | :-------------------- | :-------- | :------------------------------------------------------------------ |

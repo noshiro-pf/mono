@@ -5,7 +5,7 @@ import {
   type OctokitResponse,
 } from 'octokit-safe-types';
 import { expectType } from 'ts-data-forge';
-import { validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import { Result } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
@@ -64,7 +64,7 @@ export const getAllRulesets = async (): Promise<GetAllRulesetsResponse> => {
     const res = GetAllRulesetsResponse.validate(getAllRulesetsResponse.data);
 
     if (Result.isErr(res)) {
-      console.warn(validationErrorsToMessages(res.value));
+      console.warn(t.validationErrorsToMessages(res.value));
     }
   }
 

@@ -1,5 +1,5 @@
-import { brandedNumber, type TypeOf } from 'ts-fortress';
+import * as t from 'ts-fortress';
 
-export const Yen = brandedNumber({ typeName: 'Yen', defaultValue: 0 });
+export const Yen = t.brandedNumber({ typeName: 'Yen', defaultValue: 0 });
 
-export type Yen = TypeOf<typeof Yen>;
+export type Yen = t.TypeOf<typeof Yen>;

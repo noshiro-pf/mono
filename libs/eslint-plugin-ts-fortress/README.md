@@ -70,6 +70,7 @@ export default [
 | Rule                                       | Description                                                                                   |
 | :----------------------------------------- | :-------------------------------------------------------------------------------------------- |
 | `prefer-canonical-length-constrained-type` | Normalize a length-constrained array combinator with degenerate bounds to its canonical form. |
+| `prefer-namespace-import`                  | Require `ts-fortress` to be imported as a namespace rather than by name.                      |
 
 ### `prefer-canonical-length-constrained-type`
 
@@ -133,7 +134,10 @@ bound it carries over to the other combinator is a literal within `0..10`.
 Both the namespace style (`import * as t from 'ts-fortress'`) and named imports
 — including aliases — are recognized, and the autofix reuses whatever binding
 the file already has, adding `import { … } from 'ts-fortress';` only when a
-named call needs one.
+named call needs one. With
+[`prefer-namespace-import`](#prefer-namespace-import) on as well — as it is in
+the `recommended` preset — such an import is rewritten to a namespace access on
+a later fix pass.
 
 #### The rule deliberately leaves alone
 
@@ -148,6 +152,69 @@ named call needs one.
   they keep it.)
 - calls where the target name is already bound to something else at the call
   site.
+
+### `prefer-namespace-import`
+
+`ts-fortress` is meant to be reached through a namespace. Its exports are short,
+generic names — `string`, `number`, `record`, `array`, `Type` — that collide with
+globals and with local declarations the moment they are pulled into a file's
+scope, and every schema in the wild reads `t.string()`. The rule makes that the
+only spelling:
+
+```ts
+// ❌
+import { record, string } from 'ts-fortress';
+
+const User = record({ name: string() });
+
+// ✅
+import * as t from 'ts-fortress';
+
+const User = t.record({ name: t.string() });
+```
+
+`import type * as t from 'ts-fortress';` is accepted too, and is what the
+autofix writes when every offending import in the file is type-only. A namespace
+import may carry any local name — the rule does not rename an existing one.
+
+A default import is reported as well, and its references become the namespace
+itself. `ts-fortress` has no default export, so such a file did not type-check
+to begin with — the rewrite is what it was reaching for.
+
+A bare `import 'ts-fortress';` is reported and **deleted**: it binds no name,
+and `ts-fortress` declares `sideEffects: false`, so importing it for its own
+sake does nothing.
+
+The autofix rewrites every reference along with the import: aliases resolve back
+to the canonical export (`import { nonEmptyArray as nea }` → `t.nonEmptyArray`),
+shorthand properties are expanded (`{ string }` → `{ string: t.string }`), and
+type positions need nothing special, since `t.Type` reads as a qualified name
+there. Several ts-fortress imports in one file collapse into a single namespace
+import; when the file already has one, the others merge into it under its name.
+
+#### Options
+
+```ts
+'ts-fortress/prefer-namespace-import': ['error', { namespaceName: 'tf' }],
+```
+
+- `namespaceName` (default `'t'`) — the local name the autofix gives the
+  namespace import it creates. A namespace import already in the file is reused
+  under its own name, whatever this is set to.
+
+#### When the fix is withheld
+
+The rule still reports, but leaves the file alone, when the rewrite could not be
+completed safely:
+
+- the namespace name is already bound to something else, at the import or at any
+  reference being rewritten (a fix would silently resolve to that binding);
+- a binding is re-exported by name (`export { string };`), which no member access
+  can spell;
+- a value import would have to merge into an `import type * as t`, which cannot
+  carry it;
+- the file has two namespace imports of `ts-fortress`, or one declaration that
+  mixes a namespace specifier with a named or default one.
 
 ## License
 

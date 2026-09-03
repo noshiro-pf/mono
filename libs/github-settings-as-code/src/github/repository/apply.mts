@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { type UpdateRepositoryRequest } from 'octokit-safe-types';
 import { Obj } from 'ts-data-forge';
-import { validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import {
   formatUncommittedFiles,
   isDirectlyExecuted,
@@ -95,7 +95,7 @@ const readSettings = async (): Promise<RepositoryPicked> => {
 
   if (Result.isErr(validationResult)) {
     throw new Error(
-      validationErrorsToMessages(validationResult.value).join('\n'),
+      t.validationErrorsToMessages(validationResult.value).join('\n'),
     );
   }
 

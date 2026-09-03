@@ -1,5 +1,5 @@
 import { GetRulesetResponse, type EndpointKeys } from 'octokit-safe-types';
-import { validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import { Result } from 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
@@ -22,7 +22,7 @@ export const getRuleset = async (
     const res = GetRulesetResponse.validate(getRulesetResult.data);
 
     if (Result.isErr(res)) {
-      console.warn(validationErrorsToMessages(res.value));
+      console.warn(t.validationErrorsToMessages(res.value));
     }
   }
 

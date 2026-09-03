@@ -28,6 +28,21 @@ type RuleOptionsOf<Name extends keyof typeof tsTypeForgeRules> =
     : never;
 
 /**
+ * @description Remove a side-effect-only `import 'ts-type-forge';`, which binds no name and has no runtime entry point to resolve to. `ts-type-forge/global` is left alone.
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace NoSideEffectImport {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace uniform tuple spellings such as `[V, ...V[]]` / `[V, V, ...V[]]` / `[V, V, V]` with the canonical ts-type-forge tuple type.
  *
  *  ```md
@@ -209,6 +224,7 @@ namespace PreferStrictOrRelaxedUtilityType {
 }
 
 export type EslintTsTypeForgeRules = Readonly<{
+  'ts-type-forge/no-side-effect-import': NoSideEffectImport.RuleEntry;
   'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.RuleEntry;
   'ts-type-forge/prefer-canonical-mutable-record': PreferCanonicalMutableRecord.RuleEntry;
   'ts-type-forge/prefer-readonly-or-mutable-record': PreferReadonlyOrMutableRecord.RuleEntry;

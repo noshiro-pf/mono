@@ -8,7 +8,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { array, record, string, validationErrorsToMessages } from 'ts-fortress';
+import * as t from 'ts-fortress';
 import { $, isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -162,10 +162,10 @@ const CSPELL_CONFIG_FILENAMES = [
  * script reads it. `record` allows excess properties, so the `version` and
  * `private` fields it also carries need no mention.
  */
-const PNPM_PROJECT_LIST = array(
-  record({
-    name: string(),
-    path: string(),
+const PNPM_PROJECT_LIST = t.array(
+  t.record({
+    name: t.string(),
+    path: t.string(),
   }),
 );
 
@@ -318,7 +318,7 @@ const getWorkspacePackageDirs = async (): Promise<
     return Result.err(
       Arr.toUnshifted(
         '`pnpm ls` returned something other than a list of projects:',
-      )(validationErrorsToMessages(projects.value)).join('\n'),
+      )(t.validationErrorsToMessages(projects.value)).join('\n'),
     );
   }
 
