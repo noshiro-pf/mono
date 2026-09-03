@@ -1,3 +1,5 @@
+# cspell:ignore PCRE FFEF gsub
+
 name: Lint Pull Request
 
 on:
@@ -23,7 +25,23 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 permissions:
+  contents: read
   pull-requests: read
+
+env:
+  # What "write it in English" is enforced as: no Japanese. Both jobs below
+  # match against this one pattern — CJK symbols and punctuation, kana, the
+  # CJK ideographs and their compatibility block, and the fullwidth forms.
+  #
+  # It is deliberately not "ASCII only". Commit subjects here carry em dashes,
+  # curly quotes and the occasional accented name, none of which are a
+  # language, and a check that rejected them would be worked around rather
+  # than followed.
+  #
+  # PCRE, for `grep -P`; `LC_ALL` is set on each step so that `\x{…}` is read
+  # as a code point rather than a byte.
+  JAPANESE_PATTERN: '[\x{3000}-\x{303F}\x{3040}-\x{30FF}\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{F900}-\x{FAFF}\x{FF00}-\x{FFEF}]'
+  LC_ALL: C.UTF-8
 
 jobs:
   semantic-pull-request:
@@ -34,3 +52,70 @@ jobs:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The title is what a squash merge puts on `main`:
+      # `squash_merge_commit_title` is `PR_TITLE` in
+      # `repo-settings/repository-settings/settings.json`. So the language rule
+      # for commit messages is a rule about this string, and it is checked here
+      # rather than against the branch — the branch's own subjects are squashed
+      # into the body, which the job below covers.
+      #
+      # The whole title, not just the subject the action above validates: a
+      # scope can hold Japanese too.
+      - name: Check that the title is written in English
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! printf '%s' "${PR_TITLE}" | grep -Pq "${JAPANESE_PATTERN}"; then
+            echo 'The title is written in English.'
+            exit 0
+          fi
+
+          summary="The pull request title must be written in English, and this one is not: ${PR_TITLE}"
+          echo "::error::${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+          exit 1
+
+  commit-messages:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Read through the API rather than from a checkout: this workflow runs on
+      # `pull_request_target`, so checking the branch out would put its contents
+      # on a runner holding a token the branch's author does not have. Nothing
+      # here executes anything from the pull request — `gh` fetches the commit
+      # list, `grep` reads it.
+      #
+      # A squash merge concatenates these into the commit body
+      # (`squash_merge_commit_message` is `COMMIT_MESSAGES`), so they land on
+      # `main` as surely as the title does.
+      - name: Check that every commit message is written in English
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # One line per commit, so that a multi-line message cannot report a
+          # match without saying which commit it came from. The endpoint caps
+          # at 250 commits, which `--paginate` walks a page at a time.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/commits" \
+            --jq '.[] | "\(.sha[0:7]) \(.commit.message | gsub("\n"; " / "))"' >commit-messages.txt
+
+          if ! offending="$(grep -P "${JAPANESE_PATTERN}" commit-messages.txt)"; then
+            echo 'Every commit message is written in English.'
+            exit 0
+          fi
+
+          summary="Every commit message must be written in English. These are not:"
+          echo "::error::${summary}"
+          printf '%s\n%s\n' "${summary}" "${offending}"
+          {
+            echo "${summary}"
+            echo
+            echo '```text'
+            echo "${offending}"
+            echo '```'
+            echo
+            echo 'Rewrite them with `git rebase -i` (or `git commit --amend` for the last one) and force-push.'
+          } >>"${GITHUB_STEP_SUMMARY}"
+          exit 1

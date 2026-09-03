@@ -282,7 +282,7 @@ commands run those across every workspace member that defines them, and the
 
 ## Required status checks
 
-**Seven contexts are required, and none of them is a job that does work.** The
+**Eight contexts are required, and none of them is a job that does work.** The
 list lives in the `required_status_checks` rule of
 `repo-settings/rulesets/main.json`:
 
@@ -295,6 +295,7 @@ list lives in the `required_status_checks` rule of
 | `backup-repository-settings-result` | the aggregate job in `backup-repository-settings.yml` |
 | `no-wip-label`                      | `wip-label.yml`                                       |
 | `Validate PR title`                 | `lint-pull-request.yml`                               |
+| `Validate commit messages`          | `lint-pull-request.yml`                               |
 
 **A required context is a string matched exactly against the name of a check
 run on the pull request's head commit**, and nothing more — GitHub does not
@@ -722,8 +723,25 @@ The check also fails on a changeset naming a package that does not exist:
 The prefix does not drive versioning here — changesets do, and a commit without
 a changeset publishes nothing no matter what it is called.
 
+**Write commit messages in English**, subject and body alike. `main`'s history
+is the one part of this repository that cannot be edited afterwards, and the
+libraries under `libs/` are published, so it is read by people who do not read
+Japanese. Conversation about the work — a pull request description, a review
+comment, an issue — is not covered: only what lands in the history is.
+
+`Validate commit messages` in `lint-pull-request.yml` enforces it, and
+`Validate PR title` enforces the same thing for the title. Both are required
+status checks. What they reject is Japanese specifically — kana, CJK
+ideographs, CJK punctuation and the fullwidth forms — rather than everything
+outside ASCII, so an em dash, a curly quote or an accented name still passes.
+
 ### Pull Requests
 
+- **The title is written in English**, and is checked — see above. A squash
+  merge makes it the subject of the commit that lands on `main`
+  (`squash_merge_commit_title` is `PR_TITLE`), and the branch's own commit
+  messages its body (`squash_merge_commit_message` is `COMMIT_MESSAGES`), which
+  is why both are held to the same rule.
 - Include a clear description, link related issues, and add screenshots or logs when helpful.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
 - Make sure CI passes and `pnpm run check-all` completes without errors.
