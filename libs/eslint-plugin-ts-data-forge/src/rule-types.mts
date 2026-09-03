@@ -88,6 +88,21 @@ namespace PreferArrIsArray {
 }
 
 /**
+ * @description Report an accumulated value rebuilt from scratch for every element — `xs.map((_, i) => f(...xs.slice(0, i + 1)))`, or a `reduce` that spreads its accumulator into a new array — and point at `Arr.scan` from ts-data-forge, which does the same in one pass
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferArrScan {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace `xs.reduce((a, b) => a + b, 0)` with `Arr.sum(xs)` or `Arr.sumBy(xs, fn)` from ts-data-forge.
  *
  *  ```md
@@ -285,6 +300,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
   'ts-data-forge/prefer-canonical-length-cast': PreferCanonicalLengthCast.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
+  'ts-data-forge/prefer-arr-scan': PreferArrScan.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;
   'ts-data-forge/prefer-as-int': PreferAsInt.RuleEntry;
   'ts-data-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
