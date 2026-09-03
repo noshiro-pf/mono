@@ -411,6 +411,18 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **`better-react-use-state`（#1627）だけは `libs/` に移した。** 「いずれも `apps/` に private」の唯一の例外である。`event-schedule-app` が連れてくる 6 utils のうち 4 つがこれに依存し、復元の残り全部がこの上に乗る。それだけ土台になるものを private のままにしておく理由が無いので、Apache-2.0 で公開する側に置いた。**初回 publish は手作業**である（[libs/first-release.md](../libs/first-release.md)）
             - **2026-08-31 時点で npm に `1.0.3` が出ている。** 初回 publish は
               済んでおり、以降は changesets が動く
+            - **2026-09-04 に Preact 版も `libs/` へ移した。** 例外は 2 つに
+              なった。`better-preact-use-state` は復元時に `apps/` へ private で
+              置かれていたが（[docs/experimental-inventory.md](./experimental-inventory.md)）、
+              React 版と 1 対 1 で対応する実装をこちらだけ非公開にしておく理由が
+              無いので、同じ形（Apache-2.0・rollup ビルド・`libReplacement`
+              opt-in）に揃えた
+            - **こちらは初回 publish が要らない。** React 版と同じく、旧単独
+              リポジトリから 2025-02 に npm へ出ており（`1.0.0` / `1.0.1` /
+              `1.0.3`）、trusted publisher さえ設定されていれば changesets が
+              そのまま続きを publish できる。`package.json` の version は npm の
+              最新に合わせて `1.0.3` にしてある — `1.0.0` のままだと次の patch が
+              既に存在する `1.0.1` になり、release が落ちる
 
     - **`event-schedule-app` 本体（21136 行・314 ファイル）は #1714。** 型エラーは 3567 件から、lint は 127 件から、いずれも 0 になった
         - **2026-08-30 に #1634 の上へ載せ直し、#1714 として出した。**
