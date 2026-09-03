@@ -34,12 +34,24 @@ import { projectRootPath } from '../project-root-path.mjs';
  *    candidate is tried in the same cycle.
  * 4. Poll the rebased pull request until it merges, or until something says
  *    it will not: a required check failed, auto-merge was switched off, the
- *    branch was pushed by someone else, or it stayed green without merging.
- *    A failure is remembered against the head it failed on, so the pull
- *    request is left alone until someone pushes to it.
- * 5. Survey again. When there is nothing to do the script sleeps for
- *    `--idle-interval` seconds before looking again, and keeps going until it
- *    is interrupted or `--once` was given.
+ *    branch was pushed by someone else, or every required context reported
+ *    green and it still did not merge. "Green" means the whole list the
+ *    ruleset requires, not the part of it that has reported — a required
+ *    context with no check run on the head commit is absent from
+ *    `gh pr checks` rather than pending in it, so reading its absence as
+ *    success is what used to write a pull request off three minutes into a
+ *    twenty-five minute matrix.
+ * 5. Remember the verdict against the head *and* the base it was reached on,
+ *    so the pull request is left alone until someone pushes to it or the
+ *    base moves. The base moving is exactly what a pull request that sat
+ *    green without merging was waiting for: it is `BEHIND` now, and a rebase
+ *    is this script's job.
+ * 6. Survey again, saying what became of the pull requests this run has
+ *    touched. One that merges after the watch gave up simply stops appearing
+ *    in the list, and this is the only place that gets recorded. When there
+ *    is nothing to do the script sleeps for `--idle-interval` seconds before
+ *    looking again, and keeps going until it is interrupted or `--once` was
+ *    given.
  *
  * The rebase happens in a `git worktree` under the OS temp directory, so the
  * checkout this runs from is never touched — its working tree may be dirty,
@@ -60,12 +72,16 @@ export const unblockPrs = async (
 
   installStopHandlers();
 
-  let mut_skipped: SkipRecords = new Map();
+  let mut_state: LoopState = {
+    skipped: new Map(),
+    tracked: new Set(),
+    baseSha: undefined,
+  };
 
   while (!stopRequested()) {
-    const cycle = await runCycle(defaultBranch, mut_skipped, options);
+    const cycle = await runCycle(defaultBranch, mut_state, options);
 
-    mut_skipped = cycle.skipped;
+    mut_state = cycle.state;
 
     if (cycle.next === 'stop' || options.once || options.dryRun) break;
 
@@ -140,8 +156,8 @@ type SkipReason =
 /**
  * Why a pull request is being left alone, and the state it was in at the
  * time. A record stops applying as soon as that state changes: a push to the
- * branch clears every reason, and a rebase or push failure also clears when
- * the base moves, since the conflict may have gone with it.
+ * branch clears every reason, and every reason but `checks-failed` also
+ * clears when the base moves. See `skipStillApplies`.
  */
 type SkipRecord = Readonly<{
   number: number;
@@ -157,18 +173,30 @@ type Survey = Readonly<{
   pullRequests: readonly PullRequest[];
   /** The tip of the default branch at the time of the survey. */
   baseSha: string;
+  /** The contexts the ruleset requires, empty when they cannot be read. */
+  requiredContexts: readonly string[];
 }>;
 
 type ChecksSummary = Readonly<{
   status: 'failed' | 'passed' | 'pending';
   failed: readonly string[];
   pending: readonly string[];
+  /**
+   * Required contexts with no check run on the head commit at all. GitHub
+   * shows these as "Expected — waiting for status to be reported" and
+   * `gh pr checks` does not list them, so they are found by subtracting what
+   * has reported from what the ruleset requires.
+   */
+  missing: readonly string[];
+  /** How many checks the verdict was reached over. */
+  total: number;
 }>;
 
 type TriageContext = Readonly<{
   defaultBranch: string;
   baseSha: string;
   skipped: SkipRecords;
+  requiredContexts: readonly string[];
 }>;
 
 /** What one survey says about one pull request. */
@@ -182,6 +210,8 @@ type Classification =
 type Failing = Readonly<{ pr: PullRequest; summary: ChecksSummary }>;
 
 type Triage = Readonly<{
+  /** How many of the surveyed pull requests this script has anything to say about. */
+  inScope: number;
   /** `BEHIND`, in scope, not skipped — lowest number first. */
   candidates: readonly PullRequest[];
   /** Up to date with checks still running, or clean and about to merge. */
@@ -204,8 +234,19 @@ type WatchOutcome =
   | 'stopped'
   | 'timeout';
 
-type CycleResult = Readonly<{
+/**
+ * What one run carries from cycle to cycle: the pull requests it has given up
+ * on, the ones it has acted on and last saw open, and where the base was when
+ * it last looked.
+ */
+type LoopState = Readonly<{
   skipped: SkipRecords;
+  tracked: ReadonlySet<number>;
+  baseSha: string | undefined;
+}>;
+
+type CycleResult = Readonly<{
+  state: LoopState;
   next: 'idle' | 'stop' | 'survey';
 }>;
 
@@ -225,11 +266,20 @@ const UNKNOWN_STATE_RETRIES = 6;
 const UNKNOWN_STATE_RETRY_MS = 10_000;
 
 /**
- * How many consecutive polls a pull request may sit green and open before it
- * is written off as held by something a rebase cannot fix — a missing review,
- * a required check that never reported.
+ * How many consecutive polls a pull request may sit with every required
+ * context green, and GitHub saying nothing holds the merge, before it is
+ * written off as held by something a rebase cannot fix — a missing review, an
+ * unresolved conversation, auto-merge armed by someone who may not merge.
  */
 const GREEN_POLLS_BEFORE_GIVING_UP = 3;
+
+/**
+ * The same, for a pull request GitHub still calls `BLOCKED` while every
+ * required context reads green. That usually means the ruleset wants
+ * something the checks do not cover, but it is also what a check run that has
+ * just been superseded looks like for a moment, so it is given longer.
+ */
+const BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP = 8;
 
 /** How many consecutive polling errors end a watch. */
 const MAX_CONSECUTIVE_POLL_ERRORS = 5;
@@ -259,7 +309,7 @@ const stopRequested = (): boolean => stopController.signal.aborted;
 
 const runCycle = async (
   defaultBranch: string,
-  skippedBefore: SkipRecords,
+  before: LoopState,
   options: Options,
 ): Promise<CycleResult> => {
   const surveyed = await survey(defaultBranch);
@@ -267,17 +317,36 @@ const runCycle = async (
   if (Result.isErr(surveyed)) {
     log(`Survey failed: ${surveyed.value}`);
 
-    return { skipped: skippedBefore, next: 'idle' };
+    return { state: before, next: 'idle' };
   }
 
-  const { pullRequests, baseSha } = surveyed.value;
+  const { pullRequests, baseSha, requiredContexts } = surveyed.value;
 
-  const skipped = pruneSkips(skippedBefore, pullRequests, baseSha);
+  if (before.baseSha !== undefined && before.baseSha !== baseSha) {
+    log(`${defaultBranch} moved to ${baseSha.slice(0, 10)}.`);
+  }
+
+  // A pull request this run acted on and can no longer see is one that ended
+  // while nothing was watching it — including one the watch had given up on,
+  // whose merge would otherwise go unrecorded.
+  const tracked = await reportDeparted(before.tracked, pullRequests);
+
+  const state = (
+    nextSkipped: SkipRecords,
+    nextTracked: ReadonlySet<number> = tracked,
+  ): LoopState => ({
+    skipped: nextSkipped,
+    tracked: nextTracked,
+    baseSha,
+  });
+
+  const skipped = pruneSkips(before.skipped, pullRequests, baseSha);
 
   const triaged = await triage(pullRequests, {
     defaultBranch,
     baseSha,
     skipped,
+    requiredContexts,
   });
 
   reportTriage(triaged, pullRequests.length);
@@ -298,7 +367,7 @@ const runCycle = async (
   );
 
   if (stopRequested()) {
-    return { skipped: mut_skipped, next: 'stop' };
+    return { state: state(mut_skipped), next: 'stop' };
   }
 
   if (Arr.isNonEmpty(triaged.inFlight)) {
@@ -308,29 +377,37 @@ const runCycle = async (
       `#${target.number} is up to date (${target.mergeStateStatus}); watching it rather than rebasing another.`,
     );
 
-    if (options.dryRun) return { skipped: mut_skipped, next: 'stop' };
+    if (options.dryRun) return { state: state(mut_skipped), next: 'stop' };
 
-    const outcome = await watch(target, target.headRefOid, options);
+    const outcome = await watch(
+      target,
+      target.headRefOid,
+      requiredContexts,
+      options,
+    );
 
     return {
-      skipped: applyWatchOutcome(mut_skipped, target, baseSha, outcome),
+      state: state(
+        applyWatchOutcome(mut_skipped, target, baseSha, outcome),
+        trackAfterWatch(tracked, target.number, outcome),
+      ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
     };
   }
 
   if (!Arr.isNonEmpty(triaged.candidates)) {
-    return { skipped: mut_skipped, next: 'idle' };
+    return { state: state(mut_skipped), next: 'idle' };
   }
 
   if (options.dryRun) {
     log(`Would rebase #${triaged.candidates[0].number} onto ${defaultBranch}.`);
 
-    return { skipped: mut_skipped, next: 'stop' };
+    return { state: state(mut_skipped), next: 'stop' };
   }
 
   for (const target of triaged.candidates) {
     if (stopRequested()) {
-      return { skipped: mut_skipped, next: 'stop' };
+      return { state: state(mut_skipped), next: 'stop' };
     }
 
     log(
@@ -358,28 +435,91 @@ const runCycle = async (
       // stale. The next one will say what is actually there.
       log(`#${target.number} was already on top of ${defaultBranch}.`);
 
-      return { skipped: mut_skipped, next: 'survey' };
+      return { state: state(mut_skipped), next: 'survey' };
     }
 
     log(
       `#${target.number} pushed as ${rebased.value.slice(0, 10)}; waiting for it to merge.`,
     );
 
-    const outcome = await watch(target, rebased.value, options);
+    const outcome = await watch(
+      target,
+      rebased.value,
+      requiredContexts,
+      options,
+    );
 
     return {
-      skipped: applyWatchOutcome(
-        mut_skipped,
-        { ...target, headRefOid: rebased.value },
-        baseSha,
-        outcome,
+      state: state(
+        applyWatchOutcome(
+          mut_skipped,
+          { ...target, headRefOid: rebased.value },
+          baseSha,
+          outcome,
+        ),
+        trackAfterWatch(tracked, target.number, outcome),
       ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
     };
   }
 
   // Every candidate failed to rebase or push.
-  return { skipped: mut_skipped, next: 'idle' };
+  return { state: state(mut_skipped), next: 'idle' };
+};
+
+/**
+ * A pull request the run has acted on is worth remembering while it might
+ * still end without anything watching it; once it has ended there is nothing
+ * left to report.
+ */
+const trackAfterWatch = (
+  tracked: ReadonlySet<number>,
+  prNumber: number,
+  outcome: WatchOutcome,
+): ReadonlySet<number> =>
+  outcome === 'merged' || outcome === 'closed'
+    ? new Set(Array.from(tracked).filter((number) => number !== prNumber))
+    : new Set([...tracked, prNumber]);
+
+/**
+ * Says what became of the pull requests this run acted on that have left the
+ * open list, and returns the ones that are still on it.
+ *
+ * Nothing else notices: a pull request the watch gave up on merges minutes
+ * later, and the only trace is that it stops being listed. Without this the
+ * run that pushed the merge commit never mentions it.
+ */
+const reportDeparted = async (
+  tracked: ReadonlySet<number>,
+  pullRequests: readonly PullRequest[],
+): Promise<ReadonlySet<number>> => {
+  const isOpen = (prNumber: number): boolean =>
+    pullRequests.some((pr) => pr.number === prNumber);
+
+  const departed = Array.from(tracked).filter((prNumber) => !isOpen(prNumber));
+
+  const viewed = await Promise.all(
+    departed.map(async (prNumber) => ({
+      prNumber,
+      result: await viewPullRequest(prNumber),
+    })),
+  );
+
+  for (const { prNumber, result } of viewed) {
+    if (Result.isErr(result)) {
+      log(
+        `#${prNumber} has left the open list; cannot read it: ${result.value}`,
+      );
+    } else if (result.value.state === 'MERGED') {
+      log(`#${prNumber} merged — ${result.value.title}`);
+    } else {
+      log(
+        `#${prNumber} is no longer open (${result.value.state}) — ${result.value.title}`,
+      );
+    }
+  }
+
+  return new Set(Array.from(tracked).filter(isOpen));
 };
 
 const applyWatchOutcome = (
@@ -425,7 +565,7 @@ const applyWatchOutcome = (
 
     case 'not-merging':
       log(
-        `#${pr.number}: checks are green but it is not merging; something other than the branch holds it.`,
+        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it — a review, an unresolved conversation, or auto-merge armed by someone who may not merge.`,
       );
 
       return withSkip(skipped, {
@@ -467,6 +607,7 @@ const applyWatchOutcome = (
 const watch = async (
   pr: PullRequest,
   expectedHead: string,
+  requiredContexts: readonly string[],
   options: Options,
 ): Promise<WatchOutcome> => {
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
@@ -523,7 +664,7 @@ const watch = async (
 
     mut_errors = 0;
 
-    const summary = summarizeChecks(checks.value);
+    const summary = summarizeChecks(checks.value, requiredContexts);
 
     if (summary.status === 'failed') {
       log(`#${pr.number}: failed: ${summary.failed.join(', ')}`);
@@ -535,19 +676,32 @@ const watch = async (
       mut_greenPolls = 0;
 
       log(
-        `#${pr.number}: ${current.mergeStateStatus}, waiting on ${Arr.isNonEmpty(summary.pending) ? summary.pending.join(', ') : 'checks to be reported'}`,
+        `#${pr.number}: ${current.mergeStateStatus}, waiting on ${describeWaitingOn(summary)}`,
       );
     } else {
       mut_greenPolls += 1;
 
+      // GitHub calling it BLOCKED while every required context reads green is
+      // the one combination that is usually transient, so it is given longer
+      // than a pull request GitHub already considers mergeable.
+      const budget = isMergeableState(current.mergeStateStatus)
+        ? GREEN_POLLS_BEFORE_GIVING_UP
+        : BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP;
+
       log(
-        `#${pr.number}: ${current.mergeStateStatus}, required checks green (${mut_greenPolls}/${GREEN_POLLS_BEFORE_GIVING_UP}), waiting for auto-merge`,
+        `#${pr.number}: ${current.mergeStateStatus}, all ${summary.total} required checks green (${mut_greenPolls}/${budget}), waiting for auto-merge`,
       );
 
-      if (mut_greenPolls >= GREEN_POLLS_BEFORE_GIVING_UP) return 'not-merging';
+      if (mut_greenPolls >= budget) return 'not-merging';
     }
 
-    if (Date.now() > deadline) return 'timeout';
+    if (Date.now() > deadline) {
+      log(
+        `#${pr.number}: still waiting on ${describeWaitingOn(summary)} after ${options.watchTimeoutMin} minutes.`,
+      );
+
+      return 'timeout';
+    }
   }
 
   return 'stopped';
@@ -695,7 +849,58 @@ const survey = async (
 
   if (Result.isErr(baseSha)) return baseSha;
 
-  return Result.ok({ pullRequests: mut_listed.value, baseSha: baseSha.value });
+  return Result.ok({
+    pullRequests: mut_listed.value,
+    baseSha: baseSha.value,
+    requiredContexts: await listRequiredContexts(defaultBranch),
+  });
+};
+
+/**
+ * The contexts the ruleset requires on the default branch, as GitHub reports
+ * them, deduplicated across rulesets.
+ *
+ * This is what lets "green" mean the whole list rather than the part of it
+ * that has reported. A required context with no check run on the head commit
+ * is not pending in `gh pr checks` — it is absent from it — so a pull request
+ * three minutes into a twenty-five minute matrix looks finished without this.
+ *
+ * A repository whose rules cannot be read gives an empty list, and the watch
+ * falls back to judging by what has reported, on a longer leash.
+ */
+const listRequiredContexts = async (
+  branch: string,
+): Promise<readonly string[]> => {
+  const listed = await git(
+    [
+      'gh api',
+      // Joined rather than interpolated: `gh` fills the `{owner}` and
+      // `{repo}` placeholders in, and a template literal holding them is
+      // indistinguishable from a mistyped one to `unicorn`.
+      sh(['repos', '{owner}', '{repo}', 'rules', 'branches', branch].join('/')),
+      '--jq',
+      sh(
+        '.[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context',
+      ),
+    ].join(' '),
+  );
+
+  if (Result.isErr(listed)) {
+    log(
+      `Cannot read the required checks for ${branch}; judging by what has reported. (${lastLines(listed.value, 2)})`,
+    );
+
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      listed.value
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line !== ''),
+    ),
+  );
 };
 
 const triage = async (
@@ -709,6 +914,7 @@ const triage = async (
   );
 
   return {
+    inScope: classified.filter(({ result }) => result.kind !== 'ignore').length,
     candidates: classified
       .filter(({ result }) => result.kind === 'candidate')
       .map(({ pr }) => pr),
@@ -742,7 +948,11 @@ const classify = async (
   if (skip !== undefined && skipStillApplies(skip, pr, context.baseSha)) {
     return {
       kind: 'note',
-      note: `#${pr.number}: skipped (${skip.reason}: ${skip.detail}) until the branch is pushed again`,
+      note: `#${pr.number}: skipped (${skip.reason}: ${skip.detail}) until ${
+        skip.reason === 'checks-failed'
+          ? 'the branch is pushed again'
+          : `the branch is pushed again or ${context.defaultBranch} moves`
+      }`,
     };
   }
 
@@ -765,10 +975,11 @@ const classify = async (
         };
       }
 
-      const summary = summarizeChecks(checks.value);
+      const summary = summarizeChecks(checks.value, context.requiredContexts);
 
-      // Pending, or green and about to merge. A green one that stays open
-      // is caught by the watch.
+      // Pending — including a required context that has not reported at all —
+      // or green and about to merge. A green one that stays open is caught by
+      // the watch.
       return summary.status === 'failed'
         ? { kind: 'failing', summary }
         : { kind: 'in-flight' };
@@ -790,7 +1001,7 @@ const classify = async (
 
 const reportTriage = (triaged: Triage, total: number): void => {
   log(
-    `${total} open pull request(s): ${triaged.candidates.length} behind, ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing.`,
+    `${total} open pull request(s), ${triaged.inScope} with auto-merge: ${triaged.candidates.length} behind, ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing.`,
   );
 
   for (const note of triaged.notes) {
@@ -832,7 +1043,16 @@ const outOfScopeReason = (
   return undefined;
 };
 
-const summarizeChecks = (checks: readonly Check[]): ChecksSummary => {
+/**
+ * `checks` is what `gh pr checks --required` reported for the head commit;
+ * `requiredContexts` is what the ruleset asks for. The difference between the
+ * two is the point: a context in the second and not the first has not
+ * reported yet, and GitHub will not merge until it does.
+ */
+const summarizeChecks = (
+  checks: readonly Check[],
+  requiredContexts: readonly string[],
+): ChecksSummary => {
   const failed = checks
     .filter((check) => check.bucket === 'fail' || check.bucket === 'cancel')
     .map((check) => check.name);
@@ -841,25 +1061,70 @@ const summarizeChecks = (checks: readonly Check[]): ChecksSummary => {
     .filter((check) => check.bucket === 'pending')
     .map((check) => check.name);
 
+  const reported = new Set(checks.map((check) => check.name));
+
+  const missing = requiredContexts.filter((context) => !reported.has(context));
+
   const status = Arr.isNonEmpty(failed)
     ? 'failed'
-    : // No checks at all means they have not been reported yet.
-      Arr.isNonEmpty(pending) || !Arr.isNonEmpty(checks)
+    : // No checks at all means they have not been reported yet — which is
+      // also all that can be said when the ruleset could not be read.
+      Arr.isNonEmpty(pending) ||
+        Arr.isNonEmpty(missing) ||
+        !Arr.isNonEmpty(checks)
       ? 'pending'
       : 'passed';
 
-  return { status, failed, pending };
+  return {
+    status,
+    failed,
+    pending,
+    missing,
+    total: Math.max(checks.length, requiredContexts.length),
+  };
 };
 
+/** Everything the merge is still waiting for, reported and unreported. */
+const describeWaitingOn = (summary: ChecksSummary): string => {
+  const waiting = [
+    ...summary.pending,
+    ...summary.missing.map((context) => `${context} (not reported yet)`),
+  ];
+
+  return Arr.isNonEmpty(waiting) ? waiting.join(', ') : 'checks to be reported';
+};
+
+/** Merge states in which GitHub itself says nothing holds the merge. */
+const isMergeableState = (mergeStateStatus: string): boolean =>
+  mergeStateStatus === 'CLEAN' ||
+  mergeStateStatus === 'HAS_HOOKS' ||
+  mergeStateStatus === 'UNSTABLE';
+
+/**
+ * A verdict lasts as long as the state it was reached in. Every reason is
+ * tied to the head, so a push to the branch clears it; all but
+ * `checks-failed` are tied to the base as well.
+ *
+ * The base is what makes the difference to a pull request that sat green
+ * without merging or ran out of watch time: once the base moves that pull
+ * request is `BEHIND`, which is the one thing this script knows how to fix,
+ * and a verdict that outlived its state is what left a ready pull request
+ * sitting still through cycle after cycle of "Nothing to do". A rebase or
+ * push failure is tied to the base for the older reason: the commit it
+ * conflicted with may have gone with it.
+ *
+ * `checks-failed` is deliberately not tied to the base. Rebasing it would put
+ * the same failing matrix through again, and fixing the failure is the
+ * skill's job, not this script's — the push that carries the fix is what
+ * clears it.
+ */
 const skipStillApplies = (
   skip: SkipRecord,
   pr: PullRequest,
   baseSha: string,
 ): boolean =>
   skip.headSha === pr.headRefOid &&
-  (skip.reason === 'rebase-failed' || skip.reason === 'push-failed'
-    ? skip.baseSha === baseSha
-    : true);
+  (skip.reason === 'checks-failed' || skip.baseSha === baseSha);
 
 /** Drops records for pull requests that are gone or have moved on. */
 const pruneSkips = (

@@ -126,6 +126,23 @@ gh pr checks <number> --watch --fail-fast --interval 60
 squashes and merges the PR on its own — that is the intended ending, and nothing
 here should race it.
 
+**A short green list is not a green PR.** `gh pr checks` lists the check runs
+that exist on the head commit, and a required context whose workflow has not
+reported yet is _absent_ from that output rather than pending in it. Three
+minutes into a twenty-five minute matrix, `--required` happily returns four
+green rows out of seven. So count them against what the ruleset actually
+requires, live rather than from the file:
+
+```bash
+gh api 'repos/{owner}/{repo}/rules/branches/main' \
+  --jq '.[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context'
+```
+
+`mergeStateStatus` is the cross-check: while it says `BLOCKED` and every
+reported check is green, the reason is almost always a context that has not
+reported. Keep waiting; do not conclude the PR is held by something else, and
+above all do not start on the next PR.
+
 Do not start the next PR while this one is being watched.
 
 ## 4. Fix a failing check
@@ -182,10 +199,11 @@ Confirm with `gh pr view <number> --json state,mergedAt`. The remote branch is
 deleted automatically (`delete_branch_on_merge`); locally, `git fetch --prune`,
 and if that branch was checked out, switch back to `main` and pull.
 
-If every required check is green and the PR is still open, something outside this
-skill's two jobs is holding it — a missing review, a required check that never
-reported, auto-merge disabled behind your back. Report that and stop. Do not
-merge it.
+If every required context has reported (step 3 — not merely every context that
+happens to be listed) and all of them are green while the PR is still open,
+something outside this skill's two jobs is holding it — a missing review, an
+unresolved conversation, auto-merge disabled behind your back. Report that and
+stop. Do not merge it.
 
 Once it does merge, `main` has moved and every remaining PR reads `BEHIND` again.
 That is expected, not a regression. Return to step 1 and pick the next single PR.
