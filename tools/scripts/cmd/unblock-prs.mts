@@ -34,7 +34,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  *    candidate is tried in the same cycle.
  * 4. Poll the rebased pull request until it merges, or until something says
  *    it will not: a required check failed, auto-merge was switched off, the
- *    branch was pushed by someone else, or every required context reported
+ *    `[WIP]` label went on, the branch was pushed by someone else, or every
+ *    required context reported
  *    green and it still did not merge. "Green" means the whole list the
  *    ruleset requires, not the part of it that has reported — a required
  *    context with no check run on the head commit is absent from
@@ -232,7 +233,8 @@ type WatchOutcome =
   | 'merged'
   | 'not-merging'
   | 'stopped'
-  | 'timeout';
+  | 'timeout'
+  | 'wip-labelled';
 
 /**
  * What one run carries from cycle to cycle: the pull requests it has given up
@@ -544,6 +546,13 @@ const applyWatchOutcome = (
 
       return skipped;
 
+    case 'wip-labelled':
+      log(
+        `#${pr.number}: ${WIP_LABEL} went on while waiting; leaving it alone.`,
+      );
+
+      return skipped;
+
     case 'head-moved':
       log(`#${pr.number}: someone else pushed to the branch; surveying again.`);
 
@@ -640,6 +649,11 @@ const watch = async (
     if (current.state !== 'OPEN') return 'closed';
 
     if (!isRecord(current.autoMergeRequest)) return 'auto-merge-disabled';
+
+    // The label skips every check workflow and leaves `no-wip-label`
+    // `pending`, so from here the checks can only sit there until the watch
+    // times out. Stop now and let the survey set it aside.
+    if (isWipLabelled(current)) return 'wip-labelled';
 
     if (current.headRefOid !== expectedHead) return 'head-moved';
 
@@ -1032,9 +1046,7 @@ const outOfScopeReason = (
 
   if (pr.baseRefName !== defaultBranch) return `base is ${pr.baseRefName}`;
 
-  if (pr.labels.some((label) => label.name === WIP_LABEL)) {
-    return `labelled ${WIP_LABEL}`;
-  }
+  if (isWipLabelled(pr)) return `labelled ${WIP_LABEL}`;
 
   if (!isSafeRefName(pr.headRefName)) {
     return `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`;
@@ -1042,6 +1054,16 @@ const outOfScopeReason = (
 
   return undefined;
 };
+
+/**
+ * Whether the pull request carries the `[WIP]` label, which is what this
+ * repository uses to say "not yet": the check workflows skip while it is on
+ * and `wip-label.yml` holds the merge with a `pending` `no-wip-label` status,
+ * so there is nothing here to unblock. It is a label, deliberately — a
+ * `[WIP]` in the title means nothing to any workflow.
+ */
+const isWipLabelled = (pr: PullRequest): boolean =>
+  pr.labels.some((label) => label.name === WIP_LABEL);
 
 /**
  * `checks` is what `gh pr checks --required` reported for the head commit;

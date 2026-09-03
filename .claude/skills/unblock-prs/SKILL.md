@@ -9,9 +9,11 @@ Clear the obstacles in front of the pull requests that are already queued to
 merge, so GitHub can merge them itself.
 
 **Scope.** Only pull requests with auto-merge already enabled
-(`autoMergeRequest` is not null). That flag is the author's statement that the
-PR should land as soon as it is able to; everything else is still someone's work
-in progress and is none of this skill's business.
+(`autoMergeRequest` is not null) and no `[WIP]` label. The flag is the author's
+statement that the PR should land as soon as it is able to; the label is the
+statement that it should not, and it is checked as a label — never inferred
+from the title. Everything else is still someone's work in progress and is none
+of this skill's business.
 
 **Two jobs, and no third.** Rebase a branch that is out-of-date with `main`, and
 fix a failing check. **Never merge.** No `gh pr merge`, no `--auto`, no enabling
@@ -36,13 +38,23 @@ has to make.
 ## 1. Survey
 
 ```bash
-gh pr list --state open --json number,title,headRefName,baseRefName,isDraft,author,mergeStateStatus,autoMergeRequest \
-  --jq '[.[] | select(.autoMergeRequest != null)]'
+gh pr list --state open --json number,title,headRefName,baseRefName,isDraft,labels,author,mergeStateStatus,autoMergeRequest \
+  --jq '[.[] | select(.autoMergeRequest != null and (.labels | map(.name) | index("[WIP]") | not))]'
 ```
 
-That filter is the scope rule, and it does most of the exclusion by itself:
-`changeset-release/main` carries no auto-merge, and a draft PR cannot have one.
-Still drop any PR whose `baseRefName` is not `main`.
+Those two filters are the scope rule, and they do most of the exclusion by
+themselves: `changeset-release/main` carries no auto-merge, and a draft PR
+cannot have one. Still drop any PR whose `baseRefName` is not `main`.
+
+**A `[WIP]` label puts a PR out of scope whatever its `mergeStateStatus`
+says** — read the label, not the title, and not the draft flag. The label is
+how this repository says "not yet": the five check workflows and the two lint
+jobs skip while it is on, and `wip-label.yml` writes the required
+`no-wip-label` status as `pending`, which is the only thing holding the merge.
+So a labelled PR cannot go green however long it is watched, and rebasing one
+buys nothing but another round of skipped runs. Leave it alone and say so in
+the report — taking the label off is the author's decision, not this skill's.
+See "Check triggers, `[WIP]` and out-of-date branches" in `CLAUDE.md`.
 
 `chore/pnpm-update` does have auto-merge, enabled by the bot, so it is in scope —
 but `pnpm-update.yml` force-pushes that branch daily. If it moves under you, do
@@ -143,6 +155,11 @@ reported check is green, the reason is almost always a context that has not
 reported. Keep waiting; do not conclude the PR is held by something else, and
 above all do not start on the next PR.
 
+**`no-wip-label` pending is the exception, and it never resolves itself.** It
+means the `[WIP]` label went on while you were watching, which also skipped
+every other check on that commit. Stop watching, go back to step 1, and treat
+the PR as out of scope until the label comes off.
+
 Do not start the next PR while this one is being watched.
 
 ## 4. Fix a failing check
@@ -167,7 +184,8 @@ run `pnpm run X` at the repository root, so `type-check (knip)` reproduces as
 
 `Validate PR title` is required because a squash merge takes the PR title as the
 commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the title
-itself, not the branch.
+itself, not the branch. It checks Conventional Commits and English; `[WIP]` in
+a title means nothing to any workflow, which reads the label instead.
 
 Two things about reproducing the rest:
 
@@ -214,4 +232,5 @@ One line per PR, in the order handled: number, what was done (rebased and merged
 by GitHub / rebased and waiting / fix pushed / left alone and why), and where its
 checks stand. Name any PR left failing and what the failure is. Do not report a
 run as green while checks are still pending, and say plainly which PRs were never
-reached and which were out of scope for lacking auto-merge.
+reached and which were out of scope — for lacking auto-merge, or for carrying the
+`[WIP]` label.
