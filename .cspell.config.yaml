@@ -41,18 +41,19 @@ ignorePaths:
 words:
   - anthropics
   - bivariant
-  - tsubu
-  - trunc
   - blueprintjs
+  - msapplication
   - nand
   - noshiro
   - sindresorhus
   - testw
+  - trunc
   - tscw
   - tses
+  - tsubu
   - unshifted
   - unsub
   - valtio
-  - ymdhm
   - wireit
+  - ymdhm
   - zenn

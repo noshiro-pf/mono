@@ -8,3 +8,6 @@ words:
   # The identity function, defined in `src/utils-ported/calendar.mts` and
   # named the way the `@noshiro/ts-utils` it came from named it.
   - idfn
+
+  # The author's handle, in the `index.html` meta tags.
+  - piko
