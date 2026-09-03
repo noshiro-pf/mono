@@ -116,9 +116,6 @@
     "tsutils": "^3.21.0"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "catalog:",
-    "@rollup/plugin-strip": "catalog:",
-    "@rollup/plugin-typescript": "catalog:",
     "@types/is-glob": "4.0.4",
     "@types/json-schema": "7.0.15",
     "@types/micromatch": "4.0.10",
@@ -142,7 +139,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "rollup": "catalog:",
     "ts-codemod-lib": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "tsx": "catalog:",

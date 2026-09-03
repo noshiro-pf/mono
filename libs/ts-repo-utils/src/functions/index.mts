@@ -10,4 +10,5 @@ export * from './glob.mjs';
 export * from './is-directly-executed.mjs';
 export * from './make-empty-dir.mjs';
 export * from './should-run.mjs';
+export * from './strip-dev-only-code.mjs';
 export * from './workspace-utils/index.mjs';

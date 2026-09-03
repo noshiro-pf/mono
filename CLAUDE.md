@@ -970,13 +970,15 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       `pnpm run check:root:knip-config` is the guard for both shapes; run it
       after editing the file by hand.
 - **Build tooling that only `tools/configs/` imports is declared at the root.**
-  Fourteen packages build through `tools/configs/rollup-config.mts`, so
-  `@rollup/plugin-replace`, `@rollup/plugin-strip` and `rollup-plugin-esbuild`
-  are root devDependencies rather than repeated in each package. A package
-  still declares `rollup` itself, because its own `scripts/cmd/build.mts`
-  imports it. `import-x/no-relative-packages` objects to the relative import of
-  a shared config across the package boundary; disable it on the line, as the
-  vitest configs already do.
+  The packages that still bundle build through
+  `tools/configs/rollup-config.mts`, so `@rollup/plugin-replace`,
+  `@rollup/plugin-strip` and `rollup-plugin-esbuild` are root devDependencies
+  rather than repeated in each package. Such a package still declares `rollup`
+  itself, because its own `scripts/cmd/build.mts` imports it; a package built
+  by the native `tsc` (see "What a build emits") declares none of them.
+  `import-x/no-relative-packages` objects to the relative import of a shared
+  config across the package boundary; disable it on the line, as the vitest
+  configs already do.
 - **Versions of shared devDependencies live in the `catalog:` block of
   `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
   published package's `dependencies` and `peerDependencies` are its own API, so
@@ -1108,6 +1110,55 @@ keep it that way; breaking any one of them reintroduces a cycle.
 `docs/package-dependencies.md` holds the current graph and stage tables;
 regenerate it with `pnpm run docs:deps`.
 
+### What a build emits
+
+A library's `dist/` is one `.mjs` per source module plus the declarations,
+and two arrangements produce it. **The native `tsc` one is the target;
+Rollup is what the packages not yet moved still use.**
+
+- **Native `tsc`** (`ts-data-forge`, `eslint-config-typed`): `build.mts` runs
+  `typescript-native`'s `tsc` on `configs/tsconfig.build.json`, which emits
+  the JavaScript, the declarations and both source maps in one pass, then
+  runs `stripDistDevOnlyCode` from `tools/configs/strip-dev-only-code.mts`
+  over `dist/`. There is no `configs/rollup.config.mts` and no Rollup
+  dependency.
+- **Rollup** (the rest): `rollup-plugin-esbuild` transpiles, two
+  `@rollup/plugin-replace` and one `@rollup/plugin-strip` drop the test-only
+  code, Rollup's tree-shaking removes what that left unreferenced, and a
+  second `tsc` pass emits the declarations. TypeScript 7 has no JS compiler
+  API, which is why `@rollup/plugin-typescript` is gone.
+
+`stripDevOnlyCode` in `ts-repo-utils` is the replacement for those plugins
+plus the tree-shaking, and it is source-aware where a bundler cannot be:
+**what it removes is a list of names, and the list is the whole of the
+knowledge**. The mechanism and the list live apart: `ts-repo-utils` ships
+the pass with no names in it, because which functions are safe to remove is
+a fact about the code being built, and `tools/configs/strip-dev-only-code.mts`
+holds this repository's list (`devOnlyCode`) and the `stripDistDevOnlyCode`
+wrapper the build scripts call.
+
+- It removes `if (import.meta.vitest !== undefined) { ... }` blocks,
+  `expectType(...)` statements, every block, loop or `if` that those
+  removals emptied, the imports nothing refers to afterwards, and calls to
+  the identity casts (`castMutable`, `castDeepMutable`, `castReadonly`,
+  `castDeepReadonly`), which become their argument.
+- **Never put a function that validates on the identity list.** `asUint32`
+  and the other branded-number `castType`s look like casts and throw a
+  `TypeError` on a value outside the range; unwrapping one changes behavior.
+  The list is for `(x) => x` and nothing else.
+- **It fails rather than skipping.** An `expectType` that is not a statement
+  on its own (`() => expectType('=')`, an argument) or an
+  `import.meta.vitest` outside the guard is a build error, because the
+  alternative is a test helper shipped in `dist/` with nothing to say so.
+  Write the source in the shape the pass knows, or teach the pass the new
+  shape; do not work around it in `build.mts`.
+- Line breaks are kept wherever it removes something, so `tsc`'s source map
+  stays right line for line. Blank lines in `dist/` where a type test used to
+  be are the cost of that, not a bug.
+- The `.d.mts` output is byte-identical between the two arrangements, and the
+  runtime exports of every module were compared when `ts-data-forge` moved;
+  a package moving over should be checked the same way.
+
 ## Testing Guidelines
 
 ### Framework and Setup
@@ -1173,6 +1224,13 @@ Use `expectType<A, B>('=')` whenever possible. Avoid using `expectType<A, B>('<=
 - Use `assert.deepStrictEqual(A, B)` instead of `assert.deepEqual(A, B)`, `expect(A).toEqual(B)`, or `expect(A).toStrictEqual(B)` in Vitest tests (enforced by `vitest-coding-style/no-expect-to-strict-equal`).
 - Use `test()` instead of `it()` in Vitest tests.
 - Avoid overusing `await` for synchronous events and avoid `force`/`pause`; prefer screen API and user interaction simulation.
+- Write multi-line string fixtures and expectations with a `dedent` template
+  literal, not with an array joined by `'\n'` or a `lines(...)` helper. A
+  `dedent` literal reads like the text it stands for; a list of quoted lines
+  does not. `dedent` drops the blank lines at either end and the common
+  indentation, so when those matter to the assertion — a pass that keeps
+  line numbers, say — assert them separately (`text.split('\n').length`)
+  rather than giving up `dedent` for the whole test.
 
 ## Coding Style & Naming Conventions
 

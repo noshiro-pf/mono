@@ -15,9 +15,6 @@ catalogs:
     '@rollup/plugin-strip':
       specifier: 3.0.4
       version: 3.0.4
-    '@rollup/plugin-typescript':
-      specifier: 12.3.0
-      version: 12.3.0
     '@testing-library/dom':
       specifier: 10.4.1
       version: 10.4.1
@@ -1585,15 +1582,6 @@ importers:
         specifier: ^3.21.0
         version: 3.21.0(typescript@6.0.3)
     devDependencies:
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.63.0)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.63.0)
-      '@rollup/plugin-typescript':
-        specifier: 'catalog:'
-        version: 12.3.0(rollup@4.63.0)(tslib@2.8.1)(typescript@6.0.3)
       '@types/is-glob':
         specifier: 4.0.4
         version: 4.0.4
@@ -1663,9 +1651,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-codemod-lib:
         specifier: workspace:*
         version: link:../ts-codemod-lib
@@ -2525,9 +2510,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2631,6 +2613,9 @@ importers:
       ts-type-forge:
         specifier: workspace:^
         version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -2692,9 +2677,6 @@ importers:
       typedoc-github-theme:
         specifier: 'catalog:'
         version: 0.4.0(typedoc@0.28.20(typescript@6.0.3))
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
@@ -6013,19 +5995,6 @@ packages:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
     peerDependenciesMeta:
       rollup:
-        optional: true
-
-  '@rollup/plugin-typescript@12.3.0':
-    resolution: {integrity: sha512-7DP0/p7y3t67+NabT9f8oTBFE6gGkto4SA6Np2oudYmZE/m1dt8RB0SjL1msMxFpLo631qjRCcBlAbq1ml/Big==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0||^4.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
         optional: true
 
   '@rollup/pluginutils@4.2.1':
@@ -14038,15 +14007,6 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       rollup: 4.63.0
-
-  '@rollup/plugin-typescript@12.3.0(rollup@4.63.0)(tslib@2.8.1)(typescript@6.0.3)':
-    dependencies:
-      '@rollup/pluginutils': 5.4.0(rollup@4.63.0)
-      resolve: 1.22.12
-      typescript: 6.0.3
-    optionalDependencies:
-      rollup: 4.63.0
-      tslib: 2.8.1
 
   '@rollup/pluginutils@4.2.1':
     dependencies:

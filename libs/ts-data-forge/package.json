@@ -85,7 +85,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "rollup": "catalog:",
     "ts-repo-utils": "workspace:*",
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
