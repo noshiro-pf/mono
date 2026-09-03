@@ -50,7 +50,6 @@ on:
       - reopened
       - labeled
       - unlabeled
-      - ready_for_review
 
 # Cancelling the older run matters more here than saving its few seconds: a
 # `labeled` run still writing `pending` after the `unlabeled` run wrote

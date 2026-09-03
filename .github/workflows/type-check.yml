@@ -16,10 +16,11 @@ on:
   # checked like anything else: work in progress is exactly where a CI result
   # is worth having, and the two mechanisms below are what keep that from
   # being expensive. `labeled` / `unlabeled` are here so that adding `[WIP]`
-  # stops the checks and taking it off starts them again; `ready_for_review`
-  # is kept as a re-run for a pull request that was opened as a draft before
-  # this arrangement existed. No `paths` filter here, for the same reason the
-  # steps are gated one at a time — see the `Check diff` step.
+  # stops the checks and taking it off starts them again. No
+  # `ready_for_review`: a draft is checked on every push, so marking it ready
+  # changes nothing about the commit, and a run for it re-checked the same
+  # head with the same result. No `paths` filter here, for the same reason
+  # the steps are gated one at a time — see the `Check diff` step.
   pull_request:
     types:
       - opened
@@ -27,7 +28,6 @@ on:
       - reopened
       - labeled
       - unlabeled
-      - ready_for_review
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

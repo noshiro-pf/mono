@@ -439,7 +439,7 @@ than it saves.
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `node-version-compatibility.yml`, `verify-published-packages.yml` and
 `backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
-synchronize, reopened, labeled, unlabeled, ready_for_review]`, and on `push`
+synchronize, reopened, labeled, unlabeled]`, and on `push`
 only for `main`. One event kind per commit is what keeps the checks list at one
 entry per job: triggering on `push` for branches as well would put a push run
 and a `pull_request` run side by side on every pull request. Nothing is lost by
@@ -472,10 +472,14 @@ not change" would supersede a red title check with a skipped one.
 CI result is most useful, so being a draft skips nothing: the
 `github.event.pull_request.draft == false` clause every job used to carry is
 gone, and with it `/run-checks`, an `issue_comment` workflow whose only purpose
-was to reach a draft's checks by hand. `ready_for_review` stays in the trigger
-list as a re-run for pull requests opened as drafts before this arrangement
-existed. Two cheaper mechanisms took over the work of not spending CI on runs
-nobody will read.
+was to reach a draft's checks by hand. `ready_for_review` is not in the
+trigger list either: it stayed for a while as a re-run for pull requests
+opened as drafts before this arrangement existed, but a draft has been
+checked on every push since, so marking one ready changed nothing about its
+head and the run it fired re-checked the same commit with the same result —
+one full matrix per pull request, thrown away. It went once every open draft
+had check runs on its head. Two cheaper mechanisms took over the work of not
+spending CI on runs nobody will read.
 
 ### A push cancels the run still going for the previous one
 
