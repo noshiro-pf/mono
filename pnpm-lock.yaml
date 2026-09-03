@@ -267,33 +267,6 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3(supports-color@7.2.0)
 
-  apps/better-preact-use-state:
-    devDependencies:
-      eslint:
-        specifier: 'catalog:'
-        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
-      eslint-config-typed:
-        specifier: workspace:*
-        version: link:../../libs/eslint-config-typed
-      npm-run-all2:
-        specifier: 'catalog:'
-        version: 9.0.3
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.7.0)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.6
-      prettier-plugin-organize-imports:
-        specifier: 'catalog:'
-        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
-      prettier-plugin-packagejson:
-        specifier: 'catalog:'
-        version: 3.0.2(prettier@3.9.6)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.12
-
   apps/blueprintjs-playground-styled:
     dependencies:
       '@emotion/react':
@@ -1407,6 +1380,48 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.4.1)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+
+  libs/better-preact-use-state:
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      preact:
+        specifier: 'catalog:'
+        version: 10.29.8(preact-render-to-string@6.7.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      rollup:
+        specifier: 'catalog:'
+        version: 4.63.0
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.12
 
   libs/better-react-use-state:
     devDependencies:

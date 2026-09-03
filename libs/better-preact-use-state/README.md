@@ -1,46 +1,46 @@
-# better-react-use-state
+# better-preact-use-state
 
-A utility that improves React's `useState` to be safer and more convenient. Provides both `useState` (enhanced) and a dedicated `useBoolState` hook.
+A utility that improves Preact's `useState` to be safer and more convenient. Provides both `useState` (enhanced) and a dedicated `useBoolState` hook.
 
 ## Overview
 
-React's `useState` can cause unintended behavior when you want to hold a function as a state. `better-react-use-state` solves this problem and is a utility designed for safer state management. It is designed as a drop-in replacement for React's `useState` hook, with added functionality. `better-react-use-state` also provides a simplified hook, `useBoolState`, specifically for boolean state.
+Preact's `useState` can cause unintended behavior when you want to hold a function as a state. `better-preact-use-state` solves this problem and is a utility designed for safer state management. It is designed as a drop-in replacement for Preact's `useState` hook, with added functionality. `better-preact-use-state` also provides a simplified hook, `useBoolState`, specifically for boolean state.
 
 ## Installation
 
 You can install it with any of the following:
 
 ```bash
-npm install better-react-use-state
+npm install better-preact-use-state
 ```
 
 ```bash
-yarn add better-react-use-state
+yarn add better-preact-use-state
 ```
 
 ```bash
-pnpm add better-react-use-state
+pnpm add better-preact-use-state
 ```
 
 ## Usage
 
 ### `useState`
 
-`better-react-use-state`'s `useState` can be used the same way as React's `useState`.
+`better-preact-use-state`'s `useState` can be used the same way as Preact's `useState`.
 
 ```tsx
-import { useState } from 'better-react-use-state';
+import { useState } from 'better-preact-use-state';
 
-const MyComponent: React.FC = () => {
+const MyComponent: FunctionalComponent = () => {
     const [name, setName] = useState('John Doe');
 
     const [count, setCount, { updateState: updateCount }] = useState(0);
 
-    const onNameChange = React.useCallback((event) => {
+    const onNameChange = useCallback((event) => {
         setName(event.target.value);
     }, []);
 
-    const incrementCount = React.useCallback(() => {
+    const incrementCount = useCallback(() => {
         updateCount((x) => x + 1);
     }, []);
 
@@ -61,9 +61,9 @@ const MyComponent: React.FC = () => {
 `useBoolState` simplifies managing boolean state.
 
 ```tsx
-import { useBoolState } from 'better-react-use-state';
+import { useBoolState } from 'better-preact-use-state';
 
-const MyComponent: React.FC = () => {
+const MyComponent = () => {
     const [isOpen, { setTrue: open, setFalse: close, toggleState }] =
         useBoolState(false);
 
@@ -172,7 +172,7 @@ Updates the state by passing a function `updateFn` that takes the current state 
 
 ## Benefits of this library
 
-With React's standard `useState`, attempting to store a function as state can lead to unexpected behavior (the function being interpreted as an updater function). `better-react-use-state` solves this issue and, by providing `updateState`, allows functions to be safely held as state. Also, `resetState` lets you easily return the state to its initial value. `useBoolState` simplifies boolean state management in React, offering several advantages over directly using useState for booleans.
+With Preact's standard `useState`, attempting to store a function as state can lead to unexpected behavior (the function being interpreted as an updater function). `better-preact-use-state` solves this issue and, by providing `updateState`, allows functions to be safely held as state. Also, `resetState` lets you easily return the state to its initial value. `useBoolState` simplifies boolean state management in Preact, offering several advantages over directly using useState for booleans.
 
 ### Example Use Case
 
@@ -181,7 +181,7 @@ Useful when you want to hold a function as state.
 ```typescript
 const [fn, setFn, { updateState: updateFn }] = useState(initialFn); // Holds a function as state
 
-// In React's standard useState, `setFn(nextFn)` interprets nextFn as an update function.
+// In Preact's standard useState, `setFn(nextFn)` interprets nextFn as an update function.
 
 // If you want to update the state with an update function, you can use updateState instead.
 updateFn((currentFn) => nextFn);

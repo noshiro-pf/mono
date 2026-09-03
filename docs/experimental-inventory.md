@@ -442,11 +442,48 @@ Preact 側 5 app の前提になる utils 4 つのうち 1 つ目。**依存が�
 `preact` があるだけ）ので最初に置ける。`resize-observer-preact-hooks` がこれを
 使うので、utils の中でも先に要る。
 
-### 置き場は `apps/`
+### 置き場は `apps/`（2026-09-04 に `libs/` へ移した）
 
-「置き場は npm の公開状況で決まった」の方針どおり private で `apps/` に置いた。
-React 版の `better-react-use-state` が `libs/` にあるのは、あちらが復元ではなく
-現役の公開パッケージだからで、対応させる必要は無い。
+復元時は「置き場は npm の公開状況で決まった」の方針どおり private で `apps/` に
+置いた。React 版の `better-react-use-state` が `libs/` にあるのは、あちらが復元では
+なく現役の公開パッケージだからで、対応させる必要は無い、と判断していた。
+
+**この判断は 2026-09-04 に覆した。** 実装が 1 対 1 で対応する（違いは
+`preact/hooks` を import するか `react` を import するかだけの）パッケージが、
+片方だけ公開されていて片方は非公開、という状態を保つ理由が無い。`libs/` へ移し、
+React 版と同じ形に揃えた — `private` を外し、`exports` / `files` /
+`publishConfig`、rollup ビルド（`configs/` と `scripts/`）、LICENSE、
+`libReplacement` の opt-in と probe（`test/strict-lib-active.mts`）を足してある。
+
+**初回 publish の手作業（[libs/first-release.md](../libs/first-release.md)）は
+要らない。** このパッケージは旧単独リポジトリから 2025-02 に npm へ出ている
+（`1.0.0` / `1.0.1` / `1.0.3`）。復元時に「未公開だから `apps/`」と判断したのは
+**事実の確認を飛ばしていた**ということでもある — 方針そのもの（置き場は npm の
+公開状況で決まる）に照らしても、最初から `libs/` が正しかった。
+
+そのため `package.json` の version は `1.0.0` ではなく npm の最新に合わせた
+`1.0.3` である。`1.0.0` のまま置くと、次の changeset の patch が既に存在する
+`1.0.1` を作ろうとして release が落ちる。
+
+> **React 版には同じ問題が残っている。** `libs/better-react-use-state/package.json`
+> は `1.0.0` だが、npm には同じく `1.0.3` まで出ている。まだ changeset が 1 つも
+> 出ていないので表面化していないだけで、最初の patch で落ちる。別途直すこと。
+
+移した結果、`knip.jsonc` の `apps/better-preact-use-state` エントリは要らなく
+なった（`libs/*` の既定が同じ `src/index.mts` を見る）。`verify-npm-packages` は
+公開パッケージを自動で拾うので、`smoke/better-preact-use-state.mjs` を足した。
+npm に既にあるので `notYetPublished` は空のままで、local（tarball）と published
+（`1.0.3` ピン）の両方の空間で検査される。
+
+### README は移植元から復元した — React 版も直した
+
+`libs/better-react-use-state/README.md` は復元時に**移行作業のメモ**として書かれて
+いた（「`experimental/` から復元した」「戻す途中で何が変わったか」）。それは
+この文書が書く内容であって、npm のパッケージページに出るものではない。**両方とも
+`experimental/packages/utils/*/README.md` から復元した** — Overview・
+Installation・Usage・API Reference・Benefits があり、ライブラリの使い方を説明して
+いる。移植元との違いは 2 つだけで、見出しレベルを `##` から `#` に上げたことと、
+末尾の License を `MIT` から実際に同梱している `Apache-2.0` に直したことである。
 
 ### 直した点は React 版に揃えただけ
 
