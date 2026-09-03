@@ -9,11 +9,11 @@ import {
 import {
   flattenShapeStructure,
   hasRecordInternals,
-  type AnyType,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
   type UnknownShape,
+  type UnknownType,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { isOptionalProperty, type RequiredPropertyType } from './optional.mjs';
@@ -88,7 +88,7 @@ type RequiredValue<
 /**
  * Makes an optional property required by removing the optional flag.
  */
-const makeRequired = <T extends AnyType>(t: T): RequiredPropertyType<T> => {
+const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
   if (!isOptionalProperty(t)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return t as RequiredPropertyType<T>;

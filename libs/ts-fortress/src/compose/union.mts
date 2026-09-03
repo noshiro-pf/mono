@@ -1,15 +1,19 @@
 import { Arr, expectType, memoizeFunction, Result } from 'ts-data-forge';
-import { type ArrayElement, type NonEmptyTuple } from 'ts-type-forge';
+import {
+  type ArrayElement,
+  type NonEmptyTuple,
+  type StrictPick,
+} from 'ts-type-forge';
 import {
   flattenShapeStructure,
   hasRecordInternals,
   hasTupleInternals,
   hasUnionInternals,
-  type AnyType,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
   type UnionTypeInternals,
+  type UnknownType,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -21,7 +25,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const union = <const Types extends NonEmptyTuple<AnyType>>(
+export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   types: Types,
   options?: Partial<
     Readonly<{
@@ -32,9 +36,38 @@ export const union = <const Types extends NonEmptyTuple<AnyType>>(
 ): UnionType<Types> => {
   type T = UnionTypeValue<Types>;
 
-  const getDefaultType = memoizeFunction(
-    (): UnionType<Types> =>
-      options?.defaultType ?? (types[0] as UnionType<Types>),
+  /**
+   * Where `fill` and `defaultValue` come from when the value is not a member
+   * of the union: the explicit `defaultType`, else the first member.
+   *
+   * Deferred like every other default-value source in the package, and
+   * deliberately so although nothing here needs it: both operands exist by
+   * the time `union` is called, so this one would hold a plain `const`. The
+   * types whose default is built from *another* type's cannot — `record`
+   * reads each member's `defaultValue`, `tuple` and the length-constrained
+   * arrays read the element's, `recursion` calls the definition — and for a
+   * type defined in terms of itself, forcing that at construction does not
+   * terminate. One shape across all of them is easier to trust than a
+   * per-constructor judgement about which reads are safe to make eager.
+   *
+   * Only `defaultValue` and `fill` are ever read, and both are covariant in
+   * the value type, so the assertion widens rather than lies — the first
+   * member's default value *is* one of the union's values. The compiler
+   * cannot see that: `types[0]` resolves against the bound
+   * `readonly [UnknownType, ...UnknownType[]]`, so which member it is has
+   * already been erased to `Type<unknown>` here.
+   *
+   * Asserting the whole `UnionType<Types>` instead would be unsound, because
+   * that also promises `is` and `prune`, and the first member answers both
+   * only for its own values.
+   */
+  type DefaultSource = StrictPick<Type<T>, 'defaultValue' | 'fill'>;
+
+  const getDefaultSource = memoizeFunction(
+    (): DefaultSource =>
+      options?.defaultType ??
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (types[0] as DefaultSource),
   );
 
   const typeNameFilled: string =
@@ -61,7 +94,7 @@ export const union = <const Types extends NonEmptyTuple<AnyType>>(
    *
    * See `documents/union-closest-member-heuristic.md`.
    */
-  const memberTypes: readonly AnyType[] = types.flatMap((t) =>
+  const memberTypes: readonly UnknownType[] = types.flatMap((t) =>
     hasUnionInternals(t) ? t.memberTypes : [t],
   );
 
@@ -150,7 +183,7 @@ export const union = <const Types extends NonEmptyTuple<AnyType>>(
 
   const is = createIsFn<T>(validate);
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultType().fill(a));
+  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultSource().fill(a));
 
   // Prunes with the first member type that matches the value.
   const prune = (a: T): T => {
@@ -165,7 +198,7 @@ export const union = <const Types extends NonEmptyTuple<AnyType>>(
   const baseType = {
     typeName: typeNameFilled,
     get defaultValue() {
-      return getDefaultType().defaultValue;
+      return getDefaultSource().defaultValue;
     },
     fill,
     prune,
@@ -225,7 +258,10 @@ type MemberCloseness = Readonly<{
   score: number;
 }>;
 
-const evaluateMember = (memberType: AnyType, a: unknown): MemberCloseness => {
+const evaluateMember = (
+  memberType: UnknownType,
+  a: unknown,
+): MemberCloseness => {
   const errors = validationErrorsOf(memberType.validate(a));
 
   // A member cannot pass fewer than zero checks: a record that rejects excess
@@ -254,7 +290,7 @@ const compareByCloseness = (x: MemberCloseness, y: MemberCloseness): number =>
  * matches or does not. A record whose shape cannot be flattened to a single set
  * of keys (a union of shapes) also counts as one check.
  */
-const checkCountOf = (memberType: AnyType): number => {
+const checkCountOf = (memberType: UnknownType): number => {
   if (hasRecordInternals(memberType)) {
     const shape = flattenShapeStructure(memberType.shapeStructure);
 
@@ -273,18 +309,18 @@ const validationErrorsOf = (
 ): readonly ValidationError[] =>
   Result.isErr(result) ? result.value : ([] as const);
 
-type UnionType<Types extends NonEmptyTuple<AnyType>> = Type<
+type UnionType<Types extends NonEmptyTuple<UnknownType>> = Type<
   UnionTypeValue<Types>
 >;
 
-type UnionTypeValue<Types extends NonEmptyTuple<AnyType>> =
+type UnionTypeValue<Types extends NonEmptyTuple<UnknownType>> =
   TsFortressInternal.UnionTypeValueImpl<Types>;
 
 namespace TsFortressInternal {
-  export type UnionTypeValueImpl<Types extends NonEmptyTuple<AnyType>> =
+  export type UnionTypeValueImpl<Types extends NonEmptyTuple<UnknownType>> =
     UnwrapUnion<ArrayElement<Types>>;
 
-  type UnwrapUnion<T extends AnyType> = T extends T ? TypeOf<T> : never;
+  type UnwrapUnion<T extends UnknownType> = T extends T ? TypeOf<T> : never;
 }
 
 expectType<

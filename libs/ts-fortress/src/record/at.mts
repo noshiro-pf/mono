@@ -8,7 +8,6 @@ import {
 } from '../constraints/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
-  type AnyType,
   expandShapeStructure,
   hasRecordInternals,
   hasTupleInternals,
@@ -46,7 +45,10 @@ import { isOptionalProperty } from './optional.mjs';
 export function at<
   const S extends UnknownShape,
   const K extends keyof S & string,
->(recordType: AnyType & WithShape<S>, key: K): ShapeMemberType<S, K>;
+>(
+  recordType: Type<UnknownRecord> & WithShape<S>,
+  key: K,
+): ShapeMemberType<S, K>;
 
 /**
  * Extracts the {@link Type} stored at a single key of a record type.

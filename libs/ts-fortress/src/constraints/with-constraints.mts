@@ -1,6 +1,6 @@
 import { hasKey, isRecord, tp } from 'ts-data-forge';
 import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
-import { type AnyType, type Type } from '../type.mjs';
+import { type Type, type UnknownType } from '../type.mjs';
 
 /**
  * The carrier of the constraint values a {@link Type} was created with.
@@ -33,7 +33,7 @@ export type ConstrainedType<A, C> = Type<A> & WithConstraints<C>;
  * //   ^? { readonly int: true; readonly min: 0; readonly max: 120; ... }
  * ```
  */
-export type ConstraintsOf<T extends AnyType> =
+export type ConstraintsOf<T extends UnknownType> =
   T extends WithConstraints<infer C> ? C : never;
 
 /** The empty constraint set — the type was created without any constraint. */
@@ -60,7 +60,7 @@ export type ConstraintsCarrier<C> = unknown extends C
  * {@link ConstraintsOf}, for re-attaching a type's constraints to a type
  * derived from it.
  */
-export type ConstraintsCarrierOf<T extends AnyType> =
+export type ConstraintsCarrierOf<T extends UnknownType> =
   T extends WithConstraints<infer C> ? WithConstraints<C> : unknown;
 
 /**
@@ -106,7 +106,7 @@ export const attachConstraints = <A, C>(
   ) as ConstrainedType<A, C>;
 
 /** Runtime check for a type that carries constraint values. */
-export const hasConstraints = <T extends AnyType>(
+export const hasConstraints = <T extends UnknownType>(
   t: T,
 ): t is T & WithConstraints<UnknownRecord> => hasConstraintsImpl(t);
 

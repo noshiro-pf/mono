@@ -6,7 +6,7 @@ import {
   tp,
   unknownToString,
 } from 'ts-data-forge';
-import { type AnyType, type Type, type TypeOf } from '../type.mjs';
+import { type Type, type TypeOf, type UnknownType } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -16,12 +16,12 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-type MapResultType<K extends AnyType, V extends AnyType> = ReadonlyMap<
+type MapResultType<K extends UnknownType, V extends UnknownType> = ReadonlyMap<
   TypeOf<K>,
   TypeOf<V>
 >;
 
-export const MapType = <K extends AnyType, V extends AnyType>(
+export const MapType = <K extends UnknownType, V extends UnknownType>(
   keyType: K,
   valueType: V,
   options?: Partial<
