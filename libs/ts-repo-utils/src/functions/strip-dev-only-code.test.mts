@@ -7,8 +7,19 @@ import {
   stripDevOnlyCodeInDir,
 } from './strip-dev-only-code.mjs';
 
+/** The names this repository strips; see `tools/configs/strip-dev-only-code.mts`. */
+const options = {
+  removeCallStatements: ['expectType'],
+  unwrapIdentityCalls: [
+    'castMutable',
+    'castDeepMutable',
+    'castReadonly',
+    'castDeepReadonly',
+  ],
+} as const;
+
 const strip = (source: string): string => {
-  const result = stripDevOnlyCode(source, 'file.mjs');
+  const result = stripDevOnlyCode(source, 'file.mjs', options);
 
   assert.isTrue(Result.isOk(result));
 
@@ -305,6 +316,7 @@ describe(stripDevOnlyCode, () => {
         export const f = () => expectType('=');
       `,
       'file.mjs',
+      options,
     );
 
     assert.isTrue(Result.isErr(result));
@@ -321,6 +333,7 @@ describe(stripDevOnlyCode, () => {
         export const isTest = import.meta.vitest !== undefined;
       `,
       'file.mjs',
+      options,
     );
 
     assert.isTrue(Result.isErr(result));
@@ -407,7 +420,7 @@ describe(stripDevOnlyCodeInDir, () => {
         'export const b = 1;\n',
       );
 
-      const result = await stripDevOnlyCodeInDir(testDir);
+      const result = await stripDevOnlyCodeInDir(testDir, options);
 
       assert.isTrue(Result.isOk(result));
 
@@ -432,7 +445,7 @@ describe(stripDevOnlyCodeInDir, () => {
         "export const f = () => expectType('=');\n",
       );
 
-      const result = await stripDevOnlyCodeInDir(testDir);
+      const result = await stripDevOnlyCodeInDir(testDir, options);
 
       assert.isTrue(Result.isErr(result));
 

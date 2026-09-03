@@ -23,8 +23,7 @@ import { glob } from './glob.mjs';
  *   (`<import.meta>.vitest !== undefined`) and which has no `else`, together
  *   with everything inside it.
  * - An expression statement that is a call to one of
- *   `options.removeCallStatements` (`expectType` by default), e.g.
- *   `expectType('=');`.
+ *   `options.removeCallStatements`, e.g. `expectType('=');`.
  * - A block, loop, labeled statement or `if` whose body became empty because
  *   every statement in it was removed by this pass. A body that was already
  *   empty in the source is left alone.
@@ -54,21 +53,21 @@ import { glob } from './glob.mjs';
  *
  * @param source - Contents of the emitted JavaScript module.
  * @param fileName - Name of the file, used in error messages.
- * @param options - See {@link StripDevOnlyCodeOptions}.
+ * @param options - The names to act on; see {@link StripDevOnlyCodeOptions}.
+ *   There is no default: which functions are safe to remove is knowledge
+ *   about the code being built, not about this pass, so the caller states
+ *   it. The list this repository uses lives in
+ *   `tools/configs/strip-dev-only-code.mts`.
  * @returns The stripped source, or the reason it could not be stripped.
  */
 export const stripDevOnlyCode = (
   source: string,
   fileName: string,
-  options?: StripDevOnlyCodeOptions,
+  options: StripDevOnlyCodeOptions,
 ): Result<string, string> => {
-  const removeCallStatements = new Set(
-    options?.removeCallStatements ?? defaultRemoveCallStatements,
-  );
+  const removeCallStatements = new Set(options.removeCallStatements);
 
-  const unwrapIdentityCalls = new Set(
-    options?.unwrapIdentityCalls ?? defaultUnwrapIdentityCalls,
-  );
+  const unwrapIdentityCalls = new Set(options.unwrapIdentityCalls);
 
   const sourceFile = ts.createSourceFile(
     fileName,
@@ -115,12 +114,12 @@ export const stripDevOnlyCode = (
  * back the files that changed.
  *
  * @param dir - Directory to walk, typically a package's `dist/`.
- * @param options - See {@link StripDevOnlyCodeOptions}.
+ * @param options - The names to act on; see {@link StripDevOnlyCodeOptions}.
  * @returns How many files were rewritten, or the first error encountered.
  */
 export const stripDevOnlyCodeInDir = async (
   dir: string,
-  options?: StripDevOnlyCodeOptions,
+  options: StripDevOnlyCodeOptions,
 ): Promise<Result<Readonly<{ changedFiles: number }>, string>> => {
   const globResult = await glob('**/*.mjs', { cwd: dir, absolute: true });
 
@@ -169,34 +168,24 @@ export const stripDevOnlyCodeInDir = async (
 
 export type StripDevOnlyCodeOptions = Readonly<{
   /**
-   * Functions whose call statements are removed. A call to one of these in
-   * any other position is an error.
-   *
-   * @default ['expectType']
+   * Functions whose call statements are removed, by the name they are called
+   * by in the emitted code (`expectType`, say). A call to one of these in any
+   * other position is an error. Only list functions whose arguments have no
+   * side effects to lose: the whole statement goes, arguments included.
    */
-  removeCallStatements?: readonly string[];
+  removeCallStatements: readonly string[];
 
   /**
-   * Identity functions whose calls are replaced by their single argument.
-   * Only list functions that return their argument unchanged: a function
-   * that validates at runtime, such as `asUint32`, is not one of these.
-   *
-   * @default ['castMutable', 'castDeepMutable', 'castReadonly', 'castDeepReadonly']
+   * Identity functions whose calls are replaced by their single argument
+   * (`castMutable`, say). Only list functions that return their argument
+   * unchanged: a function that validates at runtime, such as a branded
+   * number's `asUint32`, is not one of these.
    */
-  unwrapIdentityCalls?: readonly string[];
+  unwrapIdentityCalls: readonly string[];
 }>;
-
-const defaultRemoveCallStatements = ['expectType'] as const;
 
 /** See the note at the top of the file for why this is not a literal. */
 const importMetaVitest = ['import.meta', 'vitest'].join('.');
-
-const defaultUnwrapIdentityCalls = [
-  'castMutable',
-  'castDeepMutable',
-  'castReadonly',
-  'castDeepReadonly',
-] as const;
 
 /** `[start, end)` positions in the source text. */
 type EraseRange = readonly [start: number, end: number];

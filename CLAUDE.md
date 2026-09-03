@@ -1119,17 +1119,23 @@ Rollup is what the packages not yet moved still use.**
 - **Native `tsc`** (`ts-data-forge`, `eslint-config-typed`): `build.mts` runs
   `typescript-native`'s `tsc` on `configs/tsconfig.build.json`, which emits
   the JavaScript, the declarations and both source maps in one pass, then
-  runs `stripDevOnlyCodeInDir` from `ts-repo-utils` over `dist/`. There is
-  no `configs/rollup.config.mts` and no Rollup dependency.
+  runs `stripDistDevOnlyCode` from `tools/configs/strip-dev-only-code.mts`
+  over `dist/`. There is no `configs/rollup.config.mts` and no Rollup
+  dependency.
 - **Rollup** (the rest): `rollup-plugin-esbuild` transpiles, two
   `@rollup/plugin-replace` and one `@rollup/plugin-strip` drop the test-only
   code, Rollup's tree-shaking removes what that left unreferenced, and a
   second `tsc` pass emits the declarations. TypeScript 7 has no JS compiler
   API, which is why `@rollup/plugin-typescript` is gone.
 
-`stripDevOnlyCode` is the replacement for those plugins plus the
-tree-shaking, and it is source-aware where a bundler cannot be: **what it
-removes is a list of names, and the list is the whole of the knowledge**.
+`stripDevOnlyCode` in `ts-repo-utils` is the replacement for those plugins
+plus the tree-shaking, and it is source-aware where a bundler cannot be:
+**what it removes is a list of names, and the list is the whole of the
+knowledge**. The mechanism and the list live apart: `ts-repo-utils` ships
+the pass with no names in it, because which functions are safe to remove is
+a fact about the code being built, and `tools/configs/strip-dev-only-code.mts`
+holds this repository's list (`devOnlyCode`) and the `stripDistDevOnlyCode`
+wrapper the build scripts call.
 
 - It removes `if (import.meta.vitest !== undefined) { ... }` blocks,
   `expectType(...)` statements, every block, loop or `if` that those

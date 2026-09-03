@@ -19,8 +19,8 @@ import { glob } from 'ts-repo-utils';
  *
  * A package that has moved (`ts-data-forge`, `eslint-config-typed`) has no
  * Rollup configuration: its `scripts/cmd/build.mts` emits with the native
- * `tsc` and then runs `stripDevOnlyCodeInDir` from `ts-repo-utils` over
- * `dist/`, which removes what the plugins below removed.
+ * `tsc` and then runs `stripDistDevOnlyCode` from `./strip-dev-only-code.mts`
+ * over `dist/`, which removes what the plugins below removed.
  */
 export const defineLibraryRollupConfig = async ({
   configDir,

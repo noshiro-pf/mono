@@ -1,9 +1,11 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import { $, Result, stripDevOnlyCodeInDir } from 'ts-repo-utils';
+import { $, Result } from 'ts-repo-utils';
 import { type UnknownResult } from '../../src/functional/result/index.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-code.mjs';
 
 const distDir = path.resolve(workspaceRootPath, './dist');
 
@@ -84,12 +86,12 @@ const build = async (skipCheck: boolean): Promise<void> => {
 
   // The compiler emits the type tests and the in-source tests as they are
   // written. This is what a bundler's dead-code elimination used to remove;
-  // see `stripDevOnlyCode` for the list.
+  // the names it strips are listed in `tools/configs/strip-dev-only-code.mts`.
   await logStep({
     startMessage: 'Stripping development-only code from dist',
     action: () =>
       runStep(
-        stripDevOnlyCodeInDir(distDir),
+        stripDistDevOnlyCode(distDir),
         'Stripping development-only code failed',
       ),
     successMessage: 'Development-only code stripped',
