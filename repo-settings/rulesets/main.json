@@ -69,6 +69,10 @@
           {
             "context": "Validate PR title",
             "integration_id": 15368
+          },
+          {
+            "context": "Validate commit messages",
+            "integration_id": 15368
           }
         ]
       }
