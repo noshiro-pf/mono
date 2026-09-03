@@ -184,8 +184,16 @@
     // Not an Astro site like the entry below assumes: a Vite React app whose
     // entry is the module `index.html` loads.
     "apps/event-schedule-app": {
-      "entry": ["src/main.tsx"],
+      "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": [
+        "normalize.css",
+        "@blueprintjs/icons",
+        "@blueprintjs/datetime2",
+        "@blueprintjs/select",
+      ],
     },
 
     // Not an Astro site like the entry below assumes: plain TypeScript with a
@@ -261,23 +269,36 @@
     // Not an Astro site like the entry above assumes: a Vite React app whose
     // entry is the module `index.html` would load, as `event-schedule-app` is.
     "apps/lambda-calculus-interpreter-react": {
-      "entry": ["src/main.tsx"],
+      "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
     },
 
     "apps/housing-loan-calculator-app": {
       "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": ["normalize.css", "@blueprintjs/icons"],
     },
 
     "apps/cant-stop-probability-app": {
       "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": ["normalize.css"],
     },
 
     "apps/blueprintjs-playground-styled": {
-      "entry": ["src/main.tsx"],
+      "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": [
+        "normalize.css",
+        "@blueprintjs/core",
+        "@blueprintjs/icons",
+      ],
     },
 
     // Not an Astro site like the entry above assumes: a Node program with a

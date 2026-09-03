@@ -7,5 +7,5 @@
     // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
     "jsxImportSource": "@emotion/react"
   },
-  "include": ["./src"]
+  "include": ["./src", "./scripts", "./configs"]
 }
