@@ -9,10 +9,10 @@ catalog:
   '@rollup/plugin-strip': 3.0.4
   '@testing-library/dom': 10.4.1
   '@testing-library/preact': 3.2.4
-  '@testing-library/react': 16.3.2
+  '@testing-library/react': 16.3.3
   '@types/node': 26.4.1
   '@types/react': 19.2.18
-  '@types/react-dom': 19.2.5
+  '@types/react-dom': 19.2.7
   '@typescript-eslint/parser': 8.68.0
   '@typescript-eslint/rule-tester': 8.68.0
   '@vitest/browser-playwright': 4.1.11
@@ -92,6 +92,14 @@ minimumReleaseAge: 10080 # = 7 days
 
 minimumReleaseAgeExclude:
   - '@types/**'
+
+  # octokit のパッケージ群は一つの型定義 (`@octokit/openapi-types`) を共有しており、
+  # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
+  # `expectType<..., '='>` で表明している。`minimumReleaseAge` が
+  # `@octokit/openapi-types` だけを通して `@octokit/core` を留めると、
+  # 一つのツリーに新旧二つの `@octokit/openapi-types` が入り、
+  # 表明が破れて `ws:build` が落ちる (#1832)。族ごと除外して足並みを揃える。
+  - '@octokit/**'
   - ts-type-forge
   - eslint-plugin-ts-type-forge
   - ts-data-forge

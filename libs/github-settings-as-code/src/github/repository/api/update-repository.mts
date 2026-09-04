@@ -2,6 +2,7 @@ import {
   type EndpointKeys,
   type UpdateRepositoryRequest,
 } from 'octokit-safe-types';
+import { castDeepMutable } from 'ts-data-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 
@@ -16,6 +17,8 @@ export const updateRepository = async ({
     has_issues,
     has_projects,
     has_wiki,
+    has_pull_requests,
+    pull_request_creation_policy,
     is_template,
     default_branch,
     allow_squash_merge,
@@ -47,10 +50,12 @@ export const updateRepository = async ({
     homepage,
     private: private_,
     visibility,
-    security_and_analysis,
+    security_and_analysis: castDeepMutable(security_and_analysis),
     has_issues,
     has_projects,
     has_wiki,
+    has_pull_requests,
+    pull_request_creation_policy,
     is_template,
     default_branch,
     allow_squash_merge,
