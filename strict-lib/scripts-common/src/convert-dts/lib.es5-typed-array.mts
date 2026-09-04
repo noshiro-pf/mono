@@ -45,7 +45,7 @@ export const convertInterfaceTypedArray = (
   return composeMonoTypeFns(
     convertTypedArrayCommon(options),
     replaceWithNoMatchCheck(
-      `[index: number]: number;`,
+      '[index: number]: number;',
       `[index: number]: ${elementType};`,
     ),
     replaceWithNoMatchCheck(
@@ -125,11 +125,11 @@ export const convertInterfaceTypedArray = (
       `currentValue: ${elementType}`,
     ),
     replaceWithNoMatchCheck(
-      `fill(value: number, start?: number, end?: number)`,
+      'fill(value: number, start?: number, end?: number)',
       `fill(value: ${elementType}, start?: ${brandedNumber.TypedArraySizeArg}, end?: ${brandedNumber.TypedArraySizeArg})`,
     ),
     replaceWithNoMatchCheck(
-      `searchElement: number`,
+      'searchElement: number',
       `searchElement: ${elementType}`,
     ),
     replaceWithNoMatchCheck(
@@ -170,7 +170,7 @@ export const convertLibEs5_TypedArray =
                 'equal, and',
               ),
               replaceWithNoMatchCheck(
-                `BYTES_PER_ELEMENT: number;`,
+                'BYTES_PER_ELEMENT: number;',
                 `BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elemType)};`,
               ),
               replaceWithNoMatchCheck(
@@ -193,37 +193,37 @@ export const convertLibEs5_TypedArray =
             endRegexp: closeBraceRegexp,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
-                `byteOffset?: number`,
+                'byteOffset?: number',
                 `byteOffset?: ${options.brandedNumber.TypedArraySize}`,
               ),
               replaceWithNoMatchCheck(
-                `BYTES_PER_ELEMENT: number;`,
+                'BYTES_PER_ELEMENT: number;',
                 `BYTES_PER_ELEMENT: ${BYTES_PER_ELEMENT(elemType)};`,
               ),
               replaceWithNoMatchCheck(
-                `new (array: ArrayLike<number>`,
+                'new (array: ArrayLike<number>',
                 `new (array: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}>`,
               ),
               replaceWithNoMatchCheck(
                 //
-                `length: number`,
+                'length: number',
                 `length: ${options.brandedNumber.TypedArraySize}`,
               ),
               replaceWithNoMatchCheck(
                 //
-                `length?: number`,
+                'length?: number',
                 `length?: ${options.brandedNumber.TypedArraySize}`,
               ),
               replaceWithNoMatchCheck(
-                `mapfn: (v: T, k: number) => number,`,
+                'mapfn: (v: T, k: number) => number,',
                 `mapfn: (v: T, k: ${options.brandedNumber.TypedArraySize}) => ${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)},`,
               ),
               replaceWithNoMatchCheck(
-                `of(...items: readonly number[])`,
+                'of(...items: readonly number[])',
                 `of(...items: readonly ${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}[])`,
               ),
               replaceWithNoMatchCheck(
-                `from(arrayLike: ArrayLike<number>)`,
+                'from(arrayLike: ArrayLike<number>)',
                 `from(arrayLike: ArrayLike<${typedArrayTypeToElemType(elemType, options.config.useBrandedNumber)}>)`,
               ),
             ),

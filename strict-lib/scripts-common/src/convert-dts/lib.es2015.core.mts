@@ -22,31 +22,31 @@ export const convertLibEs2015Core =
           endRegexp: closeBraceRegexp,
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
-              `predicate: (value: T, index: number, obj: readonly T[]) => unknown,`,
-              `predicate: (value: T, index: number, obj: readonly T[]) => boolean,`,
+              'predicate: (value: T, index: number, obj: readonly T[]) => unknown,',
+              'predicate: (value: T, index: number, obj: readonly T[]) => boolean,',
             ),
             replaceWithNoMatchCheck(
-              `index: number,`,
+              'index: number,',
               `index: ${brandedNumber.ArraySize},`,
             ),
             replaceWithNoMatchCheck(
-              `): number;`,
+              '): number;',
               `): ${brandedNumber.ArraySearchResult};`,
             ),
             replaceWithNoMatchCheck(
-              `start?: number`,
+              'start?: number',
               `start?: ${brandedNumber.ArraySizeArg}`,
             ),
             replaceWithNoMatchCheck(
               //
-              `end?: number`,
+              'end?: number',
               `end?: ${brandedNumber.ArraySizeArg}`,
             ),
             replaceWithNoMatchCheck(
               //
               // TS 5.5+ requires `start: number` on copyWithin; TS 5.4 and
               // earlier have `start?: number`.
-              `start: number`,
+              'start: number',
               `start: ${brandedNumber.ArraySizeArg}`,
               { onNotFound: 'off' },
             ),
@@ -66,11 +66,11 @@ export const convertLibEs2015Core =
             returnType === 'readonly'
               ? idFn
               : replaceWithNoMatchCheck(
-                  `from<T>(arrayLike: ArrayLike<T>): readonly T[];`,
-                  `from<T>(arrayLike: ArrayLike<T>): T[];`,
+                  'from<T>(arrayLike: ArrayLike<T>): readonly T[];',
+                  'from<T>(arrayLike: ArrayLike<T>): T[];',
                 ),
             replaceWithNoMatchCheck(
-              `from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: unknown): readonly U[];`,
+              'from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: unknown): readonly U[];',
               `from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: ${brandedNumber.ArraySize}) => U, thisArg?: unknown): ${readonlyModifier}U[];`,
             ),
           ),
@@ -194,16 +194,16 @@ export const convertLibEs2015Core =
           endRegexp: closeBraceRegexp,
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
-              `index: number`,
+              'index: number',
               `index: ${brandedNumber.ArraySize}`,
             ),
             replaceWithNoMatchCheck(
               //
-              `) => unknown,`,
-              `) => boolean,`,
+              ') => unknown,',
+              ') => boolean,',
             ),
             replaceWithNoMatchCheck(
-              `): number;`,
+              '): number;',
               `): ${brandedNumber.ArraySearchResult};`,
             ),
           ),
@@ -219,7 +219,7 @@ export const convertLibEs2015Core =
               `codePointAt(pos: ${brandedNumber.StringSizeArgNonNegative}): ${brandedNumber.Uint32} | undefined`,
             ),
             replaceWithNoMatchCheck(
-              `repeat(count: number): string`,
+              'repeat(count: number): string',
               `repeat(count: ${brandedNumber.SafeUint}): string`,
             ),
             replaceWithNoMatchCheck(
@@ -242,7 +242,7 @@ export const convertLibEs2015Core =
           startRegexp: 'interface StringConstructor {',
           endRegexp: closeBraceRegexp,
           mapFn: replaceWithNoMatchCheck(
-            `fromCodePoint(...codePoints: readonly number[]): string`,
+            'fromCodePoint(...codePoints: readonly number[]): string',
             `fromCodePoint(...codePoints: readonly ${brandedNumber.Uint32}[]): string`,
           ),
         }),

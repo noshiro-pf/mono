@@ -68,7 +68,7 @@ describe('PositiveUint16 test', () => {
       { name: '-1', value: -1 },
       { name: '65536', value: 65_536 },
     ] as const)(
-      `asPositiveUint16($name) should throw a TypeError`,
+      'asPositiveUint16($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asPositiveUint16(value)).toThrow(
           new TypeError(

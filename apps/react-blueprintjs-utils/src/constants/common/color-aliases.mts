@@ -59,7 +59,7 @@ export const ptDarkHeadingColor = ptDarkTextColor;
 export const ptDarkLinkColor = blue5;
 
 // Default text selection color using #7dbcff
-export const ptTextSelectionColor = `rgba(125, 188, 255, 0.6)`;
+export const ptTextSelectionColor = 'rgba(125, 188, 255, 0.6)';
 
 export const ptIconColor = ptTextColorMuted;
 

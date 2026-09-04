@@ -83,11 +83,11 @@ const initialState: AnswerFilterState = {
       ([username, iconId]: UserNameAndIconId) => `${username}--${iconId}`,
       (key) => [
         UserName.cast(key.slice(0, -6)),
-        key.endsWith(`--good`)
+        key.endsWith('--good')
           ? 'good'
-          : key.endsWith(`--fair`)
+          : key.endsWith('--fair')
             ? 'fair'
-            : key.endsWith(`--poor`)
+            : key.endsWith('--poor')
               ? 'poor'
               : 'none',
       ],

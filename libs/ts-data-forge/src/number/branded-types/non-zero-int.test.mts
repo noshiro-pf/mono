@@ -51,7 +51,7 @@ describe('NonZeroInt test', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
-    ] as const)(`asNonZeroInt($name) should throw a TypeError`, ({ value }) => {
+    ] as const)('asNonZeroInt($name) should throw a TypeError', ({ value }) => {
       expect(() => asNonZeroInt(value)).toThrow(
         new TypeError(`Expected a non-zero integer, got: ${value}`),
       );

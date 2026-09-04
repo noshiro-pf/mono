@@ -59,7 +59,7 @@ describe('PositiveInt test', () => {
       { name: '0', value: 0 },
       { name: '-1', value: -1 },
     ] as const)(
-      `asPositiveInt($name) should throw a TypeError`,
+      'asPositiveInt($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asPositiveInt(value)).toThrow(
           new TypeError(`Expected a positive integer, got: ${value}`),

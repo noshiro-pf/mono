@@ -29,7 +29,7 @@ export const convertTypedArrayCommon =
           `offset?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
         ),
         replaceWithNoMatchCheck(
-          `fromIndex?: number`,
+          'fromIndex?: number',
           `fromIndex?: ${brandedNumber.TypedArraySizeArg}`,
         ),
         replaceWithNoMatchCheck(

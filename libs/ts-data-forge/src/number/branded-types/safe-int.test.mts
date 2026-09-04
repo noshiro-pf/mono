@@ -60,7 +60,7 @@ describe('SafeInt test', () => {
       { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
-    ] as const)(`asSafeInt($name) should throw a TypeError`, ({ value }) => {
+    ] as const)('asSafeInt($name) should throw a TypeError', ({ value }) => {
       expect(() => asSafeInt(value)).toThrow(
         new TypeError(`Expected a safe integer, got: ${value}`),
       );

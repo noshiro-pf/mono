@@ -54,7 +54,7 @@ describe('Uint32 test', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
-    ] as const)(`asUint32($name) should throw a TypeError`, ({ value }) => {
+    ] as const)('asUint32($name) should throw a TypeError', ({ value }) => {
       expect(() => asUint32(value)).toThrow(
         new TypeError(
           `Expected a non-negative integer less than 2^32, got: ${value}`,

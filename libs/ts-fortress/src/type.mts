@@ -231,7 +231,7 @@ export const getShape = (internals: RecordTypeInternals): UnknownShape => {
 
   if (flattened === undefined) {
     throw new Error(
-      `getShape() can only be called on simple or intersection record types, but received a union type. Use shapeStructure instead.`,
+      'getShape() can only be called on simple or intersection record types, but received a union type. Use shapeStructure instead.',
     );
   }
 

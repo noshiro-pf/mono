@@ -150,7 +150,7 @@ export const convertLibEs2020Bigint =
               ),
               config.config.useBrandedNumber
                 ? replaceWithNoMatchCheck(
-                    `[number, bigint]`,
+                    '[number, bigint]',
                     `[${config.brandedNumber.TypedArraySize}, bigint]`,
                   )
                 : idFn,
@@ -158,14 +158,14 @@ export const convertLibEs2020Bigint =
                 ? replaceWithNoMatchCheck('bigint', elemType)
                 : idFn,
               replaceWithNoMatchCheck(
-                `index: number,`,
+                'index: number,',
                 `index: ${config.brandedNumber.TypedArraySize},`,
               ),
               config.config.useBrandedNumber
                 ? replaceWithNoMatchCheck(
                     //
                     `number | ${elemType}`,
-                    `number | bigint`,
+                    'number | bigint',
                   )
                 : idFn,
             ),
@@ -175,10 +175,10 @@ export const convertLibEs2020Bigint =
             endRegexp: closeBraceRegexp,
             mapFn: composeMonoTypeFns(
               config.config.useBrandedNumber
-                ? replaceWithNoMatchCheck(`bigint`, elemType)
+                ? replaceWithNoMatchCheck('bigint', elemType)
                 : idFn,
               replaceWithNoMatchCheck(
-                `number`,
+                'number',
                 config.brandedNumber.TypedArraySize,
               ),
             ),

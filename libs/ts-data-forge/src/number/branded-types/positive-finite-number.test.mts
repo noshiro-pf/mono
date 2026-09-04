@@ -62,7 +62,7 @@ describe('PositiveFiniteNumber test', () => {
       { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
       { name: '-1.2', value: -1.2 },
     ] as const)(
-      `asPositiveFiniteNumber($name) should throw a TypeError`,
+      'asPositiveFiniteNumber($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asPositiveFiniteNumber(value)).toThrow(
           new TypeError(`Expected a positive finite number, got: ${value}`),

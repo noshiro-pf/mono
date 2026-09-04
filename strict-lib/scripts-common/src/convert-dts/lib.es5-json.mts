@@ -18,7 +18,7 @@ export const convertLibEs5_Json =
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               //
-              `): unknown;`,
+              '): unknown;',
               `): ${returnType === 'readonly' ? 'JsonValue' : 'MutableJsonValue'};`,
             ),
             replaceWithNoMatchCheck(

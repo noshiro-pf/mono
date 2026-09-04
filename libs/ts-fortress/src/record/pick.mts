@@ -38,7 +38,7 @@ export const pick = <
 
   if (shape === undefined) {
     throw new Error(
-      `pick() requires a simple or intersection record type, but received a union type`,
+      'pick() requires a simple or intersection record type, but received a union type',
     );
   }
 

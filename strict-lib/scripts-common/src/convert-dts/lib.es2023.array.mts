@@ -53,11 +53,11 @@ export const convertLibEs2023Array =
             endRegexp: closeBraceRegexp,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
-                `findLast<S extends T>(predicate: (value: T, index: number, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;`,
+                'findLast<S extends T>(predicate: (value: T, index: number, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;',
                 `findLast<S extends T>(predicate: (value: T, index: ${brandedNumber.ArraySize}, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;`,
               ),
               replaceWithNoMatchCheck(
-                `findLast(predicate: (value: T, index: number, array: readonly T[]) => unknown, thisArg?: unknown): T | undefined;`,
+                'findLast(predicate: (value: T, index: number, array: readonly T[]) => unknown, thisArg?: unknown): T | undefined;',
                 `findLast(predicate: (value: T, index: ${brandedNumber.ArraySize}, array: readonly T[]) => boolean, thisArg?: unknown): T | undefined;`,
               ),
               replaceWithNoMatchCheck(
@@ -76,7 +76,7 @@ export const convertLibEs2023Array =
                 { onNotFound: 'off' },
               ),
               replaceWithNoMatchCheck(
-                `with(index: number, value: T): readonly T[];`,
+                'with(index: number, value: T): readonly T[];',
                 `with(index: ${brandedNumber.ArraySizeArg}, value: T): readonly T[];`,
                 { onNotFound: 'off' },
               ),

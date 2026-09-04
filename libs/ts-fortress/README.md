@@ -162,9 +162,9 @@ assert.deepStrictEqual(
         result.value satisfies readonly t.ValidationError[],
     ),
     [
-        `Error at age: missing required key "age".`,
-        `Error at preferences.notifications: missing required key "notifications".`,
-        `Error at tags: missing required key "tags".`,
+        'Error at age: missing required key "age".',
+        'Error at preferences.notifications: missing required key "notifications".',
+        'Error at tags: missing required key "tags".',
     ],
 );
 ```
@@ -509,7 +509,7 @@ try {
     assert.deepStrictEqual(
         error,
         new Error(
-            `\nError: expected <number> type but <string> type value "not a number" was passed.`,
+            '\nError: expected <number> type but <string> type value "not a number" was passed.',
         ),
     );
 }

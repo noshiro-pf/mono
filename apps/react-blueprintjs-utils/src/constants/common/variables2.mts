@@ -72,9 +72,9 @@ export const ptDarkElevationShadow4 = joinCssStr(
 );
 
 // Transitions
-export const ptTransitionEase = `cubic-bezier(0.4, 1, 0.75, 0.9)`;
+export const ptTransitionEase = 'cubic-bezier(0.4, 1, 0.75, 0.9)';
 
-export const ptTransitionEaseBounce = `cubic-bezier(0.54, 1.12, 0.38, 1.11)`;
+export const ptTransitionEaseBounce = 'cubic-bezier(0.54, 1.12, 0.38, 1.11)';
 
 export const ptTransitionDuration = '100ms';
 

@@ -7,7 +7,40 @@ export const eslintStylisticRules = {
   '@stylistic/no-confusing-arrow': 'off',
   '@stylistic/no-mixed-operators': 'off',
   '@stylistic/no-tabs': 'off',
-  '@stylistic/quotes': 'off',
+  // The one rule taken back out of this block, and only for the half no
+  // formatter covers.
+  //
+  // eslint-config-prettier turns `quotes` off because the rule *can* disagree
+  // with the formatter over which quote a string gets. It cannot disagree here,
+  // because it is not asked: `ignoreStringLiterals: true` leaves every quoted
+  // string to whatever formatter the project runs, whichever quote that
+  // formatter prefers.
+  //
+  // What no formatter touches is the backtick. Prettier and oxfmt both rewrite
+  // `"a"` to `'a'` when configured `singleQuote`, and neither will ever rewrite
+  // `` `a` `` into a quoted string — however little of a template is left in
+  // it, a template literal survives every format pass. That is what
+  // `allowTemplateLiterals: 'never'` reports, and the fix is mechanical.
+  //
+  // A template is left alone only when `quotes` counts it as using a feature of
+  // one: it is tagged, it carries a substitution, or it has a real line break
+  // in it. A backtick *inside* is not on that list — `` `a \` b` `` becomes
+  // `'a ` b'`, which needs no escape.
+  //
+  // `avoidEscape` is deliberately absent, and its absence is what keeps this
+  // strict. It does nothing on its own here — the string-literal branch returns
+  // early under `ignoreStringLiterals` — but set together with
+  // `allowTemplateLiterals: 'avoidEscape'` it exempts every template whose text
+  // merely *contains* a `'`, which is a far wider net than the escaping it is
+  // named for. Measured over this repository that would be 10 of the 68 sites,
+  // and not one of them needed an escape: the formatter turned each into an
+  // ordinary double-quoted string, which is its job and not this rule's
+  // business.
+  '@stylistic/quotes': [
+    'error',
+    'single',
+    { allowTemplateLiterals: 'never', ignoreStringLiterals: true },
+  ],
 
   // Rules kept off to mirror eslint-config-prettier ordering
   '@stylistic/array-bracket-newline': 'off',

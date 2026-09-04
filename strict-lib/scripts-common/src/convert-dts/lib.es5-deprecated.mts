@@ -83,7 +83,7 @@ export const convertLibEs5_deprecated =
               'declare function isFinite(number: number): boolean;',
               'substr(from: number, length?: number): string;',
               'compile(pattern: string, flags?: string): this;',
-              `charAt(pos: number): string;`,
+              'charAt(pos: number): string;',
               'concat(...strings: readonly string[]): string;',
             ].map((line) =>
               // comment out deprecated functions

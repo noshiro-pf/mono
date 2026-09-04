@@ -14,7 +14,7 @@ type Ext = `.${string}`;
 const extensionType = cmd.extendType(cmd.string, {
   from: (s) => {
     if (!s.startsWith('.')) {
-      throw new Error(`ext should start with '.'`);
+      throw new Error("ext should start with '.'");
     }
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -74,7 +74,7 @@ const cmdDef = cmd.command({
           from: (s) => {
             if (s !== 'none') {
               throw new Error(
-                `export-ext should be 'none' or a valid extension`,
+                "export-ext should be 'none' or a valid extension",
               );
             }
 

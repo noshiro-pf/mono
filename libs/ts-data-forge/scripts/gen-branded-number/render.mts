@@ -52,9 +52,9 @@ const renderImports = (config: BrandedNumberConfig): string =>
     ),
     ...(config.extraImports ?? []),
     ...(config.numberClassParams !== undefined
-      ? [`import { expectType } from '../../expect-type.mjs';`]
+      ? ["import { expectType } from '../../expect-type.mjs';"]
       : []),
-    `import { TsDataForgeInternals } from '../refined-number-utils.mjs';`,
+    "import { TsDataForgeInternals } from '../refined-number-utils.mjs';",
   ].join('\n');
 
 const renderFactoryCall = (config: BrandedNumberConfig): string => {
@@ -199,12 +199,12 @@ const renderEnumImports = (
   [
     `import { type ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
     `import { type ${enumSpec.wideBase} } from 'ts-type-forge';`,
-    `import { type StrictExclude } from 'ts-type-forge';`,
+    "import { type StrictExclude } from 'ts-type-forge';",
     ...(enumSpec.hasAbs
-      ? [`import { type AbsoluteValue } from 'ts-type-forge';`]
+      ? ["import { type AbsoluteValue } from 'ts-type-forge';"]
       : []),
-    `import { expectType } from '../../expect-type.mjs';`,
-    `import { TsDataForgeInternals } from '../refined-number-utils.mjs';`,
+    "import { expectType } from '../../expect-type.mjs';",
+    "import { TsDataForgeInternals } from '../refined-number-utils.mjs';",
   ].join('\n');
 
 const renderEnumFactory = (

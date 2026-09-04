@@ -66,7 +66,7 @@ describe('PositiveInt32 test', () => {
       { name: '-1', value: -1 },
       { name: '2147483648', value: 2_147_483_648 },
     ] as const)(
-      `asPositiveInt32($name) should throw a TypeError`,
+      'asPositiveInt32($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asPositiveInt32(value)).toThrow(
           new TypeError(

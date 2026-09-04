@@ -20,7 +20,7 @@ export const convertLibEs5_String =
           endRegexp: closeBraceRegexp,
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
-              `readonly length: number;`,
+              'readonly length: number;',
               `readonly length: ${brandedNumber.StringSize};`,
             ),
             replaceWithNoMatchCheck(
@@ -44,7 +44,7 @@ export const convertLibEs5_String =
               `slice(start?: ${brandedNumber.StringSizeArg}, end?: ${brandedNumber.StringSizeArg}): string;`,
             ),
             replaceWithNoMatchCheck(
-              `split(separator: string | RegExp, limit?: number): readonly string[];`,
+              'split(separator: string | RegExp, limit?: number): readonly string[];',
               `split(separator: string | RegExp, limit?: ${brandedNumber.StringSizeArgNonNegative}): ${readonlyModifier}string[];`,
             ),
             replaceWithNoMatchCheck(

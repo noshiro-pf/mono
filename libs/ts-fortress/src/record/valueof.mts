@@ -29,7 +29,7 @@ export const valueof = <const R extends UnknownRecord>(
 
   if (shape === undefined) {
     throw new Error(
-      `valueof() requires a simple or intersection record type, but received a union type`,
+      'valueof() requires a simple or intersection record type, but received a union type',
     );
   }
 

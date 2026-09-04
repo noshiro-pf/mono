@@ -57,7 +57,7 @@ describe('Int16 test', () => {
       { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
-    ] as const)(`asInt16($name) should throw a TypeError`, ({ value }) => {
+    ] as const)('asInt16($name) should throw a TypeError', ({ value }) => {
       expect(() => asInt16(value)).toThrow(
         new TypeError(`Expected an integer in [-2^15, 2^15), got: ${value}`),
       );

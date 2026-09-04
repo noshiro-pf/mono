@@ -68,7 +68,7 @@ describe('NonZeroUint16 test', () => {
       { name: '-1', value: -1 },
       { name: '65536', value: 65_536 },
     ] as const)(
-      `asNonZeroUint16($name) should throw a TypeError`,
+      'asNonZeroUint16($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asNonZeroUint16(value)).toThrow(
           new TypeError(
