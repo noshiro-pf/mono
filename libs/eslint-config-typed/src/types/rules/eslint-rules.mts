@@ -8695,7 +8695,32 @@ namespace NoRestrictedImports {
                 allowTypeImports?: boolean;
               }>
           )[];
-          patterns?: readonly string[] | readonly UnknownRecord[];
+          patterns?:
+            | readonly string[]
+            | readonly (UnknownRecord &
+                Readonly<{
+                  /**
+                   * @minItems 1
+                   */
+                  importNames?: NonEmptyTuple<string>;
+                  /**
+                   * @minItems 1
+                   */
+                  allowImportNames?: NonEmptyTuple<string>;
+                  /**
+                   * @minItems 1
+                   */
+                  group?: NonEmptyTuple<string>;
+                  regex?: string;
+                  importNamePattern?: string;
+                  allowImportNamePattern?: string;
+                  message?: string;
+                  caseSensitive?: boolean;
+                  /**
+                   * Whether to allow type-only imports for a pattern.
+                   */
+                  allowTypeImports?: boolean;
+                }>)[];
         }>,
       ];
 
@@ -8886,7 +8911,14 @@ namespace NoRestrictedProperties {
    * ]
    * ```
    */
-  export type Options = readonly UnknownRecord[];
+  export type Options = readonly (UnknownRecord &
+    Readonly<{
+      object?: string;
+      property?: string;
+      allowObjects?: readonly string[];
+      allowProperties?: readonly string[];
+      message?: string;
+    }>)[];
 
   export type RuleEntry =
     | 'off'

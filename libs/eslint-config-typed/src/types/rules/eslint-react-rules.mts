@@ -509,7 +509,32 @@ namespace ForbidComponentProps {
               message?: string;
             }
         >
-      | UnknownRecord
+      | (UnknownRecord &
+          Readonly<{
+            propName?: string;
+            /**
+             * @minItems 1
+             */
+            disallowedFor?: NonEmptyTuple<string>;
+            /**
+             * @minItems 1
+             */
+            disallowedForPatterns?: NonEmptyTuple<string>;
+            message?: string;
+          }>)
+      | (UnknownRecord &
+          Readonly<{
+            propNamePattern?: string;
+            /**
+             * @minItems 1
+             */
+            disallowedFor?: NonEmptyTuple<string>;
+            /**
+             * @minItems 1
+             */
+            disallowedForPatterns?: NonEmptyTuple<string>;
+            message?: string;
+          }>)
     )[];
     [k: string]: unknown;
   }>;
@@ -2969,8 +2994,7 @@ namespace JsxPropsNoSpreading {
     explicitSpread?: 'enforce' | 'ignore';
     exceptions?: readonly string[];
     [k: string]: unknown;
-  }> &
-    UnknownRecord;
+  }>;
 
   export type RuleEntry =
     | 'off'

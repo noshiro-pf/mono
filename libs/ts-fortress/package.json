@@ -84,7 +84,7 @@
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",
     "vite": "catalog:",
-    "zod": "4.4.3"
+    "zod": "4.5.1"
   },
   "engines": {
     "node": ">=22.22.2",
