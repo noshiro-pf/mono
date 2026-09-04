@@ -1,6 +1,6 @@
 {
   "name": "better-preact-use-state",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": false,
   "description": "useState that also hands back the setters you would otherwise write by hand: updateState, resetState, and setTrue / setFalse / toggleState for booleans.",
   "keywords": [
