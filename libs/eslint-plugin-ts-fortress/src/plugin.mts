@@ -11,6 +11,7 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
 const recommendedRules = {
   'ts-fortress/prefer-canonical-length-constrained-type': 'error',
   'ts-fortress/prefer-namespace-import': 'error',
+  'ts-fortress/prefer-schema-over-guard-chain': 'error',
 } as const satisfies ReadonlyRecord<
   `ts-fortress/${keyof typeof tsFortressRules}`,
   'error'
