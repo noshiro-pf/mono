@@ -324,12 +324,17 @@ const createResult = async (
             generatorOption.explicitRuleDefaultOption
               ? `"off" | ${RuleSeverityWithDefaultOption}`
               : 'Linter.RuleSeverity',
-            ...OptionsStrs.map(
-              (_, i) =>
-                `   | readonly [${
-                  RuleSeverityForNoOption
-                }, ${OptionsStrs.slice(0, i + 1).join(', ')}]`,
-            ),
+            // `scan` yields the severity on its own, then the severity with
+            // each further options type appended - one pass, where mapping the
+            // index rebuilt and re-joined the whole prefix for every row.
+            // `tail` drops the severity-only row, which is not an overload.
+            ...Arr.tail(
+              Arr.scan(
+                OptionsStrs,
+                (row, optionsType) => `${row}, ${optionsType}`,
+                RuleSeverityForNoOption,
+              ),
+            ).map((row) => `   | readonly [${row}]`),
             '',
           );
 
