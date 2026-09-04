@@ -1,5 +1,28 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.6.0
+
+### Minor Changes
+
+- 30de8fa: `stripDevOnlyCode` / `stripDevOnlyCodeInDir`: add `removeComments`, which removes the comments from the emitted JavaScript as well. The compiler copies each declaration's JSDoc into the JavaScript and into the `.d.mts` alike, and an editor reads the `.d.mts`, so the copy in the JavaScript is read by nobody. It was two thirds of one package's emitted JavaScript here. The compiler's own `removeComments` cannot be used for this, because it strips the `.d.mts` too. A `#!` line and the `//#` source-map pragma are kept, and line breaks are kept as everywhere else in the pass, so the source map stays valid. The option defaults to off.
+
+### Patch Changes
+
+- 30de8fa: Build with the native TypeScript compiler and drop Rollup. Each module in `dist/` is emitted by `tsc` as written, then the type tests, the in-source tests, the identity casts and the comments are removed from it. The declarations are unchanged, every module exports the same names as before, and the JavaScript is smaller: 1437 KB across these packages before, 1041 KB after.
+
+    Two things change in the published JavaScript. `export` declarations appear inline rather than in a trailing `export { ... }` list, and the line structure is the source's rather than a bundler's, so a stack trace or a source map lands where the code was written.
+
+    `github-settings-as-code` was already compiled by `tsc`; what it gains here is the removal pass, so its `dist/` no longer carries `expectType(...)` calls.
+
+- 8c955e1: `genIndex`: leave an index file alone when it already re-exports exactly what would be generated for it, and write it through a temporary file and a `rename` when it does not.
+
+    The generator emits double quotes, no trailing newline and subdirectories first, and the formatter that runs after it rewrites all three — so every run rewrote every index file in the tree twice to arrive back at the bytes that were already there. That is invisible in a single package and not invisible at all in a workspace: `genIndex` is called from a package's `build`, those builds run several at a time, and each imports its siblings' sources through `tsx`. A file being rewritten cannot be read, so a barrel touched for no reason took a sibling's build down with `SyntaxError: The requested module 'ts-repo-utils' does not provide an export named '...'`.
+
+    The comparison is on the set of module specifiers rather than on the bytes, because the bytes never match for the reason above. Anything that is not a plain list of `export * from '...';` statements — a hand-written barrel, an empty file — compares unequal, so the fallback is always to write.
+
+- Updated dependencies [30de8fa]
+    - ts-data-forge@14.6.3
+
 ## 10.5.0
 
 ### Minor Changes

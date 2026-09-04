@@ -1,6 +1,6 @@
 {
   "name": "ts-std-forge",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": false,
   "description": "Safe wrappers for throwing / null-returning standard library APIs, returning Result and Optional from ts-data-forge",
   "keywords": [
