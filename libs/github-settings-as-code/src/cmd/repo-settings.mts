@@ -1,46 +1,47 @@
 #!/usr/bin/env node
 
+import dedent from 'dedent';
 import 'dotenv/config';
 import * as util from 'node:util';
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 
-const HELP = `
-Usage: repo-settings <command> [target] [options]
+const HELP = dedent`
+  Usage: repo-settings <command> [target] [options]
 
-GitHub の repository 設定を JSON ファイルで管理する。
+  GitHub の repository 設定を JSON ファイルで管理する。
 
-Commands:
-  apply [target]     ローカルの設定ファイルを GitHub に反映する
-  backup [target]    GitHub の現在値をローカルの bk/ に保存する
+  Commands:
+    apply [target]     ローカルの設定ファイルを GitHub に反映する
+    backup [target]    GitHub の現在値をローカルの bk/ に保存する
 
-Targets:
-  all                すべて（既定）
-  repository         repo-settings/repository-settings/settings.json
-  rulesets           repo-settings/rulesets/*.json
-  variables          repository variables （ apply のみ ）
-  actions            repo-settings/actions-settings/settings.json
-  pages              repo-settings/pages/settings.json
+  Targets:
+    all                すべて（既定）
+    repository         repo-settings/repository-settings/settings.json
+    rulesets           repo-settings/rulesets/*.json
+    variables          repository variables （ apply のみ ）
+    actions            repo-settings/actions-settings/settings.json
+    pages              repo-settings/pages/settings.json
 
-Options:
-      --owner <owner>   対象の owner
-      --repo <repo>     対象の repository 名
-  -h, --help            このヘルプを表示する
+  Options:
+        --owner <owner>   対象の owner
+        --repo <repo>     対象の repository 名
+    -h, --help            このヘルプを表示する
 
-owner / repo は「コマンドライン引数 → 環境変数 OWNER / REPO_NAME →
-git remote origin → package.json の name 」の順で解決される。
-通常は git remote から決まるため、どちらの指定も不要。
+  owner / repo は「コマンドライン引数 → 環境変数 OWNER / REPO_NAME →
+  git remote origin → package.json の name 」の順で解決される。
+  通常は git remote から決まるため、どちらの指定も不要。
 
-認証は「環境変数 GITHUB_APP_TOKEN / GH_TOKEN / PERSONAL_ACCESS_TOKEN →
-gh CLI （ gh auth token ）」の順で解決される。ローカルでは gh auth login
-だけで動く。
+  認証は「環境変数 GITHUB_APP_TOKEN / GH_TOKEN / PERSONAL_ACCESS_TOKEN →
+  gh CLI （ gh auth token ）」の順で解決される。ローカルでは gh auth login
+  だけで動く。
 
-Examples:
-  repo-settings apply
-  repo-settings apply rulesets
-  repo-settings backup
-  repo-settings apply --owner noshiro-pf --repo ts-repo-utils
-`.trim();
+  Examples:
+    repo-settings apply
+    repo-settings apply rulesets
+    repo-settings backup
+    repo-settings apply --owner noshiro-pf --repo ts-repo-utils
+`;
 
 const COMMANDS = ['apply', 'backup'] as const;
 

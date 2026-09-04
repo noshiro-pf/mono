@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { type TSESLint } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
 
 const tester = new RuleTester({
@@ -69,14 +70,14 @@ describe('shared helpers', () => {
       },
       {
         name: 'memo imported from non-react',
-        code: `
+        code: dedent`
           import { memo } from 'not-react';
           const Component = memo(() => null);
         `,
       },
       {
         name: 'React member but different method',
-        code: `
+        code: dedent`
           import * as React from 'react';
           const Component = React.useMemo(() => null, []);
         `,
@@ -85,7 +86,7 @@ describe('shared helpers', () => {
     invalid: [
       {
         name: 'named memo import from react',
-        code: `
+        code: dedent`
           import { memo } from 'react';
           const Component = memo(() => null);
         `,
@@ -93,7 +94,7 @@ describe('shared helpers', () => {
       },
       {
         name: 'namespace React memo call',
-        code: `
+        code: dedent`
           import * as React from 'react';
           const Component = React.memo(() => null);
         `,
@@ -101,7 +102,7 @@ describe('shared helpers', () => {
       },
       {
         name: 'global React memo call without import',
-        code: `
+        code: dedent`
           const Component = React.memo(() => null);
         `,
         errors: [{ messageId: 'reactApiDetected' }],
@@ -113,7 +114,7 @@ describe('shared helpers', () => {
     valid: [
       {
         name: 'memo with non-arrow first argument',
-        code: `
+        code: dedent`
           import { memo } from 'react';
           function Component() { return null; }
           const Wrapped = memo(Component);
@@ -121,7 +122,7 @@ describe('shared helpers', () => {
       },
       {
         name: 'non React call with arrow argument',
-        code: `
+        code: dedent`
           const Wrapped = wrap(() => null);
         `,
       },
@@ -129,7 +130,7 @@ describe('shared helpers', () => {
     invalid: [
       {
         name: 'memo with arrow function argument',
-        code: `
+        code: dedent`
           import { memo } from 'react';
           const Wrapped = memo(() => null);
         `,
@@ -137,7 +138,7 @@ describe('shared helpers', () => {
       },
       {
         name: 'React namespace memo with arrow function argument',
-        code: `
+        code: dedent`
           import * as React from 'react';
           const Wrapped = React.memo(() => null);
         `,

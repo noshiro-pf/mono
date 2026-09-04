@@ -31,9 +31,7 @@ describe('splitStringByWhitespace', () => {
 
   test('2 sequential whitespaces and newline', () => {
     expect(
-      splitStringByWhitespace(`aaa
-    bbb
-    ccc`),
+      splitStringByWhitespace(['aaa', 'bbb', 'ccc'].join('\n    ')),
     ).toStrictEqual(['aaa', '\n    ', 'bbb', '\n    ', 'ccc']);
   });
 });

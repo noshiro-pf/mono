@@ -295,6 +295,20 @@ namespace PreferCurriedCall {
 }
 
 /**
+ * @description Require a string that spans source lines to be a tagged template (e.g. `` dedent`...` ``) rather than a bare multi-line template literal, whose value carries whatever indentation the source happens to have
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferDedent {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)
  *
  *  ```md
@@ -332,6 +346,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
+  'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
 }>;
