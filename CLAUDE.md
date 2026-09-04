@@ -1140,6 +1140,17 @@ keep it that way; breaking any one of them reintroduces a cycle.
   including `devDependencies` leaves no valid order. A consequence: anything a
   package needs _in order to build_ — an app bundling a workspace library, for
   example — belongs in `dependencies`, not `devDependencies`.
+- **A build step that rewrites a source file must not rewrite one that is
+  already correct.** The packages in a stage build at the same time and each
+  reads its siblings' sources through `tsx`, so a file being rewritten is a
+  file that cannot be imported. That is not hypothetical: `genIndex` used to
+  write every `index.mts` on every run — in the generator's own spelling, which
+  the formatter then rewrote back to the committed one — and a sibling that
+  imported `ts-repo-utils` during either window died with
+  `SyntaxError: The requested module 'ts-repo-utils' does not provide an export
+named '...'`, taking `ws:build` with it (#1835). It compares before writing
+  now, and writes through a `rename` when it does write. A generator added to a
+  build step needs both.
 
 `docs/package-dependencies.md` holds the current graph and stage tables;
 regenerate it with `pnpm run docs:deps`.

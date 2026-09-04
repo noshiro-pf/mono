@@ -321,12 +321,17 @@ const generateIndexFileForDir = async (
           config,
         );
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.writeFile(indexPath, indexContent);
+        if (await indexIsUpToDate(indexPath, indexContent)) {
+          conditionalEcho(
+            `Unchanged: ${path.relative(process.cwd(), indexPath)}`,
+          );
+        } else {
+          await writeFileAtomic(indexPath, indexContent);
 
-        conditionalEcho(
-          `Generated: ${path.relative(process.cwd(), indexPath)}`,
-        );
+          conditionalEcho(
+            `Generated: ${path.relative(process.cwd(), indexPath)}`,
+          );
+        }
       }
     }
   } catch (error) {
@@ -514,6 +519,171 @@ if (import.meta.vitest !== undefined) {
 }
 
 /**
+ * Whether the index file already on disk re-exports exactly what would be
+ * generated for it, so that nothing has to be written.
+ *
+ * The comparison is on the set of module specifiers rather than on the bytes,
+ * because the two never match: this generator emits double quotes, no trailing
+ * newline and subdirectories first, and the formatter that runs afterwards
+ * rewrites all three. Comparing bytes would therefore report every index file
+ * as changed on every run, which is what the check exists to avoid.
+ *
+ * Avoiding the write is not an optimization. `genIndex` is called from a
+ * package's `build`, and in a workspace those builds run several at a time,
+ * each importing its siblings' sources through `tsx`. A rewritten index file
+ * is unreadable while it is being rewritten, so a barrel touched needlessly is
+ * a sibling build that fails with "does not provide an export named ..." for
+ * no reason at all.
+ *
+ * @param indexPath - Absolute path of the index file.
+ * @param indexContent - The content that would be written.
+ * @returns True when the file exists and exports the same specifiers.
+ */
+const indexIsUpToDate = async (
+  indexPath: string,
+  indexContent: string,
+): Promise<boolean> => {
+  const existing = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFile(indexPath, 'utf8'),
+  );
+
+  if (Result.isErr(existing)) {
+    return false; // No index file yet, or one that cannot be read.
+  }
+
+  const onDisk = exportedSpecifiers(existing.value);
+
+  const generated = exportedSpecifiers(indexContent);
+
+  if (onDisk === undefined || generated === undefined) {
+    return false;
+  }
+
+  return (
+    onDisk.length === generated.length &&
+    onDisk.every((specifier, index) => specifier === generated[index])
+  );
+};
+
+/** What a directory with nothing to re-export gets. */
+const emptyIndexContent = 'export {};';
+
+/** Matches one `export * from '...';` statement, quoted either way. */
+const exportAllRegex = /^export \* from ['"](?<specifier>[^'"]+)['"];$/u;
+
+/**
+ * The module specifiers a generated index file re-exports, sorted.
+ *
+ * Returns `undefined` for anything this generator would not have written —
+ * a hand-written barrel with named re-exports, say — so that the caller falls
+ * back to writing the file rather than assuming it is already correct.
+ *
+ * @param source - Contents of an index file.
+ * @returns The sorted specifiers, or `undefined` if the file is not a plain
+ *   list of `export * from '...';` statements.
+ */
+const exportedSpecifiers = (source: string): readonly string[] | undefined => {
+  const lines = source
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '');
+
+  if (Arr.isEmpty(lines)) {
+    return undefined; // Not a module at all; write the file.
+  }
+
+  if (Arr.isFixedLengthArray(1, lines) && lines[0] === emptyIndexContent) {
+    return [];
+  }
+
+  const mut_specifiers: string[] = [];
+
+  for (const line of lines) {
+    const matched = exportAllRegex.exec(line);
+
+    const specifier = matched?.groups?.['specifier'];
+
+    if (specifier === undefined) {
+      return undefined;
+    }
+
+    mut_specifiers.push(specifier);
+  }
+
+  return mut_specifiers.toSorted();
+};
+
+if (import.meta.vitest !== undefined) {
+  describe('exportedSpecifiers', () => {
+    test('reads the statements this generator writes', () => {
+      assert.deepStrictEqual(
+        exportedSpecifiers(
+          'export * from "./b.mjs";\nexport * from "./a.mjs";',
+        ),
+        ['./a.mjs', './b.mjs'],
+      );
+    });
+
+    test('reads the formatted spelling of the same file back', () => {
+      // The formatter that runs after generation rewrites the quotes, the
+      // order and the trailing newline; all three have to compare equal.
+      assert.deepStrictEqual(
+        exportedSpecifiers(
+          "export * from './a.mjs';\nexport * from './b.mjs';\n",
+        ),
+        ['./a.mjs', './b.mjs'],
+      );
+    });
+
+    test('reads an index for a directory with nothing to export', () => {
+      assert.deepStrictEqual(exportedSpecifiers('export {};\n'), []);
+    });
+
+    test('gives up on anything else, so that the file is rewritten', () => {
+      expect(
+        exportedSpecifiers('export { a } from "./a.mjs";'),
+      ).toBeUndefined();
+
+      expect(
+        exportedSpecifiers('// a note\nexport * from "./a.mjs";'),
+      ).toBeUndefined();
+
+      expect(exportedSpecifiers('')).toBeUndefined();
+    });
+  });
+}
+
+/**
+ * Writes `content` to `filePath` through a temporary file in the same
+ * directory, so that a reader never sees the file half-written.
+ *
+ * `fs.writeFile` truncates first, which leaves a window in which the file is
+ * empty or partial; `rename` within one directory replaces it in one step.
+ *
+ * @param filePath - Absolute path of the file to write.
+ * @param content - The content to write.
+ */
+const writeFileAtomic = async (
+  filePath: string,
+  content: string,
+): Promise<void> => {
+  const tempPath = `${filePath}.${process.pid}.tmp` as const;
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(tempPath, content);
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.rename(tempPath, filePath);
+  } catch (error) {
+    await fs.rm(tempPath, { force: true });
+
+    throw error;
+  }
+};
+
+/**
  * Generates the content for an index file.
  *
  * @param subDirectories - Array of subdirectory names.
@@ -548,6 +718,6 @@ const generateIndexContent = (
   ] as const;
 
   return Arr.isEmpty(exportStatements)
-    ? 'export {};'
+    ? emptyIndexContent
     : exportStatements.join('\n');
 };
