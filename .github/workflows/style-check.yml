@@ -67,7 +67,16 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 25, matching type-check.yml, whose matrix builds the repository the same
+    # way this one does. It was 10, and `ws:doc` — the longest entry, because
+    # it regenerates every package README on top of that build — was measured
+    # at 9m31s and 9m44s across branches, under thirty seconds of headroom. A
+    # `pnpm/action-setup` step that took three minutes instead of its usual
+    # few seconds was enough to spend it: the build finished and the runner
+    # cancelled the job in the same second, before `ws:doc` ran at all. What
+    # the cap is for is a command that hangs, not a slow runner, and every
+    # entry here has finished well inside 10 minutes of its own.
+    timeout-minutes: 25
 
     strategy:
       # The matrix entries are independent checks. Letting one cancel the
