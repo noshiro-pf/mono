@@ -10,6 +10,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-unnecessary-array-from': 'error',
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
   'ts-restrictions/prefer-curried-call': 'error',
+  'ts-restrictions/prefer-dedent': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
   'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',
   'ts-restrictions/check-destructuring-completeness':

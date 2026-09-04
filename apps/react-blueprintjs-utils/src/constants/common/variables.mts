@@ -1,19 +1,21 @@
+import dedent from 'dedent';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 
 export const ptGridSizePx = 10;
 
-export const ptFontFamily = `
-    -apple-system,
-    "BlinkMacSystemFont",
-    "Segoe UI",
-    "Roboto",
-    "Oxygen",
-    "Ubuntu",
-    "Cantarell",
-    "Open Sans",
-    "Helvetica Neue",
-    "Icons16",
-    sans-serif;`;
+export const ptFontFamily = dedent`
+  -apple-system,
+  "BlinkMacSystemFont",
+  "Segoe UI",
+  "Roboto",
+  "Oxygen",
+  "Ubuntu",
+  "Cantarell",
+  "Open Sans",
+  "Helvetica Neue",
+  "Icons16",
+  sans-serif;
+`;
 
 export const ptFontSizePx = asPositiveFiniteNumber(ptGridSizePx * 1.4);
 

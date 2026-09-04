@@ -32,6 +32,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "better-react-use-state": "workspace:*",
+    "dedent": "catalog:",
     "react-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",

@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@octokit/core": "^7.0.8",
+    "dedent": "^1.7.2",
     "dotenv": "^17.4.2",
     "octokit-safe-types": "workspace:^",
     "ts-data-forge": "workspace:^",
