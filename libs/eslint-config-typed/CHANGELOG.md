@@ -1,5 +1,69 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.11.0
+
+### Minor Changes
+
+- 90b61b5: Add `ts-restrictions/prefer-dedent`, on at `error`: a string that spans source lines has to be a tagged template rather than a bare multi-line template literal.
+
+    ```ts
+    // reported
+    const usage = `usage:
+      cmd --flag`;
+
+    // not reported
+    const usage2 = dedent`
+        usage:
+          cmd --flag
+    `;
+    const usage3 = ['usage:', '  cmd --flag'].join('\n');
+    ```
+
+    A template literal keeps every character between its backticks, indentation included, so a multi-line one has to choose between a correct value with broken indentation (the first form above, written flush against the left margin) and intact indentation that has silently become part of the value. The second is the worse of the two: the string then depends on how deeply the expression happens to be nested, so extracting a function or wrapping the code in an `if` changes it, with nothing at the point of use to say so.
+
+    The rule reports only. There is no fix, because wrapping an already-indented template in `dedent` changes its value and only a reader can say whether that was the intent.
+
+    Not reported: any tagged template — the tag decides what the whitespace in its own template means, and `dedent`, `String.raw` and a `sql`/`gql` tag do not agree on that — and a template whose line breaks are all `\n` escapes, which occupies one source line and carries no indentation.
+
+- e32fb6a: Turn `@stylistic/quotes` on, for the one thing no formatter does: report a template literal that has nothing left in it to be a template.
+
+    ```ts
+    // reported, and mechanical to fix
+    const key = `--good`;
+
+    // left alone: tagged, or carrying a substitution or a real line break
+    const sql = dedent`
+        select 1
+    `;
+    const label = `--${kind}`;
+    const help = `usage:
+      cmd --flag`;
+    ```
+
+    The rule is configured `['error', 'single', { allowTemplateLiterals: 'never', ignoreStringLiterals: true }]`. `ignoreStringLiterals` is what keeps it out of the formatter's way: eslint-config-prettier turns `quotes` off because the rule can disagree with the formatter over which quote a string gets, and with string literals ignored it is never asked — every quoted string stays with whatever quote the project's formatter prefers, single or double. What no formatter touches is the backtick: neither Prettier nor oxfmt will ever rewrite `` `a` `` into `'a'`, however little of a template is left in it.
+
+    Only the three things `quotes` counts as using a feature of a template exempt it — a tag, a substitution, or a real line break. A backtick inside is not one of them, and needs no escape once the quotes change.
+
+    `avoidEscape` is deliberately absent. On its own it does nothing here, since the string-literal branch returns early; set together with `allowTemplateLiterals: 'avoidEscape'` it would exempt every template whose text merely _contains_ a `'` — a far wider net than the escaping it is named for, and one that catches templates the formatter would otherwise turn into ordinary double-quoted strings needing no escape at all.
+
+- d051208: Turn `functional/readonly-type` off.
+
+    `ts-codemod-lib`'s `convertToReadonlyTransformer` performs the same normalization and more of it: the rule rewrites a type literal whose members are already `readonly` into `Readonly<{ ... }>`, while the transformer wraps the literal whether or not anything in it was readonly to begin with. Every type the transformer has touched is therefore in the form the rule wants before the rule runs — measured against the repository this config is developed in, the rule reports nothing at all across `libs/`, `apps/` and `tools/`, and it needs type information to say so.
+
+    Projects that do not run that transformer and want the `Readonly<T>` spelling enforced by ESLint can turn the rule back on:
+
+    ```js
+    {
+        rules: {
+            'functional/readonly-type': ['error', 'generic'],
+        },
+    }
+    ```
+
+### Patch Changes
+
+- d004c25: Update dependencies
+
 ## 5.10.5
 
 ### Patch Changes
