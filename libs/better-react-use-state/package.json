@@ -59,7 +59,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "rollup": "catalog:",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "tsx": "catalog:"

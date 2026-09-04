@@ -9,12 +9,6 @@ catalogs:
     '@reduxjs/toolkit':
       specifier: 2.12.0
       version: 2.12.0
-    '@rollup/plugin-replace':
-      specifier: 6.0.3
-      version: 6.0.3
-    '@rollup/plugin-strip':
-      specifier: 3.0.4
-      version: 3.0.4
     '@testing-library/dom':
       specifier: 10.4.1
       version: 10.4.1
@@ -108,12 +102,6 @@ catalogs:
     react-dom:
       specifier: 19.2.8
       version: 19.2.8
-    rollup:
-      specifier: 4.63.0
-      version: 4.63.0
-    rollup-plugin-esbuild:
-      specifier: 6.2.1
-      version: 6.2.1
     rxjs:
       specifier: 7.8.2
       version: 7.8.2
@@ -149,12 +137,6 @@ importers:
       '@changesets/cli':
         specifier: 3.0.1
         version: 3.0.1
-      '@rollup/plugin-replace':
-        specifier: 'catalog:'
-        version: 6.0.3(rollup@4.63.0)
-      '@rollup/plugin-strip':
-        specifier: 'catalog:'
-        version: 3.0.4(rollup@4.63.0)
       '@types/node':
         specifier: 'catalog:'
         version: 26.4.1
@@ -224,12 +206,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
-      rollup-plugin-esbuild:
-        specifier: 'catalog:'
-        version: 6.2.1(esbuild@0.28.2)(rollup@4.63.0)(supports-color@7.2.0)
       strict-ts-lib-v7.0:
         specifier: workspace:*
         version: link:strict-lib/v7.0/output/lib
@@ -1410,9 +1386,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-data-forge:
         specifier: workspace:*
         version: link:../ts-data-forge
@@ -1455,9 +1428,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-data-forge:
         specifier: workspace:*
         version: link:../ts-data-forge
@@ -1718,9 +1688,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1770,9 +1737,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1822,9 +1786,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -1971,9 +1932,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2044,9 +2002,6 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
@@ -2111,9 +2066,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2163,9 +2115,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2227,9 +2176,6 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2291,9 +2237,6 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2352,9 +2295,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       tsx:
         specifier: 'catalog:'
         version: 4.23.12
@@ -2431,9 +2371,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2574,9 +2511,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -2671,9 +2605,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       tsx:
         specifier: 'catalog:'
         version: 4.23.12
@@ -2732,9 +2663,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      rollup:
-        specifier: 'catalog:'
-        version: 4.63.0
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
@@ -5985,24 +5913,6 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@rollup/plugin-replace@6.0.3':
-    resolution: {integrity: sha512-J4RZarRvQAm5IF0/LwUUg+obsm+xZhYnbMXmXROyoSE1ATJe3oXSb9L5MMppdxP2ylNSjv6zFBwKYjcKMucVfA==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
-  '@rollup/plugin-strip@3.0.4':
-    resolution: {integrity: sha512-LDRV49ZaavxUo2YoKKMQjCxzCxugu1rCPQa0lDYBOWLj6vtzBMr8DcoJjsmg+s450RbKbe3qI9ZLaSO+O1oNbg==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
   '@rollup/pluginutils@4.2.1':
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
     engines: {node: '>= 8.0.0'}
@@ -7548,9 +7458,6 @@ packages:
   es-iterator-helpers@1.4.0:
     resolution: {integrity: sha512-c/A0P0oxkACDc+cKWw8evLXK83oBKgn0qPOqCYT4x9uolpCIJAcYvJC9QYKNDRPsTeGyCrQ326jrvgZWdCdK5Q==}
     engines: {node: '>= 0.4'}
-
-  es-module-lexer@1.7.0:
-    resolution: {integrity: sha512-jEQoCwk8hyb2AZziIOLhDqpm5+2ww5uIE6lkO/6jcOCusfk6LhMHpXXfBLXTZ7Ydyt0j4VoUQv6uGNYbdW+kBA==}
 
   es-module-lexer@2.3.2:
     resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
@@ -9640,13 +9547,6 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  rollup-plugin-esbuild@6.2.1:
-    resolution: {integrity: sha512-jTNOMGoMRhs0JuueJrJqbW8tOwxumaWYq+V5i+PD+8ecSCVkuX27tGW7BXqDgoULQ55rO7IdNxPcnsWtshz3AA==}
-    engines: {node: '>=14.18.0'}
-    peerDependencies:
-      esbuild: '>=0.18.0'
-      rollup: ^1.20.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
-
   rollup@4.63.0:
     resolution: {integrity: sha512-T5vnZ2y4QqC3/4P+w2+JO+Q/OVdnPsv4XcSYJYMEn0R9/jjl5AgLwO9LAZMzP2lN71O6pypn91rB7lDstUkfrQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -11225,10 +11125,6 @@ packages:
 
   universal-user-agent@7.0.3:
     resolution: {integrity: sha512-TmnEAEAsBJVZM/AADELsK76llnwcf9vMKuPz8JflO1frO8Lchitr0fNaN9d+Ap0BjKtqWqd/J17qeDnXh8CL2A==}
-
-  unplugin-utils@0.2.5:
-    resolution: {integrity: sha512-gwXJnPRewT4rT7sBi/IvxKTjsms7jX7QIDLOClApuZwR49SXbrB1z2NLUZ+vDHyqCj/n58OzRRqaW+B8OZi8vg==}
-    engines: {node: '>=18.12.0'}
 
   unrs-resolver@1.12.2:
     resolution: {integrity: sha512-dmlRxBJJayXjqTwC+JtF1HhJmgf3ftQ3YejFcZrf4+KKtJv0qDsK1pjqaaVjG7wJ5NJ6UVP1OqRMQ71Z4C3rxQ==}
@@ -14003,21 +13899,6 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@rollup/plugin-replace@6.0.3(rollup@4.63.0)':
-    dependencies:
-      '@rollup/pluginutils': 5.4.0(rollup@4.63.0)
-      magic-string: 0.30.21
-    optionalDependencies:
-      rollup: 4.63.0
-
-  '@rollup/plugin-strip@3.0.4(rollup@4.63.0)':
-    dependencies:
-      '@rollup/pluginutils': 5.4.0(rollup@4.63.0)
-      estree-walker: 2.0.2
-      magic-string: 0.30.21
-    optionalDependencies:
-      rollup: 4.63.0
-
   '@rollup/pluginutils@4.2.1':
     dependencies:
       estree-walker: 2.0.2
@@ -15753,8 +15634,6 @@ snapshots:
       internal-slot: 1.1.0
       iterator.prototype: 1.1.5
       math-intrinsics: 1.1.0
-
-  es-module-lexer@1.7.0: {}
 
   es-module-lexer@2.3.2: {}
 
@@ -18547,17 +18426,6 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.6
       '@rolldown/binding-win32-x64-msvc': 1.2.6
 
-  rollup-plugin-esbuild@6.2.1(esbuild@0.28.2)(rollup@4.63.0)(supports-color@7.2.0):
-    dependencies:
-      debug: 4.4.3(supports-color@7.2.0)
-      es-module-lexer: 1.7.0
-      esbuild: 0.28.2
-      get-tsconfig: 4.14.3
-      rollup: 4.63.0
-      unplugin-utils: 0.2.5
-    transitivePeerDependencies:
-      - supports-color
-
   rollup@4.63.0:
     dependencies:
       '@types/estree': 1.0.9
@@ -18589,6 +18457,7 @@ snapshots:
       '@rollup/rollup-win32-x64-gnu': 4.63.0
       '@rollup/rollup-win32-x64-msvc': 4.63.0
       fsevents: 2.3.3
+    optional: true
 
   run-applescript@7.1.0: {}
 
@@ -20277,11 +20146,6 @@ snapshots:
       unist-util-visit-parents: 6.0.2
 
   universal-user-agent@7.0.3: {}
-
-  unplugin-utils@0.2.5:
-    dependencies:
-      pathe: 2.0.3
-      picomatch: 4.0.7
 
   unrs-resolver@1.12.2:
     dependencies:

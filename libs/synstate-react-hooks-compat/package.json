@@ -79,7 +79,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "rollup": "catalog:",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

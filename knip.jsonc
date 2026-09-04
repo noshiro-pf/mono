@@ -150,7 +150,6 @@
       "project": ["**/*.{mts,ts,tsx,mjs}"],
 
       // These live under `configs/`, not where each plugin looks by default.
-      "rollup": { "config": ["configs/rollup.config.mts"] },
       "vitest": {
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },
@@ -171,7 +170,6 @@
         "**/*.test.mts",
       ],
       "project": ["**/*.{mts,ts,tsx,mjs}"],
-      "rollup": { "config": ["configs/rollup.config.mts"] },
       "vitest": {
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },

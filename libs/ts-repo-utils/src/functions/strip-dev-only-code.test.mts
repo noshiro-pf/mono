@@ -381,6 +381,85 @@ describe(stripDevOnlyCode, () => {
   });
 });
 
+describe('removeComments', () => {
+  const stripComments = (source: string): string => {
+    const result = stripDevOnlyCode(source, 'file.mjs', {
+      ...options,
+      removeComments: true,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(lineCount(result.value), lineCount(source));
+
+    return result.value;
+  };
+
+  test('removes JSDoc, block and trailing comments', () => {
+    assert.deepStrictEqual(
+      stripComments(
+        dedent`
+          /**
+           * Adds two numbers.
+           *
+           * @param a - first
+           */
+          export const add = (a, b) => a + b;
+          /* a block */
+          export const c = 1; // a trailing one
+        `,
+      ),
+      [
+        '',
+        '',
+        '',
+        '',
+        '',
+        'export const add = (a, b) => a + b;',
+        '',
+        'export const c = 1;',
+      ].join('\n'),
+    );
+  });
+
+  test('keeps the shebang and the source map pragma', () => {
+    const source = [
+      '#!/usr/bin/env node',
+      '// a comment',
+      'export const a = 1;',
+      '//# sourceMappingURL=file.mjs.map',
+    ].join('\n');
+
+    assert.deepStrictEqual(
+      stripComments(source),
+      [
+        '#!/usr/bin/env node',
+        '',
+        'export const a = 1;',
+        '//# sourceMappingURL=file.mjs.map',
+      ].join('\n'),
+    );
+  });
+
+  test('does not mistake a division for a regular expression', () => {
+    const source = dedent`
+      export const half = (n) => n / 2 / 1;
+      export const re = /\/[a-z]+/u;
+    `;
+
+    assert.deepStrictEqual(stripComments(source), source);
+  });
+
+  test('leaves the comments alone when the option is not set', () => {
+    const source = dedent`
+      /** doc */
+      export const a = 1;
+    `;
+
+    assert.deepStrictEqual(strip(source), source);
+  });
+});
+
 describe(stripDevOnlyCodeInDir, () => {
   const withTestDir = async (
     run: (testDir: string) => Promise<void>,
