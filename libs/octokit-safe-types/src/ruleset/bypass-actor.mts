@@ -1,7 +1,7 @@
 import * as t from 'ts-fortress';
 
 export const RepositoryRulesetBypassActor = t.record({
-  /** @description The ID of the actor that can bypass a ruleset. If `actor_type` is `OrganizationAdmin`, this should be `1`. If `actor_type` is `DeployKey`, this should be null. `OrganizationAdmin` is not applicable for personal repositories. */
+  /** @description The ID of the actor that can bypass a ruleset. Required for `Integration`, `RepositoryRole`, `Team`, and `User` actor types. If `actor_type` is `OrganizationAdmin`, `actor_id` is ignored. If `actor_type` is `DeployKey`, this should be null. `OrganizationAdmin` is not applicable for personal repositories. */
   actor_id: t.optional(t.union([t.number(), t.nullType])),
 
   /**
@@ -14,6 +14,7 @@ export const RepositoryRulesetBypassActor = t.record({
     'RepositoryRole',
     'Team',
     'DeployKey',
+    'User',
   ]),
 
   /**

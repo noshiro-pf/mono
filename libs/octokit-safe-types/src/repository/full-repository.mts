@@ -89,6 +89,42 @@ const SecurityAndAnalysis = t.union([
         status: t.optional(t.enumType(['enabled', 'disabled'])),
       }),
     ),
+    secret_scanning_delegated_alert_dismissal: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning_delegated_bypass: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning_delegated_bypass_options: t.optional(
+      t.record({
+        /** @description The bypass reviewers for secret scanning delegated bypass */
+        reviewers: t.optional(
+          t.array(
+            t.record({
+              /** @description The ID of the team or role selected as a bypass reviewer */
+              reviewer_id: t.number(),
+
+              /**
+               * @description The type of the bypass reviewer
+               * @enum {string}
+               */
+              reviewer_type: t.enumType(['TEAM', 'ROLE']),
+
+              /**
+               * @description The bypass mode for the reviewer
+               * @default ALWAYS
+               * @enum {string}
+               */
+              mode: t.optional(t.enumType(['ALWAYS', 'EXEMPT'])),
+            }),
+          ),
+        ),
+      }),
+    ),
   }),
   t.nullType,
 ]);
@@ -172,6 +208,21 @@ const Repository = t.record({
   has_pages: t.boolean(),
   has_downloads: t.boolean(),
   has_discussions: t.optional(t.boolean()),
+
+  /**
+   * @description Whether pull requests are enabled.
+   * @default true
+   */
+  has_pull_requests: t.optional(t.boolean()),
+
+  /**
+   * @description The policy controlling who can create pull requests: all or collaborators_only.
+   * @enum {string}
+   */
+  pull_request_creation_policy: t.optional(
+    t.enumType(['all', 'collaborators_only']),
+  ),
+
   archived: t.boolean(),
   disabled: t.boolean(),
   visibility: t.optional(t.string()),
@@ -281,6 +332,16 @@ export const FullRepository = t.record({
   has_pages: t.boolean(),
   has_downloads: t.optional(t.boolean()),
   has_discussions: t.boolean(),
+  has_pull_requests: t.optional(t.boolean()),
+
+  /**
+   * @description The policy controlling who can create pull requests: all or collaborators_only.
+   * @enum {string}
+   */
+  pull_request_creation_policy: t.optional(
+    t.enumType(['all', 'collaborators_only']),
+  ),
+
   archived: t.boolean(),
   disabled: t.boolean(),
   visibility: t.optional(t.string()),

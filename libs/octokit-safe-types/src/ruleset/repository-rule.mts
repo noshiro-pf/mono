@@ -143,6 +143,42 @@ expectType<
   >
 >('=');
 
+const RepositoryRuleParamsActor = t.record({
+  /** @description ID of the actor that can dismiss reviews. */
+  id: t.number(),
+
+  /**
+   * @description The type of the actor
+   * @enum {string}
+   */
+  type: t.enumType([
+    'User',
+    'Team',
+    'IntegrationInstallation',
+    'RepositoryRole',
+  ]),
+});
+
+expectType<
+  t.TypeOf<typeof RepositoryRuleParamsActor>,
+  DeepReadonly<components['schemas']['repository-rule-params-actor']>
+>('=');
+
+const RepositoryRuleParamsDismissalRestriction = t.record({
+  /** @description Specify people, teams, or apps allowed to dismiss pull request reviews. */
+  allowed_actors: t.optional(t.array(RepositoryRuleParamsActor)),
+
+  /** @description Whether to restrict review dismissal to specific actors. */
+  enabled: t.boolean(),
+});
+
+expectType<
+  t.TypeOf<typeof RepositoryRuleParamsDismissalRestriction>,
+  DeepReadonly<
+    components['schemas']['repository-rule-params-dismissal-restriction']
+  >
+>('=');
+
 const RepositoryRulePullRequest = t.record({
   type: t.literal('pull_request'),
   parameters: t.optional(
@@ -154,6 +190,10 @@ const RepositoryRulePullRequest = t.record({
 
       /** @description New, reviewable commits pushed will dismiss previous pull request review approvals. */
       dismiss_stale_reviews_on_push: t.boolean(),
+
+      dismissal_restriction: t.optional(
+        RepositoryRuleParamsDismissalRestriction,
+      ),
 
       /** @description Require an approving review in pull requests that modify files that have a designated code owner. */
       require_code_owner_review: t.boolean(),
@@ -441,6 +481,17 @@ const RepositoryRuleCopilotCodeReview = t.record({
   ),
 });
 
+const RepositoryRuleLicenseComplianceScanning = t.record({
+  type: t.literal('license_compliance_scanning'),
+});
+
+expectType<
+  t.TypeOf<typeof RepositoryRuleLicenseComplianceScanning>,
+  DeepReadonly<
+    components['schemas']['repository-rule-license-compliance-scanning']
+  >
+>('=');
+
 export const RepositoryRule = t.union([
   RepositoryRuleCreation,
   RepositoryRuleUpdate,
@@ -464,6 +515,7 @@ export const RepositoryRule = t.union([
   RepositoryRuleWorkflows,
   RepositoryRuleCodeScanning,
   RepositoryRuleCopilotCodeReview,
+  RepositoryRuleLicenseComplianceScanning,
 ]);
 
 expectType<

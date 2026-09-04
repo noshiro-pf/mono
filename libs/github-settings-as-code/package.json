@@ -53,7 +53,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@octokit/core": "^7.0.7",
+    "@octokit/core": "^7.0.8",
     "dotenv": "^17.4.2",
     "octokit-safe-types": "workspace:^",
     "ts-data-forge": "workspace:^",
