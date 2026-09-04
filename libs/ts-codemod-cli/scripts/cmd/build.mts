@@ -1,9 +1,10 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { rollup } from 'rollup';
-import { Arr, unknownToString, type UnknownResult } from 'ts-data-forge';
+import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-code.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
 
@@ -57,46 +58,27 @@ const build = async (skipCheck: boolean): Promise<void> => {
   }
 
   await logStep({
-    startMessage: 'Building with Rollup',
-    action: async () => {
-      // The config is imported directly (tsx transpiles it) instead of going
-      // through `rollup --config --configPlugin typescript`, because
-      // `@rollup/plugin-typescript` requires the TypeScript JS compiler API
-      // that TypeScript 7 no longer provides.
-      const { default: rollupConfig } =
-        await import('../../configs/rollup.config.mjs');
-
-      await runStep(
-        Result.fromPromise(
-          (async () => {
-            await using bundle = await rollup(rollupConfig);
-
-            const outputs =
-              rollupConfig.output === undefined
-                ? ([] as const)
-                : Arr.isArray(rollupConfig.output)
-                  ? rollupConfig.output
-                  : ([rollupConfig.output] as const);
-
-            for (const output of outputs) {
-              await bundle.write(output);
-            }
-          })(),
-        ),
-        'Rollup build failed',
-      );
-    },
-    successMessage: 'Rollup build completed',
-  });
-
-  await logStep({
-    startMessage: 'Type-checking the sources',
+    startMessage: 'Compiling with the native tsc',
     action: () =>
       runCmdStep(
-        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
-        'Type check failed',
+        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}"`,
+        'Compilation failed',
       ),
-    successMessage: 'Sources type-checked',
+    successMessage: 'JavaScript and type declarations emitted',
+  });
+
+  // The compiler emits the type tests, the in-source tests and each
+  // declaration's JSDoc into the JavaScript as written. This is what a
+  // bundler's dead-code elimination used to remove; what goes is listed in
+  // `tools/configs/strip-dev-only-code.mts`.
+  await logStep({
+    startMessage: 'Stripping development-only code from dist',
+    action: () =>
+      runStep(
+        Result.fromPromise(stripDistDevOnlyCode(distDir)),
+        'Stripping development-only code failed',
+      ),
+    successMessage: 'Development-only code stripped',
   });
 
   console.info('✅ Build completed successfully!\n');

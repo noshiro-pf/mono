@@ -1005,16 +1005,14 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
       not even that: the file parses and the swallowed entry is silently off.
       `pnpm run check:root:knip-config` is the guard for both shapes; run it
       after editing the file by hand.
-- **Build tooling that only `tools/configs/` imports is declared at the root.**
-  The packages that still bundle build through
-  `tools/configs/rollup-config.mts`, so `@rollup/plugin-replace`,
-  `@rollup/plugin-strip` and `rollup-plugin-esbuild` are root devDependencies
-  rather than repeated in each package. Such a package still declares `rollup`
-  itself, because its own `scripts/cmd/build.mts` imports it; a package built
-  by the native `tsc` (see "What a build emits") declares none of them.
-  `import-x/no-relative-packages` objects to the relative import of a shared
-  config across the package boundary; disable it on the line, as the vitest
-  configs already do.
+- **A package's build declares no bundler.** Every library builds with the
+  native `tsc` and the strip pass (see "What a build emits"), so nothing
+  under `libs/` depends on `rollup` or a Rollup plugin, and neither does the
+  root. What a build script needs beyond the compiler is
+  `tools/configs/strip-dev-only-code.mts`, reached by relative path;
+  `import-x/no-relative-packages` objects to a relative import across the
+  package boundary, so disable it on the line, as the vitest configs already
+  do.
 - **Versions of shared devDependencies live in the `catalog:` block of
   `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
   published package's `dependencies` and `peerDependencies` are its own API, so
@@ -1149,23 +1147,21 @@ regenerate it with `pnpm run docs:deps`.
 ### What a build emits
 
 A library's `dist/` is one `.mjs` per source module plus the declarations,
-and two arrangements produce it. **The native `tsc` one is the target;
-Rollup is what the packages not yet moved still use.**
+and **two steps produce it, the same two in every package**: `build.mts`
+runs `typescript-native`'s `tsc` on `configs/tsconfig.build.json`, which
+emits the JavaScript, the declarations and both source maps in one pass,
+then calls `stripDistDevOnlyCode` from
+`tools/configs/strip-dev-only-code.mts` over `dist/`. There is no bundler
+anywhere: `rollup`, its plugins and `tools/configs/rollup-config.mts` are
+gone.
 
-- **Native `tsc`** (`ts-data-forge`, `eslint-config-typed`): `build.mts` runs
-  `typescript-native`'s `tsc` on `configs/tsconfig.build.json`, which emits
-  the JavaScript, the declarations and both source maps in one pass, then
-  runs `stripDistDevOnlyCode` from `tools/configs/strip-dev-only-code.mts`
-  over `dist/`. There is no `configs/rollup.config.mts` and no Rollup
-  dependency.
-- **Rollup** (the rest): `rollup-plugin-esbuild` transpiles, two
-  `@rollup/plugin-replace` and one `@rollup/plugin-strip` drop the test-only
-  code, Rollup's tree-shaking removes what that left unreferenced, and a
-  second `tsc` pass emits the declarations. TypeScript 7 has no JS compiler
-  API, which is why `@rollup/plugin-typescript` is gone.
-
-`stripDevOnlyCode` in `ts-repo-utils` is the replacement for those plugins
-plus the tree-shaking, and it is source-aware where a bundler cannot be:
+What Rollup used to do here was drop the test-only code with
+`@rollup/plugin-replace` and `@rollup/plugin-strip`, remove what that left
+unreferenced by tree-shaking, and transpile with `rollup-plugin-esbuild`
+because TypeScript 7 has no JS compiler API for
+`@rollup/plugin-typescript`. The compiler transpiles now, and
+`stripDevOnlyCode` in `ts-repo-utils` replaces the rest of it. It is
+source-aware where a bundler cannot be:
 **what it removes is a list of names, and the list is the whole of the
 knowledge**. The mechanism and the list live apart: `ts-repo-utils` ships
 the pass with no names in it, because which functions are safe to remove is
@@ -1178,6 +1174,13 @@ wrapper the build scripts call.
   removals emptied, the imports nothing refers to afterwards, and calls to
   the identity casts (`castMutable`, `castDeepMutable`, `castReadonly`,
   `castDeepReadonly`), which become their argument.
+- **It removes the comments too, and the compiler cannot.** `tsc` copies
+  each declaration's JSDoc into the JavaScript as well as into the `.d.mts`,
+  and an editor reads the `.d.mts`, so the copy in the JavaScript is read by
+  nobody: it was two thirds of `ts-data-forge`'s emitted JavaScript. The
+  compiler's own `removeComments` is not the way to do it — measured on
+  TypeScript 6 and 7 alike, it strips the JSDoc from the `.d.mts` as well.
+  A `#!` line and the `//#` source-map pragma are kept.
 - **Never put a function that validates on the identity list.** `asUint32`
   and the other branded-number `castType`s look like casts and throw a
   `TypeError` on a value outside the range; unwrapping one changes behavior.
@@ -1191,9 +1194,13 @@ wrapper the build scripts call.
 - Line breaks are kept wherever it removes something, so `tsc`'s source map
   stays right line for line. Blank lines in `dist/` where a type test used to
   be are the cost of that, not a bug.
-- The `.d.mts` output is byte-identical between the two arrangements, and the
-  runtime exports of every module were compared when `ts-data-forge` moved;
-  a package moving over should be checked the same way.
+- **The move off Rollup was checked package by package**, and this is how to
+  check the next build change: same set of files in `dist/`, `.d.mts`
+  byte-identical, and every module's runtime export names and their types
+  compared by importing both copies. All twenty libraries passed. The
+  emitted JavaScript itself is not comparable — `tsc` keeps the source's
+  line structure where esbuild collapsed it — so a few small packages grew
+  by a kilobyte or two while the total fell from 1437 KB to 1041 KB.
 
 ## Testing Guidelines
 

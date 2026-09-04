@@ -34,12 +34,17 @@ import { glob } from './glob.mjs';
  *   unaffected.
  * - An import binding that nothing outside the removed code refers to any
  *   more, and the whole `import` declaration when it has no bindings left.
+ * - Every comment, when `options.removeComments` is set. The compiler copies
+ *   the JSDoc of each declaration into the JavaScript as well as into the
+ *   `.d.mts`, where an editor reads it from; the copy in the JavaScript is
+ *   read by nobody and is most of the file. A `#!` line and the pragma
+ *   comments (`//# sourceMappingURL=`) are kept.
  *
  * Every line break is kept when a range is removed, so the line numbers of
  * the output are the line numbers of the input and the source map the
  * compiler emitted for the file stays valid line for line. What follows a
- * removed range on the same line shifts left, which happens on an `import`
- * line or around an unwrapped cast and nowhere else.
+ * removed range on the same line shifts left, and a line something was
+ * erased from loses the whitespace that erasing left at its end.
  *
  * It fails rather than leaving something behind: a removable call in a
  * position it cannot remove (`() => expectType('=')`, an argument, an
@@ -104,8 +109,18 @@ export const stripDevOnlyCode = (
     isErasedBy([...statementRanges, ...calleeRanges]),
   );
 
+  const commentRanges =
+    options.removeComments === true
+      ? collectComments(sourceFile, source)
+      : ([] as const);
+
   return Result.ok(
-    eraseRanges(source, [...statementRanges, ...calleeRanges, ...importRanges]),
+    eraseRanges(source, [
+      ...statementRanges,
+      ...calleeRanges,
+      ...importRanges,
+      ...commentRanges,
+    ]),
   );
 };
 
@@ -182,6 +197,20 @@ export type StripDevOnlyCodeOptions = Readonly<{
    * number's `asUint32`, is not one of these.
    */
   unwrapIdentityCalls: readonly string[];
+
+  /**
+   * Whether to remove the comments as well. The JSDoc the compiler copies
+   * into the JavaScript is the same text it puts in the `.d.mts`, which is
+   * where an editor reads it from, so the copy in the JavaScript is dead
+   * weight — two thirds of `ts-data-forge`'s, measured. `removeComments` in
+   * the compiler cannot be used for this: it strips the `.d.mts` too.
+   *
+   * Unlike the two lists above this has a default, because it says what to
+   * do rather than what this repository's functions mean.
+   *
+   * @default false
+   */
+  removeComments?: boolean;
 }>;
 
 /** See the note at the top of the file for why this is not a literal. */
@@ -644,6 +673,51 @@ const isPropertyName = (node: ts.Node): boolean => {
 };
 
 /**
+ * Every comment in the file, except the ones that carry meaning to a tool
+ * rather than to a reader: a `#!` line (which the parser reports as its own
+ * kind of trivia, not as a comment) and the `//#` pragmas that name the
+ * source map.
+ *
+ * Comments are collected from the trivia around each token rather than by
+ * scanning the text, so that a `/` that divides is never taken for the start
+ * of a regular expression.
+ */
+const collectComments = (
+  sourceFile: DeepReadonly<ts.SourceFile>,
+  source: string,
+): readonly EraseRange[] => {
+  const mut_ranges = new Map<number, EraseRange>();
+
+  const add = (range: DeepReadonly<ts.CommentRange>): void => {
+    if (!source.startsWith('//#', range.pos)) {
+      mut_ranges.set(range.pos, [range.pos, range.end]);
+    }
+  };
+
+  const visit = (node: ts.Node): void => {
+    for (const child of node.getChildren(sourceFile)) {
+      for (const range of ts.getLeadingCommentRanges(
+        source,
+        child.getFullStart(),
+      ) ?? []) {
+        add(range);
+      }
+
+      for (const range of ts.getTrailingCommentRanges(source, child.getEnd()) ??
+        []) {
+        add(range);
+      }
+
+      visit(child);
+    }
+  };
+
+  visit(sourceFile);
+
+  return Array.from(mut_ranges.values());
+};
+
+/**
  * Deletes every character in the ranges except line breaks.
  *
  * Positions are UTF-16 code units, as in the AST, so the text is split into
@@ -663,10 +737,31 @@ const eraseRanges = (source: string, ranges: readonly EraseRange[]): string => {
     mut_erased.fill(true, start, end);
   }
 
+  // Line numbers survive, so a line of the output is the line of the input
+  // with the same index, and only a line something was erased from can have
+  // picked up trailing whitespace — the space before a removed trailing
+  // comment, say.
+  const mut_touchedLines = new Set<number>();
+
+  const mut_lineCursor = { current: 0 };
+
+  for (const [pos, char] of Array.from(source).entries()) {
+    if (mut_erased[pos] === true) {
+      mut_touchedLines.add(mut_lineCursor.current);
+    }
+
+    if (char === '\n') {
+      mut_lineCursor.current += 1;
+    }
+  }
+
   return source
     .split('')
     .filter(
       (char, i) => mut_erased[i] !== true || char === '\n' || char === '\r',
     )
-    .join('');
+    .join('')
+    .split('\n')
+    .map((line, index) => (mut_touchedLines.has(index) ? line.trimEnd() : line))
+    .join('\n');
 };

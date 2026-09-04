@@ -108,7 +108,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "rollup": "catalog:",
     "tsx": "catalog:",
     "typedoc": "catalog:",
     "typedoc-github-theme": "catalog:",

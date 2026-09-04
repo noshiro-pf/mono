@@ -81,7 +81,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
-    "rollup": "catalog:",
     "rxjs": "catalog:",
     "synstate-react-hooks": "workspace:*",
     "synstate-react-hooks-compat": "workspace:*",

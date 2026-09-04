@@ -1,4 +1,4 @@
-import { type Result } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import {
   stripDevOnlyCodeInDir,
   type StripDevOnlyCodeOptions,
@@ -19,6 +19,11 @@ import {
  *   `(x) => x`. Never list a function that validates: `asUint32` and the
  *   other branded-number `castType`s throw on a value outside the range, and
  *   unwrapping one changes behavior.
+ * - `removeComments` — on. The compiler writes each declaration's JSDoc into
+ *   the JavaScript as well as into the `.d.mts`; an editor reads the
+ *   `.d.mts`, so the copy in the JavaScript is read by nobody. It was two
+ *   thirds of `ts-data-forge`'s emitted JavaScript. The compiler's own
+ *   `removeComments` cannot do this: it strips the `.d.mts` as well.
  */
 export const devOnlyCode: StripDevOnlyCodeOptions = {
   removeCallStatements: ['expectType'],
@@ -28,10 +33,22 @@ export const devOnlyCode: StripDevOnlyCodeOptions = {
     'castReadonly',
     'castDeepReadonly',
   ],
+  removeComments: true,
 };
 
-/** Runs `stripDevOnlyCodeInDir` over `distDir` with {@link devOnlyCode}. */
-export const stripDistDevOnlyCode = (
-  distDir: string,
-): Promise<Result<Readonly<{ changedFiles: number }>, string>> =>
-  stripDevOnlyCodeInDir(distDir, devOnlyCode);
+/**
+ * Runs `stripDevOnlyCodeInDir` over `distDir` with {@link devOnlyCode},
+ * throwing when a file cannot be stripped.
+ *
+ * It throws rather than returning the `Result` it gets because the build
+ * scripts report a failed step in two different ways — some take a promise of
+ * a `Result`, some a function that may throw — and a helper that throws is
+ * one line at either kind of call site.
+ */
+export const stripDistDevOnlyCode = async (distDir: string): Promise<void> => {
+  const result = await stripDevOnlyCodeInDir(distDir, devOnlyCode);
+
+  if (Result.isErr(result)) {
+    throw new Error(result.value);
+  }
+};

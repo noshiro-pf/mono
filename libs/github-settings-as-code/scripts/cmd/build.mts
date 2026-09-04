@@ -3,6 +3,8 @@ import * as path from 'node:path';
 import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-code.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
 
@@ -75,6 +77,19 @@ const build = async (skipChecks: boolean): Promise<void> => {
         'TypeScript compilation failed',
       ),
     successMessage: 'Build completed',
+  });
+
+  // The compiler emits the type tests, the in-source tests and each
+  // declaration's JSDoc into the JavaScript as written. What goes is listed
+  // in `tools/configs/strip-dev-only-code.mts`.
+  await logStep({
+    startMessage: 'Stripping development-only code from dist',
+    action: () =>
+      runStep(
+        Result.fromPromise(stripDistDevOnlyCode(distDir)),
+        'Stripping development-only code failed',
+      ),
+    successMessage: 'Development-only code stripped',
   });
 
   console.info('✅ Build completed successfully!\n');

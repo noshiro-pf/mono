@@ -80,14 +80,15 @@ const build = async (skipCheck: boolean): Promise<void> => {
     successMessage: 'JavaScript and type declarations emitted',
   });
 
-  // The compiler emits the type tests and the in-source tests as they are
-  // written. This is what a bundler's dead-code elimination used to remove;
-  // the names it strips are listed in `tools/configs/strip-dev-only-code.mts`.
+  // The compiler emits the type tests, the in-source tests and each
+  // declaration's JSDoc into the JavaScript as written. This is what a
+  // bundler's dead-code elimination used to remove; what goes is listed in
+  // `tools/configs/strip-dev-only-code.mts`.
   await logStep({
     startMessage: 'Stripping development-only code from dist',
     action: () =>
       runStep(
-        stripDistDevOnlyCode(distDir),
+        Result.fromPromise(stripDistDevOnlyCode(distDir)),
         'Stripping development-only code failed',
       ),
     successMessage: 'Development-only code stripped',

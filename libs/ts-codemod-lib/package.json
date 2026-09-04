@@ -97,7 +97,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "rollup": "catalog:",
     "ts-repo-utils": "workspace:*",
     "tsx": "catalog:",
     "typedoc": "catalog:",

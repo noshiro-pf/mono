@@ -67,7 +67,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "rollup": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-native": "npm:typescript@7.0.2"
