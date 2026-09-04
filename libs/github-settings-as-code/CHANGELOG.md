@@ -1,5 +1,13 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 3.0.1
+
+### Patch Changes
+
+- d004c25: Update dependencies
+- Updated dependencies [d004c25]
+    - octokit-safe-types@1.2.27
+
 ## 3.0.0
 
 ### Major Changes

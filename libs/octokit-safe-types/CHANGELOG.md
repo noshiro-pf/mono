@@ -1,5 +1,11 @@
 ## [1.2.25](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.24...v1.2.25) (2026-08-09)
 
+## 1.2.27
+
+### Patch Changes
+
+- d004c25: Update dependencies
+
 ## 1.2.26
 
 ### Patch Changes
