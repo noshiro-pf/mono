@@ -465,7 +465,7 @@ describe('diff', () => {
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
         await execInRepo(
-          `git commit -m "Add test file for deletion" --no-verify`,
+          'git commit -m "Add test file for deletion" --no-verify',
           {
             silent: true,
           },
@@ -491,7 +491,7 @@ describe('diff', () => {
 
         // Test with excludeDeleted = false
         // First verify the file is actually staged for deletion by checking git status
-        const gitStatusResult = await execInRepo(`git status --porcelain`, {
+        const gitStatusResult = await execInRepo('git status --porcelain', {
           silent: true,
         });
 
@@ -619,7 +619,7 @@ describe('diff', () => {
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
         await execInRepo(
-          `git commit -m "Add file for modification test" --no-verify`,
+          'git commit -m "Add file for modification test" --no-verify',
           { silent: true },
         );
 
@@ -667,7 +667,7 @@ describe('diff', () => {
         await execInRepo(`git add ${file1} ${file2}`, { silent: true });
 
         await execInRepo(
-          `git commit -m "Add files for modification test" --no-verify`,
+          'git commit -m "Add files for modification test" --no-verify',
           { silent: true },
         );
 
@@ -712,7 +712,7 @@ describe('diff', () => {
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
         await execInRepo(
-          `git commit -m "Add test file for deletion" --no-verify`,
+          'git commit -m "Add test file for deletion" --no-verify',
           { silent: true },
         );
 
@@ -827,7 +827,7 @@ describe('diff', () => {
 
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
-        await execInRepo(`git commit -m "Initial commit" --no-verify`, {
+        await execInRepo('git commit -m "Initial commit" --no-verify', {
           silent: true,
         });
 

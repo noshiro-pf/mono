@@ -63,7 +63,7 @@ expectType<
 >('=');
 
 // Test with template literal types
-expectType<WidenLiteral<`hello`>, string>('=');
+expectType<WidenLiteral<'hello'>, string>('=');
 
 expectType<WidenLiteral<`hello ${string}`>, string>('='); // Template literals with placeholders widen to string
 

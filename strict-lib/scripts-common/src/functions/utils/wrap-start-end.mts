@@ -8,7 +8,7 @@ export const wrapStartEnd = async (
 
   const res = await fn();
 
-  console.info(`Done.\n`);
+  console.info('Done.\n');
 
   return res;
 };

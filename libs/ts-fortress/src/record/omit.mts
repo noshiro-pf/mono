@@ -38,7 +38,7 @@ export const omit = <
 
   if (shape === undefined) {
     throw new Error(
-      `omit() requires a simple or intersection record type, but received a union type`,
+      'omit() requires a simple or intersection record type, but received a union type',
     );
   }
 

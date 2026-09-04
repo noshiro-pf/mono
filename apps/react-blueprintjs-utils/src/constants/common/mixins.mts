@@ -57,10 +57,10 @@ export const positionAll = (position: string, value: string) =>
 
 export const baseTypography = [
   `font-size: ${ptFontSizePx}px;`,
-  `font-weight: 400;`,
-  `letter-spacing: 0;`,
+  'font-weight: 400;',
+  'letter-spacing: 0;',
   `line-height: ${ptLineHeightPx}px;`,
-  `text-transform: none;`,
+  'text-transform: none;',
 ].join('\n');
 
 export const runningTypography = [

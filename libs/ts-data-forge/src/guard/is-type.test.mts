@@ -124,7 +124,7 @@ describe(isString, () => {
 
     assert.isTrue(isString('123'));
 
-    assert.isTrue(isString(`template`));
+    assert.isTrue(isString('template'));
   });
 
   test('should return false for non-strings', () => {
@@ -408,7 +408,7 @@ describe(isNotString, () => {
 
     assert.isFalse(isNotString('123'));
 
-    assert.isFalse(isNotString(`template`));
+    assert.isFalse(isNotString('template'));
   });
 
   test('should return true for non-string values', () => {

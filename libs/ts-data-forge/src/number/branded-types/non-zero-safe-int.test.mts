@@ -74,7 +74,7 @@ describe('NonZeroSafeInt test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
     ] as const)(
-      `asNonZeroSafeInt($name) should throw a TypeError`,
+      'asNonZeroSafeInt($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asNonZeroSafeInt(value)).toThrow(
           new TypeError(`Expected a non-zero safe integer, got: ${value}`),

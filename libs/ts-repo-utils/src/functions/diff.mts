@@ -35,7 +35,7 @@ export const getUntrackedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: `git ls-files --others --exclude-standard`,
+    cmd: 'git ls-files --others --exclude-standard',
     cmdOptionToExcludeDeleted: '',
     cmdOptionToIncludeDeleted: '--deleted',
     options,
@@ -56,7 +56,7 @@ export const getModifiedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: `git diff --name-only`,
+    cmd: 'git diff --name-only',
     cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
     cmdOptionToIncludeDeleted: '',
     options,
@@ -77,7 +77,7 @@ export const getStagedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: `git diff --staged --name-only`,
+    cmd: 'git diff --staged --name-only',
     cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
     cmdOptionToIncludeDeleted: '',
     options,

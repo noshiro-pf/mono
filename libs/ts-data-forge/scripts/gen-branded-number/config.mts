@@ -835,7 +835,8 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     customConsts: floatRounding(TO_INT_RET, TO_INT_RET, TO_INT_RET),
     customKeys: ['floor', 'ceil', 'round'],
     leadingExpectType: `expectType<${TO_INT_RET}, Int>('=');`,
-    trailingExpectTypeExtra: `expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, NonNegativeFiniteNumber>('=');`,
+    trailingExpectTypeExtra:
+      "expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, NonNegativeFiniteNumber>('=');",
     namespaceKeys: FLOAT_KEYS_UNBOUNDED_ABS,
     numberClassParams: 'never',
     division: 'exact',
@@ -882,7 +883,8 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       `expectType<${TO_INT_RET}, NonZeroInt>('=');`,
       `expectType<${REMOVE_NZ_RET}, Int>('=');`,
     ].join('\n\n'),
-    trailingExpectTypeExtra: `expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, PositiveFiniteNumber>('=');`,
+    trailingExpectTypeExtra:
+      "expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, PositiveFiniteNumber>('=');",
     namespaceKeys: [
       'is',
       'abs',

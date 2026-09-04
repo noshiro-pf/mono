@@ -66,19 +66,19 @@ export const convertLibEs5_Array =
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               //
-              `start: number`,
+              'start: number',
               `start: ${brandedNumber.ArraySizeArg}`,
             ),
             replaceWithNoMatchCheck(
-              `deleteCount?: number`,
+              'deleteCount?: number',
               `deleteCount?: ${brandedNumber.ArraySizeArgNonNegative}`,
             ),
             replaceWithNoMatchCheck(
-              `deleteCount: number`,
+              'deleteCount: number',
               `deleteCount: ${brandedNumber.ArraySizeArgNonNegative}`,
             ),
             replaceWithNoMatchCheck(
-              `unshift(...items: readonly T[]): number;`,
+              'unshift(...items: readonly T[]): number;',
               `unshift(...items: readonly T[]): ${brandedNumber.ArraySize};`,
             ),
             replaceWithNoMatchCheck(
@@ -111,42 +111,42 @@ export const convertLibEs5_Array =
                   'isArray(arg: unknown): arg is unknown[];',
                 ),
             replaceWithNoMatchCheck(
-              `  new (arrayLength?: number): readonly unknown[];`,
+              '  new (arrayLength?: number): readonly unknown[];',
               dedent`
                 /** @deprecated use \`Array.from({ length })\` instead */
                 ${commentOutDeprecated ? '// ' : ''}new (arrayLength?: ${brandedNumber.NewArrayMaxSize}): ${readonlyModifier}unknown[];
               `,
             ),
             replaceWithNoMatchCheck(
-              `  new <T>(arrayLength: number): readonly T[];`,
+              '  new <T>(arrayLength: number): readonly T[];',
               dedent`
                 /** @deprecated use \`Array.from({ length })\` instead */
                 ${commentOutDeprecated ? '// ' : ''}new <T>(arrayLength: ${brandedNumber.NewArrayMaxSize}): ${readonlyModifier}T[];
               `,
             ),
             replaceWithNoMatchCheck(
-              `  new <T>(...items: readonly T[]): readonly T[];`,
+              '  new <T>(...items: readonly T[]): readonly T[];',
               dedent`
                 /** @deprecated use \`[...items]\` instead */
                 ${commentOutDeprecated ? '// ' : ''}new <T>(...items: readonly T[]): ${readonlyModifier}T[];
               `,
             ),
             replaceWithNoMatchCheck(
-              `  (arrayLength?: number): readonly unknown[];`,
+              '  (arrayLength?: number): readonly unknown[];',
               dedent`
                 /** @deprecated use \`Array.from({ length })\` instead */
                 ${commentOutDeprecated ? '// ' : ''}(arrayLength?: ${brandedNumber.NewArrayMaxSize}): ${readonlyModifier}unknown[];
               `,
             ),
             replaceWithNoMatchCheck(
-              `  <T>(arrayLength: number): readonly T[];`,
+              '  <T>(arrayLength: number): readonly T[];',
               dedent`
                 /** @deprecated use \`Array.from({ length })\` instead */
                 ${commentOutDeprecated ? '// ' : ''}<T>(arrayLength: ${brandedNumber.NewArrayMaxSize}): ${readonlyModifier}T[];
               `,
             ),
             replaceWithNoMatchCheck(
-              `  <T>(...items: readonly T[]): readonly T[];`,
+              '  <T>(...items: readonly T[]): readonly T[];',
               dedent`
                 /** @deprecated use \`[...items]\` instead */
                 ${commentOutDeprecated ? '// ' : ''}<T>(...items: readonly T[]): ${readonlyModifier}T[];

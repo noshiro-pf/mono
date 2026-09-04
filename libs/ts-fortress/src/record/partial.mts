@@ -45,7 +45,7 @@ export const partial = <
 
   if (shape === undefined) {
     throw new Error(
-      `partial() requires a simple or intersection record type, but received a union type`,
+      'partial() requires a simple or intersection record type, but received a union type',
     );
   }
 

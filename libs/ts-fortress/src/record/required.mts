@@ -46,7 +46,7 @@ export const required = <
 
   if (shape === undefined) {
     throw new Error(
-      `required() requires a simple or intersection record type, but received a union type`,
+      'required() requires a simple or intersection record type, but received a union type',
     );
   }
 

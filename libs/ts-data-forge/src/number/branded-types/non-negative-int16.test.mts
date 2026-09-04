@@ -66,7 +66,7 @@ describe('NonNegativeInt16 test', () => {
       { name: '-1', value: -1 },
       { name: '32768', value: 32_768 },
     ] as const)(
-      `asNonNegativeInt16($name) should throw a TypeError`,
+      'asNonNegativeInt16($name) should throw a TypeError',
       ({ value }) => {
         expect(() => asNonNegativeInt16(value)).toThrow(
           new TypeError(

@@ -62,7 +62,7 @@ export const checkStrictLibLinks = async (): Promise<
         '',
         ...offenders.map((group) => `  ${SCOPE}/lib-${group}`),
         '',
-        `Run \`pnpm run z:link-strict-lib\` to restore them. \`pnpm install\``,
+        'Run `pnpm run z:link-strict-lib` to restore them. `pnpm install`',
         'does it too, through the root `prepare` script.',
       ].join('\n'),
     );

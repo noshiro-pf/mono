@@ -58,11 +58,11 @@ export const convertLibEs2015Iterable = ({
             returnType === 'readonly'
               ? idFn
               : replaceWithNoMatchCheck(
-                  `from<T>(iterable: Iterable<T> | ArrayLike<T>): readonly T[]`,
-                  `from<T>(iterable: Iterable<T> | ArrayLike<T>): T[]`,
+                  'from<T>(iterable: Iterable<T> | ArrayLike<T>): readonly T[]',
+                  'from<T>(iterable: Iterable<T> | ArrayLike<T>): T[]',
                 ),
             replaceWithNoMatchCheck(
-              `from<T, U>(iterable: Iterable<T> | ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: unknown): readonly U[];`,
+              'from<T, U>(iterable: Iterable<T> | ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: unknown): readonly U[];',
               `from<T, U>(iterable: Iterable<T> | ArrayLike<T>, mapfn: (v: T, k: ${brandedNumber.ArraySize}) => U, thisArg?: unknown): ${readonlyModifier}U[];`,
             ),
           ),
@@ -89,8 +89,8 @@ export const convertLibEs2015Iterable = ({
 
         // remove readonly
         replaceWithNoMatchCheck(
-          `new (): ReadonlyMap<unknown, unknown>;`,
-          `new (): Map<never, never>;`,
+          'new (): ReadonlyMap<unknown, unknown>;',
+          'new (): Map<never, never>;',
         ),
 
         // remove readonly, and drop `| null` — see the `| null` note in
@@ -99,14 +99,14 @@ export const convertLibEs2015Iterable = ({
         // them still advertises `| null`, `new Map(null)` keeps compiling and
         // the tightening in the other file is inert.
         replaceWithNoMatchCheck(
-          `new <K, V>(iterable?: Iterable<readonly [K, V]> | null): ReadonlyMap<K, V>`,
-          `new <K, V>(iterable?: Iterable<readonly [K, V]>): Map<K, V>`,
+          'new <K, V>(iterable?: Iterable<readonly [K, V]> | null): ReadonlyMap<K, V>',
+          'new <K, V>(iterable?: Iterable<readonly [K, V]>): Map<K, V>',
         ),
 
         // remove readonly, and drop `| null` (as above)
         replaceWithNoMatchCheck(
-          `new <T>(iterable?: Iterable<T> | null): ReadonlySet<T>;`,
-          `new <T>(iterable?: Iterable<T>): Set<T>;`,
+          'new <T>(iterable?: Iterable<T> | null): ReadonlySet<T>;',
+          'new <T>(iterable?: Iterable<T>): Set<T>;',
         ),
 
         // TS 6.0 loosened this overload from `(iterable: Iterable<…>)` to
@@ -118,8 +118,8 @@ export const convertLibEs2015Iterable = ({
         // overload. Normalize it back to the pre-6.0 shape; a no-op on <= 5.9,
         // where the file already reads that way.
         replaceWithNoMatchCheck(
-          `new <K extends WeakKey = WeakKey, V = unknown>(iterable?: Iterable<readonly [K, V]> | null): WeakMap<K, V>;`,
-          `new <K extends WeakKey, V>(iterable: Iterable<readonly [K, V]>): WeakMap<K, V>;`,
+          'new <K extends WeakKey = WeakKey, V = unknown>(iterable?: Iterable<readonly [K, V]> | null): WeakMap<K, V>;',
+          'new <K extends WeakKey, V>(iterable: Iterable<readonly [K, V]>): WeakMap<K, V>;',
           { onNotFound: 'off' },
         ),
 
@@ -128,7 +128,7 @@ export const convertLibEs2015Iterable = ({
         // without this one `new Set()` would bind to the `iterable?` overload
         // and infer `Set<unknown>` instead of `Set<never>`.
         replaceWithNoMatchCheck(
-          `interface SetConstructor {`,
+          'interface SetConstructor {',
           dedent`
             interface SetConstructor {
               new (): Set<never>;
@@ -212,7 +212,7 @@ export const convertLibEs2015Iterable = ({
             // TS 5.6+ uses `next(...[value]:)`; earlier versions use
             // `next(...args:)`.
             'next(...[value]: readonly [] | readonly [TNext]): IteratorResult<T, TReturn>;',
-            `next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>;`,
+            'next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>;',
             { onNotFound: 'off' },
           ),
         }),

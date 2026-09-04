@@ -54,7 +54,7 @@ export const convertLibEs5_Math =
             !useBrandedNumber
               ? idFn
               : replaceWithNoMatchCheck(
-                  `acos(x: number): number;`,
+                  'acos(x: number): number;',
                   `acos(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
                 ),
 
@@ -63,19 +63,19 @@ export const convertLibEs5_Math =
             !useBrandedNumber
               ? idFn
               : replaceWithNoMatchCheck(
-                  `exp(x: number): number;`,
+                  'exp(x: number): number;',
                   `exp(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
                 ),
             !useBrandedNumber
               ? idFn
               : replaceWithNoMatchCheck(
-                  `sqrt(x: number): number;`,
+                  'sqrt(x: number): number;',
                   `sqrt(x: number): ${brandedNumber.NonNegativeNumber} | ${brandedNumber.NaNType};`,
                 ),
             !useBrandedNumber
               ? idFn
               : replaceWithNoMatchCheck(
-                  `random(): number;`,
+                  'random(): number;',
                   `random(): ${brandedNumber.NonNegativeNumber};`,
                 ),
 

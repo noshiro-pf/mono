@@ -44,7 +44,7 @@ export const fetchEventListOfUser = ({
     if (!Arr.isArray(response) || !response.every(EventListItem.is)) {
       return Result.err({
         type: 'wrong-type-response' as const,
-        message: `response should be an array of EventListItem.`,
+        message: 'response should be an array of EventListItem.',
       });
     }
 

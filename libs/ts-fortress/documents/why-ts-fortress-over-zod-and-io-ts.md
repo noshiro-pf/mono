@@ -169,7 +169,7 @@ const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
 assert.strictEqual(
     ioTsErrorMessages[0],
-    `Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number`,
+    'Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number',
 );
 ```
 
@@ -205,7 +205,7 @@ const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
 
 assert.strictEqual(
     tsFortressErrorMessages[0],
-    `Error at user.profile.age: expected <number> type but <string> type value "not-a-number" was passed.`,
+    'Error at user.profile.age: expected <number> type but <string> type value "not-a-number" was passed.',
 );
 ```
 

@@ -47,7 +47,7 @@ describe('Int test', () => {
       { name: 'Number.NEGATIVE_INFINITY', value: Number.NEGATIVE_INFINITY },
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
-    ] as const)(`asInt($name) should throw a TypeError`, ({ value }) => {
+    ] as const)('asInt($name) should throw a TypeError', ({ value }) => {
       expect(() => asInt(value)).toThrow(
         new TypeError(`Expected an integer, got: ${value}`),
       );

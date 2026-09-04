@@ -31,5 +31,5 @@ const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
 assert.strictEqual(
   ioTsErrorMessages[0],
-  `Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number`,
+  'Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number',
 );
