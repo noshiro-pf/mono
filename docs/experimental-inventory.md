@@ -334,7 +334,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
 | `catan-dice-app`                        |  471 | **なし**                     |
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
-| `blueprintjs-playground`                |   92 | **なし**                     |
+| ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
@@ -722,3 +722,110 @@ npm 依存は要らない。
 するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
 した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
 変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
+
+## `blueprintjs-playground` の復元（2026-09-01）
+
+`blueprintjs-playground-styled` の**素の双子**。同じデモページを、こちらは
+Blueprint 自身の `NumericInput` / `InputGroup` で描く。2 つ並んで初めて
+「Blueprint の実物」対「スクラッチで組んだ同等品」という比較になる。
+
+中身は `app.tsx` ・ `main.tsx` ・ `index.css` の 3 つだけで、
+`apps/` 側との重複は無い（`@blueprintjs/core` を直接使うため）。`#1758` で
+styled 版に起きたような「大半が既に入っていた」ということは無かった。
+
+### `index.css` は原文のまま
+
+`normalize.css` ・ `@blueprintjs/icons` ・ `datetime2` ・ `datetime` ・ `select`
+の `@import` が並ぶが、**`event-schedule-app` も同じ一覧を持ったまま
+`@blueprintjs/core` と `datetime` しか宣言していない**。スタイルシートは
+bundler の関心事で、このリポジトリでは何もビルドしない。同じ扱いに揃えた。
+
+最初はこの playground が描かない `datetime` 系と `select` を削ったが、
+**兄弟に合わせるほうが正しい** — 差を作る理由が無い。
+
+### `noop` はローカルに置いた
+
+移植元では暗黙グローバルだった。後継は `react-blueprintjs-utils` の
+`utils/ported.mts` にあるが、**この playground が同パッケージを要る理由は
+それしかない**。`() => undefined` 1 行のためにパッケージ依存を足すのは
+釣り合わないので、`app.tsx` の中に置いて理由をコメントにした。
+
+`constants/dictionary/` は `export const dict = {} as const;` の
+テンプレート残骸なので持ち込んでいない（#1746 ・ #1754 ・ #1758 と同じ）。
+
+### これで「追加の npm 依存が要らない React app」は片付いた
+
+`#1754` で分けた 4 つ（`blueprintjs-playground` ・
+`cant-stop-probability-app` ・ `blueprintjs-playground-styled` ・
+`housing-loan-calculator-app`）がすべて復元済みになった。React 側に残るのは
+**外部依存の判断が要る 3 つ**である。
+
+| app               | 要る npm 依存                                  |
+| :---------------- | :--------------------------------------------- |
+| `catan-dice-app`  | `@mui/material`                                |
+| `color-demo-app`  | `@mui/material` ＋ `react-mui-utils`（未復元） |
+| `annotation-tool` | `pixi.js-legacy` ・ `uuid`                     |
+
+## `others/` の 6 つを見た（2026-09-01）
+
+`apps` 側で「追加の npm 依存が要らないもの」を出し切ったので、`others` を
+1 つずつ見た。**6 つのうち復元する価値があるのは 2 つ**である。
+
+| もの                           | 判断                                                              |
+| :----------------------------- | :---------------------------------------------------------------- |
+| `others/mahjong-scoring-tool`  | **復元した**（下節）                                              |
+| `others/slack-archive-tools`   | 復元できる。`io-ts` → `ts-fortress`、`ts-utils` → `ts-data-forge` |
+| `others/implement-react-hooks` | **復元しない**。未完成の学習用スクラッチ                          |
+| `others/ts_playground`         | **復元しない**。TypeScript ハンドブックの写経                     |
+| `slides/dezero_06_to_16`       | HTML 直書きの reveal.js スライド。パッケージではない              |
+| `slides/chain_rule`            | 同上                                                              |
+
+`implement-react-hooks` は `useState` が `initialState` をそのまま返し、
+`useEffect` が引数を `console.log` するだけの**書きかけ**で、トップレベルに
+`console.log` が並ぶ。`ts_playground` は `20200928_modules` ・
+`20201016_namespaces` という日付ディレクトリに TypeScript 公式ドキュメントの
+例（`ZipCodeValidator` など）が置いてあるもので、**存在しないモジュール**
+（`'hot-new-module'` ・ `'math-lib'` ・ `'json!http://example.com/data.json'`）を
+import しているのでそもそもコンパイルできない。どちらも「取っておく価値の
+あるものだけ持ってくる」の対象外である。
+
+## `mahjong-scoring-tool` の復元（2026-09-01）
+
+外部依存は無く、import している名前は 2 つだけだった。
+
+| 移植元                                          | 復元後                        |
+| :---------------------------------------------- | :---------------------------- |
+| `toUint32`（`@noshiro/mono-utils`）             | `asUint32`（`ts-data-forge`） |
+| `getShuffled`（`@noshiro/ts-utils-additional`） | 後継が無いので同梱（下記）    |
+
+`getShuffled` は `react-blueprintjs-utils` の `utils/ported.mts` と同じ扱いで、
+**後継が無いものはそれを使うパッケージに置く**。ここでは `createPointMap` の
+テスト 1 箇所だけが使う（生の点数の並び順で結果が変わらないことの確認）。
+
+### `as` を 5 つ消した
+
+移植元は `ArrayOfLength4<T>`（= `readonly [T,T,T,T]`）を自前で定義し、
+`.map()` の結果を毎回そこへキャストしていた。`Array.prototype.map` はタプルを
+`U[]` に広げるためで、**5 箇所すべてに
+`total-functions/no-unsafe-type-assertion` の disable が付いていた**。
+
+4 要素ぶんを書き下す `map4` を置けば全部要らなくなる。
+
+```ts
+const map4 = <T, U>(
+  tuple: FixedLengthTuple<4, T>,
+  mapFn: (value: T, index: 0 | 1 | 2 | 3) => U,
+): FixedLengthTuple<4, U> => [ mapFn(tuple[0], 0), … ];
+```
+
+**添字を `number` ではなくリテラル union にするのが要点。** 呼び出し側は
+その添字で別の 4-タプルを引くので、`noUncheckedIndexedAccess` の下では
+リテラルでないと `number | undefined` になり、移植元にあった `!`（非 null
+アサーション）が必要になってしまう。
+
+`toSorted` だけは長さを型で保てないので、4 要素を書き下して `?? 0` で受けた。
+`ArrayOfLength4` は `ts-type-forge` の `FixedLengthTuple<4, …>` に置き換えた。
+
+**テスト 6 件が通ることで等価性を確認している。** そのうちの 1 つが
+`getShuffled` で順序を入れ替えて同じ結果になることを見ているので、
+`map4` の書き換えはそこで実際に効いている。

@@ -273,6 +273,20 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    "apps/blueprintjs-playground": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": [
+        "normalize.css",
+        "@blueprintjs/icons",
+        "@blueprintjs/datetime2",
+        "@blueprintjs/datetime",
+        "@blueprintjs/select",
+      ],
+    },
+
     "apps/housing-loan-calculator-app": {
       "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
@@ -299,6 +313,12 @@
         "@blueprintjs/core",
         "@blueprintjs/icons",
       ],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    "apps/mahjong-scoring-tool": {
+      "entry": ["src/index.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
     },
 
     // Not an Astro site like the entry above assumes: a Node program with a
