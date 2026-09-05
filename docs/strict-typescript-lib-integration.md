@@ -1750,6 +1750,41 @@ return Result.err(`❌ Failed to embed JSDoc examples: ${String(error)}`);
 `embed-examples-in-jsdoc.mts` を持つ他のパッケージにも同じ行が残っている
 可能性が高いので、opt-in のたびに 1 件ずつ出てくることになる。
 
+## `synstate-react-hooks-compat` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** `embed-examples-in-jsdoc.mts` の 117 行 60 桁の
+`String(error)`。**16 件目にして、この行の最後の 1 つ。**
+
+### `embed-examples-in-jsdoc.mts` の重複は解消した
+
+同じスクリプトを持つ 7 パッケージすべてで、同じ行を直し終えた。
+
+| パッケージ                    | 直した PR |
+| :---------------------------- | :-------- |
+| `ts-repo-utils`               | #1618     |
+| `ts-fortress`                 | #1657     |
+| `ts-data-forge`               | #1745     |
+| `synstate-react-hooks`        | #1752     |
+| `synstate-preact-hooks`       | #1761     |
+| `synstate-preact-signals`     | #1765     |
+| `synstate-react-hooks-compat` | 本 PR     |
+
+**7 つのパッケージが同じスクリプトのコピーを持っている**という事実自体は
+残っている。`String(...)` は片付いたが、次に同じ種類の指摘が出れば、また
+7 箇所を 7 回直すことになる。共通化する価値はあるが、それは opt-in とは別の
+作業である。
+
+### opt-in できるパッケージはこれで尽きた
+
+独立して進められるものは無くなった。残りはいずれも**判断待ち**である。
+
+| 対象                  | 待っているもの                                    |
+| :-------------------- | :------------------------------------------------ |
+| `synstate`            | `samples/docs-site/why-reactive/` の扱い（#1761） |
+| `eslint-config-typed` | #1745 のマージ（型 5 件はそちらで解決済み）       |
+| `ts-std-forge`        | #1741 のマージ（`safe-number/impl/` が重なる）    |
+| `ts-type-forge`       | 意図的な opt-out。#1764 に観測を記録              |
+
 ### 確認したこと
 
 - `libReplacement: true` で type-check・lint とも 0 件、テスト 6 件も通る
@@ -2045,3 +2080,114 @@ strict lib では `Response.json()` が `any` ではなく `unknown` を返す�
 のどちらかになる。これは型安全性ではなく**ドキュメントの判断**なので、
 勝手に決めずに残した。samples がそのままでよいと決まれば、`TimerId` の 1 行と
 合わせて opt-in できる。
+
+## `synstate-preact-signals` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** #1752 で測ったとおり、
+`scripts/cmd/embed-examples-in-jsdoc.mts` の 117 行 60 桁の `String(error)`
+1 件だけ。**15 件目**。
+
+残るのは `synstate-react-hooks-compat` の同じ 1 件で、これも同じ位置である。
+
+### `embed-examples-in-jsdoc.mts` の重複について
+
+このスクリプトを持つパッケージすべてに同じ行があり、opt-in のたびに 1 件ずつ
+出てくる。これまでに直したのは
+
+`ts-repo-utils` ・ `ts-fortress` ・ `ts-data-forge` ・ `synstate-react-hooks`
+・ `synstate-preact-hooks` ・ 本パッケージ
+
+の 6 つで、`synstate-react-hooks-compat` が残っている。**まとめて 1 つの PR で
+潰す価値はあるが、opt-in と混ぜないほうが読みやすい**ので、ここまでは
+opt-in のたびに 1 件ずつ直してきた。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 25 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 8 個が true / false で完全一致
+- `pnpm run doc` も通る
+- probe を置いてから lint を測った
+
+## `numeric-input-utils` の opt-in（2026-09-01）
+
+13 パッケージ目、`apps/` 側の 2 つ目。**型・lint とも初回から 0 件**で、
+直すところが無かった。
+
+`tsconfig.json` に `compilerOptions` が無いのは #1784 と同じ。
+`test/` も無いので probe 用に作って `include` に足してある。
+
+**このパッケージには `test` スクリプトが無い**が、probe は型レベルの表明で
+`tsc` が見るものなので、ランナーは要らない。`libReplacement` を `false` に
+戻すと probe の `TS2578` だけが出ることは確認済み。
+
+## `lambda-calculus-interpreter-core` の opt-in（2026-09-01）
+
+15 パッケージ目、`apps/` 側の 4 つ目。44 ファイルあるが**型・lint とも初回から
+0 件**だった。テストは 5 ファイル 11 件通過。
+
+### `apps/` の残りをまとめて測っておいた
+
+#1786 で「依存の opt-in 状況を先に見ておくとよい」と書いたので、
+候補 5 つを先に測った。
+
+| パッケージ                         |                                        main の上での型エラー |
+| :--------------------------------- | -----------------------------------------------------------: |
+| `tiny-router-observable`           | 6（全部 `libs/synstate` の中 → #1786 で #1781 の上に積んだ） |
+| `resize-observer-react-hooks`      |                                                            0 |
+| `react-utils`                      |                                                            0 |
+| `poll-discord-app`                 |                                                            0 |
+| `lambda-calculus-interpreter-core` |                                                   0（本 PR） |
+
+**測ってから選ぶと、`synstate` 待ちの 1 つを先に見分けられる。**
+残る `apps/` のうち `event-schedule-app` ・ `event-schedule-app-styled` 系は
+まだ測っていない。
+
+### `test/` を作る対象がまた 1 つ
+
+`include` は `./src` ・ `./scripts` ・ `./configs` だけだったので、
+`./test` を足して probe を置いた。このパッケージには `test` スクリプトが
+あるが、vitest の `include` は `src/**/*.test.mts` なので probe は拾われない
+（拾われても型レベルの表明なので実行するものが無い）。
+
+## `react-utils` の opt-in（2026-09-01）
+
+19 パッケージ目、`apps/` 側の 8 つ目。**型・lint とも初回から 0 件**。
+
+`tsconfig.json` の `paths` で `better-react-use-state` をソースから解決して
+いるので、#1786 で書いたとおり**依存のソースにも strict lib が適用される**。
+それでも 0 件だったので、`libs/better-react-use-state`（#1755 で opt-in 中）の
+ソースは既に strict lib で通ることが分かる。**依存の opt-in を待つ必要は無い。**
+
+`apps/` の残りは以下のとおりで、いずれも自前の修正は要らない。
+
+| パッケージ                                                                                               | 状況                          |
+| :------------------------------------------------------------------------------------------------------- | :---------------------------- |
+| `react-utils-styled` ・ `tiny-router-react-hooks` ・ `resize-observer-react-hooks` ・ `poll-discord-app` | 0 件（`main` の上でそのまま） |
+| `event-schedule-app-shared`                                                                              | 1 件、#1784 待ち              |
+| `lambda-calculus-interpreter-react`                                                                      | 6 件、#1781 待ち              |
+
+## `poll-discord-app` の opt-in（2026-09-01）
+
+20 パッケージ目、`apps/` 側の 9 つ目。**型・lint とも初回から 0 件**。
+
+`tsconfig.node-only.json` を継承する Node 側のアプリで、`discord.js` と
+`fs` / `path` を直接使うが、strict lib で落ちるところは無かった。
+**`apps/` で `paths` を一切持たない最初のパッケージ**でもあり、
+依存のソースを巻き込まないぶん測定は素直だった。
+
+`tsconfig.json` に `compilerOptions` が無かったのでブロックごと足し、
+`test/` を作って `include` に加えてある。`test` スクリプトは無い。
+
+## `react-utils-styled` の opt-in（2026-09-01）
+
+21 パッケージ目、`apps/` 側の 10 個目。**型・lint とも初回から 0 件**。
+
+`paths` で `react-utils` ・ `resize-observer-react-hooks` ・
+`better-react-use-state` の**3 つをソースから解決している**が、それでも 0 件
+だった。#1791（`react-utils`）と同じで、**依存のソースを巻き込んでも
+エラーが出ないなら、その依存の opt-in を待つ必要は無い**。
+
+`apps/` 側でソース解決した依存が問題になったのは、結局
+`libs/synstate`（#1786 ・ #1789 ・ #1790）と
+`apps/ts-fortress-types`（#1788 ・ #1790）の 2 つだけだった。
