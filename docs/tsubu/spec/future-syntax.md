@@ -14,6 +14,7 @@ ReScript の教訓(出力 TS が eject に耐える品質ではなかった)か�
 4. **フォーマット済み**: 出力はこのリポジトリの Prettier 設定に適合する。
 5. **最小ランタイム**: emit が挿入してよい依存は ts-data-forge の import のみ。ヘルパー関数のインライン生成はしない。
 6. **eject コマンド**: `eject` 一発で全ソースが TS に変換され、以後 transpiler なしでビルド・保守できる。これを CI で常時検証する(全テストを eject 後のコードでも実行する)。
+7. **書き方の保存(D-37)**: 独自構文は v1 + ライブラリの書き方と一対一に対応させ、emit は対応するライブラリ形へそのまま落とす。**最適化・正規化はしない**(同じ意味の複数の書き方は TS 側でも Tsubu v1 側でも維持する)。v1 → v2 の逆変換が常に可能で、「v1 → v2 → v1 が整形を除き恒等」を適合性コーパスで検証する。各候補は **v1 ライブラリ形を先に整備**してから構文を定義する。
 
 実装アプローチとしては「TS の fork parser + CST(concrete syntax tree)ベースの変換」が必要(通常の AST はコメント・空白を落とすため 1〜3 を満たせない)。候補技術の調査は TODO。
 
@@ -34,8 +35,8 @@ ReScript の教訓(出力 TS が eject に耐える品質ではなかった)か�
 
 ### なぜ Tsubu では前提が覆るか
 
-- (1) は**ネイティブ実装の制約**であり、transpiler には当てはまらない。さらに prelude が直接形 + カリー化形の二本立てなので、**既知のカリー化呼び出しは直接形へ最適化 emit できる**: `xs |> Arr.map(double) |> Arr.sum` → `Arr.sum(Arr.map(xs, double))`(カリー化のアロケーションゼロ、可読な TS)。未知の式は素直に `e(x)` の入れ子へ展開。
-- (3) はカリー化 API を標準に据えた Tsubu では「分裂」ではなく言語の同一性そのもの。[overload-survey.md](../overload-survey.md) 例 1 の「カリー化形二本立ての需要がパイプで縮む」接続も、直接形最適化 emit により「二本立ては人間向け API として残し、pipe 経由は直接形に落ちる」で整合する。
+- (1) は**ネイティブ実装の制約**であり、transpiler には当てはまらない。emit は ts-data-forge の `pipe` にそのまま対応させる: `xs |> Arr.map(double) |> Arr.sum` → `pipe(xs).map(Arr.map(double)).map(Arr.sum).value`(v1 ライブラリ形と一対一、逆変換可能)。~~既知のカリー化呼び出しを直接形 `Arr.sum(Arr.map(xs, double))` へ最適化 emit する~~ 案は **D-37 で撤回** — 多対一の変換で v1 → v2 の逆変換を壊し、ReScript のカリー化周りの `.ts` 出力で eject 品質を損ねたのと同じ問題になる。カリー化のアロケーションが問題になる場所はユーザーが直接形で書けばよく、それは v2 でもそのまま書ける。
+- (3) はカリー化 API を標準に据えた Tsubu では「分裂」ではなく言語の同一性そのもの。[overload-survey.md](../overload-survey.md) 例 1 の直接形 + カリー化形の二本立ては、v2 でも両方が書ける(パイプはカリー化形の糖衣で、直接形はそのまま残る — D-37)。
 - (2) **await の扱いだけは Tsubu でも残る論点(未定)**: 案 a = パイプ内 await 禁止(await は文で書く。最小)/ 案 b = F# 提案と同じ `|> await` 特別形を採用。案 a から始めるのが安全。
 
 ### リスク(D-20 に記録)
@@ -88,6 +89,7 @@ const parsed = Json.parse(text)?;   // Err ならこの関数から即 return Er
   [TypeScript の branded type `Int` と literal の相性問題](https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int#branded-type-%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%9F%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E5%BC%8A%E5%AE%B3)、[microsoft/TypeScript#53923](https://github.com/microsoft/TypeScript/issues/53923)。
 - **含意**: この改善は構文の追加(transpiler)では実現できず、**型検査器の拡張が必要**になる — bivariance の根本解決([classes.md](./classes.md))と同じく「v3: 独自型検査器」という段階を示唆する最初の具体的動機。仕様上は「brand 型による v1 近似」と「ネイティブ型としての理想形」を分けて記述していく。
 - **接続**: bitwise 演算子の再導入条件([banned-syntax.md](./banned-syntax.md) — `Int32` 導入後に厳密化して解禁)。
+- **`typeof` の narrowing 先も絞る(v2 以降)**: TS の `typeof x === 'number'` は `x` を `number` にしか絞れない。v2 以降では、`typeof` の結果を `number` ではなく `Int` 等のより厳しい型へ絞る機能も付ける(2026-09-05 追記)。実行時の `typeof` は `'number'` 一種類しか返さないので、`Int` への narrowing は transpiler が `Number.isInteger` 等の追加検査を emit する(意味の変更 — v2 以降でのみ可能)か、型検査器側の narrowing 規則を差し替える(v3)かのどちらかで実現する。どちらを採るかは候補 7 の設計時に決める。
 
 ## 候補 8: 関数宣言構文 `fn` とオーバーロード記法
 
@@ -127,4 +129,4 @@ v1 との接続: D-13(named function はオーバーロード時のみ)により
 
 ## 導入順(提案)
 
-依存関係と費用対効果から: 候補 5(構文変更なし・transpiler の骨格作り)→ 候補 6(トークン置換に近い低リスク変換)→ 候補 1(式の局所変換)→ 候補 4(制御フロー変換 — emit 品質の本丸)→ 候補 2(最大の構文追加)→ 候補 3(型主導 emit が必要なら最後)。候補 7 は transpiler ではなく型検査器の拡張(v3)なのでこの順序の外に置く。
+依存関係と費用対効果から: 候補 5(構文変更なし・transpiler の骨格作り)→ 候補 6(トークン置換に近い低リスク変換)→ 候補 1(式の局所変換)→ 候補 4(制御フロー変換 — emit 品質の本丸)→ 候補 2(最大の構文追加)→ 候補 3(型主導 emit が必要なら最後)。候補 7 は transpiler ではなく型検査器の拡張(第 3 層 — D-37)なのでこの順序の外に置く。各候補は着手前に「v1 ライブラリ形」と両向きの codemod を明記する(D-37)。

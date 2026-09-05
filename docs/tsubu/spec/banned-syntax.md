@@ -20,21 +20,21 @@ TS の構文のうちこの言語が持たないもの。「TS 全機能の網�
 | class parameter properties               | 明示的なフィールド宣言 |
 | `import foo = require(...)` / `export =` | ESM import/export      |
 
-## 提案(既存 eslint-config-typed の運用を仕様へ昇格)
+## 確定(2026-09-05 採用 — 既存 eslint-config-typed の運用を仕様へ昇格、D-27)
 
-| 構文                                   | 代替                                       | 理由                                       |
-| :------------------------------------- | :----------------------------------------- | :----------------------------------------- |
-| `as any` / `as never` / `@ts-ignore`   | 型ガード / `@ts-expect-error`(最終手段)    | 型システムの穴                             |
-| `in` 演算子(narrowing 用途)            | `isRecord` + `hasKey`                      | prototype chain を見る・narrowing が不正確 |
-| `+foo` / `"" + foo`(暗黙変換 idiom)    | `Number()` / `String()` / template literal | 暗黙変換                                   |
-| 異型の `+`(`"1" + 2`)                  | template literal                           | 暗黙変換                                   |
-| 文字列連結の `+`                       | template literal / `.join()`               | 可読性・型安全                             |
-| `new Array()`                          | 配列リテラル / `Arr.*`                     | 引数 1 個の挙動が罠                        |
-| `eval` / `new Function`                | —                                          | セキュリティ・静的解析不能                 |
-| 比較関数なしの `sort()`(string[] 以外) | 比較関数必須                               | デフォルトの文字列比較ソートは罠           |
-| 部分関数的な生の除算                   | `Num.div` + 非ゼロ検査                     | 0 除算                                     |
-| `with`                                 | —                                          | strict mode で既に禁止                     |
-| default export(設定ファイル以外)       | named export                               | [modules.md](./modules.md)                 |
+| 構文                                                                                 | 代替                                       | 理由                                                    |
+| :----------------------------------------------------------------------------------- | :----------------------------------------- | :------------------------------------------------------ |
+| `as any` / `as never` / `@ts-ignore`                                                 | 型ガード / `@ts-expect-error`(最終手段)    | 型システムの穴                                          |
+| `in` 演算子(narrowing 用途)                                                          | `isRecord` + `hasKey`                      | prototype chain を見る・narrowing が不正確              |
+| `+foo` / `"" + foo`(暗黙変換 idiom)                                                  | `Number()` / `String()` / template literal | 暗黙変換                                                |
+| 異型の `+`(`"1" + 2`)                                                                | template literal                           | 暗黙変換                                                |
+| 文字列連結の `+`                                                                     | template literal / `.join()`               | 可読性・型安全                                          |
+| `new Array()`                                                                        | 配列リテラル / `Arr.*`                     | 引数 1 個の挙動が罠                                     |
+| `eval` / `new Function`                                                              | —                                          | セキュリティ・静的解析不能                              |
+| 比較関数なしの `sort()`(string[] 以外)                                               | 比較関数必須                               | デフォルトの文字列比較ソートは罠                        |
+| 部分関数的な生の除算                                                                 | `Num.div` + 非ゼロ検査                     | 0 除算                                                  |
+| `with`                                                                               | —                                          | strict mode で既に禁止                                  |
+| default export(`export default` / `export { x as default }`、設定ファイルも含め全面) | named export                               | [modules.md](./modules.md)(D-28。ツールへの接続は D-36) |
 
 ## 確定(2026-08-27 採用)
 
@@ -53,7 +53,7 @@ TS の構文のうちこの言語が持たないもの。「TS 全機能の網�
 | `arguments`                                          | rest パラメータ                | 遺物                                                                                                                                                                 |
 | bitwise 演算子                                       | v1 では全面禁止                | 32bit 整数への暗黙変換が罠。>=v2 で `Int32` 等の数値型分類を導入した上で厳密化して再導入([future-syntax.md](./future-syntax.md) 候補 7)                              |
 | メソッド短縮記法(型・実装とも)                       | プロパティ形式の関数型 / arrow | **bivariance の温床**。[classes.md](./classes.md) 参照                                                                                                               |
-| `throw`(全面禁止)                                    | `Result` + `fromThrowable`     | エラーは `Result` に統一([exceptions.md](./exceptions.md))。`try..catch` も禁止提案                                                                                  |
+| `throw`(全面禁止)                                    | `Result` + `fromThrowable`     | エラーは `Result` に統一([exceptions.md](./exceptions.md))。`try..catch` も禁止(確定 2026-09-05 — D-27)                                                              |
 
 ## 確定(2026-08-29 採用)
 
@@ -76,11 +76,14 @@ TS の構文のうちこの言語が持たないもの。「TS 全機能の網�
 
 v1 では bitwise 演算子自体が禁止なのでこの混同は起こり得ないが、v2 で `Int32` とともに再導入する際の設計条件(結果型が boolean / number のどちらかで判定できること)として記録しておく。
 
-## 深掘り中(未定)
+## 確定(2026-09-05 採用)
 
-| 構文            | 論点                                                                                                                                                                                  |
-| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| getter / setter | class 全面禁止(D-12)により class 文脈は消滅。残る論点は **plain object の遅延評価のために getter を使いたいケース**のみ。禁止/許可の粒度(setter のみ禁止、get のみ許可等)を深掘りする |
+| 構文                            | 代替                                               | 理由                                                                                                                      |
+| :------------------------------ | :------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| getter / setter(object literal) | 明示的な関数プロパティ(`x: () => …`)/ memoize      | プロパティアクセスが関数呼び出しになる暗黙の制御フロー。setter は mutation。class 文脈は D-12 で消滅済み(D-33 — 両方禁止) |
+| `using` / `await using`         | `fromThrowable` に渡すコールバック内で明示的に解放 | v1 では禁止、採否は v2 で再検討(D-30)                                                                                     |
+
+論理代入演算子 `&&=` / `||=` / `??=` は禁止**しない**(`mut_` 変数に限り 3 つとも許可 — D-29、[booleans-and-logic.md](./booleans-and-logic.md))。
 
 ## 強制手段
 

@@ -21,7 +21,7 @@ interface A {
 
 class のメソッド宣言も同様にメソッド記法なので bivariant。したがって:
 
-- **規則(提案)**: interface / type / class において、メソッド短縮記法を禁止し、プロパティ形式の関数型・arrow function プロパティのみ許可する。class を書く場合、メソッドは `f = (x: A): B => ...` の形。
+- **規則(確定 2026-08-27 — [banned-syntax.md](./banned-syntax.md) のメソッド短縮記法禁止)**: interface / type / class において、メソッド短縮記法を禁止し、プロパティ形式の関数型・arrow function プロパティのみ許可する。class を書く場合、メソッドは `f = (x: A): B => ...` の形。
 - 代償: arrow プロパティは prototype ではなくインスタンスごとに関数が確保される(メモリ・生成コスト)。大量インスタンス化する型では問題になりうる。ただし後述の「closure ベース factory」へ寄せるなら、そもそも同じコスト構造なので新たな代償ではない。
 - 既存ルール: `@typescript-eslint/method-signature-style`(型側)がこの目的に使える。class 実装側は `class-methods-use-this` 等ではなく専用ルールが必要(要調査)。
 

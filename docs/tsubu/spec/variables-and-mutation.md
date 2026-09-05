@@ -4,7 +4,7 @@
 
 デフォルトは不変。mutation は不可能にはしないが、**明示的なマーカーを付けた場合のみ**許可する(ReScript の `let mut` くらいのバランス)。
 
-## v1 の規則(提案)
+## v1 の規則(確定 2026-09-05 — D-27)
 
 - `var` は禁止([banned-syntax.md](./banned-syntax.md))。
 - `const` がデフォルト。
@@ -20,7 +20,7 @@
 
 v1 チェッカーの `ignoreIdentifierPattern` は `^mut_` のみになる(現行 config からの変更点 — [enforcement-map.md](../enforcement-map.md))。
 
-## 外部コードとの境界(提案)
+## 外部コードとの境界(確定 2026-09-05 — D-27)
 
 外部ライブラリのコードは `mut_` prefix 規約を持たない。この規則が縛るのは**この言語のコードが宣言する識別子名**であって外部 API の名前ではない、と定義することで破綻を避ける:
 
@@ -39,7 +39,7 @@ v1 チェッカーの `ignoreIdentifierPattern` は `^mut_` のみになる(現�
 
 ```text
 let x = 0;        // 不変束縛(TS の const に transpile)
-let mut x = 0;    // 可変束縛(TS の let x に transpile。または let mut_x を維持するか → 未定)
+let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。eject 出力が v1 規則を満たす)
 ```
 
 独自構文を導入するなら `let` のみに統一する(ReScript/Rust 風。`const` キーワードは v2 の具象構文から除去)。TS との字面差分は増えるが、宣言キーワードの transpile(`let` → `const` / `let mut` → `let`)は機械的で eject 品質を損なわない。
@@ -60,4 +60,4 @@ let mut x = 0;    // 可変束縛(TS の let x に transpile。または let mut
 ## 未解決の論点
 
 - 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
-- **global 定義名の shadow は禁止に確定**(D-19 — `undefined` / `NaN` / 組み込みオブジェクト / global 型名を宣言名に使えない。[banned-syntax.md](./banned-syntax.md))。ユーザー変数同士の shadowing は、現行 config(`@typescript-eslint/no-shadow` の `hoist: 'all'`)が既に全面禁止していることが判明(2026-08-31)。現行運用の追認として**全面禁止を提案**へ昇格(ユーザー確認待ち)。
+- **global 定義名の shadow は禁止に確定**(D-19 — `undefined` / `NaN` / 組み込みオブジェクト / global 型名を宣言名に使えない。[banned-syntax.md](./banned-syntax.md))。ユーザー変数同士の shadowing は、現行 config(`@typescript-eslint/no-shadow` の `hoist: 'all'`)が既に全面禁止していることが判明(2026-08-31)。現行運用の追認として**全面禁止に確定**(2026-09-05 — D-27)。
