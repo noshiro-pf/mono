@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/index.ts apps/housing-loan-calculator-app/src/components/numeric-input/index.mts
+index 5d3453996..8da32c5dd 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/index.ts
++++ apps/housing-loan-calculator-app/src/components/numeric-input/index.mts
+@@ -1,3 +1,3 @@
+-export * from './percent-float-numeric-input';
+-export * from './year-numeric-input';
+-export * from './yen-numeric-input';
++export * from './percent-float-numeric-input.js';
++export * from './year-numeric-input.js';
++export * from './yen-numeric-input.js';

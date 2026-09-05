@@ -1,0 +1,166 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/store/store.ts apps/housing-loan-calculator-app/src/store/store.mts
+index f887ada02..cfc4a8ffd 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/store/store.ts
++++ apps/housing-loan-calculator-app/src/store/store.mts
+@@ -1,53 +1,75 @@
+-import { defaultValues, queryParamKey } from '../constants';
+-import { Router } from '../router';
+-import { PercentFloat, Yen, type RepaymentType, type Store } from '../types';
+-import { uriWithQueryParams } from '../utils';
+-
+-const [userInput$, nextUserInput] = createVoidEventEmitter();
+-
+-const { state: repaymentType$, setState: setRepaymentType_ } =
+-  createState<RepaymentType>(defaultValues.repaymentType);
++import {
++  combine,
++  createEventEmitter,
++  createState,
++  type InitializedObservable,
++  map,
++  withCurrentValueFrom,
++} from 'synstate';
++import { Num, pipe } from 'ts-data-forge';
++import { defaultValues, queryParamKey } from '../constants/index.mjs';
++import { Router } from '../router.mjs';
++import {
++  PercentFloat,
++  type RepaymentType,
++  type Store,
++  Year,
++  Yen,
++} from '../types/index.mjs';
++import { uriWithQueryParams } from '../utils/index.mjs';
++
++const [userInput$, nextUserInput] = createEventEmitter();
++
++const [repaymentType$, setRepaymentType_] = createState<RepaymentType>(
++  defaultValues.repaymentType,
++);
+ 
+ const setRepaymentType = (value: RepaymentType): void => {
+   setRepaymentType_(value);
++
+   nextUserInput();
+ };
+ 
+ // 頭金（円）
+-const { state: downPaymentManYen$, setState: setDownPaymentManYen_ } =
+-  createState<Yen>(defaultValues.downPaymentManYen);
++const [downPaymentManYen$, setDownPaymentManYen_] = createState<Yen>(
++  defaultValues.downPaymentManYen,
++);
+ 
+ const setDownPaymentManYen = (value: Yen): void => {
+   setDownPaymentManYen_(value);
++
+   nextUserInput();
+ };
+ 
+ // 物件の金額（円）
+-const { state: propertyPriceManYen$, setState: setPropertyPriceManYen_ } =
+-  createState<Yen>(defaultValues.propertyPriceManYen);
++const [propertyPriceManYen$, setPropertyPriceManYen_] = createState<Yen>(
++  defaultValues.propertyPriceManYen,
++);
+ 
+ const setPropertyPriceManYen = (value: Yen): void => {
+   setPropertyPriceManYen_(value);
++
+   nextUserInput();
+ };
+ 
+ // 借入期間（年）
+-const { state: borrowingPeriodYear$, setState: setBorrowingPeriodYear_ } =
+-  createState<Uint32>(toUint32(defaultValues.borrowingPeriodYear));
++const [borrowingPeriodYear$, setBorrowingPeriodYear_] = createState<Year>(
++  defaultValues.borrowingPeriodYear,
++);
+ 
+-const setBorrowingPeriodYear = (value: Uint32): void => {
++const setBorrowingPeriodYear = (value: Year): void => {
+   setBorrowingPeriodYear_(value);
++
+   nextUserInput();
+ };
+ 
+ // 年当たりの金利
+-const {
+-  state: interestRatePercentPerYear$,
+-  setState: setInterestRatePercentPerYear_,
+-} = createState<PercentFloat>(defaultValues.interestRatePercentPerYear);
++const [interestRatePercentPerYear$, setInterestRatePercentPerYear_] =
++  createState<PercentFloat>(defaultValues.interestRatePercentPerYear);
+ 
+ const setInterestRatePercentPerYear = (value: PercentFloat): void => {
+   setInterestRatePercentPerYear_(value);
++
+   nextUserInput();
+ };
+ 
+@@ -57,7 +79,7 @@ const store$: InitializedObservable<Store> = combine([
+   propertyPriceManYen$,
+   borrowingPeriodYear$,
+   interestRatePercentPerYear$,
+-]).chain(
++]).pipe(
+   map(
+     ([
+       repaymentType,
+@@ -84,17 +106,18 @@ Router.state.subscribe(({ searchParams: query }) => {
+     interestRatePerMonth: query.get(queryParamKey.interestRatePerMonth),
+   } as const;
+ 
++  // `mapOptional` has no successor; `pipe(...).mapNullable` is the same
++  // mapping, and `URLSearchParams.get` returns `null` rather than `undefined`,
++  // which `mapNullable` also covers.
+   const paramsAsNumber = {
+-    downPayment: mapOptional(paramsAsStr.downPayment, Num.from),
+-    propertyPrice: mapOptional(paramsAsStr.propertyPrice, Num.from),
+-    borrowingPeriodMonth: mapOptional(
+-      paramsAsStr.borrowingPeriodMonth,
++    downPayment: pipe(paramsAsStr.downPayment).mapNullable(Num.from).value,
++    propertyPrice: pipe(paramsAsStr.propertyPrice).mapNullable(Num.from).value,
++    borrowingPeriodMonth: pipe(paramsAsStr.borrowingPeriodMonth).mapNullable(
+       Num.from,
+-    ),
+-    interestRatePerMonth: mapOptional(
+-      paramsAsStr.interestRatePerMonth,
++    ).value,
++    interestRatePerMonth: pipe(paramsAsStr.interestRatePerMonth).mapNullable(
+       Num.from,
+-    ),
++    ).value,
+   } as const;
+ 
+   if (
+@@ -103,15 +126,19 @@ Router.state.subscribe(({ searchParams: query }) => {
+   ) {
+     setRepaymentType_(paramsAsStr.repaymentType);
+   }
++
+   if (paramsAsNumber.downPayment !== undefined) {
+     setDownPaymentManYen_(Yen.cast(paramsAsNumber.downPayment));
+   }
++
+   if (paramsAsNumber.propertyPrice !== undefined) {
+     setPropertyPriceManYen_(Yen.cast(paramsAsNumber.propertyPrice));
+   }
++
+   if (paramsAsNumber.borrowingPeriodMonth !== undefined) {
+-    setBorrowingPeriodYear_(toUint32(paramsAsNumber.borrowingPeriodMonth));
++    setBorrowingPeriodYear_(Year.cast(paramsAsNumber.borrowingPeriodMonth));
+   }
++
+   if (paramsAsNumber.interestRatePerMonth !== undefined) {
+     setInterestRatePercentPerYear_(
+       PercentFloat.cast(paramsAsNumber.interestRatePerMonth),
+@@ -119,7 +146,7 @@ Router.state.subscribe(({ searchParams: query }) => {
+   }
+ });
+ 
+-userInput$.chain(withCurrentValueFrom(store$)).subscribe(([_, store]) => {
++userInput$.pipe(withCurrentValueFrom(store$)).subscribe(([_, store]) => {
+   Router.push(
+     uriWithQueryParams('/', [
+       [queryParamKey.repaymentType, store.repaymentType],

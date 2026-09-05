@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/to-percent-string.ts apps/cant-stop-probability-app/src/functions/to-percent-string.mts
+index 5eba00a06..17d83bfa9 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/to-percent-string.ts
++++ apps/cant-stop-probability-app/src/functions/to-percent-string.mts
+@@ -1,2 +1,2 @@
+ export const toPercentString = (probability: number): string =>
+-  `${(probability * 100).toFixed(1)}%`;
++  `${(probability * 100).toFixed(1)}%` as const;

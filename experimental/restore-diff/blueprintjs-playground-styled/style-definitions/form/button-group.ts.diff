@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/button-group.ts experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/button-group.ts
+deleted file mode 100644
+index 7e385f69e..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/button-group.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-export const ButtonGroup = styled.div`
+-  display: inline-flex;
+-`;
+-
+-export const ButtonGroupVertical = styled(ButtonGroup)`
+-  align-items: stretch;
+-  flex-direction: column;
+-  vertical-align: top;
+-`;

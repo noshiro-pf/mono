@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/constants/index.ts apps/housing-loan-calculator-app/src/constants/index.mts
+index da2a53e9f..b135ab0d1 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/constants/index.ts
++++ apps/housing-loan-calculator-app/src/constants/index.mts
+@@ -1,3 +1,3 @@
+-export * from './default-values';
+-export * from './dictionary';
+-export * from './query-params';
++export * from './default-values.mjs';
++export * from './dictionary/index.mjs';
++export * from './query-params.mjs';

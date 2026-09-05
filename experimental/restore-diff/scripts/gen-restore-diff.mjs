@@ -61,6 +61,28 @@ const PAIRS = [
     'apps/react-blueprintjs-utils',
   ],
   ['experimental/packages/apps/event-schedule-app', 'apps/event-schedule-app'],
+
+  // Restored after the step-3 batch, one pull request each.
+  [
+    'experimental/packages/apps/lambda-calculus-interpreter-react',
+    'apps/lambda-calculus-interpreter-react',
+  ],
+  [
+    'experimental/packages/utils/better-preact-use-state',
+    'libs/better-preact-use-state',
+  ],
+  [
+    'experimental/packages/apps/cant-stop-probability-app',
+    'apps/cant-stop-probability-app',
+  ],
+  [
+    'experimental/packages/apps/housing-loan-calculator-app',
+    'apps/housing-loan-calculator-app',
+  ],
+  [
+    'experimental/packages/apps/blueprintjs-playground-styled',
+    'apps/blueprintjs-playground-styled',
+  ],
 ];
 
 /**

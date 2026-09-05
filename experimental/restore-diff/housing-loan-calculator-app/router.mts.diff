@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/router.ts apps/housing-loan-calculator-app/src/router.mts
+index b76d5341a..222221518 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/router.ts
++++ apps/housing-loan-calculator-app/src/router.mts
+@@ -1 +1,3 @@
++import { createRouter } from 'tiny-router-observable';
++
+ export const Router = createRouter();

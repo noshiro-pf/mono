@@ -1,0 +1,8 @@
+diff --git experimental/packages/utils/better-preact-use-state/src/hooks/index.mts experimental/packages/utils/better-preact-use-state/src/hooks/index.mts
+deleted file mode 100644
+index db2dd45b5..000000000
+--- experimental/packages/utils/better-preact-use-state/src/hooks/index.mts
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export * from './use-bool-state.mjs';
+-export * from './use-state.mjs';

@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/summary-section/index.ts apps/housing-loan-calculator-app/src/components/summary-section/index.mts
+index c4f5f29d7..0d25e6978 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/summary-section/index.ts
++++ apps/housing-loan-calculator-app/src/components/summary-section/index.mts
+@@ -1,2 +1,2 @@
+-export * from './data-item';
+-export * from './summary-section';
++export * from './data-item.js';
++export * from './summary-section.js';

@@ -1,0 +1,51 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/components/input-group-view.tsx apps/blueprintjs-playground-styled/src/components/input-group-view.tsx
+index 97f86ec4b..e9bbf885c 100644
+--- experimental/packages/apps/blueprintjs-playground-styled/src/components/input-group-view.tsx
++++ apps/blueprintjs-playground-styled/src/components/input-group-view.tsx
+@@ -1,9 +1,22 @@
+-import { ptInput } from '../style-definitions';
++import { css } from '@emotion/react';
++import type * as React from 'react';
++import { ptInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
+ 
+-type Props = React.DetailedHTMLProps<
+-  React.InputHTMLAttributes<HTMLInputElement>,
+-  HTMLInputElement
+->;
++/**
++ * Only the four attributes this view forwards.
++ *
++ * The pre-restoration source typed these props as the whole of
++ * `React.DetailedHTMLProps<React.InputHTMLAttributes<…>, …>`, which
++ * `ts-restrictions/check-destructuring-completeness` rejects: destructuring
++ * four names out of some three hundred hides what the component ignores.
++ */
++type Props = Readonly<{
++  value?: string;
++  placeholder?: string;
++  disabled?: boolean;
++  onChange?: React.ChangeEventHandler<HTMLInputElement>;
++}>;
+ 
+ export const InputGroupView = memoNamed<Props>(
+   'InputGroupView',
+@@ -13,11 +26,13 @@ export const InputGroupView = memoNamed<Props>(
+         display: block;
+         position: relative;
+ 
+-        ${disabled === true
+-          ? css`
+-              cursor: not-allowed;
+-            `
+-          : css``}
++        ${
++          disabled === true
++            ? css`
++                cursor: not-allowed;
++              `
++            : css``
++        }
+       `}
+     >
+       <input

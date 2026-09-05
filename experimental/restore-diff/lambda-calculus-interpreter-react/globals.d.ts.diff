@@ -1,0 +1,14 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-react/src/globals.d.ts experimental/packages/apps/lambda-calculus-interpreter-react/src/globals.d.ts
+deleted file mode 100644
+index 84ed6e247..000000000
+--- experimental/packages/apps/lambda-calculus-interpreter-react/src/globals.d.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/// <reference types="@noshiro/global-better-react-use-state" />
+-/// <reference types="@noshiro/global-emotion-react" />
+-/// <reference types="@noshiro/global-emotion-styled" />
+-/// <reference types="@noshiro/global-react" />
+-/// <reference types="@noshiro/global-react-utils" />
+-/// <reference types="@noshiro/global-syncflow" />
+-/// <reference types="@noshiro/global-syncflow-react-hooks" />
+-/// <reference types="@noshiro/global-ts-utils" />

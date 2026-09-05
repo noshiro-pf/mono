@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/repayment-type-radio-group.tsx apps/housing-loan-calculator-app/src/components/config-section/repayment-type-radio-group.tsx
+index 19ce00de8..8162adcd1 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/repayment-type-radio-group.tsx
++++ apps/housing-loan-calculator-app/src/components/config-section/repayment-type-radio-group.tsx
+@@ -1,5 +1,8 @@
+ import { Radio, RadioGroup } from '@blueprintjs/core';
+-import { type RepaymentType } from '../../types';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { dict } from '../../constants/index.mjs';
++import { type RepaymentType } from '../../types/index.mjs';
+ 
+ type Props = Readonly<{
+   repaymentType: RepaymentType;
+@@ -9,9 +12,10 @@ type Props = Readonly<{
+ export const RepaymentTypeRadioGroup = memoNamed<Props>(
+   'RepaymentTypeRadioGroup',
+   ({ repaymentType, onRepaymentTypeChange }) => {
+-    const onChange = useCallback(
+-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+-      (ev: React.FormEvent<HTMLInputElement>) => {
++    const onChange = React.useCallback<
++      NonNullable<React.ComponentProps<typeof RadioGroup>['onChange']>
++    >(
++      (ev) => {
+         onRepaymentTypeChange(
+           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+           ev.currentTarget.value as RepaymentType,

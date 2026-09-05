@@ -1,0 +1,8 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-react/src/components/index.ts apps/lambda-calculus-interpreter-react/src/components/index.mts
+index 24ef901a6..ab0865d34 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-react/src/components/index.ts
++++ apps/lambda-calculus-interpreter-react/src/components/index.mts
+@@ -1,2 +1 @@
+-export * from './app';
+-export * from './code-area';
++export * from './code-area.js';

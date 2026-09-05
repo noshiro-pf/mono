@@ -1,0 +1,27 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/types/two-dice-sum-value.ts apps/cant-stop-probability-app/src/types/two-dice-sum-value.mts
+index 1aa6f6362..0a465f015 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/types/two-dice-sum-value.ts
++++ apps/cant-stop-probability-app/src/types/two-dice-sum-value.mts
+@@ -1,17 +1,13 @@
+-import * as t from '@noshiro/io-ts';
+-import { type DiceValue } from './dice-value';
++import * as t from 'ts-fortress';
++import { type DiceValue } from './dice-value.mjs';
+ 
+-const twoDiceSumValueType = t.uintRange({
+-  defaultValue: 2,
+-  start: 2,
+-  end: 13,
+-});
++const twoDiceSumValueType = t.uintRangeInclusive(2, 12, { defaultValue: 2 });
+ 
+ export type TwoDiceSumValue = t.TypeOf<typeof twoDiceSumValueType>;
+ 
+-export const toTwoDiceSumValue = twoDiceSumValueType.cast;
++export const asTwoDiceSumValue = twoDiceSumValueType.cast;
+ 
+ export const isTwoDiceSumValue = twoDiceSumValueType.is;
+ 
+ export const addDiceValues = (a: DiceValue, b: DiceValue): TwoDiceSumValue =>
+-  toTwoDiceSumValue(a + b);
++  asTwoDiceSumValue(a + b);

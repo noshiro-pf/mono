@@ -1,5 +1,5 @@
 diff --git experimental/packages/apps/event-schedule-app/src/api/crud/fetch-event-list.ts apps/event-schedule-app/src/api/crud/fetch-event-list.mts
-index 406928263..8112ef229 100644
+index 406928263..2a6a02410 100644
 --- experimental/packages/apps/event-schedule-app/src/api/crud/fetch-event-list.ts
 +++ apps/event-schedule-app/src/api/crud/fetch-event-list.mts
 @@ -1,6 +1,7 @@
@@ -12,7 +12,7 @@ index 406928263..8112ef229 100644
  
  const fbFetchEventListOfUser = httpsCallable(
    fbFunctions,
-@@ -34,13 +35,13 @@ export const fetchEventListOfUser = ({
+@@ -34,16 +35,16 @@ export const fetchEventListOfUser = ({
      if (Result.isErr(result)) {
        return Result.err({
          type: 'others' as const,
@@ -27,4 +27,8 @@ index 406928263..8112ef229 100644
 +    if (!Arr.isArray(response) || !response.every(EventListItem.is)) {
        return Result.err({
          type: 'wrong-type-response' as const,
-         message: `response should be an array of EventListItem.`,
+-        message: `response should be an array of EventListItem.`,
++        message: 'response should be an array of EventListItem.',
+       });
+     }
+ 

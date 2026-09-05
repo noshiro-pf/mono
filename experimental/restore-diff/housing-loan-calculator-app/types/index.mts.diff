@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/types/index.ts apps/housing-loan-calculator-app/src/types/index.mts
+index a1f15c901..e0b337441 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/types/index.ts
++++ apps/housing-loan-calculator-app/src/types/index.mts
+@@ -1,6 +1,6 @@
+-export * from './calculated-values';
+-export * from './percent-float';
+-export * from './repayment-type';
+-export * from './store';
+-export * from './year';
+-export * from './yen';
++export * from './calculated-values.mjs';
++export * from './percent-float.mjs';
++export * from './repayment-type.mjs';
++export * from './store.mjs';
++export * from './year.mjs';
++export * from './yen.mjs';

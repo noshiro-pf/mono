@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/dictionary.ts experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/dictionary.ts
+deleted file mode 100644
+index 214d2afd4..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/dictionary.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export const dict = {} as const;

@@ -1,0 +1,15 @@
+diff --git apps/cant-stop-probability-app/src/css.d.mts apps/cant-stop-probability-app/src/css.d.mts
+new file mode 100644
+index 000000000..9594ceeb1
+--- /dev/null
++++ apps/cant-stop-probability-app/src/css.d.mts
+@@ -0,0 +1,9 @@
++/**
++ * `main.tsx` imports `./index.css` for its side effect, which a bundler
++ * resolves but TypeScript does not. The pre-restoration app got this from
++ * `/// <reference types="vite/client" />` in `src/vite-env.d.ts`, alongside the
++ * `@noshiro/global-*` references that made `styled`, `css`, `pipe` and the rest
++ * implicit globals. Those are gone and the imports are explicit now; `vite` is
++ * not a dependency here, because nothing in this package builds.
++ */
++declare module '*.css' {}

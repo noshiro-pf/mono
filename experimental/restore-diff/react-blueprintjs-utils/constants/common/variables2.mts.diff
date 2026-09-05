@@ -1,13 +1,16 @@
 diff --git experimental/packages/utils/react-blueprintjs-utils/src/constants/common/variables2.mts apps/react-blueprintjs-utils/src/constants/common/variables2.mts
-index 508bb05b5..bb29f10a9 100644
+index 508bb05b5..57bbaea61 100644
 --- experimental/packages/utils/react-blueprintjs-utils/src/constants/common/variables2.mts
 +++ apps/react-blueprintjs-utils/src/constants/common/variables2.mts
-@@ -73,7 +73,9 @@ export const ptDarkElevationShadow4 = joinCssStr(
+@@ -72,8 +72,10 @@ export const ptDarkElevationShadow4 = joinCssStr(
+ );
  
  // Transitions
- export const ptTransitionEase = `cubic-bezier(0.4, 1, 0.75, 0.9)`;
+-export const ptTransitionEase = `cubic-bezier(0.4, 1, 0.75, 0.9)`;
+-export const ptTransitionEaseBounce = `cubic-bezier(0.54, 1.12, 0.38, 1.11)`;
++export const ptTransitionEase = 'cubic-bezier(0.4, 1, 0.75, 0.9)';
 +
- export const ptTransitionEaseBounce = `cubic-bezier(0.54, 1.12, 0.38, 1.11)`;
++export const ptTransitionEaseBounce = 'cubic-bezier(0.54, 1.12, 0.38, 1.11)';
 +
  export const ptTransitionDuration = '100ms';
  

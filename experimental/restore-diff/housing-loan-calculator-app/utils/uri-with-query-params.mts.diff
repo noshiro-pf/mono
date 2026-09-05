@@ -1,0 +1,29 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/utils/uri-with-query-params.ts apps/housing-loan-calculator-app/src/utils/uri-with-query-params.mts
+index 569f4a113..18fffba61 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/utils/uri-with-query-params.ts
++++ apps/housing-loan-calculator-app/src/utils/uri-with-query-params.mts
+@@ -1,4 +1,6 @@
+-import { Router } from '../router';
++import { withSlash } from 'tiny-router-observable';
++import { Arr } from 'ts-data-forge';
++import { type DeepReadonly } from 'ts-type-forge';
+ 
+ export const uriWithQueryParams = (
+   uri: string,
+@@ -10,12 +12,13 @@ export const uriWithQueryParams = (
+     ([_, value]) => value !== undefined,
+   );
+ 
+-  const normalizedUri = Router.utils.withSlash(uri);
++  const normalizedUri = withSlash(uri);
+ 
+-  if (nonNullQueryParameters.length === 0) {
++  if (Arr.isEmpty(nonNullQueryParameters)) {
+     return normalizedUri;
+   }
++
+   return `${normalizedUri}?${nonNullQueryParameters
+-    .map(([key, value]) => (isNotUndefined(value) ? `${key}=${value}` : ''))
++    .map(([key, value]) => (value !== undefined ? `${key}=${value}` : ''))
+     .join('&')}`;
+ };

@@ -1,0 +1,35 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/store/calculated-values.ts apps/housing-loan-calculator-app/src/store/calculated-values.mts
+index b09cddc98..ebfb607be 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/store/calculated-values.ts
++++ apps/housing-loan-calculator-app/src/store/calculated-values.mts
+@@ -1,15 +1,21 @@
+-import { merge } from '@noshiro/syncflow';
+-import { calcAll } from '../functions';
+-import { store$ } from './store';
++import {
++  debounce,
++  type InitializedObservable,
++  map,
++  mapTo,
++  merge,
++  withInitialValue,
++} from 'synstate';
++import { calcAll } from '../functions/index.mjs';
++import { store$ } from './store.mjs';
+ 
+ const calcAllSources$ = store$;
+ 
+ export const calculatedValues$ = calcAllSources$
+-  .chain(debounceTime(500))
+-  .chain(map(calcAll));
++  .pipe(debounce(500))
++  .pipe(map(calcAll));
+ 
+-// eslint-disable-next-line @typescript-eslint/no-deprecated
+ export const isCalculating$: InitializedObservable<boolean> = merge([
+-  calcAllSources$.chain(mapTo(true)),
+-  calculatedValues$.chain(mapTo(false)),
+-]).chain(setInitialValue(false));
++  calcAllSources$.pipe(mapTo(true)),
++  calculatedValues$.pipe(mapTo(false)),
++]).pipe(withInitialValue(false));

@@ -1,0 +1,51 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/constants/selected-3-list.ts apps/cant-stop-probability-app/src/constants/selected-3-list.mts
+index 0c8a44567..290a2329e 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/constants/selected-3-list.ts
++++ apps/cant-stop-probability-app/src/constants/selected-3-list.mts
+@@ -1,22 +1,28 @@
+-import { type TwoDiceSumValue } from '../types';
+-import { twoDiceSumSet } from './two-dice-sum-set';
++import { type FixedLengthTuple } from 'ts-type-forge';
++import { type TwoDiceSumValue } from '../types/index.mjs';
++import { twoDiceSumSet } from './two-dice-sum-set.mjs';
+ 
+-const t = twoDiceSumSet();
++const values: readonly TwoDiceSumValue[] = twoDiceSumSet().toArray();
+ 
+-export const selected3List = (): readonly ArrayOfLength<
++/**
++ * Every strictly ascending triple of column numbers.
++ *
++ * The pre-restoration version wrote this as three nested `for` loops that
++ * `continue`d past `y <= x` and `z <= y`, then sorted each triple. Slicing
++ * says the same thing directly: each element is drawn from beyond the last,
++ * so the result is ascending by construction and there is nothing left to
++ * sort.
++ */
++export const selected3List = (): readonly FixedLengthTuple<
+   3,
+   TwoDiceSumValue
+->[] => {
+-  const mut_result: ArrayOfLength<3, TwoDiceSumValue>[] = [];
+-
+-  for (const x of t) {
+-    for (const y of t) {
+-      if (y <= x) continue;
+-      for (const z of t) {
+-        if (z <= y) continue;
+-        mut_result.push(Tpl.sorted([x, y, z] as const));
+-      }
+-    }
+-  }
+-  return mut_result;
+-};
++>[] =>
++  values.flatMap((x, xIndex) =>
++    values
++      .slice(xIndex + 1)
++      .flatMap((y, yOffset) =>
++        values
++          .slice(xIndex + yOffset + 2)
++          .map((z): FixedLengthTuple<3, TwoDiceSumValue> => [x, y, z]),
++      ),
++  );

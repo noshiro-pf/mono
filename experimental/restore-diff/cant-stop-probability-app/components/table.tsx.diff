@@ -1,0 +1,56 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/components/table.tsx apps/cant-stop-probability-app/src/components/table.tsx
+index cac6dd871..52cfe6e5c 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/components/table.tsx
++++ apps/cant-stop-probability-app/src/components/table.tsx
+@@ -1,8 +1,10 @@
+ import { HTMLTable } from '@blueprintjs/core';
+-import { BpButton, BpInput } from '@noshiro/react-blueprintjs-utils';
+-import { denom, separator } from '../constants';
+-import { toPercentString } from '../functions';
+-import { type ResultRow } from '../types';
++import styled from '@emotion/styled';
++import { BpButton, BpInput } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { denom, separator } from '../constants/index.mjs';
++import { toPercentString } from '../functions/index.mjs';
++import { type ResultRow } from '../types/index.mjs';
+ 
+ type Props = Readonly<{
+   sortByDice: () => void;
+@@ -21,13 +23,17 @@ export const ProbabilityTable = memoNamed<Props>(
+     onFilterByStringChange,
+     filtered,
+   }) => (
+-    <HTMLTable bordered={true} striped={true}>
++    <HTMLTable bordered striped>
+       <thead>
+         <tr>
+           <Th colSpan={3}>
+             <NoWrapBox>
+               <span>{'選択した列の数字'}</span>
+-              <BpButton icon={'sort'} minimal={true} onClick={sortByDice} />
++              <BpButton
++                icon={'sort'}
++                variant={'minimal'}
++                onClick={sortByDice}
++              />
+             </NoWrapBox>
+           </Th>
+           <Th>
+@@ -35,7 +41,7 @@ export const ProbabilityTable = memoNamed<Props>(
+               <span>{'少なくとも1列当たる確率'}</span>
+               <BpButton
+                 icon={'sort'}
+-                minimal={true}
++                variant={'minimal'}
+                 onClick={sortByProbability}
+               />
+             </NoWrapBox>
+@@ -111,6 +117,7 @@ export const ProbabilityTable = memoNamed<Props>(
+ const Th = styled.th`
+   text-align: center !important;
+ `;
++
+ const Td = styled.td`
+   text-align: center !important;
+ `;

@@ -1,5 +1,5 @@
 diff --git experimental/packages/utils/tiny-router-observable/src/router.mts apps/tiny-router-observable/src/router.mts
-index c9a7b5df0..91a551129 100644
+index c9a7b5df0..bba4abd44 100644
 --- experimental/packages/utils/tiny-router-observable/src/router.mts
 +++ apps/tiny-router-observable/src/router.mts
 @@ -1,10 +1,7 @@
@@ -118,11 +118,21 @@ index c9a7b5df0..91a551129 100644
      updateState();
    };
  
-@@ -172,13 +177,11 @@ export const createRouter = (): Router => {
+@@ -171,14 +176,20 @@ export const createRouter = (): Router => {
+   };
  };
  
- const withSlash = (path: string): string =>
+-const withSlash = (path: string): string =>
 -  path.endsWith('/')
++/**
++ * Normalizes a path so it ends in a slash, moving a query string after it.
++ *
++ * Exported as well as reachable through `Router.utils`, so that a caller who
++ * only needs this pure transformation does not have to construct a router —
++ * `createRouter` reads `window.location` at call time, which a Node test
++ * cannot do.
++ */
++export const withSlash = (path: string): string =>
 +  path.endsWith('/') || path.includes('/?')
      ? path
 -    : path.includes('/?')
