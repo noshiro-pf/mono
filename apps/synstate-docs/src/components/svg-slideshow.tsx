@@ -32,7 +32,7 @@ export const SvgSlideshow = React.memo<Props>((props) => {
   }, [numSlides]);
 
   const fileName = React.useMemo(
-    () => String(index + 1).padStart(2, '0'),
+    () => (index + 1).toString().padStart(2, '0'),
     [index],
   );
 
