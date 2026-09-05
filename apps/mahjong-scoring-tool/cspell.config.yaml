@@ -1,0 +1,11 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # Plural of ELO, the rating system `src/elo-rating.mts` implements.
+  - elos
+  # "decorate-sort-undecorate", the name of the shuffle in `src/shuffled.mts`.
+  - undecorate
