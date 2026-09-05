@@ -253,8 +253,8 @@ const drawSnake = (
 
     mut_ctx.fillStyle =
       mut_i === 0
-        ? `rgba(59, 130, 246, ${String(alpha)})`
-        : `rgba(147, 197, 253, ${String(alpha)})`;
+        ? `rgba(59, 130, 246, ${alpha.toString()})`
+        : `rgba(147, 197, 253, ${alpha.toString()})`;
 
     mut_ctx.fill();
   }
