@@ -1,0 +1,46 @@
+/* MUI's default theme asks for Roboto. Loaded here rather than as four
+   side-effect `import` statements in `main.tsx`: `import-x/extensions` forbids
+   a file extension on a package subpath, and CSS `@import` is what a bundler
+   resolves anyway. */
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* only supported on Safari and Chrome */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  opacity: 0.3;
+  box-shadow: 0 0 4px #39d6dd;
+  background-color: #39d6dd;
+}
