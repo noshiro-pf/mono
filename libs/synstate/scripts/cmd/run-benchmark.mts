@@ -95,7 +95,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
 
     if (check !== expectedCheck) {
       console.error(
-        `❌ ${entry.name}: expected ${String(expectedCheck)} but got ${String(check)}`,
+        `❌ ${entry.name}: expected ${expectedCheck.toString()} but got ${check.toString()}`,
       );
 
       process.exit(1);
