@@ -2,6 +2,11 @@ import { type ReadonlyRecord } from 'ts-type-forge';
 
 export const fetchHolidaysJson = (): Promise<ReadonlyRecord<string, string>> =>
   fetch('https://holidays-jp.github.io/api/v1/date.json').then(
+    // `Response.json()` returns `unknown` under the strict standard library
+    // rather than `any`, so this cast is now flagged. The endpoint's shape is
+    // fixed (`{ "YYYY-MM-DD": "名称" }`), and validating it here would change
+    // what the app does on unexpected data.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (res) => res.json() as Promise<ReadonlyRecord<string, string>>,
   );
 
