@@ -1750,6 +1750,41 @@ return Result.err(`❌ Failed to embed JSDoc examples: ${String(error)}`);
 `embed-examples-in-jsdoc.mts` を持つ他のパッケージにも同じ行が残っている
 可能性が高いので、opt-in のたびに 1 件ずつ出てくることになる。
 
+## `synstate-react-hooks-compat` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** `embed-examples-in-jsdoc.mts` の 117 行 60 桁の
+`String(error)`。**16 件目にして、この行の最後の 1 つ。**
+
+### `embed-examples-in-jsdoc.mts` の重複は解消した
+
+同じスクリプトを持つ 7 パッケージすべてで、同じ行を直し終えた。
+
+| パッケージ                    | 直した PR |
+| :---------------------------- | :-------- |
+| `ts-repo-utils`               | #1618     |
+| `ts-fortress`                 | #1657     |
+| `ts-data-forge`               | #1745     |
+| `synstate-react-hooks`        | #1752     |
+| `synstate-preact-hooks`       | #1761     |
+| `synstate-preact-signals`     | #1765     |
+| `synstate-react-hooks-compat` | 本 PR     |
+
+**7 つのパッケージが同じスクリプトのコピーを持っている**という事実自体は
+残っている。`String(...)` は片付いたが、次に同じ種類の指摘が出れば、また
+7 箇所を 7 回直すことになる。共通化する価値はあるが、それは opt-in とは別の
+作業である。
+
+### opt-in できるパッケージはこれで尽きた
+
+独立して進められるものは無くなった。残りはいずれも**判断待ち**である。
+
+| 対象                  | 待っているもの                                    |
+| :-------------------- | :------------------------------------------------ |
+| `synstate`            | `samples/docs-site/why-reactive/` の扱い（#1761） |
+| `eslint-config-typed` | #1745 のマージ（型 5 件はそちらで解決済み）       |
+| `ts-std-forge`        | #1741 のマージ（`safe-number/impl/` が重なる）    |
+| `ts-type-forge`       | 意図的な opt-out。#1764 に観測を記録              |
+
 ### 確認したこと
 
 - `libReplacement: true` で type-check・lint とも 0 件、テスト 6 件も通る
@@ -2045,3 +2080,31 @@ strict lib では `Response.json()` が `any` ではなく `unknown` を返す�
 のどちらかになる。これは型安全性ではなく**ドキュメントの判断**なので、
 勝手に決めずに残した。samples がそのままでよいと決まれば、`TimerId` の 1 行と
 合わせて opt-in できる。
+
+## `synstate-preact-signals` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** #1752 で測ったとおり、
+`scripts/cmd/embed-examples-in-jsdoc.mts` の 117 行 60 桁の `String(error)`
+1 件だけ。**15 件目**。
+
+残るのは `synstate-react-hooks-compat` の同じ 1 件で、これも同じ位置である。
+
+### `embed-examples-in-jsdoc.mts` の重複について
+
+このスクリプトを持つパッケージすべてに同じ行があり、opt-in のたびに 1 件ずつ
+出てくる。これまでに直したのは
+
+`ts-repo-utils` ・ `ts-fortress` ・ `ts-data-forge` ・ `synstate-react-hooks`
+・ `synstate-preact-hooks` ・ 本パッケージ
+
+の 6 つで、`synstate-react-hooks-compat` が残っている。**まとめて 1 つの PR で
+潰す価値はあるが、opt-in と混ぜないほうが読みやすい**ので、ここまでは
+opt-in のたびに 1 件ずつ直してきた。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 25 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 8 個が true / false で完全一致
+- `pnpm run doc` も通る
+- probe を置いてから lint を測った
