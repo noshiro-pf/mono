@@ -1,0 +1,19 @@
+/**
+ * Which desktop platform the page is running on, as far as the user agent will
+ * say.
+ *
+ * Ported from `@noshiro/ts-utils-additional`; `ts-data-forge` has no successor
+ * for it. `navigator.platform` is deprecated and there is no equally simple
+ * replacement — `userAgentData` is Chromium-only — and this only decides which
+ * modifier key counts as "ctrl", so being wrong is harmless.
+ */
+export const getPlatform = (): 'mac' | 'other' | 'windows' => {
+  // eslint-disable-next-line unicorn/prefer-global-this
+  const platform = window.navigator.platform.toUpperCase();
+
+  if (platform.includes('MAC')) return 'mac';
+
+  if (platform.includes('WIN')) return 'windows';
+
+  return 'other';
+};
