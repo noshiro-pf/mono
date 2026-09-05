@@ -2559,3 +2559,57 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 `synstate` ・ `synstate-react-hooks` の 4 つをソース解決しているが、
 問題が出たのは `synstate` だけ。前 3 者は #1787 ・ #1791 で 0 件と分かって
 いるので整合している。
+
+## strict lib 側が直ったら戻す箇所（2026-09-05）
+
+この移行で入れた変更のうち、**strict lib の宣言が厳しすぎることへの回避であって、
+コードとして良くなったわけではないもの**の一覧。起票した 3 件が直ったら、
+ここを見て戻す。
+
+「回避」と「改善」は分けてある。同じ opt-in で入った変更でも、strict lib の
+言い分が正しくてコードのほうが直ったものは戻さない。
+
+### 戻す
+
+| issue | 箇所                                                                               | 入れたもの                                                         | 戻す先                                    |
+| :---- | :--------------------------------------------------------------------------------- | :----------------------------------------------------------------- | :---------------------------------------- |
+| #1839 | `apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.mts` | `getLastDateNumberOfMonth`（月ごとの日数を `switch` で書く 20 行） | `new Date(year, month, 0).getDate()`      |
+| #1840 | `libs/synstate/src/core/types/timer.mts`                                           | `TimerId = NonNullable<Parameters<typeof clearTimeout>[0]>`        | `TimerId = ReturnType<typeof setTimeout>` |
+| #1841 | `libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts`  | 可変長で受けて `isString` で絞る置換コールバック                   | `(_match, comment: string) => …`          |
+
+#1839 の 1 件だけは**部分的に戻す**ことになる。`getLastDateNumberOfMonth` を
+消すと、この関数を書いたときに一緒に落とせた
+`as StrictExtract<DateEnum, 28 | 29 | 30 | 31>` が戻ってきてしまう。
+アサーションを戻さずに済むかは #1839 の直し方（引数型を広げるのか、
+繰り上げを表現する型を用意するのか）による。
+
+### #1839 の直し方によっては戻せる
+
+| 箇所                                              | 入れたもの                                 | 条件                                                    |
+| :------------------------------------------------ | :----------------------------------------- | :------------------------------------------------------ |
+| `apps/ts-fortress-types/src/utils/date-utils.mts` | `monthToIndex`（12 行の対応表）と `create` | `Date` の**月引数**も `number` を受けるようになった場合 |
+
+`month - 1` が `MonthEnum` に対して必ず 0-11 であることは型で表現できないので、
+月引数が `Index<12>` のままなら対応表は要る。#1784 の時点では
+「strict lib の言い分が正しい」と書いたが、#1839 で引数側の方針が変わるなら
+この判断も変わる。
+
+### 戻さない（strict lib が正しいもの）
+
+紛らわしいので明記しておく。
+
+| 箇所                                                            | 内容                                                   | 理由                                                                                                       |
+| :-------------------------------------------------------------- | :----------------------------------------------------- | :--------------------------------------------------------------------------------------------------------- |
+| `apps/synstate-docs/src/components/*/adapters/mobx-adapter.mts` | `let mut_disposers` にして束縛ごと差し替える           | `Array.prototype.length` を readonly にするのは正しい。戻すなら直すのは `unicorn/no-unnecessary-splice` 側 |
+| `libs/synstate/samples/docs-site/why-reactive/*`                | `@ts-expect-error`（埋め込み時に落ちる行）             | `Response.json()` が `unknown` を返すのは正しい                                                            |
+| `apps/event-schedule-app/src/functions/fetch-holidays.mts`      | 同上（`eslint-disable-next-line` 版）                  | 同上                                                                                                       |
+| `libs/ts-codemod-lib/src/.../wrap-with-parentheses.mts`         | `charAt` → `at`、引数を `string \| undefined` に広げる | `@deprecated` は方針であって誤りではなく、`at` のほうが実態に合っている                                    |
+
+### 同じ形だが回避ではないもの
+
+`type TimerId = Parameters<typeof clearTimeout>[0];` は
+`apps/react-utils` ・ `apps/preact-utils` ・ `apps/numeric-input-utils` ・
+`apps/event-schedule-app`（`utils-ported/calendar.mts`）にもあるが、これらは
+**移植時に `@noshiro/ts-type-utils` のグローバル `TimerId` を書き直したもの**で、
+`ReturnType<typeof setTimeout>` から逃げた結果ではない。#1840 が直っても
+戻す先が無いので、そのままでよい。
