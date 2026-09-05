@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/app.tsx apps/housing-loan-calculator-app/src/app.tsx
+index 35f2226b1..f6bb06005 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/app.tsx
++++ apps/housing-loan-calculator-app/src/app.tsx
+@@ -1,6 +1,15 @@
+ import { Spinner, SpinnerSize } from '@blueprintjs/core';
+-import { ConfigSection, PaymentTable, SummarySection } from './components';
+-import { isCalculating$ } from './store';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import {
++  ConfigSection,
++  PaymentTable,
++  SummarySection,
++} from './components/index.mjs';
++import { dict } from './constants/index.mjs';
++import { isCalculating$ } from './store/index.mjs';
+ 
+ export const App = memoNamed('App', () => {
+   const isCalculating = useObservableValue(isCalculating$);

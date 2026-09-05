@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/types/repayment-type.ts apps/housing-loan-calculator-app/src/types/repayment-type.mts
+index 9ed445e99..50eaa6a65 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/types/repayment-type.ts
++++ apps/housing-loan-calculator-app/src/types/repayment-type.mts
+@@ -3,5 +3,4 @@
+  * - `principal-equal-payment` : 元金均等返済
+  */
+ export type RepaymentType =
+-  | 'principal-and-interest-equal-repayment'
+-  | 'principal-equal-payment';
++  'principal-and-interest-equal-repayment' | 'principal-equal-payment';

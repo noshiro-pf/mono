@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/components/index.ts apps/cant-stop-probability-app/src/components/index.mts
+index 175129f0f..39953dd15 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/components/index.ts
++++ apps/cant-stop-probability-app/src/components/index.mts
+@@ -1,2 +1,2 @@
+-export * from './dead-column';
+-export * from './table';
++export * from './dead-column.js';
++export * from './table.js';

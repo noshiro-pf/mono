@@ -1,0 +1,150 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/app.tsx apps/cant-stop-probability-app/src/app.tsx
+index d5a3c6ee9..7ce880ab0 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/app.tsx
++++ apps/cant-stop-probability-app/src/app.tsx
+@@ -1,21 +1,29 @@
+ import { Navbar, Tab, Tabs } from '@blueprintjs/core';
+-import { DeadColumn, ProbabilityTable } from './components';
+-import { denom, selected3List, separator } from './constants';
++import styled from '@emotion/styled';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { createState } from 'synstate';
++import { useObservableValue } from 'synstate-react-hooks';
++import { Arr, ISet, isNotUndefined, Num, SafeUint, tp } from 'ts-data-forge';
++import { DeadColumn, ProbabilityTable } from './components/index.mjs';
++import { denom, selected3List, separator } from './constants/index.mjs';
+ import {
+   calcExpected,
+   countSuccess,
+   countSuccessForRemains,
+-} from './functions';
++} from './functions/index.mjs';
+ import {
++  asTwoDiceSumValue,
+   isTwoDiceSumValue,
+-  toTwoDiceSumValue,
+   type ResultRow,
+   type TwoDiceSumValue,
+-} from './types';
++} from './types/index.mjs';
+ 
+ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
+   const count = countSuccess(x, y, z);
++
+   const countSum = SafeUint.sub(denom, count.noLine);
++
+   return {
+     id: `${x}-${y}-${z}`,
+     selected: tp(x, y, z),
+@@ -26,13 +34,11 @@ const results: readonly ResultRow[] = selected3List().map(([x, y, z]) => {
+   };
+ });
+ 
+-const resultsSortedByProbability = pipe(Array.from(results)).chain((list) =>
+-  list.toSorted((a, b) => -(a.countSum - b.countSum)),
+-).value;
++const resultsSortedByProbability = results.toSorted(
++  (a, b) => -(a.countSum - b.countSum),
++);
+ 
+-const { useCurrentValue: useSortBy, setState: setSortBy } = createState<
+-  'dice' | 'prob'
+->('prob');
++const [sortBy$, setSortBy] = createState<'dice' | 'prob'>('prob');
+ 
+ const sortByDice = (): void => {
+   setSortBy('dice');
+@@ -42,11 +48,11 @@ const sortByProbability = (): void => {
+   setSortBy('prob');
+ };
+ 
+-const { useCurrentValue: useFilterByString, setState: setFilterByString } =
+-  createState<string>('');
++const [filterByString$, setFilterByString] = createState<string>('');
+ 
+-const { useCurrentValue: useSelectedTabId, setState: setSelectedTabId } =
+-  createState<'deadColumnUI' | 'table'>('table');
++const [selectedTabId$, setSelectedTabId] = createState<
++  'deadColumnUI' | 'table'
++>('table');
+ 
+ const handleTabChange = (a: string): void => {
+   if (a === 'deadColumnUI' || a === 'table') {
+@@ -56,16 +62,20 @@ const handleTabChange = (a: string): void => {
+   }
+ };
+ 
+-const { useCurrentValue: useColumnsAlive, updateState: updateDeadColumns } =
+-  createState<readonly boolean[]>(Arr.newArray(11, true));
++const [columnsAlive$, , { updateState: updateDeadColumns }] = createState<
++  readonly boolean[]
++>(Arr.newArray(11, true));
+ 
+ export const App = memoNamed('App', () => {
+-  const sortBy = useSortBy();
+-  const filterByString = useFilterByString();
+-  const selectedTabId = useSelectedTabId();
+-  const columnsAlive = useColumnsAlive();
++  const sortBy = useObservableValue(sortBy$);
++
++  const filterByString = useObservableValue(filterByString$);
+ 
+-  const filterBy: readonly TwoDiceSumValue[] = useMemo(
++  const selectedTabId = useObservableValue(selectedTabId$);
++
++  const columnsAlive = useObservableValue(columnsAlive$);
++
++  const filterBy: readonly TwoDiceSumValue[] = React.useMemo(
+     () =>
+       filterByString
+         .split(separator)
+@@ -75,18 +85,18 @@ export const App = memoNamed('App', () => {
+     [filterByString],
+   );
+ 
+-  const sorted = useMemo(
++  const sorted = React.useMemo(
+     () => (sortBy === 'dice' ? results : resultsSortedByProbability),
+     [sortBy],
+   );
+ 
+-  const filtered = useMemo(
++  const filtered = React.useMemo(
+     () =>
+       sorted.filter((row) => filterBy.every((v) => row.selected.includes(v))),
+     [sorted, filterBy],
+   );
+ 
+-  const columnsAliveWithHandler = useMemo<
++  const columnsAliveWithHandler = React.useMemo<
+     readonly Readonly<{
+       columnId: TwoDiceSumValue;
+       alive: boolean;
+@@ -95,7 +105,7 @@ export const App = memoNamed('App', () => {
+   >(
+     () =>
+       columnsAlive.map((alive, index) => ({
+-        columnId: toTwoDiceSumValue(index + 2),
++        columnId: asTwoDiceSumValue(index + 2),
+         alive,
+         toggle: () => {
+           updateDeadColumns((prev) =>
+@@ -103,15 +113,14 @@ export const App = memoNamed('App', () => {
+           );
+         },
+       })),
+-
+     [columnsAlive],
+   );
+ 
+-  const hitSomeAliveColumnProbability = useMemo(
++  const hitSomeAliveColumnProbability = React.useMemo(
+     () =>
+       Num.div(
+         countSuccessForRemains(
+-          ISet.new(
++          ISet.create(
+             columnsAliveWithHandler
+               .filter((a) => a.alive)
+               .map((a) => a.columnId),

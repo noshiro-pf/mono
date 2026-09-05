@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/constants/denom.ts apps/cant-stop-probability-app/src/constants/denom.mts
+index c753c2ae8..69a77333c 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/constants/denom.ts
++++ apps/cant-stop-probability-app/src/constants/denom.mts
+@@ -1,2 +1,4 @@
++import { asPositiveSafeInt, SafeUint } from 'ts-data-forge';
++
+ /** `1296` */
+-export const denom = toPositiveSafeInt(SafeUint.pow(6, 4));
++export const denom = asPositiveSafeInt(SafeUint.pow(6, 4));

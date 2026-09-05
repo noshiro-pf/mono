@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/types/yen.ts apps/housing-loan-calculator-app/src/types/yen.mts
+index a860243ff..d5baad713 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/types/yen.ts
++++ apps/housing-loan-calculator-app/src/types/yen.mts
+@@ -1,5 +1,5 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+-export const Yen = t.simpleBrandedNumber('Yen', 0);
++export const Yen = t.brandedNumber({ typeName: 'Yen', defaultValue: 0 });
+ 
+ export type Yen = t.TypeOf<typeof Yen>;

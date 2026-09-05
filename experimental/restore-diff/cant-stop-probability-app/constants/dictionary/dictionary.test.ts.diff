@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/constants/dictionary/dictionary.test.ts experimental/packages/apps/cant-stop-probability-app/src/constants/dictionary/dictionary.test.ts
+deleted file mode 100644
+index cad882c33..000000000
+--- experimental/packages/apps/cant-stop-probability-app/src/constants/dictionary/dictionary.test.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-import { dict } from './dictionary';
+-
+-describe('dict', () => {
+-  test('dict', () => {
+-    expect(typeof dict).toBe('object');
+-  });
+-});

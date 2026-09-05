@@ -1,0 +1,20 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-principal-equal-payment.ts apps/housing-loan-calculator-app/src/functions/calc-principal-equal-payment.mts
+index bb2146ca1..da96184e3 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-principal-equal-payment.ts
++++ apps/housing-loan-calculator-app/src/functions/calc-principal-equal-payment.mts
+@@ -1,4 +1,5 @@
+-import { type PercentFloat, Yen } from '../types';
++import { Arr, Num, Uint32, asPositiveSafeInt } from 'ts-data-forge';
++import { type PercentFloat, Yen } from '../types/index.mjs';
+ 
+ export const calcPrincipalEqualPayment = ({
+   borrowingPeriodMonth: numPayments,
+@@ -16,7 +17,7 @@ export const calcPrincipalEqualPayment = ({
+ }> => {
+   const fixedPrincipalYenPerMonth = Yen.cast(
+     // TODO: `numPayments` を `Uint32` ではなく `PositiveSafeInt` 等の正の整数型にする
+-    Num.div(borrowingTotalYen, toPositiveSafeInt(numPayments)),
++    Num.div(borrowingTotalYen, asPositiveSafeInt(numPayments)),
+   );
+ 
+   const borrowingBalanceYen = Arr.seq(Uint32.add(numPayments, 1)).map((i) =>

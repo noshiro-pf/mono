@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/utils/index.ts apps/housing-loan-calculator-app/src/utils/index.mts
+index 905d343ba..7490992a0 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/utils/index.ts
++++ apps/housing-loan-calculator-app/src/utils/index.mts
+@@ -1 +1 @@
+-export * from './uri-with-query-params';
++export * from './uri-with-query-params.mjs';

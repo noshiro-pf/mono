@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/count-success-for-remains.ts apps/cant-stop-probability-app/src/functions/count-success-for-remains.mts
+index d74d0855a..5eb1083bb 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/count-success-for-remains.ts
++++ apps/cant-stop-probability-app/src/functions/count-success-for-remains.mts
+@@ -1,6 +1,7 @@
+-import { diceValueList } from '../constants';
+-import { type TwoDiceSumValue } from '../types';
+-import { possibleTwoDiceSums } from './possible-two-dice-sums';
++import { asSafeUint, ISet, type SafeUint } from 'ts-data-forge';
++import { diceValueList } from '../constants/index.mjs';
++import { type TwoDiceSumValue } from '../types/index.mjs';
++import { possibleTwoDiceSums } from './possible-two-dice-sums.mjs';
+ 
+ // 踏破されていない列のいずれかが出る場合の数
+ export const countSuccessForRemains = (
+@@ -23,5 +24,5 @@ export const countSuccessForRemains = (
+     }
+   }
+ 
+-  return toSafeUint(mut_count);
++  return asSafeUint(mut_count);
+ };

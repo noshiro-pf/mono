@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/constants/index.ts apps/cant-stop-probability-app/src/constants/index.mts
+index 532136a8f..12ce92aaf 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/constants/index.ts
++++ apps/cant-stop-probability-app/src/constants/index.mts
+@@ -1,6 +1,5 @@
+-export * from './denom';
+-export * from './dice-value-list';
+-export * from './dictionary';
+-export * from './selected-3-list';
+-export * from './separator';
+-export * from './two-dice-sum-set';
++export * from './denom.mjs';
++export * from './dice-value-list.mjs';
++export * from './selected-3-list.mjs';
++export * from './separator.mjs';
++export * from './two-dice-sum-set.mjs';

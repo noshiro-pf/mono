@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/index.ts apps/cant-stop-probability-app/src/functions/index.mts
+index 0a4f94797..c34bf943c 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/index.ts
++++ apps/cant-stop-probability-app/src/functions/index.mts
+@@ -1,6 +1,6 @@
+-export * from './calc-expected';
+-export * from './count-success';
+-export * from './count-success-for-remains';
+-export * from './possible-two-dice-sum-pair';
+-export * from './possible-two-dice-sums';
+-export * from './to-percent-string';
++export * from './calc-expected.mjs';
++export * from './count-success-for-remains.mjs';
++export * from './count-success.mjs';
++export * from './possible-two-dice-sum-pair.mjs';
++export * from './possible-two-dice-sums.mjs';
++export * from './to-percent-string.mjs';

@@ -61,6 +61,28 @@ const PAIRS = [
     'apps/react-blueprintjs-utils',
   ],
   ['experimental/packages/apps/event-schedule-app', 'apps/event-schedule-app'],
+
+  // Restored after the step-3 batch, one pull request each.
+  [
+    'experimental/packages/apps/lambda-calculus-interpreter-react',
+    'apps/lambda-calculus-interpreter-react',
+  ],
+  [
+    'experimental/packages/utils/better-preact-use-state',
+    'libs/better-preact-use-state',
+  ],
+  [
+    'experimental/packages/apps/cant-stop-probability-app',
+    'apps/cant-stop-probability-app',
+  ],
+  [
+    'experimental/packages/apps/housing-loan-calculator-app',
+    'apps/housing-loan-calculator-app',
+  ],
+  [
+    'experimental/packages/apps/blueprintjs-playground-styled',
+    'apps/blueprintjs-playground-styled',
+  ],
 ];
 
 /**
@@ -294,7 +316,7 @@ const readme = [
   '# `experimental/` からの復元 — src のファイル単位差分',
   '',
   '`docs/monorepo-consolidation.md` の step 3「旧 mono の復元」で',
-  '`experimental/` から復元した 13 パッケージについて、**復元前の `src/` と',
+  `\`experimental/\` から復元した ${summary.length} パッケージについて、**復元前の \`src/\` と`,
   '復元後の `src/` を 1 ファイルずつ突き合わせた差分**を置いてある。',
   '',
   '- 1 ファイル 1 `.diff`。パスは**復元後**の `src/` からの相対パスで、',

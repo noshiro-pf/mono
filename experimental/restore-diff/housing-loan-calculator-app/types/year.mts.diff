@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/types/year.ts apps/housing-loan-calculator-app/src/types/year.mts
+index c8622f75b..ef63b4205 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/types/year.ts
++++ apps/housing-loan-calculator-app/src/types/year.mts
+@@ -1,4 +1,4 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+ export const Year = t.uint32();
+ 
