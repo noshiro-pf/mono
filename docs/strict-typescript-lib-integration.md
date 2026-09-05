@@ -300,6 +300,13 @@ changeset が要る。**ただしこの判断は後述の strict-typescript-lib#
 `.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
 `octokit-safe-types` では 15 ファイルすべて同一だった。
 
+**lint は `ws:lint` ではなく `ws:lint:fix` + `z:assert-repo-is-clean` で測る。**
+strict lib が緩くした指摘に付いていた `eslint-disable` は不要になるが、
+`reportUnusedDisableDirectives` の重大度は warning なので `ws:lint` は exit 0 の
+まま「0 件」と報告する。CI の `type-check (ws:lint:fix)` は `--fix` でそれを消し、
+そのあとの clean 判定で落ちる。#1761 の `eslint-config-typed` がこれで、18 件が
+`ws:lint` を通り抜けた。
+
 ### 型チェック以外への影響（2026-08-14 実測）
 
 `ts-fortress` で opt-in を試して分かった。**導入コストは型エラーの件数では測れない。**
@@ -1932,3 +1939,109 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
   規則があり、probe の `export` に当たる。probe を置く前に lint を通して
   「0 件」と思い込むと、`ws:lint` で初めて落ちる。`#1745` と同じく、その
   ブロックの `ignores` に 1 件加えて対象外にした
+
+## `eslint-config-typed` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 5 件。** #1762 で「型 5 件」と測ったが、その 5 件は
+`ts-data-forge` の opt-in（#1745）が直したものだった。**#1745 がマージされた
+いま、実測で 0 件**である。
+
+`prefer-nullish-coalescing-when-safe.mts` の `new Set([...])` に型引数を足す
+修正で、`ts-data-forge` 側の opt-in から見つかったもの。**consumer の opt-in
+が別パッケージの型エラーを先に潰す**という順序があり得ることの実例になった。
+
+### lint 5 件 — `String` / `Boolean`
+
+| 箇所                                                                      | 直し方                                                  |
+| :------------------------------------------------------------------------ | :------------------------------------------------------ |
+| `scripts/gen-eslint-rules/apply-codemod.mts`                              | `String(error)` → `unknownToString`                     |
+| `scripts/.../print/meta-to-string.mts`                                    | `Boolean(x)` → `x === true`                             |
+| `src/plugins/react-coding-style/.../component-name.mts`                   | `String(pattern)` → `pattern.toString()`（`RegExp`）    |
+| `src/plugins/ts-restrictions/.../check-destructuring-completeness.mts` ×2 | `String(v)` → `v.toString()`（`number` に絞り込み済み） |
+
+`Boolean(x)` の 1 件だけは意味が変わり得る。読んでいるのは ESLint の rule
+metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== true` が
+意図どおりであり、truthy な非 boolean を true と扱わなくなるぶん厳しくなる。
+
+### 不要になった `eslint-disable` 18 件 — `ws:lint` では見えない
+
+`vitest-globals.d.ts` の
+`// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types`
+22 件のうち **18 件が opt-in で不要になる**。`modifier: Function` に付いていた
+ものがそれで、strict lib の `Function` は `prototype` ・ `length` ・
+`arguments` ・ `caller` を `readonly` で宣言しているため、
+`prefer-readonly-parameter-types` が鳴らなくなる。残る 4 件は
+`errorLike?: ErrorConstructor | Error | null` に付いたもので、これは変わらない。
+
+**これは `ws:lint` では落ちない。** `reportUnusedDisableDirectives: true` の
+既定の重大度は warning で、`eslint .` は exit 0 のまま「0 件」と報告する。
+一方 CI の `type-check (ws:lint:fix)` は `--fix` で 18 件を消し、そのあとの
+`z:assert-repo-is-clean` が dirty で落ちる。**lint の実測は `ws:lint` ではなく
+`ws:lint:fix` + `z:assert-repo-is-clean` で行うこと。** #1761 はこれで落ちた。
+
+### 確認したこと
+
+- `libReplacement: true` で type-check・lint とも 0 件、テスト 583 件も通る
+- `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
+- `.d.mts` 168 個が true / false で完全一致（`dist/` を消して exit code も確認）
+- probe を置いてから lint を測った
+- `ws:lint:fix` のあと `z:assert-repo-is-clean` が通る
+
+## `synstate-preact-hooks` の opt-in（2026-09-01 実測）
+
+**型エラー 0 件・lint 1 件。** 内容は #1752 で測ったとおり
+`scripts/cmd/embed-examples-in-jsdoc.mts` の `String(error)`（117 行 60 桁）
+1 件で、`unknownToString` に置き換えた。**リポジトリ内 9 件目**である。
+
+`.d.mts` 9 個が true / false で完全一致。#1757 を踏まえ、このパッケージの
+`build` が `configs/tsconfig.build.json`（`include` は `../src`）で宣言のみ
+emit することを先に確認したうえで、`dist/` を消して exit code を見る手順で
+測っている。
+
+## `synstate` 本体の opt-in は保留（2026-09-01 調査）
+
+**型エラー 12 件。うち 6 件は `src/`、6 件は `samples/docs-site/why-reactive/`。**
+`src/` の 6 件は直せたが、samples の 6 件は**ドキュメントの判断**になるので、
+ここでは opt-in していない。
+
+### `src/` の 6 件は `TimerId` 1 箇所に集約される
+
+`counter.mts` ・ `timer.mts` ・ `audit.mts` ・ `debounce.mts` ・ `throttle.mts` の
+`clearInterval` / `clearTimeout` 呼び出しがすべて落ちる。原因は
+
+```ts
+export type TimerId = ReturnType<typeof setTimeout>;
+```
+
+である。**DOM lib と `@types/node` の両方が `setTimeout` を宣言する**ので
+`typeof setTimeout` はオーバーロード集合になり、`ReturnType` は最後のシグネチャ
+だけを読む。strict lib 下ではその結果が `{} | null` になり、
+`clearInterval(id: number | undefined)` に渡せない。
+
+**「何が消せるか」で定義するほうが安定する。**
+
+```ts
+export type TimerId = NonNullable<Parameters<typeof clearTimeout>[0]>;
+```
+
+`clearTimeout` はどちらの lib でもシグネチャが 1 つなので `Parameters` は
+曖昧にならない。`NonNullable` は「消す側が許容するが handle ではない」
+`undefined` を落とすためのもの。この 1 行で `src/` の 6 件は消える（実測）。
+
+### samples の 6 件は直せるが、直すと docs が変わる
+
+`why-reactive/03-react-debounce-fetch.tsx` と `05-imperative-table.mts`
+（および `ja/` の対）は、**わざと素朴に書いた命令型のコード**で、
+`generate-sample-diffs.mts` がドキュメントへそのまま埋め込む。
+
+strict lib では `Response.json()` が `any` ではなく `unknown` を返すため、
+`setResults(data)` ・ `error.name` ・ `allRows = await …json()` が落ちる。
+**strict lib の言い分は正しい。** ただし直すには
+
+- 表示されるコードに型注釈やキャストを足す（読者に見えるものが変わる）か、
+- 型ガード／`ts-fortress` の検証を足す（サンプルの主題である debounce や
+  「命令型はつらい」から目を逸らさせる）
+
+のどちらかになる。これは型安全性ではなく**ドキュメントの判断**なので、
+勝手に決めずに残した。samples がそのままでよいと決まれば、`TimerId` の 1 行と
+合わせて opt-in できる。

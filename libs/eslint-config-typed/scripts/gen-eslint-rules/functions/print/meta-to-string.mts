@@ -29,10 +29,8 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
       'requiresTypeChecking',
 
       isRecord(docs) && hasKey(docs, 'requiresTypeChecking')
-        ? Boolean(
-            (docs as Readonly<{ requiresTypeChecking: unknown }>)
-              .requiresTypeChecking,
-          )
+        ? (docs as Readonly<{ requiresTypeChecking: unknown }>)
+            .requiresTypeChecking === true
         : undefined,
     ],
   ] as const;
