@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate-preact-hooks": "3.0.0"
+    "synstate-preact-hooks": "3.0.1"
   }
 }
