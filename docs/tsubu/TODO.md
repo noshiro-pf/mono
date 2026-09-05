@@ -34,6 +34,8 @@
 - [ ] `undefined` の排除(D-31): ts-std-forge の Optional ラッパー層が前提。v2 以降で `Optional<T>` へ一本化する規則を書く。
 - [ ] default export を emit する v2 の設定ファイル / ディレクティブの設計(D-36)と、`using` の v2 での再検討(D-30)。
 - [ ] barrel `export *` の扱い(2026-09-05 保留 — D-28)。
+- [ ] 三層(制限 / 糖衣構文 / 型検査の変更 — D-37)の呼び名を決める(連番は間に層を挟むときに困る)。
+- [ ] future-syntax.md の各候補に「v1 ライブラリ形」と両向きの codemod を明記する(D-37)。ライブラリ形の未整備分(パターンマッチ用 `match`、`?` 伝播用 `safeTry` 系)は ts-data-forge の並行ワークストリームへ。
 - [ ] getter/setter の粒度の深掘り(plain object の遅延評価 — [spec/banned-syntax.md](./spec/banned-syntax.md))。
 - [ ] 番兵値 API の棚卸し([throwing-stdlib-survey.md](./throwing-stdlib-survey.md) 次の調査枠)。
 
