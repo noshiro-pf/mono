@@ -4,6 +4,8 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "libReplacement": true,
+
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     // `samples/` imports this package by its own name, the way a consumer
