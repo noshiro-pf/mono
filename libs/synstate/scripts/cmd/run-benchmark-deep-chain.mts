@@ -172,7 +172,7 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
 
   for (const [k, depth] of PARAMS) {
     if (mut_skippingRest) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       continue;
     }
@@ -188,12 +188,12 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
     const { times, timedOut } = measureRounds(adapter, k, depth);
 
     if (timedOut) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       mut_skippingRest = true;
 
       console.info(
-        `  ⏱ ${label} K=${String(k)} M=${String(depth)}: TIMEOUT (> ${String(TIMEOUT_MS)} ms)`,
+        `  ⏱ ${label} K=${k.toString()} M=${depth.toString()}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,
       );
     } else {
       const sorted = times.toSorted((a, b) => a - b);
@@ -203,7 +203,7 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
       mut_cells.push(`${med.toFixed(1)} ms`);
 
       console.info(
-        `  ✓ ${label} K=${String(k)} M=${String(depth)}: ${med.toFixed(1)} ms`,
+        `  ✓ ${label} K=${k.toString()} M=${depth.toString()}: ${med.toFixed(1)} ms`,
       );
     }
   }
@@ -212,11 +212,13 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
 };
 
 console.info(
-  `\n## Deep Chain Throughput (${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
+  `\n## Deep Chain Throughput (${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
 );
 
 // Column headers
-const colHeaders = PARAMS.map(([k, m]) => `K=${String(k)}, M=${String(m)}`);
+const colHeaders = PARAMS.map(
+  ([k, m]) => `K=${k.toString()}, M=${m.toString()}`,
+);
 
 const mut_tableLines: string[] = [
   `| Library | ${colHeaders.join(' | ')} |`,
