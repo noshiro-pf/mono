@@ -66,7 +66,7 @@ export const CounterDemo = (): preact.JSX.Element => (
         type={'button'}
         onClick={() => {
           // eslint-disable-next-line no-alert
-          alert(`getSnapshot() = ${String(getSnapshot())}`);
+          alert(`getSnapshot() = ${getSnapshot().toString()}`);
         }}
       >
         {'getSnapshot()'}
