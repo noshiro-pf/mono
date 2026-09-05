@@ -1,0 +1,29 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # Board games, datasets and libraries named in the portfolio prose.
+  - catan
+  - dezero
+  - mnist
+  - numpy
+  - splatoon
+  # Board game with an apostrophe in its name (Tzolk'in).
+  - tzolk
+  # The author's own handles, and the sites and companies named in the CV.
+  - hideaki
+  - kabuku
+  - piko
+  - qiita
+  - rocon
+  - wantedly
+  # Japanese words written in latin letters, in article slugs and titles.
+  - setin
+  - tatekae
+  # Font name in `index.css` (ヒラギノ角ゴ), and abbreviations in product names.
+  - kaku
+  - rnjs
+  - succ
