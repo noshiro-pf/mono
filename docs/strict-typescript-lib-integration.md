@@ -300,6 +300,13 @@ changeset が要る。**ただしこの判断は後述の strict-typescript-lib#
 `.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
 `octokit-safe-types` では 15 ファイルすべて同一だった。
 
+**lint は `ws:lint` ではなく `ws:lint:fix` + `z:assert-repo-is-clean` で測る。**
+strict lib が緩くした指摘に付いていた `eslint-disable` は不要になるが、
+`reportUnusedDisableDirectives` の重大度は warning なので `ws:lint` は exit 0 の
+まま「0 件」と報告する。CI の `type-check (ws:lint:fix)` は `--fix` でそれを消し、
+そのあとの clean 判定で落ちる。#1761 の `eslint-config-typed` がこれで、18 件が
+`ws:lint` を通り抜けた。
+
 ### 型チェック以外への影響（2026-08-14 実測）
 
 `ts-fortress` で opt-in を試して分かった。**導入コストは型エラーの件数では測れない。**
@@ -1932,6 +1939,7 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
   規則があり、probe の `export` に当たる。probe を置く前に lint を通して
   「0 件」と思い込むと、`ws:lint` で初めて落ちる。`#1745` と同じく、その
   ブロックの `ignores` に 1 件加えて対象外にした
+
 ## `eslint-config-typed` の opt-in（2026-09-01 実測）
 
 **型エラー 0 件・lint 5 件。** #1762 で「型 5 件」と測ったが、その 5 件は
@@ -1955,12 +1963,30 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
 metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== true` が
 意図どおりであり、truthy な非 boolean を true と扱わなくなるぶん厳しくなる。
 
+### 不要になった `eslint-disable` 18 件 — `ws:lint` では見えない
+
+`vitest-globals.d.ts` の
+`// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types`
+22 件のうち **18 件が opt-in で不要になる**。`modifier: Function` に付いていた
+ものがそれで、strict lib の `Function` は `prototype` ・ `length` ・
+`arguments` ・ `caller` を `readonly` で宣言しているため、
+`prefer-readonly-parameter-types` が鳴らなくなる。残る 4 件は
+`errorLike?: ErrorConstructor | Error | null` に付いたもので、これは変わらない。
+
+**これは `ws:lint` では落ちない。** `reportUnusedDisableDirectives: true` の
+既定の重大度は warning で、`eslint .` は exit 0 のまま「0 件」と報告する。
+一方 CI の `type-check (ws:lint:fix)` は `--fix` で 18 件を消し、そのあとの
+`z:assert-repo-is-clean` が dirty で落ちる。**lint の実測は `ws:lint` ではなく
+`ws:lint:fix` + `z:assert-repo-is-clean` で行うこと。** #1761 はこれで落ちた。
+
 ### 確認したこと
 
 - `libReplacement: true` で type-check・lint とも 0 件、テスト 583 件も通る
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 168 個が true / false で完全一致（`dist/` を消して exit code も確認）
 - probe を置いてから lint を測った
+- `ws:lint:fix` のあと `z:assert-repo-is-clean` が通る
+
 ## `synstate-preact-hooks` の opt-in（2026-09-01 実測）
 
 **型エラー 0 件・lint 1 件。** 内容は #1752 で測ったとおり

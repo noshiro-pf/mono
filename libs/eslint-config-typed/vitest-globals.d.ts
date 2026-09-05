@@ -1055,7 +1055,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected to be modified.
    */
   changes: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1070,13 +1069,11 @@ type OverriddenAssert = Readonly<{
    * @param change amount (delta)
    */
   changesBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
@@ -1088,7 +1085,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected not to be modified.
    */
   doesNotChange: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1103,7 +1099,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected to be increased.
    */
   increases: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1119,13 +1114,11 @@ type OverriddenAssert = Readonly<{
    * @param change amount (delta)
    */
   increasesBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
@@ -1137,7 +1130,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected not to be increased.
    */
   doesNotIncrease: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1154,13 +1146,11 @@ type OverriddenAssert = Readonly<{
    */
 
   increasesButNotBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
@@ -1172,7 +1162,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected to be decreased.
    */
   decreases: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1189,13 +1178,11 @@ type OverriddenAssert = Readonly<{
    */
 
   decreasesBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
@@ -1207,7 +1194,6 @@ type OverriddenAssert = Readonly<{
    * @param property   Property of object expected not to be decreased.
    */
   doesNotDecrease: <T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
@@ -1224,13 +1210,11 @@ type OverriddenAssert = Readonly<{
    */
 
   doesNotDecreaseBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
@@ -1244,13 +1228,11 @@ type OverriddenAssert = Readonly<{
    */
 
   decreasesButNotBy: (<T>(
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     modifier: Function,
     object: T,
     property: string /* keyof T */,
     change: number,
   ) => void) &
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (<T>(modifier: Function, object: T, change: number) => void);
 
   /**
