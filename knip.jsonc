@@ -226,9 +226,62 @@
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
+
     "apps/react-blueprintjs-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
+    },
+
+    "apps/better-preact-use-state": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+"apps/preact-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    "apps/resize-observer-preact-hooks": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
+    // entry is the module `index.html` would load.
+    // `src/services/` is listed alongside the page entry because nothing in the
+    // UI imports it — that is true of the pre-restoration source too, not
+    // something lost in the move. The operations are the app's, so they are
+    // entry points rather than dead code.
+    "apps/mahjong-calculator-app": {
+      "entry": ["src/main.tsx", "src/services/index.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
+    // entry is the module `index.html` would load.
+    "apps/lambda-calculus-interpreter-preact": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a single entry point.
+    "apps/react-blueprintjs-utils": {
+      "entry": ["src/index.mts"],
+      "project": ["**/*.{mts,ts,tsx}"],
+    },
+
+    // Not an Astro site like the entry below assumes: a Vite React app whose
+    // entry is the module `index.html` would load.
+    "apps/catan-dice-app": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow. MUI's default theme asks
+      // for Roboto, so it belongs to this app.
+      "ignoreDependencies": ["@fontsource/roboto"],
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
@@ -273,6 +326,20 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    "apps/blueprintjs-playground": {
+      "entry": ["src/main.tsx", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": [
+        "normalize.css",
+        "@blueprintjs/icons",
+        "@blueprintjs/datetime2",
+        "@blueprintjs/datetime",
+        "@blueprintjs/select",
+      ],
+    },
+
     "apps/housing-loan-calculator-app": {
       "entry": ["src/main.tsx", "configs/*.mts"],
       "project": ["**/*.{mts,tsx}"],
@@ -299,6 +366,26 @@
         "@blueprintjs/core",
         "@blueprintjs/icons",
       ],
+    },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    "apps/mahjong-scoring-tool": {
+      "entry": ["src/index.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a set of Node programs,
+    // each of which runs when imported, so there is no barrel to point at.
+    "apps/slack-archive-tools": {
+      "entry": [
+        "src/dump-keys-message.mts",
+        "src/dump-keys-message-sub-keys.mts",
+        "src/dump-keys-message-sub-array-keys.mts",
+        "src/recursive-download.mts",
+        "src/run-validator.mts",
+        "configs/*.mts",
+      ],
+      "project": ["**/*.mts"],
     },
 
     // Not an Astro site like the entry above assumes: a Node program with a
