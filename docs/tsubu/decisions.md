@@ -35,12 +35,12 @@
 - **判断**: enum、runtime namespace、class parameter properties、`import =` など「型を消すだけでは JS にならない構文」を禁止する。言語の型レイヤーは常に消去可能(erasable)とする。
 - **理由**: Node.js type stripping・エコシステムの潮流と一致する。また v2 transpiler の TS emit を単純化する(型層と値層が絡まない)。
 
-## D-6: 標準ライブラリは strict-ts-lib + ts-data-forge(prelude)の二層とする
+## D-6: 標準ライブラリは strict-ts-lib + ts-data-forge(prelude)の二層に、境界ラッパー ts-std-forge を加えた三層とする(改訂 2026-09-05)
 
 (D-5 は削除済み。番号は相互参照を保つため欠番とする。)
 
-- **ステータス**: 提案
-- **判断**: 組み込み層(`lib.d.ts` 相当)は strict-ts-lib、言語ネイティブに見せたいユーティリティ(`pipe` / `match` / `Optional` / `Result` 等)は ts-data-forge を prelude として扱う。v1 では ts-data-forge からの明示 import が必要(値の自動 import は transpiler なしでは不可能)。v2 で transpiler が prelude の import 文を自動挿入する。
+- **ステータス**: 確定(2026-09-05 — D-27 で承認)
+- **判断**: 組み込み層(`lib.d.ts` 相当)は strict-ts-lib、言語ネイティブに見せたいユーティリティ(`pipe` / `match` / `Optional` / `Result` 等)は ts-data-forge を prelude として扱う。v1 では ts-data-forge からの明示 import が必要(値の自動 import は transpiler なしでは不可能)。v2 で transpiler が prelude の import 文を自動挿入する。これに D-24 で確定した **ts-std-forge**(throw する / null を返す stdlib API の Result / Optional ラッパー)を第 3 の層として加え、標準ライブラリは **strict-ts-lib(組み込み層)+ ts-data-forge(prelude)+ ts-std-forge(境界ラッパー)の三層**とする。
 - **理由**: [spec/stdlib.md](./spec/stdlib.md) 参照。型だけなら ts-type-forge 方式(global.d.mts)で v1 から global にできるが、実行時の値はモジュールから来るしかない。
 
 ## D-7: compilerOptions は言語仕様の一部として一意に固定する
@@ -189,3 +189,75 @@
 - **理由**: 仕様が固定するのは throw の**条件**であって**メッセージ**ではないため、catch 後の分類はエンジン依存のメッセージ解析にしかならず移植不能。型で排除できる失敗は排除するのが最も強く(コンパイル時)、できないものだけ事前検証で分類する。exceptions.md のクラスレス・エラー方針(Err payload は plain tagged union がデフォルト)とも一致する。
 - **残課題(言語側)**: 型 refine は `as` による嘘に対して無防備。`as` キャストの正しさをランタイム検証する言語機能、または ts-fortress のような validator ライブラリの使用強制(`as` が紛れ込みうるコード文脈を言語として限定する)を v3 の検討事項として TODO に記録。
 - **却下した代替案**: catch した Error の message / name による事前分類なしの推定(エンジン依存)。refine 済み引数へのランタイム二重チェック(全域化して素の値を返した経緯と不整合)。
+
+## D-27: 2026-09-05 時点の `提案` 節を一括承認する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: 次の `提案` を `確定` に昇格する。[spec/modules.md](./spec/modules.md) の 3 節(許可する import 形 / 禁止する形 / モジュール解決)、[spec/exceptions.md](./spec/exceptions.md) の `try..catch` 禁止と「仕様への帰結」4 項目、[spec/booleans-and-logic.md](./spec/booleans-and-logic.md) の規則表と論理演算子の式文禁止、[spec/null-undefined.md](./spec/null-undefined.md) の v1 規則、[spec/variables-and-mutation.md](./spec/variables-and-mutation.md) の v1 規則と外部境界規定、[spec/banned-syntax.md](./spec/banned-syntax.md) の「既存運用の昇格」11 項目、[spec/compiler-options.md](./spec/compiler-options.md) の固定構成(`allowJs` / `checkJs` false を含む)、D-6、ユーザー変数同士の shadowing 全面禁止。
+- **理由**: いずれも現行 eslint-config-typed / mono の tsconfig の運用と一致しており、仕様への追認である。
+- **帰結**: preset 追補(`functional/no-try-statements` の on、import 系 allow リストの精査)と、`提案` 確定待ちだった適合性フィクスチャの整備が着手可能になる。残る `未定` は [spec/future-syntax.md](./spec/future-syntax.md) のパイプ内 await / ts-pattern 採否、[spec/modules.md](./spec/modules.md) の barrel `export *` / `import.meta` で、いずれも v2 設計時まで保留。
+
+## D-28: modules の残論点 — dynamic import と `#` imports は許可、default export は全面禁止、`import * as` は現行ルールを追認
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**:
+    1. dynamic `import()` は**無制限で許可**する(TS と同じ。specifier の制限も置かない)。
+    2. `#` subpath imports(package.json の `imports` フィールド)は **v1 から許可**する。`exports` と同じく package.json が定める解決規則であり、「解決規則は一つ」に反しない。
+    3. default export は**設定ファイルも含め全面禁止**する。`export default …` と `export { x as default }` の両形が対象。default export を要求するツールへの接続は D-36。
+    4. `import * as ns` は**許可**し、非 tree-shakable な使用(ns オブジェクトを値として持ち回る等)のみ禁止する — 現行 `tree-shakable/import-star` の挙動の追認。
+    5. barrel `export * from` は**保留**(未定のまま)。「生成物のみ許可」「`export *` と明示 export の混在のみ禁止」「全面禁止」を検討したが決定を見送った。
+- **理由**: (1)(2) は禁止に見合う害がなく、code splitting と `paths` 代替という実需がある。(3) は「export の書き方を増やしてブレる」ことを避けるため(ユーザー決定)。(5) の背景: `export *` 同士の名前衝突は tsc が TS2308 で報告するが、同じ barrel の**明示 export が同名の `export *` を無警告で隠す**(2026-09-05 実測)。
+- **帰結**: enforcement-map の `import-x/no-default-export` の `*.config.*` 例外は言語では採らない。`export { x as default }` は現行 `no-restricted-exports` の `restrictedNamedExports: ['default']` が既に塞いでいる。
+
+## D-29: 論理代入演算子 `&&=` / `||=` / `??=` は `mut_` 変数に限り 3 つとも許可する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: 代入先が `mut_` 変数であれば 3 つとも許可する。`&&=` / `||=` のオペランドは `&&` / `||` と同じ boolean 厳密化([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))の対象。`??=` は値の合体なので boolean 制約の対象外。
+- **理由**: `x &&= y` は `x = x && y` と同義で、boolean 厳密化の下では純粋な boolean の畳み込みにすぎない。本来の用途(`opts ||= {}` 等の truthiness idiom)はオペランド型の制約で既に違法になる。現行 config は `logical-assignment-operators: "always"` + `unicorn/logical-assignment-operators` で**論理代入形をむしろ強制**しており、禁止すると現行運用と衝突する。
+- **帰結(実装)**: `@typescript-eslint/strict-boolean-expressions` が検査するのは `LogicalExpression` / 条件位置 / `!` のみで、`AssignmentExpression`(`&&=` / `||=`)のオペランドは**検査しない**(2026-09-05 実測、typescript-eslint 8.67)。したがって `&&=` / `||=` の両オペランドの boolean 限定は 🆕 ルール。
+
+## D-30: `using` / `await using` は v1 では禁止し、v2 で再検討する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: explicit resource management(TS 5.2+)は v1 の言語に含めない。`try..catch` 禁止で `finally` も書けなくなるが、v1 のリソース解放は `fromThrowable` に渡すコールバック内で明示的に書く。採否は v2 で再検討する。
+- **理由**: 受け皿が必要なのは確かだが、構文を増やす判断は transpiler の設計と一緒に行う(ユーザー決定)。
+
+## D-31: 「値がない」は最終的に `Optional<T>` へ一本化し、`undefined` もユーザーコードの宣言型から排除する(段階導入)
+
+- **ステータス**: 確定(2026-09-05、方針)
+- **判断**: 最終目標を `{null, undefined}` → `Optional<T>` とする。**v1 は null の排除のみ**。`undefined` の排除は、`T | undefined` を返す stdlib API を Optional 化する ts-std-forge のラッパー層が揃った段階(v2 以降)で導入する。v1 では `Optional<T>` と `T | undefined` の使い分け指針は置かず、方向性だけを記述する。`{ x?: T }` と `{ x: T | undefined }` のスタイル規定も置かない。
+- **理由**: `noUncheckedIndexedAccess` の添字、`Map.get`、`find`、optional 引数 / プロパティ(JSX props を含む)など TS のあらゆる API が `T | undefined` を返すため、ラッパー層なしに宣言型から `undefined` を禁止すると境界正規化(`Optional.fromNullable`)が至る所に必要になる。
+- **帰結**: [spec/null-undefined.md](./spec/null-undefined.md) の目標を書き換える。ts-std-forge の Optional ラッパー(TODO の並行ワークストリーム)がこの方針の前提条件になる。
+
+## D-32: 外部 API へ `null` を渡す必要は ts-std-forge のラッパーで吸収する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: `null` を要求する外部 API(`JSON.stringify(v, null, 2)` の replacer、React の `useRef(null)` 等)には ts-std-forge 側でラッパーを用意し(例: indent オプションを取る `stringify`)、ユーザーコードには `null` の字面を書かない。対象外の API は必要になった時点で個別に追加する。
+- **却下した代替案**: prelude に `Null` 定数を置く(null の別名を増やすだけ)。境界行での `null` リテラル例外(抜け穴になる)。
+
+## D-33: getter / setter は両方禁止する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: object literal の `get x() {}` / `set x(v) {}` を禁止する。遅延評価は明示的な関数プロパティ(`x: () => …`)か ts-data-forge の memoize で書く。
+- **理由**: プロパティアクセスが関数呼び出しになる暗黙の制御フロー。setter は mutation でもある。class 文脈は D-12 で既に消滅している。
+- **実装**: `no-restricted-syntax`(`Property[kind='get']` / `Property[kind='set']`)。
+
+## D-34: 言語バージョンと TS バージョンの対応は preset / チェッカーの peerDependencies で固定する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: 対応表は書かない。言語のバージョンはツール(tsubu-eslint-config、将来の `tsubu check`)のバージョンであり、対応する TS の範囲はそのツールの package.json の `peerDependencies` が単一の真実。
+- **理由**: `strict` の中身が TS のバージョンで増える問題は「どの TS で検査したか」をツールが固定すれば解決し、手書きの表は乖離する。
+
+## D-35: v2 の `let mut x` は `let mut_x` として emit する
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: v2 transpiler は `let mut x` を TS の `let mut_x`(宣言と全参照)に落とす。`let x` は `const x` に落とす。
+- **理由**: eject した出力が v1 規則を満たす合法 Tsubu v1 コードになり、可変性の情報が TS 側でも読める。v1 → v2(`mut_` 除去)と v2 → v1(`mut_` 付与)の codemod が可逆になる(D-3)。
+
+## D-36: default export を要求するツールへは v2 transpiler が default export を emit して接続する(v1 は言語外のアダプタ)
+
+- **ステータス**: 確定(2026-09-05)
+- **判断**: ソースの export 形は named 一択(D-28)。ESLint flat config / Vite / Vitest / Rollup 等が要求する default export は、**v2 では transpiler が `export default` を emit** して作る。emit の指示は **transpiler の設定ファイル(パスパターン → default にする named export 名)を第一候補**とし、ファイル内ディレクティブは次点。v1 には transpiler がないため、暫定として設定の本体を Tsubu の通常モジュール(named export)で書き、ツールが読むファイルは検査対象外の 1 行アダプタ(`export { config as default } from './configs/eslint.config.mjs';`)とする。
+- **理由**: 書き方を増やしてブレるのを避けるため、ソース側では default export を完全に禁止し、必要な形は出力側で作る(ユーザー決定)。設定ファイル方式を推す理由: ソースに特別な記法が一切入らず、v1 のアダプタ(ファイル → シンボル名)と v2 の設定エントリが同じ情報なので機械的に相互変換できる(D-3 と同型)。ディレクティブはコメントの形をした「二つ目の export の書き方」になる。
+- **却下した代替案**: 設定ファイル全体を言語の対象外にする(設定の中身は本物のコードであり、保護を失う)。**特定の構文を使えるファイルをパス指定で許可する一般機構**(現行 eslint-config-typed の `*.config.*` 例外の一般化)— 同じコードの合法性がプロジェクト設定次第で変わることになり、compilerOptions を固定して設定の自由度を消した D-7 と逆向き。境界の例外は prelude だけに `declare global` を許すのと同じく、仕様が列挙する固定の規定に限る。
+- **帰結**: 設定ファイル / ディレクティブの具体形は v2 設計時に決める。アダプタファイルは v1 preset でファイル単位の除外として扱う。

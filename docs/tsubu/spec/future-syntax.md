@@ -88,6 +88,7 @@ const parsed = Json.parse(text)?;   // Err ならこの関数から即 return Er
   [TypeScript の branded type `Int` と literal の相性問題](https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int#branded-type-%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%9F%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E5%BC%8A%E5%AE%B3)、[microsoft/TypeScript#53923](https://github.com/microsoft/TypeScript/issues/53923)。
 - **含意**: この改善は構文の追加(transpiler)では実現できず、**型検査器の拡張が必要**になる — bivariance の根本解決([classes.md](./classes.md))と同じく「v3: 独自型検査器」という段階を示唆する最初の具体的動機。仕様上は「brand 型による v1 近似」と「ネイティブ型としての理想形」を分けて記述していく。
 - **接続**: bitwise 演算子の再導入条件([banned-syntax.md](./banned-syntax.md) — `Int32` 導入後に厳密化して解禁)。
+- **`typeof` の narrowing 先も絞る(v2 以降)**: TS の `typeof x === 'number'` は `x` を `number` にしか絞れない。v2 以降では、`typeof` の結果を `number` ではなく `Int` 等のより厳しい型へ絞る機能も付ける(2026-09-05 追記)。実行時の `typeof` は `'number'` 一種類しか返さないので、`Int` への narrowing は transpiler が `Number.isInteger` 等の追加検査を emit する(意味の変更 — v2 以降でのみ可能)か、型検査器側の narrowing 規則を差し替える(v3)かのどちらかで実現する。どちらを採るかは候補 7 の設計時に決める。
 
 ## 候補 8: 関数宣言構文 `fn` とオーバーロード記法
 

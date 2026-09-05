@@ -60,18 +60,18 @@ const createHttpError = (
 - **`Object.freeze` との相互作用**: freeze 済みオブジェクトへの `captureStackTrace` は TypeError。freeze 後の `.stack` 読み出しは可。→ factory 内は `mut_` 変数で組み立ててから返す(freeze するなら最後)。
 - **コスト実測**(N=100k, stackTraceLimit=10): plain tagged record ≈ 0.05µs / `new Error` ≈ 1.3µs / `.stack` 文字列化まで ≈ 3.9µs per 件。**Error ベースは plain record の約 25 倍**。
 
-**仕様への帰結(提案)**:
+**仕様への帰結(確定 2026-09-05 — D-27)**:
 
 1. `Result` の Err ペイロードの既定は **plain tagged union(stack なし)** — hot path で Err を返す関数のコストを plain record に保つ。
 2. **境界(外部 API のラップ)と panic 経路(unwrapThrow)では上記 factory の Error ベースエラー**を使う — スタックと監視ツール連携が要る場所に限定して 25 倍のコストを払う。`fromThrowable` が捕捉する例外はもともと Error インスタンスであり、そのまま Err ペイロードに載る。
 3. `Error('msg')`(new なしの関数呼び出し)は D-15 のコンストラクタ静的呼び出し禁止に含め、生成は `new Error` か prelude の factory に統一する。
 4. dev ビルドで plain Err にも stack を付与する opt-in は、将来の checked モード([related-work.md](../related-work.md) の Safe TS 由来案)と同系の拡張として記録。
 
-## `try..catch` の扱い(提案)
+## `try..catch` の扱い(確定 2026-09-05 — D-27)
 
-`throw` を書けないなら、ユーザーコードで `try..catch` が必要なのは外部 API の境界だけであり、それは `fromThrowable` / `fromPromise` が担う。したがって **`try..catch` 構文自体も禁止**し、例外の捕捉手段を prelude の 2 関数に一本化することを提案する([banned-syntax.md](./banned-syntax.md))。
+`throw` を書けないなら、ユーザーコードで `try..catch` が必要なのは外部 API の境界だけであり、それは `fromThrowable` / `fromPromise` が担う。したがって **`try..catch` 構文自体も禁止**し、例外の捕捉手段を prelude の 2 関数に一本化する([banned-syntax.md](./banned-syntax.md))。
 
-- `finally` 相当(リソース解放)は `using` / explicit resource management(TC39 / TS 5.2+)が受け皿になりうる — `using` を言語に入れるかは未定。
+- `finally` 相当(リソース解放)は `using` / explicit resource management(TC39 / TS 5.2+)が受け皿になりうるが、**v1 では `using` / `await using` を禁止し、採否は v2 で再検討する**(D-30)。v1 のリソース解放は `fromThrowable` に渡すコールバック内で明示的に書く。
 
 ## TS へ戻るときの影響
 
@@ -80,5 +80,5 @@ const createHttpError = (
 ## 未解決の論点
 
 - `Err` ペイロードの設計規範は上記「仕様への帰結」1〜2 で骨格が決まった(既定 plain tagged union / 境界・panic は Error ベース factory)。残るのはエラーの合成(`mapErr` / union が増えていく問題)の指針と、factory 群を prelude(ts-data-forge)にどう載せるか。
-- `using` / Explicit Resource Management を採るか。
+- `using` / Explicit Resource Management の v2 での採否(v1 は禁止 — D-30)。
 - process 境界(uncaught rejection、`process.exit`)の扱い。

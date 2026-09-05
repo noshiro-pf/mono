@@ -2,10 +2,11 @@
 
 # 標準ライブラリ(strict-lib + ts-data-forge prelude)
 
-## 二層構造(D-6)
+## 三層構造(D-6 — 確定 2026-09-05)
 
 1. **組み込み層** — `lib.d.ts` 相当。strict-ts-lib を採用し、readonly 化・危険 API の型レベル封印を組み込みの前提とする([readonly.md](./readonly.md)、[compiler-options.md](./compiler-options.md))。
 2. **prelude 層** — 言語ネイティブに見せたいユーティリティ: `pipe`、`match`、`Optional`、`Result`、`Arr`、`Num` など。実体は ts-data-forge。
+3. **境界ラッパー層** — throw する / null を返す stdlib API を Result / Optional 化するラッパー。実体は ts-std-forge(D-24、D-26)。ts-data-forge への一方向依存。
 
 ### prelude の見せ方
 
@@ -85,7 +86,7 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 
 - **コンストラクタ静的呼び出しの代替生成関数**(D-15)と **throw する stdlib の Result ラッパー**(D-22 — 対象は [throwing-stdlib-survey.md](../throwing-stdlib-survey.md)): `Num.safeParseInt` 系・`Json.*` が既存モデル。**`new RegExp` の Result ラッパー(動的パターン用)をギャップに追加**(2026-08-29)。`Arr.set` の可変長配列での範囲外(RangeError が残る)への Optional/Result 版も検討対象。
 - **null / 番兵値を返す API の Optional ラップ(方針)**: throwable → Result と対になる形で、null を返す API(`RegExp.prototype.exec`、`match` 等)は Optional を返すラッパーへ寄せたい(ユーザー意向 2026-08-29。番兵値 API の棚卸しは survey の次の調査枠)。
-- **ラッパー群のパッケージ構成(確定 — D-24)**: 一方向依存の新ライブラリ **ts-std-forge**(仮名)を採用。scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)。以下は検討の記録:懸念は相互依存 — ts-data-forge は基本 ADT(Result/Optional/pipe)と拡張 `Arr` の両方を持つため、分割すると双方向依存になりうる。**整理案(提案)**: 依存を「wrapper 新 lib → ts-data-forge」の一方向に固定する。ts-data-forge が wrapper を必要とする状況は「自身の実装内部では素の stdlib を直接使ってよい(境界の実装者)」と定義すれば発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面そのままにし、新 lib が re-export で facade になる(実体移動は将来の major で)。より根本的な代替は「ADT コア(Result/Optional/pipe のみ)の最小パッケージを切り出し、ts-data-forge と wrapper lib が共にそれへ依存する」形(fp-ts/effect 型の kernel 構成)だが、公開済みパッケージの再編コストが大きい。
+- **ラッパー群のパッケージ構成(確定 — D-24)**: 一方向依存の新ライブラリ **ts-std-forge**(仮名)を採用。scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)。以下は検討の記録:懸念は相互依存 — ts-data-forge は基本 ADT(Result/Optional/pipe)と拡張 `Arr` の両方を持つため、分割すると双方向依存になりうる。**整理案(D-24 で採用)**: 依存を「wrapper 新 lib → ts-data-forge」の一方向に固定する。ts-data-forge が wrapper を必要とする状況は「自身の実装内部では素の stdlib を直接使ってよい(境界の実装者)」と定義すれば発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面そのままにし、新 lib が re-export で facade になる(実体移動は将来の major で)。より根本的な代替は「ADT コア(Result/Optional/pipe のみ)の最小パッケージを切り出し、ts-data-forge と wrapper lib が共にそれへ依存する」形(fp-ts/effect 型の kernel 構成)だが、公開済みパッケージの再編コストが大きい。
 - prelude の範囲(`Arr` / `Num` / `Obj` / `IMap` 等をどこまで「言語機能」扱いにするか)。
 - 上記ギャップを ts-data-forge 本体に実装する順序(★★★ の 4 件: `Optional.match` / `Optional.toResult` / `Result.match` / `safeTry` + async 系、が先頭候補)。
 - `TernaryResult` を言語仕様に含めるか。
