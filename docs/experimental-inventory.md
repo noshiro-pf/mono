@@ -105,14 +105,14 @@ app に連れられて来るもの。単体で復元する理由は薄い。
 
 ### others / slides（6 個）
 
-| もの                           | 行数 | 中身                                |
-| :----------------------------- | ---: | :---------------------------------- |
-| `others/slack-archive-tools`   |  952 | Slack エクスポートの整形            |
-| `others/mahjong-scoring-tool`  |  276 | 点数計算                            |
-| `others/ts_playground`         |  104 | 型の実験場                          |
-| `others/implement-react-hooks` |   56 | hooks の自作実装（学習用）          |
-| `slides/dezero_06_to_16`       |    — | reveal.js のスライド（HTML 直書き） |
-| `slides/chain_rule`            |    — | 同上                                |
+| もの                              | 行数 | 中身                                       |
+| :-------------------------------- | ---: | :----------------------------------------- |
+| ~~`others/slack-archive-tools`~~  |  952 | Slack エクスポートの整形（復元済み・下節） |
+| ~~`others/mahjong-scoring-tool`~~ |  276 | 点数計算（復元済み・下節）                 |
+| `others/ts_playground`            |  104 | 型の実験場                                 |
+| `others/implement-react-hooks`    |   56 | hooks の自作実装（学習用）                 |
+| `slides/dezero_06_to_16`          |    — | reveal.js のスライド（HTML 直書き）        |
+| `slides/chain_rule`               |    — | 同上                                       |
 
 ## 中身が無い（復元する対象が存在しない）
 
@@ -334,7 +334,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
 | `catan-dice-app`                        |  471 | **なし**                     |
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
-| `blueprintjs-playground`                |   92 | **なし**                     |
+| ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
@@ -722,3 +722,161 @@ npm 依存は要らない。
 するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
 した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
 変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
+
+## `blueprintjs-playground` の復元（2026-09-01）
+
+`blueprintjs-playground-styled` の**素の双子**。同じデモページを、こちらは
+Blueprint 自身の `NumericInput` / `InputGroup` で描く。2 つ並んで初めて
+「Blueprint の実物」対「スクラッチで組んだ同等品」という比較になる。
+
+中身は `app.tsx` ・ `main.tsx` ・ `index.css` の 3 つだけで、
+`apps/` 側との重複は無い（`@blueprintjs/core` を直接使うため）。`#1758` で
+styled 版に起きたような「大半が既に入っていた」ということは無かった。
+
+### `index.css` は原文のまま
+
+`normalize.css` ・ `@blueprintjs/icons` ・ `datetime2` ・ `datetime` ・ `select`
+の `@import` が並ぶが、**`event-schedule-app` も同じ一覧を持ったまま
+`@blueprintjs/core` と `datetime` しか宣言していない**。スタイルシートは
+bundler の関心事で、このリポジトリでは何もビルドしない。同じ扱いに揃えた。
+
+最初はこの playground が描かない `datetime` 系と `select` を削ったが、
+**兄弟に合わせるほうが正しい** — 差を作る理由が無い。
+
+### `noop` はローカルに置いた
+
+移植元では暗黙グローバルだった。後継は `react-blueprintjs-utils` の
+`utils/ported.mts` にあるが、**この playground が同パッケージを要る理由は
+それしかない**。`() => undefined` 1 行のためにパッケージ依存を足すのは
+釣り合わないので、`app.tsx` の中に置いて理由をコメントにした。
+
+`constants/dictionary/` は `export const dict = {} as const;` の
+テンプレート残骸なので持ち込んでいない（#1746 ・ #1754 ・ #1758 と同じ）。
+
+### これで「追加の npm 依存が要らない React app」は片付いた
+
+`#1754` で分けた 4 つ（`blueprintjs-playground` ・
+`cant-stop-probability-app` ・ `blueprintjs-playground-styled` ・
+`housing-loan-calculator-app`）がすべて復元済みになった。React 側に残るのは
+**外部依存の判断が要る 3 つ**である。
+
+| app               | 要る npm 依存                                  |
+| :---------------- | :--------------------------------------------- |
+| `catan-dice-app`  | `@mui/material`                                |
+| `color-demo-app`  | `@mui/material` ＋ `react-mui-utils`（未復元） |
+| `annotation-tool` | `pixi.js-legacy` ・ `uuid`                     |
+
+## `others/` の 6 つを見た（2026-09-01）
+
+`apps` 側で「追加の npm 依存が要らないもの」を出し切ったので、`others` を
+1 つずつ見た。**6 つのうち復元する価値があるのは 2 つ**である。
+
+| もの                           | 判断                                                 |
+| :----------------------------- | :--------------------------------------------------- |
+| `others/mahjong-scoring-tool`  | **復元した**（下節）                                 |
+| `others/slack-archive-tools`   | **復元した**（下節）                                 |
+| `others/implement-react-hooks` | **復元しない**。未完成の学習用スクラッチ             |
+| `others/ts_playground`         | **復元しない**。TypeScript ハンドブックの写経        |
+| `slides/dezero_06_to_16`       | HTML 直書きの reveal.js スライド。パッケージではない |
+| `slides/chain_rule`            | 同上                                                 |
+
+`implement-react-hooks` は `useState` が `initialState` をそのまま返し、
+`useEffect` が引数を `console.log` するだけの**書きかけ**で、トップレベルに
+`console.log` が並ぶ。`ts_playground` は `20200928_modules` ・
+`20201016_namespaces` という日付ディレクトリに TypeScript 公式ドキュメントの
+例（`ZipCodeValidator` など）が置いてあるもので、**存在しないモジュール**
+（`'hot-new-module'` ・ `'math-lib'` ・ `'json!http://example.com/data.json'`）を
+import しているのでそもそもコンパイルできない。どちらも「取っておく価値の
+あるものだけ持ってくる」の対象外である。
+
+## `mahjong-scoring-tool` の復元（2026-09-01）
+
+外部依存は無く、import している名前は 2 つだけだった。
+
+| 移植元                                          | 復元後                        |
+| :---------------------------------------------- | :---------------------------- |
+| `toUint32`（`@noshiro/mono-utils`）             | `asUint32`（`ts-data-forge`） |
+| `getShuffled`（`@noshiro/ts-utils-additional`） | 後継が無いので同梱（下記）    |
+
+`getShuffled` は `react-blueprintjs-utils` の `utils/ported.mts` と同じ扱いで、
+**後継が無いものはそれを使うパッケージに置く**。ここでは `createPointMap` の
+テスト 1 箇所だけが使う（生の点数の並び順で結果が変わらないことの確認）。
+
+### `as` を 5 つ消した
+
+移植元は `ArrayOfLength4<T>`（= `readonly [T,T,T,T]`）を自前で定義し、
+`.map()` の結果を毎回そこへキャストしていた。`Array.prototype.map` はタプルを
+`U[]` に広げるためで、**5 箇所すべてに
+`total-functions/no-unsafe-type-assertion` の disable が付いていた**。
+
+4 要素ぶんを書き下す `map4` を置けば全部要らなくなる。
+
+```ts
+const map4 = <T, U>(
+  tuple: FixedLengthTuple<4, T>,
+  mapFn: (value: T, index: 0 | 1 | 2 | 3) => U,
+): FixedLengthTuple<4, U> => [ mapFn(tuple[0], 0), … ];
+```
+
+**添字を `number` ではなくリテラル union にするのが要点。** 呼び出し側は
+その添字で別の 4-タプルを引くので、`noUncheckedIndexedAccess` の下では
+リテラルでないと `number | undefined` になり、移植元にあった `!`（非 null
+アサーション）が必要になってしまう。
+
+`toSorted` だけは長さを型で保てないので、4 要素を書き下して `?? 0` で受けた。
+`ArrayOfLength4` は `ts-type-forge` の `FixedLengthTuple<4, …>` に置き換えた。
+
+**テスト 6 件が通ることで等価性を確認している。** そのうちの 1 つが
+`getShuffled` で順序を入れ替えて同じ結果になることを見ているので、
+`map4` の書き換えはそこで実際に効いている。
+
+## `slack-archive-tools` の復元（2026-09-01）
+
+`others/` の 2 つ目。952 行 10 ファイル。**これで `others/` は片付いた**
+（残り 4 つのうち 2 つは復元しない判断、2 つは reveal.js のスライド）。
+
+### `zx` の暗黙グローバルが 42 箇所
+
+`import 'zx/globals'` が `path` と `fs` をグローバルに生やしていた。型エラー
+68 件のうち 42 件がこれで、`node:path` と `node:fs/promises` の明示 import に
+置き換えた。**`node:fs` ではなく `node:fs/promises`** である — zx の `fs` は
+`fs-extra` で、`readFile` などが Promise を返す。
+
+| 移植元                               | 復元後                               |
+| :----------------------------------- | :----------------------------------- |
+| `@noshiro/io-ts`（`t.*` 12 種）      | `ts-fortress`（全部そろっている）    |
+| `@noshiro/ts-utils`                  | `ts-data-forge`                      |
+| `execAsync`（`@noshiro/mono-utils`） | `$`（`ts-repo-utils`）               |
+| `zx/globals` の `path` / `fs`        | `node:path` / `node:fs/promises`     |
+| `ISet.new` / `toUint32` / `.chain(`  | `ISet.create` / `asUint32` / `.map(` |
+
+io-ts の 12 種（`enumType` ・ `mergeRecords` ・ `nonEmptyArray` ・ `partial` ・
+`positiveSafeInt` ほか）は**すべて `ts-fortress` にある**。`export function` の
+オーバーロードなので `export const` で grep すると見つからない点に注意。
+
+### `Json.stringify` は `undefined` を返し得る
+
+`JSON.stringify` は `undefined` ・関数 ・ symbol に対して `undefined` を返す。
+`ts-data-forge` の `Json.stringify` はそれを型に書いているので、`Result` を
+剥がしたあとに `string | undefined` が残る。ここでは `Json.parse` の結果を
+書き戻すだけなので実際には起きないが、書かないと通らない。ガードを 1 つ足した。
+
+### 規則同士が打ち消し合う 3 例目
+
+`unicorn/no-break-in-nested-loop`（入れ子ループで `continue` を使うな）と
+`unicorn/prefer-continue`（ループ本体を丸ごと `if` で包むな）が正面から
+ぶつかる。#1756 の `-1 * n`、#1762 の `includes` / `some` に続く 3 例目。
+
+**前者の警告文が答えを書いている** — 「入れ子のループを関数に切り出せ」。
+`collectSubKeys` ・ `collectSubArrayKeys` ・ `collectRecordKeys` に切り出すと、
+`continue` はそれぞれの関数で最外周のループに属することになり、どちらの規則
+にも触れない。ネストが 1 段深いほうは 2 段階に分ける必要があった。
+
+### barrel は作らない
+
+10 モジュールのうち **5 つは import した時点で `await main()` が走る**道具で
+ある。`pnpm run gi` が生成した `index.mts` はそれらを再エクスポートするので、
+barrel を読むだけでツールが動いてしまう。ライブラリとしての面が無いので、
+`gi` スクリプトごと外した。knip には 5 つの入口を個別に登録している。
+
+（`main` という名前が 2 モジュールで衝突して `TS2308` になったことで気付いた。）
