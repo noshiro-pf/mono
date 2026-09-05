@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/button/index.ts experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/button/index.ts
+deleted file mode 100644
+index d0b932366..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/button/index.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './common';

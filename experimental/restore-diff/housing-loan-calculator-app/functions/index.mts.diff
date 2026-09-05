@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/index.ts apps/housing-loan-calculator-app/src/functions/index.mts
+index 42c52c109..7b512a161 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/index.ts
++++ apps/housing-loan-calculator-app/src/functions/index.mts
+@@ -1,4 +1,4 @@
+-export * from './calc-all';
+-export * from './calc-principal-and-interest-equal-repayment';
+-export * from './calc-principal-equal-payment';
+-export * from './financial';
++export * from './calc-all.mjs';
++export * from './calc-principal-and-interest-equal-repayment.mjs';
++export * from './calc-principal-equal-payment.mjs';
++export * from './financial/index.mjs';

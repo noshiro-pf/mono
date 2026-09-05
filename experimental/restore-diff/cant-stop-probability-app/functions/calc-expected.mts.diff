@@ -1,0 +1,19 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/calc-expected.ts apps/cant-stop-probability-app/src/functions/calc-expected.mts
+index b1d8129bc..b45ea5d44 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/calc-expected.ts
++++ apps/cant-stop-probability-app/src/functions/calc-expected.mts
+@@ -1,4 +1,5 @@
+-import { type Count } from '../types';
++import { Num } from 'ts-data-forge';
++import { type Count } from '../types/index.mjs';
+ 
+ /**
+  * （計算式）
+@@ -23,6 +24,7 @@ import { type Count } from '../types';
+  */
+ export const calcExpected = (count: Count): number => {
+   const { noLine, oneLine, twoLine } = count;
++
+   return Num.isPositive(noLine)
+     ? Math.floor(Num.div(oneLine + 2 * twoLine, noLine))
+     : 0;

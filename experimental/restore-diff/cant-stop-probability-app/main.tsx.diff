@@ -1,0 +1,25 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/main.tsx apps/cant-stop-probability-app/src/main.tsx
+index 09cd7a355..ec9a3b720 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/main.tsx
++++ apps/cant-stop-probability-app/src/main.tsx
+@@ -1,17 +1,13 @@
+-import { StrictMode } from 'react';
+ import { createRoot } from 'react-dom/client';
+-import { App } from './app';
++import { App } from './app.js';
+ import './index.css';
+ 
+ const container = document.querySelector('#root');
+ 
+ if (container !== null) {
+   const root = createRoot(container);
+-  root.render(
+-    <StrictMode>
+-      <App />
+-    </StrictMode>,
+-  );
++
++  root.render(<App />);
+ } else {
+   throw new Error('Could not find root element');
+ }

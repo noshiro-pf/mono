@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/index.ts experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/index.ts
+deleted file mode 100644
+index 6199627fe..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/constants/dictionary/index.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './dictionary';

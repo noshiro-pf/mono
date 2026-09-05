@@ -1,0 +1,26 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/main.tsx apps/blueprintjs-playground-styled/src/main.tsx
+index 09cd7a355..374009cdb 100644
+--- experimental/packages/apps/blueprintjs-playground-styled/src/main.tsx
++++ apps/blueprintjs-playground-styled/src/main.tsx
+@@ -1,16 +1,17 @@
+-import { StrictMode } from 'react';
++import * as React from 'react';
+ import { createRoot } from 'react-dom/client';
+-import { App } from './app';
++import { App } from './app.js';
+ import './index.css';
+ 
+ const container = document.querySelector('#root');
+ 
+ if (container !== null) {
+   const root = createRoot(container);
++
+   root.render(
+-    <StrictMode>
++    <React.StrictMode>
+       <App />
+-    </StrictMode>,
++    </React.StrictMode>,
+   );
+ } else {
+   throw new Error('Could not find root element');

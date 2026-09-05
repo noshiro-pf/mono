@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/config-section.tsx apps/housing-loan-calculator-app/src/components/config-section/config-section.tsx
+index 733981988..35bcb6205 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/config-section.tsx
++++ apps/housing-loan-calculator-app/src/components/config-section/config-section.tsx
+@@ -1,4 +1,8 @@
+ import { Label } from '@blueprintjs/core';
++import styled from '@emotion/styled';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { dict } from '../../constants/index.mjs';
+ import {
+   setBorrowingPeriodYear,
+   setDownPaymentManYen,
+@@ -6,13 +10,13 @@ import {
+   setPropertyPriceManYen,
+   setRepaymentType,
+   store$,
+-} from '../../store';
++} from '../../store/index.mjs';
+ import {
+   PercentFloatNumericInput,
+   YearNumericInput,
+   YenNumericInput,
+-} from '../numeric-input';
+-import { RepaymentTypeRadioGroup } from './repayment-type-radio-group';
++} from '../numeric-input/index.mjs';
++import { RepaymentTypeRadioGroup } from './repayment-type-radio-group.js';
+ 
+ export const ConfigSection = memoNamed('ConfigSection', () => {
+   const {

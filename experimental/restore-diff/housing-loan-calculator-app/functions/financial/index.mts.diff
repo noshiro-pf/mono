@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/financial/index.ts apps/housing-loan-calculator-app/src/functions/financial/index.mts
+index 7dee607ea..63ea77804 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/financial/index.ts
++++ apps/housing-loan-calculator-app/src/functions/financial/index.mts
+@@ -1,2 +1,2 @@
+-export * from './ith-borrowing-balance-in-pier';
+-export * from './monthly-payments-in-pier';
++export * from './ith-borrowing-balance-in-pier.mjs';
++export * from './monthly-payments-in-pier.mjs';

@@ -1,0 +1,32 @@
+diff --git apps/cant-stop-probability-app/src/constants/selected-3-list.test.mts apps/cant-stop-probability-app/src/constants/selected-3-list.test.mts
+new file mode 100644
+index 000000000..ccdbe8925
+--- /dev/null
++++ apps/cant-stop-probability-app/src/constants/selected-3-list.test.mts
+@@ -0,0 +1,26 @@
++import { selected3List } from './selected-3-list.mjs';
++
++describe('selected3List', () => {
++  const list = selected3List();
++
++  test('has one entry per 3-combination of the eleven columns', () => {
++    // 11C3
++    expect(list).toHaveLength(165);
++  });
++
++  test('every triple is strictly ascending', () => {
++    expect(list.every(([x, y, z]) => x < y && y < z)).toBe(true);
++  });
++
++  test('the triples are distinct', () => {
++    const keys = new Set(list.map((t) => t.join('-')));
++
++    expect(keys.size).toBe(list.length);
++  });
++
++  test('starts and ends where slicing the ascending set says it should', () => {
++    assert.deepStrictEqual(list[0], [2, 3, 4]);
++
++    assert.deepStrictEqual(list.at(-1), [10, 11, 12]);
++  });
++});

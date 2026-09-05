@@ -1,0 +1,73 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/payment-table/payment-table.tsx apps/housing-loan-calculator-app/src/components/payment-table/payment-table.tsx
+index 955567ac8..23e3cc20b 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/payment-table/payment-table.tsx
++++ apps/housing-loan-calculator-app/src/components/payment-table/payment-table.tsx
+@@ -1,6 +1,12 @@
+ import { HTMLTable } from '@blueprintjs/core';
+-import { calculatedValues$, store$ } from '../../store';
+-import { Yen } from '../../types';
++import * as React from 'react';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { Arr, Uint32 } from 'ts-data-forge';
++import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
++import { dict } from '../../constants/index.mjs';
++import { calculatedValues$, store$ } from '../../store/index.mjs';
++import { Yen } from '../../types/index.mjs';
+ 
+ const headerCellStyle = {
+   textAlign: 'center',
+@@ -10,11 +16,12 @@ const dataCellStyle = {
+   textAlign: 'right',
+ } as const satisfies React.CSSProperties;
+ 
+-const formatYenValue = (value: Yen): string =>
+-  Intl.NumberFormat('ja-JP', {
+-    style: 'currency',
+-    currency: 'JPY',
+-  }).format(value);
++const yenFormatter = new Intl.NumberFormat('ja-JP', {
++  style: 'currency',
++  currency: 'JPY',
++});
++
++const formatYenValue = (value: Yen): string => yenFormatter.format(value);
+ 
+ export const PaymentTable = memoNamed('PaymentTable', () => {
+   const { repaymentType } = useObservableValue(store$);
+@@ -26,7 +33,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
+     monthlyPrincipalPaymentYen,
+   } = useObservableValue(calculatedValues$);
+ 
+-  const monthlyPayment = useMemo<readonly Yen[]>(
++  const monthlyPayment = React.useMemo<readonly Yen[]>(
+     () =>
+       repaymentType === 'principal-equal-payment'
+         ? monthlyPaymentTotalYen
+@@ -34,7 +41,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
+     [repaymentType, monthlyPaymentTotalYen, monthlyPrincipalPaymentYen],
+   );
+ 
+-  const numRows = useMemo(
++  const numRows = React.useMemo(
+     () =>
+       Uint32.max(
+         Arr.length(borrowingBalanceYen),
+@@ -44,7 +51,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
+     [borrowingBalanceYen, interestYen, monthlyPaymentTotalYen],
+   );
+ 
+-  const tableData = useMemo<DeepReadonly<ArrayOfLength<4, string>[]>>(
++  const tableData = React.useMemo<DeepReadonly<FixedLengthTuple<4, string>[]>>(
+     () =>
+       Arr.seq(numRows).map((i) => [
+         i.toString(),
+@@ -56,7 +63,7 @@ export const PaymentTable = memoNamed('PaymentTable', () => {
+   );
+ 
+   return (
+-    <HTMLTable bordered={true} compact={true} striped={true}>
++    <HTMLTable bordered compact striped>
+       <thead>
+         <tr>
+           <th style={headerCellStyle}>{dict.numPayments}</th>

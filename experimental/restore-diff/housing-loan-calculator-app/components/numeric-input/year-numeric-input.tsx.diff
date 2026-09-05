@@ -1,0 +1,48 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/year-numeric-input.tsx apps/housing-loan-calculator-app/src/components/numeric-input/year-numeric-input.tsx
+index 79b335677..e087fdee2 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/year-numeric-input.tsx
++++ apps/housing-loan-calculator-app/src/components/numeric-input/year-numeric-input.tsx
+@@ -1,6 +1,9 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
+-import { Year } from '../../types';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
++import { Year } from '../../types/index.mjs';
+ 
+ type Props = Readonly<{
+   value: Year;
+@@ -32,14 +35,15 @@ export const YearNumericInput = memoNamed<Props>(
+       onKeyDown,
+     } = useNumericInputWithStepState<Year>({
+       onValueChange,
+-      normalize: (n) => Year.cast(Number(n)),
+-      decode: (s) => Year.cast(Number(s)),
++      normalize: (n) => Year.cast(n),
++      decode: (s) =>
++        Year.cast(Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN)),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
++    const inputProps = React.useMemo(
+       () => ({ min, max, step, onKeyDown, 'data-e2e': cyId }),
+       [max, min, step, onKeyDown, cyId],
+     );
+@@ -47,9 +51,9 @@ export const YearNumericInput = memoNamed<Props>(
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}
