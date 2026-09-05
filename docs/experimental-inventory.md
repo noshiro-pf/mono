@@ -105,14 +105,14 @@ app に連れられて来るもの。単体で復元する理由は薄い。
 
 ### others / slides（6 個）
 
-| もの                           | 行数 | 中身                                |
-| :----------------------------- | ---: | :---------------------------------- |
-| `others/slack-archive-tools`   |  952 | Slack エクスポートの整形            |
-| `others/mahjong-scoring-tool`  |  276 | 点数計算                            |
-| `others/ts_playground`         |  104 | 型の実験場                          |
-| `others/implement-react-hooks` |   56 | hooks の自作実装（学習用）          |
-| `slides/dezero_06_to_16`       |    — | reveal.js のスライド（HTML 直書き） |
-| `slides/chain_rule`            |    — | 同上                                |
+| もの                              | 行数 | 中身                                       |
+| :-------------------------------- | ---: | :----------------------------------------- |
+| ~~`others/slack-archive-tools`~~  |  952 | Slack エクスポートの整形（復元済み・下節） |
+| ~~`others/mahjong-scoring-tool`~~ |  276 | 点数計算（復元済み・下節）                 |
+| `others/ts_playground`            |  104 | 型の実験場                                 |
+| `others/implement-react-hooks`    |   56 | hooks の自作実装（学習用）                 |
+| `slides/dezero_06_to_16`          |    — | reveal.js のスライド（HTML 直書き）        |
+| `slides/chain_rule`               |    — | 同上                                       |
 
 ## 中身が無い（復元する対象が存在しない）
 
@@ -332,9 +332,9 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`blueprintjs-playground-styled`~~     | 1701 | 大半が復元済みだった（下節） |
 | ~~`housing-loan-calculator-app`~~       | 1143 | 復元済み（下節）             |
 | ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
-| `catan-dice-app`                        |  471 | **なし**                     |
+| ~~`catan-dice-app`~~                    |  471 | **なし**                     |
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
-| `blueprintjs-playground`                |   92 | **なし**                     |
+| ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
@@ -344,10 +344,10 @@ step 3 で `poll-discord-app` から始めたときと同じ性格の作業に�
 
 ### Preact 側は utils 4 つが前提になる
 
-`algo-app`（5033）・`mahjong-calculator-app`（2428）・`my-portfolio-app-preact`
-（1244）・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
-`preact-utils`（472）・`tiny-router-preact-hooks`（140）・~~`better-preact-use-state`
-（74）~~・`resize-observer-preact-hooks`（55）が先に要る。合計 741 行で、いずれも
+`algo-app`（5033）・~~`mahjong-calculator-app`（2428）~~・~~`my-portfolio-app-preact`
+（1244）~~・`lambda-calculus-interpreter-preact`（190）・`slack-app`（42）の 5 つは、
+~~`preact-utils`~~（472）・~~`tiny-router-preact-hooks`~~（140）・~~`better-preact-use-state`~~
+（74）・~~`resize-observer-preact-hooks`~~（55）が先に要る。合計 741 行で、いずれも
 React 版が `apps/` にある。`goober` も箱だけなので npm の `goober` を直接使う。
 
 **`better-preact-use-state` は復元済み**（下節）。残る 3 つのうち
@@ -722,3 +722,534 @@ npm 依存は要らない。
 するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
 した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
 変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
+
+## `blueprintjs-playground` の復元（2026-09-01）
+
+`blueprintjs-playground-styled` の**素の双子**。同じデモページを、こちらは
+Blueprint 自身の `NumericInput` / `InputGroup` で描く。2 つ並んで初めて
+「Blueprint の実物」対「スクラッチで組んだ同等品」という比較になる。
+
+中身は `app.tsx` ・ `main.tsx` ・ `index.css` の 3 つだけで、
+`apps/` 側との重複は無い（`@blueprintjs/core` を直接使うため）。`#1758` で
+styled 版に起きたような「大半が既に入っていた」ということは無かった。
+
+### `index.css` は原文のまま
+
+`normalize.css` ・ `@blueprintjs/icons` ・ `datetime2` ・ `datetime` ・ `select`
+の `@import` が並ぶが、**`event-schedule-app` も同じ一覧を持ったまま
+`@blueprintjs/core` と `datetime` しか宣言していない**。スタイルシートは
+bundler の関心事で、このリポジトリでは何もビルドしない。同じ扱いに揃えた。
+
+最初はこの playground が描かない `datetime` 系と `select` を削ったが、
+**兄弟に合わせるほうが正しい** — 差を作る理由が無い。
+
+### `noop` はローカルに置いた
+
+移植元では暗黙グローバルだった。後継は `react-blueprintjs-utils` の
+`utils/ported.mts` にあるが、**この playground が同パッケージを要る理由は
+それしかない**。`() => undefined` 1 行のためにパッケージ依存を足すのは
+釣り合わないので、`app.tsx` の中に置いて理由をコメントにした。
+
+`constants/dictionary/` は `export const dict = {} as const;` の
+テンプレート残骸なので持ち込んでいない（#1746 ・ #1754 ・ #1758 と同じ）。
+
+### これで「追加の npm 依存が要らない React app」は片付いた
+
+`#1754` で分けた 4 つ（`blueprintjs-playground` ・
+`cant-stop-probability-app` ・ `blueprintjs-playground-styled` ・
+`housing-loan-calculator-app`）がすべて復元済みになった。React 側に残るのは
+**外部依存の判断が要る 3 つ**である。
+
+| app               | 要る npm 依存                                  |
+| :---------------- | :--------------------------------------------- |
+| `catan-dice-app`  | `@mui/material`                                |
+| `color-demo-app`  | `@mui/material` ＋ `react-mui-utils`（未復元） |
+| `annotation-tool` | `pixi.js-legacy` ・ `uuid`                     |
+
+## `others/` の 6 つを見た（2026-09-01）
+
+`apps` 側で「追加の npm 依存が要らないもの」を出し切ったので、`others` を
+1 つずつ見た。**6 つのうち復元する価値があるのは 2 つ**である。
+
+| もの                           | 判断                                                 |
+| :----------------------------- | :--------------------------------------------------- |
+| `others/mahjong-scoring-tool`  | **復元した**（下節）                                 |
+| `others/slack-archive-tools`   | **復元した**（下節）                                 |
+| `others/implement-react-hooks` | **復元しない**。未完成の学習用スクラッチ             |
+| `others/ts_playground`         | **復元しない**。TypeScript ハンドブックの写経        |
+| `slides/dezero_06_to_16`       | HTML 直書きの reveal.js スライド。パッケージではない |
+| `slides/chain_rule`            | 同上                                                 |
+
+`implement-react-hooks` は `useState` が `initialState` をそのまま返し、
+`useEffect` が引数を `console.log` するだけの**書きかけ**で、トップレベルに
+`console.log` が並ぶ。`ts_playground` は `20200928_modules` ・
+`20201016_namespaces` という日付ディレクトリに TypeScript 公式ドキュメントの
+例（`ZipCodeValidator` など）が置いてあるもので、**存在しないモジュール**
+（`'hot-new-module'` ・ `'math-lib'` ・ `'json!http://example.com/data.json'`）を
+import しているのでそもそもコンパイルできない。どちらも「取っておく価値の
+あるものだけ持ってくる」の対象外である。
+
+## `mahjong-scoring-tool` の復元（2026-09-01）
+
+外部依存は無く、import している名前は 2 つだけだった。
+
+| 移植元                                          | 復元後                        |
+| :---------------------------------------------- | :---------------------------- |
+| `toUint32`（`@noshiro/mono-utils`）             | `asUint32`（`ts-data-forge`） |
+| `getShuffled`（`@noshiro/ts-utils-additional`） | 後継が無いので同梱（下記）    |
+
+`getShuffled` は `react-blueprintjs-utils` の `utils/ported.mts` と同じ扱いで、
+**後継が無いものはそれを使うパッケージに置く**。ここでは `createPointMap` の
+テスト 1 箇所だけが使う（生の点数の並び順で結果が変わらないことの確認）。
+
+### `as` を 5 つ消した
+
+移植元は `ArrayOfLength4<T>`（= `readonly [T,T,T,T]`）を自前で定義し、
+`.map()` の結果を毎回そこへキャストしていた。`Array.prototype.map` はタプルを
+`U[]` に広げるためで、**5 箇所すべてに
+`total-functions/no-unsafe-type-assertion` の disable が付いていた**。
+
+4 要素ぶんを書き下す `map4` を置けば全部要らなくなる。
+
+```ts
+const map4 = <T, U>(
+  tuple: FixedLengthTuple<4, T>,
+  mapFn: (value: T, index: 0 | 1 | 2 | 3) => U,
+): FixedLengthTuple<4, U> => [ mapFn(tuple[0], 0), … ];
+```
+
+**添字を `number` ではなくリテラル union にするのが要点。** 呼び出し側は
+その添字で別の 4-タプルを引くので、`noUncheckedIndexedAccess` の下では
+リテラルでないと `number | undefined` になり、移植元にあった `!`（非 null
+アサーション）が必要になってしまう。
+
+`toSorted` だけは長さを型で保てないので、4 要素を書き下して `?? 0` で受けた。
+`ArrayOfLength4` は `ts-type-forge` の `FixedLengthTuple<4, …>` に置き換えた。
+
+**テスト 6 件が通ることで等価性を確認している。** そのうちの 1 つが
+`getShuffled` で順序を入れ替えて同じ結果になることを見ているので、
+`map4` の書き換えはそこで実際に効いている。
+
+## `slack-archive-tools` の復元（2026-09-01）
+
+`others/` の 2 つ目。952 行 10 ファイル。**これで `others/` は片付いた**
+（残り 4 つのうち 2 つは復元しない判断、2 つは reveal.js のスライド）。
+
+### `zx` の暗黙グローバルが 42 箇所
+
+`import 'zx/globals'` が `path` と `fs` をグローバルに生やしていた。型エラー
+68 件のうち 42 件がこれで、`node:path` と `node:fs/promises` の明示 import に
+置き換えた。**`node:fs` ではなく `node:fs/promises`** である — zx の `fs` は
+`fs-extra` で、`readFile` などが Promise を返す。
+
+| 移植元                               | 復元後                               |
+| :----------------------------------- | :----------------------------------- |
+| `@noshiro/io-ts`（`t.*` 12 種）      | `ts-fortress`（全部そろっている）    |
+| `@noshiro/ts-utils`                  | `ts-data-forge`                      |
+| `execAsync`（`@noshiro/mono-utils`） | `$`（`ts-repo-utils`）               |
+| `zx/globals` の `path` / `fs`        | `node:path` / `node:fs/promises`     |
+| `ISet.new` / `toUint32` / `.chain(`  | `ISet.create` / `asUint32` / `.map(` |
+
+io-ts の 12 種（`enumType` ・ `mergeRecords` ・ `nonEmptyArray` ・ `partial` ・
+`positiveSafeInt` ほか）は**すべて `ts-fortress` にある**。`export function` の
+オーバーロードなので `export const` で grep すると見つからない点に注意。
+
+### `Json.stringify` は `undefined` を返し得る
+
+`JSON.stringify` は `undefined` ・関数 ・ symbol に対して `undefined` を返す。
+`ts-data-forge` の `Json.stringify` はそれを型に書いているので、`Result` を
+剥がしたあとに `string | undefined` が残る。ここでは `Json.parse` の結果を
+書き戻すだけなので実際には起きないが、書かないと通らない。ガードを 1 つ足した。
+
+### 規則同士が打ち消し合う 3 例目
+
+`unicorn/no-break-in-nested-loop`（入れ子ループで `continue` を使うな）と
+`unicorn/prefer-continue`（ループ本体を丸ごと `if` で包むな）が正面から
+ぶつかる。#1756 の `-1 * n`、#1762 の `includes` / `some` に続く 3 例目。
+
+**前者の警告文が答えを書いている** — 「入れ子のループを関数に切り出せ」。
+`collectSubKeys` ・ `collectSubArrayKeys` ・ `collectRecordKeys` に切り出すと、
+`continue` はそれぞれの関数で最外周のループに属することになり、どちらの規則
+にも触れない。ネストが 1 段深いほうは 2 段階に分ける必要があった。
+
+### barrel は作らない
+
+10 モジュールのうち **5 つは import した時点で `await main()` が走る**道具で
+ある。`pnpm run gi` が生成した `index.mts` はそれらを再エクスポートするので、
+barrel を読むだけでツールが動いてしまう。ライブラリとしての面が無いので、
+`gi` スクリプトごと外した。knip には 5 つの入口を個別に登録している。
+
+（`main` という名前が 2 モジュールで衝突して `TS2308` になったことで気付いた。）
+
+## `catan-dice-app` の復元（2026-09-01）
+
+MUI を使う 3 app の 2 つ目。**依存はすべて main にあるので、スタックに載せず
+`main` の直上に置いた。**
+
+### 宣言と実態がまた食い違っていた
+
+移植元の `dependencies` は `@mui/icons-material` と `better-react-use-state` を
+挙げているが、**ソースはどちらも import していない**（knip が検出）。
+実際に増えた npm 依存は `@mui/material` と emotion ・ `@fontsource/roboto`
+だけで、**アイコンパッケージは要らなかった**。
+
+「`package.json` ではなく import を見る」は #1750・#1778 で 2 度書いたが、
+MUI 待ちにしていた 4 つを数え直したときの表（#1777）で
+`catan-dice-app` を「1/21 ファイルが MUI」としたのも同じ話で、
+実際に必要だったのは `@mui/material` 1 つだった。
+
+### synstate に `interval` は無い — `counter` がそれ
+
+`syncflow` の `interval(50)` は `synstate` では `counter(50)`
+（`libs/synstate/src/core/create/counter.mts`）。
+一定間隔で増える整数を流すので、`interval(50).chain(take(11))` は
+`counter(50).pipe(take(11))` にそのまま置き換わる。
+
+observable の `.chain(op)` は `.pipe(op)`、`pipe()` の `.chain(f)` は `.map(f)`
+で、**同じ名前のメソッドが 2 つの別物に対応する**点に注意が要る。
+
+### `Reducer` はここでも移植した
+
+`@noshiro/react-utils` のグローバルにあった `Reducer<S, A>` に後継は無い。
+`apps/react-utils` が `src/utils/` に同じ 1 行を移植しているので、
+それに倣って利用箇所の隣に置いた。
+
+### 型の爆発は 11 要素でも起きる
+
+`Arr.zip(domain, sumCount)`（どちらも 11 要素タプル）で `TS2589` ・ `TS2590`
+になった。#1779 の 360 要素ほどでなくても、`const` 型引数で両方のタプル形状を
+再構成しようとすれば十分に重い。受け手が求めているのは
+`readonly (readonly [number, number])[]` なので、素の `.map` にした。
+
+### そのほか
+
+- `constants/dictionary/` は**今回も残骸**で、参照していたのは削除対象の
+  `vite-env.d.ts`（グローバル宣言）だけだった。`constants/` はこれしか
+  持っていなかったので、ディレクトリごと落ちている。
+- `@fontsource/roboto` は #1779 と同じく `src/index.css` の `@import`。
+- `NumberType.ArraySize` は `Uint32` に置き換えた（`Uint32.add` ・
+  `Uint32.random` を使っているので、これが元の意図）。
+- `Arr.pushed` → `Arr.toPushed`、`Arr.asMut` → `castMutable`、
+  `MutableArrayOfLength<N, T>` → `Mutable<FixedLengthTuple<N, T>>`。
+
+## `preact-utils` の復元（2026-09-01）
+
+Preact 側 utils 4 つのうち 3 つ目。**`better-preact-use-state` を使うので
+#1748 の上に積んである。**
+
+### React 版が答えを全部持っていた
+
+`apps/react-utils` は同じ 23 ファイルの React 版で、復元済み・lint 通過済み。
+ファイル一覧を突き合わせると差は 3 つだけで、**詰まった箇所はすべてあちらに
+解決済みの形があった**。
+
+| 詰まった点                                | `react-utils` の答え                                           |
+| :---------------------------------------- | :------------------------------------------------------------- |
+| `getPlatform` / `PromiseState` の後継無し | `src/utils/` に移植済み。そのままコピーした                    |
+| `TimerId` が未定義                        | `type TimerId = Parameters<typeof clearTimeout>[0];`           |
+| `Reducer` が未定義                        | `type Reducer<S, A> = (prev: S, action: A) => S;`              |
+| `createTinyObservable` の後継無し         | `synstate` の `source` を使う `use-observable.mts` に置換      |
+| `usePrevious` が render 中に ref を読む   | state で書き直す（前の _描画_ ではなく前の _異なる値_ になる） |
+| codemod が `resolvers` を readonly にする | `mut_resolvers` に改名                                         |
+
+**`TimerId` の形は #1761 で `synstate` に提案したものと同じだった。**
+あちらは独立に導いたものだが、リポジトリには既に前例があったことになる。
+
+### `preact.FunctionComponent` が props を広げる
+
+規則同士がぶつかる 4 例目。`memoNamed` の引数を
+`preact.FunctionComponent<Props>` と書くと、その型は `RenderableProps<Props>`
+＝ `Props` ＋ `children` ・ `ref` ・ `key` ・ `jsx` なので、
+`ts-restrictions/check-destructuring-completeness`（全プロパティを分割代入せよ）
+を**構造的に満たせない**。分割代入に `Readonly<Props>` の注釈を足すと、今度は
+`@typescript-eslint/prefer-readonly-parameter-types` が
+「`ComponentChild` は deeply readonly ではない」と言う。
+
+`memoNamed` の引数を素の関数型 `(props: Readonly<Props>) => preact.VNode | null`
+にすると両方消える。React 19 の `FC` も `children` を足さなくなっているので、
+**2 つのパッケージが揃うことにもなる**。
+
+### 依存の食い違い
+
+インベントリは 5 つの Preact app すべてが utils 4 つを要ると書いているが、
+**import を見ると違う**。`slack-app` と `lambda-calculus-interpreter-preact` は
+`goober` と `preact` しか import していない（#1750 の
+`tiny-router-preact-hooks` と同じ、manifest と import の食い違い）。
+
+ただし `slack-app` は復元しない。`app.tsx` が
+`<div data-e2e={'root'}>{'root'}</div>` を返すだけの**空の雛形**で、
+`dict` もテンプレート残骸である。中身が無い。
+
+## `lambda-calculus-interpreter-preact` の復元（2026-09-01）
+
+Preact 側 app の 1 つ目。**`preact-utils` を使うので #1770 の上に積んである**
+（#1770 は #1748 の上）。
+
+### インベントリより依存が少ない
+
+インベントリは utils 4 つ（`preact-utils` ・ `better-preact-use-state` ほか）が
+要ると書いているが、**実際に必要なのは `preact-utils` の `memoNamed` だけ**で
+ある。`better-preact-use-state` は `preact-utils` 経由で解決に要るだけなので、
+`paths` に書いて `dependencies` には入れていない。
+
+`state.mts` は React 版（#1746、マージ済み）と**1 文字も違わなかった**ので、
+そちらの書き換えをそのまま使った。
+
+| 移植元                                | 復元後                         |
+| :------------------------------------ | :----------------------------- |
+| `createState` のオブジェクト分割代入  | タプル ＋ `useObservableValue` |
+| `.chain(debounceTime(200))`           | `.pipe(debounce(200))`         |
+| `pipe().chain()` / `.chainOptional()` | `.map()` / `.mapNullable()`    |
+| `@noshiro/goober`                     | npm の `goober`                |
+
+### `goober` を足した理由
+
+インベントリが**そう指示している** — 「`blueprint-css` と `goober` は名前こそ
+utils だが、実体はベンダのファイルを置いただけの箱。復元するなら npm の本家
+（`@blueprintjs/core`、`goober`）を直接使う」。
+
+`@mui/material` や `pixi.js-legacy` とはここが違う。あちらはインベントリが
+「その app が依存している」と記録しているだけで、**採用してよいとは書いて
+いない**。goober は後継が名指しされている。
+
+### `onChange` の型
+
+React 版は `React.ChangeEventHandler<HTMLTextAreaElement>` を使っていた。
+Preact の同名の型は `JSX` 名前空間側が `@deprecated`（#1750 の
+`MouseEventHandler` と同じ）なので、`ev.target` を `EventTarget | null` で
+受けて `instanceof HTMLTextAreaElement` で絞る形にした。**型としても
+そのほうが正確**である — `target` は本当に他の要素でもあり得る。
+
+### 残りの Preact app
+
+utils が 4 つとも揃ったので、`algo-app`（5033）・`mahjong-calculator-app`
+（2428）・`my-portfolio-app-preact`（1244）が着手可能になる。ただし
+`my-portfolio-app-preact` は `preact-media-hook` という別の npm 依存も要る。
+`slack-app` は中身が無いので復元しない（#1770）。
+
+## `mahjong-calculator-app` の復元（2026-09-01）
+
+Preact 側 app の 2 つ目。38 ファイル・3196 行。**#1772 の上に積んである**
+（`preact-utils` と `goober` を使うため）。
+
+### import だけを見ると依存を読み違える
+
+#1750 ・ #1770 ・ #1772 で「manifest ではなく import を見よ」と書いたが、
+**この app ではそれだけでは足りなかった**。explicit import には Preact utils が
+1 つも現れないのに、`memoNamed` を暗黙グローバルとして使っている。
+
+`globals.d.ts` が並べていた `@noshiro/global-*` の参照ぶんを足して初めて
+本当の依存が出る。**import ＋ globals.d.ts の両方を見る**のが正しい。
+
+### `dict` は本物だった
+
+`constants/dictionary/` を、#1746 ・ #1754 ・ #1758 ・ #1760 と同じ
+「テンプレート残骸」だと判断していったん削除したが、**この app のものは
+中身がある**（39 行の日本語ラベル）。コミット前に気付いて戻した。
+`dict = {} as const` かどうかを app ごとに見る必要がある。
+
+### 対応表
+
+| 移植元                                   | 復元後                                                       |
+| :--------------------------------------- | :----------------------------------------------------------- |
+| `Maybe.isNone` / `isSome`                | `Optional.isNone` / `isSome`                                 |
+| `Arr.pushed(a, x)` / `Arr.removed(a, i)` | `[...a, x]` / `a.toSpliced(i, 1)`（後継なし）                |
+| `Arr.asMut`                              | `castMutable`                                                |
+| `Arr.head`                               | 戻りが `Optional` になったので `=== undefined` では絞れない  |
+| `Tpl.map`                                | 後継なし。長さが要る場所は先頭 3 つを書き下す                |
+| `ArrayOfLength` / `ArrayAtLeastLen`      | `FixedLengthTuple` / `MinLengthTuple`                        |
+| `createBooleanState`                     | 戻りは `[state, utils]` の 2 要素（`createState` は 3 要素） |
+| `Record` / `Exclude` / `Extract`         | `ReadonlyRecord` / `StrictExclude` / `StrictExtract`         |
+
+`Json.stringify` が `string | undefined` を返す件（#1769）もここで出た。
+
+### `memoNamed` の戻り型が狭すぎた
+
+#1770 で `memoNamed` の引数を素の関数型にしたとき、戻りを
+`preact.VNode | null` と書いた。**`VNode` は props について不変**なので、
+`createElement` が返す `VNode<具体的なprops>` を代入できない。この app の
+button-group 3 つで初めて露見した。
+
+`preact.ComponentChildren` に直し、**#1770 側を修正して**このブランチを
+その上に rebase してある。#1770 単体でも直っている。
+
+### `src/services/` は UI から呼ばれていない
+
+`calculate` ・ `downloadProblemAsImage` ・ `downloadHmrFormatText` を import
+しているコンポーネントが無い。**移植元でも同じ**なので、移植で落としたもの
+ではない。knip の entry に `src/services/index.mts` を並べて、dead code では
+なく入口として扱っている。
+
+## `resize-observer-preact-hooks` の復元（2026-09-01）
+
+Preact 側 utils の 4 つ目。これで 4 つとも揃う。
+
+**復元スタックの一番上に積み直した。** `better-preact-use-state` を使うので
+当初は #1748 の直上に置いたが、`algo-app` がこのパッケージと `goober`
+（#1772）の両方を必要とし、兄弟ブランチをまたぐ菱形になってしまう。
+#1773 の上に載せ替えて一直線にしてある。
+
+React 版（`apps/resize-observer-react-hooks`）が復元済みなので、そちらの
+判断をそのまま引き継いだ。
+
+| 移植元                                   | 復元後（React 版と同じ）                                               |
+| :--------------------------------------- | :--------------------------------------------------------------------- |
+| `resize-observer` の polyfill            | 使わない。今のブラウザは `ResizeObserver` を持ち、`lib.dom` が型を持つ |
+| `preact.RefObject<E>`                    | `preact.RefObject<E \| null>`                                          |
+| 戻り値 `[Size, Ref]`                     | `readonly [size: Size, ref: …]`（ラベル付き）                          |
+| `RefObject<E \| null>`（React 版の字面） | `preact.RefObject<E>` — 下記                                           |
+| `@noshiro/ts-utils` の `Arr`             | `ts-data-forge`                                                        |
+| `useState`（`better-preact-use-state`）  | そのまま（#1748 で復元済み）                                           |
+
+`gi:src` に `--exclude index.mts` は付けていない。React 版は付けているが、
+[#1742](https://github.com/noshiro-pf/mono/pull/1742) のとおり no-op であり、
+同 PR が既存パッケージからも外している。
+
+**初回から type-check・lint とも 0 件**だったが、これは**利用者がまだ
+いなかったから**でもあった。
+
+### preact の `RefObject` は React 19 と意味が違う
+
+React 版に揃えて戻り値を `React.RefObject<E | null>` の字面どおり
+`preact.RefObject<E | null>` と書いていたが、これは誤りだった。
+
+|           | `RefObject<T>` の定義    | null を含む書き方      |
+| :-------- | :----------------------- | :--------------------- |
+| React 19  | `{ current: T }`         | `RefObject<E \| null>` |
+| Preact 10 | `{ current: T \| null }` | `RefObject<E>`         |
+
+preact では二重に null を付けたことになり、`<div ref={ref}>` が受け取らない。
+`my-portfolio-app-preact` がこのフックの最初の利用者になって露見した。
+`Preact.useRef<E>(null)` はオーバーロード
+`useRef<T>(initialValue: T | null): RefObject<T>` に当たるので、
+React 版の `React.useRef<E>(null)` とも形が揃う。
+
+**型の意味ではなく字面を写すと、こうなる。**
+
+## `tiny-router-preact-hooks` の復元（2026-09-01）
+
+Preact 側 utils 4 つのうち 2 つ目。`better-preact-use-state` を待たずに入れられる。
+
+### 宣言された依存 4 つのうち、実際に使っているのは 1 つ
+
+移植元の `dependencies` は `@noshiro/syncflow-preact-hooks` /
+`@noshiro/tiny-router-observable` / `@noshiro/ts-utils` / `preact` の 4 つだが、
+**ソースが import しているのは `preact/hooks` だけ**である。残り 3 つは
+過剰宣言なので持ち込まない。インベントリの「連れてくる utils」を数えるときは、
+`package.json` ではなく import を見る必要がある。
+
+### コピペされた実装を 1 つにまとめた
+
+移植元は `useRouterLinkClick` と `createRouterLinkClickHandler` が
+**同じ本体を 2 回書いている**（40 行ほどの重複）。React 版の
+`apps/tiny-router-react-hooks` は復元のときにこれを直しており、
+`createRouterLinkClickHandler` を定義して `useRouterLinkClick` はそれを
+`useCallback` で包むだけ、という形にしてある。同じ形に揃えた。
+
+React 版に合わせた点はほかに 2 つ:
+
+- `Record<...>` → `ReadonlyRecord<...>`（`ts-type-forge` のグローバル型）
+- `createPath` の戻りテンプレートに `as const`
+
+### 戻り値の型は Preact の `MouseEventHandler`
+
+React 版は `React.MouseEventHandler<HTMLElement>`。Preact にも同名の型があるが、
+**`JSX` 名前空間のほうは `@deprecated`** で、`@typescript-eslint/no-deprecated` が
+「Please import from the Preact namespace instead」と言う。`preact` のルートが
+`dom.d.ts` を `export *` しているので、
+
+```ts
+import { type MouseEventHandler } from 'preact';
+```
+
+が正しい。移植元は `(ev: MouseEvent) => void` と素の DOM 型で書いていたが、
+これは Preact が native event を渡すので間違いではない。ただ React 版と対を
+なす形にするほうが読みやすい。
+
+## `my-portfolio-app-preact` の復元（2026-09-01）
+
+Preact 側 5 app の 3 つ目。utils 4 つが揃ったので積める。
+
+### 新規依存はいらなかった
+
+行数（1244）は inventory の記載どおりだが、`src` 全体を `wc -l` すると 17493 行に
+なる。差の 16249 行は 12 枚の PNG（4.2 MB）で、テキストとして数えられているだけ。
+**行数は残作業量ではない**という #1768 の教訓がここでも当たった。
+
+`preact-media-hook` が要ると書いてあったが、実際には
+
+- 使っているのは `useMedia` 1 関数だけ、呼び出しは `mui-tabs.tsx` の 1 箇所
+- `components/mui/` は名前に反して `@mui/*` を一切 import していない。
+  goober で書いた MUI 風の自作コンポーネント
+
+だったので、**新しい npm 依存は 1 つも足していない**。`useMedia` は
+`src/hooks/use-media.mts` に移植した（`getPlatform` ・ `PromiseState` と同じ前例）。
+`matchMedia` の購読が wrapper の本体で、単に読むだけではブレークポイントを
+跨いだときに更新されない。
+
+### 型検査が通っても等価とは限らない — 今回の実例
+
+`IMap.get` は `Optional<string>` を返すようになっており、移植元の
+`zennArticleTitle.get(slug) ?? '既定のタイトル'` は 8 箇所ある。
+
+| 箇所                             | tsc       | ESLint  |
+| :------------------------------- | :-------- | :------ |
+| `title: get(…) ?? '…'`           | ✅        | ✅      |
+| ``title: `★ ${get(…) ?? '…'}` `` | ❌ 見逃す | ✅ 検出 |
+
+**テンプレートリテラルの中の 5 箇所を tsc は 1 件も報告しない。** 埋め込みは
+どんな値でも受けるからで、そのままなら `[object Object]` と表示されていた。
+`restrict-template-expressions` と `no-base-to-string` が拾った。
+**型検査の 0 件を根拠に「移植できた」と判断してはいけない**という前例がまた 1 つ増えた。
+
+### preact の `RefObject` は React 19 と意味が違う
+
+`useResizeObserver` の戻り値を `div` の `ref` に渡すと型エラーになった。
+
+|           | `RefObject<T>` の定義    | null を含む書き方      |
+| :-------- | :----------------------- | :--------------------- |
+| React 19  | `{ current: T }`         | `RefObject<E \| null>` |
+| Preact 10 | `{ current: T \| null }` | `RefObject<E>`         |
+
+`resize-observer-preact-hooks`（#1771）は React 版の**型の字面**をそのまま写して
+`preact.RefObject<E | null>` にしていた。preact では二重に null を付けたことになり、
+`ref` プロパティが受け取らない。**あの復元の時点では利用者がいなかったので気付けず、
+このアプリが最初の利用者になって露見した。** 直しは #1771 側に入れてある。
+
+### 双子のマニフェストを写すと過剰宣言になる
+
+`package.json` は `mahjong-calculator-app`（同じ Vite Preact + goober の構成）
+から起こしたが、そのまま持ってきた `synstate` ・ `ts-fortress` と、移植元が
+宣言していた `tiny-router-preact-hooks` の 3 つは**このアプリが 1 度も
+import していない**。knip が拾ったので落とした。#1750 で書いた
+「`package.json` ではなく import を見る」は、移植元だけでなく
+**手本にした側のマニフェストにも当てはまる**。
+
+`synstate` は tsconfig の `paths` にだけ残してある。`synstate-preact-hooks` が
+ソース解決で辿るためで、このパッケージの依存ではない（`mahjong-calculator-app`
+の `better-preact-use-state` と同じ扱い）。
+
+### 今回の `constants/dictionary/` はテンプレートの残骸だった
+
+#1773 で「`constants/dictionary/` は常にテンプレート残骸とは限らない」と
+訂正したばかりだが、**このアプリでは残骸だった**：`dict = {}` の 1 行、
+`typeof dict === 'object'` を確かめるだけのテスト、参照 0 箇所。
+mahjong 側は同じ場所に日本語ラベル 39 行が入っていた。
+つまり**どちらか一方に決め打ちできない**というのが結論で、毎回中身を見る。
+空の `utils/` ・ `functions/`（`export {};` と `.gitkeep` だけ）も一緒に落とした。
+
+### `assets.d.mts` は script のままにする必要がある
+
+`*.png` ・ `*.mdx` ・ `*.css` の宣言をまとめたファイルで、MDX コンポーネントの型に
+preact が要る。しかし **top-level import を 1 つ書くとこのファイルが module になり、
+ワイルドカード宣言が 3 つとも効かなくなる**（実測: 型エラー 0 → 15）。
+`import('preact')` を型注釈で使うほかなく、`consistent-type-imports` を
+その 1 行だけ disable した。理由はコメントに書いてある。
+
+### `react-hooks/hooks` が明示型引数に反応する
+
+`useState<MediaQueryState>({…})` が「Hooks may not be referenced as normal values」
+になる。`resize-observer-preact-hooks` の `useState<Size>(…)` は同じ形で通るので
+条件は絞り切れていない（引数をオブジェクトリテラルから変数にしても、
+`preact/hooks` を名前空間 import にしても再現する）。
+初期値に型注釈を付ければ型引数は不要なので、**disable ではなく型引数を落とした**。
