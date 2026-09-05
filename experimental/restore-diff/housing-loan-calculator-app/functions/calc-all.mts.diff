@@ -1,0 +1,32 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-all.ts apps/housing-loan-calculator-app/src/functions/calc-all.mts
+index 97f920136..936d2f0f7 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-all.ts
++++ apps/housing-loan-calculator-app/src/functions/calc-all.mts
+@@ -1,6 +1,12 @@
+-import { PercentFloat, Yen, type CalculatedValues, type Store } from '../types';
+-import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment';
+-import { calcPrincipalEqualPayment } from './calc-principal-equal-payment';
++import { Arr, Uint32 } from 'ts-data-forge';
++import {
++  PercentFloat,
++  Yen,
++  type CalculatedValues,
++  type Store,
++} from '../types/index.mjs';
++import { calcPrincipalAndInterestEqualPayment } from './calc-principal-and-interest-equal-repayment.mjs';
++import { calcPrincipalEqualPayment } from './calc-principal-equal-payment.mjs';
+ 
+ export const calcAll = ({
+   repaymentType,
+@@ -14,8 +20,11 @@ export const calcAll = ({
+    * - 2 -> 元利均等返済
+    */
+   const downPaymentYen = Yen.cast(downPaymentManYen * 10_000);
++
+   const propertyPriceYen = Yen.cast(propertyPriceManYen * 10_000);
++
+   const borrowingPeriodMonth = Uint32.mul(borrowingPeriodYear, 12);
++
+   const interestRatePerMonth = PercentFloat.cast(
+     interestRatePercentPerYear / 1200,
+   );

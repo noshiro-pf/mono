@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/types/index.ts apps/cant-stop-probability-app/src/types/index.mts
+index efb9ac577..93f2ec8f8 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/types/index.ts
++++ apps/cant-stop-probability-app/src/types/index.mts
+@@ -1,4 +1,4 @@
+-export * from './count';
+-export * from './dice-value';
+-export * from './result-row';
+-export * from './two-dice-sum-value';
++export * from './count.mjs';
++export * from './dice-value.mjs';
++export * from './result-row.mjs';
++export * from './two-dice-sum-value.mjs';

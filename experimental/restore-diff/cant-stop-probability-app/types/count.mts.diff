@@ -1,0 +1,10 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/types/count.ts apps/cant-stop-probability-app/src/types/count.mts
+index aa6817d69..5dd11766b 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/types/count.ts
++++ apps/cant-stop-probability-app/src/types/count.mts
+@@ -1 +1,4 @@
+-export type Count = Record<'noLine' | 'oneLine' | 'twoLine', SafeUint>;
++import { type SafeUint } from 'ts-data-forge';
++import { type ReadonlyRecord } from 'ts-type-forge';
++
++export type Count = ReadonlyRecord<'noLine' | 'oneLine' | 'twoLine', SafeUint>;

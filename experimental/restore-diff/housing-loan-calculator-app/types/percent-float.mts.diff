@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/types/percent-float.ts apps/housing-loan-calculator-app/src/types/percent-float.mts
+index 2c012fb39..074707cc2 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/types/percent-float.ts
++++ apps/housing-loan-calculator-app/src/types/percent-float.mts
+@@ -1,6 +1,11 @@
+-import * as t from '@noshiro/io-ts';
++import * as t from 'ts-fortress';
+ 
+-export const PercentFloat = t.simpleBrandedNumber('PercentFloat', 0);
++export const PercentFloat = t.brand({
++  baseType: t.number(0, { min: 0, max: 100 }),
++  defaultValue: 0,
++  typeName: 'PercentFloat',
++  brandKeys: ['PercentFloat'],
++});
+ 
+ /**
+  * @example

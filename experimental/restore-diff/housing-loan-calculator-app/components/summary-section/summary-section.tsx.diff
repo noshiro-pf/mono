@@ -1,0 +1,15 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/summary-section/summary-section.tsx apps/housing-loan-calculator-app/src/components/summary-section/summary-section.tsx
+index 9b360cf87..472c2d85b 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/summary-section/summary-section.tsx
++++ apps/housing-loan-calculator-app/src/components/summary-section/summary-section.tsx
+@@ -1,5 +1,8 @@
+-import { calculatedValues$, store$ } from '../../store';
+-import { DataItem } from './data-item';
++import { memoNamed } from 'react-utils';
++import { useObservableValue } from 'synstate-react-hooks';
++import { dict } from '../../constants/index.mjs';
++import { calculatedValues$, store$ } from '../../store/index.mjs';
++import { DataItem } from './data-item.js';
+ 
+ export const SummarySection = memoNamed('SummarySection', () => {
+   const { repaymentType, downPaymentManYen, propertyPriceManYen } =

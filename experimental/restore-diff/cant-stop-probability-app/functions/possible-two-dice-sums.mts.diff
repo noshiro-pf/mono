@@ -1,0 +1,24 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.ts apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.mts
+index 60eebf569..7a2809eb2 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.ts
++++ apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.mts
+@@ -1,4 +1,9 @@
+-import { addDiceValues, type DiceValue, type TwoDiceSumValue } from '../types';
++import { ISet } from 'ts-data-forge';
++import {
++  addDiceValues,
++  type DiceValue,
++  type TwoDiceSumValue,
++} from '../types/index.mjs';
+ 
+ export const possibleTwoDiceSums = (
+   a: DiceValue,
+@@ -6,7 +11,7 @@ export const possibleTwoDiceSums = (
+   c: DiceValue,
+   d: DiceValue,
+ ): ISet<TwoDiceSumValue> =>
+-  ISet.new([
++  ISet.create([
+     addDiceValues(a, b),
+     addDiceValues(a, c),
+     addDiceValues(a, d),

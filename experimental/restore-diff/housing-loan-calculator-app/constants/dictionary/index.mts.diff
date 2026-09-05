@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/constants/dictionary/index.ts apps/housing-loan-calculator-app/src/constants/dictionary/index.mts
+index 6199627fe..f78c5a419 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/constants/dictionary/index.ts
++++ apps/housing-loan-calculator-app/src/constants/dictionary/index.mts
+@@ -1 +1 @@
+-export * from './dictionary';
++export * from './dictionary.mjs';

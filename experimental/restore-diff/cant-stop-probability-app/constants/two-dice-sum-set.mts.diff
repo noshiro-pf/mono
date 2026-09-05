@@ -1,0 +1,12 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/constants/two-dice-sum-set.ts apps/cant-stop-probability-app/src/constants/two-dice-sum-set.mts
+index f981ad7bc..d88794b66 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/constants/two-dice-sum-set.ts
++++ apps/cant-stop-probability-app/src/constants/two-dice-sum-set.mts
+@@ -1,4 +1,5 @@
+-import { type TwoDiceSumValue } from '../types';
++import { ISet } from 'ts-data-forge';
++import { type TwoDiceSumValue } from '../types/index.mjs';
+ 
+ export const twoDiceSumSet = (): ISet<TwoDiceSumValue> =>
+-  ISet.new([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
++  ISet.create([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);

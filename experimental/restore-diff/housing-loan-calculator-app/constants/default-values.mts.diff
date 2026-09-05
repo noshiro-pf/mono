@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/constants/default-values.ts apps/housing-loan-calculator-app/src/constants/default-values.mts
+index 6f6aa7ea5..7cee5897e 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/constants/default-values.ts
++++ apps/housing-loan-calculator-app/src/constants/default-values.mts
+@@ -1,15 +1,20 @@
+-import { PercentFloat, Yen, type RepaymentType } from '../types';
++import {
++  PercentFloat,
++  Year,
++  Yen,
++  type RepaymentType,
++} from '../types/index.mjs';
+ 
+ export const defaultValues = {
+   repaymentType: 'principal-equal-payment',
+   downPaymentManYen: Yen.cast(200),
+   propertyPriceManYen: Yen.cast(2780),
+-  borrowingPeriodYear: toSafeUint(35),
++  borrowingPeriodYear: Year.cast(35),
+   interestRatePercentPerYear: PercentFloat.cast(0.5),
+ } as const satisfies Readonly<{
+   repaymentType: RepaymentType;
+   downPaymentManYen: Yen;
+   propertyPriceManYen: Yen;
+-  borrowingPeriodYear: SafeUint;
++  borrowingPeriodYear: Year;
+   interestRatePercentPerYear: PercentFloat;
+ }>;

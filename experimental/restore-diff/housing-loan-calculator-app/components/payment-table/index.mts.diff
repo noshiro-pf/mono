@@ -1,0 +1,7 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/payment-table/index.ts apps/housing-loan-calculator-app/src/components/payment-table/index.mts
+index ffec00976..6b706ce59 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/payment-table/index.ts
++++ apps/housing-loan-calculator-app/src/components/payment-table/index.mts
+@@ -1 +1 @@
+-export * from './payment-table';
++export * from './payment-table.js';

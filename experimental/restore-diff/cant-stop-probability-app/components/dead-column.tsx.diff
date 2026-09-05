@@ -1,0 +1,30 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/components/dead-column.tsx apps/cant-stop-probability-app/src/components/dead-column.tsx
+index 66c9cb8a9..b00d3eac2 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/components/dead-column.tsx
++++ apps/cant-stop-probability-app/src/components/dead-column.tsx
+@@ -1,6 +1,9 @@
+ import { ButtonGroup } from '@blueprintjs/core';
+-import { BpButton } from '@noshiro/react-blueprintjs-utils';
+-import { type TwoDiceSumValue } from '../types';
++import { css } from '@emotion/react';
++import { BpButton } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { type DeepReadonly } from 'ts-type-forge';
++import { type TwoDiceSumValue } from '../types/index.mjs';
+ 
+ type Props = DeepReadonly<{
+   columnsAliveWithHandler: {
+@@ -17,12 +20,7 @@ export const DeadColumn = memoNamed<Props>(
+     <div>
+       <ButtonGroup>
+         {columnsAliveWithHandler.map(({ columnId, alive, toggle }) => (
+-          <BpButton
+-            key={columnId}
+-            active={!alive}
+-            nowrap={true}
+-            onClick={toggle}
+-          >
++          <BpButton key={columnId} active={!alive} nowrap onClick={toggle}>
+             {alive ? (
+               <span>{columnId}</span>
+             ) : (

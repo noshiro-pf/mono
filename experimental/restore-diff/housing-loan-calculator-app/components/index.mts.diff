@@ -1,0 +1,13 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/index.ts apps/housing-loan-calculator-app/src/components/index.mts
+index 1d5eed990..38fcb2d17 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/index.ts
++++ apps/housing-loan-calculator-app/src/components/index.mts
+@@ -1,4 +1,4 @@
+-export * from './config-section';
+-export * from './numeric-input';
+-export * from './payment-table';
+-export * from './summary-section';
++export * from './config-section/index.mjs';
++export * from './numeric-input/index.mjs';
++export * from './payment-table/index.mjs';
++export * from './summary-section/index.mjs';

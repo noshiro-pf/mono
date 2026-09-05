@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/utils.ts experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/utils.ts
+deleted file mode 100644
+index 9d33e8484..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/utils.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-import { hexToRgb } from '@noshiro/ts-utils-additional';
+-
+-export const hexToRgba = (
+-  hex: string,
+-  alpha: number,
+-): `rgba(${string}, ${number})` =>
+-  `rgba(${hexToRgb(hex).join(', ')}, ${alpha})`;
+-
+-/** Join lines with `${lines.join(', \n')};` */
+-export const joinCssStr = (...lines: readonly string[]): string =>
+-  `${lines.join(', \n')};`;

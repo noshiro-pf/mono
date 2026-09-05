@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/store/index.ts apps/housing-loan-calculator-app/src/store/index.mts
+index 252f43440..3efe5f15f 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/store/index.ts
++++ apps/housing-loan-calculator-app/src/store/index.mts
+@@ -1,2 +1,2 @@
+-export * from './calculated-values';
+-export * from './store';
++export * from './calculated-values.mjs';
++export * from './store.mjs';

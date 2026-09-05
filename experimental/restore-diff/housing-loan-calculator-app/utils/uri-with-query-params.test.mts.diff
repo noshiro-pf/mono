@@ -1,0 +1,17 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/utils/uri-with-query-params.test.ts apps/housing-loan-calculator-app/src/utils/uri-with-query-params.test.mts
+index 62e9c9fca..96601cec7 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/utils/uri-with-query-params.test.ts
++++ apps/housing-loan-calculator-app/src/utils/uri-with-query-params.test.mts
+@@ -1,4 +1,5 @@
+-import { uriWithQueryParams } from './uri-with-query-params';
++import { type DeepReadonly } from 'ts-type-forge';
++import { uriWithQueryParams } from './uri-with-query-params.mjs';
+ 
+ const testUri = (
+   targetUri: string,
+@@ -37,4 +38,5 @@ testUri(
+ );
+ 
+ testUri('http://localhost/', [], 'http://localhost/');
++
+ testUri('http://localhost', [], 'http://localhost/');

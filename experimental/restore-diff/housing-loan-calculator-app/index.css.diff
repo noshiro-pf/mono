@@ -1,0 +1,28 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/index.css apps/housing-loan-calculator-app/src/index.css
+index fca1670fb..2f13e731b 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/index.css
++++ apps/housing-loan-calculator-app/src/index.css
+@@ -6,9 +6,9 @@
+ 
+ body {
+   margin: 0;
+-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+-    sans-serif;
++  font-family:
++    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
++    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-text-size-adjust: 100%;
+@@ -16,8 +16,8 @@ body {
+ }
+ 
+ code {
+-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+-    monospace;
++  font-family:
++    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+ }
+ 
+ * {
