@@ -334,7 +334,7 @@ apps の残り 15 のうち 2 つ（`template-react-app-vite` /
 | ~~`cant-stop-probability-app`~~         |  653 | 復元済み（下節）             |
 | `catan-dice-app`                        |  471 | **なし**                     |
 | ~~`lambda-calculus-interpreter-react`~~ |  196 | 復元済み（下節）             |
-| `blueprintjs-playground`                |   92 | **なし**                     |
+| ~~`blueprintjs-playground`~~            |   92 | 復元済み（下節）             |
 
 `blueprintjs-playground-styled` が依存する `blueprint-css` は「中身が無い」箱なので、
 `@blueprintjs/core` を直接使えばよい。**この 7 つは置換と書き換えだけで済む** —
@@ -722,3 +722,46 @@ npm 依存は要らない。
 するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
 した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
 変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
+
+## `blueprintjs-playground` の復元（2026-09-01）
+
+`blueprintjs-playground-styled` の**素の双子**。同じデモページを、こちらは
+Blueprint 自身の `NumericInput` / `InputGroup` で描く。2 つ並んで初めて
+「Blueprint の実物」対「スクラッチで組んだ同等品」という比較になる。
+
+中身は `app.tsx` ・ `main.tsx` ・ `index.css` の 3 つだけで、
+`apps/` 側との重複は無い（`@blueprintjs/core` を直接使うため）。`#1758` で
+styled 版に起きたような「大半が既に入っていた」ということは無かった。
+
+### `index.css` は原文のまま
+
+`normalize.css` ・ `@blueprintjs/icons` ・ `datetime2` ・ `datetime` ・ `select`
+の `@import` が並ぶが、**`event-schedule-app` も同じ一覧を持ったまま
+`@blueprintjs/core` と `datetime` しか宣言していない**。スタイルシートは
+bundler の関心事で、このリポジトリでは何もビルドしない。同じ扱いに揃えた。
+
+最初はこの playground が描かない `datetime` 系と `select` を削ったが、
+**兄弟に合わせるほうが正しい** — 差を作る理由が無い。
+
+### `noop` はローカルに置いた
+
+移植元では暗黙グローバルだった。後継は `react-blueprintjs-utils` の
+`utils/ported.mts` にあるが、**この playground が同パッケージを要る理由は
+それしかない**。`() => undefined` 1 行のためにパッケージ依存を足すのは
+釣り合わないので、`app.tsx` の中に置いて理由をコメントにした。
+
+`constants/dictionary/` は `export const dict = {} as const;` の
+テンプレート残骸なので持ち込んでいない（#1746 ・ #1754 ・ #1758 と同じ）。
+
+### これで「追加の npm 依存が要らない React app」は片付いた
+
+`#1754` で分けた 4 つ（`blueprintjs-playground` ・
+`cant-stop-probability-app` ・ `blueprintjs-playground-styled` ・
+`housing-loan-calculator-app`）がすべて復元済みになった。React 側に残るのは
+**外部依存の判断が要る 3 つ**である。
+
+| app               | 要る npm 依存                                  |
+| :---------------- | :--------------------------------------------- |
+| `catan-dice-app`  | `@mui/material`                                |
+| `color-demo-app`  | `@mui/material` ＋ `react-mui-utils`（未復元） |
+| `annotation-tool` | `pixi.js-legacy` ・ `uuid`                     |

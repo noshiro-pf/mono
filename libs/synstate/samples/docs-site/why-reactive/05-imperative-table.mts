@@ -30,6 +30,7 @@ let currentPage = 1;
 // Fetch table data from server
 const fetchData = async (): Promise<void> => {
   try {
+    /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
     allRows = await fetch('/api/rows').then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();
