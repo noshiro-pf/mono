@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // Emotion's `css` prop: the JSX factory has to come from @emotion/react.
+    "jsxImportSource": "@emotion/react"
+  },
+  "include": ["./src", "./scripts", "./configs"]
+}

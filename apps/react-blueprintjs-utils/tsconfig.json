@@ -3,5 +3,8 @@
     "../../tools/configs/tsconfig/tsconfig.type-check.json",
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
-  "include": ["./src"]
+  "compilerOptions": {
+    "libReplacement": true
+  },
+  "include": ["./src", "./test"]
 }

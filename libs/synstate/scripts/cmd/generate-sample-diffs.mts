@@ -134,5 +134,5 @@ const generated = mut_outcomes.filter((o) => o === 'generated').length;
 const skipped = mut_outcomes.filter((o) => o === 'skipped').length;
 
 console.info(
-  `\n✓ Generated ${String(generated)} diff file(s), skipped ${String(skipped)} identical file(s).`,
+  `\n✓ Generated ${generated.toString()} diff file(s), skipped ${skipped.toString()} identical file(s).`,
 );
