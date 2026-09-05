@@ -27,6 +27,7 @@ const searchResults$: InitializedObservable<
       fromAbortablePromise((signal) =>
         fetch(`/api/search?q=${query}`, { signal }).then(
           (r) =>
+            /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `Response.json()` is `unknown` under the strict standard library, so this cast is what a reader would write. The line is stripped from the embedded output.
             r.json() as Promise<
               readonly Readonly<{ id: string; name: string }>[]
             >,
