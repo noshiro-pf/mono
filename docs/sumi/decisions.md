@@ -104,7 +104,7 @@
 - **理由**: これらは暗黙変換の関数形であり、意図(パース・変換・判定)が名前に現れない。専用の生成関数(例: 既存の `Num.safeParseInt` 系)に置き換えることで、変換の失敗が `Result`/`Optional` として型に現れる。
 - **TODO**: ts-data-forge 側の生成関数の網羅(`Boolean`/`String`/`Array` 代替)は未実装 — [spec/stdlib.md](./spec/stdlib.md) のギャップに追加。
 
-## D-16: 言語名は Tsubu(粒)、拡張子は `.tsb`(2026-09-07 に D-44 で Sumi へ改名)
+## D-16: 言語名は Tsubu(粒)、拡張子は `.tsb`(2026-09-07 に D-44 で Sumi / `.sumi` へ改名)
 
 - **ステータス**: 確定(2026-08-29)
 - **判断**: 言語名を **Tsuba(鍔)**、Sumi sugar の単一拡張子(D-11)を **`.tsb`** とする。
@@ -328,4 +328,4 @@
 
 - **ステータス**: 確定(2026-09-07)
 - **判断**: 言語名を **Sumi** とする(ユーザー決定)。仕様書(`docs/sumi/`)、開発パッケージ(`languages/sumi/` — sumi-conformance / sumi-eslint-config / sumi-oxlint-config)、コーパスのマーカー(`@sumi-expect`)、JS plugin 名(`sumi/<rule>`)、preset の API 名(`sumiRules` / `eslintConfigForSumi`)を一括で改名した。D-16 と README の命名検討の記録は当初の名前(Tsubu)のまま残す。
-- **未定**: Sumi sugar のファイル拡張子。`.tsb` は Tsubu 由来なので再決定する(候補: `.sumi`)。
+- **拡張子**: Sumi sugar の単一拡張子(D-11)は **`.sumi`** とする(2026-09-07 ユーザー決定。`.tsb` は Tsubu 由来のため置き換え)。
