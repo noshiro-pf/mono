@@ -279,7 +279,7 @@
 ## D-38: 三層の呼び名は Tsubu lint / Tsubu sugar /(第 3 層は未定)
 
 - **ステータス**: 確定(2026-09-06、第 3 層のみ未定)
-- **判断**: D-37 の三層を連番ではなく「TS からの距離」が分かる語で呼ぶ。第 1 層(制限のみ、lint で実現)は **Tsubu lint**、第 2 層(糖衣構文、transpiler)は **Tsubu sugar**。第 3 層(型検査の変更、独自型検査器)の名前は未定。候補: `types`(sugar が構文を足すのに対し型システムを足す、という対で読める)/ `core` / `full` / `strict`。`native` は D-39 で strict-ts-lib の plain 版の呼び名(native number)と衝突するので避ける。`subset` は「TS の subset」であって「Tsubu subset」ではないため不採用。
+- **判断**: D-37 の三層を連番ではなく「TS からの距離」が分かる語で呼ぶ。第 1 層(制限のみ、lint で実現)は **Tsubu lint**、第 2 層(糖衣構文、transpiler)は **Tsubu sugar**。第 3 層(型検査の変更、独自型検査器)の名前は未定。候補: `refined`(第 3 層の中身はネイティブ `Int` や narrowing 先の絞り込みという refinement type そのもの。「sugar → refined」は精製の連想でも続く)/ `retyped`(TS を独自の型検査器で型付けし直す)/ `types`(型定義集の印象があり不採用寄り)/ `core` / `full` / `strict`。`native` は D-39 で strict-ts-lib の plain 版の呼び名(native number)と衝突するので避ける。`subset` は「TS の subset」であって「Tsubu subset」ではないため不採用。
 - **理由**: 連番は間に層を挟みたくなったときに困る。名前がその層に必要なツール(lint / transpiler / 型検査器)を示すので説明が要らない。
 - **帰結**: 文書中の v1 / v2 / v3 は当面そのまま使い、正式名は Tsubu lint / Tsubu sugar を併記する。第 3 層の名前が決まった時点で一括置換する。
 
@@ -305,3 +305,13 @@
     3. 代替の対応表([spec/stdlib.md](./spec/stdlib.md)): `Number(str)` → `SafeNumber.parse`(ts-data-forge の `Num.safeParseFloat` と同じ実装のコピー。有限値のみ Ok、空文字・末尾不正・`NaN`・`Infinity` は tagged Err)/ `Number.parseInt(str, 10)` → `SafeNumber.parseInteger`(`Num.safeParseInt` のコピー + 有限性チェック。`parseInt` という宣言名は global を shadow するため D-19 に反する)/ `String(x)` → `SafeString.fromPrimitive`(template literal が受けない `symbol` / `bigint` / `undefined` を含む primitive の文字列化)/ `RegExp(p, f)` → `Regex.create` / `Error('msg')` → `new Error('msg')`(`new` 形は許可)/ `Array(n)` → 配列リテラル・`Arr.newArray` / `Arr.seq`(ts-data-forge)/ `Date()` → `new Date()` / `Boolean(x)` → 代替なし(真偽は明示的な比較で書く — [spec/booleans-and-logic.md](./spec/booleans-and-logic.md))/ `Object(x)` / `Function(...)` → 代替なし。
 - **理由**: `Number(x)` / `String(x)` は stdlib API そのものであり、「throw / 番兵値を返す stdlib API を Result / Optional 化する」ts-std-forge の守備範囲。ts-data-forge は ADT コアとデータ構造に留め、依存を一方向(ts-std-forge → ts-data-forge)に保つ(D-24)。既存の `Num.safeParseInt` / `safeParseFloat`(ts-data-forge)の実装を正とし、ts-std-forge には**依存ではなくコピー**として同等の実装を置く(2026-09-06 ユーザー決定)。ts-data-forge の次の major で ts-std-forge 側に一元管理し、`Num` から落とすことを視野に入れる。
 - **実装時に判明した差異**: `Num.safeParseInt('1e400')` は `Number` 側が `Infinity`、`parseInt` 側が `1` で両者とも非 NaN のため、`Infinity` を `Int` として Ok で返す。ts-std-forge のコピーは有限性チェックを足して Err にした。ts-data-forge 側の修正は別途(TODO)。
+
+## D-42: 仕様が沈黙する点は現行 eslint-config-typed の運用を正とする(残る v1 の未決定事項の一括解決)
+
+- **ステータス**: 確定(2026-09-06)
+- **判断**: 仕様書に明示の規定がない点は、**現行 eslint-config-typed / mono の運用を言語仕様とみなす**。個別には:
+    1. `exports` を持たないパッケージへの依存は合法(nodenext の `main` / `types` 解決に従う)。何も export しない script は import できない — 副作用 import の禁止と、名前付き import の型エラーで担保され、追加規則は不要([spec/modules.md](./spec/modules.md))。
+    2. JSX ランタイムは D-40 で解決(`jsx: "react-jsx"` 拘束、`jsxImportSource` 自由)。現行 React/JSX ルール群は「型情報が要る / 誤りが実行時の不正動作になる」ものを言語仕様、a11y・props spread・inline 関数・命名をスタイル規定(ESLint に残す)とする([spec/jsx.md](./spec/jsx.md))。
+    3. 関数の明示的戻り値型は強制。default 引数・分割代入引数は TS 通り許可([spec/functions.md](./spec/functions.md))。
+- **理由**: 現行 config は言語の 7〜8 割を既にプロトタイプしている([README.md](./README.md))。沈黙している点を個別に議論するより、運用実績を既定にして逸脱だけを仕様に書く方が速く、dogfood で問題が出た点を再検討すればよい。
+- **帰結**: v1 開発を止める未決定事項は無くなった。残る `未定`(パイプ内 await / ts-pattern / `import.meta` / barrel `export *` / 第 3 層の名前)はいずれも v1 実装に影響しない。

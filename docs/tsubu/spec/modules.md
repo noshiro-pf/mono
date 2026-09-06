@@ -41,7 +41,7 @@ const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28
 解決規則は一つだけ:
 
 1. `./` / `../` で始まる specifier → 記載どおりのファイル(拡張子必須、`index` 暗黙解決なし)。
-2. それ以外 → パッケージ名として `node_modules` の `exports` フィールド経由で解決。`exports` を持たないパッケージへの依存は違法(境界の問題として扱う → 未解決の論点)。
+2. それ以外 → パッケージ名として `node_modules` の `exports` フィールド経由で解決。`exports` を持たないパッケージへの依存も**合法**(`main` / `types` による nodenext の解決に従う — 確定 2026-09-06、D-42)。ただし **何も export しない script(副作用だけのモジュール)は import できない**: 副作用 import は禁止(上表)で、名前付き import は export が無ければ型エラーになるため、追加の規則は要らない。
 3. `#` で始まる specifier → package.json の `imports` フィールド経由で解決(D-28)。`exports` と同じく package.json が定める規則であり、解決規則の種類を増やさない。
 4. `tsconfig` の `baseUrl` / `paths` は使用しない(`#` imports がその受け皿になる)。
 

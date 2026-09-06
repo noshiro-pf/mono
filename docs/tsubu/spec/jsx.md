@@ -17,7 +17,7 @@
 
 `const identity = <T,>(x: T): T => x;` を Prettier(`.mts` / `.tsx` の両方)と oxfmt に通し、**いずれも trailing comma を保持する**ことを実測確認した。`<T,>` 常時強制の成立条件はクリア。
 
-## 未解決の論点
+## 決定済みの論点(2026-09-06)
 
-- JSX の対象ランタイム(React 前提か、`jsx: react-jsx` を固定するか — [compiler-options.md](./compiler-options.md) は現状 `react-jsx`)。
-- 現行 eslint-config-typed の React/JSX ルール群(props spread 禁止、inline 関数/オブジェクト回避、a11y 等)のどこまでを「言語仕様」に昇格させ、どこからを「スタイル規定」に留めるか。
+- **JSX ランタイム**: `jsx: "react-jsx"`(automatic runtime)は拘束項目、`jsxImportSource` は自由項目(D-40)。React 前提ではなく、preact 等は `jsxImportSource` で選ぶ。
+- **現行 React/JSX ルール群の区分**(D-42 の「現行 lint 運用を正とする」原則を適用): 型情報が要る、または誤りが実行時の不正動作になる規則 — hooks の呼び出し順・依存配列(`react-hooks/*`)、`jsx-key`、`jsx-no-leaked-render`、`no-unstable-nested-components`、式の隣接連結禁止 — を**言語仕様**とし、a11y・props spread 禁止・inline 関数/オブジェクト回避・命名は**スタイル規定**として ESLint 側に残す(Phase 2 の専用チェッカーへの移植対象外 — [implementation-plan.md](../implementation-plan.md) の「言語仕様に属さないスタイル規則は ESLint に残してよい」)。

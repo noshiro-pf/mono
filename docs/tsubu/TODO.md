@@ -36,7 +36,7 @@
 - [ ] `undefined` の排除(D-31): ts-std-forge の Optional ラッパー層が前提。v2 以降で `Optional<T>` へ一本化する規則を書く。
 - [ ] default export を emit する v2 の設定ファイル / ディレクティブの設計(D-36)と、`using` の v2 での再検討(D-30)。
 - [ ] barrel `export *` の扱い(2026-09-05 保留 — D-28)。
-- [ ] 第 3 層(型検査の変更)の呼び名を決める(D-38 — 候補 `types` / `core` / `full` / `strict`。lint / sugar は確定)。
+- [ ] 第 3 層(型検査の変更)の呼び名を決める(D-38 — 候補 `refined` / `retyped` ほか。lint / sugar は確定)。
 - [ ] 拘束 compilerOptions の検証(`tsc --showConfig` の実効値と base tsconfig の拘束項目の一致検査 — D-40)を preset / チェッカーに実装する。base tsconfig の配布物化は preset 追補で。
 - [ ] future-syntax.md の各候補に「v1 ライブラリ形」と両向きの codemod を明記する(D-37)。ライブラリ形の未整備分(パターンマッチ用 `match`、`?` 伝播用 `safeTry` 系)は ts-data-forge の並行ワークストリームへ。
 - [ ] getter/setter の粒度の深掘り(plain object の遅延評価 — [spec/banned-syntax.md](./spec/banned-syntax.md))。

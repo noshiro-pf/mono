@@ -33,7 +33,7 @@ named function 宣言なら実装シグネチャとオーバーロードシグ�
 
 なし。
 
-## 未解決の論点
+## 決定済みの論点(2026-09-06 — D-42)
 
-- default 引数・分割代入引数の制限(現状は TS 通り許可の想定)。
-- 関数の明示的戻り値型の強制(`explicit-function-return-type` — 現行 lint 運用の明文化)。
+- **関数の明示的戻り値型は強制**する(`explicit-function-return-type`、現行 lint 運用の追認)。
+- default 引数・分割代入引数は **TS 通り許可**(制限しない)。
