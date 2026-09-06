@@ -34,6 +34,11 @@ import { glob } from './glob.mjs';
  *   unaffected.
  * - An import binding that nothing outside the removed code refers to any
  *   more, and the whole `import` declaration when it has no bindings left.
+ *   This is one rule and there is no other: an unwrapped identity call's own
+ *   binding is removed by it, and so stays when the file also uses that name
+ *   somewhere the pass does not unwrap (`xs.map(castMutable)`). Which is why
+ *   the pass has to see what an unwrapped call's argument refers to, even
+ *   though the argument itself is none of its business.
  * - Every comment, when `options.removeComments` is set. The compiler copies
  *   the JSDoc of each declaration into the JavaScript as well as into the
  *   `.d.mts`, where an editor reads it from; the copy in the JavaScript is
