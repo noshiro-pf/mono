@@ -51,4 +51,4 @@ export const initialGameState: GameState = {
   // turn and phase
   currentPlayerIndex: 1,
   phase: 'ph010_selectMyCardToToss',
-};
+} as const;

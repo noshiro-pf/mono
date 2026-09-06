@@ -32,8 +32,9 @@ export const getParams = (
   playerId: string | undefined;
   replay: boolean;
   observe: boolean;
-}> => ({
-  playerId: queryParams.get(params.playerId) ?? undefined,
-  replay: queryParams.get(params.replay) === 'true',
-  observe: queryParams.get(params.observe) === 'true',
-});
+}> =>
+  ({
+    playerId: queryParams.get(params.playerId) ?? undefined,
+    replay: queryParams.get(params.replay) === 'true',
+    observe: queryParams.get(params.observe) === 'true',
+  }) as const;

@@ -3,13 +3,13 @@ import { type Rect, type RectSize } from 'ts-utils-additional';
 
 export const useWindowSize = (
   windowSize: Rect,
-): {
+): Readonly<{
   tableSize: RectSize;
   headerHeight: number;
   footerHeight: number;
   headerStyle: preact.CSSProperties;
   footerStyle: preact.CSSProperties;
-} => {
+}> => {
   const windowMinSideSize = useMemo(
     () => Math.min(windowSize.height, windowSize.width),
     [windowSize],

@@ -14,7 +14,7 @@ const R = 45;
 
 const SPINNER_TRACK = `M 50,50 m 0,-${R} a ${R},${R} 0 1 1 0,${
   R * 2
-} a ${R},${R} 0 1 1 0,-${R * 2}`;
+} a ${R},${R} 0 1 1 0,-${R * 2}` as const;
 
 // unitless total length of SVG path, to which stroke-dash* properties are relative.
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pathLength

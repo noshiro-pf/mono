@@ -20,7 +20,7 @@ export const useCardAttributes = (
   float: 'always' | 'never' | 'onHover',
   showOutline: 'always' | 'never' | 'onHover',
   outlineColor: CustomColor,
-): {
+): Readonly<{
   textColor: CardTextColor;
   eyeIconColor: string;
   wrapperStyle: preact.CSSProperties;
@@ -29,7 +29,7 @@ export const useCardAttributes = (
   rectStyle: preact.CSSProperties;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-} => {
+}> => {
   const { width, height } = useMemo(() => fillCardSize(size), [size]);
 
   const textColor =

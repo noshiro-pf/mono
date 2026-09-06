@@ -43,7 +43,7 @@ export const PlayerCardsArea = memoNamed(
         width: `${areaSize.width}px`,
         height: `${areaSize.height}px`,
         zIndex: zIndex.cards,
-      };
+      } as const;
 
       switch (rotate) {
         case 0:

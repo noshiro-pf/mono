@@ -23,7 +23,7 @@ const balloonPaddingPx = 5;
 const balloonSize: RectSize = {
   width: balloonPaddingPx * 2 + smallCardSize.width,
   height: balloonPaddingPx * 2 + smallCardSize.height,
-};
+} as const;
 
 const symbolSize: number = smallCardSize.height;
 

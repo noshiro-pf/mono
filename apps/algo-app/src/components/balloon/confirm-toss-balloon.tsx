@@ -22,7 +22,7 @@ const cardMarginPx = 2;
 const balloonSize: RectSize = {
   width: balloonPaddingPx * 2 + 120 + smallCardSize.width,
   height: 100,
-};
+} as const;
 
 const marginBetweenCardAndBalloon = 10;
 

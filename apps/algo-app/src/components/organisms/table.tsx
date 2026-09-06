@@ -85,10 +85,12 @@ export const Table = memoNamed(
     playerNamePositionsDispatcher,
     cardPositionsDispatcher,
   }: Props) => {
-    const { areaSize, cardSize } = useMemo<{
-      areaSize: RectSize;
-      cardSize: RectSize;
-    }>(() => {
+    const { areaSize, cardSize } = useMemo<
+      Readonly<{
+        areaSize: RectSize;
+        cardSize: RectSize;
+      }>
+    >(() => {
       const innerRectWidth =
         tableSize.width - 2 * (sidesWidth + containerPaddingPx); /* px */
 
