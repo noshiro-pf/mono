@@ -7,5 +7,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "include": ["./src", "./scripts", "./configs"]
+  "include": ["./src", "./e2e", "./scripts", "./configs"]
 }

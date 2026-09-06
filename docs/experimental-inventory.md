@@ -1731,3 +1731,19 @@ Vite 側 (`server`/`preview` + `strictPort`) と Playwright 側の両方が
 足すだけで、これを直さないと 2 app のテストが書けないため。1 と 3 は
 それぞれ別の修正（`ts-data-forge` の循環解消、`dict` の import 化）が要るので、
 該当 4 app の spec は `experimental/` に置いたままにしてある。
+
+### 3 件は `ts-repo-utils` の修正で解けた（2026-09-06）
+
+上の表の 1 番目は `ts-data-forge` の循環 import ではなく、**ビルドの
+`stripDevOnlyCode` が `castMutable(f(x))` を `f(x)` に畳むときに、`f` の
+import まで消していた**ものだった。消去範囲が呼び出し式の先頭から始まるので、
+「開始位置が消去範囲に入っているか」で参照を数えると引数ごと数え漏らす。
+型検査はソースを見るので通り、実行時に `ReferenceError` になる。
+
+`libs/*/dist` を全部調べて、ソースにある値 import がビルドで消えているのに
+本体では呼ばれ続けている箇所は **2 モジュールだけ**だった —
+`Arr.scan`（`newArray`・`asPositiveUint32`）と `Arr.fill`（`copy`）で、
+どちらも `ts-data-forge@14.6.3` として公開済みである。
+
+これで `annotation-tool`・`color-demo-app`・`my-portfolio-app-preact` の 3 つが
+動くようになり、spec も移した。**残るは `event-schedule-app` の `dict` だけ。**

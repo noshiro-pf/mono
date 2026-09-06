@@ -1,5 +1,6 @@
 import {
   defineKnownRules,
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -41,4 +42,5 @@ export default [
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     }),
   },
+  eslintConfigForPlaywright(['e2e/**']),
 ] satisfies readonly FlatConfig[];
