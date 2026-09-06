@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "octokit-safe-types": "1.2.27"
+    "octokit-safe-types": "1.2.28"
   }
 }
