@@ -54,13 +54,13 @@ export default [
     }),
   },
   {
-    // ts-std-forge does not use branded number types (Tsubu D-26 / D-39):
+    // ts-std-forge does not use branded number types (Sumi D-26 / D-39):
     // the only things it imports from ts-type-forge are the literal-range
     // types that refine a parameter to a finite set of numbers. Every other
     // ts-type-forge type is available as a global, and a number brand
     // (`Int`, `FiniteNumber`, `SafeUint`, ...) must not appear here at all —
     // neither as a parameter type (a cast burden on every call site) nor as a
-    // return type (Tsubu refined's native `Int` will supersede it).
+    // return type (Sumi refined's native `Int` will supersede it).
     files: ['src/**', 'test/**'],
     rules: defineKnownRules({
       'no-restricted-imports': [
@@ -79,7 +79,7 @@ export default [
                 'UintRangeInclusive',
               ],
               message:
-                'ts-std-forge imports only the literal-range types from ts-type-forge; branded number types are not used here (Tsubu D-26 / D-39).',
+                'ts-std-forge imports only the literal-range types from ts-type-forge; branded number types are not used here (Sumi D-26 / D-39).',
             },
           ],
         },

@@ -4,7 +4,7 @@ import { Result } from 'ts-data-forge';
  * Parses a string as a base-10 integer — the alternative to calling
  * `Number(str)` / `Number.parseInt(str, 10)` for integers. (Named
  * `parseInteger` rather than `parseInt` because a declaration named after a
- * global shadows it — the very thing Tsubu forbids.)
+ * global shadows it — the very thing Sumi forbids.)
  *
  * `Number.parseInt` ignores trailing non-numeric characters (`'123abc'` →
  * `123`) and `Number` coerces blank input to `0`. This function is the same
