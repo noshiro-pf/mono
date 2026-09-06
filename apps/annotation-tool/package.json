@@ -38,13 +38,13 @@
     "@emotion/styled": "^11.14.1",
     "better-react-use-state": "workspace:*",
     "normalize.css": "^8.0.1",
-    "pixi.js-legacy": "^5.3.12",
+    "pixi.js-legacy": "^7.4.3",
     "react-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-utils-additional": "workspace:*",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",

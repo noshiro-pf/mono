@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "better-preact-use-state": "workspace:*",
-    "goober": "^2.1.16",
+    "goober": "^2.1.19",
     "preact-utils": "workspace:*",
     "resize-observer-preact-hooks": "workspace:*",
     "synstate-preact-hooks": "workspace:*",

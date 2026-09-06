@@ -32,8 +32,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@fontsource/roboto": "^5.2.8",
-    "@mui/material": "^9.3.1",
+    "@fontsource/roboto": "^5.3.0",
+    "@mui/material": "^9.4.0",
     "better-react-use-state": "workspace:*",
     "react-mui-utils": "workspace:*",
     "react-utils": "workspace:*",
