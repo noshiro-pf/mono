@@ -24,9 +24,6 @@ name: pnpm update
 # `update.ignoreDeps` currently holds back `typescript`, which also covers the
 # `typescript-native` alias since pnpm matches the resolved package.
 #
-# pnpm itself moves within its current major only — `pnpm self-update 11`. The
-# reason is written out at that step.
-#
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
 # (dependencies / peerDependencies / optionalDependencies) changed, mirroring
@@ -103,30 +100,11 @@ jobs:
       # Within the current major only, for the same reason `update-actions`
       # carries no `--latest`: a package manager major changes how the tree is
       # built, and that is a decision for a human rather than something to
-      # land unattended overnight.
-      #
-      # pnpm 12 is why the version is named here rather than left implicit. It
-      # rewrote peer resolution ("dependency cycles are now broken canonically
-      # during peer resolution"), and `verify-npm-packages/` — whose whole
-      # premise is a space with `hoist: false`, where a package may reach only
-      # what it declares — stopped building a tree those packages can run in.
-      # Two ways, both measured against pnpm 11.25.0 on the same space:
-      #
-      # - `eslint-plugin-unicorn` lost its `eslint` peer entirely
-      #   (`74.0.0` where pnpm 11 wrote `74.0.0_eslint@10.10.0`), so the copy
-      #   of `eslint` it found was the monorepo's, outside the space.
-      # - `eslint-plugin-ts-data-forge` was given `typescript@7.0.2` against
-      #   its own `>=5.0.0 <7.0.0` peer range, leaked from the `ts-type-forge`
-      #   project's `typescript: latest`, and died on `ts.TypeFlags` being
-      #   undefined.
-      #
-      # Neither is a fault in what those packages publish, and the monorepo's
-      # own install is unaffected — hoisting hides both. Taking the major means
-      # teaching the check space to declare the peers pnpm 12 now resolves at
-      # the importer, including transitive ones; until that is done, `11` here
-      # is what keeps the daily run from reopening the same two failures.
+      # land unattended overnight. pnpm 12 is the case that established it —
+      # it rewrote peer resolution and broke `verify-npm-packages/` (#1845),
+      # which is now built to survive that but was not warned first.
       - name: Update pnpm itself
-        run: pnpm self-update 11
+        run: pnpm self-update 12
 
       - name: Update dependencies
         run: |

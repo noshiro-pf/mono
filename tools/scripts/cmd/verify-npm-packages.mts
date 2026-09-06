@@ -1,6 +1,15 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, isRecord, isString, Json, Num, Result } from 'ts-data-forge';
+import {
+  Arr,
+  isRecord,
+  isString,
+  Json,
+  Num,
+  Obj,
+  Optional,
+  Result,
+} from 'ts-data-forge';
 import {
   $,
   formatFilesGlob,
@@ -70,37 +79,69 @@ export const verifyNpmPackages = async (
     `Installing into ${path.relative(projectRootPath, spaceDir)} ...`,
   );
 
-  // Neither space can be installed incrementally. The tarballs are packed
-  // under names without versions in them, so their paths do not change
-  // between runs even though their contents do, and pnpm keys a `file:`
-  // dependency on the path. Measured: with `cmd-ts` removed from
-  // ts-codemod-cli's dependencies, reinstalling — with `--force`, and with the
-  // lockfile deleted — still produced a tree containing `cmd-ts`, and the
-  // check passed. Only removing `node_modules` re-extracts the tarball.
-  // `latest` in the published space is a moving target for the same reason.
-  await fs.rm(path.resolve(spaceDir, 'node_modules'), {
-    recursive: true,
-    force: true,
-  });
+  const installed = await installProjects(spaceDir, included);
 
-  await fs.rm(path.resolve(spaceDir, 'pnpm-lock.yaml'), { force: true });
-
-  // `1>&2` because pnpm reports the fault — `ERR_PNPM_NO_MATCHING_VERSION`,
-  // and which package asked for what — on stdout, while Node puts only stderr
-  // into the error it hands back. Without the redirect a failed install
-  // reached CI as "Command failed: pnpm install" and nothing else.
-  const installed = await $(
-    `pnpm --dir ${spaceDir} install --no-frozen-lockfile 1>&2`,
-    { silent: true },
-  );
-
-  if (Result.isErr(installed)) {
-    return Result.err(`Install failed: ${installed.value.message}`);
-  }
+  if (Result.isErr(installed)) return installed;
 
   console.info('ok\n');
 
   return runChecks(spaceDir, included);
+};
+
+/**
+ * One `pnpm install` per package, each in its own workspace.
+ *
+ * The projects used to be one workspace with a `packages/*` glob, which is
+ * cheaper — one resolution instead of thirty-two — and was enough while pnpm
+ * resolved a peer dependency from the package that declares it. pnpm 12
+ * resolves more of them at the importer, and in one workspace the importer is
+ * shared: measured on this space, `eslint-plugin-ts-data-forge` was handed
+ * `typescript@7.0.2` against its own `>=5.0.0 <7.0.0` peer range, because the
+ * `ts-type-forge` project next to it asks for `typescript: latest`. That is
+ * the same fault the space already splits one project per package to avoid —
+ * a package passing the check on something another package brought in — and
+ * peers were the way back in.
+ *
+ * Neither space can be installed incrementally. The tarballs are packed under
+ * names without versions in them, so their paths do not change between runs
+ * even though their contents do, and pnpm keys a `file:` dependency on the
+ * path. Measured: with `cmd-ts` removed from ts-codemod-cli's dependencies,
+ * reinstalling — with `--force`, and with the lockfile deleted — still
+ * produced a tree containing `cmd-ts`, and the check passed. Only removing
+ * `node_modules` re-extracts the tarball. A pinned version in the published
+ * space is a moving target for the same reason.
+ */
+const installProjects = async (
+  spaceDir: string,
+  packages: readonly PackageToCheck[],
+): Promise<Result<undefined, string>> => {
+  for (const pkg of packages) {
+    const dir = path.resolve(spaceDir, 'packages', pkg.name);
+
+    await fs.rm(path.resolve(dir, 'node_modules'), {
+      recursive: true,
+      force: true,
+    });
+
+    await fs.rm(path.resolve(dir, 'pnpm-lock.yaml'), { force: true });
+
+    // `1>&2` because pnpm reports the fault — `ERR_PNPM_NO_MATCHING_VERSION`,
+    // and which package asked for what — on stdout, while Node puts only
+    // stderr into the error it hands back. Without the redirect a failed
+    // install reached CI as "Command failed: pnpm install" and nothing else.
+    const installed = await $(
+      `pnpm --dir ${dir} install --no-frozen-lockfile 1>&2`,
+      { silent: true },
+    );
+
+    if (Result.isErr(installed)) {
+      return Result.err(
+        `Install failed for ${pkg.name}: ${installed.value.message}`,
+      );
+    }
+  }
+
+  return Result.ok(undefined);
 };
 
 export type Target = 'local' | 'published';
@@ -284,36 +325,6 @@ const generateSpace = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.mkdir(path.resolve(spaceDir, 'packages'), { recursive: true });
 
-  await writeJson(path.resolve(spaceDir, 'package.json'), {
-    name: `verify-npm-packages-${target}`,
-    version: '0.0.0',
-    private: true,
-    type: 'module',
-  });
-
-  await writeFile(
-    path.resolve(spaceDir, 'pnpm-workspace.yaml'),
-    [
-      "packages:\n  - 'packages/*'",
-      '',
-      '# Without this, pnpm fills `node_modules/.pnpm/node_modules` and puts it',
-      '# on the resolution path, so a package that forgot to declare a',
-      '# dependency still finds it as long as something else depends on it —',
-      '# which is exactly the fault these checks look for.',
-      'hoist: false',
-      '',
-      '# What is under test is the packages, not whether someone else’s',
-      '# postinstall script is on pnpm’s allow list.',
-      'strictDepBuilds: false',
-      '',
-      '# The repository holds new releases back for a week. Here that would',
-      '# mean "published" quietly meaning "published a week ago".',
-      'minimumReleaseAge: 0',
-      '',
-      ...(target === 'local' ? siblingOverrides(spaceDir, packages) : []),
-    ].join('\n'),
-  );
-
   const mut_included: PackageToCheck[] = [];
 
   const mut_skipped: string[] = [];
@@ -345,17 +356,23 @@ const generateSpace = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(dir, { recursive: true });
 
+    const peers = await peerSpecs(target, dir, pkg, spec, options.updatePins);
+
+    if (Result.isErr(peers)) return peers;
+
+    await writeFile(
+      path.resolve(dir, 'pnpm-workspace.yaml'),
+      projectWorkspaceYaml(target, dir, packages),
+    );
+
     await writeJson(path.resolve(dir, 'package.json'), {
       name: `verify-${pkg.name}`,
       version: '0.0.0',
       private: true,
       type: 'module',
-      // Peer dependencies are deliberately not listed. pnpm installs them
-      // from the range the *installed* package declares, which is what a
-      // consumer gets — and in the published space that is the published
-      // range, not this checkout's.
       dependencies: {
         [pkg.name]: spec,
+        ...peers.value,
         // A types-only package is checked by compiling against it.
         ...(isTypesOnly(pkg.name) ? { typescript: typescriptSpec(pkg) } : {}),
       },
@@ -417,6 +434,154 @@ const generateSpace = async (
 };
 
 /**
+ * Each project is its own workspace root, so that nothing another project
+ * installed can reach it — see `installProjects`.
+ */
+const projectWorkspaceYaml = (
+  target: Target,
+  dir: string,
+  packages: readonly PackageToCheck[],
+): string =>
+  [
+    '# Without this, pnpm fills `node_modules/.pnpm/node_modules` and puts it',
+    '# on the resolution path, so a package that forgot to declare a',
+    '# dependency still finds it as long as something else depends on it —',
+    '# which is exactly the fault these checks look for.',
+    'hoist: false',
+    '',
+    '# What is under test is the packages, not whether someone else\u{2019}s',
+    '# postinstall script is on pnpm\u{2019}s allow list.',
+    'strictDepBuilds: false',
+    '',
+    '# The repository holds new releases back for a week. Here that would',
+    '# mean "published" quietly meaning "published a week ago".',
+    'minimumReleaseAge: 0',
+    '',
+    ...(target === 'local' ? siblingOverrides(dir, packages) : []),
+  ].join('\n');
+
+/**
+ * The peer dependencies the package under check declares, written into the
+ * project as ordinary dependencies — which is what a consumer has to do with
+ * a peer anyway.
+ *
+ * They used to be left out, on the reasoning that pnpm installs a peer from
+ * the range the *installed* package declares, so the published space would
+ * exercise the published range without this file having to know it. pnpm 12
+ * resolves a peer at the importer in more cases, and an importer that
+ * declares nothing gets nothing: measured on this space, every ESLint plugin
+ * `eslint-config-typed` pulls in lost its `eslint` peer, and
+ * `eslint-plugin-unicorn` then found the monorepo's copy — outside the space,
+ * which is the one thing `isolate.mjs` exists to catch.
+ *
+ * The range is still the package's own, so what is exercised is unchanged.
+ * Where it comes from differs by space, for the same reason the version pin
+ * does:
+ *
+ * - `local` reads this checkout, which is what the tarball was packed from.
+ * - `published` reads what is committed here, and looks the pinned version's
+ *   manifest up on the registry only when `--update` moves the pins. A
+ *   published version's manifest never changes, so the committed answer stays
+ *   right, and the check does not spend thirty-two registry round trips on
+ *   every run to be told what it already knows.
+ *
+ * An optional peer is left out. It is optional because a consumer may not
+ * have it, and a consumer who does not is the case worth checking.
+ */
+const peerSpecs = async (
+  target: Target,
+  dir: string,
+  pkg: PackageToCheck,
+  spec: string,
+  updatePins: boolean,
+): Promise<Result<ReadonlyRecord<string, string>, string>> => {
+  if (target === 'local') return Result.ok(declaredPeers(pkg.manifest));
+
+  const committed = updatePins ? undefined : await readCommittedPeers(dir, pkg);
+
+  if (committed !== undefined) return Result.ok(committed);
+
+  // The whole manifest rather than the two fields by name: `npm view` given
+  // several fields prints them keyed by field name only when more than one of
+  // them exists, and prints the value bare otherwise — so asking for
+  // `peerDependencies peerDependenciesMeta` returns two different shapes
+  // depending on whether the package happens to have optional peers.
+  const manifest = await $(`npm view ${pkg.name}@${spec} --json`, {
+    silent: true,
+  });
+
+  if (Result.isErr(manifest)) {
+    return Result.err(
+      `Could not look up the peer dependencies of ${pkg.name}@${spec}: ${manifest.value.message}`,
+    );
+  }
+
+  const parsed = Json.parse(manifest.value.stdout);
+
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+    return Result.err(`Could not read the manifest of ${pkg.name}@${spec}.`);
+  }
+
+  return Result.ok(declaredPeers(parsed.value));
+};
+
+/** The non-optional `peerDependencies` of a manifest, as plain specs. */
+const declaredPeers = (manifest: JsonValue): ReadonlyRecord<string, string> => {
+  const peers = isRecord(manifest) ? manifest['peerDependencies'] : undefined;
+
+  const meta = isRecord(manifest)
+    ? manifest['peerDependenciesMeta']
+    : undefined;
+
+  if (!isRecord(peers)) return {};
+
+  const isOptional = (name: string): boolean => {
+    if (!isRecord(meta)) return false;
+
+    const entry = meta[name];
+
+    return isRecord(entry) && entry['optional'] === true;
+  };
+
+  return Obj.filterMap(peers, (range, name) =>
+    isString(range) && !isOptional(name) ? Optional.some(range) : Optional.none,
+  );
+};
+
+/**
+ * What the last generation wrote, read back the way `readPinnedVersion` reads
+ * the pin: everything in the project's `dependencies` except the package
+ * itself and the `typescript` a types-only check compiles against.
+ */
+const readCommittedPeers = async (
+  dir: string,
+  pkg: PackageToCheck,
+): Promise<ReadonlyRecord<string, string> | undefined> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const raw = await fs
+    .readFile(path.resolve(dir, 'package.json'), 'utf8')
+    .catch(() => undefined);
+
+  if (raw === undefined) return undefined;
+
+  const parsed = Json.parse(raw);
+
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) return undefined;
+
+  const deps = parsed.value['dependencies'];
+
+  if (!isRecord(deps)) return undefined;
+
+  return Obj.filterMap(deps, (spec, name) =>
+    name !== pkg.name &&
+    !(name === 'typescript' && isTypesOnly(pkg.name)) &&
+    isString(spec)
+      ? Optional.some(spec)
+      : Optional.none,
+  );
+};
+
+/**
  * The packages in this repository depend on each other, and `pnpm pack`
  * resolves `workspace:^` to the version in the checkout — so the tarball of
  * `github-settings-as-code` asks for `octokit-safe-types@^1.2.26` while npm
@@ -433,7 +598,7 @@ const generateSpace = async (
  * question, not this one's.
  */
 const siblingOverrides = (
-  spaceDir: string,
+  dir: string,
   packages: readonly PackageToCheck[],
 ): readonly string[] => [
   '# Depend on the sibling packed from this checkout, not the older one on',
@@ -441,7 +606,7 @@ const siblingOverrides = (
   'overrides:',
   ...packages.map(
     (pkg) =>
-      `  '${pkg.name}': 'file:${path.relative(spaceDir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
+      `  '${pkg.name}': 'file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
   ),
   '',
 ];
@@ -657,14 +822,15 @@ const runChecks = async (
 
     const file = smokeFileName(pkg.name);
 
-    // `--import isolate.mjs` refuses any resolution outside the space. These
-    // projects sit inside the monorepo, so without it Node walks up into the
-    // repository's own `node_modules` and a package missing a dependency finds
-    // it there — the check then passes on a package a consumer cannot use.
+    // `--import isolate.mjs` refuses any resolution outside the project — its
+    // own `node_modules` and nothing above. These projects sit inside the
+    // monorepo, so without it Node walks up into the repository's own
+    // `node_modules` and a package missing a dependency finds it there — the
+    // check then passes on a package a consumer cannot use.
     // Through NODE_OPTIONS rather than an argument, so that a check which
     // spawns the package's own executable — several do — carries the boundary
     // into that child process too.
-    const isolation = `VERIFY_SPACE_ROOT=${spaceDir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'`;
+    const isolation = `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'`;
 
     // The packages whose TypeScript resolves `@typescript/lib-*` by name are
     // set up by the linker they ship, exactly as their README instructs —

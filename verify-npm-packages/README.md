@@ -41,6 +41,11 @@ local/packages/<pkg>/    生成物: package.json と smoke/ のコピー
 published/packages/<pkg>/ 同上、依存指定だけが違う
 ```
 
+`<pkg>/` はそれぞれが独立した pnpm workspace root で、`pnpm-workspace.yaml` と
+`node_modules` を自分で持つ。install も 32 回走る。ここは生成物のうち
+`pnpm-workspace.yaml` だけ commit していない — pnpm が install 中に
+`allowBuilds` を書き戻すため。
+
 **チェックを直すときは `smoke/` を直す。** `local/` `published/` 配下は
 `tools/scripts/cmd/verify-npm-packages.mts` が生成し、コミットもされている。
 生成物と `smoke/` がずれると CI の「作業ツリーが汚れていないか」チェックが落ちる。
@@ -48,21 +53,50 @@ published/packages/<pkg>/ 同上、依存指定だけが違う
 ## 独立性をどう担保しているか
 
 依存を宣言し忘れたパッケージを検出するには、各 project が**自分の宣言した依存しか
-解決できない**必要がある。実測してみると、素直に作っただけでは 3 通りの抜け道があった。
+解決できない**必要がある。実測してみると、素直に作っただけでは 4 通りの抜け道があった。
 いずれも「未宣言の依存があるパッケージが検査を素通りする」形で、この仕組みが
 検出すべきものそのものだった。
 
-| 抜け道                                                                                          | 対策                                |
-| :---------------------------------------------------------------------------------------------- | :---------------------------------- |
-| 1 つの project に全パッケージを入れると、他のパッケージが持ってきた依存を使えてしまう           | パッケージごとに 1 project に分ける |
-| pnpm 既定の hoisting で `node_modules/.pnpm/node_modules` 経由で解決できてしまう                | `hoist: false`                      |
-| **この領域はリポジトリの中にあるため、Node の解決がリポジトリ root の `node_modules` まで遡る** | `isolate.mjs` の resolve hook       |
+| 抜け道                                                                                          | 対策                                         |
+| :---------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| 1 つの project に全パッケージを入れると、他のパッケージが持ってきた依存を使えてしまう           | パッケージごとに 1 workspace に分ける        |
+| pnpm 既定の hoisting で `node_modules/.pnpm/node_modules` 経由で解決できてしまう                | `hoist: false`                               |
+| **この領域はリポジトリの中にあるため、Node の解決がリポジトリ root の `node_modules` まで遡る** | `isolate.mjs` の resolve hook                |
+| peer dependency が project をまたいで漏れる                                                     | 1 workspace 1 パッケージ + peer を自分で宣言 |
 
 3 つ目が最も厄介で、`ts-fortress` の project から `ts-data-forge` を import すると
 `<repo>/libs/ts-data-forge/dist/entry-point.mjs`（tarball ですらなく**ソースのビルド**）
-が解決できてしまっていた。`isolate.mjs` は空間の外に解決されたものをすべて拒否する。
+が解決できてしまっていた。`isolate.mjs` は project の外に解決されたものをすべて拒否する。
 `NODE_OPTIONS` 経由で渡しているので、パッケージの実行ファイルを spawn するチェックでも
 境界が効く。
+
+4 つ目は pnpm 12 で開いた。pnpm 12 は peer dependency を importer 側で解決する
+ケースを増やしたため、**何も宣言していない importer には何も入らない**。実測した
+2 つの壊れ方はどちらもこの形だった。
+
+- `eslint-config-typed` が連れてくる ESLint plugin が軒並み `eslint` peer を
+  失い、`eslint-plugin-unicorn` はリポジトリ root の `eslint` を掴んだ。
+  `isolate.mjs` が捕まえるべきものそのもの。
+- `eslint-plugin-ts-data-forge` に、自身の peer 範囲 `>=5.0.0 <7.0.0` に反する
+  `typescript@7.0.2` が渡った。隣の `ts-type-forge` project が
+  `typescript: latest` を要求していたため。1 つの workspace を共有していた頃の、
+  上の表の 1 行目がそのまま peer 経由で戻ってきた形になる。
+
+対策は 2 つで、どちらも「consumer が実際にやること」に寄せたもの。project ごとに
+workspace を分けたので隣の project の解決は届かず、各 project は**そのパッケージ
+自身が宣言する peer 範囲**を dependencies に書く。範囲はパッケージ自身のものなので、
+何が検査されるかは変わらない。範囲の出どころだけが空間で違う。
+
+|              | peer 範囲の出どころ                                                   |
+| :----------- | :-------------------------------------------------------------------- |
+| `local/`     | このチェックアウト（tarball の pack 元）                              |
+| `published/` | commit してある値。`--update` で pin を動かすときだけ registry を引く |
+
+公開済みバージョンの manifest は不変なので、commit した答えは正しいままになる。
+バージョン pin と同じ扱いで、毎回 32 回 registry を叩かずに済む。
+
+optional な peer は書かない。consumer が持っていないかもしれないから optional
+なのであって、持っていない consumer こそ検査する価値がある。
 
 もう 1 つ、インストールの側にも落とし穴がある。tarball はバージョンを含まない固定名で
 pack しているため、**中身が変わってもパスが変わらない**。pnpm は `file:` 依存をパスで
@@ -78,8 +112,8 @@ install している。
 必ずなる。素直に install すると `ERR_PNPM_NO_MATCHING_VERSION` で落ちる。
 リリースするためのブランチでこそ通らないチェックになってしまう。
 
-`local/pnpm-workspace.yaml` の `overrides` で、リポジトリ内のパッケージはすべて
-このチェックアウトから pack した tarball に向けている。バージョンブランチ以外でも
+各 project の `pnpm-workspace.yaml` の `overrides` で、リポジトリ内のパッケージは
+すべてこのチェックアウトから pack した tarball に向けている。バージョンブランチ以外でも
 解決先は npm 上の**古い方**の sibling だったので、「次のリリース」を見るという
 `local/` の目的にはこちらが正しい。ここに入っているパッケージは同時にリリースされる。
 宣言した範囲が公開済みのものと合っているかは `published/` 側の問い。
@@ -93,9 +127,6 @@ install している。
 # 2. smoke に未宣言の import を足す        → resolved outside the check space
 # 3. module / types に存在しないパスを書く → advertised but not published
 ```
-
-peer dependencies は意図的に宣言していない。pnpm が**インストールされたパッケージ
-自身**の宣言する範囲から解決するため、`published/` では公開済みの範囲が使われる。
 
 型しか公開していないパッケージ（`ts-type-forge`）は import ではなく `tsc --noEmit`
 でチェックする。実行するものが無いため。

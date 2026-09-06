@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "react": ">=16.8.0",
     "synstate-react-hooks-compat": "3.0.1"
   }
 }

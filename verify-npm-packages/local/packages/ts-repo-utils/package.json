@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "prettier": ">=3.0.0",
     "ts-repo-utils": "file:../../../.tarballs/ts-repo-utils.tgz"
   }
 }

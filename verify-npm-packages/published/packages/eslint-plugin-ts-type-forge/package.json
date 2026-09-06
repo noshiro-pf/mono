@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-type-forge": "0.8.1"
+    "eslint": ">=9.0.0",
+    "eslint-plugin-ts-type-forge": "0.8.1",
+    "typescript": ">=5.0.0"
   }
 }
