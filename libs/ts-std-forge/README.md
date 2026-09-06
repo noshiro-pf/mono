@@ -41,8 +41,8 @@ error messages, whose wording ECMAScript leaves unspecified.
 Tsubu forbids calling the built-in constructors as plain functions
 (`Number(x)`, `String(x)`, `Boolean(x)`, …): they are implicit conversions
 whose intent is not in the name and whose failure is a sentinel. The
-replacements that are stdlib wrappers live here — `SafeNumber.parse` for
-`Number(str)`, `SafeString.fromPrimitive` for `String(x)`, `Regex.create` for
+replacements that are stdlib wrappers live here — `SafeNumber.parse` /
+`SafeNumber.parseInteger` for `Number(str)` / `Number.parseInt(str, 10)`, `SafeString.fromPrimitive` for `String(x)`, `Regex.create` for
 `RegExp(p, f)`. The rest need no new API: `Error('msg')` / `Date()` become
 their `new` forms, `Array(n)` a literal or ts-data-forge's `Arr.newArray` /
 `Arr.seq`, and `Boolean(x)` an explicit comparison (there is deliberately no
@@ -53,7 +53,8 @@ no `new` form.
 
 - `Regex.create(pattern, flags?)` — `new RegExp` without throwing. Pattern validity is the engine's own grammar check (not pre-validatable); a caught `SyntaxError` becomes `'invalid-regexp'` with the error as `cause`, anything else `'unexpected'`.
 - `SafeDate.toISOString(date)` — `Date.prototype.toISOString` without throwing (Invalid Date → `Err<{ kind: 'invalid-date' }>`).
-- `SafeNumber.parse(value)` — the alternative to `Number(str)`: same StringToNumber conversion, but a blank input or a `NaN` result is `Err<{ kind: 'invalid-number', input }>` instead of a sentinel (`±Infinity` still parses).
+- `SafeNumber.parse(value)` — the alternative to `Number(str)`: the same implementation as ts-data-forge's `Num.safeParseFloat` (a copy, not a dependency), returning `Ok<FiniteNumber>` or `Err<{ kind: 'invalid-number', input }>` for blank input, trailing garbage, `NaN` and `±Infinity`.
+- `SafeNumber.parseInteger(value)` — the alternative to `Number.parseInt(str, 10)`: the same implementation as `Num.safeParseInt` plus a finiteness check, returning `Ok<Int>` (truncated toward zero) or `Err<{ kind: 'invalid-integer', input }>`. Named `parseInteger` because a declaration named `parseInt` would shadow the global.
 - `SafeNumber.toFixed(value, fractionDigits)` — `fractionDigits: UintRangeInclusive<0, 100>`; total, returns `string`.
 - `SafeNumber.toExponential(value, fractionDigits?)` — `fractionDigits?: UintRangeInclusive<0, 100>`; total, returns `string`.
 - `SafeNumber.toPrecision(value, precision)` — `precision: UintRangeInclusive<1, 100>`; total, returns `string`.

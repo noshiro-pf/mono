@@ -1,16 +1,18 @@
-import { Result } from 'ts-data-forge';
+import { asFiniteNumber, Result } from 'ts-data-forge';
+import { type FiniteNumber } from 'ts-type-forge';
 
 /**
- * Parses a string as a number without the `NaN` sentinel — the alternative
- * to calling `Number(str)`.
+ * Parses a string as a finite number — the alternative to calling
+ * `Number(str)`.
  *
- * `Number(str)` never throws; it reports failure as `NaN`, and turns the
- * empty (or whitespace-only) string into `0`. Both are sentinels that a
- * caller has to remember to check. This wrapper applies the same
- * StringToNumber conversion (so hexadecimal / exponent notation,
- * surrounding whitespace and `'Infinity'` parse exactly as `Number` parses
- * them) but reports a blank input or a `NaN` result as a tagged `Err`
- * carrying the original input.
+ * `Number(str)` never throws; it reports failure as `NaN`, turns the empty
+ * (or whitespace-only) string into `0`, and accepts `'Infinity'`. This
+ * function is the same implementation as ts-data-forge's
+ * `Num.safeParseFloat` (kept as a copy, not a dependency, so that the two
+ * can be consolidated here later): the input is accepted only when both
+ * `Number` and `Number.parseFloat` agree it is a number **and** the result
+ * is finite — which rejects blank input, trailing garbage (`'12px'`),
+ * `'NaN'` and `'Infinity'` together.
  *
  * `Number(x)` on other types is not covered here: `Number(bool)` is
  * `b ? 1 : 0`, `Number(date)` is `date.getTime()`.
@@ -24,35 +26,38 @@ import { Result } from 'ts-data-forge';
  *
  * assert.deepStrictEqual(okResult.value, 16);
  *
- * const errResult = SafeNumber.parse('12abc');
+ * const errResult = SafeNumber.parse('12px');
  *
  * assert.isTrue(Result.isErr(errResult));
  *
  * assert.deepStrictEqual(errResult.value, {
  *   kind: 'invalid-number',
- *   input: '12abc',
+ *   input: '12px',
  * });
  * ```
  *
  * @param value The string to parse.
- * @returns `Ok<number>` with the parsed value (possibly `±Infinity`), or
- *   `Err<{ kind: 'invalid-number', input }>` when the input is blank or does
- *   not parse as a number.
+ * @returns `Ok<FiniteNumber>` with the parsed value, or
+ *   `Err<{ kind: 'invalid-number', input }>` when the input is blank, has
+ *   trailing garbage, or is not finite.
  */
-export const parse = (value: string): Result<number, ParseError> => {
-  if (value.trim() === '') {
-    return Result.err({ kind: 'invalid-number', input: value });
-  }
-
-  // ts-std-forge is the boundary implementer here (D-24): it wraps the raw
-  // conversion itself rather than the prelude's finite-only `safeParseFloat`,
-  // so that `'Infinity'` parses exactly as `Number` parses it.
+export const parse = (value: string): Result<FiniteNumber, ParseError> => {
+  // ts-std-forge is the boundary implementer (D-24): it wraps the raw
+  // conversion itself rather than importing the prelude's `Num.safeParseFloat`,
+  // whose implementation this mirrors.
   // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
-  const parsed = Number(value);
+  const viaNumber = Number(value);
 
-  return Number.isNaN(parsed)
+  // `Number('')` / `Number('   ')` は 0 を返すが、`parseFloat` は NaN を返す。
+  // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
+  // 非 NaN かつ有限の場合のみ採用することで空文字・空白のみ・末尾不正・
+  // Infinity をまとめて弾く。
+  return Number.isNaN(viaNumber) ||
+    !Number.isFinite(viaNumber) ||
+    // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
+    Number.isNaN(Number.parseFloat(value))
     ? Result.err({ kind: 'invalid-number', input: value })
-    : Result.ok(parsed);
+    : Result.ok(asFiniteNumber(viaNumber));
 };
 
 /** The failure type of {@link parse}. */

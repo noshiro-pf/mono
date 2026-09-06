@@ -38,9 +38,14 @@ assert.equal(SafeNumber.toStringWithRadix(255, 16), 'ff');
 // Constructor-call alternatives (D-15): Number(str) without the NaN sentinel,
 // String(x) for the primitives a template literal cannot take.
 assert.equal(SafeNumber.parse(' 0x10 ').value, 16);
-assert.deepEqual(SafeNumber.parse('12abc').value, {
+assert.deepEqual(SafeNumber.parse('Infinity').value, {
   kind: 'invalid-number',
-  input: '12abc',
+  input: 'Infinity',
+});
+assert.equal(SafeNumber.parseInteger('-12.9').value, -12);
+assert.deepEqual(SafeNumber.parseInteger('123abc').value, {
+  kind: 'invalid-integer',
+  input: '123abc',
 });
 assert.equal(SafeString.fromPrimitive(Symbol('tag')), 'Symbol(tag)');
 assert.equal(SafeString.fromPrimitive(10n), '10');

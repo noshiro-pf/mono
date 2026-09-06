@@ -1,3 +1,4 @@
+export * from './parse-integer.mjs';
 export * from './parse.mjs';
 export * from './to-exponential.mjs';
 export * from './to-fixed.mjs';
