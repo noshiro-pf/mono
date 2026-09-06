@@ -274,14 +274,14 @@
     4. **emit の最適化・正規化はしない**: v2 → v1 の変換は書き方を保存する。パイプ演算子は ts-data-forge の `pipe` にそのまま対応させ、同じ意味の複数の書き方(`pipe(x).map(f).value` と `f(x)` 等)は TS 側でも Tsubu v1 側でも維持する。「既知のカリー化呼び出しを直接形へ最適化 emit する」という以前の案([spec/future-syntax.md](./spec/future-syntax.md) 候補 1)は**撤回**。
 - **理由**: 同じ意味の書き方を出力時に一つへ潰す最適化・正規化は多対一の変換であり、v1 → v2 の逆変換を不可能にする。ReScript ではカリー化周りの `.ts` 出力時にまさにこれが起きており、「言語移行後に eject で TS に戻ってこれる」という望ましい性質を壊していた。往復変換は日常的に使い、eject は言語をやめるときにしか使わないので、往復忠実性を既定にする。三層に分けるのは、構文の話と型検査の話が同じ候補リストに並んでいたことが判断のブレの原因だったため。
 - **帰結**: 第 2 層の各候補に「v1 ライブラリ形」と「両向きの codemod」を明記する。適合性コーパスに対する「v1 → v2 → v1 が(整形を除き)恒等」の往復プロパティテストが transpiler の主要な回帰テストになる。
-- **呼び名**: D-38 で **Tsubu lint / Tsubu sugar** に決定(第 3 層は未定)。
+- **呼び名**: D-38 で **Tsubu lint / Tsubu sugar / Tsubu refined** に決定。
 
-## D-38: 三層の呼び名は Tsubu lint / Tsubu sugar /(第 3 層は未定)
+## D-38: 三層の呼び名は Tsubu lint / Tsubu sugar / Tsubu refined
 
-- **ステータス**: 確定(2026-09-06、第 3 層のみ未定)
-- **判断**: D-37 の三層を連番ではなく「TS からの距離」が分かる語で呼ぶ。第 1 層(制限のみ、lint で実現)は **Tsubu lint**、第 2 層(糖衣構文、transpiler)は **Tsubu sugar**。第 3 層(型検査の変更、独自型検査器)の名前は未定。候補: `refined`(第 3 層の中身はネイティブ `Int` や narrowing 先の絞り込みという refinement type そのもの。「sugar → refined」は精製の連想でも続く)/ `retyped`(TS を独自の型検査器で型付けし直す)/ `types`(型定義集の印象があり不採用寄り)/ `core` / `full` / `strict`。`native` は D-39 で strict-ts-lib の plain 版の呼び名(native number)と衝突するので避ける。`subset` は「TS の subset」であって「Tsubu subset」ではないため不採用。
+- **ステータス**: 確定(2026-09-06。第 3 層は同日 `refined` で確定)
+- **判断**: D-37 の三層を連番ではなく「TS からの距離」が分かる語で呼ぶ。第 1 層(制限のみ、lint で実現)は **Tsubu lint**、第 2 層(糖衣構文、transpiler)は **Tsubu sugar**。第 3 層(型検査の変更、独自型検査器)は **Tsubu refined** — 中身がネイティブ `Int` や narrowing 先の絞り込みという refinement type そのものであり、「sugar → refined」は精製の連想でも続く。却下: `native`(strict-ts-lib の plain 版の呼び名と衝突)、`subset`(TS の subset であって Tsubu の subset ではない)、`types`(型定義集の印象)、`retyped`(手段の説明で、何が良くなるかが読めない)、`checked` / `strict`(lint や TS の `--strict` と紛れる)。
 - **理由**: 連番は間に層を挟みたくなったときに困る。名前がその層に必要なツール(lint / transpiler / 型検査器)を示すので説明が要らない。
-- **帰結**: 文書中の v1 / v2 / v3 は当面そのまま使い、正式名は Tsubu lint / Tsubu sugar を併記する。第 3 層の名前が決まった時点で一括置換する。
+- **帰結**: 文書中の v1 / v2 / v3 を Tsubu lint / Tsubu sugar / Tsubu refined に一括置換した(2026-09-06)。
 
 ## D-39: strict-ts-lib は plain(native number)版を言語標準にする
 
