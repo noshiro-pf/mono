@@ -1766,3 +1766,47 @@ ambient global として宣言したままで、値を供給していたのは�
 **`create-event.spec.ts` は `experimental/` に残す** — Firestore に実際に
 書き込むので、emulator を CI に組み込むまで走らせようが無い。
 `configs/playwright.config.ts` もそのため一緒に残してある。
+
+## Firebase 設定の復元（2026-09-06）
+
+`firebase.json` と `.firebaserc` は deploy に要るので、**自分の Firebase
+プロジェクトを持つ 9 app** について移した。`hosting.public` は `build` で、
+これは `defineViteAppConfig` の出力先と一致している。
+
+| app                                  | project                          | 移したもの                                                                  |
+| :----------------------------------- | :------------------------------- | :-------------------------------------------------------------------------- |
+| `algo-app`                           | `algo-app-45270`                 | `firebase.json`・`.firebaserc`・`firestore.rules`・`firestore.indexes.json` |
+| `annotation-tool`                    | `annotation-tool-d8b49`          | hosting のみ                                                                |
+| `cant-stop-probability-app`          | `cant-stop-probability`          | hosting のみ                                                                |
+| `catan-dice-app`                     | `catan-dice-5f3bc`               | hosting のみ                                                                |
+| `color-demo-app`                     | `color-demo-app`                 | hosting のみ                                                                |
+| `housing-loan-calculator-app`        | `housing-loan-calculator`        | hosting のみ                                                                |
+| `lambda-calculus-interpreter-preact` | `lambda-calculus-interpre-70e41` | hosting のみ                                                                |
+| `lambda-calculus-interpreter-react`  | `lambda-calculus-interpre-70e41` | hosting のみ                                                                |
+| `my-portfolio-app-preact`            | `my-portfolio-app-4f8be`         | hosting のみ                                                                |
+
+**Firestore を移したのは `algo-app` だけ。** 実際に `firebase/firestore` を
+import して読み書きしているのはこれ 1 つで、他の app の
+`firestore.rules` ・ `firestore.indexes.json` はテンプレート由来の残骸である
+（`catan-dice-app` のものもこれに当たる）。残骸は `experimental/` に残した。
+
+### 移さなかった 3 つ
+
+`blueprintjs-playground` ・ `blueprintjs-playground-styled` ・
+`mahjong-calculator-app` は `.firebaserc` を持たず、`firebase.json` の
+`hosting.site` が `react-app-template-vite`（テンプレートの site）のままである。
+**deploy 先が存在しない**ので、そのまま移すと他人の site を指す設定になる。
+必要になったらプロジェクトを作って書き起こすほうが早い。
+
+### 既知の衝突
+
+`lambda-calculus-interpreter-preact` と `-react` は**同じプロジェクトを
+`site` 指定なしで共有している**。どちらを deploy しても既定の hosting site を
+取り合うので、両方を公開するなら `site` を分けるか、プロジェクトを分ける必要が
+ある。移植元からある状態で、ここでは変えていない。
+
+### deploy の仕方
+
+npm 依存は増やしていない。app のディレクトリで
+`pnpm dlx firebase-tools deploy --only hosting` を叩けば、`firebase.json` と
+`.firebaserc` だけで通る。
