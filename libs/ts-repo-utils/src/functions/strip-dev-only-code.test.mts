@@ -207,6 +207,28 @@ describe(stripDevOnlyCode, () => {
     );
   });
 
+  test("keeps the imports an unwrapped cast's argument uses", () => {
+    // The erased range for `castMutable(` begins at the call expression's own
+    // start, so asking whether a node is erased by its start position alone
+    // skipped the whole call — argument included — and the names inside it
+    // were read as unreferenced. `ts-data-forge`'s `Arr.scan` and `Arr.fill`
+    // shipped calling `newArray` and `copy` without importing them.
+    assert.deepStrictEqual(
+      stripKeepingLines(
+        dedent`
+          import { asPositiveUint32, castMutable, newArray } from 'x';
+          export const f = (xs, init) =>
+            castMutable(newArray(asPositiveUint32(xs.length + 1), init));
+        `,
+      ),
+      dedent`
+        import { asPositiveUint32, newArray } from 'x';
+        export const f = (xs, init) =>
+          newArray(asPositiveUint32(xs.length + 1), init);
+      `,
+    );
+  });
+
   test('leaves a member call, an optional call and a two-argument call alone', () => {
     const source = dedent`
       import { castMutable } from 'ts-data-forge';

@@ -106,7 +106,7 @@ export const stripDevOnlyCode = (
 
   const importRanges = collectUnusedImports(
     sourceFile,
-    isErasedBy([...statementRanges, ...calleeRanges]),
+    isNodeErasedBy([...statementRanges, ...calleeRanges]),
   );
 
   const commentRanges =
@@ -223,10 +223,29 @@ type IsRemovable = (statement: DeepReadonly<ts.Statement>) => boolean;
 
 type IsErased = (pos: number) => boolean;
 
+type IsNodeErased = (start: number, end: number) => boolean;
+
 const isErasedBy =
   (ranges: readonly EraseRange[]): IsErased =>
   (pos) =>
     ranges.some(([start, end]) => start <= pos && pos < end);
+
+/**
+ * Whether a whole node disappears, as opposed to merely starting inside a
+ * range that is erased.
+ *
+ * The distinction is the unwrapped identity call. `castMutable(newArray(x))`
+ * erases `castMutable(` and the closing `)`, and the first of those ranges
+ * begins at the call expression's own start — so a node's start position says
+ * nothing about whether its *contents* survive. Asking about the start alone
+ * skipped the whole call, argument and all, and the names the argument used
+ * were then read as unreferenced and their imports deleted, leaving a
+ * `ReferenceError` in code that type-checked.
+ */
+const isNodeErasedBy =
+  (ranges: readonly EraseRange[]): IsNodeErased =>
+  (start, end) =>
+    ranges.some(([from, to]) => from <= start && end <= to);
 
 /**
  * Decides whether a statement is removed as a whole. A compound statement is
@@ -516,7 +535,7 @@ const standsAloneWithoutParentheses = (
  */
 const collectUnusedImports = (
   sourceFile: DeepReadonly<ts.SourceFile>,
-  isErased: IsErased,
+  isErased: IsNodeErased,
 ): readonly EraseRange[] => {
   const referencedNames = collectReferencedNames(sourceFile, isErased);
 
@@ -635,7 +654,7 @@ const specifierEraseRange = (
  */
 const collectReferencedNames = (
   sourceFile: DeepReadonly<ts.SourceFile>,
-  isErased: IsErased,
+  isErased: IsNodeErased,
 ): ReadonlySet<string> => {
   const mut_names = new Set<string>();
 
@@ -644,7 +663,7 @@ const collectReferencedNames = (
       return;
     }
 
-    if (isErased(node.getStart(sourceFile))) {
+    if (isErased(node.getStart(sourceFile), node.getEnd())) {
       return;
     }
 
