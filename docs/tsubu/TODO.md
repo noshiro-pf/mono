@@ -24,7 +24,8 @@
 ## 並行ワークストリーム(v1 と独立)
 
 - [ ] ts-std-forge: Tier 2(BigInt、`Iterator.take/drop`、`structuredClone`、toLocaleString 系)、Tier 3(TypedArray/DataView/Atomics、Intl)、Temporal family(D-23)。(Tier 1 は [#1725](https://github.com/noshiro-pf/mono/pull/1725) で完了)
-- [ ] ts-std-forge: null / 番兵値 API の Optional ラッパー(棚卸しは [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) の「次の調査枠」)。
+- [ ] ts-std-forge: null / 番兵値 API の Optional ラッパー(棚卸しは [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) の「次の調査枠」)。D-31 の undefined 排除の前提条件。
+- [ ] ts-std-forge: D-15 代替 API(`SafeNumber.parse` / `SafeString.fromPrimitive` — D-41)の実装と、preset のコンストラクタ静的呼び出しルールへの接続。
 
 ## 仕様の未着手領域(フェーズ非依存)
 
@@ -34,7 +35,8 @@
 - [ ] `undefined` の排除(D-31): ts-std-forge の Optional ラッパー層が前提。v2 以降で `Optional<T>` へ一本化する規則を書く。
 - [ ] default export を emit する v2 の設定ファイル / ディレクティブの設計(D-36)と、`using` の v2 での再検討(D-30)。
 - [ ] barrel `export *` の扱い(2026-09-05 保留 — D-28)。
-- [ ] 三層(制限 / 糖衣構文 / 型検査の変更 — D-37)の呼び名を決める(連番は間に層を挟むときに困る)。
+- [ ] 第 3 層(型検査の変更)の呼び名を決める(D-38 — 候補 `types` / `core` / `full` / `strict`。lint / sugar は確定)。
+- [ ] 拘束 compilerOptions の検証(`tsc --showConfig` の実効値と base tsconfig の拘束項目の一致検査 — D-40)を preset / チェッカーに実装する。base tsconfig の配布物化は preset 追補で。
 - [ ] future-syntax.md の各候補に「v1 ライブラリ形」と両向きの codemod を明記する(D-37)。ライブラリ形の未整備分(パターンマッチ用 `match`、`?` 伝播用 `safeTry` 系)は ts-data-forge の並行ワークストリームへ。
 - [ ] getter/setter の粒度の深掘り(plain object の遅延評価 — [spec/banned-syntax.md](./spec/banned-syntax.md))。
 - [ ] 番兵値 API の棚卸し([throwing-stdlib-survey.md](./throwing-stdlib-survey.md) 次の調査枠)。

@@ -2,16 +2,16 @@
 
 ## 目標
 
-TS では同じ字面のコードでも tsconfig 次第で意味と安全性が変わる。この「設定の自由度」自体を負の遺産と見なし、**compilerOptions を言語仕様の一部として一意に固定**する。ユーザーが書く tsconfig は存在しない(v2 ではツールチェーンが内蔵する。v1 では「この構成以外での型検査結果は言語の検査結果ではない」と定義する)。
+TS では同じ字面のコードでも tsconfig 次第で意味と安全性が変わる。この「設定の自由度」自体を負の遺産と見なし、**言語の意味と安全性に関わる compilerOptions を言語仕様として拘束**する(D-7、D-40 で改訂)。ユーザーが決めてよいのは実行環境と出力に関する項目だけで、拘束項目を上書きした構成での型検査結果は言語の検査結果ではない。
 
-## 固定する構成(確定 2026-09-05 — D-27)
+## 拘束する項目と自由な項目(確定 2026-09-06 — D-40、draft config)
 
-型チェック関連の値は mono の `tools/configs/tsconfig/tsconfig.type-check.json` の現行値を採用する(確定 2026-08-27)。
+型チェック関連の値は mono の `tools/configs/tsconfig/tsconfig.type-check.json` の現行値を採用する(確定 2026-08-27)。以下が v1 preset の配布する base tsconfig の draft。**`// 拘束`** の項目はユーザーが変更できない(チェッカーが実効値を検証する)。それ以外の項目は自由。
 
 ```jsonc
 {
     "compilerOptions": {
-        // ---- 型チェック: mono の tsconfig.type-check.json の値を採用 ----
+        // ---- 型チェックの厳密度(拘束) ----
         "strict": true,
         "noUncheckedIndexedAccess": true,
         "exactOptionalPropertyTypes": false, // 有効化しない(確定)
@@ -24,28 +24,47 @@ TS では同じ字面のコードでも tsconfig 次第で意味と安全性が�
         "allowUnusedLabels": false, // (ラベル自体禁止だが多層防御)
         "allowUnreachableCode": false,
 
-        // ---- サブセット制約 ----
+        // ---- サブセット制約(拘束) ----
         "erasableSyntaxOnly": true, // D-4
         "verbatimModuleSyntax": true, // import/export の字面 = 出力。type import の明示を強制
         "isolatedModules": true,
+        "allowImportingTsExtensions": false, // 相対 import は `.mjs`(modules.md)
+        "rewriteRelativeImportExtensions": false,
+        "experimentalDecorators": false, // デコレータ禁止(banned-syntax.md)
+        "emitDecoratorMetadata": false,
+        "allowJs": false, // JS ファイルは存在しない(D-27)
+        "checkJs": false,
 
-        // ---- モジュール解決: 一意化 ----
+        // ---- モジュール解決: 一意化(拘束) ----
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "moduleDetection": "force", // script モードの排除
+        // "baseUrl" / "paths" は指定不可(modules.md — `#` imports が受け皿)
 
-        // ---- 出力・その他 ----
-        "target": "esnext",
-        "useDefineForClassFields": true,
+        // ---- 標準ライブラリ(拘束) ----
+        "libReplacement": true, // strict-ts-lib plain 版への差し替え(D-39)
+        "skipLibCheck": true, // 外部 .d.ts は言語の管轄外(strict-ts-lib が組み込み層を担う)
         "forceConsistentCasingInFileNames": true,
-        "skipLibCheck": true, // 外部 .d.ts は言語の管轄外(strict-lib が組み込み層を担う)
+        "useDefineForClassFields": true, // class は禁止だが emit の一貫性のため固定
+        "jsx": "react-jsx", // JSX は automatic runtime のみ(jsx.md)
 
-        // ---- 標準ライブラリ ----
-        "lib": ["esnext"], // + strict-ts-lib による差し替え(libReplacement)
-        "libReplacement": true,
+        // ---- 実行環境(自由) ----
+        "lib": ["esnext"], // 環境に応じて "dom" 等を追加してよい。差し替えは libReplacement が全 lib に効く
+        "types": [],
+        "target": "esnext",
+        "jsxImportSource": "react", // preact 等に変えてよい
+        "customConditions": [],
+        "resolveJsonModule": true,
+
+        // ---- 出力・プロジェクト構成(自由) ----
+        "noEmit": true, // outDir / declaration / sourceMap / composite / incremental 等も自由
     },
 }
 ```
+
+- **拘束の基準**: その項目の値によって「同じ字面のコードが言語として合法か」「型検査の結果」「モジュール解決の結果」が変わるものは拘束する。実行環境(どの組み込み API が存在するか)、emit の形、プロジェクトのファイル構成は言語の意味に関わらないので自由。
+- **`lib`** が自由項目なので、「`dom` を含めるか」という環境別プロファイルを言語側で定義する必要はない。どの `lib` を選んでも strict-ts-lib の差し替えが効く(`@typescript/lib-dom` 等も strict-ts-lib が提供する)。
+- **`noUnusedLocals` / `noUnusedParameters`** は lint とも重なるが、tsc 側でも拘束しておく(ESLint を外しても崩れない最小限の防御)。
 
 ## 補足
 
@@ -57,10 +76,10 @@ TS では同じ字面のコードでも tsconfig 次第で意味と安全性が�
 
 ## TS へ戻るときの影響
 
-なし。この構成の tsconfig をそのままプロジェクトに置けば、同じ検査が tsc 単体で再現される。
+なし。拘束項目を含む base tsconfig をそのままプロジェクトに置けば、同じ検査が tsc 単体で再現される。
 
-## 未解決の論点
+## 決定済みの論点(2026-09-06)
 
-- `lib` に `dom` を含めるか(環境別プロファイル: `node` / `browser` / 共通、のような言語レベルのターゲット定義)。
-- strict-ts-lib の branded(`libs-branded`)と plain(`libs`)のどちらを言語標準にするか。branded 側は number の安全化([README.md](../README.md) の TODO「numeric 型の安全化」)と直結する。
-- TS バージョン更新の追従ポリシー。
+- ~~`lib` に `dom` を含めるか~~ → `lib` は自由項目(D-40)。環境別プロファイルは言語側で定義しない。
+- ~~strict-ts-lib の branded と plain のどちらを言語標準にするか~~ → **plain(`libs/`、native number)版**(D-39)。branded 版は第 3 層(ネイティブ `Int`)の設計材料として残す。
+- ~~TS バージョン更新の追従ポリシー~~ → preset / チェッカーの `peerDependencies` が単一の真実(D-34)。

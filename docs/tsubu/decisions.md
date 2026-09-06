@@ -274,4 +274,33 @@
     4. **emit の最適化・正規化はしない**: v2 → v1 の変換は書き方を保存する。パイプ演算子は ts-data-forge の `pipe` にそのまま対応させ、同じ意味の複数の書き方(`pipe(x).map(f).value` と `f(x)` 等)は TS 側でも Tsubu v1 側でも維持する。「既知のカリー化呼び出しを直接形へ最適化 emit する」という以前の案([spec/future-syntax.md](./spec/future-syntax.md) 候補 1)は**撤回**。
 - **理由**: 同じ意味の書き方を出力時に一つへ潰す最適化・正規化は多対一の変換であり、v1 → v2 の逆変換を不可能にする。ReScript ではカリー化周りの `.ts` 出力時にまさにこれが起きており、「言語移行後に eject で TS に戻ってこれる」という望ましい性質を壊していた。往復変換は日常的に使い、eject は言語をやめるときにしか使わないので、往復忠実性を既定にする。三層に分けるのは、構文の話と型検査の話が同じ候補リストに並んでいたことが判断のブレの原因だったため。
 - **帰結**: 第 2 層の各候補に「v1 ライブラリ形」と「両向きの codemod」を明記する。適合性コーパスに対する「v1 → v2 → v1 が(整形を除き)恒等」の往復プロパティテストが transpiler の主要な回帰テストになる。
-- **未定**: 三層の呼び名。連番(v1 / v2 / v3)は間に層を挟みたくなったときに困るので、強弱が分かるキーワードにするかを別途決める。
+- **呼び名**: D-38 で **Tsubu lint / Tsubu sugar** に決定(第 3 層は未定)。
+
+## D-38: 三層の呼び名は Tsubu lint / Tsubu sugar /(第 3 層は未定)
+
+- **ステータス**: 確定(2026-09-06、第 3 層のみ未定)
+- **判断**: D-37 の三層を連番ではなく「TS からの距離」が分かる語で呼ぶ。第 1 層(制限のみ、lint で実現)は **Tsubu lint**、第 2 層(糖衣構文、transpiler)は **Tsubu sugar**。第 3 層(型検査の変更、独自型検査器)の名前は未定。候補: `types`(sugar が構文を足すのに対し型システムを足す、という対で読める)/ `core` / `full` / `strict`。`native` は D-39 で strict-ts-lib の plain 版の呼び名(native number)と衝突するので避ける。`subset` は「TS の subset」であって「Tsubu subset」ではないため不採用。
+- **理由**: 連番は間に層を挟みたくなったときに困る。名前がその層に必要なツール(lint / transpiler / 型検査器)を示すので説明が要らない。
+- **帰結**: 文書中の v1 / v2 / v3 は当面そのまま使い、正式名は Tsubu lint / Tsubu sugar を併記する。第 3 層の名前が決まった時点で一括置換する。
+
+## D-39: strict-ts-lib は plain(native number)版を言語標準にする
+
+- **ステータス**: 確定(2026-09-06)
+- **判断**: 組み込み層の型定義は strict-ts-lib の plain 版(`libs/`、number は素の `number`)を言語標準とし、branded 版(`libs-branded/`)は使わない。
+- **理由**: D-26 で ts-std-forge が branded number 型を使わないと決めたのと同じ理由 — 通常の呼び出しごとに brand キャストを要求するのはユーザーには遠回りで、数値型の分類は第 3 層のネイティブ `Int`(候補 7)で行う。branded 版は第 3 層の設計材料として残す。
+
+## D-40: compilerOptions は「完全固定」ではなく「言語が拘束する項目の限定」とする(D-7 改訂)
+
+- **ステータス**: 確定(2026-09-06)
+- **判断**: D-7 の「ユーザーが書く tsconfig は存在しない」を改め、**言語が値を拘束する項目**(型検査の厳密度・サブセット制約・モジュール解決・標準ライブラリの差し替え)と、**ユーザーが自由に決める項目**(`lib` / `types` / `target` / `jsxImportSource` / 出力・プロジェクト構成)を分ける。拘束項目の一覧と draft config は [spec/compiler-options.md](./spec/compiler-options.md)。
+- **理由**: 実行環境(`dom` の有無、`target`、JSX ランタイム)は言語の意味に関わらず、固定すると環境別プロファイルを言語側で定義する羽目になる(旧・未解決論点「`lib` に `dom` を含めるか」)。`lib` を自由項目にすることでこの問題は生じない。
+- **強制手段**: v1 preset が base tsconfig を配布し、プロジェクトの実効 compilerOptions(`tsc --showConfig`)が拘束項目と一致することをチェッカーで検証する。拘束項目を上書きした tsconfig での検査結果は言語の検査結果ではない(D-7 の趣旨は維持)。
+
+## D-41: コンストラクタ静的呼び出し(D-15)の代替 API は ts-std-forge に置き、対象は「`new` 形と関数形の両方を持つ組み込み」に限る
+
+- **ステータス**: 確定(2026-09-06)
+- **判断**:
+    1. D-15 の代替生成関数は ts-data-forge(prelude)ではなく **ts-std-forge** に置く。D-15 の TODO(「ts-data-forge 側の生成関数の網羅」)はこれで置き換える。
+    2. 禁止の対象は、`new X()` と `X()` の両方を持ち関数形が暗黙変換(または別の意味)になる組み込み: `Boolean` / `Number` / `String` / `Object` / `Array` / `Date` / `RegExp` / `Error` 系 / `Function`。**`Symbol()` と `BigInt()` は対象外**(`new` 形を持たず、関数呼び出しが唯一の生成手段)。`BigInt(x)` の throw(非整数)は Tier 2 のラッパー対象。
+    3. 代替の対応表([spec/stdlib.md](./spec/stdlib.md)): `Number(str)` → `SafeNumber.parse`(NaN を `Result` に)/ `String(x)` → `SafeString.fromPrimitive`(template literal が受けない `symbol` / `bigint` / `undefined` を含む primitive の文字列化)/ `RegExp(p, f)` → `Regex.create` / `Error('msg')` → `new Error('msg')`(`new` 形は許可)/ `Array(n)` → 配列リテラル・`Arr.newArray` / `Arr.seq`(ts-data-forge)/ `Date()` → `new Date()` / `Boolean(x)` → 代替なし(真偽は明示的な比較で書く — [spec/booleans-and-logic.md](./spec/booleans-and-logic.md))/ `Object(x)` / `Function(...)` → 代替なし。
+- **理由**: `Number(x)` / `String(x)` は stdlib API そのものであり、「throw / 番兵値を返す stdlib API を Result / Optional 化する」ts-std-forge の守備範囲。ts-data-forge は ADT コアとデータ構造に留め、依存を一方向(ts-std-forge → ts-data-forge)に保つ(D-24)。既存の `Num.safeParseInt` / `safeParseFloat`(ts-data-forge)は当面残し、将来 ts-std-forge が facade になる(D-24 の記録どおり)。

@@ -101,4 +101,4 @@ core 全体(31 class)を class なしで書き換え、既存テスト 273 件 +
 ## 未解決の論点
 
 - 外部 class ライブラリ(DOM の `EventTarget` 系、Error サブクラス等)の**消費**の規定(`new` を境界でどう扱うか)。カスタム Error 型(`extends Error`)は class 禁止下では作れないため、エラーは tagged union で表現する([exceptions.md](./exceptions.md) の Err ペイロード設計と統合)。
-- getter/setter は class 文脈が消滅し、残る論点は plain object での遅延評価ユースケースのみ([banned-syntax.md](./banned-syntax.md) 深掘り中)。
+- ~~getter/setter~~ → object literal でも両方禁止に確定(D-33 — [banned-syntax.md](./banned-syntax.md))。
