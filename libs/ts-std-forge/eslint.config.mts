@@ -63,7 +63,7 @@ export default [
     // return type (Tsubu refined's native `Int` will supersede it).
     files: ['src/**', 'test/**'],
     rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': [
+      'no-restricted-imports': [
         'error',
         {
           paths: [

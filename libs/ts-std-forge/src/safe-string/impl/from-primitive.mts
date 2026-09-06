@@ -23,6 +23,9 @@
  * @returns The same string `String(value)` produces.
  */
 export const fromPrimitive = (value: StringifiablePrimitive): string =>
+  // The strict standard library marks `String(...)` deprecated to steer
+  // callers here; this is the one call site that is meant to make it.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   String(value);
 
 /** The primitives {@link fromPrimitive} accepts (every primitive but `null`). */
