@@ -2108,3 +2108,15 @@ opt-in のたびに 1 件ずつ直してきた。
 - `.d.mts` 8 個が true / false で完全一致
 - `pnpm run doc` も通る
 - probe を置いてから lint を測った
+
+## `numeric-input-utils` の opt-in（2026-09-01）
+
+13 パッケージ目、`apps/` 側の 2 つ目。**型・lint とも初回から 0 件**で、
+直すところが無かった。
+
+`tsconfig.json` に `compilerOptions` が無いのは #1784 と同じ。
+`test/` も無いので probe 用に作って `include` に足してある。
+
+**このパッケージには `test` スクリプトが無い**が、probe は型レベルの表明で
+`tsc` が見るものなので、ランナーは要らない。`libReplacement` を `false` に
+戻すと probe の `TS2578` だけが出ることは確認済み。
