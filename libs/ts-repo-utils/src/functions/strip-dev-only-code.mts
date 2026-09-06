@@ -40,6 +40,22 @@ import { glob } from './glob.mjs';
  *   read by nobody and is most of the file. A `#!` line and the pragma
  *   comments (`//# sourceMappingURL=`) are kept.
  *
+ * The pass never rewrites the tree. It walks it, collects `[start, end)`
+ * ranges of text to erase, and erases them all at the end. Two kinds of range
+ * come out of that walk, and the difference between them matters to anything
+ * that goes on to ask whether a node survived:
+ *
+ * - A **whole-node** range covers a node completely. Every removed statement
+ *   is one of these.
+ * - A **partial** range covers part of a node and keeps the rest. Unwrapping
+ *   `castMutable(x)` erases the callee and the parentheses and keeps `x`, so
+ *   the call node is half erased — and the erased half is the half it starts
+ *   with.
+ *
+ * So "does this node begin in erased text" and "is this node gone" are
+ * different questions, and only the second one is safe to prune imports by.
+ * See {@link isErasedBy} and {@link isNodeErasedBy}.
+ *
  * Every line break is kept when a range is removed, so the line numbers of
  * the output are the line numbers of the input and the source map the
  * compiler emitted for the file stays valid line for line. What follows a
@@ -98,12 +114,17 @@ export const stripDevOnlyCode = (
     return Result.err(leftover);
   }
 
+  // Only the statement ranges here: a call inside a removed statement needs
+  // no unwrapping, and every one of those ranges covers a whole node, so a
+  // position test answers the question.
   const calleeRanges = collectUnwrappedCallees(
     sourceFile,
     unwrapIdentityCalls,
     isErasedBy(statementRanges),
   );
 
+  // `isNodeErasedBy`, not `isErasedBy`: `calleeRanges` are partial, and a name
+  // inside an unwrapped call's argument is still referenced by the output.
   const importRanges = collectUnusedImports(
     sourceFile,
     isNodeErasedBy([...statementRanges, ...calleeRanges]),
@@ -221,26 +242,49 @@ type EraseRange = readonly [start: number, end: number];
 
 type IsRemovable = (statement: DeepReadonly<ts.Statement>) => boolean;
 
+/** Whether a single position falls in erased text. */
 type IsErased = (pos: number) => boolean;
 
+/** Whether a node is erased in its entirety. */
 type IsNodeErased = (start: number, end: number) => boolean;
 
+/**
+ * Whether the character at `pos` is erased.
+ *
+ * Read as "is this node gone?" this is only correct where every range covers
+ * a whole node, which is true of the statement ranges and of nothing else.
+ * {@link isNodeErasedBy} is the one to reach for otherwise.
+ */
 const isErasedBy =
   (ranges: readonly EraseRange[]): IsErased =>
   (pos) =>
     ranges.some(([start, end]) => start <= pos && pos < end);
 
 /**
- * Whether a whole node disappears, as opposed to merely starting inside a
- * range that is erased.
+ * Whether a node is erased in its entirety, rather than merely beginning in
+ * erased text.
  *
- * The distinction is the unwrapped identity call. `castMutable(newArray(x))`
- * erases `castMutable(` and the closing `)`, and the first of those ranges
- * begins at the call expression's own start — so a node's start position says
- * nothing about whether its *contents* survive. Asking about the start alone
- * skipped the whole call, argument and all, and the names the argument used
- * were then read as unreferenced and their imports deleted, leaving a
- * `ReferenceError` in code that type-checked.
+ * Unwrapping an identity call is what makes the two different, because the
+ * part it erases is the part the node starts with. Written out with the
+ * positions of `castMutable(newArray(n))`:
+ *
+ * ```text
+ * castMutable(newArray(n))
+ * ~~~~~~~~~~~~           ~   ~ erased: [0, 12) and [23, 24)
+ *             ^^^^^^^^^^^    ^ kept, and emitted as the whole expression
+ * ```
+ *
+ * The call node spans `[0, 24)` and so begins at 0, inside the first erased
+ * range — while `newArray` at 12 goes on to the output untouched. A walk that
+ * skips a subtree whenever the subtree *starts* in erased text therefore
+ * never reaches the argument, and every name the argument uses comes back
+ * unreferenced.
+ *
+ * That is precisely how the pruning below deleted the `newArray` import out
+ * from under the call that still made it. Nothing downstream noticed: the
+ * type check reads `src/`, where the import is still written, and only the
+ * built module is missing it, so the first `Arr.scan` call at run time threw
+ * `ReferenceError: newArray is not defined`.
  */
 const isNodeErasedBy =
   (ranges: readonly EraseRange[]): IsNodeErased =>
@@ -456,6 +500,11 @@ const describeLeftover = (
  * Erases `f(` and `)` around the argument of every identity function `f`,
  * or only the `f` when the argument needs the parentheses to keep its
  * meaning.
+ *
+ * The ranges this returns are **partial**: each one erases a piece of a call
+ * expression whose argument survives, and the piece starts where the call
+ * does. Anything that later asks "is this node gone?" against them has to ask
+ * by containment — see {@link isNodeErasedBy}.
  */
 const collectUnwrappedCallees = (
   sourceFile: DeepReadonly<ts.SourceFile>,
@@ -651,6 +700,13 @@ const specifierEraseRange = (
 /**
  * Names of every identifier that reads as a reference: everything except
  * import bindings themselves and property names.
+ */
+/**
+ * The names the output still refers to.
+ *
+ * A subtree is skipped only when all of it is erased. Skipping one that merely
+ * begins in erased text would lose the argument of every unwrapped identity
+ * call, whose names the output goes on using.
  */
 const collectReferencedNames = (
   sourceFile: DeepReadonly<ts.SourceFile>,

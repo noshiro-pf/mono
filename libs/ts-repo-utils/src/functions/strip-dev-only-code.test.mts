@@ -208,11 +208,13 @@ describe(stripDevOnlyCode, () => {
   });
 
   test("keeps the imports an unwrapped cast's argument uses", () => {
-    // The erased range for `castMutable(` begins at the call expression's own
-    // start, so asking whether a node is erased by its start position alone
-    // skipped the whole call — argument included — and the names inside it
-    // were read as unreferenced. `ts-data-forge`'s `Arr.scan` and `Arr.fill`
-    // shipped calling `newArray` and `copy` without importing them.
+    // Unwrapping erases `castMutable(` and the closing `)`, and the first of
+    // those ranges starts where the call itself starts. So a walk that skips
+    // a subtree beginning in erased text skips the argument too, and the
+    // names it uses come back unreferenced — while the argument is exactly
+    // what the output keeps. `ts-data-forge@14.6.3` shipped `Arr.scan` and
+    // `Arr.fill` calling `newArray`, `asPositiveUint32` and `copy` with the
+    // imports for them deleted.
     assert.deepStrictEqual(
       stripKeepingLines(
         dedent`
