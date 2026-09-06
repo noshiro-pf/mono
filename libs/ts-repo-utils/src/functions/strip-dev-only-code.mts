@@ -34,11 +34,32 @@ import { glob } from './glob.mjs';
  *   unaffected.
  * - An import binding that nothing outside the removed code refers to any
  *   more, and the whole `import` declaration when it has no bindings left.
+ *   This is one rule and there is no other: an unwrapped identity call's own
+ *   binding is removed by it, and so stays when the file also uses that name
+ *   somewhere the pass does not unwrap (`xs.map(castMutable)`). Which is why
+ *   the pass has to see what an unwrapped call's argument refers to, even
+ *   though the argument itself is none of its business.
  * - Every comment, when `options.removeComments` is set. The compiler copies
  *   the JSDoc of each declaration into the JavaScript as well as into the
  *   `.d.mts`, where an editor reads it from; the copy in the JavaScript is
  *   read by nobody and is most of the file. A `#!` line and the pragma
  *   comments (`//# sourceMappingURL=`) are kept.
+ *
+ * The pass never rewrites the tree. It walks it, collects `[start, end)`
+ * ranges of text to erase, and erases them all at the end. Two kinds of range
+ * come out of that walk, and the difference between them matters to anything
+ * that goes on to ask whether a node survived:
+ *
+ * - A **whole-node** range covers a node completely. Every removed statement
+ *   is one of these.
+ * - A **partial** range covers part of a node and keeps the rest. Unwrapping
+ *   `castMutable(x)` erases the callee and the parentheses and keeps `x`, so
+ *   the call node is half erased — and the erased half is the half it starts
+ *   with.
+ *
+ * So "does this node begin in erased text" and "is this node gone" are
+ * different questions, and only the second one is safe to prune imports by.
+ * See {@link isErasedBy} and {@link isNodeErasedBy}.
  *
  * Every line break is kept when a range is removed, so the line numbers of
  * the output are the line numbers of the input and the source map the
@@ -98,15 +119,20 @@ export const stripDevOnlyCode = (
     return Result.err(leftover);
   }
 
+  // Only the statement ranges here: a call inside a removed statement needs
+  // no unwrapping, and every one of those ranges covers a whole node, so a
+  // position test answers the question.
   const calleeRanges = collectUnwrappedCallees(
     sourceFile,
     unwrapIdentityCalls,
     isErasedBy(statementRanges),
   );
 
+  // `isNodeErasedBy`, not `isErasedBy`: `calleeRanges` are partial, and a name
+  // inside an unwrapped call's argument is still referenced by the output.
   const importRanges = collectUnusedImports(
     sourceFile,
-    isErasedBy([...statementRanges, ...calleeRanges]),
+    isNodeErasedBy([...statementRanges, ...calleeRanges]),
   );
 
   const commentRanges =
@@ -221,12 +247,54 @@ type EraseRange = readonly [start: number, end: number];
 
 type IsRemovable = (statement: DeepReadonly<ts.Statement>) => boolean;
 
+/** Whether a single position falls in erased text. */
 type IsErased = (pos: number) => boolean;
 
+/** Whether a node is erased in its entirety. */
+type IsNodeErased = (start: number, end: number) => boolean;
+
+/**
+ * Whether the character at `pos` is erased.
+ *
+ * Read as "is this node gone?" this is only correct where every range covers
+ * a whole node, which is true of the statement ranges and of nothing else.
+ * {@link isNodeErasedBy} is the one to reach for otherwise.
+ */
 const isErasedBy =
   (ranges: readonly EraseRange[]): IsErased =>
   (pos) =>
     ranges.some(([start, end]) => start <= pos && pos < end);
+
+/**
+ * Whether a node is erased in its entirety, rather than merely beginning in
+ * erased text.
+ *
+ * Unwrapping an identity call is what makes the two different, because the
+ * part it erases is the part the node starts with. Written out with the
+ * positions of `castMutable(newArray(n))`:
+ *
+ * ```text
+ * castMutable(newArray(n))
+ * ~~~~~~~~~~~~           ~   ~ erased: [0, 12) and [23, 24)
+ *             ^^^^^^^^^^^    ^ kept, and emitted as the whole expression
+ * ```
+ *
+ * The call node spans `[0, 24)` and so begins at 0, inside the first erased
+ * range — while `newArray` at 12 goes on to the output untouched. A walk that
+ * skips a subtree whenever the subtree *starts* in erased text therefore
+ * never reaches the argument, and every name the argument uses comes back
+ * unreferenced.
+ *
+ * That is precisely how the pruning below deleted the `newArray` import out
+ * from under the call that still made it. Nothing downstream noticed: the
+ * type check reads `src/`, where the import is still written, and only the
+ * built module is missing it, so the first `Arr.scan` call at run time threw
+ * `ReferenceError: newArray is not defined`.
+ */
+const isNodeErasedBy =
+  (ranges: readonly EraseRange[]): IsNodeErased =>
+  (start, end) =>
+    ranges.some(([from, to]) => from <= start && end <= to);
 
 /**
  * Decides whether a statement is removed as a whole. A compound statement is
@@ -437,6 +505,11 @@ const describeLeftover = (
  * Erases `f(` and `)` around the argument of every identity function `f`,
  * or only the `f` when the argument needs the parentheses to keep its
  * meaning.
+ *
+ * The ranges this returns are **partial**: each one erases a piece of a call
+ * expression whose argument survives, and the piece starts where the call
+ * does. Anything that later asks "is this node gone?" against them has to ask
+ * by containment — see {@link isNodeErasedBy}.
  */
 const collectUnwrappedCallees = (
   sourceFile: DeepReadonly<ts.SourceFile>,
@@ -516,7 +589,7 @@ const standsAloneWithoutParentheses = (
  */
 const collectUnusedImports = (
   sourceFile: DeepReadonly<ts.SourceFile>,
-  isErased: IsErased,
+  isErased: IsNodeErased,
 ): readonly EraseRange[] => {
   const referencedNames = collectReferencedNames(sourceFile, isErased);
 
@@ -633,9 +706,16 @@ const specifierEraseRange = (
  * Names of every identifier that reads as a reference: everything except
  * import bindings themselves and property names.
  */
+/**
+ * The names the output still refers to.
+ *
+ * A subtree is skipped only when all of it is erased. Skipping one that merely
+ * begins in erased text would lose the argument of every unwrapped identity
+ * call, whose names the output goes on using.
+ */
 const collectReferencedNames = (
   sourceFile: DeepReadonly<ts.SourceFile>,
-  isErased: IsErased,
+  isErased: IsNodeErased,
 ): ReadonlySet<string> => {
   const mut_names = new Set<string>();
 
@@ -644,7 +724,7 @@ const collectReferencedNames = (
       return;
     }
 
-    if (isErased(node.getStart(sourceFile))) {
+    if (isErased(node.getStart(sourceFile), node.getEnd())) {
       return;
     }
 

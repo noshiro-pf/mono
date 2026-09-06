@@ -207,6 +207,30 @@ describe(stripDevOnlyCode, () => {
     );
   });
 
+  test("keeps the imports an unwrapped cast's argument uses", () => {
+    // Unwrapping erases `castMutable(` and the closing `)`, and the first of
+    // those ranges starts where the call itself starts. So a walk that skips
+    // a subtree beginning in erased text skips the argument too, and the
+    // names it uses come back unreferenced — while the argument is exactly
+    // what the output keeps. `ts-data-forge@14.6.3` shipped `Arr.scan` and
+    // `Arr.fill` calling `newArray`, `asPositiveUint32` and `copy` with the
+    // imports for them deleted.
+    assert.deepStrictEqual(
+      stripKeepingLines(
+        dedent`
+          import { asPositiveUint32, castMutable, newArray } from 'x';
+          export const f = (xs, init) =>
+            castMutable(newArray(asPositiveUint32(xs.length + 1), init));
+        `,
+      ),
+      dedent`
+        import { asPositiveUint32, newArray } from 'x';
+        export const f = (xs, init) =>
+          newArray(asPositiveUint32(xs.length + 1), init);
+      `,
+    );
+  });
+
   test('leaves a member call, an optional call and a two-argument call alone', () => {
     const source = dedent`
       import { castMutable } from 'ts-data-forge';
@@ -217,6 +241,29 @@ describe(stripDevOnlyCode, () => {
     `;
 
     assert.deepStrictEqual(stripKeepingLines(source), source);
+  });
+
+  test("keeps the cast's own import when another use of it survives", () => {
+    // There is no rule that removes an identity cast's import by name, and
+    // there could not be: `castMutable` is unwrapped in one place here and
+    // left alone in the other, so the name is still referenced and has to
+    // stay imported. What removes it in the ordinary case is the one general
+    // rule — an import binding nothing in the output refers to any more goes
+    // — which is also what removes `expectType`'s import above.
+    assert.deepStrictEqual(
+      stripKeepingLines(
+        dedent`
+          import { castMutable, newArray } from 'x';
+          export const f = (xs) => xs.map(castMutable);
+          export const g = (n) => castMutable(newArray(n));
+        `,
+      ),
+      dedent`
+        import { castMutable, newArray } from 'x';
+        export const f = (xs) => xs.map(castMutable);
+        export const g = (n) => newArray(n);
+      `,
+    );
   });
 
   test('prunes a middle and a last import specifier', () => {
