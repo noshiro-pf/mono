@@ -97,14 +97,22 @@ jobs:
           node-version-file: 'package.json'
           cache: 'pnpm'
 
-      # Within the current major only, for the same reason `update-actions`
-      # carries no `--latest`: a package manager major changes how the tree is
-      # built, and that is a decision for a human rather than something to
-      # land unattended overnight. pnpm 12 is the case that established it —
-      # it rewrote peer resolution and broke `verify-npm-packages/` (#1845),
-      # which is now built to survive that but was not warned first.
+      # The latest pnpm, majors included — unlike the action pins, which
+      # `update-actions` deliberately keeps within `^current`. The difference
+      # is what the pull request this job opens can prove: every job in the
+      # check matrix installs with the new pnpm, so a major that breaks the
+      # tree fails there rather than on `main`. An action major has no such
+      # guarantee — it can sit in a workflow no pull request run exercises,
+      # which is how `changesets/action` v2 reached `release.yml`.
+      #
+      # pnpm 12 is why that can be said at all. It rewrote peer resolution and
+      # broke `verify-npm-packages/` (#1845), whose premise is a space where a
+      # package may reach only what it declares. That space is now one
+      # workspace root per project, each declaring the peer ranges of the
+      # package under check — what a consumer has to do anyway, and what keeps
+      # the next change of that kind from being invisible.
       - name: Update pnpm itself
-        run: pnpm self-update 12
+        run: pnpm self-update
 
       - name: Update dependencies
         run: |
