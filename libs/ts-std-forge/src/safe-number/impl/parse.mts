@@ -1,5 +1,4 @@
-import { asFiniteNumber, Result } from 'ts-data-forge';
-import { type FiniteNumber } from 'ts-type-forge';
+import { Result } from 'ts-data-forge';
 
 /**
  * Parses a string as a finite number — the alternative to calling
@@ -37,11 +36,13 @@ import { type FiniteNumber } from 'ts-type-forge';
  * ```
  *
  * @param value The string to parse.
- * @returns `Ok<FiniteNumber>` with the parsed value, or
+ * @returns `Ok<number>` with the parsed (finite) value — a plain `number`,
+ *   not ts-type-forge's `FiniteNumber` brand, because ts-std-forge does not
+ *   use branded number types (D-26 / D-39) — or
  *   `Err<{ kind: 'invalid-number', input }>` when the input is blank, has
  *   trailing garbage, or is not finite.
  */
-export const parse = (value: string): Result<FiniteNumber, ParseError> => {
+export const parse = (value: string): Result<number, ParseError> => {
   // ts-std-forge is the boundary implementer (D-24): it wraps the raw
   // conversion itself rather than importing the prelude's `Num.safeParseFloat`,
   // whose implementation this mirrors.
@@ -57,7 +58,7 @@ export const parse = (value: string): Result<FiniteNumber, ParseError> => {
     // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
     Number.isNaN(Number.parseFloat(value))
     ? Result.err({ kind: 'invalid-number', input: value })
-    : Result.ok(asFiniteNumber(viaNumber));
+    : Result.ok(viaNumber);
 };
 
 /** The failure type of {@link parse}. */

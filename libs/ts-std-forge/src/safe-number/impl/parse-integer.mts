@@ -1,5 +1,4 @@
-import { asInt, Result } from 'ts-data-forge';
-import { type Int } from 'ts-type-forge';
+import { Result } from 'ts-data-forge';
 
 /**
  * Parses a string as a base-10 integer — the alternative to calling
@@ -37,11 +36,15 @@ import { type Int } from 'ts-type-forge';
  * ```
  *
  * @param value The string to parse.
- * @returns `Ok<Int>` with the parsed integer, or
+ * @returns `Ok<number>` with the parsed integer — a plain `number`, not
+ *   ts-type-forge's `Int` brand, because ts-std-forge does not use branded
+ *   number types (D-26 / D-39) — or
  *   `Err<{ kind: 'invalid-integer', input }>` when the input is blank, has
  *   trailing garbage, or is not a finite number.
  */
-export const parseInteger = (value: string): Result<Int, ParseIntegerError> => {
+export const parseInteger = (
+  value: string,
+): Result<number, ParseIntegerError> => {
   // ts-std-forge is the boundary implementer (D-24): it wraps the raw
   // conversion itself rather than importing the prelude's `Num.safeParseInt`,
   // whose implementation this mirrors.
@@ -59,7 +62,7 @@ export const parseInteger = (value: string): Result<Int, ParseIntegerError> => {
     // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-int
     Number.isNaN(Number.parseInt(value, 10))
     ? Result.err({ kind: 'invalid-integer', input: value })
-    : Result.ok(asInt(Math.trunc(viaNumber)));
+    : Result.ok(Math.trunc(viaNumber));
 };
 
 /** The failure type of {@link parseInteger}. */
