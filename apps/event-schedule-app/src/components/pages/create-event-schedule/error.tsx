@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
-import { errorFontColor } from '../../../constants/index.mjs';
+import { dict, errorFontColor } from '../../../constants/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 
 const dc = dict.errorMessages;

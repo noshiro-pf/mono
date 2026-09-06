@@ -2,6 +2,7 @@ import { Button } from '@blueprintjs/core';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
+import { dict } from '../../../constants/index.mjs';
 import { CreateEventScheduleStore } from '../../../store/index.mjs';
 import {
   CreateEventResultDialog,

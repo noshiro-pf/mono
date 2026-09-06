@@ -2,7 +2,7 @@ import { type InitializedObservable, combine, map } from 'synstate';
 import { createReducer } from 'synstate-react-hooks';
 import { Optional, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
-import { Routes } from '../../constants/index.mjs';
+import { Routes, dict } from '../../constants/index.mjs';
 import {
   createToaster,
   resetPasswordPageHasError,

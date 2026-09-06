@@ -2,6 +2,7 @@ import { Button, ButtonGroup, PopoverNext } from '@blueprintjs/core';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 
 type Props = Readonly<{ onSortChange: (state: 'asc' | 'desc') => void }>;
 

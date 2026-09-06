@@ -21,6 +21,7 @@ import {
   type ReadonlyRecord,
   type SafeUint,
 } from 'ts-type-forge';
+import { dict } from '../../constants/index.mjs';
 import { AnswerFilterState } from '../../functions/index.mjs';
 import {
   type AnswerRank,

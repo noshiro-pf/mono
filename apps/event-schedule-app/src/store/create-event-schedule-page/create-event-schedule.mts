@@ -14,7 +14,11 @@ import { createBooleanState, createState } from 'synstate-react-hooks';
 import { Result, fastDeepEqual, isNotUndefined, pipe } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
 import { api } from '../../api/index.mjs';
-import { Routes, eventScheduleInitialValue } from '../../constants/index.mjs';
+import {
+  Routes,
+  dict,
+  eventScheduleInitialValue,
+} from '../../constants/index.mjs';
 import {
   EventScheduleAppLocalStorage,
   createToaster,

@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { WeightNumericInput } from '../../molecules/index.mjs';
 
 const dc = dict.answerPage.answerBeingEdited;

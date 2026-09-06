@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
+import { dict } from '../../constants/index.mjs';
 import { ResetPasswordPageStore } from '../../store/index.mjs';
 import { Label } from '../atoms/index.mjs';
 import { SignInStyled } from '../styled/index.mjs';

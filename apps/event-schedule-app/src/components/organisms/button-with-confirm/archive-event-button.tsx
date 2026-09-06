@@ -3,7 +3,7 @@ import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { eventListItemTextColor } from '../../../constants/index.mjs';
+import { dict, eventListItemTextColor } from '../../../constants/index.mjs';
 import { Description } from '../../atoms/index.mjs';
 
 const dc = dict.eventListPage;

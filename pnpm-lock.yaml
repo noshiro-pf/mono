@@ -966,6 +966,9 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18

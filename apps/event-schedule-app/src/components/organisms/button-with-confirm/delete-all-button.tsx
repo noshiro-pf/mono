@@ -1,4 +1,5 @@
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 
 const dc = dict.eventSettingsPage.section2;

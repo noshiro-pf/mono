@@ -1,5 +1,6 @@
 import { CheckboxView } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { CheckboxWrapper, FilterItem } from './styled.js';
 

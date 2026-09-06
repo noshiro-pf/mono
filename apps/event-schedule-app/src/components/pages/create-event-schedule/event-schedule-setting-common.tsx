@@ -1,4 +1,5 @@
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import {
   type EventScheduleSettingCommonState,
   type EventScheduleSettingCommonStateHandler,

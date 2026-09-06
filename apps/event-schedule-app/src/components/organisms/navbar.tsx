@@ -14,6 +14,7 @@ import { useRouterLinkClick } from 'tiny-router-react-hooks';
 import {
   Routes,
   aboutThisAppUrl,
+  dict,
   feedbackUrl,
 } from '../../constants/index.mjs';
 import { Auth, Router, UpdateUserInfoDialogStore } from '../../store/index.mjs';

@@ -1,7 +1,7 @@
 import { FormGroup } from '@blueprintjs/core';
 import { BpDatetimePicker } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { answerDeadlineShortcuts } from '../../constants/index.mjs';
+import { answerDeadlineShortcuts, dict } from '../../constants/index.mjs';
 import { useIsMobile } from '../../store/index.mjs';
 
 type Props = Readonly<{

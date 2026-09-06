@@ -5,6 +5,7 @@ import * as React from 'react';
 import { BpCheckbox, BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { type Observable as SynstateObservable } from 'synstate';
+import { dict } from '../../constants/index.mjs';
 import { type NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { isEmailString } from '../../utils-ported/index.mjs';
 import { now, ymdhmDateDiff } from '../../utils/index.mjs';

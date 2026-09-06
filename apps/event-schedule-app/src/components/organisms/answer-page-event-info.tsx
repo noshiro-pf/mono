@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { ymdhm2strWithDay } from '../../constants/index.mjs';
+import { dict, ymdhm2strWithDay } from '../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../functions/index.mjs';
 import { Description } from '../atoms/index.mjs';
 import { AnswerPageNotes } from './answer-page-notes.js';

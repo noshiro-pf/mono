@@ -5,6 +5,7 @@ import { memoNamed } from 'react-utils';
 import { Arr, Optional } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import {
+  dict,
   errorFontColor,
   eventListItemTextColor,
   Routes,

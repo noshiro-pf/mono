@@ -3,6 +3,7 @@ import { memoNamed } from 'react-utils';
 import { type IMapMapped } from 'ts-data-forge';
 import {
   calendarDateColor,
+  dict,
   hm2str,
   ymd2dayStr,
   ymd2str,

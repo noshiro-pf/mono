@@ -40,7 +40,6 @@ import {
   type Ymdhm as Ymdhm_,
 } from 'ts-fortress-types';
 import { type StrictExclude } from 'ts-type-forge';
-import { type dict as dict_ } from './constants/index.mjs';
 import {
   type AnswerSelectionMapKey as AnswerSelectionMapKey_,
   type DatetimeRangeMapKey as DatetimeRangeMapKey_,
@@ -123,8 +122,6 @@ declare global {
   type Weight = Weight_;
 
   /* others */
-  const dict: typeof dict_;
-
   type FireAuthUser = FireAuthUser_;
 
   type AuthCredential = AuthCredential_;
