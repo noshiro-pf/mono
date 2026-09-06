@@ -1747,3 +1747,22 @@ import まで消していた**ものだった。消去範囲が呼び出し式�
 
 これで `annotation-tool`・`color-demo-app`・`my-portfolio-app-preact` の 3 つが
 動くようになり、spec も移した。**残るは `event-schedule-app` の `dict` だけ。**
+
+### `event-schedule-app` の `dict` を import にした（2026-09-06）
+
+残っていた 1 件。`src/vite-env.d.ts` が `const dict: typeof dict_;` を
+ambient global として宣言したままで、値を供給していたのは移植元の
+`configs/inject-def.ts`（`@rollup/plugin-inject` に
+`dict: tp('~/constants/dictionary/dictionary', 'dict')` を渡す）だった。
+これは復元していないので、**型検査は通るのに実行時に必ず落ちる**状態だった。
+
+`dict` を使う 81 ファイルに `import { dict } from '<相対>/constants/index.mjs';`
+を足し、ambient 宣言を消した。`constants/index.mts` は
+`dictionary/index.mjs` を re-export しているので、既に他の定数を
+`constants/index.mjs` から取っているファイルと同じ形になる。循環は増えていない
+（`import-x/no-cycle` を含む lint が通る）。
+
+これで `e2e/display-create-event-page.spec.mts` が動く。
+**`create-event.spec.ts` は `experimental/` に残す** — Firestore に実際に
+書き込むので、emulator を CI に組み込むまで走らせようが無い。
+`configs/playwright.config.ts` もそのため一緒に残してある。

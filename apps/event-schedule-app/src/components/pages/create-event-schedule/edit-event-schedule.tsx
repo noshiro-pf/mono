@@ -2,6 +2,7 @@ import { Spinner } from '@blueprintjs/core';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { Result } from 'ts-data-forge';
+import { dict } from '../../../constants/index.mjs';
 import { EventScheduleStore, Router } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
 import { NotFoundPage } from '../not-found-page.js';

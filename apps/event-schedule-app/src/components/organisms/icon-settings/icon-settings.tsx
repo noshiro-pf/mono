@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import {
   iconListReducer,
   type IconListReducerAction,

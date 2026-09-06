@@ -1,4 +1,5 @@
 import { datetimeSpecificationOptions } from 'event-schedule-app-shared';
+import { dict } from '../../constants/index.mjs';
 
 const dc = dict.eventSettingsPage.section2;
 

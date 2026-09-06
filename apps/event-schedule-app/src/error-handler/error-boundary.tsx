@@ -21,6 +21,7 @@ import * as React from 'react';
 import { BpTextArea, DialogWithMaxWidth } from 'react-blueprintjs-utils';
 import { api } from '../api/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../components/index.mjs';
+import { dict } from '../constants/index.mjs';
 import { isProduction } from '../env.mjs';
 import { createToaster, showToast } from '../functions/index.mjs';
 

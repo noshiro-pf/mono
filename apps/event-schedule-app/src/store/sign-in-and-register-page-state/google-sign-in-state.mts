@@ -1,7 +1,7 @@
 import { createBooleanState } from 'synstate-react-hooks';
 import { Optional, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
-import { Routes } from '../../constants/index.mjs';
+import { Routes, dict } from '../../constants/index.mjs';
 import { createToaster, showToast } from '../../functions/index.mjs';
 import { Router } from '../router.mjs';
 

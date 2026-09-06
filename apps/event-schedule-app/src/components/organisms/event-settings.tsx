@@ -2,7 +2,10 @@ import { css } from '@emotion/react';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed, useObservable } from 'react-utils';
-import { notificationSettingsWithEmailDefaultValue } from '../../constants/index.mjs';
+import {
+  dict,
+  notificationSettingsWithEmailDefaultValue,
+} from '../../constants/index.mjs';
 import { type NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { AnswerDeadlineDatepicker } from './answer-deadline.js';
 import { AnswerIconSettingsComponent } from './icon-settings/index.mjs';

@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { AlertWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
-import { introductionUrl, Routes } from '../../../constants/index.mjs';
+import { dict, introductionUrl, Routes } from '../../../constants/index.mjs';
 import { Router } from '../../../store/index.mjs';
 
 const dc = dict.forNonLoggedInUser;

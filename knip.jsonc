@@ -184,7 +184,7 @@
     // Not an Astro site like the entry below assumes: a Vite React app whose
     // entry is the module `index.html` loads.
     "apps/event-schedule-app": {
-      "entry": ["src/main.tsx", "configs/*.mts"],
+      "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,ts,tsx}"],
       // Loaded by `src/index.css` through CSS `@import` rather than by a
       // module import, which knip does not follow.

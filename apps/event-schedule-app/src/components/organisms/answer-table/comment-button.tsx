@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { useBoolState } from 'better-react-use-state';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
 
 type Props = Readonly<{ comment: string; useSmallButton?: boolean }>;

@@ -7,7 +7,7 @@ import {
   type StrictExclude,
   type StrictPick,
 } from 'ts-type-forge';
-import { hm2str, ymd2str, ymdhm2str } from '../constants/index.mjs';
+import { dict, hm2str, ymd2str, ymdhm2str } from '../constants/index.mjs';
 import {
   Obj,
   match,

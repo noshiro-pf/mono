@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
-import { descriptionFontColor } from '../../../constants/index.mjs';
+import { descriptionFontColor, dict } from '../../../constants/index.mjs';
 import { EditEventScheduleStore } from '../../../store/index.mjs';
 import {
   BackToAnswerPageButton,

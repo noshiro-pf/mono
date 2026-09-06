@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { memoNamed } from 'react-utils';
-import { aboutThisAppUrl } from '../../constants/index.mjs';
+import { aboutThisAppUrl, dict } from '../../constants/index.mjs';
 
 export const Footer = memoNamed('Footer', () => (
   <div

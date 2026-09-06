@@ -4,6 +4,7 @@ import * as React from 'react';
 import { BpInput } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
+import { dict } from '../../../constants/index.mjs';
 import {
   DeleteAccountPageStore,
   UpdateUserInfoDialogStore,

@@ -7,7 +7,11 @@ import {
 import { createBooleanState, createState } from 'synstate-react-hooks';
 import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
-import { eventScheduleInitialValue, Routes } from '../../constants/index.mjs';
+import {
+  dict,
+  eventScheduleInitialValue,
+  Routes,
+} from '../../constants/index.mjs';
 import {
   collectEventSettingsPageDiff,
   createToaster,

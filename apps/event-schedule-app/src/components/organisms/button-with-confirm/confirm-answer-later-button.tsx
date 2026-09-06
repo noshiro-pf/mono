@@ -1,6 +1,7 @@
 import { useBoolState } from 'better-react-use-state';
 import { ButtonNowrapStyled } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { AnswerPageStore } from '../../../store/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 import { ForNonLoggedInUserDialog } from './for-non-logged-in-user-button.js';

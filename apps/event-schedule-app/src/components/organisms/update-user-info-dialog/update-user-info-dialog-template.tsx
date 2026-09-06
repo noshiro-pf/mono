@@ -1,6 +1,7 @@
 import { Button, Classes } from '@blueprintjs/core';
 import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../../styled/index.mjs';
 
 type Props = Readonly<{

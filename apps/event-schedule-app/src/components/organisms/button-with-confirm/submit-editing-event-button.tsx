@@ -1,5 +1,6 @@
 import { Button } from '@blueprintjs/core';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../../constants/index.mjs';
 import { EditEventScheduleStore } from '../../../store/index.mjs';
 import { ButtonWithConfirm } from './button-with-confirm.js';
 

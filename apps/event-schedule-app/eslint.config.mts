@@ -1,5 +1,6 @@
 import {
   defineKnownRules,
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -38,4 +39,5 @@ export default [
       'unicorn/prefer-temporal': 'off',
     }),
   },
+  eslintConfigForPlaywright(['e2e/**']),
 ] satisfies readonly FlatConfig[];

@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
 import * as React from 'react';
 import { DialogWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../constants/index.mjs';
 import { CreateEventScheduleStore } from '../../store/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
 

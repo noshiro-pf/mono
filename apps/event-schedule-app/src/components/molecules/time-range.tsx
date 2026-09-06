@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { BpTimePicker } from 'react-blueprintjs-utils';
 import { memoNamed } from 'react-utils';
+import { dict } from '../../constants/index.mjs';
 
 type Props = Readonly<{
   datetimeSpecification: DatetimeSpecificationEnumType;

@@ -5,6 +5,7 @@ import { BpInput, DialogWithMaxWidth } from 'react-blueprintjs-utils';
 import { memoNamed, useKeyEventListener } from 'react-utils';
 import { useObservableValue } from 'synstate-react-hooks';
 import { isString, pipe } from 'ts-data-forge';
+import { dict } from '../../constants/index.mjs';
 import { Auth, ConfirmEmailDialogStore } from '../../store/index.mjs';
 import { mapOptional, noop } from '../../utils-ported/index.mjs';
 import { ButtonsWrapperAlignEnd } from '../styled/index.mjs';
