@@ -86,16 +86,17 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 
 対象は `new X()` と `X()` の両方を持ち、関数形が暗黙変換(または別の意味)になる組み込みだけ。`Symbol()` / `BigInt()` は `new` 形を持たないので対象外。代替は ts-std-forge に置く(D-41)。
 
-| 禁止する呼び出し             | 代替                                                                              | 備考                                                                                                                            |
-| :--------------------------- | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
-| `Number(str)`                | `SafeNumber.parse(str)` → `Result<number, { kind: 'invalid-number' }>`            | NaN と空文字・空白のみを Err に。`Number(bool)` は `b ? 1 : 0`、`Number(date)` は `date.getTime()`                              |
-| `String(x)`                  | `SafeString.fromPrimitive(x)`(primitive → `string`、全域)                         | `symbol` / `bigint` / `undefined` は template literal に置けないのでこれを使う。`unknown` は ts-data-forge の `unknownToString` |
-| `RegExp(p, f)`               | `Regex.create(p, f)`                                                              | 既存(D-26)                                                                                                                      |
-| `Error('msg')` 系            | `new Error('msg')` / prelude の factory                                           | `new` 形は許可([exceptions.md](./exceptions.md))                                                                                |
-| `Array(n)` / `Array(a, b)`   | 配列リテラル / `Arr.newArray(n, fill)` / `Arr.seq(n)`(ts-data-forge)              | `Array(3)` は sparse(禁止)                                                                                                      |
-| `Date()`                     | `new Date()`(+ `SafeDate.toISOString`)                                            | `Date()` は現在時刻の文字列を返す別物                                                                                           |
-| `Boolean(x)`                 | 代替なし — `x !== undefined` / `Arr.isNonEmpty(xs)` / `s !== ''` 等の明示的な比較 | [booleans-and-logic.md](./booleans-and-logic.md)                                                                                |
-| `Object(x)` / `Function(..)` | 代替なし                                                                          | boxing / eval 相当                                                                                                              |
+| 禁止する呼び出し             | 代替                                                                              | 備考                                                                                                                                                      |
+| :--------------------------- | :-------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Number(str)`                | `SafeNumber.parse(str)` → `Result<FiniteNumber, { kind: 'invalid-number' }>`      | `Num.safeParseFloat` と同じ実装(コピー)。空文字・末尾不正・`NaN`・`Infinity` を Err に。`Number(bool)` は `b ? 1 : 0`、`Number(date)` は `date.getTime()` |
+| `Number.parseInt(str, 10)`   | `SafeNumber.parseInteger(str)` → `Result<Int, { kind: 'invalid-integer' }>`       | `Num.safeParseInt` と同じ実装(コピー)+ 有限性チェック。`parseInt` という宣言名は global の shadow(D-19)なので `parseInteger`                              |
+| `String(x)`                  | `SafeString.fromPrimitive(x)`(primitive → `string`、全域)                         | `symbol` / `bigint` / `undefined` は template literal に置けないのでこれを使う。`unknown` は ts-data-forge の `unknownToString`                           |
+| `RegExp(p, f)`               | `Regex.create(p, f)`                                                              | 既存(D-26)                                                                                                                                                |
+| `Error('msg')` 系            | `new Error('msg')` / prelude の factory                                           | `new` 形は許可([exceptions.md](./exceptions.md))                                                                                                          |
+| `Array(n)` / `Array(a, b)`   | 配列リテラル / `Arr.newArray(n, fill)` / `Arr.seq(n)`(ts-data-forge)              | `Array(3)` は sparse(禁止)                                                                                                                                |
+| `Date()`                     | `new Date()`(+ `SafeDate.toISOString`)                                            | `Date()` は現在時刻の文字列を返す別物                                                                                                                     |
+| `Boolean(x)`                 | 代替なし — `x !== undefined` / `Arr.isNonEmpty(xs)` / `s !== ''` 等の明示的な比較 | [booleans-and-logic.md](./booleans-and-logic.md)                                                                                                          |
+| `Object(x)` / `Function(..)` | 代替なし                                                                          | boxing / eval 相当                                                                                                                                        |
 
 ## 未解決の論点
 

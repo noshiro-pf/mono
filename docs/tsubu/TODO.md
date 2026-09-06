@@ -25,7 +25,8 @@
 
 - [ ] ts-std-forge: Tier 2(BigInt、`Iterator.take/drop`、`structuredClone`、toLocaleString 系)、Tier 3(TypedArray/DataView/Atomics、Intl)、Temporal family(D-23)。(Tier 1 は [#1725](https://github.com/noshiro-pf/mono/pull/1725) で完了)
 - [ ] ts-std-forge: null / 番兵値 API の Optional ラッパー(棚卸しは [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) の「次の調査枠」)。D-31 の undefined 排除の前提条件。
-- [ ] ts-std-forge: D-15 代替 API(`SafeNumber.parse` / `SafeString.fromPrimitive` — D-41)の実装と、preset のコンストラクタ静的呼び出しルールへの接続。
+- [ ] ts-std-forge: D-15 代替 API(`SafeNumber.parse` / `parseInteger` / `SafeString.fromPrimitive` — D-41)は [#1848](https://github.com/noshiro-pf/mono/pull/1848) で実装。残り: preset のコンストラクタ静的呼び出しルールへの接続と、eslint-plugin-ts-data-forge の `prefer-num-safe-parse-*` が案内する置き換え先を ts-std-forge 側へ向けること。
+- [ ] ts-data-forge: `Num.safeParseInt('1e400')` が `Infinity` を `Int` として Ok で返す穴の修正(#1848 で判明。ts-std-forge のコピーは有限性チェック済み)。
 
 ## 仕様の未着手領域(フェーズ非依存)
 
