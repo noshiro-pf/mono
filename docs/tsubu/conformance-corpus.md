@@ -1,6 +1,6 @@
 # 適合性コーパスの設計(Phase 0)
 
-エンジン非依存の言語適合性テスト資産の形式定義。[implementation-plan.md](./implementation-plan.md) Phase 0 の成果物で、Phase 1(ESLint preset)・Phase 2(専用チェッカー)・v3 が**同じフィクスチャ**で検証される。エンジン乗り換え時の同値性ゲートを兼ねる。
+エンジン非依存の言語適合性テスト資産の形式定義。[implementation-plan.md](./implementation-plan.md) Phase 0 の成果物で、Phase 1(ESLint preset)・Phase 2(専用チェッカー)・Tsubu refined が**同じフィクスチャ**で検証される。エンジン乗り換え時の同値性ゲートを兼ねる。
 
 ## 設計原則
 

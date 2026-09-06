@@ -6,7 +6,7 @@ TS では同じ字面のコードでも tsconfig 次第で意味と安全性が�
 
 ## 拘束する項目と自由な項目(確定 2026-09-06 — D-40、draft config)
 
-型チェック関連の値は mono の `tools/configs/tsconfig/tsconfig.type-check.json` の現行値を採用する(確定 2026-08-27)。以下が v1 preset の配布する base tsconfig の draft。**`// 拘束`** の項目はユーザーが変更できない(チェッカーが実効値を検証する)。それ以外の項目は自由。
+型チェック関連の値は mono の `tools/configs/tsconfig/tsconfig.type-check.json` の現行値を採用する(確定 2026-08-27)。以下が Tsubu lint preset の配布する base tsconfig の draft。**`// 拘束`** の項目はユーザーが変更できない(チェッカーが実効値を検証する)。それ以外の項目は自由。
 
 ```jsonc
 {

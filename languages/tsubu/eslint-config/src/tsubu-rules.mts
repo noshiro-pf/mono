@@ -1,7 +1,7 @@
 import { defineKnownRules, withDefaultOption } from 'eslint-config-typed';
 
 /**
- * The Tsubu v1 rule overrides on top of eslint-config-typed — the first
+ * The Tsubu lint rule overrides on top of eslint-config-typed — the first
  * version, limited to the enforcement-map 🔧 (option changes) and ⏻ (off →
  * on) items whose spec status is 確定 (independent of any pending 提案).
  * The 🆕 custom rules and the readonly enforcement experiment are tracked in
@@ -69,8 +69,8 @@ export const tsubuRules = defineKnownRules({
     },
   ],
 
-  // ⏻ no-bitwise: off in the base config. Banned outright in v1; revisited
-  // when v2 introduces an integer type (spec/banned-syntax.md).
+  // ⏻ no-bitwise: off in the base config. Banned outright in Tsubu lint; revisited
+  // when Tsubu sugar introduces an integer type (spec/banned-syntax.md).
   'no-bitwise': withDefaultOption('error'),
 
   // ⏻ unicorn/no-null: the null literal is banned (spec/null-undefined.md).
@@ -78,7 +78,7 @@ export const tsubuRules = defineKnownRules({
   // normalizing external null to undefined at the boundary requires it.
   'unicorn/no-null': ['error', { checkStrictEquality: false }],
 
-  // ⏻ id-denylist (D-17): `fn` is reserved for the v2 function-declaration
+  // ⏻ id-denylist (D-17): `fn` is reserved for the Tsubu sugar function-declaration
   // keyword. The rule also reports *defining* an own object property named
   // `fn` — stricter than D-17, which reserves declaration names only; reads
   // and the `{ fn: renamed }` escape hatch pass (verified by test). The 🆕

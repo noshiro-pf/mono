@@ -29,9 +29,9 @@
 
 外部ライブラリは throw するかどうかが型に現れないため悩ましい。**throwable を型で区別する仕組みが可能ならそうしたい**(方針)。TS には throws 節がない([microsoft/TypeScript#13219](https://github.com/microsoft/TypeScript/issues/13219) — 長年の未解決 issue)ため、段階案で整理する:
 
-1. **v1(保守的規則)**: この言語の Result 規約に従わない外部モジュールからの関数呼び出しは、すべて throwable とみなし `fromThrowable` / `fromPromise` 越しでのみ許可する。「throw しうるか」は静的に判定不能なので、健全なデフォルトはこれしかない。ただし実際には throw しない純粋関数まで包む過剰包装になる。
-2. **v1 の緩和(許可リスト)**: パッケージ/関数単位で「throw しない」とチェッカー設定に人手で宣言し、1 の規則から除外する。宣言は自己責任の境界であり、`@ts-expect-error` と同格の明示的エスケープとして扱う。
-3. **v3(理想形)**: 関数型に throws 効果を載せる独自型検査器拡張。先行例: Swift の `throws` / `try` マーキング、Koka などの effect system、Java の checked exceptions(悪評も含めて教訓 — 効果の伝播が全署名を汚染する問題への解を要検討)。[future-syntax.md](./future-syntax.md) 候補 7 と同じく「独自型検査器(v3)」の動機リストに加える。
+1. **Tsubu lint(保守的規則)**: この言語の Result 規約に従わない外部モジュールからの関数呼び出しは、すべて throwable とみなし `fromThrowable` / `fromPromise` 越しでのみ許可する。「throw しうるか」は静的に判定不能なので、健全なデフォルトはこれしかない。ただし実際には throw しない純粋関数まで包む過剰包装になる。
+2. **Tsubu lint の緩和(許可リスト)**: パッケージ/関数単位で「throw しない」とチェッカー設定に人手で宣言し、1 の規則から除外する。宣言は自己責任の境界であり、`@ts-expect-error` と同格の明示的エスケープとして扱う。
+3. **Tsubu refined(理想形)**: 関数型に throws 効果を載せる独自型検査器拡張。先行例: Swift の `throws` / `try` マーキング、Koka などの effect system、Java の checked exceptions(悪評も含めて教訓 — 効果の伝播が全署名を汚染する問題への解を要検討)。[future-syntax.md](./future-syntax.md) 候補 7 と同じく「独自型検査器(Tsubu refined)」の動機リストに加える。
 
 ## Err ペイロードとスタックトレース — class なしで JS ネイティブ Error 同等を実現できるか(検証 2026-08-29)
 
@@ -71,7 +71,7 @@ const createHttpError = (
 
 `throw` を書けないなら、ユーザーコードで `try..catch` が必要なのは外部 API の境界だけであり、それは `fromThrowable` / `fromPromise` が担う。したがって **`try..catch` 構文自体も禁止**し、例外の捕捉手段を prelude の 2 関数に一本化する([banned-syntax.md](./banned-syntax.md))。
 
-- `finally` 相当(リソース解放)は `using` / explicit resource management(TC39 / TS 5.2+)が受け皿になりうるが、**v1 では `using` / `await using` を禁止し、採否は v2 で再検討する**(D-30)。v1 のリソース解放は `fromThrowable` に渡すコールバック内で明示的に書く。
+- `finally` 相当(リソース解放)は `using` / explicit resource management(TC39 / TS 5.2+)が受け皿になりうるが、**Tsubu lint では `using` / `await using` を禁止し、採否は Tsubu sugar で再検討する**(D-30)。Tsubu lint のリソース解放は `fromThrowable` に渡すコールバック内で明示的に書く。
 
 ## TS へ戻るときの影響
 
@@ -80,5 +80,5 @@ const createHttpError = (
 ## 未解決の論点
 
 - `Err` ペイロードの設計規範は上記「仕様への帰結」1〜2 で骨格が決まった(既定 plain tagged union / 境界・panic は Error ベース factory)。残るのはエラーの合成(`mapErr` / union が増えていく問題)の指針と、factory 群を prelude(ts-data-forge)にどう載せるか。
-- `using` / Explicit Resource Management の v2 での採否(v1 は禁止 — D-30)。
+- `using` / Explicit Resource Management の Tsubu sugar での採否(Tsubu lint は禁止 — D-30)。
 - process 境界(uncaught rejection、`process.exit`)の扱い。

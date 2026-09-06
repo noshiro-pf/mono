@@ -4,11 +4,11 @@
 
 ## 現状の整理
 
-- class method の bivariance をはじめとする型システムの不健全性の根本解決は型検査器の自作が必要なため**後回し**(v1 の対象外)。
-- ただし bivariance に限っては、後述のとおり**構文制限だけで v1 から塞げる**。
+- class method の bivariance をはじめとする型システムの不健全性の根本解決は型検査器の自作が必要なため**後回し**(Tsubu lint の対象外)。
+- ただし bivariance に限っては、後述のとおり**構文制限だけで Tsubu lint から塞げる**。
 - class / 継承をそもそも言語に含めるかは、synstate core の実態評価(後述)を踏まえて判断する。
 
-## bivariance は v1 で塞げる
+## bivariance は Tsubu lint で塞げる
 
 TS では `strictFunctionTypes` 有効時でも、**メソッド短縮記法**で宣言された関数の引数だけは bivariant に検査される(互換性のための意図的な仕様)。プロパティ形式の関数型は正しく contravariant に検査される:
 
@@ -25,7 +25,7 @@ class のメソッド宣言も同様にメソッド記法なので bivariant。�
 - 代償: arrow プロパティは prototype ではなくインスタンスごとに関数が確保される(メモリ・生成コスト)。大量インスタンス化する型では問題になりうる。ただし後述の「closure ベース factory」へ寄せるなら、そもそも同じコスト構造なので新たな代償ではない。
 - 既存ルール: `@typescript-eslint/method-signature-style`(型側)がこの目的に使える。class 実装側は `class-methods-use-this` 等ではなく専用ルールが必要(要調査)。
 
-これで「メソッド経由の引数型の不健全性」は v1 で消える。残る不健全性(`any` の伝播、型アサーション、配列共変性など)は別途カタログ化する(TODO)。
+これで「メソッド経由の引数型の不健全性」は Tsubu lint で消える。残る不健全性(`any` の伝播、型アサーション、配列共変性など)は別途カタログ化する(TODO)。
 
 ## 他言語は「class 相当」をどう実現しているか
 

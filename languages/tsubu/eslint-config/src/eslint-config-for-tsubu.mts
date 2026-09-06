@@ -6,7 +6,7 @@ import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { tsubuRules } from './tsubu-rules.mjs';
 
 /**
- * The Tsubu v1 ESLint preset (Phase 1 first version): eslint-config-typed +
+ * The Tsubu lint ESLint preset (Phase 1 first version): eslint-config-typed +
  * eslint-plugin-ts-data-forge (the two packages the enforcement map draws
  * from) with the Tsubu overrides applied last, so they win flat-config
  * merging.

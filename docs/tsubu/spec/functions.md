@@ -7,7 +7,7 @@
 - **`this` は全面禁止(確定 2026-08-29)。** class の全面禁止(D-12 — [classes.md](./classes.md))に伴い、「class 内のみ許可」の条項は消滅した。`arguments` と `this` を禁止した状態では、named function と arrow function の安全性の差はほぼ無い — これが D-13 のオーバーロード時 named function 許容の前提でもある。
 - **async/await は残す(確定)。** 非同期は言語の一級市民。エラーを持つ非同期は `Promise<Result<S, E>>`(将来的には `ResultAsync` 相当 — [stdlib.md](./stdlib.md) ★★★)と組み合わせる。
 - **generator(`function*` / `async function*`)は許可(確定 2026-08-29 — D-18。当初の禁止を撤回)。** arrow に generator 形が存在しないため、`function*` の宣言・式は D-13 の例外として常に合法(オーバーロード不要)。`Result.safeTry(function* () { ... })` をユーザーコードで書くための実際上の必要もある。
-- **識別子 `fn` は予約(確定 2026-08-29 — D-17)。** v2 の関数宣言キーワードとして採用が決まったため、v1 から宣言名としての使用を禁止する(プロパティ名は対象外)。
+- **識別子 `fn` は予約(確定 2026-08-29 — D-17)。** Tsubu sugar の関数宣言キーワードとして採用が決まったため、Tsubu lint から宣言名としての使用を禁止する(プロパティ名は対象外)。
 
 ## オーバーロードと named function(確定 2026-08-29 — D-13)
 
@@ -25,7 +25,7 @@ const f: F = (a: string | number): string | number =>
 
 named function 宣言なら実装シグネチャとオーバーロードシグネチャを言語機能として書ける。
 
-**決定**: オーバーロードを許容し、**named function は「オーバーロードシグネチャを伴う場合のみ」合法**とする。チェッカーは「オーバーロードシグネチャを伴わない `function` 宣言」を拒否する条件付き許可ルールを実装し、**記法の一意性**(同じものを書く方法が 1 つ)を担保する。既存 lint(`prefer-arrow-functions` / `func-style`)ではこの条件付き許可を表現できないため、v1 の新規実装ルールになる(中立ルール ID 候補: `functions/function-declaration-requires-overload`)。
+**決定**: オーバーロードを許容し、**named function は「オーバーロードシグネチャを伴う場合のみ」合法**とする。チェッカーは「オーバーロードシグネチャを伴わない `function` 宣言」を拒否する条件付き許可ルールを実装し、**記法の一意性**(同じものを書く方法が 1 つ)を担保する。既存 lint(`prefer-arrow-functions` / `func-style`)ではこの条件付き許可を表現できないため、Tsubu lint の新規実装ルールになる(中立ルール ID 候補: `functions/function-declaration-requires-overload`)。
 
 なお `func-style` が mono で off になっている理由が「オーバーロードでの誤検出」だったことは、この論点の実在の実運用側の裏付けである([enforcement-map.md](../enforcement-map.md))。
 

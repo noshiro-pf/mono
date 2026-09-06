@@ -49,14 +49,14 @@ tsc 上の対応は `module: nodenext` + `moduleResolution: nodenext` に固定(
 
 ## 強制手段
 
-- v1: ESLint(`no-restricted-syntax` + import 系ルール)+ tsconfig 固定。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
+- Tsubu lint: ESLint(`no-restricted-syntax` + import 系ルール)+ tsconfig 固定。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
 
 ## default export を要求するツールとの接続(確定 2026-09-05 — D-36)
 
 ESLint flat config / Vite / Vitest / Rollup 等は設定ファイルの default export を要求するが、ソースの export 形は named 一択を崩さない。
 
-- **v2**: transpiler が `export default` を **emit** する(default export は出力側にだけ現れる)。指示は transpiler の設定ファイル(パスパターン → default にする named export 名)が第一候補、ファイル内ディレクティブが次点(D-36)。具体形は v2 設計時に決める。パス指定で構文の許可範囲を変える一般機構は採らない(D-36 却下案)。
-- **v1(暫定)**: 設定の本体は Tsubu の通常モジュールとして named export で書き(`export const eslintConfig = …`)、ツールが読むファイルは検査対象外の 1 行アダプタにする:
+- **Tsubu sugar**: transpiler が `export default` を **emit** する(default export は出力側にだけ現れる)。指示は transpiler の設定ファイル(パスパターン → default にする named export 名)が第一候補、ファイル内ディレクティブが次点(D-36)。具体形は Tsubu sugar 設計時に決める。パス指定で構文の許可範囲を変える一般機構は採らない(D-36 却下案)。
+- **Tsubu lint(暫定)**: 設定の本体は Tsubu の通常モジュールとして named export で書き(`export const eslintConfig = …`)、ツールが読むファイルは検査対象外の 1 行アダプタにする:
 
 ```ts
 // eslint.config.mts — Tsubu の検査対象外(ロジックを持たない)
