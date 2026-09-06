@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
@@ -114,7 +114,9 @@ export const embedExamplesInJsDoc = async (): Promise<
 
     return Result.ok(undefined);
   } catch (error) {
-    return Result.err(`❌ Failed to embed JSDoc examples: ${String(error)}`);
+    return Result.err(
+      `❌ Failed to embed JSDoc examples: ${unknownToString(error)}`,
+    );
   }
 };
 
