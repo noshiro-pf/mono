@@ -1,8 +1,8 @@
-<!-- cspell:ignore rescript POPL Tsuba Tsubu Sumi Togi Hagane Sunao Whet Kezuri Kanna Tsuzuri Streng romaji Klar Sauber -->
+<!-- cspell:ignore rescript POPL -->
 
 # Sumi(粒)— TypeScript サブセット言語 仕様書
 
-JS の負の遺産を引き継がず、TypeScript のサブセットだけを持つ、より安全な言語 **Sumi** の設計ドキュメント(言語名は D-16 で Tsubu / `.tsb` と決め、2026-09-07 に D-44 で Sumi / `.sumi` へ改名)。
+JS の負の遺産を引き継がず、TypeScript のサブセットだけを持つ、より安全な言語 **Sumi** の設計ドキュメント(言語名・拡張子は D-16)。
 
 ## 目的
 
@@ -62,20 +62,9 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 生きたタスクリストは [TODO.md](./TODO.md)。深掘り待ちの仕様論点(getter/setter の粒度、不健全性カタログ等)は各 spec ファイルの「未解決の論点」に記録している。型レベル機能の方針(2026-08-27 確定)は「**TS の表現力は維持**し、健全性を犠牲にする機能が特定された時点で個別に検討」。
 
-## 言語名・ファイル拡張子(決定 2026-08-29 — D-16)
+## 言語名・ファイル拡張子(決定 2026-09-07 — D-16)
 
-**言語名は Sumi、Sumi sugar の拡張子は `.sumi`**(2026-09-07 に改名 — D-44。当初の名前は Tsubu(粒)、拡張子は `.tsb`)。以下は当初の命名時の検討の記録。
+**言語名は Sumi、Sumi sugar の拡張子は `.sumi`。**
 
 - Sumi lint は合法 TS なので拡張子は `.mts` / `.tsx` のままでよい。**Sumi sugar の独自拡張子は 1 つだけ新設し、常時 JSX 文法(tsx 相当)とする**(D-11 — angle-bracket アサーションの除去と `<T,>` 強制により単一文法で曖昧性が消えるため)。
-- 候補(2026-08-29 検討。拡張子は 3 文字以内・著名言語/形式・既存略語と非衝突が条件):
-    - **Tsubu(粒)/ `.tsb`(次点 `.tsu`)**(当初採用、2026-09-07 に Sumi へ改名)— 「**粒ぞろい**」= 選び抜いた粒だけを残す、というサブセットの隠喩そのもの。綴りが ts- で始まり ts-data-forge / ts-fortress / strict-ts-lib と揃う。日本語名 OSS の成功例(Hono)と同路線。目立つ衝突なし。(第 1 案だった Tsuba(鍔)は「唾」と同音のため置換。)
-    - Togi(研ぎ)/ `.tgi` — 研ぎ澄ました TS。`.tgi` は The Sims の TGI リソース形式と軽微衝突。
-    - Hagane(鋼)/ `.hgn` — 堅牢の隠喩。ts 綴りは失われる。
-    - Sunao(素直)/ `.sna` — 暗黙変換や罠のない素直な意味論。`.sna` は旧 ZX Spectrum スナップショットと軽微衝突。
-    - **Whet / `.whet`** — 砥石(whetstone)で研ぐ。英語圏に自然な動詞で、4 文字拡張子。目立つ衝突なし。
-    - Kezuri(削り)/ `.kzr` — 「TS を削り出す」直球。衝突なしだが romaji 読みが英語圏に非自明。
-    - Kanna(鉋)/ `.kna` — 鉋で薄く削る職人道具。Swift の HTML パーサ Kanna と中程度の衝突。
-    - 不採用: **Hew**(hew to = 規範に従う、の二重義で有力だったが「Hew Language」という VS Code 拡張つきの言語が既存)、**Tsuzuri(綴り)**(同名の日本語執筆アプリ tsuzuri.ink・Canon 綴プロジェクト等で混雑)。
-    - 英語名は他はほぼ全滅(Sound=SoundScript/V8、Lean=定理証明器、Strait は `.srt`=字幕・`.sts`=Spring Tool Suite と拡張子難)。ドイツ語も Klar=Firefox Klar、Fest=FEST(Java テスト lib)、Sauber=F1 と衝突し、残る Streng(厳格)は拡張子が難。
-    - ts+1 文字の拡張子で空いているのは `.tsb` / `.tsu` / `.tsz` 程度(`.tsc`=コンパイラ名、`.tss`=Titanium、`.tsp`=TypeSpec、`.tsq`=tree-sitter 旧クエリ、`.tsl`=Three.js Shading Language、`.tst`/`.tsr`/`.tsn` は既存略語)。
 - 命名は先行研究・既存プロジェクトとの衝突を避ける。特に **Safe TypeScript**(Microsoft Research による、TypeScript に健全な gradual typing を与える先行研究。POPL 2015 "Safe & Efficient Gradual Typing for TypeScript")が既にこの系統の名前を使っている。方向性が近い(TS の不健全性の排除)ため、命名の回避対象であると同時に設計の参考文献でもある。

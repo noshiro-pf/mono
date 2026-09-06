@@ -1,4 +1,4 @@
-<!-- cspell:ignore bivariance Tsubu -->
+<!-- cspell:ignore bivariance -->
 
 # 設計判断の決定ログ
 
@@ -104,12 +104,12 @@
 - **理由**: これらは暗黙変換の関数形であり、意図(パース・変換・判定)が名前に現れない。専用の生成関数(例: 既存の `Num.safeParseInt` 系)に置き換えることで、変換の失敗が `Result`/`Optional` として型に現れる。
 - **TODO**: ts-data-forge 側の生成関数の網羅(`Boolean`/`String`/`Array` 代替)は未実装 — [spec/stdlib.md](./spec/stdlib.md) のギャップに追加。
 
-## D-16: 言語名は Tsubu(粒)、拡張子は `.tsb`(2026-09-07 に D-44 で Sumi / `.sumi` へ改名)
+## D-16: 言語名は Sumi、拡張子は `.sumi`
 
-- **ステータス**: 確定(2026-08-29)
-- **判断**: 言語名を **Tsuba(鍔)**、Sumi sugar の単一拡張子(D-11)を **`.tsb`** とする。
-- **理由**: 刀の鍔 = 手を守る防具で「TS を守る言語」の隠喩。綴りが ts- で始まり ts-data-forge / ts-fortress / strict-ts-lib と揃う。`.tsb` は著名言語・形式・略語と衝突しない(候補比較は [README.md](./README.md) の言語名節)。「唾」との同音は認識の上でユーザー決定。
-- **帰結**: 仮名 subset-ts からのリネーム — `languages/sumi/`、`docs/sumi/`、パッケージ `sumi-conformance`、期待診断マーカー `@sumi-expect`、CLI 名 `sumi`(実施済み)。
+- **ステータス**: 確定(2026-09-07。2026-08-29 の当初決定を D-44 で差し替え)
+- **判断**: 言語名を **Sumi**、Sumi sugar の単一拡張子(D-11)を **`.sumi`** とする(ユーザー決定)。
+- **理由**: 拡張子は言語名そのもので、著名な言語・形式・既存略語との衝突がない。
+- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `sumi-conformance` / `sumi-eslint-config` / `sumi-oxlint-config`、期待診断マーカー `@sumi-expect`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
 
 ## D-17: 予約語 `fn` を採用し、Sumi lint から識別子 `fn` を予約する
 
@@ -324,8 +324,7 @@
 - **制約(既知)**: oxlint はカスタム type-aware ルールを書けない(2026-09 時点)。型情報が要る 🆕 ルール(宣言への null 型禁止、境界 `?? undefined` 強制、`castMutable` 乱用、論理代入のオペランド、readonly 強制)は tsgolint の既存ルールで賄えるものを除き、**TS API 上の薄いチェッカー(Phase 2 の `sumi check` の前倒し)か ESLint ブリッジ**で実装する。どちらにするかは readonly 強制の実装方針(TODO)と併せて決める。
 - **コーパス側で判明した差分**: `no-sequences` は ESLint / oxlint とも既定 `allowInParentheses: true` で `(a, b)` を許す — 言語は全面禁止なので `false` を指定する(ESLint preset にも同じ穴があり、enforcement-map に 🔧 として反映)。デコレータ付き class の報告行はエンジン依存(class の span がデコレータから始まるか)なので、フィクスチャはデコレータと class を同一行に置く。`fn` を仮引数名にした valid フィクスチャは D-17 の「宣言名」に該当し invalid だった(修正)。
 
-## D-44: 言語名を Tsubu から Sumi に改名する
+## D-44: 言語名と拡張子を Sumi / `.sumi` に確定する(D-16 改訂)
 
 - **ステータス**: 確定(2026-09-07)
-- **判断**: 言語名を **Sumi** とする(ユーザー決定)。仕様書(`docs/sumi/`)、開発パッケージ(`languages/sumi/` — sumi-conformance / sumi-eslint-config / sumi-oxlint-config)、コーパスのマーカー(`@sumi-expect`)、JS plugin 名(`sumi/<rule>`)、preset の API 名(`sumiRules` / `eslintConfigForSumi`)を一括で改名した。D-16 と README の命名検討の記録は当初の名前(Tsubu)のまま残す。
-- **拡張子**: Sumi sugar の単一拡張子(D-11)は **`.sumi`** とする(2026-09-07 ユーザー決定。`.tsb` は Tsubu 由来のため置き換え)。
+- **判断**: D-16 の言語名と拡張子を **Sumi / `.sumi`** に差し替える(ユーザー決定)。仕様書、開発パッケージ、コーパスのマーカー、JS plugin 名、preset の API 名(`sumiRules` / `eslintConfigForSumi`)を一括で改名した。旧名は記録に残さない。
