@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import { SafeNumber } from '../src/index.mjs';
 
 const specialValues = [
@@ -136,5 +137,60 @@ describe('SafeNumber.toStringWithRadix', () => {
       // @ts-expect-error -- deliberately passing an out-of-range radix
       SafeNumber.toStringWithRadix(1, 37),
     ).toThrow(RangeError);
+  });
+});
+
+describe('SafeNumber.parse', () => {
+  test.each([
+    { input: '42', expected: 42 },
+    { input: '2.5', expected: 2.5 },
+    { input: '-1e3', expected: -1000 },
+    { input: '0x10', expected: 16 },
+    { input: '  12  ', expected: 12 },
+    { input: 'Infinity', expected: Number.POSITIVE_INFINITY },
+  ])('parse($input) returns Ok($expected)', ({ input, expected }) => {
+    const result = SafeNumber.parse(input);
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(result.value, expected);
+  });
+
+  test.each([
+    { input: '' },
+    { input: ' '.repeat(3) },
+    { input: 'abc' },
+    { input: '12abc' },
+    { input: '1_000' },
+    { input: 'NaN' },
+  ])('parse($input) returns a tagged Err', ({ input }) => {
+    const result = SafeNumber.parse(input);
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.deepStrictEqual(result.value, { kind: 'invalid-number', input });
+  });
+
+  test('never yields NaN, and otherwise agrees with Number()', () => {
+    const inputs = ['42', '', ' ', 'abc', '0b101', '1e400', '-0', '.5', '5.'];
+
+    for (const input of inputs) {
+      const result = SafeNumber.parse(input);
+
+      // The sweep deliberately compares against the raw conversion (the
+      // prelude's safeParseFloat is finite-only and would hide 'Infinity').
+      // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
+      const raw = Number(input);
+
+      // Blank input is the one case where Number() succeeds (with 0) but the
+      // wrapper does not: 0 there is a sentinel, not a parse.
+      const expectOk = input.trim() !== '' && !Number.isNaN(raw);
+
+      assert.deepStrictEqual(Result.isOk(result), expectOk);
+
+      if (Result.isOk(result)) {
+        assert.deepStrictEqual(result.value, raw);
+      }
+    }
   });
 });

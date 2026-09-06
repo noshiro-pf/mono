@@ -35,6 +35,16 @@ assert.equal(SafeNumber.toExponential(123456, 2), '1.23e+5');
 assert.equal(SafeNumber.toPrecision(123.456, 4), '123.5');
 assert.equal(SafeNumber.toStringWithRadix(255, 16), 'ff');
 
+// Constructor-call alternatives (D-15): Number(str) without the NaN sentinel,
+// String(x) for the primitives a template literal cannot take.
+assert.equal(SafeNumber.parse(' 0x10 ').value, 16);
+assert.deepEqual(SafeNumber.parse('12abc').value, {
+  kind: 'invalid-number',
+  input: '12abc',
+});
+assert.equal(SafeString.fromPrimitive(Symbol('tag')), 'Symbol(tag)');
+assert.equal(SafeString.fromPrimitive(10n), '10');
+
 // String building: invalid code points come back as tagged errors.
 assert.equal(SafeString.fromCodePoint(0x61, 0x1f600).value, 'a\u{1f600}');
 assert.deepEqual(SafeString.fromCodePoint(0x110000).value, {
