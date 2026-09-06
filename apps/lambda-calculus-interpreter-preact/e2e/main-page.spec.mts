@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('visit main page', async ({ page }) => {
+test('visit main page', { tag: '@smoke' }, async ({ page }) => {
   await page.goto('/');
 
   await expect.soft(page.getByTestId('input-area')).toBeVisible();
@@ -71,13 +71,15 @@ const testCases = [
 }[];
 
 for (const { title, input, output } of testCases) {
-  test(title, async ({ page }) => {
+  test(title, { tag: '@smoke' }, async ({ page }) => {
     await page.goto('/');
 
     const inputArea = page.getByTestId('input-area');
+
     const outputArea = page.getByTestId('output-area');
 
     await inputArea.clear();
+
     await inputArea.fill(input);
 
     await expect.soft(outputArea).toHaveValue(output.join('\n'));

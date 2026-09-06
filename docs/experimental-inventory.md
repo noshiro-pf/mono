@@ -1683,3 +1683,51 @@ synstate のオペレータ呼び出しかどうかで、それで機械的に�
 `firestoreTimestampTypeDef` の判定が**反転していた** — `a instanceof FieldValue`
 のときに `Result.err` を返し、それ以外を通していた。`validate` を書き直す際に
 明らかになったので直してある。
+
+## e2e（Playwright）の復元（2026-09-06）
+
+復元時に保留していた `e2e/` を戻す。**13 app のうち 9 つを移し、4 つは
+`experimental/` に残した** — 残した 4 つは「移す価値が無い」からではなく、
+**アプリ自体が動いていない**からで、それを見つけたのがこのテストである。
+
+### ランナー層
+
+移植元の `configs/playwright.config.ts` は `@noshiro/mono-configs` の
+`definePlaywrightConfig` を呼んでおり、これは `experimental/` にしか無い。
+代わりに `tools/configs/playwright-config.mts` を置いた。
+
+- **`testIdAttribute` は `data-e2e`。** Playwright の既定は `data-testid` で、
+  そのままだと復元後のソースに残っている `data-e2e` の目印に一切当たらず、
+  「何も確認していないテストが緑になる」わけでもなく全件 not found で落ちる。
+- **chromium のみ。** CI が入れるブラウザは 1 つ（`playwright install chromium`）で、
+  ここで見たいのはアプリ自身の描画であってブラウザ差ではない。
+- **`workers: 1`・`fullyParallel: false`。** 移植元は `fullyParallel: true` だった
+  が、dev server は app あたり 1 つで、重いアプリは読み込み時の計算が長い。
+  `cant-stop-probability-app`（165 行の確率表）は並列だと 3 件とも 30 秒で
+  タイムアウトし、直列なら 3.6 秒で通る。ここに並列で得るものは無い。
+
+### ポートは 1 箇所に集めた
+
+`tools/configs/app-dev-ports.mts` に app ごとの dev server ポートを置き、
+Vite 側 (`server`/`preview` + `strictPort`) と Playwright 側の両方が
+**パッケージのディレクトリ名を鍵に**同じ表を引く。
+
+移植元は**全 app が 5180 だった**。2 つ同時に起動できないだけでなく、
+`reuseExistingServer` が既に上がっている別 app のサーバーに繋いでしまうので、
+**別のアプリに対してテストが通る**という事故が起こり得た。
+
+### 見つかった不具合 3 件
+
+いずれも復元済み・マージ済みのアプリの**既存の不具合**で、型検査も lint も
+単体テストも通り抜けていたもの。
+
+| #   | 症状                                                                     | 原因                                                                                                                                                                                                                                             | 影響                                                                                      |
+| :-- | :----------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| 1   | `ReferenceError: newArray is not defined`                                | `ts-data-forge` の barrel 経由の循環 import。`Arr.scan` をモジュール評価中に呼ぶと `newArray` が TDZ に入る                                                                                                                                      | `annotation-tool`・`color-demo-app`・`my-portfolio-app-preact` が**本番ビルドでも白画面** |
+| 2   | `Cannot read properties of undefined (reading 'ReactCurrentDispatcher')` | `react-blueprintjs-utils` が `react-dom` を宣言しておらず、`@blueprintjs/*` の peer (`18 \|\| 19`) を pnpm が 18.3.1 で満たしていた。react 19 と react-dom 18 の同居                                                                             | `blueprintjs-playground-styled`・`cant-stop-probability-app` が白画面                     |
+| 3   | `ReferenceError: dict is not defined`                                    | `event-schedule-app` の `src/vite-env.d.ts` が `const dict` を ambient global として宣言したまま、値を供給していた `configs/inject-def.ts`（`@rollup/plugin-inject`）は復元していない。**82 ファイル・137 箇所**が bare の `dict` を参照している | `event-schedule-app` が白画面                                                             |
+
+**2 だけは本 PR で直した** — `react-blueprintjs-utils` に `react-dom` を
+足すだけで、これを直さないと 2 app のテストが書けないため。1 と 3 は
+それぞれ別の修正（`ts-data-forge` の循環解消、`dict` の import 化）が要るので、
+該当 4 app の spec は `experimental/` に置いたままにしてある。

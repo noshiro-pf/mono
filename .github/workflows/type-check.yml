@@ -137,6 +137,7 @@ jobs:
           - ws:lint:fix
           - ws:test:browser
           - ws:test:cov
+          - ws:e2e
           - codemod:full
           - knip
           - lint:published-deps
@@ -171,8 +172,9 @@ jobs:
 
       # `ws:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
+      # `ws:e2e` drives one, which is the whole point of it.
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov'
+        if: matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov' || matrix.command == 'ws:e2e'
         run: pnpm exec playwright install chromium
 
       - name: Build all packages

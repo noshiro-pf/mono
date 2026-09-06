@@ -248,6 +248,10 @@ commands run those across every workspace member that defines them, and the
 - `pnpm run ws:test` — run Vitest once across the repository. In a package,
   `test` runs it there, with `testw` for watch mode, `test:ui` for the UI,
   `test:cov` for coverage and `test:cov:ui` to preview coverage.
+- `pnpm run ws:e2e` — run the Playwright suites under `apps/*/e2e`, one app at a
+  time. Each app's `e2e` script starts its own Vite dev server; the port comes
+  from `tools/configs/app-dev-ports.mts`, which the app's Vite config reads too
+  so the two cannot disagree. See "e2e" below.
 
 **Validation:**
 
@@ -1225,6 +1229,23 @@ wrapper the build scripts call.
 - A package with a browser project runs the same files in both projects. A test
   that needs a DOM goes in `test/browser/`, which the Node.js project's
   `include` leaves out.
+
+### e2e
+
+`apps/*/e2e/*.spec.mts` are Playwright specs, run by that app's `e2e` script
+against its own dev server, and by `pnpm run ws:e2e` across the repository.
+`tools/configs/playwright-config.mts` builds every app's config.
+
+- **The test id attribute is `data-e2e`, not Playwright's default
+  `data-testid`.** That is what the restored sources are marked up with;
+  pointing it at the default makes every `getByTestId` match nothing.
+- **One worker, and no `fullyParallel`.** One dev server per app, and the
+  heavier apps compute enough on load that parallel contexts time each other
+  out — measured at 30s each in parallel against 3.6s in sequence.
+- **Chromium only**, because that is the browser CI installs.
+- An app not listed in `tools/configs/app-dev-ports.mts` throws rather than
+  falling back to Vite's default port: two apps sharing a port is what that
+  table exists to prevent.
 - **A browser project must name every third-party module its tests reach in
   `optimizeDepsInclude`.** Anything Vite has to optimize on first import
   reloads the page mid-run, and whichever test file was loading then fails with

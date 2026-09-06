@@ -50,6 +50,7 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:"
   },
