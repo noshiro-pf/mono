@@ -79,10 +79,10 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
   return (
     <svg
       style={svgStyle}
-      viewBox={`0 0 ${String(CHART_WIDTH)} ${String(CHART_HEIGHT)}`}
+      viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
     >
       <g
-        transform={`translate(${String(PADDING.left)}, ${String(PADDING.top)})`}
+        transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
       >
         {/* Grid lines */}
         {yTicks.map((tick) => (
@@ -127,8 +127,8 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
           const linePath = points
             .map((p, i) =>
               i === 0
-                ? `M ${String(p.x)} ${String(p.y)}`
-                : `L ${String(p.x)} ${String(p.y)}`,
+                ? `M ${p.x.toString()} ${p.y.toString()}`
+                : `L ${p.x.toString()} ${p.y.toString()}`,
             )
             .join(' ');
 
@@ -142,7 +142,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
               />
               {points.map((p) => (
                 <circle
-                  key={`${String(p.x)}-${String(p.y)}`}
+                  key={`${p.x.toString()}-${p.y.toString()}`}
                   cx={p.x}
                   cy={p.y}
                   fill={s.color}
@@ -182,7 +182,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
           fill={'var(--sl-color-gray-3, #6b7280)'}
           fontSize={12}
           textAnchor={'middle'}
-          transform={`translate(${String(-PADDING.left + 16)}, ${String(PLOT_H / 2)}) rotate(-90)`}
+          transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
         >
           {yAxisLabel}
         </text>
@@ -248,6 +248,6 @@ BenchmarkLineChart.displayName = 'BenchmarkLineChart';
 
 const svgStyle: React.CSSProperties = {
   width: '100%',
-  maxWidth: `${String(CHART_WIDTH)}px`,
+  maxWidth: `${CHART_WIDTH.toString()}px`,
   height: 'auto',
 } as const;

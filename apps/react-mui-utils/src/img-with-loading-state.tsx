@@ -1,0 +1,23 @@
+import { memoNamed } from 'react-utils';
+import { ImgWithPreview } from 'react-utils-styled';
+import { ImgWithLoadingCircle } from './img-with-loading-circle.js';
+
+type Props = Readonly<{
+  fullImgSrc: string;
+  previewImgSrc?: string;
+  alt?: string;
+}>;
+
+export const ImgWithLoadingState = memoNamed<Props>(
+  'ImgWithLoadingState',
+  ({ fullImgSrc, previewImgSrc, alt = '' }: Props) =>
+    previewImgSrc === undefined ? (
+      <ImgWithLoadingCircle alt={alt} src={fullImgSrc} />
+    ) : (
+      <ImgWithPreview
+        alt={alt}
+        fullImgSrc={fullImgSrc}
+        previewImgSrc={previewImgSrc}
+      />
+    ),
+);

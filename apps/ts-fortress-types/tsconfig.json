@@ -4,5 +4,8 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json",
     "../../tools/configs/tsconfig/tsconfig.node-only.json"
   ],
-  "include": ["./src", "./scripts", "./configs"]
+  "compilerOptions": {
+    "libReplacement": true
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

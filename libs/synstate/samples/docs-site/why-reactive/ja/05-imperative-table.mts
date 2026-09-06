@@ -1,5 +1,4 @@
 /* transformer-ignore */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable total-functions/no-partial-division */
 /* eslint-disable @stylistic/padding-line-between-statements */
 /* eslint-disable import-x/unambiguous */
@@ -30,6 +29,7 @@ let currentPage = 1;
 // サーバーからテーブルデータを取得
 const fetchData = async (): Promise<void> => {
   try {
+    /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
     allRows = await fetch('/api/rows').then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();

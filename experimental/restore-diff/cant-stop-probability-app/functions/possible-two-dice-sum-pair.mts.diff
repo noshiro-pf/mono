@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sum-pair.ts apps/cant-stop-probability-app/src/functions/possible-two-dice-sum-pair.mts
+index f3e6efafa..942f96762 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sum-pair.ts
++++ apps/cant-stop-probability-app/src/functions/possible-two-dice-sum-pair.mts
+@@ -1,11 +1,16 @@
+-import { addDiceValues, type DiceValue, type TwoDiceSumValue } from '../types';
++import { type FixedLengthTuple } from 'ts-type-forge';
++import {
++  addDiceValues,
++  type DiceValue,
++  type TwoDiceSumValue,
++} from '../types/index.mjs';
+ 
+ export const possibleTwoDiceSumPairs = (
+   a: DiceValue,
+   b: DiceValue,
+   c: DiceValue,
+   d: DiceValue,
+-): ArrayOfLength<3, readonly [TwoDiceSumValue, TwoDiceSumValue]> =>
++): FixedLengthTuple<3, FixedLengthTuple<2, TwoDiceSumValue>> =>
+   [
+     [addDiceValues(a, b), addDiceValues(c, d)],
+     [addDiceValues(a, c), addDiceValues(b, d)],

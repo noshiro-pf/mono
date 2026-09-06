@@ -106,7 +106,7 @@ const measureEntry = (
 
   for (const depth of DEPTHS) {
     if (mut_skippingRest) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       continue;
     }
@@ -116,7 +116,7 @@ const measureEntry = (
 
     if (check === 0 || !Number.isFinite(check)) {
       console.error(
-        `❌ ${entry.label} N=${String(depth)}: got ${String(check)}`,
+        `❌ ${entry.label} N=${depth.toString()}: got ${check.toString()}`,
       );
 
       process.exit(1);
@@ -131,12 +131,12 @@ const measureEntry = (
     const { times, timedOut } = measureRounds(mod, depth);
 
     if (timedOut) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       mut_skippingRest = true;
 
       console.info(
-        `  ⏱ ${entry.label} N=${String(depth)}: TIMEOUT (> ${String(TIMEOUT_MS)} ms)`,
+        `  ⏱ ${entry.label} N=${depth.toString()}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,
       );
     } else {
       const sorted = times.toSorted((a, b) => a - b);
@@ -146,7 +146,7 @@ const measureEntry = (
       mut_cells.push(`${med.toFixed(1)} ms`);
 
       console.info(
-        `  ✓ ${entry.label} N=${String(depth)}: ${med.toFixed(1)} ms`,
+        `  ✓ ${entry.label} N=${depth.toString()}: ${med.toFixed(1)} ms`,
       );
     }
   }
@@ -155,11 +155,11 @@ const measureEntry = (
 };
 
 console.info(
-  `\n## Cascaded Diamond (K=${String(K)} updates, ${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
+  `\n## Cascaded Diamond (K=${K.toString()} updates, ${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
 );
 
 // Column headers
-const colHeaders = DEPTHS.map((d) => `N=${String(d)}`);
+const colHeaders = DEPTHS.map((d) => `N=${d.toString()}`);
 
 const mut_tableLines: string[] = [
   `| Library | ${colHeaders.join(' | ')} |`,

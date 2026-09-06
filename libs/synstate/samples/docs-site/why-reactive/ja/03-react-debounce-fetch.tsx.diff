@@ -1,6 +1,6 @@
 --- en/03-react-debounce-fetch.tsx
 +++ ja/03-react-debounce-fetch.tsx
-@@ -9,7 +9,7 @@
+@@ -6,7 +6,7 @@
  
  /* embed-sample-code-ignore-this-line */ const Component =
    /* embed-sample-code-ignore-this-line */ (): React.JSX.Element => {
@@ -9,7 +9,7 @@
      const [query, setQuery] = React.useState('');
      const [results, setResults] = React.useState([]);
      const timerRef = React.useRef<number | undefined>(undefined);
-@@ -18,7 +18,7 @@
+@@ -15,7 +15,7 @@
      React.useEffect(() => {
        clearTimeout(timerRef.current);
        timerRef.current = window.setTimeout(() => {
@@ -18,7 +18,7 @@
          abortRef.current?.abort();
          const controller = new AbortController();
          abortRef.current = controller;
-@@ -35,7 +35,7 @@
+@@ -34,7 +34,7 @@
  
        return () => {
          clearTimeout(timerRef.current);

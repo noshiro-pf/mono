@@ -70,7 +70,7 @@ const median = (sorted: readonly number[]): number => {
 };
 
 console.info(
-  `\n## Conditional Fan-Out (K=${String(K)} inactive-branch updates, ${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
+  `\n## Conditional Fan-Out (K=${K.toString()} inactive-branch updates, ${WARMUP_ROUNDS.toString()} warmup + ${MEASURE_ROUNDS.toString()} measured, timeout=${TIMEOUT_MS.toString()} ms)\n`,
 );
 
 /**
@@ -120,7 +120,7 @@ const measureEntry = (
 
   for (const branchCount of BRANCH_COUNTS) {
     if (mut_skippingRest) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       continue;
     }
@@ -131,7 +131,7 @@ const measureEntry = (
     // Result should be 0: selector=0, active branch=branch[0]=0
     if (!Number.isFinite(check)) {
       console.error(
-        `❌ ${entry.label} B=${String(branchCount)}: got ${String(check)}`,
+        `❌ ${entry.label} B=${branchCount.toString()}: got ${check.toString()}`,
       );
 
       process.exit(1);
@@ -146,12 +146,12 @@ const measureEntry = (
     const { times, timedOut } = measureRounds(mod, branchCount);
 
     if (timedOut) {
-      mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
+      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
 
       mut_skippingRest = true;
 
       console.info(
-        `  ⏱ ${entry.label} B=${String(branchCount)}: TIMEOUT (> ${String(TIMEOUT_MS)} ms)`,
+        `  ⏱ ${entry.label} B=${branchCount.toString()}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,
       );
     } else {
       const sorted = times.toSorted((a, b) => a - b);
@@ -161,7 +161,7 @@ const measureEntry = (
       mut_cells.push(`${med.toFixed(1)} ms`);
 
       console.info(
-        `  ✓ ${entry.label} B=${String(branchCount)}: ${med.toFixed(1)} ms`,
+        `  ✓ ${entry.label} B=${branchCount.toString()}: ${med.toFixed(1)} ms`,
       );
     }
   }
@@ -170,7 +170,7 @@ const measureEntry = (
 };
 
 // Column headers
-const colHeaders = BRANCH_COUNTS.map((b) => `B=${String(b)}`);
+const colHeaders = BRANCH_COUNTS.map((b) => `B=${b.toString()}`);
 
 const mut_tableLines: string[] = [
   `| Library | ${colHeaders.join(' | ')} |`,

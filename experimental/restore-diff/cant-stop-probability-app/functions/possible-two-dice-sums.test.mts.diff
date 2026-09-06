@@ -1,0 +1,53 @@
+diff --git experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.test.ts apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.test.mts
+index 5f78b391d..763463630 100644
+--- experimental/packages/apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.test.ts
++++ apps/cant-stop-probability-app/src/functions/possible-two-dice-sums.test.mts
+@@ -1,31 +1,37 @@
+-import { possibleTwoDiceSums } from './possible-two-dice-sums';
++import { ISet } from 'ts-data-forge';
++import { possibleTwoDiceSums } from './possible-two-dice-sums.mjs';
+ 
+ test('{1, 1, 1, 1} -> {2}', () => {
+-  expect(possibleTwoDiceSums(1, 1, 1, 1).toRawSet()).toStrictEqual(
+-    ISet.new([2]).toRawSet(),
++  assert.deepStrictEqual(
++    possibleTwoDiceSums(1, 1, 1, 1).toRawSet(),
++    ISet.create([2]).toRawSet(),
+   );
+ });
+ 
+ test('{1, 1, 1, 2} -> {2, 3}', () => {
+-  expect(possibleTwoDiceSums(1, 1, 1, 2).toRawSet()).toStrictEqual(
+-    ISet.new([2, 3]).toRawSet(),
++  assert.deepStrictEqual(
++    possibleTwoDiceSums(1, 1, 1, 2).toRawSet(),
++    ISet.create([2, 3]).toRawSet(),
+   );
+ });
+ 
+ test('{2, 2, 1, 1} -> {2, 3, 4}', () => {
+-  expect(possibleTwoDiceSums(2, 2, 1, 1).toRawSet()).toStrictEqual(
+-    ISet.new([2, 3, 4]).toRawSet(),
++  assert.deepStrictEqual(
++    possibleTwoDiceSums(2, 2, 1, 1).toRawSet(),
++    ISet.create([2, 3, 4]).toRawSet(),
+   );
+ });
+ 
+ test('{2, 2, 5, 6} -> {4, 7, 8, 11}', () => {
+-  expect(possibleTwoDiceSums(2, 2, 5, 6).toRawSet()).toStrictEqual(
+-    ISet.new([4, 7, 8, 11]).toRawSet(),
++  assert.deepStrictEqual(
++    possibleTwoDiceSums(2, 2, 5, 6).toRawSet(),
++    ISet.create([4, 7, 8, 11]).toRawSet(),
+   );
+ });
+ 
+ test('{1, 1, 1, 5} -> {2, 6}', () => {
+-  expect(possibleTwoDiceSums(1, 1, 1, 5).toRawSet()).toStrictEqual(
+-    ISet.new([2, 6]).toRawSet(),
++  assert.deepStrictEqual(
++    possibleTwoDiceSums(1, 1, 1, 5).toRawSet(),
++    ISet.create([2, 6]).toRawSet(),
+   );
+ });

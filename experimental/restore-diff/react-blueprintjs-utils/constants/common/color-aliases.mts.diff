@@ -1,5 +1,5 @@
 diff --git experimental/packages/utils/react-blueprintjs-utils/src/constants/common/color-aliases.mts apps/react-blueprintjs-utils/src/constants/common/color-aliases.mts
-index 2e6f752c8..be91762f1 100644
+index 2e6f752c8..91888e73b 100644
 --- experimental/packages/utils/react-blueprintjs-utils/src/constants/common/color-aliases.mts
 +++ apps/react-blueprintjs-utils/src/constants/common/color-aliases.mts
 @@ -25,51 +25,81 @@ import {
@@ -40,7 +40,8 @@ index 2e6f752c8..be91762f1 100644
  export const ptDarkLinkColor = blue5;
 +
  // Default text selection color using #7dbcff
- export const ptTextSelectionColor = `rgba(125, 188, 255, 0.6)`;
+-export const ptTextSelectionColor = `rgba(125, 188, 255, 0.6)`;
++export const ptTextSelectionColor = 'rgba(125, 188, 255, 0.6)';
  
  export const ptIconColor = ptTextColorMuted;
 +

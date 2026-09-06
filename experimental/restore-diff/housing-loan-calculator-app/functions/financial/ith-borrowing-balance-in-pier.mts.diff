@@ -1,0 +1,44 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/financial/ith-borrowing-balance-in-pier.ts apps/housing-loan-calculator-app/src/functions/financial/ith-borrowing-balance-in-pier.mts
+index 8b3eedb1c..2dedbb35b 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/financial/ith-borrowing-balance-in-pier.ts
++++ apps/housing-loan-calculator-app/src/functions/financial/ith-borrowing-balance-in-pier.mts
+@@ -1,4 +1,5 @@
+-import { type PercentFloat } from '../../types';
++import { Num, asNonZeroFiniteNumber, type SafeUint } from 'ts-data-forge';
++import { type PercentFloat } from '../../types/index.mjs';
+ 
+ /**
+  * 元利均等返済におけるi回支払い後の残高
+@@ -7,17 +8,27 @@ import { type PercentFloat } from '../../types';
+  */
+ export const ithBorrowingBalanceInPIER = ({
+   total,
+-  numPayments: n,
+-  interestRate: r,
+-  ith: i,
++  numPayments,
++  interestRate,
++  ith,
+ }: Readonly<{
+   total: number;
+   numPayments: SafeUint;
+   interestRate: PercentFloat;
+   ith: SafeUint;
+ }>): number => {
+-  const q = 1 + r;
++  const q = 1 + interestRate;
++
++  // Widened before negating: `no-unsafe-unary-minus` rejects a unary minus on
++  // a branded integer, and `lint:fix` rewrites the `-1 * numPayments` the
++  // source used back into that unary form.
++  const exponent: number = numPayments;
++
+   return (
+-    total * Num.div(1 - q ** (i - n), toNonZeroFiniteNumber(1 - q ** (-1 * n)))
++    total *
++    Num.div(
++      1 - q ** (ith - numPayments),
++      asNonZeroFiniteNumber(1 - q ** -exponent),
++    )
+   );
+ };

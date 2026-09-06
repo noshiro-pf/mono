@@ -1,0 +1,16 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-principal-and-interest-equal-repayment.ts apps/housing-loan-calculator-app/src/functions/calc-principal-and-interest-equal-repayment.mts
+index 2177d0b22..b249c1b53 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/functions/calc-principal-and-interest-equal-repayment.ts
++++ apps/housing-loan-calculator-app/src/functions/calc-principal-and-interest-equal-repayment.mts
+@@ -1,5 +1,9 @@
+-import { type PercentFloat, Yen } from '../types';
+-import { ithBorrowingBalanceInPIER, monthlyPaymentsInPIER } from './financial';
++import { Arr, Uint32 } from 'ts-data-forge';
++import { type PercentFloat, Yen } from '../types/index.mjs';
++import {
++  ithBorrowingBalanceInPIER,
++  monthlyPaymentsInPIER,
++} from './financial/index.mjs';
+ 
+ export const calcPrincipalAndInterestEqualPayment = ({
+   borrowingPeriodMonth: numPayments,

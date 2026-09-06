@@ -1,0 +1,36 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/app.tsx apps/blueprintjs-playground-styled/src/app.tsx
+index 588b0538c..d2e07f75f 100644
+--- experimental/packages/apps/blueprintjs-playground-styled/src/app.tsx
++++ apps/blueprintjs-playground-styled/src/app.tsx
+@@ -1,4 +1,8 @@
+-import { InputGroupView, NumericInputView } from './components';
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++import { noop, NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { InputGroupView } from './components/index.mjs';
+ 
+ export const App = memoNamed('App', () => (
+   <div
+@@ -12,10 +16,10 @@ export const App = memoNamed('App', () => (
+ 
+     <h2>{'NumericInput'}</h2>
+     <MarginBox>
+-      <NumericInputView disabled={false} fill={true} value={0} />
++      <NumericInputView disabled={false} fillSpace valueAsStr={'0'} />
+     </MarginBox>
+     <MarginBox>
+-      <NumericInputView disabled={true} fill={true} value={0} />
++      <NumericInputView disabled fillSpace valueAsStr={'0'} />
+     </MarginBox>
+ 
+     <h2>{'InputGroup'}</h2>
+@@ -23,7 +27,7 @@ export const App = memoNamed('App', () => (
+       <InputGroupView value={'aaa'} onChange={noop} />
+     </MarginBox>
+     <MarginBox>
+-      <InputGroupView disabled={true} value={'aaa'} onChange={noop} />
++      <InputGroupView disabled value={'aaa'} onChange={noop} />
+     </MarginBox>
+     <MarginBox>
+       <InputGroupView

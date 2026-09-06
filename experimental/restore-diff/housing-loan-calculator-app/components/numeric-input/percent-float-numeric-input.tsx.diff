@@ -1,0 +1,48 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/percent-float-numeric-input.tsx apps/housing-loan-calculator-app/src/components/numeric-input/percent-float-numeric-input.tsx
+index 72e910310..f92c02ef9 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/numeric-input/percent-float-numeric-input.tsx
++++ apps/housing-loan-calculator-app/src/components/numeric-input/percent-float-numeric-input.tsx
+@@ -1,6 +1,9 @@
+-import { useNumericInputWithStepState } from '@noshiro/numeric-input-utils';
+-import { NumericInputView } from '@noshiro/react-blueprintjs-utils';
+-import { PercentFloat } from '../../types';
++import { useNumericInputWithStepState } from 'numeric-input-utils';
++import * as React from 'react';
++import { NumericInputView } from 'react-blueprintjs-utils';
++import { memoNamed } from 'react-utils';
++import { Num, Result } from 'ts-data-forge';
++import { PercentFloat } from '../../types/index.mjs';
+ 
+ type Props = Readonly<{
+   value: PercentFloat;
+@@ -32,14 +35,15 @@ export const PercentFloatNumericInput = memoNamed<Props>(
+       onKeyDown,
+     } = useNumericInputWithStepState<PercentFloat>({
+       onValueChange,
+-      normalize: (n) => PercentFloat.cast(Number(n)),
+-      decode: (s) => PercentFloat.cast(Number(s)),
++      normalize: (n) => PercentFloat.cast(n),
++      decode: (s) =>
++        PercentFloat.cast(Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN)),
+       encode: (s) => s.toString(),
+       valueFromProps,
+       step,
+     });
+ 
+-    const inputProps = useMemo(
++    const inputProps = React.useMemo(
+       () => ({ min, max, step, onKeyDown, 'data-e2e': cyId }),
+       [max, min, step, onKeyDown, cyId],
+     );
+@@ -47,9 +51,9 @@ export const PercentFloatNumericInput = memoNamed<Props>(
+     return (
+       <NumericInputView
+         disabled={disabled}
+-        fillSpace={true}
++        fillSpace
+         inputProps={inputProps}
+-        selectOnFocus={true}
++        selectOnFocus
+         valueAsStr={state}
+         onDecrementMouseDown={onDecrementMouseDown}
+         onIncrementMouseDown={onIncrementMouseDown}

@@ -1,0 +1,45 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-react/src/state.ts apps/lambda-calculus-interpreter-react/src/state.mts
+index 1955d6ceb..09bf3dacb 100644
+--- experimental/packages/apps/lambda-calculus-interpreter-react/src/state.ts
++++ apps/lambda-calculus-interpreter-react/src/state.mts
+@@ -2,25 +2,28 @@ import {
+   evalSequence,
+   parseLambdaTerm,
+   termToString,
+-} from '@noshiro/lambda-calculus-interpreter-core';
++} from 'lambda-calculus-interpreter-core';
++import {
++  type InitializedObservable,
++  createState,
++  debounce,
++  map,
++} from 'synstate';
++import { pipe } from 'ts-data-forge';
+ 
+-const {
+-  state: inputAreaString$,
+-  useCurrentValue: useInputAreaString,
+-  setState: setInputAreaString,
+-} = createState<string>('((+ 2) 3)');
++const [inputAreaString$, setInputAreaString] = createState<string>('((+ 2) 3)');
+ 
+ const outputAreaString$: InitializedObservable<string | undefined> =
+-  inputAreaString$.chain(debounceTime(200 /* ms */)).chain(
++  inputAreaString$.pipe(debounce(200 /* ms */)).pipe(
+     map(
+       (input) =>
+         pipe(input)
+-          .chain(parseLambdaTerm)
+-          .chainOptional(evalSequence)
+-          .chainOptional((seq) => seq.map(termToString))
+-          .chainOptional((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
++          .map(parseLambdaTerm)
++          .mapNullable(evalSequence)
++          .mapNullable((seq) => seq.map(termToString))
++          .mapNullable((seq) => seq.map((s, i) => `${i}.\t${s}`).join('\n'))
+           .value,
+     ),
+   );
+ 
+-export { outputAreaString$, setInputAreaString, useInputAreaString };
++export { inputAreaString$, outputAreaString$, setInputAreaString };

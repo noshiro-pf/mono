@@ -1,0 +1,8 @@
+diff --git experimental/packages/utils/better-preact-use-state/src/index.mts libs/better-preact-use-state/src/index.mts
+index 4a6b1bf39..db2dd45b5 100644
+--- experimental/packages/utils/better-preact-use-state/src/index.mts
++++ libs/better-preact-use-state/src/index.mts
+@@ -1 +1,2 @@
+-export * from './hooks/index.mjs';
++export * from './use-bool-state.mjs';
++export * from './use-state.mjs';

@@ -1,0 +1,23 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/components/button.tsx apps/blueprintjs-playground-styled/src/components/button.tsx
+index ea604ddc0..7f4f4ca8d 100644
+--- experimental/packages/apps/blueprintjs-playground-styled/src/components/button.tsx
++++ apps/blueprintjs-playground-styled/src/components/button.tsx
+@@ -1,15 +1,16 @@
++import styled from '@emotion/styled';
+ import {
+   ptButtonBase,
+   ptButtonHeight,
+   ptButtonHeightPx,
+-} from '../style-definitions';
++} from 'react-blueprintjs-utils';
+ 
+ export const Button = styled.button`
+   ${ptButtonBase}
+   ${ptButtonHeight(ptButtonHeightPx)}
+ 
+   &:empty {
+-    // override padding from other modifiers (for CSS icon support)
++    /* override padding from other modifiers (for CSS icon support) */
+     padding: 0 !important;
+   }
+ 

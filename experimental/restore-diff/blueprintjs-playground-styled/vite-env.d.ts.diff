@@ -1,0 +1,18 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/vite-env.d.ts experimental/packages/apps/blueprintjs-playground-styled/src/vite-env.d.ts
+deleted file mode 100644
+index a16993415..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/vite-env.d.ts
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/// <reference path="./globals.d.ts" />
+-
+-/// <reference types="react" />
+-/// <reference types="react-dom" />
+-
+-/// <reference types="vite/client" />
+-
+-import { type dict as dict_ } from './constants';
+-
+-declare global {
+-  const dict: typeof dict_;
+-}

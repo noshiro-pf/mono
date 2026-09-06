@@ -1,0 +1,11 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/common/index.ts experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/common/index.ts
+deleted file mode 100644
+index 835a55517..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/common/index.ts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-export * from './color-aliases';
+-export * from './colors';
+-export * from './mixins';
+-export * from './variables';
+-export * from './variables2';

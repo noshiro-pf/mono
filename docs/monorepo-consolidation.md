@@ -475,7 +475,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
     - **`syncflow` → `synstate` で最も手間だったのは `createState` の扱い。** 3 段階で前提が誤っていた — ①パッケージの選択はファイル単位で決まる（誤）→ ②呼び出しごとに決まる（不十分）→ ③**同一ファイルが同じ関数名で両方の版を必要とする**（正）。`synstate` は observable を、`synstate-react-hooks` は hook を返す
     - **`ts-data-forge` の API 変更で繰り返し当たったもの**: 参照系が `Optional` を返す（`IMap.get` / `Arr.first` / `Arr.last` / `Arr.maxBy`）、非破壊操作が `to…` 形に改名（`toSortedBy` / `toUpdated`）、`NonEmptyArray` と `FixedLengthArray` が brand 付きになった（分解する側は `FixedLengthTuple` が正解）
     - **後継が無く移植したもの**は各パッケージの `src/utils` にある。`match` / `mapOptional` / `noop` / `DateUtils` / `Obj.set` 系 / `Paths` / `hasKeyValue` / `createTinyObservable` / 曜日・月名の定数など
-    - **復元前後の差分は `experimental/restore-diff/` に書き出してある。** 13
+    - **復元前後の差分は `experimental/restore-diff/` に書き出してある。** 18
       パッケージぶん、`src/` の 1 ファイルにつき 1 つの `.diff`。何がどう
       書き換わったかを見るのに、`experimental/` の元ファイルと `apps/` の
       現ファイルを都度突き合わせる必要はない
@@ -483,7 +483,8 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
           `event-schedule-app` の `.ts` → `.mts` 190 件はこれで繋がる。それ以外の
           改名は生成器の `RENAMES` に手で書く — 現在 1 件で、#1631 が
           `use-tiny-observable-hooks.mts` を `use-observable.mts` にしたもの
-        - 内容が同一のファイル（703 中 143）には `.diff` を作っていない。
+        - 内容が同一のファイル（復元前 824 件のうち 146 件）には `.diff` を
+          作っていない。
           全ファイルの一覧は各パッケージの `_index.md` にあり、そこに
           `identical` として載る
         - **生成器（`scripts/gen-restore-diff.mjs`）も同じディレクトリに置いた。**
@@ -493,6 +494,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
           かける** — 除外されているぶんリポジトリ全体の整形パスが届かず、素の
           出力を書くと再生成のたびに表の桁揃えだけの差分が出るためである
           （`.diff` 本体はパッチなので整形してはいけない）
+        - **復元元は 2026-09-06 に消した。** 復元を「コピー＆修正」から
+          「移動＆修正」に揃えたので、`experimental/` 側に残っているのは
+          移植しなかったファイルだけになり、ここの `.diff` は移動直前の
+          凍結物になっている。詳細は `docs/experimental-inventory.md`
     - **その差分を読み直して、動作が変わっている箇所を 3 つ見つけた。**
       いずれも `fmt` / `lint` / `type-check` / `test` が全部通る状態で残っていた
       もので、**型検査で捕まらない書き換え**である

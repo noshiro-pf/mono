@@ -92,10 +92,10 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
   return (
     <svg
       style={svgStyle}
-      viewBox={`0 0 ${String(CHART_WIDTH)} ${String(CHART_HEIGHT)}`}
+      viewBox={`0 0 ${CHART_WIDTH.toString()} ${CHART_HEIGHT.toString()}`}
     >
       <g
-        transform={`translate(${String(PADDING.left)}, ${String(PADDING.top)})`}
+        transform={`translate(${PADDING.left.toString()}, ${PADDING.top.toString()})`}
       >
         {/* Grid lines */}
         {yTicks.map((tick) => (
@@ -121,7 +121,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
 
             return (
               <rect
-                key={`${group.label}-${series[bi]?.label ?? String(bi)}`}
+                key={`${group.label}-${series[bi]?.label ?? bi.toString()}`}
                 fill={series[bi]?.color ?? '#999'}
                 height={Math.max(0, height)}
                 rx={1.5}
@@ -162,7 +162,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
           fill={'var(--sl-color-gray-3, #6b7280)'}
           fontSize={12}
           textAnchor={'middle'}
-          transform={`translate(${String(-PADDING.left + 16)}, ${String(PLOT_H / 2)}) rotate(-90)`}
+          transform={`translate(${(-PADDING.left + 16).toString()}, ${(PLOT_H / 2).toString()}) rotate(-90)`}
         >
           {yAxisLabel}
         </text>
@@ -236,6 +236,6 @@ BenchmarkBarChart.displayName = 'BenchmarkBarChart';
 
 const svgStyle: React.CSSProperties = {
   width: '100%',
-  maxWidth: `${String(CHART_WIDTH)}px`,
+  maxWidth: `${CHART_WIDTH.toString()}px`,
   height: 'auto',
 } as const;

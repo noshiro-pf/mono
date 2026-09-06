@@ -1,5 +1,5 @@
 diff --git experimental/packages/apps/event-schedule-app/src/utils/split-string-by-whitespace.test.ts apps/event-schedule-app/src/utils/split-string-by-whitespace.test.mts
-index 351e23b5c..84b94790b 100644
+index 351e23b5c..6f6ec4d1d 100644
 --- experimental/packages/apps/event-schedule-app/src/utils/split-string-by-whitespace.test.ts
 +++ apps/event-schedule-app/src/utils/split-string-by-whitespace.test.mts
 @@ -1,4 +1,4 @@
@@ -8,7 +8,7 @@ index 351e23b5c..84b94790b 100644
  
  describe('splitStringByWhitespace', () => {
    test('1 whitespace', () => {
-@@ -22,9 +22,9 @@ describe('splitStringByWhitespace', () => {
+@@ -22,18 +22,16 @@ describe('splitStringByWhitespace', () => {
    test('2 sequential whitespaces', () => {
      expect(splitStringByWhitespace('aaa     bbb    ccc')).toStrictEqual([
        'aaa',
@@ -20,3 +20,13 @@ index 351e23b5c..84b94790b 100644
        'ccc',
      ]);
    });
+ 
+   test('2 sequential whitespaces and newline', () => {
+     expect(
+-      splitStringByWhitespace(`aaa
+-    bbb
+-    ccc`),
++      splitStringByWhitespace(['aaa', 'bbb', 'ccc'].join('\n    ')),
+     ).toStrictEqual(['aaa', '\n    ', 'bbb', '\n    ', 'ccc']);
+   });
+ });

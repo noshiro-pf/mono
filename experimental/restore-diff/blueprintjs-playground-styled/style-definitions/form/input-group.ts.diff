@@ -1,0 +1,22 @@
+diff --git experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/input-group.ts experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/input-group.ts
+deleted file mode 100644
+index fb4c3d622..000000000
+--- experimental/packages/apps/blueprintjs-playground-styled/src/style-definitions/form/input-group.ts
++++ /dev/null
+@@ -1,16 +0,0 @@
+-// 3px space between small button and regular input
+-
+-// 5px space between regular button and large input
+-
+-// 1px space between regular button and small input
+-
+-export const InputGroup = styled.div`
+-  display: block;
+-  position: relative;
+-`;
+-
+-export {
+-  ptButtonHeightPx as inputButtonHeightLargePx,
+-  ptButtonHeightSmallPx as inputButtonHeightPx,
+-  ptButtonHeightSmallerPx as inputButtonHeightSmallPx,
+-} from '../common';

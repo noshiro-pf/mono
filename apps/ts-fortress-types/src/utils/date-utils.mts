@@ -3,8 +3,10 @@ import {
   type DateEnum,
   type DayOfWeekIndex,
   type HoursEnum,
+  type Index,
   type MinutesEnum,
   type MonthEnum,
+  type ReadonlyRecord,
   type SafeUint,
 } from 'ts-type-forge';
 
@@ -182,8 +184,29 @@ export namespace DateUtils {
     date: DateEnum = 1,
     hours: HoursEnum = 0,
     minutes: MinutesEnum = 0,
-  ): Date => new Date(year, month - 1, date, hours, minutes);
+  ): Date => new Date(year, monthToIndex[month], date, hours, minutes);
 }
+
+/**
+ * `Date`'s month argument is 0-based, and the strict standard library types it
+ * as `Index<12>` rather than `number`. `month - 1` is provably in range for a
+ * `MonthEnum`, but subtraction widens to `number`, so the mapping is written
+ * out instead of asserted.
+ */
+const monthToIndex = {
+  1: 0,
+  2: 1,
+  3: 2,
+  4: 3,
+  5: 4,
+  6: 5,
+  7: 6,
+  8: 7,
+  9: 8,
+  10: 9,
+  11: 10,
+  12: 11,
+} as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
 
 const isInteger = (n: number, min: number, max: number): boolean =>
   Number.isSafeInteger(n) && n >= min && n <= max;

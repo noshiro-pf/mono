@@ -1,0 +1,9 @@
+diff --git experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/index.ts apps/housing-loan-calculator-app/src/components/config-section/index.mts
+index 89be22c53..16e101485 100644
+--- experimental/packages/apps/housing-loan-calculator-app/src/components/config-section/index.ts
++++ apps/housing-loan-calculator-app/src/components/config-section/index.mts
+@@ -1,2 +1,2 @@
+-export * from './config-section';
+-export * from './repayment-type-radio-group';
++export * from './config-section.js';
++export * from './repayment-type-radio-group.js';

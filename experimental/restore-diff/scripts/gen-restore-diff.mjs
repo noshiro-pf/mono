@@ -61,6 +61,28 @@ const PAIRS = [
     'apps/react-blueprintjs-utils',
   ],
   ['experimental/packages/apps/event-schedule-app', 'apps/event-schedule-app'],
+
+  // Restored after the step-3 batch, one pull request each.
+  [
+    'experimental/packages/apps/lambda-calculus-interpreter-react',
+    'apps/lambda-calculus-interpreter-react',
+  ],
+  [
+    'experimental/packages/utils/better-preact-use-state',
+    'libs/better-preact-use-state',
+  ],
+  [
+    'experimental/packages/apps/cant-stop-probability-app',
+    'apps/cant-stop-probability-app',
+  ],
+  [
+    'experimental/packages/apps/housing-loan-calculator-app',
+    'apps/housing-loan-calculator-app',
+  ],
+  [
+    'experimental/packages/apps/blueprintjs-playground-styled',
+    'apps/blueprintjs-playground-styled',
+  ],
 ];
 
 /**
@@ -153,6 +175,15 @@ const summary = [];
 for (const [oldDir, newDir] of PAIRS) {
   const oldSrc = path.join(repoRoot, oldDir, 'src');
   const newSrc = path.join(repoRoot, newDir, 'src');
+  // The copies these diffs were taken from are gone: the restores were squared
+  // up as moves, so `experimental/` keeps only what was never migrated. The
+  // `.diff` files are a snapshot of the moment before that, and re-running
+  // this from a tree without the sources would silently produce an empty set.
+  if (!fs.existsSync(oldSrc)) {
+    throw new Error(
+      `${oldSrc} is gone: check out the commit before the copies were removed to regenerate.`,
+    );
+  }
   const oldFiles = listFiles(oldSrc);
   const newFiles = listFiles(newSrc);
 
@@ -294,7 +325,7 @@ const readme = [
   '# `experimental/` からの復元 — src のファイル単位差分',
   '',
   '`docs/monorepo-consolidation.md` の step 3「旧 mono の復元」で',
-  '`experimental/` から復元した 13 パッケージについて、**復元前の `src/` と',
+  `\`experimental/\` から復元した ${summary.length} パッケージについて、**復元前の \`src/\` と`,
   '復元後の `src/` を 1 ファイルずつ突き合わせた差分**を置いてある。',
   '',
   '- 1 ファイル 1 `.diff`。パスは**復元後**の `src/` からの相対パスで、',
@@ -304,6 +335,10 @@ const readme = [
   '- 対応付けは「拡張子を除いた相対パス」で行っている。`event-schedule-app` の',
   '  `.ts` → `.mts` 190 件のような改名はこれで繋がる。それ以外の改名は',
   '  生成器の `RENAMES` に手で書いてある（現在 1 件）',
+  '- **復元元はもう残っていない。** 復元を「コピー＆修正」から「移動＆修正」に',
+  '  揃えたときに、移植したファイルは `experimental/` 側から消した。ここの',
+  '  `.diff` はその直前に生成した凍結物で、今の作業ツリーからは再生成できない',
+  '  （生成器はその場合エラーで止まる）',
   '',
   '## パッケージ別',
   '',

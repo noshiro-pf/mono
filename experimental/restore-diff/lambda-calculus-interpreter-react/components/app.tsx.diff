@@ -1,0 +1,60 @@
+diff --git experimental/packages/apps/lambda-calculus-interpreter-react/src/components/app.tsx experimental/packages/apps/lambda-calculus-interpreter-react/src/components/app.tsx
+deleted file mode 100644
+index 6eaf55972..000000000
+--- experimental/packages/apps/lambda-calculus-interpreter-react/src/components/app.tsx
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import {
+-  outputAreaString$,
+-  setInputAreaString,
+-  useInputAreaString,
+-} from '../state';
+-import { CodeArea } from './code-area';
+-
+-export const App = memoNamed('App', () => {
+-  const inputAreaString = useInputAreaString();
+-  const outputAreaString = useObservableValue(outputAreaString$);
+-
+-  return (
+-    <div
+-      css={css`
+-        padding: 10px;
+-        min-height: 100vh;
+-      `}
+-    >
+-      <h2>{'(Untyped) lambda calculus'}</h2>
+-      <div
+-        css={css`
+-          padding: 10px;
+-        `}
+-      >
+-        {'expr ::= x | (lambda x. expr) | (expr expr)'}
+-      </div>
+-      <TextAreaWrapper>
+-        <div>{'Input:'}</div>
+-        <CodeArea
+-          cyId={'input-area'}
+-          maxHeightPx={500}
+-          minHeightPx={100}
+-          value={inputAreaString}
+-          valueChange={setInputAreaString}
+-        />
+-      </TextAreaWrapper>
+-
+-      <TextAreaWrapper>
+-        <div>{'Output:'}</div>
+-        <CodeArea
+-          cyId={'output-area'}
+-          maxHeightPx={800}
+-          minHeightPx={500}
+-          value={outputAreaString ?? 'Parse error.'}
+-        />
+-      </TextAreaWrapper>
+-    </div>
+-  );
+-});
+-
+-const TextAreaWrapper = styled.div`
+-  padding: 10px;
+-  width: 100%;
+-`;
