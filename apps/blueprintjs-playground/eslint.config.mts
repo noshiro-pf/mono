@@ -1,5 +1,6 @@
 import {
   defineKnownRules,
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -20,6 +21,8 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
 
   ...eslintConfigForReact(),
+
+  eslintConfigForPlaywright(['e2e/**']),
 
   {
     files: ['src/**'],

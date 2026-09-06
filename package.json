@@ -73,6 +73,7 @@
     "ws:doc": "pnpm run --recursive --workspace-concurrency=1 --if-present doc",
     "ws:doc:embed": "pnpm run --recursive --workspace-concurrency=1 --if-present doc:embed",
     "ws:doc:embed:jsdoc": "pnpm run --recursive --workspace-concurrency=1 --if-present doc:embed:jsdoc",
+    "ws:e2e": "pnpm run --recursive --workspace-concurrency=1 --if-present e2e",
     "ws:gi": "pnpm run --recursive --workspace-concurrency=1 --if-present gi",
     "ws:lint": "pnpm run --recursive --if-present lint",
     "ws:lint:fix": "pnpm run --recursive --if-present lint:fix",
@@ -95,6 +96,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "3.0.1",
+    "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "@vitejs/plugin-react": "catalog:",

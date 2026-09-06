@@ -1,5 +1,6 @@
 import {
   defineKnownRules,
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -29,4 +30,5 @@ export default [
       'react-refresh/only-export-components': 'off',
     }),
   },
+  eslintConfigForPlaywright(['e2e/**']),
 ] satisfies readonly FlatConfig[];

@@ -1,4 +1,5 @@
 import {
+  eslintConfigForPlaywright,
   eslintConfigForReact,
   eslintConfigForTypeScript,
   type FlatConfig,
@@ -21,4 +22,5 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   ...eslintConfigForReact(),
+  eslintConfigForPlaywright(['e2e/**']),
 ] satisfies readonly FlatConfig[];

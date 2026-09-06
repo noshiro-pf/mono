@@ -4,6 +4,7 @@
 # Only devDependencies use the catalog: a published package's dependencies and
 # peerDependencies are its own API surface, so their ranges stay literal.
 catalog:
+  '@playwright/test': 1.62.1
   '@reduxjs/toolkit': 2.12.0
   '@testing-library/dom': 10.4.1
   '@testing-library/preact': 3.2.4

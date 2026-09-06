@@ -107,6 +107,9 @@ settings:
 
 catalogs:
   default:
+    '@playwright/test':
+      specifier: 1.62.1
+      version: 1.62.1
     '@reduxjs/toolkit':
       specifier: 2.12.0
       version: 2.12.0
@@ -241,6 +244,9 @@ importers:
       '@changesets/cli':
         specifier: 3.0.1
         version: 3.0.1
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/node':
         specifier: 'catalog:'
         version: 26.4.1
@@ -386,6 +392,9 @@ importers:
         specifier: workspace:*
         version: link:../ts-utils-additional
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       eslint:
         specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
@@ -538,6 +547,9 @@ importers:
         specifier: workspace:*
         version: link:../react-utils
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -602,6 +614,9 @@ importers:
         specifier: workspace:*
         version: link:../react-utils
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -678,6 +693,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -757,6 +775,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1088,6 +1109,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1210,6 +1234,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       eslint:
         specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
@@ -1265,6 +1292,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -1329,6 +1359,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.62.1
       eslint:
         specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
@@ -1624,10 +1657,10 @@ importers:
     dependencies:
       '@blueprintjs/core':
         specifier: ^6.18.0
-        version: 6.18.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
+        version: 6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@blueprintjs/datetime':
         specifier: ^6.2.4
-        version: 6.2.4(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
+        version: 6.2.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.2.18)(react@19.2.8)(supports-color@7.2.0)
@@ -1686,6 +1719,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.2.8
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.8(react@19.2.8)
       ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
@@ -6829,6 +6865,11 @@ packages:
   '@pixi/utils@5.3.12':
     resolution: {integrity: sha512-PU/L852YjVbTy/6fDKQtYji6Vqcwi5FZNIjK6JXKuDPF411QfJK3QBaEqJTrexzHlc9Odr0tYECjwtXkCUR02g==}
 
+  '@playwright/test@1.62.1':
+    resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   '@pnpm/deps.graph-sequencer@1100.0.1':
     resolution: {integrity: sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A==}
     engines: {node: '>=22.13'}
@@ -10572,11 +10613,6 @@ packages:
       date-fns: ^2.28.0 || ^3.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  react-dom@18.3.1:
-    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
-    peerDependencies:
-      react: ^18.3.1
-
   react-dom@19.2.8:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
     peerDependencies:
@@ -10831,9 +10867,6 @@ packages:
   sax@1.6.1:
     resolution: {integrity: sha512-42tBVwLWnaQvW5zc4HbZrTuWccECCZfBi92FDuwtqxasH+JbPB3/FOKb1m222K42R4WxuxzzMsTswfzgtSu64Q==}
     engines: {node: '>=11.0.0'}
-
-  scheduler@0.23.2:
-    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
@@ -13182,22 +13215,6 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
-  '@blueprintjs/core@6.18.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@blueprintjs/colors': 5.1.16
-      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@floating-ui/react': 0.27.20(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@popperjs/core': 2.11.8
-      classnames: 2.5.1
-      normalize.css: 8.0.1
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
-      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      react-transition-group: 4.4.5(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      tslib: 2.6.3
-    optionalDependencies:
-      '@types/react': 19.2.18
-
   '@blueprintjs/core@6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@blueprintjs/colors': 5.1.16
@@ -13228,22 +13245,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
-  '@blueprintjs/datetime@6.2.4(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@blueprintjs/select': 6.3.4(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      classnames: 2.5.1
-      date-fns: 2.30.0
-      date-fns-tz: 2.0.1(date-fns@2.30.0)
-      react: 19.2.8
-      react-day-picker: 8.10.2(date-fns@2.30.0)(react@19.2.8)
-      react-dom: 18.3.1(react@19.2.8)
-      react-innertext: 1.1.5(@types/react@19.2.18)(react@19.2.8)
-      tslib: 2.6.3
-    optionalDependencies:
-      '@types/react': 19.2.18
-
   '@blueprintjs/datetime@6.2.4(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -13260,34 +13261,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
-  '@blueprintjs/icons@6.13.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      change-case: 4.1.2
-      classnames: 2.5.1
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
-      tslib: 2.6.3
-    optionalDependencies:
-      '@types/react': 19.2.18
-
   '@blueprintjs/icons@6.13.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       change-case: 4.1.2
       classnames: 2.5.1
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
-      tslib: 2.6.3
-    optionalDependencies:
-      '@types/react': 19.2.18
-
-  '@blueprintjs/select@6.3.4(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@blueprintjs/colors': 5.1.16
-      '@blueprintjs/core': 6.18.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@blueprintjs/icons': 6.13.0(@types/react@19.2.18)(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      classnames: 2.5.1
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
       tslib: 2.6.3
     optionalDependencies:
       '@types/react': 19.2.18
@@ -14355,25 +14334,11 @@ snapshots:
       '@floating-ui/core': 1.8.0
       '@floating-ui/utils': 0.2.12
 
-  '@floating-ui/react-dom@2.1.9(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@floating-ui/dom': 1.8.0
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
-
   '@floating-ui/react-dom@2.1.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
-
-  '@floating-ui/react@0.27.20(react-dom@18.3.1(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@floating-ui/react-dom': 2.1.9(react-dom@18.3.1(react@19.2.8))(react@19.2.8)
-      '@floating-ui/utils': 0.2.12
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
-      tabbable: 6.5.0
 
   '@floating-ui/react@0.27.20(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -15261,6 +15226,10 @@ snapshots:
       earcut: 2.2.4
       eventemitter3: 3.1.2
       url: 0.11.4
+
+  '@playwright/test@1.62.1':
+    dependencies:
+      playwright: 1.62.1
 
   '@pnpm/deps.graph-sequencer@1100.0.1': {}
 
@@ -19717,12 +19686,6 @@ snapshots:
       date-fns: 2.30.0
       react: 19.2.8
 
-  react-dom@18.3.1(react@19.2.8):
-    dependencies:
-      loose-envify: 1.4.0
-      react: 19.2.8
-      scheduler: 0.23.2
-
   react-dom@19.2.8(react@19.2.8):
     dependencies:
       react: 19.2.8
@@ -19741,14 +19704,6 @@ snapshots:
 
   react-is@19.2.8: {}
 
-  react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.1(react@19.2.8))(react@19.2.8):
-    dependencies:
-      '@popperjs/core': 2.11.8
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
-      react-fast-compare: 3.2.2
-      warning: 4.0.3
-
   react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@popperjs/core': 2.11.8
@@ -19758,15 +19713,6 @@ snapshots:
       warning: 4.0.3
 
   react-refresh@0.18.0: {}
-
-  react-transition-group@4.4.5(react-dom@18.3.1(react@19.2.8))(react@19.2.8):
-    dependencies:
-      '@babel/runtime': 7.29.7
-      dom-helpers: 5.2.1
-      loose-envify: 1.4.0
-      prop-types: 15.8.1
-      react: 19.2.8
-      react-dom: 18.3.1(react@19.2.8)
 
   react-transition-group@4.4.5(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
@@ -20176,10 +20122,6 @@ snapshots:
       '@bruits/satteri-win32-x64-msvc': 0.9.5
 
   sax@1.6.1: {}
-
-  scheduler@0.23.2:
-    dependencies:
-      loose-envify: 1.4.0
 
   scheduler@0.27.0: {}
 
