@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-type-forge": "file:../../../.tarballs/eslint-plugin-ts-type-forge.tgz"
+    "eslint": ">=9.0.0",
+    "eslint-plugin-ts-type-forge": "file:../../../.tarballs/eslint-plugin-ts-type-forge.tgz",
+    "typescript": ">=5.0.0"
   }
 }

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-data-forge": "file:../../../.tarballs/ts-data-forge.tgz"
+    "ts-data-forge": "file:../../../.tarballs/ts-data-forge.tgz",
+    "typescript": ">=4.8"
   }
 }

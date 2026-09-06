@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "eslint-plugin-ts-fortress": "file:../../../.tarballs/eslint-plugin-ts-fortress.tgz"
+    "eslint": ">=9.0.0",
+    "eslint-plugin-ts-fortress": "file:../../../.tarballs/eslint-plugin-ts-fortress.tgz",
+    "typescript": ">=5.0.0"
   }
 }

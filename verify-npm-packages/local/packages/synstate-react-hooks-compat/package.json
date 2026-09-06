@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "react": ">=16.8.0",
     "synstate-react-hooks-compat": "file:../../../.tarballs/synstate-react-hooks-compat.tgz"
   }
 }

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "better-react-use-state": "file:../../../.tarballs/better-react-use-state.tgz"
+    "better-react-use-state": "file:../../../.tarballs/better-react-use-state.tgz",
+    "react": ">=16.8.0"
   }
 }

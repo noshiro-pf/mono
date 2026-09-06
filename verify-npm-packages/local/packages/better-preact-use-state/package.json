@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "better-preact-use-state": "file:../../../.tarballs/better-preact-use-state.tgz"
+    "better-preact-use-state": "file:../../../.tarballs/better-preact-use-state.tgz",
+    "preact": ">=10.0.0"
   }
 }

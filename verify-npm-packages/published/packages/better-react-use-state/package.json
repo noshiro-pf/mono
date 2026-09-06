@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "better-react-use-state": "1.0.3"
+    "better-react-use-state": "1.0.3",
+    "react": ">=16.8.0"
   }
 }
