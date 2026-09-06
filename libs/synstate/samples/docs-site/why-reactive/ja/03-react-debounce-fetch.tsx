@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/use-unknown-in-catch-callback-variable */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable unicorn/prefer-global-this */
 /* eslint-disable @stylistic/padding-line-between-statements */
 // embed-sample-code-ignore-above

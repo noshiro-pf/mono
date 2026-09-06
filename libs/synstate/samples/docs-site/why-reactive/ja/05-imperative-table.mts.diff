@@ -1,6 +1,6 @@
 --- en/05-imperative-table.mts
 +++ ja/05-imperative-table.mts
-@@ -22,12 +22,12 @@
+@@ -21,12 +21,12 @@
  let currentPageInput = 1;
  let allRows: readonly Row[] = [];
  
@@ -15,7 +15,7 @@
  const fetchData = async (): Promise<void> => {
    try {
      /* embed-sample-code-ignore-this-line */ // @ts-expect-error `Response.json()` is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
-@@ -58,10 +58,10 @@
+@@ -57,10 +57,10 @@
    renderTable(filteredRows.slice(start, start + itemsPerPage));
  };
  

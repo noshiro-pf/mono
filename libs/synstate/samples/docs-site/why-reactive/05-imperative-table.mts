@@ -1,5 +1,4 @@
 /* transformer-ignore */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable total-functions/no-partial-division */
 /* eslint-disable @stylistic/padding-line-between-statements */
 /* eslint-disable import-x/unambiguous */
