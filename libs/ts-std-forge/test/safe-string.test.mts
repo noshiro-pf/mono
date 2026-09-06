@@ -199,3 +199,22 @@ describe('SafeString.repeat', () => {
     );
   });
 });
+
+describe('SafeString.fromPrimitive', () => {
+  test.each([
+    { value: 'abc', expected: 'abc' },
+    { value: 42, expected: '42' },
+    { value: true, expected: 'true' },
+    { value: 10n, expected: '10' },
+    { value: undefined, expected: 'undefined' },
+  ])('fromPrimitive($value) returns $expected', ({ value, expected }) => {
+    assert.deepStrictEqual(SafeString.fromPrimitive(value), expected);
+  });
+
+  test('stringifies a symbol, which a template literal cannot', () => {
+    assert.deepStrictEqual(
+      SafeString.fromPrimitive(Symbol('tag')),
+      'Symbol(tag)',
+    );
+  });
+});

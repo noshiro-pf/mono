@@ -36,17 +36,37 @@ error messages, whose wording ECMAScript leaves unspecified.
   is caught by a `Result.fromThrowable` backstop and surfaces as
   `{ kind: 'unexpected', cause: Error }`.
 
+## Constructor calls without `new` (D-15 / D-41)
+
+Tsubu forbids calling the built-in constructors as plain functions
+(`Number(x)`, `String(x)`, `Boolean(x)`, …): they are implicit conversions
+whose intent is not in the name and whose failure is a sentinel. The
+replacements that are stdlib wrappers live here — `SafeNumber.parse` /
+`SafeNumber.parseInteger` for `Number(str)` / `Number.parseInt(str, 10)`, `SafeString.fromPrimitive` for `String(x)`, `Regex.create` for
+`RegExp(p, f)`. The rest need no new API: `Error('msg')` / `Date()` become
+their `new` forms, `Array(n)` a literal or ts-data-forge's `Arr.newArray` /
+`Arr.seq`, and `Boolean(x)` an explicit comparison (there is deliberately no
+truthiness helper). `Symbol()` and `BigInt()` are not affected — they have
+no `new` form.
+
 ## Current API
 
 - `Regex.create(pattern, flags?)` — `new RegExp` without throwing. Pattern validity is the engine's own grammar check (not pre-validatable); a caught `SyntaxError` becomes `'invalid-regexp'` with the error as `cause`, anything else `'unexpected'`.
 - `SafeDate.toISOString(date)` — `Date.prototype.toISOString` without throwing (Invalid Date → `Err<{ kind: 'invalid-date' }>`).
+- `SafeNumber.parse(value)` — the alternative to `Number(str)`: the same implementation as ts-data-forge's `Num.safeParseFloat` (a copy, not a dependency), returning `Ok<number>` (finite) or `Err<{ kind: 'invalid-number', input }>` for blank input, trailing garbage, `NaN` and `±Infinity`.
+- `SafeNumber.parseInteger(value)` — the alternative to `Number.parseInt(str, 10)`: the same implementation as `Num.safeParseInt` plus a finiteness check, returning `Ok<number>` (an integer, truncated toward zero) or `Err<{ kind: 'invalid-integer', input }>`. Named `parseInteger` because a declaration named `parseInt` would shadow the global.
 - `SafeNumber.toFixed(value, fractionDigits)` — `fractionDigits: UintRangeInclusive<0, 100>`; total, returns `string`.
 - `SafeNumber.toExponential(value, fractionDigits?)` — `fractionDigits?: UintRangeInclusive<0, 100>`; total, returns `string`.
 - `SafeNumber.toPrecision(value, precision)` — `precision: UintRangeInclusive<1, 100>`; total, returns `string`.
 - `SafeNumber.toStringWithRadix(value, radix)` — `radix: UintRangeInclusive<2, 36>`; total, returns `string`.
 - `SafeString.fromCodePoint(...codePoints)` — `String.fromCodePoint` without throwing (`Err<{ kind: 'invalid-code-point', codePoint, index }>`).
+- `SafeString.fromPrimitive(value)` — the alternative to `String(x)` for `string | number | boolean | bigint | symbol | undefined` (the last three cannot go in a template literal); total, returns `string`.
 - `SafeString.normalize(value, form?)` — `form` is typed as the `'NFC' | 'NFD' | 'NFKC' | 'NFKD'` union; total, returns `string`.
 - `SafeString.repeat(value, count)` — `String.prototype.repeat` without throwing (`Err<{ kind: 'invalid-count' }>`; an engine length-limit overflow surfaces as `'unexpected'`).
+
+Neither returns a branded number (`FiniteNumber` / `Int`): ts-std-forge
+does not use ts-type-forge's number brands, and an ESLint rule in this
+package allows only the literal-range types to be imported from it.
 
 Functions that can still fail export their failure type alongside
 (`SafeString.FromCodePointError`, `Regex.CreateError`, …), and the shared
