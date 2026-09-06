@@ -175,6 +175,15 @@ const summary = [];
 for (const [oldDir, newDir] of PAIRS) {
   const oldSrc = path.join(repoRoot, oldDir, 'src');
   const newSrc = path.join(repoRoot, newDir, 'src');
+  // The copies these diffs were taken from are gone: the restores were squared
+  // up as moves, so `experimental/` keeps only what was never migrated. The
+  // `.diff` files are a snapshot of the moment before that, and re-running
+  // this from a tree without the sources would silently produce an empty set.
+  if (!fs.existsSync(oldSrc)) {
+    throw new Error(
+      `${oldSrc} is gone: check out the commit before the copies were removed to regenerate.`,
+    );
+  }
   const oldFiles = listFiles(oldSrc);
   const newFiles = listFiles(newSrc);
 
@@ -326,6 +335,10 @@ const readme = [
   '- 対応付けは「拡張子を除いた相対パス」で行っている。`event-schedule-app` の',
   '  `.ts` → `.mts` 190 件のような改名はこれで繋がる。それ以外の改名は',
   '  生成器の `RENAMES` に手で書いてある（現在 1 件）',
+  '- **復元元はもう残っていない。** 復元を「コピー＆修正」から「移動＆修正」に',
+  '  揃えたときに、移植したファイルは `experimental/` 側から消した。ここの',
+  '  `.diff` はその直前に生成した凍結物で、今の作業ツリーからは再生成できない',
+  '  （生成器はその場合エラーで止まる）',
   '',
   '## パッケージ別',
   '',
