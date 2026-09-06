@@ -38,7 +38,6 @@
 - [ ] `undefined` の排除(D-31): ts-std-forge の Optional ラッパー層が前提。Sumi sugar 以降で `Optional<T>` へ一本化する規則を書く。
 - [ ] default export を emit する Sumi sugar の設定ファイル / ディレクティブの設計(D-36)と、`using` の Sumi sugar での再検討(D-30)。
 - [ ] barrel `export *` の扱い(2026-09-05 保留 — D-28)。
-- [ ] Sumi sugar のファイル拡張子の再決定(`.tsb` は旧名 Tsubu 由来 — D-44)。
 - [ ] 拘束 compilerOptions の検証(`tsc --showConfig` の実効値と base tsconfig の拘束項目の一致検査 — D-40)を preset / チェッカーに実装する。base tsconfig の配布物化は preset 追補で。
 - [ ] future-syntax.md の各候補に「Sumi lint ライブラリ形」と両向きの codemod を明記する(D-37)。ライブラリ形の未整備分(パターンマッチ用 `match`、`?` 伝播用 `safeTry` 系)は ts-data-forge の並行ワークストリームへ。
 - [ ] getter/setter の粒度の深掘り(plain object の遅延評価 — [spec/banned-syntax.md](./spec/banned-syntax.md))。
