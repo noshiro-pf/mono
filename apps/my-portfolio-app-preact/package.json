@@ -13,6 +13,7 @@
   "scripts": {
     "build": "vite build --config ./configs/vite.config.mts",
     "dev": "vite --config ./configs/vite.config.mts",
+    "e2e": "playwright test --config ./configs/playwright.config.mts",
     "fmt": "pnpm run z:format-uncommitted --cwd .",
     "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fmt:full": "prettier --write .",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@mdx-js/rollup": "^3.1.1",
+    "@playwright/test": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
