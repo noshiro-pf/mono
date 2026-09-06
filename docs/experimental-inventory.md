@@ -1,4 +1,4 @@
-<!-- cspell:ignore catan dezero Ymdhm -->
+<!-- cspell:ignore catan dezero firebaserc Ymdhm -->
 
 # `experimental/` の棚卸し
 
@@ -722,3 +722,48 @@ npm 依存は要らない。
 するので、`useMemo` / `useCallback` / `StrictMode` はすべて `React.` 経由に
 した。`StrictMode` を落とさなかったのは、実行時の挙動（開発時の二重描画）が
 変わるためで、`event-schedule-app` が持っていないことに合わせる理由は無い。
+
+## 復元済み 18 パッケージを「コピー」から「移動」に揃えた（2026-09-06）
+
+step 3 で復元した 18 パッケージは**コピー＆修正**で入れたので、`experimental/`
+側に原本がそのまま残っていた。未マージの復元 PR 群を**移動＆修正**に直したのに
+合わせて、こちらも同じ形にする。**残す/消すの境目は「移植先に対応するものが
+あるか」だけ**で、無いものには一切手を付けない。
+
+対応の付け方は `restore-diff` の生成器と同じ「拡張子を除いた相対パス」。
+ディレクトリが平らになった 3 件だけ、パッケージ内で一意に決まる basename で
+繋いだ（`better-preact-use-state` の `src/hooks/use-state.mts` →
+`src/use-state.mts` など）。**消したのは 980 件、残したのは 182 件。**
+
+### 残した 182 件
+
+| 中身                                 | 件数 | 備考                                                        |
+| :----------------------------------- | ---: | :---------------------------------------------------------- |
+| 旧ビルド設定                         |   57 | `configs/rollup.config.ts`・`tsconfig.build/test.json`      |
+| テンプレート残骸・暗黙グローバル・他 |   35 | `src/globals.d.ts`・`src/constants/dictionary/`             |
+| Firebase Functions                   |   30 | `event-schedule-app/functions/` — 移植先がまだ無い          |
+| Firebase 設定                        |   26 | `firebase.json`・`.firebaserc`・`firestore.*`               |
+| 別パッケージに移った分               |   18 | `blueprintjs-playground-styled` の `src/style-definitions/` |
+| e2e（Playwright）                    |   11 | `e2e/*.spec.ts`・`configs/playwright.config.ts`             |
+| Firestore 移行スクリプト             |    5 | `event-schedule-app/scripts/migration/history/`             |
+
+**e2e と Firebase 一式は「捨てた」ではなく「保留」である。** 復元当時の
+「このリポジトリではビルドしない」という前提は、各 app に `build` / `dev` /
+`preview` が戻った時点で失効している。`data-e2e` の目印は復元後のソースにも
+残してあるので、Playwright のランナー層さえ用意すれば戻せる。とくに
+`event-schedule-app` の `e2e/create-event.spec.ts` は 191 行の実テストで、
+テンプレート由来の雛形ではない。これらは別 PR で扱う。
+
+**`src/style-definitions/` を残したのは、対応先が別パッケージだから。** #1758
+で `blueprintjs-playground-styled` の中身の大半は
+`apps/react-blueprintjs-utils` 側に入っており、パッケージ対パッケージの
+対応表からは外れる。跨いだ対応を機械的に判定する方法が無いので、**迷う側は
+残す**に倒した。
+
+### `restore-diff` は凍結する
+
+`experimental/restore-diff/` の `.diff` は復元前後の突き合わせなので、復元元を
+消すと再生成できない。生成物はそのまま残し、生成器には `src/` が無い場合に
+理由付きで止まるガードを入れた。移動そのものは git の履歴に残るが、コピーで
+入れた 18 パッケージには「元ファイルを消したコミット」しか無いため、
+**どう書き換えたかを読むには引き続きこの `.diff` が要る。**
