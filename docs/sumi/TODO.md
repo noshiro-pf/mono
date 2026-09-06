@@ -1,5 +1,3 @@
-<!-- cspell:ignore Tsubu -->
-
 # TODO — Sumi lint 実装の残タスク
 
 生きたタスクリスト。段階の定義と設計は [implementation-plan.md](./implementation-plan.md)、ルールごとの実装手段は [enforcement-map.md](./enforcement-map.md) が正典で、このファイルは「今なにが残っているか」だけを持つ。完了した項目は消す。
