@@ -31,6 +31,8 @@ catalog:
   mobx: 7.0.3
   npm-run-all2: 9.0.3
   oxfmt: 0.65.0
+  oxlint: 1.80.0
+  oxlint-tsgolint: 7.0.2001
   playwright: 1.62.1
   preact: 10.29.8
   prettier: 3.9.6

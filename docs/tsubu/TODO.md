@@ -9,10 +9,10 @@
 
 ## Phase 1(Tsubu lint 実装の本体)
 
-- [ ] **🆕 新規ルールの実装**(preset に eslint-plugin として同梱、各 1 ルール): 宣言への null 型禁止(型情報)/ 境界 `?? undefined` 強制(型情報・最難)/ オーバーロード条件付き `function` 宣言許可 / コンストラクタ静的呼び出し禁止 / デコレータ禁止 / `<T,>` 強制(フォーマッタ互換は検証済み)/ 型空間の global 型 shadow 検査 / `castMutable` 乱用レポート / 論理代入 `&&=` `||=` の両オペランド boolean 限定(D-29 — `strict-boolean-expressions` の穴)。
-- [ ] **preset 追補(2026-09-05 の確定分)** — `functional/no-try-statements` on(D-27)/ `import-x/no-unassigned-import` / `no-internal-modules` の allow リスト精査(D-27)/ getter・setter と `using` の `no-restricted-syntax` 選択子(D-30 / D-33)/ default export の `*.config.*` 例外撤回(D-28、アダプタファイルはファイル単位で除外 — D-36)/ `#` subpath imports が既存 import ルールで誤検出されないかの確認(D-28)。
-- [ ] **readonly 強制の主課題** — `functional/prefer-immutable-types` / `type-declaration-immutability` の有効化実験(現行 config に TODO 付き下書き)。readonly-by-default 戦略(D-3)の成立条件。
-- [ ] **コーパス runner のエンジン接続** — 中立 ID → ESLint ルール名のマッピングを実装し、フィクスチャで preset を検証(同値性ゲートの稼働開始)。
+- [ ] **🆕 新規ルールの実装**(構文ルールは tsubu JS plugin — D-43。型情報が要るものは TS API 上の薄いチェッカーか ESLint ブリッジ、方針は readonly 強制と併せて決める): 宣言への null 型禁止(型情報)/ 境界 `?? undefined` 強制(型情報・最難)/ オーバーロード条件付き `function` 宣言許可 / コンストラクタ静的呼び出し禁止 / デコレータ禁止 / `<T,>` 強制(フォーマッタ互換は検証済み)/ 型空間の global 型 shadow 検査 / `castMutable` 乱用レポート / 論理代入 `&&=` `||=` の両オペランド boolean 限定(D-29 — `strict-boolean-expressions` の穴)。
+- [ ] **preset 追補(2026-09-05 の確定分、oxlint 側)** — `functional/no-try-statements` on(D-27)/ `import-x/no-unassigned-import` / `no-internal-modules` の allow リスト精査(D-27)/ getter・setter と `using` の `no-restricted-syntax` 選択子(D-30 / D-33)/ default export の `*.config.*` 例外撤回(D-28、アダプタファイルはファイル単位で除外 — D-36)/ `#` subpath imports が既存 import ルールで誤検出されないかの確認(D-28)。
+- [ ] **readonly 強制の主課題** — oxlint の JS plugin は型情報を持たないため、(a) tsgolint 既存の `prefer-readonly-parameter-types` 等で賄える範囲、(b) TS API 上の薄いチェッカー(ts-codemod-lib の `convert-to-readonly` の走査・判定を参考に、検査モードとして流用できるか)、(c) ESLint ブリッジ(`functional/prefer-immutable-types` / `type-declaration-immutability`)の三案を比較して方針を決める。readonly-by-default 戦略(D-3)の成立条件。
+- [x] ~~コーパス runner のエンジン接続~~ → oxlint エンジンで稼働(D-43、tsubu-oxlint-config)。残り: 対応表・`oxlintrc.jsonc`・enforcement-map の三者同期を検査するテスト。
 - [ ] **dogfood** — 第一対象 ts-std-forge(D-25)。違反件数と書き味を仕様へフィードバック。
 - [ ] Phase 1 完了条件: 仕様の手戻りが収束していること([implementation-plan.md](./implementation-plan.md))。
 

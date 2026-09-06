@@ -53,6 +53,7 @@ words:
   - trunc
   - tscw
   - tses
+  - tsgolint
   - tsubu
   - unshifted
   - unsub

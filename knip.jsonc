@@ -97,6 +97,19 @@
       "project": ["src/**/*.mts", "test/**/*.mts"],
     },
 
+    // The Tsubu lint oxlint preset. The package entry is the runner helper
+    // and rule-ID mapping the conformance corpus imports; src/plugin/index.mts
+    // is the JS plugin oxlint itself loads (from dist/, through
+    // oxlintrc.jsonc — a string reference knip cannot follow).
+    "languages/tsubu/oxlint-config": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/plugin/index.mts",
+        "test/**/*.test.mts",
+      ],
+      "project": ["src/**/*.mts", "test/**/*.mts"],
+    },
+
     // The strict standard library's generator. Its entry points are the
     // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;
     // `output*/` holds generated declarations that nothing imports by path.
