@@ -1,4 +1,4 @@
-<!-- cspell:ignore bivariance -->
+<!-- cspell:ignore bivariance rslint tsslint tsl corsa GritQL Rstack ByteDance -->
 
 # 設計判断の決定ログ
 
@@ -322,7 +322,16 @@
 - **判断**: Phase 1 のエンジンを ESLint から **oxlint** に切り替える。構成は (1) oxlint の native ルール、(2) `oxlint-tsgolint` による type-aware ルール(typescript-eslint の type-aware 群の native 実装)、(3) native に無い言語ルールを載せる **sumi JS plugin**(`languages/sumi/oxlint-config/src/plugin/`)の三つ。preset パッケージは `languages/sumi/oxlint-config`(sumi-oxlint-config、非公開)で、`oxlintrc.jsonc`(全 category off、仕様の行だけを明示的に有効化)、plugin、**中立ルール ID ← oxlint 診断コードの対応表**、runner ヘルパを持つ。適合性コーパスはこの対応表で診断を正規化してマーカーと照合する(runner 接続は 2026-09-07 に稼働)。D-25 の sumi-eslint-config は、oxlint に載せられない独自 type-aware ルールが必要になった場合のブリッジとして残す。
 - **理由**: ESLint の遅さは Sumi のルール数では呑めない可能性がある(ユーザー判断)。[docs/research-eslint-alternative-tools.md](../research-eslint-alternative-tools.md) の結論どおり oxlint が最有力で、実測(2026-09-07、oxlint 1.80.0)で次を確認した — ESLint 互換の JS plugin API で esquery 選択子・scope 解析が動く / Node 26 では `.mts` の plugin も直接読めるが `.mjs` 指定子の解決が無いため dist 経由にする / tsgolint は package ディレクトリを cwd にすれば動き、`strict-boolean-expressions` 等がそのまま使える / eslint-plugin-functional のような既存 ESLint plugin もエントリファイル指定で読める(ただし自前の小ルールの方が依存が軽い)/ `no-restricted-syntax` は native に無いので選択子ルールは plugin 側に書く / JSON 出力は `{ diagnostics: [{ code: "<plugin>(<rule>)", filename, labels[0].span.line }] }`。
 - **制約(既知)**: oxlint はカスタム type-aware ルールを書けない(2026-09 時点)。型情報が要る 🆕 ルール(宣言への null 型禁止、境界 `?? undefined` 強制、`castMutable` 乱用、論理代入のオペランド、readonly 強制)は tsgolint の既存ルールで賄えるものを除き、**TS API 上の薄いチェッカー(Phase 2 の `sumi check` の前倒し)か ESLint ブリッジ**で実装する。どちらにするかは readonly 強制の実装方針(TODO)と併せて決める。
-- **コーパス側で判明した差分**: `no-sequences` は ESLint / oxlint とも既定 `allowInParentheses: true` で `(a, b)` を許す — 言語は全面禁止なので `false` を指定する(ESLint preset にも同じ穴があり、enforcement-map に 🔧 として反映)。デコレータ付き class の報告行はエンジン依存(class の span がデコレータから始まるか)なので、フィクスチャはデコレータと class を同一行に置く。`fn` を仮引数名にした valid フィクスチャは D-17 の「宣言名」に該当し invalid だった(修正)。
+- **コーパス側で判明した差分**: `no-sequences` は ESLint / oxlint とも既定 `allowInParentheses: true` で、余分な括弧で囲んだカンマ式(`const r = (a(), b())`、`if ((a(), b()))`)を「意図的な用法」として許す(ESLint 本体で実測: 既定では括弧なしの `r = a(), b()` だけを報告し、`false` を指定すると括弧付きも報告する。`for` の初期化・更新部は常に許可)。フィクスチャは括弧付きで書かれており言語としては正しく違反なので、誤りはエンジン設定の側 — `false` を指定する(ESLint preset にも同じ穴があり、enforcement-map に 🔧 として反映)。デコレータ付き class の報告行はエンジン依存(class の span がデコレータから始まるか)なので、フィクスチャはデコレータと class を同一行に置く。`fn` を仮引数名にした valid フィクスチャは D-17 の「宣言名」に該当し invalid だった(修正)。
+
+- **検討して不採用(2026-09-07 時点。oxlint 以外は今回実機検証していない)**:
+    - **rslint**(ByteDance / Rstack): typescript-go 上で動き、カスタム type-aware ルールを最初から書ける唯一の候補で、ESLint v10 互換の flat config を TS で書ける。成熟度が実験的段階のため見送り。型情報が要る 🆕 ルールの実装段階で、oxlint の corsa(カスタム type-aware、early WIP)と並べて再評価する。
+    - **tsslint**: tsserver プラグインとして動きエディタ体験は良いが、TS 7(tsgo)は tsserver プラグイン API を引き継がない。Sumi は TS 7 前提(拘束 tsconfig の `libReplacement`、tsgolint)なので行き止まり。
+    - **tsl**: カスタム type-aware を書けるが JS の TS API に依存し、tsgo 対応が未定。tsslint と同じ理由で保留。
+    - **Biome**: 却下済み(GritQL plugin の表現力が限られ、型情報を持てない)。
+    - **TS API 上の自前チェッカー**(Phase 2 の `sumi check`): 候補ではなく最終形。型情報が要るルールはここに集約する計画だが、Phase 1 の目的は仕様の検証を安く回すことで、native 650 超のルールと typescript-eslint の type-aware 群を今移植するのは本末転倒。
+- **oxlint を選んだ決め手**: (1) 調査の結論と一致する、(2) type-aware が tsgolint = typescript-go ネイティブで TS 7 の方向と揃う、(3) plugin API が ESLint 互換で typescript-eslint の型定義や既存 plugin をそのまま使える、(4) リポジトリで既に oxfmt を使っており Oxc への依存が新規ではない。調査時点の弱点「JSON 設定のみ」は、現行版が `defineConfig` を export し JS / TS 設定ファイルも(実験的に)読めるため緩和されている。
+- **乗り換え可能性**: コーパスがエンジン非依存なので、エンジン固有の資産は「中立 ID ← 診断コードの対応表」と plugin だけ。rslint や corsa が成熟した時点で乗り換えても、コーパスがそのまま同値性ゲートになる。
 
 ## D-44: 言語名と拡張子を Sumi / `.sumi` に確定する(D-16 改訂)
 
