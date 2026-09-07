@@ -155,6 +155,46 @@
     "prefer-const": "error",
     "no-shadow": ["error", { "builtinGlobals": true, "hoist": "all" }],
 
+    // ---- readonly (spec/readonly.md, D-45) ----
+    "sumi/require-readonly-type": "error",
+    "typescript/prefer-readonly-parameter-types": [
+      "error",
+      {
+        "checkParameterProperties": true,
+        "ignoreInferredTypes": true,
+        "treatMethodsAsReadonly": true,
+        "allow": [
+          {
+            "from": "lib",
+            "name": [
+              "RegExp",
+              "AnimationEvent",
+              "ClipboardEvent",
+              "CompositionEvent",
+              "DragEvent",
+              "Element",
+              "Event",
+              "FocusEvent",
+              "HTMLCanvasElement",
+              "HTMLDivElement",
+              "HTMLElement",
+              "HTMLImageElement",
+              "HTMLInputElement",
+              "HTMLSelectElement",
+              "HTMLTextAreaElement",
+              "KeyboardEvent",
+              "MouseEvent",
+              "PointerEvent",
+              "TouchEvent",
+              "TransitionEvent",
+              "UIEvent",
+              "WheelEvent",
+            ],
+          },
+        ],
+      },
+    ],
+
     // ---- null (spec/null-undefined.md) ----
     "unicorn/no-null": "error",
   },

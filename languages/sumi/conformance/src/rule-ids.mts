@@ -57,6 +57,8 @@ export const knownRuleIds = [
   'mutation/no-shadow',
   'mutation/prefer-const',
   'null/no-null-literal',
+  'readonly/require-readonly-parameter',
+  'readonly/require-readonly-type',
 ] as const;
 
 export type KnownRuleId = (typeof knownRuleIds)[number];
