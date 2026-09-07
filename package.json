@@ -19,6 +19,7 @@
     "libs/*",
     "apps/*",
     "tools/*",
+    "languages/*/*",
     "strict-lib/scripts-common",
     "strict-lib/v*",
     "strict-lib/v*/output/lib"

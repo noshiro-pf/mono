@@ -5,7 +5,7 @@ import { defineKnownRules, withDefaultOption } from 'eslint-config-typed';
  * version, limited to the enforcement-map 🔧 (option changes) and ⏻ (off →
  * on) items whose spec status is 確定 (independent of any pending 提案).
  * The 🆕 custom rules and the readonly enforcement experiment are tracked in
- * docs/sumi/TODO.md.
+ * issue #1753 (the task summary).
  *
  * Each entry cites the enforcement-map row it implements; the base options it
  * replaces live in eslint-config-typed's `rules/` directory.

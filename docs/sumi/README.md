@@ -36,7 +36,7 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 各機能領域につき 1 ファイル。各項目は **許可する形 / 禁止する形 / 理由 / 強制手段 / TS へ戻るときの影響** を記述する。ステータスは `確定` / `提案` / `未定` で示す。
 
-- [TODO.md](./TODO.md) — 残タスクの生きたリスト
+- 残タスクの要約は issue [#1753](https://github.com/noshiro-pf/mono/issues/1753)。個々の論点は各 spec ファイルの「未解決の論点」が正典
 - [decisions.md](./decisions.md) — 設計判断の決定ログ(ADR)
 - [related-work.md](./related-work.md) — 先行研究・関連プロジェクトと採否(asm.js、Safe TypeScript、Refined TypeScript ほか)
 - [overload-survey.md](./overload-survey.md) — オーバーロード代替の言語間コード比較(候補 8 / D-13 の設計材料)
@@ -60,7 +60,7 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 ### 残タスク
 
-生きたタスクリストは [TODO.md](./TODO.md)。深掘り待ちの仕様論点(getter/setter の粒度、不健全性カタログ等)は各 spec ファイルの「未解決の論点」に記録している。型レベル機能の方針(2026-08-27 確定)は「**TS の表現力は維持**し、健全性を犠牲にする機能が特定された時点で個別に検討」。
+残タスクの要約は issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) で確認する(TODO.md は廃止)。深掘り待ちの仕様論点(getter/setter の粒度、不健全性カタログ等)は各 spec ファイルの「未解決の論点」に記録している。型レベル機能の方針(2026-08-27 確定)は「**TS の表現力は維持**し、健全性を犠牲にする機能が特定された時点で個別に検討」。
 
 ## 言語名・ファイル拡張子(決定 2026-09-07 — D-16)
 
