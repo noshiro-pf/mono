@@ -14,7 +14,7 @@ import {
  *
  * The default export is the plugin protocol (ESLint v9 shape).
  */
-const sumiPlugin = {
+export const sumiPlugin = {
   meta: { name: 'sumi' },
   rules: {
     'no-class': noClass,

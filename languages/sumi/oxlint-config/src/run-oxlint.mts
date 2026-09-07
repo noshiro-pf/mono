@@ -89,7 +89,7 @@ const readString = (record: UnknownRecord, key: string): string => {
 };
 
 const toDiagnostic = (raw: unknown): OxlintDiagnostic => {
-  const record = isRecord(raw) ? raw : {};
+  const record = isRecord(raw) ? raw : ({} as const);
 
   const labels = hasKey(record, 'labels') ? record.labels : undefined;
 

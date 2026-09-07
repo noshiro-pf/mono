@@ -42,17 +42,19 @@ type Observed = Readonly<{
   message: string;
 }>;
 
-const toObserved = (diagnostic: OxlintDiagnostic): Observed => ({
-  ruleId:
-    oxlintCodeToRuleId.get(diagnostic.code) ?? `unmapped:${diagnostic.code}`,
-  line: diagnostic.line,
-  message: diagnostic.message,
-});
+const toObserved = (diagnostic: OxlintDiagnostic): Observed =>
+  ({
+    ruleId:
+      oxlintCodeToRuleId.get(diagnostic.code) ?? `unmapped:${diagnostic.code}`,
+    line: diagnostic.line,
+    message: diagnostic.message,
+  }) as const;
 
-const key = (ruleId: string, line: number): string => `${line}:${ruleId}`;
+const key = (ruleId: string, line: number): string =>
+  `${line}:${ruleId}` as const;
 
 const fixtureCases = fixtures.map((fixture) => {
-  const ruleId = `${fixture.area}/${fixture.rule}`;
+  const ruleId: string = `${fixture.area}/${fixture.rule}` as const;
 
   return {
     label: `${ruleId}/${fixture.kind}/${fixture.fileName}`,
