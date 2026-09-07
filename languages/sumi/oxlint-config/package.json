@@ -40,7 +40,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^8.68.0",
+    "@typescript-eslint/utils": "^8.69.0",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "ts-data-forge": "workspace:*",

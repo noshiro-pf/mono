@@ -5836,7 +5836,7 @@ namespace NoMeaninglessVoidOperator {
    *     "properties": {
    *       "checkNever": {
    *         "type": "boolean",
-   *         "description": "Whether to suggest removing `void` when the argument has type `never`."
+   *         "description": "Whether to suggest removing `void` when a call's return type is `never`."
    *       }
    *     }
    *   }
@@ -5845,7 +5845,7 @@ namespace NoMeaninglessVoidOperator {
    */
   export type Options = Readonly<{
     /**
-     * Whether to suggest removing `void` when the argument has type `never`.
+     * Whether to suggest removing `void` when a call's return type is `never`.
      */
     checkNever?: boolean;
   }>;
@@ -5896,8 +5896,29 @@ namespace NoMisusedPromises {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checksConditionals": {
-   *         "type": "boolean",
-   *         "description": "Whether to warn when a Promise is provided to conditional statements."
+   *         "description": "Whether to warn when a Promise is provided to conditional statements.",
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean",
+   *             "description": "Whether to check conditionals."
+   *           },
+   *           {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "description": "Detailed settings for conditional inspection.",
+   *             "properties": {
+   *               "flagUnions": {
+   *                 "type": "string",
+   *                 "description": "Configures how union types containing Promise-like types are checked.",
+   *                 "enum": [
+   *                   "all",
+   *                   "strict",
+   *                   "none"
+   *                 ]
+   *               }
+   *             }
+   *           }
+   *         ]
    *       },
    *       "checksSpreads": {
    *         "type": "boolean",
@@ -5952,7 +5973,14 @@ namespace NoMisusedPromises {
     /**
      * Whether to warn when a Promise is provided to conditional statements.
      */
-    checksConditionals?: boolean;
+    checksConditionals?:
+      | boolean
+      | Readonly<{
+          /**
+           * Configures how union types containing Promise-like types are checked.
+           */
+          flagUnions?: 'all' | 'strict' | 'none';
+        }>;
     /**
      * Whether to warn when `...` spreading a `Promise`.
      */
