@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@emotion/styled": "^11.14.1",
-    "@mui/material": "^9.3.1",
+    "@mui/material": "^9.4.0",
     "better-react-use-state": "workspace:*",
     "react-utils": "workspace:*",
     "react-utils-styled": "workspace:*",

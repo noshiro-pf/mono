@@ -30,7 +30,7 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "goober": "^2.1.16",
+    "goober": "^2.1.19",
     "html2canvas": "^1.4.1",
     "preact-utils": "workspace:*",
     "synstate": "workspace:*",

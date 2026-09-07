@@ -44,7 +44,7 @@
     "synstate-react-hooks": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-utils-additional": "workspace:*",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",

@@ -85,6 +85,14 @@ update:
   githubActions: false
   ignoreDeps:
     - typescript
+    # PixiJS 7 removed `InteractionManager`, dropped the `transparent`
+    # application option and deprecated the global `settings` object.
+    # `apps/annotation-tool` is v5-era code restored from `experimental/` and
+    # uses all three, so `--latest` takes it from 5.3.12 to 7.4.3 and the
+    # build stops at `MISSING_EXPORT "InteractionManager"` (#1859). Porting
+    # the canvas to the federated events API is its own change, with its own
+    # review; it is not something a nightly dependency bump should carry.
+    - pixi.js-legacy
 
 minimumReleaseAge: 10080 # = 7 days
 
