@@ -1,0 +1,53 @@
+{
+  // The Sumi base tsconfig (docs/sumi/spec/compiler-options.md, D-40 / D-46).
+  // Projects `extends` it ("extends": "sumi-cli/tsconfig"). The locked entries
+  // are what `sumi check` verifies against the project's effective options
+  // (src/locked-compiler-options.mts is the single source of truth; a test
+  // keeps this file in sync with it); the free entries are defaults a project
+  // may override.
+  "compilerOptions": {
+    // ---- type-checking strictness (locked) ----
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    // ---- subset constraints (locked) ----
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": false,
+    "rewriteRelativeImportExtensions": false,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+    "allowJs": false,
+    "checkJs": false,
+
+    // ---- module resolution (locked) ----
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "moduleDetection": "force",
+
+    // ---- standard library (locked) ----
+    "libReplacement": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "jsx": "react-jsx",
+
+    // ---- environment (free) ----
+    "lib": ["esnext"],
+    "types": [],
+    "target": "esnext",
+
+    // ---- output (free) ----
+    "noEmit": true
+  }
+}
