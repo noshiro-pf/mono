@@ -1765,7 +1765,6 @@ ambient global として宣言したままで、値を供給していたのは�
 これで `e2e/display-create-event-page.spec.mts` が動く。
 **`create-event.spec.ts` は `experimental/` に残す** — Firestore に実際に
 書き込むので、emulator を CI に組み込むまで走らせようが無い。
-`configs/playwright.config.ts` もそのため一緒に残してある。
 
 ## Firebase 設定の復元（2026-09-06）
 
@@ -1810,3 +1809,28 @@ import して読み書きしているのはこれ 1 つで、他の app の
 npm 依存は増やしていない。app のディレクトリで
 `pnpm dlx firebase-tools deploy --only hosting` を叩けば、`firebase.json` と
 `.firebaserc` だけで通る。
+
+## 移動の取りこぼし 2 件（2026-09-07）
+
+復元が一通り終わったところで `experimental/` を両方向に突き合わせた。
+
+- **消えたファイルに対応物があるか**（＝復元漏れ）: 削除された 1716 件すべてに
+  対応物があり、**0 件**。`restore-diff` の
+  `to-css-classnames.ts.diff` だけが引っかかったが、これは #1844 が
+  `.mts.diff` に改名したもので失われていない。
+- **残ったファイルに対応物が無いか**（＝削除漏れ）: **2 件**あった。
+
+| 残っていたもの                                         | 対応物                                                              | なぜ漏れたか                                                                                                                                                                                             |
+| :----------------------------------------------------- | :------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `utils/better-preact-use-state/src/hooks/index.mts`    | `libs/better-preact-use-state/src/index.mts` と**バイト単位で同一** | `src/hooks/` を平らにしたので、旧 hooks barrel と新パッケージ barrel の中身が一致した。対応付けは「拡張子を除いた相対パス」なのでパスが違うと繋がらない                                                  |
+| `apps/event-schedule-app/configs/playwright.config.ts` | `apps/event-schedule-app/configs/playwright.config.mts`             | `create-event.spec.ts` のために残したが、これは `@noshiro/mono-configs` を import しており、experimental は install もされないので**実行しようがない**。spec を戻すときに使うのは app 側の `.mts` である |
+
+どちらも削除した。**内容が一致するファイルを blob ハッシュで総当たりした**確認も
+併せて行い、これ以外に移動し損ねた実コードは無かった（一致したのは空ファイル・
+`.gitkeep` ・ `export {};` のスタブ・共通の favicon や `firestore.rules` の
+雛形で、大半は未復元の package にある）。
+
+`ts-utils-additional` の `package.json` ・ `tsconfig.json` ・ `eslint.config.js` ・
+`README.md` ・ `configs/vitest.config.ts` は復元先にも同名があるが、**部分復元**
+（color と shape だけを移し、array ・ num ・ types は残した）なので、残った
+ソースのためにマニフェストが要る。これは取りこぼしではない。
