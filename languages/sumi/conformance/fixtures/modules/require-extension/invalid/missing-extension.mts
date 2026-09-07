@@ -1,4 +1,4 @@
 // @sumi-expect modules/require-extension
-import { helper } from '../valid/helper';
+import { helper } from '../helper';
 
 export const value = helper();

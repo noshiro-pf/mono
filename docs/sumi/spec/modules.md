@@ -49,7 +49,7 @@ tsc 上の対応は `module: nodenext` + `moduleResolution: nodenext` に固定(
 
 ## 強制手段
 
-- Sumi lint: ESLint(`no-restricted-syntax` + import 系ルール)+ tsconfig 固定。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
+- Sumi lint: oxlint preset(import 系 native ルール + sumi JS plugin の `no-internal-module-import` / `no-namespace-object-use` — D-43)+ tsconfig 拘束(`sumi check`、D-46)。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
 
 ## default export を要求するツールとの接続(確定 2026-09-05 — D-36)
 
