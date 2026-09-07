@@ -38,7 +38,7 @@
     "@emotion/styled": "^11.14.1",
     "better-react-use-state": "workspace:*",
     "normalize.css": "^8.0.1",
-    "pixi.js-legacy": "^7.4.3",
+    "pixi.js-legacy": "^5.3.12",
     "react-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",
