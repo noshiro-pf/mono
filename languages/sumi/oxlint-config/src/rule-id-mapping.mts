@@ -30,6 +30,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   ['sumi(no-this)', 'banned-syntax/no-this'],
   ['sumi(no-accessor)', 'banned-syntax/no-accessor'],
   ['sumi(no-using)', 'banned-syntax/no-using'],
+  ['sumi(no-global-type-shadow)', 'banned-syntax/no-global-type-shadow'],
   ['eslint(no-eval)', 'banned-syntax/no-eval'],
   ['typescript(no-implied-eval)', 'banned-syntax/no-eval'],
   ['eslint(prefer-rest-params)', 'banned-syntax/no-arguments'],
@@ -64,6 +65,10 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
     'typescript(explicit-function-return-type)',
     'functions/explicit-return-type',
   ],
+  ['sumi(prefer-arrow-function)', 'functions/prefer-arrow-function'],
+
+  // jsx
+  ['sumi(generic-arrow-trailing-comma)', 'jsx/generic-arrow-trailing-comma'],
 
   // modules
   ['import(no-default-export)', 'modules/no-default-export'],

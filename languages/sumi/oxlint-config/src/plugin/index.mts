@@ -1,9 +1,11 @@
 import {
+  genericArrowTrailingComma,
   noAccessor,
   noClass,
   noConstructorCall,
   noDecorator,
   noEnum,
+  noGlobalTypeShadow,
   noInOperator,
   noLetWithoutMutPrefix,
   noNewArray,
@@ -11,6 +13,7 @@ import {
   noThrow,
   noTry,
   noUsing,
+  preferArrowFunction,
 } from './rules/index.mjs';
 
 /**
@@ -23,11 +26,13 @@ import {
 export const sumiPlugin = {
   meta: { name: 'sumi' },
   rules: {
+    'generic-arrow-trailing-comma': genericArrowTrailingComma,
     'no-accessor': noAccessor,
     'no-class': noClass,
     'no-constructor-call': noConstructorCall,
     'no-decorator': noDecorator,
     'no-enum': noEnum,
+    'no-global-type-shadow': noGlobalTypeShadow,
     'no-in-operator': noInOperator,
     'no-let-without-mut-prefix': noLetWithoutMutPrefix,
     'no-new-array': noNewArray,
@@ -35,6 +40,7 @@ export const sumiPlugin = {
     'no-throw': noThrow,
     'no-try': noTry,
     'no-using': noUsing,
+    'prefer-arrow-function': preferArrowFunction,
   },
 } as const;
 
