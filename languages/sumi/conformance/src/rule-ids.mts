@@ -8,7 +8,7 @@
  * codes) will live next to each engine's runner (Phase 1).
  */
 export const knownRuleIds = [
-  'banned-syntax/no-accessor',
+  'banned-syntax/no-setter',
   'banned-syntax/no-any',
   'banned-syntax/no-arguments',
   'banned-syntax/no-bare-number-globals',
