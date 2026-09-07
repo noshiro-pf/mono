@@ -36,6 +36,11 @@ export const sumiRules = defineKnownRules({
   // the remaining cases with `+= 1` (spec/variables-and-mutation.md).
   'no-plusplus': ['error', { allowForLoopAfterthoughts: false }],
 
+  // 🔧 no-sequences: the base config takes the default `allowInParentheses:
+  // true`, which lets `(a, b)` through; the comma operator is banned
+  // everywhere (spec/banned-syntax.md — found by the corpus, D-43).
+  'no-sequences': ['error', { allowInParentheses: false }],
+
   // 🔧 functional/no-let (D-14): `mut_` is the only mutable-name prefix; the
   // base config's `^_mut_` / `^#mut_` variants are dropped.
   'functional/no-let': [

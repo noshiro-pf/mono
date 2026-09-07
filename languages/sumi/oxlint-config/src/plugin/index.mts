@@ -1,10 +1,16 @@
 import {
+  noAccessor,
   noClass,
   noConstructorCall,
   noDecorator,
   noEnum,
+  noInOperator,
   noLetWithoutMutPrefix,
+  noNewArray,
+  noThis,
   noThrow,
+  noTry,
+  noUsing,
 } from './rules/index.mjs';
 
 /**
@@ -17,12 +23,18 @@ import {
 export const sumiPlugin = {
   meta: { name: 'sumi' },
   rules: {
+    'no-accessor': noAccessor,
     'no-class': noClass,
     'no-constructor-call': noConstructorCall,
     'no-decorator': noDecorator,
     'no-enum': noEnum,
+    'no-in-operator': noInOperator,
     'no-let-without-mut-prefix': noLetWithoutMutPrefix,
+    'no-new-array': noNewArray,
+    'no-this': noThis,
     'no-throw': noThrow,
+    'no-try': noTry,
+    'no-using': noUsing,
   },
 } as const;
 

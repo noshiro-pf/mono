@@ -52,6 +52,39 @@
     "sumi/no-enum": "error",
     "sumi/no-decorator": "error",
     "sumi/no-constructor-call": "error",
+    "sumi/no-in-operator": "error",
+    "sumi/no-new-array": "error",
+    "sumi/no-this": "error",
+    "sumi/no-accessor": "error",
+    "sumi/no-using": "error",
+    // `new Function` and string-argument timers are both typescript/no-implied-eval
+    "no-eval": "error",
+    "typescript/no-implied-eval": "error",
+    "prefer-rest-params": "error",
+    "no-sparse-arrays": "error",
+    "no-labels": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/ban-ts-comment": "error",
+    "typescript/no-unsafe-type-assertion": "error",
+    "typescript/restrict-plus-operands": [
+      "error",
+      {
+        "skipCompoundAssignments": false,
+        "allowAny": false,
+        "allowBoolean": false,
+        "allowNullish": false,
+        "allowNumberAndString": false,
+        "allowRegExp": false,
+      },
+    ],
+    "typescript/require-array-sort-compare": [
+      "error",
+      { "ignoreStringArrays": true },
+    ],
+    "typescript/no-non-null-assertion": "error",
+    // D-19: assignment to a global; declaring a global's name is reported by
+    // no-shadow (builtinGlobals) under mutation/no-shadow
+    "no-global-assign": "error",
 
     // ---- boolean (spec/booleans-and-logic.md) ----
     "typescript/strict-boolean-expressions": [
@@ -72,19 +105,50 @@
       { "allowShortCircuit": false, "allowTernary": false },
     ],
 
-    // ---- classes / exceptions (D-12, spec/exceptions.md) ----
+    // ---- classes / exceptions (D-12, spec/exceptions.md, D-27) ----
     "sumi/no-class": "error",
     "sumi/no-throw": "error",
+    "sumi/no-try": "error",
 
-    // ---- functions (D-17) ----
+    // ---- functions (D-17, D-42) ----
     "id-denylist": ["error", "fn"],
+    "typescript/explicit-function-return-type": [
+      "error",
+      {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true,
+        "allowHigherOrderFunctions": true,
+        "allowConciseArrowFunctionExpressionsStartingWithVoid": false,
+        "allowDirectConstAssertionInArrowFunctions": true,
+        "allowedNames": [],
+      },
+    ],
 
     // ---- modules (spec/modules.md) ----
     "import/no-default-export": "error",
+    "import/no-unassigned-import": ["error", { "allow": [] }],
+    "import/extensions": ["error", "always", { "ignorePackages": true }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "regex": "^(\\./|\\.\\./)+index\\.mjs$",
+            "message": "Do not import a directory's index.mjs by its bare relative path; import it by module name (./X/index.mjs).",
+          },
+        ],
+      },
+    ],
+    "typescript/triple-slash-reference": [
+      "error",
+      { "path": "never", "types": "never", "lib": "never" },
+    ],
+    "typescript/no-require-imports": "error",
 
-    // ---- mutation (spec/variables-and-mutation.md, D-14) ----
+    // ---- mutation (spec/variables-and-mutation.md, D-14, D-19, D-27) ----
     "sumi/no-let-without-mut-prefix": "error",
     "prefer-const": "error",
+    "no-shadow": ["error", { "builtinGlobals": true, "hoist": "all" }],
 
     // ---- null (spec/null-undefined.md) ----
     "unicorn/no-null": "error",
