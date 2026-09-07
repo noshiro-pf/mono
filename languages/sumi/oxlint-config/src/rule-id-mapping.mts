@@ -85,6 +85,13 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   // are one rule to the engine; both surface under this ID.
   ['eslint(no-shadow)', 'mutation/no-shadow'],
 
+  // readonly
+  ['sumi(require-readonly-type)', 'readonly/require-readonly-type'],
+  [
+    'typescript(prefer-readonly-parameter-types)',
+    'readonly/require-readonly-parameter',
+  ],
+
   // null
   ['unicorn(no-null)', 'null/no-null-literal'],
 ]);

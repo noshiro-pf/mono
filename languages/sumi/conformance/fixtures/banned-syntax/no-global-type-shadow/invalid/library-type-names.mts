@@ -7,6 +7,6 @@ interface Promise<T> {
 }
 
 // @sumi-expect banned-syntax/no-global-type-shadow
-export const wrap = <Map,>(value: Map): Map => value;
+export const wrap = <Date,>(value: Date): Date => value;
 
 export type { Array, Promise };
