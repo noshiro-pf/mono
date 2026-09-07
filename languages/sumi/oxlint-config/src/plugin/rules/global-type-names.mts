@@ -4,7 +4,7 @@ import * as path from 'node:path';
 
 const libDir = `${path.dirname(
   createRequire(import.meta.url).resolve('typescript/package.json'),
-)}/lib`;
+)}/lib` as const;
 
 /**
  * The names TypeScript's standard library declares in the type space
