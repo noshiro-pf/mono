@@ -53,7 +53,8 @@ words:
   - trunc
   - tscw
   - tses
-  - tsubu
+  - tsgolint
+  - sumi
   - unshifted
   - unsub
   - valtio

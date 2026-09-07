@@ -1,0 +1,92 @@
+// Sumi lint — the oxlint configuration (Phase 1 engine).
+//
+// Every category is off: only the rules listed here run, so that the rule
+// set is exactly the language specification (docs/sumi/enforcement-map.md).
+// Rules oxlint has no native equivalent for live in the sumi JS plugin
+// (src/plugin/, built to dist/). Type-aware rules run through oxlint-tsgolint
+// (`--type-aware`; `options.typeAware` below).
+//
+// The neutral rule-ID mapping the conformance corpus checks this file
+// against is src/rule-id-mapping.mts — keep the two in sync.
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "typescript", "unicorn", "import"],
+  "jsPlugins": ["./dist/plugin/index.mjs"],
+  "options": { "typeAware": true },
+  "categories": {
+    "correctness": "off",
+    "suspicious": "off",
+    "pedantic": "off",
+    "perf": "off",
+    "style": "off",
+    "restriction": "off",
+    "nursery": "off",
+  },
+  "rules": {
+    // ---- banned-syntax (spec/banned-syntax.md) ----
+    "no-var": "error",
+    "eqeqeq": ["error", "always"],
+    "no-eq-null": "error",
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": false }],
+    "prefer-template": "error",
+    "no-bitwise": "error",
+    "no-void": ["error", { "allowAsStatement": false }],
+    // The comma operator is banned everywhere — ESLint's / oxlint's default
+    // (`allowInParentheses: true`) would let `(a, b)` through.
+    "no-sequences": ["error", { "allowInParentheses": false }],
+    "no-implicit-coercion": [
+      "error",
+      { "boolean": true, "number": true, "string": true, "allow": [] },
+    ],
+    // D-21: the bare number globals — reference the Number.* definitions
+    "no-restricted-globals": [
+      "error",
+      { "name": "NaN", "message": "Use Number.NaN (D-21)." },
+      { "name": "Infinity", "message": "Use Number.POSITIVE_INFINITY (D-21)." },
+      { "name": "parseInt", "message": "Use Number.parseInt (D-21)." },
+      { "name": "parseFloat", "message": "Use Number.parseFloat (D-21)." },
+      { "name": "isNaN", "message": "Use Number.isNaN (D-21)." },
+      { "name": "isFinite", "message": "Use Number.isFinite (D-21)." },
+    ],
+    "typescript/method-signature-style": ["error", "property"],
+    "sumi/no-enum": "error",
+    "sumi/no-decorator": "error",
+    "sumi/no-constructor-call": "error",
+
+    // ---- boolean (spec/booleans-and-logic.md) ----
+    "typescript/strict-boolean-expressions": [
+      "error",
+      {
+        "allowString": false,
+        "allowNumber": false,
+        "allowNullableObject": false,
+        "allowNullableBoolean": false,
+        "allowNullableString": false,
+        "allowNullableNumber": false,
+        "allowNullableEnum": false,
+        "allowAny": false,
+      },
+    ],
+    "no-unused-expressions": [
+      "error",
+      { "allowShortCircuit": false, "allowTernary": false },
+    ],
+
+    // ---- classes / exceptions (D-12, spec/exceptions.md) ----
+    "sumi/no-class": "error",
+    "sumi/no-throw": "error",
+
+    // ---- functions (D-17) ----
+    "id-denylist": ["error", "fn"],
+
+    // ---- modules (spec/modules.md) ----
+    "import/no-default-export": "error",
+
+    // ---- mutation (spec/variables-and-mutation.md, D-14) ----
+    "sumi/no-let-without-mut-prefix": "error",
+    "prefer-const": "error",
+
+    // ---- null (spec/null-undefined.md) ----
+    "unicorn/no-null": "error",
+  },
+}

@@ -34,8 +34,8 @@ instruction file.
   output. **See "strict-lib/" below.**
 - `languages/` — programming-language development: one directory per language,
   with that language's development packages below it (workspace glob
-  `languages/*/*`). Currently `languages/tsubu/` (the Tsubu
-  language), whose specification lives in `docs/tsubu/`. Nothing here is published — a
+  `languages/*/*`). Currently `languages/sumi/` (the Sumi
+  language), whose specification lives in `docs/sumi/`. Nothing here is published — a
   language's publishable tooling moves to `libs/` when it materializes. The
   conformance corpus's `fixtures/` hold deliberate rule violations and are
   excluded from Prettier (see below), from the package's own tsconfig/ESLint,
@@ -50,7 +50,7 @@ reformatting the generated files anyway. Generated TypeDoc output is listed at
 the root per package, because `libs/eslint-config-typed/docs` and
 `libs/synstate/docs` hold hand-written prose and must stay tracked.
 
-- **One deliberate exception**: `languages/tsubu/conformance/` carries its
+- **One deliberate exception**: `languages/sumi/conformance/` carries its
   own `.prettierignore` for `fixtures/` **in addition to** the root entry for
   the same directory. The per-package `fmt` scripts run Prettier with the
   package as cwd, and `prettier.getFileInfo` resolves its `ignorePath` from

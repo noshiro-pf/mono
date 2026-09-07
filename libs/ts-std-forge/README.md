@@ -4,8 +4,8 @@ Safe wrappers for standard library APIs that throw or return `null` / sentinel
 values, returning [`Result` / `Optional`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge)
 instead. The dependency is strictly one-way: `ts-std-forge` → `ts-data-forge`.
 
-The catalog of APIs to wrap, and the reasoning, live in the Tsubu language
-project: [docs/tsubu/throwing-stdlib-survey.md](../../docs/tsubu/throwing-stdlib-survey.md)
+The catalog of APIs to wrap, and the reasoning, live in the Sumi language
+project: [docs/sumi/throwing-stdlib-survey.md](../../docs/sumi/throwing-stdlib-survey.md)
 (decisions D-22 / D-24 / D-26).
 
 ## Error design (D-26)
@@ -24,7 +24,7 @@ error messages, whose wording ECMAScript leaves unspecified.
   Refinement stops at literal ranges: **branded number types (`SafeUint`
   etc.) are deliberately not used** — demanding a brand cast at ordinary
   call sites would be a detour for callers, and busywork a native integer
-  type (Tsubu v2) would later obsolete.
+  type (Sumi v2) would later obsolete.
 - **Validate-first, tagged**: when the domain is not expressible as a
   literal range (`fromCodePoint`'s 0–0x10FFFF, `repeat`'s count, `Date`
   validity), the parameter stays a plain `number` / `Date` and the wrapper
@@ -38,7 +38,7 @@ error messages, whose wording ECMAScript leaves unspecified.
 
 ## Constructor calls without `new` (D-15 / D-41)
 
-Tsubu forbids calling the built-in constructors as plain functions
+Sumi forbids calling the built-in constructors as plain functions
 (`Number(x)`, `String(x)`, `Boolean(x)`, …): they are implicit conversions
 whose intent is not in the name and whose failure is a sentinel. The
 replacements that are stdlib wrappers live here — `SafeNumber.parse` /

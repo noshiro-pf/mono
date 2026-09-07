@@ -82,19 +82,36 @@
   "ignoreBinaries": ["diff"],
 
   "workspaces": {
-    // The conformance corpus of the tsubu language project. `fixtures/`
+    // The conformance corpus of the sumi language project. `fixtures/`
     // holds deliberate rule violations that the runner reads as text — not
     // project files.
-    "languages/tsubu/conformance": {
+    "languages/sumi/conformance": {
       "entry": ["test/**/*.test.mts"],
       "project": ["src/**/*.mts", "test/**/*.mts"],
     },
 
-    // The Tsubu v1 ESLint preset. Consumed by other packages'
+    // The Sumi lint ESLint preset (the bridge engine since D-43). Consumed by other packages'
     // eslint.config.mts through the package entry point.
-    "languages/tsubu/eslint-config": {
+    "languages/sumi/eslint-config": {
       "entry": ["src/entry-point.mts", "test/**/*.test.mts"],
       "project": ["src/**/*.mts", "test/**/*.mts"],
+    },
+
+    // The Sumi lint oxlint preset. The package entry is the runner helper
+    // and rule-ID mapping the conformance corpus imports; src/plugin/index.mts
+    // is the JS plugin oxlint itself loads (from dist/, through
+    // oxlintrc.jsonc — a string reference knip cannot follow).
+    "languages/sumi/oxlint-config": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/plugin/index.mts",
+        "test/**/*.test.mts",
+      ],
+      "project": ["src/**/*.mts", "test/**/*.mts"],
+      // Neither is imported: the runner locates the oxlint CLI by resolving
+      // `oxlint/package.json` at runtime and spawns it, and oxlint itself
+      // finds oxlint-tsgolint (the type-aware engine) in node_modules.
+      "ignoreDependencies": ["oxlint", "oxlint-tsgolint"],
     },
 
     // The strict standard library's generator. Its entry points are the

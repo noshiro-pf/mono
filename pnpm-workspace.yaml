@@ -31,6 +31,8 @@ catalog:
   mobx: 7.0.3
   npm-run-all2: 9.0.3
   oxfmt: 0.65.0
+  oxlint: 1.80.0
+  oxlint-tsgolint: 7.0.2001
   playwright: 1.62.1
   preact: 10.29.8
   prettier: 3.9.6
@@ -55,7 +57,7 @@ packages:
   # Language development. One directory per language under languages/, with
   # that language's development packages (the conformance corpus for now)
   # below it. Not published, and fits none of libs (npm packages) / apps /
-  # tools (repository tooling). See docs/tsubu/decisions.md (D-8).
+  # tools (repository tooling). See docs/sumi/decisions.md (D-8).
   - languages/*/*
   # The strict standard library. Its generator and its generated output live
   # together, so it does not fit `libs/*` (one directory, one npm package) and
