@@ -337,3 +337,14 @@
 
 - **ステータス**: 確定(2026-09-07)
 - **判断**: D-16 の言語名と拡張子を **Sumi / `.sumi`** に差し替える(ユーザー決定)。仕様書、開発パッケージ、コーパスのマーカー、JS plugin 名、preset の API 名(`sumiRules` / `eslintConfigForSumi`)を一括で改名した。旧名は記録に残さない。
+
+## D-45: readonly 強制は「引数は tsgolint、注釈は codemod の不動点検査」で実装する
+
+- **ステータス**: 提案(2026-09-07。ユーザー未承認)
+- **判断**: Sumi lint の readonly 注釈の全箇所強制([spec/readonly.md](./spec/readonly.md))を次の二段で実装する。
+    1. **引数の readonly 性**: oxlint-tsgolint の `typescript/prefer-readonly-parameter-types`(type-aware、`ignoreInferredTypes` + `treatMethodsAsReadonly`、境界型の allow リストは現行 config を継承)。実測(2026-09-07)で `(xs: number[])` を報告し、推論される callback 引数は無視することを確認済み。
+    2. **型注釈(配列・タプル・オブジェクト型リテラル・戻り値型・型宣言)の readonly 記法**: ts-codemod-lib の `convert-to-readonly`(+ `append-as-const`)を**検査モード**で走らせ、変換で字面が変わる箇所を違反として報告する(codemod の不動点 = 仕様適合)。リポジトリの CI が既に `codemod:full` + 作業ツリー clean で運用している方式そのもので、ルール実装の二重化がなく、fixer は codemod、Sumi sugar への移行 codemod(D-3)とも同じ変換器になる。
+- **置き場所**: (2) は TS AST(ts-morph)上の変換なので oxlint の native / JS plugin では書けない。第一候補は **sumi JS plugin 内で `typescript` / ts-codemod-lib を使って対象ファイルを再 parse し、`transformSourceCode` の結果と原文の差分位置を報告する**(エンジンを 1 つに保てる。ファイルごとに TS parse が 1 回増えるが型検査は不要)。それが遅ければ TS API 上の薄いチェッカー(Phase 2 の `sumi check` の前倒し)へ移す。
+- **対象外**: 推論される局所変数の readonly 性(`const xs = [1, 2]`)は求めない — 破壊的操作は `mut_` 側の規則が担う(readonly.md の未解決論点)。ESLint ブリッジ(`functional/prefer-immutable-types` / `type-declaration-immutability`)は採らない(型情報必須で oxlint に載らず、codemod と規則が二重になる)。
+- **理由**: D-42 で戻り値型の明示が必須になったので、引数・戻り値・型宣言はすべて注釈として字面に現れ、readonly-by-default は注釈の構文検査で大半を賄える。その検査規則を新たに書くより、既に同じ規則を実装している codemod を「変換が生じたら違反」と読み替える方が、規則の単一性と Sumi sugar への一対一対応(D-37)の両方に適う。
+- **dogfood 計測(2026-09-07、現時点の preset + 引数 readonly)**: ts-std-forge(src 28 + test 5 ファイル、0.4 秒)は 6 件 — 境界の実装者としての素の `String()` 3 件(D-24 の例外を inline disable で表す)、テストヘルパの `fn` 引数名と `try..catch` 各 1 件、`entry-point.mts` の `./index.mjs` 再 export 1 件(パッケージ入口の慣行 — ファイル単位の例外が要る)。eslint-plugin-ts-data-forge(src 31 ファイル)は 62 件 — `no-bitwise` 33(`ts.TypeFlags` のビット演算)、`fn` 19、`== null` 3 + `no-eq-null` 3、`null` 3、accessor 1。readonly 引数の違反はどちらも 0(現行 config で既に強制済み)。
