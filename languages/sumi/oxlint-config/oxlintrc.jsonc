@@ -200,4 +200,13 @@
     // ---- null (spec/null-undefined.md) ----
     "unicorn/no-null": "error",
   },
+  "overrides": [
+    {
+      // A package entry (`entry-point.mts`) re-exports its own root index:
+      // the one place `./index.mjs` is the module being addressed, not a
+      // shortcut into a directory (spec/modules.md, package-entry exemption).
+      "files": ["**/entry-point.mts"],
+      "rules": { "no-restricted-imports": "off" },
+    },
+  ],
 }

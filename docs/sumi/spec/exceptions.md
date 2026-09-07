@@ -79,6 +79,8 @@ const createHttpError = (
 
 ## 未解決の論点
 
+- **panic 経路の関数が prelude に無い(2026-09-08、synstate の dogfood で判明)。** 「停止は prelude の unwrap 系関数を通してのみ起こる」としているが、`throw new Error('not implemented')` や不変条件違反(循環依存の検出)のような**値の無い panic** を `Result.unwrapThrow` で書くのは不自然で、synstate では `oxlint-disable-next-line sumi/no-throw` で逃がしている(2 件)。ts-data-forge(prelude)に `panic(message): never` / `unreachable()` / `todo()` 相当を追加し、それを唯一の停止手段として `no-throw` の例外にしないか(追加すれば disable は不要になる)。
+
 - `Err` ペイロードの設計規範は上記「仕様への帰結」1〜2 で骨格が決まった(既定 plain tagged union / 境界・panic は Error ベース factory)。残るのはエラーの合成(`mapErr` / union が増えていく問題)の指針と、factory 群を prelude(ts-data-forge)にどう載せるか。
 - `using` / Explicit Resource Management の Sumi sugar での採否(Sumi lint は禁止 — D-30)。
 - process 境界(uncaught rejection、`process.exit`)の扱い。

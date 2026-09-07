@@ -15,7 +15,7 @@
 
 ## フォーマッタ互換(検証済み 2026-08-31)
 
-`const identity = <T,>(x: T): T => x;` を Prettier(`.mts` / `.tsx` の両方)と oxfmt に通し、**いずれも trailing comma を保持する**ことを実測確認した。`<T,>` 常時強制の成立条件はクリア。
+`const identity = <T,>(x: T): T => x;` を Prettier(`.mts` / `.tsx` の両方)と oxfmt に通し、**いずれも trailing comma を保持する**ことを実測確認した。**追記(2026-09-08、synstate の dogfood)**: Prettier は `<const T,>` と `<T = X,>` も保持するが、**制約付き `<T extends X,>` の trailing comma は `.mts` / `.tsx` とも除去する**(`.ts` では `<T,>` も除去する — Sumi lint は `.ts` を対象にしない)。制約付きの形は `extends` 自体が JSX との曖昧さを消す(TS が `.tsx` で提示するもう一方の回避策)ので、規則 `jsx/generic-arrow-trailing-comma` は**制約付きの単一型引数を対象外**とする。`<T,>` 常時強制の成立条件はクリア。
 
 ## 決定済みの論点(2026-09-06)
 

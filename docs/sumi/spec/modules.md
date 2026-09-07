@@ -67,6 +67,10 @@ export { eslintConfig as default } from './configs/eslint.config.mjs';
 
 なし。許可される形はすべて標準的な TS/ESM であり、むしろ最も互換性の高い書き方に限定している。
 
+## パッケージ入口の例外(確定 2026-09-08 — D-42 の運用追認)
+
+パッケージの入口ファイル `entry-point.mts` は自身のルート `index.mjs` を再 export してよい(`export * from './index.mjs';`)。「相対 index 直指定禁止」は生成 index をディレクトリの外から近道で参照することを防ぐ規則であり、入口が自分のルート index を指すのはその対象ではない。強制手段の側はファイル名 `entry-point.mts` に対する override(sumi-oxlint-config の `overrides`)で表す。
+
 ## 未解決の論点
 
 - **barrel ファイル(`export * from ...`)を許すか(保留 2026-09-05 — D-28)。** この monorepo の `pnpm run gi` は `export *` で index.mts を生成している。`export *` 同士の名前衝突は tsc が TS2308 で報告するが、同じ barrel の**明示 export(`export const foo` / `export { foo } from`)が同名の `export *` を無警告で隠す**(2026-09-05 実測)。生成 index は `export *` のみで構成され明示 export と混ざらないのでこの問題は起きない。「生成物のみ許可」「混在のみ禁止」「全面禁止」を検討したが決定は見送り。

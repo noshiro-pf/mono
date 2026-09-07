@@ -185,6 +185,81 @@
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
     },
 
+    // Same as `libs/*`, plus the Sumi dogfood exception.
+    "libs/synstate": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+
+      // These live under `configs/`, not where each plugin looks by default.
+      "vitest": {
+        "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
+      },
+      "typedoc": { "config": ["configs/typedoc.config.mjs"] },
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
+      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      "ignoreDependencies": ["sumi-cli"],
+    },
+
+    // Same as `libs/*`, plus the Sumi dogfood exception.
+    "libs/synstate-preact-hooks": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+
+      // These live under `configs/`, not where each plugin looks by default.
+      "vitest": {
+        "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
+      },
+      "typedoc": { "config": ["configs/typedoc.config.mjs"] },
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
+      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      "ignoreDependencies": ["sumi-cli"],
+    },
+
+    // Same as `libs/*`, plus the Sumi dogfood exception.
+    "libs/synstate-react-hooks": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+
+      // These live under `configs/`, not where each plugin looks by default.
+      "vitest": {
+        "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
+      },
+      "typedoc": { "config": ["configs/typedoc.config.mjs"] },
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
+      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      "ignoreDependencies": ["sumi-cli"],
+    },
+
     // Same as `libs/*` — knip replaces a workspace config rather than merging
     // it, so the shared settings are repeated — plus one exception.
     "libs/eslint-config-typed": {

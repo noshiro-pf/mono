@@ -1,0 +1,15 @@
+{
+  // The Sumi lint check of this package (`pnpm run sumi:check`, D-46): the
+  // locked compilerOptions come from the base config, the free ones are
+  // this package's. Sumi dogfood target since 2026-09-08 (issue #1753).
+  "extends": "sumi-cli/tsconfig",
+  "compilerOptions": {
+    "lib": ["esnext", "dom"],
+    "types": [
+      "ts-type-forge/global",
+      "vitest/importMeta",
+      "eslint-config-typed/vitest-globals"
+    ]
+  },
+  "include": ["./src"]
+}

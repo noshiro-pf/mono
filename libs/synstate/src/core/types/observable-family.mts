@@ -61,124 +61,123 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
-namespace SynStateInternals {
-  type Cast<A> = A extends NonEmptyUnknownList ? A : never;
+type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 
-  type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
-    OS extends NonEmptyTuple<InitializedObservable<unknown>> ? true : false;
+type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
+  OS extends NonEmptyTuple<InitializedObservable<unknown>> ? true : false;
 
-  type IsInitialized<O> = readonly [O] extends readonly [
-    InitializedObservable<unknown>,
-  ]
-    ? true
-    : false;
+type IsInitialized<O> = readonly [O] extends readonly [
+  InitializedObservable<unknown>,
+]
+  ? true
+  : false;
 
-  /** Evaluates true | false as true instead of boolean */
-  type LogicalValue<B extends boolean> = readonly [B] extends readonly [true]
-    ? true
-    : readonly [B] extends readonly [false]
-      ? false
-      : true;
+/** Evaluates true | false as true instead of boolean */
+type LogicalValue<B extends boolean> = readonly [B] extends readonly [true]
+  ? true
+  : readonly [B] extends readonly [false]
+    ? false
+    : true;
 
-  type SomeInitializedImpl<OS extends Observable<unknown>> =
-    // union distribution
-    LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
+type SomeInitializedImpl<OS extends Observable<unknown>> =
+  // union distribution
+  LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
 
-  type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
-    SomeInitializedImpl<OS[number]>;
+type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
+  SomeInitializedImpl<OS[number]>;
 
-  expectType<EveryInitialized<readonly [Observable<1>]>, false>('=');
+expectType<EveryInitialized<readonly [Observable<1>]>, false>('=');
 
-  expectType<EveryInitialized<readonly [InitializedObservable<1>]>, true>('=');
+expectType<EveryInitialized<readonly [InitializedObservable<1>]>, true>('=');
 
-  expectType<
-    EveryInitialized<
-      readonly [InitializedObservable<1>, InitializedObservable<2>]
-    >,
-    true
-  >('=');
+expectType<
+  EveryInitialized<
+    readonly [InitializedObservable<1>, InitializedObservable<2>]
+  >,
+  true
+>('=');
 
-  expectType<
-    EveryInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
-    false
-  >('=');
+expectType<
+  EveryInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
+  false
+>('=');
 
-  expectType<SomeInitialized<readonly [Observable<1>]>, false>('=');
+expectType<SomeInitialized<readonly [Observable<1>]>, false>('=');
 
-  expectType<SomeInitialized<readonly [InitializedObservable<1>]>, true>('=');
+expectType<SomeInitialized<readonly [InitializedObservable<1>]>, true>('=');
 
-  expectType<
-    SomeInitialized<
-      readonly [InitializedObservable<1>, InitializedObservable<2>]
-    >,
-    true
-  >('=');
+expectType<
+  SomeInitialized<
+    readonly [InitializedObservable<1>, InitializedObservable<2>]
+  >,
+  true
+>('=');
 
-  expectType<
-    SomeInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
-    true
-  >('=');
+expectType<
+  SomeInitialized<readonly [Observable<1>, InitializedObservable<2>]>,
+  true
+>('=');
 
-  type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<A, A>;
+type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<A, A>;
 
-  export type CombineObservableImpl<A extends NonEmptyUnknownList> =
-    SyncChildObservable<A, A>;
+type CombineObservableImpl<A extends NonEmptyUnknownList> = SyncChildObservable<
+  A,
+  A
+>;
 
-  export type CombineObservableRefinedImpl<
-    OS extends NonEmptyTuple<Observable<unknown>>,
-  > =
-    EveryInitialized<OS> extends true
-      ? InitializedCombineObservableImpl<Cast<Unwrap<OS>>>
-      : CombineObservableImpl<Unwrap<OS>>;
+type CombineObservableRefinedImpl<
+  OS extends NonEmptyTuple<Observable<unknown>>,
+> =
+  EveryInitialized<OS> extends true
+    ? InitializedCombineObservableImpl<Cast<Unwrap<OS>>>
+    : CombineObservableImpl<Unwrap<OS>>;
 
-  type InitializedZipObservableImpl<A extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<A, A>;
+type InitializedZipObservableImpl<A extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<A, A>;
 
-  export type ZipObservableImpl<A extends NonEmptyUnknownList> =
-    SyncChildObservable<A, A>;
+type ZipObservableImpl<A extends NonEmptyUnknownList> = SyncChildObservable<
+  A,
+  A
+>;
 
-  export type ZipObservableRefinedImpl<
-    OS extends NonEmptyTuple<Observable<unknown>>,
-  > =
-    EveryInitialized<OS> extends true
-      ? InitializedZipObservableImpl<Cast<Unwrap<OS>>>
-      : ZipObservableImpl<Unwrap<OS>>;
+type ZipObservableRefinedImpl<OS extends NonEmptyTuple<Observable<unknown>>> =
+  EveryInitialized<OS> extends true
+    ? InitializedZipObservableImpl<Cast<Unwrap<OS>>>
+    : ZipObservableImpl<Unwrap<OS>>;
 
-  type InitializedMergeObservableImpl<P extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<ArrayElement<P>, P>;
+type InitializedMergeObservableImpl<P extends NonEmptyUnknownList> =
+  InitializedSyncChildObservable<ArrayElement<P>, P>;
 
-  export type MergeObservableImpl<P extends NonEmptyUnknownList> =
-    SyncChildObservable<ArrayElement<P>, P>;
+type MergeObservableImpl<P extends NonEmptyUnknownList> = SyncChildObservable<
+  ArrayElement<P>,
+  P
+>;
 
-  export type MergeObservableRefinedImpl<
-    OS extends NonEmptyTuple<Observable<unknown>>,
-  > =
-    SomeInitialized<OS> extends true
-      ? InitializedMergeObservableImpl<Cast<Unwrap<OS>>>
-      : MergeObservableImpl<Unwrap<OS>>;
-}
+type MergeObservableRefinedImpl<OS extends NonEmptyTuple<Observable<unknown>>> =
+  SomeInitialized<OS> extends true
+    ? InitializedMergeObservableImpl<Cast<Unwrap<OS>>>
+    : MergeObservableImpl<Unwrap<OS>>;
 
 export type CombineObservable<A extends NonEmptyUnknownList> =
-  SynStateInternals.CombineObservableImpl<A>;
+  CombineObservableImpl<A>;
 
 export type CombineObservableRefined<
   OS extends NonEmptyTuple<Observable<unknown>>,
-> = SynStateInternals.CombineObservableRefinedImpl<OS>;
+> = CombineObservableRefinedImpl<OS>;
 
-export type ZipObservable<A extends NonEmptyUnknownList> =
-  SynStateInternals.ZipObservableImpl<A>;
+export type ZipObservable<A extends NonEmptyUnknownList> = ZipObservableImpl<A>;
 
 export type ZipObservableRefined<
   OS extends NonEmptyTuple<Observable<unknown>>,
-> = SynStateInternals.ZipObservableRefinedImpl<OS>;
+> = ZipObservableRefinedImpl<OS>;
 
 export type MergeObservable<A extends NonEmptyUnknownList> =
-  SynStateInternals.MergeObservableImpl<A>;
+  MergeObservableImpl<A>;
 
 export type MergeObservableRefined<
   OS extends NonEmptyTuple<Observable<unknown>>,
-> = SynStateInternals.MergeObservableRefinedImpl<OS>;
+> = MergeObservableRefinedImpl<OS>;
 
 export type MapOperatorObservable<A, B> = SyncChildObservable<B, readonly [A]>;
 
