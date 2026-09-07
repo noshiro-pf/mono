@@ -1,4 +1,3 @@
-import { type TSESTree } from '@typescript-eslint/utils';
 import { createRule } from './create-rule.mjs';
 
 /**
@@ -40,7 +39,9 @@ export const genericArrowTrailingComma = createRule({
       if (param === undefined) return;
 
       // (`null` from oxlint, `undefined` per the typings — see above.)
-      const constraint: TSESTree.TypeNode | null | undefined = param.constraint;
+      // Declared `unknown` so that assignment narrowing does not make the
+      // `null` half of the check unreachable to the type checker.
+      const constraint: unknown = param.constraint;
 
       if (constraint !== null && constraint !== undefined) return;
 
