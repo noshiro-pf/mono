@@ -71,12 +71,12 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
   defaultOptions: [],
   create: (context) => ({
     TSArrayType: (node) => {
-      if (isExcluded(node) || isDirectlyReadonly(node)) return;
+      if (isExcluded(node) || isCovered(node, 'array')) return;
 
       context.report({ node, messageId: 'array' });
     },
     TSTupleType: (node) => {
-      if (isExcluded(node) || isDirectlyReadonly(node)) return;
+      if (isExcluded(node) || isCovered(node, 'tuple')) return;
 
       context.report({ node, messageId: 'tuple' });
     },
@@ -87,7 +87,7 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
 
       if (alternative === undefined) return;
 
-      if (isExcluded(node) || isDirectArgumentOfShallowReadonly(node)) return;
+      if (isExcluded(node) || isCovered(node, 'reference')) return;
 
       context.report({
         node: node.typeName,
@@ -98,7 +98,7 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
     TSPropertySignature: (node) => {
       if (node.readonly) return;
 
-      if (isExcluded(node) || isMemberOfReadonlyLiteral(node)) return;
+      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) return;
 
       const name = propertyName(node.key);
 
@@ -113,14 +113,14 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
     TSIndexSignature: (node) => {
       if (node.readonly) return;
 
-      if (isExcluded(node) || isMemberOfReadonlyLiteral(node)) return;
+      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) return;
 
       context.report({ node, messageId: 'indexSignature' });
     },
     TSMappedType: (node) => {
       if (node.readonly === true || node.readonly === '+') return;
 
-      if (isExcluded(node)) return;
+      if (isExcluded(node) || isCovered(node, 'mapped')) return;
 
       context.report({ node, messageId: 'mappedType' });
     },
@@ -137,31 +137,95 @@ const propertyName = (key: AnyNode): string | undefined =>
       ? key.value
       : undefined;
 
-/** `readonly T[]` / `readonly [A]`: the parent is the readonly type operator. */
-const isDirectlyReadonly = (node: AnyNode): boolean =>
-  (node.parent?.type === AST_NODE_TYPES.TSTypeOperator &&
-    node.parent.operator === 'readonly') ||
-  isDirectArgumentOfShallowReadonly(node);
+type Kind = 'array' | 'tuple' | 'reference' | 'mapped';
 
-/** `Readonly<X>` where X is exactly this node. */
-const isDirectArgumentOfShallowReadonly = (node: AnyNode): boolean => {
-  const instantiation = node.parent;
+/**
+ * Whether the position already makes the node readonly (the codemod leaves
+ * these alone). Unions and intersections are looked through (parentheses do
+ * not exist in the AST): `Readonly<A | B>` covers both members.
+ *
+ * - `readonly T[]` / `readonly [A]`: the readonly type operator.
+ * - The direct type argument of `Readonly<>` (arrays, tuples, literals,
+ *   mapped types, and `Array` / `Record` references — `Readonly<Map<>>` is
+ *   not a `ReadonlyMap` and stays reported).
+ * - The object of an indexed access (`{ a: T[] }['a']`, `Record<K, V>[I]`):
+ *   the codemod strips `Readonly` there.
+ * - The type of a rest element (`readonly [A, ...B[]]`): the tuple's
+ *   readonly-ness is what counts; the codemod writes `...B[]`.
+ * - A tuple or array used as a distribution guard in a conditional type
+ *   (`[A] extends [B] ? ...`, `A[] extends B[] ? ...`).
+ */
+const isCovered = (node: AnyNode, kind: Kind): boolean => {
+  let mut_current: AnyNode = node;
 
-  const reference = instantiation?.parent;
+  let mut_parent: AnyNode | undefined = node.parent;
 
-  return (
-    instantiation?.type === AST_NODE_TYPES.TSTypeParameterInstantiation &&
+  while (
+    mut_parent !== undefined &&
+    (mut_parent.type === AST_NODE_TYPES.TSUnionType ||
+      mut_parent.type === AST_NODE_TYPES.TSIntersectionType)
+  ) {
+    mut_current = mut_parent;
+
+    mut_parent = mut_parent.parent;
+  }
+
+  if (mut_parent === undefined) return false;
+
+  if (
+    mut_parent.type === AST_NODE_TYPES.TSTypeOperator &&
+    mut_parent.operator === 'readonly'
+  ) {
+    return true;
+  }
+
+  if (mut_parent.type === AST_NODE_TYPES.TSIndexedAccessType) {
+    return mut_parent.objectType === mut_current;
+  }
+
+  if (mut_parent.type === AST_NODE_TYPES.TSRestType) {
+    return kind === 'array' || kind === 'tuple';
+  }
+
+  if (mut_parent.type === AST_NODE_TYPES.TSConditionalType) {
+    // The distribution guard (`[A] extends [B]`, `A[] extends B[]`) — in
+    // effect only when the check type itself is a tuple or an array.
+    const checkType = mut_parent.checkType;
+
+    return (
+      (kind === 'tuple' || kind === 'array') &&
+      (checkType.type === AST_NODE_TYPES.TSTupleType ||
+        checkType.type === AST_NODE_TYPES.TSArrayType) &&
+      (checkType === mut_current || mut_parent.extendsType === mut_current)
+    );
+  }
+
+  const reference = mut_parent.parent;
+
+  const isReadonlyArgument =
+    mut_parent.type === AST_NODE_TYPES.TSTypeParameterInstantiation &&
     reference?.type === AST_NODE_TYPES.TSTypeReference &&
     reference.typeName.type === AST_NODE_TYPES.Identifier &&
     shallowReadonlyNames.has(reference.typeName.name) &&
-    instantiation.params[0] === node
+    mut_parent.params[0] === mut_current;
+
+  if (!isReadonlyArgument) return false;
+
+  if (kind !== 'reference') return true;
+
+  // `Readonly<Array<T>>` is a ReadonlyArray and `Readonly<Record<K, V>>` a
+  // readonly record; `Readonly<Map<K, V>>` / `Readonly<Set<T>>` are not.
+  return (
+    node.type === AST_NODE_TYPES.TSTypeReference &&
+    node.typeName.type === AST_NODE_TYPES.Identifier &&
+    (node.typeName.name === 'Array' || node.typeName.name === 'Record')
   );
 };
 
-/** A member of a type literal that is itself the direct argument of `Readonly<>`. */
-const isMemberOfReadonlyLiteral = (member: AnyNode): boolean =>
+/** A member of a type literal whose position already makes it readonly. */
+const isMemberOfCoveredLiteral = (member: AnyNode): boolean =>
   member.parent?.type === AST_NODE_TYPES.TSTypeLiteral &&
-  isDirectArgumentOfShallowReadonly(member.parent);
+  isCovered(member.parent, 'mapped');
 
 /**
  * Whether a `DeepReadonly<>` / `Mutable<>` reference, or a `mut_`-named
