@@ -44,7 +44,7 @@ readonly-by-default は自分のコードだけでは完結しない — `lib.d.
 
 ## 強制手段
 
-- Sumi lint: 引数は tsgolint の `prefer-readonly-parameter-types`、注釈の記法は ts-codemod-lib `convert-to-readonly` の不動点検査(D-45 提案。現行 ESLint 運用は `functional/prefer-readonly-type` 系)。
+- Sumi lint: 引数は tsgolint の `prefer-readonly-parameter-types`、注釈の記法は `convert-to-readonly` の判定を fork した検査専用ルール `sumi/require-readonly-type`(D-45。readonly の綴りは正規化しない。現行 ESLint 運用は `functional/prefer-readonly-type` 系)。
 
 ## TS へ戻るときの影響
 
