@@ -41,7 +41,7 @@ const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28
 解決規則は一つだけ:
 
 1. `./` / `../` で始まる specifier → 記載どおりのファイル(拡張子必須、`index` 暗黙解決なし)。
-2. それ以外 → パッケージ名として `node_modules` の `exports` フィールド経由で解決。`exports` を持たないパッケージへの依存は違法(境界の問題として扱う → 未解決の論点)。
+2. それ以外 → パッケージ名として `node_modules` の `exports` フィールド経由で解決。`exports` を持たないパッケージへの依存も**合法**(`main` / `types` による nodenext の解決に従う — 確定 2026-09-06、D-42)。ただし **何も export しない script(副作用だけのモジュール)は import できない**: 副作用 import は禁止(上表)で、名前付き import は export が無ければ型エラーになるため、追加の規則は要らない。
 3. `#` で始まる specifier → package.json の `imports` フィールド経由で解決(D-28)。`exports` と同じく package.json が定める規則であり、解決規則の種類を増やさない。
 4. `tsconfig` の `baseUrl` / `paths` は使用しない(`#` imports がその受け皿になる)。
 
@@ -49,14 +49,14 @@ tsc 上の対応は `module: nodenext` + `moduleResolution: nodenext` に固定(
 
 ## 強制手段
 
-- v1: ESLint(`no-restricted-syntax` + import 系ルール)+ tsconfig 固定。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
+- Tsubu lint: ESLint(`no-restricted-syntax` + import 系ルール)+ tsconfig 固定。この monorepo の既存規約(「`.mts` を `.mjs` 拡張子で import」「named export のみ」)がそのまま土台になる。
 
 ## default export を要求するツールとの接続(確定 2026-09-05 — D-36)
 
 ESLint flat config / Vite / Vitest / Rollup 等は設定ファイルの default export を要求するが、ソースの export 形は named 一択を崩さない。
 
-- **v2**: transpiler が `export default` を **emit** する(default export は出力側にだけ現れる)。指示は transpiler の設定ファイル(パスパターン → default にする named export 名)が第一候補、ファイル内ディレクティブが次点(D-36)。具体形は v2 設計時に決める。パス指定で構文の許可範囲を変える一般機構は採らない(D-36 却下案)。
-- **v1(暫定)**: 設定の本体は Tsubu の通常モジュールとして named export で書き(`export const eslintConfig = …`)、ツールが読むファイルは検査対象外の 1 行アダプタにする:
+- **Tsubu sugar**: transpiler が `export default` を **emit** する(default export は出力側にだけ現れる)。指示は transpiler の設定ファイル(パスパターン → default にする named export 名)が第一候補、ファイル内ディレクティブが次点(D-36)。具体形は Tsubu sugar 設計時に決める。パス指定で構文の許可範囲を変える一般機構は採らない(D-36 却下案)。
+- **Tsubu lint(暫定)**: 設定の本体は Tsubu の通常モジュールとして named export で書き(`export const eslintConfig = …`)、ツールが読むファイルは検査対象外の 1 行アダプタにする:
 
 ```ts
 // eslint.config.mts — Tsubu の検査対象外(ロジックを持たない)

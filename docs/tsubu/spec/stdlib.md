@@ -12,9 +12,9 @@
 
 目標: `Optional` / `Result` / `pipe` / `match` を、import 文なしでネイティブ言語機能のように使えること。
 
-- **型**は v1 から global にできる(ts-type-forge が `global.d.mts` でやっている方式)。
-- **実行時の値**は v1 では明示 import が必要。`globalThis` への注入は「アプリの entry point が先に実行される」ことに依存し、ライブラリでは成立しないため採らない。
-- **v2**: transpiler が prelude 識別子の使用を検出し、emit する TS に `import { Optional } from 'ts-data-forge';` を自動挿入する。eject 後のコードは明示 import 付きの普通の TS になる(D-3 の「機械的移行」が import 挿入という形で成立)。
+- **型**は Tsubu lint から global にできる(ts-type-forge が `global.d.mts` でやっている方式)。
+- **実行時の値**は Tsubu lint では明示 import が必要。`globalThis` への注入は「アプリの entry point が先に実行される」ことに依存し、ライブラリでは成立しないため採らない。
+- **Tsubu sugar**: transpiler が prelude 識別子の使用を検出し、emit する TS に `import { Optional } from 'ts-data-forge';` を自動挿入する。eject 後のコードは明示 import 付きの普通の TS になる(D-3 の「機械的移行」が import 挿入という形で成立)。
 
 ## Optional / Result の現状 API(2026-08-27 調査)
 
@@ -37,28 +37,28 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 - `Optional.toResult` は **`Result.fromOptional`** として実装した(optional → result 方向の import は既存の `Result.toOptional` と合わせて循環 import になるため。`Result.toOptional` との命名対称性も得られる)。
 - `safeTry` は `yield* Result.safeUnwrap(r)` で unwrap する neverthrow 方式。`async function*` を渡すと `Promise<Result>` が返り body 内で `await` が使えるため、async 合成の一部はこれで書ける。
 - **`ResultAsync`(`Promise<Result>` を透過する `map`/`flatMap` 群)は未実装のまま残る唯一の ★★★**。
-- 実装から得た v2 構文設計への知見: `Generator<Err<E1>, Result<S, E2>>` 型の union → union 推論(`Ok<number> | Err<'e2'>` を `Ok<S> | Err<E2>` に当てる)は TS が候補を出せず破綻するため、`UnwrapOk`/`UnwrapErr` による全体推論形が必要だった。`?` 構文の emit を safeTry 包みで行う場合([future-syntax.md](./future-syntax.md) 候補 4)も同じ制約を受ける。
+- 実装から得た Tsubu sugar 構文設計への知見: `Generator<Err<E1>, Result<S, E2>>` 型の union → union 推論(`Ok<number> | Err<'e2'>` を `Ok<S> | Err<E2>` に当てる)は TS が候補を出せず破綻するため、`UnwrapOk`/`UnwrapErr` による全体推論形が必要だった。`?` 構文の emit を safeTry 包みで行う場合([future-syntax.md](./future-syntax.md) 候補 4)も同じ制約を受ける。
 
 ### Optional
 
-| 欠けている機能                  | 他言語での対応物                 | 優先度 | 備考                                                                                       |
-| :------------------------------ | :------------------------------- | :----- | :----------------------------------------------------------------------------------------- |
-| `match` / 値への畳み込み        | Rust `map_or_else`、fp-ts `fold` | ★★★    | `Optional.match(o, { some: (v) => ..., none: () => ... })`。パターンマッチ構文(v2)の関数版 |
-| `toResult`(err 値を与えて変換)  | Rust `ok_or` / `ok_or_else`      | ★★★    | `Result.toOptional` の逆向きが無い                                                         |
-| `sequence` / `traverse`         | Rust `collect::<Option<Vec<_>>>` | ★★     | `readonly Optional<T>[]` → `Optional<readonly T[]>`。`Arr` 側との連携                      |
-| 遅延デフォルト `unwrapOrElse`   | Rust `unwrap_or_else`            | ★★     | `unwrapOr` は eager のみ                                                                   |
-| 遅延 `orElse`(thunk を取る)     | Rust `or_else`                   | ★★     | 現状の `orElse` は評価済みの代替値を取る                                                   |
-| n-ary `zip` / `zipWith`         | —                                | ★      | 現状 2 引数のみ                                                                            |
-| `flatten`                       | Rust `flatten`                   | ★      | `Optional<Optional<T>>` → `Optional<T>`(`flatMap(id)` で代用可)                            |
-| `tap` / `inspect`               | Rust `inspect`                   | ★      | デバッグ・副作用の明示点                                                                   |
-| 述語系 `isSomeAnd` / `contains` | Rust `is_some_and`               | ★      |                                                                                            |
-| type guard 版 `filter`          | —                                | ★      | `filter` に narrowing オーバーロードが無い                                                 |
+| 欠けている機能                  | 他言語での対応物                 | 優先度 | 備考                                                                                                |
+| :------------------------------ | :------------------------------- | :----- | :-------------------------------------------------------------------------------------------------- |
+| `match` / 値への畳み込み        | Rust `map_or_else`、fp-ts `fold` | ★★★    | `Optional.match(o, { some: (v) => ..., none: () => ... })`。パターンマッチ構文(Tsubu sugar)の関数版 |
+| `toResult`(err 値を与えて変換)  | Rust `ok_or` / `ok_or_else`      | ★★★    | `Result.toOptional` の逆向きが無い                                                                  |
+| `sequence` / `traverse`         | Rust `collect::<Option<Vec<_>>>` | ★★     | `readonly Optional<T>[]` → `Optional<readonly T[]>`。`Arr` 側との連携                               |
+| 遅延デフォルト `unwrapOrElse`   | Rust `unwrap_or_else`            | ★★     | `unwrapOr` は eager のみ                                                                            |
+| 遅延 `orElse`(thunk を取る)     | Rust `or_else`                   | ★★     | 現状の `orElse` は評価済みの代替値を取る                                                            |
+| n-ary `zip` / `zipWith`         | —                                | ★      | 現状 2 引数のみ                                                                                     |
+| `flatten`                       | Rust `flatten`                   | ★      | `Optional<Optional<T>>` → `Optional<T>`(`flatMap(id)` で代用可)                                     |
+| `tap` / `inspect`               | Rust `inspect`                   | ★      | デバッグ・副作用の明示点                                                                            |
+| 述語系 `isSomeAnd` / `contains` | Rust `is_some_and`               | ★      |                                                                                                     |
+| type guard 版 `filter`          | —                                | ★      | `filter` に narrowing オーバーロードが無い                                                          |
 
 ### Result
 
 | 欠けている機能                             | 他言語での対応物                                            | 優先度 | 備考                                                                                                                                                                                                                                  |
 | :----------------------------------------- | :---------------------------------------------------------- | :----- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **早期 return 伝播(`?` 相当)**             | Rust `?`、neverthrow `safeTry`(generator 利用)              | ★★★    | これが無いと `flatMap` の入れ子地獄になる。v1 は generator ベースの `safeTry` 相当で橋渡し、v2 で構文化([future-syntax.md](./future-syntax.md))                                                                                       |
+| **早期 return 伝播(`?` 相当)**             | Rust `?`、neverthrow `safeTry`(generator 利用)              | ★★★    | これが無いと `flatMap` の入れ子地獄になる。Tsubu lint は generator ベースの `safeTry` 相当で橋渡し、Tsubu sugar で構文化([future-syntax.md](./future-syntax.md))                                                                      |
 | `match` / 値への畳み込み                   | Rust `map_or_else`、neverthrow `match`                      | ★★★    | 現状の `fold` は bimap(Result → Result)で、名前が他言語の fold(→ 値)と衝突している点も要整理                                                                                                                                          |
 | **async 系(`AsyncResult`)**                | neverthrow `ResultAsync`(`map`/`andThen` が Promise を透過) | ★★★    | **実装済み([#1724](https://github.com/noshiro-pf/mono/pull/1724))**: `AsyncResult<S, E> = Promise<Result<S, E>>` + fromPromise(mapError 必須で unknown 問題も解消)/ fromThrowable / map / mapErr / flatMap / unwrapOr(カリー化形付き) |
 | `fromPromise` のエラー型指定               | neverthrow `fromPromise(p, errFn)`                          | ★★     | **実装済み([#1724](https://github.com/noshiro-pf/mono/pull/1724))**: `AsyncResult.fromPromise(promise, mapError)` として(mapError 必須)                                                                                               |
@@ -74,17 +74,33 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 
 ### 横断的な論点
 
-- **`pipe` との統合**: `Pipe` に `mapResult` / `flatMapOptional` / `flatMapResult` が無く、Optional 系だけ特別扱いになっている。prelude として一貫させるなら演算子相当の網羅が要る(ただし v2 でパイプ演算子が入るなら fluent ラッパーは過渡的手段)。
+- **`pipe` との統合**: `Pipe` に `mapResult` / `flatMapOptional` / `flatMapResult` が無く、Optional 系だけ特別扱いになっている。prelude として一貫させるなら演算子相当の網羅が要る(ただし Tsubu sugar でパイプ演算子が入るなら fluent ラッパーは過渡的手段)。
 - **`match` の二重意味**: 現状の `match`(文字列テーブル引き)と、将来のパターンマッチ(構造的)は別物。名前の衝突を今のうちに設計しておく(現 `match` を `matchTag` 等へ改名するか、構造マッチャーが `match` を継承拡張するか)。
 - **`T | undefined` と `Optional<T>` の使い分け指針**が未規定。Rust には「`null` が無いのですべて `Option`」という一貫性があるが、この言語では `undefined` が生き残る([null-undefined.md](./null-undefined.md))ため、「境界・単発は `?? undefined`、合成が続くなら `Optional`」のような規範を言語として明文化する必要がある。`exactOptionalPropertyTypes` 下でのプロパティ表現も含む。
 
 ## TS へ戻るときの影響
 
-なし(v1 は明示 import の普通のライブラリ利用。v2 の auto-import も eject 時に import 文として実体化される)。
+なし(Tsubu lint は明示 import の普通のライブラリ利用。Tsubu sugar の auto-import も eject 時に import 文として実体化される)。
+
+## コンストラクタ静的呼び出しの代替(D-15 / D-41)
+
+対象は `new X()` と `X()` の両方を持ち、関数形が暗黙変換(または別の意味)になる組み込みだけ。`Symbol()` / `BigInt()` は `new` 形を持たないので対象外。代替は ts-std-forge に置く(D-41)。
+
+| 禁止する呼び出し             | 代替                                                                              | 備考                                                                                                                                                                                                                           |
+| :--------------------------- | :-------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Number(str)`                | `SafeNumber.parse(str)` → `Result<number, { kind: 'invalid-number' }>`            | `Num.safeParseFloat` と同じ実装(コピー)。空文字・末尾不正・`NaN`・`Infinity` を Err に。戻り値は brand 型(`FiniteNumber`)ではなく素の `number`(D-26 / D-39)。`Number(bool)` は `b ? 1 : 0`、`Number(date)` は `date.getTime()` |
+| `Number.parseInt(str, 10)`   | `SafeNumber.parseInteger(str)` → `Result<number, { kind: 'invalid-integer' }>`    | `Num.safeParseInt` と同じ実装(コピー)+ 有限性チェック。戻り値は `Int` ではなく素の `number`。`parseInt` という宣言名は global の shadow(D-19)なので `parseInteger`                                                             |
+| `String(x)`                  | `SafeString.fromPrimitive(x)`(primitive → `string`、全域)                         | `symbol` / `bigint` / `undefined` は template literal に置けないのでこれを使う。`unknown` は ts-data-forge の `unknownToString`                                                                                                |
+| `RegExp(p, f)`               | `Regex.create(p, f)`                                                              | 既存(D-26)                                                                                                                                                                                                                     |
+| `Error('msg')` 系            | `new Error('msg')` / prelude の factory                                           | `new` 形は許可([exceptions.md](./exceptions.md))                                                                                                                                                                               |
+| `Array(n)` / `Array(a, b)`   | 配列リテラル / `Arr.newArray(n, fill)` / `Arr.seq(n)`(ts-data-forge)              | `Array(3)` は sparse(禁止)                                                                                                                                                                                                     |
+| `Date()`                     | `new Date()`(+ `SafeDate.toISOString`)                                            | `Date()` は現在時刻の文字列を返す別物                                                                                                                                                                                          |
+| `Boolean(x)`                 | 代替なし — `x !== undefined` / `Arr.isNonEmpty(xs)` / `s !== ''` 等の明示的な比較 | [booleans-and-logic.md](./booleans-and-logic.md)                                                                                                                                                                               |
+| `Object(x)` / `Function(..)` | 代替なし                                                                          | boxing / eval 相当                                                                                                                                                                                                             |
 
 ## 未解決の論点
 
-- **コンストラクタ静的呼び出しの代替生成関数**(D-15)と **throw する stdlib の Result ラッパー**(D-22 — 対象は [throwing-stdlib-survey.md](../throwing-stdlib-survey.md)): `Num.safeParseInt` 系・`Json.*` が既存モデル。**`new RegExp` の Result ラッパー(動的パターン用)をギャップに追加**(2026-08-29)。`Arr.set` の可変長配列での範囲外(RangeError が残る)への Optional/Result 版も検討対象。
+- **コンストラクタ静的呼び出しの代替生成関数**(D-15 — 配置と対象は D-41 で確定、下表)と **throw する stdlib の Result ラッパー**(D-22 — 対象は [throwing-stdlib-survey.md](../throwing-stdlib-survey.md)): `Num.safeParseInt` 系・`Json.*` が既存モデル。**`new RegExp` の Result ラッパー(動的パターン用)をギャップに追加**(2026-08-29)。`Arr.set` の可変長配列での範囲外(RangeError が残る)への Optional/Result 版も検討対象。
 - **null / 番兵値を返す API の Optional ラップ(方針)**: throwable → Result と対になる形で、null を返す API(`RegExp.prototype.exec`、`match` 等)は Optional を返すラッパーへ寄せたい(ユーザー意向 2026-08-29。番兵値 API の棚卸しは survey の次の調査枠)。
 - **ラッパー群のパッケージ構成(確定 — D-24)**: 一方向依存の新ライブラリ **ts-std-forge**(仮名)を採用。scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)。以下は検討の記録:懸念は相互依存 — ts-data-forge は基本 ADT(Result/Optional/pipe)と拡張 `Arr` の両方を持つため、分割すると双方向依存になりうる。**整理案(D-24 で採用)**: 依存を「wrapper 新 lib → ts-data-forge」の一方向に固定する。ts-data-forge が wrapper を必要とする状況は「自身の実装内部では素の stdlib を直接使ってよい(境界の実装者)」と定義すれば発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面そのままにし、新 lib が re-export で facade になる(実体移動は将来の major で)。より根本的な代替は「ADT コア(Result/Optional/pipe のみ)の最小パッケージを切り出し、ts-data-forge と wrapper lib が共にそれへ依存する」形(fp-ts/effect 型の kernel 構成)だが、公開済みパッケージの再編コストが大きい。
 - prelude の範囲(`Arr` / `Num` / `Obj` / `IMap` 等をどこまで「言語機能」扱いにするか)。

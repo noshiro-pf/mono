@@ -80,7 +80,7 @@ let inc = |b| add(1, b);
 fn add_curried(a: i32) -> impl Fn(i32) -> i32 { move |b| a + b }
 ```
 
-**教訓(例 1)**: arity オーバーロードは「自動カリー化なし + 部分適用を API として提供したい」という TS 固有の条件から生まれる。Tsubu v2 で仮にパイプ演算子(候補 1)が入りカリー化形の主用途(`pipe` への部分適用渡し)が構文で置き換わると、この需要自体が縮む可能性がある — 記法設計の前に確認する価値がある接続。
+**教訓(例 1)**: arity オーバーロードは「自動カリー化なし + 部分適用を API として提供したい」という TS 固有の条件から生まれる。Tsubu sugar で仮にパイプ演算子(候補 1)が入りカリー化形の主用途(`pipe` への部分適用渡し)が構文で置き換わると、この需要自体が縮む可能性がある — 記法設計の前に確認する価値がある接続。
 
 ## 例 2: 型オーバーロード — `show`(値を表示文字列へ)
 
@@ -153,8 +153,8 @@ string_of_bool : bool -> string
 
 ## Tsubu への含意
 
-- **v1**: TS の閉じたオーバーロード(単一実装)を D-13 の条件付きで許容。ts-data-forge の二本立て API がそのまま書ける。
-- **v2 案 A**: `fn` にシグネチャ列挙を統合(記法改善のみ、1:1 emit)。
-- **v2 案 B**: Elixir/Swift 型の実装分離 clause。emit は例 1 の TS コード(`args.length` switch)を transpiler が生成する形になり、**ts-data-forge が手書きしている dispatch がまさに生成対象のテンプレート**になる。clause が実行時判別可能(arity か `typeof`/タグ)という制約はこの例で言えば「`[number, number]` と `[number]` は length で判別可」。
-- **open なアドホック多相(型クラス級)は非目標**: 構造的型 + union が部分代替であり、導入すると型検査器の大工事(v3 でも大きい)。例 2 の closed で足りる場面に限って overload を使う、という線引きを保つ。
+- **Tsubu lint**: TS の閉じたオーバーロード(単一実装)を D-13 の条件付きで許容。ts-data-forge の二本立て API がそのまま書ける。
+- **Tsubu sugar 案 A**: `fn` にシグネチャ列挙を統合(記法改善のみ、1:1 emit)。
+- **Tsubu sugar 案 B**: Elixir/Swift 型の実装分離 clause。emit は例 1 の TS コード(`args.length` switch)を transpiler が生成する形になり、**ts-data-forge が手書きしている dispatch がまさに生成対象のテンプレート**になる。clause が実行時判別可能(arity か `typeof`/タグ)という制約はこの例で言えば「`[number, number]` と `[number]` は length で判別可」。
+- **open なアドホック多相(型クラス級)は非目標**: 構造的型 + union が部分代替であり、導入すると型検査器の大工事(Tsubu refined でも大きい)。例 2 の closed で足りる場面に限って overload を使う、という線引きを保つ。
 - パイプ演算子(候補 1)導入時に**カリー化形二本立ての需要が縮む**可能性を、記法確定前に再評価する。
