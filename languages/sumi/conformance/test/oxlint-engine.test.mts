@@ -42,10 +42,22 @@ type Observed = Readonly<{
   message: string;
 }>;
 
+/**
+ * A TypeScript diagnostic tsgolint passes through (`TS(<code>)`) is the
+ * corpus's `compiler/<code>` — a diagnostic of the fixed compilerOptions,
+ * not of a lint rule (docs/sumi/conformance-corpus.md).
+ */
+const toRuleId = (code: string): string => {
+  const compiler = /^TS\((\d+)\)$/u.exec(code);
+
+  return compiler?.[1] === undefined
+    ? (oxlintCodeToRuleId.get(code) ?? `unmapped:${code}`)
+    : `compiler/${compiler[1]}`;
+};
+
 const toObserved = (diagnostic: OxlintDiagnostic): Observed =>
   ({
-    ruleId:
-      oxlintCodeToRuleId.get(diagnostic.code) ?? `unmapped:${diagnostic.code}`,
+    ruleId: toRuleId(diagnostic.code),
     line: diagnostic.line,
     message: diagnostic.message,
   }) as const;
@@ -88,8 +100,8 @@ describe('oxlint engine', () => {
     const unmapped = Array.from(
       new Set(
         run.diagnostics
-          .filter((d) => !oxlintCodeToRuleId.has(d.code))
-          .map((d) => d.code),
+          .map((d) => toRuleId(d.code))
+          .filter((ruleId) => ruleId.startsWith('unmapped:')),
       ),
     ).toSorted();
 

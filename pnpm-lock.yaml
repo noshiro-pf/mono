@@ -2458,6 +2458,9 @@ importers:
       ts-data-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-data-forge
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -2488,16 +2491,13 @@ importers:
         version: link:../../../libs/ts-type-forge
       tsx:
         specifier: 'catalog:'
-        version: 4.23.12
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
+        version: 4.23.13
       typescript-native:
         specifier: npm:typescript@7.0.2
         version: typescript@7.0.2
       vitest:
         specifier: 'catalog:'
-        version: 4.1.11(@types/node@26.4.1)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 4.1.11(@types/node@26.4.1)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
 
   libs/better-preact-use-state:
     devDependencies:

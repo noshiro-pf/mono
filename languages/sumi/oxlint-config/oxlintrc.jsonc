@@ -57,6 +57,8 @@
     "sumi/no-this": "error",
     "sumi/no-accessor": "error",
     "sumi/no-using": "error",
+    // D-19 type space; `libs` mirrors compilerOptions.lib (add "dom" for browser code)
+    "sumi/no-global-type-shadow": ["error", { "libs": ["esnext"] }],
     // `new Function` and string-argument timers are both typescript/no-implied-eval
     "no-eval": "error",
     "typescript/no-implied-eval": "error",
@@ -112,6 +114,9 @@
 
     // ---- functions (D-17, D-42) ----
     "id-denylist": ["error", "fn"],
+    "sumi/prefer-arrow-function": "error",
+    // D-11 (spec/jsx.md): `<T,>` in every file
+    "sumi/generic-arrow-trailing-comma": "error",
     "typescript/explicit-function-return-type": [
       "error",
       {
