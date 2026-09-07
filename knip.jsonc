@@ -108,6 +108,10 @@
         "test/**/*.test.mts",
       ],
       "project": ["src/**/*.mts", "test/**/*.mts"],
+      // Neither is imported: the runner locates the oxlint CLI by resolving
+      // `oxlint/package.json` at runtime and spawns it, and oxlint itself
+      // finds oxlint-tsgolint (the type-aware engine) in node_modules.
+      "ignoreDependencies": ["oxlint", "oxlint-tsgolint"],
     },
 
     // The strict standard library's generator. Its entry points are the
