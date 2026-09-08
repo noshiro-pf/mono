@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { hasKey, isRecord } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
 
@@ -73,9 +74,8 @@ const isStarExport = (
 };
 
 const nameOf = (exported: unknown): string =>
-  typeof exported === 'object' &&
-  exported !== null &&
-  'name' in exported &&
+  isRecord(exported) &&
+  hasKey(exported, 'name') &&
   typeof exported.name === 'string'
     ? exported.name
     : '*';

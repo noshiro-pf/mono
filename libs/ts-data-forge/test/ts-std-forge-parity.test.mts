@@ -1,5 +1,8 @@
-import { SafeNumber } from 'ts-std-forge';
-import { Num, Result } from '../src/entry-point.mjs';
+// `Result` comes from ts-std-forge rather than through ts-data-forge's
+// re-export of it: since the D-49 inversion both names denote the same
+// declarations, and this is the side the value is being handed to.
+import { Result, SafeNumber } from 'ts-std-forge';
+import { Num } from '../src/index.mjs';
 
 /**
  * The one seam left between the two packages, checked from this side because
@@ -59,7 +62,7 @@ describe('Num.safeParseFloat is SafeNumber.parse plus a brand', () => {
 
     assert.isTrue(Result.isErr(failed));
 
-    assert.isTrue(Error.isError(failed.value));
+    expect(failed.value).toBeInstanceOf(Error);
 
     assert.strictEqual(
       failed.value.message,
@@ -98,7 +101,7 @@ describe('Num.safeParseInt is SafeNumber.parseInteger plus a brand', () => {
 
     assert.isTrue(Result.isErr(failed));
 
-    assert.isTrue(Error.isError(failed.value));
+    expect(failed.value).toBeInstanceOf(Error);
 
     assert.strictEqual(
       failed.value.message,

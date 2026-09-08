@@ -5,7 +5,7 @@ describe(createPanicError, () => {
   test('builds an Error named PanicError with the message and cause', () => {
     const error = createPanicError('boom', { cause: 'x' });
 
-    assert.isTrue(Error.isError(error));
+    expect(error).toBeInstanceOf(Error);
 
     assert.strictEqual(error.name, 'PanicError');
 

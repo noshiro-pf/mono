@@ -102,6 +102,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       mut_modifiedFiles.push(sourceFilePath);
     }
 
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- `Arr` lives in ts-data-forge, which depends on this package since the D-49 inversion.
     if (mut_modifiedFiles.length > 0) {
       console.info(
         `\nFormatting ${mut_modifiedFiles.length} modified files...`,

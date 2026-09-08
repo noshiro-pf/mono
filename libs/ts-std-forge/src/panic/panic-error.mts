@@ -68,7 +68,14 @@ export const createPanicError = (
  * A frozen error cannot be marked, so it is wrapped instead: the result is a
  * fresh panic carrying it as `cause`.
  */
-export const markAsPanic = (error: Error): PanicError =>
+export const markAsPanic = (
+  // The parameter cannot be `Readonly<Error>`, and the assignment cannot be a
+  // copy: marking the caller's own object in place is the whole point — a new
+  // error would carry a stack pointing here rather than at the failure.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  error: Error,
+): PanicError =>
   Object.isFrozen(error)
     ? createPanicError(error.message, { cause: error })
-    : Object.assign(error, panicMark);
+    : // eslint-disable-next-line functional/immutable-data
+      Object.assign(error, panicMark);

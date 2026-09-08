@@ -41,6 +41,7 @@ const normalizeIndent = (source: string): string => {
 
   // `Arr.isEmptyTuple` in ts-data-forge; a length check does the same here,
   // and `Math.min()` of nothing would be Infinity.
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge depends on this package since the D-49 inversion.
   if (indents.length === 0) {
     return source;
   }

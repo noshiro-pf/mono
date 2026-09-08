@@ -47,6 +47,7 @@ export const hasKey = <
 >(
   obj: R,
   key: K,
+  // eslint-disable-next-line ts-data-forge/prefer-is-record-and-has-key -- this is `hasKey`, the function the rule points at.
 ): obj is HasKeyReturnType<R, K> => Object.hasOwn(obj, key);
 
 /**

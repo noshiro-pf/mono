@@ -96,6 +96,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
       // the build still succeeds and only the emitted types degrade. Fail
       // instead. (The ADT variant types live in `src/adt-types.mts` for this
       // reason.)
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       if (existsSync(typesFile)) {
         await runStep(
           Promise.resolve(

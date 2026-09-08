@@ -49,12 +49,17 @@ export function panic(
   options?: Readonly<{ cause?: unknown }>,
 ): never;
 
+// `Readonly<Error>` here and below would be a lie: this overload hands the
+// error to `markAsPanic`, which marks that very object in place so that its
+// stack keeps pointing at the failure.
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export function panic(error: Error): never;
 
 // Written as a named function rather than an arrow, because that is how an
 // overload is spelled: an arrow would need its type as an object holding call
 // signatures, and `Readonly<...>` over such an object erases them.
 export function panic(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   reason: Error | string,
   options?: Readonly<{ cause?: unknown }>,
 ): never {

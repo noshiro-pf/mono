@@ -33,4 +33,5 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-restricted-types
 export const isNonNullObject = (u: unknown): u is object =>
+  // eslint-disable-next-line ts-data-forge/prefer-is-non-null-object -- this is `isNonNullObject`.
   typeof u === 'object' && u !== null;

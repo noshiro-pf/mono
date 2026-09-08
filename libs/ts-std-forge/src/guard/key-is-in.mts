@@ -46,4 +46,5 @@ export const keyIsIn = <
 >(
   key: K,
   obj: R,
+  // eslint-disable-next-line ts-data-forge/prefer-is-record-and-has-key -- `keyIsIn` is one of the two functions the rule points at.
 ): key is K & keyof typeof obj => Object.hasOwn(obj, key);

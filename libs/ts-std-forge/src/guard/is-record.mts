@@ -55,6 +55,7 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  * @see {@link hasKey} - For checking if a record has specific keys
  */
 export const isRecord = (u: unknown): u is UnknownRecord =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array -- `Arr` lives in ts-data-forge, which depends on this package since the D-49 inversion.
   isNonNullObject(u) && !Array.isArray(u);
 
 /**
