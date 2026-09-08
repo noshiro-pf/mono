@@ -30,8 +30,8 @@ catalog:
   markdownlint-cli2: 0.23.2
   mobx: 7.0.3
   npm-run-all2: 9.0.3
-  oxfmt: 0.65.0
-  oxlint: 1.80.0
+  oxfmt: 0.66.0
+  oxlint: 1.81.0
   oxlint-tsgolint: 7.0.2001
   playwright: 1.62.1
   preact: 10.29.8
