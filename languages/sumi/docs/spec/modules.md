@@ -71,7 +71,66 @@ export { eslintConfig as default } from './configs/eslint.config.mjs';
 
 パッケージの入口ファイル `entry-point.mts` は自身のルート `index.mjs` を再 export してよい(`export * from './index.mjs';`)。「相対 index 直指定禁止」は生成 index をディレクトリの外から近道で参照することを防ぐ規則であり、入口が自分のルート index を指すのはその対象ではない。強制手段の側はファイル名 `entry-point.mts` に対する override(@sumi-lang/oxlint-config の `overrides`)で表す。
 
+## barrel ファイル(確定 2026-09-08 — D-52)
+
+`export * from '...'` を 1 つでも含むファイル(barrel)は、**`export * from` / `export type * from` だけで構成する**。ローカル宣言、`export { foo } from`、`export * as ns from`、`import`、実行文は置けない。`export *` 同士を並べること、ディレクトリごとに `index.mts` を再帰的に置くことは従来どおり許す。
+
+### 何を防ぐか — 明示 export による暗黙の shadowing
+
+ES の export 解決では、ローカル宣言と `export { } from` の**明示 export が星 export より優先**され、同名があっても診断は出ない。tsc も同じ挙動で(tsgo 7.0.2 で実測)、次のコードは型エラーにならない。
+
+```ts
+// a.mts
+export const foo = 'from a';
+export const onlyA = 1;
+
+// c.mts
+export const foo = 'from c';
+
+// index.mts — 混在 barrel(禁止)
+export * from './a.mjs';
+export { foo } from './c.mjs'; // a.mts の foo をここで無警告で隠す
+
+// use.mts
+import { foo, onlyA } from './index.mjs';
+const check: 'from c' = foo; // 通る: barrel 経由では a.mts の foo は存在しない
+```
+
+問題になるのは変更の経路である。`c.mts` の `foo` を明示 re-export している barrel に対して、後から誰かが `a.mts` にも `foo` を追加すると(逆に、`a.mts` の `foo` が先にあって後から `export { foo } from './c.mjs'` が足された場合も同じ)、barrel 経由の利用者は**全員が黙って `c` の実装を掴んだまま**になる。`a.mts` を直接 import している側との間で同じ名前が別物を指す状態が、どこにも診断が出ないまま成立する。ローカル宣言(`export const foo = ...` を barrel 内に直接書く形)でも同じことが起きる。
+
+対して、星 export 同士の衝突は必ず診断になる。
+
+```ts
+// index.mts — export * のみ(許可)
+export * from './a.mjs';
+export * from './c.mjs'; // TS2308: Module './a.mjs' has already exported a member named 'foo'.
+```
+
+実行時も一致していて、曖昧な名前は星 export から除外され、名前指定で import した時点で `SyntaxError: The requested module './index.mjs' contains conflicting star exports for name 'foo'` になる。つまり barrel を星 export だけにしておけば、名前の衝突は型検査でも実行時でも必ず表面化し、黙って別の実装に差し替わる経路がなくなる。
+
+### 書き換え方
+
+混在していた barrel は、インラインの部分を別ファイルへ出してそれを `export *` すれば同じ公開面になる。
+
+```ts
+// 変更前 — index.mts
+export * from './a.mjs';
+export const helper = (x: number): number => x + 1;
+
+// 変更後 — helper.mts
+export const helper = (x: number): number => x + 1;
+
+// 変更後 — index.mts
+export * from './a.mjs';
+export * from './helper.mjs';
+```
+
+名前付きの厳選 re-export(`export { foo, bar } from './impl.mjs'` だけを並べる入口)は `export *` を含まないので対象外であり、そのままでよい。両方を混ぜたい場合だけ、上のように分ける。
+
+### 強制手段
+
+`sumi/no-mixed-star-export`(🆕、未実装): `ExportAllDeclaration` を含むファイルに他の文があれば報告する構文ルール。型情報は要らない。名前が実際に衝突しているかは見ない — それは tsc の TS2308 が担当する。この monorepo の `pnpm run gi` が生成する index.mts は `export *` のみなので既に適合する。
+
 ## 未解決の論点
 
-- **barrel ファイル(`export * from ...`)を許すか(保留 2026-09-05 — D-28)。** この monorepo の `pnpm run gi` は `export *` で index.mts を生成している。`export *` 同士の名前衝突は tsc が TS2308 で報告するが、同じ barrel の**明示 export(`export const foo` / `export { foo } from`)が同名の `export *` を無警告で隠す**(2026-09-05 実測)。生成 index は `export *` のみで構成され明示 export と混ざらないのでこの問題は起きない。「生成物のみ許可」「混在のみ禁止」「全面禁止」を検討したが決定は見送り。
 - `import.meta.url` など `import.meta` の扱い。
