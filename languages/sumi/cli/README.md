@@ -18,12 +18,12 @@ ts-data-forge(287 ファイル)で tsgo 0.9 秒 + oxlint 1.1 秒(2026-09-07 実�
 
 ## 提供物
 
-| export                             | 用途                                                                                                                                                                                    |
-| :--------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@sumi-lang/cli/tsconfig`          | base tsconfig(`tsconfig.base.json`)。プロジェクトの tsconfig が `extends` する。拘束項目 + 自由項目の既定値                                                                             |
-| `eslintConfigOffForSumiCheck`      | `sumi check` が既に検査する ESLint ルールを全て `off` にする flat config ブロック。既存 ESLint 設定の**末尾**に置く(二重検査の回避)。対応表は `src/configs/eslint-rules-by-rule-id.mts` |
-| `@sumi-lang/cli/oxlint-config-off` | 同じく oxlint 用(`oxlint-config-off.json`)。自前の oxlint 設定から `extends` する。対応表(@sumi-lang/oxlint-config)から生成(`pnpm run gen:oxlint-config-off`)                           |
-| `runCheck(project)`                | `sumi check` の本体(構造化された結果を返す)                                                                                                                                             |
+| export                              | 用途                                                                                                                                                                                                                                                                                                                   |
+| :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@sumi-lang/cli/tsconfig.base.json` | base tsconfig(`tsconfig.base.json`)。プロジェクトの tsconfig が `extends` する。拘束項目 + 自由項目の既定値。subpath 名をファイル名と同じにしてあるのは、VS Code の tsconfig リンク(`exports` を読まず `<値>` / `<値>.json` / `<値>/tsconfig.json` の実在だけを見る)と tsc(`exports` 経由)が同じファイルに着地するため |
+| `eslintConfigOffForSumiCheck`       | `sumi check` が既に検査する ESLint ルールを全て `off` にする flat config ブロック。既存 ESLint 設定の**末尾**に置く(二重検査の回避)。対応表は `src/configs/eslint-rules-by-rule-id.mts`                                                                                                                                |
+| `@sumi-lang/cli/oxlint-config-off`  | 同じく oxlint 用(`oxlint-config-off.json`)。自前の oxlint 設定から `extends` する。対応表(@sumi-lang/oxlint-config)から生成(`pnpm run gen:oxlint-config-off`)                                                                                                                                                          |
+| `runCheck(project)`                 | `sumi check` の本体(構造化された結果を返す)                                                                                                                                                                                                                                                                            |
 
 Sumi の規則集合そのものを既存の oxlint 実行に混ぜたい場合は @sumi-lang/oxlint-config の `oxlintrc.jsonc` を `extends` する(同一エンジン内なので二重にはならない)。
 

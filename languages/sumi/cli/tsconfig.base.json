@@ -1,6 +1,10 @@
 {
   // The Sumi base tsconfig (languages/sumi/docs/spec/compiler-options.md, D-40 / D-46).
-  // Projects `extends` it ("extends": "@sumi-lang/cli/tsconfig"). The locked entries
+  // Projects `extends` it ("extends": "@sumi-lang/cli/tsconfig.base.json").
+  // The subpath is spelled like the file on purpose: VS Code's tsconfig link
+  // provider ignores `exports` and probes `<value>`, `<value>.json` and
+  // `<value>/tsconfig.json`, so a bare `./tsconfig` sent it to this
+  // package's own tsconfig.json while tsc read this file. The locked entries
   // are what `sumi check` verifies against the project's effective options
   // (src/locked-compiler-options.mts is the single source of truth; a test
   // keeps this file in sync with it); the free entries are defaults a project

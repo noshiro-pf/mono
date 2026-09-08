@@ -205,7 +205,7 @@
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
-      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
+      // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },
@@ -230,7 +230,7 @@
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
-      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
+      // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },
@@ -255,7 +255,7 @@
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
-      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
+      // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },

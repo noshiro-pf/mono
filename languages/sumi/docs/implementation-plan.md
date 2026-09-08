@@ -21,7 +21,7 @@ Sumi lint チェッカー開発の段階計画。ゴールは「1 回の検査�
 
 - ~~eslint-config-typed の組み合わせ~~ → **oxlint**(native + tsgolint + sumi JS plugin — D-43)+ 拘束 tsconfig([spec/compiler-options.md](./spec/compiler-options.md))で subset preset を組み、小さいパッケージ 1〜2 個に適用する。ESLint preset は oxlint に載らない type-aware ルールのブリッジ。
 - ここで焼き潰すリスクは性能ではなく**仕様の妥当性**(どのルールが実際に書き味を壊すか)。違反件数と体感の摩擦を対応表へフィードバックする。二重走査の遅さはこの規模では許容する。
-- 完了条件: preset 適用パッケージが check green で稼働し、仕様側の手戻り(ルールの修正・緩和)が収束していること。**適用状況(2026-09-08)**: synstate / synstate-preact-hooks / synstate-react-hooks が `sumi:check`(`tsconfig.sumi.json` = `extends: @sumi-lang/cli/tsconfig`)を持ち、CI の type-check matrix(`ws:sumi:check`)で常時検査される。第一対象を ts-std-forge から synstate に変えたのは、ts-std-forge が境界の実装者(Sumi lint の内部実装に近い)で、普通のコードの書き味を測る対象として不適切なため(ユーザー判断)。
+- 完了条件: preset 適用パッケージが check green で稼働し、仕様側の手戻り(ルールの修正・緩和)が収束していること。**適用状況(2026-09-08)**: synstate / synstate-preact-hooks / synstate-react-hooks が `sumi:check`(`tsconfig.sumi.json` = `extends: @sumi-lang/cli/tsconfig.base.json`)を持ち、CI の type-check matrix(`ws:sumi:check`)で常時検査される。第一対象を ts-std-forge から synstate に変えたのは、ts-std-forge が境界の実装者(Sumi lint の内部実装に近い)で、普通のコードの書き味を測る対象として不適切なため(ユーザー判断)。
 
 ## Phase 2: 専用チェッカー `sumi check`(仮)
 

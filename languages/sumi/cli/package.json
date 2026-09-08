@@ -16,7 +16,7 @@
   "type": "module",
   "exports": {
     ".": "./src/entry-point.mts",
-    "./tsconfig": "./tsconfig.base.json",
+    "./tsconfig.base.json": "./tsconfig.base.json",
     "./oxlint-config-off": "./oxlint-config-off.json"
   },
   "bin": {
