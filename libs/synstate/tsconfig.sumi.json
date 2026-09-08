@@ -5,11 +5,10 @@
   "extends": "@sumi-lang/cli/tsconfig",
   "compilerOptions": {
     "lib": ["esnext", "dom"],
-    "types": [
-      "ts-type-forge/global",
-      "vitest/importMeta",
-      "eslint-config-typed/vitest-globals"
-    ]
+    // In-source tests (`import.meta.vitest`) and colocated `*.test.mts` live
+    // under src/, so the check needs the vitest globals; nothing else is
+    // ambient (ts-type-forge types are imported explicitly).
+    "types": ["vitest/importMeta", "eslint-config-typed/vitest-globals"]
   },
   "include": ["./src"]
 }
