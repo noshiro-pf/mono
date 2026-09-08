@@ -39,6 +39,17 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - Sumi lint の具象構文は TS と同一なので Sumi lint チェッカーに独自 parser は不要。Sumi sugar の CST 保存 parser([spec/future-syntax.md](./spec/future-syntax.md) の受け入れ条件)は、出力を「`ts.SourceFile` 相当 + ソースマップ」へ **lower してから** Phase 2 のルール層と emitter に渡す。チェッカーの書き直しは発生しない。
 - 具象構文の互換性は「Sumi sugar 構文 ⊃ Sumi lint 構文 = TS 構文」で構成的に保たれる。コストの重心(CST parser・高品質 emit)は Sumi sugar に置く。
 
+## 将来の作業(future work)
+
+### ユーザー / コミュニティが lint ルールを追加できる仕組み(2026-09-08 追記、ユーザー要望)
+
+Sumi sugar / Sumi refined では、言語同梱の規則だけでなく**ユーザーやコミュニティが lint ルールを書いて足せる**ようにする。
+
+- **設定**: `sumi.config.json`(将来的には `config.sumi` を検討)に lint 設定(有効にするルールとそのオプション、ルールの読み込み元)を追記すれば、`sumi check` が言語の検査と**併せて**実行する。層の宣言(D-46)や default export の emit 設定(D-36)と同じファイルになる見込み。
+- **ルールの記述**: ESLint / oxlint と同じ要領で **AST node にマッチさせる**形を基本にする(ts-morph のような形式も候補だが未深掘り)。Sumi lint のエンジンは oxlint の JS plugin(ESLint v9 互換 API — D-43)なので、lint 層のユーザールールは今日でも oxlint plugin として書けるが、sugar / refined では AST が Sumi の CST / 独自型検査器の上に載るため、Phase 2 の **facade(`ts.Node` + checker を直接晒さない薄い層)がそのままユーザールール API**になるのが望ましい。facade 上に書かれたルールはエンジンの乗り換え(oxlint → 専用チェッカー → refined の独自型検査器)を跨いで動く。
+- **エラーの報告**: `context.report` のような**即時の副作用**で発火する形に加えて、ルールを純関数(node と文脈を受けて診断の列を返す)として書き、**Result パターンで収集**する形が可能か検討する。診断が値になれば、ルールの合成・テスト(適合性コーパスの `valid` / `invalid` 形式をユーザールールにも流用)・並列実行が素直になる。両形式を同じ facade の上で提供するか、片方に寄せるかは設計時に決める。
+- **未検討**: ルールの配布形態(npm パッケージか単一ファイルか)、型情報を要するルールに checker をどこまで晒すか(D-43 の制約: oxlint はカスタム type-aware ルールを書けない)、ルール名の名前空間(`sumi/*` は言語同梱に予約)。
+
 ## リスクと監視事項
 
 - **tsgo(native TS)の外部 API**: Phase 2 を JS コンパイラ API で書く間、repo の type-check(native)と別に型検査が走る。facade の下層差し替えで解消する計画だが、native 側 API の成熟を追う。
