@@ -21,7 +21,7 @@ Sumi lint チェッカー開発の段階計画。ゴールは「1 回の検査�
 
 - ~~eslint-config-typed の組み合わせ~~ → **oxlint**(native + tsgolint + sumi JS plugin — D-43)+ 拘束 tsconfig([spec/compiler-options.md](./spec/compiler-options.md))で subset preset を組み、小さいパッケージ 1〜2 個に適用する。ESLint preset は oxlint に載らない type-aware ルールのブリッジ。
 - ここで焼き潰すリスクは性能ではなく**仕様の妥当性**(どのルールが実際に書き味を壊すか)。違反件数と体感の摩擦を対応表へフィードバックする。二重走査の遅さはこの規模では許容する。
-- 完了条件: preset 適用パッケージが check green で稼働し、仕様側の手戻り(ルールの修正・緩和)が収束していること。**適用状況(2026-09-08)**: synstate / synstate-preact-hooks / synstate-react-hooks が `sumi:check`(`tsconfig.sumi.json` = `extends: sumi-cli/tsconfig`)を持ち、CI の type-check matrix(`ws:sumi:check`)で常時検査される。第一対象を ts-std-forge から synstate に変えたのは、ts-std-forge が境界の実装者(Sumi lint の内部実装に近い)で、普通のコードの書き味を測る対象として不適切なため(ユーザー判断)。
+- 完了条件: preset 適用パッケージが check green で稼働し、仕様側の手戻り(ルールの修正・緩和)が収束していること。**適用状況(2026-09-08)**: synstate / synstate-preact-hooks / synstate-react-hooks が `sumi:check`(`tsconfig.sumi.json` = `extends: @sumi-lang/cli/tsconfig`)を持ち、CI の type-check matrix(`ws:sumi:check`)で常時検査される。第一対象を ts-std-forge から synstate に変えたのは、ts-std-forge が境界の実装者(Sumi lint の内部実装に近い)で、普通のコードの書き味を測る対象として不適切なため(ユーザー判断)。
 
 ## Phase 2: 専用チェッカー `sumi check`(仮)
 
@@ -31,7 +31,7 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - **ルール API は `ts.Node` + checker を直接晒さず、薄い facade を挟む。** この縫い目が後の乗り換えを支える: (a) native コンパイラ(tsgo)の外部 API が安定したら下層を差し替えて「JS コンパイラでの二重型検査」を解消、(b) Sumi refined の独自型検査器への置き換えでもルール層を保持。
 - **エディタ統合を後回しにしない**(Flow の敗因 — [related-work.md](./related-work.md))。最初は CLI + TS language service plugin として出し、LSP を自作せずにエディタ診断を得る。watch モードは `ts.createWatchProgram` の incremental で。
 - Phase 1 preset からルールを 1 個ずつ移植し、適合性コーパスで同値性をゲートしながら ESLint 側を退役させる。移植完了まで両者は並走してよい(コーパスが同値性を保証する)。言語仕様に属さないスタイル規則は ESLint に残してよい。
-- 置き場所: `languages/sumi/cli`(sumi-cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
+- 置き場所: `languages/sumi/cli`(@sumi-lang/cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
 - 完了条件: 対応表の全項目が専用チェッカーで検査され、subset preset(言語仕様分)が退役していること。
 
 ## Phase 3(Sumi sugar): fork parser はチェッカーと結合させずに足す

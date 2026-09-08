@@ -65,6 +65,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@sumi-lang/cli": "workspace:*",
     "@testing-library/preact": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",
@@ -76,7 +77,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "sumi-cli": "workspace:*",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

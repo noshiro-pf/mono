@@ -1,5 +1,5 @@
 {
-  "name": "sumi-oxlint-config",
+  "name": "@sumi-lang/oxlint-config",
   "version": "0.0.0",
   "private": true,
   "description": "oxlint preset for Sumi lint: the fixed rule set, the sumi JS plugin (rules oxlint has no native equivalent for), and the neutral rule-ID mapping the conformance corpus runs against. See docs/sumi/enforcement-map.md.",

@@ -69,7 +69,7 @@ export { eslintConfig as default } from './configs/eslint.config.mjs';
 
 ## パッケージ入口の例外(確定 2026-09-08 — D-42 の運用追認)
 
-パッケージの入口ファイル `entry-point.mts` は自身のルート `index.mjs` を再 export してよい(`export * from './index.mjs';`)。「相対 index 直指定禁止」は生成 index をディレクトリの外から近道で参照することを防ぐ規則であり、入口が自分のルート index を指すのはその対象ではない。強制手段の側はファイル名 `entry-point.mts` に対する override(sumi-oxlint-config の `overrides`)で表す。
+パッケージの入口ファイル `entry-point.mts` は自身のルート `index.mjs` を再 export してよい(`export * from './index.mjs';`)。「相対 index 直指定禁止」は生成 index をディレクトリの外から近道で参照することを防ぐ規則であり、入口が自分のルート index を指すのはその対象ではない。強制手段の側はファイル名 `entry-point.mts` に対する override(@sumi-lang/oxlint-config の `overrides`)で表す。
 
 ## 未解決の論点
 

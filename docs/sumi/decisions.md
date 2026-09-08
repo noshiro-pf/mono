@@ -109,7 +109,7 @@
 - **ステータス**: 確定(2026-09-07。2026-08-29 の当初決定を D-44 で差し替え)
 - **判断**: 言語名を **Sumi**、Sumi sugar の単一拡張子(D-11)を **`.sumi`** とする(ユーザー決定)。
 - **理由**: 拡張子は言語名そのもので、著名な言語・形式・既存略語との衝突がない。
-- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `sumi-conformance` / `sumi-eslint-config` / `sumi-oxlint-config`、期待診断マーカー `@sumi-expect`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
+- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `@sumi-lang/conformance` / `@sumi-lang/eslint-config` / `@sumi-lang/oxlint-config`、期待診断マーカー `@sumi-expect`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
 
 ## D-17: 予約語 `fn` を採用し、Sumi lint から識別子 `fn` を予約する
 
@@ -173,11 +173,11 @@
 - **理由**: ts-data-forge は ADT コア(Result/Optional/pipe)とデータ構造の両方を持つため、分割時の相互依存が懸念されたが、「**ts-data-forge は境界の実装者として、自身の内部では素の stdlib を直接使ってよい**」と定義すれば wrapper への逆依存は構造的に発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面動かさず、新 lib の re-export facade で一択の入口を作る(実体移動は将来の major)。
 - **実施**: scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)(`Regex.create` / `SafeDate.toISOString` を TDD で実装済み)。パッケージ名は初回 publish(手動 — libs/first-release.md)まで仮。
 
-## D-25: Sumi lint preset は `languages/sumi/eslint-config`(パッケージ名 sumi-eslint-config)、dogfood 第一対象は ts-std-forge
+## D-25: Sumi lint preset は `languages/sumi/eslint-config`(パッケージ名 @sumi-lang/eslint-config)、dogfood 第一対象は ts-std-forge
 
 - **ステータス**: 確定(2026-08-31)
 - **判断**:
-    - Phase 1 の subset ESLint preset(D-10 の独立パッケージ)は `languages/sumi/eslint-config` に置き、パッケージ名は **sumi-eslint-config**(仮名。非公開)とする。仕様に属する新規 lint ルール(enforcement-map の 🆕)も同パッケージに eslint-plugin として同梱する。
+    - Phase 1 の subset ESLint preset(D-10 の独立パッケージ)は `languages/sumi/eslint-config` に置き、パッケージ名は **@sumi-lang/eslint-config**(仮名。非公開)とする。仕様に属する新規 lint ルール(enforcement-map の 🆕)も同パッケージに eslint-plugin として同梱する。
     - dogfood の第一対象は **ts-std-forge**(最小・新規・こちらで完全に制御可能)。第二候補: octokit-safe-types(小規模で型付きルールの効きが見える)、synstate(class-less 化済みで言語の想定スタイルに最も近いが中規模)。
 - **理由**: 公開は当面しないため languages/ 配下(D-8 の区分どおり)。公開する段になれば libs/ へ移す(D-8 補足)。
 
@@ -247,7 +247,7 @@
 ## D-34: 言語バージョンと TS バージョンの対応は preset / チェッカーの peerDependencies で固定する
 
 - **ステータス**: 確定(2026-09-05)
-- **判断**: 対応表は書かない。言語のバージョンはツール(sumi-eslint-config、将来の `sumi check`)のバージョンであり、対応する TS の範囲はそのツールの package.json の `peerDependencies` が単一の真実。
+- **判断**: 対応表は書かない。言語のバージョンはツール(@sumi-lang/eslint-config、将来の `sumi check`)のバージョンであり、対応する TS の範囲はそのツールの package.json の `peerDependencies` が単一の真実。
 - **理由**: `strict` の中身が TS のバージョンで増える問題は「どの TS で検査したか」をツールが固定すれば解決し、手書きの表は乖離する。
 
 ## D-35: Sumi sugar の `let mut x` は `let mut_x` として emit する
@@ -319,7 +319,7 @@
 ## D-43: Sumi lint のエンジンは oxlint(native ルール + tsgolint の type-aware + sumi JS plugin)とし、ESLint preset は移行期のブリッジに格下げする
 
 - **ステータス**: 確定(2026-09-07)
-- **判断**: Phase 1 のエンジンを ESLint から **oxlint** に切り替える。構成は (1) oxlint の native ルール、(2) `oxlint-tsgolint` による type-aware ルール(typescript-eslint の type-aware 群の native 実装)、(3) native に無い言語ルールを載せる **sumi JS plugin**(`languages/sumi/oxlint-config/src/plugin/`)の三つ。preset パッケージは `languages/sumi/oxlint-config`(sumi-oxlint-config、非公開)で、`oxlintrc.jsonc`(全 category off、仕様の行だけを明示的に有効化)、plugin、**中立ルール ID ← oxlint 診断コードの対応表**、runner ヘルパを持つ。適合性コーパスはこの対応表で診断を正規化してマーカーと照合する(runner 接続は 2026-09-07 に稼働)。D-25 の sumi-eslint-config は、oxlint に載せられない独自 type-aware ルールが必要になった場合のブリッジとして残す。
+- **判断**: Phase 1 のエンジンを ESLint から **oxlint** に切り替える。構成は (1) oxlint の native ルール、(2) `oxlint-tsgolint` による type-aware ルール(typescript-eslint の type-aware 群の native 実装)、(3) native に無い言語ルールを載せる **sumi JS plugin**(`languages/sumi/oxlint-config/src/plugin/`)の三つ。preset パッケージは `languages/sumi/oxlint-config`(@sumi-lang/oxlint-config、非公開)で、`oxlintrc.jsonc`(全 category off、仕様の行だけを明示的に有効化)、plugin、**中立ルール ID ← oxlint 診断コードの対応表**、runner ヘルパを持つ。適合性コーパスはこの対応表で診断を正規化してマーカーと照合する(runner 接続は 2026-09-07 に稼働)。D-25 の @sumi-lang/eslint-config は、oxlint に載せられない独自 type-aware ルールが必要になった場合のブリッジとして残す。
 - **理由**: ESLint の遅さは Sumi のルール数では呑めない可能性がある(ユーザー判断)。[docs/research-eslint-alternative-tools.md](../research-eslint-alternative-tools.md) の結論どおり oxlint が最有力で、実測(2026-09-07、oxlint 1.80.0)で次を確認した — ESLint 互換の JS plugin API で esquery 選択子・scope 解析が動く / Node 26 では `.mts` の plugin も直接読めるが `.mjs` 指定子の解決が無いため dist 経由にする / tsgolint は package ディレクトリを cwd にすれば動き、`strict-boolean-expressions` 等がそのまま使える / eslint-plugin-functional のような既存 ESLint plugin もエントリファイル指定で読める(ただし自前の小ルールの方が依存が軽い)/ `no-restricted-syntax` は native に無いので選択子ルールは plugin 側に書く / JSON 出力は `{ diagnostics: [{ code: "<plugin>(<rule>)", filename, labels[0].span.line }] }`。
 - **制約(既知)**: oxlint はカスタム type-aware ルールを書けない(2026-09 時点)。型情報が要る 🆕 ルール(宣言への null 型禁止、境界 `?? undefined` 強制、`castMutable` 乱用、論理代入のオペランド、readonly 強制)は tsgolint の既存ルールで賄えるものを除き、**TS API 上の薄いチェッカー(Phase 2 の `sumi check` の前倒し)か ESLint ブリッジ**で実装する。どちらにするかは readonly 強制の実装方針(TODO)と併せて決める。
 - **コーパス側で判明した差分**: `no-sequences` は ESLint / oxlint とも既定 `allowInParentheses: true` で、余分な括弧で囲んだカンマ式(`const r = (a(), b())`、`if ((a(), b()))`)を「意図的な用法」として許す(ESLint 本体で実測: 既定では括弧なしの `r = a(), b()` だけを報告し、`false` を指定すると括弧付きも報告する。`for` の初期化・更新部は常に許可)。フィクスチャは括弧付きで書かれており言語としては正しく違反なので、誤りはエンジン設定の側 — `false` を指定する(ESLint preset にも同じ穴があり、enforcement-map に 🔧 として反映)。デコレータ付き class の報告行はエンジン依存(class の span がデコレータから始まるか)なので、フィクスチャはデコレータと class を同一行に置く。`fn` を仮引数名にした valid フィクスチャは D-17 の「宣言名」に該当し invalid だった(修正)。
@@ -354,24 +354,24 @@
 
 - **ステータス**: 確定(2026-09-08)
 - **判断**:
-    1. **提供形態**: パッケージ `sumi-cli`(`languages/sumi/cli`、非公開。publish 時に `libs/` へ移す。npm の `sumi` は無関係のパッケージが取得済みなので公開名は未定)。`sumi check <project>` が 1 コマンドで Sumi lint の検査を全部走らせる — (a) native tsc(`typescript-native` = TS 7)の `--showConfig` で実効 compilerOptions を取り、拘束項目([spec/compiler-options.md](./spec/compiler-options.md))と比較する。違反があれば**そこで止まる**(上書きされた設定での検査結果は言語の検査結果ではない — D-7 / D-40)。(b) 同じ native tsc で型検査(`--noEmit`)。(c) `--showConfig` が返す `files`(= プログラムの全ファイル)に sumi-oxlint-config の preset を実行する。tsconfig は**内蔵しない**: base tsconfig(`sumi-cli/tsconfig`)を配布してプロジェクトに `extends` させ、実効値を検証するメタ的解決を採る(D-40 の強制手段の具体化)。ユーザーの自由項目(`lib` / `target` / emit)を残すには内蔵では足りず、検証なら `extends` を忘れたプロジェクトも捕まえられる。
+    1. **提供形態**: パッケージ `@sumi-lang/cli`(`languages/sumi/cli`、非公開。publish 時に `libs/` へ移す。npm の `sumi` は無関係のパッケージが取得済み → **D-50 で `@sumi-lang/cli` に確定**)。`sumi check <project>` が 1 コマンドで Sumi lint の検査を全部走らせる — (a) native tsc(`typescript-native` = TS 7)の `--showConfig` で実効 compilerOptions を取り、拘束項目([spec/compiler-options.md](./spec/compiler-options.md))と比較する。違反があれば**そこで止まる**(上書きされた設定での検査結果は言語の検査結果ではない — D-7 / D-40)。(b) 同じ native tsc で型検査(`--noEmit`)。(c) `--showConfig` が返す `files`(= プログラムの全ファイル)に @sumi-lang/oxlint-config の preset を実行する。tsconfig は**内蔵しない**: base tsconfig(`@sumi-lang/cli/tsconfig`)を配布してプロジェクトに `extends` させ、実効値を検証するメタ的解決を採る(D-40 の強制手段の具体化)。ユーザーの自由項目(`lib` / `target` / emit)を残すには内蔵では足りず、検証なら `extends` を忘れたプロジェクトも捕まえられる。
     2. **動詞の体系**: `check` / `build` / `eject` / `test` / `fix` / `init` の 6 動詞。層ごとに動詞を増やさず(`sumi lint check` のような形は採らない)、プロジェクトが設定で層を宣言し、**同じ動詞が層に応じて振る舞いを変える**。
 
-        | 動詞         | Sumi lint                                                  | Sumi sugar                                                                                                                                     | Sumi refined                                                                                                 |
-        | :----------- | :--------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-        | `sumi check` | 拘束 compilerOptions → native tsc → oxlint preset          | `.sumi` をメモリ上で TS に transpile し、その出力に lint 層の check を全て適用 + sugar 固有の構文検査。診断は source map で `.sumi` の位置へ   | 独自型検査器 + 同上                                                                                          |
-        | `sumi build` | 型検査のみ(出力なし)                                       | `.sumi` → TS を emit。`--target mts \| ts \| tsx` で出力の拡張子・方言を選ぶ。**再現可能な派生物**で source は `.sumi` のまま                  | TS を emit するが、TS に無い型は弱めた形になる(派生物としては可)                                             |
-        | `sumi eject` | Sumi の設定を外して素の TS プロジェクトにする              | source を lint 層の TS に **codemod で降ろす**(D-37 により可逆)                                                                                | source を sugar / lint 層に降ろす。**不可逆**なので確認プロンプトと `--yes`、降ろし先は `--to sugar \| lint` |
-        | `sumi test`  | vitest をそのまま実行                                      | `.sumi` を transpile する Vite plugin を仕込んだ vitest。`--as-ejected` で `sumi build` の出力に同じテストを走らせ、eject 品質を CI で常時検証 | 同左                                                                                                         |
-        | `sumi fix`   | codemod(`convert-to-readonly` 等)と oxlint の fixer        | 同左 + sugar 構文の fixer                                                                                                                      | 同左                                                                                                         |
-        | `sumi init`  | tsconfig(`extends: sumi-cli/tsconfig`)と oxlint 設定を生成 | 同左 + `.sumi` 用の設定                                                                                                                        | 同左                                                                                                         |
+        | 動詞         | Sumi lint                                                        | Sumi sugar                                                                                                                                     | Sumi refined                                                                                                 |
+        | :----------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+        | `sumi check` | 拘束 compilerOptions → native tsc → oxlint preset                | `.sumi` をメモリ上で TS に transpile し、その出力に lint 層の check を全て適用 + sugar 固有の構文検査。診断は source map で `.sumi` の位置へ   | 独自型検査器 + 同上                                                                                          |
+        | `sumi build` | 型検査のみ(出力なし)                                             | `.sumi` → TS を emit。`--target mts \| ts \| tsx` で出力の拡張子・方言を選ぶ。**再現可能な派生物**で source は `.sumi` のまま                  | TS を emit するが、TS に無い型は弱めた形になる(派生物としては可)                                             |
+        | `sumi eject` | Sumi の設定を外して素の TS プロジェクトにする                    | source を lint 層の TS に **codemod で降ろす**(D-37 により可逆)                                                                                | source を sugar / lint 層に降ろす。**不可逆**なので確認プロンプトと `--yes`、降ろし先は `--to sugar \| lint` |
+        | `sumi test`  | vitest をそのまま実行                                            | `.sumi` を transpile する Vite plugin を仕込んだ vitest。`--as-ejected` で `sumi build` の出力に同じテストを走らせ、eject 品質を CI で常時検証 | 同左                                                                                                         |
+        | `sumi fix`   | codemod(`convert-to-readonly` 等)と oxlint の fixer              | 同左 + sugar 構文の fixer                                                                                                                      | 同左                                                                                                         |
+        | `sumi init`  | tsconfig(`extends: @sumi-lang/cli/tsconfig`)と oxlint 設定を生成 | 同左 + `.sumi` 用の設定                                                                                                                        | 同左                                                                                                         |
 
         `build` と `eject` を分ける基準は「**source が残るか**」: `build` の出力は source から何度でも再生成できる派生物、`eject` は source 自体を書き換えて層を降りる操作。sugar では往復可能、refined では不可逆という違いは動詞ではなく**動詞の保証**として文書化する。transpile を別動詞にしないのは、それが `build` の中身そのものだから。
 
-    3. **既存 lint 設定との併用(二重検査の回避)**: `sumi-cli` は「`sumi check` が既に検査するルールを off にする」config を export する — ESLint 向け `eslintConfigOffForSumiCheck`(flat config ブロック、既存設定の末尾に置く)と oxlint 向け `sumi-cli/oxlint-config-off`(JSON、`extends` する)。どちらも手書きの一覧ではなく**中立 ID ← エンジンのルール名の対応表から生成**し、テストで「対応表のキー集合 = oxlint preset が実装する中立 ID」「off にする ESLint ルールは eslint-config-typed が実際に設定しているルール」を検査する。Sumi が検査するものの**一部しか**重ならないルール(`no-restricted-syntax` の他の選択子、`no-restricted-globals` の browser 向けリスト)は off にしない — 残りを失うより二重検査の方が安い。Sumi の規則集合そのものを既存の oxlint 実行に混ぜるなら sumi-oxlint-config の `oxlintrc.jsonc` を `extends` すればよく、同一エンジン内なので二重にはならない。
+    3. **既存 lint 設定との併用(二重検査の回避)**: `@sumi-lang/cli` は「`sumi check` が既に検査するルールを off にする」config を export する — ESLint 向け `eslintConfigOffForSumiCheck`(flat config ブロック、既存設定の末尾に置く)と oxlint 向け `@sumi-lang/cli/oxlint-config-off`(JSON、`extends` する)。どちらも手書きの一覧ではなく**中立 ID ← エンジンのルール名の対応表から生成**し、テストで「対応表のキー集合 = oxlint preset が実装する中立 ID」「off にする ESLint ルールは eslint-config-typed が実際に設定しているルール」を検査する。Sumi が検査するものの**一部しか**重ならないルール(`no-restricted-syntax` の他の選択子、`no-restricted-globals` の browser 向けリスト)は off にしない — 残りを失うより二重検査の方が安い。Sumi の規則集合そのものを既存の oxlint 実行に混ぜるなら @sumi-lang/oxlint-config の `oxlintrc.jsonc` を `extends` すればよく、同一エンジン内なので二重にはならない。
 - **理由**: 「コマンド一発で全チェック項目を検査できること」「既存の ESLint 等と併用するなら高速であること」がユーザー要件。実測(2026-09-07、ts-data-forge 287 ファイル): tsgo 0.92 秒、oxlint + tsgolint 1.06 秒、tsc(JS 版)8.69 秒 — 順次実行で 2 秒であり、`sumi check` の内部が native tsc + oxlint の直列で足りる根拠。動詞を層で分けないのは、層を移るときに利用者が覚え直さず、CI のスクリプト(`sumi check` / `sumi test`)が層をまたいで同じ字面で済むため。
 - **実装で決めた細目(2026-09-08)**: 拘束項目の比較は「コンパイラの読み方」に合わせる — 不在の boolean は `false`(TS の既定)として受け入れる。ただし `allowUnusedLabels` / `allowUnreachableCode` は不在が「suggestion」の意味なので明示必須 / `strict` 系サブフラグ(`noImplicitAny` 等、TS 7.0 時点の一覧)を個別に `false` にするのは `strict` の違反 / enum 値は大文字小文字を無視(`NodeNext` = `nodenext`)。lint 対象はプログラムのファイル集合(tsconfig の `include` と lint の対象が乖離しない)。終了コード 0 / 1(違反)/ 2(実行不能)。**既知の制約**: tsgolint は各ファイルから最寄りの `tsconfig.json` を探すため、`-p` に別名の tsconfig を渡すと型情報ルールの見る設定がずれうる(oxlint の `--tsconfig` は import 解決用)。
-- **dogfood 計測(2026-09-08)**: ts-std-forge の tsconfig(mono 共通設定)は拘束 4 項目に違反(`erasableSyntaxOnly` / `verbatimModuleSyntax` が false、`allowJs` / `checkJs` が true)。本適用には Sumi 用の tsconfig(`extends: sumi-cli/tsconfig`)が要る(issue #1753 タスク 6)。
+- **dogfood 計測(2026-09-08)**: ts-std-forge の tsconfig(mono 共通設定)は拘束 4 項目に違反(`erasableSyntaxOnly` / `verbatimModuleSyntax` が false、`allowJs` / `checkJs` が true)。本適用には Sumi 用の tsconfig(`extends: @sumi-lang/cli/tsconfig`)が要る(issue #1753 タスク 6)。
 - **未決(sugar 設計時)**: プロジェクトが層を宣言する `sumi.config` の形式(D-36 の default export emit 設定と同じファイルになる見込み)/ `.sumi` はフォーマッタが読めないので `sumi fmt` が要る(oxfmt の fork か、transpile → 整形 → 逆変換)/ oxlint の実験機能 `--type-check`(tsgolint が tsc 診断も返す)で native tsc の起動を省き 1 プロセスにできるかは、安定後に再評価。
 
 ## D-47: getter は Sumi lint / Sumi sugar で許可し、Sumi refined で落とす(D-33 改訂。setter は禁止のまま)
@@ -408,3 +408,10 @@
     2. **ts-data-forge を反転させる**: ts-data-forge が ts-std-forge に依存し、自前の functional 実装を削除して **re-export** に置き換える(`export { Result, Optional, pipe, … } from 'ts-std-forge'`)。API は不変なので minor。内部の `others/` `guard/` の共有分も同様に扱う(残すか ts-std-forge から re-export するか)。1 と 2 は循環を作らないよう**この順序**で、別リリースにする。
     3. **推奨と整理(任意、major)**: eslint-plugin-ts-data-forge に「`Result` 等は ts-std-forge から import する」規則(autofix 付き)を足し、repo 内 50 パッケージを移す。ts-data-forge の re-export を落とすのは次の major で、必要が無ければ落とさない。
 - **検討事項**: (a) ts-std-forge の名前と説明(「throw / null API の安全なラッパー」から「Sumi の prelude」へ広がる — 初回 publish は済んでいるので改名は別問題)。(b) `expectType` の置き場(両方が使う開発用ユーティリティ。ts-type-forge へ移す案)。(c) `Num.safeParseFloat` / `safeParseInt` と `SafeNumber.parse` / `parseInteger` の一本化(D-41 の「次の major で一元管理」をここで実施)。(d) eslint-plugin-ts-data-forge の規則名・案内文(`prefer-num-safe-parse-*` 等)の更新。(e) D-48 の `PanicError` 分担の解消(反転後は ts-std-forge に統合)。(f) stdlib.md の層の記述(prelude の実体を ts-data-forge から ts-std-forge に書き換える)。
+
+## D-50: Sumi のパッケージは npm org `sumi-lang`(`@sumi-lang/*`)に置く
+
+- **ステータス**: 確定(2026-09-08、ユーザー決定。org は作成済み: <https://www.npmjs.com/settings/sumi-lang>)
+- **判断**: 言語 Sumi の npm パッケージはすべて scope `@sumi-lang` の下に置く。現在の開発パッケージも同じ命名にした — `@sumi-lang/cli`(`sumi` コマンド、`languages/sumi/cli`)/ `@sumi-lang/oxlint-config`(preset、`languages/sumi/oxlint-config`)/ `@sumi-lang/eslint-config`(ブリッジ、`languages/sumi/eslint-config`)/ `@sumi-lang/conformance`(コーパス、`languages/sumi/conformance`)。いずれも `private: true` のままで、publish の判断(初回は手動 — libs/first-release.md)は別。`bin` 名は `sumi` のまま(`npx @sumi-lang/cli check` / インストール後は `sumi check`)。
+- **理由**: npm の `sumi` は無関係のパッケージが取得済み(D-46 の未決事項)。scope なら名前の衝突を気にせず、言語のパッケージ群が一目で分かる。
+- **帰結**: D-46 の「公開名は未定」は解消。ts-std-forge / ts-data-forge は言語のパッケージではなく汎用ライブラリなので対象外(D-49 の依存反転後も同じ)。将来 `libs/` へ移すときも名前は変えない。

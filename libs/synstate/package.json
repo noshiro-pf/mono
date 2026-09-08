@@ -68,6 +68,7 @@
   },
   "devDependencies": {
     "@reduxjs/toolkit": "catalog:",
+    "@sumi-lang/cli": "workspace:*",
     "@types/react": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "argparse": "catalog:",
@@ -83,7 +84,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "rxjs": "catalog:",
-    "sumi-cli": "workspace:*",
     "synstate-react-hooks": "workspace:*",
     "synstate-react-hooks-compat": "workspace:*",
     "ts-repo-utils": "workspace:*",

@@ -65,6 +65,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@sumi-lang/cli": "workspace:*",
     "@testing-library/dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
@@ -80,7 +81,6 @@
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sumi-cli": "workspace:*",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

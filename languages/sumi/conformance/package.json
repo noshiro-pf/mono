@@ -1,5 +1,5 @@
 {
-  "name": "sumi-conformance",
+  "name": "@sumi-lang/conformance",
   "version": "0.0.0",
   "private": true,
   "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Sumi). See docs/sumi/conformance-corpus.md.",
@@ -31,6 +31,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "devDependencies": {
+    "@sumi-lang/oxlint-config": "workspace:*",
     "@types/node": "catalog:",
     "cspell": "catalog:",
     "eslint": "catalog:",
@@ -39,7 +40,6 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "sumi-oxlint-config": "workspace:*",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "typescript-native": "npm:typescript@7.0.2",

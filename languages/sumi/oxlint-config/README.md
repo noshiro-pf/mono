@@ -1,4 +1,4 @@
-# sumi-oxlint-config
+# @sumi-lang/oxlint-config
 
 Sumi lint の **oxlint preset**(Phase 1 のエンジン — [docs/sumi/implementation-plan.md](../../../docs/sumi/implementation-plan.md))。
 

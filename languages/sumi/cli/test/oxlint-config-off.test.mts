@@ -1,6 +1,6 @@
+import { oxlintConfigPath } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { oxlintConfigPath } from 'sumi-oxlint-config';
 import { hasKey, isRecord } from 'ts-data-forge';
 import { oxlintConfigOffForSumiCheck } from '../src/index.mjs';
 

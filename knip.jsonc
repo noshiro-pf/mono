@@ -204,10 +204,10 @@
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
-      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
-      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
+      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
-      "ignoreDependencies": ["sumi-cli"],
+      "ignoreDependencies": ["@sumi-lang/cli"],
     },
 
     // Same as `libs/*`, plus the Sumi dogfood exception.
@@ -229,10 +229,10 @@
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
-      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
-      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
+      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
-      "ignoreDependencies": ["sumi-cli"],
+      "ignoreDependencies": ["@sumi-lang/cli"],
     },
 
     // Same as `libs/*`, plus the Sumi dogfood exception.
@@ -254,10 +254,10 @@
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
-      // Sumi dogfood target: `tsconfig.sumi.json` reaches sumi-cli through
-      // `extends: "sumi-cli/tsconfig"`, which knip does not read (it is not
+      // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
+      // `extends: "@sumi-lang/cli/tsconfig"`, which knip does not read (it is not
       // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
-      "ignoreDependencies": ["sumi-cli"],
+      "ignoreDependencies": ["@sumi-lang/cli"],
     },
 
     // Same as `libs/*` — knip replaces a workspace config rather than merging

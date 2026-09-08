@@ -1,6 +1,6 @@
 /**
  * Neutral rule ID (what `sumi check` covers — the value set of
- * sumi-oxlint-config's mapping) → the ESLint rules of eslint-config-typed
+ * @sumi-lang/oxlint-config's mapping) → the ESLint rules of eslint-config-typed
  * that check the same thing. This is what `eslintConfigOffForSumiCheck`
  * turns off (D-46): a project that runs `sumi check` and keeps ESLint for its
  * style rules does not check these twice.

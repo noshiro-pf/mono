@@ -1,4 +1,4 @@
-import { oxlintCodeToRuleId } from 'sumi-oxlint-config';
+import { oxlintCodeToRuleId } from '@sumi-lang/oxlint-config';
 import { type ReadonlyRecord } from 'ts-type-forge';
 
 /**

@@ -1,6 +1,6 @@
 {
   // The Sumi base tsconfig (docs/sumi/spec/compiler-options.md, D-40 / D-46).
-  // Projects `extends` it ("extends": "sumi-cli/tsconfig"). The locked entries
+  // Projects `extends` it ("extends": "@sumi-lang/cli/tsconfig"). The locked entries
   // are what `sumi check` verifies against the project's effective options
   // (src/locked-compiler-options.mts is the single source of truth; a test
   // keeps this file in sync with it); the free entries are defaults a project

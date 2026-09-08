@@ -1,9 +1,9 @@
+import { implementedRuleIds } from '@sumi-lang/oxlint-config';
 import {
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
 import * as path from 'node:path';
-import { implementedRuleIds } from 'sumi-oxlint-config';
 import {
   eslintConfigOffForSumiCheck,
   eslintRulesByRuleId,

@@ -64,7 +64,7 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 ## 言語名・ファイル拡張子(決定 2026-09-07 — D-16)
 
-**言語名は Sumi、Sumi sugar の拡張子は `.sumi`。**
+**言語名は Sumi、Sumi sugar の拡張子は `.sumi`。npm パッケージは org `sumi-lang`(`@sumi-lang/*`)に置く(D-50、2026-09-08)。**
 
 - Sumi lint は合法 TS なので拡張子は `.mts` / `.tsx` のままでよい。**Sumi sugar の独自拡張子は 1 つだけ新設し、常時 JSX 文法(tsx 相当)とする**(D-11 — angle-bracket アサーションの除去と `<T,>` 強制により単一文法で曖昧性が消えるため)。
 - 命名は先行研究・既存プロジェクトとの衝突を避ける。特に **Safe TypeScript**(Microsoft Research による、TypeScript に健全な gradual typing を与える先行研究。POPL 2015 "Safe & Efficient Gradual Typing for TypeScript")が既にこの系統の名前を使っている。方向性が近い(TS の不健全性の排除)ため、命名の回避対象であると同時に設計の参考文献でもある。
