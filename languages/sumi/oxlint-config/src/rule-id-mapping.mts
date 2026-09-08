@@ -77,6 +77,8 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   ['eslint(no-restricted-imports)', 'modules/no-index-file-import'],
   ['typescript(triple-slash-reference)', 'modules/no-triple-slash'],
   ['typescript(no-require-imports)', 'modules/no-require'],
+  ['sumi(no-internal-module-import)', 'modules/no-internal-module-import'],
+  ['sumi(no-namespace-object-use)', 'modules/no-namespace-object-use'],
 
   // mutation
   ['sumi(no-let-without-mut-prefix)', 'mutation/no-let-without-mut-prefix'],

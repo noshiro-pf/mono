@@ -49,6 +49,8 @@ export const knownRuleIds = [
   'jsx/generic-arrow-trailing-comma',
   'modules/no-default-export',
   'modules/no-index-file-import',
+  'modules/no-internal-module-import',
+  'modules/no-namespace-object-use',
   'modules/no-require',
   'modules/no-side-effect-import',
   'modules/no-triple-slash',

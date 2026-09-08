@@ -149,6 +149,8 @@
       { "path": "never", "types": "never", "lib": "never" },
     ],
     "typescript/no-require-imports": "error",
+    "sumi/no-internal-module-import": "error",
+    "sumi/no-namespace-object-use": "error",
 
     // ---- mutation (spec/variables-and-mutation.md, D-14, D-19, D-27) ----
     "sumi/no-let-without-mut-prefix": "error",

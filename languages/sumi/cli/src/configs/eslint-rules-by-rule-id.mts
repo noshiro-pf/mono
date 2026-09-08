@@ -117,6 +117,8 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ['modules/no-index-file-import', ['no-restricted-imports']],
     ['modules/no-triple-slash', ['@typescript-eslint/triple-slash-reference']],
     ['modules/no-require', ['@typescript-eslint/no-require-imports']],
+    ['modules/no-internal-module-import', ['import-x/no-internal-modules']],
+    ['modules/no-namespace-object-use', ['tree-shakable/import-star']],
 
     // mutation
     ['mutation/no-let-without-mut-prefix', ['functional/no-let']],
