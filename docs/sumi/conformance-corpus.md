@@ -36,18 +36,19 @@ ID の一覧と各エンジンへの対応は runner のマッピングファイ
 ## 期待診断マーカー
 
 ```ts
-// @sumi-expect banned-syntax/no-var
+// @sumi-expect-error banned-syntax/no-var
 var x = 1;
 
 // 同一行に複数の診断が出る場合はマーカーを重ねる
-// @sumi-expect banned-syntax/no-loose-equality
-// @sumi-expect boolean/strict-logical-operands
+// @sumi-expect-error banned-syntax/no-loose-equality
+// @sumi-expect-error boolean/strict-logical-operands
 const b = a == c && n;
 ```
 
 - マーカーは**直後の 1 行**に適用される。
-- オプションでメッセージ部分文字列を検証できる: `// @sumi-expect null/no-null-literal "use undefined"`
-- ファイル全体に対する診断(モジュール形式の違反など)は先頭の `// @sumi-expect-file <rule-id>` で表す。
+- オプションでメッセージ部分文字列を検証できる: `// @sumi-expect-error null/no-null-literal "use undefined"`
+- ファイル全体に対する診断(モジュール形式の違反など)は先頭の `// @sumi-expect-error-file <rule-id>` で表す。
+- 語形は `@ts-expect-error` に揃えている(D-51、2026-09-08 に `@sumi-expect` から改名)。コーパス内では**抑制ではなく期待の表明**で、出なければ失敗・余分に出ても失敗。ユーザーコードでの抑制コメントとして同じ形を採用するかは D-51 の将来項目。
 - `valid/` 配下のファイルはマーカーを含んではならない(runner が検証)。
 
 ## runner の契約(Phase 1 で実装)

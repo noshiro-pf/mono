@@ -1,2 +1,2 @@
-// @sumi-expect banned-syntax/no-sparse-array
+// @sumi-expect-error banned-syntax/no-sparse-array
 export const withHole = [1, , 3];

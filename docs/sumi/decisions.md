@@ -109,7 +109,7 @@
 - **ステータス**: 確定(2026-09-07。2026-08-29 の当初決定を D-44 で差し替え)
 - **判断**: 言語名を **Sumi**、Sumi sugar の単一拡張子(D-11)を **`.sumi`** とする(ユーザー決定)。
 - **理由**: 拡張子は言語名そのもので、著名な言語・形式・既存略語との衝突がない。
-- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `@sumi-lang/conformance` / `@sumi-lang/eslint-config` / `@sumi-lang/oxlint-config`、期待診断マーカー `@sumi-expect`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
+- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `@sumi-lang/conformance` / `@sumi-lang/eslint-config` / `@sumi-lang/oxlint-config`、期待診断マーカー `@sumi-expect-error`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
 
 ## D-17: 予約語 `fn` を採用し、Sumi lint から識別子 `fn` を予約する
 
@@ -415,3 +415,10 @@
 - **判断**: 言語 Sumi の npm パッケージはすべて scope `@sumi-lang` の下に置く。現在の開発パッケージも同じ命名にした — `@sumi-lang/cli`(`sumi` コマンド、`languages/sumi/cli`)/ `@sumi-lang/oxlint-config`(preset、`languages/sumi/oxlint-config`)/ `@sumi-lang/eslint-config`(ブリッジ、`languages/sumi/eslint-config`)/ `@sumi-lang/conformance`(コーパス、`languages/sumi/conformance`)。いずれも `private: true` のままで、publish の判断(初回は手動 — libs/first-release.md)は別。`bin` 名は `sumi` のまま(`npx @sumi-lang/cli check` / インストール後は `sumi check`)。
 - **理由**: npm の `sumi` は無関係のパッケージが取得済み(D-46 の未決事項)。scope なら名前の衝突を気にせず、言語のパッケージ群が一目で分かる。
 - **帰結**: D-46 の「公開名は未定」は解消。ts-std-forge / ts-data-forge は言語のパッケージではなく汎用ライブラリなので対象外(D-49 の依存反転後も同じ)。将来 `libs/` へ移すときも名前は変えない。
+
+## D-51: コーパスのマーカーは `@sumi-expect-error <id>` とし、将来のユーザー向け抑制コメントも同じ形・同じ意味論にする
+
+- **ステータス**: 確定(2026-09-08、ユーザー提案)
+- **判断**: 適合性コーパスのマーカー `// @sumi-expect <rule-id>` を **`// @sumi-expect-error <rule-id>`** に改名する(ファイル全体は `// @sumi-expect-error-file <rule-id>`)。用法は `@ts-expect-error` と同じ「この行にこの診断が出る」。コーパス内では**抑制ではなく期待の表明**(出なければ失敗、余分に出ても失敗 — conformance-corpus.md の exact match)。
+- **理由**: `@sumi-expect banned-syntax/no-var` は「このルールを有効にする」設定ディレクティブに見える。`-error` を付ければ `@ts-expect-error` と同じ語形で一意に読め、`compiler/<code>` の診断にも自然に当てはまる(Sumi の診断はすべて error)。
+- **帰結(将来)**: ユーザーコードでの Sumi 自身の抑制コメントを設けるなら同じ字面 `// @sumi-expect-error <中立 ID>` にし、意味論も `@ts-expect-error` と同じ「**診断が出なければそれ自体が違反**」とする(disable 系と違って古い抑制が残らない)。中立 ID で書くのでエンジン(oxlint → 専用チェッカー)を替えても変わらず、現在 synstate で使っている `oxlint-disable-next-line sumi/no-throw` のようなエンジン固有のコメントを置き換えられる。採用時期は `sumi check` の設定(`sumi.config.json`、D-46)と併せて決める。

@@ -15,7 +15,7 @@ import {
 /**
  * Phase 1 engine check: the oxlint preset (@sumi-lang/oxlint-config) run over the
  * whole corpus, its diagnostics normalized to neutral rule IDs through the
- * preset's mapping, and compared with the `@sumi-expect` markers — exact
+ * preset's mapping, and compared with the `@sumi-expect-error` markers — exact
  * match both ways (docs/sumi/conformance-corpus.md, "runner の契約").
  */
 

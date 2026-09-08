@@ -2,9 +2,9 @@
  * Parser for the expected-diagnostic markers described in
  * `docs/sumi/conformance-corpus.md`:
  *
- * - `// @sumi-expect <rule-id> ["message substring"]` applies to the next
+ * - `// @sumi-expect-error <rule-id> ["message substring"]` applies to the next
  *   non-marker line (markers stack).
- * - `// @sumi-expect-file <rule-id>` describes a file-wide diagnostic.
+ * - `// @sumi-expect-error-file <rule-id>` describes a file-wide diagnostic.
  */
 
 export type ExpectedDiagnostic = Readonly<{
@@ -60,7 +60,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
 
     if (parsed.type === 'malformed') {
       mut_problems.push(
-        `line ${lineNumber}: malformed @sumi-expect marker: ${lineText}`,
+        `line ${lineNumber}: malformed @sumi-expect-error marker: ${lineText}`,
       );
 
       continue;
@@ -69,7 +69,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
     if (mut_pending.length > 0) {
       if (lineText === '') {
         mut_problems.push(
-          `line ${lineNumber}: @sumi-expect marker must be immediately followed by a code line`,
+          `line ${lineNumber}: @sumi-expect-error marker must be immediately followed by a code line`,
         );
 
         mut_pending.length = 0;
@@ -87,7 +87,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
 
   for (const [markerLine] of mut_pending) {
     mut_problems.push(
-      `line ${markerLine}: @sumi-expect marker at end of file applies to nothing`,
+      `line ${markerLine}: @sumi-expect-error marker at end of file applies to nothing`,
     );
   }
 
@@ -99,7 +99,7 @@ export const hasMarkerLikeComment = (sourceText: string): boolean =>
     .split('\n')
     .some((line) => line.trimStart().startsWith(markerPrefix));
 
-const markerPrefix = '// @sumi-expect';
+const markerPrefix = '// @sumi-expect-error';
 
 type ParsedMarkerLine = Readonly<
   | {

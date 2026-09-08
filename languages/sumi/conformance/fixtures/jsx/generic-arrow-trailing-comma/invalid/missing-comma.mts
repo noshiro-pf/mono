@@ -3,5 +3,5 @@
 // the compiler diagnostic appears. The rule's own positive cases are `.ts` /
 // `.tsx` files, covered by the preset's unit test until the corpus takes
 // `.tsx` fixtures.
-// @sumi-expect compiler/7060
+// @sumi-expect-error compiler/7060
 export const identity = <T>(value: T): T => value;

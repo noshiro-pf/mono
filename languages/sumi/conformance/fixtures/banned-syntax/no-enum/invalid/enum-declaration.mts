@@ -1,4 +1,4 @@
-// @sumi-expect banned-syntax/no-enum
+// @sumi-expect-error banned-syntax/no-enum
 export enum Direction {
   Up,
   Down,
