@@ -113,6 +113,18 @@
       // finds oxlint-tsgolint (the type-aware engine) in node_modules.
       "ignoreDependencies": ["oxlint", "oxlint-tsgolint"],
     },
+    "languages/sumi/cli": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/cmd/sumi.mts",
+        "scripts/cmd/*.mts",
+        "test/**/*.test.mts",
+      ],
+      "project": ["src/**/*.mts", "scripts/**/*.mts", "test/**/*.mts"],
+      // Resolved by path at runtime (the native tsc the check spawns), not
+      // imported.
+      "ignoreDependencies": ["typescript-native"],
+    },
 
     // The strict standard library's generator. Its entry points are the
     // per-version `scripts/`, which the root `strict-lib:gen*` commands drive;

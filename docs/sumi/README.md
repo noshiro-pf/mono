@@ -22,11 +22,11 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 ## ロードマップ
 
-| 段階         | 形態                                                     | 具象構文            | 実装                                                               |
-| :----------- | :------------------------------------------------------- | :------------------ | :----------------------------------------------------------------- |
-| Sumi lint    | 合法 TS サブセット + 外部チェッカー                      | TS と完全に同じ     | ESLint ルール群(既存の eslint-config-typed が土台)+ 専用チェッカー |
-| Sumi sugar   | 独自構文を transpiler で TS に変換(Sumi lint を包含する) | TS + 少数の拡張構文 | parser + 高品質 TS emit                                            |
-| Sumi refined | 型検査の変更(ネイティブ `Int` 等。TS に対応物なし)       | Sumi sugar と同じ   | 独自型検査器                                                       |
+| 段階         | 形態                                                     | 具象構文            | 実装                                                                    |
+| :----------- | :------------------------------------------------------- | :------------------ | :---------------------------------------------------------------------- |
+| Sumi lint    | 合法 TS サブセット + 外部チェッカー                      | TS と完全に同じ     | oxlint preset(D-43)を `sumi check` が native tsc と直列に走らせる(D-46) |
+| Sumi sugar   | 独自構文を transpiler で TS に変換(Sumi lint を包含する) | TS + 少数の拡張構文 | parser + 高品質 TS emit                                                 |
+| Sumi refined | 型検査の変更(ネイティブ `Int` 等。TS に対応物なし)       | Sumi sugar と同じ   | 独自型検査器                                                            |
 
 三層の区分と、Sumi sugar 構文を Sumi lint + ライブラリと一対一対応させる方針は D-37、呼び名は D-38([decisions.md](./decisions.md))。
 
@@ -41,7 +41,7 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 - [related-work.md](./related-work.md) — 先行研究・関連プロジェクトと採否(asm.js、Safe TypeScript、Refined TypeScript ほか)
 - [overload-survey.md](./overload-survey.md) — オーバーロード代替の言語間コード比較(候補 8 / D-13 の設計材料)
 - [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) — throw しうる標準ライブラリ API の棚卸し(D-22 の基礎、Node 実測込み)
-- [implementation-plan.md](./implementation-plan.md) — Sumi lint 実装計画(Phase 0: 対応表とコーパス → Phase 1: ESLint dogfood → Phase 2: 単一パス専用チェッカー → Phase 3: Sumi sugar parser)
+- [implementation-plan.md](./implementation-plan.md) — Sumi lint 実装計画(Phase 0: 対応表とコーパス → Phase 1: oxlint preset + `sumi check` で dogfood → Phase 2: 単一パス専用チェッカー → Phase 3: Sumi sugar parser)
 - [enforcement-map.md](./enforcement-map.md) — 仕様→強制手段の対応表(Phase 0 成果物)
 - [conformance-corpus.md](./conformance-corpus.md) — 適合性コーパスの形式定義(Phase 0 成果物)
 - [spec/modules.md](./spec/modules.md) — モジュール、import/export、モジュール解決

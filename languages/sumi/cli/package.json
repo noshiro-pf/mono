@@ -1,0 +1,81 @@
+{
+  "name": "sumi-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The `sumi` command (D-46): `sumi check` runs the whole Sumi lint check in one go (locked compilerOptions validation, native tsc, the oxlint preset), and the package exports the base tsconfig plus the ESLint / oxlint fragments that turn off what `sumi check` already covers. See docs/sumi/decisions.md.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "languages/sumi/cli"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": [
+    "./dist/cmd/*.mjs"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./src/entry-point.mts",
+    "./tsconfig": "./tsconfig.base.json",
+    "./oxlint-config-off": "./oxlint-config-off.json"
+  },
+  "bin": {
+    "sumi": "./dist/cmd/sumi.mjs"
+  },
+  "files": [
+    "dist",
+    "tsconfig.base.json",
+    "oxlint-config-off.json"
+  ],
+  "scripts": {
+    "build": "node ../../../node_modules/typescript-native/bin/tsc -p ./configs/tsconfig.build.json",
+    "build:min": "pnpm run build",
+    "codemod": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --uncommitted --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "codemod:full": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../../ --no-progress",
+    "fmt": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fmt:diff": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gen:oxlint-config-off": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-oxlint-config-off.mts && pnpm run fmt",
+    "gi": "pnpm run gi:src && pnpm run fmt",
+    "gi:src": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --exclude 'cmd/*'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "sumi": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ./src/cmd/sumi.mts",
+    "test": "pnpm run z:vitest:node run",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
+    "type-check": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "cmd-ts": "^0.15.0",
+    "sumi-oxlint-config": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "typescript-native": "npm:typescript@7.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "cspell": "catalog:",
+    "dedent": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "jiti": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:~",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  },
+  "volta": {
+    "node": "26.3.1"
+  }
+}

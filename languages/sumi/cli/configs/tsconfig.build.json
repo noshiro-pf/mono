@@ -1,0 +1,12 @@
+{
+  // Emits the `sumi` executable (dist/cmd/sumi.mjs, what `bin` points at)
+  // and the library modules next to it.
+  "extends": "../../../../tools/configs/tsconfig/tsconfig.build.json",
+  "compilerOptions": {
+    "rootDir": "../src",
+    "outDir": "../dist",
+    "declaration": true,
+    "types": ["node"]
+  },
+  "include": ["../src"]
+}
