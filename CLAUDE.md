@@ -35,7 +35,10 @@ instruction file.
 - `languages/` — programming-language development: one directory per language,
   with that language's development packages below it (workspace glob
   `languages/*/*`). Currently `languages/sumi/` (the Sumi
-  language), whose specification lives in `docs/sumi/`. Its packages are named
+  language), whose specification, decision log and enforcement map live in
+  `languages/sumi/docs/` (moved from the root `docs/sumi/` on 2026-09-08 so
+  that everything about the language sits together; a user-facing
+  documentation site would be a separate `doc-site`-style package). Its packages are named
   `@sumi-lang/*` (the npm org `sumi-lang`, D-50). Nothing here is published yet — a
   language's publishable tooling moves to `libs/` when it materializes. The
   conformance corpus's `fixtures/` hold deliberate rule violations and are

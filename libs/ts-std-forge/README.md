@@ -5,7 +5,7 @@ values, returning [`Result` / `Optional`](https://github.com/noshiro-pf/mono/tre
 instead. The dependency is strictly one-way: `ts-std-forge` → `ts-data-forge`.
 
 The catalog of APIs to wrap, and the reasoning, live in the Sumi language
-project: [docs/sumi/throwing-stdlib-survey.md](../../docs/sumi/throwing-stdlib-survey.md)
+project: [languages/sumi/docs/throwing-stdlib-survey.md](../../languages/sumi/docs/throwing-stdlib-survey.md)
 (decisions D-22 / D-24 / D-26).
 
 ## Error design (D-26)

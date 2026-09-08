@@ -1,6 +1,6 @@
 /**
  * Neutral rule ID (`<spec-area>/<rule>`, the corpus vocabulary — see
- * docs/sumi/conformance-corpus.md) ← oxlint diagnostic code
+ * languages/sumi/docs/conformance-corpus.md) ← oxlint diagnostic code
  * (`<plugin>(<rule>)`, as printed by `oxlint -f json`).
  *
  * This is the single source of truth for "which oxlint rule implements which

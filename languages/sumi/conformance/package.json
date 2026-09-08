@@ -2,7 +2,7 @@
   "name": "@sumi-lang/conformance",
   "version": "0.0.0",
   "private": true,
-  "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Sumi). See docs/sumi/conformance-corpus.md.",
+  "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Sumi). See languages/sumi/docs/conformance-corpus.md.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",

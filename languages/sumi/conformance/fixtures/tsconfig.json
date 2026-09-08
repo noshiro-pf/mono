@@ -1,7 +1,7 @@
 {
   // The compilerOptions the fixtures are type-checked under by the engines
   // that need type information (oxlint-tsgolint discovers this file per
-  // fixture). It is the Sumi base tsconfig draft (docs/sumi/spec/
+  // fixture). It is the Sumi base tsconfig draft (languages/sumi/docs/spec/
   // compiler-options.md, D-40): the locked options verbatim, and the free
   // ones at their defaults.
   "compilerOptions": {

@@ -16,7 +16,7 @@ import {
  * Phase 1 engine check: the oxlint preset (@sumi-lang/oxlint-config) run over the
  * whole corpus, its diagnostics normalized to neutral rule IDs through the
  * preset's mapping, and compared with the `@sumi-expect-error` markers — exact
- * match both ways (docs/sumi/conformance-corpus.md, "runner の契約").
+ * match both ways (languages/sumi/docs/conformance-corpus.md, "runner の契約").
  */
 
 /**
@@ -45,7 +45,7 @@ type Observed = Readonly<{
 /**
  * A TypeScript diagnostic tsgolint passes through (`TS(<code>)`) is the
  * corpus's `compiler/<code>` — a diagnostic of the fixed compilerOptions,
- * not of a lint rule (docs/sumi/conformance-corpus.md).
+ * not of a lint rule (languages/sumi/docs/conformance-corpus.md).
  */
 const toRuleId = (code: string): string => {
   const compiler = /^TS\((\d+)\)$/u.exec(code);

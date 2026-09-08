@@ -2,13 +2,13 @@
 
 # @sumi-lang/cli
 
-`sumi` コマンド(D-46 — [docs/sumi/decisions.md](../../../docs/sumi/decisions.md))。Sumi lint 層の `sumi check` と、既存の ESLint / oxlint 設定と併用するための config を提供する。
+`sumi` コマンド(D-46 — [languages/sumi/docs/decisions.md](../docs/decisions.md))。Sumi lint 層の `sumi check` と、既存の ESLint / oxlint 設定と併用するための config を提供する。
 
 ## `sumi check <project>`
 
 1 コマンドで Sumi lint の検査を全部走らせる。`<project>` は tsconfig のパスか `tsconfig.json` を持つディレクトリ。
 
-1. **拘束 compilerOptions の検証** — native tsc(`typescript-native`、TS 7)の `--showConfig` で実効設定を取り、[spec/compiler-options.md](../../../docs/sumi/spec/compiler-options.md) の拘束項目(`src/locked-compiler-options.mts`)と比較する。違反があればここで止まる(上書きされた設定での検査結果は言語の検査結果ではない — D-7 / D-40)。
+1. **拘束 compilerOptions の検証** — native tsc(`typescript-native`、TS 7)の `--showConfig` で実効設定を取り、[spec/compiler-options.md](../docs/spec/compiler-options.md) の拘束項目(`src/locked-compiler-options.mts`)と比較する。違反があればここで止まる(上書きされた設定での検査結果は言語の検査結果ではない — D-7 / D-40)。
 2. **型検査** — 同じ native tsc で `--noEmit`。
 3. **lint** — `--showConfig` が返す `files`(= プログラムの全ファイル)に対して @sumi-lang/oxlint-config の preset(oxlint native + tsgolint + sumi JS plugin)を実行する。
 

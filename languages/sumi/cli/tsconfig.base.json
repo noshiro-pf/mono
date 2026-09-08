@@ -1,5 +1,5 @@
 {
-  // The Sumi base tsconfig (docs/sumi/spec/compiler-options.md, D-40 / D-46).
+  // The Sumi base tsconfig (languages/sumi/docs/spec/compiler-options.md, D-40 / D-46).
   // Projects `extends` it ("extends": "@sumi-lang/cli/tsconfig"). The locked entries
   // are what `sumi check` verifies against the project's effective options
   // (src/locked-compiler-options.mts is the single source of truth; a test

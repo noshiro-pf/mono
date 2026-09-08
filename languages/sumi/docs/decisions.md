@@ -109,7 +109,7 @@
 - **ステータス**: 確定(2026-09-07。2026-08-29 の当初決定を D-44 で差し替え)
 - **判断**: 言語名を **Sumi**、Sumi sugar の単一拡張子(D-11)を **`.sumi`** とする(ユーザー決定)。
 - **理由**: 拡張子は言語名そのもので、著名な言語・形式・既存略語との衝突がない。
-- **帰結**: `languages/sumi/`、`docs/sumi/`、パッケージ `@sumi-lang/conformance` / `@sumi-lang/eslint-config` / `@sumi-lang/oxlint-config`、期待診断マーカー `@sumi-expect-error`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
+- **帰結**: `languages/sumi/`、`languages/sumi/docs/`、パッケージ `@sumi-lang/conformance` / `@sumi-lang/eslint-config` / `@sumi-lang/oxlint-config`、期待診断マーカー `@sumi-expect-error`、JS plugin 名 `sumi/<rule>`、CLI 名 `sumi`。
 
 ## D-17: 予約語 `fn` を採用し、Sumi lint から識別子 `fn` を予約する
 
@@ -320,7 +320,7 @@
 
 - **ステータス**: 確定(2026-09-07)
 - **判断**: Phase 1 のエンジンを ESLint から **oxlint** に切り替える。構成は (1) oxlint の native ルール、(2) `oxlint-tsgolint` による type-aware ルール(typescript-eslint の type-aware 群の native 実装)、(3) native に無い言語ルールを載せる **sumi JS plugin**(`languages/sumi/oxlint-config/src/plugin/`)の三つ。preset パッケージは `languages/sumi/oxlint-config`(@sumi-lang/oxlint-config、非公開)で、`oxlintrc.jsonc`(全 category off、仕様の行だけを明示的に有効化)、plugin、**中立ルール ID ← oxlint 診断コードの対応表**、runner ヘルパを持つ。適合性コーパスはこの対応表で診断を正規化してマーカーと照合する(runner 接続は 2026-09-07 に稼働)。D-25 の @sumi-lang/eslint-config は、oxlint に載せられない独自 type-aware ルールが必要になった場合のブリッジとして残す。
-- **理由**: ESLint の遅さは Sumi のルール数では呑めない可能性がある(ユーザー判断)。[docs/research-eslint-alternative-tools.md](../research-eslint-alternative-tools.md) の結論どおり oxlint が最有力で、実測(2026-09-07、oxlint 1.80.0)で次を確認した — ESLint 互換の JS plugin API で esquery 選択子・scope 解析が動く / Node 26 では `.mts` の plugin も直接読めるが `.mjs` 指定子の解決が無いため dist 経由にする / tsgolint は package ディレクトリを cwd にすれば動き、`strict-boolean-expressions` 等がそのまま使える / eslint-plugin-functional のような既存 ESLint plugin もエントリファイル指定で読める(ただし自前の小ルールの方が依存が軽い)/ `no-restricted-syntax` は native に無いので選択子ルールは plugin 側に書く / JSON 出力は `{ diagnostics: [{ code: "<plugin>(<rule>)", filename, labels[0].span.line }] }`。
+- **理由**: ESLint の遅さは Sumi のルール数では呑めない可能性がある(ユーザー判断)。[docs/research-eslint-alternative-tools.md](../../../docs/research-eslint-alternative-tools.md) の結論どおり oxlint が最有力で、実測(2026-09-07、oxlint 1.80.0)で次を確認した — ESLint 互換の JS plugin API で esquery 選択子・scope 解析が動く / Node 26 では `.mts` の plugin も直接読めるが `.mjs` 指定子の解決が無いため dist 経由にする / tsgolint は package ディレクトリを cwd にすれば動き、`strict-boolean-expressions` 等がそのまま使える / eslint-plugin-functional のような既存 ESLint plugin もエントリファイル指定で読める(ただし自前の小ルールの方が依存が軽い)/ `no-restricted-syntax` は native に無いので選択子ルールは plugin 側に書く / JSON 出力は `{ diagnostics: [{ code: "<plugin>(<rule>)", filename, labels[0].span.line }] }`。
 - **制約(既知)**: oxlint はカスタム type-aware ルールを書けない(2026-09 時点)。型情報が要る 🆕 ルール(宣言への null 型禁止、境界 `?? undefined` 強制、`castMutable` 乱用、論理代入のオペランド、readonly 強制)は tsgolint の既存ルールで賄えるものを除き、**TS API 上の薄いチェッカー(Phase 2 の `sumi check` の前倒し)か ESLint ブリッジ**で実装する。どちらにするかは readonly 強制の実装方針(TODO)と併せて決める。
 - **コーパス側で判明した差分**: `no-sequences` は ESLint / oxlint とも既定 `allowInParentheses: true` で、余分な括弧で囲んだカンマ式(`const r = (a(), b())`、`if ((a(), b()))`)を「意図的な用法」として許す(ESLint 本体で実測: 既定では括弧なしの `r = a(), b()` だけを報告し、`false` を指定すると括弧付きも報告する。`for` の初期化・更新部は常に許可)。フィクスチャは括弧付きで書かれており言語としては正しく違反なので、誤りはエンジン設定の側 — `false` を指定する(ESLint preset にも同じ穴があり、enforcement-map に 🔧 として反映)。デコレータ付き class の報告行はエンジン依存(class の span がデコレータから始まるか)なので、フィクスチャはデコレータと class を同一行に置く。`fn` を仮引数名にした valid フィクスチャは D-17 の「宣言名」に該当し invalid だった(修正)。
 

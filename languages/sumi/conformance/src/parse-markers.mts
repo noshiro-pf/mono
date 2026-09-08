@@ -1,6 +1,6 @@
 /**
  * Parser for the expected-diagnostic markers described in
- * `docs/sumi/conformance-corpus.md`:
+ * `languages/sumi/docs/conformance-corpus.md`:
  *
  * - `// @sumi-expect-error <rule-id> ["message substring"]` applies to the next
  *   non-marker line (markers stack).

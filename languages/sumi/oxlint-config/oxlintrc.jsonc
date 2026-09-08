@@ -1,7 +1,7 @@
 // Sumi lint — the oxlint configuration (Phase 1 engine).
 //
 // Every category is off: only the rules listed here run, so that the rule
-// set is exactly the language specification (docs/sumi/enforcement-map.md).
+// set is exactly the language specification (languages/sumi/docs/enforcement-map.md).
 // Rules oxlint has no native equivalent for live in the sumi JS plugin
 // (src/plugin/, built to dist/). Type-aware rules run through oxlint-tsgolint
 // (`--type-aware`; `options.typeAware` below).

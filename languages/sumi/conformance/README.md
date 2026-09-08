@@ -1,8 +1,8 @@
 # @sumi-lang/conformance
 
 TypeScript サブセット言語(Sumi)の**エンジン非依存の適合性コーパス**。形式定義・設計判断は
-[docs/sumi/conformance-corpus.md](../../../docs/sumi/conformance-corpus.md) と
-[docs/sumi/implementation-plan.md](../../../docs/sumi/implementation-plan.md)(Phase 0 / 1)を参照。
+[languages/sumi/docs/conformance-corpus.md](../docs/conformance-corpus.md) と
+[languages/sumi/docs/implementation-plan.md](../docs/implementation-plan.md)(Phase 0 / 1)を参照。
 
 - `fixtures/<spec-area>/<rule-id>/{valid,invalid}/*.mts` — フィクスチャ。期待診断は `// @sumi-expect-error <rule-id>` マーカーで表す。**Prettier から除外されており(ルート `.prettierignore`)、byte-for-byte で保存される。** リポジトリ自身の lint / tsc の対象でもない(意図的な違反コードを含むため)。`fixtures/tsconfig.json` は type-aware エンジンがフィクスチャを型検査するときの compilerOptions で、Sumi の base tsconfig の draft(D-40)そのもの。
 - `src/` — マーカーのパーサとフィクスチャ走査。
