@@ -26,8 +26,9 @@ import { projectRootPath } from '../project-root-path.mjs';
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
  *    so a second rebase now would only run a CI matrix to throw it away.
- * 3. Otherwise take the lowest-numbered pull request that is `BEHIND`, rebase
- *    it onto `origin/<default branch>` in a throwaway worktree, and push with
+ * 3. Otherwise take the lowest-numbered pull request that is `BEHIND` —
+ *    or, once those are exhausted, one GitHub calls `DIRTY` — rebase it onto
+ *    `origin/<default branch>` in a throwaway worktree, and push with
  *    `--force-with-lease` against the head the survey saw. A rebase that
  *    conflicts, or a push that is refused, drops that pull request for as
  *    long as its head and the base stay where they are, and the next
@@ -148,6 +149,7 @@ const CheckListSchema = t.array(
 type Check = t.TypeOf<typeof CheckListSchema>[number];
 
 type SkipReason =
+  | 'already-in-base'
   | 'checks-failed'
   | 'not-merging'
   | 'push-failed'
@@ -253,7 +255,7 @@ type CycleResult = Readonly<{
 }>;
 
 type RebaseFailure = Readonly<{
-  reason: 'push-failed' | 'rebase-failed';
+  reason: 'already-in-base' | 'push-failed' | 'rebase-failed';
   detail: string;
 }>;
 
@@ -266,6 +268,12 @@ const WIP_LABEL = '[WIP]';
 const UNKNOWN_STATE_RETRIES = 6;
 
 const UNKNOWN_STATE_RETRY_MS = 10_000;
+
+/**
+ * How long to wait before surveying again after a rebase that changed
+ * nothing, which means the merge state the survey acted on was stale.
+ */
+const STALE_STATE_PAUSE_MS = 30_000;
 
 /**
  * How many consecutive polls a pull request may sit with every required
@@ -402,7 +410,13 @@ const runCycle = async (
   }
 
   if (options.dryRun) {
-    log(`Would rebase #${triaged.candidates[0].number} onto ${defaultBranch}.`);
+    const first = triaged.candidates[0];
+
+    log(
+      `Would rebase #${first.number} onto ${defaultBranch}${
+        isConflicting(first) ? ' to find out whether it really conflicts' : ''
+      }.`,
+    );
 
     return { state: state(mut_skipped), next: 'stop' };
   }
@@ -413,7 +427,11 @@ const runCycle = async (
     }
 
     log(
-      `Rebasing #${target.number} (${target.headRefName}) onto ${defaultBranch}.`,
+      `Rebasing #${target.number} (${target.headRefName}) onto ${defaultBranch}${
+        isConflicting(target)
+          ? ', which GitHub says conflicts — trying it locally to find out'
+          : ''
+      }.`,
     );
 
     const rebased = await rebaseAndPush(target, defaultBranch);
@@ -433,9 +451,16 @@ const runCycle = async (
     }
 
     if (rebased.value === target.headRefOid) {
-      // GitHub said BEHIND but the rebase changed nothing — the survey was
-      // stale. The next one will say what is actually there.
-      log(`#${target.number} was already on top of ${defaultBranch}.`);
+      // GitHub said BEHIND or DIRTY but the rebase changed nothing — the
+      // merge state was stale. The next survey will say what is actually
+      // there; wait first, because a state GitHub is still recomputing would
+      // otherwise send this straight back here, and each turn costs a fetch
+      // and a worktree.
+      log(
+        `#${target.number} was already on top of ${defaultBranch}; its ${target.mergeStateStatus} was stale.`,
+      );
+
+      await pause(STALE_STATE_PAUSE_MS);
 
       return { state: state(mut_skipped), next: 'survey' };
     }
@@ -796,6 +821,21 @@ const rebaseAndPush = async (
 
     if (sha === pr.headRefOid) return Result.ok(sha);
 
+    const baseHead = await git(
+      `git rev-parse ${sh(`origin/${defaultBranch}`)}`,
+    );
+
+    if (Result.isOk(baseHead) && sha === baseHead.value.trim()) {
+      // The rebase left the branch at the base: every commit on it had a
+      // patch already upstream, so `git rebase` skipped the lot. Pushing that
+      // would leave a pull request with no commits in it, which auto-merge
+      // will never merge, so leave the branch alone and say what happened.
+      return Result.err({
+        reason: 'already-in-base',
+        detail: `every commit is already in ${defaultBranch}; the pull request has nothing left to merge`,
+      });
+    }
+
     // The lease names the SHA the survey saw, not the remote-tracking ref: a
     // bare `--force-with-lease` compares against whatever the last fetch
     // left, which is exactly the race this is meant to lose safely.
@@ -929,9 +969,14 @@ const triage = async (
 
   return {
     inScope: classified.filter(({ result }) => result.kind !== 'ignore').length,
+    // Lowest number first, but the ones GitHub only *thinks* conflict go last:
+    // a rebase this script is sure of is worth spending the cycle on before
+    // one it is guessing at. `toSorted` is stable, so the numbers keep their
+    // order within each group.
     candidates: classified
       .filter(({ result }) => result.kind === 'candidate')
-      .map(({ pr }) => pr),
+      .map(({ pr }) => pr)
+      .toSorted((a, b) => candidateRank(a) - candidateRank(b)),
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
@@ -971,7 +1016,19 @@ const classify = async (
   }
 
   switch (pr.mergeStateStatus) {
+    // `DIRTY` is a candidate too, rather than something handed straight back.
+    // It answers a different question from the one this script asks: whether
+    // *merging* the branch into the base conflicts, three-way from the merge
+    // base, where a rebase replays each commit onto the current tip and drops
+    // the ones already upstream. And it is an asynchronously computed, cached
+    // answer, so it is regularly stale — a force-push, or a base that has
+    // just moved, leaves the old verdict standing. Both are common enough
+    // here that taking `DIRTY` at its word set branches aside for conflicts
+    // they did not have. So try the rebase and let it answer: when the
+    // conflict is real, the rebase is aborted, the worktree thrown away and
+    // the pull request skipped exactly as before.
     case 'BEHIND':
+    case 'DIRTY':
       return { kind: 'candidate' };
 
     case 'CLEAN':
@@ -999,12 +1056,6 @@ const classify = async (
         : { kind: 'in-flight' };
     }
 
-    case 'DIRTY':
-      return {
-        kind: 'note',
-        note: `#${pr.number}: conflicts with ${context.defaultBranch}; needs a hand`,
-      };
-
     default:
       return {
         kind: 'note',
@@ -1013,9 +1064,21 @@ const classify = async (
   }
 };
 
+/**
+ * Whether GitHub says merging this pull request into the base conflicts. It
+ * is a candidate all the same — see the `DIRTY` case in `classify` — but a
+ * less promising one, so it is reported and ordered apart from the rest.
+ */
+const isConflicting = (pr: PullRequest): boolean =>
+  pr.mergeStateStatus === 'DIRTY';
+
+const candidateRank = (pr: PullRequest): number => (isConflicting(pr) ? 1 : 0);
+
 const reportTriage = (triaged: Triage, total: number): void => {
+  const conflicting = triaged.candidates.filter(isConflicting).length;
+
   log(
-    `${total} open pull request(s), ${triaged.inScope} with auto-merge: ${triaged.candidates.length} behind, ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing.`,
+    `${total} open pull request(s), ${triaged.inScope} with auto-merge: ${triaged.candidates.length - conflicting} behind, ${conflicting} conflicting, ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing.`,
   );
 
   for (const note of triaged.notes) {
@@ -1029,7 +1092,11 @@ const reportTriage = (triaged: Triage, total: number): void => {
   }
 
   for (const pr of triaged.candidates) {
-    log(`  #${pr.number}: behind — ${pr.title}`);
+    log(
+      isConflicting(pr)
+        ? `  #${pr.number}: GitHub says it conflicts; a rebase will say — ${pr.title}`
+        : `  #${pr.number}: behind — ${pr.title}`,
+    );
   }
 };
 
