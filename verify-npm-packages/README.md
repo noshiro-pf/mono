@@ -50,6 +50,23 @@ published/packages/<pkg>/ 同上、依存指定だけが違う
 `tools/scripts/cmd/verify-npm-packages.mts` が生成し、コミットもされている。
 生成物と `smoke/` がずれると CI の「作業ツリーが汚れていないか」チェックが落ちる。
 
+**ただし、まだリリースしていない API のアサーションを足したときは `published/`
+を再生成しない。** 再生成すると、ピンの指す公開済みバージョンにはまだ無い名前を
+import することになり、`SyntaxError: does not provide an export named ...` で
+`verify-published` が落ちる。**ここに存在しない API を書けるのは `local/` だけ**
+で、それが 2 つの空間の違いそのもの。手順は次のとおり。
+
+1. `smoke/<pkg>.mjs` にアサーションを足す
+2. `pnpm run verify:npm-packages` で `local/` だけを再生成してコミットする
+3. `published/<pkg>` は**触らない**
+
+`published/` の生成物が古いままでも「作業ツリーが汚れていないか」は落ちない。
+`local/` を再生成するのは `verify:npm-packages`、`published/` を再生成するのは
+`verify:npm-packages:published` で、後者が CI で走るのは
+`verify-npm-packages/published/` に差分があるときだけ — つまり触らなければ走らない。
+`published/` は次にピンが動くとき（`pnpm-update` の `--update`）に、新しい API を
+持つバージョンと一緒に追いつく。
+
 ## 独立性をどう担保しているか
 
 依存を宣言し忘れたパッケージを検出するには、各 project が**自分の宣言した依存しか

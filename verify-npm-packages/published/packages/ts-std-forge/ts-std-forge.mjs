@@ -1,22 +1,12 @@
 // cspell:ignore ababab
 import * as assert from 'node:assert/strict';
-import {
-  Optional,
-  pipe,
-  Regex,
-  Result,
-  SafeDate,
-  SafeNumber,
-  SafeString,
-} from 'ts-std-forge';
+import { Regex, SafeDate, SafeNumber, SafeString } from 'ts-std-forge';
 
 // Only the package itself may be imported here: the check space resolves
-// nothing else. That is no longer a limitation for the Result values — the
-// algebraic data types ship from this package since the D-49 port — but the
-// structural assertions are kept as they are, because they also pin the
-// runtime shape the tags give. The number formatters are total (their digit /
-// radix parameters are literal-range typed), so they return plain strings;
-// the remaining fallible wrappers return plain tagged errors.
+// nothing else, so the Result values are inspected structurally. The number
+// formatters are total (their digit / radix parameters are literal-range
+// typed), so they return plain strings; the remaining fallible wrappers
+// return plain tagged errors.
 
 // A dynamic pattern compiles into a working RegExp, without throwing.
 const okRegex = Regex.create('^a+$', 'u');
@@ -76,18 +66,5 @@ assert.deepEqual(SafeString.repeat('ab', -1).value, {
   kind: 'invalid-count',
   count: -1,
 });
-
-// The ported ADT core (D-49 stage 1): the same package now provides the
-// Result / Optional / pipe the wrappers above return into.
-assert.equal(Result.isOk(SafeNumber.parse('1.5')), true);
-assert.equal(Result.unwrapOkOr(SafeNumber.parse('x'), 0), 0);
-assert.equal(Optional.unwrapOr(Optional.some(1), 0), 1);
-assert.equal(Optional.unwrapOr(Optional.fromNullable(undefined), 0), 0);
-assert.equal(
-  pipe(' 2 ')
-    .map((s) => s.trim())
-    .map((s) => Result.unwrapOkOr(SafeNumber.parse(s), 0)).value,
-  2,
-);
 
 console.info('ts-std-forge ok');
