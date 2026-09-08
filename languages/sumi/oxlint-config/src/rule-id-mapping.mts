@@ -28,7 +28,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   ['sumi(no-in-operator)', 'banned-syntax/no-in-operator'],
   ['sumi(no-new-array)', 'banned-syntax/no-new-array'],
   ['sumi(no-this)', 'banned-syntax/no-this'],
-  ['sumi(no-accessor)', 'banned-syntax/no-accessor'],
+  ['sumi(no-setter)', 'banned-syntax/no-setter'],
   ['sumi(no-using)', 'banned-syntax/no-using'],
   ['sumi(no-global-type-shadow)', 'banned-syntax/no-global-type-shadow'],
   ['eslint(no-eval)', 'banned-syntax/no-eval'],

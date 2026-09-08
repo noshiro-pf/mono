@@ -1,6 +1,5 @@
 import {
   genericArrowTrailingComma,
-  noAccessor,
   noClass,
   noConstructorCall,
   noDecorator,
@@ -11,6 +10,7 @@ import {
   noLetWithoutMutPrefix,
   noNamespaceObjectUse,
   noNewArray,
+  noSetter,
   noThis,
   noThrow,
   noTry,
@@ -30,7 +30,6 @@ export const sumiPlugin = {
   meta: { name: 'sumi' },
   rules: {
     'generic-arrow-trailing-comma': genericArrowTrailingComma,
-    'no-accessor': noAccessor,
     'no-class': noClass,
     'no-constructor-call': noConstructorCall,
     'no-decorator': noDecorator,
@@ -41,6 +40,7 @@ export const sumiPlugin = {
     'no-in-operator': noInOperator,
     'no-let-without-mut-prefix': noLetWithoutMutPrefix,
     'no-new-array': noNewArray,
+    'no-setter': noSetter,
     'no-this': noThis,
     'no-throw': noThrow,
     'no-try': noTry,

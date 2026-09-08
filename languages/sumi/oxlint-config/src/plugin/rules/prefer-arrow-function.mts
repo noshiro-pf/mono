@@ -28,8 +28,8 @@ export const preferArrowFunction = createRule({
     FunctionExpression: (node) => {
       if (node.generator) return;
 
-      // An accessor's body can only be a function expression; the accessor
-      // itself is what is banned (no-accessor), so it is not reported twice.
+      // An accessor's body can only be a function expression: a getter is
+      // allowed as written (D-47), and a setter is what no-setter reports.
       if (
         (node.parent.type === AST_NODE_TYPES.Property ||
           node.parent.type === AST_NODE_TYPES.MethodDefinition) &&

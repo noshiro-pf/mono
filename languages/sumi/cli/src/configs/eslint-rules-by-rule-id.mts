@@ -42,7 +42,7 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
       ['unicorn/no-new-array', '@typescript-eslint/no-array-constructor'],
     ],
     ['banned-syntax/no-this', ['functional/no-this-expressions']],
-    ['banned-syntax/no-accessor', []],
+    ['banned-syntax/no-setter', []],
     ['banned-syntax/no-using', []],
     ['banned-syntax/no-global-type-shadow', []],
     [

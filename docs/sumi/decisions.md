@@ -239,7 +239,7 @@
 
 ## D-33: getter / setter は両方禁止する
 
-- **ステータス**: 確定(2026-09-05)
+- **ステータス**: 確定(2026-09-05)。**getter は D-47 で許可に改訂**(setter の禁止は維持)
 - **判断**: object literal の `get x() {}` / `set x(v) {}` を禁止する。遅延評価は明示的な関数プロパティ(`x: () => …`)か ts-data-forge の memoize で書く。
 - **理由**: プロパティアクセスが関数呼び出しになる暗黙の制御フロー。setter は mutation でもある。class 文脈は D-12 で既に消滅している。
 - **実装**: `no-restricted-syntax`(`Property[kind='get']` / `Property[kind='set']`)。
@@ -373,3 +373,11 @@
 - **実装で決めた細目(2026-09-08)**: 拘束項目の比較は「コンパイラの読み方」に合わせる — 不在の boolean は `false`(TS の既定)として受け入れる。ただし `allowUnusedLabels` / `allowUnreachableCode` は不在が「suggestion」の意味なので明示必須 / `strict` 系サブフラグ(`noImplicitAny` 等、TS 7.0 時点の一覧)を個別に `false` にするのは `strict` の違反 / enum 値は大文字小文字を無視(`NodeNext` = `nodenext`)。lint 対象はプログラムのファイル集合(tsconfig の `include` と lint の対象が乖離しない)。終了コード 0 / 1(違反)/ 2(実行不能)。**既知の制約**: tsgolint は各ファイルから最寄りの `tsconfig.json` を探すため、`-p` に別名の tsconfig を渡すと型情報ルールの見る設定がずれうる(oxlint の `--tsconfig` は import 解決用)。
 - **dogfood 計測(2026-09-08)**: ts-std-forge の tsconfig(mono 共通設定)は拘束 4 項目に違反(`erasableSyntaxOnly` / `verbatimModuleSyntax` が false、`allowJs` / `checkJs` が true)。本適用には Sumi 用の tsconfig(`extends: sumi-cli/tsconfig`)が要る(issue #1753 タスク 6)。
 - **未決(sugar 設計時)**: プロジェクトが層を宣言する `sumi.config` の形式(D-36 の default export emit 設定と同じファイルになる見込み)/ `.sumi` はフォーマッタが読めないので `sumi fmt` が要る(oxfmt の fork か、transpile → 整形 → 逆変換)/ oxlint の実験機能 `--type-check`(tsgolint が tsc 診断も返す)で native tsc の起動を省き 1 プロセスにできるかは、安定後に再評価。
+
+## D-47: getter は Sumi lint / Sumi sugar で許可し、Sumi refined で落とす(D-33 改訂。setter は禁止のまま)
+
+- **ステータス**: 確定(2026-09-08)
+- **判断**: object literal の `get x() {}` を **Sumi lint と Sumi sugar では許可**する(ユーザー決定)。禁止は **Sumi refined** で行う — refined は eject が不可逆であることを前提にした層なので、「getter を関数呼び出し API に置き換え、TS へ戻すときに `get` へ復元しない」変換をそこに置ける。setter(`set x(v) {}`)は D-33 のまま禁止: 代入が実行コードになる点に加えて mutation であり、`mut_` 側の規則とも衝突する。
+- **理由**: getter は本質的には関数呼び出し API と等価であり、関数呼び出しに置き換えても問題は無い(D-33 の指摘は正しい)。しかし Sumi lint は既存の TS コードをそのまま検査する層で、TS の慣用句である getter を弾くと移行コストだけが増える(synstate の dogfood で `get isCompleted(): boolean { return handle.isCompleted(); }` の形が 4 件 — 2026-09-08 計測)。
+- **却下した代替案**: **Sumi sugar への移行時に関数呼び出しへ置き換え、戻すときに `get` へ復元しない**(ユーザー提示のもう一方の案)。sugar は Sumi lint + ライブラリとの一対一対応と**双方向の codemod**が原則(D-37)であり、片方向の変換を sugar の移行に入れると往復忠実性が破れる。不可逆な変換は refined だけが持つ性質なので、そこへ置く方が層の定義と整合する。
+- **帰結**: `sumi/no-accessor` を `sumi/no-setter`(中立 ID `banned-syntax/no-setter`)に改名し、setter だけを報告する。`prefer-arrow-function` は getter 本体の function 式を報告しない(従来どおり)。refined の getter 除去(getter → 関数呼び出し、呼び出し側の書き換えを含む)は refined 設計時の項目。

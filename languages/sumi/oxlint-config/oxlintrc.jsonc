@@ -55,7 +55,7 @@
     "sumi/no-in-operator": "error",
     "sumi/no-new-array": "error",
     "sumi/no-this": "error",
-    "sumi/no-accessor": "error",
+    "sumi/no-setter": "error",
     "sumi/no-using": "error",
     // D-19 type space; `libs` mirrors compilerOptions.lib (add "dom" for browser code)
     "sumi/no-global-type-shadow": ["error", { "libs": ["esnext"] }],
