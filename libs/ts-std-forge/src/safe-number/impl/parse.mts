@@ -5,13 +5,15 @@ import { Result } from '../../functional/index.mjs';
  * `Number(str)`.
  *
  * `Number(str)` never throws; it reports failure as `NaN`, turns the empty
- * (or whitespace-only) string into `0`, and accepts `'Infinity'`. This
- * function is the same implementation as ts-data-forge's
- * `Num.safeParseFloat` (kept as a copy, not a dependency, so that the two
- * can be consolidated here later): the input is accepted only when both
- * `Number` and `Number.parseFloat` agree it is a number **and** the result
- * is finite — which rejects blank input, trailing garbage (`'12px'`),
- * `'NaN'` and `'Infinity'` together.
+ * (or whitespace-only) string into `0`, and accepts `'Infinity'`. The input
+ * is accepted only when both `Number` and `Number.parseFloat` agree it is a
+ * number **and** the result is finite — which rejects blank input, trailing
+ * garbage (`'12px'`), `'NaN'` and `'Infinity'` together.
+ *
+ * This is the single implementation of the conversion: ts-data-forge's
+ * `Num.safeParseFloat` delegates here since D-49 (c) and only adds its own
+ * contract on top (the `FiniteNumber` brand on the success side, an `Error`
+ * on the failure side).
  *
  * `Number(x)` on other types is not covered here: `Number(bool)` is
  * `b ? 1 : 0`, `Number(date)` is `date.getTime()`.

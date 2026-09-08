@@ -271,8 +271,9 @@ const detectCircularDependency = (
   for (const parent of parents) {
     if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
       // A programming error (invariant violation), not a recoverable
-      // failure. Sumi has no panic function in its prelude yet
-      // (spec/exceptions.md, open point).
+      // failure. The Sumi form is `panic(...)` (D-48), which lives in
+      // ts-std-forge; this package does not depend on it yet, so the throw
+      // stays until it does.
       // oxlint-disable-next-line sumi/no-throw
       throw new Error(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',

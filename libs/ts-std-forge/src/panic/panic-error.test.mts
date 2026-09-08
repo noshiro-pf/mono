@@ -66,6 +66,22 @@ describe(markAsPanic, () => {
 
     assert.strictEqual(marked.cause, frozen);
   });
+
+  test('wraps a sealed error too, which `Object.isFrozen` does not catch', () => {
+    // `new Error` keeps `message` and `stack` writable, so a sealed error is
+    // not frozen; `Object.assign` would still throw on the new property.
+    const sealed = Object.seal(new Error('sealed'));
+
+    assert.isFalse(Object.isFrozen(sealed));
+
+    const marked = markAsPanic(sealed);
+
+    assert.isFalse(Object.is(marked, sealed));
+
+    assert.isTrue(isPanicError(marked));
+
+    assert.strictEqual(marked.cause, sealed);
+  });
 });
 
 describe('boundary functions rethrow a panic', () => {
@@ -132,12 +148,22 @@ describe('boundary functions rethrow a panic', () => {
       () => Result.expectToBe(Result.err('e'), 'm'),
     ] as const;
 
+    // `thrownBy` returns `undefined` when nothing was thrown, so the
+    // assertion fails on a function that stopped throwing — a bare
+    // `try` / `catch` would pass vacuously instead.
     for (const fn of failing) {
-      try {
-        fn();
-      } catch (error) {
-        assert.isTrue(isPanicError(error));
-      }
+      assert.isTrue(isPanicError(thrownBy(fn)));
     }
   });
 });
+
+/** What `fn` threw, or `undefined` when it returned. */
+const thrownBy = (fn: () => unknown): unknown => {
+  try {
+    fn();
+  } catch (error) {
+    return error;
+  }
+
+  return undefined;
+};

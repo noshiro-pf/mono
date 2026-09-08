@@ -7,14 +7,17 @@ import { Result } from '../../functional/index.mjs';
  * global shadows it — the very thing Sumi forbids.)
  *
  * `Number.parseInt` ignores trailing non-numeric characters (`'123abc'` →
- * `123`) and `Number` coerces blank input to `0`. This function is the same
- * implementation as ts-data-forge's `Num.safeParseInt` (kept as a copy, not
- * a dependency, so that the two can be consolidated here later): the input
- * is accepted only when both `Number` and `Number.parseInt` agree it is a
- * finite number, and the `Number` result is truncated toward zero — which
- * rejects blank input and trailing garbage, and turns `'-12.9'` into `-12`.
- * (The finiteness check is the one addition over `Num.safeParseInt`, which
- * lets `'1e400'` through as `Infinity` typed as `Int`.)
+ * `123`) and `Number` coerces blank input to `0`. The input is accepted only
+ * when both `Number` and `Number.parseInt` agree it is a finite number, and
+ * the `Number` result is truncated toward zero — which rejects blank input
+ * and trailing garbage, and turns `'-12.9'` into `-12`.
+ *
+ * This is the single implementation of the conversion: ts-data-forge's
+ * `Num.safeParseInt` delegates here since D-49 (c) and only adds its own
+ * contract on top (the `Int` brand on the success side, an `Error` on the
+ * failure side). The finiteness check is what the old ts-data-forge
+ * implementation lacked — it let `'1e400'` through as `Infinity` typed as
+ * `Int`.
  *
  * @example
  *

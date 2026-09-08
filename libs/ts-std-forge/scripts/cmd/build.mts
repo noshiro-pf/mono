@@ -96,12 +96,21 @@ const build = async (skipCheck: boolean): Promise<void> => {
       // the build still succeeds and only the emitted types degrade. Fail
       // instead. (The ADT variant types live in `src/adt-types.mts` for this
       // reason.)
+      //
+      // The check is on the source, not on the emitted file: `--skip-check`
+      // leaves the previous build's `dist/` in place, and `src/types.mts` is
+      // the only source path that compiles to this name anyway.
+      const reservedSourceFile = path.resolve(
+        projectRootPath,
+        './src/types.mts',
+      );
+
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      if (existsSync(typesFile)) {
+      if (existsSync(reservedSourceFile)) {
         await runStep(
           Promise.resolve(
             Result.err(
-              `${typesFile} already exists: a source file compiles to the name reserved for the types entry. Rename it.`,
+              `${reservedSourceFile} compiles to ${typesFile}, the name reserved for the types entry, and would be overwritten by the shim. Rename it.`,
             ),
           ),
           'Failed to generate dist/types.d.mts',

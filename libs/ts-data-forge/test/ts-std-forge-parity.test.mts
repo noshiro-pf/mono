@@ -48,7 +48,7 @@ describe('Num.safeParseFloat is SafeNumber.parse plus a brand', () => {
 
       const viaSafeNumber = SafeNumber.parse(input);
 
-      assert.deepStrictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
+      assert.strictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
 
       assert.deepStrictEqual(
         Result.unwrapOkOr(viaNum, undefined),
@@ -79,7 +79,7 @@ describe('Num.safeParseInt is SafeNumber.parseInteger plus a brand', () => {
 
       const viaSafeNumber = SafeNumber.parseInteger(input);
 
-      assert.deepStrictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
+      assert.strictEqual(Result.isOk(viaNum), Result.isOk(viaSafeNumber));
 
       assert.deepStrictEqual(
         Result.unwrapOkOr(viaNum, undefined),

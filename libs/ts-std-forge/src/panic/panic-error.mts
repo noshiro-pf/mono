@@ -65,8 +65,11 @@ export const createPanicError = (
  * points at where the failure happened, not at the panic — survive.
  * `panic(error)` is this plus the throw.
  *
- * A frozen error cannot be marked, so it is wrapped instead: the result is a
- * fresh panic carrying it as `cause`.
+ * An error that cannot take the mark is wrapped instead: the result is a
+ * fresh panic carrying it as `cause`. The test is extensibility, not
+ * `Object.isFrozen`: a sealed error (`Object.seal` / `preventExtensions`)
+ * keeps `message` and `stack` writable, so `isFrozen` is `false` for it while
+ * `Object.assign` still throws a `TypeError` on the new property.
  */
 export const markAsPanic = (
   // The parameter cannot be `Readonly<Error>`, and the assignment cannot be a
@@ -75,7 +78,7 @@ export const markAsPanic = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   error: Error,
 ): PanicError =>
-  Object.isFrozen(error)
-    ? createPanicError(error.message, { cause: error })
-    : // eslint-disable-next-line functional/immutable-data
-      Object.assign(error, panicMark);
+  Object.isExtensible(error)
+    ? // eslint-disable-next-line functional/immutable-data
+      Object.assign(error, panicMark)
+    : createPanicError(error.message, { cause: error });

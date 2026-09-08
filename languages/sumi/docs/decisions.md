@@ -449,7 +449,7 @@
 - **ステータス**: 確定(2026-09-09、ユーザー決定)。D-48 と D-42 の運用を改める。
 - **判断**:
     1. **panic の印を `$$panic` に移す**。`PanicError = Error & { $$panic: true }`(旧: `Error & { name: 'PanicError' }`)。`isPanicError` はこのキーを見る。`createPanicError` は表示のため `name: 'PanicError'` も付け続ける。
-    2. **`panic` は `string | Error` を受ける**。`panic(message, options?)` は従来どおり新しい `PanicError` を投げ、`panic(error)` は**渡されたエラーそのもの**に印を付けて投げる(`markAsPanic` が同じ処理を throw せずに行う)。凍結済みのエラーだけは印を付けられないので `cause` に載せて包む。
+    2. **`panic` は `string | Error` を受ける**。`panic(message, options?)` は従来どおり新しい `PanicError` を投げ、`panic(error)` は**渡されたエラーそのもの**に印を付けて投げる(`markAsPanic` が同じ処理を throw せずに行う)。拡張不可のエラー(`Object.freeze` / `Object.seal` / `preventExtensions`)だけは印を付けられないので `cause` に載せて包む(判定は `Object.isExtensible`。`Object.isFrozen` では seal 済みのエラーを取りこぼし、`Object.assign` が `TypeError` を投げる)。
     3. **相対 index は `./index.mjs` を許し、`../index.mjs` 以上の遡りを禁止する**。ファイル名 `entry-point.mts` に対する oxlint の `overrides` は廃止([spec/modules.md](./spec/modules.md))。
 - **理由**:
   1・2 について。D-27 が確立したクラスレスのエラー factory は `Object.assign(new Error(msg), { name: 'HttpError', kind: 'http' } as const)` で、**`name` にそのエラー自身の身元**を書く。panic の印を `name` に置くと 1 つの枠を 2 つの意味が奪い合い、既存のエラーは「身元を保つ」か「panic と認識される」かのどちらかしか選べない。印を別のキーに移せば両立し、`panic(error)` が `name` / `kind` / ペイロード、そして何より**失敗地点を指す stack** を保ったまま投げられる。panic は「復帰不能な `throw x` の代替」なので `throw error` が `panic(error)` に機械的に移せることには実用上の意味がある。印を構造的に持つこと自体は D-48 のまま(`instanceof` は使わない)。変更できたのは `panic` 一式が changeset 未消化で**未リリース**だったため。

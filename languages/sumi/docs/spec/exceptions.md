@@ -11,7 +11,7 @@
 
 ## panic 経路の位置づけ
 
-**確定(2026-09-08 — D-48)**: panic は ts-std-forge の関数 `panic(message, { cause? }): never` / `unreachable(value: never)` / `todo(message?)` で行い、専用の `PanicError`(`name` が `'PanicError'` の `Error`。定義と `isPanicError` は ts-data-forge)を投げる。`unwrapThrow` / `expectToBe` 系も `PanicError` を投げる。境界関数(`Result.fromThrowable` / `fromPromise`、`AsyncResult` の同名関数)は `PanicError` を `Err` に変換せず再 throw する — Rust の `?` が panic を拾わないのと同じ性質で、バグが回復可能エラーに化けない。`throw` / `try..catch` を native にサポートしない理由は D-48。
+**確定(2026-09-08 — D-48。D-49 / D-53 で更新)**: panic は ts-std-forge の関数 `panic(message, { cause? }): never` / `panic(error: Error): never` / `unreachable(value: never)` / `todo(message?)` で行い、専用の `PanicError` を投げる。panic の印は `name` ではなく専用ブランド `$$panic` で、型・`isPanicError` / `createPanicError` / `markAsPanic` の定義も ts-std-forge にある(D-49 の依存反転で ts-data-forge に置く理由が消えた。ts-data-forge からは re-export)。`unwrapThrow` / `expectToBe` 系も `PanicError` を投げる。境界関数(`Result.fromThrowable` / `fromPromise`、`AsyncResult` の同名関数)は `PanicError` を `Err` に変換せず再 throw する — Rust の `?` が panic を拾わないのと同じ性質で、バグが回復可能エラーに化けない。`throw` / `try..catch` を native にサポートしない理由は D-48。
 
 `throw` を禁止しても、プログラムが停止する経路は残る:
 
