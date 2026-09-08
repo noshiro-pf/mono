@@ -254,6 +254,9 @@ export const createTryUpdateNotImplemented = (): ((
 ) => void) => tryUpdateNotImplemented;
 
 const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
+  // A programming error, not a recoverable failure. Sumi has no panic
+  // function in its prelude yet (spec/exceptions.md, open point).
+  // oxlint-disable-next-line sumi/no-throw
   throw new Error('not implemented');
 };
 

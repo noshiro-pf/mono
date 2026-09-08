@@ -5,6 +5,11 @@ import { createRule } from './create-rule.mjs';
  * parameter is written `<T,>(...)`, in every file (D-11): the trailing comma
  * is what keeps the generic unambiguous under the JSX grammar, and writing it
  * everywhere keeps the spelling independent of the file extension.
+ *
+ * A constrained parameter (`<T extends X>`) is exempt: the constraint already
+ * disambiguates it (it is TypeScript's other suggested spelling), and Prettier
+ * removes a trailing comma after a constraint in every extension (measured
+ * 2026-09-08, spec/jsx.md), so requiring it would fight the formatter.
  */
 export const genericArrowTrailingComma = createRule({
   meta: {
@@ -32,6 +37,13 @@ export const genericArrowTrailingComma = createRule({
       const [param] = params;
 
       if (param === undefined) return;
+
+      // (`null` from oxlint, `undefined` per the typings — see above.)
+      // Declared `unknown` so that assignment narrowing does not make the
+      // `null` half of the check unreachable to the type checker.
+      const constraint: unknown = param.constraint;
+
+      if (constraint !== null && constraint !== undefined) return;
 
       const declaration = param.parent;
 

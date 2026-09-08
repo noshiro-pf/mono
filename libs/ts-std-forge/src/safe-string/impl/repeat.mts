@@ -1,6 +1,6 @@
 // cspell:ignore ababab
-import { Result } from 'ts-data-forge';
 import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
+import { Result } from '../../functional/index.mjs';
 
 /**
  * Mirror of the ECMAScript ToIntegerOrInfinity abstract operation: `NaN`

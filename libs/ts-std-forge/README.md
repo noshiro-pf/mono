@@ -1,11 +1,19 @@
 # ts-std-forge
 
 Safe wrappers for standard library APIs that throw or return `null` / sentinel
-values, returning [`Result` / `Optional`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge)
-instead. The dependency is strictly one-way: `ts-std-forge` → `ts-data-forge`.
+values, returning `Result` / `Optional` instead — and, since the D-49 port
+below, those algebraic data types themselves.
+
+**The dependency between this package and ts-data-forge now runs the other
+way.** It used to be `ts-std-forge` → `ts-data-forge`; Sumi decision D-49
+reverses it. The ADT core — `Result`, `Optional`, `TernaryResult`,
+`AsyncResult`, `pipe`, `match` — and the helpers it needs are implemented
+here, and ts-data-forge re-exports them, so `import { Result } from
+'ts-data-forge'` keeps working and denotes the same declarations. There is one
+implementation, not two. New code should import these from `ts-std-forge`.
 
 The catalog of APIs to wrap, and the reasoning, live in the Sumi language
-project: [docs/sumi/throwing-stdlib-survey.md](../../docs/sumi/throwing-stdlib-survey.md)
+project: [languages/sumi/docs/throwing-stdlib-survey.md](../../languages/sumi/docs/throwing-stdlib-survey.md)
 (decisions D-22 / D-24 / D-26).
 
 ## Error design (D-26)
@@ -51,9 +59,12 @@ no `new` form.
 
 ## Current API
 
+- `panic(message, { cause? })` / `panic(error)` / `unreachable(value: never, message?)` / `todo(message?)` — the panic path (Sumi D-48 / D-53). Given an error, `panic` marks that very object and throws it, so its `name`, tag, payload and stack survive: a programming error stops the program by throwing a `PanicError`, which the `Result` / `AsyncResult` boundary functions rethrow rather than turn into `Err`. All three return `never` and are declared with explicit types so that a call terminates control flow.
 - `Regex.create(pattern, flags?)` — `new RegExp` without throwing. Pattern validity is the engine's own grammar check (not pre-validatable); a caught `SyntaxError` becomes `'invalid-regexp'` with the error as `cause`, anything else `'unexpected'`.
 - `SafeDate.toISOString(date)` — `Date.prototype.toISOString` without throwing (Invalid Date → `Err<{ kind: 'invalid-date' }>`).
-- `SafeNumber.parse(value)` — the alternative to `Number(str)`: the same implementation as ts-data-forge's `Num.safeParseFloat` (a copy, not a dependency), returning `Ok<number>` (finite) or `Err<{ kind: 'invalid-number', input }>` for blank input, trailing garbage, `NaN` and `±Infinity`.
+- `Result` / `Optional` / `TernaryResult` / `AsyncResult` / `pipe` / `match` — the ADT core, ported from ts-data-forge (D-49 stage 1). Same API, same runtime tags; ts-data-forge still exports its own copy.
+- `PanicError` / `isPanicError` / `createPanicError` / `markAsPanic` — grouped with `panic`, which is now the single place this package stops the program from (the `unwrapThrow` / `expectToBe` families call it rather than throwing directly). `unknownToString`, `hasKey` / `isRecord` / `keyIsIn` / `isNonNullObject`, `expectType` — the helpers the ADT core needs, ported with it. `expectType`\'s permanent home is still open (D-49 (b)).
+- `SafeNumber.parse(value)` — the alternative to `Number(str)`: the same implementation as ts-data-forge's `Num.safeParseFloat` (a copy — D-49 (c) will unify the two), returning `Ok<number>` (finite) or `Err<{ kind: 'invalid-number', input }>` for blank input, trailing garbage, `NaN` and `±Infinity`.
 - `SafeNumber.parseInteger(value)` — the alternative to `Number.parseInt(str, 10)`: the same implementation as `Num.safeParseInt` plus a finiteness check, returning `Ok<number>` (an integer, truncated toward zero) or `Err<{ kind: 'invalid-integer', input }>`. Named `parseInteger` because a declaration named `parseInt` would shadow the global.
 - `SafeNumber.toFixed(value, fractionDigits)` — `fractionDigits: UintRangeInclusive<0, 100>`; total, returns `string`.
 - `SafeNumber.toExponential(value, fractionDigits?)` — `fractionDigits?: UintRangeInclusive<0, 100>`; total, returns `string`.

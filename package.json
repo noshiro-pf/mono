@@ -78,6 +78,7 @@
     "ws:gi": "pnpm run --recursive --workspace-concurrency=1 --if-present gi",
     "ws:lint": "pnpm run --recursive --if-present lint",
     "ws:lint:fix": "pnpm run --recursive --if-present lint:fix",
+    "ws:sumi:check": "pnpm run --recursive --if-present sumi:check",
     "ws:test": "pnpm run --recursive --workspace-concurrency=1 --if-present test",
     "ws:test:browser": "pnpm run --recursive --workspace-concurrency=1 --if-present test:browser",
     "ws:test:cov": "run-s ws:test:cov:run coverage:normalize-paths",

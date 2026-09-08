@@ -1,27 +1,4 @@
-import { Num, Result } from 'ts-data-forge';
-import { SafeNumber } from '../src/index.mjs';
-
-// Inputs shared by the equivalence sweeps against the ts-data-forge
-// implementations that parse / parseInt mirror.
-const parseSweep = [
-  '42',
-  '-12.9',
-  '1e3',
-  '1e400',
-  '0x10',
-  '0b101',
-  '.5',
-  '5.',
-  '-0',
-  '',
-  ' ',
-  'abc',
-  '12px',
-  '123abc',
-  'NaN',
-  'Infinity',
-  '-Infinity',
-] as const;
+import { Result, SafeNumber } from '../src/index.mjs';
 
 const specialValues = [
   1.5,
@@ -193,25 +170,16 @@ describe('SafeNumber.parse', () => {
 
     assert.deepStrictEqual(result.value, { kind: 'invalid-number', input });
   });
-
-  test.each(parseSweep.map((input) => ({ input })))(
-    'parse($input) accepts exactly what Num.safeParseFloat accepts',
-    ({ input }) => {
-      const result = SafeNumber.parse(input);
-
-      const reference = Num.safeParseFloat(input);
-
-      assert.deepStrictEqual(Result.isOk(result), Result.isOk(reference));
-
-      assert.deepStrictEqual(
-        Result.unwrapOkOr(result, undefined),
-        Result.unwrapOkOr(reference, undefined),
-      );
-    },
-  );
 });
 
 describe('SafeNumber.parseInteger', () => {
+  test('rejects a non-finite value', () => {
+    // Number('1e400') is Infinity while parseInt('1e400', 10) is 1, so an
+    // agreement check against parseInt alone would accept it; this
+    // implementation adds a finiteness check.
+    assert.isTrue(Result.isErr(SafeNumber.parseInteger('1e400')));
+  });
+
   test.each([
     { input: '42', expected: 42 },
     { input: '-12.9', expected: -12 },
@@ -240,33 +208,4 @@ describe('SafeNumber.parseInteger', () => {
 
     assert.deepStrictEqual(result.value, { kind: 'invalid-integer', input });
   });
-
-  test('rejects a non-finite value that Num.safeParseInt lets through', () => {
-    // Number('1e400') is Infinity while parseInt('1e400', 10) is 1, so the
-    // agreement check alone accepts it; the copy adds a finiteness check.
-    assert.isTrue(Result.isErr(SafeNumber.parseInteger('1e400')));
-
-    assert.deepStrictEqual(
-      Result.unwrapOkOr(Num.safeParseInt('1e400'), undefined),
-      Number.POSITIVE_INFINITY,
-    );
-  });
-
-  test.each(
-    parseSweep.filter((input) => input !== '1e400').map((input) => ({ input })),
-  )(
-    'parseInteger($input) accepts exactly what Num.safeParseInt accepts',
-    ({ input }) => {
-      const result = SafeNumber.parseInteger(input);
-
-      const reference = Num.safeParseInt(input);
-
-      assert.deepStrictEqual(Result.isOk(result), Result.isOk(reference));
-
-      assert.deepStrictEqual(
-        Result.unwrapOkOr(result, undefined),
-        Result.unwrapOkOr(reference, undefined),
-      );
-    },
-  );
 });

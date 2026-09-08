@@ -1,7 +1,7 @@
 // Sumi lint — the oxlint configuration (Phase 1 engine).
 //
 // Every category is off: only the rules listed here run, so that the rule
-// set is exactly the language specification (docs/sumi/enforcement-map.md).
+// set is exactly the language specification (languages/sumi/docs/enforcement-map.md).
 // Rules oxlint has no native equivalent for live in the sumi JS plugin
 // (src/plugin/, built to dist/). Type-aware rules run through oxlint-tsgolint
 // (`--type-aware`; `options.typeAware` below).
@@ -138,8 +138,13 @@
       {
         "patterns": [
           {
-            "regex": "^(\\./|\\.\\./)+index\\.mjs$",
-            "message": "Do not import a directory's index.mjs by its bare relative path; import it by module name (./X/index.mjs).",
+            // Reaching up to another directory's index without naming that
+            // directory. `./index.mjs` is left alone: it is a file asking for
+            // its own directory's index, which cannot be named from inside,
+            // and which is a cycle whenever the file is part of that index
+            // (spec/modules.md).
+            "regex": "^\\.\\.(/\\.\\.)*/index\\.mjs$",
+            "message": "Do not reach into another directory's index.mjs by a bare relative path; import it by module name (./X/index.mjs).",
           },
         ],
       },
@@ -150,6 +155,7 @@
     ],
     "typescript/no-require-imports": "error",
     "sumi/no-internal-module-import": "error",
+    "sumi/no-mixed-star-export": "error",
     "sumi/no-namespace-object-use": "error",
 
     // ---- mutation (spec/variables-and-mutation.md, D-14, D-19, D-27) ----

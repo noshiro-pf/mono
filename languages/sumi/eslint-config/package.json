@@ -1,8 +1,8 @@
 {
-  "name": "sumi-eslint-config",
+  "name": "@sumi-lang/eslint-config",
   "version": "0.0.0",
   "private": true,
-  "description": "ESLint preset for Sumi lint: eslint-config-typed + eslint-plugin-ts-data-forge plus the Sumi rule overrides (the bridge engine since D-43; the primary engine is sumi-oxlint-config). See docs/sumi/enforcement-map.md.",
+  "description": "ESLint preset for Sumi lint: eslint-config-typed + eslint-plugin-ts-data-forge plus the Sumi rule overrides (the bridge engine since D-43; the primary engine is @sumi-lang/oxlint-config). See languages/sumi/docs/enforcement-map.md.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",

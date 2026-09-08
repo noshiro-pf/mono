@@ -9,7 +9,7 @@
  * them as well. This function names the intent — stringify a primitive —
  * and is total: `String` cannot throw for any of the accepted types.
  * Objects are deliberately excluded (their `toString` may throw or be
- * missing); use `unknownToString` from ts-data-forge for `unknown`.
+ * missing); use `unknownToString` from this package for `unknown`.
  *
  * @example
  *

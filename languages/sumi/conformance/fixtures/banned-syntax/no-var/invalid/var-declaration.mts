@@ -1,4 +1,4 @@
-// @sumi-expect banned-syntax/no-var
+// @sumi-expect-error banned-syntax/no-var
 var mut_count = 0;
 
 mut_count += 1;

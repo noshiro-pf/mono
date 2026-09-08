@@ -1,2 +1,2 @@
-// @sumi-expect null/no-null-literal
+// @sumi-expect-error null/no-null-literal
 export const empty = null;

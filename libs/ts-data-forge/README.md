@@ -126,6 +126,7 @@ Additional helpers for common programming tasks.
 
 - **Type Casting** - `castMutable`, `castReadonly`
 - **Utilities** - `memoizeFunction`, `mapNullable`, `unknownToString`
+- **Panics** - `PanicError`, `isPanicError`, `createPanicError`: the error a programming-error stop throws (the `panic` / `unreachable` / `todo` functions live in ts-std-forge). A panic is marked by a `$$panic` property rather than by the error `name`, so an error keeps its own identity while being recognized as a panic; the `Result` / `AsyncResult` boundary functions rethrow one instead of turning it into `Err`.
 - **Conditionals** - `ifThen` for conditional operations
 
 ## Usage Examples
@@ -627,7 +628,7 @@ assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 - **`json`**: Type-safe JSON parsing and stringification utilities.
 - **`collections`**: Immutable data structures like `IMap`, `ISet`, and `Queue` with full type safety.
 - **`iterator`**: Utilities for working with iterators and generators (e.g., `range`).
-- **`others`**: Miscellaneous utilities like `castMutable`, `castReadonly`, `ifThen`, `mapNullable`, `memoizeFunction`, `tuple`, `unknownToString`.
+- **`others`**: Miscellaneous utilities like `castMutable`, `castReadonly`, `ifThen`, `mapNullable`, `memoizeFunction`, `PanicError` / `isPanicError` / `createPanicError`, `tuple`, `unknownToString`.
 
 ## Key Benefits
 

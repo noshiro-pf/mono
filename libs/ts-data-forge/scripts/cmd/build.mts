@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
-import { type UnknownResult } from '../../src/functional/result/index.mjs';
+import { type UnknownResult } from '../../src/functional/index.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-code.mjs';

@@ -9,5 +9,5 @@ experimental
 strict-lib
 # Conformance fixtures are the code under test and must be preserved
 # byte-for-byte (a formatter rewrite would erase what a fixture checks, e.g.
-# a `<T,>` trailing comma). See docs/sumi/decisions.md (D-9).
+# a `<T,>` trailing comma). See languages/sumi/docs/decisions.md (D-9).
 languages/sumi/conformance/fixtures

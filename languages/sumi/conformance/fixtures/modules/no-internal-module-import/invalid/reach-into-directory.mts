@@ -1,4 +1,4 @@
-// @sumi-expect modules/no-internal-module-import
+// @sumi-expect-error modules/no-internal-module-import
 import { sibling } from '../valid/helper.mjs';
 
 export const value = sibling;

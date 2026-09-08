@@ -67,6 +67,7 @@
   },
   "dependencies": {
     "@sindresorhus/is": "^8.1.0",
+    "ts-std-forge": "workspace:^",
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {

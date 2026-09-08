@@ -135,6 +135,8 @@ jobs:
           - strict-lib:lint
           - ws:type-check
           - ws:lint:fix
+          # The Sumi lint check of the dogfood packages (`sumi:check` scripts).
+          - ws:sumi:check
           - ws:test:browser
           - ws:test:cov
           - ws:e2e

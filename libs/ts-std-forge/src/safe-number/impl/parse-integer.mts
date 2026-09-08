@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Result } from '../../functional/index.mjs';
 
 /**
  * Parses a string as a base-10 integer — the alternative to calling
@@ -45,9 +45,9 @@ import { Result } from 'ts-data-forge';
 export const parseInteger = (
   value: string,
 ): Result<number, ParseIntegerError> => {
-  // ts-std-forge is the boundary implementer (D-24): it wraps the raw
-  // conversion itself rather than importing the prelude's `Num.safeParseInt`,
-  // whose implementation this mirrors.
+  // This is the implementation of the conversion, not a mirror of one:
+  // ts-data-forge's `Num.safeParse*` delegates here since D-49 (c). The
+  // raw `Number` call is what this function exists to wrap.
   // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
   const viaNumber = Number(value);
 

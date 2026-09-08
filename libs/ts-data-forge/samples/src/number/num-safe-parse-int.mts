@@ -41,6 +41,13 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(Result.unwrapOk(Num.safeParseInt('  ')), undefined);
 
+    // A value that overflows to Infinity is not an integer either, even
+    // though native `parseInt` reads a 1 out of it.
+
+    assert.strictEqual(Number.parseInt('1e400', 10), 1);
+
+    assert.isTrue(Result.isErr(Num.safeParseInt('1e400')));
+
     // embed-sample-code-ignore-below
   });
 }

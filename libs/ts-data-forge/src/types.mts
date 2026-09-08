@@ -75,57 +75,7 @@ export namespace SizeType {
   >;
 }
 
-// #region Optional
-/**
- * Represents the 'Some' variant of an Optional, containing a value.
- *
- * @template S The type of the contained value.
- */
-export type Some<S> = Readonly<{
-  /** @internal Discriminant property for the 'Some' type. */
-  $$tag: 'ts-data-forge::Optional.some';
-
-  /** The contained value. */
-  value: S;
-}>;
-
-/**
- * Represents the 'None' variant of an Optional, indicating the absence
- * of a value.
- */
-export type None = Readonly<{
-  /** @internal Discriminant property for the 'None' type. */
-  $$tag: 'ts-data-forge::Optional.none';
-}>;
-
-// #endregion Optional
-
-// #region Result
-
-/**
- * Represents a `Result` that is a success, containing a value.
- *
- * @template S The type of the success value.
- */
-export type Ok<S> = Readonly<{
-  /** @internal Discriminant property for the 'Ok' type. */
-  $$tag: 'ts-data-forge::Result.ok';
-
-  /** The success value. */
-  value: S;
-}>;
-
-/**
- * Represents a `Result` that is an error, containing an error value.
- *
- * @template E The type of the error value.
- */
-export type Err<E> = Readonly<{
-  /** @internal Discriminant property for the 'Err' type. */
-  $$tag: 'ts-data-forge::Result.err';
-
-  /** The error value. */
-  value: E;
-}>;
-
-// #endregion Result
+// The four variant shapes of `Optional` and `Result` are implemented in
+// ts-std-forge since Sumi D-49; re-exported here so that `Ok` / `Err` /
+// `Some` / `None` keep denoting the same declarations in both packages.
+export type { Err, None, Ok, Some } from 'ts-std-forge';

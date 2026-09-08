@@ -45,6 +45,7 @@
     "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "sumi:check": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../languages/sumi/cli/src/cmd/sumi.mts check ./tsconfig.sumi.json",
     "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
     "test:cov": "pnpm run z:vitest run --coverage",
@@ -64,6 +65,7 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
+    "@sumi-lang/cli": "workspace:*",
     "@testing-library/preact": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "eslint-config-typed": "workspace:*",

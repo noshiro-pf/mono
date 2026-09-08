@@ -1,5 +1,5 @@
-import { Result } from 'ts-data-forge';
 import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
+import { Result } from '../../functional/index.mjs';
 
 /**
  * Converts a `Date` to an ISO 8601 string without throwing.

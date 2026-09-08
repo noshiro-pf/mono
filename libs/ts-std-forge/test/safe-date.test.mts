@@ -1,5 +1,4 @@
-import { Result } from 'ts-data-forge';
-import { SafeDate } from '../src/index.mjs';
+import { Result, SafeDate } from '../src/index.mjs';
 
 describe('SafeDate.toISOString', () => {
   test('returns Ok for a valid date', () => {

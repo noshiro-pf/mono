@@ -1,6 +1,6 @@
 /**
  * Neutral rule ID (`<spec-area>/<rule>`, the corpus vocabulary — see
- * docs/sumi/conformance-corpus.md) ← oxlint diagnostic code
+ * languages/sumi/docs/conformance-corpus.md) ← oxlint diagnostic code
  * (`<plugin>(<rule>)`, as printed by `oxlint -f json`).
  *
  * This is the single source of truth for "which oxlint rule implements which
@@ -78,6 +78,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   ['typescript(triple-slash-reference)', 'modules/no-triple-slash'],
   ['typescript(no-require-imports)', 'modules/no-require'],
   ['sumi(no-internal-module-import)', 'modules/no-internal-module-import'],
+  ['sumi(no-mixed-star-export)', 'modules/no-mixed-star-export'],
   ['sumi(no-namespace-object-use)', 'modules/no-namespace-object-use'],
 
   // mutation

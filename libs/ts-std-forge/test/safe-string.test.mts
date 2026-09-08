@@ -1,6 +1,6 @@
 // cspell:ignore ababab
-import { Result } from 'ts-data-forge';
-import { SafeString } from '../src/index.mjs';
+
+import { Result, SafeString } from '../src/index.mjs';
 
 /**
  * Whether calling `fn` throws — used by the equivalence sweep to compare the

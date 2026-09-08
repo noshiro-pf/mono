@@ -9,6 +9,7 @@ export * from './no-global-type-shadow.mjs';
 export * from './no-in-operator.mjs';
 export * from './no-internal-module-import.mjs';
 export * from './no-let-without-mut-prefix.mjs';
+export * from './no-mixed-star-export.mjs';
 export * from './no-namespace-object-use.mjs';
 export * from './no-new-array.mjs';
 export * from './no-setter.mjs';

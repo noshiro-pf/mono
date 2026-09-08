@@ -47,6 +47,7 @@
     "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/base/**\" --exclude \"core/utils/**\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "sumi:check": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../languages/sumi/cli/src/cmd/sumi.mts check ./tsconfig.sumi.json",
     "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
     "test:cov": "pnpm run z:vitest:node run --coverage",
@@ -67,6 +68,7 @@
   },
   "devDependencies": {
     "@reduxjs/toolkit": "catalog:",
+    "@sumi-lang/cli": "workspace:*",
     "@types/react": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "argparse": "catalog:",
