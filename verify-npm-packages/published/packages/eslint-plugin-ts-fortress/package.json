@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "eslint": ">=9.0.0",
-    "eslint-plugin-ts-fortress": "1.2.0",
+    "eslint-plugin-ts-fortress": "1.2.1",
     "typescript": ">=5.0.0"
   }
 }
