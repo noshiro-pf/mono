@@ -1,5 +1,11 @@
 # eslint-plugin-ts-fortress
 
+## 1.2.1
+
+### Patch Changes
+
+- 89e14c8: Update dependencies
+
 ## 1.2.0
 
 ### Minor Changes
