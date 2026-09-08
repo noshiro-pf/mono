@@ -60,4 +60,8 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 ## 未解決の論点
 
 - 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
+- **immer のような Proxy ベースのライブラリと setter / 代入構文(2026-09-08 追記、ユーザー要望)。** Sumi lint / sugar / refined で immer 相当(`produce(state, (mut_draft) => { mut_draft.x = 1; })`)を実現するには `Proxy` のサポートが要る。整理:
+    - **setter 構文(`set x(v) {}`)は要らない見込み。** immer の draft への `mut_draft.x = 1` は object literal の setter ではなく **Proxy の `set` トラップ**(handler の `set` という名前のプロパティ。arrow function プロパティとして書ける)で捕捉される。ライブラリ側の実装も `new Proxy(target, { set: (t, k, v) => … })` と `Reflect.set` で書けるため、D-33 の setter 禁止(D-47 でも維持)を緩める必要はない。`Proxy` は `new` 形で生成する組み込みで、D-15 / D-41 の禁止対象にも入っていない。
+    - **残る論点は「draft への代入式」の扱い。** Sumi lint では `mut_` 束縛への代入として今日でも合法(上表の `mut_draft`)。sugar / refined でこの代入式を残すか、**関数呼び出しで置き換える**か(例: `Draft.set(mut_draft, 'x', 1)`、lens / optic 風の `mut_draft.x.set(1)`、あるいは `produce` 自体をパスと値で更新する API)が未決。ユーザーの希望は**なるべく関数呼び出しでカバーする**方向。関数呼び出し形なら Proxy に頼らない実装(構造共有のパス更新)も選べ、refined で代入式の意味論を狭める余地が生まれる。
+    - **検討時に決めること**: 代入式を残す場合の型付け(draft の型と `readonly` 除去の範囲 — `castDraft` 相当をどこで許すか)、関数呼び出し形にした場合の書き味(ネストの深い更新)、両形式の Sumi lint 形(ライブラリ API)を先に整備してから sugar の糖衣を決める順序(D-37 のライブラリ先行の原則)。
 - **global 定義名の shadow は禁止に確定**(D-19 — `undefined` / `NaN` / 組み込みオブジェクト / global 型名を宣言名に使えない。[banned-syntax.md](./banned-syntax.md))。ユーザー変数同士の shadowing は、現行 config(`@typescript-eslint/no-shadow` の `hoist: 'all'`)が既に全面禁止していることが判明(2026-08-31)。現行運用の追認として**全面禁止に確定**(2026-09-05 — D-27)。
