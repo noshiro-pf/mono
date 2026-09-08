@@ -67,7 +67,12 @@ not fight it: re-survey and take its new state.
 - `BLOCKED` — up to date, but a required check is failing or still pending, or a
   review is missing. Go to step 3 or 4; do not rebase it, that only restarts the
   same matrix.
-- `DIRTY` — the rebase will conflict. Step 2b.
+- `DIRTY` — GitHub's test _merge_ of the branch into `main` conflicts, which is
+  not the same as saying a rebase will. That answer is computed asynchronously
+  and cached, so it is regularly stale after a force-push or a base that has
+  just moved, and a rebase replays commit by commit onto the tip rather than
+  three-way merging from a merge base. Try the rebase before believing it —
+  step 2b. Only a rebase that actually stops on a conflict is a conflict.
 - `UNKNOWN` — GitHub has not finished computing the merge state. Query again a
   few seconds later; do not read it as up to date.
 - `CLEAN` — nothing is blocking it and auto-merge is on, so it is already
@@ -102,10 +107,11 @@ when `git status --porcelain` is empty — never discard uncommitted work:
 git fetch origin <branch> && git reset --hard "origin/<branch>"
 ```
 
-### 2b. When it conflicts
+### 2b. When GitHub says it conflicts
 
-`gh pr update-branch` fails, or `mergeStateStatus` was `DIRTY`. Rebase locally,
-from a clean working tree:
+`gh pr update-branch` fails, or `mergeStateStatus` was `DIRTY`. Rebase locally
+anyway, from a clean working tree — it often just works, and where it does the
+PR was never conflicted:
 
 ```bash
 git fetch origin main
