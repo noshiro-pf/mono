@@ -28,8 +28,9 @@ const el2 = document.querySelector('.foo'); // Element | null が伝播する
 
 構文だけでは「型に null が含まれるか」は分からないため、これは型情報を使う lint になる:
 
-1. `null` リテラル・`null` 型キーワードの出現を禁止(構文レベル、`unicorn/no-null`)。
-2. 宣言(変数・引数・戻り値・プロパティ)の型に `null` が含まれたらエラー(型情報レベル。typescript-eslint の type-aware rule として実装)。
+1. `null` リテラルの出現を禁止(構文レベル、`unicorn/no-null` — 実装済み、中立 ID `null/no-null-literal`)。
+2. `null` **型キーワード**の出現を禁止(構文レベル、`sumi/no-null-in-type` — 2026-09-09 実装、中立 ID `null/no-null-in-type`)。alias・引数・戻り値・プロパティ・型引数のどこに書かれていても捕まる。
+3. 宣言(変数・引数・戻り値・プロパティ)の**推論された**型に `null` が含まれたらエラー(型情報レベル、未実装)。2 が「書かれた `null`」を全部塞ぐので、3 に残るのは `document.querySelector('.foo')` の戻り値をそのまま宣言に入れる類 — 外部由来の `null` が注釈なしで伝播する場合である。境界正規化の強制はこの 3 が担う。
 
 (2) により、外部 API の戻り値は「宣言に入れられない」ので式の場で潰すしかなくなり、境界正規化が強制される。
 

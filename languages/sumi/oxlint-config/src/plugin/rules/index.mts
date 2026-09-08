@@ -12,6 +12,7 @@ export * from './no-let-without-mut-prefix.mjs';
 export * from './no-mixed-star-export.mjs';
 export * from './no-namespace-object-use.mjs';
 export * from './no-new-array.mjs';
+export * from './no-null-in-type.mjs';
 export * from './no-setter.mjs';
 export * from './no-this.mjs';
 export * from './no-throw.mjs';

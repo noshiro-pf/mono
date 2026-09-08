@@ -59,6 +59,7 @@ export const knownRuleIds = [
   'mutation/no-let-without-mut-prefix',
   'mutation/no-shadow',
   'mutation/prefer-const',
+  'null/no-null-in-type',
   'null/no-null-literal',
   'readonly/require-readonly-parameter',
   'readonly/require-readonly-type',

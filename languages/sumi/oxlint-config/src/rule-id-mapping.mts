@@ -97,6 +97,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
 
   // null
   ['unicorn(no-null)', 'null/no-null-literal'],
+  ['sumi(no-null-in-type)', 'null/no-null-in-type'],
 ]);
 
 /** The neutral IDs this engine implements (the mapping's value set). */
