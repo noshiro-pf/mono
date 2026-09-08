@@ -1,4 +1,4 @@
-import { panic } from '../../../others/index.mjs';
+import { createPanicError } from '../../../others/index.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
@@ -70,5 +70,5 @@ const expectToBeImpl = <R extends UnknownResult>(
     return unwrapOk(result);
   }
 
-  panic(message);
+  throw createPanicError(message);
 };

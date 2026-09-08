@@ -1,4 +1,4 @@
-import { panic } from '../../../others/index.mjs';
+import { createPanicError } from '../../../others/index.mjs';
 import { type Optional, type UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
@@ -72,5 +72,5 @@ const expectToBeImpl = <O extends UnknownOptional>(
     return unwrap(optional);
   }
 
-  panic(message);
+  throw createPanicError(message);
 };

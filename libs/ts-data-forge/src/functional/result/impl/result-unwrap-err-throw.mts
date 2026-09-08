@@ -1,4 +1,4 @@
-import { panic, unknownToString } from '../../../others/index.mjs';
+import { createPanicError, unknownToString } from '../../../others/index.mjs';
 import { match } from '../../match.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
@@ -47,7 +47,7 @@ export const unwrapErrThrow = <R extends UnknownResult>(
     'ts-data-forge::Result.err': 'Err',
   });
 
-  panic(
+  throw createPanicError(
     `Expected Err but got ${variant}: ${toStr(
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       result.value as UnwrapOk<R>,

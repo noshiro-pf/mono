@@ -1,4 +1,4 @@
-import { panic, unknownToString } from '../../../others/index.mjs';
+import { createPanicError, unknownToString } from '../../../others/index.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
 import { type UnwrapErr, type UnwrapOk } from './types.mjs';
@@ -38,7 +38,7 @@ export const unwrapThrow = <R extends UnknownResult>(
 ): UnwrapOk<R> => {
   if (isErr(result)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    panic(toStr(result.value as UnwrapErr<R>));
+    throw createPanicError(toStr(result.value as UnwrapErr<R>));
   }
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

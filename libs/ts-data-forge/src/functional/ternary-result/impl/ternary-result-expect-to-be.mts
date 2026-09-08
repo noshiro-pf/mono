@@ -1,4 +1,4 @@
-import { panic } from '../../../others/index.mjs';
+import { createPanicError } from '../../../others/index.mjs';
 import {
   type TernaryResult,
   type UnknownTernaryResult,
@@ -62,5 +62,5 @@ const expectImpl = <R extends UnknownTernaryResult>(
     return unwrapOk(result);
   }
 
-  panic(message);
+  throw createPanicError(message);
 };

@@ -1,4 +1,4 @@
-import { panic, unknownToString } from '../../../others/index.mjs';
+import { createPanicError, unknownToString } from '../../../others/index.mjs';
 import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isErr } from './ternary-result-is-err.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
@@ -26,7 +26,7 @@ export const unwrapThrow = <R extends UnknownTernaryResult>(
   toStr: (value: UnwrapWarn<R> | UnwrapErr<R>) => string = unknownToString,
 ): UnwrapOk<R> => {
   if (isErr(result)) {
-    panic(
+    throw createPanicError(
       `Expected Ok but got Err: ${toStr(
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         result.value as UnwrapErr<R>,
@@ -35,7 +35,7 @@ export const unwrapThrow = <R extends UnknownTernaryResult>(
   }
 
   if (isWarn(result)) {
-    panic(
+    throw createPanicError(
       `Expected Ok but got Warn: ${toStr(
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         result.warning as UnwrapWarn<R>,

@@ -11,7 +11,7 @@
 
 ## panic 経路の位置づけ
 
-**確定(2026-09-08 — D-48)**: panic は prelude の関数 `panic(message, { cause? }): never` / `unreachable(value: never)` / `todo(message?)` で行い、専用の `PanicError`(`name` が `'PanicError'` の `Error`)を投げる。`unwrapThrow` / `expectToBe` 系も `PanicError` を投げる。境界関数(`Result.fromThrowable` / `fromPromise`、`AsyncResult` の同名関数)は `PanicError` を `Err` に変換せず再 throw する — Rust の `?` が panic を拾わないのと同じ性質で、バグが回復可能エラーに化けない。`throw` / `try..catch` を native にサポートしない理由は D-48。
+**確定(2026-09-08 — D-48)**: panic は ts-std-forge の関数 `panic(message, { cause? }): never` / `unreachable(value: never)` / `todo(message?)` で行い、専用の `PanicError`(`name` が `'PanicError'` の `Error`。定義と `isPanicError` は ts-data-forge)を投げる。`unwrapThrow` / `expectToBe` 系も `PanicError` を投げる。境界関数(`Result.fromThrowable` / `fromPromise`、`AsyncResult` の同名関数)は `PanicError` を `Err` に変換せず再 throw する — Rust の `?` が panic を拾わないのと同じ性質で、バグが回復可能エラーに化けない。`throw` / `try..catch` を native にサポートしない理由は D-48。
 
 `throw` を禁止しても、プログラムが停止する経路は残る:
 
@@ -81,7 +81,7 @@ const createHttpError = (
 
 ## 未解決の論点
 
-- ~~**panic 経路の関数が prelude に無い(2026-09-08、synstate の dogfood で判明)。**~~ → **D-48 で解決(同日)**: ts-data-forge に `panic` / `unreachable` / `todo` / `isPanicError` を追加し、境界関数は `PanicError` を再 throw する。以下は記録として残す。 「停止は prelude の unwrap 系関数を通してのみ起こる」としているが、`throw new Error('not implemented')` や不変条件違反(循環依存の検出)のような**値の無い panic** を `Result.unwrapThrow` で書くのは不自然で、synstate では `oxlint-disable-next-line sumi/no-throw` で逃がしている(2 件)。ts-data-forge(prelude)に `panic(message): never` / `unreachable()` / `todo()` 相当を追加し、それを唯一の停止手段として `no-throw` の例外にしないか(追加すれば disable は不要になる)。
+- ~~**panic 経路の関数が prelude に無い(2026-09-08、synstate の dogfood で判明)。**~~ → **D-48 で解決(同日)**: ts-std-forge に `panic` / `unreachable` / `todo` を、ts-data-forge に `PanicError` / `isPanicError` / `createPanicError` を追加し、境界関数は `PanicError` を再 throw する。以下は記録として残す。 「停止は prelude の unwrap 系関数を通してのみ起こる」としているが、`throw new Error('not implemented')` や不変条件違反(循環依存の検出)のような**値の無い panic** を `Result.unwrapThrow` で書くのは不自然で、synstate では `oxlint-disable-next-line sumi/no-throw` で逃がしている(2 件)。ts-data-forge(prelude)に `panic(message): never` / `unreachable()` / `todo()` 相当を追加し、それを唯一の停止手段として `no-throw` の例外にしないか(追加すれば disable は不要になる)。
 
 - `Err` ペイロードの設計規範は上記「仕様への帰結」1〜2 で骨格が決まった(既定 plain tagged union / 境界・panic は Error ベース factory)。残るのはエラーの合成(`mapErr` / union が増えていく問題)の指針と、factory 群を prelude(ts-data-forge)にどう載せるか。
 - `using` / Explicit Resource Management の Sumi sugar での採否(Sumi lint は禁止 — D-30)。

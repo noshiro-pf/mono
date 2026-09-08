@@ -51,6 +51,7 @@ no `new` form.
 
 ## Current API
 
+- `panic(message, { cause? })` / `unreachable(value: never, message?)` / `todo(message?)` — the panic path (Sumi D-48): a programming error stops the program by throwing ts-data-forge's `PanicError`, which the `Result` / `AsyncResult` boundary functions rethrow rather than turn into `Err`. All three return `never` and are declared with explicit types so that a call terminates control flow.
 - `Regex.create(pattern, flags?)` — `new RegExp` without throwing. Pattern validity is the engine's own grammar check (not pre-validatable); a caught `SyntaxError` becomes `'invalid-regexp'` with the error as `cause`, anything else `'unexpected'`.
 - `SafeDate.toISOString(date)` — `Date.prototype.toISOString` without throwing (Invalid Date → `Err<{ kind: 'invalid-date' }>`).
 - `SafeNumber.parse(value)` — the alternative to `Number(str)`: the same implementation as ts-data-forge's `Num.safeParseFloat` (a copy, not a dependency), returning `Ok<number>` (finite) or `Err<{ kind: 'invalid-number', input }>` for blank input, trailing garbage, `NaN` and `±Infinity`.

@@ -1,48 +1,14 @@
-import { isError } from '@sindresorhus/is';
-import { unknownToString } from './unknown-to-string.mjs';
-
-/**
- * The error a panic throws. It is an ordinary `Error` whose `name` is
- * `'PanicError'`, so it carries a stack and prints like any error, and it
- * is what `isPanicError` recognizes across realms.
- */
-export type PanicError = Error & Readonly<{ name: 'PanicError' }>;
-
-const panicErrorName = 'PanicError';
-
-const panicErrorBrand: Readonly<{ name: typeof panicErrorName }> = {
-  name: panicErrorName,
-} as const;
-
-/**
- * Whether `value` was thrown by `panic` (or by the unwrap functions that
- * panic on failure).
- *
- * @example
- *
- * ```ts
- * assert.isTrue(
- *   isPanicError(Result.fromThrowable(() => panic('boom'))),
- * ); // never reached: fromThrowable rethrows a panic
- * ```
- */
-export const isPanicError = (value: unknown): value is PanicError =>
-  isError(value) && value.name === panicErrorName;
-
-const createPanicError = (message: string, cause: unknown): PanicError =>
-  Object.assign(
-    cause === undefined ? new Error(message) : new Error(message, { cause }),
-    panicErrorBrand,
-  );
+import { createPanicError, unknownToString } from 'ts-data-forge';
 
 /**
  * Stops the program on a programming error — an invariant that cannot hold
- * — by throwing a `PanicError`. This is the counterpart of Rust's `panic!`:
- * not an error-handling path (that is `Result`), but the assertion that
- * reaching this point is a bug. The boundary functions (`Result.fromThrowable`,
- * `Result.fromPromise`, `AsyncResult.fromThrowable`, `AsyncResult.fromPromise`)
- * rethrow a `PanicError` rather than turning it into `Err`, so a bug does
- * not masquerade as a recoverable failure.
+ * — by throwing ts-data-forge's `PanicError` (Sumi D-48). This is the
+ * counterpart of Rust's `panic!`: not an error-handling path (that is
+ * `Result`), but the assertion that reaching this point is a bug. The
+ * boundary functions of ts-data-forge (`Result.fromThrowable`,
+ * `Result.fromPromise`, `AsyncResult.fromThrowable`,
+ * `AsyncResult.fromPromise`) rethrow a `PanicError` rather than turning it
+ * into `Err`, so a bug does not masquerade as a recoverable failure.
  *
  * Declared with an explicit type so that TypeScript treats a call as
  * terminating (control-flow analysis honours `never` only on annotated
@@ -65,7 +31,7 @@ export const panic: (
   message: string,
   options?: Readonly<{ cause?: unknown }>,
 ) => never = (message, options) => {
-  throw createPanicError(message, options?.cause);
+  throw createPanicError(message, options);
 };
 
 /**

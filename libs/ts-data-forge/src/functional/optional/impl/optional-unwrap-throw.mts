@@ -1,4 +1,4 @@
-import { panic } from '../../../others/index.mjs';
+import { createPanicError } from '../../../others/index.mjs';
 import { type UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { type Unwrap } from './types.mjs';
@@ -38,5 +38,5 @@ export const unwrapThrow = <O extends UnknownOptional>(
     return optional.value as Unwrap<O>;
   }
 
-  panic('`unwrapThrow()` has failed because it is `None`');
+  throw createPanicError('`unwrapThrow()` has failed because it is `None`');
 };

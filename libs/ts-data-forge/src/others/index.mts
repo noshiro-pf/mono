@@ -5,6 +5,6 @@ export * from './fast-deep-equal.mjs';
 export * from './if-then.mjs';
 export * from './map-nullable.mjs';
 export * from './memoize-function.mjs';
-export * from './panic.mjs';
+export * from './panic-error.mjs';
 export * from './tuple.mjs';
 export * from './unknown-to-string.mjs';
