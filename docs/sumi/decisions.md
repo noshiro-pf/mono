@@ -168,7 +168,7 @@
 
 ## D-24: safe stdlib wrapper は一方向依存の新ライブラリとする
 
-- **ステータス**: 確定(2026-08-29)
+- **ステータス**: 確定(2026-08-29)。**依存方向は D-49 で反転する方針**(ts-data-forge → ts-std-forge。2026-09-08、実施は段階計画)
 - **判断**: D-22 のラッパー群は ts-data-forge に追加し続けるのではなく、新ライブラリ(仮名 **ts-std-forge**、`libs/`)に実装する。依存は **ts-std-forge → ts-data-forge の一方向のみ**。
 - **理由**: ts-data-forge は ADT コア(Result/Optional/pipe)とデータ構造の両方を持つため、分割時の相互依存が懸念されたが、「**ts-data-forge は境界の実装者として、自身の内部では素の stdlib を直接使ってよい**」と定義すれば wrapper への逆依存は構造的に発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面動かさず、新 lib の re-export facade で一択の入口を作る(実体移動は将来の major)。
 - **実施**: scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)(`Regex.create` / `SafeDate.toISOString` を TDD で実装済み)。パッケージ名は初回 publish(手動 — libs/first-release.md)まで仮。
@@ -385,7 +385,7 @@
 ## D-48: `throw` / `try..catch` の禁止は維持し、panic 経路は ts-std-forge の `panic` / `unreachable` / `todo` 関数で提供する(`PanicError` の定義は ts-data-forge に置き、境界関数が再 throw する)
 
 - **ステータス**: 確定(2026-09-08)
-- **判断**: Sumi は `throw` 文と `try..catch` を native にサポートしない(D-2 / exceptions.md を維持)。プログラミングエラーによる停止(panic)は **ts-std-forge** の関数で行う(ユーザー指示 2026-09-08。当初 ts-data-forge に置いたものを移動)— `panic(message, { cause? }): never`(専用の `PanicError` = `name` が `'PanicError'` の `Error` を投げる)/ `unreachable(value: never, message?)`(網羅性)/ `todo(message?)`(未実装スタブ)。**`PanicError` 型・`isPanicError`・`createPanicError` は ts-data-forge** に置く: ts-data-forge 自身の `unwrapThrow` / `unwrapErrThrow` / `expectToBe` / `safeUnwrap` 系が `PanicError` を投げ、境界関数がそれを再 throw する必要があり、依存は ts-std-forge → ts-data-forge の一方向(D-24)なので、エラーの定義は下層に、ユーザーが呼ぶ panic 関数は stdlib 層(D-41 の代替 API と同じ置き場)に分かれる。**境界関数 `Result.fromThrowable` / `Result.fromPromise` / `AsyncResult.fromThrowable` / `AsyncResult.fromPromise` は `PanicError` を `Err` に変換せず再 throw する**(Rust の `?` が panic を拾わないのと同じ性質)。`sumi/no-throw` の例外は ts-std-forge / ts-data-forge の実装のみ(境界の実装者は inline disable)。
+- **判断**: Sumi は `throw` 文と `try..catch` を native にサポートしない(D-2 / exceptions.md を維持)。プログラミングエラーによる停止(panic)は **ts-std-forge** の関数で行う(ユーザー指示 2026-09-08。当初 ts-data-forge に置いたものを移動)— `panic(message, { cause? }): never`(専用の `PanicError` = `name` が `'PanicError'` の `Error` を投げる)/ `unreachable(value: never, message?)`(網羅性)/ `todo(message?)`(未実装スタブ)。**`PanicError` 型・`isPanicError`・`createPanicError` は ts-data-forge** に置く: ts-data-forge 自身の `unwrapThrow` / `unwrapErrThrow` / `expectToBe` / `safeUnwrap` 系が `PanicError` を投げ、境界関数がそれを再 throw する必要があり、依存は ts-std-forge → ts-data-forge の一方向(D-24)なので、エラーの定義は下層に、ユーザーが呼ぶ panic 関数は stdlib 層(D-41 の代替 API と同じ置き場)に分かれる。**この分担は暫定**: D-49 の依存反転後は `PanicError` 一式も ts-std-forge に統合する。**境界関数 `Result.fromThrowable` / `Result.fromPromise` / `AsyncResult.fromThrowable` / `AsyncResult.fromPromise` は `PanicError` を `Err` に変換せず再 throw する**(Rust の `?` が panic を拾わないのと同じ性質)。`sumi/no-throw` の例外は ts-std-forge / ts-data-forge の実装のみ(境界の実装者は inline disable)。
 - **理由(native `throw` / `try..catch` と比べた利点)**:
     1. **意図が名前に出る。** `throw` は「バグなので止める」と「エラーを呼び出し側へ渡す」の両方に使われ字面で区別できないが、`panic(` は grep でき、「ライブラリの `src/` では panic 禁止、アプリでは許可」のような規則も単純な lint で書ける。
     2. **専用のエラー型を持てる。** JS では panic も実行時には throw なので、境界の `fromThrowable` が panic まで `Err` に変換するとバグが回復可能エラーに化ける。`panic` が投げるものを規定できるからこそ `PanicError` を区別して再 throw でき、任意の値を投げられる `throw` 文では成り立たない。
@@ -396,3 +396,15 @@
 - **移植性**: `throw new Error(x)` → `panic(x)` は一対一の機械的な書き換えで codemod で往復できる(D-3 / D-37)。移植で手間なのは `catch` 側を Result に直す作業で、`throw` を解禁しても `catch` まで解禁しない限り軽くならない。
 - **却下した代替案**: `throw` / `try..catch` の native サポート(上記の理由。ラッパーで吸収しきれないほど throw する外部 API が多い場合の逃げ道だが、それは ts-std-forge の守備範囲として進行中)。
 - **帰結**: synstate の `throw` 2 件(#1868 で `oxlint-disable`)は `todo()` / `panic()` に置き換えて disable を外す(ts-std-forge の次のリリース後。synstate が ts-std-forge に依存することになる)。exceptions.md の「panic 経路の関数が無い」論点は解消。
+
+## D-49: ts-std-forge と ts-data-forge の依存方向を反転する(ts-data-forge → ts-std-forge。Result / Optional / pipe 等を ts-std-forge に移し、ts-data-forge は当面 re-export する)
+
+- **ステータス**: 方向は確定(2026-09-08、ユーザー決定)。実施は下の段階計画(提案)に従い、別 PR で進める(TODO — issue #1753)。
+- **判断**: D-24 の一方向依存(ts-std-forge → ts-data-forge)を**反転**する。ADT コア(`Result` / `Optional` / `TernaryResult` / `AsyncResult` / `pipe` / `match`)を ts-std-forge に移植し、ts-data-forge はそれに依存する側になる。移行中は ts-data-forge からも同じ名前を **re-export** して既存の import を壊さない。ts-std-forge からの import を推奨し、次の major で ts-data-forge の re-export を落とすかは後で判断する(不要かもしれない)。
+- **理由**: Sumi の層構造(stdlib.md)では ts-std-forge が「言語の prelude + 境界ラッパー」に近く、ts-data-forge は「その上のデータ構造・ユーティリティ」になる。D-48 で panic 関数を ts-std-forge に置き、`PanicError` を ts-data-forge に置かざるを得なかったのは現在の依存方向の帰結で、反転すればこの分断は消える。D-41 で `Num.safeParseFloat` を ts-std-forge に**コピー**したのも同じ制約の回避で、反転後は ts-std-forge の実装が正となり ts-data-forge 側は薄い re-export か削除候補になる。
+- **計測(2026-09-08)**: ts-data-forge の `functional/` は 105 ファイル、テストを除き 5,037 行。functional が依存する外側は `others/`(15 箇所 — `unknownToString`、`castMutable` 等)・`guard/`(4 箇所)・`types.mts`(`Ok` / `Err` / `Some` / `None`)。ts-data-forge 内で functional を使う他ディレクトリは 13 ファイル(array 3、collections 4、number 2、json / object / promise 各 1、entry-point)。ts-std-forge が ts-data-forge から取っているのは `Result`(11 箇所)、`Num`(D-41 のコピー元の型)、`unknownToString`、`PanicError` 一式、`expectType`。ts-data-forge に依存するパッケージはリポジトリ内で 50。**規模から「すぐに対応」ではなく段階計画で行う。**
+- **段階計画(提案)**:
+    1. **ts-std-forge を自立させる**: `functional/` とその依存(`types.mts` の ADT 型、`unknownToString`、必要な guard、`PanicError` 一式)を ts-std-forge に**移植**し、ts-std-forge の `dependencies` から ts-data-forge を外す。この時点では両パッケージに同じ実装が並ぶ(コピー)。ts-std-forge minor。
+    2. **ts-data-forge を反転させる**: ts-data-forge が ts-std-forge に依存し、自前の functional 実装を削除して **re-export** に置き換える(`export { Result, Optional, pipe, … } from 'ts-std-forge'`)。API は不変なので minor。内部の `others/` `guard/` の共有分も同様に扱う(残すか ts-std-forge から re-export するか)。1 と 2 は循環を作らないよう**この順序**で、別リリースにする。
+    3. **推奨と整理(任意、major)**: eslint-plugin-ts-data-forge に「`Result` 等は ts-std-forge から import する」規則(autofix 付き)を足し、repo 内 50 パッケージを移す。ts-data-forge の re-export を落とすのは次の major で、必要が無ければ落とさない。
+- **検討事項**: (a) ts-std-forge の名前と説明(「throw / null API の安全なラッパー」から「Sumi の prelude」へ広がる — 初回 publish は済んでいるので改名は別問題)。(b) `expectType` の置き場(両方が使う開発用ユーティリティ。ts-type-forge へ移す案)。(c) `Num.safeParseFloat` / `safeParseInt` と `SafeNumber.parse` / `parseInteger` の一本化(D-41 の「次の major で一元管理」をここで実施)。(d) eslint-plugin-ts-data-forge の規則名・案内文(`prefer-num-safe-parse-*` 等)の更新。(e) D-48 の `PanicError` 分担の解消(反転後は ts-std-forge に統合)。(f) stdlib.md の層の記述(prelude の実体を ts-data-forge から ts-std-forge に書き換える)。

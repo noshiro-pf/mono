@@ -104,5 +104,6 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 - **null / 番兵値を返す API の Optional ラップ(方針)**: throwable → Result と対になる形で、null を返す API(`RegExp.prototype.exec`、`match` 等)は Optional を返すラッパーへ寄せたい(ユーザー意向 2026-08-29。番兵値 API の棚卸しは survey の次の調査枠)。
 - **ラッパー群のパッケージ構成(確定 — D-24)**: 一方向依存の新ライブラリ **ts-std-forge**(仮名)を採用。scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)。以下は検討の記録:懸念は相互依存 — ts-data-forge は基本 ADT(Result/Optional/pipe)と拡張 `Arr` の両方を持つため、分割すると双方向依存になりうる。**整理案(D-24 で採用)**: 依存を「wrapper 新 lib → ts-data-forge」の一方向に固定する。ts-data-forge が wrapper を必要とする状況は「自身の実装内部では素の stdlib を直接使ってよい(境界の実装者)」と定義すれば発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面そのままにし、新 lib が re-export で facade になる(実体移動は将来の major で)。より根本的な代替は「ADT コア(Result/Optional/pipe のみ)の最小パッケージを切り出し、ts-data-forge と wrapper lib が共にそれへ依存する」形(fp-ts/effect 型の kernel 構成)だが、公開済みパッケージの再編コストが大きい。
 - prelude の範囲(`Arr` / `Num` / `Obj` / `IMap` 等をどこまで「言語機能」扱いにするか)。
+- **prelude の実体を ts-std-forge に移す(D-49、2026-09-08)**: ts-std-forge と ts-data-forge の依存方向を反転し、`Result` / `Optional` / `pipe` 等を ts-std-forge に移植する(ts-data-forge は当面 re-export)。完了後、この文書の「prelude 層の実体は ts-data-forge」の記述を書き換える。
 - 上記ギャップを ts-data-forge 本体に実装する順序(★★★ の 4 件: `Optional.match` / `Optional.toResult` / `Result.match` / `safeTry` + async 系、が先頭候補)。
 - `TernaryResult` を言語仕様に含めるか。
