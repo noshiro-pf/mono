@@ -1,4 +1,4 @@
-import { unknownToString } from '../../../others/index.mjs';
+import { panic, unknownToString } from '../../../others/index.mjs';
 import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
@@ -31,7 +31,7 @@ export const unwrapWarnThrow = <R extends UnknownTernaryResult>(
 
   const variant = variantName(result.$$tag);
 
-  throw new Error(
+  panic(
     `Expected Warn but got ${variant}: ${toStr(
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       result.value as UnwrapOk<R> | UnwrapErr<R>,

@@ -381,3 +381,18 @@
 - **理由**: getter は本質的には関数呼び出し API と等価であり、関数呼び出しに置き換えても問題は無い(D-33 の指摘は正しい)。しかし Sumi lint は既存の TS コードをそのまま検査する層で、TS の慣用句である getter を弾くと移行コストだけが増える(synstate の dogfood で `get isCompleted(): boolean { return handle.isCompleted(); }` の形が 4 件 — 2026-09-08 計測)。
 - **却下した代替案**: **Sumi sugar への移行時に関数呼び出しへ置き換え、戻すときに `get` へ復元しない**(ユーザー提示のもう一方の案)。sugar は Sumi lint + ライブラリとの一対一対応と**双方向の codemod**が原則(D-37)であり、片方向の変換を sugar の移行に入れると往復忠実性が破れる。不可逆な変換は refined だけが持つ性質なので、そこへ置く方が層の定義と整合する。
 - **帰結**: `sumi/no-accessor` を `sumi/no-setter`(中立 ID `banned-syntax/no-setter`)に改名し、setter だけを報告する。`prefer-arrow-function` は getter 本体の function 式を報告しない(従来どおり)。refined の getter 除去(getter → 関数呼び出し、呼び出し側の書き換えを含む)は refined 設計時の項目。
+
+## D-48: `throw` / `try..catch` の禁止は維持し、panic 経路は prelude の `panic` / `unreachable` / `todo` 関数で提供する(`PanicError` は境界関数が再 throw する)
+
+- **ステータス**: 確定(2026-09-08)
+- **判断**: Sumi は `throw` 文と `try..catch` を native にサポートしない(D-2 / exceptions.md を維持)。プログラミングエラーによる停止(panic)は ts-data-forge(prelude)の関数で行う — `panic(message, { cause? }): never`(専用の `PanicError` = `name` が `'PanicError'` の `Error` を投げる)/ `unreachable(value: never, message?)`(網羅性)/ `todo(message?)`(未実装スタブ)/ `isPanicError(value)`。既存の `unwrapThrow` / `unwrapErrThrow` / `expectToBe` / `safeUnwrap` 系も `PanicError` を投げる。**境界関数 `Result.fromThrowable` / `Result.fromPromise` / `AsyncResult.fromThrowable` / `AsyncResult.fromPromise` は `PanicError` を `Err` に変換せず再 throw する**(Rust の `?` が panic を拾わないのと同じ性質)。`sumi/no-throw` の例外は prelude の実装のみ(境界の実装者は inline disable)。
+- **理由(native `throw` / `try..catch` と比べた利点)**:
+    1. **意図が名前に出る。** `throw` は「バグなので止める」と「エラーを呼び出し側へ渡す」の両方に使われ字面で区別できないが、`panic(` は grep でき、「ライブラリの `src/` では panic 禁止、アプリでは許可」のような規則も単純な lint で書ける。
+    2. **専用のエラー型を持てる。** JS では panic も実行時には throw なので、境界の `fromThrowable` が panic まで `Err` に変換するとバグが回復可能エラーに化ける。`panic` が投げるものを規定できるからこそ `PanicError` を区別して再 throw でき、任意の値を投げられる `throw` 文では成り立たない。
+    3. **式として使える。** `never` を返す関数なので `m.get(k) ?? panic('missing')` と書け、制御フロー解析も効く(throw 式は JS に無い)。TS が `never` 呼び出しを終端として扱うのは**型注釈付きの宣言**に限るため、`panic` 等は明示的な関数型注釈付きの `const` で宣言する。
+    4. **`try..catch` を解禁せずに済む。** `throw` を許せば `catch` も解禁することになり、「どの関数も投げうるが型に現れない」TS の現状に戻る。禁止の狙いは停止を防ぐことではなく、型に見えない非局所的な制御フローの経路を作らないこと。
+- **`process.exit` との関係**: `process.exit` は終了であって巻き戻し(unwind)ではなく、途中の呼び出し元が握りつぶす余地がない。危険なのは throw が catch と組で隠れた制御フローの経路になることなので、`process.exit` を潰せていないことは `throw` 解禁の根拠にならない(Node 境界の API として ts-std-forge の対象)。
+- **Rust との対応**: Rust の panic も文ではなく呼び出し(`panic!` / `unwrap` / `expect`)で、境界の `catch_unwind` もライブラリ関数。`panic()` = `panic!`、`Result.unwrapThrow` = `unwrap`、`fromThrowable` = FFI 境界の `catch_unwind` という対応になり、「Rust に panic があるから Sumi にも」は prelude 関数案を支持する。
+- **移植性**: `throw new Error(x)` → `panic(x)` は一対一の機械的な書き換えで codemod で往復できる(D-3 / D-37)。移植で手間なのは `catch` 側を Result に直す作業で、`throw` を解禁しても `catch` まで解禁しない限り軽くならない。
+- **却下した代替案**: `throw` / `try..catch` の native サポート(上記の理由。ラッパーで吸収しきれないほど throw する外部 API が多い場合の逃げ道だが、それは ts-std-forge の守備範囲として進行中)。
+- **帰結**: synstate の `throw` 2 件(#1868 で `oxlint-disable`)は `todo()` / `panic()` に置き換えて disable を外す(ts-data-forge の次のリリース後)。exceptions.md の「panic 経路の関数が無い」論点は解消。

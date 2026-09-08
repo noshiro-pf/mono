@@ -1,4 +1,4 @@
-import { unknownToString } from '../../../others/index.mjs';
+import { panic, unknownToString } from '../../../others/index.mjs';
 import { match } from '../../match.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
@@ -30,7 +30,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *   for the error message when the Result is unexpectedly Ok. Defaults to
  *   `String`.
  * @returns The error value if `Result.Err`.
- * @throws {Error} Error with message "Expected Err but got Ok: {value}" if
+ * @throws {PanicError} Error with message "Expected Err but got Ok: {value}" if
  *   the `Result` is `Result.Ok`.
  */
 export const unwrapErrThrow = <R extends UnknownResult>(
@@ -47,7 +47,7 @@ export const unwrapErrThrow = <R extends UnknownResult>(
     'ts-data-forge::Result.err': 'Err',
   });
 
-  throw new Error(
+  panic(
     `Expected Err but got ${variant}: ${toStr(
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       result.value as UnwrapOk<R>,

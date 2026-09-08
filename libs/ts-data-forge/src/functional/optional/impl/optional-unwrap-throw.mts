@@ -1,3 +1,4 @@
+import { panic } from '../../../others/index.mjs';
 import { type UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { type Unwrap } from './types.mjs';
@@ -26,7 +27,7 @@ import { type Unwrap } from './types.mjs';
  * @template O The `UnknownOptional` type to unwrap.
  * @param optional The `Optional` to unwrap.
  * @returns The contained value if `Some`.
- * @throws {Error} Error with message "`unwrapThrow()` has failed because it
+ * @throws {PanicError} Error with message "`unwrapThrow()` has failed because it
  *   is `None`" if the `Optional` is `None`.
  */
 export const unwrapThrow = <O extends UnknownOptional>(
@@ -37,5 +38,5 @@ export const unwrapThrow = <O extends UnknownOptional>(
     return optional.value as Unwrap<O>;
   }
 
-  throw new Error('`unwrapThrow()` has failed because it is `None`');
+  panic('`unwrapThrow()` has failed because it is `None`');
 };

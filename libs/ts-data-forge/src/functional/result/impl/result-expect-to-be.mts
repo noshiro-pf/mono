@@ -1,3 +1,4 @@
+import { panic } from '../../../others/index.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
@@ -29,7 +30,7 @@ import { type UnwrapOk } from './types.mjs';
  * @param result The `Result` to unwrap.
  * @param message The error message to throw if the `Result` is `Result.Err`.
  * @returns The success value if `Result.Ok`.
- * @throws Error with the provided message if the `Result` is `Result.Err`.
+ * @throws {PanicError} A panic with the provided message if the `Result` is `Result.Err`.
  */
 export function expectToBe<R extends UnknownResult>(
   result: R,
@@ -69,5 +70,5 @@ const expectToBeImpl = <R extends UnknownResult>(
     return unwrapOk(result);
   }
 
-  throw new Error(message);
+  panic(message);
 };

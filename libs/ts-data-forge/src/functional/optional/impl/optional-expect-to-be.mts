@@ -1,3 +1,4 @@
+import { panic } from '../../../others/index.mjs';
 import { type Optional, type UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { unwrap } from './optional-unwrap.mjs';
@@ -32,7 +33,7 @@ import { type Unwrap } from './types.mjs';
  * @param message The error message to throw if the `Optional` is
  *   `None`.
  * @returns The contained value if `Some`.
- * @throws Error with the provided message if the `Optional` is
+ * @throws {PanicError} A panic with the provided message if the `Optional` is
  *   `None`.
  */
 export function expectToBe<O extends UnknownOptional>(
@@ -71,5 +72,5 @@ const expectToBeImpl = <O extends UnknownOptional>(
     return unwrap(optional);
   }
 
-  throw new Error(message);
+  panic(message);
 };

@@ -1,3 +1,4 @@
+import { isPanicError } from '../../../others/index.mjs';
 import { Result } from '../../result/index.mjs';
 import { type AsyncResult } from '../async-result.mjs';
 
@@ -73,6 +74,10 @@ const fromThrowableImpl = async <S, E>(
   try {
     return Result.ok(await fn());
   } catch (error) {
+    // A panic is a bug, not a recoverable failure: let it propagate.
+
+    if (isPanicError(error)) throw error;
+
     return Result.err(mapError(error));
   }
 };

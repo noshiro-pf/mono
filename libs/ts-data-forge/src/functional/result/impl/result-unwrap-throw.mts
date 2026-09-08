@@ -1,4 +1,4 @@
-import { unknownToString } from '../../../others/index.mjs';
+import { panic, unknownToString } from '../../../others/index.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
 import { type UnwrapErr, type UnwrapOk } from './types.mjs';
@@ -29,7 +29,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  * @param toStr An optional function to convert the error value to a string
  *   for the error message. Defaults to `String`.
  * @returns The success value if `Result.Ok`.
- * @throws {Error} Error with the stringified error value if the `Result` is
+ * @throws {PanicError} Error with the stringified error value if the `Result` is
  *   `Result.Err`.
  */
 export const unwrapThrow = <R extends UnknownResult>(
@@ -38,7 +38,7 @@ export const unwrapThrow = <R extends UnknownResult>(
 ): UnwrapOk<R> => {
   if (isErr(result)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    throw new Error(toStr(result.value as UnwrapErr<R>));
+    panic(toStr(result.value as UnwrapErr<R>));
   }
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

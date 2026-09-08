@@ -1,5 +1,5 @@
 import { isError } from '@sindresorhus/is';
-import { unknownToString } from '../../../others/index.mjs';
+import { isPanicError, unknownToString } from '../../../others/index.mjs';
 import { type Result } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { ok } from './result-ok.mjs';
@@ -9,7 +9,9 @@ import { ok } from './result-ok.mjs';
  *
  * This is a fundamental utility for converting traditional exception-based
  * error handling into Result-based error handling. Any thrown value is
- * converted to an Error object for consistent error handling.
+ * converted to an Error object for consistent error handling. A `PanicError`
+ * (thrown by `panic` or the unwrap functions) is rethrown instead: a bug is
+ * not a recoverable failure.
  *
  * If the function executes successfully, returns `Result.Ok` with the result.
  * If the function throws, returns `Result.Err` with the caught error.
@@ -37,6 +39,10 @@ export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
   try {
     return ok(fn());
   } catch (error) {
+    // A panic is a bug, not a recoverable failure: let it propagate.
+
+    if (isPanicError(error)) throw error;
+
     if (isError(error)) {
       return err(error);
     }

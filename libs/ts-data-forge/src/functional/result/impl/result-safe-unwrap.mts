@@ -1,3 +1,4 @@
+import { panic } from '../../../others/index.mjs';
 import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
 import { type NarrowToErr, type UnwrapOk } from './types.mjs';
@@ -40,7 +41,7 @@ export function* safeUnwrap<R extends UnknownResult>(
   if (isErr(result)) {
     yield result;
 
-    throw new Error(
+    panic(
       '`safeUnwrap()` generator was resumed after yielding an `Err`; it must only be used via `yield*` inside `safeTry()`',
     );
   }

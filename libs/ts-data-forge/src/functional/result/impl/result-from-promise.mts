@@ -1,3 +1,4 @@
+import { isPanicError } from '../../../others/index.mjs';
 import { type Ok } from '../../../types.mjs';
 import { type Result } from '../result.mjs';
 import { err } from './result-err.mjs';
@@ -15,7 +16,8 @@ type UnwrapPromise<P extends Promise<unknown>> =
  * Converts a Promise into a Promise that resolves to a `Result`. If the input
  * Promise resolves, the `Result` will be `Ok` with the resolved value. If the
  * input Promise rejects, the `Result` will be `Err` with the rejection
- * reason.
+ * reason. A rejection with a `PanicError` is rethrown instead: a bug is not
+ * a recoverable failure.
  *
  * The error channel is `unknown`, since the rejection reason is carried
  * through untouched. For a concrete error type, use `AsyncResult.fromPromise`
@@ -47,5 +49,13 @@ type UnwrapPromise<P extends Promise<unknown>> =
 export const fromPromise = <P extends Promise<unknown>>(
   promise: P,
 ): Promise<Result<UnwrapPromise<P>, unknown>> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  promise.then((v) => ok(v) as Ok<UnwrapPromise<P>>).catch(err);
+  promise
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    .then((v) => ok(v) as Ok<UnwrapPromise<P>>)
+    .catch((error: unknown) => {
+      // A panic is a bug, not a recoverable failure: let it propagate.
+
+      if (isPanicError(error)) throw error;
+
+      return err(error);
+    });
