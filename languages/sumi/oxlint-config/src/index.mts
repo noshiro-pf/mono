@@ -1,3 +1,4 @@
+export * from './expect-error-markers.mjs';
 export * from './oxlint-paths.mjs';
 export * from './plugin/index.mjs';
 export * from './rule-id-mapping.mjs';

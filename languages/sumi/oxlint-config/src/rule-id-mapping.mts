@@ -104,3 +104,22 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
 export const implementedRuleIds: ReadonlySet<string> = new Set(
   oxlintCodeToRuleId.values(),
 );
+
+/**
+ * The neutral ID for one engine diagnostic code — the single normalization
+ * both the conformance corpus and `sumi check` compare markers against.
+ *
+ * A TypeScript diagnostic that tsgolint passes through arrives as
+ * `TS(<code>)`, and is the corpus's `compiler/<code>`: a diagnostic of the
+ * fixed compilerOptions rather than of a lint rule
+ * (languages/sumi/docs/conformance-corpus.md). Anything the mapping does not
+ * know becomes `unmapped:<code>`, which the corpus asserts never appears —
+ * an unmapped code is a preset that grew a rule the mapping has not heard of.
+ */
+export const toRuleId = (code: string): string => {
+  const compiler = /^TS\((\d+)\)$/u.exec(code);
+
+  return compiler?.[1] === undefined
+    ? (oxlintCodeToRuleId.get(code) ?? `unmapped:${code}`)
+    : `compiler/${compiler[1]}`;
+};

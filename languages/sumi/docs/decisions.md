@@ -436,7 +436,12 @@
 - **ステータス**: 確定(2026-09-08、ユーザー提案)
 - **判断**: 適合性コーパスのマーカー `// @sumi-expect <rule-id>` を **`// @sumi-expect-error <rule-id>`** に改名する(ファイル全体は `// @sumi-expect-error-file <rule-id>`)。用法は `@ts-expect-error` と同じ「この行にこの診断が出る」。コーパス内では**抑制ではなく期待の表明**(出なければ失敗、余分に出ても失敗 — conformance-corpus.md の exact match)。
 - **理由**: `@sumi-expect banned-syntax/no-var` は「このルールを有効にする」設定ディレクティブに見える。`-error` を付ければ `@ts-expect-error` と同じ語形で一意に読め、`compiler/<code>` の診断にも自然に当てはまる(Sumi の診断はすべて error)。
-- **帰結(将来)**: ユーザーコードでの Sumi 自身の抑制コメントを設けるなら同じ字面 `// @sumi-expect-error <中立 ID>` にし、意味論も `@ts-expect-error` と同じ「**診断が出なければそれ自体が違反**」とする(disable 系と違って古い抑制が残らない)。中立 ID で書くのでエンジン(oxlint → 専用チェッカー)を替えても変わらず、現在 synstate で使っている `oxlint-disable-next-line sumi/no-throw` のようなエンジン固有のコメントを置き換えられる。採用時期は `sumi check` の設定(`sumi.config.json`、D-46)と併せて決める。
+- **帰結(将来 → 実施済み 2026-09-09)**: ユーザーコードでの Sumi 自身の抑制コメントを設けるなら同じ字面 `// @sumi-expect-error <中立 ID>` にし、意味論も `@ts-expect-error` と同じ「**診断が出なければそれ自体が違反**」とする(disable 系と違って古い抑制が残らない)。中立 ID で書くのでエンジン(oxlint → 専用チェッカー)を替えても変わらず、現在 synstate で使っている `oxlint-disable-next-line sumi/no-throw` のようなエンジン固有のコメントを置き換えられる。~~採用時期は `sumi check` の設定(`sumi.config.json`、D-46)と併せて決める。~~ → **`sumi check` に実装した(ユーザー決定)**。`sumi.config.json` を待たずに入れたのは、この機能に設定項目が無いため — マーカーはコード中にあり、有効・無効の選択肢が無い。要点:
+    - マーカーが当たった lint 診断は抑制し、**当たらなかったマーカーは `unused @sumi-expect-error` として報告して exit 1** にする。後者がこのコメントの存在理由で、`oxlint-disable` 系と違って古い抑制が残らない。
+    - **対象は lint 診断のみ**。コンパイラ診断には `@ts-expect-error` があり TypeScript 自身が同じ陳腐化検査をするので、1 つの仕事に 2 つのコメントを置くと「どちらが効くのか」が問題になるだけ。
+    - **2 つのエンジン(oxlint プリセットと型認識チェッカー、D-54)をまとめて 1 パスで照合する**。マーカーが語れるのは中立 ID だけで、どちらのエンジンが出した診断かは書けない(コーパスが両者を 1 本のリストに統合するのと同じ理由)。エンジンごとに照合すると、他方が答えたマーカーがすべて unused になる。
+    - **マーカーのパーサはコーパスと共有**する(`@sumi-lang/oxlint-config` の `expect-error-markers.mts` に移動)。字面と意味論が同じである以上、実装が 2 つあるとずれる。中立 ID への正規化(`toRuleId`)も同じ理由で共有に上げた。
+    - 別 ID を書いたマーカーは「当たらなかった」扱いで、その行の診断はそのまま残る。そこにある診断を無条件に飲み込む方が blanket disable に近づくため。
 
 ## D-52: `export * from` を含むファイルは `export * from` だけで構成する(barrel の混在禁止)
 

@@ -1,9 +1,9 @@
+import { parseMarkers } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import {
   fixturesRootPath,
   isKnownRuleId,
   listFixtures,
-  parseMarkers,
 } from '../src/index.mjs';
 
 /**
