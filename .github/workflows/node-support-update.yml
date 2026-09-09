@@ -1,0 +1,248 @@
+# cspell:ignore esbuild rollup vitest
+name: Node.js Support Update
+
+# Keeps tools/configs/node-support.json — and every `package.json` field
+# derived from it — following the Node.js release lines, and tries the next
+# major before it exists.
+#
+# Two jobs, answering the two ends of the same question:
+#
+# - `canary` runs the build and the tests on the newest *release* and on a
+#   nightly of the next major. Neither is a required status check and neither
+#   gates a pull request; a failure opens an issue instead. This is what makes
+#   the `reactive` upper-bound policy honest rather than optimistic: a nightly
+#   of the next major exists roughly nine months before that major ships, so an
+#   incompatibility is found, and `knownBroken` written down, long before any
+#   consumer can install a Node that hits it.
+# - `update` refreshes the pinned `lts` and `current` versions and opens a pull
+#   request. It never moves `targets.minimum` — that is the `engines.node` floor
+#   of every published package, so raising it is a breaking change and a
+#   decision, not a weekly chore. See update-node-support.mts.
+#
+# The pull request is where the new versions are proven: node-version-compatibility.yml
+# runs the full matrix on it, so a version that does not work never reaches
+# main. That is the whole reason the refresh is a pull request and not a push.
+
+on:
+  schedule:
+    # Weekly, Tuesday 05:17 JST (20:17 UTC Monday). Node's release cadence is
+    # measured in weeks and its majors are scheduled a year out, so a daily run
+    # would only add noise — nine months of nightly lead time is not improved
+    # by finding out on Tuesday instead of the following Monday.
+    - cron: '17 20 * * 1'
+
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+      issues: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # `current` is the newest release, floating — the pinned `current` in
+        # node-support.json is a week behind it at most, and this catches the
+        # patch that broke something before the refresh pull request does.
+        # `nightly` is the next major, which has no release at all yet.
+        channel: [current, nightly]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      # `setup-node` takes `<major>-nightly` and resolves it to the newest
+      # nightly of that line; the major comes from the pinned `current` rather
+      # than being written here, so this follows the release lines too.
+      - name: Resolve the Node.js version for `${{ matrix.channel }}`
+        id: node-version
+        env:
+          CHANNEL: ${{ matrix.channel }}
+        run: |
+          set -euo pipefail
+          if [ "${CHANNEL}" = 'current' ]; then
+            version='current'
+          else
+            current_major="$(node -p "require('./tools/configs/node-support.json').targets.current.split('.')[0]")"
+            version="$((current_major + 1))-nightly"
+          fi
+          echo "${CHANNEL} -> ${version}"
+          echo "version=${version}" >>"${GITHUB_OUTPUT}"
+
+      - name: Set up Node.js for `${{ matrix.channel }}`
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ steps.node-version.outputs.version }}
+          cache: 'pnpm'
+
+      # No `--engine-strict` here, unlike node-version-compatibility.yml, and
+      # not by oversight. A semver range matches a prerelease only when one of
+      # its comparators names the same `major.minor.patch` *and* carries a
+      # prerelease tag, so `>=22.22.2` does not match `27.0.0-nightly…` — the
+      # install would fail on every nightly run whatever `engines.node` said,
+      # which is the one outcome that would tell us nothing.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run ws:build
+
+      - name: Test
+        run: pnpm run ws:test
+
+  # Turns a red canary into an issue, because nothing else would: the job is
+  # not a required check and runs on a schedule, where a failure is an email
+  # nobody reads. One issue per channel, reused — a comment on the open one
+  # rather than a new issue every week.
+  canary-report:
+    needs: canary
+    if: always() && needs.canary.result == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Open or update the tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          title='Node.js canary is failing'
+
+          body="$(printf '%s\n' \
+            'The scheduled Node.js canary failed: the build or the tests did not pass on the newest release, on a nightly of the next major, or on both.' \
+            '' \
+            "Run: ${RUN_URL}" \
+            '' \
+            'What to do with it:' \
+            '' \
+            '1. Open the run and see which channel failed, and whether the failure is in what the packages *publish* or only in the build toolchain (tsx, esbuild, rollup, vitest). Only the first kind says anything about `engines.node`.' \
+            '2. If a published package is genuinely broken on that Node, record it in `tools/configs/node-support.json` as `knownBroken` — `since`, `reason`, and this issue number. Under the `reactive` policy that is what adds the `<major` upper bound to every published `engines.node`; `pnpm run check:root:node-support --fix` writes it out, and it needs a changeset because it narrows what consumers may install.' \
+            '3. If the toolchain is what broke, nothing about `engines` changes. Fix or pin the tool.' \
+            '' \
+            'Close this once the canary is green again, or once `knownBroken` records the breakage; the next failing run reopens the conversation with a new comment.')"
+
+          # The phrase is quoted inside the search so GitHub matches it whole
+          # rather than as five separate terms, and the result is filtered on
+          # an exact title anyway — a search is a ranking, not a lookup.
+          existing="$(gh issue list --state open --search "\"${title}\" in:title" --json number,title \
+            --jq "map(select(.title == \"${title}\")) | .[0].number // empty")"
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No token in the git config: `pnpm install` below runs dependency
+          # lifecycle scripts, and the App token must not be exposed to them.
+          # It is supplied inline for the push alone, as in pnpm-update.yml.
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Refreshes `lts` and `current` from nodejs.org and rewrites the
+      # `volta.node` / `devEngines.runtime` fields that follow them.
+      # `targets.minimum` and therefore `engines.node` are left alone, which is
+      # why this pull request needs no changeset: nothing a consumer can
+      # observe changes.
+      - name: Refresh the Node.js support targets
+        run: pnpm run node-support:update
+
+      - name: Format what changed
+        run: pnpm run fmt:full
+
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
+          permission-contents: write # push the branch
+          permission-pull-requests: write # open the pull request
+
+      - name: Open a pull request if anything changed
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo 'Node support targets already up to date; nothing to do.'
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # A fixed branch name rebuilt from main every run, as in
+          # pnpm-update.yml: one open pull request at a time, always rebased,
+          # never a stale one left beside the new one.
+          branch='chore/node-support-update'
+          git switch -c "$branch"
+          git add -A
+          git commit -m 'chore: refresh the Node.js support targets'
+
+          remote_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          # `--force-with-lease` with an explicit value: `actions/checkout`
+          # configures a fetch refspec for the default branch alone, so this
+          # branch has no remote-tracking ref and the valueless form would be
+          # rejected as "stale info" on every run after the first. An empty
+          # expected value means "expect it not to exist".
+          remote_ref="$(git ls-remote "$remote_url" "refs/heads/${branch}")"
+          expected="$(printf '%s' "$remote_ref" | cut -f1)"
+
+          git push --force-with-lease="refs/heads/${branch}:${expected}" \
+            "$remote_url" \
+            "HEAD:refs/heads/${branch}"
+
+          # By branch name alone `gh pr view` also finds a merged pull request,
+          # and this branch is recreated every run — so ask for an open one.
+          if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title 'chore: refresh the Node.js support targets' \
+              --body "$(printf '%s\n' \
+                'Refreshes the pinned `lts` and `current` versions in `tools/configs/node-support.json` from the Node.js release data, and the `volta.node` / `devEngines.runtime` fields derived from them.' \
+                '' \
+                'The `engines.node` floor (`targets.minimum`) is deliberately not touched: raising it is a breaking change for consumers, so it moves by a decision rather than on a schedule. Nothing a consumer can observe changes here, which is why there is no changeset.' \
+                '' \
+                'The compatibility matrix on this pull request is what proves the new versions work. Rebuilt from main every run, so force-pushes to this branch are expected.')"
+          fi

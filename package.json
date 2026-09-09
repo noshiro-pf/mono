@@ -32,7 +32,9 @@
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:lint": "pnpm run z:eslint ./tools/{scripts,configs}/**/*.mts --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
+    "check:root:node-support": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-node-support.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
+    "check:root:test": "vitest run --config ./tools/configs/vitest.tools.config.mts",
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
@@ -50,6 +52,7 @@
     "knip": "knip --no-progress --no-config-hints --include dependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
     "lint:published-deps": "pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' --quiet",
     "md": "markdownlint-cli2",
+    "node-support:update": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/update-node-support.mts",
     "prepare": "pnpm run z:link-strict-lib",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
@@ -141,6 +144,6 @@
     "pnpm": ">=9.0.0"
   },
   "volta": {
-    "node": "25.9.0"
+    "node": "26.8.1"
   }
 }
