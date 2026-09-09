@@ -1,4 +1,5 @@
 import { Arr, type Optional, type Some } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type MutableSet } from 'ts-type-forge';
 import {
   isChildObservable,
@@ -271,11 +272,10 @@ const detectCircularDependency = (
   for (const parent of parents) {
     if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
       // A programming error (invariant violation), not a recoverable
-      // failure. The Sumi form is `panic(...)` (D-48), which lives in
-      // ts-std-forge; this package does not depend on it yet, so the throw
-      // stays until it does.
-      // oxlint-disable-next-line sumi/no-throw
-      throw new Error(
+      // failure. `panic` marks the error it throws, so the `Result` /
+      // `AsyncResult` boundaries rethrow it rather than turning an invariant
+      // violation into an `Err` a caller might handle (Sumi D-48 / D-53).
+      panic(
         'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
       );
     }

@@ -1,4 +1,5 @@
 import { Arr, Optional } from 'ts-data-forge';
+import { todo } from 'ts-std-forge';
 import {
   type MutableMap,
   type MutableSet,
@@ -254,11 +255,10 @@ export const createTryUpdateNotImplemented = (): ((
 ) => void) => tryUpdateNotImplemented;
 
 const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
-  // A programming error, not a recoverable failure. The Sumi form is
-  // `todo(...)` / `panic(...)` (D-48), which lives in ts-std-forge; this
-  // package does not depend on it yet, so the throw stays until it does.
-  // oxlint-disable-next-line sumi/no-throw
-  throw new Error('not implemented');
+  // A programming error, not a recoverable failure: this is the `tryUpdate`
+  // of an observable that has no parents, so nothing should be calling it.
+  // `todo()` panics with exactly the message this used to throw (Sumi D-48).
+  todo();
 };
 
 type AssembleObservableArgs<

@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "ts-data-forge": "workspace:^",
+    "ts-std-forge": "workspace:^",
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {

@@ -29,8 +29,9 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
-        {/* bundle-size:synstate */}~4.6 kB min+gzip
-        {/* /bundle-size:synstate */} with only one external runtime dependency.
+        {/* bundle-size:synstate */}~4.7 kB min+gzip
+        {/* /bundle-size:synstate */} with two external runtime dependencies,
+        one of which depends on the other.
     </Card>
     <Card title="Built-in Async Operators" icon="setting">
         `debounce`, `throttle`, `switchMap`, and more — handle complex async
