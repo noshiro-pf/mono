@@ -925,6 +925,104 @@ during the monorepo consolidation; do not reintroduce `release.config.js`.
   `ts-data-forge/ts-data-forge@14.1.0`, …) are imported history from the
   standalone repositories that were merged in; never create new tags in that form.
 
+## Node.js version support
+
+**`tools/configs/node-support.json` is the single source of truth, and
+`pnpm run check:root:node-support` is what keeps everything else agreeing with
+it.** Three pinned versions live there, and three `package.json` fields plus
+the compatibility matrix are derived from them.
+
+| version   | derives                                    | answers                                                |
+| :-------- | :----------------------------------------- | :----------------------------------------------------- |
+| `minimum` | `engines.node`, the matrix `minimum` entry | what a _consumer_ needs to install a published package |
+| `lts`     | the matrix `lts` entry                     | what is _tested_                                       |
+| `current` | `volta.node`, the matrix `current` entry   | what a _contributor_ builds on                         |
+
+Those are three different questions, and conflating them is the failure this
+check exists to stop.
+
+- **`engines.node` is a promise to consumers, not a record of what was
+  tested.** Its floor is `targets.minimum`, and raising it is a breaking change
+  — every consumer on an older Node stops being able to install. It therefore
+  moves by a decision (a line is dropped, an API is adopted), never because the
+  matrix was refreshed. The direction is one-way: the floor is chosen first and
+  the matrix minimum follows it.
+- **A line going EOL is not on its own a reason to raise the floor.** It is a
+  reason to stop _testing_ the line. Those are separate events, and only the
+  second one is breaking. `update-node-support.mts` says so in a warning rather
+  than acting on it.
+- **The floor is tested at exactly the version it names.** `minimum` is a
+  pinned patch, not a range, and the matrix runs it — a floor nothing runs on is
+  a claim rather than a fact. `pnpm install --engine-strict` in that job is what
+  turns it into a check: pnpm refuses the install when any package's
+  `engines.node` excludes the running version.
+- **`volta.node` is what CI actually runs.** `actions/setup-node` resolves
+  `node-version-file: 'package.json'` through `volta.node` first, so the root's
+  value is the Node nine of the ten workflows use. It was `25.9.0` — a line that
+  reached end of life in June 2026 — until this check started asserting it
+  equals `targets.current`.
+
+### The upper bound
+
+`policy` decides what an upper bound on `engines.node` is allowed to mean. It
+is `reactive`: no bound normally, and a `<major` bound exactly while
+`knownBroken` names a version that broke. The bound is _derived_ from
+`knownBroken`, so "we know it breaks above N" cannot quietly become "we have
+not tried above N" — a bound with nothing behind it fails the check.
+
+The alternative `major-ceiling` bounds the top at the major after
+`targets.current` whether or not anything is known to be broken. It is
+supported and it is not the default, because an upper bound is not free: pnpm
+and npm refuse the install under `engine-strict`, Yarn 1 refuses by default,
+and the consumer cannot override it for one dependency. Blocking every
+consumer on a new Node to guard against a break that usually does not happen
+costs more than it saves — and unlike the matrix, which a commit fixes, a
+published `engines` range is wrong until a release goes out and consumers
+upgrade to it.
+
+### The scheduled jobs
+
+`node-support-update.yml` runs weekly and does two things that do not depend on
+each other:
+
+- **`update` refreshes `lts` and `current`** from nodejs.org and opens a pull
+  request. It never touches `targets.minimum` (that needs
+  `--allow-minimum-change`, which the schedule does not pass), so nothing a
+  consumer can observe changes and no changeset is needed. The compatibility
+  matrix on that pull request is what proves the new versions work — which is
+  why the refresh is a pull request and not a push.
+- **`canary` runs the build and the tests on the newest release and on a
+  nightly of the next major.** Neither is a required check; a failure opens an
+  issue. This is what makes `reactive` honest rather than optimistic: a nightly
+  of the next major exists roughly nine months before that major ships, so an
+  incompatibility is found — and `knownBroken` written down and released —
+  before any consumer can install a Node that hits it.
+
+Two things about that canary are deliberate and easy to undo by accident:
+
+- **It installs without `--engine-strict`.** A semver range matches a
+  prerelease only when one of its comparators names the same
+  `major.minor.patch` _and_ carries a prerelease tag, so `>=22.22.2` does not
+  match `27.0.0-nightly…`. With `--engine-strict` the install would fail on
+  every nightly run whatever `engines.node` said — the one outcome that would
+  tell us nothing.
+- **A canary failure is not automatically an `engines` change.** Only a failure
+  in what the packages _publish_ says anything about `engines.node`; a build
+  toolchain that does not run on the next Node yet (tsx, esbuild, rollup,
+  vitest) is a `volta.node` problem at most. The issue the job opens says which
+  question to ask first.
+
+### `devEngines`
+
+Nothing declares `devEngines.runtime`, and the check governs it only where it
+is declared. Adopting it is a larger decision than it looks: pnpm implements
+only `onFail: "download"` — `error`, `warn` and `ignore` are read and ignored —
+and under `download` it treats the runtime as a dependency, writing
+`node@runtime:^X.Y.Z` into `pnpm-lock.yaml` and fetching Node on every install.
+So the field is either inert here or it changes how the repository installs.
+`volta.node` carries the same information meanwhile, and carries it where
+`setup-node` reads it.
+
 ## Dependencies
 
 - **Every package declares what it imports.** `packageDirs` in a package's
