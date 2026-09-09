@@ -1,6 +1,6 @@
-# @sumi-lang/cli
+# @sumi-lang/conformance
 
-## 0.0.2
+## 0.0.1
 
 ### Patch Changes
 
@@ -30,14 +30,3 @@
     so that the corpus and the CLI share one implementation — one spelling and one
     meaning cannot survive two parsers. The neutral-ID normalization (`toRuleId`)
     moves with it for the same reason; it was a private helper in the corpus test.
-
-- Updated dependencies [003c848]
-    - @sumi-lang/oxlint-config@0.0.2
-
-## 0.0.1
-
-### Patch Changes
-
-- Updated dependencies [9c21467]
-    - ts-data-forge@14.7.0
-    - @sumi-lang/oxlint-config@0.0.1

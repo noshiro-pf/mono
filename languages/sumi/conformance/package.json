@@ -1,6 +1,6 @@
 {
   "name": "@sumi-lang/conformance",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Sumi). See languages/sumi/docs/conformance-corpus.md.",
   "repository": {
