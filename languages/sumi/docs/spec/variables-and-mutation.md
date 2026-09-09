@@ -46,7 +46,7 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 強制手段
 
-- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`functional/immutable-data`、`prefer-const`。
+- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入 / `delete` / `Array`・`Map`・`Set`・`Object` の破壊的メソッド。型情報が要るので oxlint preset ではなくチェッカー側。[enforcement-map.md](../enforcement-map.md))。
 
 ## TS へ戻るときの影響
 
@@ -59,7 +59,8 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 未解決の論点
 
-- 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
+- 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。**チェッカーの現状(2026-09-10)**: `sumi/no-mutation-without-mut-prefix` は**アクセスパスのどのセグメントに `mut_` があっても許可する**(`mut_xs[0]`、`state.mut_seen.x`)。ESLint ブリッジの `ignoreIdentifierPattern: ['^mut_']` + `ignoreAccessorPattern: ['**.mut_**']` の追認であって、仕様上の決定ではない。根に限るなら実装は 1 行縮む。
+- **`window.location.href` 等の実務例外(2026-09-10、未決)。** ESLint ブリッジは `window.location.href` / `**.current.**`(React ref)/ `**.displayName` / `**.scrollTop` / `**.debugLabel`(jotai)を例外にしているが、チェッカー側のルールには**入れていない**。synstate 3 パッケージでは 1 件も要らなかった(実測)ため、要ると分かった時点で「どれを言語の境界規定として認めるか」を決める。
 - **未初期化の変数は許可しない(2026-09-09、ユーザー決定 — issue #1753 のコメント)。** 宣言は必ず初期化子を持つ。「まだ値が無い」ことは `undefined` または `Optional.none` を**明示的に書く**ことで表す。`let mut_x;` のように初期化子を省いた宣言は書けない。
     - **帰結: `??=` は不要になる。** `x ??= v` の用途は「まだ初期化されていない変数に値を入れる」であり、初期化が必ず宣言と同時に起きるならこの操作の居場所が無い。D-29 は 3 つの論理代入をすべて許可したが、その根拠のうち `??=` の分は消える(`&&=` / `||=` の boolean 限定はそのまま — [decisions.md](../decisions.md) D-29)。
     - **実装に要るもの**(未着手): (1) 初期化子の無い宣言を禁止する構文ルール(`VariableDeclaration` の `initializer` が無い場合。型情報は要らない)。(2) `??=` を禁止に回す — 現在は `sumi/strict-logical-assignment-operands` が `??=` を対象外にしているので、その除外を外すのではなく「`??=` 自体を禁止」の別ルールにする(D-29 の改訂として決める)。

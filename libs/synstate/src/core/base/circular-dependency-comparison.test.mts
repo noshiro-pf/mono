@@ -7,7 +7,6 @@
  * - Jotai: circular atom definitions are silently accepted. A cycle manifests
  *   only at read time as a `Maximum call stack size exceeded` error.
  */
-/* eslint-disable functional/immutable-data */
 import { type Atom, atom, createStore } from 'jotai';
 import { BehaviorSubject, combineLatest, map as rxMap } from 'rxjs';
 import { Optional } from 'ts-data-forge';
@@ -26,7 +25,7 @@ describe('circular dependency comparison', () => {
         () => ({}),
       );
 
-      const childA = createSyncChildObservable(
+      const mut_childA = createSyncChildObservable(
         {
           parents: [root],
           initialValue: Optional.some(0),
@@ -36,16 +35,16 @@ describe('circular dependency comparison', () => {
 
       const childB = createSyncChildObservable(
         {
-          parents: [childA],
+          parents: [mut_childA],
           initialValue: Optional.some(0),
         },
         createTryUpdateNotImplemented,
       );
 
-      // Simulate a cycle: childA → childB → childA
+      // Simulate a cycle: mut_childA → childB → mut_childA
       // In normal usage this is impossible — the check runs in every
       // child constructor before the reference becomes available.
-      Object.defineProperty(childA, 'parents', {
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childB],
         writable: false,
         configurable: true,
@@ -54,7 +53,7 @@ describe('circular dependency comparison', () => {
       expect(() => {
         createSyncChildObservable(
           {
-            parents: [childA],
+            parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,

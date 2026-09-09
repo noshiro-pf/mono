@@ -58,6 +58,7 @@ export const knownRuleIds = [
   'modules/no-triple-slash',
   'modules/require-extension',
   'mutation/no-let-without-mut-prefix',
+  'mutation/no-mutation-without-mut-prefix',
   'mutation/no-shadow',
   'mutation/prefer-const',
   'null/no-null-in-type',
