@@ -218,7 +218,7 @@
 - **判断**: 代入先が `mut_` 変数であれば 3 つとも許可する。`&&=` / `||=` のオペランドは `&&` / `||` と同じ boolean 厳密化([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))の対象。`??=` は値の合体なので boolean 制約の対象外。
 - **理由**: `x &&= y` は `x = x && y` と同義で、boolean 厳密化の下では純粋な boolean の畳み込みにすぎない。本来の用途(`opts ||= {}` 等の truthiness idiom)はオペランド型の制約で既に違法になる。現行 config は `logical-assignment-operators: "always"` + `unicorn/logical-assignment-operators` で**論理代入形をむしろ強制**しており、禁止すると現行運用と衝突する。
 - **帰結(実装)**: `@typescript-eslint/strict-boolean-expressions` が検査するのは `LogicalExpression` / 条件位置 / `!` のみで、`AssignmentExpression`(`&&=` / `||=`)のオペランドは**検査しない**(2026-09-05 実測、typescript-eslint 8.67)。したがって `&&=` / `||=` の両オペランドの boolean 限定は 🆕 ルール。
-- **実装(2026-09-09)**: `boolean/strict-logical-assignment-operands`(`@sumi-lang/checker`、D-54)。型情報が要るので専用チェッカー側。両オペランドの型が boolean(`TypeFlags.BooleanLike`、union なら全メンバー)であることを要求し、`??=` は見ない。左オペランドが boolean なら TypeScript が右オペランドを boolean に制約するので、実際に捕まるのは `mut_name ||= fallback` のような truthiness idiom である。
+- **実装(2026-09-09)**: `boolean/strict-logical-assignment-operands`(`@sumi-lang/checker`、D-55)。型情報が要るので専用チェッカー側。両オペランドの型が boolean(`TypeFlags.BooleanLike`、union なら全メンバー)であることを要求し、`??=` は見ない。左オペランドが boolean なら TypeScript が右オペランドを boolean に制約するので、実際に捕まるのは `mut_name ||= fallback` のような truthiness idiom である。
 
 ## D-30: `using` / `await using` は Sumi lint では禁止し、Sumi sugar で再検討する
 
@@ -498,16 +498,36 @@
     - 残る型情報ルール(`castMutable` 乱用、論理代入のオペランド boolean 限定、`mut_` 以外への破壊的操作)も同じ場所に実装する。
     - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
 
-## D-55: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
+## D-56: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
 
 - **ステータス**: 確定(2026-09-09、ユーザー了承)
-- **背景**: D-54 で型情報ルール用の自前チェッカー(`@sumi-lang/checker`)ができ、`sumi check` は 2 エンジン(oxlint preset + 自前チェッカー)になった。Phase 2 の完了条件はもともと「対応表の全項目が専用チェッカーで検査され、preset が退役していること」なので、2 エンジン併存は**移行期間の姿**であって最終形ではない。では preset を今すぐ畳むか、が論点。
+- **背景**: D-55 で型情報ルール用の自前チェッカー(`@sumi-lang/checker`)ができ、`sumi check` は 2 エンジン(oxlint preset + 自前チェッカー)になった。Phase 2 の完了条件はもともと「対応表の全項目が専用チェッカーで検査され、preset が退役していること」なので、2 エンジン併存は**移行期間の姿**であって最終形ではない。では preset を今すぐ畳むか、が論点。
 - **現状(2026-09-09 計測)**: preset の有効ルールは **57 本**。内訳は自前の JS plugin が **20**、oxlint / tsgolint のネイティブが **37**(eslint core 20、typescript 13、import 3、unicorn 1)。
 - **判断**:
-    1. **段階的に減らす**。(a) 型情報が要る残り 3 ルールを自前チェッカーに実装する(D-54)。(b) 構文だけで決まるネイティブルール(20 本ほど)を、コーパスで同値性を保証しながら 1 本ずつ移す。(c) 残るのは型情報が要るネイティブ 5 本前後になるので、そこで「これも自前で書くか、oxlint を残すか」を実物の分量を見て判断する。
+    1. **段階的に減らす**。(a) 型情報が要る残り 3 ルールを自前チェッカーに実装する(D-55)。(b) 構文だけで決まるネイティブルール(20 本ほど)を、コーパスで同値性を保証しながら 1 本ずつ移す。(c) 残るのは型情報が要るネイティブ 5 本前後になるので、そこで「これも自前で書くか、oxlint を残すか」を実物の分量を見て判断する。
     2. **分ける線は「Sumi の言語仕様そのもの」か「TypeScript 一般の型安全規則」か**。前者はコーパスで固定すべき Sumi の定義そのものなので自前で持つ。後者はどの TS プロジェクトでも同じもので、自前で書き直すのは車輪の再実装になる。現在の 20 / 37 の分かれ目はほぼこの線に沿っている。
 - **理由**:
     - **一度に移すとコーパスがゲートとして機能しなくなる**。適合性コーパスが同値性を保証できるのは、片方を動かしてもう片方が固定されているときだけである。57 本を同時に移せば、コーパスは「新実装が旧実装と一致する」ではなく「新実装が自分自身と一致する」ことしか確認できない。
     - **型情報を要するネイティブルールの一部は、実績のある込み入った実装**である。`prefer-readonly-parameter-types`(再帰的 readonly 判定と循環参照)、`strict-boolean-expressions`、`no-unsafe-type-assertion`、`restrict-plus-operands`、`require-array-sort-compare`、そして `no-shadow`(スコープ解析)と `import/extensions`(モジュール解決)。書き直しは間違えたときに**黙って見逃す**種類の作業で、言語仕様の実装ではない。
     - 一方 2 エンジンのコストも実在する: oxlint プロセスの起動、JS plugin のロード、`dist` へのビルド、診断形式を中立 ID に正規化する層。(b) が進むほどこれらの価値は下がるので、(c) の判断はその時点の実物で行う。
 - **帰結**: implementation-plan の Phase 2 完了条件は変わらない。中立ルール ID(`conformance/src/rule-ids.mts`)がエンジンの差を隠す仕組みは、この移行の間ずっと効き続ける前提であり、移行のたびにコーパスが同値性を確認する。
+
+## D-57: `sumi check` は bulk suppressions で段階的移行を支え、suppressions が空であることを Sumi sugar 移行の前提条件にする
+
+- **ステータス**: 確定(2026-09-09、ユーザー要望 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)。機構の細部は未決(下記「検討事項」)。
+- **判断**:
+    1. **ESLint の bulk suppressions に相当する機構を `sumi check` に持たせる**。既存の違反をファイル外の一覧(仮に `sumi-suppressions.json`)にまとめて記録し、記録済みの分だけを黙らせる。既存の TS プロジェクトが「今日からは新しいコードだけ Sumi に従う」形で移行を始められるようにするのが目的。
+    2. **Sumi sugar への移行は suppressions が空であることを前提条件とする**。層の昇格ゲートであり、`sumi check` が config の層宣言(D-46)を読んで検査する。
+- **理由**:
+    - **移行の入口が要る**。数百〜数千件の違反を全部直すまで CI に載せられないのでは、大きなコードベースは Sumi を試すことすらできない。抑制を外部ファイルへ一括で追い出せば、初日から「新規の違反はゼロ」を強制できる。
+    - **行単位の抑制コメント(D-51 の `@sumi-expect-error`)ではこれができない**。数千行にコメントを挿入するのはレビュー不能な diff であり、`git blame` を汚し、消し忘れが個別のファイルに散る。移行の負債は **1 か所にまとまっていて数えられる形**にあるべきで、それは「今どれだけ残っているか」を CI とレビューが読める唯一の形でもある。役割分担は「恒久的・意図的な逸脱は行コメント(理由が書けてレビューで見える)、移行中の負債は suppressions(まとめて数えられる)」。行コメントの側は 2026-09-09 に `sumi check` へ実装済み(D-51)。
+    - **層の昇格ゲートとして自然である**。Sumi sugar は Sumi lint の規則が成り立っていることを前提に、セマンティクスを変える codemod を機械的に適用する(D-3 / D-37)。抑制された違反とは「Sumi lint に従っていないコード」なので、そこでは codemod の前提が成立しない。つまり **suppressions が空であることは sugar 移行の実装上の前提そのもの**であり、規約として足したものではない。三層は機能の段階であると同時に「規則を満たす度合い」の段階でもある、という読み方がここで具体化する。
+- **参考実装(ESLint 9.24+、10.9.1 の実装を確認)**: `Record<相対パス, Record<ruleId, { count: number }>>` の JSON(既定 `eslint-suppressions.json`)。`--suppress-all` / `--suppress-rule` で書き出し、`--prune-suppressions` で減った分を回収、`--pass-on-unpruned-suppressions` で未回収を許す。適用は**ファイル × ルールの件数比較**で、違反数が count 以下なら全件を `suppressedMessages` へ移し、count を超えたらそのルールの違反を**全件**報告する(超過分だけではない)。行番号もコード片も持たないので編集に強い。
+- **検討事項(未決)**:
+    1. **粒度**。count 方式(編集に強いが、同じファイル・同じルールで違反を入れ替えても気づかない)/ 行番号(編集で即壊れる)/ 違反箇所のコードのハッシュ(中間案。整形や周辺の変更に弱い)。第一候補は ESLint と同じ count 方式 — 精度より編集耐性を取る設計で、移行という用途に対しては正しい方の妥協に見える。
+    2. **ratchet の既定**。未回収の抑制(prune 対象)が残っていたら失敗させるか。**既定は失敗**にしたい(負債が単調減少することを CI が保証する)。ESLint も既定は失敗で、`--pass-on-unpruned-suppressions` が逃げ道。
+    3. **書式は中立ルール ID(`conformance/src/rule-ids.mts`)で書く**。2 エンジン併存(D-56)を跨いで同じファイルが効かなければならない。oxlint 側のルールを自前チェッカーへ移した瞬間に既存の suppressions が全部無効化されるのでは、D-56 の段階的移行と両立しない。
+    4. **抑制の対象は Sumi の lint 規則だけに限る**。tsc 診断(`compiler/<code>`)や拘束 compilerOptions の違反(`sumi check` 第 1 段)を抑制対象にすると、大原則 1「Sumi lint の有効なプログラムは有効な TS プログラム」が壊れる。型エラーを抱えたまま green になる状態は Sumi では作らない。
+    5. **置き場所**。`sumi.config.json`(D-46)に内包するか別ファイルにするか。生成物であり diff の性質(機械が書く・巨大・単調減少)が設定と違うので、**別ファイルが素直**。
+    6. **コーパスへの影響はない**。適合性コーパスは suppressions を読まない(読めば期待診断が消える)。この機構は CLI の層にあり、ルールエンジンには見えない位置に置く。
+    7. **`@sumi-expect-error`(D-51)との適用順**。両方が同じ診断に当たる行をどう扱うか。マーカーの方が具体的で自己回収する(当たらなければ失敗する)ので、**マーカーを先に適用し、残ったものを suppressions が濾す**のが素直に見える。逆順にすると、suppressions に飲まれたマーカーが `unused @sumi-expect-error` として報告され、移行中は直しようがない指摘が出る。ratchet の向きは両者で揃っている — マーカーは不要になった時点で失敗し、suppressions は prune で減る。

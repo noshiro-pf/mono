@@ -24,7 +24,7 @@ import { fixturesRootPath, listFixtures } from '../src/index.mjs';
  *
  * Two engines because a rule needs one or the other, never both: the oxlint
  * preset (@sumi-lang/oxlint-config) for what syntax settles, and the Sumi
- * checker (@sumi-lang/checker, D-54) on TypeScript 7's own API for what needs
+ * checker (@sumi-lang/checker, D-55) on TypeScript 7's own API for what needs
  * the type checker. The corpus does not care which produced a diagnostic —
  * that is the point of the neutral IDs — so the two lists are merged before
  * anything is compared.

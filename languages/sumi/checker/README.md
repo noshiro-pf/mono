@@ -4,7 +4,7 @@
 
 Sumi の**型情報が要るルール**を走らせるチェッカー。TypeScript 7 が同梱する
 JS API(`typescript-native/unstable/*`)の上に直接乗っており、1 プロジェクト
-= 1 プログラム = 1 パスで全ルールを回す(D-54)。
+= 1 プログラム = 1 パスで全ルールを回す(D-55)。
 
 構文だけで決まるルールは [@sumi-lang/oxlint-config](../oxlint-config) の
 oxlint preset 側にある。どちらのエンジンが出した診断かは中立ルール ID

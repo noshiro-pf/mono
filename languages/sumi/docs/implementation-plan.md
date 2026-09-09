@@ -32,7 +32,7 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - **エディタ統合を後回しにしない**(Flow の敗因 — [related-work.md](./related-work.md))。最初は CLI + TS language service plugin として出し、LSP を自作せずにエディタ診断を得る。watch モードは `ts.createWatchProgram` の incremental で。
 - Phase 1 preset からルールを 1 個ずつ移植し、適合性コーパスで同値性をゲートしながら ESLint 側を退役させる。移植完了まで両者は並走してよい(コーパスが同値性を保証する)。言語仕様に属さないスタイル規則は ESLint に残してよい。
 - 置き場所: `languages/sumi/cli`(@sumi-lang/cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
-- **着手済み(2026-09-09、D-54)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
+- **着手済み(2026-09-09、D-55)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
 - 完了条件: 対応表の全項目が専用チェッカーで検査され、subset preset(言語仕様分)が退役していること。
 
 ## Phase 3(Sumi sugar): fork parser はチェッカーと結合させずに足す
@@ -44,6 +44,16 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 
 - **React Compiler を意識した設計(2026-09-02、ユーザー要望 — issue #1753 のコメント、未整理)。** React Compiler は「コンポーネントとフックが冪等で、レンダー中に値を変更しない」ことを前提にメモ化を自動挿入する。Sumi の既存の規律 — `const` 既定と `mut_` prefix(D-14)、`functional/immutable-data` 相当、readonly 強制(D-45)、副作用 import の禁止 — はその前提とほぼ同じものを別の言葉で言っており、**Sumi lint を通ったコードは React Compiler が最適化できるコードである**という関係を明示できるはずである。整理すべき点: (1) React Compiler の bail-out 条件(レンダー中の変更、条件付きフック呼び出し、ref の読み書き)と Sumi の規則の対応表を作り、Sumi 側で捕まえられていない条件があれば規則を足すか記録する。(2) `mut_` 束縛をどこまで許すか — レンダー中のローカルな可変アキュムレータは React Compiler も許すので、規則の緩さの線が一致しているかを確認する。(3) React Compiler が要求する `"use memo"` / `"use no memo"` ディレクティブと、D-36 の default export emit 設定や `sumi.config` の関係。(4) synstate(このリポジトリの状態管理ライブラリ)と React Compiler の相互作用は別問題として切り分ける。
 
+### 既存コードベースの段階的移行(bulk suppressions、2026-09-09 追記 — D-57)
+
+`sumi check` に **ESLint の bulk suppressions 相当**を持たせ、既存の TS プロジェクトが違反を全部直す前に Sumi lint を CI へ載せられるようにする。既存の違反はファイル外の一覧(仮に `sumi-suppressions.json`)に件数として記録し、記録済みの分だけを黙らせる。**新規の違反はゼロ**が初日から強制でき、負債は 1 か所で数えられる。
+
+- **Sumi sugar への移行は suppressions が空であることを前提条件にする**(D-57)。sugar はセマンティクスを変える codemod を Sumi lint の規則が成り立っていることを前提に適用するので、抑制された違反が残っているコードでは前提が崩れる。三層は「規則を満たす度合い」の段階でもある。
+- **実装位置は CLI の層**(`@sumi-lang/cli`)。ルールエンジン(oxlint preset / `@sumi-lang/checker`)からは見えない位置に置き、診断を集めたあとで濾す。適合性コーパスはこの機構を通さない。
+- **記録は中立ルール ID で行う**。2 エンジン併存(D-56)を跨いで効かないと、oxlint 側のルールを自前チェッカーへ移した瞬間に既存の suppressions が全部無効化される。
+- **抑制の対象は Sumi の lint 規則だけ**。tsc 診断と拘束 compilerOptions の違反は対象外にする(大原則 1 が壊れるため)。
+- 未決の粒度・ratchet の既定・置き場所は D-57 の「検討事項」。
+
 ### ユーザー / コミュニティが lint ルールを追加できる仕組み(2026-09-08 追記、ユーザー要望)
 
 Sumi sugar / Sumi refined では、言語同梱の規則だけでなく**ユーザーやコミュニティが lint ルールを書いて足せる**ようにする。
@@ -51,6 +61,7 @@ Sumi sugar / Sumi refined では、言語同梱の規則だけでなく**ユー�
 - **設定**: `sumi.config.json`(将来的には `config.sumi` を検討)に lint 設定(有効にするルールとそのオプション、ルールの読み込み元)を追記すれば、`sumi check` が言語の検査と**併せて**実行する。層の宣言(D-46)や default export の emit 設定(D-36)と同じファイルになる見込み。
 - **ルールの記述**: ESLint / oxlint と同じ要領で **AST node にマッチさせる**形を基本にする(ts-morph のような形式も候補だが未深掘り)。Sumi lint のエンジンは oxlint の JS plugin(ESLint v9 互換 API — D-43)なので、lint 層のユーザールールは今日でも oxlint plugin として書けるが、sugar / refined では AST が Sumi の CST / 独自型検査器の上に載るため、Phase 2 の **facade(`ts.Node` + checker を直接晒さない薄い層)がそのままユーザールール API**になるのが望ましい。facade 上に書かれたルールはエンジンの乗り換え(oxlint → 専用チェッカー → refined の独自型検査器)を跨いで動く。
 - **エラーの報告**: `context.report` のような**即時の副作用**で発火する形に加えて、ルールを純関数(node と文脈を受けて診断の列を返す)として書き、**Result パターンで収集**する形が可能か検討する。診断が値になれば、ルールの合成・テスト(適合性コーパスの `valid` / `invalid` 形式をユーザールールにも流用)・並列実行が素直になる。両形式を同じ facade の上で提供するか、片方に寄せるかは設計時に決める。
+- **ドキュメントを成果物に含める(2026-09-09 追記、ユーザー要望 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)**: 「ルールを書ける」ことと「ルールが書ける形で公開されている」ことは別なので、**ルール作成ガイドを API と同時に用意する**。内容は (1) facade API のリファレンス(node 述語、checker に聞ける範囲、`report` と message ID)、(2) ルールのテストの書き方 — `@sumi-lang/checker` の `testRule(rule, { valid, invalid })` が既にこの形なので、公開時はこれがそのままユーザー向けのテストヘルパになる、(3) `sumi.config` への登録と配布、(4) 「構文で候補を絞ってから型を聞く」という性能上の作法(D-55: checker は RPC 越しでノード 1 個あたり 0.2 ms)。
 - **未検討**: ルールの配布形態(npm パッケージか単一ファイルか)、型情報を要するルールに checker をどこまで晒すか(D-43 の制約: oxlint はカスタム type-aware ルールを書けない)、ルール名の名前空間(`sumi/*` は言語同梱に予約)。
 
 ## リスクと監視事項
