@@ -1,11 +1,11 @@
 {
-  "name": "verify-eslint-plugin-ts-data-forge",
+  "name": "verify-eslint-plugin-ts-std-forge",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
     "eslint": ">=9.0.0",
-    "eslint-plugin-ts-data-forge": "0.7.3",
+    "eslint-plugin-ts-std-forge": "0.1.1",
     "typescript": ">=5.0.0 <7.0.0"
   }
 }
