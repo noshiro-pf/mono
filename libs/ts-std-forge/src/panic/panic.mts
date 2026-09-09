@@ -123,7 +123,7 @@ export const unreachable: (value?: never, message?: string) => never = (
 const unreachableMessage = (value: unknown): string =>
   value === undefined
     ? 'Reached code the types mark unreachable'
-    : `Reached code the types mark unreachable: ${unknownToString(value)}`;
+    : (`Reached code the types mark unreachable: ${unknownToString(value)}` as const);
 
 /**
  * Panics with "not implemented" — the placeholder for a code path that is

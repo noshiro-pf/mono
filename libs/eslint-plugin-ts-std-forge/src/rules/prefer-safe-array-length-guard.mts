@@ -45,12 +45,12 @@ const FLIPPED: ReadonlyRecord<string, string> = {
   '<': '>',
   '>=': '<=',
   '<=': '>=',
-};
+} as const;
 
 const MESSAGE_IDS: ReadonlyRecord<Guard, MessageIds> = {
   isEmpty: 'useIsEmpty',
   isNonEmpty: 'useIsNonEmpty',
-};
+} as const;
 
 export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
   MessageIds,

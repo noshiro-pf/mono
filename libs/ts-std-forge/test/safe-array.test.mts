@@ -11,7 +11,7 @@ describe('SafeArray.isArray', () => {
       null,
       { length: 2 },
       new Set([1]),
-    ];
+    ] as const;
 
     for (const value of values) {
       assert.strictEqual(SafeArray.isArray(value), Array.isArray(value));
@@ -31,7 +31,7 @@ describe('SafeArray.isArray', () => {
   });
 
   test('narrows unknown to readonly unknown[] rather than to any[]', () => {
-    const value: unknown = [1, 2];
+    const value: unknown = [1, 2] as const;
 
     if (SafeArray.isArray(value)) {
       expectType<typeof value, readonly unknown[]>('=');
@@ -51,7 +51,7 @@ describe('SafeArray.isEmpty', () => {
   });
 
   test('narrows to the empty tuple', () => {
-    const values: readonly number[] = [];
+    const values: readonly number[] = [] as const;
 
     if (SafeArray.isEmpty(values)) {
       expectType<typeof values, readonly []>('=');
@@ -69,7 +69,7 @@ describe('SafeArray.isNonEmpty', () => {
   });
 
   test('narrows the first element out of `E | undefined`', () => {
-    const values: readonly number[] = [1, 2];
+    const values: readonly number[] = [1, 2] as const;
 
     assert.isTrue(SafeArray.isNonEmpty(values));
 
@@ -81,7 +81,7 @@ describe('SafeArray.isNonEmpty', () => {
   });
 
   test('is the complement of isEmpty over the same inputs', () => {
-    const arrays: readonly (readonly number[])[] = [[], [0], [0, 1]];
+    const arrays: readonly (readonly number[])[] = [[], [0], [0, 1]] as const;
 
     for (const array of arrays) {
       assert.strictEqual(
@@ -110,7 +110,7 @@ describe('SafeArray.create', () => {
   });
 
   test('shares one reference across the elements', () => {
-    const init: { readonly tag: string } = { tag: 'x' };
+    const init: Readonly<{ tag: string }> = { tag: 'x' } as const;
 
     const result = SafeArray.create(2, init);
 
