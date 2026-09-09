@@ -47,6 +47,15 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Type checking passed',
   });
 
+  // The Sumi lint check of the dogfood packages (`sumi:check` scripts): the
+  // locked compilerOptions, the native type check and the oxlint preset, in
+  // one command per package (languages/sumi/docs/decisions.md, D-46).
+  await logStep({
+    startMessage: 'Running the Sumi check',
+    action: () => runCmdStep('pnpm run ws:sumi:check', 'Sumi check failed'),
+    successMessage: 'Sumi check passed',
+  });
+
   // The root lints itself with the workspace copies of eslint-config-typed and
   // the eslint-plugin-ts-* packages, which resolve to their `dist/`.
   await logStep({

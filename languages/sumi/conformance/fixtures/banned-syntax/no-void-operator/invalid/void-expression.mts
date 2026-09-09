@@ -1,2 +1,2 @@
-// @sumi-expect banned-syntax/no-void-operator
+// @sumi-expect-error banned-syntax/no-void-operator
 export const nothing = void 0;

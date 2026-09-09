@@ -1,5 +1,5 @@
-import { Result } from 'ts-data-forge';
 import { toUnexpectedError, type UnexpectedError } from '../../error/index.mjs';
+import { Result } from '../../functional/index.mjs';
 
 /**
  * Creates a `RegExp` from a dynamic pattern without throwing.

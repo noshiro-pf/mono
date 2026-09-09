@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Result } from '../../functional/index.mjs';
 
 /**
  * Parses a string as a base-10 integer — the alternative to calling
@@ -7,14 +7,17 @@ import { Result } from 'ts-data-forge';
  * global shadows it — the very thing Sumi forbids.)
  *
  * `Number.parseInt` ignores trailing non-numeric characters (`'123abc'` →
- * `123`) and `Number` coerces blank input to `0`. This function is the same
- * implementation as ts-data-forge's `Num.safeParseInt` (kept as a copy, not
- * a dependency, so that the two can be consolidated here later): the input
- * is accepted only when both `Number` and `Number.parseInt` agree it is a
- * finite number, and the `Number` result is truncated toward zero — which
- * rejects blank input and trailing garbage, and turns `'-12.9'` into `-12`.
- * (The finiteness check is the one addition over `Num.safeParseInt`, which
- * lets `'1e400'` through as `Infinity` typed as `Int`.)
+ * `123`) and `Number` coerces blank input to `0`. The input is accepted only
+ * when both `Number` and `Number.parseInt` agree it is a finite number, and
+ * the `Number` result is truncated toward zero — which rejects blank input
+ * and trailing garbage, and turns `'-12.9'` into `-12`.
+ *
+ * This is the single implementation of the conversion: ts-data-forge's
+ * `Num.safeParseInt` delegates here since D-49 (c) and only adds its own
+ * contract on top (the `Int` brand on the success side, an `Error` on the
+ * failure side). The finiteness check is what the old ts-data-forge
+ * implementation lacked — it let `'1e400'` through as `Infinity` typed as
+ * `Int`.
  *
  * @example
  *
@@ -45,10 +48,9 @@ import { Result } from 'ts-data-forge';
 export const parseInteger = (
   value: string,
 ): Result<number, ParseIntegerError> => {
-  // ts-std-forge is the boundary implementer (D-24): it wraps the raw
-  // conversion itself rather than importing the prelude's `Num.safeParseInt`,
-  // whose implementation this mirrors.
-  // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
+  // This is the implementation of the conversion, not a mirror of one:
+  // ts-data-forge's `Num.safeParse*` delegates here since D-49 (c). The
+  // raw `Number` call is what this function exists to wrap.
   const viaNumber = Number(value);
 
   // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
@@ -59,7 +61,6 @@ export const parseInteger = (
   // 穴)。有限性も要求する。
   return Number.isNaN(viaNumber) ||
     !Number.isFinite(viaNumber) ||
-    // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-int
     Number.isNaN(Number.parseInt(value, 10))
     ? Result.err({ kind: 'invalid-integer', input: value })
     : Result.ok(Math.trunc(viaNumber));

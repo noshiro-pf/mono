@@ -1,6 +1,6 @@
+import { runOxlint, type OxlintDiagnostic } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { runOxlint, type OxlintDiagnostic } from 'sumi-oxlint-config';
 import { Result } from 'ts-data-forge';
 import { showConfig } from './show-config.mjs';
 import { typeCheck, type TypeCheckDiagnostic } from './type-check.mjs';

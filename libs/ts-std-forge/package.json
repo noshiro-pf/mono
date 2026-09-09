@@ -2,7 +2,7 @@
   "name": "ts-std-forge",
   "version": "0.4.0",
   "private": false,
-  "description": "Safe wrappers for throwing / null-returning standard library APIs, returning Result and Optional from ts-data-forge",
+  "description": "Safe wrappers for throwing / null-returning standard library APIs, returning the Result and Optional this package also provides",
   "keywords": [
     "typescript",
     "result",
@@ -50,11 +50,12 @@
     "codemod:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
+    "doc:embed:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "prettier --write .",
     "gi": "pnpm run gi:src && pnpm run fmt",
-    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts",
+    "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --preserve 'functional/index.mts' --preserve 'functional/**/index.mts' --preserve 'regex/index.mts' --preserve 'safe-*/index.mts'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "pnpm run z:vitest:node run",
@@ -67,16 +68,16 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "ts-data-forge": "workspace:^",
+    "@sindresorhus/is": "^8.1.0",
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "cspell": "catalog:",
+    "dedent": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
-    "eslint-plugin-ts-data-forge": "workspace:*",
     "jiti": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",

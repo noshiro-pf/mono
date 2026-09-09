@@ -1,8 +1,8 @@
 {
-  "name": "sumi-oxlint-config",
+  "name": "@sumi-lang/oxlint-config",
   "version": "0.0.0",
   "private": true,
-  "description": "oxlint preset for Sumi lint: the fixed rule set, the sumi JS plugin (rules oxlint has no native equivalent for), and the neutral rule-ID mapping the conformance corpus runs against. See docs/sumi/enforcement-map.md.",
+  "description": "oxlint preset for Sumi lint: the fixed rule set, the sumi JS plugin (rules oxlint has no native equivalent for), and the neutral rule-ID mapping the conformance corpus runs against. See languages/sumi/docs/enforcement-map.md.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",

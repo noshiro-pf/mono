@@ -1,2 +1,1 @@
-export * from './impl/index.mjs';
-export * from './safe-date.mjs';
+export * as SafeDate from './impl/index.mjs';

@@ -1,6 +1,6 @@
 export const requirePositive = (n: number): number => {
   if (n <= 0) {
-    // @sumi-expect exceptions/no-throw
+    // @sumi-expect-error exceptions/no-throw
     throw new Error('must be positive');
   }
 

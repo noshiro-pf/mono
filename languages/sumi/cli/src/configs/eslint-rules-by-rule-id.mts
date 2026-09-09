@@ -1,6 +1,6 @@
 /**
  * Neutral rule ID (what `sumi check` covers — the value set of
- * sumi-oxlint-config's mapping) → the ESLint rules of eslint-config-typed
+ * @sumi-lang/oxlint-config's mapping) → the ESLint rules of eslint-config-typed
  * that check the same thing. This is what `eslintConfigOffForSumiCheck`
  * turns off (D-46): a project that runs `sumi check` and keeps ESLint for its
  * style rules does not check these twice.
@@ -118,6 +118,8 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ['modules/no-triple-slash', ['@typescript-eslint/triple-slash-reference']],
     ['modules/no-require', ['@typescript-eslint/no-require-imports']],
     ['modules/no-internal-module-import', ['import-x/no-internal-modules']],
+    // No ESLint rule checks the shape (D-52); nothing to switch off.
+    ['modules/no-mixed-star-export', []],
     ['modules/no-namespace-object-use', ['tree-shakable/import-star']],
 
     // mutation

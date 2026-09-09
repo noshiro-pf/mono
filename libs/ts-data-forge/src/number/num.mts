@@ -1,3 +1,4 @@
+import { SafeNumber } from 'ts-std-forge';
 import {
   type Decrement,
   type FiniteNumber,
@@ -118,25 +119,34 @@ export namespace Num {
    * assert.isTrue(Result.isErr(Num.safeParseInt('')));
    *
    * assert.strictEqual(Result.unwrapOk(Num.safeParseInt('  ')), undefined);
+   *
+   * // A value that overflows to Infinity is not an integer either, even
+   * // though native `parseInt` reads a 1 out of it.
+   *
+   * assert.strictEqual(Number.parseInt('1e400', 10), 1);
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseInt('1e400')));
    * ```
    *
    * @param s The string to parse.
    * @returns `Result.ok(parsedInt)` for valid input, otherwise `Result.err`
-   *   wrapping an `Error` describing the invalid input.
+   *   wrapping an `Error` describing the invalid input. A value that
+   *   overflows to `Infinity` is rejected, so the `Int` brand never lies.
    */
-  export const safeParseInt = (s: string): Result<Int, Error> => {
-    const viaNumber = Number(s);
-
-    // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
-    // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
-    // 有効な場合のみ採用することで空文字・空白のみ・末尾不正をまとめて弾く。
-    return Number.isNaN(viaNumber) || Number.isNaN(Number.parseInt(s, 10))
-      ? Result.err(
+  export const safeParseInt = (s: string): Result<Int, Error> =>
+    // The parsing itself is `SafeNumber.parseInteger` (Sumi D-49 (c)): one
+    // implementation, in the package that owns the standard-library
+    // boundary. What stays here is this function's own contract — the `Int`
+    // brand on the success side, and an `Error` rather than a tagged record
+    // on the failure side.
+    Result.match(SafeNumber.parseInteger(s), {
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      ok: (n) => Result.ok(n as Int),
+      err: () =>
+        Result.err(
           new Error(`safeParseInt: "${s}" is not a valid base-10 integer`),
-        )
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        Result.ok(Math.trunc(viaNumber) as Int);
-  };
+        ),
+    });
 
   /**
    * Safely parses a finite floating-point number from a string, returning a
@@ -201,22 +211,20 @@ export namespace Num {
    * @returns `Result.ok(parsedFloat)` for valid finite input, otherwise
    *   `Result.err` wrapping an `Error` describing the invalid input.
    */
-  export const safeParseFloat = (s: string): Result<FiniteNumber, Error> => {
-    const viaNumber = Number(s);
-
-    // `Number('')` / `Number('   ')` は 0 を返すが、`parseFloat` は NaN を返す。
-    // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
-    // 非 NaN かつ有限の場合のみ採用することで空文字・空白のみ・末尾不正・
-    // Infinity をまとめて弾く。
-    return Number.isNaN(viaNumber) ||
-      !Number.isFinite(viaNumber) ||
-      Number.isNaN(Number.parseFloat(s))
-      ? Result.err(
+  export const safeParseFloat = (s: string): Result<FiniteNumber, Error> =>
+    // The parsing itself is `SafeNumber.parse` (Sumi D-49 (c)): one
+    // implementation, in the package that owns the standard-library
+    // boundary. What stays here is this function's own contract — the
+    // `FiniteNumber` brand on the success side, and an `Error` rather than a
+    // tagged record on the failure side.
+    Result.match(SafeNumber.parse(s), {
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      ok: (n) => Result.ok(n as FiniteNumber),
+      err: () =>
+        Result.err(
           new Error(`safeParseFloat: "${s}" is not a valid finite number`),
-        )
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        Result.ok(viaNumber as FiniteNumber);
-  };
+        ),
+    });
 
   /**
    * Type guard that checks if a number is non-zero.

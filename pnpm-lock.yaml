@@ -2362,12 +2362,12 @@ importers:
 
   languages/sumi/cli:
     dependencies:
+      '@sumi-lang/oxlint-config':
+        specifier: workspace:*
+        version: link:../oxlint-config
       cmd-ts:
         specifier: ^0.15.0
         version: 0.15.0(supports-color@7.2.0)
-      sumi-oxlint-config:
-        specifier: workspace:*
-        version: link:../oxlint-config
       ts-data-forge:
         specifier: workspace:*
         version: link:../../../libs/ts-data-forge
@@ -2417,6 +2417,9 @@ importers:
 
   languages/sumi/conformance:
     devDependencies:
+      '@sumi-lang/oxlint-config':
+        specifier: workspace:*
+        version: link:../oxlint-config
       '@types/node':
         specifier: 'catalog:'
         version: 26.5.0
@@ -2441,9 +2444,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
-      sumi-oxlint-config:
-        specifier: workspace:*
-        version: link:../oxlint-config
       tsx:
         specifier: 'catalog:'
         version: 4.23.13
@@ -2938,6 +2938,55 @@ importers:
         specifier: workspace:*
         version: link:../ts-repo-utils
 
+  libs/eslint-plugin-ts-std-forge:
+    dependencies:
+      '@typescript-eslint/utils':
+        specifier: ^8.69.0
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint:
+        specifier: '>=9.0.0'
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:../ts-std-forge
+      ts-type-forge:
+        specifier: workspace:~
+        version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
+    devDependencies:
+      '@typescript-eslint/parser':
+        specifier: 'catalog:'
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@typescript-eslint/rule-tester':
+        specifier: 'catalog:'
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
   libs/eslint-plugin-ts-type-forge:
     dependencies:
       '@typescript-eslint/utils':
@@ -3150,6 +3199,9 @@ importers:
       ts-data-forge:
         specifier: workspace:^
         version: link:../ts-data-forge
+      ts-std-forge:
+        specifier: workspace:^
+        version: link:../ts-std-forge
       ts-type-forge:
         specifier: workspace:^
         version: link:../ts-type-forge
@@ -3157,6 +3209,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: 'catalog:'
         version: 2.12.0(react@19.2.8)
+      '@sumi-lang/cli':
+        specifier: workspace:*
+        version: link:../../languages/sumi/cli
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.18
@@ -3230,6 +3285,9 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
+      '@sumi-lang/cli':
+        specifier: workspace:*
+        version: link:../../languages/sumi/cli
       '@testing-library/preact':
         specifier: 'catalog:'
         version: 3.2.4(preact@10.29.8)
@@ -3328,6 +3386,9 @@ importers:
         specifier: workspace:^
         version: link:../ts-type-forge
     devDependencies:
+      '@sumi-lang/cli':
+        specifier: workspace:*
+        version: link:../../languages/sumi/cli
       '@testing-library/dom':
         specifier: 'catalog:'
         version: 10.4.1
@@ -3598,6 +3659,9 @@ importers:
       '@sindresorhus/is':
         specifier: ^8.1.0
         version: 8.1.0
+      ts-std-forge:
+        specifier: workspace:^
+        version: link:../ts-std-forge
       ts-type-forge:
         specifier: workspace:~
         version: link:../ts-type-forge
@@ -3620,9 +3684,6 @@ importers:
       '@vitest/browser-playwright':
         specifier: 'catalog:'
         version: 4.1.11(playwright@1.62.1)(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))(vitest@4.1.11)
-      dedent:
-        specifier: 'catalog:'
-        version: 1.7.2(babel-plugin-macros@3.1.0)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
@@ -3823,9 +3884,9 @@ importers:
 
   libs/ts-std-forge:
     dependencies:
-      ts-data-forge:
-        specifier: workspace:^
-        version: link:../ts-data-forge
+      '@sindresorhus/is':
+        specifier: ^8.1.0
+        version: 8.1.0
       ts-type-forge:
         specifier: workspace:~
         version: link:../ts-type-forge
@@ -3839,15 +3900,15 @@ importers:
       cspell:
         specifier: 'catalog:'
         version: 10.2.0
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
       eslint:
         specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
-      eslint-plugin-ts-data-forge:
-        specifier: workspace:*
-        version: link:../eslint-plugin-ts-data-forge
       jiti:
         specifier: 'catalog:'
         version: 2.7.0

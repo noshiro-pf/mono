@@ -21,7 +21,7 @@ export type TypeCheckResult = Readonly<{
 
 /**
  * Type-checks the project with the native compiler, no emit. The locked
- * options are already verified at this point (docs/sumi/spec/compiler-options.md),
+ * options are already verified at this point (languages/sumi/docs/spec/compiler-options.md),
  * so these diagnostics are the language's.
  */
 export const typeCheck = (tsconfigPath: string): TypeCheckResult => {

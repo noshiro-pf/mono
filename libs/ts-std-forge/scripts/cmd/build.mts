@@ -1,7 +1,8 @@
+import { existsSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
+import { unknownToString, type UnknownResult } from '../../src/entry-point.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-code.mjs';
@@ -88,6 +89,33 @@ const build = async (skipCheck: boolean): Promise<void> => {
       const content = "export * from './entry-point.mjs';\n";
 
       const typesFile = path.resolve(distDir, 'types.d.mts');
+
+      // `dist/types.d.mts` is what package.json advertises as the package's
+      // types entry, so this shim owns the name. A `src/types.mts` would
+      // compile to the same path and be overwritten here -- silently, since
+      // the build still succeeds and only the emitted types degrade. Fail
+      // instead. (The ADT variant types live in `src/adt-types.mts` for this
+      // reason.)
+      //
+      // The check is on the source, not on the emitted file: `--skip-check`
+      // leaves the previous build's `dist/` in place, and `src/types.mts` is
+      // the only source path that compiles to this name anyway.
+      const reservedSourceFile = path.resolve(
+        projectRootPath,
+        './src/types.mts',
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      if (existsSync(reservedSourceFile)) {
+        await runStep(
+          Promise.resolve(
+            Result.err(
+              `${reservedSourceFile} compiles to ${typesFile}, the name reserved for the types entry, and would be overwritten by the shim. Rename it.`,
+            ),
+          ),
+          'Failed to generate dist/types.d.mts',
+        );
+      }
 
       await runStep(
         // eslint-disable-next-line security/detect-non-literal-fs-filename

@@ -628,7 +628,12 @@ const siblingOverrides = (
  * leave the check. Delete the entry once the package has been published; from
  * then on it is verified like any other.
  */
-const notYetPublished: ReadonlySet<string> = new Set();
+const notYetPublished: ReadonlySet<string> = new Set([
+  // Added with the D-49 follow-up that split the ts-std-forge rules out of
+  // eslint-plugin-ts-data-forge. Delete this entry after its first manual
+  // publish (libs/first-release.md).
+  'eslint-plugin-ts-std-forge',
+]);
 
 /**
  * The published space pins an exact version, committed, rather than tracking

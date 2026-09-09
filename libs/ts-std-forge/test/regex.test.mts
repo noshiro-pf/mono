@@ -1,5 +1,4 @@
-import { Result } from 'ts-data-forge';
-import { Regex } from '../src/index.mjs';
+import { Regex, Result } from '../src/index.mjs';
 
 describe('Regex.create', () => {
   test('returns Ok with a working RegExp for a valid pattern', () => {

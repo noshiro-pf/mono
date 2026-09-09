@@ -46,7 +46,7 @@ const reserved = (name: string, description: string): ReservedCommand =>
     args: {},
     handler: () => {
       console.error(
-        `sumi ${name} is reserved for a later tier (docs/sumi/decisions.md, D-46) and does nothing yet.`,
+        `sumi ${name} is reserved for a later tier (languages/sumi/docs/decisions.md, D-46) and does nothing yet.`,
       );
 
       process.exit(2);
@@ -70,7 +70,7 @@ const sumi = cmd.subcommands({
 const report = (result: CheckResult): number => {
   if (result.kind === 'config-violation') {
     console.error(
-      `${result.tsconfigPath}: the effective compilerOptions differ from the Sumi lock (docs/sumi/spec/compiler-options.md). Nothing else was checked.`,
+      `${result.tsconfigPath}: the effective compilerOptions differ from the Sumi lock (languages/sumi/docs/spec/compiler-options.md). Nothing else was checked.`,
     );
 
     for (const violation of result.violations) {

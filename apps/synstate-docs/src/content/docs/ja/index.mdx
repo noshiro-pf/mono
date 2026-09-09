@@ -29,7 +29,8 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="軽量" icon="seti:favicon">
         {/* bundle-size:synstate */}~4.6 kB min+gzip
-        {/* /bundle-size:synstate */}、外部ランタイム依存は1つのみ。
+        {/* /bundle-size:synstate */}、外部ランタイム依存は 2
+        つ(一方がもう一方に依存している)。
     </Card>
     <Card title="非同期オペレーター内蔵" icon="setting">
         `debounce`、`throttle`、`switchMap` など —

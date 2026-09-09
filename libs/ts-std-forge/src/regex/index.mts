@@ -1,2 +1,1 @@
-export * from './impl/index.mjs';
-export * from './regex.mjs';
+export * as Regex from './impl/index.mjs';

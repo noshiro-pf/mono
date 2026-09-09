@@ -19,6 +19,7 @@
     "paths": {
       "ts-type-forge": ["libs/ts-type-forge/src/index.mts"],
       "ts-data-forge": ["libs/ts-data-forge/src/entry-point.mts"],
+      "ts-std-forge": ["libs/ts-std-forge/src/entry-point.mts"],
       "ts-repo-utils": ["libs/ts-repo-utils/src/entry-point.mts"],
       "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
       "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],

@@ -1,7 +1,7 @@
 import { type ReadonlyRecord } from 'ts-type-forge';
 
 /**
- * The compilerOptions Sumi locks (docs/sumi/spec/compiler-options.md, D-40):
+ * The compilerOptions Sumi locks (languages/sumi/docs/spec/compiler-options.md, D-40):
  * the entries whose value decides whether the same source is legal, what
  * the type check says, or how a module resolves. `sumi check` refuses to run
  * against a project whose effective options differ from these, because the

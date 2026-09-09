@@ -1,4 +1,5 @@
 import { Arr, Optional } from 'ts-data-forge';
+import { unreachable } from 'ts-std-forge';
 import {
   type MutableMap,
   type MutableSet,
@@ -254,7 +255,13 @@ export const createTryUpdateNotImplemented = (): ((
 ) => void) => tryUpdateNotImplemented;
 
 const tryUpdateNotImplemented = (_updateToken: UpdateToken): void => {
-  throw new Error('not implemented');
+  // Not `todo()`: nothing here is waiting to be written. This is the base
+  // default of what was a base-class method, and every observable that can
+  // receive a parent update supplies its own `tryUpdate`; an observable with
+  // no parents never gets one. Reaching this is the invariant breaking, which
+  // is what `unreachable` says (Sumi D-48). There is no `never` value to
+  // hand it — the fact of the call is the error.
+  unreachable();
 };
 
 type AssembleObservableArgs<

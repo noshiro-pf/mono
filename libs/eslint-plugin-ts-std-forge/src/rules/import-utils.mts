@@ -1,0 +1,56 @@
+import {
+  AST_NODE_TYPES,
+  type TSESLint,
+  type TSESTree,
+} from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
+import { TS_STD_FORGE_MODULE } from './constants.mjs';
+
+/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
+
+export const getTsStdForgeImport = (
+  program: TSESTree.Program,
+): TSESTree.ImportDeclaration | undefined =>
+  program.body.find(
+    (node): node is TSESTree.ImportDeclaration =>
+      node.type === AST_NODE_TYPES.ImportDeclaration &&
+      node.source.value === TS_STD_FORGE_MODULE,
+  );
+
+export const getNamedImports = (
+  node: DeepReadonly<TSESTree.ImportDeclaration> | undefined,
+): readonly string[] => {
+  if (node === undefined) return [];
+
+  return node.specifiers.flatMap((specifier) =>
+    specifier.type === AST_NODE_TYPES.ImportSpecifier
+      ? (() => {
+          const importedName =
+            specifier.imported.type === AST_NODE_TYPES.Identifier
+              ? specifier.imported.name
+              : specifier.imported.value;
+
+          return typeof importedName === 'string' ? [importedName] : [];
+        })()
+      : [],
+  );
+};
+
+export const buildImportFixes = (
+  fixer: TSESLint.RuleFixer,
+  program: TSESTree.Program,
+  requiredNames: readonly string[],
+): readonly TSESLint.RuleFix[] => {
+  const specifierText = requiredNames.join(', ');
+
+  const importStatement =
+    `import { ${specifierText} } from '${TS_STD_FORGE_MODULE}';` as const;
+
+  const newLine = '\n';
+
+  const insertionText = `${importStatement}${newLine}` as const;
+
+  // Always insert at the beginning of the file
+  // (organize-imports will handle merging/deduplication)
+  return [fixer.insertTextBefore(program, insertionText)];
+};

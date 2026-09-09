@@ -1,0 +1,11 @@
+{
+  "name": "verify-eslint-plugin-ts-std-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "eslint": ">=9.0.0",
+    "eslint-plugin-ts-std-forge": "file:../../../.tarballs/eslint-plugin-ts-std-forge.tgz",
+    "typescript": ">=5.0.0 <7.0.0"
+  }
+}
