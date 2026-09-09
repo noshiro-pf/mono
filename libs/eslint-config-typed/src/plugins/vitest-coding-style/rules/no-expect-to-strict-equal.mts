@@ -12,12 +12,30 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
     typeParameters?: TSESTree.TSTypeParameterInstantiation;
   }>;
 
+/**
+ * The trade-off, measured in `assert-vs-expect-strict-equality.test.mts`:
+ *
+ * - `assert.deepStrictEqual: <T>(actual: T, expected: T) => void` binds both
+ *   arguments to one type parameter, so a mismatched pair fails to compile.
+ *   `toStrictEqual: <E>(expected: E) => void` leaves `E` unconstrained and
+ *   type-checks nothing at all — a misspelled key in the expected object is a
+ *   run-time failure there and a compile-time one here.
+ * - In exchange, `toStrictEqual` compares prototypes and Vitest's
+ *   `assert.deepStrictEqual` does not. The latter is Chai's `deepEqual` — the
+ *   same function object, not merely an equivalent one — and not Node.js's
+ *   `node:assert` function of that name, which does compare prototypes. A test
+ *   that has to pin a class rather than a shape needs `assert.instanceOf`
+ *   alongside the structural comparison.
+ *
+ * The compile-time check is preferred because it is the one that cannot be
+ * recovered by adding a second assertion.
+ */
 export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, as the former also checks type equality between X and Y.',
+        'Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.',
     },
     fixable: 'code',
     schema: [],

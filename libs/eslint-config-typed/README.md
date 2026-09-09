@@ -648,6 +648,17 @@ This type definition provides overridden `Chai.Assert` type:
 | `prefer-assert-is-true-over-expect-true`             | Rewrite `expect(x).toBe(true)` to `assert.isTrue(x)` (only when `x` is boolean; type-aware)   |
 | `prefer-assert-is-false-over-expect-false`           | Rewrite `expect(x).toBe(false)` to `assert.isFalse(x)` (only when `x` is boolean; type-aware) |
 
+Why `assert.deepStrictEqual` rather than `expect(x).toStrictEqual(y)`, given
+that only the latter compares prototypes: it is the only one of the two that
+type-checks. `deepStrictEqual: <T>(actual: T, expected: T) => void` binds both
+arguments to a single type parameter, while every `expect` matcher — `toBe`,
+`toEqual`, `toStrictEqual` alike — is `<E>(expected: E) => void` and constrains
+nothing. Note also that this `deepStrictEqual` is Chai's `deepEqual` under a
+second name (the same function object), not Node.js's `node:assert` function of
+that name; a test that has to pin a class rather than a shape needs
+`assert.instanceOf` alongside it. Both halves are pinned as executable tests in
+[`assert-vs-expect-strict-equality.test.mts`](src/plugins/vitest-coding-style/rules/assert-vs-expect-strict-equality.test.mts).
+
 #### react-coding-style
 
 **`eslintPluginReactCodingStyle`** - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.).
