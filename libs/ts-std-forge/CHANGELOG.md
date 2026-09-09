@@ -1,5 +1,73 @@
 # ts-std-forge
 
+## 0.5.0
+
+### Minor Changes
+
+- 9c21467: Move the algebraic data type core from ts-data-forge to ts-std-forge and reverse the dependency between the two packages (Sumi D-49).
+
+    `Result`, `Optional`, `TernaryResult`, `AsyncResult`, `pipe` and `match` are now implemented in ts-std-forge, together with the helpers they need: the four variant types (`Ok`, `Err`, `Some`, `None`), `PanicError` and its constructor and guard, `unknownToString`, `hasKey` / `isRecord` / `keyIsIn` / `isNonNullObject`, and `expectType`. ts-data-forge re-exports every one of them and now depends on ts-std-forge, which no longer depends on ts-data-forge at all.
+
+    **Nothing is removed from either package, and the move itself changes no behavior.** The re-exports denote the same declarations, so `import { Result } from 'ts-data-forge'` and `import { Result } from 'ts-std-forge'` are interchangeable, values built through either are the same type, and the runtime tags are unchanged. New code should prefer `ts-std-forge`. Two behavior changes do arrive with the port, both described below: the boundary functions now rethrow a `PanicError`, and `Num.safeParseInt` rejects a value that overflows to `Infinity`.
+
+    The panic path arrives with it. `panic`, `unreachable` and `todo` live in ts-std-forge; `PanicError`, `isPanicError` and `createPanicError` are exported from both. `Result.fromThrowable`, `Result.fromPromise`, `AsyncResult.fromThrowable` and `AsyncResult.fromPromise` now rethrow a `PanicError` instead of converting it to `Err`, and the `unwrapThrow` / `unwrapErrThrow` / `expectToBe` / `safeUnwrap` families throw one (still an `Error` with the same message), so a programming error cannot masquerade as a recoverable failure.
+
+    `Num.safeParseFloat` and `Num.safeParseInt` are now implemented by delegating to `SafeNumber.parse` and `SafeNumber.parseInteger`, keeping their own contract on top: the `FiniteNumber` / `Int` brand on the success side and an `Error` on the failure side. **`Num.safeParseInt` rejects a value that overflows to `Infinity`, where it used to accept one.** `Number('1e400')` is `Infinity` while `parseInt('1e400', 10)` is `1`, so the old agreement check let it through and returned `Ok(Infinity)` branded as `Int` — a value the brand promised could not exist. `SafeNumber.parseInteger` already checked finiteness, and delegating closes the hole.
+
+    The samples and JSDoc examples that document the ADT core moved with the implementation.
+
+- 9c21467: Reach the wrapper modules through their namespace only (BREAKING).
+
+    `Regex`, `SafeDate`, `SafeNumber`, `SafeString` and the new `SafeArray` no
+    longer re-export their contents at the package's top level, so the bare
+    `create`, `toISOString`, `parse`, `parseInteger`, `toExponential`, `toFixed`,
+    `toPrecision`, `toStringWithRadix`, `fromCodePoint`, `fromPrimitive`,
+    `normalize` and `repeat` — and the failure types beside them (`CreateError`,
+    `ParseError`, `RepeatError`, …) — are gone. Import the namespace instead:
+
+    ```ts
+    // before
+    import { repeat } from 'ts-std-forge';
+    // after
+    import { SafeString } from 'ts-std-forge';
+    SafeString.repeat('ab', 3);
+    ```
+
+    `SafeString.repeat(s, 3)` was already the documented spelling and the only one
+    used in this repository; the bare names were a by-product of the barrels being
+    generated. They also collide: `Regex.create` and `SafeArray.create` are both
+    `create`, which `export *` reports as TS2308 rather than resolving — the
+    reason `SafeArray` shipped namespace-only, now applied to all five.
+
+    The guards (`isRecord`, `hasKey`, …), the ADT core (`Result`, `Optional`,
+    `pipe`, `match`, …), `panic` and `unknownToString` are unaffected: they have no
+    namespace to sit under and keep their bare names.
+
+- 9c21467: Add `SafeArray`: `create`, `isArray`, `isEmpty`, `isNonEmpty`.
+
+    `SafeArray.create(length, init)` is the D-15 / D-41 alternative to `Array(n)`,
+    which the mapping used to send to ts-data-forge's `Arr.newArray` — the wrong
+    direction since the D-49 inversion. It returns `Err<{ kind: 'invalid-length',
+length }>` for the lengths `Array(n)` throws on. Writing the same thing as
+    `Array.from({ length })` does not throw at all: `ToLength` clamps `-1` to `0`
+    and truncates `1.5`, so a computed length silently produces the wrong array,
+    which is the sentinel this package replaces.
+
+    The three guards are copies of `Arr.isArray`, `Arr.isEmptyTuple` and
+    `Arr.isNonEmptyTuple`. They are here so that this package and its new ESLint
+    plugin stop pointing across at `Arr` for them; the `*Tuple` suffix is dropped
+    because there is no branded length family here to tell them apart from.
+
+    `SafeArray` is reachable only through the namespace — `Regex` already exports
+    `create` and `CreateError`, and `export *` reports the ambiguity rather than
+    picking one.
+
+- 9c21467: Add the panic path for a programming error (Sumi D-48 / D-53): `panic`, `unreachable`, `todo`, and the `PanicError` type with `isPanicError`, `createPanicError` and `markAsPanic`.
+
+    `panic(message, { cause? })` throws a fresh `PanicError`. `panic(error)` marks the error the caller already holds and throws that very object, so its `name`, its tag, its payload and above all its stack — which points at where the failure happened rather than at the panic — all survive; that is what makes `throw error` port to `panic(error)` without losing anything. `unreachable(value?: never, message?)` covers exhaustiveness checks, and with no argument the standing invariant — the default of a method every implementation is expected to override, where there is no `never` value to hand and the fact of being called is the whole error. The value stays the first parameter rather than gaining a message-first form, which would swallow the exhaustiveness check over a union of string literals: a forgotten `'b'` case is not assignable to `never` but is assignable to `string`. `todo(message?)` marks an unwritten path. All are declared with explicit `never`-returning types so that a call terminates control flow.
+
+    A panic is marked by a dedicated `$$panic` property rather than by the error's `name`, which is where a class-free error factory puts the error's own identity (`name: 'HttpError'`); marking on `name` would force an existing error to choose between keeping what it is and being recognized as a panic. `isPanicError` matches on the mark, not on the constructor, so an error that crossed a package boundary is recognized just the same — which is what keeps `Result.fromThrowable` and the other boundary functions re-throwing a panic instead of turning it into `Err`.
+
 ## 0.4.0
 
 ### Minor Changes
