@@ -1,10 +1,22 @@
 /**
- * Parser for the expected-diagnostic markers described in
- * `languages/sumi/docs/conformance-corpus.md`:
+ * Parser for the `@sumi-expect-error` markers:
  *
  * - `// @sumi-expect-error <rule-id> ["message substring"]` applies to the next
  *   non-marker line (markers stack).
  * - `// @sumi-expect-error-file <rule-id>` describes a file-wide diagnostic.
+ *
+ * One parser, two callers, because D-51 gave the marker one spelling and one
+ * meaning wherever it appears — "the diagnostic must be here, and its absence
+ * is itself a violation", as `@ts-expect-error` has:
+ *
+ * - the conformance corpus, where the markers are the expected output and are
+ *   matched exactly (`languages/sumi/docs/conformance-corpus.md`);
+ * - `sumi check` on user code, where a matched diagnostic is suppressed and an
+ *   unmatched marker is reported.
+ *
+ * It lives here rather than in the corpus package because the corpus is a test
+ * of the engine while `sumi check` is the product, and the product cannot
+ * depend on its own test corpus.
  */
 
 export type ExpectedDiagnostic = Readonly<{

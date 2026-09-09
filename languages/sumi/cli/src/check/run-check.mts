@@ -3,6 +3,7 @@ import { runOxlint, type OxlintDiagnostic } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
+import { applyExpectErrors, type UnusedExpectError } from './expect-error.mjs';
 import { showConfig } from './show-config.mjs';
 import { typeCheck, type TypeCheckDiagnostic } from './type-check.mjs';
 import {
@@ -18,7 +19,8 @@ import {
  *   entries. Nothing else ran — a check under overridden options is not the
  *   language's check (D-7 / D-40).
  * - `checked`: the type check, the oxlint preset and the type-aware checker
- *   ran; `ok` is whether all three were clean.
+ *   ran; `ok` is whether all three were clean and no `@sumi-expect-error` was
+ *   left unanswered.
  */
 export type CheckResult = Readonly<
   | {
@@ -36,15 +38,23 @@ export type CheckResult = Readonly<
         output: string;
       }>;
       lint: Readonly<{
+        /** After `@sumi-expect-error` suppression. */
         diagnostics: readonly OxlintDiagnostic[];
         stderr: string;
       }>;
       checker: Readonly<{
+        /** After `@sumi-expect-error` suppression. */
         diagnostics: readonly CheckerDiagnostic[];
 
         /** Set when the checker could not open the project at all. */
         error: string | undefined;
       }>;
+
+      /**
+       * Markers that named a diagnostic which did not appear. A failure in
+       * its own right — the directive is an assertion, not a mute button.
+       */
+      unusedExpectErrors: readonly UnusedExpectError[];
     }
 >;
 
@@ -99,21 +109,34 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
     ? checkerResult.value
     : ([] as const);
 
+  // Both engines at once, because a neutral rule ID is the whole of what a
+  // marker says and which engine answered it is not part of that (D-51; the
+  // corpus merges the two lists for the same reason). Applying the markers to
+  // one engine at a time would report every marker the other engine answered
+  // as unused.
+  const expectErrors = applyExpectErrors(
+    config.value.files,
+    lintResult.diagnostics,
+    checkerDiagnostics,
+  );
+
   return Result.ok({
     kind: 'checked',
     tsconfigPath: tsconfigPath.value,
     ok:
       typeCheckResult.diagnostics.length === 0 &&
-      lintResult.diagnostics.length === 0 &&
-      checkerDiagnostics.length === 0 &&
+      expectErrors.lint.length === 0 &&
+      expectErrors.checker.length === 0 &&
+      expectErrors.unused.length === 0 &&
       Result.isOk(checkerResult),
     fileCount: config.value.files.length,
     typeCheck: typeCheckResult,
-    lint: lintResult,
+    lint: { diagnostics: expectErrors.lint, stderr: lintResult.stderr },
     checker: {
-      diagnostics: checkerDiagnostics,
+      diagnostics: expectErrors.checker,
       error: Result.isErr(checkerResult) ? checkerResult.value : undefined,
     },
+    unusedExpectErrors: expectErrors.unused,
   });
 };
 

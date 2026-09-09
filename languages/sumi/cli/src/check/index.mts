@@ -1,3 +1,4 @@
+export * from './expect-error.mjs';
 export * from './native-tsc.mjs';
 export * from './run-check.mjs';
 export * from './show-config.mjs';

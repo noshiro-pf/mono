@@ -4,20 +4,17 @@ import {
   runRules,
 } from '@sumi-lang/checker';
 import {
-  oxlintCodeToRuleId,
   implementedRuleIds as oxlintRuleIds,
+  parseMarkers,
   runOxlint,
+  toRuleId,
+  type ExpectedDiagnostic,
   type OxlintDiagnostic,
 } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import {
-  fixturesRootPath,
-  listFixtures,
-  parseMarkers,
-  type ExpectedDiagnostic,
-} from '../src/index.mjs';
+import { fixturesRootPath, listFixtures } from '../src/index.mjs';
 
 /**
  * The engine check: both engines run over the whole corpus, their diagnostics
@@ -71,19 +68,6 @@ type Observed = Readonly<{
   line: number;
   message: string;
 }>;
-
-/**
- * A TypeScript diagnostic tsgolint passes through (`TS(<code>)`) is the
- * corpus's `compiler/<code>` — a diagnostic of the fixed compilerOptions,
- * not of a lint rule (languages/sumi/docs/conformance-corpus.md).
- */
-const toRuleId = (code: string): string => {
-  const compiler = /^TS\((\d+)\)$/u.exec(code);
-
-  return compiler?.[1] === undefined
-    ? (oxlintCodeToRuleId.get(code) ?? `unmapped:${code}`)
-    : `compiler/${compiler[1]}`;
-};
 
 const toObserved = (diagnostic: OxlintDiagnostic): Observed =>
   ({
