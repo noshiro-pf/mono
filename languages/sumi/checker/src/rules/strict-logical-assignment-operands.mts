@@ -27,6 +27,10 @@ export const strictLogicalAssignmentOperands: Rule = {
   ruleId: 'boolean/strict-logical-assignment-operands',
   description:
     'Require both operands of `&&=` and `||=` to be boolean, as `&&` and `||` already are (Sumi D-29).',
+  messages: {
+    nonBooleanOperand:
+      '{{operands}} not boolean. `x {{operator}} y` is `x = x {{logicalOperator}} y`, and Sumi folds booleans there rather than truthiness (D-29). Compare explicitly, or use `??=` when coalescing a value.',
+  },
   visit: (node, { checker, report }) => {
     if (!isBinaryExpression(node)) return;
 
@@ -46,10 +50,16 @@ export const strictLogicalAssignmentOperands: Rule = {
 
     if (offending.length === 0) return;
 
-    report(
-      node,
-      `${offending.map(({ side }) => `The ${side} operand`).join(' and ')} of \`${operatorText(operator)}\` ${offending.length === 1 ? 'is' : 'are'} not boolean. \`x ${operatorText(operator)} y\` is \`x = x ${operatorText(operator).slice(0, -1)} y\`, and Sumi folds booleans there rather than truthiness (D-29). Compare explicitly, or use \`??=\` when coalescing a value.`,
-    );
+    const text = operatorText(operator);
+
+    report(node, 'nonBooleanOperand', {
+      operands:
+        offending.length === 1
+          ? `The ${offending[0]?.side ?? ''} operand of \`${text}\` is`
+          : `Neither operand of \`${text}\` is`,
+      operator: text,
+      logicalOperator: text.slice(0, -1),
+    });
   },
 } as const;
 
@@ -69,7 +79,7 @@ const isBooleanTyped = (
   // this package does not get to restate them.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
-   
+
   operand: TsNode,
 ): boolean => {
   const type = checker.getTypeAtLocation(operand);

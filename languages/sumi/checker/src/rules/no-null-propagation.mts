@@ -31,6 +31,10 @@ export const noNullPropagation: Rule = {
   ruleId: 'null/no-null-propagation',
   description:
     'Disallow a declaration whose inferred type includes `null`; normalize at the boundary with `?? undefined` (Sumi D-27).',
+  messages: {
+    inferredNull:
+      'This declaration takes a `null` from its initializer. "No value" is `undefined` in Sumi: normalize where the `null` enters (`?? undefined`) rather than letting the type propagate.',
+  },
   visit: (node, { checker, report }) => {
     const name = annotationFreeDeclarationName(node);
 
@@ -40,10 +44,7 @@ export const noNullPropagation: Rule = {
 
     if (type === undefined || !includesNull(type)) return;
 
-    report(
-      name,
-      'This declaration takes a `null` from its initializer. "No value" is `undefined` in Sumi: normalize where the `null` enters (`?? undefined`) rather than letting the type propagate.',
-    );
+    report(name, 'inferredNull');
   },
 } as const;
 

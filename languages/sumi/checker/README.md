@@ -54,6 +54,38 @@ export const myRule: Rule = {
 
 `src/all-rules.mts` に加えれば有効になる。
 
+## テストの書き方
+
+`libs/eslint-*` のプラグインが ESLint の `RuleTester` で書いているのと同じ
+valid / invalid 形式。`testRule` が 1 ケース 1 `test` を宣言する。
+
+```ts
+import dedent from 'dedent';
+import { myRule, testRule } from '../src/index.mjs';
+
+describe(myRule.ruleId, () => {
+    testRule(myRule, {
+        valid: [{ name: '...', code: dedent`...` }],
+        invalid: [
+            {
+                name: '...',
+                code: dedent`...`,
+                errors: [{ messageId: 'someId', line: 3 }],
+            },
+        ],
+    });
+});
+```
+
+**全ケースが 1 つの一時プロジェクトにまとめて置かれ、1 度だけ検査される。**
+プログラムを開くのが高い(約 66 ms)ので、ケースごとにプロジェクトを作ると
+その分を毎回払うことになる。したがって**各ケースは単独のモジュールとして
+成立している必要があり**、束縛名が衝突しそうなら別名にするかローカルに閉じる。
+
+適合性コーパス([../conformance](../conformance))との役割分担: コーパスは
+「中立ルール ID と行」の多重集合をエンジン横断で固定する。こちらは 1 ルールの
+挙動を、どのメッセージが出たかまで含めて、読める名前で固定する。
+
 **`checker` は RPC 越し**であることに注意。`Type` はハンドルで、`getTypes()` の
 ような呼び出しは往復になる。走査は全ノードを訪れるので、**構文で候補を絞ってから
 型を聞く**こと。全ノードに型を聞けばプログラム全体の型付けを払うことになる。

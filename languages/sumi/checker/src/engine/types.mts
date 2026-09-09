@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   type SourceFile,
   type Node as TsNode,
@@ -16,8 +17,19 @@ export type RuleContext = Readonly<{
   checker: Checker;
   sourceFile: SourceFile;
 
-  /** Reports `node` under the rule's own neutral ID. */
-  report: (node: TsNode, message: string) => void;
+  /**
+   * Reports `node` under the rule's own neutral ID, naming one of the rule's
+   * `messages`. `data` fills the `{{placeholder}}`s in that message.
+   *
+   * The ID rather than the prose so that a test can pin *which* message a
+   * rule produced -- the conformance corpus compares rule IDs and lines and
+   * never looks at the text.
+   */
+  report: (
+    node: TsNode,
+    messageId: string,
+    data?: ReadonlyRecord<string, string>,
+  ) => void;
 }>;
 
 /**
@@ -31,6 +43,9 @@ export type Rule = Readonly<{
    */
   ruleId: string;
   description: string;
+
+  /** Message templates by ID. `{{name}}` is replaced from `report`'s `data`. */
+  messages: ReadonlyRecord<string, string>;
   // `Node` is TypeScript's own interface, declared mutable; this package does
   // not get to restate it.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -40,6 +55,9 @@ export type Rule = Readonly<{
 /** One reported problem, in the shape the corpus and the CLI compare. */
 export type CheckerDiagnostic = Readonly<{
   ruleId: string;
+
+  /** Which of the rule's `messages` was reported. */
+  messageId: string;
   fileName: string;
 
   /** 1-based, as diagnostics are conventionally shown. */

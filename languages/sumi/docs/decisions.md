@@ -214,7 +214,7 @@
 
 ## D-29: 論理代入演算子 `&&=` / `||=` / `??=` は `mut_` 変数に限り 3 つとも許可する
 
-- **ステータス**: 確定(2026-09-05)
+- **ステータス**: 確定(2026-09-05)。**`??=` の部分は再検討中**(2026-09-09、ユーザー — issue #1753 のコメント「初期化されていない変数は許可しない → `??=` は必要無い」)。宣言が必ず初期化子を持つなら `??=` の用途が消えるため、禁止に回す方向。[spec/variables-and-mutation.md](./spec/variables-and-mutation.md) の未解決の論点に整理を置いた。`&&=` / `||=` の boolean 限定はこの再検討の影響を受けない
 - **判断**: 代入先が `mut_` 変数であれば 3 つとも許可する。`&&=` / `||=` のオペランドは `&&` / `||` と同じ boolean 厳密化([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))の対象。`??=` は値の合体なので boolean 制約の対象外。
 - **理由**: `x &&= y` は `x = x && y` と同義で、boolean 厳密化の下では純粋な boolean の畳み込みにすぎない。本来の用途(`opts ||= {}` 等の truthiness idiom)はオペランド型の制約で既に違法になる。現行 config は `logical-assignment-operators: "always"` + `unicorn/logical-assignment-operators` で**論理代入形をむしろ強制**しており、禁止すると現行運用と衝突する。
 - **帰結(実装)**: `@typescript-eslint/strict-boolean-expressions` が検査するのは `LogicalExpression` / 条件位置 / `!` のみで、`AssignmentExpression`(`&&=` / `||=`)のオペランドは**検査しない**(2026-09-05 実測、typescript-eslint 8.67)。したがって `&&=` / `||=` の両オペランドの boolean 限定は 🆕 ルール。

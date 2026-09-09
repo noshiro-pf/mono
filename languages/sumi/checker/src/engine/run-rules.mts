@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   type SourceFile,
   type Node as TsNode,
@@ -98,17 +99,22 @@ const walkFile = (
     context: {
       checker,
       sourceFile,
-      report: (node: TsNode, message: string): void => {
+      report: (
+        node: TsNode,
+        messageId: string,
+        data?: ReadonlyRecord<string, string>,
+      ): void => {
         const { line, character } = sourceFile.getLineAndCharacterOfPosition(
           node.getStart(sourceFile),
         );
 
         mut_diagnostics.push({
           ruleId: rule.ruleId,
+          messageId,
           fileName: sourceFile.fileName,
           line: line + 1,
           column: character + 1,
-          message,
+          message: fillMessage(rule.messages[messageId] ?? messageId, data),
         });
       },
     },
@@ -124,3 +130,19 @@ const walkFile = (
 
   sourceFile.forEachChild(visit);
 };
+
+/**
+ * Replaces each `{{name}}` with `data[name]`, leaving unknown names as they
+ * are. Split and joined rather than replaced, because a replacement value is
+ * data and `$&` in it must not be read as a capture reference.
+ */
+const fillMessage = (
+  template: string,
+  data: ReadonlyRecord<string, string> | undefined,
+): string =>
+  data === undefined
+    ? template
+    : Object.entries(data).reduce(
+        (message, [name, value]) => message.split(`{{${name}}}`).join(value),
+        template,
+      );

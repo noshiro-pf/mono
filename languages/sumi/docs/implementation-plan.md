@@ -42,6 +42,8 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 
 ## 将来の作業(future work)
 
+- **React Compiler を意識した設計(2026-09-02、ユーザー要望 — issue #1753 のコメント、未整理)。** React Compiler は「コンポーネントとフックが冪等で、レンダー中に値を変更しない」ことを前提にメモ化を自動挿入する。Sumi の既存の規律 — `const` 既定と `mut_` prefix(D-14)、`functional/immutable-data` 相当、readonly 強制(D-45)、副作用 import の禁止 — はその前提とほぼ同じものを別の言葉で言っており、**Sumi lint を通ったコードは React Compiler が最適化できるコードである**という関係を明示できるはずである。整理すべき点: (1) React Compiler の bail-out 条件(レンダー中の変更、条件付きフック呼び出し、ref の読み書き)と Sumi の規則の対応表を作り、Sumi 側で捕まえられていない条件があれば規則を足すか記録する。(2) `mut_` 束縛をどこまで許すか — レンダー中のローカルな可変アキュムレータは React Compiler も許すので、規則の緩さの線が一致しているかを確認する。(3) React Compiler が要求する `"use memo"` / `"use no memo"` ディレクティブと、D-36 の default export emit 設定や `sumi.config` の関係。(4) synstate(このリポジトリの状態管理ライブラリ)と React Compiler の相互作用は別問題として切り分ける。
+
 ### ユーザー / コミュニティが lint ルールを追加できる仕組み(2026-09-08 追記、ユーザー要望)
 
 Sumi sugar / Sumi refined では、言語同梱の規則だけでなく**ユーザーやコミュニティが lint ルールを書いて足せる**ようにする。
