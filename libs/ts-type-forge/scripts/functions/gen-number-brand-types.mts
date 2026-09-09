@@ -2,7 +2,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { hasKey, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { extractSampleCode } from '../cmd/embed-examples-utils.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { extractSampleCode } from '../../../../tools/configs/embed-examples-utils.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 // =============================================================================

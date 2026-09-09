@@ -288,6 +288,50 @@ commands run those across every workspace member that defines them, and the
   `scripts/cmd/embed-examples.mts`.
 - `pnpm run docs:deps` — regenerate `docs/package-dependencies.md`.
 
+### Embedding samples into documents
+
+**One implementation, in `tools/configs/`, not a copy per package.** It used
+to be a copy per package — fifteen of `embed-examples-utils.mts`, thirteen of
+the markdown embedder, nine of the JSDoc one — and the copies drifted in the
+direction that matters least and stood still in the one that matters most:
+the coverage check below was written into `ts-type-forge`'s copy alone and
+reached none of the other eight.
+
+- `embed-examples-utils.mts` — `extractSampleCode`, which is the marker
+  handling (`// embed-sample-code-ignore-above` and friends) and the
+  indentation normalizing.
+- `embed-examples-in-markdown.mts` — fills the ` ```ts ` / ` ```tsx ` / ` ```js ` fences of a markdown document from a `samples/`
+  directory. A package's `doc:embed`.
+- `embed-examples-in-jsdoc.mts` — fills the ` ```ts ` fences of the
+  `@example` blocks under `src/`. A package's `doc:embed:jsdoc`.
+
+A package's `scripts/cmd/embed-examples*.mts` is the call site and the data —
+its documents, its `sourceFileMappings`, its root path — and nothing else. It
+reaches the shared module by relative path, the way a build script reaches
+`strip-dev-only-code.mts`, with `import-x/no-relative-packages` disabled on
+the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
+
+- **`stripTransformerDirectives` cannot be always on.** The synstate family
+  and `apps/synstate-docs` pass it, because the
+  `// transformer-ignore-next-line` directives their samples carry are noise
+  in a rendered document — but `ts-codemod-lib`'s samples are _about_ that
+  directive, and stripping it there would gut the examples.
+- **The JSDoc embedder fails on an `@example` that no sample backs.** The
+  trigger is the `@example` tag, not the fence it is supposed to contain: an
+  example written as bare JSDoc lines has no fence at all, so keying off the
+  fence would only ever catch files that already follow the convention.
+- **`exemptSourcePaths` is a backlog that may only shrink.** The four packages
+  that had unmapped examples when the check reached them name those files
+  there; an entry that is no longer needed is itself an error, so a sample
+  written for one of them takes its line with it. Adding a line is not how a
+  new `@example` gets written — see
+  [#1880](https://github.com/noshiro-pf/mono/issues/1880).
+- **CI runs these through `ws:doc`, never through `ws:doc:embed*`.** Each
+  package's `doc` script reaches its own embedding steps, and `style-check (ws:doc)`
+  runs `doc` and then asserts the tree is clean. So a `gen-docs.mts` that
+  forgets to call one is a package whose embedding — and whose coverage check
+  — nothing runs: exactly what had happened to `ts-std-forge`.
+
 ## Required status checks
 
 **Eight contexts are required, and none of them is a job that does work.** The

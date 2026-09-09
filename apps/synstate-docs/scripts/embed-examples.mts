@@ -2,7 +2,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
-import { extractSampleCode } from './embed-examples-utils.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { extractSampleCode } from '../../../tools/configs/embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const synstateSamplesRoot = path.resolve(
@@ -434,7 +435,9 @@ const embedExamples = async (): Promise<void> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const sampleContent = await fs.readFile(samplePath, 'utf8');
 
-      const sampleContentSliced = extractSampleCode(sampleContent);
+      const sampleContentSliced = extractSampleCode(sampleContent, {
+        stripTransformerDirectives: true,
+      });
 
       const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
 

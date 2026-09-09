@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { type DeepReadonly } from 'ts-type-forge';
-import { extractSampleCode } from './embed-examples-utils.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { extractSampleCode } from '../../../tools/configs/embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const synstateRoot = path.resolve(workspaceRootPath, '../../libs/synstate');
@@ -205,7 +206,9 @@ const embedJsdocExamples = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const sampleContent = await fs.readFile(samplePath, 'utf8');
 
-    const extracted = extractSampleCode(sampleContent);
+    const extracted = extractSampleCode(sampleContent, {
+      stripTransformerDirectives: true,
+    });
 
     const formatted = formatForJsdoc(extracted);
 

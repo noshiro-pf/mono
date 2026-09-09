@@ -1,124 +1,53 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import { Result, SafeArray, unknownToString } from '../../src/entry-point.mjs';
+import { isDirectlyExecuted, Result } from 'ts-repo-utils';
+// eslint-disable-next-line import-x/no-relative-packages
+import { embedExamplesInJsDoc as embedExamplesInJsDocShared } from '../../../../tools/configs/embed-examples-in-jsdoc.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
-import { extractSampleCode } from './embed-examples-utils.mjs';
-
-const codeBlockStart = '```ts';
-
-const codeBlockEnd = '```';
 
 /**
- * Embeds sample code from samples/src into JSDoc @example code blocks in src
- * files. Replaces code blocks sequentially in the order defined in
- * sourceFileMappings.
+ * `@example` blocks that are not backed by a sample file under `samples/src`
+ * yet — the backlog of https://github.com/noshiro-pf/mono/issues/1880. The
+ * coverage check fails on an entry that is no longer needed, so the list can
+ * only shrink.
+ */
+const exemptSourcePaths: readonly string[] = [
+  'src/functional/async-result/impl/async-result-flat-map.mts',
+  'src/functional/async-result/impl/async-result-from-promise.mts',
+  'src/functional/async-result/impl/async-result-from-throwable.mts',
+  'src/functional/async-result/impl/async-result-map-err.mts',
+  'src/functional/async-result/impl/async-result-map.mts',
+  'src/functional/async-result/impl/async-result-unwrap-or.mts',
+  'src/panic/panic.mts',
+  'src/regex/impl/create.mts',
+  'src/safe-array/impl/create.mts',
+  'src/safe-array/impl/is-array.mts',
+  'src/safe-array/impl/is-empty.mts',
+  'src/safe-array/impl/is-non-empty.mts',
+  'src/safe-date/impl/to-iso-string.mts',
+  'src/safe-number/impl/parse-integer.mts',
+  'src/safe-number/impl/parse.mts',
+  'src/safe-number/impl/to-exponential.mts',
+  'src/safe-number/impl/to-fixed.mts',
+  'src/safe-number/impl/to-precision.mts',
+  'src/safe-number/impl/to-string-with-radix.mts',
+  'src/safe-string/impl/from-code-point.mts',
+  'src/safe-string/impl/from-primitive.mts',
+  'src/safe-string/impl/normalize.mts',
+  'src/safe-string/impl/repeat.mts',
+] as const;
+
+/**
+ * Embeds sample code from samples/src into the JSDoc `@example` code blocks of
+ * this package's src files.
  */
 export const embedExamplesInJsDoc = async (): Promise<
   Result<undefined, unknown>
-> => {
-  try {
-    const mut_modifiedFiles: string[] = [];
-
-    for (const { sampleFiles, sourcePath } of sourceFileMappings) {
-      const sourceFilePath = path.resolve(projectRootPath, sourcePath);
-
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
-
-      const codeBlockCount = sourceContent.split(codeBlockStart).length - 1;
-
-      if (codeBlockCount !== sampleFiles.length) {
-        return Result.err(
-          `❌ Code block count mismatch in ${sourcePath}: found ${codeBlockCount} \`\`\`ts blocks but expected ${sampleFiles.length} sample files`,
-        );
-      }
-
-      const mut_results: string[] = [];
-
-      let mut_rest: string = sourceContent;
-
-      for (const sampleFile of sampleFiles) {
-        const samplePath = path.resolve(projectRootPath, sampleFile);
-
-        // Read sample content
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const sampleContent = await fs.readFile(samplePath, 'utf8');
-
-        const sampleContentSliced = extractSampleCode(sampleContent);
-
-        // Find next code block
-        const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
-
-        if (codeBlockStartIndex === -1) {
-          return Result.err(
-            `❌ Code block start not found for ${sampleFile} in ${sourcePath}`,
-          );
-        }
-
-        const codeBlockEndIndex = mut_rest.indexOf(
-          codeBlockEnd,
-          codeBlockStartIndex + codeBlockStart.length,
-        );
-
-        if (codeBlockEndIndex === -1) {
-          return Result.err(
-            `❌ Code block end not found for ${sampleFile} in ${sourcePath}`,
-          );
-        }
-
-        // Replace the code block content
-        const beforeBlock = mut_rest.slice(
-          0,
-          Math.max(0, codeBlockStartIndex + codeBlockStart.length),
-        );
-
-        const afterBlock = mut_rest.slice(Math.max(0, codeBlockEndIndex));
-
-        // Indent the sample code to match JSDoc style (3 spaces + ' * ')
-        const indentedSampleCode = sampleContentSliced
-          .split('\n')
-          .map((line) => (line.trim() === '' ? '   *' : `   * ${line}`))
-          .join('\n');
-
-        mut_results.push(beforeBlock, '\n', indentedSampleCode, '\n   * ');
-
-        mut_rest = afterBlock;
-
-        console.info(
-          `✓ Updated code block for ${sampleFile} in ${path.relative(projectRootPath, sourceFilePath)}`,
-        );
-      }
-
-      mut_results.push(mut_rest);
-
-      // Write updated source file
-      const updatedContent = mut_results.join('');
-
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
-
-      mut_modifiedFiles.push(sourceFilePath);
-    }
-
-    if (SafeArray.isNonEmpty(mut_modifiedFiles)) {
-      console.info(
-        `\nFormatting ${mut_modifiedFiles.length} modified files...`,
-      );
-
-      await formatFiles(mut_modifiedFiles);
-
-      console.info('✓ Formatting completed');
-    }
-
-    return Result.ok(undefined);
-  } catch (error) {
-    return Result.err(
-      `❌ Failed to embed JSDoc examples: ${unknownToString(error)}`,
-    );
-  }
-};
+> =>
+  embedExamplesInJsDocShared({
+    packageRootPath: projectRootPath,
+    sourceFileMappings,
+    exemptSourcePaths,
+  });
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedExamplesInJsDoc();

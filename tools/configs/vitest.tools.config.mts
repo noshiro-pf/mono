@@ -2,7 +2,7 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 import { defineViteConfig } from './vite-config.mjs';
 
 /**
- * The Vitest project for `tools/scripts/`.
+ * The Vitest project for `tools/`.
  *
  * `tools/configs/` and `tools/scripts/` deliberately have no `package.json` —
  * they are plain directories consumed by relative path, not workspace members
@@ -15,7 +15,7 @@ import { defineViteConfig } from './vite-config.mjs';
 export default defineViteConfig({
   packageRoot: projectRootPath,
   node: {
-    include: ['tools/scripts/**/*.test.mts'],
+    include: ['tools/{scripts,configs}/**/*.test.mts'],
   },
   browser: false,
 });
