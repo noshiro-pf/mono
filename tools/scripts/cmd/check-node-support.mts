@@ -117,6 +117,59 @@ export const readNodeSupportConfig = async (): Promise<
   return parseNodeSupportConfig(parsed.value);
 };
 
+/**
+ * Validates the parsed contents of `node-support.json`.
+ *
+ * Exported for the unit tests: it is the only part of this file that is a
+ * pure function of its input, and it is where every rejection message the
+ * config can produce is decided.
+ */
+export const parseNodeSupportConfig = (
+  parsed: unknown,
+): Result<NodeSupportConfig, string> =>
+  Result.safeTry(function* () {
+    if (!isRecord(parsed)) {
+      return Result.err(`❌ ${nodeSupportConfigPath} is not an object.`);
+    }
+
+    const policy: unknown = hasKey(parsed, 'policy')
+      ? parsed.policy
+      : undefined;
+
+    if (
+      policy !== 'none' &&
+      policy !== 'reactive' &&
+      policy !== 'major-ceiling'
+    ) {
+      return Result.err(
+        '❌ `policy` must be one of "none", "reactive", "major-ceiling".',
+      );
+    }
+
+    const targetsResult = yield* Result.safeUnwrap(
+      parseTargets(hasKey(parsed, 'targets') ? parsed.targets : undefined),
+    );
+
+    const knownBroken = yield* Result.safeUnwrap(
+      parseKnownBroken(
+        hasKey(parsed, 'knownBroken') ? parsed.knownBroken : undefined,
+      ),
+    );
+
+    if (policy === 'none' && knownBroken !== null) {
+      return Result.err(
+        [
+          '❌ `policy` is "none", which promises never to bound the top of',
+          '   `engines.node`, but `knownBroken` names a version that broke.',
+          '   Switch the policy to "reactive" — bounding the top is the honest',
+          '   thing to do once something is known to be broken.',
+        ].join('\n'),
+      );
+    }
+
+    return Result.ok({ policy, knownBroken, targets: targetsResult });
+  });
+
 export const nodeSupportConfigPath = path.resolve(
   projectRootPath,
   'tools/configs/node-support.json',
@@ -250,52 +303,6 @@ const workflowPath = path.resolve(
   projectRootPath,
   '.github/workflows/node-version-compatibility.yml',
 );
-
-const parseNodeSupportConfig = (
-  parsed: unknown,
-): Result<NodeSupportConfig, string> =>
-  Result.safeTry(function* () {
-    if (!isRecord(parsed)) {
-      return Result.err(`❌ ${nodeSupportConfigPath} is not an object.`);
-    }
-
-    const policy: unknown = hasKey(parsed, 'policy')
-      ? parsed.policy
-      : undefined;
-
-    if (
-      policy !== 'none' &&
-      policy !== 'reactive' &&
-      policy !== 'major-ceiling'
-    ) {
-      return Result.err(
-        '❌ `policy` must be one of "none", "reactive", "major-ceiling".',
-      );
-    }
-
-    const targetsResult = yield* Result.safeUnwrap(
-      parseTargets(hasKey(parsed, 'targets') ? parsed.targets : undefined),
-    );
-
-    const knownBroken = yield* Result.safeUnwrap(
-      parseKnownBroken(
-        hasKey(parsed, 'knownBroken') ? parsed.knownBroken : undefined,
-      ),
-    );
-
-    if (policy === 'none' && knownBroken !== null) {
-      return Result.err(
-        [
-          '❌ `policy` is "none", which promises never to bound the top of',
-          '   `engines.node`, but `knownBroken` names a version that broke.',
-          '   Switch the policy to "reactive" — bounding the top is the honest',
-          '   thing to do once something is known to be broken.',
-        ].join('\n'),
-      );
-    }
-
-    return Result.ok({ policy, knownBroken, targets: targetsResult });
-  });
 
 const parseTargets = (
   value: unknown,

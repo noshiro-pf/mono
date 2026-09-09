@@ -34,6 +34,7 @@
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:node-support": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-node-support.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
+    "check:root:test": "vitest run --config ./tools/configs/vitest.tools.config.mts",
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
