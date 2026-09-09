@@ -15,6 +15,7 @@ import {
   type ConverterOptions,
 } from './common.mjs';
 import { convertReturnTypeToUintRange } from './convert-return-type-to-uint-range.mjs';
+import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 import { convertLibDomCommon } from './dom-common.mjs';
 import { convertLibDomIterable } from './lib.dom.iterable.mjs';
 import { convertLibDom } from './lib.dom.mjs';
@@ -219,14 +220,19 @@ export const convert = (
           (() => {
             switch (filename) {
               case 'lib.decorators.d.ts':
+                // Bare `never`, as in `lib.es5.d.ts` — see the note on the
+                // same rewrite in `convertLibEs5`. `readonly never[]` rejects
+                // a generic signature whose rest parameter is computed from
+                // its own type parameter, so one spelling for every
+                // "accepts a call with any arguments" position.
                 return composeMonoTypeFns(
                   replaceWithNoMatchCheck(
                     'Class extends abstract new (...args: unknown) => unknown = abstract new (...args: unknown) => unknown',
-                    'Class extends abstract new (...args: readonly never[]) => unknown = abstract new (...args: readonly never[]) => unknown',
+                    'Class extends abstract new (...args: never) => unknown = abstract new (...args: never) => unknown',
                   ),
                   replaceWithNoMatchCheck(
                     'Value extends (this: This, ...args: unknown) => unknown = (this: This, ...args: unknown) => unknown',
-                    'Value extends (this: This, ...args: readonly never[]) => unknown = (this: This, ...args: readonly never[]) => unknown',
+                    'Value extends (this: This, ...args: never) => unknown = (this: This, ...args: never) => unknown',
                   ),
                 );
 
@@ -267,9 +273,10 @@ export const convert = (
                 return convertEs2015SymbolWellknown(options);
 
               case 'lib.es2015.reflect.d.ts':
+                // Bare `never` — see the note in `convertLibEs5`.
                 return replaceWithNoMatchCheck(
                   'newTarget?: new (...args: unknown) => unknown',
-                  'newTarget?: new (...args: readonly never[]) => unknown',
+                  'newTarget?: new (...args: never) => unknown',
                 );
 
               case 'lib.es2015.core.d.ts':
@@ -380,6 +387,11 @@ export const convert = (
 
               case 'lib.es2022.object.d.ts':
                 return convertLibEs2022Object(options);
+
+              case 'lib.es2021.string.d.ts':
+                // `String.prototype.replaceAll`, whose replacement callback
+                // has to be typed the same way as `replace`'s.
+                return convertStringReplacerArgs;
 
               case 'lib.es2022.string.d.ts':
                 return replaceWithNoMatchCheck(

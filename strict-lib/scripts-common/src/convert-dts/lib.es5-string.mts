@@ -6,6 +6,7 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 
 export const convertLibEs5_String =
   ({
@@ -59,6 +60,7 @@ export const convertLibEs5_String =
               'search(regexp: string | RegExp): number;',
               `search(regexp: string | RegExp): ${brandedNumber.StringSearchResult};`,
             ),
+            convertStringReplacerArgs,
           ),
         }),
       ),

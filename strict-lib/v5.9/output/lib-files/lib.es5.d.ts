@@ -533,7 +533,10 @@ interface String {
    */
   replace(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: readonly unknown[]) => string,
+    replacer: (
+      substring: string,
+      ...args: readonly (string | undefined)[]
+    ) => string,
   ): string;
 
   /**
@@ -1899,7 +1902,7 @@ type NonNullable<T> = T & {};
 /**
  * Obtain the parameters of a function type in a tuple
  */
-type Parameters<T extends (...args: readonly never[]) => unknown> = T extends (
+type Parameters<T extends (...args: never) => unknown> = T extends (
   ...args: infer P
 ) => unknown
   ? P
@@ -1908,15 +1911,14 @@ type Parameters<T extends (...args: readonly never[]) => unknown> = T extends (
 /**
  * Obtain the parameters of a constructor function type in a tuple
  */
-type ConstructorParameters<
-  T extends abstract new (...args: readonly never[]) => unknown,
-> = T extends abstract new (...args: infer P) => unknown ? P : never;
+type ConstructorParameters<T extends abstract new (...args: never) => unknown> =
+  T extends abstract new (...args: infer P) => unknown ? P : never;
 
 /**
  * Obtain the return type of a function type
  */
-type ReturnType<T extends (...args: readonly never[]) => unknown> = T extends (
-  ...args: readonly never[]
+type ReturnType<T extends (...args: never) => unknown> = T extends (
+  ...args: never
 ) => infer R
   ? R
   : unknown;
@@ -1924,9 +1926,8 @@ type ReturnType<T extends (...args: readonly never[]) => unknown> = T extends (
 /**
  * Obtain the return type of a constructor function type
  */
-type InstanceType<
-  T extends abstract new (...args: readonly never[]) => unknown,
-> = T extends abstract new (...args: readonly never[]) => infer R ? R : unknown;
+type InstanceType<T extends abstract new (...args: never) => unknown> =
+  T extends abstract new (...args: never) => infer R ? R : unknown;
 
 /**
  * Convert string literal type to uppercase

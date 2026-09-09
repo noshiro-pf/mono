@@ -6,7 +6,6 @@ import dedent from 'dedent';
 import * as prettierPluginEstree from 'prettier/plugins/estree';
 import * as prettierPluginTypeScript from 'prettier/plugins/typescript';
 import * as prettier from 'prettier/standalone';
-import { isString } from 'ts-data-forge';
 import {
   convertToReadonlyTransformer,
   type ReadonlyTransformerOptions,
@@ -64,15 +63,8 @@ const normalizeWhitespaceForComparison = (code: string): string => {
   // 1. Protect newlines immediately following line comments
   const protectedCode = code.replaceAll(
     /(\/\/.*?)\r?\n/gu,
-    // The strict standard library types a capture group as `unknown`: an
-    // optional group is `undefined` when it does not participate, so `string`
-    // is not something the signature can promise. This group is not optional,
-    // so the narrowing never actually fails — it just has to be written.
-    (match: string, ...args: readonly unknown[]): string => {
-      const comment = args[0];
-
-      return isString(comment) ? `${comment}${placeholder}` : match;
-    },
+    (match: string, comment: string | undefined): string =>
+      comment === undefined ? match : `${comment}${placeholder}`,
   );
 
   // 2. Collapse multiple whitespace characters (including unprotected newlines) into a single space

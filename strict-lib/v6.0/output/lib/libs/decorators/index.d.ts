@@ -26,8 +26,9 @@ type DecoratorMetadata = typeof globalThis extends {
  * @template Class The type of the decorated class associated with this context.
  */
 interface ClassDecoratorContext<
-  Class extends abstract new (...args: readonly never[]) => unknown =
-    abstract new (...args: readonly never[]) => unknown,
+  Class extends abstract new (...args: never) => unknown = abstract new (
+    ...args: never
+  ) => unknown,
 > {
   /** The kind of element that was decorated. */
   readonly kind: 'class';
@@ -65,9 +66,9 @@ interface ClassDecoratorContext<
  */
 interface ClassMethodDecoratorContext<
   This = unknown,
-  Value extends (this: This, ...args: readonly never[]) => unknown = (
+  Value extends (this: This, ...args: never) => unknown = (
     this: This,
-    ...args: readonly never[]
+    ...args: never
   ) => unknown,
 > {
   /** The kind of class element that was decorated. */

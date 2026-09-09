@@ -48,25 +48,34 @@
  }
  
  interface GeneratorFunction {
-@@ -204,7 +189,7 @@ interface RegExp {
+@@ -204,7 +189,10 @@ interface RegExp {
     */
    [Symbol.replace](
      string: string,
 -    replacer: (substring: string, ...args: any[]) => string,
-+    replacer: (substring: string, ...args: readonly unknown[]) => string,
++    replacer: (
++      substring: string,
++      ...args: readonly (string | undefined)[]
++    ) => string,
    ): string;
  
    /**
-@@ -265,10 +250,10 @@ interface String {
+@@ -265,10 +253,16 @@ interface String {
      searchValue: {
        [Symbol.replace](
          string: string,
 -        replacer: (substring: string, ...args: any[]) => string,
-+        replacer: (substring: string, ...args: readonly unknown[]) => string,
++        replacer: (
++          substring: string,
++          ...args: readonly (string | undefined)[]
++        ) => string,
        ): string;
      },
 -    replacer: (substring: string, ...args: any[]) => string,
-+    replacer: (substring: string, ...args: readonly unknown[]) => string,
++    replacer: (
++      substring: string,
++      ...args: readonly (string | undefined)[]
++    ) => string,
    ): string;
  
    /**

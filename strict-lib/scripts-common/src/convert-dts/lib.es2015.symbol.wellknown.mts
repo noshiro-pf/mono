@@ -6,6 +6,7 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 
 export const convertEs2015SymbolWellknown =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
@@ -48,5 +49,12 @@ export const convertEs2015SymbolWellknown =
             ),
           ),
         }),
+
+        // Three occurrences here — `RegExp[Symbol.replace]` and the two in
+        // `String.prototype.replace`'s object-searchValue overload — and they
+        // have to agree with the ones in `lib.es5.d.ts`. Applied to the whole
+        // file rather than per interface: the innermost of the three sits in a
+        // structural type inside a parameter, not in an interface body.
+        convertStringReplacerArgs,
       ),
     ).value;
