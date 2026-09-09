@@ -1,5 +1,25 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.11.6
+
+### Patch Changes
+
+- 55a93f9: Correct the rationale documented on `vitest-coding-style/no-expect-to-strict-equal`, and pin the underlying behavior as executable tests.
+
+    The rule's description claimed that `expect(X).toStrictEqual(Y)` "also checks type equality between X and Y". It is the other way round: every `expect` matcher is `<E>(expected: E) => void` and constrains nothing, while `assert.deepStrictEqual: <T>(actual: T, expected: T) => void` binds both arguments to one type parameter. That compile-time check is what the rule is for.
+
+    The trade-off it makes in exchange is now written down too: Vitest's `assert.deepStrictEqual` is Chai's `deepEqual` under a second name — the same function object, not Node.js's `node:assert` function of that name — and compares structure without regard to prototypes, where `toStrictEqual` separates a class instance from a plain object of the same shape. A test that has to pin a class needs `assert.instanceOf` alongside it.
+
+    No rule behavior changes.
+
+- 68247c9: Resolve the binding behind `assert` and `expect` in the `vitest-coding-style` rules, instead of matching the identifier's spelling.
+
+    `includeSource` puts in-source tests in ordinary `src/**` modules, so `eslintConfigForVitest()` cannot be scoped to `*.test.*` files and is applied to every file. Matching on the name alone therefore reported `assert(x)` imported from `node:assert` — whose fix output, `assert.isTrue`, does not exist there — along with any local named `assert` or `expect`. Those are no longer reported.
+
+    The same change closes the opposite gap: `import { assert as a } from 'vitest'` is Vitest's `assert` under another name and is now recognized through the imported name. Fixes rewrite only the method, so the receiver keeps the name the file gave it (`a.ok(x)` becomes `a.isTrue(x)`, not `assert.isTrue(x)`).
+
+    Affects `prefer-assert-is-true-over-assert`, `prefer-assert-is-false-over-assert-not-ok`, `prefer-assert-deep-strict-equal-over-deep-equal`, `prefer-assert-is-false-over-negated-assert-is-true`, `prefer-assert-is-true-over-negated-assert-is-false`, `prefer-assert-is-true-over-expect-true` and `prefer-assert-is-false-over-expect-false`. A codebase that imports these from Vitest under an alias may see reports it did not before.
+
 ## 5.11.5
 
 ### Patch Changes
