@@ -1,3 +1,4 @@
+import { allRules, runRules, type CheckerDiagnostic } from '@sumi-lang/checker';
 import { runOxlint, type OxlintDiagnostic } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -10,13 +11,14 @@ import {
 } from './validate-compiler-options.mjs';
 
 /**
- * The outcome of `sumi check` for the lint tier (D-46): the three steps in
+ * The outcome of `sumi check` for the lint tier (D-46): the four steps in
  * order, each recorded so the caller can print them.
  *
  * - `config-violation`: the effective compilerOptions differ from the locked
  *   entries. Nothing else ran — a check under overridden options is not the
  *   language's check (D-7 / D-40).
- * - `checked`: the type check and the lint ran; `ok` is whether both were clean.
+ * - `checked`: the type check, the oxlint preset and the type-aware checker
+ *   ran; `ok` is whether all three were clean.
  */
 export type CheckResult = Readonly<
   | {
@@ -37,14 +39,21 @@ export type CheckResult = Readonly<
         diagnostics: readonly OxlintDiagnostic[];
         stderr: string;
       }>;
+      checker: Readonly<{
+        diagnostics: readonly CheckerDiagnostic[];
+
+        /** Set when the checker could not open the project at all. */
+        error: string | undefined;
+      }>;
     }
 >;
 
 /**
  * Runs the whole Sumi lint check for one project: locked compilerOptions
- * validation, then the native type check, then the oxlint preset over
- * exactly the files the project's program contains (so the two never
- * disagree about what is in scope).
+ * validation, then the native type check, then the oxlint preset over exactly
+ * the files the project's program contains (so the two never disagree about
+ * what is in scope), then the type-aware checker (D-54) over the same
+ * project.
  *
  * `project` is a tsconfig path or a directory holding `tsconfig.json`.
  */
@@ -74,15 +83,37 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
       ? ({ diagnostics: [], stderr: '' } as const)
       : runOxlint(config.value.files);
 
+  // The checker opens the same tsconfig, so it sees the same program the type
+  // check just ran on; `files` is passed only to keep the two from disagreeing
+  // about scope when the project pulls in something outside its own roots.
+  const projectFiles: ReadonlySet<string> = new Set(config.value.files);
+
+  const checkerResult =
+    config.value.files.length === 0
+      ? Result.ok<readonly CheckerDiagnostic[]>([])
+      : runRules(tsconfigPath.value, allRules, (fileName) =>
+          projectFiles.has(fileName),
+        );
+
+  const checkerDiagnostics = Result.isOk(checkerResult)
+    ? checkerResult.value
+    : ([] as const);
+
   return Result.ok({
     kind: 'checked',
     tsconfigPath: tsconfigPath.value,
     ok:
       typeCheckResult.diagnostics.length === 0 &&
-      lintResult.diagnostics.length === 0,
+      lintResult.diagnostics.length === 0 &&
+      checkerDiagnostics.length === 0 &&
+      Result.isOk(checkerResult),
     fileCount: config.value.files.length,
     typeCheck: typeCheckResult,
     lint: lintResult,
+    checker: {
+      diagnostics: checkerDiagnostics,
+      error: Result.isErr(checkerResult) ? checkerResult.value : undefined,
+    },
   });
 };
 

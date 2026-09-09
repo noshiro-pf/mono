@@ -61,6 +61,7 @@ export const knownRuleIds = [
   'mutation/prefer-const',
   'null/no-null-in-type',
   'null/no-null-literal',
+  'null/no-null-propagation',
   'readonly/require-readonly-parameter',
   'readonly/require-readonly-type',
 ] as const;

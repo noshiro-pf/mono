@@ -96,10 +96,20 @@ const report = (result: CheckResult): number => {
     console.error(result.lint.stderr.trimEnd());
   }
 
+  for (const diagnostic of result.checker.diagnostics) {
+    console.error(
+      `${diagnostic.fileName}(${diagnostic.line},${diagnostic.column}): ${diagnostic.ruleId}: ${diagnostic.message}`,
+    );
+  }
+
+  if (result.checker.error !== undefined) {
+    console.error(result.checker.error);
+  }
+
   console.error(
     result.ok
       ? `sumi check: ${result.fileCount} files, no problems.`
-      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length} lint problems.`,
+      : `sumi check: ${result.fileCount} files, ${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems.`,
   );
 
   return result.ok ? 0 : 1;

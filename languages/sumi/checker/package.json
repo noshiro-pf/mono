@@ -1,18 +1,29 @@
 {
-  "name": "@sumi-lang/conformance",
+  "name": "@sumi-lang/checker",
   "version": "0.0.0",
   "private": true,
-  "description": "Engine-agnostic conformance corpus for the TypeScript-subset language (Sumi). See languages/sumi/docs/conformance-corpus.md.",
+  "description": "The Sumi type-aware checker: rules that need type information, run on TypeScript 7's own API in one pass (languages/sumi/docs, D-54)",
+  "keywords": [
+    "sumi"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
-    "directory": "languages/sumi/conformance"
+    "directory": "languages/sumi/oxlint-config"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": false,
   "type": "module",
+  "exports": {
+    ".": "./src/entry-point.mts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
+    "build": "node ../../../node_modules/typescript-native/bin/tsc -p ./configs/tsconfig.build.json",
+    "build:min": "pnpm run build",
     "codemod": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --uncommitted --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
     "codemod:full": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer append-as-const --transformer convert-to-readonly '{src,scripts,test}/**/*.mts' && pnpm run fmt",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ../../../ --no-progress",
@@ -20,7 +31,7 @@
     "fmt:diff": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "prettier --write .",
     "gi": "pnpm run gi:src && pnpm run fmt",
-    "gi:src": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "gi:src": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "pnpm run z:vitest:node run",
@@ -31,11 +42,10 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@sumi-lang/checker": "workspace:*",
-    "ts-data-forge": "workspace:*"
+    "ts-data-forge": "workspace:*",
+    "typescript-native": "npm:typescript@7.0.2"
   },
   "devDependencies": {
-    "@sumi-lang/oxlint-config": "workspace:*",
     "@types/node": "catalog:",
     "cspell": "catalog:",
     "eslint": "catalog:",
@@ -45,16 +55,6 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "tsx": "catalog:",
-    "typescript": "catalog:",
-    "typescript-native": "npm:typescript@7.0.2",
     "vitest": "catalog:"
-  },
-  "packageManager": "pnpm@11.20.0",
-  "engines": {
-    "node": ">=22.22.2",
-    "pnpm": ">=9.0.0"
-  },
-  "volta": {
-    "node": "26.3.1"
   }
 }

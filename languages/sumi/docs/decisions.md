@@ -472,3 +472,22 @@
     - `gi` は `export * from` しか吐けないため、これらの index は `--preserve`(`regex/index.mts` と `safe-*/index.mts`)で手書きにしている。
     - `SafeArray.create` の `Result` 化は throw だけが理由ではない。`Array.from({ length })` で書き換えると `ToLength` が負値を 0 に丸め小数を切り捨てるので、**throw せずに黙って違う配列**が返る。ts-std-forge が置き換えたい番兵そのもの。
     - copy した guard から `*Tuple` の接尾辞を落とした。ts-data-forge であれが要るのは branded な `isEmpty` / `isNonEmpty` と区別するためで、brand を持たない(D-26 / D-39)こちらには区別する相手がいない。
+
+## D-55: 型情報が要るルールは TypeScript 7 同梱の JS API 上の自前チェッカーで実装する(`@sumi-lang/checker`)
+
+- **ステータス**: 確定(2026-09-09、ユーザー決定)
+- **判断**: 型情報を使う Sumi のルールは、既存 linter の拡張ではなく **TypeScript 7 が同梱する JS API(`typescript-native/unstable/*`)の上に書いた自前の薄いチェッカー**で実装する。新パッケージ `@sumi-lang/checker`(`languages/sumi/checker`)。1 プロジェクト = 1 プログラム = 1 パスで全ルールを回し、`sumi check` の第 4 段として走る。構文だけで決まるルールは従来どおり oxlint preset(`@sumi-lang/oxlint-config`)側に残し、**どちらのエンジンが出したかは中立ルール ID に正規化して隠す**。適合性コーパスは両エンジンの診断を混ぜて 1 つの多重集合として比較する。
+- **理由**:
+    - **速いネイティブ linter はどれも型情報付きカスタムルールを書けない**(2026-09 調査)。oxlint は JS plugin のドキュメントが「型情報に依存するルール」を未対応と明記し、ロードマップは placeholder の issue 1 本のみ。rslint は plugin ルールから `parserServices` が取れず、しかも**エラーも出さずに何も報告しない**とドキュメントにある。Biome の GritQL plugin は型に触れず 2026 のロードマップにも無い。typescript-eslint は書けるが遅い(Go 系との差は 12〜34 倍)。
+    - **fork も選べない**。oxlint / tsgolint / rslint のどれを fork してもルールは **Go** で、しかも typescript-go の内部 API を公開化した shim に対して書くことになり、TypeScript のリリースごとにバイナリを再ビルドし、それでいて既存の構文ルールとは統合されない。
+    - **TS 7 の公式 API で足りる**。`Project` が `program` と `checker` を持ち、`checker.getTypeAtLocation` / `getSymbolAtLocation` / `getTypeOfSymbol` と `TypeFlags` / `SymbolFlags`、`unstable/ast` に `SyntaxKind`・352 個の `is*` 述語・`node.forEachChild` が揃う。**`typescript-native` は既に `@sumi-lang/cli` の依存なので依存が 1 つも増えず**、lint と型検査が同じコンパイラ・同じバージョン・同じ tsconfig を見る。
+    - **速い**。synstate(76 ファイル)の 1 パスが実測 262 ms — プロジェクトを開く 66 ms、全ファイルの構文走査 18 ms、宣言名 804 個への `getTypeAtLocation`(cold)164 ms、union 判定 11 ms。ノード 1 個あたり 0.2 ms なので、ESLint 流の「ルールがノードごとに checker に問い合わせる」API がそのまま成立する。batch オーバーロード(`getTypeAtLocation(nodes)`)もあるが 1.3 倍程度の差。
+    - **Phase 2 の土台がそのまま手に入る**。D-46 が計画している「`sumi check` の内部を単一パスの専用チェッカーに置き換える」作業の前倒しであり、sugar でも同じ AST とスキャナを使える。sugar でどのみち自前実装が要る以上、既存ツールを複雑に使うより自前の単純な実装を選ぶ(ユーザー方針)。
+- **代替案と却下理由**: **TSSLint** は「作ろうとしていた薄いチェッカーが既にある」に近く、組み込みルールを持たないハーネスで ESLint 互換層も持つが、**TS 6 側**である(`@tsslint/cli` 3.1.4 の peer dependency は `typescript: "*"` = このリポジトリの 6.0.3、依存に `@volar/*`)。TS 7 対応は v4 で `typescript-native-bridge` を埋め込む計画が進行中だが未着。加えて実質 1 人開発で破壊的な書き換えの最中であり、必須ステータスチェックの土台には維持リスクが重い。**tsl** は API の型付けが最も良いが TS 5.8/5.9/6.0 のみで、TS 7 対応は未着手の issue。**`typescript-native-bridge`** は TS 7 の公式 API で足りたので不要になった。
+- **帰結**:
+    - 最初のルールは `null/no-null-propagation`(spec/null-undefined.md の段階 3、境界正規化の強制)。適用範囲は変数宣言と分割代入の束縛。
+    - コーパスの runner は 2 エンジンを混ぜる形に変わった(`test/engine.test.mts`、旧 `oxlint-engine.test.mts`)。
+    - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く(全ノードに型を聞けばプログラム全体の型付けを払う)。
+    - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
+    - 残る型情報ルール(`castMutable` 乱用、論理代入のオペランド boolean 限定、`mut_` 以外への破壊的操作)も同じ場所に実装する。
+    - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。

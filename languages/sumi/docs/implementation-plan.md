@@ -1,4 +1,4 @@
-<!-- cspell:ignore tsslint tsgo -->
+<!-- cspell:ignore tsslint tsgo rslint -->
 
 # Sumi lint 実装計画
 
@@ -32,6 +32,7 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - **エディタ統合を後回しにしない**(Flow の敗因 — [related-work.md](./related-work.md))。最初は CLI + TS language service plugin として出し、LSP を自作せずにエディタ診断を得る。watch モードは `ts.createWatchProgram` の incremental で。
 - Phase 1 preset からルールを 1 個ずつ移植し、適合性コーパスで同値性をゲートしながら ESLint 側を退役させる。移植完了まで両者は並走してよい(コーパスが同値性を保証する)。言語仕様に属さないスタイル規則は ESLint に残してよい。
 - 置き場所: `languages/sumi/cli`(@sumi-lang/cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
+- **着手済み(2026-09-09、D-54)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
 - 完了条件: 対応表の全項目が専用チェッカーで検査され、subset preset(言語仕様分)が退役していること。
 
 ## Phase 3(Sumi sugar): fork parser はチェッカーと結合させずに足す
