@@ -30,6 +30,8 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 
 三層の区分と、Sumi sugar 構文を Sumi lint + ライブラリと一対一対応させる方針は D-37、呼び名は D-38([decisions.md](./decisions.md))。
 
+三層は機能の段階であると同時に、**規則を満たす度合いの段階**でもある: Sumi lint は移行用の一括抑制(bulk suppressions)を認めるが、Sumi sugar へ上がるにはそれが空になっている必要がある(D-57)。sugar の codemod が Sumi lint の規則の成立を前提にするため。
+
 この monorepo は eslint-config-typed(構文制限)+ strict-ts-lib(標準ライブラリの安全化)+ ts-type-forge / ts-data-forge(型・データユーティリティ)で、この言語の Sumi lint の 7〜8 割をすでにプロトタイプしている。Sumi lint とは、この蓄積を一つの仕様書と単一のチェッカーとして形式化したものである。
 
 ## 仕様書の構成

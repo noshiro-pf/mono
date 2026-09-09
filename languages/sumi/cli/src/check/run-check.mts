@@ -62,7 +62,7 @@ export type CheckResult = Readonly<
  * Runs the whole Sumi lint check for one project: locked compilerOptions
  * validation, then the native type check, then the oxlint preset over exactly
  * the files the project's program contains (so the two never disagree about
- * what is in scope), then the type-aware checker (D-54) over the same
+ * what is in scope), then the type-aware checker (D-55) over the same
  * project.
  *
  * `project` is a tsconfig path or a directory holding `tsconfig.json`.
