@@ -124,13 +124,33 @@ export const convertLibEs5 =
           // ),
         ),
 
+        // `(...args: never)` — a bare `never`, not `readonly never[]` — is how
+        // the "accepts a call with any arguments" position is spelled here.
+        // This is upstream's own spelling (`ThisParameterType` /
+        // `OmitThisParameter` in `lib.es5.d.ts` are written that way even in
+        // the stock library); the `any` this replaces is what the rest of the
+        // conversion exists to remove.
+        //
+        // `readonly never[]` looks like the stricter choice and is not: a
+        // *generic* overload whose rest parameter is computed from its own type
+        // parameter (`@types/node`'s `setTimeout<TArgs extends any[]>(cb, ms?,
+        // ...args: MakeVoidParameterOptional<TArgs>)`) fails to match it, so
+        // `ReturnType<typeof setTimeout>` fell to the conditional's false
+        // branch and came out `unknown` — silently, since the false branch is
+        // a type rather than an error (#1840). The bare `never` matches it.
+        //
+        // Keep the constraint and the conditional's `extends` clause spelled
+        // the same way. Both are rewritten by these two rules, which is what
+        // makes the false branch unreachable for any `T` the constraint admits
+        // — and therefore what keeps "did not resolve" from being spelled
+        // `unknown` and propagating.
         replaceWithNoMatchCheck(
           'extends (...args: unknown) =>',
-          'extends (...args: readonly never[]) =>',
+          'extends (...args: never) =>',
         ),
         replaceWithNoMatchCheck(
           'extends abstract new (...args: unknown) =>',
-          'extends abstract new (...args: readonly never[]) =>',
+          'extends abstract new (...args: never) =>',
         ),
 
         // Error クラスを継承した際に name を書き換えるケースに対応するため

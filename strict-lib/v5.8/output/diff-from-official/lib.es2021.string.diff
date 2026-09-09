@@ -17,11 +17,14 @@
  /// <reference no-default-lib="true"/>
  
  interface String {
-@@ -30,6 +15,6 @@ interface String {
+@@ -30,6 +15,9 @@ interface String {
     */
    replaceAll(
      searchValue: string | RegExp,
 -    replacer: (substring: string, ...args: any[]) => string,
-+    replacer: (substring: string, ...args: readonly unknown[]) => string,
++    replacer: (
++      substring: string,
++      ...args: readonly (string | undefined)[]
++    ) => string,
    ): string;
  }

@@ -2571,13 +2571,12 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 
 ### 戻す
 
-| issue | 箇所                                                                               | 入れたもの                                                         | 戻す先                                    |
-| :---- | :--------------------------------------------------------------------------------- | :----------------------------------------------------------------- | :---------------------------------------- |
-| #1839 | `apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.mts` | `getLastDateNumberOfMonth`（月ごとの日数を `switch` で書く 20 行） | `new Date(year, month, 0).getDate()`      |
-| #1840 | `libs/synstate/src/core/types/timer.mts`                                           | `TimerId = NonNullable<Parameters<typeof clearTimeout>[0]>`        | `TimerId = ReturnType<typeof setTimeout>` |
-| #1841 | `libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts`  | 可変長で受けて `isString` で絞る置換コールバック                   | `(_match, comment: string) => …`          |
+| issue | 箇所                                                                               | 入れたもの                                                         | 戻す先                               |
+| :---- | :--------------------------------------------------------------------------------- | :----------------------------------------------------------------- | :----------------------------------- |
+| #1839 | `apps/event-schedule-app/src/functions/multiple-date-picker/generate-calendar.mts` | `getLastDateNumberOfMonth`（月ごとの日数を `switch` で書く 20 行） | `new Date(year, month, 0).getDate()` |
 
-#1839 の 1 件だけは**部分的に戻す**ことになる。`getLastDateNumberOfMonth` を
+#1840 と #1841 の 2 行は**戻し済み**。下の「#1840 / #1841 を直した」を参照。
+残りは #1839 の 1 件で、これは**部分的に戻す**ことになる。`getLastDateNumberOfMonth` を
 消すと、この関数を書いたときに一緒に落とせた
 `as StrictExtract<DateEnum, 28 | 29 | 30 | 31>` が戻ってきてしまう。
 アサーションを戻さずに済むかは #1839 の直し方（引数型を広げるのか、
@@ -2613,3 +2612,99 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 **移植時に `@noshiro/ts-type-utils` のグローバル `TimerId` を書き直したもの**で、
 `ReturnType<typeof setTimeout>` から逃げた結果ではない。#1840 が直っても
 戻す先が無いので、そのままでよい。
+
+## #1840 / #1841 を直した（2026-09-10）
+
+どちらも「strict lib の宣言が厳しすぎる」ではなく、**変換規則のほうの取りこぼし**
+だった。
+
+### #1840: `(...args: readonly never[])` は「任意の引数で呼べる」を表せない
+
+`ReturnType` ・ `InstanceType` の条件型の `extends` 節は
+`(...args: readonly never[]) => infer R` だった。これが
+**最後の overload が generic で、その rest 引数が自分の型引数から計算されている**
+シグネチャにマッチしない。`@types/node` の
+
+```ts
+function setTimeout<TArgs extends any[]>(
+    callback: (...args: TArgs) => void,
+    delay?: number,
+    ...args: MakeVoidParameterOptional<TArgs> // = [void] extends TArgs ? Partial<TArgs> : TArgs
+): NodeJS.Timeout;
+```
+
+がまさにその形で、DOM 側の `setTimeout` と declaration merging した結果
+`ReturnType<typeof setTimeout>` が false 分岐に落ちて `unknown` になっていた。
+
+issue 本文が疑っていた「`...arguments: readonly unknown[]` と matcher の組み合わせ」
+ではない。DOM 側を公式どおり `...arguments: any[]` に戻しても同じように落ちる
+（測定済み）ので、効いているのは **matcher の `readonly never[]` だけ**。
+`Partial<TArgs>` を経由しない `...args: TArgs` なら落ちないし、overload が
+1 つだけでも落ちない。3 つ揃ったときだけ落ちる。
+
+直し方は **bare `never`** ——`(...args: never) => infer R`。これは公式 lib 自身の
+綴りで、`ThisParameterType` / `OmitThisParameter` は stock lib でも
+`(this: infer U, ...args: never) => any` と書いてある。`any` を消すという
+この変換の目的は損なわない。
+
+制約側（`T extends (...args: never) => unknown`）も同じ綴りに揃えてある。
+**揃えること自体が目的**で、制約と matcher が同じ形なら、制約を通った `T` に
+対して false 分岐が到達不能になる。issue の 3 節目「失敗が静かなこと自体も問題」
+はこれで閉じる ——「解決できなかった」が `unknown` として伝播する経路が無くなる。
+
+同じ「任意の引数で呼べる」の意味で `readonly never[]` を使っていた
+`lib.decorators.d.ts`（`ClassDecoratorContext` などの型引数制約）と
+`lib.es2015.reflect.d.ts`（`Reflect.construct` の `newTarget`）も揃えた。
+壊れてはいなかったが、綴りが 1 つでないと同じ罠がまた掘られる。
+
+### #1841: 置換コールバックの可変長引数は `string | undefined`
+
+issue の選択肢 2 を採った。`readonly unknown[]` → `readonly (string | undefined)[]`。
+
+- 選択肢 3（`[...captures: readonly (string | undefined)[], offset: number, str: string]`
+  のような中間 rest のタプル）は**使えない**。TypeScript は
+  「そのタプルの要素を全部宣言したコールバック」しか受け付けないので、
+  `(m) => m.toUpperCase()` すら通らなくなる（測定済み）。
+- 正確にやるには正規表現リテラルから参加グループ数を型で読む必要があり、
+  それは型システムにできることではない。だから**健全性はここで買えない**。
+  買えないなら、公式の `any[]` より狭く、`unknown` より書きやすいところに置く。
+
+**手放したもの**: 最後のキャプチャより後ろの引数（offset・元文字列・named groups
+のオブジェクト）を `string | undefined` と宣言できてしまう。これは嘘で、承知で
+嘘をついている。引数を数えて到達する位置なので、実害は `any[]` より小さい。
+
+5 箇所を**まとめて**直す必要がある。`String.prototype.replace` の `searchValue`
+は `[Symbol.replace]` のシグネチャを構造的に書いているので、片方だけ変えると
+`RegExp` が `searchValue` に代入できなくなる。
+
+| lib                                | 箇所                                                            |
+| :--------------------------------- | :-------------------------------------------------------------- |
+| `lib.es5.d.ts`                     | `String.prototype.replace`                                      |
+| `lib.es2021.string.d.ts`           | `String.prototype.replaceAll`                                   |
+| `lib.es2015.symbol.wellknown.d.ts` | `RegExp[Symbol.replace]` と `replace` の object overload 2 箇所 |
+
+### 回帰テストの置き場
+
+`strict-lib/configs/tsconfig/lib-check-entry.ts`。空ファイルだったところに
+アサーションを 2 つ足した。この 1 ファイルを 12 マイナー × dom/webworker の
+24 個の `tsconfig.lib-check*.json` が `files` に挙げているので、**1 箇所書けば
+全部で検査される**。
+
+どちらの issue も「宣言自体は通るのに、使うと落ちる／黙って `unknown` になる」
+型なので、`skipLibCheck: false` の lib-check では捕まらなかった。
+`@types/node` はここでは使えない（`types: []`）ので、#1840 のほうは
+overload の形だけ書き写してある。
+
+`#1841` のアサーションは**引数に型注釈を付けてある**。テンプレートリテラルは
+`unknown` も受けるので、注釈なしのコールバックだと宣言が戻っても通ってしまう。
+
+### 戻したもの
+
+| 箇所                                                                              | 戻した先                                                         |
+| :-------------------------------------------------------------------------------- | :--------------------------------------------------------------- |
+| `libs/synstate/src/core/types/timer.mts`                                          | `TimerId = ReturnType<typeof setTimeout>`                        |
+| `libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts` | `(match, comment: string \| undefined) => …` と `undefined` 比較 |
+
+`ts-codemod-lib` のほうは `comment: string` には**戻らない**。選択肢 2 では
+キャプチャは `string | undefined` なので、`isString` が
+`comment === undefined` の 1 行になったところまで。issue が予告していたとおり。

@@ -17,11 +17,14 @@
  interface String {
    /**
     * Replace all instances of a substring in a string, using a regular expression or search string.
-@@ -28,6 +13,6 @@ interface String {
+@@ -28,6 +13,9 @@ interface String {
     */
    replaceAll(
      searchValue: string | RegExp,
 -    replacer: (substring: string, ...args: any[]) => string,
-+    replacer: (substring: string, ...args: readonly unknown[]) => string,
++    replacer: (
++      substring: string,
++      ...args: readonly (string | undefined)[]
++    ) => string,
    ): string;
  }

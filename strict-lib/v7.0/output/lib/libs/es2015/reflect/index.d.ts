@@ -27,7 +27,7 @@ declare namespace Reflect {
   function construct<A extends readonly unknown[], R>(
     target: new (...args: A) => R,
     argumentsList: Readonly<A>,
-    newTarget?: new (...args: readonly never[]) => unknown,
+    newTarget?: new (...args: never) => unknown,
   ): R;
   function construct(
     target: Function,
