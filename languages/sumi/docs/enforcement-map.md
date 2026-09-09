@@ -78,7 +78,7 @@
 | `!!x` 禁止                              | `no-implicit-coercion` boolean: true                                      | 🔧                       | 不要                                                                 | 上表と同件               |
 | `Boolean(x)` 禁止(有力)                 | `no-restricted-syntax`(CallExpression selector)                           | 🆕                       | 不要                                                                 | 仕様確定後               |
 | JSX 条件描画は三項                      | `react/jsx-no-leaked-render` `{validStrategies: ["ternary"]}`             | ✅                       | 不要                                                                 |                          |
-| 論理代入演算子(`mut_` 変数のみ、`&&=` ` |                                                                           | =` はオペランド boolean) | 代入先: `functional/no-let` + `immutable-data`(既存)/ オペランド: 🆕 | 🆕                       | 要  | D-29。`strict-boolean-expressions` は `AssignmentExpression` を検査しない(実測)。現行 `logical-assignment-operators: "always"` と整合 |
+| 論理代入演算子(`mut_` 変数のみ、`&&=` ` |                                                                           | =` はオペランド boolean) | 代入先: `functional/no-let` + `immutable-data`(既存)/ オペランド: 🆕 | 🆕                       | 要  | D-29。`strict-boolean-expressions` は `AssignmentExpression` を検査しない(実測)。現行 `logical-assignment-operators: "always"` と整合 オペランドの boolean 限定は `sumi/strict-logical-assignment-operands`(@sumi-lang/checker — 2026-09-09 実装、D-54)。`??=` は対象外 |
 
 ## モジュール([spec/modules.md](./spec/modules.md))
 

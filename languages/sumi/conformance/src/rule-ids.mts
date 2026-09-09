@@ -39,6 +39,7 @@ export const knownRuleIds = [
   'banned-syntax/prefer-template',
   'banned-syntax/require-sort-compare',
   'boolean/no-logical-expression-statement',
+  'boolean/strict-logical-assignment-operands',
   'boolean/strict-logical-operands',
   'classes/no-class',
   'exceptions/no-throw',
