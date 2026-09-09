@@ -45,58 +45,49 @@ import { projectRootPath } from '../project-root-path.mjs';
  */
 export const checkNodeSupport = async (
   options: Readonly<{ fix: boolean }>,
-): Promise<Result<CheckSummary, string>> => {
-  const configResult = await readNodeSupportConfig();
+): Promise<Result<CheckSummary, string>> =>
+  Result.safeTry(async function* () {
+    const config = yield* Result.safeUnwrap(await readNodeSupportConfig());
 
-  if (Result.isErr(configResult)) {
-    return Result.err(configResult.value);
-  }
+    const expected = expectedFields(config);
 
-  const config = configResult.value;
+    const manifests = yield* Result.safeUnwrap(await collectManifests());
 
-  const expected = expectedFields(config);
+    const manifestViolations = manifests.flatMap((manifest) =>
+      checkManifest(manifest, expected),
+    );
 
-  const manifestsResult = await collectManifests();
+    const workflowViolations = await checkWorkflowMatrix(config);
 
-  if (Result.isErr(manifestsResult)) {
-    return Result.err(manifestsResult.value);
-  }
+    const violations = [...manifestViolations, ...workflowViolations];
 
-  const manifests = manifestsResult.value;
+    if (!Arr.isNonEmpty(violations)) {
+      return Result.ok({ manifestCount: manifests.length, fixedCount: 0 });
+    }
 
-  const manifestViolations = manifests.flatMap((manifest) =>
-    checkManifest(manifest, expected),
-  );
+    if (!options.fix) {
+      return Result.err(formatViolations(violations, expected));
+    }
 
-  const workflowViolations = await checkWorkflowMatrix(config);
+    const fixable = violations.filter(
+      (violation) => violation.fix !== undefined,
+    );
 
-  const violations = [...manifestViolations, ...workflowViolations];
+    const unfixable = violations.filter(
+      (violation) => violation.fix === undefined,
+    );
 
-  if (!Arr.isNonEmpty(violations)) {
-    return Result.ok({ manifestCount: manifests.length, fixedCount: 0 });
-  }
+    await applyFixes(fixable);
 
-  if (!options.fix) {
-    return Result.err(formatViolations(violations, expected));
-  }
+    if (Arr.isNonEmpty(unfixable)) {
+      return Result.err(formatViolations(unfixable, expected));
+    }
 
-  const fixable = violations.filter((violation) => violation.fix !== undefined);
-
-  const unfixable = violations.filter(
-    (violation) => violation.fix === undefined,
-  );
-
-  await applyFixes(fixable);
-
-  if (Arr.isNonEmpty(unfixable)) {
-    return Result.err(formatViolations(unfixable, expected));
-  }
-
-  return Result.ok({
-    manifestCount: manifests.length,
-    fixedCount: fixable.length,
+    return Result.ok({
+      manifestCount: manifests.length,
+      fixedCount: fixable.length,
+    });
   });
-};
 
 /**
  * The values every governed `package.json` field must hold, derived from the
@@ -262,54 +253,49 @@ const workflowPath = path.resolve(
 
 const parseNodeSupportConfig = (
   parsed: unknown,
-): Result<NodeSupportConfig, string> => {
-  if (!isRecord(parsed)) {
-    return Result.err(`❌ ${nodeSupportConfigPath} is not an object.`);
-  }
+): Result<NodeSupportConfig, string> =>
+  Result.safeTry(function* () {
+    if (!isRecord(parsed)) {
+      return Result.err(`❌ ${nodeSupportConfigPath} is not an object.`);
+    }
 
-  const policy: unknown = hasKey(parsed, 'policy') ? parsed.policy : undefined;
+    const policy: unknown = hasKey(parsed, 'policy')
+      ? parsed.policy
+      : undefined;
 
-  if (
-    policy !== 'none' &&
-    policy !== 'reactive' &&
-    policy !== 'major-ceiling'
-  ) {
-    return Result.err(
-      '❌ `policy` must be one of "none", "reactive", "major-ceiling".',
+    if (
+      policy !== 'none' &&
+      policy !== 'reactive' &&
+      policy !== 'major-ceiling'
+    ) {
+      return Result.err(
+        '❌ `policy` must be one of "none", "reactive", "major-ceiling".',
+      );
+    }
+
+    const targetsResult = yield* Result.safeUnwrap(
+      parseTargets(hasKey(parsed, 'targets') ? parsed.targets : undefined),
     );
-  }
 
-  const targetsResult = parseTargets(
-    hasKey(parsed, 'targets') ? parsed.targets : undefined,
-  );
-
-  if (Result.isErr(targetsResult)) {
-    return Result.err(targetsResult.value);
-  }
-
-  const knownBrokenResult = parseKnownBroken(
-    hasKey(parsed, 'knownBroken') ? parsed.knownBroken : undefined,
-  );
-
-  if (Result.isErr(knownBrokenResult)) {
-    return Result.err(knownBrokenResult.value);
-  }
-
-  const knownBroken = knownBrokenResult.value;
-
-  if (policy === 'none' && knownBroken !== null) {
-    return Result.err(
-      [
-        '❌ `policy` is "none", which promises never to bound the top of',
-        '   `engines.node`, but `knownBroken` names a version that broke.',
-        '   Switch the policy to "reactive" — bounding the top is the honest',
-        '   thing to do once something is known to be broken.',
-      ].join('\n'),
+    const knownBroken = yield* Result.safeUnwrap(
+      parseKnownBroken(
+        hasKey(parsed, 'knownBroken') ? parsed.knownBroken : undefined,
+      ),
     );
-  }
 
-  return Result.ok({ policy, knownBroken, targets: targetsResult.value });
-};
+    if (policy === 'none' && knownBroken !== null) {
+      return Result.err(
+        [
+          '❌ `policy` is "none", which promises never to bound the top of',
+          '   `engines.node`, but `knownBroken` names a version that broke.',
+          '   Switch the policy to "reactive" — bounding the top is the honest',
+          '   thing to do once something is known to be broken.',
+        ].join('\n'),
+      );
+    }
+
+    return Result.ok({ policy, knownBroken, targets: targetsResult });
+  });
 
 const parseTargets = (
   value: unknown,
