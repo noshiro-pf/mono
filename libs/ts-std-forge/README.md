@@ -51,11 +51,10 @@ Sumi forbids calling the built-in constructors as plain functions
 whose intent is not in the name and whose failure is a sentinel. The
 replacements that are stdlib wrappers live here — `SafeNumber.parse` /
 `SafeNumber.parseInteger` for `Number(str)` / `Number.parseInt(str, 10)`, `SafeString.fromPrimitive` for `String(x)`, `Regex.create` for
-`RegExp(p, f)`. The rest need no new API: `Error('msg')` / `Date()` become
-their `new` forms, `Array(n)` a literal or ts-data-forge's `Arr.newArray` /
-`Arr.seq`, and `Boolean(x)` an explicit comparison (there is deliberately no
-truthiness helper). `Symbol()` and `BigInt()` are not affected — they have
-no `new` form.
+`RegExp(p, f)`, `SafeArray.create` for `Array(n)`. The rest need no new API:
+`Error('msg')` / `Date()` become their `new` forms, and `Boolean(x)` an
+explicit comparison (there is deliberately no truthiness helper). `Symbol()`
+and `BigInt()` are not affected — they have no `new` form.
 
 ## Current API
 
@@ -74,6 +73,9 @@ no `new` form.
 - `SafeString.fromPrimitive(value)` — the alternative to `String(x)` for `string | number | boolean | bigint | symbol | undefined` (the last three cannot go in a template literal); total, returns `string`.
 - `SafeString.normalize(value, form?)` — `form` is typed as the `'NFC' | 'NFD' | 'NFKC' | 'NFKD'` union; total, returns `string`.
 - `SafeString.repeat(value, count)` — `String.prototype.repeat` without throwing (`Err<{ kind: 'invalid-count' }>`; an engine length-limit overflow surfaces as `'unexpected'`).
+- `SafeArray.create(length, init)` — the alternative to `Array(n)`, returning `Err<{ kind: 'invalid-length', length }>` for the lengths `Array(n)` throws on. Writing it as `Array.from({ length })` instead does not throw — `ToLength` clamps `-1` to `0` and truncates `1.5` — so the failure this replaces is a silently wrong array rather than an exception.
+- `SafeArray.isArray(value)` / `SafeArray.isEmpty(array)` / `SafeArray.isNonEmpty(array)` — the array guards, copied from ts-data-forge's `Arr` (`isArray`, `isEmptyTuple`, `isNonEmptyTuple`) so that this package and its ESLint plugin no longer have to point across at `Arr` for them. `isArray` keeps the array members of a union where `Array.isArray` widens to `any[]`; the other two narrow to `readonly []` / `MinLengthTuple<1, E>`, which is what makes the non-empty branch index without an assertion under `noUncheckedIndexedAccess`. The `*Tuple` suffix is dropped because there is no branded family here to tell them apart from.
+- Unlike the other modules, `SafeArray` is reachable **only** through the namespace: `Regex` already exports `create` / `CreateError`, and `export *` reports the ambiguity rather than picking one.
 
 Neither returns a branded number (`FiniteNumber` / `Int`): ts-std-forge
 does not use ts-type-forge's number brands, and an ESLint rule in this

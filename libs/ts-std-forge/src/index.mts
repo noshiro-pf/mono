@@ -6,6 +6,7 @@ export * from './guard/index.mjs';
 export * from './others/index.mjs';
 export * from './panic/index.mjs';
 export * from './regex/index.mjs';
+export * from './safe-array/index.mjs';
 export * from './safe-date/index.mjs';
 export * from './safe-number/index.mjs';
 export * from './safe-string/index.mjs';

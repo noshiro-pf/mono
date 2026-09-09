@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import { Result, unknownToString } from '../../src/entry-point.mjs';
+import { Result, SafeArray, unknownToString } from '../../src/entry-point.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
@@ -102,8 +102,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       mut_modifiedFiles.push(sourceFilePath);
     }
 
-    // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- `Arr` lives in ts-data-forge, which depends on this package since the D-49 inversion.
-    if (mut_modifiedFiles.length > 0) {
+    if (SafeArray.isNonEmpty(mut_modifiedFiles)) {
       console.info(
         `\nFormatting ${mut_modifiedFiles.length} modified files...`,
       );

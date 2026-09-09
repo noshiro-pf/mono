@@ -5,7 +5,6 @@ import {
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
-import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
@@ -15,8 +14,6 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [thisDir],
   }),
-
-  eslintPluginTsDataForge.configs.recommended,
 
   eslintConfigForVitest(),
 
@@ -101,9 +98,8 @@ export default [
     // is not a global fallback — this package compiles with `types: []`, so a
     // ts-type-forge type is only in scope if the file imports it. Two groups:
     // the literal-range types that refine a parameter to a finite set of
-    // numbers, and the record and type-level utilities that the ADT core and
-    // the guards arrived with in the D-49 port. Neither group carries a
-    // brand.
+    // numbers, and the record and type-level utilities that the ADT core, the
+    // guards and `SafeArray` arrived with. Neither group carries a brand.
     files: ['src/**', 'test/**'],
     rules: defineKnownRules({
       'no-restricted-imports': [
@@ -121,6 +117,10 @@ export default [
                 'UintRange',
                 'UintRangeInclusive',
 
+                'BoolOr',
+                'IsAny',
+                'IsUnknown',
+                'MinLengthTuple',
                 'MutableRecord',
                 'ReadonlyRecord',
                 'RelaxedExclude',

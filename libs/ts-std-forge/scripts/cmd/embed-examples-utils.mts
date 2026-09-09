@@ -1,4 +1,4 @@
-import { pipe } from '../../src/entry-point.mjs';
+import { pipe, SafeArray } from '../../src/entry-point.mjs';
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 
@@ -39,10 +39,8 @@ const normalizeIndent = (source: string): string => {
       return match !== null ? match[0].length : 0;
     });
 
-  // `Arr.isEmptyTuple` in ts-data-forge; a length check does the same here,
-  // and `Math.min()` of nothing would be Infinity.
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-length-guard -- ts-data-forge depends on this package since the D-49 inversion.
-  if (indents.length === 0) {
+  // `Math.min()` of nothing would be Infinity.
+  if (SafeArray.isEmpty(indents)) {
     return source;
   }
 

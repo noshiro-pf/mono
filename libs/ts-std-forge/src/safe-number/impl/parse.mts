@@ -48,7 +48,6 @@ export const parse = (value: string): Result<number, ParseError> => {
   // This is the implementation of the conversion, not a mirror of one:
   // ts-data-forge's `Num.safeParse*` delegates here since D-49 (c). The
   // raw `Number` call is what this function exists to wrap.
-  // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
   const viaNumber = Number(value);
 
   // `Number('')` / `Number('   ')` は 0 を返すが、`parseFloat` は NaN を返す。
@@ -57,7 +56,6 @@ export const parse = (value: string): Result<number, ParseError> => {
   // Infinity をまとめて弾く。
   return Number.isNaN(viaNumber) ||
     !Number.isFinite(viaNumber) ||
-    // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
     Number.isNaN(Number.parseFloat(value))
     ? Result.err({ kind: 'invalid-number', input: value })
     : Result.ok(viaNumber);

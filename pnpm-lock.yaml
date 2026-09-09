@@ -2938,6 +2938,55 @@ importers:
         specifier: workspace:*
         version: link:../ts-repo-utils
 
+  libs/eslint-plugin-ts-std-forge:
+    dependencies:
+      '@typescript-eslint/utils':
+        specifier: ^8.69.0
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint:
+        specifier: '>=9.0.0'
+        version: 10.9.1(jiti@2.7.0)(supports-color@7.2.0)
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:../ts-std-forge
+      ts-type-forge:
+        specifier: workspace:~
+        version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
+    devDependencies:
+      '@typescript-eslint/parser':
+        specifier: 'catalog:'
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@typescript-eslint/rule-tester':
+        specifier: 'catalog:'
+        version: 8.69.0(eslint@10.9.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.6)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.6)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
   libs/eslint-plugin-ts-type-forge:
     dependencies:
       '@typescript-eslint/utils':
@@ -3857,9 +3906,6 @@ importers:
       eslint-config-typed:
         specifier: workspace:*
         version: link:../eslint-config-typed
-      eslint-plugin-ts-data-forge:
-        specifier: workspace:*
-        version: link:../eslint-plugin-ts-data-forge
       jiti:
         specifier: 'catalog:'
         version: 2.7.0

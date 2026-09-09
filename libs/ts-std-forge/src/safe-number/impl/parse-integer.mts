@@ -51,7 +51,6 @@ export const parseInteger = (
   // This is the implementation of the conversion, not a mirror of one:
   // ts-data-forge's `Num.safeParse*` delegates here since D-49 (c). The
   // raw `Number` call is what this function exists to wrap.
-  // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-float
   const viaNumber = Number(value);
 
   // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
@@ -62,7 +61,6 @@ export const parseInteger = (
   // 穴)。有限性も要求する。
   return Number.isNaN(viaNumber) ||
     !Number.isFinite(viaNumber) ||
-    // eslint-disable-next-line ts-data-forge/prefer-num-safe-parse-int
     Number.isNaN(Number.parseInt(value, 10))
     ? Result.err({ kind: 'invalid-integer', input: value })
     : Result.ok(Math.trunc(viaNumber));
