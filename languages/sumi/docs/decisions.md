@@ -467,6 +467,8 @@
 - **帰結・注意**:
     - **2 つの plugin を同じファイルに同時に有効にしてはいけない**。6 規則すべてが対になっており、同じコードを二重に報告して autofix が衝突する。README にその表と警告を書いた。
     - eslint-config-typed には**入れない**。あそこに入れると repo 全体で `ts-data-forge/*` と衝突する。使う側が明示的に選ぶ opt-in の plugin にとどめる。
-    - `SafeArray` は namespace 経由でしか参照できない(`export * as SafeArray`)。他のモジュールと違って `impl/` を top-level に re-export していないのは、`Regex` が既に `create` / `CreateError` を出しており `export *` が TS2308 になるため。
+    - **ラッパーモジュールは全部 namespace 経由だけにした**(`export * as SafeArray` 等)。`SafeArray` を足したときに `Regex` の `create` / `CreateError` と衝突して TS2308 になったのが発端だが、`Regex` / `SafeDate` / `SafeNumber` / `SafeString` も同じ形に揃えた — top-level に `create` / `parse` / `repeat` / `normalize` のような一般名を置く理由が無く、モジュールが増えるたびに同じ衝突が起きるため。破壊的変更だが 0.x なので minor(0.3.0 の前例)。bare 名を使っていた箇所はリポジトリ内に無かった。guard / ADT / `panic` は namespace を持たないのでそのまま。
+    - barrel に `export * from` と `export * as ns from` は同居できない(D-52 が名前空間再 export を明示的に禁じている)ので、namespace を index に直接書くなら `impl/` の bare re-export は落とすことになる。この 2 つは同じ決定の表と裏。
+    - `gi` は `export * from` しか吐けないため、これらの index は `--preserve`(`regex/index.mts` と `safe-*/index.mts`)で手書きにしている。
     - `SafeArray.create` の `Result` 化は throw だけが理由ではない。`Array.from({ length })` で書き換えると `ToLength` が負値を 0 に丸め小数を切り捨てるので、**throw せずに黙って違う配列**が返る。ts-std-forge が置き換えたい番兵そのもの。
     - copy した guard から `*Tuple` の接尾辞を落とした。ts-data-forge であれが要るのは branded な `isEmpty` / `isNonEmpty` と区別するためで、brand を持たない(D-26 / D-39)こちらには区別する相手がいない。

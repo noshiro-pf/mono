@@ -1,2 +1,1 @@
-export * from './impl/index.mjs';
-export * from './safe-number.mjs';
+export * as SafeNumber from './impl/index.mjs';

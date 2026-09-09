@@ -75,14 +75,22 @@ and `BigInt()` are not affected — they have no `new` form.
 - `SafeString.repeat(value, count)` — `String.prototype.repeat` without throwing (`Err<{ kind: 'invalid-count' }>`; an engine length-limit overflow surfaces as `'unexpected'`).
 - `SafeArray.create(length, init)` — the alternative to `Array(n)`, returning `Err<{ kind: 'invalid-length', length }>` for the lengths `Array(n)` throws on. Writing it as `Array.from({ length })` instead does not throw — `ToLength` clamps `-1` to `0` and truncates `1.5` — so the failure this replaces is a silently wrong array rather than an exception.
 - `SafeArray.isArray(value)` / `SafeArray.isEmpty(array)` / `SafeArray.isNonEmpty(array)` — the array guards, copied from ts-data-forge's `Arr` (`isArray`, `isEmptyTuple`, `isNonEmptyTuple`) so that this package and its ESLint plugin no longer have to point across at `Arr` for them. `isArray` keeps the array members of a union where `Array.isArray` widens to `any[]`; the other two narrow to `readonly []` / `MinLengthTuple<1, E>`, which is what makes the non-empty branch index without an assertion under `noUncheckedIndexedAccess`. The `*Tuple` suffix is dropped because there is no branded family here to tell them apart from.
-- Unlike the other modules, `SafeArray` is reachable **only** through the namespace: `Regex` already exports `create` / `CreateError`, and `export *` reports the ambiguity rather than picking one.
+
+Every wrapper module is reachable **only** through its namespace —
+`SafeString.repeat(s, 3)`, never a bare `repeat`. The barrels stopped
+re-exporting their `impl/` contents at the package's top level in the same
+release that added `SafeArray`: generic names (`create`, `parse`, `repeat`,
+`normalize`) are not what a top level is for, and they collide across modules
+— `Regex.create` and `SafeArray.create` are both `create`, which `export *`
+reports as TS2308 rather than resolving. The guards, the ADT core and `panic`
+keep their bare names; they have no namespace to sit under.
 
 Neither returns a branded number (`FiniteNumber` / `Int`): ts-std-forge
 does not use ts-type-forge's number brands, and an ESLint rule in this
 package allows only the literal-range types to be imported from it.
 
-Functions that can still fail export their failure type alongside
-(`SafeString.FromCodePointError`, `Regex.CreateError`, …), and the shared
-fallback type is `UnexpectedError`.
+Functions that can still fail export their failure type alongside, under the
+same namespace (`SafeString.FromCodePointError`, `Regex.CreateError`, …), and
+the shared fallback type is `UnexpectedError`.
 
 Module and package names are provisional.

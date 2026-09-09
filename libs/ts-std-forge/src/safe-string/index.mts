@@ -1,2 +1,1 @@
-export * from './impl/index.mjs';
-export * from './safe-string.mjs';
+export * as SafeString from './impl/index.mjs';
