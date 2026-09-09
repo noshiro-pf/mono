@@ -627,13 +627,15 @@ const siblingOverrides = (
  * rename, an unpublish, a typo in a manifest — has to fail rather than quietly
  * leave the check. Delete the entry once the package has been published; from
  * then on it is verified like any other.
+ *
+ * "Published" has to mean *working*, not merely present. A first publish that
+ * happens before the sibling release its code needs is on the registry and
+ * broken: `eslint-plugin-ts-std-forge@0.1.0` shipped importing `SafeArray`
+ * from `ts-std-forge`, with `workspace:*` resolved to the exact `0.4.0` in the
+ * checkout — a version that does not have it. Removing the entry then only
+ * pins the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set([
-  // Added with the D-49 follow-up that split the ts-std-forge rules out of
-  // eslint-plugin-ts-data-forge. Delete this entry after its first manual
-  // publish (libs/first-release.md).
-  'eslint-plugin-ts-std-forge',
-]);
+const notYetPublished: ReadonlySet<string> = new Set();
 
 /**
  * The published space pins an exact version, committed, rather than tracking
