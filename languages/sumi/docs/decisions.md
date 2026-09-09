@@ -214,10 +214,11 @@
 
 ## D-29: 論理代入演算子 `&&=` / `||=` / `??=` は `mut_` 変数に限り 3 つとも許可する
 
-- **ステータス**: 確定(2026-09-05)
+- **ステータス**: 確定(2026-09-05)。**`??=` の部分は再検討中**(2026-09-09、ユーザー — issue #1753 のコメント「初期化されていない変数は許可しない → `??=` は必要無い」)。宣言が必ず初期化子を持つなら `??=` の用途が消えるため、禁止に回す方向。[spec/variables-and-mutation.md](./spec/variables-and-mutation.md) の未解決の論点に整理を置いた。`&&=` / `||=` の boolean 限定はこの再検討の影響を受けない
 - **判断**: 代入先が `mut_` 変数であれば 3 つとも許可する。`&&=` / `||=` のオペランドは `&&` / `||` と同じ boolean 厳密化([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))の対象。`??=` は値の合体なので boolean 制約の対象外。
 - **理由**: `x &&= y` は `x = x && y` と同義で、boolean 厳密化の下では純粋な boolean の畳み込みにすぎない。本来の用途(`opts ||= {}` 等の truthiness idiom)はオペランド型の制約で既に違法になる。現行 config は `logical-assignment-operators: "always"` + `unicorn/logical-assignment-operators` で**論理代入形をむしろ強制**しており、禁止すると現行運用と衝突する。
 - **帰結(実装)**: `@typescript-eslint/strict-boolean-expressions` が検査するのは `LogicalExpression` / 条件位置 / `!` のみで、`AssignmentExpression`(`&&=` / `||=`)のオペランドは**検査しない**(2026-09-05 実測、typescript-eslint 8.67)。したがって `&&=` / `||=` の両オペランドの boolean 限定は 🆕 ルール。
+- **実装(2026-09-09)**: `boolean/strict-logical-assignment-operands`(`@sumi-lang/checker`、D-54)。型情報が要るので専用チェッカー側。両オペランドの型が boolean(`TypeFlags.BooleanLike`、union なら全メンバー)であることを要求し、`??=` は見ない。左オペランドが boolean なら TypeScript が右オペランドを boolean に制約するので、実際に捕まるのは `mut_name ||= fallback` のような truthiness idiom である。
 
 ## D-30: `using` / `await using` は Sumi lint では禁止し、Sumi sugar で再検討する
 
@@ -472,3 +473,36 @@
     - `gi` は `export * from` しか吐けないため、これらの index は `--preserve`(`regex/index.mts` と `safe-*/index.mts`)で手書きにしている。
     - `SafeArray.create` の `Result` 化は throw だけが理由ではない。`Array.from({ length })` で書き換えると `ToLength` が負値を 0 に丸め小数を切り捨てるので、**throw せずに黙って違う配列**が返る。ts-std-forge が置き換えたい番兵そのもの。
     - copy した guard から `*Tuple` の接尾辞を落とした。ts-data-forge であれが要るのは branded な `isEmpty` / `isNonEmpty` と区別するためで、brand を持たない(D-26 / D-39)こちらには区別する相手がいない。
+
+## D-55: 型情報が要るルールは TypeScript 7 同梱の JS API 上の自前チェッカーで実装する(`@sumi-lang/checker`)
+
+- **ステータス**: 確定(2026-09-09、ユーザー決定)
+- **判断**: 型情報を使う Sumi のルールは、既存 linter の拡張ではなく **TypeScript 7 が同梱する JS API(`typescript-native/unstable/*`)の上に書いた自前の薄いチェッカー**で実装する。新パッケージ `@sumi-lang/checker`(`languages/sumi/checker`)。1 プロジェクト = 1 プログラム = 1 パスで全ルールを回し、`sumi check` の第 4 段として走る。構文だけで決まるルールは従来どおり oxlint preset(`@sumi-lang/oxlint-config`)側に残し、**どちらのエンジンが出したかは中立ルール ID に正規化して隠す**。適合性コーパスは両エンジンの診断を混ぜて 1 つの多重集合として比較する。
+- **理由**:
+    - **速いネイティブ linter はどれも型情報付きカスタムルールを書けない**(2026-09 調査)。oxlint は JS plugin のドキュメントが「型情報に依存するルール」を未対応と明記し、ロードマップは placeholder の issue 1 本のみ。rslint は plugin ルールから `parserServices` が取れず、しかも**エラーも出さずに何も報告しない**とドキュメントにある。Biome の GritQL plugin は型に触れず 2026 のロードマップにも無い。typescript-eslint は書けるが遅い(Go 系との差は 12〜34 倍)。
+    - **fork も選べない**。oxlint / tsgolint / rslint のどれを fork してもルールは **Go** で、しかも typescript-go の内部 API を公開化した shim に対して書くことになり、TypeScript のリリースごとにバイナリを再ビルドし、それでいて既存の構文ルールとは統合されない。
+    - **TS 7 の公式 API で足りる**。`Project` が `program` と `checker` を持ち、`checker.getTypeAtLocation` / `getSymbolAtLocation` / `getTypeOfSymbol` と `TypeFlags` / `SymbolFlags`、`unstable/ast` に `SyntaxKind`・352 個の `is*` 述語・`node.forEachChild` が揃う。**`typescript-native` は既に `@sumi-lang/cli` の依存なので依存が 1 つも増えず**、lint と型検査が同じコンパイラ・同じバージョン・同じ tsconfig を見る。
+    - **速い**。synstate(76 ファイル)の 1 パスが実測 262 ms — プロジェクトを開く 66 ms、全ファイルの構文走査 18 ms、宣言名 804 個への `getTypeAtLocation`(cold)164 ms、union 判定 11 ms。ノード 1 個あたり 0.2 ms なので、ESLint 流の「ルールがノードごとに checker に問い合わせる」API がそのまま成立する。batch オーバーロード(`getTypeAtLocation(nodes)`)もあるが 1.3 倍程度の差。
+    - **Phase 2 の土台がそのまま手に入る**。D-46 が計画している「`sumi check` の内部を単一パスの専用チェッカーに置き換える」作業の前倒しであり、sugar でも同じ AST とスキャナを使える。sugar でどのみち自前実装が要る以上、既存ツールを複雑に使うより自前の単純な実装を選ぶ(ユーザー方針)。
+- **代替案と却下理由**: **TSSLint** は「作ろうとしていた薄いチェッカーが既にある」に近く、組み込みルールを持たないハーネスで ESLint 互換層も持つが、**TS 6 側**である(`@tsslint/cli` 3.1.4 の peer dependency は `typescript: "*"` = このリポジトリの 6.0.3、依存に `@volar/*`)。TS 7 対応は v4 で `typescript-native-bridge` を埋め込む計画が進行中だが未着。加えて実質 1 人開発で破壊的な書き換えの最中であり、必須ステータスチェックの土台には維持リスクが重い。**tsl** は API の型付けが最も良いが TS 5.8/5.9/6.0 のみで、TS 7 対応は未着手の issue。**`typescript-native-bridge`** は TS 7 の公式 API で足りたので不要になった。
+- **帰結**:
+    - 最初のルールは `null/no-null-propagation`(spec/null-undefined.md の段階 3、境界正規化の強制)。適用範囲は変数宣言と分割代入の束縛。
+    - コーパスの runner は 2 エンジンを混ぜる形に変わった(`test/engine.test.mts`、旧 `oxlint-engine.test.mts`)。
+    - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く(全ノードに型を聞けばプログラム全体の型付けを払う)。
+    - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
+    - 残る型情報ルール(`castMutable` 乱用、論理代入のオペランド boolean 限定、`mut_` 以外への破壊的操作)も同じ場所に実装する。
+    - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
+
+## D-55: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
+
+- **ステータス**: 確定(2026-09-09、ユーザー了承)
+- **背景**: D-54 で型情報ルール用の自前チェッカー(`@sumi-lang/checker`)ができ、`sumi check` は 2 エンジン(oxlint preset + 自前チェッカー)になった。Phase 2 の完了条件はもともと「対応表の全項目が専用チェッカーで検査され、preset が退役していること」なので、2 エンジン併存は**移行期間の姿**であって最終形ではない。では preset を今すぐ畳むか、が論点。
+- **現状(2026-09-09 計測)**: preset の有効ルールは **57 本**。内訳は自前の JS plugin が **20**、oxlint / tsgolint のネイティブが **37**(eslint core 20、typescript 13、import 3、unicorn 1)。
+- **判断**:
+    1. **段階的に減らす**。(a) 型情報が要る残り 3 ルールを自前チェッカーに実装する(D-54)。(b) 構文だけで決まるネイティブルール(20 本ほど)を、コーパスで同値性を保証しながら 1 本ずつ移す。(c) 残るのは型情報が要るネイティブ 5 本前後になるので、そこで「これも自前で書くか、oxlint を残すか」を実物の分量を見て判断する。
+    2. **分ける線は「Sumi の言語仕様そのもの」か「TypeScript 一般の型安全規則」か**。前者はコーパスで固定すべき Sumi の定義そのものなので自前で持つ。後者はどの TS プロジェクトでも同じもので、自前で書き直すのは車輪の再実装になる。現在の 20 / 37 の分かれ目はほぼこの線に沿っている。
+- **理由**:
+    - **一度に移すとコーパスがゲートとして機能しなくなる**。適合性コーパスが同値性を保証できるのは、片方を動かしてもう片方が固定されているときだけである。57 本を同時に移せば、コーパスは「新実装が旧実装と一致する」ではなく「新実装が自分自身と一致する」ことしか確認できない。
+    - **型情報を要するネイティブルールの一部は、実績のある込み入った実装**である。`prefer-readonly-parameter-types`(再帰的 readonly 判定と循環参照)、`strict-boolean-expressions`、`no-unsafe-type-assertion`、`restrict-plus-operands`、`require-array-sort-compare`、そして `no-shadow`(スコープ解析)と `import/extensions`(モジュール解決)。書き直しは間違えたときに**黙って見逃す**種類の作業で、言語仕様の実装ではない。
+    - 一方 2 エンジンのコストも実在する: oxlint プロセスの起動、JS plugin のロード、`dist` へのビルド、診断形式を中立 ID に正規化する層。(b) が進むほどこれらの価値は下がるので、(c) の判断はその時点の実物で行う。
+- **帰結**: implementation-plan の Phase 2 完了条件は変わらない。中立ルール ID(`conformance/src/rule-ids.mts`)がエンジンの差を隠す仕組みは、この移行の間ずっと効き続ける前提であり、移行のたびにコーパスが同値性を確認する。

@@ -1,10 +1,17 @@
 import {
-  implementedRuleIds,
+  allRules,
+  implementedRuleIds as checkerRuleIds,
+  runRules,
+} from '@sumi-lang/checker';
+import {
   oxlintCodeToRuleId,
+  implementedRuleIds as oxlintRuleIds,
   runOxlint,
   type OxlintDiagnostic,
 } from '@sumi-lang/oxlint-config';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { Result } from 'ts-data-forge';
 import {
   fixturesRootPath,
   listFixtures,
@@ -13,19 +20,29 @@ import {
 } from '../src/index.mjs';
 
 /**
- * Phase 1 engine check: the oxlint preset (@sumi-lang/oxlint-config) run over the
- * whole corpus, its diagnostics normalized to neutral rule IDs through the
- * preset's mapping, and compared with the `@sumi-expect-error` markers — exact
- * match both ways (languages/sumi/docs/conformance-corpus.md, "runner の契約").
+ * The engine check: both engines run over the whole corpus, their diagnostics
+ * normalized to neutral rule IDs, and compared with the `@sumi-expect-error`
+ * markers — exact match both ways (languages/sumi/docs/conformance-corpus.md,
+ * "runner の契約").
+ *
+ * Two engines because a rule needs one or the other, never both: the oxlint
+ * preset (@sumi-lang/oxlint-config) for what syntax settles, and the Sumi
+ * checker (@sumi-lang/checker, D-54) on TypeScript 7's own API for what needs
+ * the type checker. The corpus does not care which produced a diagnostic —
+ * that is the point of the neutral IDs — so the two lists are merged before
+ * anything is compared.
  */
 
 /**
- * Neutral IDs that have fixtures but no oxlint implementation yet (fixtures
- * are written first — TDD for 🆕 rules). Listed explicitly, like an
+ * Neutral IDs that have fixtures but no implementation in either engine yet
+ * (fixtures are written first — TDD for 🆕 rules). Listed explicitly, like an
  * `@ts-expect-error`: an entry whose rule becomes implemented fails the
  * "still unimplemented" check below and has to be removed.
  */
 const knownUnimplementedRuleIds: ReadonlySet<string> = new Set();
+
+const implementedRuleIds: ReadonlySet<string> =
+  oxlintRuleIds.union(checkerRuleIds);
 
 const fixtures = listFixtures(fixturesRootPath).fixtures;
 
@@ -33,8 +50,21 @@ const fixtures = listFixtures(fixturesRootPath).fixtures;
 // dominates per-file cost.
 const run = runOxlint(fixtures.map((fixture) => fixture.absolutePath));
 
-const diagnosticsByFile: ReadonlyMap<string, readonly OxlintDiagnostic[]> =
-  Map.groupBy(run.diagnostics, (diagnostic) => diagnostic.filename);
+// One program for the whole corpus, for the same reason.
+const fixturePaths: ReadonlySet<string> = new Set(
+  fixtures.map((fixture) => fixture.absolutePath),
+);
+
+const oxlintDiagnosticsByFile: ReadonlyMap<
+  string,
+  readonly OxlintDiagnostic[]
+> = Map.groupBy(run.diagnostics, (diagnostic) => diagnostic.filename);
+
+const checkerRun = runRules(
+  path.resolve(fixturesRootPath, 'tsconfig.json'),
+  allRules,
+  (fileName) => fixturePaths.has(fileName),
+);
 
 type Observed = Readonly<{
   ruleId: string;
@@ -62,6 +92,29 @@ const toObserved = (diagnostic: OxlintDiagnostic): Observed =>
     message: diagnostic.message,
   }) as const;
 
+/**
+ * Both engines' diagnostics for one file. Which engine found a problem is not
+ * part of the corpus's contract, so the lists are concatenated and compared as
+ * one multiset.
+ */
+const observedByFile: ReadonlyMap<string, readonly Observed[]> = new Map(
+  fixtures.map((fixture) => [
+    fixture.absolutePath,
+    [
+      ...(oxlintDiagnosticsByFile.get(fixture.absolutePath) ?? []).map(
+        toObserved,
+      ),
+      ...(Result.isOk(checkerRun) ? checkerRun.value : [])
+        .filter((d) => d.fileName === fixture.absolutePath)
+        .map((d): Observed => ({
+          ruleId: d.ruleId,
+          line: d.line,
+          message: d.message,
+        })),
+    ],
+  ]),
+);
+
 const key = (ruleId: string, line: number): string =>
   `${line}:${ruleId}` as const;
 
@@ -71,9 +124,7 @@ const fixtureCases = fixtures.map((fixture) => {
   return {
     label: `${ruleId}/${fixture.kind}/${fixture.fileName}`,
     ruleId,
-    observed: (diagnosticsByFile.get(fixture.absolutePath) ?? []).map(
-      toObserved,
-    ),
+    observed: observedByFile.get(fixture.absolutePath) ?? [],
     expected: parseMarkers(
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.readFileSync(fixture.absolutePath, 'utf8'),
@@ -85,7 +136,13 @@ const implementedCases = fixtureCases.filter((c) =>
   implementedRuleIds.has(c.ruleId),
 );
 
-describe('oxlint engine', () => {
+describe('engines', () => {
+  test('the Sumi checker opened the corpus project', () => {
+    // A checker that failed to start reports nothing, which would make every
+    // type-aware fixture fail confusingly, so it is asserted first.
+    assert.isTrue(Result.isOk(checkerRun));
+  });
+
   test('oxlint ran without loader or type-aware failures', () => {
     // A failed JS-plugin load or a missing tsgolint prints to stderr and
     // yields no diagnostics at all — which would make every invalid fixture

@@ -138,5 +138,7 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ],
 
     // null
+    // No ESLint rule bans the `null` type keyword; nothing to switch off.
+    ['null/no-null-in-type', []],
     ['null/no-null-literal', ['unicorn/no-null']],
   ]);

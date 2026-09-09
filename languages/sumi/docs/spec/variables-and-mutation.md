@@ -60,6 +60,10 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 ## 未解決の論点
 
 - 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
+- **未初期化の変数は許可しない(2026-09-09、ユーザー決定 — issue #1753 のコメント)。** 宣言は必ず初期化子を持つ。「まだ値が無い」ことは `undefined` または `Optional.none` を**明示的に書く**ことで表す。`let mut_x;` のように初期化子を省いた宣言は書けない。
+    - **帰結: `??=` は不要になる。** `x ??= v` の用途は「まだ初期化されていない変数に値を入れる」であり、初期化が必ず宣言と同時に起きるならこの操作の居場所が無い。D-29 は 3 つの論理代入をすべて許可したが、その根拠のうち `??=` の分は消える(`&&=` / `||=` の boolean 限定はそのまま — [decisions.md](../decisions.md) D-29)。
+    - **実装に要るもの**(未着手): (1) 初期化子の無い宣言を禁止する構文ルール(`VariableDeclaration` の `initializer` が無い場合。型情報は要らない)。(2) `??=` を禁止に回す — 現在は `sumi/strict-logical-assignment-operands` が `??=` を対象外にしているので、その除外を外すのではなく「`??=` 自体を禁止」の別ルールにする(D-29 の改訂として決める)。
+- **auto freezing を有効にするか(2026-09-09、ユーザー提起 — issue #1753 のコメント、未決)。** 生成したオブジェクト・配列を `Object.freeze` で凍結して、型だけでなく実行時にも不変にするか。immutable 指向(D-14 の `mut_` 規律)を実行時まで徹底できる一方、コストと外部ライブラリとの相互作用(凍結オブジェクトを変更しようとするライブラリ、`Object.assign` の失敗)がある。**`sumi.config` で切り替えられるようにするか**も併せて検討する(設定の形は D-46 / #1753 の `sumi.config.json` 設計と同居)。immer 相当の draft や `markAsPanic`(凍結エラーには印を付けられない)のように、凍結が前提を変える箇所があることも判断材料。
 - **immer のような Proxy ベースのライブラリと setter / 代入構文(2026-09-08 追記、ユーザー要望)。** Sumi lint / sugar / refined で immer 相当(`produce(state, (mut_draft) => { mut_draft.x = 1; })`)を実現するには `Proxy` のサポートが要る。整理:
     - **setter 構文(`set x(v) {}`)は要らない見込み。** immer の draft への `mut_draft.x = 1` は object literal の setter ではなく **Proxy の `set` トラップ**(handler の `set` という名前のプロパティ。arrow function プロパティとして書ける)で捕捉される。ライブラリ側の実装も `new Proxy(target, { set: (t, k, v) => … })` と `Reflect.set` で書けるため、D-33 の setter 禁止(D-47 でも維持)を緩める必要はない。`Proxy` は `new` 形で生成する組み込みで、D-15 / D-41 の禁止対象にも入っていない。
     - **残る論点は「draft への代入式」の扱い。** Sumi lint では `mut_` 束縛への代入として今日でも合法(上表の `mut_draft`)。sugar / refined でこの代入式を残すか、**関数呼び出しで置き換える**か(例: `Draft.set(mut_draft, 'x', 1)`、lens / optic 風の `mut_draft.x.set(1)`、あるいは `produce` 自体をパスと値で更新する API)が未決。ユーザーの希望は**なるべく関数呼び出しでカバーする**方向。関数呼び出し形なら Proxy に頼らない実装(構造共有のパス更新)も選べ、refined で代入式の意味論を狭める余地が生まれる。

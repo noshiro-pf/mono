@@ -62,12 +62,12 @@
 
 ## null([spec/null-undefined.md](./spec/null-undefined.md))
 
-| 仕様ルール                              | 強制手段                                                           | 状態 | 型   | 備考                                                                                         |
-| :-------------------------------------- | :----------------------------------------------------------------- | :--- | :--- | :------------------------------------------------------------------------------------------- |
-| `null` リテラル禁止                     | `unicorn/no-null`                                                  | ⏻    | 不要 | 現行 off                                                                                     |
-| 型注釈への `null` 禁止                  | `no-restricted-syntax`(TSNullKeyword)                              | 🆕   | 不要 | 注釈の構文検査で大半を賄える                                                                 |
-| null 含み型の伝播禁止(境界正規化の強制) | —                                                                  | 🆕   | 要   | Sumi lint 新規実装の本丸。宣言(変数・引数・戻り値・プロパティ)の型に null が含まれたらエラー |
-| `?? undefined` イディオム               | `ts-restrictions/no-unnecessary-coalesce-undefined` と干渉しないか | ❓   | 要   | null を undefined へ潰す用途は「necessary」のはずだが要確認                                  |
+| 仕様ルール                              | 強制手段                                                           | 状態 | 型   | 備考                                                                                                                      |
+| :-------------------------------------- | :----------------------------------------------------------------- | :--- | :--- | :------------------------------------------------------------------------------------------------------------------------ |
+| `null` リテラル禁止                     | `unicorn/no-null`                                                  | ⏻    | 不要 | 現行 off                                                                                                                  |
+| 型注釈への `null` 禁止                  | `sumi/no-null-in-type`(`TSNullKeyword` — 2026-09-09 実装)          | ✅   | 不要 | 書かれた `null` 型は全部捕まる。推論結果に `null` が混ざる場合(下行)は別                                                  |
+| null 含み型の伝播禁止(境界正規化の強制) | `sumi/no-null-propagation`(@sumi-lang/checker — 2026-09-09 実装)   | ✅   | 要   | D-54。TS 7 の JS API 上の専用チェッカー。現在は変数宣言と分割代入の束縛のみ。引数・プロパティ・戻り値位置は spec の未解決 |
+| `?? undefined` イディオム               | `ts-restrictions/no-unnecessary-coalesce-undefined` と干渉しないか | ❓   | 要   | null を undefined へ潰す用途は「necessary」のはずだが要確認                                                               |
 
 ## boolean([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))
 
@@ -78,7 +78,7 @@
 | `!!x` 禁止                              | `no-implicit-coercion` boolean: true                                      | 🔧                       | 不要                                                                 | 上表と同件               |
 | `Boolean(x)` 禁止(有力)                 | `no-restricted-syntax`(CallExpression selector)                           | 🆕                       | 不要                                                                 | 仕様確定後               |
 | JSX 条件描画は三項                      | `react/jsx-no-leaked-render` `{validStrategies: ["ternary"]}`             | ✅                       | 不要                                                                 |                          |
-| 論理代入演算子(`mut_` 変数のみ、`&&=` ` |                                                                           | =` はオペランド boolean) | 代入先: `functional/no-let` + `immutable-data`(既存)/ オペランド: 🆕 | 🆕                       | 要  | D-29。`strict-boolean-expressions` は `AssignmentExpression` を検査しない(実測)。現行 `logical-assignment-operators: "always"` と整合 |
+| 論理代入演算子(`mut_` 変数のみ、`&&=` ` |                                                                           | =` はオペランド boolean) | 代入先: `functional/no-let` + `immutable-data`(既存)/ オペランド: 🆕 | 🆕                       | 要  | D-29。`strict-boolean-expressions` は `AssignmentExpression` を検査しない(実測)。現行 `logical-assignment-operators: "always"` と整合 オペランドの boolean 限定は `sumi/strict-logical-assignment-operands`(@sumi-lang/checker — 2026-09-09 実装、D-54)。`??=` は対象外 |
 
 ## モジュール([spec/modules.md](./spec/modules.md))
 

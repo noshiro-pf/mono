@@ -50,6 +50,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "@sumi-lang/checker": "workspace:*",
     "@sumi-lang/oxlint-config": "workspace:*",
     "cmd-ts": "^0.15.0",
     "ts-data-forge": "workspace:*",

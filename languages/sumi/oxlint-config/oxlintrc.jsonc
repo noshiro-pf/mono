@@ -205,5 +205,6 @@
 
     // ---- null (spec/null-undefined.md) ----
     "unicorn/no-null": "error",
+    "sumi/no-null-in-type": "error",
   },
 }

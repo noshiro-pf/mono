@@ -1,4 +1,4 @@
-<!-- cspell:ignore tsslint tsgo -->
+<!-- cspell:ignore tsslint tsgo rslint -->
 
 # Sumi lint 実装計画
 
@@ -32,6 +32,7 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - **エディタ統合を後回しにしない**(Flow の敗因 — [related-work.md](./related-work.md))。最初は CLI + TS language service plugin として出し、LSP を自作せずにエディタ診断を得る。watch モードは `ts.createWatchProgram` の incremental で。
 - Phase 1 preset からルールを 1 個ずつ移植し、適合性コーパスで同値性をゲートしながら ESLint 側を退役させる。移植完了まで両者は並走してよい(コーパスが同値性を保証する)。言語仕様に属さないスタイル規則は ESLint に残してよい。
 - 置き場所: `languages/sumi/cli`(@sumi-lang/cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
+- **着手済み(2026-09-09、D-54)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
 - 完了条件: 対応表の全項目が専用チェッカーで検査され、subset preset(言語仕様分)が退役していること。
 
 ## Phase 3(Sumi sugar): fork parser はチェッカーと結合させずに足す
@@ -40,6 +41,8 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - 具象構文の互換性は「Sumi sugar 構文 ⊃ Sumi lint 構文 = TS 構文」で構成的に保たれる。コストの重心(CST parser・高品質 emit)は Sumi sugar に置く。
 
 ## 将来の作業(future work)
+
+- **React Compiler を意識した設計(2026-09-02、ユーザー要望 — issue #1753 のコメント、未整理)。** React Compiler は「コンポーネントとフックが冪等で、レンダー中に値を変更しない」ことを前提にメモ化を自動挿入する。Sumi の既存の規律 — `const` 既定と `mut_` prefix(D-14)、`functional/immutable-data` 相当、readonly 強制(D-45)、副作用 import の禁止 — はその前提とほぼ同じものを別の言葉で言っており、**Sumi lint を通ったコードは React Compiler が最適化できるコードである**という関係を明示できるはずである。整理すべき点: (1) React Compiler の bail-out 条件(レンダー中の変更、条件付きフック呼び出し、ref の読み書き)と Sumi の規則の対応表を作り、Sumi 側で捕まえられていない条件があれば規則を足すか記録する。(2) `mut_` 束縛をどこまで許すか — レンダー中のローカルな可変アキュムレータは React Compiler も許すので、規則の緩さの線が一致しているかを確認する。(3) React Compiler が要求する `"use memo"` / `"use no memo"` ディレクティブと、D-36 の default export emit 設定や `sumi.config` の関係。(4) synstate(このリポジトリの状態管理ライブラリ)と React Compiler の相互作用は別問題として切り分ける。
 
 ### ユーザー / コミュニティが lint ルールを追加できる仕組み(2026-09-08 追記、ユーザー要望)
 

@@ -39,6 +39,7 @@ export const knownRuleIds = [
   'banned-syntax/prefer-template',
   'banned-syntax/require-sort-compare',
   'boolean/no-logical-expression-statement',
+  'boolean/strict-logical-assignment-operands',
   'boolean/strict-logical-operands',
   'classes/no-class',
   'exceptions/no-throw',
@@ -59,7 +60,9 @@ export const knownRuleIds = [
   'mutation/no-let-without-mut-prefix',
   'mutation/no-shadow',
   'mutation/prefer-const',
+  'null/no-null-in-type',
   'null/no-null-literal',
+  'null/no-null-propagation',
   'readonly/require-readonly-parameter',
   'readonly/require-readonly-type',
 ] as const;

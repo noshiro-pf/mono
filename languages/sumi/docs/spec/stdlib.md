@@ -100,6 +100,8 @@ ts-data-forge の現状(すべて直接形 + カリー化形の二本立て):
 
 ## 未解決の論点
 
+- **`Object` 配下の API の棚卸し(2026-09-09、ユーザー提起 — issue #1753 のコメント、未着手)。** `Object.create` のように、Sumi では使う必要がなさそうなものがある。`Object.*` を一つずつ「言語に要る / prelude のラッパーに置き換える / 禁止する」に分類する調査枠。`Object.create` はプロトタイプ操作(class 全面禁止 — D-12 と同じ動機で不要)、`Object.defineProperty` / `Object.setPrototypeOf` / `Object.seal` も同類の候補。逆に `Object.hasOwn`(現行 config が `in` の代替として推奨)、`Object.entries` / `keys` / `values`、`Object.freeze`(auto freezing の論点 — [variables-and-mutation.md](./variables-and-mutation.md))は残す側。throwing-stdlib-survey と同じ形式で表にする。
+
 - **コンストラクタ静的呼び出しの代替生成関数**(D-15 — 配置と対象は D-41 で確定、下表)と **throw する stdlib の Result ラッパー**(D-22 — 対象は [throwing-stdlib-survey.md](../throwing-stdlib-survey.md)): `Num.safeParseInt` 系・`Json.*` が既存モデル。**`new RegExp` の Result ラッパー(動的パターン用)をギャップに追加**(2026-08-29)。`Arr.set` の可変長配列での範囲外(RangeError が残る)への Optional/Result 版も検討対象。
 - **null / 番兵値を返す API の Optional ラップ(方針)**: throwable → Result と対になる形で、null を返す API(`RegExp.prototype.exec`、`match` 等)は Optional を返すラッパーへ寄せたい(ユーザー意向 2026-08-29。番兵値 API の棚卸しは survey の次の調査枠)。
 - **ラッパー群のパッケージ構成(確定 — D-24)**: 一方向依存の新ライブラリ **ts-std-forge**(仮名)を採用。scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)。以下は検討の記録:懸念は相互依存 — ts-data-forge は基本 ADT(Result/Optional/pipe)と拡張 `Arr` の両方を持つため、分割すると双方向依存になりうる。**整理案(D-24 で採用)**: 依存を「wrapper 新 lib → ts-data-forge」の一方向に固定する。ts-data-forge が wrapper を必要とする状況は「自身の実装内部では素の stdlib を直接使ってよい(境界の実装者)」と定義すれば発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面そのままにし、新 lib が re-export で facade になる(実体移動は将来の major で)。より根本的な代替は「ADT コア(Result/Optional/pipe のみ)の最小パッケージを切り出し、ts-data-forge と wrapper lib が共にそれへ依存する」形(fp-ts/effect 型の kernel 構成)だが、公開済みパッケージの再編コストが大きい。
