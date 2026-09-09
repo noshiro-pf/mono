@@ -43,7 +43,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  * `reactive` policy an upper bound exists exactly while `knownBroken` names the
  * version that broke.
  */
-export const checkNodeSupport = async (
+export const checkNodeSupport = (
   options: Readonly<{ fix: boolean }>,
 ): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
@@ -146,7 +146,7 @@ export const parseNodeSupportConfig = (
       );
     }
 
-    const targetsResult = yield* Result.safeUnwrap(
+    const targets = yield* Result.safeUnwrap(
       parseTargets(hasKey(parsed, 'targets') ? parsed.targets : undefined),
     );
 
@@ -167,7 +167,7 @@ export const parseNodeSupportConfig = (
       );
     }
 
-    return Result.ok({ policy, knownBroken, targets: targetsResult });
+    return Result.ok({ policy, knownBroken, targets });
   });
 
 export const nodeSupportConfigPath = path.resolve(
