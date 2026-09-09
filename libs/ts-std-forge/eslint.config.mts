@@ -120,7 +120,7 @@ export default [
                 'BoolOr',
                 'IsAny',
                 'IsUnknown',
-                'MinLengthTuple',
+                'NonEmptyTuple',
                 'MutableRecord',
                 'ReadonlyRecord',
                 'RelaxedExclude',

@@ -69,8 +69,21 @@ export function panic(
 }
 
 /**
- * Panics on a value that the types say cannot exist — the exhaustiveness
- * check of a `switch` over a union.
+ * Panics on a code path the types say cannot be reached.
+ *
+ * Two forms. With a value it is the exhaustiveness check of a `switch` over a
+ * union, and the value's string form goes into the message. With no argument
+ * at all it is the standing invariant — the default of a method every
+ * implementation is expected to override, say — where there is no `never`
+ * value to hand and the fact of being called is the whole error.
+ *
+ * The value stays the *first* parameter, and optional rather than gaining a
+ * message-first overload. An `unreachable(message: string)` form would
+ * swallow the exhaustiveness check over a union of string literals: a
+ * forgotten `'b'` case is not assignable to `never` but is assignable to
+ * `string`, so it would pick that overload and compile. Say why the path is
+ * unreachable in a comment beside the call; the `PanicError`'s stack points
+ * at it.
  *
  * @example
  *
@@ -92,18 +105,25 @@ export function panic(
  * ```
  *
  * @param value The value the types exclude; its string form goes into the
- *   message when no message is given.
+ *   message. Omitted for the standing-invariant form.
  * @param message Overrides the default message.
  * @throws {PanicError} Always.
  */
-export const unreachable: (value: never, message?: string) => never = (
+export const unreachable: (value?: never, message?: string) => never = (
   value,
   message,
-) =>
-  panic(
-    message ??
-      `Reached code the types mark unreachable: ${unknownToString(value)}`,
-  );
+) => panic(message ?? unreachableMessage(value));
+
+/**
+ * The default message. Takes `unknown` rather than the parameter's own
+ * `never | undefined` so that the check is a branch the checker has to
+ * evaluate: typed as the latter it would be a condition whose answer is
+ * already known.
+ */
+const unreachableMessage = (value: unknown): string =>
+  value === undefined
+    ? 'Reached code the types mark unreachable'
+    : `Reached code the types mark unreachable: ${unknownToString(value)}`;
 
 /**
  * Panics with "not implemented" — the placeholder for a code path that is

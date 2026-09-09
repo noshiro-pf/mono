@@ -86,4 +86,34 @@ describe(unreachable, () => {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     expect(() => unreachable(1 as never, 'custom')).toThrow('custom');
   });
+
+  test('panics without a value, for a standing invariant', () => {
+    expect(() => unreachable()).toThrow(
+      'Reached code the types mark unreachable',
+    );
+
+    // The value form's message is the same sentence plus the value, so pin
+    // that the no-argument one does not end up saying "... : undefined".
+    let mut_message = '';
+
+    try {
+      unreachable();
+    } catch (error) {
+      mut_message = isPanicError(error) ? error.message : '';
+    }
+
+    assert.strictEqual(mut_message, 'Reached code the types mark unreachable');
+  });
+
+  test('marks what it throws as a panic', () => {
+    let mut_caught: unknown = undefined;
+
+    try {
+      unreachable();
+    } catch (error) {
+      mut_caught = error;
+    }
+
+    assert.isTrue(isPanicError(mut_caught));
+  });
 });
