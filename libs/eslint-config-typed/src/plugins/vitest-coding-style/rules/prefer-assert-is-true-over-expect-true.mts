@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
+import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsTrueOverExpectTrue';
 
@@ -38,8 +39,11 @@ export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
         if (
           node.callee.type === AST_NODE_TYPES.MemberExpression &&
           node.callee.object.type === AST_NODE_TYPES.CallExpression &&
-          node.callee.object.callee.type === AST_NODE_TYPES.Identifier &&
-          node.callee.object.callee.name === 'expect' &&
+          getVitestReceiver(
+            context.sourceCode,
+            node.callee.object.callee,
+            'expect',
+          ) !== undefined &&
           node.callee.property.type === AST_NODE_TYPES.Identifier &&
           node.callee.property.name === 'toBe' &&
           Arr.isFixedLengthTuple(1, node.arguments) &&

@@ -1,5 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsTrueOverAssert';
 
@@ -26,19 +27,23 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
   create: (context) => ({
     CallExpression: (node) => {
       // assert(X) -> assert.isTrue(X)
-      if (
-        node.callee.type === AST_NODE_TYPES.Identifier &&
-        node.callee.name === 'assert'
-      ) {
+      const bareCallee = getVitestReceiver(
+        context.sourceCode,
+        node.callee,
+        'assert',
+      );
+
+      if (bareCallee !== undefined) {
         if (Arr.isEmpty(node.arguments)) {
           return;
         }
 
         context.report({
-          node: node.callee,
+          node: bareCallee,
           messageId: 'preferAssertIsTrueOverAssert',
-          data: { method: 'assert' },
-          fix: (fixer) => fixer.replaceText(node.callee, 'assert.isTrue'),
+          data: { method: bareCallee.name },
+          fix: (fixer) =>
+            fixer.replaceText(bareCallee, `${bareCallee.name}.isTrue`),
         });
 
         return;
@@ -49,17 +54,24 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
       if (node.callee.type === AST_NODE_TYPES.MemberExpression) {
         const callee = node.callee;
 
+        const receiver = getVitestReceiver(
+          context.sourceCode,
+          callee.object,
+          'assert',
+        );
+
         if (
-          callee.object.type === AST_NODE_TYPES.Identifier &&
-          callee.object.name === 'assert' &&
+          receiver !== undefined &&
           callee.property.type === AST_NODE_TYPES.Identifier &&
           (callee.property.name === 'isOk' || callee.property.name === 'ok')
         ) {
+          const { property } = callee;
+
           context.report({
             node: callee,
             messageId: 'preferAssertIsTrueOverAssert',
-            data: { method: `assert.${callee.property.name}` },
-            fix: (fixer) => fixer.replaceText(callee, 'assert.isTrue'),
+            data: { method: `${receiver.name}.${property.name}` },
+            fix: (fixer) => fixer.replaceText(property, 'isTrue'),
           });
         }
       }

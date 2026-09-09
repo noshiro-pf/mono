@@ -659,6 +659,14 @@ that name; a test that has to pin a class rather than a shape needs
 `assert.instanceOf` alongside it. Both halves are pinned as executable tests in
 [`assert-vs-expect-strict-equality.test.mts`](src/plugins/vitest-coding-style/rules/assert-vs-expect-strict-equality.test.mts).
 
+All of these rules resolve the binding behind `assert` / `expect` rather than
+matching the identifier's spelling. `includeSource` puts in-source tests in
+ordinary `src/**` modules, so the config cannot be scoped to `*.test.*` files;
+resolving the binding is what keeps `assert(x)` imported from `node:assert`
+(which has no `isTrue`) out of it, and what lets
+`import { assert as a } from 'vitest'` be recognized — the fixes then keep the
+local name instead of writing one the file does not have.
+
 #### react-coding-style
 
 **`eslintPluginReactCodingStyle`** - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.).

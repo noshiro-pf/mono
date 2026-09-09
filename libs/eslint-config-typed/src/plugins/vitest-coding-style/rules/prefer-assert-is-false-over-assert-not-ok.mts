@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverAssertNotOk';
 
@@ -25,17 +26,19 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
   create: (context) => ({
     MemberExpression: (node) => {
       if (
-        node.object.type === AST_NODE_TYPES.Identifier &&
-        node.object.name === 'assert' &&
+        getVitestReceiver(context.sourceCode, node.object, 'assert') !==
+          undefined &&
         node.property.type === AST_NODE_TYPES.Identifier &&
         (node.property.name === 'isNotOk' || node.property.name === 'notOk') &&
         node.parent.type === AST_NODE_TYPES.CallExpression &&
         node.parent.callee === node
       ) {
+        const { property } = node;
+
         context.report({
           node,
           messageId: 'preferAssertIsFalseOverAssertNotOk',
-          fix: (fixer) => fixer.replaceText(node, 'assert.isFalse'),
+          fix: (fixer) => fixer.replaceText(property, 'isFalse'),
         });
       }
     },
