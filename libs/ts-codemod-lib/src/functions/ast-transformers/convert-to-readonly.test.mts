@@ -3255,6 +3255,125 @@ describe(convertToReadonlyTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('Call and construct signatures', () => {
+    // `Readonly<T>` is a mapped type over `keyof T`, and a call or construct
+    // signature is not a property, so wrapping a type literal that carries one
+    // silently drops it — the value stops being callable. See #1881.
+    test.each([
+      {
+        name: 'Overloaded call signatures are not wrapped',
+        source: dedent`
+          const panic: {
+            (message: string, options?: { cause?: unknown }): never;
+            (error: Error): never;
+          } = impl;
+        `,
+        expected: dedent`
+          const panic: {
+            (message: string, options?: Readonly<{ cause?: unknown }>): never;
+            (error: Error): never;
+          } = impl;
+        `,
+      },
+      {
+        name: 'A single call signature is not wrapped',
+        source: dedent`
+          type F = { (arg: number[]): string[] };
+        `,
+        expected: dedent`
+          type F = { (arg: readonly number[]): readonly string[] };
+        `,
+      },
+      {
+        name: 'A construct signature is not wrapped',
+        source: dedent`
+          type C = { new (arg: string[]): { prop: number[] } };
+        `,
+        expected: dedent`
+          type C = { new (arg: readonly string[]): Readonly<{ prop: readonly number[] }> };
+        `,
+      },
+      {
+        name: 'Members alongside a call signature are marked readonly in place',
+        source: dedent`
+          type F = {
+            (arg: number[]): void;
+            prop: string[];
+            [key: string]: unknown;
+          };
+        `,
+        expected: dedent`
+          type F = {
+            (arg: readonly number[]): void;
+            readonly prop: readonly string[];
+            readonly [key: string]: unknown;
+          };
+        `,
+      },
+      {
+        name: 'Members alongside a construct signature are marked readonly in place',
+        source: dedent`
+          type C = {
+            new (arg: string[]): unknown;
+            readonly prop: number[];
+          };
+        `,
+        expected: dedent`
+          type C = {
+            new (arg: readonly string[]): unknown;
+            readonly prop: readonly number[];
+          };
+        `,
+      },
+      {
+        name: 'A callable type literal in a union is left alone',
+        source: dedent`
+          type T = { (): void } | { a: number[] };
+        `,
+        expected: dedent`
+          type T = { (): void } | Readonly<{ a: readonly number[] }>;
+        `,
+      },
+      {
+        name: 'A callable type literal in an intersection is left alone',
+        source: dedent`
+          type T = { (): void } & { a: number[] };
+        `,
+        expected: dedent`
+          type T = { (): void } & Readonly<{ a: readonly number[] }>;
+        `,
+      },
+      {
+        name: 'A nested callable type literal is left alone',
+        source: dedent`
+          type T = { fn: { (): void }; a: number[] };
+        `,
+        expected: dedent`
+          type T = Readonly<{ fn: { (): void }; a: readonly number[] }>;
+        `,
+      },
+    ])('$name', testFn);
+
+    test('a callable type literal reaches a fixed point', () => {
+      const code = dedent`
+        const panic: {
+          (message: string, options?: { cause?: unknown }): never;
+          (error: Error): never;
+        } = impl;
+      `;
+
+      const once = transformSourceCode(code, false, [
+        convertToReadonlyTransformer(),
+      ]);
+
+      const twice = transformSourceCode(once, false, [
+        convertToReadonlyTransformer(),
+      ]);
+
+      expect(twice).toBe(once);
+    });
+  });
+
   describe('Generic Types', () => {
     test.each([
       {

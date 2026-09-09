@@ -15,6 +15,7 @@ import {
   type StrictExtract,
 } from 'ts-type-forge';
 import {
+  hasCallOrConstructSignature,
   hasDisableNextLineComment,
   isAtomicTypeNode,
   isConditionalTypeDistributionGuard,
@@ -1032,10 +1033,24 @@ const transformTypeLiteralNode = (
     return;
   }
 
+  // Whether this position is one where the literal is wrapped at all — a
+  // context that already carries `Readonly` or `DeepReadonly` does it, and
+  // inside an indexed access the modifier makes no difference to the result.
+  const wrappingApplies =
+    readonlyContext.type === 'none' && readonlyContext.indexedAccessDepth === 0;
+
+  // A call or construct signature does not survive `Readonly<T>`, so a literal
+  // carrying one is left unwrapped and marked readonly member by member
+  // instead. See `hasCallOrConstructSignature`.
+  const skipWrapping = wrappingApplies && hasCallOrConstructSignature(node);
+
   // Recursive processing
   transformMembers(
     node.getMembers(),
-    'remove',
+    // A wrapper — the one added below, or the one the context already carries —
+    // is what makes the members readonly, so an inner modifier would be
+    // redundant. Without one, each member has to say so itself.
+    skipWrapping ? 'add' : 'remove',
     nextReadonlyContext({
       currentReadonlyContext: readonlyContext,
       nextReadonlyContextType: 'none',
@@ -1044,18 +1059,9 @@ const transformTypeLiteralNode = (
     options,
   );
 
-  switch (readonlyContext.type) {
-    case 'DeepReadonly':
-    case 'Readonly':
-      // Don't wrap with Readonly if already readonly
-      return;
-
-    case 'none': {
-      if (readonlyContext.indexedAccessDepth === 0) {
-        // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
-        options.replaceNode(node, `Readonly<${node.getFullText()}>`);
-      }
-    }
+  if (wrappingApplies && !skipWrapping) {
+    // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
+    options.replaceNode(node, `Readonly<${node.getFullText()}>`);
   }
 };
 
