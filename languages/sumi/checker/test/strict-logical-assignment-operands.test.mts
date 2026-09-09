@@ -1,5 +1,6 @@
 import dedent from 'dedent';
-import { strictLogicalAssignmentOperands, testRule } from '../src/index.mjs';
+import { strictLogicalAssignmentOperands } from '../src/index.mjs';
+import { testRule } from './rule-tester.mjs';
 
 describe(strictLogicalAssignmentOperands.ruleId, () => {
   testRule(strictLogicalAssignmentOperands, {

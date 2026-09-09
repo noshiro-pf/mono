@@ -6,7 +6,7 @@ import {
   runRules,
   type CheckerDiagnostic,
   type Rule,
-} from '../engine/index.mjs';
+} from '../src/engine/index.mjs';
 
 /** A case the rule must accept. */
 export type ValidCase = Readonly<{

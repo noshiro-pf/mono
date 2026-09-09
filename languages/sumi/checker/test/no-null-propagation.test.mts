@@ -1,5 +1,6 @@
 import dedent from 'dedent';
-import { noNullPropagation, testRule } from '../src/index.mjs';
+import { noNullPropagation } from '../src/index.mjs';
+import { testRule } from './rule-tester.mjs';
 
 describe(noNullPropagation.ruleId, () => {
   testRule(noNullPropagation, {

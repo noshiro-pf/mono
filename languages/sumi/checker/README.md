@@ -57,11 +57,15 @@ export const myRule: Rule = {
 ## テストの書き方
 
 `libs/eslint-*` のプラグインが ESLint の `RuleTester` で書いているのと同じ
-valid / invalid 形式。`testRule` が 1 ケース 1 `test` を宣言する。
+valid / invalid 形式。`test/rule-tester.mts` の `testRule` が 1 ケース 1 `test` を宣言する。
+vitest のグローバル(`test` / `describe` / `assert`)を使うので `src/` ではなく
+`test/` にある — `src/` は build が型検査して `dist/` に出す範囲なので、
+テストヘルパーを置くとその build が落ちる。
 
 ```ts
 import dedent from 'dedent';
-import { myRule, testRule } from '../src/index.mjs';
+import { myRule } from '../src/index.mjs';
+import { testRule } from './rule-tester.mjs';
 
 describe(myRule.ruleId, () => {
     testRule(myRule, {
