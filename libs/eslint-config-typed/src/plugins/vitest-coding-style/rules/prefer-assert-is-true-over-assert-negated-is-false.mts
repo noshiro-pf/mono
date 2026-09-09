@@ -1,5 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsTrueOverNegatedAssertIsFalse';
 
@@ -26,12 +27,14 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
     CallExpression: (node) => {
       if (
         node.callee.type === AST_NODE_TYPES.MemberExpression &&
-        node.callee.object.type === AST_NODE_TYPES.Identifier &&
-        node.callee.object.name === 'assert' &&
+        getVitestReceiver(context.sourceCode, node.callee.object, 'assert') !==
+          undefined &&
         node.callee.property.type === AST_NODE_TYPES.Identifier &&
         node.callee.property.name === 'isFalse' &&
         Arr.isFixedLengthTuple(1, node.arguments)
       ) {
+        const { property } = node.callee;
+
         const [arg] = node.arguments;
 
         if (
@@ -43,8 +46,12 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
           context.report({
             node: arg,
             messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse',
-            fix: (fixer) =>
-              fixer.replaceText(node, `assert.isTrue(${targetText})`),
+            // The method name and the negated argument are rewritten
+            // separately, so the receiver keeps the name it has here.
+            fix: (fixer) => [
+              fixer.replaceText(property, 'isTrue'),
+              fixer.replaceText(arg, targetText),
+            ],
           });
         }
       }
