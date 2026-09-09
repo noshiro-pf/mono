@@ -1,6 +1,6 @@
 {
   "name": "@sumi-lang/cli",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "The `sumi` command (D-46): `sumi check` runs the whole Sumi lint check in one go (locked compilerOptions validation, native tsc, the oxlint preset), and the package exports the base tsconfig plus the ESLint / oxlint fragments that turn off what `sumi check` already covers. See languages/sumi/docs/decisions.md.",
   "repository": {

@@ -1,5 +1,14 @@
 # synstate-react-hooks
 
+## 3.0.2
+
+### Patch Changes
+
+- Updated dependencies [9c21467]
+- Updated dependencies [9c21467]
+    - ts-data-forge@14.7.0
+    - synstate@3.0.2
+
 ## 3.0.1
 
 ### Patch Changes

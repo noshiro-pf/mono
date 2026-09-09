@@ -1,5 +1,12 @@
 # eslint-plugin-ts-fortress
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [9c21467]
+    - ts-data-forge@14.7.0
+
 ## 1.2.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 12.1.2
+
+### Patch Changes
+
+- Updated dependencies [9c21467]
+    - ts-data-forge@14.7.0
+
 ## 12.1.1
 
 ### Patch Changes
