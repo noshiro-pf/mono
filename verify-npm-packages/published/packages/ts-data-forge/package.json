@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "ts-data-forge": "14.6.4",
+    "ts-data-forge": "14.7.0",
     "typescript": ">=4.8"
   }
 }
