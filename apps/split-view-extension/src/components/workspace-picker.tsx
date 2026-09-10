@@ -4,6 +4,7 @@ import {
   type WorkspaceEntry,
   type WorkspaceRegistry,
 } from '../state/index.mjs';
+import { Icon } from './icon.js';
 
 type Props = Readonly<{
   activeId: string | undefined;
@@ -137,7 +138,7 @@ export const WorkspacePicker = memoNamed(
           type={'button'}
           onClick={onCreate}
         >
-          {'+'}
+          <Icon icon={'plus'} />
         </button>
 
         <button

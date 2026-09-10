@@ -396,9 +396,26 @@ body {
   cursor: default;
 }
 
+/* The icons are 16x16 strokes in `currentColor`; this is the size they are
+   drawn at, and `block` keeps a button from carrying the line box a baseline
+   would add under them. */
+.icon {
+  display: block;
+  /* 12px, which is the size of the glyphs these replaced: a pane can be
+     narrow, and its toolbar has fourteen controls in it. An icon button any
+     wider than the text it replaced pushes the last of them off the edge. */
+  height: 12px;
+  /* Decoration: the button under it is what a pointer is aiming at, and a
+     click that lands on the icon instead is a click the button never sees. */
+  pointer-events: none;
+  width: 12px;
+}
+
 .pane__warning {
+  align-items: center;
   color: var(--sv-warn);
   cursor: help;
+  display: flex;
   flex: none;
   padding: 0 2px;
 }

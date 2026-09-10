@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
-import { Num } from 'ts-data-forge';
 import {
   formatPaneZoom,
   steppedPaneZoom,
@@ -17,6 +16,7 @@ import {
   type PageToFrameMessage,
 } from '../shared/index.mjs';
 import { hostnameOf, originOf, type WorkspaceAction } from '../state/index.mjs';
+import { Icon } from './icon.js';
 
 /**
  * How long a pane waits for its frame to say hello before it says the page may
@@ -456,28 +456,25 @@ export const PaneFrame = memoNamed(
     );
 
     /**
-     * Zoom, as the browser does it: the element is made `1 / zoom` of the
-     * space it has and then drawn at `zoom`, so the site is laid out for the
-     * viewport it appears to have — narrower as you zoom in, wider as you zoom
-     * out — rather than being a picture of a page stretched to fit.
+     * Zoom, as `zoom` rather than as a `transform`.
      *
-     * `transform-origin` is the top left because that corner is the one the
-     * pane's rectangle is positioned from.
+     * Measured, because the two look the same on paper: with a scale
+     * transform the frame's renderer rasterizes at 1x and the compositor
+     * stretches the result — `devicePixelRatio` inside the frame stays 1 and
+     * the text is soft. `zoom` on the element propagates into the frame as an
+     * effective zoom, so `devicePixelRatio` there becomes the zoom and the
+     * page is rasterized at that scale, which is what the browser's own zoom
+     * does.
+     *
+     * The layout is the same either way: percentages resolve in the zoomed
+     * space, so `width: 100%` still fills the pane and the site is laid out
+     * for the viewport it appears to have — narrower as you zoom in, wider as
+     * you zoom out.
      */
-    const frameStyle = React.useMemo<React.CSSProperties>(() => {
-      if (!Num.isNonZero(pane.zoom) || pane.zoom === 1) {
-        return {};
-      }
-
-      const inverse = `${String(Num.div(100, pane.zoom))}%` as const;
-
-      return {
-        width: inverse,
-        height: inverse,
-        transform: `scale(${String(pane.zoom)})`,
-        transformOrigin: '0 0',
-      };
-    }, [pane.zoom]);
+    const frameStyle = React.useMemo<React.CSSProperties>(
+      () => (pane.zoom === 1 ? {} : { zoom: pane.zoom }),
+      [pane.zoom],
+    );
 
     const zoomLabel = formatPaneZoom(pane.zoom);
 
@@ -504,7 +501,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onPointerDown={handleMoveStart}
           >
-            {'⠿'}
+            <Icon icon={'grip'} />
           </button>
           <button
             aria-label={'Back'}
@@ -514,7 +511,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleBack}
           >
-            {'←'}
+            <Icon icon={'back'} />
           </button>
           <button
             aria-label={'Forward'}
@@ -524,7 +521,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleForward}
           >
-            {'→'}
+            <Icon icon={'forward'} />
           </button>
           <button
             aria-label={'Reload'}
@@ -534,7 +531,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleReload}
           >
-            {'↻'}
+            <Icon icon={'reload'} />
           </button>
 
           <form className={'pane__address'} onSubmit={handleSubmit}>
@@ -560,7 +557,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleZoomOut}
           >
-            {'－'}
+            <Icon icon={'minus'} />
           </button>
           <button
             aria-label={`Zoom ${zoomLabel}. Back to 100%`}
@@ -579,7 +576,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleZoomIn}
           >
-            {'＋'}
+            <Icon icon={'plus'} />
           </button>
 
           {showAgentWarning ? (
@@ -622,7 +619,7 @@ export const PaneFrame = memoNamed(
                 'No answer from this page. It may be refusing to be framed, or be a page the extension cannot run its script in \u{2014} a chrome:// URL, the Web Store, an error page.'
               }
             >
-              {'⚠'}
+              <Icon icon={'warning'} />
             </span>
           ) : undefined}
 
@@ -634,7 +631,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleOpenExternally}
           >
-            {'↗'}
+            <Icon icon={'external'} />
           </button>
           <button
             aria-label={
@@ -655,7 +652,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleToggleSandbox}
           >
-            {pane.sandboxed ? '🔒' : '🔓'}
+            <Icon icon={pane.sandboxed ? 'lock' : 'unlock'} />
           </button>
           <button
             aria-label={'Split to the right'}
@@ -664,7 +661,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleSplitRow}
           >
-            {'⬌'}
+            <Icon icon={'split-right'} />
           </button>
           <button
             aria-label={'Split downwards'}
@@ -673,7 +670,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleSplitColumn}
           >
-            {'⬍'}
+            <Icon icon={'split-down'} />
           </button>
           <button
             aria-label={'Close this pane'}
@@ -683,7 +680,7 @@ export const PaneFrame = memoNamed(
             type={'button'}
             onClick={handleClose}
           >
-            {'✕'}
+            <Icon icon={'close'} />
           </button>
         </header>
 

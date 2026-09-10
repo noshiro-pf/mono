@@ -96,12 +96,13 @@ export type PaneState = Readonly<{
   /**
    * How far this pane's page is scaled, `1` being unzoomed.
    *
-   * It is applied by the *page*, as a `transform` on the `iframe` with the
-   * element's own size divided by it — so the framed site is laid out for the
-   * viewport it appears to have and then drawn at that scale, which is what
-   * the browser's own zoom does. Applying it inside the frame instead would
-   * need the content script, and a pane whose page blocks content scripts is
-   * exactly the sort of page that turns out to need zooming out.
+   * It is applied by the *page*, as `zoom` on the `iframe` — which Chrome
+   * propagates into the frame as an effective zoom, so the framed site is
+   * laid out for the viewport it appears to have *and rasterized at that
+   * scale*. A `transform` would do the layout part and not the second: the
+   * frame's own renderer would draw at 1x and the compositor would stretch
+   * it, which is visibly soft. Neither needs the content script, so a page
+   * that will not run one can still be zoomed.
    */
   zoom: number;
 

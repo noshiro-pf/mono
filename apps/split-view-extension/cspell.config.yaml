@@ -8,6 +8,9 @@ words:
   # `window.top` is [LegacyUnforgeable] in the HTML specification, which is why
   # a framed page cannot be lied to about being framed.
   - unforgeable
+  # What a renderer does with a page: turn it into pixels. The zoom mechanism
+  # turns on whether it happens again at the zoomed scale.
+  - rasterizes
   # The three PNG chunk types the icon generator writes: the header, the
   # compressed pixels, and the end marker.
   - IHDR

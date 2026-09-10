@@ -1,3 +1,4 @@
+export * from './icon.js';
 export * from './pane-drop-indicator.js';
 export * from './pane-frame.js';
 export * from './splitter.js';

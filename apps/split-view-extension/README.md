@@ -90,11 +90,17 @@ browser — `xvfb-run -a pnpm run smoke` where there is no display.
   trackpad pinch) over it does the same. The percentage appears beside them
   when it is not 100%, and clicking it goes back. The zoom is saved with the
   layout, and it travels with the pane when you move it.
-    - It is the _page_ that scales the pane's `iframe` — the element is made
-      `1 / zoom` of the space it has and drawn at `zoom` — so the site is laid
-      out for the viewport it appears to have, exactly as the browser's own
-      zoom does it, and a pane can be zoomed even on a page that will not run
-      the extension's content script.
+    - It is the _page_ that zooms the pane's `iframe`, with the CSS `zoom`
+      property, so a pane can be zoomed even on a page that will not run the
+      extension's content script.
+    - **`zoom`, not `transform: scale`**, and the difference is measurable:
+      with a scale transform the frame's own renderer draws at 1x and the
+      compositor stretches the result, so text is soft — `devicePixelRatio`
+      inside the frame stays `1`. `zoom` propagates into the frame as an
+      effective zoom, and `devicePixelRatio` there becomes the zoom, so the
+      page is drawn at that scale. The layout is the same either way:
+      percentages resolve in the zoomed space, so the frame still fills the
+      pane and the site is laid out for the viewport it appears to have.
 - Type an address into a pane and press Enter. A bare host gets `https://`,
   `localhost:5173` gets `http://`, and anything that is not an address becomes
   a web search.
@@ -212,13 +218,39 @@ CSP header has to go rather than just the one directive — `declarativeNetReque
 cannot read a header's value, only remove, set or append it — so a pane also
 loses the site's own XSS protections.
 
-**Panes are `sandbox`ed, without `allow-top-navigation`.** That is what stops a
-framed page from replacing the whole split view with itself. It cannot be done
-from the page's side: `window.top` is unforgeable, and assigning to a
-cross-origin `top.location` is allowed by design. `allow-same-origin` is kept,
-so the frame keeps its origin, its cookies and its storage. 🔒 in a pane's
-toolbar turns the sandbox off for that pane, for a site that genuinely needs
-top-level navigation.
+**Panes are `sandbox`ed, without `allow-top-navigation`** — and the padlock in
+a pane's toolbar turns that off for one pane. Both halves of that follow from
+the header stripping above, in a chain worth writing down, because the sandbox
+looks like belt-and-braces until you see what it is for:
+
+1. **Stripping the headers makes frame busters live.** A site that sends
+   `X-Frame-Options` usually also carries the older defense: a script that
+   notices `window.top !== window.self` and assigns `top.location = self`. It
+   does nothing while the browser is refusing to frame the page. Remove the
+   headers and it starts working, and what it does is replace the whole split
+   view with that one site.
+2. **The framed page cannot be stopped from the outside.** `window.top` is
+   `[LegacyUnforgeable]` in the HTML specification, so a page cannot be lied to
+   about being framed, and assigning to a cross-origin `top.location` is
+   allowed by design. There is no lever on this side of the frame boundary.
+3. **The `sandbox` attribute is the only lever there is**, and
+   `allow-top-navigation` is the token to leave out of it. `sandbox` denies by
+   default, so everything a page legitimately needs has to be put back
+   explicitly — which is what the rest of `paneSandboxTokens` is.
+4. **`allow-same-origin` is the one that must stay.** Without it the frame gets
+   an opaque origin: no cookies, no `localStorage`, no `IndexedDB`. Every site
+   in every pane would be signed out, which is worse than what the sandbox is
+   preventing.
+5. **The cost is the pages that legitimately navigate the top frame** — a
+   sign-in flow that redirects, a payment page, a link with `target="_top"`.
+   They break with the sandbox on, and nothing on our side can tell them from a
+   frame buster. Hence a per-pane escape hatch, off by default, rather than a
+   global setting or a guess.
+
+`sandbox` is read when a document is loaded into the frame, so changing it
+means recreating the element: `set-sandboxed` in the reducer bumps
+`reloadToken`, and turning the sandbox off reloads that pane. There is no way
+round that.
 
 **The page and the panes talk over `postMessage`.** The page cannot read a
 cross-origin frame's URL or call `history.back()` on it, so a content script
