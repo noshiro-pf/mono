@@ -2,12 +2,14 @@ import { memoNamed } from 'react-utils';
 
 export type IconName =
   | 'back'
+  | 'clear-sw'
   | 'close'
   | 'external'
   | 'forward'
   | 'grip'
   | 'lock'
   | 'minus'
+  | 'more'
   | 'plus'
   | 'reload'
   | 'split-down'
@@ -85,6 +87,20 @@ const icons: Readonly<Record<IconName, IconShape>> = {
   reload: { strokes: ['M13 8a5 5 0 1 1-1.9-3.9', 'M13.2 3.2v3.4h-3.4'] },
 
   minus: { strokes: ['M3.5 8h9'] },
+
+  // Three dots: there is more of this than fits.
+  more: {
+    strokes: ['M3.6 8v.01', 'M8 8v.01', 'M12.4 8v.01'],
+    width: 2,
+  },
+
+  // A circle with a slash through it: the thing this removes.
+  'clear-sw': {
+    strokes: [
+      'M8 2.9a5.1 5.1 0 1 0 0 10.2 5.1 5.1 0 0 0 0-10.2z',
+      'M4.4 4.4l7.2 7.2',
+    ],
+  },
   plus: { strokes: ['M8 3.5v9', 'M3.5 8h9'] },
 
   // The arrow leaves through the corner the box does not have. It stops short

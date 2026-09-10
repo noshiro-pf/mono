@@ -77,7 +77,12 @@ browser — `xvfb-run -a pnpm run smoke` where there is no display.
 - **⬌ / ⬍ in a pane's toolbar splits that pane** to the right or downwards, and
   ✕ closes it. Those two are the whole of "phase 2": the layout is a binary
   tree, so a pane can be split again as deep as you like.
-- **Drag a pane by the ⠿ at the left of its toolbar to move it.** Dropping it
+- **A narrow pane keeps its toolbar in a menu.** Below about 440px there is no
+  room for fourteen controls and an address bar, so the zoom, the sandbox
+  toggle, the split buttons and "open in a new tab" move into `⋯` — and the two
+  service-worker actions are in there at every width, because a menu row has
+  room to say what they do and a 12px icon does not.
+- **Drag a pane by the grip at the left of its toolbar to move it.** Dropping it
   on the **middle** of another pane exchanges the two; dropping it on an
   **edge** takes that side of the pane, and the space the moved pane leaves
   behind is taken over by whatever it was sharing a divider with. An outline says which of the two it
@@ -183,7 +188,11 @@ the toolbar button should open. Consequences:
   both save, and the last write wins. `Alt`-click a chip for a workspace you
   are not already looking at.
 
-**Two rules strip the headers, because neither covers the other's case.**
+**Two rules edit the headers, because neither covers the other's case.** Each
+removes the response headers that refuse framing _and_ sets the three
+`Sec-Fetch-*` request headers to what a top-level navigation would have sent —
+see ["What will not open in a pane"](#what-will-not-open-in-a-pane-and-why) for
+why the second half is needed at all.
 
 - A **dynamic** rule scoped by `initiatorDomains: [<extension id>]` — the host
   part of a `chrome-extension://` URL is the extension id, so this matches every
@@ -352,16 +361,63 @@ JSON file, and `Import` reads it back by id: an id already on the list has its
 layout and name replaced, an id that is not is appended, and nothing is deleted.
 Importing the same file twice therefore does nothing the second time.
 
-## The one thing that may not work
+## What will not open in a pane, and why
 
-An `iframe` on an extension page is a cross-site context, so a site's
-`SameSite=Lax` session cookie — the browser default — may not be sent, and the
-pane shows you logged out. Whether it is sent depends on how Chrome treats a
-request an extension with host permissions initiates, which is worth measuring
-against the sites you actually want to use rather than reasoning about.
+Four different mechanisms, and only two of them have an answer. Each is worth
+telling apart, because the symptom is the same — a pane that stays blank — and
+the thing to try next is not.
 
-↗ in a pane's toolbar opens that pane's address in a normal tab, which is the
-escape hatch for a site that will not work embedded.
+**1. A response header that refuses framing.** `X-Frame-Options`, or a CSP
+`frame-ancestors` directive. Most of the interesting web does this.
+**Handled**: the two rules above strip those headers, for this extension's own
+frames and for the split view's tab only.
+
+**2. The site refuses in the server, by reading the request.** Some sites do
+not send a framing header at all; they look at the Fetch Metadata headers the
+browser attaches — `Sec-Fetch-Dest: iframe`, `Sec-Fetch-Site: cross-site` — and
+answer a framed request differently. Google Translate is the case that turned
+this up. Measured, with everything else held equal:
+
+| the request                                            | what `translate.google.com` answers |
+| :----------------------------------------------------- | :---------------------------------- |
+| `Sec-Fetch-Dest: document`, `Sec-Fetch-Site: none`     | `200` and the page                  |
+| `Sec-Fetch-Dest: iframe`, `Sec-Fetch-Site: cross-site` | **`403` and no body**               |
+
+and it says as much in `Vary: Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site`.
+There is no response header to remove: the refusal _is_ the response.
+**Handled**, though it took a second mechanism: both rules also _set_ those
+three request headers to what a top-level navigation would have sent. Measured
+again — 403 becomes 200, and the page renders in the pane. The scope is the
+same as the header stripping: `sub_frame` requests only, so nothing changes for
+a script or an XHR, which is where Fetch Metadata guards against CSRF and XSSI
+rather than against framing.
+
+**3. A page the browser will not put in a frame at all.** `chrome://`
+anything, the Chrome Web Store, another extension's pages, `view-source:`,
+`file:` in most configurations. Chrome refuses these to _every_ frame, and no
+extension can change it. **Not handled, and cannot be** — nor can the address
+bar even try: a `chrome://` address typed into a pane is treated as a search
+term today, which is at least honest about the outcome but is confusing while
+it lasts.
+
+**4. A page served by the site's own service worker.** See the section above:
+the response never passes through the network layer, so no rule can touch it.
+**Handled by asking the site to give it up** — the pane offers to unregister
+the worker, and can do it per origin from then on. That is what a signed-in
+GitHub needs for its issues pages.
+
+Two more things that are not "will not open" but look like it:
+
+- **A pane is a third-party context for cookies.** A site's `SameSite=Lax`
+  session cookie — the browser default — may not be sent, and the pane shows
+  you signed out. Which sites this affects is worth measuring against the ones
+  you actually use rather than reasoning about.
+- **A page that wants to navigate the whole tab** — a sign-in redirect, a
+  payment flow — is stopped by the pane's sandbox. Turning the sandbox off for
+  that pane (the padlock, or the pane's menu when it is narrow) is the escape
+  hatch.
+
+"Open in a new tab" in a pane's toolbar is the way out of all of them.
 
 ## Permissions, and why
 

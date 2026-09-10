@@ -72,6 +72,7 @@ export const ensureInitiatorRule = async (): Promise<boolean> => {
         priority: 1,
         action: {
           type: 'modifyHeaders',
+          requestHeaders: castMutable(requestHeaderActions()),
           responseHeaders: castMutable(framingHeaderActions()),
         },
         condition: {
@@ -87,7 +88,7 @@ export const ensureInitiatorRule = async (): Promise<boolean> => {
   return installed.some((rule) => rule.id === initiatorRuleId);
 };
 
-/** The header edits both rules apply. */
+/** The response header edits both rules apply. */
 const framingHeaderActions = (): readonly Readonly<{
   header: string;
   operation: 'remove';
@@ -95,6 +96,41 @@ const framingHeaderActions = (): readonly Readonly<{
   strippedResponseHeaders.map(
     (header) => ({ header, operation: 'remove' }) as const,
   );
+
+/**
+ * The request headers that say "this is a cross-site frame", rewritten to say
+ * "this is a top-level navigation".
+ *
+ * Some sites refuse in the *server* rather than in a response header, by
+ * reading the Fetch Metadata headers the browser attaches. Google Translate is
+ * the case that turned this up: measured, `translate.google.com` answers a
+ * request with `Sec-Fetch-Dest: document` with `200` and the same request with
+ * `Sec-Fetch-Dest: iframe`, `Sec-Fetch-Site: cross-site` with **`403` and no
+ * body** — and says so in `Vary: Sec-Fetch-Dest, Sec-Fetch-Mode,
+ * Sec-Fetch-Site`. There is no response header to strip: the refusal *is* the
+ * response.
+ *
+ * So the request is made to look like what it would be if the user had typed
+ * the address into a tab, which is the same claim the extension already makes
+ * by removing `X-Frame-Options`. Measured again: 403 becomes 200 and the page
+ * renders.
+ *
+ * The scope is what keeps this narrow, and it is the scope both rules already
+ * have: `sub_frame` requests only — never a top-level document, never a script
+ * or an XHR, which is where Fetch Metadata guards against CSRF and XSSI rather
+ * than against framing — and only in this extension's own frames, or in the
+ * one tab a split view is open in.
+ */
+const requestHeaderActions = (): readonly Readonly<{
+  header: string;
+  operation: 'set';
+  value: string;
+}>[] =>
+  [
+    { header: 'sec-fetch-dest', value: 'document' },
+    { header: 'sec-fetch-mode', value: 'navigate' },
+    { header: 'sec-fetch-site', value: 'none' },
+  ].map(({ header, value }) => ({ header, operation: 'set', value }) as const);
 
 /**
  * The rule id used for a tab. Rule ids have to be positive, and a tab id is
@@ -114,6 +150,7 @@ export const installHeaderRule = async (tabId: number): Promise<void> => {
         priority: 1,
         action: {
           type: 'modifyHeaders',
+          requestHeaders: castMutable(requestHeaderActions()),
           responseHeaders: castMutable(framingHeaderActions()),
         },
         condition: {

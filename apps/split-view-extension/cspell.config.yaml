@@ -8,6 +8,10 @@ words:
   # `window.top` is [LegacyUnforgeable] in the HTML specification, which is why
   # a framed page cannot be lied to about being framed.
   - unforgeable
+  # Cross-Site Script Inclusion, one of the things the Fetch Metadata request
+  # headers guard against — and so one of the reasons the rules that rewrite
+  # them are scoped to sub-frames.
+  - XSSI
   # What a renderer does with a page: turn it into pixels. The zoom mechanism
   # turns on whether it happens again at the zoomed scale.
   - rasterizes

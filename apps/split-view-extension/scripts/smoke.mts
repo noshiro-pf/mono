@@ -245,14 +245,23 @@ const main = async (): Promise<void> => {
       .first()
       .inputValue();
 
-    // One pane for the rest of it. A pane a fifth of the window wide has less
-    // room than its toolbar wants — fourteen controls and an address bar — so
-    // the last of them are clipped at its right edge, and this section presses
-    // two of the last of them. That is a real shortcoming of a narrow pane and
-    // not what these checks are about.
-    await page.locator('.top-bar__button[title*="One pane"]').click();
+    /**
+     * Opens the first pane's overflow menu, where the rare actions live.
+     *
+     * Idempotent: the button toggles, so opening an open menu would close it.
+     */
+    const openPaneMenu = async (): Promise<void> => {
+      if ((await page.locator('.pane__menu-popover').count()) > 0) {
+        return;
+      }
 
-    await page.waitForTimeout(400);
+      await page
+        .locator('.pane__button[aria-label="More for this pane"]')
+        .first()
+        .click();
+
+      await page.waitForTimeout(300);
+    };
 
     // A pane blocked by the site's own service worker, and the way out of it.
     await address.fill(`http://localhost:${String(serverPort)}/sw-home`);
@@ -271,13 +280,15 @@ const main = async (): Promise<void> => {
 
     const blockedByWorker = !(await appears('#sw-target', 2000));
 
+    await openPaneMenu();
+
     const offersReset = await appears(
-      '.pane__button[title*="own service worker"]',
+      '.pane__menu-item[title*="own service worker"]',
       3000,
     );
 
     await page
-      .locator('.pane__button[title*="own service worker"]')
+      .locator('.pane__menu-item[title*="own service worker"]')
       .first()
       .click();
 
@@ -309,8 +320,10 @@ const main = async (): Promise<void> => {
 
     const blockedAgain = !(await appears('#sw-target', 2000));
 
+    await openPaneMenu();
+
     await page
-      .locator('.pane__button[title*="Always clear service workers"]')
+      .locator('.pane__menu-item[title*="Always clear service workers"]')
       .first()
       .click();
 
@@ -449,6 +462,13 @@ const main = async (): Promise<void> => {
       .inputValue();
 
     // --- zooming one pane -----------------------------------------------
+    // One pane, so that the zoom controls are in the toolbar rather than in
+    // the overflow menu. The menu is what the service-worker section above
+    // went through, at a fifth of the window wide.
+    await page.locator('.top-bar__button[title*="One pane"]').click();
+
+    await page.waitForTimeout(500);
+
     const zoomLabelOf = async (paneIndex: number): Promise<string> =>
       page
         .locator(`.pane >> nth=${String(paneIndex)} >> .pane__zoom`)
@@ -615,8 +635,10 @@ const main = async (): Promise<void> => {
       movedBox0.x > movedBox3.x && Math.abs(movedBox0.y - movedBox3.y) < 4;
 
     // The zoom travelled with the pane, being a property of the pane rather
-    // than of the rectangle it sits in.
-    const zoomAfterMove = await zoomLabelOf(0);
+    // than of the rectangle it sits in. Read from the frame rather than from
+    // the toolbar's label: the moved pane is narrow enough that its zoom
+    // controls are in the overflow menu.
+    const zoomAfterMove = await frameStyleOf(0);
 
     report([
       check(
@@ -762,7 +784,7 @@ const main = async (): Promise<void> => {
       ),
       check(
         'a moved pane keeps its zoom',
-        zoomAfterMove === '150%',
+        zoomAfterMove.includes('zoom: 1.5'),
         zoomAfterMove,
       ),
       check(

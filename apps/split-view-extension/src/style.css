@@ -396,6 +396,74 @@ body {
   cursor: default;
 }
 
+/* --- a pane's overflow menu ------------------------------------------ */
+
+/* No box of its own; the button and the popover are the toolbar's own items.
+   See `.workspace-picker` for the same trick and the same reason. */
+.pane__menu {
+  display: contents;
+}
+
+/* Positioned against `.pane`, which is the nearest positioned ancestor — the
+   toolbar deliberately is not one. That is what keeps the toolbar's own
+   `overflow: clip` from clipping this away: an absolutely positioned box is
+   clipped by its containing block's chain, not by an ancestor that is not
+   positioned itself. The
+   `top` is therefore the toolbar's height rather than `100%`. */
+.pane__menu-popover {
+  background: var(--sv-bg-raised);
+  border: 1px solid var(--sv-border-active);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 45%);
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: 4px;
+  position: absolute;
+  right: 4px;
+  top: 30px;
+  z-index: 10;
+}
+
+.pane__menu-item {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--sv-text);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 8px;
+  padding: 5px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.pane__menu-item:hover:not(:disabled) {
+  background: #363b44;
+}
+
+.pane__menu-item:disabled {
+  color: #5f666f;
+  cursor: default;
+}
+
+.pane__menu-item--warn {
+  color: var(--sv-warn);
+}
+
+/* The zoom controls keep their shape in the menu: three items in a row rather
+   than three rows. */
+.pane__menu-zoom {
+  align-items: center;
+  border-bottom: 1px dashed var(--sv-border);
+  display: flex;
+  gap: 2px;
+  margin-bottom: 4px;
+  padding: 0 4px 4px;
+}
+
 /* The icons are 16x16 strokes in `currentColor`; this is the size they are
    drawn at, and `block` keeps a button from carrying the line box a baseline
    would add under them. */

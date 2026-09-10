@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { memoNamed } from 'react-utils';
+import { Arr } from 'ts-data-forge';
 import {
   formatPaneZoom,
   steppedPaneZoom,
@@ -16,7 +17,7 @@ import {
   type PageToFrameMessage,
 } from '../shared/index.mjs';
 import { hostnameOf, originOf, type WorkspaceAction } from '../state/index.mjs';
-import { Icon } from './icon.js';
+import { Icon, type IconName } from './icon.js';
 
 /**
  * How long a pane waits for its frame to say hello before it says the page may
@@ -49,6 +50,59 @@ const paneSandboxTokens = [
   'allow-orientation-lock',
   'allow-pointer-lock',
 ].join(' ');
+
+/** One row of a pane's menu. */
+type PaneMenuAction = Readonly<{
+  icon: IconName;
+  label: string;
+  title: string;
+  disabled?: boolean;
+  pressed?: boolean;
+  tone?: 'warn';
+  onSelect: () => void;
+}>;
+
+const PaneMenuItem = memoNamed(
+  'PaneMenuItem',
+  ({
+    item,
+    onChosen,
+  }: Readonly<{ item: PaneMenuAction; onChosen: () => void }>) => {
+    const handleClick = React.useCallback((): void => {
+      item.onSelect();
+
+      onChosen();
+    }, [item, onChosen]);
+
+    return (
+      <button
+        aria-pressed={item.pressed}
+        className={
+          item.tone === 'warn'
+            ? 'pane__menu-item pane__menu-item--warn'
+            : 'pane__menu-item'
+        }
+        disabled={item.disabled ?? false}
+        title={item.title}
+        type={'button'}
+        onClick={handleClick}
+      >
+        <Icon icon={item.icon} />
+
+        {item.label}
+      </button>
+    );
+  },
+);
+
+/**
+ * The width at which a pane's toolbar stops holding everything.
+ *
+ * Below it the zoom controls, the sandbox toggle, the split buttons and "open
+ * in a new tab" move into the menu. Above it they are inline and the menu
+ * holds only what is always in it.
+ */
+const compactPaneWidthPx = 440;
 
 const paneClassName = (active: boolean, moving: boolean): string =>
   [
@@ -478,6 +532,162 @@ export const PaneFrame = memoNamed(
 
     const zoomLabel = formatPaneZoom(pane.zoom);
 
+    /**
+     * Whether this pane is too narrow for its whole toolbar.
+     *
+     * A width rather than a measurement: the pane's rectangle is already known
+     * here, where a `ResizeObserver` would cost a second render per pane to
+     * learn what the layout tree has just decided. The number is what the
+     * toolbar needs — the grip, three navigation buttons, the close button and
+     * the menu come to about 130px, the collapsible half to about 150, and an
+     * address bar wants the rest.
+     */
+    const compact = rect.width < compactPaneWidthPx;
+
+    const [menuOpen, setMenuOpen] = React.useState(false);
+
+    const [menuRoot, setMenuRoot] = React.useState<HTMLSpanElement | null>(
+      null,
+    );
+
+    const handleToggleMenu = React.useCallback((): void => {
+      setMenuOpen((shown) => !shown);
+    }, []);
+
+    const handleCloseMenu = React.useCallback((): void => {
+      setMenuOpen(false);
+    }, []);
+
+    // A pane that grows out of being compact should not leave a menu open over
+    // the controls that have just come back into the toolbar.
+    React.useEffect(() => {
+      setMenuOpen(false);
+    }, [compact]);
+
+    /** Escape, or a click anywhere but in the menu, closes it. */
+    React.useEffect(() => {
+      if (!menuOpen) {
+        return undefined;
+      }
+
+      const onPointerDown = (
+        pointerEvent: Readonly<{ target: unknown }>,
+      ): void => {
+        if (
+          menuRoot !== null &&
+          pointerEvent.target instanceof Node &&
+          !menuRoot.contains(pointerEvent.target)
+        ) {
+          setMenuOpen(false);
+        }
+      };
+
+      const onKeyDown = (keyboardEvent: Readonly<{ key: string }>): void => {
+        if (keyboardEvent.key === 'Escape') {
+          setMenuOpen(false);
+        }
+      };
+
+      addEventListener('pointerdown', onPointerDown);
+
+      addEventListener('keydown', onKeyDown);
+
+      return () => {
+        removeEventListener('pointerdown', onPointerDown);
+
+        removeEventListener('keydown', onKeyDown);
+      };
+    }, [menuOpen, menuRoot]);
+
+    /**
+     * What the menu holds.
+     *
+     * The two service-worker actions are in it whatever the pane's width,
+     * because they are rare, they are hard to label in an icon, and a menu row
+     * has room to say what they do. The rest of it is what a narrow pane has
+     * no room for inline.
+     */
+    const menuItems = React.useMemo<readonly PaneMenuAction[]>(
+      () => [
+        // Each group is typed as `PaneMenuAction[]` rather than inferred: a
+        // spread of a conditional array widens to include `undefined`.
+        ...(showAgentWarning
+          ? ([
+              {
+                icon: 'clear-sw',
+                label: 'Clear the site\u{2019}s service workers',
+                title:
+                  'This page may be served by the site\u{2019}s own service worker, which puts it out of reach of the header-stripping rules. This removes the worker and reloads the pane; the site registers it again on its next ordinary visit.',
+                tone: 'warn',
+                onSelect: handleResetServiceWorkers,
+              },
+            ] satisfies readonly PaneMenuAction[])
+          : []),
+        ...(showResetToggle
+          ? ([
+              {
+                icon: 'clear-sw',
+                label: alwaysReset
+                  ? 'Stop clearing them for this site'
+                  : 'Always clear them for this site',
+                title: resetToggleTitle,
+                pressed: alwaysReset,
+                onSelect: handleToggleAlwaysReset,
+              },
+            ] satisfies readonly PaneMenuAction[])
+          : []),
+        ...(compact
+          ? ([
+              {
+                icon: 'external',
+                label: 'Open in a new tab',
+                title: 'Open in a new tab',
+                disabled: address === '',
+                onSelect: handleOpenExternally,
+              },
+              {
+                icon: pane.sandboxed ? 'lock' : 'unlock',
+                label: pane.sandboxed
+                  ? 'Turn the sandbox off'
+                  : 'Turn the sandbox on',
+                title: pane.sandboxed
+                  ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
+                  : 'Turn the sandbox on',
+                tone: pane.sandboxed ? undefined : 'warn',
+                onSelect: handleToggleSandbox,
+              },
+              {
+                icon: 'split-right',
+                label: 'Split to the right',
+                title: 'Split to the right',
+                onSelect: handleSplitRow,
+              },
+              {
+                icon: 'split-down',
+                label: 'Split downwards',
+                title: 'Split downwards',
+                onSelect: handleSplitColumn,
+              },
+            ] satisfies readonly PaneMenuAction[])
+          : []),
+      ],
+      [
+        compact,
+        showAgentWarning,
+        showResetToggle,
+        alwaysReset,
+        resetToggleTitle,
+        address,
+        pane.sandboxed,
+        handleResetServiceWorkers,
+        handleToggleAlwaysReset,
+        handleOpenExternally,
+        handleToggleSandbox,
+        handleSplitRow,
+        handleSplitColumn,
+      ],
+    );
+
     const label = pane.title ?? hostnameOf(address) ?? 'Empty pane';
 
     const faviconUrl =
@@ -549,62 +759,39 @@ export const PaneFrame = memoNamed(
             />
           </form>
 
-          <button
-            aria-label={'Zoom out'}
-            className={'pane__button'}
-            disabled={steppedPaneZoom(pane.zoom, 'out') === pane.zoom}
-            title={'Zoom out (Ctrl + wheel does it too)'}
-            type={'button'}
-            onClick={handleZoomOut}
-          >
-            <Icon icon={'minus'} />
-          </button>
-          <button
-            aria-label={`Zoom ${zoomLabel}. Back to 100%`}
-            className={'pane__zoom'}
-            title={'Back to 100%'}
-            type={'button'}
-            onClick={handleZoomReset}
-          >
-            {zoomLabel}
-          </button>
-          <button
-            aria-label={'Zoom in'}
-            className={'pane__button'}
-            disabled={steppedPaneZoom(pane.zoom, 'in') === pane.zoom}
-            title={'Zoom in (Ctrl + wheel does it too)'}
-            type={'button'}
-            onClick={handleZoomIn}
-          >
-            <Icon icon={'plus'} />
-          </button>
-
-          {showAgentWarning ? (
-            <button
-              className={'pane__button pane__button--warn'}
-              title={
-                'This page may be served by the site\u{2019}s own service worker, which puts it out of reach of the header-stripping rules. This removes the worker and reloads the pane; the site registers it again on its next ordinary visit.'
-              }
-              type={'button'}
-              onClick={handleResetServiceWorkers}
-            >
-              {'Clear SW'}
-            </button>
-          ) : undefined}
-
-          {showResetToggle ? (
-            <button
-              aria-pressed={alwaysReset}
-              className={
-                alwaysReset ? 'pane__button pane__button--on' : 'pane__button'
-              }
-              title={resetToggleTitle}
-              type={'button'}
-              onClick={handleToggleAlwaysReset}
-            >
-              {alwaysReset ? 'SW auto' : 'Always clear'}
-            </button>
-          ) : undefined}
+          {compact ? undefined : (
+            <>
+              <button
+                aria-label={'Zoom out'}
+                className={'pane__button'}
+                disabled={steppedPaneZoom(pane.zoom, 'out') === pane.zoom}
+                title={'Zoom out (Ctrl + wheel does it too)'}
+                type={'button'}
+                onClick={handleZoomOut}
+              >
+                <Icon icon={'minus'} />
+              </button>
+              <button
+                aria-label={`Zoom ${zoomLabel}. Back to 100%`}
+                className={'pane__zoom'}
+                title={'Back to 100%'}
+                type={'button'}
+                onClick={handleZoomReset}
+              >
+                {zoomLabel}
+              </button>
+              <button
+                aria-label={'Zoom in'}
+                className={'pane__button'}
+                disabled={steppedPaneZoom(pane.zoom, 'in') === pane.zoom}
+                title={'Zoom in (Ctrl + wheel does it too)'}
+                type={'button'}
+                onClick={handleZoomIn}
+              >
+                <Icon icon={'plus'} />
+              </button>
+            </>
+          )}
 
           {serviceWorkersRemoved === undefined ? undefined : (
             <span className={'pane__warning'} title={'Service workers removed'}>
@@ -623,55 +810,125 @@ export const PaneFrame = memoNamed(
             </span>
           ) : undefined}
 
-          <button
-            aria-label={'Open in a new tab'}
-            className={'pane__button'}
-            disabled={address === ''}
-            title={'Open in a new tab'}
-            type={'button'}
-            onClick={handleOpenExternally}
-          >
-            <Icon icon={'external'} />
-          </button>
-          <button
-            aria-label={
-              pane.sandboxed
-                ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
-                : 'Turn the sandbox on'
-            }
-            className={
-              pane.sandboxed
-                ? 'pane__button'
-                : 'pane__button pane__button--warn'
-            }
-            title={
-              pane.sandboxed
-                ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
-                : 'Turn the sandbox on'
-            }
-            type={'button'}
-            onClick={handleToggleSandbox}
-          >
-            <Icon icon={pane.sandboxed ? 'lock' : 'unlock'} />
-          </button>
-          <button
-            aria-label={'Split to the right'}
-            className={'pane__button'}
-            title={'Split to the right'}
-            type={'button'}
-            onClick={handleSplitRow}
-          >
-            <Icon icon={'split-right'} />
-          </button>
-          <button
-            aria-label={'Split downwards'}
-            className={'pane__button'}
-            title={'Split downwards'}
-            type={'button'}
-            onClick={handleSplitColumn}
-          >
-            <Icon icon={'split-down'} />
-          </button>
+          {compact ? undefined : (
+            <>
+              <button
+                aria-label={'Open in a new tab'}
+                className={'pane__button'}
+                disabled={address === ''}
+                title={'Open in a new tab'}
+                type={'button'}
+                onClick={handleOpenExternally}
+              >
+                <Icon icon={'external'} />
+              </button>
+              <button
+                aria-label={
+                  pane.sandboxed
+                    ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
+                    : 'Turn the sandbox on'
+                }
+                className={
+                  pane.sandboxed
+                    ? 'pane__button'
+                    : 'pane__button pane__button--warn'
+                }
+                title={
+                  pane.sandboxed
+                    ? 'Turn the sandbox off (this page will be able to reach the frames above it)'
+                    : 'Turn the sandbox on'
+                }
+                type={'button'}
+                onClick={handleToggleSandbox}
+              >
+                <Icon icon={pane.sandboxed ? 'lock' : 'unlock'} />
+              </button>
+              <button
+                aria-label={'Split to the right'}
+                className={'pane__button'}
+                title={'Split to the right'}
+                type={'button'}
+                onClick={handleSplitRow}
+              >
+                <Icon icon={'split-right'} />
+              </button>
+              <button
+                aria-label={'Split downwards'}
+                className={'pane__button'}
+                title={'Split downwards'}
+                type={'button'}
+                onClick={handleSplitColumn}
+              >
+                <Icon icon={'split-down'} />
+              </button>
+            </>
+          )}
+
+          {Arr.isEmpty(menuItems) ? undefined : (
+            <span ref={setMenuRoot} className={'pane__menu'}>
+              <button
+                aria-expanded={menuOpen}
+                aria-label={'More for this pane'}
+                className={'pane__button'}
+                title={'More for this pane'}
+                type={'button'}
+                onClick={handleToggleMenu}
+              >
+                <Icon icon={'more'} />
+              </button>
+
+              {menuOpen ? (
+                <div className={'pane__menu-popover'}>
+                  {compact ? (
+                    <div className={'pane__menu-zoom'}>
+                      <button
+                        aria-label={'Zoom out'}
+                        className={'pane__button'}
+                        disabled={
+                          steppedPaneZoom(pane.zoom, 'out') === pane.zoom
+                        }
+                        title={'Zoom out (Ctrl + wheel does it too)'}
+                        type={'button'}
+                        onClick={handleZoomOut}
+                      >
+                        <Icon icon={'minus'} />
+                      </button>
+                      <button
+                        aria-label={`Zoom ${zoomLabel}. Back to 100%`}
+                        className={'pane__zoom'}
+                        title={'Back to 100%'}
+                        type={'button'}
+                        onClick={handleZoomReset}
+                      >
+                        {zoomLabel}
+                      </button>
+                      <button
+                        aria-label={'Zoom in'}
+                        className={'pane__button'}
+                        disabled={
+                          steppedPaneZoom(pane.zoom, 'in') === pane.zoom
+                        }
+                        title={'Zoom in (Ctrl + wheel does it too)'}
+                        type={'button'}
+                        onClick={handleZoomIn}
+                      >
+                        <Icon icon={'plus'} />
+                      </button>
+                    </div>
+                  ) : undefined}
+
+                  {menuItems.map((item) => (
+                    <PaneMenuItem
+                      key={item.label}
+                      item={item}
+                      onChosen={handleCloseMenu}
+                    />
+                  ))}
+                </div>
+              ) : undefined}
+            </span>
+          )}
+
           <button
             aria-label={'Close this pane'}
             className={'pane__button'}

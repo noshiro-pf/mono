@@ -48,18 +48,30 @@ navigated to.
 
 Worth knowing before you install:
 
-• Most sites refuse to be shown inside another page. Split View removes those
-  headers for its own panes, which also removes the site's own protection
-  against being framed while it is in a pane. It does this for the split view's
-  tab and for frames the extension itself opened — ordinary browsing in other
-  tabs is untouched — and each pane runs sandboxed so that a page in it cannot
-  navigate the tab away.
+• Most sites refuse to be shown inside another page, in one of two ways. Some
+  send a header saying so (X-Frame-Options, or a Content-Security-Policy
+  frame-ancestors directive); Split View removes those headers for its own
+  panes, which also removes the site's own protection against being framed
+  while it is in a pane. Others refuse in the server, by reading the
+  Sec-Fetch-* headers that mark a request as coming from a frame — Google
+  Translate is one — so for its own panes Split View sets those headers to what
+  a page you had typed into a tab would have sent. Both apply only to frames
+  the extension itself opened and to the tab a split view is open in; ordinary
+  browsing in other tabs is untouched, and each pane runs sandboxed so that a
+  page in it cannot navigate the tab away.
+• Some pages cannot be opened in a pane at all, and no extension can change
+  that: chrome:// pages, the Chrome Web Store, other extensions' pages,
+  view-source:. The browser refuses these to every frame.
+• A site whose own service worker answers its pages cannot be framed either —
+  the response never reaches the network, so nothing can be rewritten. The pane
+  offers to remove that worker, per site if you like, and the site registers it
+  again on its next ordinary visit. A signed-in GitHub needs this for its
+  issues pages.
 • A pane is a third-party context for cookies, so a site you are signed in to
-  may appear signed out. Every pane has a button that opens its address in an
-  ordinary tab.
-• A site whose own service worker answers its pages cannot be framed at all;
-  the pane offers to remove that worker, and the site registers it again on its
-  next ordinary visit.
+  may appear signed out. And a page that wants to navigate the whole tab — a
+  sign-in redirect, a payment flow — is stopped by the pane's sandbox, which
+  you can turn off for that one pane. Every pane can open its address in an
+  ordinary tab, which is the way out of any of this.
 • Nothing leaves your computer. There is no account, no analytics and no
   server: the layouts and addresses live in the browser's own extension
   storage.
@@ -101,15 +113,29 @@ URL and makes no network request of its own.
 **`declarativeNetRequestWithHostAccess`**
 
 ```text
-Most sites send X-Frame-Options or a Content-Security-Policy frame-ancestors
-directive, which stops them being shown inside another page — including inside
-this extension's own panes, which is the whole function of the extension. Two
-declarativeNetRequest rules remove those response headers, and they are scoped
-so that ordinary browsing is not affected: one matches only requests initiated
-by this extension's own pages, the other only sub-frame requests in the single
-tab the split view is open in. This variant of the permission was chosen over
-plain declarativeNetRequest precisely so that the rules can act only where the
-user has granted host access.
+Most sites stop themselves being shown inside another page, which is the whole
+function of this extension, and they do it in two ways that need two different
+edits.
+
+Some send a response header: X-Frame-Options, or a Content-Security-Policy
+frame-ancestors directive. The rules remove those headers.
+
+Others refuse in the server, by reading the Fetch Metadata request headers that
+mark a request as coming from a frame. Google Translate answers a request
+carrying Sec-Fetch-Dest: iframe with 403 and no body, while the same request
+with Sec-Fetch-Dest: document is served normally, and advertises this with
+Vary: Sec-Fetch-Dest, Sec-Fetch-Mode, Sec-Fetch-Site. There is no response
+header to remove, so the rules set those three request headers to the values a
+top-level navigation would have carried.
+
+Both edits are made by the same two rules, and both are scoped so that ordinary
+browsing is not affected: sub_frame requests only — never a top-level document,
+and never a script, an image or an XHR, which is where Fetch Metadata protects
+against CSRF and XSSI rather than against framing — and then either requests
+initiated by this extension's own pages, or requests in the single tab a split
+view is open in. This variant of the permission was chosen over plain
+declarativeNetRequest precisely so that the rules can act only where the user
+has granted host access.
 ```
 
 **Host permission (`<all_urls>`)**
