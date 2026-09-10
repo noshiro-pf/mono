@@ -88,33 +88,103 @@ TS 固有の事情から来ている。
 宣言」が 2 本消え、`as` が 1 か所に残るだけになる。検査されない主張が**明示され、
 grep できる**形になるのが本質的な改善。
 
-**さらに良いのは、精密化が成り立つようにデータ側を作り直すこと。** `None` にも
-`value: undefined` を持たせれば `unwrap` は `<O extends Opt<unknown>>(o: O): O['value']`
-という**条件型も `as` も無い**単一シグネチャになる(実測)。射影が全域になれば
-TypeScript が自分で証明する。**C の正しい解決は言語機能ではなくデータ設計**である。
+**さらに良いのは、精密化が成り立つようにデータ側を作り直すこと。** 射影が全域になれば
+TypeScript が自分で証明するので、条件型も `as` も要らなくなる。**C の正しい解決は言語機能
+ではなくデータ設計**である。ただし実物に当てると `Optional` と `Result` で答えが割れる。
+
+#### `Optional`: ほぼ無償で成立する(推奨)
+
+現状は `None` が `value` を持たないので `unwrap` は 2 本のオーバーロード + `as` になる。
+**`None` の型に省略可能プロパティを 1 つ足すだけ**で射影が全域になる:
+
+```ts
+export type None = Readonly<{
+    $$tag: 'ts-data-forge::Optional.none';
+
+    /** 常に不在。`Optional.unwrap` の射影を全域にするためだけの型上の宣言。 */
+    value?: undefined;
+}>;
+
+// 2 本のオーバーロードと 1 個の `as` と eslint-disable が、これ 1 行に置き換わる
+export const unwrap = <const O extends UnknownOptional>(
+    optional: O,
+): O['value'] => optional.value;
+```
+
+**`?:` にするのが要点**で、これで `無駄なプロパティ` の懸念は消える:
+
+- **ランタイムは 1 バイトも変わらない。** `none` は今までどおり `{ $$tag: … }` のままで、
+  `value` キーは**存在しない**。`?:` は「不在または `undefined`」を意味するので、型は
+  実物を正確に述べている(嘘ではない)。`Object.keys(none)`、`'value' in none`、
+  `deepStrictEqual(none, { $$tag: … })` の結果はどれも現状と同じ。
+- **`as` も要らない。** `const none: None = { $$tag: NoneTypeTagName }` は今の字面のまま通る。
+  必須プロパティ(`value: undefined`)にすると逆に定義側で `value: undefined` を書く必要が
+  生じるので、そちらは採らない。
+- **型の精密化は現状と完全に同値**(実測): `Some<number>` なら `number`、
+  `Optional<number>` なら `number | undefined`。`Unwrap<O>` を使った現状の推論と一致する。
+- **破壊的変更ではない。** 公開 API の増分は「`None` 型の値に `.value` と書くと `undefined`
+  になる」だけで、既存のコードは 1 行も壊れない。
+- 代償は 2 つ: (a) `Optional.unwrap` を使わず `.value` を直接読む書き方が型として可能になる
+  (`Some` については元から可能だったので、増えるのは `None` の側だけ)、(b) `exactOptionalPropertyTypes`
+  を将来 `true` にする場合の再確認 — 現在は Sumi の拘束 compilerOptions で `false` に固定
+  されているので今日の問題ではない。
+
+#### `Result`: 同じ手は使えない(現状維持を推奨)
+
+`Ok<S>` と `Err<E>` は**どちらも `value` を持っている**(`Err.value` はエラー値)。したがって
+`r.value` は `S | E` であって、`unwrapOk` が欲しい `S | undefined` にはならない。全域にするには
+**キーを分ける**しかない:
+
+```ts
+export type Ok<S> = Readonly<{ $$tag: '…ok'; value: S; error?: undefined }>;
+export type Err<E> = Readonly<{ $$tag: '…err'; error: E; value?: undefined }>;
+// unwrapOk = (r) => r.value   → R['value'] = S | undefined
+// unwrapErr = (r) => r.error  → R['error'] = E | undefined
+```
+
+概念的にはこちらが正しい(Err が抱えているのは「値」ではなく「エラー」である)。しかし
+**`Err.value` は公開 API として実際に使われている** — ts-std-forge の JSDoc の例だけでも
+`assert.deepStrictEqual(errResult.value, { kind: 'invalid-number', … })` の形が多数あり、
+これは README とドキュメントに出る面である。`value` → `error` の改名は published パッケージの
+破壊的変更で、得られるのは `unwrapOk` 系 2 個(Result / TernaryResult)のオーバーロード解消に
+とどまる。**割に合わない。**
+
+`Ok` に `okValue` を増やす等の非破壊案は**ペイロードを実体として二重に持つ**ことになり、
+ここでは本当に無駄なプロパティなので採らない(`Optional` の `?:` が無償なのは、増えるのが
+型だけでランタイムに何も増えないからである)。
+
+したがって **`Result` の `unwrapOk` は C の一般解 — 条件型の戻り値を持つ単一シグネチャ +
+1 個の `as` — に留める。** オーバーロード宣言 2 本が消えて、検査されない主張が 1 か所に
+明示されるところまでは同じように得られる。
 
 ### B(省略可能引数) — 条件付き rest タプルで単一シグネチャにする
 
 ```ts
 type CmpRest<Ar extends readonly unknown[]> = Ar extends readonly number[]
-    ? [comparator?: Cmp<Ar[number]>]
-    : [comparator: Cmp<Ar[number]>];
+    ? readonly [comparator?: Cmp<Ar[number]>]
+    : readonly [comparator: Cmp<Ar[number]>];
 
 export const min = <const Ar extends readonly unknown[]>(
     array: Ar,
     ...rest: CmpRest<Ar>
 ): Ar[number] | undefined => {
+    // 本体では `Ar` が未解決なので条件型が両枝の union に潰れる。`as` はここだけ。
+    const comparator = rest[0] as Cmp<Ar[number]> | undefined;
     /* … */
 };
 ```
 
 呼び出し側の挙動は 2 本のオーバーロードと同じ(数値配列なら省略可、それ以外は必須。
-実測)。代償は本体で `rest[0]` を取り出す 1 か所の `as`(本体の中では `Ar` が未解決な
-ので条件型が両枝の union に潰れる)。
+実測)。代償は本体で `rest[0]` を取り出す 1 か所の `as`。
 
-**注意**: この rest タプルは `readonly` にできない。TypeScript は rest 引数のタプルを
-mutable に正規化するため、`readonly` の条件型タプルは決して満たせない。D-45 の
-readonly 強制と正面から衝突する既知の摩擦点。
+**`readonly` は問題なく書ける(2026-09-10 訂正)。** この文書の初版は「rest 引数のタプルは
+mutable に正規化されるので `readonly` にできず D-45 と衝突する」と書いたが**誤りだった**。
+上のとおり両枝を `readonly` で書いた形は宣言も呼び出しも通り、`sumi/require-readonly-type`
+も報告しない(preset を実際に走らせて確認)。mutable で書けば同ルールが両枝を報告するので、
+**ルールの言うとおりに `readonly` を付ければ正しくなる**。初版が見ていた失敗は別物で、
+**実装を別の関数に切り出して alias に代入する形**でだけ起きる — その形では実装側の rest が
+普通の省略可能引数へ正規化され、`readonly` タプルとの variance が合わない。**実装を直接
+書く限り摩擦は無い。**
 
 ### A(arity) — パイプ演算子で需要ごと消す
 
@@ -122,6 +192,49 @@ readonly 強制と正面から衝突する既知の摩擦点。
 カリー化形の主用途は `pipe` への部分適用渡しである([overload-survey.md](./overload-survey.md)
 の例 1)。**候補 1(パイプ演算子)が入れば A の 6 個 + 混在 3 個、つまり 19 個中 9 個
 のオーバーロードが不要になる。** 記法を設計するより先に測るべき接続。
+
+#### Sumi lint での答え: `pipe` に引数を渡せるメソッドを足す(構文不要)
+
+パイプ演算子は sugar の機能なので、Sumi lint(合法 TS)には別の答えが要る。**カリー化形が
+何のために存在するかを見ると、答えは構文ではなくライブラリにある。**
+
+`pipe` は可変長の `pipe(f, g, h)` ではなく **fluent builder**(`pipe(x).map(f).value`)である。
+`.map` は関数を 1 つ取るので、そこへ `Arr.count(pred)` のような**部分適用済みの関数**を渡す
+ためにカリー化形が要る(使用箇所 20 か所、`ts-restrictions/prefer-curried-call` が推奨しても
+いる)。つまり**カリー化形の存在理由は `.map` が引数を 1 つしか渡せないこと**に尽きる。
+
+そこで `.map` の隣に「残りの引数も一緒に渡す」メソッドを 1 つ足す:
+
+```ts
+mapWith: <const Rest extends readonly unknown[], B>(
+    fn: (a: A, ...rest: Rest) => B,
+    ...rest: Rest
+) => Pipe<B>;
+// pipe(x).mapWith(f, ...rest) === pipe(f(x, ...rest))
+```
+
+```ts
+// before(カリー化形のオーバーロードが要る)
+pipe(xs).map(Arr.count((x) => x > 1)).value;
+
+// after(データ第一形だけで足りる)
+pipe(xs).mapWith(Arr.count, (x) => x > 1).value;
+```
+
+実測: `Rest` の推論は効き、**コールバック引数 `(x) => x > 1` の `x` も文脈から推論される**
+(注釈不要)。チェーンも従来どおり。したがって **A のカリー化オーバーロードは新構文を待たず
+今日そのまま削除できる。**
+
+これは D-37 が要求する「sugar 構文の Sumi lint ライブラリ形」そのものでもある:
+
+| 層         | 書き方                                           |
+| :--------- | :----------------------------------------------- |
+| Sumi lint  | `pipe(xs).mapWith(Arr.count, pred).value`        |
+| Sumi sugar | `xs \|> Arr.count(^, pred)`(記法は候補 1 で確定) |
+
+両向きの codemod は機械的(`.mapWith(f, ...args)` ↔ `f(^, ...args)`)。**パイプ演算子の採否
+を待たずに `mapWith` を先に入れれば A の 9 個は先に消える**ので、複数節構文の必要性は D の
+1 個だけを相手に判断すればよくなる。
 
 ### D(実行時分岐) — 節ごとの関数 + narrowing dispatch
 
@@ -255,10 +368,26 @@ tsc が検査しないのは「宣言ごとの戻り値型」だけで、そこ�
    「arrow ではオーバーロードが書きにくいから」ではなく、「実行時分岐のオーバーロードは
    (1) でしか `as` 無しに書けないから」である。
 
-## 未決(ユーザー判断)
+## 決定と残タスク(2026-09-10)
 
-- 上の 1〜4 を D-13 の改訂として決定ログに落とすか。
-- パイプ演算子(候補 1)を先に測るか — A の 9 個が消えるなら複数節構文の優先度は下がる。
-- `readonly` にできない rest タプルを D-45 の例外として認めるか。
-- ts-std-forge の `Optional` / `Result` を「射影が全域」な形に作り直すか(C の 4 個 +
-  混在 3 個が `as` ごと消えるが、公開 API の破壊的変更になる)。
+決定は **D-58** に記録した。この文書が正典として残すのは測定と根拠である。
+
+実装の残タスク(いずれも独立に着手できる):
+
+1. **`pipe` に `mapWith` を足す**(ts-std-forge)。カリー化オーバーロード 9 個の削除は
+   その後の別作業で、`ts-restrictions/prefer-curried-call` の去就も併せて決める。
+2. **`None` に `value?: undefined` を足し、`Optional.unwrap` を単一シグネチャにする**
+   (ts-std-forge)。ランタイム変更なし・破壊的変更なし。
+3. **`Result` / `TernaryResult` の `unwrapOk` を条件型の単一シグネチャへ**。`Err.value` の
+   改名はしない。
+4. **`min` / `max` / `minBy` / `maxBy` を条件付き rest タプルへ**(ts-data-forge)。
+5. **`functions/no-refinement-overload` の実装**。1〜4 が終われば対象は `panic` 以外ほぼ
+   無くなるので、**新規の逆行を止めるための番人**という位置づけになる。
+6. **`functions/prefer-intersection-call-signature` の実装**。現状の違反は 0 件。
+
+未決のまま残るもの:
+
+- Sumi sugar の複数節構文を**そもそも入れるか**。1〜4 のあと実行時分岐のオーバーロードが
+  `panic` の 1 個だけになるなら、構文を足す価値があるかは改めて判断する(D-58 の判断 2 は
+  「入れるならこの形」であって「入れる」ではない)。
+- パイプ演算子(候補 1)の記法そのもの — プレースホルダの字面は候補 1 の担当。
