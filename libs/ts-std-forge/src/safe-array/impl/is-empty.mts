@@ -14,7 +14,7 @@
  * @example
  *
  * ```ts
- * const values: readonly number[] = [];
+ * const values: readonly number[] = [] as const;
  *
  * assert.isTrue(SafeArray.isEmpty(values));
  *

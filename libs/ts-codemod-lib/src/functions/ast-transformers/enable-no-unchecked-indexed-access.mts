@@ -37,17 +37,40 @@ const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
  * as the `if` of `const v = xs[0]!; if (v === undefined) …` now is.
  *
  * @example
- * ```ts
- * declare const xs: readonly number[];
- * declare const pair: readonly [number, number];
- * declare const rec: Record<string, number>;
- * declare const known: { a: number };
  *
- * xs[0].toFixed(); // -> xs[0]!.toFixed();
- * rec['a'].toFixed(); // -> rec['a']!.toFixed();
- * rec.a.toFixed(); // -> rec.a!.toFixed();
- * pair[1].toFixed(); // -> pair[1].toFixed(); (guaranteed to exist)
- * known.a.toFixed(); // -> known.a.toFixed(); (guaranteed to exist)
+ * ```ts
+ * const before = dedent`
+ *   declare const xs: readonly number[];
+ *   declare const pair: readonly [number, number];
+ *   declare const rec: Record<string, number>;
+ *   declare const known: { a: number };
+ *
+ *   xs[0].toFixed();
+ *   rec['a'].toFixed();
+ *   rec.a.toFixed();
+ *   pair[1].toFixed();
+ *   known.a.toFixed();
+ * `;
+ *
+ * const after = transformSourceCode(before, false, [
+ *   enableNoUncheckedIndexedAccessTransformer(),
+ * ]);
+ *
+ * assert.deepStrictEqual(
+ *   after.trim(),
+ *   dedent`
+ *     declare const xs: readonly number[];
+ *     declare const pair: readonly [number, number];
+ *     declare const rec: Record<string, number>;
+ *     declare const known: { a: number };
+ *
+ *     xs[0]!.toFixed();
+ *     rec['a']!.toFixed();
+ *     rec.a!.toFixed();
+ *     pair[1].toFixed();
+ *     known.a.toFixed();
+ *   `,
+ * );
  * ```
  */
 export const enableNoUncheckedIndexedAccessTransformer = (

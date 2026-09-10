@@ -19,13 +19,54 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
- * const results$ = query.pipe(
- *   switchMap((q) =>
- *     fromAbortablePromise((signal) =>
- *       fetch(`/api/search?q=${q}`, { signal }).then((r) => r.json()),
- *     ),
+ * //  Timeline:
+ * //
+ * //  query$      "a"            "b"
+ * //  request a   [in flight]    | (aborted)
+ * //  request b                  [in flight]  -> "result for b"
+ * //  results$                                  Ok("result for b")
+ * //
+ * //  Explanation:
+ * //  - fromAbortablePromise hands its factory an AbortSignal
+ * //  - switchMap completes the previous inner observable, which aborts it
+ * //  - The AbortError that follows is swallowed, so nothing is emitted for it
+ *
+ * const search = (query: string, signal: AbortSignal): Promise<string> =>
+ *   new Promise((resolve, reject) => {
+ *     const timer = setTimeout(() => {
+ *       resolve(`result for ${query}`);
+ *     }, 50);
+ *
+ *     signal.addEventListener('abort', () => {
+ *       clearTimeout(timer);
+ *
+ *       reject(new DOMException('aborted', 'AbortError'));
+ *     });
+ *   });
+ *
+ * const query$ = source<string>();
+ *
+ * const results$ = query$.pipe(
+ *   switchMap((query) =>
+ *     fromAbortablePromise((signal) => search(query, signal)),
  *   ),
  * );
+ *
+ * const valueHistory: Result<string, unknown>[] = [];
+ *
+ * results$.subscribe((result) => {
+ *   valueHistory.push(result);
+ * });
+ *
+ * query$.next('a');
+ *
+ * query$.next('b');
+ *
+ * await new Promise<void>((resolve) => {
+ *   setTimeout(resolve, 150);
+ * });
+ *
+ * assert.deepStrictEqual(valueHistory, [Result.ok('result for b')]);
  * ```
  */
 export const fromAbortablePromise = <A, E = unknown>(

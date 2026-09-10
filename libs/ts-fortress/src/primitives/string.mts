@@ -143,6 +143,10 @@ export type StringConstraintsResultType<C extends StringTypeConstraints> =
  * const maxLength: 32 = Name.constraints.maxLength;
  *
  * const regex: undefined = Name.constraints.regex;
+ *
+ * assert.strictEqual(maxLength, 32);
+ *
+ * assert.isUndefined(regex);
  * ```
  */
 export type StringConstraintsOf<C extends StringTypeConstraints> =

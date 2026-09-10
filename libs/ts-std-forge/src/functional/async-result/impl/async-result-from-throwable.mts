@@ -17,7 +17,7 @@ import { type AsyncResult } from '../async-result.mjs';
  * ```ts
  * const success = await AsyncResult.fromThrowable(
  *   () => Promise.resolve(2),
- *   (error) => `failed: ${String(error)}`,
+ *   (error) => `failed: ${unknownToString(error)}`,
  * );
  *
  * const failure = await AsyncResult.fromThrowable(
@@ -32,11 +32,9 @@ import { type AsyncResult } from '../async-result.mjs';
  * assert.deepStrictEqual(failure, Result.err('boom'));
  *
  * // Without `mapError`, the thrown value is carried as-is.
- * const untyped = await AsyncResult.fromThrowable(
- *   (): Promise<number> => {
- *     throw new Error('boom');
- *   },
- * );
+ * const untyped = await AsyncResult.fromThrowable((): Promise<number> => {
+ *   throw new Error('boom');
+ * });
  *
  * assert.isTrue(Result.isErr(untyped));
  * ```

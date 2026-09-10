@@ -47,4 +47,27 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/other-types/template-literal/semver.mts',
     ],
   },
+  {
+    sourcePath: 'src/constraints/with-constraints.mts',
+    sampleFiles: [
+      'samples/src/constraints/constraints-of-example.mts',
+      'samples/src/constraints/attach-constraints-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/primitives/number.mts',
+    sampleFiles: ['samples/src/primitives/number-constraints-example.mts'],
+  },
+  {
+    sourcePath: 'src/primitives/string.mts',
+    sampleFiles: ['samples/src/primitives/string-constraints-example.mts'],
+  },
+  {
+    sourcePath: 'src/record/at.mts',
+    sampleFiles: [
+      'samples/src/record/at-constraints-example.mts',
+      'samples/src/record/at-record-example.mts',
+      'samples/src/record/at-tuple-example.mts',
+    ],
+  },
 ] as const;

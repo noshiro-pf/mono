@@ -320,12 +320,27 @@ the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
   trigger is the `@example` tag, not the fence it is supposed to contain: an
   example written as bare JSDoc lines has no fence at all, so keying off the
   fence would only ever catch files that already follow the convention.
-- **`exemptSourcePaths` is a backlog that may only shrink.** The four packages
-  that had unmapped examples when the check reached them name those files
-  there; an entry that is no longer needed is itself an error, so a sample
-  written for one of them takes its line with it. Adding a line is not how a
-  new `@example` gets written — see
-  [#1880](https://github.com/noshiro-pf/mono/issues/1880).
+- **There is no way to exempt an `@example` from it.** There was, for one
+  release: `exemptSourcePaths` froze the backlog of the four packages that had
+  unmapped examples when the check first reached them. The samples are written
+  now ([#1880](https://github.com/noshiro-pf/mono/issues/1880)), the lists are
+  empty, and the option is gone — a knob whose only documented purpose has
+  been met is a knob the next unmapped example would be quietly added to. A
+  declaration samples genuinely cannot reach — a module-local helper, since
+  samples import the package the way a consumer does, or a snippet that is not
+  TypeScript at all — describes itself in prose, with the fence and no
+  `@example` tag.
+- **`pnpm run check:root:example-coverage` asks the one thing the per-package
+  check cannot ask about itself: whether it runs.** The check above only ever
+  runs for a package that has an `embed-examples-in-jsdoc.mts` and reaches it
+  from `doc`, so a package that never opted in is not a package that passes —
+  it is a package nothing looked at, with no failure to notice. That is how
+  `ts-codemod-lib` and `ts-repo-utils` kept hand-written `@example` blocks
+  while eight packages were being checked. `tools/scripts/cmd/check-example-coverage.mts`
+  fails when a `libs/*` package has an `@example` under `src/` and no wiring
+  to check it; it deliberately does not re-answer whether the example is
+  mapped, because two implementations of that would be two things to keep in
+  agreement.
 - **CI runs these through `ws:doc`, never through `ws:doc:embed*`.** Each
   package's `doc` script reaches its own embedding steps, and `style-check (ws:doc)`
   runs `doc` and then asserts the tree is clean. So a `gen-docs.mts` that

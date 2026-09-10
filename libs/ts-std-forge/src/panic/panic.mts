@@ -88,7 +88,7 @@ export function panic(
  * @example
  *
  * ```ts
- * type Shape = { kind: 'circle' } | { kind: 'square' };
+ * type Shape = Readonly<{ kind: 'circle' } | { kind: 'square' }>;
  *
  * const area = (shape: Shape): number => {
  *   switch (shape.kind) {

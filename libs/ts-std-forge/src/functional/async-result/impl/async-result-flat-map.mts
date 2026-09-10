@@ -15,8 +15,8 @@ import {
  * @example
  *
  * ```ts
- * const parseNumber = (input: string): Result<number, string> => {
- *   const num = Number.parseInt(input, 10);
+ * const parseNumber = (text: string): Result<number, string> => {
+ *   const num = Number.parseInt(text, 10);
  *
  *   return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
  * };

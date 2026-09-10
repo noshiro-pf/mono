@@ -510,4 +510,26 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/string/as-non-empty-string-example.mts',
     ],
   },
+  {
+    sourcePath: 'src/array/impl/array-utils-length-bounded-array-cast.mts',
+    sampleFiles: [
+      'samples/src/array/as-fixed-length-array-example.mts',
+      'samples/src/array/as-min-length-array-example.mts',
+      'samples/src/array/as-max-length-array-example.mts',
+      'samples/src/array/as-bounded-length-array-example.mts',
+      'samples/src/array/as-empty-array-example.mts',
+      'samples/src/array/as-non-empty-array-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/array/impl/array-utils-length-bounded-tuple-cast.mts',
+    sampleFiles: [
+      'samples/src/array/as-fixed-length-tuple-example.mts',
+      'samples/src/array/as-min-length-tuple-example.mts',
+      'samples/src/array/as-max-length-tuple-example.mts',
+      'samples/src/array/as-bounded-length-tuple-example.mts',
+      'samples/src/array/as-empty-tuple-example.mts',
+      'samples/src/array/as-non-empty-tuple-example.mts',
+    ],
+  },
 ] as const;

@@ -29,15 +29,6 @@ export type EmbedExamplesInJsDocOptions = Readonly<{
   exemptFileNames?: readonly string[];
 
   /**
-   * Package-relative source paths whose `@example` blocks are knowingly not
-   * backed by a sample file yet — the backlog of
-   * https://github.com/noshiro-pf/mono/issues/1880, frozen so that it can only
-   * shrink. An entry that is no longer needed is an error, so an example moved
-   * into `samples/` takes its line here with it.
-   */
-  exemptSourcePaths?: readonly string[];
-
-  /**
    * See `ExtractSampleCodeOptions` in `embed-examples-utils.mts`, which is
    * where the reason this is not always on is written down.
    */
@@ -57,7 +48,6 @@ export type EmbedExamplesInJsDocOptions = Readonly<{
  */
 export const embedExamplesInJsDoc = async ({
   exemptFileNames = defaultExemptFileNames,
-  exemptSourcePaths = [],
   packageRootPath,
   sourceFileMappings,
   stripTransformerDirectives,
@@ -65,7 +55,6 @@ export const embedExamplesInJsDoc = async ({
   try {
     const coverageResult = await assertAllExamplesAreMapped({
       exemptFileNames,
-      exemptSourcePaths,
       packageRootPath,
       sourceFileMappings,
     });
@@ -228,7 +217,7 @@ const countExampleTags = (content: string): number =>
  * Verifies that every `@example` under src is backed by a type-checked sample
  * file in samples/src, i.e. that its module is listed in sourceFileMappings.
  * Generated files (index.mts / global.mts / entry-point.mts by default) and
- * tests are exempt, as are the paths a package names in `exemptSourcePaths`.
+ * tests are exempt.
  *
  * The trigger is the `@example` tag, not the ```ts fence it is supposed to
  * contain. Keying off the fence would only ever catch a file that already
@@ -245,12 +234,10 @@ const countExampleTags = (content: string): number =>
  */
 const assertAllExamplesAreMapped = async ({
   exemptFileNames,
-  exemptSourcePaths,
   packageRootPath,
   sourceFileMappings,
 }: Readonly<{
   exemptFileNames: readonly string[];
-  exemptSourcePaths: readonly string[];
   packageRootPath: string;
   sourceFileMappings: readonly SourceFileMapping[];
 }>): Promise<Result<undefined, string>> => {
@@ -266,15 +253,7 @@ const assertAllExamplesAreMapped = async ({
     ),
   );
 
-  const exemptedSourcePaths = new Set<string>(
-    exemptSourcePaths.map((sourcePath) =>
-      path.resolve(packageRootPath, sourcePath),
-    ),
-  );
-
   const mut_unmappedFiles: string[] = [];
-
-  const mut_usedExemptions = new Set<string>();
 
   for (const filePath of filesResult.value) {
     if (
@@ -294,12 +273,6 @@ const assertAllExamplesAreMapped = async ({
       continue;
     }
 
-    if (exemptedSourcePaths.has(filePath)) {
-      mut_usedExemptions.add(filePath);
-
-      continue;
-    }
-
     mut_unmappedFiles.push(
       `${path.relative(packageRootPath, filePath)} (${exampleTagCount} \`@example\`)`,
     );
@@ -315,23 +288,6 @@ const assertAllExamplesAreMapped = async ({
         'Create sample files under samples/src and add mapping entries for them,',
         'or, for a declaration samples cannot reach, describe the behavior in prose',
         'instead of an `@example`.',
-      ].join('\n'),
-    );
-  }
-
-  const staleExemptions = exemptSourcePaths.filter(
-    (sourcePath) =>
-      !mut_usedExemptions.has(path.resolve(packageRootPath, sourcePath)),
-  );
-
-  if (Arr.isNonEmpty(staleExemptions)) {
-    return Result.err(
-      [
-        `❌ \`exemptSourcePaths\` names ${staleExemptions.length} path(s) that no longer`,
-        'need exempting — mapped, carrying no `@example`, or gone:',
-        ...staleExemptions.toSorted().map((p) => `  - ${p}`),
-        'Delete them from scripts/cmd/embed-examples-in-jsdoc.mts. The list is a',
-        'backlog, so it may only shrink.',
       ].join('\n'),
     );
   }

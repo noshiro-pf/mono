@@ -16,10 +16,7 @@ import { type AsyncResult } from '../async-result.mjs';
  * @example
  *
  * ```ts
- * const okValue = AsyncResult.fromPromise(
- *   Promise.resolve(5),
- *   () => 'failed',
- * );
+ * const okValue = AsyncResult.fromPromise(Promise.resolve(5), () => 'failed');
  *
  * const doubled = await AsyncResult.map(okValue, (value) => value * 2);
  *

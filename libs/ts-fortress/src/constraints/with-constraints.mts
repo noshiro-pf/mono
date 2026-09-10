@@ -30,7 +30,11 @@ export type ConstrainedType<A, C> = Type<A> & WithConstraints<C>;
  * const Age = t.number(0, { int: true, min: 0, max: 120 });
  *
  * type AgeConstraints = t.ConstraintsOf<typeof Age>;
- * //   ^? { readonly int: true; readonly min: 0; readonly max: 120; ... }
+ *
+ * // { readonly int: true; readonly min: 0; readonly max: 120; ... }
+ * const ageConstraints: AgeConstraints = Age.constraints;
+ *
+ * assert.strictEqual(ageConstraints.max, 120);
  * ```
  */
 export type ConstraintsOf<T extends UnknownType> =
@@ -86,6 +90,10 @@ export type FillConstraints<All extends UnknownRecord, C> = Readonly<{
  * const max: 120 = Age.constraints.max;
  *
  * const step: undefined = Age.constraints.step;
+ *
+ * assert.strictEqual(max, 120);
+ *
+ * assert.isUndefined(step);
  * ```
  */
 export const attachConstraints = <A, C>(
