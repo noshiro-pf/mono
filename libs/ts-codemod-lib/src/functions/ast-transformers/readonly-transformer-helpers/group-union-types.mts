@@ -1,5 +1,6 @@
 import * as tsm from 'ts-morph';
 import {
+  hasCallOrConstructSignature,
   isAtomicTypeNode,
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTypeReferenceNode,
@@ -121,8 +122,14 @@ export const groupUnionIntersectionTypes = (
       continue;
     }
 
+    // A type literal that declares a call or construct signature is deliberately
+    // not grouped here: this group is joined and wrapped in a single
+    // `Readonly<...>`, which such a literal does not survive. It falls through
+    // to `others`, which leaves it as written. See
+    // `hasCallOrConstructSignature`.
     if (
-      t.isKind(tsm.SyntaxKind.TypeLiteral) ||
+      (t.isKind(tsm.SyntaxKind.TypeLiteral) &&
+        !hasCallOrConstructSignature(t)) ||
       isReadonlyTypeReferenceNode(t)
     ) {
       if (mut_grouped.typeLiterals === undefined) {

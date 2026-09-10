@@ -110,6 +110,28 @@ type User2 = Readonly<{
     friendIds: readonly number[];
     mut_items: string[]; // Not made readonly due to 'mut_' prefix
 }>;
+
+// A type literal that declares a call or construct signature is marked
+// `readonly` member by member rather than wrapped, because `Readonly<T>` is a
+// mapped type over `keyof T` and neither signature kind survives it.
+
+// Before
+type Parse = {
+    (input: string): string[];
+
+    (input: string, strict: boolean): string[] | undefined;
+
+    separators: string[];
+};
+
+// After (still callable; only the members inside it changed)
+type Parse2 = {
+    (input: string): readonly string[];
+
+    (input: string, strict: boolean): readonly string[] | undefined;
+
+    readonly separators: readonly string[];
+};
 ```
 
 For more detailed transformation examples, see the [test file](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/src/functions/ast-transformers/convert-to-readonly.test.mts) which covers various scenarios including complex types, nested structures, and DeepReadonly transformations.
