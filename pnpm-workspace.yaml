@@ -15,11 +15,11 @@ catalog:
   '@typescript-eslint/parser': 8.69.0
   '@typescript-eslint/rule-tester': 8.69.0
   '@vitejs/plugin-react': 6.1.1
-  '@vitest/browser-playwright': 4.1.11
-  '@vitest/coverage-v8': 4.1.11
-  '@vitest/ui': 4.1.11
+  '@vitest/browser-playwright': 5.0.0
+  '@vitest/coverage-v8': 5.0.0
+  '@vitest/ui': 5.0.0
   argparse: 3.0.1
-  cspell: 10.2.0
+  cspell: 10.2.1
   dedent: 1.7.2
   esbuild: 0.28.2
   eslint: 10.9.1
@@ -47,7 +47,7 @@ catalog:
   typescript: 6.0.3
   valtio: 2.3.2
   vite: 8.2.2
-  vitest: 4.1.11
+  vitest: 5.0.0
   zustand: 5.0.15
 
 packages:
