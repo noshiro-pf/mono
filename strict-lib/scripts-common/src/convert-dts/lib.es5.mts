@@ -6,6 +6,8 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import {
+  anyArgumentsRef,
+  anyArgumentsTypeDefString,
   brandedNumberTypeDefString,
   closeBraceRegexp,
   idFn,
@@ -124,33 +126,35 @@ export const convertLibEs5 =
           // ),
         ),
 
-        // `(...args: never)` — a bare `never`, not `readonly never[]` — is how
-        // the "accepts a call with any arguments" position is spelled here.
-        // This is upstream's own spelling (`ThisParameterType` /
-        // `OmitThisParameter` in `lib.es5.d.ts` are written that way even in
-        // the stock library); the `any` this replaces is what the rest of the
-        // conversion exists to remove.
+        // The wildcard rest parameter — "match any argument list", not a type
+        // anything has. `StrictLibInternals.AnyArguments` is `never`, declared
+        // at the end of this file; its own doc comment is where the reasoning
+        // lives. Named rather than written inline so that the two readings of
+        // the `any` this conversion removes stay distinguishable: a value's
+        // `any` becomes `unknown` or `never` by variance, a wildcard's `any`
+        // becomes this.
         //
-        // `readonly never[]` looks like the stricter choice and is not: a
-        // *generic* overload whose rest parameter is computed from its own type
-        // parameter (`@types/node`'s `setTimeout<TArgs extends any[]>(cb, ms?,
-        // ...args: MakeVoidParameterOptional<TArgs>)`) fails to match it, so
-        // `ReturnType<typeof setTimeout>` fell to the conditional's false
-        // branch and came out `unknown` — silently, since the false branch is
-        // a type rather than an error (#1840). The bare `never` matches it.
-        //
-        // Keep the constraint and the conditional's `extends` clause spelled
-        // the same way. Both are rewritten by these two rules, which is what
-        // makes the false branch unreachable for any `T` the constraint admits
-        // — and therefore what keeps "did not resolve" from being spelled
-        // `unknown` and propagating.
+        // The blanket `any` -> `unknown` pass has already run, so what these
+        // match is `(...args: unknown)`. Both the type-parameter constraint and
+        // the conditional's `extends` clause are rewritten, which is what makes
+        // the false branch unreachable for any `T` the constraint admits — and
+        // therefore what keeps "did not match" from being spelled `unknown` and
+        // propagating (#1840).
         replaceWithNoMatchCheck(
           'extends (...args: unknown) =>',
-          'extends (...args: never) =>',
+          `extends (...args: ${anyArgumentsRef}) =>`,
         ),
         replaceWithNoMatchCheck(
           'extends abstract new (...args: unknown) =>',
-          'extends abstract new (...args: never) =>',
+          `extends abstract new (...args: ${anyArgumentsRef}) =>`,
+        ),
+
+        // The one wildcard the stock library already writes as `never`. Renamed
+        // too, so that grepping the alias finds every site rather than most of
+        // them.
+        replaceWithNoMatchCheck(
+          '(this: infer U, ...args: never) => unknown',
+          `(this: infer U, ...args: ${anyArgumentsRef}) => unknown`,
         ),
 
         // Error クラスを継承した際に name を書き換えるケースに対応するため
@@ -377,6 +381,7 @@ export const convertLibEs5 =
           // append type utils
           [
             s,
+            anyArgumentsTypeDefString(),
             'type RawDateMutType = Date;',
             'type RawDateType = Readonly<RawDateMutType>;',
             'type TimerId = ReturnType<typeof setTimeout>; // NodeJS.Timeout or number',

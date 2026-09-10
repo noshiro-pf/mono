@@ -7,8 +7,10 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import {
+  anyArgumentsRef,
   closeBraceRegexp,
   createBrandedNumber,
+  ensureEs5Reference,
   idFn,
   tsLibShapeFor,
   type ConverterConfig,
@@ -220,19 +222,18 @@ export const convert = (
           (() => {
             switch (filename) {
               case 'lib.decorators.d.ts':
-                // Bare `never`, as in `lib.es5.d.ts` — see the note on the
-                // same rewrite in `convertLibEs5`. `readonly never[]` rejects
-                // a generic signature whose rest parameter is computed from
-                // its own type parameter, so one spelling for every
-                // "accepts a call with any arguments" position.
+                // Wildcard rest parameters — see the note in `convertLibEs5`
+                // and the alias's own doc comment. `ensureEs5Reference` because
+                // the alias is declared in `lib.es5.d.ts`.
                 return composeMonoTypeFns(
+                  ensureEs5Reference,
                   replaceWithNoMatchCheck(
                     'Class extends abstract new (...args: unknown) => unknown = abstract new (...args: unknown) => unknown',
-                    'Class extends abstract new (...args: never) => unknown = abstract new (...args: never) => unknown',
+                    `Class extends abstract new (...args: ${anyArgumentsRef}) => unknown = abstract new (...args: ${anyArgumentsRef}) => unknown`,
                   ),
                   replaceWithNoMatchCheck(
                     'Value extends (this: This, ...args: unknown) => unknown = (this: This, ...args: unknown) => unknown',
-                    'Value extends (this: This, ...args: never) => unknown = (this: This, ...args: never) => unknown',
+                    `Value extends (this: This, ...args: ${anyArgumentsRef}) => unknown = (this: This, ...args: ${anyArgumentsRef}) => unknown`,
                   ),
                 );
 
@@ -273,10 +274,13 @@ export const convert = (
                 return convertEs2015SymbolWellknown(options);
 
               case 'lib.es2015.reflect.d.ts':
-                // Bare `never` — see the note in `convertLibEs5`.
-                return replaceWithNoMatchCheck(
-                  'newTarget?: new (...args: unknown) => unknown',
-                  'newTarget?: new (...args: never) => unknown',
+                // Wildcard rest parameter — see the note in `convertLibEs5`.
+                return composeMonoTypeFns(
+                  ensureEs5Reference,
+                  replaceWithNoMatchCheck(
+                    'newTarget?: new (...args: unknown) => unknown',
+                    `newTarget?: new (...args: ${anyArgumentsRef}) => unknown`,
+                  ),
                 );
 
               case 'lib.es2015.core.d.ts':

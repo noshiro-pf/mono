@@ -352,7 +352,10 @@ declare const Function: FunctionConstructor;
 /**
  * Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter.
  */
-type ThisParameterType<T> = T extends (this: infer U, ...args: never) => unknown
+type ThisParameterType<T> = T extends (
+  this: infer U,
+  ...args: StrictLibInternals.AnyArguments
+) => unknown
   ? U
   : unknown;
 
@@ -1894,32 +1897,34 @@ type NonNullable<T> = T & {};
 /**
  * Obtain the parameters of a function type in a tuple
  */
-type Parameters<T extends (...args: never) => unknown> = T extends (
-  ...args: infer P
-) => unknown
-  ? P
-  : never;
+type Parameters<
+  T extends (...args: StrictLibInternals.AnyArguments) => unknown,
+> = T extends (...args: infer P) => unknown ? P : never;
 
 /**
  * Obtain the parameters of a constructor function type in a tuple
  */
-type ConstructorParameters<T extends abstract new (...args: never) => unknown> =
-  T extends abstract new (...args: infer P) => unknown ? P : never;
+type ConstructorParameters<
+  T extends abstract new (...args: StrictLibInternals.AnyArguments) => unknown,
+> = T extends abstract new (...args: infer P) => unknown ? P : never;
 
 /**
  * Obtain the return type of a function type
  */
-type ReturnType<T extends (...args: never) => unknown> = T extends (
-  ...args: never
-) => infer R
+type ReturnType<
+  T extends (...args: StrictLibInternals.AnyArguments) => unknown,
+> = T extends (...args: StrictLibInternals.AnyArguments) => infer R
   ? R
   : unknown;
 
 /**
  * Obtain the return type of a constructor function type
  */
-type InstanceType<T extends abstract new (...args: never) => unknown> =
-  T extends abstract new (...args: never) => infer R ? R : unknown;
+type InstanceType<
+  T extends abstract new (...args: StrictLibInternals.AnyArguments) => unknown,
+> = T extends abstract new (...args: StrictLibInternals.AnyArguments) => infer R
+  ? R
+  : unknown;
 
 /**
  * Convert string literal type to uppercase
@@ -5728,6 +5733,36 @@ interface Date {
     locales?: string | readonly string[],
     options?: Intl.DateTimeFormatOptions,
   ): string;
+}
+
+declare namespace StrictLibInternals {
+  /**
+   * The rest-parameter type that means "matches any argument list". A
+   * marker rather than a type anything has: it is `never`.
+   *
+   * `any` reads two ways in a function type, and only one of them is what
+   * this library removes. `any` as a *value* — a return type, a property,
+   * an argument a caller supplies — is the unsound one, and becomes
+   * `unknown` or `never` here according to variance. `any` as a *wildcard*
+   * — the `(...args: any)` in `ReturnType` — describes nothing at all: it
+   * is there to switch the parameter comparison off, so that the
+   * conditional matches whatever signature it is handed. The stock library
+   * spells that marker two ways, `(...args: any)` in `ReturnType` and
+   * `(...args: never)` in `ThisParameterType`. This library spells it one
+   * way, and without `any`.
+   *
+   * Keep it a bare `never`. `never[]` and `readonly never[]` are ordinary
+   * array types, checked like any array: neither is assignable to a tuple
+   * with a required element, which is what the parameter list of the
+   * signature being matched turns into once that signature's own rest
+   * parameter stops being an array — as `@types/node`'s generic
+   * `setTimeout` overload does. That is what made
+   * `ReturnType<typeof setTimeout>` resolve to `unknown`, silently, a
+   * conditional's false branch being a type rather than an error.
+   *
+   * @internal
+   */
+  type AnyArguments = never;
 }
 
 type RawDateMutType = Date;

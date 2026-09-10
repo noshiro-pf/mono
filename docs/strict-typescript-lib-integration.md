@@ -2647,15 +2647,56 @@ issue 本文が疑っていた「`...arguments: readonly unknown[]` と matcher 
 `(this: infer U, ...args: never) => any` と書いてある。`any` を消すという
 この変換の目的は損なわない。
 
-制約側（`T extends (...args: never) => unknown`）も同じ綴りに揃えてある。
+制約側（`T extends (...) => unknown`）も同じ綴りに揃えてある。
 **揃えること自体が目的**で、制約と matcher が同じ形なら、制約を通った `T` に
 対して false 分岐が到達不能になる。issue の 3 節目「失敗が静かなこと自体も問題」
 はこれで閉じる ——「解決できなかった」が `unknown` として伝播する経路が無くなる。
 
-同じ「任意の引数で呼べる」の意味で `readonly never[]` を使っていた
-`lib.decorators.d.ts`（`ClassDecoratorContext` などの型引数制約）と
-`lib.es2015.reflect.d.ts`（`Reflect.construct` の `newTarget`）も揃えた。
-壊れてはいなかったが、綴りが 1 つでないと同じ罠がまた掘られる。
+### `any` の 2 つの読み方を名前で分ける
+
+`readonly never[]` を選んでしまったのは、`any` の除去先を**位置の変性だけ**で
+決めていたからだった。実際には除去すべき `any` は 2 種類ある。
+
+| `any` の読み方                       | 例                               | 置換先                            |
+| :----------------------------------- | :------------------------------- | :-------------------------------- |
+| **値**（共変）                       | 返り値・プロパティ               | `unknown`                         |
+| **値**（反変）                       | 呼び出し側が渡す引数             | `never`                           |
+| **ワイルドカード**（照合をやめる印） | `ReturnType` の `(...args: any)` | `StrictLibInternals.AnyArguments` |
+
+3 行目は「厳しくする」対象ではない。**何も記述していない**——引数の照合を
+オフにして、渡された任意のシグネチャにマッチさせるための印でしかない。
+公式ですらこの印を 2 通りに綴っていて（`ReturnType` は `(...args: any)`、
+`ThisParameterType` は `(...args: never)`）、綴りが揺れているぶん
+「値の `any`」と混同しやすい。
+
+そこで `never` に**名前を付けて**、印であることを型名で明示した。
+`lib.es5.d.ts` 末尾（`RawDateType` などと同じ追記ブロック）に：
+
+```ts
+declare namespace StrictLibInternals {
+    /** ... @internal */
+    type AnyArguments = never;
+}
+```
+
+- **`StrictLibInternals` に置く**——consumer 向けの型ではないので
+  `TimerId` のようなグローバル名にはしない。この namespace は既にあり、
+  宣言はマージされる。
+- **`lib.es5.d.ts` に置く**——どの lib チェーンからも必ず読み込まれる。
+  外から参照する `lib.decorators.d.ts` と `lib.es2015.reflect.d.ts` には
+  `ensureEs5Reference`（既存のヘルパ）で `/// <reference lib="es5" />` を付けた。
+- **grep 可能になる**——「照合をやめる印」の全箇所が `AnyArguments` 1 語で出る。
+  以前は `readonly never[]` と bare `never` に割れていて、片方だけ直すと
+  もう片方が残った。実際 `ThisParameterType` は公式由来の bare `never` のまま
+  取り残されていた。
+
+書き換えたのは 7 箇所（`lib.es5.d.ts` の `ThisParameterType` ・ `Parameters` ・
+`ConstructorParameters` ・ `ReturnType` ・ `InstanceType`、
+`lib.decorators.d.ts` の型引数制約、`lib.es2015.reflect.d.ts` の
+`Reflect.construct` の `newTarget`）。後ろの 2 つは壊れてはいなかったが、
+綴りが 1 つでないと同じ罠がまた掘られる。
+
+型 alias は関係検査で透過なので、挙動は bare `never` と完全に同じ（計測済み）。
 
 ### #1841: 置換コールバックの可変長引数は `string | undefined`
 
