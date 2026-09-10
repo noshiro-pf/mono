@@ -150,6 +150,10 @@ export type NumberRangeConstraints = StrictPick<
  * const max: 120 = Age.constraints.max;
  *
  * const step: undefined = Age.constraints.step;
+ *
+ * assert.strictEqual(max, 120);
+ *
+ * assert.isUndefined(step);
  * ```
  */
 export type NumberConstraintsOf<C extends NumberTypeConstraints> =

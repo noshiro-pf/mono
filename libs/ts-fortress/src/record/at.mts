@@ -40,6 +40,10 @@ import { isOptionalProperty } from './optional.mjs';
  *
  * // equivalently, straight off the record type
  * const sameMax: 120 = User.shape.age.constraints.max;
+ *
+ * assert.strictEqual(max, 120);
+ *
+ * assert.strictEqual(sameMax, 120);
  * ```
  */
 export function at<
@@ -75,7 +79,7 @@ export function at<
  *
  * const year = t.at(ymd, 'year'); // Type<number>
  *
- * year.is(2000); // true
+ * assert.isTrue(year.is(2000));
  * ```
  */
 export function at<
@@ -94,7 +98,7 @@ export function at<
  *
  * const second = t.at(tup, 1); // Type<string>
  *
- * second.is('hello'); // true
+ * assert.isTrue(second.is('hello'));
  * ```
  */
 export function at<

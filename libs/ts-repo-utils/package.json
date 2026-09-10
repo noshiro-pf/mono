@@ -53,6 +53,7 @@
     "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "pnpm run z:format-uncommitted --cwd .",

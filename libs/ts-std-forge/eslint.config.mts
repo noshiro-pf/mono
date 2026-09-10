@@ -22,8 +22,13 @@ export default [
     // values is the point of these files, and Temporal is not a substitute
     // for the API under test. A `Date` in one of the guard tests is there for
     // the same reason — it is the sample value that is an object but not a
-    // record.
-    files: ['test/**/*.mts', '**/*.test.mts', 'src/safe-date/**'],
+    // record, and so is the one in the sample that documents `SafeDate`.
+    files: [
+      'test/**/*.mts',
+      '**/*.test.mts',
+      'src/safe-date/**',
+      'samples/src/safe-date/**',
+    ],
     rules: defineKnownRules({
       'unicorn/prefer-temporal': 'off',
     }),

@@ -2,6 +2,7 @@ import * as path from 'node:path';
 import { Result, type UnknownResult, unknownToString } from 'ts-data-forge';
 import { $, assertPathExists, isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
+import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
 import { embedExamples } from './embed-examples.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
@@ -22,6 +23,13 @@ export const genDocs = async (): Promise<void> => {
     startMessage: 'Embedding example code into README',
     action: () => runStep(embedExamples(), 'Example embedding failed'),
     successMessage: 'Example code embedded into README',
+  });
+
+  await logStep({
+    startMessage: 'Embedding example code into JSDoc',
+    action: () =>
+      runStep(embedExamplesInJsDoc(), 'Example embedding into JSDoc failed'),
+    successMessage: 'Example code embedded into JSDoc',
   });
 
   await logStep({

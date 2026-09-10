@@ -17,7 +17,7 @@ import { type AsyncResult } from '../async-result.mjs';
  * ```ts
  * const resolved = await AsyncResult.fromPromise(
  *   Promise.resolve('ok'),
- *   (error) => `failed: ${String(error)}`,
+ *   (error) => `failed: ${unknownToString(error)}`,
  * );
  *
  * const rejected = await AsyncResult.fromPromise(

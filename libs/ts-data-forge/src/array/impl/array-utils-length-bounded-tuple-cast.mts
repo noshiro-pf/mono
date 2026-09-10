@@ -36,7 +36,11 @@ import {
  * // curried version
  * const asRgb = Arr.asFixedLengthTuple(3);
  *
- * // Arr.asFixedLengthTuple(3, [255, 128]); // throws TypeError
+ * assert.strictEqual(red, 255);
+ *
+ * assert.deepStrictEqual(asRgb([0, 255, 0]), [0, 255, 0]);
+ *
+ * assert.throws(() => Arr.asFixedLengthTuple(3, [255, 128]), TypeError);
  * ```
  *
  * @template Length - The exact number of elements.
@@ -104,7 +108,11 @@ const asFixedLengthTupleImpl = (
  * // curried version
  * const asHistory = Arr.asMinLengthTuple(3);
  *
- * // Arr.asMinLengthTuple(3, [0, 1]); // throws TypeError
+ * assert.strictEqual(first, 0);
+ *
+ * assert.deepStrictEqual(asHistory([4, 5, 6]), [4, 5, 6]);
+ *
+ * assert.throws(() => Arr.asMinLengthTuple(3, [0, 1]), TypeError);
  * ```
  *
  * @template MinLength - The minimum number of elements (inclusive).
@@ -170,7 +178,11 @@ const asMinLengthTupleImpl = (
  * // curried version
  * const asTags = Arr.asMaxLengthTuple(8);
  *
- * // Arr.asMaxLengthTuple(2, ['a', 'b', 'c']); // throws TypeError
+ * assert.deepStrictEqual(tags, ['a', 'b', 'c']);
+ *
+ * assert.deepStrictEqual(asTags(['d', 'e']), ['d', 'e']);
+ *
+ * assert.throws(() => Arr.asMaxLengthTuple(2, ['a', 'b', 'c']), TypeError);
  * ```
  *
  * @template MaxLength - The maximum number of elements (inclusive).
@@ -236,7 +248,11 @@ const asMaxLengthTupleImpl = (
  * // curried version
  * const asSelection = Arr.asBoundedLengthTuple(1, 5);
  *
- * // Arr.asBoundedLengthTuple(1, 2, [1, 2, 3]); // throws TypeError
+ * assert.deepStrictEqual(selection, [1, 2, 3]);
+ *
+ * assert.deepStrictEqual(asSelection([4, 5]), [4, 5]);
+ *
+ * assert.throws(() => Arr.asBoundedLengthTuple(1, 2, [1, 2, 3]), TypeError);
  * ```
  *
  * @template Min - The minimum number of elements (inclusive).
@@ -311,7 +327,9 @@ const asBoundedLengthTupleImpl = (
  * ```ts
  * const nothing = Arr.asEmptyTuple([]);
  *
- * // Arr.asEmptyTuple([1]); // throws TypeError
+ * assert.deepStrictEqual(nothing, []);
+ *
+ * assert.throws(() => Arr.asEmptyTuple([1]), TypeError);
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).
@@ -345,7 +363,9 @@ export const asEmptyTuple = <Xs extends readonly unknown[]>(
  *
  * const first: number = values[0]; // OK — no `undefined`
  *
- * // Arr.asNonEmptyTuple([]); // throws TypeError
+ * assert.strictEqual(first, 1);
+ *
+ * assert.throws(() => Arr.asNonEmptyTuple([]), TypeError);
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).

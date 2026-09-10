@@ -18,29 +18,33 @@ import { getDiffFrom, getGitRoot } from './diff.mjs';
  * reports a status check, so a pull request that changed only the filtered
  * paths waits forever on a required check that will never arrive.
  *
- * @example
- *   ```typescript
- *   // Skip when the diff only touches a directory nothing checks
- *   await checkShouldRun({ pathsIgnore: ['experimental/'] });
+ * In a GitHub Actions workflow, the step writes `should_run` to
+ * `GITHUB_OUTPUT`, and the steps it gates read it — the YAML is not an
+ * `@example` because it is not TypeScript and so cannot be embedded from a
+ * sample file:
  *
- *   // Custom base branch
- *   await checkShouldRun({
- *     pathsIgnore: ['docs/', '**.md'],
- *     baseBranch: 'origin/develop',
- *   });
- *   ```;
- *
- * @example
- *   GitHub Actions usage
- *   ```yaml
- *   - name: Check diff
+ * ```yaml
+ * - name: Check diff
  *   id: check_diff
  *   run: npm exec -- check-should-run --paths-ignore 'experimental/'
  *
- *   - name: Run the checks
+ * - name: Run the checks
  *   if: steps.check_diff.outputs.should_run == 'true'
  *   run: npm run check
- *   ```
+ * ```
+ *
+ * @example
+ *
+ * ```ts
+ * // Skip when the diff only touches a directory nothing checks
+ * await checkShouldRun({ pathsIgnore: ['experimental/'] });
+ *
+ * // Custom base branch
+ * await checkShouldRun({
+ *   pathsIgnore: ['docs/', '**.md'],
+ *   baseBranch: 'origin/develop',
+ * });
+ * ```
  *
  * @param options - Configuration options
  * @param options.pathsIgnore - Patterns whose files do not affect the step.
@@ -118,33 +122,34 @@ export const checkShouldRun = async (
  * are documentation, configuration, or other non-TypeScript files, type checks
  * can be safely skipped to improve build performance.
  *
- * @example
- *   ```typescript
- *   // Use default settings (compare against origin/main, ignore docs/md/txt files)
- *   await checkShouldRunTypeChecks();
+ * The GitHub Actions form, for the same reason not an `@example`:
  *
- *   // Custom ignore patterns
- *   await checkShouldRunTypeChecks({
- *     pathsIgnore: ['.eslintrc.json', 'docs/', '**.md', 'scripts/'],
- *   });
- *
- *   // Custom base branch
- *   await checkShouldRunTypeChecks({
- *     baseBranch: 'origin/develop',
- *   });
- *   ```;
- *
- * @example
- *   GitHub Actions usage
- *   ```yaml
- *   - name: Check if type checks should run
+ * ```yaml
+ * - name: Check if type checks should run
  *   id: check_diff
  *   run: npm exec check-should-run-type-checks
  *
- *   - name: Run type checks
+ * - name: Run type checks
  *   if: steps.check_diff.outputs.should_run == 'true'
  *   run: npm run type-check
- *   ```
+ * ```
+ *
+ * @example
+ *
+ * ```ts
+ * // Use the defaults: compare against origin/main, ignore docs/md/txt files
+ * await checkShouldRunTypeChecks();
+ *
+ * // Custom ignore patterns
+ * await checkShouldRunTypeChecks({
+ *   pathsIgnore: ['.eslintrc.json', 'docs/', '**.md', 'scripts/'],
+ * });
+ *
+ * // Custom base branch
+ * await checkShouldRunTypeChecks({
+ *   baseBranch: 'origin/develop',
+ * });
+ * ```
  *
  * @param options - Configuration options
  * @param options.pathsIgnore - Array of patterns to ignore when determining if

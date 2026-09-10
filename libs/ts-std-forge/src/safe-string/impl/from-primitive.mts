@@ -14,7 +14,10 @@
  * @example
  *
  * ```ts
- * assert.deepStrictEqual(SafeString.fromPrimitive(Symbol('tag')), 'Symbol(tag)');
+ * assert.deepStrictEqual(
+ *   SafeString.fromPrimitive(Symbol('tag')),
+ *   'Symbol(tag)',
+ * );
  *
  * assert.deepStrictEqual(SafeString.fromPrimitive(10n), '10');
  * ```

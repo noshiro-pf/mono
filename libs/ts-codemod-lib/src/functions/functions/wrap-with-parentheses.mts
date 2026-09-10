@@ -1,13 +1,3 @@
-/**
- * Checks if a string is already wrapped with a single pair of balanced parentheses
- * that encompasses the entire expression.
- *
- * @example
- * isWrappedWithParentheses('(A)') // true
- * isWrappedWithParentheses('((A))') // true (outer pair wraps everything)
- * isWrappedWithParentheses('(A) | (B)') // false (outer parens don't wrap everything)
- * isWrappedWithParentheses('A') // false
- */
 import { asUint32, range } from 'ts-data-forge';
 
 const parenDepthDelta = (char: string | undefined): number => {
@@ -26,6 +16,19 @@ const parenDepthDelta = (char: string | undefined): number => {
   }
 };
 
+/**
+ * Checks if a string is already wrapped with a single pair of balanced
+ * parentheses that encompasses the entire expression.
+ *
+ * `'(A)'` and `'((A))'` are wrapped — in the second the outer pair still spans
+ * everything — while `'A'` is not, and neither is `'(A) | (B)'`, whose first
+ * parenthesis closes before the end.
+ *
+ * Module-local, so `samples/` — which imports the package the way a consumer
+ * does — cannot reach it, and it therefore carries no `@example`. See
+ * {@link wrapWithParentheses}, the exported form, whose example covers the
+ * same cases.
+ */
 const isWrappedWithParentheses = (str: string): boolean => {
   const trimmed = str.trim();
 
@@ -55,11 +58,20 @@ const isWrappedWithParentheses = (str: string): boolean => {
  * fully wrapped with balanced parentheses.
  *
  * @example
- * wrapWithParentheses('A') // '(A)'
- * wrapWithParentheses('(A)') // '(A)' (not '((A))')
- * wrapWithParentheses('A | B') // '(A | B)'
- * wrapWithParentheses('(A | B)') // '(A | B)' (not '((A | B))')
- * wrapWithParentheses('(A) | (B)') // '((A) | (B))' (needs outer parens)
+ *
+ * ```ts
+ * assert.deepStrictEqual(wrapWithParentheses('A'), '(A)');
+ *
+ * // already wrapped, so not '((A))'
+ * assert.deepStrictEqual(wrapWithParentheses('(A)'), '(A)');
+ *
+ * assert.deepStrictEqual(wrapWithParentheses('A | B'), '(A | B)');
+ *
+ * assert.deepStrictEqual(wrapWithParentheses('(A | B)'), '(A | B)');
+ *
+ * // the outer parentheses do not span everything, so a pair is added
+ * assert.deepStrictEqual(wrapWithParentheses('(A) | (B)'), '((A) | (B))');
+ * ```
  */
 export const wrapWithParentheses = (nodeStr: string): string => {
   const trimmed = nodeStr.trim();

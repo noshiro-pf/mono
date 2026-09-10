@@ -381,4 +381,107 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/guard/key-is-in.mts',
     sampleFiles: ['samples/src/guard/key-is-in/key-is-in-example.mts'],
   },
+  {
+    sourcePath: 'src/functional/async-result/impl/async-result-flat-map.mts',
+    sampleFiles: ['samples/src/functional/async-result/flat-map-example.mts'],
+  },
+  {
+    sourcePath:
+      'src/functional/async-result/impl/async-result-from-promise.mts',
+    sampleFiles: [
+      'samples/src/functional/async-result/from-promise-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/async-result/impl/async-result-from-throwable.mts',
+    sampleFiles: [
+      'samples/src/functional/async-result/from-throwable-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/functional/async-result/impl/async-result-map.mts',
+    sampleFiles: ['samples/src/functional/async-result/map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-result/impl/async-result-map-err.mts',
+    sampleFiles: ['samples/src/functional/async-result/map-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/async-result/impl/async-result-unwrap-or.mts',
+    sampleFiles: ['samples/src/functional/async-result/unwrap-or-example.mts'],
+  },
+  {
+    sourcePath: 'src/panic/panic.mts',
+    sampleFiles: [
+      'samples/src/panic/panic-message-example.mts',
+      'samples/src/panic/panic-error-example.mts',
+      'samples/src/panic/unreachable-example.mts',
+      'samples/src/panic/todo-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/regex/impl/create.mts',
+    sampleFiles: ['samples/src/regex/create-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-array/impl/create.mts',
+    sampleFiles: ['samples/src/safe-array/create-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-array/impl/is-array.mts',
+    sampleFiles: ['samples/src/safe-array/is-array-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-array/impl/is-empty.mts',
+    sampleFiles: ['samples/src/safe-array/is-empty-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-array/impl/is-non-empty.mts',
+    sampleFiles: ['samples/src/safe-array/is-non-empty-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-date/impl/to-iso-string.mts',
+    sampleFiles: ['samples/src/safe-date/to-iso-string-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/parse.mts',
+    sampleFiles: ['samples/src/safe-number/parse-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/parse-integer.mts',
+    sampleFiles: ['samples/src/safe-number/parse-integer-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/to-exponential.mts',
+    sampleFiles: ['samples/src/safe-number/to-exponential-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/to-fixed.mts',
+    sampleFiles: ['samples/src/safe-number/to-fixed-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/to-precision.mts',
+    sampleFiles: ['samples/src/safe-number/to-precision-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-number/impl/to-string-with-radix.mts',
+    sampleFiles: ['samples/src/safe-number/to-string-with-radix-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-string/impl/from-code-point.mts',
+    sampleFiles: ['samples/src/safe-string/from-code-point-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-string/impl/from-primitive.mts',
+    sampleFiles: ['samples/src/safe-string/from-primitive-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-string/impl/normalize.mts',
+    sampleFiles: ['samples/src/safe-string/normalize-example.mts'],
+  },
+  {
+    sourcePath: 'src/safe-string/impl/repeat.mts',
+    sampleFiles: ['samples/src/safe-string/repeat-example.mts'],
+  },
 ] as const;

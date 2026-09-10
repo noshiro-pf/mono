@@ -101,10 +101,6 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/skip-while-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/throttle.mts',
-    sampleFiles: ['samples/src/throttle-example.mts'],
-  },
-  {
     sourcePath: 'src/core/operators/pairwise.mts',
     sampleFiles: ['samples/src/pairwise-example.mts'],
   },
@@ -153,5 +149,54 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/core/create/from-subscribable.mts',
     sampleFiles: ['samples/src/from-subscribable-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/create/from-abortable-promise.mts',
+    sampleFiles: ['samples/src/from-abortable-promise-example.mts'],
+  },
+  // Predefined operators
+  {
+    sourcePath: 'src/core/predefined/operators/attach-index.mts',
+    sampleFiles: ['samples/src/attach-index-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/map-optional.mts',
+    sampleFiles: ['samples/src/map-optional-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/map-result-err.mts',
+    sampleFiles: ['samples/src/map-result-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/map-result-ok.mts',
+    sampleFiles: ['samples/src/map-result-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/map-to.mts',
+    sampleFiles: ['samples/src/map-to-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/pluck.mts',
+    sampleFiles: ['samples/src/get-key-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/skip.mts',
+    sampleFiles: ['samples/src/skip-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/take.mts',
+    sampleFiles: ['samples/src/take-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/unwrap-optional.mts',
+    sampleFiles: ['samples/src/unwrap-optional-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/unwrap-result-err.mts',
+    sampleFiles: ['samples/src/unwrap-result-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/predefined/operators/unwrap-result-ok.mts',
+    sampleFiles: ['samples/src/unwrap-result-ok-example.mts'],
   },
 ] as const;

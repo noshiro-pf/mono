@@ -33,13 +33,21 @@ import {
  * const rgb = Arr.asFixedLengthArray(3, [255, 128, 0]);
  *
  * const atMost5: MaxLengthArray<5, number> = rgb; // OK (3 <= 5)
+ *
  * const red: number = rgb[0]; // OK — no `undefined`
  *
  * // curried version
  * const asRgb = Arr.asFixedLengthArray(3);
+ *
  * const green = asRgb([0, 255, 0]);
  *
- * // Arr.asFixedLengthArray(3, [255, 128]); // throws TypeError
+ * assert.deepStrictEqual(Array.from(atMost5), [255, 128, 0]);
+ *
+ * assert.strictEqual(red, 255);
+ *
+ * assert.deepStrictEqual(green, [0, 255, 0]);
+ *
+ * assert.throws(() => Arr.asFixedLengthArray(3, [255, 128]), TypeError);
  * ```
  *
  * @template Length - The exact number of elements.
@@ -110,13 +118,21 @@ const asFixedLengthArrayImpl = <E,>(
  * const history = Arr.asMinLengthArray(3, [0, 1, 2, 3]);
  *
  * const nonEmpty: MinLengthArray<1, number> = history; // OK (3 >= 1)
+ *
  * const first: number = history[0]; // OK — no `undefined`
  *
  * // curried version
  * const asHistory = Arr.asMinLengthArray(3);
+ *
  * const next = asHistory([4, 5, 6, 7]);
  *
- * // Arr.asMinLengthArray(3, [0]); // throws TypeError
+ * assert.deepStrictEqual(Array.from(nonEmpty), [0, 1, 2, 3]);
+ *
+ * assert.strictEqual(first, 0);
+ *
+ * assert.deepStrictEqual(next, [4, 5, 6, 7]);
+ *
+ * assert.throws(() => Arr.asMinLengthArray(3, [0]), TypeError);
  * ```
  *
  * @template MinLength - The minimum number of elements (inclusive).
@@ -188,9 +204,14 @@ const asMinLengthArrayImpl = <E,>(
  *
  * // curried version
  * const asTags = Arr.asMaxLengthArray(8);
+ *
  * const more = asTags(['d', 'e']);
  *
- * // Arr.asMaxLengthArray(2, ['a', 'b', 'c']); // throws TypeError
+ * assert.deepStrictEqual(Array.from(relaxed), ['a', 'b', 'c']);
+ *
+ * assert.deepStrictEqual(more, ['d', 'e']);
+ *
+ * assert.throws(() => Arr.asMaxLengthArray(2, ['a', 'b', 'c']), TypeError);
  * ```
  *
  * @template MaxLength - The maximum number of elements (inclusive).
@@ -264,9 +285,14 @@ const asMaxLengthArrayImpl = <E,>(
  *
  * // curried version
  * const asSelection = Arr.asBoundedLengthArray(1, 5);
+ *
  * const next = asSelection([4, 5]);
  *
- * // Arr.asBoundedLengthArray(1, 5, []); // throws TypeError
+ * assert.deepStrictEqual(Array.from(relaxed), [1, 2, 3]);
+ *
+ * assert.deepStrictEqual(next, [4, 5]);
+ *
+ * assert.throws(() => Arr.asBoundedLengthArray(1, 5, []), TypeError);
  * ```
  *
  * @template MinLength - The minimum number of elements (inclusive).
@@ -349,7 +375,9 @@ const asBoundedLengthArrayImpl = <E,>(
  *
  * const atMost5: MaxLengthArray<5, never> = nothing; // OK (0 <= 5)
  *
- * // Arr.asEmptyArray([1]); // throws TypeError
+ * assert.deepStrictEqual(Array.from(atMost5), []);
+ *
+ * assert.throws(() => Arr.asEmptyArray([1]), TypeError);
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).
@@ -387,7 +415,9 @@ export const asEmptyArray = <Xs extends readonly unknown[]>(
  *
  * const first: number = history[0]; // OK — no `undefined`
  *
- * // Arr.asNonEmptyArray([]); // throws TypeError
+ * assert.strictEqual(first, 0);
+ *
+ * assert.throws(() => Arr.asNonEmptyArray([]), TypeError);
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).

@@ -15,7 +15,7 @@ import { type NonEmptyTuple } from 'ts-type-forge';
  * @example
  *
  * ```ts
- * const values: readonly number[] = [1, 2];
+ * const values: readonly number[] = [1, 2] as const;
  *
  * assert.isTrue(SafeArray.isNonEmpty(values));
  *
