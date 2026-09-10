@@ -1,0 +1,340 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { Arr, unknownToString } from 'ts-data-forge';
+import { formatFiles, glob, Result } from 'ts-repo-utils';
+import { extractSampleCode } from './embed-examples-utils.mjs';
+
+/**
+ * One source file and the samples that fill its `@example` fences.
+ *
+ * Sample files must be listed in the order their `@example` blocks appear in
+ * the source file (top to bottom). Both paths are relative to the package root.
+ */
+export type SourceFileMapping = Readonly<{
+  sourcePath: string;
+  sampleFiles: readonly string[];
+}>;
+
+export type EmbedExamplesInJsDocOptions = Readonly<{
+  /** The package's own root — `workspaceRootPath` / `projectRootPath`. */
+  packageRootPath: string;
+
+  sourceFileMappings: readonly SourceFileMapping[];
+
+  /**
+   * File names {@link embedExamplesInJsDoc}'s coverage check skips, because
+   * nothing hand-written lives in them. Defaults to the generated barrels;
+   * pass a package's own set when it has more.
+   */
+  exemptFileNames?: readonly string[];
+
+  /**
+   * Package-relative source paths whose `@example` blocks are knowingly not
+   * backed by a sample file yet — the backlog of
+   * https://github.com/noshiro-pf/mono/issues/1880, frozen so that it can only
+   * shrink. An entry that is no longer needed is an error, so an example moved
+   * into `samples/` takes its line here with it.
+   */
+  exemptSourcePaths?: readonly string[];
+
+  /**
+   * See `ExtractSampleCodeOptions` in `embed-examples-utils.mts`, which is
+   * where the reason this is not always on is written down.
+   */
+  stripTransformerDirectives?: boolean;
+}>;
+
+/**
+ * Embeds sample code from `samples/src` into the JSDoc `@example` code blocks
+ * of a package's `src` files. Replaces code blocks sequentially in the order
+ * defined in `sourceFileMappings`.
+ *
+ * Fails if any `@example` in `src` is not backed by a type-checked sample file
+ * in `samples/src` — see {@link assertAllExamplesAreMapped}.
+ *
+ * A package's `scripts/cmd/embed-examples-in-jsdoc.mts` is the call site and
+ * nothing else; this is the code that was copied into all nine of them.
+ */
+export const embedExamplesInJsDoc = async ({
+  exemptFileNames = defaultExemptFileNames,
+  exemptSourcePaths = [],
+  packageRootPath,
+  sourceFileMappings,
+  stripTransformerDirectives,
+}: EmbedExamplesInJsDocOptions): Promise<Result<undefined, unknown>> => {
+  try {
+    const coverageResult = await assertAllExamplesAreMapped({
+      exemptFileNames,
+      exemptSourcePaths,
+      packageRootPath,
+      sourceFileMappings,
+    });
+
+    if (Result.isErr(coverageResult)) {
+      return coverageResult;
+    }
+
+    const mut_modifiedFiles: string[] = [];
+
+    for (const { sampleFiles, sourcePath } of sourceFileMappings) {
+      const sourceFilePath = path.resolve(packageRootPath, sourcePath);
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
+
+      const codeBlockCount = sourceContent.split(codeBlockStart).length - 1;
+
+      if (codeBlockCount !== sampleFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${sourcePath}: found ${codeBlockCount} \`\`\`ts blocks but expected ${sampleFiles.length} sample files`,
+        );
+      }
+
+      const exampleTagCount = countExampleTags(sourceContent);
+
+      if (exampleTagCount !== codeBlockCount) {
+        return Result.err(
+          [
+            `❌ ${sourcePath} has ${exampleTagCount} \`@example\` tag(s) but only ${codeBlockCount} \`\`\`ts block(s).`,
+            'An `@example` written as bare JSDoc lines is never type-checked and',
+            'silently drifts. Move the snippet into a sample file under',
+            'samples/src, leave a ```ts block in its place, and list the sample in',
+            'scripts/cmd/embed-examples-in-jsdoc-map.mts.',
+          ].join('\n'),
+        );
+      }
+
+      const mut_results: string[] = [];
+
+      let mut_rest: string = sourceContent;
+
+      for (const sampleFile of sampleFiles) {
+        const samplePath = path.resolve(packageRootPath, sampleFile);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const sampleContent = await fs.readFile(samplePath, 'utf8');
+
+        const sampleContentSliced = extractSampleCode(sampleContent, {
+          stripTransformerDirectives,
+        });
+
+        const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
+
+        if (codeBlockStartIndex === -1) {
+          return Result.err(
+            `❌ Code block start not found for ${sampleFile} in ${sourcePath}`,
+          );
+        }
+
+        const codeBlockEndIndex = mut_rest.indexOf(
+          codeBlockEnd,
+          codeBlockStartIndex + codeBlockStart.length,
+        );
+
+        if (codeBlockEndIndex === -1) {
+          return Result.err(
+            `❌ Code block end not found for ${sampleFile} in ${sourcePath}`,
+          );
+        }
+
+        // The JSDoc line prefix of the opening fence line (e.g. ` * `),
+        // reused to indent the embedded sample lines.
+        const lineStartIndex =
+          mut_rest.lastIndexOf('\n', codeBlockStartIndex) + 1;
+
+        const linePrefix = mut_rest.slice(lineStartIndex, codeBlockStartIndex);
+
+        const beforeBlock = mut_rest.slice(
+          0,
+          codeBlockStartIndex + codeBlockStart.length,
+        );
+
+        const afterBlock = mut_rest.slice(codeBlockEndIndex);
+
+        const indentedSampleCode = sampleContentSliced
+          .split('\n')
+          .map((line) =>
+            line.trim() === '' ? linePrefix.trimEnd() : `${linePrefix}${line}`,
+          )
+          .join('\n');
+
+        mut_results.push(
+          beforeBlock,
+          '\n',
+          indentedSampleCode,
+          '\n',
+          linePrefix,
+        );
+
+        mut_rest = afterBlock;
+
+        console.info(`✓ Updated code block for ${sampleFile} in ${sourcePath}`);
+      }
+
+      mut_results.push(mut_rest);
+
+      const updatedContent = mut_results.join('');
+
+      if (updatedContent !== sourceContent) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
+
+        mut_modifiedFiles.push(sourceFilePath);
+      }
+    }
+
+    if (Arr.isNonEmpty(mut_modifiedFiles)) {
+      console.info(
+        `\nFormatting ${mut_modifiedFiles.length} modified files...`,
+      );
+
+      await formatFiles(mut_modifiedFiles);
+
+      console.info('✓ Formatting completed');
+    }
+
+    return Result.ok(undefined);
+  } catch (error) {
+    return Result.err(
+      `❌ Failed to embed JSDoc examples: ${unknownToString(error)}`,
+    );
+  }
+};
+
+const codeBlockStart = '```ts';
+
+const codeBlockEnd = '```';
+
+/** Generated barrels: nothing hand-written, so nothing to map. */
+const defaultExemptFileNames = [
+  'index.mts',
+  'global.mts',
+  'entry-point.mts',
+] as const;
+
+/**
+ * Number of `@example` JSDoc tags in a source file.
+ *
+ * The pattern is anchored to the ` * ` comment-line prefix rather than matching
+ * the bare word, so prose mentioning `@example` (this file's own doc comments,
+ * for instance) is not counted as a tag. It is also built per call: a `/g`
+ * regex carries mutable `lastIndex` state, which a shared literal would leak
+ * from one file to the next.
+ */
+const countExampleTags = (content: string): number =>
+  Array.from(content.matchAll(/^\s*\*\s*@example\b/gmu)).length;
+
+/**
+ * Verifies that every `@example` under src is backed by a type-checked sample
+ * file in samples/src, i.e. that its module is listed in sourceFileMappings.
+ * Generated files (index.mts / global.mts / entry-point.mts by default) and
+ * tests are exempt, as are the paths a package names in `exemptSourcePaths`.
+ *
+ * The trigger is the `@example` tag, not the ```ts fence it is supposed to
+ * contain. Keying off the fence would only ever catch a file that already
+ * follows the convention: an example written as bare JSDoc lines has no fence
+ * at all, so it would pass unnoticed — never type-checked, free to drift as the
+ * API around it changes. The complementary per-file count check in
+ * {@link embedExamplesInJsDoc} covers the same mistake inside a module that is
+ * already mapped.
+ *
+ * A declaration that genuinely cannot be reached from samples/src — a
+ * module-local `@internal` helper, say, since samples import the package
+ * through its public entry point — should describe its behavior in prose
+ * instead of carrying an `@example`.
+ */
+const assertAllExamplesAreMapped = async ({
+  exemptFileNames,
+  exemptSourcePaths,
+  packageRootPath,
+  sourceFileMappings,
+}: Readonly<{
+  exemptFileNames: readonly string[];
+  exemptSourcePaths: readonly string[];
+  packageRootPath: string;
+  sourceFileMappings: readonly SourceFileMapping[];
+}>): Promise<Result<undefined, string>> => {
+  const filesResult = await glob(path.resolve(packageRootPath, 'src/**/*.mts'));
+
+  if (Result.isErr(filesResult)) {
+    return Result.err(unknownToString(filesResult.value));
+  }
+
+  const mappedSourcePaths = new Set<string>(
+    sourceFileMappings.map(({ sourcePath }) =>
+      path.resolve(packageRootPath, sourcePath),
+    ),
+  );
+
+  const exemptedSourcePaths = new Set<string>(
+    exemptSourcePaths.map((sourcePath) =>
+      path.resolve(packageRootPath, sourcePath),
+    ),
+  );
+
+  const mut_unmappedFiles: string[] = [];
+
+  const mut_usedExemptions = new Set<string>();
+
+  for (const filePath of filesResult.value) {
+    if (
+      filePath.endsWith('.test.mts') ||
+      exemptFileNames.includes(path.basename(filePath)) ||
+      mappedSourcePaths.has(filePath)
+    ) {
+      continue;
+    }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const content = await fs.readFile(filePath, 'utf8');
+
+    const exampleTagCount = countExampleTags(content);
+
+    if (exampleTagCount === 0 && !content.includes(codeBlockStart)) {
+      continue;
+    }
+
+    if (exemptedSourcePaths.has(filePath)) {
+      mut_usedExemptions.add(filePath);
+
+      continue;
+    }
+
+    mut_unmappedFiles.push(
+      `${path.relative(packageRootPath, filePath)} (${exampleTagCount} \`@example\`)`,
+    );
+  }
+
+  if (Arr.isNonEmpty(mut_unmappedFiles)) {
+    return Result.err(
+      [
+        `❌ Found ${mut_unmappedFiles.length} src file(s) whose \`@example\` blocks are not`,
+        'sourced from samples/src (missing from sourceFileMappings in',
+        'scripts/cmd/embed-examples-in-jsdoc-map.mts):',
+        ...mut_unmappedFiles.toSorted().map((p) => `  - ${p}`),
+        'Create sample files under samples/src and add mapping entries for them,',
+        'or, for a declaration samples cannot reach, describe the behavior in prose',
+        'instead of an `@example`.',
+      ].join('\n'),
+    );
+  }
+
+  const staleExemptions = exemptSourcePaths.filter(
+    (sourcePath) =>
+      !mut_usedExemptions.has(path.resolve(packageRootPath, sourcePath)),
+  );
+
+  if (Arr.isNonEmpty(staleExemptions)) {
+    return Result.err(
+      [
+        `❌ \`exemptSourcePaths\` names ${staleExemptions.length} path(s) that no longer`,
+        'need exempting — mapped, carrying no `@example`, or gone:',
+        ...staleExemptions.toSorted().map((p) => `  - ${p}`),
+        'Delete them from scripts/cmd/embed-examples-in-jsdoc.mts. The list is a',
+        'backlog, so it may only shrink.',
+      ].join('\n'),
+    );
+  }
+
+  return Result.ok(undefined);
+};
