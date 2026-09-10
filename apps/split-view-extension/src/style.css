@@ -362,6 +362,12 @@ body {
   outline: none;
 }
 
+/* A fixed box, wide enough for the widest the label gets (`100%`, `200%`).
+   Its text is what changes as a pane is zoomed, and a button that changes
+   width moves the − and + either side of it out from under the pointer, which
+   is exactly where they are wanted when zooming a step at a time.
+   `tabular-nums` is the other half of it: without it `1` is narrower than `7`
+   and the label shifts inside its own box. */
 .pane__zoom {
   background: transparent;
   white-space: nowrap;
@@ -373,7 +379,12 @@ body {
   font: inherit;
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  padding: 3px 4px;
+  padding: 3px 0;
+  text-align: center;
+  /* The widest label (`100%`, `200%`) measures 34.3px against this box's 40.1px
+     of content, so nothing is clipped and there is room for a font stack whose
+     metrics are wider than `system-ui`'s. */
+  width: 5.5ch;
 }
 
 .pane__zoom--on {
