@@ -1,3 +1,5 @@
+/// <reference lib="es5" />
+
 declare namespace Reflect {
   /**
    * Calls the function with the specified object as the this value
@@ -27,7 +29,7 @@ declare namespace Reflect {
   function construct<A extends readonly unknown[], R>(
     target: new (...args: A) => R,
     argumentsList: Readonly<A>,
-    newTarget?: new (...args: never) => unknown,
+    newTarget?: new (...args: StrictLibInternals.AnyArguments) => unknown,
   ): R;
   function construct(
     target: Function,

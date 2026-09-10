@@ -17,7 +17,8 @@
  * clause `(...args: readonly never[])`. An overload set whose last member is
  * *generic*, with a rest parameter computed from its own type parameter, does
  * not match that — so the conditional took its false branch and produced
- * `unknown`. Silently: a false branch is a type, not an error.
+ * `unknown`. Silently: a false branch is a type, not an error. The clause is
+ * `StrictLibInternals.AnyArguments` now, which is a bare `never`.
  *
  * `setTimeout` is exactly that shape once `@types/node` merges its
  * `setTimeout<TArgs extends any[]>(cb, ms?, ...args:

@@ -365,6 +365,56 @@ export const getSrcFileList = async (
 export const idFn = (s: string): string => s;
 
 /**
+ * The qualified name of the wildcard rest-parameter type, as written into the
+ * generated lib. Every "matches any argument list" position is spelled with
+ * this, so grepping it finds all of them — which is the point of it having a
+ * name at all. See {@link anyArgumentsTypeDefString}.
+ */
+export const anyArgumentsRef = 'StrictLibInternals.AnyArguments';
+
+/**
+ * Declares {@link anyArgumentsRef}. Appended to `lib.es5.d.ts`, which every lib
+ * chain loads; the two files that use it from outside `lib.es5.d.ts` carry
+ * {@link ensureEs5Reference} so that they still see it when resolved on their
+ * own.
+ *
+ * Written as joined lines rather than a `dedent` template because the doc
+ * comment is full of backticks, which a template literal would need escaped.
+ */
+export const anyArgumentsTypeDefString = (): string =>
+  [
+    'declare namespace StrictLibInternals {',
+    '  /**',
+    '   * The rest-parameter type that means "matches any argument list". A',
+    '   * marker rather than a type anything has: it is `never`.',
+    '   *',
+    '   * `any` reads two ways in a function type, and only one of them is what',
+    '   * this library removes. `any` as a *value* — a return type, a property,',
+    '   * an argument a caller supplies — is the unsound one, and becomes',
+    '   * `unknown` or `never` here according to variance. `any` as a *wildcard*',
+    '   * — the `(...args: any)` in `ReturnType` — describes nothing at all: it',
+    '   * is there to switch the parameter comparison off, so that the',
+    '   * conditional matches whatever signature it is handed. The stock library',
+    '   * spells that marker two ways, `(...args: any)` in `ReturnType` and',
+    '   * `(...args: never)` in `ThisParameterType`. This library spells it one',
+    '   * way, and without `any`.',
+    '   *',
+    '   * Keep it a bare `never`. `never[]` and `readonly never[]` are ordinary',
+    '   * array types, checked like any array: neither is assignable to a tuple',
+    '   * with a required element, which is what the parameter list of the',
+    "   * signature being matched turns into once that signature's own rest",
+    "   * parameter stops being an array — as `@types/node`'s generic",
+    '   * `setTimeout` overload does. That is what made',
+    '   * `ReturnType<typeof setTimeout>` resolve to `unknown`, silently, a',
+    "   * conditional's false branch being a type rather than an error.",
+    '   *',
+    '   * @internal',
+    '   */',
+    '  type AnyArguments = never;',
+    '}',
+  ].join('\n');
+
+/**
  * Ensures the file carries a top-of-file `/// <reference lib="es5" />`
  * directive, so a lib that augments a base es5 interface (e.g.
  * `ObjectConstructor` in `lib.es2019.object` / `lib.es2022.object`) can see the

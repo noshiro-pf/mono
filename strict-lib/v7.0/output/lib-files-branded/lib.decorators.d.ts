@@ -1,3 +1,5 @@
+/// <reference lib="es5" />
+
 /**
  * The decorator context types provided to class element decorators.
  */
@@ -26,8 +28,10 @@ type DecoratorMetadata = typeof globalThis extends {
  * @template Class The type of the decorated class associated with this context.
  */
 interface ClassDecoratorContext<
-  Class extends abstract new (...args: never) => unknown = abstract new (
-    ...args: never
+  Class extends abstract new (
+    ...args: StrictLibInternals.AnyArguments
+  ) => unknown = abstract new (
+    ...args: StrictLibInternals.AnyArguments
   ) => unknown,
 > {
   /** The kind of element that was decorated. */
@@ -66,9 +70,12 @@ interface ClassDecoratorContext<
  */
 interface ClassMethodDecoratorContext<
   This = unknown,
-  Value extends (this: This, ...args: never) => unknown = (
+  Value extends (
     this: This,
-    ...args: never
+    ...args: StrictLibInternals.AnyArguments
+  ) => unknown = (
+    this: This,
+    ...args: StrictLibInternals.AnyArguments
   ) => unknown,
 > {
   /** The kind of class element that was decorated. */

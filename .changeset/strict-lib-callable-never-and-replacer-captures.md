@@ -26,15 +26,25 @@ is exactly that shape once it merges with the DOM's `setTimeout`, so
 `ReturnType<typeof setTimeout>` was `unknown` and could not be handed back to
 `clearTimeout`.
 
-The spelling is now a bare `never` — `(...args: never) => infer R` — which is
-what the stock library itself uses for `ThisParameterType` and
-`OmitThisParameter`, and which gives up none of the `any` removal this library
-exists for. The type-parameter constraint is spelled the same way, so the false
-branch is unreachable for any `T` the constraint admits: "did not resolve" can
-no longer arrive as an `unknown` that propagates. The same spelling now covers
-the other "accepts a call with any arguments" positions —
-`ClassDecoratorContext` and friends in `lib.decorators.d.ts`, and
-`Reflect.construct`'s `newTarget`.
+The spelling is now a bare `never`, which is what the stock library itself uses
+for `ThisParameterType` and `OmitThisParameter`, and which gives up none of the
+`any` removal this library exists for. The type-parameter constraint is spelled
+the same way, so the false branch is unreachable for any `T` the constraint
+admits: "did not resolve" can no longer arrive as an `unknown` that propagates.
+
+That `never` now has a name, `StrictLibInternals.AnyArguments`, declared in
+`lib.es5.d.ts`. `any` reads two ways in a function type and only one of them is
+what this library removes: `any` as a _value_ becomes `unknown` or `never` by
+variance, while `any` as a _wildcard_ — the `(...args: any)` in `ReturnType` —
+describes nothing at all and is there only to switch the parameter comparison
+off. The stock library spells that wildcard two ways (`any` in `ReturnType`,
+`never` in `ThisParameterType`); this library spells it one way, and the name
+says which of the two readings is meant. Every such position uses it: the four
+utility types and `ThisParameterType` in `lib.es5.d.ts`, the decorator context
+type parameters in `lib.decorators.d.ts`, and `Reflect.construct`'s `newTarget`
+in `lib.es2015.reflect.d.ts`. The last two were not broken; one spelling is so
+that the trap cannot be re-dug, and so that grepping the name finds all of
+them.
 
 **A replacement callback's trailing arguments are `string | undefined`, not
 `unknown`.** `String.prototype.replace` / `replaceAll` and the
