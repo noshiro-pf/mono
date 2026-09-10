@@ -1,0 +1,24 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # `window.top` is [LegacyUnforgeable] in the HTML specification, which is why
+  # a framed page cannot be lied to about being framed.
+  - unforgeable
+  # The three PNG chunk types the icon generator writes: the header, the
+  # compressed pixels, and the end marker.
+  - IHDR
+  - IDAT
+  - IEND
+  # `font-variant-numeric: tabular-nums`, so that the zoom percentage does not
+  # change width as it counts.
+  - nums
+  # "Not zoomed": what a pane is at 100%, which reads better than the
+  # alternatives when the point is that nothing has been done to it.
+  - unzoomed
+  # Plural of "navigation": a nested browsing context keeps its name across
+  # cross-origin navigations, which is what identifies a pane's frame.
+  - navigations

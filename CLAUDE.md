@@ -92,8 +92,10 @@ they are plain directories consumed by relative path, not packages.
   Not tracked.
 - `configs/` — that package's TypeScript, Vitest, Rollup and TypeDoc config.
 - `scripts/` — that package's own `tsx` helpers (build, doc generation, checks).
-- `docs/` — TypeDoc output. Not tracked, except in `eslint-config-typed` and
-  `synstate` where it is hand-written prose.
+- `docs/` — TypeDoc output. Not tracked, except in `eslint-config-typed`,
+  `synstate` and `apps/split-view-extension`, where it is hand-written prose.
+  The root `.gitignore` lists the generated ones by name for that reason, so a
+  package with no TypeDoc may put prose here without doing anything else.
 - `samples/` — sample code, embedded into the README by `pnpm run doc:embed`.
 
 ### Zenn

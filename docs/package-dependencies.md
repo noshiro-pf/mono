@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 53 個。
+このリポジトリの workspace パッケージは 54 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -38,6 +38,7 @@ graph LR
   resize_observer_preact_hooks["resize-observer-preact-hooks"]
   resize_observer_react_hooks["resize-observer-react-hooks"]
   slack_archive_tools["slack-archive-tools"]
+  split_view_extension["split-view-extension"]
   _synstate_docs["@synstate/docs"]
   tiny_router_observable["tiny-router-observable"]
   tiny_router_preact_hooks["tiny-router-preact-hooks"]
@@ -174,6 +175,8 @@ graph LR
   slack_archive_tools --> ts_data_forge
   slack_archive_tools --> ts_fortress
   slack_archive_tools --> ts_repo_utils
+  split_view_extension --> react_utils
+  split_view_extension --> ts_data_forge
   _synstate_docs --> synstate
   _synstate_docs --> synstate_preact_hooks
   _synstate_docs --> synstate_preact_signals
@@ -240,16 +243,16 @@ graph LR
 
 ### `ws:build` が使う段階
 
-| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                              |
-| ---: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-|    1 | `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                             |
-|    2 | `ts-std-forge`                                                                                                                                                                                                                                                                                                                                          |
-|    3 | `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                           |
-|    4 | `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils` |
-|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                              |
-|    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `@synstate/docs`, `github-settings-as-code`                    |
-|    7 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                    |
-|    8 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                        |
+| 段階 | パッケージ                                                                                                                                                                                                                                                                                                                                                   |
+| ---: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    1 | `tiny-router-preact-hooks`, `tiny-router-react-hooks`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`                                                                                                                                                                                                                                  |
+|    2 | `ts-std-forge`                                                                                                                                                                                                                                                                                                                                               |
+|    3 | `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                |
+|    4 | `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`      |
+|    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                   |
+|    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `github-settings-as-code` |
+|    7 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                         |
+|    8 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                             |
 
 ### 参考: devDependencies も含めた場合
 
@@ -311,6 +314,8 @@ graph LR
 | `resize-observer-react-hooks`        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                               |
 | `slack-archive-tools`                | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `slack-archive-tools`                | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `split-view-extension`               | dep  | `react-utils`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `split-view-extension`               | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                             |
 | `@synstate/docs`                     | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-signals`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                       |
 | `@synstate/docs`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                 |
 | `tiny-router-observable`             | dep  | `synstate`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -361,7 +366,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-53 / 53 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+54 / 54 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

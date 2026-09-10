@@ -486,6 +486,22 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry above assumes: a Chrome extension, which
+    // has three entry points rather than one — the page the browser loads, the
+    // service worker the manifest names, and the content script injected into
+    // every pane.
+    "apps/split-view-extension": {
+      "entry": [
+        "src/main.tsx",
+        "src/background.mts",
+        "src/frame-agent.mts",
+        "configs/*.mts",
+        "scripts/**/*.mts",
+        "test/**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     "apps/blueprintjs-playground": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],

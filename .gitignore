@@ -207,6 +207,11 @@ rollup.config-*.mjs
 **/playwright/.cache/
 
 # `verify-npm-packages/` installs real packages; only the checks are tracked.
+# The Chrome Web Store package, written by `pnpm run pack` in
+# apps/split-view-extension: dist/ without its source maps and without the
+# manifest `key`, which the store refuses.
+apps/split-view-extension/pack/
+
 verify-npm-packages/.tarballs/
 verify-npm-packages/*/packages/*/node_modules/
 verify-npm-packages/*/packages/*/pnpm-lock.yaml

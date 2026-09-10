@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    // `chrome` on top of what tsconfig.vite.json lists: the extension APIs are
+    // global, so they arrive through `types` rather than through an import.
+    "types": [
+      "eslint-config-typed/vitest-globals",
+      "vitest/importMeta",
+      "node",
+      "chrome"
+    ]
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}
