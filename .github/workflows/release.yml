@@ -13,6 +13,30 @@ jobs:
     name: Release
     timeout-minutes: 15
     runs-on: ubuntu-latest
+
+    # npm の trusted publisher が検証するのは organization / repository /
+    # workflow のファイル名、そして（設定されていれば）environment 名だけで、
+    # **git ref は見ない**。つまり Environment が空欄のままだと、
+    # `.github/workflows/release.yml` という名前の workflow が
+    # `id-token: write` 付きでこの repository のどの ref から動いても、
+    # trusted publisher を設定した全パッケージへ publish できてしまう。
+    #
+    # `release` environment に GitHub 側で
+    # 「 Deployment branches and tags: Selected branches → main 」を設定し、
+    # npm 側の Environment 欄にも `release` を入れることで、その抜けを塞ぐ:
+    # main 以外の ref の run は environment を参照できず、OIDC トークンに
+    # `environment` claim が乗らないので npm が publish を拒否する。
+    #
+    # required reviewers は付けていない。ここで止めても審査できるのは
+    # 「 publish してよいか」であって依存ツリーの中身ではなく、その代わりに
+    # 毎回の merge が承認待ちになる。人手のゲートを足すなら npm の
+    # staged publishing の方が筋がよい（ changesets 側が未対応 —
+    # changesets/changesets#2025 ）。
+    #
+    # 順序に注意: この `environment` を main に入れてから npm 側の
+    # Environment 欄を埋めること。逆順にすると次の release が落ちる。
+    environment: release
+
     permissions:
       packages: write
       contents: write # to create release

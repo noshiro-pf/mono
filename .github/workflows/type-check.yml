@@ -1,3 +1,5 @@
+# cspell:ignore vitest
+
 name: Type Check
 
 on:
@@ -58,6 +60,27 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Deny by default; each job grants back exactly what it needs.
+#
+# The repository's own default is "read and write"
+# (`GET /repos/{owner}/{repo}/actions/permissions/workflow`), and without a
+# `permissions` key every job here inherits it. Every job here also runs the
+# branch's own code — the `prepare` script during `pnpm install`, `ws:build`,
+# `eslint.config.mts`, the vitest configs — so that default hands a
+# write-capable `GITHUB_TOKEN` to whatever the branch happens to contain.
+#
+# A fork's pull request is capped at read-only by GitHub whatever this says,
+# but a branch in this repository is not, and `chore/pnpm-update` is exactly
+# that: a branch whose contents are whatever the registry served that morning,
+# opened and auto-merged with no human in between. Nothing below writes
+# anything.
+#
+# Keep this as the deny-all form rather than a repository-wide setting: a
+# setting is one switch for every workflow at once, and
+# `repo-settings/actions-settings/` does not model it, so a change there would
+# not be noticed by `backup-repository-settings`.
+permissions: {}
+
 jobs:
   # Is the branch up to date with `main`, and does the diff touch anything
   # this workflow reads? A job of its own because both answers take work a
@@ -70,6 +93,13 @@ jobs:
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, '[WIP]')
     uses: ./.github/workflows/check-gates.yml
+    # What check-gates.yml's own job declares. A caller's job-level
+    # `permissions` is the ceiling for the workflow it calls — permissions can
+    # be reduced along the chain, never elevated — so the top-level `{}` above
+    # would otherwise leave the called workflow unable to check out.
+    permissions:
+      contents: read
+      packages: read
     with:
       diff-scope: code
 
@@ -118,6 +148,10 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
+      packages: read
     timeout-minutes: 25
 
     strategy:
@@ -217,6 +251,10 @@ jobs:
       github.event_name == 'push' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
+      packages: read
     timeout-minutes: 25
 
     steps:
@@ -300,6 +338,8 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
+    # Reads `needs.*.result` and echoes. It touches nothing.
+    permissions: {}
     timeout-minutes: 5
 
     steps:
