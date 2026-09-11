@@ -1,5 +1,22 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 3.1.0
+
+### Minor Changes
+
+- 91288ce: Manage Settings > Actions > General > Workflow permissions.
+
+    `ActionsSettings` gains `default_workflow_permissions` (`read` | `write`) and `can_approve_pull_request_reviews`, read from and written to `GET|PUT /repos/{owner}/{repo}/actions/permissions/workflow`.
+
+    That setting decides what a job's `GITHUB_TOKEN` can do when the job declares no `permissions` of its own, so leaving it outside the managed set left the most consequential Actions setting as the one nobody could see drift in: a repository can read as fully declared while every undeclared job holds a write-capable token.
+
+### Patch Changes
+
+- Updated dependencies [6e23aed]
+    - ts-data-forge@14.7.1
+    - ts-repo-utils@10.6.2
+    - ts-fortress@12.1.3
+
 ## 3.0.2
 
 ### Patch Changes

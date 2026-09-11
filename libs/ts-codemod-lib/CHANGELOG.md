@@ -1,5 +1,41 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.3.2
+
+### Patch Changes
+
+- 44a9d66: Leave a type literal that declares a call or construct signature unwrapped in `convert-to-readonly`.
+
+    `Readonly<T>` is a mapped type over `keyof T`, and neither signature kind is a property, so neither survives the mapping. Wrapping an annotation such as
+
+    ```ts
+    const panic: {
+        (message: string, options?: { cause?: unknown }): never;
+        (error: Error): never;
+    } = impl;
+    ```
+
+    produced a value that is no longer callable — `TS2349` at every call site, and `TS2366` after it wherever the `never` return was what terminated the control flow. A literal mixing properties with a call signature was worse: the properties came through and only the signature disappeared.
+
+    Such a literal is now marked `readonly` member by member instead of being wrapped, which is what interfaces have always done, and is skipped by the union/intersection grouping that joins type literals under a single `Readonly<...>`. Everything inside it — parameter and return types, property types — is still converted.
+
+- 6e23aed: Back every JSDoc `@example` with a type-checked sample file
+
+    The `@example` blocks under `src/` are filled from real `.mts` files under
+    `samples/`, which the package type-checks and — where the package runs its
+    samples — executes as Vitest cases. Forty-four source files still carried
+    `@example` blocks written by hand, so what they showed was compiled by
+    nothing: the snippets are now sample files, and the ones that cannot be
+    reached from `samples/` — a module-local helper, or a block that is not
+    TypeScript at all — say what they do in prose instead.
+
+    Documentation only; no runtime or type change. A few examples read slightly
+    differently for it, because an illustration with nothing to assert became one
+    with an assertion.
+
+- Updated dependencies [6e23aed]
+    - ts-data-forge@14.7.1
+
 ## 3.3.1
 
 ### Patch Changes
