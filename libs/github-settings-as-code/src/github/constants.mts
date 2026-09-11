@@ -25,6 +25,8 @@ export const actionsSettingsDir = path.resolve(
 
 export const pagesSettingsDir = path.resolve(settingsDir, './pages');
 
+export const environmentsDir = path.resolve(settingsDir, './environments');
+
 export const rulesetsDir = path.resolve(settingsDir, './rulesets');
 
 export const octokitHeaders = {

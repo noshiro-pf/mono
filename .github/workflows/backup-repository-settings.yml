@@ -143,6 +143,9 @@ jobs:
           permission-administration: write
           permission-contents: write
           permission-pages: read
+          # environments のバックアップに必要。 App の installation に
+          # Environments: read が無いと、この step が落ちる。
+          permission-environments: read
 
       - name: Install pnpm
         if: steps.should_run.outputs.should_run == 'true'
