@@ -37,6 +37,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Deny by default; each job grants back exactly what it needs. See the note in
+# type-check.yml for why the repository's own default is not good enough here.
+permissions: {}
+
 jobs:
   # Whether the branch is behind `main`, whether the diff touches anything
   # this workflow reads, and whether `[WIP]` is on the pull request — see the
@@ -46,6 +50,13 @@ jobs:
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, '[WIP]')
     uses: ./.github/workflows/check-gates.yml
+    # What check-gates.yml's own job declares. A caller's job-level
+    # `permissions` is the ceiling for the workflow it calls — permissions can
+    # be reduced along the chain, never elevated — so the top-level `{}` above
+    # would otherwise leave the called workflow unable to check out.
+    permissions:
+      contents: read
+      packages: read
     with:
       # `style`, a much narrower ignore list than `code`: `experimental/` and
       # nothing else. Every entry in this matrix can be affected by a change
@@ -67,6 +78,10 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
+      packages: read
     # 25, matching type-check.yml, whose matrix builds the repository the same
     # way this one does. It was 10, and `ws:doc` — the longest entry, because
     # it regenerates every package README on top of that build — was measured
@@ -162,6 +177,8 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
+    # Reads `needs.*.result` and echoes. It touches nothing.
+    permissions: {}
     timeout-minutes: 5
 
     steps:
