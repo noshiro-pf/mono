@@ -6,3 +6,4 @@ export * from './repository/index.mjs';
 export * from './resolve-target-repo.mjs';
 export * from './ruleset/index.mjs';
 export * from './variables/index.mjs';
+export * from './vulnerability-alerts/index.mjs';
