@@ -16,14 +16,41 @@ import {
   type IncomingMessageEvent,
   type PageToFrameMessage,
 } from '../shared/index.mjs';
-import { hostnameOf, originOf, type WorkspaceAction } from '../state/index.mjs';
+import {
+  hostnameOf,
+  originOf,
+  unframeableKindOf,
+  type WorkspaceAction,
+} from '../state/index.mjs';
 import { Icon, type IconName } from './icon.js';
+import { PaneFallback } from './pane-fallback.js';
 
 /**
- * How long a pane waits for its frame to say hello before it says the page may
- * not be embeddable. Long enough for a slow site, short enough to be an answer.
+ * How long after a frame has loaded its content script has to report.
+ *
+ * The page greets a frame on its `load` event and the content script answers
+ * with the address and the title, so a document that can be scripted at all has
+ * answered within a round trip of that. Silence past this is what "the frame is
+ * showing something else" looks like from outside: an error page, a refusal to
+ * be framed, a viewer of the browser's own.
+ *
+ * Measured, and the reason this is a `load` event rather than a clock: a frame
+ * fires `load` exactly once whether the response was a page, an
+ * `X-Frame-Options` refusal, a 403 with no body or a connection error — so
+ * "loaded, and nobody answered" is an answer, where a fixed timer would call
+ * every slow page a failure.
  */
-const agentTimeoutMs = 2500;
+const greetingGraceMs = 800;
+
+/**
+ * The backstop, for a frame that does not even get as far as loading.
+ *
+ * A request the server never answers has no `load` event to read, and neither
+ * has an address Chrome refuses to navigate to — it keeps the frame on
+ * whatever it was showing. Long, because all that is being waited for here is
+ * the first byte.
+ */
+const noAnswerTimeoutMs = 10_000;
 
 /**
  * Everything except top-level navigation.
@@ -173,6 +200,23 @@ export const PaneFrame = memoNamed(
     );
 
     /**
+     * Reports from the document that is in the frame now, counted rather than
+     * remembered: `pane.currentUrl` says that *some* document answered, and a
+     * pane that follows a link into a page which will not be framed has to
+     * notice that the next one did not.
+     */
+    const mut_reportsSinceLoad = React.useRef(0);
+
+    /** Bumped on every `load` of the pane's frame, to run the check below. */
+    const [loadCount, setLoadCount] = React.useState(0);
+
+    /** That load ended in a document nothing answered from. */
+    const [frameBlocked, setFrameBlocked] = React.useState(false);
+
+    /** The fallback was sent away for the document in the frame now. */
+    const [fallbackDismissed, setFallbackDismissed] = React.useState(false);
+
+    /**
      * A hidden frame at the site's origin, used to reach a page of that site
      * when the pane itself cannot load one: it is where the site's service
      * worker can be unregistered from. See `frame-agent.mts`.
@@ -188,10 +232,41 @@ export const PaneFrame = memoNamed(
       number | undefined
     >(undefined);
 
-    const showAgentWarning =
-      !agentSeen && pane.url !== '' && waitedFor === loadKey;
+    /** Known from the address alone: the browser frames none of these. */
+    const browserRefusal = unframeableKindOf(address);
+
+    /**
+     * The pane is not showing the page it was asked for.
+     *
+     * Three ways of knowing, in order of how much they know: the address is one
+     * Chrome refuses outright, the frame loaded a document nothing answered
+     * from, or nothing at all has happened for long enough that saying so is
+     * better than a blank pane.
+     */
+    const blocked =
+      pane.url !== '' &&
+      (browserRefusal !== undefined ||
+        frameBlocked ||
+        (!agentSeen && waitedFor === loadKey));
+
+    /**
+     * Blocked for a reason the extension may still be able to undo, which is
+     * what the service-worker offers hang off. Nothing undoes a browser
+     * refusal, so offering to try there would be offering nothing.
+     */
+    const blockedBySite = blocked && browserRefusal === undefined;
 
     const siteOrigin = originOf(address);
+
+    /** There is a site to clear a worker for, and a worker might be the cause. */
+    const canClearServiceWorkers = blockedBySite && siteOrigin !== undefined;
+
+    /**
+     * What failed is the address the pane was pointed at, so retrying it means
+     * something. After a navigation made inside the frame it does not: the page
+     * knows where the pane *was*, not where the link went.
+     */
+    const canRetry = blockedBySite && !agentSeen;
 
     const alwaysReset =
       siteOrigin !== undefined && resetOrigins.includes(siteOrigin);
@@ -260,6 +335,13 @@ export const PaneFrame = memoNamed(
           return;
         }
 
+        // Something is running in the frame, so whatever is in it now is a
+        // document the extension can see into — and any fallback over it is
+        // wrong from this moment on.
+        mut_reportsSinceLoad.current += 1;
+
+        setFrameBlocked(false);
+
         dispatch({
           type: 'report',
           paneId: pane.id,
@@ -283,12 +365,55 @@ export const PaneFrame = memoNamed(
 
       const timer = setTimeout(() => {
         setWaitedFor(loadKey);
-      }, agentTimeoutMs);
+      }, noAnswerTimeoutMs);
 
       return () => {
         clearTimeout(timer);
       };
     }, [agentSeen, loadKey]);
+
+    // What the frame's `load` event meant, decided a round trip later. The
+    // count is read rather than watched, so a report that arrives between the
+    // event and this still counts as an answer.
+    React.useEffect(() => {
+      if (loadCount === 0) {
+        return undefined;
+      }
+
+      // A document of its own gets a fallback of its own: a pane whose fallback
+      // was sent away and which then followed a link into another page that
+      // will not frame should say so again.
+      setFallbackDismissed(false);
+
+      const answered = mut_reportsSinceLoad.current > 0;
+
+      mut_reportsSinceLoad.current = 0;
+
+      if (answered) {
+        setFrameBlocked(false);
+
+        return undefined;
+      }
+
+      const timer = setTimeout(() => {
+        if (mut_reportsSinceLoad.current === 0) {
+          setFrameBlocked(true);
+        }
+      }, greetingGraceMs);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [loadCount]);
+
+    // A new address, or a reload, starts all of that over.
+    React.useEffect(() => {
+      setFrameBlocked(false);
+
+      setFallbackDismissed(false);
+
+      mut_reportsSinceLoad.current = 0;
+    }, [loadKey]);
 
     const sendToFrame = React.useCallback(
       (message: PageToFrameMessage): void => {
@@ -323,6 +448,12 @@ export const PaneFrame = memoNamed(
     // so the greeting is sent on both occasions rather than on `load` alone.
     React.useEffect(() => {
       announceToFrame();
+    }, [announceToFrame]);
+
+    const handleFrameLoad = React.useCallback((): void => {
+      announceToFrame();
+
+      setLoadCount((count) => count + 1);
     }, [announceToFrame]);
 
     const handleAddressChange = React.useCallback<
@@ -395,7 +526,7 @@ export const PaneFrame = memoNamed(
     }, [siteOrigin]);
 
     const showResetToggle =
-      siteOrigin !== undefined && (alwaysReset || showAgentWarning);
+      siteOrigin !== undefined && (alwaysReset || blockedBySite);
 
     const resetToggleTitle =
       siteOrigin === undefined
@@ -413,11 +544,19 @@ export const PaneFrame = memoNamed(
     // With the origin on the list, a pane that cannot load does not wait to be
     // asked: the worker is removed and the pane reloaded, once per load.
     React.useEffect(() => {
-      if (!alwaysReset || !showAgentWarning) {
+      if (!alwaysReset || !blockedBySite) {
         return;
       }
 
       if (resetUrl !== undefined || resetAttemptedFor === loadKey) {
+        return;
+      }
+
+      // The last clear found no worker to remove, so the next one would find
+      // none either: whatever is keeping this pane from loading is not a
+      // service worker. Reloading on a timer forever is worse than a pane that
+      // says it did not load.
+      if (serviceWorkersRemoved === 0) {
         return;
       }
 
@@ -426,9 +565,10 @@ export const PaneFrame = memoNamed(
       setResetUrl(`${siteOrigin}/`);
     }, [
       alwaysReset,
-      showAgentWarning,
+      blockedBySite,
       resetUrl,
       resetAttemptedFor,
+      serviceWorkersRemoved,
       loadKey,
       siteOrigin,
     ]);
@@ -492,6 +632,10 @@ export const PaneFrame = memoNamed(
       },
       [onMoveStart, pane.id],
     );
+
+    const handleDismissFallback = React.useCallback((): void => {
+      setFallbackDismissed(true);
+    }, []);
 
     const handleOpenExternally = React.useCallback((): void => {
       if (address !== '') {
@@ -611,7 +755,7 @@ export const PaneFrame = memoNamed(
       () => [
         // Each group is typed as `PaneMenuAction[]` rather than inferred: a
         // spread of a conditional array widens to include `undefined`.
-        ...(showAgentWarning
+        ...(blockedBySite
           ? ([
               {
                 icon: 'clear-sw',
@@ -673,7 +817,7 @@ export const PaneFrame = memoNamed(
       ],
       [
         compact,
-        showAgentWarning,
+        blockedBySite,
         showResetToggle,
         alwaysReset,
         resetToggleTitle,
@@ -799,7 +943,7 @@ export const PaneFrame = memoNamed(
             </span>
           )}
 
-          {showAgentWarning ? (
+          {blocked ? (
             <span
               className={'pane__warning'}
               title={
@@ -969,9 +1113,26 @@ export const PaneFrame = memoNamed(
               src={pane.url}
               style={frameStyle}
               title={label}
-              onLoad={announceToFrame}
+              onLoad={handleFrameLoad}
             />
           )}
+
+          {/* Over the frame rather than instead of it: the element stays in
+              the document, because taking it out and putting it back is a
+              reload. */}
+          {blocked && !fallbackDismissed ? (
+            <PaneFallback
+              address={agentSeen ? undefined : address}
+              canClearServiceWorkers={canClearServiceWorkers}
+              canOpenExternally={address !== ''}
+              canReload={canRetry}
+              refusal={browserRefusal}
+              onClearServiceWorkers={handleResetServiceWorkers}
+              onDismiss={handleDismissFallback}
+              onOpenExternally={handleOpenExternally}
+              onReload={handleReload}
+            />
+          ) : undefined}
         </div>
       </section>
     );

@@ -67,6 +67,10 @@ Worth knowing before you install:
   offers to remove that worker, per site if you like, and the site registers it
   again on its next ordinary visit. A signed-in GitHub needs this for its
   issues pages.
+• A pane that cannot show its page says so in place of it, with the reason
+  where the reason is knowable and a way to open the address in an ordinary tab.
+  It can be dismissed: a page Split View cannot see into — a PDF in Chrome's own
+  viewer — looks the same from outside as a page that refused to load.
 • A pane is a third-party context for cookies, so a site you are signed in to
   may appear signed out. And a page that wants to navigate the whole tab — a
   sign-in redirect, a payment flow — is stopped by the pane's sandbox, which

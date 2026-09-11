@@ -280,6 +280,9 @@ const main = async (): Promise<void> => {
 
     const blockedByWorker = !(await appears('#sw-target', 2000));
 
+    // The pane is blank behind this, which is what the fallback is for.
+    const fallbackWhenBlocked = await appears('.pane__fallback', 3000);
+
     await openPaneMenu();
 
     const offersReset = await appears(
@@ -335,6 +338,40 @@ const main = async (): Promise<void> => {
       .waitFor({ timeout: 12_000 })
       .then(() => true)
       .catch(() => false);
+
+    // --- the fallback shown in place of a page that will not load ------
+    // The pane is at the service-worker page above, which loaded in the end;
+    // an address the browser refuses outright is the other half of it, and it
+    // needs no waiting at all: nothing has to fail first for the pane to know.
+    const fallbackWhileLoaded = await page.locator('.pane__fallback').count();
+
+    await address.fill('file:///etc/hostname');
+
+    await address.press('Enter');
+
+    const refusalShown = await appears('.pane__fallback', 4000);
+
+    const refusalText = await page
+      .locator('.pane__fallback-title')
+      .first()
+      .innerText();
+
+    await page
+      .locator('.pane__fallback-action', { hasText: 'Show the frame anyway' })
+      .first()
+      .click();
+
+    await page.waitForTimeout(300);
+
+    const fallbackAfterDismiss = await page.locator('.pane__fallback').count();
+
+    // Back to where the next section expects to find this pane: what a split
+    // view was left showing is part of what it restores.
+    await address.fill(`http://localhost:${String(serverPort)}/sw-target`);
+
+    await address.press('Enter');
+
+    await page.waitForTimeout(3000);
 
     // --- the saved list of split views ---------------------------------
     const optionsAtStart = await workspaceOptionCount();
@@ -673,6 +710,11 @@ const main = async (): Promise<void> => {
         blockedByWorker,
         '',
       ),
+      check(
+        'the pane says so in place of the blank page',
+        fallbackWhenBlocked,
+        '',
+      ),
       check('the pane offers to remove it', offersReset, ''),
       check('removing it gets the pane loading again', recovered, ''),
       check('the site can register its worker again', blockedAgain, ''),
@@ -680,6 +722,21 @@ const main = async (): Promise<void> => {
         'with the origin on the list the pane clears it by itself',
         clearedByItself,
         '',
+      ),
+      check(
+        'a pane showing a page leaves it alone',
+        fallbackWhileLoaded === 0,
+        fallbackWhileLoaded,
+      ),
+      check(
+        'a pane says so in place of a page the browser will not frame',
+        refusalShown && refusalText.includes('cannot be shown'),
+        refusalText,
+      ),
+      check(
+        'and the frame can be asked for anyway',
+        fallbackAfterDismiss === 0,
+        fallbackAfterDismiss,
       ),
       check(
         'the picker lists the split view in the URL',

@@ -29,3 +29,7 @@ words:
   # Plural of "navigation": a nested browsing context keeps its name across
   # cross-origin navigations, which is what identifies a pane's frame.
   - navigations
+  # "Cannot be put in a frame at all": the browser's own refusals, told apart
+  # from a site refusing to be framed, which is a different thing with a
+  # different answer.
+  - unframeable

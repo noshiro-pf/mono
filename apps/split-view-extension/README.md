@@ -266,7 +266,9 @@ cross-origin frame's URL or call `history.back()` on it, so a content script
 inside the frame does both and reports back. It is declared for `<all_urls>` and
 every frame, and the first thing it does on an ordinary page is notice that
 `location.ancestorOrigins` is empty and return. A pane where it cannot run — a
-`chrome://` URL, the Web Store, an error page — shows ⚠ in its toolbar; the
+`chrome://` URL, the Web Store, an error page — shows ⚠ in its toolbar and a
+message over the frame (see
+["What a pane shows instead"](#what-will-not-open-in-a-pane-and-why)); the
 address bar and the frame still work, but the title, the back button and
 "restore where I navigated to" do not.
 
@@ -416,6 +418,32 @@ Two more things that are not "will not open" but look like it:
   payment flow — is stopped by the pane's sandbox. Turning the sandbox off for
   that pane (the padlock, or the pane's menu when it is narrow) is the escape
   hatch.
+
+### What a pane shows instead
+
+Every one of those leaves the frame showing nothing, or the browser's own
+"refused to connect" page — neither of which says what to do next. So the pane
+covers it with a message and the two or three things worth trying: open it in a
+tab of its own, try again, clear the site's service workers. How it decides
+there is something to say:
+
+- **From the address**, for the ones the browser refuses outright — `chrome://`,
+  `file:`, the Web Store, another extension's pages. Those never start a
+  navigation at all, so there is nothing to wait for: the message is immediate,
+  and it names the reason, the reason being known.
+- **From the frame's `load` event**, for everything else. Measured: a frame
+  fires `load` exactly once whether the response was a page, an
+  `X-Frame-Options` refusal, a 403 with no body or a connection error — so
+  "the frame finished loading and the content script in it did not report
+  within 800ms" is an answer, where a fixed timer would call every slow page a
+  failure. A `load` that never comes — a server that never responds — is
+  covered by a backstop at ten seconds.
+
+**And it can be sent away.** "Show the frame anyway" reveals what is behind it,
+because the signal is "nothing in the frame answered", and a page this
+extension merely cannot script answers exactly like a page that never loaded —
+a PDF in Chrome's own viewer being the case to know about. The next navigation
+in that pane gets its own message.
 
 "Open in a new tab" in a pane's toolbar is the way out of all of them.
 

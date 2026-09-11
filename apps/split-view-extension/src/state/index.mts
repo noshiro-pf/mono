@@ -4,5 +4,6 @@ export * from './registry.mjs';
 export * from './storage.mjs';
 export * from './sw-origins.mjs';
 export * from './tab-identity.mjs';
+export * from './unframeable.mjs';
 export * from './url.mjs';
 export * from './workspace-id.mjs';

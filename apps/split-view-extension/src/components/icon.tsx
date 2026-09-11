@@ -1,4 +1,5 @@
 import { memoNamed } from 'react-utils';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 export type IconName =
   | 'back'
@@ -78,7 +79,7 @@ type IconShape = Readonly<{
   width?: number;
 }>;
 
-const icons: Readonly<Record<IconName, IconShape>> = {
+const icons: ReadonlyRecord<IconName, IconShape> = {
   back: { strokes: ['M13 8H3.5', 'M7.5 3.5 3 8l4.5 4.5'] },
   forward: { strokes: ['M3 8h9.5', 'M8.5 3.5 13 8l-4.5 4.5'] },
 
@@ -149,4 +150,4 @@ const icons: Readonly<Record<IconName, IconShape>> = {
     ],
     width: 2,
   },
-};
+} as const;

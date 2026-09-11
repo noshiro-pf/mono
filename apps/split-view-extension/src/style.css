@@ -522,6 +522,88 @@ body {
   justify-content: center;
 }
 
+/* --- a pane whose page would not load -------------------------------- */
+
+/* Over the frame, and opaque: what is behind it is either the browser's own
+   "refused to connect" page or a blank white document, and neither says
+   anything the user can act on. `auto` rather than `clip` so that the card is
+   reachable in a pane too short for it, and `safe` centring so that a card
+   taller than the pane starts at its first line rather than being cut off at
+   both ends. */
+.pane__fallback {
+  align-items: safe center;
+  background: var(--sv-bg);
+  display: flex;
+  inset: 0;
+  justify-content: safe center;
+  overflow: auto;
+  padding: 16px;
+  position: absolute;
+  /* Under the pane's menu, which is positioned against `.pane` and has to stay
+     usable while this is up. */
+  z-index: 1;
+}
+
+.pane__fallback-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.pane__fallback-title {
+  align-items: center;
+  color: var(--sv-warn);
+  display: flex;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  margin: 0;
+}
+
+.pane__fallback-detail {
+  color: var(--sv-text-dim);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pane__fallback-address {
+  color: var(--sv-text-dim);
+  font-family: ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
+  margin: 0;
+  /* An address has no spaces to wrap at, and a pane is narrow. */
+  overflow-wrap: anywhere;
+}
+
+.pane__fallback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.pane__fallback-action {
+  align-items: center;
+  background: var(--sv-bg-raised);
+  border: 1px solid var(--sv-border);
+  border-radius: 4px;
+  color: var(--sv-text);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 6px;
+  padding: 5px 9px;
+}
+
+.pane__fallback-action:hover:not(:disabled) {
+  border-color: var(--sv-border-active);
+}
+
+.pane__fallback-action:disabled {
+  color: #5f666f;
+  cursor: default;
+}
+
 /* --- splitter -------------------------------------------------------- */
 
 .splitter {
