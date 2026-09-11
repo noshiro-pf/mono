@@ -1,8 +1,0 @@
-{
-  "name": "shielded-caverns-35103",
-  "wait_timer": 0,
-  "prevent_self_review": false,
-  "reviewers": [],
-  "deployment_branch_policy": null,
-  "deployment_branch_policies": []
-}
