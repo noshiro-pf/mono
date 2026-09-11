@@ -24,7 +24,9 @@ instruction file.
 - `repo-settings/` — declarative GitHub repository settings, applied via
   [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
   `pages/settings.json` there is what enables Pages; the deploy workflow does
-  not enable it.
+  not enable it. `environments/` holds one file per deployment environment —
+  **see the note on environments under "Required status checks"** before
+  adding one.
 - `articles/` — Zenn articles. **See "Zenn" below.**
 - `books/` — Zenn books. **See "Zenn" below.**
 - `docs/` — prose notes about the repository itself, plus a few verbatim
@@ -463,6 +465,19 @@ by `repo-settings:backup`. The `backup-repository-settings` check compares
 changing nothing — the settings take effect when someone runs `apply`, which
 rewrites both the root file and `bk/`.
 
+**An environment a workflow names is created the moment that workflow first
+runs, with no protection rules on it.** `release` arrived exactly that way.
+Pull request #1910 added `environment: release` to `release.yml`, the merge
+ran it, and three seconds later the repository held an environment with
+`protection_rules: []` and `deployment_branch_policy: null` — no restriction
+at all. Nothing failed and nothing said so, and what the binding was added to
+enforce was simply absent: npm's trusted publisher does not check the git ref,
+so the deployment branch policy is the whole of what confines a publish to
+`main`. Declare the environment under `repo-settings/environments/` and run
+`pnpm run repo-settings:apply environments` **before** merging the workflow
+that names it. The other order leaves a window in which the environment
+exists, reads as configured, and restricts nothing.
+
 ## CI diff gates
 
 The check workflows carry no `paths` filter. A workflow that a path filter
@@ -690,7 +705,8 @@ report `skipped`. What to know about that:
   was a draft: green checks that stood for work that never happened, and one
   booted runner per matrix entry per push.
 - **The label is not declared anywhere in this repository.**
-  `repo-settings/` covers repository settings, rulesets and Pages, not labels,
+  `repo-settings/` covers repository settings, rulesets, the Actions settings,
+  Pages and environments, but not labels,
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
   the same string and would simply stop matching too. The string is written
