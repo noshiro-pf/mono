@@ -13,7 +13,7 @@
   "squash_merge_commit_message": "COMMIT_MESSAGES",
   "merge_commit_title": "MERGE_MESSAGE",
   "merge_commit_message": "PR_TITLE",
-  "web_commit_signoff_required": false,
+  "web_commit_signoff_required": true,
   "security_and_analysis": {
     "secret_scanning": {
       "status": "enabled"

@@ -26,6 +26,19 @@ export const setActionsSettings = async (
     permissionsParams,
   );
 
+  // https://docs.github.com/rest/actions/permissions#set-default-workflow-permissions-for-a-repository
+  await octokit.request(
+    'PUT /repos/{owner}/{repo}/actions/permissions/workflow' satisfies EndpointKeys,
+    {
+      owner: OWNER,
+      repo: REPO,
+      headers: octokitHeaders,
+      default_workflow_permissions: settings.default_workflow_permissions,
+      can_approve_pull_request_reviews:
+        settings.can_approve_pull_request_reviews,
+    },
+  );
+
   // https://docs.github.com/rest/actions/permissions#set-fork-pr-contributor-approval-permissions-for-a-repository
   await octokit.request(
     'PUT /repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval' satisfies EndpointKeys,

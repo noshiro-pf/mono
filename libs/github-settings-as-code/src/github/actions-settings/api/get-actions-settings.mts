@@ -6,12 +6,18 @@ import { ActionsSettings } from '../constants.mjs';
 /**
  * Settings > Actions > General の現在値を取得する。
  *
- * 2 つのエンドポイントの結果を 1 つのオブジェクトにまとめる。
+ * 3 つのエンドポイントの結果を 1 つのオブジェクトにまとめる。
  */
 export const getActionsSettings = async (): Promise<ActionsSettings> => {
   // https://docs.github.com/rest/actions/permissions#get-github-actions-permissions-for-a-repository
   const permissions = await octokit.request(
     'GET /repos/{owner}/{repo}/actions/permissions' satisfies EndpointKeys,
+    { owner: OWNER, repo: REPO, headers: octokitHeaders },
+  );
+
+  // https://docs.github.com/rest/actions/permissions#get-default-workflow-permissions-for-a-repository
+  const workflowPermissions = await octokit.request(
+    'GET /repos/{owner}/{repo}/actions/permissions/workflow' satisfies EndpointKeys,
     { owner: OWNER, repo: REPO, headers: octokitHeaders },
   );
 
@@ -25,6 +31,10 @@ export const getActionsSettings = async (): Promise<ActionsSettings> => {
     enabled: permissions.data.enabled,
     allowed_actions: permissions.data.allowed_actions,
     sha_pinning_required: permissions.data.sha_pinning_required,
+    default_workflow_permissions:
+      workflowPermissions.data.default_workflow_permissions,
+    can_approve_pull_request_reviews:
+      workflowPermissions.data.can_approve_pull_request_reviews,
     fork_pr_contributor_approval_policy: forkPrApproval.data.approval_policy,
   });
 };
