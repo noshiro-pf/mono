@@ -497,9 +497,11 @@ Things to keep in mind when editing a gated workflow:
   which is why the gate had to be a step back then. See "Required status
   checks".
 
-`verify-published-packages.yml` and `backup-repository-settings.yml` gate
-themselves in shell, on the same principle but against a merge base and a
-single directory rather than an ignore list. They call `check-gates.yml` with
+`verify-published-packages.yml` gates itself in shell, on the same principle
+but against a merge base and a single directory rather than an ignore list.
+`backup-repository-settings.yml` asks no question about the diff at all: its
+steps run only where the checkout is main's own content (see below), which is
+an event name rather than a set of paths. Both call `check-gates.yml` with
 `diff-scope: none`, which answers the branch question and skips the checkout:
 each has one job, so a gate that installs to save one runner would cost more
 than it saves.
@@ -535,9 +537,24 @@ no `push` trigger at all, and the two that keep one run a single job on it:
   report has to come from a run on `main`. It is gated on the diff like the
   matrix, so a merge that touched nothing the tests read uploads nothing.
 - `backup-repository-settings.yml` compares `bk/` with the repository's live
-  settings, which no branch changes and no pull request run covers unless it
-  touched `repo-settings/`. A merge is simply the occasion on which that drift
-  is looked for.
+  settings, which no branch changes and no pull request run covers at all. A
+  merge is simply the occasion on which that drift is looked for.
+    - **The comparison runs only where the checkout is `main`'s own content**:
+      that push, and a `workflow_dispatch`. It is not a property of a branch —
+      no branch can change the live settings, and nothing a branch changes can
+      make the comparison say something different — while the tooling that
+      performs it (`repo-settings:backup`, which is
+      `libs/github-settings-as-code` through `tsx`) comes from the checked-out
+      tree, along with everything that tree's `pnpm install` runs.
+      So a pull request that hand-edits `repo-settings/` is checked against
+      reality by the run on `main` after it merges, rather than while it is
+      open; the checkout is the only step of that job a pull request runs.
+    - **The `pull_request` trigger stays even so**, because the job's aggregate
+      is the required `backup-repository-settings-result` and a context that
+      never appears on the head commit blocks the merge forever. The job runs,
+      its steps skip, and it reports `success` — which is why the steps carry
+      the condition and the job does not: a job-level skip would make the
+      aggregate read `skipped` and need a carve-out of its own.
 
 What this gives up is the after-the-fact check on a merge made with the
 admin's bypass, which is the one way a head that is behind `main`, or was
