@@ -88,74 +88,86 @@ TS 固有の事情から来ている。
 宣言」が 2 本消え、`as` が 1 か所に残るだけになる。検査されない主張が**明示され、
 grep できる**形になるのが本質的な改善。
 
-**さらに良いのは、精密化が成り立つようにデータ側を作り直すこと。** 射影が全域になれば
-TypeScript が自分で証明するので、条件型も `as` も要らなくなる。**C の正しい解決は言語機能
-ではなくデータ設計**である。ただし実物に当てると `Optional` と `Result` で答えが割れる。
+残る `as` を消せるか、が次の問いになる。**射影が全域になるようデータ側を作り直せば
+TypeScript が自分で証明するので、条件型も `as` も要らなくなる** — この道は実際に成立する
+のだが、**実物に当てて測ったうえで採らないことにした**(2026-09-11)。以下はその測定と理由、
+そして代わりに採る道。
 
-#### `Optional`: ほぼ無償で成立する(推奨)
+#### なぜ `as` が残るのか、どうすれば消えるのか
 
-現状は `None` が `value` を持たないので `unwrap` は 2 本のオーバーロード + `as` になる。
-**`None` の型に省略可能プロパティを 1 つ足すだけ**で射影が全域になる:
+**TypeScript は generic 関数の本体を、型引数を不透明にしたまま 1 回だけ検査する。** 条件型
+`Unwrap<O>` は *instantiation ごとにしか真にならない主張*なので、本体の中では評価されず、
+証明しようがない。`as` を外すと `Type 'unknown' is not assignable to type 'Unwrap<O> | undefined'`
+になる(実測)。`isSome(o)` で `O & Some<unknown>` に narrowing しても `o.value` は `unknown`
+止まりで、相手は評価されない条件型のままである。
 
-```ts
-export type None = Readonly<{
-    $$tag: 'ts-data-forge::Optional.none';
+`as` が消えるのは、戻り値型が式から**計算**されるのではなく**定義上等しい**ときだけ:
 
-    /** 常に不在。`Optional.unwrap` の射影を全域にするためだけの型上の宣言。 */
-    value?: undefined;
-}>;
+1. **恒等** — `<A>(a: A): A => a`
+2. **射影(indexed access)** — `O['value']` は `o.value` の型そのもの。`O` が未解決でも伝播する
+3. 1 と 2 の合成
 
-// 2 本のオーバーロードと 1 個の `as` と eslint-disable が、これ 1 行に置き換わる
-export const unwrap = <const O extends UnknownOptional>(
-    optional: O,
-): O['value'] => optional.value;
-```
+条件型や新しく構築した値では消えない。したがって**この種の `as` を discharge する道は 2 つ
+しかない**:
 
-**`?:` にするのが要点**で、これで `無駄なプロパティ` の懸念は消える:
+- **(a) 主張を射影に書き換える** → データモデルを変える
+- **(b) 宣言されたケースごとに本体を検査する** → チェッカーを変える
 
-- **ランタイムは 1 バイトも変わらない。** `none` は今までどおり `{ $$tag: … }` のままで、
-  `value` キーは**存在しない**。`?:` は「不在または `undefined`」を意味するので、型は
-  実物を正確に述べている(嘘ではない)。`Object.keys(none)`、`'value' in none`、
-  `deepStrictEqual(none, { $$tag: … })` の結果はどれも現状と同じ。
-- **`as` も要らない。** `const none: None = { $$tag: NoneTypeTagName }` は今の字面のまま通る。
-  必須プロパティ(`value: undefined`)にすると逆に定義側で `value: undefined` を書く必要が
-  生じるので、そちらは採らない。
-- **型の精密化は現状と完全に同値**(実測): `Some<number>` なら `number`、
-  `Optional<number>` なら `number | undefined`。`Unwrap<O>` を使った現状の推論と一致する。
-- **破壊的変更ではない。** 公開 API の増分は「`None` 型の値に `.value` と書くと `undefined`
-  になる」だけで、既存のコードは 1 行も壊れない。
-- 代償は 2 つ: (a) `Optional.unwrap` を使わず `.value` を直接読む書き方が型として可能になる
-  (`Some` については元から可能だったので、増えるのは `None` の側だけ)、(b) `exactOptionalPropertyTypes`
-  を将来 `true` にする場合の再確認 — 現在は Sumi の拘束 compilerOptions で `false` に固定
-  されているので今日の問題ではない。
+#### (a) データモデルを曲げる案 — 測ったうえで**不採用**(2026-09-11)
 
-#### `Result`: 同じ手は使えない(現状維持を推奨)
+`None` に `value?: undefined` を足せば `unwrap` は `(o: O) => O['value']` の 1 行になり、
+`as` もオーバーロードも消える。ランタイムは変わらず(`?:` は「不在または `undefined`」なので
+型は実物を正確に述べる)、破壊的変更でもない — **それでも採らない。**
 
-`Ok<S>` と `Err<E>` は**どちらも `value` を持っている**(`Err.value` はエラー値)。したがって
-`r.value` は `S | E` であって、`unwrapOk` が欲しい `S | undefined` にはならない。全域にするには
-**キーを分ける**しかない:
+フィールドが無いと射影は型としてすら成立しない(`TS2536: Type '"value"' cannot be used to
+index type 'O'`)ので、利得は全部この phantom field に乗っている。それを 3 つの基準で見ると:
 
-```ts
-export type Ok<S> = Readonly<{ $$tag: '…ok'; value: S; error?: undefined }>;
-export type Err<E> = Readonly<{ $$tag: '…err'; error: E; value?: undefined }>;
-// unwrapOk = (r) => r.value   → R['value'] = S | undefined
-// unwrapErr = (r) => r.error  → R['error'] = E | undefined
-```
+1. **そのフィールドは情報を持たない。** doc コメントは「常に不在。射影を全域にするためだけ
+   の型上の宣言」としか書けない。実行時に読む `$$tag` や意図を運ぶ `mut_` とは質が違う。
+   D-15 が `Boolean(x)` を「意図が名前に現れない」として禁じたのと同じ物差しで落ちる。
+2. **一般化しない。** 必要な phantom の数は「射影ごとに、それを持たない variant の数」の総和:
 
-概念的にはこちらが正しい(Err が抱えているのは「値」ではなく「エラー」である)。しかし
-**`Err.value` は公開 API として実際に使われている** — ts-std-forge の JSDoc の例だけでも
-`assert.deepStrictEqual(errResult.value, { kind: 'invalid-number', … })` の形が多数あり、
-これは README とドキュメントに出る面である。`value` → `error` の改名は published パッケージの
-破壊的変更で、得られるのは `unwrapOk` 系 2 個(Result / TernaryResult)のオーバーロード解消に
-とどまる。**割に合わない。**
+    | 型              | variant | 射影 | phantom | 前提                                     |
+    | :-------------- | ------: | ---: | ------: | :--------------------------------------- |
+    | `Optional`      |       2 |    1 |   **1** | なし                                     |
+    | `Result`        |       2 |    2 |       2 | `Err.value` → `error` の破壊的改名が必要 |
+    | `TernaryResult` |       3 |    3 |   **5** | 同じ改名が必要                           |
 
-`Ok` に `okValue` を増やす等の非破壊案は**ペイロードを実体として二重に持つ**ことになり、
-ここでは本当に無駄なプロパティなので採らない(`Optional` の `?:` が無償なのは、増えるのが
-型だけでランタイムに何も増えないからである)。
+    **`Optional` が安いのはありうる最小の ADT だからにすぎない。** variant ごと・射影ごとに
+    手当てを繰り返す必要がある技法は、設計原理ではなく回避策である。
 
-したがって **`Result` の `unwrapOk` は C の一般解 — 条件型の戻り値を持つ単一シグネチャ +
-1 個の `as` — に留める。** オーバーロード宣言 2 本が消えて、検査されない主張が 1 か所に
-明示されるところまでは同じように得られる。
+3. **型がライブラリの作らない状態を認めるようになる。** `None` の表現できる形が
+   `{ $$tag }` と `{ $$tag, value: undefined }` の 2 つになる。どちらも型検査を通り、作られる
+   のは前者だけで、`deepStrictEqual` はこの 2 つを**区別する**(明示的な `undefined` キーは
+   有意 — 実測)。リポジトリには `Optional.none` に対する構造比較が 93 か所ある。
+
+加えて一貫性の代償がある。`Optional` だけ `as` が無く `Result` / `TernaryResult` には残る形に
+なり、`as` 1 個のために読み手が覚える規則が 1 つから 2 つに増える。
+
+`Ok` に `okValue` を足すような `Result` 向けの非破壊案は、**ペイロードを実体として二重に持つ**
+ので論外である(`Optional` の `?:` が無償に見えたのは、増えるのが型だけでランタイムに何も
+増えないからで、`Result` にはその逃げ道がない)。
+
+#### 採る形: 3 つの ADT を同じ扱いにする
+
+`Optional.unwrap` / `Result.unwrapOk` / `TernaryResult.unwrapOk` のいずれも、**条件型の戻り値を
+持つ単一シグネチャ + 局所的な `as` 1 個**にする。データモデルは無傷で、**未検査のオーバー
+ロード宣言 6 本が消え**(利得の大部分はここ)、残る 3 個の `as` は明示されて grep できる。
+
+#### (b) 本当の解決はチェッカー側(Sumi refined)
+
+> **条件型の戻り値は、型引数の制約が有限 union のとき、その member ごとに本体を検査する。**
+> `unwrap` なら `O := Some<S>` で 1 回、`O := None` で 1 回。どちらも通れば `as` は要らない。
+> 制約が有限 union でない場合は従来どおり `as` を残す。
+
+ADT はまさに「制約が有限 union」の形なので、これで 3 つとも一度に片付き、将来の分にも効き、
+データモデルは変わらない。
+
+そして**これは D-58 のオーバーロードの判断とまったく同じ考えである**。TS は本体を 1 回しか
+検査しない。だから D-58 は「N 個のシグネチャを 1 つの本体に名乗らせない(節ごとに本体を持つ)」
+と決めた。C の `as` も同じ病気で、答えも同じ — **宣言されたケースごとに検査する**。片方を構文
+規則、もう片方をデータモデルの小技で解くより、**1 つの原理で両方を説明できる**方が言語として
+筋が通る。
 
 ### B(省略可能引数) — 条件付き rest タプルで単一シグネチャにする
 
@@ -368,7 +380,7 @@ tsc が検査しないのは「宣言ごとの戻り値型」だけで、そこ�
    「arrow ではオーバーロードが書きにくいから」ではなく、「実行時分岐のオーバーロードは
    (1) でしか `as` 無しに書けないから」である。
 
-## 決定と残タスク(2026-09-10)
+## 決定と残タスク(2026-09-10、C の扱いは 2026-09-11 に改訂)
 
 決定は **D-58** に記録した。この文書が正典として残すのは測定と根拠である。
 
@@ -376,14 +388,15 @@ tsc が検査しないのは「宣言ごとの戻り値型」だけで、そこ�
 
 1. **`pipe` に `mapWith` を足す**(ts-std-forge)。カリー化オーバーロード 9 個の削除は
    その後の別作業で、`ts-restrictions/prefer-curried-call` の去就も併せて決める。
-2. **`None` に `value?: undefined` を足し、`Optional.unwrap` を単一シグネチャにする**
-   (ts-std-forge)。ランタイム変更なし・破壊的変更なし。
-3. **`Result` / `TernaryResult` の `unwrapOk` を条件型の単一シグネチャへ**。`Err.value` の
-   改名はしない。
-4. **`min` / `max` / `minBy` / `maxBy` を条件付き rest タプルへ**(ts-data-forge)。
-5. **`functions/no-refinement-overload` の実装**。1〜4 が終われば対象は `panic` 以外ほぼ
+2. **`Optional.unwrap` / `Result.unwrapOk` / `TernaryResult.unwrapOk` を条件型の単一
+   シグネチャへ**(ts-std-forge)。データモデルは変えない — phantom field も `Err.value` の
+   改名もしない。オーバーロード宣言 6 本が消え、`as` は 3 個が明示された形で残る。
+3. **`min` / `max` / `minBy` / `maxBy` を条件付き rest タプルへ**(ts-data-forge)。
+4. **`functions/no-refinement-overload` の実装**。1〜3 が終われば対象は `panic` 以外ほぼ
    無くなるので、**新規の逆行を止めるための番人**という位置づけになる。
-6. **`functions/prefer-intersection-call-signature` の実装**。現状の違反は 0 件。
+5. **`functions/prefer-intersection-call-signature` の実装**。現状の違反は 0 件。
+6. **(Sumi refined)条件型の戻り値をケースごとに検査する**。上の 2 で残る `as` 3 個を
+   discharge する唯一の筋であり、D-58 の overload の判断と同じ原理の適用でもある。
 
 未決のまま残るもの:
 
