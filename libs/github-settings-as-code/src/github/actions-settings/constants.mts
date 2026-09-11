@@ -7,6 +7,7 @@ import * as t from 'ts-fortress';
  * 管理する:
  *
  * - `GET|PUT /repos/{owner}/{repo}/actions/permissions`
+ * - `GET|PUT /repos/{owner}/{repo}/actions/permissions/workflow`
  * - `GET|PUT /repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval`
  */
 export const ActionsSettings = t.record({
@@ -26,6 +27,29 @@ export const ActionsSettings = t.record({
    * リクエスト時にのみ手当てしている（ set-actions-permissions.mts 参照）。
    */
   sha_pinning_required: t.boolean(false),
+
+  /**
+   * 「 Workflow permissions 」。 job が `permissions` を宣言しなかったときに
+   * `GITHUB_TOKEN` が受け取る既定値。
+   *
+   * `read` にできるのは、 workflow 側が全て明示的に `permissions` を宣言して
+   * いる場合だけ。宣言の無い job はこの既定値をそのまま受け取るため、
+   * `write` のままだと「 branch の中身が何であれ書き込めるトークン」が
+   * 渡る。 .github/workflows/type-check.yml 冒頭の注記を参照。
+   */
+  default_workflow_permissions: t.enumType(['read', 'write'], {
+    typeName: 'DefaultWorkflowPermissions',
+    defaultValue: 'read',
+  }),
+
+  /**
+   * 「 Allow GitHub Actions to create and approve pull requests 」。
+   *
+   * `main` の ruleset は `required_approving_review_count` が 0 なので
+   * 承認そのものは merge 条件ではないが、 Actions に PR を作らせる必要が
+   * あるのは App token を使う workflow だけで、 `GITHUB_TOKEN` には要らない。
+   */
+  can_approve_pull_request_reviews: t.boolean(false),
 
   /**
    * 「 Approval for running fork pull request workflows from contributors 」。
