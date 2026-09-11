@@ -1,0 +1,35 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # `window.top` is [LegacyUnforgeable] in the HTML specification, which is why
+  # a framed page cannot be lied to about being framed.
+  - unforgeable
+  # Cross-Site Script Inclusion, one of the things the Fetch Metadata request
+  # headers guard against — and so one of the reasons the rules that rewrite
+  # them are scoped to sub-frames.
+  - XSSI
+  # What a renderer does with a page: turn it into pixels. The zoom mechanism
+  # turns on whether it happens again at the zoomed scale.
+  - rasterizes
+  # The three PNG chunk types the icon generator writes: the header, the
+  # compressed pixels, and the end marker.
+  - IHDR
+  - IDAT
+  - IEND
+  # `font-variant-numeric: tabular-nums`, so that the zoom percentage does not
+  # change width as it counts.
+  - nums
+  # "Not zoomed": what a pane is at 100%, which reads better than the
+  # alternatives when the point is that nothing has been done to it.
+  - unzoomed
+  # Plural of "navigation": a nested browsing context keeps its name across
+  # cross-origin navigations, which is what identifies a pane's frame.
+  - navigations
+  # "Cannot be put in a frame at all": the browser's own refusals, told apart
+  # from a site refusing to be framed, which is a different thing with a
+  # different answer.
+  - unframeable

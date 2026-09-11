@@ -77,9 +77,12 @@
     "prettier-plugin-packagejson",
   ],
 
-  // Invoked by `libs/synstate/scripts/cmd/generate-sample-diffs.mts`. A system
-  // binary, not something to install.
-  "ignoreBinaries": ["diff"],
+  // System binaries, not something to install:
+  // - `diff`, invoked by `libs/synstate/scripts/cmd/generate-sample-diffs.mts`.
+  // - `pass` and `openssl`, invoked by
+  //   `apps/split-view-extension/scripts/pack-crx.mts` — the signing key is
+  //   read out of `pass`, and `openssl` derives the extension id from it.
+  "ignoreBinaries": ["diff", "openssl", "pass"],
 
   "workspaces": {
     // The conformance corpus of the sumi language project. `fixtures/`
@@ -483,6 +486,22 @@
     // entry is the module `index.html` would load, as `event-schedule-app` is.
     "apps/lambda-calculus-interpreter-react": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Chrome extension, which
+    // has three entry points rather than one — the page the browser loads, the
+    // service worker the manifest names, and the content script injected into
+    // every pane.
+    "apps/split-view-extension": {
+      "entry": [
+        "src/main.tsx",
+        "src/background.mts",
+        "src/frame-agent.mts",
+        "configs/*.mts",
+        "scripts/**/*.mts",
+        "test/**/*.test.mts",
+      ],
       "project": ["**/*.{mts,tsx}"],
     },
 

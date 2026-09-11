@@ -5,9 +5,54 @@ tooling, and the Zenn articles published at <https://zenn.dev/noshiro_piko>.
 
 ## Setup
 
+**Node and pnpm come from the repository, not from your shell's defaults.**
+`tools/configs/node-support.json` is the single source of truth for the three
+Node versions that matter here, and `pnpm run check:root:node-support` is what
+keeps `engines.node`, `volta.node` and the compatibility matrix agreeing with
+it:
+
+| version           | what it is                                     |
+| :---------------- | :--------------------------------------------- |
+| `targets.current` | what a contributor builds on, and `volta.node` |
+| `targets.lts`     | what is tested                                 |
+| `targets.minimum` | the floor `engines.node` promises to consumers |
+
 ```sh
+# Node: whatever pins it for you, at the version volta.node names
+volta install node          # or: fnm use, nvm install, asdf …
+corepack enable             # pnpm, at the version packageManager names
+
 pnpm install
 ```
+
+`packageManager` in the root `package.json` pins pnpm exactly, so `corepack`
+is enough; installing pnpm globally works too as long as it satisfies
+`engines.pnpm`.
+
+Then, to check the checkout is sound:
+
+```sh
+pnpm run ws:build           # builds every package, in dependency order
+pnpm run ws:test
+```
+
+`pnpm run check-all` runs everything CI does, in the order CI needs it, and
+takes about fifteen minutes; the targeted commands under
+[Commands](#commands) are the quick versions.
+
+### What some packages need beyond that
+
+Nothing above needs anything installed outside the repository. A few packages
+do:
+
+| what                                    | for                                                                                    |
+| :-------------------------------------- | :------------------------------------------------------------------------------------- |
+| `pnpm exec playwright install chromium` | the Playwright suites under `apps/*/e2e`, and `apps/split-view-extension`'s smoke test |
+| `xvfb-run -a <command>`                 | those same suites on a machine with no display                                         |
+| `zip`, `openssl`, `pass`                | packaging and signing `apps/split-view-extension` for the Chrome Web Store             |
+
+Each package's own README says which of these it wants, and none of them is
+needed to build, test or lint.
 
 ## Structure
 
