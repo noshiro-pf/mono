@@ -1320,6 +1320,15 @@ So the field is either inert here or it changes how the repository installs.
       leaving the major alone, not by listing it in `ignoreDeps`.
     - `pnpm outdated --include-github-actions --latest` lists the majors that are
       waiting.
+- **`pnpm self-update` ignores `minimumReleaseAge` by design, and the next
+  pnpm command does not.** `self-update` only rewrites `packageManager`; the
+  pnpm that runs afterwards fetches that version through the registry under
+  the hold, so a release younger than seven days made `pnpm-update.yml` fail
+  daily with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` until it matured. The
+  workflow therefore picks the newest stable pnpm older than the hold itself
+  and passes it to `self-update`. Do not put `pnpm` in
+  `minimumReleaseAgeExclude` to get the same effect: it is the one package
+  that runs every install script in the tree.
 - Dependencies between packages in this repository always use the `workspace:`
   protocol — there is no dependency on a published copy of our own packages
   anywhere. For `dependencies` and `peerDependencies`, match the protocol to
