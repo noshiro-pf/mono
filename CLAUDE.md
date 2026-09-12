@@ -1027,6 +1027,39 @@ The check also fails on a changeset naming a package that does not exist:
     - Push to GitHub or remote repositories
     - Access `~/.ssh` or other sensitive directories
 
+## Security findings
+
+**This repository is public, and a finding about it is a reproduction.** What an
+investigation produces is not "here is a weak point" but "here is the order to
+do things in", and publishing that before the fix lands hands it over. So
+findings go in the private **`noshiro-pf/mono-security`**, and not in this
+repository's issues or pull requests.
+
+What that repository holds:
+
+- `reports/` — one file per investigation: the chain, the measurements, and the
+  reasons something is not yet fixed.
+- Issues — one finding each, carrying a `<!-- finding-key: … -->` header, with
+  issue #1 an audit log a routine appends to.
+- `scripts/` — the settings-drift check that runs against this repository. It
+  has no dependencies, deliberately: the job holds an App token that cannot be
+  made weaker, because `bypass_actors` and the merge-related settings are each
+  only returned to a caller with write access.
+
+**What may stay here is the fix.** A pull request that closes something can say
+what it closes and why the shape matters — the notes throughout this file do
+exactly that. What it should not do is read as a set of steps that works.
+
+**A public issue cannot be taken back.** Editing the body does not redact it:
+GitHub keeps the edit history and it is readable through GraphQL
+`userContentEdits`. The public events feed carries the body as written, and
+external archives ingest that feed hourly. Deleting the issue is the only
+removal, and it does not reach those archives. The decision is made when it is
+written, not afterwards.
+
+**Reports from outside come through private vulnerability reporting**, which is
+enabled on this repository — see `.github/SECURITY.md`. Not through an issue.
+
 ## Commit & Pull Request Guidelines
 
 ### Commit Messages
