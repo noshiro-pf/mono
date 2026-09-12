@@ -505,42 +505,70 @@ The file used to read `* @noshiro-pf`. That was harmless while the rule was
 off, and would have blocked every pull request in the repository the moment it
 was turned on.
 
-**An inline `run:` block in a privileged job is not a style choice.** Two steps
-here hold a GitHub App token by the time they run — `pnpm-update.yml`'s "Open
-auto-merge PR if anything changed" and `node-support-update.yml`'s "Open a pull
-request if anything changed" — and both are long enough to look like something
-that wants to be a `tools/scripts/cmd/*.mts`. Moving them there would hand them
-to the attacker they are written against.
+**A job that holds a key must not execute anything it reads out of the working
+tree.** That is the rule; "keep it inline" is a consequence of it and not the
+rule itself, which is worth stating because the inline form is easy to satisfy
+while missing the point — an inline `run:` that calls `node ./tools/x.mts` is
+exactly as exposed as a step that does.
 
-What a `run:` block runs is part of the workflow definition GitHub resolved for
-the event; on a `schedule` that is the default branch's file, and nothing on the
-runner can change it. What a `.mts` runs is read out of the checked-out working
-tree at the moment it is invoked — which is after `pnpm install` has executed
-every allowed install script in the dependency tree. In these two jobs the token
-is in the environment by then, so a dependency that rewrote the file would be
-running its own code holding it.
+The distinction is where the executed bytes come from. A `run:` block is part of
+the workflow definition GitHub resolved for the event — on a `schedule`, the
+default branch's file — and nothing on the runner can change it. A file in the
+working tree is read at the moment it is invoked, after third-party code has had
+a chance to rewrite it. `git` and `gh` are on the runner image, so a step built
+out of those two is reading nothing from the tree; that is why the token-holding
+step in `pnpm-update.yml` is made of them.
 
-The rule that follows: **a step that runs after a token is minted stays inline,
-and work that does not need the token belongs in a step before it**, where a
-`.mts` costs nothing and can be tested. `pnpm-update.yml` is arranged that way
-— the action pins and the changeset are each their own step ahead of
-`Generate Token`, which is what let both become files with tests — and the step
-that does hold the token is down to `git` and `gh`.
+**CODEOWNERS does not substitute for this.** It governs what gets merged, and
+the rewrite here is not a merge: a dependency writing over a file on the runner
+produces no commit, no pull request and no diff. `main` keeps the correct file
+while the copy being executed is something else.
 
-Two details that ordering brings with it:
+**`allowBuilds` does not either, and it is narrower than it looks.** It is an
+allowlist for the _install lifecycle scripts_ of dependencies — which is exactly
+what it claims and no more. It says nothing about the import-time code of every
+package the toolchain loads: `pnpm install`, `tsx`, `ws:build`, ESLint and Vitest
+all execute third-party modules, and a module runs its top level when it is
+imported. The wide door stays open by necessity; `allowBuilds` closes a narrow
+one.
 
+**Between steps, this can only be raised, not closed.** `$GITHUB_ENV` and
+`$GITHUB_PATH` are files whose paths are in the environment, and the runner
+applies what a step writes there to the steps that follow. A process spawned
+during `pnpm install` inherits that environment, so it can prepend a directory
+and decide what `git` or `gh` means two steps later. Ordering and inlining do
+not reach that.
+
+**What does close it is a separate job**, which gets a fresh runner, a fresh
+checkout and a fresh environment. `pnpm-update.yml` is split that way: `update`
+runs the dependency tree's code and holds no key, and `commit` holds the App
+token — the one with `workflows: write` — and installs nothing. What crosses
+between them is a patch, which `commit` applies rather than executes; a diff
+cannot express a `.git/hooks` entry or a `$GITHUB_PATH` line, and `git apply`
+refuses paths outside the work tree. The worst a tampered patch carries is
+content, which lands in a pull request where `.github/workflows/` is behind
+CODEOWNERS.
+
+`node-support-update.yml` has the same shape and has not been split. Its App
+token is `contents` + `pull-requests` and **not** `workflows`, so the branch it
+can write is one the `main` ruleset and CODEOWNERS already bound; split it when
+that stops being true.
+
+Three details that follow from the ordering:
+
+- **Work that does not need the token belongs in a step before it**, where a
+  `.mts` costs nothing and can be tested. The action pins and the changeset are
+  each their own step ahead of `Generate Token` for that reason.
 - **A step placed before `pnpm install` cannot use `pnpm run`.** `pnpm run`
   verifies the workspace's dependencies first and installs them when they are
   missing, which is the thing such a step exists to come before. Invoke the
-  script with `node` directly, and keep the `package.json` script as the local
-  entry point. This is why `mature-updates.mts` imports `node:*` alone.
-- **`git config core.hooksPath /dev/null` before committing.** An install
-  script can leave a `.git/hooks/pre-commit` behind, and `git commit` in the
-  token-holding step would run it with the key in scope. `pnpm-update.yml` and
-  `node-support-update.yml` both set it next to `user.name`.
+  script with `node` directly and keep the `package.json` script as the local
+  entry point — this is why `mature-updates.mts` imports `node:*` alone.
+- **`git config core.hooksPath /dev/null` before committing.** An install script
+  can leave a `.git/hooks/pre-commit` behind, and `git commit` would run it.
 
-The rest of the inline blocks cannot move for a different reason — they run
-with no checkout and no `pnpm install` at all, and a `.mts` needs both:
+Most of the remaining inline blocks cannot move at all, for an unrelated reason:
+they run with no checkout and no `pnpm install`, and a `.mts` needs both.
 
 - The five `*-result` aggregates boot a runner, read `needs.*.result` and echo.
 - `wip-label.yml` makes one API call, on every event, for every pull request.
