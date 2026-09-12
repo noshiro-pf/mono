@@ -1424,6 +1424,25 @@ So the field is either inert here or it changes how the repository installs.
       runners' IP range, is hit.
     - `pnpm outdated --include-github-actions --latest` still lists the majors
       that are waiting, and the script prints them on every run.
+- **An entry in `minimumReleaseAgeExclude` is a waiver, not a policy.** Write
+  the version as well as the name — `'@octokit/core@7.0.8'` — and leave
+  `minimumReleaseAgeExcludePrune` on, so the entry lasts exactly as long as it
+  is true. A bare name exempts a package for good and nothing notices when the
+  reason stops applying; **a glob never expires at all**, because pruning keeps
+  patterns by design. Measured on pnpm 12.3.4: pruning runs on `pnpm update`
+  rather than `pnpm install`, drops any entry the lockfile no longer resolves,
+  and keeps every pattern.
+    - **`@types/*` is deliberately not excluded.** "Type packages carry no
+      executable code" is true here, and what makes it true is `allowBuilds`
+      stopping install scripts and `.d.ts` never being executed — neither of
+      which this list checks. A type definition is never urgent, so the
+      exemption bought little and rested on an assumption nothing verifies.
+    - **Nor is anything this repository publishes.** The only place those come
+      from the registry is `verify-npm-packages/published/packages/*`, and
+      `verify-npm-packages.mts` writes each of those spaces a
+      `pnpm-workspace.yaml` carrying `minimumReleaseAge: 0`. It is gitignored
+      and generated at install time, so looking for it in the tree finds
+      nothing and invites the wrong conclusion.
 - **`pnpm self-update` ignores `minimumReleaseAge` by design, and the next
   pnpm command does not.** `self-update` only rewrites `packageManager`; the
   pnpm that runs afterwards fetches that version through the registry under
