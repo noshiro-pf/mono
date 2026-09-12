@@ -522,7 +522,22 @@ running its own code holding it.
 
 The rule that follows: **a step that runs after a token is minted stays inline,
 and work that does not need the token belongs in a step before it**, where a
-`.mts` costs nothing and can be tested.
+`.mts` costs nothing and can be tested. `pnpm-update.yml` is arranged that way
+— the action pins and the changeset are each their own step ahead of
+`Generate Token`, which is what let both become files with tests — and the step
+that does hold the token is down to `git` and `gh`.
+
+Two details that ordering brings with it:
+
+- **A step placed before `pnpm install` cannot use `pnpm run`.** `pnpm run`
+  verifies the workspace's dependencies first and installs them when they are
+  missing, which is the thing such a step exists to come before. Invoke the
+  script with `node` directly, and keep the `package.json` script as the local
+  entry point. This is why `mature-updates.mts` imports `node:*` alone.
+- **`git config core.hooksPath /dev/null` before committing.** An install
+  script can leave a `.git/hooks/pre-commit` behind, and `git commit` in the
+  token-holding step would run it with the key in scope. `pnpm-update.yml` and
+  `node-support-update.yml` both set it next to `user.name`.
 
 The rest of the inline blocks cannot move for a different reason — they run
 with no checkout and no `pnpm install` at all, and a `.mts` needs both:

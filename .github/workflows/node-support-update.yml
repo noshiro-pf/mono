@@ -210,6 +210,13 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
+          # No hooks. `pnpm install` above ran the dependency tree's lifecycle
+          # scripts, and one of them can leave a `.git/hooks/pre-commit` behind
+          # — which `git commit` would then run, here, with the App token
+          # already in this step's environment. Set for the rest of the step
+          # rather than per command, so a `git` added later is covered too.
+          git config core.hooksPath /dev/null
+
           # A fixed branch name rebuilt from main every run, as in
           # pnpm-update.yml: one open pull request at a time, always rebased,
           # never a stale one left beside the new one.
