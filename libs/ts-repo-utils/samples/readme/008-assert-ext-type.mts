@@ -1,8 +1,8 @@
 type CheckExtConfig = Readonly<{
   directories: readonly Readonly<{
     path: string; // Directory path to check
-    extension: string; // Expected file extension (including the dot)
-    ignorePatterns?: readonly string[]; // Optional glob patterns to ignore
+    extension: `.${string}` | readonly `.${string}`[]; // Expected file extension(s) (including the dot)
+    ignorePatterns?: readonly string[]; // Optional glob patterns to ignore (default: ['tsconfig.json'])
   }>[];
 }>;
 

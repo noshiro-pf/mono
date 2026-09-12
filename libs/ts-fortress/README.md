@@ -4,7 +4,7 @@ TypeScript-first schema validation library with static type inference.
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/ts-fortress/>
+- API reference: <https://noshiro-pf.github.io/mono/ts-fortress/>
 
 [![npm version](https://img.shields.io/npm/v/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
 [![npm downloads](https://img.shields.io/npm/dm/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
@@ -273,7 +273,7 @@ const Slug = t.string('feature-flag', {
     regex: /^[a-z-]+$/u,
 });
 
-Slug.is('feature-beta'); // true
+Slug.is('feature-new-flag'); // true
 
 Slug.is('Feature-Flag'); // false (fails regex)
 
@@ -322,7 +322,7 @@ Numeric constraints cover:
 ```tsx
 import * as t from 'ts-fortress';
 
-const PermissionsMask = t.bigint(0b11_1111n, {
+const PermissionsMask = t.bigint(0b11_1100n, {
     gte: 0n,
     lte: (1n << 6n) - 1n,
     multipleOf: 1n << 2n,
@@ -409,7 +409,7 @@ type User = t.TypeOf<typeof User>;
 
 Key differences:
 
-- **Default values**: ts-fortress types are functions to allow for explicit default values ​​etc.
+- **Default values**: ts-fortress types are functions to allow for explicit default values, etc.
 - **Naming**: `record` instead of `type`, more explicit function names
 - **Error handling**: `Result` type instead of `Either`
 
@@ -455,10 +455,10 @@ const result = User.validate(validData);
 
 assert.isTrue(t.Result.isOk(result));
 
-// In strip mode (default), a new object is created even without excess properties
+// A valid input is returned as is (the same reference)
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
 
-assert.notStrictEqual(result.value, validData);
+assert.strictEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;
@@ -954,7 +954,7 @@ const DiceRoll2 = t.uintRangeInclusive(1, 6, { defaultValue: 1 }); // integers f
 type DiceRoll2 = t.TypeOf<typeof DiceRoll2>; // 1 | 2 | 3 | 4 | 5 | 6
 ```
 
-Tips: It is often better to use `uintRange` instead of `enumType` when possible, because `enumType` stores a Set of the sizes of its members as data, while `uintRange` only stores the range, resulting in smaller memory usage.
+Tips: It is often better to use `uintRange` instead of `enumType` when possible, because `enumType` stores a Set of its members as data, while `uintRange` only stores the range, resulting in smaller memory usage.
 
 ## Error Handling
 
@@ -1057,8 +1057,8 @@ type ValidationError = Readonly<{
     path: readonly string[];
     actualValue: unknown; // The actual value that failed validation
     expectedType: string; // The expected type or constraint
-    message: string | undefined; // Optional custom error message
     typeName: string; // Name of the type being validated
+    details?: ValidationErrorDetails | undefined; // Structured information used to build a descriptive message
 }>;
 ```
 
@@ -1085,8 +1085,8 @@ type ValidationError = Readonly<{
 ### Objects
 
 - `t.record(schema, options?)` - Object validation
-    - `options.allowExcessProperties?: boolean` - Allow properties not defined in schema (default: true)
-- `t.strictRecord(schema, options?)` - Object validation with strict mode (alias for `record` with `allowExcessProperties: false`)
+    - `options.excessProperty?: 'allow' | 'reject'` - How properties not defined in the schema are handled (default: `'allow'`)
+- `t.strictRecord(schema, options?)` - Object validation with strict mode (alias for `record` with `excessProperty: 'reject'`)
 - `t.keyValueRecord(keyType, valueType)` - Corresponding to the `Record<K, V>` type
 - `t.partial(recordType)` - Make all fields optional
 - `t.optional(type)` - Optional field wrapper
@@ -1120,18 +1120,18 @@ type ValidationError = Readonly<{
 - `t.intRange(start, end, { defaultValue? })` - Integer range validation (`end` is exclusive)
 - `t.uintRangeInclusive(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is inclusive)
 - `t.intRangeInclusive(start, end, { defaultValue? })` - Integer range validation (`end` is inclusive)
-- `t.unknown` - Unknown Type
+- `t.unknown()` - Unknown Type
 - `t.recursion(typeName, definition)` - Define recursive type
 
 ### Pre-defined types
 
-- `t.int8` / `t.uint8` - Int8 / Uint8
+- `t.int8()` / `t.uint8()` - Int8 / Uint8
 - `t.JsonValue` / `t.JsonPrimitive` / `t.JsonObject`
 - `t.nullable(T)` - An alias of `t.union([T, t.undefinedType])`
 
 ## Contributing
 
-We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md) for details.
+We welcome contributions! Please open an issue or a pull request in the [noshiro-pf/mono](https://github.com/noshiro-pf/mono) repository.
 
 ## License
 

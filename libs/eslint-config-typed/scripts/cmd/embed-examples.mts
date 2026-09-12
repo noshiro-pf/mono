@@ -25,6 +25,8 @@ const documents = [
       'target-specific-files.mts',
       'common-issues-tsconfig-path.mts',
       'common-issues-package-dirs.mts',
+      'import-x-no-unused-modules-eslintrc.cjs',
+      'import-x-no-unused-modules-flat-config.mts',
     ],
   },
 ] as const;

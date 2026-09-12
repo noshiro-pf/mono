@@ -9,10 +9,18 @@
     // `prepare` script writes do nothing without it. Set per package while the
     // repository migrates one at a time; it moves to the shared config once
     // every package passes. See docs/strict-typescript-lib-integration.md.
-    "libReplacement": true
+    "libReplacement": true,
+
+    // `samples/` imports this package by its own name, the way a consumer
+    // does, and is embedded into the README verbatim. Mapped to the source so
+    // that a sample is checked against the code being edited rather than
+    // against the last build. See docs/workspace-package-linking.md.
+    "paths": {
+      "eslint-plugin-ts-std-forge": ["./src/index.mts"]
+    }
   },
   // `./test` holds only `strict-lib-active.mts`, the probe that fails when the
   // replacement above stops happening. It is not published — `files` lists
   // `src` and `dist`.
-  "include": ["./src", "./test", "./scripts", "./configs"]
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
 }

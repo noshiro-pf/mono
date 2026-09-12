@@ -20,7 +20,7 @@ export default Arr.toPushed(
       'no-restricted-globals': 'error',
       // ~~~~~~~~~~~~~~~~~~~~
       // ^ Type Error! (Because "no-restricted-globals" has options)
-      // NOTE: In addition, some rules, such as "no-restricted-syntax" "and no-restricted-globals", have no effect unless you set the option.
+      // NOTE: In addition, some rules, such as "no-restricted-syntax" and "no-restricted-globals", have no effect unless you set the option.
 
       // OK
       'object-shorthand': withDefaultOption('error'),

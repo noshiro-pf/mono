@@ -1,8 +1,9 @@
 # eslint-plugin-ts-fortress
 
 ESLint rules that steer schema definitions toward
-[`ts-fortress`](https://www.npmjs.com/package/ts-fortress) idioms. Every rule is
-auto-fixable, and every rewrite is **type-preserving**.
+[`ts-fortress`](https://www.npmjs.com/package/ts-fortress) idioms. Every rule except
+`prefer-schema-over-guard-chain` (which only reports) is auto-fixable, and every
+rewrite is **type-preserving**.
 
 ## Installation
 
@@ -93,12 +94,12 @@ import * as t from 'ts-fortress';
 // ❌
 const Tags = t.minLengthArray(1, t.string());
 const Rgb = t.boundedLengthTuple(3, 3, t.number());
-const Page = t.boundedLengthTuple(0, 20, t.string());
+const Page = t.boundedLengthTuple(0, 10, t.string());
 
 // ✅
 const Tags = t.nonEmptyArray(t.string());
 const Rgb = t.fixedLengthTuple(3, t.number());
-const Page = t.maxLengthTuple(20, t.string());
+const Page = t.maxLengthTuple(10, t.string());
 ```
 
 Each rewrite keeps the accepted values, the `defaultValue`, and the options
@@ -265,8 +266,8 @@ almost all of what a function-scoped count reports.
 'ts-fortress/prefer-schema-over-guard-chain': ['error', { threshold: 4 }],
 ```
 
-- `threshold` (default `5`) — how many guards on one value a single chain may
-  contain before it is reported.
+- `threshold` (default `5`) — the number of guards on one value at which a
+  single chain is reported.
 - `guards` (default: the `ts-data-forge` narrowing helpers — `hasKey`,
   `isRecord`, `isString`, `isNumber`, `isBoolean`, `isBigint`, `isSymbol`,
   `isArray`, `isNonEmpty`, `isNonNullish`, `isNotNull`, `isNotUndefined`,

@@ -64,6 +64,16 @@ export default [
     }),
   },
 
+  {
+    // `samples/readme/` is embedded into the README by `pnpm run doc:embed`.
+    // A flat config's `export default` is what the README documents.
+    files: ['samples/**'],
+    rules: defineKnownRules({
+      'import-x/no-default-export': 'off',
+      'import-x/no-anonymous-default-export': 'off',
+    }),
+  },
+
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],

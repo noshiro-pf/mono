@@ -28,11 +28,13 @@ export type EmbedExamplesInMarkdownOptions = Readonly<{
 }>;
 
 /**
- * Embeds sample code into the ```ts / ```tsx / ```js fences of markdown
+ * Embeds sample code into the JavaScript / TypeScript fences of markdown
  * documents — a package's README, usually, from its `samples/readme`.
  *
- * A package's `scripts/cmd/embed-examples.mts` is the mapping and nothing
- * else; this is the code that was copied into all thirteen of them.
+ * Every such fence has to be backed by a sample; see
+ * {@link fenceStartRegex} for what counts as one. A package's
+ * `scripts/cmd/embed-examples.mts` is the mapping and nothing else; this is
+ * the code that was copied into all thirteen of them.
  */
 export const embedExamplesInMarkdown = async ({
   documents,
@@ -43,73 +45,35 @@ export const embedExamplesInMarkdown = async ({
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
-      const codeBlockCount = (
-        markdownContent.match(codeBlockStartRegexGlobal) ?? []
-      ).length;
-
-      if (codeBlockCount !== sampleCodeFiles.length) {
-        return Result.err(
-          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} code blocks but expected ${sampleCodeFiles.length} sample files`,
-        );
-      }
-
-      const mut_results: string[] = [];
-
-      let mut_rest: string = markdownContent;
-
-      for (const sampleCodeFile of sampleCodeFiles) {
-        const samplePath = path.resolve(samplesDir, sampleCodeFile);
-
-        // Read sample content
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const sampleContent = await fs.readFile(samplePath, 'utf8');
-
-        const sampleContentSliced = extractSampleCode(sampleContent, {
-          stripTransformerDirectives,
-        });
-
-        // Find the next code block (line-start anchor avoids nested fences)
-        const match = codeBlockStartRegex.exec(mut_rest);
-
-        if (match === null) {
-          return Result.err(
-            `❌ Opening code fence (\`\`\`ts, \`\`\`tsx, or \`\`\`js) not found for ${sampleCodeFile}`,
+      const samples = await Promise.all(
+        sampleCodeFiles.map(async (sampleCodeFile) => {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          const sampleContent = await fs.readFile(
+            path.resolve(samplesDir, sampleCodeFile),
+            'utf8',
           );
-        }
 
-        const codeBlockStartIndex = match.index;
+          return {
+            name: sampleCodeFile,
+            code: extractSampleCode(sampleContent, {
+              stripTransformerDirectives,
+            }),
+          } as const;
+        }),
+      );
 
-        const codeBlockStart = match[0];
+      const embedded = embedSamplesIntoMarkdown(markdownContent, samples);
 
-        const codeBlockEndIndex = mut_rest.indexOf(
-          codeBlockEnd,
-          codeBlockStartIndex + codeBlockStart.length,
-        );
-
-        if (codeBlockEndIndex === -1) {
-          return Result.err(`❌ codeBlockEnd not found for ${sampleCodeFile}`);
-        }
-
-        // Replace the code block content
-        const beforeBlock = mut_rest.slice(
-          0,
-          Math.max(0, codeBlockStartIndex + codeBlockStart.length),
-        );
-
-        const afterBlock = mut_rest.slice(Math.max(0, codeBlockEndIndex));
-
-        mut_results.push(beforeBlock, sampleContentSliced);
-
-        mut_rest = afterBlock;
-
-        console.info(`✓ Updated code block for ${sampleCodeFile}`);
+      if (Result.isErr(embedded)) {
+        return Result.err(`❌ ${mdPath}: ${embedded.value}`);
       }
 
-      mut_results.push(mut_rest);
+      for (const { name } of samples) {
+        console.info(`✓ Updated code block for ${name}`);
+      }
 
-      // Write updated markdown
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(mdPath, mut_results.join('\n'), 'utf8');
+      await fs.writeFile(mdPath, embedded.value, 'utf8');
 
       await formatFiles([mdPath]);
     }
@@ -120,22 +84,105 @@ export const embedExamplesInMarkdown = async ({
   }
 };
 
-const codeBlockEnd = '```';
+/**
+ * Replaces the body of every sample-backed fence in `markdown`, in order, with
+ * the corresponding sample.
+ *
+ * A fence nested in a list item keeps its indentation: the sample is indented
+ * to the column of the opening fence, which is what markdown needs to keep the
+ * block inside the item.
+ */
+export const embedSamplesIntoMarkdown = (
+  markdown: string,
+  samples: readonly Readonly<{ name: string; code: string }>[],
+): Result<string, string> => {
+  const fenceCount = countSampleBackedFences(markdown);
+
+  if (fenceCount !== samples.length) {
+    return Result.err(
+      `Code block count mismatch: found ${fenceCount} JavaScript / TypeScript code blocks but expected ${samples.length} sample files`,
+    );
+  }
+
+  const mut_results: string[] = [];
+
+  let mut_rest: string = markdown;
+
+  for (const { name, code } of samples) {
+    const match = fenceStartRegex.exec(mut_rest);
+
+    if (match === null) {
+      return Result.err(`Opening code fence not found for ${name}`);
+    }
+
+    const indent = match[1] ?? '';
+
+    const bodyStartIndex = match.index + match[0].length;
+
+    const closing = fenceEndRegex.exec(mut_rest.slice(bodyStartIndex));
+
+    if (closing === null) {
+      return Result.err(`Closing code fence not found for ${name}`);
+    }
+
+    // `fenceEndRegex` matches from the line break before the closing fence, so
+    // the rest keeps the fence's own indentation.
+    const closingLineStartIndex = bodyStartIndex + closing.index + 1;
+
+    mut_results.push(
+      mut_rest.slice(0, bodyStartIndex),
+      indentLines(code, indent),
+    );
+
+    mut_rest = mut_rest.slice(closingLineStartIndex);
+  }
+
+  mut_results.push(mut_rest);
+
+  return Result.ok(mut_results.join('\n'));
+};
 
 /**
- * Matches the start of an opening code fence whose language tag is exactly
- * `ts`, `tsx`, or `js`. The `(?=\s|$)` lookahead requires the tag to be followed
- * by whitespace or end-of-line, so tags like `jsx`, `typescript`, or
- * `ts-ignore` are not matched. Only the fence prefix (backticks + tag) is
- * matched; any trailing info string is not part of the match.
+ * Number of fences in `markdown` that must be backed by a sample, at any
+ * indentation.
  */
-const codeBlockStartRegex = /^```(?:tsx|ts|js)(?=\s|$)/mu;
+export const countSampleBackedFences = (markdown: string): number =>
+  Array.from(markdown.matchAll(fenceStartRegexGlobal)).length;
 
 /**
- * Global counterpart of {@link codeBlockStartRegex} for counting all fences. The
- * flags are derived from `codeBlockStartRegex` (plus `g`) so the two cannot drift.
+ * Matches the opening fence of a sample-backed block, capturing its
+ * indentation.
+ *
+ * Every spelling of JavaScript and TypeScript is listed, not just the `ts` /
+ * `tsx` / `js` the embedder once matched, and a fence nested in a list item
+ * counts too: a fence tagged `typescript` used to be skipped, so it was
+ * hand-written, never type-checked, and free to call functions that do not
+ * exist — which is exactly what one in `ts-type-forge`'s README did.
+ *
+ * The `(?=\s|$)` lookahead requires the tag to be followed by whitespace or
+ * end-of-line, so a tag such as `ts-ignore` does not match. Only the fence
+ * prefix (indentation, backticks and tag) is matched; any trailing info string
+ * is not part of the match.
  */
-const codeBlockStartRegexGlobal = new RegExp(
-  codeBlockStartRegex,
-  `${codeBlockStartRegex.flags.replace('g', '')}g`,
+const fenceStartRegex =
+  /^([ \t]*)```(?:ts|tsx|mts|cts|typescript|js|jsx|mjs|cjs|javascript)(?=\s|$)/mu;
+
+/**
+ * Global counterpart of {@link fenceStartRegex} for counting all fences. The
+ * flags are derived from `fenceStartRegex` (plus `g`) so the two cannot drift.
+ */
+const fenceStartRegexGlobal = new RegExp(
+  fenceStartRegex,
+  `${fenceStartRegex.flags.replace('g', '')}g`,
 );
+
+/** The line break before a closing fence, at any indentation. */
+const fenceEndRegex = /\n[ \t]*```/u;
+
+const indentLines = (code: string, indent: string): string =>
+  indent === ''
+    ? code
+    : code
+        .split('\n')
+        .map((line) => (line.trim() === '' ? '' : `${indent}${line}`))
+        .join('\n');
