@@ -1,6 +1,6 @@
 name: WIP Label
 
-# `[WIP]` on a pull request skips the five check workflows and the two lint
+# `[WIP]` on a pull request skips the four check workflows and the two lint
 # jobs — see the note in type-check.yml. GitHub has no label-based merge
 # block, so on its own the label would leave a pull request that nothing
 # checked looking exactly like one that passed. This is the block: a required
