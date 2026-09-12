@@ -1,4 +1,4 @@
-import { splitViewPagePath, workspaceQueryParam } from '../shared/index.mjs';
+import { workspaceQueryParam } from '../shared/index.mjs';
 
 // See the note in `frame-agent.mts`: neither `window.history`,
 // `globalThis.history` nor a bare `history` satisfies the lint rules together.
@@ -45,15 +45,4 @@ export const putWorkspaceIdInUrl = (
   } else {
     browserHistory.replaceState(undefined, '', url);
   }
-};
-
-/** Opens a workspace in a tab of its own. */
-export const openWorkspaceInNewTab = async (
-  workspaceId: string,
-): Promise<void> => {
-  const url = new URL(chrome.runtime.getURL(splitViewPagePath));
-
-  url.searchParams.set(workspaceQueryParam, workspaceId);
-
-  await chrome.tabs.create({ url: url.href });
 };

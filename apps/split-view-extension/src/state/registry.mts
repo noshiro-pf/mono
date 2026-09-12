@@ -19,6 +19,16 @@ export type WorkspaceEntry = Readonly<{
   name: string;
 
   createdAt: number;
+
+  /**
+   * Whether the tab this split view was last seen in was pinned.
+   *
+   * Part of what "open every split view" restores, so that a pinned row of
+   * split views comes back pinned. It is noticed rather than set: the page
+   * reads its own tab whenever it is looked at, which is also when a tab that
+   * has just been pinned is about to be left alone.
+   */
+  pinned: boolean;
 }>;
 
 /**
@@ -60,6 +70,34 @@ export const addWorkspaceEntry = (
         ...registry,
         entries: Arr.toPushed(registry.entries, entry),
       } as const);
+
+/**
+ * Records whether the tab a workspace is shown in is pinned.
+ *
+ * Identity-preserving, because this is called every time the page is looked at
+ * and the answer is almost always the one already stored — and a registry
+ * written back is a registry every other tab is told about.
+ */
+export const setWorkspaceEntryPinned = (
+  registry: WorkspaceRegistry,
+  workspaceId: string,
+  pinned: boolean,
+): WorkspaceRegistry => {
+  const entry = registry.entries.find(
+    (candidate) => candidate.id === workspaceId,
+  );
+
+  if (entry === undefined || entry.pinned === pinned) {
+    return registry;
+  }
+
+  return {
+    ...registry,
+    entries: registry.entries.map((candidate) =>
+      candidate.id === workspaceId ? { ...candidate, pinned } : candidate,
+    ),
+  } as const;
+};
 
 /**
  * Drops an entry. The caller is left to decide what to show instead — see
@@ -224,6 +262,7 @@ export const registryFromStoredWorkspaces = (
       id: entry.id,
       name: `split-view-${String(index + 1)}`,
       createdAt: entry.savedAt,
+      pinned: false,
     })),
     activeId: ordered[0]?.id,
   };
@@ -274,6 +313,7 @@ export const resolveWorkspace = async (
           id: fromUrl,
           name: nextWorkspaceName(loaded),
           createdAt: now,
+          pinned: false,
         });
 
   const withFirstEntry = Arr.isNonEmpty(withUrlEntry.entries)
@@ -282,6 +322,7 @@ export const resolveWorkspace = async (
         id: defaultWorkspaceId,
         name: nextWorkspaceName(withUrlEntry),
         createdAt: now,
+        pinned: false,
       });
 
   const workspaceId =
@@ -399,6 +440,7 @@ const parseWorkspaceEntry = (value: unknown): WorkspaceEntry | undefined => {
       hasKey(value, 'createdAt') && typeof value.createdAt === 'number'
         ? value.createdAt
         : 0,
+    pinned: hasKey(value, 'pinned') && value.pinned === true,
   };
 };
 

@@ -25,6 +25,7 @@ import {
   ensureHeaderRule,
   ensureInitiatorRule,
   readRuleDiagnostics,
+  recordOpenSplitViewTab,
   splitViewTabIdSessionKey,
   workspacePositionFromCode,
   workspaceShortcutCodeOf,
@@ -35,6 +36,7 @@ import {
   activateWorkspaceEntry,
   addWorkspaceEntry,
   applyTabIdentity,
+  describeOpenedWorkspaces,
   downloadJsonFile,
   emptyWorkspaceRegistry,
   exportWorkspacesAsJson,
@@ -44,6 +46,7 @@ import {
   loadWorkspaceState,
   moveWorkspaceEntry,
   nextWorkspaceName,
+  openEveryWorkspaceInTabs,
   openWorkspaceInNewTab,
   pruneUnlistedWorkspaces,
   putWorkspaceIdInUrl,
@@ -55,6 +58,7 @@ import {
   saveWorkspaceRegistry,
   saveWorkspaceState,
   setServiceWorkerResetOrigin,
+  setWorkspaceEntryPinned,
   watchWorkspaceRegistry,
   workspaceAtPosition,
   workspaceEntryOf,
@@ -73,6 +77,15 @@ const saveDebounceMs = 250;
 
 /** How long an import's report stays in the workspace bar. */
 const noticeMs = 6000;
+
+/**
+ * How often a tab asks the browser about itself when nothing has happened.
+ *
+ * Slow: what it is looking for is a pin, which is a thing the user does once
+ * and then leaves, and the answer is only read when the split views are opened
+ * again. One `chrome.tabs.getCurrent` and one read of session storage.
+ */
+const tabNoteIntervalMs = 30_000;
 
 /**
  * The workspace this tab is showing, and its layout, as one value.
@@ -243,6 +256,40 @@ export const App = memoNamed('App', () => {
     );
   }, []);
 
+  /**
+   * Records what this tab is, for "open every split view" to read back: which
+   * workspace it is showing, and whether it is pinned.
+   *
+   * Called when the workspace changes and whenever the tab is looked at or
+   * left, because there is no event for a tab being pinned — and pinning one is
+   * something done just before looking at another. `chrome.tabs.getCurrent`
+   * needs no permission for this much: `pinned` is not one of the fields the
+   * `tabs` permission guards, which are the URL, the title and the icon.
+   */
+  const noteThisTab = React.useCallback(async (): Promise<void> => {
+    const { workspaceId } = mut_liveSession.current;
+
+    if (workspaceId === undefined) {
+      return;
+    }
+
+    const tab = await chrome.tabs.getCurrent();
+
+    if (tab?.id === undefined) {
+      return;
+    }
+
+    await recordOpenSplitViewTab(tab.id, workspaceId);
+
+    commitRegistry(
+      setWorkspaceEntryPinned(
+        mut_liveRegistry.current,
+        workspaceId,
+        tab.pinned,
+      ),
+    );
+  }, [commitRegistry]);
+
   const handleRequestHostAccess = React.useCallback((): void => {
     const request = async (): Promise<void> => {
       // Withheld host permissions can be asked for again, from a user gesture.
@@ -380,6 +427,7 @@ export const App = memoNamed('App', () => {
         id: workspaceId,
         name: nextWorkspaceName(mut_liveRegistry.current),
         createdAt: Date.now(),
+        pinned: false,
       }),
     );
 
@@ -404,6 +452,27 @@ export const App = memoNamed('App', () => {
     },
     [],
   );
+
+  const handleOpenAllWorkspaces = React.useCallback((): void => {
+    const openAll = async (): Promise<void> => {
+      // As above: what is on screen is written first, so that the tab opened on
+      // this workspace — if this one is not the tab it ends up in — starts from
+      // what is on screen rather than from the last save.
+      const live = mut_liveSession.current;
+
+      if (live.workspaceId !== undefined) {
+        await saveWorkspaceState(live.workspaceId, live.state);
+      }
+
+      setNotice(
+        describeOpenedWorkspaces(
+          await openEveryWorkspaceInTabs(mut_liveRegistry.current.entries),
+        ),
+      );
+    };
+
+    openAll().catch(console.error);
+  }, []);
 
   const handleRenameWorkspace = React.useCallback(
     (workspaceId: string, workspaceName: string): void => {
@@ -454,6 +523,7 @@ export const App = memoNamed('App', () => {
               id: replacement,
               name: nextWorkspaceName(without),
               createdAt: Date.now(),
+              pinned: false,
             }),
           );
 
@@ -642,6 +712,41 @@ export const App = memoNamed('App', () => {
       applyTabIdentity(position, entry.name);
     }
   }, [registry, session.workspaceId]);
+
+  /**
+   * When the tab's own notes are taken.
+   *
+   * There is no event for a tab being pinned that the page in it can hear, and
+   * the one the browser does offer — `chrome.tabs.onUpdated` — wakes the
+   * service worker for every navigation, title and icon change in every tab in
+   * the browser, which is a great deal of waking for a flag that matters when
+   * the browser closes. So the page asks about itself at the moments a pin is
+   * likely to have just happened: pinning a tab is done in the tab strip, which
+   * takes the focus off the page, and a tab that has been pinned is usually
+   * then left alone. The timer is the backstop for the rest — the focus can be
+   * inside a pane, where neither event reaches this page.
+   */
+  React.useEffect(() => {
+    const note = (): void => {
+      noteThisTab().catch(console.error);
+    };
+
+    note();
+
+    addEventListener('visibilitychange', note);
+
+    addEventListener('blur', note);
+
+    const timer = setInterval(note, tabNoteIntervalMs);
+
+    return () => {
+      removeEventListener('visibilitychange', note);
+
+      removeEventListener('blur', note);
+
+      clearInterval(timer);
+    };
+  }, [noteThisTab, session.workspaceId]);
 
   // Coming back to the tab is the moment a discarded-and-restored tab id would
   // have changed under us.
@@ -948,6 +1053,7 @@ export const App = memoNamed('App', () => {
           onExport={handleExportWorkspaces}
           onImport={handleImportWorkspaces}
           onMove={handleMoveWorkspace}
+          onOpenAll={handleOpenAllWorkspaces}
           onOpenInNewTab={handleOpenWorkspaceInNewTab}
           onRemove={handleRemoveWorkspace}
           onRename={handleRenameWorkspace}

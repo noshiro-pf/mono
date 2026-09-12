@@ -479,6 +479,88 @@ const main = async (): Promise<void> => {
       })
       .catch(() => '');
 
+    // --- opening every saved split view at once -------------------------
+    // Still in the popover. Two are saved and one of them is open here, so
+    // this should open exactly one tab.
+    await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+    await page.waitForTimeout(2000);
+
+    const tabsAfterOpenAll = context.pages().length;
+
+    const otherTab = context.pages().find((tab) => tab !== page);
+
+    const otherTabUrl = otherTab?.url() ?? '';
+
+    // Pressing it again opens nothing: two tabs on one workspace are two tabs
+    // saving one layout over each other.
+    await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+    await page.waitForTimeout(2000);
+
+    const tabsAfterOpeningTwice = context.pages().length;
+
+    const openAllNotice = await page
+      .locator('.workspace-popover__notice')
+      .innerText();
+
+    // And a split view last seen in a pinned tab comes back pinned. Pinning is
+    // noticed when the tab is left, which is when it is about to matter.
+    const otherTabId = await otherTab?.evaluate(async () => {
+      const own = await chrome.tabs.getCurrent();
+
+      return own?.id;
+    });
+
+    if (otherTab !== undefined && otherTabId !== undefined) {
+      await otherTab.evaluate(
+        async ([tabId]) => {
+          await chrome.tabs.update(tabId, { pinned: true });
+        },
+        [otherTabId],
+      );
+
+      // A load is one of the moments a tab takes notes about itself, and the
+      // only one this harness can produce: a background tab goes on reporting
+      // itself as visible here, so nothing can be made of the events a real
+      // browser would send. It is also what Chrome does to a pinned tab it
+      // restores at startup.
+      await otherTab.reload();
+
+      await otherTab.waitForSelector('.pane', { timeout: 10_000 });
+
+      await page.waitForTimeout(1000);
+
+      await otherTab.close();
+
+      await page.waitForTimeout(500);
+
+      await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+      await page.waitForTimeout(2000);
+    }
+
+    const reopenedPinned =
+      (await context
+        .pages()
+        .find((tab) => tab !== page)
+        ?.evaluate(async () => {
+          const own = await chrome.tabs.getCurrent();
+
+          return own?.pinned;
+        })) ?? false;
+
+    // Back to one tab: the next thing this does is delete a workspace, and a
+    // second tab open on one is a second opinion about what is saved.
+    await Promise.all(
+      context
+        .pages()
+        .filter((tab) => tab !== page)
+        .map(async (tab) => tab.close()),
+    );
+
+    await page.waitForTimeout(500);
+
     // The popover is still open from the rename — `✎` toggles, so clicking it
     // again would close it.
     await page
@@ -795,6 +877,21 @@ const main = async (): Promise<void> => {
         'renaming reaches the picker and the tab title',
         renamedOption.includes('検証') && renamedTitle === '2: 検証',
         `${renamedOption} / ${renamedTitle}`,
+      ),
+      check(
+        'opening every split view gives a tab to the one not open',
+        tabsAfterOpenAll === 2 && otherTabUrl.includes('ws='),
+        `${String(tabsAfterOpenAll)} tabs / ${otherTabUrl.slice(-24)}`,
+      ),
+      check(
+        'and asking again opens nothing, saying so instead',
+        tabsAfterOpeningTwice === 2 && openAllNotice.includes('already open'),
+        `${String(tabsAfterOpeningTwice)} tabs / ${openAllNotice}`,
+      ),
+      check(
+        'a split view last seen in a pinned tab comes back pinned',
+        reopenedPinned,
+        '',
       ),
       check(
         'the export writes a backup of every saved split view',

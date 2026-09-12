@@ -127,6 +127,19 @@ browser — `xvfb-run -a pnpm run smoke` where there is no display.
   the number in the favicon — so reordering is how a split view is given a
   shorter shortcut. Deleting takes the layout with it, and needs a second
   click.
+- **`↗ Open all` opens every saved split view, each in a tab of its own** —
+  what to press after a browser restart that did not restore the tabs. The ones
+  already open in a tab are left where they are, because two tabs on one split
+  view both save its layout and the one closed last writes over the other's
+  work; the popover says how many it opened and how many were already there.
+    - **One last seen in a pinned tab comes back pinned.** No event a page can
+      hear says that its own tab has been pinned, and the one the browser does
+      offer — `chrome.tabs.onUpdated` — wakes the service worker for every
+      navigation, title and icon change in every tab there is. So the page asks
+      about itself instead, at the moments a pin has probably just happened:
+      when it loads, when the focus leaves it (pinning is done in the tab
+      strip), when it is switched away from, and every 30 seconds otherwise. A
+      tab pinned and closed in the same breath comes back unpinned.
 - **`Export` / `Import` are the way across an extension id that changed** —
   see "The list, and what it is keyed to" below.
 - The toolbar button opens the split view you had last, or focuses the tab if

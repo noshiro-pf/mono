@@ -45,6 +45,10 @@ navigated to.
 • Keep as many split views as you like. The select at the left of the toolbar
   lists them, Alt+1 to Alt+9 switch between them, and each is saved under its
   own name. Export the lot to JSON and import it back on another machine.
+• Open every saved split view at once, each in a tab of its own — what to press
+  after a restart that did not bring the tabs back. Anything already open is
+  left where it is, and a split view last seen in a pinned tab comes back
+  pinned.
 
 Worth knowing before you install:
 
