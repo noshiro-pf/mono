@@ -125,20 +125,34 @@ jobs:
       - name: Update pnpm itself
         run: node ./tools/scripts/cmd/mature-updates.mts pnpm
 
+      # Before the install, not after, and a step of its own — both for the
+      # same reason. `pnpm install` below runs the dependency tree's lifecycle
+      # scripts, and what this step executes is a file in the working tree
+      # (`mature-updates.mts`, through `pnpm run`), which those scripts can
+      # rewrite. Running it first means the file this step executes is still
+      # the one that was checked out, and the token it carries has not been
+      # anywhere near them. See "An inline `run:` block in a privileged job"
+      # in CLAUDE.md for the general shape.
+      #
+      # `node`, not `pnpm run update-actions`, for the same reason the step
+      # above invokes the script directly: `pnpm run` verifies the workspace's
+      # dependencies first and installs them when they are missing, which is
+      # exactly the thing this step has to come before. The script imports
+      # `node:*` alone, so Node runs it with no `node_modules` at all. The
+      # package.json script stays as the local entry point.
+      #
+      # `GITHUB_TOKEN` only reads the Releases and Commits APIs here, and lifts
+      # the unauthenticated rate limit that the runners' shared IP range
+      # otherwise exhausts.
+      - name: Update the action pins
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./tools/scripts/cmd/mature-updates.mts actions
+
       - name: Update dependencies
         run: |
           pnpm run update-packages
           pnpm install --no-frozen-lockfile
-
-      # A step of its own so that the token is in scope for nothing else:
-      # `pnpm install` above runs dependency lifecycle scripts, which is why no
-      # token may reach it (see the checkout). `GITHUB_TOKEN` only reads the
-      # Releases and Commits APIs here, and lifts the unauthenticated rate
-      # limit that the runners' shared IP range otherwise exhausts.
-      - name: Update the action pins
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm run update-actions
 
       # The published half of `verify-npm-packages` pins exact versions, and
       # this is where they move — a release shows up as a reviewable diff
@@ -152,6 +166,19 @@ jobs:
 
       # 依存更新が終わってからトークンを発行する。許可済みビルドスクリプトが
       # 動く前に鍵を job へ持ち込まないため。
+      # Before the token, not inside the step that holds it. Reading the
+      # manifests and writing a changeset needs no token, and everything that
+      # happens in that last step happens with the App's key in the
+      # environment — so the less of it there is, the better. Being its own
+      # step is also what lets it be a file with a test rather than a `node`
+      # heredoc; see the note in the script, and "An inline `run:` block in a
+      # privileged job" in CLAUDE.md for why the reverse would not be safe.
+      #
+      # `HEAD` is still the pre-update commit here: nothing is committed until
+      # the step below.
+      - name: Add a changeset if a published package's runtime deps moved
+        run: pnpm run update-changeset
+
       - name: Generate Token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -176,50 +203,15 @@ jobs:
             exit 0
           fi
 
-          # Add a patch changeset for each publishable package whose runtime deps
-          # changed, so the Changesets release flow publishes it. (HEAD is still
-          # the pre-update baseline here — nothing has been committed yet.)
-          export DATESTR="$(date -u +%Y%m%d)"
-          node <<'NODE'
-          const fs = require('node:fs');
-          const cp = require('node:child_process');
-          const path = require('node:path');
-          const RUNTIME = ['dependencies', 'peerDependencies', 'optionalDependencies'];
-          const baseline = (file) => {
-            try {
-              return JSON.parse(cp.execSync(`git show HEAD:${file}`, { encoding: 'utf8' }));
-            } catch {
-              return {};
-            }
-          };
-          const changed = [];
-          const workspaceDirs = ['libs', 'apps'].flatMap((group) =>
-            fs.readdirSync(group, { withFileTypes: true })
-              .filter((d) => d.isDirectory())
-              .map((d) => path.join(group, d.name)),
-          );
-          for (const dir of workspaceDirs) {
-            const file = path.join(dir, 'package.json');
-            if (!fs.existsSync(file)) continue;
-            const cur = JSON.parse(fs.readFileSync(file, 'utf8'));
-            if (typeof cur.name !== 'string' || cur.private === true) continue;
-            const base = baseline(file);
-            const runtimeChanged = RUNTIME.some(
-              (k) => JSON.stringify(cur[k] ?? {}) !== JSON.stringify(base[k] ?? {}),
-            );
-            if (runtimeChanged) changed.push(cur.name);
-          }
-          if (changed.length === 0) {
-            console.log('No publishable runtime-dependency changes; no changeset added.');
-          } else {
-            const lines = ['---', ...changed.map((n) => `'${n}': patch`), '---', '', 'Update dependencies', ''];
-            fs.writeFileSync(`.changeset/pnpm-update-${process.env.DATESTR}.md`, lines.join('\n'));
-            console.log(`Added patch changeset for: ${changed.join(', ')}`);
-          }
-          NODE
-
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # No hooks. `pnpm install` above ran the dependency tree's lifecycle
+          # scripts, and one of them can leave a `.git/hooks/pre-commit` behind
+          # — which `git commit` would then run, here, with the App token
+          # already in this step's environment. Set for the rest of the step
+          # rather than per command, so a `git` added later is covered too.
+          git config core.hooksPath /dev/null
 
           # A fixed branch name, not one carrying the date: every run starts from
           # a fresh checkout of main, so force-pushing here both refreshes the
