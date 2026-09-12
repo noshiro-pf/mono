@@ -41,8 +41,11 @@ jobs:
     timeout-minutes: 30
 
     permissions:
+      # No `issues: write`, although this job used to carry it. It installs and
+      # builds the whole dependency tree, and it opens no issue — `canary-report`
+      # below is what does that, from a job that installs nothing. A write that
+      # is never used is a write a compromised dependency inherits for free.
       contents: read
-      issues: write
 
     strategy:
       fail-fast: false
