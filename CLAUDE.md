@@ -478,6 +478,33 @@ so the deployment branch policy is the whole of what confines a publish to
 that names it. The other order leaves a window in which the environment
 exists, reads as configured, and restricts nothing.
 
+**`.github/CODEOWNERS` is a merge gate, not a notification list.** The `main`
+ruleset sets `require_code_owner_review`, so a pull request touching a path
+that file names cannot merge without an approving review from the owner — and
+`pnpm-update`'s auto-merge is not an owner. That is what it is for: the App
+token that workflow pushes with holds `workflows: write`, so a dependency that
+gets code running in that job can leave a doctored workflow in the working
+tree, have `git add -A` commit it, and have it auto-merged with nobody
+looking. Once a doctored `release.yml` is on `main`, the `release`
+environment's branch policy passes it.
+
+Two consequences:
+
+- **A path listed there stops auto-merging.** `pnpm-update` opens a pull
+  request that waits for a human whenever `update-actions` moves an action
+  pin. That is the cost, and it is the intended one. Adding a path is
+  therefore a judgement about how often it changes as much as about how much
+  it matters — `pnpm-workspace.yaml` is left out for that reason alone, and
+  the file says so.
+- **The owner cannot approve their own pull request**, so a change to one of
+  these paths merges through the admin's ruleset bypass, not through a review.
+  What the rule buys is that the bypass is a person clicking it, which the
+  `pnpm-update` App cannot do.
+
+The file used to read `* @noshiro-pf`. That was harmless while the rule was
+off, and would have blocked every pull request in the repository the moment it
+was turned on.
+
 ## CI diff gates
 
 The check workflows carry no `paths` filter. A workflow that a path filter
@@ -706,7 +733,7 @@ report `skipped`. What to know about that:
   booted runner per matrix entry per push.
 - **The label is not declared anywhere in this repository.**
   `repo-settings/` covers repository settings, rulesets, the Actions settings,
-  Pages and environments, but not labels,
+  Pages, environments and Dependabot alerts, but not labels,
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
   the same string and would simply stop matching too. The string is written
