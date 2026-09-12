@@ -15,6 +15,9 @@ interface String {
    */
   replaceAll(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: readonly unknown[]) => string,
+    replacer: (
+      substring: string,
+      ...args: readonly (string | undefined)[]
+    ) => string,
   ): string;
 }

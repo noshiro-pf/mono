@@ -6,6 +6,8 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import {
+  anyArgumentsRef,
+  anyArgumentsTypeDefString,
   brandedNumberTypeDefString,
   closeBraceRegexp,
   idFn,
@@ -124,13 +126,35 @@ export const convertLibEs5 =
           // ),
         ),
 
+        // The wildcard rest parameter — "match any argument list", not a type
+        // anything has. `StrictLibInternals.AnyArguments` is `never`, declared
+        // at the end of this file; its own doc comment is where the reasoning
+        // lives. Named rather than written inline so that the two readings of
+        // the `any` this conversion removes stay distinguishable: a value's
+        // `any` becomes `unknown` or `never` by variance, a wildcard's `any`
+        // becomes this.
+        //
+        // The blanket `any` -> `unknown` pass has already run, so what these
+        // match is `(...args: unknown)`. Both the type-parameter constraint and
+        // the conditional's `extends` clause are rewritten, which is what makes
+        // the false branch unreachable for any `T` the constraint admits — and
+        // therefore what keeps "did not match" from being spelled `unknown` and
+        // propagating (#1840).
         replaceWithNoMatchCheck(
           'extends (...args: unknown) =>',
-          'extends (...args: readonly never[]) =>',
+          `extends (...args: ${anyArgumentsRef}) =>`,
         ),
         replaceWithNoMatchCheck(
           'extends abstract new (...args: unknown) =>',
-          'extends abstract new (...args: readonly never[]) =>',
+          `extends abstract new (...args: ${anyArgumentsRef}) =>`,
+        ),
+
+        // The one wildcard the stock library already writes as `never`. Renamed
+        // too, so that grepping the alias finds every site rather than most of
+        // them.
+        replaceWithNoMatchCheck(
+          '(this: infer U, ...args: never) => unknown',
+          `(this: infer U, ...args: ${anyArgumentsRef}) => unknown`,
         ),
 
         // Error クラスを継承した際に name を書き換えるケースに対応するため
@@ -357,6 +381,7 @@ export const convertLibEs5 =
           // append type utils
           [
             s,
+            anyArgumentsTypeDefString(),
             'type RawDateMutType = Date;',
             'type RawDateType = Readonly<RawDateMutType>;',
             'type TimerId = ReturnType<typeof setTimeout>; // NodeJS.Timeout or number',

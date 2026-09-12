@@ -7,14 +7,17 @@ import {
   replaceWithNoMatchCheckBetweenRegexp,
 } from '../functions/utils/node-utils.mjs';
 import {
+  anyArgumentsRef,
   closeBraceRegexp,
   createBrandedNumber,
+  ensureEs5Reference,
   idFn,
   tsLibShapeFor,
   type ConverterConfig,
   type ConverterOptions,
 } from './common.mjs';
 import { convertReturnTypeToUintRange } from './convert-return-type-to-uint-range.mjs';
+import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 import { convertLibDomCommon } from './dom-common.mjs';
 import { convertLibDomIterable } from './lib.dom.iterable.mjs';
 import { convertLibDom } from './lib.dom.mjs';
@@ -219,14 +222,18 @@ export const convert = (
           (() => {
             switch (filename) {
               case 'lib.decorators.d.ts':
+                // Wildcard rest parameters — see the note in `convertLibEs5`
+                // and the alias's own doc comment. `ensureEs5Reference` because
+                // the alias is declared in `lib.es5.d.ts`.
                 return composeMonoTypeFns(
+                  ensureEs5Reference,
                   replaceWithNoMatchCheck(
                     'Class extends abstract new (...args: unknown) => unknown = abstract new (...args: unknown) => unknown',
-                    'Class extends abstract new (...args: readonly never[]) => unknown = abstract new (...args: readonly never[]) => unknown',
+                    `Class extends abstract new (...args: ${anyArgumentsRef}) => unknown = abstract new (...args: ${anyArgumentsRef}) => unknown`,
                   ),
                   replaceWithNoMatchCheck(
                     'Value extends (this: This, ...args: unknown) => unknown = (this: This, ...args: unknown) => unknown',
-                    'Value extends (this: This, ...args: readonly never[]) => unknown = (this: This, ...args: readonly never[]) => unknown',
+                    `Value extends (this: This, ...args: ${anyArgumentsRef}) => unknown = (this: This, ...args: ${anyArgumentsRef}) => unknown`,
                   ),
                 );
 
@@ -267,9 +274,13 @@ export const convert = (
                 return convertEs2015SymbolWellknown(options);
 
               case 'lib.es2015.reflect.d.ts':
-                return replaceWithNoMatchCheck(
-                  'newTarget?: new (...args: unknown) => unknown',
-                  'newTarget?: new (...args: readonly never[]) => unknown',
+                // Wildcard rest parameter — see the note in `convertLibEs5`.
+                return composeMonoTypeFns(
+                  ensureEs5Reference,
+                  replaceWithNoMatchCheck(
+                    'newTarget?: new (...args: unknown) => unknown',
+                    `newTarget?: new (...args: ${anyArgumentsRef}) => unknown`,
+                  ),
                 );
 
               case 'lib.es2015.core.d.ts':
@@ -380,6 +391,11 @@ export const convert = (
 
               case 'lib.es2022.object.d.ts':
                 return convertLibEs2022Object(options);
+
+              case 'lib.es2021.string.d.ts':
+                // `String.prototype.replaceAll`, whose replacement callback
+                // has to be typed the same way as `replace`'s.
+                return convertStringReplacerArgs;
 
               case 'lib.es2022.string.d.ts':
                 return replaceWithNoMatchCheck(
