@@ -59,10 +59,6 @@
             "integration_id": 15368
           },
           {
-            "context": "backup-repository-settings-result",
-            "integration_id": 15368
-          },
-          {
             "context": "no-wip-label",
             "integration_id": 15368
           },
