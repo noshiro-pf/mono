@@ -78,7 +78,8 @@ concurrency:
 # Keep this as the deny-all form rather than a repository-wide setting: a
 # setting is one switch for every workflow at once, and
 # `repo-settings/actions-settings/` does not model it, so a change there would
-# not be noticed by `backup-repository-settings`.
+# not be noticed by the settings drift check, which runs from the private
+# `noshiro-pf/mono-security` — see "Security findings" in CLAUDE.md.
 permissions: {}
 
 jobs:
@@ -301,9 +302,8 @@ jobs:
   #   earlier run stays green, and the pull request reads as fully checked
   #   while nothing ran.
   # - A skipped job whose check run name *is* the required context — a job
-  #   with no matrix, as `verify-published` and `backup-repository-settings`
-  #   are — reports `skipped`, and GitHub counts a skipped required check as
-  #   satisfied.
+  #   with no matrix, as `verify-published` is — reports `skipped`, and GitHub
+  #   counts a skipped required check as satisfied.
   #
   # This job closes both. Its name does not depend on a matrix, so every run
   # supersedes the last, and `always()` means a failed or cancelled matrix
