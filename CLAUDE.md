@@ -112,6 +112,19 @@ Consequently:
 - Both directories are excluded from ESLint and markdownlint. Leave them that
   way: there is no TypeScript in either, and Zenn's front matter and Markdown
   dialect do not match markdownlint's defaults.
+    - **The markdownlint exclusions live in `ignores`, never as a `globs`
+      negation**, and `pnpm run check:root:markdownlint-config` enforces it. A
+      negation is matched against the path as written, so one anchored at the
+      cwd does not match a file named on the command line as an _absolute_
+      path — that file is linted, and with `fix: true` linted means rewritten.
+      That is not hypothetical: it is what kept giving `articles/` and
+      `experimental/` unexplained `*` → `-` list-marker changes, reproducible
+      only with an absolute path and so by no repository script. `ignores`
+      prunes the discovery walk just as a negation does (markdownlint-cli2
+      appends those entries to the glob patterns itself) and also holds for a
+      path named directly. Prettier has no equivalent hole — `.prettierignore`
+      applies to an absolute path correctly (measured).
+
 - **Prettier and cspell do cover them**, contrary to what this file used to
   say. `.prettierignore` lists only `pnpm-lock.yaml`, `.prettierignore` and
   `experimental`, which is also why `articles/` and `books/` are absent from
