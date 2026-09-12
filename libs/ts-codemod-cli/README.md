@@ -1,6 +1,6 @@
 # ts-codemod-cli
 
-Command line interface for [`ts-codemod-lib`](../ts-codemod-lib).
+Command line interface for [`ts-codemod-lib`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-codemod-lib).
 
 ```sh
 npm install -D ts-codemod-cli

@@ -94,6 +94,16 @@ export default [
     }),
   },
 
+  {
+    // README samples are `eslint.config.mts` snippets, which export their
+    // config array as an anonymous default, the way a consumer writes one.
+    files: ['samples/**'],
+    rules: defineKnownRules({
+      'import-x/no-default-export': 'off',
+      'import-x/no-anonymous-default-export': 'off',
+    }),
+  },
+
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],

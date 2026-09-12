@@ -17,7 +17,7 @@
 
 "SynState" is named after "Synchronized + State." It represents a sound synchronized state through a **glitch-free**[^1] Observable implementation.
 
-[^1]: See ["How SynState solved the glitch?"](https://noshiro-pf.github.io/synstate/internals/how-synstate-solved-the-glitch/).
+[^1]: See ["How SynState solved the glitch?"](https://noshiro-pf.github.io/mono/synstate/internals/how-synstate-solved-the-glitch/).
 
 ## Features
 
@@ -32,7 +32,7 @@
 
 ## Documentation
 
-- <https://noshiro-pf.github.io/synstate/>
+- <https://noshiro-pf.github.io/mono/synstate/>
 
 ## Installation
 
@@ -111,7 +111,7 @@ const UserProfile = (): React.JSX.Element => {
 };
 ```
 
-This is equivalent to the following code without synstate-react-hook:
+This is equivalent to the following code without synstate-react-hooks:
 
 ```tsx
 import * as React from 'react';
@@ -150,7 +150,7 @@ const UserProfile = (): React.JSX.Element => {
 };
 ```
 
-See also the [synstate-react-hooks README](../synstate-react-hooks/README.md).
+See also the [synstate-react-hooks README](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-react-hooks#readme).
 
 If you're using React v17 or earlier:
 
@@ -207,7 +207,7 @@ A state management library that scales from simple global state to complex async
 
 RxJS is the most well-known Observable library, and it excels at modeling asynchronous event processing. However, RxJS has a fundamental issue known as **glitch**[^1] — a phenomenon where derived values can temporarily enter inconsistent intermediate states during synchronous propagation. For a state management library, where consistency of derived state is critical, this is unacceptable. SynState was built from scratch with a glitch-free Observable implementation to solve this problem.
 
-For a detailed explanation, see ["How SynState solved the glitch?"](https://noshiro-pf.github.io/synstate/internals/how-synstate-solved-the-glitch/).
+For a detailed explanation, see ["How SynState solved the glitch?"](https://noshiro-pf.github.io/mono/synstate/internals/how-synstate-solved-the-glitch/).
 
 ### Key Differences from RxJS
 
@@ -243,7 +243,7 @@ const [
 // type of state: InitializedObservable<number>
 // type of setState: (v: number) => number
 // type of updateState: (updater: (prev: number) => number) => number
-// type of resetState: () => void
+// type of resetState: () => number
 // type of getSnapshot: () => number
 // type of initialState: number
 

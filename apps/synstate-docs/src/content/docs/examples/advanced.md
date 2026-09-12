@@ -118,7 +118,7 @@ const [
 // type of state: InitializedObservable<number>
 // type of setState: (v: number) => number
 // type of updateState: (updater: (prev: number) => number) => number
-// type of resetState: () => void
+// type of resetState: () => number
 // type of getSnapshot: () => number
 // type of initialState: number
 

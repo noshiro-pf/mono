@@ -13,7 +13,7 @@ here, and ts-data-forge re-exports them, so `import { Result } from
 implementation, not two. New code should import these from `ts-std-forge`.
 
 The catalog of APIs to wrap, and the reasoning, live in the Sumi language
-project: [languages/sumi/docs/throwing-stdlib-survey.md](../../languages/sumi/docs/throwing-stdlib-survey.md)
+project: [languages/sumi/docs/throwing-stdlib-survey.md](https://github.com/noshiro-pf/mono/blob/main/languages/sumi/docs/throwing-stdlib-survey.md)
 (decisions D-22 / D-24 / D-26).
 
 ## Error design (D-26)
@@ -85,7 +85,7 @@ release that added `SafeArray`: generic names (`create`, `parse`, `repeat`,
 reports as TS2308 rather than resolving. The guards, the ADT core and `panic`
 keep their bare names; they have no namespace to sit under.
 
-Neither returns a branded number (`FiniteNumber` / `Int`): ts-std-forge
+Neither `SafeNumber.parse` nor `SafeNumber.parseInteger` returns a branded number (`FiniteNumber` / `Int`): ts-std-forge
 does not use ts-type-forge's number brands, and an ESLint rule in this
 package allows only the literal-range types to be imported from it.
 

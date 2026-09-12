@@ -24,7 +24,7 @@ export default [
   {
     files: ['scripts/**/*.ts'],
     rules: defineKnownRules({
-      // Allow console in scripts
+      // Relax rules for scripts
       'no-await-in-loop': 'off',
       'import-x/no-unassigned-import': 'off',
     }),

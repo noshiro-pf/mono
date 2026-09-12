@@ -20,7 +20,7 @@ export default [
           selector:
             "ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']",
           message:
-            "React should be imported as `import * as React from 'react'.",
+            "React should be imported as `import * as React from 'react'`.",
         },
       ],
     }),
