@@ -78,12 +78,14 @@ update:
   # GitHub Actions のピンは `update-packages` ではなく `update-actions` が動かす。
   # ここを true にすると `--latest` の付いた `update-packages` が actions も
   # メジャー更新してしまい、`changesets/action` v1 → v2 のような、設定の書き換えを
-  # 伴う更新が無人でマージされる。`update-actions` は `--latest` を付けないので
-  # `^current` の範囲に留まり、メジャー更新は人間が判断することになる。
+  # 伴う更新が無人でマージされる。`update-actions` は同一メジャー内でしか動かさない
+  # ので、メジャー更新は人間が判断することになる。
   #
-  # `minimumReleaseAge` は actions には効かない。pnpm は actions のバージョンを
-  # `git ls-remote` の ref 一覧から取っており、タグの作成日時を持たないため。
-  # 同じ理由で下の `ignoreDeps` も actions には適用されない。
+  # pnpm の `--include-github-actions` には `minimumReleaseAge` が効かない。pnpm は
+  # actions のバージョンを `git ls-remote` の ref 一覧から取っており、タグの公開日時を
+  # 持たないため。そこで `update-actions` は pnpm ではなく
+  # `tools/scripts/cmd/mature-updates.mts actions` を動かし、GitHub Releases の
+  # `published_at` で同じ保留を適用する。下の `ignoreDeps` は actions には適用されない。
   githubActions: false
   ignoreDeps:
     - typescript
@@ -98,30 +100,53 @@ update:
 
 minimumReleaseAge: 10080 # = 7 days
 
-minimumReleaseAgeExclude:
-  - '@types/**'
+# 除外は「方針」ではなく「一時的な waiver」として書く。名前だけで書くと、その
+# パッケージは以後ずっと隔離を素通りする — 理由が解消しても誰も気づかない。
+# バージョンまで書いて prune に失効させれば、必要なあいだだけ効く。
+#
+# prune は `pnpm update` で走り、lockfile が解決しなくなったエントリを落とす。
+# 実測（pnpm 12.3.4）: lockfile に無い名前も `name@1.2.3` も消え、`pattern-*`
+# だけは常に残る。だから **glob で書くと失効しない**。
+minimumReleaseAgeExcludePrune: true
 
-  # octokit のパッケージ群は一つの型定義 (`@octokit/openapi-types`) を共有しており、
+minimumReleaseAgeExclude:
+  # #1832 の waiver。octokit 族は `@octokit/openapi-types` を共有し、
   # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
-  # `expectType<..., '='>` で表明している。`minimumReleaseAge` が
-  # `@octokit/openapi-types` だけを通して `@octokit/core` を留めると、
-  # 一つのツリーに新旧二つの `@octokit/openapi-types` が入り、
-  # 表明が破れて `ws:build` が落ちる (#1832)。族ごと除外して足並みを揃える。
-  - '@octokit/**'
-  - ts-type-forge
-  - eslint-plugin-ts-type-forge
-  - ts-data-forge
-  - eslint-plugin-ts-data-forge
-  - ts-fortress
-  - eslint-plugin-ts-fortress
-  - ts-repo-utils
-  - ts-codemod-lib
-  - synstate
-  - 'synstate-*'
-  - eslint-config-typed
-  - octokit-safe-types
-  - github-settings-as-code
-  - 'strict-ts-lib-*'
+  # `expectType<..., '='>` で表明している。隔離が族を 1 つずつ通すと
+  # `@octokit/openapi-types` が 2 バージョン同居して表明が破れ、`ws:build` が
+  # 落ちる（12 ジョブ道連れになった）。族が揃って動く必要があるのはそのため。
+  #
+  # 要求は「族の原子性」であって「隔離の免除」ではない。バージョンを固定して
+  # あるので、族が次に揃って動いた時点で prune が落とす。
+  - '@octokit/auth-token@6.0.0'
+  - '@octokit/core@7.0.8'
+  - '@octokit/endpoint@11.0.5'
+  - '@octokit/graphql@9.0.5'
+  - '@octokit/openapi-types@29.0.1'
+  - '@octokit/request@10.0.16'
+  - '@octokit/request-error@7.1.2'
+  - '@octokit/types@18.0.0'
+
+  # `@types/**` の恒久除外を外した時点で lockfile に入っていて、まだ 7 日を
+  # 超えていなかったもの。**すでにツリーに在るものの再承認**であって新しい
+  # 露出ではない — 隔離が見ているのは新しい解決のほう。成熟して次に動いた
+  # 時点で prune が落とすので、手で消す必要は無い。
+  - '@types/node@22.20.2 || 24.13.4 || 26.5.0'
+  - '@types/react@19.3.0'
+  - '@types/react-dom@19.3.0'
+
+  # ここに `@types/**` は無い。「型定義だけなので実行コードを持たない」という
+  # 理由で恒久除外していたが、それを保証しているのは `allowBuilds`（install
+  # スクリプトを止める）と「`.d.ts` は実行されない」という TypeScript の性質で、
+  # このリストが検証しているものではない。守っているものが小さい（型定義の
+  # 更新に緊急性は無い）のに、検証されていない前提に寄りかかった穴が恒久的に
+  # 開くので、外した。型の改竄という残りのリスクは、7 日待っても変わらない。
+  #
+  # 自作パッケージも無い。npm から取り直すのは
+  # `verify-npm-packages/published/packages/*/` だけで、そこは
+  # `verify-npm-packages.mts` が space ごとに `minimumReleaseAge: 0` を書いた
+  # `pnpm-workspace.yaml` を生成する（gitignore 対象、実行時生成）。root の
+  # 設定はそこまで届かないので、ここに書いても何も起きていなかった。
 
 allowBuilds:
   # Both arrive with `firebase`, which apps/poll-discord-app depends on.

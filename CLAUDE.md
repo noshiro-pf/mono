@@ -1,3 +1,5 @@
+<!-- cspell:ignore pnpmfile -->
+
 # CLAUDE.md
 
 This file is the instructions for this repository, and is maintained by hand.
@@ -24,7 +26,9 @@ instruction file.
 - `repo-settings/` — declarative GitHub repository settings, applied via
   [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
   `pages/settings.json` there is what enables Pages; the deploy workflow does
-  not enable it.
+  not enable it. `environments/` holds one file per deployment environment —
+  **see the note on environments under "Required status checks"** before
+  adding one.
 - `articles/` — Zenn articles. **See "Zenn" below.**
 - `books/` — Zenn books. **See "Zenn" below.**
 - `docs/` — prose notes about the repository itself, plus a few verbatim
@@ -368,16 +372,15 @@ the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
 list lives in the `required_status_checks` rule of
 `repo-settings/rulesets/main.json`:
 
-| context                             | comes from                                            |
-| :---------------------------------- | :---------------------------------------------------- |
-| `type-check-result`                 | the aggregate job in `type-check.yml`                 |
-| `style-check-result`                | the aggregate job in `style-check.yml`                |
-| `test-node-versions-result`         | the aggregate job in `node-version-compatibility.yml` |
-| `verify-published-result`           | the aggregate job in `verify-published-packages.yml`  |
-| `backup-repository-settings-result` | the aggregate job in `backup-repository-settings.yml` |
-| `no-wip-label`                      | a commit status written by `wip-label.yml`            |
-| `Validate PR title`                 | `lint-pull-request.yml`                               |
-| `Validate commit messages`          | `lint-pull-request.yml`                               |
+| context                     | comes from                                            |
+| :-------------------------- | :---------------------------------------------------- |
+| `type-check-result`         | the aggregate job in `type-check.yml`                 |
+| `style-check-result`        | the aggregate job in `style-check.yml`                |
+| `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
+| `verify-published-result`   | the aggregate job in `verify-published-packages.yml`  |
+| `no-wip-label`              | a commit status written by `wip-label.yml`            |
+| `Validate PR title`         | `lint-pull-request.yml`                               |
+| `Validate commit messages`  | `lint-pull-request.yml`                               |
 
 **A required context is a string matched exactly against the name of a check
 run — or the context of a commit status — on the pull request's head
@@ -452,16 +455,168 @@ Consequences worth knowing:
 
 `gates / check` is deliberately **not** required. It is a gate that fails
 open — the jobs waiting on it use `!cancelled()` and `!= 'false'`, so an
-unanswered gate lets them run — and each of the five workflows contributes a
+unanswered gate lets them run — and each of the four workflows contributes a
 context under the same name.
 
 **`repo-settings/` is a declaration, not a lever.** The root files under it
 are the desired state, applied only by `pnpm run repo-settings:apply` (it
 needs an admin token); `bk/` is a mirror of what GitHub currently has, written
-by `repo-settings:backup`. The `backup-repository-settings` check compares
-`bk/` against the live repository, so editing a root file passes CI while
+by `repo-settings:backup`. Editing a root file therefore passes CI while
 changing nothing — the settings take effect when someone runs `apply`, which
 rewrites both the root file and `bk/`.
+
+**What notices that they have drifted apart runs somewhere else.** A daily
+workflow in the private `noshiro-pf/mono-security` compares the committed
+`bk/` with the repository's live settings and fails when they differ. It used
+to be a workflow here, and it moved because of what reading those settings
+costs: `bypass_actors` is returned only to a caller with write access to the
+ruleset, and the merge-related settings only with `contents:read` and
+`contents:write`, so the App token cannot be made weaker. What can change is
+where its key lives — and it no longer lives in the secrets of a public
+repository that merges dependency updates unattended. See "Security findings".
+
+**An environment a workflow names is created the moment that workflow first
+runs, with no protection rules on it.** `release` arrived exactly that way.
+Pull request #1910 added `environment: release` to `release.yml`, the merge
+ran it, and three seconds later the repository held an environment with
+`protection_rules: []` and `deployment_branch_policy: null` — no restriction
+at all. Nothing failed and nothing said so, and what the binding was added to
+enforce was simply absent: npm's trusted publisher does not check the git ref,
+so the deployment branch policy is the whole of what confines a publish to
+`main`. Declare the environment under `repo-settings/environments/` and run
+`pnpm run repo-settings:apply environments` **before** merging the workflow
+that names it. The other order leaves a window in which the environment
+exists, reads as configured, and restricts nothing.
+
+**`.github/CODEOWNERS` is a merge gate, not a notification list.** The `main`
+ruleset sets `require_code_owner_review`, so a pull request touching a path
+that file names cannot merge without an approving review from the owner — and
+`pnpm-update`'s auto-merge is not an owner. That is what it is for: the App
+token that workflow pushes with holds `workflows: write`, so a dependency that
+gets code running in that job can leave a doctored workflow in the working
+tree, have `git add -A` commit it, and have it auto-merged with nobody
+looking. Once a doctored `release.yml` is on `main`, the `release`
+environment's branch policy passes it.
+
+Two consequences:
+
+- **A path listed there stops auto-merging.** `pnpm-update` opens a pull
+  request that waits for a human whenever `update-actions` moves an action
+  pin. That is the cost, and it is the intended one. Adding a path is
+  therefore a judgement about how often it changes as much as about how much
+  it matters — `pnpm-workspace.yaml` is left out for that reason alone, and
+  the file says so.
+- **The owner cannot approve their own pull request**, so a change to one of
+  these paths merges through the admin's ruleset bypass, not through a review.
+  What the rule buys is that the bypass is a person clicking it, which the
+  `pnpm-update` App cannot do.
+
+The file used to read `* @noshiro-pf`. That was harmless while the rule was
+off, and would have blocked every pull request in the repository the moment it
+was turned on.
+
+**How much third-party code may share a job with a key is a question about the
+key.** There is no blanket rule here, and an earlier version of this note read
+like one. What a compromised dependency in that job can reach is exactly what
+the key can do, so the answer is different for each of them — and the cost of
+separating is not.
+
+| job                              | what its key can do                            | third-party code | split?         |
+| :------------------------------- | :--------------------------------------------- | :--------------- | :------------- |
+| `pnpm-update`                    | `contents` + `pull-requests` + **`workflows`** | a lot            | **yes** — done |
+| `node-support-update` / `update` | `contents` + `pull-requests`, no auto-merge    | a lot            | no             |
+| `release`                        | OIDC, i.e. publish                             | the whole build  | worth solving  |
+
+`pnpm-update` is the one that had to move, and `workflows: write` is the whole
+reason. It is the single capability that turns "a dependency got in" into "every
+published package is gone": a doctored `.github/workflows/release.yml` pushed to
+any branch runs there, and until the `release` environment existed npm would
+have taken its OIDC token. No other key here converts that way.
+`node-support-update` holds `contents` + `pull-requests` and **not** `workflows`,
+so GitHub refuses a push carrying a workflow change, and it enables no
+auto-merge — what an attacker gets is a pull request waiting for a person.
+Splitting that would cost the same and buy almost nothing.
+
+**What actually runs is smaller than "the dependency tree", and worth knowing
+before reaching for a split.** A root `pnpm install` here executes pnpm, the
+install scripts of the three packages `allowBuilds` permits, and
+`strict-ts-lib-v7.0-link` through the root `prepare`. There is no
+`.pnpmfile.cjs`. That is four trust anchors, not eight hundred — so "we ran
+`pnpm install`" is not on its own a reason to move a key.
+
+What makes `pnpm-update`'s update job genuinely broad is the rest of it:
+`tsx` pulls in its scripts' whole import graph, and
+`verify:npm-packages:published:update` installs `latest` of every published
+package from npm into throwaway spaces and runs a program against each. That
+last one executes code fetched from the registry minutes earlier, which is the
+same npm account this whole arrangement exists to protect.
+
+**Where the executed bytes come from is what the ordering inside a job is
+about.** A `run:` block is part of the workflow definition GitHub resolved for
+the event — on a `schedule`, the default branch's file — and nothing on the
+runner can change it. A file in the working tree is read when it is invoked,
+after third-party code has had a chance to rewrite it. `git` and `gh` are on the
+runner image, so a step built out of those two reads nothing from the tree.
+"Keep it inline" is a consequence of this and not the rule: an inline `run:`
+that calls `node ./tools/x.mts` is exactly as exposed as a step that does.
+
+**CODEOWNERS does not substitute for this.** It governs what gets merged, and
+the rewrite here is not a merge: a dependency writing over a file on the runner
+produces no commit, no pull request and no diff. `main` keeps the correct file
+while the copy being executed is something else.
+
+**`allowBuilds` does not either, and it is narrower than it looks.** It is an
+allowlist for the _install lifecycle scripts_ of dependencies — which is exactly
+what it claims and no more. It says nothing about the import-time code of every
+package the toolchain loads: `pnpm install`, `tsx`, `ws:build`, ESLint and Vitest
+all execute third-party modules, and a module runs its top level when it is
+imported. The wide door stays open by necessity; `allowBuilds` closes a narrow
+one.
+
+**Between steps, this can only be raised, not closed.** `$GITHUB_ENV` and
+`$GITHUB_PATH` are files whose paths are in the environment, and the runner
+applies what a step writes there to the steps that follow. A process spawned
+during `pnpm install` inherits that environment, so it can prepend a directory
+and decide what `git` or `gh` means two steps later. Ordering and inlining do
+not reach that.
+
+**What does close it is a separate job**, which gets a fresh runner, a fresh
+checkout and a fresh environment. `pnpm-update.yml` is split that way: `update`
+runs the dependency tree's code and holds no key, and `commit` holds the App
+token — the one with `workflows: write` — and installs nothing. What crosses
+between them is a patch, which `commit` applies rather than executes; a diff
+cannot express a `.git/hooks` entry or a `$GITHUB_PATH` line, and `git apply`
+refuses paths outside the work tree. The worst a tampered patch carries is
+content, which lands in a pull request where `.github/workflows/` is behind
+CODEOWNERS.
+
+`node-support-update.yml` has the same shape and has not been split. Its App
+token is `contents` + `pull-requests` and **not** `workflows`, so the branch it
+can write is one the `main` ruleset and CODEOWNERS already bound; split it when
+that stops being true.
+
+Three details that follow from the ordering:
+
+- **Work that does not need the token belongs in a step before it**, where a
+  `.mts` costs nothing and can be tested. The action pins and the changeset are
+  each their own step ahead of `Generate Token` for that reason.
+- **A step placed before `pnpm install` cannot use `pnpm run`.** `pnpm run`
+  verifies the workspace's dependencies first and installs them when they are
+  missing, which is the thing such a step exists to come before. Invoke the
+  script with `node` directly and keep the `package.json` script as the local
+  entry point — this is why `mature-updates.mts` imports `node:*` alone.
+- **`git config core.hooksPath /dev/null` before committing.** An install script
+  can leave a `.git/hooks/pre-commit` behind, and `git commit` would run it.
+
+Most of the remaining inline blocks cannot move at all, for an unrelated reason:
+they run with no checkout and no `pnpm install`, and a `.mts` needs both.
+
+- The five `*-result` aggregates boot a runner, read `needs.*.result` and echo.
+- `wip-label.yml` makes one API call, on every event, for every pull request.
+- `check-gates.yml`'s branch check runs **before** its checkout, which is the
+  whole point: a branch behind `main` stays a four-second job.
+- `lint-pull-request.yml` runs on `pull_request_target` and must never check the
+  pull request out. A `.mts` there would require exactly that.
 
 ## CI diff gates
 
@@ -510,18 +665,17 @@ Things to keep in mind when editing a gated workflow:
   which is why the gate had to be a step back then. See "Required status
   checks".
 
-`verify-published-packages.yml` and `backup-repository-settings.yml` gate
-themselves in shell, on the same principle but against a merge base and a
-single directory rather than an ignore list. They call `check-gates.yml` with
-`diff-scope: none`, which answers the branch question and skips the checkout:
-each has one job, so a gate that installs to save one runner would cost more
-than it saves.
+`verify-published-packages.yml` gates itself in shell, on the same principle
+but against a merge base and a single directory rather than an ignore list. It
+calls `check-gates.yml` with `diff-scope: none`, which answers the branch
+question and skips the checkout: it has one job, so a gate that installs to
+save one runner would cost more than it saves.
 
 ## Check triggers, `[WIP]` and out-of-date branches
 
-The five check workflows — `type-check.yml`, `style-check.yml`,
-`node-version-compatibility.yml`, `verify-published-packages.yml` and
-`backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
+The four check workflows — `type-check.yml`, `style-check.yml`,
+`node-version-compatibility.yml` and `verify-published-packages.yml` — trigger
+on `pull_request: types: [opened,
 synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
 keeps the checks list at one entry per job: triggering on `push` for branches
 as well would put a push run and a `pull_request` run side by side on every
@@ -539,18 +693,14 @@ tree as the pull request's head — a tree every check has already run on. The
 check workflows used to run their whole matrix on it anyway, on the reasoning
 that a squash makes a commit no pull request run has seen; that is true of the
 commit and false of its contents, and it cost 108 runner-minutes per merge for
-`type-check.yml` alone, at fifty-odd merges a week. So three of the five have
-no `push` trigger at all, and the two that keep one run a single job on it:
+`type-check.yml` alone, at fifty-odd merges a week. So three of the four have
+no `push` trigger at all, and the one that keeps it runs a single job on it:
 
 - `type-check.yml` runs `coverage-main`, which is the matrix's `ws:test:cov`
   entry on its own. Codecov compares a pull request's coverage with the
   report on its base commit, and the base commit is one on `main`, so the
   report has to come from a run on `main`. It is gated on the diff like the
   matrix, so a merge that touched nothing the tests read uploads nothing.
-- `backup-repository-settings.yml` compares `bk/` with the repository's live
-  settings, which no branch changes and no pull request run covers unless it
-  touched `repo-settings/`. A merge is simply the occasion on which that drift
-  is looked for.
 
 What this gives up is the after-the-fact check on a merge made with the
 admin's bypass, which is the one way a head that is behind `main`, or was
@@ -690,11 +840,12 @@ report `skipped`. What to know about that:
   was a draft: green checks that stood for work that never happened, and one
   booted runner per matrix entry per push.
 - **The label is not declared anywhere in this repository.**
-  `repo-settings/` covers repository settings, rulesets and Pages, not labels,
+  `repo-settings/` covers repository settings, rulesets, the Actions settings,
+  Pages, environments and Dependabot alerts, but not labels,
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
   the same string and would simply stop matching too. The string is written
-  down in the workflows — the five check workflows, `wip-label.yml` and
+  down in the workflows — the four check workflows, `wip-label.yml` and
   `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs.mts`, which
   sets a labelled pull request aside; change it everywhere or nowhere.
 - **Any label event re-runs the checks, not just `[WIP]`'s.** The trigger is
@@ -860,6 +1011,39 @@ The check also fails on a changeset naming a package that does not exist:
 - **RESTRICTIONS**: Do not perform these actions without explicit user instructions:
     - Push to GitHub or remote repositories
     - Access `~/.ssh` or other sensitive directories
+
+## Security findings
+
+**This repository is public, and a finding about it is a reproduction.** What an
+investigation produces is not "here is a weak point" but "here is the order to
+do things in", and publishing that before the fix lands hands it over. So
+findings go in the private **`noshiro-pf/mono-security`**, and not in this
+repository's issues or pull requests.
+
+What that repository holds:
+
+- `reports/` — one file per investigation: the chain, the measurements, and the
+  reasons something is not yet fixed.
+- Issues — one finding each, carrying a `<!-- finding-key: … -->` header, with
+  issue #1 an audit log a routine appends to.
+- `scripts/` — the settings-drift check that runs against this repository. It
+  has no dependencies, deliberately: the job holds an App token that cannot be
+  made weaker, because `bypass_actors` and the merge-related settings are each
+  only returned to a caller with write access.
+
+**What may stay here is the fix.** A pull request that closes something can say
+what it closes and why the shape matters — the notes throughout this file do
+exactly that. What it should not do is read as a set of steps that works.
+
+**A public issue cannot be taken back.** Editing the body does not redact it:
+GitHub keeps the edit history and it is readable through GraphQL
+`userContentEdits`. The public events feed carries the body as written, and
+external archives ingest that feed hourly. Deleting the issue is the only
+removal, and it does not reach those archives. The decision is made when it is
+written, not afterwards.
+
+**Reports from outside come through private vulnerability reporting**, which is
+enabled on this repository — see `.github/SECURITY.md`. Not through an issue.
 
 ## Commit & Pull Request Guidelines
 
@@ -1217,20 +1401,72 @@ So the field is either inert here or it changes how the repository installs.
       single source of truth.
 - **GitHub Action pins are updated by `update-actions`, not by
   `update-packages`.** `update.githubActions` is `false` so that
-  `update-packages`, which carries `--latest`, leaves the workflow files alone;
-  `update-actions` turns the check back on with `--include-github-actions` and
-  deliberately omits `--latest`, so an action only moves within `^current` and a
-  major waits for a human. Do not set `update.githubActions` back to `true`, and
-  do not add `--latest` to `update-actions`: `changesets/action` v2 requires
-  Changesets CLI v3 and renamed every input, so taking that major unattended
-  broke `release.yml` on main.
-    - Neither `minimumReleaseAge` nor `update.ignoreDeps` applies to actions.
-      pnpm resolves action versions from `git ls-remote` refs, which carry a tag
-      name and a SHA but no publication date, so there is nothing for the age
-      check to read — a tag hours old is taken regardless. Hold an action back by
-      leaving the major alone, not by listing it in `ignoreDeps`.
-    - `pnpm outdated --include-github-actions --latest` lists the majors that are
-      waiting.
+  `update-packages`, which carries `--latest`, leaves the workflow files alone,
+  and `update-actions` runs `tools/scripts/cmd/mature-updates.mts actions`
+  rather than `pnpm update --include-github-actions`. It moves a pin only
+  within its major, so a major waits for a human. Do not set
+  `update.githubActions` back to `true`, and do not teach the script to cross
+  a major: `changesets/action` v2 requires Changesets CLI v3 and renamed every
+  input, so taking that major unattended broke `release.yml` on main.
+    - **pnpm cannot hold an action to `minimumReleaseAge`; the script can.**
+      pnpm resolves action versions from `git ls-remote` refs, which carry a
+      tag name and a SHA but no publication date, so under
+      `--include-github-actions` a tag hours old was taken regardless. The
+      script reads each action's GitHub Releases instead, takes the newest
+      release of the same major whose `published_at` is older than the hold,
+      and resolves the tag to its commit through the Commits API — the same
+      SHA pin pnpm wrote. Drafts, prereleases and releases without a publish
+      time are not candidates. `update.ignoreDeps` still does not apply to
+      actions; hold one back by leaving the major alone.
+    - The step passes `GITHUB_TOKEN` as `GH_TOKEN`, in a step of its own so
+      that no token is in scope for the lifecycle scripts `pnpm install` runs.
+      Without a token the unauthenticated rate limit, shared across the
+      runners' IP range, is hit.
+    - `pnpm outdated --include-github-actions --latest` still lists the majors
+      that are waiting, and the script prints them on every run.
+- **An entry in `minimumReleaseAgeExclude` is a waiver, not a policy.** Write
+  the version as well as the name — `'@octokit/core@7.0.8'` — and leave
+  `minimumReleaseAgeExcludePrune` on, so the entry lasts exactly as long as it
+  is true. A bare name exempts a package for good and nothing notices when the
+  reason stops applying; **a glob never expires at all**, because pruning keeps
+  patterns by design. Measured on pnpm 12.3.4: pruning runs on `pnpm update`
+  rather than `pnpm install`, drops any entry the lockfile no longer resolves,
+  and keeps every pattern.
+    - **`@types/*` is deliberately not excluded.** "Type packages carry no
+      executable code" is true here, and what makes it true is `allowBuilds`
+      stopping install scripts and `.d.ts` never being executed — neither of
+      which this list checks. A type definition is never urgent, so the
+      exemption bought little and rested on an assumption nothing verifies.
+    - **Nor is anything this repository publishes.** The only place those come
+      from the registry is `verify-npm-packages/published/packages/*`, and
+      `verify-npm-packages.mts` writes each of those spaces a
+      `pnpm-workspace.yaml` carrying `minimumReleaseAge: 0`. It is gitignored
+      and generated at install time, so looking for it in the tree finds
+      nothing and invites the wrong conclusion.
+- **`pnpm self-update` ignores `minimumReleaseAge` by design, and the next
+  pnpm command does not.** `self-update` only rewrites `packageManager`; the
+  pnpm that runs afterwards fetches that version through the registry under
+  the hold, so a release younger than seven days made `pnpm-update.yml` fail
+  daily with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` until it matured. The
+  workflow therefore runs `tools/scripts/cmd/mature-updates.mts pnpm`, which
+  picks the newest stable pnpm older than the hold and passes it to
+  `self-update`. Do not put `pnpm` in `minimumReleaseAgeExclude` to get the
+  same effect: it is the one package that runs every install script in the
+  tree.
+    - **That script runs on `node`, not `tsx`.** Both subcommands run before
+      `pnpm install`, so nothing in `node_modules` exists yet; Node strips the
+      types itself, which holds only while the file imports `node:*` alone at
+      runtime (a top-level `import type` is erased; the inline form the lint
+      prefers is kept as a bare module load) and uses erasable syntax.
+      `Temporal` makes it Node 26 or later — the Node the workflow runs on,
+      not the floor of the compatibility matrix. Its test executes it under
+      `node` against a fake `pnpm` and a fake GitHub API, and asserts that the
+      runtime imports stay `node:`-only, which is what catches an ESLint
+      `--fix` that pulls `ts-data-forge` in.
+    - **A local `pnpm self-update` does not reproduce the failure.** The
+      standalone binary switches versions by another route; CI runs the JS
+      build `pnpm/action-setup` installs with npm, which adds the `pnpm` npm
+      package to switch and so meets the hold.
 - Dependencies between packages in this repository always use the `workspace:`
   protocol — there is no dependency on a published copy of our own packages
   anywhere. For `dependencies` and `peerDependencies`, match the protocol to

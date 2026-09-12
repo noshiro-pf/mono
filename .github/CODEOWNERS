@@ -1,1 +1,38 @@
-* @noshiro-pf
+# 所有者を宣言するのはパスを絞ったここだけ。
+#
+# `main` の ruleset が `require_code_owner_review` を有効にしているため、この
+# ファイルに現れるパスを触る pull request は code owner の承認なしにマージでき
+# ない。裏を返せば、ここに書いたパスは**そのぶん auto-merge が止まる**という
+# ことなので、書く基準は「無審査で main に入ったら困るか」ひとつ。
+#
+# 以前は `* @noshiro-pf` だった。所有者が全ファイルに付いている状態で
+# `require_code_owner_review` を立てると、依存更新を含む全ての pull request が
+# 承認待ちになり、`pnpm-update` の auto-merge が成立しなくなる。所有の意味が
+# 「レビュー依頼の宛先」から「マージのゲート」に変わったので、範囲もそれに
+# 合わせて絞ってある。
+
+# ここが本命。悪意ある依存が `pnpm-update` のジョブ内でコードを実行できた場合、
+# 作業ツリーに細工した workflow ファイルを置いておけば、後続ステップの
+# `git add -A` がそれを拾い、`workflows: write` を持つ App token で push され、
+# auto-merge で `main` に入る。`release.yml` が `main` 上で汚染されてしまえば、
+# `release` environment の deployment branch policy は通過してしまう。
+# ここを止めれば、その経路には必ず人間が一度入る。
+/.github/workflows/ @noshiro-pf
+
+# 上のゲートそのものを外す変更を、同じ経路で通されないようにする。
+/.github/CODEOWNERS @noshiro-pf
+
+# ruleset・Actions の既定権限・environment の保護ルールの宣言。
+# `apply` は手作業なので main に入っただけでは効かないが、宣言が黙って書き換え
+# られた状態は、次に誰かが `apply` を実行した瞬間に効く。
+/repo-settings/ @noshiro-pf
+
+# あえて入れていないもの:
+#
+# - `pnpm-workspace.yaml` — `minimumReleaseAge` と `allowBuilds` という供給
+#   チェーン上重要な設定を持つ一方、`update-packages` が catalog を毎回書き
+#   換える。所有させると依存更新の auto-merge が事実上全部止まる。
+# - `libs/*/package.json` — publish 設定を含むが、同じ理由で毎回動く。
+#
+# どちらも「無審査で入ると困る」は真だが、頻度が高すぎてゲートとして機能しない。
+# 守るなら別の手立て（`verify-npm-packages` や `lint:published-deps`）で。
