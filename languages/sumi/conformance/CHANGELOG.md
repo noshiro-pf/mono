@@ -1,5 +1,13 @@
 # @sumi-lang/conformance
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [6e23aed]
+    - ts-data-forge@14.7.1
+    - @sumi-lang/checker@0.0.1
+
 ## 0.0.1
 
 ### Patch Changes

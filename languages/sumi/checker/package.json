@@ -1,6 +1,6 @@
 {
   "name": "@sumi-lang/checker",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "The Sumi type-aware checker: rules that need type information, run on TypeScript 7's own API in one pass (languages/sumi/docs, D-54)",
   "keywords": [
