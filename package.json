@@ -55,6 +55,7 @@
     "lint:published-deps": "pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' --quiet",
     "md": "markdownlint-cli2",
     "node-support:update": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/update-node-support.mts",
+    "npm-trusted-publishers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/report-npm-trusted-publishers.mts",
     "prepare": "pnpm run z:link-strict-lib",
     "repo-settings:apply": "pnpm run z:repo-settings apply",
     "repo-settings:backup": "pnpm run z:repo-settings backup",
