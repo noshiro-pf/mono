@@ -143,9 +143,22 @@ jobs:
       # the job while allowed build scripts run — the same order as
       # pnpm-update.yml and node-support-update.yml, which say so too.
       #
-      # `contents` is not among them: the backup writes into the workspace and
-      # reads settings through the API, and nothing here writes to the
-      # repository.
+      # `contents: write` is here for a reason that has nothing to do with
+      # writing. "Get a repository" says: "To view merge-related settings, you
+      # must have the contents:read and contents:write permissions." The
+      # merge-related settings are eleven of the sixteen keys
+      # `repository-settings/settings.json` carries — `allow_squash_merge`,
+      # `squash_merge_commit_title`, `delete_branch_on_merge` and the rest —
+      # so without it the backup dumps their defaults instead of their values
+      # and `z:assert-repo-is-clean` fails on main.
+      #
+      # It was dropped once, on the reasoning that nothing in this job writes
+      # to the repository. That is true and not what the permission is for.
+      #
+      # `administration: write` is the same shape: "Get a repository ruleset"
+      # says `bypass_actors` "is only returned if the user making the API
+      # request has write access to the ruleset", and a ruleset's bypass list
+      # is the drift most worth catching.
       - name: Generate Token
         id: app-token
         if: github.event_name != 'pull_request'
@@ -154,6 +167,7 @@ jobs:
           client-id: ${{ vars.REPO_SETTINGS_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_SETTINGS_BOT_PRIVATE_KEY }}
           permission-administration: write
+          permission-contents: write
           permission-pages: read
           # environments のバックアップに必要。 App の installation に
           # Environments: read が無いと、この step が落ちる。
