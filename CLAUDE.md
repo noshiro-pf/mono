@@ -1200,6 +1200,26 @@ So the field is either inert here or it changes how the repository installs.
     - What dependency updates hold back also lives there, in `update.ignoreDeps`.
       That is the single source of truth for _which dependency_ stops moving; do
       not name a package in the `update-packages` script instead.
+- **`minimumReleaseAgeExclude` may name only `@types/*` and packages published
+  from this repository**, and `pnpm run check:root:minimum-release-age` is what
+  keeps it that way. `minimumReleaseAge` is the week a release has to sit on the
+  registry before an install here will take it, and with
+  `required_approving_review_count: 0` and `pnpm-update` enabling auto-merge it
+  is what stands between a version published elsewhere and `main`. An exclusion
+  turns that week off for **everything its pattern matches**, which is not
+  usually what the entry was written for: `'@octokit/**'` was added so that the
+  family's shared type definitions could not arrive one at a time (#1832), and
+  it took six packages of runtime JavaScript out of the delay with them.
+    - **A family that has to move together is held with `update.ignoreDeps`
+      instead.** Not updating any of them keeps their versions in step just as
+      an exclusion does, and it keeps the delay for everything else the pattern
+      reaches. The cost is that the family then moves when someone moves it, so
+      write the reason next to the entry, as `pixi.js-legacy` does.
+    - The check reads the exclusion list against `pnpm-lock.yaml`, so it asks
+      what the patterns actually cover rather than how they are spelled. A
+      workspace sibling reached through `workspace:` is a `link:` in an
+      importer rather than a resolved package, so what it looks at is what an
+      install downloads.
 - **`update-packages` writes to every workspace member except the generated
   bundle manifests.** The script carries
   `--filter '!./strict-lib/v*/output/lib'`. Those twelve `package.json` are

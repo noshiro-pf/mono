@@ -95,19 +95,25 @@ update:
     # the canvas to the federated events API is its own change, with its own
     # review; it is not something a nightly dependency bump should carry.
     - pixi.js-legacy
+    # octokit のパッケージ群は一つの型定義 (`@octokit/openapi-types`) を共有しており、
+    # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
+    # `expectType<..., '='>` で表明している。族の一部だけが動くと、一つのツリーに
+    # 新旧二つの `@octokit/openapi-types` が入り、表明が破れて `ws:build` が
+    # 落ちる (#1832)。必要なのは族が足並みを揃えることであって、族が速く動く
+    # ことではないので、`minimumReleaseAgeExclude` ではなくここで止める。除外は
+    # 7 日の待機ごと外してしまうが、こちらは待機を保ったまま版を揃えられる。
+    # 更新は人間がレビューする PR で族ごとまとめて行う。
+    # `*` はスコープの `/` も跨ぐ (`@pnpm/matcher`)。
+    - '@octokit/*'
 
 minimumReleaseAge: 10080 # = 7 days
 
+# ここに並べてよいのは、型定義だけの `@types/*` と、このリポジトリが publish して
+# いるパッケージだけである（`pnpm run check:root:minimum-release-age` が検査する）。
+# 第三者のランタイムコードをここに載せると、publish された当日の版を
+# 翌日の `pnpm-update` が取り込む。族を揃えたいだけなら `update.ignoreDeps` を使う。
 minimumReleaseAgeExclude:
   - '@types/**'
-
-  # octokit のパッケージ群は一つの型定義 (`@octokit/openapi-types`) を共有しており、
-  # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
-  # `expectType<..., '='>` で表明している。`minimumReleaseAge` が
-  # `@octokit/openapi-types` だけを通して `@octokit/core` を留めると、
-  # 一つのツリーに新旧二つの `@octokit/openapi-types` が入り、
-  # 表明が破れて `ws:build` が落ちる (#1832)。族ごと除外して足並みを揃える。
-  - '@octokit/**'
   - ts-type-forge
   - eslint-plugin-ts-type-forge
   - ts-data-forge
