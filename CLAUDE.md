@@ -505,6 +505,35 @@ The file used to read `* @noshiro-pf`. That was harmless while the rule was
 off, and would have blocked every pull request in the repository the moment it
 was turned on.
 
+**An inline `run:` block in a privileged job is not a style choice.** Two steps
+here hold a GitHub App token by the time they run — `pnpm-update.yml`'s "Open
+auto-merge PR if anything changed" and `node-support-update.yml`'s "Open a pull
+request if anything changed" — and both are long enough to look like something
+that wants to be a `tools/scripts/cmd/*.mts`. Moving them there would hand them
+to the attacker they are written against.
+
+What a `run:` block runs is part of the workflow definition GitHub resolved for
+the event; on a `schedule` that is the default branch's file, and nothing on the
+runner can change it. What a `.mts` runs is read out of the checked-out working
+tree at the moment it is invoked — which is after `pnpm install` has executed
+every allowed install script in the dependency tree. In these two jobs the token
+is in the environment by then, so a dependency that rewrote the file would be
+running its own code holding it.
+
+The rule that follows: **a step that runs after a token is minted stays inline,
+and work that does not need the token belongs in a step before it**, where a
+`.mts` costs nothing and can be tested.
+
+The rest of the inline blocks cannot move for a different reason — they run
+with no checkout and no `pnpm install` at all, and a `.mts` needs both:
+
+- The five `*-result` aggregates boot a runner, read `needs.*.result` and echo.
+- `wip-label.yml` makes one API call, on every event, for every pull request.
+- `check-gates.yml`'s branch check runs **before** its checkout, which is the
+  whole point: a branch behind `main` stays a four-second job.
+- `lint-pull-request.yml` runs on `pull_request_target` and must never check the
+  pull request out. A `.mts` there would require exactly that.
+
 ## CI diff gates
 
 The check workflows carry no `paths` filter. A workflow that a path filter
