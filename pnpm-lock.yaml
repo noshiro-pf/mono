@@ -3048,6 +3048,9 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.6)
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../ts-fortress
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

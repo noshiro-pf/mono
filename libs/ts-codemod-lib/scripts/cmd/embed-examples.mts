@@ -20,6 +20,7 @@ const documents = [
       'transformer-ignore-file-example.mts',
       'programmatic-usage.mts',
       'apply-transformers-to-src-directory.mts',
+      'jsdoc-example.mts',
     ],
   },
 ] as const;

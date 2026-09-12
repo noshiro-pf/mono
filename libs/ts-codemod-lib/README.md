@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-codemod-lib/LICENSE)
 [![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?component=ts-codemod-lib)](https://codecov.io/gh/noshiro-pf/mono)
 
-A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the [ts-morph](https://github.com/dsherret/ts-morph).
+A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by [ts-morph](https://github.com/dsherret/ts-morph).
 
 ## Overview
 
@@ -160,7 +160,7 @@ type User2 = {
 
 Replaces `any` type annotations with `unknown` for improved type safety. The `unknown` type requires type checking before operations, making your code more robust. For function parameters with rest arguments, `(...args: any) => R` is converted to `(...args: readonly unknown[]) => R`.
 
-Example:
+Example (the `as any` casts in the "After" code are not produced by the transformer; they are there only to keep the sample compiling):
 
 ```ts
 // Before
@@ -319,7 +319,7 @@ The transformers are also available as commands, published separately as
 
 ```bash
 npm add -D ts-codemod-cli
-npx convert-to-readonly 'src/**/*.mts'
+npx ts-codemod -t convert-to-readonly 'src/**/*.mts'
 ```
 
 They are in their own package because they need `cmd-ts`, `dedent` and
@@ -330,7 +330,7 @@ package's README for the full command list and options.
 
 ### Using Transformers with String Input/Output
 
-You can use the `astTransformerToStringTransformer` utility to apply these transformers to source code strings:
+You can use the `transformSourceCode` utility to apply these transformers to source code strings:
 
 ```tsx
 import dedent from 'dedent';
@@ -475,12 +475,12 @@ node codemod.mjs
      * @param {string[]} user.roles - User roles.
      * @returns {object} Processed data.
      */
-    function processUser(user: { name: string; roles: string[] }): {
+    const processUser = (_user: {
+        name: string;
+        roles: string[];
+    }): {
         success: boolean;
-    } {
-        // ... implementation ...
-        return { success: true };
-    }
+    } => ({ success: true });
 
     // After applying convertToReadonlyTransformer
     /**
@@ -489,12 +489,12 @@ node codemod.mjs
      * @param {string[]} user.roles - User roles. // JSDoc type is not changed
      * @returns {object} Processed data. // JSDoc type is not changed
      */
-    function processUser(
-        user: Readonly<{ name: string; roles: readonly string[] }>,
-    ): Readonly<{ success: boolean }> {
-        // ... implementation ...
-        return { success: true };
-    }
+    const processUser2 = (
+        _user: Readonly<{
+            name: string;
+            roles: readonly string[];
+        }>,
+    ): Readonly<{ success: boolean }> => ({ success: true }) as const;
     ```
 
 - Comment positions might change due to the heuristics used for restoring comments in the code.
@@ -505,7 +505,7 @@ node codemod.mjs
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/ts-codemod-lib/>
+- API reference: <https://noshiro-pf.github.io/mono/ts-codemod-lib/>
 
 ## For Developers
 

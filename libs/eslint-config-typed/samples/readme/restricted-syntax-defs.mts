@@ -1,4 +1,4 @@
-// configs/restricted-syntax-defs.mjs
+// restricted-syntax-defs.mts
 
 import { eslintRules, type EslintRulesOption } from 'eslint-config-typed';
 import { Arr } from 'ts-data-forge';

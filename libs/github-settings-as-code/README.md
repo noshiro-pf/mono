@@ -1,12 +1,19 @@
-# Github Settings as Code
+# GitHub Settings as Code
 
-GitHub の repository 設定を JSON ファイルで管理するための CLI。
+A CLI for managing a GitHub repository's settings as JSON files.
 
-設定ファイルは repository root の `repo-settings/` から読む。
+The settings files are read from `repo-settings/` at the repository root.
 
-> **v3.0.0 での破壊的変更**: 読み込み元が `github/` から `repo-settings/` に
-> 変わった。`git mv github repo-settings` で移行する。旧名は `.github/` の
-> 別名に見えて、workflow もここにあると誤解させるものだった。
+> **Breaking change in v3.0.0**: the settings directory moved from `github/` to
+> `repo-settings/`. Migrate with `git mv github repo-settings`. The old name
+> looked like an alias of `.github/` and suggested that workflows lived there
+> too.
+
+## Installation
+
+```sh
+npm install -D github-settings-as-code
+```
 
 ## Usage
 
@@ -14,19 +21,19 @@ GitHub の repository 設定を JSON ファイルで管理するための CLI。
 repo-settings <command> [target] [options]
 ```
 
-| Command  | 説明                                         |
-| -------- | -------------------------------------------- |
-| `apply`  | ローカルの設定ファイルを GitHub に反映する   |
-| `backup` | GitHub の現在値をローカルの `bk/` に保存する |
+| Command  | Description                                                      |
+| -------- | ---------------------------------------------------------------- |
+| `apply`  | Apply the local settings files to GitHub                         |
+| `backup` | Save the current values on GitHub to the local `bk/` directories |
 
-| Target        | 対応するファイル                                  | `apply` | `backup` |
-| ------------- | ------------------------------------------------- | ------- | -------- |
-| `all`（既定） | すべて                                            | ✅      | ✅       |
-| `repository`  | `repo-settings/repository-settings/settings.json` | ✅      | ✅       |
-| `rulesets`    | `repo-settings/rulesets/*.json`                   | ✅      | ✅       |
-| `variables`   | repository variables                              | ✅      | —        |
-| `actions`     | `repo-settings/actions-settings/settings.json`    | ✅      | ✅       |
-| `pages`       | `repo-settings/pages/settings.json`               | ✅      | ✅       |
+| Target          | Files                                             | `apply` | `backup` |
+| --------------- | ------------------------------------------------- | ------- | -------- |
+| `all` (default) | All of the below                                  | ✅      | ✅       |
+| `repository`    | `repo-settings/repository-settings/settings.json` | ✅      | ✅       |
+| `rulesets`      | `repo-settings/rulesets/*.json`                   | ✅      | ✅       |
+| `variables`     | Repository variables                              | ✅      | —        |
+| `actions`       | `repo-settings/actions-settings/settings.json`    | ✅      | ✅       |
+| `pages`         | `repo-settings/pages/settings.json`               | ✅      | ✅       |
 
 ```sh
 repo-settings apply
@@ -35,34 +42,47 @@ repo-settings backup
 repo-settings apply --owner noshiro-pf --repo ts-repo-utils
 ```
 
-## 対象 repository の解決
+Each `backup` is written to a `bk/` directory next to the settings file it
+mirrors (for example `repo-settings/rulesets/bk/`). `apply` reads the values
+back from GitHub afterwards and rewrites the local files with what was actually
+applied.
 
-以下の順で決まる。通常は `git remote` から決まるため、どちらの指定も不要。
+## Resolving the target repository
 
-1. コマンドライン引数 `--owner` / `--repo`
-2. 環境変数 `OWNER` / `REPO_NAME`
+The target is resolved in the following order. It is normally derived from
+`git remote`, so neither option is usually needed.
+
+1. The command-line options `--owner` / `--repo`
+2. The environment variables `OWNER` / `REPO_NAME`
 3. `git remote get-url origin`
-4. `package.json` の `name`（ repository 名のみ ）
+4. The `name` field of `package.json` (repository name only)
 
-## 認証
+## Authentication
 
-以下の順で解決される。ローカルでは `gh auth login` 済みであれば設定不要。
+The token is resolved in the following order. Locally, nothing needs to be
+configured once you have run `gh auth login`.
 
-1. 環境変数 `GITHUB_APP_TOKEN` / `GH_TOKEN` / `PERSONAL_ACCESS_TOKEN`
-2. `gh auth token`（ gh CLI のログイン情報 ）
+1. The environment variables `GITHUB_APP_TOKEN` / `GH_TOKEN` /
+   `PERSONAL_ACCESS_TOKEN`
+2. `gh auth token` (the gh CLI's login)
 
-CI では GitHub App の installation token を `GH_TOKEN` に渡す。 repository
-設定・ruleset の操作には **Administration** 権限が必要で、既定の `GITHUB_TOKEN`
-では権限が足りない（`permissions:` に `administration` は存在しない）。
+`GITHUB_TOKEN` is deliberately not read. In GitHub Actions it may hold the
+default token, which lacks the Administration permission.
 
-## 管理できる設定
+In CI, pass a GitHub App installation token as `GH_TOKEN`. Changing repository
+settings and rulesets requires the **Administration** permission, which the
+default `GITHUB_TOKEN` cannot be granted (`administration` is not a valid key
+under `permissions:`).
 
-| ファイル                                          | GitHub 上の場所                         |
+## Managed settings
+
+| File                                              | Location on GitHub                      |
 | ------------------------------------------------- | --------------------------------------- |
 | `repo-settings/repository-settings/settings.json` | Settings > General                      |
 | `repo-settings/rulesets/*.json`                   | Settings > Rules > Rulesets             |
 | `repo-settings/actions-settings/settings.json`    | Settings > Actions > General            |
 | `repo-settings/pages/settings.json`               | Settings > Pages > Build and deployment |
 
-`repo-settings/pages/settings.json` を置いていない repository では Pages の操作を行わない
-（ Pages を使わない repository で誤って有効化しないため ）。
+In a repository without `repo-settings/pages/settings.json`, Pages is left
+untouched, so that a repository that does not use Pages never has it enabled by
+mistake.

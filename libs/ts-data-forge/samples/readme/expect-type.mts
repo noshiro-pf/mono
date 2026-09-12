@@ -20,7 +20,7 @@ import { expectType } from 'ts-data-forge';
     // expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expectType<User, any>('!='); // Error: Comparisons with `any` are also strictly checked.
+    expectType<User, any>('!='); // OK: `User` is not strictly equal to `any` (comparisons with `any` are also strictly checked)
 
     // embed-sample-code-ignore-below
   });

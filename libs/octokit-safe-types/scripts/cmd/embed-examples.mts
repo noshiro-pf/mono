@@ -8,7 +8,7 @@ const documents = [
   {
     mdPath: path.resolve(projectRootPath, 'README.md'),
     samplesDir: path.resolve(projectRootPath, 'samples/readme'),
-    sampleCodeFiles: [],
+    sampleCodeFiles: ['validate-repository.mts'],
   },
 ] as const;
 

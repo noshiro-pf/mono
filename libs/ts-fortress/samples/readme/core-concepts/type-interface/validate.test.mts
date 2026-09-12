@@ -12,10 +12,10 @@ const result = User.validate(validData);
 
 assert.isTrue(t.Result.isOk(result));
 
-// In strip mode (default), a new object is created even without excess properties
+// A valid input is returned as is (the same reference)
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
 
-assert.notStrictEqual(result.value, validData);
+assert.strictEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;

@@ -2,7 +2,7 @@
 
 synstate-preact-hooks re-exports all exports from synstate except for `createState`, `createReducer`, and `createBooleanState`, and exports modified versions of those creation functions.
 
-The first element of the array returned by the `createState<T>` function provided by synstate-preact-hooks is changed from `InitializedObservable<T>` to a React hook `() => T`, and the `InitializedObservable<T>` has been moved to the `state` property in the object at index 2.
+The first element of the array returned by the `createState<T>` function provided by synstate-preact-hooks is changed from `InitializedObservable<T>` to a Preact hook `() => T`, and the `InitializedObservable<T>` has been moved to the `state` property in the object at index 2.
 
 ## Installation
 

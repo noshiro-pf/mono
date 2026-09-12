@@ -10,7 +10,7 @@ const Slug = t.string('feature-flag', {
   regex: /^[a-z-]+$/u,
 });
 
-Slug.is('feature-beta'); // true
+Slug.is('feature-new-flag'); // true
 
 Slug.is('Feature-Flag'); // false (fails regex)
 
