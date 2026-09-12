@@ -30,15 +30,19 @@ name: pnpm update
 # the classification that dependabot-changeset.yml used, so the Changesets
 # release flow publishes those packages once the PR merges.
 #
-# The action pins move in a second, separate step. `update.githubActions` is
-# deliberately `false`, so `update-packages` — which carries `--latest` — leaves
-# them alone, and `update-actions` turns the check back on per-invocation with
-# `--include-github-actions`. That second command has no `--latest`, so an
-# action only moves within `^current`: a major stays put until a human takes it.
+# The action pins move in a separate step, and not through pnpm.
+# `update.githubActions` is deliberately `false`, so `update-packages` — which
+# carries `--latest` — leaves them alone, and `update-actions` runs
+# `tools/scripts/cmd/mature-updates.mts actions` rather than
+# `pnpm update --include-github-actions`: pnpm resolves action versions from
+# `git ls-remote` refs, which carry no publication date, so neither
+# `minimumReleaseAge` nor `ignoreDeps` reaches them and a tag hours old was
+# taken regardless. The script reads each action's GitHub Releases, moves a pin
+# to the newest release of the same major that is older than
+# `minimumReleaseAge`, and resolves the tag to its commit — the same SHA pin
+# pnpm wrote. A major stays put until a human takes it, as before:
 # `changesets/action` v2 is why. It requires Changesets CLI v3 and renamed every
-# input, so the major landing unattended broke release.yml on main, and neither
-# `minimumReleaseAge` nor `ignoreDeps` applies to actions (pnpm reads their
-# versions from `git ls-remote` refs, which carry no publication date).
+# input, so the major landing unattended broke release.yml on main.
 #
 # Because that step rewrites files under .github/workflows/, the token below has
 # to carry the `workflows` permission, or the push is rejected the moment an
@@ -119,13 +123,22 @@ jobs:
       # its header has the whole story. It runs on `node` alone — nothing is
       # installed yet at this point, so `tsx` is not an option.
       - name: Update pnpm itself
-        run: node ./tools/scripts/cmd/self-update-pnpm.mts
+        run: node ./tools/scripts/cmd/mature-updates.mts pnpm
 
       - name: Update dependencies
         run: |
           pnpm run update-packages
-          pnpm run update-actions
           pnpm install --no-frozen-lockfile
+
+      # A step of its own so that the token is in scope for nothing else:
+      # `pnpm install` above runs dependency lifecycle scripts, which is why no
+      # token may reach it (see the checkout). `GITHUB_TOKEN` only reads the
+      # Releases and Commits APIs here, and lifts the unauthenticated rate
+      # limit that the runners' shared IP range otherwise exhausts.
+      - name: Update the action pins
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm run update-actions
 
       # The published half of `verify-npm-packages` pins exact versions, and
       # this is where they move — a release shows up as a reviewable diff
@@ -246,6 +259,6 @@ jobs:
               --base main \
               --head "$branch" \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\` (to the newest pnpm older than \`minimumReleaseAge\`). Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. The latter two go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself and the action pins to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
