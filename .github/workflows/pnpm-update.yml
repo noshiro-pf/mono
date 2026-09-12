@@ -111,8 +111,49 @@ jobs:
       # workspace root per project, each declaring the peer ranges of the
       # package under check — what a consumer has to do anyway, and what keeps
       # the next change of that kind from being invisible.
+      #
+      # Not a bare `pnpm self-update`, which by design ignores
+      # `minimumReleaseAge` and pins whatever `latest` is. The pin is only
+      # written to `packageManager`; the very next pnpm command then fetches
+      # that version through the registry like any other package, and *that*
+      # fetch does honour `minimumReleaseAge`. So a pnpm release younger than
+      # the hold made `self-update` succeed and `update-packages` die with
+      # `ERR_PNPM_NO_MATURE_MATCHING_VERSION` — every day until the release
+      # matured, since the job runs daily (2026-09-11, pnpm 12.4.1 one day
+      # old). Excluding pnpm from the hold would fix the symptom by exempting
+      # the one package that runs every install script in the tree. Instead
+      # the step picks the newest stable pnpm that is already older than the
+      # hold and passes it to `self-update`, which is idempotent when the pin
+      # already says so. `pnpm config get` reads `minimumReleaseAge` from
+      # pnpm-workspace.yaml, so the two cannot disagree.
       - name: Update pnpm itself
-        run: pnpm self-update
+        run: |
+          node <<'NODE'
+          const cp = require('node:child_process');
+          const run = (cmd) =>
+            cp.execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }).trim();
+
+          const minutes = Number.parseInt(run('pnpm config get minimumReleaseAge'), 10) || 0;
+          const cutoff = Date.now() - minutes * 60_000;
+          const { versions, time } = JSON.parse(run('pnpm view pnpm versions time --json'));
+
+          const stable = /^\d+\.\d+\.\d+$/u;
+          const parse = (v) => v.split('.').map(Number);
+          const newer = (a, b) => {
+            const [x, y] = [parse(a), parse(b)];
+            for (let i = 0; i < 3; i += 1) if (x[i] !== y[i]) return x[i] > y[i];
+            return false;
+          };
+
+          const mature = versions.filter((v) => stable.test(v) && Date.parse(time[v]) <= cutoff);
+          if (mature.length === 0) throw new Error('No pnpm release is older than minimumReleaseAge.');
+          const target = mature.reduce((best, v) => (newer(v, best) ? v : best));
+          const heldBack = versions.filter((v) => stable.test(v) && newer(v, target));
+
+          console.log(`minimumReleaseAge: ${minutes} min (cutoff ${new Date(cutoff).toISOString()})`);
+          console.log(`Newest mature pnpm: ${target}${heldBack.length > 0 ? ` (held back: ${heldBack.join(', ')})` : ''}`);
+          cp.execSync(`pnpm self-update ${target}`, { stdio: 'inherit' });
+          NODE
 
       - name: Update dependencies
         run: |
@@ -239,6 +280,6 @@ jobs:
               --base main \
               --head "$branch" \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\` (to the newest pnpm older than \`minimumReleaseAge\`). Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
