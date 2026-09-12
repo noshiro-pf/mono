@@ -1,3 +1,5 @@
+<!-- cspell:ignore pnpmfile -->
+
 # CLAUDE.md
 
 This file is the instructions for this repository, and is maintained by hand.
@@ -505,19 +507,51 @@ The file used to read `* @noshiro-pf`. That was harmless while the rule was
 off, and would have blocked every pull request in the repository the moment it
 was turned on.
 
-**A job that holds a key must not execute anything it reads out of the working
-tree.** That is the rule; "keep it inline" is a consequence of it and not the
-rule itself, which is worth stating because the inline form is easy to satisfy
-while missing the point — an inline `run:` that calls `node ./tools/x.mts` is
-exactly as exposed as a step that does.
+**How much third-party code may share a job with a key is a question about the
+key.** There is no blanket rule here, and an earlier version of this note read
+like one. What a compromised dependency in that job can reach is exactly what
+the key can do, so the answer is different for each of them — and the cost of
+separating is not.
 
-The distinction is where the executed bytes come from. A `run:` block is part of
-the workflow definition GitHub resolved for the event — on a `schedule`, the
-default branch's file — and nothing on the runner can change it. A file in the
-working tree is read at the moment it is invoked, after third-party code has had
-a chance to rewrite it. `git` and `gh` are on the runner image, so a step built
-out of those two is reading nothing from the tree; that is why the token-holding
-step in `pnpm-update.yml` is made of them.
+| job                              | what its key can do                            | third-party code | split?         |
+| :------------------------------- | :--------------------------------------------- | :--------------- | :------------- |
+| `pnpm-update`                    | `contents` + `pull-requests` + **`workflows`** | a lot            | **yes** — done |
+| `node-support-update` / `update` | `contents` + `pull-requests`, no auto-merge    | a lot            | no             |
+| `backup-repository-settings`     | `administration: write`                        | a lot            | not yet        |
+| `release`                        | OIDC, i.e. publish                             | the whole build  | worth solving  |
+
+`pnpm-update` is the one that had to move, and `workflows: write` is the whole
+reason. It is the single capability that turns "a dependency got in" into "every
+published package is gone": a doctored `.github/workflows/release.yml` pushed to
+any branch runs there, and until the `release` environment existed npm would
+have taken its OIDC token. No other key here converts that way.
+`node-support-update` holds `contents` + `pull-requests` and **not** `workflows`,
+so GitHub refuses a push carrying a workflow change, and it enables no
+auto-merge — what an attacker gets is a pull request waiting for a person.
+Splitting that would cost the same and buy almost nothing.
+
+**What actually runs is smaller than "the dependency tree", and worth knowing
+before reaching for a split.** A root `pnpm install` here executes pnpm, the
+install scripts of the three packages `allowBuilds` permits, and
+`strict-ts-lib-v7.0-link` through the root `prepare`. There is no
+`.pnpmfile.cjs`. That is four trust anchors, not eight hundred — so "we ran
+`pnpm install`" is not on its own a reason to move a key.
+
+What makes `pnpm-update`'s update job genuinely broad is the rest of it:
+`tsx` pulls in its scripts' whole import graph, and
+`verify:npm-packages:published:update` installs `latest` of every published
+package from npm into throwaway spaces and runs a program against each. That
+last one executes code fetched from the registry minutes earlier, which is the
+same npm account this whole arrangement exists to protect.
+
+**Where the executed bytes come from is what the ordering inside a job is
+about.** A `run:` block is part of the workflow definition GitHub resolved for
+the event — on a `schedule`, the default branch's file — and nothing on the
+runner can change it. A file in the working tree is read when it is invoked,
+after third-party code has had a chance to rewrite it. `git` and `gh` are on the
+runner image, so a step built out of those two reads nothing from the tree.
+"Keep it inline" is a consequence of this and not the rule: an inline `run:`
+that calls `node ./tools/x.mts` is exactly as exposed as a step that does.
 
 **CODEOWNERS does not substitute for this.** It governs what gets merged, and
 the rewrite here is not a merge: a dependency writing over a file on the runner
