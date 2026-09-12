@@ -372,16 +372,15 @@ the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
 list lives in the `required_status_checks` rule of
 `repo-settings/rulesets/main.json`:
 
-| context                             | comes from                                            |
-| :---------------------------------- | :---------------------------------------------------- |
-| `type-check-result`                 | the aggregate job in `type-check.yml`                 |
-| `style-check-result`                | the aggregate job in `style-check.yml`                |
-| `test-node-versions-result`         | the aggregate job in `node-version-compatibility.yml` |
-| `verify-published-result`           | the aggregate job in `verify-published-packages.yml`  |
-| `backup-repository-settings-result` | the aggregate job in `backup-repository-settings.yml` |
-| `no-wip-label`                      | a commit status written by `wip-label.yml`            |
-| `Validate PR title`                 | `lint-pull-request.yml`                               |
-| `Validate commit messages`          | `lint-pull-request.yml`                               |
+| context                     | comes from                                            |
+| :-------------------------- | :---------------------------------------------------- |
+| `type-check-result`         | the aggregate job in `type-check.yml`                 |
+| `style-check-result`        | the aggregate job in `style-check.yml`                |
+| `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
+| `verify-published-result`   | the aggregate job in `verify-published-packages.yml`  |
+| `no-wip-label`              | a commit status written by `wip-label.yml`            |
+| `Validate PR title`         | `lint-pull-request.yml`                               |
+| `Validate commit messages`  | `lint-pull-request.yml`                               |
 
 **A required context is a string matched exactly against the name of a check
 run — or the context of a commit status — on the pull request's head
@@ -456,16 +455,25 @@ Consequences worth knowing:
 
 `gates / check` is deliberately **not** required. It is a gate that fails
 open — the jobs waiting on it use `!cancelled()` and `!= 'false'`, so an
-unanswered gate lets them run — and each of the five workflows contributes a
+unanswered gate lets them run — and each of the four workflows contributes a
 context under the same name.
 
 **`repo-settings/` is a declaration, not a lever.** The root files under it
 are the desired state, applied only by `pnpm run repo-settings:apply` (it
 needs an admin token); `bk/` is a mirror of what GitHub currently has, written
-by `repo-settings:backup`. The `backup-repository-settings` check compares
-`bk/` against the live repository, so editing a root file passes CI while
+by `repo-settings:backup`. Editing a root file therefore passes CI while
 changing nothing — the settings take effect when someone runs `apply`, which
 rewrites both the root file and `bk/`.
+
+**What notices that they have drifted apart runs somewhere else.** A daily
+workflow in the private `noshiro-pf/mono-security` compares the committed
+`bk/` with the repository's live settings and fails when they differ. It used
+to be a workflow here, and it moved because of what reading those settings
+costs: `bypass_actors` is returned only to a caller with write access to the
+ruleset, and the merge-related settings only with `contents:read` and
+`contents:write`, so the App token cannot be made weaker. What can change is
+where its key lives — and it no longer lives in the secrets of a public
+repository that merges dependency updates unattended. See "Security findings".
 
 **An environment a workflow names is created the moment that workflow first
 runs, with no protection rules on it.** `release` arrived exactly that way.
@@ -517,7 +525,6 @@ separating is not.
 | :------------------------------- | :--------------------------------------------- | :--------------- | :------------- |
 | `pnpm-update`                    | `contents` + `pull-requests` + **`workflows`** | a lot            | **yes** — done |
 | `node-support-update` / `update` | `contents` + `pull-requests`, no auto-merge    | a lot            | no             |
-| `backup-repository-settings`     | `administration: write`                        | a lot            | not yet        |
 | `release`                        | OIDC, i.e. publish                             | the whole build  | worth solving  |
 
 `pnpm-update` is the one that had to move, and `workflows: write` is the whole
@@ -659,19 +666,16 @@ Things to keep in mind when editing a gated workflow:
   checks".
 
 `verify-published-packages.yml` gates itself in shell, on the same principle
-but against a merge base and a single directory rather than an ignore list.
-`backup-repository-settings.yml` asks no question about the diff at all: its
-steps run only where the checkout is main's own content (see below), which is
-an event name rather than a set of paths. Both call `check-gates.yml` with
-`diff-scope: none`, which answers the branch question and skips the checkout:
-each has one job, so a gate that installs to save one runner would cost more
-than it saves.
+but against a merge base and a single directory rather than an ignore list. It
+calls `check-gates.yml` with `diff-scope: none`, which answers the branch
+question and skips the checkout: it has one job, so a gate that installs to
+save one runner would cost more than it saves.
 
 ## Check triggers, `[WIP]` and out-of-date branches
 
-The five check workflows — `type-check.yml`, `style-check.yml`,
-`node-version-compatibility.yml`, `verify-published-packages.yml` and
-`backup-repository-settings.yml` — trigger on `pull_request: types: [opened,
+The four check workflows — `type-check.yml`, `style-check.yml`,
+`node-version-compatibility.yml` and `verify-published-packages.yml` — trigger
+on `pull_request: types: [opened,
 synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
 keeps the checks list at one entry per job: triggering on `push` for branches
 as well would put a push run and a `pull_request` run side by side on every
@@ -689,33 +693,14 @@ tree as the pull request's head — a tree every check has already run on. The
 check workflows used to run their whole matrix on it anyway, on the reasoning
 that a squash makes a commit no pull request run has seen; that is true of the
 commit and false of its contents, and it cost 108 runner-minutes per merge for
-`type-check.yml` alone, at fifty-odd merges a week. So three of the five have
-no `push` trigger at all, and the two that keep one run a single job on it:
+`type-check.yml` alone, at fifty-odd merges a week. So three of the four have
+no `push` trigger at all, and the one that keeps it runs a single job on it:
 
 - `type-check.yml` runs `coverage-main`, which is the matrix's `ws:test:cov`
   entry on its own. Codecov compares a pull request's coverage with the
   report on its base commit, and the base commit is one on `main`, so the
   report has to come from a run on `main`. It is gated on the diff like the
   matrix, so a merge that touched nothing the tests read uploads nothing.
-- `backup-repository-settings.yml` compares `bk/` with the repository's live
-  settings, which no branch changes and no pull request run covers at all. A
-  merge is simply the occasion on which that drift is looked for.
-    - **The comparison runs only where the checkout is `main`'s own content**:
-      that push, and a `workflow_dispatch`. It is not a property of a branch —
-      no branch can change the live settings, and nothing a branch changes can
-      make the comparison say something different — while the tooling that
-      performs it (`repo-settings:backup`, which is
-      `libs/github-settings-as-code` through `tsx`) comes from the checked-out
-      tree, along with everything that tree's `pnpm install` runs.
-      So a pull request that hand-edits `repo-settings/` is checked against
-      reality by the run on `main` after it merges, rather than while it is
-      open; the checkout is the only step of that job a pull request runs.
-    - **The `pull_request` trigger stays even so**, because the job's aggregate
-      is the required `backup-repository-settings-result` and a context that
-      never appears on the head commit blocks the merge forever. The job runs,
-      its steps skip, and it reports `success` — which is why the steps carry
-      the condition and the job does not: a job-level skip would make the
-      aggregate read `skipped` and need a carve-out of its own.
 
 What this gives up is the after-the-fact check on a merge made with the
 admin's bypass, which is the one way a head that is behind `main`, or was
@@ -860,7 +845,7 @@ report `skipped`. What to know about that:
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
   the same string and would simply stop matching too. The string is written
-  down in the workflows — the five check workflows, `wip-label.yml` and
+  down in the workflows — the four check workflows, `wip-label.yml` and
   `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs.mts`, which
   sets a labelled pull request aside; change it everywhere or nowhere.
 - **Any label event re-runs the checks, not just `[WIP]`'s.** The trigger is
