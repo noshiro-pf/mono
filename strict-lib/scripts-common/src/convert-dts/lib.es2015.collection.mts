@@ -4,9 +4,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2015Collection =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
@@ -62,9 +62,8 @@ export const convertLibEs2015Collection =
         // checks a subclass's static side against, so `prototype: Set<never>`
         // makes every `class X extends Set<T>` / `class X extends Map<K, V>`
         // fail with TS2417.
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface MapConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'MapConstructor',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'new (): ReadonlyMap<unknown, unknown>;',
@@ -77,9 +76,8 @@ export const convertLibEs2015Collection =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface SetConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'SetConstructor',
           mapFn: replaceWithNoMatchCheck(
             'new <T = unknown>(values?: readonly T[] | null): ReadonlySet<T>;',
             dedent`
@@ -89,9 +87,8 @@ export const convertLibEs2015Collection =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface WeakMapConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'WeakMapConstructor',
           mapFn: replaceWithNoMatchCheck(
             `new <K extends ${weakKey} = ${weakKey}, V = unknown>(entries?: readonly (readonly [K, V])[] | null): WeakMap<K, V>;`,
             dedent`
@@ -101,9 +98,8 @@ export const convertLibEs2015Collection =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface WeakSetConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'WeakSetConstructor',
           mapFn: replaceWithNoMatchCheck(
             `new <T extends ${weakKey} = ${weakKey}>(values?: readonly T[] | null): WeakSet<T>;`,
             dedent`

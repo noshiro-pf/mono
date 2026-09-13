@@ -3,9 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
+import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibDomCommon =
   ({ config: { returnType } }: ConverterOptions): MonoTypeFunction<string> =>
@@ -36,18 +36,15 @@ export const convertLibDomCommon =
           'readonly any[]',
           'readonly unknown[]',
         ),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Request extends Body {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Request',
           mapFn: replaceWithNoMatchCheck(
             'readonly method: string;',
             'readonly method: HTTPRequestMethod;',
           ),
         }), // https://developer.mozilla.org/ja/docs/Web/HTML/Element/form#method
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp:
-            'interface XMLHttpRequest extends XMLHttpRequestEventTarget {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'XMLHttpRequest',
           mapFn: replaceWithNoMatchCheck(
             'method: string',
             "method: 'post' | 'get' | 'dialog'",
@@ -57,9 +54,8 @@ export const convertLibDomCommon =
         // use mutable array in return value (undo of batch replacement results)
         returnType === 'readonly'
           ? idFn
-          : replaceWithNoMatchCheckBetweenRegexp({
-              startRegexp: 'interface FileSystemDirectoryHandle',
-              endRegexp: closeBraceRegexp,
+          : replaceWithinInterface({
+              name: 'FileSystemDirectoryHandle',
               mapFn: replaceWithNoMatchCheck(
                 '): Promise<readonly string[] | null>',
                 '): Promise<string[] | null>',
@@ -67,9 +63,8 @@ export const convertLibDomCommon =
             }),
         returnType === 'readonly'
           ? idFn
-          : replaceWithNoMatchCheckBetweenRegexp({
-              startRegexp: 'interface IDBIndex {',
-              endRegexp: closeBraceRegexp,
+          : replaceWithinInterface({
+              name: 'IDBIndex',
               mapFn: replaceWithNoMatchCheck(
                 /\): IDBRequest<readonly ([_$a-zA-Z][_$a-zA-Z0-9]*)\[\]>/gu,
                 '): IDBRequest<$1[]>',
@@ -77,9 +72,8 @@ export const convertLibDomCommon =
             }),
         returnType === 'readonly'
           ? idFn
-          : replaceWithNoMatchCheckBetweenRegexp({
-              startRegexp: 'interface IDBObjectStore {',
-              endRegexp: closeBraceRegexp,
+          : replaceWithinInterface({
+              name: 'IDBObjectStore',
               mapFn: replaceWithNoMatchCheck(
                 /\): IDBRequest<readonly ([_$a-zA-Z][_$a-zA-Z0-9]*)\[\]>/gu,
                 '): IDBRequest<$1[]>',

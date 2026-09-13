@@ -3,13 +3,11 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
   arrayIteratorName,
-  closeBraceRegexp,
   idFn,
-  typedArrayInterfaceStartRegexp,
   typedArrayRef,
   wrapTolerant,
   type ConverterOptions,
@@ -140,9 +138,8 @@ export const convertLibEs2020Bigint =
         ...(
           ['BigInt64', 'BigUint64'] as const satisfies readonly ElemType[]
         ).flatMap((elemType) => [
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: typedArrayInterfaceStartRegexp(`${elemType}Array`),
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${elemType}Array`,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 'readonly [index: number]: bigint;',
@@ -170,9 +167,8 @@ export const convertLibEs2020Bigint =
                 : idFn,
             ),
           }),
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: `interface ${elemType}ArrayConstructor {`,
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${elemType}ArrayConstructor`,
             mapFn: composeMonoTypeFns(
               config.config.useBrandedNumber
                 ? replaceWithNoMatchCheck('bigint', elemType)

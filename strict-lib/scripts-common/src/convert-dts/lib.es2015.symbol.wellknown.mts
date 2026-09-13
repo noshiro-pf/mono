@@ -3,9 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { type ConverterOptions } from './common.mjs';
 import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 
 export const convertEs2015SymbolWellknown =
@@ -13,9 +13,8 @@ export const convertEs2015SymbolWellknown =
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Array<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn:
             // revert eslint fix
             replaceWithNoMatchCheck(
@@ -24,9 +23,8 @@ export const convertEs2015SymbolWellknown =
             ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ReadonlyArray<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ReadonlyArray',
           mapFn:
             // revert eslint fix
             replaceWithNoMatchCheck(
@@ -35,9 +33,8 @@ export const convertEs2015SymbolWellknown =
             ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface RegExp {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'RegExp',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               '[Symbol.search](string: string): number;',

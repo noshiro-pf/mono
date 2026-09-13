@@ -3,32 +3,25 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import {
-  closeBraceRegexp,
-  enumType,
-  typedArrayInterfaceStartRegexp,
-  type ConverterOptions,
-} from './common.mjs';
+import { enumType, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2022Array =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Array<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn: replaceWithNoMatchCheck(
             'at(index: number): T | undefined;',
             `at(index: ${brandedNumber.ArraySizeArg}): T | undefined;`,
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ReadonlyArray<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ReadonlyArray',
           mapFn: replaceWithNoMatchCheck(
             'at(index: number): T | undefined;',
             `at(index: ${brandedNumber.ArraySizeArg}): T | undefined`,
@@ -50,9 +43,8 @@ export const convertLibEs2022Array =
             ['BigUint64Array', 'bigint', brandedNumber.BigUint64],
           ] as const
         ).map(([typeName, returnTypeBefore, returnTypeAfter]) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: typedArrayInterfaceStartRegexp(typeName),
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: typeName,
             mapFn: replaceWithNoMatchCheck(
               `at(index: number): ${returnTypeBefore} | undefined;`,
               `at(index: ${brandedNumber.TypedArraySizeArg}): ${returnTypeAfter} | undefined;`,

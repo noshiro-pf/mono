@@ -4,6 +4,4 @@ export { generateKeyValueRecordFromKeys } from './generate-key-value-record-from
 
 export { replaceWithNoMatchCheck } from './replace-with-no-match-check.mjs';
 
-export { replaceWithNoMatchCheckBetweenRegexp } from './replace-with-no-match-check-between-regexp.mjs';
-
-export { sliceByMatch } from './slice-by-match.mjs';
+export { replaceWithinInterface } from './replace-within-interface.mjs';

@@ -3,9 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { type ConverterOptions } from './common.mjs';
 import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 
 export const convertLibEs5_String =
@@ -16,9 +16,8 @@ export const convertLibEs5_String =
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface String {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'String',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'readonly length: number;',

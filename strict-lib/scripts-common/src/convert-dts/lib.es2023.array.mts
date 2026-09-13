@@ -4,11 +4,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
-  closeBraceRegexp,
-  typedArrayInterfaceStartRegexp,
   typedArrayThisCaptureRegexSource,
   type ConverterOptions,
 } from './common.mjs';
@@ -17,22 +15,6 @@ import {
   typedArrayTypeToElemBaseType,
   typedArrayTypeToElemType,
 } from './lib.typed-array-common.mjs';
-
-const markers = {
-  Array: 'interface Array<T> {' as RegExp | string,
-  ReadonlyArray: 'interface ReadonlyArray<T> {' as RegExp | string,
-  Int8: typedArrayInterfaceStartRegexp('Int8Array'),
-  Uint8: typedArrayInterfaceStartRegexp('Uint8Array'),
-  Uint8Clamped: typedArrayInterfaceStartRegexp('Uint8ClampedArray'),
-  Int16: typedArrayInterfaceStartRegexp('Int16Array'),
-  Uint16: typedArrayInterfaceStartRegexp('Uint16Array'),
-  Int32: typedArrayInterfaceStartRegexp('Int32Array'),
-  Uint32: typedArrayInterfaceStartRegexp('Uint32Array'),
-  Float32: typedArrayInterfaceStartRegexp('Float32Array'),
-  Float64: typedArrayInterfaceStartRegexp('Float64Array'),
-  BigInt64: typedArrayInterfaceStartRegexp('BigInt64Array'),
-  BigUint64: typedArrayInterfaceStartRegexp('BigUint64Array'),
-} as const;
 
 const arrayTypes = ['Array', 'ReadonlyArray'] as const satisfies readonly (
   | 'Array'
@@ -48,9 +30,8 @@ export const convertLibEs2023Array =
     pipe(src).map(
       composeMonoTypeFns(
         ...arrayTypes.map((type) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: markers[type],
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: type,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 'findLast<S extends T>(predicate: (value: T, index: number, array: readonly T[]) => value is S, thisArg?: unknown): S | undefined;',
@@ -83,9 +64,8 @@ export const convertLibEs2023Array =
             ),
           }),
         ),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: markers.Array,
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               // TS 5.2+ docs (`toSpliced` jsdoc)
@@ -101,9 +81,8 @@ export const convertLibEs2023Array =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: markers.ReadonlyArray,
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ReadonlyArray',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               // TS 5.2+ docs (`toReversed` jsdoc)
@@ -125,9 +104,8 @@ export const convertLibEs2023Array =
         }),
 
         ...typedArrayElemTypes.map((elemType) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: markers[elemType],
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${elemType}Array`,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 // typed-array `toSpliced` / `toReversed` jsdoc (TS 5.2+).

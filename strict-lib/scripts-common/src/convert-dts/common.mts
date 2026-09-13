@@ -97,23 +97,6 @@ export const typedArrayThisRegexSource = (typeName: string): string =>
 export const typedArrayThisCaptureRegexSource = (typeName: string): string =>
   `(this|${typeName})` as const;
 
-export const closeBraceRegexp = /\n\}\n/gu;
-
-/**
- * Matches `interface ${typeName} {` with an optional `<TArrayBuffer extends
- * ArrayBufferLike>` or `<TArrayBuffer extends ArrayBufferLike =
- * ArrayBufferLike>` generic parameter. TypeScript 5.7 introduced the generic
- * parameter on typed-array interfaces; earlier versions (e.g. TS 5.6) declare
- * them without it. Tolerant of oxfmt wrapping the generic parameter list onto
- * its own lines (with a trailing comma before `>`), which happens for some TS
- * versions' fetched lib files.
- */
-export const typedArrayInterfaceStartRegexp = (typeName: string): RegExp =>
-  new RegExp(
-    String.raw`interface ${typeName}(?:<\s*TArrayBuffer extends ArrayBufferLike(?:\s*=\s*ArrayBufferLike)?,?\s*>)?\s*\{`,
-    'u',
-  );
-
 /**
  * Regex source fragment that matches a typed-array reference with or without
  * the `<ArrayBufferLike>` generic argument. Use to compose patterns covering

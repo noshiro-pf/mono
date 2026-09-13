@@ -3,14 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import {
-  closeBraceRegexp,
-  enumType,
-  typedArrayInterfaceStartRegexp,
-  type ConverterOptions,
-} from './common.mjs';
+import { enumType, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2016ArrayInclude =
   ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
@@ -18,9 +13,8 @@ export const convertLibEs2016ArrayInclude =
     pipe(src).map(
       composeMonoTypeFns(
         ...(['Array', 'ReadonlyArray'] as const).map((typeName) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: `interface ${typeName}<T> {`,
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: typeName,
             mapFn: replaceWithNoMatchCheck(
               // change Array.includes() to accept widen literal types
               'includes(searchElement: T, fromIndex?: number): boolean;',
@@ -42,9 +36,8 @@ export const convertLibEs2016ArrayInclude =
             ['Float64Array', brandedNumber.Float64],
           ] as const
         ).map(([typeName, elemType]) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: typedArrayInterfaceStartRegexp(typeName),
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: typeName,
             mapFn: replaceWithNoMatchCheck(
               'includes(searchElement: number, fromIndex?: number): boolean;',
               `includes(searchElement: ${elemType}, fromIndex?: ${brandedNumber.TypedArraySizeArg}): boolean;`,

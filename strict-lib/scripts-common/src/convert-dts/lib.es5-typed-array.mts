@@ -3,12 +3,10 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
-  closeBraceRegexp,
   enumType,
-  typedArrayInterfaceStartRegexp,
   typedArrayThisCaptureRegexSource,
   wrapTolerant,
   type ConverterOptions,
@@ -150,9 +148,8 @@ export const convertLibEs5_TypedArray =
     pipe(src).map(
       composeMonoTypeFns(
         ...typedArrayNumberElemTypes.flatMap((elemType) => [
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: typedArrayInterfaceStartRegexp(`${elemType}Array`),
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${elemType}Array`,
             mapFn: composeMonoTypeFns(
               convertInterfaceTypedArray(options, elemType),
               replaceWithNoMatchCheck(
@@ -188,9 +185,8 @@ export const convertLibEs5_TypedArray =
             ),
           }),
 
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: `interface ${elemType}ArrayConstructor {`,
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${elemType}ArrayConstructor`,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 'byteOffset?: number',
@@ -231,9 +227,8 @@ export const convertLibEs5_TypedArray =
         ]),
 
         // DataView
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayBuffer {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayBuffer',
           mapFn: replaceWithNoMatchCheck(
             // TS 5.7 made `begin` optional; earlier versions had it required.
             /slice\(begin\??: number, end\?: number\)/gu,
@@ -241,9 +236,8 @@ export const convertLibEs5_TypedArray =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: typedArrayInterfaceStartRegexp('DataView'),
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'DataView',
           mapFn: composeMonoTypeFns(
             ...(
               [
@@ -303,9 +297,8 @@ export const convertLibEs5_TypedArray =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface DataViewConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'DataViewConstructor',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteLength?: number',

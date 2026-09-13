@@ -3,16 +3,14 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp } from './common.mjs';
 
 export const convertLibEs5_Number: MonoTypeFunction<string> = (src) =>
   pipe(src).map(
     composeMonoTypeFns(
-      replaceWithNoMatchCheckBetweenRegexp({
-        startRegexp: 'interface Number {',
-        endRegexp: closeBraceRegexp,
+      replaceWithinInterface({
+        name: 'Number',
         mapFn: composeMonoTypeFns(
           replaceWithNoMatchCheck(
             'toString(radix?: number): string;',
