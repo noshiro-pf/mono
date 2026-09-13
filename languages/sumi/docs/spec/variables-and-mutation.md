@@ -13,28 +13,27 @@
 - `let` は変数名が `mut_` prefix を持つ場合のみ許可: `let mut_count = 0;`
 - オブジェクト・配列の破壊的変更(`functional/immutable-data` が検出する操作)も、対象の変数名が `mut_` prefix を持つ場合のみ許可: `mut_xs[0] = 100;`
 - 引数・戻り値は readonly 型を強制([readonly.md](./readonly.md))。
-- **tuple の長さは変えられない(確定 2026-09-13)。** `mut_` 束縛であっても、tuple 型の値に対する `push` / `pop` / `shift` / `unshift` / `splice` は禁止する。要素の書き換え(`mut_pair[0] = 9`)と、長さを保つミューテータ(`sort` / `reverse` / `fill` / `copyWithin`)は従来どおり合法。
+- **tuple に対して `Array` のミューテータを呼ばない(確定 2026-09-14)。** `mut_` 束縛であっても、tuple 型の値に対する **9 つすべて** — 長さを変える `push` / `pop` / `shift` / `unshift` / `splice` と、**位置を書き換える** `sort` / `reverse` / `fill` / `copyWithin` — を禁止する。**要素への代入(`mut_pair[0] = 9`)はそのスロットの型に対して検査されるので合法**のまま。
 
-    これは様式ではなく**健全性の穴を塞ぐ規則**である。TypeScript の可変 tuple は `Array` を継承しているので長さを変えるメソッドが呼べてしまい、呼んだあとも型は元の長さを主張し続ける(実測):
+    これは様式ではなく**健全性の穴を塞ぐ規則**である。tuple 型は長さと**位置ごとの型**を主張するが、TypeScript はどちらも保たない。可変 tuple は `Array` を継承しているので 9 つとも呼べてしまい、しかも**すべて TypeScript が受け付ける**(実測):
 
     ```ts
-    const mut_pair: [number, number] = [1, 2];
+    const mut_pair: [number, string] = [1, 'a'];
 
-    mut_pair.push(3);
+    mut_pair.push(3); // 長さ: 型は 2 のまま、値は 3 要素
+    mut_pair.reverse(); // 位置: slot 1 は string 型なのに 1 が入る
+    mut_pair.fill(0); // 両方 0 になる。slot 1 は string 型のまま
 
-    const claimed: 2 = mut_pair.length; // 型は 2 のまま通る
-    mut_pair[2]; // 型エラー(「index 2 は無い」)— 実行時には 3 が入っている
+    const stillString: string = mut_pair[1]; // 型検査を通り、実行時は number
     ```
 
-    `length` への直接代入だけは TypeScript が弾く(tuple の `length` はリテラル型)。**唯一 `mut_` prefix が免除しない mutation 規則**であり、`mut_` が答えるのは「誰が変更してよいか」で、こちらが言うのは「tuple とは何か」だからである — 名前で 2 要素の tuple を 3 要素にはできない。`mutation/no-tuple-length-change`(@sumi-lang/checker)として実装。
+    実測値: `[1, 'a']` に対して `reverse()` → `["a", 1]`、`fill(0)` → `[0, 0]`、`copyWithin(0, 1)` → `["a", "a"]`。`length` への直接代入だけは TypeScript が弾く(tuple の `length` はリテラル型)。
 
-これは eslint-config-typed の現行運用(`functional/no-let` + `functional/immutable-data` + `mut_` prefix 慣習)を土台にするが、**prefix は `mut_` の一種類のみとする(確定 2026-08-29 — D-14)**。現行 lint が許容する variant はすべて廃止する:
+    **唯一 `mut_` prefix が免除しない mutation 規則**である。`mut_` が答えるのは「誰が変更してよいか」で、こちらが言うのは「tuple とは何か」だからである — 名前で 2 要素の tuple を 3 要素にも、number のスロットに string を入れられるようにもできない。
 
-- `_mut_*` — `_` prefix は unused parameter 用だが、使わない引数は readonly のままで問題なく、可変で無視する `_mut_*` に存在意義がない。
-- `#mut_*` — class の private フィールド用だが、class 全面禁止(D-12)で出現余地がない。
-- `draft`(immer)— `mut_draft` を強制する。
+    **同種要素の tuple では一部が健全だが、それでも報告する。** `[number, number].reverse()` は誤ったスロットに値を置きようがないが、要素型がたまたま一致するかどうかで規則の適用が変わると、tuple の性質ではなく呼び出し箇所ごとに考える問題になる。順序が変わるものを扱いたいなら配列か、コピーを返す形(`toSorted` / `toReversed` / `with` — いずれも対象外)を使う。
 
-Sumi lint チェッカーの `ignoreIdentifierPattern` は `^mut_` のみになる(現行 config からの変更点 — [enforcement-map.md](../enforcement-map.md))。
+    `mutation/no-tuple-mutating-method`(@sumi-lang/checker)として実装。
 
 ## 外部コードとの境界(確定 2026-09-05 — D-27)
 

@@ -60,7 +60,7 @@ export const knownRuleIds = [
   'mutation/no-let-without-mut-prefix',
   'mutation/no-mutation-without-mut-prefix',
   'mutation/no-shadow',
-  'mutation/no-tuple-length-change',
+  'mutation/no-tuple-mutating-method',
   'mutation/prefer-const',
   'null/no-null-in-type',
   'null/no-null-literal',
