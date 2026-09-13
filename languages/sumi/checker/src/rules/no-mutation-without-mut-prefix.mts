@@ -1,6 +1,6 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   isArrayLiteralExpression,
-  isAsExpression,
   isAssignmentOperator,
   isBinaryExpression,
   isCallExpression,
@@ -8,9 +8,7 @@ import {
   isElementAccessExpression,
   isIdentifier,
   isNewExpression,
-  isNonNullExpression,
   isObjectLiteralExpression,
-  isParenthesizedExpression,
   isPropertyAccessExpression,
   isStringLiteralLikeNode,
   type ElementAccessExpression,
@@ -18,6 +16,7 @@ import {
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
 import { type Checker } from 'typescript-native/unstable/sync';
+import { ownerOf, unwrap } from '../ast/index.mjs';
 import { type Rule } from '../engine/index.mjs';
 
 /**
@@ -316,27 +315,3 @@ const isFreshValue = (
     (freshValueMembersByOwner.get(owner)?.has(callee.name.text) ?? false)
   );
 };
-
-/**
- * The name of the interface that declares the member being accessed, or
- * `undefined` when it does not resolve.
- *
- * This is the only checker query the rule makes, and the syntactic filters
- * above are what keep it from running per node: the pass walks every node of
- * every file, and each query is a round trip (D-55).
- */
-const ownerOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  checker: Checker,
-
-  access: PropertyAccessExpression,
-): string | undefined =>
-  checker.getSymbolAtLocation(access.name)?.getParent()?.name;
-
-/** Parentheses, `as` and `!` say nothing about what is being mutated. */
-const unwrap = (node: TsNode): TsNode =>
-  isParenthesizedExpression(node) ||
-  isAsExpression(node) ||
-  isNonNullExpression(node)
-    ? unwrap(node.expression)
-    : node;

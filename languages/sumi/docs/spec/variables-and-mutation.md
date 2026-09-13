@@ -1,3 +1,5 @@
+<!-- cspell:ignore unshift -->
+
 # 変数宣言と mutation
 
 ## 目標
@@ -11,6 +13,20 @@
 - `let` は変数名が `mut_` prefix を持つ場合のみ許可: `let mut_count = 0;`
 - オブジェクト・配列の破壊的変更(`functional/immutable-data` が検出する操作)も、対象の変数名が `mut_` prefix を持つ場合のみ許可: `mut_xs[0] = 100;`
 - 引数・戻り値は readonly 型を強制([readonly.md](./readonly.md))。
+- **tuple の長さは変えられない(確定 2026-09-13)。** `mut_` 束縛であっても、tuple 型の値に対する `push` / `pop` / `shift` / `unshift` / `splice` は禁止する。要素の書き換え(`mut_pair[0] = 9`)と、長さを保つミューテータ(`sort` / `reverse` / `fill` / `copyWithin`)は従来どおり合法。
+
+    これは様式ではなく**健全性の穴を塞ぐ規則**である。TypeScript の可変 tuple は `Array` を継承しているので長さを変えるメソッドが呼べてしまい、呼んだあとも型は元の長さを主張し続ける(実測):
+
+    ```ts
+    const mut_pair: [number, number] = [1, 2];
+
+    mut_pair.push(3);
+
+    const claimed: 2 = mut_pair.length; // 型は 2 のまま通る
+    mut_pair[2]; // 型エラー(「index 2 は無い」)— 実行時には 3 が入っている
+    ```
+
+    `length` への直接代入だけは TypeScript が弾く(tuple の `length` はリテラル型)。**唯一 `mut_` prefix が免除しない mutation 規則**であり、`mut_` が答えるのは「誰が変更してよいか」で、こちらが言うのは「tuple とは何か」だからである — 名前で 2 要素の tuple を 3 要素にはできない。`mutation/no-tuple-length-change`(@sumi-lang/checker)として実装。
 
 これは eslint-config-typed の現行運用(`functional/no-let` + `functional/immutable-data` + `mut_` prefix 慣習)を土台にするが、**prefix は `mut_` の一種類のみとする(確定 2026-08-29 — D-14)**。現行 lint が許容する variant はすべて廃止する:
 
