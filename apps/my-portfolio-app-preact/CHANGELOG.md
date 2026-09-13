@@ -1,5 +1,13 @@
 # my-portfolio-app-preact
 
+## 0.0.5
+
+### Patch Changes
+
+- preact-utils@0.0.5
+    - tiny-router-observable@0.0.8
+    - synstate-preact-hooks@3.0.4
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # synstate-react-hooks-compat
 
+## 3.0.4
+
+### Patch Changes
+
+- Updated dependencies [90bf42e]
+    - synstate@3.0.4
+
 ## 3.0.3
 
 ### Patch Changes

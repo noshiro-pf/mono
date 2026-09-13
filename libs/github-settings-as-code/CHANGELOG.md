@@ -1,5 +1,29 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 3.2.0
+
+### Minor Changes
+
+- bcd93f5: Manage Settings > Environments.
+
+    A new `environments` target covers `repo-settings/environments/*.json`, one file per environment, alongside the existing `repository` / `rulesets` / `actions` / `pages` ones. `applyEnvironments` and `backupEnvironments` are exported, and `apply`/`backup` with no target now include them.
+
+    Each file is the whole of one environment: the wait timer, the self-review setting, the required reviewers, the deployment branch policy selection, and — folded in from the separate endpoint GitHub keeps them on — the branch and tag patterns that selection refers to. Splitting those two apart would leave a file that reads as a restriction while restricting nothing, so `apply` rejects patterns written under a selection that does not use them, and rejects `protected_branches` and `custom_branch_policies` set together.
+
+    Patterns are reconciled rather than replaced: one whose name and type already match is left alone, because deleting and re-creating it changes its id and leaves a window in which the ref it names cannot deploy.
+
+    Reading an environment back means reading GitHub's `protection_rules`, whose elements are typed as a bare `string` discriminant upstream and so cannot be narrowed. They are parsed with `ts-fortress` instead of cast, which fails loudly if the shape moves.
+
+- bcd93f5: Manage Dependabot alerts.
+
+    A new `vulnerability-alerts` target covers `repo-settings/vulnerability-alerts/settings.json`, a single `enabled` flag read from and written to `GET|PUT|DELETE /repos/{owner}/{repo}/vulnerability-alerts`.
+
+    It is a file of its own rather than a key in `repository-settings/settings.json` because it is a different API: no JSON body, and the current value arrives as a status code — 204 for enabled, 404 for disabled. `getVulnerabilityAlerts` turns the 404 into `enabled: false` and rethrows anything else, so "disabled" and "could not be read" stay distinct.
+
+    `applyVulnerabilityAlerts` does nothing when the file is absent, as `applyPagesSettings` does, so a repository that has not declared the setting does not have it turned off by omission.
+
+    Not to be confused with `dependabot_security_updates` in `repository-settings/settings.json`: that one decides whether Dependabot opens pull requests to fix vulnerable dependencies. This one decides only whether the vulnerabilities are reported.
+
 ## 3.1.0
 
 ### Minor Changes

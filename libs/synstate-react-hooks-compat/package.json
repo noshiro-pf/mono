@@ -1,6 +1,6 @@
 {
   "name": "synstate-react-hooks-compat",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "SynState React hooks for React 16.8–17 (without useSyncExternalStore)",
   "repository": {
     "type": "git",
