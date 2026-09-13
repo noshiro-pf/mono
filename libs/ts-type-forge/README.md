@@ -4,7 +4,7 @@
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/ts-type-forge/>
+- API reference: <https://noshiro-pf.github.io/mono/ts-type-forge/>
 
 [![npm downloads](https://img.shields.io/npm/dm/ts-type-forge.svg)](https://www.npmjs.com/package/ts-type-forge)
 [![License](https://img.shields.io/npm/l/ts-type-forge.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/LICENSE)
@@ -477,7 +477,7 @@ The library is organized into logical modules for easy navigation and understand
 - **`tuple-and-list/`**: Array and tuple operations with `List` and `Tuple` namespaces for type-safe manipulations.
 - **`type-level-integer/`**: Mathematical operations like `Increment`, `UintRange`, `AbsoluteValue` performed at the type level.
 - **`constants/`**: Pre-defined constants like `Primitive`, `FalsyValue`, `HTTPRequestMethod`, and enum types.
-- **`others/`**: Utility types like `JsonValue`, `Mutable`, `WidenLiteral`, and helper functions.
+- **`others/`**: Utility types like `JsonValue`, `Mutable`, `WidenLiteral`.
 
 ## Key Benefits
 
@@ -490,7 +490,7 @@ The library is organized into logical modules for easy navigation and understand
 
 ## API Reference
 
-For detailed information on all types, see the [Full API Reference](https://noshiro-pf.github.io/ts-type-forge/).
+For detailed information on all types, see the [Full API Reference](https://noshiro-pf.github.io/mono/ts-type-forge/).
 
 ### Overview of All Types (with source code links)
 
@@ -876,31 +876,28 @@ While **ts-type-forge** provides powerful compile-time type utilities, combining
 /// <reference types="ts-type-forge/global" />
 
 // Runtime validation with ts-data-forge
-import {
-    isUint,
-    expectType,
-    assertNonEmptyArray,
-    parseJsonValue,
-    isRecord,
-    hasKey,
-} from 'ts-data-forge';
+import { Arr, expectType, hasKey, isRecord, Json, Result } from 'ts-data-forge';
 
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 
 // Type-safe length checking
-if (Arr.isMinLengthArray(2, numbers)) {
-    // numbers is now guaranteed to have at least 3 elements
+if (Arr.isMinLengthTuple(2, numbers)) {
+    // numbers is now guaranteed to have at least 2 elements
     expectType<typeof numbers, MinLengthTuple<2, number>>('=');
     console.log(numbers[1]); // Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled
 }
 
-// Safe JSON parsing with type validation
+// Safe JSON parsing
 const jsonString = '{"count": 42, "items": [1, 2, 3]}';
-const data: JsonValue = parseJsonValue(jsonString); // Validates at runtime
+const parsed: Result<JsonValue, string> = Json.parse(jsonString); // Never throws
 
 // Use the data with confidence
-if (isRecord(data) && hasKey(data, 'count')) {
-    console.log(data.count); // Safe access
+if (
+    Result.isOk(parsed) &&
+    isRecord(parsed.value) &&
+    hasKey(parsed.value, 'count')
+) {
+    console.log(parsed.value.count); // Safe access
 }
 ```
 

@@ -4,7 +4,7 @@
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/ts-repo-utils/>
+- API reference: <https://noshiro-pf.github.io/mono/ts-repo-utils/>
 
 [![npm downloads](https://img.shields.io/npm/dm/ts-repo-utils.svg)](https://www.npmjs.com/package/ts-repo-utils)
 [![License](https://img.shields.io/npm/l/ts-repo-utils.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-repo-utils/LICENSE)
@@ -75,6 +75,7 @@ npm exec -- format-uncommitted --silent
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
 - `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
+- `--cwd <dir>` - Only format files within this directory (relative paths are resolved against the current working directory)
 
 ### `format-diff-from`
 
@@ -112,6 +113,7 @@ Example in npm scripts:
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
 - `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
+- `--cwd <dir>` - Only format files within this directory (relative paths are resolved against the current working directory)
 
 ### `gen-index-ts`
 
@@ -264,7 +266,7 @@ npm exec -- check-should-run-type-checks \
 
 **GitHub Actions Integration:**
 
-When running in GitHub Actions, the command sets the `GITHUB_OUTPUT` environment variable with `should_run=true` or `should_run=false`, which can be used in subsequent steps.
+When running in GitHub Actions, the command appends `should_run=true` or `should_run=false` to the file named by the `GITHUB_OUTPUT` environment variable, which can be used in subsequent steps.
 
 ## API Reference
 
@@ -415,8 +417,8 @@ await assertExt({
 type CheckExtConfig = Readonly<{
     directories: readonly Readonly<{
         path: string; // Directory path to check
-        extension: string; // Expected file extension (including the dot)
-        ignorePatterns?: readonly string[]; // Optional glob patterns to ignore
+        extension: `.${string}` | readonly `.${string}`[]; // Expected file extension(s) (including the dot)
+        ignorePatterns?: readonly string[]; // Optional glob patterns to ignore (default: ['tsconfig.json'])
     }>[];
 }>;
 ```
@@ -774,6 +776,15 @@ type GenIndexConfig = Readonly<{
 
     /** Whether to suppress output during execution (default: false) */
     silent?: boolean;
+
+    /** Minimum depth to start generating index files (default: 0) */
+    minDepth?: number;
+
+    /**
+     * Glob patterns of index files to leave untouched, matched against the index
+     * file's own path relative to the target directory (default: none)
+     */
+    preserve?: readonly string[];
 }>;
 ```
 
@@ -814,6 +825,7 @@ await runCmdInStagesAcrossWorkspaces({
 - `cmd` - The npm script command to execute in each package
 - `concurrency?` - Maximum packages to process simultaneously within each stage (default: 3)
 - `filterWorkspacePattern?` - Optional function to filter packages by name
+- `dependencyFields?` - Which `package.json` fields the stage ordering is derived from (default: `['dependencies', 'devDependencies', 'peerDependencies']`)
 
 #### `runCmdInParallelAcrossWorkspaces(options): Promise<void>`
 

@@ -1,6 +1,6 @@
 import * as t from 'ts-fortress';
 
-const PermissionsMask = t.bigint(0b11_1111n, {
+const PermissionsMask = t.bigint(0b11_1100n, {
   gte: 0n,
   lte: (1n << 6n) - 1n,
   multipleOf: 1n << 2n,

@@ -9,12 +9,16 @@ const documents = [
     mdPath: path.resolve(workspaceRootPath, 'README.md'),
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
     sampleCodeFiles: [
+      'setup-explicit-import.mts',
+      'setup-ambient-types-option.mts',
+      'setup-ambient-triple-slash.mts',
       '01-type-eq-and-extends.mts',
       '02-deep-readonly-and-deep-partial.mts',
       '03-strict-omit.mts',
       '04-non-empty-array-and-list.mts',
       '05-json-value.mts',
       '06-uint-range-and-brands.mts',
+      'runtime-type-guards-with-ts-data-forge.mts',
     ],
   },
 ] as const;

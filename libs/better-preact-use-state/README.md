@@ -4,7 +4,7 @@ A utility that improves Preact's `useState` to be safer and more convenient. Pro
 
 ## Overview
 
-Preact's `useState` can cause unintended behavior when you want to hold a function as a state. `better-preact-use-state` solves this problem and is a utility designed for safer state management. It is designed as a drop-in replacement for Preact's `useState` hook, with added functionality. `better-preact-use-state` also provides a simplified hook, `useBoolState`, specifically for boolean state.
+Preact's `useState` hands back a single setter that accepts either the next value or an updater function, so the two cannot be told apart by type. `better-preact-use-state` is a utility designed for safer state management: its `setState` accepts only the next value, and it also hands back `updateState` and `resetState`. It is designed as a drop-in replacement for Preact's `useState` hook, with added functionality. `better-preact-use-state` also provides a simplified hook, `useBoolState`, specifically for boolean state.
 
 ## Installation
 
@@ -30,27 +30,34 @@ pnpm add better-preact-use-state
 
 ```tsx
 import { useState } from 'better-preact-use-state';
+import type * as Preact from 'preact';
+import { useCallback } from 'preact/hooks';
 
-const MyComponent: FunctionalComponent = () => {
-    const [name, setName] = useState('John Doe');
+export const MyComponent = (): Preact.JSX.Element => {
+    const [userName, setUserName] = useState('John Doe');
 
-    const [count, setCount, { updateState: updateCount }] = useState(0);
+    const [count, , { updateState: updateCount }] = useState(0);
 
-    const onNameChange = useCallback((event) => {
-        setName(event.target.value);
-    }, []);
+    const onNameInput: Preact.InputEventHandler<HTMLInputElement> = useCallback(
+        (ev) => {
+            setUserName(ev.currentTarget.value);
+        },
+        [setUserName],
+    );
 
     const incrementCount = useCallback(() => {
         updateCount((x) => x + 1);
-    }, []);
+    }, [updateCount]);
 
     return (
         <div>
             <p>{`Count: ${count}`}</p>
-            <button onClick={incrementCount}>{'Increment'}</button>
+            <button type={'button'} onClick={incrementCount}>
+                {'Increment'}
+            </button>
 
-            <p>{`Name: ${name}`}</p>
-            <input type="text" value={name} onChange={onNameChange} />
+            <p>{`Name: ${userName}`}</p>
+            <input type={'text'} value={userName} onInput={onNameInput} />
         </div>
     );
 };
@@ -62,18 +69,25 @@ const MyComponent: FunctionalComponent = () => {
 
 ```tsx
 import { useBoolState } from 'better-preact-use-state';
+import type * as Preact from 'preact';
 
-const MyComponent = () => {
-    const [isOpen, { setTrue: open, setFalse: close, toggleState }] =
+export const MyComponent = (): Preact.JSX.Element => {
+    const [isOpen, { setTrue: openPanel, setFalse: closePanel, toggleState }] =
         useBoolState(false);
 
     return (
         <div>
             <p>{`Is Open: ${isOpen ? 'Yes' : 'No'}`}</p>
-            <button onClick={open}>{'Open'}</button>
-            <button onClick={close}>{'Close'}</button>
-            <button onClick={toggleState}>{'Toggle'}</button>
+            <button type={'button'} onClick={openPanel}>
+                {'Open'}
+            </button>
+            <button type={'button'} onClick={closePanel}>
+                {'Close'}
+            </button>
             {/* Toggles the boolean value */}
+            <button type={'button'} onClick={toggleState}>
+                {'Toggle'}
+            </button>
         </div>
     );
 };
@@ -83,8 +97,8 @@ const MyComponent = () => {
 
 ### `useState`
 
-```typescript
-const [state, setState, { updateState, resetState }] = useState<T>(initialState: T);
+```ts
+const [state, setState, { updateState, resetState }] = useState(initialState);
 ```
 
 - `state`: The current state.
@@ -94,24 +108,27 @@ const [state, setState, { updateState, resetState }] = useState<T>(initialState:
 
 #### `updateState`
 
-```typescript
-updateState(updateFn: (v: T) => T): void;
+```ts
+updateState: (updateFn: (v: T) => T) => void;
 ```
 
 Updates the state by passing a function `updateFn` that takes the current state as an argument and returns the new state.
 
 #### `resetState`
 
-```typescript
-resetState(): void;
+```ts
+resetState: () => void;
 ```
 
 Resets the state to the initial value.
 
 ### `useBoolState`
 
-```typescript
-const [state, { setState, setTrue, setFalse, resetState, toggleState, updateState }] = useBoolState(initialState: boolean);
+```ts
+const [
+    state,
+    { setState, setTrue, setFalse, resetState, toggleState, updateState },
+] = useBoolState(initialState);
 ```
 
 - `state`: The current boolean value.
@@ -124,67 +141,66 @@ const [state, { setState, setTrue, setFalse, resetState, toggleState, updateStat
 
 #### `setState`
 
-```typescript
-setState(next: boolean): void;
+```ts
+setState: (next: boolean) => void;
 ```
 
 Sets the state to the provided boolean value.
 
 #### `setTrue`
 
-```typescript
-setTrue(): void;
+```ts
+setTrue: () => void;
 ```
 
 Sets the state to `true`.
 
 #### `setFalse`
 
-```typescript
-setFalse(): void;
+```ts
+setFalse: () => void;
 ```
 
 Sets the state to `false`.
 
 #### `resetState`
 
-```typescript
-resetState(): void;
+```ts
+resetState: () => void;
 ```
 
 Resets the state to the initial value.
 
 #### `toggleState`
 
-```typescript
-toggleState(): void;
+```ts
+toggleState: () => void;
 ```
 
 Toggles the current boolean value.
 
 #### `updateState`
 
-```typescript
-updateState(updateFn: (v: boolean) => boolean): void;
+```ts
+updateState: (updateFn: (v: boolean) => boolean) => void;
 ```
 
 Updates the state by passing a function `updateFn` that takes the current state as an argument and returns the new state. This is useful for updates that depend on the current state.
 
 ## Benefits of this library
 
-With Preact's standard `useState`, attempting to store a function as state can lead to unexpected behavior (the function being interpreted as an updater function). `better-preact-use-state` solves this issue and, by providing `updateState`, allows functions to be safely held as state. Also, `resetState` lets you easily return the state to its initial value. `useBoolState` simplifies boolean state management in Preact, offering several advantages over directly using useState for booleans.
+With Preact's standard `useState`, `setState` accepts either the next value or an updater function, and nothing in the types tells the two apart. `better-preact-use-state` separates them: `setState` is typed to accept only the next value, and an update that depends on the current value goes through `updateState` explicitly. `resetState` lets you easily return the state to its initial value. `useBoolState` simplifies boolean state management in Preact, offering several advantages over directly using `useState` for booleans.
 
-### Example Use Case
+### Holding a function as state
 
-Useful when you want to hold a function as state.
+The initial value and the argument of `setState` are passed to Preact's `useState` as they are, so a function given to either is still called as a lazy initializer or an updater, just as with Preact's own hook. To hold a function as state, wrap it in an object:
 
-```typescript
-const [fn, setFn, { updateState: updateFn }] = useState(initialFn); // Holds a function as state
+```ts
+const [{ fn }, setFn] = useState({ fn: initialFn });
 
-// In Preact's standard useState, `setFn(nextFn)` interprets nextFn as an update function.
-
-// If you want to update the state with an update function, you can use updateState instead.
-updateFn((currentFn) => nextFn);
+const onReplace = (): void => {
+    setFn({ fn: nextFn });
+};
 ```
 
 ## License

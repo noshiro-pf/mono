@@ -20,7 +20,7 @@ const processUser = (_user: {
 /**
  * Processes user data.
  * @param {object} user - The user object. // JSDoc type is not changed
- * @param {readonly string[]} user.roles - User roles. // JSDoc type is not changed
+ * @param {string[]} user.roles - User roles. // JSDoc type is not changed
  * @returns {object} Processed data. // JSDoc type is not changed
  */
 const processUser2 = (

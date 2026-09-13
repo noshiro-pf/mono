@@ -16,7 +16,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [defineConfig helper](#defineconfig-helper)
     - [defineKnownRules utility](#defineknownrules-utility)
     - [withDefaultOption utility](#withdefaultoption-utility)
-- [TypeScript Configuration Files](#typescript-configuration-files)
+    - [TypeScript Configuration Files](#typescript-configuration-files)
 - [Configuration Examples](#configuration-examples)
     - [TypeScript + React Project](#typescript--react-project)
     - [Node.js TypeScript Project](#nodejs-typescript-project)
@@ -35,6 +35,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
         - [ts-restrictions](#ts-restrictions)
         - [vitest-coding-style](#vitest-coding-style)
         - [react-coding-style](#react-coding-style)
+        - [ts-data-forge](#ts-data-forge)
     - [Type Definitions](#type-definitions)
         - [Core Types](#core-types)
         - [Rule Types](#rule-types)
@@ -62,9 +63,9 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 
 ## Requirements
 
-- Node.js >= 18.0.0
+- Node.js >= 22.22.2
 - ESLint >= 9.0.0
-- TypeScript >= 5.0.0 (for TypeScript projects)
+- TypeScript >= 5.0.0 < 7.0.0 (for TypeScript projects)
 
 ## Installation
 
@@ -210,7 +211,7 @@ export default Arr.toPushed(
 
 ### defineKnownRules utility
 
-`defineKnownRules` is a helper designed for the `rules` field in ESLint flat configs. It keeps the returned object untouched while giving you **type-safe rule names and option inference** in editors (like biome.json). When you wrap your overrides with this function you can rely on:
+`defineKnownRules` is a helper designed for the `rules` field in ESLint flat configs. It keeps the returned object untouched while giving you **type-safe rule names and option inference** in editors. When you wrap your overrides with this function you can rely on:
 
 - autocomplete and early feedback for rule identifiers, eliminating typo-prone string literals;
 - strongly typed options for every plugin rule that ships with `eslint-config-typed`, so you can discover valid properties without leaving your editor;
@@ -286,7 +287,7 @@ export default Arr.toPushed(
             'no-restricted-globals': 'error',
             // ~~~~~~~~~~~~~~~~~~~~
             // ^ Type Error! (Because "no-restricted-globals" has options)
-            // NOTE: In addition, some rules, such as "no-restricted-syntax" "and no-restricted-globals", have no effect unless you set the option.
+            // NOTE: In addition, some rules, such as "no-restricted-syntax" and "no-restricted-globals", have no effect unless you set the option.
 
             // OK
             'object-shorthand': withDefaultOption('error'),
@@ -426,8 +427,7 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
         {
             "mode": "auto"
         }
-    ],
-    "eslint.experimental.useFlatConfig": true
+    ]
     // "editor.codeActionsOnSave": {
     //   "source.fixAll.eslint": "explicit"
     // }
@@ -475,20 +475,23 @@ These functions return (arrays of) ESLint flat configuration(s):
     - `options.tsconfigRootDir`: Root directory containing tsconfig.json
     - `options.tsconfigFileName`: Path to tsconfig.json file
     - `options.packageDirs`: Array of package directories for import resolution
-- **`eslintConfigForBrowser`** - Browser configuration (Turn off Node.js-specific rules)
-- **`eslintConfigForNodeJs`** - Node.js configuration (Turn off browser-specific rules)
+    - `options.files` (optional): Glob patterns the rules apply to (defaults to all JS/TS files)
+    - `options.usingStrictTsLib` (optional): Set to `true` when the project uses a strict TypeScript lib replacement
+- **`eslintConfigForBrowser(files?)`** - Browser configuration (Turn off Node.js-specific rules)
+- **`eslintConfigForNodeJs(files?)`** - Node.js configuration (Turn off browser-specific rules)
 
 #### Framework Configurations
 
-- **`eslintConfigForReact(options?)`** - React configuration with hooks and JSX rules
+- **`eslintConfigForReact(files?)`** - React configuration with hooks and JSX rules
     - `eslintConfigForBrowser` is included in this configuration
-- **`eslintConfigForPreact(options?)`** - Preact (lighter React alternative) configuration
+- **`eslintConfigForPreact(files?)`** - Preact (lighter React alternative) configuration
     - `eslintConfigForBrowser` is included in this configuration
-- **`eslintConfigForVitest(options?)`** - Vitest testing framework configuration
-- **`eslintConfigForJest(options?)`** - Jest testing framework configuration
-- **`eslintConfigForTestingLibrary(options?)`** - Testing Library configuration
-- **`eslintConfigForPlaywright(options?)`** - Playwright E2E testing configuration
-- **`eslintConfigForCypress(options?)`** - Cypress E2E testing configuration
+- **`eslintConfigForVitest(files?)`** - Vitest testing framework configuration
+- **`eslintConfigForJest(files?)`** - Jest testing framework configuration
+- **`eslintConfigForTestingLibrary(files?)`** - Testing Library configuration
+- **`eslintConfigForPlaywright(files?)`** - Playwright E2E testing configuration
+- **`eslintConfigForCypress(files?)`** - Cypress E2E testing configuration
+- **`eslintConfigForImmer(files?)`** - Immer coding style configuration
 
 #### Utility Configurations
 
@@ -503,7 +506,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintRules`**                          | (eslint)                               | Core ESLint rules                                      |
 | **`typescriptEslintRules`**                | `@typescript-eslint/eslint-plugin`     | TypeScript-specific ESLint rules                       |
 | **`eslintFunctionalRules`**                | `eslint-plugin-functional`             | Functional programming style rules                     |
-| **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Functional programming style rules                     |
+| **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Total functions (no partial operations) rules          |
 | **`eslintUnicornRules`**                   | `eslint-plugin-unicorn`                | Unicorn plugin rules for better code                   |
 | **`eslintArrayFuncRules`**                 | `eslint-plugin-array-func`             | Array function preference rules                        |
 | **`eslintMathRules`**                      | `eslint-plugin-math`                   | Math object and Number rules                           |
@@ -529,6 +532,8 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintCypressRules`**                   | `eslint-plugin-cypress`                | Cypress-specific rules                                 |
 | **`eslintVitestCodingStyleRules`**         | `eslint-plugin-vitest-coding-style`    | Vitest best practices                                  |
 | **`eslintPluginRules`**                    | `eslint-plugin-eslint-plugin`          | eslint-plugin development rules                        |
+| **`eslintImmerCodingStyleRules`**          | `eslint-plugin-immer-coding-style`     | Immer usage style rules                                |
+| **`eslintTsDataForgeRules`**               | `eslint-plugin-ts-data-forge`          | ts-data-forge usage rules                              |
 
 ### Exported Pre-configured Rule Options
 
@@ -588,7 +593,7 @@ export default [
                     selector:
                         "ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']",
                     message:
-                        "React should be imported as `import * as React from 'react'.",
+                        "React should be imported as `import * as React from 'react'`.",
                 },
             ],
         }),
@@ -625,7 +630,7 @@ This type definition provides overridden `Chai.Assert` type:
         - `isTrue: (value: boolean) => asserts value;`
         - `isFalse: (value: boolean) => asserts value is false`
 - Removed the call signature (`assert(x)`)
-- Removed `deepEqual`, `equal`, `notEqual`, `ok`, `notOk`, `isOk`, `isNotOk`,
+- Removed `deepEqual`, `equal`, `notEqual`, `ok`, `notOk`, `isOk`, `isNotOk`
     - `deepEqual` : Removed in favor of `assert.deepStrictEqual`
     - `equal` : Removed in favor of `assert.strictEqual`
     - `notEqual` : Removed in favor of `assert.notStrictEqual`
@@ -672,7 +677,7 @@ local name instead of writing one the file does not have.
 **`eslintPluginReactCodingStyle`** - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.).
 
 - See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
-- Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/react-hooks-definition-style`.
+- Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/use-memo-hook-style`.
 
 | Included rules                   | Description                                                                                                           |
 | :------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
@@ -688,7 +693,7 @@ local name instead of writing one the file does not have.
 
 #### ts-data-forge
 
-**`eslintPluginTsDataForge`** - Custom ESLint plugin for [`ts-data-forge`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge).
+The rules for [`ts-data-forge`](https://github.com/noshiro-pf/mono/tree/main/libs/ts-data-forge) are provided by a separate package, [`eslint-plugin-ts-data-forge`](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-ts-data-forge). `eslint-config-typed` exports the pre-configured rule set `eslintTsDataForgeRules` (and its types `EslintTsDataForgeRules` / `EslintTsDataForgeRulesOption`); register the plugin under the `ts-data-forge` prefix to use it.
 
 ### Type Definitions
 
@@ -697,7 +702,7 @@ All rules and configurations come with complete TypeScript type definitions:
 #### Core Types
 
 - **`FlatConfig`** - ESLint flat configuration type
-    - `= DeepReadonly<import('@typescript-eslint/utils/ts-eslint').FlatConfig>`
+    - `= DeepReadonly<import('@typescript-eslint/utils/ts-eslint').FlatConfig.Config>`
 - **`ESLintPlugin`** - ESLint plugin type
     - `= DeepReadonly<import('@typescript-eslint/utils/ts-eslint').FlatConfig.Plugin>`
 - **`Rule`** - ESLint rule definition type
@@ -725,7 +730,6 @@ Each plugin provides typed rule definitions:
     - **`EslintStrictDependenciesRules`** & **`EslintStrictDependenciesRulesOption`**
     - **`EslintSecurityRules`** (no options)
     - **`EslintTreeShakableRules`** (no options)
-    - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
     - **`EslintTsRestrictionsRules`** & **`EslintTsRestrictionsRulesOption`**
     - **`EslintNRules`** & **`EslintNRulesOption`**
 - React & JSX
@@ -808,7 +812,7 @@ export default Arr.toPushed(
 Leverage TypeScript for type-safe rule configuration:
 
 ```tsx
-// configs/restricted-syntax-defs.mjs
+// restricted-syntax-defs.mts
 
 import { eslintRules, type EslintRulesOption } from 'eslint-config-typed';
 import { Arr } from 'ts-data-forge';
@@ -883,7 +887,7 @@ export default [
     {
         files: ['scripts/**/*.ts'],
         rules: defineKnownRules({
-            // Allow console in scripts
+            // Relax rules for scripts
             'no-await-in-loop': 'off',
             'import-x/no-unassigned-import': 'off',
         }),
@@ -944,7 +948,7 @@ For large projects, consider:
 - Using `TIMING=1 eslint` to identify heavy rules
 - Using `NODE_OPTIONS='--max-old-space-size=<memory-size-MB>' eslint` to increase the maximum memory available
 - Separate heavy rules into a separate config and prepare a dedicated command
-- Using `.eslintignore` or `ignores` patterns to skip generated files
+- Using `ignores` patterns to skip generated files
 - Running ESLint with `--cache` flag
 - Limiting the scope of type-aware rules
 
@@ -959,7 +963,7 @@ module.exports = {
 };
 ```
 
-The flat config then enables the rule for our source tree and marks the public federation module as an allowed unused export:
+The flat config then enables the rule for our source tree and marks the package entry point as an allowed unused export:
 
 ```typescript
 // eslint.config.mts (excerpt)

@@ -19,6 +19,7 @@ const documents = [
       'iteration-range.mts',
       'mutability-utilities.tsx',
       'mutability-utilities2.mts',
+      'vite-config-remove-expect-type.mts',
     ],
   },
 ] as const;

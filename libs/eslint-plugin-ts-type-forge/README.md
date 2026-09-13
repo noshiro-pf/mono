@@ -44,7 +44,7 @@ export default [
         rules: {
             'ts-type-forge/prefer-canonical-length-constrained-tuple': [
                 'error',
-                { importStyle: 'named' },
+                { importStyle: 'global' },
             ],
         } satisfies Partial<EslintTsTypeForgeRules>,
     },
@@ -64,7 +64,12 @@ export default [
     {
         plugins: { 'ts-type-forge': eslintPluginTsTypeForge },
         rules: {
-            'ts-type-forge/prefer-canonical-length-constrained-tuple': 'error',
+            'ts-type-forge/no-side-effect-import': 'error',
+            // A rule with options is typed to be given them.
+            'ts-type-forge/prefer-canonical-length-constrained-tuple': [
+                'error',
+                {},
+            ],
         } satisfies Partial<EslintTsTypeForgeRules>,
     },
 ];
@@ -251,14 +256,10 @@ Either way, if the file already imports the target type from `ts-type-forge`
 (possibly under an alias), the fix reuses that binding.
 
 ```ts
-{
-    rules: {
-        'ts-type-forge/prefer-canonical-length-constrained-tuple': [
-            'error',
-            { importStyle: 'named', maxLength: 6 },
-        ],
-    },
-}
+'ts-type-forge/prefer-canonical-length-constrained-tuple': [
+    'error',
+    { importStyle: 'named', maxLength: 6 },
+],
 ```
 
 ## License

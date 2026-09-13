@@ -315,8 +315,9 @@ reached none of the other eight.
 - `embed-examples-utils.mts` — `extractSampleCode`, which is the marker
   handling (`// embed-sample-code-ignore-above` and friends) and the
   indentation normalizing.
-- `embed-examples-in-markdown.mts` — fills the ` ```ts ` / ` ```tsx ` / ` ```js ` fences of a markdown document from a `samples/`
-  directory. A package's `doc:embed`.
+- `embed-examples-in-markdown.mts` — fills every JavaScript / TypeScript
+  fence of a markdown document from a `samples/` directory. A package's
+  `doc:embed`.
 - `embed-examples-in-jsdoc.mts` — fills the ` ```ts ` fences of the
   `@example` blocks under `src/`. A package's `doc:embed:jsdoc`.
 
@@ -356,6 +357,23 @@ the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
   to check it; it deliberately does not re-answer whether the example is
   mapped, because two implementations of that would be two things to keep in
   agreement.
+- **Every JavaScript / TypeScript fence in a README is a sample, whatever
+  its tag or indentation.** The markdown embedder used to match only
+  ` ```ts `, ` ```tsx ` and ` ```js ` at the start of a line, so a fence
+  tagged ` ```typescript ` or ` ```javascript `, or one nested in a list item,
+  was skipped: hand-written, never type-checked, and nothing said so. That is
+  how `ts-type-forge`'s README came to call functions ts-data-forge does not
+  have. It now matches `ts`, `tsx`, `mts`, `cts`, `typescript`, `js`, `jsx`,
+  `mjs`, `cjs` and `javascript` at any indentation, re-indents a sample to its
+  fence's column, and fails when the count of those fences differs from
+  `sampleCodeFiles`. Changing a fence's tag is therefore not a way out of the
+  check; a snippet that is not code (a shell command, JSON) keeps its own tag.
+- **`pnpm run check:root:readme-sample-coverage` is the same "does it run"
+  question for READMEs.** `tools/scripts/cmd/check-readme-sample-coverage.mts`
+  fails when a `libs/*` README has such a fence and the package has no
+  `scripts/cmd/embed-examples.mts` naming `README.md`, or a `doc` script that
+  never reaches it. Six packages — both `better-*-use-state` and four ESLint
+  plugins — had READMEs full of fences and no embedder at all.
 - **CI runs these through `ws:doc`, never through `ws:doc:embed*`.** Each
   package's `doc` script reaches its own embedding steps, and `style-check (ws:doc)`
   runs `doc` and then asserts the tree is clean. So a `gen-docs.mts` that
@@ -1280,7 +1298,7 @@ So the field is either inert here or it changes how the repository installs.
     - **The one legitimate `paths` entry is a package's own name**, so that
       `samples/` — embedded verbatim into the README by `doc:embed` — can
       import the way a consumer does while still being checked against the
-      source being edited. Twelve such entries remain, each with the reason
+      source being edited. Nineteen such entries remain, each with the reason
       written next to it. Everything else resolves through `dist/`, which is
       why `check-all` and the CI workflows run `ws:build` before any type
       check.

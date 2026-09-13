@@ -34,6 +34,15 @@ type GenIndexConfig = Readonly<{
 
   /** Whether to suppress output during execution (default: false) */
   silent?: boolean;
+
+  /** Minimum depth to start generating index files (default: 0) */
+  minDepth?: number;
+
+  /**
+   * Glob patterns of index files to leave untouched, matched against the index
+   * file's own path relative to the target directory (default: none)
+   */
+  preserve?: readonly string[];
 }>;
 
 // embed-sample-code-ignore-below

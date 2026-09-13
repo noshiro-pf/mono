@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/npm/l/ts-data-forge.svg)](https://github.com/noshiro-pf/mono/blob/main/libs/ts-data-forge/LICENSE)
 [![codecov](https://codecov.io/gh/noshiro-pf/mono/graph/badge.svg?component=ts-data-forge)](https://codecov.io/gh/noshiro-pf/mono)
 
-**ts-data-forge** is a TypeScript utility library that provides type-safe functional programming utilities with zero runtime dependencies. It aims to enhance development robustness, maintainability, and correctness by leveraging TypeScript's powerful type system.
+**ts-data-forge** is a TypeScript utility library that provides type-safe functional programming utilities with minimal runtime dependencies. It aims to enhance development robustness, maintainability, and correctness by leveraging TypeScript's powerful type system.
 
 ## Perfect Companion to ts-type-forge
 
@@ -34,7 +34,7 @@ This library offers a range of utilities, including:
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/ts-data-forge/>
+- API reference: <https://noshiro-pf.github.io/mono/ts-data-forge/>
 
 ## Installation
 
@@ -76,7 +76,7 @@ ts-data-forge works best with strict TypeScript settings:
 
 ## Core Modules
 
-### 🎯 [Functional Programming](https://noshiro-pf.github.io/ts-data-forge/)
+### 🎯 [Functional Programming](https://noshiro-pf.github.io/mono/ts-data-forge/)
 
 Essential FP utilities for cleaner, more reliable code.
 
@@ -108,7 +108,7 @@ Type-safe array and tuple utilities with functional programming patterns.
 - **Array Utils** - Comprehensive array manipulation functions
 - **Tuple Utils** - Type-safe tuple operations with compile-time guarantees
 
-### 📦 [Collections](https://noshiro-pf.github.io/ts-data-forge/)
+### 📦 [Collections](https://noshiro-pf.github.io/mono/ts-data-forge/)
 
 Immutable data structures for safer state management.
 
@@ -158,7 +158,7 @@ expectType<Readonly<{ x: number }>, Readonly<{ x: number }>>('=');
 // expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-expectType<User, any>('!='); // Error: Comparisons with `any` are also strictly checked.
+expectType<User, any>('!='); // OK: `User` is not strictly equal to `any` (comparisons with `any` are also strictly checked)
 ```
 
 ### 2. Functional Programming with `Optional`, `Result`, `pipe`, and `match`
@@ -628,14 +628,14 @@ assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 - **`json`**: Type-safe JSON parsing and stringification utilities.
 - **`collections`**: Immutable data structures like `IMap`, `ISet`, and `Queue` with full type safety.
 - **`iterator`**: Utilities for working with iterators and generators (e.g., `range`).
-- **`others`**: Miscellaneous utilities like `castMutable`, `castReadonly`, `ifThen`, `mapNullable`, `memoizeFunction`, `PanicError` / `isPanicError` / `createPanicError`, `tuple`, `unknownToString`.
+- **`others`**: Miscellaneous utilities like `castMutable`, `castReadonly`, `ifThen`, `mapNullable`, `memoizeFunction`, `PanicError` / `isPanicError` / `createPanicError`, `tp`, `unknownToString`.
 
 ## Key Benefits
 
 - **Type Safety**: All utilities are designed with TypeScript's type system in mind, providing compile-time guarantees.
 - **Immutability**: Data structures and operations promote immutable patterns for safer, more predictable code.
 - **Functional Programming**: Support for functional programming paradigms with utilities like `Optional`, `Result`, and `pipe`.
-- **Zero Runtime Dependencies**: The library has no external runtime dependencies except for [@sindresorhus/is](https://github.com/sindresorhus/is), keeping your bundle size minimal.
+- **Minimal Runtime Dependencies**: The only runtime dependencies are [@sindresorhus/is](https://github.com/sindresorhus/is) plus two sibling packages, [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) and [ts-type-forge](https://www.npmjs.com/package/ts-type-forge), keeping your bundle size minimal.
 - **Comprehensive Testing**: All utilities are thoroughly tested with both runtime and compile-time tests.
 
 **Important Notes:**
@@ -648,34 +648,19 @@ assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 
 Since `expectType` is only used for compile-time type checking, you should remove these calls in production builds for better performance.
 
-### Rollup Configuration
-
-```javascript
-import rollupPluginStrip from '@rollup/plugin-strip';
-
-export default {
-    // ... other config
-    plugins: [
-        // ... other plugins
-        rollupPluginStrip({
-            functions: ['expectType'],
-            include: '**/*.(mts|ts|mjs|js)',
-        }),
-    ],
-};
-```
-
 ### Vite Configuration
 
-```javascript
+```ts
 import { defineConfig } from 'vite';
 
 export default defineConfig({
     // ... other config
     build: {
-        terserOptions: {
-            compress: {
-                pure_funcs: ['expectType'],
+        rolldownOptions: {
+            treeshake: {
+                // Calls to these functions are treated as side-effect free, so
+                // statements that only call them are removed from the bundle.
+                manualPureFunctions: ['expectType'],
             },
         },
     },

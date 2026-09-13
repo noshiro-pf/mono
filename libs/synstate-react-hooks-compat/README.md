@@ -1,8 +1,10 @@
-# SynState React hooks
+# SynState React hooks (compat)
 
-synstate-react-hooks re-exports all exports from synstate except for `createState`, `createReducer`, and `createBooleanState`, and exports modified versions of those creation functions.
+synstate-react-hooks-compat re-exports all exports from synstate except for `createState`, `createReducer`, and `createBooleanState`, and exports modified versions of those creation functions.
 
-The first element of the array returned by the `createState<T>` function provided by synstate-preact-hooks is changed from `InitializedObservable<T>` to a React hook `() => T`, and the `InitializedObservable<T>` has been moved to the `state` property in the object at index 2.
+The first element of the array returned by the `createState<T>` function provided by synstate-react-hooks-compat is changed from `InitializedObservable<T>` to a React hook `() => T`, and the `InitializedObservable<T>` has been moved to the `state` property in the object at index 2.
+
+This package provides the same API as [synstate-react-hooks](https://www.npmjs.com/package/synstate-react-hooks), but subscribes to observables with `useState` + `useEffect` instead of `useSyncExternalStore`, so it also works with React 16.8 and 17. Use synstate-react-hooks if you are on React 18 or later.
 
 ## Installation
 
