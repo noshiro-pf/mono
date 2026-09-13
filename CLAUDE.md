@@ -1481,6 +1481,14 @@ So the field is either inert here or it changes how the repository installs.
   patterns by design. Measured on pnpm 12.3.4: pruning runs on `pnpm update`
   rather than `pnpm install`, drops any entry the lockfile no longer resolves,
   and keeps every pattern.
+    - **`pnpm run check:root:minimum-release-age` is what holds that shape**,
+      because pnpm takes both spellings without a word: it fails on an entry
+      with no version and on one containing `*`, and on the delay or the
+      pruning going missing. A range needs no rule of its own — pnpm rejects
+      `vite@^8.0.0` with `ERR_PNPM_INVALID_MINIMUM_RELEASE_AGE_EXCLUDE`, which
+      is a failed install rather than a silent exemption. What the check
+      cannot judge is whether a waiver was warranted; that is what the reason
+      written next to it is for.
     - **`@types/*` is deliberately not excluded.** "Type packages carry no
       executable code" is true here, and what makes it true is `allowBuilds`
       stopping install scripts and `.d.ts` never being executed — neither of
