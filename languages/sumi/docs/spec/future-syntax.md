@@ -131,35 +131,61 @@ Sumi lint との接続: D-13(named function はオーバーロード時のみ)�
 
 TS の `[a, b, c] as const` に相当し、**配列型ではなく readonly tuple 型に推論される**リテラル構文が欲しい。mutable tuple も作れるようにしたい。
 
-### `as const` は 3 つの軸を一度に動かしている(実測 2026-09-13)
+### 要望の中心は「注釈なしで mutable tuple を書く手段が無い」こと(2026-09-13 補足)
 
-要望を設計に落とす前に、`as const` が実際に何をしているかを分解する。TypeScript 7.0.2 で確認:
+最初の記録は軸の分解に寄っていたが、要望の中心はもっと具体的だった。**`const mut_tpl1: [number, number] = ???` の `???` に書ける式が無い。** そして `#[1, 2]` を `as const` 相当として入れても、それは readonly 側なので `???` には入らない。
 
-| 書き方                                         | 推論される型           | readonly | tuple | 要素型     |
-| :--------------------------------------------- | :--------------------- | :------- | :---- | :--------- |
-| `[1, 2]`                                       | `number[]`             | ✗        | ✗     | widened    |
-| `[1, 2] as const`                              | `readonly [1, 2]`      | ✓        | ✓     | literal    |
-| `[a, mut_b] as const`(`a: 1`, `mut_b: number`) | `readonly [1, number]` | ✓        | ✓     | 変数のまま |
-| `const t: readonly number[] = [1, 2]`          | `readonly number[]`    | ✓        | ✗     | widened    |
-| `const t: [number, string] = [1, 'a']`         | `[number, string]`     | ✗        | ✓     | 注釈どおり |
+式だけで(束縛に注釈を書かずに)到達できる型を実測した(TypeScript 7.0.2 / 6.0.3 で同結果):
 
-読み取れること:
+| 欲しい型                    | readonly | tuple | 要素型  | 注釈なしの式          |
+| :-------------------------- | :------- | :---- | :------ | :-------------------- |
+| `number[]`                  | ✗        | ✗     | widened | `[1, 2]`              |
+| `readonly [1, 2]`           | ✓        | ✓     | literal | `[1, 2] as const`     |
+| `readonly number[]`         | ✓        | ✗     | widened | **無い**(注釈が要る)  |
+| **`[number, number]`**      | ✗        | ✓     | widened | **無い** ← 要望はここ |
+| `[1, 2]`(mutable・literal)  | ✗        | ✓     | literal | **無い**              |
+| `readonly [number, number]` | ✓        | ✓     | widened | **無い**              |
 
-1. **軸は 3 つ**(readonly / tuple / 要素型の literal 化)あり、`as const` は 3 つを同時に立てる。要望が求めているのは前 2 つで、3 つ目は付いてくるだけである。
-2. **literal 化はリテラル式にしか効かない。** `as const` は変数の型を更に狭めはしない(3 行目)。「`as const` は何でもリテラル型にする」という誤解を避ける必要がある。
-3. **mutable tuple には式レベルの手段が無い。** `as mutable` は存在せず、注釈を書くしかない(5 行目)。要望の「mutable tuple も作れるように」はここを指している。
+**`mut_` prefix は推論を一切変えない**ことも確認した(`const mut_a = [1, 2]` は `number[]` のまま)。`mut_` は束縛の名前であって式の性質ではないので、当然ではあるが、最初の記録で「mutable は `mut_` 束縛が担う」と書いたのは誤りだった。
+
+### 6 通りのうち書けるようにすべきなのは 2 通り(実測 2026-09-13)
+
+表は 6 行あるが、**mutable × literal は誰も欲しがらない組み合わせ**である。要素型がリテラルだと、可変なスロットに書き戻せる値がその同じリテラルしかない:
+
+```ts
+let mut_lit: [1, 2] = [1, 2];
+mut_lit[0] = 1; // 通る(唯一代入できる値)
+mut_lit[0] = 3; // 型エラー
+```
+
+つまり **readonly なら literal、mutable なら widened** が実用上の唯一の組み合わせであり、記法は 2 つで足りる。
+
+### Sumi lint のライブラリ形は 2 行で書ける(実測 2026-09-13)
+
+D-37 は各候補に「Sumi lint でのライブラリ形」と両向きの codemod を要求する。この候補についてはライブラリ形が**ごく小さい**:
+
+```ts
+export const tuple = <const T extends readonly unknown[]>(...xs: T): T => xs;
+export const mutTuple = <T extends unknown[]>(...xs: T): T => xs;
+
+const t = tuple(1, 2); // readonly [1, 2]
+const mut_t = mutTuple(1, 2); // [number, number] ← 注釈なしで到達できる
+```
+
+**widening の違いは型引数の `const` 修飾子 1 つだけから出る** — `<const T>` なら literal、`<T>` なら widened。前節の「readonly なら literal、mutable なら widened」がそのまま 1 トークンの差に対応するので、sugar の 2 つの記法はこの 2 つの関数へ機械的に落ちる。
+
+### 記法の案(未確定)
+
+- **`#[1, 2]` / `#mut[1, 2]`**(ユーザー案)。対称で読みやすいが、`#` は取り下げられた Record & Tuple の記憶を呼ぶ(下記)。
+- **`mut` を式の前置詞にする**: `[1, 2]` / `mut [1, 2]`。sugar は既に `let mut x`(D-35)で `mut` をキーワードに持つので語彙が増えない。ただし `let mut t = mut [1, 2]` のように `mut` が 2 度出るのが冗長に見える。
+- **束縛の可変性から推論する**(記法を足さない案): sugar で `let mut t = [1, 2]` なら mutable tuple、`let t = [1, 2]` なら readonly tuple と推論する。**要望の例はこれで解決する**が、引数・戻り値・入れ子のリテラルなど**束縛を経由しない位置は覆えない**ので、式の記法の代わりにはならない。補完関係として両方を持つ設計はありうる。
+- どの案でも、**リテラルの既定を readonly tuple にするか、現行どおり `number[]` のままにするか**は別に決める必要がある。既定を変えると `readonly number[]`(homogeneous・可変長)が書きにくくなる側の代償が出る。
 
 ### リポジトリの現況 — 既に機械化されている
 
 `as const` はソースに **1,937 箇所**あり、`ts-codemod-lib` の `append-as-const` transformer が機械的に付与している。その transformer は `ignorePrefixes: ['mut_', '#mut_', '_mut_', 'draft']` を持つ — つまりこのリポジトリの運用は既に **「`mut_` 以外のリテラルには `as const` を付ける」** であり、判定は D-14 の `mut_` 規律とちょうど一致している。
 
-したがって候補 9 は新しい意味論の導入ではなく、**既に codemod が実行している規則を構文の既定にする**という話になる。D-37 が各候補に求める「Sumi lint のライブラリ形」と「両向きの codemod」は、この候補については**既に存在する**。
-
-### 設計の方向(提案、未確定)
-
-- **リテラルは既定で readonly tuple**(暗黙の `as const`)。readonly-by-default(D-3)と既存 codemod の追認。
-- **mutable は `mut_` 束縛が担う**(D-14)。ただし `mut_` は**束縛の性質**であって式の性質ではないので、`f([1, 2])` のように束縛を経由しない位置での mutable tuple の作り方が別途要る。ここが未決の中心。
-- **要素型の literal 化は別の軸**として扱う。`readonly [1, 2]` が欲しい場面と `readonly number[]` が欲しい場面は別で、`as const` はこれを区別できない。sugar で区別できる記法にするか、注釈に委ねるかを決める。
+つまり **readonly 側の需要は既に機械化されている**。候補 9 で新しいのは mutable 側で、そこは codemod の対象外(`mut_` は `ignorePrefixes` に入っている)である一方、前節のとおり式の形が存在しない。**readonly 側は追認、mutable 側は新設**という非対称な構図になる。
 
 ### TC39 との関係(調査 2026-09-13)
 
@@ -170,10 +196,11 @@ TS の `[a, b, c] as const` に相当し、**配列型ではなく readonly tupl
 
 ### 未解決の論点
 
-- 束縛を経由しない位置(引数・戻り値・リテラルの入れ子)での mutable tuple の作り方。
-- 要素型の literal 化の軸を構文で区別するか、注釈に委ねるか。
-- 既定を readonly tuple にすると `readonly number[]`(homogeneous な可変長)が書きにくくならないか — 1,937 箇所の内訳を「tuple が欲しかった / 配列が欲しかった」で数えると判断材料になる。
-- object literal 側(`{ a: 1 } as const`)も同じ 3 軸を持つので、tuple だけ先に決めてよいか。
+- **記法の決定**(上の 3 案)。`#` を使うなら値等価を期待させないことを明記できるか。
+- **リテラルの既定**を readonly tuple に変えるか、現行の `number[]` のままにするか。変えると `readonly number[]`(homogeneous・可変長)を書く側の代償が出る — 1,937 箇所の `as const` を「tuple が欲しかった / 配列が欲しかった」で数えると判断材料になる。
+- **ライブラリ形を先に入れるか。** `tuple` / `mutTuple` は 2 行で、sugar を待たずに ts-std-forge に置ける。D-37 の「ライブラリ先行」の原則からはそうすべきで、そうすれば `???` の穴は sugar より前に埋まる。
+- **`readonly [number, number]` と `readonly number[]`** は依然として注釈でしか書けない。2 記法で足りるという整理はこの 2 つを注釈側に残す前提なので、実際に困るかを dogfood で見る。
+- object literal 側(`{ a: 1 } as const`)も同じ軸を持つので、tuple だけ先に決めてよいか。
 
 ## 導入順(提案)
 
