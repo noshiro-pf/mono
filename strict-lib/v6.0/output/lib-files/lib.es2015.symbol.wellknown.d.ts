@@ -187,7 +187,10 @@ interface RegExp {
    */
   [Symbol.replace](
     string: string,
-    replacer: (substring: string, ...args: readonly unknown[]) => string,
+    replacer: (
+      substring: string,
+      ...args: readonly (string | undefined)[]
+    ) => string,
   ): string;
 
   /**
@@ -248,10 +251,16 @@ interface String {
     searchValue: {
       [Symbol.replace](
         string: string,
-        replacer: (substring: string, ...args: readonly unknown[]) => string,
+        replacer: (
+          substring: string,
+          ...args: readonly (string | undefined)[]
+        ) => string,
       ): string;
     },
-    replacer: (substring: string, ...args: readonly unknown[]) => string,
+    replacer: (
+      substring: string,
+      ...args: readonly (string | undefined)[]
+    ) => string,
   ): string;
 
   /**
