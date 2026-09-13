@@ -22,6 +22,9 @@ const HELP = dedent`
     variables          repository variables （ apply のみ ）
     actions            repo-settings/actions-settings/settings.json
     pages              repo-settings/pages/settings.json
+    environments       repo-settings/environments/*.json
+    vulnerability-alerts
+                       repo-settings/vulnerability-alerts/settings.json
 
   Options:
         --owner <owner>   対象の owner
@@ -54,6 +57,8 @@ const TARGETS = [
   'variables',
   'actions',
   'pages',
+  'environments',
+  'vulnerability-alerts',
 ] as const;
 
 type Target = (typeof TARGETS)[number];
@@ -125,12 +130,18 @@ const runners: ReadonlyRecord<
       await github.applyActionsSettings();
 
       await github.applyPagesSettings();
+
+      await github.applyEnvironments();
+
+      await github.applyVulnerabilityAlerts();
     },
     repository: github.applyRepositorySettings,
     rulesets: github.applyRulesets,
     variables: github.applyVariables,
     actions: github.applyActionsSettings,
     pages: github.applyPagesSettings,
+    environments: github.applyEnvironments,
+    'vulnerability-alerts': github.applyVulnerabilityAlerts,
   },
   backup: {
     all: async () => {
@@ -141,11 +152,17 @@ const runners: ReadonlyRecord<
       await github.backupActionsSettings();
 
       await github.backupPagesSettings();
+
+      await github.backupEnvironments();
+
+      await github.backupVulnerabilityAlerts();
     },
     repository: github.backupRepositorySettings,
     rulesets: github.backupRulesets,
     actions: github.backupActionsSettings,
     pages: github.backupPagesSettings,
+    environments: github.backupEnvironments,
+    'vulnerability-alerts': github.backupVulnerabilityAlerts,
   },
 } as const;
 

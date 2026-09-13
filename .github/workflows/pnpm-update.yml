@@ -30,15 +30,19 @@ name: pnpm update
 # the classification that dependabot-changeset.yml used, so the Changesets
 # release flow publishes those packages once the PR merges.
 #
-# The action pins move in a second, separate step. `update.githubActions` is
-# deliberately `false`, so `update-packages` — which carries `--latest` — leaves
-# them alone, and `update-actions` turns the check back on per-invocation with
-# `--include-github-actions`. That second command has no `--latest`, so an
-# action only moves within `^current`: a major stays put until a human takes it.
+# The action pins move in a separate step, and not through pnpm.
+# `update.githubActions` is deliberately `false`, so `update-packages` — which
+# carries `--latest` — leaves them alone, and `update-actions` runs
+# `tools/scripts/cmd/mature-updates.mts actions` rather than
+# `pnpm update --include-github-actions`: pnpm resolves action versions from
+# `git ls-remote` refs, which carry no publication date, so neither
+# `minimumReleaseAge` nor `ignoreDeps` reaches them and a tag hours old was
+# taken regardless. The script reads each action's GitHub Releases, moves a pin
+# to the newest release of the same major that is older than
+# `minimumReleaseAge`, and resolves the tag to its commit — the same SHA pin
+# pnpm wrote. A major stays put until a human takes it, as before:
 # `changesets/action` v2 is why. It requires Changesets CLI v3 and renamed every
-# input, so the major landing unattended broke release.yml on main, and neither
-# `minimumReleaseAge` nor `ignoreDeps` applies to actions (pnpm reads their
-# versions from `git ls-remote` refs, which carry no publication date).
+# input, so the major landing unattended broke release.yml on main.
 #
 # Because that step rewrites files under .github/workflows/, the token below has
 # to carry the `workflows` permission, or the push is rejected the moment an
@@ -70,22 +74,45 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+# Deny by default; each job grants back what it needs. Neither writes through
+# `GITHUB_TOKEN` — the branch and the pull request go through the App token in
+# `commit` — so `contents: read` is the whole of it. See the note in
+# type-check.yml.
+permissions: {}
 
 jobs:
-  pnpm-update:
+  # Everything that runs the dependency tree's own code, and nothing that holds
+  # a key.
+  #
+  # This job and `commit` used to be one. Splitting them is the only thing that
+  # actually contains a compromised dependency rather than raising the bar for
+  # it: `pnpm install` and every `tsx` invocation below execute third-party code
+  # — `allowBuilds` gates install scripts, not the import-time code of the
+  # toolchain — and anything that runs here can rewrite a file a later step
+  # would execute, or append to `$GITHUB_PATH` so that a later step's `git` or
+  # `gh` is something else. Both of those reach across steps. Neither reaches
+  # across jobs: `commit` gets a fresh runner, a fresh checkout and a fresh
+  # environment, and the only thing that crosses is a patch, which it applies
+  # rather than executes.
+  update:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
+    permissions:
+      contents: read
+
+    outputs:
+      changed: ${{ steps.patch.outputs.changed }}
+      base_sha: ${{ steps.patch.outputs.base_sha }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Do not persist any token in the git config: `pnpm install` below runs
-          # dependency lifecycle scripts, and the PAT must not be exposed to them.
-          # It is supplied inline only for the final push.
+          # No token in the git config. This job runs the dependency tree's own
+          # code — `pnpm install` and every `tsx` invocation below — and the
+          # `GITHUB_TOKEN` this job does hold is read-only anyway. The key that
+          # can write is in `commit`, on another runner.
           persist-credentials: false
 
       - name: Install pnpm
@@ -111,13 +138,43 @@ jobs:
       # workspace root per project, each declaring the peer ranges of the
       # package under check — what a consumer has to do anyway, and what keeps
       # the next change of that kind from being invisible.
+      #
+      # Not a bare `pnpm self-update`: that ignores `minimumReleaseAge` by
+      # design, and the pnpm command after it does not, so a release younger
+      # than the hold failed this job daily until it matured. The script picks
+      # the newest pnpm the hold already accepts and hands it to `self-update`;
+      # its header has the whole story. It runs on `node` alone — nothing is
+      # installed yet at this point, so `tsx` is not an option.
       - name: Update pnpm itself
-        run: pnpm self-update
+        run: node ./tools/scripts/cmd/mature-updates.mts pnpm
+
+      # Before the install, not after, and a step of its own — both for the
+      # same reason. `pnpm install` below runs the dependency tree's lifecycle
+      # scripts, and what this step executes is a file in the working tree
+      # (`mature-updates.mts`, through `pnpm run`), which those scripts can
+      # rewrite. Running it first means the file this step executes is still
+      # the one that was checked out, and the token it carries has not been
+      # anywhere near them. See "An inline `run:` block in a privileged job"
+      # in CLAUDE.md for the general shape.
+      #
+      # `node`, not `pnpm run update-actions`, for the same reason the step
+      # above invokes the script directly: `pnpm run` verifies the workspace's
+      # dependencies first and installs them when they are missing, which is
+      # exactly the thing this step has to come before. The script imports
+      # `node:*` alone, so Node runs it with no `node_modules` at all. The
+      # package.json script stays as the local entry point.
+      #
+      # `GITHUB_TOKEN` only reads the Releases and Commits APIs here, and lifts
+      # the unauthenticated rate limit that the runners' shared IP range
+      # otherwise exhausts.
+      - name: Update the action pins
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./tools/scripts/cmd/mature-updates.mts actions
 
       - name: Update dependencies
         run: |
           pnpm run update-packages
-          pnpm run update-actions
           pnpm install --no-frozen-lockfile
 
       # The published half of `verify-npm-packages` pins exact versions, and
@@ -130,8 +187,78 @@ jobs:
         continue-on-error: true
         run: pnpm run verify:npm-packages:published:update
 
-      # 依存更新が終わってからトークンを発行する。許可済みビルドスクリプトが
-      # 動く前に鍵を job へ持ち込まないため。
+      # Reading the manifests and writing a changeset needs no key and no
+      # network, so it belongs here rather than next to the one that has both.
+      # Being its own step is also what lets it be a file with a test rather
+      # than a `node` heredoc.
+      #
+      # `HEAD` is still the pre-update commit: nothing is committed in this
+      # job at all.
+      - name: Add a changeset if a published package's runtime deps moved
+        run: pnpm run update-changeset
+
+      # What crosses to `commit`: the update as a patch, and the commit it
+      # applies to. Not the working tree — `git apply` writes files, it does
+      # not run anything, and a diff cannot carry a `.git/hooks` entry or a
+      # `$GITHUB_PATH` line. `--binary` so a lockfile with any non-text change
+      # survives; `git add -A` first so files the update created are in it.
+      - name: Bundle the update as a patch
+        id: patch
+        run: |
+          echo "base_sha=$(git rev-parse HEAD)" >>"${GITHUB_OUTPUT}"
+
+          git add -A
+
+          # `--cached`, so this is the whole of what `git add -A` just staged —
+          # the same set `git status --porcelain` used to gate on, additions
+          # and deletions included.
+          if git diff --cached --quiet; then
+            echo 'Dependencies already up to date; nothing to do.'
+            echo 'changed=false' >>"${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          git diff --cached --binary >"${RUNNER_TEMP}/pnpm-update.patch"
+          echo 'changed=true' >>"${GITHUB_OUTPUT}"
+
+      - name: Upload the patch
+        if: steps.patch.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pnpm-update-patch
+          path: ${{ runner.temp }}/pnpm-update.patch
+          # Read once, by the job below, minutes later.
+          retention-days: 1
+
+  # The key lives here, and nothing from the dependency tree does. This job
+  # installs nothing and runs nothing out of the working tree: `git` and `gh`
+  # are on the runner image, and the patch is applied, never executed.
+  commit:
+    needs: update
+    if: needs.update.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      # The commit `update` started from, not `main`'s tip: the patch was made
+      # against it, and `main` may have moved since. A run that lands behind
+      # is not a problem — the branch is rebuilt from `main` every night, and
+      # the pull request is rebased by the next run.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.update.outputs.base_sha }}
+          persist-credentials: false
+
+      - name: Download the patch
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pnpm-update-patch
+          path: ${{ runner.temp }}
+
       - name: Generate Token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
@@ -143,68 +270,36 @@ jobs:
           # `update-actions` により .github/workflows/ の action ピンも
           # 更新されるため、これが無いと push が
           # 「refusing to allow a GitHub App to create or update workflow ...」で拒否される。
+          #
+          # これが、この job を分けた一番の理由でもある。この鍵は workflow
+          # ファイルを push できるので、依存ツリーのコードと同じ job に置くと
+          # 「細工した release.yml を push して、そのブランチで動かす」が届く。
           permission-workflows: write # workflow ファイルを含むコミットの push
 
-      - name: Open auto-merge PR if anything changed
+      - name: Open the auto-merge pull request
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          # `git status --porcelain` (not `git diff --quiet`) so untracked files
-          # created by the update are detected too.
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "Dependencies already up to date; nothing to do."
-            exit 0
-          fi
-
-          # Add a patch changeset for each publishable package whose runtime deps
-          # changed, so the Changesets release flow publishes it. (HEAD is still
-          # the pre-update baseline here — nothing has been committed yet.)
-          export DATESTR="$(date -u +%Y%m%d)"
-          node <<'NODE'
-          const fs = require('node:fs');
-          const cp = require('node:child_process');
-          const path = require('node:path');
-          const RUNTIME = ['dependencies', 'peerDependencies', 'optionalDependencies'];
-          const baseline = (file) => {
-            try {
-              return JSON.parse(cp.execSync(`git show HEAD:${file}`, { encoding: 'utf8' }));
-            } catch {
-              return {};
-            }
-          };
-          const changed = [];
-          const workspaceDirs = ['libs', 'apps'].flatMap((group) =>
-            fs.readdirSync(group, { withFileTypes: true })
-              .filter((d) => d.isDirectory())
-              .map((d) => path.join(group, d.name)),
-          );
-          for (const dir of workspaceDirs) {
-            const file = path.join(dir, 'package.json');
-            if (!fs.existsSync(file)) continue;
-            const cur = JSON.parse(fs.readFileSync(file, 'utf8'));
-            if (typeof cur.name !== 'string' || cur.private === true) continue;
-            const base = baseline(file);
-            const runtimeChanged = RUNTIME.some(
-              (k) => JSON.stringify(cur[k] ?? {}) !== JSON.stringify(base[k] ?? {}),
-            );
-            if (runtimeChanged) changed.push(cur.name);
-          }
-          if (changed.length === 0) {
-            console.log('No publishable runtime-dependency changes; no changeset added.');
-          } else {
-            const lines = ['---', ...changed.map((n) => `'${n}': patch`), '---', '', 'Update dependencies', ''];
-            fs.writeFileSync(`.changeset/pnpm-update-${process.env.DATESTR}.md`, lines.join('\n'));
-            console.log(`Added patch changeset for: ${changed.join(', ')}`);
-          }
-          NODE
+          # Applied, not executed. `git apply` refuses paths outside the work
+          # tree unless asked otherwise, and a diff has no way to express a
+          # `.git/` entry, so the worst a tampered patch can carry is content
+          # — which lands in a pull request, where `.github/workflows/` is
+          # behind CODEOWNERS.
+          git apply --binary --whitespace=nowarn "${RUNNER_TEMP}/pnpm-update.patch"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          # A fixed branch name, not one carrying the date: every run starts from
-          # a fresh checkout of main, so force-pushing here both refreshes the
-          # open pull request and rebases it, instead of leaving yesterday's
-          # behind and opening another one.
+          # No hooks. Nothing in this job installs anything, so there is no
+          # install script to have left a `.git/hooks/pre-commit` behind — but
+          # the patch is still something another job produced, and the cost of
+          # being sure is one line.
+          git config core.hooksPath /dev/null
+
+          # A fixed branch name, not one carrying the date: every run starts
+          # from whatever `main` was when `update` checked out, so force-pushing
+          # here both refreshes the open pull request and rebases it, instead of
+          # leaving yesterday's behind and opening another one.
           branch="chore/pnpm-update"
           git switch -c "$branch"
           git add -A
@@ -239,6 +334,6 @@ jobs:
               --base main \
               --head "$branch" \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. Action pins move within \`^current\` only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. The latter two go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself and the action pins to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
