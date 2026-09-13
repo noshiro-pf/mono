@@ -389,7 +389,8 @@ const isRepositorySegment = (segment: string): boolean =>
 
 export const renderActionPin = (
   pin: StrictOmit<ActionPin, 'file' | 'line'>,
-): string => `${pin.prefix}${pin.repo}${pin.subpath}@${pin.sha} # ${pin.tag}`;
+): string =>
+  `${pin.prefix}${pin.repo}${pin.subpath}@${pin.sha} # ${pin.tag}` as const;
 
 export type ActionPin = Readonly<{
   /** Absolute path of the workflow file. */
@@ -458,12 +459,14 @@ const describeSelection = (
 ): string => {
   const move =
     selection.target === undefined
-      ? `${pin.tag} unchanged`
-      : `${pin.tag} -> ${selection.target}`;
+      ? (`${pin.tag} unchanged` as const)
+      : (`${pin.tag} -> ${selection.target}` as const);
 
-  const heldBack = `held back by minimumReleaseAge: [${selection.heldBack.join(', ')}]`;
+  const heldBack =
+    `held back by minimumReleaseAge: [${selection.heldBack.join(', ')}]` as const;
 
-  const majors = `majors waiting for a human: [${selection.majorsWaiting.join(', ')}]`;
+  const majors =
+    `majors waiting for a human: [${selection.majorsWaiting.join(', ')}]` as const;
 
   return `${pin.repo}: ${move} (${heldBack}; ${majors})`;
 };
@@ -577,13 +580,14 @@ const createGitHubApi = (): GitHubApi => {
  */
 const maxReleasePages = 10;
 
-const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release => ({
-  tag: typeof raw['tag_name'] === 'string' ? raw['tag_name'] : '',
-  publishedAt:
-    typeof raw['published_at'] === 'string' ? raw['published_at'] : undefined,
-  draft: raw['draft'] === true,
-  prerelease: raw['prerelease'] === true,
-});
+const parseRelease = (raw: ReadonlyRecord<string, unknown>): Release =>
+  ({
+    tag: typeof raw['tag_name'] === 'string' ? raw['tag_name'] : ('' as const),
+    publishedAt:
+      typeof raw['published_at'] === 'string' ? raw['published_at'] : undefined,
+    draft: raw['draft'] === true,
+    prerelease: raw['prerelease'] === true,
+  }) as const;
 
 // ---------------------------------------------------------------------------
 // shared
@@ -652,7 +656,7 @@ const readMinimumReleaseAge = (): Hold => {
 };
 
 const describeHold = (hold: Hold, cutoff: number): string =>
-  `minimumReleaseAge: ${hold.minutes} min (cutoff ${Temporal.Instant.fromEpochMilliseconds(cutoff).toString()})`;
+  `minimumReleaseAge: ${hold.minutes} min (cutoff ${Temporal.Instant.fromEpochMilliseconds(cutoff).toString()})` as const;
 
 const toEpochMilliseconds = (value: unknown): number | undefined => {
   if (typeof value !== 'string') {

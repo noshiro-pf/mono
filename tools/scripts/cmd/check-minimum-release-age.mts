@@ -116,39 +116,42 @@ const WILDCARD = '*';
 
 const collectViolations = (
   settings: MinimumReleaseAgeSettings,
-): readonly Violation[] => [
-  ...(settings.delayMinutes === undefined || settings.delayMinutes === 0
-    ? [
-        {
-          entry: undefined,
-          message: [
-            `${WORKSPACE_FILE_NAME} declares no \`minimumReleaseAge\`, so every`,
-            'entry below it is moot and a version published minutes ago can be',
-            'installed by the next `pnpm-update` run.',
-          ].join(' '),
-        },
-      ]
-    : []),
+): readonly Violation[] =>
+  [
+    ...(settings.delayMinutes === undefined || settings.delayMinutes === 0
+      ? ([
+          {
+            entry: undefined,
+            message: [
+              `${WORKSPACE_FILE_NAME} declares no \`minimumReleaseAge\`, so every`,
+              'entry below it is moot and a version published minutes ago can be',
+              'installed by the next `pnpm-update` run.',
+            ].join(' '),
+          },
+        ] as const)
+      : ([] as const)),
 
-  ...(settings.pruneEnabled
-    ? []
-    : [
-        {
-          entry: undefined,
-          message: [
-            '`minimumReleaseAgeExcludePrune` is not on, so no waiver ever',
-            'expires: each one stands until somebody notices it, which is what',
-            'writing the version was for.',
-          ].join(' '),
-        },
-      ]),
+    ...(settings.pruneEnabled
+      ? ([] as const)
+      : ([
+          {
+            entry: undefined,
+            message: [
+              '`minimumReleaseAgeExcludePrune` is not on, so no waiver ever',
+              'expires: each one stands until somebody notices it, which is what',
+              'writing the version was for.',
+            ].join(' '),
+          },
+        ] as const)),
 
-  ...settings.excludeEntries.flatMap((entry) => {
-    const problem = classifyExcludeEntry(entry);
+    ...settings.excludeEntries.flatMap((entry) => {
+      const problem = classifyExcludeEntry(entry);
 
-    return problem === undefined ? [] : [{ entry, message: REASONS[problem] }];
-  }),
-];
+      return problem === undefined
+        ? []
+        : [{ entry, message: REASONS[problem] }];
+    }),
+  ] as const;
 
 const REASONS = {
   'bare-name': [

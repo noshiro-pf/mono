@@ -9,7 +9,7 @@ on:
 
   # `synchronize` fires on every push to the pull request's branch, so these
   # types cover the pull request's whole life — a draft included. `labeled` /
-  # `unlabeled` are what let a `[WIP]` label stop and restart the checks; see
+  # `unlabeled` are what let a `skip-ci` label stop and restart the checks; see
   # the note in type-check.yml. No `paths` filter here — see the
   # note in style-check.yml.
   pull_request:
@@ -36,14 +36,14 @@ permissions: {}
 
 jobs:
   # Whether the branch is behind `main`, whether the diff touches anything
-  # this workflow reads, and whether `[WIP]` is on the pull request — see the
+  # this workflow reads, and whether `skip-ci` is on the pull request — see the
   # notes in type-check.yml and check-gates.yml. `code` is the same ignore
   # list type-check.yml gates on, which is why it lives in the root
   # package.json rather than in either workflow.
   gates:
     if: >-
       github.event_name != 'pull_request' ||
-      !contains(github.event.pull_request.labels.*.name, '[WIP]')
+      !contains(github.event.pull_request.labels.*.name, 'skip-ci')
     uses: ./.github/workflows/check-gates.yml
     # What check-gates.yml's own job declares. A caller's job-level
     # `permissions` is the ceiling for the workflow it calls — permissions can
@@ -57,13 +57,13 @@ jobs:
 
   test-node-versions:
     needs: gates
-    # Skip the whole job while the pull request carries the `[WIP]` label,
+    # Skip the whole job while the pull request carries the `skip-ci` label,
     # while its branch is behind `main` and cannot be merged as it stands, or
     # when the diff touches nothing any command below reads — see the notes in
     # type-check.yml. Being a draft no longer skips anything.
     if: >-
       !cancelled() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
@@ -141,7 +141,7 @@ jobs:
   # The one required status check for this workflow: it reports whatever
   # happened above, so that a skipped run cannot read as a passing one. The
   # two clauses after `always()` are the skips that are not failures — a
-  # `[WIP]` label, held by `no-wip-label`, and a branch behind the base
+  # `skip-ci` label, held by `no-skip-ci-label`, and a branch behind the base
   # branch, held by the ruleset — for which this job reports `skipped` rather
   # than red. See the note on `type-check-result` in type-check.yml.
   test-node-versions-result:
@@ -150,7 +150,7 @@ jobs:
       - test-node-versions
     if: >-
       always() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest

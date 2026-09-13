@@ -330,9 +330,14 @@ jobs:
           # merges, this would skip creating the next and then fail trying to
           # auto-merge a closed pull request. Ask for an open one.
           if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
+            # `merge-queued` is what `unblock-prs` reads: without it nothing
+            # rebases this branch when main moves under it. It is opened
+            # queued because nobody reviews it — auto-merge below is the same
+            # statement, made by the same bot in the same breath.
             gh pr create \
               --base main \
               --head "$branch" \
+              --label merge-queued \
               --title "chore: update dependencies" \
               --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm self-update\`. The latter two go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself and the action pins to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, so a major waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi

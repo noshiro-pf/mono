@@ -108,7 +108,7 @@ jobs:
           }
 
           # `push` and `workflow_dispatch` are exempt, exactly as they are
-          # from the `[WIP]` gate: there is no pull request to be behind
+          # from the `skip-ci` gate: there is no pull request to be behind
           # anything, and asking for the checks by hand from the Actions tab
           # is asking for them regardless of the branch's state.
           if [ "${GITHUB_EVENT_NAME}" != 'pull_request' ]; then

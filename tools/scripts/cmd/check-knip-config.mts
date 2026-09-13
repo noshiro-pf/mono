@@ -105,7 +105,7 @@ const collectNestedWorkspaceKeys = (
     ? Object.keys(entry)
         .filter(looksLikeWorkspacePath)
         .map((key) => ({ owner, key }))
-    : [];
+    : ([] as const);
 
 /**
  * knip's own workspace options are bare identifiers (`entry`, `project`,

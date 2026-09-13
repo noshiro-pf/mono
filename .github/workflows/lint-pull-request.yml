@@ -21,7 +21,7 @@ on:
       # with a satisfied one.
       - edited
       - synchronize
-      # So that `[WIP]` skips these checks as it skips the five check
+      # So that `skip-ci` skips these checks as it skips the five check
       # workflows, and taking the label off runs them again — see the job
       # `if`s below.
       - labeled
@@ -53,17 +53,17 @@ env:
   LC_ALL: C.UTF-8
 
 jobs:
-  # Both jobs skip while the `[WIP]` label is on, as every check workflow
+  # Both jobs skip while the `skip-ci` label is on, as every check workflow
   # does — see the note in type-check.yml. Each job's name is its required
   # context and neither has a matrix, so the check run GitHub creates for
   # the skipped job carries that very name, reported as `skipped`, which a
-  # required status check accepts; `no-wip-label` in wip-label.yml is what
+  # required status check accepts; `no-skip-ci-label` in skip-ci-label.yml is what
   # holds the merge meanwhile, and taking the label off fires `unlabeled`,
   # which runs both again. Only `pull_request_target` reaches this workflow,
   # so there is no other event to exempt.
   semantic-pull-request:
     name: Validate PR title
-    if: ${{ !contains(github.event.pull_request.labels.*.name, '[WIP]') }}
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -96,7 +96,7 @@ jobs:
 
   commit-messages:
     name: Validate commit messages
-    if: ${{ !contains(github.event.pull_request.labels.*.name, '[WIP]') }}
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

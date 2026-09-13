@@ -1,6 +1,6 @@
 ---
 name: unblock-prs
-description: Clear what is blocking the open pull requests that already have auto-merge enabled — rebase the one that is out-of-date with the base branch, watch its checks, fix what fails — one PR at a time, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, watch CI, or fix a failing check on a PR.
+description: Clear what is blocking the open pull requests labelled `merge-queued` — rebase the one that is out-of-date with the base branch, take `skip-ci` off when its turn comes, watch its checks, fix what fails — one PR at a time, in the order they declare with `Merge-After:`, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, release the merge queue, watch CI, or fix a failing check on a PR.
 ---
 
 # Unblock open pull requests
@@ -8,12 +8,18 @@ description: Clear what is blocking the open pull requests that already have aut
 Clear the obstacles in front of the pull requests that are already queued to
 merge, so GitHub can merge them itself.
 
-**Scope.** Only pull requests with auto-merge already enabled
-(`autoMergeRequest` is not null) and no `[WIP]` label. The flag is the author's
-statement that the PR should land as soon as it is able to; the label is the
-statement that it should not, and it is checked as a label — never inferred
-from the title. Everything else is still someone's work in progress and is none
-of this skill's business.
+**Scope.** Only pull requests labelled `merge-queued` with auto-merge already
+enabled (`autoMergeRequest` is not null). The label is the author saying this
+one is reviewed and is to be landed; auto-merge is what actually lands it,
+since this skill never merges anything. A PR without the label is none of this
+skill's business however ready it looks — pass it over in silence. A PR with
+the label that cannot be acted on (a draft, no auto-merge, a base that is not
+`main`) is reported, because the label asked for something and the answer is
+no.
+
+**`skip-ci` does not put a PR out of scope; taking it off is the job.** It
+pauses a queued PR rather than removing it, and the release is a PR at a time,
+in turn.
 
 **Two jobs, and no third.** Rebase a branch that is out-of-date with `main`, and
 fix a failing check. **Never merge.** No `gh pr merge`, no `--auto`, no enabling
@@ -32,35 +38,37 @@ with `--force-with-lease`. Nothing on `main`, and no merges.
 ## The loop
 
 **Survey → pick one → rebase → watch → fix → it merges itself → survey again.**
+`tools/scripts/cmd/unblock-prs/README.md` walks through what the script does
+at each of those steps, in English and Japanese; this skill is the half the
+script does not do.
 Stop and report instead of continuing when a failure needs a decision the user
 has to make.
 
 ## 1. Survey
 
 ```bash
-gh pr list --state open --json number,title,headRefName,baseRefName,isDraft,labels,author,mergeStateStatus,autoMergeRequest \
-  --jq '[.[] | select(.autoMergeRequest != null and (.labels | map(.name) | index("[WIP]") | not))]'
+gh pr list --state open --json number,title,body,headRefName,baseRefName,isDraft,labels,author,mergeStateStatus,autoMergeRequest \
+  --jq '[.[] | select(.autoMergeRequest != null and (.labels | map(.name) | index("merge-queued")))]'
 ```
 
-Those two filters are the scope rule, and they do most of the exclusion by
-themselves: `changeset-release/main` carries no auto-merge, and a draft PR
-cannot have one. Still drop any PR whose `baseRefName` is not `main`.
+Those two filters are the scope rule. Still drop any PR whose `baseRefName` is
+not `main`. `body` is in the list because the declared order is read from it —
+see "The declared merge order" below.
 
-**A `[WIP]` label puts a PR out of scope whatever its `mergeStateStatus`
-says** — read the label, not the title, and not the draft flag. The label is
-how this repository says "not yet": the five check workflows and the two lint
-jobs skip while it is on, and `wip-label.yml` writes the required
-`no-wip-label` status as `pending`, which is the only thing holding the merge.
-So a labelled PR cannot go green however long it is watched, and rebasing one
-buys nothing but another round of skipped runs. Leave it alone and say so in
-the report — taking the label off is the author's decision, not this skill's.
-See "Check triggers, `[WIP]` and out-of-date branches" in `CLAUDE.md`.
+**A `skip-ci` PR in that list is a paused one, not an excluded one.** While the
+label is on, the five check workflows and the two lint jobs skip and
+`skip-ci-label.yml` writes the required `no-skip-ci-label` status as `pending`,
+which is the only thing holding the merge — so its `mergeStateStatus` says
+nothing useful (`BLOCKED` however ready it is) and its checks cannot go green
+however long it is watched. Taking the label off is the action, one PR at a
+time. See "Check triggers, `skip-ci` and out-of-date branches" in `CLAUDE.md`.
 
-`chore/pnpm-update` does have auto-merge, enabled by the bot, so it is in scope —
-but `pnpm-update.yml` force-pushes that branch daily. If it moves under you, do
-not fight it: re-survey and take its new state.
+`chore/pnpm-update` is opened `merge-queued` by the bot, with auto-merge, so it
+is in scope — but `pnpm-update.yml` force-pushes that branch daily. If it moves
+under you, do not fight it: re-survey and take its new state.
 
-`mergeStateStatus` says what is blocking each one:
+`mergeStateStatus` says what is blocking each one (for a PR without `skip-ci` —
+with it, the state is `BLOCKED` and means nothing):
 
 - `BEHIND` — exactly the "out-of-date with the base branch" banner. This is the
   one the loop rebases.
@@ -161,8 +169,8 @@ reported check is green, the reason is almost always a context that has not
 reported. Keep waiting; do not conclude the PR is held by something else, and
 above all do not start on the next PR.
 
-**`no-wip-label` pending is the exception, and it never resolves itself.** It
-means the `[WIP]` label went on while you were watching, which also skipped
+**`no-skip-ci-label` pending is the exception, and it never resolves itself.** It
+means the `skip-ci` label went on while you were watching, which also skipped
 every other check on that commit. Stop watching, go back to step 1, and treat
 the PR as out of scope until the label comes off.
 
@@ -190,7 +198,7 @@ run `pnpm run X` at the repository root, so `type-check (knip)` reproduces as
 
 `Validate PR title` is required because a squash merge takes the PR title as the
 commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the title
-itself, not the branch. It checks Conventional Commits and English; `[WIP]` in
+itself, not the branch. It checks Conventional Commits and English; `skip-ci` in
 a title means nothing to any workflow, which reads the label instead.
 
 Two things about reproducing the rest:
@@ -232,11 +240,40 @@ stop. Do not merge it.
 Once it does merge, `main` has moved and every remaining PR reads `BEHIND` again.
 That is expected, not a regression. Return to step 1 and pick the next single PR.
 
+## The declared merge order
+
+**`Merge-After: #1234`, a trailer on its own line in the PR body.** The PR is
+not _picked_ — not rebased, not released from `skip-ci` — while any PR it
+names is still open. It constrains picking and nothing else: a PR that is
+already up to date and merging is left to auto-merge, which takes no notice of
+anything written here, and passing it over would only send you off to rebase a
+branch that merge is about to invalidate. Several numbers may be named, on one
+line or on several, so the declarations form a graph; a cycle in it blocks
+everything it touches, and it is named as a cycle rather than left to report
+"waiting on #N" forever.
+
+**A trailer inside a fenced code block is not read**, so a PR that documents
+the convention does not accidentally declare one. Write examples in a fence.
+
+**Rebase first, take `skip-ci` off second.** While the label is on, the push the
+rebase makes fires a `synchronize` whose every check workflow skips, so it
+costs nothing; taking the label off then fires `unlabeled`, and the matrix
+that starts runs once, on the head that will actually be merged. The other
+order starts a full matrix on the pre-rebase head and has the push cancel it.
+
+**Releasing one PR is the whole of the job.** From there it is an ordinary
+queued PR: if its checks fail it is set aside like any other, with its
+`skip-ci` off, and everything that declared `Merge-After` on it waits, because
+it has not merged. That is a queue that has stalled and is waiting for a
+person, which is what a declared order is for — do not take the next PR out of
+turn to keep things moving.
+
 ## 6. Report
 
 One line per PR, in the order handled: number, what was done (rebased and merged
 by GitHub / rebased and waiting / fix pushed / left alone and why), and where its
 checks stand. Name any PR left failing and what the failure is. Do not report a
 run as green while checks are still pending, and say plainly which PRs were never
-reached and which were out of scope — for lacking auto-merge, or for carrying the
-`[WIP]` label.
+reached and which were out of scope — for lacking `merge-queued`, or for
+lacking auto-merge. Report it as an order: which PR was released, what is
+behind it, and what each one is waiting on.

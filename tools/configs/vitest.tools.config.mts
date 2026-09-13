@@ -16,6 +16,19 @@ export default defineViteConfig({
   packageRoot: projectRootPath,
   node: {
     include: ['tools/{scripts,configs}/**/*.test.mts'],
+    // In-source tests. `includeSource` defaults to a package's `src/` and
+    // `samples/`, neither of which exists here, so without this an in-source
+    // test block under `tools/` is dead code: nothing runs it and nothing
+    // says so. A file named here is *imported* to be searched for one, which
+    // is safe for these — every command script does its work behind
+    // `isDirectlyExecuted(import.meta.url)`.
+    //
+    // Which of them Vitest actually collects is decided by searching the file
+    // for the in-source marker as a literal string, so this comment
+    // deliberately does not spell that marker out: writing it here made
+    // Vitest collect this config as a test file and fail it for having no
+    // test suite in it.
+    includeSource: ['tools/{scripts,configs}/**/!(*.test).mts'],
   },
   browser: false,
 });

@@ -68,7 +68,7 @@ describe(parseTrustListOutput, () => {
 });
 
 describe(diffFromExpected, () => {
-  const base = { ...expectedFlat, project: undefined };
+  const base = { ...expectedFlat, project: undefined } as const;
 
   test('a matching configuration has no differences', () => {
     assert.deepStrictEqual(diffFromExpected(base), []);

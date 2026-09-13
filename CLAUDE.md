@@ -22,7 +22,14 @@ instruction file.
     - `tools/configs/` — shared TypeScript / Vite config used by the root and by
       packages.
     - `tools/scripts/cmd/` — repository-level `tsx` commands (`check-all`,
-      `ws-build-stages`, the dependency-graph generator, …).
+      `ws-build-stages`, the dependency-graph generator, …). One file per
+      command, except where a command outgrew one: `unblock-prs/` is a
+      directory whose `main.mts` is the entry point, and the `package.json`
+      script names that file. There is no `index.mts` — `ws:gi` only walks
+      workspace members, and `tools/` is deliberately not one, so a barrel
+      here would be hand-maintained for nothing. A command with a directory
+      of its own carries a `README.md` describing what it does, step by step;
+      this file keeps the conventions and the reasons, not the walk-through.
 - `repo-settings/` — declarative GitHub repository settings, applied via
   [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
   `pages/settings.json` there is what enables Pages; the deploy workflow does
@@ -310,9 +317,30 @@ commands run those across every workspace member that defines them, and the
 - `pnpm run lint:published-deps` — imports that a published package does not
   declare. See "Dependencies".
 - `pnpm run check-all` — everything above plus the build, the codemods and
-  formatting, in the order CI needs. Slow; this is the pre-push check. It
-  covers every job in CI except `ws:test:browser`, which needs Playwright's
-  browsers installed.
+  formatting, in the order CI needs. It covers every job in CI except
+  `ws:test:browser`, which needs Playwright's browsers installed.
+
+**Run the checks the diff touches, not `check-all`.** A full sweep builds
+every package and runs every test in the repository; on a change that touched
+four files under `tools/` that is many minutes spent to re-answer questions
+nothing asked. Reach for it when the change is genuinely repository-wide — a
+shared config, a dependency bump, a codemod — and otherwise pick from this
+table. `pnpm run fmt` is cheap and belongs on every change.
+
+| the diff touches            | run                                                              |
+| :-------------------------- | :--------------------------------------------------------------- |
+| TypeScript in a package     | that package's `type-check`, `lint:fix` and `test`               |
+| `tools/`                    | `check:root:type`, `check:root:lint`, `check:root:test`          |
+| Markdown or prose           | `md`, `cspell`                                                   |
+| a `package.json`, lockfile  | `knip`, `lint:published-deps`, and a build of what depends on it |
+| workflows, `repo-settings/` | nothing but `fmt` and `cspell` reads them locally                |
+
+**What this trades away is worth naming.** `check-all` also runs the codemods
+and the whole-repository formatting pass, so a targeted run can leave the tree
+in a state CI's `style-check` will reject — most often a file some other
+package's generator writes. It is CI that catches that, and CI only runs once
+the `skip-ci` label is off, which is why that label is a pause and not a place
+to leave a branch. See "Opening a pull request".
 
 **Formatting:**
 
@@ -419,7 +447,7 @@ list lives in the `required_status_checks` rule of
 | `strict-lib-gen-result`     | the aggregate job in `strict-lib-gen.yml`             |
 | `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
 | `verify-published-result`   | the aggregate job in `verify-published-packages.yml`  |
-| `no-wip-label`              | a commit status written by `wip-label.yml`            |
+| `no-skip-ci-label`          | a commit status written by `skip-ci-label.yml`        |
 | `Validate PR title`         | `lint-pull-request.yml`                               |
 | `Validate commit messages`  | `lint-pull-request.yml`                               |
 
@@ -440,7 +468,7 @@ never happened satisfy them.** Both ways were measured on this repository:
 - **A skipped job does not expand its matrix.** A `type-check` job that a
   job-level `if` skips produces one check run named `type-check` — not the
   eleven `type-check (…)` contexts. Nothing supersedes those, so they keep
-  whatever they last said: a pull request that was green and then had `[WIP]`
+  whatever they last said: a pull request that was green and then had `skip-ci`
   added still had all 22 matrix contexts reading `success`, with every
   required check satisfied.
 - **A skipped job with no matrix reports the required context itself.** Its
@@ -461,17 +489,17 @@ each case:
 
 | carve-out                                          | what holds the merge instead                                                              |
 | :------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| `[WIP]` on the pull request                        | `no-wip-label` — see below                                                                |
+| `skip-ci` on the pull request                      | `no-skip-ci-label` — see below                                                            |
 | `needs.gates.outputs.branch_up_to_date` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything  |
 | `needs.gates.outputs.should_run` is `false`        | nothing, and nothing needs to: no command in the workflow reads any path the diff touched |
 
-**`no-wip-label` is therefore load-bearing, not decorative.** It is the only
+**`no-skip-ci-label` is therefore load-bearing, not decorative.** It is the only
 thing that stops a labelled pull request from merging. Deleting
-`wip-label.yml`, or dropping its context from `main.json`, leaves `[WIP]`
+`skip-ci-label.yml`, or dropping its context from `main.json`, leaves `skip-ci`
 skipping every check with nothing holding the merge — which is the exact hole
 the aggregates were added to close. The two are one mechanism. See the note on
 `type-check-result` in `type-check.yml`. It holds the merge by staying
-`pending`, not by failing — see "A `[WIP]` label skips the checks" below for
+`pending`, not by failing — see "A `skip-ci` label skips the checks" below for
 why.
 
 Consequences worth knowing:
@@ -488,6 +516,16 @@ Consequences worth knowing:
 - **Adding a job is still two edits.** A new check workflow needs its
   aggregate's context added to `main.json`, and so does any job that is not
   behind an aggregate.
+- **Renaming a context is three steps, and the middle one is not a commit.**
+  A required context is matched by string, and the workflow that answers a
+  pull request event is the one on the pull request's _head_. So a branch that
+  renames one writes the new name while the ruleset still asks for the old,
+  and is blocked until `repo-settings:apply rulesets` runs — which is a person
+  with an admin token, after the merge. Merge it with the ruleset bypass,
+  apply, and expect every other open pull request to read blocked until it is
+  rebased onto the workflow that writes the new name. `unblock-prs` does that
+  rebasing, one at a time, so what it costs is a round of CI rather than any
+  hand work. `no-wip-label` became `no-skip-ci-label` this way.
 - **A red aggregate does not name what failed.** The matrix contexts still
   report and still appear on the pull request; they are simply not what the
   ruleset reads. Open the run to see which entry went red.
@@ -653,7 +691,7 @@ Most of the remaining inline blocks cannot move at all, for an unrelated reason:
 they run with no checkout and no `pnpm install`, and a `.mts` needs both.
 
 - The five `*-result` aggregates boot a runner, read `needs.*.result` and echo.
-- `wip-label.yml` makes one API call, on every event, for every pull request.
+- `skip-ci-label.yml` makes one API call, on every event, for every pull request.
 - `check-gates.yml`'s branch check runs **before** its checkout, which is the
   whole point: a branch behind `main` stays a four-second job.
 - `lint-pull-request.yml` runs on `pull_request_target` and must never check the
@@ -667,7 +705,7 @@ one through its aggregate job, so a pull request that changed only the
 filtered paths would wait forever on a check that never arrives. The gate is
 a job-level `if` instead: `check-gates.yml` answers whether the diff touches
 anything the workflow reads, and the job is skipped when it does not — see
-"Check triggers, `[WIP]` and out-of-date branches" for the rest of what that
+"Check triggers, `skip-ci` and out-of-date branches" for the rest of what that
 one job answers.
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
@@ -719,7 +757,7 @@ calls `check-gates.yml` with `diff-scope: none`, which answers the branch
 question and skips the checkout: it has one job, so a gate that installs to
 save one runner would cost more than it saves.
 
-## Check triggers, `[WIP]` and out-of-date branches
+## Check triggers, `skip-ci` and out-of-date branches
 
 The five check workflows — `type-check.yml`, `style-check.yml`,
 `strict-lib-gen.yml`, `node-version-compatibility.yml` and
@@ -756,9 +794,9 @@ admin's bypass, which is the one way a head that is behind `main`, or was
 never checked, can land. Run the check workflows by hand from the Actions tab
 (`workflow_dispatch`) after such a merge; nothing else will.
 
-`wip-label.yml` rides along with the same trigger list. It is not a check
+`skip-ci-label.yml` rides along with the same trigger list. It is not a check
 workflow — it checks nothing, and does one API call — but it is what makes
-the `[WIP]` label hold the merge; see below. `lint-pull-request.yml` carries
+the `skip-ci` label hold the merge; see below. `lint-pull-request.yml` carries
 `labeled` and `unlabeled` too, next to its own `opened`, `edited` and
 `synchronize`, so that the label skips and restarts the title and commit
 message checks the same way.
@@ -812,7 +850,7 @@ cancelled one would have.
   `workflow_dispatch` run asked for by hand lands in a different group from the
   pull request's own runs and the two do not cancel each other.
 
-### A `[WIP]` label skips the checks; taking it off starts them again
+### A `skip-ci` label skips the checks; taking it off starts them again
 
 Where the draft flag used to say "not yet", a label does — and says it on its
 own, rather than by borrowing a state GitHub attaches other meanings to:
@@ -822,7 +860,7 @@ jobs:
     gates:
         if: >-
             github.event_name != 'pull_request' ||
-            !contains(github.event.pull_request.labels.*.name, '[WIP]')
+            !contains(github.event.pull_request.labels.*.name, 'skip-ci')
         uses: ./.github/workflows/check-gates.yml
         with:
             diff-scope: code
@@ -831,7 +869,7 @@ jobs:
         needs: gates
         if: >-
             !cancelled() &&
-            (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+            (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
             needs.gates.outputs.branch_up_to_date != 'false' &&
             needs.gates.outputs.should_run != 'false'
 ```
@@ -845,12 +883,12 @@ report `skipped`. What to know about that:
   that is the only thing that starts the checks again on a commit already
   pushed. A list with `labeled` alone gives a label that goes on and never
   comes off.
-- **The label does not hold the merge by itself; `wip-label.yml` does.**
+- **The label does not hold the merge by itself; `skip-ci-label.yml` does.**
   GitHub refuses to merge a draft natively and has no equivalent for a label,
   and a skipped job can satisfy a required status check — a pull request that
-  was green and then had `[WIP]` added was measured with all 22 matrix
+  was green and then had `skip-ci` added was measured with all 22 matrix
   contexts still reading `success`. So the label comes with a required check
-  of its own, `no-wip-label`: a **commit status** that `wip-label.yml`
+  of its own, `no-skip-ci-label`: a **commit status** that `skip-ci-label.yml`
   writes on the head commit at every event — `pending` while the label is
   on, `success` once it is off — through the Status API rather than as the
   check run of a job.
@@ -870,7 +908,7 @@ report `skipped`. What to know about that:
       status to be reported" and blocks forever — so the job cannot be
       skipped on the label-less case. `gates / check` already costs each
       check workflow the same on the same events.
-    - **The job is named `wip-label`, not `no-wip-label`.** Its own check
+    - **The job is named `skip-ci-label`, not `no-skip-ci-label`.** Its own check
       run and the status it writes would otherwise share a name, and which
       of the two the ruleset would read is not a thing to discover on a
       merge.
@@ -878,7 +916,7 @@ report `skipped`. What to know about that:
       Actions app — the `integration_id` the ruleset pins the context to.
       The job's `permissions` grant `statuses: write` and nothing else.
 - **It is the only thing that blocks a labelled pull request**, because the
-  `*-result` aggregates carve `[WIP]` out and report `skipped` for it rather
+  `*-result` aggregates carve `skip-ci` out and report `skipped` for it rather
   than red — see "Required status checks". One pending check that names its
   reason, rather than six that have to be interpreted.
 - **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
@@ -891,16 +929,20 @@ report `skipped`. What to know about that:
 - **The label is not declared anywhere in this repository.**
   `repo-settings/` covers repository settings, rulesets, the Actions settings,
   Pages, environments and Dependabot alerts, but not labels,
-  so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
-  turns the skipping off — though not the blocking, since `no-wip-label` reads
+  so `skip-ci` exists only on GitHub. Renaming or deleting it there silently
+  turns the skipping off — though not the blocking, since `no-skip-ci-label` reads
   the same string and would simply stop matching too. The string is written
-  down in the workflows — the five check workflows, `wip-label.yml` and
-  `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs.mts`, which
-  sets a labelled pull request aside; change it everywhere or nowhere.
-- **Any label event re-runs the checks, not just `[WIP]`'s.** The trigger is
-  `labeled` / `unlabeled` and the condition reads only whether `[WIP]` is on,
+  down in the workflows — the five check workflows, `skip-ci-label.yml` and
+  `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs/`, which
+  takes it off a queued pull request when its turn comes; change it everywhere
+  or nowhere. The same holds for `merge-queued` — see "A declared merge order"
+  — which is read by `unblock-prs` and written by `pnpm-update.yml`, so
+  deleting it on GitHub empties the queue and breaks that workflow's
+  `gh pr create`.
+- **Any label event re-runs the checks, not just `skip-ci`'s.** The trigger is
+  `labeled` / `unlabeled` and the condition reads only whether `skip-ci` is on,
   so attaching `bug` to a pull request mid-run cancels that run and starts
-  another. Skipping on "not the `[WIP]` label" would not help: the run would
+  another. Skipping on "not the `skip-ci` label" would not help: the run would
   still exist, still cancel the one in progress, and its skipped aggregate
   would supersede the last verdict. Put other labels on before pushing, or
   after the checks have reported.
@@ -913,7 +955,7 @@ the required checks have to pass on a head that already contains main's tip:
 the branch cannot merge as it stands, and the update that clears it fires
 `synchronize` and runs everything again on the commit that will actually be
 merged. The run before that update produces a result nothing can use — and,
-unlike `[WIP]`, the thing that holds the merge meanwhile is the ruleset rather
+unlike `skip-ci`, the thing that holds the merge meanwhile is the ruleset rather
 than a convention.
 
 Being behind is not in the event payload — `mergeable_state` arrives as
@@ -933,7 +975,7 @@ What that shape is for:
   `type-check.yml` — to decide it had nothing to do, and each of those eleven
   checks out and installs dependencies first, about 45 seconds apiece. The
   gate job costs one boot per workflow run and skips the rest before they
-  start. The `[WIP]` gate needs no job of its own because its answer is free.
+  start. The `skip-ci` gate needs no job of its own because its answer is free.
 - **A reusable workflow, not the same shell copied five times.** One answer,
   one place to change it — the same reason the diff gate's path lists live in
   the root `package.json`. The price is one more entry in the checks list per
@@ -943,14 +985,14 @@ What that shape is for:
   answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
   jobs from being skipped along with it. Failing open costs a CI run; failing
   closed would skip every check on the pull request while reporting the
-  required ones as satisfied. The `[WIP]` clause is repeated in the longer
+  required ones as satisfied. The `skip-ci` clause is repeated in the longer
   condition because `!cancelled()` also lifts the automatic skip that a
   skipped dependency would otherwise give.
 - **Only the default branch.** The gate compares against
   `github.event.pull_request.base.ref` and skips only when it is the
   repository's default branch. Nowhere else does being behind block a merge,
   so nowhere else does an update that re-runs the checks have to come.
-- **`push` and `workflow_dispatch` are exempt**, as they are from the `[WIP]`
+- **`push` and `workflow_dispatch` are exempt**, as they are from the `skip-ci`
   gate, and for the same reason.
 
 The design leans on the `main` ruleset
@@ -1125,8 +1167,8 @@ comment, an issue — is not covered: only what lands in the history is.
 
 `Validate commit messages` in `lint-pull-request.yml` enforces it, and
 `Validate PR title` enforces the same thing for the title. Both are required
-status checks, and both skip while the `[WIP]` label is on, as the check
-workflows do — see "Check triggers, `[WIP]` and out-of-date branches". What
+status checks, and both skip while the `skip-ci` label is on, as the check
+workflows do — see "Check triggers, `skip-ci` and out-of-date branches". What
 they reject is Japanese specifically — kana, CJK ideographs, CJK punctuation
 and the fullwidth forms — rather than everything outside ASCII, so an em
 dash, a curly quote or an accented name still passes.
@@ -1140,22 +1182,26 @@ dash, a curly quote or an accented name still passes.
   is why both are held to the same rule.
 - Include a clear description, link related issues, and add screenshots or logs when helpful.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
-- Make sure CI passes and `pnpm run check-all` completes without errors.
+- Make sure CI passes, and that the checks the diff touches pass locally
+  first — see "Essential Development Commands" for which those are.
 
-### Opening a pull request: draft, with `[WIP]` on it
+### Opening a pull request: draft, with `skip-ci` on it
 
 **Implement the change, run the local checks, and only then open the pull
-request — as a draft, with the `[WIP]` label on it.** The two markers are
+request — as a draft, with the `skip-ci` label on it.** The two markers are
 addressed to different readers and both are wanted at that moment:
 
 - **Draft is addressed to people.** It says the branch is not asking for
   review yet, and GitHub refuses to merge a draft natively.
-- **`[WIP]` is addressed to CI.** Every check workflow and both lint jobs skip
-  while it is on, and `no-wip-label` holds the merge with a pending status —
-  see "Check triggers, `[WIP]` and out-of-date branches". `unblock-prs` sets a
-  labelled pull request aside too, so the loop neither rebases nor watches it.
+- **`skip-ci` is addressed to CI.** Every check workflow and both lint jobs skip
+  while it is on, and `no-skip-ci-label` holds the merge with a pending status —
+  see "Check triggers, `skip-ci` and out-of-date branches". `unblock-prs` looks
+  only at pull requests labelled `merge-queued`, so an unlabelled one is left
+  alone whether or not it carries `skip-ci`; a labelled one has its `skip-ci`
+  taken off when its turn comes, which is the one thing that takes it off. See
+  "A declared merge order".
 
-`gh pr create --draft --label '[WIP]'` does both in the call that opens it.
+`gh pr create --draft --label 'skip-ci'` does both in the call that opens it.
 Adding the label afterwards works, but the `opened` event has already started
 a run by then, which the `labeled` event then cancels through the concurrency
 group — the runner minutes are spent either way.
@@ -1163,10 +1209,11 @@ group — the runner minutes are spent either way.
 Consequences worth having in mind:
 
 - **While the label is on, the local checks are the only checks the branch
-  gets.** Nothing runs on the runners at all. `pnpm run check-all` before
-  opening is therefore not politeness but the whole verification, and a pull
-  request opened without it sits in the list looking exactly like one that
-  passed.
+  gets.** Nothing runs on the runners at all, so a pull request opened without
+  running anything sits in the list looking exactly like one that passed. Run
+  the checks the diff touches — see "Essential Development Commands" — and say
+  in the description which ones, so the gap between that and a full CI run is
+  written down rather than assumed.
 - **Taking the label off is how CI is asked for.** `unlabeled` is in every
   check workflow's trigger list, so removing it starts the whole matrix on the
   commit already pushed — there is no need to push an empty commit to wake
@@ -1175,8 +1222,17 @@ Consequences worth having in mind:
   pull request, so relying on it instead of the label spends a full matrix on
   every push to work that is not ready to be read yet.
 - **The label is a pause, not a state to leave a branch in.** A pull request
-  that keeps it is one nothing will ever merge: no check runs, `no-wip-label`
-  stays pending, and `unblock-prs` skips it.
+  that keeps it is one nothing will ever merge: no check runs, and
+  `no-skip-ci-label` stays pending. `merge-queued` is how a pause becomes a
+  queue position instead — a pull request that has been reviewed and is
+  waiting its turn rather than waiting for someone to look at it, and that
+  `unblock-prs` will take the label off when its turn comes.
+- **Queueing one is three actions, and `skip-ci` is not among them.** Mark it
+  ready for review, arm auto-merge, add `merge-queued`. The order is forced:
+  auto-merge cannot be armed on a draft, and `unblock-prs` reports a queued
+  draft rather than acting on it. `skip-ci` stays on — taking it off by hand
+  starts a matrix now, which is the thing the queue exists to do one branch at
+  a time.
 
 ### Several pull requests from one session
 
@@ -1206,6 +1262,65 @@ stop and ask a human about it.
   the ruleset the required checks answer to is `main`'s. The child's diff
   shows the parent's commits until the parent lands; that is the price, and it
   costs less than a pull request the loop will not look at.
+
+### A declared merge order
+
+The chain above is an order that exists in git and nowhere else, which is why
+it has to be read off the branches by a person. `pnpm run unblock-prs` reads
+one the pull requests state instead, out of two things they carry.
+
+- **The `merge-queued` label is the scope rule.** A pull request without it is
+  passed over in silence, whatever else it carries; the label is the author
+  saying this one is reviewed and is to be landed. Auto-merge is still
+  required — nothing here merges anything — and a queued pull request that
+  lacks it, or is a draft, or is based on something other than `main`, is
+  reported rather than skipped quietly, because the label asked for something
+  and the answer is no.
+- **`Merge-After: #1234`**, a trailer on its own line in the pull request
+  body. The pull request is not _picked_ — not rebased, not released — while
+  any pull request it names is still open. Several numbers may be named, on
+  one line or on several, so what is declared is a graph rather than a chain,
+  and a pull request whose `Merge-After` names nothing open is unconstrained.
+  A trailer inside a fenced code block is not read: a declaration and an
+  example of one are the same text, so the pull request that introduced this
+  could not have described it otherwise.
+
+`skip-ci` is not a scope rule here: it pauses a queued pull request rather
+than removing it, and taking it off when its turn comes is what the loop is
+for. That is also why a `skip-ci` pull request is a candidate whatever
+`mergeStateStatus` says about it — with `no-skip-ci-label` pending it reads
+`BLOCKED` however ready it is, and checks that were skipped are
+indistinguishable from checks still running.
+
+What the declaration buys over chaining branches is that the order is stated
+rather than inferred, so it survives the rebases: the loop's own rebase of A
+rewrites A's commits, and anything that read B's dependency on A out of its
+ancestry would lose it at that moment. A number does not move.
+
+Four things follow from how it releases one:
+
+- **It constrains picking and nothing else.** A pull request that is already
+  up to date and merging is watched as it always was, because auto-merge is
+  going to merge it whatever is declared here. `Merge-After` cannot hold back
+  something that is already going.
+- **The rebase comes first and the `skip-ci` removal second.** While the label
+  is on, the push fires a `synchronize` whose every check skips, so it is
+  free; taking the label off then fires `unlabeled` and runs the matrix once,
+  on the head that will actually be merged. The other order runs a full matrix
+  on the pre-rebase head and has the push cancel it.
+- **A queue stalls rather than reordering itself.** A released pull request
+  whose checks fail is set aside like any other, with its `skip-ci` off, and
+  everything declaring `Merge-After` on it waits, because it has not merged.
+  A cycle stalls the same way, and is reported by name — without that its
+  members would each report "waiting on #N" for as long as the loop ran, with
+  nothing saying why that never changes.
+- **A bot that opens a pull request has to label it.** `pnpm-update.yml` does,
+  in the same `gh pr create` that opens it and next to the `gh pr merge
+--auto` that arms it — nobody reviews that branch, so the two statements are
+  one. Without the label nothing rebases it when `main` moves under it, and
+  the only thing that would notice is the branch quietly sitting `BEHIND`.
+  `node-support-update.yml` deliberately does not: it arms no auto-merge
+  either, and a pull request waiting for a person is the point of it.
 
 ## Releases
 
