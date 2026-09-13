@@ -555,3 +555,29 @@
     - **したがって `Optional` / `Result` / `TernaryResult` を同じ扱いにする**: いずれも条件型の戻り値を持つ単一シグネチャ + 局所的な `as` 1 個。未検査のオーバーロード宣言 6 本が消え(利得の大部分)、`as` 3 個は明示されて grep できる形で残る。`Err.value` の改名もしない
     - **残った `as` は Sumi refined のチェッカーで discharge する**: 「**条件型の戻り値は、型引数の制約が有限 union のとき、その member ごとに本体を検査する**」(`unwrap` なら `O := Some<S>` と `O := None` の 2 回)。ADT はまさにこの形なので 3 つとも一度に片付き、将来の分にも効く。**これは判断 2 と同じ原理の適用である** — TS が本体を 1 回しか検査しないことが両方の病因で、答えはどちらも「宣言されたケースごとに検査する」。片方を構文規則、もう片方をデータモデルの小技で解くより、1 つの原理で両方を説明できる方が言語として筋が通る
     - sugar の複数節構文を**入れるかどうかは未決**。上の書き換えのあと実行時分岐は `panic` の 1 個だけになるので、判断 2 は「入れるならこの形」であって「入れる」ではない
+
+## D-59: 副作用 import は例外なく禁止し、型だけの import 文の記法はそこから決まる
+
+- **ステータス**: 確定(2026-09-13、ユーザー了承 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) の 2026-09-12 のコメント)
+- **判断**:
+    1. **副作用 import(`import '...'`)は例外なく禁止する。** 代替は「CLI から実行する」か「関数として import して呼ぶ」。
+    2. **束縛が全部型である import 文は `import type` で書く**(名前空間なら `import type * as X`)。値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。**Sumi lint の段階から強制する。**
+- **理由**:
+    - **2 は 1 の帰結であって、記法の好みではない。** 拘束 compilerOption の `verbatimModuleSyntax`(常時 true — D-40)は「書いたとおりに出す」ので、inline の型指定子だけを消して**空の import 文を残す**。実測(TypeScript 7.0.2 / 6.0.3 で同結果):
+
+        | 書き方                               | 出力                                      |
+        | :----------------------------------- | :---------------------------------------- |
+        | `import { type Foo } from 'm';`      | `import {} from 'm';` ← **副作用 import** |
+        | `import type { Foo } from 'm';`      | (完全に消える)                            |
+        | `import { bar, type Foo } from 'm';` | `import { bar } from 'm';`                |
+        | `import * as Ns from 'm';`(型専用)   | `import * as Ns from 'm';`                |
+        | `import type * as Ns from 'm';`      | (完全に消える)                            |
+
+        つまり inline 形は、その文の束縛が全部型のとき、**判断 1 が禁止している構文そのものを出力する**。1 を決めた時点で 2 は選択の余地がない。元のユーザー提案は「Sumi lint では記法を選ばない」だったが、この測定を受けて選ぶ方に改めた(ユーザー了承)。
+
+    - **代替手段の有無は用途で割れるが、例外規定は要らない。** リポジトリ内の副作用 import 33 件のうち 20 件は `import 'dotenv/config'` で、これは `config()` の関数呼び出しに置き換わる。残る 13 件は `import './index.css'` で、**アセットの import はモジュールの実行ではなくバンドラへの指示**なので関数形が存在しない。しかし Sumi のモジュール解決(拡張子必須・パッケージは `exports` 経由)は `.css` を解決しないので、**そもそも Sumi 下ではモジュールグラフに載らない**。例外を設けるのではなく「アセットは `index.html` の `<link>` かバンドラ設定側に出す」が Sumi での書き方になる。
+- **帰結**:
+    - **強制手段は 2 つとも oxlint のネイティブルールで足りる**(2026-09-13 確認、いずれも現在 off): `typescript/no-import-type-side-effects`(inline 形が全部型の場合)と `typescript/consistent-type-imports` の `prefer: "type-imports"`(名前空間を含む、型にしか使わない import 全般)。preset に 2 行足すだけで、新規実装は要らない。
+    - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧(allow リストの精査待ち)から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
+    - **アセットの扱いは利用者向けドキュメントに書く**(implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」)。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
+    - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする(ユーザー要望)。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない(大原則: sugar の出力は Sumi lint を満たす)。

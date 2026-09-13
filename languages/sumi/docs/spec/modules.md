@@ -9,12 +9,25 @@
 
 ```ts
 import { foo, bar } from './relative/path.mjs'; // 名前付き import
-import { type Foo, baz } from 'package-name'; // inline type 指定
-import type { Foo } from 'package-name'; // 型のみ import
+import { type Foo, baz } from 'package-name'; // inline type 指定(値と混在する文のみ)
+import type { Foo } from 'package-name'; // 型だけの文は必ずこの形(D-59)
+import type * as NsType from 'package-name'; // 型だけの名前空間 import(D-59)
 import * as ns from 'package-name'; // 名前空間 import(使用はプロパティアクセスのみ — D-28)
 import { qux } from '#internal/qux.mjs'; // `#` subpath import(package.json の `imports` 経由 — D-28)
 const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28)
 ```
+
+- **束縛が全部型である import 文は `import type` で書く(確定 2026-09-13 — D-59)。** 値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。これは好みの問題ではなく、拘束 compilerOption の `verbatimModuleSyntax`(常時 true — [compiler-options.md](./compiler-options.md))の帰結である:
+
+    ```ts
+    import { type Foo } from './dep.mjs'; // → import {} from './dep.mjs';  ← 副作用 import が残る
+    import type { Foo } from './dep.mjs'; // → 完全に消える
+    import { bar, type Foo } from './dep.mjs'; // → import { bar } from './dep.mjs';  ← 問題なし
+    import * as Ns from './dep.mjs'; // 型にしか使わなくても → import * as Ns from './dep.mjs';
+    import type * as Ns from './dep.mjs'; // → 完全に消える
+    ```
+
+    `verbatimModuleSyntax` は「書いたとおりに出す」ので、inline の型指定子だけを消して**空の import 文を残す**(TypeScript 7.0.2 / 6.0.3 で実測)。その残骸は上表で禁止している**副作用 import そのもの**であり、したがって記法の選択は副作用 import の禁止から一意に決まる。**Sumi lint の段階から強制する。**
 
 - 相対 import は必ず拡張子付き(`.mjs`)。
 - パッケージ import はパッケージ名(+ `exports` で公開された subpath)のみ。
@@ -29,7 +42,7 @@ const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28
 | `import foo from '...'`(default)                               | default export の禁止と対。名前の同一性が失われる(import 側が自由に命名できてしまう)                                                                          |
 | `export default ...` / `export { x as default }`               | 同上。named export のみ。**設定ファイルも含め全面禁止**(D-28)。default export を要求するツールへの接続は下記「default export を要求するツールとの接続」(D-36) |
 | `import * as ns` の非 tree-shakable な使用                     | import 自体は許可(上表)。`ns` を値として渡す・spread する等、プロパティアクセス以外の使用を禁止(D-28)                                                         |
-| `import '...'`(副作用 import)                                  | 副作用のためだけのモジュール実行は暗黙のグローバル状態変更                                                                                                    |
+| `import '...'`(副作用 import)                                  | 副作用のためだけのモジュール実行は暗黙のグローバル状態変更。**例外なし**(確定 2026-09-13 — D-59)。代替は「CLI から実行する」か「関数として import して呼ぶ」  |
 | `require` の代替としての dynamic `import()` の禁止は**しない** | dynamic `import()` は無制限で許可(D-28)。この行は旧「未定」の記録                                                                                             |
 | `require` / `import foo = require(..)`                         | CJS は存在しない(erasableSyntaxOnly にも含まれる)                                                                                                             |
 | `declare global` / script モード                               | ユーザーコードはグローバルを定義できない。すべてのファイルはモジュール(prelude だけが例外)                                                                    |
@@ -136,6 +149,19 @@ export * from './helper.mjs';
 ### 強制手段
 
 `sumi/no-mixed-star-export`(@sumi-lang/oxlint-config の JS plugin、2026-09-08 実装): `ExportAllDeclaration`(`exported` を持たない `export * from` / `export type * from`)を含むファイルに他の文があれば、その文ごとに報告する構文ルール。`export * as ns from` は名前 `ns` の明示 export なので「他の文」側。型情報は要らない。名前が実際に衝突しているかは見ない — それは tsc の TS2308 が担当する。この monorepo の `pnpm run gen:index` が生成する index.mts は `export *` のみなので既に適合する。
+
+## 副作用 import の代替(確定 2026-09-13 — D-59)
+
+禁止そのものは D-27 で確定済みで、`import/no-unassigned-import` を `allow: []` で有効化して実装されている。残っていたのは「代替手段が本当にあるのか」で、リポジトリ内の実例 33 件で確かめた結果、**答えは用途で割れる**:
+
+| 実例                      | 件数 | 代替                                                                    |
+| :------------------------ | ---: | :---------------------------------------------------------------------- |
+| `import 'dotenv/config';` |   20 | **ある** — `import { config } from 'dotenv'; config();`(関数として呼ぶ) |
+| `import './index.css';`   |   13 | **無い** — 下記                                                         |
+
+**CSS(および画像等のアセット)の import はモジュールの実行ではなく、バンドラへの指示である。** 関数形は存在しないので「関数として import して呼ぶ」は当てはまらない。かつ Sumi のモジュール解決(拡張子必須・パッケージは `exports` 経由)は `.css` を解決しないので、**Sumi 下のアプリは CSS をモジュールグラフに載せられない**。したがって例外規定を設けるのではなく、**CSS は `index.html` の `<link>` かバンドラ設定側に出す**のが Sumi での書き方になる。
+
+これは規則ではなく**移行の作法**なので、Sumi sugar / refined の利用者向けドキュメントに書く必要がある([../implementation-plan.md](../implementation-plan.md) の「将来の作業」に TODO)。現在 `sumi check` の対象は synstate 3 パッケージだけで apps を含まないため、この衝突はまだ表面化していない。
 
 ## 未解決の論点
 
