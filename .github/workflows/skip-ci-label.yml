@@ -41,9 +41,32 @@ name: Skip CI Label
 #
 # No `push` trigger: the required checks are evaluated when a pull request
 # merges, and the `main` ruleset accepts no other way onto the branch.
+#
+# `pull_request_target`, not `pull_request`, for the reason
+# `lint-pull-request.yml` gives for the same choice: it runs the workflow file
+# as it exists on the base branch. Under `pull_request` the file that runs is
+# the one on the pull request's own head, so the branch this status is
+# deciding about would be the branch supplying the decision — and the
+# `statuses: write` below is already all the permission that needs. Since this
+# is the one required check a `skip-ci` pull request does not satisfy by
+# skipping, that gate belongs on `main`.
+#
+# The usual hazard of `pull_request_target` — a writable token in a job that
+# runs the branch's code — is absent here, and must stay absent: this job
+# checks nothing out and executes nothing from the working tree, only the
+# `run:` block below, which the event resolved from the base branch. A step
+# added here must keep to that; read the pull request from the event payload,
+# never from a checkout. Moving the trigger means moving the event name in the
+# concurrency block with it — `pnpm run check:root:workflow-event-name` holds
+# the two in agreement here and in every other workflow.
+#
+# No `branches:` filter, deliberately. The required checks are `main`'s, but a
+# pull request whose base is anything else still needs this status written:
+# a head commit without it reads "Expected — waiting for status to be
+# reported", which blocks forever.
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - synchronize
@@ -57,7 +80,7 @@ on:
 # newer event's run is the one whose answer is current.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 permissions:
   statuses: write
