@@ -127,6 +127,54 @@ TS の「関数型を `&` で結ぶ」「interface にメソッド記法で並�
 
 Sumi lint との接続: D-13(named function はオーバーロード時のみ)により、Sumi lint の `function` 宣言の出現箇所 = オーバーロード関数だけになっている。Sumi sugar で `fn` を導入すれば、この出現箇所がそのまま `fn` 化の対象になり移行が機械的。
 
+## 候補 9: tuple リテラルの構文(2026-09-13 追記、ユーザー要望 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)
+
+TS の `[a, b, c] as const` に相当し、**配列型ではなく readonly tuple 型に推論される**リテラル構文が欲しい。mutable tuple も作れるようにしたい。
+
+### `as const` は 3 つの軸を一度に動かしている(実測 2026-09-13)
+
+要望を設計に落とす前に、`as const` が実際に何をしているかを分解する。TypeScript 7.0.2 で確認:
+
+| 書き方                                         | 推論される型           | readonly | tuple | 要素型     |
+| :--------------------------------------------- | :--------------------- | :------- | :---- | :--------- |
+| `[1, 2]`                                       | `number[]`             | ✗        | ✗     | widened    |
+| `[1, 2] as const`                              | `readonly [1, 2]`      | ✓        | ✓     | literal    |
+| `[a, mut_b] as const`(`a: 1`, `mut_b: number`) | `readonly [1, number]` | ✓        | ✓     | 変数のまま |
+| `const t: readonly number[] = [1, 2]`          | `readonly number[]`    | ✓        | ✗     | widened    |
+| `const t: [number, string] = [1, 'a']`         | `[number, string]`     | ✗        | ✓     | 注釈どおり |
+
+読み取れること:
+
+1. **軸は 3 つ**(readonly / tuple / 要素型の literal 化)あり、`as const` は 3 つを同時に立てる。要望が求めているのは前 2 つで、3 つ目は付いてくるだけである。
+2. **literal 化はリテラル式にしか効かない。** `as const` は変数の型を更に狭めはしない(3 行目)。「`as const` は何でもリテラル型にする」という誤解を避ける必要がある。
+3. **mutable tuple には式レベルの手段が無い。** `as mutable` は存在せず、注釈を書くしかない(5 行目)。要望の「mutable tuple も作れるように」はここを指している。
+
+### リポジトリの現況 — 既に機械化されている
+
+`as const` はソースに **1,937 箇所**あり、`ts-codemod-lib` の `append-as-const` transformer が機械的に付与している。その transformer は `ignorePrefixes: ['mut_', '#mut_', '_mut_', 'draft']` を持つ — つまりこのリポジトリの運用は既に **「`mut_` 以外のリテラルには `as const` を付ける」** であり、判定は D-14 の `mut_` 規律とちょうど一致している。
+
+したがって候補 9 は新しい意味論の導入ではなく、**既に codemod が実行している規則を構文の既定にする**という話になる。D-37 が各候補に求める「Sumi lint のライブラリ形」と「両向きの codemod」は、この候補については**既に存在する**。
+
+### 設計の方向(提案、未確定)
+
+- **リテラルは既定で readonly tuple**(暗黙の `as const`)。readonly-by-default(D-3)と既存 codemod の追認。
+- **mutable は `mut_` 束縛が担う**(D-14)。ただし `mut_` は**束縛の性質**であって式の性質ではないので、`f([1, 2])` のように束縛を経由しない位置での mutable tuple の作り方が別途要る。ここが未決の中心。
+- **要素型の literal 化は別の軸**として扱う。`readonly [1, 2]` が欲しい場面と `readonly number[]` が欲しい場面は別で、`as const` はこれを区別できない。sugar で区別できる記法にするか、注釈に委ねるかを決める。
+
+### TC39 との関係(調査 2026-09-13)
+
+- **Record & Tuple は取り下げられている。** Stage 2 まで進んだのち **2025-04-15 に withdrawn**、リポジトリも archive 済み([tc39/proposal-record-tuple#394](https://github.com/tc39/proposal-record-tuple/issues/394))。`#[1, 2]` / `#{ a: 1 }` という構文、新しいプリミティブ、`typeof` の拡張、プリミティブしか入れられない深い不変性が提案の中身だった。
+- **したがって `#[...]` を借りるのは勧めない。** 将来 JS がその構文を持つ見込みが無くなった以上、収束先としての価値は消えている。それ以上に、**構文が約束する意味論を lowering が提供できない**: `#[...]` を知っている読み手は値としての等価性(`#[1,2] === #[1,2]`)と深い凍結を期待するが、`as const` へ落とすだけではどちらも得られない。Sumi sugar の出力は TS であり意味論を変えない(大原則 2)ので、この差は埋まらない。
+- **後継の Composites は tuple の代わりにならない。** Stage 1、`Composite({ x: 1 })` という**オブジェクト**(プリミティブではない)で、interning による値等価を与える。ただし**名前付きプロパティのみ**で位置による tuple 形が無く、可変値も入れられる。tuple の需要には答えない。
+- **参考になるのは意味論の側**である。「immutable tuple」が実行時に何を意味するか(値等価・深い凍結)は、**Sumi refined**(独自型検査器と実行時表現を持てる層)でしか提供できない。Sumi sugar の候補 9 は**型の付き方の話**に限定し、値等価は refined の論点として切り離すのが筋が通る。auto freezing([variables-and-mutation.md](./variables-and-mutation.md))と同じ枠に入る。
+
+### 未解決の論点
+
+- 束縛を経由しない位置(引数・戻り値・リテラルの入れ子)での mutable tuple の作り方。
+- 要素型の literal 化の軸を構文で区別するか、注釈に委ねるか。
+- 既定を readonly tuple にすると `readonly number[]`(homogeneous な可変長)が書きにくくならないか — 1,937 箇所の内訳を「tuple が欲しかった / 配列が欲しかった」で数えると判断材料になる。
+- object literal 側(`{ a: 1 } as const`)も同じ 3 軸を持つので、tuple だけ先に決めてよいか。
+
 ## 導入順(提案)
 
 依存関係と費用対効果から: 候補 5(構文変更なし・transpiler の骨格作り)→ 候補 6(トークン置換に近い低リスク変換)→ 候補 1(式の局所変換)→ 候補 4(制御フロー変換 — emit 品質の本丸)→ 候補 2(最大の構文追加)→ 候補 3(型主導 emit が必要なら最後)。候補 7 は transpiler ではなく型検査器の拡張(第 3 層 — D-37)なのでこの順序の外に置く。各候補は着手前に「Sumi lint ライブラリ形」と両向きの codemod を明記する(D-37)。
