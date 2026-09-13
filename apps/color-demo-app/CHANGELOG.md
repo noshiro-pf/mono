@@ -1,5 +1,12 @@
 # color-demo-app
 
+## 0.0.5
+
+### Patch Changes
+
+- react-utils@0.0.8
+    - react-mui-utils@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
