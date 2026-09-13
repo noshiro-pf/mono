@@ -2,8 +2,8 @@
 
 # Storage and state
 
-What this extension keeps, where it keeps it, and what reads it back. The
-[README](../README.md) covers the parts that are about the browser rather than
+What this extension keeps, where it keeps it, and what reads it back.
+[`how-it-works.md`](./how-it-works.md) covers the parts that are about the browser rather than
 about data — the header-stripping rules, the `sandbox` attribute, why a site's
 own service worker defeats both. This document is the data.
 
@@ -146,7 +146,7 @@ type LayoutNode =
 `row` puts `first` on the **left**, `column` puts it on **top** — the names
 follow CSS `flex-direction`, which says how the children are arranged rather
 than how the divider is drawn. A 2×2 grid is therefore a `row` of two `column`s,
-never the other way round; see the README for why that distinction is the whole
+never the other way round; see `how-it-works.md` for why that distinction is the whole
 point of the nesting.
 
 `ratio` is clamped to `0.05..0.95` on the way in as well as on the way out, so
@@ -346,7 +346,7 @@ extension's id is derived from the directory it was loaded from — so the same
 code loaded from another path is a different extension looking at empty storage.
 `key` in `public/manifest.json` pins the id to
 `nifmgpafbfpgpcijgmfpcoonjbalbkhf` wherever it is loaded from. See "The list,
-and what it is keyed to" in the README for what that means for packing a `.crx`
+and what it is keyed to" in `how-it-works.md` for what that means for packing a `.crx`
 and for anything saved before the key was added.
 
 ## The page's own state

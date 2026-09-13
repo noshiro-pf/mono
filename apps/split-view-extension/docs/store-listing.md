@@ -9,7 +9,7 @@ Upload `pack/split-view-extension-<version>.zip` from `pnpm run pack` — not
 CRX upload** is turned on for the item, a zip is refused too ("アイテムを crx
 パッケージで更新する必要があります") and `pnpm run pack:crx` is what to upload
 instead: the same package, signed by Chrome with the key registered on the
-account, which the script takes out of `pass`. See "What the storage is keyed to" in the [README](../README.md).
+account, which the script takes out of `pass`. See "The list, and what it is keyed to" in [`how-it-works.md`](./how-it-works.md#the-list-and-what-it-is-keyed-to).
 
 ## Store listing
 

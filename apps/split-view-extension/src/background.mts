@@ -91,7 +91,7 @@ if (SPLIT_VIEW_DIAGNOSTICS) {
    * it is the only way to see what Chrome attributes a pane's request to
    * (`initiator`, `tabId`, `type`) and which framing headers are on the response
    * by the time it arrives. A pane that will not load is then answerable rather
-   * than arguable. It can be dropped once the cause is known — see the README.
+   * than arguable. It can be dropped once the cause is known — see `docs/development.md`.
    */
   chrome.webRequest.onBeforeRequest.addListener(
     (details) => {
