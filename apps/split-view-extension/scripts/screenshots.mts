@@ -73,10 +73,17 @@ const main = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(shotsPath, { recursive: true });
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(readmeShotsPath, { recursive: true });
+
     const shoot = async (fileName: string): Promise<void> => {
       const file = path.resolve(shotsPath, fileName);
 
       await page.screenshot({ path: file });
+
+      // The README shows the same pictures, so it is given a tracked copy
+      // rather than a second set that could fall behind the store's.
+      fs.copyFileSync(file, path.resolve(readmeShotsPath, fileName));
 
       console.log(file);
     };
@@ -191,6 +198,9 @@ type Box = Readonly<{ x: number; y: number; width: number; height: number }>;
 const distPath = path.resolve(workspaceRootPath, 'dist');
 
 const shotsPath = path.resolve(workspaceRootPath, 'pack', 'screenshots');
+
+/** Tracked, unlike `pack/`, because the README embeds them. */
+const readmeShotsPath = path.resolve(workspaceRootPath, 'docs', 'screenshots');
 
 const assertBuildIsPresent = (): void => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
