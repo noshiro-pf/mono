@@ -18,7 +18,7 @@ name: Check Gates
 #
 # ## Whether the diff matters
 #
-# `check-should-run` from `ts-repo-utils`, against one of the two ignore lists
+# `check-should-run` from `ts-repo-utils`, against one of the ignore lists
 # in the root `package.json` — see "CI diff gates" in CLAUDE.md. This used to
 # be a step inside every job, which meant each of the 22 matrix runners across
 # the three workflows booted, checked out and installed dependencies (~45s
@@ -51,9 +51,9 @@ on:
         description: >-
           Which ignore list in the root `package.json` to gate on: `code` for
           type-check.yml and node-version-compatibility.yml, `style` for
-          style-check.yml. `none` skips the diff question altogether, for the
-          one workflow that gates itself in shell — the gate then costs
-          one API call and no checkout.
+          style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
+          the diff question altogether, for the one workflow that gates itself
+          in shell — the gate then costs one API call and no checkout.
         type: string
         required: true
     outputs:
@@ -203,9 +203,9 @@ jobs:
           SCOPE: ${{ inputs.diff-scope }}
         run: |
           case "${SCOPE}" in
-            code | style) ;;
+            code | style | strict-lib) ;;
             *)
-              echo "::error::Unknown diff-scope \"${SCOPE}\"; expected code, style or none."
+              echo "::error::Unknown diff-scope \"${SCOPE}\"; expected code, style, strict-lib or none."
               exit 1
               ;;
           esac

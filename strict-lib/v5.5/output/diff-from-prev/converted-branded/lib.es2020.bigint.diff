@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts
-index 41d61b22d..bc23c89b8 100644
+index cf1f0dff434a2d6ce92bf31ff9f2be9d7c2bc595..7e2e3dbe567311de4275f520669ae11aded6add0 100644
 --- a/v5.4/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts
-@@ -468,7 +468,10 @@ interface BigInt64Array {
+@@ -489,7 +489,10 @@ interface BigInt64Array {
    ): BigInt64Array;
  
    /** Converts the array to a string by using the current locale. */
@@ -14,7 +14,7 @@ index 41d61b22d..bc23c89b8 100644
  
    /** Returns a string representation of the array. */
    toString(): string;
-@@ -863,7 +866,10 @@ interface BigUint64Array {
+@@ -884,7 +887,10 @@ interface BigUint64Array {
    ): BigUint64Array;
  
    /** Converts the array to a string by using the current locale. */
@@ -26,7 +26,7 @@ index 41d61b22d..bc23c89b8 100644
  
    /** Returns a string representation of the array. */
    toString(): string;
-@@ -970,6 +976,5 @@ interface DataView {
+@@ -991,6 +997,5 @@ interface DataView {
  declare namespace Intl {
    interface NumberFormat {
      format(value: number | bigint): string;

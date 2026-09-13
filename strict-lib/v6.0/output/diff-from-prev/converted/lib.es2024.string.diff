@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.string.d.ts b/v6.0/output/lib-files/lib.es2024.string.d.ts
-index 62dcbcd47..821ed98b7 100644
+index 62dcbcd475695ab2a1dcc4d8302d0746e35b7ae6..821ed98b7f313eea99d7981969bb6fffd0da7ea2 100644
 --- a/v5.9/output/lib-files/lib.es2024.string.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.string.d.ts
 @@ -1,5 +1,3 @@

@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.array.d.ts b/v5.7/output/lib-files/lib.esnext.array.d.ts
-index 67b0196ef..9b08357d1 100644
+index 67b0196ef9c4583f5aa686209208c83e3b9b4e4e..9b08357d10dc300cec0506b5f42e96ef683e7515 100644
 --- a/v5.6/output/lib-files/lib.esnext.array.d.ts
 +++ b/v5.7/output/lib-files/lib.esnext.array.d.ts
 @@ -22,7 +22,7 @@ interface ArrayConstructor {

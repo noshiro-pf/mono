@@ -1,5 +1,5 @@
 diff --git a/v5.5/temp/copied/lib.es2018.asyncgenerator.d.ts b/v5.6/temp/copied/lib.es2018.asyncgenerator.d.ts
-index 8b2f9d979..17169cc70 100644
+index 8b2f9d979701212cd2628d8d5757755c60562373..17169cc701c8904be9263ea891104b72cee863d0 100644
 --- a/v5.5/temp/copied/lib.es2018.asyncgenerator.d.ts
 +++ b/v5.6/temp/copied/lib.es2018.asyncgenerator.d.ts
 @@ -20,10 +20,10 @@ and limitations under the License.

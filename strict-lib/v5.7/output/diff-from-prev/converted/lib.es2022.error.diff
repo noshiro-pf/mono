@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.es2022.error.d.ts b/v5.7/output/lib-files/lib.es2022.error.d.ts
-index 13ba8cefc..4da9ab24a 100644
+index 13ba8cefc303a5e7c8bc1af7b3a585fb25b1f36c..4da9ab24ab1db6ff6cfd22682d76bf6962dfe50b 100644
 --- a/v5.6/output/lib-files/lib.es2022.error.d.ts
 +++ b/v5.7/output/lib-files/lib.es2022.error.d.ts
 @@ -1,5 +1,7 @@

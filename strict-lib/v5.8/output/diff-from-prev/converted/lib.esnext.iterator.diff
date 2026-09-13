@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files/lib.esnext.iterator.d.ts b/v5.8/output/lib-files/lib.esnext.iterator.d.ts
-index 877ba2443..3a3b19f41 100644
+index 877ba24430e7b51fd49f3b4e545c6e1dd00047cf..3a3b19f4123dbefffc28d7ceba0151922a5ebb26 100644
 --- a/v5.7/output/lib-files/lib.esnext.iterator.d.ts
 +++ b/v5.8/output/lib-files/lib.esnext.iterator.d.ts
 @@ -121,7 +121,7 @@ declare global {

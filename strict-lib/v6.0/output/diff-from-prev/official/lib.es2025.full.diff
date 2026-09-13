@@ -1,6 +1,6 @@
 diff --git a/v6.0/temp/copied/lib.es2025.full.d.ts b/v6.0/temp/copied/lib.es2025.full.d.ts
 new file mode 100644
-index 000000000..66090e449
+index 0000000000000000000000000000000000000000..66090e44941275e09369eb0e69bbd893513f7c27
 --- /dev/null
 +++ b/v6.0/temp/copied/lib.es2025.full.d.ts
 @@ -0,0 +1,21 @@

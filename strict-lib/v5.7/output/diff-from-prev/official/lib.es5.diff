@@ -1,5 +1,5 @@
 diff --git a/v5.6/temp/copied/lib.es5.d.ts b/v5.7/temp/copied/lib.es5.d.ts
-index dda327f2f..666b0675b 100644
+index dda327f2f8458e015009e5da3b88dd537ec90197..666b0675b3cd7e7a5af5b26ea0955528803bf94b 100644
 --- a/v5.6/temp/copied/lib.es5.d.ts
 +++ b/v5.7/temp/copied/lib.es5.d.ts
 @@ -1947,7 +1947,7 @@ interface ArrayBuffer {

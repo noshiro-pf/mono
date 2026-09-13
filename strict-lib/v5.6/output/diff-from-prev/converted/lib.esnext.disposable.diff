@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files/lib.esnext.disposable.d.ts b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
-index 4c7b74f3d..1c549f93a 100644
+index 4c7b74f3dfe08e30ae09d0a596e464abdd45b4a7..1c549f93a103fad73f9efd249a63f388498d2971 100644
 --- a/v5.5/output/lib-files/lib.esnext.disposable.d.ts
 +++ b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
 @@ -1,6 +1,8 @@

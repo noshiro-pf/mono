@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2024.collection.d.ts b/v6.0/temp/copied/lib.es2024.collection.d.ts
-index 790cdb73c..93147a254 100644
+index 790cdb73c5c985eb8a9f03d078ab5eb400ec76ae..93147a2546e9da9beceb92b44a53ae11aac3ba1e 100644
 --- a/v5.9/temp/copied/lib.es2024.collection.d.ts
 +++ b/v6.0/temp/copied/lib.es2024.collection.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

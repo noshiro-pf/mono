@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files-branded/lib.webworker.d.ts b/v5.6/output/lib-files-branded/lib.webworker.d.ts
-index 4e866f60b..7fb955ae9 100644
+index 4e866f60b47ee80786724d85f0a61f5d43f15c8a..7fb955ae94670c35430d6f76129a711d63e4827d 100644
 --- a/v5.5/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.webworker.d.ts
 @@ -323,10 +323,6 @@ interface ImageEncodeOptions {

@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files/lib.es2020.bigint.d.ts b/v5.6/output/lib-files/lib.es2020.bigint.d.ts
-index 507a7797b..dc68cbda3 100644
+index faebf538e6db90e51c75a527fefd5350dce5e3a2..0f1e14022f3a639ec2ce81a66f98988260d447af 100644
 --- a/v5.5/output/lib-files/lib.es2020.bigint.d.ts
 +++ b/v5.6/output/lib-files/lib.es2020.bigint.d.ts
-@@ -158,7 +158,7 @@ interface BigInt64Array {
+@@ -179,7 +179,7 @@ interface BigInt64Array {
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -11,7 +11,7 @@ index 507a7797b..dc68cbda3 100644
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -258,7 +258,7 @@ interface BigInt64Array {
+@@ -279,7 +279,7 @@ interface BigInt64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -20,7 +20,7 @@ index 507a7797b..dc68cbda3 100644
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -419,9 +419,9 @@ interface BigInt64Array {
+@@ -440,9 +440,9 @@ interface BigInt64Array {
    valueOf(): BigInt64Array;
  
    /** Yields each value in the array. */
@@ -32,7 +32,7 @@ index 507a7797b..dc68cbda3 100644
  
    readonly [Symbol.toStringTag]: 'BigInt64Array';
  
-@@ -492,7 +492,7 @@ interface BigUint64Array {
+@@ -513,7 +513,7 @@ interface BigUint64Array {
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -41,7 +41,7 @@ index 507a7797b..dc68cbda3 100644
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -592,7 +592,7 @@ interface BigUint64Array {
+@@ -613,7 +613,7 @@ interface BigUint64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -50,7 +50,7 @@ index 507a7797b..dc68cbda3 100644
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -753,9 +753,9 @@ interface BigUint64Array {
+@@ -774,9 +774,9 @@ interface BigUint64Array {
    valueOf(): BigUint64Array;
  
    /** Yields each value in the array. */

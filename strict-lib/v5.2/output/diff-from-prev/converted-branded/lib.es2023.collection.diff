@@ -1,6 +1,6 @@
 diff --git a/v5.2/output/lib-files-branded/lib.es2023.collection.d.ts b/v5.2/output/lib-files-branded/lib.es2023.collection.d.ts
 new file mode 100644
-index 000000000..e2365b130
+index 0000000000000000000000000000000000000000..e2365b1309e625de456582f0504315b2ecb57b44
 --- /dev/null
 +++ b/v5.2/output/lib-files-branded/lib.es2023.collection.d.ts
 @@ -0,0 +1,5 @@

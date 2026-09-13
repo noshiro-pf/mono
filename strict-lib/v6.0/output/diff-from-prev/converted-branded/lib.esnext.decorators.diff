@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.esnext.decorators.d.ts b/v6.0/output/lib-files-branded/lib.esnext.decorators.d.ts
-index 5fb4c983a..44702215c 100644
+index 5fb4c983a4298e5810f0ccceaaf0a5f62a4bf934..44702215c07b14b7c7e0e75b4b9a661d932a740e 100644
 --- a/v5.9/output/lib-files-branded/lib.esnext.decorators.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.esnext.decorators.d.ts
 @@ -1,5 +1,3 @@

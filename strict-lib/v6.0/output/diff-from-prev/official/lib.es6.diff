@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es6.d.ts b/v6.0/temp/copied/lib.es6.d.ts
-index ff90ee9af..9f04deefd 100644
+index ff90ee9af18291c1b8546acf0b9d0849ca3ff9ea..9f04deefda3cdb5b29b3ac5f48b5d909e1271aa0 100644
 --- a/v5.9/temp/copied/lib.es6.d.ts
 +++ b/v6.0/temp/copied/lib.es6.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.d.ts b/v5.6/output/lib-files-branded/lib.dom.d.ts
-index 7905a704a..a86dbcd30 100644
+index 7905a704a9d6eb07a8fbba632fa94ade65cc6b62..a86dbcd302152bd8ec851ff7d52a501197258aee 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.d.ts
 @@ -580,6 +580,11 @@ interface GetAnimationsOptions {

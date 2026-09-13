@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2021.full.d.ts b/v6.0/output/lib-files/lib.es2021.full.d.ts
-index ca5c00db1..efc584a07 100644
+index ca5c00db1a66cd3ea7c4c08ab7add35ca215e8d6..efc584a07ee6bfe2c17bb27558c2d5001a29c243 100644
 --- a/v5.9/output/lib-files/lib.es2021.full.d.ts
 +++ b/v6.0/output/lib-files/lib.es2021.full.d.ts
 @@ -1,5 +1,3 @@

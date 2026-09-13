@@ -1,5 +1,5 @@
 diff --git a/v5.0/temp/copied/lib.es2015.collection.d.ts b/v5.1/temp/copied/lib.es2015.collection.d.ts
-index 758d015c4..e3851bf3b 100644
+index 758d015c44404fe49788dda12787fb0dec0315fd..e3851bf3b7dcdeddd0561e04fb340a64f14ecf4a 100644
 --- a/v5.0/temp/copied/lib.es2015.collection.d.ts
 +++ b/v5.1/temp/copied/lib.es2015.collection.d.ts
 @@ -87,7 +87,7 @@ interface WeakMap<K extends object, V> {

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts b/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
-index ca86575fb..0d451b7c7 100644
+index ca86575fb30c46bb05b66b2fd99af85cb659bbf5..0d451b7c754fba5868017677183d1f4082ce1767 100644
 --- a/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
 @@ -1,5 +1,3 @@

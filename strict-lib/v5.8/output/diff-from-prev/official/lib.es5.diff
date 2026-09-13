@@ -1,5 +1,5 @@
 diff --git a/v5.7/temp/copied/lib.es5.d.ts b/v5.8/temp/copied/lib.es5.d.ts
-index 666b0675b..a5ae209ad 100644
+index 666b0675b3cd7e7a5af5b26ea0955528803bf94b..a5ae209addbc87c0a2bf1ebc9fcd9724f75175cb 100644
 --- a/v5.7/temp/copied/lib.es5.d.ts
 +++ b/v5.8/temp/copied/lib.es5.d.ts
 @@ -748,7 +748,7 @@ interface Math {

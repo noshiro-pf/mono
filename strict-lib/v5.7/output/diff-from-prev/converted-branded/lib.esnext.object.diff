@@ -1,6 +1,6 @@
 diff --git a/v5.6/output/lib-files-branded/lib.esnext.object.d.ts b/v5.6/output/lib-files-branded/lib.esnext.object.d.ts
 deleted file mode 100644
-index 14e43f298..000000000
+index 14e43f29814b397173e318ab0e4790b060c13c3f..0000000000000000000000000000000000000000
 --- a/v5.6/output/lib-files-branded/lib.esnext.object.d.ts
 +++ /dev/null
 @@ -1,13 +0,0 @@

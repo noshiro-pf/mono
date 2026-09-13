@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
-index 727fa1f87..5312106b5 100644
+index 56cef0631570d576eea76637252f1a7db95a10b9..44997b487fd1e0e908257d2be420344d9f38574e 100644
 --- a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
 @@ -1,5 +1,3 @@
@@ -8,7 +8,7 @@ index 727fa1f87..5312106b5 100644
  /// <reference path="./lib.es2020.intl.d.ts" />
  
  interface BigIntToLocaleStringOptions {
-@@ -278,7 +276,7 @@ interface BigInt64Array<
+@@ -299,7 +297,7 @@ interface BigInt64Array<
    ): boolean;
  
    /**
@@ -17,7 +17,7 @@ index 727fa1f87..5312106b5 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -299,7 +297,7 @@ interface BigInt64Array<
+@@ -320,7 +318,7 @@ interface BigInt64Array<
    keys(): ArrayIterator<NumberType.TypedArraySize>;
  
    /**
@@ -26,7 +26,7 @@ index 727fa1f87..5312106b5 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -720,7 +718,7 @@ interface BigUint64Array<
+@@ -741,7 +739,7 @@ interface BigUint64Array<
    ): boolean;
  
    /**
@@ -35,7 +35,7 @@ index 727fa1f87..5312106b5 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -741,7 +739,7 @@ interface BigUint64Array<
+@@ -762,7 +760,7 @@ interface BigUint64Array<
    keys(): ArrayIterator<NumberType.TypedArraySize>;
  
    /**

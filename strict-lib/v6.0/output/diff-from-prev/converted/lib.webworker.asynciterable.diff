@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.webworker.asynciterable.d.ts b/v6.0/output/lib-files/lib.webworker.asynciterable.d.ts
-index be99ebadb..3b3e55b7a 100644
+index be99ebadb3e8a668fbb6e4f300aeb636f8cab61c..3b3e55b7a43b5d3e58dd5f54d1ef8f082227a35a 100644
 --- a/v5.9/output/lib-files/lib.webworker.asynciterable.d.ts
 +++ b/v6.0/output/lib-files/lib.webworker.asynciterable.d.ts
 @@ -1,41 +1,2 @@

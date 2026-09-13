@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.es2017.sharedmemory.d.ts b/v5.7/output/lib-files/lib.es2017.sharedmemory.d.ts
-index 18ce9e4eb..24333188d 100644
+index 18ce9e4ebb17ddcc43e6c1718367630b8c63ee2c..24333188dd0cc1079aa5b8ac2953522ab3fa3ace 100644
 --- a/v5.6/output/lib-files/lib.es2017.sharedmemory.d.ts
 +++ b/v5.7/output/lib-files/lib.es2017.sharedmemory.d.ts
 @@ -12,14 +12,14 @@ interface SharedArrayBuffer {

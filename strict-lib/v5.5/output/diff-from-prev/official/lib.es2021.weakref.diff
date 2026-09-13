@@ -1,5 +1,5 @@
 diff --git a/v5.4/temp/copied/lib.es2021.weakref.d.ts b/v5.5/temp/copied/lib.es2021.weakref.d.ts
-index eb554fcd5..8339b1f56 100644
+index eb554fcd51aaf16738315e6cec971a4b2156eee5..8339b1f569f2f5af40aae1e487449bb3106dcdcb 100644
 --- a/v5.4/temp/copied/lib.es2021.weakref.d.ts
 +++ b/v5.5/temp/copied/lib.es2021.weakref.d.ts
 @@ -59,7 +59,7 @@ interface FinalizationRegistry<T> {

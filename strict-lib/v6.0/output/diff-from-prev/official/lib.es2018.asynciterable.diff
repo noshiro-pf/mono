@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2018.asynciterable.d.ts b/v6.0/temp/copied/lib.es2018.asynciterable.d.ts
-index 917f09695..51a58fae3 100644
+index 917f09695ffb3e42cfacc7a319406dddfa8f12fc..51a58fae378bbadb8261a93893137b0de72fbca5 100644
 --- a/v5.9/temp/copied/lib.es2018.asynciterable.d.ts
 +++ b/v6.0/temp/copied/lib.es2018.asynciterable.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

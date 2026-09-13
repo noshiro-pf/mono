@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.dom.d.ts b/v5.2/temp/copied/lib.dom.d.ts
-index 0144ae547..db208a05c 100644
+index 0144ae5475ee7fe7ac8811fa2b5d223d6c40911f..db208a05c402113f22e49fe0fcdbcc8af1575fa9 100644
 --- a/v5.1/temp/copied/lib.dom.d.ts
 +++ b/v5.2/temp/copied/lib.dom.d.ts
 @@ -749,6 +749,7 @@ interface Keyframe {

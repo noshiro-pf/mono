@@ -51,6 +51,10 @@
             "integration_id": 15368
           },
           {
+            "context": "strict-lib-gen-result",
+            "integration_id": 15368
+          },
+          {
             "context": "test-node-versions-result",
             "integration_id": 15368
           },

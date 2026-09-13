@@ -1,5 +1,5 @@
 diff --git a/v5.4/temp/copied/lib.webworker.d.ts b/v5.5/temp/copied/lib.webworker.d.ts
-index 420a46adf..f213ac30b 100644
+index 420a46adf1d9d39d8ba568f274b519d02c7de0b1..f213ac30b6c8150c7cadd19885ecaed89f21deb3 100644
 --- a/v5.4/temp/copied/lib.webworker.d.ts
 +++ b/v5.5/temp/copied/lib.webworker.d.ts
 @@ -548,6 +548,17 @@ interface ReadableStreamGetReaderOptions {

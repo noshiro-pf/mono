@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es5.d.ts b/v6.0/output/lib-files/lib.es5.d.ts
-index d9ae14fef..4134371a1 100644
+index fe1da4d49633c233cb212fb52a7b107ec3db8e16..6228516dec882cc345a3808e3220eabf052817ff 100644
 --- a/v5.9/output/lib-files/lib.es5.d.ts
 +++ b/v6.0/output/lib-files/lib.es5.d.ts
 @@ -1,5 +1,3 @@
@@ -8,7 +8,7 @@ index d9ae14fef..4134371a1 100644
  /// <reference path="./lib.decorators.d.ts" />
  /// <reference path="./lib.decorators.legacy.d.ts" />
  
-@@ -494,14 +492,14 @@ interface String {
+@@ -497,14 +495,14 @@ interface String {
    concat(...strings: readonly string[]): string;
  
    /**
@@ -25,7 +25,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchString The substring to search for.
     * @param position The index at which to begin searching. If omitted, the search begins at the end of the string.
     */
-@@ -2288,7 +2286,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2298,7 +2296,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -34,7 +34,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -2306,7 +2304,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2316,7 +2314,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -43,7 +43,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -2696,7 +2694,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2706,7 +2704,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -52,7 +52,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -2714,7 +2712,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2724,7 +2722,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -61,7 +61,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3110,7 +3108,7 @@ interface Uint8ClampedArray<
+@@ -3120,7 +3118,7 @@ interface Uint8ClampedArray<
    ): void;
  
    /**
@@ -70,7 +70,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3128,7 +3126,7 @@ interface Uint8ClampedArray<
+@@ -3138,7 +3136,7 @@ interface Uint8ClampedArray<
    join(separator?: string): string;
  
    /**
@@ -79,7 +79,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3498,7 +3496,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3508,7 +3506,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -88,7 +88,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3513,7 +3511,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3523,7 +3521,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -97,7 +97,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3859,7 +3857,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3869,7 +3867,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -106,7 +106,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -3874,7 +3872,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3884,7 +3882,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -115,7 +115,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4219,7 +4217,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4229,7 +4227,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -124,7 +124,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4234,7 +4232,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4244,7 +4242,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -133,7 +133,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4580,7 +4578,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4590,7 +4588,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -142,7 +142,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4595,7 +4593,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4605,7 +4603,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -151,7 +151,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4941,7 +4939,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4951,7 +4949,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -160,7 +160,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -4956,7 +4954,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4966,7 +4964,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -169,7 +169,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -5302,7 +5300,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5312,7 +5310,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    ): void;
  
    /**
@@ -178,7 +178,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -5317,7 +5315,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5327,7 +5325,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    join(separator?: string): string;
  
    /**
@@ -187,7 +187,7 @@ index d9ae14fef..4134371a1 100644
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -5565,6 +5563,7 @@ declare namespace Intl {
+@@ -5575,6 +5573,7 @@ declare namespace Intl {
      readonly collation?:
        | 'big5han'
        | 'compat'

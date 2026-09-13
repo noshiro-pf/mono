@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.webworker.d.ts b/v5.2/output/lib-files-branded/lib.webworker.d.ts
-index 878b9913f..520535e51 100644
+index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647dac226f12 100644
 --- a/v5.1/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.webworker.d.ts
 @@ -437,7 +437,7 @@ interface NotificationOptions {

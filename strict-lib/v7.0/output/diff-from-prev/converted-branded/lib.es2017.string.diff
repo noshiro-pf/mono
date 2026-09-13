@@ -1,5 +1,5 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2017.string.d.ts b/v7.0/output/lib-files-branded/lib.es2017.string.d.ts
-index fd102d3fc..e1711db63 100644
+index fd102d3fc1d6e4fc603177138b99ba1ec664ed92..e1711db63f1bcc10717a567c47ef344de88c2641 100644
 --- a/v6.0/output/lib-files-branded/lib.es2017.string.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2017.string.d.ts
 @@ -1,33 +1,37 @@

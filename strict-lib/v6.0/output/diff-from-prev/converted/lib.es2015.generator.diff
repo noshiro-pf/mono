@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.generator.d.ts b/v6.0/output/lib-files/lib.es2015.generator.d.ts
-index 4180c1ea5..99eda61b0 100644
+index 4180c1ea5cfd0faec70300245e8d47ca4d61875c..99eda61b06ee48fecf71c5c982ca7b06d0a41a3d 100644
 --- a/v5.9/output/lib-files/lib.es2015.generator.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.generator.d.ts
 @@ -1,5 +1,3 @@

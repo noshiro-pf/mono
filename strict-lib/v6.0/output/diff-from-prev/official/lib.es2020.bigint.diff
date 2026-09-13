@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2020.bigint.d.ts b/v6.0/temp/copied/lib.es2020.bigint.d.ts
-index e6ca05cce..efe608a23 100644
+index e6ca05cce167ebab7beb82ee1be07df3a9ba921f..efe608a232bca016a05693e68601d200c5a36591 100644
 --- a/v5.9/temp/copied/lib.es2020.bigint.d.ts
 +++ b/v6.0/temp/copied/lib.es2020.bigint.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

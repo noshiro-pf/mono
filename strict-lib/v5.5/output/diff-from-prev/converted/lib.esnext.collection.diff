@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.esnext.collection.d.ts b/v5.5/output/lib-files/lib.esnext.collection.d.ts
-index 956f3bc2a..2cf94d51e 100644
+index 956f3bc2a35c954316b6cc0a9e8c80fa10d2da80..2cf94d51ed7347f3243fb058a92e19ea195cecaa 100644
 --- a/v5.4/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v5.5/output/lib-files/lib.esnext.collection.d.ts
 @@ -11,3 +11,80 @@ interface MapConstructor {

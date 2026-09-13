@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.webworker.d.ts b/v6.0/temp/copied/lib.webworker.d.ts
-index 5eb91253b..ea9e546f4 100644
+index 5eb91253b1cc2b143ecb0068c114220ad2302181..ea9e546f42a5e6335dd19b039217ddb691cdf8a8 100644
 --- a/v5.9/temp/copied/lib.webworker.d.ts
 +++ b/v6.0/temp/copied/lib.webworker.d.ts
 @@ -7,18 +7,23 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2021.intl.d.ts b/v5.4/output/lib-files-branded/lib.es2021.intl.d.ts
-index 5003281cd..7e4216e77 100644
+index 5003281cdcc2968f594136e7cb8b77b020eb4422..7e4216e77250d539ac7ac12ace23c927e9b33602 100644
 --- a/v5.3/output/lib-files-branded/lib.es2021.intl.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2021.intl.d.ts
 @@ -136,10 +136,7 @@ declare namespace Intl {

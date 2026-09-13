@@ -1,6 +1,6 @@
 diff --git a/v6.0/temp/copied/lib.es2025.regexp.d.ts b/v6.0/temp/copied/lib.es2025.regexp.d.ts
 new file mode 100644
-index 000000000..a2c1a4264
+index 0000000000000000000000000000000000000000..a2c1a42643c8245a4794fd4d545e3a2df84d9c47
 --- /dev/null
 +++ b/v6.0/temp/copied/lib.es2025.regexp.d.ts
 @@ -0,0 +1,29 @@

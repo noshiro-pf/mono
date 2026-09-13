@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.es5.d.ts b/v5.2/temp/copied/lib.es5.d.ts
-index 4ff861f75..d26a2c393 100644
+index 4ff861f75052e9a43d77f57992758e05c6129932..d26a2c3938b70589da25cd6a2aa306766d3af99d 100644
 --- a/v5.1/temp/copied/lib.es5.d.ts
 +++ b/v5.2/temp/copied/lib.es5.d.ts
 @@ -1909,6 +1909,15 @@ type Uncapitalize<S extends string> = intrinsic;

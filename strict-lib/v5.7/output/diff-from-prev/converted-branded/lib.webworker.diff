@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.webworker.d.ts b/v5.7/output/lib-files-branded/lib.webworker.d.ts
-index 7fb955ae9..516ddbf90 100644
+index 7fb955ae94670c35430d6f76129a711d63e4827d..516ddbf90ffc3d859380c8ce2209514b1f362147 100644
 --- a/v5.6/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.webworker.d.ts
 @@ -49,6 +49,59 @@ interface AudioConfiguration {

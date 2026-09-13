@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files-branded/lib.dom.asynciterable.d.ts b/v5.5/output/lib-files-branded/lib.dom.asynciterable.d.ts
-index 586fe130f..638bac452 100644
+index 586fe130f4724d8044e8205f0d41ddbd84025b33..638bac452fe122a5d22b250b211c43f33e6d63dc 100644
 --- a/v5.4/output/lib-files-branded/lib.dom.asynciterable.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.dom.asynciterable.d.ts
 @@ -12,3 +12,10 @@ interface FileSystemDirectoryHandle {

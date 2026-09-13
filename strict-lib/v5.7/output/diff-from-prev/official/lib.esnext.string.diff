@@ -1,6 +1,6 @@
 diff --git a/v5.6/temp/copied/lib.esnext.string.d.ts b/v5.6/temp/copied/lib.esnext.string.d.ts
 deleted file mode 100644
-index 40894231c..000000000
+index 40894231c7f2e0bbaf6a69304b4dfea209c8b263..0000000000000000000000000000000000000000
 --- a/v5.6/temp/copied/lib.esnext.string.d.ts
 +++ /dev/null
 @@ -1,28 +0,0 @@

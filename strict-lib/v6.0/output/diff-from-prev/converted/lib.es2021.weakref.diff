@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2021.weakref.d.ts b/v6.0/output/lib-files/lib.es2021.weakref.d.ts
-index f02bb0a08..89450d9b7 100644
+index f02bb0a08c2524ee88a27091276e021f695355fe..89450d9b765ce1bd9740c4f1d535a46afe1008ab 100644
 --- a/v5.9/output/lib-files/lib.es2021.weakref.d.ts
 +++ b/v6.0/output/lib-files/lib.es2021.weakref.d.ts
 @@ -1,5 +1,3 @@

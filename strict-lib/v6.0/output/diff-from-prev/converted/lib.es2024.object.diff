@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.object.d.ts b/v6.0/output/lib-files/lib.es2024.object.d.ts
-index 3ba740792..ef70d4b75 100644
+index 3ba7407929ac95a348d091e135a66b9cb4dd7d5e..ef70d4b75d8587fee0212c3520ea0972f0f01fc3 100644
 --- a/v5.9/output/lib-files/lib.es2024.object.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.object.d.ts
 @@ -1,5 +1,3 @@

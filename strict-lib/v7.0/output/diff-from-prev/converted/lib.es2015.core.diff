@@ -1,5 +1,5 @@
 diff --git a/v6.0/output/lib-files/lib.es2015.core.d.ts b/v7.0/output/lib-files/lib.es2015.core.d.ts
-index cd0ff3b68..94ac5b20b 100644
+index b426e29f61b4e53e844a341f19549efdf7f90cb9..0e9c12af1a2584cf476e9f5b214c09b3af12c0ca 100644
 --- a/v6.0/output/lib-files/lib.es2015.core.d.ts
 +++ b/v7.0/output/lib-files/lib.es2015.core.d.ts
 @@ -110,7 +110,7 @@ interface Math {

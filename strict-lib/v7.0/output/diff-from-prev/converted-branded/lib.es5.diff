@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es5.d.ts b/v7.0/output/lib-files-branded/lib.es5.d.ts
-index 52e2f2d6f..a1bfd35d4 100644
+index 8909473c1dfe28f48d203583aaf8bb4419898ae6..794e6adb3bc6bc3ea095e2eb0213c35b7f2bbfce 100644
 --- a/v6.0/output/lib-files-branded/lib.es5.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es5.d.ts
-@@ -481,8 +481,8 @@ interface String {
+@@ -484,8 +484,8 @@ interface String {
    charAt(pos: NumberType.StringSizeArg): string;
  
    /**
@@ -13,14 +13,16 @@ index 52e2f2d6f..a1bfd35d4 100644
     */
    charCodeAt(index: NumberType.StringSizeArg): number;
  
-@@ -654,13 +654,13 @@ interface Number {
+@@ -660,7 +660,7 @@ interface Number {
  
    /**
     * Returns a string representing a number in fixed-point notation.
 -   * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
 +   * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 100, inclusive.
     */
-   toFixed(fractionDigits?: import('ts-type-forge').UintRange<0, 101>): string;
+   toFixed(
+     fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
+@@ -668,7 +668,7 @@ interface Number {
  
    /**
     * Returns a string containing a number represented in exponential notation.
@@ -28,13 +30,13 @@ index 52e2f2d6f..a1bfd35d4 100644
 +   * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 100, inclusive.
     */
    toExponential(
-     fractionDigits?: import('ts-type-forge').UintRange<1, 101>,
-@@ -668,7 +668,7 @@ interface Number {
+     fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
+@@ -676,7 +676,7 @@ interface Number {
  
    /**
     * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.
 -   * @param precision Number of significant digits. Must be in the range 1 - 21, inclusive.
 +   * @param precision Number of significant digits. Must be in the range 1 - 100, inclusive.
     */
-   toPrecision(precision?: import('ts-type-forge').UintRange<1, 101>): string;
- 
+   toPrecision(
+     precision?: import('ts-type-forge').UintRangeInclusive<1, 100>,

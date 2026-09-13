@@ -1,6 +1,6 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.error.d.ts b/v5.9/output/lib-files/lib.esnext.error.d.ts
 new file mode 100644
-index 000000000..7b0617817
+index 0000000000000000000000000000000000000000..7b0617817ac9ed13e21ab76e5bbcf9886e794ebb
 --- /dev/null
 +++ b/v5.9/output/lib-files/lib.esnext.error.d.ts
 @@ -0,0 +1,8 @@

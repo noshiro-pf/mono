@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2021.promise.d.ts b/v6.0/temp/copied/lib.es2021.promise.d.ts
-index df3f64fb0..5a1b647d8 100644
+index df3f64fb0faeb372708729581194eea9abdadcb5..5a1b647d89a0d3c629270253d9cea771613ddde7 100644
 --- a/v5.9/temp/copied/lib.es2021.promise.d.ts
 +++ b/v6.0/temp/copied/lib.es2021.promise.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,6 +1,6 @@
 diff --git a/v5.4/output/lib-files/lib.esnext.object.d.ts b/v5.4/output/lib-files/lib.esnext.object.d.ts
 new file mode 100644
-index 000000000..3ba740792
+index 0000000000000000000000000000000000000000..3ba7407929ac95a348d091e135a66b9cb4dd7d5e
 --- /dev/null
 +++ b/v5.4/output/lib-files/lib.esnext.object.d.ts
 @@ -0,0 +1,13 @@

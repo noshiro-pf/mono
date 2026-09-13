@@ -1,5 +1,5 @@
 diff --git a/v5.6/temp/copied/lib.es2015.symbol.wellknown.d.ts b/v5.7/temp/copied/lib.es2015.symbol.wellknown.d.ts
-index 78aa8007a..dc849de5e 100644
+index 78aa8007ad084b84396499fdc5363257ce8804f1..dc849de5e5c15e46e987195106d2df8f527ddf15 100644
 --- a/v5.6/temp/copied/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.7/temp/copied/lib.es2015.symbol.wellknown.d.ts
 @@ -292,43 +292,43 @@ interface ArrayBuffer {

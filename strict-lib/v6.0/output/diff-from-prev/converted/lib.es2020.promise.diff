@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2020.promise.d.ts b/v6.0/output/lib-files/lib.es2020.promise.d.ts
-index a6df09f8b..d98d906f1 100644
+index a6df09f8b4a0070c32584e13567055b2f238e05c..d98d906f1355d0ae447f5359ee98358b4b66889d 100644
 --- a/v5.9/output/lib-files/lib.es2020.promise.d.ts
 +++ b/v6.0/output/lib-files/lib.es2020.promise.d.ts
 @@ -1,5 +1,3 @@

@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files/lib.es2015.iterable.d.ts b/v5.6/output/lib-files/lib.es2015.iterable.d.ts
-index b5c9a5a9d..44bcbb86b 100644
+index b5c9a5a9d75c1704fcd1951a4bdf54e8df80ddc9..44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e 100644
 --- a/v5.5/output/lib-files/lib.es2015.iterable.d.ts
 +++ b/v5.6/output/lib-files/lib.es2015.iterable.d.ts
 @@ -24,39 +24,71 @@ type IteratorResult<T, TReturn = any> =

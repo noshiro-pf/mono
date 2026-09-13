@@ -1,5 +1,5 @@
 diff --git a/v5.8/temp/copied/lib.dom.iterable.d.ts b/v5.9/temp/copied/lib.dom.iterable.d.ts
-index ee75dddf2..8dcc43081 100644
+index ee75dddf2659c109b41da220cc336d4b91b058a5..8dcc43081f6e3ad036a32c23756459712241934c 100644
 --- a/v5.8/temp/copied/lib.dom.iterable.d.ts
 +++ b/v5.9/temp/copied/lib.dom.iterable.d.ts
 @@ -20,7 +20,11 @@ and limitations under the License.

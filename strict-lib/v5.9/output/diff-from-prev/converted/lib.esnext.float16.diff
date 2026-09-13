@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files/lib.esnext.float16.d.ts b/v5.9/output/lib-files/lib.esnext.float16.d.ts
-index cb00ceb4c..c6a0bd61d 100644
+index cb00ceb4c02096e66f9ff6a570dc501994fe7840..c6a0bd61d0b4d25466b3b53c9b15f142a7ac89c3 100644
 --- a/v5.8/output/lib-files/lib.esnext.float16.d.ts
 +++ b/v5.9/output/lib-files/lib.esnext.float16.d.ts
 @@ -422,6 +422,12 @@ interface Float16ArrayConstructor {

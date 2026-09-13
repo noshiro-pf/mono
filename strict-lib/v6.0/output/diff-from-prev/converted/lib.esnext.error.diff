@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.error.d.ts b/v6.0/output/lib-files/lib.esnext.error.d.ts
-index 7b0617817..15dd38bcf 100644
+index 7b0617817ac9ed13e21ab76e5bbcf9886e794ebb..15dd38bcfca57a00d43ad651c23dfa2b2ecae895 100644
 --- a/v5.9/output/lib-files/lib.esnext.error.d.ts
 +++ b/v6.0/output/lib-files/lib.esnext.error.d.ts
 @@ -1,5 +1,3 @@

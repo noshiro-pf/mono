@@ -1,6 +1,6 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.iterator.d.ts b/v5.6/output/lib-files/lib.esnext.iterator.d.ts
 new file mode 100644
-index 000000000..877ba2443
+index 0000000000000000000000000000000000000000..877ba24430e7b51fd49f3b4e545c6e1dd00047cf
 --- /dev/null
 +++ b/v5.6/output/lib-files/lib.esnext.iterator.d.ts
 @@ -0,0 +1,172 @@

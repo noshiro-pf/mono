@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.webworker.iterable.d.ts b/v5.4/output/lib-files/lib.webworker.iterable.d.ts
-index d1782f9c0..0816bced5 100644
+index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a183446426 100644
 --- a/v5.3/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.4/output/lib-files/lib.webworker.iterable.d.ts
 @@ -150,6 +150,11 @@ interface SubtleCrypto {

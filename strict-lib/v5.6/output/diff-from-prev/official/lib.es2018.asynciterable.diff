@@ -1,5 +1,5 @@
 diff --git a/v5.5/temp/copied/lib.es2018.asynciterable.d.ts b/v5.6/temp/copied/lib.es2018.asynciterable.d.ts
-index ddccae4d0..917f09695 100644
+index ddccae4d0710b1d88ec8ffbebab5b40faa5cf4cc..917f09695ffb3e42cfacc7a319406dddfa8f12fc 100644
 --- a/v5.5/temp/copied/lib.es2018.asynciterable.d.ts
 +++ b/v5.6/temp/copied/lib.es2018.asynciterable.d.ts
 @@ -26,19 +26,37 @@ interface SymbolConstructor {

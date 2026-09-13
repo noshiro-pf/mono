@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2018.intl.d.ts b/v6.0/temp/copied/lib.es2018.intl.d.ts
-index 5ed8e8ce3..7a64395e2 100644
+index 5ed8e8ce32b06dc1dd310f478d4f5ba5035e7d1e..7a64395e2dbf9a4bc9878f9b87ce8c381b364639 100644
 --- a/v5.9/temp/copied/lib.es2018.intl.d.ts
 +++ b/v6.0/temp/copied/lib.es2018.intl.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

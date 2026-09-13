@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files-branded/lib.dom.d.ts b/v5.9/output/lib-files-branded/lib.dom.d.ts
-index 67887eda2..2812e95e6 100644
+index 67887eda2d9ba8666086d06fd9368d5e76857784..2812e95e65e7b58a64aa5e02e0256a5ee98f8a34 100644
 --- a/v5.8/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.dom.d.ts
 @@ -123,7 +123,7 @@ interface AudioDataInit {

@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.d.ts b/v6.0/temp/copied/lib.d.ts
-index 0670f1489..529133f00 100644
+index 0670f1489a76b68fd0dca19827b239274adcba56..529133f005d283225cd63478f39a0c56c7222922 100644
 --- a/v5.9/temp/copied/lib.d.ts
 +++ b/v6.0/temp/copied/lib.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

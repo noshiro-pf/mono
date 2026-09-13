@@ -1,5 +1,5 @@
 diff --git a/v5.6/temp/copied/lib.webworker.d.ts b/v5.7/temp/copied/lib.webworker.d.ts
-index 5d33ae5d7..676d1ca59 100644
+index 5d33ae5d774228d0177d0dd044a8e8adc1ed0633..676d1ca5918317dab02245ff09873615a0c361ef 100644
 --- a/v5.6/temp/copied/lib.webworker.d.ts
 +++ b/v5.7/temp/copied/lib.webworker.d.ts
 @@ -64,6 +64,59 @@ interface AudioConfiguration {

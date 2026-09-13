@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2024.promise.d.ts b/v6.0/temp/copied/lib.es2024.promise.d.ts
-index 9fab1724e..15d8b8c51 100644
+index 9fab1724e9e67ea260b5ed8f015951d526791df9..15d8b8c51d5be8a8d18184265460cbcd08ac7c9f 100644
 --- a/v5.9/temp/copied/lib.es2024.promise.d.ts
 +++ b/v6.0/temp/copied/lib.es2024.promise.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

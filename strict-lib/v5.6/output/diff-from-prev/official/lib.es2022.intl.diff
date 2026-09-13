@@ -1,5 +1,5 @@
 diff --git a/v5.5/temp/copied/lib.es2022.intl.d.ts b/v5.6/temp/copied/lib.es2022.intl.d.ts
-index 2a652f0c6..abafb5007 100644
+index 2a652f0c6ace7d09b23efe63a90e2f8cd4293290..abafb5007e0a830c29c6fe7afe501c31913f3305 100644
 --- a/v5.5/temp/copied/lib.es2022.intl.d.ts
 +++ b/v5.6/temp/copied/lib.es2022.intl.d.ts
 @@ -45,6 +45,14 @@ declare namespace Intl {

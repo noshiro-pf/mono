@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.dom.d.ts b/v6.0/output/lib-files-branded/lib.dom.d.ts
-index 2812e95e6..230afa834 100644
+index 2812e95e65e7b58a64aa5e02e0256a5ee98f8a34..230afa834dcb85f02c16c7345d5b28a88510ec68 100644
 --- a/v5.9/output/lib-files-branded/lib.dom.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.dom.d.ts
 @@ -1,9 +1,14 @@

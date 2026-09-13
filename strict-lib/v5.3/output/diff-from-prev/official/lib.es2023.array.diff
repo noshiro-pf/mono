@@ -1,5 +1,5 @@
 diff --git a/v5.2/temp/copied/lib.es2023.array.d.ts b/v5.3/temp/copied/lib.es2023.array.d.ts
-index df1fafe37..9fc0b83ab 100644
+index df1fafe37ba552e929293838f0eb2d4c1ca2798f..9fc0b83abd941170bca3323b8d84c8cdd72b075a 100644
 --- a/v5.2/temp/copied/lib.es2023.array.d.ts
 +++ b/v5.3/temp/copied/lib.es2023.array.d.ts
 @@ -213,7 +213,7 @@ interface Int8Array {

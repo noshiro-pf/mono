@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
-index 8b8b65757..a6f4b4802 100644
+index 8b8b65757f0467fcc501cea7140840e9df307742..a6f4b4802cb35c91a54d8967899fdaa8b539b5f0 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
 @@ -1,6 +1,7 @@

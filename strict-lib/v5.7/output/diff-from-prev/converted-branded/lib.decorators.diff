@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.decorators.d.ts b/v5.7/output/lib-files-branded/lib.decorators.d.ts
-index dcd593f97..823f8ce7e 100644
+index 39ce31b52116ccc745974e7f748b22bcba5bfd11..98af8a1aedffe8ef2c98e2cf0d9335b98672d34d 100644
 --- a/v5.6/output/lib-files-branded/lib.decorators.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.decorators.d.ts
-@@ -100,9 +100,9 @@ interface ClassMethodDecoratorContext<
+@@ -107,9 +107,9 @@ interface ClassMethodDecoratorContext<
    };
  
    /**
@@ -15,7 +15,7 @@ index dcd593f97..823f8ce7e 100644
     *
     * @example
     * ```ts
-@@ -163,9 +163,9 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
+@@ -170,9 +170,9 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
    };
  
    /**
@@ -28,7 +28,7 @@ index dcd593f97..823f8ce7e 100644
     */
    addInitializer(initializer: (this: This) => void): void;
  
-@@ -207,9 +207,9 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
+@@ -214,9 +214,9 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
    };
  
    /**
@@ -41,7 +41,7 @@ index dcd593f97..823f8ce7e 100644
     */
    addInitializer(initializer: (this: This) => void): void;
  
-@@ -260,9 +260,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
+@@ -267,9 +267,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
    };
  
    /**
@@ -53,7 +53,7 @@ index dcd593f97..823f8ce7e 100644
     */
    addInitializer(initializer: (this: This) => void): void;
  
-@@ -354,9 +353,8 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
+@@ -361,9 +360,8 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
    };
  
    /**

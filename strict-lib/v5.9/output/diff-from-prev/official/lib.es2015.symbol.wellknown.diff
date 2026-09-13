@@ -1,5 +1,5 @@
 diff --git a/v5.8/temp/copied/lib.es2015.symbol.wellknown.d.ts b/v5.9/temp/copied/lib.es2015.symbol.wellknown.d.ts
-index dc849de5e..9e908eae7 100644
+index dc849de5e5c15e46e987195106d2df8f527ddf15..9e908eae7b8f5210aa2dadb1d60154829a7f2276 100644
 --- a/v5.8/temp/copied/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.9/temp/copied/lib.es2015.symbol.wellknown.d.ts
 @@ -289,7 +289,7 @@ interface String {

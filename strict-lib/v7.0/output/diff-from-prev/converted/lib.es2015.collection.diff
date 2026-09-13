@@ -1,5 +1,5 @@
 diff --git a/v6.0/output/lib-files/lib.es2015.collection.d.ts b/v7.0/output/lib-files/lib.es2015.collection.d.ts
-index da1c16d40..a962586c0 100644
+index da1c16d403df9b9ba8cfe192f3c44aa9849c90c8..a962586c0f72ff83b7214c8aa3cc2c951d5fdabf 100644
 --- a/v6.0/output/lib-files/lib.es2015.collection.d.ts
 +++ b/v7.0/output/lib-files/lib.es2015.collection.d.ts
 @@ -106,7 +106,7 @@ interface Set<T> {

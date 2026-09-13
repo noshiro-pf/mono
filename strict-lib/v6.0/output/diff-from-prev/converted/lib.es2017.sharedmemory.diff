@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts b/v6.0/output/lib-files/lib.es2017.sharedmemory.d.ts
-index 6dc54bb77..00fbc2fa2 100644
+index 6dc54bb77402b44212f469a87e44726de26a3f24..00fbc2fa271a6813fb6a3f278d2ecb77beb5d2e2 100644
 --- a/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files/lib.es2017.sharedmemory.d.ts
 @@ -1,5 +1,3 @@

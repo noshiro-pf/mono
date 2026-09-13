@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.esnext.intl.d.ts b/v6.0/temp/copied/lib.esnext.intl.d.ts
-index b740dc251..daa02960c 100644
+index b740dc251666e4be66b60078e044b06d2a96165f..daa02960c447969b6229216f4fc11adca5bf4a0b 100644
 --- a/v5.9/temp/copied/lib.esnext.intl.d.ts
 +++ b/v6.0/temp/copied/lib.esnext.intl.d.ts
 @@ -7,14 +7,114 @@ License at http://www.apache.org/licenses/LICENSE-2.0

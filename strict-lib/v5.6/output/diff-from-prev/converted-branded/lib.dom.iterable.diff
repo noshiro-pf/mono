@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.iterable.d.ts b/v5.6/output/lib-files-branded/lib.dom.iterable.d.ts
-index 1a0f200ed..da1b5038f 100644
+index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23dc88da80a 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.iterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.iterable.d.ts
 @@ -35,40 +35,38 @@ interface BaseAudioContext {

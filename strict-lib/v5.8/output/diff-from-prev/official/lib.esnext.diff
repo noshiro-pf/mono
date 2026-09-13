@@ -1,5 +1,5 @@
 diff --git a/v5.7/temp/copied/lib.esnext.d.ts b/v5.8/temp/copied/lib.esnext.d.ts
-index d469d8ac4..4a8e43334 100644
+index d469d8ac4f55bbde94150cf32d70cc06f5c96cea..4a8e43334908557ec307b5e056012c56239532a4 100644
 --- a/v5.7/temp/copied/lib.esnext.d.ts
 +++ b/v5.8/temp/copied/lib.esnext.d.ts
 @@ -22,3 +22,5 @@ and limitations under the License.

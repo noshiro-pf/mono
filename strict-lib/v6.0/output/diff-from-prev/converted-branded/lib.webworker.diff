@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.webworker.d.ts b/v6.0/output/lib-files-branded/lib.webworker.d.ts
-index 6e3aac2f0..95d150c8e 100644
+index 6e3aac2f032ad5c138debb6ad4abd79d65803a68..95d150c8e575e1845dcaf064a258af9fdf6cfa16 100644
 --- a/v5.9/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.webworker.d.ts
 @@ -1,9 +1,14 @@

@@ -1,6 +1,6 @@
 diff --git a/v5.6/output/lib-files-branded/lib.esnext.promise.d.ts b/v5.6/output/lib-files-branded/lib.esnext.promise.d.ts
 deleted file mode 100644
-index 34245af3b..000000000
+index 34245af3b51af90bed19b825beb0ed6fbd93b8f4..0000000000000000000000000000000000000000
 --- a/v5.6/output/lib-files-branded/lib.esnext.promise.d.ts
 +++ /dev/null
 @@ -1,19 +0,0 @@

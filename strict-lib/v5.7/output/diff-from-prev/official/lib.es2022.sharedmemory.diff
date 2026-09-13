@@ -1,6 +1,6 @@
 diff --git a/v5.6/temp/copied/lib.es2022.sharedmemory.d.ts b/v5.6/temp/copied/lib.es2022.sharedmemory.d.ts
 deleted file mode 100644
-index 312370046..000000000
+index 312370046b955087291ee7626b970252287a72c7..0000000000000000000000000000000000000000
 --- a/v5.6/temp/copied/lib.es2022.sharedmemory.d.ts
 +++ /dev/null
 @@ -1,52 +0,0 @@

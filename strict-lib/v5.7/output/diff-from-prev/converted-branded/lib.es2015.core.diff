@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2015.core.d.ts b/v5.7/output/lib-files-branded/lib.es2015.core.d.ts
-index acd6d5833..da43b83cf 100644
+index 4a643699fd2fc99eb06d151cb7cad030af500a8a..f792791a2b92356ec57fd4e01427a70f1dd751e9 100644
 --- a/v5.6/output/lib-files-branded/lib.es2015.core.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2015.core.d.ts
 @@ -648,63 +648,63 @@ interface StringConstructor {

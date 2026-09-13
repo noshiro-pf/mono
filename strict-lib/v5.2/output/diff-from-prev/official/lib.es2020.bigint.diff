@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.es2020.bigint.d.ts b/v5.2/temp/copied/lib.es2020.bigint.d.ts
-index 5fab3f1f7..eb6efbab4 100644
+index 5fab3f1f76444dec96627ec1d62ba0b48e18bb8e..eb6efbab42f34b369402f8c510f0de0ecb6c5be1 100644
 --- a/v5.1/temp/copied/lib.es2020.bigint.d.ts
 +++ b/v5.2/temp/copied/lib.es2020.bigint.d.ts
 @@ -272,10 +272,10 @@ interface BigInt64Array {

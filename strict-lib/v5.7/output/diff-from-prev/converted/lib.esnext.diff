@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.d.ts b/v5.7/output/lib-files/lib.esnext.d.ts
-index 159ddbb01..e129aeef4 100644
+index 159ddbb011de28810d136a6a315af8bed1571726..e129aeef4ebdc2e9d7e5be0ad0ea86f097810cb6 100644
 --- a/v5.6/output/lib-files/lib.esnext.d.ts
 +++ b/v5.7/output/lib-files/lib.esnext.d.ts
 @@ -1,13 +1,9 @@

@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.es2018.intl.d.ts b/v5.5/output/lib-files/lib.es2018.intl.d.ts
-index 309b1eb03..2e5ccab51 100644
+index b0880c13aa6ad0377249ae41d611d0401c093a7a..ca7fa30cfbe9ac81a7145757c7d8b59ba4453af4 100644
 --- a/v5.4/output/lib-files/lib.es2018.intl.d.ts
 +++ b/v5.5/output/lib-files/lib.es2018.intl.d.ts
-@@ -64,33 +64,22 @@ declare namespace Intl {
+@@ -73,33 +73,22 @@ declare namespace Intl {
  
    const PluralRules: PluralRulesConstructor;
  

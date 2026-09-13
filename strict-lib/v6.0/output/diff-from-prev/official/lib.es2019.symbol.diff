@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2019.symbol.d.ts b/v6.0/temp/copied/lib.es2019.symbol.d.ts
-index 7d68b0a8e..740d0bad3 100644
+index 7d68b0a8ea7d1e6d1860646daf13f9795d41172f..740d0bad38f4c2152ad67600dc8d7436f87ce2b3 100644
 --- a/v5.9/temp/copied/lib.es2019.symbol.d.ts
 +++ b/v6.0/temp/copied/lib.es2019.symbol.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

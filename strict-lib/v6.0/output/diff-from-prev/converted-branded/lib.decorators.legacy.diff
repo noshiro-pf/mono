@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.decorators.legacy.d.ts b/v6.0/output/lib-files-branded/lib.decorators.legacy.d.ts
-index 91a9dca66..e7364ff99 100644
+index 91a9dca664151a4c24ccd2c3f14ac20be9b23406..e7364ff990197481bf4d629e624acd60c40a4242 100644
 --- a/v5.9/output/lib-files-branded/lib.decorators.legacy.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.decorators.legacy.d.ts
 @@ -1,5 +1,3 @@

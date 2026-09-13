@@ -1,6 +1,6 @@
 diff --git a/v5.9/temp/copied/lib.esnext.promise.d.ts b/v5.9/temp/copied/lib.esnext.promise.d.ts
 deleted file mode 100644
-index 29c12add0..000000000
+index 29c12add0bb20cc340232853655dcc1335bd4779..0000000000000000000000000000000000000000
 --- a/v5.9/temp/copied/lib.esnext.promise.d.ts
 +++ /dev/null
 @@ -1,36 +0,0 @@

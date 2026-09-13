@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.es2015.iterable.d.ts b/v5.2/temp/copied/lib.es2015.iterable.d.ts
-index ff20454a2..edc618827 100644
+index ff20454a208e11f9881497c2f5d23ef73cbf0cac..edc6188278e9566fc904c64929c55054e25bb844 100644
 --- a/v5.1/temp/copied/lib.es2015.iterable.d.ts
 +++ b/v5.2/temp/copied/lib.es2015.iterable.d.ts
 @@ -164,10 +164,12 @@ interface MapConstructor {

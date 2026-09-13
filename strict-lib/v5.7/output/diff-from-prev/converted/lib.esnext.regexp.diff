@@ -1,6 +1,6 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.regexp.d.ts b/v5.6/output/lib-files/lib.esnext.regexp.d.ts
 deleted file mode 100644
-index f85fdba98..000000000
+index f85fdba98664c975391e078684a184d34a68c73f..0000000000000000000000000000000000000000
 --- a/v5.6/output/lib-files/lib.esnext.regexp.d.ts
 +++ /dev/null
 @@ -1,9 +0,0 @@

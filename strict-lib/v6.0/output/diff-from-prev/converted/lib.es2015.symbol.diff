@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.symbol.d.ts b/v6.0/output/lib-files/lib.es2015.symbol.d.ts
-index 343dd252d..663725be3 100644
+index 343dd252dac3847a5449139ce3db20bb03623faa..663725be37a6b2a136622cd2bfe5f18fe4861900 100644
 --- a/v5.9/output/lib-files/lib.es2015.symbol.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.symbol.d.ts
 @@ -1,5 +1,3 @@

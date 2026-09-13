@@ -1,5 +1,5 @@
 diff --git a/v5.7/temp/copied/lib.es2015.iterable.d.ts b/v5.8/temp/copied/lib.es2015.iterable.d.ts
-index 9f6e23091..06d85bee0 100644
+index 9f6e2309111e7382656225e511a709edff661410..06d85bee00a7fe8158569593e45c84fd20201d74 100644
 --- a/v5.7/temp/copied/lib.es2015.iterable.d.ts
 +++ b/v5.8/temp/copied/lib.es2015.iterable.d.ts
 @@ -223,10 +223,12 @@ interface SetIterator<T> extends IteratorObject<

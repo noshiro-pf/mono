@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.dom.iterable.d.ts b/v5.4/output/lib-files/lib.dom.iterable.d.ts
-index 5ad10570e..7aa19c8bb 100644
+index 5ad10570ec51e2f802fe03f0ead23a9eec6c9bd2..7aa19c8bb4926aba941c48eacee305cb7cde8d7f 100644
 --- a/v5.3/output/lib-files/lib.dom.iterable.d.ts
 +++ b/v5.4/output/lib-files/lib.dom.iterable.d.ts
 @@ -150,6 +150,10 @@ interface Headers {

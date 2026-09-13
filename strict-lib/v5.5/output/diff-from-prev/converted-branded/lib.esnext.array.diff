@@ -1,6 +1,6 @@
 diff --git a/v5.5/output/lib-files-branded/lib.esnext.array.d.ts b/v5.5/output/lib-files-branded/lib.esnext.array.d.ts
 new file mode 100644
-index 000000000..7223df4fc
+index 0000000000000000000000000000000000000000..7223df4fc5f45616610ebb3e48fc8ffdb9bedcd8
 --- /dev/null
 +++ b/v5.5/output/lib-files-branded/lib.esnext.array.d.ts
 @@ -0,0 +1,28 @@

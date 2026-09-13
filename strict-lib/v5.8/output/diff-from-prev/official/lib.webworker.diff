@@ -1,5 +1,5 @@
 diff --git a/v5.7/temp/copied/lib.webworker.d.ts b/v5.8/temp/copied/lib.webworker.d.ts
-index 676d1ca59..082fe13a7 100644
+index 676d1ca5918317dab02245ff09873615a0c361ef..082fe13a72a2c7c4436110d449a06df5ecfda9de 100644
 --- a/v5.7/temp/copied/lib.webworker.d.ts
 +++ b/v5.8/temp/copied/lib.webworker.d.ts
 @@ -290,7 +290,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {

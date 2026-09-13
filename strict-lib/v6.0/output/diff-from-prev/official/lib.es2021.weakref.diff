@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2021.weakref.d.ts b/v6.0/temp/copied/lib.es2021.weakref.d.ts
-index a1062eb89..2c7372ba2 100644
+index a1062eb89d8bbb1a17efd59d511523fd8f54ce1f..2c7372ba229a9e4bfaf2a9555b99fe9831813b80 100644
 --- a/v5.9/temp/copied/lib.es2021.weakref.d.ts
 +++ b/v6.0/temp/copied/lib.es2021.weakref.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0
