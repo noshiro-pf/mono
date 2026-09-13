@@ -4,11 +4,10 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
   anyArgumentsRef,
-  closeBraceRegexp,
   createBrandedNumber,
   ensureEs5Reference,
   idFn,
@@ -368,9 +367,8 @@ export const convert = (
 
               case 'lib.es2021.weakref.d.ts':
                 // fix type errors
-                return replaceWithNoMatchCheckBetweenRegexp({
-                  startRegexp: 'interface WeakRefConstructor {',
-                  endRegexp: closeBraceRegexp,
+                return replaceWithinInterface({
+                  name: 'WeakRefConstructor',
                   mapFn: replaceWithNoMatchCheck(
                     'readonly prototype: WeakRef<unknown>;',
                     'readonly prototype: WeakRef<object>;',

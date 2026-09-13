@@ -3,9 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { type ConverterOptions } from './common.mjs';
 import { convertLibDomCommon } from './dom-common.mjs';
 
 export const convertLibDom =
@@ -16,18 +16,16 @@ export const convertLibDom =
         convertLibDomCommon(options),
 
         // fix type errors in lib.dom.d.ts
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface BeforeUnloadEvent',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'BeforeUnloadEvent',
           mapFn: replaceWithNoMatchCheck(
             //
             'extends Event',
             'extends Omit<Event, "returnValue">',
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface SVGElement',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'SVGElement',
           mapFn: replaceWithNoMatchCheck(
             'readonly className: unknown;',
             '// readonly className: unknown;',

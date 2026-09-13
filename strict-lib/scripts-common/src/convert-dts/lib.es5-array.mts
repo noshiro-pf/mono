@@ -4,15 +4,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
-
-const markers = {
-  ReadonlyArray: 'interface ReadonlyArray<T> {',
-  Array: 'interface Array<T> {',
-  ConcatArray: 'interface ConcatArray<T> {',
-} as const;
+import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_Array =
   ({
@@ -24,9 +18,8 @@ export const convertLibEs5_Array =
     pipe(src).map(
       composeMonoTypeFns(
         ...(['ReadonlyArray', 'Array'] as const).map((key) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: markers[key],
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: key,
             mapFn: composeMonoTypeFns(
               // require predicate function to return boolean
               replaceWithNoMatchCheck(
@@ -50,9 +43,8 @@ export const convertLibEs5_Array =
         ),
 
         ...(['ReadonlyArray', 'ConcatArray', 'Array'] as const).map((key) =>
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: markers[key],
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: key,
             mapFn: replaceWithNoMatchCheck(
               'slice(start?: number, end?: number)',
               `slice(start?: ${brandedNumber.ArraySizeArg}, end?: ${brandedNumber.ArraySizeArg})`,
@@ -60,9 +52,8 @@ export const convertLibEs5_Array =
           }),
         ),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: markers.Array,
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               //
@@ -100,9 +91,8 @@ export const convertLibEs5_Array =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayConstructor',
           mapFn: composeMonoTypeFns(
             returnType === 'readonly'
               ? idFn

@@ -4,14 +4,12 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
   arrayIteratorName,
-  closeBraceRegexp,
   enumType,
   idFn,
-  typedArrayInterfaceStartRegexp,
   type ConverterOptions,
 } from './common.mjs';
 
@@ -32,9 +30,8 @@ export const convertLibEs2015Iterable = ({
     pipe(src).map(
       composeMonoTypeFns(
         // Array
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Array<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               new RegExp(
@@ -51,9 +48,8 @@ export const convertLibEs2015Iterable = ({
         }),
 
         // ArrayConstructor
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayConstructor',
           mapFn: composeMonoTypeFns(
             returnType === 'readonly'
               ? idFn
@@ -69,9 +65,8 @@ export const convertLibEs2015Iterable = ({
         }),
 
         // ReadonlyArray
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ReadonlyArray<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ReadonlyArray',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               new RegExp(
@@ -148,9 +143,8 @@ export const convertLibEs2015Iterable = ({
             ['Float64Array', brandedNumber.Float64],
           ] as const
         ).flatMap(([typeName, elementType]) => [
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: typedArrayInterfaceStartRegexp(typeName),
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: typeName,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 new RegExp(
@@ -182,9 +176,8 @@ export const convertLibEs2015Iterable = ({
               ),
             ),
           }),
-          replaceWithNoMatchCheckBetweenRegexp({
-            startRegexp: `interface ${typeName}Constructor {`,
-            endRegexp: closeBraceRegexp,
+          replaceWithinInterface({
+            name: `${typeName}Constructor`,
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 // Add `<T extends number>` to the bare `from(...)` overload.
@@ -205,9 +198,8 @@ export const convertLibEs2015Iterable = ({
             ),
           }),
         ]),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Iterator<',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Iterator',
           mapFn: replaceWithNoMatchCheck(
             // TS 5.6+ uses `next(...[value]:)`; earlier versions use
             // `next(...args:)`.
@@ -218,9 +210,8 @@ export const convertLibEs2015Iterable = ({
         }),
         returnType === 'readonly'
           ? idFn
-          : replaceWithNoMatchCheckBetweenRegexp({
-              startRegexp: 'interface PromiseConstructor {',
-              endRegexp: closeBraceRegexp,
+          : replaceWithinInterface({
+              name: 'PromiseConstructor',
               mapFn: replaceWithNoMatchCheck(
                 '): Promise<readonly Awaited<T>[]>',
                 '): Promise<Awaited<T>[]>',

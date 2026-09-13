@@ -3,9 +3,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
+import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs2015Core =
   ({
@@ -17,9 +17,8 @@ export const convertLibEs2015Core =
     pipe(src).map(
       composeMonoTypeFns(
         // Array
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Array<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Array',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'predicate: (value: T, index: number, obj: readonly T[]) => unknown,',
@@ -59,9 +58,8 @@ export const convertLibEs2015Core =
         }),
 
         // ArrayConstructor
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayConstructor',
           mapFn: composeMonoTypeFns(
             returnType === 'readonly'
               ? idFn
@@ -77,9 +75,8 @@ export const convertLibEs2015Core =
         }),
 
         // Math
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Math {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Math',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'clz32(x: number): number;',
@@ -129,9 +126,8 @@ export const convertLibEs2015Core =
         }),
 
         // NumberConstructor
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface NumberConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'NumberConstructor',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               //
@@ -176,9 +172,8 @@ export const convertLibEs2015Core =
         }),
 
         // ObjectConstructor
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ObjectConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ObjectConstructor',
           mapFn: composeMonoTypeFns(
             // use the refined type definition in lib-files/lib.es5.d.ts
             replaceWithNoMatchCheck(
@@ -189,9 +184,8 @@ export const convertLibEs2015Core =
         }),
 
         // ReadonlyArray
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ReadonlyArray<T> {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ReadonlyArray',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'index: number',
@@ -210,9 +204,8 @@ export const convertLibEs2015Core =
         }),
 
         // String
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface String {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'String',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'codePointAt(pos: number): number | undefined',
@@ -238,9 +231,8 @@ export const convertLibEs2015Core =
         }),
 
         // StringConstructor
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface StringConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'StringConstructor',
           mapFn: replaceWithNoMatchCheck(
             'fromCodePoint(...codePoints: readonly number[]): string',
             `fromCodePoint(...codePoints: readonly ${brandedNumber.Uint32}[]): string`,

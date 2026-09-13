@@ -3,13 +3,11 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
   arrayIteratorName,
-  closeBraceRegexp,
   idFn,
-  typedArrayInterfaceStartRegexp,
   typedArrayThisCaptureRegexSource,
   type ConverterOptions,
 } from './common.mjs';
@@ -60,9 +58,8 @@ export const convertLibEsnextFloat16 = (
     pipe(src).map(
       composeMonoTypeFns(
         // ---- interface Float16Array ----
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: typedArrayInterfaceStartRegexp('Float16Array'),
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Float16Array',
           mapFn: composeMonoTypeFns(
             // `findLast` / `findLastIndex` (normally handled by lib.es2023.array
             // for the other typed arrays). Run before the shared converter so
@@ -157,9 +154,8 @@ export const convertLibEsnextFloat16 = (
         }),
 
         // ---- interface Float16ArrayConstructor ----
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Float16ArrayConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Float16ArrayConstructor',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteOffset?: number',
@@ -219,9 +215,8 @@ export const convertLibEsnextFloat16 = (
             ),
 
         // ---- DataView.getFloat16 / setFloat16 (cf. lib.es5-typed-array) ----
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: typedArrayInterfaceStartRegexp('DataView'),
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'DataView',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'getFloat16(byteOffset: number, littleEndian?: boolean): number;',

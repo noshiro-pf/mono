@@ -4,9 +4,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, type ConverterOptions } from './common.mjs';
+import { type ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_BooleanConstructor =
   ({
@@ -15,9 +15,8 @@ export const convertLibEs5_BooleanConstructor =
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface BooleanConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'BooleanConstructor',
           mapFn: composeMonoTypeFns(
             ...[
               //

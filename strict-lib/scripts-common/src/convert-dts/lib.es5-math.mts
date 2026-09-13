@@ -4,9 +4,9 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import { closeBraceRegexp, idFn, type ConverterOptions } from './common.mjs';
+import { idFn, type ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_Math =
   ({
@@ -16,9 +16,8 @@ export const convertLibEs5_Math =
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Math {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Math',
           mapFn: composeMonoTypeFns(
             ...(!useBrandedNumber
               ? []

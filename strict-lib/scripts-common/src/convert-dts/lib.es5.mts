@@ -3,15 +3,13 @@ import { type MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithNoMatchCheckBetweenRegexp,
+  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import {
   anyArgumentsRef,
   anyArgumentsTypeDefString,
   brandedNumberTypeDefString,
-  closeBraceRegexp,
   idFn,
-  typedArrayInterfaceStartRegexp,
   type ConverterOptions,
 } from './common.mjs';
 import { convertReturnTypeToUintRange } from './convert-return-type-to-uint-range.mjs';
@@ -158,9 +156,8 @@ export const convertLibEs5 =
         ),
 
         // Error クラスを継承した際に name を書き換えるケースに対応するため
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface Error {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'Error',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               //
@@ -174,25 +171,22 @@ export const convertLibEs5 =
             ),
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayBuffer {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayBuffer',
           mapFn: replaceWithNoMatchCheck(
             'byteLength: number',
             `byteLength: ${options.brandedNumber.TypedArraySize}`,
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface ArrayBufferConstructor {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayBufferConstructor',
           mapFn: replaceWithNoMatchCheck(
             'byteLength: number',
             `byteLength: ${options.brandedNumber.TypedArraySize}`,
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: typedArrayInterfaceStartRegexp('ArrayBufferView'),
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'ArrayBufferView',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteLength: number',
@@ -204,9 +198,8 @@ export const convertLibEs5 =
             ),
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: typedArrayInterfaceStartRegexp('DataView'),
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'DataView',
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteLength: number',
@@ -219,25 +212,22 @@ export const convertLibEs5 =
           ),
         }),
 
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface RegExp {',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'RegExp',
           mapFn: replaceWithNoMatchCheck(
             'readonly lastIndex: number;',
             `readonly lastIndex: ${options.brandedNumber.ArraySize};`,
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface RegExpExecArray',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'RegExpExecArray',
           mapFn: replaceWithNoMatchCheck(
             'readonly index: number;',
             `readonly index: ${options.brandedNumber.ArraySize};`,
           ),
         }),
-        replaceWithNoMatchCheckBetweenRegexp({
-          startRegexp: 'interface RegExpMatchArray',
-          endRegexp: closeBraceRegexp,
+        replaceWithinInterface({
+          name: 'RegExpMatchArray',
           mapFn: replaceWithNoMatchCheck(
             'readonly index?: number;',
             `readonly index?: ${options.brandedNumber.ArraySizeArg};`,
