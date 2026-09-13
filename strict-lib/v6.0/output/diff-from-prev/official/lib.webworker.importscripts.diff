@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.webworker.importscripts.d.ts b/v6.0/temp/copied/lib.webworker.importscripts.d.ts
-index e0fc25d91..cae93c8dd 100644
+index e0fc25d91fb9670689cd3865cf7764ec22eb99e9..cae93c8dd2ff1bbbfda5c549cf56810b5843e039 100644
 --- a/v5.9/temp/copied/lib.webworker.importscripts.d.ts
 +++ b/v6.0/temp/copied/lib.webworker.importscripts.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

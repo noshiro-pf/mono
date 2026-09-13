@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.scripthost.d.ts b/v6.0/output/lib-files/lib.scripthost.d.ts
-index 4dbcc7420..bcc2201e3 100644
+index 4dbcc7420d9002acbb7029cc21ca71463a53cb4d..bcc2201e3766206177d93fbd78d4f7357ca85cd0 100644
 --- a/v5.9/output/lib-files/lib.scripthost.d.ts
 +++ b/v6.0/output/lib-files/lib.scripthost.d.ts
 @@ -1,5 +1,3 @@

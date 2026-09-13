@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.webworker.importscripts.d.ts b/v6.0/output/lib-files/lib.webworker.importscripts.d.ts
-index 77a191ce2..357f22d1c 100644
+index 77a191ce2ddde885dee37a729e2c2f422fba3612..357f22d1c0f4889ecde6d68b3dc55ae4b734254f 100644
 --- a/v5.9/output/lib-files/lib.webworker.importscripts.d.ts
 +++ b/v6.0/output/lib-files/lib.webworker.importscripts.d.ts
 @@ -1,5 +1,3 @@

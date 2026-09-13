@@ -1,5 +1,5 @@
 diff --git a/v5.4/temp/copied/lib.dom.d.ts b/v5.5/temp/copied/lib.dom.d.ts
-index aa56a37e0..60427857b 100644
+index aa56a37e040f1b6945f7b05c78c1401f4d400002..60427857bdfb751c1ed73277f2e14044cf71dffd 100644
 --- a/v5.4/temp/copied/lib.dom.d.ts
 +++ b/v5.5/temp/copied/lib.dom.d.ts
 @@ -218,6 +218,9 @@ interface ChannelSplitterOptions extends AudioNodeOptions {

@@ -220,6 +220,28 @@ strict-lib/
 Generation runs through `strict-lib:gen*` at the root; see
 `docs/strict-typescript-lib-integration.md`.
 
+- **CI regenerates all of it and fails on any difference.**
+  `strict-lib-gen.yml` runs `strict-lib:gen:with-codemod-fixed` and then
+  `strict-lib:gen:version-diff`, and asserts the tree is clean. So a converter
+  change is committed together with the output it produces, and
+  `output/diff-from-prev/` with it — that directory had gone stale after
+  #1744 and #1751, when nothing checked it.
+- **The harness scripts run `tsx` with `tools/configs/tsconfig.tsx.json`**, as
+  every `tsx` invocation here does, so generation needs no `ws:build`: all
+  twelve series regenerate in under two minutes from a checkout with no
+  `dist/` at all. A harness script without it resolves our packages through
+  `dist/` and fails on a clean checkout.
+- **Anything committed from the generator must not depend on the clone.**
+  `gen-version-diff` passes `--full-index` to `git diff` for that reason: an
+  abbreviated blob hash is as long as the local object database needs, 9
+  digits in a full clone and 7 in CI's shallow checkout.
+- **It has a workflow and a diff gate of its own**, because neither existing
+  one fits. The bundle's `CHANGELOG.md` is copied from the harness, so a
+  markdown-only diff — a `chore: version packages` branch — changes the
+  output, which `code-checks` would skip on `**.md`; and `style-checks`
+  ignores so little that it would regenerate the library on every pull
+  request.
+
 ### `experimental/`
 
 `experimental/` holds the contents of the pre-2026 monorepo (the old `packages/`,
@@ -394,6 +416,7 @@ list lives in the `required_status_checks` rule of
 | :-------------------------- | :---------------------------------------------------- |
 | `type-check-result`         | the aggregate job in `type-check.yml`                 |
 | `style-check-result`        | the aggregate job in `style-check.yml`                |
+| `strict-lib-gen-result`     | the aggregate job in `strict-lib-gen.yml`             |
 | `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
 | `verify-published-result`   | the aggregate job in `verify-published-packages.yml`  |
 | `no-wip-label`              | a commit status written by `wip-label.yml`            |
@@ -473,7 +496,7 @@ Consequences worth knowing:
 
 `gates / check` is deliberately **not** required. It is a gate that fails
 open — the jobs waiting on it use `!cancelled()` and `!= 'false'`, so an
-unanswered gate lets them run — and each of the four workflows contributes a
+unanswered gate lets them run — and each of the five workflows contributes a
 context under the same name.
 
 **`repo-settings/` is a declaration, not a lever.** The root files under it
@@ -648,7 +671,7 @@ anything the workflow reads, and the job is skipped when it does not — see
 one job answers.
 
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
-two lists in the root `package.json`, one per kind of check:
+three lists in the root `package.json`, one per kind of check:
 
 - `z:check-should-run:code-checks` — `type-check.yml` and
   `node-version-compatibility.yml`. Ignores `experimental/`, the root `docs/`,
@@ -658,6 +681,13 @@ two lists in the root `package.json`, one per kind of check:
   `experimental/` and nothing else. The rest of that matrix reads markdown,
   regenerates READMEs, or globs every file under a package directory, so the
   wider list would skip those checks exactly when they should fail.
+- `z:check-should-run:strict-lib-checks` — `strict-lib-gen.yml`. Ignores what
+  the generator cannot reach: `experimental/`, `docs/`, `articles/`, `books/`,
+  `apps/`, `languages/`, `verify-npm-packages/`, `repo-settings/`,
+  `.changeset/`, the style tools' configuration, and markdown at the root and
+  under `libs/` only. Markdown under `strict-lib/` is read — each harness's
+  `CHANGELOG.md` is copied into the published bundle — so `**.md` must not go
+  on this list.
 
 Add a path to a list only when **no** command that workflow runs reads it.
 `experimental/` qualifies for both: it is outside the pnpm workspace and
@@ -691,8 +721,9 @@ save one runner would cost more than it saves.
 
 ## Check triggers, `[WIP]` and out-of-date branches
 
-The four check workflows — `type-check.yml`, `style-check.yml`,
-`node-version-compatibility.yml` and `verify-published-packages.yml` — trigger
+The five check workflows — `type-check.yml`, `style-check.yml`,
+`strict-lib-gen.yml`, `node-version-compatibility.yml` and
+`verify-published-packages.yml` — trigger
 on `pull_request: types: [opened,
 synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
 keeps the checks list at one entry per job: triggering on `push` for branches
@@ -711,7 +742,7 @@ tree as the pull request's head — a tree every check has already run on. The
 check workflows used to run their whole matrix on it anyway, on the reasoning
 that a squash makes a commit no pull request run has seen; that is true of the
 commit and false of its contents, and it cost 108 runner-minutes per merge for
-`type-check.yml` alone, at fifty-odd merges a week. So three of the four have
+`type-check.yml` alone, at fifty-odd merges a week. So four of the five have
 no `push` trigger at all, and the one that keeps it runs a single job on it:
 
 - `type-check.yml` runs `coverage-main`, which is the matrix's `ws:test:cov`
@@ -863,7 +894,7 @@ report `skipped`. What to know about that:
   so `[WIP]` exists only on GitHub. Renaming or deleting it there silently
   turns the skipping off — though not the blocking, since `no-wip-label` reads
   the same string and would simply stop matching too. The string is written
-  down in the workflows — the four check workflows, `wip-label.yml` and
+  down in the workflows — the five check workflows, `wip-label.yml` and
   `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs.mts`, which
   sets a labelled pull request aside; change it everywhere or nowhere.
 - **Any label event re-runs the checks, not just `[WIP]`'s.** The trigger is

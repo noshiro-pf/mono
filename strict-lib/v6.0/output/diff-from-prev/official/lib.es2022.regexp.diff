@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2022.regexp.d.ts b/v6.0/temp/copied/lib.es2022.regexp.d.ts
-index 82d90aca7..0043ad07f 100644
+index 82d90aca78afd015a7626c1bb22de7702c020de3..0043ad07f7851c2d7b783539670b5e6fb43842ca 100644
 --- a/v5.9/temp/copied/lib.es2022.regexp.d.ts
 +++ b/v6.0/temp/copied/lib.es2022.regexp.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

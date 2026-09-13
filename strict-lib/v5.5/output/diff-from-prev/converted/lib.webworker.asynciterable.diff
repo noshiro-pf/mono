@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.webworker.asynciterable.d.ts b/v5.5/output/lib-files/lib.webworker.asynciterable.d.ts
-index 8a28f6465..dbf4189ec 100644
+index 8a28f6465c5721f01e450ff4d4f95b9fd7be3d35..dbf4189ecc308cb2ccef70590a7c1d5975a342a1 100644
 --- a/v5.4/output/lib-files/lib.webworker.asynciterable.d.ts
 +++ b/v5.5/output/lib-files/lib.webworker.asynciterable.d.ts
 @@ -12,3 +12,10 @@ interface FileSystemDirectoryHandle {

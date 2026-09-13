@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.es2015.core.d.ts b/v5.2/temp/copied/lib.es2015.core.d.ts
-index 6d2c9db79..68aaca53f 100644
+index 6d2c9db7980974246648d94c83209dd85cbacbed..68aaca53f60e42d99ae17b9ab6775651ac4c7c6c 100644
 --- a/v5.1/temp/copied/lib.es2015.core.d.ts
 +++ b/v5.2/temp/copied/lib.es2015.core.d.ts
 @@ -64,10 +64,10 @@ interface Array<T> {

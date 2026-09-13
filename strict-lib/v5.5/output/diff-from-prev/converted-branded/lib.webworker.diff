@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files-branded/lib.webworker.d.ts b/v5.5/output/lib-files-branded/lib.webworker.d.ts
-index a6b507462..4e866f60b 100644
+index a6b507462d6bfc32e68541bfc337aa31bf7fa657..4e866f60b47ee80786724d85f0a61f5d43f15c8a 100644
 --- a/v5.4/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.webworker.d.ts
 @@ -533,6 +533,17 @@ interface ReadableStreamGetReaderOptions {

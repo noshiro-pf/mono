@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2015.reflect.d.ts b/v6.0/temp/copied/lib.es2015.reflect.d.ts
-index 565092d7a..41b1cc93f 100644
+index 565092d7a069385e1170fd6279617c07fe0eb06e..41b1cc93f17f72a538c156db623853c650a136a5 100644
 --- a/v5.9/temp/copied/lib.es2015.reflect.d.ts
 +++ b/v6.0/temp/copied/lib.es2015.reflect.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

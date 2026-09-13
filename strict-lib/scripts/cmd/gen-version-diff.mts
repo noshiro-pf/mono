@@ -101,8 +101,13 @@ const gitDiff = async (
 ): Promise<string> => {
   // `git diff` exits 1 when there are differences; `|| true` keeps the diff on
   // stdout instead of turning the non-zero exit into a Result.err.
+  //
+  // `--full-index`, because the output is committed and checked by CI. Without
+  // it the `index` line carries blob hashes abbreviated to however many digits
+  // are unambiguous in the object database at hand: 9 in a full clone, 7 in
+  // the shallow checkout CI makes, so every diff file differed there.
   const result = await $(
-    `git diff --no-index --no-color -- "${left}" "${right}" || true`,
+    `git diff --no-index --no-color --full-index -- "${left}" "${right}" || true`,
     {
       cwd: projectRootPath,
       maxBuffer: 100 * 1024 * 1024, // 100MB

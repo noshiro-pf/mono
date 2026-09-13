@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.es2015.symbol.wellknown.d.ts b/v5.2/temp/copied/lib.es2015.symbol.wellknown.d.ts
-index 802e66a93..78aa8007a 100644
+index 802e66a93ad7cfac14493cc92b46b8f127ef9c6c..78aa8007ad084b84396499fdc5363257ce8804f1 100644
 --- a/v5.1/temp/copied/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.2/temp/copied/lib.es2015.symbol.wellknown.d.ts
 @@ -136,7 +136,7 @@ interface Map<K, V> {

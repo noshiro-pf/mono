@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.symbol.wellknown.d.ts b/v6.0/output/lib-files/lib.es2015.symbol.wellknown.d.ts
-index 33e0ec53b..38beeea9c 100644
+index 0ab7ef49d1ff72290d7a34b33a47b55555949c19..4f13e02c37456233c48e28782cb5d70e90d89995 100644
 --- a/v5.9/output/lib-files/lib.es2015.symbol.wellknown.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.symbol.wellknown.d.ts
 @@ -1,5 +1,3 @@

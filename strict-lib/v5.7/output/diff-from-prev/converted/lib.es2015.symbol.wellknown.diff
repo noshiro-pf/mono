@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2015.symbol.wellknown.d.ts b/v5.7/output/lib-files/lib.es2015.symbol.wellknown.d.ts
-index c018555d8..5b5c1ad66 100644
+index 2c146e3c5a41dd0e53ee2cbcfe5c96b6af0e5e8b..ae5f4d16212fa132a1f5970e789532a727a65242 100644
 --- a/v5.6/output/lib-files/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.7/output/lib-files/lib.es2015.symbol.wellknown.d.ts
-@@ -277,43 +277,43 @@ interface ArrayBuffer {
+@@ -286,43 +286,43 @@ interface ArrayBuffer {
    readonly [Symbol.toStringTag]: string;
  }
  

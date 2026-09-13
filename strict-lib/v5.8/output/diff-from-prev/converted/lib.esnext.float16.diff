@@ -1,6 +1,6 @@
 diff --git a/v5.8/output/lib-files/lib.esnext.float16.d.ts b/v5.8/output/lib-files/lib.esnext.float16.d.ts
 new file mode 100644
-index 000000000..cb00ceb4c
+index 0000000000000000000000000000000000000000..cb00ceb4c02096e66f9ff6a570dc501994fe7840
 --- /dev/null
 +++ b/v5.8/output/lib-files/lib.esnext.float16.d.ts
 @@ -0,0 +1,499 @@

@@ -1,5 +1,5 @@
 diff --git a/v6.0/temp/copied/lib.es2017.string.d.ts b/v7.0/temp/copied/lib.es2017.string.d.ts
-index 1a101191a..5a8500d21 100644
+index 1a101191a2bfbd748b3a0dd830a570812120efcc..5a8500d216a0d555c4f41cfd9b13dbc8711db16d 100644
 --- a/v6.0/temp/copied/lib.es2017.string.d.ts
 +++ b/v7.0/temp/copied/lib.es2017.string.d.ts
 @@ -15,28 +15,32 @@ and limitations under the License.

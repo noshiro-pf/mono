@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.esnext.error.d.ts b/v6.0/temp/copied/lib.esnext.error.d.ts
-index e202a1d89..5022f51fb 100644
+index e202a1d89a1206075040a333cb37f431321fb64e..5022f51fb7d2d42c2f0676ff4ef51b22eb7ed966 100644
 --- a/v5.9/temp/copied/lib.esnext.error.d.ts
 +++ b/v6.0/temp/copied/lib.esnext.error.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

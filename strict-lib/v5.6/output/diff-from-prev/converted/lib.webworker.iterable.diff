@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files/lib.webworker.iterable.d.ts b/v5.6/output/lib-files/lib.webworker.iterable.d.ts
-index dcd9374d5..5c26799d6 100644
+index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b548399326ef64 100644
 --- a/v5.5/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.6/output/lib-files/lib.webworker.iterable.d.ts
 @@ -10,24 +10,24 @@ interface AbortSignal {

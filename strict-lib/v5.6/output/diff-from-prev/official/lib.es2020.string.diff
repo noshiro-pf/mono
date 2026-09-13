@@ -1,5 +1,5 @@
 diff --git a/v5.5/temp/copied/lib.es2020.string.d.ts b/v5.6/temp/copied/lib.es2020.string.d.ts
-index 9be28b737..ad45314e1 100644
+index 9be28b7373a5f67b7566b2c759343a4226d6dbf0..ad45314e16e402b155411d3cb8f0f1e56f532858 100644
 --- a/v5.5/temp/copied/lib.es2020.string.d.ts
 +++ b/v5.6/temp/copied/lib.es2020.string.d.ts
 @@ -15,7 +15,7 @@ and limitations under the License.

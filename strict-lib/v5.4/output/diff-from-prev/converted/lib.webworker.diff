@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.webworker.d.ts b/v5.4/output/lib-files/lib.webworker.d.ts
-index 2190767bb..7d97730ac 100644
+index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51f46a19b4 100644
 --- a/v5.3/output/lib-files/lib.webworker.d.ts
 +++ b/v5.4/output/lib-files/lib.webworker.d.ts
 @@ -166,7 +166,7 @@ interface EcdsaParams extends Algorithm {

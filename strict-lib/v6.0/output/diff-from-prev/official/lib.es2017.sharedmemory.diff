@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2017.sharedmemory.d.ts b/v6.0/temp/copied/lib.es2017.sharedmemory.d.ts
-index cec4a1af5..fcbc01186 100644
+index cec4a1af520bc8c797694350af0bba3cce561cbe..fcbc01186c124902572c9f9d73bfbe34cfa3d5e2 100644
 --- a/v5.9/temp/copied/lib.es2017.sharedmemory.d.ts
 +++ b/v6.0/temp/copied/lib.es2017.sharedmemory.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

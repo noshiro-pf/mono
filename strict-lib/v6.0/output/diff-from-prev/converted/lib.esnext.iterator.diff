@@ -1,6 +1,6 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.iterator.d.ts b/v5.9/output/lib-files/lib.esnext.iterator.d.ts
 deleted file mode 100644
-index 3a3b19f41..000000000
+index 3a3b19f4123dbefffc28d7ceba0151922a5ebb26..0000000000000000000000000000000000000000
 --- a/v5.9/output/lib-files/lib.esnext.iterator.d.ts
 +++ /dev/null
 @@ -1,172 +0,0 @@

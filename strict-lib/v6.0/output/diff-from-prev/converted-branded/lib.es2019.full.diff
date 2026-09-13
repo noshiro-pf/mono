@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2019.full.d.ts b/v6.0/output/lib-files-branded/lib.es2019.full.d.ts
-index 6f80ebf18..7e5cec833 100644
+index 6f80ebf18390ae4b6d344fe5702629557e259564..7e5cec833aaf3ff0db22114b20fa1c1bb13fc8fb 100644
 --- a/v5.9/output/lib-files-branded/lib.es2019.full.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2019.full.d.ts
 @@ -1,5 +1,3 @@

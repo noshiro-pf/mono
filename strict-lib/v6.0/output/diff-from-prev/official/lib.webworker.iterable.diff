@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.webworker.iterable.d.ts b/v6.0/temp/copied/lib.webworker.iterable.d.ts
-index 3bc065fcd..a6694dc93 100644
+index 3bc065fcd43aa9db6a2a90fd0fcb5e7f9a6da35b..a6694dc93c9dc9f7e180bbf3fb593ec04251bb87 100644
 --- a/v5.9/temp/copied/lib.webworker.iterable.d.ts
 +++ b/v6.0/temp/copied/lib.webworker.iterable.d.ts
 @@ -7,639 +7,11 @@ License at http://www.apache.org/licenses/LICENSE-2.0

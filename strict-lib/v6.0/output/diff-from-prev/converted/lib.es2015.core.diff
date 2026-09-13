@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.core.d.ts b/v6.0/output/lib-files/lib.es2015.core.d.ts
-index 5100c37c6..cd0ff3b68 100644
+index abd1d99867f1d750094967fe4ddb5c35e5e069cb..b426e29f61b4e53e844a341f19549efdf7f90cb9 100644
 --- a/v5.9/output/lib-files/lib.es2015.core.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.core.d.ts
 @@ -1,5 +1,3 @@

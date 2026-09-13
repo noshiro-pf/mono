@@ -1,5 +1,5 @@
 diff --git a/v5.4/temp/copied/lib.dom.asynciterable.d.ts b/v5.5/temp/copied/lib.dom.asynciterable.d.ts
-index d7e7a538c..db3dfb450 100644
+index d7e7a538cf5e3c0f780df6e563489828a7ba914c..db3dfb4504305b99dd19ee25f6aa7ef4b8077d5e 100644
 --- a/v5.4/temp/copied/lib.dom.asynciterable.d.ts
 +++ b/v5.5/temp/copied/lib.dom.asynciterable.d.ts
 @@ -25,3 +25,10 @@ interface FileSystemDirectoryHandle {

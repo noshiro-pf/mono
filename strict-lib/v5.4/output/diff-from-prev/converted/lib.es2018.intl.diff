@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.es2018.intl.d.ts b/v5.4/output/lib-files/lib.es2018.intl.d.ts
-index 5f67013a8..309b1eb03 100644
+index 520a92bf4c8b08df0cfff14354e28c94bd562f97..b0880c13aa6ad0377249ae41d611d0401c093a7a 100644
 --- a/v5.3/output/lib-files/lib.es2018.intl.d.ts
 +++ b/v5.4/output/lib-files/lib.es2018.intl.d.ts
-@@ -47,7 +47,7 @@ declare namespace Intl {
+@@ -56,7 +56,7 @@ declare namespace Intl {
      select(n: number): LDMLPluralRule;
    }
  
@@ -11,7 +11,7 @@ index 5f67013a8..309b1eb03 100644
      new (
        locales?: string | readonly string[],
        options?: PluralRulesOptions,
-@@ -56,12 +56,13 @@ declare namespace Intl {
+@@ -65,12 +65,13 @@ declare namespace Intl {
        locales?: string | readonly string[],
        options?: PluralRulesOptions,
      ): PluralRules;

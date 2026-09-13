@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files/lib.webworker.d.ts b/v5.9/output/lib-files/lib.webworker.d.ts
-index 92542c685..bb75b8fcd 100644
+index 92542c68562a93b211dccfce95300062216e7fac..bb75b8fcd5cb3212cfb81768fe6b441e1f7b8337 100644
 --- a/v5.8/output/lib-files/lib.webworker.d.ts
 +++ b/v5.9/output/lib-files/lib.webworker.d.ts
 @@ -68,7 +68,7 @@ interface AudioDataInit {

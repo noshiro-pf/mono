@@ -1,5 +1,5 @@
 diff --git a/v5.5/temp/copied/lib.webworker.asynciterable.d.ts b/v5.6/temp/copied/lib.webworker.asynciterable.d.ts
-index 39c04f771..e26ad4732 100644
+index 39c04f771d8698755100dd1030c3b8b2bc2c7157..e26ad47320fa9356820efbe612a95846df9e90e5 100644
 --- a/v5.5/temp/copied/lib.webworker.asynciterable.d.ts
 +++ b/v5.6/temp/copied/lib.webworker.asynciterable.d.ts
 @@ -19,16 +19,36 @@ and limitations under the License.

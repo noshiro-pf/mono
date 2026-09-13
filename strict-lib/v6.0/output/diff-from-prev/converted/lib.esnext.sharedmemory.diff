@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.sharedmemory.d.ts b/v6.0/output/lib-files/lib.esnext.sharedmemory.d.ts
-index 836fb241a..49e390b31 100644
+index 836fb241aed81fd2504c334f1b2eec72bb2a1a98..49e390b3185e610e6e2b92a4543985d388c5f365 100644
 --- a/v5.9/output/lib-files/lib.esnext.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files/lib.esnext.sharedmemory.d.ts
 @@ -1,5 +1,3 @@

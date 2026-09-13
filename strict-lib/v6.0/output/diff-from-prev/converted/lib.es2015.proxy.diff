@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.proxy.d.ts b/v6.0/output/lib-files/lib.es2015.proxy.d.ts
-index 1ff1b266b..5b81f4ad9 100644
+index 1ff1b266b63316cde9e6afc213d3f7411845cd88..5b81f4ad9929f37c5537ee369f4fb2331a843832 100644
 --- a/v5.9/output/lib-files/lib.es2015.proxy.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.proxy.d.ts
 @@ -1,5 +1,3 @@

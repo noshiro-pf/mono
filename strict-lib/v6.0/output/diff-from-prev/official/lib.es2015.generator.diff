@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2015.generator.d.ts b/v6.0/temp/copied/lib.es2015.generator.d.ts
-index c9b73ee50..3d1e404c3 100644
+index c9b73ee506227bbbbeb08071b5aa81a878e3ba3a..3d1e404c3e18f95c226a1d8bc83bced70850f87f 100644
 --- a/v5.9/temp/copied/lib.es2015.generator.d.ts
 +++ b/v6.0/temp/copied/lib.es2015.generator.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

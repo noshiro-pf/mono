@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2023.collection.d.ts b/v6.0/output/lib-files-branded/lib.es2023.collection.d.ts
-index e2365b130..92fd6e8ec 100644
+index e2365b1309e625de456582f0504315b2ecb57b44..92fd6e8ecf46607cc7818bc6285ec820eeb5ebfd 100644
 --- a/v5.9/output/lib-files-branded/lib.es2023.collection.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2023.collection.d.ts
 @@ -1,5 +1,3 @@

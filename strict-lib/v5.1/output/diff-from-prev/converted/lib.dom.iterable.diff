@@ -1,5 +1,5 @@
 diff --git a/v5.0/output/lib-files/lib.dom.iterable.d.ts b/v5.1/output/lib-files/lib.dom.iterable.d.ts
-index 663002a33..5ad10570e 100644
+index 663002a33944b21d7ead7e3dbb77cc5ecae7e8d9..5ad10570ec51e2f802fe03f0ead23a9eec6c9bd2 100644
 --- a/v5.0/output/lib-files/lib.dom.iterable.d.ts
 +++ b/v5.1/output/lib-files/lib.dom.iterable.d.ts
 @@ -5,6 +5,7 @@

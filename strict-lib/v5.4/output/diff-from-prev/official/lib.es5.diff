@@ -1,5 +1,5 @@
 diff --git a/v5.3/temp/copied/lib.es5.d.ts b/v5.4/temp/copied/lib.es5.d.ts
-index 4bb23e948..65c6045be 100644
+index 4bb23e948ded87d185df4c85cb032ecb6d6e8849..65c6045be4486d780a68b3ca2737ae896a0a9035 100644
 --- a/v5.3/temp/copied/lib.es5.d.ts
 +++ b/v5.4/temp/copied/lib.es5.d.ts
 @@ -696,6 +696,7 @@ interface ImportCallOptions {

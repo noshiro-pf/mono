@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2019.array.d.ts b/v6.0/output/lib-files/lib.es2019.array.d.ts
-index b75d09d67..df8bfbf4b 100644
+index b75d09d676217de535bfbff5d6fac58eaec8cd7f..df8bfbf4b99ec33739d3f04eec63bb01a46eaa5f 100644
 --- a/v5.9/output/lib-files/lib.es2019.array.d.ts
 +++ b/v6.0/output/lib-files/lib.es2019.array.d.ts
 @@ -1,5 +1,3 @@

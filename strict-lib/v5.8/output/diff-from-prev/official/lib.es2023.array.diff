@@ -1,5 +1,5 @@
 diff --git a/v5.7/temp/copied/lib.es2023.array.d.ts b/v5.8/temp/copied/lib.es2023.array.d.ts
-index 808251490..855ba26fd 100644
+index 808251490ea12fd519fe21bed6bb874a3ff08f60..855ba26fd732e8b28f93df061b58bdb0048bad9c 100644
 --- a/v5.7/temp/copied/lib.es2023.array.d.ts
 +++ b/v5.8/temp/copied/lib.es2023.array.d.ts
 @@ -57,7 +57,7 @@ interface Array<T> {

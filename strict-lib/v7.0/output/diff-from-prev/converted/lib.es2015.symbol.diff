@@ -1,5 +1,5 @@
 diff --git a/v6.0/output/lib-files/lib.es2015.symbol.d.ts b/v7.0/output/lib-files/lib.es2015.symbol.d.ts
-index 663725be3..3df2235d8 100644
+index 663725be37a6b2a136622cd2bfe5f18fe4861900..3df2235d8520e7dd0cca38ba65f054584c2a3e0c 100644
 --- a/v6.0/output/lib-files/lib.es2015.symbol.d.ts
 +++ b/v7.0/output/lib-files/lib.es2015.symbol.d.ts
 @@ -19,7 +19,7 @@ interface SymbolConstructor {

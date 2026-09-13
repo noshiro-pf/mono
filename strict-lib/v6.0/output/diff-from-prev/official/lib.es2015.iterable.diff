@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2015.iterable.d.ts b/v6.0/temp/copied/lib.es2015.iterable.d.ts
-index 06d85bee0..fd14a21d2 100644
+index 06d85bee00a7fe8158569593e45c84fd20201d74..fd14a21d29fb5cda37759d86d29bbf5393280498 100644
 --- a/v5.9/temp/copied/lib.es2015.iterable.d.ts
 +++ b/v6.0/temp/copied/lib.es2015.iterable.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

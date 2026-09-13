@@ -1,5 +1,5 @@
 diff --git a/v5.6/temp/copied/lib.es2022.error.d.ts b/v5.7/temp/copied/lib.es2022.error.d.ts
-index 3c5ae0442..53d3a284c 100644
+index 3c5ae0442d52f4bba20ba683ae41ea0148fde447..53d3a284cb2965e134dd73b8f67d85a9d2413073 100644
 --- a/v5.6/temp/copied/lib.es2022.error.d.ts
 +++ b/v5.7/temp/copied/lib.es2022.error.d.ts
 @@ -15,6 +15,8 @@ and limitations under the License.

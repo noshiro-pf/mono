@@ -1,5 +1,5 @@
 diff --git a/v5.0/output/lib-files/lib.dom.d.ts b/v5.1/output/lib-files/lib.dom.d.ts
-index 8b084a544..e6bad6782 100644
+index 8b084a544e9a76dd32a0d455491aa8b6fe4f87ec..e6bad678240ca64d3c970bcd7e6d94ff19763b61 100644
 --- a/v5.0/output/lib-files/lib.dom.d.ts
 +++ b/v5.1/output/lib-files/lib.dom.d.ts
 @@ -135,6 +135,10 @@ interface AuthenticatorSelectionCriteria {

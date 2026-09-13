@@ -1,5 +1,5 @@
 diff --git a/v5.3/temp/copied/lib.es2020.string.d.ts b/v5.4/temp/copied/lib.es2020.string.d.ts
-index 9d319e309..9be28b737 100644
+index 9d319e3093add559b20f7484fcdc33e107a33148..9be28b7373a5f67b7566b2c759343a4226d6dbf0 100644
 --- a/v5.3/temp/copied/lib.es2020.string.d.ts
 +++ b/v5.4/temp/copied/lib.es2020.string.d.ts
 @@ -23,5 +23,23 @@ interface String {

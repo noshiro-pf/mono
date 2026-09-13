@@ -1,6 +1,6 @@
 diff --git a/v6.0/temp/copied/lib.esnext.date.d.ts b/v6.0/temp/copied/lib.esnext.date.d.ts
 new file mode 100644
-index 000000000..6b6d87fa0
+index 0000000000000000000000000000000000000000..6b6d87fa0601e5ce37f0eb6ff4fd12233e214ed0
 --- /dev/null
 +++ b/v6.0/temp/copied/lib.esnext.date.d.ts
 @@ -0,0 +1,20 @@

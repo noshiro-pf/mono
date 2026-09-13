@@ -1,6 +1,6 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2025.promise.d.ts b/v6.0/output/lib-files-branded/lib.es2025.promise.d.ts
 new file mode 100644
-index 000000000..14f988721
+index 0000000000000000000000000000000000000000..14f988721421ce818d8e96c28fbacf6b3eff9737
 --- /dev/null
 +++ b/v6.0/output/lib-files-branded/lib.es2025.promise.d.ts
 @@ -0,0 +1,19 @@

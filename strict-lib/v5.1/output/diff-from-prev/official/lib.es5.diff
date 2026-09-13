@@ -1,5 +1,5 @@
 diff --git a/v5.0/temp/copied/lib.es5.d.ts b/v5.1/temp/copied/lib.es5.d.ts
-index f104f6389..4ff861f75 100644
+index f104f6389575ea335765d1e0c0365027e79ae793..4ff861f75052e9a43d77f57992758e05c6129932 100644
 --- a/v5.0/temp/copied/lib.es5.d.ts
 +++ b/v5.1/temp/copied/lib.es5.d.ts
 @@ -358,9 +358,14 @@ interface CallableFunction extends Function {

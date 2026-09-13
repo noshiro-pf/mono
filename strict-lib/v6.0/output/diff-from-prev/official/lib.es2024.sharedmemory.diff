@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2024.sharedmemory.d.ts b/v6.0/temp/copied/lib.es2024.sharedmemory.d.ts
-index bde0c0587..ffbd40014 100644
+index bde0c058749eb735bece5f4a98b7304aa4d51394..ffbd40014e0428c6c96124c60eff2a14f98e4141 100644
 --- a/v5.9/temp/copied/lib.es2024.sharedmemory.d.ts
 +++ b/v6.0/temp/copied/lib.es2024.sharedmemory.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

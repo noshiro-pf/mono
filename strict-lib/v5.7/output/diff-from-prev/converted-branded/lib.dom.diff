@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.dom.d.ts b/v5.7/output/lib-files-branded/lib.dom.d.ts
-index a86dbcd30..89c9c6f53 100644
+index a86dbcd302152bd8ec851ff7d52a501197258aee..89c9c6f53e040843615537beb1331160f6e515e6 100644
 --- a/v5.6/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.dom.d.ts
 @@ -10,6 +10,19 @@ interface AddEventListenerOptions extends EventListenerOptions {

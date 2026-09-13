@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files/lib.es2015.collection.d.ts b/v5.2/output/lib-files/lib.es2015.collection.d.ts
-index e0cc6aadd..380e6c026 100644
+index e0cc6aadd74ba9aee0c0b8ff36f5ea2fb0ffebf1..380e6c02633076ade9c81a3a4d287b999f07c44c 100644
 --- a/v5.1/output/lib-files/lib.es2015.collection.d.ts
 +++ b/v5.2/output/lib-files/lib.es2015.collection.d.ts
 @@ -49,7 +49,7 @@ interface ReadonlyMap<K, V> {

@@ -1,5 +1,5 @@
 diff --git a/v5.4/temp/copied/lib.webworker.iterable.d.ts b/v5.5/temp/copied/lib.webworker.iterable.d.ts
-index 67cc45aa2..847d9ce5b 100644
+index 67cc45aa200947a5e4a650d11128dc6f66aa599a..847d9ce5b2843e5fcee7ceb966687ee4ee0d63e2 100644
 --- a/v5.4/temp/copied/lib.webworker.iterable.d.ts
 +++ b/v5.5/temp/copied/lib.webworker.iterable.d.ts
 @@ -19,6 +19,11 @@ and limitations under the License.

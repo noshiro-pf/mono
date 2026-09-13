@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2022.array.d.ts b/v6.0/temp/copied/lib.es2022.array.d.ts
-index 8b644860e..1ff3ee3a2 100644
+index 8b644860eb85f54f76bcd495d77e0299c289b742..1ff3ee3a20caf5791280b0d3dc3469dd2511a749 100644
 --- a/v5.9/temp/copied/lib.es2022.array.d.ts
 +++ b/v6.0/temp/copied/lib.es2022.array.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2020.sharedmemory.d.ts b/v6.0/temp/copied/lib.es2020.sharedmemory.d.ts
-index ba5b421b6..faa986b3c 100644
+index ba5b421b67d883855e8baae275eb0c5321c2741a..faa986b3c04540d07034c5d8dc62837a76d1d401 100644
 --- a/v5.9/temp/copied/lib.es2020.sharedmemory.d.ts
 +++ b/v6.0/temp/copied/lib.es2020.sharedmemory.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

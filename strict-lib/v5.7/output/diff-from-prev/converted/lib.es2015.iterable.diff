@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.es2015.iterable.d.ts b/v5.7/output/lib-files/lib.es2015.iterable.d.ts
-index 44bcbb86b..1de4dc587 100644
+index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815ac2e3c7c 100644
 --- a/v5.6/output/lib-files/lib.es2015.iterable.d.ts
 +++ b/v5.7/output/lib-files/lib.es2015.iterable.d.ts
 @@ -287,7 +287,7 @@ interface String {

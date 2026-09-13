@@ -1,6 +1,6 @@
 diff --git a/v5.4/temp/copied/lib.es2016.intl.d.ts b/v5.4/temp/copied/lib.es2016.intl.d.ts
 new file mode 100644
-index 000000000..6b536b32b
+index 0000000000000000000000000000000000000000..6b536b32b870cc17b9c589f8ec81883fed47ac7f
 --- /dev/null
 +++ b/v5.4/temp/copied/lib.es2016.intl.d.ts
 @@ -0,0 +1,30 @@

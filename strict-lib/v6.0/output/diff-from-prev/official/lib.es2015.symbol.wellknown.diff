@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2015.symbol.wellknown.d.ts b/v6.0/temp/copied/lib.es2015.symbol.wellknown.d.ts
-index 9e908eae7..4a220e4ec 100644
+index 9e908eae7b8f5210aa2dadb1d60154829a7f2276..4a220e4ecbf4d70b9c9ff776550e7abc45e1beec 100644
 --- a/v5.9/temp/copied/lib.es2015.symbol.wellknown.d.ts
 +++ b/v6.0/temp/copied/lib.es2015.symbol.wellknown.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

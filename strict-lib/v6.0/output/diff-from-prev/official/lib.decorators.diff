@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.decorators.d.ts b/v6.0/temp/copied/lib.decorators.d.ts
-index 66cab5064..60c86a135 100644
+index 66cab5064f05792f46830d003c16cada00a86afa..60c86a1354e7666800f68eaf284c14c8115771be 100644
 --- a/v5.9/temp/copied/lib.decorators.d.ts
 +++ b/v6.0/temp/copied/lib.decorators.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

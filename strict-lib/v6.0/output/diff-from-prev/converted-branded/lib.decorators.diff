@@ -1,10 +1,9 @@
 diff --git a/v5.9/output/lib-files-branded/lib.decorators.d.ts b/v6.0/output/lib-files-branded/lib.decorators.d.ts
-index 823f8ce7e..e129d1df1 100644
+index 98af8a1aedffe8ef2c98e2cf0d9335b98672d34d..d1062990587925ecde6bd5e7cc6aff9fbd33e353 100644
 --- a/v5.9/output/lib-files-branded/lib.decorators.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.decorators.d.ts
-@@ -1,5 +1,3 @@
+@@ -1,4 +1,3 @@
 -/// <reference no-default-lib="true"/>
--
+ /// <reference lib="es5" />
+ 
  /**
-  * The decorator context types provided to class element decorators.
-  */

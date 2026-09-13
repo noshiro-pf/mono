@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.sharedmemory.d.ts b/v6.0/output/lib-files/lib.es2024.sharedmemory.d.ts
-index 66549c62c..f9c507a1e 100644
+index 66549c62ccbfd94516b5dd0b157d0be4c3b0f896..f9c507a1e9abb8e0f1a8805c1e1f57015e189d62 100644
 --- a/v5.9/output/lib-files/lib.es2024.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.sharedmemory.d.ts
 @@ -1,5 +1,3 @@

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.regexp.d.ts b/v6.0/output/lib-files/lib.es2024.regexp.d.ts
-index f85fdba98..2700ba841 100644
+index f85fdba98664c975391e078684a184d34a68c73f..2700ba841bb5ee3680c7d88734922b7fc636073b 100644
 --- a/v5.9/output/lib-files/lib.es2024.regexp.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.regexp.d.ts
 @@ -1,5 +1,3 @@

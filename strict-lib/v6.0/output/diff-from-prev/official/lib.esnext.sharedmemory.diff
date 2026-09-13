@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.esnext.sharedmemory.d.ts b/v6.0/temp/copied/lib.esnext.sharedmemory.d.ts
-index 5c03b65f4..c22a1db4d 100644
+index 5c03b65f47aca1981ed6c72e30db4e3dd2c6f84f..c22a1db4d8b89b47d6ec00131b9120f4c9e146b1 100644
 --- a/v5.9/temp/copied/lib.esnext.sharedmemory.d.ts
 +++ b/v6.0/temp/copied/lib.esnext.sharedmemory.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

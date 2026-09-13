@@ -1,0 +1,204 @@
+name: Strict Lib Generation
+
+# Regenerates the strict standard library for every TypeScript minor and fails
+# when the result differs from what is committed.
+#
+# Everything under `strict-lib/v*/output/` is generated and tracked, and until
+# this workflow nothing in CI ran the generator: the other workflows only
+# format, type-check and lint the generator's *source*. A converter change that
+# moved the output, or an output edited without its converter, therefore
+# reached `main` with a green pull request. `output/diff-from-prev/` had in
+# fact gone stale that way after #1744 and #1751.
+#
+# A workflow of its own rather than a matrix entry elsewhere, because neither
+# existing gate fits what the generator reads:
+#
+# - type-check.yml gates on `z:check-should-run:code-checks`, which ignores
+#   `**.md`. The generator copies each harness's `CHANGELOG.md` into the
+#   published bundle, so a markdown-only diff — a `chore: version packages`
+#   branch is exactly that — can change the output and would skip the check.
+# - style-check.yml gates on almost nothing, which is right for formatting but
+#   would regenerate the library on every pull request in the repository.
+#
+# So it gates on `z:check-should-run:strict-lib-checks`, a list of its own.
+
+on:
+  # No `push`, not even for `main`: a merge is a squash of a branch that
+  # already contained main's tip, so its tree is one this workflow has already
+  # checked. See the trigger note in type-check.yml.
+  #
+  # `labeled` / `unlabeled` let a `[WIP]` label stop and restart the check;
+  # see the note in type-check.yml. No `paths` filter — see style-check.yml.
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# One run per pull request; a push cancels the run for the previous one. See
+# the note in type-check.yml.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Deny by default; each job grants back exactly what it needs. See the note in
+# type-check.yml.
+permissions: {}
+
+jobs:
+  # Is the branch up to date with `main`, and does the diff touch anything the
+  # generator reads? See check-gates.yml.
+  #
+  # The ignore list is `z:check-should-run:strict-lib-checks` in the root
+  # `package.json`. A pull request is skipped only when *every* changed path
+  # matches it, so a pattern belongs there only when nothing below can read the
+  # paths it matches. Why each entry is there, and why some are not:
+  #
+  # Ignored:
+  #
+  # - `experimental/`, `docs/`, `articles/`, `books/`, `verify-npm-packages/`,
+  #   `repo-settings/`, `.changeset/`: nothing the generator runs reads them.
+  #   A changeset changes the output only once `changeset version` has
+  #   rewritten a harness's `CHANGELOG.md` and `package.json`, and that
+  #   rewrite is under `strict-lib/`, which is not ignored.
+  # - `apps/`, `languages/`: the generator imports nothing from them. Their
+  #   `package.json` files are read by the `pnpm install` the generator runs
+  #   at the end, but "Install dependencies" above has already installed the
+  #   same lockfile, and `--frozen-lockfile` there fails first on a manifest
+  #   the lockfile does not match.
+  # - `LICENSE` and the style tools' own configuration (`.editorconfig`,
+  #   `.prettierrc`, `.prettierignore`, `.cspell.config.yaml`,
+  #   `**/cspell.config.yaml`, `.markdownlint-cli2.mjs`): Prettier, cspell and
+  #   markdownlint do not run here. oxfmt does, and its configuration is under
+  #   `strict-lib/`.
+  # - `*.md` and `libs/**/*.md`: markdown at the root and in the libraries.
+  #   `*.md` does not cross a `/`, so it matches `CLAUDE.md` and `README.md`
+  #   and nothing deeper.
+  #
+  # Deliberately not ignored:
+  #
+  # - `**.md`: each harness's `CHANGELOG.md` is copied into the published
+  #   bundle, and the bundle's `README.md` is generated. This is why the
+  #   workflow does not share type-check.yml's `code-checks` list.
+  # - `**.txt`: `output/diff-from-prev/*/summary.txt` is generated output.
+  # - `libs/`: the generator imports `ts-data-forge`, `ts-repo-utils`,
+  #   `ts-type-forge` and `ts-fortress` from their sources through
+  #   `tools/configs/tsconfig.tsx.json`. Listing only those four would miss the
+  #   next import someone adds, so the whole directory stays in.
+  # - `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`: a new oxfmt or
+  #   TypeScript version changes the formatted and parsed output.
+  # - `tools/`: `tsconfig.tsx.json` decides what those imports resolve to.
+  # - `.github/`: this workflow and check-gates.yml are in it.
+  #
+  # When the generator starts reading something new, check it against the
+  # list before relying on a green run.
+  gates:
+    if: >-
+      github.event_name != 'pull_request' ||
+      !contains(github.event.pull_request.labels.*.name, '[WIP]')
+    uses: ./.github/workflows/check-gates.yml
+    permissions:
+      contents: read
+      packages: read
+    with:
+      diff-scope: strict-lib
+
+  strict-lib-gen:
+    needs: gates
+    # The same three skips as type-check.yml, for the same reasons: `[WIP]`,
+    # a branch behind `main`, and a diff nothing here reads. `!cancelled()`
+    # and `!= 'false'` so that a gate that failed to answer fails open.
+    if: >-
+      !cancelled() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
+      packages: read
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The branch tip, not the merge commit: the check asserts that the
+          # branch's own output matches its own generator.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@noshiro-pf'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # No `ws:build`. Every harness runs `tsx` with
+      # `tools/configs/tsconfig.tsx.json`, which maps our packages to their
+      # sources, so the generator needs no `dist/` — measured at under two
+      # minutes for all twelve series with every `dist/` removed.
+      #
+      # `temp/copied/` is tracked, so this step fetches nothing: it reformats
+      # the upstream lib files, reruns the codemod and the converter, and
+      # regenerates `output/`. It ends with a `pnpm install` of its own, which
+      # is why the token is set here too.
+      - name: Regenerate the strict standard library
+        run: pnpm run strict-lib:gen:with-codemod-fixed
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # `output/diff-from-prev/` compares consecutive series, so it has to run
+      # after all of them have been regenerated.
+      - name: Regenerate the cross-version diffs
+        run: pnpm run strict-lib:gen:version-diff
+
+      - name: Check if there is no file diff
+        run: pnpm run z:assert-repo-is-clean
+
+  # The one required status check for this workflow. See the note on
+  # `type-check-result` in type-check.yml for why a required context is an
+  # aggregate rather than the job that does the work.
+  strict-lib-gen-result:
+    needs:
+      - gates
+      - strict-lib-gen
+    if: >-
+      always() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, '[WIP]')) &&
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.should_run != 'false'
+    runs-on: ubuntu-latest
+    # Reads `needs.*.result` and echoes. It touches nothing.
+    permissions: {}
+    timeout-minutes: 5
+
+    steps:
+      - name: Require the check above to have passed
+        env:
+          RESULT: ${{ needs.strict-lib-gen.result }}
+        run: |
+          if [ "${RESULT}" = 'success' ]; then
+            echo 'The check passed.'
+            exit 0
+          fi
+
+          summary="The check did not pass on this commit (result: ${RESULT})."
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+          exit 1

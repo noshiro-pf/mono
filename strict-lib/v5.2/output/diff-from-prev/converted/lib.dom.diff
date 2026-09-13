@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files/lib.dom.d.ts b/v5.2/output/lib-files/lib.dom.d.ts
-index e6bad6782..c093eb8f6 100644
+index e6bad678240ca64d3c970bcd7e6d94ff19763b61..c093eb8f6cc55e7f78ec20e2f0b1e55d6cccb76d 100644
 --- a/v5.1/output/lib-files/lib.dom.d.ts
 +++ b/v5.2/output/lib-files/lib.dom.d.ts
 @@ -734,6 +734,7 @@ interface Keyframe {

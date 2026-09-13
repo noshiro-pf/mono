@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.es2022.array.d.ts b/v5.7/output/lib-files/lib.es2022.array.d.ts
-index b4e4d05fc..6589528b9 100644
+index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612851ee030 100644
 --- a/v5.6/output/lib-files/lib.es2022.array.d.ts
 +++ b/v5.7/output/lib-files/lib.es2022.array.d.ts
 @@ -16,7 +16,7 @@ interface ReadonlyArray<T> {

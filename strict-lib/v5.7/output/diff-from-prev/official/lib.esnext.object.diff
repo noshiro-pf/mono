@@ -1,6 +1,6 @@
 diff --git a/v5.6/temp/copied/lib.esnext.object.d.ts b/v5.6/temp/copied/lib.esnext.object.d.ts
 deleted file mode 100644
-index 368e66f93..000000000
+index 368e66f939493feebc8a3653d0eab923ad03a97b..0000000000000000000000000000000000000000
 --- a/v5.6/temp/copied/lib.esnext.object.d.ts
 +++ /dev/null
 @@ -1,28 +0,0 @@

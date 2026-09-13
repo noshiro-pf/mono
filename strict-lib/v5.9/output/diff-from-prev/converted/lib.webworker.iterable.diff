@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files/lib.webworker.iterable.d.ts b/v5.9/output/lib-files/lib.webworker.iterable.d.ts
-index ffca25e54..a9b3f24e5 100644
+index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed31902cec6602 100644
 --- a/v5.8/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.9/output/lib-files/lib.webworker.iterable.d.ts
 @@ -26,7 +26,11 @@ interface CSSUnparsedValue {

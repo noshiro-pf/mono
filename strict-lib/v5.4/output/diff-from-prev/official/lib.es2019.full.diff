@@ -1,5 +1,5 @@
 diff --git a/v5.3/temp/copied/lib.es2019.full.d.ts b/v5.4/temp/copied/lib.es2019.full.d.ts
-index 8a9e80c1d..6031b8146 100644
+index 8a9e80c1d9211881099ab76382010b9393d10bd4..6031b81468a586116fbf9b0b530f464b5995222e 100644
 --- a/v5.3/temp/copied/lib.es2019.full.d.ts
 +++ b/v5.4/temp/copied/lib.es2019.full.d.ts
 @@ -20,3 +20,4 @@ and limitations under the License.

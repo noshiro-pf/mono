@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2021.d.ts b/v6.0/output/lib-files-branded/lib.es2021.d.ts
-index 6f059fb32..15890a852 100644
+index 6f059fb3266364a3fda8a10f14b99623ecb0576e..15890a852bbde781f5614fbd8598dcb741742c77 100644
 --- a/v5.9/output/lib-files-branded/lib.es2021.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2021.d.ts
 @@ -1,5 +1,3 @@

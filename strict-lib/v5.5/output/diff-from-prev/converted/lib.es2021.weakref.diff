@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.es2021.weakref.d.ts b/v5.5/output/lib-files/lib.es2021.weakref.d.ts
-index 6d134ad5c..48a16d0b7 100644
+index 6d134ad5c044dff9dd0b9f0d341311b829a5c2e8..48a16d0b7b1deba784a6537b1d92af5e0f25492f 100644
 --- a/v5.4/output/lib-files/lib.es2021.weakref.d.ts
 +++ b/v5.5/output/lib-files/lib.es2021.weakref.d.ts
 @@ -44,7 +44,7 @@ interface FinalizationRegistry<T> {

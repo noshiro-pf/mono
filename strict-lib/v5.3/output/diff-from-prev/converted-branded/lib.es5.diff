@@ -1,8 +1,8 @@
 diff --git a/v5.2/output/lib-files-branded/lib.es5.d.ts b/v5.3/output/lib-files-branded/lib.es5.d.ts
-index 9cd98c4f9..cd0d714d4 100644
+index 2803eda339b02f6b6caa9788235aaab6c3482bc7..00c598456f1701cd66de1976293c4debbf80f9d0 100644
 --- a/v5.2/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.3/output/lib-files-branded/lib.es5.d.ts
-@@ -731,7 +731,8 @@ interface ImportMeta {}
+@@ -741,7 +741,8 @@ interface ImportMeta {}
   * augmented via interface merging.
   */
  interface ImportCallOptions {
@@ -12,7 +12,7 @@ index 9cd98c4f9..cd0d714d4 100644
  }
  
  /**
-@@ -741,6 +742,13 @@ interface ImportAssertions {
+@@ -751,6 +752,13 @@ interface ImportAssertions {
    readonly [key: string]: string;
  }
  

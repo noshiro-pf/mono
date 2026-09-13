@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2018.asyncgenerator.d.ts b/v6.0/output/lib-files-branded/lib.es2018.asyncgenerator.d.ts
-index f45b0d819..ed5d3d50f 100644
+index f45b0d819610922bd6d44ceff57fbe0639c2a082..ed5d3d50f93c1565b91836039912f33b4d7afdb9 100644
 --- a/v5.9/output/lib-files-branded/lib.es2018.asyncgenerator.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2018.asyncgenerator.d.ts
 @@ -1,5 +1,3 @@

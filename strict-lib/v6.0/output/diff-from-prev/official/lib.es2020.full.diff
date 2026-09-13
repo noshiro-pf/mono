@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2020.full.d.ts b/v6.0/temp/copied/lib.es2020.full.d.ts
-index 0f5cacf5f..2c80d06bb 100644
+index 0f5cacf5f2f9d6cf8f0624b88aaa1b7a4d169f86..2c80d06bb5c8d867192e33ec6cca29c0ef61e034 100644
 --- a/v5.9/temp/copied/lib.es2020.full.d.ts
 +++ b/v6.0/temp/copied/lib.es2020.full.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

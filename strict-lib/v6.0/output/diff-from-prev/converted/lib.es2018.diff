@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.es2018.d.ts b/v6.0/output/lib-files/lib.es2018.d.ts
-index 3fc3ce9d8..218b00883 100644
+index 3fc3ce9d873a5c91687224bad92d7ddac85a75ed..218b00883b9f69f0a7fb7ebb916d212942efbab4 100644
 --- a/v5.9/output/lib-files/lib.es2018.d.ts
 +++ b/v6.0/output/lib-files/lib.es2018.d.ts
 @@ -1,5 +1,3 @@

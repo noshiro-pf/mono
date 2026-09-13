@@ -1,6 +1,6 @@
 diff --git a/v6.0/temp/copied/lib.esnext.temporal.d.ts b/v6.0/temp/copied/lib.esnext.temporal.d.ts
 new file mode 100644
-index 000000000..a8d43fed2
+index 0000000000000000000000000000000000000000..a8d43fed21be513c22e72c7cfb5236fa126a89b0
 --- /dev/null
 +++ b/v6.0/temp/copied/lib.esnext.temporal.d.ts
 @@ -0,0 +1,684 @@

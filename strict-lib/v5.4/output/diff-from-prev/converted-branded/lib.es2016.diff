@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2016.d.ts b/v5.4/output/lib-files-branded/lib.es2016.d.ts
-index ccd1e1324..09d2179d8 100644
+index ccd1e132472bd0fa4036a20fef7bdf267bcca2d3..09d2179d801f6026d00d39e7bad41d02bd811a8b 100644
 --- a/v5.3/output/lib-files-branded/lib.es2016.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2016.d.ts
 @@ -2,3 +2,4 @@

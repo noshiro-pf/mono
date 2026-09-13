@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.dom.d.ts b/v5.4/output/lib-files-branded/lib.dom.d.ts
-index 6ce12613b..faac081d8 100644
+index 6ce12613bc17c14d42069c5b1f638f1d2d2fc0b6..faac081d8c2fe3367d94e98a4c1dabe36ea4cbb3 100644
 --- a/v5.3/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.dom.d.ts
 @@ -120,6 +120,7 @@ interface AuthenticationExtensionsClientInputs {

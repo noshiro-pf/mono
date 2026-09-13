@@ -1,5 +1,5 @@
 diff --git a/v5.9/temp/copied/lib.es2018.promise.d.ts b/v6.0/temp/copied/lib.es2018.promise.d.ts
-index 34f8873fb..bbe29f95e 100644
+index 34f8873fbb34bfa9142aaf45686173d500080866..bbe29f95e3065555f683e0dec7ee7936610ed253 100644
 --- a/v5.9/temp/copied/lib.es2018.promise.d.ts
 +++ b/v6.0/temp/copied/lib.es2018.promise.d.ts
 @@ -7,14 +7,12 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.webworker.iterable.d.ts b/v6.0/output/lib-files-branded/lib.webworker.iterable.d.ts
-index 76cfed992..3b3e55b7a 100644
+index 76cfed992ab5847046b53b1516d58da1c5f1236d..3b3e55b7a43b5d3e58dd5f54d1ef8f082227a35a 100644
 --- a/v5.9/output/lib-files-branded/lib.webworker.iterable.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.webworker.iterable.d.ts
 @@ -1,630 +1,2 @@

@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
-index bd305cae9..a74f7c064 100644
+index bd305cae94e6e9b55356ca289d83cec9adde317c..a74f7c0643dc1e325444161dc9c124a8361777d6 100644
 --- a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
 @@ -1,5 +1,7 @@

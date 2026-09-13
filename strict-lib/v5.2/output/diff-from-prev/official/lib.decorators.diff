@@ -1,5 +1,5 @@
 diff --git a/v5.1/temp/copied/lib.decorators.d.ts b/v5.2/temp/copied/lib.decorators.d.ts
-index 2f8c163ee..17059007f 100644
+index 2f8c163ee7939632495c11a290eca238ee19f7d9..17059007fd409d9bc1c9744ef870ede90804ab5b 100644
 --- a/v5.1/temp/copied/lib.decorators.d.ts
 +++ b/v5.2/temp/copied/lib.decorators.d.ts
 @@ -30,6 +30,14 @@ type ClassMemberDecoratorContext =

@@ -1,5 +1,5 @@
 diff --git a/v5.3/temp/copied/lib.esnext.disposable.d.ts b/v5.4/temp/copied/lib.esnext.disposable.d.ts
-index 1594dcdbe..8cc9d429f 100644
+index 1594dcdbe2189690f735310f1aa40024360c3278..8cc9d429fcfa6a4ab90dd99d96792252ca81ceef 100644
 --- a/v5.3/temp/copied/lib.esnext.disposable.d.ts
 +++ b/v5.4/temp/copied/lib.esnext.disposable.d.ts
 @@ -42,7 +42,7 @@ interface SuppressedError extends Error {
