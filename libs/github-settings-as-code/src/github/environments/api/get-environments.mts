@@ -102,7 +102,7 @@ const parseProtectionRules = (
 ): Readonly<{
   wait_timer: number;
   prevent_self_review: boolean;
-  reviewers: readonly { type: 'User' | 'Team'; id: number }[];
+  reviewers: readonly Readonly<{ type: 'User' | 'Team'; id: number }>[];
 }> => {
   const validationResult = ProtectionRules.validate(protectionRules ?? []);
 

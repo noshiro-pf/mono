@@ -51,7 +51,7 @@ export const setEnvironment = async (
  * その間だけ deploy できない ref ができる。
  */
 const keyOf = (policy: Readonly<{ name: string; type: string }>): string =>
-  `${policy.type}:${policy.name}`;
+  `${policy.type}:${policy.name}` as const;
 
 const setDeploymentBranchPolicies = async (
   settings: EnvironmentSettings,
