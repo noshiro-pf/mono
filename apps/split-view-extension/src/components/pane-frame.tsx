@@ -43,6 +43,19 @@ import { PaneFallback } from './pane-fallback.js';
 const greetingGraceMs = 800;
 
 /**
+ * How many times a pane clears an always-clear site's workers by itself before
+ * it stops and says so.
+ *
+ * Two: one clear is what the ordinary case needs, and the second covers the
+ * clear that arrives too early — a worker registered while the page was
+ * loading is not there yet when the clear runs, so the load after it is
+ * answered from the worker after all. Past that, the thing keeping the pane
+ * from loading is not a worker, and a pane that reloads every second is worse
+ * than a pane that says it did not load.
+ */
+const maxAutomaticClears = 2;
+
+/**
  * The backstop, for a frame that does not even get as far as loading.
  *
  * A request the server never answers has no `load` event to read, and neither
@@ -217,6 +230,18 @@ export const PaneFrame = memoNamed(
     const [fallbackDismissed, setFallbackDismissed] = React.useState(false);
 
     /**
+     * Automatic service-worker clears made since the last document that
+     * loaded.
+     *
+     * A budget, because a site that registers its worker on every visit turns
+     * the automatic clear into a loop otherwise: the clear gets the page back,
+     * the page registers the worker again, the next load is answered from it,
+     * and the pane reloads for as long as anyone watches. Spending the budget
+     * leaves the fallback up instead, which offers the same clear as a button.
+     */
+    const [automaticClears, setAutomaticClears] = React.useState(0);
+
+    /**
      * A hidden frame at the site's origin, used to reach a page of that site
      * when the pane itself cannot load one: it is where the site's service
      * worker can be unregistered from. See `frame-agent.mts`.
@@ -271,6 +296,20 @@ export const PaneFrame = memoNamed(
     const alwaysReset =
       siteOrigin !== undefined && resetOrigins.includes(siteOrigin);
 
+    /**
+     * A clear is running, or is about to run, so this pane has not finished
+     * failing.
+     *
+     * Without this the automatic clear is a message and a reload, several times
+     * over, at a user who asked for one page: each attempt loads, is found to
+     * be blocked, puts the fallback up and then reloads out from under it. The
+     * pane simply keeps loading until the attempts are spent.
+     */
+    const clearingAutomatically =
+      alwaysReset &&
+      blockedBySite &&
+      (resetUrl !== undefined || automaticClears < maxAutomaticClears);
+
     /** The load a reset was already attempted for, so it happens once. */
     const [resetAttemptedFor, setResetAttemptedFor] = React.useState<
       string | undefined
@@ -305,11 +344,21 @@ export const PaneFrame = memoNamed(
         }
 
         if (message.kind === 'service-workers') {
-          setServiceWorkersRemoved(message.count);
+          // Two clears reach here and only one of them is a repair. The helper
+          // frame's is: the pane is blocked, the worker that was answering for
+          // it is gone, and the reload is what finally shows the page. The one
+          // sent into a pane that is *working* is housekeeping — the site
+          // registers a worker on every visit and the next navigation would be
+          // the one it answers — and reloading after that throws away the page
+          // the user is reading, about 40ms after it arrived. Measured: it
+          // doubled every load on an origin on the list.
+          if (fromReset) {
+            setServiceWorkersRemoved(message.count);
 
-          setResetUrl(undefined);
+            setResetUrl(undefined);
 
-          dispatch({ type: 'reload', paneId: pane.id });
+            dispatch({ type: 'reload', paneId: pane.id });
+          }
 
           return;
         }
@@ -341,6 +390,11 @@ export const PaneFrame = memoNamed(
         mut_reportsSinceLoad.current += 1;
 
         setFrameBlocked(false);
+
+        // A document that answered is a document that loaded, so whatever the
+        // automatic clears below have spent getting here, they have spent it
+        // well and start again from the next failure.
+        setAutomaticClears(0);
 
         dispatch({
           type: 'report',
@@ -552,15 +606,13 @@ export const PaneFrame = memoNamed(
         return;
       }
 
-      // The last clear found no worker to remove, so the next one would find
-      // none either: whatever is keeping this pane from loading is not a
-      // service worker. Reloading on a timer forever is worse than a pane that
-      // says it did not load.
-      if (serviceWorkersRemoved === 0) {
+      if (automaticClears >= maxAutomaticClears) {
         return;
       }
 
       setResetAttemptedFor(loadKey);
+
+      setAutomaticClears((count) => count + 1);
 
       setResetUrl(`${siteOrigin}/`);
     }, [
@@ -568,23 +620,25 @@ export const PaneFrame = memoNamed(
       blockedBySite,
       resetUrl,
       resetAttemptedFor,
-      serviceWorkersRemoved,
+      automaticClears,
       loadKey,
       siteOrigin,
     ]);
 
     // And while such a pane is loading fine, the worker is kept away: the site
     // registers it again on every visit, and the next navigation would be the
-    // one to fail.
+    // one to fail. Once per load rather than once per pane — every document is
+    // another chance for the site to register one — and nobody hears it in a
+    // document that failed to load, which is what the clear above is for.
     React.useEffect(() => {
-      if (alwaysReset && agentSeen) {
+      if (alwaysReset && loadCount > 0) {
         sendToFrame({
           tag: splitViewMessageTag,
           kind: 'unregister-service-workers',
           paneId: pane.id,
         });
       }
-    }, [alwaysReset, agentSeen, sendToFrame, pane.id]);
+    }, [alwaysReset, loadCount, sendToFrame, pane.id]);
 
     const handleResetFrameLoad = React.useCallback((): void => {
       const target = resetFrame?.contentWindow;
@@ -1120,7 +1174,7 @@ export const PaneFrame = memoNamed(
           {/* Over the frame rather than instead of it: the element stays in
               the document, because taking it out and putting it back is a
               reload. */}
-          {blocked && !fallbackDismissed ? (
+          {blocked && !fallbackDismissed && !clearingAutomatically ? (
             <PaneFallback
               address={agentSeen ? undefined : address}
               canClearServiceWorkers={canClearServiceWorkers}

@@ -7,6 +7,7 @@ import {
   registryFromStoredWorkspaces,
   removeWorkspaceEntry,
   renameWorkspaceEntry,
+  setWorkspaceEntryPinned,
   workspaceAtPosition,
   workspaceEntryOf,
   workspacePositionOf,
@@ -23,6 +24,7 @@ const registryOf = (
       id: `id-${String(index)}`,
       name: label,
       createdAt: index,
+      pinned: false,
     })),
     activeId: activeId ?? 'id-0',
   }) as const;
@@ -56,6 +58,7 @@ describe('addWorkspaceEntry', () => {
       id: 'new',
       name: 'b',
       createdAt: 5,
+      pinned: false,
     });
 
     assert.deepStrictEqual(labelsOf(next), ['a', 'b']);
@@ -68,6 +71,7 @@ describe('addWorkspaceEntry', () => {
       addWorkspaceEntry(registry, {
         id: 'id-0',
         name: 'again',
+        pinned: false,
         createdAt: 5,
       }) === registry,
     );
@@ -210,12 +214,12 @@ describe('parseWorkspaceRegistry', () => {
     assert.deepStrictEqual(
       parseWorkspaceRegistry({
         version: 1,
-        entries: [{ id: 'a', name: '調査', createdAt: 7 }],
+        entries: [{ id: 'a', name: '調査', createdAt: 7, pinned: false }],
         activeId: 'a',
       }),
       {
         version: 1,
-        entries: [{ id: 'a', name: '調査', createdAt: 7 }],
+        entries: [{ id: 'a', name: '調査', createdAt: 7, pinned: false }],
         activeId: 'a',
       },
     );
@@ -234,7 +238,7 @@ describe('parseWorkspaceRegistry', () => {
 
     assert.deepStrictEqual(parsed, {
       version: 1,
-      entries: [{ id: 'a', name: 'a', createdAt: 0 }],
+      entries: [{ id: 'a', name: 'a', createdAt: 0, pinned: false }],
       activeId: 'a',
     });
   });
@@ -243,5 +247,28 @@ describe('parseWorkspaceRegistry', () => {
     assert.deepStrictEqual(parseWorkspaceRegistry(undefined), undefined);
 
     assert.deepStrictEqual(parseWorkspaceRegistry({ version: 1 }), undefined);
+  });
+});
+
+describe('setWorkspaceEntryPinned', () => {
+  test('records that the tab a workspace is in was pinned', () => {
+    const next = setWorkspaceEntryPinned(registryOf(['a', 'b']), 'id-1', true);
+
+    assert.deepStrictEqual(
+      next.entries.map((entry) => entry.pinned),
+      [false, true],
+    );
+  });
+
+  // It is called every time the page is looked at, and a registry written back
+  // is a registry every other tab is told about.
+  test('leaves the registry alone when it already says so', () => {
+    const registry = setWorkspaceEntryPinned(registryOf(['a']), 'id-0', true);
+
+    assert.isTrue(setWorkspaceEntryPinned(registry, 'id-0', true) === registry);
+
+    assert.isTrue(
+      setWorkspaceEntryPinned(registry, 'not-on-the-list', true) === registry,
+    );
   });
 });

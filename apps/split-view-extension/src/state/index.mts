@@ -1,4 +1,5 @@
 export * from './backup.mjs';
+export * from './open-workspaces.mjs';
 export * from './reducer.mjs';
 export * from './registry.mjs';
 export * from './storage.mjs';

@@ -8,13 +8,14 @@ import { Icon } from './icon.js';
 
 type Props = Readonly<{
   activeId: string | undefined;
-  /** What the last import, or a refused one, had to say. */
+  /** What the last import or the last "open all" had to say. */
   notice: string | undefined;
   registry: WorkspaceRegistry;
   onCreate: () => void;
   onExport: () => void;
   onImport: (text: string) => void;
   onMove: (workspaceId: string, offset: number) => void;
+  onOpenAll: () => void;
   onOpenInNewTab: (workspaceId: string) => void;
   onRemove: (workspaceId: string) => void;
   onRename: (workspaceId: string, workspaceName: string) => void;
@@ -45,6 +46,7 @@ export const WorkspacePicker = memoNamed(
     onExport,
     onImport,
     onMove,
+    onOpenAll,
     onOpenInNewTab,
     onRemove,
     onRename,
@@ -145,7 +147,7 @@ export const WorkspacePicker = memoNamed(
           aria-expanded={editing}
           className={'top-bar__button'}
           title={
-            'Rename, reorder or delete this split view, open it in a tab of its own, export and import'
+            'Rename, reorder or delete this split view, open one or all of them in tabs, export and import'
           }
           type={'button'}
           onClick={handleToggleEditing}
@@ -160,6 +162,7 @@ export const WorkspacePicker = memoNamed(
             onExport={onExport}
             onImport={onImport}
             onMove={onMove}
+            onOpenAll={onOpenAll}
             onOpenInNewTab={onOpenInNewTab}
             onRemove={onRemove}
             onRename={onRename}
@@ -178,6 +181,7 @@ const WorkspaceEditor = memoNamed(
     onExport,
     onImport,
     onMove,
+    onOpenAll,
     onOpenInNewTab,
     onRemove,
     onRename,
@@ -187,6 +191,7 @@ const WorkspaceEditor = memoNamed(
     onExport: () => void;
     onImport: (text: string) => void;
     onMove: (workspaceId: string, offset: number) => void;
+    onOpenAll: () => void;
     onOpenInNewTab: (workspaceId: string) => void;
     onRemove: (workspaceId: string) => void;
     onRename: (workspaceId: string, workspaceName: string) => void;
@@ -348,6 +353,17 @@ const WorkspaceEditor = memoNamed(
         </div>
 
         <div className={'workspace-popover__row workspace-popover__row--last'}>
+          <button
+            className={'top-bar__button'}
+            title={
+              'Open every saved split view, each in a tab of its own. The ones already open in a tab are left where they are, and one last seen in a pinned tab comes back pinned.'
+            }
+            type={'button'}
+            onClick={onOpenAll}
+          >
+            {'\u{2197} Open all'}
+          </button>
+
           <button
             className={'top-bar__button'}
             title={

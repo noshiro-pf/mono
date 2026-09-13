@@ -89,6 +89,7 @@ export const importWorkspacesFromJson = async (
             id: workspace.id,
             name: uniqueName(acc, workspace.name),
             createdAt: now,
+            pinned: false,
           })
         : renameWorkspaceEntry(acc, workspace.id, workspace.name),
     registry,

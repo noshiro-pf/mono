@@ -339,6 +339,19 @@ const main = async (): Promise<void> => {
       .then(() => true)
       .catch(() => false);
 
+    // And a page on that origin which registers a worker on every visit — what
+    // a real one does — is loaded once and left alone. It used to be loaded
+    // twice: the clear that keeps the worker away from the *next* navigation
+    // was followed by a reload, about 40ms after the page arrived, and the
+    // page that came back registered another worker for the next one to find.
+    await address.fill(`http://localhost:${String(serverPort)}/sw-loop`);
+
+    await address.press('Enter');
+
+    await page.waitForTimeout(6000);
+
+    const loopPageLoads = server.hits('/sw-loop');
+
     // --- the fallback shown in place of a page that will not load ------
     // The pane is at the service-worker page above, which loaded in the end;
     // an address the browser refuses outright is the other half of it, and it
@@ -465,6 +478,88 @@ const main = async (): Promise<void> => {
         return fs.readFileSync(downloadPath, 'utf8');
       })
       .catch(() => '');
+
+    // --- opening every saved split view at once -------------------------
+    // Still in the popover. Two are saved and one of them is open here, so
+    // this should open exactly one tab.
+    await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+    await page.waitForTimeout(2000);
+
+    const tabsAfterOpenAll = context.pages().length;
+
+    const otherTab = context.pages().find((tab) => tab !== page);
+
+    const otherTabUrl = otherTab?.url() ?? '';
+
+    // Pressing it again opens nothing: two tabs on one workspace are two tabs
+    // saving one layout over each other.
+    await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+    await page.waitForTimeout(2000);
+
+    const tabsAfterOpeningTwice = context.pages().length;
+
+    const openAllNotice = await page
+      .locator('.workspace-popover__notice')
+      .innerText();
+
+    // And a split view last seen in a pinned tab comes back pinned. Pinning is
+    // noticed when the tab is left, which is when it is about to matter.
+    const otherTabId = await otherTab?.evaluate(async () => {
+      const own = await chrome.tabs.getCurrent();
+
+      return own?.id;
+    });
+
+    if (otherTab !== undefined && otherTabId !== undefined) {
+      await otherTab.evaluate(
+        async ([tabId]) => {
+          await chrome.tabs.update(tabId, { pinned: true });
+        },
+        [otherTabId],
+      );
+
+      // A load is one of the moments a tab takes notes about itself, and the
+      // only one this harness can produce: a background tab goes on reporting
+      // itself as visible here, so nothing can be made of the events a real
+      // browser would send. It is also what Chrome does to a pinned tab it
+      // restores at startup.
+      await otherTab.reload();
+
+      await otherTab.waitForSelector('.pane', { timeout: 10_000 });
+
+      await page.waitForTimeout(1000);
+
+      await otherTab.close();
+
+      await page.waitForTimeout(500);
+
+      await page.locator('.top-bar__button[title*="Open every saved"]').click();
+
+      await page.waitForTimeout(2000);
+    }
+
+    const reopenedPinned =
+      (await context
+        .pages()
+        .find((tab) => tab !== page)
+        ?.evaluate(async () => {
+          const own = await chrome.tabs.getCurrent();
+
+          return own?.pinned;
+        })) ?? false;
+
+    // Back to one tab: the next thing this does is delete a workspace, and a
+    // second tab open on one is a second opinion about what is saved.
+    await Promise.all(
+      context
+        .pages()
+        .filter((tab) => tab !== page)
+        .map(async (tab) => tab.close()),
+    );
+
+    await page.waitForTimeout(500);
 
     // The popover is still open from the rename — `✎` toggles, so clicking it
     // again would close it.
@@ -724,6 +819,11 @@ const main = async (): Promise<void> => {
         '',
       ),
       check(
+        'a page that registers a worker on every visit is loaded once',
+        loopPageLoads === 1,
+        loopPageLoads,
+      ),
+      check(
         'a pane showing a page leaves it alone',
         fallbackWhileLoaded === 0,
         fallbackWhileLoaded,
@@ -777,6 +877,21 @@ const main = async (): Promise<void> => {
         'renaming reaches the picker and the tab title',
         renamedOption.includes('検証') && renamedTitle === '2: 検証',
         `${renamedOption} / ${renamedTitle}`,
+      ),
+      check(
+        'opening every split view gives a tab to the one not open',
+        tabsAfterOpenAll === 2 && otherTabUrl.includes('ws='),
+        `${String(tabsAfterOpenAll)} tabs / ${otherTabUrl.slice(-24)}`,
+      ),
+      check(
+        'and asking again opens nothing, saying so instead',
+        tabsAfterOpeningTwice === 2 && openAllNotice.includes('already open'),
+        `${String(tabsAfterOpeningTwice)} tabs / ${openAllNotice}`,
+      ),
+      check(
+        'a split view last seen in a pinned tab comes back pinned',
+        reopenedPinned,
+        '',
       ),
       check(
         'the export writes a backup of every saved split view',
@@ -919,8 +1034,13 @@ const assertBuildIsPresent = (): void => {
  * the page cannot see except through the content script.
  */
 const startPageServer = async (): Promise<
-  Readonly<{ close: () => Promise<void> }>
+  Readonly<{ hits: (route: string) => number; close: () => Promise<void> }>
 > => {
+  // What each route has been asked for, so that a pane reloading itself in a
+  // loop is something the test can see. Nothing else can see it: the reloads
+  // are a fraction of a second apart and the pane looks the same after each.
+  const mut_hits = new Map<string, number>();
+
   const firstPage = [
     '<!doctype html><html lang="en"><head><title>Refuses Framing</title></head>',
     '<body><h1 id="hello">framed anyway</h1>',
@@ -957,6 +1077,35 @@ const startPageServer = async (): Promise<
     '});',
   ].join('\n');
 
+  // A page that behaves like a signed-in GitHub: it is framed fine from the
+  // network, and it registers a worker on every visit which then answers the
+  // *same* address from its cache — a response no rule can reach, so the load
+  // after it is blocked. A pane on an always-clear origin used to answer that
+  // by clearing the worker out of the page it had just loaded and reloading
+  // it, which the site answered by registering another one.
+  const loopPage = [
+    '<!doctype html><html lang="en"><head><title>SW Loop</title></head><body>',
+    '<h1 id="sw-loop">sw loop</h1>',
+    "<script>navigator.serviceWorker.register('/sw-loop.js')</script>",
+    '</body></html>',
+  ].join('');
+
+  const loopScript = [
+    "self.addEventListener('install', (e) => e.waitUntil((async () => {",
+    "  const cache = await caches.open('loop');",
+    "  await cache.put('/sw-loop', new Response(",
+    '    \'<!doctype html><html lang="en"><head><title>SW Loop</title></head><body><h1 id="sw-loop">from the cache</h1></body></html>\',',
+    "    { headers: { 'content-type': 'text/html; charset=utf-8', 'x-frame-options': 'DENY' } }));",
+    '  await self.skipWaiting();',
+    '})()));',
+    "self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));",
+    "self.addEventListener('fetch', (e) => {",
+    "  if (new URL(e.request.url).pathname === '/sw-loop') {",
+    "    e.respondWith(caches.match('/sw-loop'));",
+    '  }',
+    '});',
+  ].join('\n');
+
   const serviceWorkerTarget = [
     '<!doctype html><html lang="en"><head><title>SW Target</title></head>',
     '<body><h1 id="sw-target">sw target</h1></body></html>',
@@ -975,13 +1124,27 @@ const startPageServer = async (): Promise<
     ) => {
       const route = (request.url ?? '/').split('?', 1)[0];
 
-      if (route === '/sw.js') {
+      mut_hits.set(route ?? '/', (mut_hits.get(route ?? '/') ?? 0) + 1);
+
+      if (route === '/sw.js' || route === '/sw-loop.js') {
         response.writeHead(200, {
           'content-type': 'text/javascript; charset=utf-8',
           'cache-control': 'no-store',
         });
 
-        response.end(serviceWorkerScript);
+        response.end(route === '/sw.js' ? serviceWorkerScript : loopScript);
+
+        return;
+      }
+
+      if (route === '/sw-loop') {
+        response.writeHead(200, {
+          'content-type': 'text/html; charset=utf-8',
+          'cache-control': 'no-store',
+          'x-frame-options': 'DENY',
+        });
+
+        response.end(loopPage);
 
         return;
       }
@@ -1019,6 +1182,7 @@ const startPageServer = async (): Promise<
   });
 
   return {
+    hits: (route: string): number => mut_hits.get(route) ?? 0,
     close: async (): Promise<void> => {
       await new Promise<void>((resolve) => {
         server.close(() => {

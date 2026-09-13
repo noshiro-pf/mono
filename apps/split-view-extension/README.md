@@ -9,6 +9,74 @@ layout and the addresses across a reload.
 
 Not published anywhere. It is loaded unpacked, in developer mode.
 
+![Four pages in one tab, in a 2×2 grid](./docs/screenshots/1-grid.png)
+
+## What it is for
+
+Reading the documentation beside the code review beside the log. Keeping a
+dashboard, a chat and a ticket in view at once without arranging four windows
+by hand. Comparing the same page in two environments. Anything where you would
+otherwise be switching tabs back and forth — put the pages side by side in one
+tab, and keep that arrangement for the next time.
+
+- **As many panes as you like.** Start from a preset — columns, rows, a 2×2 or
+  2×3 grid, one large pane beside two small ones — and split any pane again,
+  to the right or downwards, as often as you want. Drag a divider to change the
+  sizes.
+- **Every pane is a real page.** It has its own address bar, back and forward
+  buttons, reload, and its own history. Links work, and the page stays live
+  while you look at the one beside it.
+- **It is all still there tomorrow.** The layout, and the page each pane had
+  navigated to, are saved as you go: reload the tab, restart the browser, or
+  reopen a closed tab and everything comes back where it was.
+- **Nothing leaves your computer.** No account, no server, no analytics — the
+  layouts live in the browser's own extension storage.
+
+### Zoom one pane, not the whole tab
+
+![The bottom-left pane zoomed out to 75%, the others at 100%](./docs/screenshots/2-zoom.png)
+
+`−` / `+` in a pane's toolbar, or `Ctrl` + wheel over it, zooms that pane alone.
+A site laid out for a wide window fits a narrow pane, and a small one can be
+made readable — something a browser window cannot do to a quarter of itself.
+The zoom is saved with the layout.
+
+### Rearrange without reloading
+
+![A pane being dragged onto another, with "Swap" shown on the target](./docs/screenshots/3-move.png)
+
+Drag a pane by the grip at the left of its toolbar. Drop it on the middle of
+another pane to swap the two, or on an edge to take that side of it. The page
+is not reloaded, so it keeps its scroll position, its history and whatever you
+had typed into it.
+
+### Keep several split views, and switch between them
+
+![The Edit popover open over the list of saved split views](./docs/screenshots/4-saved.png)
+
+One set of panes for writing, another for monitoring, another for a project you
+come back to once a week. The select at the left of the toolbar lists them;
+`＋` adds one, and **`Alt+1` … `Alt+9`** jumps to one by position — even with
+the focus inside a pane. **Edit** renames, reorders, opens one in a tab of its
+own or deletes it, and **↗ Open all** puts every saved split view in a tab of its
+own at once — the button for after a restart that did not bring the tabs back.
+**Export** / **Import** carry the whole list to another machine as one JSON
+file.
+
+### When a page will not show
+
+Most sites ask not to be shown inside another page. For its own panes, in the
+tab a split view is open in, the extension removes that refusal, and ordinary
+browsing in every other tab is left exactly as it was. A few pages cannot be
+framed by anything — `chrome://` pages, the Chrome Web Store — and a pane
+showing one of those says so, with a button to open the address in an ordinary
+tab instead. The details, and the one or two cases that need a click, are in
+["What will not open in a pane, and why"](#what-will-not-open-in-a-pane-and-why).
+
+The screenshots are taken by `pnpm run screenshots` against placeholder pages
+the script serves itself; it writes them both to `pack/screenshots/`, for the
+store listing, and to `docs/screenshots/`, for this README.
+
 ## Development setup
 
 From the repository root, once — see [Setup](../../README.md#setup) for Node,
@@ -127,6 +195,19 @@ browser — `xvfb-run -a pnpm run smoke` where there is no display.
   the number in the favicon — so reordering is how a split view is given a
   shorter shortcut. Deleting takes the layout with it, and needs a second
   click.
+- **`↗ Open all` opens every saved split view, each in a tab of its own** —
+  what to press after a browser restart that did not restore the tabs. The ones
+  already open in a tab are left where they are, because two tabs on one split
+  view both save its layout and the one closed last writes over the other's
+  work; the popover says how many it opened and how many were already there.
+    - **One last seen in a pinned tab comes back pinned.** No event a page can
+      hear says that its own tab has been pinned, and the one the browser does
+      offer — `chrome.tabs.onUpdated` — wakes the service worker for every
+      navigation, title and icon change in every tab there is. So the page asks
+      about itself instead, at the moments a pin has probably just happened:
+      when it loads, when the focus leaves it (pinning is done in the tab
+      strip), when it is switched away from, and every 30 seconds otherwise. A
+      tab pinned and closed in the same breath comes back unpinned.
 - **`Export` / `Import` are the way across an extension id that changed** —
   see "The list, and what it is keyed to" below.
 - The toolbar button opens the split view you had last, or focuses the tab if

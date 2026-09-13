@@ -3,9 +3,11 @@ import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   ensureInitiatorRule,
   eventLogSessionKey,
+  forgetOpenSplitViewTab,
   headerRuleIdForTab,
   installHeaderRule,
   maxEventLogEntries,
+  moveOpenSplitViewTab,
   removeHeaderRule,
   splitViewPagePath,
   splitViewTabIdSessionKey,
@@ -268,6 +270,8 @@ const moveHeaderRule = async (
 
   await installHeaderRule(addedTabId);
 
+  await moveOpenSplitViewTab(removedTabId, addedTabId);
+
   const stored = await chrome.storage.session.get(splitViewTabIdSessionKey);
 
   if (stored[splitViewTabIdSessionKey] === removedTabId) {
@@ -283,6 +287,12 @@ const forgetTab = async (tabId: number): Promise<void> => {
   if (stored[splitViewTabIdSessionKey] === tabId) {
     await chrome.storage.session.remove(splitViewTabIdSessionKey);
   }
+
+  // The page cannot take itself off the list of open split views — the tab is
+  // gone by the time it would — so this is where a closed one is forgotten.
+  // "Open every split view" checks the browser as well, because a tab that
+  // went while the worker was asleep is not announced to anybody.
+  await forgetOpenSplitViewTab(tabId);
 
   await removeHeaderRule(tabId);
 };
