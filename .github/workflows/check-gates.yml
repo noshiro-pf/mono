@@ -40,7 +40,7 @@ name: Check Gates
 #
 # ## Why a workflow of its own
 #
-# `workflow_call` rather than the same shell copied into five workflows:
+# `workflow_call` rather than the same shell copied into four workflows:
 # there is one answer to give and one place to change it. Callers fail open —
 # see the note on the `if` in type-check.yml.
 
@@ -52,7 +52,7 @@ on:
           Which ignore list in the root `package.json` to gate on: `code` for
           type-check.yml and node-version-compatibility.yml, `style` for
           style-check.yml. `none` skips the diff question altogether, for the
-          two workflows that gate themselves in shell — the gate then costs
+          one workflow that gates itself in shell — the gate then costs
           one API call and no checkout.
         type: string
         required: true
