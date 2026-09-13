@@ -4,7 +4,7 @@
 # Only devDependencies use the catalog: a published package's dependencies and
 # peerDependencies are its own API surface, so their ranges stay literal.
 catalog:
-  '@playwright/test': 1.62.1
+  '@playwright/test': 1.63.0
   '@reduxjs/toolkit': 2.12.0
   '@testing-library/dom': 10.4.1
   '@testing-library/preact': 3.2.4
@@ -19,10 +19,10 @@ catalog:
   '@vitest/coverage-v8': 5.0.0
   '@vitest/ui': 5.0.0
   argparse: 3.0.1
-  cspell: 10.2.1
+  cspell: 10.2.2
   dedent: 1.7.2
   esbuild: 0.28.2
-  eslint: 10.9.1
+  eslint: 10.10.0
   immer: 11.1.18
   jiti: 2.7.0
   jotai: 2.20.3
@@ -33,7 +33,7 @@ catalog:
   oxfmt: 0.66.0
   oxlint: 1.81.0
   oxlint-tsgolint: 7.0.2001
-  playwright: 1.62.1
+  playwright: 1.63.0
   preact: 10.29.8
   prettier: 3.9.6
   prettier-plugin-organize-imports: 4.3.0
@@ -111,14 +111,6 @@ minimumReleaseAge: 10080 # = 7 days
 minimumReleaseAgeExcludePrune: true
 
 minimumReleaseAgeExclude:
-  # octokit 族は `@octokit/openapi-types` を共有し、
-  # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
-  # `expectType<..., '='>` で表明している。隔離が族を一つずつ通すと
-  # `@octokit/openapi-types` が 2 バージョン同居して表明が破れ、`ws:build` が
-  # 落ちる。族が揃って動く必要があるのはそのため。
-  #
-  # 要求は「族の原子性」であって「隔離の免除」ではない。バージョンを固定して
-  # あるので、族が次に揃って動いた時点で prune が落とす。
   - '@octokit/auth-token@6.0.0'
   - '@octokit/core@7.0.8'
   - '@octokit/endpoint@11.0.5'
@@ -127,10 +119,7 @@ minimumReleaseAgeExclude:
   - '@octokit/request@10.0.16'
   - '@octokit/request-error@7.1.2'
   - '@octokit/types@18.0.0'
-
-  # `@types/**` の恒久除外を外した時点で lockfile に入っていて、まだ 7 日を
-  # 超えていなかったもの。成熟して次に動いた時点で prune が落とす。
-  - '@types/node@22.20.2 || 24.13.4 || 26.5.0'
+  - '@types/node@24.13.4 || 26.5.0'
   - '@types/react@19.3.0'
   - '@types/react-dom@19.3.0'
 

@@ -34,7 +34,7 @@
     "@astrojs/react": "^6.0.5",
     "@astrojs/starlight": "^0.42.0",
     "@fontsource/noto-sans-jp": "^5.3.0",
-    "@preact/signals": "^2.11.1",
+    "@preact/signals": "^2.11.2",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.3.1",
     "preact": "^10.29.8",
