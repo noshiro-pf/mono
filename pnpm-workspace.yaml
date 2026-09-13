@@ -89,6 +89,7 @@ update:
   githubActions: false
   ignoreDeps:
     - typescript
+
     # PixiJS 7 removed `InteractionManager`, dropped the `transparent`
     # application option and deprecated the global `settings` object.
     # `apps/annotation-tool` is v5-era code restored from `experimental/` and
@@ -100,30 +101,38 @@ update:
 
 minimumReleaseAge: 10080 # = 7 days
 
-minimumReleaseAgeExclude:
-  - '@types/**'
+# 除外は「方針」ではなく「一時的な waiver」として書く。名前だけで書くと、その
+# パッケージは以後ずっと隔離を素通りする — 理由が解消しても誰も気づかない。
+# バージョンまで書いて prune に失効させれば、必要なあいだだけ効く。
+#
+# prune は `pnpm update` で走り、lockfile が解決しなくなったエントリを落とす。
+# 実測（pnpm 12.3.4）: lockfile に無い名前も `name@1.2.3` も消え、`pattern-*`
+# だけは常に残る。だから **glob で書くと失効しない**。
+minimumReleaseAgeExcludePrune: true
 
-  # octokit のパッケージ群は一つの型定義 (`@octokit/openapi-types`) を共有しており、
+minimumReleaseAgeExclude:
+  # octokit 族は `@octokit/openapi-types` を共有し、
   # `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
-  # `expectType<..., '='>` で表明している。`minimumReleaseAge` が
-  # `@octokit/openapi-types` だけを通して `@octokit/core` を留めると、
-  # 一つのツリーに新旧二つの `@octokit/openapi-types` が入り、
-  # 表明が破れて `ws:build` が落ちる (#1832)。族ごと除外して足並みを揃える。
-  - '@octokit/**'
-  - ts-type-forge
-  - eslint-plugin-ts-type-forge
-  - ts-data-forge
-  - eslint-plugin-ts-data-forge
-  - ts-fortress
-  - eslint-plugin-ts-fortress
-  - ts-repo-utils
-  - ts-codemod-lib
-  - synstate
-  - 'synstate-*'
-  - eslint-config-typed
-  - octokit-safe-types
-  - github-settings-as-code
-  - 'strict-ts-lib-*'
+  # `expectType<..., '='>` で表明している。隔離が族を一つずつ通すと
+  # `@octokit/openapi-types` が 2 バージョン同居して表明が破れ、`ws:build` が
+  # 落ちる。族が揃って動く必要があるのはそのため。
+  #
+  # 要求は「族の原子性」であって「隔離の免除」ではない。バージョンを固定して
+  # あるので、族が次に揃って動いた時点で prune が落とす。
+  - '@octokit/auth-token@6.0.0'
+  - '@octokit/core@7.0.8'
+  - '@octokit/endpoint@11.0.5'
+  - '@octokit/graphql@9.0.5'
+  - '@octokit/openapi-types@29.0.1'
+  - '@octokit/request@10.0.16'
+  - '@octokit/request-error@7.1.2'
+  - '@octokit/types@18.0.0'
+
+  # `@types/**` の恒久除外を外した時点で lockfile に入っていて、まだ 7 日を
+  # 超えていなかったもの。成熟して次に動いた時点で prune が落とす。
+  - '@types/node@22.20.2 || 24.13.4 || 26.5.0'
+  - '@types/react@19.3.0'
+  - '@types/react-dom@19.3.0'
 
 allowBuilds:
   # Both arrive with `firebase`, which apps/poll-discord-app depends on.
