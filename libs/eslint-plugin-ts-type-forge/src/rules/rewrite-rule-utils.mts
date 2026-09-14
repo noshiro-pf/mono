@@ -40,12 +40,10 @@ export const reportTypeRewrites = <MessageIds extends string>(
     return target === undefined ? [] : [{ rewrite, target }];
   });
 
-  const importNames = Array.from(
-    new Set(
-      resolved
-        .filter(({ target }) => target.needsImport)
-        .map(({ rewrite }) => rewrite.canonicalName),
-    ),
+  const importNames = Arr.uniq(
+    resolved
+      .filter(({ target }) => target.needsImport)
+      .map(({ rewrite }) => rewrite.canonicalName),
   );
 
   for (const [index, { rewrite, target }] of resolved.entries()) {

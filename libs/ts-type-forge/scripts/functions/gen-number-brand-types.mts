@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { hasKey, unknownToString } from 'ts-data-forge';
+import { Arr, hasKey, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 // eslint-disable-next-line import-x/no-relative-packages
 import { extractSampleCode } from '../../../../tools/configs/embed-examples-utils.mjs';
@@ -635,18 +635,16 @@ const buildImports = (members: readonly Member[]): string => {
 
   // Distinct external symbols referenced by any definition, excluding names
   // defined in this same file.
-  const referenced: readonly string[] = Array.from(
-    new Set(
-      members.flatMap((m) =>
-        (m.def.match(/[A-Za-z_][A-Za-z0-9_]*/gu) ?? []).filter(
-          (token) => !localNames.has(token) && hasKey(symbolModules, token),
-        ),
+  const referenced: readonly string[] = Arr.uniq(
+    members.flatMap((m) =>
+      (m.def.match(/[A-Za-z_][A-Za-z0-9_]*/gu) ?? []).filter(
+        (token) => !localNames.has(token) && hasKey(symbolModules, token),
       ),
     ),
   );
 
-  const specifiers: readonly string[] = Array.from(
-    new Set(referenced.map((symbol) => symbolModules[symbol] ?? '')),
+  const specifiers: readonly string[] = Arr.uniq(
+    referenced.map((symbol) => symbolModules[symbol] ?? ''),
   ).toSorted((a, b) => a.localeCompare(b));
 
   return specifiers

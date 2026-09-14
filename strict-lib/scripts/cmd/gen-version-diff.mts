@@ -139,10 +139,9 @@ const genDiffForKind = async (
 
   // A plain-array spread keeps the element type as `string`; `Iterator.concat`
   // resolves to `Iterator<unknown>` in this toolchain, which would poison the
-  // downstream `Set`/`names` types.
-  // eslint-disable-next-line unicorn/prefer-iterator-concat
-  const names = Array.from(new Set([...prevNames, ...curNames])).toSorted(
-    (a, b) => a.localeCompare(b),
+  // downstream `names` type.
+  const names = Arr.uniq([...prevNames, ...curNames]).toSorted((a, b) =>
+    a.localeCompare(b),
   );
 
   const outDir = path.join(packagesDir, cur.dir, outputDirName, kind.name);
