@@ -160,6 +160,65 @@ mut_lit[0] = 3; // 型エラー
 
 つまり **readonly なら literal、mutable なら widened** が実用上の唯一の組み合わせであり、記法は 2 つで足りる。
 
+### 配列と tuple を別の型ファミリーにするか(2026-09-14、ユーザー提起)
+
+#### 現状の部分型関係(実測)
+
+**「最小長 N の配列 `[T, T, ...T[]]` は サイズ N の tuple `[T, T]` の supertype」— 合っている。** TypeScript 7.0.2 / 6.0.3 で確認:
+
+```text
+[T, T]  <:  [T, T, ...T[]]  <:  T[]
+readonly [T, T]  <:  readonly [T, T, ...T[]]  <:  readonly T[]
+[T, T]  <:  readonly [T, T]
+```
+
+逆向き(`[T, T, ...T[]]` → `[T, T]`、`readonly [T, T]` → `[T, T]`)はすべて拒否される。
+
+#### 新しい言語の意味論として妥当か: **readonly なら妥当、mutable なら不健全**
+
+- **mutable では破れる(実測)。** 幅の部分型付けと mutation が組み合わさると壊れる:
+
+    ```ts
+    const grow = (mut_xs: [number, number, ...number[]]): void => {
+        mut_xs.push(3);
+    };
+    const mut_pair: [number, number] = [1, 2];
+
+    grow(mut_pair); // 通る
+
+    const claimed: 2 = mut_pair.length; // 型は 2 のまま、実行時は 3
+    mut_pair[2]; // 型エラーのまま、実行時には 3 が入っている
+    ```
+
+    これは配列の共変性と同じ古典的な穴で、**部分型の向きが問題なのではなく、可変であることが問題**である。
+
+- **readonly なら健全**で、その理由は Python の型仕様が明言している: _"Because tuple contents are immutable, the element types of a tuple are covariant."_ Python は `tuple[int, int] <: tuple[int, ...]` を認めるが、それは **tuple が不変だから**であって、`list` との間には部分型関係を置いていない。**不変性が部分型付けを許している**という構図がそのまま Sumi に当てはまる。
+
+- **Sumi ではこの穴は既に塞がっている(実測)。** 上の例が成立するには**可変 tuple を引数の型に書く**必要があるが、preset はそれを 2 つの規則で拒否する(`sumi/require-readonly-type` と `typescript/prefer-readonly-parameter-types` — D-45)。readonly 版の同じ関数は通る。つまり**readonly-by-default が、部分型関係に手を入れずに不健全性だけを取り除いている。**
+
+- 付随して分かったこと: **rest 要素があっても `push` は健全ではない。** `[string, ...number[]]` に対し `push` の引数型は全要素型の union(`string | number`)になるので、`mut_t.push('oops')` が通り、`number[]` の側に string が入る(実測)。したがって `mutation/no-tuple-mutating-method` が rest 付き tuple にも 9 つすべてを禁止しているのは過剰ではなく正しい。
+
+#### 別ファミリーにする案 — 他言語はほぼそうしている
+
+| 言語            | tuple と配列の関係                                                                                                                               |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rust            | `(T, U)` / `[T; N]` / `[T]` は**別の型**。部分型付けは(ライフタイム以外)無く、`&[T; N]` → `&[T]` は unsized coercion。tuple に長さ多相の形は無い |
+| Haskell / OCaml | arity ごとに別の型。リストとの関係は無く、変換は手書き                                                                                           |
+| Swift           | tuple は構造的な別ファミリー。`Array` との部分型関係も長さ多相も無い                                                                             |
+| Scala 3         | `Tuple` は `*:` の cons 構造(長さ多相な操作が書ける)。`Array` / `Seq` とは別                                                                     |
+| Python          | `tuple[...]` の中に固定長と可変長(`tuple[int, ...]`)があり両者に部分型関係。`list` との関係は**無い**                                            |
+| TypeScript      | **tuple は配列である。** 可変長 tuple へも `T[]` へも部分型。可変だと不健全(上記)                                                                |
+
+**TS が外れ値なのには理由がある: JS では tuple は実行時に本当に配列**である。Sumi はその実行時を共有するので、別ファミリーにしても値は同じオブジェクトのままになる(Rust の `[T; N]` と `&[T]` も表現は地続きなので、それ自体は矛盾ではない)。
+
+#### 分離の代償: `NonEmptyArray` は変換ではなく**narrowing** に依存している
+
+このリポジトリで `NonEmptyArray<T> = readonly [T, ...T[]]` と `Arr.isNonEmpty` は **488 箇所**に出る。`noUncheckedIndexedAccess` の下で添字アクセスを安全にする中心的なイディオムであり、`isNonEmpty` は**型ガード**である — `readonly T[]` を `readonly [T, ...T[]]` へ narrowing する。これは**まさに部分型関係そのもの**なので、別ファミリーにすると「相互変換と spread を提供すれば足りる」では済まず、**narrowing が書けなくなる**(ガードの結果として別ファミリーの値を作り直すことになる)。
+
+#### 現時点の見立て
+
+**1 つのファミリーのまま、readonly 側の部分型関係を保つ**のが筋に見える。分離が買うのは健全性だが、**Sumi はそれを readonly-by-default と `mutation/no-tuple-mutating-method` で既に得ている**(上の実測)一方、分離が失うのは 488 箇所が依存する narrowing である。Sumi refined で独自型検査器を持つ段になれば「可変 tuple には幅の部分型を認めない」という**より狭い選択肢**も取れるので、ファミリーを分ける前にそちらを検討する順序が自然。
+
 ### Sumi lint のライブラリ形は 2 行で書ける(実測 2026-09-13)
 
 D-37 は各候補に「Sumi lint でのライブラリ形」と両向きの codemod を要求する。この候補についてはライブラリ形が**ごく小さい**:
