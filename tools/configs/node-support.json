@@ -4,6 +4,6 @@
   "targets": {
     "minimum": "22.22.2",
     "lts": "24.21.0",
-    "current": "26.8.1"
+    "current": "26.8.2"
   }
 }
