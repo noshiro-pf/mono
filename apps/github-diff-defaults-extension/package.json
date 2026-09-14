@@ -20,17 +20,23 @@
     "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --min-depth 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "pack": "run-s build z:pack",
+    "pack:crx": "run-s build z:pack-crx",
+    "smoke": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/smoke.mts",
     "test": "vitest --config ./configs/vitest.config.mts run",
     "testw": "vitest --config ./configs/vitest.config.mts watch",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
-    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts",
+    "z:pack": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/pack.mts",
+    "z:pack-crx": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/pack-crx.mts"
   },
   "dependencies": {
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -38,6 +44,7 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"
   }

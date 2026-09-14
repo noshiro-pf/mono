@@ -106,10 +106,41 @@ and what goes on them — and `src/content.mts` is the glue that applies it.
 | :-------------------- | :---------------------------------------------------- |
 | `pnpm run build`      | builds `dist/`, which is what Chrome loads            |
 | `pnpm run test`       | runs the unit tests                                   |
+| `pnpm run smoke`      | runs the built extension in a real Chromium           |
 | `pnpm run type-check` | type-checks the package                               |
 | `pnpm run lint`       | lints it                                              |
 | `pnpm run gen:icons`  | redraws `public/icons/` — see `scripts/gen-icons.mts` |
+| `pnpm run pack`       | builds and writes the Chrome Web Store zip            |
+| `pnpm run pack:crx`   | the same package, signed, for verified CRX upload     |
 
 The icons are committed, so `gen:icons` is only run when the shape changes.
+
+`smoke` needs a headed browser — Chromium loads no extensions in the headless
+shell — so on a machine with no display run it as `xvfb-run -a pnpm run smoke`.
+It touches no network: every github.com request is answered from a fixture in
+`scripts/smoke.mts`, which is also what lets it check the thing the unit tests
+cannot — that the extension does not redirect a second time when the site takes
+the parameters off its own address bar.
+
+## Release
+
+1. `pnpm run test && pnpm run build && xvfb-run -a pnpm run smoke`.
+2. Raise `version` in [`public/manifest.json`](./public/manifest.json). It is
+   the manifest's version that the store reads and that names the package; the
+   `package.json` version is unused, this being a private package.
+3. `pnpm run pack`, which builds and writes
+   `pack/github-diff-defaults-extension-<version>.zip` — `dist/` without its
+   source maps. `pack/` is not tracked.
+4. Upload that zip to the
+   [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole),
+   with the copy in [`docs/store-listing.md`](./docs/store-listing.md) and the
+   policy in [`docs/privacy-policy.md`](./docs/privacy-policy.md).
+
+Once **verified CRX upload** is turned on for the item the store stops taking a
+zip, and `pnpm run pack:crx` is what to upload instead: the same staged package
+signed by Chrome with the key registered on the account. That key is not in the
+repository and must not be — it comes out of `pass`, and there is not one yet;
+`scripts/pack-crx.mts` says how to make it and where it has to live. Losing it
+means losing the ability to publish an update.
 
 This extension is not affiliated with GitHub.
