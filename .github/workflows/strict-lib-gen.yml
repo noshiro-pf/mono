@@ -103,10 +103,12 @@ jobs:
       !contains(github.event.pull_request.labels.*.name, 'skip-ci')
     uses: ./.github/workflows/check-gates.yml
     permissions:
+      actions: read
       contents: read
       packages: read
     with:
       diff-scope: strict-lib
+      result-job: strict-lib-gen-result
 
   strict-lib-gen:
     needs: gates
@@ -117,7 +119,8 @@ jobs:
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false'
+      needs.gates.outputs.should_run != 'false' &&
+      needs.gates.outputs.reused_result == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -192,7 +195,25 @@ jobs:
       - name: Require the check above to have passed
         env:
           RESULT: ${{ needs.strict-lib-gen.result }}
+          # Set when an earlier run already reached a verdict on this head
+          # commit and the check above were skipped for it — see "A commit that
+          # already has a verdict" in check-gates.yml.
+          REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
+          REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |
+          case "${REUSED_RESULT}" in
+            success)
+              echo "The check already passed on this commit: ${REUSED_FROM}"
+              exit 0
+              ;;
+            failure)
+              summary="The check already failed on this commit: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
+              echo "${summary}"
+              echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+              exit 1
+              ;;
+          esac
+
           if [ "${RESULT}" = 'success' ]; then
             echo 'The check passed.'
             exit 0

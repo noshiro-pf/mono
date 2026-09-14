@@ -38,6 +38,40 @@ name: Check Gates
 #   — "Expected", blocking forever. Only since the `*-result` aggregates
 #   became the required contexts is a job-level skip safe here.
 #
+# ## A commit that already has a verdict
+#
+# Every job the callers run reads the pull request's head commit and nothing
+# else — they check out `pull_request.head.sha` — so a second run on the same
+# head can only repeat the first one's verdict, pass or fail. Such runs are
+# common: any label event (`merge-queued`, `bug`, …), `reopened`, and a
+# `skip-ci` taken off a commit that was checked before it went on. So when an
+# earlier run of the calling workflow on this head reached a verdict, its
+# aggregate job's conclusion is handed back as `reused_result`, the callers
+# skip their matrix, and their aggregate reports that conclusion — green or
+# red, never skipped, so a reused verdict cannot read as a check that did not
+# happen.
+#
+# What makes "same head" enough is the branch question above: the lookup only
+# happens on an up-to-date branch of the default branch, where the commit that
+# would be merged has the head's tree, workflow files included. An earlier run
+# made while the branch was behind has a skipped aggregate and is not a
+# verdict.
+#
+# Some things are deliberately not reused:
+#
+# - A run that was cancelled — its aggregate still runs under `always()` and
+#   reads red, but it says nothing about the commit.
+# - A skipped aggregate (`skip-ci`, behind, nothing relevant in the diff).
+# - Anything, when this is a re-run (`run_attempt` > 1) or not a
+#   `pull_request` event. "Re-run all jobs" and `workflow_dispatch` are how a
+#   person asks for the checks to actually run — to see whether a failure was
+#   a flake, say. "Re-run failed jobs" is not enough after a reused failure:
+#   it keeps this job's outputs from the first attempt.
+#
+# Where several earlier runs have a verdict, the one whose aggregate completed
+# last wins, so a flake that was re-run to green supersedes the red that a
+# later run reused from it.
+#
 # ## Why a workflow of its own
 #
 # `workflow_call` rather than the same shell copied into four workflows:
@@ -56,6 +90,12 @@ on:
           in shell — the gate then costs one API call and no checkout.
         type: string
         required: true
+      result-job:
+        description: >-
+          The id of the caller's aggregate job (`type-check-result`, …), whose
+          conclusion in an earlier run on the same head is what gets reused.
+        type: string
+        required: true
     outputs:
       branch_up_to_date:
         description: >-
@@ -72,22 +112,37 @@ on:
           there is no point paying for the answer. Callers read empty as
           `true`.
         value: ${{ jobs.check.outputs.should_run }}
+      reused_result:
+        description: >-
+          `success` or `failure` when an earlier run of the calling workflow
+          reached that verdict on this head commit — the caller skips its
+          work and its aggregate reports this instead. Empty otherwise,
+          including when the lookup failed, which the callers read as "run
+          the checks". `should_run` is left empty when this is set.
+        value: ${{ jobs.check.outputs.reused_result }}
+      reused_from:
+        description: The URL of the aggregate job whose verdict was reused.
+        value: ${{ jobs.check.outputs.reused_from }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    # One public API call and a read-only checkout. `gh` needs a token to be
-    # set at all, hence `github.token`; `packages: read` is what the install
+    # A few API calls and a read-only checkout. `gh` needs a token to be set
+    # at all, hence `github.token`; `actions: read` is what listing the
+    # earlier runs and their jobs needs; `packages: read` is what the install
     # needs for the `@noshiro-pf` scope.
     permissions:
+      actions: read
       contents: read
       packages: read
 
     outputs:
       branch_up_to_date: ${{ steps.branch_state.outputs.branch_up_to_date }}
       should_run: ${{ steps.check_diff.outputs.should_run }}
+      reused_result: ${{ steps.reuse.outputs.reused_result }}
+      reused_from: ${{ steps.reuse.outputs.reused_from }}
 
     steps:
       - name: Check whether the branch is behind the base branch
@@ -151,13 +206,95 @@ jobs:
           echo "${summary}"
           echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
 
+      # See "A commit that already has a verdict" at the top. Before the
+      # checkout, because a reused verdict makes the diff question moot.
+      - name: Look for a verdict already reached on this head commit
+        id: reuse
+        if: steps.branch_state.outputs.branch_up_to_date != 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+          RESULT_JOB: ${{ inputs.result-job }}
+        run: |
+          # Leaves both outputs empty, which the callers read as "run the checks".
+          run_the_checks() {
+            echo "${1}"
+            exit 0
+          }
+
+          if [ "${GITHUB_EVENT_NAME}" != 'pull_request' ]; then
+            run_the_checks "Not a pull request event (${GITHUB_EVENT_NAME}): the checks run."
+          fi
+
+          if [ "${GITHUB_RUN_ATTEMPT}" != '1' ]; then
+            run_the_checks "This is attempt ${GITHUB_RUN_ATTEMPT} of the run, i.e. a re-run asked for by hand: the checks run for real."
+          fi
+
+          # Only against the default branch does being up to date guarantee
+          # that the commit to be merged has the head's tree.
+          if [ "${BASE_REF}" != "${DEFAULT_BRANCH}" ]; then
+            run_the_checks "The base branch is ${BASE_REF}, not ${DEFAULT_BRANCH}: no verdict is reused."
+          fi
+
+          # `github.workflow_ref` is the caller's, even inside a called
+          # workflow: `<owner>/<repo>/.github/workflows/<file>@<ref>`.
+          workflow_path="${GITHUB_WORKFLOW_REF%@*}"
+          workflow_file="${workflow_path##*/}"
+
+          # Runs still in progress have no verdict, and a cancelled run's red
+          # aggregate is not one; `success` / `failure` is also what a run
+          # whose every job was skipped concludes, which the job filter below
+          # takes care of.
+          if ! run_ids="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow_file}/runs?head_sha=${HEAD_SHA}&status=completed&per_page=20" \
+            --jq '.workflow_runs[] | select(.conclusion == "success" or .conclusion == "failure") | .id' 2>&1)"; then
+            run_the_checks "Could not list earlier runs of ${workflow_file}, so the checks run: ${run_ids}"
+          fi
+
+          verdicts=''
+          for run_id in ${run_ids}; do
+            if [ "${run_id}" = "${GITHUB_RUN_ID}" ]; then
+              continue
+            fi
+
+            if ! jobs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?filter=latest&per_page=100" \
+              --jq '.jobs[] | select(.name == env.RESULT_JOB and (.conclusion == "success" or .conclusion == "failure")) | "\(.completed_at)\t\(.conclusion)\t\(.html_url)"' 2>&1)"; then
+              run_the_checks "Could not list the jobs of run ${run_id}, so the checks run: ${jobs}"
+            fi
+
+            if [ -n "${jobs}" ]; then
+              verdicts="${verdicts}${jobs}"$'\n'
+            fi
+          done
+
+          # ISO 8601 timestamps in UTC sort as strings.
+          latest="$(printf '%s' "${verdicts}" | sort -r | head -n 1)"
+
+          if [ -z "${latest}" ]; then
+            run_the_checks "No earlier run of ${workflow_file} reached a verdict on ${HEAD_SHA}: the checks run."
+          fi
+
+          conclusion="$(printf '%s' "${latest}" | cut -f 2)"
+          url="$(printf '%s' "${latest}" | cut -f 3)"
+
+          echo "reused_result=${conclusion}" >>"${GITHUB_OUTPUT}"
+          echo "reused_from=${url}" >>"${GITHUB_OUTPUT}"
+
+          summary="${RESULT_JOB} already concluded \`${conclusion}\` on ${HEAD_SHA} (${url}); that verdict is reused and the checks do not run again. Use \"Re-run all jobs\" to run them anyway."
+          echo "${summary}"
+          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+
       # Everything below answers the diff question, and is worth nothing when
-      # the caller is going to skip on the answer above — so it is gated on it
-      # as well as on the scope. A branch behind `main` therefore still costs
-      # the four seconds this gate used to cost in total.
+      # the caller is going to skip on either answer above — so it is gated on
+      # both as well as on the scope. A branch behind `main` therefore still
+      # costs the four seconds this gate used to cost in total.
       - name: Checkout
         id: checkout
-        if: inputs.diff-scope != 'none' && steps.branch_state.outputs.branch_up_to_date != 'false'
+        if: >-
+          inputs.diff-scope != 'none' &&
+          steps.branch_state.outputs.branch_up_to_date != 'false' &&
+          steps.reuse.outputs.reused_result == ''
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The branch tip, not the merge commit GitHub synthesises for a

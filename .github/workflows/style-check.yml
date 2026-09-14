@@ -55,6 +55,7 @@ jobs:
     # be reduced along the chain, never elevated — so the top-level `{}` above
     # would otherwise leave the called workflow unable to check out.
     permissions:
+      actions: read
       contents: read
       packages: read
     with:
@@ -65,6 +66,7 @@ jobs:
       # under the directories it is given — so `code` would skip this workflow
       # exactly when it should fail. See "CI diff gates" in CLAUDE.md.
       diff-scope: style
+      result-job: style-check-result
 
   style-check:
     needs: gates
@@ -76,7 +78,8 @@ jobs:
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false'
+      needs.gates.outputs.should_run != 'false' &&
+      needs.gates.outputs.reused_result == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -185,7 +188,25 @@ jobs:
       - name: Require the checks above to have passed
         env:
           RESULT: ${{ needs.style-check.result }}
+          # Set when an earlier run already reached a verdict on this head
+          # commit and the checks above were skipped for it — see "A commit that
+          # already has a verdict" in check-gates.yml.
+          REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
+          REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |
+          case "${REUSED_RESULT}" in
+            success)
+              echo "The checks already passed on this commit: ${REUSED_FROM}"
+              exit 0
+              ;;
+            failure)
+              summary="The checks already failed on this commit: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
+              echo "${summary}"
+              echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+              exit 1
+              ;;
+          esac
+
           if [ "${RESULT}" = 'success' ]; then
             echo 'The checks passed.'
             exit 0
