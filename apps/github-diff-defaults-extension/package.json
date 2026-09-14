@@ -1,0 +1,51 @@
+{
+  "name": "github-diff-defaults-extension",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/github-diff-defaults-extension"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config ./configs/vite.config.mts",
+    "fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fmt:full": "prettier --write .",
+    "gen:icons": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-icons.mts",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --min-depth 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "pack": "run-s build z:pack",
+    "pack:crx": "run-s build z:pack-crx",
+    "smoke": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/smoke.mts",
+    "test": "vitest --config ./configs/vitest.config.mts run",
+    "testw": "vitest --config ./configs/vitest.config.mts watch",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts",
+    "z:pack": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/pack.mts",
+    "z:pack-crx": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/pack-crx.mts"
+  },
+  "dependencies": {
+    "ts-data-forge": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
+    "tsx": "catalog:",
+    "vite": "catalog:"
+  }
+}

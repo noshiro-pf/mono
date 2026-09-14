@@ -505,6 +505,19 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // Not an Astro site like the entry above assumes either: a Chrome extension
+    // with one entry point, the content script the manifest names. `src/index.mts`
+    // is reached from the tests rather than being an entry of its own.
+    "apps/github-diff-defaults-extension": {
+      "entry": [
+        "src/content.mts",
+        "configs/*.mts",
+        "scripts/**/*.mts",
+        "test/**/*.test.mts",
+      ],
+      "project": ["**/*.mts"],
+    },
+
     "apps/blueprintjs-playground": {
       "entry": ["src/main.tsx", "configs/*.mts", "e2e/**/*.spec.mts"],
       "project": ["**/*.{mts,tsx}"],
