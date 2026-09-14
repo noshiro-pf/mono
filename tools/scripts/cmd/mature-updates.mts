@@ -323,6 +323,7 @@ export const selectMatureRelease = (
     heldBack: newerSameMajor
       .filter(({ parsed }) => compareVersions(parsed, floor) > 0)
       .map(({ release }) => release.tag),
+    // eslint-disable-next-line ts-data-forge/prefer-arr-uniq -- ts-data-forge is not installed when this runs (see the header).
     majorsWaiting: Array.from(
       new Set(
         stable

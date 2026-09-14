@@ -4,6 +4,7 @@ import { noUnnecessaryTypeGuard } from './no-unnecessary-type-guard.mjs';
 import { preferArrIsArray } from './prefer-arr-is-array.mjs';
 import { preferArrScan } from './prefer-arr-scan.mjs';
 import { preferArrSum } from './prefer-arr-sum.mjs';
+import { preferArrUniq } from './prefer-arr-uniq.mjs';
 import { preferAsInt } from './prefer-as-int.mjs';
 import { preferCanonicalArraySlicing } from './prefer-canonical-array-slicing.mjs';
 import { preferCanonicalLengthCast } from './prefer-canonical-length-cast.mjs';
@@ -23,6 +24,7 @@ export const tsDataForgeRules = {
   'prefer-arr-is-array': preferArrIsArray,
   'prefer-arr-scan': preferArrScan,
   'prefer-arr-sum': preferArrSum,
+  'prefer-arr-uniq': preferArrUniq,
   'prefer-as-int': preferAsInt,
   'prefer-is-non-null-object': preferIsNonNullObject,
   'prefer-range-for-loop': preferRangeForLoop,

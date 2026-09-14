@@ -33,9 +33,8 @@ export const setServiceWorkerResetOrigin = async (
   const current = await loadServiceWorkerResetOrigins();
 
   const next = enabled
-    ? Arr.toSorted(
-        Array.from(new Set(Arr.toPushed(current, siteOrigin))),
-        (a, b) => (a < b ? -1 : 1),
+    ? Arr.toSorted(Arr.uniq(Arr.toPushed(current, siteOrigin)), (a, b) =>
+        a < b ? -1 : 1,
       )
     : current.filter((entry) => entry !== siteOrigin);
 

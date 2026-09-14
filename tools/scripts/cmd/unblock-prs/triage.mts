@@ -114,13 +114,11 @@ const listRequiredContexts = async (
     return [];
   }
 
-  return Array.from(
-    new Set(
-      listed.value
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line !== ''),
-    ),
+  return Arr.uniq(
+    listed.value
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line !== ''),
   );
 };
 

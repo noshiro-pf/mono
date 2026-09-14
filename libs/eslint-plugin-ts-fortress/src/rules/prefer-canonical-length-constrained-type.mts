@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import {
   ARRAY_FN,
   BOUNDED_LENGTH_TUPLE_FN,
@@ -201,12 +202,10 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
           (match) => match.localName !== undefined,
         );
 
-        const namesNeedingImport = Array.from(
-          new Set(
-            reportable
-              .filter((match) => match.needsImport)
-              .map((match) => match.rewrite.to),
-          ),
+        const namesNeedingImport = Arr.uniq(
+          reportable
+            .filter((match) => match.needsImport)
+            .map((match) => match.rewrite.to),
         );
 
         // Every missing import rides on a single report; see `buildImportsFix`.

@@ -15,6 +15,7 @@ const recommendedRules = {
   'ts-data-forge/prefer-arr-is-array': 'error',
   'ts-data-forge/prefer-arr-scan': 'error',
   'ts-data-forge/prefer-arr-sum': 'error',
+  'ts-data-forge/prefer-arr-uniq': 'error',
   'ts-data-forge/prefer-as-int': 'error',
   'ts-data-forge/prefer-is-non-null-object': 'error',
   'ts-data-forge/prefer-range-for-loop': 'error',
