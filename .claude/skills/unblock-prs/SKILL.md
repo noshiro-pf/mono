@@ -203,13 +203,13 @@ a title means nothing to any workflow, which reads the label instead.
 
 Two things about reproducing the rest:
 
-- `type-check (*)`, `style-check (ws:doc)` and `style-check (ws:check:ext)` run
-  `pnpm run ws:build` first in CI. Do the same locally or they fail for the wrong
-  reason.
+- `type-check (*)`, `style-check (ws:doc)`, `style-check (ws:check:ext)` and
+  `style-check (ws:gen:src)` run `pnpm run ws:build` first in CI. Do the same
+  locally or they fail for the wrong reason.
 - Every job ends with `z:assert-repo-is-clean`. So `fmt:full`, `ws:doc`,
-  `codemod:full` and `ws:lint:fix` fail by _changing_ files, and the fix is to
-  run the command locally and commit what it wrote. A green run of the command
-  with a dirty tree afterwards is still a failure.
+  `codemod:full`, `ws:lint:fix`, `ws:gi` and `ws:gen:src` fail by _changing_
+  files, and the fix is to run the command locally and commit what it wrote. A
+  green run of the command with a dirty tree afterwards is still a failure.
 
 Reproduce locally before pushing — a speculative fix costs another full matrix,
 which is the cost this whole loop exists to avoid. Fix the cause: `CLAUDE.md`

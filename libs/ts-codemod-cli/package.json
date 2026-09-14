@@ -32,7 +32,6 @@
   ],
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
-    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "clean": "pnpm run /clean:.*/",
     "clean:logs": "npx rimraf ./*.log",
@@ -44,7 +43,6 @@
     "lint:fix": "eslint . --fix",
     "prepare-release": "run-s sync-cli-versions fmt build",
     "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts",
-    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit"
   },
   "dependencies": {

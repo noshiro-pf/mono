@@ -9,7 +9,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "run-s doc type-check build:astro",
+    "build": "run-s doc build:astro",
     "build:astro": "astro build",
     "dev": "astro dev",
     "doc": "run-s doc:embed:bundle-size doc:embed:jsdoc-examples doc:embed:jsdoc doc:embed fmt",
@@ -24,7 +24,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "astro preview",
-    "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"

@@ -41,7 +41,6 @@
   "scripts": {
     "apply-type-transformations": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-eslint-rules/codemod/apply-type-transformations.mts",
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
-    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
     "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "codemod": "run-s codemod:uncommitted:* fmt",
@@ -69,11 +68,11 @@
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
     "testw": "pnpm run z:vitest:node watch",
-    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
-    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'",
+    "gen:src": "pnpm run gen-rule-type"
   },
   "dependencies": {
     "@eslint/core": "^1.2.1",

@@ -291,9 +291,14 @@ commands run those across every workspace member that defines them, and the
 
 **Build:**
 
-- `pnpm run ws:build` — build every package, in dependency order. See "Building
-  from a clean checkout".
+- `pnpm run ws:build` — build every package, in dependency order. It compiles
+  and emits, and does nothing else; see "Building from a clean checkout".
 - `pnpm run ws:gi` — regenerate `index.mts` files under `src/`.
+- `pnpm run ws:gen:src` — regenerate the other committed generated sources
+  (the ESLint rule types, ts-data-forge's branded numbers, ts-type-forge's
+  `global.mts` / `entry-point.mts`, the synstate re-export shims). Needs
+  `ws:build` first. **Not** `ws:gen`: `strict-lib/v*` already defines `gen`,
+  and a recursive run reaches those too.
 
 **Testing:**
 
@@ -313,6 +318,13 @@ commands run those across every workspace member that defines them, and the
 - `pnpm run ws:lint` / `pnpm run ws:lint:fix` — ESLint check/fix.
 - `pnpm run check:root` — lint and type-check `tools/`, which is not a workspace
   member and so is not covered by the `ws:*` commands.
+- `pnpm run ws:check` — the checks that read what a build emitted rather than
+  the sources: each package's `dist/` type-checked by package name through its
+  `exports` map, plus the API consistency checks that need a built sibling.
+  Needs `ws:build` first.
+- `pnpm run ws:check:ext` — file extensions. Needs no build, and is gated under
+  the wider `style` ignore list, because a `.md` added under a package's
+  `scripts/` is something it has to see.
 - `pnpm run knip` — dependencies declared but not imported.
 - `pnpm run lint:published-deps` — imports that a published package does not
   declare. See "Dependencies".
@@ -1730,7 +1742,8 @@ So the field is either inert here or it changes how the repository installs.
 ## Building from a clean checkout
 
 `pnpm install && pnpm run ws:build` works with no `dist/` anywhere. Three rules
-keep it that way; breaking any one of them reintroduces a cycle.
+keep it that way; breaking any one of them reintroduces a cycle, or puts back
+the four minutes described under "A build compiles and emits".
 
 - **Run `tsx` with `--tsconfig <root>/tools/configs/tsconfig.tsx.json.`** That
   config maps our package names to their sources, so a build script can import
@@ -1743,27 +1756,67 @@ keep it that way; breaking any one of them reintroduces a cycle.
   and `eslint.config.mts` import the toolchain, which is built later, so they
   are checked afterwards by `pnpm run ws:type-check`. Do not add a full-scope
   `tsc --noEmit` back into `build`, and do not add `eslint.config.mts` to a
-  package's `tsconfig.json` `include`.
+  package's `tsconfig.json` `include`. Nothing else belongs in `build` either
+  — see "A build compiles and emits".
 - **Build order comes from `dependencies` + `peerDependencies` only**, via the
   `dependencyFields` option of `runCmdInStagesAcrossWorkspaces`. Packages
   devDepend on the toolchain and the toolchain depends back on them, so
   including `devDependencies` leaves no valid order. A consequence: anything a
   package needs _in order to build_ — an app bundling a workspace library, for
   example — belongs in `dependencies`, not `devDependencies`.
-- **A build step that rewrites a source file must not rewrite one that is
-  already correct.** The packages in a stage build at the same time and each
-  reads its siblings' sources through `tsx`, so a file being rewritten is a
-  file that cannot be imported. That is not hypothetical: `genIndex` used to
-  write every `index.mts` on every run — in the generator's own spelling, which
-  the formatter then rewrote back to the committed one — and a sibling that
-  imported `ts-repo-utils` during either window died with
-  `SyntaxError: The requested module 'ts-repo-utils' does not provide an export
-named '...'`, taking `ws:build` with it (#1835). It compares before writing
-  now, and writes through a `rename` when it does write. A generator added to a
-  build step needs both.
+- **A build step must not rewrite a source file at all.** The packages in a
+  stage build at the same time and each reads its siblings' sources through
+  `tsx`, so a file being rewritten is a file that cannot be imported. That is
+  not hypothetical: `genIndex` used to write every `index.mts` on every run —
+  in the generator's own spelling, which the formatter then rewrote back to the
+  committed one — and a sibling that imported `ts-repo-utils` during either
+  window died with `SyntaxError: The requested module 'ts-repo-utils' does not
+provide an export named '...'`, taking `ws:build` with it (#1835). It compares
+  before writing now, and writes through a `rename` when it does write — both
+  still true, and neither is relied on any more: no `build` runs a generator.
 
 `docs/package-dependencies.md` holds the current graph and stage tables;
 regenerate it with `pnpm run docs:deps`.
+
+### A build compiles and emits
+
+`build` runs `tsc`, strips the development-only code, writes the two or three
+small files `dist/` needs, and stops. It checks nothing and generates nothing,
+and both of those used to be false:
+
+- **The checks are now their own scripts.** `check:ext` (already had
+  `ws:check:ext`), the `dist/`-through-the-`exports`-map type checks in the
+  five packages with a `test/dist_/` harness, eslint-plugin-ts-data-forge's
+  branded-number coverage check, and a stray `pnpm run type-check` inside
+  github-settings-as-code's build that `ws:type-check` was already running.
+  The last three are `pnpm run ws:check`, a `type-check.yml` matrix entry.
+- **The generators are `pnpm run ws:gen:src`**, a `style-check.yml` matrix
+  entry that regenerates and then asserts the tree is clean — the same shape
+  `ws:gi` has. Their output is committed, so a build regenerating it produced
+  nothing but the risk described above.
+
+What that is worth: `pnpm run ws:build` went from **4m43s to 34s** on a clean
+checkout (measured). Three of those minutes were eslint-config-typed's
+`gen-rule-type` alone, which regenerates 33 rule-type modules and then runs a
+codemod, Prettier and `eslint --fix` over them. Every entry of the
+`type-check.yml` matrix builds first, and so do three of `style-check.yml`'s,
+so that was paid fifteen-odd times per pull request to produce output that was
+already committed.
+
+Consequences:
+
+- **A check or a generator added to a `build.mts` is paid by every job that
+  builds.** Put it in the package's `check` or `gen:src` script instead. If it
+  is the package's first one, add the script — the root aggregates pick it up
+  with no further wiring, since both are `--if-present` recursive runs.
+- **`build:min` is gone, and so is `ws:build:min` and the `--skip-check` flag
+  every `build.mts` took.** They existed to run a build without its checks and
+  its generators, to break the bootstrap cycle on a clean checkout; `build` is
+  that now, so a second spelling of it is a second thing to keep in step.
+- **A package's `gen:src` is not named `gen`.** `strict-lib/v*` defines `gen`
+  (the strict standard library generator, which needs `temp/codemod-fixed`
+  prepared first), and those are workspace members, so a recursive `gen` runs
+  them too — measured: it wipes `output/lib-files*` and then fails.
 
 ### What a build emits
 

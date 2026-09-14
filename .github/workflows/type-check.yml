@@ -172,6 +172,11 @@ jobs:
           - strict-lib:type-check
           - strict-lib:lint
           - ws:type-check
+          # What the build emitted, type-checked by package name through the
+          # `exports` map — the way a consumer reaches it. Part of `build`
+          # until it was moved out, so that the twelve other entries here,
+          # which only need `dist/`, stop paying for it.
+          - ws:check
           - ws:lint:fix
           # The Sumi lint check of the dogfood packages (`sumi:check` scripts).
           - ws:sumi:check

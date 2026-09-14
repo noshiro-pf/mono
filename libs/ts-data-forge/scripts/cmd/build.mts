@@ -31,48 +31,23 @@ const nativeTsc = path.resolve(
 /**
  * Builds the entire project.
  */
-const build = async (skipCheck: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
 
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Cleaning dist directory',
-      action: () =>
-        runStep(
-          Result.fromPromise(
-            fs.rm(distDir, {
-              recursive: true,
-              force: true,
-            }),
-          ),
-          'Failed to clean dist directory',
+  await logStep({
+    startMessage: 'Cleaning dist directory',
+    action: () =>
+      runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
         ),
-      successMessage: 'Cleaned dist directory',
-    });
-
-    await logStep({
-      startMessage: 'Generating branded-number modules',
-      action: () =>
-        runCmdStep(
-          'pnpm run gen:branded-number',
-          'Generating branded-number modules failed',
-        ),
-      successMessage: 'Branded-number modules generated',
-    });
-
-    await logStep({
-      startMessage: 'Generating index files',
-      action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-      successMessage: 'Index files generated',
-    });
-  }
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
+  });
 
   await logStep({
     startMessage: 'Compiling with the native tsc',
@@ -148,4 +123,4 @@ const runStep = async (
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

@@ -30,23 +30,8 @@ const nativeTsc = path.resolve(
 /**
  * Builds the entire project.
  */
-const build = async (skipChecks: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
-
-  if (!skipChecks) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Running type checks',
-      action: () => runCmdStep('pnpm run type-check', 'Type checking failed'),
-      successMessage: 'Type checking passed',
-    });
-  }
 
   await logStep({
     startMessage: 'Cleaning dist directory',
@@ -61,12 +46,6 @@ const build = async (skipChecks: boolean): Promise<void> => {
         'Failed to clean dist directory',
       ),
     successMessage: 'Cleaned dist directory',
-  });
-
-  await logStep({
-    startMessage: 'Generating index files',
-    action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-    successMessage: 'Index files generated',
   });
 
   await logStep({
@@ -142,4 +121,4 @@ const runStep = async (
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

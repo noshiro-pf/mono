@@ -25,7 +25,6 @@
     "lint:fix": "eslint . --fix",
     "test": "pnpm run z:vitest:node run",
     "testw": "pnpm run z:vitest:node watch",
-    "tsc": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
     "type-check": "node ../../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
