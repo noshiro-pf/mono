@@ -102,7 +102,9 @@ export const parseTrustListOutput = (
     return Result.err(`Unparsable npm output: ${stdout.trim()}`);
   }
 
-  const items = Arr.isArray(value.value) ? value.value : [value.value];
+  const items = Arr.isArray(value.value)
+    ? value.value
+    : ([value.value] as const);
 
   const mut_configs: TrustConfig[] = [];
 
@@ -176,7 +178,7 @@ export const formatReportTable = (
   );
 
   const line = (cells: readonly string[]): string =>
-    `| ${cells.map((c, i) => c.padEnd(widths[i] ?? 0)).join(' | ')} |`;
+    `| ${cells.map((c, i) => c.padEnd(widths[i] ?? 0)).join(' | ')} |` as const;
 
   const counts = Object.keys(statusIcon)
     .map((status) => ({
@@ -393,7 +395,7 @@ const toTrustConfig = (item: ReadonlyRecord<string, unknown>): TrustConfig => {
   const { id, type, repository, project, file, environment, permissions } =
     item;
 
-  const claims = isRecord(item['claims']) ? item['claims'] : {};
+  const claims = isRecord(item['claims']) ? item['claims'] : ({} as const);
 
   const {
     repository: claimRepository,

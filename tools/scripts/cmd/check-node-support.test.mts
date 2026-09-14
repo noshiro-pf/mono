@@ -19,15 +19,15 @@ const validConfig = {
 } as const;
 
 /** `validConfig` with one or more fields replaced. */
-const configWith = (
-  overrides: Partial<NodeSupportConfig>,
-): NodeSupportConfig => ({ ...validConfig, ...overrides });
+const configWith = (overrides: Partial<NodeSupportConfig>): NodeSupportConfig =>
+  ({ ...validConfig, ...overrides }) as const;
 
-const v = (major: number, minor: number, patch: number): Version => ({
-  major,
-  minor,
-  patch,
-});
+const v = (major: number, minor: number, patch: number): Version =>
+  ({
+    major,
+    minor,
+    patch,
+  }) as const;
 
 describe('parseNodeSupportConfig', () => {
   test('accepts a valid config', () => {

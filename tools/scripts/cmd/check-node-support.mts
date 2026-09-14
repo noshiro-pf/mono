@@ -59,7 +59,7 @@ export const checkNodeSupport = (
 
     const workflowViolations = await checkWorkflowMatrix(config);
 
-    const violations = [...manifestViolations, ...workflowViolations];
+    const violations = [...manifestViolations, ...workflowViolations] as const;
 
     if (!Arr.isNonEmpty(violations)) {
       return Result.ok({ manifestCount: manifests.length, fixedCount: 0 });
@@ -94,7 +94,7 @@ export const checkNodeSupport = (
  * config so that the check and the updater cannot disagree about them.
  */
 export const expectedFields = (config: NodeSupportConfig): ExpectedFields => {
-  const lower = `>=${config.targets.minimum}`;
+  const lower = `>=${config.targets.minimum}` as const;
 
   const ceiling = expectedCeiling(config);
 
@@ -482,11 +482,12 @@ const collectManifests = async (): Promise<
 const checkManifest = (
   manifest: Manifest,
   expected: ExpectedFields,
-): readonly Violation[] => [
-  ...checkEnginesNode(manifest, expected),
-  ...checkVoltaNode(manifest, expected),
-  ...checkDevEnginesRuntime(manifest, expected),
-];
+): readonly Violation[] =>
+  [
+    ...checkEnginesNode(manifest, expected),
+    ...checkVoltaNode(manifest, expected),
+    ...checkDevEnginesRuntime(manifest, expected),
+  ] as const;
 
 const checkEnginesNode = (
   manifest: Manifest,
@@ -695,7 +696,7 @@ const rewriteStringAt = (
 ): Violation['fix'] =>
   readStringAt(manifest.parsed, keyPath) === undefined
     ? undefined
-    : { absolutePath: manifest.absolutePath, keyPath, value };
+    : ({ absolutePath: manifest.absolutePath, keyPath, value } as const);
 
 /**
  * A copy of `source` with `keyPath` set to `value`, creating the objects along
@@ -711,7 +712,7 @@ const setStringAt = (
 
   if (head === undefined) return value;
 
-  const base = isRecord(source) ? source : {};
+  const base = isRecord(source) ? source : ({} as const);
 
   return {
     ...base,

@@ -43,9 +43,9 @@
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-all.mts",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-    "codemod": "pnpm run z:ts-codemod --uncommitted --transformer append-as-const --transformer convert-to-readonly '{libs/*,apps/*,tools/*,languages/*/*}/{src,scripts,samples,test}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**' && pnpm run fmt",
-    "codemod:diff": "pnpm run z:ts-codemod --diff-from origin/main --transformer append-as-const --transformer convert-to-readonly '{libs/*,apps/*,tools/*,languages/*/*}/{src,scripts,samples,test}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**' && pnpm run fmt",
-    "codemod:full": "pnpm run z:ts-codemod --transformer append-as-const --transformer convert-to-readonly '{libs/*,apps/*,tools/*,languages/*/*}/{src,scripts,samples,test}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**' && pnpm run fmt",
+    "codemod": "pnpm run z:ts-codemod --uncommitted && pnpm run fmt",
+    "codemod:diff": "pnpm run z:ts-codemod --diff-from origin/main && pnpm run fmt",
+    "codemod:full": "pnpm run z:ts-codemod && pnpm run fmt",
     "coverage:normalize-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/normalize-coverage-paths.mts",
     "cspell": "cspell \"{**,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress && pnpm run cspell:changeset",
     "cspell:changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/cspell-changeset.mts",
@@ -70,7 +70,7 @@
     "strict-lib:lint": "pnpm run z:eslint --config ./strict-lib/eslint.config.mts './strict-lib/**/*.mts'",
     "strict-lib:publish": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/dist-npm-publish.mts",
     "strict-lib:type-check": "tsc -p ./strict-lib/tsconfig.tooling.json --noEmit",
-    "unblock-prs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/unblock-prs.mts",
+    "unblock-prs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/unblock-prs/main.mts",
     "update-actions": "node ./tools/scripts/cmd/mature-updates.mts actions",
     "update-changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/changeset-for-dependency-update.mts",
     "update-packages": "pnpm update --latest --recursive --filter '!./strict-lib/v*/output/lib'",
@@ -104,7 +104,8 @@
     "z:format-uncommitted": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
     "z:link-strict-lib": "strict-ts-lib-v7.0-link",
     "z:repo-settings": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/github-settings-as-code/src/cmd/repo-settings.mts",
-    "z:ts-codemod": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-codemod-cli/src/cmd/ts-codemod.mts"
+    "z:ts-codemod": "pnpm run z:ts-codemod:cmd  --transformer append-as-const --transformer convert-to-readonly '{libs/**,apps/**,tools/**,languages/*/*}/{src,scripts,samples,test}/**/*.{ts,mts,tsx}' --exclude 'libs/ts-type-forge/{src,samples,scripts}/**' --exclude 'libs/eslint-plugin-ts-type-forge/{src,samples}/**'",
+    "z:ts-codemod:cmd": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/ts-codemod-cli/src/cmd/ts-codemod.mts"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.2",

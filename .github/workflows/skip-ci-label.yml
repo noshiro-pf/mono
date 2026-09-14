@@ -1,10 +1,10 @@
-name: WIP Label
+name: Skip CI Label
 
-# `[WIP]` on a pull request skips the four check workflows and the two lint
+# `skip-ci` on a pull request skips the four check workflows and the two lint
 # jobs — see the note in type-check.yml. GitHub has no label-based merge
 # block, so on its own the label would leave a pull request that nothing
 # checked looking exactly like one that passed. This is the block: a required
-# status check, `no-wip-label`, that stays `pending` for as long as the label
+# status check, `no-skip-ci-label`, that stays `pending` for as long as the label
 # is on.
 #
 # It is the *only* thing that blocks a labelled pull request. The `*-result`
@@ -12,11 +12,11 @@ name: WIP Label
 # red while the label is on — a pull request nobody is checking yet should
 # read grey, not broken — and a skipped required check is satisfied. So the
 # blocking is concentrated here, in one check that names its reason. Removing
-# this workflow, or its `no-wip-label` context from
-# `repo-settings/rulesets/main.json`, would leave `[WIP]` skipping every check
+# this workflow, or its `no-skip-ci-label` context from
+# `repo-settings/rulesets/main.json`, would leave `skip-ci` skipping every check
 # with nothing holding the merge at all.
 #
-# `no-wip-label` is a commit status, not the check run of a job. A job's
+# `no-skip-ci-label` is a commit status, not the check run of a job. A job's
 # check run concludes the way the job ends — success, failure, skipped,
 # cancelled — and none of those is right here. Skipped and success both
 # satisfy a required check, so they cannot hold the merge. Failure holds it,
@@ -63,37 +63,37 @@ permissions:
   statuses: write
 
 jobs:
-  # Deliberately not named `no-wip-label`: this job's own check run and the
+  # Deliberately not named `no-skip-ci-label`: this job's own check run and the
   # status it writes would then share a name, and which of the two the
   # ruleset reads is not something to find out on a merge.
-  wip-label:
+  skip-ci-label:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Write the `no-wip-label` status for the head commit
+      - name: Write the `no-skip-ci-label` status for the head commit
         env:
           GH_TOKEN: ${{ github.token }}
           # The pull request's own head, not the merge commit GitHub
           # synthesises for the event: the required checks are read on the
           # head.
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          LABELLED: ${{ contains(github.event.pull_request.labels.*.name, '[WIP]') }}
+          LABELLED: ${{ contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [ "${LABELLED}" = 'true' ]; then
             state='pending'
-            description='The [WIP] label is on. Take it off to run the checks and unblock the merge.'
-            summary='The `[WIP]` label is on this pull request, so the checks were skipped and `no-wip-label` is left `pending`, which holds the merge. Take the label off: removing it fires `unlabeled`, runs the checks, and writes `success` here.'
+            description='The skip-ci label is on. Take it off to run the checks and unblock the merge.'
+            summary='The `skip-ci` label is on this pull request, so the checks were skipped and `no-skip-ci-label` is left `pending`, which holds the merge. Take the label off: removing it fires `unlabeled`, runs the checks, and writes `success` here.'
           else
             state='success'
-            description='No [WIP] label.'
-            summary='No `[WIP]` label on this pull request: `no-wip-label` is `success` and holds nothing.'
+            description='No skip-ci label.'
+            summary='No `skip-ci` label on this pull request: `no-skip-ci-label` is `success` and holds nothing.'
           fi
 
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${HEAD_SHA}" \
             --field state="${state}" \
-            --field context='no-wip-label' \
+            --field context='no-skip-ci-label' \
             --field description="${description}" \
             --field target_url="${RUN_URL}" \
             >/dev/null

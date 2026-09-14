@@ -281,8 +281,8 @@ const collectPaths = (manifest: JsonValue): readonly string[] => {
   const fromBin = isRecord(binField)
     ? Object.values(binField).filter(isString)
     : isString(binField)
-      ? [binField]
-      : [];
+      ? ([binField] as const)
+      : ([] as const);
 
   return [
     ...fromTopLevel,
@@ -600,16 +600,17 @@ const readCommittedPeers = async (
 const siblingOverrides = (
   dir: string,
   packages: readonly PackageToCheck[],
-): readonly string[] => [
-  '# Depend on the sibling packed from this checkout, not the older one on',
-  '# npm — on a version branch the bumped version is not published at all.',
-  'overrides:',
-  ...packages.map(
-    (pkg) =>
-      `  '${pkg.name}': 'file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
-  ),
-  '',
-];
+): readonly string[] =>
+  [
+    '# Depend on the sibling packed from this checkout, not the older one on',
+    '# npm — on a version branch the bumped version is not published at all.',
+    'overrides:',
+    ...packages.map(
+      (pkg) =>
+        `  '${pkg.name}': 'file:${path.relative(dir, path.resolve(tarballDir, `${pkg.name}.tgz`))}'`,
+    ),
+    '',
+  ] as const;
 
 /**
  * Packages that are in the workspace but not on npm yet, and so are left out
@@ -720,7 +721,9 @@ const readPinnedVersion = async (
  * as `.mts`, and the presence of that file is what selects the mode.
  */
 const smokeFileName = (packageName: string): string =>
-  isTypesOnly(packageName) ? `${packageName}.mts` : `${packageName}.mjs`;
+  isTypesOnly(packageName)
+    ? (`${packageName}.mts` as const)
+    : (`${packageName}.mjs` as const);
 
 /**
  * The strict standard library packages all share one check, because they only
@@ -837,7 +840,8 @@ const runChecks = async (
     // Through NODE_OPTIONS rather than an argument, so that a check which
     // spawns the package's own executable — several do — carries the boundary
     // into that child process too.
-    const isolation = `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'`;
+    const isolation =
+      `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'` as const;
 
     // The packages whose TypeScript resolves `@typescript/lib-*` by name are
     // set up by the linker they ship, exactly as their README instructs —
@@ -847,12 +851,12 @@ const runChecks = async (
     // from its own path — a consumer running `npx` in their project needs
     // neither.
     const link = needsLinker(pkg.name)
-      ? `${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir} && `
+      ? (`${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir} && ` as const)
       : '';
 
     const cmd = file.endsWith('.mts')
-      ? `${link}${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, 'tsconfig.json')}`
-      : `${isolation} node ${path.resolve(dir, file)}`;
+      ? (`${link}${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, 'tsconfig.json')}` as const)
+      : (`${isolation} node ${path.resolve(dir, file)}` as const);
 
     // From the project directory, which is where a consumer runs their own
     // build. It is not cosmetic: TypeScript 5.0 resolves `@typescript/lib-*`

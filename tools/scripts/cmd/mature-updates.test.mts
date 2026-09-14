@@ -38,11 +38,12 @@ const daysAgo = (days: number): string =>
 const cutoffDaysAgo = (days: number): number =>
   now.epochMilliseconds - days * millisecondsPerDay;
 
-const v = (major: string, minor: string, patch: string): StableVersion => ({
-  major,
-  minor,
-  patch,
-});
+const v = (major: string, minor: string, patch: string): StableVersion =>
+  ({
+    major,
+    minor,
+    patch,
+  }) as const;
 
 const sha = (fill: string): string => fill.repeat(40);
 
@@ -124,7 +125,7 @@ describe('pnpm', () => {
       '13.0.0-alpha.0': daysAgo(40),
       // '12.5.0' deliberately has no publish time.
     },
-  };
+  } as const;
 
   describe('selectMaturePnpmVersion', () => {
     test('picks the newest stable version older than the hold', () => {
@@ -233,13 +234,14 @@ describe('actions', () => {
     tag: string,
     publishedDaysAgo: number | undefined,
     flags?: Readonly<Partial<StrictPick<Release, 'draft' | 'prerelease'>>>,
-  ): Release => ({
-    tag,
-    publishedAt:
-      publishedDaysAgo === undefined ? undefined : daysAgo(publishedDaysAgo),
-    draft: flags?.draft ?? false,
-    prerelease: flags?.prerelease ?? false,
-  });
+  ): Release =>
+    ({
+      tag,
+      publishedAt:
+        publishedDaysAgo === undefined ? undefined : daysAgo(publishedDaysAgo),
+      draft: flags?.draft ?? false,
+      prerelease: flags?.prerelease ?? false,
+    }) as const;
 
   const checkoutReleases: readonly Release[] = [
     release('v7.0.3', 1),
@@ -250,7 +252,7 @@ describe('actions', () => {
     release('v7.0.1', 60),
     release('v6.1.0', 5),
     release('v9.0.0', 2),
-  ];
+  ] as const;
 
   describe('selectMatureRelease', () => {
     test('moves within the major to the newest release older than the hold', () => {
@@ -331,7 +333,8 @@ describe('actions', () => {
 
   describe('parseActionPinLine / renderActionPin', () => {
     test('round-trips a pinned line, subpath included', () => {
-      const line = `      - uses: owner/tool/sub/path@${sha('a')} # v1.2.3`;
+      const line =
+        `      - uses: owner/tool/sub/path@${sha('a')} # v1.2.3` as const;
 
       const pin = parseActionPinLine(line);
 
@@ -411,12 +414,12 @@ describe('actions', () => {
         { tag_name: 'v1.2.4', published_at: realDaysAgo(30) },
         { tag_name: 'v1.2.3', published_at: realDaysAgo(90) },
       ],
-    };
+    } as const;
 
     const commitShaByTag: ReadonlyRecord<string, string> = {
       'actions/checkout@v7.0.2': sha('b'),
       'owner/tool@v1.2.4': sha('c'),
-    };
+    } as const;
 
     const mut_requests: string[] = [];
 

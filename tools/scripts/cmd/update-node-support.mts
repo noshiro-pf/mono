@@ -328,7 +328,7 @@ const writeTargets = async (
   config: NodeSupportConfig,
   desired: NodeSupportConfig['targets'],
 ): Promise<void> => {
-  const updated = { ...config, targets: desired };
+  const updated = { ...config, targets: desired } as const;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
@@ -360,7 +360,7 @@ const fetchJson = async (url: string): Promise<Result<unknown, string>> => {
 };
 
 const formatVersion = (version: Version): string =>
-  `${String(version.major)}.${String(version.minor)}.${String(version.patch)}`;
+  `${String(version.major)}.${String(version.minor)}.${String(version.patch)}` as const;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const allowMinimumChange = process.argv.includes('--allow-minimum-change');

@@ -118,7 +118,7 @@ const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
 };
 
 const stringRecord = (value: unknown): ReadonlyRecord<string, string> =>
-  isRecord(value) ? Obj.filter(value, isString) : {};
+  isRecord(value) ? Obj.filter(value, isString) : ({} as const);
 
 /** Keeps only the entries that name a package in this repository. */
 const internal = (
@@ -379,7 +379,7 @@ const cycleNotes: readonly string[] = [
   '`dependencies` / `peerDependencies` はそのパッケージの API なので',
   'カタログ化せず、レンジをそのまま書く。',
   '',
-];
+] as const;
 
 const mermaidEdges = (
   packages: readonly PackageInfo[],
@@ -403,8 +403,8 @@ const stageTable = (
   stages: readonly (readonly string[])[] | undefined,
 ): readonly string[] =>
   stages === undefined
-    ? [`### ${title}`, '', '循環があり、段階に分解できない。', '']
-    : [
+    ? ([`### ${title}`, '', '循環があり、段階に分解できない。', ''] as const)
+    : ([
         `### ${title}`,
         '',
         '| 段階 | パッケージ |',
@@ -413,7 +413,7 @@ const stageTable = (
           (stage, i) =>
             `| ${i + 1} | ${stage.map((name) => `\`${name}\``).join(', ')} |`,
         ),
-      ];
+      ] as const);
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await genDependencyGraph();

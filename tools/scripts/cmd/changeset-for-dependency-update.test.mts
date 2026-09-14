@@ -11,15 +11,15 @@ describe('runtimeDependenciesChanged', () => {
       name: 'ts-data-forge',
       dependencies: { 'ts-type-forge': '^4.0.0' },
       devDependencies: { eslint: '^9.0.0' },
-    };
+    } as const;
 
     expect(runtimeDependenciesChanged(manifest, manifest)).toBe(false);
   });
 
   test.each(runtimeFields)('is true when %s moved', (field) => {
-    const before = { name: 'p', [field]: { dep: '^1.0.0' } };
+    const before = { name: 'p', [field]: { dep: '^1.0.0' } } as const;
 
-    const after = { name: 'p', [field]: { dep: '^1.1.0' } };
+    const after = { name: 'p', [field]: { dep: '^1.1.0' } } as const;
 
     expect(runtimeDependenciesChanged(after, before)).toBe(true);
   });
@@ -39,9 +39,12 @@ describe('runtimeDependenciesChanged', () => {
   // The whole point of the classification: a devDependency bump publishes
   // nothing, and a changeset for it would release every package on every run.
   test('is false when only devDependencies moved', () => {
-    const before = { name: 'p', devDependencies: { eslint: '^9.0.0' } };
+    const before = {
+      name: 'p',
+      devDependencies: { eslint: '^9.0.0' },
+    } as const;
 
-    const after = { name: 'p', devDependencies: { eslint: '^9.1.0' } };
+    const after = { name: 'p', devDependencies: { eslint: '^9.1.0' } } as const;
 
     expect(runtimeDependenciesChanged(after, before)).toBe(false);
   });
