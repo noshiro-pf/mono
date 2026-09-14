@@ -95,6 +95,7 @@ type OnlyObjects<T> = T extends Primitive ? never : T;
 
 expectType<OnlyObjects<string | object>, object>('=');
 
+// eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
 expectType<OnlyObjects<number | boolean | {}>, {}>('=');
 
 expectType<

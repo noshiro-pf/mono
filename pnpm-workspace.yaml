@@ -12,8 +12,8 @@ catalog:
   '@types/node': 26.5.0
   '@types/react': 19.3.0
   '@types/react-dom': 19.3.0
-  '@typescript-eslint/parser': 8.69.0
-  '@typescript-eslint/rule-tester': 8.69.0
+  '@typescript-eslint/parser': 8.70.0
+  '@typescript-eslint/rule-tester': 8.70.0
   '@vitejs/plugin-react': 6.1.1
   '@vitest/browser-playwright': 5.0.0
   '@vitest/coverage-v8': 5.0.0
@@ -30,8 +30,8 @@ catalog:
   markdownlint-cli2: 0.23.2
   mobx: 7.0.3
   npm-run-all2: 9.0.3
-  oxfmt: 0.66.0
-  oxlint: 1.81.0
+  oxfmt: 0.67.0
+  oxlint: 1.82.0
   oxlint-tsgolint: 7.0.2001
   playwright: 1.63.0
   preact: 10.29.8

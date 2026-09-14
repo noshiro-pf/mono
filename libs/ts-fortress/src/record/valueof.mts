@@ -74,7 +74,7 @@ type ValueOfType<T extends UnknownRecord> =
   expectType<TypeOf<ReturnType<typeof valueof<Single>>>, 'hello'>('=');
 
   // valueof of empty record yields undefined
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type,@typescript-eslint/no-generated-empty-object-type
   type EmptyRecord = Readonly<{}>;
 
   expectType<ValueOfType<EmptyRecord>, Type<undefined>>('=');

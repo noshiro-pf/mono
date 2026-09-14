@@ -479,6 +479,8 @@ export const typescriptEslintRules = {
   // Disabled because it reports common state updater patterns as unnecessary errors.
   '@typescript-eslint/strict-void-return': 'off',
 
+  '@typescript-eslint/no-generated-empty-object-type': 'error',
+
   // For browser environment only
 
   // For Node.js environment only

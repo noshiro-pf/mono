@@ -5487,6 +5487,23 @@ namespace NoForInArray {
 }
 
 /**
+ * @description Disallow type operations that resolve to the "empty object" type
+ * @link https://typescript-eslint.io/rules/no-generated-empty-object-type
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | strict  |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace NoGeneratedEmptyObjectType {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow the use of `eval()`-like functions
  * @link https://typescript-eslint.io/rules/no-implied-eval
  *
@@ -10450,6 +10467,7 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/no-extraneous-class': NoExtraneousClass.RuleEntry;
   '@typescript-eslint/no-floating-promises': NoFloatingPromises.RuleEntry;
   '@typescript-eslint/no-for-in-array': NoForInArray.RuleEntry;
+  '@typescript-eslint/no-generated-empty-object-type': NoGeneratedEmptyObjectType.RuleEntry;
   '@typescript-eslint/no-implied-eval': NoImpliedEval.RuleEntry;
   '@typescript-eslint/no-import-type-side-effects': NoImportTypeSideEffects.RuleEntry;
   '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;

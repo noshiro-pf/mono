@@ -117,6 +117,7 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
   expectType<DeepPick<{ a: number }, ['a']>, { a: number }>('=');
 
   // Path through primitive: consistent with RelaxedPick (non-existent key → {})
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<DeepPick<{ a: number }, ['a', 'b']>, { a: NonNullable<unknown> }>(
     '=',
   );
@@ -124,16 +125,19 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
   // Path through primitive with method name: still {} (primitives are opaque)
   expectType<
     DeepPick<{ a: number }, ['a', 'toString']>,
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     { a: NonNullable<unknown> }
   >('=');
 
   // Non-existent nested key on record: consistent with RelaxedPick
   expectType<
     DeepPick<{ a: { b: number } }, ['a', 'x']>,
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     { a: NonNullable<unknown> }
   >('=');
 
   // Non-existent top-level key: consistent with RelaxedPick
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<DeepPick<{ a: number }, ['x']>, NonNullable<unknown>>('=');
 
   // Union input: distributes over each member
@@ -153,11 +157,14 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
 
   // Union input: members with disjoint keys
   expectType<
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     DeepPick<{ a: number } | { b: string }, ['a']>,
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     NonNullable<unknown> | { a: number }
   >('=');
 
   // Reference: picking a non-existent key produces an empty object type
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<RelaxedPick<{ b: number }, 'a'>, {}>('=');
 
   // Union input with union paths
@@ -241,6 +248,7 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
       { a: { b: { c: number }; d: string }; e: boolean },
       ['a', 'b', 'c'] | ['e']
     >,
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     { a: { b: NonNullable<unknown>; d: string } }
   >('=');
 
@@ -354,6 +362,7 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
       { a: { x: number; y: string } } | { a: { x: boolean }; b: number },
       ['a', 'x']
     >,
+    // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
     { a: { y: string } } | { a: NonNullable<unknown>; b: number }
   >('=');
 

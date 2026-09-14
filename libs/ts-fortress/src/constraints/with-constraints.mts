@@ -41,6 +41,7 @@ export type ConstraintsOf<T extends UnknownType> =
   T extends WithConstraints<infer C> ? C : never;
 
 /** The empty constraint set — the type was created without any constraint. */
+// eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
 export type NoConstraints = ReadonlyRecord<never, never>;
 
 /**

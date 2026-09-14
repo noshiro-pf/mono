@@ -79,6 +79,7 @@ type KeyofType<R extends UnknownRecord> =
   expectType<TypeOf<ReturnType<typeof keyof<Base>>>, 'a' | 'b' | 'c'>('=');
 
   // keyof of empty record yields undefined
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   type EmptyRecord = ReadonlyRecord<never, never>;
 
   expectType<TypeOf<ReturnType<typeof keyof<EmptyRecord>>>, undefined>('=');

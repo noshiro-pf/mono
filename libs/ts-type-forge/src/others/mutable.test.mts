@@ -89,6 +89,7 @@ expectType<MutableMap<any, any>, Map<any, any>>('=');
 // Test edge cases
 
 // Empty object
+// eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
 expectType<Mutable<{}>, {}>('=');
 
 // Object with optional properties
