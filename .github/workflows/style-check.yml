@@ -121,6 +121,14 @@ jobs:
           # goes stale — or when `gi` overwrites a hand-written index file,
           # which is what `--preserve` in each package's `gi:src` now stops.
           - ws:gi
+          # The rest of the committed generated sources: the ESLint rule
+          # types, ts-data-forge's branded numbers, ts-type-forge's
+          # `global.mts` / `entry-point.mts`, the synstate re-export shims.
+          # `build` used to regenerate all of it on every run, which put three
+          # of the five minutes a full build took into every job that builds;
+          # regenerating it here and letting the repository-clean step below
+          # compare is what replaces that.
+          - ws:gen:src
 
     steps:
       - name: Checkout
@@ -149,13 +157,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ws:doc and ws:check:ext load each package's sources, which import
-      # workspace siblings and resolve through their `exports` map to dist/.
-      # Nothing is built yet on a clean checkout, so these two need the
-      # packages emitted first. The other matrix entries do not touch dist/,
-      # so they skip the build.
+      # ws:doc, ws:check:ext and ws:gen:src load each package's sources, which
+      # import workspace siblings and resolve through their `exports` map to
+      # dist/. Nothing is built yet on a clean checkout, so these three need
+      # the packages emitted first. The other matrix entries do not touch
+      # dist/, so they skip the build.
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
+        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext' || matrix.command == 'ws:gen:src'
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"

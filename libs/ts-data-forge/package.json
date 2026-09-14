@@ -37,7 +37,6 @@
   ],
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
-    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
@@ -48,6 +47,7 @@
     "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "gen:branded-number": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-branded-number/generate.mts && pnpm run doc:embed:jsdoc && pnpm run z:prettier 'src/number/branded-types/*.mts' 'src/number/enum/*.mts'",
+    "gen:src": "pnpm run gen:branded-number",
     "gi": "run-s gi:src fmt",
     "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --preserve 'array/index.mts' --preserve 'functional/index.mts'",
     "lint": "eslint .",
@@ -58,7 +58,6 @@
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
     "testw": "pnpm run z:vitest:node watch",
-    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",

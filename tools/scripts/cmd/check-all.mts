@@ -38,6 +38,32 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Build succeeded',
   });
 
+  // `build` emits and nothing else, so the committed sources it used to
+  // regenerate on every run are regenerated here instead, once. CI does the
+  // same and then asserts the tree is clean — see "What a build emits" in
+  // CLAUDE.md. Both need `dist/`: the re-export generators import their
+  // sibling by name, and `gen-rule-type` lints what it wrote.
+  await logStep({
+    startMessage: 'Regenerating the generated sources',
+    action: () => runCmdStep('pnpm run ws:gen:src', 'Source generation failed'),
+    successMessage: 'Generated sources regenerated',
+  });
+
+  await logStep({
+    startMessage: 'Regenerating the index files',
+    action: () => runCmdStep('pnpm run ws:gi', 'Index generation failed'),
+    successMessage: 'Index files regenerated',
+  });
+
+  // What the build emitted, reached by package name through the `exports`
+  // map — the way a consumer reaches it — plus the API consistency checks
+  // that need a built sibling to read.
+  await logStep({
+    startMessage: 'Checking the build output',
+    action: () => runCmdStep('pnpm run ws:check', 'Build output checks failed'),
+    successMessage: 'Build output validated',
+  });
+
   // A package's `build` only type-checks what it publishes; everything else
   // (tests, scripts, configs, lint config) imports siblings that are built
   // later, so it is checked here, once every `dist/` exists.

@@ -11,7 +11,7 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
-    "build": "run-s type-check build:esbuild",
+    "build": "pnpm run build:esbuild",
     "build:esbuild": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/build.mts",
     "fmt": "pnpm run z:format-uncommitted --cwd .",
     "fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
@@ -21,7 +21,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "node ./build/index.mjs",
-    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",

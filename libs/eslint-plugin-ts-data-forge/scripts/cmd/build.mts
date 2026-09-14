@@ -27,34 +27,8 @@ const nativeTsc = path.resolve(
 /**
  * Builds the ESLint plugin package.
  */
-const build = async (skipCheck: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
-
-  await logStep({
-    startMessage: 'Generating rule type definitions',
-    action: () =>
-      runCmdStep('pnpm run gen:rule-types', 'Rule type generation failed'),
-    successMessage: 'Rule type definitions generated',
-  });
-
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Verifying branded number type coverage',
-      action: () =>
-        runCmdStep(
-          'pnpm run check:branded-number-types',
-          'Branded number type coverage check failed',
-        ),
-      successMessage: 'Branded number type coverage verified',
-    });
-
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-  }
 
   await logStep({
     startMessage: 'Cleaning dist directory',
@@ -140,4 +114,4 @@ const runStep = async (
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

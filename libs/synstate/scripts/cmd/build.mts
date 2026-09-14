@@ -28,14 +28,8 @@ const nativeTsc = path.resolve(
 /**
  * Builds the entire project.
  */
-const build = async (skipCheck: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
-
-  await logStep({
-    startMessage: 'Generating index files',
-    action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-    successMessage: 'Index files generated',
-  });
 
   await logStep({
     startMessage: 'Cleaning dist directory',
@@ -80,7 +74,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     startMessage: 'Building synstate-react-hooks',
     action: async () => {
       await runCmdStep(
-        'cd ../synstate-react-hooks && pnpm run build:min',
+        'cd ../synstate-react-hooks && pnpm run build',
         'Building synstate-react-hooks failed',
       );
     },
@@ -118,15 +112,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
     },
     successMessage: 'Generated dist/tsconfig.json',
   });
-
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-  }
 
   console.info('✅ Build completed successfully!\n');
 };
@@ -178,4 +163,4 @@ const runStep = async (
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

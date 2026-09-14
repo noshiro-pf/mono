@@ -26,38 +26,23 @@ const nativeTsc = path.resolve(
 /**
  * Builds the entire project.
  */
-const build = async (skipCheck: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
 
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Cleaning dist directory',
-      action: () =>
-        runStep(
-          Result.fromPromise(
-            fs.rm(distDir, {
-              recursive: true,
-              force: true,
-            }),
-          ),
-          'Failed to clean dist directory',
+  await logStep({
+    startMessage: 'Cleaning dist directory',
+    action: () =>
+      runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
         ),
-      successMessage: 'Cleaned dist directory',
-    });
-
-    await logStep({
-      startMessage: 'Generating index files',
-      action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-      successMessage: 'Index files generated',
-    });
-  }
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
+  });
 
   await logStep({
     startMessage: 'Compiling with the native tsc',
@@ -97,9 +82,8 @@ const build = async (skipCheck: boolean): Promise<void> => {
       // instead. (The ADT variant types live in `src/adt-types.mts` for this
       // reason.)
       //
-      // The check is on the source, not on the emitted file: `--skip-check`
-      // leaves the previous build's `dist/` in place, and `src/types.mts` is
-      // the only source path that compiles to this name anyway.
+      // The check is on the source, not on the emitted file: `src/types.mts`
+      // is the only source path that compiles to this name anyway.
       const reservedSourceFile = path.resolve(
         projectRootPath,
         './src/types.mts',
@@ -192,4 +176,4 @@ const runStep = async (
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

@@ -53,7 +53,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](ht
 
 - **Run tests**: `npm test`
 - **Run tests in watch mode**: `npm run testw`
-- **Type checking**: `npm run tsc`
+- **Type checking**: `npm run type-check`
 - **Linting**: `npm run lint`
 - **Formatting**: `npm run fmt`
 - **Build the project**: `npm run build`

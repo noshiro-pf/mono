@@ -30,32 +30,23 @@ const nativeTsc = path.resolve(
  * (`dist/types.d.mts`, `dist/tsconfig.json`, the `test/dist_` smoke test) have
  * no counterpart here. The declaration pass is kept purely as the type-check.
  */
-const build = async (skipCheck: boolean): Promise<void> => {
+const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
 
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Cleaning dist directory',
-      action: () =>
-        runStep(
-          Result.fromPromise(
-            fs.rm(distDir, {
-              recursive: true,
-              force: true,
-            }),
-          ),
-          'Failed to clean dist directory',
+  await logStep({
+    startMessage: 'Cleaning dist directory',
+    action: () =>
+      runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
         ),
-      successMessage: 'Cleaned dist directory',
-    });
-  }
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
+  });
 
   await logStep({
     startMessage: 'Compiling with the native tsc',
@@ -127,4 +118,4 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   }
 };
 
-await build(process.argv.includes('--skip-check'));
+await build();

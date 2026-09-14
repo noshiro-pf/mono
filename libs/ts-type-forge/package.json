@@ -44,7 +44,7 @@
   ],
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
-    "build:min": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts --skip-check",
+    "check": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-dist.mts",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
@@ -54,13 +54,13 @@
     "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fmt:full": "pnpm run z:prettier .",
+    "gen:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-src.mts",
     "gi": "run-s gi:src fmt",
     "gi:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "run-p test:*",
     "test:src": "node ../../node_modules/typescript-native/bin/tsc --noEmit -p ./tsconfig.json",
-    "tsc": "run-p test:*",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"

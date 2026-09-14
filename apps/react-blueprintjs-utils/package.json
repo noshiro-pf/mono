@@ -19,7 +19,6 @@
     "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
