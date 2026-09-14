@@ -359,7 +359,7 @@ React 版が `apps/` にある。`goober` も箱だけなので npm の `goober`
 `experimental/restore-diff/` に置いた。復元前 703 ファイル・復元後 723 ファイルで、
 **変更 555 / 同一 143 / 追加 25 / 削除 5**。
 
-- **同一 143 のうち 77 は `index.mts` の barrel。** `pnpm run gi` の生成物で
+- **同一 143 のうち 77 は `index.mts` の barrel。** `pnpm run gen:index` の生成物で
   中身は `export * from './x.mjs'` の並びだけなので、周りが全部書き換わっても
   ファイルとしては変わらない
 - `event-schedule-app` の同一 25 は、`assets/icon_svg/*.svg` 7 件と、
@@ -516,7 +516,7 @@ Installation・Usage・API Reference・Benefits があり、ライブラリの�
 言うもので、index ファイルはそもそも export 対象から外れている）。同 PR が
 残り 10 パッケージから外すので、新しく足す側には最初から書かない。
 
-`pnpm run gi` が手書きの barrel と同じものを生成することは確認済み。
+`pnpm run gen:index` が手書きの barrel と同じものを生成することは確認済み。
 
 ### knip
 
@@ -920,7 +920,7 @@ io-ts の 12 種（`enumType` ・ `mergeRecords` ・ `nonEmptyArray` ・ `partia
 ### barrel は作らない
 
 10 モジュールのうち **5 つは import した時点で `await main()` が走る**道具で
-ある。`pnpm run gi` が生成した `index.mts` はそれらを再エクスポートするので、
+ある。`pnpm run gen:index` が生成した `index.mts` はそれらを再エクスポートするので、
 barrel を読むだけでツールが動いてしまう。ライブラリとしての面が無いので、
 `gi` スクリプトごと外した。knip には 5 つの入口を個別に登録している。
 
@@ -1343,10 +1343,10 @@ MUI を使う 3 app（`catan-dice-app` ・ `color-demo-app` ・ `annotation-tool
 移植元は `index.mts` の先頭で Roboto の 4 ウェイトを副作用 import している。
 これは**復元してはいけない形**だった：
 
-1. `index.mts` は `pnpm run gi` の生成物である。実際に走らせると
+1. `index.mts` は `pnpm run gen:index` の生成物である。実際に走らせると
    副作用 import は 4 行とも消える — issue #1737 の 1 件目
    （`poll-discord-app` の実行エントリが barrel に潰された）と同じ壊れ方で、
-   #1742 で CI に入った `style-check (ws:gi)` が落ちる。
+   #1742 で CI に入った `style-check (ws:gen)` が落ちる。
 2. `import-x/extensions` は `never`（例外は `json` と `mjs`）なので、
    `@fontsource/roboto/300.css` のようなパッケージ副パスの拡張子は通らない。
    リポジトリ内の CSS import は `import './index.css'` の相対形しか前例が無い。
@@ -1442,7 +1442,7 @@ tsconfig で `ts-type-forge` を参照している 2 パッケージだけ。
 ### `append-as-const` が型を爆発させた 2 ファイル
 
 パッケージ単体の `type-check` ・ `lint` ・ `test` が 3 つとも 0 件になった後で
-`pnpm run codemod` を掛けると、**型エラーが 4 件・lint エラーが 8 件生えた**。
+`pnpm run fix:codemod` を掛けると、**型エラーが 4 件・lint エラーが 8 件生えた**。
 
 `hsl-to-str.mts` ・ `rgb-to-str.mts` のテンプレートリテラルに `as const` が
 付いたためで、`` `hsl(${h}, ${s}%, ${l}%)` `` の型が `Hue`（360 通り）と

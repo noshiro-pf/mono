@@ -252,7 +252,7 @@ npm exec -- check-should-run-type-checks \
 
 - name: Run type checks
   if: steps.check_diff.outputs.should_run == 'true'
-  run: npm run type-check
+  run: npm run check:types
 ```
 
 **Options:**

@@ -135,7 +135,7 @@ export * from './helper.mjs';
 
 ### 強制手段
 
-`sumi/no-mixed-star-export`(@sumi-lang/oxlint-config の JS plugin、2026-09-08 実装): `ExportAllDeclaration`(`exported` を持たない `export * from` / `export type * from`)を含むファイルに他の文があれば、その文ごとに報告する構文ルール。`export * as ns from` は名前 `ns` の明示 export なので「他の文」側。型情報は要らない。名前が実際に衝突しているかは見ない — それは tsc の TS2308 が担当する。この monorepo の `pnpm run gi` が生成する index.mts は `export *` のみなので既に適合する。
+`sumi/no-mixed-star-export`(@sumi-lang/oxlint-config の JS plugin、2026-09-08 実装): `ExportAllDeclaration`(`exported` を持たない `export * from` / `export type * from`)を含むファイルに他の文があれば、その文ごとに報告する構文ルール。`export * as ns from` は名前 `ns` の明示 export なので「他の文」側。型情報は要らない。名前が実際に衝突しているかは見ない — それは tsc の TS2308 が担当する。この monorepo の `pnpm run gen:index` が生成する index.mts は `export *` のみなので既に適合する。
 
 ## 未解決の論点
 

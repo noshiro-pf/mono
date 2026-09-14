@@ -15,13 +15,13 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Running spell check',
-    action: () => runCmdStep('pnpm run cspell', 'Spell check failed'),
+    action: () => runCmdStep('pnpm run check:cspell', 'Spell check failed'),
     successMessage: 'Spell check passed',
   });
 
   await logStep({
     startMessage: 'Running Markdown check',
-    action: () => runCmdStep('pnpm run md', 'Markdown check failed'),
+    action: () => runCmdStep('pnpm run check:md', 'Markdown check failed'),
     successMessage: 'Markdown check passed',
   });
 
@@ -41,18 +41,12 @@ const checkAll = async (): Promise<void> => {
   // `build` emits and nothing else, so the committed sources it used to
   // regenerate on every run are regenerated here instead, once. CI does the
   // same and then asserts the tree is clean — see "What a build emits" in
-  // CLAUDE.md. Both need `dist/`: the re-export generators import their
-  // sibling by name, and `gen-rule-type` lints what it wrote.
+  // CLAUDE.md. It needs `dist/`: the re-export generators import their sibling
+  // by name, and `gen:rule-types` lints what it wrote.
   await logStep({
     startMessage: 'Regenerating the generated sources',
-    action: () => runCmdStep('pnpm run ws:gen:src', 'Source generation failed'),
+    action: () => runCmdStep('pnpm run ws:gen', 'Source generation failed'),
     successMessage: 'Generated sources regenerated',
-  });
-
-  await logStep({
-    startMessage: 'Regenerating the index files',
-    action: () => runCmdStep('pnpm run ws:gi', 'Index generation failed'),
-    successMessage: 'Index files regenerated',
   });
 
   // What the build emitted, reached by package name through the `exports`
@@ -60,7 +54,8 @@ const checkAll = async (): Promise<void> => {
   // that need a built sibling to read.
   await logStep({
     startMessage: 'Checking the build output',
-    action: () => runCmdStep('pnpm run ws:check', 'Build output checks failed'),
+    action: () =>
+      runCmdStep('pnpm run ws:check:dist', 'Build output checks failed'),
     successMessage: 'Build output validated',
   });
 
@@ -69,7 +64,7 @@ const checkAll = async (): Promise<void> => {
   // later, so it is checked here, once every `dist/` exists.
   await logStep({
     startMessage: 'Running type checking',
-    action: () => runCmdStep('pnpm run ws:type-check', 'Type checking failed'),
+    action: () => runCmdStep('pnpm run ws:check:types', 'Type checking failed'),
     successMessage: 'Type checking passed',
   });
 
@@ -78,7 +73,7 @@ const checkAll = async (): Promise<void> => {
   // one command per package (languages/sumi/docs/decisions.md, D-46).
   await logStep({
     startMessage: 'Running the Sumi check',
-    action: () => runCmdStep('pnpm run ws:sumi:check', 'Sumi check failed'),
+    action: () => runCmdStep('pnpm run ws:check:sumi', 'Sumi check failed'),
     successMessage: 'Sumi check passed',
   });
 
@@ -98,7 +93,7 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Checking the strict standard library tooling',
     action: () =>
       runCmdStep(
-        'pnpm run strict-lib:type-check',
+        'pnpm run strict-lib:check:types',
         'Type checking strict-lib failed',
       ),
     successMessage: 'strict-lib types validated',
@@ -107,7 +102,7 @@ const checkAll = async (): Promise<void> => {
   await logStep({
     startMessage: 'Linting the strict standard library tooling',
     action: () =>
-      runCmdStep('pnpm run strict-lib:lint', 'Linting strict-lib failed'),
+      runCmdStep('pnpm run strict-lib:check:lint', 'Linting strict-lib failed'),
     successMessage: 'strict-lib lint passed',
   });
 
@@ -115,7 +110,8 @@ const checkAll = async (): Promise<void> => {
   // imports siblings through their `exports` map.
   await logStep({
     startMessage: 'Checking for unused dependencies',
-    action: () => runCmdStep('pnpm run knip', 'knip found unused declarations'),
+    action: () =>
+      runCmdStep('pnpm run check:knip', 'knip found unused declarations'),
     successMessage: 'No unused declarations',
   });
 
@@ -123,7 +119,7 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Checking what the packages publish',
     action: () =>
       runCmdStep(
-        'pnpm run lint:published-deps',
+        'pnpm run check:published-deps',
         'A published module imports something consumers do not get',
       ),
     successMessage: 'Published imports validated',
@@ -138,13 +134,16 @@ const checkAll = async (): Promise<void> => {
   await logStep({
     startMessage: 'Regenerating the dependency graph',
     action: () =>
-      runCmdStep('pnpm run docs:deps', 'Dependency graph generation failed'),
+      runCmdStep(
+        'pnpm run gen:deps-graph',
+        'Dependency graph generation failed',
+      ),
     successMessage: 'Dependency graph regenerated',
   });
 
   await logStep({
     startMessage: 'Running tests',
-    action: () => runCmdStep('pnpm run ws:test:cov', 'Tests failed'),
+    action: () => runCmdStep('pnpm run ws:check:test:cov', 'Tests failed'),
     successMessage: 'Tests passed',
   });
 
@@ -162,23 +161,23 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run ws:lint:fix', 'Linting failed'),
+    action: () => runCmdStep('pnpm run ws:fix:lint', 'Linting failed'),
     successMessage: 'Lint fixes applied',
   });
 
   await logStep({
     startMessage: 'Running codemod',
-    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    action: () => runCmdStep('pnpm run fix:codemod:full', 'Codemod failed'),
     successMessage: 'Codemod applied',
   });
 
   await logStep({
     startMessage: 'Formatting code',
-    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
+    action: () => runCmdStep('pnpm run fix:fmt:diff', 'File formatting failed'),
     successMessage: 'Code formatted',
   });
 
-  // `ws:test:browser` is deliberately not here: it needs Playwright's browsers
+  // `ws:check:test:browser` is deliberately not here: it needs Playwright's browsers
   // installed, which `pnpm install` does not do. Run it directly, or let CI.
   console.info('✅ All checks completed successfully!\n');
 };

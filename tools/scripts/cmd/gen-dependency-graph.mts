@@ -237,7 +237,7 @@ const render = (
 
   return [
     '<!-- AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. -->',
-    '<!-- Regenerate with `pnpm run docs:deps`. -->',
+    '<!-- Regenerate with `pnpm run gen:deps-graph`. -->',
     '',
     '# パッケージ間の依存関係',
     '',
@@ -343,7 +343,7 @@ const cycleNotes: readonly string[] = [
   '検証しており、外れるのは test・scripts・configs・lint 設定という',
   '「後段のツールチェーンを import する support code」だけである。',
   '',
-  'それらは全パッケージのビルド後に `pnpm run ws:type-check` が検証する',
+  'それらは全パッケージのビルド後に `pnpm run ws:check:types` が検証する',
   '（`check-all` にも入れてある）。',
   '',
   '### 3. ビルド順は実行時依存だけで決める',

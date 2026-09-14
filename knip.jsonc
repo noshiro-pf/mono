@@ -7,7 +7,7 @@
   // covers the other direction — a declared dependency nothing imports — plus
   // the imports ESLint cannot see, such as the ones in `samples/`.
   //
-  // Run with `pnpm run knip`.
+  // Run with `pnpm run check:knip`.
 
   // The CI gate is `dependencies,unlisted,binaries,unresolved,catalog,
   // catalogReferences` — the issue types that are about what a package
@@ -213,7 +213,7 @@
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
       // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
-      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      // the package's tsconfig.json), and `check:sumi` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },
 
@@ -238,7 +238,7 @@
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
       // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
-      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      // the package's tsconfig.json), and `check:sumi` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },
 
@@ -263,7 +263,7 @@
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
       // Sumi dogfood target: `tsconfig.sumi.json` reaches @sumi-lang/cli through
       // `extends: "@sumi-lang/cli/tsconfig.base.json"`, which knip does not read (it is not
-      // the package's tsconfig.json), and `sumi:check` runs the CLI by path.
+      // the package's tsconfig.json), and `check:sumi` runs the CLI by path.
       "ignoreDependencies": ["@sumi-lang/cli"],
     },
 

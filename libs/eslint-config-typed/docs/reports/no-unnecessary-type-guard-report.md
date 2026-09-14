@@ -130,7 +130,7 @@ type NonEmptyString = Brand<string, 'NonEmptyString'>;
 ### 既知の制約
 
 - 本リポジトリは `dist/` 未ビルドのため `eslint.config.mts` の self-import が解決できず
-  `pnpm run lint` は実行不可（本変更とは無関係）。型チェックとテストで検証済み。
+  `pnpm run check:lint` は実行不可（本変更とは無関係）。型チェックとテストで検証済み。
   未使用の `// eslint-disable-next-line no-bitwise` ディレクティブは削除済み
   （本リポジトリでは `no-bitwise` 未有効化のため）。
 

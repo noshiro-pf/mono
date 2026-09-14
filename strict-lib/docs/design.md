@@ -257,11 +257,11 @@ export type LibReplacementStrategy = Readonly<{
         "ws:gen:with-codemod-fixed": "tsx ./scripts/cmd/ws-gen-with-codemod-fixed-stages.mts",
 
         // 生成 lib の型チェック (各バージョンの type-check = tsc@5.x + libReplacement)
-        "ws:type-check": "pnpm run --recursive --if-present type-check",
+        "ws:check:types": "pnpm run --recursive --if-present check:types",
 
         // build tooling の型チェック (root の typescript で一括)
         "check:root": "pnpm run '/check:root:.*/'",
-        "check:root:type": "tsc -p ./tsconfig.json --noEmit", // dogfood: v5.9 strict lib (libReplacement)
+        "check:root:types": "tsc -p ./tsconfig.json --noEmit", // dogfood: v5.9 strict lib (libReplacement)
         "check:root:tooling": "tsc -p ./tsconfig.tooling.json --noEmit", // stock lib で全 build tooling
 
         "changeset:all": "tsx ./scripts/cmd/create-changeset.mts", // 全公開パッケージの changeset 一括生成
@@ -321,12 +321,12 @@ ESLint 設定は root の `eslint.config.mts` 1 つに集約し、per-package �
 `scripts/cmd/check-all.mts` のステップ:
 
 1. `pnpm i`
-2. `pnpm run cspell`
-3. `pnpm run md`
+2. `pnpm run check:cspell`
+3. `pnpm run check:md`
 4. `pnpm run check:root` — build tooling の型チェック (dogfood + tooling)
 5. `pnpm run ws:gen:with-codemod-fixed` — 全バージョンの生成
-6. `pnpm run ws:type-check` — 生成 lib を各バージョンの tsc@5.x で検証
-7. `pnpm run lint:fix` — 単一 config でリポジトリ全体を lint
+6. `pnpm run ws:check:types` — 生成 lib を各バージョンの tsc@5.x で検証
+7. `pnpm run fix:lint` — 単一 config でリポジトリ全体を lint
 8. `pnpm run fmt` — oxfmt (差分が出ないこと)
 
 ## 9. CI / 公開

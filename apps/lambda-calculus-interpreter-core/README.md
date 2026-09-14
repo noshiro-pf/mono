@@ -25,5 +25,5 @@ comes back to `apps/` as a private package.
 
 ```sh
 pnpm run test
-pnpm run type-check
+pnpm run check:types
 ```

@@ -300,12 +300,12 @@ changeset が要る。**ただしこの判断は後述の strict-typescript-lib#
 `.d.mts` が変わらないこと。`libReplacement` の有無で 2 通り emit して突き合わせる。
 `octokit-safe-types` では 15 ファイルすべて同一だった。
 
-**lint は `ws:lint` ではなく `ws:lint:fix` + `z:assert-repo-is-clean` で測る。**
+**lint は `ws:check:lint` ではなく `ws:fix:lint` + `z:assert-repo-is-clean` で測る。**
 strict lib が緩くした指摘に付いていた `eslint-disable` は不要になるが、
-`reportUnusedDisableDirectives` の重大度は warning なので `ws:lint` は exit 0 の
-まま「0 件」と報告する。CI の `type-check (ws:lint:fix)` は `--fix` でそれを消し、
+`reportUnusedDisableDirectives` の重大度は warning なので `ws:check:lint` は exit 0 の
+まま「0 件」と報告する。CI の `type-check (ws:fix:lint)` は `--fix` でそれを消し、
 そのあとの clean 判定で落ちる。#1761 の `eslint-config-typed` がこれで、18 件が
-`ws:lint` を通り抜けた。
+`ws:check:lint` を通り抜けた。
 
 ### 型チェック以外への影響（2026-08-14 実測）
 
@@ -587,7 +587,7 @@ tsconfig のあるディレクトリから上へ `node_modules` を辿るだけ�
 $ pnpm install                    # 依存宣言は strict-ts-lib-v7.0 の 1 件だけ
 $ ls node_modules/@typescript | wc -l
 107
-$ cd libs/octokit-safe-types && pnpm run type-check   # opt-in 済みパッケージ
+$ cd libs/octokit-safe-types && pnpm run check:types   # opt-in 済みパッケージ
 （エラー 0 件）
 ```
 
@@ -595,7 +595,7 @@ $ cd libs/octokit-safe-types && pnpm run type-check   # opt-in 済みパッケ�
 
 ```text
 $ echo "export const n = parseInt('10', 1);" > libs/octokit-safe-types/src/probe.mts
-$ pnpm run type-check
+$ pnpm run check:types
 src/probe.mts(1,33): error TS2345: Argument of type '1' is not assignable to
   parameter of type '2 | 3 | … | 36 | undefined'.
 ```
@@ -1652,7 +1652,7 @@ probe はテストではない（`@ts-expect-error` 1 個がファイルの全�
 
 ### `.d.mts` の比較でやり方を間違えた
 
-このパッケージの `build` は、宣言 emit の前に **`pnpm run type-check`（`test/` を
+このパッケージの `build` は、宣言 emit の前に **`pnpm run check:types`（`test/` を
 含む全スコープ）を走らせる**。ここまでの 7 パッケージの `build` は `src` の
 宣言 emit だけだったので、同じ手順が通用しない。
 
@@ -1972,7 +1972,7 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
 - **probe を足したあとに lint を測り直す。** このパッケージにも
   `ts-data-forge`（#1745）と同じ「テストファイルは export してはならない」
   規則があり、probe の `export` に当たる。probe を置く前に lint を通して
-  「0 件」と思い込むと、`ws:lint` で初めて落ちる。`#1745` と同じく、その
+  「0 件」と思い込むと、`ws:check:lint` で初めて落ちる。`#1745` と同じく、その
   ブロックの `ignores` に 1 件加えて対象外にした
 
 ## `eslint-config-typed` の opt-in（2026-09-01 実測）
@@ -1998,7 +1998,7 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
 metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== true` が
 意図どおりであり、truthy な非 boolean を true と扱わなくなるぶん厳しくなる。
 
-### 不要になった `eslint-disable` 18 件 — `ws:lint` では見えない
+### 不要になった `eslint-disable` 18 件 — `ws:check:lint` では見えない
 
 `vitest-globals.d.ts` の
 `// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types`
@@ -2008,11 +2008,11 @@ metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== tr
 `prefer-readonly-parameter-types` が鳴らなくなる。残る 4 件は
 `errorLike?: ErrorConstructor | Error | null` に付いたもので、これは変わらない。
 
-**これは `ws:lint` では落ちない。** `reportUnusedDisableDirectives: true` の
+**これは `ws:check:lint` では落ちない。** `reportUnusedDisableDirectives: true` の
 既定の重大度は warning で、`eslint .` は exit 0 のまま「0 件」と報告する。
-一方 CI の `type-check (ws:lint:fix)` は `--fix` で 18 件を消し、そのあとの
-`z:assert-repo-is-clean` が dirty で落ちる。**lint の実測は `ws:lint` ではなく
-`ws:lint:fix` + `z:assert-repo-is-clean` で行うこと。** #1761 はこれで落ちた。
+一方 CI の `type-check (ws:fix:lint)` は `--fix` で 18 件を消し、そのあとの
+`z:assert-repo-is-clean` が dirty で落ちる。**lint の実測は `ws:check:lint` ではなく
+`ws:fix:lint` + `z:assert-repo-is-clean` で行うこと。** #1761 はこれで落ちた。
 
 ### 確認したこと
 
@@ -2020,7 +2020,7 @@ metadata の `requiresTypeChecking` で、真偽値のフラグなので `=== tr
 - `libReplacement: false` にすると **probe だけ**が `TS2578` で落ちる
 - `.d.mts` 168 個が true / false で完全一致（`dist/` を消して exit code も確認）
 - probe を置いてから lint を測った
-- `ws:lint:fix` のあと `z:assert-repo-is-clean` が通る
+- `ws:fix:lint` のあと `z:assert-repo-is-clean` が通る
 
 ## `synstate-preact-hooks` の opt-in（2026-09-01 実測）
 

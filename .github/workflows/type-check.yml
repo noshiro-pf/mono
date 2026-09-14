@@ -18,7 +18,7 @@ on:
   #
   # The one thing a pull request run cannot do is give Codecov its baseline:
   # coverage is compared against the base commit's report, and the base
-  # commit is one on main. So `ws:test:cov` alone runs on main, in a job of
+  # commit is one on main. So `ws:check:test:cov` alone runs on main, in a job of
   # its own, and uploads.
   push:
     branches:
@@ -169,23 +169,23 @@ jobs:
           - check:root
           # `strict-lib/` is a directory, not a workspace member, so the `ws:*`
           # entries never reach its generator or scripts.
-          - strict-lib:type-check
-          - strict-lib:lint
-          - ws:type-check
+          - strict-lib:check:types
+          - strict-lib:check:lint
+          - ws:check:types
           # What the build emitted, type-checked by package name through the
           # `exports` map — the way a consumer reaches it. Part of `build`
           # until it was moved out, so that the twelve other entries here,
           # which only need `dist/`, stop paying for it.
-          - ws:check
-          - ws:lint:fix
+          - ws:check:dist
+          - ws:fix:lint
           # The Sumi lint check of the dogfood packages (`sumi:check` scripts).
-          - ws:sumi:check
-          - ws:test:browser
-          - ws:test:cov
-          - ws:e2e
+          - ws:check:sumi
+          - ws:check:test:browser
+          - ws:check:test:cov
+          - ws:check:e2e
           - codemod:full
           - knip
-          - lint:published-deps
+          - check:published-deps
           - verify:npm-packages
 
     steps:
@@ -215,11 +215,11 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # `ws:test:cov` needs a browser too: the synstate adapters' hooks only
+      # `ws:check:test:cov` needs a browser too: the synstate adapters' hooks only
       # run in one, so their coverage would otherwise be reported as zero.
-      # `ws:e2e` drives one, which is the whole point of it.
+      # `ws:check:e2e` drives one, which is the whole point of it.
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:test:browser' || matrix.command == 'ws:test:cov' || matrix.command == 'ws:e2e'
+        if: matrix.command == 'ws:check:test:browser' || matrix.command == 'ws:check:test:cov' || matrix.command == 'ws:check:e2e'
         run: pnpm exec playwright install chromium
 
       - name: Build all packages
@@ -237,10 +237,10 @@ jobs:
         run: pnpm run z:assert-repo-is-clean
 
       - name: Upload coverage reports to Codecov
-        if: matrix.command == 'ws:test:cov'
+        if: matrix.command == 'ws:check:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
-  # What a push to main runs: the `ws:test:cov` entry of the matrix above and
+  # What a push to main runs: the `ws:check:test:cov` entry of the matrix above and
   # nothing else, so that Codecov has a report on the base commit to compare
   # a pull request's against. See the trigger note at the top for why the
   # rest of the matrix does not run here.
@@ -292,8 +292,8 @@ jobs:
       - name: Build all packages
         run: pnpm run ws:build
 
-      - name: Run "ws:test:cov"
-        run: pnpm run ws:test:cov
+      - name: Run "ws:check:test:cov"
+        run: pnpm run ws:check:test:cov
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0

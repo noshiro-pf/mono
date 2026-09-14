@@ -32,7 +32,7 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
  * The rule is not type-aware, so this pass needs no TypeScript program and
  * stays fast.
  *
- * Run with `pnpm run lint:published-deps`.
+ * Run with `pnpm run check:published-deps`.
  */
 /** `true` for a directory holding a package that gets published. */
 const isPublishedPackage = (dir: string): boolean => {

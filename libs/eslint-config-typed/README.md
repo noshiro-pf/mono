@@ -148,9 +148,9 @@ Add a lint script to your `package.json`:
 Run the linter:
 
 ```sh
-npm run lint
+npm run check:lint
 # or auto-fix issues
-npm run lint:fix
+npm run fix:lint
 ```
 
 ### defineConfig helper

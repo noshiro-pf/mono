@@ -47,7 +47,7 @@ export const definePlaywrightAppConfig = ({
     retries: process.env['CI'] !== undefined ? 2 : 0,
 
     // Not `html`: that writes a report directory and starts a server after the
-    // run, neither of which a CI job or `ws:e2e` has any use for.
+    // run, neither of which a CI job or `ws:check:e2e` has any use for.
     reporter: process.env['CI'] !== undefined ? 'line' : 'list',
 
     use: {

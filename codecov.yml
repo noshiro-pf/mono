@@ -19,7 +19,7 @@ comment:
   require_changes: false
 
 # One component per package, so that a repository-wide number is not the only
-# thing on offer. `pnpm run ws:test:cov` writes a coverage report per package
+# thing on offer. `pnpm run ws:check:test:cov` writes a coverage report per package
 # and the workflow uploads them in a single step; components split that back
 # apart by path, which flags could not do without one upload per package.
 #

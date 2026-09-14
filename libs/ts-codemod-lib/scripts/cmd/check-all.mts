@@ -15,7 +15,7 @@ const checkAll = async (): Promise<void> => {
   await logStep({
     startMessage: 'Running spell check',
     action: () =>
-      runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed'),
+      runCmdStep('pnpm run check:cspell --fail-fast', 'Spell check failed'),
     successMessage: 'Spell check passed',
   });
 
@@ -34,19 +34,20 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Running test:browser',
-    action: () => runCmdStep('pnpm run test:browser', 'Browser tests failed'),
+    action: () =>
+      runCmdStep('pnpm run check:test:browser', 'Browser tests failed'),
     successMessage: 'Browser tests passed',
   });
 
   await logStep({
     startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
+    action: () => runCmdStep('pnpm run fix:lint', 'Linting failed'),
     successMessage: 'Lint fixes applied',
   });
 
   await logStep({
     startMessage: 'Running codemod',
-    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    action: () => runCmdStep('pnpm run fix:codemod:full', 'Codemod failed'),
     successMessage: 'Codemod applied',
   });
 
@@ -58,7 +59,7 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Formatting code',
-    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
+    action: () => runCmdStep('pnpm run fix:fmt:diff', 'File formatting failed'),
     successMessage: 'Code formatted',
   });
 

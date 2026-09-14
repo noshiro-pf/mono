@@ -65,7 +65,7 @@ export default [
   },
 
   {
-    // `samples/readme/` is embedded into the README by `pnpm run doc:embed`.
+    // `samples/readme/` is embedded into the README by `pnpm run gen:readme`.
     // A flat config's `export default` is what the README documents.
     files: ['samples/**'],
     rules: defineKnownRules({

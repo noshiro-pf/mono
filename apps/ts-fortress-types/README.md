@@ -31,5 +31,5 @@ copy is named after what replaced it. Nothing here refers to `io-ts` any more.
 
 ```sh
 pnpm run test
-pnpm run type-check
+pnpm run check:types
 ```

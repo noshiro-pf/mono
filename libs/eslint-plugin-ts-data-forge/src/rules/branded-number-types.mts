@@ -1,5 +1,5 @@
 // Keep this list in sync with the `as<Type>` cast functions exported by
-// ts-data-forge. `pnpm run check:branded-number-types` (also run during the
+// ts-data-forge. `pnpm run check:dist:branded-number-types` (also run during the
 // build) fails if a branded number type is missing here or no longer exists.
 const brandedNumberTypes = [
   'FiniteNumber',

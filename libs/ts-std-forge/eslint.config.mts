@@ -53,7 +53,7 @@ export default [
   },
 
   {
-    // `samples/` is embedded verbatim into the JSDoc by `doc:embed`, so each
+    // `samples/` is embedded verbatim into the JSDoc by `gen:readme`, so each
     // file is written to read as documentation: it names the value it just
     // built before asserting on it, which is a comparison the checker can see
     // through, and it demonstrates a mutable record by mutating one. The

@@ -252,7 +252,7 @@ cd ../ts-data-forge   # ts-fortress も同様
 target=$(realpath node_modules/ts-type-forge)
 rm -rf "$target/dist"
 cp -r ../ts-type-forge/dist "$target/dist"
-pnpm run type-check && pnpm run lint && pnpm run test
+pnpm run check:types && pnpm run check:lint && pnpm run test
 ```
 
 - `rsync` の in-place 書き込みはハードリンク経由で pnpm のグローバル store を書き換えるため使わないこと。
