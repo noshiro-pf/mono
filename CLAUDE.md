@@ -721,9 +721,26 @@ runs the dependency tree's code and holds no key, and `commit` holds the App
 token — the one with `workflows: write` — and installs nothing. What crosses
 between them is a patch, which `commit` applies rather than executes; a diff
 cannot express a `.git/hooks` entry or a `$GITHUB_PATH` line, and `git apply`
-refuses paths outside the work tree. The worst a tampered patch carries is
-content, which lands in a pull request where `.github/workflows/` is behind
-CODEOWNERS.
+refuses paths outside the work tree.
+
+**What a patch carries is content, so `commit` says which content.** The
+paths it applied are matched against the set a dependency update writes —
+`package.json` at any depth, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
+`.changeset/*.md` and `.github/workflows/*.yml`, which is `pnpm install`,
+`verify:npm-packages:published:update`, `update-changeset` and
+`update-actions` respectively — and anything else stops the job before a
+commit exists. That is the half the split leaves open rather than a doubt
+about the split: the patch's contents are decided in the job that runs the
+dependency tree's code, this pull request auto-merges with no approval
+required, and CODEOWNERS covers three paths deliberately, since owning the
+manifests would leave every dependency update waiting for a human. The
+matching is refusal, not filtering — a patch that carries something else is
+worth seeing rather than quietly trimming — and the list is inline in the
+`run:` block for the reason above: that block is the definition GitHub
+resolved for the event, and a file in the working tree is read when it is
+invoked. A step added to `update` that legitimately writes a new path fails
+`commit` until the list names it, which is the direction to fail in; read a
+failure as "what put this in the patch" before widening it.
 
 `node-support-update.yml` has the same shape and has not been split. Its App
 token is `contents` + `pull-requests` and **not** `workflows`, so the branch it

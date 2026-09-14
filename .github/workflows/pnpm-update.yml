@@ -232,7 +232,9 @@ jobs:
 
   # The key lives here, and nothing from the dependency tree does. This job
   # installs nothing and runs nothing out of the working tree: `git` and `gh`
-  # are on the runner image, and the patch is applied, never executed.
+  # are on the runner image, and the patch is applied, never executed — and
+  # what it applied is held to the paths a dependency update writes before any
+  # of it is committed. See the check in the last step.
   commit:
     needs: update
     if: needs.update.outputs.changed == 'true'
@@ -282,9 +284,8 @@ jobs:
         run: |
           # Applied, not executed. `git apply` refuses paths outside the work
           # tree unless asked otherwise, and a diff has no way to express a
-          # `.git/` entry, so the worst a tampered patch can carry is content
-          # — which lands in a pull request, where `.github/workflows/` is
-          # behind CODEOWNERS.
+          # `.git/` entry, so what a patch can carry is content — which is
+          # why which content is checked below, before it becomes a commit.
           git apply --binary --whitespace=nowarn "${RUNNER_TEMP}/pnpm-update.patch"
 
           git config user.name 'github-actions[bot]'
@@ -303,6 +304,51 @@ jobs:
           branch="chore/pnpm-update"
           git switch -c "$branch"
           git add -A
+
+          # What a dependency update writes, and nothing else. The patch's
+          # contents are decided by `update`, where the dependency tree's own
+          # code runs, so the set of paths it carries is checked here, in the
+          # job that holds the key — `pnpm install` and
+          # `verify:npm-packages:published:update` write manifests, the
+          # lockfile and the catalog, `update-changeset` writes one changeset,
+          # and `update-actions` moves the action pins. A patch reaching
+          # beyond that is not a dependency update whatever it is, and this is
+          # the last point before it becomes a commit that auto-merges.
+          #
+          # This does not replace the split into two jobs; it is what the
+          # split leaves to be said. What crosses between them is content, and
+          # a manifest is content like any other file — CODEOWNERS covers
+          # `.github/workflows/`, `.github/CODEOWNERS` and `repo-settings/`
+          # and deliberately no more, because owning the manifests would leave
+          # every dependency update waiting for a human.
+          #
+          # Refused rather than filtered out with `git apply --include=`:
+          # a patch carrying anything else is itself worth seeing, and
+          # dropping those paths quietly would leave the run looking ordinary.
+          # `--no-renames` so a rename is two paths and both are read. An
+          # unusual path arrives quoted and matches nothing, which fails in
+          # the safe direction; so does anything not named below, including a
+          # `verify-npm-packages/published/` smoke program left behind by a
+          # `smoke/` edit nothing regenerated — that is a `style-check`
+          # failure on main, and it reads here as a patch to look at.
+          #
+          # The list is inline because a `run:` block is the workflow
+          # definition GitHub resolved for the event, which nothing on a
+          # runner can rewrite, while a file in the working tree is read when
+          # it is invoked. Keep it in step with the steps of `update`: a path
+          # a new step legitimately writes fails this job until it is named.
+          unexpected="$(git diff --cached --name-only --no-renames \
+            | grep -Ev '^(pnpm-lock\.yaml|pnpm-workspace\.yaml)$' \
+            | grep -Ev '(^|/)package\.json$' \
+            | grep -Ev '^\.changeset/[^/]+\.md$' \
+            | grep -Ev '^\.github/workflows/[^/]+\.ya?ml$' || true)"
+
+          if [ -n "$unexpected" ]; then
+            echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
+
           git commit -m "chore: update dependencies"
 
           # Authenticate the push inline so the PAT is never written to git config.
