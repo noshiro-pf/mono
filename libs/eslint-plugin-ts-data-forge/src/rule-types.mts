@@ -118,6 +118,21 @@ namespace PreferArrSum {
 }
 
 /**
+ * @description Replace `Array.from(new Set(xs))` / `[...new Set(xs)]` with `Arr.uniq(xs)` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferArrUniq {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace branded number type assertions (e.g., `as Int`) with corresponding functions (e.g., `asInt()`) from ts-data-forge.
  *
  *  ```md
@@ -302,6 +317,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
   'ts-data-forge/prefer-arr-scan': PreferArrScan.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;
+  'ts-data-forge/prefer-arr-uniq': PreferArrUniq.RuleEntry;
   'ts-data-forge/prefer-as-int': PreferAsInt.RuleEntry;
   'ts-data-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
   'ts-data-forge/prefer-range-for-loop': PreferRangeForLoop.RuleEntry;
