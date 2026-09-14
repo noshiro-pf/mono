@@ -945,7 +945,29 @@ report `skipped`. What to know about that:
   another. Skipping on "not the `skip-ci` label" would not help: the run would
   still exist, still cancel the one in progress, and its skipped aggregate
   would supersede the last verdict. Put other labels on before pushing, or
-  after the checks have reported.
+  after the checks have reported. Once they have, the re-run costs one gate
+  job — see below.
+
+### A commit already checked is not checked again
+
+Every check job reads the pull request's head commit and nothing else, so a
+second run on the same head can only repeat the first one's verdict. Label
+events, `reopened` and a `skip-ci` taken off a commit checked earlier all
+produce such runs. `check-gates.yml` therefore looks up the calling workflow's
+earlier runs on the same head SHA and, when the aggregate job of one reached a
+verdict, returns it as `reused_result`: the matrix is skipped and the
+aggregate reports that verdict — **failure as well as success**, never
+skipped, so reuse cannot read as a check that did not happen.
+
+- **Only on an up-to-date branch of `main`**, where the commit to be merged
+  has the head's tree, workflow files included. Each caller passes its
+  aggregate's id as `result-job`, and the gate needs `actions: read`.
+- **Not reused**: cancelled runs, skipped aggregates, anything on a re-run
+  (`run_attempt` > 1) or a non-`pull_request` event. Where several earlier
+  runs have a verdict, the aggregate that completed last wins.
+- **A reused failure is re-examined with "Re-run all jobs"**, or with
+  `workflow_dispatch`. "Re-run failed jobs" is not enough: it keeps the gate's
+  outputs from the first attempt and so reuses the failure again.
 
 ### A branch behind `main` runs nothing either
 
