@@ -34,10 +34,11 @@ export const typeCheck = (tsconfigPath: string): TypeCheckResult => {
   const output = `${result.stdout}${result.stderr}` as const;
 
   return {
-    diagnostics: parseDiagnostics(
-      output,
-      path.dirname(path.resolve(tsconfigPath)),
-    ),
+    // The compiler prints each file relative to its working directory — this
+    // process's, which is also what makes the printed output usable from the
+    // terminal it ran in. Resolved against the project directory instead,
+    // every filename came out wrong but its basename.
+    diagnostics: parseDiagnostics(output, process.cwd()),
     output,
   };
 };
@@ -50,17 +51,17 @@ export const typeCheck = (tsconfigPath: string): TypeCheckResult => {
  */
 const parseDiagnostics = (
   output: string,
-  projectDir: string,
+  workingDir: string,
 ): readonly TypeCheckDiagnostic[] =>
   output.split('\n').flatMap((text) => {
-    const diagnostic = parseDiagnosticLine(text, projectDir);
+    const diagnostic = parseDiagnosticLine(text, workingDir);
 
     return diagnostic === undefined ? [] : [diagnostic];
   });
 
 const parseDiagnosticLine = (
   text: string,
-  projectDir: string,
+  workingDir: string,
 ): TypeCheckDiagnostic | undefined => {
   const marker = 'error TS';
 
@@ -94,7 +95,7 @@ const parseDiagnosticLine = (
   const lineText = head.slice(open + 1, -3).split(',', 1)[0] ?? '0';
 
   return {
-    filename: path.resolve(projectDir, head.slice(0, open)),
+    filename: path.resolve(workingDir, head.slice(0, open)),
     line: Number.parseInt(lineText, 10),
     code,
     message,

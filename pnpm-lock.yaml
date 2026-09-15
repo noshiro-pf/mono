@@ -2574,6 +2574,12 @@ importers:
         specifier: workspace:*
         version: link:../../../libs/ts-data-forge
     devDependencies:
+      '@sumi-lang/cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@sumi-lang/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
       '@sumi-lang/oxlint-config':
         specifier: workspace:*
         version: link:../oxlint-config
