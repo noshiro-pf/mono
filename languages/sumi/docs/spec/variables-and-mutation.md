@@ -31,7 +31,7 @@
 
     **唯一 `mut_` prefix が免除しない mutation 規則**である。`mut_` が答えるのは「誰が変更してよいか」で、こちらが言うのは「tuple とは何か」だからである — 名前で 2 要素の tuple を 3 要素にも、number のスロットに string を入れられるようにもできない。
 
-    **同種要素の tuple では一部が健全だが、それでも報告する。** `[number, number].reverse()` は誤ったスロットに値を置きようがないが、要素型がたまたま一致するかどうかで規則の適用が変わると、tuple の性質ではなく呼び出し箇所ごとに考える問題になる。順序が変わるものを扱いたいなら配列か、コピーを返す形(`toSorted` / `toReversed` / `with` — いずれも対象外)を使う。
+    **rest 要素を持つ tuple も報告する。** `[number, ...string[]]` の `length` は `number` だが、継承元 `Array` の要素型は `number | string` なので `push(2)` が通り、以降すべて string のはずの位置に number が入る。**同種要素の tuple では一部が健全だが、それでも報告する。** `[number, number].reverse()` は誤ったスロットに値を置きようがないが、要素型がたまたま一致するかどうかで規則の適用が変わると、tuple の性質ではなく呼び出し箇所ごとに考える問題になる。順序が変わるものを扱いたいなら配列か、コピーを返す形(`toSorted` / `toReversed` / `with` — いずれも対象外)を使う。
 
     `mutation/no-tuple-mutating-method`(@sumi-lang/checker)として実装。
 
@@ -61,7 +61,7 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 強制手段
 
-- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入 / `delete` / `Array`・`Map`・`Set`・`Object` の破壊的メソッド。型情報が要るので oxlint preset ではなくチェッカー側。[enforcement-map.md](../enforcement-map.md))。
+- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入(`for … of` / `for … in` の左辺を含む)/ `delete` / 組み込みの破壊的メソッド — `Array` と型付き配列、`Map`・`Set`・弱参照コレクション(`getOrInsert` 系を含む)、`Date` の setter、`Object`・`Reflect`。`Readonly<Date>` のように mapped type 越しに見えるメンバーも宣言元のインターフェースで判定する。型情報が要るので oxlint preset ではなくチェッカー側。[enforcement-map.md](../enforcement-map.md))。
 
 ## TS へ戻るときの影響
 

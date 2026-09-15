@@ -46,6 +46,18 @@ describe(noMutationWithoutMutPrefix.ruleId, () => {
         `,
       },
       {
+        name: 'a fresh typed array, a fresh `Date`, and a declared loop variable',
+        code: dedent`
+          const bytesFresh: Readonly<Uint8Array> = new Uint8Array([3, 1, 2]);
+          export const sortedBytes = bytesFresh.slice().sort();
+          export const midnight = new Date().setHours(0);
+          for (const _item of [1, 2]) {
+            // a declaration binds a new name each time
+          }
+          export const read = Reflect.get({ a: 1 }, 'a');
+        `,
+      },
+      {
         name: 'rebinding a variable is `functional/no-let`’s business',
         code: dedent`
           let mut_count = 0;
@@ -123,6 +135,81 @@ describe(noMutationWithoutMutPrefix.ruleId, () => {
           export const assignResult = assignTarget;
         `,
         errors: [{ messageId: 'mutatingCall', line: 2 }],
+      },
+      {
+        name: '`Map.getOrInsert` and `getOrInsertComputed`',
+        code: dedent`
+          const cacheMap = new Map<string, number>();
+          const heldCache = cacheMap;
+          heldCache.getOrInsert('a', 1);
+          heldCache.getOrInsertComputed('b', () => 2);
+          export const cache = heldCache;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 3 },
+          { messageId: 'mutatingCall', line: 4 },
+        ],
+      },
+      {
+        name: 'a `Date` setter and the typed-array mutators',
+        code: dedent`
+          const heldDate: Readonly<Date> = new Date(0);
+          const heldBytes: Readonly<Uint8Array> = new Uint8Array(2);
+          heldDate.setFullYear(2000);
+          heldBytes.set([1], 0);
+          heldBytes.sort();
+          export const dated = [heldDate, heldBytes] as const;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 3 },
+          { messageId: 'mutatingCall', line: 4 },
+          { messageId: 'mutatingCall', line: 5 },
+        ],
+      },
+      {
+        name: '`Reflect` mutators report their first argument',
+        code: dedent`
+          const reflected: Record<string, number> = { a: 1 };
+          Reflect.set(reflected, 'a', 2);
+          Reflect.deleteProperty(reflected, 'a');
+          export const reflectedOut = reflected;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 2 },
+          { messageId: 'mutatingCall', line: 3 },
+        ],
+      },
+      {
+        name: 'a parenthesized or asserted target, and a delete through parentheses',
+        code: dedent`
+          const wrapped: { a: number } = { a: 1 };
+          (wrapped.a) = 2;
+          (wrapped.a as number) = 3;
+          delete (wrapped as Partial<{ a: number }>).a;
+          export const wrappedOut = wrapped;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 2 },
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'deletion', line: 4 },
+        ],
+      },
+      {
+        name: 'a member access as a loop target',
+        code: dedent`
+          const cursor: { current: number; key: string } = { current: 0, key: '' };
+          for (cursor.current of [1, 2]) {
+            // each iteration assigns cursor.current
+          }
+          for (cursor.key in { a: 1 }) {
+            // each iteration assigns cursor.key
+          }
+          export const cursorOut = cursor;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 2 },
+          { messageId: 'assignment', line: 5 },
+        ],
       },
       {
         name: 'a `mut_` index does not make the path mutable',

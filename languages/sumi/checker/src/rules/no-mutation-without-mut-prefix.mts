@@ -1,4 +1,3 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   isArrayLiteralExpression,
   isAssignmentOperator,
@@ -6,6 +5,8 @@ import {
   isCallExpression,
   isDeleteExpression,
   isElementAccessExpression,
+  isForInStatement,
+  isForOfStatement,
   isIdentifier,
   isNewExpression,
   isObjectLiteralExpression,
@@ -17,7 +18,7 @@ import {
 } from 'typescript-native/unstable/ast';
 import { type Checker } from 'typescript-native/unstable/sync';
 import { ownerOf, unwrap } from '../ast/index.mjs';
-import { type Rule } from '../engine/index.mjs';
+import { type Rule, type RuleContext } from '../engine/index.mjs';
 
 /**
  * `mutation/no-mutation-without-mut-prefix` — a destructive operation is
@@ -29,8 +30,9 @@ import { type Rule } from '../engine/index.mjs';
  * binding *points at* — and that needs the checker, because `xs.sort()` is a
  * mutation and `xs.toSorted()` is not, while `report.sort()` on an object of
  * one's own that happens to have a `sort` method is neither. The method is
- * resolved to the interface that declares it, so only `Array`, `Map`, `Set`,
- * the weak collections and `Object`'s own mutators count.
+ * resolved to the interface that declares it, so only the mutators of the
+ * built-ins listed in `mutatorsByOwner` count: `Array` and the typed arrays,
+ * `Map` / `Set` and the weak collections, `Date`, and `Object` / `Reflect`.
  *
  * ```ts
  * const mut_xs: number[] = [];
@@ -51,6 +53,11 @@ import { type Rule } from '../engine/index.mjs';
  *   else holds a reference to. This is `ignoreImmediateMutation` in the
  *   ESLint bridge, kept for the same reason: a mutation nobody can observe.
  *
+ * A `for … of` / `for … in` whose target is a member access
+ * (`for (obj.current of xs)`) assigns on every iteration and is reported like
+ * an assignment. Parentheses and `as` around a target (`(obj.x as T) = 1`)
+ * are looked through.
+ *
  * One known gap: a destructuring assignment whose targets are member accesses
  * (`[a.x, b.y] = pair`) is not reported, because the left of the assignment is
  * the pattern rather than an access. The form does not occur in this
@@ -70,23 +77,27 @@ export const noMutationWithoutMutPrefix: Rule = {
   },
   visit: (node, { checker, report }) => {
     if (isBinaryExpression(node)) {
-      if (
-        !isAssignmentOperator(node.operatorToken.kind) ||
-        !isAccess(node.left) ||
-        isMutPermitted(node.left)
-      ) {
-        return;
-      }
+      if (!isAssignmentOperator(node.operatorToken.kind)) return;
 
-      report(node.left, 'assignment', { path: pathText(node.left) });
+      reportAssignedAccess(node.left, report);
+
+      return;
+    }
+
+    if (isForOfStatement(node) || isForInStatement(node)) {
+      // A declaration (`for (const x of xs)`) binds a new name each time; only
+      // an expression target assigns to something that already exists.
+      reportAssignedAccess(node.initializer, report);
 
       return;
     }
 
     if (isDeleteExpression(node)) {
-      if (!isAccess(node.expression) || isMutPermitted(node.expression)) return;
+      const deleted = unwrap(node.expression);
 
-      report(node.expression, 'deletion', { path: pathText(node.expression) });
+      if (!isAccess(deleted) || isMutPermitted(deleted)) return;
+
+      report(deleted, 'deletion', { path: pathText(deleted) });
 
       return;
     }
@@ -105,17 +116,17 @@ export const noMutationWithoutMutPrefix: Rule = {
 
     const owner = ownerOf(checker, callee);
 
-    if (
-      owner === undefined ||
-      !(mutatorsByOwner.get(owner)?.has(method) ?? false)
-    ) {
-      return;
-    }
+    const alternative =
+      owner === undefined ? undefined : mutatorsByOwner.get(owner)?.get(method);
 
-    // `Object.assign(target, …)` mutates its first argument; every other
-    // mutator mutates its receiver.
+    if (owner === undefined || alternative === undefined) return;
+
+    const staticOwner = argumentMutatingOwners.get(owner);
+
+    // `Object.assign(target, …)` and `Reflect.set(target, …)` mutate their
+    // first argument; every other mutator mutates its receiver.
     const target =
-      owner === 'ObjectConstructor' ? node.arguments.at(0) : callee.expression;
+      staticOwner === undefined ? callee.expression : node.arguments.at(0);
 
     if (
       target === undefined ||
@@ -126,9 +137,9 @@ export const noMutationWithoutMutPrefix: Rule = {
     }
 
     report(target, 'mutatingCall', {
-      method: owner === 'ObjectConstructor' ? `Object.${method}` : method,
+      method: staticOwner === undefined ? method : `${staticOwner}.${method}`,
       path: pathText(target),
-      alternative: alternatives[method] ?? 'a copy',
+      alternative,
     });
   },
 } as const;
@@ -140,62 +151,154 @@ const isAccess = (
   isPropertyAccessExpression(node) || isElementAccessExpression(node);
 
 /**
- * The mutators, by the interface that declares them. Grouping by owner is
- * what separates `xs.sort()` from a `sort` of one's own: the name alone
- * selects a candidate, and the declaring interface decides.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/prototype
+ * The typed-array interfaces. `subarray` is deliberately absent from their
+ * fresh-value members below: it returns a view onto the same buffer.
  */
-const mutatorsByOwner: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+const typedArrayNames: readonly string[] = [
+  'Int8Array',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'Int16Array',
+  'Uint16Array',
+  'Int32Array',
+  'Uint32Array',
+  'Float16Array',
+  'Float32Array',
+  'Float64Array',
+  'BigInt64Array',
+  'BigUint64Array',
+] as const;
+
+/** `Date`'s setters, local and UTC. */
+const dateSetterNames: readonly string[] = [
+  'setDate',
+  'setFullYear',
+  'setHours',
+  'setMilliseconds',
+  'setMinutes',
+  'setMonth',
+  'setSeconds',
+  'setTime',
+  'setUTCDate',
+  'setUTCFullYear',
+  'setUTCHours',
+  'setUTCMilliseconds',
+  'setUTCMinutes',
+  'setUTCMonth',
+  'setUTCSeconds',
+] as const;
+
+/**
+ * The mutators, by the interface that declares them, each with the copying
+ * form to suggest. Grouping by owner is what separates `xs.sort()` from a
+ * `sort` of one's own: the name alone selects a candidate, and the declaring
+ * interface decides — which is also why the suggestion is looked up by owner,
+ * since `set` means one thing on a `Map` and another on a `Uint8Array`.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
+ */
+const mutatorsByOwner: ReadonlyMap<
+  string,
+  ReadonlyMap<string, string>
+> = new Map([
   [
     'Array',
-    new Set([
-      'copyWithin',
-      'fill',
-      'pop',
-      'push',
-      'reverse',
-      'shift',
-      'sort',
-      'splice',
-      'unshift',
+    new Map([
+      ['copyWithin', '`with`'],
+      ['fill', '`Array.from`'],
+      ['pop', '`xs.slice(0, -1)`'],
+      ['push', '`[...xs, x]`'],
+      ['reverse', '`toReversed`'],
+      ['shift', '`xs.slice(1)`'],
+      ['sort', '`toSorted`'],
+      ['splice', '`toSpliced`'],
+      ['unshift', '`[x, ...xs]`'],
     ]),
   ],
-  ['Map', new Set(['clear', 'delete', 'set'])],
-  ['Set', new Set(['add', 'clear', 'delete'])],
-  ['WeakMap', new Set(['delete', 'set'])],
-  ['WeakSet', new Set(['add', 'delete'])],
+  ...typedArrayNames.map(
+    (name) =>
+      [
+        name,
+        new Map([
+          ['copyWithin', '`with`'],
+          ['fill', '`xs.map(() => value)`'],
+          ['reverse', '`toReversed`'],
+          ['set', '`with`, or a new typed array'],
+          ['sort', '`toSorted`'],
+        ]),
+      ] as const,
+  ),
+  [
+    'Map',
+    new Map([
+      ['clear', '`new Map()`'],
+      ['delete', 'a new `Map` built without the entry'],
+      ['getOrInsert', '`m.get(k) ?? v`'],
+      ['getOrInsertComputed', '`m.get(k) ?? f(k)`'],
+      ['set', '`new Map([...m, [k, v]])`'],
+    ]),
+  ],
+  [
+    'Set',
+    new Map([
+      ['add', '`new Set([...s, x])`'],
+      ['clear', '`new Set()`'],
+      ['delete', 'a new `Set` built without the element'],
+    ]),
+  ],
+  [
+    'WeakMap',
+    new Map([
+      ['delete', 'a new `WeakMap` built without the entry'],
+      ['getOrInsert', '`m.get(k) ?? v`'],
+      ['getOrInsertComputed', '`m.get(k) ?? f(k)`'],
+      ['set', 'a new `WeakMap`'],
+    ]),
+  ],
+  [
+    'WeakSet',
+    new Map([
+      ['add', 'a new `WeakSet`'],
+      ['delete', 'a new `WeakSet` built without the element'],
+    ]),
+  ],
+  [
+    'Date',
+    new Map(dateSetterNames.map((name) => [name, 'a new `Date`'] as const)),
+  ],
   [
     'ObjectConstructor',
-    new Set(['assign', 'defineProperties', 'defineProperty', 'setPrototypeOf']),
+    new Map([
+      ['assign', '`{ ...target, ...source }`'],
+      ['defineProperties', '`{ ...target, ...properties }`'],
+      ['defineProperty', '`{ ...target, [key]: value }`'],
+      ['setPrototypeOf', '`Object.create`'],
+    ]),
   ],
+  [
+    'Reflect',
+    new Map([
+      ['defineProperty', '`{ ...target, [key]: value }`'],
+      ['deleteProperty', 'a new object built without the key'],
+      ['set', '`{ ...target, [key]: value }`'],
+      ['setPrototypeOf', '`Object.create`'],
+    ]),
+  ],
+]);
+
+/**
+ * The owners whose mutators are static functions taking the target as their
+ * first argument, with the name to print them under.
+ */
+const argumentMutatingOwners: ReadonlyMap<string, string> = new Map([
+  ['ObjectConstructor', 'Object'],
+  ['Reflect', 'Reflect'],
 ]);
 
 /** Every mutator name, for the syntactic filter. */
 const mutatorMethodNames: ReadonlySet<string> = new Set(
-  mutatorsByOwner.values().flatMap((methods) => methods.values()),
+  mutatorsByOwner.values().flatMap((methods) => methods.keys()),
 );
-
-/** The copying form to suggest, one per mutator. */
-const alternatives: ReadonlyRecord<string, string> = {
-  add: '`new Set([...s, x])`',
-  assign: '`{ ...target, ...source }`',
-  clear: '`new Map()` / `new Set()`',
-  copyWithin: '`with`',
-  defineProperties: '`{ ...target, ...properties }`',
-  defineProperty: '`{ ...target, [key]: value }`',
-  delete: 'a new collection built without the entry',
-  fill: '`Array.from`',
-  pop: '`xs.slice(0, -1)`',
-  push: '`[...xs, x]`',
-  reverse: '`toReversed`',
-  set: '`new Map([...m, [k, v]])`',
-  setPrototypeOf: '`Object.create`',
-  shift: '`xs.slice(1)`',
-  sort: '`toSorted`',
-  splice: '`toSpliced`',
-  unshift: '`[x, ...xs]`',
-} as const;
 
 /** The `Array` members that return a new array rather than mutating one. */
 const arrayCopyingMethods = [
@@ -227,6 +330,13 @@ const freshValueMembersByOwner: ReadonlyMap<
     'ObjectConstructor',
     new Set(['create', 'entries', 'fromEntries', 'keys', 'values']),
   ],
+  ...typedArrayNames.map(
+    (name) =>
+      [
+        name,
+        new Set(['filter', 'map', 'slice', 'toReversed', 'toSorted', 'with']),
+      ] as const,
+  ),
   ['String', new Set(['split'])],
   ['Set', new Set(['difference', 'intersection', 'union'])],
   ['ReadonlySet', new Set(['difference', 'intersection', 'union'])],
@@ -314,4 +424,19 @@ const isFreshValue = (
     owner !== undefined &&
     (freshValueMembersByOwner.get(owner)?.has(callee.name.text) ?? false)
   );
+};
+
+/**
+ * Assignment through an access path: the target of `=`, a compound operator,
+ * or a `for … of` / `for … in` header.
+ */
+const reportAssignedAccess = (
+  node: TsNode,
+  report: RuleContext['report'],
+): void => {
+  const target = unwrap(node);
+
+  if (!isAccess(target) || isMutPermitted(target)) return;
+
+  report(target, 'assignment', { path: pathText(target) });
 };

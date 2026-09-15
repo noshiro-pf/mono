@@ -1,5 +1,6 @@
 import {
   isAsExpression,
+  isInterfaceDeclaration,
   isNonNullExpression,
   isParenthesizedExpression,
   type PropertyAccessExpression,
@@ -15,7 +16,8 @@ import { type Checker } from 'typescript-native/unstable/sync';
  * name selects a candidate syntactically, and the declaring interface —
  * `Array`, `Map`, `ObjectConstructor` — decides. It is a checker query, so
  * narrow the candidates by syntax first: the pass walks every node of every
- * file and each query is a round trip (D-55).
+ * file and each query is a round trip (D-55). The fallback for a member
+ * reached through a mapped type costs one more.
  */
 export const ownerOf = (
   // `Checker` is TypeScript's own interface, declared mutable; this package
@@ -24,8 +26,26 @@ export const ownerOf = (
   checker: Checker,
 
   access: PropertyAccessExpression,
-): string | undefined =>
-  checker.getSymbolAtLocation(access.name)?.getParent()?.name;
+): string | undefined => {
+  const symbol = checker.getSymbolAtLocation(access.name);
+
+  if (symbol === undefined) return undefined;
+
+  const parent = symbol.getParent();
+
+  if (parent !== undefined) return parent.name;
+
+  // A member reached through a mapped type — `Readonly<Date>`,
+  // `Readonly<Uint8Array>` — is a synthesized symbol with no parent, so the
+  // mutator would go unrecognized exactly where the binding is annotated
+  // readonly-looking. Its declaration still sits in the interface that
+  // declared it (measured against the API).
+  const container = symbol.declarations.at(0)?.resolve()?.parent;
+
+  return container !== undefined && isInterfaceDeclaration(container)
+    ? container.name.text
+    : undefined;
+};
 
 /** Parentheses, `as` and `!` say nothing about what an expression denotes. */
 export const unwrap = (node: TsNode): TsNode =>

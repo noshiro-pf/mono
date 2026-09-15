@@ -1,8 +1,9 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import {
   isCallExpression,
   isPropertyAccessExpression,
 } from 'typescript-native/unstable/ast';
-import { type Type } from 'typescript-native/unstable/sync';
+import { type Checker, type Type } from 'typescript-native/unstable/sync';
 import { ownerOf } from '../ast/index.mjs';
 import { type Rule } from '../engine/index.mjs';
 
@@ -42,7 +43,11 @@ import { type Rule } from '../engine/index.mjs';
  * anyway. `[number, number].reverse()` cannot put a value in the wrong slot,
  * but making the rule depend on whether the element types happen to coincide
  * would make it a question to work out per call site rather than a property
- * of tuples. The copying forms — `toSorted`, `toReversed`, `with` — return an
+ * of tuples. **A tuple with a rest element is reported too**, though its
+ * length is `number`: `push` on `[number, ...string[]]` accepts
+ * `number | string` — the element type of the `Array` it inherits from — and
+ * so can append a number where the type says every later element is a
+ * string. The copying forms — `toSorted`, `toReversed`, `with` — return an
  * array and are untouched, which is the shape to reach for when the order is
  * what varies.
  */
@@ -52,7 +57,7 @@ export const noTupleMutatingMethod: Rule = {
     'Disallow the `Array` mutators on a tuple, whose type states a length and a type per position that they do not preserve.',
   messages: {
     lengthChanged:
-      '`{{method}}` changes the length of a tuple, and its type goes on stating the original one. Build a new tuple, or use an array type if the length varies.',
+      '`{{method}}` changes the length of a tuple, and its type does not follow: it states the original length, or — with a rest element — a type for each position the call can fill. Build a new tuple, or use an array type if the length varies.',
     positionsRewritten:
       '`{{method}}` moves or overwrites a tuple’s elements by position, and its type states a type per position — so a value can land in a slot typed for something else. Use the copying form (`toSorted`, `toReversed`, `with`), which returns an array.',
   },
@@ -77,7 +82,9 @@ export const noTupleMutatingMethod: Rule = {
 
     const receiverType = checker.getTypeAtLocation(callee.expression);
 
-    if (receiverType === undefined || !isTupleTyped(receiverType)) return;
+    if (receiverType === undefined || !isTupleTyped(checker, receiverType)) {
+      return;
+    }
 
     report(callee.name, messageId, { method });
   },
@@ -90,7 +97,7 @@ export const noTupleMutatingMethod: Rule = {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/prototype
  */
-const mutatorMessages: Readonly<Record<string, string | undefined>> = {
+const mutatorMessages: ReadonlyRecord<string, string | undefined> = {
   pop: 'lengthChanged',
   push: 'lengthChanged',
   shift: 'lengthChanged',
@@ -101,18 +108,49 @@ const mutatorMessages: Readonly<Record<string, string | undefined>> = {
   fill: 'positionsRewritten',
   reverse: 'positionsRewritten',
   sort: 'positionsRewritten',
-};
+} as const;
 
 /**
  * Whether the receiver is a tuple — or a union in which any member is, since
- * a call on `[number, number] | number[]` can land on the tuple.
+ * a call on `[number, number] | number[]` can land on the tuple; or an
+ * intersection with one and no array, which is how a branded tuple is
+ * written; or a type parameter constrained to one.
  *
  * A tuple arrives as a *type reference* whose target is the tuple, so
  * `isTupleType()` on the type itself answers `false` and the target has to be
  * asked (measured against the API).
  */
-const isTupleTyped = (type: Type): boolean => {
-  if (type.isUnionType()) return type.getTypes().some(isTupleTyped);
+const isTupleTyped = (
+  // `Checker` is TypeScript's own interface, declared mutable; this package
+  // does not get to restate it.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: Checker,
+
+  type: Type,
+): boolean => {
+  if (type.isUnionType()) {
+    return type.getTypes().some((member) => isTupleTyped(checker, member));
+  }
+
+  if (type.isIntersectionType()) {
+    const members = type.getTypes();
+
+    // `X[] & [X, ...X[]]` is not a tuple someone declared: it is an array
+    // narrowed by a non-emptiness guard (`Arr.isNonEmpty(mut_xs)`), and
+    // `while (isNonEmpty(mut_queue)) mut_queue.pop()` is the ordinary way to
+    // drain one. The guard is re-checked where it matters, so an array member
+    // means the binding is an array.
+    return (
+      members.every((member) => !checker.isArrayType(member)) &&
+      members.some((member) => isTupleTyped(checker, member))
+    );
+  }
+
+  if (type.isTypeParameter()) {
+    const constraint = checker.getBaseConstraintOfType(type);
+
+    return constraint !== undefined && isTupleTyped(checker, constraint);
+  }
 
   if (type.isTupleType()) return true;
 
