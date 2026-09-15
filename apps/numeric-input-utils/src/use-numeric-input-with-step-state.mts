@@ -1,13 +1,5 @@
 import * as React from 'react';
 
-/**
- * What `setTimeout` hands back and `clearTimeout` takes — `number` in the
- * browser, `Timeout` under Node. `@noshiro/ts-type-utils` had a global
- * `TimerId` for this; `ts-type-forge` does not, and asking the standard library
- * keeps it right in both.
- */
-type TimerId = Parameters<typeof clearTimeout>[0];
-
 export const numericInputContinuousChangeDelay = 400;
 
 export const numericInputContinuousChangeInterval = 40;
@@ -98,9 +90,13 @@ export const useNumericInputWithStepState = <N extends number>({
     commonCallbackFn('decrement');
   }, [commonCallbackFn]);
 
-  const delayTimerRef = React.useRef<TimerId | undefined>(undefined);
+  const delayTimerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
-  const intervalTimerRef = React.useRef<TimerId | undefined>(undefined);
+  const intervalTimerRef = React.useRef<
+    ReturnType<typeof setTimeout> | undefined
+  >(undefined);
 
   const clearTimers = React.useCallback(() => {
     if (delayTimerRef.current !== undefined) {

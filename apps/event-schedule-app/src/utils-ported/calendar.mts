@@ -94,9 +94,6 @@ export const isEmailString = (str: string): boolean =>
 /** The identity function. */
 export const idfn = <T,>(value: T): T => value;
 
-/** What `setTimeout` returns and `clearTimeout` takes. */
-export type TimerId = Parameters<typeof clearTimeout>[0];
-
 /** A function whose input and output are the same type. */
 export type MonoTypeFunction<T> = (value: T) => T;
 

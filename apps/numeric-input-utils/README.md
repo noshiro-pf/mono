@@ -30,6 +30,6 @@ is private.
   `useEffect(() => setState(…), [value])`. The effect rendered once with the
   stale text and again with the new one, which is what the compiler objects to.
 - `dirty` is a plain expression rather than a `useMemo`.
-- `TimerId` was a global from `@noshiro/ts-type-utils`. It is
-  `Parameters<typeof clearTimeout>[0]` here, which is right under both Node and
-  the browser.
+- `TimerId` was a global from `@noshiro/ts-type-utils`. The strict standard
+  library declares the same global, but consumers without it type-check this
+  source too, so it is `ReturnType<typeof setTimeout>` here.
