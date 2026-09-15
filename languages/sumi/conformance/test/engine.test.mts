@@ -3,6 +3,7 @@ import {
   implementedRuleIds as checkerRuleIds,
   runRules,
 } from '@sumi-lang/checker';
+import { typeCheck } from '@sumi-lang/cli';
 import {
   implementedRuleIds as oxlintRuleIds,
   parseMarkers,
@@ -17,17 +18,23 @@ import { Result } from 'ts-data-forge';
 import { fixturesRootPath, listFixtures } from '../src/index.mjs';
 
 /**
- * The engine check: both engines run over the whole corpus, their diagnostics
+ * The engine check: every engine runs over the whole corpus, their diagnostics
  * normalized to neutral rule IDs, and compared with the `@sumi-expect-error`
  * markers — exact match both ways (languages/sumi/docs/conformance-corpus.md,
  * "runner の契約").
  *
- * Two engines because a rule needs one or the other, never both: the oxlint
- * preset (@sumi-lang/oxlint-config) for what syntax settles, and the Sumi
- * checker (@sumi-lang/checker, D-55) on TypeScript 7's own API for what needs
- * the type checker. The corpus does not care which produced a diagnostic —
- * that is the point of the neutral IDs — so the two lists are merged before
- * anything is compared.
+ * Two lint engines because a rule needs one or the other, never both: the
+ * oxlint preset (@sumi-lang/oxlint-config) for what syntax settles, and the
+ * Sumi checker (@sumi-lang/checker, D-55) on TypeScript 7's own API for what
+ * needs the type checker. The corpus does not care which produced a
+ * diagnostic — that is the point of the neutral IDs — so the lists are merged
+ * before anything is compared.
+ *
+ * The native compiler is the third engine, under the fixed compilerOptions of
+ * `fixtures/tsconfig.json`, and reports as `compiler/<code>`. It is what
+ * `sumi check` runs before lint, so a fixture is only a faithful example if it
+ * says what the compiler says about it too: an invalid fixture marks the
+ * compiler errors its violation produces, and a valid one type-checks.
  */
 
 /**
@@ -63,6 +70,9 @@ const checkerRun = runRules(
   (fileName) => fixturePaths.has(fileName),
 );
 
+// One compiler run for the whole corpus, for the same reason.
+const tscRun = typeCheck(path.resolve(fixturesRootPath, 'tsconfig.json'));
+
 type Observed = Readonly<{
   ruleId: string;
   line: number;
@@ -76,15 +86,36 @@ const toObserved = (diagnostic: OxlintDiagnostic): Observed =>
     message: diagnostic.message,
   }) as const;
 
+const key = (ruleId: string, line: number): string =>
+  `${line}:${ruleId}` as const;
+
 /**
- * Both engines' diagnostics for one file. Which engine found a problem is not
+ * A syntax error is found by both parsers — oxlint reports `TS(7060)` for the
+ * same `<T>` the compiler does — and it is still one fact about the file, so a
+ * `compiler/*` diagnostic counts once per line however many engines saw it.
+ * Lint diagnostics are left alone: two reports of one rule on one line are two
+ * findings.
+ */
+const dropRepeatedCompilerDiagnostics = (
+  observed: readonly Observed[],
+): readonly Observed[] =>
+  observed.filter(
+    (o, index) =>
+      !o.ruleId.startsWith('compiler/') ||
+      observed.findIndex(
+        (p) => key(p.ruleId, p.line) === key(o.ruleId, o.line),
+      ) === index,
+  );
+
+/**
+ * Every engine's diagnostics for one file. Which engine found a problem is not
  * part of the corpus's contract, so the lists are concatenated and compared as
  * one multiset.
  */
 const observedByFile: ReadonlyMap<string, readonly Observed[]> = new Map(
   fixtures.map((fixture) => [
     fixture.absolutePath,
-    [
+    dropRepeatedCompilerDiagnostics([
       ...(oxlintDiagnosticsByFile.get(fixture.absolutePath) ?? []).map(
         toObserved,
       ),
@@ -95,12 +126,16 @@ const observedByFile: ReadonlyMap<string, readonly Observed[]> = new Map(
           line: d.line,
           message: d.message,
         })),
-    ],
+      ...tscRun.diagnostics
+        .filter((d) => d.filename === fixture.absolutePath)
+        .map((d): Observed => ({
+          ruleId: `compiler/${d.code.replace(/^TS/u, '')}`,
+          line: d.line,
+          message: d.message,
+        })),
+    ]),
   ]),
 );
-
-const key = (ruleId: string, line: number): string =>
-  `${line}:${ruleId}` as const;
 
 const fixtureCases = fixtures.map((fixture) => {
   const ruleId: string = `${fixture.area}/${fixture.rule}` as const;
@@ -134,6 +169,17 @@ describe('engines', () => {
     assert.deepStrictEqual(
       run.stderr.replaceAll(/^warning:.*$/gmu, '').trim(),
       '',
+    );
+  });
+
+  test('the compiler reported nothing outside the fixtures', () => {
+    // A config error or a diagnostic in a file the corpus does not list (a
+    // helper module) would otherwise be dropped without being compared.
+    assert.deepStrictEqual(
+      tscRun.diagnostics
+        .filter((d) => !fixturePaths.has(d.filename))
+        .map((d) => `${d.filename}:${d.line} ${d.code} ${d.message}`),
+      [],
     );
   });
 

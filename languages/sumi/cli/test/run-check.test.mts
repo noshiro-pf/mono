@@ -2,7 +2,7 @@ import dedent from 'dedent';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { runCheck } from '../src/index.mjs';
 
@@ -19,7 +19,16 @@ const makeProject = (
   files: ReadonlyRecord<string, string>,
   compilerOptions: ReadonlyRecord<string, unknown> = {},
 ): string => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sumi-check-'));
+  // Nested well below the temporary directory: the compiler prints paths
+  // relative to its working directory, and a project one level under `/tmp`
+  // resolves correctly from anywhere by accident — `..` stops at the root.
+  const dir = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'sumi-check-')),
+    ...Arr.seq(8).map((i) => `nested-${i}`),
+  );
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.mkdirSync(dir, { recursive: true });
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.writeFileSync(
@@ -83,12 +92,14 @@ describe(runCheck, () => {
     assert.strictEqual(result.value.ok, false);
 
     assert.deepStrictEqual(
+      // The full path, not the basename: the compiler prints paths relative
+      // to its working directory, which is not this test's.
       result.value.typeCheck.diagnostics.map((d) => [
-        path.basename(d.filename),
+        d.filename,
         d.line,
         d.code,
       ]),
-      [['a.mts', 1, 'TS2322']],
+      [[path.join(dir, 'a.mts'), 1, 'TS2322']],
     );
 
     assert.deepStrictEqual(

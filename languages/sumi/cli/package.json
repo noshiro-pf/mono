@@ -45,6 +45,8 @@
     "gen:index:src": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ../../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude entry-point.mts --exclude 'cmd/*'",
     "gen:oxlint-config-off": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-oxlint-config-off.mts && pnpm run fix:fmt",
     "sumi": "tsx --tsconfig ../../../tools/configs/tsconfig.tsx.json ./src/cmd/sumi.mts",
+    "sumi:demo": "pnpm run sumi check ./demo/violations",
+    "sumi:demo:options": "pnpm run sumi check ./demo/unlocked-options",
     "test": "pnpm run check:test",
     "watch:test": "pnpm run z:vitest:node watch",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",

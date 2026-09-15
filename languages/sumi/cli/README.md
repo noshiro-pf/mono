@@ -33,7 +33,8 @@ Sumi の規則集合そのものを既存の oxlint 実行に混ぜたい場合�
 
 ## 開発
 
-- `pnpm run sumi check <project>` — ソースから実行(tsx)。
+- `pnpm run sumi check <project>` — ソースから実行(tsx)。`<project>` はこのパッケージからの相対パス。
+- `pnpm run sumi:demo` / `pnpm run sumi:demo:options` — `demo/` の違反入りプロジェクトに `sumi check` をかけ、報告の出方を見る(終了コード 1 になるので CI では走らせない)。`demo/` はこのパッケージの tsconfig / ESLint の対象外。
 - `pnpm run build` — `dist/cmd/sumi.mjs`(`bin`)を emit。
 - `pnpm run test` — 一時プロジェクトを作って `runCheck` を end-to-end で確かめる(tsgo と oxlint を実際に起動する)。
 
