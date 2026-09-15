@@ -93,6 +93,17 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     // functions
     ['functions/no-fn-identifier', ['id-denylist']],
     [
+      'functions/adjacent-overload-signatures',
+      ['@typescript-eslint/adjacent-overload-signatures'],
+    ],
+    ['functions/unified-signatures', ['@typescript-eslint/unified-signatures']],
+    // prefer-function-type reports only a type whose sole member is a call
+    // signature — a subset of what the ID bans (D-58).
+    [
+      'functions/no-call-signature-member',
+      ['@typescript-eslint/prefer-function-type'],
+    ],
+    [
       'functions/explicit-return-type',
       ['@typescript-eslint/explicit-function-return-type'],
     ],
