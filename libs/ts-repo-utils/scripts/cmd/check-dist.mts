@@ -24,7 +24,7 @@ const nativeTsc = path.resolve(
  *
  * Not part of `build` — a build emits, and what it emitted is checked here,
  * so that every CI job which only needs `dist/` stops paying for the check as
- * well. `pnpm run ws:check` is the repository-wide form.
+ * well. `pnpm run ws:check:dist` is the repository-wide form.
  */
 const checkDist = async (): Promise<void> => {
   await ensureDistTestPackageLink();

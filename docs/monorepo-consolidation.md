@@ -187,7 +187,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - 5 パッケージの `fmt` が `format-uncommitted` を `--cwd` なしで呼んでおり、**リポジトリ全体の未コミットファイル**を整形していた。統合前は「リポジトリ = パッケージ」だったので不要だった引数が、統合後に意味を持つようになっていた
 - ビルドスクリプトが `tsx` の `paths` で自作パッケージを**ソース**へ解決するようになったため、あるパッケージのソースが書き換わっている最中に、別パッケージのツールがそれを読んで壊れる
 
-`--cwd .` を 5 パッケージに追加し、ソースを書き換える workspace スクリプト（`ws:doc` / `ws:doc:embed` / `ws:doc:embed:jsdoc` / `ws:gi`）を `ws:test` と同じく直列化した。
+`--cwd .` を 5 パッケージに追加し、ソースを書き換える workspace スクリプト（`ws:doc` / `ws:gen:readme` / `ws:gen:jsdoc` / `ws:gen`）を `ws:check:test` と同じく直列化した。
 
 ### テストのリソース競合
 
@@ -225,7 +225,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 - `ts-type-forge` — emit された `.d.mts` が `import("ts-type-forge").StrictOmit<…>`
   の形で明示的に名前を出す。→ `dependencies` 必須
 
-`lint:published-deps` はこの基準をほぼ機械的に検査するが、**`@types/*` は盲点**。
+`check:published-deps` はこの基準をほぼ機械的に検査するが、**`@types/*` は盲点**。
 `import @types/micromatch` と書く箇所は存在せず、「`micromatch` が自前の型を
 持たない」という暗黙の関係なので、ルールからは見えない。実験して確認済み。
 
@@ -360,10 +360,10 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **ドラフトの間 CI は 1 つも走らない**（ジョブごとの `if` が
           `pull_request.draft == false` を見ている）。#1634 と #1714 は一度も
           CI にかかっていなかったので、それぞれの先端でローカルに一通り回した —
-          `ws:build` / `ws:type-check` / `ws:lint` / `ws:test` / `knip` / `cspell` /
-          `md` / `check:root` / `lint:published-deps` / `codemod:diff` がいずれも
-          通り、`ws:doc` / `ws:doc:embed` / `ws:check:ext` の後もツリーは clean で
-          ある（`ws:test:browser` だけは Playwright のブラウザが要るので未実施）
+          `ws:build` / `ws:check:types` / `ws:check:lint` / `ws:check:test` / `knip` / `cspell` /
+          `md` / `check:root` / `check:published-deps` / `codemod:diff` がいずれも
+          通り、`ws:doc` / `ws:gen:readme` / `ws:check:ext` の後もツリーは clean で
+          ある（`ws:check:test:browser` だけは Playwright のブラウザが要るので未実施）
             - **マージ後の main の push 実行で裏が取れた。** `7763c23c7`
               （#1714 のマージコミット）に対する Type Check / Style Check /
               Node.js Version Compatibility / Verify Published Packages /
@@ -378,23 +378,23 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
         - **スタックした PR は、下の PR が squash merge されるたびに rebase が要る。**
           `--onto` で下の PR のコミットを落として付け替えるのが確実で、
           `docs/package-dependencies.md` と `pnpm-lock.yaml` は生成物なので
-          conflict は base 側を取って `pnpm install` / `pnpm run docs:deps` で
+          conflict は base 側を取って `pnpm install` / `pnpm run gen:deps-graph` で
           作り直す。knip の per-package entry だけは手で書くものなので、
           落とすと `apps/*` の Astro 前提の glob に落ちて黙って通る
         - **`docs/package-dependencies.md` は、conflict にならなくても壊れる。**
           #1709 が `ts-std-forge` を足した後で rebase したところ、git の自動マージ
           がその行だけを落とした 3 本のブランチができた — conflict マーカーは
           出ず、`fmt` も `lint` も通る。**しかもこのファイルを再生成して差分を
-          見る CI ジョブは無い**（`docs:deps` はどの workflow からも呼ばれて
+          見る CI ジョブは無い**（`gen:deps-graph` はどの workflow からも呼ばれて
           いない）ので、気付かなければそのまま main に入る。**実際 main の
           ファイルは #1709 の時点で古くなっていた** — 3 本のブランチで見つけた
           欠落は、その古い版を rebase したときに出たものだった
         - **その CI チェックは #1715 で入れた。** `style-check` は各コマンドの後に
-          リポジトリが clean かを確認する作りなので、`docs:deps` をマトリクスに
+          リポジトリが clean かを確認する作りなので、`gen:deps-graph` をマトリクスに
           足すだけで drift チェックになる。ただし**生成器がテーブルを整形せずに
           書いていた**ため、そのままでは毎回差分が出て使いものにならなかった。
           `formatFiles` で自分の出力を整形するようにしてある
-            - **`style-check (docs:deps)` を required にするのは別作業。**
+            - **`style-check (gen:deps-graph)` を required にするのは別作業。**
               `repo-settings/rulesets/main.json` に足したうえで
               `pnpm run repo-settings:apply` を回す必要がある。同じ PR に入れると
               `backup-repository-settings` が落ちる — あれは
@@ -402,7 +402,7 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
               見るので、apply 前の宣言は「実態と違う」と判定される
                 - **2026-08-31 時点でまだ入っていない。** ついでに数えると、
                   `style-check` のマトリクスは 7 件あるのに required は 5 件で、
-                  **`docs:deps` と `strict-lib:fmt` の 2 件が漏れている**。
+                  **`gen:deps-graph` と `strict-lib:fix:fmt` の 2 件が漏れている**。
                   どちらも「コマンドを回した後にツリーが clean か」を見る形なので、
                   required でなければ生成物の drift がそのまま main に入る
         - **`poll-discord-app`（#1620）では暗黙グローバルの撤廃が作業の本体だった。** `Result` / `IMap` / `pipe` など 24 個の識別子が esbuild プラグイン経由で auto-import されていた。明示 import に直すと型エラーは 390 件から始まり、API のずれを潰して 0 になった
@@ -548,9 +548,9 @@ newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型�
 
 ### その他の宿題
 
-- **`pnpm run ws:gi` は main で 4 パッケージを壊していた。** 3 通りの壊れ方が
+- **`pnpm run ws:gen` は main で 4 パッケージを壊していた。** 3 通りの壊れ方が
   あり、**うち 1 つ（拡張子）は #1716 で直した**。残る 2 つは未修正である。
-  CLAUDE.md が「`pnpm run gi` で自動生成せよ」と書いているので、**指示に従った
+  CLAUDE.md が「`pnpm run gen:index` で自動生成せよ」と書いているので、**指示に従った
   人が壊す**
     - **2026-08-31 に両方とも再現することを確認した。** `apps/react-utils` と
       `apps/react-utils-styled` は `gi` を回してもツリーが clean のままで、
@@ -576,7 +576,7 @@ newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型�
       `./component-switcher.mjs` になる。型エラーは react-utils で 2 件、
       react-utils-styled で 8 件。**リポジトリ内の呼び出しは 20 箇所すべてが
       `--export-ext .mjs`** なので、`.tsx` → `.mjs` を望んでいる利用者はいない
-    - **生成器を直しても `ws:gi` はまだ CI に足せない。** `docs:deps`（#1715）と
+    - **生成器を直しても `ws:gen` はまだ CI に足せない。** `gen:deps-graph`（#1715）と
       同じ穴が空いてはいるが、上の 2 つが残っている限りリポジトリ全体では
       回せない。先に「どのパッケージの index が生成物で、どれが手書きか」を
       決める必要がある — あの 2 つはそもそも `gi` スクリプトを持つべきでない
@@ -606,10 +606,10 @@ newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型�
     - `tsconfig/` は対応済み。自前のコピーを持っていたのは 6 パッケージで、共有側が先に進んでいたため中身が古くなっていた（`importHelpers` が消えている、`jsx` が増えている等）。すべて `tools/configs/tsconfig/` を extends する形にし、`tsc --showConfig` の差分で解決後の設定が変わらないことを確認した
     - node 専用パッケージの `lib` を `["ESNext"]` に絞る指定は `tools/configs/tsconfig/tsconfig.node-only.json` に切り出した（3 パッケージが extends）
     - `rollup.config.mts` も対応済み。15 本中 14 本が同一の内容だったので `tools/configs/rollup-config.mts` に集約し、各パッケージは 7 行になった。生成物 1519 ファイルの md5 が前後で全て一致することを確認済み。`@rollup/plugin-replace` / `@rollup/plugin-strip` / `rollup-plugin-esbuild` の宣言も 38 箇所から root の 1 回になった。`eslint-config-typed` だけは `@rollup/plugin-typescript` を使う別物なので据え置き
-    - `vitest.config.mts` も対応済み。自前で書いていた 10 パッケージを `tools/configs/vite-config.mts` に寄せ、757 行 → 344 行 + 共有 146 行になった。各 config を import して解決後のオブジェクトを比較し、6 個は完全一致、残り 9 個の差分が意図した 3 種類だけであることを確認した（`includeSource` の `[]` 明示、`fileParallelism` の `true` 明示、synstate 5 個の typecheck tsconfig パス修正）。`ws:test` のファイル数・テスト数も前後で一致
+    - `vitest.config.mts` も対応済み。自前で書いていた 10 パッケージを `tools/configs/vite-config.mts` に寄せ、757 行 → 344 行 + 共有 146 行になった。各 config を import して解決後のオブジェクトを比較し、6 個は完全一致、残り 9 個の差分が意図した 3 種類だけであることを確認した（`includeSource` の `[]` 明示、`fileParallelism` の `true` 明示、synstate 5 個の typecheck tsconfig パス修正）。`ws:check:test` のファイル数・テスト数も前後で一致
     - パッケージごとの `include` / `includeSource` の食い違い（15 パッケージで 6 通り / 4 通り）はそのまま残した。揃えるとテスト対象が変わるので、置き場所の統一とは別の判断になる
 - **`libs/*/configs/tsconfig.build.json` にコメントを書いてはいけない。** 各パッケージの `configs/rollup.config.mts` が `import tsconfig from './tsconfig.build.json' with { type: 'json' }` で読んでおり、JSON import は strict JSON なので esbuild が `JSON does not support comments` で落ちる。共有側の `tools/configs/tsconfig/*.json` は extends されるだけなのでコメントを書ける
-- ~~`eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない~~ → 対応済み。`lint:published-deps` の pass（`tools/configs/eslint.published-deps.mts`）に 19 ファイル分の config object を足して、`import-x/no-extraneous-dependencies` を devDependencies 許可で掛けるようにした
+- ~~`eslint.config.mts` は `eslint-config-typed` が既定で ignore するため lint されず、そこからの import だけは機械検証できていない~~ → 対応済み。`check:published-deps` の pass（`tools/configs/eslint.published-deps.mts`）に 19 ファイル分の config object を足して、`import-x/no-extraneous-dependencies` を devDependencies 許可で掛けるようにした
     - 新しい job を作らず既存の pass に相乗りさせたのは、job 名が増えると ruleset の required status checks を更新する必要があり、更新前に旧名が消えると全 PR がマージ不能になるため（統合時に一度踏んでいる）
     - 効くことは実測で確認した。`libs/synstate/package.json` から `eslint-plugin-ts-fortress` を消すと `libs/synstate/eslint.config.mts` の import が落ちる
     - **root の `eslint.config.mts` だけは workspace パッケージの import を検出できない。** シンボリックリンクを解決した先が root 自身の配下（`libs/*`）になるため、rule が内部モジュールと見なして飛ばす。パッケージ配下からは自分の外に解決されるので検出できる。root からの外部パッケージの import は検出できる（`import 'dedent'` を足して確認）
@@ -635,7 +635,7 @@ newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型�
     - Codecov のダッシュボードで component 別 coverage が空だったのはこれが原因。component の設定自体は正しく動いており、PR ブランチでは per-package の値が出ている（`components/?branch=<branch>` で確認）
 - ~~**browser テストが実質走っていないパッケージが 4 つある。**~~ → 対応済み。`synstate-preact-hooks` / `synstate-preact-signals` / `synstate-react-hooks` / `synstate-react-hooks-compat` の 4 パッケージにテストを書いた。`passWithNoTests: true` により `No test files found, exiting with code 0` で成功扱いになっていた
     - hooks の 3 パッケージは、レンダリングを要するものを `test/browser/` に置き、Browser project だけが拾うようにした（node project の `include` を `test/*.test.mts` までに絞る）。レンダリングには `@testing-library/react` / `@testing-library/preact` を使う
-    - hooks 本体は browser でしか動かないため、この 3 パッケージだけ `test:cov` を全 project 実行に変えた。合わせて `ws:test:cov` の job でも chromium を install する。statement coverage は 0% / 0% / 23.52% → いずれも 100%
+    - hooks 本体は browser でしか動かないため、この 3 パッケージだけ `test:cov` を全 project 実行に変えた。合わせて `ws:check:test:cov` の job でも chromium を install する。statement coverage は 0% / 0% / 23.52% → いずれも 100%
     - テストが本当に効いていることは、`useObservableValue` の購読解除を no-op に差し替えると 18 件中 7 件が落ちることで確認した
 - ~~**`synstate` の browser テストが不安定。**~~ → 対応済み。原因は Vite の依存プリバンドルだった。テストファイルを走査して見つからなかった依存は初回 import 時に最適化され、そこでページがリロードされる。リロードに巻き込まれたファイルが `Failed to fetch dynamically imported module` になる（毎回違うファイルが落ちるのはこのため）
     - 各パッケージの `optimizeDepsInclude` に取りこぼしていた依存を列挙して解消した。`node_modules/.vite` を消してからの実行で、synstate は列挙前 4/4 失敗・列挙後 6/6 成功。warm なら列挙の有無にかかわらず通るので、CI でだけ落ちていた
@@ -643,5 +643,5 @@ newMessage` が `newMessage` だけになっていた。discord.js 14.27 の型�
     - `nick-fields/retry` による 2 回試行と `ts-codemod-lib` の `retry: 2` は外した。原因が消えた以上、失敗は再試行するものではなく失敗として扱う
 - ~~**Codecov のパス解決が同名ファイルを取り違えている。**~~ → 対応済み（後述の方法で修正）。以下は問題の記録。 `synstate-react-hooks` / `synstate-preact-hooks` / `synstate-react-hooks-compat` は同じ相対パス（`src/create-boolean-state.mts` など）を持つが、Codecov 上には `synstate-react-hooks` の分しか存在しない（[API](https://api.codecov.io/api/v2/github/noshiro-pf/repos/mono/report/) で確認）。lcov の `SF:` はパッケージ相対なので、1 回のアップロードで全パッケージ分をまとめて渡すと、同名パスがどれか 1 つに畳まれてしまう。component は path で切るので、この取り違えは component では直せない。パッケージごとに `directory` を指定してアップロードを分けるか、lcov のパスをリポジトリルート相対に直すかの選択になる
     - 現状の実害は小さい。畳まれている 3 パッケージはいずれもテストが 0 件で、係数自体に意味が無い
-    - **修正**: `pnpm run coverage:normalize-paths` を `ws:test:cov` の後段に入れ、各 `lcov.info` の `SF:` をリポジトリルート相対に書き換えるようにした。Codecov に推測させる余地が無くなる。ローカルでは 3 つのミラーパッケージが別々のパスになることを確認済み
+    - **修正**: `pnpm run coverage:normalize-paths` を `ws:check:test:cov` の後段に入れ、各 `lcov.info` の `SF:` をリポジトリルート相対に書き換えるようにした。Codecov に推測させる余地が無くなる。ローカルでは 3 つのミラーパッケージが別々のパスになることを確認済み
     - **確認済み**: main へマージ後の upload で、`components/?branch=main` が 15 component すべてに値を返すようになった（`synstate-preact-hooks` と `synstate-react-hooks-compat` は `null` から 0% へ。当時はまだテストが 0 件だったので 0% が正しい値）

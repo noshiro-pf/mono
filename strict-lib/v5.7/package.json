@@ -5,12 +5,12 @@
   "description": "Generator harness for TypeScript 5.7 strict lib packages",
   "type": "module",
   "scripts": {
-    "gen": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen.mts",
+    "gen:lib": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen.mts",
     "gen:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-full.mts",
     "gen:lib-files": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-lib-files.mts",
     "gen:packages": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-packages.mts",
     "gen:with-codemod-fixed": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen-with-codemod-fixed.mts",
-    "type-check": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json && tsc -p tsconfig.lib-files-check.json && tsc -p tsconfig.lib-files-check.branded.json"
+    "check:types": "tsc -p tsconfig.lib-check.json && tsc -p tsconfig.lib-check.webworker.json && tsc -p tsconfig.lib-files-check.json && tsc -p tsconfig.lib-files-check.branded.json"
   },
   "devDependencies": {
     "@typescript/lib-decorators": "file:output/lib/libs/decorators",

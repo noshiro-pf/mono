@@ -152,7 +152,7 @@ stays consistent with `divInt`.
 ## Verification
 
 - `pnpm run tsc` (clean) — especially the new `expectType` sign×level matrix.
-- `pnpm run lint` (clean) — boundary `as` casts and division need the established eslint-disable comments.
+- `pnpm run check:lint` (clean) — boundary `as` casts and division need the established eslint-disable comments.
 - `pnpm test` (all green) — `Num` runtime matrix + migrated branded tests.
 - Spot-check intent: `Num.mul(asNegativeInt(-5), asNegativeInt(-3)) === 15` typed `PositiveInt`;
   `Num.mul(asPositiveInt(5), asNegativeInt(-3))` typed `NegativeInt`;

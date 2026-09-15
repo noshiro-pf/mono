@@ -108,7 +108,7 @@ const checkPackage = async (
  * would fill and check them, or `undefined` when the wiring is whole.
  *
  * "Reaches it from `doc`" is read the ways the repository writes it: a `doc`
- * script that chains `doc:embed` (the `synstate` family) or runs the embed
+ * script that chains `gen:readme` (the `synstate` family) or runs the embed
  * script directly, or a `gen-docs.mts` that imports the embedder and calls it
  * (everywhere else).
  */
@@ -146,11 +146,11 @@ const findWiringViolation = async (
     };
   }
 
-  // `doc:embed:jsdoc` contains `doc:embed`, so compare whole words.
+  // `gen:jsdoc` contains `gen:readme`, so compare whole words.
   const docWords = new Set(docScript.split(/\s+/u));
 
   if (
-    docWords.has('doc:embed') ||
+    docWords.has('gen:readme') ||
     docWords.has(`./${embedScriptRelativePath}`)
   ) {
     return undefined;
@@ -170,7 +170,7 @@ const findWiringViolation = async (
   return {
     packageName,
     detail:
-      'has an embedder that the `doc` script never reaches. Chain `doc:embed` from `doc`, or call `embedExamples()` in `scripts/cmd/gen-docs.mts`.',
+      'has an embedder that the `doc` script never reaches. Chain `gen:readme` from `doc`, or call `embedExamples()` in `scripts/cmd/gen-docs.mts`.',
   };
 };
 

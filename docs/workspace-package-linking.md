@@ -45,7 +45,7 @@ import できるようにするため**に導入されたものだった。
 import { Json, Result } from 'ts-data-forge'; // ← 相対パスにしたくない
 ```
 
-`samples/` は `doc:embed` で README に**そのまま埋め込まれる**ので、利用者が書く
+`samples/` は `gen:readme` で README に**そのまま埋め込まれる**ので、利用者が書く
 のと同じ形でなければならない。かといって `dist` に解決させると「いま編集している
 ソース」ではなく「前回のビルド結果」に対して型検査することになる。だから自分の
 ソースへ向ける、という一点だけが目的だった。
@@ -86,7 +86,7 @@ knip が効くようになった（`paths` は依存宣言を完全にバイパ�
 
 ### 群 B — `dist` で足りる
 
-`check-all` は `ws:build` → `ws:type-check` の順で走り、その順序には
+`check-all` は `ws:build` → `ws:check:types` の順で走り、その順序には
 
 > A package's `build` only type-checks what it publishes; everything else
 > (tests, scripts, configs, lint config) imports siblings that are built
@@ -100,7 +100,7 @@ matrix コマンドを実行する。
 `paths` 無しで、つまり `dist` 経由で解決していた。群 B の 21 エントリは一貫性を
 足していたのではなく、**同じリポジトリの中に 2 通りの解決経路を作っていた**。
 
-`apps/synstate-docs` が分かりやすい。`type-check` は `paths` で `synstate` の
+`apps/synstate-docs` が分かりやすい。`check:types` は `paths` で `synstate` の
 `src` を見る一方、`astro build`（Vite）は `node_modules` 経由で `dist` を見る。
 型検査が通ったものとビルドされたものが別物という状態だった。`paths` を外して
 両者は一致した。

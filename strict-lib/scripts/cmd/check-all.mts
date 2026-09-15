@@ -16,13 +16,13 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Running spell check',
-    action: () => runCmdStep('pnpm run cspell', 'Spell check failed'),
+    action: () => runCmdStep('pnpm run check:cspell', 'Spell check failed'),
     successMessage: 'Spell check passed',
   });
 
   await logStep({
     startMessage: 'Running Markdown check',
-    action: () => runCmdStep('pnpm run md', 'Markdown check failed'),
+    action: () => runCmdStep('pnpm run check:md', 'Markdown check failed'),
     successMessage: 'Markdown check passed',
   });
 
@@ -45,13 +45,13 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Type-checking generated lib with each pinned typescript@5.x',
-    action: () => runCmdStep('pnpm run ws:type-check', 'Type-check failed'),
+    action: () => runCmdStep('pnpm run ws:check:types', 'Type-check failed'),
     successMessage: 'Type-check passed',
   });
 
   await logStep({
     startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
+    action: () => runCmdStep('pnpm run fix:lint', 'Linting failed'),
     successMessage: 'Lint fixes applied',
   });
 

@@ -100,7 +100,7 @@ jobs:
         run: pnpm run ws:build
 
       - name: Test
-        run: pnpm run ws:test
+        run: pnpm run ws:check:test
 
   # Turns a red canary into an issue, because nothing else would: the job is
   # not a required check and runs on a schedule, where a failure is an email
@@ -188,7 +188,7 @@ jobs:
         run: pnpm run node-support:update
 
       - name: Format what changed
-        run: pnpm run fmt:full
+        run: pnpm run fix:fmt:full
 
       - name: Generate Token
         id: app-token

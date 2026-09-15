@@ -14,7 +14,7 @@ pnpm and `pnpm install`. Then, for this package:
 pnpm exec playwright install chromium   # for `smoke` and `screenshots`
 ```
 
-That is everything `build`, `test`, `lint` and `type-check` need. The rest is
+That is everything `build`, `check:test`, `check:lint` and `check:types` need. The rest is
 wanted only by the commands whose output leaves the repository:
 
 | command       | also needs                                                                     |

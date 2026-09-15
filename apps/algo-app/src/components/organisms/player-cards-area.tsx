@@ -73,7 +73,7 @@ export const PlayerCardsArea = memoNamed(
           }>
       >
     >(
-      // Not `pipe(cards).map(Arr.map(…))`: `lint:fix` rewrites that into
+      // Not `pipe(cards).map(Arr.map(…))`: `fix:lint` rewrites that into
       // `Arr.map`'s curried overload, which cannot infer the element type.
       () =>
         Arr.map(cards, (c: CardWithDisplayValue) => ({

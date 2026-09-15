@@ -8,7 +8,7 @@ type SourceFileMapping = Readonly<{
  * listed in the order their `@example` blocks appear in the source file (top
  * to bottom).
  *
- * Run `pnpm run doc:embed:jsdoc` after editing this, and see
+ * Run `pnpm run gen:jsdoc` after editing this, and see
  * `tools/scripts/cmd/check-example-coverage.mts` for the check that every
  * `@example` under `src/` is listed here.
  */

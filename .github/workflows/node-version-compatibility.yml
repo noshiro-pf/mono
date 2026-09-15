@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + ws:test across 17 packages, per Node version.
+    # install + ws:build + ws:check:test across 17 packages, per Node version.
     # The 10 minutes this was set to when the repository held two packages
     # cut two of the three matrix entries off mid-test.
     timeout-minutes: 30
@@ -139,7 +139,7 @@ jobs:
         run: pnpm run ws:build
 
       - name: Test
-        run: pnpm run ws:test
+        run: pnpm run ws:check:test
 
   # The one required status check for this workflow: it reports whatever
   # happened above, so that a skipped run cannot read as a passing one. The

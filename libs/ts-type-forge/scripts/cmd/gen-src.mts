@@ -17,13 +17,13 @@ const entryPointFilePath = path.resolve(srcDir, 'entry-point.mts');
 /**
  * Regenerates the committed sources this package derives from its own tree.
  *
- * `gi` sits in the middle rather than beside the other barrels: `global.mts`
+ * `gen:index` sits in the middle rather than beside the other barrels: `global.mts`
  * and `entry-point.mts` are written from the per-directory `index.mts` files,
  * so they are stale until those have been regenerated.
  *
  * Not part of `build` — the output is committed, and a build that rewrites
  * sources is a build that cannot run beside its siblings (see "Building from a
- * clean checkout" in CLAUDE.md). `pnpm run ws:gen:src` is the repository-wide
+ * clean checkout" in CLAUDE.md). `pnpm run ws:gen` is the repository-wide
  * form, and CI runs it and then asserts the tree is clean.
  */
 const gen = async (): Promise<void> => {
@@ -39,7 +39,7 @@ const gen = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Generating per-directory index.mts files',
-    action: () => runCmdStep('pnpm run gi', 'Index generation failed'),
+    action: () => runCmdStep('pnpm run gen:index', 'Index generation failed'),
     successMessage: 'Generated src/**/index.mts',
   });
 

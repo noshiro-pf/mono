@@ -44,10 +44,13 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Linting markdown files',
-    // `md` is a repository-wide script (the markdownlint config lives at the
+    // `check:md` is a repository-wide script (the markdownlint config lives at the
     // monorepo root), so it has to be invoked from there.
     action: () =>
-      runCmdStep('pnpm --workspace-root run md', 'Markdown linting failed'),
+      runCmdStep(
+        'pnpm --workspace-root run check:md',
+        'Markdown linting failed',
+      ),
     successMessage: 'Markdown linting completed',
   });
 

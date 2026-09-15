@@ -7,7 +7,7 @@ import { renderModule } from './render.mjs';
 /**
  * Generates every configured branded-number module under `src/number`. Worked
  * `@example` blocks are emitted as empty placeholders; run
- * `pnpm run doc:embed:jsdoc` afterwards to fill them, then Prettier to
+ * `pnpm run gen:jsdoc` afterwards to fill them, then Prettier to
  * normalize formatting.
  */
 const main = async (): Promise<void> => {

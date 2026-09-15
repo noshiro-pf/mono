@@ -8,7 +8,7 @@ import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
 export const genDocs = async (): Promise<void> => {
   console.info('Starting documentation generation...\n');
 
-  // What puts `doc:embed:jsdoc` in front of CI. `ws:doc` is the style-check
+  // What puts `gen:jsdoc` in front of CI. `ws:doc` is the style-check
   // matrix entry that runs each package's `doc` and then asserts the tree is
   // clean; every other package with an `@example` mapping reaches its
   // embedder from here, and this one did not, so its examples — and the

@@ -99,7 +99,7 @@ type Violation = Readonly<{
 
 /**
  * Files under `src/` that never carry a hand-written `@example`: the barrels
- * `gi` generates, the entry point, the ambient globals, and the tests. Kept in
+ * `gen:index` generates, the entry point, the ambient globals, and the tests. Kept in
  * step with `defaultExemptFileNames` in
  * `tools/configs/embed-examples-in-jsdoc.mts`, whose check they are exempt
  * from for the same reason.
@@ -187,7 +187,7 @@ const checkPackage = async (
  * would look at them, or `undefined` when the wiring is whole.
  *
  * "Reaches it from `doc`" is read two ways because the repository writes it two
- * ways: a `doc` script that chains `doc:embed:jsdoc` (the `synstate` family), or
+ * ways: a `doc` script that chains `gen:jsdoc` (the `synstate` family), or
  * a `gen-docs.mts` that imports the embedder and calls it (everywhere else).
  */
 const findWiringViolation = async (
@@ -229,7 +229,7 @@ const findWiringViolation = async (
     };
   }
 
-  if (docScript.includes('doc:embed:jsdoc')) return undefined;
+  if (docScript.includes('gen:jsdoc')) return undefined;
 
   const genDocs = await readFileOrUndefined(
     path.resolve(packageDir, 'scripts/cmd/gen-docs.mts'),
@@ -242,7 +242,7 @@ const findWiringViolation = async (
   return {
     packageName,
     detail: 'has an embedder that the `doc` script never reaches.',
-    hint: 'Chain `doc:embed:jsdoc` from `doc`, or call `embedExamplesInJsDoc()` in `scripts/cmd/gen-docs.mts`; otherwise `ws:doc` runs everything but this.',
+    hint: 'Chain `gen:jsdoc` from `doc`, or call `embedExamplesInJsDoc()` in `scripts/cmd/gen-docs.mts`; otherwise `ws:doc` runs everything but this.',
   };
 };
 

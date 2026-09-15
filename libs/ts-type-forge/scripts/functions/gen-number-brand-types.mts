@@ -25,7 +25,7 @@ import { workspaceRootPath } from '../workspace-root-path.mjs';
  *
  * `@example` code blocks are inlined here from the type-checked sample files in
  * `samples/src/...` using the exact same extraction/indentation as
- * `pnpm run doc:embed:jsdoc`, so the two pipelines produce identical output and
+ * `pnpm run gen:jsdoc`, so the two pipelines produce identical output and
  * the generator's result stays stable (no drift) under `pnpm run build`.
  *
  * Non-integer brands (`FiniteNumber`, `Float*`, `InfiniteNumber`, `NaNType`,

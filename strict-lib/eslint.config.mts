@@ -48,7 +48,7 @@ const toolingFiles = [
 ] as const;
 
 /**
- * The flat ESLint config for `strict-lib/`, run by `strict-lib:lint` from the
+ * The flat ESLint config for `strict-lib/`, run by `strict-lib:check:lint` from the
  * repository root. The rest of the repository is linted per package.
  *
  * Typed linting resolves against `tsconfig.tooling.json`, which includes all of

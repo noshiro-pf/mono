@@ -196,7 +196,7 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 | `constants.mts`   | 待ち時間と諦めるまでの回数                                |
 | `util.mts`        | quoting、ログ、停止シグナル                               |
 
-`index.mts` はありません。`ws:gi` は workspace メンバーしか歩かず `tools/` は
+`index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
 
 ## English
@@ -392,5 +392,5 @@ sleeps for `--idle-interval` (300s) and surveys again.
 | `constants.mts`   | how long it waits, and how long before it gives up       |
 | `util.mts`        | quoting, logging, the stop signal                        |
 
-There is no `index.mts`: `ws:gi` only walks workspace members and `tools/` is
+There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.

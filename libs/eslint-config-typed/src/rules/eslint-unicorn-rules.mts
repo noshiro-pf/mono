@@ -513,7 +513,7 @@ export const eslintUnicornRules = {
   // Added in v73.
 
   /**
-   * Barrel files are the convention here — `pnpm run gi` generates an
+   * Barrel files are the convention here — `pnpm run gen:index` generates an
    * `index.mts` for every directory, and other directories import through it.
    */
   'unicorn/no-barrel-files': 'off',

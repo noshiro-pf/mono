@@ -32,18 +32,19 @@
   ],
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "check:cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check:lint": "eslint .",
+    "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "clean": "pnpm run /clean:.*/",
     "clean:logs": "npx rimraf ./*.log",
-    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
-    "fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
-    "fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
-    "fmt:full": "prettier --write .",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "prepare-release": "run-s sync-cli-versions fmt build",
-    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts",
-    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit"
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "prettier --write .",
+    "fix:lint": "eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "prepare-release": "run-s sync-cli-versions fix:fmt build",
+    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts"
   },
   "dependencies": {
     "cmd-ts": "^0.15.0",

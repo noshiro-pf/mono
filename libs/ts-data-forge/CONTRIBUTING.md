@@ -52,9 +52,9 @@ By participating in this project, you agree to abide by our [Code of Conduct](ht
 ### Essential Commands
 
 - **Run tests**: `npm test`
-- **Run tests in watch mode**: `npm run testw`
-- **Type checking**: `npm run type-check`
-- **Linting**: `npm run lint`
+- **Run tests in watch mode**: `npm run watch:test`
+- **Type checking**: `npm run check:types`
+- **Linting**: `npm run check:lint`
 - **Formatting**: `npm run fmt`
 - **Build the project**: `npm run build`
 - **Full validation** (lint + test + build): `npm run check-all`

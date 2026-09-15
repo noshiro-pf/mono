@@ -55,7 +55,7 @@ const sourceFileMappings: readonly SourceFileMapping[] = [
 ### 3. Run the Script
 
 ```bash
-npm run doc:embed:jsdoc
+npm run gen:jsdoc
 ```
 
 Or run directly:

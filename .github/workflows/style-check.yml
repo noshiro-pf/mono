@@ -104,31 +104,29 @@ jobs:
       fail-fast: false
       matrix:
         command:
-          - fmt:full
+          - fix:fmt:full
           # oxfmt owns `strict-lib/`; Prettier ignores it. The repository-clean
           # step after this one is what makes the check an idempotence check.
-          - strict-lib:fmt
-          - md
-          - cspell
+          - strict-lib:fix:fmt
+          - check:md
+          - check:cspell
           - ws:doc
           - ws:check:ext
           # `docs/package-dependencies.md` is generated from every
           # `package.json`, so it goes stale whenever one changes and whenever a
           # rebase drops a row from it. Regenerating it here and letting the
           # repository-clean step below compare is the only thing that notices.
-          - docs:deps
-          # The generated `index.mts` barrels. Nothing else notices when one
-          # goes stale — or when `gi` overwrites a hand-written index file,
-          # which is what `--preserve` in each package's `gi:src` now stops.
-          - ws:gi
-          # The rest of the committed generated sources: the ESLint rule
-          # types, ts-data-forge's branded numbers, ts-type-forge's
-          # `global.mts` / `entry-point.mts`, the synstate re-export shims.
+          - gen:deps-graph
+          # Every committed generated source: the `index.mts` barrels, the
+          # ESLint rule types, ts-data-forge's branded numbers, ts-type-forge's
+          # `global.mts` / `entry-point.mts`, the synstate re-export shims, the
+          # samples embedded into READMEs and `@example` blocks. Each package's
+          # `gen` names its own generators in order, and the repository-clean
+          # step below is what notices when one has gone stale.
+          #
           # `build` used to regenerate all of it on every run, which put three
-          # of the five minutes a full build took into every job that builds;
-          # regenerating it here and letting the repository-clean step below
-          # compare is what replaces that.
-          - ws:gen:src
+          # of the five minutes a full build took into every job that builds.
+          - ws:gen
 
     steps:
       - name: Checkout
@@ -157,13 +155,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ws:doc, ws:check:ext and ws:gen:src load each package's sources, which
-      # import workspace siblings and resolve through their `exports` map to
-      # dist/. Nothing is built yet on a clean checkout, so these three need
-      # the packages emitted first. The other matrix entries do not touch
-      # dist/, so they skip the build.
+      # ws:doc and ws:gen load each package's sources, which import workspace
+      # siblings and resolve through their `exports` map to dist/. Nothing is
+      # built yet on a clean checkout, so these two need the packages emitted
+      # first. The other matrix entries do not touch dist/, so they skip the
+      # build.
+      #
+      # `ws:check:ext` used to be on this list and is not: `check-ext.mts`
+      # globs file names under `src/` and `scripts/` and resolves nothing, so
+      # the build it was paying for did nothing for it.
       - name: Build all packages
-        if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext' || matrix.command == 'ws:gen:src'
+        if: matrix.command == 'ws:doc' || matrix.command == 'ws:gen'
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"

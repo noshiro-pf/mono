@@ -29,5 +29,5 @@ npm, and this copy is private.
 
 ```sh
 pnpm run test
-pnpm run type-check
+pnpm run check:types
 ```
