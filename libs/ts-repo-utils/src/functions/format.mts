@@ -398,7 +398,8 @@ const filterFilesByCwd = (
  * Format only files that differ from the specified base branch or commit
  *
  * @param base - Base branch name or commit hash to compare against (defaults to
- *   'main')
+ *   'main'). It names exactly one revision and reaches `git` as a single
+ *   argument; see {@link getDiffFrom}.
  * @param options - Options for formatting
  * @param options.includeUntracked - Include untracked files in addition to diff
  *   files (default is true)

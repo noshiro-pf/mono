@@ -54,7 +54,8 @@ import { getDiffFrom, getGitRoot } from './diff.mjs';
  *   (`.editorconfig`) and ordinary globs (`**.md`, `docs/**`) both work.
  *   Defaults to `[]`, which ignores nothing.
  * @param options.baseBranch - Base branch to compare against for determining
- *   changed files. Defaults to `'origin/main'`
+ *   changed files. It names exactly one revision and reaches `git` as a single
+ *   argument; see {@link getDiffFrom}. Defaults to `'origin/main'`
  * @returns Whether the step should run. An empty diff reads as "nothing
  *   changed" and so returns `false`. When running in GitHub Actions, also
  *   appends `should_run=true` or `should_run=false` to the file named by the
@@ -163,7 +164,8 @@ export const checkShouldRun = async (
  *       '.prettierrc', 'docs/', '**.md', '**.txt']`
  *
  * @param options.baseBranch - Base branch to compare against for determining
- *   changed files. Defaults to `'origin/main'`
+ *   changed files. It names exactly one revision and reaches `git` as a single
+ *   argument; see {@link getDiffFrom}. Defaults to `'origin/main'`
  * @returns A promise that resolves when the check is complete. The function
  *   will set the GITHUB_OUTPUT environment variable with `should_run=true` or
  *   `should_run=false` if running in GitHub Actions environment.
