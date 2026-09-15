@@ -5,7 +5,7 @@ const mut_xs: number[] = [];
 mut_xs.push(1);
 mut_xs[0] = 2;
 
-const state: { mut_seen: Record<string, number> } = { mut_seen: {} };
+const state: { mut_seen: { [key: string]: number } } = { mut_seen: {} };
 
 state.mut_seen['a'] = 1;
 

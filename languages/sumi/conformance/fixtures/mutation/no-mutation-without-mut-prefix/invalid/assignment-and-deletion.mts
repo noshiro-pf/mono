@@ -11,7 +11,7 @@ cells[0] = 1;
 // A mutable annotation is a violation in its own right; what this pins is the
 // second diagnostic, on the operation rather than on the type.
 // @sumi-expect-error readonly/require-readonly-type
-const bag: Record<string, number> = { a: 1 };
+const bag: { [key: string]: number } = { a: 1 };
 
 // @sumi-expect-error mutation/no-mutation-without-mut-prefix
 delete bag['a'];
