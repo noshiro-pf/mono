@@ -19,13 +19,13 @@ catalog:
   '@vitest/coverage-v8': 5.0.0
   '@vitest/ui': 5.0.0
   argparse: 3.0.1
-  cspell: 10.2.2
+  cspell: 10.3.0
   dedent: 1.7.2
   esbuild: 0.28.2
   eslint: 10.10.0
   immer: 11.1.18
   jiti: 2.7.0
-  jotai: 2.20.3
+  jotai: 3.0.0
   markdownlint: 0.41.1
   markdownlint-cli2: 0.23.2
   mobx: 7.0.3

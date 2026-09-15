@@ -37,7 +37,7 @@
     "@fontsource/noto-sans-jp": "^5.3.0",
     "@preact/signals": "^2.11.2",
     "@resvg/resvg-js": "^2.6.2",
-    "astro": "^7.3.1",
+    "astro": "^7.3.2",
     "preact": "^10.29.8",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -50,7 +50,7 @@
     "synstate-react-hooks": "workspace:*"
   },
   "devDependencies": {
-    "@astrojs/markdown-remark": "7.3.0",
+    "@astrojs/markdown-remark": "7.3.1",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "esbuild": "catalog:",
