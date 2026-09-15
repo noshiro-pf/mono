@@ -74,7 +74,7 @@ pnpm workspace のメンバーは `libs/*`, `apps/*`, `tools/*` のみ
 ```sh
 pnpm run check-all      # 全チェック（install, spell, markdown, type, build, test, lint, format）
 pnpm run ws:build       # 依存関係の順にビルド
-pnpm run ws:check:test        # 全パッケージのテスト
+pnpm run ws:check:test  # 全パッケージのテスト
 pnpm run fmt            # 未コミットのファイルを整形
 pnpm changeset          # リリース用の changeset を追加
 ```
