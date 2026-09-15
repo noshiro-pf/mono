@@ -20,7 +20,8 @@ const MUT_PREFIX = 'mut_';
  * the same promise for the types that are not written. Without it an
  * unannotated literal is the one place a mutable type enters a non-`mut_`
  * binding, and the compiler accepts every write through it. With it, a write
- * to such a binding is a compiler error (TS2540 / TS2542 / TS2704).
+ * to such a binding is a compiler error (TS2540 / TS2542 / TS2704), which is
+ * why `mutation/no-mutation-without-mut-prefix` leaves those to the compiler.
  *
  * The literal is found through what passes its type on unchanged: `satisfies`,
  * both branches of a conditional, and both operands of `??`. An assertion to

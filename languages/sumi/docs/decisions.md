@@ -602,10 +602,15 @@
 - **判断**:
     1. **型注釈の無い `const` 束縛で、名前が `mut_` で始まらないものは、型の推論元になる配列・オブジェクトリテラルに `as const` を付ける。** 新規ルール `readonly/require-as-const`(sumi プラグイン)。リテラルは `satisfies`、条件式の両分岐、`??` の両辺を通して探す(いずれも型をそのまま通すため)
     2. **対象外**: 型注釈のある束縛(注釈が型であり、`readonly/require-readonly-type` が検査する。`as const` は要求も禁止もしない — D-45 の「綴りを正規化しない」)、プリミティブ・テンプレートリテラル(変更可能な部分が無い)、分割代入の `const`(リテラルは束縛されず、どの名前が可変かを `as const` では言えない)、`let`(`mut_` 名にしか許されない)、呼び出しの引数・関数本体・他のリテラルの内側(引数と戻り値は注釈され、`as const` はリテラル全体に及ぶ)
+    3. **`mutation/no-mutation-without-mut-prefix` は、対象の型が既に書き込みを禁じている代入・`delete` を報告しない。** その位置にはコンパイラが TS2540 / TS2542 / TS2704 を出すので、同じ指摘が二重になる
 - **理由**:
     - **推論された型だけが readonly 強制の抜け穴だった。** 書かれる型は `require-readonly-type` が、引数は `prefer-readonly-parameter-types` が readonly にする。D-42 で戻り値型も書かれる。残る「型が書かれない場所」のうち、可変な型を生むのは配列・オブジェクトリテラルで、`const target = { a: 1 }` は `{ a: number }` になり、以後の `target.a = 2` をコンパイラは受け付ける
     - **D-45 はこの穴を `mut_` 側の規則に任せていた**(「破壊的操作は `mut_` 側の規則が担う」)。しかし `no-mutation-without-mut-prefix` は checker のルールで、**型に readonly が現れない限り、Sumi sugar で readonly をデフォルトにする codemod(D-3)の材料にもならない**。`as const` があれば、無注釈の束縛も注釈と同じく字面に readonly 性を持つ
     - **このリポジトリの運用の追認である。** `ts-codemod-lib` の `append-as-const` が `mut_` 以外のリテラルに `as const` を機械的に付けており([spec/future-syntax.md](./spec/future-syntax.md) の候補 9)、dogfood 対象の synstate 3 パッケージ(92 ファイル)は導入時点で違反 0 件だった。codemod はプリミティブにも付け、`#mut_` / `_mut_` / `draft` も免除するが、Sumi の免除は D-14 の `mut_` だけで、要求するのは readonly に効く範囲だけ
+    - **判断 3 は判断 1 の帰結。** リテラル由来の値が readonly になると、それへの書き込みはコンパイラが拒否する。checker が同じ行を重ねて報告しても情報は増えず、`sumi check` の出力で同じ誤りが 2 件に数えられる
 - **帰結**:
-    - 適合性コーパスでは、型注釈の無いリテラルを使っていた fixture に `as const` を足した(検査対象が変わらないもの)。分割代入の元になる値だけは、`as const` にすると要素がリテラル型になり `let` への `+= 1` が型エラーになるので、型注釈にした
+    - `no-mutation-without-mut-prefix` の役割は「**型が書き込みを許しているのに、名前が `mut_` でない**」ケースに絞られる: `new Map()` など literal 以外から作った値、`Object.assign` / `Reflect.set`(引数が `object`)、`Readonly<Date>` の setter(mapped type はメソッドを消さない)、可変な型を返す外部 API の値、`mut_` 値の別名、そして `as` を挟んだ代入(`(t.a as number) = 3` はコンパイラが通す — 実測)。代入・`delete`・破壊的メソッドの 3 種類はどれも残る
+    - 抑制の判定は**型ではなくコンパイラの診断で行う**。対象ノードの範囲に TS2540 / TS2542 / TS2704 があるときだけ報告しない。型から readonly 性を推し量ると、上の `as` のように型は readonly でもコンパイラが通す書き込みを取りこぼす
+    - 破壊的メソッドは元から二重にならない: readonly 配列には `push` が無く(TS2339)、宣言元のインターフェースを引けないのでルールは報告しない
+    - 適合性コーパスでは、型注釈の無いリテラルを使っていた fixture に `as const` を足した(検査対象が変わらないもの)。分割代入の元になる値だけは、`as const` にすると要素がリテラル型になり `let` への `+= 1` が型エラーになるので、型注釈にした。`no-mutation-without-mut-prefix` の fixture は、コンパイラに任せる書き込み(`compiler/2540` のみ)と、ルールが報告し続ける経路(`mut_` 値の別名、`as` を挟んだ代入)を並べる形に書き直した
     - ESLint ブリッジに対応するルールは無い(`append-as-const` は codemod であって lint ではない)

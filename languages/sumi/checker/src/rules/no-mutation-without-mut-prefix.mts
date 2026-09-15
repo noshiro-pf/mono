@@ -42,8 +42,17 @@ import { type Rule, type RuleContext } from '../engine/index.mjs';
  * xs.push(1); // reported
  * ```
  *
- * Three things are deliberately out of scope:
+ * Four things are deliberately out of scope:
  *
+ * - **A write the type already refuses.** An assignment or `delete` whose
+ *   target is read-only — an `as const` value, which `readonly/require-as-const`
+ *   gives every non-`mut_` literal binding (D-60), a `readonly T[]`, a
+ *   `Readonly<Record<…>>` — is a compiler error on that very span, and is left
+ *   to it. The decision is the compiler's own diagnostic, not a reading of the
+ *   type: `(frozen.a as number) = 2` has a read-only target and the compiler
+ *   accepts it, so it is still reported here. A mutator call needs no such
+ *   case: a read-only type does not have the method, and its owner does not
+ *   resolve.
  * - **Rebinding a variable** (`x = 1`). Only a `let` can be rebound and only
  *   a `mut_` name may be a `let`, so `functional/no-let` has already refused
  *   it; a second report would say the same thing twice.
@@ -75,11 +84,13 @@ export const noMutationWithoutMutPrefix: Rule = {
     mutatingCall:
       '`{{method}}` mutates `{{path}}` in place. Sumi allows that only through a name marked mutable: rename the binding to `mut_…`, or use the copying form ({{alternative}}) instead (D-14).',
   },
-  visit: (node, { checker, report }) => {
+  visit: (node, context) => {
+    const { checker, report } = context;
+
     if (isBinaryExpression(node)) {
       if (!isAssignmentOperator(node.operatorToken.kind)) return;
 
-      reportAssignedAccess(node.left, report);
+      reportAssignedAccess(node.left, report, context.isReportedByCompiler);
 
       return;
     }
@@ -87,7 +98,11 @@ export const noMutationWithoutMutPrefix: Rule = {
     if (isForOfStatement(node) || isForInStatement(node)) {
       // A declaration (`for (const x of xs)`) binds a new name each time; only
       // an expression target assigns to something that already exists.
-      reportAssignedAccess(node.initializer, report);
+      reportAssignedAccess(
+        node.initializer,
+        report,
+        context.isReportedByCompiler,
+      );
 
       return;
     }
@@ -95,7 +110,13 @@ export const noMutationWithoutMutPrefix: Rule = {
     if (isDeleteExpression(node)) {
       const deleted = unwrap(node.expression);
 
-      if (!isAccess(deleted) || isMutPermitted(deleted)) return;
+      if (
+        !isAccess(deleted) ||
+        isMutPermitted(deleted) ||
+        context.isReportedByCompiler(deleted, readonlyWriteCodes)
+      ) {
+        return;
+      }
 
       report(deleted, 'deletion', { path: pathText(deleted) });
 
@@ -143,6 +164,15 @@ export const noMutationWithoutMutPrefix: Rule = {
     });
   },
 } as const;
+
+/**
+ * The compiler's errors for a write its type refuses: TS2540 (a read-only
+ * property, `as const` included), TS2542 (a read-only index signature —
+ * `readonly T[]`, `Readonly<Record<…>>`) and TS2704 (`delete` of a read-only
+ * property). Where one of them lands on the target, the write is already
+ * reported, and a second report of the same line would say nothing new.
+ */
+const readonlyWriteCodes: ReadonlySet<number> = new Set([2540, 2542, 2704]);
 
 /** An access path: `a.b`, `a[0]`, and the chains built from them. */
 const isAccess = (
@@ -433,10 +463,17 @@ const isFreshValue = (
 const reportAssignedAccess = (
   node: TsNode,
   report: RuleContext['report'],
+  isReportedByCompiler: RuleContext['isReportedByCompiler'],
 ): void => {
   const target = unwrap(node);
 
-  if (!isAccess(target) || isMutPermitted(target)) return;
+  if (
+    !isAccess(target) ||
+    isMutPermitted(target) ||
+    isReportedByCompiler(target, readonlyWriteCodes)
+  ) {
+    return;
+  }
 
   report(target, 'assignment', { path: pathText(target) });
 };

@@ -30,6 +30,16 @@ export type RuleContext = Readonly<{
     messageId: string,
     data?: ReadonlyRecord<string, string>,
   ) => void;
+
+  /**
+   * Whether the compiler reports one of `codes` within `node`'s span.
+   *
+   * For a rule that would otherwise say what the compiler already says — the
+   * way to leave a case to it without guessing, from the types, whether it
+   * will. The file's semantic diagnostics are fetched on the first call and
+   * kept for the rest of the file, so a rule that never asks costs nothing.
+   */
+  isReportedByCompiler: (node: TsNode, codes: ReadonlySet<number>) => boolean;
 }>;
 
 /**

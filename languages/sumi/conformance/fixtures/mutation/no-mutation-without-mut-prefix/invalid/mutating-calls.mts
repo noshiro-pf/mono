@@ -1,7 +1,10 @@
-const xs = [1] as const;
+// A read-only array has no `push` at all, so that is the compiler's to report;
+// the rule is for a mutable array held under a name without the prefix.
+const mut_values = [1];
 
-// A readonly array has no `push` at all, so this is the compiler's to report.
-// @sumi-expect-error compiler/2339
+const xs = mut_values;
+
+// @sumi-expect-error mutation/no-mutation-without-mut-prefix
 xs.push(2);
 
 const byName = new Map<string, number>();
