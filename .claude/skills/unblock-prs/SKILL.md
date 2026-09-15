@@ -186,7 +186,7 @@ gh run view --job <job-id> --log-failed
 ```
 
 **The check name is the command.** `style-check (X)` and `type-check (X)` both
-run `pnpm run X` at the repository root, so `type-check (knip)` reproduces as
+run `pnpm run X` at the repository root, so `type-check (check:knip)` reproduces as
 `pnpm run check:knip`. Four checks do not follow that rule:
 
 | Check                        | What to run                                                     |

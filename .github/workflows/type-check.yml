@@ -183,8 +183,8 @@ jobs:
           - ws:check:test:browser
           - ws:check:test:cov
           - ws:check:e2e
-          - codemod:full
-          - knip
+          - fix:codemod:full
+          - check:knip
           - check:published-deps
           - verify:npm-packages
 
