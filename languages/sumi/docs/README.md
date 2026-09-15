@@ -42,6 +42,7 @@ TypeScript は「JS のスーパーセットである」ことで JS 資産を�
 - [decisions.md](./decisions.md) — 設計判断の決定ログ(ADR)
 - [related-work.md](./related-work.md) — 先行研究・関連プロジェクトと採否(asm.js、Safe TypeScript、Refined TypeScript ほか)
 - [overload-survey.md](./overload-survey.md) — オーバーロード代替の言語間コード比較(候補 8 / D-13 の設計材料)
+- [overload-design.md](./overload-design.md) — オーバーロードの設計検討(TS 実装 4 方式の健全性実測、リポジトリのオーバーロードの分類、オーバーロードが必要なときの TS での書き方、Sumi sugar の複数節構文の提案)
 - [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) — throw しうる標準ライブラリ API の棚卸し(D-22 の基礎、Node 実測込み)
 - [implementation-plan.md](./implementation-plan.md) — Sumi lint 実装計画(Phase 0: 対応表とコーパス → Phase 1: oxlint preset + `sumi check` で dogfood → Phase 2: 単一パス専用チェッカー → Phase 3: Sumi sugar parser)
 - [enforcement-map.md](./enforcement-map.md) — 仕様→強制手段の対応表(Phase 0 成果物)

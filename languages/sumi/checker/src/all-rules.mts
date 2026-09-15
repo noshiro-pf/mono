@@ -1,6 +1,9 @@
 import { type Rule } from './engine/index.mjs';
 import {
+  noMutationWithoutMutPrefix,
   noNullPropagation,
+  noOverloadedFunctionExpression,
+  noTupleMutatingMethod,
   strictLogicalAssignmentOperands,
 } from './rules/index.mjs';
 
@@ -9,7 +12,10 @@ import {
  * take the list from here, so a rule is enabled by being in it.
  */
 export const allRules: readonly Rule[] = [
+  noMutationWithoutMutPrefix,
   noNullPropagation,
+  noOverloadedFunctionExpression,
+  noTupleMutatingMethod,
   strictLogicalAssignmentOperands,
 ] as const;
 

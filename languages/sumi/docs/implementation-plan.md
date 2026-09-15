@@ -32,7 +32,7 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 - **エディタ統合を後回しにしない**(Flow の敗因 — [related-work.md](./related-work.md))。最初は CLI + TS language service plugin として出し、LSP を自作せずにエディタ診断を得る。watch モードは `ts.createWatchProgram` の incremental で。
 - Phase 1 preset からルールを 1 個ずつ移植し、適合性コーパスで同値性をゲートしながら ESLint 側を退役させる。移植完了まで両者は並走してよい(コーパスが同値性を保証する)。言語仕様に属さないスタイル規則は ESLint に残してよい。
 - 置き場所: `languages/sumi/cli`(@sumi-lang/cli、D-46)。**`sumi check` コマンド自体は Phase 1 で先に存在する**(拘束 compilerOptions の検証 → native tsc → oxlint preset の直列ラッパー、2026-09-08)。Phase 2 はその内部を単一パスのチェッカーに置き換える作業であり、コマンドの字面と off config(D-46)は変わらない。publish 時に `libs/` へ移す。
-- **着手済み(2026-09-09、D-55)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
+- **着手済み(2026-09-09、D-55)**: 型情報が要るルールを既存 linter で書けないことが判明したため(oxlint の JS plugin はドキュメントが未対応と明記、rslint は plugin から型が取れない)、**Phase 2 の実体を前倒しで作った** — `@sumi-lang/checker`(`languages/sumi/checker`)は TypeScript 7 同梱の JS API(`typescript-native/unstable/*`)の上で 1 プロジェクト = 1 プログラム = 1 パスで走る自前チェッカーで、`sumi check` の第 4 段として動く。最初のルールは `null/no-null-propagation`、次いで `boolean/strict-logical-assignment-operands`、`mutation/no-mutation-without-mut-prefix`(2026-09-10 — `mut_` 以外への破壊的操作。中核規則で、これまで `sumi check` のどの段でも検査されていなかった)。構文ルールは当面 oxlint preset 側に残り、コーパスが両エンジンの診断を中立 ID で混ぜて比較する。Phase 2 の完了は「対応表の全項目がこのチェッカー側に移り、preset が退役する」ことで変わらない。
 - 完了条件: 対応表の全項目が専用チェッカーで検査され、subset preset(言語仕様分)が退役していること。
 
 ## Phase 3(Sumi sugar): fork parser はチェッカーと結合させずに足す
@@ -43,6 +43,13 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 ## 将来の作業(future work)
 
 - **React Compiler を意識した設計(2026-09-02、ユーザー要望 — issue #1753 のコメント、未整理)。** React Compiler は「コンポーネントとフックが冪等で、レンダー中に値を変更しない」ことを前提にメモ化を自動挿入する。Sumi の既存の規律 — `const` 既定と `mut_` prefix(D-14)、`functional/immutable-data` 相当、readonly 強制(D-45)、副作用 import の禁止 — はその前提とほぼ同じものを別の言葉で言っており、**Sumi lint を通ったコードは React Compiler が最適化できるコードである**という関係を明示できるはずである。整理すべき点: (1) React Compiler の bail-out 条件(レンダー中の変更、条件付きフック呼び出し、ref の読み書き)と Sumi の規則の対応表を作り、Sumi 側で捕まえられていない条件があれば規則を足すか記録する。(2) `mut_` 束縛をどこまで許すか — レンダー中のローカルな可変アキュムレータは React Compiler も許すので、規則の緩さの線が一致しているかを確認する。(3) React Compiler が要求する `"use memo"` / `"use no memo"` ディレクティブと、D-36 の default export emit 設定や `sumi.config` の関係。(4) synstate(このリポジトリの状態管理ライブラリ)と React Compiler の相互作用は別問題として切り分ける。
+
+### Sumi sugar / refined の利用者向けドキュメント(2026-09-13 追記 — D-59)
+
+規則そのものではなく**規則に従うための書き方**を、利用者向けドキュメントとして書く必要がある。最初の項目は**アセットの扱い**:
+
+- **CSS・画像等は `index.html` の `<link>` かバンドラ設定側に出す。** 副作用 import は例外なく禁止(D-59)で、`import './index.css'` はモジュールの実行ではなくバンドラへの指示なので「関数として import して呼ぶ」という代替が存在しない。加えて Sumi のモジュール解決は `.css` を解決しない。つまり Sumi 下のアプリでは**アセットがモジュールグラフに載らない**という前提そのものを説明する必要がある([spec/modules.md](./spec/modules.md) の「副作用 import の代替」)。
+- 同じ枠で書くべきものが他にもあるはず(`dotenv/config` → `config()` のような置き換え表、prelude の入れ方、`sumi.config` の書き方)。**「ルール作成ガイド」(下記)と同じ成果物の一部**として扱う。
 
 ### 既存コードベースの段階的移行(bulk suppressions、2026-09-09 追記 — D-57)
 

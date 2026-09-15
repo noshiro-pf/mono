@@ -1,4 +1,4 @@
-<!-- cspell:ignore bivariance rslint tsslint tsl corsa GritQL Rstack ByteDance -->
+<!-- cspell:ignore bivariance rslint tsslint tsl corsa GritQL Rstack ByteDance GADT -->
 
 # 設計判断の決定ログ
 
@@ -87,9 +87,10 @@
 
 ## D-13: オーバーロードを許容し、named function はオーバーロード時のみ許可する
 
-- **ステータス**: 確定(2026-08-29)
+- **ステータス**: 確定(2026-08-29)。**結論は維持、根拠は D-58 で差し替え(2026-09-10)**
 - **判断**: 関数オーバーロードは言語機能として許容する。`function` 宣言は「オーバーロードシグネチャを伴う場合のみ」合法とし、それ以外は arrow function に統一する。チェッカーに条件付き許可ルールを実装して記法の一意性(同じものを書く方法が 1 つ)を担保する。
 - **理由**: `arguments` と `this` を禁止した状態では、named function と arrow function の安全性の差はほぼ消える。一方 arrow ではオーバーロード宣言が書きづらい(実装シグネチャの型付けが緩む)。
+- **根拠の訂正(D-58)**: 「arrow では書きづらい」は測ってみると弱い。実際の理由は **戻り値が引数の型で変わるオーバーロードは arrow の記法では `as` 無しに書けない**ことである(呼び出しシグネチャを並べたオブジェクト型への代入検査は実装が全シグネチャを満たすことを要求するため)。また D-13 は「オーバーロードを許容する」とだけ言っていて**何をオーバーロードで書いてよいか**を決めていなかった。その線引きが D-58。
 
 ## D-14: mutability prefix は `mut_` の一種類のみ
 
@@ -375,6 +376,13 @@
 - **実装で決めた細目(2026-09-08)**: 拘束項目の比較は「コンパイラの読み方」に合わせる — 不在の boolean は `false`(TS の既定)として受け入れる。ただし `allowUnusedLabels` / `allowUnreachableCode` は不在が「suggestion」の意味なので明示必須 / `strict` 系サブフラグ(`noImplicitAny` 等、TS 7.0 時点の一覧)を個別に `false` にするのは `strict` の違反 / enum 値は大文字小文字を無視(`NodeNext` = `nodenext`)。lint 対象はプログラムのファイル集合(tsconfig の `include` と lint の対象が乖離しない)。終了コード 0 / 1(違反)/ 2(実行不能)。**既知の制約**: tsgolint は各ファイルから最寄りの `tsconfig.json` を探すため、`-p` に別名の tsconfig を渡すと型情報ルールの見る設定がずれうる(oxlint の `--tsconfig` は import 解決用)。
 - **subpath 名(2026-09-08)**: base tsconfig の export 名は `./tsconfig.base.json`(ファイル名と同じ)。当初の `./tsconfig` は tsc(TS 5.0 以降 `extends` は `exports` を読む)では正しく解決されたが、VS Code の tsconfig リンクは `exports` を読まず `<値>` / `<値>.json` / `<値>/tsconfig.json` の実在だけを見るため、`@sumi-lang/cli/tsconfig.json` = パッケージ自身の tsconfig.json に飛んでいた(ユーザー報告)。ファイル名どおりの subpath なら両者が同じファイルに着地する(`@tsconfig/node20/tsconfig.json` と同じ流儀)。
 - **dogfood 計測(2026-09-08)**: ts-std-forge の tsconfig(mono 共通設定)は拘束 4 項目に違反(`erasableSyntaxOnly` / `verbatimModuleSyntax` が false、`allowJs` / `checkJs` が true)。本適用には Sumi 用の tsconfig(`extends: @sumi-lang/cli/tsconfig.base.json`)が要る(issue #1753 タスク 6)。
+- **再検討: `sumi build` は TS を吐くべきか(2026-09-14、ユーザー提起 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753))。** 上の表は sugar の `build` を「`.sumi` → TS を emit」と定めているが、その先に tsc が要るので**利用者から見ると 2 段**になる。論点は「TS を経由すべきか」ではなく「**TS の中間形を利用者に見せるか、実装の内側に隠すか**」である。
+    - **根拠を取り違えない。** 「人間可読な TS」は大原則 3 の要件だが、それは **`sumi eject`** — Sumi を捨てたあと人が保守する物 — にかかる。`build` の出力は誰も編集しない派生物なので、要件は**正しさと `.sumi` へ戻る source map**であって可読性ではない。この区別は `build` と `eject` を分けた基準(「source が残るか」)そのものである。
+    - **中間形は無料ではない(実測 2026-09-14)。** `tsc` には**入力 source map を受け取るオプションが無い**(`sourceMap` / `inlineSourceMap` / `declarationMap` / `sourceRoot` / `mapRoot` / `inlineSources` のみ)。したがって `.sumi` → TS → JS の経路では、`.sumi` まで戻る map を Sumi 側が**2 枚合成して作る**必要がある。中間形を挟んでも map の手間は消えない。
+    - **中間形が買うもの**: 宣言 emit と JS emit を tsc に任せられる(`typescript-native` は既に依存にある)。自前で declaration emit を実装するのは重い。
+    - **第一候補**: `sumi build` は **JS + `.d.mts` + `.sumi` へ戻る map** を吐く 1 コマンドとし、内部で tsc を呼ぶかは実装詳細にする。中間 TS を成果物として出すのは `--emit-ts` のような明示的な指定のときだけにする(コンパイラ自体のデバッグ用)。
+    - **`sumi test --as-ejected` は付け替える。** 上の表はこれを「`sumi build` の出力に同じテストを走らせ、eject 品質を検証」と定めているが、eject 品質を測るなら対象は **`sumi eject` の出力**であるべきで、build の出力ではない。build が TS を吐く設計になっていた理由の一部がこれなので、付け替えれば build の形は自由になる。
+    - **未測定**: TS 7 の API で、合成した SourceFile から位置を保ったまま JS と宣言を emit できるか(できれば中間形をファイルとして落とさずに済む)。
 - **未決(sugar 設計時)**: プロジェクトが層を宣言する `sumi.config` の形式(D-36 の default export emit 設定と同じファイルになる見込み)/ `.sumi` はフォーマッタが読めないので `sumi fmt` が要る(oxfmt の fork か、transpile → 整形 → 逆変換)/ oxlint の実験機能 `--type-check`(tsgolint が tsc 診断も返す)で native tsc の起動を省き 1 プロセスにできるかは、安定後に再評価。
 
 ## D-47: getter は Sumi lint / Sumi sugar で許可し、Sumi refined で落とす(D-33 改訂。setter は禁止のまま)
@@ -495,7 +503,7 @@
     - コーパスの runner は 2 エンジンを混ぜる形に変わった(`test/engine.test.mts`、旧 `oxlint-engine.test.mts`)。
     - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く(全ノードに型を聞けばプログラム全体の型付けを払う)。
     - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
-    - 残る型情報ルール(`castMutable` 乱用、論理代入のオペランド boolean 限定、`mut_` 以外への破壊的操作)も同じ場所に実装する。
+    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10 に実装済み。残りは `castMutable` 乱用の検出。
     - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
 
 ## D-56: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
@@ -531,3 +539,59 @@
     5. **置き場所**。`sumi.config.json`(D-46)に内包するか別ファイルにするか。生成物であり diff の性質(機械が書く・巨大・単調減少)が設定と違うので、**別ファイルが素直**。
     6. **コーパスへの影響はない**。適合性コーパスは suppressions を読まない(読めば期待診断が消える)。この機構は CLI の層にあり、ルールエンジンには見えない位置に置く。
     7. **`@sumi-expect-error`(D-51)との適用順**。両方が同じ診断に当たる行をどう扱うか。マーカーの方が具体的で自己回収する(当たらなければ失敗する)ので、**マーカーを先に適用し、残ったものを suppressions が濾す**のが素直に見える。逆順にすると、suppressions に飲まれたマーカーが `unused @sumi-expect-error` として報告され、移行中は直しようがない指摘が出る。ratchet の向きは両者で揃っている — マーカーは不要になった時点で失敗し、suppressions は prune で減る。
+
+## D-58: オーバーロードは「実行時に分岐するもの」に限り、精密化は単一シグネチャで書く
+
+- **ステータス**: 確定(2026-09-10、ユーザー了承。C の帰結を 2026-09-11 に、判断 3 / 4 を 2026-09-15 に改訂)。D-13 の結論は維持し、その適用範囲を定める。測定と根拠は [overload-design.md](./overload-design.md) が正典
+- **背景**: D-13 はオーバーロードを許容したが、何をオーバーロードで書いてよいかを決めていなかった。[spec/functions.md](./spec/functions.md) に残っていた「記法が 2 つある」という論点を調べるうちに、より基本的な問題が出た。**このリポジトリの 19 個のオーバーロードのうち、引数の実行時の型で分岐するものは `panic` の 1 個だけ**で、6 個は arity(カリー化形)、残りは**分岐の一切無い戻り値型の精密化**だった。「オーバーロード」という一語が 3 つの別物を指している
+- **判断**:
+    1. **オーバーロードで書いてよいのは「節が実行時に判別可能で、かつ互いに素」なものだけ**とする。判別不能なもの・重なるものは**単一シグネチャ**で書く(戻り値は条件型、省略可能引数は条件付き rest タプル)。この 1 つの判定条件が、実行時分岐と精密化を分ける
+    2. **Sumi sugar に「オーバーロード」機能は作らない。** 実行時分岐は**複数節関数**(節ごとに本体を持つ)として入れ、精密化には構文を足さない。sugar の複数節は上の条件 1 を構文レベルの要件とし、**互いに素であることを要求する**(TS の「最初にマッチしたものが勝つ」は、重なるシグネチャで順序が黙って意味を持つことを許す。互いに素なら順序は意味を失う)。emit は宣言列 + 各枝に節の本体をインライン展開した dispatcher で、**節ごとの戻り値型の検査は Sumi のチェッカーが持つ**
+    3. **Sumi lint では記法 (1)(`function` 宣言のシグネチャ列挙)を正典とし、関数値の型注釈に呼び出しシグネチャのオブジェクト型リテラルを書くこと(記法 (2))を禁止する。** ~~ただし**型の中**の呼び出しシグネチャは禁止しない — `method-signature-style: "property"` の下でオーバーロードされたメンバーを書く唯一の手段だからである~~ → **2026-09-15 改訂**: 複数シグネチャの型を文脈型に持つ**関数式はすべて**禁止する(交差型の注釈も含む)。型の中の呼び出し / 構築シグネチャの**メンバーもすべて**禁止する
+    4. **関数型を書く必要がある場所では、呼び出しシグネチャの列挙ではなく交差型を使う。**(2026-09-15 改訂で「型の中では交差型だけ」になった)
+    5. **A(カリー化形)は `pipe` に `mapWith` を足して消す。** 構文を待たずに今日できる
+- **理由**:
+    - **TS のオーバーロードの不健全性は「1 つの本体が N 個のシグネチャを名乗る」ことに尽きる**(実測: 2 つのオーバーロードについて両方とも逆の型を返す実装が通る)。堅牢な実装方式とは例外なく「本体を 1 シグネチャ 1 つに戻す」やり方だった。したがって構文としてその形を書けなくするのが根本的な対処になる
+    - **精密化(本体が 1 つ)をオーバーロードで書くのは TS 固有の歪み**である。言語間比較([overload-survey.md](./overload-survey.md))で、戻り値型の精密化をオーバーロードで解いている言語は無かった(Haskell なら GADT / 型族、Rust なら関連型の領分)。オーバーロードを 2 本書いた形と、条件型の戻り値を持つ単一シグネチャは**呼び出し側の挙動が完全に一致する**(実測)ので、後者にすれば「TS が一切検査しない宣言」が消え、検査されない主張が 1 か所の `as` として明示される
+    - **交差型を選ぶ理由は消去(erasure)**。対象が呼び出しシグネチャを 2 本以上持つとき TypeScript は型引数を `any` に置換して比較するため、`{ <A>(a: A): A; <A>(a: A, b: A): A }` には嘘の実装が通る。同じ組を交差型で書くと拒否される。構造的には相互代入可能で解決順序も同じなので、**厳密な方を選ばない理由が無い**
+    - **判別可能性と互いに素であることが線引きとして機能する**のは偶然ではない。`min` の 2 本(`readonly number[]` ⊂ `readonly unknown[]`)も `useObservableValue` の `InitializedObservable` ⊂ `Observable` も、判別不能かつ重なっている — つまり実行時には**同じ 1 つの本体**しかありえない。条件 1 は「本体が何個あるか」を型から読み取る判定になっている
+- **帰結**:
+    - 新規ルール **`functions/no-refinement-overload`**(判別不能なオーバーロード集合を拒否)と ~~**`functions/prefer-intersection-call-signature`**~~ を Sumi lint に足す。前者は現状 19 個中 12 個に当たる(19 個は標本 — 下の「測定の訂正」。実装は [#1952](https://github.com/noshiro-pf/mono/issues/1952))が、下記の書き換えを済ませたあとは**逆行を止める番人**になる。後者は 2026-09-15 の改訂で `functions/no-call-signature-member` と `functions/no-overloaded-function-expression` に置き換わった(下記)
+    - ライブラリ側の書き換え: `pipe.mapWith` の追加 → カリー化オーバーロード 9 個の削除、~~`None` への `value?: undefined` 追加 →~~ `Optional.unwrap` の単一シグネチャ化(phantom field は下記の改訂で不採用)、`Result` / `TernaryResult` の `unwrapOk` の単一シグネチャ化、`min` / `max` / `minBy` / `maxBy` の条件付き rest タプル化
+    - **ADT のデータモデルは変えない(2026-09-11 改訂、ユーザー判断)。** 当初の帰結は「`None` に `value?: undefined` を足して `Optional.unwrap` の射影を全域にし、`as` を消す」だったが、**phantom field は採らない**ことにした。ランタイム変更も破壊的変更も無い案ではあるが、(1) そのフィールドは情報を持たず、doc に書けることが「射影を全域にするためだけの宣言」しかない(D-15 が `Boolean(x)` を退けたのと同じ物差し)、(2) **一般化しない** — 必要な phantom は「射影ごとに、それを持たない variant の数」の総和で、`Optional` は 2 variant × 1 射影 = 1 個と安いだけ、`Result` は 2 個 + `Err.value` → `error` の破壊的改名、`TernaryResult` は 5 個 + 同じ改名になる、(3) `None` の表現できる形が `{ $$tag }` と `{ $$tag, value: undefined }` の 2 つに増え、`deepStrictEqual` はこれを区別する(リポジトリ内に `Optional.none` への構造比較が 93 か所)。**variant ごと・射影ごとに手当てを繰り返す必要がある技法は設計原理ではなく回避策である**、というのが判断の芯
+    - **したがって `Optional` / `Result` / `TernaryResult` を同じ扱いにする**: いずれも条件型の戻り値を持つ単一シグネチャ + 局所的な `as` 1 個。未検査のオーバーロード宣言 6 本が消え(利得の大部分)、`as` 3 個は明示されて grep できる形で残る。`Err.value` の改名もしない
+    - **残った `as` は Sumi refined のチェッカーで discharge する**: 「**条件型の戻り値は、型引数の制約が有限 union のとき、その member ごとに本体を検査する**」(`unwrap` なら `O := Some<S>` と `O := None` の 2 回)。ADT はまさにこの形なので 3 つとも一度に片付き、将来の分にも効く。**これは判断 2 と同じ原理の適用である** — TS が本体を 1 回しか検査しないことが両方の病因で、答えはどちらも「宣言されたケースごとに検査する」。片方を構文規則、もう片方をデータモデルの小技で解くより、1 つの原理で両方を説明できる方が言語として筋が通る
+    - sugar の複数節構文を**入れるかどうかは未決**。上の書き換えのあと実行時分岐は `panic` の 1 個だけになる(2026-09-16: その `panic` も戻り値が同じ `never` の精密化で、`functions/unified-signatures` が報告する)ので、判断 2 は「入れるならこの形」であって「入れる」ではない
+- **改訂(2026-09-15)— 判断 3 / 4 の「型の中の呼び出しシグネチャは残す」を撤回し、記法を値に 1 つ・型に 1 つにする**:
+    - **判断 3 の例外の根拠は誤りだった。** `method-signature-style: "property"` の下でも、オーバーロードされたメンバーは**プロパティの型を交差型にすれば書ける**(`encode: ((v: string) => string) & ((v: number) => number)`、解決順序・`Parameters<>` / `ReturnType<>`・generic HOF への推論とも呼び出しシグネチャの列挙と同じ — 実測 TypeScript 7.0.2 / 6.0.3)。呼び出し可能な値にプロパティが付く形も `((v: number) => string) & Readonly<{ label: string }>` で書ける。したがってメンバーとしての呼び出し / 構築シグネチャは**書く必要が一度も無く**、判断 4 により厳密な交差型に一本化できる
+    - **値の側では交差型の注釈も認めない。** 関数式が複数シグネチャの型に代入できるのは、自分のシグネチャが各シグネチャに代入可能なときだけ — つまり自分のシグネチャだけで全呼び出しを受け付け、戻り値もどのシグネチャより粗くない。**受理される形は判断 1 の精密化そのもの**で単一シグネチャで書け、戻り値が引数に従う本物のオーバーロードは逆に `as` 無しには受理されない。`panic` の 2 本(どちらも `never`)はこの意味で精密化であり、`typescript/unified-signatures` も報告する
+    - **`Readonly<>` の危険は記法 (2) 固有ではない**(`Readonly<F1 & F2>` も呼べない — 実測)。ただし readonly 化の codemod と `readonly/require-readonly-type` が包むのは型リテラルなので、シグネチャのメンバーを禁じれば包まれる型リテラルが常にレコードになり、#1881 の経路は閉じる
+    - **強制**: `functions/no-call-signature-member`(sumi プラグイン、`typescript/prefer-function-type` を包含)、`functions/no-overloaded-function-expression`(checker — 関数式の文脈型のシグネチャ数を見るので alias・`typeof`・注釈付きオブジェクトのプロパティも捕まえる)、`functions/adjacent-overload-signatures` と `functions/unified-signatures`(oxlint ネイティブ。後者は判断 1 のうち構文で決まる部分集合)。`functions/no-refinement-overload` は未実装のまま([#1952](https://github.com/noshiro-pf/mono/issues/1952))。宣言と節の整合性の検査行(`expectType` の 2 行)を要求するルールも未実装([#1953](https://github.com/noshiro-pf/mono/issues/1953))。振り分けの正しさはどちらも保証しない
+    - **適合性アサートの向きの訂正**: [overload-design.md](./overload-design.md) の D のレシピにあった `const _: typeof arm1 & typeof arm2 = f` は宣言を節へ代入する向きで、**宣言が節より狭い嘘を通していた**(実測)。節を宣言へ代入する向き(`expectType<typeof arm1 & typeof arm2, typeof f>('<=')`)に直し、generic は `typeof f<Opaque>` で型引数を固定して消去を避ける
+    - **測定の訂正**: 「19 個・17 ファイル・31 シグネチャ」は過少だった。2026-09-15 に TypeScript の AST で数え直すと、本体の無い `function` 宣言を伴う関数は `libs/` だけで 157 個(ts-data-forge 76、ts-std-forge 38、ts-fortress 35、synstate 系 6、ts-repo-utils 2)。種別ごとの内訳と「実行時分岐は `panic` だけ」という結論は、この母集団で分類し直すまで暫定とする
+
+## D-59: 副作用 import は例外なく禁止し、型だけの import 文の記法はそこから決まる
+
+- **ステータス**: 確定(2026-09-13、ユーザー了承 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) の 2026-09-12 のコメント)
+- **判断**:
+    1. **副作用 import(`import '...'`)は例外なく禁止する。** 代替は「CLI から実行する」か「関数として import して呼ぶ」。
+    2. **束縛が全部型である import 文は `import type` で書く**(名前空間なら `import type * as X`)。値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。**Sumi lint の段階から強制する。**
+- **理由**:
+    - **2 は 1 の帰結であって、記法の好みではない。** 拘束 compilerOption の `verbatimModuleSyntax`(常時 true — D-40)は「書いたとおりに出す」ので、inline の型指定子だけを消して**空の import 文を残す**。実測(TypeScript 7.0.2 / 6.0.3 で同結果):
+
+        | 書き方                               | 出力                                      |
+        | :----------------------------------- | :---------------------------------------- |
+        | `import { type Foo } from 'm';`      | `import {} from 'm';` ← **副作用 import** |
+        | `import type { Foo } from 'm';`      | (完全に消える)                            |
+        | `import { bar, type Foo } from 'm';` | `import { bar } from 'm';`                |
+        | `import * as Ns from 'm';`(型専用)   | `import * as Ns from 'm';`                |
+        | `import type * as Ns from 'm';`      | (完全に消える)                            |
+
+        つまり inline 形は、その文の束縛が全部型のとき、**判断 1 が禁止している構文そのものを出力する**。1 を決めた時点で 2 は選択の余地がない。元のユーザー提案は「Sumi lint では記法を選ばない」だったが、この測定を受けて選ぶ方に改めた(ユーザー了承)。
+
+    - **代替手段の有無は用途で割れるが、例外規定は要らない。** リポジトリ内の副作用 import 33 件のうち 20 件は `import 'dotenv/config'` で、これは `config()` の関数呼び出しに置き換わる。残る 13 件は `import './index.css'` で、**アセットの import はモジュールの実行ではなくバンドラへの指示**なので関数形が存在しない。しかし Sumi のモジュール解決(拡張子必須・パッケージは `exports` 経由)は `.css` を解決しないので、**そもそも Sumi 下ではモジュールグラフに載らない**。例外を設けるのではなく「アセットは `index.html` の `<link>` かバンドラ設定側に出す」が Sumi での書き方になる。
+- **帰結**:
+    - **強制手段は 2 つとも oxlint のネイティブルールで足りる**(2026-09-13 確認、いずれも現在 off): `typescript/no-import-type-side-effects`(inline 形が全部型の場合)と `typescript/consistent-type-imports` の `prefer: "type-imports"`(名前空間を含む、型にしか使わない import 全般)。preset に 2 行足すだけで、新規実装は要らない。
+    - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧(allow リストの精査待ち)から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
+    - **アセットの扱いは利用者向けドキュメントに書く**(implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」)。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
+    - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする(ユーザー要望)。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない(大原則: sugar の出力は Sumi lint を満たす)。

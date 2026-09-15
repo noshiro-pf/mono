@@ -1,4 +1,3 @@
-/* eslint-disable functional/immutable-data */
 import { Optional } from 'ts-data-forge';
 import { combine, merge } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
@@ -18,7 +17,7 @@ describe('circular dependency detection', () => {
         () => ({}),
       );
 
-      const childA = createSyncChildObservable(
+      const mut_childA = createSyncChildObservable(
         {
           parents: [root],
           initialValue: Optional.some(0),
@@ -28,14 +27,14 @@ describe('circular dependency detection', () => {
 
       const childB = createSyncChildObservable(
         {
-          parents: [childA],
+          parents: [mut_childA],
           initialValue: Optional.some(0),
         },
         createTryUpdateNotImplemented,
       );
 
-      // Mutate childA.parents to create a cycle: childA -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Mutate mut_childA.parents to create a cycle: mut_childA -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childB],
         writable: false,
         configurable: true,
@@ -44,7 +43,7 @@ describe('circular dependency detection', () => {
       expect(() => {
         createSyncChildObservable(
           {
-            parents: [childA],
+            parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,
@@ -60,7 +59,7 @@ describe('circular dependency detection', () => {
         () => ({}),
       );
 
-      const childA = createAsyncChildObservable(
+      const mut_childA = createAsyncChildObservable(
         {
           parents: [root],
           initialValue: Optional.some(0),
@@ -70,14 +69,14 @@ describe('circular dependency detection', () => {
 
       const childB = createSyncChildObservable(
         {
-          parents: [childA],
+          parents: [mut_childA],
           initialValue: Optional.some(0),
         },
         createTryUpdateNotImplemented,
       );
 
-      // Create cycle: childA -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Create cycle: mut_childA -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childB],
         writable: false,
         configurable: true,
@@ -86,7 +85,7 @@ describe('circular dependency detection', () => {
       expect(() => {
         createAsyncChildObservable(
           {
-            parents: [childA],
+            parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,
@@ -102,7 +101,7 @@ describe('circular dependency detection', () => {
         () => ({}),
       );
 
-      const childA = createSyncChildObservable(
+      const mut_childA = createSyncChildObservable(
         {
           parents: [root],
           initialValue: Optional.some(0),
@@ -112,7 +111,7 @@ describe('circular dependency detection', () => {
 
       const childB = createSyncChildObservable(
         {
-          parents: [childA],
+          parents: [mut_childA],
           initialValue: Optional.some(0),
         },
         createTryUpdateNotImplemented,
@@ -126,8 +125,8 @@ describe('circular dependency detection', () => {
         createTryUpdateNotImplemented,
       );
 
-      // Create cycle: childA -> childC -> childB -> childA
-      Object.defineProperty(childA, 'parents', {
+      // Create cycle: mut_childA -> childC -> childB -> mut_childA
+      Object.defineProperty(mut_childA, 'parents', {
         value: [childC],
         writable: false,
         configurable: true,
@@ -136,7 +135,7 @@ describe('circular dependency detection', () => {
       expect(() => {
         createSyncChildObservable(
           {
-            parents: [childA],
+            parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,
@@ -152,7 +151,7 @@ describe('circular dependency detection', () => {
         () => ({}),
       );
 
-      const childA = createSyncChildObservable(
+      const mut_childA = createSyncChildObservable(
         {
           parents: [root],
           initialValue: Optional.some(0),
@@ -160,9 +159,9 @@ describe('circular dependency detection', () => {
         createTryUpdateNotImplemented,
       );
 
-      // Make childA's parents reference childA itself (self-loop)
-      Object.defineProperty(childA, 'parents', {
-        value: [childA],
+      // Make mut_childA's parents reference mut_childA itself (self-loop)
+      Object.defineProperty(mut_childA, 'parents', {
+        value: [mut_childA],
         writable: false,
         configurable: true,
       });
@@ -170,7 +169,7 @@ describe('circular dependency detection', () => {
       expect(() => {
         createSyncChildObservable(
           {
-            parents: [childA],
+            parents: [mut_childA],
             initialValue: Optional.some(0),
           },
           createTryUpdateNotImplemented,
