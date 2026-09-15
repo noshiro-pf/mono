@@ -1,0 +1,9 @@
+{
+  // A project that overrides a locked compilerOption, for seeing stage 1 of
+  // `sumi check` stop before anything else runs: `pnpm run sumi:demo:options`.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": false
+  },
+  "include": ["**/*.mts"]
+}

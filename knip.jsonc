@@ -89,7 +89,10 @@
     // holds deliberate rule violations that the runner reads as text — not
     // project files.
     "languages/sumi/conformance": {
-      "entry": ["test/**/*.test.mts"],
+      // configs/eslint-bridge.config.mts is loaded by ESLint by path from
+      // test/eslint-bridge.test.mts, not imported, and it is what imports
+      // @sumi-lang/eslint-config.
+      "entry": ["test/**/*.test.mts", "configs/eslint-bridge.config.mts"],
       "project": ["src/**/*.mts", "test/**/*.mts"],
     },
 

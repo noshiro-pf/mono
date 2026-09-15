@@ -1,3 +1,5 @@
+<!-- cspell:ignore resi -->
+
 # モジュール、import/export、モジュール解決
 
 ## 目標
@@ -9,12 +11,25 @@
 
 ```ts
 import { foo, bar } from './relative/path.mjs'; // 名前付き import
-import { type Foo, baz } from 'package-name'; // inline type 指定
-import type { Foo } from 'package-name'; // 型のみ import
+import { type Foo, baz } from 'package-name'; // inline type 指定(値と混在する文のみ)
+import type { Foo } from 'package-name'; // 型だけの文は必ずこの形(D-59)
+import type * as NsType from 'package-name'; // 型だけの名前空間 import(D-59)
 import * as ns from 'package-name'; // 名前空間 import(使用はプロパティアクセスのみ — D-28)
 import { qux } from '#internal/qux.mjs'; // `#` subpath import(package.json の `imports` 経由 — D-28)
 const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28)
 ```
+
+- **束縛が全部型である import 文は `import type` で書く(確定 2026-09-13 — D-59)。** 値と型が混在する文は inline 形(`import { bar, type Foo }`)でよい。これは好みの問題ではなく、拘束 compilerOption の `verbatimModuleSyntax`(常時 true — [compiler-options.md](./compiler-options.md))の帰結である:
+
+    ```ts
+    import { type Foo } from './dep.mjs'; // → import {} from './dep.mjs';  ← 副作用 import が残る
+    import type { Foo } from './dep.mjs'; // → 完全に消える
+    import { bar, type Foo } from './dep.mjs'; // → import { bar } from './dep.mjs';  ← 問題なし
+    import * as Ns from './dep.mjs'; // 型にしか使わなくても → import * as Ns from './dep.mjs';
+    import type * as Ns from './dep.mjs'; // → 完全に消える
+    ```
+
+    `verbatimModuleSyntax` は「書いたとおりに出す」ので、inline の型指定子だけを消して**空の import 文を残す**(TypeScript 7.0.2 / 6.0.3 で実測)。その残骸は上表で禁止している**副作用 import そのもの**であり、したがって記法の選択は副作用 import の禁止から一意に決まる。**Sumi lint の段階から強制する。**
 
 - 相対 import は必ず拡張子付き(`.mjs`)。
 - パッケージ import はパッケージ名(+ `exports` で公開された subpath)のみ。
@@ -29,7 +44,7 @@ const lazy = await import('./lazy.mjs'); // dynamic import(制限なし — D-28
 | `import foo from '...'`(default)                               | default export の禁止と対。名前の同一性が失われる(import 側が自由に命名できてしまう)                                                                          |
 | `export default ...` / `export { x as default }`               | 同上。named export のみ。**設定ファイルも含め全面禁止**(D-28)。default export を要求するツールへの接続は下記「default export を要求するツールとの接続」(D-36) |
 | `import * as ns` の非 tree-shakable な使用                     | import 自体は許可(上表)。`ns` を値として渡す・spread する等、プロパティアクセス以外の使用を禁止(D-28)                                                         |
-| `import '...'`(副作用 import)                                  | 副作用のためだけのモジュール実行は暗黙のグローバル状態変更                                                                                                    |
+| `import '...'`(副作用 import)                                  | 副作用のためだけのモジュール実行は暗黙のグローバル状態変更。**例外なし**(確定 2026-09-13 — D-59)。代替は「CLI から実行する」か「関数として import して呼ぶ」  |
 | `require` の代替としての dynamic `import()` の禁止は**しない** | dynamic `import()` は無制限で許可(D-28)。この行は旧「未定」の記録                                                                                             |
 | `require` / `import foo = require(..)`                         | CJS は存在しない(erasableSyntaxOnly にも含まれる)                                                                                                             |
 | `declare global` / script モード                               | ユーザーコードはグローバルを定義できない。すべてのファイルはモジュール(prelude だけが例外)                                                                    |
@@ -136,6 +151,77 @@ export * from './helper.mjs';
 ### 強制手段
 
 `sumi/no-mixed-star-export`(@sumi-lang/oxlint-config の JS plugin、2026-09-08 実装): `ExportAllDeclaration`(`exported` を持たない `export * from` / `export type * from`)を含むファイルに他の文があれば、その文ごとに報告する構文ルール。`export * as ns from` は名前 `ns` の明示 export なので「他の文」側。型情報は要らない。名前が実際に衝突しているかは見ない — それは tsc の TS2308 が担当する。この monorepo の `pnpm run gen:index` が生成する index.mts は `export *` のみなので既に適合する。
+
+## 副作用 import の代替(確定 2026-09-13 — D-59)
+
+禁止そのものは D-27 で確定済みで、`import/no-unassigned-import` を `allow: []` で有効化して実装されている。残っていたのは「代替手段が本当にあるのか」で、リポジトリ内の実例 33 件で確かめた結果、**答えは用途で割れる**:
+
+| 実例                      | 件数 | 代替                                                                    |
+| :------------------------ | ---: | :---------------------------------------------------------------------- |
+| `import 'dotenv/config';` |   20 | **ある** — `import { config } from 'dotenv'; config();`(関数として呼ぶ) |
+| `import './index.css';`   |   13 | **無い** — 下記                                                         |
+
+**CSS(および画像等のアセット)の import はモジュールの実行ではなく、バンドラへの指示である。** 関数形は存在しないので「関数として import して呼ぶ」は当てはまらない。かつ Sumi のモジュール解決(拡張子必須・パッケージは `exports` 経由)は `.css` を解決しないので、**Sumi 下のアプリは CSS をモジュールグラフに載せられない**。したがって例外規定を設けるのではなく、**CSS は `index.html` の `<link>` かバンドラ設定側に出す**のが Sumi での書き方になる。
+
+これは規則ではなく**移行の作法**なので、Sumi sugar / refined の利用者向けドキュメントに書く必要がある([../implementation-plan.md](../implementation-plan.md) の「将来の作業」に TODO)。現在 `sumi check` の対象は synstate 3 パッケージだけで apps を含まないため、この衝突はまだ表面化していない。
+
+## Sumi sugar / refined でのライブラリ配布(未決 — 2026-09-13、ユーザー提起 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)
+
+`.d.mts` 相当の宣言ファイルが要るのか、declaration merging を支えるのか、そもそも npm でどう配るのか。まだ決めていないが、判断材料は揃っている。
+
+### 訂正: 「人間可読な TS」は eject の要件であって build の要件ではない(2026-09-14、ユーザー指摘)
+
+この節の初版は「Sumi sugar の出力も TS(大原則 3)」と書いて、公開物が TS であることの根拠にしていた。**これは大原則 3 の読み違いである。** 大原則 3 が求めているのは _Sumi を捨てるときに手元に残る TS_ の品質であって、ビルドが吐く物の形ではない。D-46 はそこを動詞で分けている:
+
+| 動詞         | 何をするか                                                     | 出力への要件                          |
+| :----------- | :------------------------------------------------------------- | :------------------------------------ |
+| `sumi build` | source は `.sumi` のまま、**何度でも再生成できる派生物**を作る | 正しさと source map。**可読性は不要** |
+| `sumi eject` | **source 自体を書き換えて**層を降りる(sugar → lint は codemod) | 可読性(以後これを人が保守する)        |
+
+つまり「ビルドは何を吐くべきか」は大原則 3 から導けない別の問いであり、下記で扱う。
+
+### 判定条件: 宣言ファイルが要るのは「型体系が TS から離れたとき」だけ
+
+- **Sumi lint の型は TS の型そのもの**(大原則 1)。**Sumi sugar も型は TS の型**である — sugar が変えるのは構文と、TS へ落ちる範囲の意味論であって、公開される型ではない。したがって sugar までの層では `.d.mts` が**情報を落とさない**。**TS の利用者にも Sumi の利用者にも普通の TS パッケージに見える。**
+- **Sumi refined は型検査を変える**(ネイティブ `Int` 等 — TS に対応物が無い)。D-46 自身が `sumi build` について「TS に無い型は弱めた形になる」と認めているとおり、ここで初めて `.d.mts` は**損失を伴う**。**`.d.sumi` 相当が要るとすればこの層だけ**である。
+
+### 「Sumi 製パッケージを Sumi のまま import したい」— 層で答えが違う(2026-09-14、ユーザー提起)
+
+「必ず TS 層を経由する二度手間になるのでは」という懸念に対して:
+
+- **lint / sugar では二度手間は発生しない。** 利用者側のコンパイラは依存を**コンパイルしない** — `.d.mts` を読むだけである。そして上記のとおりその `.d.mts` は情報を落としていない。「宣言ファイルを読む」ことは「TS を経由する」ことではない。初版がこの二度手間があるかのように読めたのは、上の訂正した誤りの影響である。
+- **refined では実在する。** `.d.mts` は弱めた型しか運べないので、refined の利用者が refined のパッケージを使うと**精度が落ちる**。ここは「Sumi のまま読む」道が要り、手段は (a) `.sumi` ソースを同梱して利用者側のコンパイラが読む(ReScript 方式)、(b) Sumi ネイティブの宣言成果物を吐く、のどちらか。**この層に限った問題として設計すればよい。**
+- **別枠: monorepo 内の開発時解決。** 同じリポジトリの兄弟パッケージを**ビルドせずに** `.sumi` ソースのまま解決したい、という需要は上とは別にある(このリポジトリが `tsx --tsconfig tools/configs/tsconfig.tsx.json` で TS に対してやっていることの Sumi 版 — CLAUDE.md「Building from a clean checkout」)。配布の話ではなく開発体験の話なので、切り離して扱う。
+
+### 宣言ファイルの本当の用途は「Sumi でないものを記述すること」
+
+リポジトリ内の実例を数えると(2026-09-13):
+
+| 用途                               | 例                                              | Sumi での扱い                                           |
+| :--------------------------------- | :---------------------------------------------- | :------------------------------------------------------ |
+| 型の無い JS ライブラリに型を付ける | `html2canvas.d.mts`                             | **残る需要**                                            |
+| JS でないアセットに型を付ける      | `css.d.mts` ×2                                  | D-59 でアセットはモジュールグラフを離れるので**消える** |
+| ビルド時に注入される値             | `build-id.d.mts`                                | **残る需要**                                            |
+| prelude の global 型               | ts-type-forge の `global.mts`(`declare global`) | prelude の例外規定として既に想定済み                    |
+
+`declare module` は 19 箇所、`declare global` は 5 箇所。**残る需要はいずれも「Sumi で書かれていないものを記述する」**ためであって、Sumi のコードを記述するためではない。そちらは `.d.mts` が今日そのまま使える。
+
+### declaration merging
+
+`interface` 自体は公開型として残す方針([classes.md](./classes.md))。merging の用途は (a) global 拡張 — `declare global` は既に禁止(prelude のみ例外)、(b) サードパーティの型の module augmentation — 上の表の「型の無い JS」と同じ枠。したがって **merging を言語機能として支えるかどうかは、(b) をどう扱うかとほぼ同じ問い**になる。`.d.sumi` の中でだけ許す、という案(ユーザー提起)はこの枠に素直に収まる。
+
+### ReScript の参考(調査 2026-09-13、要追確認)
+
+- **ReScript には `.d.ts` に相当する別形式が無い。** 公開パッケージには `.res` ソースがそのまま入り、依存側は `rescript.json` の `bs-dependencies` / `dependencies` に書く。コンパイラは依存を **`node_modules` の中から**見つける必要があり(パスと package 名の両方を検証する)、ローカルパス参照は拒否される。**ソースが宣言を兼ねる**形。
+- 公式マニュアルの推奨は「コンパイル済み JS も公開せよ」で、**JS 利用者は ReScript 製だと気づかずに使える**。`.resi`(モジュールごとの署名ファイル)は任意であって、別の成果物形式ではない。
+- **Sumi との違い**: ReScript は出力 JS を「読む物」とは考えていないのでソース同梱が要る。Sumi sugar は**出力 TS が人間の保守に耐えること**を受け入れ条件にしている(大原則 3)ので、**出力そのものが配布物になれる** — ここが分岐点で、ReScript の方式をそのまま真似る必要は無い。
+- npm registry 自体は任意のファイルを含む tarball を受け付けるので、`.sumi` ソースの同梱は可能。`package.json` の `types` は `.d.ts` を指す前提なので Sumi 独自の宣言を載せる先にはならず、必要になれば `exports` の条件(`"sumi"` 等)か独自フィールドになる。**ただし上記のとおり sugar までは必要にならない見込み。**
+
+### 検討すること
+
+- refined で `.d.sumi` を導入するとして、**sugar / lint の利用者からどう見えるか**(同じパッケージが両方の層から使われる)。
+- 型の無い JS ライブラリへの型付けを Sumi の中でどう書くか(`.d.mts` をそのまま書くのか、Sumi 側の記法を用意するのか)。
+- `exports` の条件を足す案を採る場合、D-28 が固定した「解決規則は一つだけ」との整合。
 
 ## 未解決の論点
 

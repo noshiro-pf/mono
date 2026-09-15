@@ -37,6 +37,8 @@
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
+    "@sumi-lang/cli": "workspace:*",
+    "@sumi-lang/eslint-config": "workspace:*",
     "@sumi-lang/oxlint-config": "workspace:*",
     "@types/node": "catalog:",
     "cspell": "catalog:",

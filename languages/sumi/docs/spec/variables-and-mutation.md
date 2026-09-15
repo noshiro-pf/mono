@@ -1,3 +1,5 @@
+<!-- cspell:ignore unshift -->
+
 # 変数宣言と mutation
 
 ## 目標
@@ -11,14 +13,27 @@
 - `let` は変数名が `mut_` prefix を持つ場合のみ許可: `let mut_count = 0;`
 - オブジェクト・配列の破壊的変更(`functional/immutable-data` が検出する操作)も、対象の変数名が `mut_` prefix を持つ場合のみ許可: `mut_xs[0] = 100;`
 - 引数・戻り値は readonly 型を強制([readonly.md](./readonly.md))。
+- **tuple に対して `Array` のミューテータを呼ばない(確定 2026-09-14)。** `mut_` 束縛であっても、tuple 型の値に対する **9 つすべて** — 長さを変える `push` / `pop` / `shift` / `unshift` / `splice` と、**位置を書き換える** `sort` / `reverse` / `fill` / `copyWithin` — を禁止する。**要素への代入(`mut_pair[0] = 9`)はそのスロットの型に対して検査されるので合法**のまま。
 
-これは eslint-config-typed の現行運用(`functional/no-let` + `functional/immutable-data` + `mut_` prefix 慣習)を土台にするが、**prefix は `mut_` の一種類のみとする(確定 2026-08-29 — D-14)**。現行 lint が許容する variant はすべて廃止する:
+    これは様式ではなく**健全性の穴を塞ぐ規則**である。tuple 型は長さと**位置ごとの型**を主張するが、TypeScript はどちらも保たない。可変 tuple は `Array` を継承しているので 9 つとも呼べてしまい、しかも**すべて TypeScript が受け付ける**(実測):
 
-- `_mut_*` — `_` prefix は unused parameter 用だが、使わない引数は readonly のままで問題なく、可変で無視する `_mut_*` に存在意義がない。
-- `#mut_*` — class の private フィールド用だが、class 全面禁止(D-12)で出現余地がない。
-- `draft`(immer)— `mut_draft` を強制する。
+    ```ts
+    const mut_pair: [number, string] = [1, 'a'];
 
-Sumi lint チェッカーの `ignoreIdentifierPattern` は `^mut_` のみになる(現行 config からの変更点 — [enforcement-map.md](../enforcement-map.md))。
+    mut_pair.push(3); // 長さ: 型は 2 のまま、値は 3 要素
+    mut_pair.reverse(); // 位置: slot 1 は string 型なのに 1 が入る
+    mut_pair.fill(0); // 両方 0 になる。slot 1 は string 型のまま
+
+    const stillString: string = mut_pair[1]; // 型検査を通り、実行時は number
+    ```
+
+    実測値: `[1, 'a']` に対して `reverse()` → `["a", 1]`、`fill(0)` → `[0, 0]`、`copyWithin(0, 1)` → `["a", "a"]`。`length` への直接代入だけは TypeScript が弾く(tuple の `length` はリテラル型)。
+
+    **唯一 `mut_` prefix が免除しない mutation 規則**である。`mut_` が答えるのは「誰が変更してよいか」で、こちらが言うのは「tuple とは何か」だからである — 名前で 2 要素の tuple を 3 要素にも、number のスロットに string を入れられるようにもできない。
+
+    **rest 要素を持つ tuple も報告する。** `[number, ...string[]]` の `length` は `number` だが、継承元 `Array` の要素型は `number | string` なので `push(2)` が通り、以降すべて string のはずの位置に number が入る。**同種要素の tuple では一部が健全だが、それでも報告する。** `[number, number].reverse()` は誤ったスロットに値を置きようがないが、要素型がたまたま一致するかどうかで規則の適用が変わると、tuple の性質ではなく呼び出し箇所ごとに考える問題になる。順序が変わるものを扱いたいなら配列か、コピーを返す形(`toSorted` / `toReversed` / `with` — いずれも対象外)を使う。
+
+    `mutation/no-tuple-mutating-method`(@sumi-lang/checker)として実装。
 
 ## 外部コードとの境界(確定 2026-09-05 — D-27)
 
@@ -46,7 +61,7 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 強制手段
 
-- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`functional/immutable-data`、`prefer-const`。
+- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入(`for … of` / `for … in` の左辺を含む)/ `delete` / 組み込みの破壊的メソッド — `Array` と型付き配列、`Map`・`Set`・弱参照コレクション(`getOrInsert` 系を含む)、`Date` の setter、`Object`・`Reflect`。`Readonly<Date>` のように mapped type 越しに見えるメンバーも宣言元のインターフェースで判定する。型情報が要るので oxlint preset ではなくチェッカー側。[enforcement-map.md](../enforcement-map.md))。
 
 ## TS へ戻るときの影響
 
@@ -59,7 +74,8 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 未解決の論点
 
-- 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。
+- 引数名・プロパティ名への `mut_` prefix の適用範囲(現行 monorepo 運用の明文化)。**チェッカーの現状(2026-09-10)**: `sumi/no-mutation-without-mut-prefix` は**アクセスパスのどのセグメントに `mut_` があっても許可する**(`mut_xs[0]`、`state.mut_seen.x`)。ESLint ブリッジの `ignoreIdentifierPattern: ['^mut_']` + `ignoreAccessorPattern: ['**.mut_**']` の追認であって、仕様上の決定ではない。根に限るなら実装は 1 行縮む。
+- **`window.location.href` 等の実務例外(2026-09-10、未決)。** ESLint ブリッジは `window.location.href` / `**.current.**`(React ref)/ `**.displayName` / `**.scrollTop` / `**.debugLabel`(jotai)を例外にしているが、チェッカー側のルールには**入れていない**。synstate 3 パッケージでは 1 件も要らなかった(実測)ため、要ると分かった時点で「どれを言語の境界規定として認めるか」を決める。
 - **未初期化の変数は許可しない(2026-09-09、ユーザー決定 — issue #1753 のコメント)。** 宣言は必ず初期化子を持つ。「まだ値が無い」ことは `undefined` または `Optional.none` を**明示的に書く**ことで表す。`let mut_x;` のように初期化子を省いた宣言は書けない。
     - **帰結: `??=` は不要になる。** `x ??= v` の用途は「まだ初期化されていない変数に値を入れる」であり、初期化が必ず宣言と同時に起きるならこの操作の居場所が無い。D-29 は 3 つの論理代入をすべて許可したが、その根拠のうち `??=` の分は消える(`&&=` / `||=` の boolean 限定はそのまま — [decisions.md](../decisions.md) D-29)。
     - **実装に要るもの**(未着手): (1) 初期化子の無い宣言を禁止する構文ルール(`VariableDeclaration` の `initializer` が無い場合。型情報は要らない)。(2) `??=` を禁止に回す — 現在は `sumi/strict-logical-assignment-operands` が `??=` を対象外にしているので、その除外を外すのではなく「`??=` 自体を禁止」の別ルールにする(D-29 の改訂として決める)。
