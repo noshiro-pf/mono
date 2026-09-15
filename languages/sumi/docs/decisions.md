@@ -495,7 +495,7 @@
     - コーパスの runner は 2 エンジンを混ぜる形に変わった(`test/engine.test.mts`、旧 `oxlint-engine.test.mts`)。
     - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く(全ノードに型を聞けばプログラム全体の型付けを払う)。
     - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
-    - 残る型情報ルール(`castMutable` 乱用、論理代入のオペランド boolean 限定、`mut_` 以外への破壊的操作)も同じ場所に実装する。
+    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10 に実装済み。残りは `castMutable` 乱用の検出。
     - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
 
 ## D-56: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
