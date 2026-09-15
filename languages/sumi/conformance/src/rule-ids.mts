@@ -69,6 +69,7 @@ export const knownRuleIds = [
   'null/no-null-in-type',
   'null/no-null-literal',
   'null/no-null-propagation',
+  'readonly/require-as-const',
   'readonly/require-readonly-parameter',
   'readonly/require-readonly-type',
 ] as const;

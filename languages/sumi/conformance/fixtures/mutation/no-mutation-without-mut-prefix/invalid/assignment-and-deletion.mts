@@ -1,11 +1,13 @@
-const target = { a: 1 };
+const target = { a: 1 } as const;
 
 // @sumi-expect-error mutation/no-mutation-without-mut-prefix
+// @sumi-expect-error compiler/2540
 target.a = 2;
 
-const cells = [0];
+const cells = [0] as const;
 
 // @sumi-expect-error mutation/no-mutation-without-mut-prefix
+// @sumi-expect-error compiler/2540
 cells[0] = 1;
 
 // A mutable annotation is a violation in its own right; what this pins is the

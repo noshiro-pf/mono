@@ -348,7 +348,7 @@
     1. **引数の readonly 性**: oxlint-tsgolint の `typescript/prefer-readonly-parameter-types`(type-aware、`ignoreInferredTypes` + `treatMethodsAsReadonly`、境界型の allow リストは現行 config を継承)。実測(2026-09-07)で `(xs: number[])` を報告し、推論される callback 引数は無視することを確認済み。
     2. **型注釈(配列・タプル・オブジェクト型リテラル・interface・mapped type・`Array` / `Map` / `Set` / `Record` 参照)の readonly 記法**: ts-codemod-lib `convert-to-readonly` の**判定ロジックを fork した検査専用ルール** `sumi/require-readonly-type`(sumi JS plugin、TSESTree 上)。変換器と同じ基準で「readonly を要する型ノード」を見つけて報告するが、**readonly の綴りはすべて受け入れ、正規化はしない**(`readonly T[]` と `ReadonlyArray<T>`、`Readonly<{ a: T }>` と `{ readonly a: T }`、`ReadonlyRecord<K, V>` と `Readonly<Record<K, V>>` はいずれも適合)。除外規則も変換器を写す: `mut_` 接頭辞の変数・型別名・interface・プロパティ配下、`DeepReadonly<>` 配下、`Mutable<>` 配下、空のオブジェクト型。ただし**引数は名前によらず readonly**(spec/readonly.md の「引数は readonly 型を強制」— 型情報側の `prefer-readonly-parameter-types` も名前で例外を作らない)ので、変換器の `mut_` 引数の除外だけは写さない。fixer は付けず、修正は codemod に任せる。
 - **却下した案**: codemod の**不動点検査**(変換で字面が変わったら違反)。`convert-to-readonly` は readonly 化と同時に `Record` → `ReadonlyRecord` 等の**正規化**も行うため、readonly ではあるが綴りが正典と違うだけの箇所を違反にしてしまい、lint の判定としては不適切(ユーザー指摘 2026-09-07)。ESLint ブリッジ(`functional/prefer-immutable-types` / `type-declaration-immutability`)は型情報必須で oxlint に載らず、規則が二重になるため採らない。
-- **対象外**: 推論される局所変数の readonly 性(`const xs = [1, 2]`)は求めない — 破壊的操作は `mut_` 側の規則が担う(readonly.md の未解決論点)。
+- **対象外**: ~~推論される局所変数の readonly 性(`const xs = [1, 2]`)は求めない — 破壊的操作は `mut_` 側の規則が担う(readonly.md の未解決論点)。~~ → **D-60 で改訂(2026-09-16)**: `mut_` でない `const` が推論する配列・オブジェクトリテラルには `as const` を求める。
 - **dogfood で調整した判定(2026-09-07、ts-data-forge 196 ファイル: 115 件 → 3 件)**: 変換器が手を付けない位置は報告しない — `Readonly<>` の直接引数(union / intersection のメンバーを含む: `Readonly<A | B>`)、indexed access のオブジェクト側(`{ a: T }['a']`、`Record<K, V>[I]` — ただしメンバーの型自体は readonly が要る)、tuple の rest 要素の型(`readonly [A, ...B[]]`)、条件型の分配ガード(`[A] extends [B]`、`A[] extends B[]`)。残った 3 件はすべて `mut_keys: string[]` のような**可変アキュムレータ引数**で、リポジトリ側では `prefer-readonly-parameter-types` の disable コメントを付けて意図的に可変にしているもの。Sumi では引数は名前によらず readonly なので、この用法には注釈ルール側にも disable コメントが要る(注釈ルールと型情報ルールの両方を黙らせる必要がある点は dogfood の摩擦として記録)。
 - **理由**: D-42 で戻り値型の明示が必須になったので、引数・戻り値・型宣言はすべて注釈として字面に現れ、readonly-by-default は注釈の構文検査で大半を賄える。判定基準を変換器と共有することで、Sumi sugar への移行 codemod(D-3)と検査が同じ「readonly を要する箇所」の定義を持つ。
 - **dogfood 計測(2026-09-07、現時点の preset + 引数 readonly)**: ts-std-forge(src 28 + test 5 ファイル、0.4 秒)は 6 件 — 境界の実装者としての素の `String()` 3 件(D-24 の例外を inline disable で表す)、テストヘルパの `fn` 引数名と `try..catch` 各 1 件、`entry-point.mts` の `./index.mjs` 再 export 1 件(パッケージ入口の慣行 — ファイル単位の例外が要る)。eslint-plugin-ts-data-forge(src 31 ファイル)は 62 件 — `no-bitwise` 33(`ts.TypeFlags` のビット演算)、`fn` 19、`== null` 3 + `no-eq-null` 3、`null` 3、accessor 1。readonly 引数の違反はどちらも 0(現行 config で既に強制済み)。
@@ -595,3 +595,17 @@
     - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧(allow リストの精査待ち)から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
     - **アセットの扱いは利用者向けドキュメントに書く**(implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」)。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
     - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする(ユーザー要望)。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない(大原則: sugar の出力は Sumi lint を満たす)。
+
+## D-60: `mut_` でない `const` が型を推論する配列・オブジェクトリテラルには `as const` を強制する
+
+- **ステータス**: 確定(2026-09-16、ユーザー要望)。D-45 の「対象外」を改訂する
+- **判断**:
+    1. **型注釈の無い `const` 束縛で、名前が `mut_` で始まらないものは、型の推論元になる配列・オブジェクトリテラルに `as const` を付ける。** 新規ルール `readonly/require-as-const`(sumi プラグイン)。リテラルは `satisfies`、条件式の両分岐、`??` の両辺を通して探す(いずれも型をそのまま通すため)
+    2. **対象外**: 型注釈のある束縛(注釈が型であり、`readonly/require-readonly-type` が検査する。`as const` は要求も禁止もしない — D-45 の「綴りを正規化しない」)、プリミティブ・テンプレートリテラル(変更可能な部分が無い)、分割代入の `const`(リテラルは束縛されず、どの名前が可変かを `as const` では言えない)、`let`(`mut_` 名にしか許されない)、呼び出しの引数・関数本体・他のリテラルの内側(引数と戻り値は注釈され、`as const` はリテラル全体に及ぶ)
+- **理由**:
+    - **推論された型だけが readonly 強制の抜け穴だった。** 書かれる型は `require-readonly-type` が、引数は `prefer-readonly-parameter-types` が readonly にする。D-42 で戻り値型も書かれる。残る「型が書かれない場所」のうち、可変な型を生むのは配列・オブジェクトリテラルで、`const target = { a: 1 }` は `{ a: number }` になり、以後の `target.a = 2` をコンパイラは受け付ける
+    - **D-45 はこの穴を `mut_` 側の規則に任せていた**(「破壊的操作は `mut_` 側の規則が担う」)。しかし `no-mutation-without-mut-prefix` は checker のルールで、**型に readonly が現れない限り、Sumi sugar で readonly をデフォルトにする codemod(D-3)の材料にもならない**。`as const` があれば、無注釈の束縛も注釈と同じく字面に readonly 性を持つ
+    - **このリポジトリの運用の追認である。** `ts-codemod-lib` の `append-as-const` が `mut_` 以外のリテラルに `as const` を機械的に付けており([spec/future-syntax.md](./spec/future-syntax.md) の候補 9)、dogfood 対象の synstate 3 パッケージ(92 ファイル)は導入時点で違反 0 件だった。codemod はプリミティブにも付け、`#mut_` / `_mut_` / `draft` も免除するが、Sumi の免除は D-14 の `mut_` だけで、要求するのは readonly に効く範囲だけ
+- **帰結**:
+    - 適合性コーパスでは、型注釈の無いリテラルを使っていた fixture に `as const` を足した(検査対象が変わらないもの)。分割代入の元になる値だけは、`as const` にすると要素がリテラル型になり `let` への `+= 1` が型エラーになるので、型注釈にした
+    - ESLint ブリッジに対応するルールは無い(`append-as-const` は codemod であって lint ではない)

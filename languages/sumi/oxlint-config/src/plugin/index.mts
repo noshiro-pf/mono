@@ -19,6 +19,7 @@ import {
   noTry,
   noUsing,
   preferArrowFunction,
+  requireAsConst,
   requireReadonlyType,
 } from './rules/index.mjs';
 
@@ -52,6 +53,7 @@ export const sumiPlugin = {
     'no-try': noTry,
     'no-using': noUsing,
     'prefer-arrow-function': preferArrowFunction,
+    'require-as-const': requireAsConst,
     'require-readonly-type': requireReadonlyType,
   },
 } as const;

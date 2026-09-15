@@ -171,6 +171,8 @@
 
     // ---- readonly (spec/readonly.md, D-45) ----
     "sumi/require-readonly-type": "error",
+    // D-60: the literal an unannotated, non-mut_ const infers its type from
+    "sumi/require-as-const": "error",
     "typescript/prefer-readonly-parameter-types": [
       "error",
       {
