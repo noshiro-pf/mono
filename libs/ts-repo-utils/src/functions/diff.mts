@@ -1,4 +1,4 @@
-import { type ExecException } from 'node:child_process';
+import { execFile, type ExecException } from 'node:child_process';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
 import { $ } from './exec-async.mjs';
@@ -35,9 +35,9 @@ export const getUntrackedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: 'git ls-files --others --exclude-standard',
-    cmdOptionToExcludeDeleted: '',
-    cmdOptionToIncludeDeleted: '--deleted',
+    args: ['ls-files', '--others', '--exclude-standard'],
+    argsToExcludeDeleted: [],
+    argsToIncludeDeleted: ['--deleted'],
     options,
   });
 
@@ -56,9 +56,9 @@ export const getModifiedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: 'git diff --name-only',
-    cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
-    cmdOptionToIncludeDeleted: '',
+    args: ['diff', '--name-only'],
+    argsToExcludeDeleted: ['--diff-filter=d'], // lower case 'd' means exclude deleted files
+    argsToIncludeDeleted: [],
     options,
   });
 
@@ -77,15 +77,21 @@ export const getStagedFiles = async (
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > =>
   cmdResultToFiles({
-    cmd: 'git diff --staged --name-only',
-    cmdOptionToExcludeDeleted: '--diff-filter=d', // lower case 'd' means exclude deleted files
-    cmdOptionToIncludeDeleted: '',
+    args: ['diff', '--staged', '--name-only'],
+    argsToExcludeDeleted: ['--diff-filter=d'], // lower case 'd' means exclude deleted files
+    argsToIncludeDeleted: [],
     options,
   });
 
 /**
  * Get files that differ from the specified base branch or commit. Runs `git
- * diff --name-only <base> [--diff-filter=d]`
+ * diff --name-only [--diff-filter=d] <base> --`
+ *
+ * `base` names exactly one revision. It reaches `git` as a single argument and
+ * never as a command line, so whatever it contains — whitespace, punctuation —
+ * is part of the revision name rather than further arguments, and a `base` that
+ * git does not resolve comes back as an `Err`. A value beginning with `-` is
+ * rejected before git is invoked, because git would read it as an option.
  */
 export const getDiffFrom = async (
   base: string,
@@ -97,23 +103,35 @@ export const getDiffFrom = async (
   }>,
 ): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
-> =>
-  cmdResultToFiles({
-    cmd: `git diff --name-only ${base}`,
-    cmdOptionToExcludeDeleted: '--diff-filter=d',
-    cmdOptionToIncludeDeleted: '',
+> => {
+  if (base.startsWith('-')) {
+    return Result.err({
+      message: `Invalid base "${base}": a base must name a revision, not an option.`,
+    });
+  }
+
+  return cmdResultToFiles({
+    args: ['diff', '--name-only'],
+    argsToExcludeDeleted: ['--diff-filter=d'],
+    argsToIncludeDeleted: [],
+    // `--` ends the revision list, so a base that happens to match a path in
+    // the working tree is still read as a revision.
+    trailingArgs: [base, '--'],
     options,
   });
+};
 
 const cmdResultToFiles = async ({
-  cmd,
-  cmdOptionToExcludeDeleted,
-  cmdOptionToIncludeDeleted,
+  args,
+  argsToExcludeDeleted,
+  argsToIncludeDeleted,
+  trailingArgs = [],
   options,
 }: Readonly<{
-  cmd: string;
-  cmdOptionToExcludeDeleted: string;
-  cmdOptionToIncludeDeleted: string;
+  args: readonly string[];
+  argsToExcludeDeleted: readonly string[];
+  argsToIncludeDeleted: readonly string[];
+  trailingArgs?: readonly string[];
   options?: Readonly<{
     /** @default true */
     excludeDeleted?: boolean;
@@ -132,15 +150,14 @@ const cmdResultToFiles = async ({
 
   const gitRoot = gitRootResult.value;
 
-  const result = await $(
+  const result = await execGit(
     [
-      cmd,
-      (options?.excludeDeleted ?? true)
-        ? cmdOptionToExcludeDeleted
-        : cmdOptionToIncludeDeleted,
-    ]
-      .filter((s) => s !== '')
-      .join(' '),
+      ...args,
+      ...((options?.excludeDeleted ?? true)
+        ? argsToExcludeDeleted
+        : argsToIncludeDeleted),
+      ...trailingArgs,
+    ],
     {
       silent: options?.silent ?? false,
       // Run git from the repository root so that `git ls-files` (which
@@ -166,4 +183,53 @@ const cmdResultToFiles = async ({
     .map((relativePath) => path.join(gitRoot, relativePath));
 
   return Result.ok(files);
+};
+
+/**
+ * Runs `git` with `args` handed to the process one argument at a time. No shell
+ * is involved, so each entry of `args` arrives at git exactly as written.
+ *
+ * This is deliberately not {@link $}, which takes a command line and runs it
+ * through a shell: the values these functions pass come from their callers, and
+ * a caller's value is data rather than a fragment of a command.
+ */
+const execGit = async (
+  args: readonly string[],
+  options: Readonly<{ silent: boolean; cwd: string }>,
+): Promise<
+  Result<Readonly<{ stdout: string; stderr: string }>, ExecException>
+> => {
+  const { silent, cwd } = options;
+
+  if (!silent) {
+    console.info(`$ git ${args.join(' ')}`);
+  }
+
+  return new Promise((resolve) => {
+    execFile(
+      'git',
+      args,
+      { cwd, encoding: 'utf8' },
+      (error, stdout, stderr) => {
+        if (!silent) {
+          if (stdout !== '') {
+            console.info(stdout);
+          }
+
+          if (stderr !== '') {
+            console.error(stderr);
+          }
+        }
+
+        resolve(
+          error === null
+            ? Result.ok<Readonly<{ stdout: string; stderr: string }>>({
+                stdout,
+                stderr,
+              })
+            : Result.err(error),
+        );
+      },
+    );
+  });
 };
