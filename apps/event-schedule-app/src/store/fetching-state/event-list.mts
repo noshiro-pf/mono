@@ -15,7 +15,7 @@ import { createBooleanState } from 'synstate-react-hooks';
 import { Result, isNotUndefined, tp } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { noop, type TimerId } from '../../utils-ported/index.mjs';
+import { noop } from '../../utils-ported/index.mjs';
 import { Auth } from '../auth.mjs';
 import { EventListPageFilterStore } from '../event-list-page-state/index.mjs';
 

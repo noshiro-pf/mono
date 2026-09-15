@@ -2608,10 +2608,14 @@ strict lib が厳しすぎる側の例で、#1782（PixiJS）や #1789
 
 `type TimerId = Parameters<typeof clearTimeout>[0];` は
 `apps/react-utils` ・ `apps/preact-utils` ・ `apps/numeric-input-utils` ・
-`apps/event-schedule-app`（`utils-ported/calendar.mts`）にもあるが、これらは
+`apps/event-schedule-app`（`utils-ported/calendar.mts`）にもあったが、これらは
 **移植時に `@noshiro/ts-type-utils` のグローバル `TimerId` を書き直したもの**で、
-`ReturnType<typeof setTimeout>` から逃げた結果ではない。#1840 が直っても
-戻す先が無いので、そのままでよい。
+`ReturnType<typeof setTimeout>` から逃げた結果ではなかった。#1840 が直った後、
+末端のアプリである `apps/event-schedule-app` ではグローバルの `TimerId` に、
+それ以外（と `libs/ts-data-forge` の `debounce-function.mts`）では
+`ReturnType<typeof setTimeout>` に置き換えた。`apps/react-utils` などの `src/` は
+strict lib を有効にしていない利用側からも型チェックされるので、
+グローバルの `TimerId` には頼れない。
 
 ## #1840 / #1841 を直した（2026-09-10）
 

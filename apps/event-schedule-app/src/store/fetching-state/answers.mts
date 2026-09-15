@@ -12,7 +12,7 @@ import { createBooleanState } from 'synstate-react-hooks';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import { api } from '../../api/index.mjs';
 import { fetchThrottleTime } from '../../constants/index.mjs';
-import { noop, type TimerId } from '../../utils-ported/index.mjs';
+import { noop } from '../../utils-ported/index.mjs';
 import { Router } from '../router.mjs';
 import { EventScheduleStore } from './event-schedule.mjs';
 

@@ -1,10 +1,6 @@
 import { useState } from 'better-react-use-state';
 import * as React from 'react';
 
-/** What `setTimeout` returns and `clearTimeout` takes; a global in the old
- * `@noshiro/ts-type-utils`, and right under both Node and the browser here. */
-type TimerId = Parameters<typeof clearTimeout>[0];
-
 export const useInterval = (
   milliSec: number,
   delayMilliSec: number = 0,
@@ -12,7 +8,8 @@ export const useInterval = (
   const [counter, _, { updateState: updateCounter }] = useState(0);
 
   React.useEffect(() => {
-    let mut_intervalTimer: TimerId | undefined = undefined;
+    let mut_intervalTimer: ReturnType<typeof setTimeout> | undefined =
+      undefined;
 
     const delayTimer = setTimeout(() => {
       mut_intervalTimer = setInterval(() => {
