@@ -806,9 +806,11 @@ admin's bypass, which is the one way a head that is behind `main`, or was
 never checked, can land. Run the check workflows by hand from the Actions tab
 (`workflow_dispatch`) after such a merge; nothing else will.
 
-`skip-ci-label.yml` rides along with the same trigger list. It is not a check
-workflow — it checks nothing, and does one API call — but it is what makes
-the `skip-ci` label hold the merge; see below. `lint-pull-request.yml` carries
+`skip-ci-label.yml` rides along with the same activity types, on
+`pull_request_target` rather than `pull_request` — see below for why the one
+gate a labelled pull request does not skip is read from the base branch. It
+is not a check workflow — it checks nothing, and does one API call — but it
+is what makes the `skip-ci` label hold the merge. `lint-pull-request.yml` carries
 `labeled` and `unlabeled` too, next to its own `opened`, `edited` and
 `synchronize`, so that the label skips and restarts the title and commit
 message checks the same way.
@@ -861,6 +863,21 @@ cancelled one would have.
 - **The group keys on the pull request number** where there is one, so a
   `workflow_dispatch` run asked for by hand lands in a different group from the
   pull request's own runs and the two do not cancel each other.
+- **The event name in that expression has to stay a trigger of the workflow,
+  and `pnpm run check:root:workflow-event-name` is what keeps it one.**
+  `github.event_name` is the name of the trigger that started the run, so a
+  comparison against an event the workflow does not fire on is not a stale
+  comment — it is a constant: `== 'x'` always `false`, `!= 'x'` always `true`.
+  Nothing errors and nothing goes red; the expression simply stops being a
+  condition. What that costs here is `cancel-in-progress` turning off
+  altogether, and in `skip-ci-label.yml` that is a `labeled` run writing
+  `pending` after the `unlabeled` run wrote `success` — a pull request blocked
+  with no label on it. Seven workflows carry the expression and the mistake is
+  one edit of an `on:` block away in each, so the check reads
+  `.github/workflows/*.yml` rather than any one file. It asks nothing of a
+  reusable workflow: inside one, `github.event_name` is the **caller's** event
+  and never `workflow_call`, so `check-gates.yml`'s own trigger list says
+  nothing about what a comparison there may name.
 
 ### A `skip-ci` label skips the checks; taking it off starts them again
 
@@ -927,6 +944,20 @@ report `skipped`. What to know about that:
     - **Written with `GITHUB_TOKEN`**, so it is attributed to the GitHub
       Actions app — the `integration_id` the ruleset pins the context to.
       The job's `permissions` grant `statuses: write` and nothing else.
+    - **The trigger is `pull_request_target`, so the gate is `main`'s copy
+      of it.** `pull_request` runs the workflow file as it exists on the
+      pull request's head, which would put the one check a labelled pull
+      request does not satisfy by skipping inside the branch it is deciding
+      about — with `statuses: write` already granted, and the other seven
+      contexts reporting `skipped`. `lint-pull-request.yml` chose
+      `pull_request_target` for the same reason. What normally makes that
+      trigger dangerous is a writable token in a job that runs the branch's
+      code, and this job has no checkout and executes nothing from the tree;
+      a step added there has to keep it that way, reading the pull request
+      from the event payload. Moving the trigger means moving the
+      concurrency block's `github.event_name` comparison with it — see "A
+      push cancels the run still going for the previous one" for what is
+      enforced about that, and for what leaving it behind costs here.
 - **It is the only thing that blocks a labelled pull request**, because the
   `*-result` aggregates carve `skip-ci` out and report `skipped` for it rather
   than red — see "Required status checks". One pending check that names its
