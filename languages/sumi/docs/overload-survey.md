@@ -153,6 +153,8 @@ string_of_bool : bool -> string
 
 ## Sumi への含意
 
+> **2026-09-16 注**: 以下は調査時点の含意で、D-58 と [overload-design.md](./overload-design.md) に置き換わっている。Sumi lint はオーバーロードを「実行時に判別可能で互いに素なもの」に限り、書き方を節ごとの関数 + `function` 宣言 + 整合性の検査行に決めた。Sumi sugar の案 A は採らない。
+
 - **Sumi lint**: TS の閉じたオーバーロード(単一実装)を D-13 の条件付きで許容。ts-data-forge の二本立て API がそのまま書ける。
 - **Sumi sugar 案 A**: `fn` にシグネチャ列挙を統合(記法改善のみ、1:1 emit)。
 - **Sumi sugar 案 B**: Elixir/Swift 型の実装分離 clause。emit は例 1 の TS コード(`args.length` switch)を transpiler が生成する形になり、**ts-data-forge が手書きしている dispatch がまさに生成対象のテンプレート**になる。clause が実行時判別可能(arity か `typeof`/タグ)という制約はこの例で言えば「`[number, number]` と `[number]` は length で判別可」。
