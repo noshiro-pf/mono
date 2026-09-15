@@ -357,21 +357,29 @@ tsc が検査しないのは「宣言ごとの戻り値型」だけで、そこ�
 
 ### 精密化(B / C)には構文を足さない
 
-- **C**: 単一シグネチャ + 条件型の戻り値。**推奨はデータ側を直して射影を全域にすること**
+- **C**: 単一シグネチャ + 条件型の戻り値。~~**推奨はデータ側を直して射影を全域にすること**
   (`None` に `value: undefined` を持たせる)。これは ts-std-forge の設計課題であって
-  言語機能ではない。残る `as` は Sumi refined で「宣言された有限個のケースごとに本体を
+  言語機能ではない。~~(2026-09-11 に不採用 — 上の「(a) データモデルを曲げる案」)残る `as` は Sumi refined で「宣言された有限個のケースごとに本体を
   検査する」ことで初めて消える — **TS が拒む「本体を N 回検査する」を自前検査器がやる**
   というのが筋の通った最終形。
-- **B**: 条件付き rest タプル。`readonly` にできない問題は D-45 の例外として仕様化が要る。
+- **B**: 条件付き rest タプル。~~`readonly` にできない問題は D-45 の例外として仕様化が要る。~~
+  (2026-09-10 訂正: `readonly` で書ける — 上の「B(省略可能引数)」)
 
 ### Sumi lint(今日)への帰結
 
+> **2026-09-15 改訂**: 1 と 2 は [spec/functions.md](./spec/functions.md)「オーバーロードの記法」
+> に置き換わった。値は `function` 宣言だけ(複数シグネチャの型を文脈型に持つ関数式は交差型でも
+> 禁止 — `functions/no-overloaded-function-expression`)、型は交差型だけ(呼び出し / 構築
+> シグネチャのメンバーを禁止 — `functions/no-call-signature-member`)。下の 1 の「型の中の呼び出し
+> シグネチャは禁止できない」は誤りで、プロパティの型を交差型にすれば書ける(実測)。
+
 1. **記法 (1) を正典、(2) は関数値の型注釈で禁止。** 理由は `Readonly<>` の危険だけでは
    なく、戻り値が変わるオーバーロードを表現できないこと・generic で検査が消去されること。
-   ただし**型の中の呼び出しシグネチャは禁止できない** — `method-signature-style: "property"`
-   の下でオーバーロードされたメンバーを書く唯一の手段だからである。
-2. **新規ルール候補 `functions/prefer-intersection-call-signature`**: 関数型を書くとき、
-   呼び出しシグネチャの列挙より交差型を要求する。消去の差ぶん厳密になる。
+   ~~ただし**型の中の呼び出しシグネチャは禁止できない** — `method-signature-style: "property"`
+   の下でオーバーロードされたメンバーを書く唯一の手段だからである。~~
+2. ~~**新規ルール候補 `functions/prefer-intersection-call-signature`**: 関数型を書くとき、
+   呼び出しシグネチャの列挙より交差型を要求する。消去の差ぶん厳密になる。~~ → 型の中の
+   シグネチャのメンバーを全面禁止する `functions/no-call-signature-member` として実装した。
 3. **新規ルール候補 `functions/no-refinement-overload`**(高価値): オーバーロード集合が
    **実行時に判別可能でない**とき — つまり本体が 1 つしかありえないとき — 拒否し、単一
    シグネチャへ誘導する。現状 19 個中 12 個が該当し、Sumi sugar の複数節構文への移行が
@@ -394,7 +402,10 @@ tsc が検査しないのは「宣言ごとの戻り値型」だけで、そこ�
 3. **`min` / `max` / `minBy` / `maxBy` を条件付き rest タプルへ**(ts-data-forge)。
 4. **`functions/no-refinement-overload` の実装**。1〜3 が終われば対象は `panic` 以外ほぼ
    無くなるので、**新規の逆行を止めるための番人**という位置づけになる。
-5. **`functions/prefer-intersection-call-signature` の実装**。現状の違反は 0 件。
+5. ~~**`functions/prefer-intersection-call-signature` の実装**。現状の違反は 0 件。~~ →
+   **実装済み(2026-09-15)**: `functions/no-call-signature-member` と
+   `functions/no-overloaded-function-expression`、あわせて oxlint ネイティブの
+   `functions/adjacent-overload-signatures` / `functions/unified-signatures` を有効にした。
 6. **(Sumi refined)条件型の戻り値をケースごとに検査する**。上の 2 で残る `as` 3 個を
    discharge する唯一の筋であり、D-58 の overload の判断と同じ原理の適用でもある。
 
