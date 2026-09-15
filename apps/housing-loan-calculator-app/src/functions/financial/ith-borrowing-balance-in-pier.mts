@@ -20,7 +20,7 @@ export const ithBorrowingBalanceInPIER = ({
   const q = 1 + interestRate;
 
   // Widened before negating: `no-unsafe-unary-minus` rejects a unary minus on
-  // a branded integer, and `lint:fix` rewrites the `-1 * numPayments` the
+  // a branded integer, and `fix:lint` rewrites the `-1 * numPayments` the
   // source used back into that unary form.
   const exponent: number = numPayments;
 

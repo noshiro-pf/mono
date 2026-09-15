@@ -35,4 +35,4 @@
 # - `libs/*/package.json` — publish 設定を含むが、同じ理由で毎回動く。
 #
 # どちらも「無審査で入ると困る」は真だが、頻度が高すぎてゲートとして機能しない。
-# 守るなら別の手立て（`verify-npm-packages` や `lint:published-deps`）で。
+# 守るなら別の手立て（`verify-npm-packages` や `check:published-deps`）で。

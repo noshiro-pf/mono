@@ -8,7 +8,7 @@
 - `github-settings-as-code` — 14 モジュールが `ts-repo-utils` を import しているのに依存宣言が無く、`repo-settings backup` が起動しなかった
 - `synstate` 系 5 パッケージ — `module` / `types` がビルドの出力しないファイルを指していた
 
-`check:published-deps` はソースを、`knip` はマニフェストを見る。ここは**成果物そのもの**を見る。
+`check:published-deps` はソースを、`check:knip` はマニフェストを見る。ここは**成果物そのもの**を見る。
 
 ## 2 つの空間
 

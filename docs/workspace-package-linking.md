@@ -100,7 +100,7 @@ matrix コマンドを実行する。
 `paths` 無しで、つまり `dist` 経由で解決していた。群 B の 21 エントリは一貫性を
 足していたのではなく、**同じリポジトリの中に 2 通りの解決経路を作っていた**。
 
-`apps/synstate-docs` が分かりやすい。`type-check` は `paths` で `synstate` の
+`apps/synstate-docs` が分かりやすい。`check:types` は `paths` で `synstate` の
 `src` を見る一方、`astro build`（Vite）は `node_modules` 経由で `dist` を見る。
 型検査が通ったものとビルドされたものが別物という状態だった。`paths` を外して
 両者は一致した。

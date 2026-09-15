@@ -55,7 +55,7 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Linting markdown files',
-    // `md` is a repository-wide script (the markdownlint config lives at the
+    // `check:md` is a repository-wide script (the markdownlint config lives at the
     // monorepo root), so it has to be invoked from there.
     action: () =>
       runCmdStep(

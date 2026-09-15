@@ -14,8 +14,8 @@ export default defineViteConfig({
    * `enableNoUncheckedIndexedAccess` checks the file twice — once with the
    * option on and once with it off — so a single case costs a second or so.
    * V8 coverage instrumentation multiplies that by roughly five, which took
-   * the default 5 s timeout out from under `test:cov` on CI while `test` and
-   * `test:browser` stayed green.
+   * the default 5 s timeout out from under `check:test:cov` on CI while `check:test` and
+   * `check:test:browser` stayed green.
    */
   node: {
     testTimeout: 30_000,

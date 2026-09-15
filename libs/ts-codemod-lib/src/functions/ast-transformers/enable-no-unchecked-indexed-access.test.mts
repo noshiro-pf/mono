@@ -84,7 +84,7 @@ const transformInProject = (
  * off. A case that went through it therefore paid for the whole default
  * library, `lib.esnext.full.d.ts` with the DOM inside it, being parsed and
  * checked from scratch: ~300 ms a case, of which the file under test was a
- * fraction of a millisecond. Sixty of those took `test:cov` past Vitest's
+ * fraction of a millisecond. Sixty of those took `check:test:cov` past Vitest's
  * timeout on CI.
  *
  * Reusing the project is half of the answer and the smaller half — measured,

@@ -99,7 +99,7 @@ type Violation = Readonly<{
 
 /**
  * Files under `src/` that never carry a hand-written `@example`: the barrels
- * `gi` generates, the entry point, the ambient globals, and the tests. Kept in
+ * `gen:index` generates, the entry point, the ambient globals, and the tests. Kept in
  * step with `defaultExemptFileNames` in
  * `tools/configs/embed-examples-in-jsdoc.mts`, whose check they are exempt
  * from for the same reason.

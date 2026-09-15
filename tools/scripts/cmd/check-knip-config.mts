@@ -19,7 +19,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * Nothing else catches it. Git auto-merges the insertion without a conflict,
  * and knip is not run by the fast checks, so the first sign is
- * `style-check (fmt:full)` reporting a Prettier `SyntaxError` — a message
+ * `style-check (fix:fmt:full)` reporting a Prettier `SyntaxError` — a message
  * about formatting, several minutes into CI, that names neither knip nor the
  * entry that was damaged.
  *

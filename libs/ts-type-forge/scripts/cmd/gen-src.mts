@@ -17,7 +17,7 @@ const entryPointFilePath = path.resolve(srcDir, 'entry-point.mts');
 /**
  * Regenerates the committed sources this package derives from its own tree.
  *
- * `gi` sits in the middle rather than beside the other barrels: `global.mts`
+ * `gen:index` sits in the middle rather than beside the other barrels: `global.mts`
  * and `entry-point.mts` are written from the per-directory `index.mts` files,
  * so they are stale until those have been regenerated.
  *

@@ -1,5 +1,5 @@
 // Hand-written, like every other wrapper module's barrel, and named in
-// `gi:src`'s `--preserve` list because `gi` emits only `export * from` and
+// `gen:index:src`'s `--preserve` list because `gen:index` emits only `export * from` and
 // cannot write `export * as`.
 //
 // The namespace is the whole entry point: `./impl/index.mjs` is deliberately

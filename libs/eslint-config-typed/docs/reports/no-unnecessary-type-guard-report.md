@@ -91,7 +91,7 @@ type NonEmptyString = Brand<string, 'NonEmptyString'>;
 | `src/plugins/ts-data-forge/rules/no-unnecessary-type-guard.test.mts` | テスト（新規、valid 11 / invalid 12、計 23 件）     |
 | `src/plugins/ts-data-forge/rules/rules.mts`                          | プラグインへ登録                                    |
 | `src/rules/eslint-ts-data-forge-rules.mts`                           | config エントリ追加（`withDefaultOption('error')`） |
-| `src/types/rules/eslint-ts-data-forge-rules.mts`                     | `pnpm run gen-rule-type` で型定義を自動生成         |
+| `src/types/rules/eslint-ts-data-forge-rules.mts`                     | `pnpm run gen:rule-types` で型定義を自動生成        |
 
 ### 判定ロジック（確定仕様）
 

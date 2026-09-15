@@ -120,7 +120,7 @@ mono の `libs/*` は「1 ディレクトリ = 1 npm パッケージ」。統合
 | package.json 整列   | `prettier-plugin-packagejson`      | `sortPackageJson`                       |
 | Markdown `tabWidth` | 4                                  | 対象外                                  |
 
-出力そのものは近いので、ディレクトリごとにフォーマッタを分ける運用は技術的には可能。ただし `fmt:full` / `style-check` / `assert-repo-is-clean` がすべて分岐を持つことになる。
+出力そのものは近いので、ディレクトリごとにフォーマッタを分ける運用は技術的には可能。ただし `fix:fmt:full` / `style-check` / `assert-repo-is-clean` がすべて分岐を持つことになる。
 
 **これは統合を避ける理由としては A〜C より弱い。** 仮に A〜C が解決しても D だけなら統合できる、という程度の問題。mono には既に oxfmt 移行の draft PR（[#1549](https://github.com/noshiro-pf/mono/pull/1549)）があり、mono 側が oxfmt に寄れば差は消える。
 
@@ -323,8 +323,8 @@ strict lib が緩くした指摘に付いていた `eslint-disable` は不要に
 `ts-fortress` では型エラー 4 件を直したあとに **lint が 21 件**残った（opt-in 前は
 0 件）。パッケージごとの見積りには lint の件数も要る。
 
-**2. `lint:fix` が strict lib 前提のコードに書き換える。** `key-value-record.mts`
-では、strict lib 下で不要になった型アサーションと `eslint-disable` を `lint:fix` が
+**2. `fix:lint` が strict lib 前提のコードに書き換える。** `key-value-record.mts`
+では、strict lib 下で不要になった型アサーションと `eslint-disable` を `fix:lint` が
 自動削除した。strict lib 下では正しいが、**標準 lib に戻すと型エラーになる**。
 
 ```text
@@ -544,10 +544,10 @@ type-check の対象に入っている。他パッケージが `eslint-config-ty
 その状態で測り直した結果（`libs/ts-data-forge/tsconfig.json` に
 `"libReplacement": true` を足しただけ、他は無改変）:
 
-|              | 素の lib                 | strict lib                    |
-| :----------- | :----------------------- | :---------------------------- |
-| `type-check` | エラー 0 件              | **エラー 0 件**               |
-| `lint`       | エラー 0 件 / 警告 15 件 | エラー **23 件** / 警告 17 件 |
+|               | 素の lib                 | strict lib                    |
+| :------------ | :----------------------- | :---------------------------- |
+| `check:types` | エラー 0 件              | **エラー 0 件**               |
+| `check:lint`  | エラー 0 件 / 警告 15 件 | エラー **23 件** / 警告 17 件 |
 
 **型チェックは 1 件も残っていない。**「止まっている 2 件」は両方とも解消済みで、
 `ts-data-forge` の opt-in を妨げるものはもう無い。
@@ -864,7 +864,7 @@ strict-lib/
 
 フォーマッタは住み分ける。`.prettierignore` に `strict-lib` を足し、
 `strict-lib/` 配下だけ oxfmt で回す。生成物が数千ファイルあるので、
-**prettier を通さないこと自体が `fmt:full` の高速化になる**。
+**prettier を通さないこと自体が `fix:fmt:full` の高速化になる**。
 `style-check` と `assert-repo-is-clean` は分岐を持つことになる。
 
 `experimental/` と同じく、**ここも独自の `.gitignore` は置かない**（リポジトリ

@@ -69,7 +69,7 @@ export const generateRulesType = async (
     // re-introduces `Readonly<Record<...>>` after the codemod above has
     // already run. Run the codemod once more so the generated files end up in
     // the codemod's record style (`ReadonlyRecord`) and regeneration stays a
-    // fixed point of `codemod:full`.
+    // fixed point of `fix:codemod:full`.
     console.info('running codemod (post `lint --fix`)...');
 
     await applyTypeTransformationsForTargets(targetFileNames);

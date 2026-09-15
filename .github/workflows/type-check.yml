@@ -178,7 +178,7 @@ jobs:
           # which only need `dist/`, stop paying for it.
           - ws:check:dist
           - ws:fix:lint
-          # The Sumi lint check of the dogfood packages (`sumi:check` scripts).
+          # The Sumi lint check of the dogfood packages (`check:sumi` scripts).
           - ws:check:sumi
           - ws:check:test:browser
           - ws:check:test:cov

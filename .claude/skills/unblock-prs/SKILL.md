@@ -206,8 +206,8 @@ Two things about reproducing the rest:
 - `type-check (*)`, `style-check (ws:doc)`, `style-check (ws:check:ext)` and
   `style-check (ws:gen)` run `pnpm run ws:build` first in CI. Do the same
   locally or they fail for the wrong reason.
-- Every job ends with `z:assert-repo-is-clean`. So `fmt:full`, `ws:doc`,
-  `codemod:full`, `ws:fix:lint`, `ws:gen` and `ws:gen` fail by _changing_
+- Every job ends with `z:assert-repo-is-clean`. So `fix:fmt:full`, `ws:doc`,
+  `fix:codemod:full`, `ws:fix:lint` and `ws:gen` fail by _changing_
   files, and the fix is to run the command locally and commit what it wrote. A
   green run of the command with a dirty tree afterwards is still a failure.
 

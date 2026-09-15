@@ -68,7 +68,7 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Type checking passed',
   });
 
-  // The Sumi lint check of the dogfood packages (`sumi:check` scripts): the
+  // The Sumi lint check of the dogfood packages (`check:sumi` scripts): the
   // locked compilerOptions, the native type check and the oxlint preset, in
   // one command per package (languages/sumi/docs/decisions.md, D-46).
   await logStep({

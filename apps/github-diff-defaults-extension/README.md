@@ -102,16 +102,16 @@ and what goes on them — and `src/content.mts` is the glue that applies it.
 
 ## Commands
 
-| command               | what it does                                          |
-| :-------------------- | :---------------------------------------------------- |
-| `pnpm run build`      | builds `dist/`, which is what Chrome loads            |
-| `pnpm run test`       | runs the unit tests                                   |
-| `pnpm run smoke`      | runs the built extension in a real Chromium           |
-| `pnpm run type-check` | type-checks the package                               |
-| `pnpm run lint`       | lints it                                              |
-| `pnpm run gen:icons`  | redraws `public/icons/` — see `scripts/gen-icons.mts` |
-| `pnpm run pack`       | builds and writes the Chrome Web Store zip            |
-| `pnpm run pack:crx`   | the same package, signed, for verified CRX upload     |
+| command                | what it does                                          |
+| :--------------------- | :---------------------------------------------------- |
+| `pnpm run build`       | builds `dist/`, which is what Chrome loads            |
+| `pnpm run test`        | runs the unit tests                                   |
+| `pnpm run smoke`       | runs the built extension in a real Chromium           |
+| `pnpm run check:types` | type-checks the package                               |
+| `pnpm run check:lint`  | lints it                                              |
+| `pnpm run gen:icons`   | redraws `public/icons/` — see `scripts/gen-icons.mts` |
+| `pnpm run pack`        | builds and writes the Chrome Web Store zip            |
+| `pnpm run pack:crx`    | the same package, signed, for verified CRX upload     |
 
 The icons are committed, so `gen:icons` is only run when the shape changes.
 
