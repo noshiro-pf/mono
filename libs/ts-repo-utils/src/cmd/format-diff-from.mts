@@ -11,7 +11,8 @@ const cmdDef = cmd.command({
     base: cmd.positional({
       type: cmd.string,
       displayName: 'base',
-      description: 'Base branch name or commit hash to compare against',
+      description:
+        'Base branch name or commit hash to compare against. Names exactly one revision, and is passed to git as a single argument.',
     }),
     excludeUntracked: cmd.flag({
       long: 'exclude-untracked',

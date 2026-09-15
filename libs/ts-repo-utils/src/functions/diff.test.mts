@@ -840,5 +840,114 @@ describe('diff', () => {
         await cleanup();
       }
     });
+
+    test('should list the files that differ from the given base', async () => {
+      const { repoPath, cleanup, execInRepo } = await createTempRepo();
+
+      const repoFunctions = createRepoFunctions(repoPath);
+
+      try {
+        const testFileName = `test-base-file-${crypto.randomUUID()}.tmp`;
+
+        const testFilePath = path.join(repoPath, testFileName);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(testFilePath, 'initial content');
+
+        await execInRepo(`git add ${testFileName}`, { silent: true });
+
+        await execInRepo('git commit -m "Initial commit" --no-verify', {
+          silent: true,
+        });
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(testFilePath, 'modified content');
+
+        await execInRepo(`git add ${testFileName}`, { silent: true });
+
+        await execInRepo('git commit -m "Second commit" --no-verify', {
+          silent: true,
+        });
+
+        const result = await repoFunctions.getDiffFrom('HEAD~1', {
+          silent: true,
+        });
+
+        assert.isTrue(Result.isOk(result));
+
+        if (Result.isOk(result)) {
+          expect(result.value).toContain(testFilePath);
+        }
+      } finally {
+        await cleanup();
+      }
+    });
+
+    test('should treat the base as one revision rather than several arguments', async () => {
+      const { repoPath, cleanup, execInRepo } = await createTempRepo();
+
+      const repoFunctions = createRepoFunctions(repoPath);
+
+      try {
+        const testFileName = `test-single-arg-${crypto.randomUUID()}.tmp`;
+
+        const testFilePath = path.join(repoPath, testFileName);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(testFilePath, 'initial content');
+
+        await execInRepo(`git add ${testFileName}`, { silent: true });
+
+        await execInRepo('git commit -m "Initial commit" --no-verify', {
+          silent: true,
+        });
+
+        const writtenByGit = path.join(repoPath, 'written-by-git.tmp');
+
+        // Whitespace in the base is part of the revision name, so the text
+        // after it is never read as an option to git.
+        const result = await repoFunctions.getDiffFrom(
+          `HEAD --output=${writtenByGit}`,
+          { silent: true },
+        );
+
+        assert.isTrue(Result.isErr(result));
+
+        assert.isFalse(await fileExists(writtenByGit));
+      } finally {
+        await cleanup();
+      }
+    });
+
+    test('should reject a base that begins with a hyphen', async () => {
+      const { repoPath, cleanup } = await createTempRepo();
+
+      const repoFunctions = createRepoFunctions(repoPath);
+
+      try {
+        const writtenByGit = path.join(repoPath, 'written-by-git.tmp');
+
+        const result = await repoFunctions.getDiffFrom(
+          `--output=${writtenByGit}`,
+          { silent: true },
+        );
+
+        assert.isTrue(Result.isErr(result));
+
+        assert.isFalse(await fileExists(writtenByGit));
+      } finally {
+        await cleanup();
+      }
+    });
   });
 });
+
+const fileExists = async (filePath: string): Promise<boolean> => {
+  try {
+    await fs.access(filePath);
+
+    return true;
+  } catch {
+    return false;
+  }
+};
