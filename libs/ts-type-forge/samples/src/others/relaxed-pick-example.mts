@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-generated-empty-object-type -- `Empty` is shown resolving to `{}` */
 import { type RelaxedPick } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above

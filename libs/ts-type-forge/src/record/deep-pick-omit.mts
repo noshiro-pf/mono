@@ -109,7 +109,8 @@ type DeepPickValue<T, Tail extends readonly PropertyKey[]> = [Tail] extends [
     ? T
     : [NonNullable<T>] extends [RecursableValue]
       ? DeepPick<NonNullable<T>, Tail>
-      : NonNullable<unknown>;
+      : // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
+        NonNullable<unknown>;
 
 /**
  * @internal Extracts keys that should be removed (from paths of exactly length 1).

@@ -7,6 +7,6 @@ export const isDevelopment = import.meta.env.DEV;
 export const useEmulators: boolean = true;
 
 export const experimentalFeature = {} as const satisfies ReadonlyRecord<
-  never,
+  string,
   'hidden' | 'shown'
 >;

@@ -55,8 +55,10 @@ export default [
       // rule of this plugin takes options. It gains members as soon as one
       // does, and the alternative spellings of "an object with no keys" are
       // all `Record`, which `ts-type-forge/prefer-readonly-or-mutable-record`
-      // rejects here.
+      // rejects here. `no-generated-empty-object-type` reports the same line
+      // for the same reason.
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-generated-empty-object-type': 'off',
     }),
   },
 

@@ -47,6 +47,8 @@ export type RootObservableConfig<A> = Readonly<{
  */
 export const createRootObservable = <
   A,
+  // The default is deliberately empty: a root leaf without `init` adds no members.
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   Extension extends ReadonlyRecord<string, unknown> = ReadonlyRecord<
     never,
     never

@@ -36,6 +36,8 @@ const check = cmd.command({
 });
 
 type ReservedCommand = ReturnType<
+  // A reserved command takes no arguments, so its args record is empty.
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   typeof cmd.command<ReadonlyRecord<never, never>, () => never>
 >;
 

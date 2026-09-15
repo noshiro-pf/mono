@@ -67,6 +67,7 @@ type Base = { a: number; b: string; c: boolean };
 
   expectType<RelaxedPick<Base, string>, Base>('='); // Picks all string keys ('a', 'b', 'c')
 
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<RelaxedPick<Base, number>, {}>('='); // No numeric keys
 }
 
@@ -112,6 +113,7 @@ type Base = { a: number; b: string; c: boolean };
 
   expectType<RelaxedOmit<Base, 'a' | 'x'>, { b: string; c: boolean }>('='); // Ignores 'x'
 
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<RelaxedOmit<Base, string>, {}>('='); // Omits all string keys ('a', 'b', 'c')
 
   expectType<RelaxedOmit<Base, number>, Base>('='); // No numeric keys to omit

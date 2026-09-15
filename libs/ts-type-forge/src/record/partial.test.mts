@@ -257,6 +257,7 @@ type Base = {
     { a: never; b: never }
   >('=');
 
+  // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
   expectType<TSTypeForgeInternals_MapToNever<{}>, {}>('=');
 }
 
