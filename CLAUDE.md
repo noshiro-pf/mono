@@ -1357,8 +1357,16 @@ had accumulated across 41 files before anything asked.
     - Do not use file-level `/* eslint-disable */` or turn off rules in
       `eslint.config.mts` to fix lint errors.
     - Avoid using `// eslint-disable-next-line` whenever possible.
-- **RESTRICTIONS**: Do not perform these actions without explicit user instructions:
-    - Push to GitHub or remote repositories
+- **RESTRICTIONS**: pushing the session's own branch and opening its pull
+  request is the work, not something to ask about — see "Opening a pull
+  request". Do not do any of these without explicit user instructions:
+    - Push to a branch other than the one the session was given. `main` is
+      never one of them: the ruleset refuses a direct push there even from the
+      repository admin.
+    - Force-push, or rebase a branch whose pull request is open — see "After
+      it is open: watch it, and wait before rebasing".
+    - Merge a pull request, arm auto-merge on one, or add `merge-queued`.
+      Those are the author's.
     - Access `~/.ssh` or other sensitive directories
 
 ## Security findings
@@ -1440,17 +1448,25 @@ dash, a curly quote or an accented name still passes.
   is why both are held to the same rule.
 - Include a clear description, link related issues, and add screenshots or logs when helpful.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
-- Make sure CI passes, and that the checks the diff touches pass locally
-  first — see "Essential Development Commands" for which those are.
+- **Run the checks the diff touches locally before opening it** — see
+  "Essential Development Commands" for which those are. Passing CI is what the
+  merge waits for, but CI does not run while `skip-ci` is on, so until the
+  label comes off the local pass is the only evidence there is.
 
-### Opening a pull request: draft, with `skip-ci` on it
+### Opening a pull request: ready for review, with `skip-ci` on it
 
 **Implement the change, run the local checks, and only then open the pull
-request — as a draft, with the `skip-ci` label on it.** The two markers are
-addressed to different readers and both are wanted at that moment:
+request — ready for review, with the `skip-ci` label on it.**
 
-- **Draft is addressed to people.** It says the branch is not asking for
-  review yet, and GitHub refuses to merge a draft natively.
+**Not a draft.** A draft says the branch is not asking to be read yet, and
+that is not how anything here works: nothing pushes a half-finished branch and
+grows it in place, so the pull request appears when the work is complete and
+asks to be read from its first commit. Saying otherwise costs something real —
+GitHub refuses to merge a draft natively, auto-merge cannot be armed on one,
+and `unblock-prs` reports a queued draft rather than acting on it. What the
+branch is actually waiting for is a person, and `skip-ci` says that without
+claiming the work is unfinished.
+
 - **`skip-ci` is addressed to CI.** Every check workflow and both lint jobs skip
   while it is on, and `no-skip-ci-label` holds the merge with a pending status —
   see "Check triggers, `skip-ci` and out-of-date branches". `unblock-prs` looks
@@ -1459,12 +1475,13 @@ addressed to different readers and both are wanted at that moment:
   taken off when its turn comes, which is the one thing that takes it off. See
   "A declared merge order".
 
-`gh pr create --draft --label 'skip-ci'` does both in the call that opens it.
-Where the call that opens it cannot carry a label — GitHub's REST API takes
-none when creating a pull request, and the MCP tool over it takes none either
-— label it immediately afterwards. The runner minutes are spent either way:
-the `opened` event has already started a run by then, and the `labeled` event
-cancels it through the concurrency group.
+`gh pr create --label 'skip-ci'` puts the label on in the call that opens the
+pull request, and that is the one way to avoid what follows. Where the call
+cannot carry a label — GitHub's REST API takes none when creating a pull
+request, and the MCP tool over it takes none either, which is every session
+without the `gh` CLI — label it immediately afterwards. The runner minutes are
+spent either way: the `opened` event has already started a run by then, and
+the `labeled` event cancels it through the concurrency group.
 
 **That cancellation does not read as one, and the red checks it leaves are to
 be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
@@ -1491,21 +1508,17 @@ Consequences worth having in mind:
   check workflow's trigger list, so removing it starts the whole matrix on the
   commit already pushed — there is no need to push an empty commit to wake
   anything up.
-- **The draft flag alone skips nothing.** A draft is checked like any other
-  pull request, so relying on it instead of the label spends a full matrix on
-  every push to work that is not ready to be read yet.
 - **The label is a pause, not a state to leave a branch in.** A pull request
   that keeps it is one nothing will ever merge: no check runs, and
   `no-skip-ci-label` stays pending. `merge-queued` is how a pause becomes a
   queue position instead — a pull request that has been reviewed and is
   waiting its turn rather than waiting for someone to look at it, and that
   `unblock-prs` will take the label off when its turn comes.
-- **Queueing one is three actions, and `skip-ci` is not among them.** Mark it
-  ready for review, arm auto-merge, add `merge-queued`. The order is forced:
-  auto-merge cannot be armed on a draft, and `unblock-prs` reports a queued
-  draft rather than acting on it. `skip-ci` stays on — taking it off by hand
-  starts a matrix now, which is the thing the queue exists to do one branch at
-  a time.
+- **Queueing one is the author's, and a session does not do it.** Arming
+  auto-merge and adding `merge-queued` are two deliberate statements about
+  landing the branch, and they are made by hand. `skip-ci` is not among them
+  and stays on — taking it off starts a matrix now, which is the thing the
+  queue exists to do one branch at a time.
 
 ### After it is open: watch it, and wait before rebasing
 
@@ -1520,9 +1533,9 @@ afterwards, and only one of them is the session's to answer on its own.
   `subscribe_pr_activity` in Claude Code's remote environment — subscribe as
   soon as the pull request is open and leave it subscribed. The events wake
   the session by themselves, so ending the turn is how to wait for one; a
-  polling loop is not. A session that stops at `gh pr create` never sees any
-  of this, and a comment nobody read looks exactly like a comment nobody
-  agreed with.
+  polling loop is not. A session that stops once the pull request exists never
+  sees any of this, and a comment nobody read looks exactly like a comment
+  nobody agreed with.
     - What to do about one follows the usual rule: a small, in-scope fix
       belongs on the branch, and anything larger is a question for the author
       rather than a push.
