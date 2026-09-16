@@ -4,7 +4,6 @@ import { type ReadonlyRecord } from 'ts-type-forge';
 import cascadedDiamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-cascaded-diamond.json' with { type: 'json' };
 import conditionalFanOutJson from '../../../libs/synstate/samples/docs-site/benchmark/results-conditional-fan-out.json' with { type: 'json' };
 import deepChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results-deep-chain.json' with { type: 'json' };
-import diamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-diamond.json' with { type: 'json' };
 import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results.json' with { type: 'json' };
 /* eslint-enable import-x/no-relative-packages */
 
@@ -42,14 +41,17 @@ import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   ({
-    // The headline figures on the introduction and the landing page
-    'intro/jotai-over-synstate': bestRatio('Jotai'),
-    'intro/redux-over-synstate': bestRatio('Redux'),
-
     // Scenario: Derived Chain / Diamond Dependency
+    //
+    // The first two are also the headline figures on the introduction and the
+    // landing page — see the note on the derived chain below.
     'derived-chain/updates': count(updates(derivedChain)),
     'derived-chain/jotai-over-synstate': ratio(
       median(derivedChain, 'Jotai'),
+      median(derivedChain, 'SynState'),
+    ),
+    'derived-chain/redux-over-synstate': ratio(
+      median(derivedChain, 'Redux'),
       median(derivedChain, 'SynState'),
     ),
 
@@ -139,9 +141,20 @@ type StatsData = Readonly<{
   rows: readonly Readonly<{ label: string; median: number }>[];
 }>;
 
+/**
+ * The derived chain, which is also where the headline "up to N× faster than
+ * Jotai and M× faster than Redux" is read from.
+ *
+ * It is the one scenario that carries both libraries and the simplest graph
+ * either of them can be asked for, so both halves of that sentence come from
+ * one measurement. Reading each half from whichever of the two single-point
+ * scenarios flatters it most — which is how the pages came to say 30× and 16×,
+ * the first from the derived chain and the second from the diamond — turned
+ * out to be a choice noise makes: Redux's diamond median held at ~317 ms
+ * across the two runs while SynState's doubled with the machine, and that
+ * alone moved the wider scenario from one to the other.
+ */
 const derivedChain: StatsData = derivedChainJson;
-
-const diamond: StatsData = diamondJson;
 
 const deepChain: SeriesData = deepChainJson;
 
@@ -184,24 +197,6 @@ const fanOutCrossoverLabel = (): string =>
  * Renders a measurement the way the prose quotes one: a tenth of a millisecond
  * below 100 ms, and whole milliseconds above it, where the tenth is noise.
  */
-/**
- * How much faster SynState is than `label` where the gap is widest, across the
- * scenarios measured at a single point.
- *
- * The introduction and the landing page each say "up to N× faster", and "up
- * to" is this maximum. Taking it from the data rather than from whoever last
- * read the tables is the whole point: the pages claimed 30× and 16× against a
- * run that gave 20× and 13×.
- */
-const bestRatio = (label: string): string =>
-  count(
-    Math.max(
-      ...[derivedChain, diamond].map((data) =>
-        Math.round(divide(median(data, label), median(data, 'SynState'))),
-      ),
-    ),
-  );
-
 const ms = (value: number): string =>
   value < 100
     ? (`${value.toFixed(1)} ms` as const)
