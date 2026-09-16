@@ -436,13 +436,13 @@ nothing asked. Reach for it when the change is genuinely repository-wide — a
 shared config, a dependency bump, a codemod — and otherwise pick from this
 table. `pnpm run fmt` is cheap and belongs on every change.
 
-| the diff touches            | run                                                                     |
-| :-------------------------- | :---------------------------------------------------------------------- |
-| TypeScript in a package     | that package's `check:types`, `fix:lint` and `check:test`               |
-| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`                |
-| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                               |
-| a `package.json`, lockfile  | `check:knip`, `check:published-deps`, and a build of what depends on it |
-| workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                 |
+| the diff touches            | run                                                                                       |
+| :-------------------------- | :---------------------------------------------------------------------------------------- |
+| TypeScript in a package     | that package's `check:types`, `fix:lint` and `check:test`                                 |
+| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`                                  |
+| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                 |
+| a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it |
+| workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                                   |
 
 **What this trades away is worth naming.** `check-all` also runs the codemods
 and the whole-repository formatting pass, so a targeted run can leave the tree
@@ -906,6 +906,77 @@ but against a merge base and a single directory rather than an ignore list. It
 calls `check-gates.yml` with `diff-scope: none`, which answers the branch
 question and skips the checkout: it has one job, so a gate that installs to
 save one runner would cost more than it saves.
+
+## What the check workflows run
+
+A pull request's checks are about forty matrix entries across five workflows,
+and what each entry runs is a script name that resolves through the root
+manifest into other scripts, and through the `ws:` commands into every
+package's. So two things are invisible by reading any one file: a command
+already covered by another one looks exactly like a command that is not, and a
+check nothing runs looks exactly like a check that passes.
+
+`pnpm run check:root:ci-commands` asks both.
+
+Both had happened. `test-node-versions (current)` ran the whole Vitest suite a
+second time on the Node every other workflow already uses, with a second
+`ws:build` in front of it (#1968). In the other direction, six packages'
+READMEs carried code fences that nothing embedded into, which is what
+`check-readme-sample-coverage.mts` was written for — one instance of a question
+nothing was asking in general.
+
+**Most of the covering relation is written down already, so it is read rather
+than restated.** `check:prose` _is_ `pnpm run '/check:prose:.*/'`, and
+`ws:check:types` _is_ a recursive run of every package's `check:types`. The
+guard parses those bodies, so a script that stops calling another stops
+covering it here too. Only what a body cannot show is declared, in
+`DECLARED_COVERAGE`, with the reason beside each: `check:test:cov` runs the
+same suite as `check:test` with `--coverage`, `fix:lint` is `check:lint` with
+`--fix`, and a package's `doc` reaches its embedding steps through a `gen-docs.mts`
+that names neither.
+
+Consequences worth knowing:
+
+- **An argument after the script name is not the same command.**
+  `verify:npm-packages:published` is `pnpm run verify:npm-packages
+--published`, and what `--published` selects — the versions pinned under
+  `verify-npm-packages/published` rather than tarballs packed from the
+  checkout — is a different question. What separates the two is position:
+  everything before the script name is a flag of pnpm's own (`--recursive`,
+  `--if-present`), everything after it is handed to the script. Whether such a
+  variant still covers what it wraps is a judgement, so it goes in
+  `DECLARED_COVERAGE` rather than being read off the body.
+- **A workflow that pins its own Node is left out of the comparison.**
+  `node-version-compatibility.yml`'s `ws:check:test` is covered by
+  `code-check`'s `ws:check:test:cov` on paper and is not the same check,
+  because the Node underneath differs. Which versions that matrix may name is
+  `check-node-support.mts`'s question, and it is the one that caught `current`
+  naming the same version as `volta.node`. The guard reads this off the
+  `setup-node` inputs rather than off the file name, so a workflow that starts
+  pinning a version gets a group of its own with nothing to remember.
+- **A check workflow is one that triggers on `pull_request`**, which is
+  exactly the five. `lint-pull-request.yml` and `skip-ci-label.yml` use
+  `pull_request_target` and run no repository command; `check-gates.yml` is
+  reached through `workflow_call`. A check that only `pnpm-update.yml` or
+  `release.yml` reaches is a check no pull request gets, which is the answer
+  wanted rather than a gap in the reading.
+- **The `z:` namespace is not asked about.** Those are scripts another script
+  or a workflow's own glue invokes — `z:check-should-run` is the diff gate,
+  which `check-gates.yml` calls — never a check in its own right. `verify:`
+  is asked about, because what `verify-npm-packages/` reads is the published
+  artifact rather than the source, which is a check by every meaning except
+  the prefix.
+- **An entry in `UNCOVERED_BY_DESIGN` is a claim, not a silencer.** The five
+  there say that something else already covers the script (a package's
+  `check-all` and `check:cspell`, against the root-level pass) or that it is
+  not a check at all (`verify:npm-packages:published:update` rewrites the
+  pins; `check-all` is a human aid — see "Essential Development Commands").
+  Emptying the list and running the guard is how to find one that has gone
+  dead, the way emptying `words` finds a dead cspell entry.
+- **It needs no wiring of its own.** `check:root` is
+  `pnpm run '/check:root:.*/'`, so a new `check:root:*` is a `code-check`
+  matrix entry the moment it exists — which is also why the guard sees itself
+  as covered.
 
 ## Check triggers, `skip-ci` and out-of-date branches
 

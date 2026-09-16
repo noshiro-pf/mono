@@ -386,6 +386,7 @@ root はワークスペースメンバーではないので、上のビルド順
 | `ts-data-forge`               | `workspace:*` |
 | `ts-fortress`                 | `workspace:*` |
 | `ts-repo-utils`               | `workspace:*` |
+| `ts-std-forge`                | `workspace:*` |
 | `ts-type-forge`               | `workspace:*` |
 
 ## 内部依存はすべて `workspace:` である
