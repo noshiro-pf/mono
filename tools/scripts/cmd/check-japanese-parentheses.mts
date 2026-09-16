@@ -233,7 +233,7 @@ const JAPANESE_RANGES: readonly FixedLengthTuple<2, number>[] = [
   [0x34_00, 0x4d_bf],
   [0x4e_00, 0x9f_ff],
   [0xff_01, 0xff_60],
-];
+] as const;
 
 const isJapanese = (character: string): boolean => {
   const codePoint = character.codePointAt(0);
@@ -299,7 +299,7 @@ const IGNORED_PREFIXES: readonly string[] = [
   'docs/rust_book/',
   'docs/typescript_book/',
   'experimental/',
-];
+] as const;
 
 const IGNORED_PATTERN = /^strict-lib\/v[\d.]+\//u;
 
