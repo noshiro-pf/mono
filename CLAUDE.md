@@ -2166,9 +2166,29 @@ What that is worth: `pnpm run ws:build` went from **4m43s to 34s** on a clean
 checkout (measured). Three of those minutes were eslint-config-typed's
 `gen:rule-types` alone, which regenerates 33 rule-type modules and then runs a
 codemod, Prettier and `eslint --fix` over them. Every entry of the
-`code-check.yml` matrix builds first, and so do three of `style-check.yml`'s,
-so that was paid fifteen-odd times per pull request to produce output that was
-already committed.
+`code-check.yml` matrix built first back then, and two of `style-check.yml`'s
+still do, so that was paid fifteen-odd times per pull request to produce output
+that was already committed.
+
+**`code-check.yml` builds once now, in a `build` job the matrix waits on.**
+Every entry of it needs `dist/`, so fourteen of them ran the same 34-second
+command over the same 27 directories — about eight runner-minutes a pull
+request. The output travels as one tarball (5.9 MB against 42 MB on disk, and
+one upload rather than a walk over 3,875 files at each end), and the matrix
+unpacks it. What that trades is wall clock: the matrix waits on one build
+instead of each entry building alongside the others, so the critical path
+grows by about a minute while the runner time falls by six.
+
+- **`needs.build.result == 'success'` is explicit on the matrix**, because
+  `!cancelled()` would otherwise let the entries run with nothing to download.
+  The aggregate names the build separately, since a failed build reaches it
+  only as a skipped matrix.
+- **The two other workflows that build keep doing it per job.** In
+  `node-version-compatibility.yml`, building on each Node version _is_ the
+  check. In `style-check.yml` only `ws:doc` and `ws:gen` build at all, so a job
+  to serve two entries would cost more than it saves.
+- **No `actions: read` is needed for the download.** `pnpm-update.yml`'s
+  `commit` job already reads a same-run artifact with `contents: read` alone.
 
 Consequences:
 
