@@ -1462,12 +1462,20 @@ addressed to different readers and both are wanted at that moment:
 `gh pr create --draft --label 'skip-ci'` does both in the call that opens it.
 Where the call that opens it cannot carry a label — GitHub's REST API takes
 none when creating a pull request, and the MCP tool over it takes none either
-— label it immediately afterwards, and expect one cancelled workflow run:
-the `opened` event has already started a run, and the `labeled` event cancels
-it through the concurrency group. **That cancellation is the arrangement
-working rather than a failure, and the notification it sends is to be
-ignored** — not investigated, and not re-run. The runner minutes are spent
-either way, so neither order is the cheaper one.
+— label it immediately afterwards. The runner minutes are spent either way:
+the `opened` event has already started a run by then, and the `labeled` event
+cancels it through the concurrency group.
+
+**That cancellation does not read as one, and the red checks it leaves are to
+be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
+`cancelled`, and its `*-result` aggregates conclude **`failure`** — being
+`if: always()` they run anyway, and assert `result == 'success'` against a job
+that was cancelled. What arrives is four "check failed" notifications seconds
+apart, naming nothing that failed. The `labeled` run reports those same four
+contexts `skipped` a moment later and supersedes them, and `no-skip-ci-label`
+goes `pending`, which is what actually holds the merge. So there is nothing to
+investigate and nothing to re-run: by the time the notification is read, the
+red it names has already been superseded.
 
 Consequences worth having in mind:
 
