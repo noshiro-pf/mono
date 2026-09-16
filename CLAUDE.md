@@ -5,14 +5,10 @@
 This file is the instructions for this repository, and is maintained by hand.
 It is the only one — there is no `AGENTS.md` and no generator behind it.
 
-It began as two files — rules vendored from a shared `common-agent-config`
-repository plus a repository-specific appendix — assembled by a generator. That
-arrangement existed so that nine separate repositories could share one set of
-rules; with those repositories merged into this one there is nothing left to
-share, so the pieces were folded together here and the generator removed. The
-same reasoning later collapsed the `AGENTS.md` / `CLAUDE.md` pair, which had
-kept a one-line stub pointing at a 780-line file: one repository, one
-instruction file.
+Both went the same way, for the same reason: the generator assembled rules
+that nine separate repositories shared, and `AGENTS.md` was a one-line stub
+pointing here. Once those repositories were merged into this one, one
+repository meant one instruction file.
 
 ## Repository Layout
 
@@ -708,6 +704,8 @@ The file used to read `* @noshiro-pf`. That was harmless while the rule was
 off, and would have blocked every pull request in the repository the moment it
 was turned on.
 
+## Tokens, secrets and third-party code in a job
+
 **How much third-party code may share a job with a key is a question about the
 key.** There is no blanket rule here, and an earlier version of this note read
 like one. What a compromised dependency in that job can reach is exactly what
@@ -1054,9 +1052,8 @@ report `skipped`. What to know about that:
   comes off.
 - **The label does not hold the merge by itself; `skip-ci-label.yml` does.**
   GitHub refuses to merge a draft natively and has no equivalent for a label,
-  and a skipped job can satisfy a required status check — a pull request that
-  was green and then had `skip-ci` added was measured with all 22 matrix
-  contexts still reading `success`. So the label comes with a required check
+  and a skipped job can satisfy a required status check — see "Required status
+  checks" for the measurement. So the label comes with a required check
   of its own, `no-skip-ci-label`: a **commit status** that `skip-ci-label.yml`
   writes on the head commit at every event — `pending` while the label is
   on, `success` once it is off — through the Status API rather than as the
@@ -1354,15 +1351,28 @@ had accumulated across 41 files before anything asked.
 
 ## Important Instructions
 
-- After making code changes, run `pnpm run fmt`, then check for type errors with
-  `pnpm run check:types` and lint errors with `pnpm run fix:lint` if you changed
-  TypeScript/JavaScript code (`ws:check:types` / `ws:fix:lint` from the root).
-  Fix any errors found.
+- After making code changes, run `pnpm run fmt` and then the checks the diff
+  touches — the table under "Essential Development Commands" says which those
+  are — and fix what they report.
     - Do not use file-level `/* eslint-disable */` or turn off rules in
       `eslint.config.mts` to fix lint errors.
     - Avoid using `// eslint-disable-next-line` whenever possible.
-- **RESTRICTIONS**: Do not perform these actions without explicit user instructions:
-    - Push to GitHub or remote repositories
+- **RESTRICTIONS**: pushing the session's own branch and opening its pull
+  request is the work, not something to ask about — see "Opening a pull
+  request". Do not do any of these without explicit user instructions:
+    - Push to a branch other than the one the session was given. `main` is
+      never one of them: the ruleset refuses a direct push there even from the
+      repository admin.
+    - Force-push, or rebase a branch whose pull request is open — see "After
+      it is open: watch it, and wait before rebasing".
+    - Merge a pull request, arm auto-merge on one, or add `merge-queued`.
+      Those are the author's.
+    - Run the `gh` CLI. It is authenticated as the person who set it up and
+      can do everything that account can — merge, rewrite the repository's
+      settings, delete a branch — which is far more than any of this needs,
+      so it stays a tool a person runs and a session works through the
+      GitHub API instead. `pnpm run unblock-prs` shells out to it, so asking
+      for that is asking for this.
     - Access `~/.ssh` or other sensitive directories
 
 ## Security findings
@@ -1444,17 +1454,25 @@ dash, a curly quote or an accented name still passes.
   is why both are held to the same rule.
 - Include a clear description, link related issues, and add screenshots or logs when helpful.
 - Note any breaking changes using `BREAKING CHANGE: ...`.
-- Make sure CI passes, and that the checks the diff touches pass locally
-  first — see "Essential Development Commands" for which those are.
+- **Run the checks the diff touches locally before opening it** — see
+  "Essential Development Commands" for which those are. Passing CI is what the
+  merge waits for, but CI does not run while `skip-ci` is on, so until the
+  label comes off the local pass is the only evidence there is.
 
-### Opening a pull request: draft, with `skip-ci` on it
+### Opening a pull request: ready for review, with `skip-ci` on it
 
 **Implement the change, run the local checks, and only then open the pull
-request — as a draft, with the `skip-ci` label on it.** The two markers are
-addressed to different readers and both are wanted at that moment:
+request — ready for review, with the `skip-ci` label on it.**
 
-- **Draft is addressed to people.** It says the branch is not asking for
-  review yet, and GitHub refuses to merge a draft natively.
+**Not a draft.** A draft says the branch is not asking to be read yet, and
+that is not how anything here works: nothing pushes a half-finished branch and
+grows it in place, so the pull request appears when the work is complete and
+asks to be read from its first commit. Saying otherwise costs something real —
+GitHub refuses to merge a draft natively, auto-merge cannot be armed on one,
+and `unblock-prs` reports a queued draft rather than acting on it. What the
+branch is actually waiting for is a person, and `skip-ci` says that without
+claiming the work is unfinished.
+
 - **`skip-ci` is addressed to CI.** Every check workflow and both lint jobs skip
   while it is on, and `no-skip-ci-label` holds the merge with a pending status —
   see "Check triggers, `skip-ci` and out-of-date branches". `unblock-prs` looks
@@ -1463,10 +1481,27 @@ addressed to different readers and both are wanted at that moment:
   taken off when its turn comes, which is the one thing that takes it off. See
   "A declared merge order".
 
-`gh pr create --draft --label 'skip-ci'` does both in the call that opens it.
-Adding the label afterwards works, but the `opened` event has already started
-a run by then, which the `labeled` event then cancels through the concurrency
-group — the runner minutes are spent either way.
+**The label goes on immediately after the pull request is opened**, because
+nothing here can put it on in the same call: GitHub's REST API takes no labels
+when creating a pull request, and the MCP tool over it takes none either.
+`gh pr create --label` would do both at once and is not an option — see
+"Important Instructions" for why the `gh` CLI is a person's tool rather than a
+session's. The runner minutes are spent either way: the `opened` event has
+already started a run by the time the label goes on, and the `labeled` event
+cancels it through the concurrency group.
+
+**That cancellation does not read as one, and the red checks it leaves are to
+be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
+`cancelled`, and its `*-result` aggregates conclude **`failure`** — being
+`if: always()` they run anyway, and assert `result == 'success'` against a job
+that was cancelled. What arrives is one "check failed" notification per check
+workflow, naming nothing that failed — five of them there, four within
+seconds and the fifth five minutes later, that run's `gates / check` having
+still been going when the cancel reached it. The `labeled` run reports those
+same contexts `skipped` and supersedes them, and `no-skip-ci-label` goes
+`pending`, which is what actually holds the merge. So there is nothing to
+investigate and nothing to re-run: by the time the notification is read, the
+red it names has already been superseded.
 
 Consequences worth having in mind:
 
@@ -1480,21 +1515,46 @@ Consequences worth having in mind:
   check workflow's trigger list, so removing it starts the whole matrix on the
   commit already pushed — there is no need to push an empty commit to wake
   anything up.
-- **The draft flag alone skips nothing.** A draft is checked like any other
-  pull request, so relying on it instead of the label spends a full matrix on
-  every push to work that is not ready to be read yet.
 - **The label is a pause, not a state to leave a branch in.** A pull request
   that keeps it is one nothing will ever merge: no check runs, and
   `no-skip-ci-label` stays pending. `merge-queued` is how a pause becomes a
   queue position instead — a pull request that has been reviewed and is
   waiting its turn rather than waiting for someone to look at it, and that
   `unblock-prs` will take the label off when its turn comes.
-- **Queueing one is three actions, and `skip-ci` is not among them.** Mark it
-  ready for review, arm auto-merge, add `merge-queued`. The order is forced:
-  auto-merge cannot be armed on a draft, and `unblock-prs` reports a queued
-  draft rather than acting on it. `skip-ci` stays on — taking it off by hand
-  starts a matrix now, which is the thing the queue exists to do one branch at
-  a time.
+- **Queueing one is the author's, and a session does not do it.** Arming
+  auto-merge and adding `merge-queued` are two deliberate statements about
+  landing the branch, and they are made by hand. `skip-ci` is not among them
+  and stays on — taking it off starts a matrix now, which is the thing the
+  queue exists to do one branch at a time.
+
+### After it is open: watch it, and wait before rebasing
+
+**A pull request a session opened stays that session's until it merges or
+closes.** Opening it is not the end of the task. Two things happen to it
+afterwards, and only one of them is the session's to answer on its own.
+
+- **Comments are the session's to notice.** Keep a watch on the pull request
+  running from the moment it exists until it is merged or closed, and read
+  what arrives — a review comment, a bot's finding, a reviewer's question.
+  Where the session has a subscription mechanism for it —
+  `subscribe_pr_activity` in Claude Code's remote environment — subscribe as
+  soon as the pull request is open and leave it subscribed. The events wake
+  the session by themselves, so ending the turn is how to wait for one; a
+  polling loop is not. A session that stops once the pull request exists never
+  sees any of this, and a comment nobody read looks exactly like a comment
+  nobody agreed with.
+    - What to do about one follows the usual rule: a small, in-scope fix
+      belongs on the branch, and anything larger is a question for the author
+      rather than a push.
+- **`main` moving under the branch is not.** Another pull request merges, the
+  branch reads `BEHIND`, and whether to rebase and force-push is a question to
+  ask rather than one to answer — wait for the instruction. Being behind
+  blocks the merge and nothing else (see "A branch behind `main` runs nothing
+  either"), and for a pull request that has been queued the rebase is
+  `unblock-prs`'s job, one branch at a time in the order they declare. A
+  rebase done by hand ahead of that is one the next merge invalidates, and the
+  force-push it takes rewrites commits someone may be part-way through
+  reading.
 
 ### Several pull requests from one session
 
@@ -2117,11 +2177,11 @@ wrapper the build scripts call.
 
 ### Framework and Setup
 
-- Framework: Vitest with globals enabled.
+- Framework: Vitest, with `vitest/globals` enabled — do not import `test`,
+  `expect`, `assert` or `describe` explicitly.
 - Place unit tests near source files or under `test/` using `*.test.mts`.
 - Maintain meaningful coverage; exclude simple re-export files.
 - Run tests locally with `pnpm run test` during development.
-- `vitest/globals` are enabled. Do not import `test`, `expect`, `assert`, or `describe` explicitly.
 - A package with a browser project runs the same files in both projects. A test
   that needs a DOM goes in `test/browser/`, which the Node.js project's
   `include` leaves out.
@@ -2163,7 +2223,7 @@ When implementing new features, follow this TDD workflow:
 
 ### Testing Approach
 
-This project uses **Vitest** with a dual testing strategy:
+Tests are written in two layers:
 
 1. **Compile-time type testing** via the `expectType` utility.
 2. **Runtime behavioral testing** with standard assertions.
@@ -2469,6 +2529,11 @@ const xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 // eslint-disable-next-line functional/immutable-data
 xs[0] = 100;
+
+const obj = { value: 'old value' };
+
+// error  Modifying an existing object/array is not allowed  functional/immutable-data
+obj.value = 'new value';
 ```
 
 ```ts
@@ -2481,6 +2546,10 @@ mut_temp = 2;
 const mut_xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 mut_xs[0] = 100;
+
+const mut_obj = { value: 'old value' };
+
+mut_obj.value = 'new value';
 ```
 
 #### vitest/no-conditional-expect
@@ -2500,21 +2569,6 @@ You can write it like this using the `assert` function, which narrows down the t
 assert.isTrue(Result.isErr(result));
 
 assert.deepStrictEqual(result.value, { data: [] });
-```
-
-#### functional/immutable-data
-
-NG:
-
-```ts
-// error  Modifying an existing object/array is not allowed  functional/immutable-data
-temp.value = 'new value';
-```
-
-OK:
-
-```ts
-mut_temp.value = 'new value';
 ```
 
 ## About Libraries
