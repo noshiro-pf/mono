@@ -1,6 +1,8 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { pathExists } from 'ts-repo-utils';
+import { benchmarkNumbers } from './benchmark-numbers.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const benchmarkSamplesDir = path.resolve(
@@ -8,7 +10,8 @@ const benchmarkSamplesDir = path.resolve(
   '../../libs/synstate/samples/docs-site/benchmark',
 );
 
-const targetMarkdownFiles: readonly string[] = [
+/** The pages carrying the result tables, and the numbers quoted around them. */
+const tablePages: readonly string[] = [
   path.resolve(
     workspaceRootPath,
     'src/content/docs/guides/library-comparison/benchmark.mdx',
@@ -17,6 +20,28 @@ const targetMarkdownFiles: readonly string[] = [
     workspaceRootPath,
     'src/content/docs/ja/guides/library-comparison/benchmark.mdx',
   ),
+] as const;
+
+/**
+ * Pages that quote a benchmark figure without showing a table.
+ *
+ * The introduction and the landing page each open with "up to N× faster than
+ * Jotai", which is the first number a reader sees and the last one anyone
+ * thinks to update: both said 30× and 16× against a run that gave 20× and
+ * 13×. They carry the same markers as the benchmark page, in the spelling
+ * their format allows — see `inlineMarkers`.
+ */
+const quotingPages: readonly string[] = [
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/getting-started/introduction.md',
+  ),
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/ja/getting-started/introduction.md',
+  ),
+  path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
+  path.resolve(workspaceRootPath, 'src/content/docs/ja/index.mdx'),
 ] as const;
 
 type EmbedTarget = Readonly<{
@@ -105,8 +130,98 @@ const embedOneTarget = async (
   return `${before}\n${results.trim()}\n${after}`;
 };
 
+/**
+ * Rewrites every `{/* bench:<key> *\/}…{/* /bench *\/}` span from
+ * `benchmarkNumbers`.
+ *
+ * The tables above are embedded whole; the sentences around them quote single
+ * numbers out of the same measurements, and those used to be typed in by hand
+ * — which is how a paragraph came to describe a run two re-measurements old.
+ * The markers are a pair rather than a placeholder so that the number stays
+ * readable in the `.mdx` source and shows up in the diff when it moves.
+ */
+const embedInlineNumbers = (
+  markdown: string,
+  targetMarkdownFile: string,
+  mut_usedKeys: Set<string>,
+): string => {
+  const numbers = benchmarkNumbers();
+
+  return inlineMarkers.reduce(
+    (mut_content, { pattern, render }) =>
+      mut_content.replaceAll(pattern, (_match, key: string | undefined) => {
+        const value = key === undefined ? undefined : numbers[key];
+
+        if (key === undefined || value === undefined) {
+          throw new Error(
+            `❌ no benchmark number named '${key}' (used in ${path.relative(workspaceRootPath, targetMarkdownFile)})`,
+          );
+        }
+
+        mut_usedKeys.add(key);
+
+        return render(key, value);
+      }),
+    markdown,
+  );
+};
+
+/**
+ * The two spellings a marker takes, one per document format.
+ *
+ * MDX has no HTML comments and Markdown does not evaluate `{…}`, so a marker
+ * written the other way round would render on the page — the same split
+ * `embed-bundle-size.mts` already lives with. A page is only ever one of the
+ * two, so running both passes over it is a no-op for the form it does not use.
+ *
+ * `[\s\S]*?` rather than something that excludes `{`: an entry whose value is
+ * a whole `$…$` expression carries braces of its own, and KaTeX's thousands
+ * separator is written `100{,}000`.
+ */
+const inlineMarkers: readonly Readonly<{
+  pattern: RegExp;
+  render: (key: string, value: string) => string;
+}>[] = [
+  {
+    pattern:
+      /\{\/\* bench:(?<key>[^\s*]+) \*\/\}[\s\S]*?\{\/\* \/bench \*\/\}/gu,
+    render: (key, value) => `{/* bench:${key} */}${value}{/* /bench */}`,
+  },
+  {
+    pattern: /<!-- bench:(?<key>\S+) -->[\s\S]*?<!-- \/bench -->/gu,
+    render: (key, value) => `<!-- bench:${key} -->${value}<!-- /bench -->`,
+  },
+] as const;
+
+/**
+ * Fails on an emphasis Prettier could not round-trip.
+ *
+ * Measured on this file: in some paragraphs — not all, and what makes the
+ * difference is not apparent — Prettier rewrites `**{marker}32{/marker}×
+ * slower**` as `**…× slower\*\*`, so the page renders a literal `**`. MDX
+ * itself parses the original correctly, so nothing else notices.
+ *
+ * The escape is stable once written, which is what makes it worth a check
+ * rather than a note: Prettier reproduces it, and the page goes on rendering
+ * `**` with every other check green. Running before anything is embedded means
+ * the content judged is the one in the commit, escaped by whoever last
+ * formatted it. The fix is to leave the number outside the emphasis.
+ */
+const assertNoEscapedEmphasis = (
+  markdown: string,
+  targetMarkdownFile: string,
+): void => {
+  if (markdown.includes(String.raw`\*`)) {
+    throw new Error(
+      `❌ ${path.relative(workspaceRootPath, targetMarkdownFile)} contains an escaped '*'. Prettier writes one when it cannot re-emit an emphasis that holds a benchmark marker; move the marker out of the '**…**'.`,
+    );
+  }
+};
+
 const embedBenchmark = async (): Promise<void> => {
-  for (const targetMarkdownFile of targetMarkdownFiles) {
+  const mut_usedKeys = new Set<string>();
+
+  for (const targetMarkdownFile of tablePages.concat(quotingPages)) {
     const fileExists = await pathExists(targetMarkdownFile);
 
     if (!fileExists) {
@@ -118,7 +233,11 @@ const embedBenchmark = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     let mut_markdown = await fs.readFile(targetMarkdownFile, 'utf8');
 
-    for (const target of targets) {
+    assertNoEscapedEmphasis(mut_markdown, targetMarkdownFile);
+
+    for (const target of tablePages.includes(targetMarkdownFile)
+      ? targets
+      : []) {
       mut_markdown = await embedOneTarget(
         mut_markdown,
         targetMarkdownFile,
@@ -126,9 +245,30 @@ const embedBenchmark = async (): Promise<void> => {
       );
     }
 
+    mut_markdown = embedInlineNumbers(
+      mut_markdown,
+      targetMarkdownFile,
+      mut_usedKeys,
+    );
+
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(targetMarkdownFile, mut_markdown, 'utf8');
   }
+
+  // A key nothing uses is a number the prose stopped quoting, and the entry
+  // that computes it is the only thing still asserting the measurement is
+  // there. Report it rather than leaving it to rot beside the ones in use.
+  const unused = Object.keys(benchmarkNumbers()).filter(
+    (key) => !mut_usedKeys.has(key),
+  );
+
+  if (Arr.isNonEmpty(unused)) {
+    throw new Error(
+      `❌ benchmark numbers named by no marker: ${unused.join(', ')}`,
+    );
+  }
+
+  console.info(`✓ Embedded ${mut_usedKeys.size.toString()} inline numbers`);
 };
 
 const result = await embedBenchmark().catch((error: unknown) => error);

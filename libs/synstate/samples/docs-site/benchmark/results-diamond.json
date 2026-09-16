@@ -1,0 +1,49 @@
+{
+  "kind": "stats",
+  "meta": {
+    "updates": 100000,
+    "timeoutMs": null
+  },
+  "rows": [
+    {
+      "label": "SynState",
+      "median": 38.97,
+      "min": 37.36,
+      "max": 44.99,
+      "p95": 44.52,
+      "opsPerSec": 2566072
+    },
+    {
+      "label": "RxJS",
+      "median": 10.58,
+      "min": 10.07,
+      "max": 11.77,
+      "p95": 11.72,
+      "opsPerSec": 9449963
+    },
+    {
+      "label": "MobX",
+      "median": 78.29,
+      "min": 76.62,
+      "max": 106.63,
+      "p95": 80.48,
+      "opsPerSec": 1277365
+    },
+    {
+      "label": "Jotai",
+      "median": 572.1,
+      "min": 557.65,
+      "max": 596.98,
+      "p95": 589.1,
+      "opsPerSec": 174796
+    },
+    {
+      "label": "Redux",
+      "median": 316.63,
+      "min": 290.92,
+      "max": 349.59,
+      "p95": 343.66,
+      "opsPerSec": 315828
+    }
+  ]
+}

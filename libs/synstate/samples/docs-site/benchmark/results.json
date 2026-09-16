@@ -1,0 +1,65 @@
+{
+  "kind": "stats",
+  "meta": {
+    "updates": 100000,
+    "timeoutMs": null
+  },
+  "rows": [
+    {
+      "label": "SynState",
+      "median": 18.49,
+      "min": 16.65,
+      "max": 30.03,
+      "p95": 23.78,
+      "opsPerSec": 5407526
+    },
+    {
+      "label": "RxJS",
+      "median": 4.04,
+      "min": 3.85,
+      "max": 5.04,
+      "p95": 4.62,
+      "opsPerSec": 24773929
+    },
+    {
+      "label": "MobX",
+      "median": 59.2,
+      "min": 58.23,
+      "max": 59.92,
+      "p95": 59.64,
+      "opsPerSec": 1689179
+    },
+    {
+      "label": "Jotai",
+      "median": 375.85,
+      "min": 369.12,
+      "max": 387.47,
+      "p95": 386.05,
+      "opsPerSec": 266061
+    },
+    {
+      "label": "Redux",
+      "median": 245.71,
+      "min": 228.01,
+      "max": 267.99,
+      "p95": 261.8,
+      "opsPerSec": 406979
+    },
+    {
+      "label": "Zustand",
+      "median": 3.21,
+      "min": 3.01,
+      "max": 3.6,
+      "p95": 3.33,
+      "opsPerSec": 31116631
+    },
+    {
+      "label": "Valtio",
+      "median": 24.75,
+      "min": 24.15,
+      "max": 25.15,
+      "p95": 25.05,
+      "opsPerSec": 4040299
+    }
+  ]
+}

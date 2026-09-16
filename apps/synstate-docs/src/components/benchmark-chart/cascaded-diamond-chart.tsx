@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { cascadedDiamondResults, toColouredSeries } from './benchmark-data.mjs';
 import { BenchmarkLineChart } from './benchmark-line-chart.js';
 
 /**
@@ -19,49 +20,13 @@ export const CascadedDiamondChart = React.memo(() => (
 
 CascadedDiamondChart.displayName = 'CascadedDiamondChart';
 
-const series = [
-  {
-    label: 'SynState',
-    color: '#3b82f6',
-    values: [0.5, 0.6, 0.5, 0.5, 0.8, 1.9, 6.2, 23.1, 90.8, 359.2],
-  },
-  {
-    label: 'RxJS',
-    color: '#ef4444',
-    values: [
-      0.2,
-      0.5,
-      2.1,
-      11.1,
-      60.2,
-      373.9,
-      2018.1,
-      undefined,
-      undefined,
-      undefined,
-    ],
-  },
-  {
-    label: 'Jotai',
-    color: '#f59e0b',
-    values: [1.5, 1.9, 2.5, 5.3, 7.2, 13, 35.9, 116.4, 414.5, undefined],
-  },
-  {
-    label: 'MobX',
-    color: '#8b5cf6',
-    values: [1, 0.6, 0.9, 0.8, 0.9, 0.9, 1, 1.1, 1.2, 1.3],
-  },
-] as const;
+const colors = {
+  SynState: '#3b82f6',
+  RxJS: '#ef4444',
+  Jotai: '#f59e0b',
+  MobX: '#8b5cf6',
+} as const;
 
-const xLabels = [
-  '2',
-  '4',
-  '6',
-  '8',
-  '10',
-  '12',
-  '14',
-  '16',
-  '18',
-  '20',
-] as const;
+const series = toColouredSeries(cascadedDiamondResults, colors);
+
+const xLabels = cascadedDiamondResults.xLabels;

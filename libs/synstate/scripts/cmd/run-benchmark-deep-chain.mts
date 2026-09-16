@@ -6,11 +6,15 @@ import { type SafeUint } from 'ts-type-forge';
  * (apps/synstate-docs/src/components/throughput-demo/adapters/) to ensure
  * the benchmark measures the same reactive chain topology.
  */
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { asSafeUint, range } from 'ts-data-forge';
+import {
+  type BenchmarkSeries,
+  formatBenchmarkCell,
+  writeBenchmarkResults,
+} from '../benchmark-results.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 const WARMUP_ROUNDS = 2;
@@ -163,16 +167,16 @@ const measureRounds = (
  * Measures every parameter pair for a single adapter. Extracted into its own
  * function so that the parameter loop is not nested inside the entry loop.
  */
-const measureEntry = (entry: AdapterEntry): readonly string[] => {
+const measureEntry = (entry: AdapterEntry): readonly (number | null)[] => {
   const { label, createAdapter } = entry;
 
-  const mut_cells: string[] = [];
+  const mut_values: (number | null)[] = [];
 
   let mut_skippingRest = false;
 
   for (const [k, depth] of PARAMS) {
     if (mut_skippingRest) {
-      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
+      mut_values.push(null);
 
       continue;
     }
@@ -188,7 +192,7 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
     const { times, timedOut } = measureRounds(adapter, k, depth);
 
     if (timedOut) {
-      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
+      mut_values.push(null);
 
       mut_skippingRest = true;
 
@@ -200,7 +204,7 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
 
       const med = median(sorted);
 
-      mut_cells.push(`${med.toFixed(1)} ms`);
+      mut_values.push(med);
 
       console.info(
         `  ✓ ${label} K=${k.toString()} M=${depth.toString()}: ${med.toFixed(1)} ms`,
@@ -208,7 +212,7 @@ const measureEntry = (entry: AdapterEntry): readonly string[] => {
     }
   }
 
-  return mut_cells;
+  return mut_values;
 };
 
 console.info(
@@ -220,15 +224,21 @@ const colHeaders = PARAMS.map(
   ([k, m]) => `K=${k.toString()}, M=${m.toString()}`,
 );
 
+const mut_series: BenchmarkSeries[] = [];
+
 const mut_tableLines: string[] = [
   `| Library | ${colHeaders.join(' | ')} |`,
   `| ------- | ${PARAMS.map(() => '----------:').join(' | ')} |`,
 ];
 
 for (const entry of entries) {
-  const cells = measureEntry(entry);
+  const values = measureEntry(entry);
 
-  mut_tableLines.push(`| ${entry.label} | ${cells.join(' | ')} |`);
+  mut_series.push({ label: entry.label, values });
+
+  mut_tableLines.push(
+    `| ${entry.label} | ${values.map((v) => formatBenchmarkCell(v, TIMEOUT_MS)).join(' | ')} |`,
+  );
 }
 
 const tableContent = mut_tableLines.join('\n');
@@ -240,9 +250,14 @@ const benchmarkDir = path.resolve(
   'samples/docs-site/benchmark',
 );
 
-const resultsPath = path.resolve(benchmarkDir, 'results-deep-chain.md');
-
-// eslint-disable-next-line security/detect-non-literal-fs-filename
-await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
-
-console.info(`\n✓ Results written to ${resultsPath}`);
+await writeBenchmarkResults(
+  benchmarkDir,
+  'results-deep-chain.md',
+  tableContent,
+  {
+    kind: 'series',
+    meta: { updates: null, timeoutMs: TIMEOUT_MS },
+    xLabels: colHeaders,
+    series: mut_series,
+  },
+);
