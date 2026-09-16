@@ -77,7 +77,7 @@ on:
 # Deny by default; each job grants back what it needs. Neither writes through
 # `GITHUB_TOKEN` — the branch and the pull request go through the App token in
 # `commit` — so `contents: read` is the whole of it. See the note in
-# type-check.yml.
+# code-check.yml.
 permissions: {}
 
 jobs:

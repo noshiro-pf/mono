@@ -33,7 +33,7 @@ name: Check Gates
 #   its output, which is the shape this workflow already had for the branch
 #   question.
 # - A skipped matrix job produces one check run named after the *job*, never
-#   the `type-check (…)` matrix contexts. While those were the required
+#   the `code-check (…)` matrix contexts. While those were the required
 #   status checks, skipping the job at job level would have left them missing
 #   — "Expected", blocking forever. Only since the `*-result` aggregates
 #   became the required contexts is a job-level skip safe here.
@@ -76,7 +76,7 @@ name: Check Gates
 #
 # `workflow_call` rather than the same shell copied into four workflows:
 # there is one answer to give and one place to change it. Callers fail open —
-# see the note on the `if` in type-check.yml.
+# see the note on the `if` in code-check.yml.
 
 on:
   workflow_call:
@@ -84,7 +84,7 @@ on:
       diff-scope:
         description: >-
           Which ignore list in the root `package.json` to gate on: `code` for
-          type-check.yml and node-version-compatibility.yml, `style` for
+          code-check.yml and node-version-compatibility.yml, `style` for
           style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
           the diff question altogether, for the one workflow that gates itself
           in shell — the gate then costs one API call and no checkout.
@@ -92,7 +92,7 @@ on:
         required: true
       result-job:
         description: >-
-          The id of the caller's aggregate job (`type-check-result`, …), whose
+          The id of the caller's aggregate job (`code-check-result`, …), whose
           conclusion in an earlier run on the same head is what gets reused.
         type: string
         required: true

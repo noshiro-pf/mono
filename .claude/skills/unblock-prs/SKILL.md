@@ -185,8 +185,8 @@ gh pr checks <number> --json name,bucket,link --jq '.[] | select(.bucket=="fail"
 gh run view --job <job-id> --log-failed
 ```
 
-**The check name is the command.** `style-check (X)` and `type-check (X)` both
-run `pnpm run X` at the repository root, so `type-check (check:knip)` reproduces as
+**The check name is the command.** `style-check (X)` and `code-check (X)` both
+run `pnpm run X` at the repository root, so `code-check (check:knip)` reproduces as
 `pnpm run check:knip`. Four checks do not follow that rule:
 
 | Check                        | What to run                                                     |
@@ -203,7 +203,7 @@ a title means nothing to any workflow, which reads the label instead.
 
 Two things about reproducing the rest:
 
-- `type-check (*)`, `style-check (ws:doc)`, `style-check (ws:check:ext)` and
+- `code-check (*)`, `style-check (ws:doc)`, `style-check (ws:check:ext)` and
   `style-check (ws:gen)` run `pnpm run ws:build` first in CI. Do the same
   locally or they fail for the wrong reason.
 - Every job ends with `z:assert-repo-is-clean`. So `fix:fmt:full`, `ws:doc`,
@@ -219,7 +219,7 @@ push to the branch, and go back to watching. Auto-merge survives the push, so a
 green result merges the PR without another command. Do not re-rebase for a fix
 unless `main` has moved.
 
-`type-check` and `node-version-compatibility` jobs gate on
+`code-check` and `node-version-compatibility` jobs gate on
 `z:check-should-run:code-checks`, and `style-check` jobs on
 `z:check-should-run:style-checks`; both diff against `origin/main`. A job that
 reports green having skipped its steps is expected on a docs-only branch (or,

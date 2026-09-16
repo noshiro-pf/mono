@@ -1,7 +1,7 @@
 name: Skip CI Label
 
 # `skip-ci` on a pull request skips the four check workflows and the two lint
-# jobs — see the note in type-check.yml. GitHub has no label-based merge
+# jobs — see the note in code-check.yml. GitHub has no label-based merge
 # block, so on its own the label would leave a pull request that nothing
 # checked looking exactly like one that passed. This is the block: a required
 # status check, `no-skip-ci-label`, that stays `pending` for as long as the label
