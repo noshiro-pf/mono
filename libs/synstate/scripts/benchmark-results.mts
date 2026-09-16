@@ -32,15 +32,18 @@ export const formatBenchmarkCell = (
   value: number | null,
   timeoutMs: number,
 ): string =>
-  value === null ? `> ${timeoutMs.toString()} ms` : `${value.toFixed(1)} ms`;
+  value === null
+    ? (`> ${timeoutMs.toString()} ms` as const)
+    : (`${value.toFixed(1)} ms` as const);
 
-export type BenchmarkResults =
-  | Readonly<{
+export type BenchmarkResults = Readonly<
+  | {
       kind: 'series';
       xLabels: readonly string[];
       series: readonly BenchmarkSeries[];
-    }>
-  | Readonly<{ kind: 'stats'; rows: readonly BenchmarkStats[] }>;
+    }
+  | { kind: 'stats'; rows: readonly BenchmarkStats[] }
+>;
 
 /**
  * Writes one scenario's results twice: the Markdown table the docs embed, and
@@ -94,15 +97,15 @@ export const writeBenchmarkResults = async (
  */
 const normalize = (data: BenchmarkResults): BenchmarkResults =>
   data.kind === 'series'
-    ? {
+    ? ({
         kind: 'series',
         xLabels: data.xLabels,
         series: data.series.map((s) => ({
           label: plainLabel(s.label),
           values: s.values.map((v) => (v === null ? null : round(v, 1))),
         })),
-      }
-    : {
+      } as const)
+    : ({
         kind: 'stats',
         rows: data.rows.map((r) => ({
           label: plainLabel(r.label),
@@ -112,7 +115,7 @@ const normalize = (data: BenchmarkResults): BenchmarkResults =>
           p95: round(r.p95, 2),
           opsPerSec: r.opsPerSec,
         })),
-      };
+      } as const);
 
 const plainLabel = (label: string): string => label.replaceAll('*', '');
 
