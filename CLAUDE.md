@@ -5,14 +5,10 @@
 This file is the instructions for this repository, and is maintained by hand.
 It is the only one — there is no `AGENTS.md` and no generator behind it.
 
-It began as two files — rules vendored from a shared `common-agent-config`
-repository plus a repository-specific appendix — assembled by a generator. That
-arrangement existed so that nine separate repositories could share one set of
-rules; with those repositories merged into this one there is nothing left to
-share, so the pieces were folded together here and the generator removed. The
-same reasoning later collapsed the `AGENTS.md` / `CLAUDE.md` pair, which had
-kept a one-line stub pointing at a 780-line file: one repository, one
-instruction file.
+Both went the same way, for the same reason: the generator assembled rules
+that nine separate repositories shared, and `AGENTS.md` was a one-line stub
+pointing here. Once those repositories were merged into this one, one
+repository meant one instruction file.
 
 ## Repository Layout
 
@@ -708,6 +704,8 @@ The file used to read `* @noshiro-pf`. That was harmless while the rule was
 off, and would have blocked every pull request in the repository the moment it
 was turned on.
 
+## Tokens, secrets and third-party code in a job
+
 **How much third-party code may share a job with a key is a question about the
 key.** There is no blanket rule here, and an earlier version of this note read
 like one. What a compromised dependency in that job can reach is exactly what
@@ -1054,9 +1052,8 @@ report `skipped`. What to know about that:
   comes off.
 - **The label does not hold the merge by itself; `skip-ci-label.yml` does.**
   GitHub refuses to merge a draft natively and has no equivalent for a label,
-  and a skipped job can satisfy a required status check — a pull request that
-  was green and then had `skip-ci` added was measured with all 22 matrix
-  contexts still reading `success`. So the label comes with a required check
+  and a skipped job can satisfy a required status check — see "Required status
+  checks" for the measurement. So the label comes with a required check
   of its own, `no-skip-ci-label`: a **commit status** that `skip-ci-label.yml`
   writes on the head commit at every event — `pending` while the label is
   on, `success` once it is off — through the Status API rather than as the
@@ -1354,10 +1351,9 @@ had accumulated across 41 files before anything asked.
 
 ## Important Instructions
 
-- After making code changes, run `pnpm run fmt`, then check for type errors with
-  `pnpm run check:types` and lint errors with `pnpm run fix:lint` if you changed
-  TypeScript/JavaScript code (`ws:check:types` / `ws:fix:lint` from the root).
-  Fix any errors found.
+- After making code changes, run `pnpm run fmt` and then the checks the diff
+  touches — the table under "Essential Development Commands" says which those
+  are — and fix what they report.
     - Do not use file-level `/* eslint-disable */` or turn off rules in
       `eslint.config.mts` to fix lint errors.
     - Avoid using `// eslint-disable-next-line` whenever possible.
@@ -1464,9 +1460,14 @@ addressed to different readers and both are wanted at that moment:
   "A declared merge order".
 
 `gh pr create --draft --label 'skip-ci'` does both in the call that opens it.
-Adding the label afterwards works, but the `opened` event has already started
-a run by then, which the `labeled` event then cancels through the concurrency
-group — the runner minutes are spent either way.
+Where the call that opens it cannot carry a label — GitHub's REST API takes
+none when creating a pull request, and the MCP tool over it takes none either
+— label it immediately afterwards, and expect one cancelled workflow run:
+the `opened` event has already started a run, and the `labeled` event cancels
+it through the concurrency group. **That cancellation is the arrangement
+working rather than a failure, and the notification it sends is to be
+ignored** — not investigated, and not re-run. The runner minutes are spent
+either way, so neither order is the cheaper one.
 
 Consequences worth having in mind:
 
@@ -1495,6 +1496,35 @@ Consequences worth having in mind:
   draft rather than acting on it. `skip-ci` stays on — taking it off by hand
   starts a matrix now, which is the thing the queue exists to do one branch at
   a time.
+
+### After it is open: watch it, and wait before rebasing
+
+**A pull request a session opened stays that session's until it merges or
+closes.** Opening it is not the end of the task. Two things happen to it
+afterwards, and only one of them is the session's to answer on its own.
+
+- **Comments are the session's to notice.** Keep a watch on the pull request
+  running from the moment it exists until it is merged or closed, and read
+  what arrives — a review comment, a bot's finding, a reviewer's question.
+  Where the session has a subscription mechanism for it —
+  `subscribe_pr_activity` in Claude Code's remote environment — subscribe as
+  soon as the pull request is open and leave it subscribed. The events wake
+  the session by themselves, so ending the turn is how to wait for one; a
+  polling loop is not. A session that stops at `gh pr create` never sees any
+  of this, and a comment nobody read looks exactly like a comment nobody
+  agreed with.
+    - What to do about one follows the usual rule: a small, in-scope fix
+      belongs on the branch, and anything larger is a question for the author
+      rather than a push.
+- **`main` moving under the branch is not.** Another pull request merges, the
+  branch reads `BEHIND`, and whether to rebase and force-push is a question to
+  ask rather than one to answer — wait for the instruction. Being behind
+  blocks the merge and nothing else (see "A branch behind `main` runs nothing
+  either"), and for a pull request that has been queued the rebase is
+  `unblock-prs`'s job, one branch at a time in the order they declare. A
+  rebase done by hand ahead of that is one the next merge invalidates, and the
+  force-push it takes rewrites commits someone may be part-way through
+  reading.
 
 ### Several pull requests from one session
 
@@ -2117,11 +2147,11 @@ wrapper the build scripts call.
 
 ### Framework and Setup
 
-- Framework: Vitest with globals enabled.
+- Framework: Vitest, with `vitest/globals` enabled — do not import `test`,
+  `expect`, `assert` or `describe` explicitly.
 - Place unit tests near source files or under `test/` using `*.test.mts`.
 - Maintain meaningful coverage; exclude simple re-export files.
 - Run tests locally with `pnpm run test` during development.
-- `vitest/globals` are enabled. Do not import `test`, `expect`, `assert`, or `describe` explicitly.
 - A package with a browser project runs the same files in both projects. A test
   that needs a DOM goes in `test/browser/`, which the Node.js project's
   `include` leaves out.
@@ -2163,7 +2193,7 @@ When implementing new features, follow this TDD workflow:
 
 ### Testing Approach
 
-This project uses **Vitest** with a dual testing strategy:
+Tests are written in two layers:
 
 1. **Compile-time type testing** via the `expectType` utility.
 2. **Runtime behavioral testing** with standard assertions.
@@ -2469,6 +2499,11 @@ const xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 // eslint-disable-next-line functional/immutable-data
 xs[0] = 100;
+
+const obj = { value: 'old value' };
+
+// error  Modifying an existing object/array is not allowed  functional/immutable-data
+obj.value = 'new value';
 ```
 
 ```ts
@@ -2481,6 +2516,10 @@ mut_temp = 2;
 const mut_xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 mut_xs[0] = 100;
+
+const mut_obj = { value: 'old value' };
+
+mut_obj.value = 'new value';
 ```
 
 #### vitest/no-conditional-expect
@@ -2500,21 +2539,6 @@ You can write it like this using the `assert` function, which narrows down the t
 assert.isTrue(Result.isErr(result));
 
 assert.deepStrictEqual(result.value, { data: [] });
-```
-
-#### functional/immutable-data
-
-NG:
-
-```ts
-// error  Modifying an existing object/array is not allowed  functional/immutable-data
-temp.value = 'new value';
-```
-
-OK:
-
-```ts
-mut_temp.value = 'new value';
 ```
 
 ## About Libraries
