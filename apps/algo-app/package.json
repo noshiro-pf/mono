@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "better-preact-use-state": "workspace:*",
-    "firebase": "^12.18.0",
+    "firebase": "^12.19.0",
     "goober": "^2.1.19",
     "immer": "^11.1.18",
     "preact-utils": "workspace:*",

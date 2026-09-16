@@ -32,7 +32,7 @@
   "dependencies": {
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2",
-    "firebase": "^12.18.0",
+    "firebase": "^12.19.0",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*"
   },

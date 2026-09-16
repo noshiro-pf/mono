@@ -43,7 +43,7 @@
     "@emotion/styled": "^11.14.1",
     "better-react-use-state": "workspace:*",
     "event-schedule-app-shared": "workspace:*",
-    "firebase": "^12.18.0",
+    "firebase": "^12.19.0",
     "html2canvas": "^1.4.1",
     "normalize.css": "^8.0.1",
     "numeric-input-utils": "workspace:*",
