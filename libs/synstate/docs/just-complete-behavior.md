@@ -54,7 +54,7 @@ auth$.pipe(
 
 ## `complete()` による subscriber clear の影響
 
-`complete()` は subscriber map を clear する (create-observable-base.mts の `completeBase`)。
+`complete()` は subscriber map を clear する（create-observable-base.mts の `completeBase`）。
 `just` の場合は初期値が snapshot として保持されているため、
 completed 後に `.pipe()` で子を繋いでも子の factory が snapshot を読める。
 

@@ -51,7 +51,7 @@ export const parse = (value: string): Result<number, ParseError> => {
   const viaNumber = Number(value);
 
   // `Number('')` / `Number('   ')` は 0 を返すが、`parseFloat` は NaN を返す。
-  // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
+  // 末尾不正文字（'12abc' 等）は `Number` 側が NaN にするので、両者が共に
   // 非 NaN かつ有限の場合のみ採用することで空文字・空白のみ・末尾不正・
   // Infinity をまとめて弾く。
   return Number.isNaN(viaNumber) ||

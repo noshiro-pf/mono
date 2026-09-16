@@ -60,7 +60,7 @@ needed to build, test or lint.
 - `apps/*` — アプリケーション。
 - `tools/` — リポジトリ内部向けのツール。
     - `tools/configs/` — root と各パッケージが共有する TypeScript / Vite / Rollup 設定。
-    - `tools/scripts/cmd/` — リポジトリ全体のコマンド (`check-all`, `ws-build-stages` など)。
+    - `tools/scripts/cmd/` — リポジトリ全体のコマンド（`check-all`, `ws-build-stages` など）。
 - `github/` — [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code) で適用する GitHub リポジトリ設定。
 - `articles/`, `books/` — Zenn のコンテンツ。[Zenn](#zenn) を参照。
 - `docs/` — 雑多なメモ。lint 対象外。
