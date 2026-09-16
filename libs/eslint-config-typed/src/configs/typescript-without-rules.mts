@@ -163,3 +163,43 @@ const eslintPluginImportXSettings = {
     // },
   },
 } as const;
+
+if (import.meta.vitest !== undefined) {
+  describe('buildVersionedTypesConditionNames', () => {
+    test('claims every minor up to the running one, and none above it', () => {
+      const result = buildVersionedTypesConditionNames('6.0');
+
+      expect(result).toContain('types@>=5.5'); // what jotai 3 declares
+
+      expect(result).toContain('types@>=6.0');
+
+      expect(result).not.toContain('types@>=6.1');
+
+      expect(result).not.toContain('types@>=7.0');
+    });
+
+    test('an older compiler does not claim a newer condition', () => {
+      // The stub jotai points `types` at is correct for 5.4 — it says which
+      // TypeScript is required — so the condition must not be claimed there.
+      expect(buildVersionedTypesConditionNames('5.4')).not.toContain(
+        'types@>=5.5',
+      );
+    });
+
+    test('generates only the `>=` form', () => {
+      assert.isTrue(
+        buildVersionedTypesConditionNames('6.0').every((name) =>
+          name.startsWith('types@>='),
+        ),
+      );
+    });
+
+    test('a version it cannot parse claims nothing', () => {
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('next'), []);
+
+      assert.deepStrictEqual(buildVersionedTypesConditionNames(''), []);
+
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('6'), []);
+    });
+  });
+}
