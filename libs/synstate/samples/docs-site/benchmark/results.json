@@ -1,5 +1,9 @@
 {
   "kind": "stats",
+  "meta": {
+    "updates": 100000,
+    "timeoutMs": null
+  },
   "rows": [
     {
       "label": "SynState",

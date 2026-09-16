@@ -1,5 +1,9 @@
 {
   "kind": "series",
+  "meta": {
+    "updates": 100000,
+    "timeoutMs": 5000
+  },
   "xLabels": [
     "B=2",
     "B=5",

@@ -256,6 +256,7 @@ await writeBenchmarkResults(
   tableContent,
   {
     kind: 'series',
+    meta: { updates: null, timeoutMs: TIMEOUT_MS },
     xLabels: colHeaders,
     series: mut_series,
   },

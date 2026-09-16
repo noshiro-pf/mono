@@ -175,7 +175,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
     benchmarkDir,
     scenario.resultsFile,
     tableContent,
-    { kind: 'stats', rows: mut_rows },
+    { kind: 'stats', meta: { updates: N, timeoutMs: null }, rows: mut_rows },
   );
 };
 

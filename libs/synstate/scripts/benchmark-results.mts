@@ -12,6 +12,30 @@ export type BenchmarkSeries = Readonly<{
   values: readonly (number | null)[];
 }>;
 
+/**
+ * The constants the runner drove the scenario with.
+ *
+ * They are quoted in the prose beside the table — "measurements exceeding
+ * 5,000 ms are aborted", "over $K = 100{,}000$ updates" — and a derived figure
+ * such as "ns per branch per update" cannot be computed without them. Recorded
+ * by the runner rather than repeated in the docs, so that changing `K` in the
+ * runner changes every sentence that names it.
+ */
+export type BenchmarkMeta = Readonly<{
+  /**
+   * Updates driven per measurement — `K` in the scenario's description.
+   * `null` where the sweep varies `K` itself, so that each point's value is
+   * already in its column heading.
+   */
+  updates: number | null;
+
+  /**
+   * A measurement taking longer than this is abandoned and recorded as `null`.
+   * `null` where the scenario has no timeout.
+   */
+  timeoutMs: number | null;
+}>;
+
 /** One library's row in a scenario measured at a single parameter point. */
 export type BenchmarkStats = Readonly<{
   label: string;
@@ -39,10 +63,11 @@ export const formatBenchmarkCell = (
 export type BenchmarkResults = Readonly<
   | {
       kind: 'series';
+      meta: BenchmarkMeta;
       xLabels: readonly string[];
       series: readonly BenchmarkSeries[];
     }
-  | { kind: 'stats'; rows: readonly BenchmarkStats[] }
+  | { kind: 'stats'; meta: BenchmarkMeta; rows: readonly BenchmarkStats[] }
 >;
 
 /**
@@ -99,6 +124,7 @@ const normalize = (data: BenchmarkResults): BenchmarkResults =>
   data.kind === 'series'
     ? ({
         kind: 'series',
+        meta: data.meta,
         xLabels: data.xLabels,
         series: data.series.map((s) => ({
           label: plainLabel(s.label),
@@ -107,6 +133,7 @@ const normalize = (data: BenchmarkResults): BenchmarkResults =>
       } as const)
     : ({
         kind: 'stats',
+        meta: data.meta,
         rows: data.rows.map((r) => ({
           label: plainLabel(r.label),
           median: round(r.median, 2),
