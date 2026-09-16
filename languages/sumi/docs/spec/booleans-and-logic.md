@@ -41,8 +41,8 @@ truthiness(暗黙の boolean 変換)を言語から排除する。`@typescript-e
 
 どちらも禁止。`Boolean(x)` はコンストラクタ静的呼び出しの全面禁止(D-15 — [banned-syntax.md](./banned-syntax.md))に含まれ、`!!x` は暗黙変換 idiom として禁止。真偽の判定は `x !== undefined` / `Arr.isNonEmpty(xs)` / `s !== ''` など意図が伝わる比較で書く。
 
-## 論理代入演算子(確定 2026-09-05 — D-29)
+## 論理代入演算子(確定 2026-09-05 — D-29。`??=` は 2026-09-16 に再確認)
 
-`&&=` / `||=` / `??=` は、代入先が `mut_` 変数であれば **3 つとも許可**する。`&&=` / `||=` のオペランドは `&&` / `||` と同じく両辺 `boolean` のみ(`mut_ok &&= cond` は `mut_ok = mut_ok && cond` と同義)。`??=` は値の合体なので boolean 制約の対象外で、`mut_x ??= init()` の遅延初期化がその用途。`mut_opts ||= {}` のような truthiness idiom はオペランド型の制約で違法になる。
+`&&=` / `||=` / `??=` は、代入先が `mut_` 変数であれば **3 つとも許可**する。`&&=` / `||=` のオペランドは `&&` / `||` と同じく両辺 `boolean` のみ(`mut_ok &&= cond` は `mut_ok = mut_ok && cond` と同義)。`??=` は値の合体なので boolean 制約の対象外で、`let mut_x: T | undefined = undefined;` と明示的に初期化した変数を後から埋める(`mut_x ??= init()`)のがその用途 — 宣言の初期化子が必須([variables-and-mutation.md](./variables-and-mutation.md))でも残る用途なので、`??=` は許可のまま維持する。`mut_opts ||= {}` のような truthiness idiom はオペランド型の制約で違法になる。
 
 - **実装上の注意**: `@typescript-eslint/strict-boolean-expressions` は `LogicalExpression` / 条件位置 / `!` だけを検査し、`AssignmentExpression`(`&&=` / `||=`)のオペランドは検査しない(2026-09-05 実測)。両オペランドの boolean 限定は 🆕 ルール([enforcement-map.md](../enforcement-map.md))。現行 config の `logical-assignment-operators: "always"` は `x = x && y` を `x &&= y` へ寄せる方向で、本規則と整合する。

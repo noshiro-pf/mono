@@ -41,7 +41,7 @@
 
 (D-5 は削除済み。番号は相互参照を保つため欠番とする。)
 
-- **ステータス**: 確定(2026-09-05 — D-27 で承認)
+- **ステータス**: 確定(2026-09-05 — D-27 で承認)。**prelude の実体は D-49 で ts-std-forge に移った**(段階 1・2 とも実施済み。ts-data-forge は当面 re-export)
 - **判断**: 組み込み層(`lib.d.ts` 相当)は strict-ts-lib、言語ネイティブに見せたいユーティリティ(`pipe` / `match` / `Optional` / `Result` 等)は ts-data-forge を prelude として扱う。Sumi lint では ts-data-forge からの明示 import が必要(値の自動 import は transpiler なしでは不可能)。Sumi sugar で transpiler が prelude の import 文を自動挿入する。これに D-24 で確定した **ts-std-forge**(throw する / null を返す stdlib API の Result / Optional ラッパー)を第 3 の層として加え、標準ライブラリは **strict-ts-lib(組み込み層)+ ts-data-forge(prelude)+ ts-std-forge(境界ラッパー)の三層**とする。
 - **理由**: [spec/stdlib.md](./spec/stdlib.md) 参照。型だけなら ts-type-forge 方式(global.d.mts)で Sumi lint から global にできるが、実行時の値はモジュールから来るしかない。
 
@@ -54,10 +54,11 @@
 ## D-8: 言語開発は新トップレベル `languages/` に置く(改訂 2026-08-29)
 
 - **ステータス**: 確定(2026-08-28、2026-08-29 改訂)
-- **判断**: 言語開発用のトップレベル `languages/` を新設し、1 言語 = 1 ディレクトリでその配下にその言語の開発用パッケージを置く。本言語は `languages/sumi/`(仮名。言語名決定後にリネーム)で、適合性コーパスは `languages/sumi/conformance`。workspace glob は `languages/*/*`。ディレクトリ名は既存トップレベル(libs / apps / tools)に合わせて複数形。
+- **判断**: 言語開発用のトップレベル `languages/` を新設し、1 言語 = 1 ディレクトリでその配下にその言語の開発用パッケージを置く。本言語は `languages/sumi/`(言語名は D-16 / D-44 で Sumi に確定)で、適合性コーパスは `languages/sumi/conformance`。workspace glob は `languages/*/*`。ディレクトリ名は既存トップレベル(libs / apps / tools)に合わせて複数形。
 - **理由**: リポジトリの分類基準 — libs = npm 公開パッケージ / tools = リポジトリ開発ツール / docs = 文書 — のどれにも該当しないため(先例は strict-lib)。`languages/` とすることで、今後別の言語や本言語の Sumi sugar / Sumi refined 段階を開発する場合の置き場所に悩まない。docs 配下は CI diff ゲートの ignore 対象のため、フィクスチャ変更で code-checks が走らない問題もこれで回避される。
 - **検討して不採用**: `experimental/` — 本来は実験的コードの置き場(「遺産置き場」は一時的な使い方)だが、構造的に pnpm workspace の外・全チェック対象外であることが同ディレクトリの提供する保証(依存更新で壊れない等)そのものであり、CI でゲートされ続けることが存在意義である適合性コーパスとは要件が正反対のため。
 - **補足**: 将来の専用チェッカーは npm 公開するので libs/ へ置く(Phase 2)。`languages/` に置くのは公開しない開発資産のみ。
+- **現況(2026-09-16)**: 専用チェッカーは D-55 で `@sumi-lang/checker`(`languages/sumi/checker`)として作った。非公開のうちは `languages/` に置き、publish する段で `libs/` へ移す(`@sumi-lang/cli` と同じ — D-46 / D-50)。区分そのものは変わらない。
 
 ## D-9: 適合性フィクスチャはルート `.prettierignore` で除外する
 
@@ -100,10 +101,10 @@
 
 ## D-15: コンストラクタ関数の静的呼び出しを全面禁止する
 
-- **ステータス**: 確定(2026-08-29)
-- **判断**: `Boolean(x)` / `Number(x)` / `String(x)` / `Array(x)` などコンストラクタ関数の関数呼び出し(new なし)をすべて禁止し、代替の生成関数を ts-data-forge(prelude)から提供する。
-- **理由**: これらは暗黙変換の関数形であり、意図(パース・変換・判定)が名前に現れない。専用の生成関数(例: 既存の `Num.safeParseInt` 系)に置き換えることで、変換の失敗が `Result`/`Optional` として型に現れる。
-- **TODO**: ts-data-forge 側の生成関数の網羅(`Boolean`/`String`/`Array` 代替)は未実装 — [spec/stdlib.md](./spec/stdlib.md) のギャップに追加。
+- **ステータス**: 確定(2026-08-29)。**代替 API の置き場は D-41 で ts-std-forge に確定**(2026-09-06)
+- **判断**: `Boolean(x)` / `Number(x)` / `String(x)` / `Array(x)` などコンストラクタ関数の関数呼び出し(new なし)をすべて禁止し、代替の生成関数を **ts-std-forge** から提供する。
+- **理由**: これらは暗黙変換の関数形であり、意図(パース・変換・判定)が名前に現れない。専用の生成関数(例: `SafeNumber.parse` / `SafeNumber.parseInteger`)に置き換えることで、変換の失敗が `Result`/`Optional` として型に現れる。
+- **TODO**: ~~ts-data-forge 側の生成関数の網羅(`Boolean`/`String`/`Array` 代替)は未実装~~ → **D-41 で置き換え(2026-09-06)**。禁止対象と代替の対応表は D-41、`Array(n)` の代替 `SafeArray` は D-54(2026-09-09)。`Boolean(x)` / `Object(x)` / `Function(...)` は代替を置かない(D-41)。
 
 ## D-16: 言語名は Sumi、拡張子は `.sumi`
 
@@ -139,7 +140,7 @@
 - **ステータス**: 確定(2026-08-29)
 - **判断**: Sumi sugar のパイプ演算子(候補 1)は **F# スタイル**(`x |> f` = `f(x)`、右辺は単項関数に評価される式)とする。TC39 が Hack スタイルを選び F# を却下した経緯は理解した上での決定([spec/future-syntax.md](./spec/future-syntax.md) 候補 1 に詳細)。F# スタイルを好むユーザー層の取り込みも狙いに含む。
 - **理由(却下理由が Sumi では成立しないこと)**:
-    1. **ステップごとのクロージャ生成の性能懸念**(エンジン実装者の反対理由)は、ネイティブ実装ではなく transpiler の emit には当てはまらない。さらに prelude(ts-data-forge)が直接形とカリー化形の**二本立て API** を持つため、`xs |> Arr.map(double)` を `Arr.map(double)(xs)` ではなく**直接形 `Arr.map(xs, double)` へ最適化 emit** でき、カリー化のアロケーション自体を消せる。
+    1. **ステップごとのクロージャ生成の性能懸念**(エンジン実装者の反対理由)は、ネイティブ実装ではなく transpiler の emit には当てはまらない。さらに prelude(ts-data-forge)が直接形とカリー化形の**二本立て API** を持つため、`xs |> Arr.map(double)` を `Arr.map(double)(xs)` ではなく**直接形 `Arr.map(xs, double)` へ最適化 emit** でき、カリー化のアロケーション自体を消せる。**この最適化 emit の案は D-37(2026-09-05)で撤回した** — 多対一の変換は Sumi sugar → Sumi lint の逆変換を壊す。却下理由への反論として残るのは 1 文目(transpiler の emit には性能懸念が当てはまらない)の方で、F# スタイルを採る判断自体は変わらない。
     2. **エコシステム分裂懸念**(カリー化・tacit スタイルの奨励が JS 全体を割る)は、カリー化 API を標準に据えた Sumi では分裂ではなく**言語の同一性**である。
     3. **await の構文問題**は残る(下記、未定)。
 - **リスク**: 将来 TS/JS に Hack 版 `|>` が入ると、「独自構文は TS の構文エラーである字面を選ぶ」原則と衝突する。提案は 2021 年の Hack 選定後も Stage 2 で停滞しており発生確率は低いと評価するが、発生時はトークン変更か原則の明示的例外化を再決定する。eject への影響はない(emit に `|>` は現れない)。
@@ -155,7 +156,7 @@
 
 ## D-22: throw しうる stdlib API は Result ラッパーに一択化し、素の形を禁止する
 
-- **ステータス**: 確定(2026-08-29)
+- **ステータス**: 確定(2026-08-29)。**ラッパーの置き場は同日の D-24 で新ライブラリ ts-std-forge に移り、prelude の実体も D-49 で ts-std-forge になった**(下の「prelude(ts-data-forge)」は当時の層の呼び方)
 - **判断**: 標準ライブラリの「値依存で throw しうる」API は、prelude(ts-data-forge)の Result 返しラッパーに一択化し、素の形の使用を禁止する(D-21 の一般原則「参照すべき定義は一択」の throw 系への適用)。将来的には Sumi の lib 構成側で素の宣言を落とし、lint ではなく型エラーにする。
 - **理由**: 失敗が型(`Result`)に現れる形へ寄せる(exceptions.md の方針)。`Number.parseInt` vs `Num.safeParseInt` の「どちらが最終一択か」も本決定で解決 — **最終一択は prelude 側**。
 - **規模**: [throwing-stdlib-survey.md](./throwing-stdlib-survey.md) に調査済み。型・immutability・既存禁止で到達不能な throw を除外すると、コアの新規ラップ対象は約 17、family(TypedArray 系・Intl)込みで 100 前後(Temporal 除く)。
@@ -171,15 +172,15 @@
 ## D-24: safe stdlib wrapper は一方向依存の新ライブラリとする
 
 - **ステータス**: 確定(2026-08-29)。**依存方向は D-49 で反転する方針**(ts-data-forge → ts-std-forge。2026-09-08、実施は段階計画)
-- **判断**: D-22 のラッパー群は ts-data-forge に追加し続けるのではなく、新ライブラリ(仮名 **ts-std-forge**、`libs/`)に実装する。依存は **ts-std-forge → ts-data-forge の一方向のみ**。
+- **判断**: D-22 のラッパー群は ts-data-forge に追加し続けるのではなく、新ライブラリ **ts-std-forge**(`libs/ts-std-forge`)に実装する。依存は **ts-std-forge → ts-data-forge の一方向のみ**。
 - **理由**: ts-data-forge は ADT コア(Result/Optional/pipe)とデータ構造の両方を持つため、分割時の相互依存が懸念されたが、「**ts-data-forge は境界の実装者として、自身の内部では素の stdlib を直接使ってよい**」と定義すれば wrapper への逆依存は構造的に発生しない。歴史的に ts-data-forge にある `Json.*` / `Num.safeParse*` は当面動かさず、新 lib の re-export facade で一択の入口を作る(実体移動は将来の major)。
-- **実施**: scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)(`Regex.create` / `SafeDate.toISOString` を TDD で実装済み)。パッケージ名は初回 publish(手動 — libs/first-release.md)まで仮。
+- **実施**: scaffold は [#1709](https://github.com/noshiro-pf/mono/pull/1709)(`Regex.create` / `SafeDate.toISOString` を TDD で実装済み)。パッケージ名は初回 publish(手動 — libs/first-release.md)で確定し、npm 公開済み(D-49 の検討事項 (a) — 改名するなら公開後の別問題)。
 
 ## D-25: Sumi lint preset は `languages/sumi/eslint-config`(パッケージ名 @sumi-lang/eslint-config)、dogfood 第一対象は ts-std-forge
 
 - **ステータス**: 確定(2026-08-31)
 - **判断**:
-    - Phase 1 の subset ESLint preset(D-10 の独立パッケージ)は `languages/sumi/eslint-config` に置き、パッケージ名は **@sumi-lang/eslint-config**(仮名。非公開)とする。仕様に属する新規 lint ルール(enforcement-map の 🆕)も同パッケージに eslint-plugin として同梱する。
+    - Phase 1 の subset ESLint preset(D-10 の独立パッケージ)は `languages/sumi/eslint-config` に置き、パッケージ名は **@sumi-lang/eslint-config**(非公開。scope は D-50 で確定)とする。仕様に属する新規 lint ルール(enforcement-map の 🆕)も同パッケージに eslint-plugin として同梱する。
     - dogfood の第一対象は **ts-std-forge**(最小・新規・こちらで完全に制御可能)。第二候補: octokit-safe-types(小規模で型付きルールの効きが見える)、synstate(class-less 化済みで言語の想定スタイルに最も近いが中規模)。
 - **理由**: 公開は当面しないため languages/ 配下(D-8 の区分どおり)。公開する段になれば libs/ へ移す(D-8 補足)。
 
@@ -215,10 +216,11 @@
 
 ## D-29: 論理代入演算子 `&&=` / `||=` / `??=` は `mut_` 変数に限り 3 つとも許可する
 
-- **ステータス**: 確定(2026-09-05)。**`??=` の部分は再検討中**(2026-09-09、ユーザー — issue #1753 のコメント「初期化されていない変数は許可しない → `??=` は必要無い」)。宣言が必ず初期化子を持つなら `??=` の用途が消えるため、禁止に回す方向。[spec/variables-and-mutation.md](./spec/variables-and-mutation.md) の未解決の論点に整理を置いた。`&&=` / `||=` の boolean 限定はこの再検討の影響を受けない
+- **ステータス**: 確定(2026-09-05)。**`??=` は再検討のうえ許可のまま維持**(2026-09-16、ユーザー決定。下の「`??=` の再検討」)
 - **判断**: 代入先が `mut_` 変数であれば 3 つとも許可する。`&&=` / `||=` のオペランドは `&&` / `||` と同じ boolean 厳密化([spec/booleans-and-logic.md](./spec/booleans-and-logic.md))の対象。`??=` は値の合体なので boolean 制約の対象外。
 - **理由**: `x &&= y` は `x = x && y` と同義で、boolean 厳密化の下では純粋な boolean の畳み込みにすぎない。本来の用途(`opts ||= {}` 等の truthiness idiom)はオペランド型の制約で既に違法になる。現行 config は `logical-assignment-operators: "always"` + `unicorn/logical-assignment-operators` で**論理代入形をむしろ強制**しており、禁止すると現行運用と衝突する。
 - **帰結(実装)**: `@typescript-eslint/strict-boolean-expressions` が検査するのは `LogicalExpression` / 条件位置 / `!` のみで、`AssignmentExpression`(`&&=` / `||=`)のオペランドは**検査しない**(2026-09-05 実測、typescript-eslint 8.67)。したがって `&&=` / `||=` の両オペランドの boolean 限定は 🆕 ルール。
+- **`??=` の再検討(2026-09-09 提起 → 2026-09-16 決着)**: 「未初期化の変数は許可しない」(2026-09-09、ユーザー — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)を受けて、宣言が必ず初期化子を持つなら `??=` の用途が消えるとして禁止に回す案を検討したが、**許可のまま維持する**(2026-09-16、ユーザー決定)。初期化子が必須でも `let mut_x: string | undefined = undefined;` のように **`undefined` で初期化した変数へ後から値を埋めるコードはありうる**ため、`??=` の用途は消えない。宣言の初期化子必須([spec/variables-and-mutation.md](./spec/variables-and-mutation.md))は別の規則として残り、`??=` の可否はそれに連動しない。実装への影響も無い — `boolean/strict-logical-assignment-operands` は最初から `??=` を見ておらず、禁止側の新規ルールは作らない。
 - **実装(2026-09-09)**: `boolean/strict-logical-assignment-operands`(`@sumi-lang/checker`、D-55)。型情報が要るので専用チェッカー側。両オペランドの型が boolean(`TypeFlags.BooleanLike`、union なら全メンバー)であることを要求し、`??=` は見ない。左オペランドが boolean なら TypeScript が右オペランドを boolean に制約するので、実際に捕まるのは `mut_name ||= fallback` のような truthiness idiom である。
 
 ## D-30: `using` / `await using` は Sumi lint では禁止し、Sumi sugar で再検討する
@@ -435,7 +437,7 @@
 ## D-50: Sumi のパッケージは npm org `sumi-lang`(`@sumi-lang/*`)に置く
 
 - **ステータス**: 確定(2026-09-08、ユーザー決定。org は作成済み: <https://www.npmjs.com/settings/sumi-lang>)
-- **判断**: 言語 Sumi の npm パッケージはすべて scope `@sumi-lang` の下に置く。現在の開発パッケージも同じ命名にした — `@sumi-lang/cli`(`sumi` コマンド、`languages/sumi/cli`)/ `@sumi-lang/oxlint-config`(preset、`languages/sumi/oxlint-config`)/ `@sumi-lang/eslint-config`(ブリッジ、`languages/sumi/eslint-config`)/ `@sumi-lang/conformance`(コーパス、`languages/sumi/conformance`)。いずれも `private: true` のままで、publish の判断(初回は手動 — libs/first-release.md)は別。`bin` 名は `sumi` のまま(`npx @sumi-lang/cli check` / インストール後は `sumi check`)。
+- **判断**: 言語 Sumi の npm パッケージはすべて scope `@sumi-lang` の下に置く。現在の開発パッケージも同じ命名にした — `@sumi-lang/cli`(`sumi` コマンド、`languages/sumi/cli`)/ `@sumi-lang/oxlint-config`(preset、`languages/sumi/oxlint-config`)/ `@sumi-lang/eslint-config`(ブリッジ、`languages/sumi/eslint-config`)/ `@sumi-lang/conformance`(コーパス、`languages/sumi/conformance`)。D-55 の型認識チェッカー `@sumi-lang/checker`(`languages/sumi/checker`、2026-09-09)も同じ命名に従う。いずれも `private: true` のままで、publish の判断(初回は手動 — libs/first-release.md)は別。`bin` 名は `sumi` のまま(`npx @sumi-lang/cli check` / インストール後は `sumi check`)。
 - **理由**: npm の `sumi` は無関係のパッケージが取得済み(D-46 の未決事項)。scope なら名前の衝突を気にせず、言語のパッケージ群が一目で分かる。
 - **帰結**: D-46 の「公開名は未定」は解消。ts-std-forge / ts-data-forge は言語のパッケージではなく汎用ライブラリなので対象外(D-49 の依存反転後も同じ)。将来 `libs/` へ移すときも名前は変えない。
 
@@ -447,7 +449,7 @@
 - **帰結(将来 → 実施済み 2026-09-09)**: ユーザーコードでの Sumi 自身の抑制コメントを設けるなら同じ字面 `// @sumi-expect-error <中立 ID>` にし、意味論も `@ts-expect-error` と同じ「**診断が出なければそれ自体が違反**」とする(disable 系と違って古い抑制が残らない)。中立 ID で書くのでエンジン(oxlint → 専用チェッカー)を替えても変わらず、現在 synstate で使っている `oxlint-disable-next-line sumi/no-throw` のようなエンジン固有のコメントを置き換えられる。~~採用時期は `sumi check` の設定(`sumi.config.json`、D-46)と併せて決める。~~ → **`sumi check` に実装した(ユーザー決定)**。`sumi.config.json` を待たずに入れたのは、この機能に設定項目が無いため — マーカーはコード中にあり、有効・無効の選択肢が無い。要点:
     - マーカーが当たった lint 診断は抑制し、**当たらなかったマーカーは `unused @sumi-expect-error` として報告して exit 1** にする。後者がこのコメントの存在理由で、`oxlint-disable` 系と違って古い抑制が残らない。
     - **対象は lint 診断のみ**。コンパイラ診断には `@ts-expect-error` があり TypeScript 自身が同じ陳腐化検査をするので、1 つの仕事に 2 つのコメントを置くと「どちらが効くのか」が問題になるだけ。
-    - **2 つのエンジン(oxlint プリセットと型認識チェッカー、D-54)をまとめて 1 パスで照合する**。マーカーが語れるのは中立 ID だけで、どちらのエンジンが出した診断かは書けない(コーパスが両者を 1 本のリストに統合するのと同じ理由)。エンジンごとに照合すると、他方が答えたマーカーがすべて unused になる。
+    - **2 つのエンジン(oxlint プリセットと型認識チェッカー、D-55)をまとめて 1 パスで照合する**。マーカーが語れるのは中立 ID だけで、どちらのエンジンが出した診断かは書けない(コーパスが両者を 1 本のリストに統合するのと同じ理由)。エンジンごとに照合すると、他方が答えたマーカーがすべて unused になる。
     - **マーカーのパーサはコーパスと共有**する(`@sumi-lang/oxlint-config` の `expect-error-markers.mts` に移動)。字面と意味論が同じである以上、実装が 2 つあるとずれる。中立 ID への正規化(`toRuleId`)も同じ理由で共有に上げた。
     - 別 ID を書いたマーカーは「当たらなかった」扱いで、その行の診断はそのまま残る。そこにある診断を無条件に飲み込む方が blanket disable に近づくため。
 
@@ -503,7 +505,7 @@
     - コーパスの runner は 2 エンジンを混ぜる形に変わった(`test/engine.test.mts`、旧 `oxlint-engine.test.mts`)。
     - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く(全ノードに型を聞けばプログラム全体の型付けを払う)。
     - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
-    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10 に実装済み。残りは `castMutable` 乱用の検出。
+    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10、タプルへの破壊的メソッド(`mutation/no-tuple-mutating-method`)は 2026-09-14、複数シグネチャの型を文脈型に持つ関数式(`functions/no-overloaded-function-expression`、D-58)は 2026-09-15 に実装済み。残りは `castMutable` 乱用の検出。
     - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
 
 ## D-56: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
