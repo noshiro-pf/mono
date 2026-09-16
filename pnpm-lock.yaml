@@ -340,6 +340,9 @@ importers:
       ts-repo-utils:
         specifier: workspace:*
         version: link:libs/ts-repo-utils
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:libs/ts-std-forge
       ts-type-forge:
         specifier: workspace:*
         version: link:libs/ts-type-forge
