@@ -1367,6 +1367,12 @@ had accumulated across 41 files before anything asked.
       it is open: watch it, and wait before rebasing".
     - Merge a pull request, arm auto-merge on one, or add `merge-queued`.
       Those are the author's.
+    - Run the `gh` CLI. It is authenticated as the person who set it up and
+      can do everything that account can — merge, rewrite the repository's
+      settings, delete a branch — which is far more than any of this needs,
+      so it stays a tool a person runs and a session works through the
+      GitHub API instead. `pnpm run unblock-prs` shells out to it, so asking
+      for that is asking for this.
     - Access `~/.ssh` or other sensitive directories
 
 ## Security findings
@@ -1475,13 +1481,14 @@ claiming the work is unfinished.
   taken off when its turn comes, which is the one thing that takes it off. See
   "A declared merge order".
 
-`gh pr create --label 'skip-ci'` puts the label on in the call that opens the
-pull request, and that is the one way to avoid what follows. Where the call
-cannot carry a label — GitHub's REST API takes none when creating a pull
-request, and the MCP tool over it takes none either, which is every session
-without the `gh` CLI — label it immediately afterwards. The runner minutes are
-spent either way: the `opened` event has already started a run by then, and
-the `labeled` event cancels it through the concurrency group.
+**The label goes on immediately after the pull request is opened**, because
+nothing here can put it on in the same call: GitHub's REST API takes no labels
+when creating a pull request, and the MCP tool over it takes none either.
+`gh pr create --label` would do both at once and is not an option — see
+"Important Instructions" for why the `gh` CLI is a person's tool rather than a
+session's. The runner minutes are spent either way: the `opened` event has
+already started a run by the time the label goes on, and the `labeled` event
+cancels it through the concurrency group.
 
 **That cancellation does not read as one, and the red checks it leaves are to
 be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
