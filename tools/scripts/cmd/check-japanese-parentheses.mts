@@ -303,8 +303,28 @@ const IGNORED_PREFIXES: readonly string[] = [
 
 const IGNORED_PATTERN = /^strict-lib\/v[\d.]+\//u;
 
+/**
+ * This check's own fixtures, which are deliberately the thing it forbids.
+ *
+ * Every `'速度(実測)を測る。'` in that file is an input the rule has to report,
+ * so a scan that read it would fail on the test that proves the scan works,
+ * and the only way out would be to spell the fixtures in escapes — which is
+ * to stop them being readable as the text they stand for. The conformance
+ * corpus under `languages/sumi/conformance/fixtures/` is excluded from
+ * Prettier for the same reason: a pass over a fixture erases what the fixture
+ * checks.
+ *
+ * It is an exact path rather than a directive comment in the file, because a
+ * directive the scan looks for would be a string this very file has to
+ * contain, and containing it would exempt the check from itself.
+ */
+const IGNORED_PATHS: ReadonlySet<string> = new Set([
+  'tools/scripts/cmd/check-japanese-parentheses.test.mts',
+]);
+
 const isScanned = (relativePath: string): boolean =>
   SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
+  !IGNORED_PATHS.has(relativePath) &&
   IGNORED_PREFIXES.every((prefix) => !relativePath.startsWith(prefix)) &&
   !IGNORED_PATTERN.test(relativePath);
 

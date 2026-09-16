@@ -25,6 +25,16 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Markdown check passed',
   });
 
+  // The checks whose inputs are documents rather than code. They are not part
+  // of `check:root` on purpose — `check:root` runs under the `code` diff gate,
+  // whose ignore list drops the very paths these three read. Here they need no
+  // `dist/`, so they come before the build.
+  await logStep({
+    startMessage: 'Checking the documents',
+    action: () => runCmdStep('pnpm run check:prose', 'Document checks failed'),
+    successMessage: 'Documents validated',
+  });
+
   await logStep({
     startMessage: 'Checking file extensions',
     action: () =>
