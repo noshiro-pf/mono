@@ -57,7 +57,7 @@ export const checkNodeSupport = (
       checkManifest(manifest, expected),
     );
 
-    const workflowViolations = await checkWorkflowMatrix(config);
+    const workflowViolations = await checkWorkflowMatrix();
 
     const violations = [...manifestViolations, ...workflowViolations] as const;
 
@@ -575,9 +575,27 @@ const checkDevEnginesRuntime = (
  * added or dropped — which is exactly when someone should be made to look at
  * the workflow.
  */
-const checkWorkflowMatrix = async (
-  config: NodeSupportConfig,
-): Promise<readonly Violation[]> => {
+/**
+ * The `targets` keys the compatibility matrix is expected to carry.
+ *
+ * `current` is not one of them, and that is the whole of why this is a list
+ * rather than `Object.keys(config.targets)`. `expectedFields` above asserts
+ * `volta.node === targets.current`, and `volta.node` is what
+ * `node-version-file: 'package.json'` resolves to in every other workflow — so
+ * `code-check (ws:check:test:cov)` runs the same Vitest suite on the same Node
+ * already, with coverage on top of it. A `current` entry in the matrix was
+ * that suite a second time, and `ws:build` in front of it a second time.
+ *
+ * What the two that remain are for is covered nowhere else: `minimum` is the
+ * only job that runs on the floor `engines.node` promises, and `lts` the only
+ * one on the line most consumers are on.
+ */
+const MATRIX_TARGETS: readonly (keyof NodeSupportConfig['targets'])[] = [
+  'minimum',
+  'lts',
+] as const;
+
+const checkWorkflowMatrix = async (): Promise<readonly Violation[]> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const text = await Result.fromPromise(fs.readFile(workflowPath, 'utf8'));
 
@@ -606,14 +624,16 @@ const checkWorkflowMatrix = async (
     .map((entry) => entry.trim())
     .filter((entry) => entry !== '');
 
-  const wanted = Object.keys(config.targets);
-
-  if (declared.join(',') === wanted.join(',')) return [];
+  if (declared.join(',') === MATRIX_TARGETS.join(',')) return [];
 
   return [
     {
       file: relativePath,
-      detail: `matrix targets are [${declared.join(', ')}], expected [${wanted.join(', ')}].`,
+      detail: [
+        `matrix targets are [${declared.join(', ')}], expected`,
+        `[${MATRIX_TARGETS.join(', ')}]. \`current\` belongs to \`volta.node\`,`,
+        'which every other workflow already runs on.',
+      ].join(' '),
     },
   ];
 };
