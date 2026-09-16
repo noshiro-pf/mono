@@ -10,7 +10,8 @@ const benchmarkSamplesDir = path.resolve(
   '../../libs/synstate/samples/docs-site/benchmark',
 );
 
-const targetMarkdownFiles: readonly string[] = [
+/** The pages carrying the result tables, and the numbers quoted around them. */
+const tablePages: readonly string[] = [
   path.resolve(
     workspaceRootPath,
     'src/content/docs/guides/library-comparison/benchmark.mdx',
@@ -19,6 +20,28 @@ const targetMarkdownFiles: readonly string[] = [
     workspaceRootPath,
     'src/content/docs/ja/guides/library-comparison/benchmark.mdx',
   ),
+] as const;
+
+/**
+ * Pages that quote a benchmark figure without showing a table.
+ *
+ * The introduction and the landing page each open with "up to N× faster than
+ * Jotai", which is the first number a reader sees and the last one anyone
+ * thinks to update: both said 30× and 16× against a run that gave 20× and
+ * 13×. They carry the same markers as the benchmark page, in the spelling
+ * their format allows — see `inlineMarkers`.
+ */
+const quotingPages: readonly string[] = [
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/getting-started/introduction.md',
+  ),
+  path.resolve(
+    workspaceRootPath,
+    'src/content/docs/ja/getting-started/introduction.md',
+  ),
+  path.resolve(workspaceRootPath, 'src/content/docs/index.mdx'),
+  path.resolve(workspaceRootPath, 'src/content/docs/ja/index.mdx'),
 ] as const;
 
 type EmbedTarget = Readonly<{
@@ -124,31 +147,51 @@ const embedInlineNumbers = (
 ): string => {
   const numbers = benchmarkNumbers();
 
-  return markdown.replaceAll(
-    inlineMarker,
-    (_match, key: string | undefined) => {
-      const value = key === undefined ? undefined : numbers[key];
+  return inlineMarkers.reduce(
+    (mut_content, { pattern, render }) =>
+      mut_content.replaceAll(pattern, (_match, key: string | undefined) => {
+        const value = key === undefined ? undefined : numbers[key];
 
-      if (key === undefined || value === undefined) {
-        throw new Error(
-          `❌ no benchmark number named '${key}' (used in ${path.relative(workspaceRootPath, targetMarkdownFile)})`,
-        );
-      }
+        if (key === undefined || value === undefined) {
+          throw new Error(
+            `❌ no benchmark number named '${key}' (used in ${path.relative(workspaceRootPath, targetMarkdownFile)})`,
+          );
+        }
 
-      mut_usedKeys.add(key);
+        mut_usedKeys.add(key);
 
-      return `{/* bench:${key} */}${value}{/* /bench */}`;
-    },
+        return render(key, value);
+      }),
+    markdown,
   );
 };
 
 /**
+ * The two spellings a marker takes, one per document format.
+ *
+ * MDX has no HTML comments and Markdown does not evaluate `{…}`, so a marker
+ * written the other way round would render on the page — the same split
+ * `embed-bundle-size.mts` already lives with. A page is only ever one of the
+ * two, so running both passes over it is a no-op for the form it does not use.
+ *
  * `[\s\S]*?` rather than something that excludes `{`: an entry whose value is
  * a whole `$…$` expression carries braces of its own, and KaTeX's thousands
  * separator is written `100{,}000`.
  */
-const inlineMarker =
-  /\{\/\* bench:(?<key>[^\s*]+) \*\/\}[\s\S]*?\{\/\* \/bench \*\/\}/gu;
+const inlineMarkers: readonly Readonly<{
+  pattern: RegExp;
+  render: (key: string, value: string) => string;
+}>[] = [
+  {
+    pattern:
+      /\{\/\* bench:(?<key>[^\s*]+) \*\/\}[\s\S]*?\{\/\* \/bench \*\/\}/gu,
+    render: (key, value) => `{/* bench:${key} */}${value}{/* /bench */}`,
+  },
+  {
+    pattern: /<!-- bench:(?<key>\S+) -->[\s\S]*?<!-- \/bench -->/gu,
+    render: (key, value) => `<!-- bench:${key} -->${value}<!-- /bench -->`,
+  },
+] as const;
 
 /**
  * Fails on an emphasis Prettier could not round-trip.
@@ -178,7 +221,7 @@ const assertNoEscapedEmphasis = (
 const embedBenchmark = async (): Promise<void> => {
   const mut_usedKeys = new Set<string>();
 
-  for (const targetMarkdownFile of targetMarkdownFiles) {
+  for (const targetMarkdownFile of tablePages.concat(quotingPages)) {
     const fileExists = await pathExists(targetMarkdownFile);
 
     if (!fileExists) {
@@ -192,7 +235,9 @@ const embedBenchmark = async (): Promise<void> => {
 
     assertNoEscapedEmphasis(mut_markdown, targetMarkdownFile);
 
-    for (const target of targets) {
+    for (const target of tablePages.includes(targetMarkdownFile)
+      ? targets
+      : []) {
       mut_markdown = await embedOneTarget(
         mut_markdown,
         targetMarkdownFile,

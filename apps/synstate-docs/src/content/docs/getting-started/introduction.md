@@ -16,7 +16,7 @@ sidebar:
 ## Features
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React `useState`/`useReducer`, but for global state.
-- ⚡ **High Performance**: Glitch-free $O(n)$ propagation — up to 30× faster than Jotai and 16× faster than Redux. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
+- ⚡ **High Performance**: Glitch-free $O(n)$ propagation — up to <!-- bench:intro/jotai-over-synstate -->20<!-- /bench -->× faster than Jotai and <!-- bench:intro/redux-over-synstate -->13<!-- /bench -->× faster than Redux. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
 - 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.6 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second).
 - 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
 - ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.

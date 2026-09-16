@@ -24,13 +24,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         `useState` / `useReducer` for global state.
     </Card>
     <Card title="High Performance" icon="rocket">
-        Glitch-free O(n) propagation — up to **30× faster** than Jotai and **16×
-        faster** than Redux. See
-        [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
+
+Glitch-free O(n) propagation — up to **{/* bench:intro/jotai-over-synstate */}20{/* /bench */}× faster** than Jotai and **{/* bench:intro/redux-over-synstate */}13{/* /bench */}× faster** than Redux. See [benchmarks](/mono/synstate/guides/library-comparison/benchmark/).
+
     </Card>
     <Card title="Lightweight" icon="seti:favicon">
-        {/* bundle-size:synstate */}~4.6 kB min+gzip
-        {/* /bundle-size:synstate */} with two external runtime dependencies,
+        {/* bundle-size:synstate */}~4.6 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies,
         one of which depends on the other.
     </Card>
     <Card title="Built-in Async Operators" icon="setting">
@@ -46,4 +45,5 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
         framework. For React and Preact, hooks wrappers are available. For
         Preact, a Preact Signals integration is also provided.
     </Card>
+
 </CardGrid>

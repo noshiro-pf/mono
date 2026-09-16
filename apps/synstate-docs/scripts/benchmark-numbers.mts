@@ -4,6 +4,7 @@ import { type ReadonlyRecord } from 'ts-type-forge';
 import cascadedDiamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-cascaded-diamond.json' with { type: 'json' };
 import conditionalFanOutJson from '../../../libs/synstate/samples/docs-site/benchmark/results-conditional-fan-out.json' with { type: 'json' };
 import deepChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results-deep-chain.json' with { type: 'json' };
+import diamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-diamond.json' with { type: 'json' };
 import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results.json' with { type: 'json' };
 /* eslint-enable import-x/no-relative-packages */
 
@@ -41,6 +42,10 @@ import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   ({
+    // The headline figures on the introduction and the landing page
+    'intro/jotai-over-synstate': bestRatio('Jotai'),
+    'intro/redux-over-synstate': bestRatio('Redux'),
+
     // Scenario: Derived Chain / Diamond Dependency
     'derived-chain/updates': count(updates(derivedChain)),
     'derived-chain/jotai-over-synstate': ratio(
@@ -136,6 +141,8 @@ type StatsData = Readonly<{
 
 const derivedChain: StatsData = derivedChainJson;
 
+const diamond: StatsData = diamondJson;
+
 const deepChain: SeriesData = deepChainJson;
 
 const cascadedDiamond: SeriesData = cascadedDiamondJson;
@@ -177,6 +184,24 @@ const fanOutCrossoverLabel = (): string =>
  * Renders a measurement the way the prose quotes one: a tenth of a millisecond
  * below 100 ms, and whole milliseconds above it, where the tenth is noise.
  */
+/**
+ * How much faster SynState is than `label` where the gap is widest, across the
+ * scenarios measured at a single point.
+ *
+ * The introduction and the landing page each say "up to N× faster", and "up
+ * to" is this maximum. Taking it from the data rather than from whoever last
+ * read the tables is the whole point: the pages claimed 30× and 16× against a
+ * run that gave 20× and 13×.
+ */
+const bestRatio = (label: string): string =>
+  count(
+    Math.max(
+      ...[derivedChain, diamond].map((data) =>
+        Math.round(divide(median(data, label), median(data, 'SynState'))),
+      ),
+    ),
+  );
+
 const ms = (value: number): string =>
   value < 100
     ? (`${value.toFixed(1)} ms` as const)
