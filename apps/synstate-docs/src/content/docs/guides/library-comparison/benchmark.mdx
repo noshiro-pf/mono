@@ -28,7 +28,7 @@ A simple linear chain that measures pure overhead of each library's reactive pri
 
 {/* benchmark-result */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
-| -------- | ----------: | -------: | -------: | -------: | --------: |
+| ------------ | ----------: | -------: | -------: | -------: | ---------: |
 | **SynState** | 18.49 | 16.65 | 30.03 | 23.78 | 5,407,526 |
 | RxJS | 4.04 | 3.85 | 5.04 | 4.62 | 24,773,929 |
 | MobX | 59.20 | 58.23 | 59.92 | 59.64 | 1,689,179 |
@@ -284,7 +284,7 @@ RxJS `combineLatest` fires the subscriber **twice per update** in this diamond g
 
 {/* benchmark-result-diamond */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
-| -------- | ----------: | -------: | -------: | -------: | --------: |
+| ------------ | ----------: | -------: | -------: | -------: | --------: |
 | **SynState** | 38.97 | 37.36 | 44.99 | 44.52 | 2,566,072 |
 | RxJS | 10.58 | 10.07 | 11.77 | 11.72 | 9,449,963 |
 | MobX | 78.29 | 76.62 | 106.63 | 80.48 | 1,277,365 |
@@ -498,7 +498,7 @@ SynState's `combine` waits until the entire propagation order is resolved before
 
 {/* benchmark-result-deep-chain */}
 | Library | K=100, M=50 | K=500, M=50 | K=1000, M=50 | K=100, M=100 | K=500, M=100 | K=1000, M=100 | K=500, M=200 | K=1000, M=200 |
-| ------- | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: |
+| ------------ | ----------: | ----------: | -----------: | -----------: | -----------: | ------------: | -----------: | ------------: |
 | **SynState** | 0.8 ms | 2.3 ms | 4.6 ms | 0.9 ms | 4.3 ms | 8.2 ms | 8.7 ms | 15.1 ms |
 | RxJS | 3.0 ms | 17.3 ms | 35.2 ms | 20.7 ms | 99.5 ms | 186.5 ms | 516.5 ms | 1042.4 ms |
 | Jotai | 11.4 ms | 48.0 ms | 95.6 ms | 20.0 ms | 94.9 ms | 195.4 ms | 198.6 ms | 399.0 ms |
@@ -535,7 +535,7 @@ Each `combineLatest` in the chain fires twice per upstream emission (once for th
 
 {/* benchmark-result-cascaded-diamond */}
 | Library | N=2 | N=4 | N=6 | N=8 | N=10 | N=12 | N=14 | N=16 | N=18 | N=20 |
-| ------- | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: |
+| ------------ | -----: | -----: | -----: | ------: | ------: | -------: | --------: | --------: | --------: | --------: |
 | **SynState** | 0.8 ms | 1.1 ms | 0.7 ms | 1.0 ms | 1.6 ms | 3.4 ms | 11.3 ms | 37.6 ms | 146.3 ms | 572.6 ms |
 | RxJS | 0.1 ms | 0.5 ms | 2.3 ms | 12.3 ms | 60.4 ms | 341.1 ms | 1996.6 ms | > 5000 ms | > 5000 ms | > 5000 ms |
 | Jotai | 1.3 ms | 2.4 ms | 2.9 ms | 3.9 ms | 4.9 ms | 5.4 ms | 6.1 ms | 7.2 ms | 8.2 ms | 8.5 ms |

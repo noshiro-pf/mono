@@ -96,7 +96,7 @@ export const writeBenchmarkResults = async (
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  await fs.writeFile(markdownPath, `${markdown}\n`, 'utf8');
+  await fs.writeFile(markdownPath, `${alignTable(markdown)}\n`, 'utf8');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
@@ -108,6 +108,115 @@ export const writeBenchmarkResults = async (
   console.info(`\n✓ Results written to ${markdownPath}`);
 
   console.info(`✓ Results written to ${jsonPath}`);
+};
+
+/**
+ * Pads a pipe table's cells so that its columns line up.
+ *
+ * The runners build their tables by hand, and a column wide enough for one
+ * run is not wide enough for the next: a re-measurement that pushed
+ * `Ops/sec` from seven digits to eight left the pipes ragged, and both
+ * `check:md` (MD060, table-column-style) and Prettier rejected the file. The
+ * pass that would have fixed it is `pnpm run fmt`, which is exactly the step a
+ * re-measurement commit forgets — it had to be remembered twice before this
+ * moved here.
+ *
+ * What it writes is what Prettier writes, verified cell for cell against
+ * `prettier --write` on all five results files: each column as wide as its
+ * widest cell and at least three, the separator filled with dashes carrying
+ * the alignment's colons, and every cell padded to its column's alignment.
+ * So `fmt` over a freshly generated file is a no-op rather than a diff.
+ *
+ * Widths are counted in code units, which is right while every cell is a
+ * library name, a number or `> 5000 ms`. A full-width character would need a
+ * display width instead, as Prettier uses.
+ */
+const alignTable = (markdown: string): string => {
+  const lines = markdown.split('\n');
+
+  if (
+    lines.length < 2 ||
+    lines.some((line) => !(line.startsWith('|') && line.endsWith('|')))
+  ) {
+    return markdown;
+  }
+
+  const rows: readonly (readonly string[])[] = lines.map((line) =>
+    line
+      .slice(1, -1)
+      .split('|')
+      .map((cell) => cell.trim()),
+  );
+
+  const separator = rows[1];
+
+  if (separator === undefined) {
+    return markdown;
+  }
+
+  const alignments: readonly ColumnAlignment[] = separator.map((cell) =>
+    cell.startsWith(':') && cell.endsWith(':')
+      ? 'center'
+      : cell.endsWith(':')
+        ? 'right'
+        : cell.startsWith(':')
+          ? 'left'
+          : 'none',
+  );
+
+  const cellRows = rows.filter((_, i) => i !== 1);
+
+  const widths = alignments.map((_, column) =>
+    Math.max(
+      MIN_COLUMN_WIDTH,
+      ...cellRows.map((row) => (row[column] ?? '').length),
+    ),
+  );
+
+  const width = (column: number): number => widths[column] ?? MIN_COLUMN_WIDTH;
+
+  return rows
+    .map((row, i) =>
+      i === 1
+        ? `| ${alignments.map((alignment, column) => separatorCell(width(column), alignment)).join(' | ')} |`
+        : `| ${row.map((cell, column) => padCell(cell, width(column), alignments[column] ?? 'none')).join(' | ')} |`,
+    )
+    .join('\n');
+};
+
+type ColumnAlignment = 'center' | 'left' | 'none' | 'right';
+
+const MIN_COLUMN_WIDTH = 3;
+
+const separatorCell = (width: number, alignment: ColumnAlignment): string => {
+  switch (alignment) {
+    case 'right':
+      return `${'-'.repeat(width - 1)}:`;
+    case 'center':
+      return `:${'-'.repeat(width - 2)}:`;
+    case 'left':
+      return `:${'-'.repeat(width - 1)}`;
+    case 'none':
+      return '-'.repeat(width);
+  }
+};
+
+const padCell = (
+  cell: string,
+  width: number,
+  alignment: ColumnAlignment,
+): string => {
+  switch (alignment) {
+    case 'right':
+      return cell.padStart(width);
+    case 'center':
+      return cell
+        .padStart(Math.floor((width - cell.length) / 2) + cell.length)
+        .padEnd(width);
+    case 'left':
+    case 'none':
+      return cell.padEnd(width);
+  }
 };
 
 /**
