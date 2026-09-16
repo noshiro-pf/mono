@@ -88,7 +88,15 @@ jobs:
         # readable as "the floor `engines.node` promises" instead of as a
         # number nobody can place. `check-node-support` fails when this list
         # and that file's keys disagree.
-        target: [minimum, lts, current]
+        #
+        # `current` is deliberately not one of them. `check-node-support` also
+        # asserts `volta.node == targets.current`, and `volta.node` is what
+        # `node-version-file: 'package.json'` resolves to in every other
+        # workflow — so `code-check (ws:check:test:cov)` already runs this very
+        # suite on this very version, with coverage on top. A `current` entry
+        # here was the same tests on the same Node a second time, and the build
+        # in front of them a second time.
+        target: [minimum, lts]
 
     steps:
       - name: Checkout

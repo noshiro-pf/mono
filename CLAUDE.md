@@ -1620,7 +1620,7 @@ the compatibility matrix are derived from them.
 | :-------- | :----------------------------------------- | :----------------------------------------------------- |
 | `minimum` | `engines.node`, the matrix `minimum` entry | what a _consumer_ needs to install a published package |
 | `lts`     | the matrix `lts` entry                     | what is _tested_                                       |
-| `current` | `volta.node`, the matrix `current` entry   | what a _contributor_ builds on                         |
+| `current` | `volta.node`                               | what a _contributor_ builds on                         |
 
 Those are three different questions, and conflating them is the failure this
 check exists to stop.
@@ -1645,6 +1645,14 @@ check exists to stop.
   value is the Node nine of the ten workflows use. It was `25.9.0` — a line that
   reached end of life in June 2026 — until this check started asserting it
   equals `targets.current`.
+- **`current` is therefore not a matrix entry**, and `MATRIX_TARGETS` in
+  `check-node-support.mts` is the list of the two that are. Because
+  `volta.node == targets.current` is asserted above, every other workflow
+  already runs on that version — `code-check (ws:check:test:cov)` runs this
+  matrix's own Vitest suite there, with coverage on top. A `current` entry ran
+  the same tests on the same Node a second time, and `ws:build` in front of
+  them a second time. `minimum` and `lts` are covered nowhere else, which is
+  what keeps them.
 
 ### The upper bound
 
