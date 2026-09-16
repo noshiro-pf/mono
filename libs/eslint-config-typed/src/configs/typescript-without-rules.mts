@@ -1,6 +1,7 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
 import { defaultConditionNames } from 'eslint-import-resolver-typescript';
 import globals from 'globals';
+import { Arr, isUint32 } from 'ts-data-forge';
 import { versionMajorMinor } from 'typescript';
 import { type FlatConfig } from '../types/index.mjs';
 import { plugins } from './plugins.mjs';
@@ -69,12 +70,16 @@ const allExtensions = [
 ] as const;
 
 /**
- * Every `types@>=X.Y` from `1.0` up to `majorMinor`, newest first.
+ * Every `types@>=X.Y` from `1.0` up to `majorMinor`.
  *
  * Minors are enumerated `0`-`9` for each major below the current one. Some of
  * those releases never existed — there was no TypeScript 1.2 — which costs
  * nothing: a condition name only ever matches a key some package chose to
- * write.
+ * write. The order is not significant either, because the resolver tests a
+ * package's `exports` keys against these as a set.
+ *
+ * A version that does not parse as two non-negative integers yields nothing,
+ * rather than throwing: this runs while the ESLint config is being built.
  */
 const buildVersionedTypesConditionNames = (
   majorMinor: string,
@@ -85,20 +90,21 @@ const buildVersionedTypesConditionNames = (
 
   const minor = Number(minorStr);
 
-  if (!Number.isSafeInteger(major) || !Number.isSafeInteger(minor)) {
+  if (!isUint32(major) || !isUint32(minor)) {
     return [];
   }
 
-  return Array.from({ length: major }, (_, i) => major - i).flatMap(
-    (majorCandidate) => {
-      const highestMinor = majorCandidate === major ? minor : 9;
+  return Arr.seq(major).flatMap((majorIndex) => {
+    const majorCandidate = majorIndex + 1;
 
-      return Array.from(
-        { length: highestMinor + 1 },
-        (_, i) => `types@>=${majorCandidate}.${highestMinor - i}`,
-      );
-    },
-  );
+    // The current major stops at the minor in use; every earlier one is
+    // complete, and 9 is the highest minor TypeScript has ever shipped.
+    const highestMinor = majorCandidate === major ? minor : 9;
+
+    return Arr.seq(10)
+      .filter((minorCandidate) => minorCandidate <= highestMinor)
+      .map((minorCandidate) => `types@>=${majorCandidate}.${minorCandidate}`);
+  });
 };
 
 /**
@@ -194,12 +200,15 @@ if (import.meta.vitest !== undefined) {
       );
     });
 
-    test('a version it cannot parse claims nothing', () => {
+    test('a version that is not two non-negative integers claims nothing', () => {
       assert.deepStrictEqual(buildVersionedTypesConditionNames('next'), []);
 
       assert.deepStrictEqual(buildVersionedTypesConditionNames(''), []);
 
       assert.deepStrictEqual(buildVersionedTypesConditionNames('6'), []);
+
+      // Returned, not thrown: this runs while the config is being built.
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('-1.0'), []);
     });
   });
 }
