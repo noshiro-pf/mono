@@ -1,7 +1,7 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
 import { defaultConditionNames } from 'eslint-import-resolver-typescript';
 import globals from 'globals';
-import { Arr, isUint32 } from 'ts-data-forge';
+import { Arr, Num, Result, isUint32 } from 'ts-data-forge';
 import { versionMajorMinor } from 'typescript';
 import { type FlatConfig } from '../types/index.mjs';
 import { plugins } from './plugins.mjs';
@@ -86,9 +86,11 @@ const buildVersionedTypesConditionNames = (
 ): readonly string[] => {
   const [majorStr, minorStr] = majorMinor.split('.', 2);
 
-  const major = Number(majorStr);
+  // `Number` is not a parser here: it reads '' and '  ' as 0, so a version
+  // string missing a component would silently become major 0.
+  const major = Result.unwrapOkOr(Num.safeParseInt(majorStr ?? ''), Number.NaN);
 
-  const minor = Number(minorStr);
+  const minor = Result.unwrapOkOr(Num.safeParseInt(minorStr ?? ''), Number.NaN);
 
   if (!isUint32(major) || !isUint32(minor)) {
     return [];
@@ -209,6 +211,14 @@ if (import.meta.vitest !== undefined) {
 
       // Returned, not thrown: this runs while the config is being built.
       assert.deepStrictEqual(buildVersionedTypesConditionNames('-1.0'), []);
+
+      // `Number('')` is 0, so a missing component used to read as minor 0
+      // and produce a full list for a version string that has none.
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('6.'), []);
+
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('6.  '), []);
+
+      assert.deepStrictEqual(buildVersionedTypesConditionNames('.0'), []);
     });
   });
 }
