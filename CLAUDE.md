@@ -124,7 +124,7 @@ Consequently:
   way: there is no TypeScript in either, and Zenn's front matter and Markdown
   dialect do not match markdownlint's defaults.
     - **The markdownlint exclusions live in `ignores`, never as a `globs`
-      negation**, and `pnpm run check:root:markdownlint-config` enforces it. A
+      negation**, and `pnpm run check:prose:markdownlint-config` enforces it. A
       negation is matched against the path as written, so one anchored at the
       cwd does not match a file named on the command line as an _absolute_
       path — that file is linted, and with `fix: true` linted means rewritten.
@@ -332,6 +332,46 @@ Consequences worth knowing:
   so the recursive `gen` above does not reach it. A `gen` there is what made
   an earlier attempt wipe `output/lib-files*` and fail.
 
+### The two repository-level check namespaces
+
+The small `tsx` guards under `tools/scripts/cmd/` are split across two
+aggregates, and **which one a guard belongs to is decided by what it reads, not
+by what it is about**:
+
+- **`check:prose:*`** — its inputs are documents, or the configuration of a
+  tool that reads documents. Three so far: `japanese-parentheses`,
+  `markdownlint-config` and `readme-sample-coverage`.
+- **`check:root:*`** — everything else, plus `types`, `lint` and `test` for
+  `tools/` itself.
+
+**The split is not taxonomy; it is the only way these guards run at all.**
+`check:root` is a `code-check.yml` matrix entry, and that workflow is gated on
+the `code` ignore list, which drops `**.md`, `**.txt`, `docs/`,
+`.markdownlint-cli2.mjs` and the rest of the style tooling's configuration —
+see "CI diff gates". A guard that reads one of those paths and rides
+`check:root` is therefore skipped by exactly the diff it exists to judge:
+`check:root:markdownlint-config` never ran on a pull request whose only change
+was `.markdownlint-cli2.mjs`, and `check:root:readme-sample-coverage` never ran
+on one that only added README fences. `check:prose` is a `style-check.yml`
+entry instead, and that workflow's ignore list is `experimental/` and nothing
+else.
+
+Consequences worth knowing:
+
+- **A new guard goes in the namespace its inputs put it in.** Ask which paths
+  it reads, then check them against `z:check-should-run:code-checks` in the
+  root `package.json`. One hit, and it is a `check:prose:*`.
+- **A guard may not be in both.** `check:root` is `pnpm run '/check:root:.*/'`,
+  so anything named `check:root:…` is in it; that is why these three were
+  renamed rather than listed twice, and why a `check:root:prose` aggregate
+  would not have worked — the glob would have matched it too.
+- **`check:prose` must stay buildless.** All three reach `ts-data-forge` and
+  `ts-repo-utils` through `tsconfig.tsx.json`, so `style-check.yml` runs the
+  entry without `ws:build`. A guard added here that needs `dist/` costs that
+  job a build it does not otherwise pay.
+- **`check-all` runs both**, `check:prose` before the build for the same
+  reason.
+
 **Build:**
 
 - `pnpm run ws:build` — build every package, in dependency order. It compiles
@@ -360,7 +400,11 @@ Consequences worth knowing:
 - `pnpm run ws:check:types` — TypeScript type checking, no emit.
 - `pnpm run ws:check:lint` / `pnpm run ws:fix:lint` — ESLint check/fix.
 - `pnpm run check:root` — lint and type-check `tools/`, which is not a workspace
-  member and so is not covered by the `ws:*` commands.
+  member and so is not covered by the `ws:*` commands, plus the small guards
+  over the repository's own configuration.
+- `pnpm run check:prose` — the guards whose inputs are documents rather than
+  code. **See "The two repository-level check namespaces" below** for why
+  these are not part of `check:root`.
 - `pnpm run ws:check:dist` — the checks that read what a build emitted rather than
   the sources: each package's `dist/` type-checked by package name through its
   `exports` map, plus the API consistency checks that need a built sibling.
@@ -387,7 +431,7 @@ table. `pnpm run fmt` is cheap and belongs on every change.
 | :-------------------------- | :---------------------------------------------------------------------- |
 | TypeScript in a package     | that package's `check:types`, `fix:lint` and `check:test`               |
 | `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`                |
-| Markdown or prose           | `check:md`, `check:cspell`                                              |
+| Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                               |
 | a `package.json`, lockfile  | `check:knip`, `check:published-deps`, and a build of what depends on it |
 | workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                 |
 
@@ -478,7 +522,7 @@ the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
   fence's column, and fails when the count of those fences differs from
   `sampleCodeFiles`. Changing a fence's tag is therefore not a way out of the
   check; a snippet that is not code (a shell command, JSON) keeps its own tag.
-- **`pnpm run check:root:readme-sample-coverage` is the same "does it run"
+- **`pnpm run check:prose:readme-sample-coverage` is the same "does it run"
   question for READMEs.** `tools/scripts/cmd/check-readme-sample-coverage.mts`
   fails when a `libs/*` README has such a fence and the package has no
   `scripts/cmd/embed-examples.mts` naming `README.md`, or a `doc` script that
@@ -1237,6 +1281,63 @@ would find, and runs cspell once per config.
 
 The check also fails on a changeset naming a package that does not exist:
 `changeset version` fails on it, and until then it releases nothing.
+
+## Japanese text
+
+Much of what is written here is written in Japanese: the Sumi specification and
+its decision log, the strict standard library's design notes and work logs, the
+Zenn articles, the Japanese pages of `apps/synstate-docs`, and comments
+throughout the source. What lands in `main`'s history is not — see "Commit
+Messages" — so this section is about documents and comments, not about commits.
+
+**Parentheses enclosing Japanese text are fullwidth: `（）`, not `()`.** A
+halfwidth `(` is set flush against the character before it, which in a script
+with no interword space closes the line up; a fullwidth `（` carries that space
+inside the glyph. Writing both in one document is the sort of difference that
+is invisible while a line is being written and obvious once the lines sit next
+to each other, and it is not a thing a reviewer reliably catches — 1,086 pairs
+had accumulated across 41 files before anything asked.
+
+`pnpm run check:prose:japanese-parentheses` is what asks, and
+`pnpm run fix:japanese-parentheses` rewrites what it finds.
+
+- **The space the halfwidth pair needed goes with it.** `コマンド (…) を` becomes
+  `コマンド（…）を`, not `コマンド （…） を` — the fullwidth glyph already holds
+  that space, so keeping the written one sets a space and a half. The fixer
+  drops one space immediately inside the pair, one immediately before it where
+  that is not the line's indentation, and one immediately after it where
+  Japanese follows.
+- **What it asks is deliberately narrow, so that the answer is never a
+  judgement call.** A pair is reported only when the text inside it _is itself
+  Japanese_ and the pair is next to Japanese — the character before `(`, or the
+  one after `)` with at most one space skipped. So `Num.div(a, b)` and
+  `toHaveText('合計額')` are left alone, nothing Japanese touching their
+  parentheses, and so is `(D-7)` in Japanese prose, whose contents are not
+  Japanese. Parentheses around a purely Latin run are house style, which this
+  has no opinion about.
+- **A space on the left is not enough on its own**, though a space on the right
+  is. What follows a parenthetical is the sentence carrying on, so Japanese
+  there says the sentence is Japanese; what precedes one says much less.
+  `確定 (independent of any pending 提案).` is an English sentence with Japanese
+  terms in it, and `// "9月4日 (土)" 15` is a sample of a quoted input that has
+  to stay byte for byte — both would read as Japanese prose if the character
+  before the space counted.
+- **Three things are never read**, because in each the parentheses are syntax
+  rather than punctuation: fenced code blocks in Markdown, inline code spans,
+  and a Markdown link or image destination — where a Japanese anchor
+  (`](#日本語の見出し)`) must go on spelling the heading exactly as the heading
+  spells it.
+- **A pair split across two lines is not read either.** The scan is line by
+  line, and looking for a pair that wraps would cost more in false positives
+  than it would find.
+- **The verbatim texts under `docs/` are not ours to punctuate**, and are
+  skipped by name: `docs/json-spec/` (the IETF RFCs, excluded from cspell for
+  the same reason), `docs/rust_book/` and `docs/typescript_book/`. Editing one
+  would make it no longer a copy of what was received.
+- **It is a `check:prose:*` and not a `check:root:*`**, because `check:root`
+  is a `code-check.yml` entry whose gate drops `**.md` — a documentation-only
+  diff, which is the diff this check is about, would skip it. See "The two
+  repository-level check namespaces".
 
 ## Important Instructions
 

@@ -12,7 +12,7 @@ v5.6 / v5.7 の上に v5.8, v5.9, v5.5, v5.4, v5.3, v5.2, v5.1, v5.0 を順次�
 | 5.4 | 5.4.5 | 16 | なし |
 | 5.3 | 5.3.3 | 16 | なし |
 | 5.2 | 5.2.2 | 16 | なし |
-| 5.1 | 5.1.6 | 16 | `copyWithin(target: number, start: number, ...)` を `start\??:` regex 化 (TS 5.5+ で `start` 必須化)。`copyWithin` の `start: number` / `target: number` 単独 rule を `onNotFound: 'off'`。`lib.es2023.array.mts` の `toSpliced` / `with` / `toReversed` / `toSorted` 関連 rules を `onNotFound: 'off'` (TS 5.2+ のみ存在) |
+| 5.1 | 5.1.6 | 16 | `copyWithin(target: number, start: number, ...)` を `start\??:` regex 化（TS 5.5+ で `start` 必須化）。`copyWithin` の `start: number` / `target: number` 単独 rule を `onNotFound: 'off'`。`lib.es2023.array.mts` の `toSpliced` / `with` / `toReversed` / `toSorted` 関連 rules を `onNotFound: 'off'` (TS 5.2+ のみ存在) |
 | 5.0 | 5.0.4 | 16 | なし |
 
 合計 10 バージョン × (非 branded + branded) × 各 ~16 sub-package = **320+ 配布パッケージ** が生成される。
@@ -59,12 +59,12 @@ v5.6 / v5.7 の上に v5.8, v5.9, v5.5, v5.4, v5.3, v5.2, v5.1, v5.0 を順次�
 ## CI 観点の留意点
 
 - `pnpm install --no-frozen-lockfile` は新バージョン追加時に必要。check-all の Step 1 (`pnpm i`) が CI でこれを使えるか確認すること。
-- バージョンを増やすたび `gen` の所要時間が線形に伸びる (各 TS の lib ファイルを GitHub から fetch するため)。ローカル cache 化の余地あり。
+- バージョンを増やすたび `gen` の所要時間が線形に伸びる（各 TS の lib ファイルを GitHub から fetch するため）。ローカル cache 化の余地あり。
 - `tsc -p output/tsconfig.json` 等が全バージョン分走るため check-all の 6. (Type-checking) も増える。
 
 ## Phase 2 で未着手
 
-- v4.5 〜 v4.9 (TS 4.x の `@typescript/lib-xxx` 対応版)。Phase 4 (≤4.4) ではなくこの 4.5–4.9 は Phase 2 残部分。
-- `output-branded/diff/` 生成 (現状 non-branded のみ)。
-- 再生成決定性チェック (`git diff --exit-code` を check-all に追加)。
+- v4.5 〜 v4.9（TS 4.x の `@typescript/lib-xxx` 対応版）。Phase 4 (≤4.4) ではなくこの 4.5–4.9 は Phase 2 残部分。
+- `output-branded/diff/` 生成（現状 non-branded のみ）。
+- 再生成決定性チェック（`git diff --exit-code` を check-all に追加）。
 - Changesets workflow セットアップ。

@@ -6,7 +6,7 @@
 > [distribution.md](./distribution.md) を参照。
 
 
-TypeScript 標準 lib (`lib.es5.d.ts` など) を厳格化した置き換え用型定義を、TypeScript の各バージョンごとに npm パッケージとして生成・配布するためのリポジトリ。
+TypeScript 標準 lib（`lib.es5.d.ts` など）を厳格化した置き換え用型定義を、TypeScript の各バージョンごとに npm パッケージとして生成・配布するためのリポジトリ。
 
 参考実装: 既存の private な参照実装をベースにしている。
 
@@ -21,7 +21,7 @@ TypeScript 標準 lib (`lib.es5.d.ts` など) を厳格化した置き換え用�
 | Branded 配布        | 別 npm パッケージ。命名順序は `strict-ts-lib-v{TS}-branded-{lib}`                                                                                                |
 | ベース              | the source repo をベースに the reference monorepo の branded configs を復活                                                                                      |
 | 生成ツールチェーン  | `tsx` 直接実行 (the source repo 流)                                                                                                                              |
-| 補助ライブラリ      | `ts-repo-utils` / `ts-data-forge` (参考実装の private な node-utils の代替)。`any`→`unknown` / readonly 付与は `typescript` を使った自前の text-splice transform |
+| 補助ライブラリ      | `ts-repo-utils` / `ts-data-forge`（参考実装の private な node-utils の代替）。`any`→`unknown` / readonly 付与は `typescript` を使った自前の text-splice transform |
 | ライセンス          | Apache-2.0                                                                                                                                                       |
 | 配布レジストリ      | npmjs.com (Changesets で公開)                                                                                                                                    |
 | 生成物の git 管理   | コミットする (diff レビューと CI 安定のため)                                                                                                                     |
@@ -29,7 +29,7 @@ TypeScript 標準 lib (`lib.es5.d.ts` など) を厳格化した置き換え用�
 
 ## 2. リポジトリ構成
 
-現在の typescript-template scaffold (`src/`, `samples/`, `configs/rollup.config.ts`, `vite.doc.config.mts`, `vitest.config.mts` 等) は撤去し、pnpm モノレポに置き換える。`CLAUDE.md` / `.github` / `.oxfmtrc.json` / `eslint.config.mts` / `LICENSE` 等の共通設定は流用する。
+現在の typescript-template scaffold（`src/`, `samples/`, `configs/rollup.config.ts`, `vite.doc.config.mts`, `vitest.config.mts` 等）は撤去し、pnpm モノレポに置き換える。`CLAUDE.md` / `.github` / `.oxfmtrc.json` / `eslint.config.mts` / `LICENSE` 等の共通設定は流用する。
 
 ```text
 strict-typescript-lib/
@@ -134,8 +134,8 @@ strict-typescript-lib/
 
 - `scripts-common` は workspace パッケージ。各 `packages/vX.Y` から `workspace:*` で参照する。
 - `packages/vX.Y/package.json` は `private: true`。公開対象は `output*/packages/*/` 配下のみ。
-- TS バージョン固有の override が必要になったら、`packages/vX.Y/version-config.json` と `scripts/_options.mts` から `scripts-common` の hook ポイント (関数引数 / オプション) に差し込む。フェーズ 1 では override 不要。
-- `output*/` は git commit する (両参考実装と同じ運用)。
+- TS バージョン固有の override が必要になったら、`packages/vX.Y/version-config.json` と `scripts/_options.mts` から `scripts-common` の hook ポイント（関数引数 / オプション）に差し込む。フェーズ 1 では override 不要。
+- `output*/` は git commit する（両参考実装と同じ運用）。
 
 ## 3. npm 公開命名規約
 
@@ -145,11 +145,11 @@ strict-typescript-lib/
 | 非 branded・sub lib | `strict-ts-lib-v5.7-es2015-core`, `strict-ts-lib-v5.7-dom-iterable`, ...         |
 | branded             | `strict-ts-lib-v5.7-branded-es5`, `strict-ts-lib-v5.7-branded-dom-iterable`, ... |
 
-- `version`: 通常の semver。例: `1.0.0`。the source repo の `5.7.2-strict-lib-v9` 方式は採らない (TS バージョンは名前で表現)。
+- `version`: 通常の semver。例: `1.0.0`。the source repo の `5.7.2-strict-lib-v9` 方式は採らない（TS バージョンは名前で表現）。
 - 各サブパッケージは `peerDependencies` を持つ:
     - `ts-type-forge`: `^N` (利用ライブラリのバージョンに従う)
     - `typescript`: 対応する TS バージョン範囲。例: v5.7 系 → `">=5.7.0 <5.8.0"`
-- npm 規約: 内部にドットを含むパッケージ名は許容される (例: `socket.io`)。先頭が `.`/`_` の新規名は不可だが、`strict-ts-lib-v5.7-...` は問題なし。
+- npm 規約: 内部にドットを含むパッケージ名は許容される（例: `socket.io`）。先頭が `.`/`_` の新規名は不可だが、`strict-ts-lib-v5.7-...` は問題なし。
 - 利用者は package.json のエイリアス機能で `@typescript/lib-xxx` にマップする:
 
     ```json
@@ -173,7 +173,7 @@ strict-typescript-lib/
     //   branded: "strict-ts-lib-v5.7-branded-dom-iterable"
     ```
 
-    TypeScript コンパイラは `<reference lib="dom.iterable" />` を `@typescript/lib-dom-iterable` (ドットを `-` に置換) に解決するため、npm 名側にドットを含めなくても動作する。
+    TypeScript コンパイラは `<reference lib="dom.iterable" />` を `@typescript/lib-dom-iterable`（ドットを `-` に置換）に解決するため、npm 名側にドットを含めなくても動作する。
 
 ## 4. ベース移植マッピング
 
@@ -281,7 +281,7 @@ export type LibReplacementStrategy = Readonly<{
 - **tooling** (`tsconfig.tooling.json`, root typescript): stock lib で root + `scripts-common` + 全 `packages/v*/scripts` を一括検証。ベース `configs/tsconfig/tsconfig.type-check.json` は `libReplacement: false` を既定にし、strict lib 置換は上記 dogfood と各 lib-check のみで有効化する。
 - **lib-check** (各 `packages/vX.Y/tsconfig.lib-check{,.webworker}.json`, その版の tsc@5.x): 自バージョンの生成物を `@typescript/lib-*` として link し `skipLibCheck: false` で lib 自体を検証。
 
-ESLint 設定は root の `eslint.config.mts` 1 つに集約し、per-package の `eslint.config.mts` / `tsconfig.json` は持たない (typed-lint は `tsconfig.tooling.json` を project に使う)。
+ESLint 設定は root の `eslint.config.mts` 1 つに集約し、per-package の `eslint.config.mts` / `tsconfig.json` は持たない（typed-lint は `tsconfig.tooling.json` を project に使う）。
 
 各 `packages/vX.Y/package.json` (例: v5.7):
 

@@ -141,7 +141,7 @@ https://playcode.io/2136118
 
 > If you need to have more control over your numeric input's behavior, you can specify the value property to use the component in controlled mode. --- （筆者訳） 数値入力の動作をさらに制御する必要がある場合は、 value プロパティを指定してコンポーネントを制御モードで使用できます。
 
-> Note that NumericInput supports arbitrary text entry (not only numeric digits) so the value should always be provided as a string, not a number. --- （筆者訳） NumericInput は任意のテキスト入力 (数値だけでなく) をサポートしているため、値は常に数値ではなく文字列として指定する必要があることに注意してください。
+> Note that NumericInput supports arbitrary text entry (not only numeric digits) so the value should always be provided as a string, not a number. --- （筆者訳） NumericInput は任意のテキスト入力（数値だけでなく）をサポートしているため、値は常に数値ではなく文字列として指定する必要があることに注意してください。
 
 とも書かれています。
 

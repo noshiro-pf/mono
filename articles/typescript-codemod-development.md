@@ -68,7 +68,7 @@ ASTを使うことで、単純なテキスト検索や正規表現による置�
 - [jscodeshift](https://jscodeshift.com/)
   - JavaScript や TypeScript の codemod のためのツール
   - recast のラッパー
-  - Meta (旧Facebook) 製。
+  - Meta（旧Facebook）製。
 - [ast-grep](https://ast-grep.github.io/)
   - コード片のような直感的なパターン (`console.log($MATCH)`) を使ってASTノードを検索・置換する。`$MATCH` はキャプチャ変数。
   - 精密さに欠けるテキストベースの置換ではなく、ASTベースでの置換を行いたいが、ASTでの記述は面倒、というときに便利。grep のような手軽さで AST ベースのコード置換を行うことができる。

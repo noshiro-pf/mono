@@ -59,7 +59,7 @@ export const EnvironmentSettings = t.record({
   /**
    * `custom_branch_policies` が `true` のときの pattern 一覧。
    *
-   * それ以外のときは空配列でなければならない ( `applyEnvironments` が拒否する )。
+   * それ以外のときは空配列でなければならない（`applyEnvironments` が拒否する）。
    * GitHub 側は別エンドポイントだが、「どの ref から deploy できるか」を
    * 決めているのは選択と pattern の組で、片方だけ見ても意味を成さない。
    */

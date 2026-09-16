@@ -54,7 +54,7 @@ export const parseInteger = (
   const viaNumber = Number(value);
 
   // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
-  // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
+  // 末尾不正文字（'12abc' 等）は `Number` 側が NaN にするので、両者が共に
   // 有効な場合のみ採用することで空文字・空白のみ・末尾不正をまとめて弾く。
   // `Number('1e400')` は Infinity だが `parseInt('1e400', 10)` は 1 なので、
   // 両者の一致だけでは Infinity が整数として通ってしまう(Num.safeParseInt の
