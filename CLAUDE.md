@@ -1238,6 +1238,65 @@ would find, and runs cspell once per config.
 The check also fails on a changeset naming a package that does not exist:
 `changeset version` fails on it, and until then it releases nothing.
 
+## Japanese text
+
+Much of what is written here is written in Japanese: the Sumi specification and
+its decision log, the strict standard library's design notes and work logs, the
+Zenn articles, the Japanese pages of `apps/synstate-docs`, and comments
+throughout the source. What lands in `main`'s history is not — see "Commit
+Messages" — so this section is about documents and comments, not about commits.
+
+**Parentheses enclosing Japanese text are fullwidth: `（）`, not `()`.** A
+halfwidth `(` is set flush against the character before it, which in a script
+with no interword space closes the line up; a fullwidth `（` carries that space
+inside the glyph. Writing both in one document is the sort of difference that
+is invisible while a line is being written and obvious once the lines sit next
+to each other, and it is not a thing a reviewer reliably catches — 1,086 pairs
+had accumulated across 41 files before anything asked.
+
+`pnpm run check:root:japanese-parentheses` is what asks, and
+`pnpm run fix:japanese-parentheses` rewrites what it finds.
+
+- **The space the halfwidth pair needed goes with it.** `コマンド (…) を` becomes
+  `コマンド（…）を`, not `コマンド （…） を` — the fullwidth glyph already holds
+  that space, so keeping the written one sets a space and a half. The fixer
+  drops one space immediately inside the pair, one immediately before it where
+  that is not the line's indentation, and one immediately after it where
+  Japanese follows.
+- **What it asks is deliberately narrow, so that the answer is never a
+  judgement call.** A pair is reported only when the text inside it _is itself
+  Japanese_ and the pair is next to Japanese — the character before `(`, or the
+  one after `)` with at most one space skipped. So `Num.div(a, b)` and
+  `toHaveText('合計額')` are left alone, nothing Japanese touching their
+  parentheses, and so is `(D-7)` in Japanese prose, whose contents are not
+  Japanese. Parentheses around a purely Latin run are house style, which this
+  has no opinion about.
+- **A space on the left is not enough on its own**, though a space on the right
+  is. What follows a parenthetical is the sentence carrying on, so Japanese
+  there says the sentence is Japanese; what precedes one says much less.
+  `確定 (independent of any pending 提案).` is an English sentence with Japanese
+  terms in it, and `// "9月4日 (土)" 15` is a sample of a quoted input that has
+  to stay byte for byte — both would read as Japanese prose if the character
+  before the space counted.
+- **Three things are never read**, because in each the parentheses are syntax
+  rather than punctuation: fenced code blocks in Markdown, inline code spans,
+  and a Markdown link or image destination — where a Japanese anchor
+  (`](#日本語の見出し)`) must go on spelling the heading exactly as the heading
+  spells it.
+- **A pair split across two lines is not read either.** The scan is line by
+  line, and looking for a pair that wraps would cost more in false positives
+  than it would find.
+- **The verbatim texts under `docs/` are not ours to punctuate**, and are
+  skipped by name: `docs/json-spec/` (the IETF RFCs, excluded from cspell for
+  the same reason), `docs/rust_book/` and `docs/typescript_book/`. Editing one
+  would make it no longer a copy of what was received.
+- **It is a `style-check.yml` matrix entry as well as a `check:root:*`
+  script.** It rides `check:root` for nothing, but `check:root` is a
+  `type-check.yml` entry and that workflow's ignore list drops `**.md` — so on
+  a documentation-only diff, which is the diff this check is about, the
+  `check:root` run never happens. `style` ignores `experimental/` and nothing
+  else. See "CI diff gates".
+
 ## Important Instructions
 
 - After making code changes, run `pnpm run fmt`, then check for type errors with

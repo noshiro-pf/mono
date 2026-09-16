@@ -110,6 +110,12 @@ jobs:
           - strict-lib:fix:fmt
           - check:md
           - check:cspell
+          # Halfwidth parentheses around Japanese text in Japanese prose. It
+          # rides `check:root` too, but `check:root` is a `type-check.yml`
+          # entry and that workflow's ignore list drops `**.md` — so on the
+          # diffs this check is about, a documentation change, it would never
+          # run. `style` ignores `experimental/` and nothing else.
+          - check:root:japanese-parentheses
           - ws:doc
           - ws:check:ext
           # `docs/package-dependencies.md` is generated from every
