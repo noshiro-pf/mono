@@ -12,11 +12,15 @@
  * Each combineLatest doubles the emission count, producing 2^N
  * subscriber calls per source update in RxJS.
  */
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { range } from 'ts-data-forge';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
+import {
+  type BenchmarkSeries,
+  formatBenchmarkCell,
+  writeBenchmarkResults,
+} from '../benchmark-results.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 const WARMUP_ROUNDS = 2;
@@ -99,14 +103,14 @@ const measureRounds = (
 const measureEntry = (
   entry: BenchmarkEntry,
   mod: BenchmarkModule,
-): readonly string[] => {
-  const mut_cells: string[] = [];
+): readonly (number | null)[] => {
+  const mut_values: (number | null)[] = [];
 
   let mut_skippingRest = false;
 
   for (const depth of DEPTHS) {
     if (mut_skippingRest) {
-      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
+      mut_values.push(null);
 
       continue;
     }
@@ -131,7 +135,7 @@ const measureEntry = (
     const { times, timedOut } = measureRounds(mod, depth);
 
     if (timedOut) {
-      mut_cells.push(`> ${TIMEOUT_MS.toString()} ms`);
+      mut_values.push(null);
 
       mut_skippingRest = true;
 
@@ -143,7 +147,7 @@ const measureEntry = (
 
       const med = median(sorted);
 
-      mut_cells.push(`${med.toFixed(1)} ms`);
+      mut_values.push(med);
 
       console.info(
         `  ✓ ${entry.label} N=${depth.toString()}: ${med.toFixed(1)} ms`,
@@ -151,7 +155,7 @@ const measureEntry = (
     }
   }
 
-  return mut_cells;
+  return mut_values;
 };
 
 console.info(
@@ -160,6 +164,8 @@ console.info(
 
 // Column headers
 const colHeaders = DEPTHS.map((d) => `N=${d.toString()}`);
+
+const mut_series: BenchmarkSeries[] = [];
 
 const mut_tableLines: string[] = [
   `| Library | ${colHeaders.join(' | ')} |`,
@@ -172,18 +178,26 @@ for (const entry of entries) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const mod: BenchmarkModule = await import(filePath);
 
-  const cells = measureEntry(entry, mod);
+  const values = measureEntry(entry, mod);
 
-  mut_tableLines.push(`| ${entry.label} | ${cells.join(' | ')} |`);
+  mut_series.push({ label: entry.label, values });
+
+  mut_tableLines.push(
+    `| ${entry.label} | ${values.map((v) => formatBenchmarkCell(v, TIMEOUT_MS)).join(' | ')} |`,
+  );
 }
 
 const tableContent = mut_tableLines.join('\n');
 
 console.info(`\n${tableContent}`);
 
-const resultsPath = path.resolve(benchmarkDir, 'results-cascaded-diamond.md');
-
-// eslint-disable-next-line security/detect-non-literal-fs-filename
-await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
-
-console.info(`\n✓ Results written to ${resultsPath}`);
+await writeBenchmarkResults(
+  benchmarkDir,
+  'results-cascaded-diamond.md',
+  tableContent,
+  {
+    kind: 'series',
+    xLabels: colHeaders,
+    series: mut_series,
+  },
+);

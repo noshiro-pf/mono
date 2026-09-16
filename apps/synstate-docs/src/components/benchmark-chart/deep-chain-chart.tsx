@@ -1,5 +1,10 @@
 import * as React from 'react';
 import { BenchmarkBarChart } from './benchmark-bar-chart.js';
+import {
+  deepChainResults,
+  toColouredSeries,
+  toGroups,
+} from './benchmark-data.mjs';
 
 /**
  * Deep Chain Throughput chart — shows ms vs (K, M) parameter combinations.
@@ -24,23 +29,23 @@ export const DeepChainChart = React.memo(() => (
 
 DeepChainChart.displayName = 'DeepChainChart';
 
-const groups = [
-  { label: 'K=100\nM=50', values: [0.4, 3.3, 9.2, 18.9] },
-  { label: 'K=500\nM=50', values: [1, 14.6, 46.5, 79.4] },
-  { label: 'K=1000\nM=50', values: [1.5, 31.1, 91.3, 156.2] },
-  { label: 'K=100\nM=100', values: [0.3, 14.2, 17.2, 30] },
-  { label: 'K=500\nM=100', values: [1.6, 66.7, 89.6, 150.1] },
-  { label: 'K=1000\nM=100', values: [2.8, 135, 182.9, 289.9] },
-  { label: 'K=500\nM=200', values: [2.9, 335.3, 194.5, 289.8] },
-  { label: 'K=1000\nM=200', values: [5.6, 678.4, 398.5, 575.2] },
-] as const;
+const colors = {
+  SynState: '#3b82f6',
+  RxJS: '#ef4444',
+  Jotai: '#f59e0b',
+  MobX: '#8b5cf6',
+} as const;
 
-const series = [
-  { label: 'SynState', color: '#3b82f6' },
-  { label: 'RxJS', color: '#ef4444' },
-  { label: 'Jotai', color: '#f59e0b' },
-  { label: 'MobX', color: '#8b5cf6' },
-] as const;
+// The bar chart wants one group per (K, M) point, and takes the labels from
+// the group; the newline keeps K and M on separate lines under the axis.
+const groups = toGroups(deepChainResults).map(({ label, values }) => ({
+  label: label.replace(', ', '\n'),
+  values,
+}));
+
+const series = toColouredSeries(deepChainResults, colors).map(
+  ({ label, color }) => ({ label, color }),
+);
 
 const style = {
   textAlign: 'center',

@@ -44,6 +44,10 @@ export default [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             '@astrojs/**',
             'jotai/utils',
+            // The benchmark numbers the charts draw. `libs/synstate` does not
+            // publish `samples/`, so there is no package entry point to
+            // reach them through; see benchmark-chart/benchmark-data.mts.
+            '**/libs/synstate/samples/docs-site/benchmark/*',
           ],
         },
       ],
