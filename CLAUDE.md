@@ -1470,10 +1470,12 @@ cancels it through the concurrency group.
 be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
 `cancelled`, and its `*-result` aggregates conclude **`failure`** — being
 `if: always()` they run anyway, and assert `result == 'success'` against a job
-that was cancelled. What arrives is four "check failed" notifications seconds
-apart, naming nothing that failed. The `labeled` run reports those same four
-contexts `skipped` a moment later and supersedes them, and `no-skip-ci-label`
-goes `pending`, which is what actually holds the merge. So there is nothing to
+that was cancelled. What arrives is one "check failed" notification per check
+workflow, naming nothing that failed — five of them there, four within
+seconds and the fifth five minutes later, that run's `gates / check` having
+still been going when the cancel reached it. The `labeled` run reports those
+same contexts `skipped` and supersedes them, and `no-skip-ci-label` goes
+`pending`, which is what actually holds the merge. So there is nothing to
 investigate and nothing to re-run: by the time the notification is read, the
 red it names has already been superseded.
 
