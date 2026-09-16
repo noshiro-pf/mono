@@ -345,7 +345,7 @@ by what it is about**:
   `tools/` itself.
 
 **The split is not taxonomy; it is the only way these guards run at all.**
-`check:root` is a `type-check.yml` matrix entry, and that workflow is gated on
+`check:root` is a `code-check.yml` matrix entry, and that workflow is gated on
 the `code` ignore list, which drops `**.md`, `**.txt`, `docs/`,
 `.markdownlint-cli2.mjs` and the rest of the style tooling's configuration —
 see "CI diff gates". A guard that reads one of those paths and rides
@@ -1335,7 +1335,7 @@ had accumulated across 41 files before anything asked.
   the same reason), `docs/rust_book/` and `docs/typescript_book/`. Editing one
   would make it no longer a copy of what was received.
 - **It is a `check:prose:*` and not a `check:root:*`**, because `check:root`
-  is a `type-check.yml` entry whose gate drops `**.md` — a documentation-only
+  is a `code-check.yml` entry whose gate drops `**.md` — a documentation-only
   diff, which is the diff this check is about, would skip it. See "The two
   repository-level check namespaces".
 

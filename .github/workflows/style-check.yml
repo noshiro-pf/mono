@@ -113,7 +113,7 @@ jobs:
           # The checks whose inputs are documents: halfwidth parentheses
           # around Japanese text, the shape of `.markdownlint-cli2.mjs`, and
           # the READMEs whose code fences no sample backs. They are here and
-          # not in `check:root` because `check:root` is a `type-check.yml`
+          # not in `check:root` because `check:root` is a `code-check.yml`
           # entry, and that workflow's ignore list drops `**.md` and
           # `.markdownlint-cli2.mjs` — so a diff touching only those skips the
           # very checks that read them. `style` ignores `experimental/` and
