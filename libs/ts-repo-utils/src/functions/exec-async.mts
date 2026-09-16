@@ -24,7 +24,19 @@ export type ExecResult<T extends string | Buffer> = Result<
 /**
  * Executes a shell command asynchronously.
  *
- * @param command - The command to execute.
+ * `command` is a command line, and it is run by a shell. That is the contract,
+ * and it is what makes `$` useful — but it also means **a value that is data
+ * must not be interpolated into it**. A branch name, a path, a message, or
+ * anything else that came from a caller or from the environment stops being
+ * data once it is part of this string: the shell reads its punctuation as
+ * syntax, and whatever program runs then reads the rest as its own options.
+ *
+ * Build an argv and start the process without a shell instead — `execGit` in
+ * `diff.mts` is the example to copy. Use `$` for a command line that is
+ * entirely written here, in this repository, by us.
+ *
+ * @param command - The command to execute. A literal command line, not a
+ *   template filled with values from elsewhere.
  * @param options - Optional configuration for command execution.
  * @returns A promise that resolves with the command result.
  */

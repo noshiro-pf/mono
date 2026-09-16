@@ -92,6 +92,12 @@ export const getStagedFiles = async (
  * is part of the revision name rather than further arguments, and a `base` that
  * git does not resolve comes back as an `Err`. A value beginning with `-` is
  * rejected before git is invoked, because git would read it as an option.
+ *
+ * `base` is the only caller-supplied value this module puts on a git
+ * invocation, which makes the two properties above the ones to preserve: see
+ * {@link execGit} for why they are handled as data rather than as text, and
+ * `tools/scripts/cmd/unblock-prs/util.mts` in this repository for the same
+ * leading-`-` rule applied to refs from an untrusted source.
  */
 export const getDiffFrom = async (
   base: string,
@@ -189,9 +195,26 @@ const cmdResultToFiles = async ({
  * Runs `git` with `args` handed to the process one argument at a time. No shell
  * is involved, so each entry of `args` arrives at git exactly as written.
  *
- * This is deliberately not {@link $}, which takes a command line and runs it
- * through a shell: the values these functions pass come from their callers, and
- * a caller's value is data rather than a fragment of a command.
+ * **This is deliberately not {@link $}, and the difference is a security
+ * boundary rather than a matter of taste.** `$` takes a _command line_ and runs
+ * it through a shell (see its own documentation, which says so). The values
+ * these functions pass come from their callers, and a caller's value is data:
+ * a branch name, a commit-ish. Interpolating data into a command line makes the
+ * shell — and then `git`'s own option parser — read parts of it as syntax, so a
+ * caller that happens to have wired an externally-influenced value into `base`
+ * would be handing whoever controls that value the ability to run commands in
+ * the process, or to write files through options like `git diff --output=`.
+ * That is not hypothetical for a published library: `base` is documented as a
+ * branch name or commit hash, so nothing warns a consumer that the value has to
+ * be shell-safe, and a ref name may legitimately contain characters a shell
+ * treats as syntax.
+ *
+ * With `execFile` there is no command line to be part of. Every element of
+ * `args` is one argv entry, whatever it contains — whitespace, punctuation,
+ * anything — so data cannot become commands or extra options.
+ *
+ * Keep it that way: do not rewrite this to build a string, and do not route
+ * caller-supplied values through `$`.
  */
 const execGit = async (
   args: readonly string[],
