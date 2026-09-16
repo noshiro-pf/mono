@@ -402,9 +402,13 @@ Consequences worth knowing:
 - `pnpm run check:root` — lint and type-check `tools/`, which is not a workspace
   member and so is not covered by the `ws:*` commands, plus the small guards
   over the repository's own configuration.
-- `pnpm run check:prose` — the guards whose inputs are documents rather than
-  code. **See "The two repository-level check namespaces" below** for why
-  these are not part of `check:root`.
+- `pnpm run check:prose` — the small `tsx` guards whose inputs are documents
+  rather than code. **See "The two repository-level check namespaces" below**
+  for why these are not part of `check:root`. `check:md` and `check:cspell`
+  read documents too and are deliberately not in it: they are whole-tool runs
+  with `style-check.yml` entries of their own, so they already answer to the
+  gate `check:prose` exists to reach, and folding them in would trade three
+  parallel runners for one serial job.
 - `pnpm run ws:check:dist` — the checks that read what a build emitted rather than
   the sources: each package's `dist/` type-checked by package name through its
   `exports` map, plus the API consistency checks that need a built sibling.
@@ -417,8 +421,17 @@ Consequences worth knowing:
 - `pnpm run check:published-deps` — imports that a published package does not
   declare. See "Dependencies".
 - `pnpm run check-all` — everything above plus the build, the codemods and
-  formatting, in the order CI needs. It covers every job in CI except
-  `ws:check:test:browser`, which needs Playwright's browsers installed.
+  formatting, in the order CI needs. **It does not cover every CI job**, and
+  what it leaves out is listed at the end of `check-all.mts`, next to the
+  steps it belongs to: `ws:check:test:browser` and `ws:check:e2e` need
+  Playwright's browsers, `verify:npm-packages:published` reads pinned
+  versions rather than the working tree, and `strict-lib-gen.yml`'s
+  regeneration is [#1965](https://github.com/noshiro-pf/mono/issues/1965).
+  Two of its steps are also narrower than CI's: it formats what differs from
+  `origin/main` where CI formats everything, and it asserts nothing about the
+  tree afterwards, so a rewrite one of its fixers made is a clean local run
+  and a red `z:assert-repo-is-clean` in CI. **Nothing keeps that list in step
+  with the workflows** — also #1965.
 
 **Run the checks the diff touches, not `check-all`.** A full sweep builds
 every package and runs every test in the repository; on a change that touched

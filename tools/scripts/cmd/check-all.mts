@@ -187,8 +187,37 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Code formatted',
   });
 
-  // `ws:check:test:browser` is deliberately not here: it needs Playwright's browsers
-  // installed, which `pnpm install` does not do. Run it directly, or let CI.
+  // The other half of the formatting pass. `strict-lib/` is in
+  // `.prettierignore` — oxfmt owns it — so the step above does not reach a
+  // single file under it, and `style-check (strict-lib:fix:fmt)` was the only
+  // thing that noticed. Six seconds over 5,914 files, and a no-op on a tree
+  // that is already formatted.
+  await logStep({
+    startMessage: 'Formatting the strict standard library',
+    action: () =>
+      runCmdStep('pnpm run strict-lib:fix:fmt', 'Formatting strict-lib failed'),
+    successMessage: 'strict-lib formatted',
+  });
+
+  // What CI runs and this deliberately does not:
+  //
+  // - `ws:check:test:browser` and `ws:check:e2e` need Playwright's browsers,
+  //   which `pnpm install` does not fetch — `code-check.yml` runs
+  //   `playwright install chromium` before them. Run them directly, or let CI.
+  // - `verify:npm-packages:published` installs the versions pinned in
+  //   `verify-npm-packages/published/`, so it says nothing about the working
+  //   tree; CI runs it only when those pins change.
+  // - `strict-lib:gen:with-codemod-fixed` and `strict-lib:gen:version-diff`,
+  //   which are the whole of `strict-lib-gen.yml`, rewrite ~7,800 files.
+  //   Whether that belongs in a local command is issue #1965.
+  //
+  // Two narrower-than-CI steps above are worth knowing about as well.
+  // `fix:fmt:diff` formats what differs from `origin/main`, where CI runs
+  // `fix:fmt:full`, so a file outside the diff that Prettier would rewrite
+  // passes here. And
+  // nothing here asserts the tree is clean afterwards — the fixers above
+  // write, and CI's `z:assert-repo-is-clean` is what turns an uncommitted
+  // rewrite into a failure. Read `git status` before pushing; #1965 again.
   console.info('✅ All checks completed successfully!\n');
 };
 
