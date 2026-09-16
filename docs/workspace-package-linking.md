@@ -93,7 +93,7 @@ knip が効くようになった（`paths` は依存宣言を完全にバイパ�
 > later, so it is checked here, once every `dist/` exists.
 
 というコメントが付いている。**型検査は `dist` が揃った状態で走ることが前提**で
-あり、CI（`.github/workflows/type-check.yml`）も `Build all packages` の後に
+あり、CI（`.github/workflows/code-check.yml`）も `Build all packages` の後に
 matrix コマンドを実行する。
 
 実際、整理前でも `apps/event-schedule-app` は `ts-data-forge` や `ts-fortress` を
@@ -201,7 +201,7 @@ matrix コマンドを実行する。
 `tools/scripts/cmd/check-tsconfig-paths.mts` が、パッケージに属する
 `tsconfig*.json` をすべて読み、`compilerOptions.paths` の各エントリについて次を
 検査する。`check:root:*` の一員なので `pnpm run check:root` に自動的に入り、
-必須ステータスチェック `type-check-result` の下（`type-check (check:root)`）で
+必須ステータスチェック `code-check-result` の下（`code-check (check:root)`）で
 走る。
 
 | 検査                             | 落ちる例                                                                |

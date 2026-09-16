@@ -1,6 +1,6 @@
 # cspell:ignore vitest
 
-name: Type Check
+name: Code Check
 
 on:
   # Only main, and on main only the `coverage-main` job below runs. Pull
@@ -104,9 +104,9 @@ jobs:
       packages: read
     with:
       diff-scope: code
-      result-job: type-check-result
+      result-job: code-check-result
 
-  type-check:
+  code-check:
     needs: gates
     # Three states are not worth a CI run, and each skips the whole job before
     # a runner is booted — a job-level `if` is evaluated by GitHub itself.
@@ -304,8 +304,8 @@ jobs:
   # that never happened. Two ways, both measured on this repository:
   #
   # - A job GitHub skips produces exactly one check run, named after the
-  #   *job* (`type-check`) — never the matrix contexts
-  #   (`type-check (check:root)`, …). Those contexts are not superseded, so
+  #   *job* (`code-check`) — never the matrix contexts
+  #   (`code-check (check:root)`, …). Those contexts are not superseded, so
   #   they keep whatever they last said on that commit: a green from an
   #   earlier run stays green, and the pull request reads as fully checked
   #   while nothing ran.
@@ -335,10 +335,10 @@ jobs:
   #
   # Not on `push` either: the matrix does not run there (see `coverage-main`),
   # and there is no pull request on main for a required check to hold.
-  type-check-result:
+  code-check-result:
     needs:
       - gates
-      - type-check
+      - code-check
     if: >-
       always() &&
       github.event_name != 'push' &&
@@ -353,7 +353,7 @@ jobs:
     steps:
       - name: Require the checks above to have passed
         env:
-          RESULT: ${{ needs.type-check.result }}
+          RESULT: ${{ needs.code-check.result }}
           # Set when an earlier run already reached a verdict on this head
           # commit and the checks above were skipped for it — see "A commit that
           # already has a verdict" in check-gates.yml.

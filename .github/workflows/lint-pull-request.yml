@@ -28,7 +28,7 @@ on:
       - unlabeled
 
 # The title is edited and the branch pushed to in bursts; only the last state
-# is worth a run — see the note in type-check.yml.
+# is worth a run — see the note in code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
@@ -54,7 +54,7 @@ env:
 
 jobs:
   # Both jobs skip while the `skip-ci` label is on, as every check workflow
-  # does — see the note in type-check.yml. Each job's name is its required
+  # does — see the note in code-check.yml. Each job's name is its required
   # context and neither has a matrix, so the check run GitHub creates for
   # the skipped job carries that very name, reported as `skipped`, which a
   # required status check accepts; `no-skip-ci-label` in skip-ci-label.yml is what

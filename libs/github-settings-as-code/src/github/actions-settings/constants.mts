@@ -35,7 +35,7 @@ export const ActionsSettings = t.record({
    * `read` にできるのは、 workflow 側が全て明示的に `permissions` を宣言して
    * いる場合だけ。宣言の無い job はこの既定値をそのまま受け取るため、
    * `write` のままだと「 branch の中身が何であれ書き込めるトークン」が
-   * 渡る。 .github/workflows/type-check.yml 冒頭の注記を参照。
+   * 渡る。 .github/workflows/code-check.yml 冒頭の注記を参照。
    */
   default_workflow_permissions: t.enumType(['read', 'write'], {
     typeName: 'DefaultWorkflowPermissions',

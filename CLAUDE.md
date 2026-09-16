@@ -498,7 +498,7 @@ list lives in the `required_status_checks` rule of
 
 | context                     | comes from                                            |
 | :-------------------------- | :---------------------------------------------------- |
-| `type-check-result`         | the aggregate job in `type-check.yml`                 |
+| `code-check-result`         | the aggregate job in `code-check.yml`                 |
 | `style-check-result`        | the aggregate job in `style-check.yml`                |
 | `strict-lib-gen-result`     | the aggregate job in `strict-lib-gen.yml`             |
 | `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
@@ -521,9 +521,9 @@ id>` for a reusable workflow.
 **The matrix entries used to be the required contexts, and that let a run that
 never happened satisfy them.** Both ways were measured on this repository:
 
-- **A skipped job does not expand its matrix.** A `type-check` job that a
-  job-level `if` skips produces one check run named `type-check` — not the
-  eleven `type-check (…)` contexts. Nothing supersedes those, so they keep
+- **A skipped job does not expand its matrix.** A `code-check` job that a
+  job-level `if` skips produces one check run named `code-check` — not the
+  eleven `code-check (…)` contexts. Nothing supersedes those, so they keep
   whatever they last said: a pull request that was green and then had `skip-ci`
   added still had all 22 matrix contexts reading `success`, with every
   required check satisfied.
@@ -554,7 +554,7 @@ thing that stops a labelled pull request from merging. Deleting
 `skip-ci-label.yml`, or dropping its context from `main.json`, leaves `skip-ci`
 skipping every check with nothing holding the merge — which is the exact hole
 the aggregates were added to close. The two are one mechanism. See the note on
-`type-check-result` in `type-check.yml`. It holds the merge by staying
+`code-check-result` in `code-check.yml`. It holds the merge by staying
 `pending`, not by failing — see "A `skip-ci` label skips the checks" below for
 why.
 
@@ -564,7 +564,7 @@ Consequences worth knowing:
   needed the context added to `main.json` by hand as well, and an entry added
   without it ran, reported, and blocked nothing — which is how
   `style-check (strict-lib:fix:fmt)`, `style-check (gen:deps-graph)`,
-  `type-check (strict-lib:check:types)` and `type-check (strict-lib:check:lint)` sat
+  `code-check (strict-lib:check:types)` and `code-check (strict-lib:check:lint)` sat
   unenforced. Three of those four run a command and then assert the tree is
   clean, so what an unenforced one let through was generated output drifting
   from its generator, on `main`, with a green pull request. A new matrix entry
@@ -581,7 +581,8 @@ Consequences worth knowing:
   apply, and expect every other open pull request to read blocked until it is
   rebased onto the workflow that writes the new name. `unblock-prs` does that
   rebasing, one at a time, so what it costs is a round of CI rather than any
-  hand work. `no-wip-label` became `no-skip-ci-label` this way.
+  hand work. `no-wip-label` became `no-skip-ci-label` this way, and
+  `type-check-result` became `code-check-result` the same way.
 - **A red aggregate does not name what failed.** The matrix contexts still
   report and still appear on the pull request; they are simply not what the
   ruleset reads. Open the run to see which entry went red.
@@ -784,7 +785,7 @@ one job answers.
 The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
 three lists in the root `package.json`, one per kind of check:
 
-- `z:check-should-run:code-checks` — `type-check.yml` and
+- `z:check-should-run:code-checks` — `code-check.yml` and
   `node-version-compatibility.yml`. Ignores `experimental/`, the root `docs/`,
   `**.md`, `**.txt`, `LICENSE`, and the style tools' own configuration
   (`.prettierrc`, `.cspell.config.yaml`, `**/cspell.config.yaml`, …).
@@ -806,6 +807,27 @@ excluded from ESLint, tsc, knip, Prettier, cspell and markdownlint alike.
 `articles/` and `books/` do not qualify for the style list — Prettier formats
 them.
 
+**`code-check.yml` and `style-check.yml` are named after those two scopes,
+because `code` and `style` are already this repository's words for the
+distinction.** `check-gates.yml` takes `diff-scope: code | style | none`, and
+the two gate scripts above are `z:check-should-run:code-checks` and
+`z:check-should-run:style-checks`. The file was called `type-check.yml` until
+that left it the one place speaking a third vocabulary — while passing
+`diff-scope: code` — and the name was a misnomer besides: type checking is
+three of its fourteen matrix entries, and the rest are the lint pass, the
+tests, e2e, knip, the codemods, `check:published-deps`,
+`verify:npm-packages` and the Sumi checks.
+
+What the two workflows actually divide on is whether a check needs
+`pnpm run ws:build` first, and that is deliberately not what either name
+says. That requirement changes — a check that only globs file names today may
+import a sibling tomorrow — so a name derived from it goes quietly wrong on
+the day the fact does, and nothing fails to say so. `ws:check:ext` is the
+measured case: the build step it carried outlived the reason for it, and only
+a comment claiming the opposite marked the spot. It is the same reason a
+script's name carries what it does to the working tree rather than what it
+needs in order to run; see "The verb namespaces".
+
 Things to keep in mind when editing a gated workflow:
 
 - **A step needs no condition of its own.** Every gate is now a job-level
@@ -816,10 +838,10 @@ Things to keep in mind when editing a gated workflow:
 - **On a push to `main`, diffing against `origin/main` is a diff against
   `HEAD`**, which is empty and reads as "nothing changed" — every job would
   skip. The gate therefore compares against `github.event.before` on `main`.
-  Only `type-check.yml` still asks it on a push, for `coverage-main`.
+  Only `code-check.yml` still asks it on a push, for `coverage-main`.
 - **The matrix jobs must stay behind an aggregate for this to be safe.** A
   skipped matrix job produces one check run named after the job, never the
-  `type-check (…)` contexts. While those were the required status checks, a
+  `code-check (…)` contexts. While those were the required status checks, a
   job-level skip would have left them missing — "Expected", blocking forever —
   which is why the gate had to be a step back then. See "Required status
   checks".
@@ -832,7 +854,7 @@ save one runner would cost more than it saves.
 
 ## Check triggers, `skip-ci` and out-of-date branches
 
-The five check workflows — `type-check.yml`, `style-check.yml`,
+The five check workflows — `code-check.yml`, `style-check.yml`,
 `strict-lib-gen.yml`, `node-version-compatibility.yml` and
 `verify-published-packages.yml` — trigger
 on `pull_request: types: [opened,
@@ -853,10 +875,10 @@ tree as the pull request's head — a tree every check has already run on. The
 check workflows used to run their whole matrix on it anyway, on the reasoning
 that a squash makes a commit no pull request run has seen; that is true of the
 commit and false of its contents, and it cost 108 runner-minutes per merge for
-`type-check.yml` alone, at fifty-odd merges a week. So four of the five have
+`code-check.yml` alone, at fifty-odd merges a week. So four of the five have
 no `push` trigger at all, and the one that keeps it runs a single job on it:
 
-- `type-check.yml` runs `coverage-main`, which is the matrix's `ws:check:test:cov`
+- `code-check.yml` runs `coverage-main`, which is the matrix's `ws:check:test:cov`
   entry on its own. Codecov compares a pull request's coverage with the
   report on its base commit, and the base commit is one on `main`, so the
   report has to come from a run on `main`. It is gated on the diff like the
@@ -955,7 +977,7 @@ jobs:
         with:
             diff-scope: code
 
-    type-check:
+    code-check:
         needs: gates
         if: >-
             !cancelled() &&
@@ -1098,7 +1120,7 @@ What that shape is for:
 
 - **One job, not a step in each job.** A step cannot skip the job it is in, so
   a step-level gate boots every runner in the matrix — eleven of them in
-  `type-check.yml` — to decide it had nothing to do, and each of those eleven
+  `code-check.yml` — to decide it had nothing to do, and each of those eleven
   checks out and installs dependencies first, about 45 seconds apiece. The
   gate job costs one boot per workflow run and skips the rest before they
   start. The `skip-ci` gate needs no job of its own because its answer is free.
@@ -1881,7 +1903,7 @@ and both of those used to be false:
   five packages with a `test/dist_/` harness, eslint-plugin-ts-data-forge's
   branded-number coverage check, and a stray `pnpm run check:types` inside
   github-settings-as-code's build that `ws:check:types` was already running.
-  The last three are `pnpm run ws:check:dist`, a `type-check.yml` matrix entry.
+  The last three are `pnpm run ws:check:dist`, a `code-check.yml` matrix entry.
 - **The generators are `pnpm run ws:gen`**, a `style-check.yml` matrix
   entry that regenerates and then asserts the tree is clean — the same shape
   `ws:gen` has. Their output is committed, so a build regenerating it produced
@@ -1891,7 +1913,7 @@ What that is worth: `pnpm run ws:build` went from **4m43s to 34s** on a clean
 checkout (measured). Three of those minutes were eslint-config-typed's
 `gen:rule-types` alone, which regenerates 33 rule-type modules and then runs a
 codemod, Prettier and `eslint --fix` over them. Every entry of the
-`type-check.yml` matrix builds first, and so do three of `style-check.yml`'s,
+`code-check.yml` matrix builds first, and so do three of `style-check.yml`'s,
 so that was paid fifteen-odd times per pull request to produce output that was
 already committed.
 

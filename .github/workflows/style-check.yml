@@ -4,19 +4,19 @@ on:
   # No `push`, not even for `main`. The `main` ruleset accepts changes through
   # pull requests only and requires the branch to be up to date, so the squash
   # commit a merge makes has the same tree as the pull request's head — a tree
-  # this workflow has already checked. See the note in type-check.yml, which
+  # this workflow has already checked. See the note in code-check.yml, which
   # keeps one job on `push` for a reason of its own.
 
   # `synchronize` fires on every push to the pull request's branch, so these
   # types cover the pull request's whole life — a draft included. `labeled` /
   # `unlabeled` are what let a `skip-ci` label stop and restart the checks; see
-  # the note in type-check.yml.
+  # the note in code-check.yml.
   #
   # No `paths` filter here. Every job in this matrix is a required status
   # check, and a workflow that a path filter skips never reports one — so a
   # pull request changing only the filtered files would wait on checks that
   # never arrive. Paths that do not concern this workflow are skipped a step
-  # at a time by the `Check diff` gate below, the same way type-check.yml
+  # at a time by the `Check diff` gate below, the same way code-check.yml
   # does it.
   pull_request:
     types:
@@ -32,19 +32,19 @@ on:
 # One run per pull request; a push cancels the run still going for the
 # previous one. `cancel-in-progress` is an expression rather than `true` so
 # that a `workflow_dispatch` run is left alone — see the note in
-# type-check.yml.
+# code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Deny by default; each job grants back exactly what it needs. See the note in
-# type-check.yml for why the repository's own default is not good enough here.
+# code-check.yml for why the repository's own default is not good enough here.
 permissions: {}
 
 jobs:
   # Whether the branch is behind `main`, whether the diff touches anything
   # this workflow reads, and whether `skip-ci` is on the pull request — see the
-  # notes in type-check.yml and check-gates.yml.
+  # notes in code-check.yml and check-gates.yml.
   gates:
     if: >-
       github.event_name != 'pull_request' ||
@@ -73,7 +73,7 @@ jobs:
     # Skip the whole job while the pull request carries the `skip-ci` label,
     # while its branch is behind `main` and cannot be merged as it stands, or
     # when the diff touches nothing any command below reads — see the notes in
-    # type-check.yml. Being a draft no longer skips anything.
+    # code-check.yml. Being a draft no longer skips anything.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -85,7 +85,7 @@ jobs:
       contents: read
       # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
-    # 25, matching type-check.yml, whose matrix builds the repository the same
+    # 25, matching code-check.yml, whose matrix builds the repository the same
     # way this one does. It was 10, and `ws:doc` — the longest entry, because
     # it regenerates every package README on top of that build — was measured
     # at 9m31s and 9m44s across branches, under thirty seconds of headroom. A
@@ -179,7 +179,7 @@ jobs:
   # two clauses after `always()` are the skips that are not failures — a
   # `skip-ci` label, held by `no-skip-ci-label`, and a branch behind the base
   # branch, held by the ruleset — for which this job reports `skipped` rather
-  # than red. See the note on `type-check-result` in type-check.yml.
+  # than red. See the note on `code-check-result` in code-check.yml.
   style-check-result:
     needs:
       - gates

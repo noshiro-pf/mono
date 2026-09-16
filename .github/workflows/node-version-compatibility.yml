@@ -4,13 +4,13 @@ on:
   # No `push`, not even for `main`. The `main` ruleset accepts changes through
   # pull requests only and requires the branch to be up to date, so the squash
   # commit a merge makes has the same tree as the pull request's head — a tree
-  # this workflow has already checked. See the note in type-check.yml, which
+  # this workflow has already checked. See the note in code-check.yml, which
   # keeps one job on `push` for a reason of its own.
 
   # `synchronize` fires on every push to the pull request's branch, so these
   # types cover the pull request's whole life — a draft included. `labeled` /
   # `unlabeled` are what let a `skip-ci` label stop and restart the checks; see
-  # the note in type-check.yml. No `paths` filter here — see the
+  # the note in code-check.yml. No `paths` filter here — see the
   # note in style-check.yml.
   pull_request:
     types:
@@ -25,20 +25,20 @@ on:
 # One run per pull request; a push cancels the run still going for the
 # previous one. `cancel-in-progress` is an expression rather than `true` so
 # that a `workflow_dispatch` run is left alone — see the note in
-# type-check.yml.
+# code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Deny by default; each job grants back exactly what it needs. See the note in
-# type-check.yml for why the repository's own default is not good enough here.
+# code-check.yml for why the repository's own default is not good enough here.
 permissions: {}
 
 jobs:
   # Whether the branch is behind `main`, whether the diff touches anything
   # this workflow reads, and whether `skip-ci` is on the pull request — see the
-  # notes in type-check.yml and check-gates.yml. `code` is the same ignore
-  # list type-check.yml gates on, which is why it lives in the root
+  # notes in code-check.yml and check-gates.yml. `code` is the same ignore
+  # list code-check.yml gates on, which is why it lives in the root
   # package.json rather than in either workflow.
   gates:
     if: >-
@@ -62,7 +62,7 @@ jobs:
     # Skip the whole job while the pull request carries the `skip-ci` label,
     # while its branch is behind `main` and cannot be merged as it stands, or
     # when the diff touches nothing any command below reads — see the notes in
-    # type-check.yml. Being a draft no longer skips anything.
+    # code-check.yml. Being a draft no longer skips anything.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -146,7 +146,7 @@ jobs:
   # two clauses after `always()` are the skips that are not failures — a
   # `skip-ci` label, held by `no-skip-ci-label`, and a branch behind the base
   # branch, held by the ruleset — for which this job reports `skipped` rather
-  # than red. See the note on `type-check-result` in type-check.yml.
+  # than red. See the note on `code-check-result` in code-check.yml.
   test-node-versions-result:
     needs:
       - gates
