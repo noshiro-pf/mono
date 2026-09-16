@@ -128,8 +128,46 @@ jobs:
   # job to serve them would cost more than it saves.
   build:
     needs: gates
-    # The same gate as the matrix below, so that a run which skips the checks
-    # does not build for nobody.
+    # This is where the gate lives now: the matrix below waits on this job, so
+    # everything that skips the checks skips them by skipping this.
+    #
+    # Four states are not worth a CI run, and each skips the whole job before a
+    # runner is booted — a job-level `if` is evaluated by GitHub itself.
+    #
+    # - A `skip-ci` label on the pull request says its author does not want the
+    #   checks yet. Labels arrive in the event payload, so this costs nothing,
+    #   and taking the label off fires `unlabeled`, which runs everything
+    #   again. Being a draft is deliberately NOT one of these states — a draft
+    #   is where a CI result is most useful.
+    # - A branch behind `main` is the "This branch is out-of-date with the base
+    #   branch" state: it cannot be merged, and the update that clears it fires
+    #   `synchronize` and runs everything again — on the commit that will
+    #   actually be merged, which this one is not.
+    # - A diff that touches nothing any command below reads. This used to be a
+    #   step inside each job, which meant every runner in the matrix booted,
+    #   checked out and installed dependencies before finding out it had
+    #   nothing to do; the gate job pays that once. See "CI diff gates" in
+    #   CLAUDE.md.
+    # - A verdict already reached on this head commit, which the matrix would
+    #   only repeat. See "A commit already checked is not checked again".
+    #
+    # The skipped conclusion satisfies a required status check in every case,
+    # so each of them needs something else to hold the merge — and each has
+    # one. Out of date: the ruleset's `strict_required_status_checks_policy`.
+    # `skip-ci`: the `no-skip-ci-label` status written by skip-ci-label.yml,
+    # which stays `pending` for as long as the label is on. Nothing relevant in
+    # the diff: nothing here would have read those paths anyway, which is the
+    # one case where "not checked" is the right answer. A reused verdict: the
+    # aggregate reports that verdict rather than `skipped`.
+    #
+    # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
+    # that failed to answer leaves `should_run` empty: failing open costs a CI
+    # run, failing closed would skip every check on the pull request while
+    # reporting the required ones as satisfied.
+    #
+    # Not on `push`: that is a merge of a tree this matrix has already run on —
+    # see the trigger note at the top. `coverage-main` below is what a push
+    # runs.
     if: >-
       !cancelled() &&
       github.event_name != 'push' &&
@@ -200,49 +238,19 @@ jobs:
     needs:
       - gates
       - build
-    # Three states are not worth a CI run, and each skips the whole job before
-    # a runner is booted — a job-level `if` is evaluated by GitHub itself.
+    # The gate is `build`'s, above, and asking whether that job succeeded asks
+    # all of it at once. Every state that skips the checks skips `build`, and a
+    # job that did not build is a job this matrix has nothing to download from.
+    # Restating the six clauses here would be two conditions that have to stay
+    # identical, with nothing to report the day they stop being.
     #
-    # - A `skip-ci` label on the pull request says its author does not want the
-    #   checks yet. Labels arrive in the event payload, so this costs
-    #   nothing, and taking the label off fires `unlabeled`, which runs
-    #   everything again. Being a draft is deliberately NOT one of these
-    #   states any more — a draft is where a CI result is most useful.
-    # - A branch behind `main` is the "This branch is out-of-date with the
-    #   base branch" state: it cannot be merged, and the update that clears it
-    #   fires `synchronize` and runs everything again — on the commit that
-    #   will actually be merged, which this one is not.
-    # - A diff that touches nothing any command below reads. This used to be a
-    #   step inside each job, which meant all eleven runners booted, checked
-    #   out and installed dependencies before finding out they had nothing to
-    #   do; the gate job pays that once. See "CI diff gates" in CLAUDE.md.
-    #
-    # The skipped conclusion satisfies a required status check in every case,
-    # so each of the three needs something else to hold the merge — and each
-    # has one. Out of date: the ruleset's
-    # `strict_required_status_checks_policy`. `skip-ci`: the `no-skip-ci-label`
-    # status written by skip-ci-label.yml, which stays `pending` for as long as
-    # the label is on.
-    # Nothing relevant in the diff: nothing here would have read those paths
-    # anyway, which is the one case where "not checked" is the right answer.
-    #
-    # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
-    # that failed to answer leaves `should_run` empty: failing open costs a CI
-    # run, failing closed would skip every check on the pull request while
-    # reporting the required ones as satisfied. The `skip-ci` condition is
-    # repeated here because `!cancelled()` also lifts the automatic skip that
-    # a skipped dependency would otherwise give us.
-    #
-    # Not on `push`: that is a merge of a tree this matrix has already run
-    # on — see the trigger note at the top. `coverage-main` below is what a
-    # push runs.
+    # `!cancelled()` still earns its place. Without it this job would be
+    # skipped whenever *any* job it needs did not succeed — including `gates`,
+    # which is meant to fail open. `build` carries its own `!cancelled()`, so a
+    # gate that failed to answer still builds; this clause is what lets the
+    # matrix follow it.
     if: >-
       !cancelled() &&
-      github.event_name != 'push' &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false' &&
-      needs.gates.outputs.reused_result == '' &&
       needs.build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
