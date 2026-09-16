@@ -7,43 +7,43 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 57.45,
-      "min": 53.37,
-      "max": 99.57,
-      "p95": 85.32,
-      "opsPerSec": 1740558
+      "median": 38.97,
+      "min": 37.36,
+      "max": 44.99,
+      "p95": 44.52,
+      "opsPerSec": 2566072
     },
     {
       "label": "RxJS",
-      "median": 13.71,
-      "min": 13.32,
-      "max": 16.13,
-      "p95": 15.32,
-      "opsPerSec": 7293851
+      "median": 10.58,
+      "min": 10.07,
+      "max": 11.77,
+      "p95": 11.72,
+      "opsPerSec": 9449963
     },
     {
       "label": "MobX",
-      "median": 126.56,
-      "min": 115.01,
-      "max": 132.16,
-      "p95": 131.18,
-      "opsPerSec": 790111
+      "median": 78.29,
+      "min": 76.62,
+      "max": 106.63,
+      "p95": 80.48,
+      "opsPerSec": 1277365
     },
     {
       "label": "Jotai",
-      "median": 900.54,
-      "min": 861.27,
-      "max": 954.29,
-      "p95": 953.19,
-      "opsPerSec": 111044
+      "median": 572.1,
+      "min": 557.65,
+      "max": 596.98,
+      "p95": 589.1,
+      "opsPerSec": 174796
     },
     {
       "label": "Redux",
-      "median": 545.56,
-      "min": 515.53,
-      "max": 599.3,
-      "p95": 597.77,
-      "opsPerSec": 183297
+      "median": 316.63,
+      "min": 290.92,
+      "max": 349.59,
+      "p95": 343.66,
+      "opsPerSec": 315828
     }
   ]
 }

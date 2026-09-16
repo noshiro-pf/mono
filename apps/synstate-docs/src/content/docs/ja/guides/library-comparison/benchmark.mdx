@@ -28,14 +28,14 @@ import ConditionalFanOutChart from '../../../../../components/benchmark-chart/co
 
 {/* benchmark-result */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
-| ------------ | ----------: | -------: | -------: | -------: | ---------: |
-| **SynState** | 26.16 | 20.96 | 30.28 | 28.35 | 3,822,363 |
-| RxJS | 5.01 | 4.85 | 5.88 | 5.79 | 19,943,701 |
-| MobX | 90.84 | 86.14 | 97.04 | 94.47 | 1,100,830 |
-| Jotai | 612.69 | 591.14 | 654.76 | 653.85 | 163,215 |
-| Redux | 357.36 | 326.03 | 395.05 | 379.58 | 279,830 |
-| Zustand | 5.35 | 4.90 | 10.36 | 10.25 | 18,686,802 |
-| Valtio | 36.95 | 35.23 | 66.11 | 58.93 | 2,706,159 |
+| -------- | ----------: | -------: | -------: | -------: | --------: |
+| **SynState** | 18.49 | 16.65 | 30.03 | 23.78 | 5,407,526 |
+| RxJS | 4.04 | 3.85 | 5.04 | 4.62 | 24,773,929 |
+| MobX | 59.20 | 58.23 | 59.92 | 59.64 | 1,689,179 |
+| Jotai | 375.85 | 369.12 | 387.47 | 386.05 | 266,061 |
+| Redux | 245.71 | 228.01 | 267.99 | 261.80 | 406,979 |
+| Zustand | 3.21 | 3.01 | 3.60 | 3.33 | 31,116,631 |
+| Valtio | 24.75 | 24.15 | 25.15 | 25.05 | 4,040,299 |
 {/* /benchmark-result */}
 
 :::note
@@ -284,12 +284,12 @@ RxJS の `combineLatest` はこのダイヤモンドグラフで**更新ごと�
 
 {/* benchmark-result-diamond */}
 | Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
-| ------------ | ----------: | -------: | -------: | -------: | --------: |
-| **SynState** | 57.45 | 53.37 | 99.57 | 85.32 | 1,740,558 |
-| RxJS | 13.71 | 13.32 | 16.13 | 15.32 | 7,293,851 |
-| MobX | 126.56 | 115.01 | 132.16 | 131.18 | 790,111 |
-| Jotai | 900.54 | 861.27 | 954.29 | 953.19 | 111,044 |
-| Redux | 545.56 | 515.53 | 599.30 | 597.77 | 183,297 |
+| -------- | ----------: | -------: | -------: | -------: | --------: |
+| **SynState** | 38.97 | 37.36 | 44.99 | 44.52 | 2,566,072 |
+| RxJS | 10.58 | 10.07 | 11.77 | 11.72 | 9,449,963 |
+| MobX | 78.29 | 76.62 | 106.63 | 80.48 | 1,277,365 |
+| Jotai | 572.10 | 557.65 | 596.98 | 589.10 | 174,796 |
+| Redux | 316.63 | 290.92 | 349.59 | 343.66 | 315,828 |
 {/* /benchmark-result-diamond */}
 
 ### 実装の詳細
@@ -498,22 +498,22 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 
 {/* benchmark-result-deep-chain */}
 | Library | K=100, M=50 | K=500, M=50 | K=1000, M=50 | K=100, M=100 | K=500, M=100 | K=1000, M=100 | K=500, M=200 | K=1000, M=200 |
-| ------------ | ----------: | ----------: | -----------: | -----------: | -----------: | ------------: | -----------: | ------------: |
-| **SynState** | 0.7 ms | 3.9 ms | 6.0 ms | 1.1 ms | 5.5 ms | 10.7 ms | 11.3 ms | 23.8 ms |
-| RxJS | 6.9 ms | 32.5 ms | 60.7 ms | 36.9 ms | 167.6 ms | 328.4 ms | 897.4 ms | 1905.3 ms |
-| Jotai | 16.7 ms | 94.6 ms | 174.2 ms | 34.6 ms | 182.0 ms | 330.2 ms | 343.3 ms | 696.1 ms |
-| MobX | 20.3 ms | 94.6 ms | 185.0 ms | 39.0 ms | 184.0 ms | 390.2 ms | 378.4 ms | 753.3 ms |
+| ------- | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: |
+| **SynState** | 0.8 ms | 2.3 ms | 4.6 ms | 0.9 ms | 4.3 ms | 8.2 ms | 8.7 ms | 15.1 ms |
+| RxJS | 3.0 ms | 17.3 ms | 35.2 ms | 20.7 ms | 99.5 ms | 186.5 ms | 516.5 ms | 1042.4 ms |
+| Jotai | 11.4 ms | 48.0 ms | 95.6 ms | 20.0 ms | 94.9 ms | 195.4 ms | 198.6 ms | 399.0 ms |
+| MobX | 14.1 ms | 66.7 ms | 133.0 ms | 24.8 ms | 125.3 ms | 253.0 ms | 248.4 ms | 504.2 ms |
 {/* /benchmark-result-deep-chain */}
 
 <DeepChainChart />
 
 ### 主な観察結果
 
-- **SynState** は $K$ と $M$ の両方に対して線形に増加します。$K=1000$, $M=200$ でも **{/* bench:deep-chain/synstate@k1000-m200 */}23.8 ms{/* /bench */}** で完了し、プッシュベースの直接関数呼び出しによるステージあたりのオーバーヘッドはごくわずかです。
-- **RxJS** は $K=1000$, $M=200$ で **{/* bench:deep-chain/rxjs@k1000-m200 */}1,905 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}80{/* /bench */}倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
-- **Jotai** は $K=1000$, $M=200$ で **{/* bench:deep-chain/jotai@k1000-m200 */}696 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/jotai-over-synstate@k1000-m200 */}29{/* /bench */}倍**です。`selectAtom` の更新ごとのオーバーヘッド（エポックベースの再計算と動的依存関係追跡）に起因します。
-- **MobX** は $K=1000$, $M=200$ で **{/* bench:deep-chain/mobx@k1000-m200 */}753 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}32{/* /bench */}倍**です。このシナリオは `scan`（ステートフルな累積：各ステージが自身の前回値と新しい入力を必要とする）を使用します。MobX の `computed` は純粋な派生であり、自身の前回出力にアクセスする手段を持たないため、ここでは使えません。`observable.box` + `reaction`（push-based）を使う必要があり、プロキシ追跡・依存通知・`autorun` の再読み取りによるステージごとのオーバーヘッドが発生します。対照的に、[カスケードダイアモンドシナリオ](#シナリオ：-カスケードダイアモンド)はステートレスな派生のため `computed` の遅延評価で高効率に処理できます。
-- $K=500$, $M=100$（60fps アニメーションで中程度のグラフ複雑度を想定）の場合、SynState（**{/* bench:deep-chain/synstate@k500-m100 */}5.5 ms{/* /bench */}**）は 16ms のフレーム時間内に余裕で収まりますが、RxJS（{/* bench:deep-chain/rxjs@k500-m100 */}168 ms{/* /bench */}）、Jotai（{/* bench:deep-chain/jotai@k500-m100 */}182 ms{/* /bench */}）、MobX（{/* bench:deep-chain/mobx@k500-m100 */}184 ms{/* /bench */}）はいずれも大幅に超過します。
+- **SynState** は $K$ と $M$ の両方に対して線形に増加します。$K=1000$, $M=200$ でも **{/* bench:deep-chain/synstate@k1000-m200 */}15.1 ms{/* /bench */}** で完了し、プッシュベースの直接関数呼び出しによるステージあたりのオーバーヘッドはごくわずかです。
+- **RxJS** は $K=1000$, $M=200$ で **{/* bench:deep-chain/rxjs@k1000-m200 */}1,042 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/rxjs-over-synstate@k1000-m200 */}69{/* /bench */}倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
+- **Jotai** は $K=1000$, $M=200$ で **{/* bench:deep-chain/jotai@k1000-m200 */}399 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/jotai-over-synstate@k1000-m200 */}26{/* /bench */}倍**です。`selectAtom` の更新ごとのオーバーヘッド（エポックベースの再計算と動的依存関係追跡）に起因します。
+- **MobX** は $K=1000$, $M=200$ で **{/* bench:deep-chain/mobx@k1000-m200 */}504 ms{/* /bench */}** — SynState の**約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}33{/* /bench */}倍**です。このシナリオは `scan`（ステートフルな累積：各ステージが自身の前回値と新しい入力を必要とする）を使用します。MobX の `computed` は純粋な派生であり、自身の前回出力にアクセスする手段を持たないため、ここでは使えません。`observable.box` + `reaction`（push-based）を使う必要があり、プロキシ追跡・依存通知・`autorun` の再読み取りによるステージごとのオーバーヘッドが発生します。対照的に、[カスケードダイアモンドシナリオ](#シナリオ：-カスケードダイアモンド)はステートレスな派生のため `computed` の遅延評価で高効率に処理できます。
+- $K=500$, $M=100$（60fps アニメーションで中程度のグラフ複雑度を想定）の場合、SynState（**{/* bench:deep-chain/synstate@k500-m100 */}4.3 ms{/* /bench */}**）は 16ms のフレーム時間内に余裕で収まりますが、RxJS（{/* bench:deep-chain/rxjs@k500-m100 */}99.5 ms{/* /bench */}）、Jotai（{/* bench:deep-chain/jotai@k500-m100 */}94.9 ms{/* /bench */}）、MobX（{/* bench:deep-chain/mobx@k500-m100 */}125 ms{/* /bench */}）はいずれも大幅に超過します。
 
 ## シナリオ： カスケードダイアモンド
 
@@ -535,21 +535,21 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 
 {/* benchmark-result-cascaded-diamond */}
 | Library | N=2 | N=4 | N=6 | N=8 | N=10 | N=12 | N=14 | N=16 | N=18 | N=20 |
-| ------------ | -----: | -----: | -----: | ------: | -------: | -------: | --------: | --------: | --------: | --------: |
-| **SynState** | 1.0 ms | 0.8 ms | 1.1 ms | 1.1 ms | 2.0 ms | 6.0 ms | 17.9 ms | 60.4 ms | 234.7 ms | 918.9 ms |
-| RxJS | 0.3 ms | 0.9 ms | 4.6 ms | 22.6 ms | 147.2 ms | 742.7 ms | 3900.4 ms | > 5000 ms | > 5000 ms | > 5000 ms |
-| Jotai | 3.5 ms | 3.5 ms | 5.2 ms | 6.2 ms | 10.7 ms | 11.7 ms | 13.0 ms | 14.6 ms | 15.4 ms | 17.1 ms |
-| MobX | 1.2 ms | 0.8 ms | 0.7 ms | 0.8 ms | 0.9 ms | 1.0 ms | 1.1 ms | 1.2 ms | 1.3 ms | 1.6 ms |
+| ------- | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: |
+| **SynState** | 0.8 ms | 1.1 ms | 0.7 ms | 1.0 ms | 1.6 ms | 3.4 ms | 11.3 ms | 37.6 ms | 146.3 ms | 572.6 ms |
+| RxJS | 0.1 ms | 0.5 ms | 2.3 ms | 12.3 ms | 60.4 ms | 341.1 ms | 1996.6 ms | > 5000 ms | > 5000 ms | > 5000 ms |
+| Jotai | 1.3 ms | 2.4 ms | 2.9 ms | 3.9 ms | 4.9 ms | 5.4 ms | 6.1 ms | 7.2 ms | 8.2 ms | 8.5 ms |
+| MobX | 0.5 ms | 0.4 ms | 0.4 ms | 0.5 ms | 0.4 ms | 0.5 ms | 0.6 ms | 0.6 ms | 0.8 ms | 0.8 ms |
 {/* /benchmark-result-cascaded-diamond */}
 
 <CascadedDiamondChart />
 
 ### 主な観察結果
 
-- **RxJS** は典型的な $O(2^N)$ の指数関数的増大（二分岐）を示します。{/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=16${/* /bench */} でタイムアウト（ソース更新あたり {/* bench:cascaded-diamond/rxjs-timeout-emissions-math */}$2^{16} = 65536${/* /bench */} 回の発行 {/* bench:cascaded-diamond/updates-math */}$\times 100${/* /bench */} 回の更新）。{/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=14${/* /bench */} では既に **{/* bench:cascaded-diamond/rxjs@last-measured */}3,900 ms{/* /bench */}** — SynState（{/* bench:cascaded-diamond/synstate@rxjs-last-measured */}17.9 ms{/* /bench */}）の約{/* bench:cascaded-diamond/rxjs-over-synstate@last-measured */}218{/* /bench */}倍です。
-- **MobX** は遅延 `computed` 評価により $N=20$ でも {/* bench:cascaded-diamond/mobx@max-n */}1.6 ms{/* /bench */} にとどまります。MobX の `computed` 値は依存が変化しても即座に再計算されず、実際に読み取られたときに初めて再計算されます。`reaction` は最終段の `computed` のみを読み取り、それがチェーンを遡って各 `computed` を1回ずつ遅延評価するため、更新あたりの総作業量は $O(N)$ で、オーバーヘッドも最小限です。これは[ディープチェーンスループットシナリオ](#シナリオ：-ディープチェーンスループット)で MobX が SynState の約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}32{/* /bench */}倍遅い結果と対照的です。あちらのシナリオでは `computed` ではなく `reaction` チェーン（push-based）を使用しており、パフォーマンス特性は使用する MobX プリミティブに大きく依存します。
-- **SynState** は深さ順走査により $O(N)$ で伝播しますが、このベンチマークでは各 `runBenchmark` 呼び出しでグラフを再構築（$3N+1$ 個の Observable を二分探索挿入で `propagationOrder` に登録）しているため、その構築コストが $N$ の増加とともに支配的になります。$N=20$ で {/* bench:cascaded-diamond/synstate@max-n */}919 ms{/* /bench */}。グラフを一度構築して繰り返し更新する実アプリケーションでは、更新あたりのコストはディープチェーンスループットシナリオで示した通り $O(N)$ です。
-- **Jotai** はほぼ横ばいです — $N=2$ で {/* bench:cascaded-diamond/jotai@min-n */}3.5 ms{/* /bench */}、$N=20$ で {/* bench:cascaded-diamond/jotai@max-n */}17.1 ms{/* /bench */}。動的依存関係追跡により派生 atom が深さによらず更新あたり1回ずつ再計算されること、そしてこのシナリオでは更新のたびにグラフを再構築していないことによります。{/* bench:cascaded-diamond/jotai-lead-from-n-math */}$N=14${/* /bench */} 以降は MobX に次いで高速で、$N=20$ では SynState の約{/* bench:cascaded-diamond/synstate-over-jotai@max-n */}54{/* /bench */}倍高速です（SynState 側の計測は上述の呼び出しごとのグラフ構築コストが支配的です）。
+- **RxJS** は典型的な $O(2^N)$ の指数関数的増大（二分岐）を示します。{/* bench:cascaded-diamond/rxjs-timeout-n-math */}$N=16${/* /bench */} でタイムアウト（ソース更新あたり {/* bench:cascaded-diamond/rxjs-timeout-emissions-math */}$2^{16} = 65536${/* /bench */} 回の発行 {/* bench:cascaded-diamond/updates-math */}$\times 100${/* /bench */} 回の更新）。{/* bench:cascaded-diamond/rxjs-last-measured-n-math */}$N=14${/* /bench */} では既に **{/* bench:cascaded-diamond/rxjs@last-measured */}1,997 ms{/* /bench */}** — SynState（{/* bench:cascaded-diamond/synstate@rxjs-last-measured */}11.3 ms{/* /bench */}）の約{/* bench:cascaded-diamond/rxjs-over-synstate@last-measured */}177{/* /bench */}倍です。
+- **MobX** は遅延 `computed` 評価により $N=20$ でも {/* bench:cascaded-diamond/mobx@max-n */}0.8 ms{/* /bench */} にとどまります。MobX の `computed` 値は依存が変化しても即座に再計算されず、実際に読み取られたときに初めて再計算されます。`reaction` は最終段の `computed` のみを読み取り、それがチェーンを遡って各 `computed` を1回ずつ遅延評価するため、更新あたりの総作業量は $O(N)$ で、オーバーヘッドも最小限です。これは[ディープチェーンスループットシナリオ](#シナリオ：-ディープチェーンスループット)で MobX が SynState の約{/* bench:deep-chain/mobx-over-synstate@k1000-m200 */}33{/* /bench */}倍遅い結果と対照的です。あちらのシナリオでは `computed` ではなく `reaction` チェーン（push-based）を使用しており、パフォーマンス特性は使用する MobX プリミティブに大きく依存します。
+- **SynState** は深さ順走査により $O(N)$ で伝播しますが、このベンチマークでは各 `runBenchmark` 呼び出しでグラフを再構築（$3N+1$ 個の Observable を二分探索挿入で `propagationOrder` に登録）しているため、その構築コストが $N$ の増加とともに支配的になります。$N=20$ で {/* bench:cascaded-diamond/synstate@max-n */}573 ms{/* /bench */}。グラフを一度構築して繰り返し更新する実アプリケーションでは、更新あたりのコストはディープチェーンスループットシナリオで示した通り $O(N)$ です。
+- **Jotai** はほぼ横ばいです — $N=2$ で {/* bench:cascaded-diamond/jotai@min-n */}1.3 ms{/* /bench */}、$N=20$ で {/* bench:cascaded-diamond/jotai@max-n */}8.5 ms{/* /bench */}。動的依存関係追跡により派生 atom が深さによらず更新あたり1回ずつ再計算されること、そしてこのシナリオでは更新のたびにグラフを再構築していないことによります。{/* bench:cascaded-diamond/jotai-lead-from-n-math */}$N=14${/* /bench */} 以降は MobX に次いで高速で、$N=20$ では SynState の約{/* bench:cascaded-diamond/synstate-over-jotai@max-n */}67{/* /bench */}倍高速です（SynState 側の計測は上述の呼び出しごとのグラフ構築コストが支配的です）。
 
 ## シナリオ： 条件付きファンアウト
 
@@ -844,4 +844,4 @@ Jotai はグリッチフリーのセマンティクスを持ちながら、両�
 - **SynState**： `setCounter(i)` → `doubled` の map 関数を呼び出し → `quadrupled` の map 関数を呼び出し → subscriber を呼び出し。フレームワークによる管理処理を伴わない、3回の直接関数呼び出しのみ。
 - **Jotai**： `store.set(counterAtom, i)` → DFS 無効化（WeakSet アロケーション + Map 書き込み）→ DFS トポロジカルソート（WeakSet アロケーション + 配列 push + reverse）→ `doubledAtom` の再計算（Map 検索 + エポックチェック + Map 書き込み）→ `quadrupledAtom` の再計算（同上）→ コールバックをフラッシュ → `store.get(quadrupledAtom)`（キャッシュ検索）。
 
-{/* bench:derived-chain/updates */}100,000{/* /bench */}回のイテレーションにわたって、SynState は3回の関数呼び出しが処理の大半を占める一方、Jotai では更新ごとの管理処理（Map/WeakSet アロケーション、エポック比較、2回の DFS トラバーサル）が蓄積され、観測される約{/* bench:derived-chain/jotai-over-synstate */}23{/* /bench */}倍の差になります。
+{/* bench:derived-chain/updates */}100,000{/* /bench */}回のイテレーションにわたって、SynState は3回の関数呼び出しが処理の大半を占める一方、Jotai では更新ごとの管理処理（Map/WeakSet アロケーション、エポック比較、2回の DFS トラバーサル）が蓄積され、観測される約{/* bench:derived-chain/jotai-over-synstate */}20{/* /bench */}倍の差になります。
