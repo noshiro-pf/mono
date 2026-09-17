@@ -232,3 +232,11 @@ strict-lib/v*/temp/codemod-fixed
 strict-lib/v*/temp/copied-for-diff
 
 .claude/worktrees
+
+# Marp render output for the decks under `docs/marp-slides/`. It lives here
+# rather than in a per-deck `.gitignore` because Prettier reads `.gitignore`
+# only from the repository root: a nested one keeps git quiet while
+# `fix:fmt:full` goes on rewriting the rendered HTML (measured —
+# `prettier --check docs/marp-slides/` flagged `slides.html`).
+docs/marp-slides/*/slides.html
+docs/marp-slides/*/slides.pdf
