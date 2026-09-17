@@ -5,8 +5,8 @@ import { range } from 'ts-data-forge';
 import {
   type BenchmarkStats,
   writeBenchmarkResults,
-} from '../benchmark-results.mjs';
-import { workspaceRootPath } from '../workspace-root-path.mjs';
+} from './benchmark-results.mjs';
+import { resultsDir, scenarioDir } from './paths.mjs';
 
 const WARMUP_ROUNDS = 5;
 
@@ -59,11 +59,6 @@ const scenarios: readonly Scenario[] = [
   },
 ] as const;
 
-const benchmarkDir = path.resolve(
-  workspaceRootPath,
-  'samples/docs-site/benchmark',
-);
-
 const median = (sorted: readonly number[]): number => {
   const mid = Math.floor(sorted.length / 2);
 
@@ -86,7 +81,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   const mut_results: { name: string; times: number[] }[] = [];
 
   for (const entry of scenario.entries) {
-    const filePath = path.resolve(benchmarkDir, entry.file);
+    const filePath = path.resolve(scenarioDir, entry.file);
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const mod = (await import(filePath)) as BenchmarkModule;
@@ -171,12 +166,11 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   // Print to console
   console.info(tableContent);
 
-  await writeBenchmarkResults(
-    benchmarkDir,
-    scenario.resultsFile,
-    tableContent,
-    { kind: 'stats', meta: { updates: N, timeoutMs: null }, rows: mut_rows },
-  );
+  await writeBenchmarkResults(resultsDir, scenario.resultsFile, tableContent, {
+    kind: 'stats',
+    meta: { updates: N, timeoutMs: null },
+    rows: mut_rows,
+  });
 };
 
 for (const scenario of scenarios) {

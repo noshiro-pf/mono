@@ -1,6 +1,10 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Num, Result } from 'ts-data-forge';
+import {
+  type BenchmarkEnvironment,
+  readBenchmarkEnvironment,
+} from './environment.mjs';
 
 /**
  * One library's row in a scenario swept over a parameter (`N`, `B`, `K`/`M`).
@@ -60,6 +64,32 @@ export const formatBenchmarkCell = (
     ? (`> ${timeoutMs.toString()} ms` as const)
     : (`${value.toFixed(1)} ms` as const);
 
+/**
+ * `BenchmarkMeta` as written, with the environment {@link
+ * writeBenchmarkResults} stamps on.
+ *
+ * It is added there rather than passed by each runner so that no runner can
+ * forget it: a results file without its environment is a row of milliseconds
+ * nobody can compare with anything.
+ */
+export type WrittenBenchmarkMeta = BenchmarkMeta &
+  Readonly<{ environment: BenchmarkEnvironment }>;
+
+/** A results file as written: {@link BenchmarkResults} plus the environment. */
+export type WrittenBenchmarkResults = Readonly<
+  | {
+      kind: 'series';
+      meta: WrittenBenchmarkMeta;
+      xLabels: readonly string[];
+      series: readonly BenchmarkSeries[];
+    }
+  | {
+      kind: 'stats';
+      meta: WrittenBenchmarkMeta;
+      rows: readonly BenchmarkStats[];
+    }
+>;
+
 export type BenchmarkResults = Readonly<
   | {
       kind: 'series';
@@ -81,17 +111,17 @@ export type BenchmarkResults = Readonly<
  * timeout, for one, renders as `> 5000 ms` and is `null` here.
  */
 export const writeBenchmarkResults = async (
-  benchmarkDir: string,
+  resultsDir: string,
   resultsFileName: string,
   markdown: string,
   data: BenchmarkResults,
 ): Promise<void> => {
-  const normalized = normalize(data);
+  const normalized = normalize(data, await readBenchmarkEnvironment());
 
-  const markdownPath = path.resolve(benchmarkDir, resultsFileName);
+  const markdownPath = path.resolve(resultsDir, resultsFileName);
 
   const jsonPath = path.resolve(
-    benchmarkDir,
+    resultsDir,
     resultsFileName.replace(/\.md$/u, '.json'),
   );
 
@@ -229,11 +259,14 @@ const padCell = (
  * with and would churn the diff on every run; each value is rounded to the
  * precision its table column shows.
  */
-const normalize = (data: BenchmarkResults): BenchmarkResults =>
+const normalize = (
+  data: BenchmarkResults,
+  environment: BenchmarkEnvironment,
+): WrittenBenchmarkResults =>
   data.kind === 'series'
     ? ({
         kind: 'series',
-        meta: data.meta,
+        meta: { ...data.meta, environment },
         xLabels: data.xLabels,
         series: data.series.map((s) => ({
           label: plainLabel(s.label),
@@ -242,7 +275,7 @@ const normalize = (data: BenchmarkResults): BenchmarkResults =>
       } as const)
     : ({
         kind: 'stats',
-        meta: data.meta,
+        meta: { ...data.meta, environment },
         rows: data.rows.map((r) => ({
           label: plainLabel(r.label),
           median: round(r.median, 2),
