@@ -847,7 +847,8 @@ describe('diff', () => {
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
-        const testFileName = `test-base-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-base-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -889,7 +890,8 @@ describe('diff', () => {
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
-        const testFileName = `test-single-arg-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-single-arg-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
