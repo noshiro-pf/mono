@@ -1,9 +1,9 @@
 import { type ReadonlyRecord } from 'ts-type-forge';
-/* eslint-disable import-x/no-relative-packages */
-import cascadedDiamond from '../../../../../libs/synstate/samples/docs-site/benchmark/results-cascaded-diamond.json' with { type: 'json' };
-import conditionalFanOut from '../../../../../libs/synstate/samples/docs-site/benchmark/results-conditional-fan-out.json' with { type: 'json' };
-import deepChain from '../../../../../libs/synstate/samples/docs-site/benchmark/results-deep-chain.json' with { type: 'json' };
-/* eslint-enable import-x/no-relative-packages */
+import {
+  cascadedDiamond,
+  conditionalFanOut,
+  deepChain,
+} from '../../data/index.mjs';
 
 /**
  * The benchmark numbers, read from what the runners wrote.

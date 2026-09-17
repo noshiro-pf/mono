@@ -10,12 +10,13 @@ import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { asSafeUint, range } from 'ts-data-forge';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import {
   type BenchmarkSeries,
   formatBenchmarkCell,
   writeBenchmarkResults,
-} from '../benchmark-results.mjs';
-import { workspaceRootPath } from '../workspace-root-path.mjs';
+} from './benchmark-results.mjs';
+import { resultsDir } from './paths.mjs';
 
 const WARMUP_ROUNDS = 2;
 
@@ -37,11 +38,13 @@ const PARAMS: readonly (readonly [k: number, depth: number])[] = [
 
 // --- Import adapters from the docs throughput demo ---
 
-// A path rather than an import: the documentation site is an application, and
-// a library must not depend on one. `workspaceRootPath` is `libs/synstate`.
+// A path rather than an import so that this stays the one module the runner
+// loads dynamically, alongside the scenario files. The adapters are in this
+// package now — the reason it used to be a cross-package path (a library must
+// not depend on an application) went away with the move.
 const docsAdaptersDir = path.resolve(
   workspaceRootPath,
-  '../../apps/synstate-docs/src/components/throughput-demo/adapters/index.mjs',
+  'src/components/throughput-demo/adapters/index.mjs',
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
@@ -245,19 +248,9 @@ const tableContent = mut_tableLines.join('\n');
 
 console.info(`\n${tableContent}`);
 
-const benchmarkDir = path.resolve(
-  workspaceRootPath,
-  'samples/docs-site/benchmark',
-);
-
-await writeBenchmarkResults(
-  benchmarkDir,
-  'results-deep-chain.md',
-  tableContent,
-  {
-    kind: 'series',
-    meta: { updates: null, timeoutMs: TIMEOUT_MS },
-    xLabels: colHeaders,
-    series: mut_series,
-  },
-);
+await writeBenchmarkResults(resultsDir, 'results-deep-chain.md', tableContent, {
+  kind: 'series',
+  meta: { updates: null, timeoutMs: TIMEOUT_MS },
+  xLabels: colHeaders,
+  series: mut_series,
+});

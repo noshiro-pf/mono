@@ -29,9 +29,6 @@
     "LICENSE"
   ],
   "scripts": {
-    "benchmark": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/run-benchmark.mts",
-    "benchmark:cascaded-diamond": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/run-benchmark-cascaded-diamond.mts",
-    "benchmark:deep-chain": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/run-benchmark-deep-chain.mts",
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "eslint .",

@@ -1,11 +1,12 @@
-import { Num, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
-/* eslint-disable import-x/no-relative-packages */
-import cascadedDiamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-cascaded-diamond.json' with { type: 'json' };
-import conditionalFanOutJson from '../../../libs/synstate/samples/docs-site/benchmark/results-conditional-fan-out.json' with { type: 'json' };
-import deepChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results-deep-chain.json' with { type: 'json' };
-import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results.json' with { type: 'json' };
-/* eslint-enable import-x/no-relative-packages */
+import {
+  cascadedDiamond as cascadedDiamondJson,
+  conditionalFanOut as conditionalFanOutJson,
+  deepChain as deepChainJson,
+  derivedChain as derivedChainJson,
+  diamond as diamondJson,
+} from '../src/data/index.mjs';
 
 /**
  * Every number the benchmark prose quotes, keyed by what it stands for.
@@ -41,6 +42,17 @@ import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   ({
+    // Where the numbers on this page were measured. Three bare facts rather
+    // than a sentence: a marker's value is written once and spliced into both
+    // language versions, so it must carry no English of its own.
+    'environment/runner': environmentFact((e) =>
+      e.runner === 'github-actions'
+        ? `GitHub Actions ${e.runnerImage ?? 'standard runner'}`
+        : e.cpu,
+    ),
+    'environment/node': environmentFact((e) => e.node),
+    'environment/measured-on': environmentFact((e) => e.measuredOn),
+
     // Scenario: Derived Chain / Diamond Dependency
     //
     // The first two are also the headline figures on the introduction and the
@@ -127,8 +139,29 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   }) as const;
 
 /** One library's row in a sweep, and the constants the sweep ran under. */
+/**
+ * The environment a results file records, as this module needs to read it.
+ *
+ * Optional because the tables committed before the measurement moved to CI do
+ * not carry one — see {@link environmentFact}, which writes an em dash rather
+ * than inventing a machine.
+ */
+type RecordedEnvironment = Readonly<{
+  runner: string;
+  runnerImage: string | null;
+  node: string;
+  cpu: string;
+  measuredOn: string;
+}>;
+
+type ResultsMeta = Readonly<{
+  updates: number | null;
+  timeoutMs: number | null;
+  environment?: RecordedEnvironment;
+}>;
+
 type SeriesData = Readonly<{
-  meta: Readonly<{ updates: number | null; timeoutMs: number | null }>;
+  meta: ResultsMeta;
   xLabels: readonly string[];
   series: readonly Readonly<{
     label: string;
@@ -137,7 +170,7 @@ type SeriesData = Readonly<{
 }>;
 
 type StatsData = Readonly<{
-  meta: Readonly<{ updates: number | null; timeoutMs: number | null }>;
+  meta: ResultsMeta;
   rows: readonly Readonly<{ label: string; median: number }>[];
 }>;
 
@@ -161,6 +194,69 @@ const deepChain: SeriesData = deepChainJson;
 const cascadedDiamond: SeriesData = cascadedDiamondJson;
 
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
+
+/**
+ * Every committed table, for the environment check alone.
+ *
+ * The diamond is here and nowhere else in this module: no sentence quotes a
+ * number from it any more, but it is a table on the page, so the environment
+ * it was measured in has to agree with the others' or the page's one-sentence
+ * description of where the numbers come from is false.
+ */
+const allResults: readonly (StatsData | SeriesData)[] = [
+  derivedChain,
+  diamondJson,
+  deepChain,
+  cascadedDiamond,
+  conditionalFanOut,
+];
+
+/**
+ * One fact about where every table on the page was measured.
+ *
+ * Derived rather than written, for the reason the rest of this module exists:
+ * the environment is as much a part of a millisecond as the digits are, and a
+ * page describing one machine while its tables came from another is how this
+ * repository spent a day telling a code regression apart from a change of
+ * machine.
+ *
+ * The scenarios must agree, the date included — `benchmark` measures all of
+ * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
+ * useful on one machine and misleading across two, so a disagreement fails
+ * here rather than being averaged into a claim. An em dash where nothing was
+ * recorded: those tables predate the pinned runner, and inventing a machine
+ * for them would be worse than saying so.
+ */
+const environmentFact = (
+  read: (environment: RecordedEnvironment) => string,
+): string => {
+  const recorded = allResults
+    .map((r) => r.meta.environment)
+    .filter((e) => e !== undefined);
+
+  if (recorded.length < allResults.length) {
+    return '\u{2014}';
+  }
+
+  const distinct = Arr.uniq(recorded.map(read));
+
+  const [only] = distinct;
+
+  if (only === undefined || distinct.length > 1) {
+    throw new Error(
+      [
+        'The scenarios disagree about where they were measured, so no single',
+        'value describes the page:',
+        ...distinct.map((d) => `  - ${d}`),
+        '',
+        'Re-measure every scenario with',
+        '`pnpm --filter @synstate/docs run benchmark`.',
+      ].join('\n'),
+    );
+  }
+
+  return only;
+};
 
 /** The sweep points the prose singles out by name. */
 const DEEP_MAX = 'K=1000, M=200';
