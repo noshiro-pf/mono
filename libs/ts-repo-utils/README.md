@@ -107,7 +107,7 @@ Example in npm scripts:
 
 **Options:**
 
-- `<base>` - Base branch name or commit hash to compare against (required)
+- `<base>` - Base branch name or commit hash to compare against (required). It names exactly one revision and is handed to `git` as a single argument, never as part of a command line.
 - `--exclude-untracked` - Exclude untracked files (default: false)
 - `--exclude-modified` - Exclude modified files (default: false)
 - `--exclude-staged` - Exclude staged files (default: false)
@@ -215,7 +215,7 @@ npm exec -- check-should-run \
     - Directory prefixes: `docs/` (the same as `docs/**`)
     - Globs: `**.md`, `libs/*/samples/**`
     - Default: `[]` — nothing is ignored, so the step always runs when anything changed
-- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
+- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`). It names exactly one revision and is handed to `git` as a single argument, never as part of a command line.
 
 An empty diff reads as "nothing changed", so it reports `should_run=false`. On a push to the base branch itself the diff against that branch is empty for that reason; pass the commit the branch pointed at before the push as `--base-branch` there.
 
@@ -262,7 +262,7 @@ npm exec -- check-should-run-type-checks \
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
     - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
-- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
+- `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`). It names exactly one revision and is handed to `git` as a single argument, never as part of a command line.
 
 **GitHub Actions Integration:**
 
@@ -539,7 +539,9 @@ Runs `git diff --staged --name-only [--diff-filter=d]`
 ##### `getDiffFrom(base: string, options?)`
 
 Gets files that differ from the specified base branch or commit.  
-Runs `git diff --name-only <base> [--diff-filter=d]`
+Runs `git diff --name-only [--diff-filter=d] <base> --`
+
+`base` names exactly one revision. It reaches `git` as a single argument and never as part of a command line, so whatever it contains is read as the name of a revision and nothing else; a `base` git cannot resolve comes back as an `Err`. A `base` beginning with `-` is rejected without invoking git, since git would read it as an option.
 
 **Common options:**
 
@@ -603,7 +605,7 @@ const shouldRun2 = await checkShouldRunTypeChecks({
     - Directory prefixes: `docs/` (the same as `docs/**`)
     - Globs: `**.md` (matches any markdown file), `libs/*/samples/**`
     - Default: `[]` for `checkShouldRun`; for `checkShouldRunTypeChecks`, `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']` — passing the option replaces that list rather than adding to it
-- `baseBranch?` - Base branch to compare against (default: `origin/main`)
+- `baseBranch?` - Base branch to compare against (default: `origin/main`). It names exactly one revision and reaches `git` as a single argument.
 
 Both return whether the step should run, and, in GitHub Actions, append `should_run=<result>` to the file named by `GITHUB_OUTPUT`. An empty diff reads as "nothing changed" and so returns `false`.
 
@@ -680,6 +682,8 @@ type Ret = Promise<
 
 Formats only files that differ from the specified base branch or commit.
 (Function version of the `format-diff-from` command)
+
+`base` is passed through to [`getDiffFrom`](#getdifffrombase-string-options), so it names exactly one revision and reaches `git` as a single argument.
 
 ```tsx
 import { formatDiffFrom } from 'ts-repo-utils';

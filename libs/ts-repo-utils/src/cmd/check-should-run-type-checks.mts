@@ -18,7 +18,7 @@ const cmdDef = cmd.command({
       long: 'base-branch',
       type: cmd.optional(cmd.string),
       description:
-        'Base branch to compare against for determining changed files. Defaults to "origin/main"',
+        'Base branch to compare against for determining changed files. Names exactly one revision, and is passed to git as a single argument. Defaults to "origin/main"',
     }),
   },
   handler: (args) => {
