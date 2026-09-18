@@ -1,46 +1,61 @@
 # GitHub Diff Defaults
 
-A Chrome extension that opens every GitHub pull request diff the way you would
-have set it up by hand: whitespace-only changes hidden, and the files you have
-already marked as viewed collapsed.
+A Chrome extension that opens a few GitHub pages the way you would have set
+them up by hand: a pull request diff with whitespace-only changes hidden and
+the files you have already marked as viewed collapsed, and a repository's
+branches page as the full list of branches rather than the overview.
 
-It does that by putting two query parameters on the "Files changed" URL —
+| page                             | opened as                                              |
+| :------------------------------- | :----------------------------------------------------- |
+| `/{owner}/{repo}/pull/{n}/files` | the same URL with `?w=1&show-viewed-files=false` added |
+| `/{owner}/{repo}/branches`       | `/{owner}/{repo}/branches/all`                         |
 
-| parameter                 | what it does                                 |
-| :------------------------ | :------------------------------------------- |
-| `w=1`                     | hides changes that are whitespace only       |
-| `show-viewed-files=false` | collapses the files already marked as viewed |
-
-— so `github.com/owner/repo/pull/123/files` becomes
+`w=1` hides changes that are whitespace only, and
+`show-viewed-files=false` collapses the files already marked as viewed — so
+`github.com/owner/repo/pull/123/files` becomes
 `github.com/owner/repo/pull/123/files?w=1&show-viewed-files=false`, whether you
-got there from a link, a bookmark, or the tab at the top of a pull request.
+got there from a link, a bookmark, or the tab at the top of a pull request. The
+branches page's own "All" tab is reached the same way, whether you got there
+from the repository's navigation or by typing the address.
 
-It is the same idea as
+The diff half is the same idea as
 [Hide Whitespace for GitHub](https://github.com/jackchuka/chrome-extension-github-whitespace),
 which is where the approach comes from, with the viewed-files parameter added
 and one difference in behavior — see below.
 
 ## What it does, exactly
 
-- **On the pull request diff pages only** —
+- **On the pull request diff pages** —
   `/{owner}/{repo}/pull/{number}/files`, the `/changes` spelling of the same
   tab, and anything below either of them, such as the diff between two of the
   pull request's commits. Not the conversation tab, not a commit page, not a
   comparison.
+- **On a repository's branch overview** — `/{owner}/{repo}/branches`, and
+  nothing else under it. The tabs that name what they list — `/branches/all`,
+  `/branches/yours`, `/branches/active`, `/branches/stale` — already say what
+  they want, so they are left exactly as they are.
 - **It rewrites the links before you click them.** Every anchor on the page
-  that points at a diff gets the parameters, so clicking "Files changed" goes
-  straight to the right address. Landing on a bare diff URL from outside — a
-  bookmark, a notification e-mail — is redirected instead, which costs a second
-  page load and is the only time you would notice the extension at all.
-- **A parameter that is already on the URL is never rewritten.** This is the
-  difference from the extension above, which always forces `w=1`. GitHub's own
-  "Show whitespace changes" and "Toggle viewed files" controls navigate to the
-  same page with `w=0` or `show-viewed-files=true` on it; forcing the defaults
-  back would leave no way to look at what the extension hides. A link somebody
+  that points at one of those gets the treatment, so clicking "Files changed"
+  or "Branches" goes straight to the right address. Landing on a bare URL from
+  outside — a bookmark, a notification e-mail — is redirected instead, which
+  costs a second page load and is the only time you would notice the extension
+  at all.
+- **What the address already says is never overruled.** This is the difference
+  from the extension above, which always forces `w=1`. GitHub's own "Show
+  whitespace changes" and "Toggle viewed files" controls navigate to the same
+  page with `w=0` or `show-viewed-files=true` on it; forcing the defaults back
+  would leave no way to look at what the extension hides. A link somebody
   shared with `w=0` on it keeps it, too.
+- **The branches "Overview" tab still works.** It points at the very URL the
+  branch rule redirects, so redirecting it whatever the circumstances would
+  make the overview unreachable. The way out is where the visit came from: the
+  overview reached from another tab of the same repository's branches page is
+  somebody clicking "Overview", and is left alone; reached from anywhere else —
+  the repository's navigation, a bookmark, a typed URL — it is somebody asking
+  for the branches, and the full list is what that means.
 - **Nothing else.** No options, no storage, no network, no permissions beyond
-  running on `github.com`. The two parameters are a constant in
-  `src/diff-url.mts`; changing them is an edit and a rebuild.
+  running on `github.com`. Both rules are a table in `src/page-url.mts`;
+  changing them is an edit and a rebuild.
 
 Only `https://github.com` is matched. A GitHub Enterprise installation on
 another host is not covered — add its origin to `content_scripts.matches` in
@@ -73,22 +88,26 @@ extension's card.
 Three mechanisms, in the order they matter:
 
 - **The links are rewritten.** A `MutationObserver` watches the document and
-  gives every new anchor pointing at a diff the parameters it is missing. A
-  pull request page grows its links as you use it, so this runs for the life of
-  the page rather than once; a `WeakSet` of the anchors already looked at keeps
-  the rescans cheap.
+  gives every new anchor pointing at one of those pages the address the rules
+  want. A pull request page grows its links as you use it, so this runs for the
+  life of the page rather than once; a `WeakSet` of the anchors already looked
+  at keeps the rescans cheap. An anchor is judged from the page it is on, which
+  is where a click on it would come from — the same question the redirect asks
+  of the referrer.
 - **Clicks on those links are left to the browser.** GitHub navigates between
   its own pages without loading a document, and would use the route it holds
   for the link rather than the address in the attribute — which would undo the
   rewrite at the moment it matters. The extension stops the click from reaching
   GitHub's handler, so the anchor does what an anchor does.
-- **The page it lands on is redirected**, if it is a diff URL without the
-  parameters. The content script runs at `document_start`, before the document
-  is parsed, so the load it abandons has barely begun. This also covers the
+- **The page it lands on is redirected**, if the rules want something else of
+  it. The content script runs at `document_start`, before the document is
+  parsed, so the load it abandons has barely begun. This also covers the
   client-side navigations the first two do not reach: the observer notices the
-  address changing under it and asks again.
+  address changing under it and asks again — and what it passes as "where this
+  came from" is the address it last saw, which is what `document.referrer`
+  would have said had a document been loaded.
 
-**Each diff page is given the defaults once, and once only.** GitHub takes the
+**Each page is acted on once, and once only.** GitHub takes the
 parameters in and then rewrites its own address bar without them — measured on
 a logged-out session, `?w=1&show-viewed-files=false` becomes `?w=1` a moment
 after the page loads. An extension that read that as "the defaults are gone"
@@ -96,9 +115,9 @@ would put them back, and the page would load again, forever. So the paths
 already dealt with are remembered for the life of the document: parameters
 coming off afterwards is GitHub having used them, not GitHub having lost them.
 
-`src/diff-url.mts` holds all of the rules and touches no DOM — which URLs count
-and what goes on them — and `src/content.mts` is the glue that applies it.
-`test/diff-url.test.mts` covers the first of those.
+`src/page-url.mts` holds all of the rules and touches no DOM — which URLs count
+and what the extension wants of them — and `src/content.mts` is the glue that
+applies it. `test/page-url.test.mts` covers the first of those.
 
 ## Commands
 
@@ -118,9 +137,10 @@ The icons are committed, so `gen:icons` is only run when the shape changes.
 `smoke` needs a headed browser — Chromium loads no extensions in the headless
 shell — so on a machine with no display run it as `xvfb-run -a pnpm run smoke`.
 It touches no network: every github.com request is answered from a fixture in
-`scripts/smoke.mts`, which is also what lets it check the thing the unit tests
-cannot — that the extension does not redirect a second time when the site takes
-the parameters off its own address bar.
+`scripts/smoke.mts`, which is also what lets it check the two things the unit
+tests cannot — that the extension does not redirect a second time when the site
+takes the parameters off its own address bar, and that the referrer the
+branches rule reads is the one a browser actually sends.
 
 ## Release
 

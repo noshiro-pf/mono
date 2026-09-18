@@ -22,31 +22,33 @@ GitHub Diff Defaults
 **Summary** (132 characters)
 
 ```text
-Opens every GitHub pull request diff with whitespace changes hidden and the files you have already reviewed collapsed.
+Opens GitHub pull request diffs with whitespace hidden and reviewed files collapsed, and the branches page as the full list.
 ```
 
 **Description**
 
 ```text
-Reviewing a pull request on GitHub usually starts with two clicks nobody wants
-to make: hide the whitespace-only changes, and collapse the files already
-marked as viewed. GitHub remembers neither. This extension makes both the
-default.
+Some GitHub pages open one click short of where you wanted them, every time.
+Reviewing a pull request starts with hiding the whitespace-only changes and
+collapsing the files already marked as viewed. Opening a repository's branches
+lands on a summary, with the list of every branch one tab further on. GitHub
+remembers none of it. This extension makes them the default.
 
-It works by putting GitHub's own settings on the address before the page loads
-— w=1 and show-viewed-files=false, the same two the "Hide whitespace changes"
-and "Viewed files" controls write — so what you get is the ordinary Files
-changed page, opened the way you would have set it up by hand.
+It works with GitHub's own addresses, before the page loads — w=1 and
+show-viewed-files=false, the same two the "Hide whitespace changes" and "Viewed
+files" controls write, and the branches page's own "All" tab. What you get is
+the ordinary GitHub page, opened the way you would have set it up by hand.
 
 • Every route in. A link from a notification, a bookmark, a pasted URL, or the
-  "Files changed" tab at the top of the pull request: all of them arrive with
-  the settings on. Links on the page are rewritten before you click them, so
-  the usual case costs no extra page load at all.
-• It gets out of the way. A setting already on the address is never overwritten
-  — so GitHub's own controls still work, and a link somebody shared with the
-  whitespace shown keeps showing it.
-• Pull request diffs only. Commit pages, comparisons and the rest of GitHub are
-  untouched.
+  tab at the top of the page: all of them arrive set up. Links on the page are
+  rewritten before you click them, so the usual case costs no extra page load
+  at all.
+• It gets out of the way. What the address already says is never overruled — so
+  GitHub's own controls still work, a link somebody shared with the whitespace
+  shown keeps showing it, and the branches page's "Overview" tab still reaches
+  the overview.
+• Two kinds of page, and no others. Pull request diffs and the branch overview.
+  Commit pages, comparisons and the rest of GitHub are untouched.
 • Nothing is collected, stored or sent. No account, no analytics, no server, no
   storage permission. It runs on github.com and nowhere else.
 
@@ -62,9 +64,10 @@ Not affiliated with GitHub.
 The store asks for one sentence, and means it:
 
 ```text
-Applies two of GitHub's own pull request diff settings — hide whitespace-only
-changes, and collapse files already marked as viewed — to every pull request
-diff page, so they do not have to be set by hand on each one.
+Opens GitHub pages at the view their own controls would have to be clicked to
+reach — pull request diffs with whitespace-only changes hidden and viewed files
+collapsed, and a repository's branches as the full list — so that view does not
+have to be chosen by hand on every page.
 ```
 
 ## Permission justifications
@@ -75,12 +78,13 @@ one thing to justify is the content script.
 **Content script on `https://github.com/*`**
 
 ```text
-The extension's only job is to put two query parameters on GitHub pull request
-diff URLs. Deciding whether the current page is such a URL, and rewriting the
-links on the page that point at one, has to happen in the page. The script
-reads the page's address and the href of its links, and nothing else — no page
-content, no form fields, no cookies, no storage. It is declared for github.com
-alone and runs nowhere else.
+The extension's only job is to send two kinds of GitHub URL to the view they
+would otherwise have to be clicked into. Deciding whether the current page is
+such a URL, and rewriting the links on the page that point at one, has to
+happen in the page. The script reads the page's address, the address it was
+reached from, and the href of its links, and nothing else — no page content, no
+form fields, no cookies, no storage. It is declared for github.com alone and
+runs nowhere else.
 ```
 
 **Remote code**: No. The one script in the package is in the package; nothing
@@ -109,8 +113,10 @@ The store wants at least one, 1280×800 or 640×400. There is no command for
 these here, deliberately: this extension has no interface of its own, so a
 screenshot is a picture of GitHub, and the only honest one is a before-and-after
 of a pull request whose diff is mostly whitespace — with a signed-in account,
-since "viewed" files exist only for one. Which pull request that is, is a
-judgement about the listing rather than something a script should pick.
+since "viewed" files exist only for one — or of a repository with enough
+branches for the overview to be hiding most of them. Which pull request or
+repository that is, is a judgement about the listing rather than something a
+script should pick.
 
 Take them by hand on a diff you know: the Files changed tab as GitHub opens it,
 and the same tab with the extension installed.
