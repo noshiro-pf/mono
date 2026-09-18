@@ -42,6 +42,26 @@ import {
 export type ObservableBaseHandle<A> = Readonly<{
   id: ObservableId;
 
+  /**
+   * Registers the public object {@link assembleObservable} built from this
+   * handle, so that the four state flags below can be mirrored onto it as
+   * plain data properties.
+   *
+   * They used to be getters delegating to this handle's closures, and that
+   * costs more than it looks. Reading one was an accessor call plus a closure
+   * call where a field read would do — `updateToken` is read once per child
+   * per update, so the propagation path paid it on every step — and an object
+   * literal carrying accessors is far more expensive to create than one
+   * carrying data, which is most of what building a graph costs. Measured on
+   * one machine with `pnpm run benchmark`: the derived chain's 100,000 updates
+   * 16.7 ms -> 13.6 ms, and the cascaded diamond at N=20, whose measurement is
+   * dominated by graph construction, 587 ms -> 362 ms.
+   *
+   * Every write below therefore has to keep the mirror in step; that is the
+   * price of not reading through a closure on the hot path.
+   */
+  attach: (writers: ObservableStateWriters) => void;
+
   addChild: <B>(child: ChildObservable<B>) => void;
 
   getSnapshot: () => Optional<A>;
@@ -70,6 +90,20 @@ export type ObservableBaseHandle<A> = Readonly<{
   completeBase: () => void;
 }>;
 
+/**
+ * How the handle writes the four state flags onto the public object. The
+ * writers are closures over that object rather than the object itself, because
+ * a parameter this side could mutate has to be a mutable type, which
+ * `@typescript-eslint/prefer-readonly-parameter-types` rejects — and the object
+ * is `Readonly` to everyone else.
+ */
+type ObservableStateWriters = Readonly<{
+  setIsCompleted: (value: boolean) => void;
+  setUpdateToken: (value: UpdateToken) => void;
+  setHasSubscriber: (value: boolean) => void;
+  setHasChild: (value: boolean) => void;
+}>;
+
 export const createObservableBaseHandle = <A,>(
   initialValue: Optional<A>,
 ): ObservableBaseHandle<A> => {
@@ -85,17 +119,41 @@ export const createObservableBaseHandle = <A,>(
 
   let mut_updateToken: UpdateToken = issueUpdateToken();
 
+  /**
+   * Set once {@link assembleObservable} has built the public object. It does
+   * not exist while a leaf factory's `init` callback runs — that callback may
+   * already subscribe or complete — so every write below is optional, and
+   * `attach` copies the state as it stands rather than assuming defaults.
+   */
+  let mut_writers: ObservableStateWriters | undefined;
+
+  const attach = (writers: ObservableStateWriters): void => {
+    mut_writers = writers;
+
+    writers.setIsCompleted(mut_isCompleted);
+
+    writers.setUpdateToken(mut_updateToken);
+
+    writers.setHasSubscriber(mut_subscribers.size > 0);
+
+    writers.setHasChild(Arr.isNonEmpty(mut_children));
+  };
+
   const addSubscriber = (s: Subscriber<A>): SubscriberId => {
     // return the id of added subscriber
     const subscriberId = issueSubscriberId();
 
     mut_subscribers.set(subscriberId, s);
 
+    mut_writers?.setHasSubscriber(true);
+
     return subscriberId;
   };
 
   const removeSubscriber = (subscriberId: SubscriberId): void => {
     mut_subscribers.delete(subscriberId);
+
+    mut_writers?.setHasSubscriber(mut_subscribers.size > 0);
   };
 
   const addChild = <B,>(child: ChildObservable<B>): void => {
@@ -104,6 +162,8 @@ export const createObservableBaseHandle = <A,>(
 
       child as ChildObservable<unknown>,
     );
+
+    mut_writers?.setHasChild(true);
   };
 
   const getSnapshot = (): Optional<A> => mut_currentValue;
@@ -122,6 +182,8 @@ export const createObservableBaseHandle = <A,>(
   const setNext = (nextValue: A, nextUpdateToken: UpdateToken): void => {
     mut_updateToken = nextUpdateToken;
 
+    mut_writers?.setUpdateToken(nextUpdateToken);
+
     mut_currentValue = Optional.some(nextValue);
 
     for (const s of mut_subscribers.values()) {
@@ -135,6 +197,8 @@ export const createObservableBaseHandle = <A,>(
     // change state
     mut_isCompleted = true;
 
+    mut_writers?.setIsCompleted(true);
+
     // run subscribers for the current value
     for (const s of mut_subscribers.values()) {
       s.onComplete();
@@ -142,6 +206,8 @@ export const createObservableBaseHandle = <A,>(
 
     // remove all subscribers
     mut_subscribers.clear();
+
+    mut_writers?.setHasSubscriber(false);
 
     // propagate to children
     for (const o of mut_children) {
@@ -181,6 +247,7 @@ export const createObservableBaseHandle = <A,>(
 
   return {
     id,
+    attach,
     addChild,
     getSnapshot,
     isCompleted,
@@ -315,11 +382,16 @@ export const assembleObservable = <
   function pipe<B>(operator: Operator<A, B>): Observable<B> {
     return operator(
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      observable as unknown as InitializedObservable<A>,
+      mut_observable as unknown as InitializedObservable<A>,
     );
   }
 
-  const observable = {
+  // The four state flags are plain data properties kept in step by the handle,
+  // not getters delegating to it — see `ObservableBaseHandle.attach` for the
+  // measurements that decided this. `updateToken` in particular is read once
+  // per child per update, and `tryUpdate` reading a field rather than calling
+  // through an accessor is most of what the change buys.
+  const mut_observable = {
     ...extra,
 
     id: handle.id,
@@ -332,21 +404,13 @@ export const assembleObservable = <
 
     getSnapshot: handle.getSnapshot,
 
-    get isCompleted(): boolean {
-      return handle.isCompleted();
-    },
+    isCompleted: false,
 
-    get updateToken(): UpdateToken {
-      return handle.updateToken();
-    },
+    updateToken: handle.updateToken(),
 
-    get hasSubscriber(): boolean {
-      return handle.hasSubscriber();
-    },
+    hasSubscriber: false,
 
-    get hasChild(): boolean {
-      return handle.hasChild();
-    },
+    hasChild: false,
 
     hasActiveChild: handle.hasActiveChild,
 
@@ -359,7 +423,25 @@ export const assembleObservable = <
     subscribe: handle.subscribe,
 
     pipe,
-  } as const;
+  };
 
-  return observable;
+  handle.attach({
+    setIsCompleted: (value) => {
+      mut_observable.isCompleted = value;
+    },
+
+    setUpdateToken: (value) => {
+      mut_observable.updateToken = value;
+    },
+
+    setHasSubscriber: (value) => {
+      mut_observable.hasSubscriber = value;
+    },
+
+    setHasChild: (value) => {
+      mut_observable.hasChild = value;
+    },
+  });
+
+  return mut_observable;
 };

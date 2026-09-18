@@ -38,9 +38,18 @@ import ConditionalFanOutChart from '../../../../../components/benchmark-chart/co
 | Valtio | 24.75 | 24.15 | 25.15 | 25.05 | 4,040,299 |
 {/* /benchmark-result */}
 
-:::note
-結果は https://github.com/noshiro-pf/mono/tree/main/libs/synstate の `pnpm --filter synstate run benchmark` で自動生成され、`pnpm --filter @synstate/docs run doc` で埋め込まれています。
-実際の数値はマシンやランタイム環境によって異なります。
+:::note[この数値の作られ方]
+`pnpm --filter @synstate/docs run benchmark` が全シナリオを計測し、その 1 回の計測からこのページの表・グラフ・文章をすべて書き換えます。コマンドは[ドキュメントパッケージ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs)にあり、各シナリオの結果ファイルには計測環境が記録されます。
+
+|          |                                                      |
+| :------- | :--------------------------------------------------- |
+| 実行環境 | {/* bench:environment/runner */}—{/* /bench */}      |
+| Node     | {/* bench:environment/node */}—{/* /bench */}        |
+| 計測日   | {/* bench:environment/measured-on */}—{/* /bench */} |
+
+計測環境は各シナリオの結果ファイルに記録され、上の 3 つの値はそこから読み出されています。ダッシュ（—）は、実行環境を固定する前に計測された表であることを意味します。
+
+絶対値のミリ秒は同一環境内でのみ比較できます。ここの数値とご自身で計測した数値が食い違う場合は、ミリ秒ではなくライブラリ間の比を見てください。
 :::
 
 :::caution[数値の読み方について]

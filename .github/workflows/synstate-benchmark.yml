@@ -1,0 +1,179 @@
+name: SynState Benchmark
+
+# A `paths` filter, unlike every check workflow here.
+#
+# The reason those carry none is that each reports a required status check, and
+# a workflow a path filter skips never reports one — the pull request would wait
+# forever on a check that never arrives (see the note in style-check.yml). This
+# workflow reports none: a benchmark on a shared runner is a measurement, not a
+# verdict, and gating a merge on it would gate it on the runner's mood. So a
+# path filter is exactly right here, and it keeps every unrelated pull request
+# from spending five minutes measuring what it did not touch.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'libs/synstate/src/**'
+      - 'libs/synstate/samples/docs-site/benchmark/**'
+      - 'apps/synstate-docs/scripts/benchmark/**'
+      - 'apps/synstate-docs/src/data/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/synstate-benchmark.yml'
+
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - 'libs/synstate/src/**'
+      - 'libs/synstate/samples/docs-site/benchmark/**'
+      - 'apps/synstate-docs/scripts/benchmark/**'
+      - 'apps/synstate-docs/src/data/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/synstate-benchmark.yml'
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+jobs:
+  benchmark:
+    # Pinned, not `ubuntu-latest`. Comparability is the entire point: these
+    # numbers are published, and a table measured on one image beside a table
+    # measured on the next is the confusion this workflow exists to end. When
+    # this moves, every baseline cache key moves with it — the image is part of
+    # the key below — so the tables are re-measured rather than silently mixed.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    # Four scenarios, and the cascaded diamond alone spends three 5-second
+    # timeouts on RxJS. Measured locally at about 2m30s for all four, plus
+    # install and build.
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The key is the set of versions being compared, because that is what a
+      # benchmark result is a fact about. Re-measuring on every push would put
+      # a diff of noise in the tables on every pull request, which is what
+      # `libraries` in the key prevents; measuring once per version set and
+      # reusing it is what keeps the published tables still.
+      #
+      # The image and the Node version are spelled out rather than folded into
+      # the digest, so that a glance at the cache name says which runner a
+      # baseline came from.
+      - name: Compute the baseline cache key
+        id: key
+        run: |
+          set -euo pipefail
+          libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"
+          node_major="$(node -p 'process.versions.node.split(".")[0]')"
+          echo "value=synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}" >>"${GITHUB_OUTPUT}"
+          echo "Baseline key: synstate-benchmark-v1-ubuntu-24.04-node${node_major}-${libs}"
+
+      # Restore only. A cache written on a pull request branch is visible to
+      # that branch alone, so a baseline has to come from `main` to be worth
+      # anything; the save step below is therefore gated on `main`.
+      - name: Restore the baseline for these versions
+        id: baseline
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: baseline
+          key: ${{ steps.key.outputs.value }}
+
+      - name: Build
+        run: pnpm run ws:build
+
+      - name: Measure
+        run: pnpm --filter @synstate/docs run benchmark
+
+      # What the measurement would change if it were committed. On `main` with
+      # no baseline yet, this is the diff to commit; on a pull request it is
+      # information, and nothing here commits anything.
+      - name: Show what the measurement changes
+        run: |
+          set -euo pipefail
+          {
+            echo '### The measurement against the committed tables'
+            echo
+            echo '```diff'
+            git --no-pager diff --stat -- apps/synstate-docs/src/data || true
+            echo '```'
+          } >>"${GITHUB_STEP_SUMMARY}"
+
+      - name: Compare with the baseline
+        if: steps.baseline.outputs.cache-hit == 'true'
+        run: |
+          set -euo pipefail
+          pnpm --filter @synstate/docs run --silent z:benchmark:compare \
+            "$(pwd)/baseline" \
+            "$(pwd)/apps/synstate-docs/src/data" \
+            >>"${GITHUB_STEP_SUMMARY}"
+
+      - name: Say that there was no baseline
+        if: steps.baseline.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          {
+            echo '### No baseline for these library versions'
+            echo
+            echo 'Nothing has been measured on this runner image for this set of'
+            echo 'versions yet, so there is nothing to compare against. A run on'
+            echo '`main` establishes it.'
+          } >>"${GITHUB_STEP_SUMMARY}"
+
+      # The results are the artifact whether or not they become the baseline:
+      # on a pull request they are what the author can download and commit if
+      # the change is meant to move the published tables.
+      - name: Upload the measurement
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synstate-benchmark-${{ github.run_id }}
+          path: apps/synstate-docs/src/data
+          if-no-files-found: error
+
+      # Only from `main`, and only when there was no baseline: a cache entry is
+      # immutable, so this writes the first measurement for a version set and
+      # never overwrites it. That immutability is the feature — the baseline a
+      # pull request is compared against does not drift under it.
+      - name: Save this as the baseline
+        if: >-
+          github.ref == 'refs/heads/main' &&
+          github.event_name != 'pull_request' &&
+          steps.baseline.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          rm -rf baseline
+          cp -R apps/synstate-docs/src/data baseline
+
+      - name: Store the baseline
+        if: >-
+          github.ref == 'refs/heads/main' &&
+          github.event_name != 'pull_request' &&
+          steps.baseline.outputs.cache-hit != 'true'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: baseline
+          key: ${{ steps.key.outputs.value }}
