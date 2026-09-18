@@ -1,2683 +1,518 @@
-<!-- cspell:ignore pnpmfile tscw -->
-
 # CLAUDE.md
 
-This file is the instructions for this repository, and is maintained by hand.
-It is the only one — there is no `AGENTS.md` and no generator behind it.
+Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
 
-Both went the same way, for the same reason: the generator assembled rules
-that nine separate repositories shared, and `AGENTS.md` was a one-line stub
-pointing here. Once those repositories were merged into this one, one
-repository meant one instruction file.
+## What belongs in this file
 
-## Repository Layout
+**A rule goes here only when nothing else will tell you about it.** Before
+adding a paragraph, ask what happens when the rule is broken:
 
-- `libs/*` — published npm packages, one directory per package.
-- `apps/*` — applications.
-- `tools/` — repository-level tooling. Not published.
-    - `tools/configs/` — shared TypeScript / Vite config used by the root and by
-      packages.
-    - `tools/scripts/cmd/` — repository-level `tsx` commands (`check-all`,
-      `ws-build-stages`, the dependency-graph generator, …). One file per
-      command, except where a command outgrew one: `unblock-prs/` is a
-      directory whose `main.mts` is the entry point, and the `package.json`
-      script names that file. There is no `index.mts` — `ws:gen` only walks
-      workspace members, and `tools/` is deliberately not one, so a barrel
-      here would be hand-maintained for nothing. A command with a directory
-      of its own carries a `README.md` describing what it does, step by step;
-      this file keeps the conventions and the reasons, not the walk-through.
-- `repo-settings/` — declarative GitHub repository settings, applied via
-  [github-settings-as-code](https://github.com/noshiro-pf/mono/tree/main/libs/github-settings-as-code).
-  `pages/settings.json` there is what enables Pages; the deploy workflow does
-  not enable it. `environments/` holds one file per deployment environment —
-  **see the note on environments under "Required status checks"** before
-  adding one.
-- `articles/` — Zenn articles. **See "Zenn" below.**
-- `books/` — Zenn books. **See "Zenn" below.**
-- `docs/` — prose notes about the repository itself, plus a few verbatim
-  reference texts. Not built, not type-checked, and outside ESLint's and
-  markdownlint's globs — but Prettier formats it and cspell reads it.
-- `strict-lib/` — the strict standard library: its generator and its generated
-  output. **See "strict-lib/" below.**
-- `languages/` — programming-language development: one directory per language,
-  with that language's development packages below it (workspace glob
-  `languages/*/*`). Currently `languages/sumi/` (the Sumi
-  language), whose specification, decision log and enforcement map live in
-  `languages/sumi/docs/` (moved from the root `docs/sumi/` on 2026-09-08 so
-  that everything about the language sits together; a user-facing
-  documentation site would be a separate `doc-site`-style package). Its packages are named
-  `@sumi-lang/*` (the npm org `sumi-lang`, D-50). Nothing here is published yet — a
-  language's publishable tooling moves to `libs/` when it materializes. The
-  conformance corpus's `fixtures/` hold deliberate rule violations and are
-  excluded from Prettier (see below), from the package's own tsconfig/ESLint,
-  and from knip's project globs.
-- `experimental/` — legacy code. **See "experimental/" below.**
+- **The failure names the rule and the fix** (an ESLint rule id, a `tsc`
+  diagnostic, a guard under `tools/scripts/cmd/` that says what it found) —
+  do not write it here. Run the check, read the error, fix it. The check is
+  the documentation.
+- **The failure is silent, late, misleading, or invites the wrong fix** (a
+  dirty tree with no hint which generator wrote it, a release that quietly
+  does not happen, an error whose natural fix is `eslint-disable`) — write
+  the rule and the correct fix, in a few sentences.
+- **There is no check at all** — write the rule. Better still, write a guard
+  in `tools/scripts/cmd/` and reduce the prose to a pointer.
 
-**There is one `.gitignore`, at the repository root** (`experimental/` keeps its
-own, being outside the workspace). Do not add one to a package: Prettier reads
-`.gitignore` and `.prettierignore` from the root and nowhere else, so a pattern
-in a package-level file would keep git quiet while `fix:fmt:full` went on
-reformatting the generated files anyway. Generated TypeDoc output is listed at
-the root per package, because `libs/eslint-config-typed/docs` and
-`libs/synstate/docs` hold hand-written prose and must stay tracked.
+The same test applies when removing: a paragraph whose rule has since gained a
+guard with a clear error should go. Keep measurements, anecdotes and issue
+numbers out; one sentence of _why_ is enough.
 
-- **One deliberate exception**: `languages/sumi/conformance/` carries its
-  own `.prettierignore` for `fixtures/` **in addition to** the root entry for
-  the same directory. The per-package `fmt` scripts run Prettier with the
-  package as cwd, and `prettier.getFileInfo` resolves its `ignorePath` from
-  the cwd — so the root file alone would not stop a package-local format pass
-  from rewriting fixtures, which must stay byte-for-byte (a reformat would
-  erase what a fixture checks, e.g. a `<T,>` trailing comma). The root entry
-  still covers repository-wide passes; keep the two in sync.
+## Repository layout
 
-Only `libs/*`, `apps/*`, `tools/*` and `languages/*/*` are pnpm workspace
-globs (`pnpm-workspace.yaml`, plus the explicit `strict-lib/*` entries — see
-"strict-lib/"), and a directory only becomes a member if it has a
-`package.json`. `tools/configs/` and `tools/scripts/` deliberately have none —
-they are plain directories consumed by relative path, not packages.
+- `libs/*` — published npm packages. `apps/*` — applications, private, each
+  still carrying `"exports": "./src/index.mts"` so siblings can resolve it.
+- `tools/` — repository tooling; not a workspace member. `tools/configs/`
+  holds shared config and the sample embedding scripts; `tools/scripts/cmd/`
+  holds root-level `tsx` commands, one file each (a command that outgrows one
+  file becomes a directory with `main.mts` and a `README.md`, like
+  `unblock-prs/`).
+- `repo-settings/` — declarative GitHub settings. See "Repository settings".
+- `articles/`, `books/` — Zenn content. See "Zenn".
+- `docs/` — prose about the repository plus verbatim texts (`json-spec/`,
+  `rust_book/`, `typescript_book/`), which are never edited.
+- `strict-lib/` — the strict standard library. See "strict-lib/".
+- `languages/*/*` — language development, currently `languages/sumi/`
+  (`@sumi-lang/*`, docs in `languages/sumi/docs/`). Nothing published yet.
+- `experimental/` — legacy code outside the workspace. See "experimental/".
+- `verify-npm-packages/` — installs what the packages publish and runs it.
 
-### Inside a package
+Workspace globs are in `pnpm-workspace.yaml`; a directory is a member only
+with a `package.json`, and `tools/configs/`, `tools/scripts/` have none on
+purpose.
 
-- `src/` — source.
-    - `entry-point.mts` (or `index.mts`) — what the package exports.
-    - `**/index.mts` — per-directory entry points, generated by `pnpm run gen:index`.
-      A hand-written one — an executable entry point, or a curated list of
-      named re-exports — has to be named in that package's `gen:index:src` script by
-      `--preserve`, whose patterns are matched against the path relative to
-      `./src` (`index.mts` is the one at the root of the walk, `"v*/index.mts"`
-      a whole generation of them). `--exclude` will not do it: it says what an
-      index file may not _export_, index files are never exported anyway, and
-      its patterns also match a bare file name, so `--exclude index.mts` names
-      every index file in the tree and therefore does nothing. `ws:gen` is in
-      the `style-check` matrix, so a barrel that goes stale — or a hand-written
-      index that is not preserved and gets overwritten — fails there, and
-      `style-check (ws:gen)` is a required status check.
-    - `src/cmd/` — CLI entry points, for packages that ship executables.
-- `test/` — tests not colocated with the source (Vitest, `.mts`). Coverage
-  output goes to `coverage/`.
-- `dist/` — build output: ES modules (`.mjs`) and type definitions (`.d.mts`).
-  Not tracked.
-- `configs/` — that package's TypeScript, Vitest, Rollup and TypeDoc config.
-- `scripts/` — that package's own `tsx` helpers (build, doc generation, checks).
-- `docs/` — TypeDoc output. Not tracked, except in `eslint-config-typed`,
-  `synstate` and `apps/split-view-extension`, where it is hand-written prose.
-  The root `.gitignore` lists the generated ones by name for that reason, so a
-  package with no TypeDoc may put prose here without doing anything else.
-- `samples/` — sample code, embedded into the README by `pnpm run gen:readme`.
+**One `.gitignore`, at the root.** Prettier reads ignore files from the root
+only, so a package-level one keeps git quiet while `fix:fmt:full` reformats
+anyway. Generated TypeDoc `docs/` are gitignored per package by name because
+`libs/eslint-config-typed/docs`, `libs/synstate/docs` and
+`apps/split-view-extension/docs` are hand-written. The one deliberate
+package-level `.prettierignore` is `languages/sumi/conformance/` (fixtures
+must stay byte for byte and a package-local `fmt` resolves `ignorePath` from
+its cwd); keep it in sync with the root entry.
+
+Inside a package: `src/` (`entry-point.mts` or `index.mts` is the public
+entry; `src/cmd/` for CLIs), `test/` (`test/browser/` for DOM tests),
+`configs/`, `scripts/`, `samples/`, untracked `dist/` and `docs/`.
+`**/index.mts` barrels are generated by `gen:index`; a hand-written one must
+be named by `--preserve` in the package's `gen:index:src` script, or `ws:gen`
+overwrites it.
 
 ### Zenn
 
-`articles/` and `books/` are published to <https://zenn.dev> by Zenn's own GitHub
-integration, configured on zenn.dev — **not** by any workflow in this repository.
-That integration reads `articles/` and `books/` from the repository root, and
-the paths are fixed by Zenn's convention.
-
-Consequently:
-
-- **Never move, rename or nest `articles/` or `books/`.** Doing so silently
-  breaks publishing, with no failing CI to warn you.
-- Both directories are excluded from ESLint and markdownlint. Leave them that
-  way: there is no TypeScript in either, and Zenn's front matter and Markdown
-  dialect do not match markdownlint's defaults.
-    - **The markdownlint exclusions live in `ignores`, never as a `globs`
-      negation**, and `pnpm run check:prose:markdownlint-config` enforces it. A
-      negation is matched against the path as written, so one anchored at the
-      cwd does not match a file named on the command line as an _absolute_
-      path — that file is linted, and with `fix: true` linted means rewritten.
-      That is not hypothetical: it is what kept giving `articles/` and
-      `experimental/` unexplained `*` → `-` list-marker changes, reproducible
-      only with an absolute path and so by no repository script. `ignores`
-      prunes the discovery walk just as a negation does (markdownlint-cli2
-      appends those entries to the glob patterns itself) and also holds for a
-      path named directly. Prettier has no equivalent hole — `.prettierignore`
-      applies to an absolute path correctly (measured).
-
-- **Prettier and cspell do cover them**, contrary to what this file used to
-  say. `.prettierignore` lists only `pnpm-lock.yaml`, `.prettierignore` and
-  `experimental`, which is also why `articles/` and `books/` are absent from
-  the style-check gate's ignore list — see "CI diff gates". The prose is
-  Japanese, which cspell skips, so what it reports is the English technical
-  vocabulary around it; suppress that per file rather than by re-excluding the
-  directory — see "Spell checking".
-- `zenn-cli` is a root devDependency for local preview (`pnpm exec zenn preview`).
+Published by Zenn's GitHub integration, which reads `articles/` and `books/`
+from the root. **Never move, rename or nest them** — nothing in CI would
+notice. Their markdownlint exclusion lives in `ignores`, never as a `globs`
+negation (a negation misses absolute paths, and `fix: true` then rewrites the
+file); `check:prose:markdownlint-config` guards that. Prettier and cspell do
+cover them.
 
 ### `strict-lib/`
 
-The strict rewrite of TypeScript's built-in library declarations, one package
-per TypeScript minor. It has a top level of its own rather than living in
-`libs/*`, because the generator and the ~7,800 generated files it produces sit
-together and do not fit "one directory, one npm package".
+One harness per TypeScript minor (`strict-ts-lib-vX.Y-source`), a shared
+converter (`scripts-common/`), and per version the published bundle
+`output/lib/` (`strict-ts-lib-vX.Y`) plus `output/lib-files*/`,
+`output/diff-from-*/` and `temp/copied/`. Details in
+`docs/strict-typescript-lib-integration.md`. Rules with no error behind them:
 
-```text
-strict-lib/
-  scripts-common/   the converter, shared by every version
-  scripts/          repository-level commands (generation, publishing)
-  configs/          tsconfig bases for the self-checks
-  v7.0/ v6.0/ …     one directory per TypeScript minor
-    output/lib/     the published package: package.json, README.md,
-                    libs/ (plain number) and libs-branded/ (branded)
-    output/lib-files/, output/lib-files-branded/,
-    output/diff-from-official/, output/diff-from-prev/, temp/copied/
-```
-
-- **`strict-lib/v*/output/lib` is the published package, laid out as it ships.**
-  Nothing is rearranged at pack time, because the `@typescript/lib-*` links
-  resolve into `node_modules/strict-ts-lib-v7.0/libs/*`, which is a workspace
-  symlink to this very directory. A layout assembled while packing would exist
-  only in the tarball.
-- **oxfmt formats this subtree; Prettier ignores it** (`.prettierignore` lists
-  `strict-lib`). With thousands of generated declarations, not walking them is
-  most of what keeps the repository-wide format pass quick. Run
-  `pnpm run strict-lib:fix:fmt`.
-- **`temp/copied/`, `output/lib-files*/` and `output/diff-from-*/` are
-  tooling, not debt.** The version-to-version diffs are how anyone decides
-  whether the converter has to follow an upstream TypeScript change, and
-  `temp/copied` is the _input_ to the `official` one. Do not untrack them.
-- **The per-group `package.json` under `libs/` are not published** and are not
-  spare either: each harness devDepends on `file:output/lib/libs/<group>` so
-  that its `lib-check` can resolve `@typescript/lib-<group>` **by name**. That
-  is the only way TypeScript 6 and earlier find a replacement — their lib
-  resolution is a fixed Node10 lookup that ignores `paths`.
-- Every TypeScript minor **shares one version number**, kept together by the
-  `fixed` group in `.changeset/config.json`.
-- **A changeset for the strict standard library names the `-source` harnesses,
-  not the bundles — and names all twelve of them.**
-    - Naming a bundle (`strict-ts-lib-v7.0`) looks right and does nothing:
-      `changeset version` bumps that manifest, then `strict-lib:gen:packages`
-      runs next in `changeset:version-packages` and stamps each bundle with its
-      harness's version, putting the old number back. Nothing errors — the
-      release just silently does not happen, and the changeset is consumed. It
-      cost #1672 and #1673 their release.
-    - The `fixed` group aligns the twelve **versions** from a single name, but
-      a changeset's text reaches only the packages it names; the rest get a
-      bare version heading with nothing under it. Anything in
-      `scripts-common/` affects every series equally, so list every series.
-- **`strict-ts-lib-scripts-common` is a devDependency of the `-source`
-  harnesses, and has to stay one.** changesets bumps a dependent through
-  `dependencies` and `peerDependencies`, never through `devDependencies`. With
-  that one edge in `dependencies` the chain ran `ts-repo-utils` →
-  `scripts-common` → all twelve harnesses → (via `gen:packages` stamping the
-  harness version) all twelve published bundles. Measured: one `ts-repo-utils`
-  patch bumped 15 packages instead of 3. Bundle `0.5.1` is what that looks
-  like shipped — its entire changelog entry is
-  `- strict-ts-lib-scripts-common@0.0.1`, against no change to a single
-  declaration.
-    - Ordering is not a reason to move it back. The `dependencyFields` option
-      on the `strict-lib:gen*` stage runners is there to keep the toolchain's
-      cyclic devDependencies out of the graph, nothing more:
-      `scripts-common` has no `scripts` block at all and exports its `.mts`
-      sources directly, so it never appears in a stage, and the harnesses are
-      independent of one another.
-    - **The same reasoning holds for every private manifest under
-      `strict-lib/`**: `scripts-common` and the `-source` harnesses declare
-      everything in `devDependencies`, so a toolchain patch bumps nothing it
-      does not change. The separate `-output` / `-output-branded` harness
-      packages the v5.x series once carried held `ts-type-forge` in
-      `dependencies`, and one `ts-type-forge` patch put a meaningless version
-      bump and changelog into all twenty of them (#1683); they were removed,
-      and their `noLib` checks now run from each `-source` harness via
-      `tsconfig.lib-files-check*.json`. `ts-type-forge` stays in
-      `dependencies` only where it is part of what ships: the published
-      bundles, whose declarations carry real `import('ts-type-forge')` types.
-
-Generation runs through `strict-lib:gen*` at the root; see
-`docs/strict-typescript-lib-integration.md`.
-
-- **CI regenerates all of it and fails on any difference.**
-  `strict-lib-gen.yml` runs `strict-lib:gen:with-codemod-fixed` and then
-  `strict-lib:gen:version-diff`, and asserts the tree is clean. So a converter
-  change is committed together with the output it produces, and
-  `output/diff-from-prev/` with it — that directory had gone stale after
-  #1744 and #1751, when nothing checked it.
-- **The harness scripts run `tsx` with `tools/configs/tsconfig.tsx.json`**, as
-  every `tsx` invocation here does, so generation needs no `ws:build`: all
-  twelve series regenerate in under two minutes from a checkout with no
-  `dist/` at all. A harness script without it resolves our packages through
-  `dist/` and fails on a clean checkout.
-- **Anything committed from the generator must not depend on the clone.**
-  `gen-version-diff` passes `--full-index` to `git diff` for that reason: an
-  abbreviated blob hash is as long as the local object database needs, 9
-  digits in a full clone and 7 in CI's shallow checkout.
-- **It has a workflow and a diff gate of its own**, because neither existing
-  one fits. The bundle's `CHANGELOG.md` is copied from the harness, so a
-  markdown-only diff — a `chore: version packages` branch — changes the
-  output, which `code-checks` would skip on `**.md`; and `style-checks`
-  ignores so little that it would regenerate the library on every pull
-  request.
+- **`output/lib` ships as laid out.** The `@typescript/lib-*` links resolve
+  into it through a workspace symlink; nothing may be rearranged at pack time.
+- **`temp/copied/`, `output/lib-files*/`, `output/diff-from-*/` and the
+  per-group `package.json` under `libs/` stay tracked.** The diffs are how
+  converter changes are judged; the per-group manifests are what lets each
+  harness resolve `@typescript/lib-<group>` by name.
+- **A changeset names all twelve `-source` harnesses, never a bundle.** A
+  bundle bump is stamped back by `strict-lib:gen:packages` and the release
+  silently does not happen; the `fixed` group aligns versions but a
+  changeset's text reaches only the packages it names.
+- **Private manifests under `strict-lib/` use `devDependencies` only.**
+  changesets bumps dependents through `dependencies`, so one such edge turns
+  a toolchain patch into twelve empty bundle releases. `ts-type-forge` is a
+  `dependency` only in the published bundles.
+- **The generator is `gen:lib`, not `gen`.** A `gen` there would be run by
+  `ws:gen` and wipes `output/lib-files*`.
+- Converter changes are committed with their output (`strict-lib-gen.yml`
+  regenerates and asserts a clean tree; no `ws:build` needed). Nothing
+  committed may depend on the clone (`gen-version-diff` uses `--full-index`).
+- oxfmt formats it (`strict-lib:fix:fmt`); Prettier ignores it.
 
 ### `experimental/`
 
-`experimental/` holds the contents of the pre-2026 monorepo (the old `packages/`,
-`configs/` and `scripts/`), plus standalone repositories imported before their
-deletion so that their content survives — `github-branches-viewer` and
-`life-plan-simulator` so far. It is deliberately **outside** the pnpm workspace
-globs, so nothing in it is installed, built, linted or type-checked, and
-dependency updates cannot break it.
+The pre-2026 monorepo plus standalone repositories imported before deletion;
+inventory in `docs/experimental-inventory.md`. Nothing here is installed,
+built or checked, and a diff touching only it skips every workflow.
 
-- Do not add `experimental/` to `pnpm-workspace.yaml`.
-- Do not "fix" code in `experimental/` as part of unrelated work.
-- **An imported repository is a snapshot, not a checkout.** Whatever tooling
-  config came with it is inert here: only the root `.github/workflows/` runs,
-  and only workspace members are installed. A `README.md` at the top of each
-  records the source repository, the commit it was taken at, and what was left
-  behind.
-- **Check every branch before importing one, and say which one you took.** Both
-  imports so far turned on this: `github-branches-viewer` did its work on
-  `develop`, whose React rewrite left `main` holding a superseded static page,
-  and `life-plan-simulator` has nothing of its own on `main` at all — what is
-  worth keeping sits on an open pull request's branch. Import the branch the
-  work is on, not the default one.
-- **Import what is worth keeping, not the whole tree.** A repository generated
-  from a template carries a copy of that template; where the template still
-  exists, take only the files that do not, and list the omissions in the README.
-- A branch whose diff touches nothing but `experimental/` skips the work in
-  every check workflow — see "CI diff gates".
-- To revive something, move that one package to `libs/` or `apps/`, migrate its
-  dependencies to the current libraries (`@noshiro/ts-utils` → `ts-data-forge`,
-  `@noshiro/ts-type-utils` → `ts-type-forge`, `@noshiro/io-ts` → `ts-fortress`),
-  and bring it up to the conventions in this document.
+- Do not add it to the workspace, and do not fix code here in unrelated work.
+- An import is a snapshot: take the branch the work is on (check every
+  branch, say which), take only what a still-existing template does not
+  provide, and record source, commit and omissions in a `README.md` at its
+  top.
+- To revive a package, move it to `libs/` or `apps/` and migrate
+  `@noshiro/ts-utils` → `ts-data-forge`, `@noshiro/ts-type-utils` →
+  `ts-type-forge`, `@noshiro/io-ts` → `ts-fortress`.
 
-## Essential Development Commands
+## Commands
 
-Commands exist at two levels. **In a package directory** the single-package
-commands run there. **At the repository root** the `ws:*` commands run those
-across every workspace member that defines them, and the `ws:` prefix is the
-signal that you are asking for the whole repository.
+Single-package scripts run in the package; the root `ws:*` scripts run one
+across every member that defines it.
 
-### The verb namespaces
+**The prefix says what a script does to the working tree**: `check:` reads,
+`fix:` rewrites, `gen:` writes committed generated sources, `watch:` never
+terminates. `build` and `doc` write untracked output. Consequences:
 
-**A script's prefix says what it does to your working tree**, which is the
-thing you need to know before you type it:
+- `pnpm run '/^check:[^:]*$/'` runs a package's checks in parallel; that is
+  safe for `check:` only, so `fix:` and `gen:` keep ordered `run-s`
+  aggregates. `check-all` keeps its hyphen to stay out of the glob.
+- `test` and `fmt` are aliases for `check:test` and `fix:fmt`. Keep them, add
+  no more.
+- Root guards live in two globbed namespaces, **chosen by what the guard
+  reads**: `check:prose:*` for documents and document-tool configuration
+  (runs in `style-check.yml`, whose gate ignores only `experimental/`), and
+  `check:root:*` for everything else (runs in `code-check.yml`, whose gate
+  drops `**.md`, `docs/` and style-tool configuration — a document guard
+  there is skipped by the very diff it judges). A new `check:root:*` or
+  `check:prose:*` script is in CI with no other wiring. `check:prose` must
+  stay buildless.
 
-| prefix   | does                                           | examples                                                             |
-| :------- | :--------------------------------------------- | :------------------------------------------------------------------- |
-| `check:` | reads and reports; never writes                | `check:lint`, `check:types`, `check:test`, `check:ext`, `check:dist` |
-| `fix:`   | rewrites your files                            | `fix:lint`, `fix:fmt`, `fix:codemod`                                 |
-| `gen:`   | writes committed generated sources             | `gen:index`, `gen:rule-types`, `gen:readme`, `gen:jsdoc`             |
-| `watch:` | never terminates; for a human to leave running | `watch:types`, `watch:test`, `watch:doc`                             |
+Main entry points: `ws:build`, `ws:gen` (needs `ws:build`), `ws:check:types`,
+`ws:fix:lint`, `ws:check:test[:cov|:browser]`, `ws:check:e2e`,
+`ws:check:dist` (needs `ws:build`), `ws:check:ext`, `ws:check:sumi`,
+`ws:doc`, `check:cspell`, `check:md`, `check:prose`, `check:root`,
+`check:knip` (needs `ws:build`), `check:published-deps`, `gen:deps-graph`,
+`fmt` / `fix:fmt:diff` / `fix:fmt:full`, `fix:codemod[:full]`.
 
-`build` sits outside all four: it produces `dist/`, which is not committed.
-So does `doc`, which drives TypeDoc into an untracked `docs/`.
-
-Consequences worth knowing:
-
-- **`pnpm run '/^check:[^:]*$/'` runs every check a package defines.** pnpm
-  takes a regex in place of a script name and runs every match, so a new
-  `check:*` needs no aggregate script to be picked up. `[^:]*` keeps it to the
-  one-level names: `check:test:cov` is a _variant_ of `check:test`, not a
-  second check, and matching both would run the suite twice.
-- **`check-all` keeps its hyphen**, which is what keeps it out of that glob.
-  It is the aggregate of aggregates; a `check:all` would recurse.
-- **The glob is safe for `check:` and not for `fix:` or `gen:`.** Measured:
-  pnpm runs regex-matched scripts _in parallel_. Checks are independent, so
-  that is a speed-up. `fix:lint` and `fix:fmt` are not — `eslint --fix` has to
-  finish before Prettier runs — and neither are some generators, so those keep
-  explicit ordered aggregates (`fix:*` at the root, a per-package `gen` that
-  names its generators with `run-s`).
-- **`watch:` exists because a watch is not a check.** `tscw` renamed to
-  `check:types:watch` would have made `pnpm run '/^check:/'` hang forever.
-- **`test` and `fmt` are kept as aliases** for `check:test` and `fix:fmt`.
-  `pnpm test` / `npm test` is an npm lifecycle name that works without `run`,
-  and `fmt` is the most-typed command here. Both are one-line aliases; do not
-  delete them, and do not add more.
-- **A package's `gen` is the ordered aggregate of its own generators** — it
-  names them with `run-s` because ts-type-forge's, for one, only make sense in
-  order (branded types → `gen:index` → `global.mts` → `entry-point.mts`).
-  `pnpm run ws:gen` runs those across the repository.
-- **`strict-lib/v*` deliberately has no `gen`.** Its generator is `gen:lib`,
-  so the recursive `gen` above does not reach it. A `gen` there is what made
-  an earlier attempt wipe `output/lib-files*` and fail.
-
-### The two repository-level check namespaces
-
-The small `tsx` guards under `tools/scripts/cmd/` are split across two
-aggregates, and **which one a guard belongs to is decided by what it reads, not
-by what it is about**:
-
-- **`check:prose:*`** — its inputs are documents, or the configuration of a
-  tool that reads documents. Three so far: `japanese-parentheses`,
-  `markdownlint-config` and `readme-sample-coverage`.
-- **`check:root:*`** — everything else, plus `types`, `lint` and `test` for
-  `tools/` itself.
-
-**The split is not taxonomy; it is the only way these guards run at all.**
-`check:root` is a `code-check.yml` matrix entry, and that workflow is gated on
-the `code` ignore list, which drops `**.md`, `**.txt`, `docs/`,
-`.markdownlint-cli2.mjs` and the rest of the style tooling's configuration —
-see "CI diff gates". A guard that reads one of those paths and rides
-`check:root` is therefore skipped by exactly the diff it exists to judge:
-`check:root:markdownlint-config` never ran on a pull request whose only change
-was `.markdownlint-cli2.mjs`, and `check:root:readme-sample-coverage` never ran
-on one that only added README fences. `check:prose` is a `style-check.yml`
-entry instead, and that workflow's ignore list is `experimental/` and nothing
-else.
-
-Consequences worth knowing:
-
-- **A new guard goes in the namespace its inputs put it in.** Ask which paths
-  it reads, then check them against `z:check-should-run:code-checks` in the
-  root `package.json`. One hit, and it is a `check:prose:*`.
-- **A guard may not be in both.** `check:root` is `pnpm run '/check:root:.*/'`,
-  so anything named `check:root:…` is in it; that is why these three were
-  renamed rather than listed twice, and why a `check:root:prose` aggregate
-  would not have worked — the glob would have matched it too.
-- **`check:prose` must stay buildless.** All three reach `ts-data-forge` and
-  `ts-repo-utils` through `tsconfig.tsx.json`, so `style-check.yml` runs the
-  entry without `ws:build`. A guard added here that needs `dist/` costs that
-  job a build it does not otherwise pay.
-- **`check-all` runs both**, `check:prose` before the build for the same
-  reason.
-
-**Build:**
-
-- `pnpm run ws:build` — build every package, in dependency order. It compiles
-  and emits, and does nothing else; see "Building from a clean checkout".
-- `pnpm run ws:gen` — regenerate every committed generated source: the
-  `index.mts` barrels, the ESLint rule types, ts-data-forge's branded numbers,
-  ts-type-forge's `global.mts` / `entry-point.mts`, the synstate re-export
-  shims, and the samples embedded into READMEs and `@example` blocks. Needs
-  `ws:build` first.
-
-**Testing:**
-
-- `pnpm run ws:check:test` — run Vitest once across the repository. In a
-  package, `check:test` (or the `test` alias) runs it there, with `watch:test`
-  for watch mode, `test:ui` for the UI, `check:test:cov` for coverage and
-  `test:cov:ui` to preview coverage.
-- `pnpm run ws:check:e2e` — run the Playwright suites under `apps/*/e2e`, one app at a
-  time. Each app's `check:e2e` script starts its own Vite dev server; the port comes
-  from `tools/configs/app-dev-ports.mts`, which the app's Vite config reads too
-  so the two cannot disagree. See "e2e" below.
-
-**Validation:**
-
-- `pnpm run check:cspell` — spell checking (whole repository; there is no `ws:` form).
-- `pnpm run check:md` — markdownlint.
-- `pnpm run ws:check:types` — TypeScript type checking, no emit.
-- `pnpm run ws:check:lint` / `pnpm run ws:fix:lint` — ESLint check/fix.
-- `pnpm run check:root` — lint and type-check `tools/`, which is not a workspace
-  member and so is not covered by the `ws:*` commands, plus the small guards
-  over the repository's own configuration.
-- `pnpm run check:prose` — the small `tsx` guards whose inputs are documents
-  rather than code. **See "The two repository-level check namespaces" below**
-  for why these are not part of `check:root`. `check:md` and `check:cspell`
-  read documents too and are deliberately not in it: they are whole-tool runs
-  with `style-check.yml` entries of their own, so they already answer to the
-  gate `check:prose` exists to reach, and folding them in would trade three
-  parallel runners for one serial job.
-- `pnpm run ws:check:dist` — the checks that read what a build emitted rather than
-  the sources: each package's `dist/` type-checked by package name through its
-  `exports` map, plus the API consistency checks that need a built sibling.
-  Needs `ws:build` first.
-- `pnpm run ws:check:ext` — file extensions. Gated under the wider `style`
-  ignore list, because a `.md` added under a package's `scripts/` is something
-  it has to see. It needs no build: `check-ext.mts` globs file names and
-  resolves nothing, which is why `style-check.yml` no longer builds for it.
-- `pnpm run check:knip` — dependencies declared but not imported.
-- `pnpm run check:published-deps` — imports that a published package does not
-  declare. See "Dependencies".
-- `pnpm run check-all` — everything above plus the build, the codemods and
-  formatting, in the order CI needs. **It does not cover every CI job**, and
-  what it leaves out is listed at the end of `check-all.mts`, next to the
-  steps it belongs to: `ws:check:test:browser` and `ws:check:e2e` need
-  Playwright's browsers, `verify:npm-packages:published` reads pinned
-  versions rather than the working tree, and `strict-lib-gen.yml`'s
-  regeneration is [#1965](https://github.com/noshiro-pf/mono/issues/1965).
-  Two of its steps are also narrower than CI's: it formats what differs from
-  `origin/main` where CI formats everything, and it asserts nothing about the
-  tree afterwards, so a rewrite one of its fixers made is a clean local run
-  and a red `z:assert-repo-is-clean` in CI. **Nothing keeps that list in step
-  with the workflows** — also #1965.
-
-**Run the checks the diff touches, not `check-all`.** A full sweep builds
-every package and runs every test in the repository; on a change that touched
-four files under `tools/` that is many minutes spent to re-answer questions
-nothing asked. Reach for it when the change is genuinely repository-wide — a
-shared config, a dependency bump, a codemod — and otherwise pick from this
-table. `pnpm run fmt` is cheap and belongs on every change.
+**Run the checks the diff touches, not `check-all`.** `check-all` is a human
+aid: what it skips and where it is narrower than CI is listed at the end of
+`check-all.mts`. `pnpm run fmt` belongs on every change.
 
 | the diff touches            | run                                                                                       |
 | :-------------------------- | :---------------------------------------------------------------------------------------- |
-| TypeScript in a package     | that package's `check:types`, `fix:lint` and `check:test`                                 |
+| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`                                    |
 | `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`                                  |
 | Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                 |
 | a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it |
 | workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                                   |
 
-**What this trades away is worth naming.** `check-all` also runs the codemods
-and the whole-repository formatting pass, so a targeted run can leave the tree
-in a state CI's `style-check` will reject — most often a file some other
-package's generator writes. It is CI that catches that, and CI only runs once
-the `skip-ci` label is off, which is why that label is a pause and not a place
-to leave a branch. See "Opening a pull request".
-
-**Formatting:**
-
-- `pnpm run fmt` — format only uncommitted files.
-- `pnpm run fix:fmt:diff` — format only files changed from `origin/main`.
-- `pnpm run fix:fmt:full` — format all files.
-
-**Document generation:**
-
-- `pnpm run ws:doc` — generate Markdown documentation into each package's
-  `docs/`.
-- `pnpm run ws:gen:readme` — embed sample code from `samples/` into the Markdown
-  document (e.g. `README.md`) named in the package's
-  `scripts/cmd/embed-examples.mts`.
-- `pnpm run gen:deps-graph` — regenerate `docs/package-dependencies.md`.
-
-### Embedding samples into documents
-
-**One implementation, in `tools/configs/`, not a copy per package.** It used
-to be a copy per package — fifteen of `embed-examples-utils.mts`, thirteen of
-the markdown embedder, nine of the JSDoc one — and the copies drifted in the
-direction that matters least and stood still in the one that matters most:
-the coverage check below was written into `ts-type-forge`'s copy alone and
-reached none of the other eight.
-
-- `embed-examples-utils.mts` — `extractSampleCode`, which is the marker
-  handling (`// embed-sample-code-ignore-above` and friends) and the
-  indentation normalizing.
-- `embed-examples-in-markdown.mts` — fills every JavaScript / TypeScript
-  fence of a markdown document from a `samples/` directory. A package's
-  `gen:readme`.
-- `embed-examples-in-jsdoc.mts` — fills the ` ```ts ` fences of the
-  `@example` blocks under `src/`. A package's `gen:jsdoc`.
-
-A package's `scripts/cmd/embed-examples*.mts` is the call site and the data —
-its documents, its `sourceFileMappings`, its root path — and nothing else. It
-reaches the shared module by relative path, the way a build script reaches
-`strip-dev-only-code.mts`, with `import-x/no-relative-packages` disabled on
-the line. `embed-examples-in-jsdoc-map.mts` stays per package: it is the data.
-
-- **`stripTransformerDirectives` cannot be always on.** The synstate family
-  and `apps/synstate-docs` pass it, because the
-  `// transformer-ignore-next-line` directives their samples carry are noise
-  in a rendered document — but `ts-codemod-lib`'s samples are _about_ that
-  directive, and stripping it there would gut the examples.
-- **The JSDoc embedder fails on an `@example` that no sample backs.** The
-  trigger is the `@example` tag, not the fence it is supposed to contain: an
-  example written as bare JSDoc lines has no fence at all, so keying off the
-  fence would only ever catch files that already follow the convention.
-- **There is no way to exempt an `@example` from it.** There was, for one
-  release: `exemptSourcePaths` froze the backlog of the four packages that had
-  unmapped examples when the check first reached them. The samples are written
-  now ([#1880](https://github.com/noshiro-pf/mono/issues/1880)), the lists are
-  empty, and the option is gone — a knob whose only documented purpose has
-  been met is a knob the next unmapped example would be quietly added to. A
-  declaration samples genuinely cannot reach — a module-local helper, since
-  samples import the package the way a consumer does, or a snippet that is not
-  TypeScript at all — describes itself in prose, with the fence and no
-  `@example` tag.
-- **`pnpm run check:root:example-coverage` asks the one thing the per-package
-  check cannot ask about itself: whether it runs.** The check above only ever
-  runs for a package that has an `embed-examples-in-jsdoc.mts` and reaches it
-  from `doc`, so a package that never opted in is not a package that passes —
-  it is a package nothing looked at, with no failure to notice. That is how
-  `ts-codemod-lib` and `ts-repo-utils` kept hand-written `@example` blocks
-  while eight packages were being checked. `tools/scripts/cmd/check-example-coverage.mts`
-  fails when a `libs/*` package has an `@example` under `src/` and no wiring
-  to check it; it deliberately does not re-answer whether the example is
-  mapped, because two implementations of that would be two things to keep in
-  agreement.
-- **Every JavaScript / TypeScript fence in a README is a sample, whatever
-  its tag or indentation.** The markdown embedder used to match only
-  ` ```ts `, ` ```tsx ` and ` ```js ` at the start of a line, so a fence
-  tagged ` ```typescript ` or ` ```javascript `, or one nested in a list item,
-  was skipped: hand-written, never type-checked, and nothing said so. That is
-  how `ts-type-forge`'s README came to call functions ts-data-forge does not
-  have. It now matches `ts`, `tsx`, `mts`, `cts`, `typescript`, `js`, `jsx`,
-  `mjs`, `cjs` and `javascript` at any indentation, re-indents a sample to its
-  fence's column, and fails when the count of those fences differs from
-  `sampleCodeFiles`. Changing a fence's tag is therefore not a way out of the
-  check; a snippet that is not code (a shell command, JSON) keeps its own tag.
-- **`pnpm run check:prose:readme-sample-coverage` is the same "does it run"
-  question for READMEs.** `tools/scripts/cmd/check-readme-sample-coverage.mts`
-  fails when a `libs/*` README has such a fence and the package has no
-  `scripts/cmd/embed-examples.mts` naming `README.md`, or a `doc` script that
-  never reaches it. Six packages — both `better-*-use-state` and four ESLint
-  plugins — had READMEs full of fences and no embedder at all.
-- **CI runs these through `ws:doc`, never through `ws:gen:readme*`.** Each
-  package's `doc` script reaches its own embedding steps, and `style-check (ws:doc)`
-  runs `doc` and then asserts the tree is clean. So a `gen-docs.mts` that
-  forgets to call one is a package whose embedding — and whose coverage check
-  — nothing runs: exactly what had happened to `ts-std-forge`.
-
-## Required status checks
-
-**Eight contexts are required, and none of them is a job that does work.** The
-list lives in the `required_status_checks` rule of
-`repo-settings/rulesets/main.json`:
-
-| context                     | comes from                                            |
-| :-------------------------- | :---------------------------------------------------- |
-| `code-check-result`         | the aggregate job in `code-check.yml`                 |
-| `style-check-result`        | the aggregate job in `style-check.yml`                |
-| `strict-lib-gen-result`     | the aggregate job in `strict-lib-gen.yml`             |
-| `test-node-versions-result` | the aggregate job in `node-version-compatibility.yml` |
-| `verify-published-result`   | the aggregate job in `verify-published-packages.yml`  |
-| `no-skip-ci-label`          | a commit status written by `skip-ci-label.yml`        |
-| `Validate PR title`         | `lint-pull-request.yml`                               |
-| `Validate commit messages`  | `lint-pull-request.yml`                               |
-
-**A required context is a string matched exactly against the name of a check
-run — or the context of a commit status — on the pull request's head
-commit**, and nothing more — GitHub does not know which workflow is supposed
-to produce it. A name it does not find reads
-as "Expected — waiting for status to be reported" and blocks the merge;
-`success`, `skipped` and `neutral` all satisfy it; where a name appears more
-than once on the commit, the most recent one wins. What Actions names a check
-run is the job's `name:` where it sets one, else `<job id> (<matrix values>)`
-for a matrix job, else the bare job id — and `<caller job id> / <called job
-id>` for a reusable workflow.
-
-**The matrix entries used to be the required contexts, and that let a run that
-never happened satisfy them.** Both ways were measured on this repository:
-
-- **A skipped job does not expand its matrix.** A `code-check` job that a
-  job-level `if` skips produces one check run named `code-check` — not the
-  eleven `code-check (…)` contexts. Nothing supersedes those, so they keep
-  whatever they last said: a pull request that was green and then had `skip-ci`
-  added still had all 22 matrix contexts reading `success`, with every
-  required check satisfied.
-- **A skipped job with no matrix reports the required context itself.** Its
-  check run is named `verify-published`, which _is_ the context, with
-  conclusion `skipped` — which counts as satisfied.
-
-So each check workflow now ends with an aggregate job — `if: always()`,
-`needs:` the gate and the matrix job — whose only step asserts
-`needs.<job>.result == 'success'`. Having no matrix its name is stable, so
-every run supersedes the last; being `always()` it reports rather than being
-skipped along with the work. "Skipped" cannot read as "passed" there.
-
-Three cases are carved out, in the job-level `if` rather than in the step, so
-that the aggregate reports `skipped` for them — grey, and satisfying the
-required check — rather than red. A pull request nobody is checking yet
-should read grey, not broken. What holds the merge is a different check in
-each case:
-
-| carve-out                                          | what holds the merge instead                                                              |
-| :------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| `skip-ci` on the pull request                      | `no-skip-ci-label` — see below                                                            |
-| `needs.gates.outputs.branch_up_to_date` is `false` | `strict_required_status_checks_policy`, and the update that clears it re-runs everything  |
-| `needs.gates.outputs.should_run` is `false`        | nothing, and nothing needs to: no command in the workflow reads any path the diff touched |
-
-**`no-skip-ci-label` is therefore load-bearing, not decorative.** It is the only
-thing that stops a labelled pull request from merging. Deleting
-`skip-ci-label.yml`, or dropping its context from `main.json`, leaves `skip-ci`
-skipping every check with nothing holding the merge — which is the exact hole
-the aggregates were added to close. The two are one mechanism. See the note on
-`code-check-result` in `code-check.yml`. It holds the merge by staying
-`pending`, not by failing — see "A `skip-ci` label skips the checks" below for
-why.
-
-Consequences worth knowing:
-
-- **Adding a matrix entry is now one edit, not two.** The old arrangement
-  needed the context added to `main.json` by hand as well, and an entry added
-  without it ran, reported, and blocked nothing — which is how
-  `style-check (strict-lib:fix:fmt)`, `style-check (gen:deps-graph)`,
-  `code-check (strict-lib:check:types)` and `code-check (strict-lib:check:lint)` sat
-  unenforced. Three of those four run a command and then assert the tree is
-  clean, so what an unenforced one let through was generated output drifting
-  from its generator, on `main`, with a green pull request. A new matrix entry
-  is covered the moment it exists.
-- **Adding a job is still two edits.** A new check workflow needs its
-  aggregate's context added to `main.json`, and so does any job that is not
-  behind an aggregate.
-- **Renaming a context is three steps, and the middle one is not a commit.**
-  A required context is matched by string, and the workflow that answers a
-  pull request event is the one on the pull request's _head_. So a branch that
-  renames one writes the new name while the ruleset still asks for the old,
-  and is blocked until `repo-settings:apply rulesets` runs — which is a person
-  with an admin token, after the merge. Merge it with the ruleset bypass,
-  apply, and expect every other open pull request to read blocked until it is
-  rebased onto the workflow that writes the new name. `unblock-prs` does that
-  rebasing, one at a time, so what it costs is a round of CI rather than any
-  hand work. `no-wip-label` became `no-skip-ci-label` this way, and
-  `type-check-result` became `code-check-result` the same way.
-- **A red aggregate does not name what failed.** The matrix contexts still
-  report and still appear on the pull request; they are simply not what the
-  ruleset reads. Open the run to see which entry went red.
-- **Keep the matrix jobs behind an aggregate.** A matrix job whose context was
-  made required directly would bring the first failure mode straight back.
-
-`gates / check` is deliberately **not** required. It is a gate that fails
-open — the jobs waiting on it use `!cancelled()` and `!= 'false'`, so an
-unanswered gate lets them run — and each of the five workflows contributes a
-context under the same name.
-
-**`repo-settings/` is a declaration, not a lever.** The root files under it
-are the desired state, applied only by `pnpm run repo-settings:apply` (it
-needs an admin token); `bk/` is a mirror of what GitHub currently has, written
-by `repo-settings:backup`. Editing a root file therefore passes CI while
-changing nothing — the settings take effect when someone runs `apply`, which
-rewrites both the root file and `bk/`.
-
-**What notices that they have drifted apart runs somewhere else.** A daily
-workflow in the private `noshiro-pf/mono-security` compares the committed
-`bk/` with the repository's live settings and fails when they differ. It used
-to be a workflow here, and it moved because of what reading those settings
-costs: `bypass_actors` is returned only to a caller with write access to the
-ruleset, and the merge-related settings only with `contents:read` and
-`contents:write`, so the App token cannot be made weaker. What can change is
-where its key lives — and it no longer lives in the secrets of a public
-repository that merges dependency updates unattended. See "Security findings".
-
-**An environment a workflow names is created the moment that workflow first
-runs, with no protection rules on it.** `release` arrived exactly that way.
-Pull request #1910 added `environment: release` to `release.yml`, the merge
-ran it, and three seconds later the repository held an environment with
-`protection_rules: []` and `deployment_branch_policy: null` — no restriction
-at all. Nothing failed and nothing said so, and what the binding was added to
-enforce was simply absent: npm's trusted publisher does not check the git ref,
-so the deployment branch policy is the whole of what confines a publish to
-`main`. Declare the environment under `repo-settings/environments/` and run
-`pnpm run repo-settings:apply environments` **before** merging the workflow
-that names it. The other order leaves a window in which the environment
-exists, reads as configured, and restricts nothing.
-
-**`.github/CODEOWNERS` is a merge gate, not a notification list.** The `main`
-ruleset sets `require_code_owner_review`, so a pull request touching a path
-that file names cannot merge without an approving review from the owner — and
-`pnpm-update`'s auto-merge is not an owner. That is what it is for: the App
-token that workflow pushes with holds `workflows: write`, so a dependency that
-gets code running in that job can leave a doctored workflow in the working
-tree, have `git add -A` commit it, and have it auto-merged with nobody
-looking. Once a doctored `release.yml` is on `main`, the `release`
-environment's branch policy passes it.
-
-Two consequences:
-
-- **A path listed there stops auto-merging.** `pnpm-update` opens a pull
-  request that waits for a human whenever `update-actions` moves an action
-  pin. That is the cost, and it is the intended one. Adding a path is
-  therefore a judgement about how often it changes as much as about how much
-  it matters — `pnpm-workspace.yaml` is left out for that reason alone, and
-  the file says so.
-- **The owner cannot approve their own pull request**, so a change to one of
-  these paths merges through the admin's ruleset bypass, not through a review.
-  What the rule buys is that the bypass is a person clicking it, which the
-  `pnpm-update` App cannot do.
-
-The file used to read `* @noshiro-pf`. That was harmless while the rule was
-off, and would have blocked every pull request in the repository the moment it
-was turned on.
-
-## Tokens, secrets and third-party code in a job
-
-**How much third-party code may share a job with a key is a question about the
-key.** There is no blanket rule here, and an earlier version of this note read
-like one. What a compromised dependency in that job can reach is exactly what
-the key can do, so the answer is different for each of them — and the cost of
-separating is not.
-
-| job                              | what its key can do                            | third-party code | split?         |
-| :------------------------------- | :--------------------------------------------- | :--------------- | :------------- |
-| `pnpm-update`                    | `contents` + `pull-requests` + **`workflows`** | a lot            | **yes** — done |
-| `node-support-update` / `update` | `contents` + `pull-requests`, no auto-merge    | a lot            | no             |
-| `release`                        | OIDC, i.e. publish                             | the whole build  | worth solving  |
-
-`pnpm-update` is the one that had to move, and `workflows: write` is the whole
-reason. It is the single capability that turns "a dependency got in" into "every
-published package is gone": a doctored `.github/workflows/release.yml` pushed to
-any branch runs there, and until the `release` environment existed npm would
-have taken its OIDC token. No other key here converts that way.
-`node-support-update` holds `contents` + `pull-requests` and **not** `workflows`,
-so GitHub refuses a push carrying a workflow change, and it enables no
-auto-merge — what an attacker gets is a pull request waiting for a person.
-Splitting that would cost the same and buy almost nothing.
-
-**What actually runs is smaller than "the dependency tree", and worth knowing
-before reaching for a split.** A root `pnpm install` here executes pnpm, the
-install scripts of the three packages `allowBuilds` permits, and
-`strict-ts-lib-v7.0-link` through the root `prepare`. There is no
-`.pnpmfile.cjs`. That is four trust anchors, not eight hundred — so "we ran
-`pnpm install`" is not on its own a reason to move a key.
-
-What makes `pnpm-update`'s update job genuinely broad is the rest of it:
-`tsx` pulls in its scripts' whole import graph, and
-`verify:npm-packages:published:update` installs `latest` of every published
-package from npm into throwaway spaces and runs a program against each. That
-last one executes code fetched from the registry minutes earlier, which is the
-same npm account this whole arrangement exists to protect.
-
-**Where the executed bytes come from is what the ordering inside a job is
-about.** A `run:` block is part of the workflow definition GitHub resolved for
-the event — on a `schedule`, the default branch's file — and nothing on the
-runner can change it. A file in the working tree is read when it is invoked,
-after third-party code has had a chance to rewrite it. `git` and `gh` are on the
-runner image, so a step built out of those two reads nothing from the tree.
-"Keep it inline" is a consequence of this and not the rule: an inline `run:`
-that calls `node ./tools/x.mts` is exactly as exposed as a step that does.
-
-**CODEOWNERS does not substitute for this.** It governs what gets merged, and
-the rewrite here is not a merge: a dependency writing over a file on the runner
-produces no commit, no pull request and no diff. `main` keeps the correct file
-while the copy being executed is something else.
-
-**`allowBuilds` does not either, and it is narrower than it looks.** It is an
-allowlist for the _install lifecycle scripts_ of dependencies — which is exactly
-what it claims and no more. It says nothing about the import-time code of every
-package the toolchain loads: `pnpm install`, `tsx`, `ws:build`, ESLint and Vitest
-all execute third-party modules, and a module runs its top level when it is
-imported. The wide door stays open by necessity; `allowBuilds` closes a narrow
-one.
-
-**Between steps, this can only be raised, not closed.** `$GITHUB_ENV` and
-`$GITHUB_PATH` are files whose paths are in the environment, and the runner
-applies what a step writes there to the steps that follow. A process spawned
-during `pnpm install` inherits that environment, so it can prepend a directory
-and decide what `git` or `gh` means two steps later. Ordering and inlining do
-not reach that.
-
-**What does close it is a separate job**, which gets a fresh runner, a fresh
-checkout and a fresh environment. `pnpm-update.yml` is split that way: `update`
-runs the dependency tree's code and holds no key, and `commit` holds the App
-token — the one with `workflows: write` — and installs nothing. What crosses
-between them is a patch, which `commit` applies rather than executes; a diff
-cannot express a `.git/hooks` entry or a `$GITHUB_PATH` line, and `git apply`
-refuses paths outside the work tree.
-
-**What a patch carries is content, so `commit` says which content.** The
-paths it applied are matched against the set a dependency update writes —
-`package.json` at any depth, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
-`.changeset/*.md` and `.github/workflows/*.yml`, which is `pnpm install`,
-`verify:npm-packages:published:update`, `update-changeset` and
-`update-actions` respectively — and anything else stops the job before a
-commit exists. That is the half the split leaves open rather than a doubt
-about the split: the patch's contents are decided in the job that runs the
-dependency tree's code, this pull request auto-merges with no approval
-required, and CODEOWNERS covers three paths deliberately, since owning the
-manifests would leave every dependency update waiting for a human. The
-matching is refusal, not filtering — a patch that carries something else is
-worth seeing rather than quietly trimming — and the list is inline in the
-`run:` block for the reason above: that block is the definition GitHub
-resolved for the event, and a file in the working tree is read when it is
-invoked. A step added to `update` that legitimately writes a new path fails
-`commit` until the list names it, which is the direction to fail in; read a
-failure as "what put this in the patch" before widening it.
-
-`node-support-update.yml` has the same shape and has not been split. Its App
-token is `contents` + `pull-requests` and **not** `workflows`, so the branch it
-can write is one the `main` ruleset and CODEOWNERS already bound; split it when
-that stops being true.
-
-Three details that follow from the ordering:
-
-- **Work that does not need the token belongs in a step before it**, where a
-  `.mts` costs nothing and can be tested. The action pins and the changeset are
-  each their own step ahead of `Generate Token` for that reason.
-- **A step placed before `pnpm install` cannot use `pnpm run`.** `pnpm run`
-  verifies the workspace's dependencies first and installs them when they are
-  missing, which is the thing such a step exists to come before. Invoke the
-  script with `node` directly and keep the `package.json` script as the local
-  entry point — this is why `mature-updates.mts` imports `node:*` alone.
-- **`git config core.hooksPath /dev/null` before committing.** An install script
-  can leave a `.git/hooks/pre-commit` behind, and `git commit` would run it.
-
-Most of the remaining inline blocks cannot move at all, for an unrelated reason:
-they run with no checkout and no `pnpm install`, and a `.mts` needs both.
-
-- The five `*-result` aggregates boot a runner, read `needs.*.result` and echo.
-- `skip-ci-label.yml` makes one API call, on every event, for every pull request.
-- `check-gates.yml`'s branch check runs **before** its checkout, which is the
-  whole point: a branch behind `main` stays a four-second job.
-- `lint-pull-request.yml` runs on `pull_request_target` and must never check the
-  pull request out. A `.mts` there would require exactly that.
-
-## CI diff gates
-
-The check workflows carry no `paths` filter. A workflow that a path filter
-skips never reports a status check, and each of these contributes a required
-one through its aggregate job, so a pull request that changed only the
-filtered paths would wait forever on a check that never arrives. The gate is
-a job-level `if` instead: `check-gates.yml` answers whether the diff touches
-anything the workflow reads, and the job is skipped when it does not — see
-"Check triggers, `skip-ci` and out-of-date branches" for the rest of what that
-one job answers.
-
-The gate is `check-should-run` from `ts-repo-utils`. The paths it ignores are
-three lists in the root `package.json`, one per kind of check:
-
-- `z:check-should-run:code-checks` — `code-check.yml` and
-  `node-version-compatibility.yml`. Ignores `experimental/`, the root `docs/`,
-  `**.md`, `**.txt`, `LICENSE`, and the style tools' own configuration
-  (`.prettierrc`, `.cspell.config.yaml`, `**/cspell.config.yaml`, …).
-- `z:check-should-run:style-checks` — `style-check.yml`. Ignores
-  `experimental/` and nothing else. The rest of that matrix reads markdown,
-  regenerates READMEs, or globs every file under a package directory, so the
-  wider list would skip those checks exactly when they should fail.
-- `z:check-should-run:strict-lib-checks` — `strict-lib-gen.yml`. Ignores what
-  the generator cannot reach: `experimental/`, `docs/`, `articles/`, `books/`,
-  `apps/`, `languages/`, `verify-npm-packages/`, `repo-settings/`,
-  `.changeset/`, the style tools' configuration, and markdown at the root and
-  under `libs/` only. Markdown under `strict-lib/` is read — each harness's
-  `CHANGELOG.md` is copied into the published bundle — so `**.md` must not go
-  on this list.
-
-Add a path to a list only when **no** command that workflow runs reads it.
-`experimental/` qualifies for both: it is outside the pnpm workspace and
-excluded from ESLint, tsc, knip, Prettier, cspell and markdownlint alike.
-`articles/` and `books/` do not qualify for the style list — Prettier formats
-them.
-
-**`code-check.yml` and `style-check.yml` are named after those two scopes,
-because `code` and `style` are already this repository's words for the
-distinction.** `check-gates.yml` takes `diff-scope: code | style | none`, and
-the two gate scripts above are `z:check-should-run:code-checks` and
-`z:check-should-run:style-checks`. The file was called `type-check.yml` until
-that left it the one place speaking a third vocabulary — while passing
-`diff-scope: code` — and the name was a misnomer besides: type checking is
-three of its fourteen matrix entries, and the rest are the lint pass, the
-tests, e2e, knip, the codemods, `check:published-deps`,
-`verify:npm-packages` and the Sumi checks.
-
-What the two workflows actually divide on is whether a check needs
-`pnpm run ws:build` first, and that is deliberately not what either name
-says. That requirement changes — a check that only globs file names today may
-import a sibling tomorrow — so a name derived from it goes quietly wrong on
-the day the fact does, and nothing fails to say so. `ws:check:ext` is the
-measured case: the build step it carried outlived the reason for it, and only
-a comment claiming the opposite marked the spot. It is the same reason a
-script's name carries what it does to the working tree rather than what it
-needs in order to run; see "The verb namespaces".
-
-Things to keep in mind when editing a gated workflow:
-
-- **A step needs no condition of its own.** Every gate is now a job-level
-  `if`, so a step added anywhere in a gated job simply runs when the job does.
-  This used to be the other way round — the gate was a `Check diff` step and
-  each later step carried `if: steps.<id>.outputs.should_run == 'true'` — and
-  a step added without it was a step that ran when nothing else did.
-- **On a push to `main`, diffing against `origin/main` is a diff against
-  `HEAD`**, which is empty and reads as "nothing changed" — every job would
-  skip. The gate therefore compares against `github.event.before` on `main`.
-  Only `code-check.yml` still asks it on a push, for `coverage-main`.
-- **The matrix jobs must stay behind an aggregate for this to be safe.** A
-  skipped matrix job produces one check run named after the job, never the
-  `code-check (…)` contexts. While those were the required status checks, a
-  job-level skip would have left them missing — "Expected", blocking forever —
-  which is why the gate had to be a step back then. See "Required status
-  checks".
-
-`verify-published-packages.yml` gates itself in shell, on the same principle
-but against a merge base and a single directory rather than an ignore list. It
-calls `check-gates.yml` with `diff-scope: none`, which answers the branch
-question and skips the checkout: it has one job, so a gate that installs to
-save one runner would cost more than it saves.
-
-## What the check workflows run
-
-A pull request's checks are about forty matrix entries across five workflows,
-and what each entry runs is a script name that resolves through the root
-manifest into other scripts, and through the `ws:` commands into every
-package's. So two things are invisible by reading any one file: a command
-already covered by another one looks exactly like a command that is not, and a
-check nothing runs looks exactly like a check that passes.
-
-`pnpm run check:root:ci-commands` asks both.
-
-Both had happened. `test-node-versions (current)` ran the whole Vitest suite a
-second time on the Node every other workflow already uses, with a second
-`ws:build` in front of it (#1968). In the other direction, six packages'
-READMEs carried code fences that nothing embedded into, which is what
-`check-readme-sample-coverage.mts` was written for — one instance of a question
-nothing was asking in general.
-
-**Most of the covering relation is written down already, so it is read rather
-than restated.** `check:prose` _is_ `pnpm run '/check:prose:.*/'`, and
-`ws:check:types` _is_ a recursive run of every package's `check:types`. The
-guard parses those bodies, so a script that stops calling another stops
-covering it here too. Only what a body cannot show is declared, in
-`DECLARED_COVERAGE`, with the reason beside each: `check:test:cov` runs the
-same suite as `check:test` with `--coverage`, `fix:lint` is `check:lint` with
-`--fix`, and a package's `doc` reaches its embedding steps through a `gen-docs.mts`
-that names neither.
-
-Consequences worth knowing:
-
-- **An argument after the script name is not the same command.**
-  `verify:npm-packages:published` is `pnpm run verify:npm-packages
---published`, and what `--published` selects — the versions pinned under
-  `verify-npm-packages/published` rather than tarballs packed from the
-  checkout — is a different question. What separates the two is position:
-  everything before the script name is a flag of pnpm's own (`--recursive`,
-  `--if-present`), everything after it is handed to the script. Whether such a
-  variant still covers what it wraps is a judgement, so it goes in
-  `DECLARED_COVERAGE` rather than being read off the body.
-- **A workflow that pins its own Node is left out of the comparison.**
-  `node-version-compatibility.yml`'s `ws:check:test` is covered by
-  `code-check`'s `ws:check:test:cov` on paper and is not the same check,
-  because the Node underneath differs. Which versions that matrix may name is
-  `check-node-support.mts`'s question, and it is the one that caught `current`
-  naming the same version as `volta.node`. The guard reads this off the
-  `setup-node` inputs rather than off the file name, so a workflow that starts
-  pinning a version gets a group of its own with nothing to remember.
-- **A check workflow is one that triggers on `pull_request`**, which is
-  exactly the five. `lint-pull-request.yml` and `skip-ci-label.yml` use
-  `pull_request_target` and run no repository command; `check-gates.yml` is
-  reached through `workflow_call`. A check that only `pnpm-update.yml` or
-  `release.yml` reaches is a check no pull request gets, which is the answer
-  wanted rather than a gap in the reading.
-- **The `z:` namespace is not asked about.** Those are scripts another script
-  or a workflow's own glue invokes — `z:check-should-run` is the diff gate,
-  which `check-gates.yml` calls — never a check in its own right. `verify:`
-  is asked about, because what `verify-npm-packages/` reads is the published
-  artifact rather than the source, which is a check by every meaning except
-  the prefix.
-- **An entry in `UNCOVERED_BY_DESIGN` is a claim, not a silencer.** The five
-  there say that something else already covers the script (a package's
-  `check-all` and `check:cspell`, against the root-level pass) or that it is
-  not a check at all (`verify:npm-packages:published:update` rewrites the
-  pins; `check-all` is a human aid — see "Essential Development Commands").
-  Emptying the list and running the guard is how to find one that has gone
-  dead, the way emptying `words` finds a dead cspell entry.
-- **It needs no wiring of its own.** `check:root` is
-  `pnpm run '/check:root:.*/'`, so a new `check:root:*` is a `code-check`
-  matrix entry the moment it exists — which is also why the guard sees itself
-  as covered.
-
-## Check triggers, `skip-ci` and out-of-date branches
-
-The five check workflows — `code-check.yml`, `style-check.yml`,
-`strict-lib-gen.yml`, `node-version-compatibility.yml` and
-`verify-published-packages.yml` — trigger
-on `pull_request: types: [opened,
-synchronize, reopened, labeled, unlabeled]`. One event kind per commit is what
-keeps the checks list at one entry per job: triggering on `push` for branches
-as well would put a push run and a `pull_request` run side by side on every
-pull request. Nothing is lost by leaving `push` out — `synchronize` fires on
-every push to a branch with an open pull request, `opened` covers the pushes
-made before it existed, and a branch that never gets a pull request has
-nothing to protect, because the `main` ruleset accepts changes through pull
-requests only.
-
-**A push to `main` runs almost nothing either, and two jobs are the
-exception.** A push to `main` is a merge, and a merge is a squash (the only
-merge method enabled) of a branch that already contained `main`'s tip
-(`strict_required_status_checks_policy`), so the commit it makes has the same
-tree as the pull request's head — a tree every check has already run on. The
-check workflows used to run their whole matrix on it anyway, on the reasoning
-that a squash makes a commit no pull request run has seen; that is true of the
-commit and false of its contents, and it cost 108 runner-minutes per merge for
-`code-check.yml` alone, at fifty-odd merges a week. So four of the five have
-no `push` trigger at all, and the one that keeps it runs a single job on it:
-
-- `code-check.yml` runs `coverage-main`, which is the matrix's `ws:check:test:cov`
-  entry on its own. Codecov compares a pull request's coverage with the
-  report on its base commit, and the base commit is one on `main`, so the
-  report has to come from a run on `main`. It is gated on the diff like the
-  matrix, so a merge that touched nothing the tests read uploads nothing.
-
-What this gives up is the after-the-fact check on a merge made with the
-admin's bypass, which is the one way a head that is behind `main`, or was
-never checked, can land. Run the check workflows by hand from the Actions tab
-(`workflow_dispatch`) after such a merge; nothing else will.
-
-`skip-ci-label.yml` rides along with the same activity types, on
-`pull_request_target` rather than `pull_request` — see below for why the one
-gate a labelled pull request does not skip is read from the base branch. It
-is not a check workflow — it checks nothing, and does one API call — but it
-is what makes the `skip-ci` label hold the merge. `lint-pull-request.yml` carries
-`labeled` and `unlabeled` too, next to its own `opened`, `edited` and
-`synchronize`, so that the label skips and restarts the title and commit
-message checks the same way.
-
-**Nothing but `lint-pull-request.yml` triggers on `edited`, and nothing at
-all on `issue_comment`.** Editing the description or commenting therefore
-starts no check run. `edited` fires for the title, the body and the base
-branch alike, with no finer filter, so a check workflow subscribed to it
-would produce a run for every description tweak — and such a run is not free
-even with every job skipped: it cancels the run in progress through the
-concurrency group, and its skipped `*-result` aggregate supersedes the last
-real verdict on the commit, reading as satisfied. The two lint jobs re-run on
-a body edit for the same reason in reverse: skipping them on "the title did
-not change" would supersede a red title check with a skipped one.
-
-**A draft pull request is checked like any other.** Work in progress is where a
-CI result is most useful, so being a draft skips nothing: the
-`github.event.pull_request.draft == false` clause every job used to carry is
-gone, and with it `/run-checks`, an `issue_comment` workflow whose only purpose
-was to reach a draft's checks by hand. `ready_for_review` is not in the
-trigger list either: it stayed for a while as a re-run for pull requests
-opened as drafts before this arrangement existed, but a draft has been
-checked on every push since, so marking one ready changed nothing about its
-head and the run it fired re-checked the same commit with the same result —
-one full matrix per pull request, thrown away. It went once every open draft
-had check runs on its head. Two cheaper mechanisms took over the work of not
-spending CI on runs nobody will read.
-
-### A push cancels the run still going for the previous one
-
-Every check workflow carries
-
-```yaml
-concurrency:
-    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-```
-
-so a branch pushed to five times in a row costs one CI result rather than five.
-Nothing is lost on a pull request branch: the diff gate in `check-gates.yml`
-diffs against `origin/main`, so the newer run covers every commit the
-cancelled one would have.
-
-- **`cancel-in-progress` is an expression, not a bare `true`.** On `main` that
-  same gate diffs against `github.event.before`, so a push's run covers only
-  that push. Cancelling the run for X when Y lands would leave the diff X
-  introduced — the coverage upload for it, in the one job that still runs on
-  `main` — read by nothing at all. Pushes to `main` therefore run to
-  completion, and so does a `workflow_dispatch` run.
-- **The group keys on the pull request number** where there is one, so a
-  `workflow_dispatch` run asked for by hand lands in a different group from the
-  pull request's own runs and the two do not cancel each other.
-- **The event name in that expression has to stay a trigger of the workflow,
-  and `pnpm run check:root:workflow-event-name` is what keeps it one.**
-  `github.event_name` is the name of the trigger that started the run, so a
-  comparison against an event the workflow does not fire on is not a stale
-  comment — it is a constant: `== 'x'` always `false`, `!= 'x'` always `true`.
-  Nothing errors and nothing goes red; the expression simply stops being a
-  condition. What that costs here is `cancel-in-progress` turning off
-  altogether, and in `skip-ci-label.yml` that is a `labeled` run writing
-  `pending` after the `unlabeled` run wrote `success` — a pull request blocked
-  with no label on it. Seven workflows carry the expression and the mistake is
-  one edit of an `on:` block away in each, so the check reads
-  `.github/workflows/*.yml` rather than any one file. It asks nothing of a
-  reusable workflow: inside one, `github.event_name` is the **caller's** event
-  and never `workflow_call`, so `check-gates.yml`'s own trigger list says
-  nothing about what a comparison there may name.
-
-### A `skip-ci` label skips the checks; taking it off starts them again
-
-Where the draft flag used to say "not yet", a label does — and says it on its
-own, rather than by borrowing a state GitHub attaches other meanings to:
-
-```yaml
-jobs:
-    gates:
-        if: >-
-            github.event_name != 'pull_request' ||
-            !contains(github.event.pull_request.labels.*.name, 'skip-ci')
-        uses: ./.github/workflows/check-gates.yml
-        with:
-            diff-scope: code
-
-    code-check:
-        needs: gates
-        if: >-
-            !cancelled() &&
-            (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-            needs.gates.outputs.branch_up_to_date != 'false' &&
-            needs.gates.outputs.should_run != 'false'
-```
-
-Labels arrive in the event payload, so there is no API lookup, and a job-level
-`if` is evaluated by GitHub itself, so no runner is booted — the checks just
-report `skipped`. What to know about that:
-
-- **`labeled` and `unlabeled` both have to be in the trigger list.** Adding the
-  label fires `labeled`, whose run skips; removing it fires `unlabeled`, and
-  that is the only thing that starts the checks again on a commit already
-  pushed. A list with `labeled` alone gives a label that goes on and never
-  comes off.
-- **The label does not hold the merge by itself; `skip-ci-label.yml` does.**
-  GitHub refuses to merge a draft natively and has no equivalent for a label,
-  and a skipped job can satisfy a required status check — see "Required status
-  checks" for the measurement. So the label comes with a required check
-  of its own, `no-skip-ci-label`: a **commit status** that `skip-ci-label.yml`
-  writes on the head commit at every event — `pending` while the label is
-  on, `success` once it is off — through the Status API rather than as the
-  check run of a job.
-    - **A status, because a job's check run cannot say "not yet".** A job
-      concludes success, failure, skipped or cancelled. Success and skipped
-      both satisfy a required check, so neither can hold the merge. Failure
-      held it, and did for a while, but it also said something false — a
-      pull request whose author has not asked for the checks yet is not
-      broken — and GitHub took it at its word: a red cross in the pull
-      request list, `fail` in `gh pr checks`, and a "workflow run failed"
-      e-mail on every push and every label event. A status can be written
-      `pending`, which is what is actually meant, blocks the merge exactly
-      as failure did, and notifies nobody.
-    - **It costs one runner per event, label or no label**, where the
-      failing job booted none without the label. A status has to be on
-      every head commit — one without it reads "Expected — waiting for
-      status to be reported" and blocks forever — so the job cannot be
-      skipped on the label-less case. `gates / check` already costs each
-      check workflow the same on the same events.
-    - **The job is named `skip-ci-label`, not `no-skip-ci-label`.** Its own check
-      run and the status it writes would otherwise share a name, and which
-      of the two the ruleset would read is not a thing to discover on a
-      merge.
-    - **Written with `GITHUB_TOKEN`**, so it is attributed to the GitHub
-      Actions app — the `integration_id` the ruleset pins the context to.
-      The job's `permissions` grant `statuses: write` and nothing else.
-    - **The trigger is `pull_request_target`, so the gate is `main`'s copy
-      of it.** `pull_request` runs the workflow file as it exists on the
-      pull request's head, which would put the one check a labelled pull
-      request does not satisfy by skipping inside the branch it is deciding
-      about — with `statuses: write` already granted, and the other seven
-      contexts reporting `skipped`. `lint-pull-request.yml` chose
-      `pull_request_target` for the same reason. What normally makes that
-      trigger dangerous is a writable token in a job that runs the branch's
-      code, and this job has no checkout and executes nothing from the tree;
-      a step added there has to keep it that way, reading the pull request
-      from the event payload. Moving the trigger means moving the
-      concurrency block's `github.event_name` comparison with it — see "A
-      push cancels the run still going for the previous one" for what is
-      enforced about that, and for what leaving it behind costs here.
-- **It is the only thing that blocks a labelled pull request**, because the
-  `*-result` aggregates carve `skip-ci` out and report `skipped` for it rather
-  than red — see "Required status checks". One pending check that names its
-  reason, rather than six that have to be interpreted.
-- **`push` and `workflow_dispatch` runs are exempt.** The condition constrains
-  only `pull_request` events; asking for the checks by hand is asking for them
-  regardless of the pull request's state.
-- **Do not make a skipped state report success instead.** An older design gated
-  every step on an API lookup and let the job report green while a pull request
-  was a draft: green checks that stood for work that never happened, and one
-  booted runner per matrix entry per push.
-- **The label is not declared anywhere in this repository.**
-  `repo-settings/` covers repository settings, rulesets, the Actions settings,
-  Pages, environments and Dependabot alerts, but not labels,
-  so `skip-ci` exists only on GitHub. Renaming or deleting it there silently
-  turns the skipping off — though not the blocking, since `no-skip-ci-label` reads
-  the same string and would simply stop matching too. The string is written
-  down in the workflows — the five check workflows, `skip-ci-label.yml` and
-  `lint-pull-request.yml` — and in `tools/scripts/cmd/unblock-prs/`, which
-  takes it off a queued pull request when its turn comes; change it everywhere
-  or nowhere. The same holds for `merge-queued` — see "A declared merge order"
-  — which is read by `unblock-prs` and written by `pnpm-update.yml`, so
-  deleting it on GitHub empties the queue and breaks that workflow's
-  `gh pr create`.
-- **Any label event re-runs the checks, not just `skip-ci`'s.** The trigger is
-  `labeled` / `unlabeled` and the condition reads only whether `skip-ci` is on,
-  so attaching `bug` to a pull request mid-run cancels that run and starts
-  another. Skipping on "not the `skip-ci` label" would not help: the run would
-  still exist, still cancel the one in progress, and its skipped aggregate
-  would supersede the last verdict. Put other labels on before pushing, or
-  after the checks have reported. Once they have, the re-run costs one gate
-  job — see below.
-
-### A commit already checked is not checked again
-
-Every check job reads the pull request's head commit and nothing else, so a
-second run on the same head can only repeat the first one's verdict. Label
-events, `reopened` and a `skip-ci` taken off a commit checked earlier all
-produce such runs. `check-gates.yml` therefore looks up the calling workflow's
-earlier runs on the same head SHA and, when the aggregate job of one reached a
-verdict, returns it as `reused_result`: the matrix is skipped and the
-aggregate reports that verdict — **failure as well as success**, never
-skipped, so reuse cannot read as a check that did not happen.
-
-- **Only on an up-to-date branch of `main`**, where the commit to be merged
-  has the head's tree, workflow files included. Each caller passes its
-  aggregate's id as `result-job`, and the gate needs `actions: read`.
-- **Not reused**: cancelled runs, skipped aggregates, anything on a re-run
-  (`run_attempt` > 1) or a non-`pull_request` event. Where several earlier
-  runs have a verdict, the aggregate that completed last wins.
-- **A reused failure is re-examined with "Re-run all jobs"**, or with
-  `workflow_dispatch`. "Re-run failed jobs" is not enough: it keeps the gate's
-  outputs from the first attempt and so reuses the failure again.
-
-### A branch behind `main` runs nothing either
-
-That is the state the pull request page calls "This branch is out-of-date with
-the base branch". The ruleset sets `strict_required_status_checks_policy`, so
-the required checks have to pass on a head that already contains main's tip:
-the branch cannot merge as it stands, and the update that clears it fires
-`synchronize` and runs everything again on the commit that will actually be
-merged. The run before that update produces a result nothing can use — and,
-unlike `skip-ci`, the thing that holds the merge meanwhile is the ruleset rather
-than a convention.
-
-Being behind is not in the event payload — `mergeable_state` arrives as
-`unknown` on the `synchronize` that triggered the run — and a job-level `if`
-cannot make an API call, nor run `pnpm install`, which the diff gate needs. So
-each check workflow opens with one small job that can do both,
-`check-gates.yml` through `workflow_call`, and every other job in the workflow
-waits on its two outputs (see the `needs:` in the snippet above). It answers
-the branch question first and skips the checkout when the answer is `false`,
-so a branch behind `main` still costs the four seconds this gate cost when it
-answered only that.
-
-What that shape is for:
-
-- **One job, not a step in each job.** A step cannot skip the job it is in, so
-  a step-level gate boots every runner in the matrix — eleven of them in
-  `code-check.yml` — to decide it had nothing to do, and each of those eleven
-  checks out and installs dependencies first, about 45 seconds apiece. The
-  gate job costs one boot per workflow run and skips the rest before they
-  start. The `skip-ci` gate needs no job of its own because its answer is free.
-- **A reusable workflow, not the same shell copied five times.** One answer,
-  one place to change it — the same reason the diff gate's path lists live in
-  the root `package.json`. The price is one more entry in the checks list per
-  workflow, `gates / check`, which is also where the reason for a skipped
-  matrix is written down.
-- **`!cancelled()` and `!= 'false'`, never `== 'true'`.** A gate that fails to
-  answer leaves `should_run` empty, and `!cancelled()` keeps the dependent
-  jobs from being skipped along with it. Failing open costs a CI run; failing
-  closed would skip every check on the pull request while reporting the
-  required ones as satisfied. The `skip-ci` clause is repeated in the longer
-  condition because `!cancelled()` also lifts the automatic skip that a
-  skipped dependency would otherwise give.
-- **Only the default branch.** The gate compares against
-  `github.event.pull_request.base.ref` and skips only when it is the
-  repository's default branch. Nowhere else does being behind block a merge,
-  so nowhere else does an update that re-runs the checks have to come.
-- **`push` and `workflow_dispatch` are exempt**, as they are from the `skip-ci`
-  gate, and for the same reason.
-
-The design leans on the `main` ruleset
-(`repo-settings/rulesets/main.json`): merging into `main` requires a pull
-request, and the admin's bypass is `bypass_mode: "pull_request"` — usable
-inside a pull request flow only, so a direct push to `main` is refused even
-for the repository admin. The escape hatch for a wedged required check is to
-merge a pull request with the bypass, not to push. Do not widen it back to
-`"always"`: checks arrive only through pull requests now, so an unchecked
-direct push would reach `main` with nothing having seen it at all — the
-check workflows no longer run their matrix on a push to `main`. The same goes
-for a bypass merge; see "Check triggers" for the `workflow_dispatch` that
-covers it.
+A targeted run can miss a file another package's generator writes; CI's
+`assert-repo-is-clean` catches it once `skip-ci` is off. Read `git status`
+before pushing.
+
+### Samples and generated documentation
+
+Sample embedding is one implementation in `tools/configs/`
+(`embed-examples-*.mts`); a package's `scripts/cmd/embed-examples*.mts` is
+call site and data only. Every JavaScript / TypeScript fence in a README is a
+sample, and every `@example` needs one; there is no exemption list. A
+declaration a sample cannot reach describes itself in prose with a fence and
+no `@example` tag. **CI reaches the embedding scripts only through each package's
+`doc` script**, so a `gen-docs.mts` that forgets to call one is a package
+nothing checks; `check:root:example-coverage` and
+`check:prose:readme-sample-coverage` exist to notice.
+
+## Repository settings
+
+`repo-settings/` root files are desired state, applied only by
+`pnpm run repo-settings:apply` (admin token); `bk/` mirrors GitHub. **Editing
+a root file passes CI and changes nothing** until applied. Drift is checked
+daily from the private `noshiro-pf/mono-security`.
+
+- **Declare and apply an environment before merging the workflow that names
+  it.** An environment created by a first run has no protection rules, and
+  nothing fails to say so. `release`'s branch policy is the whole of what
+  confines a publish to `main`.
+- **`.github/CODEOWNERS` is a merge gate**, not a notification list: the
+  ruleset requires an owner review for listed paths, which stops
+  `pnpm-update`'s auto-merge there. That is the point (its App token holds
+  `workflows: write`). Listing a path is a judgement about frequency as much
+  as importance; the owner's own pull requests merge by ruleset bypass.
+
+## Tokens and third-party code in a job
+
+What a compromised dependency can reach is what the job's key can do.
+`pnpm-update.yml` is split for that reason — `update` runs the dependency
+tree's code with no key, `commit` holds the `workflows: write` token and
+installs nothing, and a patch crosses between them (applied, never executed,
+and refused if it touches paths a dependency update does not write).
+`node-support-update.yml` is not split: its token lacks `workflows` and arms
+no auto-merge. When editing these:
+
+- A `run:` block is the definition GitHub resolved; a file in the tree is read
+  at invocation, after third-party code could rewrite it. Steps that must not
+  trust the tree stay inline and use `git`/`gh` only.
+- Work that needs no token goes before `Generate Token`. A step before
+  `pnpm install` runs its script with `node`, not `pnpm run` (which installs);
+  that is why `mature-updates.mts` imports `node:*` only.
+- `git config core.hooksPath /dev/null` before committing on a runner.
+
+## CI
+
+### Required status checks
+
+The eight required contexts (`repo-settings/rulesets/main.json`) are the five
+`*-result` aggregate jobs, the `no-skip-ci-label` commit status, and the two
+`lint-pull-request.yml` jobs. **None is a job that does work**: a skipped job
+satisfies a required check and a skipped matrix job does not expand its
+matrix, so matrix contexts made required directly go stale. Each aggregate is
+`if: always()` and asserts `needs.<job>.result == 'success'`, reporting
+`skipped` only for `skip-ci`, a branch behind `main`, and a diff the workflow
+does not read — each held by something else.
+
+- A new matrix entry needs nothing; a new job or workflow needs its aggregate
+  context added to `main.json`, or it runs and blocks nothing.
+- A context not found reads "Expected — waiting" forever. Renaming one: merge
+  with the ruleset bypass, run `repo-settings:apply rulesets`, then expect
+  every open pull request to read blocked until rebased.
+- A red aggregate does not name what failed; open the run.
+- The `main` ruleset requires squash-merged pull requests and the admin's
+  bypass is `pull_request` mode only; do not widen it, since nothing checks a
+  direct push.
+
+### Diff gates
+
+Check workflows carry no `paths` filter (a filtered-out workflow reports no
+status). `check-gates.yml` decides per workflow whether the diff touches
+anything it reads, using the three `z:check-should-run:*` ignore lists in the
+root `package.json`. **Add a path to a list only when no command that workflow
+runs reads it** (`articles/` is not on the style list because Prettier
+formats it; `**.md` is not on the strict-lib list because changelogs are
+copied into the bundles). Gates are job-level `if`s, so a step added to a
+gated job needs no condition. Dependent jobs use `!cancelled()` and
+`!= 'false'`, never `== 'true'`, so an unanswered gate fails open.
+
+### Triggers, `skip-ci`, out-of-date branches
+
+The check workflows trigger on `pull_request` (`opened`, `synchronize`,
+`reopened`, `labeled`, `unlabeled`) and `workflow_dispatch`; only
+`code-check.yml` also runs one job on a push to `main`, for Codecov's base
+report. Nothing else runs on `main`, so **after a bypass merge run the
+workflows by hand**. Drafts are checked like anything else. Do not add
+`edited` or `issue_comment`: such a run cancels the one in progress and its
+skipped aggregate supersedes the last verdict.
+
+- **`skip-ci` label**: every gated job skips while it is on, booting no
+  runner; removing it (`unlabeled`) is what starts the checks on a commit
+  already pushed. Any label event re-runs the checks, so add other labels
+  before pushing or after the checks report.
+- **`no-skip-ci-label`** is a commit status written by `skip-ci-label.yml` on
+  every event (`pending` with the label, `success` without). It is the only
+  thing holding a labelled pull request; deleting the workflow or its context
+  leaves `skip-ci` skipping everything with nothing holding the merge. It runs
+  on `pull_request_target` with no checkout so that `main`'s copy decides;
+  keep it executing nothing from the tree.
+- `skip-ci` and `merge-queued` exist only on GitHub; the strings are in the
+  workflows and `tools/scripts/cmd/unblock-prs/`. Change them everywhere or
+  nowhere.
+- **A commit already checked is not checked again**: `check-gates.yml` reuses
+  the aggregate verdict of an earlier run on the same head, failure included.
+  Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
+- **A branch behind `main` runs nothing**; the ruleset blocks it and the update
+  re-runs everything.
+- `pnpm run check:root:ci-commands` asks whether any matrix command duplicates
+  another and whether any check script runs nowhere. What a script body cannot
+  show is declared in `DECLARED_COVERAGE`; `UNCOVERED_BY_DESIGN` is a list of
+  claims, each with a reason, not a silencer.
 
 ## Spell checking
 
-`pnpm run check:cspell` covers the whole repository apart from `experimental/`, the
-verbatim IETF RFCs under `docs/json-spec/`, and the rest of `ignorePaths` in
-the root `.cspell.config.yaml`. Seven packages under `libs/` also run cspell
-themselves, with the package directory as cwd. `.changeset/` is checked
-separately — see below.
+Declare a word at the narrowest scope covering every occurrence: a
+`cspell:ignore` directive in the file, a `cspell.config.yaml` in the package
+or top-level directory (which **must `import` the root config**, or the
+package's own cspell run loses everything the root declares), and only then
+`words` in the root `.cspell.config.yaml`. Confirm it is not a misspelling
+first; delete the entry when the last occurrence goes (to find dead entries,
+empty `words`, run the check, restore what it reports).
 
-cspell walks up from each file looking for a configuration and merges what it
-finds, so a word can be declared at the scope it actually belongs to. Use the
-narrowest one that covers every occurrence:
-
-- **One file** — a `cspell:ignore` directive in that file: `// cspell:ignore …`
-  in TypeScript and JSONC, `# cspell:ignore …` in YAML,
-  `<!-- cspell:ignore … -->` in Markdown. It applies to the whole file wherever
-  it sits; keep it at the top, below the front matter or a shebang.
-- **One package or one top-level directory** — a `cspell.config.yaml` there.
-  Thirteen exist: `.github/`, `strict-lib/`, six under `apps/` and five under
-  `libs/`.
-- **More than one of those** — the `words` list in the root
-  `.cspell.config.yaml`. It is meant to stay short.
-
-**Every directory-level config must `import` the root one.** cspell stops at
-the first configuration it finds walking up from its cwd, so a package running
-its own `check:cspell` script never reaches the root file; without the import that
-package silently loses `allowCompoundWords`, the shared `words` and every
-`ignorePaths` entry.
-
-Reach for the next scope up when the file cannot carry a comment
-(`package.json`) — and for `ignorePaths` when it is a document that must stay
-byte-for-byte as received, which is why `docs/json-spec/` is excluded rather
-than annotated.
-
-Add a word only after confirming it is not a real misspelling, and delete its
-entry once the last occurrence goes. To find entries that have gone dead, empty
-`words`, run `pnpm run check:cspell`, and restore only what it reports: doing that
-once retired 240 of the 300 words the root list had accumulated, nearly all of
-them left over from packages that now live in `experimental/`.
-
-### `.changeset/`
-
-**A changeset's text does not stay where it is written, so it is not checked
-where it is written.** `pnpm run check:cspell:changeset` handles `.changeset/`, and
-the root `check:cspell` script runs it after the repository-wide pass.
-
-`changeset version` copies a changeset's body into the `CHANGELOG.md` of every
-package its front matter names, and those are checked like any other file —
-`**/CHANGELOG.md` is deliberately **not** in `ignorePaths`. So the same text is
-checked twice in its life, in two places that disagree in both directions: as
-`.changeset/<name>.md` at the repository root, where only the root config
-applies, and as `libs/<pkg>/CHANGELOG.md`, where that package's own config
-does. A word `libs/ts-data-forge/cspell.config.yaml` allows would fail while
-the changeset exists; a word only the root allows would pass then and fail at
-release, on the `chore: version packages` branch, after the changeset that
-would have explained it is gone.
-
-`tools/scripts/cmd/cspell-changeset.mts` settles that in favour of the
-destination. It reads each changeset's front matter, resolves every named
-package to its directory, walks up from there for the config cspell itself
-would find, and runs cspell once per config.
-
-- **A changeset must pass under _every_ config it names, not just one.** The
-  one body is copied into every named package's changelog, so a word is safe
-  only if all of those configs accept it. A changeset for the strict standard
-  library names twelve harnesses, which all resolve to the single
-  `strict-lib/cspell.config.yaml`.
-- **A word used in a changeset belongs in the named package's config** — the
-  scope it will need anyway once the text is in that package's changelog, and
-  one that goes away with the package rather than outliving the changeset.
-- **`.changeset` must not go into `ignorePaths`.** Those globs resolve against
-  the config that declares them and every package config imports the root one,
-  so a root entry would also silence the per-package runs that are the point.
-  It is kept out of the repository-wide pass by being absent from that script's
-  glob instead — `**` does not match a dot directory, which is why the glob
-  used to name `.changeset/**/*` explicitly.
-- Files in `.changeset/` with no front matter — `README.md`, `config.json`, a
-  `pre.json` during a pre-release — have no destination and are checked under
-  the root config, which is where the repository-wide pass would have taken
-  them.
-
-The check also fails on a changeset naming a package that does not exist:
-`changeset version` fails on it, and until then it releases nothing.
+**A changeset's words belong in the config of the package it names**, because
+`changeset version` copies the body into that package's changelog, which is
+checked there. `check:cspell:changeset` runs each changeset under every named
+package's config. Do not put `.changeset` in `ignorePaths`.
 
 ## Japanese text
 
-Much of what is written here is written in Japanese: the Sumi specification and
-its decision log, the strict standard library's design notes and work logs, the
-Zenn articles, the Japanese pages of `apps/synstate-docs`, and comments
-throughout the source. What lands in `main`'s history is not — see "Commit
-Messages" — so this section is about documents and comments, not about commits.
+Documents and comments may be Japanese; commits and pull request titles may
+not (see below). Parentheses around Japanese text are fullwidth `（）`;
+`pnpm run fix:japanese-parentheses` rewrites the halfwidth ones and drops the
+spaces they needed. Verbatim texts under `docs/` are never touched.
 
-**Parentheses enclosing Japanese text are fullwidth: `（）`, not `()`.** A
-halfwidth `(` is set flush against the character before it, which in a script
-with no interword space closes the line up; a fullwidth `（` carries that space
-inside the glyph. Writing both in one document is the sort of difference that
-is invisible while a line is being written and obvious once the lines sit next
-to each other, and it is not a thing a reviewer reliably catches — 1,086 pairs
-had accumulated across 41 files before anything asked.
+## Session rules
 
-`pnpm run check:prose:japanese-parentheses` is what asks, and
-`pnpm run fix:japanese-parentheses` rewrites what it finds.
-
-- **The space the halfwidth pair needed goes with it.** `コマンド (…) を` becomes
-  `コマンド（…）を`, not `コマンド （…） を` — the fullwidth glyph already holds
-  that space, so keeping the written one sets a space and a half. The fixer
-  drops one space immediately inside the pair, one immediately before it where
-  that is not the line's indentation, and one immediately after it where
-  Japanese follows.
-- **What it asks is deliberately narrow, so that the answer is never a
-  judgement call.** A pair is reported only when the text inside it _is itself
-  Japanese_ and the pair is next to Japanese — the character before `(`, or the
-  one after `)` with at most one space skipped. So `Num.div(a, b)` and
-  `toHaveText('合計額')` are left alone, nothing Japanese touching their
-  parentheses, and so is `(D-7)` in Japanese prose, whose contents are not
-  Japanese. Parentheses around a purely Latin run are house style, which this
-  has no opinion about.
-- **A space on the left is not enough on its own**, though a space on the right
-  is. What follows a parenthetical is the sentence carrying on, so Japanese
-  there says the sentence is Japanese; what precedes one says much less.
-  `確定 (independent of any pending 提案).` is an English sentence with Japanese
-  terms in it, and `// "9月4日 (土)" 15` is a sample of a quoted input that has
-  to stay byte for byte — both would read as Japanese prose if the character
-  before the space counted.
-- **Three things are never read**, because in each the parentheses are syntax
-  rather than punctuation: fenced code blocks in Markdown, inline code spans,
-  and a Markdown link or image destination — where a Japanese anchor
-  (`](#日本語の見出し)`) must go on spelling the heading exactly as the heading
-  spells it.
-- **A pair split across two lines is not read either.** The scan is line by
-  line, and looking for a pair that wraps would cost more in false positives
-  than it would find.
-- **The verbatim texts under `docs/` are not ours to punctuate**, and are
-  skipped by name: `docs/json-spec/` (the IETF RFCs, excluded from cspell for
-  the same reason), `docs/rust_book/` and `docs/typescript_book/`. Editing one
-  would make it no longer a copy of what was received.
-- **It is a `check:prose:*` and not a `check:root:*`**, because `check:root`
-  is a `code-check.yml` entry whose gate drops `**.md` — a documentation-only
-  diff, which is the diff this check is about, would skip it. See "The two
-  repository-level check namespaces".
-
-## Important Instructions
-
-- After making code changes, run `pnpm run fmt` and then the checks the diff
-  touches — the table under "Essential Development Commands" says which those
-  are — and fix what they report.
-    - Do not use file-level `/* eslint-disable */` or turn off rules in
-      `eslint.config.mts` to fix lint errors.
-    - Avoid using `// eslint-disable-next-line` whenever possible.
-- **RESTRICTIONS**: pushing the session's own branch and opening its pull
-  request is the work, not something to ask about — see "Opening a pull
-  request". Do not do any of these without explicit user instructions:
-    - Push to a branch other than the one the session was given. `main` is
-      never one of them: the ruleset refuses a direct push there even from the
-      repository admin.
-    - Force-push, or rebase a branch whose pull request is open — see "After
-      it is open: watch it, and wait before rebasing".
-    - Merge a pull request, arm auto-merge on one, or add `merge-queued`.
-      Those are the author's.
-    - Run the `gh` CLI. It is authenticated as the person who set it up and
-      can do everything that account can — merge, rewrite the repository's
-      settings, delete a branch — which is far more than any of this needs,
-      so it stays a tool a person runs and a session works through the
-      GitHub API instead. `pnpm run unblock-prs` shells out to it, so asking
-      for that is asking for this.
-    - Access `~/.ssh` or other sensitive directories
+- After code changes, run `pnpm run fmt` and the checks the diff touches, and
+  fix what they report. **No file-level `eslint-disable`, no turning rules off
+  in `eslint.config.mts`, and `eslint-disable-next-line` only as a last
+  resort** — the rules below say what the intended fix is.
+- Pushing the session's own branch and opening its pull request is the work.
+  **Without explicit instruction, never**: push to any other branch (`main`
+  refuses direct pushes anyway); force-push or rebase a branch whose pull
+  request is open; merge, arm auto-merge or add `merge-queued`; run the `gh`
+  CLI (it is a person's account; use the GitHub API — `pnpm run unblock-prs`
+  shells out to `gh`); access `~/.ssh` or other sensitive directories.
 
 ## Security findings
 
-**This repository is public, and a finding about it is a reproduction.** What an
-investigation produces is not "here is a weak point" but "here is the order to
-do things in", and publishing that before the fix lands hands it over. So
-findings go in the private **`noshiro-pf/mono-security`**, and not in this
-repository's issues or pull requests.
+This repository is public, so a finding about it is a reproduction. Findings
+go to the private **`noshiro-pf/mono-security`**, never to issues or pull
+requests here; a fix here may say what it closes, not read as steps that
+work. A public issue cannot be taken back (edit history is readable, archives
+ingest the feed). Outside reports come through private vulnerability reporting
+(`.github/SECURITY.md`).
 
-What that repository holds:
+## Commits and pull requests
 
-- `reports/` — one file per investigation: the chain, the measurements, and the
-  reasons something is not yet fixed.
-- Issues — one finding each, carrying a `<!-- finding-key: … -->` header, with
-  issue #1 an audit log a routine appends to.
-- `scripts/` — the settings-drift check that runs against this repository. It
-  has no dependencies, deliberately: the job holds an App token that cannot be
-  made weaker, because `bypass_actors` and the merge-related settings are each
-  only returned to a caller with write access.
-
-**What may stay here is the fix.** A pull request that closes something can say
-what it closes and why the shape matters — the notes throughout this file do
-exactly that. What it should not do is read as a set of steps that works.
-
-**A public issue cannot be taken back.** Editing the body does not redact it:
-GitHub keeps the edit history and it is readable through GraphQL
-`userContentEdits`. The public events feed carries the body as written, and
-external archives ingest that feed hourly. Deleting the issue is the only
-removal, and it does not reach those archives. The decision is made when it is
-written, not afterwards.
-
-**Reports from outside come through private vulnerability reporting**, which is
-enabled on this repository — see `.github/SECURITY.md`. Not through an issue.
-
-## Commit & Pull Request Guidelines
-
-### Commit Messages
-
-- Use Conventional Commits, for example:
-    - `feat: add parser for .mts`
-    - `fix: handle Windows path resolution`
-    - `chore(deps): bump rollup to 4.50.1`
-
-| prefix   | description                                                                                 |
-| :------- | :------------------------------------------------------------------------------------------ |
-| feat     | A new feature                                                                               |
-| fix      | A bug fix                                                                                   |
-| docs     | Documentation-only changes                                                                  |
-| style    | Changes that do not affect code behavior (whitespace, formatting, missing semicolons, etc.) |
-| refactor | A code change that neither fixes a bug nor adds a feature                                   |
-| perf     | A code change that improves performance                                                     |
-| test     | Adding missing tests or correcting existing tests                                           |
-| chore    | Changes to build process, auxiliary tools, or libraries (e.g., documentation generation)    |
-
-The prefix does not drive versioning here — changesets do, and a commit without
-a changeset publishes nothing no matter what it is called.
-
-**Write commit messages in English**, subject and body alike. `main`'s history
-is the one part of this repository that cannot be edited afterwards, and the
-libraries under `libs/` are published, so it is read by people who do not read
-Japanese. Conversation about the work — a pull request description, a review
-comment, an issue — is not covered: only what lands in the history is.
-
-`Validate commit messages` in `lint-pull-request.yml` enforces it, and
-`Validate PR title` enforces the same thing for the title. Both are required
-status checks, and both skip while the `skip-ci` label is on, as the check
-workflows do — see "Check triggers, `skip-ci` and out-of-date branches". What
-they reject is Japanese specifically — kana, CJK ideographs, CJK punctuation
-and the fullwidth forms — rather than everything outside ASCII, so an em
-dash, a curly quote or an accented name still passes.
-
-### Pull Requests
-
-- **The title is written in English**, and is checked — see above. A squash
-  merge makes it the subject of the commit that lands on `main`
-  (`squash_merge_commit_title` is `PR_TITLE`), and the branch's own commit
-  messages its body (`squash_merge_commit_message` is `COMMIT_MESSAGES`), which
-  is why both are held to the same rule.
-- Include a clear description, link related issues, and add screenshots or logs when helpful.
-- Note any breaking changes using `BREAKING CHANGE: ...`.
-- **Run the checks the diff touches locally before opening it** — see
-  "Essential Development Commands" for which those are. Passing CI is what the
-  merge waits for, but CI does not run while `skip-ci` is on, so until the
-  label comes off the local pass is the only evidence there is.
-
-### Opening a pull request: ready for review, with `skip-ci` on it
-
-**Implement the change, run the local checks, and only then open the pull
-request — ready for review, with the `skip-ci` label on it.**
-
-**Not a draft.** A draft says the branch is not asking to be read yet, and
-that is not how anything here works: nothing pushes a half-finished branch and
-grows it in place, so the pull request appears when the work is complete and
-asks to be read from its first commit. Saying otherwise costs something real —
-GitHub refuses to merge a draft natively, auto-merge cannot be armed on one,
-and `unblock-prs` reports a queued draft rather than acting on it. What the
-branch is actually waiting for is a person, and `skip-ci` says that without
-claiming the work is unfinished.
-
-- **`skip-ci` is addressed to CI.** Every check workflow and both lint jobs skip
-  while it is on, and `no-skip-ci-label` holds the merge with a pending status —
-  see "Check triggers, `skip-ci` and out-of-date branches". `unblock-prs` looks
-  only at pull requests labelled `merge-queued`, so an unlabelled one is left
-  alone whether or not it carries `skip-ci`; a labelled one has its `skip-ci`
-  taken off when its turn comes, which is the one thing that takes it off. See
-  "A declared merge order".
-
-**The label goes on immediately after the pull request is opened**, because
-nothing here can put it on in the same call: GitHub's REST API takes no labels
-when creating a pull request, and the MCP tool over it takes none either.
-`gh pr create --label` would do both at once and is not an option — see
-"Important Instructions" for why the `gh` CLI is a person's tool rather than a
-session's. The runner minutes are spent either way: the `opened` event has
-already started a run by the time the label goes on, and the `labeled` event
-cancels it through the concurrency group.
-
-**That cancellation does not read as one, and the red checks it leaves are to
-be ignored.** Measured on #1966: the cancelled run's matrix jobs conclude
-`cancelled`, and its `*-result` aggregates conclude **`failure`** — being
-`if: always()` they run anyway, and assert `result == 'success'` against a job
-that was cancelled. What arrives is one "check failed" notification per check
-workflow, naming nothing that failed — five of them there, four within
-seconds and the fifth five minutes later, that run's `gates / check` having
-still been going when the cancel reached it. The `labeled` run reports those
-same contexts `skipped` and supersedes them, and `no-skip-ci-label` goes
-`pending`, which is what actually holds the merge. So there is nothing to
-investigate and nothing to re-run: by the time the notification is read, the
-red it names has already been superseded.
-
-Consequences worth having in mind:
-
-- **While the label is on, the local checks are the only checks the branch
-  gets.** Nothing runs on the runners at all, so a pull request opened without
-  running anything sits in the list looking exactly like one that passed. Run
-  the checks the diff touches — see "Essential Development Commands" — and say
-  in the description which ones, so the gap between that and a full CI run is
-  written down rather than assumed.
-- **Taking the label off is how CI is asked for.** `unlabeled` is in every
-  check workflow's trigger list, so removing it starts the whole matrix on the
-  commit already pushed — there is no need to push an empty commit to wake
-  anything up.
-- **The label is a pause, not a state to leave a branch in.** A pull request
-  that keeps it is one nothing will ever merge: no check runs, and
-  `no-skip-ci-label` stays pending. `merge-queued` is how a pause becomes a
-  queue position instead — a pull request that has been reviewed and is
-  waiting its turn rather than waiting for someone to look at it, and that
-  `unblock-prs` will take the label off when its turn comes.
-- **Queueing one is the author's, and a session does not do it.** Arming
-  auto-merge and adding `merge-queued` are two deliberate statements about
-  landing the branch, and they are made by hand. `skip-ci` is not among them
-  and stays on — taking it off starts a matrix now, which is the thing the
-  queue exists to do one branch at a time.
-
-### After it is open: watch it, and wait before rebasing
-
-**A pull request a session opened stays that session's until it merges or
-closes.** Opening it is not the end of the task. Two things happen to it
-afterwards, and only one of them is the session's to answer on its own.
-
-- **Comments are the session's to notice.** Keep a watch on the pull request
-  running from the moment it exists until it is merged or closed, and read
-  what arrives — a review comment, a bot's finding, a reviewer's question.
-  Where the session has a subscription mechanism for it —
-  `subscribe_pr_activity` in Claude Code's remote environment — subscribe as
-  soon as the pull request is open and leave it subscribed. The events wake
-  the session by themselves, so ending the turn is how to wait for one; a
-  polling loop is not. A session that stops once the pull request exists never
-  sees any of this, and a comment nobody read looks exactly like a comment
-  nobody agreed with.
-    - What to do about one follows the usual rule: a small, in-scope fix
-      belongs on the branch, and anything larger is a question for the author
-      rather than a push.
-- **`main` moving under the branch is not.** Another pull request merges, the
-  branch reads `BEHIND`, and whether to rebase and force-push is a question to
-  ask rather than one to answer — wait for the instruction. Being behind
-  blocks the merge and nothing else (see "A branch behind `main` runs nothing
-  either"), and for a pull request that has been queued the rebase is
-  `unblock-prs`'s job, one branch at a time in the order they declare. A
-  rebase done by hand ahead of that is one the next merge invalidates, and the
-  force-push it takes rewrites commits someone may be part-way through
-  reading.
-
-### Several pull requests from one session
-
-**When one session produces more than one pull request, chain the branches
-instead of growing each one from `main`.** Branch B off A, C off B, and so on
-— `main <- A <- B <- C`, not `main <- A`, `main <- B`, `main <- C` in
-parallel.
-
-The reason is how they land: `pnpm run unblock-prs` and the `unblock-prs`
-skill rebase one out-of-date branch at a time and let auto-merge do the rest,
-and every merge moves `main` and puts every other open branch `BEHIND`. A
-chain rebases mechanically — once A lands, B already contains A, so its rebase
-is a no-op or close to it. Three branches grown independently from `main` each
-have to be rebased onto whatever the previous merge produced, and every one of
-those is a chance for a conflict nobody was expecting, in a loop that has to
-stop and ask a human about it.
-
-- **The exception is changes that plainly cannot collide** — different files,
-  different packages, nothing shared. Those may branch from `main` in
-  parallel. "Plainly" means you can point at the disjoint paths; if you are
-  weighing it up, chain them.
-- **Order the chain so the earlier links are the ones most likely to be
-  merged.** A branch stacked behind one that gets rejected has to be rebased
-  by hand, which is the cost the chain was avoiding.
-- **A stacked pull request targets `main`, not its parent branch.**
-  `unblock-prs` drops any pull request whose `baseRefName` is not `main`, and
-  the ruleset the required checks answer to is `main`'s. The child's diff
-  shows the parent's commits until the parent lands; that is the price, and it
-  costs less than a pull request the loop will not look at.
-
-### A declared merge order
-
-The chain above is an order that exists in git and nowhere else, which is why
-it has to be read off the branches by a person. `pnpm run unblock-prs` reads
-one the pull requests state instead, out of two things they carry.
-
-- **The `merge-queued` label is the scope rule.** A pull request without it is
-  passed over in silence, whatever else it carries; the label is the author
-  saying this one is reviewed and is to be landed. Auto-merge is still
-  required — nothing here merges anything — and a queued pull request that
-  lacks it, or is a draft, or is based on something other than `main`, is
-  reported rather than skipped quietly, because the label asked for something
-  and the answer is no.
-- **`Merge-After: #1234`**, a trailer on its own line in the pull request
-  body. The pull request is not _picked_ — not rebased, not released — while
-  any pull request it names is still open. Several numbers may be named, on
-  one line or on several, so what is declared is a graph rather than a chain,
-  and a pull request whose `Merge-After` names nothing open is unconstrained.
-  A trailer inside a fenced code block is not read: a declaration and an
-  example of one are the same text, so the pull request that introduced this
-  could not have described it otherwise.
-
-`skip-ci` is not a scope rule here: it pauses a queued pull request rather
-than removing it, and taking it off when its turn comes is what the loop is
-for. That is also why a `skip-ci` pull request is a candidate whatever
-`mergeStateStatus` says about it — with `no-skip-ci-label` pending it reads
-`BLOCKED` however ready it is, and checks that were skipped are
-indistinguishable from checks still running.
-
-What the declaration buys over chaining branches is that the order is stated
-rather than inferred, so it survives the rebases: the loop's own rebase of A
-rewrites A's commits, and anything that read B's dependency on A out of its
-ancestry would lose it at that moment. A number does not move.
-
-Four things follow from how it releases one:
-
-- **It constrains picking and nothing else.** A pull request that is already
-  up to date and merging is watched as it always was, because auto-merge is
-  going to merge it whatever is declared here. `Merge-After` cannot hold back
-  something that is already going.
-- **The rebase comes first and the `skip-ci` removal second.** While the label
-  is on, the push fires a `synchronize` whose every check skips, so it is
-  free; taking the label off then fires `unlabeled` and runs the matrix once,
-  on the head that will actually be merged. The other order runs a full matrix
-  on the pre-rebase head and has the push cancel it.
-- **A queue stalls rather than reordering itself.** A released pull request
-  whose checks fail is set aside like any other, with its `skip-ci` off, and
-  everything declaring `Merge-After` on it waits, because it has not merged.
-  A cycle stalls the same way, and is reported by name — without that its
-  members would each report "waiting on #N" for as long as the loop ran, with
-  nothing saying why that never changes.
-- **A bot that opens a pull request has to label it.** `pnpm-update.yml` does,
-  in the same `gh pr create` that opens it and next to the `gh pr merge
---auto` that arms it — nobody reviews that branch, so the two statements are
-  one. Without the label nothing rebases it when `main` moves under it, and
-  the only thing that would notice is the branch quietly sitting `BEHIND`.
-  `node-support-update.yml` deliberately does not: it arms no auto-merge
-  either, and a pull request waiting for a person is the point of it.
+- Conventional Commits (`feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
+  `test`, `chore`). The prefix does not drive versioning; changesets do.
+- **Commit messages and pull request titles are English** (`main`'s history
+  is unchangeable and the libraries are published). Checked by
+  `lint-pull-request.yml`; a squash merge makes the title the subject and the
+  branch's messages the body.
+- **Open the pull request ready for review, with `skip-ci` on it**, after
+  running the local checks and saying in the description which ones — while
+  the label is on they are the only checks the branch gets. Not a draft (a
+  draft cannot be auto-merged and `unblock-prs` only reports it). The label
+  goes on right after creation; **the `opened` run it cancels leaves red
+  `*-result` checks and "check failed" notifications naming nothing — ignore
+  them**, the `labeled` run supersedes them.
+- Taking `skip-ci` off is how CI is asked for. Queueing (auto-merge,
+  `merge-queued`) is the author's; a session leaves `skip-ci` on.
+- **The pull request stays the session's until it merges or closes.**
+  Subscribe to its activity (`subscribe_pr_activity` where available) and end
+  the turn to wait — do not poll. A small in-scope fix goes on the branch;
+  anything larger is a question. `main` moving under the branch is not the
+  session's to fix: ask before rebasing.
+- **Several pull requests from one session are chained** (`main <- A <- B`),
+  likeliest merge first, unless the paths are plainly disjoint. Each still
+  targets `main`.
+- `pnpm run unblock-prs` (and the `unblock-prs` skill) lands queued pull
+  requests one at a time: scope is the `merge-queued` label, order is the
+  `Merge-After: #N` body trailer (not read inside fenced code), and it
+  rebases before removing `skip-ci` so the matrix runs once. A bot that opens
+  a pull request labels it (`pnpm-update.yml` does; `node-support-update.yml`
+  deliberately does not). Details in `tools/scripts/cmd/unblock-prs/README.md`.
 
 ## Releases
 
-Releases are managed by **changesets** only. `semantic-release` was removed
-during the monorepo consolidation; do not reintroduce `release.config.js`.
-
-- Add a changeset with `pnpm changeset` for any user-visible change to a package
-  under `libs/`.
-- `.changeset/` at the repository root is the single source of truth. Never
-  create a nested `.changeset/` directory inside a package.
-- **A package's first publish is manual.** The release workflow authenticates
-  through npm trusted publishing, which has to be configured per package and
-  cannot be configured before the package exists on npm. See
-  [libs/first-release.md](./libs/first-release.md).
-- **`changeset:version-packages` formats `strict-lib/` before regenerating the
-  bundles.** `changeset version` writes each bumped package a `CHANGELOG.md`
-  entry indented its own way, and `strict-lib` is in `.prettierignore` — oxfmt
-  owns it — so the harness changelogs land unformatted and `style-check
-(strict-lib:fix:fmt)` fails on the `chore: version packages` branch. The format
-  pass runs before `strict-lib:gen:packages` so that each bundle's changelog is
-  derived from the formatted text.
-- Tags for releases published from this repository are `<package-name>@<version>`.
-  Tags prefixed with a repository name (`eslint-config-typed/v5.8.4`,
-  `ts-data-forge/ts-data-forge@14.1.0`, …) are imported history from the
-  standalone repositories that were merged in; never create new tags in that form.
+Changesets only; do not reintroduce `semantic-release`. `pnpm changeset` for
+any user-visible change to a `libs/` package; `.changeset/` at the root is
+the only one. **A package's first publish is manual** (`libs/first-release.md`).
+Tags are `<package-name>@<version>`; repository-prefixed tags are imported
+history, never create new ones. `changeset:version-packages` formats
+`strict-lib/` before regenerating the bundles, because `changeset version`
+writes changelogs Prettier does not own.
 
 ## Node.js version support
 
-**`tools/configs/node-support.json` is the single source of truth, and
-`pnpm run check:root:node-support` is what keeps everything else agreeing with
-it.** Three pinned versions live there, and three `package.json` fields plus
-the compatibility matrix are derived from them.
+`tools/configs/node-support.json` is the single source of truth and
+`check:root:node-support` derives everything else from it. What the check
+cannot decide:
 
-| version   | derives                                    | answers                                                |
-| :-------- | :----------------------------------------- | :----------------------------------------------------- |
-| `minimum` | `engines.node`, the matrix `minimum` entry | what a _consumer_ needs to install a published package |
-| `lts`     | the matrix `lts` entry                     | what is _tested_                                       |
-| `current` | `volta.node`                               | what a _contributor_ builds on                         |
-
-Those are three different questions, and conflating them is the failure this
-check exists to stop.
-
-- **`engines.node` is a promise to consumers, not a record of what was
-  tested.** Its floor is `targets.minimum`, and raising it is a breaking change
-  — every consumer on an older Node stops being able to install. It therefore
-  moves by a decision (a line is dropped, an API is adopted), never because the
-  matrix was refreshed. The direction is one-way: the floor is chosen first and
-  the matrix minimum follows it.
-- **A line going EOL is not on its own a reason to raise the floor.** It is a
-  reason to stop _testing_ the line. Those are separate events, and only the
-  second one is breaking. `update-node-support.mts` says so in a warning rather
-  than acting on it.
-- **The floor is tested at exactly the version it names.** `minimum` is a
-  pinned patch, not a range, and the matrix runs it — a floor nothing runs on is
-  a claim rather than a fact. `pnpm install --engine-strict` in that job is what
-  turns it into a check: pnpm refuses the install when any package's
-  `engines.node` excludes the running version.
-- **`volta.node` is what CI actually runs.** `actions/setup-node` resolves
-  `node-version-file: 'package.json'` through `volta.node` first, so the root's
-  value is the Node nine of the ten workflows use. It was `25.9.0` — a line that
-  reached end of life in June 2026 — until this check started asserting it
-  equals `targets.current`.
-- **`current` is therefore not a matrix entry**, and `MATRIX_TARGETS` in
-  `check-node-support.mts` is the list of the two that are. Because
-  `volta.node == targets.current` is asserted above, every other workflow
-  already runs on that version — `code-check (ws:check:test:cov)` runs this
-  matrix's own Vitest suite there, with coverage on top. A `current` entry ran
-  the same tests on the same Node a second time, and `ws:build` in front of
-  them a second time. `minimum` and `lts` are covered nowhere else, which is
-  what keeps them.
-
-### The upper bound
-
-`policy` decides what an upper bound on `engines.node` is allowed to mean. It
-is `reactive`: no bound normally, and a `<major` bound exactly while
-`knownBroken` names a version that broke. The bound is _derived_ from
-`knownBroken`, so "we know it breaks above N" cannot quietly become "we have
-not tried above N" — a bound with nothing behind it fails the check.
-
-The alternative `major-ceiling` bounds the top at the major after
-`targets.current` whether or not anything is known to be broken. It is
-supported and it is not the default, because an upper bound is not free: pnpm
-and npm refuse the install under `engine-strict`, Yarn 1 refuses by default,
-and the consumer cannot override it for one dependency. Blocking every
-consumer on a new Node to guard against a break that usually does not happen
-costs more than it saves — and unlike the matrix, which a commit fixes, a
-published `engines` range is wrong until a release goes out and consumers
-upgrade to it.
-
-### The scheduled jobs
-
-`node-support-update.yml` runs weekly and does two things that do not depend on
-each other:
-
-- **`update` refreshes `lts` and `current`** from nodejs.org and opens a pull
-  request. It never touches `targets.minimum` (that needs
-  `--allow-minimum-change`, which the schedule does not pass), so nothing a
-  consumer can observe changes and no changeset is needed. The compatibility
-  matrix on that pull request is what proves the new versions work — which is
-  why the refresh is a pull request and not a push.
-- **`canary` runs the build and the tests on the newest release and on a
-  nightly of the next major.** Neither is a required check; a failure opens an
-  issue. This is what makes `reactive` honest rather than optimistic: a nightly
-  of the next major exists roughly nine months before that major ships, so an
-  incompatibility is found — and `knownBroken` written down and released —
-  before any consumer can install a Node that hits it.
-
-Two things about that canary are deliberate and easy to undo by accident:
-
-- **It installs without `--engine-strict`.** A semver range matches a
-  prerelease only when one of its comparators names the same
-  `major.minor.patch` _and_ carries a prerelease tag, so `>=22.22.2` does not
-  match `27.0.0-nightly…`. With `--engine-strict` the install would fail on
-  every nightly run whatever `engines.node` said — the one outcome that would
-  tell us nothing.
-- **A canary failure is not automatically an `engines` change.** Only a failure
-  in what the packages _publish_ says anything about `engines.node`; a build
-  toolchain that does not run on the next Node yet (tsx, esbuild, rollup,
-  vitest) is a `volta.node` problem at most. The issue the job opens says which
-  question to ask first.
-
-### `devEngines`
-
-Nothing declares `devEngines.runtime`, and the check governs it only where it
-is declared. Adopting it is a larger decision than it looks: pnpm implements
-only `onFail: "download"` — `error`, `warn` and `ignore` are read and ignored —
-and under `download` it treats the runtime as a dependency, writing
-`node@runtime:^X.Y.Z` into `pnpm-lock.yaml` and fetching Node on every install.
-So the field is either inert here or it changes how the repository installs.
-`volta.node` carries the same information meanwhile, and carries it where
-`setup-node` reads it.
+- **`engines.node` (`targets.minimum`) is a promise to consumers and moves by
+  decision only.** A line going EOL is a reason to stop testing it, not to
+  raise the floor. The scheduled `node-support-update.yml` refreshes `lts` and
+  `current` and never `minimum`.
+- **Upper bound policy is `reactive`**: no bound unless `knownBroken` names a
+  version. `major-ceiling` exists and is not the default, because a published
+  bound blocks consumers until a release goes out.
+- The weekly canary (newest release and a nightly of the next major) installs
+  **without** `--engine-strict`, because a semver range never matches a
+  prerelease. A canary failure is an `engines` matter only when what the
+  packages publish is broken; a toolchain failure is a `volta.node` matter.
+- `devEngines.runtime` is not declared: pnpm implements only
+  `onFail: "download"`, which changes how the repository installs.
 
 ## Dependencies
 
-- **Every package declares what it imports.** `packageDirs` in a package's
-  `eslint.config.mts` lists only that package's own directory, so
-  `import-x/no-extraneous-dependencies` fails on anything not declared there.
-  Do not add the repository root back to `packageDirs`, and do not turn that
-  rule off for `scripts/**` or `configs/**`.
-    - The one file this pass cannot check is `eslint.config.mts` itself, which
-      `eslint-config-typed` ignores by default. `check:published-deps` covers it
-      instead — see below.
-- **`pnpm run check:published-deps` runs the two dependency checks the
-  repository-wide pass cannot.** Both live in
-  `tools/configs/eslint.published-deps.mts`.
-    - **What a package publishes may import.** A module under `src/` may only
-      import what a consumer is given — `dependencies` and `peerDependencies`,
-      never a devDependency. `files` ships `src` alongside `dist` so that "Go
-      to Definition" lands in the original source, which makes this true of
-      type-only imports as well.
-    - **What `eslint.config.mts` imports**, with devDependencies allowed. The
-      root's own config is covered only for packages outside the workspace: a
-      workspace sibling resolves to a path inside the root's own tree, and the
-      rule treats anything there as internal. From a package it resolves
-      outside that package, so there the check is complete.
-    - Its blind spot is `@types/*`: nothing imports `@types/micromatch` by
-      name, so the rule cannot know that `micromatch` needs it. When a runtime
-      dependency carries no types of its own, put its `@types` package in
-      `dependencies` by hand.
-- **`verify-npm-packages/` checks the artifact rather than the source.** It
-  installs what the packages publish and runs a small program against each.
-  `pnpm run verify:npm-packages` uses tarballs packed from the checkout — what
-  the next release will be — and runs on every branch;
-  `pnpm run verify:npm-packages:published` uses versions pinned in
-  `verify-npm-packages/published/packages/*/package.json`, and runs only when
-  those pins change. `pnpm-update` moves them, so a release arrives as a diff
-  rather than as an unrelated branch starting to fail. Only the local half
-  needs `pnpm run ws:build`. See `verify-npm-packages/README.md`.
-    - Edit the checks in `verify-npm-packages/smoke/`. Everything under
-      `local/` and `published/` is generated from it and committed, so the
-      repository-is-clean check fails if they drift.
-    - Three things keep an undeclared dependency from resolving anyway: one
-      project per package, `hoist: false`, and a resolve hook that refuses
-      anything outside the space. The last matters most — these projects sit
-      inside the monorepo, so without it Node walks up into the repository's
-      own `node_modules` and finds our libraries there, built from source.
-    - The space's `node_modules` is deleted before each install. The tarballs
-      are packed under names without versions in them, and pnpm keys a `file:`
-      dependency on its path, so it otherwise reuses the previous tarball —
-      neither `--force` nor deleting the lockfile is enough.
-    - The local space `overrides` every package in this repository to the
-      tarball packed here, because `pnpm pack` resolves `workspace:^` to the
-      version in the checkout. On a `chore: version packages` branch the
-      sibling it asks for is the bumped version, which npm does not have until
-      the release goes out — the check would fail on the one branch whose
-      purpose is to be released. Elsewhere it resolved, but to the older
-      sibling on npm, which is the `published` space's question rather than
-      this one's.
-- **`pnpm run check:knip` covers the other direction: a declared dependency nothing
-  imports.** It also sees imports ESLint does not, such as the ones in
-  `samples/`, and reports files nothing reaches and catalog entries no package
-  uses. Configuration is in `knip.jsonc`. The gate takes only the issue types
-  about what a package declares. Whether code is reachable — `files`,
-  `exports`, `types`, `duplicates` — stays out of it, because an export nothing
-  imports yet is what unfinished work looks like, and because knip cannot see a
-  dynamic import built from a computed path. The reasons are at the top of that
-  file; `pnpm exec knip` without arguments reports them.
-    - knip executes each package's vitest config, which imports workspace
-      siblings through their `exports` map, so it needs `pnpm run ws:build`
-      first.
-    - A dependency named as a _string_ in a config file rather than imported is
-      invisible to knip. The Prettier plugins are the case here: each package
-      runs `fmt` with its own directory as cwd and resolves them from there,
-      even though only the root `.prettierrc` names them. Add such a dependency
-      to `ignoreDependencies` with the reason rather than deleting it — dropping
-      the Prettier plugins silently stopped import sorting in generated files.
-    - **A new workspace entry goes after the previous entry's closing `},`,
-      never after its `"entry"` line.** Most of the blocks in `knip.jsonc` are
-      byte-identical — five share
-      `{"entry": ["src/index.mts"], "project": ["**/*.mts"]}` alone — so an
-      edit anchored on `"entry"` or `"project"` has several equally good
-      matches and readily lands _inside_ the entry above, which then loses its
-      body. It happened three times running (#1758 / #1754 / #1756), in every
-      case to `apps/lambda-calculus-interpreter-react`. Git merges the
-      insertion without a conflict, so nothing objects until Prettier reports
-      a `SyntaxError` about formatting, minutes into CI, naming neither knip
-      nor the entry that was damaged — and when the braces happen to balance,
-      not even that: the file parses and the swallowed entry is silently off.
-      `pnpm run check:root:knip-config` is the guard for both shapes; run it
-      after editing the file by hand.
-- **A package's build declares no bundler.** Every library builds with the
-  native `tsc` and the strip pass (see "What a build emits"), so nothing
-  under `libs/` depends on `rollup` or a Rollup plugin, and neither does the
-  root. What a build script needs beyond the compiler is
-  `tools/configs/strip-dev-only-code.mts`, reached by relative path;
-  `import-x/no-relative-packages` objects to a relative import across the
-  package boundary, so disable it on the line, as the vitest configs already
-  do.
-- **Versions of shared devDependencies live in the `catalog:` block of
-  `pnpm-workspace.yaml`.** Write `"eslint": "catalog:"` in the package. A
-  published package's `dependencies` and `peerDependencies` are its own API, so
-  their ranges stay literal and are not catalogued.
-    - What dependency updates hold back also lives there, in `update.ignoreDeps`.
-      That is the single source of truth for _which dependency_ stops moving; do
-      not name a package in the `update-packages` script instead.
-- **`update-packages` writes to every workspace member except the generated
-  bundle manifests.** The script carries
-  `--filter '!./strict-lib/v*/output/lib'`. Those twelve `package.json` are
-  written by `strict-lib:gen:packages`, which derives their `ts-type-forge`
-  range from the harness as `^<major>.0.0` deliberately, so that a consumer is
-  not pinned to whatever version happened to be current when the library was
-  generated. Without the filter `pnpm update --latest` rewrites all twelve to
-  that exact current version and the next generation puts them back: twelve
-  meaningless lines on every dependency-update pull request, reverted by every
-  release.
-    - `ignoreDeps` cannot express this. It names a dependency, so it would stop
-      `ts-type-forge` moving everywhere else too. The filter is the other axis —
-      which _project_ the update may write to — and generated output is the only
-      thing that belongs on it, because a generated file's generator is its
-      single source of truth.
-- **GitHub Action pins are updated by `update-actions`, not by
-  `update-packages`.** `update.githubActions` is `false` so that
-  `update-packages`, which carries `--latest`, leaves the workflow files alone,
-  and `update-actions` runs `tools/scripts/cmd/mature-updates.mts actions`
-  rather than `pnpm update --include-github-actions`. It moves a pin only
-  within its major, so a major waits for a human. Do not set
-  `update.githubActions` back to `true`, and do not teach the script to cross
-  a major: `changesets/action` v2 requires Changesets CLI v3 and renamed every
-  input, so taking that major unattended broke `release.yml` on main.
-    - **pnpm cannot hold an action to `minimumReleaseAge`; the script can.**
-      pnpm resolves action versions from `git ls-remote` refs, which carry a
-      tag name and a SHA but no publication date, so under
-      `--include-github-actions` a tag hours old was taken regardless. The
-      script reads each action's GitHub Releases instead, takes the newest
-      release of the same major whose `published_at` is older than the hold,
-      and resolves the tag to its commit through the Commits API — the same
-      SHA pin pnpm wrote. Drafts, prereleases and releases without a publish
-      time are not candidates. `update.ignoreDeps` still does not apply to
-      actions; hold one back by leaving the major alone.
-    - The step passes `GITHUB_TOKEN` as `GH_TOKEN`, in a step of its own so
-      that no token is in scope for the lifecycle scripts `pnpm install` runs.
-      Without a token the unauthenticated rate limit, shared across the
-      runners' IP range, is hit.
-    - `pnpm outdated --include-github-actions --latest` still lists the majors
-      that are waiting, and the script prints them on every run.
-- **An entry in `minimumReleaseAgeExclude` is a waiver, not a policy.** Write
-  the version as well as the name — `'@octokit/core@7.0.8'` — and leave
-  `minimumReleaseAgeExcludePrune` on, so the entry lasts exactly as long as it
-  is true. A bare name exempts a package for good and nothing notices when the
-  reason stops applying; **a glob never expires at all**, because pruning keeps
-  patterns by design. Measured on pnpm 12.3.4: pruning runs on `pnpm update`
-  rather than `pnpm install`, drops any entry the lockfile no longer resolves,
-  and keeps every pattern.
-    - **`pnpm run check:root:minimum-release-age` is what holds that shape**,
-      because pnpm takes both spellings without a word: it fails on an entry
-      with no version and on one containing `*`, and on the delay or the
-      pruning going missing. A range needs no rule of its own — pnpm rejects
-      `vite@^8.0.0` with `ERR_PNPM_INVALID_MINIMUM_RELEASE_AGE_EXCLUDE`, which
-      is a failed install rather than a silent exemption. What the check
-      cannot judge is whether a waiver was warranted; that is what the reason
-      written next to it is for.
-    - **`@types/*` is deliberately not excluded.** "Type packages carry no
-      executable code" is true here, and what makes it true is `allowBuilds`
-      stopping install scripts and `.d.ts` never being executed — neither of
-      which this list checks. A type definition is never urgent, so the
-      exemption bought little and rested on an assumption nothing verifies.
-    - **Nor is anything this repository publishes.** The only place those come
-      from the registry is `verify-npm-packages/published/packages/*`, and
-      `verify-npm-packages.mts` writes each of those spaces a
-      `pnpm-workspace.yaml` carrying `minimumReleaseAge: 0`. It is gitignored
-      and generated at install time, so looking for it in the tree finds
-      nothing and invites the wrong conclusion.
-- **`pnpm self-update` ignores `minimumReleaseAge` by design, and the next
-  pnpm command does not.** `self-update` only rewrites `packageManager`; the
-  pnpm that runs afterwards fetches that version through the registry under
-  the hold, so a release younger than seven days made `pnpm-update.yml` fail
-  daily with `ERR_PNPM_NO_MATURE_MATCHING_VERSION` until it matured. The
-  workflow therefore runs `tools/scripts/cmd/mature-updates.mts pnpm`, which
-  picks the newest stable pnpm older than the hold and passes it to
-  `self-update`. Do not put `pnpm` in `minimumReleaseAgeExclude` to get the
-  same effect: it is the one package that runs every install script in the
-  tree.
-    - **That script runs on `node`, not `tsx`.** Both subcommands run before
-      `pnpm install`, so nothing in `node_modules` exists yet; Node strips the
-      types itself, which holds only while the file imports `node:*` alone at
-      runtime (a top-level `import type` is erased; the inline form the lint
-      prefers is kept as a bare module load) and uses erasable syntax.
-      `Temporal` makes it Node 26 or later — the Node the workflow runs on,
-      not the floor of the compatibility matrix. Its test executes it under
-      `node` against a fake `pnpm` and a fake GitHub API, and asserts that the
-      runtime imports stay `node:`-only, which is what catches an ESLint
-      `--fix` that pulls `ts-data-forge` in.
-    - **A local `pnpm self-update` does not reproduce the failure.** The
-      standalone binary switches versions by another route; CI runs the JS
-      build `pnpm/action-setup` installs with npm, which adds the `pnpm` npm
-      package to switch and so meets the hold.
-- Dependencies between packages in this repository always use the `workspace:`
-  protocol — there is no dependency on a published copy of our own packages
-  anywhere. For `dependencies` and `peerDependencies`, match the protocol to
-  the range you intend to publish: `^x.y.z` → `workspace:^`,
-  `~x.y.z` → `workspace:~`, an exact pin → `workspace:*`. `devDependencies` use
-  `workspace:*`.
-- `linkWorkspacePackages` is left at its default (`false`). Only an explicit
-  `workspace:` specifier links locally.
-- **The strict standard library is one ordinary registry dependency.**
-  `strict-ts-lib-v7.0` is a devDependency at the root, and every built-in
-  library ships inside it under `libs/`. Nothing in `pnpm-workspace.yaml`
-  supports it any more: the URL layout that needed `blockExoticSubdeps: false`
-  and `publicHoistPattern` is gone, and neither setting should come back.
-    - **What connects it to TypeScript is a name, not `paths`.** The root
-      `prepare` script runs the bundle's own linker, which writes one symlink
-      per lib group into `node_modules/@typescript/`. Both compilers find it
-      there: the type check runs `typescript-native` (7.x) and the lint runs
-      the `typescript` module (6.x, what typescript-eslint loads), and each
-      resolves a lib replacement as an ordinary package-name lookup once
-      `libReplacement` is on — which both default to off, so nothing changes
-      for a package that has not opted in. Do not reintroduce the
-      `@typescript/lib-*` entry in `paths`: one mechanism is the point, and a
-      second one that silently disagrees is what the removed
-      `check:root:tsconfig-lib-paths` existed to police.
-    - **It fails silently, so two guards stand in for a diagnostic.**
-      `pnpm run check:root:strict-lib-links` fails when the 18 links stop
-      resolving, and a package that opts in carries a `@ts-expect-error` probe
-      (see `libs/octokit-safe-types/test/strict-lib-active.mts`) so that a
-      replacement which stops happening breaks the type check rather than
-      passing quietly.
-    - **Never leave the links in place while running an older TypeScript.**
-      5.0–5.7 have no `libReplacement` option and do the lookup
-      unconditionally, so a check meant to reproduce what a consumer sees has
-      to run `pnpm exec strict-ts-lib-v7.0-link --unlink` first, or it fails on
-      the strict declarations themselves rather than on the code under test.
-    - `pnpm run check:root:lockfile` keeps URL dependencies out entirely: pnpm
-      blocks them as subdependencies, but a direct one is always allowed and
-      `pnpm-update` auto-merges. See
-      `docs/strict-typescript-lib-integration.md`.
-- **A workspace sibling is reached through its `exports`, not through
-  `tsconfig` `paths`.** pnpm's part ends at the `node_modules/<name>` symlink;
-  what the name resolves _to_ is decided by the target's own `package.json`.
-  So a package that nothing can resolve is a package missing an `exports`
-  field, and the fix goes there — the ten private `apps/*` packages that
-  publish nothing still carry `"exports": "./src/index.mts"` for exactly this
-  reason.
-    - **The one legitimate `paths` entry is a package's own name**, so that
-      `samples/` — embedded verbatim into the README by `gen:readme` — can
-      import the way a consumer does while still being checked against the
-      source being edited. Nineteen such entries remain, each with the reason
-      written next to it. Everything else resolves through `dist/`, which is
-      why `check-all` and the CI workflows run `ws:build` before any type
-      check.
-    - **That much is enforced rather than remembered.**
-      `pnpm run check:root:tsconfig-paths` fails on a `paths` key that is not
-      the package's own name and on a target that is not a file — the two
-      things TypeScript itself reports as nothing at all. What it cannot
-      judge is whether a self-reference is warranted in the first place; the
-      `samples/` case above is the only one so far. See
-      `docs/workspace-package-linking.md`, which also records what the check
-      leaves out and why `customConditions` was measured and not adopted.
-    - `tools/configs/tsconfig.tsx.json` is separate, and outside what that
-      check reads: its `paths` are `tsx`'s runtime resolution for build
-      scripts that run before any `dist/` exists. See "Building from a clean
-      checkout".
-
-## Building from a clean checkout
-
-`pnpm install && pnpm run ws:build` works with no `dist/` anywhere. Three rules
-keep it that way; breaking any one of them reintroduces a cycle, or puts back
-the four minutes described under "A build compiles and emits".
-
-- **Run `tsx` with `--tsconfig <root>/tools/configs/tsconfig.tsx.json.`** That
-  config maps our package names to their sources, so a build script can import
-  `ts-repo-utils` before anything is built. Every `tsx` invocation in a
-  `package.json` script uses it. Our own CLIs are invoked the same way, through
-  their source under `libs/*/src/cmd/`, not through `node_modules/.bin` — CI
-  steps such as the `check-should-run` diff gate run before the build.
-- **A package's `build` only type-checks what it publishes.** Declaration emit
-  (`configs/tsconfig.build.json`) covers `src/`. Tests, `scripts/`, `configs/`
-  and `eslint.config.mts` import the toolchain, which is built later, so they
-  are checked afterwards by `pnpm run ws:check:types`. Do not add a full-scope
-  `tsc --noEmit` back into `build`, and do not add `eslint.config.mts` to a
-  package's `tsconfig.json` `include`. Nothing else belongs in `build` either
-  — see "A build compiles and emits".
-- **Build order comes from `dependencies` + `peerDependencies` only**, via the
-  `dependencyFields` option of `runCmdInStagesAcrossWorkspaces`. Packages
-  devDepend on the toolchain and the toolchain depends back on them, so
-  including `devDependencies` leaves no valid order. A consequence: anything a
-  package needs _in order to build_ — an app bundling a workspace library, for
-  example — belongs in `dependencies`, not `devDependencies`.
-- **A build step must not rewrite a source file at all.** The packages in a
-  stage build at the same time and each reads its siblings' sources through
-  `tsx`, so a file being rewritten is a file that cannot be imported. That is
-  not hypothetical: `genIndex` used to write every `index.mts` on every run —
-  in the generator's own spelling, which the formatter then rewrote back to the
-  committed one — and a sibling that imported `ts-repo-utils` during either
-  window died with `SyntaxError: The requested module 'ts-repo-utils' does not
-provide an export named '...'`, taking `ws:build` with it (#1835). It compares
-  before writing now, and writes through a `rename` when it does write — both
-  still true, and neither is relied on any more: no `build` runs a generator.
-
-`docs/package-dependencies.md` holds the current graph and stage tables;
-regenerate it with `pnpm run gen:deps-graph`.
-
-### A build compiles and emits
-
-`build` runs `tsc`, strips the development-only code, writes the two or three
-small files `dist/` needs, and stops. It checks nothing and generates nothing,
-and both of those used to be false:
-
-- **The checks are now their own scripts.** `check:ext` (already had
-  `ws:check:ext`), the `dist/`-through-the-`exports`-map type checks in the
-  five packages with a `test/dist_/` harness, eslint-plugin-ts-data-forge's
-  branded-number coverage check, and a stray `pnpm run check:types` inside
-  github-settings-as-code's build that `ws:check:types` was already running.
-  The last three are `pnpm run ws:check:dist`, a `code-check.yml` matrix entry.
-- **The generators are `pnpm run ws:gen`**, a `style-check.yml` matrix
-  entry that regenerates and then asserts the tree is clean — the same shape
-  `ws:gen` has. Their output is committed, so a build regenerating it produced
-  nothing but the risk described above.
-
-What that is worth: `pnpm run ws:build` went from **4m43s to 34s** on a clean
-checkout (measured). Three of those minutes were eslint-config-typed's
-`gen:rule-types` alone, which regenerates 33 rule-type modules and then runs a
-codemod, Prettier and `eslint --fix` over them. Every entry of the
-`code-check.yml` matrix built first back then, and two of `style-check.yml`'s
-still do, so that was paid fifteen-odd times per pull request to produce output
-that was already committed.
-
-**`code-check.yml` builds once now, in a `build` job the matrix waits on.**
-Every entry of it needs `dist/`, so fourteen of them ran the same 34-second
-command over the same 27 directories — about eight runner-minutes a pull
-request. The output travels as one tarball (5.9 MB against 42 MB on disk, and
-one upload rather than a walk over 3,875 files at each end), and the matrix
-unpacks it. What that trades is wall clock: the matrix waits on one build
-instead of each entry building alongside the others, so the critical path
-grows by about a minute while the runner time falls by six.
-
-- **`needs.build.result == 'success'` is explicit on the matrix**, because
-  `!cancelled()` would otherwise let the entries run with nothing to download.
-  The aggregate names the build separately, since a failed build reaches it
-  only as a skipped matrix.
-- **The two other workflows that build keep doing it per job.** In
-  `node-version-compatibility.yml`, building on each Node version _is_ the
-  check. In `style-check.yml` only `ws:doc` and `ws:gen` build at all, so a job
-  to serve two entries would cost more than it saves.
-- **No `actions: read` is needed for the download.** `pnpm-update.yml`'s
-  `commit` job already reads a same-run artifact with `contents: read` alone.
-
-Consequences:
-
-- **A check or a generator added to a `build.mts` is paid by every job that
-  builds.** Put a check in a `check:*` script and a generator in a `gen:*`
-  script named in the package's `gen` instead. If it is the package's first
-  generator, add `gen` too — `ws:gen` picks it up with no further wiring, being
-  an `--if-present` recursive run.
-- **`build:min` is gone, and so is `ws:build:min` and the `--skip-check` flag
-  every `build.mts` took.** They existed to run a build without its checks and
-  its generators, to break the bootstrap cycle on a clean checkout; `build` is
-  that now, so a second spelling of it is a second thing to keep in step.
-- **`strict-lib/v*`'s generator is `gen:lib`, not `gen`.** It needs
-  `temp/codemod-fixed` prepared first, and those are workspace members, so a
-  `gen` there would be run by `ws:gen` too — measured: it wipes
-  `output/lib-files*` and then fails.
-
-### What a build emits
-
-A library's `dist/` is one `.mjs` per source module plus the declarations,
-and **two steps produce it, the same two in every package**: `build.mts`
-runs `typescript-native`'s `tsc` on `configs/tsconfig.build.json`, which
-emits the JavaScript, the declarations and both source maps in one pass,
-then calls `stripDistDevOnlyCode` from
-`tools/configs/strip-dev-only-code.mts` over `dist/`. There is no bundler
-anywhere: `rollup`, its plugins and `tools/configs/rollup-config.mts` are
-gone.
-
-What Rollup used to do here was drop the test-only code with
-`@rollup/plugin-replace` and `@rollup/plugin-strip`, remove what that left
-unreferenced by tree-shaking, and transpile with `rollup-plugin-esbuild`
-because TypeScript 7 has no JS compiler API for
-`@rollup/plugin-typescript`. The compiler transpiles now, and
-`stripDevOnlyCode` in `ts-repo-utils` replaces the rest of it. It is
-source-aware where a bundler cannot be:
-**what it removes is a list of names, and the list is the whole of the
-knowledge**. The mechanism and the list live apart: `ts-repo-utils` ships
-the pass with no names in it, because which functions are safe to remove is
-a fact about the code being built, and `tools/configs/strip-dev-only-code.mts`
-holds this repository's list (`devOnlyCode`) and the `stripDistDevOnlyCode`
-wrapper the build scripts call.
-
-- It removes `if (import.meta.vitest !== undefined) { ... }` blocks,
-  `expectType(...)` statements, every block, loop or `if` that those
-  removals emptied, the imports nothing refers to afterwards, and calls to
-  the identity casts (`castMutable`, `castDeepMutable`, `castReadonly`,
-  `castDeepReadonly`), which become their argument.
-- **It removes the comments too, and the compiler cannot.** `tsc` copies
-  each declaration's JSDoc into the JavaScript as well as into the `.d.mts`,
-  and an editor reads the `.d.mts`, so the copy in the JavaScript is read by
-  nobody: it was two thirds of `ts-data-forge`'s emitted JavaScript. The
-  compiler's own `removeComments` is not the way to do it — measured on
-  TypeScript 6 and 7 alike, it strips the JSDoc from the `.d.mts` as well.
-  A `#!` line and the `//#` source-map pragma are kept.
-- **Never put a function that validates on the identity list.** `asUint32`
-  and the other branded-number `castType`s look like casts and throw a
-  `TypeError` on a value outside the range; unwrapping one changes behavior.
-  The list is for `(x) => x` and nothing else.
-- **It fails rather than skipping.** An `expectType` that is not a statement
-  on its own (`() => expectType('=')`, an argument) or an
-  `import.meta.vitest` outside the guard is a build error, because the
-  alternative is a test helper shipped in `dist/` with nothing to say so.
-  Write the source in the shape the pass knows, or teach the pass the new
-  shape; do not work around it in `build.mts`.
-- Line breaks are kept wherever it removes something, so `tsc`'s source map
-  stays right line for line. Blank lines in `dist/` where a type test used to
-  be are the cost of that, not a bug.
-- **The move off Rollup was checked package by package**, and this is how to
-  check the next build change: same set of files in `dist/`, `.d.mts`
-  byte-identical, and every module's runtime export names and their types
-  compared by importing both copies. All twenty libraries passed. The
-  emitted JavaScript itself is not comparable — `tsc` keeps the source's
-  line structure where esbuild collapsed it — so a few small packages grew
-  by a kilobyte or two while the total fell from 1437 KB to 1041 KB.
-
-## Testing Guidelines
-
-### Framework and Setup
-
-- Framework: Vitest, with `vitest/globals` enabled — do not import `test`,
-  `expect`, `assert` or `describe` explicitly.
-- Place unit tests near source files or under `test/` using `*.test.mts`.
-- Maintain meaningful coverage; exclude simple re-export files.
-- Run tests locally with `pnpm run test` during development.
-- A package with a browser project runs the same files in both projects. A test
-  that needs a DOM goes in `test/browser/`, which the Node.js project's
-  `include` leaves out.
-
-### e2e
-
-`apps/*/e2e/*.spec.mts` are Playwright specs, run by that app's `check:e2e` script
-against its own dev server, and by `pnpm run ws:check:e2e` across the repository.
-`tools/configs/playwright-config.mts` builds every app's config.
-
-- **The test id attribute is `data-e2e`, not Playwright's default
-  `data-testid`.** That is what the restored sources are marked up with;
-  pointing it at the default makes every `getByTestId` match nothing.
-- **One worker, and no `fullyParallel`.** One dev server per app, and the
-  heavier apps compute enough on load that parallel contexts time each other
-  out — measured at 30s each in parallel against 3.6s in sequence.
-- **Chromium only**, because that is the browser CI installs.
-- An app not listed in `tools/configs/app-dev-ports.mts` throws rather than
-  falling back to Vite's default port: two apps sharing a port is what that
-  table exists to prevent.
-- **A browser project must name every third-party module its tests reach in
-  `optimizeDepsInclude`.** Anything Vite has to optimize on first import
-  reloads the page mid-run, and whichever test file was loading then fails with
-  `Failed to fetch dynamically imported module`. Delete `node_modules/.vite`
-  before checking — warm, it passes either way. See the comment on the option
-  in `tools/configs/vite-config.mts`.
-
-### Test-Driven Development (TDD)
-
-When implementing new features, follow this TDD workflow:
-
-1. **Write tests first**: Create tests based on expected inputs and outputs.
-2. **Verify test failure**: Run tests to confirm they fail as expected.
-3. **Implement code**: Write the minimal code needed to make tests pass.
-4. **Refactor**: Improve code while keeping tests green.
-5. **Repeat**: Continue the cycle for additional functionality.
-
-**Important**: During implementation, avoid modifying tests unless requirements change.
-
-### Testing Approach
-
-Tests are written in two layers:
-
-1. **Compile-time type testing** via the `expectType` utility.
-2. **Runtime behavioral testing** with standard assertions.
-
-Example pattern:
-
-```typescript
-import { expectType } from '../expect-type.mjs';
-
-// Type-level assertion
-expectType<typeof result, readonly [0, 0, 0]>('=');
-// Runtime assertion
-assert.deepStrictEqual(result, [0, 0, 0]);
-```
-
-The `expectType` utility provides a DSL for type assertions:
-
-- `"="`: Exact type equality
-- `"~="`: Mutual extension (A extends B and B extends A)
-- `"<="`: A extends B
-- `">="`: B extends A
-- `"!="`, `"!<="`, `"!>="`: Negated versions
-
-Use `expectType<A, B>('=')` whenever possible. Avoid using `expectType<A, B>('<=')` or `expectType<A, B>('!=')` except when intended.
-
-### Test Code Conventions
-
-- Unify `test` names, `describe` nesting, and `expect` placement with Vitest/Jest/Playwright/Cypress rules.
-- Use `assert.deepStrictEqual(A, B)` instead of `assert.deepEqual(A, B)`, `expect(A).toEqual(B)`, or `expect(A).toStrictEqual(B)` in Vitest tests (enforced by `vitest-coding-style/no-expect-to-strict-equal`).
-- Use `test()` instead of `it()` in Vitest tests.
-- Avoid overusing `await` for synchronous events and avoid `force`/`pause`; prefer screen API and user interaction simulation.
-- Write multi-line string fixtures and expectations with a `dedent` template
-  literal, not with an array joined by `'\n'` or a `lines(...)` helper. A
-  `dedent` literal reads like the text it stands for; a list of quoted lines
-  does not. `dedent` drops the blank lines at either end and the common
-  indentation, so when those matter to the assertion — a pass that keeps
-  line numbers, say — assert them separately (`text.split('\n').length`)
-  rather than giving up `dedent` for the whole test.
-
-## Coding Style & Naming Conventions
-
-### Important Patterns
-
-- **Immutability**: Functions return immutable data structures
-- **Type Safety**: Leverage `ts-type-forge` for advanced TypeScript patterns
-- **Type Guards**: Prefer type guard functions over type assertions
-- **Import Strategy**:
-    - Import `.mts` with extensions `.mjs`.
-    - Use relative paths within `src/`; avoid importing from generated `dist/` and `index.mjs` directly.
-- **Export Strategy**:
-    - All exports go through generated `index.mts` files
-    - Modules should use named exports, default exports are only allowed for configuration.
-- **Documentation**: Auto-generated from TSDoc comments using TypeDoc
-- **File Naming**:
-    - `camelCase` for variables/functions, `PascalCase` for types/classes, `kebab-case` for file names.
-    - Language: TypeScript ESM; prefer `.mts` for modules and `.d.mts` for types. Compiled output is `.mjs`.
-- **Formatting**:
-    - Follow the repository’s Prettier setup with organize-imports and package.json plugins—avoid manual formatting.
-        - Indentation: 2 spaces; LF endings. Markdown uses 4-space indents (see `.editorconfig`).
-
-#### Why enforce readonly?
-
-```ts
-// ❌
-const t: [string, number] = ['a', 1];
-
-function f(x: number) {
-    if (typeof x !== 'number') throw new Error('Error!!');
-}
-
-t.reverse(); // [1, 'a']
-
-f(t[1]); // "Error!!" (but no type errors)
-```
-
-In this example, we reverse a mutable tuple `t` and pass it to `f`. `reverse` is a destructive method, and after applying it, the content of `t` becomes `[1, 'a']`, but TypeScript's type system keeps `t`'s type as `[string, number]`. This creates an inconsistency where `t[1]` is type `number` in TypeScript but `string` at runtime, causing a runtime error when calling `f`.
-
-If we annotate it as readonly as shown below, the destructive method `reverse` cannot be called on the readonly tuple `t`. Instead, we must call the non-destructive method `toReversed`, which is inferred as type `(string | number)[]`, causing a type error: "`string | number` is not assignable to parameter of type `number`".
-
-```ts
-// ✅
-const t: readonly [string, number] = ['a', 1];
-
-function f(x: number) {
-    if (typeof x !== 'number') throw new Error('Error!!');
-}
-
-const r = t.toReversed(); // (string | number)[]
-
-f(r[1]);
-// Argument of type 'string | number' is not assignable to parameter of type 'number'.
-```
-
-Beyond this, treating most variables as immutable improves code readability and prevents various issues, such as mutating objects without changing their references in React rendering (which can cause UI not to update), enhancing overall robustness.
-
-See also: [TypeScript Issue #52375](https://github.com/microsoft/TypeScript/issues/52375)
-
-### Script Organization Rules
-
-Within a file, organize code in the following order:
-
-1. **main function** - entry point at the top
-2. **exported functions and definitions** - public API surface
-3. **type definitions** - types used by the above functions
-4. **constants and settings** - configuration values
-5. **helper functions** - organized by call hierarchy level (ascending order: lower-level helpers before higher-level ones)
-6. **utility functions** - lowest-level utilities
-
-This organization makes the script easier to read and understand the execution flow.
-
-### TypeScript/React File Organization
-
-When implementing functions or React components in TypeScript:
-
-- Place exported functions/components immediately after import statements at the top of the file
-- Organize code in a top-down manner so that the reading direction (top to bottom) matches the direction of tracing definitions
-- This allows readers to understand the main logic first, then follow implementation details naturally as they read downward
-
-#### React Component File Structure
-
-For React component files, follow this specific order:
-
-1. **Import statements**
-2. **Type Props definition** (e.g., `type Props = { ... }`)
-3. **Exported React component**
-4. **displayName assignment** (if the component is memoized)
-5. **Other definitions** (styles, helper functions, constants, etc.)
-
-Additionally:
-
-- **One component per file** as a general principle
-- Each component file should focus on a single component to maintain clarity and modularity
-
-### Syntax rules (and corresponding ESLint rules)
-
-- Type safety first
-    - **NEVER** use `as any`, `as never`, or `@ts-ignore` (use `@ts-expect-error` when absolutely necessary)
-    - Explicitly specify function return types (checked by `@typescript-eslint/explicit-function-return-type` rule)
-        - Explicit return types do make it visually more clear what type is returned by a function. They can also speed up TypeScript type checking performance in large codebases with many large functions.
-    - Avoid dangerous type assertions with `any` or `never`.
-    - Avoid any casting as possible.
-    - Use readonly properties and parameters by default. Follow lint configuration for type definition notation.
-    - Avoid implicit type coercion
-        - Do not use non-boolean values in conditions of if/while statements or as operands of logical operators (checked by `@typescript-eslint/strict-boolean-expressions` rule).
-        - Do not embed variables of types other than number, string, or boolean in template literals (checked by `@typescript-eslint/restrict-template-expressions` rule).
-    - Always provide a comparison function when sorting arrays. Exception: may be omitted only for string arrays (`string[]`) (checked by `require-array-sort-compare` rule).
-    - Prohibit operations that easily produce exceptions such as partial `reduce` or division
-- Operator usage restrictions
-    - Prohibit `+foo` (coercion to number) or `"" + foo` (coercion to string) (checked by `no-implicit-coercion` rule).
-    - Prohibit addition of different types like `"1" + 2` (checked by `@typescript-eslint/restrict-plus-operands` rule).
-    - Do not use `+` for string concatenation (checked by `prefer-template` rule). Instead, follow these patterns:
-        - For a few strings: use template literals (e.g., `${a}_${b}`)
-        - For many strings or dynamic lists: use array `.join()` or `.concat()` (e.g., `["aaa", "bbb", "ccc", ..., "zzz"].join("\n")`)
-        - For source code generation: consider using `dedent` for cleaner formatting
-- Immutable data orientation
-    - Use `const` instead of `let` (`functional/no-let`).
-        - If you absolutely must use it, add the `mut_` prefix to the variable name.
-    - Enforce readonly types.
-        - Always use `readonly T[]` instead of `T[]` for arrays.
-        - When nesting is deep and writing `Readonly<*>` becomes verbose, consider using `DeepReadonly` type utility like `DeepReadonly<{ a: { b: { c: number[] }}}>`.
-    - Define object and array constants with `as const`.
-    - Prohibit direct mutation of objects and avoid making arguments or return values mutable (checked by `functional/immutable-data` rule).
-    - Eliminate mutable/partial structures like class inheritance and enums in principle.
-- Enforce modern syntax
-    - Do not use legacy syntax such as `var`, `new Array()`, `in` operator, or `React.useImperativeHandle`.
-    - Prefer template literals, object spread, and `Object.hasOwn`
-    - Use arrow functions in all cases
-- Module and dependency management
-    - Use ES modules (import/export) syntax over CommonJS (require)
-    - Use named exports unless restricted by libraries or frameworks
-    - Destructuring imports when possible (e.g., `import { foo } from 'bar'`)
-        - Exceptions: Node utilities such as fs, path, url etc.
-    - Avoid circular imports (`import-x/no-cycle`).
-    - Use explicit type-imports and do not add extensions except for `.mjs`/`.json`.
-    - Do not use internal path imports like `./a/b`. Place index.mts files in each directory and export items to be referenced by other directories. Use `pnpm run gen:index` command to auto-generate index.mts files for all directories.
-    - Write code that is tree-shakeable
-    - Use standard modules with `node:` prefix
-- Robust async handling
-    - Always use `await` or `.catch()` with Promises, eliminating nesting and multiple resolutions (checked by `no-floating-promises` rule).
-- React/JSX rules
-    - Define components with arrow functions + `.tsx` extension.
-    - Avoid props spread and inline functions/objects.
-    - Strictly manage Hooks dependency arrays and call order, preventing unnecessary re-renders and improper exports with React Refresh/Perf rules.
-    - In JSX conditionals, do not use short-circuit evaluation like `cond && <Something />`, instead use ternary operators for strict branching: `cond ? <Something /> : undefined` (checked by `react/jsx-no-leaked-render`).
-    - Do not concatenate strings by placing multiple expressions adjacently in JSX (e.g., `<div>{x}{y}</div>`). Instead, use template literals: `<div>{`${x}${y}`}</div>`.
-- Accessibility enforcement
-    - Provide roles and labels for all interactive elements. Follow JSX a11y rules for consistent `alt` and `aria-*` attributes, focus management, and tabindex control.
-- Security and quality
-    - Prohibit `eval`, `Function`, dynamic `require`, `import`, and dangerous regular expressions.
-    - Enforce file naming, array operations, and modern DOM/Node API adoption with `unicorn/*`, improve readability and reduce bugs with `import-x/no-useless-path-segments` and `no-restricted-globals`.
-
-## Troubleshooting
-
-### Type Errors
-
-#### `noUncheckedIndexedAccess` Related Issues
-
-This project uses TypeScript with the strict setting noUncheckedIndexedAccess: true , so the following code will result in a type error:
-
-```ts
-// ❌
-const xs: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-if (xs.length > 0) {
-    console.log(xs[0] * 2);
-    //          ~~~~~
-    //          Object is possibly 'undefined'.
-}
-```
-
-This error can be resolved as follows:
-
-```ts
-// ✅
-import { Arr } from 'ts-data-forge';
-
-const xs: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-if (Arr.isNonEmpty(xs)) {
-    console.log(xs[0] * 2);
-}
-```
-
-`isNonEmpty` is defined as follows:
-
-```ts
-type NonEmptyArray<A> = readonly [A, ...(readonly A[])];
-
-const isNonEmpty = <E>(array: readonly E[]): array is NonEmptyArray<E> =>
-    array.length > 0;
-```
-
-##### Early Return
-
-```ts
-// ❌
-const fn = (xs: readonly number[]): void => {
-    if (xs.length === 0) {
-        return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const first: number = xs[0]!;
-
-    // ...
-};
-```
-
-```ts
-// ✅
-const fn = (xs: readonly number[]): void => {
-    if (!Arr.isNonEmpty(xs)) {
-        return;
-    }
-
-    const first: number = xs[0];
-
-    // ...
-};
-```
-
-### Lint Errors
-
-#### total-functions/no-partial-division
-
-To avoid division by zero errors, always use `Num.div` from `ts-data-forge` and explicitly check for zero before dividing:
-
-```ts
-// ❌ Don't do this:
-const result = a / b; // Error: Division is partial
-
-// ❌ Don't create your own utility like this:
-const safeDivide = (a: number, b: number): number =>
-    // eslint-disable-next-line total-functions/no-partial-division
-    b === 0 ? 0 : a / b;
-```
-
-```ts
-// ✅ Do this:
-import { Num } from 'ts-data-forge';
-
-const calculateValue = (a: number, b: number): number => {
-    if (!Num.isNonZero(b)) return 0;
-    return Num.div(a, b);
-};
-```
-
-Note: `Num.div` requires the denominator to be of type `NonZeroNumber | 1 | 2 | ... | 39 | -1 | -2 | ... | -40` for compile-time safety, so you must check for zero before calling it.
-
-#### functional/immutable-data / functional/no-let
-
-This disables mutation and encourages functional programming, but if you absolutely need to use mutable variables, you can avoid errors by adding the `mut_` prefix to the variable name.
-
-```ts
-// ❌
-
-// eslint-disable-next-line functional/no-let
-let temp = 0;
-
-temp = 2;
-
-const xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-// eslint-disable-next-line functional/immutable-data
-xs[0] = 100;
-
-const obj = { value: 'old value' };
-
-// error  Modifying an existing object/array is not allowed  functional/immutable-data
-obj.value = 'new value';
-```
-
-```ts
-// ✅
-
-let mut_temp = 0;
-
-mut_temp = 2;
-
-const mut_xs: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-mut_xs[0] = 100;
-
-const mut_obj = { value: 'old value' };
-
-mut_obj.value = 'new value';
-```
-
-#### vitest/no-conditional-expect
-
-```ts
-expect(Result.isErr(result)).toBe(true);
-
-if (Result.isErr(result)) {
-    // error  Avoid calling `expect` inside conditional statements  vitest/no-conditional-expect
-    assert.deepStrictEqual(result.value, { data: [] });
-}
-```
-
-You can write it like this using the `assert` function, which narrows down the types:
-
-```ts
-assert.isTrue(Result.isErr(result));
-
-assert.deepStrictEqual(result.value, { data: [] });
-```
-
-## About Libraries
-
-### ts-type-forge
-
-Types such as `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` etc. are installed globally via `global.d.mts` provided by `ts-type-forge`. There is no need to explicitly import types from `ts-type-forge`.
-
-### ts-data-forge
-
-- Use `Arr.isArray` instead of `Array.isArray` (enforced by the `ts-data-forge/prefer-arr-is-array` rule from [eslint-config-typed](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-config-typed))
-- Use `isRecord` and `hasKey` for type narrowing instead of `Object.hasOwn` or `in` operator (enforced by `ts-data-forge/prefer-is-record-and-has-key` rule)
-- Arguments for functions like `Arr.seq` must be of type `Int` (cast using `asUint32` utility)
-- Use `memoizeFunction` for function memoization
-- Use `fastDeepEqual` for deep equality comparison
-- Unit test
-    - Write `assert.isTrue(Result.isErr(result))` instead of `expect(Result.isErr(result)).toBe(true)`
-
-### immer
-
-- When assigning readonly values to immer's draft causes type errors, use `castDraft` to resolve them
+- Every package declares what it imports (`packageDirs` in its
+  `eslint.config.mts` is its own directory; do not add the root or turn the
+  rule off for `scripts/**` / `configs/**`). `check:published-deps` checks
+  that `src/` imports only what consumers get; its blind spot is `@types/*`,
+  so when a runtime dependency has no types put its `@types` package in
+  `dependencies` by hand.
+- `check:knip` covers declared-but-unused (needs `ws:build`). A dependency
+  named as a string in a config (the Prettier plugins) is invisible to it; put
+  it in `ignoreDependencies` with the reason. **A new entry in `knip.jsonc`
+  goes after the previous entry's closing `},`**, never anchored on an
+  `"entry"` line — identical blocks make the edit land inside the block above,
+  and when the braces balance nothing fails. Run `check:root:knip-config`.
+- `verify-npm-packages/`: edit `smoke/` only; `local/` and `published/` are
+  generated. `verify:npm-packages` packs the checkout (needs `ws:build`);
+  `:published` uses pins `pnpm-update` moves. See its `README.md`.
+- No bundler: libraries build with `tsc` plus the strip pass. Nothing depends
+  on `rollup`.
+- Shared devDependency versions live in the `catalog:` of
+  `pnpm-workspace.yaml`; published `dependencies` / `peerDependencies` keep
+  literal ranges. `update.ignoreDeps` is the one place a dependency is held
+  back; `update.githubActions` stays `false` (action pins move within their
+  major through `update-actions`, held to `minimumReleaseAge` via GitHub
+  Releases; a major waits for a human).
+- `update-packages` filters out `strict-lib/v*/output/lib`, whose manifests
+  are generated with a `^<major>.0.0` range.
+- **`minimumReleaseAgeExclude` entries are waivers**: `name@version`, with a
+  reason beside it, so pruning retires them. Not `@types/*` and not our own
+  packages. Do not put `pnpm` there; `pnpm-update.yml` picks a mature pnpm
+  through `mature-updates.mts pnpm` instead.
+- Workspace dependencies use `workspace:^` / `workspace:~` / `workspace:*`
+  matching the range to publish; `devDependencies` use `workspace:*`.
+- **The strict standard library is one root devDependency**
+  (`strict-ts-lib-v7.0`) linked into `node_modules/@typescript/` by the root
+  `prepare`. Do not reintroduce `@typescript/lib-*` in `paths`,
+  `blockExoticSubdeps: false` or `publicHoistPattern`. Unlink
+  (`strict-ts-lib-v7.0-link --unlink`) before running TypeScript 5.0–5.7. A
+  package that opts in carries a `@ts-expect-error` probe
+  (`libs/octokit-safe-types/test/strict-lib-active.mts`), because a
+  replacement that stops happening fails nothing on its own.
+- **A workspace sibling is reached through its `exports`, not `tsconfig`
+  `paths`.** The one legitimate `paths` entry is a package's own name, for
+  `samples/`; `tools/configs/tsconfig.tsx.json` is separate (runtime
+  resolution for scripts that run before `dist/` exists). See
+  `docs/workspace-package-linking.md`.
+
+## Build
+
+`pnpm install && pnpm run ws:build` works with no `dist/` anywhere, and three
+rules keep it so:
+
+- Every `tsx` invocation uses `--tsconfig <root>/tools/configs/tsconfig.tsx.json`,
+  and our own CLIs are run from `libs/*/src/cmd/`, not `node_modules/.bin`.
+- A package's `build` type-checks only `src/` (`configs/tsconfig.build.json`);
+  tests, `scripts/`, `configs/` and `eslint.config.mts` are checked later by
+  `ws:check:types`. Do not add a full `tsc --noEmit` to `build` or
+  `eslint.config.mts` to a package's `tsconfig.json`.
+- Build order comes from `dependencies` + `peerDependencies` only, so anything
+  a package needs in order to build belongs in `dependencies`. A build step
+  must not rewrite a source file (siblings in the same stage import it).
+
+**`build` compiles, strips and stops.** Checks go in `check:*` scripts
+(`ws:check:dist` for those reading `dist/`), generators in `gen:*` scripts
+named by the package's `gen`; anything added to `build.mts` is paid by every
+job that builds. `code-check.yml` builds once and hands `dist/` to the matrix.
+
+The strip pass (`tools/configs/strip-dev-only-code.mts`, mechanism in
+`ts-repo-utils`) removes `import.meta.vitest` blocks, `expectType` statements,
+what those empty, unreferenced imports, JavaScript comments, and the identity
+casts listed in `devOnlyCode`. **Never put a validating function on that
+list** (`asUint32` throws; the list is for `(x) => x` only). It fails rather
+than skipping on a shape it does not know; teach the pass, do not work around
+it in `build.mts`. Check a build change as the move off Rollup was checked:
+same files in `dist/`, `.d.mts` byte-identical, runtime exports compared by
+importing both copies. `docs/package-dependencies.md` holds the stage tables
+(`gen:deps-graph`).
+
+## Testing
+
+- Vitest with globals. `*.test.mts` colocated or under `test/`; DOM tests in
+  `test/browser/`.
+- **TDD**: tests first, see them fail, implement, refactor; do not modify
+  tests during implementation unless requirements change.
+- Two layers: `expectType<A, B>('=')` for types (other operators only when
+  intended) and runtime assertions. Prefer `assert.isTrue(Result.isErr(r))`
+  over `expect(...).toBe(true)`: it narrows, which is what
+  `vitest/no-conditional-expect` wants. Multi-line fixtures use `dedent`;
+  assert edge blank lines separately when they matter.
+- **e2e** (`apps/*/e2e`, Playwright via `tools/configs/playwright-config.mts`):
+  the test id attribute is `data-e2e`; one worker, Chromium only; ports come
+  from `tools/configs/app-dev-ports.mts`, which the Vite config reads too. A
+  browser project must list every third-party module its tests reach in
+  `optimizeDepsInclude`, or Vite's first-import optimization reloads the page
+  mid-run — reproducible only after deleting `node_modules/.vite`.
+
+## Coding style
+
+ESLint enforces the syntax rules and names them in its output; what follows is
+the intended fix where the error does not say.
+
+- **Immutability by default**: `readonly` arrays and properties, `as const`,
+  `DeepReadonly` for deep nesting, functions returning immutable data. A
+  mutable `[string, number]` reversed in place keeps its type while its
+  contents change; `readonly` forces `toReversed()`, whose type is honest.
+  Where mutation is unavoidable, prefix the binding `mut_`
+  (`functional/no-let`, `functional/immutable-data`).
+- **Type safety**: never `as any`, `as never`, `@ts-ignore`; type guards over
+  assertions. Under `noUncheckedIndexedAccess` narrow with `Arr.isNonEmpty(xs)`
+  rather than `xs.length > 0` plus `!`.
+- **Division**: `Num.isNonZero` then `Num.div`, never a `safeDivide` helper
+  with the rule disabled.
+- **Strings**: template literals for a few, `.join()` for lists, `dedent` for
+  generated source.
+- **Modules**: named exports (default only for configuration), `.mjs`
+  extensions on relative imports, no internal path imports like `./a/b` — each
+  directory has a generated `index.mts`.
+- **File organization**, top-down: exported functions first, then types,
+  constants, helpers with lower-level ones before their callers, utilities
+  last. React files: imports, `type Props`, the component, `displayName` if
+  memoized, then styles and helpers; one component per file, arrow functions,
+  `.tsx`.
+- **JSX**: `cond ? <X /> : undefined`, not `cond && <X />`; template literals
+  rather than adjacent expressions; roles, labels, `alt`, `aria-*` on
+  interactive elements.
+- Naming: `camelCase` / `PascalCase` / `kebab-case` files; `.mts` modules,
+  `.d.mts` types. Prettier formats; Markdown uses 4-space indents.
+
+## Libraries
+
+- **ts-type-forge**: `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` etc. are
+  global; no import.
+- **ts-data-forge**: `Arr.isArray`, `isRecord` / `hasKey` (both lint-enforced);
+  `Arr.seq` takes an `Int` (`asUint32`); `memoizeFunction`; `fastDeepEqual`.
+- **immer**: `castDraft` when assigning readonly values to a draft.
