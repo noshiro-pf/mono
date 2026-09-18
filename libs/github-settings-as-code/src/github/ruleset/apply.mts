@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
+import { settingsFilePath } from '../settings-file-path.mjs';
 import {
   createRuleset,
   getAllRulesets,
@@ -71,12 +72,14 @@ export const applyRulesets = async (): Promise<void> => {
         2,
       );
 
+      // `settingsFilePath` が、どちらもそのディレクトリの直下であることを
+      // 確かめている。`bk` は名前と結合する前に解決しておく。
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
+      await fs.writeFile(settingsFilePath(rulesetsDir, rule.name), str);
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
-        path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
+        settingsFilePath(path.resolve(rulesetsDir, './bk'), rule.name),
         str,
       );
     }
