@@ -270,7 +270,7 @@ describe('isSettledUrl', () => {
 });
 
 describe('preferredUrlOf, on a repository branches page', () => {
-  const overview = `${pageOrigin}/noshiro-pf/mono/branches`;
+  const overview = `${pageOrigin}/noshiro-pf/mono/branches` as const;
 
   describe('the pages it acts on', () => {
     test.each([

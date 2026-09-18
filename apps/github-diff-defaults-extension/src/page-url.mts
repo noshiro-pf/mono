@@ -236,7 +236,7 @@ const pageRules: readonly PageRule[] = [
       return `${url.origin}${branches}/${allBranchesSegment}${url.search}${url.hash}`;
     },
   },
-];
+] as const;
 
 /**
  * Which rule `href` falls under, with the address parsed, or `undefined` when
@@ -245,7 +245,7 @@ const pageRules: readonly PageRule[] = [
 const managedPageOf = (
   href: string,
   pageOrigin: string,
-): { readonly rule: PageRule; readonly url: PageUrl } | undefined => {
+): Readonly<{ rule: PageRule; url: PageUrl }> | undefined => {
   const url = parseUrl(href);
 
   if (url === undefined) {
