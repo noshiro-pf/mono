@@ -1,8 +1,8 @@
 import {
-  diffPagePathOf,
-  diffUrlWithDefaults,
-  isSettledDiffUrl,
-} from './diff-url.mjs';
+  isSettledUrl,
+  managedPagePathOf,
+  preferredUrlOf,
+} from './page-url.mjs';
 
 /**
  * The content script, injected into github.com at `document_start`.
@@ -10,12 +10,14 @@ import {
  * It does two things, and the second is what makes the first almost never
  * happen:
  *
- * - **It redirects the page it lands on**, when that page is a pull request
- *   diff without the defaults. This is the fallback — a typed URL, a bookmark,
- *   a link from outside GitHub — and it costs a second load of the page.
- * - **It rewrites the links on the page** so they already carry the defaults.
- *   A "Files changed" tab clicked from the conversation view then navigates
- *   straight to the settled URL, and the redirect above has nothing to do.
+ * - **It redirects the page it lands on**, when that page is one the rules
+ *   speak for and it was not opened the way they want it. This is the fallback
+ *   — a typed URL, a bookmark, a link from outside GitHub — and it costs a
+ *   second load of the page.
+ * - **It rewrites the links on the page** so they already say what the rules
+ *   want. A "Files changed" tab clicked from the conversation view then
+ *   navigates straight to the settled URL, and the redirect above has nothing
+ *   to do.
  *
  * `document_start` is what makes the redirect cheap: the script runs before the
  * document is parsed, so the load it abandons is a response that had barely
@@ -45,7 +47,7 @@ const evaluated = new WeakSet<Element>();
 const listening = new WeakSet<Element>();
 
 /**
- * The diff pages this document has already given the defaults to, by path.
+ * The pages this document has already acted on, by path.
  *
  * **This is what stops an endless redirect**, and it is not a nicety. GitHub
  * takes the parameters in and then rewrites its own address bar without them:
@@ -60,7 +62,11 @@ const listening = new WeakSet<Element>();
 const mut_settledPages = new Set<string>();
 
 const main = (): void => {
-  applyDefaultsToThisPage();
+  // The referrer is how the branches rule tells "the Overview tab was clicked"
+  // from "somebody asked for the branches of this repository" — see
+  // `page-url.mts`. It is `''` for a typed URL or a bookmark, which is the
+  // second of those.
+  applyPreferredUrlToThisPage(document.referrer);
 
   patchNewAnchors();
 
@@ -68,26 +74,32 @@ const main = (): void => {
 };
 
 /**
- * The fallback, for a diff page reached without going through a link this
- * extension had already rewritten — a typed URL, a bookmark, a notification.
+ * The fallback, for a page reached without going through a link this extension
+ * had already rewritten — a typed URL, a bookmark, a notification.
+ *
+ * `cameFrom` is the address the visit came from: the referrer on the document
+ * the script landed on, and the address the observer last saw for a client-side
+ * navigation.
  */
-const applyDefaultsToThisPage = (): void => {
-  const page = diffPagePathOf(browserLocation.href, browserLocation.origin);
+const applyPreferredUrlToThisPage = (cameFrom: string): void => {
+  const page = managedPagePathOf(browserLocation.href, browserLocation.origin);
 
   if (page === undefined) {
     return;
   }
 
-  const next = diffUrlWithDefaults(
+  const next = preferredUrlOf(
     browserLocation.href,
     browserLocation.origin,
+    cameFrom,
   );
 
   if (next === undefined) {
-    // It arrived carrying them — because a rewritten link brought us here, or
-    // because the redirect below has just happened and this is the new
-    // document. Either way this page is done, and what GitHub does to the
-    // address from here is its own business.
+    // It arrived the way the rules want it — because a rewritten link brought
+    // us here, because the redirect below has just happened and this is the new
+    // document, or because the rule decided to leave it be. Either way this
+    // page is done, and what GitHub does to the address from here is its own
+    // business.
     mut_settledPages.add(page);
 
     return;
@@ -99,9 +111,9 @@ const applyDefaultsToThisPage = (): void => {
 
   mut_settledPages.add(page);
 
-  // `replace` rather than `assign`: the URL without the defaults was never a
-  // page the user looked at, so it does not belong in the history. Going back
-  // from here should leave the pull request, not bounce through a redirect.
+  // `replace` rather than `assign`: the address as it arrived was never a page
+  // the user looked at, so it does not belong in the history. Going back from
+  // here should leave the pull request, not bounce through a redirect.
   browserLocation.replace(next);
 };
 
@@ -119,7 +131,7 @@ const patchNewAnchors = (): void => {
 };
 
 /**
- * Gives one anchor the defaults, and the listener that keeps them.
+ * Gives one anchor the address the rules want, and the listener that keeps it.
  *
  * It takes an `Element` and asks what it is, rather than being handed an
  * `HTMLAnchorElement`, because neither caller has one: `a[href]` also matches
@@ -131,7 +143,15 @@ const patchAnchor = (element: Element): void => {
     return;
   }
 
-  const next = diffUrlWithDefaults(element.href, browserLocation.origin);
+  // The page the anchor is on is where a click on it would come from, which is
+  // what the branches rule reads: the "Overview" tab of a branches page is a
+  // link this extension leaves alone, and the same href in the repository's own
+  // navigation is not.
+  const next = preferredUrlOf(
+    element.href,
+    browserLocation.origin,
+    browserLocation.href,
+  );
 
   if (next !== undefined) {
     // `setAttribute` rather than assigning `href`: the two are equivalent here,
@@ -139,7 +159,9 @@ const patchAnchor = (element: Element): void => {
     element.setAttribute('href', next);
   }
 
-  if (!isSettledDiffUrl(element.href, browserLocation.origin)) {
+  if (
+    !isSettledUrl(element.href, browserLocation.origin, browserLocation.href)
+  ) {
     return;
   }
 
@@ -174,7 +196,7 @@ const suppressClientSideNavigation = (clickEvent: Event): void => {
 
   if (
     anchor instanceof HTMLAnchorElement &&
-    isSettledDiffUrl(anchor.href, browserLocation.origin)
+    isSettledUrl(anchor.href, browserLocation.origin, browserLocation.href)
   ) {
     clickEvent.stopPropagation();
   }
@@ -203,9 +225,14 @@ const watchForChanges = (): void => {
     // Most of what this catches is not a navigation at all but GitHub tidying
     // its own address bar, which is why `mut_settledPages` guards the answer.
     if (currentHref !== mut_lastHref) {
+      const previousHref = mut_lastHref;
+
       mut_lastHref = currentHref;
 
-      applyDefaultsToThisPage();
+      // The address we were at is this navigation's referrer in every sense
+      // that matters: no document was loaded, so `document.referrer` still
+      // names whatever loaded this one.
+      applyPreferredUrlToThisPage(previousHref);
     }
 
     // A re-render can reset an anchor's `href` in place, which the `evaluated`

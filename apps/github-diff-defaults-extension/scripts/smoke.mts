@@ -8,7 +8,9 @@ import { distPath } from './store-package.mjs';
 /**
  * Loads the built extension into a real Chromium and checks the things nothing
  * else can check: that the redirect happens, that the links are rewritten, that
- * a click on one goes where the link says — and that none of it happens twice.
+ * a click on one goes where the link says, that the referrer the branches rule
+ * reads is the one the browser actually sends — and that none of it happens
+ * twice.
  *
  * **It never touches github.com.** Every request to that origin is fulfilled
  * from a fixture here, which is what makes this deterministic, and is also what
@@ -88,15 +90,25 @@ const main = async (): Promise<void> => {
     });
 
     /**
-     * The address once it has stopped moving, or the last one seen.
+     * The address once it has stopped moving and `isDone` accepts it, or the
+     * last one seen.
      *
      * Recursive rather than a loop, which is what lets each wait be awaited:
      * the extension's redirect is a second document load, so there is no one
      * event to wait for that means "it has finished deciding".
+     *
+     * `isDone` is what makes the `/stripped/` check below deterministic. That
+     * fixture rewrites its own address on a 200ms interval and the ticks here
+     * are 100ms, so an address that has merely stopped moving is as likely to
+     * be one the interval has not reached yet: the check passed or failed
+     * about evenly without this. Returning the last address rather than
+     * throwing keeps a genuine failure a reported difference rather than a
+     * stack trace.
      */
     const settledUrl = async (
       previous: string,
       ticksLeft: number,
+      isDone: (url: string) => boolean,
     ): Promise<string> => {
       if (ticksLeft <= 0) {
         return page.url();
@@ -106,12 +118,18 @@ const main = async (): Promise<void> => {
 
       const current = page.url();
 
-      return current === previous
+      return current === previous && isDone(current)
         ? current
-        : settledUrl(current, ticksLeft - 1);
+        : settledUrl(current, ticksLeft - 1, isDone);
     };
 
-    const settle = async (): Promise<string> => settledUrl('', settleTicks);
+    const settle = async (): Promise<string> =>
+      settledUrl('', settleTicks, anyUrl);
+
+    /** `settle`, for an address that is only final once the page rewrote it. */
+    const settleUntil = async (
+      isDone: (url: string) => boolean,
+    ): Promise<string> => settledUrl('', settleTicks, isDone);
 
     /** `goto` is interrupted when the extension redirects, which is the point. */
     const visit = async (url: string): Promise<string> => {
@@ -180,13 +198,57 @@ const main = async (): Promise<void> => {
       `${origin}/noshiro-pf/mono/pull/1/files?w=1&show-viewed-files=false`,
     );
 
+    console.log('the branches page');
+
+    check(
+      'the branch overview becomes the full list',
+      await visit(`${origin}/noshiro-pf/mono/branches`),
+      `${origin}/noshiro-pf/mono/branches/all`,
+    );
+
+    check(
+      'a list that names its tab is left alone',
+      await visit(`${origin}/noshiro-pf/mono/branches/yours`),
+      `${origin}/noshiro-pf/mono/branches/yours`,
+    );
+
+    await visit(`${origin}/noshiro-pf/mono/pull/1`);
+
+    check(
+      'the branches link is rewritten',
+      await hrefOf('#branches-tab'),
+      `${origin}/noshiro-pf/mono/branches/all`,
+    );
+
+    await visit(`${origin}/noshiro-pf/mono/branches/all`);
+
+    check(
+      'the same link on the branches page is not',
+      await hrefOf('#branches-tab'),
+      '/noshiro-pf/mono/branches',
+    );
+
+    // The opt-out, and the one thing a unit test cannot show: the "Overview"
+    // tab points at the very URL the redirect acts on, so the redirect has to
+    // read the referrer to leave it alone. Landing back on `/branches` and
+    // staying there is what says it did.
+    await page.locator('#branches-tab').click();
+
+    check(
+      'and clicking it reaches the overview, without being sent back',
+      await settle(),
+      `${origin}/noshiro-pf/mono/branches`,
+    );
+
     console.log('the address bar the site rewrites');
 
     // `/stripped/` is the fixture that behaves like GitHub: it deletes
     // `show-viewed-files` from its own address and keeps mutating the DOM.
+    await visit(`${origin}/stripped/mono/pull/1/files`);
+
     check(
       'the site gets its address back',
-      await visit(`${origin}/stripped/mono/pull/1/files`),
+      await settleUntil((url) => !url.includes('show-viewed-files')),
       `${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
@@ -216,6 +278,9 @@ const main = async (): Promise<void> => {
 /** The only origin the extension is declared for. */
 const origin = 'https://github.com';
 
+/** The `isDone` of a wait that only asks the address to stop moving. */
+const anyUrl = (): boolean => true;
+
 const settleStepMs = 100;
 
 const settleTicks = 40;
@@ -226,7 +291,8 @@ const loopWatchMs = 2500;
  * What every github.com request is answered with.
  *
  * Enough of a pull request page to click through: the tab links the extension
- * rewrites, two it must leave alone, and — under `/stripped/` — the address-bar
+ * rewrites, two it must leave alone, the branches links whose treatment depends
+ * on the page they are read from, and — under `/stripped/` — the address-bar
  * rewriting the real site does.
  */
 const fixtureFor = (url: string): string => {
@@ -240,6 +306,11 @@ const fixtureFor = (url: string): string => {
     '<a id="files-tab" href="/noshiro-pf/mono/pull/1/files">Files changed</a>',
     '<a id="commits-tab" href="/noshiro-pf/mono/pull/1/commits">Commits</a>',
     '<a id="offsite" href="https://example.com/noshiro-pf/mono/pull/1/files">elsewhere</a>',
+    // Both spellings of the branches link, which is the same anchor in two
+    // roles: the repository's own navigation on a page that is not the branches
+    // page, and the "Overview" tab on one that is.
+    '<a id="branches-tab" href="/noshiro-pf/mono/branches">Branches</a>',
+    '<a id="branches-all-tab" href="/noshiro-pf/mono/branches/all">All branches</a>',
     '<div id="feed"></div>',
     pathname.startsWith('/stripped/')
       ? `<script>${addressRewritingScript}</script>`
