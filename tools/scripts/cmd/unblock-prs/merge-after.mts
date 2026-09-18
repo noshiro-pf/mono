@@ -56,8 +56,12 @@ export const parseMergeAfter = (body: string): readonly number[] =>
  * example would have been read as a constraint on the pull request
  * documenting it. A fence is how every document here already says "this is a
  * sample, not the thing itself", so it is the line to draw.
+ *
+ * Exported because `pr-report` reads the closing keywords (`Closes #12`) out
+ * of the same bodies and has to draw the line in the same place — a document
+ * showing what a declaration looks like must not become one.
  */
-const outsideCodeFences = (body: string): string => {
+export const outsideCodeFences = (body: string): string => {
   let mut_inFence = false;
 
   return body
