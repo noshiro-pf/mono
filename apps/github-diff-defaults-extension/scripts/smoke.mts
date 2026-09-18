@@ -90,15 +90,25 @@ const main = async (): Promise<void> => {
     });
 
     /**
-     * The address once it has stopped moving, or the last one seen.
+     * The address once it has stopped moving and `isDone` accepts it, or the
+     * last one seen.
      *
      * Recursive rather than a loop, which is what lets each wait be awaited:
      * the extension's redirect is a second document load, so there is no one
      * event to wait for that means "it has finished deciding".
+     *
+     * `isDone` is what makes the `/stripped/` check below deterministic. That
+     * fixture rewrites its own address on a 200ms interval and the ticks here
+     * are 100ms, so an address that has merely stopped moving is as likely to
+     * be one the interval has not reached yet: the check passed or failed
+     * about evenly without this. Returning the last address rather than
+     * throwing keeps a genuine failure a reported difference rather than a
+     * stack trace.
      */
     const settledUrl = async (
       previous: string,
       ticksLeft: number,
+      isDone: (url: string) => boolean,
     ): Promise<string> => {
       if (ticksLeft <= 0) {
         return page.url();
@@ -108,12 +118,18 @@ const main = async (): Promise<void> => {
 
       const current = page.url();
 
-      return current === previous
+      return current === previous && isDone(current)
         ? current
-        : settledUrl(current, ticksLeft - 1);
+        : settledUrl(current, ticksLeft - 1, isDone);
     };
 
-    const settle = async (): Promise<string> => settledUrl('', settleTicks);
+    const settle = async (): Promise<string> =>
+      settledUrl('', settleTicks, anyUrl);
+
+    /** `settle`, for an address that is only final once the page rewrote it. */
+    const settleUntil = async (
+      isDone: (url: string) => boolean,
+    ): Promise<string> => settledUrl('', settleTicks, isDone);
 
     /** `goto` is interrupted when the extension redirects, which is the point. */
     const visit = async (url: string): Promise<string> => {
@@ -228,9 +244,11 @@ const main = async (): Promise<void> => {
 
     // `/stripped/` is the fixture that behaves like GitHub: it deletes
     // `show-viewed-files` from its own address and keeps mutating the DOM.
+    await visit(`${origin}/stripped/mono/pull/1/files`);
+
     check(
       'the site gets its address back',
-      await visit(`${origin}/stripped/mono/pull/1/files`),
+      await settleUntil((url) => !url.includes('show-viewed-files')),
       `${origin}/stripped/mono/pull/1/files?w=1`,
     );
 
@@ -259,6 +277,9 @@ const main = async (): Promise<void> => {
 
 /** The only origin the extension is declared for. */
 const origin = 'https://github.com';
+
+/** The `isDone` of a wait that only asks the address to stop moving. */
+const anyUrl = (): boolean => true;
 
 const settleStepMs = 100;
 
