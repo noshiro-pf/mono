@@ -61,6 +61,8 @@
     "fix:fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",
     "fix:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts --fix",
     "fmt": "pnpm run fix:fmt",
+    "fmt:diff": "pnpm run fix:fmt:diff",
+    "fmt:full": "pnpm run fix:fmt:full",
     "gen:deps-graph": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/gen-dependency-graph.mts",
     "node-support:update": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/update-node-support.mts",
     "npm-trusted-publishers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/report-npm-trusted-publishers.mts",
