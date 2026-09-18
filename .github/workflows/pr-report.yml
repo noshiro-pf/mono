@@ -1,0 +1,107 @@
+# cspell:ignore ededed
+
+name: PR Report
+
+# Writes the daily state of every open pull request — the order they declare
+# with `Merge-After:`, the issues they close, their labels, the verdict of the
+# checks the ruleset requires, and how far each branch is from `main` — into
+# one issue, updated in place.
+#
+# An issue rather than a comment or a new issue each day, because the report
+# is a *current state*, not an event: editing a body notifies nobody and
+# leaves no timeline, so the link keeps pointing at the truth and the
+# repository stays quiet. The run's own summary carries the same text, for
+# reading a single run without leaving the Actions tab.
+#
+# `pnpm run pr-report` is the whole of it. Everything this workflow adds is
+# where the text goes, so the same report can be had locally, or by an agent,
+# with no GitHub UI involved.
+
+on:
+  schedule:
+    # 07:00 JST. A scheduled workflow runs on the default branch, and GitHub
+    # disables one in a repository that has been idle for 60 days.
+    - cron: '0 22 * * *'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # To create the report issue on the first run and edit it on every one
+  # after. This job installs the dependency tree and then holds a token, which
+  # is the pairing `pnpm-update.yml` is split to avoid; it is accepted here
+  # because the whole of what the token can do is rewrite the body of one
+  # issue in a public repository with text this job generated anyway.
+  issues: write
+
+concurrency:
+  # A scheduled run and a dispatched one would otherwise race to edit the same
+  # body. Not `cancel-in-progress`: the later run supersedes nothing, it just
+  # waits.
+  group: pr-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      # The script runs from source through `tsx`, so nothing has to be built.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate the report
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm run pr-report -- --format markdown > "${RUNNER_TEMP}/pr-report.md"
+
+      - name: Add it to the run summary
+        run: cat "${RUNNER_TEMP}/pr-report.md" >> "${GITHUB_STEP_SUMMARY}"
+
+      # The label is what identifies the one report issue across runs: a title
+      # can be edited by anyone reading it, and the issue number is not
+      # something a workflow can remember between runs without a repository
+      # variable and the admin token that writes one.
+      - name: Publish it to the report issue
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REPORT_LABEL: pr-report
+          REPORT_TITLE: Open pull requests
+        run: |
+          set -euo pipefail
+
+          gh label create "${REPORT_LABEL}" \
+            --color ededed \
+            --description 'The daily open pull request report, updated in place' \
+            --force
+
+          number="$(gh issue list \
+            --label "${REPORT_LABEL}" \
+            --state open \
+            --limit 1 \
+            --json number \
+            --jq '.[0].number // empty')"
+
+          if [ -z "${number}" ]; then
+            gh issue create \
+              --title "${REPORT_TITLE}" \
+              --label "${REPORT_LABEL}" \
+              --body-file "${RUNNER_TEMP}/pr-report.md"
+          else
+            gh issue edit "${number}" \
+              --body-file "${RUNNER_TEMP}/pr-report.md"
+          fi
