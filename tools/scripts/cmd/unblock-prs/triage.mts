@@ -5,6 +5,7 @@ import { listRequiredChecks, summarizeChecks } from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
 import { git, listPullRequests, remoteSha } from './github.mjs';
 import {
+  blocksRelease,
   isMergeQueued,
   isSkipCiLabelled,
   MERGE_QUEUED_LABEL,
@@ -32,6 +33,7 @@ import {
   sh,
   stopRequested,
 } from './util.mjs';
+import { isVersionPullRequest, versionPullRequestHold } from './version-pr.mjs';
 
 /**
  * Lists the open pull requests, re-listing a few times while GitHub is still
@@ -129,7 +131,20 @@ export const triage = async (
   const sorted = pullRequests.toSorted((a, b) => a.number - b.number);
 
   const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
-    sorted.map((pr) => [pr.number, parseMergeAfter(pr.body)] as const),
+    sorted.map(
+      (pr) =>
+        [
+          pr.number,
+          // The version pull request declares nothing: its body is rewritten
+          // on every push to the base, so a trailer written there would hold
+          // for a cycle or two and then silently stop. `blocks-release`, on
+          // the pull requests it is waiting for, is how an order is declared
+          // on it. Other pull requests may still name *it*.
+          isVersionPullRequest(pr, base.defaultBranch)
+            ? []
+            : parseMergeAfter(pr.body),
+        ] as const,
+    ),
   );
 
   const cycles = findMergeAfterCycles(dependencies);
@@ -139,6 +154,7 @@ export const triage = async (
     openNumbers: new Set(sorted.map((pr) => pr.number)),
     dependencies,
     cyclic: new Set(cycles.flat()),
+    releaseBlockers: sorted.filter(blocksRelease),
   } as const;
 
   const classified = await Promise.all(
@@ -156,7 +172,11 @@ export const triage = async (
     candidates: classified
       .filter(({ result }) => result.kind === 'candidate')
       .map(({ pr }) => pr)
-      .toSorted((a, b) => candidateRank(a) - candidateRank(b)),
+      .toSorted(
+        (a, b) =>
+          candidateRank(a, base.defaultBranch) -
+          candidateRank(b, base.defaultBranch),
+      ),
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
@@ -199,6 +219,25 @@ const classify = async (
     };
   }
 
+  // The version pull request is derived state, rebuilt from the tip of the
+  // base and force-pushed by the release workflow on every push to it, so
+  // nothing here rebases it: that would be two things force-pushing one
+  // branch, and a rebase puts the old version commit on a tip carrying a
+  // changeset it never consumed — a release missing the change the queue was
+  // assembled for. Taking `skip-ci` off is the whole of what it can be given.
+  if (isVersionPullRequest(pr, context.defaultBranch)) {
+    const held = await versionPullRequestHold(pr, context);
+
+    if (held !== undefined) return held;
+
+    // Nothing holds it. Paused means there is a label to take off; otherwise
+    // it is already on its way and auto-merge owns it, exactly as with
+    // anything else that is up to date.
+    return isSkipCiLabelled(pr)
+      ? { kind: 'candidate' }
+      : classifyByChecks(pr, context);
+  }
+
   // `skip-ci` makes the merge state say nothing useful: `no-skip-ci-label` is
   // pending, so the pull request is `BLOCKED` however ready it is, and checks
   // that were skipped look exactly like checks still running. Taking the
@@ -229,25 +268,8 @@ const classify = async (
     case 'UNSTABLE':
       return { kind: 'in-flight' };
 
-    case 'BLOCKED': {
-      const checks = await listRequiredChecks(pr.number);
-
-      if (Result.isErr(checks)) {
-        return {
-          kind: 'note',
-          note: `#${pr.number}: could not read checks: ${checks.value}`,
-        };
-      }
-
-      const summary = summarizeChecks(checks.value, context.requiredContexts);
-
-      // Pending — including a required context that has not reported at all —
-      // or green and about to merge. A green one that stays open is caught by
-      // the watch.
-      return summary.status === 'failed'
-        ? { kind: 'failing', summary }
-        : { kind: 'in-flight' };
-    }
+    case 'BLOCKED':
+      return classifyByChecks(pr, context);
 
     default:
       return {
@@ -258,6 +280,37 @@ const classify = async (
 };
 
 /**
+ * What a pull request nothing here can move is doing: waiting on its checks,
+ * or held by one that failed.
+ *
+ * Reached from `BLOCKED`, and from the version pull request whatever its
+ * merge state — with the branch already on the tip of the base and no label
+ * to take off, there is nothing left to do to either but watch.
+ */
+const classifyByChecks = async (
+  pr: PullRequest,
+  context: TriageContext,
+): Promise<Classification> => {
+  const checks = await listRequiredChecks(pr.number);
+
+  if (Result.isErr(checks)) {
+    return {
+      kind: 'note',
+      note: `#${pr.number}: could not read checks: ${checks.value}`,
+    };
+  }
+
+  const summary = summarizeChecks(checks.value, context.requiredContexts);
+
+  // Pending — including a required context that has not reported at all — or
+  // green and about to merge. A green one that stays open is caught by the
+  // watch.
+  return summary.status === 'failed'
+    ? { kind: 'failing', summary }
+    : { kind: 'in-flight' };
+};
+
+/**
  * Whether GitHub says merging this pull request into the base conflicts. It
  * is a candidate all the same — see the `DIRTY` case in `classify` — but a
  * less promising one, so it is reported and ordered apart from the rest.
@@ -265,7 +318,18 @@ const classify = async (
 const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
 
-const candidateRank = (pr: PullRequest): number => (isConflicting(pr) ? 1 : 0);
+/**
+ * Where a candidate sits in the cycle's order, lowest first. Within a rank
+ * the numbers keep their order, because `toSorted` is stable.
+ *
+ * The version pull request goes last. This is an ordering rather than the
+ * gate — `blocks-release` is the gate — so it never stops a release: it only
+ * says that when a queued change and the release are both ready, the change
+ * goes first. The alternative is releasing, then rebuilding the version pull
+ * request for a second release of the very thing that was already queued.
+ */
+const candidateRank = (pr: PullRequest, defaultBranch: string): number =>
+  isVersionPullRequest(pr, defaultBranch) ? 2 : isConflicting(pr) ? 1 : 0;
 
 export const reportTriage = (
   triaged: Triage,
@@ -308,13 +372,15 @@ export const describeAction = (
   pr: PullRequest,
   defaultBranch: string,
 ): string =>
-  [
-    `rebase onto ${defaultBranch}`,
-    isConflicting(pr)
-      ? ', which GitHub says conflicts — a rebase will say'
-      : '',
-    isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
-  ].join('');
+  isVersionPullRequest(pr, defaultBranch)
+    ? `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`
+    : [
+        `rebase onto ${defaultBranch}`,
+        isConflicting(pr)
+          ? ', which GitHub says conflicts — a rebase will say'
+          : '',
+        isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
+      ].join('');
 
 /** Why a pull request is none of this script's business, if it is not. */
 const outOfScopeReason = (

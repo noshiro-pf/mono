@@ -1,6 +1,6 @@
 ---
 name: unblock-prs
-description: Clear what is blocking the open pull requests labelled `merge-queued` — rebase the one that is out-of-date with the base branch, take `skip-ci` off when its turn comes, watch its checks, fix what fails — one PR at a time, in the order they declare with `Merge-After:`, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, release the merge queue, watch CI, or fix a failing check on a PR.
+description: Clear what is blocking the open pull requests labelled `merge-queued` — rebase the one that is out-of-date with the base branch, take `skip-ci` off when its turn comes, watch its checks, fix what fails — one PR at a time, in the order they declare with `Merge-After:` and `blocks-release`, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, release the merge queue, watch CI, or fix a failing check on a PR.
 ---
 
 # Unblock open pull requests
@@ -66,6 +66,11 @@ time. See "Check triggers, `skip-ci` and out-of-date branches" in `CLAUDE.md`.
 `chore/pnpm-update` is opened `merge-queued` by the bot, with auto-merge, so it
 is in scope — but `pnpm-update.yml` force-pushes that branch daily. If it moves
 under you, do not fight it: re-survey and take its new state.
+
+**`changeset-release/main` is the version PR, and it is never rebased** — see
+"The release goes last" below. `release.yml` rebuilds that branch from the tip
+of `main` and force-pushes it on every push to `main`, so the only thing it is
+ever given is its `skip-ci`.
 
 `mergeStateStatus` says what is blocking each one (for a PR without `skip-ci` —
 with it, the state is `BLOCKED` and means nothing):
@@ -267,6 +272,42 @@ queued PR: if its checks fail it is set aside like any other, with its
 it has not merged. That is a queue that has stalled and is waiting for a
 person, which is what a declared order is for — do not take the next PR out of
 turn to keep things moving.
+
+## The release goes last
+
+**`changeset-release/main`** is the PR `changesets/action` opens to version the
+packages and publish them. It is derived, not written, and that changes what
+you may do to it.
+
+**Never rebase it.** `release.yml` rebuilds the branch from the tip of `main`
+and force-pushes it on every push to `main`. Rebasing it here would be a second
+thing force-pushing one branch, and it would land the old version commit on a
+tip carrying a changeset it never consumed — merge that and the release is
+missing the very change the queue was assembled for. If it is not on the tip of
+`main`, wait: the release run is regenerating it. Check with git, not with
+`mergeStateStatus`, which is an asynchronously computed cached answer:
+
+```bash
+test "$(git merge-base "$(git rev-parse origin/main)" "$HEAD_OID")" = "$(git rev-parse origin/main)"
+```
+
+**`blocks-release` on any open PR holds it.** That label is how an order is
+declared _on_ the version PR, because its body cannot carry one — `release.yml`
+overwrites its title and body on every push to `main`, so a `Merge-After:`
+written there is wiped exactly when another queued PR merging first made it
+matter. **Never write a `Merge-After:` trailer into the version PR's body**;
+put `blocks-release` on the PR the release is waiting for instead. A draft
+carrying it counts, and nothing ever takes it off — merging or closing that PR
+is what clears it.
+
+**Report the blockers every cycle, by number.** A forgotten draft carrying
+`blocks-release` holds every release silently, and the report is the only thing
+that would say so.
+
+**Take its `skip-ci` off last**, after the queued PRs: a queued change belongs
+in this release rather than in the one after it. `release.yml` puts `skip-ci`
+back on whenever it rebuilds the branch, which is correct — the contents
+changed, so the PR goes through the queue again. Do not work around it.
 
 ## 6. Report
 

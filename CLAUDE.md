@@ -265,9 +265,9 @@ skipped aggregate supersedes the last verdict.
   leaves `skip-ci` skipping everything with nothing holding the merge. It runs
   on `pull_request_target` with no checkout so that `main`'s copy decides;
   keep it executing nothing from the tree.
-- `skip-ci` and `merge-queued` exist only on GitHub; the strings are in the
-  workflows and `tools/scripts/cmd/unblock-prs/`. Change them everywhere or
-  nowhere.
+- `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
+  strings are in the workflows and `tools/scripts/cmd/unblock-prs/`. Change
+  them everywhere or nowhere.
 - **A commit already checked is not checked again**: `check-gates.yml` reuses
   the aggregate verdict of an earlier run on the same head, failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
@@ -357,10 +357,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
   targets `main`.
 - `pnpm run unblock-prs` (and the `unblock-prs` skill) lands queued pull
   requests one at a time: scope is the `merge-queued` label, order is the
-  `Merge-After: #N` body trailer (not read inside fenced code), and it
-  rebases before removing `skip-ci` so the matrix runs once. A bot that opens
-  a pull request labels it (`pnpm-update.yml` does; `node-support-update.yml`
-  deliberately does not). Details in `tools/scripts/cmd/unblock-prs/README.md`.
+  `Merge-After: #N` body trailer (not read inside fenced code) plus
+  `blocks-release` for the release (see "Releases"), and it rebases before
+  removing `skip-ci` so the matrix runs once. A bot that opens a pull request
+  labels it (`pnpm-update.yml` does; `node-support-update.yml` deliberately
+  does not). Details in `tools/scripts/cmd/unblock-prs/README.md`.
 
 ## Releases
 
@@ -371,6 +372,19 @@ Tags are `<package-name>@<version>`; repository-prefixed tags are imported
 history, never create new ones. `changeset:version-packages` formats
 `strict-lib/` before regenerating the bundles, because `changeset version`
 writes changelogs Prettier does not own.
+
+**A release is queued like anything else, but the version pull request is
+declared _on_ rather than _by_.** `changesets/action` overwrites the title and
+body of `changeset-release/main` on every push to `main`, so a `Merge-After:`
+written there is wiped precisely when another queued pull request merging first
+made it matter — which is why **`blocks-release`, on the pull request the
+release must contain, is the only ordering that holds**. `release.yml` keeps
+`skip-ci` on the version pull request, so it is held from the moment it
+exists; arming auto-merge
+and adding `merge-queued` is the author's act of saying "release this".
+`unblock-prs` never rebases that branch — `release.yml` rebuilds it from the
+tip itself, and a rebase would carry the old version commit onto a tip whose
+changesets it never consumed, releasing without them.
 
 ## Node.js version support
 

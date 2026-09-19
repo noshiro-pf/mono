@@ -90,3 +90,25 @@ jobs:
           # Used by the `gh` CLI in `dist:github-release` to create/upload the
           # tarball GitHub Release.
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      # version PR は derived state で、この workflow が main の先端から毎回
+      # 作り直して force-push し、title と body も上書きする。auto-merge が
+      # 武装された状態で素のまま緑になれば、その瞬間に publish まで走る。
+      # `skip-ci` だけがそれを押さえられるので、**毎回**付け直す:
+      #
+      # - 作られたばかりの version PR が、押さえの無いまま存在する窓を無くす
+      #   （ CLAUDE.md の「 `skip-ci` を付けてから auto-merge を武装する」を、
+      #   人の手順ではなく生成側で保証する）。
+      # - `unblock-prs` が `skip-ci` を外した後に別の PR が main に入ると、
+      #   このブランチは作り直されて中身が変わる。押さえ直してキューをやり
+      #   直させるのが正しい。
+      #
+      # 既に付いている場合 `--add-label` はイベントを起こさないので、CI が
+      # 無駄に回ることはない。リリースが走った run（ version PR が無い）では
+      # `pr-number` が空になるので、その時はスキップする。
+      - name: Hold the version pull request with `skip-ci`
+        if: steps.changesets.outputs.pr-number != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_NUMBER: ${{ steps.changesets.outputs.pr-number }}
+        run: gh pr edit "$PR_NUMBER" --add-label skip-ci

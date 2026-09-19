@@ -76,7 +76,7 @@ import { watch } from './watch.mjs';
  *
  * ## The order, and `skip-ci`
  *
- * Two things the pull requests themselves declare shape that loop.
+ * Three things the pull requests themselves declare shape that loop.
  *
  * - **`Merge-After: #1234` in the body** adds an ordering constraint: the
  *   pull request is not *picked* while any pull request it names is still
@@ -96,6 +96,17 @@ import { watch } from './watch.mjs';
  *   which runs the matrix once, on the head that will actually be merged. The
  *   other order starts a full matrix on the pre-rebase head and has the push
  *   cancel it.
+ * - **The `blocks-release` label** says the next release must contain this
+ *   pull request: while it is open the version pull request — the one
+ *   `changesets/action` opens from `changeset-release/<base>` — is not
+ *   picked. It exists because that is the one pull request whose body cannot
+ *   declare anything: its title and body are overwritten on every push to the
+ *   base, so a `Merge-After:` written there is wiped exactly while several
+ *   queued pull requests made it matter. The same branch is rebuilt from the
+ *   tip and force-pushed by the same workflow, so nothing here rebases it
+ *   either: taking `skip-ci` off, once the release workflow has rebuilt it on
+ *   the current tip, is all it is ever given, and it is picked last so that a
+ *   queued change goes into the release rather than after it.
  *
  * Releasing one is as far as it goes. From there it is an ordinary queued
  * pull request, and if its checks fail it is set aside like any other — with
@@ -110,6 +121,7 @@ import { watch } from './watch.mjs';
  * - `triage.mts` — what one survey says about each pull request, and why.
  * - `merge-after.mts` — the declared order: the trailer parser and the cycle
  *   detection.
+ * - `version-pr.mts` — the version pull request, and what holds it back.
  * - `rebase.mts` — moving a branch: the rebase in a throwaway worktree, and
  *   taking `skip-ci` off.
  * - `watch.mts` — polling one pull request until it merges, or until it will
