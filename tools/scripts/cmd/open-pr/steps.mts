@@ -42,7 +42,7 @@ export const mergeAfterTrailer = (
   numbers: readonly number[],
 ): string | undefined =>
   Arr.isNonEmpty(numbers)
-    ? `Merge-After: ${numbers.map((n) => `#${n}`).join(', ')}`
+    ? (`Merge-After: ${numbers.map((n) => `#${n}`).join(', ')}` as const)
     : undefined;
 
 const hasLabel = (pr: PullRequest, name: string): boolean =>
