@@ -34,6 +34,8 @@ export const vulnerabilityAlertsDir = path.resolve(
 
 export const rulesetsDir = path.resolve(settingsDir, './rulesets');
 
+export const variablesDir = path.resolve(settingsDir, './variables');
+
 export const octokitHeaders = {
   'X-GitHub-Api-Version': '2022-11-28',
 } as const;
