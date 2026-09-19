@@ -327,17 +327,18 @@ ingest the feed). Outside reports come through private vulnerability reporting
   is unchangeable and the libraries are published). Checked by
   `lint-pull-request.yml`; a squash merge makes the title the subject and the
   branch's messages the body.
-- **Open the pull request ready for review, add `skip-ci`, then arm
-  auto-merge — in that order**, after running the local checks and saying in
-  the description which ones; while the label is on they are the only checks
-  the branch gets. Not a draft (a draft cannot be auto-merged and
-  `unblock-prs` only reports it). **The order is the safety**: `skip-ci` is
-  the only thing holding the merge — the ruleset asks for
-  `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
-  a green branch has nothing else to clear — and arming before the label is
-  arming with nothing holding it. **The `opened` run the label cancels leaves
-  red `*-result` checks and "check failed" notifications naming nothing —
-  ignore them**, the `labeled` run supersedes them.
+- **`pnpm run open-pr` opens it**: push, create it ready for review (never a
+  draft), add `skip-ci`, then arm auto-merge — in that order, which the script
+  enforces by re-reading the pull request and refusing to arm one the label is
+  not on. **The order is the safety**: `skip-ci` is the only thing holding the
+  merge, since the ruleset asks for `required_approving_review_count: 0` and
+  outside `.github/CODEOWNERS` paths a green branch has nothing else to clear.
+  Run the local checks first and say in the description which ones — while the
+  label is on they are the only checks the branch gets. Details in
+  `tools/scripts/cmd/open-pr/README.md`.
+- **The `opened` run the label cancels leaves red `*-result` checks and "check
+  failed" notifications naming nothing — ignore them**, the `labeled` run
+  supersedes them.
 - Taking `skip-ci` off is how CI is asked for, and `unblock-prs` takes it off
   only from a pull request labelled `merge-queued`. **Queueing one is that
   label alone** — auto-merge is already armed — and it is the author's; a
