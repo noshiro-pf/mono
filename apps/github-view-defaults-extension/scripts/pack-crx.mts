@@ -74,7 +74,7 @@ type SigningKey = Readonly<{
  * The `pass` entry the key is in, unless `GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS`
  * says otherwise.
  */
-const defaultPassEntry = 'github-diff-defaults-extension';
+const defaultPassEntry = 'github-view-defaults-extension';
 
 const signingKeyEnvName = 'GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS';
 
@@ -89,7 +89,7 @@ const signingKeyEnvName = 'GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS';
  * There is no key yet. Making one, and putting it where this will find it:
  *
  * ```sh
- * openssl genrsa 2048 | pass insert --multiline github-diff-defaults-extension
+ * openssl genrsa 2048 | pass insert --multiline github-view-defaults-extension
  * ```
  */
 const readSigningKey = (): SigningKey => {
@@ -98,7 +98,7 @@ const readSigningKey = (): SigningKey => {
   const pem = passShow(entry);
 
   const directory = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'github-diff-defaults-key-'),
+    path.join(os.tmpdir(), 'github-view-defaults-key-'),
   );
 
   const file = path.join(directory, 'signing-key.pem');

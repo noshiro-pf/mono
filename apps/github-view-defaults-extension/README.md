@@ -1,14 +1,15 @@
-# GitHub Diff Defaults
+# GitHub View Defaults
 
 A Chrome extension that opens a few GitHub pages the way you would have set
 them up by hand: a pull request diff with whitespace-only changes hidden and
 the files you have already marked as viewed collapsed, and a repository's
 branches page as the full list of branches rather than the overview.
 
-| page                             | opened as                                              |
-| :------------------------------- | :----------------------------------------------------- |
-| `/{owner}/{repo}/pull/{n}/files` | the same URL with `?w=1&show-viewed-files=false` added |
-| `/{owner}/{repo}/branches`       | `/{owner}/{repo}/branches/all`                         |
+| page                                  | opened as                                              |
+| :------------------------------------ | :----------------------------------------------------- |
+| `/{owner}/{repo}/pull/{n}/files`      | the same URL with `?w=1&show-viewed-files=false` added |
+| `/{owner}/{repo}/branches`            | `/{owner}/{repo}/branches/all`                         |
+| `/{owner}/{repo}/branches?overview=1` | left as it is — see below                              |
 
 `w=1` hides changes that are whitespace only, and
 `show-viewed-files=false` collapses the files already marked as viewed — so
@@ -47,12 +48,21 @@ and one difference in behavior — see below.
   would leave no way to look at what the extension hides. A link somebody
   shared with `w=0` on it keeps it, too.
 - **The branches "Overview" tab still works.** It points at the very URL the
-  branch rule redirects, so redirecting it whatever the circumstances would
-  make the overview unreachable. The way out is where the visit came from: the
-  overview reached from another tab of the same repository's branches page is
-  somebody clicking "Overview", and is left alone; reached from anywhere else —
-  the repository's navigation, a bookmark, a typed URL — it is somebody asking
-  for the branches, and the full list is what that means.
+  branch rule redirects, so redirecting it whatever the address said would make
+  the overview unreachable. The way out is in the address: the extension gives
+  that one link `?overview=1`, and an overview whose address carries it is left
+  exactly as it is. So the tab reaches the overview, and the address goes on
+  saying so — a reload stays there, and the URL can be bookmarked or shared and
+  still means the overview.
+    - **Everything else about the overview is decided by the address alone**,
+      which is why a link followed, an address typed, a bookmark opened and a
+      page reloaded all get the same answer. It was `document.referrer` at
+      first, and that is a fact about how a page was reached rather than about
+      the page: measured, a reload of the overview carried the referrer of the
+      click before it and so stayed, while the same address bookmarked went to
+      the list. `overview=1` cannot disagree with itself that way.
+    - `overview=1` is not one of GitHub's parameters; GitHub ignores it. The
+      extension reads only whether it is there, the way it reads `w` on a diff.
 - **Nothing else.** No options, no storage, no network, no permissions beyond
   running on `github.com`. Both rules are a table in `src/page-url.mts`;
   changing them is an edit and a rebuild.
@@ -73,12 +83,12 @@ It is installed from source, as an unpacked extension. You need
     git clone https://github.com/noshiro-pf/mono.git
     cd mono
     pnpm install
-    pnpm --filter github-diff-defaults-extension run build
+    pnpm --filter github-view-defaults-extension run build
     ```
 
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Choose **Load unpacked**, and select
-   `apps/github-diff-defaults-extension/dist`.
+   `apps/github-view-defaults-extension/dist`.
 
 To update it later, pull, build again, and press the reload button on the
 extension's card.
@@ -91,9 +101,10 @@ Three mechanisms, in the order they matter:
   gives every new anchor pointing at one of those pages the address the rules
   want. A pull request page grows its links as you use it, so this runs for the
   life of the page rather than once; a `WeakSet` of the anchors already looked
-  at keeps the rescans cheap. An anchor is judged from the page it is on, which
-  is where a click on it would come from — the same question the redirect asks
-  of the referrer.
+  at keeps the rescans cheap. An anchor is judged from the page it sits on,
+  which is the one thing a page-level rule cannot know and does not need: it is
+  what separates the branches page's own "Overview" tab from the identical href
+  in the repository's navigation.
 - **Clicks on those links are left to the browser.** GitHub navigates between
   its own pages without loading a document, and would use the route it holds
   for the link rather than the address in the attribute — which would undo the
@@ -103,9 +114,9 @@ Three mechanisms, in the order they matter:
   it. The content script runs at `document_start`, before the document is
   parsed, so the load it abandons has barely begun. This also covers the
   client-side navigations the first two do not reach: the observer notices the
-  address changing under it and asks again — and what it passes as "where this
-  came from" is the address it last saw, which is what `document.referrer`
-  would have said had a document been loaded.
+  address changing under it and asks again. The question it asks reads the
+  address and nothing else, so a typed URL, a bookmark, a notification link and
+  a reload are all answered the same.
 
 **Each page is acted on once, and once only.** GitHub takes the
 parameters in and then rewrites its own address bar without them — measured on
@@ -139,8 +150,8 @@ shell — so on a machine with no display run it as `xvfb-run -a pnpm run smoke`
 It touches no network: every github.com request is answered from a fixture in
 `scripts/smoke.mts`, which is also what lets it check the two things the unit
 tests cannot — that the extension does not redirect a second time when the site
-takes the parameters off its own address bar, and that the referrer the
-branches rule reads is the one a browser actually sends.
+takes the parameters off its own address bar, and that a reload of a page the
+extension decided about is decided the same way again.
 
 ## Release
 
@@ -149,7 +160,7 @@ branches rule reads is the one a browser actually sends.
    the manifest's version that the store reads and that names the package; the
    `package.json` version is unused, this being a private package.
 3. `pnpm run pack`, which builds and writes
-   `pack/github-diff-defaults-extension-<version>.zip` — `dist/` without its
+   `pack/github-view-defaults-extension-<version>.zip` — `dist/` without its
    source maps. `pack/` is not tracked.
 4. Upload that zip to the
    [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole),

@@ -1,8 +1,8 @@
-# GitHub Diff Defaults — privacy policy
+# GitHub View Defaults — privacy policy
 
-Last updated: 2026-09-18
+Last updated: 2026-09-19
 
-**GitHub Diff Defaults collects nothing, stores nothing, and sends nothing.**
+**GitHub View Defaults collects nothing, stores nothing, and sends nothing.**
 There is no account, no analytics, no telemetry, no server and no third party
 of any kind.
 
@@ -15,19 +15,16 @@ page, and is gone when the page is left.
 
 ## What it reads
 
-One script runs on `https://github.com` pages, and reads three kinds of thing:
+One script runs on `https://github.com` pages, and reads two kinds of thing:
 
 - **The address of the page**, to decide whether it is a pull request diff or a
   repository's branch overview.
 - **The `href` of the links on the page**, to decide which of them point at
   one.
-- **The address the page was reached from** — `document.referrer`, which the
-  browser has already given the page. It is read for one decision only: the
-  branch overview reached from another tab of the same branches page is the
-  "Overview" tab being clicked, and is left alone. It is not stored, not sent,
-  and not read for anything else.
 
-That is all of it. It does not read page content, diffs, comments, form fields,
+That is all of it. It does not read the address the page was reached from: an
+earlier version read `document.referrer` for one decision, and that decision is
+now made from the address itself. It does not read page content, diffs, comments, form fields,
 cookies or storage, and it reads nothing at all on any other site: the
 extension is declared for `github.com` and is not injected anywhere else.
 
@@ -37,8 +34,9 @@ extension is declared for `github.com` and is not injected anywhere else.
   that does not already say otherwise — the same two settings GitHub's own
   "Hide whitespace changes" and "Viewed files" controls write.
 - It sends a repository's branch overview to that repository's full branch
-  list, `/branches/all` — the page's own "All" tab — unless it was reached from
-  another tab of the same page.
+  list, `/branches/all` — the page's own "All" tab — unless the address carries
+  `overview=1`, which is what the extension writes on the page's own "Overview"
+  tab so that the overview stays reachable.
 - It makes the same two changes to links on the page that point at such an
   address.
 

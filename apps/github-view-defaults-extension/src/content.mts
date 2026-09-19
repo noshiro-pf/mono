@@ -1,7 +1,8 @@
 import {
-  isSettledUrl,
+  isSettledLink,
   managedPagePathOf,
-  preferredUrlOf,
+  preferredUrlOfLink,
+  preferredUrlOfPage,
 } from './page-url.mjs';
 
 /**
@@ -62,11 +63,7 @@ const listening = new WeakSet<Element>();
 const mut_settledPages = new Set<string>();
 
 const main = (): void => {
-  // The referrer is how the branches rule tells "the Overview tab was clicked"
-  // from "somebody asked for the branches of this repository" — see
-  // `page-url.mts`. It is `''` for a typed URL or a bookmark, which is the
-  // second of those.
-  applyPreferredUrlToThisPage(document.referrer);
+  applyPreferredUrlToThisPage();
 
   patchNewAnchors();
 
@@ -75,24 +72,19 @@ const main = (): void => {
 
 /**
  * The fallback, for a page reached without going through a link this extension
- * had already rewritten — a typed URL, a bookmark, a notification.
+ * had already rewritten — a typed URL, a bookmark, a notification, a reload.
  *
- * `cameFrom` is the address the visit came from: the referrer on the document
- * the script landed on, and the address the observer last saw for a client-side
- * navigation.
+ * It asks about the address alone, which is why those four and a click all get
+ * the same answer. See `preferredUrlOfPage`.
  */
-const applyPreferredUrlToThisPage = (cameFrom: string): void => {
+const applyPreferredUrlToThisPage = (): void => {
   const page = managedPagePathOf(browserLocation.href, browserLocation.origin);
 
   if (page === undefined) {
     return;
   }
 
-  const next = preferredUrlOf(
-    browserLocation.href,
-    browserLocation.origin,
-    cameFrom,
-  );
+  const next = preferredUrlOfPage(browserLocation.href, browserLocation.origin);
 
   if (next === undefined) {
     // It arrived the way the rules want it — because a rewritten link brought
@@ -143,11 +135,10 @@ const patchAnchor = (element: Element): void => {
     return;
   }
 
-  // The page the anchor is on is where a click on it would come from, which is
-  // what the branches rule reads: the "Overview" tab of a branches page is a
-  // link this extension leaves alone, and the same href in the repository's own
-  // navigation is not.
-  const next = preferredUrlOf(
+  // The page the anchor is on is what the branches rule reads: the "Overview"
+  // tab of a branches page is marked as the overview somebody asked for, and
+  // the same href in the repository's own navigation is sent to the full list.
+  const next = preferredUrlOfLink(
     element.href,
     browserLocation.origin,
     browserLocation.href,
@@ -160,7 +151,7 @@ const patchAnchor = (element: Element): void => {
   }
 
   if (
-    !isSettledUrl(element.href, browserLocation.origin, browserLocation.href)
+    !isSettledLink(element.href, browserLocation.origin, browserLocation.href)
   ) {
     return;
   }
@@ -196,7 +187,7 @@ const suppressClientSideNavigation = (clickEvent: Event): void => {
 
   if (
     anchor instanceof HTMLAnchorElement &&
-    isSettledUrl(anchor.href, browserLocation.origin, browserLocation.href)
+    isSettledLink(anchor.href, browserLocation.origin, browserLocation.href)
   ) {
     clickEvent.stopPropagation();
   }
@@ -225,14 +216,9 @@ const watchForChanges = (): void => {
     // Most of what this catches is not a navigation at all but GitHub tidying
     // its own address bar, which is why `mut_settledPages` guards the answer.
     if (currentHref !== mut_lastHref) {
-      const previousHref = mut_lastHref;
-
       mut_lastHref = currentHref;
 
-      // The address we were at is this navigation's referrer in every sense
-      // that matters: no document was loaded, so `document.referrer` still
-      // names whatever loaded this one.
-      applyPreferredUrlToThisPage(previousHref);
+      applyPreferredUrlToThisPage();
     }
 
     // A re-render can reset an anchor's `href` in place, which the `evaluated`
