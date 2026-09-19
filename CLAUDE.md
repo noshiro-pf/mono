@@ -306,9 +306,9 @@ spaces they needed. Verbatim texts under `docs/` are never touched.
 - Pushing the session's own branch and opening its pull request is the work.
   **Without explicit instruction, never**: push to any other branch (`main`
   refuses direct pushes anyway); force-push or rebase a branch whose pull
-  request is open; merge, arm auto-merge or add `merge-queued`; run the `gh`
-  CLI (it is a person's account; use the GitHub API — `pnpm run unblock-prs`
-  shells out to `gh`); access `~/.ssh` or other sensitive directories.
+  request is open; merge or add `merge-queued`; run the `gh` CLI (it is a
+  person's account; use the GitHub API — `pnpm run unblock-prs` shells out to
+  `gh`); access `~/.ssh` or other sensitive directories.
 
 ## Security findings
 
@@ -327,15 +327,22 @@ ingest the feed). Outside reports come through private vulnerability reporting
   is unchangeable and the libraries are published). Checked by
   `lint-pull-request.yml`; a squash merge makes the title the subject and the
   branch's messages the body.
-- **Open the pull request ready for review, with `skip-ci` on it**, after
-  running the local checks and saying in the description which ones — while
-  the label is on they are the only checks the branch gets. Not a draft (a
-  draft cannot be auto-merged and `unblock-prs` only reports it). The label
-  goes on right after creation; **the `opened` run it cancels leaves red
-  `*-result` checks and "check failed" notifications naming nothing — ignore
-  them**, the `labeled` run supersedes them.
-- Taking `skip-ci` off is how CI is asked for. Queueing (auto-merge,
-  `merge-queued`) is the author's; a session leaves `skip-ci` on.
+- **Open the pull request ready for review, add `skip-ci`, then arm
+  auto-merge — in that order**, after running the local checks and saying in
+  the description which ones; while the label is on they are the only checks
+  the branch gets. Not a draft (a draft cannot be auto-merged and
+  `unblock-prs` only reports it). **The order is the safety**: `skip-ci` is
+  the only thing holding the merge — the ruleset asks for
+  `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
+  a green branch has nothing else to clear — and arming before the label is
+  arming with nothing holding it. **The `opened` run the label cancels leaves
+  red `*-result` checks and "check failed" notifications naming nothing —
+  ignore them**, the `labeled` run supersedes them.
+- Taking `skip-ci` off is how CI is asked for, and `unblock-prs` takes it off
+  only from a pull request labelled `merge-queued`. **Queueing one is that
+  label alone** — auto-merge is already armed — and it is the author's; a
+  session leaves `skip-ci` on. The label itself blocks nothing: GitHub does
+  not read it, so it is never a substitute for `skip-ci`.
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix goes on the branch;
