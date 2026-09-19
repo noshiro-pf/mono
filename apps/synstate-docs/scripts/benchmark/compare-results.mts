@@ -179,7 +179,7 @@ const readScenario = async (
 
 /** `''` for a single-point scenario, the sweep's labels for a swept one. */
 const pointsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats' ? [''] : results.xLabels;
+  results.kind === 'stats' ? ([''] as const) : results.xLabels;
 
 const valueAt = (
   results: Results,

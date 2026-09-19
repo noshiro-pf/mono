@@ -64,27 +64,31 @@ export type BenchmarkEnvironment = Readonly<{
 
 /** Captures the environment of the run in progress. */
 export const readBenchmarkEnvironment =
-  async (): Promise<BenchmarkEnvironment> => ({
-    runner:
-      process.env['GITHUB_ACTIONS'] === 'true' ? 'github-actions' : 'local',
+  async (): Promise<BenchmarkEnvironment> =>
+    ({
+      runner:
+        process.env['GITHUB_ACTIONS'] === 'true'
+          ? ('github-actions' as const)
+          : ('local' as const),
 
-    runnerImage: process.env['ImageOS'] ?? process.env['RUNNER_IMAGE'] ?? null,
+      runnerImage:
+        process.env['ImageOS'] ?? process.env['RUNNER_IMAGE'] ?? null,
 
-    node: process.version,
+      node: process.version,
 
-    platform: `${os.type()} ${os.release()}`,
+      platform: `${os.type()} ${os.release()}`,
 
-    arch: process.arch,
+      arch: process.arch,
 
-    cpu: Optional.unwrapOr(
-      Optional.map(Optional.fromNullable(os.cpus()[0]), (c) => c.model),
-      'unknown',
-    ),
+      cpu: Optional.unwrapOr(
+        Optional.map(Optional.fromNullable(os.cpus()[0]), (c) => c.model),
+        'unknown',
+      ),
 
-    measuredOn: Temporal.Now.plainDateISO().toString(),
+      measuredOn: Temporal.Now.plainDateISO().toString(),
 
-    libraries: await readComparisonLibraryVersions(),
-  });
+      libraries: await readComparisonLibraryVersions(),
+    }) as const;
 
 const synstatePackageDir = path.resolve(scenarioDir, '../../..');
 

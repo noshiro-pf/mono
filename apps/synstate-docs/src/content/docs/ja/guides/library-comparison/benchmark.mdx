@@ -589,7 +589,7 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 ### 主な観察結果
 
 - **MobX** はこのシナリオで最も高速です。`computed(() => branches[selector.get()].get())` は実行時に `selector` と `branches[0]` のみを購読するため、`branches[1]` の observer リストは空です。`branches[1]` を更新しても通知先が存在せず、B に関係なく約 {/* bench:fan-out/mobx-typical */}2.6 ms{/* /bench */} で一定です。
-- **SynState** のコストは B に対して線形に増加します。`combine` が構築時に全分岐を購読するため、どの分岐が更新されても combine が発火します。グラフで線形な傾向が明確に見えます：B=2 で {/* bench:fan-out/synstate@min-b */}47.4 ms{/* /bench */}、B=1000 で {/* bench:fan-out/synstate@max-b */}3,069 ms{/* /bench */}（{/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} 回の更新にわたり、1分岐・1更新あたり約 {/* bench:fan-out/synstate-ns-per-branch-per-update */}31{/* /bench */} ns）。
+- **SynState** のコストは B に対して線形に増加します。`combine` が構築時に全分岐を購読するため、どの分岐が更新されても combine が発火します。グラフで線形な傾向が明確に見えます：B=2 で {/* bench:fan-out/synstate@min-b */}47.4 ms{/* /bench */}、B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */} で {/* bench:fan-out/synstate@last-measured-b */}3,069 ms{/* /bench */}（{/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} 回の更新にわたり、1分岐・1更新あたり約 {/* bench:fan-out/synstate-ns-per-branch-per-update */}31{/* /bench */} ns）。
 - **RxJS** は SynState と同じ静的な `combineLatest` アプローチです。コストは B に応じて増加しますが、SynState より緩やかです。`combineLatest` は等値比較による下流伝搬スキップを行わず常に発行するため、subscriber は毎回呼ばれますが処理は最小限（値の代入のみ）です。
 - **Jotai** は MobX と同じ動的購読を行います — `resultAtom` は非アクティブな分岐を購読していないため再計算はトリガーされません。しかし `store.set()` 自体が atom store 内で invalidation チェック等の管理処理を実行するため、B に関係なく約 {/* bench:fan-out/jotai-typical */}108 ms{/* /bench */} の一定オーバーヘッドが発生します。このため B≤{/* bench:fan-out/jotai-slower-through-b */}10{/* /bench */} では SynState より遅い結果です。
 
