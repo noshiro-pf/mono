@@ -2,6 +2,7 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { environmentsDir } from '../constants.mjs';
 import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments } from './api/index.mjs';
@@ -9,12 +10,15 @@ import { getAllEnvironments } from './api/index.mjs';
 /**
  * Settings > Environments の現在値を宣言ファイルへ撮り直す。
  *
- * ruleset と同じく、live に無い宣言は消さない。
+ * ruleset と同じく、先に直下の `*.json` を消してから書く。理由は
+ * {@link clearJsonFilesIn} を参照。
  */
 export const backupEnvironments = async (
   fmt: boolean = true,
 ): Promise<void> => {
   const environments = await getAllEnvironments();
+
+  await clearJsonFilesIn(environmentsDir);
 
   for (const environment of environments) {
     // `settingsFilePath` が `environmentsDir` の直下であることを確かめている。

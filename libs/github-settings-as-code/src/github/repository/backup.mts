@@ -4,6 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings } from './api/index.mjs';
 import { repositoryKeysToPick } from './constants.mjs';
@@ -12,6 +13,8 @@ export const backupRepositorySettings = async (
   fmt: boolean = true,
 ): Promise<void> => {
   const repositorySettings = await getRepositorySettings();
+
+  await clearJsonFilesIn(repositorySettingsDir);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(

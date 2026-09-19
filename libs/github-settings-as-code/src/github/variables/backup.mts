@@ -3,6 +3,7 @@ import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { settingsJsonName, variablesDir } from '../constants.mjs';
 import { listRepoVariables } from './api/index.mjs';
 import { type RepositoryVariables } from './constants.mjs';
@@ -16,6 +17,8 @@ import { type RepositoryVariables } from './constants.mjs';
  */
 export const backupVariables = async (fmt: boolean = true): Promise<void> => {
   const variables = await listRepoVariables();
+
+  await clearJsonFilesIn(variablesDir);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
