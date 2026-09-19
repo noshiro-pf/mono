@@ -77,19 +77,6 @@ describe('the ruleset schema', () => {
     }
   });
 
-  test('accepts every backed-up ruleset', async () => {
-    const files = await readJsonFilesIn(path.resolve(rulesetsDir, './bk'));
-
-    assert.isTrue(Arr.isNonEmpty(files));
-
-    for (const [name, content] of files) {
-      assert.deepStrictEqual(
-        outcomeOf(name, RulesetPicked.validate(content)),
-        name,
-      );
-    }
-  });
-
   test('accepts the fields GitHub adds to what apply sends back', async () => {
     const files = await readJsonFilesIn(rulesetsDir);
 

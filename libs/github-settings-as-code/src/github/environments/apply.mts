@@ -2,24 +2,21 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import { Arr } from 'ts-data-forge';
-import { isDirectlyExecuted } from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { environmentsDir } from '../constants.mjs';
 import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments, setEnvironment } from './api/index.mjs';
-import { backupEnvironments } from './backup.mjs';
 import { type EnvironmentSettings } from './constants.mjs';
 import { readEnvironmentFiles } from './read-environment-contents.mjs';
 
 /**
  * `repo-settings/environments/*.json` を Settings > Environments に反映する。
  *
- * ruleset と同じく、宣言に無い環境は消さない。 GUI で作られたものが `bk/` に
- * 現れることが drift の見え方であって、 apply が黙って片付けてしまうと
- * 「いつ誰が何を作ったか」を見る機会がなくなる。
+ * ruleset と同じく、宣言に無い環境は消さない。 GUI で作られたものは drift
+ * 検査が報せるのであって、 apply が黙って片付けてしまうと「いつ誰が何を
+ * 作ったか」を見る機会がなくなる。
  */
 export const applyEnvironments = async (): Promise<void> => {
-  await backupEnvironments(false);
-
   const environments = await readEnvironmentFiles();
 
   for (const environment of environments) {
@@ -45,10 +42,7 @@ export const applyEnvironments = async (): Promise<void> => {
       );
     }
 
-    // `bk/` は backup 側が makeEmptyDir から作り直す。ここで書き足すのではなく
-    // 呼び直しているのは、消えた環境のファイルが残らないようにするため。
-    // 整形もそこでまとめて走る。
-    await backupEnvironments();
+    await formatUncommittedFiles();
   }
 };
 

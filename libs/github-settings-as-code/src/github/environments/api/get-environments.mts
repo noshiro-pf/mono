@@ -10,7 +10,7 @@ import { EnvironmentSettings } from '../constants.mjs';
  * Settings > Environments の現在値を、宣言ファイルと同じ形にして返す。
  *
  * 名前順に整える。 GitHub が返す順は作成順で、環境を 1 つ足しただけで
- * `bk/` の中身が並び替わると差分が読めなくなるため。
+ * 宣言ファイルの中身が並び替わると差分が読めなくなるため。
  */
 export const getAllEnvironments = async (): Promise<
   readonly EnvironmentSettings[]

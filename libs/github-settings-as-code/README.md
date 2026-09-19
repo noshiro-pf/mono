@@ -21,10 +21,10 @@ npm install -D github-settings-as-code
 repo-settings <command> [target] [options]
 ```
 
-| Command  | Description                                                      |
-| -------- | ---------------------------------------------------------------- |
-| `apply`  | Apply the local settings files to GitHub                         |
-| `backup` | Save the current values on GitHub to the local `bk/` directories |
+| Command  | Description                                                            |
+| -------- | ---------------------------------------------------------------------- |
+| `apply`  | Apply the local settings files to GitHub                               |
+| `backup` | Re-snapshot the local settings files from the current values on GitHub |
 
 | Target          | Files                                             | `apply` | `backup` |
 | --------------- | ------------------------------------------------- | ------- | -------- |
@@ -42,10 +42,11 @@ repo-settings backup
 repo-settings apply --owner noshiro-pf --repo ts-repo-utils
 ```
 
-Each `backup` is written to a `bk/` directory next to the settings file it
-mirrors (for example `repo-settings/rulesets/bk/`). `apply` reads the values
-back from GitHub afterwards and rewrites the local files with what was actually
-applied.
+`backup` rewrites the settings files themselves from what GitHub currently
+has — there is one copy of each resource, not a declaration and a mirror of it.
+`apply` reads the values back from GitHub afterwards and rewrites the files
+with what was actually applied, so a value GitHub canonicalized or refused
+shows up as a diff.
 
 ## Resolving the target repository
 

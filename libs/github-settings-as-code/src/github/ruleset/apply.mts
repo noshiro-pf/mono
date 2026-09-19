@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
@@ -12,25 +11,22 @@ import {
   getRuleset,
   updateRuleset,
 } from './api/index.mjs';
-import { backupRulesets } from './backup.mjs';
 import { rulesetKeysToPick } from './constants.mjs';
-import {
-  readRulesetBackupFiles,
-  readRulesetFiles,
-} from './read-rule-set-contents.mjs';
+import { readRulesetFiles } from './read-rule-set-contents.mjs';
 
 export const applyRulesets = async (): Promise<void> => {
-  await backupRulesets(false);
-
   const rulesets = await readRulesetFiles();
 
-  const backupIds: ReadonlySet<number> = await readRulesetBackupFiles().then(
+  // 既にあるかどうかは live に訊く。以前はこの直前に走らせた backup の出力を
+  // 読んでいたが、それは live の写しでしかなく、写した時点と送る時点のあいだに
+  // 消えた ruleset を「更新できる」と誤らせる余地があった。
+  const existingIds: ReadonlySet<number> = await getAllRulesets().then(
     (rs) => new Set(rs.map((r) => r.id)),
   );
 
-  const rulesetsToUpdate = rulesets.filter((r) => backupIds.has(r.id));
+  const rulesetsToUpdate = rulesets.filter((r) => existingIds.has(r.id));
 
-  const rulesetsToCreate = rulesets.filter((r) => !backupIds.has(r.id));
+  const rulesetsToCreate = rulesets.filter((r) => !existingIds.has(r.id));
 
   for (const ruleset of rulesetsToUpdate) {
     await updateRuleset({
@@ -72,16 +68,9 @@ export const applyRulesets = async (): Promise<void> => {
         2,
       );
 
-      // `settingsFilePath` が、どちらもそのディレクトリの直下であることを
-      // 確かめている。`bk` は名前と結合する前に解決しておく。
+      // `settingsFilePath` が `rulesetsDir` の直下であることを確かめている。
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(settingsFilePath(rulesetsDir, rule.name), str);
-
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(
-        settingsFilePath(path.resolve(rulesetsDir, './bk'), rule.name),
-        str,
-      );
     }
 
     await formatUncommittedFiles();

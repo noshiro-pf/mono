@@ -2,7 +2,7 @@ import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
 import { settingsFilePath } from './settings-file-path.mjs';
 
-const dir = path.resolve('/tmp/repo-settings/environments/bk');
+const dir = path.resolve('/tmp/repo-settings/environments');
 
 /** `'rejected'` when the name was refused, the resolved path when it was not. */
 const outcomeOf = (name: string): string => {

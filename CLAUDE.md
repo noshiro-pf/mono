@@ -174,10 +174,13 @@ nothing checks; `check:root:example-coverage` and
 
 ## Repository settings
 
-`repo-settings/` root files are desired state, applied only by
-`pnpm run repo-settings:apply` (admin token); `bk/` mirrors GitHub. **Editing
-a root file passes CI and changes nothing** until applied. Drift is checked
-daily from the private `noshiro-pf/mono-security`.
+`repo-settings/` files are desired state, applied only by
+`pnpm run repo-settings:apply` (admin token); `repo-settings:backup` writes
+the same files from what GitHub currently has. **Editing one passes CI and
+changes nothing** until applied. Drift is checked daily from the private
+`noshiro-pf/mono-security`, which compares these files against GitHub — so a
+`backup` committed without thought silently turns a drift into the
+declaration.
 
 - **Declare and apply an environment before merging the workflow that names
   it.** An environment created by a first run has no protection rules, and

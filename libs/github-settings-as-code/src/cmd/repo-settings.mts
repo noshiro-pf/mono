@@ -13,7 +13,7 @@ const HELP = dedent`
 
   Commands:
     apply [target]     ローカルの設定ファイルを GitHub に反映する
-    backup [target]    GitHub の現在値をローカルの bk/ に保存する
+    backup [target]    GitHub の現在値でローカルの設定ファイルを撮り直す
 
   Targets:
     all                すべて（既定）

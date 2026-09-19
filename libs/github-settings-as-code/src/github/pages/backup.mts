@@ -2,22 +2,19 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  formatUncommittedFiles,
-  isDirectlyExecuted,
-  makeEmptyDir,
-} from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { pagesSettingsDir, settingsJsonName } from '../constants.mjs';
 import { getPagesSettings } from './api/index.mjs';
 
-const backupDir = path.resolve(pagesSettingsDir, './bk');
-
-/** Settings > Pages の現在値を `bk/` に保存する。 */
+/**
+ * Settings > Pages の現在値を宣言ファイルへ撮り直す。
+ *
+ * Pages が無効なら宣言はそのまま残す。消してしまうと「Pages を使う」という
+ * 宣言が、一時的に無効だった日の backup で失われる。
+ */
 export const backupPagesSettings = async (
   fmt: boolean = true,
 ): Promise<void> => {
-  await makeEmptyDir(backupDir);
-
   const settings = await getPagesSettings();
 
   if (settings === undefined) {
@@ -30,7 +27,7 @@ export const backupPagesSettings = async (
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
-    path.resolve(backupDir, settingsJsonName),
+    path.resolve(pagesSettingsDir, settingsJsonName),
     JSON.stringify(settings, undefined, 2),
   );
 

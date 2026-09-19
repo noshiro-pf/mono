@@ -10,10 +10,6 @@ export const readEnvironmentFiles = async (): Promise<
   readonly EnvironmentSettings[]
 > => readFilesIn(environmentsDir);
 
-export const readEnvironmentBackupFiles = async (): Promise<
-  readonly EnvironmentSettings[]
-> => readFilesIn(path.resolve(environmentsDir, './bk'));
-
 const readFilesIn = async (
   dir: string,
 ): Promise<readonly EnvironmentSettings[]> => {
