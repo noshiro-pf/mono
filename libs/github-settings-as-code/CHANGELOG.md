@@ -1,5 +1,83 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.0
+
+### Major Changes
+
+- e926094: `backup` writes the settings files themselves. The `bk/` mirror directories are
+  gone, and so is every read of them.
+
+    There used to be two copies of each resource: the declaration
+    (`repo-settings/<target>/…json`) and a mirror of GitHub under `bk/`. The mirror
+    was meant as a pre-apply safety copy, but nothing ever checked the two against
+    each other, and running `apply` after a while produced a diff in `bk/` that
+    carried no information. What the mirror was for is now done continuously by the
+    drift check, which compares GitHub against the files that are actually
+    declared.
+
+    Breaking changes for anyone calling this as a library:
+
+    - `backupRulesets`, `backupEnvironments`, `backupActionsSettings`,
+      `backupPagesSettings`, `backupRepositorySettings`,
+      `backupVulnerabilityAlerts` and `backupVariables` write
+      `repo-settings/<target>/…json` instead of `repo-settings/<target>/bk/…json`.
+      **`backup` now overwrites the declaration**, which is the point of it — it is
+      how you pull the current state in — but it is no longer a read-only-ish
+      operation on a throwaway directory.
+    - `readRulesetBackupFiles` and `readEnvironmentBackupFiles` are removed. There
+      is nothing to read.
+    - `apply` no longer takes a snapshot before it sends anything. It could not:
+      that snapshot now writes the declaration, so taking it would overwrite the
+      very file `apply` is about to read.
+
+    The multi-file backups (`rulesets`, `environments`) no longer empty the
+    directory first. Emptying it would delete a resource that is declared but not
+    yet applied, and any `README.md` sitting beside the declarations. A file that
+    is declared with nothing live behind it is reported by the drift check, which
+    is where that belongs.
+
+    `applyRulesets` decides create-versus-update from the live rulesets rather than
+    from the old mirror, which is also more correct: the mirror was a copy taken
+    moments earlier, so a ruleset deleted in between would have been treated as
+    updatable.
+
+### Minor Changes
+
+- cb5b072: `backup` and `apply` now reject an environment or ruleset name that cannot be
+  used as a single file name, instead of joining it onto the output directory.
+  A name carrying `/`, `\` or a `\0`, and the names `''`, `.` and `..`, are
+  refused with an error naming the name and the directory; every other name is
+  written exactly where it was before.
+
+    Such a name used to fail partway through, with only the missing directory to
+    go on, or — where the directory did exist — resolve outside the one it was
+    given and be written there. `repo-settings/` holds the declarations that
+    `bk/` is compared against, so a backup able to reach them has nothing left to
+    compare against. Names without a separator, which is every name these
+    settings use, are unaffected.
+
+- 3f0112c: Repository variables are declared in `repo-settings/variables/settings.json`
+  instead of being written into the source of `applyVariables`, and `backup`
+  covers them like every other target.
+
+    The declaration is a record of name to value. `apply` validates it, refuses
+    every name GitHub would refuse before it sends the first one — alphanumerics
+    and `_`, no leading digit, no `GITHUB_` prefix — and then creates or updates
+    each declared variable. `backup` writes what is actually there, sorted by name
+    and without the timestamps, so the file changes only when a value does.
+
+    Two properties are deliberate and match the other targets. A variable that is
+    not declared is **not deleted**: what someone added in the web UI shows up in
+    `bk/`, which is how it gets noticed, rather than disappearing on the next
+    apply. And `apply` does not write the live values back into the declaration,
+    because the live set can be larger than the declared one and writing it back
+    would quietly adopt the difference.
+
+    Nothing secret belongs in this file — a repository variable is readable
+    through the API and in workflow logs. It is for values that are merely
+    configuration, such as the client id of a GitHub App whose private key is a
+    secret.
+
 ## 3.2.0
 
 ### Minor Changes
