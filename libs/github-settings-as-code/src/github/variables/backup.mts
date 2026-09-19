@@ -2,32 +2,27 @@
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  formatUncommittedFiles,
-  isDirectlyExecuted,
-  makeEmptyDir,
-} from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { settingsJsonName, variablesDir } from '../constants.mjs';
 import { listRepoVariables } from './api/index.mjs';
 import { type RepositoryVariables } from './constants.mjs';
 
-const backupDir = path.resolve(variablesDir, './bk');
-
 /**
- * repository variable の現在値を `bk/` に保存する。
+ * repository variable の現在値を宣言ファイルへ撮り直す。
  *
- * 宣言していないものも含めて live にあるものを全部書く。 `bk/` は「いま何が
- * あるか」であって「何を宣言したか」ではないので、 GUI で足された変数は
- * ここに現れてほしい。
+ * 宣言していないものも含めて live にあるものを全部書く。 backup は「いま何が
+ * あるか」を写す操作なので、 GUI で足された変数もここで宣言に入る。要らない
+ * ものは撮り直したあとに宣言から外し、 GitHub 側でも消す。
  */
 export const backupVariables = async (fmt: boolean = true): Promise<void> => {
-  await makeEmptyDir(backupDir);
-
   const variables = await listRepoVariables();
+
+  await clearJsonFilesIn(variablesDir);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
-    path.resolve(backupDir, settingsJsonName),
+    path.resolve(variablesDir, settingsJsonName),
     JSON.stringify(toDeclaration(variables), undefined, 2),
   );
 
@@ -40,7 +35,7 @@ export const backupVariables = async (fmt: boolean = true): Promise<void> => {
  * API の配列を `settings.json` と同じ record に畳む。
  *
  * `created_at` / `updated_at` はここで落ちる。値が変わっていなくても動くので、
- * 残すと `bk/` が毎日変わり、ドリフト検査が本当の変更を報せなくなる。
+ * 残すと宣言ファイルが毎日変わり、ドリフト検査が本当の変更を報せなくなる。
  */
 export const toDeclaration = (
   variables: Awaited<ReturnType<typeof listRepoVariables>>,

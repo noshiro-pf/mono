@@ -3,27 +3,22 @@ import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
-import {
-  formatUncommittedFiles,
-  isDirectlyExecuted,
-  makeEmptyDir,
-} from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings } from './api/index.mjs';
 import { repositoryKeysToPick } from './constants.mjs';
 
-const backupDir = path.resolve(repositorySettingsDir, './bk');
-
 export const backupRepositorySettings = async (
   fmt: boolean = true,
 ): Promise<void> => {
-  await makeEmptyDir(backupDir);
-
   const repositorySettings = await getRepositorySettings();
+
+  await clearJsonFilesIn(repositorySettingsDir);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
-    path.resolve(backupDir, settingsJsonName),
+    path.resolve(repositorySettingsDir, settingsJsonName),
     JSON.stringify(
       Obj.pick(repositorySettings, repositoryKeysToPick),
       undefined,

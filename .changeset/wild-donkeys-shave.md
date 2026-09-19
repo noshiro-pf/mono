@@ -9,9 +9,8 @@ covers them like every other target.
 The declaration is a record of name to value. `apply` validates it, refuses
 every name GitHub would refuse before it sends the first one — alphanumerics
 and `_`, no leading digit, no `GITHUB_` prefix — and then creates or updates
-each declared variable. `backup` writes what is actually there to
-`repo-settings/variables/bk/settings.json`, sorted by name and without the
-timestamps, so the file changes only when a value does.
+each declared variable. `backup` writes what is actually there, sorted by name
+and without the timestamps, so the file changes only when a value does.
 
 Two properties are deliberate and match the other targets. A variable that is
 not declared is **not deleted**: what someone added in the web UI shows up in

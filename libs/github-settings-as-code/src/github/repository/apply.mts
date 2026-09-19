@@ -13,7 +13,6 @@ import {
 import { type StrictPick } from 'ts-type-forge';
 import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings, updateRepository } from './api/index.mjs';
-import { backupRepositorySettings } from './backup.mjs';
 import {
   type RepositoryKeysToPick,
   repositoryKeysToPick,
@@ -21,8 +20,6 @@ import {
 } from './constants.mjs';
 
 export const applyRepositorySettings = async (): Promise<void> => {
-  await backupRepositorySettings(false);
-
   const settings = await readSettings();
 
   await updateRepository({
@@ -69,12 +66,6 @@ export const applyRepositorySettings = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
       path.resolve(repositorySettingsDir, settingsJsonName),
-      str,
-    );
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(
-      path.resolve(repositorySettingsDir, 'bk', settingsJsonName),
       str,
     );
 

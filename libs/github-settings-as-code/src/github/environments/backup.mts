@@ -1,31 +1,30 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import {
-  formatUncommittedFiles,
-  isDirectlyExecuted,
-  makeEmptyDir,
-} from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { clearJsonFilesIn } from '../clear-json-files.mjs';
 import { environmentsDir } from '../constants.mjs';
 import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments } from './api/index.mjs';
 
-const backupDir = path.resolve(environmentsDir, './bk');
-
-/** Settings > Environments の現在値を `bk/` に保存する。 */
+/**
+ * Settings > Environments の現在値を宣言ファイルへ撮り直す。
+ *
+ * ruleset と同じく、先に直下の `*.json` を消してから書く。理由は
+ * {@link clearJsonFilesIn} を参照。
+ */
 export const backupEnvironments = async (
   fmt: boolean = true,
 ): Promise<void> => {
-  await makeEmptyDir(backupDir);
-
   const environments = await getAllEnvironments();
 
+  await clearJsonFilesIn(environmentsDir);
+
   for (const environment of environments) {
-    // `settingsFilePath` が `backupDir` の直下であることを確かめている。
+    // `settingsFilePath` が `environmentsDir` の直下であることを確かめている。
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      settingsFilePath(backupDir, environment.name),
+      settingsFilePath(environmentsDir, environment.name),
       JSON.stringify(environment, undefined, 2),
     );
   }
