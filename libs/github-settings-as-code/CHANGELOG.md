@@ -1,5 +1,45 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 3.3.0
+
+### Minor Changes
+
+- cb5b072: `backup` and `apply` now reject an environment or ruleset name that cannot be
+  used as a single file name, instead of joining it onto the output directory.
+  A name carrying `/`, `\` or a `\0`, and the names `''`, `.` and `..`, are
+  refused with an error naming the name and the directory; every other name is
+  written exactly where it was before.
+
+    Such a name used to fail partway through, with only the missing directory to
+    go on, or — where the directory did exist — resolve outside the one it was
+    given and be written there. `repo-settings/` holds the declarations that
+    `bk/` is compared against, so a backup able to reach them has nothing left to
+    compare against. Names without a separator, which is every name these
+    settings use, are unaffected.
+
+- 3f0112c: Repository variables are declared in `repo-settings/variables/settings.json`
+  instead of being written into the source of `applyVariables`, and `backup`
+  covers them like every other target.
+
+    The declaration is a record of name to value. `apply` validates it, refuses
+    every name GitHub would refuse before it sends the first one — alphanumerics
+    and `_`, no leading digit, no `GITHUB_` prefix — and then creates or updates
+    each declared variable. `backup` writes what is actually there to
+    `repo-settings/variables/bk/settings.json`, sorted by name and without the
+    timestamps, so the file changes only when a value does.
+
+    Two properties are deliberate and match the other targets. A variable that is
+    not declared is **not deleted**: what someone added in the web UI shows up in
+    `bk/`, which is how it gets noticed, rather than disappearing on the next
+    apply. And `apply` does not write the live values back into the declaration,
+    because the live set can be larger than the declared one and writing it back
+    would quietly adopt the difference.
+
+    Nothing secret belongs in this file — a repository variable is readable
+    through the API and in workflow logs. It is for values that are merely
+    configuration, such as the client id of a GitHub App whose private key is a
+    secret.
+
 ## 3.2.0
 
 ### Minor Changes
