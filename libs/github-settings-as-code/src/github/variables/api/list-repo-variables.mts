@@ -23,5 +23,7 @@ export const listRepoVariables = async (): Promise<
     },
   );
 
-  return result.data.variables;
+  // `getAllEnvironments` と同じく名前順に整えて返す。 `bk/` の中身が API の
+  // 返す順に左右されると、値が変わっていない日にも diff が出る。
+  return result.data.variables.toSorted((a, b) => a.name.localeCompare(b.name));
 };
