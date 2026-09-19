@@ -2,12 +2,12 @@
 
 name: PR Report
 
-# Writes the daily state of every open pull request — the order they declare
-# with `Merge-After:`, the issues they close, their labels, the verdict of the
+# Writes the state of every open pull request — the order they declare with
+# `Merge-After:`, the issues they close, their labels, the verdict of the
 # checks the ruleset requires, and how far each branch is from `main` — into
 # one issue, updated in place.
 #
-# An issue rather than a comment or a new issue each day, because the report
+# An issue rather than a comment or a new issue each time, because the report
 # is a *current state*, not an event: editing a body notifies nobody and
 # leaves no timeline, so the link keeps pointing at the truth and the
 # repository stays quiet. The run's own summary carries the same text, for
@@ -17,10 +17,54 @@ name: PR Report
 # where the text goes, so the same report can be had locally, or by an agent,
 # with no GitHub UI involved.
 
+# The events are pings, not input: nothing from a payload reaches the job,
+# which re-reads every pull request from the API each time. So the trigger
+# list is only the question "what can change the report", and the answer is
+# the pull requests themselves, `main` moving under all of them, and time.
 on:
+  # `pull_request_target`, not `pull_request`, for two reasons that both
+  # matter. A `pull_request` run from a fork gets a read-only token whatever
+  # `permissions:` below says, so the `gh issue edit` would fail — silently,
+  # as far as the report's readers are concerned, since the issue would simply
+  # stop changing. And `pull_request` resolves the workflow file, and the
+  # checkout, from the pull request's own head: the branch being reported on
+  # would be the branch supplying the reporter. The usual hazard of
+  # `pull_request_target` is answered at the checkout step below.
+  pull_request_target:
+    types:
+      # Membership of the list.
+      - opened
+      - reopened
+      - closed
+      # The title, and the body the `Merge-After:` trailer and the closing
+      # keywords are read from.
+      - edited
+      # `skip-ci` and `merge-queued`, which are what the `paused` and `queued`
+      # verdicts are.
+      - labeled
+      - unlabeled
+      # A new head: ahead / behind, and every check verdict, start over.
+      - synchronize
+      # The report counts drafts.
+      - ready_for_review
+      - converted_to_draft
+
+  push:
+    # A merge — or anything else reaching `main` — moves the base under every
+    # open pull request at once, which is the one change no `pull_request`
+    # event reports. No `paths:` filter: any commit at all changes the ahead /
+    # behind of all of them.
+    branches:
+      - main
+
   schedule:
-    # 07:00 JST. A scheduled workflow runs on the default branch, and GitHub
-    # disables one in a repository that has been idle for 60 days.
+    # 07:00 JST, as the floor rather than the whole of it. Check runs finish
+    # without any event this workflow can subscribe to — `check_suite` does not
+    # trigger a workflow when the suite is GitHub Actions' own — so a report
+    # written while the checks were still running is only corrected by the next
+    # pull request event or by this. A scheduled workflow runs on the default
+    # branch, and GitHub disables one in a repository that has been idle for 60
+    # days.
     - cron: '0 22 * * *'
 
   workflow_dispatch:
@@ -35,9 +79,18 @@ permissions:
   issues: write
 
 concurrency:
-  # A scheduled run and a dispatched one would otherwise race to edit the same
-  # body. Not `cancel-in-progress`: the later run supersedes nothing, it just
-  # waits.
+  # One issue, one writer: every run of this workflow edits the same body, so
+  # they queue behind one another globally rather than per pull request.
+  #
+  # Not `cancel-in-progress`, even though a later run does supersede an earlier
+  # one here. GitHub already collapses a burst: when a run is queued behind a
+  # running one, any run that was *already* queued in the group is cancelled,
+  # so a stream of events leaves one running plus the newest pending and drops
+  # everything between. That is the debounce this wants, and it cannot starve —
+  # whereas cancelling the in-progress run would let a steady trickle of events
+  # keep killing the run that was about to write. The cost is one extra
+  # completed run per burst, whose body the pending one overwrites seconds
+  # later.
   group: pr-report
   cancel-in-progress: false
 
@@ -49,6 +102,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # This is where `pull_request_target`'s hazard — a writable token in
+          # a job that installs and runs the tree it checked out — is answered.
+          # The event's own ref is the pull request's *base*, which is not
+          # necessarily `main`: a chained pull request's base is another
+          # branch, and running that branch's `pr-report` and lockfile with
+          # `issues: write` is the thing being avoided. Pinning to the default
+          # branch also makes `repo-settings/rulesets/main.json` — desired
+          # state, which a pull request may be in the middle of changing — read
+          # from the one copy that decides.
+          #
+          # Empty is `actions/checkout`'s own default, so every other event
+          # keeps checking out the ref it was raised on; a `workflow_dispatch`
+          # from a branch is how a change to this workflow gets tried out.
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.repository.default_branch || '' }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0

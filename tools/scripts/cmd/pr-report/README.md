@@ -45,8 +45,9 @@ pnpm run pr-report -- --repo owner/name # 別のリポジトリ
 ### トークン
 
 `GITHUB_TOKEN` か `GH_TOKEN` があれば使い、無ければ無認証で読みます。mono は
-public なので無認証でも動き、1日1回のレポートは匿名の 60 requests/hour に収まり
-ます（PR 1本あたり約3リクエスト = 20本程度まで）。
+public なので無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
+す（PR 1本あたり約3リクエスト = 20本程度まで）。workflow は `github.token` を
+渡すので、この上限は手元で無認証に走らせたときの話です。
 
 トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
 閉じる issue を GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
@@ -82,11 +83,30 @@ public なので無認証でも動き、1日1回のレポートは匿名の 60 r
 
 スクリプトは stdout に出すだけです。配信は2つ。
 
-- `.github/workflows/pr-report.yml` が毎日 07:00 JST に実行し、`pr-report`
-  ラベルの付いた issue の body を上書きします（通知もタイムラインも増えません）。
-  同じ本文が run summary にも出ます。
+- `.github/workflows/pr-report.yml` が実行し、`pr-report` ラベルの付いた issue
+  の body を上書きします（通知もタイムラインも増えません）。同じ本文が run
+  summary にも出ます。
 - Claude の routine が同じコマンドを実行して結果を貼ります。そのまま
   `/unblock-prs` に繋げられるのが、読むだけのレポートとの違いです。
+
+workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
+open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
+がそこにあるため）、ラベルの着脱、push、draft の切り替え、そして `main` への
+push（全 PR の ahead / behind が同時に動くので）。加えて毎日 07:00 JST の
+schedule と `workflow_dispatch`。
+
+イベントは**合図としてしか使いません** — payload の中身は job に一切入らず、
+毎回 API から全 PR を読み直します。そのため schedule が下限として残っていま
+す。チェックの完了だけはこの workflow が購読できるイベントを持たない
+（`check_suite` は GitHub Actions 自身のスイートでは workflow を起動しない）
+ので、チェック実行中に書かれたレポートは次の PR イベントか schedule で直りま
+す。
+
+同じ issue を全 run が書き換えるため concurrency は1グループに直列化していま
+す。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
+「すでに queue にいた run」を落とすので、バースト時は実行中の1本＋最新の1本だ
+け残り、間は捨てられます。これが欲しい debounce そのもので、しかも枯渇しませ
+ん。
 
 ## English
 
@@ -129,3 +149,21 @@ It reads one page of a hundred pull requests and fails rather than reporting a
 part of them as the whole. Pull requests on a `Merge-After` cycle are named in
 their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
+
+The script only prints. `.github/workflows/pr-report.yml` is what puts the
+text somewhere: it overwrites the body of the issue labelled `pr-report`,
+which notifies nobody and leaves no timeline, and repeats the same text in the
+run summary. It runs whenever something that can change the report happens — a
+pull request opened, closed, reopened, edited, labelled, pushed to or switched
+in or out of draft, and a push to `main`, which moves the ahead / behind of
+every open pull request at once — plus the daily schedule and
+`workflow_dispatch`. The events are pings and nothing else: no payload reaches
+the job, which re-reads every pull request from the API each time. The
+schedule stays as the floor, because a check run finishing raises no event
+this workflow can subscribe to.
+
+Every run edits the same body, so they share one concurrency group and run one
+at a time, deliberately not with `cancel-in-progress`: GitHub already drops a
+run that was queued when another is queued behind the same running one, which
+debounces a burst down to one running plus the newest pending without the risk
+that a trickle of events keeps cancelling the run that was about to write.
