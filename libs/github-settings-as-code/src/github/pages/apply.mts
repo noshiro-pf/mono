@@ -43,12 +43,6 @@ export const applyPagesSettings = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(settingsPath, str);
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(
-      path.resolve(pagesSettingsDir, 'bk', settingsJsonName),
-      str,
-    );
-
     await formatUncommittedFiles();
   }
 };

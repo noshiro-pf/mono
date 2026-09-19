@@ -10,7 +10,7 @@ import * as t from 'ts-fortress';
  *
  * 変数名をキー、値を値にした素の record にしてある。 API が返す配列
  * (`{ name, value, created_at, updated_at }[]`) をそのまま写さないのは、
- * `created_at` / `updated_at` が値の変化なしに動くためで、 `bk/` に入れると
+ * `created_at` / `updated_at` が値の変化なしに動くためで、宣言に入れると
  * 毎日ドリフトとして出てしまう。ここで持つのは宣言できるものだけ。
  *
  * **ここに秘密を書かないこと。** repository variable は API でも Actions の

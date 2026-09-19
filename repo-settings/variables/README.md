@@ -1,8 +1,7 @@
 # repository variables
 
-`settings.json` が宣言、`bk/` が GitHub の現在値。反映は
-`pnpm run repo-settings:apply variables`、撮り直しは
-`pnpm run repo-settings:backup variables`。
+`settings.json` が宣言。反映は `pnpm run repo-settings:apply variables`、
+GitHub の現在値で撮り直すのは `pnpm run repo-settings:backup variables`。
 
 JSON にコメントが書けないので、何のための値かはここに置いてある。
 
@@ -15,4 +14,4 @@ JSON にコメントが書けないので、何のための値かはここに置
 client id が置いてあるのは、それが公開値で、対になる秘密鍵の方が secret だから。
 
 `apply` は宣言に無い変数を消さない。消すときは宣言から外したうえで GitHub 側でも
-消す。外し忘れると、次の `backup` で `bk/` に残って気づく。
+消す。外し忘れると、次の `backup` が宣言に書き戻すので気づく。

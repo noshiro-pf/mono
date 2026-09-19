@@ -10,7 +10,6 @@ import {
   listRepoVariables,
   updateRepoVariable,
 } from './api/index.mjs';
-import { backupVariables } from './backup.mjs';
 import {
   assertVariableNamesAreValid,
   RepositoryVariables,
@@ -22,12 +21,10 @@ import {
  *
  * ruleset や environment と同じく、**宣言に無い変数は消さない。** 消したい
  * ときは宣言から外したうえで GitHub 側でも消す。 apply が片付けてしまうと、
- * 誰かが GUI で足したものが「いつの間にか無くなる」ことになり、`bk/` に
- * 現れて気づくという drift の見え方が働かなくなる。
+ * 誰かが GUI で足したものが「いつの間にか無くなる」ことになり、drift 検査が
+ * 報せるという見え方が働かなくなる。
  */
 export const applyVariables = async (): Promise<void> => {
-  await backupVariables(false);
-
   const variables = await readSettings();
 
   // 1 本目を送る前に、全部の名前を見る。
@@ -43,12 +40,11 @@ export const applyVariables = async (): Promise<void> => {
       : createRepoVariable({ name, value }));
   }
 
-  // `bk/` は backup 側が makeEmptyDir から作り直す。整形もそこで走る。
-  //
-  // `settings.json` の方は書き戻さない。他の target と違って live は宣言の
-  // 上位集合になりうるので、書き戻すと宣言していない変数まで宣言に採り込んで
-  // しまう。宣言は手で書くもので、 `bk/` がその答え合わせをする。
-  await backupVariables();
+  // ここで live を読み直して書き戻すことはしない。 backup は live をそのまま
+  // 宣言に写す操作で、 live は宣言の上位集合になりうる — apply の締めに呼ぶと、
+  // 宣言していない変数まで黙って宣言に入る。送った値は宣言そのものなので、
+  // 書き戻して得られるものも無い。現在値を取り込みたいときは backup を明示的に
+  // 実行する。
 };
 
 const readSettings = async (): Promise<RepositoryVariables> => {

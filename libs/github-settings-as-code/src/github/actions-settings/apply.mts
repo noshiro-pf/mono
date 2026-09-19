@@ -10,13 +10,10 @@ import {
 } from 'ts-repo-utils';
 import { actionsSettingsDir, settingsJsonName } from '../constants.mjs';
 import { getActionsSettings, setActionsSettings } from './api/index.mjs';
-import { backupActionsSettings } from './backup.mjs';
 import { ActionsSettings } from './constants.mjs';
 
 /** `repo-settings/actions-settings/settings.json` を Settings > Actions > General に反映する。 */
 export const applyActionsSettings = async (): Promise<void> => {
-  await backupActionsSettings(false);
-
   const settings = await readSettings();
 
   await setActionsSettings(settings);
@@ -29,12 +26,6 @@ export const applyActionsSettings = async (): Promise<void> => {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(path.resolve(actionsSettingsDir, settingsJsonName), str);
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.writeFile(
-      path.resolve(actionsSettingsDir, 'bk', settingsJsonName),
-      str,
-    );
 
     await formatUncommittedFiles();
   }
