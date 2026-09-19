@@ -9,10 +9,6 @@ import { RulesetPicked } from './constants.mjs';
 export const readRulesetFiles = async (): Promise<readonly RulesetPicked[]> =>
   readFilesIn(rulesetsDir);
 
-export const readRulesetBackupFiles = async (): Promise<
-  readonly RulesetPicked[]
-> => readFilesIn(path.resolve(rulesetsDir, './bk'));
-
 const readFilesIn = async (dir: string): Promise<readonly RulesetPicked[]> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const files: readonly Dirent<string>[] = await fs.readdir(dir, {

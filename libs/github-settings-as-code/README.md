@@ -21,17 +21,17 @@ npm install -D github-settings-as-code
 repo-settings <command> [target] [options]
 ```
 
-| Command  | Description                                                      |
-| -------- | ---------------------------------------------------------------- |
-| `apply`  | Apply the local settings files to GitHub                         |
-| `backup` | Save the current values on GitHub to the local `bk/` directories |
+| Command  | Description                                                            |
+| -------- | ---------------------------------------------------------------------- |
+| `apply`  | Apply the local settings files to GitHub                               |
+| `backup` | Re-snapshot the local settings files from the current values on GitHub |
 
 | Target          | Files                                             | `apply` | `backup` |
 | --------------- | ------------------------------------------------- | ------- | -------- |
 | `all` (default) | All of the below                                  | ✅      | ✅       |
 | `repository`    | `repo-settings/repository-settings/settings.json` | ✅      | ✅       |
 | `rulesets`      | `repo-settings/rulesets/*.json`                   | ✅      | ✅       |
-| `variables`     | Repository variables                              | ✅      | —        |
+| `variables`     | `repo-settings/variables/settings.json`           | ✅      | ✅       |
 | `actions`       | `repo-settings/actions-settings/settings.json`    | ✅      | ✅       |
 | `pages`         | `repo-settings/pages/settings.json`               | ✅      | ✅       |
 
@@ -42,10 +42,11 @@ repo-settings backup
 repo-settings apply --owner noshiro-pf --repo ts-repo-utils
 ```
 
-Each `backup` is written to a `bk/` directory next to the settings file it
-mirrors (for example `repo-settings/rulesets/bk/`). `apply` reads the values
-back from GitHub afterwards and rewrites the local files with what was actually
-applied.
+`backup` rewrites the settings files themselves from what GitHub currently
+has — there is one copy of each resource, not a declaration and a mirror of it.
+`apply` reads the values back from GitHub afterwards and rewrites the files
+with what was actually applied, so a value GitHub canonicalized or refused
+shows up as a diff.
 
 ## Resolving the target repository
 
@@ -76,12 +77,13 @@ under `permissions:`).
 
 ## Managed settings
 
-| File                                              | Location on GitHub                      |
-| ------------------------------------------------- | --------------------------------------- |
-| `repo-settings/repository-settings/settings.json` | Settings > General                      |
-| `repo-settings/rulesets/*.json`                   | Settings > Rules > Rulesets             |
-| `repo-settings/actions-settings/settings.json`    | Settings > Actions > General            |
-| `repo-settings/pages/settings.json`               | Settings > Pages > Build and deployment |
+| File                                              | Location on GitHub                                     |
+| ------------------------------------------------- | ------------------------------------------------------ |
+| `repo-settings/repository-settings/settings.json` | Settings > General                                     |
+| `repo-settings/rulesets/*.json`                   | Settings > Rules > Rulesets                            |
+| `repo-settings/actions-settings/settings.json`    | Settings > Actions > General                           |
+| `repo-settings/pages/settings.json`               | Settings > Pages > Build and deployment                |
+| `repo-settings/variables/settings.json`           | Settings > Secrets and variables > Actions > Variables |
 
 In a repository without `repo-settings/pages/settings.json`, Pages is left
 untouched, so that a repository that does not use Pages never has it enabled by

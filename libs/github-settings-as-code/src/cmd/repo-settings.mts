@@ -13,13 +13,13 @@ const HELP = dedent`
 
   Commands:
     apply [target]     ローカルの設定ファイルを GitHub に反映する
-    backup [target]    GitHub の現在値をローカルの bk/ に保存する
+    backup [target]    GitHub の現在値でローカルの設定ファイルを撮り直す
 
   Targets:
     all                すべて（既定）
     repository         repo-settings/repository-settings/settings.json
     rulesets           repo-settings/rulesets/*.json
-    variables          repository variables （ apply のみ ）
+    variables          repo-settings/variables/settings.json
     actions            repo-settings/actions-settings/settings.json
     pages              repo-settings/pages/settings.json
     environments       repo-settings/environments/*.json
@@ -156,9 +156,12 @@ const runners: ReadonlyRecord<
       await github.backupEnvironments();
 
       await github.backupVulnerabilityAlerts();
+
+      await github.backupVariables();
     },
     repository: github.backupRepositorySettings,
     rulesets: github.backupRulesets,
+    variables: github.backupVariables,
     actions: github.backupActionsSettings,
     pages: github.backupPagesSettings,
     environments: github.backupEnvironments,
