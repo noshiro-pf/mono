@@ -508,7 +508,7 @@
     // Not an Astro site like the entry above assumes either: a Chrome extension
     // with one entry point, the content script the manifest names. `src/index.mts`
     // is reached from the tests rather than being an entry of its own.
-    "apps/github-diff-defaults-extension": {
+    "apps/github-view-defaults-extension": {
       "entry": [
         "src/content.mts",
         "configs/*.mts",

@@ -1,21 +1,23 @@
 import {
   allBranchesSegment,
   diffViewDefaults,
-  isSettledUrl,
+  isSettledLink,
   managedPagePathOf,
-  preferredUrlOf,
+  overviewParam,
+  preferredUrlOfLink,
+  preferredUrlOfPage,
 } from '../src/index.mjs';
 
 const pageOrigin = 'https://github.com';
 
 /**
- * Where the visit came from, for the cases in which it makes no difference.
+ * A page that holds a link, for the cases where which page makes no
+ * difference.
  *
  * Only the branches rule reads it, and only on the overview; every diff case
- * below answers the same whatever is passed here. `''` is what
- * `document.referrer` says on a typed URL or a bookmark.
+ * below answers the same whatever is passed here.
  */
-const noReferrer = '';
+const somePage = `${pageOrigin}/noshiro-pf/mono` as const;
 
 describe('preferredUrlOf, on a pull request diff', () => {
   describe('the pages it acts on', () => {
@@ -35,7 +37,7 @@ describe('preferredUrlOf, on a pull request diff', () => {
       ],
     ])('adds both defaults to %s', (_name, href) => {
       assert.deepStrictEqual(
-        preferredUrlOf(href, pageOrigin, noReferrer),
+        preferredUrlOfPage(href, pageOrigin),
         `${href}?w=1&show-viewed-files=false`,
       );
     });
@@ -56,20 +58,16 @@ describe('preferredUrlOf, on a pull request diff', () => {
         `${pageOrigin}/noshiro-pf/mono/pull/1938/filestore`,
       ],
     ])('leaves %s alone', (_name, href) => {
-      assert.deepStrictEqual(
-        preferredUrlOf(href, pageOrigin, noReferrer),
-        undefined,
-      );
+      assert.deepStrictEqual(preferredUrlOfPage(href, pageOrigin), undefined);
     });
 
     test('leaves another origin alone, however the path reads', () => {
       // A link inside a comment body can point anywhere, and a path that looks
       // like GitHub's is not GitHub's.
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           'https://example.com/noshiro-pf/mono/pull/1938/files',
           pageOrigin,
-          noReferrer,
         ),
         undefined,
       );
@@ -77,7 +75,7 @@ describe('preferredUrlOf, on a pull request diff', () => {
 
     test('leaves an href the URL parser rejects alone', () => {
       assert.deepStrictEqual(
-        preferredUrlOf('#diff-abc', pageOrigin, noReferrer),
+        preferredUrlOfPage('#diff-abc', pageOrigin),
         undefined,
       );
     });
@@ -86,10 +84,9 @@ describe('preferredUrlOf, on a pull request diff', () => {
   describe('what it does to the query it finds', () => {
     test('adds nothing when both defaults are already there', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           `${pageOrigin}/noshiro-pf/mono/pull/1938/files?w=1&show-viewed-files=false`,
           pageOrigin,
-          noReferrer,
         ),
         undefined,
       );
@@ -100,10 +97,9 @@ describe('preferredUrlOf, on a pull request diff', () => {
       // navigates to `w=0`, and forcing it back to `w=1` would leave no way to
       // look at what the extension hides.
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           `${pageOrigin}/noshiro-pf/mono/pull/1938/files?w=0`,
           pageOrigin,
-          noReferrer,
         ),
         `${pageOrigin}/noshiro-pf/mono/pull/1938/files?w=0&show-viewed-files=false`,
       );
@@ -111,10 +107,9 @@ describe('preferredUrlOf, on a pull request diff', () => {
 
     test('adds only the one that is missing', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           `${pageOrigin}/noshiro-pf/mono/pull/1938/files?show-viewed-files=true`,
           pageOrigin,
-          noReferrer,
         ),
         `${pageOrigin}/noshiro-pf/mono/pull/1938/files?show-viewed-files=true&w=1`,
       );
@@ -124,10 +119,9 @@ describe('preferredUrlOf, on a pull request diff', () => {
       // Appended rather than re-serialized, so an escape GitHub wrote survives:
       // `URLSearchParams` would turn the `%20` into a `+`.
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           `${pageOrigin}/noshiro-pf/mono/pull/1938/files?diff=split&q=a%20b`,
           pageOrigin,
-          noReferrer,
         ),
         `${pageOrigin}/noshiro-pf/mono/pull/1938/files?diff=split&q=a%20b&w=1&show-viewed-files=false`,
       );
@@ -135,28 +129,23 @@ describe('preferredUrlOf, on a pull request diff', () => {
 
     test('keeps the fragment, which is how a file is linked to', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           `${pageOrigin}/noshiro-pf/mono/pull/1938/files#diff-abc123`,
           pageOrigin,
-          noReferrer,
         ),
         `${pageOrigin}/noshiro-pf/mono/pull/1938/files?w=1&show-viewed-files=false#diff-abc123`,
       );
     });
 
     test('is idempotent: what it returns needs nothing further', () => {
-      const once = preferredUrlOf(
+      const once = preferredUrlOfPage(
         `${pageOrigin}/noshiro-pf/mono/pull/1938/files`,
         pageOrigin,
-        noReferrer,
       );
 
       assert.isDefined(once);
 
-      assert.deepStrictEqual(
-        preferredUrlOf(once, pageOrigin, noReferrer),
-        undefined,
-      );
+      assert.deepStrictEqual(preferredUrlOfPage(once, pageOrigin), undefined);
     });
   });
 });
@@ -215,7 +204,7 @@ describe('diffViewDefaults', () => {
   });
 });
 
-describe('isSettledUrl', () => {
+describe('isSettledLink', () => {
   test.each([
     [
       true,
@@ -248,19 +237,25 @@ describe('isSettledUrl', () => {
       'a branch list that is already a named one',
       `${pageOrigin}/noshiro-pf/mono/branches/all`,
     ],
-    [false, 'the branch overview', `${pageOrigin}/noshiro-pf/mono/branches`],
+    [
+      true,
+      'the branch overview carrying the overview parameter',
+      `${pageOrigin}/noshiro-pf/mono/branches?overview=1`,
+    ],
+    [
+      false,
+      'the bare branch overview',
+      `${pageOrigin}/noshiro-pf/mono/branches`,
+    ],
   ])('is %s for %s', (expected, _name, href) => {
-    assert.deepStrictEqual(
-      isSettledUrl(href, pageOrigin, noReferrer),
-      expected,
-    );
+    assert.deepStrictEqual(isSettledLink(href, pageOrigin, somePage), expected);
   });
 
-  test('is true for the branch overview reached from another of its tabs', () => {
-    // Which is what tells the click handler to leave that link to the browser
-    // rather than treating it as one to rewrite.
-    assert.isTrue(
-      isSettledUrl(
+  test('is false for the bare overview even in the branches page tab bar', () => {
+    // There it is the "Overview" tab, which the rule marks rather than
+    // redirects — so it is a link with something still to be done to it.
+    assert.isFalse(
+      isSettledLink(
         `${pageOrigin}/noshiro-pf/mono/branches`,
         pageOrigin,
         `${pageOrigin}/noshiro-pf/mono/branches/all`,
@@ -269,7 +264,7 @@ describe('isSettledUrl', () => {
   });
 });
 
-describe('preferredUrlOf, on a repository branches page', () => {
+describe('preferredUrlOfPage, on a repository branches page', () => {
   const overview = `${pageOrigin}/noshiro-pf/mono/branches` as const;
 
   describe('the pages it acts on', () => {
@@ -282,7 +277,7 @@ describe('preferredUrlOf, on a repository branches page', () => {
       ],
     ])('sends %s to the full list', (_name, href) => {
       assert.deepStrictEqual(
-        preferredUrlOf(href, pageOrigin, noReferrer),
+        preferredUrlOfPage(href, pageOrigin),
         `${href.replace(/\/$/u, '')}/all`,
       );
     });
@@ -300,56 +295,52 @@ describe('preferredUrlOf, on a repository branches page', () => {
         `${pageOrigin}/noshiro-pf/mono/branchesets`,
       ],
     ])('leaves %s alone', (_name, href) => {
-      assert.deepStrictEqual(
-        preferredUrlOf(href, pageOrigin, noReferrer),
-        undefined,
-      );
+      assert.deepStrictEqual(preferredUrlOfPage(href, pageOrigin), undefined);
     });
 
     test('leaves another origin alone, however the path reads', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(
+        preferredUrlOfPage(
           'https://example.com/noshiro-pf/mono/branches',
           pageOrigin,
-          noReferrer,
         ),
         undefined,
       );
     });
   });
 
-  describe('where the visit came from', () => {
-    test.each([
-      ['the full list', `${overview}/all`],
-      ['another tab of the same page', `${overview}/yours`],
-      ['the overview of the same repository', overview],
-    ])(
-      'leaves the overview alone when it was reached from %s',
-      (_name, from) => {
-        // This is the opt-out. The "Overview" tab of the branches page points at
-        // the very URL this rule redirects, so a rule that acted on it whatever
-        // the referrer said would make that tab unreachable.
-        assert.deepStrictEqual(
-          preferredUrlOf(overview, pageOrigin, from),
-          undefined,
-        );
-      },
-    );
-
-    test.each([
-      ['the repository root', `${pageOrigin}/noshiro-pf/mono`],
-      [
-        'the branches page of a different repository',
-        `${pageOrigin}/noshiro-pf/other/branches`,
-      ],
-      ['a pull request', `${pageOrigin}/noshiro-pf/mono/pull/1938`],
-      ['another origin', 'https://example.com/noshiro-pf/mono/branches'],
-      ['nowhere — a typed URL or a bookmark', noReferrer],
-      ['an address the URL parser rejects', 'not a url'],
-    ])('acts on the overview reached from %s', (_name, from) => {
+  describe('the overview parameter', () => {
+    test('leaves the overview alone when the address asks for it', () => {
+      // This is the opt-out, and it is in the address rather than in how the
+      // address was reached — which is what makes a reload, a bookmark and the
+      // click that wrote it answer the same.
       assert.deepStrictEqual(
-        preferredUrlOf(overview, pageOrigin, from),
-        `${overview}/all`,
+        preferredUrlOfPage(`${overview}?overview=1`, pageOrigin),
+        undefined,
+      );
+    });
+
+    test('reads the parameter by name, whatever its value', () => {
+      // The value is what this extension writes, not what it checks: the
+      // question the address answers is whether the parameter is there at all,
+      // the same way the diff rule reads `w`.
+      assert.deepStrictEqual(
+        preferredUrlOfPage(`${overview}?overview=0`, pageOrigin),
+        undefined,
+      );
+    });
+
+    test('is not confused by a parameter that only starts the same', () => {
+      assert.deepStrictEqual(
+        preferredUrlOfPage(`${overview}?overviewing=1`, pageOrigin),
+        `${overview}/all?overviewing=1`,
+      );
+    });
+
+    test('does not act on a named list that carries it', () => {
+      assert.deepStrictEqual(
+        preferredUrlOfPage(`${overview}/all?overview=1`, pageOrigin),
+        undefined,
       );
     });
   });
@@ -357,27 +348,24 @@ describe('preferredUrlOf, on a repository branches page', () => {
   describe('what it does to the rest of the address', () => {
     test('keeps the query, which is where the branch search goes', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(`${overview}?query=release%2F1`, pageOrigin, noReferrer),
+        preferredUrlOfPage(`${overview}?query=release%2F1`, pageOrigin),
         `${overview}/all?query=release%2F1`,
       );
     });
 
     test('keeps the fragment', () => {
       assert.deepStrictEqual(
-        preferredUrlOf(`${overview}#top`, pageOrigin, noReferrer),
+        preferredUrlOfPage(`${overview}#top`, pageOrigin),
         `${overview}/all#top`,
       );
     });
 
     test('is idempotent: what it returns needs nothing further', () => {
-      const once = preferredUrlOf(overview, pageOrigin, noReferrer);
+      const once = preferredUrlOfPage(overview, pageOrigin);
 
       assert.isDefined(once);
 
-      assert.deepStrictEqual(
-        preferredUrlOf(once, pageOrigin, noReferrer),
-        undefined,
-      );
+      assert.deepStrictEqual(preferredUrlOfPage(once, pageOrigin), undefined);
     });
   });
 
@@ -392,11 +380,74 @@ describe('preferredUrlOf, on a repository branches page', () => {
   });
 });
 
-describe('allBranchesSegment', () => {
-  test('is the tab the overview is opened as', () => {
-    // Pinned rather than left implicit: with `diffViewDefaults` above, this is
-    // the whole of what the extension does, and the README, the store
-    // description and the manifest all describe it.
-    assert.deepStrictEqual(allBranchesSegment, 'all');
+describe('preferredUrlOfLink, on a link to the branch overview', () => {
+  const overview = `${pageOrigin}/noshiro-pf/mono/branches` as const;
+
+  test.each([
+    ['the full list', `${overview}/all`],
+    ['another tab of the same page', `${overview}/yours`],
+    ['the overview itself', overview],
+    ['the overview carrying the parameter', `${overview}?overview=1`],
+  ])('marks it as the overview when the link sits on %s', (_name, pageHref) => {
+    // The "Overview" tab points at the very URL the rule redirects, so the tab
+    // is marked rather than left alone: the mark is what survives the
+    // navigation, and the reload after it.
+    assert.deepStrictEqual(
+      preferredUrlOfLink(overview, pageOrigin, pageHref),
+      `${overview}?overview=1`,
+    );
+  });
+
+  test.each([
+    ['the repository root', `${pageOrigin}/noshiro-pf/mono`],
+    [
+      'the branches page of a different repository',
+      `${pageOrigin}/noshiro-pf/other/branches`,
+    ],
+    ['a pull request', `${pageOrigin}/noshiro-pf/mono/pull/1938`],
+    ['another origin', 'https://example.com/noshiro-pf/mono/branches'],
+    ['an address the URL parser rejects', 'not a url'],
+  ])(
+    'sends it to the full list when the link sits on %s',
+    (_name, pageHref) => {
+      assert.deepStrictEqual(
+        preferredUrlOfLink(overview, pageOrigin, pageHref),
+        `${overview}/all`,
+      );
+    },
+  );
+
+  test('keeps the query when it marks one', () => {
+    assert.deepStrictEqual(
+      preferredUrlOfLink(
+        `${overview}?query=release`,
+        pageOrigin,
+        `${overview}/all`,
+      ),
+      `${overview}?query=release&overview=1`,
+    );
+  });
+
+  test('is idempotent: a marked link needs nothing further', () => {
+    const once = preferredUrlOfLink(overview, pageOrigin, `${overview}/all`);
+
+    assert.isDefined(once);
+
+    assert.deepStrictEqual(
+      preferredUrlOfLink(once, pageOrigin, `${overview}/all`),
+      undefined,
+    );
+  });
+});
+
+describe('allBranchesSegment and overviewParam', () => {
+  test('are what the extension writes', () => {
+    // Pinned rather than left implicit: with `diffViewDefaults` above, these
+    // are the whole of what the extension does, and the README, the store
+    // description and the manifest all describe them.
+    assert.deepStrictEqual(
+      [allBranchesSegment, overviewParam],
+      ['all', ['overview', '1']],
+    );
   });
 });

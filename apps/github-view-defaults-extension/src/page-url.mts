@@ -13,7 +13,8 @@ import { Arr } from 'ts-data-forge';
  *   the files already marked as viewed collapsed, by putting GitHub's own query
  *   parameters on the address;
  * - **a repository's branch overview** is opened as the full branch list, by
- *   going to `/branches/all` instead.
+ *   going to `/branches/all` instead, unless the address says the overview is
+ *   what was asked for.
  *
  * They are one table rather than two exported functions because the caller has
  * no way to tell which page it is looking at — and should not have to.
@@ -41,64 +42,86 @@ export const diffViewDefaults = [
 export const allBranchesSegment = 'all';
 
 /**
- * The same URL as the extension would rather have it, or `undefined` when there
- * is nothing to do — it is not a page these rules speak for, or it already says
- * what it wants.
+ * The parameter that says the branch overview is what was asked for.
  *
- * **Nothing the address already states is overruled.** That is the whole of the
- * opt-out, and it takes a different shape in each rule: for a diff, a parameter
- * that is already there is left as it is, because GitHub's own "Show whitespace
- * changes" and "Toggle viewed files" controls navigate to the same page with
- * `w=0` or `show-viewed-files=true` on it; for the branches page, the overview
- * is left alone when it was reached from another tab of the same repository's
- * branches page, because that is somebody clicking the "Overview" tab of the
- * very page this rule redirects to. A rule that forced its answer back in
- * either case would leave no way to look at what it hides.
+ * The overview tab points at the very URL the branches rule redirects, so the
+ * rule needs a way to be told "this one, deliberately" — and the address is the
+ * only place that answer survives what the user does next. It was
+ * `document.referrer` at first, which is true of how the page was reached and
+ * is not part of the page: a reload of the overview kept the referrer of the
+ * click before it, so the rule read the reload as that click and left the
+ * address alone, while a bookmark of the same address went to the list. The
+ * address cannot disagree with itself that way, and it is the same opt-out the
+ * diff rule has — what is already written is not overruled.
+ *
+ * It is not one of GitHub's own parameters, which GitHub ignores, and it says
+ * in the address bar what it means.
+ */
+export const overviewParam = ['overview', '1'] as const satisfies readonly [
+  string,
+  string,
+];
+
+/**
+ * How this page should have been opened, or `undefined` when it is already
+ * right — it is not a page these rules speak for, or the address says what it
+ * wants.
+ *
+ * **Nothing the address already states is overruled**, which is the whole of
+ * the opt-out in both rules: a diff keeps a `w` or `show-viewed-files` its
+ * address already carries, because that is GitHub's own "Show whitespace
+ * changes" and "Toggle viewed files" controls writing to it, and the branch
+ * overview keeps the overview when its address carries `overviewParam`. A rule
+ * that forced its answer back would leave no way to look at what it hides.
+ *
+ * **It reads the address and nothing else**, so it answers the same for a link
+ * followed, an address typed, a bookmark opened and a page reloaded. That is
+ * the point: what is being asked is a property of the address, and an answer
+ * drawn from how the address was reached is one the next reload can change.
  *
  * `pageOrigin` is passed in rather than read from `location`, because the
  * caller asks this about other pages' links too: an anchor inside a comment
  * body can point at a path that matches while belonging to some other host.
- *
- * `cameFrom` is where the visit would be coming from — the referrer for the
- * page the script landed on, the address the observer last saw for a
- * client-side navigation, and the current page for a link that has not been
- * clicked yet. It is `''` when there is none, which is what `document.referrer`
- * says on a typed URL or a bookmark.
  */
-export const preferredUrlOf = (
+export const preferredUrlOfPage = (
   href: string,
   pageOrigin: string,
-  cameFrom: string,
-): string | undefined => {
-  const page = managedPageOf(href, pageOrigin);
-
-  if (page === undefined) {
-    return undefined;
-  }
-
-  return page.rule.preferredUrl(page.url, parseUrl(cameFrom));
-};
+): string | undefined => preferredUrl(href, pageOrigin, undefined);
 
 /**
- * Whether `href` is a page these rules speak for that needs nothing — either
- * because the extension has already given it what it wanted, or because it
- * arrived carrying it.
+ * What a link on the page at `pageHref` should point at, or `undefined` when it
+ * already points there.
+ *
+ * The page holding the link is what separates the two `/branches` links a
+ * branches page carries: the one in its own tab bar is the "Overview" tab and
+ * is given `overviewParam`, and the same href anywhere else — the repository's
+ * navigation, a comment — is somebody asking for the branches and is sent to
+ * the full list. Only the branches rule reads it.
+ *
+ * This is a question about a link, not about a page: it is asked of an anchor
+ * that has not been clicked, and `pageHref` is where that anchor sits.
+ */
+export const preferredUrlOfLink = (
+  href: string,
+  pageOrigin: string,
+  pageHref: string,
+): string | undefined => preferredUrl(href, pageOrigin, parseUrl(pageHref));
+
+/**
+ * Whether a link on the page at `pageHref` needs nothing — either because the
+ * extension has already given it what it wanted, or because it arrived carrying
+ * it.
  *
  * This is what the click handler asks. See `content.mts` for why a click on
  * such a link is left to the browser.
  */
-export const isSettledUrl = (
+export const isSettledLink = (
   href: string,
   pageOrigin: string,
-  cameFrom: string,
-): boolean => {
-  const page = managedPageOf(href, pageOrigin);
-
-  return (
-    page !== undefined &&
-    page.rule.preferredUrl(page.url, parseUrl(cameFrom)) === undefined
-  );
-};
+  pageHref: string,
+): boolean =>
+  preferredUrlOfLink(href, pageOrigin, pageHref) === undefined &&
+  managedPagePathOf(href, pageOrigin) !== undefined;
 
 /**
  * Which page `href` is, or `undefined` when it is not one these rules speak
@@ -114,6 +137,20 @@ export const managedPagePathOf = (
   href: string,
   pageOrigin: string,
 ): string | undefined => managedPageOf(href, pageOrigin)?.url.pathname;
+
+/**
+ * The one place a rule is asked anything; the two exported questions differ
+ * only in what they know about where the address was read.
+ */
+const preferredUrl = (
+  href: string,
+  pageOrigin: string,
+  readFrom: PageUrl | undefined,
+): string | undefined => {
+  const page = managedPageOf(href, pageOrigin);
+
+  return page?.rule.preferredUrl(page.url, readFrom);
+};
 
 /**
  * The parts of an address a rule is allowed to look at.
@@ -135,13 +172,15 @@ type PageRule = Readonly<{
   path: RegExp;
 
   /**
-   * The address this page should have been opened with, or `undefined` when it
-   * is already right. `cameFrom` is `undefined` when there is no referrer, or
-   * when it is not an address the URL parser accepts.
+   * What the address should be, or `undefined` when it is already right.
+   *
+   * `readFrom` is the page an anchor carrying this address sits on, and
+   * `undefined` when the question is about a page rather than a link, and also
+   * for a `pageHref` the URL parser rejects.
    */
   preferredUrl: (
     url: PageUrl,
-    cameFrom: PageUrl | undefined,
+    readFrom: PageUrl | undefined,
   ) => string | undefined;
 }>;
 
@@ -210,9 +249,20 @@ const pageRules: readonly PageRule[] = [
   {
     path: branchesPath,
 
-    preferredUrl: (url, cameFrom) => {
+    preferredUrl: (url, readFrom) => {
       if (!branchesOverviewPath.test(url.pathname)) {
         // Already one of the named lists. Whichever it is, it was asked for.
+        return undefined;
+      }
+
+      const [overviewKey] = overviewParam;
+
+      const params = new URLSearchParams(url.search);
+
+      if (params.has(overviewKey)) {
+        // The address says the overview is what was wanted, and an address is
+        // not overruled. This is what a reload and a bookmark of the overview
+        // read, as well as the click that wrote it.
         return undefined;
       }
 
@@ -221,15 +271,17 @@ const pageRules: readonly PageRule[] = [
       // shares and the path the tab is appended to.
       const branches = url.pathname.replace(/\/$/u, '');
 
-      if (isTabOfSameBranchesPage(cameFrom, url.origin, branches)) {
-        // The overview reached from another tab of *this repository's* branches
-        // page is the "Overview" tab being clicked, which is the one thing this
-        // rule must not undo. Coming from anywhere else — the repository's own
-        // navigation, another repository, a bookmark, a typed URL — is somebody
-        // asking for the branches, and the full list is what that means.
-        return undefined;
+      if (isTabOfSameBranchesPage(readFrom, url.origin, branches)) {
+        // An anchor to the overview, sitting on that very page: the "Overview"
+        // tab, which is the one link this rule must not send to the list.
+        // Marking it is what carries the request into the next document, where
+        // the address is all that is left of it.
+        return `${url.origin}${branches}${searchWith(url.search, overviewParam)}${url.hash}`;
       }
 
+      // Anywhere else — the repository's own navigation, a comment, or the page
+      // itself rather than a link on one — the branches are what was asked for.
+      //
       // The query is carried over because the branches page puts its search
       // there: `?query=release` on the overview means the same thing on the
       // list, and dropping it would throw away what was typed.
@@ -262,28 +314,27 @@ const managedPageOf = (
 };
 
 /**
- * Whether the address a visit came from is another tab of the same
- * repository's branches page — where `branches` is that page's
- * `/{owner}/{repo}/branches` path.
+ * Whether `readFrom` is a tab of the same repository's branches page — where
+ * `branches` is that page's `/{owner}/{repo}/branches` path.
  *
  * Written with an early return rather than as one expression, because
- * `cameFrom !== undefined && cameFrom.origin === …` is the shape the lint rules
+ * `readFrom !== undefined && readFrom.origin === …` is the shape the lint rules
  * ask to be an optional chain, and an optional chain does not narrow the rest
  * of the condition.
  */
 const isTabOfSameBranchesPage = (
-  cameFrom: PageUrl | undefined,
+  readFrom: PageUrl | undefined,
   pageOrigin: string,
   branches: string,
 ): boolean => {
-  if (cameFrom === undefined) {
+  if (readFrom === undefined) {
     return false;
   }
 
   return (
-    cameFrom.origin === pageOrigin &&
-    (cameFrom.pathname === branches ||
-      cameFrom.pathname.startsWith(`${branches}/`))
+    readFrom.origin === pageOrigin &&
+    (readFrom.pathname === branches ||
+      readFrom.pathname.startsWith(`${branches}/`))
   );
 };
 
@@ -307,6 +358,24 @@ const parseUrl = (href: string): PageUrl | undefined => {
   } catch {
     return undefined;
   }
+};
+
+/**
+ * A query string with one more parameter on it.
+ *
+ * Appended to the query as it stands for the same reason the diff rule appends
+ * its own: re-serializing through `URLSearchParams` would rewrite escapes
+ * GitHub wrote, turning a `%20` into a `+`.
+ */
+const searchWith = (
+  search: string,
+  [key, value]: readonly [string, string],
+): string => {
+  const params = new URLSearchParams([[key, value]]);
+
+  const added = params.toString();
+
+  return search === '' ? `?${added}` : `${search}&${added}`;
 };
 
 /** Which of the defaults a query string does not already speak for. */

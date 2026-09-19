@@ -212,8 +212,8 @@ rollup.config-*.mjs
 # manifest `key`, which the store refuses.
 apps/split-view-extension/pack/
 
-# The same, from apps/github-diff-defaults-extension.
-apps/github-diff-defaults-extension/pack/
+# The same, from apps/github-view-defaults-extension.
+apps/github-view-defaults-extension/pack/
 
 verify-npm-packages/.tarballs/
 verify-npm-packages/*/packages/*/node_modules/

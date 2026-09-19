@@ -68,7 +68,7 @@ export const packPath = path.resolve(workspaceRootPath, 'pack');
 export const stagingPath = path.resolve(packPath, 'unpacked');
 
 /** What the packaged files are named after, version aside. */
-export const packageName = 'github-diff-defaults-extension';
+export const packageName = 'github-view-defaults-extension';
 
 const assertBuildIsPresent = (): void => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename

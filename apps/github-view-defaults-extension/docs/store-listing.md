@@ -4,7 +4,7 @@ Copy for the dashboard, kept here so that what was submitted is written down
 and the next version can be edited rather than rewritten. Field limits are the
 store's.
 
-Upload `pack/github-diff-defaults-extension-<version>.zip` from
+Upload `pack/github-view-defaults-extension-<version>.zip` from
 `pnpm run pack` — not `dist/`, which carries the source maps. Once **verified
 CRX upload** is turned on for the item, a zip is refused and
 `pnpm run pack:crx` is what to upload instead: the same package, signed by
@@ -16,7 +16,7 @@ Chrome with the key registered on the account, which the script takes out of
 **Name** (45 characters)
 
 ```text
-GitHub Diff Defaults
+GitHub View Defaults
 ```
 
 **Summary** (132 characters)
@@ -45,8 +45,10 @@ the ordinary GitHub page, opened the way you would have set it up by hand.
   at all.
 • It gets out of the way. What the address already says is never overruled — so
   GitHub's own controls still work, a link somebody shared with the whitespace
-  shown keeps showing it, and the branches page's "Overview" tab still reaches
-  the overview.
+  shown keeps showing it, and the branches page's own "Overview" tab still
+  reaches the overview and stays there when you reload it.
+• The address is the whole of it. What you get depends on the address you open
+  and nothing else, so a link, a typed URL, a bookmark and a reload all agree.
 • Two kinds of page, and no others. Pull request diffs and the branch overview.
   Commit pages, comparisons and the rest of GitHub are untouched.
 • Nothing is collected, stored or sent. No account, no analytics, no server, no
@@ -81,10 +83,9 @@ one thing to justify is the content script.
 The extension's only job is to send two kinds of GitHub URL to the view they
 would otherwise have to be clicked into. Deciding whether the current page is
 such a URL, and rewriting the links on the page that point at one, has to
-happen in the page. The script reads the page's address, the address it was
-reached from, and the href of its links, and nothing else — no page content, no
-form fields, no cookies, no storage. It is declared for github.com alone and
-runs nowhere else.
+happen in the page. The script reads the page's address and the href of its
+links, and nothing else — no page content, no form fields, no cookies, no
+storage. It is declared for github.com alone and runs nowhere else.
 ```
 
 **Remote code**: No. The one script in the package is in the package; nothing
@@ -105,7 +106,7 @@ creditworthiness.
 user data, and answering "none" is still an answer it wants a policy for.
 Point it at
 [`privacy-policy.md`](./privacy-policy.md) as rendered on GitHub:
-<https://github.com/noshiro-pf/mono/blob/main/apps/github-diff-defaults-extension/docs/privacy-policy.md>
+<https://github.com/noshiro-pf/mono/blob/main/apps/github-view-defaults-extension/docs/privacy-policy.md>
 
 ## Screenshots
 

@@ -8,9 +8,9 @@ import { distPath } from './store-package.mjs';
 /**
  * Loads the built extension into a real Chromium and checks the things nothing
  * else can check: that the redirect happens, that the links are rewritten, that
- * a click on one goes where the link says, that the referrer the branches rule
- * reads is the one the browser actually sends — and that none of it happens
- * twice.
+ * a click on one goes where the link says, that a reload answers what the
+ * address says rather than what the click before it said — and that none of it
+ * happens twice.
  *
  * **It never touches github.com.** Every request to that origin is fulfilled
  * from a fixture here, which is what makes this deterministic, and is also what
@@ -36,7 +36,7 @@ const main = async (): Promise<void> => {
   assertBuildIsPresent();
 
   const userDataDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'github-diff-defaults-smoke-'),
+    path.join(os.tmpdir(), 'github-view-defaults-smoke-'),
   );
 
   const context = await chromium.launchPersistentContext(userDataDir, {
@@ -223,21 +223,47 @@ const main = async (): Promise<void> => {
     await visit(`${origin}/noshiro-pf/mono/branches/all`);
 
     check(
-      'the same link on the branches page is not',
+      'the same link in the branches tab bar is marked instead',
       await hrefOf('#branches-tab'),
-      '/noshiro-pf/mono/branches',
+      `${origin}/noshiro-pf/mono/branches?overview=1`,
     );
 
-    // The opt-out, and the one thing a unit test cannot show: the "Overview"
-    // tab points at the very URL the redirect acts on, so the redirect has to
-    // read the referrer to leave it alone. Landing back on `/branches` and
-    // staying there is what says it did.
+    // The opt-out. The "Overview" tab points at the very URL the redirect acts
+    // on, so the tab carries a mark that says the overview is what was asked
+    // for — and landing on it is the redirect reading that mark.
     await page.locator('#branches-tab').click();
 
     check(
       'and clicking it reaches the overview, without being sent back',
       await settle(),
-      `${origin}/noshiro-pf/mono/branches`,
+      `${origin}/noshiro-pf/mono/branches?overview=1`,
+    );
+
+    // What the mark buys over reading the referrer, and the thing neither a
+    // unit test nor the referrer could give: the address says what was wanted,
+    // so it goes on saying it. A referrer does not survive being bookmarked,
+    // and the one a reload carries is the click before it — measured: with the
+    // referrer, a reload of the overview stayed and a bookmark of it did not.
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+
+    check(
+      'reloading the overview keeps the overview',
+      await settle(),
+      `${origin}/noshiro-pf/mono/branches?overview=1`,
+    );
+
+    check(
+      'and the bare overview is the full list, however it was reached',
+      await visit(`${origin}/noshiro-pf/mono/branches`),
+      `${origin}/noshiro-pf/mono/branches/all`,
+    );
+
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+
+    check(
+      'which a reload does not undo either',
+      await settle(),
+      `${origin}/noshiro-pf/mono/branches/all`,
     );
 
     console.log('the address bar the site rewrites');
@@ -308,7 +334,8 @@ const fixtureFor = (url: string): string => {
     '<a id="offsite" href="https://example.com/noshiro-pf/mono/pull/1/files">elsewhere</a>',
     // Both spellings of the branches link, which is the same anchor in two
     // roles: the repository's own navigation on a page that is not the branches
-    // page, and the "Overview" tab on one that is.
+    // page, and the "Overview" tab on one that is. The two are rewritten
+    // differently, which is what the checks below read.
     '<a id="branches-tab" href="/noshiro-pf/mono/branches">Branches</a>',
     '<a id="branches-all-tab" href="/noshiro-pf/mono/branches/all">All branches</a>',
     '<div id="feed"></div>',
