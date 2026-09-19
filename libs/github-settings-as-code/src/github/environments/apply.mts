@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { environmentsDir } from '../constants.mjs';
+import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments, setEnvironment } from './api/index.mjs';
 import { backupEnvironments } from './backup.mjs';
 import { type EnvironmentSettings } from './constants.mjs';
@@ -37,9 +37,10 @@ export const applyEnvironments = async (): Promise<void> => {
     for (const environment of applied) {
       const str = JSON.stringify(environment, undefined, 2);
 
+      // `settingsFilePath` が `environmentsDir` の直下であることを確かめている。
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
-        path.resolve(environmentsDir, `${environment.name}.json`),
+        settingsFilePath(environmentsDir, environment.name),
         str,
       );
     }

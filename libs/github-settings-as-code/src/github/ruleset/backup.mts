@@ -9,6 +9,7 @@ import {
   makeEmptyDir,
 } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
+import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllRulesets, getRuleset } from './api/index.mjs';
 import { rulesetKeysToPick } from './constants.mjs';
 
@@ -22,9 +23,10 @@ export const backupRulesets = async (fmt: boolean = true): Promise<void> => {
   for (const rule of rulesetsResult) {
     const content = await getRuleset(rule.id);
 
+    // `settingsFilePath` が `backupDir` の直下であることを確かめている。
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      path.resolve(backupDir, `${rule.name}.json`),
+      settingsFilePath(backupDir, rule.name),
       JSON.stringify(Obj.pick(content, rulesetKeysToPick), undefined, 2),
     );
   }

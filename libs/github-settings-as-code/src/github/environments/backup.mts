@@ -8,6 +8,7 @@ import {
   makeEmptyDir,
 } from 'ts-repo-utils';
 import { environmentsDir } from '../constants.mjs';
+import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments } from './api/index.mjs';
 
 const backupDir = path.resolve(environmentsDir, './bk');
@@ -21,9 +22,10 @@ export const backupEnvironments = async (
   const environments = await getAllEnvironments();
 
   for (const environment of environments) {
+    // `settingsFilePath` が `backupDir` の直下であることを確かめている。
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      path.resolve(backupDir, `${environment.name}.json`),
+      settingsFilePath(backupDir, environment.name),
       JSON.stringify(environment, undefined, 2),
     );
   }
