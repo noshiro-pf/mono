@@ -19,6 +19,10 @@ ignorePaths:
   - apps/synstate-docs/public/**
   - apps/synstate-docs/assets/**
   - apps/synstate-docs/src/components/data-table-demo/sample-data.mts
+  # Repository variable values are opaque identifiers (App client ids), never
+  # prose, so every one of them would otherwise need its own `words` entry.
+  # The README beside them is prose and stays checked.
+  - 'repo-settings/variables/**/*.json'
   - '**/prior-art-research.md'
   - '**/prior-art-and-design-rationale.mdx'
   # --- mono-specific ---
