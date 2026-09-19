@@ -5,10 +5,7 @@ import { pathExists } from 'ts-repo-utils';
 import { benchmarkNumbers } from './benchmark-numbers.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
-const benchmarkSamplesDir = path.resolve(
-  workspaceRootPath,
-  '../../libs/synstate/samples/docs-site/benchmark',
-);
+const benchmarkResultsDir = path.resolve(workspaceRootPath, 'src/data');
 
 /** The pages carrying the result tables, and the numbers quoted around them. */
 const tablePages: readonly string[] = [
@@ -89,7 +86,7 @@ const embedOneTarget = async (
   targetMarkdownFile: string,
   { resultsFile, startMarker, endMarker }: EmbedTarget,
 ): Promise<string> => {
-  const resultsPath = path.resolve(benchmarkSamplesDir, resultsFile);
+  const resultsPath = path.resolve(benchmarkResultsDir, resultsFile);
 
   const exists = await pathExists(resultsPath);
 

@@ -38,9 +38,18 @@ import ConditionalFanOutChart from '../../../../../components/benchmark-chart/co
 | Valtio | 24.75 | 24.15 | 25.15 | 25.05 | 4,040,299 |
 {/* /benchmark-result */}
 
-:::note
-結果は https://github.com/noshiro-pf/mono/tree/main/libs/synstate の `pnpm --filter synstate run benchmark` で自動生成され、`pnpm --filter @synstate/docs run doc` で埋め込まれています。
-実際の数値はマシンやランタイム環境によって異なります。
+:::note[この数値の作られ方]
+`pnpm --filter @synstate/docs run benchmark` が全シナリオを計測し、その 1 回の計測からこのページの表・グラフ・文章をすべて書き換えます。コマンドは[ドキュメントパッケージ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs)にあり、各シナリオの結果ファイルには計測環境が記録されます。
+
+|          |                                                      |
+| :------- | :--------------------------------------------------- |
+| 実行環境 | {/* bench:environment/runner */}—{/* /bench */}      |
+| Node     | {/* bench:environment/node */}—{/* /bench */}        |
+| 計測日   | {/* bench:environment/measured-on */}—{/* /bench */} |
+
+計測環境は各シナリオの結果ファイルに記録され、上の 3 つの値はそこから読み出されています。ダッシュ（—）は、実行環境を固定する前に計測された表であることを意味します。
+
+絶対値のミリ秒は同一環境内でのみ比較できます。ここの数値とご自身で計測した数値が食い違う場合は、ミリ秒ではなくライブラリ間の比を見てください。
 :::
 
 :::caution[数値の読み方について]
@@ -580,7 +589,7 @@ SynState の `combine` は伝播順序が完全に解決されてから発行す
 ### 主な観察結果
 
 - **MobX** はこのシナリオで最も高速です。`computed(() => branches[selector.get()].get())` は実行時に `selector` と `branches[0]` のみを購読するため、`branches[1]` の observer リストは空です。`branches[1]` を更新しても通知先が存在せず、B に関係なく約 {/* bench:fan-out/mobx-typical */}2.6 ms{/* /bench */} で一定です。
-- **SynState** のコストは B に対して線形に増加します。`combine` が構築時に全分岐を購読するため、どの分岐が更新されても combine が発火します。グラフで線形な傾向が明確に見えます：B=2 で {/* bench:fan-out/synstate@min-b */}47.4 ms{/* /bench */}、B=1000 で {/* bench:fan-out/synstate@max-b */}3,069 ms{/* /bench */}（{/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} 回の更新にわたり、1分岐・1更新あたり約 {/* bench:fan-out/synstate-ns-per-branch-per-update */}31{/* /bench */} ns）。
+- **SynState** のコストは B に対して線形に増加します。`combine` が構築時に全分岐を購読するため、どの分岐が更新されても combine が発火します。グラフで線形な傾向が明確に見えます：B=2 で {/* bench:fan-out/synstate@min-b */}47.4 ms{/* /bench */}、B={/* bench:fan-out/synstate-last-measured-b */}1000{/* /bench */} で {/* bench:fan-out/synstate@last-measured-b */}3,069 ms{/* /bench */}（{/* bench:fan-out/updates-math */}$K = 100{,}000${/* /bench */} 回の更新にわたり、1分岐・1更新あたり約 {/* bench:fan-out/synstate-ns-per-branch-per-update */}31{/* /bench */} ns）。
 - **RxJS** は SynState と同じ静的な `combineLatest` アプローチです。コストは B に応じて増加しますが、SynState より緩やかです。`combineLatest` は等値比較による下流伝搬スキップを行わず常に発行するため、subscriber は毎回呼ばれますが処理は最小限（値の代入のみ）です。
 - **Jotai** は MobX と同じ動的購読を行います — `resultAtom` は非アクティブな分岐を購読していないため再計算はトリガーされません。しかし `store.set()` 自体が atom store 内で invalidation チェック等の管理処理を実行するため、B に関係なく約 {/* bench:fan-out/jotai-typical */}108 ms{/* /bench */} の一定オーバーヘッドが発生します。このため B≤{/* bench:fan-out/jotai-slower-through-b */}10{/* /bench */} では SynState より遅い結果です。
 

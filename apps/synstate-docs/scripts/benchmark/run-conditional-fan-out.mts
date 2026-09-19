@@ -29,8 +29,8 @@ import {
   type BenchmarkSeries,
   formatBenchmarkCell,
   writeBenchmarkResults,
-} from '../benchmark-results.mjs';
-import { workspaceRootPath } from '../workspace-root-path.mjs';
+} from './benchmark-results.mjs';
+import { resultsDir, scenarioDir } from './paths.mjs';
 
 const WARMUP_ROUNDS = 2;
 
@@ -59,11 +59,6 @@ const entries: readonly BenchmarkEntry[] = [
   { label: 'Jotai', file: '05-conditional-fan-out.jotai.mts' },
   { label: 'MobX', file: '05-conditional-fan-out.mobx.mts' },
 ] as const;
-
-const benchmarkDir = path.resolve(
-  workspaceRootPath,
-  'samples/docs-site/benchmark',
-);
 
 const median = (sorted: readonly number[]): number => {
   const mid = Math.floor(sorted.length / 2);
@@ -184,7 +179,7 @@ const mut_tableLines: string[] = [
 ];
 
 for (const entry of entries) {
-  const filePath = path.resolve(benchmarkDir, entry.file);
+  const filePath = path.resolve(scenarioDir, entry.file);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const mod: BenchmarkModule = await import(filePath);
@@ -203,7 +198,7 @@ const tableContent = mut_tableLines.join('\n');
 console.info(`\n${tableContent}`);
 
 await writeBenchmarkResults(
-  benchmarkDir,
+  resultsDir,
   'results-conditional-fan-out.md',
   tableContent,
   {

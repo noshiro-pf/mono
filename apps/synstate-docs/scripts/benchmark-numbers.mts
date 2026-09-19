@@ -1,11 +1,12 @@
-import { Num, Result } from 'ts-data-forge';
+import { Arr, Num, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
-/* eslint-disable import-x/no-relative-packages */
-import cascadedDiamondJson from '../../../libs/synstate/samples/docs-site/benchmark/results-cascaded-diamond.json' with { type: 'json' };
-import conditionalFanOutJson from '../../../libs/synstate/samples/docs-site/benchmark/results-conditional-fan-out.json' with { type: 'json' };
-import deepChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results-deep-chain.json' with { type: 'json' };
-import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark/results.json' with { type: 'json' };
-/* eslint-enable import-x/no-relative-packages */
+import {
+  cascadedDiamond as cascadedDiamondJson,
+  conditionalFanOut as conditionalFanOutJson,
+  deepChain as deepChainJson,
+  derivedChain as derivedChainJson,
+  diamond as diamondJson,
+} from '../src/data/index.mjs';
 
 /**
  * Every number the benchmark prose quotes, keyed by what it stands for.
@@ -41,6 +42,17 @@ import derivedChainJson from '../../../libs/synstate/samples/docs-site/benchmark
  */
 export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
   ({
+    // Where the numbers on this page were measured. Three bare facts rather
+    // than a sentence: a marker's value is written once and spliced into both
+    // language versions, so it must carry no English of its own.
+    'environment/runner': environmentFact((e) =>
+      e.runner === 'github-actions'
+        ? `GitHub Actions ${e.runnerImage ?? 'standard runner'}`
+        : e.cpu,
+    ),
+    'environment/node': environmentFact((e) => e.node),
+    'environment/measured-on': environmentFact((e) => e.measuredOn),
+
     // Scenario: Derived Chain / Diamond Dependency
     //
     // The first two are also the headline figures on the introduction and the
@@ -119,16 +131,38 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, string> =>
     'fan-out/synstate@min-b': ms(
       at(conditionalFanOut, 'SynState', FAN_OUT_MIN),
     ),
-    'fan-out/synstate@max-b': ms(
-      at(conditionalFanOut, 'SynState', FAN_OUT_MAX),
+    'fan-out/synstate-last-measured-b': param(fanOutLastLabel()).toString(),
+    'fan-out/synstate@last-measured-b': ms(
+      at(conditionalFanOut, 'SynState', fanOutLastLabel()),
     ),
     'fan-out/synstate-ns-per-branch-per-update': nsPerBranchPerUpdate(),
     'fan-out/jotai-slower-through-b': count(param(fanOutCrossoverLabel())),
   }) as const;
 
 /** One library's row in a sweep, and the constants the sweep ran under. */
+/**
+ * The environment a results file records, as this module needs to read it.
+ *
+ * Optional because the tables committed before the measurement moved to CI do
+ * not carry one — see {@link environmentFact}, which writes an em dash rather
+ * than inventing a machine.
+ */
+type RecordedEnvironment = Readonly<{
+  runner: string;
+  runnerImage: string | null;
+  node: string;
+  cpu: string;
+  measuredOn: string;
+}>;
+
+type ResultsMeta = Readonly<{
+  updates: number | null;
+  timeoutMs: number | null;
+  environment?: RecordedEnvironment;
+}>;
+
 type SeriesData = Readonly<{
-  meta: Readonly<{ updates: number | null; timeoutMs: number | null }>;
+  meta: ResultsMeta;
   xLabels: readonly string[];
   series: readonly Readonly<{
     label: string;
@@ -137,7 +171,7 @@ type SeriesData = Readonly<{
 }>;
 
 type StatsData = Readonly<{
-  meta: Readonly<{ updates: number | null; timeoutMs: number | null }>;
+  meta: ResultsMeta;
   rows: readonly Readonly<{ label: string; median: number }>[];
 }>;
 
@@ -162,6 +196,69 @@ const cascadedDiamond: SeriesData = cascadedDiamondJson;
 
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
 
+/**
+ * Every committed table, for the environment check alone.
+ *
+ * The diamond is here and nowhere else in this module: no sentence quotes a
+ * number from it any more, but it is a table on the page, so the environment
+ * it was measured in has to agree with the others' or the page's one-sentence
+ * description of where the numbers come from is false.
+ */
+const allResults: readonly (StatsData | SeriesData)[] = [
+  derivedChain,
+  diamondJson,
+  deepChain,
+  cascadedDiamond,
+  conditionalFanOut,
+] as const;
+
+/**
+ * One fact about where every table on the page was measured.
+ *
+ * Derived rather than written, for the reason the rest of this module exists:
+ * the environment is as much a part of a millisecond as the digits are, and a
+ * page describing one machine while its tables came from another is how this
+ * repository spent a day telling a code regression apart from a change of
+ * machine.
+ *
+ * The scenarios must agree, the date included — `benchmark` measures all of
+ * them in one pass, and re-measuring one alone (`benchmark:deep-chain`) is
+ * useful on one machine and misleading across two, so a disagreement fails
+ * here rather than being averaged into a claim. An em dash where nothing was
+ * recorded: those tables predate the pinned runner, and inventing a machine
+ * for them would be worse than saying so.
+ */
+const environmentFact = (
+  read: (environment: RecordedEnvironment) => string,
+): string => {
+  const recorded = allResults
+    .map((r) => r.meta.environment)
+    .filter((e) => e !== undefined);
+
+  if (recorded.length < allResults.length) {
+    return '\u{2014}';
+  }
+
+  const distinct = Arr.uniq(recorded.map(read));
+
+  const [only] = distinct;
+
+  if (only === undefined || distinct.length > 1) {
+    throw new Error(
+      [
+        'The scenarios disagree about where they were measured, so no single',
+        'value describes the page:',
+        ...distinct.map((d) => `  - ${d}`),
+        '',
+        'Re-measure every scenario with',
+        '`pnpm --filter @synstate/docs run benchmark`.',
+      ].join('\n'),
+    );
+  }
+
+  return only;
+};
+
 /** The sweep points the prose singles out by name. */
 const DEEP_MAX = 'K=1000, M=200';
 
@@ -172,8 +269,6 @@ const CASCADED_MIN = 'N=2';
 const CASCADED_MAX = 'N=20';
 
 const FAN_OUT_MIN = 'B=2';
-
-const FAN_OUT_MAX = 'B=1000';
 
 /** Where RxJS first exceeds the timeout, and the last depth it survived. */
 const rxjsTimeoutLabel = (): string =>
@@ -188,6 +283,19 @@ const rxjsLastLabel = (): string => lastMeasuredLabel(cascadedDiamond, 'RxJS');
  */
 const jotaiLeadLabel = (): string =>
   leadFromLabel(cascadedDiamond, 'Jotai', ['MobX']);
+
+/**
+ * The largest branch count SynState was measured at.
+ *
+ * Not the sweep's largest, which is what the prose used to name: SynState's
+ * fan-out row is the one that grows with $B$, so it is the row the timeout
+ * catches first, and on a machine slower than the one the committed tables
+ * came from the last point is a timeout rather than a measurement. Read off
+ * the data — as {@link rxjsLastLabel} is for the same reason — the sentence
+ * quotes the largest branch count that was actually measured, and names it.
+ */
+const fanOutLastLabel = (): string =>
+  lastMeasuredLabel(conditionalFanOut, 'SynState');
 
 /** The largest branch count at which SynState still beats Jotai. */
 const fanOutCrossoverLabel = (): string =>
@@ -235,20 +343,51 @@ const param = (xLabel: string): number => {
   return parsed.value;
 };
 
-const at = (data: SeriesData, label: string, xLabel: string): number => {
+/**
+ * What the row holds at one point of the sweep: the measurement, or `null`
+ * where the runner gave up on it. A timeout is a result the prose reads —
+ * which library stopped completing, and from where — so the comparisons below
+ * ask for the nullable value and decide what it means, and only {@link at},
+ * for a number a sentence quotes outright, insists on one.
+ */
+const valueAt = (
+  data: SeriesData,
+  label: string,
+  xLabel: string,
+): number | null => {
   const index = data.xLabels.indexOf(xLabel);
 
   if (index === -1) {
     throw new Error(`❌ '${xLabel}' is not one of the measured points`);
   }
 
-  const value = row(data, label).values[index];
+  return row(data, label).values[index] ?? null;
+};
 
-  if (value === undefined || value === null) {
+const at = (data: SeriesData, label: string, xLabel: string): number => {
+  const value = valueAt(data, label, xLabel);
+
+  if (value === null) {
     throw new Error(`❌ ${label} has no measurement at '${xLabel}'`);
   }
 
   return value;
+};
+
+/**
+ * Whether `label` completed the point faster than `rival` did. A point one of
+ * them did not complete is decided by the one that did: the row that timed out
+ * is the slower of the two, which is exactly what the timeout established.
+ */
+const aheadAt = (
+  data: SeriesData,
+  label: string,
+  rival: number | null,
+  xLabel: string,
+): boolean => {
+  const mine = valueAt(data, label, xLabel);
+
+  return mine !== null && (rival === null || mine < rival);
 };
 
 const median = (data: StatsData, label: string): number => {
@@ -283,15 +422,15 @@ const typical = (data: SeriesData, label: string): number => {
 
 /**
  * The slope of SynState's fan-out row in nanoseconds, which is the figure that
- * makes "linear in B" concrete: the largest branch count's cost spread over
- * its branches and over the updates the runner drove.
+ * makes "linear in B" concrete: the largest measured branch count's cost
+ * spread over its branches and over the updates the runner drove.
  */
 const nsPerBranchPerUpdate = (): string =>
   count(
     Math.round(
       divide(
-        at(conditionalFanOut, 'SynState', FAN_OUT_MAX) * NS_PER_MS,
-        param(FAN_OUT_MAX) * updates(conditionalFanOut),
+        at(conditionalFanOut, 'SynState', fanOutLastLabel()) * NS_PER_MS,
+        param(fanOutLastLabel()) * updates(conditionalFanOut),
       ),
     ),
   );
@@ -332,13 +471,7 @@ const leadFromLabel = (
   );
 
   const ahead = data.xLabels.map((point, i) =>
-    rivals.every((r) => {
-      const rival = r.values[i];
-
-      return (
-        rival === undefined || rival === null || at(data, label, point) < rival
-      );
-    }),
+    rivals.every((r) => aheadAt(data, label, r.values[i] ?? null, point)),
   );
 
   const index = ahead.findIndex((_, i) => ahead.slice(i).every((a) => a));
@@ -360,7 +493,7 @@ const lastAheadLabel = (
   const index = data.xLabels.findLastIndex((_xLabel, i) =>
     data.xLabels
       .slice(0, i + 1)
-      .every((x) => at(data, label, x) < at(data, rival, x)),
+      .every((x) => aheadAt(data, label, valueAt(data, rival, x), x)),
   );
 
   const xLabel = index === -1 ? undefined : data.xLabels[index];
