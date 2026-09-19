@@ -30,6 +30,10 @@ const PullRequestSchema = t.record({
   updated_at: t.string(),
   user: t.union([t.record({ login: t.string() }), t.nullType]),
   labels: t.array(t.record({ name: t.string() })),
+  // `null` until auto-merge is armed, and an object describing it after.
+  // Only its presence is read: what the report answers is whether anything
+  // will land the pull request once the checks go green.
+  auto_merge: t.union([t.record({}), t.nullType]),
   head: t.record({ ref: t.string(), sha: t.string() }),
   base: t.record({ ref: t.string() }),
 });
@@ -318,6 +322,7 @@ export const createClient = (
           author: pr.user?.login ?? 'unknown',
           isDraft: pr.draft,
           labels: pr.labels.map((label) => label.name),
+          autoMerge: pr.auto_merge !== null,
           headRef: pr.head.ref,
           headSha: pr.head.sha,
           baseRef: pr.base.ref,
