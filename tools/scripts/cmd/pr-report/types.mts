@@ -45,6 +45,13 @@ export type PullRequestFacts = Readonly<{
   author: string;
   isDraft: boolean;
   labels: readonly string[];
+  /**
+   * Whether auto-merge is armed. Separate from `merge-queued`, which is the
+   * author saying a pull request is to be landed: the label is the request
+   * and this is the mechanism, and `unblock-prs` passes over a pull request
+   * that has the one without the other.
+   */
+  autoMerge: boolean;
   headRef: string;
   headSha: string;
   baseRef: string;

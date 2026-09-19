@@ -27,6 +27,11 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
 - **閉じる issue** — body を開かずに「これは何のための PR か」が分かるように。
 - **ラベル** — `skip-ci` と `merge-queued` はこのリポジトリの「まだ」と「準備
   完了」そのものです。
+- **auto-merge** — ラベルは依頼、auto-merge は機構で、この2つはズレ得ます。
+  `merge-queued` が付いているのに auto-merge が無い PR を `unblock-prs` は
+  「auto-merge is not enabled」として見送るので、そこに `no auto-merge` と出し
+  ます。news のときだけ言う項目で、誰もキューに入れていない PR については黙り
+  ます。
 - **ruleset が要求する context の判定** — 「走ったチェック」とは別物です。何も
   報告していない required context は永久に "Expected — waiting" のまま出ますし、
   赤い aggregate は何が落ちたかを名乗りません。どちらも名指しで出します。
@@ -119,6 +124,12 @@ order declared by the `Merge-After:` trailers drawn as a tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
 requires (named, including the ones that have reported nothing at all), and
 how far the branch is ahead of and behind its base.
+
+Auto-merge is reported only when it is news. The label is the request and
+auto-merge is the mechanism, and the two can come apart: a pull request
+labelled `merge-queued` with nothing armed to land it is the combination
+`unblock-prs` passes over with "auto-merge is not enabled", and it reads
+`no auto-merge` here. One that has never been queued says nothing either way.
 
 ```bash
 pnpm run pr-report                      # for a terminal (the default)

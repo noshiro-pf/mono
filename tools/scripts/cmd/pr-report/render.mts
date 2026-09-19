@@ -159,6 +159,7 @@ const describe = (
     entry.isDraft ? 'draft' : undefined,
     commits(entry),
     ...entry.labels.map((label) => (markdown ? `\`${label}\`` : `[${label}]`)),
+    autoMerge(entry),
     issues(entry, markdown),
     failures(entry.checks),
   ].filter((part) => part !== undefined);
@@ -167,6 +168,23 @@ const describe = (
 
   return Arr.toUnshifted(`${glyph} ${ref} ${title_}`)(detail).join(' · ');
 };
+
+/**
+ * Whether anything will land the pull request once the checks go green.
+ *
+ * Said only when it is news. A pull request nobody has queued and nobody has
+ * armed is the ordinary case, and a line for it on every entry would bury the
+ * one combination that matters: `merge-queued` — the author saying this is to
+ * be landed — with no auto-merge to land it. `unblock-prs` passes such a pull
+ * request over with "auto-merge is not enabled", and until now the only place
+ * that was visible was that script's own log.
+ */
+const autoMerge = (entry: ReportEntry): string | undefined =>
+  entry.autoMerge
+    ? 'auto-merge'
+    : entry.labels.includes(MERGE_QUEUED_LABEL)
+      ? 'no auto-merge'
+      : undefined;
 
 /**
  * `+3 / -12`: three commits of its own, twelve of `main` it has not got.

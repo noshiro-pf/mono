@@ -17,6 +17,7 @@ const facts = (
     url: `https://github.com/noshiro-pf/mono/pull/${overrides.number}`,
     updatedAt: '2026-09-18T00:00:00Z',
     comparison: { aheadBy: 1, behindBy: 0 },
+    autoMerge: false,
     reported: new Map(),
     linkedIssues: [],
     ...overrides,
@@ -108,6 +109,39 @@ describe('renderMarkdown', () => {
     assert.isTrue(rendered.includes('skip-ci'));
 
     assert.isTrue(rendered.includes('merge-queued'));
+  });
+
+  test('says a queued pull request has auto-merge armed', () => {
+    const rendered = renderMarkdown(
+      report([
+        facts({ number: 1901, labels: ['merge-queued'], autoMerge: true }),
+      ]),
+    );
+
+    assert.isTrue(rendered.includes('auto-merge'));
+
+    assert.isFalse(rendered.includes('no auto-merge'));
+  });
+
+  // The combination `unblock-prs` passes over with "auto-merge is not
+  // enabled": queued, so the author asked for it to land, and nothing that
+  // would land it.
+  test('names a queued pull request that has no auto-merge', () => {
+    const rendered = renderMarkdown(
+      report([
+        facts({ number: 1901, labels: ['merge-queued'], autoMerge: false }),
+      ]),
+    );
+
+    assert.isTrue(rendered.includes('no auto-merge'));
+  });
+
+  test('says nothing about auto-merge on a pull request that is not queued', () => {
+    const rendered = renderMarkdown(
+      report([facts({ number: 1901, autoMerge: false })]),
+    );
+
+    assert.isFalse(rendered.includes('auto-merge'));
   });
 
   test('names the pull requests on a `Merge-After` cycle', () => {
