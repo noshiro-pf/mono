@@ -1,7 +1,7 @@
 name: Deploy Pages
 
-# Publishes the documentation for everything this repository ships to
-# https://noshiro-pf.github.io/mono/.
+# Publishes the documentation for everything this repository ships, and the
+# applications hosted alongside it, to https://noshiro-pf.github.io/mono/.
 #
 # Each library used to build and serve its own documentation from its own
 # repository. Those repositories are archived: their pages still answer, but
@@ -62,6 +62,8 @@ jobs:
       - name: Build the documentation site
         run: pnpm --filter @synstate/docs run build:astro
 
+      # Also copies the apps `tools/configs/pages-apps.mts` names, which
+      # `ws:build` above has already built into their own `build/`.
       - name: Assemble the site
         run: pnpm run build:pages-site
 

@@ -1,0 +1,57 @@
+{
+  "name": "pr-report-payload",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The machine-readable report `pr-report` embeds in its issue, and the app reads back",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/pr-report-payload"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "exports": "./src/index.mts",
+  "scripts": {
+    "check:lint": "eslint .",
+    "check:test": "pnpm run z:vitest:node run",
+    "check:test:cov": "pnpm run z:vitest:node run --coverage",
+    "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fix:fmt:full": "prettier --write .",
+    "fix:lint": "eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:index",
+    "gen:index": "run-s gen:index:src fix:fmt",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "test": "pnpm run check:test",
+    "watch:test": "pnpm run z:vitest:node watch",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "tsx": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
