@@ -73,6 +73,10 @@
           {
             "context": "Validate commit messages",
             "integration_id": 15368
+          },
+          {
+            "context": "Validate commit count",
+            "integration_id": 15368
           }
         ]
       }

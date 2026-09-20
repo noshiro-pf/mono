@@ -192,7 +192,7 @@ gh run view --job <job-id> --log-failed
 
 **The check name is the command.** `style-check (X)` and `code-check (X)` both
 run `pnpm run X` at the repository root, so `code-check (check:knip)` reproduces as
-`pnpm run check:knip`. Four checks do not follow that rule:
+`pnpm run check:knip`. Five checks do not follow that rule:
 
 | Check                        | What to run                                                     |
 | :--------------------------- | :-------------------------------------------------------------- |
@@ -200,11 +200,21 @@ run `pnpm run X` at the repository root, so `code-check (check:knip)` reproduces
 | `verify-published`           | `pnpm run verify:npm-packages:published`                        |
 | `backup-repository-settings` | `pnpm run repo-settings:backup`, then look for a dirty tree     |
 | `Validate PR title`          | The PR title is not Conventional Commits — `gh pr edit --title` |
+| `Validate commit count`      | The branch is more than one commit — squash it, see below       |
 
 `Validate PR title` is required because a squash merge takes the PR title as the
 commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the title
 itself, not the branch. It checks Conventional Commits and English; `skip-ci` in
 a title means nothing to any workflow, which reads the label instead.
+
+`Validate commit count` is the same rule about the other half of the squash
+commit: the branch's subjects become its body, so the branch is one commit.
+Squashing rewrites someone's branch and writes the message that lands on
+`main`, which is more than a rebase — do it only for a pull request this run is
+already moving, from a throwaway worktree, with
+`git reset --soft "$(git merge-base HEAD origin/main)" && git commit` and a
+`--force-with-lease` push against the head the survey saw. If the message is
+not obvious from the PR title and body, stop and ask.
 
 Two things about reproducing the rest:
 
