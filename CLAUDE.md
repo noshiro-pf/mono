@@ -52,7 +52,7 @@ comments may be Japanese — see "Japanese text".
   holds root-level `tsx` commands, one file each (a command that outgrows one
   file becomes a directory with `main.mts` and a `README.md`, like
   `unblock-prs/`).
-- `repo-settings/` — declarative GitHub settings. See "Repository settings".
+- `repo-settings/` — declarative GitHub settings (`repo-settings/README.md`).
 - `articles/`, `books/` — Zenn content. See "Zenn".
 - `docs/` — prose about the repository plus verbatim texts (`json-spec/`,
   `rust_book/`, `typescript_book/`), which are never edited.
@@ -200,23 +200,12 @@ nothing checks; `check:root:example-coverage` and
 
 ## Repository settings
 
-`repo-settings/` files are desired state, applied only by
-`pnpm run repo-settings:apply` (admin token); `repo-settings:backup` writes
-the same files from what GitHub currently has. **Editing one passes CI and
-changes nothing** until applied. Drift is checked daily from the private
-`noshiro-pf/mono-security`, which compares these files against GitHub — so a
-`backup` committed without thought silently turns a drift into the
-declaration.
-
-- **Declare and apply an environment before merging the workflow that names
-  it.** An environment created by a first run has no protection rules, and
-  nothing fails to say so. `release`'s branch policy is the whole of what
-  confines a publish to `main`.
-- **`.github/CODEOWNERS` is a merge gate**, not a notification list: the
-  ruleset requires an owner review for listed paths, which stops
-  `pnpm-update`'s auto-merge there. That is the point (its App token holds
-  `workflows: write`). Listing a path is a judgement about frequency as much
-  as importance; the owner's own pull requests merge by ruleset bypass.
+**Editing a file under `repo-settings/` passes CI and changes nothing** until
+`repo-settings:apply` is run by hand. `repo-settings/README.md` has that and
+the rest: what `backup` can silently turn a drift into, why an environment is
+declared and applied before the workflow naming it merges, and what
+`rulesets/main.json` asks of a new job, a renamed context, the admin bypass
+and `.github/CODEOWNERS`.
 
 ## Tokens and third-party code in a job
 
@@ -251,13 +240,8 @@ does not read — each held by something else.
 
 - A new matrix entry needs nothing; a new job or workflow needs its aggregate
   context added to `main.json`, or it runs and blocks nothing.
-- A context not found reads "Expected — waiting" forever. Renaming one: merge
-  with the ruleset bypass, run `repo-settings:apply rulesets`, then expect
-  every open pull request to read blocked until rebased.
+  `repo-settings/README.md` has that, renaming a context, and the bypass.
 - A red aggregate does not name what failed; open the run.
-- The `main` ruleset requires squash-merged pull requests and the admin's
-  bypass is `pull_request` mode only; do not widen it, since nothing checks a
-  direct push.
 
 ### Diff gates
 
