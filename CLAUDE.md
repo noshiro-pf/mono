@@ -391,6 +391,16 @@ and adding `merge-queued` is the author's act of saying "release this".
 tip itself, and a rebase would carry the old version commit onto a tip whose
 changesets it never consumed, releasing without them.
 
+**`release.yml` builds in a job that holds no key, and publishes in one that
+does not build.** `changeset:publish` is `pnpm changeset publish` and nothing
+else: the `dist/` it publishes arrives as an artifact from the `build` job. So
+running it by hand publishes whatever `dist/` happens to be on disk, and
+putting `ws:build` back — into that script, into the `release` job, or by
+merging the two jobs — puts the whole build toolchain back inside
+`id-token: write`, where a compromised dependency can ask for an OIDC token and
+publish anything. The `release` job installs with `--ignore-scripts` for the
+same reason; a step added there must not need an install script to have run.
+
 ## Node.js version support
 
 `tools/configs/node-support.json` is the single source of truth and
