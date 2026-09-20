@@ -1385,7 +1385,7 @@ MUI を使う 3 app（`catan-dice-app` ・ `color-demo-app` ・ `annotation-tool
 | `catan-dice-app`          | 0                                             |
 | `my-portfolio-app-preact` | 0                                             |
 
-CLAUDE.md の「Import what is worth keeping, not the whole tree」に従い、
+CLAUDE.md の「`experimental/`」節に従い、
 **今すぐ利用者がいるものだけ**を入れて、省いたものは
 `apps/ts-utils-additional/README.md` に表で残した。
 

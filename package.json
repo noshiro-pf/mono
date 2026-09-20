@@ -33,6 +33,7 @@
     "check:knip": "knip --no-progress --no-config-hints --include dependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
     "check:md": "markdownlint-cli2",
     "check:prose": "pnpm run '/check:prose:.*/'",
+    "check:prose:claude-md-references": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-claude-md-references.mts",
     "check:prose:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts",
     "check:prose:markdownlint-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdownlint-config.mts",
     "check:prose:readme-sample-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-sample-coverage.mts",

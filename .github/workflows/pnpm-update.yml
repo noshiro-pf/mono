@@ -55,6 +55,24 @@ name: pnpm update
 # installation must be granted Workflows: write; the `permission-*` inputs can
 # only narrow what the App already holds, never widen it.
 #
+# ## What a job that holds a key may do
+#
+# Three rules, and the split below is made of them. They hold wherever a job
+# carries a token and something in the same run has executed third-party code
+# — `node-support-update.yml` and `release.yml` are the other two, and both
+# say which of these they lean on.
+#
+# - **A `run:` block is the definition GitHub resolved** when the run started.
+#   A file in the tree is read at invocation instead, after anything that ran
+#   earlier could have rewritten it. So a step that must not trust the tree
+#   stays inline, and uses `git` / `gh` only.
+# - **Work that needs no token goes before `Generate Token`.** A step placed
+#   before `pnpm install` runs its script with `node`, never `pnpm run`, which
+#   installs first — that is why `mature-updates.mts` imports `node:*` alone.
+# - **`git config core.hooksPath /dev/null` before committing on a runner.**
+#   An install script can leave a `.git/hooks/pre-commit` behind, and `git
+#   commit` would run it with the token already in the step's environment.
+#
 # ## One branch, reused
 #
 # The branch is `chore/pnpm-update` with no date in it, and every run rebuilds
@@ -173,8 +191,8 @@ jobs:
       # (`mature-updates.mts`, through `pnpm run`), which those scripts can
       # rewrite. Running it first means the file this step executes is still
       # the one that was checked out, and the token it carries has not been
-      # anywhere near them. See "An inline `run:` block in a privileged job"
-      # in CLAUDE.md for the general shape.
+      # anywhere near them. See "What a job that holds a key may do" at the top
+      # of this file for the general shape.
       #
       # `node`, not `pnpm run update-actions`, for the same reason the step
       # above invokes the script directly: `pnpm run` verifies the workspace's

@@ -136,7 +136,7 @@ matrix コマンドを実行する。
 ここの 6 エントリは型検査ではなく **`tsx` の実行時解決**である。クリーン
 チェックアウトから `pnpm run ws:build` を走らせるとき、ビルドスクリプト自身が
 `ts-repo-utils` などを import する。`dist` はまだ無いので、ソースへ向ける以外に
-起動手段が無い。CLAUDE.md の "Building from a clean checkout" が根拠であり、
+起動手段が無い。CLAUDE.md の "Build" が根拠であり、
 今回の整理の対象外。
 
 ## 却下した案

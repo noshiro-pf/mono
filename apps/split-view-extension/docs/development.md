@@ -48,7 +48,7 @@ pnpm --filter-prod 'split-view-extension...' run build
 
 `--filter-prod` follows `dependencies` only. The plain `--filter` follows
 `devDependencies` too, which pulls in the lint toolchain, and that has no valid
-build order — see "Building from a clean checkout" in the root `CLAUDE.md`.
+build order — see "Build" in the root `CLAUDE.md`.
 
 Then load `dist/` as described in the README's [Install](../README.md#install).
 There is no dev server: the page has to be served from `chrome-extension://`,

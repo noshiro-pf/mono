@@ -61,7 +61,7 @@ label is on, the five check workflows and the two lint jobs skip and
 which is the only thing holding the merge — so its `mergeStateStatus` says
 nothing useful (`BLOCKED` however ready it is) and its checks cannot go green
 however long it is watched. Taking the label off is the action, one PR at a
-time. See "Check triggers, `skip-ci` and out-of-date branches" in `CLAUDE.md`.
+time. See "Triggers, `skip-ci`, out-of-date branches" in `CLAUDE.md`.
 
 `chore/pnpm-update` is opened `merge-queued` by the bot, with auto-merge, so it
 is in scope — but `pnpm-update.yml` force-pushes that branch twice a week. If

@@ -8,8 +8,8 @@
 - [English](#english)
 
 The authority for the conventions this reads is `CLAUDE.md`: "Required status
-checks", "Check triggers, `skip-ci` and out-of-date branches" and "A declared
-merge order". This file describes what the script does with them.
+checks", "Triggers, `skip-ci`, out-of-date branches" and "Commits and pull
+requests". This file describes what the script does with them.
 
 ## 日本語
 

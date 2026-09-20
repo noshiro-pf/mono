@@ -108,6 +108,31 @@ minimumReleaseAge: 10080 # = 7 days
 # prune は `pnpm update` で走り、lockfile が解決しなくなったエントリを落とす。
 # 実測（pnpm 12.3.4）: lockfile に無い名前も `name@1.2.3` も消え、`pattern-*`
 # だけは常に残る。だから **glob で書くと失効しない**。
+#
+# **waiver の理由は、下のリストの中ではなく、ここに書く。** prune はリストを
+# 書き直すとき、その中のコメントを道連れにする。実測: 12.3.4 は
+# `minimumReleaseAgeExclude:` の直後にあるコメントまで消し — #1937 で octokit 族
+# の説明 8 行が消えたのがこれ — 12.5.1 は消える項目に付いたコメントだけ消す。
+# このキーの上は両方のバージョンで無傷だった。`minimumReleaseAgeExclude:` の
+# 直前も駄目で、リストが空になるとキーごと消えて理由だけが次のキーの上に浮く。
+#
+# 書式は `# waiver: <名前かその前方一致>` の見出しと、その下の説明。族で理由が
+# 一つなら前方一致で一度書けばよい。`check:root:minimum-release-age` が、理由の
+# 無い entry、entry の無い理由、リストの中に書かれた見出しで落ちる。
+#
+# waiver: @octokit/
+#   octokit 族は `@octokit/openapi-types` を共有し、
+#   `octokit-safe-types` はその型と自前のスキーマが厳密に一致することを
+#   `expectType<..., '='>` で表明している。隔離が族を一つずつ通すと
+#   `@octokit/openapi-types` が 2 バージョン同居して表明が破れ、`ws:build` が
+#   落ちる。族が揃って動く必要があるのはそのため。
+#
+#   要求は「族の原子性」であって「隔離の免除」ではない。バージョンを固定して
+#   あるので、族が次に揃って動いた時点で prune が落とす。
+#
+# waiver: @types/
+#   `@types/**` の恒久除外を外した時点で lockfile に入っていて、まだ 7 日を
+#   超えていなかったもの。成熟して次に動いた時点で prune が落とす。
 minimumReleaseAgeExcludePrune: true
 
 minimumReleaseAgeExclude:
@@ -140,8 +165,7 @@ allowBuilds:
 # `ts-repo-utils`, the ESLint plugins) and the toolchain devDepends back on the
 # libraries it is built from, so there is no order that satisfies all of them —
 # the same fact that makes `runCmdInStagesAcrossWorkspaces` derive build order
-# from `dependencies` + `peerDependencies` alone (see CLAUDE.md, "Building from
-# a clean checkout").
+# from `dependencies` + `peerDependencies` alone (see CLAUDE.md, "Build").
 #
 # The scripts this affects — `gen:index`, `check:lint`, `check:test`, `doc`, … — are per-package
 # and order-independent; only `build` needs an order, and it does not come from

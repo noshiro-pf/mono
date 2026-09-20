@@ -50,8 +50,8 @@ const checkAll = async (): Promise<void> => {
 
   // `build` emits and nothing else, so the committed sources it used to
   // regenerate on every run are regenerated here instead, once. CI does the
-  // same and then asserts the tree is clean — see "What a build emits" in
-  // CLAUDE.md. It needs `dist/`: the re-export generators import their sibling
+  // same and then asserts the tree is clean — see "Build" in CLAUDE.md. It
+  // needs `dist/`: the re-export generators import their sibling
   // by name, and `gen:rule-types` lints what it wrote.
   await logStep({
     startMessage: 'Regenerating the generated sources',

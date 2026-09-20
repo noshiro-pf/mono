@@ -22,6 +22,16 @@ name: Node.js Support Update
 # The pull request is where the new versions are proven: node-version-compatibility.yml
 # runs the full matrix on it, so a version that does not work never reaches
 # main. That is the whole reason the refresh is a pull request and not a push.
+#
+# `update` installs the dependency tree and holds a token in the same job,
+# which pnpm-update.yml deliberately does not — see "What a job that holds a
+# key may do" there for the three rules this one still follows. It is not
+# split because of what its token cannot do: no `workflows` permission, so a
+# rewritten workflow file cannot be pushed, and no auto-merge is armed, so
+# nothing it opens merges unattended. What the update step writes is
+# `tools/configs/node-support.json` and the `package.json` fields derived from
+# it. Grant this token `workflows`, or arm auto-merge here, and the split
+# becomes necessary.
 
 on:
   schedule:

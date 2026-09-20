@@ -119,8 +119,7 @@ const checkFile = async (file: string): Promise<readonly Violation[]> => {
   // No package of its own: the nearest `package.json` is the repository root.
   // `tools/configs/tsconfig.tsx.json` is the case here, and its `paths` are a
   // different mechanism — `tsx`'s runtime resolution for build scripts that
-  // run before any `dist/` exists. See CLAUDE.md, "Building from a clean
-  // checkout".
+  // run before any `dist/` exists. See CLAUDE.md, "Build".
   if (packageDir === undefined) return [];
 
   const packageName = await readPackageName(packageDir);
