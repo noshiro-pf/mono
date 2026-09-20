@@ -94,6 +94,12 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 - Claude の routine が同じコマンドを実行して結果を貼ります。そのまま
   `/unblock-prs` に繋げられるのが、読むだけのレポートとの違いです。
 
+`--format markdown` の末尾には、折りたたんだ JSON のブロックが付きます。これを
+読むのが **GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）で、
+issue に書いたその本文がそのままアプリのデータ源になります。ブロックの形と、
+なぜ issue を経由するのかは `apps/pr-report-payload/README.md` にあります。
+
 workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
 open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
 がそこにあるため）、ラベルの着脱、push、draft の切り替え、そして `main` への
@@ -164,7 +170,12 @@ merge order to draw them at.
 The script only prints. `.github/workflows/pr-report.yml` is what puts the
 text somewhere: it overwrites the body of the issue labelled `pr-report`,
 which notifies nobody and leaves no timeline, and repeats the same text in the
-run summary. It runs whenever something that can change the report happens — a
+run summary. `--format markdown` ends with a collapsed block of JSON, which is
+what the **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) reads:
+the body written for a person is also the app's data source, so there is no
+second place to keep in step. `apps/pr-report-payload/README.md` has the shape
+of that block and why the issue is the transport at all. It runs whenever something that can change the report happens — a
 pull request opened, closed, reopened, edited, labelled, pushed to or switched
 in or out of draft, and a push to `main`, which moves the ahead / behind of
 every open pull request at once — plus the daily schedule and

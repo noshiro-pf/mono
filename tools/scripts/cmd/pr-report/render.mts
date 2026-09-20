@@ -1,8 +1,11 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
+import { embedPayload } from 'pr-report-payload';
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { MERGE_QUEUED_LABEL } from '../unblock-prs/labels.mjs';
+import { toPayload } from './payload.mjs';
+import { summarize } from './summarize.mjs';
 import {
   type ChecksSummary,
   type PrReport,
@@ -29,10 +32,25 @@ const GLYPH = {
  * The merge order is a nested list rather than a table because the nesting
  * *is* the information — a table would have to spell the tree back out in a
  * column, and a reader would have to rebuild it.
+ *
+ * The same text carries the report a second time, as the collapsed JSON block
+ * {@link embedPayload} writes at the bottom, which is what the Pull Requests
+ * Manager app reads. One body rather than two places to keep in step: see
+ * `apps/pr-report-payload`.
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
-    return [heading(report), '', EMPTY, ''].join('\n');
+    // With the payload even so. "Nothing is open" is an answer the app has to
+    // be able to give, and a body without the block reads to it as a report
+    // written before there was one.
+    return [
+      heading(report),
+      '',
+      EMPTY,
+      '',
+      embedPayload(toPayload(report)),
+      '',
+    ].join('\n');
   }
 
   const byNumber = index(report);
@@ -63,6 +81,8 @@ export const renderMarkdown = (report: PrReport): string => {
     ...report.roots.flatMap((root) => line(root, 0)),
     ...cyclesSection(report),
     ...footnote(report),
+    '',
+    embedPayload(toPayload(report)),
     '',
   ].join('\n');
 };
@@ -126,18 +146,18 @@ const heading = (report: PrReport): string => `# ${title(report)}` as const;
 /**
  * One line saying how much there is and how much of it wants attention, so
  * that a reader who opens the report and closes it again has still learnt
- * the only thing a daily report has to tell them.
+ * the only thing a daily report has to tell them. The same counts travel in
+ * the payload, from the same {@link summarize}.
  */
 const summary = (report: PrReport): string => {
-  const count = (predicate: (entry: ReportEntry) => boolean): number =>
-    report.entries.filter(predicate).length;
+  const counts = summarize(report);
 
   return [
-    `**${report.entries.length} open**`,
-    `${count((e) => e.labels.includes(MERGE_QUEUED_LABEL))} queued`,
-    `${count((e) => e.isDraft)} draft`,
-    `${count((e) => e.checks.verdict === 'failing')} failing`,
-    `${count((e) => (e.comparison?.behindBy ?? 0) > 0)} behind`,
+    `**${counts.open} open**`,
+    `${counts.queued} queued`,
+    `${counts.draft} draft`,
+    `${counts.failing} failing`,
+    `${counts.behind} behind`,
     `generated ${report.generatedAt}`,
   ].join(' · ');
 };

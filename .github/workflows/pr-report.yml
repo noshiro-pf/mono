@@ -16,6 +16,11 @@ name: PR Report
 # `pnpm run pr-report` is the whole of it. Everything this workflow adds is
 # where the text goes, so the same report can be had locally, or by an agent,
 # with no GitHub UI involved.
+#
+# That body is also what the GitHub Pull Requests Manager page reads
+# (`apps/pr-manager-app`): the Markdown ends with a collapsed block of JSON
+# carrying the same report, so the page has a data source without a second
+# place to write it to. See `apps/pr-report-payload/README.md`.
 
 # The events are pings, not input: nothing from a payload reaches the job,
 # which re-reads every pull request from the API each time. So the trigger

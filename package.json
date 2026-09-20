@@ -141,6 +141,7 @@
     "npm-run-all2": "catalog:",
     "oxfmt": "catalog:",
     "playwright": "catalog:",
+    "pr-report-payload": "workspace:*",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

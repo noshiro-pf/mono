@@ -26,6 +26,7 @@ export const defineViteAppConfig = ({
   packageRoot,
   framework,
   jsxImportSource,
+  base,
 }: Readonly<{
   /** The package's root directory, i.e. the parent of `configs`. */
   packageRoot: string;
@@ -36,6 +37,18 @@ export const defineViteAppConfig = ({
    * `'@emotion/react'`; leave it off where the tsconfig does.
    */
   jsxImportSource?: string;
+  /**
+   * The path the built site is served under, for an app published to GitHub
+   * Pages rather than to a Firebase host of its own. Pages serves this
+   * repository at `/mono/`, and `build-pages-site.mts` puts each app in a
+   * directory below that, so the asset URLs Vite writes have to carry the
+   * whole prefix — the default `/` would ask the browser for
+   * `noshiro-pf.github.io/assets/…` and get the user page's 404.
+   *
+   * Left off by the Firebase-hosted apps, which are served at the root of
+   * their own domain.
+   */
+  base?: string;
 }>): UserConfig => {
   // `strictPort` so that a port already taken is an error rather than Vite
   // quietly moving to the next one — the e2e config points at this exact
@@ -44,6 +57,8 @@ export const defineViteAppConfig = ({
 
   return {
     root: packageRoot,
+
+    ...(base === undefined ? {} : { base }),
 
     build: {
       outDir: path.resolve(packageRoot, 'build'),

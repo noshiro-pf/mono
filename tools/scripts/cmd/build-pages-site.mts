@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted, pathExists } from 'ts-repo-utils';
+import { pagesAppEntries } from '../../configs/pages-apps.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -17,12 +18,17 @@ import { projectRootPath } from '../project-root-path.mjs';
  * _site/
  *   index.html            a list of what is here
  *   synstate/             the hand-written documentation site (Astro)
+ *   pr-manager/           the Pull Requests Manager app (Vite)
  *   ts-data-forge/        TypeDoc output
  *   …
  * ```
  *
  * Reads what each package has already produced — `pnpm run ws:build`,
  * `pnpm run ws:doc` and the Astro build have to run first — and only copies.
+ *
+ * An app's directory here and the `base` its bundle was built with have to
+ * agree, or the page loads and then asks for its script at a path nothing
+ * serves. Both come from `tools/configs/pages-apps.mts` for that reason.
  */
 export const buildPagesSite = async (): Promise<Result<number, string>> => {
   const outDir = path.resolve(projectRootPath, '_site');
@@ -68,6 +74,23 @@ export const buildPagesSite = async (): Promise<Result<number, string>> => {
     });
 
     mut_published.push({ name: 'synstate', from: 'Astro' });
+  }
+
+  for (const [packageDir, siteDir] of pagesAppEntries()) {
+    const appBuild = path.resolve(projectRootPath, 'apps', packageDir, 'build');
+
+    if (!(await pathExists(path.resolve(appBuild, 'index.html')))) {
+      return Result.err(
+        [
+          `${packageDir} has no built app at ${appBuild}/index.html.`,
+          'Run `pnpm run ws:build` first.',
+        ].join('\n'),
+      );
+    }
+
+    await fs.cp(appBuild, path.resolve(outDir, siteDir), { recursive: true });
+
+    mut_published.push({ name: siteDir, from: 'app' });
   }
 
   const indexPath = path.resolve(outDir, 'index.html');
@@ -120,7 +143,8 @@ const indexHtml = (
     '  </head>',
     '  <body>',
     '    <h1>noshiro-pf/mono</h1>',
-    '    <p>Documentation for the packages this repository publishes.</p>',
+    '    <p>Documentation for the packages this repository publishes, and the',
+    '      applications it hosts here.</p>',
     '    <ul>',
     ...published.map(
       ({ name, from }) =>

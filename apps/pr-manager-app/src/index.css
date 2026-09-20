@@ -1,0 +1,326 @@
+/*
+ * The tokens are the validated default palette of the data-visualization
+ * guidance: chart surface, page plane, the three inks, the hairlines, and the
+ * four reserved status steps. Dark mode is a selected set of steps rather than
+ * an automatic flip, which is why every value is written twice.
+ *
+ * A status colour never carries meaning on its own here — every badge that
+ * uses one also carries a glyph and a word, which is the mitigation the
+ * palette asks for on the light surface, where `warning` and `serious` sit
+ * below 3:1 by design.
+ */
+
+:root {
+  color-scheme: light;
+
+  --surface: #fcfcfb;
+  --plane: #f9f9f7;
+  --ink-primary: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+  --hairline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border-ring: rgb(11 11 11 / 10%);
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  --accent: #2a78d6;
+
+  --radius: 8px;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --surface: #1a1a19;
+    --plane: #0d0d0d;
+    --ink-primary: #fff;
+    --ink-secondary: #c3c2b7;
+    --ink-muted: #898781;
+    --hairline: #2c2c2a;
+    --baseline: #383835;
+    --border-ring: rgb(255 255 255 / 10%);
+
+    --accent: #3987e5;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}
+
+.page {
+  margin: 0 auto;
+  max-width: 68rem;
+  padding: 2rem 1rem 4rem;
+}
+
+/* --- header ------------------------------------------------------------- */
+
+.page-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  margin: 0.15rem 0 0;
+}
+
+.header-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.refresh-button {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.refresh-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.refresh-button:disabled {
+  color: var(--ink-muted);
+  cursor: progress;
+}
+
+/* --- the summary row ---------------------------------------------------- */
+
+.summary-row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: var(--ink-secondary);
+  display: block;
+  font-size: 0.8125rem;
+}
+
+.stat-tile[data-status='critical'] .stat-value {
+  color: var(--status-critical);
+}
+
+.stat-tile[data-status='warning'] .stat-value {
+  color: var(--ink-primary);
+}
+
+/* --- sections ----------------------------------------------------------- */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  border-bottom: 1px solid var(--hairline);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.4rem;
+}
+
+.section-note {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+/* --- the merge order ---------------------------------------------------- */
+
+.merge-order,
+.merge-order-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.merge-order-children {
+  border-left: 2px solid var(--hairline);
+  margin-left: 1.1rem;
+  padding-left: 1rem;
+}
+
+.merge-order > li + li,
+.merge-order-children > li {
+  margin-top: 0.6rem;
+}
+
+/* --- one pull request --------------------------------------------------- */
+
+.pull-request {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+}
+
+.pull-request-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pull-request-number {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.pull-request-title {
+  flex: 1 1 20rem;
+  font-weight: 600;
+}
+
+.pull-request-meta {
+  align-items: center;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.pull-request-repeated {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  padding: 0.35rem 0.9rem;
+}
+
+/* --- badges and chips --------------------------------------------------- */
+
+.badge {
+  align-items: center;
+  border: 1px solid var(--border-ring);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  gap: 0.3rem;
+  line-height: 1.6;
+  padding: 0 0.55rem;
+  white-space: nowrap;
+}
+
+.badge[data-status='good'] {
+  border-color: var(--status-good);
+  color: var(--status-good);
+}
+
+.badge[data-status='critical'] {
+  border-color: var(--status-critical);
+  color: var(--status-critical);
+}
+
+.badge[data-status='warning'] {
+  border-color: var(--status-warning);
+  color: var(--ink-primary);
+}
+
+.badge[data-status='neutral'] {
+  border-color: var(--baseline);
+  color: var(--ink-secondary);
+}
+
+.label-chip {
+  background: var(--plane);
+  border: 1px solid var(--baseline);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 0 0.55rem;
+}
+
+.commit-counts {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.failed-checks {
+  color: var(--status-critical);
+}
+
+.stale-checks {
+  color: var(--ink-muted);
+}
+
+/* --- notices ------------------------------------------------------------ */
+
+.notice {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-left: 3px solid var(--baseline);
+  border-radius: var(--radius);
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.notice[data-status='critical'] {
+  border-left-color: var(--status-critical);
+}
+
+.footnote {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+}
