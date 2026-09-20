@@ -30,11 +30,15 @@
       that snapshot now writes the declaration, so taking it would overwrite the
       very file `apply` is about to read.
 
-    The multi-file backups (`rulesets`, `environments`) no longer empty the
-    directory first. Emptying it would delete a resource that is declared but not
-    yet applied, and any `README.md` sitting beside the declarations. A file that
-    is declared with nothing live behind it is reported by the drift check, which
-    is where that belongs.
+    Every backup deletes the `*.json` directly under its own directory before it
+    writes, so what is there afterwards is exactly what GitHub returned. A
+    resource that was not fetched shows up as a deletion in `git status` instead
+    of hiding behind its stale file, and so does a declaration with nothing live
+    behind it. Only `*.json` directly under the directory goes, so a `README.md`
+    sitting beside the declarations survives and nothing in a subdirectory is
+    touched. `backupRulesets` fetches every ruleset before it deletes anything, so
+    a failure part way through cannot leave the declarations deleted with nothing
+    written in their place.
 
     `applyRulesets` decides create-versus-update from the live rulesets rather than
     from the old mirror, which is also more correct: the mirror was a copy taken
@@ -51,10 +55,10 @@
 
     Such a name used to fail partway through, with only the missing directory to
     go on, or — where the directory did exist — resolve outside the one it was
-    given and be written there. `repo-settings/` holds the declarations that
-    `bk/` is compared against, so a backup able to reach them has nothing left to
-    compare against. Names without a separator, which is every name these
-    settings use, are unaffected.
+    given and be written there. `repo-settings/` holds the declarations the drift
+    check compares GitHub against, so a name able to escape its own directory
+    could overwrite another target's declaration. Names without a separator, which
+    is every name these settings use, are unaffected.
 
 - 3f0112c: Repository variables are declared in `repo-settings/variables/settings.json`
   instead of being written into the source of `applyVariables`, and `backup`
@@ -68,10 +72,11 @@
 
     Two properties are deliberate and match the other targets. A variable that is
     not declared is **not deleted**: what someone added in the web UI shows up in
-    `bk/`, which is how it gets noticed, rather than disappearing on the next
-    apply. And `apply` does not write the live values back into the declaration,
-    because the live set can be larger than the declared one and writing it back
-    would quietly adopt the difference.
+    the declaration the next time `backup` runs, which is how it gets noticed,
+    rather than disappearing on the next apply. And `apply` does not write the
+    live values back into the declaration, because the live set can be larger
+    than the declared one and writing it back would quietly adopt the
+    difference.
 
     Nothing secret belongs in this file — a repository variable is readable
     through the API and in workflow logs. It is for values that are merely
