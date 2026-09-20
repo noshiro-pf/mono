@@ -8,19 +8,20 @@ import {
 
 const pullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,
-): PullRequest => ({
-  title: `pull request #${fields.number}`,
-  body: '',
-  state: 'OPEN',
-  headRefName: `feature/${fields.number}`,
-  headRefOid: 'a'.repeat(40),
-  baseRefName: 'main',
-  isDraft: false,
-  mergeStateStatus: 'BLOCKED',
-  autoMergeRequest: {},
-  labels: [],
-  ...fields,
-});
+): PullRequest =>
+  ({
+    title: `pull request #${fields.number}`,
+    body: '',
+    state: 'OPEN',
+    headRefName: `feature/${fields.number}`,
+    headRefOid: 'a'.repeat(40),
+    baseRefName: 'main',
+    isDraft: false,
+    mergeStateStatus: 'BLOCKED',
+    autoMergeRequest: {},
+    labels: [],
+    ...fields,
+  }) as const;
 
 const versionPr = (number: number): PullRequest =>
   pullRequest({
@@ -29,16 +30,17 @@ const versionPr = (number: number): PullRequest =>
     labels: [{ name: 'merge-queued' }, { name: 'skip-ci' }],
   });
 
-const context = (blockers: readonly PullRequest[]): TriageContext => ({
-  defaultBranch: 'main',
-  baseSha: 'b'.repeat(40),
-  skipped: new Map(),
-  requiredContexts: [],
-  openNumbers: new Set(),
-  dependencies: new Map(),
-  cyclic: new Set(),
-  releaseBlockers: blockers,
-});
+const context = (blockers: readonly PullRequest[]): TriageContext =>
+  ({
+    defaultBranch: 'main',
+    baseSha: 'b'.repeat(40),
+    skipped: new Map(),
+    requiredContexts: [],
+    openNumbers: new Set(),
+    dependencies: new Map(),
+    cyclic: new Set(),
+    releaseBlockers: blockers,
+  }) as const;
 
 describe('versionBranchName', () => {
   test('is the branch changesets/action opens the pull request from', () => {

@@ -32,7 +32,7 @@ import { lastLines, sh } from './util.mjs';
 
 /** The branch `changesets/action` opens the version pull request from. */
 export const versionBranchName = (defaultBranch: string): string =>
-  `changeset-release/${defaultBranch}`;
+  `changeset-release/${defaultBranch}` as const;
 
 /**
  * Whether this is the version pull request, by the branch it comes from.

@@ -373,7 +373,7 @@ export const describeAction = (
   defaultBranch: string,
 ): string =>
   isVersionPullRequest(pr, defaultBranch)
-    ? `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`
+    ? (`take ${SKIP_CI_LABEL} off it — the release workflow owns the branch` as const)
     : [
         `rebase onto ${defaultBranch}`,
         isConflicting(pr)
