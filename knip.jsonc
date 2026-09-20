@@ -85,6 +85,12 @@
   "ignoreBinaries": ["diff", "openssl", "pass"],
 
   "workspaces": {
+    // **A new entry goes after the previous entry's closing `},`**, never
+    // anchored on an `"entry"` line. Every block below looks alike, so an edit
+    // anchored on one of those lines lands inside the block above it — and
+    // because the braces still balance, nothing fails. `check:root:knip-config`
+    // is what notices afterwards.
+
     // The conformance corpus of the sumi language project. `fixtures/`
     // holds deliberate rule violations that the runner reads as text — not
     // project files.

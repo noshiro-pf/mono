@@ -4,8 +4,10 @@ Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
 
 ## What belongs in this file
 
-**A rule goes here only when nothing else will tell you about it.** Before
-adding a paragraph, ask what happens when the rule is broken:
+**A rule goes here only when nothing else will tell you about it.** Two
+questions decide that, and the second is the one that is easy to skip.
+
+**What happens when the rule is broken?**
 
 - **The failure names the rule and the fix** (an ESLint rule id, a `tsc`
   diagnostic, a guard under `tools/scripts/cmd/` that says what it found) —
@@ -18,9 +20,28 @@ adding a paragraph, ask what happens when the rule is broken:
 - **There is no check at all** — write the rule. Better still, write a guard
   in `tools/scripts/cmd/` and reduce the prose to a pointer.
 
+**What is the reader looking at, at the moment they would break it?**
+
+- **One file, and it can carry a comment** — the rule goes in that file. A
+  comment beside the declaration reaches everyone who edits it, including
+  whoever never opens this file; a paragraph here reaches whoever thought to
+  look. `knip.jsonc` says where a new entry goes and `devOnlyCode` says what
+  may join it, for that reason. Keep at most a pointer here.
+- **One file, and it cannot** — JSON takes no comments, so the declarations
+  under `repo-settings/` and the ignore lists in the root `package.json` have
+  nowhere else to say it, and the rule stays here.
+- **No single file** — a rule addressed to whoever is working rather than to
+  whoever is editing one file (session conduct, how a release is queued, what
+  a commit message is) stays here.
+
 The same test applies when removing: a paragraph whose rule has since gained a
-guard with a clear error should go. Keep measurements, anecdotes and issue
-numbers out; one sentence of _why_ is enough.
+guard with a clear error, or a comment in the file it is about, should go.
+Keep measurements, anecdotes and issue numbers out; one sentence of _why_ is
+enough.
+
+Rules about how this file is written belong in this section and nowhere else.
+It is English throughout, though the repository's other prose and its code
+comments may be Japanese — see "Japanese text".
 
 ## Repository layout
 
@@ -421,10 +442,8 @@ cannot decide:
   `dependencies` by hand.
 - `check:knip` covers declared-but-unused (needs `ws:build`). A dependency
   named as a string in a config (the Prettier plugins) is invisible to it; put
-  it in `ignoreDependencies` with the reason. **A new entry in `knip.jsonc`
-  goes after the previous entry's closing `},`**, never anchored on an
-  `"entry"` line — identical blocks make the edit land inside the block above,
-  and when the braces balance nothing fails. Run `check:root:knip-config`.
+  it in `ignoreDependencies` with the reason. `knip.jsonc` says where a new
+  entry goes; `check:root:knip-config` reads the result.
 - `verify-npm-packages/`: edit `smoke/` only; `local/` and `published/` are
   generated. `verify:npm-packages` packs the checkout (needs `ws:build`);
   `:published` uses pins `pnpm-update` moves. See its `README.md`.
@@ -481,13 +500,12 @@ job that builds. `code-check.yml` builds once and hands `dist/` to the matrix.
 The strip pass (`tools/configs/strip-dev-only-code.mts`, mechanism in
 `ts-repo-utils`) removes `import.meta.vitest` blocks, `expectType` statements,
 what those empty, unreferenced imports, JavaScript comments, and the identity
-casts listed in `devOnlyCode`. **Never put a validating function on that
-list** (`asUint32` throws; the list is for `(x) => x` only). It fails rather
-than skipping on a shape it does not know; teach the pass, do not work around
-it in `build.mts`. Check a build change as the move off Rollup was checked:
-same files in `dist/`, `.d.mts` byte-identical, runtime exports compared by
-importing both copies. `docs/package-dependencies.md` holds the stage tables
-(`gen:deps-graph`).
+casts listed in `devOnlyCode`, whose own comment says what may join them. It
+fails rather than skipping on a shape it does not know; teach the pass, do not
+work around it in `build.mts`. Check a build change as the move off Rollup was
+checked: same files in `dist/`, `.d.mts` byte-identical, runtime exports
+compared by importing both copies. `docs/package-dependencies.md` holds the
+stage tables (`gen:deps-graph`).
 
 ## Testing
 
