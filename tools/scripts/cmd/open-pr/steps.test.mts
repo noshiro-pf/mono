@@ -5,6 +5,7 @@ import { type PullRequest } from './types.mjs';
 const pr = (overrides: Partial<PullRequest> = {}): PullRequest =>
   ({
     number: 1901,
+    nodeId: 'PR_node_1901',
     state: 'OPEN',
     isDraft: false,
     labels: [{ name: SKIP_CI_LABEL }],

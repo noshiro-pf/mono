@@ -34,6 +34,23 @@ script does with them.
 上のラベル追加が成功を報告していても、それは「今ラベルが付いている」ことと同じ
 ではないからです。この差が `main` に着地する唯一の判断がここです。
 
+### 認証情報
+
+GitHub の API を直接叩きます（`gh` は要りません）。トークンは
+**`GITHUB_TOKEN` → `GH_TOKEN` → `gh auth token`** の順に探します。コンテナや
+runner には前2つが既にあり、`gh` で設定しただけのマシンでは3つ目が拾われるので、
+どちらでも何も書き出さずに動きます。どれも無ければその旨を言って止まります。
+
+`gh` を捨てたのは、このコマンドが一番効く場所 — クラウドのコンテナや runner —
+が `gh` の入っていない場所だからです。呼ぶ API は `gh` と同じものです。
+
+4つの書き込みのうち2つ（draft の解除と auto-merge の武装）は REST に無いので
+GraphQL の mutation を使います。
+
+**プロキシ配下でも動きます。** Node の `fetch` は `HTTPS_PROXY` を自動では見な
+いため、スクリプト側で `NODE_USE_ENV_PROXY=1` を付けています。これが無いと
+プロキシを迂回して `401 Bad credentials` になり、トークンの問題に見えます。
+
 ### 途中で失敗したら、もう一度実行してください
 
 各ステップは既に済んでいればスキップされます。PR が既にあれば作らず、ラベルが
@@ -65,7 +82,7 @@ pnpm run open-pr -- --merge-after '#1901'          # チェーンを宣言
 
 - 既定ブランチの上にいるとき（先にブランチを切ってください）
 - detached HEAD のとき
-- `gh` が未認証のとき
+- 認証情報がどこからも取れないとき
 - **読み直した PR に `skip-ci` が無いとき** — auto-merge を張らずに失敗します
 - **PR が draft のとき** — GitHub が draft に auto-merge を張れないため、
   先に ready にします（既存 PR が draft だった場合）
@@ -94,6 +111,20 @@ a few lines earlier reported, because "the call succeeded" and "the label is on
 now" are not the same claim, and this is the one decision where the difference
 lands on `main`.
 
+It calls the GitHub API directly; `gh` is not required. The token is looked
+for in **`GITHUB_TOKEN`, then `GH_TOKEN`, then `gh auth token`** — the first
+two are already set in a container or on a runner, and the third picks up a
+machine set up with `gh` alone, so neither kind of machine has to export
+anything. `gh` was dropped because the places this command is most useful are
+the places `gh` is least likely to be installed; the API it calls is the same
+one `gh` calls. Two of its four writes — taking a pull request out of draft
+and arming auto-merge — have no REST equivalent and go through GraphQL.
+
+It works behind a proxy: Node's `fetch` does not read `HTTPS_PROXY` on its
+own, so the script sets `NODE_USE_ENV_PROXY=1`. Without that it bypasses the
+proxy and fails with `401 Bad credentials`, which reads like a token problem
+and is not one.
+
 Every step is skipped when it is already done, so a run that failed part way
 through is finished by running it again rather than unpicked.
 
@@ -117,8 +148,8 @@ locally are the only checks the branch gets, so say which ones. `--merge-after`
 puts the `Merge-After:` line at the top of the body, where `unblock-prs` reads
 it.
 
-It refuses to run on the default branch, on a detached HEAD, and without an
-authenticated `gh`. It refuses to arm when the re-read says the pull request is
+It refuses to run on the default branch, on a detached HEAD, and without a
+credential. It refuses to arm when the re-read says the pull request is
 not open, is a draft, or does not carry `skip-ci` — the last of those being the
 whole point.
 
