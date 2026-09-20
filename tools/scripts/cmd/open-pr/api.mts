@@ -93,7 +93,8 @@ export const rest = async <A,>(
   const parameters =
     query === undefined ? undefined : new URLSearchParams({ ...query });
 
-  const search = parameters === undefined ? '' : `?${parameters.toString()}`;
+  const search =
+    parameters === undefined ? '' : (`?${parameters.toString()}` as const);
 
   const response = await send({
     url: `https://api.github.com/repos/${context.repo.owner}/${context.repo.name}${path}${search}`,
