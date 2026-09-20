@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "build:pages-site": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/build-pages-site.mts",
-    "changeset:publish": "pnpm run ws:build && pnpm changeset publish",
+    "changeset:publish": "pnpm changeset publish",
     "changeset:version-packages": "pnpm changeset version && pnpm run strict-lib:fix:fmt && pnpm run strict-lib:gen:packages && pnpm install --no-frozen-lockfile",
     "check:cspell": "cspell \"{**,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress && pnpm run check:cspell:changeset",
     "check:cspell:changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/cspell-changeset.mts",
