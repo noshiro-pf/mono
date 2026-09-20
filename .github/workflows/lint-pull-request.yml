@@ -138,3 +138,58 @@ jobs:
             echo 'Rewrite them with `git rebase -i` (or `git commit --amend` for the last one) and force-push.'
           } >>"${GITHUB_STEP_SUMMARY}"
           exit 1
+
+  commit-count:
+    name: Validate commit count
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # A squash merge writes the branch's subjects into the body of the one
+      # commit it puts on `main` (`squash_merge_commit_message` is
+      # `COMMIT_MESSAGES`), so a branch of several commits lands as a list of
+      # whatever it was written in while the work was in progress. `main`'s
+      # history is unchangeable, which makes this the last point at which that
+      # message can be decided: one commit, whose message is the one the
+      # repository keeps.
+      #
+      # Read through the API, for the reason the job above gives: this
+      # workflow runs on `pull_request_target`, and nothing from the branch is
+      # put on a runner holding a token its author does not have. `.commits`
+      # on the pull request itself is the total — the commit list endpoint
+      # caps at 250, and a count is all this needs.
+      #
+      # A pull request based on another one (the chain CLAUDE.md describes)
+      # counts its parent's commit too, and so reads as more than one until
+      # the parent merges and it is rebased. That is `unblock-prs`'s order
+      # already: it rebases before taking `skip-ci` off, and while the label
+      # is on this job does not run.
+      - name: Check that the branch is a single commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          count="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '.commits')"
+
+          if [ "${count}" -eq 1 ]; then
+            echo 'The branch is a single commit.'
+            exit 0
+          fi
+
+          summary="A pull request is squashed into a single commit before it is merged, and this one has ${count}."
+          echo "::error::${summary}"
+          echo "${summary}"
+          {
+            echo "${summary}"
+            echo
+            echo 'Squash them into one whose message is what `main` should keep:'
+            echo
+            echo '```bash'
+            echo 'git fetch origin main'
+            echo 'git reset --soft "$(git merge-base HEAD origin/main)"'
+            echo 'git commit'
+            echo '```'
+            echo
+            echo 'then force-push.'
+          } >>"${GITHUB_STEP_SUMMARY}"
+          exit 1

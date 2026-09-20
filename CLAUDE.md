@@ -229,8 +229,8 @@ no auto-merge. When editing these:
 
 ### Required status checks
 
-The eight required contexts (`repo-settings/rulesets/main.json`) are the five
-`*-result` aggregate jobs, the `no-skip-ci-label` commit status, and the two
+The nine required contexts (`repo-settings/rulesets/main.json`) are the five
+`*-result` aggregate jobs, the `no-skip-ci-label` commit status, and the three
 `lint-pull-request.yml` jobs. **None is a job that does work**: a skipped job
 satisfies a required check and a skipped matrix job does not expand its
 matrix, so matrix contexts made required directly go stale. Each aggregate is
@@ -319,9 +319,10 @@ spaces they needed. Verbatim texts under `docs/` are never touched.
 - Pushing the session's own branch and opening its pull request is the work.
   **Without explicit instruction, never**: push to any other branch (`main`
   refuses direct pushes anyway); force-push or rebase a branch whose pull
-  request is open; merge or add `merge-queued`; run the `gh` CLI (it is a
-  person's account; use the GitHub API — `pnpm run unblock-prs` shells out to
-  `gh`); access `~/.ssh` or other sensitive directories.
+  request is open, save for amending the session's own one commit (see
+  "Commits and pull requests"); merge or add `merge-queued`; run the `gh` CLI
+  (it is a person's account; use the GitHub API — `pnpm run unblock-prs` shells
+  out to `gh`); access `~/.ssh` or other sensitive directories.
 
 ## Security findings
 
@@ -340,6 +341,15 @@ ingest the feed). Outside reports come through private vulnerability reporting
   is unchangeable and the libraries are published). Checked by
   `lint-pull-request.yml`; a squash merge makes the title the subject and the
   branch's messages the body.
+- **A pull request is one commit**, because that body is otherwise the list of
+  subjects the work happened to be written under, and `main` keeps it.
+  `Validate commit count` in `lint-pull-request.yml` is what says so. This is
+  the exception to "do not force-push an open pull request": a fix pushed to
+  the branch is `git commit --amend` and a force-push with `--force-with-lease`,
+  which is the session's to do on its own branch. A chained pull request reads
+  as more than one commit until its parent merges and it is rebased, and
+  `unblock-prs` rebases before taking `skip-ci` off — the job does not run
+  while the label is on.
 - **`pnpm run open-pr` opens it**: push, create it ready for review (never a
   draft), add `skip-ci`, then arm auto-merge — in that order, which the script
   enforces by re-reading the pull request and refusing to arm one the label is
@@ -367,9 +377,9 @@ ingest the feed). Outside reports come through private vulnerability reporting
   not read it, so it is never a substitute for `skip-ci`.
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
-  the turn to wait — do not poll. A small in-scope fix goes on the branch;
-  anything larger is a question. `main` moving under the branch is not the
-  session's to fix: ask before rebasing.
+  the turn to wait — do not poll. A small in-scope fix is amended onto the
+  branch's one commit; anything larger is a question. `main` moving under the
+  branch is not the session's to fix: ask before rebasing.
 - **Several pull requests from one session are chained** (`main <- A <- B`),
   likeliest merge first, unless the paths are plainly disjoint. Each still
   targets `main`.
