@@ -2,8 +2,9 @@ name: pnpm update
 
 # Runs this repository's own `update-packages` and `update-actions` scripts
 # together with `pnpm self-update`, and opens a single bundled pull request that
-# auto-merges once CI passes. It runs daily and always rebuilds from main, so
-# the pull request follows main rather than accumulating a new one per run.
+# auto-merges once CI passes. It runs twice a week and always rebuilds from
+# main, so the pull request follows main rather than accumulating a new one per
+# run.
 #
 # This replaces Dependabot entirely: the npm dependencies come from
 # `update-packages` (whose skip rules — `update.ignoreDeps`,
@@ -59,18 +60,36 @@ name: pnpm update
 # The branch is `chore/pnpm-update` with no date in it, and every run rebuilds
 # it from a fresh checkout of main and force-pushes. A run that lands no update
 # therefore does not leave a stale pull request behind for the next one to sit
-# beside — there is only ever one open, and it is always rebased onto main.
+# beside — there is only ever one open, and the run that opened it started from
+# main's tip.
+#
+# That rebuild happens twice a week, so it is not what keeps an open pull
+# request current. The one this opens carries `merge-queued` and auto-merge and
+# normally merges within the hour; one held open by a red check is rebased by
+# `unblock-prs`, not by the next run.
 #
 # Reusing the name is what makes the two details below matter; with a new dated
 # branch each run neither could bite, because the branch never already existed.
 
 on:
   schedule:
-    # Daily, 06:07 JST (21:07 UTC the day before). `minimumReleaseAge` holds
-    # releases for a week, so most days find nothing and exit without pushing;
-    # the days that do find something also pick up whatever landed on main,
-    # which is what keeps the open pull request from going stale.
-    - cron: '7 21 * * *'
+    # Twice a week, Monday and Thursday 06:07 JST (21:07 UTC Sunday and
+    # Wednesday). This is a review-cost decision and nothing else: running
+    # daily opened a pull request on 24 of the 39 days to 2026-09-20, 32 in
+    # all, and reviewing one that often is what #1975 asks to stop.
+    #
+    # What it costs is freshness, because `minimumReleaseAge` and this period
+    # add rather than overlap. The hold decides when a release becomes
+    # installable — seven days after it is published — and this decides how
+    # long after that the run which takes it comes. Three to four days between
+    # runs puts the worst case at eleven days, against eight for a daily run.
+    # `workflow_dispatch` is how an update is taken before its turn.
+    #
+    # Two fixed weekdays rather than `*/3`, which counts days of the month and
+    # so leaves a one-day gap across every month boundary. Sunday and Wednesday
+    # UTC also keep this off node-support-update.yml's day (Monday 20:17 UTC),
+    # so the two do not open a pull request each within the hour.
+    - cron: '7 21 * * 0,3'
 
   workflow_dispatch:
 
@@ -141,10 +160,10 @@ jobs:
       #
       # Not a bare `pnpm self-update`: that ignores `minimumReleaseAge` by
       # design, and the pnpm command after it does not, so a release younger
-      # than the hold failed this job daily until it matured. The script picks
-      # the newest pnpm the hold already accepts and hands it to `self-update`;
-      # its header has the whole story. It runs on `node` alone — nothing is
-      # installed yet at this point, so `tsx` is not an option.
+      # than the hold failed this job every run until it matured. The script
+      # picks the newest pnpm the hold already accepts and hands it to
+      # `self-update`; its header has the whole story. It runs on `node` alone
+      # — nothing is installed yet at this point, so `tsx` is not an option.
       - name: Update pnpm itself
         run: node ./tools/scripts/cmd/mature-updates.mts pnpm
 
@@ -247,8 +266,9 @@ jobs:
     steps:
       # The commit `update` started from, not `main`'s tip: the patch was made
       # against it, and `main` may have moved since. A run that lands behind
-      # is not a problem — the branch is rebuilt from `main` every night, and
-      # the pull request is rebased by the next run.
+      # is not a problem — the pull request carries `merge-queued`, so
+      # `unblock-prs` rebases it, and the next run rebuilds the branch from
+      # `main` regardless.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

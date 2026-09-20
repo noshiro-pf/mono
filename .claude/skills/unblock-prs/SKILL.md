@@ -64,8 +64,8 @@ however long it is watched. Taking the label off is the action, one PR at a
 time. See "Check triggers, `skip-ci` and out-of-date branches" in `CLAUDE.md`.
 
 `chore/pnpm-update` is opened `merge-queued` by the bot, with auto-merge, so it
-is in scope — but `pnpm-update.yml` force-pushes that branch daily. If it moves
-under you, do not fight it: re-survey and take its new state.
+is in scope — but `pnpm-update.yml` force-pushes that branch twice a week. If
+it moves under you, do not fight it: re-survey and take its new state.
 
 **`changeset-release/main` is the version PR, and it is never rebased** — see
 "The release goes last" below. `release.yml` rebuilds that branch from the tip
