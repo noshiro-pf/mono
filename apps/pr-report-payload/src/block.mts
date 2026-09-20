@@ -97,9 +97,10 @@ export const extractBlock = <A,>(
  * up inside the JSON — one line, beginning with `{` — so it can never be at
  * the start of a line, and never be mistaken for the marker itself.
  */
-const beginMarker = (kind: BlockKind): string => `<!-- ${kind}:begin -->`;
+const beginMarker = (kind: BlockKind): string =>
+  `<!-- ${kind}:begin -->` as const;
 
-const endMarker = (kind: BlockKind): string => `<!-- ${kind}:end -->`;
+const endMarker = (kind: BlockKind): string => `<!-- ${kind}:end -->` as const;
 
 /**
  * The one line of JSON between the markers, found by scanning lines rather

@@ -41,9 +41,35 @@ requests each, and an anonymous browser gets sixty an hour for the whole
 address it sits behind. The report pays that cost in a job that holds a token;
 the page reads what it wrote.
 
-So the page is as fresh as the last run of the workflow, which is every pull
-request event, every push to `main`, and 07:00 JST. The header says how long
-ago that was, and **Refresh** goes and looks again.
+## Staying current
+
+The page re-reads the issues **every minute while it is on screen**, and again
+the moment a hidden tab is brought back. Nothing has to be clicked; **Refresh**
+is there for impatience.
+
+That is affordable only because **every request is conditional**. GitHub
+answers `304 Not Modified` to an `If-None-Match` it issued itself, and a 304
+costs nothing against the rate limit — measured on this repository,
+`x-ratelimit-remaining` unchanged across one. Two unconditional requests a
+minute would be 120 an hour against the 60 an anonymous browser is allowed for
+its whole address; two conditional ones cost nothing until a report is
+actually rewritten. An `ETag` is sent only for a value still on the page, so a
+`304` can always be answered from what is on screen.
+
+A poll may add to the page and may say it failed, but **may not take the page
+away**: a refresh that fails leaves the last report on screen with a note
+beside it, because a dashboard that blanks on a spent rate limit is worse than
+one showing data from four minutes ago.
+
+So the page is as fresh as the last run of `pr-report.yml`, which is every
+pull request event, every push to `main`, **every completion of a workflow
+behind a required context**, and 07:00 JST. That last trigger is what makes a
+CI verdict arrive in about a minute rather than at the next pull request
+event; the page notices within another minute of that.
+
+The "generated 3 hours ago" line is measured against a clock of its own that
+ticks every 30 seconds. It used to be fixed at the moment of the load, which
+meant a tab left open read as fresh forever.
 
 ## Running it
 

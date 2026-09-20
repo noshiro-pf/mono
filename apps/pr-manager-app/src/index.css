@@ -540,3 +540,8 @@ a:focus-visible {
 .run-log-detail {
   color: var(--ink-secondary);
 }
+
+.poll-error {
+  color: var(--status-critical);
+  font-size: 0.8125rem;
+}

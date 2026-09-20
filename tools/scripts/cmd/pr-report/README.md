@@ -111,16 +111,19 @@ issue に書いたその本文がそのままアプリのデータ源になり�
 
 workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
 open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
-がそこにあるため）、ラベルの着脱、push、draft の切り替え、そして `main` への
-push（全 PR の ahead / behind が同時に動くので）。加えて毎日 07:00 JST の
-schedule と `workflow_dispatch`。
+がそこにあるため）、ラベルの着脱、push、draft の切り替え、`main` への push
+（全 PR の ahead / behind が同時に動くので）、そして**必須 context を出す7つの
+workflow の完了**。加えて毎日 07:00 JST の schedule と `workflow_dispatch`。
+
+最後のものは `workflow_run` です。`check_suite` ではありません — GitHub は
+Actions 自身のスイートではそれで workflow を起動しないので、チェックの完了は
+長らくこの workflow に届いていませんでした。`workflow_run` は名前で対象を指す
+ので、**必須 context を出す workflow を増やしたらここにも足す**必要がありま
+す。名前が実在するかは `pnpm run check:root:workflow-run-names` が見ます。
 
 イベントは**合図としてしか使いません** — payload の中身は job に一切入らず、
-毎回 API から全 PR を読み直します。そのため schedule が下限として残っていま
-す。チェックの完了だけはこの workflow が購読できるイベントを持たない
-（`check_suite` は GitHub Actions 自身のスイートでは workflow を起動しない）
-ので、チェック実行中に書かれたレポートは次の PR イベントか schedule で直りま
-す。
+毎回 API から全 PR を読み直します。schedule は、Actions 以外が書く status が
+将来現れたときのための下限として残しています。
 
 同じ issue を全 run が書き換えるため concurrency は1グループに直列化していま
 す。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
@@ -194,12 +197,23 @@ the body written for a person is also the app's data source, so there is no
 second place to keep in step. `apps/pr-report-payload/README.md` has the shape
 of that block and why the issue is the transport at all. It runs whenever something that can change the report happens — a
 pull request opened, closed, reopened, edited, labelled, pushed to or switched
-in or out of draft, and a push to `main`, which moves the ahead / behind of
-every open pull request at once — plus the daily schedule and
-`workflow_dispatch`. The events are pings and nothing else: no payload reaches
-the job, which re-reads every pull request from the API each time. The
-schedule stays as the floor, because a check run finishing raises no event
-this workflow can subscribe to.
+in or out of draft, a push to `main`, which moves the ahead / behind of every
+open pull request at once, and the completion of each of the seven workflows
+behind the required contexts — plus the daily schedule and
+`workflow_dispatch`.
+
+That last one is `workflow_run`, not `check_suite`: GitHub does not trigger a
+workflow with `check_suite` when the suite is Actions' own, which is why a
+check finishing went unheard here for so long. `workflow_run` matches on
+another workflow's `name:`, so **a workflow added behind a required context
+has to be added to that list too**, and
+`pnpm run check:root:workflow-run-names` is what checks that every name there
+resolves to a workflow that exists.
+
+The events are pings and nothing else: no payload reaches the job, which
+re-reads every pull request from the API each time. The schedule stays as the
+floor, for anything that reports a status without an Actions workflow behind
+it.
 
 Every run edits the same body, so they share one concurrency group and run one
 at a time, deliberately not with `cancel-in-progress`: GitHub already drops a

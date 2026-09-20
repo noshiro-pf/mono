@@ -79,7 +79,7 @@ export const CommitDivergence = ({
 const share = (count: number, scaleMax: number): string =>
   count === 0 || !Num.isNonZero(scaleMax)
     ? '0'
-    : `${Math.max(Num.div(count, scaleMax) * 100, MIN_VISIBLE_PERCENT)}%`;
+    : (`${Math.max(Num.div(count, scaleMax) * 100, MIN_VISIBLE_PERCENT)}%` as const);
 
 /** Small enough to read as "barely any", large enough to see. */
 const MIN_VISIBLE_PERCENT = 4;

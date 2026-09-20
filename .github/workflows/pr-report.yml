@@ -62,14 +62,43 @@ on:
     branches:
       - main
 
+  # A check finishing is the other thing that changes the report, and for a
+  # long time it raised no event this workflow could hear. `check_suite` is
+  # the obvious candidate and is the wrong one — GitHub does not trigger a
+  # workflow with it when the suite is GitHub Actions' own, which here is all
+  # of them. `workflow_run` does fire, for each workflow named below, whatever
+  # triggered that workflow's own run.
+  #
+  # The list is the workflows behind the nine contexts
+  # `repo-settings/rulesets/main.json` requires, which are the verdicts the
+  # report states. **A workflow added there has to be added here too**, or its
+  # result reaches the report only at the next pull request event or at the
+  # schedule below; `pnpm run check:root:workflow-run-names` checks that every
+  # name here is a workflow that exists, which is the half of that a script
+  # can decide.
+  #
+  # Seven of these finish within seconds of one another, so this arrives in
+  # bursts. The concurrency group below is what makes that affordable: the
+  # same collapse that debounces a run of label events debounces this, leaving
+  # one run writing and one queued behind it.
+  workflow_run:
+    workflows:
+      - Code Check
+      - Style Check
+      - Strict Lib Generation
+      - Node.js Version Compatibility
+      - Verify Published Packages
+      - Skip CI Label
+      - Lint Pull Request
+    types:
+      - completed
+
   schedule:
-    # 07:00 JST, as the floor rather than the whole of it. Check runs finish
-    # without any event this workflow can subscribe to — `check_suite` does not
-    # trigger a workflow when the suite is GitHub Actions' own — so a report
-    # written while the checks were still running is only corrected by the next
-    # pull request event or by this. A scheduled workflow runs on the default
-    # branch, and GitHub disables one in a repository that has been idle for 60
-    # days.
+    # 07:00 JST, as the floor rather than the whole of it. The `workflow_run`
+    # block above covers the checks this repository runs; anything that reports
+    # a status without an Actions workflow behind it would still land here
+    # first. A scheduled workflow runs on the default branch, and GitHub
+    # disables one in a repository that has been idle for 60 days.
     - cron: '0 22 * * *'
 
   workflow_dispatch:

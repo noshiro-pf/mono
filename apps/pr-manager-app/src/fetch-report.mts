@@ -7,6 +7,15 @@
  * against the 60 an hour an anonymous browser is allowed for the whole
  * address it sits behind. Both reports did that work already, one in a job
  * that holds a token and one on somebody's terminal.
+ *
+ * **Every request is conditional.** An answer carries an `ETag`; sending it
+ * back as `If-None-Match` gets a `304` that costs nothing against the quota —
+ * measured on this repository, `x-ratelimit-remaining` unchanged across a
+ * 304. That is what makes polling affordable at all: two requests a minute
+ * would be 120 an hour against a limit of 60, where two *conditional*
+ * requests a minute cost nothing until the report is actually rewritten.
+ * GitHub allows `If-None-Match` across origins and exposes `ETag` to
+ * scripts, both of which this depends on.
  */
 
 import {
@@ -23,12 +32,24 @@ export type LoadedReport = Readonly<{
   payload: PrReportPayload;
   /** The issue it was read from, so the page can link at its own source. */
   issueUrl: string;
+  /** Sent back as `If-None-Match` next time; absent if GitHub sent none. */
+  etag: string | undefined;
 }>;
 
 export type LoadedRunLog = Readonly<{
   log: UnblockPrsLog;
   issueUrl: string;
+  etag: string | undefined;
 }>;
+
+/**
+ * What a conditional request found when the answer was `304`: whatever the
+ * caller already has is still current. The caller keeps it — which is safe
+ * because an `ETag` is only ever sent for a value that is still on screen.
+ */
+export const UNCHANGED = 'unchanged';
+
+export type Unchanged = typeof UNCHANGED;
 
 /**
  * What `fetchReport` needs of `globalThis.fetch`, and no more: a route in, an
@@ -39,7 +60,11 @@ export type LoadedRunLog = Readonly<{
  * answer it wants to test against instead of replacing a global and having to
  * put it back — and this repository's lint bans the `afterEach` that would.
  */
-export type Fetch = (route: string) => Promise<Response>;
+export type Fetch = (
+  route: string,
+  /** The previous answer's `ETag`, when there was one. */
+  etag: string | undefined,
+) => Promise<Response>;
 
 /**
  * The report, or a sentence a reader can act on.
@@ -51,17 +76,29 @@ export type Fetch = (route: string) => Promise<Response>;
  */
 export const fetchReport = async (
   source: ReportSource,
+  previousEtag?: string,
   fetchImpl: Fetch = askGitHub,
-): Promise<Result<LoadedReport, string>> => {
-  const issue = await fetchLabelledIssue(source, source.label, fetchImpl);
+): Promise<Result<LoadedReport | Unchanged, string>> => {
+  const issue = await fetchLabelledIssue(
+    source,
+    source.label,
+    previousEtag,
+    fetchImpl,
+  );
 
   if (Result.isErr(issue)) return issue;
+
+  if (issue.value === UNCHANGED) return Result.ok(UNCHANGED);
 
   const payload = extractPayload(issue.value.body ?? '');
 
   return Result.isErr(payload)
     ? payload
-    : Result.ok({ payload: payload.value, issueUrl: issue.value.html_url });
+    : Result.ok({
+        payload: payload.value,
+        issueUrl: issue.value.html_url,
+        etag: issue.value.etag,
+      });
 };
 
 /**
@@ -74,27 +111,44 @@ export const fetchReport = async (
  */
 export const fetchRunLog = async (
   source: ReportSource,
+  previousEtag?: string,
   fetchImpl: Fetch = askGitHub,
-): Promise<Result<LoadedRunLog, string>> => {
-  const issue = await fetchLabelledIssue(source, source.runLogLabel, fetchImpl);
+): Promise<Result<LoadedRunLog | Unchanged, string>> => {
+  const issue = await fetchLabelledIssue(
+    source,
+    source.runLogLabel,
+    previousEtag,
+    fetchImpl,
+  );
 
   if (Result.isErr(issue)) return issue;
+
+  if (issue.value === UNCHANGED) return Result.ok(UNCHANGED);
 
   const log = extractRunLog(issue.value.body ?? '');
 
   return Result.isErr(log)
     ? log
-    : Result.ok({ log: log.value, issueUrl: issue.value.html_url });
+    : Result.ok({
+        log: log.value,
+        issueUrl: issue.value.html_url,
+        etag: issue.value.etag,
+      });
 };
 
 const API_ROOT = 'https://api.github.com';
+
+const NOT_MODIFIED = 304;
 
 /** The one open issue carrying a label, or a sentence saying why not. */
 const fetchLabelledIssue = async (
   source: ReportSource,
   label: string,
+  previousEtag: string | undefined,
   fetchImpl: Fetch,
-): Promise<Result<Issue, string>> => {
+): Promise<
+  Result<(Issue & Readonly<{ etag: string | undefined }>) | Unchanged, string>
+> => {
   const query = new URLSearchParams({
     labels: label,
     state: 'open',
@@ -104,11 +158,13 @@ const fetchLabelledIssue = async (
   const route =
     `${API_ROOT}/repos/${source.owner}/${source.repo}/issues?${query.toString()}` as const;
 
-  const answered = await request(route, fetchImpl);
+  const answered = await request(route, previousEtag, fetchImpl);
 
   if (Result.isErr(answered)) return answered;
 
-  const parsed = Json.parse(answered.value);
+  if (answered.value === UNCHANGED) return Result.ok(UNCHANGED);
+
+  const parsed = Json.parse(answered.value.body);
 
   if (Result.isErr(parsed)) {
     return Result.err(`GitHub did not answer JSON: ${parsed.value}`);
@@ -128,7 +184,7 @@ const fetchLabelledIssue = async (
     ? Result.err(
         `No open issue labelled \`${label}\` in ${source.owner}/${source.repo} yet.`,
       )
-    : Result.ok(issue);
+    : Result.ok({ ...issue, etag: answered.value.etag });
 };
 
 /**
@@ -153,20 +209,30 @@ const IssueListSchema = t.array(IssueSchema);
  * wrapper rather than handed over bare, because `fetch` detached from the
  * global it belongs to is not callable in every engine.
  */
-const askGitHub: Fetch = async (route) =>
+const askGitHub: Fetch = async (route, etag) =>
   fetch(route, {
+    // `no-store` so that the browser does its own revalidation nowhere: the
+    // conditional request below is this module's, and a cache layer turning a
+    // 304 back into a 200 from its own copy would hide the one answer worth
+    // telling apart.
     cache: 'no-store',
     headers: {
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
+      ...(etag === undefined ? {} : { 'If-None-Match': etag }),
     },
   });
 
+type Answer = Readonly<{ body: string; etag: string | undefined }>;
+
 const request = async (
   route: string,
+  etag: string | undefined,
   fetchImpl: Fetch,
-): Promise<Result<string, string>> => {
-  const response = await fetchImpl(route).catch((error: unknown) => error);
+): Promise<Result<Answer | Unchanged, string>> => {
+  const response = await fetchImpl(route, etag).catch(
+    (error: unknown) => error,
+  );
 
   if (!(response instanceof Response)) {
     return Result.err(
@@ -174,7 +240,16 @@ const request = async (
     );
   }
 
-  if (response.ok) return Result.ok(await response.text());
+  // Answered before `ok`, because a 304 is not `ok` and is not a failure
+  // either — it is the whole point of having sent the `ETag`.
+  if (response.status === NOT_MODIFIED) return Result.ok(UNCHANGED);
+
+  if (response.ok) {
+    return Result.ok({
+      body: await response.text(),
+      etag: response.headers.get('etag') ?? undefined,
+    });
+  }
 
   // The one failure a reader can do something about — wait — without reading
   // the body of the answer. A browser has no token, so the quota is 60 an

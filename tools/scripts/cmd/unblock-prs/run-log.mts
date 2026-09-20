@@ -140,7 +140,7 @@ export const publishRunLog = async (
     // The tail, because a long run's later events are the ones still worth
     // reading; the cap is what keeps one run from filling the body.
     events: mut_events.slice(-RUN_LOG_MAX_EVENTS),
-  };
+  } as const;
 
   const existing = await readLogIssue();
 
@@ -151,7 +151,7 @@ export const publishRunLog = async (
     RUN_LOG_MAX_RUNS,
   );
 
-  const next: UnblockPrsLog = { version: RUN_LOG_VERSION, runs };
+  const next: UnblockPrsLog = { version: RUN_LOG_VERSION, runs } as const;
 
   const written = await writeLogIssue(existing.value?.number, render(next));
 

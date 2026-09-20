@@ -60,7 +60,7 @@ const FALLBACK = 'ededed';
 
 type Rgb = FixedLengthTuple<3, number>;
 
-const BLACK: Rgb = [0, 0, 0];
+const BLACK: Rgb = [0, 0, 0] as const;
 
 const MAX_CHANNEL: NonZeroFiniteNumber = asNonZeroFiniteNumber(255);
 

@@ -44,3 +44,20 @@ export const reportIssuesUrl = (
 
   return `${repositoryUrl(source)}/issues?${query.toString()}`;
 };
+
+/**
+ * How often the page goes and looks again while it is on screen.
+ *
+ * A minute is affordable only because the requests are conditional: an
+ * unchanged report answers `304`, which costs nothing against the quota. Two
+ * unconditional requests a minute would be 120 an hour against the 60 an
+ * anonymous browser is allowed.
+ */
+export const POLL_INTERVAL_MS = 60_000;
+
+/**
+ * How often "3 hours ago" is recomputed. Not tied to the poll: the report can
+ * go an hour without changing and the sentence about its age still has to
+ * keep up, or a tab left open reads as fresh forever.
+ */
+export const CLOCK_TICK_MS = 30_000;
