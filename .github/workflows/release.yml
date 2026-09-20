@@ -47,6 +47,11 @@ jobs:
   # を回すかどうかを先に判定させると、その判定と `changesets/action` 自身の
   # 判定がずれたときに「`dist/` の無いまま publish」が起きうる。リリース経路で
   # 一番避けたいのはそれなので、無条件に作る。
+  #
+  # **この分割は戻さないこと。** `ws:build` を `changeset:publish` に足し直す、
+  # 下の `release` job にステップとして足す、二つの job を一つに畳む —
+  # どれも同じことで、ビルドツールチェーン全部が `id-token: write` の内側に
+  # 帰ってくる。速くしたいなら、ここを速くするか `needs` を組み替えるか。
   build:
     name: Build
     timeout-minutes: 15
@@ -173,6 +178,9 @@ jobs:
       # `changeset:version-packages` はどれもしない。その最後の
       # `pnpm install --no-frozen-lockfile` が script 付きで走り直すので、
       # リンクはそこで戻る。
+      #
+      # ここにステップを足すときは、install script が走っていることを前提に
+      # しないこと。前提にしなければならないものは `build` job の側にある。
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
         env:
@@ -206,7 +214,9 @@ jobs:
           permission-pull-requests: write # version PR の作成と更新
 
       # `changeset:publish` はもう `ws:build` を呼ばない。ビルドは `build` job
-      # が済ませていて、その成果物は上で展開済み。
+      # が済ませていて、その成果物は上で展開済み。裏を返すと、このスクリプトを
+      # 手で走らせるとディスクにある `dist/` をそのまま publish する — 中身が
+      # 何であれ。publish はこの workflow の仕事で、手元の仕事ではない。
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
