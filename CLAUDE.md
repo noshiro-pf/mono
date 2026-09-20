@@ -142,7 +142,7 @@ Main entry points: `ws:build`, `ws:gen` (needs `ws:build`), `ws:check:types`,
 `ws:check:dist` (needs `ws:build`), `ws:check:ext`, `ws:check:sumi`,
 `ws:doc`, `check:cspell`, `check:md`, `check:prose`, `check:root`,
 `check:knip` (needs `ws:build`), `check:published-deps`, `gen:deps-graph`,
-`fmt` / `fix:fmt:diff` / `fix:fmt:full`, `fix:codemod[:full]`.
+`fmt` / `fix:fmt:diff` / `fix:fmt:full`, `fix:codemod[:diff|:full]`.
 
 **Run the checks the diff touches, not `check-all`.** `check-all` is a human
 aid: what it skips and where it is narrower than CI is listed at the end of
@@ -150,11 +150,16 @@ aid: what it skips and where it is narrower than CI is listed at the end of
 
 | the diff touches            | run                                                                                       |
 | :-------------------------- | :---------------------------------------------------------------------------------------- |
-| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`                                    |
-| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`                                  |
+| TypeScript in a package     | that package's `check:types`, `fix:lint`, `check:test`, and `fix:codemod:diff`            |
+| `tools/`                    | `check:root:types`, `check:root:lint`, `check:root:test`, `fix:codemod:diff`              |
 | Markdown or prose           | `check:md`, `check:cspell`, `check:prose`                                                 |
 | a `package.json`, lockfile  | `check:knip`, `check:published-deps`, `gen:deps-graph`, and a build of what depends on it |
 | workflows, `repo-settings/` | nothing but `fmt` and `check:cspell` reads them locally                                   |
+
+`fix:codemod:diff` is in both TypeScript rows because no lint rule stands
+behind the codemod — `prefer-as-const` rewrites `as 'foo'` and says nothing
+about an `as const` that is missing — so `code-check (fix:codemod:full)` is
+otherwise the first thing to mention it.
 
 A targeted run can miss a file another package's generator writes; CI's
 `assert-repo-is-clean` catches it once `skip-ci` is off. Read `git status`
