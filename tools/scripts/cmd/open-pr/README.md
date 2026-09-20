@@ -1,3 +1,5 @@
+<!-- cspell:ignore unreviewed -->
+
 # `open-pr`
 
 `pnpm run open-pr` — opens the pull request for the current branch the way
