@@ -18,12 +18,29 @@ name: Check Gates
 #
 # ## Whether the diff matters
 #
-# `check-should-run` from `ts-repo-utils`, against one of the ignore lists
-# in the root `package.json` — see "CI diff gates" in CLAUDE.md. This used to
-# be a step inside every job, which meant each of the 22 matrix runners across
-# the three workflows booted, checked out and installed dependencies (~45s
-# apiece) before finding out it had nothing to do. Here it costs one runner
-# for all of them.
+# `check-should-run` from `ts-repo-utils`, against one of the three
+# `z:check-should-run:*` ignore lists in the root `package.json`. Those lists
+# are JSON and can carry no comment of their own, so what they mean is here:
+#
+# - **A path goes on a list only when no command that workflow runs reads
+#   it.** `articles/` is not on the style list because Prettier formats it;
+#   `**.md` is not on the strict-lib list because the changelogs are copied
+#   into the bundles. Adding a path wrongly fails nothing — it makes the
+#   workflow skip a diff it was the one thing meant to judge.
+# - **A check workflow carries no `paths:` filter of its own.** A workflow
+#   filtered out that way reports no status at all, and a required context
+#   that never arrives blocks the merge forever. This gate is what decides,
+#   and it decides after the workflow has started.
+# - **A gate is a job-level `if`**, so a step added inside a gated job needs
+#   no condition of its own.
+# - **A job downstream of a gate reads `!cancelled()` and `!= 'false'`, never
+#   `== 'true'`.** A gate that failed to answer then fails open — the work
+#   runs — rather than skipping silently.
+#
+# This used to be a step inside every job, which meant each of the 22 matrix
+# runners across the three workflows booted, checked out and installed
+# dependencies (~45s apiece) before finding out it had nothing to do. Here it
+# costs one runner for all of them.
 #
 # Two things had to be true before it could move:
 #

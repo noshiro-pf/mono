@@ -146,8 +146,8 @@ jobs:
     # - A diff that touches nothing any command below reads. This used to be a
     #   step inside each job, which meant every runner in the matrix booted,
     #   checked out and installed dependencies before finding out it had
-    #   nothing to do; the gate job pays that once. See "CI diff gates" in
-    #   CLAUDE.md.
+    #   nothing to do; the gate job pays that once. What may go on an ignore
+    #   list is in check-gates.yml, under "Whether the diff matters".
     # - A verdict already reached on this head commit, which the matrix would
     #   only repeat. See "A commit already checked is not checked again".
     #

@@ -66,14 +66,10 @@ Workspace globs are in `pnpm-workspace.yaml`; a directory is a member only
 with a `package.json`, and `tools/configs/`, `tools/scripts/` have none on
 purpose.
 
-**One `.gitignore`, at the root.** Prettier reads ignore files from the root
-only, so a package-level one keeps git quiet while `fix:fmt:full` reformats
-anyway. Generated TypeDoc `docs/` are gitignored per package by name because
-`libs/eslint-config-typed/docs`, `libs/synstate/docs` and
-`apps/split-view-extension/docs` are hand-written. The one deliberate
-package-level `.prettierignore` is `languages/sumi/conformance/` (fixtures
-must stay byte for byte and a package-local `fmt` resolves `ignorePath` from
-its cwd); keep it in sync with the root entry.
+**One `.gitignore`, at the root**, and one deliberate package-level
+`.prettierignore` (`languages/sumi/conformance/`). Each says why in its own
+header, and a third of either kind has to answer them first: Prettier reads
+ignore files from one directory and no other.
 
 Inside a package: `src/` (`entry-point.mts` or `index.mts` is the public
 entry; `src/cmd/` for CLIs), `test/` (`test/browser/` for DOM tests),
@@ -207,24 +203,6 @@ declared and applied before the workflow naming it merges, and what
 `rulesets/main.json` asks of a new job, a renamed context, the admin bypass
 and `.github/CODEOWNERS`.
 
-## Tokens and third-party code in a job
-
-What a compromised dependency can reach is what the job's key can do.
-`pnpm-update.yml` is split for that reason — `update` runs the dependency
-tree's code with no key, `commit` holds the `workflows: write` token and
-installs nothing, and a patch crosses between them (applied, never executed,
-and refused if it touches paths a dependency update does not write).
-`node-support-update.yml` is not split: its token lacks `workflows` and arms
-no auto-merge. When editing these:
-
-- A `run:` block is the definition GitHub resolved; a file in the tree is read
-  at invocation, after third-party code could rewrite it. Steps that must not
-  trust the tree stay inline and use `git`/`gh` only.
-- Work that needs no token goes before `Generate Token`. A step before
-  `pnpm install` runs its script with `node`, not `pnpm run` (which installs);
-  that is why `mature-updates.mts` imports `node:*` only.
-- `git config core.hooksPath /dev/null` before committing on a runner.
-
 ## CI
 
 ### Required status checks
@@ -245,15 +223,11 @@ does not read — each held by something else.
 
 ### Diff gates
 
-Check workflows carry no `paths` filter (a filtered-out workflow reports no
-status). `check-gates.yml` decides per workflow whether the diff touches
-anything it reads, using the three `z:check-should-run:*` ignore lists in the
-root `package.json`. **Add a path to a list only when no command that workflow
-runs reads it** (`articles/` is not on the style list because Prettier
-formats it; `**.md` is not on the strict-lib list because changelogs are
-copied into the bundles). Gates are job-level `if`s, so a step added to a
-gated job needs no condition. Dependent jobs use `!cancelled()` and
-`!= 'false'`, never `== 'true'`, so an unanswered gate fails open.
+Check workflows carry no `paths` filter; `check-gates.yml` decides per
+workflow whether the diff touches anything it reads, from the three
+`z:check-should-run:*` ignore lists in the root `package.json`. What may go on
+a list, and what a job downstream of a gate may assume, is written in that
+workflow.
 
 ### Triggers, `skip-ci`, out-of-date branches
 
@@ -300,15 +274,15 @@ empty `words`, run the check, restore what it reports).
 
 **A changeset's words belong in the config of the package it names**, because
 `changeset version` copies the body into that package's changelog, which is
-checked there. `check:cspell:changeset` runs each changeset under every named
-package's config. Do not put `.changeset` in `ignorePaths`.
+checked there; `check:cspell:changeset` is what says so. Do not put
+`.changeset` in `ignorePaths`.
 
 ## Japanese text
 
 Documents and comments may be Japanese; commits and pull request titles may
-not (see below). Parentheses around Japanese text are fullwidth `（）`;
-`pnpm run fix:japanese-parentheses` rewrites the halfwidth ones and drops the
-spaces they needed. Verbatim texts under `docs/` are never touched.
+not (`lint-pull-request.yml` fails on them). Parentheses around Japanese text
+are fullwidth `（）`; `check:prose:japanese-parentheses` names the fix and
+leaves the verbatim texts under `docs/` alone.
 
 ## Session rules
 
@@ -446,9 +420,9 @@ cannot decide:
   named as a string in a config (the Prettier plugins) is invisible to it; put
   it in `ignoreDependencies` with the reason. `knip.jsonc` says where a new
   entry goes; `check:root:knip-config` reads the result.
-- `verify-npm-packages/`: edit `smoke/` only; `local/` and `published/` are
-  generated. `verify:npm-packages` packs the checkout (needs `ws:build`);
-  `:published` uses pins `pnpm-update` moves. See its `README.md`.
+- `verify-npm-packages/` keeps its rules in its own `README.md` — which part
+  is hand-written, and which of the two commands reads what. It needs
+  `ws:build`.
 - No bundler: libraries build with `tsc` plus the strip pass. Nothing depends
   on `rollup`.
 - Shared devDependency versions live in the `catalog:` of
@@ -459,10 +433,10 @@ cannot decide:
   Releases; a major waits for a human).
 - `update-packages` filters out `strict-lib/v*/output/lib`, whose manifests
   are generated with a `^<major>.0.0` range.
-- **`minimumReleaseAgeExclude` entries are waivers**: `name@version`, with a
-  reason beside it, so pruning retires them. Not `@types/*` and not our own
-  packages. Do not put `pnpm` there; `pnpm-update.yml` picks a mature pnpm
-  through `mature-updates.mts pnpm` instead.
+- **Do not put `pnpm` on `minimumReleaseAgeExclude`**; `pnpm-update.yml` picks
+  a mature pnpm through `mature-updates.mts pnpm` instead. What that list asks
+  of an entry, and where a reason has to go so that pruning cannot take it
+  away, is written above it in `pnpm-workspace.yaml`.
 - Workspace dependencies use `workspace:^` / `workspace:~` / `workspace:*`
   matching the range to publish; `devDependencies` use `workspace:*`.
 - **The strict standard library is one root devDependency**

@@ -31,8 +31,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * run the dependency tree's lifecycle scripts, so a dependency could rewrite
  * it. Before the token is minted that buys an attacker nothing they do not
  * already have — they are already executing code in this job. After it, it
- * would buy them the token. See "An inline `run:` block in a privileged job"
- * in CLAUDE.md.
+ * would buy them the token. See "What a job that holds a key may do" in
+ * pnpm-update.yml.
  *
  * ## The baseline
  *
@@ -68,7 +68,7 @@ export const main = async (): Promise<void> => {
  * The body of `.changeset/pnpm-update-<date>.md`.
  *
  * The front matter names every package, and the text below it is copied into
- * each of their changelogs — see CLAUDE.md, "`.changeset/`", for why what it
+ * each of their changelogs — see CLAUDE.md, "Spell checking", for why what it
  * says has to pass cspell under each named package's own config.
  */
 export const renderChangeset = (packageNames: readonly string[]): string =>

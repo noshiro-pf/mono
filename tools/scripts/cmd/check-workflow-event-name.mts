@@ -238,7 +238,7 @@ const formatViolations = (violations: readonly string[]): string =>
     '',
     ...violations.map((message) => `  ${message}`),
     '',
-    'See CLAUDE.md, "A push cancels the run still going for the previous one":',
+    'See CLAUDE.md, "Triggers, `skip-ci`, out-of-date branches":',
     'moving a trigger and leaving the comparison behind turns',
     '`cancel-in-progress` off with nothing to say so.',
   ].join('\n');
