@@ -88,6 +88,11 @@ export type TriageContext = TriageBase &
     dependencies: ReadonlyMap<number, readonly number[]>;
     /** Every number that sits on a `Merge-After` cycle. */
     cyclic: ReadonlySet<number>;
+    /**
+     * The open pull requests labelled `blocks-release`, which hold the
+     * version pull request for as long as they are open.
+     */
+    releaseBlockers: readonly PullRequest[];
   }>;
 
 /** What one survey says about one pull request. */

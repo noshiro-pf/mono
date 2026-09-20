@@ -20,6 +20,7 @@ import {
   type RebaseFailure,
 } from './types.mjs';
 import { lastLines, sh } from './util.mjs';
+import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
  * Rebases the pull request's branch onto `origin/<defaultBranch>` in a
@@ -164,11 +165,32 @@ const rebaseInWorktree = async (
  * take off either: then GitHub's `BEHIND` or `DIRTY` was stale and the survey
  * has to start over. A paused pull request that is already on top of the base
  * is simply one whose only obstacle was the label.
+ *
+ * The version pull request is the exception: only the label comes off it.
+ * `changesets/action` rebuilds that branch from the tip of the base itself
+ * and force-pushes the result, so rebasing it here would be a second thing
+ * force-pushing one branch — and would carry the old version commit onto a
+ * tip whose changesets it never consumed. Triage has already established
+ * that the branch is on the tip; there is nothing left to move.
  */
 export const advance = async (
   pr: PullRequest,
   defaultBranch: string,
 ): Promise<Result<Advanced, RebaseFailure>> => {
+  if (isVersionPullRequest(pr, defaultBranch)) {
+    if (!isSkipCiLabelled(pr)) {
+      // Triage only ever offers this one while it is paused, so nothing to
+      // take off means the survey is a release behind.
+      return Result.ok({ kind: 'stale-merge-state' });
+    }
+
+    const unlabelled = await removeSkipCiLabel(pr, pr.headRefOid);
+
+    return Result.isErr(unlabelled)
+      ? unlabelled
+      : Result.ok({ kind: 'advanced', head: pr.headRefOid });
+  }
+
   const rebased = await rebaseAndPush(pr, defaultBranch);
 
   if (Result.isErr(rebased)) return rebased;

@@ -25,7 +25,7 @@ merge order". This file describes what the script does with them.
 事）。rebase は使い捨ての `git worktree` の中で行うので、実行元のチェックアウ
 トの作業ツリーには触れません。
 
-### PR 側で宣言する2つのこと
+### PR 側で宣言する3つのこと
 
 **`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
 に無視します。付いていて、かつ動かせない PR（auto-merge 無し / draft /
@@ -50,6 +50,28 @@ Merge-After: #1901, #1903
 - **コードフェンス内のトレーラは読みません。** 宣言とその実例は同じ文字列なの
   で、この機能を説明する文書が本物の制約になってしまわないようにするためです。
 
+**`blocks-release` ラベル** は「次のリリースにはこれが入っていなければならな
+い」という宣言です。これが付いた PR が1本でも open な間、version PR
+（ `changeset-release/main` から changesets が開く PR ）は pick されません。
+
+- 制約するのは version PR だけです。ラベルの付いた PR 自身は何も制約されませ
+  ん。
+- **draft でも数えます。** キューに入れていない PR、まだ書きかけの PR でリリー
+  スを止められるのがこのラベルの目的だからです。裏返すと、忘れられた draft が
+  1本あるとリリースは止まり続けるので、毎サイクル名指しで報告します。
+- 外す運用はありません。制約は「 open であること」なので、マージでもクローズで
+  も PR が閉じれば自動的に解除されます。
+- version PR 自身に付いた場合は無視します（自分で自分を止め続けるだけで、誰も
+  外せないため）。
+
+**なぜ本文ではなくラベルなのか。** version PR は唯一、本文に何も書けない PR で
+す。`changesets/action` は main への push のたびに `updatePullRequest` で title
+と body を丸ごと上書きするので、そこに書いた `Merge-After:` は消えます。しかも
+消えるのは「キューに他の PR があって先にマージされた時」、つまり順序宣言が効い
+ていてほしいまさにその瞬間です。だから宣言は逆側 — リリースが待っている当の
+PR — から行います。public repository なので、コメントではなく write 権限の要る
+ラベルであることにも意味があります。
+
 **`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
 せるだけで、順番が来たら外すのがこのスクリプトの仕事です。
 
@@ -70,13 +92,23 @@ Merge-After: #1901, #1903
 
 #### 2. triage
 
-1. 全 PR の body から `Merge-After:` を読んで依存グラフを作り、閉路を検出。
+1. 全 PR の body から `Merge-After:` を読んで依存グラフを作り、閉路を検出
+   （ version PR の body だけは読みません — 上書きされるので）。
 2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
    れば `note`（理由を出力）。
 3. **skip 記録** — 前のサイクルで諦めた PR は、当時の head と base のままなら
    `note`。
 4. **`Merge-After` ゲート** — 指定先が1つでも open なら `note`。
-5. **振り分け**
+5. **version PR** — `changeset-release/<デフォルトブランチ>` から来た PR は専
+   用の扱いになります。`blocks-release` の付いた open な PR があれば `note`。
+   無ければ、そのブランチが **main の現在の先端の上に建っているか** を
+   `git merge-base` で確かめ、建っていなければ `note`（ Release workflow がま
+   だ作り直していない）。どちらでもなければ、`skip-ci` が付いていれば
+   **candidate**、付いていなければ必須チェックを読んで **failing** か
+   **in-flight**。`mergeStateStatus` を使わないのは、これを読み違えた代償が
+   「feature 抜きのリリース」だからです（ GitHub の答えは非同期に計算された
+   キャッシュ）。
+6. **振り分け**
     - `skip-ci` 付き → **candidate**。merge state は見ません。
       `no-skip-ci-label` が pending なので、どれだけ準備できていても必ず
       `BLOCKED` になり、「スキップされたチェック」と「実行中のチェック」が区別
@@ -88,6 +120,15 @@ Merge-After: #1901, #1903
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in-flight**。
     - `BLOCKED` → 必須チェックを読み、失敗なら **failing**、未完なら
       **in-flight**。
+
+このスクリプトは **version PR を rebase しません。** `changeset-release/main`
+は Release workflow が main の先端から毎回作り直して force-push するブランチで、
+ここで rebase すると (a) 2つの自動化が同じブランチを force-push し、(b) 古い
+version commit が「まだ消費していない changeset を含む先端」の上に乗るため、
+マージすると **その changeset 抜きのリリース** が出ます。やることは `skip-ci`
+を外すことだけです。候補の並びでも最後に回します — こちらはゲートではなく順序
+なので、リリースを止めることはありません（キュー済みの変更とリリースが同時に準
+備できた時、変更を先に入れるだけ）。
 
 #### 3. 1本だけ動かす
 
@@ -185,6 +226,7 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 | `main.mts`        | ループ本体とコマンドライン（入口）                        |
 | `triage.mts`      | 1回の survey が各 PR について何を言うか                   |
 | `merge-after.mts` | 宣言された順序 — トレーラのパーサと閉路検出               |
+| `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
 | `checks.mts`      | マージが何を待っているか                                  |
@@ -213,7 +255,7 @@ rebase runs a full CI matrix per branch and throws all but the first away.
 The rebase happens in a throwaway `git worktree`, so the checkout it runs from
 is never touched.
 
-### The two things a pull request declares
+### The three things a pull request declares
 
 **The `merge-queued` label is the scope rule.** A pull request without it is
 passed over in silence. One that has it and cannot be acted on — no
@@ -240,6 +282,31 @@ Merge-After: #1901, #1903
 - **A trailer inside a fenced code block is not read**, so a document
   describing the convention does not become a constraint.
 
+**The `blocks-release` label says the next release must contain this pull
+request.** While one carrying it is open, the version pull request — the one
+`changesets/action` opens from `changeset-release/main` — is not picked.
+
+- It constrains the version pull request and nothing else. The pull request
+  carrying it is not constrained at all.
+- **A draft counts.** Holding a release for something not queued, or not
+  finished, is the whole point of the label. The other side of that is a
+  forgotten draft holding every release, so the blockers are named in the
+  report on every cycle.
+- Nothing ever takes it off: the constraint is "open", so merging or closing
+  the pull request ends it and leaves no state to clean up.
+- On the version pull request itself it is ignored — it would hold it forever
+  with nothing able to take it off, which is a `Merge-After` cycle by another
+  name.
+
+**Why a label, and not the body.** The version pull request is the one pull
+request that cannot declare anything in its body: `changesets/action`
+overwrites its title and body through `updatePullRequest` on every push to the
+base, so a `Merge-After:` written there is wiped — and wiped precisely when
+another queued pull request merged first, which is when the order mattered. So
+the declaration is made from the other side, by the pull request the release is
+waiting for. A label rather than a comment for a second reason: this repository
+is public, and a label needs write access while a comment does not.
+
 **`skip-ci` is not a scope rule.** It pauses a queued pull request, and taking
 it off when its turn comes is the job.
 
@@ -262,13 +329,23 @@ GitHub is still computing is never read as up to date. The tip of
 #### 2. Triage
 
 1. Build the dependency graph from every body's `Merge-After:`, and find the
-   cycles in it.
+   cycles in it. The version pull request's body is the one that is not read,
+   because it is overwritten; others may still name it.
 2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not
    actionable means a `note` naming the reason.
 3. **Skip records** — a pull request a previous cycle gave up on is a `note`
    for as long as its head and the base are where they were.
 4. **The `Merge-After` gate** — a `note` while anything it names is open.
-5. **The rest**
+5. **The version pull request** — one whose branch is
+   `changeset-release/<default branch>` is handled on its own. A `note` while
+   any pull request labelled `blocks-release` is open. Otherwise `git
+merge-base` says whether the branch was built on the current tip of the
+   base, and a `note` while it was not — the release workflow has not rebuilt
+   it yet. Past both: **candidate** if it carries `skip-ci`, and otherwise
+   **failing** or **in flight** by its required checks. `mergeStateStatus` is
+   not what answers this one: GitHub's answer is computed asynchronously and
+   cached, and being wrong here releases a set the branch was built before.
+6. **The rest**
     - Carrying `skip-ci` → **candidate**, whatever the merge state says. With
       `no-skip-ci-label` pending it reads `BLOCKED` however ready it is, and
       checks that were skipped are indistinguishable from checks still
@@ -280,6 +357,16 @@ GitHub is still computing is never read as up to date. The tip of
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in flight**.
     - `BLOCKED` → read the required checks: **failing** if one failed,
       **in flight** if they are still running.
+
+**The version pull request is never rebased.** `changeset-release/main` is
+rebuilt from the tip of the base and force-pushed by the release workflow on
+every push to it, so a rebase here would be (a) a second thing force-pushing
+one branch and (b) the old version commit landing on a tip that carries a
+changeset it never consumed — merge that and the release is missing the change
+the queue was assembled for. Taking `skip-ci` off is the whole of what it is
+given, and it is ordered last among the candidates. That last part is an
+ordering and not a gate, so it never stops a release: it only means that when
+a queued change and the release are both ready, the change goes in first.
 
 #### 3. Act on exactly one
 
@@ -381,6 +468,7 @@ sleeps for `--idle-interval` (300s) and surveys again.
 | `main.mts`        | the loop and the command line (entry point)              |
 | `triage.mts`      | what one survey says about each pull request, and why    |
 | `merge-after.mts` | the declared order — the trailer parser, cycle detection |
+| `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
 | `checks.mts`      | what the merge is waiting for                            |
