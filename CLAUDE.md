@@ -349,6 +349,14 @@ ingest the feed). Outside reports come through private vulnerability reporting
   Run the local checks first and say in the description which ones — while the
   label is on they are the only checks the branch gets. Details in
   `tools/scripts/cmd/open-pr/README.md`.
+- **In a Claude Code session it gets as far as `skip-ci` and stops there.** The
+  proxy refuses GitHub's GraphQL outright, and arming auto-merge is GraphQL
+  only — `gh pr merge --auto` is refused the same way, so this is the
+  environment rather than the script. What it leaves is the safe half, and the
+  session arms auto-merge with its own GitHub tooling. **Do not teach the
+  script the proxy's `ccr/` route**: it is not GitHub's API and answers 404
+  from anywhere else, so it would be a code path dead everywhere the command
+  normally runs.
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
   failed" notifications naming nothing — ignore them**, the `labeled` run
   supersedes them.

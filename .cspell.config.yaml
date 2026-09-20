@@ -49,6 +49,9 @@ words:
   - catan
   - bivariant
   - blueprintjs
+  # undici's warning code for its proxy agent, silenced in the `open-pr`
+  # script so the warning does not treble its output.
+  - EHPA
   - msapplication
   - nand
   - noshiro

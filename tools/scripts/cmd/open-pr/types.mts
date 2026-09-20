@@ -1,4 +1,4 @@
-/** The shapes this command passes around, and what it asks `gh` for. */
+/** The shapes this command passes around, and what the API answers with. */
 
 import * as t from 'ts-fortress';
 
@@ -10,18 +10,54 @@ import * as t from 'ts-fortress';
  *
  * `autoMergeRequest` is read as `unknown` because only its presence matters;
  * what merge method GitHub recorded is not this command's business.
+ *
+ * `nodeId` is here because two of the four writes are GraphQL mutations,
+ * which address a pull request by node id rather than by number. It is
+ * carried on the read that already happens rather than fetched again.
  */
 export const PullRequestSchema = t.record({
   number: t.number(),
+  nodeId: t.string(),
   state: t.string(),
   isDraft: t.boolean(),
   labels: t.array(t.record({ name: t.string() })),
   autoMergeRequest: t.unknown(),
 });
 
-export const PullRequestListSchema = t.array(PullRequestSchema);
-
 export type PullRequest = t.TypeOf<typeof PullRequestSchema>;
 
-/** `gh pr list --json` takes these names; they match the schema above. */
-export const PR_JSON_FIELDS = 'number,state,isDraft,labels,autoMergeRequest';
+/**
+ * What `GET /repos/{owner}/{repo}/pulls[/{number}]` answers with, in the
+ * REST API's own names. Only the fields above are declared; everything else
+ * in that response is ignored.
+ */
+export const PullRequestResponseSchema = t.record({
+  number: t.number(),
+  node_id: t.string(),
+  state: t.string(),
+  draft: t.boolean(),
+  labels: t.array(t.record({ name: t.string() })),
+  auto_merge: t.unknown(),
+});
+
+export const PullRequestListResponseSchema = t.array(PullRequestResponseSchema);
+
+export type PullRequestResponse = t.TypeOf<typeof PullRequestResponseSchema>;
+
+/**
+ * The REST response in this command's own terms.
+ *
+ * `state` is upper-cased because that is what `armBlockedBy` compares against
+ * and what it prints: the REST API says `open`, GraphQL and `gh` say `OPEN`,
+ * and the one this command reasons in should not depend on which of them
+ * answered.
+ */
+export const toPullRequest = (response: PullRequestResponse): PullRequest =>
+  ({
+    number: response.number,
+    nodeId: response.node_id,
+    state: response.state.toUpperCase(),
+    isDraft: response.draft,
+    labels: response.labels,
+    autoMergeRequest: response.auto_merge,
+  }) as const;

@@ -3,6 +3,7 @@ import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { SKIP_CI_LABEL } from '../unblock-prs/labels.mjs';
 import { log } from '../unblock-prs/util.mjs';
+import { type ApiContext } from './api.mjs';
 import {
   addLabel,
   armAutoMerge,
@@ -41,11 +42,11 @@ export const openPullRequest = async (
 
   if (Result.isErr(context)) return context;
 
-  const { branch, defaultBranch } = context.value;
+  const { api, branch, defaultBranch } = context.value;
 
   const base = options.base ?? defaultBranch;
 
-  if (options.dryRun) return dryRun(branch, base, options);
+  if (options.dryRun) return dryRun(api, branch, base, options);
 
   const pushed = await pushBranch(branch);
 
@@ -53,25 +54,25 @@ export const openPullRequest = async (
 
   log(`pushed ${branch}`);
 
-  const existing = await findOpenPullRequest(branch);
+  const existing = await findOpenPullRequest(api, branch);
 
   if (Result.isErr(existing)) return existing;
 
   const prNumber =
     existing.value === undefined
-      ? await open(branch, base, options)
+      ? await open(api, branch, base, options)
       : Result.ok(existing.value.number);
 
   if (Result.isErr(prNumber)) return prNumber;
 
   // Re-read rather than reuse what the listing said: between then and now
   // this run has created it, and a draft cannot be armed.
-  const created = await viewPullRequest(prNumber.value);
+  const created = await viewPullRequest(api, prNumber.value);
 
   if (Result.isErr(created)) return created;
 
   if (created.value.isDraft) {
-    const ready = await markReady(prNumber.value);
+    const ready = await markReady(api, created.value.nodeId);
 
     if (Result.isErr(ready)) {
       return Result.err(`cannot mark it ready for review: ${ready.value}`);
@@ -80,7 +81,7 @@ export const openPullRequest = async (
     log(`#${prNumber.value}: marked ready for review`);
   }
 
-  const labelled = await addLabel(prNumber.value, SKIP_CI_LABEL);
+  const labelled = await addLabel(api, prNumber.value, SKIP_CI_LABEL);
 
   if (Result.isErr(labelled)) {
     return Result.err(`cannot add ${SKIP_CI_LABEL}: ${labelled.value}`);
@@ -88,7 +89,7 @@ export const openPullRequest = async (
 
   log(`#${prNumber.value}: ${SKIP_CI_LABEL} is on`);
 
-  return arm(prNumber.value);
+  return arm(api, prNumber.value);
 };
 
 /**
@@ -96,8 +97,11 @@ export const openPullRequest = async (
  * call above reported success, which is not the same as the label being on
  * now, and this is the one decision where the difference lands on `main`.
  */
-const arm = async (prNumber: number): Promise<Result<string, string>> => {
-  const current = await viewPullRequest(prNumber);
+const arm = async (
+  api: ApiContext,
+  prNumber: number,
+): Promise<Result<string, string>> => {
+  const current = await viewPullRequest(api, prNumber);
 
   if (Result.isErr(current)) return current;
 
@@ -111,7 +115,7 @@ const arm = async (prNumber: number): Promise<Result<string, string>> => {
     return Result.ok(`#${prNumber}: auto-merge was already armed.`);
   }
 
-  const armed = await armAutoMerge(prNumber);
+  const armed = await armAutoMerge(api, current.value.nodeId);
 
   if (Result.isErr(armed)) {
     return Result.err(`cannot arm auto-merge: ${armed.value}`);
@@ -126,6 +130,7 @@ const arm = async (prNumber: number): Promise<Result<string, string>> => {
 };
 
 const open = async (
+  api: ApiContext,
   branch: string,
   base: string,
   options: Options,
@@ -139,6 +144,7 @@ const open = async (
   if (Result.isErr(body)) return body;
 
   const created = await createPullRequest({
+    api,
     branch,
     base,
     title: title.value,
@@ -188,11 +194,12 @@ const resolveBody = async (
 };
 
 const dryRun = async (
+  api: ApiContext,
   branch: string,
   base: string,
   options: Options,
 ): Promise<Result<string, string>> => {
-  const existing = await findOpenPullRequest(branch);
+  const existing = await findOpenPullRequest(api, branch);
 
   if (Result.isErr(existing)) return existing;
 
