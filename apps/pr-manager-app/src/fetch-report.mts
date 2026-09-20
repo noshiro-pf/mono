@@ -1,14 +1,20 @@
 /**
- * Reading the report back out of the issue `pr-report.yml` writes.
+ * Reading the reports back out of the issues that write them.
  *
- * The app asks GitHub for one issue and nothing else. Asking it about the
- * pull requests directly is what it cannot afford: three requests each — the
- * comparison against the base and the two kinds of check — against the 60 an
- * hour an anonymous browser is allowed, shared with everyone behind the same
- * address. The report already did that work, in a job that holds a token.
+ * Two requests a load: the issue `pr-report.yml` writes, and the one
+ * `unblock-prs` writes when it acts on something. Asking GitHub about the
+ * pull requests directly is what this cannot afford — three requests each,
+ * against the 60 an hour an anonymous browser is allowed for the whole
+ * address it sits behind. Both reports did that work already, one in a job
+ * that holds a token and one on somebody's terminal.
  */
 
-import { extractPayload, type PrReportPayload } from 'pr-report-payload';
+import {
+  extractPayload,
+  extractRunLog,
+  type PrReportPayload,
+  type UnblockPrsLog,
+} from 'pr-report-payload';
 import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type ReportSource } from './constants.mjs';
@@ -16,6 +22,11 @@ import { type ReportSource } from './constants.mjs';
 export type LoadedReport = Readonly<{
   payload: PrReportPayload;
   /** The issue it was read from, so the page can link at its own source. */
+  issueUrl: string;
+}>;
+
+export type LoadedRunLog = Readonly<{
+  log: UnblockPrsLog;
   issueUrl: string;
 }>;
 
@@ -42,13 +53,56 @@ export const fetchReport = async (
   source: ReportSource,
   fetchImpl: Fetch = askGitHub,
 ): Promise<Result<LoadedReport, string>> => {
+  const issue = await fetchLabelledIssue(source, source.label, fetchImpl);
+
+  if (Result.isErr(issue)) return issue;
+
+  const payload = extractPayload(issue.value.body ?? '');
+
+  return Result.isErr(payload)
+    ? payload
+    : Result.ok({ payload: payload.value, issueUrl: issue.value.html_url });
+};
+
+/**
+ * The same, for the issue `unblock-prs` writes.
+ *
+ * Its own call rather than part of the one above, and its own place in the
+ * page's state: the log is secondary, and a missing or unreadable log is not
+ * a reason for the page to show nothing. Both are asked for at once, so the
+ * second costs wall clock rather than a wait.
+ */
+export const fetchRunLog = async (
+  source: ReportSource,
+  fetchImpl: Fetch = askGitHub,
+): Promise<Result<LoadedRunLog, string>> => {
+  const issue = await fetchLabelledIssue(source, source.runLogLabel, fetchImpl);
+
+  if (Result.isErr(issue)) return issue;
+
+  const log = extractRunLog(issue.value.body ?? '');
+
+  return Result.isErr(log)
+    ? log
+    : Result.ok({ log: log.value, issueUrl: issue.value.html_url });
+};
+
+const API_ROOT = 'https://api.github.com';
+
+/** The one open issue carrying a label, or a sentence saying why not. */
+const fetchLabelledIssue = async (
+  source: ReportSource,
+  label: string,
+  fetchImpl: Fetch,
+): Promise<Result<Issue, string>> => {
   const query = new URLSearchParams({
-    labels: source.label,
+    labels: label,
     state: 'open',
     per_page: '1',
   });
 
-  const route = `${API_ROOT}/repos/${source.owner}/${source.repo}/issues?${query.toString()}`;
+  const route =
+    `${API_ROOT}/repos/${source.owner}/${source.repo}/issues?${query.toString()}` as const;
 
   const answered = await request(route, fetchImpl);
 
@@ -70,20 +124,12 @@ export const fetchReport = async (
 
   const issue = validated.value[0];
 
-  if (issue === undefined) {
-    return Result.err(
-      `No open issue labelled \`${source.label}\` in ${source.owner}/${source.repo}. The first run of the PR Report workflow creates it.`,
-    );
-  }
-
-  const payload = extractPayload(issue.body ?? '');
-
-  return Result.isErr(payload)
-    ? payload
-    : Result.ok({ payload: payload.value, issueUrl: issue.html_url });
+  return issue === undefined
+    ? Result.err(
+        `No open issue labelled \`${label}\` in ${source.owner}/${source.repo} yet.`,
+      )
+    : Result.ok(issue);
 };
-
-const API_ROOT = 'https://api.github.com';
 
 /**
  * Only the fields the app reads. `t.record` accepts the rest, which is the
@@ -93,6 +139,8 @@ const IssueSchema = t.record({
   html_url: t.string(),
   body: t.union([t.nullType, t.string()]),
 });
+
+type Issue = t.TypeOf<typeof IssueSchema>;
 
 const IssueListSchema = t.array(IssueSchema);
 

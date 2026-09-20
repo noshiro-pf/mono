@@ -1,5 +1,10 @@
 import { Result } from 'ts-data-forge';
-import { embedPayload, extractPayload } from './embed.mjs';
+import {
+  embedPayload,
+  embedRunLog,
+  extractPayload,
+  extractRunLog,
+} from './embed.mjs';
 import {
   PAYLOAD_VERSION,
   type PayloadEntry,
@@ -57,6 +62,8 @@ const payload = (
       children: [],
     })),
     cycles: [],
+    merged: [],
+    mergedWithinDays: 7,
   }) as const;
 
 describe('embedPayload and extractPayload', () => {
@@ -108,7 +115,9 @@ describe('embedPayload and extractPayload', () => {
 
     assert.isTrue(Result.isErr(read));
 
-    assert.isTrue(read.value.includes('no machine-readable payload'));
+    assert.isTrue(
+      read.value.includes('no machine-readable `pr-report:payload` block'),
+    );
   });
 
   test('names both versions when they differ', () => {
@@ -150,3 +159,54 @@ const withJsonLine = (json: string): string =>
     .split('\n')
     .map((line) => (line.startsWith('{') ? json : line))
     .join('\n');
+
+describe('embedRunLog and extractRunLog', () => {
+  const runLog = {
+    version: 1,
+    runs: [
+      {
+        startedAt: '2026-09-20T10:00:00Z',
+        startedAtEpochMs: 1_758_362_400_000,
+        finishedAt: '2026-09-20T10:31:00Z',
+        finishedAtEpochMs: 1_758_364_260_000,
+        dryRun: false,
+        events: [
+          {
+            at: '2026-09-20T10:04:00Z',
+            atEpochMs: 1_758_362_640_000,
+            number: 1901,
+            outcome: 'released',
+            detail: 'rebased onto main and released from skip-ci',
+          },
+        ],
+      },
+    ],
+  } as const;
+
+  test('reads back what it wrote', () => {
+    const read = extractRunLog(
+      ['# unblock-prs', '', embedRunLog(runLog)].join('\n'),
+    );
+
+    assert.isTrue(Result.isOk(read));
+
+    assert.deepStrictEqual(read.value, runLog);
+  });
+
+  // The two blocks share a body format and nothing else. Reading one out of
+  // the other's marker would be a page showing the wrong thing rather than
+  // saying it could not find its own.
+  test('does not read the other block out of the same body', () => {
+    const body = [embedPayload(payload()), embedRunLog(runLog)].join('\n\n');
+
+    const asLog = extractRunLog(embedPayload(payload()));
+
+    assert.isTrue(Result.isErr(asLog));
+
+    const both = extractRunLog(body);
+
+    assert.isTrue(Result.isOk(both));
+
+    expect(both.value.runs).toHaveLength(1);
+  });
+});

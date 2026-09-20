@@ -29,6 +29,9 @@ import { type PrReport } from './types.mjs';
  * - **How far ahead and behind the branch is.** A branch behind its base runs
  *   nothing and merges nothing, and the pull request page states it only as
  *   a sentence, without the size of the gap.
+ * - **What landed recently.** The one section that is not about the queue,
+ *   and the first question a reader of a daily report has: did the thing I
+ *   queued yesterday go in.
  *
  * It reads and prints. Nothing here labels, rebases, merges or comments —
  * that is `unblock-prs`, and keeping the report incapable of it is what makes
@@ -56,6 +59,18 @@ export const prReport = async (
 
   if (Result.isErr(facts)) return facts;
 
+  // One more request, and the one section that is not about what is open:
+  // what landed. A report that only lists the queue cannot answer "did the
+  // thing I queued yesterday go in", which is the first question a reader of
+  // a daily report has.
+  const merged = await client.merged(
+    repo.value,
+    options.mergedDays,
+    options.mergedLimit,
+  );
+
+  if (Result.isErr(merged)) return merged;
+
   const report = buildReport({
     repo: repo.value,
     generatedAt: Temporal.Now.instant()
@@ -64,18 +79,54 @@ export const prReport = async (
     required: required.value,
     authenticated: client.authenticated,
     pulls: facts.value,
+    merged: merged.value,
+    mergedWithinDays: options.mergedDays,
   });
 
   switch (options.format) {
     case 'json':
       return Result.ok(JSON.stringify(serializable(report), undefined, 2));
 
-    case 'markdown':
-      return Result.ok(renderMarkdown(report));
+    case 'markdown': {
+      const markdown = renderMarkdown(report);
+
+      warnIfTooLongForAnIssue(markdown);
+
+      return Result.ok(markdown);
+    }
 
     case 'terminal':
       return Result.ok(renderTerminal(report));
   }
+};
+
+/**
+ * What GitHub accepts in an issue body. The Markdown report is written into
+ * one, and the collapsed payload block at the bottom is the part that grows —
+ * with the open pull requests and with the merges of the last week.
+ */
+const ISSUE_BODY_LIMIT = 65_536;
+
+/**
+ * Said on stderr, not returned as an error.
+ *
+ * The same text is read in three places and only one of them is an issue:
+ * `pr-report.yml` writes it to one, the run summary takes the same string,
+ * and a person runs the command in a terminal. Refusing to print a report
+ * because one of its three destinations would refuse it is worse than
+ * printing it and saying so — and the destination that does refuse says so
+ * itself, loudly, in the workflow log. This is here to name the two flags
+ * that make it fit before someone has to work that out.
+ */
+const warnIfTooLongForAnIssue = (markdown: string): void => {
+  if (markdown.length <= ISSUE_BODY_LIMIT) return;
+
+  console.warn(
+    [
+      `This report is ${markdown.length} characters and a GitHub issue body holds ${ISSUE_BODY_LIMIT}.`,
+      'Lower --merged-days or --merged-limit; the merged section is what grows.',
+    ].join('\n'),
+  );
 };
 
 /**

@@ -17,34 +17,40 @@ import { type PrReport } from './types.mjs';
  * An issue body holds 65536 characters, and both of those grow with the
  * number of open pull requests.
  */
-export const toPayload = (report: PrReport): PrReportPayload => ({
-  version: PAYLOAD_VERSION,
-  repo: report.repo,
-  generatedAt: report.generatedAt,
-  generatedAtEpochMs: Temporal.Instant.from(report.generatedAt)
-    .epochMilliseconds,
-  authenticated: report.authenticated,
-  required: report.required,
-  summary: summarize(report),
-  entries: report.entries.map((entry) => ({
-    number: entry.number,
-    title: entry.title,
-    author: entry.author,
-    url: entry.url,
-    isDraft: entry.isDraft,
-    labels: entry.labels,
-    autoMerge: entry.autoMerge,
-    headRef: entry.headRef,
-    baseRef: entry.baseRef,
-    updatedAt: entry.updatedAt,
-    // `null` rather than the absent property: this is JSON by the time
-    // anything reads it, and `undefined` is not a value JSON has.
-    comparison: entry.comparison ?? null,
-    linkedIssues: entry.linkedIssues,
-    mergeAfter: entry.mergeAfter,
-    blockedBy: entry.blockedBy,
-    checks: entry.checks,
-  })),
-  roots: report.roots,
-  cycles: report.cycles,
-});
+export const toPayload = (report: PrReport): PrReportPayload =>
+  ({
+    version: PAYLOAD_VERSION,
+    repo: report.repo,
+    generatedAt: report.generatedAt,
+    generatedAtEpochMs: Temporal.Instant.from(report.generatedAt)
+      .epochMilliseconds,
+    authenticated: report.authenticated,
+    required: report.required,
+    summary: summarize(report),
+    entries: report.entries.map((entry) => ({
+      number: entry.number,
+      title: entry.title,
+      author: entry.author,
+      url: entry.url,
+      isDraft: entry.isDraft,
+      labels: entry.labels,
+      autoMerge: entry.autoMerge,
+      headRef: entry.headRef,
+      baseRef: entry.baseRef,
+      updatedAt: entry.updatedAt,
+      // `null` rather than the absent property: this is JSON by the time
+      // anything reads it, and `undefined` is not a value JSON has.
+      comparison: entry.comparison ?? null,
+      linkedIssues: entry.linkedIssues,
+      mergeAfter: entry.mergeAfter,
+      blockedBy: entry.blockedBy,
+      checks: entry.checks,
+    })),
+    roots: report.roots,
+    cycles: report.cycles,
+    merged: report.merged.map((pr) => ({
+      ...pr,
+      mergedAtEpochMs: Temporal.Instant.from(pr.mergedAt).epochMilliseconds,
+    })),
+    mergedWithinDays: report.mergedWithinDays,
+  }) as const;

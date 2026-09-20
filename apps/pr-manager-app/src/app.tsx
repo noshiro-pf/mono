@@ -2,7 +2,12 @@ import * as React from 'react';
 import { Result, unknownToString } from 'ts-data-forge';
 import { Notice, ReportView } from './components/index.mjs';
 import { REPORT_SOURCE, reportIssuesUrl, repositoryUrl } from './constants.mjs';
-import { fetchReport, type LoadedReport } from './fetch-report.mjs';
+import {
+  fetchReport,
+  fetchRunLog,
+  type LoadedReport,
+  type LoadedRunLog,
+} from './fetch-report.mjs';
 
 /**
  * GitHub Pull Requests Manager.
@@ -24,14 +29,20 @@ export const App = (): React.ReactElement => {
   // effect that sets state synchronously is a cascading render. The initial
   // state is already `loading`, so there is nothing for it to say.
   const read = React.useCallback((): void => {
-    fetchReport(REPORT_SOURCE)
-      .then((result) => {
+    // Both at once. The log is secondary — a page with no log is still the
+    // page — but asking for it after the report would cost a second round
+    // trip in sequence for something that has nothing to do with the first.
+    Promise.all([fetchReport(REPORT_SOURCE), fetchRunLog(REPORT_SOURCE)])
+      .then(([report, runLog]) => {
         setState(
-          Result.isErr(result)
-            ? { type: 'failed', message: result.value }
+          Result.isErr(report)
+            ? { type: 'failed', message: report.value }
             : {
                 type: 'ready',
-                report: result.value,
+                report: report.value,
+                // Passed on as it came. A log that could not be read is a
+                // sentence in its own section, not a reason to show nothing.
+                runLog,
                 // Read here rather than during the render below: the instant
                 // the page went and looked is a fact about this load, and a
                 // render is not allowed to have facts of its own.
@@ -91,16 +102,26 @@ export const App = (): React.ReactElement => {
       ) : undefined}
 
       {state.type === 'ready' ? (
-        <ReportView nowMs={state.readAtMs} report={state.report} />
+        <ReportView
+          nowMs={state.readAtMs}
+          report={state.report}
+          runLog={state.runLog}
+        />
       ) : undefined}
     </main>
   );
 };
 
-type LoadState =
-  | Readonly<{ type: 'failed'; message: string }>
-  | Readonly<{ type: 'loading' }>
-  | Readonly<{ type: 'ready'; report: LoadedReport; readAtMs: number }>;
+type LoadState = Readonly<
+  | { type: 'failed'; message: string }
+  | { type: 'loading' }
+  | {
+      type: 'ready';
+      report: LoadedReport;
+      runLog: Result<LoadedRunLog, string>;
+      readAtMs: number;
+    }
+>;
 
 /** One value, so that a re-render does not make a new one to compare. */
-const LOADING: LoadState = { type: 'loading' };
+const LOADING: LoadState = { type: 'loading' } as const;

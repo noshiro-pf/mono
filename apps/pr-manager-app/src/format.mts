@@ -13,7 +13,7 @@ export const describeComparison = (
 ): string =>
   comparison === null
     ? 'ahead/behind unread'
-    : `+${comparison.aheadBy} / -${comparison.behindBy}`;
+    : (`+${comparison.aheadBy} / -${comparison.behindBy}` as const);
 
 /**
  * How long ago, in the largest unit that is still more than one.

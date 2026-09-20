@@ -6,6 +6,8 @@ import { PullRequestCard } from './pull-request-card.js';
 type Props = Readonly<{
   nodes: readonly PayloadTreeNode[];
   byNumber: ReadonlyMap<number, PayloadEntry>;
+  /** The scale every divergence bar in the report is drawn against. */
+  scaleMax: number;
   /** Only the top level is the list; everything below it is a continuation. */
   depth?: number;
 }>;
@@ -19,6 +21,7 @@ type Props = Readonly<{
 export const MergeOrder = ({
   nodes,
   byNumber,
+  scaleMax,
   depth = 0,
 }: Props): React.ReactElement => (
   <ul className={depth === 0 ? 'merge-order' : 'merge-order-children'}>
@@ -35,7 +38,7 @@ export const MergeOrder = ({
               {' — shown above'}
             </div>
           ) : (
-            <PullRequestCard entry={entry} />
+            <PullRequestCard entry={entry} scaleMax={scaleMax} />
           )}
 
           {Arr.isNonEmpty(node.children) ? (
@@ -43,6 +46,7 @@ export const MergeOrder = ({
               byNumber={byNumber}
               depth={depth + 1}
               nodes={node.children}
+              scaleMax={scaleMax}
             />
           ) : undefined}
         </li>

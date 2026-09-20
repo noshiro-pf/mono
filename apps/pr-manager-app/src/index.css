@@ -1,3 +1,4 @@
+/* cspell:ignore nums */
 /*
  * The tokens are the validated default palette of the data-visualization
  * guidance: chart surface, page plane, the three inks, the hairlines, and the
@@ -29,6 +30,17 @@
 
   --accent: #2a78d6;
 
+  /*
+   * The diverging pair for the ahead / behind bars. Blue and red, with the
+   * hairline track as the neutral middle: the two arms are opposite
+   * directions of one quantity, not two categories, and the pair has to read
+   * as opposite. These are the categorical blue and red of the palette rather
+   * than its status steps, because "39 behind" is a measurement and not a
+   * failure.
+   */
+  --diverge-ahead: #2a78d6;
+  --diverge-behind: #e34948;
+
   --radius: 8px;
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -48,6 +60,8 @@
     --border-ring: rgb(255 255 255 / 10%);
 
     --accent: #3987e5;
+    --diverge-ahead: #3987e5;
+    --diverge-behind: #e66767;
   }
 }
 
@@ -323,4 +337,206 @@ a:focus-visible {
 .footnote {
   color: var(--ink-secondary);
   font-size: 0.8125rem;
+}
+
+/* --- one pull request, in rows ----------------------------------------- */
+
+.pull-request-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.pull-request-row {
+  align-items: center;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.badge[data-state='open'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.badge[data-state='draft'] {
+  border-color: var(--baseline);
+  color: var(--ink-secondary);
+}
+
+.badge[data-auto-merge='on'] {
+  border-color: var(--baseline);
+  color: var(--ink-primary);
+}
+
+.badge[data-auto-merge='off'] {
+  border-color: var(--hairline);
+  color: var(--ink-muted);
+}
+
+/* --- labels, in GitHub's own colours ------------------------------------ */
+
+.label-chip {
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.7;
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+
+/* --- the branch --------------------------------------------------------- */
+
+.branch {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.branch-arrow,
+.branch-base {
+  color: var(--ink-muted);
+}
+
+/* --- ahead / behind ----------------------------------------------------- */
+
+.divergence {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.divergence-unread {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.divergence-count {
+  color: var(--ink-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * Two halves meeting at a centre line, each filled from the middle outwards,
+ * so that the eye reads distance from zero rather than two unrelated bars.
+ */
+.divergence-track {
+  display: inline-flex;
+  inline-size: 9rem;
+}
+
+.divergence-half {
+  background: var(--hairline);
+  block-size: 8px;
+  display: flex;
+  flex: 1 1 50%;
+}
+
+.divergence-behind {
+  border-radius: 4px 0 0 4px;
+  justify-content: flex-end;
+  /* The 2px of surface at the centre is the spacer the two arms need not to
+     read as one bar. */
+  margin-inline-end: 1px;
+}
+
+.divergence-ahead {
+  border-radius: 0 4px 4px 0;
+  justify-content: flex-start;
+  margin-inline-start: 1px;
+}
+
+.divergence-bar {
+  block-size: 100%;
+}
+
+.divergence-behind .divergence-bar {
+  background: var(--diverge-behind);
+  border-radius: 4px 0 0 4px;
+}
+
+.divergence-ahead .divergence-bar {
+  background: var(--diverge-ahead);
+  border-radius: 0 4px 4px 0;
+}
+
+/* --- linked issues ------------------------------------------------------ */
+
+.linked-issues a[data-state='closed'] {
+  text-decoration: line-through;
+}
+
+/* --- what landed -------------------------------------------------------- */
+
+.merged-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.merged-item {
+  border-block-end: 1px solid var(--hairline);
+  padding: 0.6rem 0;
+}
+
+.merged-item:last-child {
+  border-block-end: 0;
+}
+
+.merged-when {
+  color: var(--ink-secondary);
+}
+
+/* --- the unblock-prs log ------------------------------------------------ */
+
+.run-log,
+.run-log-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-log-run {
+  border-block-end: 1px solid var(--hairline);
+  padding: 0.6rem 0;
+}
+
+.run-log-run:last-child {
+  border-block-end: 0;
+}
+
+.run-log-when {
+  align-items: baseline;
+  display: flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+}
+
+.run-log-exact {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.run-log-event {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+}
+
+.run-log-detail {
+  color: var(--ink-secondary);
 }

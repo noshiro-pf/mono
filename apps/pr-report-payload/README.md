@@ -1,13 +1,19 @@
 # `pr-report-payload`
 
-The machine-readable copy of the open pull request report: the shape, the
-schema that validates it, and the block it travels in.
+The machine-readable copies of the two reports this repository keeps in
+issues: the shapes, the schemas that validate them, and the block they travel
+in.
 
-Two packages depend on this one and nothing else does.
-`tools/scripts/cmd/pr-report` builds a payload and appends the block to the
-Markdown it writes into the report issue; `apps/pr-manager-app` reads that
-issue back and validates what it finds. The definition lives here rather than
-in either of them so that there is one of it.
+Two of them, with different writers:
+
+| block               | written by                             | read by          |
+| :------------------ | :------------------------------------- | :--------------- |
+| `pr-report:payload` | `pr-report`, from `.github/workflows/` | `pr-manager-app` |
+| `unblock-prs:log`   | `unblock-prs`, from someone's terminal | `pr-manager-app` |
+
+Two issues rather than two sections of one, because a body is overwritten
+whole and these two writers do not know about each other. The definitions live
+here rather than in either end so that there is one of each.
 
 ## Why the issue is the transport
 
@@ -75,6 +81,16 @@ spelling lives in the workflows and in `tools/scripts/cmd/unblock-prs/`, and
 reason: parsing a date _string_ is the one operation whose result the language
 leaves to the implementation, and a page saying "generated 3 hours ago" should
 not be computing that from an implementation-defined parse.
+
+## The `unblock-prs` log
+
+Events, not lines. What that script prints is prose meant to be watched live;
+what is worth keeping is the shape underneath it — which pull request, what
+was done, how it turned out — which is also what a page can lay out as rows.
+The caps (`RUN_LOG_MAX_RUNS`, `RUN_LOG_MAX_EVENTS`) are here because this is
+the one payload that grows without an upper bound of its own; the oldest runs
+are dropped rather than left to truncate the block one day in the middle of
+its JSON.
 
 ## Versions
 
