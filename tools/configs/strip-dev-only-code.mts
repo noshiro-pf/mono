@@ -24,6 +24,12 @@ import {
  *   `.d.mts`, so the copy in the JavaScript is read by nobody. It was two
  *   thirds of `ts-data-forge`'s emitted JavaScript. The compiler's own
  *   `removeComments` cannot do this: it strips the `.d.mts` as well.
+ *
+ * **`unwrapIdentityCalls` takes `(x) => x` and nothing else.** The pass
+ * deletes the call and keeps the argument, so a function that validates —
+ * `asUint32`, which throws on a value out of range — would have its check
+ * removed from `dist/` while the source still reads as if it were there. The
+ * four below are casts the type system asks for and the runtime does not see.
  */
 export const devOnlyCode: StripDevOnlyCodeOptions = {
   removeCallStatements: ['expectType'],
