@@ -4,8 +4,10 @@ Instructions for this repository, maintained by hand. There is no `AGENTS.md`.
 
 ## What belongs in this file
 
-**A rule goes here only when nothing else will tell you about it.** Before
-adding a paragraph, ask what happens when the rule is broken:
+**A rule goes here only when nothing else will tell you about it.** Two
+questions decide that, and the second is the one that is easy to skip.
+
+**What happens when the rule is broken?**
 
 - **The failure names the rule and the fix** (an ESLint rule id, a `tsc`
   diagnostic, a guard under `tools/scripts/cmd/` that says what it found) —
@@ -18,9 +20,28 @@ adding a paragraph, ask what happens when the rule is broken:
 - **There is no check at all** — write the rule. Better still, write a guard
   in `tools/scripts/cmd/` and reduce the prose to a pointer.
 
+**What is the reader looking at, at the moment they would break it?**
+
+- **One file, and it can carry a comment** — the rule goes in that file. A
+  comment beside the declaration reaches everyone who edits it, including
+  whoever never opens this file; a paragraph here reaches whoever thought to
+  look. `knip.jsonc` says where a new entry goes and `devOnlyCode` says what
+  may join it, for that reason. Keep at most a pointer here.
+- **One file, and it cannot** — JSON takes no comments, so the declarations
+  under `repo-settings/` and the ignore lists in the root `package.json` have
+  nowhere else to say it, and the rule stays here.
+- **No single file** — a rule addressed to whoever is working rather than to
+  whoever is editing one file (session conduct, how a release is queued, what
+  a commit message is) stays here.
+
 The same test applies when removing: a paragraph whose rule has since gained a
-guard with a clear error should go. Keep measurements, anecdotes and issue
-numbers out; one sentence of _why_ is enough.
+guard with a clear error, or a comment in the file it is about, should go.
+Keep measurements, anecdotes and issue numbers out; one sentence of _why_ is
+enough.
+
+Rules about how this file is written belong in this section and nowhere else.
+It is English throughout, though the repository's other prose and its code
+comments may be Japanese — see "Japanese text".
 
 ## Repository layout
 
