@@ -13,7 +13,7 @@ type Props = Readonly<{ issues: readonly PayloadLinkedIssue[] }>;
  * keywords out of the body instead of GitHub's own list, and for every merged
  * pull request, whose links are only ever read that way.
  */
-export const LinkedIssues = ({ issues }: Props): React.ReactElement => (
+export const LinkedIssues = React.memo<Props>(({ issues }) => (
   <span className={'linked-issues'}>
     {'closes '}
     {issues.map((issue, index) => (
@@ -26,4 +26,6 @@ export const LinkedIssues = ({ issues }: Props): React.ReactElement => (
       </React.Fragment>
     ))}
   </span>
-);
+));
+
+LinkedIssues.displayName = 'LinkedIssues';

@@ -1,4 +1,4 @@
-import type * as React from 'react';
+import * as React from 'react';
 
 type Props = Readonly<{
   href: string;
@@ -28,21 +28,19 @@ type Props = Readonly<{
  * `noopener`, which is what keeps the opened page from reaching back through
  * `window.opener`.
  */
-export const ExternalLink = ({
-  href,
-  children,
-  variant,
-  dataState,
-  title,
-}: Props): React.ReactElement => (
-  <a
-    className={variant}
-    data-state={dataState}
-    href={href}
-    rel={'noreferrer'}
-    target={'_blank'}
-    title={title}
-  >
-    {children}
-  </a>
+export const ExternalLink = React.memo<Props>(
+  ({ href, children, variant, dataState, title }) => (
+    <a
+      className={variant}
+      data-state={dataState}
+      href={href}
+      rel={'noreferrer'}
+      target={'_blank'}
+      title={title}
+    >
+      {children}
+    </a>
+  ),
 );
+
+ExternalLink.displayName = 'ExternalLink';

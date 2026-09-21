@@ -9,7 +9,8 @@ import { castNode } from './shared.mjs';
 type MessageIds = 'disallowReactFunctionalComponentTypes';
 
 // NOTE: React.FC による型注釈があれば React.memo を使うように促すルール。
-// React.FC で型注釈されていない React.memo 化されていないコンポーネントは別途検出する必要がある。
+// React.FC で型注釈されていない React.memo 化されていないコンポーネントは
+// require-react-memo が検出する。
 
 export const componentVarTypeAnnotationRule: TSESLint.RuleModule<MessageIds> = {
   meta: {

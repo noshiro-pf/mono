@@ -1,5 +1,5 @@
 import { type RunLogOutcome } from 'pr-report-payload';
-import type * as React from 'react';
+import * as React from 'react';
 import { Arr, Result } from 'ts-data-forge';
 import { type LoadedRunLog } from '../fetch-report.mjs';
 import { describeAge, formatLocalTime } from '../format.mjs';
@@ -22,11 +22,7 @@ type Props = Readonly<{
  * each happened once, on a terminal, and was never visible again. This is
  * that, kept.
  */
-export const RunLogSection = ({
-  runLog,
-  repoUrl,
-  nowMs,
-}: Props): React.ReactElement => (
+export const RunLogSection = React.memo<Props>(({ runLog, repoUrl, nowMs }) => (
   <section className={'section'}>
     <h2 className={'section-title'}>{'unblock-prs'}</h2>
 
@@ -72,7 +68,9 @@ export const RunLogSection = ({
       </ul>
     )}
   </section>
-);
+));
+
+RunLogSection.displayName = 'RunLogSection';
 
 /**
  * Only two of the outcomes are verdicts about a pull request. `unfinished` is

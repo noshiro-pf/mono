@@ -1,11 +1,13 @@
 import { type PayloadChecks } from 'pr-report-payload';
-import type * as React from 'react';
+import * as React from 'react';
 import { presentVerdict } from '../verdict.mjs';
 
 type Props = Readonly<{ checks: PayloadChecks }>;
 
 /** The verdict of the contexts the ruleset requires, as an icon and a word. */
-export const VerdictBadge = ({ checks }: Props): React.ReactElement => {
+export const VerdictBadge = React.memo<Props>((props) => {
+  const { checks } = props;
+
   const verdict = presentVerdict(checks.verdict);
 
   return (
@@ -37,4 +39,6 @@ export const VerdictBadge = ({ checks }: Props): React.ReactElement => {
       {verdict.label}
     </span>
   );
-};
+});
+
+VerdictBadge.displayName = 'VerdictBadge';

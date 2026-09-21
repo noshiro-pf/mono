@@ -27,11 +27,9 @@ type Props = Readonly<{
  * Both numbers are written out beside the bars. A reader should never have to
  * measure a bar to learn a count that is three characters long.
  */
-export const CommitDivergence = ({
-  comparison,
-  scaleMax,
-  baseRef,
-}: Props): React.ReactElement => {
+export const CommitDivergence = React.memo<Props>((props) => {
+  const { comparison, scaleMax, baseRef } = props;
+
   const behind = React.useMemo(
     () => ({ inlineSize: share(comparison?.behindBy ?? 0, scaleMax) }),
     [comparison?.behindBy, scaleMax],
@@ -69,7 +67,9 @@ export const CommitDivergence = ({
       >{`${comparison.aheadBy} ahead`}</span>
     </span>
   );
-};
+});
+
+CommitDivergence.displayName = 'CommitDivergence';
 
 /**
  * A zero draws nothing at all rather than a sliver: "nothing on this side" is

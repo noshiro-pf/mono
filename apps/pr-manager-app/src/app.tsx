@@ -46,7 +46,7 @@ import {
  * page that is safe to leave open — which is what this is for, so it keeps
  * itself current rather than going stale behind a tab.
  */
-export const App = (): React.ReactElement => {
+export const App = React.memo(() => {
   const [state, setState] = React.useState<LoadState>(LOADING);
 
   /**
@@ -312,7 +312,9 @@ export const App = (): React.ReactElement => {
       ) : undefined}
     </main>
   );
-};
+});
+
+App.displayName = 'App';
 
 type LoadState = Readonly<
   | { type: 'failed'; message: string }

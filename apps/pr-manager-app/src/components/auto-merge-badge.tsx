@@ -1,4 +1,4 @@
-import type * as React from 'react';
+import * as React from 'react';
 
 type Props = Readonly<{ armed: boolean }>;
 
@@ -12,9 +12,11 @@ type Props = Readonly<{ armed: boolean }>;
  * until this page existed the only place that was visible was that script's
  * own output.
  */
-export const AutoMergeBadge = ({ armed }: Props): React.ReactElement => (
+export const AutoMergeBadge = React.memo<Props>(({ armed }) => (
   <span className={'badge'} data-auto-merge={armed ? 'on' : 'off'}>
     <span aria-hidden={'true'}>{armed ? '⇥' : '⊘'}</span>
     {armed ? 'auto-merge on' : 'auto-merge off'}
   </span>
-);
+));
+
+AutoMergeBadge.displayName = 'AutoMergeBadge';

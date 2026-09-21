@@ -9,6 +9,7 @@ export const eslintReactCodingStyleRules = {
   'react-coding-style/props-type-annotation-style': 'error',
   'react-coding-style/react-memo-props-argument-name': 'error',
   'react-coding-style/react-memo-type-parameter': 'error',
+  'react-coding-style/require-react-memo': ['error', {}],
   'react-coding-style/ban-use-imperative-handle-hook': 'error',
   'react-coding-style/use-memo-hook-style': 'error',
   'react-coding-style/display-name': ['error', {}],

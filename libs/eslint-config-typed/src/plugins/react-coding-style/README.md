@@ -57,3 +57,44 @@ MyComponent.displayName = 'MyComponent';
 const MyComponent = React.memo(() => <div>Hello</div>);
 MyComponent.displayName = 'SomeOtherName';
 ```
+
+## `require-react-memo`
+
+Requires a React component to be memoized. The other rules here describe how a
+component created with `React.memo` is written, so a component that was never
+memoized in the first place would otherwise pass them all.
+
+A component passed to a function this rule knows nothing about (`memoNamed(...)`
+and other higher order components, which may well memoize it) is left alone;
+reported are the components bound to a name directly, and those wrapped in
+`React.forwardRef` alone.
+
+**Options:**
+
+- `ignoreName` (string | string[], default: `[]`): Component names allowed to be
+  defined without memo.
+
+**Examples:**
+
+```typescript
+// ❌ Bad
+export const MyComponent = (props: Props) => <div>{props.value}</div>;
+
+// ❌ Bad
+export function MyComponent(props: Props) {
+    return <div>{props.value}</div>;
+}
+
+// ❌ Bad
+export const MyComponent = React.forwardRef<HTMLDivElement, Props>(
+    (props, ref) => <div ref={ref}>{props.value}</div>,
+);
+
+// ✅ Good
+export const MyComponent = React.memo<Props>((props) => <div>{props.value}</div>);
+
+// ✅ Good (memoized by a higher order component)
+export const MyComponent = memoNamed<Props>('MyComponent', (props) => (
+    <div>{props.value}</div>
+));
+```

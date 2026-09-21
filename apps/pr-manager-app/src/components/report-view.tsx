@@ -1,4 +1,4 @@
-import type * as React from 'react';
+import * as React from 'react';
 import { Arr, type Result } from 'ts-data-forge';
 import { type LoadedReport, type LoadedRunLog } from '../fetch-report.mjs';
 import { describeAge, formatLocalTime } from '../format.mjs';
@@ -18,11 +18,9 @@ type Props = Readonly<{
 }>;
 
 /** A report that loaded: the counts, the queue, what landed, and the caveats. */
-export const ReportView = ({
-  report,
-  runLog,
-  nowMs,
-}: Props): React.ReactElement => {
+export const ReportView = React.memo<Props>((props) => {
+  const { report, runLog, nowMs } = props;
+
   const { payload, sourceUrl } = report;
 
   const repoUrl =
@@ -81,7 +79,9 @@ export const ReportView = ({
       )}
     </>
   );
-};
+});
+
+ReportView.displayName = 'ReportView';
 
 /**
  * One scale for every divergence bar on the page, so that a bar on one card

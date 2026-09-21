@@ -44,4 +44,13 @@ export default [
       'import-x/no-anonymous-default-export': 'off',
     }),
   },
+  {
+    files: ['samples/**'],
+    rules: defineKnownRules({
+      // The samples show how the hook is used, in the plain React the reader
+      // knows; memoizing every one of them would bury that under this
+      // repository's component style.
+      'react-coding-style/require-react-memo': 'off',
+    }),
+  },
 ] satisfies readonly FlatConfig[];

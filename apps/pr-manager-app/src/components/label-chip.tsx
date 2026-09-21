@@ -11,7 +11,9 @@ type Props = Readonly<{ label: PayloadLabel }>;
  * whole point: a reader who knows what `skip-ci` looks like on GitHub should
  * not have to read the word here.
  */
-export const LabelChip = ({ label }: Props): React.ReactElement => {
+export const LabelChip = React.memo<Props>((props) => {
+  const { label } = props;
+
   const style = React.useMemo(() => {
     const colors = chipColors(label.color);
 
@@ -31,4 +33,6 @@ export const LabelChip = ({ label }: Props): React.ReactElement => {
       {label.name}
     </span>
   );
-};
+});
+
+LabelChip.displayName = 'LabelChip';
