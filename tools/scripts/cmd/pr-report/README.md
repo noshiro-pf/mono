@@ -86,7 +86,16 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
   見えます。名前は `stale red:` として残します。
 - **`no-skip-ci-label` は check run ではなく commit status** です。両方の
   エンドポイントを読むのはそのためで、片方だけだと全ての labelled な PR を
-  止めている context が missing に見えます。
+  止めている context が missing に見えます。同名の check run と commit status
+  が両方ある場合は、**厳しい方**を採ります — GitHub は「both must pass」と
+  規定しているので、緑の status が同名の赤い check run を覆い隠すことは
+  ありません。
+- **同名の check run が複数あるときは、id が最大の check suite のものを採ります**
+  — 一番新しく始まった run でも、一番新しく終わった run でもありません。GitHub
+  がそう解決するからです。1回の push が作る suite は全て同じ秒に作られるので、
+  どれが大きい id を得るかは運で、取り消された `opened` run の suite が勝つと、
+  後から緑になった方があっても**その赤が実際にマージを止めます**。
+  `started_at` で並べ替えると、止まっている PR を緑と報告することになります。
 
 ### 限界
 
@@ -187,11 +196,14 @@ the ones the bodies declare with a closing keyword rather than GitHub's own
 list, which only GraphQL serves. The report says so at the bottom when it ran
 that way.
 
-Three rules decide the verdicts. `skipped` is a pass, because GitHub counts it
+Four rules decide the verdicts. `skipped` is a pass, because GitHub counts it
 as one. `skip-ci` is its own verdict, `paused`, because while the label is on
 the red a reader sees is the cancelled `opened` run rather than news — it is
-still listed, as `stale red:`. And `no-skip-ci-label` is a commit status, not
-a check run, so both endpoints are read.
+still listed, as `stale red:`. `no-skip-ci-label` is a commit status, not a
+check run, so both endpoints are read. And where one name has reported more
+than once, the run in the check suite with the greatest id is the answer,
+which is how GitHub resolves it — not the newest run, which would call a pull
+request green that a stale red is holding.
 
 The required contexts come from `repo-settings/rulesets/main.json` rather than
 from the API, which wants an admin token. A context added there and not yet
