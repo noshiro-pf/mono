@@ -58,7 +58,8 @@ pnpm run pr-report -- --format json
 ```
 
 `entries` is one object per open pull request. The scope rule is
-`autoMerge === true` and `labels` containing `merge-queued`; still drop any
+`autoMerge === true` and a `labels` entry whose `name` is `merge-queued`;
+still drop any
 whose `baseRef` is not `main`. The declared order is already read for you, as
 `mergeAfter` and `blockedBy` — see "The declared merge order" below.
 
