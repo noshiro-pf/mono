@@ -3,10 +3,11 @@
 import * as cmd from 'cmd-ts';
 import { Arr } from 'ts-data-forge';
 import { checkShouldRun } from '../functions/index.mjs';
+import { cliVersion } from './cli-version.mjs';
 
 const cmdDef = cmd.command({
   name: 'check-should-run-cli',
-  version: '10.2.0',
+  version: cliVersion,
   args: {
     pathsIgnore: cmd.multioption({
       long: 'paths-ignore',

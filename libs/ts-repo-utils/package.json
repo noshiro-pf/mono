@@ -67,8 +67,6 @@
     "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude cmd",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
-    "prepare-release": "run-s sync-cli-versions fix:fmt build doc",
-    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
