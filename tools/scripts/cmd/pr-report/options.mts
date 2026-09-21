@@ -1,9 +1,9 @@
 /** What the command line says, and how it is read. */
 
 import * as util from 'node:util';
-import { Result } from 'ts-data-forge';
+import { Num, Result } from 'ts-data-forge';
 
-export const FORMATS = ['json', 'markdown', 'terminal'] as const;
+export const FORMATS = ['json', 'markdown', 'payload', 'terminal'] as const;
 
 export type Format = (typeof FORMATS)[number];
 
@@ -11,7 +11,37 @@ export type Options = Readonly<{
   format: Format;
   /** `owner/name`; the repository this checkout is of when not given. */
   repo: string | undefined;
+  /** How far back the "recently merged" section goes. */
+  mergedDays: number;
+  /** And how many of them it lists, whatever the window turns up. */
+  mergedLimit: number;
+  /**
+   * Where to also write the machine-readable payload, if anywhere.
+   *
+   * A second output rather than a second run, because a run is twenty or so
+   * requests against the API and about a minute of wall clock, and
+   * `pr-report.yml` needs both the Markdown and the payload from the same
+   * moment: two runs would have the issue and the page describing states
+   * that differ by whatever happened in between.
+   */
+  payloadFile: string | undefined;
 }>;
+
+/**
+ * A week, so that a report read on a Monday still covers the Friday. Long
+ * enough to answer "what landed since I last looked" and short enough that
+ * the section stays a list rather than an archive.
+ */
+export const DEFAULT_MERGED_DAYS = 7;
+
+/**
+ * A cap as well as a window, and now a matter of reading rather than of
+ * fitting: the report is written to a file, which refuses nothing. Twenty is
+ * more than enough to answer "did the thing I queued go in", which is what
+ * the section is for, and past that the section stops being a list and
+ * starts being an archive.
+ */
+export const DEFAULT_MERGED_LIMIT = 20;
 
 export const HELP = [
   'Usage: pnpm run pr-report [-- options]',
@@ -22,7 +52,13 @@ export const HELP = [
   '',
   'Options:',
   `  --format <${FORMATS.join('|')}>  how to print it (default terminal)`,
+  '                                   `payload` is the one the page reads;',
+  '                                   `json` is the whole report, bodies and all',
   '  --repo <owner/name>              which repository (default: this one)',
+  `  --merged-days <n>                how far back "recently merged" goes (default ${DEFAULT_MERGED_DAYS})`,
+  `  --merged-limit <n>               how many it lists at most (default ${DEFAULT_MERGED_LIMIT})`,
+  '  --payload-file <path>            also write the payload there, from the',
+  '                                   same run that printed the report',
   '  -h, --help                       show this help',
   '',
   'Reads GITHUB_TOKEN or GH_TOKEN when one is set. Without it the public API',
@@ -45,6 +81,9 @@ export const parseOptions = (
       options: {
         format: { type: 'string' },
         repo: { type: 'string' },
+        'merged-days': { type: 'string' },
+        'merged-limit': { type: 'string' },
+        'payload-file': { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -64,7 +103,50 @@ export const parseOptions = (
     );
   }
 
-  return Result.ok({ format, repo: values.repo });
+  const mergedDays = positive(
+    'merged-days',
+    values['merged-days'],
+    DEFAULT_MERGED_DAYS,
+  );
+
+  if (Result.isErr(mergedDays)) return mergedDays;
+
+  const mergedLimit = positive(
+    'merged-limit',
+    values['merged-limit'],
+    DEFAULT_MERGED_LIMIT,
+  );
+
+  if (Result.isErr(mergedLimit)) return mergedLimit;
+
+  return Result.ok({
+    format,
+    repo: values.repo,
+    mergedDays: mergedDays.value,
+    mergedLimit: mergedLimit.value,
+    payloadFile: values['payload-file'],
+  });
+};
+
+/**
+ * Rejected rather than clamped when it is not a positive whole number: `-3`
+ * or `two` is a typo, and a report that quietly used the default instead
+ * would be a report saying something other than what was asked for.
+ */
+const positive = (
+  name: string,
+  raw: string | undefined,
+  fallback: number,
+): Result<number, string> => {
+  if (raw === undefined) return Result.ok(fallback);
+
+  const parsed = Result.unwrapOkOr(Num.safeParseFloat(raw), Number.NaN);
+
+  return Number.isSafeInteger(parsed) && parsed > 0
+    ? Result.ok(parsed)
+    : Result.err(
+        `--${name} must be a positive whole number, got ${JSON.stringify(raw)}`,
+      );
 };
 
 /**

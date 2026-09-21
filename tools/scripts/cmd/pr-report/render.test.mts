@@ -1,6 +1,12 @@
+// cspell:ignore ededed
+
 import { renderMarkdown, renderTerminal } from './render.mjs';
 import { buildReport } from './report.mjs';
-import { type PrReport, type PullRequestFacts } from './types.mjs';
+import { type Label, type PrReport, type PullRequestFacts } from './types.mjs';
+
+/** Labels by name alone, for the tests that do not care what colour they are. */
+const labelled = (...names: readonly string[]): readonly Label[] =>
+  names.map((name) => ({ name, color: 'ededed', description: '' }));
 
 const facts = (
   overrides: Partial<PullRequestFacts> & Readonly<{ number: number }>,
@@ -28,6 +34,8 @@ const report = (pulls: readonly PullRequestFacts[]): PrReport =>
     repo: { owner: 'noshiro-pf', name: 'mono' },
     generatedAt: '2026-09-18T09:00:00Z',
     required: ['code-check-result', 'no-skip-ci-label'],
+    merged: [],
+    mergedWithinDays: 7,
     authenticated: false,
     pulls,
   });
@@ -96,7 +104,7 @@ describe('renderMarkdown', () => {
       report([
         facts({
           number: 1901,
-          labels: ['skip-ci', 'merge-queued'],
+          labels: labelled('skip-ci', 'merge-queued'),
           comparison: { aheadBy: 3, behindBy: 12 },
         }),
       ]),
@@ -114,7 +122,11 @@ describe('renderMarkdown', () => {
   test('says a queued pull request has auto-merge armed', () => {
     const rendered = renderMarkdown(
       report([
-        facts({ number: 1901, labels: ['merge-queued'], autoMerge: true }),
+        facts({
+          number: 1901,
+          labels: labelled('merge-queued'),
+          autoMerge: true,
+        }),
       ]),
     );
 
@@ -129,7 +141,11 @@ describe('renderMarkdown', () => {
   test('names a queued pull request that has no auto-merge', () => {
     const rendered = renderMarkdown(
       report([
-        facts({ number: 1901, labels: ['merge-queued'], autoMerge: false }),
+        facts({
+          number: 1901,
+          labels: labelled('merge-queued'),
+          autoMerge: false,
+        }),
       ]),
     );
 

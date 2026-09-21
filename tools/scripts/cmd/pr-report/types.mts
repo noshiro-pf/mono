@@ -1,3 +1,5 @@
+// cspell:ignore RRGGBB
+
 /** The shapes every module here passes around. */
 
 /** The repository being reported on. */
@@ -28,6 +30,14 @@ export type ChecksSummary = Readonly<{
 /** Commits the head has that the base does not, and the other way round. */
 export type Comparison = Readonly<{ aheadBy: number; behindBy: number }>;
 
+/** A label as GitHub holds it: the name, and what it looks like. */
+export type Label = Readonly<{
+  name: string;
+  /** `RRGGBB`, no leading `#`, exactly as the API sends it. */
+  color: string;
+  description: string;
+}>;
+
 export type LinkedIssue = Readonly<{
   number: number;
   /** Empty when the issue was read from the body without a token. */
@@ -44,7 +54,7 @@ export type PullRequestFacts = Readonly<{
   body: string;
   author: string;
   isDraft: boolean;
-  labels: readonly string[];
+  labels: readonly Label[];
   /**
    * Whether auto-merge is armed. Separate from `merge-queued`, which is the
    * author saying a pull request is to be landed: the label is the request
@@ -84,6 +94,25 @@ export type TreeNode = Readonly<{
   children: readonly TreeNode[];
 }>;
 
+/**
+ * One pull request that has already landed, for the section that says what
+ * shipped. Nothing that is true of an open pull request — a merge order, a
+ * check verdict, a distance from its base — is true of one that has merged,
+ * so it is its own shape rather than an entry with the fields blanked.
+ */
+export type MergedPullRequest = Readonly<{
+  number: number;
+  title: string;
+  author: string;
+  url: string;
+  headRef: string;
+  baseRef: string;
+  mergedAt: string;
+  labels: readonly Label[];
+  /** Read from the body: GitHub's own list is only served for open ones. */
+  linkedIssues: readonly LinkedIssue[];
+}>;
+
 export type PrReport = Readonly<{
   repo: RepoRef;
   /** ISO 8601, so that a reader can tell a stale report from a fresh one. */
@@ -96,4 +125,8 @@ export type PrReport = Readonly<{
   /** The merge order, as a forest. Pull requests on a cycle are not in it. */
   roots: readonly TreeNode[];
   cycles: readonly (readonly number[])[];
+  /** Merged within {@link PrReport.mergedWithinDays}, newest first. */
+  merged: readonly MergedPullRequest[];
+  /** How far back that list goes. */
+  mergedWithinDays: number;
 }>;

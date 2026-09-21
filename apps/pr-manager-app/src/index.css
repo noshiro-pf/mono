@@ -1,0 +1,710 @@
+/* cspell:ignore nums */
+/*
+ * The tokens are the validated default palette of the data-visualization
+ * guidance: chart surface, page plane, the three inks, the hairlines, and the
+ * four reserved status steps. Dark mode is a selected set of steps rather than
+ * an automatic flip, which is why every value is written twice.
+ *
+ * A status colour never carries meaning on its own here — every badge that
+ * uses one also carries a glyph and a word, which is the mitigation the
+ * palette asks for on the light surface, where `warning` and `serious` sit
+ * below 3:1 by design.
+ */
+
+:root {
+  color-scheme: light;
+
+  --surface: #fcfcfb;
+  --plane: #f9f9f7;
+  --ink-primary: #0b0b0b;
+  --ink-secondary: #52514e;
+  --ink-muted: #898781;
+  --hairline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border-ring: rgb(11 11 11 / 10%);
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  --accent: #2a78d6;
+
+  /*
+   * The diverging pair for the ahead / behind bars. Blue and red, with the
+   * hairline track as the neutral middle: the two arms are opposite
+   * directions of one quantity, not two categories, and the pair has to read
+   * as opposite. These are the categorical blue and red of the palette rather
+   * than its status steps, because "39 behind" is a measurement and not a
+   * failure.
+   */
+  --diverge-ahead: #2a78d6;
+  --diverge-behind: #e34948;
+
+  --radius: 8px;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --surface: #1a1a19;
+    --plane: #0d0d0d;
+    --ink-primary: #fff;
+    --ink-secondary: #c3c2b7;
+    --ink-muted: #898781;
+    --hairline: #2c2c2a;
+    --baseline: #383835;
+    --border-ring: rgb(255 255 255 / 10%);
+
+    --accent: #3987e5;
+    --diverge-ahead: #3987e5;
+    --diverge-behind: #e66767;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover,
+a:focus-visible {
+  text-decoration: underline;
+}
+
+.page {
+  margin: 0 auto;
+  max-width: 68rem;
+  padding: 2rem 1rem 4rem;
+}
+
+/* --- header ------------------------------------------------------------- */
+
+.page-header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  margin: 0.15rem 0 0;
+}
+
+.header-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.refresh-button {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.refresh-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.refresh-button:disabled {
+  color: var(--ink-muted);
+  cursor: progress;
+}
+
+/* --- the summary row ---------------------------------------------------- */
+
+.summary-row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: var(--ink-secondary);
+  display: block;
+  font-size: 0.8125rem;
+}
+
+.stat-tile[data-status='critical'] .stat-value {
+  color: var(--status-critical);
+}
+
+.stat-tile[data-status='warning'] .stat-value {
+  color: var(--ink-primary);
+}
+
+/* --- sections ----------------------------------------------------------- */
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  border-bottom: 1px solid var(--hairline);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.4rem;
+}
+
+.section-note {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+/* --- the merge order ---------------------------------------------------- */
+
+.merge-order,
+.merge-order-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.merge-order-children {
+  border-left: 2px solid var(--hairline);
+  margin-left: 1.1rem;
+  padding-left: 1rem;
+}
+
+.merge-order > li + li,
+.merge-order-children > li {
+  margin-top: 0.6rem;
+}
+
+/* --- one pull request --------------------------------------------------- */
+
+.pull-request {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.9rem;
+}
+
+.pull-request-heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pull-request-number {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.pull-request-title {
+  flex: 1 1 20rem;
+  font-weight: 600;
+}
+
+.pull-request-meta {
+  align-items: center;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.pull-request-repeated {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  padding: 0.35rem 0.9rem;
+}
+
+/* --- badges and chips --------------------------------------------------- */
+
+.badge {
+  align-items: center;
+  border: 1px solid var(--border-ring);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  gap: 0.3rem;
+  line-height: 1.6;
+  padding: 0 0.55rem;
+  white-space: nowrap;
+}
+
+.badge[data-status='good'] {
+  border-color: var(--status-good);
+  color: var(--status-good);
+}
+
+.badge[data-status='critical'] {
+  border-color: var(--status-critical);
+  color: var(--status-critical);
+}
+
+.badge[data-status='warning'] {
+  border-color: var(--status-warning);
+  color: var(--ink-primary);
+}
+
+.badge[data-status='neutral'] {
+  border-color: var(--baseline);
+  color: var(--ink-secondary);
+}
+
+.label-chip {
+  background: var(--plane);
+  border: 1px solid var(--baseline);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 0 0.55rem;
+}
+
+.commit-counts {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.failed-checks {
+  color: var(--status-critical);
+}
+
+.stale-checks {
+  color: var(--ink-muted);
+}
+
+/* --- notices ------------------------------------------------------------ */
+
+/*
+ * `display` first, and it is not a nicety: `output` is an inline element by
+ * default, so the border, the background and the padding below were wrapping
+ * around line boxes instead of forming one. A message with a line break in it
+ * — which every one of these has, since the link sits under the sentence —
+ * came out as two detached boxes with the left border on only the first.
+ */
+.notice {
+  background: var(--surface);
+  border: 1px solid var(--border-ring);
+  border-left: 3px solid var(--baseline);
+  border-radius: var(--radius);
+  display: block;
+  padding: 1rem;
+  white-space: pre-wrap;
+}
+
+.notice[data-status='critical'] {
+  border-left-color: var(--status-critical);
+}
+
+.footnote {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+}
+
+/* --- one pull request, in rows ----------------------------------------- */
+
+.pull-request-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+}
+
+.pull-request-row {
+  align-items: center;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.badge[data-state='open'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.badge[data-state='draft'] {
+  border-color: var(--baseline);
+  color: var(--ink-secondary);
+}
+
+.badge[data-auto-merge='on'] {
+  border-color: var(--baseline);
+  color: var(--ink-primary);
+}
+
+.badge[data-auto-merge='off'] {
+  border-color: var(--hairline);
+  color: var(--ink-muted);
+}
+
+/* --- labels, in GitHub's own colours ------------------------------------ */
+
+.label-chip {
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.7;
+  padding: 0 0.6rem;
+  white-space: nowrap;
+}
+
+/* --- the branch --------------------------------------------------------- */
+
+.branch {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.branch-arrow,
+.branch-base {
+  color: var(--ink-muted);
+}
+
+/* --- ahead / behind ----------------------------------------------------- */
+
+.divergence {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.divergence-unread {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.divergence-count {
+  color: var(--ink-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * Two halves meeting at a centre line, each filled from the middle outwards,
+ * so that the eye reads distance from zero rather than two unrelated bars.
+ */
+.divergence-track {
+  display: inline-flex;
+  inline-size: 9rem;
+}
+
+.divergence-half {
+  background: var(--hairline);
+  block-size: 8px;
+  display: flex;
+  flex: 1 1 50%;
+}
+
+.divergence-behind {
+  border-radius: 4px 0 0 4px;
+  justify-content: flex-end;
+  /* The 2px of surface at the centre is the spacer the two arms need not to
+     read as one bar. */
+  margin-inline-end: 1px;
+}
+
+.divergence-ahead {
+  border-radius: 0 4px 4px 0;
+  justify-content: flex-start;
+  margin-inline-start: 1px;
+}
+
+.divergence-bar {
+  block-size: 100%;
+}
+
+.divergence-behind .divergence-bar {
+  background: var(--diverge-behind);
+  border-radius: 4px 0 0 4px;
+}
+
+.divergence-ahead .divergence-bar {
+  background: var(--diverge-ahead);
+  border-radius: 0 4px 4px 0;
+}
+
+/* --- linked issues ------------------------------------------------------ */
+
+.linked-issues a[data-state='closed'] {
+  text-decoration: line-through;
+}
+
+/* --- what landed -------------------------------------------------------- */
+
+.merged-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.merged-item {
+  border-block-end: 1px solid var(--hairline);
+  padding: 0.6rem 0;
+}
+
+.merged-item:last-child {
+  border-block-end: 0;
+}
+
+.merged-when {
+  color: var(--ink-secondary);
+}
+
+/* --- the unblock-prs log ------------------------------------------------ */
+
+.run-log,
+.run-log-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-log-run {
+  border-block-end: 1px solid var(--hairline);
+  padding: 0.6rem 0;
+}
+
+.run-log-run:last-child {
+  border-block-end: 0;
+}
+
+.run-log-when {
+  align-items: baseline;
+  display: flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+}
+
+.run-log-exact {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.run-log-event {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  padding: 0.15rem 0;
+}
+
+.run-log-detail {
+  color: var(--ink-secondary);
+}
+
+.poll-error {
+  color: var(--status-critical);
+  font-size: 0.8125rem;
+}
+
+/* --- the token panel ---------------------------------------------------- */
+
+/*
+ * A row that is one line until it is opened, because the page works without a
+ * token and most readers will never want it. Quiet rather than hidden: a
+ * reader who has hit the anonymous limit has to be able to find the thing
+ * that lifts it.
+ */
+.token-panel {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.token-summary {
+  color: var(--ink-secondary);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.85rem;
+}
+
+.token-body {
+  border-top: 1px solid var(--hairline);
+  padding: 0.85rem;
+}
+
+.token-state {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  margin: 0 0 0.75rem;
+}
+
+.token-form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 34rem;
+}
+
+.token-field {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+}
+
+.token-input {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+}
+
+.token-remember {
+  align-items: center;
+  color: var(--ink-secondary);
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.4rem;
+}
+
+.token-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.token-use,
+.token-clear {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.token-use:hover,
+.token-clear:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.token-error {
+  color: var(--status-critical);
+  font-size: 0.8125rem;
+  margin: 0.75rem 0 0;
+}
+
+.token-help {
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+}
+
+.token-help summary {
+  color: var(--ink-primary);
+  cursor: pointer;
+}
+
+.token-help h4 {
+  color: var(--ink-primary);
+  font-size: 0.8125rem;
+  margin: 1rem 0 0.35rem;
+}
+
+.token-help p,
+.token-help ol {
+  margin: 0.35rem 0;
+}
+
+.token-help ol {
+  padding-left: 1.25rem;
+}
+
+.token-help li {
+  margin: 0.25rem 0;
+}
+
+.token-help a {
+  color: var(--accent);
+}
+
+.token-help strong {
+  color: var(--ink-primary);
+}
+
+/*
+ * `critical` rather than `warning` or `serious`, which are the steps this
+ * would otherwise take: both sit below 3:1 on the light surface by design,
+ * which the palette allows for a badge carrying a glyph and a word but not
+ * for a sentence someone has to read. The sentence says "Running low" either
+ * way, so the colour is drawing the eye rather than carrying the meaning.
+ */
+.token-state-low {
+  color: var(--status-critical);
+  font-weight: 600;
+}
+
+/*
+ * Sized in `em` so it tracks whatever the badge's font-size is, and given no
+ * colour of its own: the path is stroked in `currentColor`, which the badge
+ * has already set per status.
+ */
+.badge-icon {
+  flex: none;
+  height: 0.9em;
+  width: 0.9em;
+}

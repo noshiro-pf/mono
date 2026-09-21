@@ -37,15 +37,26 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
   赤い aggregate は何が落ちたかを名乗りません。どちらも名指しで出します。
 - **base との ahead / behind** — behind な branch は何も走らず何もマージされま
   せん。PR ページはそれを文章で言うだけで、差の大きさは言いません。
+- **直近マージされた PR** — キューの話ではない唯一の節で、日次レポートの読者が
+  最初に持つ疑問（昨日キューに入れたものは入ったのか）に答えます。
 
 ### 実行
 
 ```bash
 pnpm run pr-report                      # 端末向け（既定）
 pnpm run pr-report -- --format markdown # GitHub issue / Claude 向け
-pnpm run pr-report -- --format json     # 他のツールに渡す
+pnpm run pr-report -- --format payload  # ページが読む JSON
+pnpm run pr-report -- --format json     # 他のツールに渡す（body 込みの全体）
 pnpm run pr-report -- --repo owner/name # 別のリポジトリ
+pnpm run pr-report -- --merged-days 3   # 「直近マージ」の遡る日数
+pnpm run pr-report -- --merged-limit 5  # その最大件数
+pnpm run pr-report -- --format markdown --payload-file out.json # 1回で両方
 ```
+
+`--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
+掛かります。上限は「入らないから」ではなく「読めなくなるから」で、20件を超えた
+あたりからこのセクションは一覧ではなく履歴になります。出力先はファイルなので
+文字数の上限はありません。
 
 ### トークン
 
@@ -88,27 +99,50 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 
 スクリプトは stdout に出すだけです。配信は2つ。
 
-- `.github/workflows/pr-report.yml` が実行し、`pr-report` ラベルの付いた issue
-  の body を上書きします（通知もタイムラインも増えません）。同じ本文が run
-  summary にも出ます。
+- `.github/workflows/pr-report.yml` が実行し、`data/pr-report` ブランチを
+  上書きします（通知もタイムラインも増えません）。同じ本文が run summary にも
+  出ます。
 - Claude の routine が同じコマンドを実行して結果を貼ります。そのまま
   `/unblock-prs` に繋げられるのが、読むだけのレポートとの違いです。
 
+`data/pr-report` ブランチに2つのファイルが置かれます。`pr-report.json` を読むの
+が **GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）、
+`pr-report.md` は同じレポートの散文で、GitHub がそのままレンダリングします。
+
+以前は issue に書いていました。issue は人が読んで購読するものであって簡易DBで
+はない、というのが移した理由です。issue が持っていて惜しかった唯一の性質 —
+「現在の状態が固定 URL で人に読める」— は `pr-report.md` がそのまま引き継ぎ、
+代わりに publish job から `issues: write` と `gh` が消えました。詳細は
+`apps/pr-report-payload/README.md`。
+
+**1回の実行で両方を出します。** workflow は `--format markdown` と
+`--payload-file` を同時に渡します。2回実行すると API を倍使い、しかも2つの
+ファイルがその間に起きたことの分だけ違う瞬間を指してしまいます。
+
+workflow は2つの job に分かれています。`report` は依存ツリーを走らせますがトー
+クンを持たず、成果物を artifact で渡すだけ。`publish` はトークンを持ちますが
+checkout も install もせず、`git` と `gh` だけを inline で叩きます。
+`pnpm-update.yml` と同じ分け方で、理由も同じです。
+
 workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
 open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
-がそこにあるため）、ラベルの着脱、push、draft の切り替え、そして `main` への
-push（全 PR の ahead / behind が同時に動くので）。加えて毎日 07:00 JST の
-schedule と `workflow_dispatch`。
+がそこにあるため）、ラベルの着脱、push、draft の切り替え、`main` への push
+（全 PR の ahead / behind が同時に動くので）、そして**必須 context を出す7つの
+workflow の完了**。加えて毎日 07:00 JST の schedule と `workflow_dispatch`。
+
+最後のものは `workflow_run` です。`check_suite` ではありません — GitHub は
+Actions 自身のスイートではそれで workflow を起動しないので、チェックの完了は
+長らくこの workflow に届いていませんでした。`workflow_run` は名前で対象を指す
+ので、**必須 context を出す workflow を増やしたらここにも足す**必要がありま
+す。名前が実在するかは `pnpm run check:root:workflow-run-names` が見ます。
 
 イベントは**合図としてしか使いません** — payload の中身は job に一切入らず、
-毎回 API から全 PR を読み直します。そのため schedule が下限として残っていま
-す。チェックの完了だけはこの workflow が購読できるイベントを持たない
-（`check_suite` は GitHub Actions 自身のスイートでは workflow を起動しない）
-ので、チェック実行中に書かれたレポートは次の PR イベントか schedule で直りま
-す。
+毎回 API から全 PR を読み直します。schedule は、Actions 以外が書く status が
+将来現れたときのための下限として残しています。
 
-同じ issue を全 run が書き換えるため concurrency は1グループに直列化していま
-す。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
+同じ issue と同じブランチを全 run が書き換えるため concurrency は1グループに
+直列化しています。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
 「すでに queue にいた run」を落とすので、バースト時は実行中の1本＋最新の1本だ
 け残り、間は捨てられます。これが欲しい debounce そのもので、しかも枯渇しませ
 ん。
@@ -122,8 +156,9 @@ makes it safe to run on a schedule, with a read-only token or none.
 It reports what the pull request list cannot show in one screen: the merge
 order declared by the `Merge-After:` trailers drawn as a tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
-requires (named, including the ones that have reported nothing at all), and
-how far the branch is ahead of and behind its base.
+requires (named, including the ones that have reported nothing at all), how
+far the branch is ahead of and behind its base, and — the one section that is
+not about the queue — what merged recently.
 
 Auto-merge is reported only when it is news. The label is the request and
 auto-merge is the mechanism, and the two can come apart: a pull request
@@ -136,7 +171,14 @@ pnpm run pr-report                      # for a terminal (the default)
 pnpm run pr-report -- --format markdown # for a GitHub issue or Claude
 pnpm run pr-report -- --format json     # for another tool
 pnpm run pr-report -- --repo owner/name # a different repository
+pnpm run pr-report -- --merged-days 3   # how far back "recently merged" goes
+pnpm run pr-report -- --merged-limit 5  # and how many it lists
 ```
+
+The merged section is bounded twice, by days (7) and by count (20). The cap is
+about reading rather than about fitting — the report is written to a file,
+which refuses nothing — and past twenty the section stops being a list and
+starts being an archive.
 
 `GITHUB_TOKEN` or `GH_TOKEN` is used when set. Without one the public API
 allows 60 requests an hour — about twenty pull requests at roughly three
@@ -161,17 +203,49 @@ part of them as the whole. Pull requests on a `Merge-After` cycle are named in
 their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
 
-The script only prints. `.github/workflows/pr-report.yml` is what puts the
-text somewhere: it overwrites the body of the issue labelled `pr-report`,
-which notifies nobody and leaves no timeline, and repeats the same text in the
-run summary. It runs whenever something that can change the report happens — a
+The script only prints. `.github/workflows/pr-report.yml` is what puts the text
+somewhere: it force-pushes two files to `data/pr-report` — `pr-report.json`,
+which the **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) reads,
+and `pr-report.md`, the same report as prose, which GitHub renders on the
+branch. It repeats the same text in the run summary.
+
+This wrote to an issue until recently. `apps/pr-report-payload/README.md` says
+why a branch; the short version is that an issue is a thing people open and
+subscribe to rather than a database, and that the one property worth keeping —
+a current report at a URL, readable without the app — is what `pr-report.md`
+carries over. What it costs the publishing job is `issues: write` and every
+call to `gh`.
+
+**One run produces both.** The workflow passes `--payload-file` beside
+`--format markdown`, because a second run would cost another twenty requests
+and another minute, and would leave the issue and the page describing moments
+that differ by whatever happened in between.
+
+The workflow is two jobs. `report` runs the dependency tree and holds no
+token, handing what it made over as an artifact; `publish` holds the token and
+neither checks out nor installs anything, using only inline `git` and `gh`.
+The same split as `pnpm-update.yml`, for the same reason.
+
+It runs whenever something that can change the report happens — a
 pull request opened, closed, reopened, edited, labelled, pushed to or switched
-in or out of draft, and a push to `main`, which moves the ahead / behind of
-every open pull request at once — plus the daily schedule and
-`workflow_dispatch`. The events are pings and nothing else: no payload reaches
-the job, which re-reads every pull request from the API each time. The
-schedule stays as the floor, because a check run finishing raises no event
-this workflow can subscribe to.
+in or out of draft, a push to `main`, which moves the ahead / behind of every
+open pull request at once, and the completion of each of the seven workflows
+behind the required contexts — plus the daily schedule and
+`workflow_dispatch`.
+
+That last one is `workflow_run`, not `check_suite`: GitHub does not trigger a
+workflow with `check_suite` when the suite is Actions' own, which is why a
+check finishing went unheard here for so long. `workflow_run` matches on
+another workflow's `name:`, so **a workflow added behind a required context
+has to be added to that list too**, and
+`pnpm run check:root:workflow-run-names` is what checks that every name there
+resolves to a workflow that exists.
+
+The events are pings and nothing else: no payload reaches the job, which
+re-reads every pull request from the API each time. The schedule stays as the
+floor, for anything that reports a status without an Actions workflow behind
+it.
 
 Every run edits the same body, so they share one concurrency group and run one
 at a time, deliberately not with `cancel-in-progress`: GitHub already drops a
