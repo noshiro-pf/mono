@@ -8,6 +8,7 @@ const source: ReportSource = {
   owner: 'noshiro-pf',
   repo: 'mono',
   label: 'pr-report',
+  runLogLabel: 'unblock-prs-log',
 } as const;
 
 const payload: PrReportPayload = {
@@ -21,6 +22,8 @@ const payload: PrReportPayload = {
   entries: [],
   roots: [],
   cycles: [],
+  merged: [],
+  mergedWithinDays: 7,
 } as const;
 
 /** One canned answer from the GitHub API, in place of the network. */

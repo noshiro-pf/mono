@@ -48,4 +48,9 @@ export const toPayload = (report: PrReport): PrReportPayload =>
     })),
     roots: report.roots,
     cycles: report.cycles,
+    merged: report.merged.map((pr) => ({
+      ...pr,
+      mergedAtEpochMs: Temporal.Instant.from(pr.mergedAt).epochMilliseconds,
+    })),
+    mergedWithinDays: report.mergedWithinDays,
   }) as const;

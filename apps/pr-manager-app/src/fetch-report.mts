@@ -1,11 +1,12 @@
 /**
- * Reading the report back out of the issue `pr-report.yml` writes.
+ * Reading the reports back out of the issues that write them.
  *
- * The app asks GitHub for one issue and nothing else. Asking it about the
- * pull requests directly is what it cannot afford: three requests each — the
- * comparison against the base and the two kinds of check — against the 60 an
- * hour an anonymous browser is allowed, shared with everyone behind the same
- * address. The report already did that work, in a job that holds a token.
+ * Two requests a load: the issue `pr-report.yml` writes, and the one
+ * `unblock-prs` writes when it acts on something. Asking GitHub about the
+ * pull requests directly is what this cannot afford — three requests each,
+ * against the 60 an hour an anonymous browser is allowed for the whole
+ * address it sits behind. Both reports did that work already, one in a job
+ * that holds a token and one on somebody's terminal.
  *
  * **Every request is conditional**, and it is worth being exact about what
  * that buys, because the obvious answer is wrong here. Sending an `ETag` back
@@ -23,7 +24,12 @@
  * both of which this depends on.
  */
 
-import { extractPayload, type PrReportPayload } from 'pr-report-payload';
+import {
+  extractPayload,
+  extractRunLog,
+  type PrReportPayload,
+  type UnblockPrsLog,
+} from 'pr-report-payload';
 import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type ReportSource } from './constants.mjs';
@@ -33,6 +39,12 @@ export type LoadedReport = Readonly<{
   /** The issue it was read from, so the page can link at its own source. */
   issueUrl: string;
   /** Sent back as `If-None-Match` next time; absent if GitHub sent none. */
+  etag: string | undefined;
+}>;
+
+export type LoadedRunLog = Readonly<{
+  log: UnblockPrsLog;
+  issueUrl: string;
   etag: string | undefined;
 }>;
 
@@ -73,8 +85,78 @@ export const fetchReport = async (
   previousEtag?: string,
   fetchImpl: Fetch = askGitHub,
 ): Promise<Result<LoadedReport | Unchanged, string>> => {
+  const issue = await fetchLabelledIssue(
+    source,
+    source.label,
+    previousEtag,
+    fetchImpl,
+  );
+
+  if (Result.isErr(issue)) return issue;
+
+  if (issue.value === UNCHANGED) return Result.ok(UNCHANGED);
+
+  const payload = extractPayload(issue.value.body ?? '');
+
+  return Result.isErr(payload)
+    ? payload
+    : Result.ok({
+        payload: payload.value,
+        issueUrl: issue.value.html_url,
+        etag: issue.value.etag,
+      });
+};
+
+/**
+ * The same, for the issue `unblock-prs` writes.
+ *
+ * Its own call rather than part of the one above, and its own place in the
+ * page's state: the log is secondary, and a missing or unreadable log is not
+ * a reason for the page to show nothing. Both are asked for at once, so the
+ * second costs wall clock rather than a wait.
+ */
+export const fetchRunLog = async (
+  source: ReportSource,
+  previousEtag?: string,
+  fetchImpl: Fetch = askGitHub,
+): Promise<Result<LoadedRunLog | Unchanged, string>> => {
+  const issue = await fetchLabelledIssue(
+    source,
+    source.runLogLabel,
+    previousEtag,
+    fetchImpl,
+  );
+
+  if (Result.isErr(issue)) return issue;
+
+  if (issue.value === UNCHANGED) return Result.ok(UNCHANGED);
+
+  const log = extractRunLog(issue.value.body ?? '');
+
+  return Result.isErr(log)
+    ? log
+    : Result.ok({
+        log: log.value,
+        issueUrl: issue.value.html_url,
+        etag: issue.value.etag,
+      });
+};
+
+const API_ROOT = 'https://api.github.com';
+
+const NOT_MODIFIED = 304;
+
+/** The one open issue carrying a label, or a sentence saying why not. */
+const fetchLabelledIssue = async (
+  source: ReportSource,
+  label: string,
+  previousEtag: string | undefined,
+  fetchImpl: Fetch,
+): Promise<
+  Result<(Issue & Readonly<{ etag: string | undefined }>) | Unchanged, string>
+> => {
   const query = new URLSearchParams({
-    labels: source.label,
+    labels: label,
     state: 'open',
     per_page: '1',
   });
@@ -104,26 +186,12 @@ export const fetchReport = async (
 
   const issue = validated.value[0];
 
-  if (issue === undefined) {
-    return Result.err(
-      `No open issue labelled \`${source.label}\` in ${source.owner}/${source.repo}. The first run of the PR Report workflow creates it.`,
-    );
-  }
-
-  const payload = extractPayload(issue.body ?? '');
-
-  return Result.isErr(payload)
-    ? payload
-    : Result.ok({
-        payload: payload.value,
-        issueUrl: issue.html_url,
-        etag: answered.value.etag,
-      });
+  return issue === undefined
+    ? Result.err(
+        `No open issue labelled \`${label}\` in ${source.owner}/${source.repo} yet.`,
+      )
+    : Result.ok({ ...issue, etag: answered.value.etag });
 };
-
-const API_ROOT = 'https://api.github.com';
-
-const NOT_MODIFIED = 304;
 
 /**
  * Only the fields the app reads. `t.record` accepts the rest, which is the
@@ -133,6 +201,8 @@ const IssueSchema = t.record({
   html_url: t.string(),
   body: t.union([t.nullType, t.string()]),
 });
+
+type Issue = t.TypeOf<typeof IssueSchema>;
 
 const IssueListSchema = t.array(IssueSchema);
 
@@ -147,7 +217,7 @@ const IssueListSchema = t.array(IssueSchema);
  */
 const askGitHub: Fetch = async (route, etag) =>
   fetch(route, {
-    // `no-store` so that the browser revalidates nowhere on its own: the
+    // `no-store` so that the browser does its own revalidation nowhere: the
     // conditional request below is this module's, and a cache layer turning a
     // 304 back into a 200 from its own copy would hide the one answer worth
     // telling apart.

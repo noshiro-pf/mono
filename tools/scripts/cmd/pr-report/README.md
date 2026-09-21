@@ -37,6 +37,8 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
   赤い aggregate は何が落ちたかを名乗りません。どちらも名指しで出します。
 - **base との ahead / behind** — behind な branch は何も走らず何もマージされま
   せん。PR ページはそれを文章で言うだけで、差の大きさは言いません。
+- **直近マージされた PR** — キューの話ではない唯一の節で、日次レポートの読者が
+  最初に持つ疑問（昨日キューに入れたものは入ったのか）に答えます。
 
 ### 実行
 
@@ -45,7 +47,14 @@ pnpm run pr-report                      # 端末向け（既定）
 pnpm run pr-report -- --format markdown # GitHub issue / Claude 向け
 pnpm run pr-report -- --format json     # 他のツールに渡す
 pnpm run pr-report -- --repo owner/name # 別のリポジトリ
+pnpm run pr-report -- --merged-days 3   # 「直近マージ」の遡る日数
+pnpm run pr-report -- --merged-limit 5  # その最大件数
 ```
+
+`--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
+掛かります。issue の body は 65536 文字までで、忙しい1週間はそれを超えさせうる
+唯一の入力なので、窓だけでなく上限も置いています。超えた場合は stdout はその
+まま出し、stderr に「どちらのフラグを下げればよいか」を書きます。
 
 ### トークン
 
@@ -131,8 +140,9 @@ makes it safe to run on a schedule, with a read-only token or none.
 It reports what the pull request list cannot show in one screen: the merge
 order declared by the `Merge-After:` trailers drawn as a tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
-requires (named, including the ones that have reported nothing at all), and
-how far the branch is ahead of and behind its base.
+requires (named, including the ones that have reported nothing at all), how
+far the branch is ahead of and behind its base, and — the one section that is
+not about the queue — what merged recently.
 
 Auto-merge is reported only when it is news. The label is the request and
 auto-merge is the mechanism, and the two can come apart: a pull request
@@ -145,7 +155,14 @@ pnpm run pr-report                      # for a terminal (the default)
 pnpm run pr-report -- --format markdown # for a GitHub issue or Claude
 pnpm run pr-report -- --format json     # for another tool
 pnpm run pr-report -- --repo owner/name # a different repository
+pnpm run pr-report -- --merged-days 3   # how far back "recently merged" goes
+pnpm run pr-report -- --merged-limit 5  # and how many it lists
 ```
+
+The merged section is bounded twice, by days (7) and by count (20). An issue
+body holds 65536 characters and a busy week is the one input that can push the
+report past it; when it does, stdout is still the report and stderr says which
+of the two flags to lower.
 
 `GITHUB_TOKEN` or `GH_TOKEN` is used when set. Without one the public API
 allows 60 requests an hour — about twenty pull requests at roughly three

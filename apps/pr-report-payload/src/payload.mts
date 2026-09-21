@@ -1,3 +1,5 @@
+// cspell:ignore RRGGBB
+
 /**
  * The machine-readable copy of the pull request report: what `pr-report`
  * writes into its issue, and what the Pull Requests Manager app reads back.
@@ -34,6 +36,20 @@ export type PayloadChecks = Readonly<{
   pending: readonly string[];
   missing: readonly string[];
   required: number;
+}>;
+
+/**
+ * A label as GitHub holds it, colour and all.
+ *
+ * The colour is carried because a chip that is not the colour GitHub shows is
+ * a chip a reader has to translate. It is six hex digits with no `#`, which
+ * is exactly what the API sends.
+ */
+export type PayloadLabel = Readonly<{
+  name: string;
+  /** `RRGGBB`, no leading `#`. */
+  color: string;
+  description: string;
 }>;
 
 /** An issue the pull request closes. */
@@ -78,7 +94,7 @@ export type PayloadEntry = Readonly<{
   author: string;
   url: string;
   isDraft: boolean;
-  labels: readonly string[];
+  labels: readonly PayloadLabel[];
   /** Whether auto-merge is armed, which the `merge-queued` label is not. */
   autoMerge: boolean;
   headRef: string;
@@ -114,6 +130,33 @@ export type PayloadSummary = Readonly<{
   behind: number;
 }>;
 
+/**
+ * One pull request that has already landed.
+ *
+ * A separate shape rather than a {@link PayloadEntry} with the fields blanked
+ * out: nothing that is true of an open pull request — a merge order, a
+ * verdict, a distance from its base — is true of one that has merged, and a
+ * type that admitted both would be a type whose every field has to be
+ * checked before it is read.
+ */
+export type PayloadMerged = Readonly<{
+  number: number;
+  title: string;
+  author: string;
+  url: string;
+  headRef: string;
+  baseRef: string;
+  mergedAt: string;
+  mergedAtEpochMs: number;
+  labels: readonly PayloadLabel[];
+  /**
+   * The issues the body declared with a closing keyword. GitHub's own list
+   * is GraphQL-only and is read for the open pull requests; a merged one is
+   * history, and its body is what is left to read it from.
+   */
+  linkedIssues: readonly PayloadLinkedIssue[];
+}>;
+
 export type PrReportPayload = Readonly<{
   version: number;
   repo: Readonly<{ owner: string; name: string }>;
@@ -140,6 +183,10 @@ export type PrReportPayload = Readonly<{
   /** The merge order as a forest. Pull requests on a cycle are not in it. */
   roots: readonly PayloadTreeNode[];
   cycles: readonly (readonly number[])[];
+  /** Merged within {@link PrReportPayload.mergedWithinDays}, newest first. */
+  merged: readonly PayloadMerged[];
+  /** How far back the list above goes, so a page can say so. */
+  mergedWithinDays: number;
 }>;
 
 export const PayloadChecksSchema: t.Type<PayloadChecks> = t.record({
@@ -148,6 +195,12 @@ export const PayloadChecksSchema: t.Type<PayloadChecks> = t.record({
   pending: t.array(t.string()),
   missing: t.array(t.string()),
   required: t.number(),
+});
+
+export const PayloadLabelSchema: t.Type<PayloadLabel> = t.record({
+  name: t.string(),
+  color: t.string(),
+  description: t.string(),
 });
 
 export const PayloadLinkedIssueSchema: t.Type<PayloadLinkedIssue> = t.record({
@@ -191,7 +244,7 @@ export const PayloadEntrySchema: t.Type<PayloadEntry> = t.record({
   author: t.string(),
   url: t.string(),
   isDraft: t.boolean(),
-  labels: t.array(t.string()),
+  labels: t.array(PayloadLabelSchema),
   autoMerge: t.boolean(),
   headRef: t.string(),
   baseRef: t.string(),
@@ -201,6 +254,19 @@ export const PayloadEntrySchema: t.Type<PayloadEntry> = t.record({
   mergeAfter: t.array(t.number()),
   blockedBy: t.array(t.number()),
   checks: PayloadChecksSchema,
+});
+
+export const PayloadMergedSchema: t.Type<PayloadMerged> = t.record({
+  number: t.number(),
+  title: t.string(),
+  author: t.string(),
+  url: t.string(),
+  headRef: t.string(),
+  baseRef: t.string(),
+  mergedAt: t.string(),
+  mergedAtEpochMs: t.number(),
+  labels: t.array(PayloadLabelSchema),
+  linkedIssues: t.array(PayloadLinkedIssueSchema),
 });
 
 /**
@@ -220,4 +286,6 @@ export const PrReportPayloadSchema: t.Type<PrReportPayload> = t.record({
   entries: t.array(PayloadEntrySchema),
   roots: t.array(PayloadTreeNodeSchema),
   cycles: t.array(t.array(t.number())),
+  merged: t.array(PayloadMergedSchema),
+  mergedWithinDays: t.number(),
 });

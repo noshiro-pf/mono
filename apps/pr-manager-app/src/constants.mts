@@ -10,12 +10,20 @@ export type ReportSource = Readonly<{
    * repository variable and the admin token that writes one.
    */
   label: string;
+  /**
+   * The label on the issue `unblock-prs` writes its runs to. A second issue
+   * rather than a second section of the first: the two have different
+   * writers — a workflow and a person's terminal — and one body cannot be
+   * overwritten wholesale by both.
+   */
+  runLogLabel: string;
 }>;
 
 export const REPORT_SOURCE: ReportSource = {
   owner: 'noshiro-pf',
   repo: 'mono',
   label: 'pr-report',
+  runLogLabel: 'unblock-prs-log',
 } as const;
 
 /** The repository the report is about. */
@@ -26,9 +34,12 @@ export const repositoryUrl = (source: ReportSource): string =>
  * Where the report issue can be found, for the case where the app could not
  * read it and the reader wants to see it for themselves.
  */
-export const reportIssuesUrl = (source: ReportSource): string => {
+export const reportIssuesUrl = (
+  source: ReportSource,
+  label: string = source.label,
+): string => {
   const query = new URLSearchParams({
-    q: `is:issue is:open label:${source.label}`,
+    q: `is:issue is:open label:${label}`,
   });
 
   return `${repositoryUrl(source)}/issues?${query.toString()}`;

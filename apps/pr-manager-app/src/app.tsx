@@ -10,8 +10,10 @@ import {
 } from './constants.mjs';
 import {
   fetchReport,
+  fetchRunLog,
   UNCHANGED,
   type LoadedReport,
+  type LoadedRunLog,
   type Unchanged,
 } from './fetch-report.mjs';
 
@@ -35,49 +37,62 @@ export const App = (): React.ReactElement => {
   /**
    * The instant every "3 hours ago" on the page is measured against.
    *
-   * Its own state, ticking on its own timer. Fixed at the moment of the load
-   * it would read "generated 5 minutes ago" for as long as the tab stays
-   * open, which is the one thing a page about freshness must not do.
+   * Its own state, ticking on its own timer, because the alternative is what
+   * this used to do: fix it at the moment of the load, and read "generated 5
+   * minutes ago" for as long as the tab stays open.
    */
   const [nowMs, setNowMs] = React.useState(0);
 
   // Split from `refresh` below because this is what the effect and the timer
   // run, and neither may set state synchronously. The initial state is
   // already `loading`, so there is nothing for them to say up front.
-  const read = React.useCallback((previous: LoadState): void => {
-    fetchReport(REPORT_SOURCE, etagOf(previous))
-      .then((report) => {
-        setNowMs(Date.now());
+  const read = React.useCallback(
+    (previous: LoadState, include: Include): void => {
+      const sent = etagsOf(previous);
 
-        setState((current) => merge(current, report));
-      })
-      .catch((error: unknown) => {
-        setState((current) =>
-          merge(current, Result.err(unknownToString(error))),
-        );
-      });
-  }, []);
+      Promise.all([
+        fetchReport(REPORT_SOURCE, sent.report),
+        // The log is only ever written by someone running `unblock-prs` on
+        // their own machine, so a timer has nothing to find. Left out of the
+        // poll, it costs a request on the loads that can actually turn one up.
+        include === 'everything'
+          ? fetchRunLog(REPORT_SOURCE, sent.runLog)
+          : Promise.resolve(Result.ok(UNCHANGED)),
+      ])
+        .then(([report, runLog]) => {
+          setNowMs(Date.now());
+
+          setState((current) => merge(current, report, runLog));
+        })
+        .catch((error: unknown) => {
+          const failed = Result.err(unknownToString(error));
+
+          setState((current) => merge(current, failed, failed));
+        });
+    },
+    [],
+  );
 
   const refresh = React.useCallback((): void => {
     setState(asRefreshing);
 
-    read(state);
+    read(state, 'everything');
   }, [read, state]);
 
   React.useEffect(() => {
-    read(state);
+    read(state, 'everything');
     // The first load only. Everything after it is the timer below, whose
-    // dependency on `state` is what gives it the ETag to send.
+    // dependency on `state` is what gives it the ETags to send.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [read]);
 
   React.useEffect(() => {
     const id = setInterval(() => {
       // A hidden tab is a tab nobody is reading, and a forgotten one would
-      // otherwise go on spending the budget for the rest of the day. Coming
-      // back to it is handled below.
+      // otherwise go on asking for the rest of the day. Coming back to it
+      // is handled below.
       if (document.visibilityState === 'visible') {
-        read(state);
+        read(state, 'report');
       }
     }, POLL_INTERVAL_MS);
 
@@ -94,7 +109,7 @@ export const App = (): React.ReactElement => {
 
       setNowMs(Date.now());
 
-      read(state);
+      read(state, 'report');
     };
 
     document.addEventListener('visibilitychange', onVisible);
@@ -162,7 +177,7 @@ export const App = (): React.ReactElement => {
       ) : undefined}
 
       {state.type === 'ready' ? (
-        <ReportView nowMs={nowMs} report={state.report} />
+        <ReportView nowMs={nowMs} report={state.report} runLog={state.runLog} />
       ) : undefined}
     </main>
   );
@@ -174,6 +189,7 @@ type LoadState = Readonly<
   | {
       type: 'ready';
       report: LoadedReport;
+      runLog: Result<LoadedRunLog, string>;
       /**
        * A background poll that failed, kept beside the data it did not
        * replace. Silence here would be a page that had quietly stopped being
@@ -185,16 +201,30 @@ type LoadState = Readonly<
     }
 >;
 
+/**
+ * Whether a read asks for the `unblock-prs` log as well as the report. Every
+ * request counts here — see `POLL_INTERVAL_MS` — so the timer asks for the
+ * one of the two that a timer can find anything new in.
+ */
+type Include = 'everything' | 'report';
+
 /** One value, so that a re-render does not make a new one to compare. */
 const LOADING: LoadState = { type: 'loading' } as const;
 
 /**
- * The ETag to send, and the reason a `304` can always be answered: it is sent
- * only for a report that is still on the page, so "unchanged" never means
+ * The ETags to send, and the reason a `304` can always be answered: one is
+ * sent only for a value that is still on the page, so "unchanged" never means
  * "unchanged from something that is gone".
  */
-const etagOf = (state: LoadState): string | undefined =>
-  state.type === 'ready' ? state.report.etag : undefined;
+const etagsOf = (
+  state: LoadState,
+): Readonly<{ report: string | undefined; runLog: string | undefined }> =>
+  state.type === 'ready'
+    ? ({
+        report: state.report.etag,
+        runLog: Result.isOk(state.runLog) ? state.runLog.value.etag : undefined,
+      } as const)
+    : ({ report: undefined, runLog: undefined } as const);
 
 const asRefreshing = (state: LoadState): LoadState =>
   state.type === 'ready' ? ({ ...state, refreshing: true } as const) : state;
@@ -214,6 +244,7 @@ const asRefreshing = (state: LoadState): LoadState =>
 const merge = (
   previous: LoadState,
   report: Result<LoadedReport | Unchanged, string>,
+  runLog: Result<LoadedRunLog | Unchanged, string>,
 ): LoadState => {
   const kept = previous.type === 'ready' ? previous : undefined;
 
@@ -226,7 +257,7 @@ const merge = (
   const nextReport = report.value === UNCHANGED ? kept?.report : report.value;
 
   if (nextReport === undefined) {
-    // Unreachable while `etagOf` is what decides what is sent, and worth
+    // Unreachable while `etagsOf` is what decides what is sent, and worth
     // saying rather than rendering an empty page if that ever stops holding.
     return {
       type: 'failed',
@@ -235,11 +266,14 @@ const merge = (
     };
   }
 
-  // The same object back when nothing moved, so that a poll answered `304`
+  const nextRunLog = mergeRunLog(kept?.runLog, runLog);
+
+  // The same objects back when nothing moved, so that a poll answered `304`
   // costs no render — and so the timer that depends on this state is not
   // restarted by an answer that said nothing.
   const nothingMoved =
     nextReport === kept?.report &&
+    nextRunLog === kept.runLog &&
     kept.pollError === undefined &&
     !kept.refreshing;
 
@@ -248,7 +282,30 @@ const merge = (
     : {
         type: 'ready',
         report: nextReport,
+        runLog: nextRunLog,
         pollError: undefined,
         refreshing: false,
       };
+};
+
+/**
+ * The log is allowed to be absent — there is no issue until someone runs the
+ * script — so its failures are values rather than page-level errors. The
+ * previous one is returned unchanged when the new one says the same thing, so
+ * that "no log yet", repeated every minute, is not a re-render every minute.
+ */
+const mergeRunLog = (
+  kept: Result<LoadedRunLog, string> | undefined,
+  next: Result<LoadedRunLog | Unchanged, string>,
+): Result<LoadedRunLog, string> => {
+  if (Result.isErr(next)) {
+    return kept !== undefined && Result.isErr(kept) && kept.value === next.value
+      ? kept
+      : next;
+  }
+
+  return next.value === UNCHANGED
+    ? (kept ??
+        Result.err('The log was unchanged, but this page has no copy of it.'))
+    : Result.ok(next.value);
 };

@@ -20,7 +20,9 @@ export const summarize = (report: PrReport): PayloadSummary => {
 
   return {
     open: report.entries.length,
-    queued: count((entry) => entry.labels.includes(MERGE_QUEUED_LABEL)),
+    queued: count((entry) =>
+      entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL),
+    ),
     draft: count((entry) => entry.isDraft),
     failing: count((entry) => entry.checks.verdict === 'failing'),
     behind: count((entry) => (entry.comparison?.behindBy ?? 0) > 0),

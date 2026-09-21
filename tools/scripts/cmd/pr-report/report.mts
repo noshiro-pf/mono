@@ -5,6 +5,7 @@ import { parseMergeAfter } from '../unblock-prs/merge-after.mjs';
 import { summarizeChecks } from './checks.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import {
+  type MergedPullRequest,
   type PrReport,
   type PullRequestFacts,
   type RepoRef,
@@ -23,12 +24,16 @@ export const buildReport = ({
   required,
   authenticated,
   pulls,
+  merged,
+  mergedWithinDays,
 }: Readonly<{
   repo: RepoRef;
   generatedAt: string;
   required: readonly string[];
   authenticated: boolean;
   pulls: readonly PullRequestFacts[];
+  merged: readonly MergedPullRequest[];
+  mergedWithinDays: number;
 }>): PrReport => {
   const open = new Set(pulls.map(({ number }) => number));
 
@@ -44,7 +49,7 @@ export const buildReport = ({
         checks: summarizeChecks({
           required,
           reported: facts.reported,
-          paused: facts.labels.includes(SKIP_CI_LABEL),
+          paused: facts.labels.some((label) => label.name === SKIP_CI_LABEL),
         }),
       };
     });
@@ -59,5 +64,7 @@ export const buildReport = ({
     entries,
     roots,
     cycles,
+    merged,
+    mergedWithinDays,
   };
 };
