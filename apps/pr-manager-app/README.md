@@ -26,15 +26,20 @@ is a page that is safe to leave open.
 
 ## Where the data comes from
 
-Two requests, both to the GitHub REST API and both for one issue: the open one
-labelled `pr-report`, and the open one labelled `unblock-prs-log`. Each
-carries its report as a block inside its body; `pr-report-payload` holds both
-sides of that convention and says why an issue is the transport at all.
+Two requests, both to the GitHub REST contents API and both for one JSON file
+on a branch of its own: `pr-report.json` on `data/pr-report`, written by the
+workflow, and `unblock-prs-log.json` on `data/unblock-prs-log`, written by the
+script. `pr-report-payload` holds both sides of that convention and says why a
+branch — it was an issue body until recently, and an issue is a thing people
+read and subscribe to rather than a database.
+
+The human-readable report is still an issue, the one labelled `pr-report`, and
+this page links at it. It does not read it.
 
 The log is asked for alongside the report rather than after it, and a log that
 is missing or unreadable is a sentence in its own section rather than a reason
-for the page to show nothing. There is no `unblock-prs-log` issue until
-someone runs the script, and the page says so.
+for the page to show nothing. There is no log until someone runs the script,
+and the page says so.
 
 The short version: asking GitHub about the pull requests directly costs three
 requests each, and an anonymous browser gets sixty an hour for the whole
@@ -91,8 +96,9 @@ There is a panel at the top of the page that takes a GitHub personal access
 token, and **the page works without one** — it is closed by default and most
 readers will never open it.
 
-**It buys the rate limit and nothing else.** The page reads two issues of a
-public repository; a token gives it no data a stranger could not already see.
+**It buys the rate limit and nothing else.** The page reads two JSON files out
+of a public repository; a token gives it no data a stranger could not already
+see.
 That is what makes the recipe the panel asks for the correct one rather than a
 cautious one:
 
@@ -133,7 +139,7 @@ pnpm run preview
 pnpm run check:test
 ```
 
-The issues are read from the live API in every one of these, including `dev`.
+The files are read from the live API in every one of these, including `dev`.
 Without a token that is sixty requests an hour for the whole address — two per
 load, so thirty loads, which is only a limit if the page is being reloaded in
 a loop. `dev` gets no `Content-Security-Policy`; only the build does.

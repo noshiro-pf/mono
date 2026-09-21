@@ -184,7 +184,7 @@ const TokenHelp = (): React.ReactElement => (
 
     <p>
       {
-        'This page reads two issues of a public repository and nothing else. It needs no permission you do not already have as a stranger — what it needs is the higher rate limit, and GitHub charges that to the account rather than to what the token is allowed to reach. So the right token here is the weakest one you can make.'
+        'This page reads two small JSON files out of a public repository and nothing else. It needs no permission you do not already have as a stranger — what it needs is the higher rate limit, and GitHub charges that to the account rather than to what the token is allowed to reach. So the right token here is the weakest one you can make.'
       }
     </p>
 

@@ -1,8 +1,13 @@
-import { embedPayload, type PrReportPayload } from 'pr-report-payload';
+import { serializePayload, type PrReportPayload } from 'pr-report-payload';
 import { Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type ReportSource } from './constants.mjs';
-import { fetchReport, UNCHANGED, type Fetch } from './fetch-report.mjs';
+import {
+  fetchReport,
+  fetchRunLog,
+  UNCHANGED,
+  type Fetch,
+} from './fetch-report.mjs';
 
 /**
  * Read with the name as a value rather than as a literal in brackets, which
@@ -18,7 +23,6 @@ const source: ReportSource = {
   owner: 'noshiro-pf',
   repo: 'mono',
   label: 'pr-report',
-  runLogLabel: 'unblock-prs-log',
 } as const;
 
 const payload: PrReportPayload = {
@@ -36,12 +40,8 @@ const payload: PrReportPayload = {
   mergedWithinDays: 7,
 } as const;
 
-const issueBody = JSON.stringify([
-  {
-    html_url: 'https://github.com/noshiro-pf/mono/issues/1991',
-    body: `# Open pull requests\n\n${embedPayload(payload)}`,
-  },
-]);
+/** The file, as GitHub's contents API answers it under `vnd.github.raw`. */
+const file = serializePayload(payload);
 
 /** One canned answer from the GitHub API, in place of the network. */
 const answering =
@@ -78,7 +78,7 @@ describe(fetchReport, () => {
     const { result } = await fetchReport(source, {
       etag: undefined,
       token: undefined,
-      fetchImpl: answering(issueBody),
+      fetchImpl: answering(file),
     });
 
     assert.isTrue(Result.isOk(result));
@@ -87,24 +87,68 @@ describe(fetchReport, () => {
 
     expect(result.value.payload.generatedAt).toBe(payload.generatedAt);
 
-    expect(result.value.issueUrl).toBe(
-      'https://github.com/noshiro-pf/mono/issues/1991',
+    // Where a person can go and look at the same file.
+    expect(result.value.sourceUrl).toBe(
+      'https://github.com/noshiro-pf/mono/blob/data/pr-report/pr-report.json',
     );
 
     // Kept so the next request can be conditional.
     expect(result.value.etag).toBe('"abc"');
   });
 
-  test('says where to look when no issue carries the label', async () => {
+  // The first run of the workflow is what creates the branch, so a 404 is a
+  // thing that has not happened yet rather than a fault — and the two files
+  // are missing for different reasons, so each says its own.
+  test('says the report has not been written when there is no file', async () => {
     const { result } = await fetchReport(source, {
       etag: undefined,
       token: undefined,
-      fetchImpl: answering('[]'),
+      fetchImpl: answering('{"message":"Not Found"}', { status: 404 }),
     });
 
     assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(result.value.includes('pr-report'));
+    assert.isTrue(result.value.includes('PR Report workflow'));
+  });
+
+  test('says nobody has run unblock-prs when there is no log', async () => {
+    const { result } = await fetchRunLog(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering('{"message":"Not Found"}', { status: 404 }),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.isTrue(result.value.includes('unblock-prs'));
+  });
+
+  test('asks for the file itself rather than an envelope around it', async () => {
+    const sent = await headersSentFor(undefined);
+
+    expect(headerOf(sent, 'Accept')).toBe('application/vnd.github.raw');
+  });
+
+  test('asks the branch the payload lives on', async () => {
+    let mut_route = '';
+
+    await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: (route) => {
+        mut_route = route;
+
+        return Promise.resolve(new Response(file, { status: 200 }));
+      },
+    });
+
+    assert.isTrue(
+      mut_route.startsWith(
+        'https://api.github.com/repos/noshiro-pf/mono/contents/pr-report.json?',
+      ),
+    );
+
+    assert.isTrue(mut_route.includes('ref=data%2Fpr-report'));
   });
 
   // The quota a browser spends belongs to the address rather than to the
@@ -132,16 +176,16 @@ describe(fetchReport, () => {
     const { result } = await fetchReport(source, {
       etag: undefined,
       token: undefined,
-      fetchImpl: answering('{"message":"Not Found"}', { status: 404 }),
+      fetchImpl: answering('{"message":"Server Error"}', { status: 500 }),
     });
 
     assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(result.value.includes('404'));
+    assert.isTrue(result.value.includes('500'));
   });
 
   test('answers "unchanged" to the ETag it was given', async () => {
-    const github = conditional(issueBody, '"v1"');
+    const github = conditional(file, '"v1"');
 
     const first = await fetchReport(source, {
       etag: undefined,
@@ -193,7 +237,7 @@ const headersSentFor = async (
     fetchImpl: (_route, init) => {
       mut_sent = init.headers;
 
-      return Promise.resolve(new Response(issueBody, { status: 200 }));
+      return Promise.resolve(new Response(file, { status: 200 }));
     },
   });
 
@@ -255,7 +299,7 @@ describe('the rate limit beside the answer', () => {
     const { rateLimit } = await fetchReport(source, {
       etag: undefined,
       token: undefined,
-      fetchImpl: answering(issueBody, {
+      fetchImpl: answering(file, {
         status: 200,
         headers: {
           'x-ratelimit-limit': '60',
@@ -303,7 +347,7 @@ describe('the rate limit beside the answer', () => {
     const { rateLimit } = await fetchReport(source, {
       etag: undefined,
       token: undefined,
-      fetchImpl: answering(issueBody),
+      fetchImpl: answering(file),
     });
 
     expect(rateLimit).toBeUndefined();

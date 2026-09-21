@@ -17,10 +17,13 @@ name: PR Report
 # where the text goes, so the same report can be had locally, or by an agent,
 # with no GitHub UI involved.
 #
-# That body is also what the GitHub Pull Requests Manager page reads
-# (`apps/pr-manager-app`): the Markdown ends with a collapsed block of JSON
-# carrying the same report, so the page has a data source without a second
-# place to write it to. See `apps/pr-report-payload/README.md`.
+# The same run also writes a machine-readable copy of the report to a branch
+# of its own, which is what the GitHub Pull Requests Manager page reads
+# (`apps/pr-manager-app`). One run, two outputs — `--payload-file` beside
+# `--format markdown` — so the issue and the page can never be describing
+# moments that differ by whatever happened between two runs. See
+# `apps/pr-report-payload/README.md` for why a branch rather than the issue
+# body this used to be embedded in.
 
 # The events are pings, not input: nothing from a payload reaches the job,
 # which re-reads every pull request from the API each time. So the trigger
@@ -103,14 +106,9 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: read
-  # To create the report issue on the first run and edit it on every one
-  # after. This job installs the dependency tree and then holds a token, which
-  # is the pairing `pnpm-update.yml` is split to avoid; it is accepted here
-  # because the whole of what the token can do is rewrite the body of one
-  # issue in a public repository with text this job generated anyway.
-  issues: write
+# Deny by default; each job grants back what it needs. The split below is
+# what this is in aid of.
+permissions: {}
 
 concurrency:
   # One issue, one writer: every run of this workflow edits the same body, so
@@ -129,23 +127,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Runs the dependency tree, and holds nothing. Everything this job produces
+  # leaves as an artifact.
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # This is where `pull_request_target`'s hazard — a writable token in
-          # a job that installs and runs the tree it checked out — is answered.
-          # The event's own ref is the pull request's *base*, which is not
-          # necessarily `main`: a chained pull request's base is another
-          # branch, and running that branch's `pr-report` and lockfile with
-          # `issues: write` is the thing being avoided. Pinning to the default
-          # branch also makes `repo-settings/rulesets/main.json` — desired
-          # state, which a pull request may be in the middle of changing — read
-          # from the one copy that decides.
+          # This is where `pull_request_target`'s hazard — a job that installs
+          # and runs the tree it checked out — is answered. The event's own
+          # ref is the pull request's *base*, which is not necessarily `main`:
+          # a chained pull request's base is another branch, and running that
+          # branch's `pr-report` and lockfile is the thing being avoided.
+          # Pinning to the default branch also makes
+          # `repo-settings/rulesets/main.json` — desired state, which a pull
+          # request may be in the middle of changing — read from the one copy
+          # that decides.
           #
           # Empty is `actions/checkout`'s own default, so every other event
           # keeps checking out the ref it was raised on; a `workflow_dispatch`
@@ -165,19 +168,89 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # One run, both outputs. A second run for the payload would cost another
+      # twenty requests and another minute, and would describe a different
+      # moment from the Markdown.
       - name: Generate the report
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: pnpm run pr-report -- --format markdown > "${RUNNER_TEMP}/pr-report.md"
+        run: |
+          mkdir -p "${RUNNER_TEMP}/report"
+          pnpm run pr-report -- \
+            --format markdown \
+            --payload-file "${RUNNER_TEMP}/report/pr-report.json" \
+            > "${RUNNER_TEMP}/report/pr-report.md"
 
       - name: Add it to the run summary
-        run: cat "${RUNNER_TEMP}/pr-report.md" >> "${GITHUB_STEP_SUMMARY}"
+        run: cat "${RUNNER_TEMP}/report/pr-report.md" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Hand it to the publisher
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-report
+          path: ${{ runner.temp }}/report
+          retention-days: 1
+
+  # Holds the token, and installs nothing. No checkout either: every step
+  # below is the definition GitHub resolved rather than a file out of a tree,
+  # so there is nothing here a dependency of the job above could have
+  # rewritten. This is the same split, and the same reason, as
+  # `pnpm-update.yml`.
+  publish:
+    needs: report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      # Force-pushes the payload to its own branch. `main` is out of reach:
+      # `repo-settings/rulesets/main-no-bypass.json` forbids creation,
+      # deletion and non-fast-forward there with no bypass actors, and a
+      # `GITHUB_TOKEN` cannot write `.github/workflows/` at all.
+      contents: write
+      # Creates the report issue on the first run and edits it on every one
+      # after.
+      issues: write
+
+    steps:
+      - name: Take the report
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: pr-report
+          path: ${{ runner.temp }}/report
+
+      # A fresh repository each time, so the branch is one commit holding one
+      # file however long this goes on — rather than a commit per run, which
+      # at fifty runs a day is what the repository would otherwise carry.
+      #
+      # Nothing watches this branch: every `push:` trigger in
+      # `.github/workflows/` names `main`, so this starts no run of anything.
+      - name: Publish the payload to its branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DATA_BRANCH: data/pr-report
+          DATA_PATH: pr-report.json
+        run: |
+          set -euo pipefail
+
+          work="$(mktemp -d)"
+          cp "${RUNNER_TEMP}/report/pr-report.json" "${work}/${DATA_PATH}"
+          cd "${work}"
+
+          git init --quiet --initial-branch=main
+          git config core.hooksPath /dev/null
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "${DATA_PATH}"
+          git commit --quiet --message 'chore(pr-report): publish the payload'
+          git push --quiet --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:refs/heads/${DATA_BRANCH}"
 
       # The label is what identifies the one report issue across runs: a title
       # can be edited by anyone reading it, and the issue number is not
       # something a workflow can remember between runs without a repository
       # variable and the admin token that writes one.
-      - name: Publish it to the report issue
+      - name: Publish the report to its issue
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -202,8 +275,8 @@ jobs:
             gh issue create \
               --title "${REPORT_TITLE}" \
               --label "${REPORT_LABEL}" \
-              --body-file "${RUNNER_TEMP}/pr-report.md"
+              --body-file "${RUNNER_TEMP}/report/pr-report.md"
           else
             gh issue edit "${number}" \
-              --body-file "${RUNNER_TEMP}/pr-report.md"
+              --body-file "${RUNNER_TEMP}/report/pr-report.md"
           fi

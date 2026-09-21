@@ -1,12 +1,16 @@
 /**
- * Reading the reports back out of the issues that write them.
+ * Reading the two reports back out of the files that carry them.
  *
- * Two requests a load: the issue `pr-report.yml` writes, and the one
- * `unblock-prs` writes when it acts on something. Asking GitHub about the
- * pull requests directly is what this cannot afford — three requests each,
- * against the 60 an hour an anonymous browser is allowed for the whole
- * address it sits behind. Both reports did that work already, one in a job
- * that holds a token and one on somebody's terminal.
+ * Two requests a load, both to the GitHub REST contents API, both for one
+ * JSON file on a branch of its own: what `pr-report.yml` writes, and what
+ * `unblock-prs` writes when it acts on something. Which branch and which
+ * path is `pr-report-payload`'s to say, and its `location.mts` says why a
+ * branch rather than the issue body this used to be embedded in.
+ *
+ * Asking GitHub about the pull requests directly is what this cannot afford
+ * — three requests each, against the 60 an hour an anonymous browser is
+ * allowed for the whole address it sits behind. Both reports did that work
+ * already, one in a job that holds a token and one on somebody's terminal.
  *
  * **Every request is conditional**, and it is worth being exact about what
  * that buys, because the answer depends on who is asking. Sending an `ETag`
@@ -18,41 +22,49 @@
  * it saves; what it does *not* do is buy a shorter interval for a page with
  * no token, and `pollIntervalMs` is where that is decided.
  *
- * The three things this depends on GitHub doing across origins, all
- * measured against `api.github.com` from a `noshiro-pf.github.io` origin:
- * it accepts `If-None-Match` and `Authorization` (both named in
- * `Access-Control-Allow-Headers`), it exposes `ETag` and the
- * `X-RateLimit-*` headers to scripts, and it does both **on the `304` as
- * well as on the `200`** — a 304 that answered no `Access-Control-Allow-
- * Origin` would be dropped by the browser before this code saw it. The
- * preflight those headers force is answered with `Access-Control-Max-Age:
- * 86400` and is not charged against the rate limit, so it costs one request
- * a day rather than one per poll.
+ * The contents API's `ETag` is the blob's SHA, which is a better ETag than
+ * the issues API's was: it changes exactly when the file's content does, and
+ * a report rewritten to the same bytes does not cost a re-render.
+ *
+ * The things this depends on GitHub doing across origins, all measured
+ * against `api.github.com` from a `noshiro-pf.github.io` origin: it accepts
+ * `If-None-Match` and `Authorization` (both named in
+ * `Access-Control-Allow-Headers`), it exposes `ETag` and the `X-RateLimit-*`
+ * headers to scripts, and it does both **on the `304` as well as on the
+ * `200`** — a 304 that answered no `Access-Control-Allow-Origin` would be
+ * dropped by the browser before this code saw it. The preflight those
+ * headers force is answered with `Access-Control-Max-Age: 86400` and is not
+ * charged against the rate limit, so it costs one request a day rather than
+ * one per poll.
  */
 
 import {
-  extractPayload,
-  extractRunLog,
+  browseUrl,
+  contentsRoute,
+  parsePayload,
+  parseRunLog,
+  REPORT_FILE,
+  RUN_LOG_FILE,
+  type DataFile,
   type PrReportPayload,
   type UnblockPrsLog,
 } from 'pr-report-payload';
-import { Json, Result } from 'ts-data-forge';
-import * as t from 'ts-fortress';
+import { Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type ReportSource } from './constants.mjs';
 import { readRateLimit, type RateLimit } from './rate-limit.mjs';
 
 export type LoadedReport = Readonly<{
   payload: PrReportPayload;
-  /** The issue it was read from, so the page can link at its own source. */
-  issueUrl: string;
+  /** Where the file is, so the page can link at its own source. */
+  sourceUrl: string;
   /** Sent back as `If-None-Match` next time; absent if GitHub sent none. */
   etag: string | undefined;
 }>;
 
 export type LoadedRunLog = Readonly<{
   log: UnblockPrsLog;
-  issueUrl: string;
+  sourceUrl: string;
   etag: string | undefined;
 }>;
 
@@ -87,15 +99,7 @@ export type ReadRequest = Readonly<{
   fetchImpl?: Fetch;
 }>;
 
-/**
- * What these functions need of `globalThis.fetch`, and no more.
- *
- * The shape of `fetch` itself rather than something narrower, so that what a
- * test is handed is the request that would have gone out — headers included.
- * A `Fetch` taking an ETag and a token instead would leave the one line that
- * turns them into headers as the one line no test ever reads, which is where
- * an `Authorization` that never got sent would hide.
- */
+/** What these functions need of `globalThis.fetch`, and no more. */
 export type Fetch = (route: string, init: FetchInit) => Promise<Response>;
 
 /**
@@ -126,26 +130,34 @@ export type Answered<T> = Readonly<{
  * The report, or a sentence a reader can act on.
  *
  * Every failure is a failure in front of someone, so none of them is a stack
- * trace: an issue that is not there yet, a quota spent, a token GitHub will
- * not take, a body written by a `pr-report` of a different age.
- * {@link extractPayload} words the last of those; this words the ones that
- * happen before there is a body to read.
+ * trace: a branch the workflow has not written yet, a quota spent, a token
+ * GitHub will not take, a file written by a `pr-report` of a different age.
+ * {@link parsePayload} words the last of those; this words the ones that
+ * happen before there is a file to read.
  */
 export const fetchReport = async (
   source: ReportSource,
   request: ReadRequest,
 ): Promise<Answered<LoadedReport>> => {
-  const { result, rateLimit } = await fetchLabelledIssue(
+  const { result, rateLimit } = await fetchDataFile(
     source,
-    source.label,
+    REPORT_FILE,
+    'The report has not been written yet. The first run of the PR Report workflow writes it.',
     request,
   );
 
-  return { rateLimit, result: readIssue(result, extractPayload, payloadOf) };
+  return {
+    rateLimit,
+    result: read(result, parsePayload, (payload, found) => ({
+      payload,
+      sourceUrl: found.sourceUrl,
+      etag: found.etag,
+    })),
+  };
 };
 
 /**
- * The same, for the issue `unblock-prs` writes.
+ * The same, for what `unblock-prs` writes.
  *
  * Its own call rather than part of the one above, and its own place in the
  * page's state: the log is secondary, and a missing or unreadable log is not
@@ -156,13 +168,21 @@ export const fetchRunLog = async (
   source: ReportSource,
   request: ReadRequest,
 ): Promise<Answered<LoadedRunLog>> => {
-  const { result, rateLimit } = await fetchLabelledIssue(
+  const { result, rateLimit } = await fetchDataFile(
     source,
-    source.runLogLabel,
+    RUN_LOG_FILE,
+    'No runs recorded yet. `pnpm run unblock-prs` writes this the first time it acts on something.',
     request,
   );
 
-  return { rateLimit, result: readIssue(result, extractRunLog, logOf) };
+  return {
+    rateLimit,
+    result: read(result, parseRunLog, (log, found) => ({
+      log,
+      sourceUrl: found.sourceUrl,
+      etag: found.etag,
+    })),
+  };
 };
 
 const API_ROOT = 'https://api.github.com';
@@ -171,24 +191,29 @@ const NOT_MODIFIED = 304;
 
 const UNAUTHORIZED = 401;
 
-type FoundIssue = Issue & Readonly<{ etag: string | undefined }>;
+const NOT_FOUND = 404;
 
-/** The one open issue carrying a label, or a sentence saying why not. */
-const fetchLabelledIssue = async (
+type FoundFile = Readonly<{
+  text: string;
+  sourceUrl: string;
+  etag: string | undefined;
+}>;
+
+/**
+ * One file from one branch, or a sentence saying why not.
+ *
+ * `absent` is what the caller passes for the 404, because the two files are
+ * missing for different reasons and only the caller knows which one this is.
+ */
+const fetchDataFile = async (
   source: ReportSource,
-  label: string,
+  file: DataFile,
+  absent: string,
   request: ReadRequest,
-): Promise<Answered<FoundIssue>> => {
-  const query = new URLSearchParams({
-    labels: label,
-    state: 'open',
-    per_page: '1',
-  });
+): Promise<Answered<FoundFile>> => {
+  const route = contentsRoute(API_ROOT, source.owner, source.repo, file);
 
-  const route =
-    `${API_ROOT}/repos/${source.owner}/${source.repo}/issues?${query.toString()}` as const;
-
-  const answered = await ask(route, request);
+  const answered = await ask(route, absent, request);
 
   const { rateLimit } = answered;
 
@@ -200,85 +225,36 @@ const fetchLabelledIssue = async (
     return { rateLimit, result: Result.ok(UNCHANGED) };
   }
 
-  const found = firstIssue(answered.result.value);
-
   return {
     rateLimit,
-    result: Result.isErr(found)
-      ? Result.err(
-          found.value === NONE
-            ? `No open issue labelled \`${label}\` in ${source.owner}/${source.repo} yet.`
-            : found.value,
-        )
-      : found,
+    result: Result.ok({
+      ...answered.result.value,
+      sourceUrl: browseUrl(source.owner, source.repo, file),
+    }),
   };
-};
-
-/** Told apart from a real parse failure so the label can be named. */
-const NONE = 'none';
-
-const firstIssue = (answer: Answer): Result<FoundIssue, string> => {
-  const parsed = Json.parse(answer.body);
-
-  if (Result.isErr(parsed)) {
-    return Result.err(`GitHub did not answer JSON: ${parsed.value}`);
-  }
-
-  const validated = IssueListSchema.validate(parsed.value);
-
-  if (Result.isErr(validated)) {
-    return Result.err(
-      `GitHub answered an unexpected shape:\n${t.validationErrorsToMessages(validated.value).join('\n')}`,
-    );
-  }
-
-  const found = validated.value[0];
-
-  return found === undefined
-    ? Result.err(NONE)
-    : Result.ok({ ...found, etag: answer.etag });
 };
 
 /**
  * The half the two readers share: a `304` is passed through untouched, and
- * anything else has its body handed to whichever extractor knows the block.
+ * anything else has its text handed to whichever parser knows the file.
  */
-const readIssue = <T, U>(
-  found: Result<FoundIssue | Unchanged, string>,
-  extract: (body: string) => Result<T, string>,
-  assemble: (value: T, from: FoundIssue) => U,
+const read = <T, U>(
+  found: Result<FoundFile | Unchanged, string>,
+  parse: (text: string) => Result<T, string>,
+  assemble: (value: T, from: FoundFile) => U,
 ): Result<U | Unchanged, string> => {
   if (Result.isErr(found)) return found;
 
   if (found.value === UNCHANGED) return Result.ok(UNCHANGED);
 
-  const issue = found.value;
+  const file = found.value;
 
-  const extracted = extract(issue.body ?? '');
+  const parsed = parse(file.text);
 
-  return Result.isErr(extracted)
-    ? extracted
-    : Result.ok(assemble(extracted.value, issue));
+  return Result.isErr(parsed)
+    ? parsed
+    : Result.ok(assemble(parsed.value, file));
 };
-
-const payloadOf = (payload: PrReportPayload, issue: FoundIssue): LoadedReport =>
-  ({ payload, issueUrl: issue.html_url, etag: issue.etag }) as const;
-
-const logOf = (log: UnblockPrsLog, issue: FoundIssue): LoadedRunLog =>
-  ({ log, issueUrl: issue.html_url, etag: issue.etag }) as const;
-
-/**
- * Only the fields the app reads. `t.record` accepts the rest, which is the
- * whole of what GitHub sends about an issue.
- */
-const IssueSchema = t.record({
-  html_url: t.string(),
-  body: t.union([t.nullType, t.string()]),
-});
-
-type Issue = t.TypeOf<typeof IssueSchema>;
-
-const IssueListSchema = t.array(IssueSchema);
 
 /**
  * Written as a wrapper rather than handed over bare, because `fetch`
@@ -287,9 +263,10 @@ const IssueListSchema = t.array(IssueSchema);
 const askGitHub: Fetch = async (route, init) => fetch(route, init);
 
 /**
- * `Bearer` rather than `token` because both fine-grained and classic
- * personal access tokens are accepted under it, and the panel that collects
- * one recommends whichever is weaker.
+ * `vnd.github.raw` so the answer is the file rather than a JSON envelope
+ * with the file base64 inside it. `Bearer` rather than `token` because both
+ * fine-grained and classic personal access tokens are accepted under it, and
+ * the panel that collects one recommends whichever is weaker.
  */
 const requestInit = (
   etag: string | undefined,
@@ -301,19 +278,18 @@ const requestInit = (
   // telling apart.
   cache: 'no-store',
   headers: {
-    Accept: 'application/vnd.github+json',
+    Accept: 'application/vnd.github.raw',
     'X-GitHub-Api-Version': '2022-11-28',
     ...(etag === undefined ? {} : { 'If-None-Match': etag }),
     ...(token === undefined ? {} : { Authorization: `Bearer ${token}` }),
   },
 });
 
-type Answer = Readonly<{ body: string; etag: string | undefined }>;
-
 const ask = async (
   route: string,
+  absent: string,
   request: ReadRequest,
-): Promise<Answered<Answer>> => {
+): Promise<Answered<Readonly<{ text: string; etag: string | undefined }>>> => {
   const { etag, token, fetchImpl = askGitHub } = request;
 
   const response = await fetchImpl(route, requestInit(etag, token)).catch(
@@ -341,13 +317,13 @@ const ask = async (
     return {
       rateLimit,
       result: Result.ok({
-        body: await response.text(),
+        text: await response.text(),
         etag: response.headers.get('etag') ?? undefined,
       }),
     };
   }
 
-  return { rateLimit, result: Result.err(refusal(response, token)) };
+  return { rateLimit, result: Result.err(refusal(response, absent, token)) };
 };
 
 /**
@@ -355,7 +331,16 @@ const ask = async (
  * they would do. The rest are given by their status, which is at least
  * something to search for.
  */
-const refusal = (response: Response, token: string | undefined): string => {
+const refusal = (
+  response: Response,
+  absent: string,
+  token: string | undefined,
+): string => {
+  // The branch, or the file on it, is not there. For both of these files
+  // that is a thing that has not happened yet rather than a fault, which is
+  // why the words are the caller's.
+  if (response.status === NOT_FOUND) return absent;
+
   if (response.status === UNAUTHORIZED) {
     return 'GitHub would not accept the token. It may have expired or been revoked — clear it below, or paste a new one.';
   }

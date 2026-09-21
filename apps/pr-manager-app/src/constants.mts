@@ -1,4 +1,11 @@
-/** Which report this app reads. */
+/**
+ * Which repository this app reads, and where the human-readable half of the
+ * report is.
+ *
+ * The machine-readable half — the files this page actually loads — is
+ * `pr-report-payload`'s to place, because both the writer and this reader
+ * have to agree about it and neither of them owns the other.
+ */
 
 export type ReportSource = Readonly<{
   owner: string;
@@ -8,22 +15,18 @@ export type ReportSource = Readonly<{
    * `pr-report.yml` uses it: a title can be edited by anyone reading it, and
    * a workflow cannot remember an issue number between runs without a
    * repository variable and the admin token that writes one.
+   *
+   * That issue is prose for people. This page does not read it — it reads
+   * the payload file the same run writes — but it links at it, which is what
+   * a reader who wants the report without the app is after.
    */
   label: string;
-  /**
-   * The label on the issue `unblock-prs` writes its runs to. A second issue
-   * rather than a second section of the first: the two have different
-   * writers — a workflow and a person's terminal — and one body cannot be
-   * overwritten wholesale by both.
-   */
-  runLogLabel: string;
 }>;
 
 export const REPORT_SOURCE: ReportSource = {
   owner: 'noshiro-pf',
   repo: 'mono',
   label: 'pr-report',
-  runLogLabel: 'unblock-prs-log',
 } as const;
 
 /** The repository the report is about. */

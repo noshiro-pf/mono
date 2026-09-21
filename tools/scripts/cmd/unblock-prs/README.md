@@ -1,4 +1,4 @@
-<!-- cspell:ignore unlabel -->
+<!-- cspell:ignore unlabel, gpgsign -->
 
 # `unblock-prs`
 
@@ -226,13 +226,20 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 conflict した、push が弾かれた、auto-merge の無い PR を見送った — どれも一度
 きり、誰かの端末で起きて、そのあとはどこにも残りません。
 
-そこで、**何かに手を出した実行だけ**が `unblock-prs-log` ラベルの issue に記録
-を追記します（何もしなかった実行は書きません。夜通し回した idle ループが「何も
-なし」で埋まるだけなので）。保持するのは直近 20 実行、1実行あたり 50 イベント
-まで。イベントは行ではなく構造 —「どの PR に」「何をして」「どうなったか」—
-で、それを **GitHub Pull Requests Manager**
-（<https://noshiro-pf.github.io/mono/pr-manager/>）が読んで表示します。ブロック
-の形は `apps/pr-report-payload/README.md` にあります。
+そこで、**何かに手を出した実行だけ**が `data/unblock-prs-log` ブランチの
+`unblock-prs-log.json` に記録を追記します（何もしなかった実行は書きません。夜
+通し回した idle ループが「何もなし」で埋まるだけなので）。保持するのは直近 20
+実行、1実行あたり 50 イベントまで。イベントは行ではなく構造 —「どの PR に」
+「何をして」「どうなったか」— で、それを **GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>）が読んで表示します。
+
+以前は issue でした。issue は人が読んで購読するものであって簡易DBではない、と
+いうのが移した理由です（`apps/pr-report-payload/README.md`）。push は
+`origin` が既に指している URL に対する素の `git` なので、普段ブランチを push
+しているのと同じ資格情報で通ります。毎回 orphan commit を force-push するため、
+ブランチは常に1コミット1ファイルのままです。署名はしません — 機械の出力です
+し、`commit.gpgsign` を大域で有効にしている環境で鍵が無いときにログだけが落ち
+るのは筋が悪いからです。
 
 書き込みに失敗しても実行は止まりません。このスクリプトの仕事は PR を landing
 させることで、ログが書けなかったことはそれを止める理由ではありません — ただし
@@ -490,14 +497,21 @@ conflicted, a push that was refused, a queued pull request passed over for
 having no auto-merge — each happened once, on a terminal, and was never
 visible again.
 
-So a run that **acts on something** appends a record to the issue labelled
-`unblock-prs-log`. A run that acts on nothing writes nothing, or an idle
-overnight loop would fill the log with entries saying so. Twenty runs are
-kept, fifty events each. The entries are events rather than lines — which
-pull request, what was done, how it turned out — which is also what the
+So a run that **acts on something** adds a record to `unblock-prs-log.json` on
+the `data/unblock-prs-log` branch. A run that acts on nothing writes nothing,
+or an idle overnight loop would fill the log with entries saying so. Twenty
+runs are kept, fifty events each. The entries are events rather than lines —
+which pull request, what was done, how it turned out — which is also what the
 **GitHub Pull Requests Manager** page
 (<https://noshiro-pf.github.io/mono/pr-manager/>) lays out as rows.
-`apps/pr-report-payload/README.md` has the shape of the block.
+
+It was an issue until recently; `apps/pr-report-payload/README.md` says why a
+branch. The push is plain `git` against whatever URL `origin` already
+resolves to, so it works with the credentials you push branches with, SSH or
+HTTPS. Each run force-pushes a fresh orphan commit, so the branch stays one
+commit holding one file. It signs nothing: this is machine output, and a
+`commit.gpgsign` set globally would otherwise make the log — and only the log
+— fail on a machine with no key loaded.
 
 A log that could not be written never fails the run: the job is to land pull
 requests, and this is not a reason to stop doing it. It is a reason to say so,

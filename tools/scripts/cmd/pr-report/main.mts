@@ -1,7 +1,10 @@
+import * as fs from 'node:fs/promises';
+import { serializePayload } from 'pr-report-payload';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { createClient, parseRepoRef } from './github.mjs';
-import { HELP, parseOptions, type Options } from './options.mjs';
+import { HELP, parseOptions, type Format, type Options } from './options.mjs';
+import { toPayload } from './payload.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
 import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
 import { buildReport } from './report.mjs';
@@ -39,7 +42,7 @@ import { type PrReport } from './types.mjs';
  */
 export const prReport = async (
   options: Options,
-): Promise<Result<string, string>> => {
+): Promise<Result<Output, string>> => {
   const repo =
     options.repo === undefined
       ? await readRepoRef()
@@ -83,27 +86,59 @@ export const prReport = async (
     mergedWithinDays: options.mergedDays,
   });
 
-  switch (options.format) {
+  // Always, whatever was asked to be printed: it is a projection of a report
+  // already in hand, and `--payload-file` is allowed to ask for it beside any
+  // of the three.
+  const payload = serializePayload(toPayload(report));
+
+  return Result.ok({ payload, text: print(report, options.format, payload) });
+};
+
+/**
+ * What one run produces.
+ *
+ * Two outputs from one run rather than two runs, because
+ * `.github/workflows/pr-report.yml` wants the Markdown for the issue and the
+ * payload for the branch the page reads. Two runs would cost twice the API
+ * budget and twice the wall clock, and would leave the issue and the page
+ * describing moments that differ by whatever happened between them.
+ */
+export type Output = Readonly<{
+  /** What was asked for on standard output. */
+  text: string;
+  /**
+   * What `--payload-file` writes, and what the workflow force-pushes to the
+   * report's own branch. See `apps/pr-report-payload`.
+   */
+  payload: string;
+}>;
+
+const print = (report: PrReport, format: Format, payload: string): string => {
+  switch (format) {
     case 'json':
-      return Result.ok(JSON.stringify(serializable(report), undefined, 2));
+      return JSON.stringify(serializable(report), undefined, 2);
 
     case 'markdown': {
       const markdown = renderMarkdown(report);
 
       warnIfTooLongForAnIssue(markdown);
 
-      return Result.ok(markdown);
+      return markdown;
     }
 
+    case 'payload':
+      return payload;
+
     case 'terminal':
-      return Result.ok(renderTerminal(report));
+      return renderTerminal(report);
   }
 };
 
 /**
  * What GitHub accepts in an issue body. The Markdown report is written into
- * one, and the collapsed payload block at the bottom is the part that grows —
- * with the open pull requests and with the merges of the last week.
+ * one, and what grows is the list of open pull requests and the merges of the
+ * last week. The payload this run also writes is a file on a branch and has
+ * no such limit.
  */
 const ISSUE_BODY_LIMIT = 65_536;
 
@@ -164,6 +199,14 @@ if (isDirectlyExecuted(import.meta.url)) {
       process.exit(1);
     }
 
-    console.info(result.value);
+    const { payloadFile } = options.value;
+
+    if (payloadFile !== undefined) {
+      // The path is the caller's own, given on their own command line.
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(payloadFile, result.value.payload);
+    }
+
+    console.info(result.value.text);
   }
 }

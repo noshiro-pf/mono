@@ -3,7 +3,7 @@
 import * as util from 'node:util';
 import { Num, Result } from 'ts-data-forge';
 
-export const FORMATS = ['json', 'markdown', 'terminal'] as const;
+export const FORMATS = ['json', 'markdown', 'payload', 'terminal'] as const;
 
 export type Format = (typeof FORMATS)[number];
 
@@ -15,6 +15,16 @@ export type Options = Readonly<{
   mergedDays: number;
   /** And how many of them it lists, whatever the window turns up. */
   mergedLimit: number;
+  /**
+   * Where to also write the machine-readable payload, if anywhere.
+   *
+   * A second output rather than a second run, because a run is twenty or so
+   * requests against the API and about a minute of wall clock, and
+   * `pr-report.yml` needs both the Markdown and the payload from the same
+   * moment: two runs would have the issue and the page describing states
+   * that differ by whatever happened in between.
+   */
+  payloadFile: string | undefined;
 }>;
 
 /**
@@ -25,10 +35,12 @@ export type Options = Readonly<{
 export const DEFAULT_MERGED_DAYS = 7;
 
 /**
- * A cap as well as a window, because an issue body holds 65536 characters and
- * a busy week is the one input that can push the report past it. Twenty is
- * more than enough to answer "did the thing I queued go in", which is what
- * the section is for.
+ * A cap as well as a window. An issue body holds 65536 characters and the
+ * Markdown report is written into one; a busy week is the one input that can
+ * push it past that. Twenty is more than enough to answer "did the thing I
+ * queued go in", which is what the section is for. The payload file has no
+ * such limit, and is capped by the same numbers so that the page and the
+ * issue say the same thing.
  */
 export const DEFAULT_MERGED_LIMIT = 20;
 
@@ -41,9 +53,13 @@ export const HELP = [
   '',
   'Options:',
   `  --format <${FORMATS.join('|')}>  how to print it (default terminal)`,
+  '                                   `payload` is the one the page reads;',
+  '                                   `json` is the whole report, bodies and all',
   '  --repo <owner/name>              which repository (default: this one)',
   `  --merged-days <n>                how far back "recently merged" goes (default ${DEFAULT_MERGED_DAYS})`,
   `  --merged-limit <n>               how many it lists at most (default ${DEFAULT_MERGED_LIMIT})`,
+  '  --payload-file <path>            also write the payload there, from the',
+  '                                   same run that printed the report',
   '  -h, --help                       show this help',
   '',
   'Reads GITHUB_TOKEN or GH_TOKEN when one is set. Without it the public API',
@@ -68,6 +84,7 @@ export const parseOptions = (
         repo: { type: 'string' },
         'merged-days': { type: 'string' },
         'merged-limit': { type: 'string' },
+        'payload-file': { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -108,6 +125,7 @@ export const parseOptions = (
     repo: values.repo,
     mergedDays: mergedDays.value,
     mergedLimit: mergedLimit.value,
+    payloadFile: values['payload-file'],
   });
 };
 

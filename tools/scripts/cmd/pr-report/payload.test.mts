@@ -1,6 +1,7 @@
 import {
-  extractPayload,
+  parsePayload,
   PrReportPayloadSchema,
+  serializePayload,
   type PrReportPayload,
 } from 'pr-report-payload';
 import { Result } from 'ts-data-forge';
@@ -59,14 +60,18 @@ describe('toPayload', () => {
     );
 
     // The trailer it was read for is in the payload; the prose it was read
-    // out of is not, because an issue body has 65536 characters to spend.
+    // out of is not, because nothing displays a body and it is by far the
+    // largest thing read about a pull request.
     expect(payload.entries[0]?.mergeAfter).toStrictEqual([1900]);
 
     assert.isTrue(!JSON.stringify(payload).includes('Merge-After'));
   });
 
+  // "Nothing is open" is an answer the page has to be able to give, and it
+  // has to be told rather than left to infer it from a file that is not
+  // there.
   test('says nothing is open rather than saying nothing', () => {
-    const read = extractPayload(renderMarkdown(report([])));
+    const read = parsePayload(serializePayload(toPayload(report([]))));
 
     assert.isTrue(Result.isOk(read));
 
@@ -74,14 +79,19 @@ describe('toPayload', () => {
   });
 });
 
-describe('renderMarkdown', () => {
-  test('carries a payload a reader of the issue can read back', () => {
+/**
+ * The drift this file exists to catch: the writer and the reader are two
+ * packages, and the only thing joining them is that what one serializes the
+ * other parses.
+ */
+describe('the file the page reads', () => {
+  test('round-trips a report through the branch payload', () => {
     const original: PrReport = report([
       facts({ number: 1901 }),
       facts({ number: 1903, body: 'Merge-After: #1901' }),
     ]);
 
-    const read = extractPayload(renderMarkdown(original));
+    const read = parsePayload(serializePayload(toPayload(original)));
 
     assert.isTrue(Result.isOk(read));
 
@@ -92,5 +102,19 @@ describe('renderMarkdown', () => {
     ]);
 
     expect(payload.roots).toStrictEqual(original.roots);
+  });
+});
+
+describe('renderMarkdown', () => {
+  // The payload used to be a collapsed block at the bottom of this. It is a
+  // file on a branch now, and the issue is prose again.
+  test('carries no machine-readable copy of itself', () => {
+    const markdown = renderMarkdown(
+      report([facts({ number: 1901 }), facts({ number: 1903 })]),
+    );
+
+    assert.isFalse(markdown.includes('pr-report:payload'));
+
+    assert.isFalse(markdown.includes('"generatedAtEpochMs"'));
   });
 });

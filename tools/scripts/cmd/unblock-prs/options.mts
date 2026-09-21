@@ -17,7 +17,8 @@ export type Options = Readonly<{
   watchTimeoutMin: number;
   /**
    * Whether a run that acted on something writes what it did to the
-   * `unblock-prs-log` issue. On by default: the whole point of a log is that
+   * `data/unblock-prs-log` branch. On by default: the whole point of a log
+   * is that
    * it is there without anyone having asked for it that time.
    */
   writeLog: boolean;
@@ -45,7 +46,7 @@ export const HELP = [
   `  --idle-interval <sec>  wait between surveys when nothing is behind (default ${defaultOptions.idleIntervalSec})`,
   `  --poll-interval <sec>  wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
   `  --watch-timeout <min>  give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
-  '  --no-log               do not write this run to the unblock-prs-log issue',
+  '  --no-log               do not write this run to the data/unblock-prs-log branch',
   '  -h, --help             show this help',
 ].join('\n');
 

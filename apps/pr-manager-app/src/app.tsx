@@ -28,8 +28,9 @@ import {
 /**
  * GitHub Pull Requests Manager.
  *
- * The page the daily pull request report is for. It reads the issue
- * `pr-report.yml` writes and shows what that report says — the merge order
+ * The page the daily pull request report is for. It reads the payload
+ * `pr-report.yml` writes to a branch of its own and shows what that report
+ * says — the merge order
  * the `Merge-After:` trailers declare, the issues each pull request closes,
  * its labels, the verdict of the contexts the ruleset requires, and how far
  * each branch is from its base.
@@ -369,7 +370,7 @@ const merge = (
 };
 
 /**
- * The log is allowed to be absent — there is no issue until someone runs the
+ * The log is allowed to be absent — there is no file until someone runs the
  * script — so its failures are values rather than page-level errors. The
  * previous one is returned unchanged when the new one says the same thing, so
  * that "no log yet", repeated every minute, is not a re-render every minute.

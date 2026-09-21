@@ -36,8 +36,7 @@
   },
   "dependencies": {
     "pr-report-payload": "workspace:*",
-    "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*"
+    "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "catalog:",

@@ -45,16 +45,20 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
 ```bash
 pnpm run pr-report                      # 端末向け（既定）
 pnpm run pr-report -- --format markdown # GitHub issue / Claude 向け
-pnpm run pr-report -- --format json     # 他のツールに渡す
+pnpm run pr-report -- --format payload  # ページが読む JSON
+pnpm run pr-report -- --format json     # 他のツールに渡す（body 込みの全体）
 pnpm run pr-report -- --repo owner/name # 別のリポジトリ
 pnpm run pr-report -- --merged-days 3   # 「直近マージ」の遡る日数
 pnpm run pr-report -- --merged-limit 5  # その最大件数
+pnpm run pr-report -- --format markdown --payload-file out.json # 1回で両方
 ```
 
 `--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
 掛かります。issue の body は 65536 文字までで、忙しい1週間はそれを超えさせうる
 唯一の入力なので、窓だけでなく上限も置いています。超えた場合は stdout はその
-まま出し、stderr に「どちらのフラグを下げればよいか」を書きます。
+まま出し、stderr に「どちらのフラグを下げればよいか」を書きます。payload の
+ファイルにはこの制限はありませんが、ページと issue が同じことを言うように同じ
+数字で切っています。
 
 ### トークン
 
@@ -103,11 +107,21 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 - Claude の routine が同じコマンドを実行して結果を貼ります。そのまま
   `/unblock-prs` に繋げられるのが、読むだけのレポートとの違いです。
 
-`--format markdown` の末尾には、折りたたんだ JSON のブロックが付きます。これを
-読むのが **GitHub Pull Requests Manager**
-（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）で、
-issue に書いたその本文がそのままアプリのデータ源になります。ブロックの形と、
-なぜ issue を経由するのかは `apps/pr-report-payload/README.md` にあります。
+機械可読なコピーは `data/pr-report` ブランチの `pr-report.json` に置かれ、これ
+を読むのが **GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）です。
+以前は issue の body に折りたたんだ JSON ブロックとして埋め込んでいましたが、
+issue は人が読んで購読するものであって簡易DBではない、というのが移した理由で
+す。詳細は `apps/pr-report-payload/README.md`。
+
+**1回の実行で両方を出します。** workflow は `--format markdown` と
+`--payload-file` を同時に渡します。2回実行すると API を倍使い、しかも issue と
+ページがその間に起きたことの分だけ違う瞬間を指してしまいます。
+
+workflow は2つの job に分かれています。`report` は依存ツリーを走らせますがトー
+クンを持たず、成果物を artifact で渡すだけ。`publish` はトークンを持ちますが
+checkout も install もせず、`git` と `gh` だけを inline で叩きます。
+`pnpm-update.yml` と同じ分け方で、理由も同じです。
 
 workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
 open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
@@ -125,8 +139,8 @@ Actions 自身のスイートではそれで workflow を起動しないので�
 毎回 API から全 PR を読み直します。schedule は、Actions 以外が書く status が
 将来現れたときのための下限として残しています。
 
-同じ issue を全 run が書き換えるため concurrency は1グループに直列化していま
-す。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
+同じ issue と同じブランチを全 run が書き換えるため concurrency は1グループに
+直列化しています。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
 「すでに queue にいた run」を落とすので、バースト時は実行中の1本＋最新の1本だ
 け残り、間は捨てられます。これが欲しい debounce そのもので、しかも枯渇しませ
 ん。
@@ -161,8 +175,10 @@ pnpm run pr-report -- --merged-limit 5  # and how many it lists
 
 The merged section is bounded twice, by days (7) and by count (20). An issue
 body holds 65536 characters and a busy week is the one input that can push the
-report past it; when it does, stdout is still the report and stderr says which
-of the two flags to lower.
+Markdown past it; when it does, stdout is still the report and stderr says
+which of the two flags to lower. The payload file has no such limit and is
+capped by the same numbers, so that the page and the issue say the same
+thing.
 
 `GITHUB_TOKEN` or `GH_TOKEN` is used when set. Without one the public API
 allows 60 requests an hour — about twenty pull requests at roughly three
@@ -188,14 +204,25 @@ their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
 
 The script only prints. `.github/workflows/pr-report.yml` is what puts the
-text somewhere: it overwrites the body of the issue labelled `pr-report`,
-which notifies nobody and leaves no timeline, and repeats the same text in the
-run summary. `--format markdown` ends with a collapsed block of JSON, which is
-what the **GitHub Pull Requests Manager** page
-(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) reads:
-the body written for a person is also the app's data source, so there is no
-second place to keep in step. `apps/pr-report-payload/README.md` has the shape
-of that block and why the issue is the transport at all. It runs whenever something that can change the report happens — a
+text somewhere, in two places. It overwrites the body of the issue labelled
+`pr-report`, which notifies nobody and leaves no timeline, and repeats the
+same text in the run summary. And it force-pushes the machine-readable copy to
+`data/pr-report`, where the **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) reads
+it. That copy used to be a collapsed block of JSON at the bottom of the issue
+body; `apps/pr-report-payload/README.md` says why it is a branch now.
+
+**One run produces both.** The workflow passes `--payload-file` beside
+`--format markdown`, because a second run would cost another twenty requests
+and another minute, and would leave the issue and the page describing moments
+that differ by whatever happened in between.
+
+The workflow is two jobs. `report` runs the dependency tree and holds no
+token, handing what it made over as an artifact; `publish` holds the token and
+neither checks out nor installs anything, using only inline `git` and `gh`.
+The same split as `pnpm-update.yml`, for the same reason.
+
+It runs whenever something that can change the report happens — a
 pull request opened, closed, reopened, edited, labelled, pushed to or switched
 in or out of draft, a push to `main`, which moves the ahead / behind of every
 open pull request at once, and the completion of each of the seven workflows

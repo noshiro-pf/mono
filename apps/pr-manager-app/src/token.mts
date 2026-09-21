@@ -1,8 +1,8 @@
 /**
  * The optional token, and the one thing it buys.
  *
- * This page reads two issues of a public repository and nothing else, so a
- * token gives it no data it could not already see. What it gives it is the
+ * This page reads two JSON files out of a public repository and nothing
+ * else, so a token gives it no data it could not already see. What it gives it is the
  * rate limit. GitHub allows an anonymous caller 60 requests an hour for the
  * whole address the browser sits behind and charges it for a `304` as well
  * as for a `200`, which is what holds the poll at two minutes. It allows an

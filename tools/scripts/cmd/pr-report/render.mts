@@ -1,10 +1,8 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
-import { embedPayload } from 'pr-report-payload';
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { MERGE_QUEUED_LABEL } from '../unblock-prs/labels.mjs';
-import { toPayload } from './payload.mjs';
 import { summarize } from './summarize.mjs';
 import {
   type ChecksSummary,
@@ -33,24 +31,14 @@ const GLYPH = {
  * *is* the information — a table would have to spell the tree back out in a
  * column, and a reader would have to rebuild it.
  *
- * The same text carries the report a second time, as the collapsed JSON block
- * {@link embedPayload} writes at the bottom, which is what the Pull Requests
- * Manager app reads. One body rather than two places to keep in step: see
- * `apps/pr-report-payload`.
+ * Prose only. The machine-readable copy the Pull Requests Manager app reads
+ * used to be a collapsed JSON block at the bottom of this; it is now a file
+ * on a branch of its own, written by the same run — see
+ * `apps/pr-report-payload`, and `--format payload` for the other half.
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
-    // With the payload even so. "Nothing is open" is an answer the app has to
-    // be able to give, and a body without the block reads to it as a report
-    // written before there was one.
-    return [
-      heading(report),
-      '',
-      EMPTY,
-      '',
-      embedPayload(toPayload(report)),
-      '',
-    ].join('\n');
+    return [heading(report), '', EMPTY, ''].join('\n');
   }
 
   const byNumber = index(report);
@@ -82,8 +70,6 @@ export const renderMarkdown = (report: PrReport): string => {
     ...cyclesSection(report),
     ...mergedSection(report, 'markdown'),
     ...footnote(report),
-    '',
-    embedPayload(toPayload(report)),
     '',
   ].join('\n');
 };

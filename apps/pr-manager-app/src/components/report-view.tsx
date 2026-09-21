@@ -22,7 +22,7 @@ export const ReportView = ({
   runLog,
   nowMs,
 }: Props): React.ReactElement => {
-  const { payload, issueUrl } = report;
+  const { payload, sourceUrl } = report;
 
   const repoUrl =
     `https://github.com/${payload.repo.owner}/${payload.repo.name}` as const;
@@ -35,7 +35,7 @@ export const ReportView = ({
     <>
       <p className={'page-subtitle'}>
         {`Generated ${describeAge(payload.generatedAtEpochMs, nowMs)} `}
-        <a href={issueUrl}>{'from the report issue'}</a>
+        <a href={sourceUrl}>{'from the report data'}</a>
         {` · ${payload.generatedAt}`}
       </p>
 

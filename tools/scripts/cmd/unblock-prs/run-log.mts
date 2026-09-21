@@ -1,4 +1,4 @@
-// cspell:ignore ededed
+// cspell:ignore gpgsign
 
 /**
  * What this run did, and where that is kept.
@@ -7,41 +7,47 @@
  * where nobody can see it afterwards. A rebase that conflicted, a push that
  * was refused, a queued pull request passed over for having no auto-merge —
  * each happened once, on somebody's terminal, and was never visible again.
- * So a run that acted on something appends a record to an issue of its own,
- * the way the report writes one, and the Pull Requests Manager page reads it
- * back.
+ * So a run that acted on something adds a record to a file of its own, and
+ * the Pull Requests Manager page reads it back.
  *
  * Events, not lines. The output is prose meant to be watched live; what is
  * worth keeping is the shape underneath it — which pull request, what was
  * done, how it turned out.
+ *
+ * **A branch, not an issue.** `RUN_LOG_BRANCH` holds one JSON file and
+ * nothing else, force-pushed as a single orphan commit so that the
+ * repository does not accumulate a commit per run. It was an issue until
+ * recently, which meant this script's bookkeeping sat in the issue list
+ * beside the things issues are for; `apps/pr-report-payload/src/location.mts`
+ * has the rest of that reasoning.
+ *
+ * The push is plain `git` against whatever URL `origin` already resolves to,
+ * so it works with the credentials the person running this pushes branches
+ * with, SSH or HTTPS. It signs nothing: this is machine output, and a
+ * `commit.gpgsign` set globally would otherwise make the log fail on a
+ * machine with no key loaded.
  */
 
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
-  embedRunLog,
-  extractRunLog,
+  parseRunLog,
+  RUN_LOG_BRANCH,
   RUN_LOG_MAX_EVENTS,
   RUN_LOG_MAX_RUNS,
+  RUN_LOG_PATH,
   RUN_LOG_VERSION,
+  serializeRunLog,
   type RunLogEntry,
   type RunLogEvent,
   type RunLogOutcome,
   type UnblockPrsLog,
 } from 'pr-report-payload';
 import { Arr, Result } from 'ts-data-forge';
-import * as t from 'ts-fortress';
-import { git, parseJson } from './github.mjs';
+import { git } from './github.mjs';
 import { type WatchOutcome } from './types.mjs';
 import { log, sh } from './util.mjs';
-
-/**
- * The label that identifies the one log issue across runs, chosen for the
- * same reason `pr-report` uses one: a title can be edited by anyone reading
- * it, and a script has nowhere to remember a number between runs.
- */
-export const RUN_LOG_LABEL = 'unblock-prs-log';
 
 /**
  * What this run has done so far.
@@ -118,7 +124,7 @@ export const recordWatchOutcome = (
 };
 
 /**
- * Writes this run into the log issue, or says why it could not.
+ * Writes this run into the log, or says why it could not.
  *
  * Never fails the run. The script's job is to land pull requests, and a log
  * that could not be written is not a reason to stop doing it — but it is a
@@ -138,142 +144,130 @@ export const publishRunLog = async (
     finishedAtEpochMs: finishedAt.epochMilliseconds,
     dryRun,
     // The tail, because a long run's later events are the ones still worth
-    // reading; the cap is what keeps one run from filling the body.
+    // reading; the cap is what keeps one run from filling the file.
     events: mut_events.slice(-RUN_LOG_MAX_EVENTS),
   } as const;
 
-  const existing = await readLogIssue();
+  const existing = await readLog();
 
   if (Result.isErr(existing)) return existing;
 
-  const runs = Arr.toUnshifted(entry)(existing.value?.log.runs ?? []).slice(
+  const runs = Arr.toUnshifted(entry)(existing.value?.runs ?? []).slice(
     0,
     RUN_LOG_MAX_RUNS,
   );
 
   const next: UnblockPrsLog = { version: RUN_LOG_VERSION, runs } as const;
 
-  const written = await writeLogIssue(existing.value?.number, render(next));
+  const written = await writeLog(serializeRunLog(next));
 
   return Result.isErr(written) ? written : Result.ok('published');
 };
 
-const RUN_LOG_TITLE = 'unblock-prs log';
-
-const IssueListSchema = t.array(
-  t.record({ number: t.number(), body: t.union([t.string(), t.nullType]) }),
-);
-
-/** The log issue as it is now, or `undefined` when there is not one yet. */
-const readLogIssue = async (): Promise<
-  Result<Readonly<{ number: number; log: UnblockPrsLog }> | undefined, string>
+/**
+ * The log as it is now, or `undefined` when there is not one yet.
+ *
+ * The branch is asked about before the file is, because "no branch" is the
+ * first run and not a failure, and `git ls-remote` says so by answering
+ * nothing rather than by failing — which is what keeps this from having to
+ * tell a 404 apart from a network error by reading its text.
+ */
+const readLog = async (): Promise<
+  Result<UnblockPrsLog | undefined, string>
 > => {
-  const listed = await git(
-    `gh issue list --label ${RUN_LOG_LABEL} --state open --limit 1 --json number,body`,
-  );
+  const ref = `refs/heads/${RUN_LOG_BRANCH}` as const;
+
+  const listed = await git(`git ls-remote --heads origin ${sh(ref)}`);
 
   if (Result.isErr(listed)) return listed;
 
-  const parsed = parseJson(listed.value, IssueListSchema);
+  if (listed.value.trim() === '') return Result.ok(undefined);
 
-  if (Result.isErr(parsed)) return parsed;
+  const fetched = await git(
+    `git fetch --quiet --depth 1 origin ${sh(`${ref}:${ref}`)} --force`,
+  );
 
-  const issue = parsed.value[0];
+  if (Result.isErr(fetched)) return fetched;
 
-  if (issue === undefined) return Result.ok(undefined);
+  const shown = await git(`git show ${sh(`${ref}:${RUN_LOG_PATH}`)}`);
 
-  const log_ = extractRunLog(issue.body ?? '');
+  if (Result.isErr(shown)) return shown;
 
-  // A body with no block yet — the issue was opened by hand, or by a version
-  // of this script that did not embed one — is an empty log rather than an
-  // error. The alternative is a script that refuses to log because it has
-  // never logged.
-  return Result.ok({
-    number: issue.number,
-    log: Result.isErr(log_)
-      ? { version: RUN_LOG_VERSION, runs: [] }
-      : log_.value,
-  });
+  const parsed = parseRunLog(shown.value);
+
+  // A file this version cannot read is not a reason to lose this run: the
+  // entry is prepended to nothing and the unreadable one is overwritten,
+  // which is the same thing that happens when the cap drops the oldest run.
+  return Result.ok(Result.isErr(parsed) ? undefined : parsed.value);
 };
 
 /**
- * Through a file rather than an argument: a body is Markdown with newlines in
- * it, and the whole log at once is tens of kilobytes.
+ * A fresh repository each time, so the branch is one commit holding one file
+ * however long this goes on. Nothing is checked out and nothing is merged,
+ * so there is no state for a half-finished run to leave behind — and the
+ * working repository this script is otherwise driving is never touched.
  */
-const writeLogIssue = async (
-  number: number | undefined,
-  body: string,
+const writeLog = async (
+  contents: string,
 ): Promise<Result<undefined, string>> => {
+  const origin = await git('git remote get-url origin');
+
+  if (Result.isErr(origin)) return origin;
+
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'unblock-prs-log-'));
 
-  const file = path.join(dir, 'body.md');
-
-  const written = await Result.fromPromise(
+  try {
     // The path is this function's own: `mkdtemp` made the directory a line
     // above and nothing outside chose either half of it.
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFile(file, body),
-  );
+    const written = await Result.fromPromise(
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.writeFile(path.join(dir, RUN_LOG_PATH), contents),
+    );
 
-  if (Result.isErr(written)) {
-    return Result.err(`could not write the log body: ${String(written.value)}`);
-  }
-
-  try {
-    if (number === undefined) {
-      // The label has to exist before an issue can be opened with it, and
-      // `--force` makes this one call whether or not it does.
-      const labelled = await git(
-        `gh label create ${RUN_LOG_LABEL} --color ededed --description 'What unblock-prs did, updated in place' --force`,
-      );
-
-      if (Result.isErr(labelled)) return labelled;
-
-      const created = await git(
-        `gh issue create --title ${sh(RUN_LOG_TITLE)} --label ${RUN_LOG_LABEL} --body-file ${sh(file)}`,
-      );
-
-      return Result.isErr(created) ? created : Result.ok(undefined);
+    if (Result.isErr(written)) {
+      return Result.err(`could not write the log: ${String(written.value)}`);
     }
 
-    const edited = await git(`gh issue edit ${number} --body-file ${sh(file)}`);
+    const steps: readonly string[] = [
+      'git init --quiet --initial-branch=main',
+      'git config core.hooksPath /dev/null',
+      `git add ${sh(RUN_LOG_PATH)}`,
+      // `commit.gpgsign` is off for this one commit: it is machine output,
+      // and a global signing setting would otherwise make the log fail on a
+      // machine with no key loaded.
+      `git -c commit.gpgsign=false -c user.name=unblock-prs -c user.email=${sh(LOG_AUTHOR_EMAIL)} commit --quiet --message ${sh('chore(unblock-prs): publish the run log')}`,
+      `git push --quiet --force ${sh(origin.value.trim())} ${sh(`HEAD:refs/heads/${RUN_LOG_BRANCH}`)}`,
+    ];
 
-    return Result.isErr(edited) ? edited : Result.ok(undefined);
+    for (const step of steps) {
+      // Sequential because each one depends on the last; a `Promise.all` here
+      // would be a repository with no commit being pushed.
+
+      const ran = await git(step, dir);
+
+      if (Result.isErr(ran)) return ran;
+    }
+
+    return Result.ok(undefined);
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }
 };
 
 /**
- * The issue body: the runs as prose, and the same runs as the block the page
- * reads. One body, so the two cannot disagree.
+ * GitHub's no-reply form, so the commit is attributed to nobody's inbox. The
+ * branch is machine output and a real address here would subscribe whoever
+ * owns it to it.
  */
-const render = (logged: UnblockPrsLog): string =>
-  [
-    `# ${RUN_LOG_TITLE}`,
-    '',
-    `What \`pnpm run unblock-prs\` did, most recent first, ${RUN_LOG_MAX_RUNS} runs at most.`,
-    'Written by the script itself; nothing else edits this issue.',
-    '',
-    ...logged.runs.flatMap((run) => [
-      `## ${run.startedAt}${run.dryRun ? ' (dry run)' : ''}`,
-      '',
-      ...run.events.map(
-        (event) => `- \`${event.at}\` #${event.number} — ${event.detail}`,
-      ),
-      '',
-    ]),
-    embedRunLog(logged),
-    '',
-  ].join('\n');
+const LOG_AUTHOR_EMAIL = 'unblock-prs@users.noreply.github.com';
 
 /** Said by `main.mts` once the loop is over. */
 export const reportRunLog = (
   result: Result<'nothing-to-say' | 'published', string>,
 ): void => {
   if (Result.isErr(result)) {
-    log(`Could not write the ${RUN_LOG_LABEL} issue: ${result.value}`);
+    log(`Could not write the run log to ${RUN_LOG_BRANCH}: ${result.value}`);
   } else if (result.value === 'published') {
-    log(`Wrote this run to the ${RUN_LOG_LABEL} issue.`);
+    log(`Wrote this run to ${RUN_LOG_BRANCH}.`);
   }
 };
