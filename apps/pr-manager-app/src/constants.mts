@@ -46,27 +46,36 @@ export const reportIssuesUrl = (
 };
 
 /**
- * How often the page goes and looks again while it is on screen.
+ * How often the page goes and looks again while it is on screen, which is a
+ * different number depending on whether the reader has given it a token.
  *
- * Two minutes, and the number is set by the rate limit rather than by taste.
- * **An anonymous caller is charged for a `304` as well as for a `200`** —
- * measured against this repository, `x-ratelimit-remaining` falling 59, 58,
- * 57 across three conditional requests that all answered 304. Only an
- * *authenticated* caller gets them free, which is the opposite of what is
- * convenient: the page has no token, so its budget is 60 requests an hour for
- * the whole address it sits behind, conditional or not.
+ * **Without one, two minutes, and the number is set by the rate limit rather
+ * than by taste.** An anonymous caller is charged for a `304` as well as for
+ * a `200` — measured against this repository, `x-ratelimit-remaining`
+ * falling 59, 58, 57 across three conditional requests that all answered
+ * 304 — and the budget is 60 an hour for the whole address the browser sits
+ * behind, not for the page. One request every two minutes is 30 an hour,
+ * which leaves half of it for reloads and for whatever else shares the
+ * address.
  *
- * One request every two minutes is 30 an hour, which leaves half the budget
- * for reloads and for whatever else shares the address. The conditional
- * request is still worth sending — it saves the transfer, and it is what will
- * make a faster interval possible if this page ever carries a token — but it
- * does not buy a shorter interval on its own.
+ * **With one, fifteen seconds**, because both halves of that reverse. The
+ * budget becomes 5,000 an hour and belongs to the account rather than to the
+ * address, and a `304` is charged nothing at all — measured,
+ * `x-ratelimit-remaining` unchanged across four of them. A poll that finds
+ * nothing is therefore free, and 240 an hour is inside the budget even if
+ * every one of them found something.
  *
- * Little is lost to the wait. A report is rewritten by a workflow that takes
- * about a minute to run (median 58s, measured over its last twenty runs), so
- * the interval is not what decides how old the page is.
+ * Little is lost to the slower of the two. A report is rewritten by a
+ * workflow that takes about a minute to run (median 58s, measured over its
+ * last twenty runs), so neither interval is what decides how old the page
+ * is.
  */
-export const POLL_INTERVAL_MS = 120_000;
+export const pollIntervalMs = (token: string | undefined): number =>
+  token === undefined ? ANONYMOUS_POLL_INTERVAL_MS : SIGNED_IN_POLL_INTERVAL_MS;
+
+export const ANONYMOUS_POLL_INTERVAL_MS = 120_000;
+
+export const SIGNED_IN_POLL_INTERVAL_MS = 15_000;
 
 /**
  * How often "3 hours ago" is recomputed. Not tied to the poll: the report can

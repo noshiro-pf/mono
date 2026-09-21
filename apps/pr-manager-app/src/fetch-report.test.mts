@@ -4,6 +4,16 @@ import { type ReadonlyRecord } from 'ts-type-forge';
 import { type ReportSource } from './constants.mjs';
 import { fetchReport, UNCHANGED, type Fetch } from './fetch-report.mjs';
 
+/**
+ * Read with the name as a value rather than as a literal in brackets, which
+ * is what keeps `dot-notation` from rewriting it into a property access the
+ * index signature does not allow.
+ */
+const headerOf = (
+  headers: ReadonlyRecord<string, string>,
+  header: string,
+): string | undefined => headers[header];
+
 const source: ReportSource = {
   owner: 'noshiro-pf',
   repo: 'mono',
@@ -25,6 +35,13 @@ const payload: PrReportPayload = {
   merged: [],
   mergedWithinDays: 7,
 } as const;
+
+const issueBody = JSON.stringify([
+  {
+    html_url: 'https://github.com/noshiro-pf/mono/issues/1991',
+    body: `# Open pull requests\n\n${embedPayload(payload)}`,
+  },
+]);
 
 /** One canned answer from the GitHub API, in place of the network. */
 const answering =
@@ -49,114 +66,246 @@ const answering =
  */
 const conditional =
   (body: string, etag: string): Fetch =>
-  (_route, sent) =>
+  (_route, init) =>
     Promise.resolve(
-      sent === etag
-        ? new Response(undefined, { status: 304 })
+      headerOf(init.headers, 'If-None-Match') === etag
+        ? new Response(undefined, { status: 304, headers: { etag } })
         : new Response(body, { status: 200, headers: { etag } }),
     );
 
 describe(fetchReport, () => {
   test('reads the payload out of the issue the label names', async () => {
-    const read = await fetchReport(
-      source,
-      undefined,
-      answering(
-        JSON.stringify([
-          {
-            html_url: 'https://github.com/noshiro-pf/mono/issues/1991',
-            body: `# Open pull requests\n\n${embedPayload(payload)}`,
-          },
-        ]),
-      ),
-    );
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering(issueBody),
+    });
 
-    assert.isTrue(Result.isOk(read));
+    assert.isTrue(Result.isOk(result));
 
-    assert.isTrue(read.value !== UNCHANGED);
+    assert.isTrue(result.value !== UNCHANGED);
 
-    expect(read.value.payload.generatedAt).toBe(payload.generatedAt);
+    expect(result.value.payload.generatedAt).toBe(payload.generatedAt);
 
-    expect(read.value.issueUrl).toBe(
+    expect(result.value.issueUrl).toBe(
       'https://github.com/noshiro-pf/mono/issues/1991',
     );
 
     // Kept so the next request can be conditional.
-    expect(read.value.etag).toBe('"abc"');
+    expect(result.value.etag).toBe('"abc"');
   });
 
   test('says where to look when no issue carries the label', async () => {
-    const read = await fetchReport(source, undefined, answering('[]'));
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering('[]'),
+    });
 
-    assert.isTrue(Result.isErr(read));
+    assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(read.value.includes('pr-report'));
+    assert.isTrue(result.value.includes('pr-report'));
   });
 
   // The quota a browser spends belongs to the address rather than to the
   // page, so this is the failure a reader is most likely to meet and the one
   // they can do something about.
   test('tells a spent quota apart from any other refusal', async () => {
-    const read = await fetchReport(
-      source,
-      undefined,
-      answering('{"message":"API rate limit exceeded"}', {
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering('{"message":"API rate limit exceeded"}', {
         status: 403,
         headers: { 'x-ratelimit-remaining': '0' },
       }),
-    );
+    });
 
-    assert.isTrue(Result.isErr(read));
+    assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(read.value.includes('rate limit'));
+    assert.isTrue(result.value.includes('rate limit'));
+
+    // The way out of it, since this reader has not got one.
+    assert.isTrue(result.value.includes('token'));
   });
 
   test('reports any other refusal by its status', async () => {
-    const read = await fetchReport(
-      source,
-      undefined,
-      answering('{"message":"Not Found"}', { status: 404 }),
-    );
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering('{"message":"Not Found"}', { status: 404 }),
+    });
 
-    assert.isTrue(Result.isErr(read));
+    assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(read.value.includes('404'));
+    assert.isTrue(result.value.includes('404'));
   });
 
   test('answers "unchanged" to the ETag it was given', async () => {
-    const issue = JSON.stringify([
-      {
-        html_url: 'https://github.com/noshiro-pf/mono/issues/1991',
-        body: embedPayload(payload),
-      },
-    ]);
+    const github = conditional(issueBody, '"v1"');
 
-    const github = conditional(issue, '"v1"');
+    const first = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: github,
+    });
 
-    const first = await fetchReport(source, undefined, github);
+    assert.isTrue(Result.isOk(first.result));
 
-    assert.isTrue(Result.isOk(first));
+    assert.isTrue(first.result.value !== UNCHANGED);
 
-    assert.isTrue(first.value !== UNCHANGED);
+    expect(first.result.value.etag).toBe('"v1"');
 
-    expect(first.value.etag).toBe('"v1"');
+    const second = await fetchReport(source, {
+      etag: first.result.value.etag,
+      token: undefined,
+      fetchImpl: github,
+    });
 
-    const second = await fetchReport(source, first.value.etag, github);
-
-    assert.isTrue(Result.isOk(second));
+    assert.isTrue(Result.isOk(second.result));
 
     // Not an error and not a re-read: the caller keeps what it has, which is
-    // what costs nothing against the rate limit.
-    expect(second.value).toBe(UNCHANGED);
+    // what costs nothing against an authenticated rate limit.
+    expect(second.result.value).toBe(UNCHANGED);
   });
 
   test('does not leave a network failure as an unhandled rejection', async () => {
-    const read = await fetchReport(source, undefined, () =>
-      Promise.reject(new TypeError('Failed to fetch')),
-    );
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: () => Promise.reject(new TypeError('Failed to fetch')),
+    });
 
-    assert.isTrue(Result.isErr(read));
+    assert.isTrue(Result.isErr(result));
 
-    assert.isTrue(read.value.includes('Could not reach'));
+    assert.isTrue(result.value.includes('Could not reach'));
+  });
+});
+
+/** The headers that went out on the wire for a token, or the lack of one. */
+const headersSentFor = async (
+  token: string | undefined,
+): Promise<ReadonlyRecord<string, string>> => {
+  let mut_sent: ReadonlyRecord<string, string> = {};
+
+  await fetchReport(source, {
+    token,
+    etag: '"v1"',
+    fetchImpl: (_route, init) => {
+      mut_sent = init.headers;
+
+      return Promise.resolve(new Response(issueBody, { status: 200 }));
+    },
+  });
+
+  return mut_sent;
+};
+
+describe('the token on the request', () => {
+  test('sends it as a bearer token beside the conditional header', async () => {
+    const sent = await headersSentFor('github_pat_example');
+
+    expect(headerOf(sent, 'Authorization')).toBe('Bearer github_pat_example');
+
+    expect(headerOf(sent, 'If-None-Match')).toBe('"v1"');
+  });
+
+  // Anonymous is the case the page is built for, and an `Authorization:
+  // Bearer undefined` would be a 401 for every reader who never opened the
+  // panel.
+  test('sends no authorization at all without one', async () => {
+    const sent = await headersSentFor(undefined);
+
+    expect(headerOf(sent, 'Authorization')).toBeUndefined();
+  });
+
+  test('says what to do about a token GitHub will not take', async () => {
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: 'expired',
+      fetchImpl: answering('{"message":"Bad credentials"}', { status: 401 }),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.isTrue(result.value.includes('expired'));
+  });
+
+  // With a token the account is what runs out, so the sentence that tells an
+  // anonymous reader to go and get one would be nonsense.
+  test('does not offer a token to a reader who already has one', async () => {
+    const { result } = await fetchReport(source, {
+      etag: undefined,
+      token: 'valid',
+      fetchImpl: answering('{"message":"rate limited"}', {
+        status: 403,
+        headers: { 'x-ratelimit-remaining': '0' },
+      }),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.isTrue(result.value.includes('rate limit'));
+
+    assert.isFalse(result.value.includes('5,000'));
+  });
+});
+
+describe('the rate limit beside the answer', () => {
+  test('is read from a 200', async () => {
+    const { rateLimit } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering(issueBody, {
+        status: 200,
+        headers: {
+          'x-ratelimit-limit': '60',
+          'x-ratelimit-remaining': '57',
+          'x-ratelimit-reset': '1758387338',
+        },
+      }),
+    });
+
+    assert.deepStrictEqual(rateLimit, {
+      limit: 60,
+      remaining: 57,
+      resetEpochMs: 1_758_387_338_000,
+    });
+  });
+
+  // The answer a poll gets most of the time, and the one a reader watching
+  // the budget most wants the number from. GitHub exposes the headers on it
+  // across origins, which is what this depends on.
+  test('is read from a 304 as well', async () => {
+    const { result, rateLimit } = await fetchReport(source, {
+      etag: '"v1"',
+      token: 'valid',
+      fetchImpl: () =>
+        Promise.resolve(
+          new Response(undefined, {
+            status: 304,
+            headers: {
+              'x-ratelimit-limit': '5000',
+              'x-ratelimit-remaining': '4827',
+              'x-ratelimit-reset': '1758387338',
+            },
+          }),
+        ),
+    });
+
+    expect(result.value).toBe(UNCHANGED);
+
+    expect(rateLimit?.remaining).toBe(4827);
+
+    expect(rateLimit?.limit).toBe(5000);
+  });
+
+  test('is absent when the answer named none', async () => {
+    const { rateLimit } = await fetchReport(source, {
+      etag: undefined,
+      token: undefined,
+      fetchImpl: answering(issueBody),
+    });
+
+    expect(rateLimit).toBeUndefined();
   });
 });

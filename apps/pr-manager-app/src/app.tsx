@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Result, unknownToString } from 'ts-data-forge';
-import { Notice, ReportView } from './components/index.mjs';
+import { Notice, ReportView, TokenPanel } from './components/index.mjs';
 import {
   CLOCK_TICK_MS,
-  POLL_INTERVAL_MS,
+  pollIntervalMs,
   REPORT_SOURCE,
   reportIssuesUrl,
   repositoryUrl,
@@ -12,10 +12,18 @@ import {
   fetchReport,
   fetchRunLog,
   UNCHANGED,
+  type Answered,
   type LoadedReport,
   type LoadedRunLog,
   type Unchanged,
 } from './fetch-report.mjs';
+import { type RateLimit } from './rate-limit.mjs';
+import {
+  forgetToken,
+  readToken,
+  saveToken,
+  type StoredToken,
+} from './token.mjs';
 
 /**
  * GitHub Pull Requests Manager.
@@ -43,6 +51,30 @@ export const App = (): React.ReactElement => {
    */
   const [nowMs, setNowMs] = React.useState(0);
 
+  /**
+   * The reader's token, if they have given one. Read from storage once, at
+   * the first render, so that a reader who ticked "remember" does not have
+   * to paste it again — and `undefined` for everyone else, which is the
+   * case the whole page is built to work in.
+   */
+  const [token, setToken] = React.useState<StoredToken | undefined>(readToken);
+
+  /** Said out loud only when the browser refused to keep the token. */
+  const [saveError, setSaveError] = React.useState<string | undefined>(
+    undefined,
+  );
+
+  /**
+   * What GitHub last said was left of the budget. Kept beside the report
+   * rather than inside it because a `304` and a refusal both carry it, and
+   * those are the answers a reader most wants the number for.
+   */
+  const [rateLimit, setRateLimit] = React.useState<RateLimit | undefined>(
+    undefined,
+  );
+
+  const tokenValue = token?.value;
+
   // Split from `refresh` below because this is what the effect and the timer
   // run, and neither may set state synchronously. The initial state is
   // already `loading`, so there is nothing for them to say up front.
@@ -51,18 +83,25 @@ export const App = (): React.ReactElement => {
       const sent = etagsOf(previous);
 
       Promise.all([
-        fetchReport(REPORT_SOURCE, sent.report),
+        fetchReport(REPORT_SOURCE, { etag: sent.report, token: tokenValue }),
         // The log is only ever written by someone running `unblock-prs` on
         // their own machine, so a timer has nothing to find. Left out of the
         // poll, it costs a request on the loads that can actually turn one up.
         include === 'everything'
-          ? fetchRunLog(REPORT_SOURCE, sent.runLog)
-          : Promise.resolve(Result.ok(UNCHANGED)),
+          ? fetchRunLog(REPORT_SOURCE, { etag: sent.runLog, token: tokenValue })
+          : Promise.resolve(NOT_ASKED),
       ])
         .then(([report, runLog]) => {
           setNowMs(Date.now());
 
-          setState((current) => merge(current, report, runLog));
+          // The last answer that named a limit, rather than the last answer:
+          // a reply from a cache names none, and a blank where a number was
+          // reads as a page that has stopped being told anything.
+          setRateLimit(
+            (current) => report.rateLimit ?? runLog.rateLimit ?? current,
+          );
+
+          setState((current) => merge(current, report.result, runLog.result));
         })
         .catch((error: unknown) => {
           const failed = Result.err(unknownToString(error));
@@ -70,8 +109,29 @@ export const App = (): React.ReactElement => {
           setState((current) => merge(current, failed, failed));
         });
     },
-    [],
+    [tokenValue],
   );
+
+  /**
+   * Kept even when the browser refuses to store it: a token that works for
+   * as long as the tab is open is still the thing the reader asked for, and
+   * `saveError` is what says the rest.
+   */
+  const onSaveToken = React.useCallback((next: StoredToken): void => {
+    const saved = saveToken(next);
+
+    setSaveError(Result.isErr(saved) ? saved.value : undefined);
+
+    setToken(next);
+  }, []);
+
+  const onForgetToken = React.useCallback((): void => {
+    forgetToken();
+
+    setSaveError(undefined);
+
+    setToken(undefined);
+  }, []);
 
   const refresh = React.useCallback((): void => {
     setState(asRefreshing);
@@ -81,7 +141,9 @@ export const App = (): React.ReactElement => {
 
   React.useEffect(() => {
     read(state, 'everything');
-    // The first load only. Everything after it is the timer below, whose
+    // The first load, and any later change of token — `read` closes over it,
+    // so pasting one goes and looks again, which is how a reader finds out
+    // whether GitHub takes it. Everything else is the timer below, whose
     // dependency on `state` is what gives it the ETags to send.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [read]);
@@ -94,12 +156,12 @@ export const App = (): React.ReactElement => {
       if (document.visibilityState === 'visible') {
         read(state, 'report');
       }
-    }, POLL_INTERVAL_MS);
+    }, pollIntervalMs(tokenValue));
 
     return () => {
       clearInterval(id);
     };
-  }, [read, state]);
+  }, [read, state, tokenValue]);
 
   React.useEffect(() => {
     const onVisible = (): void => {
@@ -164,6 +226,14 @@ export const App = (): React.ReactElement => {
         </div>
       </header>
 
+      <TokenPanel
+        rateLimit={rateLimit}
+        saveError={saveError}
+        token={token}
+        onForget={onForgetToken}
+        onSave={onSaveToken}
+      />
+
       {state.type === 'loading' ? (
         <Notice tone={'neutral'}>{'Reading the report…'}</Notice>
       ) : undefined}
@@ -203,13 +273,23 @@ type LoadState = Readonly<
 
 /**
  * Whether a read asks for the `unblock-prs` log as well as the report. Every
- * request counts here — see `POLL_INTERVAL_MS` — so the timer asks for the
- * one of the two that a timer can find anything new in.
+ * request counts here — see `pollIntervalMs` — so the timer asks for the one
+ * of the two that a timer can find anything new in.
  */
 type Include = 'everything' | 'report';
 
 /** One value, so that a re-render does not make a new one to compare. */
 const LOADING: LoadState = { type: 'loading' } as const;
+
+/**
+ * What stands in for the log when a poll does not ask for it: the same shape
+ * a `304` would have produced, so nothing downstream has to know the request
+ * was never sent.
+ */
+const NOT_ASKED: Answered<LoadedRunLog> = {
+  result: Result.ok(UNCHANGED),
+  rateLimit: undefined,
+} as const;
 
 /**
  * The ETags to send, and the reason a `304` can always be answered: one is

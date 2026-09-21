@@ -43,32 +43,32 @@ the page reads what it wrote.
 
 ## Staying current
 
-The page re-reads the report **every two minutes while it is on screen**, and
-again the moment a hidden tab is brought back. Nothing has to be clicked;
-**Refresh** is there for impatience, and is also what re-reads the
-`unblock-prs` log — only a person running that script writes one, so a timer
-has nothing to find.
+The page re-reads the report **while it is on screen** — every two minutes
+without a token, every fifteen seconds with one — and again the moment a
+hidden tab is brought back. Nothing has to be clicked; **Refresh** is there
+for impatience, and is also what re-reads the `unblock-prs` log, since only a
+person running that script writes one and a timer has nothing to find.
 
-**Two minutes is set by the rate limit, not by taste.** The obvious reasoning
-is wrong here and it is worth writing down:
+**Both intervals are set by the rate limit, not by taste.** The obvious
+reasoning is wrong here and it is worth writing down:
 
-| caller                        |                  limit | is a `304` charged? |
-| :---------------------------- | ---------------------: | :------------------ |
-| anonymous — what this page is |   60/hour, per address | **yes**             |
-| authenticated                 | 5000/hour, per account | no                  |
+| caller                          |                  limit | is a `304` charged? |
+| :------------------------------ | ---------------------: | :------------------ |
+| anonymous — the default         |   60/hour, per address | **yes**             |
+| authenticated — an optional PAT | 5000/hour, per account | no                  |
 
 Both measured against this repository: `x-ratelimit-remaining` unchanged
 across four conditional requests with a token, and falling 59, 58, 57 across
-three without one. So the conditional request saves the transfer and the
-parse, and saves nothing on the quota — one request every two minutes is 30
-an hour, leaving half the budget for reloads and for whatever else shares the
-address. The `If-None-Match` is sent anyway: it is free, it is correct, and it
-is what would make a much shorter interval possible the day this page carries
-a token.
+three without one. So without a token the conditional request saves the
+transfer and the parse and saves nothing on the quota — one request every two
+minutes is 30 an hour, leaving half the budget for reloads and for whatever
+else shares the address. With one, a poll that finds nothing is free outright,
+and both halves of the arithmetic change: the budget is 5,000 an hour and it
+belongs to the account rather than to the address.
 
-Little is lost to the wait. The report is rewritten by a workflow that takes
-about a minute (median 58s over its last twenty runs), so the interval is not
-what decides how old the page is.
+Little is lost to the slower of the two. The report is rewritten by a workflow
+that takes about a minute (median 58s over its last twenty runs), so neither
+interval is what decides how old the page is.
 
 A poll may add to the page and may say it failed, but **may not take the page
 away**: a refresh that fails leaves the last report on screen with a note
@@ -85,6 +85,45 @@ The "generated 3 hours ago" line is measured against a clock of its own that
 ticks every 30 seconds. It used to be fixed at the moment of the load, which
 meant a tab left open read as fresh forever.
 
+## The optional token
+
+There is a panel at the top of the page that takes a GitHub personal access
+token, and **the page works without one** — it is closed by default and most
+readers will never open it.
+
+**It buys the rate limit and nothing else.** The page reads two issues of a
+public repository; a token gives it no data a stranger could not already see.
+That is what makes the recipe the panel asks for the correct one rather than a
+cautious one:
+
+- **A classic token with no scopes ticked.** In GitHub's words, "a token with
+  no assigned scopes can only access public information". It cannot read a
+  private repository, write anything, or act as its owner. The limit is
+  charged to the _account_, not to what the token may reach, so a token that
+  can do nothing lifts it exactly as far as one that can do everything.
+- Or **a fine-grained token** on `noshiro-pf/mono` alone, with
+  `Issues: Read-only` and nothing else.
+
+The panel says both of those on screen, with links to the two pages, so that
+nobody has to come here to find out what to tick.
+
+Where it is kept is the reader's choice and the default is the cautious one:
+`sessionStorage`, gone when the tab closes. "Remember on this device" moves it
+to `localStorage` — which on GitHub Pages is **shared by every app published
+under `noshiro-pf.github.io`**, since that is one origin for all of them.
+
+The build writes a `Content-Security-Policy` into `index.html` naming
+`api.github.com` as the only host this page may connect to, so "it is sent
+nowhere else" is a property of the page rather than a promise about its code.
+`style-src` allows inline styles because the label chips and the ahead/behind
+bars carry `style` attributes computed from the report; `script-src` does not.
+The policy is added by a build-only Vite plugin, because the dev server needs
+an inline preamble for Fast Refresh and a websocket for HMR, and a policy
+loose enough for those would not be worth shipping.
+
+**A token is never a build-time value.** `vite build` bakes in what it is
+given, and this bundle is served from a public site.
+
 ## Running it
 
 ```sh
@@ -97,7 +136,7 @@ pnpm run check:test
 The issues are read from the live API in every one of these, including `dev`.
 Without a token that is sixty requests an hour for the whole address — two per
 load, so thirty loads, which is only a limit if the page is being reloaded in
-a loop.
+a loop. `dev` gets no `Content-Security-Policy`; only the build does.
 
 ## Deployment
 

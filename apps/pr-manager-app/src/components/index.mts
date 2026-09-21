@@ -12,4 +12,5 @@ export * from './run-log-section.js';
 export * from './stat-tile.js';
 export * from './state-badge.js';
 export * from './summary-row.js';
+export * from './token-panel.js';
 export * from './verdict-badge.js';
