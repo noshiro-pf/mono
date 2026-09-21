@@ -8,6 +8,7 @@ import { Arr, expectType } from 'ts-data-forge';
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
 import { type NonEmptyArray } from 'ts-type-forge';
 import { genIndex } from '../functions/index.mjs';
+import { cliVersion } from './cli-version.mjs';
 
 type Ext = `.${string}`;
 
@@ -46,7 +47,7 @@ const nonEmptyArray = <T extends cmd.Type<any, any>>(
 
 const cmdDef = cmd.command({
   name: 'gen-index-ts-cli',
-  version: '10.1.8',
+  version: cliVersion,
   args: {
     // required args
     targetDirectory: cmd.positional({

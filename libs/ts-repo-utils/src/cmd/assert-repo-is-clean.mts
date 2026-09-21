@@ -3,10 +3,11 @@
 import * as cmd from 'cmd-ts';
 import { Arr } from 'ts-data-forge';
 import { assertRepoIsClean } from '../functions/index.mjs';
+import { cliVersion } from './cli-version.mjs';
 
 const cmdDef = cmd.command({
   name: 'assert-repo-is-clean-cli',
-  version: '10.1.8',
+  version: cliVersion,
   args: {
     silent: cmd.flag({
       long: 'silent',

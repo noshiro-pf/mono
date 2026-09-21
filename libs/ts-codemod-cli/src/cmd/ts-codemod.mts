@@ -10,6 +10,7 @@ import {
   replaceRecordWithUnknownRecordTransformer,
 } from 'ts-codemod-lib';
 import { Arr, Result } from 'ts-data-forge';
+import { cliVersion } from './cli-version.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
 /** Every transformer this CLI can apply, keyed by the name `--transformer` takes. */
@@ -41,7 +42,7 @@ const transformerNames = [
 
 const cmdDef = cmd.command({
   name: 'ts-codemod',
-  version: '1.0.1',
+  version: cliVersion,
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

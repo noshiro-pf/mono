@@ -3,10 +3,11 @@
 import * as cmd from 'cmd-ts';
 import { Arr, Result } from 'ts-data-forge';
 import { formatDiffFrom } from '../functions/index.mjs';
+import { cliVersion } from './cli-version.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-diff-from-cli',
-  version: '10.1.8',
+  version: cliVersion,
   args: {
     base: cmd.positional({
       type: cmd.string,

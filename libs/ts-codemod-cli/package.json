@@ -42,9 +42,7 @@
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fix:fmt:full": "prettier --write .",
     "fix:lint": "eslint . --fix",
-    "fmt": "pnpm run fix:fmt",
-    "prepare-release": "run-s sync-cli-versions fix:fmt build",
-    "sync-cli-versions": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json scripts/cmd/sync-cli-versions.mts"
+    "fmt": "pnpm run fix:fmt"
   },
   "dependencies": {
     "cmd-ts": "^0.15.0",
@@ -62,7 +60,6 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jiti": "catalog:",
-    "npm-run-all2": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",

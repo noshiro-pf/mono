@@ -65,7 +65,6 @@
     "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
-    "prepare-release": "run-s fix:fmt build doc",
     "run:test": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/test-code/transform-test-code.mts",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",

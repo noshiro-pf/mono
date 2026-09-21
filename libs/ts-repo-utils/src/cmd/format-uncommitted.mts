@@ -3,10 +3,11 @@
 import * as cmd from 'cmd-ts';
 import { Arr, Result } from 'ts-data-forge';
 import { formatUncommittedFiles } from '../functions/index.mjs';
+import { cliVersion } from './cli-version.mjs';
 
 const cmdDef = cmd.command({
   name: 'format-uncommitted-cli',
-  version: '10.1.8',
+  version: cliVersion,
   args: {
     excludeUntracked: cmd.flag({
       long: 'exclude-untracked',
