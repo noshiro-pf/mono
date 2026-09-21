@@ -1,6 +1,8 @@
 import {
   classifyCheckRun,
   classifyCommitStatus,
+  combineContextStates,
+  statesFromCheckRuns,
   summarizeChecks,
 } from './checks.mjs';
 
@@ -138,5 +140,108 @@ describe('summarizeChecks', () => {
     assert.deepStrictEqual(summary.verdict, 'passed');
 
     assert.deepStrictEqual(summary.failed, []);
+  });
+});
+
+// The numbers below are from noshiro-pf/mono#2021 at 864f8099, where the
+// `opened` runs were cancelled by the `labeled` ones and both stayed on the
+// commit.
+const run = (
+  name: string,
+  conclusion: string,
+  checkSuiteId: number,
+  id: number,
+) => ({ name, status: 'completed', conclusion, checkSuiteId, id }) as const;
+
+describe('statesFromCheckRuns', () => {
+  test('the run in the later suite is the one that counts', () => {
+    // `code-check-result`: the cancelled suite was created first, so the
+    // green that superseded it is what GitHub answers with.
+    const states = statesFromCheckRuns([
+      run('code-check-result', 'success', 96_234_480_526, 106_168_151_475),
+      run('code-check-result', 'failure', 96_234_480_291, 106_166_534_044),
+    ]);
+
+    assert.deepStrictEqual(states.get('code-check-result'), 'passed');
+  });
+
+  test('a stale red in a later suite still holds the merge', () => {
+    // `test-node-versions-result`, the one context of the five that blocked
+    // #2021: the cancelled suite happens to have the greater id, so GitHub
+    // reports the failure however much later the green one finished. Reading
+    // the newest `started_at` instead would call this pull request green
+    // while GitHub blocks it.
+    const states = statesFromCheckRuns([
+      run(
+        'test-node-versions-result',
+        'success',
+        96_234_480_391,
+        106_167_733_967,
+      ),
+      run(
+        'test-node-versions-result',
+        'failure',
+        96_234_480_438,
+        106_166_533_069,
+      ),
+    ]);
+
+    assert.deepStrictEqual(states.get('test-node-versions-result'), 'failed');
+  });
+
+  test('the order the runs arrive in does not decide it', () => {
+    const forwards = statesFromCheckRuns([
+      run('style-check-result', 'failure', 96_234_480_277, 1),
+      run('style-check-result', 'success', 96_234_480_875, 2),
+    ]);
+
+    const backwards = statesFromCheckRuns([
+      run('style-check-result', 'success', 96_234_480_875, 2),
+      run('style-check-result', 'failure', 96_234_480_277, 1),
+    ]);
+
+    assert.deepStrictEqual(forwards.get('style-check-result'), 'passed');
+
+    assert.deepStrictEqual(backwards.get('style-check-result'), 'passed');
+  });
+
+  test('a re-run inside one suite is told apart by its id', () => {
+    const states = statesFromCheckRuns([
+      run('code-check (check:knip)', 'failure', 96_234_480_526, 1),
+      run('code-check (check:knip)', 'success', 96_234_480_526, 2),
+    ]);
+
+    assert.deepStrictEqual(states.get('code-check (check:knip)'), 'passed');
+  });
+
+  test('a name reported once is left as it is', () => {
+    const states = statesFromCheckRuns([
+      run('coverage-main', 'skipped', 96_234_480_526, 106_166_639_842),
+    ]);
+
+    assert.deepStrictEqual(states.get('coverage-main'), 'passed');
+  });
+});
+
+describe('combineContextStates', () => {
+  test('a red check run is not covered by a green status of the same name', () => {
+    // GitHub: "If a check and a commit status have the same name, both must
+    // pass when that name is required."
+    assert.deepStrictEqual(combineContextStates('failed', 'passed'), 'failed');
+
+    assert.deepStrictEqual(combineContextStates('passed', 'failed'), 'failed');
+  });
+
+  test('one still running holds the pair', () => {
+    assert.deepStrictEqual(
+      combineContextStates('passed', 'pending'),
+      'pending',
+    );
+
+    assert.deepStrictEqual(combineContextStates('failed', 'pending'), 'failed');
+  });
+
+  test('both green is green', () => {
+    assert.deepStrictEqual(combineContextStates('passed', 'passed'), 'passed');
   });
 });

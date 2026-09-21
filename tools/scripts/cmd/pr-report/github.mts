@@ -2,7 +2,12 @@
 
 import { Arr, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { classifyCheckRun, classifyCommitStatus } from './checks.mjs';
+import {
+  classifyCommitStatus,
+  combineContextStates,
+  statesFromCheckRuns,
+  type CheckRunReport,
+} from './checks.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
 import {
   type Comparison,
@@ -22,6 +27,13 @@ const API_VERSION = '2022-11-28';
  * than paginating and reporting half of it as the whole.
  */
 const PAGE_SIZE = 100;
+
+/**
+ * How many pages of check runs one commit may have. A bound rather than a
+ * `while (true)`: a paginating loop against an answer that never says it has
+ * ended is the one bug in a read-only report that costs a rate limit.
+ */
+const MAX_CHECK_RUN_PAGES = 10;
 
 const PullRequestSchema = t.record({
   number: t.number(),
@@ -57,8 +69,13 @@ const ComparisonSchema = t.record({
 });
 
 const CheckRunsSchema = t.record({
+  total_count: t.number(),
   check_runs: t.array(
     t.record({
+      // Read so that two runs of one name can be told apart; which of them
+      // counts is decided in `checks.mts`.
+      id: t.number(),
+      check_suite: t.record({ id: t.number() }),
       name: t.string(),
       status: t.string(),
       conclusion: t.union([t.string(), t.nullType]),
@@ -206,6 +223,52 @@ export const createClient = (
   };
 
   /**
+   * Every check run on one commit, across as many pages as it takes.
+   *
+   * One page is not enough and has not been for a while: each package
+   * contributes two codecov runs, and the aggregates, the matrix jobs and
+   * the gates are on top of that. A commit that overflows the page would
+   * quietly lose whichever required contexts fell off the end, and the
+   * report would call them "missing" — the one wording that reads as "CI has
+   * not got to it yet" rather than "this report did not look".
+   */
+  const checkRuns = async (
+    prefix: string,
+  ): Promise<Result<readonly CheckRunReport[], string>> => {
+    const mut_collected: CheckRunReport[] = [];
+
+    for (const page of Arr.seq(MAX_CHECK_RUN_PAGES)) {
+      const answered = await getJson(
+        `${prefix}/check-runs?per_page=${PAGE_SIZE}&page=${page + 1}`,
+        CheckRunsSchema,
+      );
+
+      if (Result.isErr(answered)) return answered;
+
+      for (const run of answered.value.check_runs) {
+        mut_collected.push({
+          id: run.id,
+          checkSuiteId: run.check_suite.id,
+          name: run.name,
+          status: run.status,
+          conclusion: run.conclusion ?? undefined,
+        });
+      }
+
+      if (
+        Arr.isEmpty(answered.value.check_runs) ||
+        mut_collected.length >= answered.value.total_count
+      ) {
+        return Result.ok(mut_collected);
+      }
+    }
+
+    return Result.err(
+      `${prefix}/check-runs has more than ${PAGE_SIZE * MAX_CHECK_RUN_PAGES} runs, which is more than this reads.`,
+    );
+  };
+
+  /**
    * What every context has reported on one commit, from both places GitHub
    * keeps them. The aggregate jobs are check runs; `no-skip-ci-label` is a
    * commit status, so reading only the first would report the context that
@@ -217,24 +280,16 @@ export const createClient = (
   ): Promise<ReadonlyMap<string, ContextState>> => {
     const prefix = `/repos/${repo.owner}/${repo.name}/commits/${sha}` as const;
 
-    const runs = await getJson(
-      `${prefix}/check-runs?per_page=${PAGE_SIZE}`,
-      CheckRunsSchema,
-    );
+    const runs = await checkRuns(prefix);
 
     const statuses = await getJson(
       `${prefix}/status?per_page=${PAGE_SIZE}`,
       CombinedStatusSchema,
     );
 
-    const fromRuns: readonly (readonly [string, ContextState])[] = Result.isErr(
-      runs,
-    )
-      ? ([] as const)
-      : runs.value.check_runs.map(({ name, status, conclusion }) => [
-          name,
-          classifyCheckRun(status, conclusion ?? undefined),
-        ]);
+    const fromRuns = Result.isErr(runs)
+      ? new Map<string, ContextState>()
+      : statesFromCheckRuns(runs.value);
 
     const fromStatuses: readonly (readonly [string, ContextState])[] =
       Result.isErr(statuses)
@@ -244,13 +299,18 @@ export const createClient = (
             classifyCommitStatus(state),
           ]);
 
-    // A commit status and a check run of the same name would be the same
-    // context reported twice; the status is read second and wins, which is
-    // the order GitHub itself resolves them in.
+    // A commit status and a check run of the same name are two requirements,
+    // not one reported twice: GitHub asks both to pass. So the stricter of
+    // the two is kept rather than whichever was read second.
     const mut_states = new Map<string, ContextState>(fromRuns);
 
     for (const [name, state] of fromStatuses) {
-      mut_states.set(name, state);
+      const reported = mut_states.get(name);
+
+      mut_states.set(
+        name,
+        reported === undefined ? state : combineContextStates(reported, state),
+      );
     }
 
     return mut_states;

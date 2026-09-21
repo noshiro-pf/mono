@@ -4,6 +4,64 @@ import { Arr } from 'ts-data-forge';
 import { type ChecksSummary, type ContextState } from './types.mjs';
 
 /**
+ * What every context reported, from a head commit's check runs.
+ *
+ * A name appears more than once whenever two check suites reported it, and on
+ * a queued pull request that is the normal case rather than the odd one: the
+ * run the `opened` event starts is cancelled by the `labeled` event's, and
+ * both stay on the commit — the cancelled one leaving its `*-result`
+ * aggregate concluded `failure`, because an `if: always()` job that asserts
+ * on cancelled `needs` fails.
+ *
+ * **The newest check suite wins, and that is not the same as the newest
+ * run.** GitHub resolves a required context to the run in the suite with the
+ * greatest id, so where the cancelled suite happens to have been created
+ * after the one that superseded it, the stale red is what holds the merge —
+ * however much later the green one finished. Every suite of one push is
+ * created in the same second, so which of them got the higher id is not
+ * something the repository decides.
+ *
+ * This is why the rule is not "the newest `started_at`", which reads more
+ * natural and would call such a pull request green while GitHub blocks it.
+ * A report that says a blocked pull request will merge is worse than one
+ * that says a green one will not: `CLAUDE.md`'s "Triggers, `skip-ci`,
+ * out-of-date branches" says to ignore the red the cancelled run leaves, and
+ * this is the case where GitHub does not.
+ */
+export const statesFromCheckRuns = (
+  runs: readonly CheckRunReport[],
+): ReadonlyMap<string, ContextState> => {
+  const mut_winner = new Map<string, CheckRunReport>();
+
+  for (const run of runs) {
+    const previous = mut_winner.get(run.name);
+
+    if (previous === undefined || outranks(run, previous)) {
+      mut_winner.set(run.name, run);
+    }
+  }
+
+  const mut_states = new Map<string, ContextState>();
+
+  for (const [name, run] of mut_winner) {
+    mut_states.set(name, classifyCheckRun(run.status, run.conclusion));
+  }
+
+  return mut_states;
+};
+
+/** One check run, in the terms the decision above is made in. */
+export type CheckRunReport = Readonly<{
+  name: string;
+  status: string;
+  conclusion: string | undefined;
+  /** The suite it belongs to. Greatest wins, which is what GitHub does. */
+  checkSuiteId: number;
+  /** Ascending, so it orders two runs of one name inside one suite. */
+  id: number;
+}>;
+
+/**
  * What one check run has reported.
  *
  * A run that has not completed is pending whatever it concluded last — the
@@ -31,6 +89,35 @@ const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set([
   'skipped',
   'success',
 ]);
+
+/**
+ * Which of two runs of one name GitHub would answer with: the one in the
+ * later-created suite, and within one suite the later run of it — a re-run
+ * keeps the suite and takes a new run id.
+ */
+const outranks = (run: CheckRunReport, previous: CheckRunReport): boolean =>
+  run.checkSuiteId === previous.checkSuiteId
+    ? run.id > previous.id
+    : run.checkSuiteId > previous.checkSuiteId;
+
+/**
+ * What a context reported that is both a check run and a commit status.
+ *
+ * Not "the status wins", which is what this used to assume. GitHub's own
+ * answer is that neither does: "If a check and a commit status have the same
+ * name, both must pass when that name is required." So the stricter of the
+ * two is the verdict, and a green status cannot cover a red check run of the
+ * same name.
+ */
+export const combineContextStates = (
+  a: ContextState,
+  b: ContextState,
+): ContextState =>
+  a === 'failed' || b === 'failed'
+    ? 'failed'
+    : a === 'pending' || b === 'pending'
+      ? 'pending'
+      : 'passed';
 
 /**
  * What one commit status has reported. `no-skip-ci-label` is one of these
