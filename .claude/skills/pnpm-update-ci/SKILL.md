@@ -154,6 +154,14 @@ design call, a test whose expected value could reasonably go either way — is
 not this skill's to resolve. Leave exactly one comment on the pull request, in
 Japanese, saying what is broken and what the choice is, and end.
 
+**`check:root:licenses` failing is always one of these.** It means an update
+brought in a license `tools/configs/license-policy.mts` does not let through,
+or changed the license of a package an exception covers. Adding or rewriting
+an exception would turn the check green and is exactly what it exists to
+prevent: that edit belongs to a person who has read the license, in a pull
+request to `main`. Say in the comment which package, which version, and from
+which license to which, and end.
+
 ## Report
 
 Nothing at all, if nothing was done. Otherwise: which check failed, why, what
