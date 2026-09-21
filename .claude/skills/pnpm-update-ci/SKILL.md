@@ -53,7 +53,8 @@ Take the entry whose `headRef` is `chore/pnpm-update`.
 
 - **No such entry** — end silently. Either it merged or there was nothing to
   update that day; both are the system working.
-- **`labels` contains `skip-ci`** — end silently. Somebody stopped it on
+- **`labels` has `skip-ci`** (each is `{ name, color, description }`, so the
+  test is on `name`) — end silently. Somebody stopped it on
   purpose, and taking the label off is not this skill's job.
 - **`checks.verdict` is `passed`** — end silently. Auto-merge will land it.
 - **`checks.verdict` is `pending`** — the matrix is still running. Wait, and

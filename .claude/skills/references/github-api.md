@@ -78,7 +78,12 @@ GitHub rather than about the script.
 
 `--format json` gives one object per pull request, with `checks.verdict`
 (`passed` / `failing` / `pending` / `paused`), `checks.failed`,
-`checks.missing`, `labels`, `autoMerge`, `headSha` and `comparison.behindBy`.
+`checks.missing`, `labels` (each `{ name, color, description }`),
+`autoMerge`, `headSha` and `comparison.behindBy`.
+
+**`json`, not `payload`.** The `payload` format is what the pull request page
+reads, and it leaves out what a page does not display — `headSha` among it,
+which is the field that says whether the branch moved under you.
 
 Read by hand, this is what to watch for:
 
