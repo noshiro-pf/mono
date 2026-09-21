@@ -592,5 +592,20 @@
       "entry": ["src/index.mts", "scripts/**/*.mts"],
       "project": ["**/*.mts"],
     },
+
+    // Not an Astro site like the entry above assumes: a single entry point.
+    // The contract between `pr-report` and the app below, which is the only
+    // reason it is a package of its own.
+    "apps/pr-report-payload": {
+      "entry": ["src/index.mts", "configs/*.mts", "scripts/**/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
+    // Not an Astro site like the entry above assumes: a Vite React app whose
+    // entry is the module `index.html` loads.
+    "apps/pr-manager-app": {
+      "entry": ["src/main.tsx", "configs/*.mts", "scripts/**/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
   },
 }

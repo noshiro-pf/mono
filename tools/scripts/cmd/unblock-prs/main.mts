@@ -5,6 +5,12 @@ import { checkPreflight, viewPullRequest } from './github.mjs';
 import { SKIP_CI_LABEL } from './labels.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
 import { advance } from './rebase.mjs';
+import {
+  publishRunLog,
+  recordEvent,
+  recordWatchOutcome,
+  reportRunLog,
+} from './run-log.mjs';
 import { pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
@@ -168,6 +174,14 @@ const unblockPrs = async (
     }
   }
 
+  // After the loop rather than after each cycle: one run is one entry, and a
+  // run that is interrupted has still done whatever it did. A run that acted
+  // on nothing writes nothing — an idle overnight loop would otherwise fill
+  // the log with entries saying so.
+  if (options.writeLog) {
+    reportRunLog(await publishRunLog(options.dryRun));
+  }
+
   return Result.ok(undefined);
 };
 
@@ -251,6 +265,8 @@ const runCycle = async (
       options,
     );
 
+    recordWatchOutcome(target.number, outcome);
+
     return {
       state: state(
         applyWatchOutcome(mut_skipped, target, baseSha, outcome),
@@ -286,6 +302,8 @@ const runCycle = async (
     if (Result.isErr(advanced)) {
       log(`#${target.number}: ${advanced.value.detail}`);
 
+      recordEvent(target.number, 'set-aside', advanced.value.detail);
+
       mut_skipped = withSkip(mut_skipped, {
         number: target.number,
         headSha: target.headRefOid,
@@ -318,7 +336,19 @@ const runCycle = async (
       `#${target.number} is at ${head.slice(0, 10)}; waiting for it to merge.`,
     );
 
+    // "advanced" rather than the phrase `describeAction` writes, which is
+    // imperative and about to become the past: what `advance` does is a
+    // rebase, the removal of `skip-ci`, or both, and which of them it was is
+    // not what a reader of the log is asking.
+    recordEvent(
+      target.number,
+      'released',
+      `advanced onto ${defaultBranch}; now at ${head.slice(0, 10)}`,
+    );
+
     const outcome = await watch(target, head, requiredContexts, options);
+
+    recordWatchOutcome(target.number, outcome);
 
     return {
       state: state(
@@ -376,17 +406,28 @@ const reportDeparted = async (
     })),
   );
 
+  // Recorded as well as printed, and this is the one place it matters most:
+  // a pull request the watch gave up on is left in the log as `unfinished`,
+  // and this is where the log finds out it merged after all. Without it the
+  // last word on the log's side would be the giving up.
   for (const { prNumber, result } of viewed) {
     if (Result.isErr(result)) {
-      log(
-        `#${prNumber} has left the open list; cannot read it: ${result.value}`,
-      );
+      const detail =
+        `left the open list; cannot read it: ${result.value}` as const;
+
+      log(`#${prNumber} has ${detail}`);
+
+      recordEvent(prNumber, 'failed', detail);
     } else if (result.value.state === 'MERGED') {
       log(`#${prNumber} merged — ${result.value.title}`);
+
+      recordEvent(prNumber, 'merged', 'merged after this run had moved on');
     } else {
-      log(
-        `#${prNumber} is no longer open (${result.value.state}) — ${result.value.title}`,
-      );
+      const detail = `no longer open (${result.value.state})` as const;
+
+      log(`#${prNumber} is ${detail} — ${result.value.title}`);
+
+      recordEvent(prNumber, 'set-aside', detail);
     }
   }
 

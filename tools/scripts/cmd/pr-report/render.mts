@@ -3,6 +3,7 @@
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { MERGE_QUEUED_LABEL } from '../unblock-prs/labels.mjs';
+import { summarize } from './summarize.mjs';
 import {
   type ChecksSummary,
   type PrReport,
@@ -24,11 +25,17 @@ const GLYPH = {
 >;
 
 /**
- * The report as Markdown, for a GitHub issue body or the Claude app.
+ * The report as Markdown, for the file on the report's branch, the run
+ * summary, or the Claude app.
  *
  * The merge order is a nested list rather than a table because the nesting
  * *is* the information — a table would have to spell the tree back out in a
  * column, and a reader would have to rebuild it.
+ *
+ * Prose only. The machine-readable copy the Pull Requests Manager app reads
+ * used to be a collapsed JSON block at the bottom of this; it is now a file
+ * on a branch of its own, written by the same run — see
+ * `apps/pr-report-payload`, and `--format payload` for the other half.
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
@@ -62,6 +69,7 @@ export const renderMarkdown = (report: PrReport): string => {
     '',
     ...report.roots.flatMap((root) => line(root, 0)),
     ...cyclesSection(report),
+    ...mergedSection(report, 'markdown'),
     ...footnote(report),
     '',
   ].join('\n');
@@ -110,6 +118,7 @@ export const renderTerminal = (report: PrReport): string => {
     '',
     ...report.roots.flatMap((root) => line(root, '', '')),
     ...cyclesSection(report).map((l) => l.replace(/^#+ /u, '')),
+    ...mergedSection(report, 'terminal').map((l) => l.replace(/^#+ /u, '')),
     ...footnote(report).map((l) => l.replace(/^> /u, '')),
     '',
   ].join('\n');
@@ -126,18 +135,18 @@ const heading = (report: PrReport): string => `# ${title(report)}` as const;
 /**
  * One line saying how much there is and how much of it wants attention, so
  * that a reader who opens the report and closes it again has still learnt
- * the only thing a daily report has to tell them.
+ * the only thing a daily report has to tell them. The same counts travel in
+ * the payload, from the same {@link summarize}.
  */
 const summary = (report: PrReport): string => {
-  const count = (predicate: (entry: ReportEntry) => boolean): number =>
-    report.entries.filter(predicate).length;
+  const counts = summarize(report);
 
   return [
-    `**${report.entries.length} open**`,
-    `${count((e) => e.labels.includes(MERGE_QUEUED_LABEL))} queued`,
-    `${count((e) => e.isDraft)} draft`,
-    `${count((e) => e.checks.verdict === 'failing')} failing`,
-    `${count((e) => (e.comparison?.behindBy ?? 0) > 0)} behind`,
+    `**${counts.open} open**`,
+    `${counts.queued} queued`,
+    `${counts.draft} draft`,
+    `${counts.failing} failing`,
+    `${counts.behind} behind`,
     `generated ${report.generatedAt}`,
   ].join(' · ');
 };
@@ -158,7 +167,7 @@ const describe = (
   const detail = [
     entry.isDraft ? 'draft' : undefined,
     commits(entry),
-    ...entry.labels.map((label) => (markdown ? `\`${label}\`` : `[${label}]`)),
+    ...entry.labels.map(({ name }) => (markdown ? `\`${name}\`` : `[${name}]`)),
     autoMerge(entry),
     issues(entry, markdown),
     failures(entry.checks),
@@ -182,7 +191,7 @@ const describe = (
 const autoMerge = (entry: ReportEntry): string | undefined =>
   entry.autoMerge
     ? 'auto-merge'
-    : entry.labels.includes(MERGE_QUEUED_LABEL)
+    : entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL)
       ? 'no auto-merge'
       : undefined;
 
@@ -244,6 +253,44 @@ const cyclesSection = (report: PrReport): readonly string[] =>
         ),
       ] as const)
     : ([] as const);
+
+/**
+ * What landed, and when.
+ *
+ * Below the queue rather than above it, because the queue is what a reader
+ * can act on and this is what they no longer have to. Omitted entirely when
+ * nothing merged inside the window, rather than left as an empty heading
+ * saying the report looked.
+ */
+const mergedSection = (
+  report: PrReport,
+  format: 'markdown' | 'terminal',
+): readonly string[] => {
+  if (!Arr.isNonEmpty(report.merged)) return [] as const;
+
+  const markdown = format === 'markdown';
+
+  return [
+    '',
+    `## Merged in the last ${report.mergedWithinDays} day${report.mergedWithinDays === 1 ? '' : 's'}`,
+    '',
+    ...report.merged.map((pr) => {
+      const ref = markdown
+        ? (`[#${pr.number}](${pr.url})` as const)
+        : (`#${pr.number}` as const);
+
+      const detail = [
+        pr.mergedAt,
+        `by ${pr.author}`,
+        ...pr.linkedIssues.map(({ number, url }) =>
+          markdown ? `closes [#${number}](${url})` : `closes #${number}`,
+        ),
+      ] as const;
+
+      return `- ${ref} ${markdown ? `**${pr.title}**` : pr.title} · ${detail.join(' · ')}`;
+    }),
+  ] as const;
+};
 
 /** Said once, at the bottom, rather than beside every pull request. */
 const footnote = (report: PrReport): readonly string[] =>

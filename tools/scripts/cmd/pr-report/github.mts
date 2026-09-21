@@ -7,7 +7,9 @@ import { parseClosingIssueRefs } from './linked-issues.mjs';
 import {
   type Comparison,
   type ContextState,
+  type Label,
   type LinkedIssue,
+  type MergedPullRequest,
   type PullRequestFacts,
   type RepoRef,
 } from './types.mjs';
@@ -29,7 +31,16 @@ const PullRequestSchema = t.record({
   html_url: t.string(),
   updated_at: t.string(),
   user: t.union([t.record({ login: t.string() }), t.nullType]),
-  labels: t.array(t.record({ name: t.string() })),
+  // The colour is read so that a chip can be the colour GitHub shows; the
+  // description so that hovering one says what the label means.
+  labels: t.array(
+    t.record({
+      name: t.string(),
+      color: t.string(),
+      description: t.union([t.string(), t.nullType]),
+    }),
+  ),
+  merged_at: t.union([t.string(), t.nullType]),
   // `null` until auto-merge is armed, and an object describing it after.
   // Only its presence is read: what the report answers is whether anything
   // will land the pull request once the checks go green.
@@ -89,6 +100,15 @@ export type Client = Readonly<{
   facts: (
     repo: RepoRef,
   ) => Promise<Result<readonly PullRequestFacts[], string>>;
+  /**
+   * The pull requests that landed in the last `withinDays` days, newest
+   * first. One request: the closed list, sorted by when it last changed.
+   */
+  merged: (
+    repo: RepoRef,
+    withinDays: number,
+    limit: number,
+  ) => Promise<Result<readonly MergedPullRequest[], string>>;
 }>;
 
 /**
@@ -291,6 +311,60 @@ export const createClient = (
   return {
     authenticated: token !== undefined,
 
+    merged: async (repo, withinDays, limit) => {
+      // Sorted by `updated`, not by when they merged: GitHub does not sort
+      // closed pull requests by merge time, and `updated` is the closest
+      // thing that is monotonic enough for a window this short. The filter
+      // below is what decides membership; the sort only decides what one
+      // page of a hundred contains, and a hundred pull requests updated more
+      // recently than a merge inside the window is not a state this
+      // repository reaches.
+      const listed = await getJson(
+        `/repos/${repo.owner}/${repo.name}/pulls?state=closed&per_page=${PAGE_SIZE}&sort=updated&direction=desc`,
+        PullRequestListSchema,
+      );
+
+      if (Result.isErr(listed)) return listed;
+
+      const cutoff =
+        Temporal.Now.instant().epochMilliseconds -
+        withinDays * 24 * 60 * 60 * 1000;
+
+      const within = listed.value.filter((pr) => {
+        if (pr.merged_at === null) return false;
+
+        const at = Result.fromThrowable(
+          () => Temporal.Instant.from(pr.merged_at ?? '').epochMilliseconds,
+        );
+
+        return Result.isOk(at) && at.value >= cutoff;
+      });
+
+      return Result.ok(
+        within
+          .map((pr) => ({
+            number: pr.number,
+            title: pr.title,
+            author: pr.user?.login ?? 'unknown',
+            url: pr.html_url,
+            headRef: pr.head.ref,
+            baseRef: pr.base.ref,
+            mergedAt: pr.merged_at ?? '',
+            labels: labelsOf(pr.labels),
+            linkedIssues: parseClosingIssueRefs(pr.body ?? '', repo).map(
+              (number) => ({
+                number,
+                title: '',
+                url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
+                state: 'unknown' as const,
+              }),
+            ),
+          }))
+          .toSorted((a, b) => b.mergedAt.localeCompare(a.mergedAt))
+          .slice(0, limit),
+      );
+    },
+
     facts: async (repo) => {
       const listed = await getJson(
         `/repos/${repo.owner}/${repo.name}/pulls?state=open&per_page=${PAGE_SIZE}&sort=created&direction=asc`,
@@ -321,7 +395,7 @@ export const createClient = (
           body,
           author: pr.user?.login ?? 'unknown',
           isDraft: pr.draft,
-          labels: pr.labels.map((label) => label.name),
+          labels: labelsOf(pr.labels),
           autoMerge: pr.auto_merge !== null,
           headRef: pr.head.ref,
           headSha: pr.head.sha,
@@ -349,6 +423,24 @@ export const createClient = (
     },
   };
 };
+
+/**
+ * The labels, as the report passes them on. GitHub sends a `null` description
+ * for a label that has none; the report carries the empty string, so that
+ * nothing downstream has to know the difference.
+ */
+const labelsOf = (
+  labels: readonly Readonly<{
+    name: string;
+    color: string;
+    description: string | null;
+  }>[],
+): readonly Label[] =>
+  labels.map(({ name, color, description }) => ({
+    name,
+    color,
+    description: description ?? '',
+  }));
 
 /** `owner/name`, as it is written everywhere else. */
 export const parseRepoRef = (raw: string): Result<RepoRef, string> => {

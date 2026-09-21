@@ -1,4 +1,4 @@
-<!-- cspell:ignore unlabel -->
+<!-- cspell:ignore unlabel, gpgsign -->
 
 # `unblock-prs`
 
@@ -218,6 +218,32 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 | `--idle-interval <sec>` |  300 | 何もない時の再 survey までの待ち時間  |
 | `--poll-interval <sec>` |   60 | watch 中のポーリング間隔              |
 | `--watch-timeout <min>` |   90 | 1本を諦めるまでの時間                 |
+| `--no-log`              |      | 実行結果を issue に書かない           |
+
+### 実行ログ
+
+このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。rebase が
+conflict した、push が弾かれた、auto-merge の無い PR を見送った — どれも一度
+きり、誰かの端末で起きて、そのあとはどこにも残りません。
+
+そこで、**何かに手を出した実行だけ**が `data/unblock-prs-log` ブランチの
+`unblock-prs-log.json` に記録を追記します（何もしなかった実行は書きません。夜
+通し回した idle ループが「何もなし」で埋まるだけなので）。保持するのは直近 20
+実行、1実行あたり 50 イベントまで。イベントは行ではなく構造 —「どの PR に」
+「何をして」「どうなったか」— で、それを **GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>）が読んで表示します。
+
+以前は issue でした。issue は人が読んで購読するものであって簡易DBではない、と
+いうのが移した理由です（`apps/pr-report-payload/README.md`）。push は
+`origin` が既に指している URL に対する素の `git` なので、普段ブランチを push
+しているのと同じ資格情報で通ります。毎回 orphan commit を force-push するため、
+ブランチは常に1コミット1ファイルのままです。署名はしません — 機械の出力です
+し、`commit.gpgsign` を大域で有効にしている環境で鍵が無いときにログだけが落ち
+るのは筋が悪いからです。
+
+書き込みに失敗しても実行は止まりません。このスクリプトの仕事は PR を landing
+させることで、ログが書けなかったことはそれを止める理由ではありません — ただし
+黙って消えるのは最悪なので、その旨はログに出ます。
 
 ### ファイル構成
 
@@ -236,6 +262,7 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 | `options.mts`     | コマンドライン                                            |
 | `types.mts`       | 共有される型とスキーマ                                    |
 | `constants.mts`   | 待ち時間と諦めるまでの回数                                |
+| `run-log.mts`     | この実行が何をしたかと、それを書く issue                  |
 | `util.mts`        | quoting、ログ、停止シグナル                               |
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
@@ -460,6 +487,35 @@ sleeps for `--idle-interval` (300s) and surveys again.
 | `--idle-interval <sec>` |     300 | wait between surveys when there is nothing |
 | `--poll-interval <sec>` |      60 | wait between polls of the watched one      |
 | `--watch-timeout <min>` |      90 | give up on one pull request after this     |
+| `--no-log`              |         | do not write the run to its issue          |
+
+### The run log
+
+This script runs on someone's machine and says everything it does on standard
+output, which is exactly where nobody can see it afterwards. A rebase that
+conflicted, a push that was refused, a queued pull request passed over for
+having no auto-merge — each happened once, on a terminal, and was never
+visible again.
+
+So a run that **acts on something** adds a record to `unblock-prs-log.json` on
+the `data/unblock-prs-log` branch. A run that acts on nothing writes nothing,
+or an idle overnight loop would fill the log with entries saying so. Twenty
+runs are kept, fifty events each. The entries are events rather than lines —
+which pull request, what was done, how it turned out — which is also what the
+**GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>) lays out as rows.
+
+It was an issue until recently; `apps/pr-report-payload/README.md` says why a
+branch. The push is plain `git` against whatever URL `origin` already
+resolves to, so it works with the credentials you push branches with, SSH or
+HTTPS. Each run force-pushes a fresh orphan commit, so the branch stays one
+commit holding one file. It signs nothing: this is machine output, and a
+`commit.gpgsign` set globally would otherwise make the log — and only the log
+— fail on a machine with no key loaded.
+
+A log that could not be written never fails the run: the job is to land pull
+requests, and this is not a reason to stop doing it. It is a reason to say so,
+which it does, because an entry that silently went missing is worse than none.
 
 ### Layout
 
@@ -478,6 +534,7 @@ sleeps for `--idle-interval` (300s) and surveys again.
 | `options.mts`     | the command line                                         |
 | `types.mts`       | the shapes every module passes around                    |
 | `constants.mts`   | how long it waits, and how long before it gives up       |
+| `run-log.mts`     | what this run did, and the issue it is written to        |
 | `util.mts`        | quoting, logging, the stop signal                        |
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
