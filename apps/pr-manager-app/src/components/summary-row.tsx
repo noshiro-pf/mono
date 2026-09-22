@@ -1,5 +1,5 @@
 import { type PayloadSummary } from 'pr-report-payload';
-import type * as React from 'react';
+import * as React from 'react';
 import { StatTile } from './stat-tile.js';
 
 type Props = Readonly<{ summary: PayloadSummary }>;
@@ -10,7 +10,7 @@ type Props = Readonly<{ summary: PayloadSummary }>;
  * The counts are the report's own — see `PayloadSummary` for why they are
  * carried rather than recomputed here.
  */
-export const SummaryRow = ({ summary }: Props): React.ReactElement => (
+export const SummaryRow = React.memo<Props>(({ summary }) => (
   <div className={'summary-row'}>
     <StatTile label={'open'} value={summary.open} />
     <StatTile label={'queued'} value={summary.queued} />
@@ -22,4 +22,6 @@ export const SummaryRow = ({ summary }: Props): React.ReactElement => (
     />
     <StatTile label={'behind base'} value={summary.behind} />
   </div>
-);
+));
+
+SummaryRow.displayName = 'SummaryRow';

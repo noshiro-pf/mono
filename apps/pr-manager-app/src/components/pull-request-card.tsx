@@ -1,5 +1,5 @@
 import { type PayloadEntry } from 'pr-report-payload';
-import type * as React from 'react';
+import * as React from 'react';
 import { Arr } from 'ts-data-forge';
 import { AutoMergeBadge } from './auto-merge-badge.js';
 import { CommitDivergence } from './commit-divergence.js';
@@ -23,10 +23,7 @@ type Props = Readonly<{
  * Which branch, and how far from its base. What has been said about it — the
  * labels, and the names of any checks that are red.
  */
-export const PullRequestCard = ({
-  entry,
-  scaleMax,
-}: Props): React.ReactElement => (
+export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
   <article className={'pull-request'}>
     <div className={'pull-request-badges'}>
       <StateBadge isDraft={entry.isDraft} />
@@ -82,4 +79,6 @@ export const PullRequestCard = ({
       ) : undefined}
     </div>
   </article>
-);
+));
+
+PullRequestCard.displayName = 'PullRequestCard';

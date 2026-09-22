@@ -29,13 +29,9 @@ type Props = Readonly<{
  * is the correct token for the job, and saying so is what keeps a reader
  * from reaching for `repo` because it sounded like the one that works.
  */
-export const TokenPanel = ({
-  token,
-  rateLimit,
-  saveError,
-  onSave,
-  onForget,
-}: Props): React.ReactElement => {
+export const TokenPanel = React.memo<Props>((props) => {
+  const { token, rateLimit, saveError, onSave, onForget } = props;
+
   const [typed, setTyped] = React.useState('');
 
   const [remember, setRemember] = React.useState(false);
@@ -145,7 +141,9 @@ export const TokenPanel = ({
       </div>
     </details>
   );
-};
+});
+
+TokenPanel.displayName = 'TokenPanel';
 
 const INPUT_ID = 'github-token';
 
@@ -203,7 +201,7 @@ const seconds = (ms: number): string => {
  * *tick nothing*, in those words, with GitHub's own sentence about what that
  * grants.
  */
-const TokenHelp = (): React.ReactElement => (
+const TokenHelp = React.memo(() => (
   <details className={'token-help'}>
     <summary>{'Which token, and with what permissions?'}</summary>
 
@@ -280,4 +278,6 @@ const TokenHelp = (): React.ReactElement => (
       }
     </p>
   </details>
-);
+));
+
+TokenHelp.displayName = 'TokenHelp';

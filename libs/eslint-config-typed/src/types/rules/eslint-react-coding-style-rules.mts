@@ -154,6 +154,59 @@ namespace ReactMemoTypeParameter {
 }
 
 /**
+ * @description Requires React components to be wrapped with React.memo.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace RequireReactMemo {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreName": {
+   *         "description": "Component names allowed to be defined without memo.",
+   *         "oneOf": [
+   *           {
+   *             "type": "string"
+   *           },
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             },
+   *             "minItems": 0
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Component names allowed to be defined without memo.
+     */
+    ignoreName?: string | readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Restricts React.useMemo hook usage patterns for consistent styles.
  *
  *  ```md
@@ -241,6 +294,7 @@ export type EslintReactCodingStyleRules = Readonly<{
   'react-coding-style/props-type-annotation-style': PropsTypeAnnotationStyle.RuleEntry;
   'react-coding-style/react-memo-props-argument-name': ReactMemoPropsArgumentName.RuleEntry;
   'react-coding-style/react-memo-type-parameter': ReactMemoTypeParameter.RuleEntry;
+  'react-coding-style/require-react-memo': RequireReactMemo.RuleEntry;
   'react-coding-style/use-memo-hook-style': UseMemoHookStyle.RuleEntry;
   'react-coding-style/ban-use-imperative-handle-hook': BanUseImperativeHandleHook.RuleEntry;
   'react-coding-style/display-name': DisplayName.RuleEntry;
@@ -249,5 +303,6 @@ export type EslintReactCodingStyleRules = Readonly<{
 export type EslintReactCodingStyleRulesOption = Readonly<{
   'react-coding-style/component-name': ComponentName.Options;
   'react-coding-style/import-style': ImportStyle.Options;
+  'react-coding-style/require-react-memo': RequireReactMemo.Options;
   'react-coding-style/display-name': DisplayName.Options;
 }>;

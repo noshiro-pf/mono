@@ -13,10 +13,7 @@ type Props = Readonly<{
  * Named rather than drawn: there is no position in a merge order to draw them
  * at, which is why they are absent from the tree above.
  */
-export const CyclesSection = ({
-  repoUrl,
-  cycles,
-}: Props): React.ReactElement => (
+export const CyclesSection = React.memo<Props>(({ repoUrl, cycles }) => (
   <section className={'section'}>
     <h2 className={'section-title'}>{'Merge-After cycles'}</h2>
     <p className={'section-note'}>
@@ -45,4 +42,6 @@ export const CyclesSection = ({
       )}
     </ul>
   </section>
-);
+));
+
+CyclesSection.displayName = 'CyclesSection';

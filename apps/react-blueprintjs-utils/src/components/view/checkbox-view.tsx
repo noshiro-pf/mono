@@ -1,6 +1,7 @@
 // cspell:ignore csvg cpath -- percent-encoded `<svg>` / `<path>` in a data URI
 import styled from '@emotion/styled';
 import * as React from 'react';
+import { memoNamed } from 'react-utils';
 import { type DeepReadonly, type Mutable } from 'ts-type-forge';
 
 type Props = DeepReadonly<{
@@ -10,43 +11,41 @@ type Props = DeepReadonly<{
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }>;
 
-export const CheckboxView = ({
-  state,
-  disabled = false,
-  onCheck,
-  onChange,
-}: Props): React.JSX.Element => {
-  const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
-    React.useCallback(
-      (ev) => {
-        onCheck?.(ev.target.checked);
+export const CheckboxView = memoNamed<Props>(
+  'CheckboxView',
+  ({ state, disabled = false, onCheck, onChange }) => {
+    const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> =
+      React.useCallback(
+        (ev) => {
+          onCheck?.(ev.target.checked);
 
-        onChange?.(ev);
-      },
-      [onCheck, onChange],
+          onChange?.(ev);
+        },
+        [onCheck, onChange],
+      );
+
+    const inputRef = React.useRef<Mutable<HTMLInputElement>>(null);
+
+    React.useEffect(() => {
+      if (inputRef.current !== null) {
+        inputRef.current.indeterminate = state === 'indeterminate';
+      }
+    }, [state]);
+
+    return (
+      <Root>
+        <input
+          ref={inputRef}
+          checked={state === 'checked'}
+          disabled={disabled}
+          type={'checkbox'}
+          onChange={onChangeHandler}
+        />
+        <span />
+      </Root>
     );
-
-  const inputRef = React.useRef<Mutable<HTMLInputElement>>(null);
-
-  React.useEffect(() => {
-    if (inputRef.current !== null) {
-      inputRef.current.indeterminate = state === 'indeterminate';
-    }
-  }, [state]);
-
-  return (
-    <Root>
-      <input
-        ref={inputRef}
-        checked={state === 'checked'}
-        disabled={disabled}
-        type={'checkbox'}
-        onChange={onChangeHandler}
-      />
-      <span />
-    </Root>
-  );
-};
+  },
+);
 
 const Root = styled.label`
   /* .bp4-control */

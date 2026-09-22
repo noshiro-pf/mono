@@ -99,6 +99,10 @@ export default [
       'react/jsx-no-bind': 'off',
       'react-perf/jsx-no-new-function-as-prop': 'off',
       'react/no-array-index-key': 'off',
+      // The samples show how synstate is used, in the plain React the reader
+      // knows; memoizing every one of them would bury that under this
+      // repository's component style.
+      'react-coding-style/require-react-memo': 'off',
       'functional/immutable-data': 'off',
       'functional/no-let': 'off',
       'import-x/no-extraneous-dependencies': [
