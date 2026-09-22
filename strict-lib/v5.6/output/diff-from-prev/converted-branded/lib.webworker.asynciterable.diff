@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.webworker.asynciterable.d.ts b/v5.6/output/lib-files-branded/lib.webworker.asynciterable.d.ts
-index dbf4189ecc308cb2ccef70590a7c1d5975a342a1..be99ebadb3e8a668fbb6e4f300aeb636f8cab61c 100644
+index d87ab5ee42ecc8fa8afb93bc34d1c217ecb0b6f3..ac99f086ae673acdd9c389c779c96423fcb2890d 100644
 --- a/v5.5/output/lib-files-branded/lib.webworker.asynciterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.webworker.asynciterable.d.ts
-@@ -4,18 +4,38 @@
+@@ -26,18 +26,38 @@ and limitations under the License.
  /// Worker Async Iterable APIs
  /////////////////////////////
  

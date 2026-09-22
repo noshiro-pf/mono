@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files/lib.esnext.disposable.d.ts b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
-index 4c7b74f3dfe08e30ae09d0a596e464abdd45b4a7..1c549f93a103fad73f9efd249a63f388498d2971 100644
+index 3eb3f928416b4a45a98bfcdc4dd5cdf12564c96a..ace099fdc2760fc22539437ba48a16d5739f6179 100644
 --- a/v5.5/output/lib-files/lib.esnext.disposable.d.ts
 +++ b/v5.6/output/lib-files/lib.esnext.disposable.d.ts
-@@ -1,6 +1,8 @@
+@@ -23,6 +23,8 @@ and limitations under the License.
  /// <reference no-default-lib="true"/>
  
  /// <reference path="./lib.es2015.symbol.d.ts" />
@@ -11,7 +11,7 @@ index 4c7b74f3dfe08e30ae09d0a596e464abdd45b4a7..1c549f93a103fad73f9efd249a63f388
  
  interface SymbolConstructor {
    /**
-@@ -167,3 +169,7 @@ interface AsyncDisposableStackConstructor {
+@@ -189,3 +191,7 @@ interface AsyncDisposableStackConstructor {
    readonly prototype: AsyncDisposableStack;
  }
  declare const AsyncDisposableStack: AsyncDisposableStackConstructor;

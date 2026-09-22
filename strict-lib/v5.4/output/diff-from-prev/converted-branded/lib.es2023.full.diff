@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2023.full.d.ts b/v5.4/output/lib-files-branded/lib.es2023.full.d.ts
-index e552990d7721448f0e961a88eeaa882f41e7c779..dcf6524e5d72da44b43bbf57a7300c65b2103f06 100644
+index 14b196b1e48747743731ddfe38dc284cbe1b4b18..91508ebcb14e1bb53efa6fabb3b37dbbd98b87ed 100644
 --- a/v5.3/output/lib-files-branded/lib.es2023.full.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2023.full.d.ts
-@@ -5,3 +5,4 @@
+@@ -27,3 +27,4 @@ and limitations under the License.
  /// <reference path="./lib.webworker.importscripts.d.ts" />
  /// <reference path="./lib.scripthost.d.ts" />
  /// <reference path="./lib.dom.iterable.d.ts" />

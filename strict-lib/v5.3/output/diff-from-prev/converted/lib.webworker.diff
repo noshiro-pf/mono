@@ -1,8 +1,8 @@
 diff --git a/v5.2/output/lib-files/lib.webworker.d.ts b/v5.3/output/lib-files/lib.webworker.d.ts
-index 27773ea3a3457247cc52a2a9975a56a48bf840b9..2190767bb9d413fbe85ac47c4efd1163a31888d2 100644
+index 1cc36030077b720940688f46a572850c6a772fad..b85bc88cd9034bfdb853a99dbe38b16180aad636 100644
 --- a/v5.2/output/lib-files/lib.webworker.d.ts
 +++ b/v5.3/output/lib-files/lib.webworker.d.ts
-@@ -6238,7 +6238,16 @@ interface SubtleCrypto {
+@@ -6260,7 +6260,16 @@ interface SubtleCrypto {
      format: Exclude<KeyFormat, 'jwk'>,
      key: CryptoKey,
    ): Promise<ArrayBuffer>;

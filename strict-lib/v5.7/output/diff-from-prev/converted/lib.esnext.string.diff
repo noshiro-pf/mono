@@ -1,9 +1,31 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.string.d.ts b/v5.6/output/lib-files/lib.esnext.string.d.ts
 deleted file mode 100644
-index 62dcbcd475695ab2a1dcc4d8302d0746e35b7ae6..0000000000000000000000000000000000000000
+index 76aa703b25b8b7581045c9c3cd5728520b44ffdb..0000000000000000000000000000000000000000
 --- a/v5.6/output/lib-files/lib.esnext.string.d.ts
 +++ /dev/null
-@@ -1,13 +0,0 @@
+@@ -1,35 +0,0 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+-/*
+- * Modified from TypeScript's `lib.esnext.string.d.ts` by strict-ts-lib
+- * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
+- * stricter types. This is not the original file. See the NOTICE and LICENSE
+- * files of the package this ships in.
+- */
+-
 -/// <reference no-default-lib="true"/>
 -
 -interface String {

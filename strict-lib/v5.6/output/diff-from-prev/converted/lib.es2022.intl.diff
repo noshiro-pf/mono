@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files/lib.es2022.intl.d.ts b/v5.6/output/lib-files/lib.es2022.intl.d.ts
-index 480e65796540f0f06bb7b918336c44809a71e506..814d11100e4595f9019c171336721bad71c1c9c7 100644
+index 488715690a33fd0f367014195034a23719ffee45..89aeb3e4d75742fb39bea10b515d3ba297233e08 100644
 --- a/v5.5/output/lib-files/lib.es2022.intl.d.ts
 +++ b/v5.6/output/lib-files/lib.es2022.intl.d.ts
-@@ -30,6 +30,14 @@ declare namespace Intl {
+@@ -52,6 +52,14 @@ declare namespace Intl {
      readonly granularity: 'grapheme' | 'word' | 'sentence';
    }
  
@@ -17,7 +17,7 @@ index 480e65796540f0f06bb7b918336c44809a71e506..814d11100e4595f9019c171336721bad
    interface Segments {
      /**
       * Returns an object describing the segment in the original string that includes the code unit at a specified index.
-@@ -39,7 +47,7 @@ declare namespace Intl {
+@@ -61,7 +69,7 @@ declare namespace Intl {
      containing(codeUnitIndex?: number): SegmentData;
  
      /** Returns an iterator to iterate over the segments. */

@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2022.intl.d.ts b/v5.4/output/lib-files-branded/lib.es2022.intl.d.ts
-index 1c1555f68469d818db0ec7b8854369d2b77e5c9c..b62e87c3d362efd62c230c77cc970ad3c2450efb 100644
+index 48a5963570a0c8675a5e5aae7eedc12a692b2442..398355f6f3cf1dd88ff4b0784bae9782e9932fd1 100644
 --- a/v5.3/output/lib-files-branded/lib.es2022.intl.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2022.intl.d.ts
-@@ -73,10 +73,7 @@ declare namespace Intl {
+@@ -95,10 +95,7 @@ declare namespace Intl {
       *
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter).
       */
@@ -14,7 +14,7 @@ index 1c1555f68469d818db0ec7b8854369d2b77e5c9c..b62e87c3d362efd62c230c77cc970ad3
  
      /**
       * Returns an array containing those of the provided locales that are supported without having to fall back to the runtime's default locale.
-@@ -91,9 +88,9 @@ declare namespace Intl {
+@@ -113,9 +110,9 @@ declare namespace Intl {
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter/supportedLocalesOf)
       */
      supportedLocalesOf(

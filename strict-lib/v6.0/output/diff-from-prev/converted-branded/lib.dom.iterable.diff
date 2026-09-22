@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.dom.iterable.d.ts b/v6.0/output/lib-files-branded/lib.dom.iterable.d.ts
-index d004111233069b270f741c251bb812421b88fdec..3b3e55b7a43b5d3e58dd5f54d1ef8f082227a35a 100644
+index c4903008d3426967152d944d24755feeed5d9a71..d9d45226de9f9f6ae49dce7c6c72bc4c887bd71d 100644
 --- a/v5.9/output/lib-files-branded/lib.dom.iterable.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.dom.iterable.d.ts
-@@ -1,874 +1,2 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,877 +20,5 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
 -/////////////////////////////

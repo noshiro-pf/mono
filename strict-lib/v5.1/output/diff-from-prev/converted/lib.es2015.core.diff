@@ -1,8 +1,8 @@
 diff --git a/v5.0/output/lib-files/lib.es2015.core.d.ts b/v5.1/output/lib-files/lib.es2015.core.d.ts
-index a7d044e25fb1bc00a5178b54b8fc503c2a93d4da..8057f26841b47ba202514981181af00e5fba97ff 100644
+index 71883373ae66906ff34aa404fcd9dbd9bf6b3aa2..996d9fe75ef963fcfbfcf7b902cda32995d6cc14 100644
 --- a/v5.0/output/lib-files/lib.es2015.core.d.ts
 +++ b/v5.1/output/lib-files/lib.es2015.core.d.ts
-@@ -49,10 +49,10 @@ interface Array<T> {
+@@ -71,10 +71,10 @@ interface Array<T> {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it

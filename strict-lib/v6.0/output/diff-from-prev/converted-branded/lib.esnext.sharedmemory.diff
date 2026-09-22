@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.esnext.sharedmemory.d.ts b/v6.0/output/lib-files-branded/lib.esnext.sharedmemory.d.ts
-index 836fb241aed81fd2504c334f1b2eec72bb2a1a98..49e390b3185e610e6e2b92a4543985d388c5f365 100644
+index 6d3068e8c07dfba18829242058f9ac782bbc131f..9756a7975274a5965f773e8c522080a9da0edcc0 100644
 --- a/v5.9/output/lib-files-branded/lib.esnext.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.esnext.sharedmemory.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface Atomics {

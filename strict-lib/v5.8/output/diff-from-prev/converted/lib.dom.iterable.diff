@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files/lib.dom.iterable.d.ts b/v5.8/output/lib-files/lib.dom.iterable.d.ts
-index 1742446fefbc85cc16acfad9a1f64f834159e6f9..49740504fd1b38a8e12aa6872f0b8aba6465e5fc 100644
+index e14f7b210479bb626a2768d1c0f90292b2ecae78..8e42c096f5fab910795564f55c29b98a2f38fa54 100644
 --- a/v5.7/output/lib-files/lib.dom.iterable.d.ts
 +++ b/v5.8/output/lib-files/lib.dom.iterable.d.ts
-@@ -4,11 +4,6 @@
+@@ -26,11 +26,6 @@ and limitations under the License.
  /// Window Iterable APIs
  /////////////////////////////
  
@@ -14,7 +14,7 @@ index 1742446fefbc85cc16acfad9a1f64f834159e6f9..49740504fd1b38a8e12aa6872f0b8aba
  interface AudioParam {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime) */
    setValueCurveAtTime(
-@@ -205,6 +200,10 @@ interface IDBObjectStore {
+@@ -227,6 +222,10 @@ interface IDBObjectStore {
    ): IDBIndex;
  }
  
@@ -25,7 +25,7 @@ index 1742446fefbc85cc16acfad9a1f64f834159e6f9..49740504fd1b38a8e12aa6872f0b8aba
  interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
  
  interface MIDIOutput {
-@@ -381,7 +380,7 @@ interface SubtleCrypto {
+@@ -403,7 +402,7 @@ interface SubtleCrypto {
    ): Promise<CryptoKey>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
    generateKey(
@@ -34,7 +34,7 @@ index 1742446fefbc85cc16acfad9a1f64f834159e6f9..49740504fd1b38a8e12aa6872f0b8aba
      extractable: boolean,
      keyUsages: ReadonlyArray<'sign' | 'verify'>,
    ): Promise<CryptoKeyPair>;
-@@ -477,6 +476,8 @@ interface URLSearchParams {
+@@ -499,6 +498,8 @@ interface URLSearchParams {
    values(): URLSearchParamsIterator<string>;
  }
  
@@ -43,7 +43,7 @@ index 1742446fefbc85cc16acfad9a1f64f834159e6f9..49740504fd1b38a8e12aa6872f0b8aba
  interface WEBGL_draw_buffers {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_draw_buffers/drawBuffersWEBGL) */
    drawBuffersWEBGL(buffers: Iterable<GLenum>): void;
-@@ -718,7 +719,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -740,7 +741,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: number,
      srcLength?: GLuint,
    ): void;

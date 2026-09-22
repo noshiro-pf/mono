@@ -1,9 +1,31 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts b/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..279a25355891abddea17606d31c7142797bd4c64
+index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e5e88eac8
 --- /dev/null
 +++ b/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,192 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABILITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.es2025.iterator.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2015.iterable.d.ts" />
 +
 +// NOTE: This is specified as what is essentially an unreachable module. All actual global declarations can be found

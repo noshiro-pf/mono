@@ -1,14 +1,26 @@
 diff --git a/v5.9/output/lib-files/lib.es2022.regexp.d.ts b/v6.0/output/lib-files/lib.es2022.regexp.d.ts
-index 6d463d4ca3a33ad66fffc7f5b6ae59e52c3fad51..e80a823d21ffa4cf8dafb4fbe7ddd071082bfa49 100644
+index 8a507c7306e2de9ede3d47e89438830b5fab3184..5dda71c858bdeaad97d1d8d5784ec89774c4c3dd 100644
 --- a/v5.9/output/lib-files/lib.es2022.regexp.d.ts
 +++ b/v6.0/output/lib-files/lib.es2022.regexp.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface RegExpMatchArray {
    readonly indices?: RegExpIndicesArray;
  }
-@@ -8,7 +6,9 @@ interface RegExpExecArray {
+@@ -30,7 +28,9 @@ interface RegExpExecArray {
    readonly indices?: RegExpIndicesArray;
  }
  

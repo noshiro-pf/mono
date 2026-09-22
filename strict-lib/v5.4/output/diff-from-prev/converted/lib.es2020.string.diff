@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.es2020.string.d.ts b/v5.4/output/lib-files/lib.es2020.string.d.ts
-index 227ab91f935f93ba55acc8dd4d8d874eedb3545c..fac6484ff6101a90baa97c473613e4708c4e5d6d 100644
+index 3ecd0dced487d32dfa84a0c358a20f4f8a16c465..a579af6cc97d84222c6d01b3cfe092bf8d571369 100644
 --- a/v5.3/output/lib-files/lib.es2020.string.d.ts
 +++ b/v5.4/output/lib-files/lib.es2020.string.d.ts
-@@ -8,5 +8,23 @@ interface String {
+@@ -30,5 +30,23 @@ interface String {
     * containing the results of that search.
     * @param regexp A variable name or string literal containing the regular expression pattern and flags.
     */

@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.dom.d.ts b/v5.5/output/lib-files/lib.dom.d.ts
-index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247c3de5a91 100644
+index 1628b1dddf1ef71d9eec57f65fa11291daf35186..528279008c90f50d6b43cbe9dd242105538f6f2b 100644
 --- a/v5.4/output/lib-files/lib.dom.d.ts
 +++ b/v5.5/output/lib-files/lib.dom.d.ts
-@@ -203,6 +203,9 @@ interface ChannelSplitterOptions extends AudioNodeOptions {
+@@ -225,6 +225,9 @@ interface ChannelSplitterOptions extends AudioNodeOptions {
  interface CheckVisibilityOptions {
    checkOpacity?: boolean;
    checkVisibilityCSS?: boolean;
@@ -12,7 +12,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  }
  
  interface ClientQueryOptions {
-@@ -269,6 +272,10 @@ interface ConstrainULongRange extends ULongRange {
+@@ -291,6 +294,10 @@ interface ConstrainULongRange extends ULongRange {
    ideal?: number;
  }
  
@@ -23,7 +23,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  interface ConvolverOptions extends AudioNodeOptions {
    buffer?: AudioBuffer | null;
    disableNormalization?: boolean;
-@@ -558,6 +565,8 @@ interface GainOptions extends AudioNodeOptions {
+@@ -580,6 +587,8 @@ interface GainOptions extends AudioNodeOptions {
  
  interface GamepadEffectParameters {
    duration?: number;
@@ -32,7 +32,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    startDelay?: number;
    strongMagnitude?: number;
    weakMagnitude?: number;
-@@ -1364,8 +1373,8 @@ interface RTCIceCandidateInit {
+@@ -1386,8 +1395,8 @@ interface RTCIceCandidateInit {
  }
  
  interface RTCIceCandidatePair {
@@ -43,7 +43,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  }
  
  interface RTCIceCandidatePairStats extends RTCStats {
-@@ -1620,6 +1629,17 @@ interface ReadableStreamGetReaderOptions {
+@@ -1642,6 +1651,17 @@ interface ReadableStreamGetReaderOptions {
    mode?: ReadableStreamReaderMode;
  }
  
@@ -61,7 +61,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  interface ReadableStreamReadDoneResult<T> {
    done: true;
    value?: T;
-@@ -1751,21 +1771,22 @@ interface ScrollToOptions extends ScrollOptions {
+@@ -1773,21 +1793,22 @@ interface ScrollToOptions extends ScrollOptions {
  interface SecurityPolicyViolationEventInit extends EventInit {
    blockedURI?: string;
    columnNumber?: number;
@@ -90,7 +90,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    slotAssignment?: SlotAssignmentMode;
  }
  
-@@ -2205,6 +2226,8 @@ interface ARIAMixin {
+@@ -2227,6 +2248,8 @@ interface ARIAMixin {
    ariaAtomic: string | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/ariaAutoComplete) */
    ariaAutoComplete: string | null;
@@ -99,7 +99,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/ariaBusy) */
    ariaBusy: string | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/ariaChecked) */
-@@ -2353,6 +2376,8 @@ declare const AbortSignal: {
+@@ -2375,6 +2398,8 @@ declare const AbortSignal: {
    new (): AbortSignal;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
    abort(reason?: unknown): AbortSignal;
@@ -108,7 +108,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
    timeout(milliseconds: number): AbortSignal;
  };
-@@ -4074,6 +4099,16 @@ declare const CSSScale: {
+@@ -4096,6 +4121,16 @@ declare const CSSScale: {
    new (x: CSSNumberish, y: CSSNumberish, z?: CSSNumberish): CSSScale;
  };
  
@@ -125,7 +125,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew) */
  interface CSSSkew extends CSSTransformComponent {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew/ax) */
-@@ -4109,6 +4144,14 @@ declare const CSSSkewY: {
+@@ -4131,6 +4166,14 @@ declare const CSSSkewY: {
    new (ay: CSSNumericValue): CSSSkewY;
  };
  
@@ -140,7 +140,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  /**
   * An object that is a CSS declaration block, and exposes style information and various style-related methods and properties.
   *
-@@ -4334,6 +4377,7 @@ interface CSSStyleDeclaration {
+@@ -4356,6 +4399,7 @@ interface CSSStyleDeclaration {
    clipRule: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/color) */
    color: string;
@@ -148,7 +148,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    colorInterpolation: string;
    colorInterpolationFilters: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/color-scheme) */
-@@ -4378,6 +4422,8 @@ interface CSSStyleDeclaration {
+@@ -4400,6 +4444,8 @@ interface CSSStyleDeclaration {
    containerType: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/content) */
    content: string;
@@ -157,7 +157,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/counter-increment) */
    counterIncrement: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/counter-reset) */
-@@ -4879,6 +4925,8 @@ interface CSSStyleDeclaration {
+@@ -4901,6 +4947,8 @@ interface CSSStyleDeclaration {
    textUnderlinePosition: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/text-wrap) */
    textWrap: string;
@@ -166,7 +166,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/top) */
    top: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/touch-action) */
-@@ -4893,6 +4941,8 @@ interface CSSStyleDeclaration {
+@@ -4915,6 +4963,8 @@ interface CSSStyleDeclaration {
    transformStyle: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/transition) */
    transition: string;
@@ -175,7 +175,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/transition-delay) */
    transitionDelay: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/transition-duration) */
-@@ -5314,6 +5364,8 @@ interface CSSStyleDeclaration {
+@@ -5336,6 +5386,8 @@ interface CSSStyleDeclaration {
    webkitUserSelect: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/white-space) */
    whiteSpace: string;
@@ -184,7 +184,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/widows) */
    widows: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/width) */
-@@ -5332,6 +5384,8 @@ interface CSSStyleDeclaration {
+@@ -5354,6 +5406,8 @@ interface CSSStyleDeclaration {
    y: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/CSS/z-index) */
    zIndex: string;
@@ -193,7 +193,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleDeclaration/getPropertyPriority) */
    getPropertyPriority(property: string): string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSStyleDeclaration/getPropertyValue) */
-@@ -6317,6 +6371,20 @@ declare const ConstantSourceNode: {
+@@ -6339,6 +6393,20 @@ declare const ConstantSourceNode: {
    ): ConstantSourceNode;
  };
  
@@ -214,7 +214,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  /**
   * An AudioNode that performs a Linear Convolution on a given AudioBuffer, often used to achieve a reverb effect. A ConvolverNode always has exactly one input and one output.
   *
-@@ -6487,6 +6555,19 @@ declare const CustomEvent: {
+@@ -6509,6 +6577,19 @@ declare const CustomEvent: {
    new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
  };
  
@@ -234,7 +234,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  /**
   * An abnormal event (called an exception) which occurs as a result of calling a method or accessing a property of a web API.
   *
-@@ -7778,6 +7859,9 @@ interface Document
+@@ -7800,6 +7881,9 @@ interface Document
    createEvent(eventInterface: 'ClipboardEvent'): ClipboardEvent;
    createEvent(eventInterface: 'CloseEvent'): CloseEvent;
    createEvent(eventInterface: 'CompositionEvent'): CompositionEvent;
@@ -244,7 +244,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    createEvent(eventInterface: 'CustomEvent'): CustomEvent;
    createEvent(eventInterface: 'DeviceMotionEvent'): DeviceMotionEvent;
    createEvent(eventInterface: 'DeviceOrientationEvent'): DeviceOrientationEvent;
-@@ -8100,6 +8184,7 @@ interface Document
+@@ -8122,6 +8206,7 @@ interface Document
  declare const Document: {
    prototype: Document;
    new (): Document;
@@ -252,7 +252,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  };
  
  /**
-@@ -8590,6 +8675,7 @@ interface Element
+@@ -8612,6 +8697,7 @@ interface Element
    setAttributeNode(attr: Attr): Attr | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/setAttributeNodeNS) */
    setAttributeNodeNS(attr: Attr): Attr | null;
@@ -260,7 +260,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/setPointerCapture) */
    setPointerCapture(pointerId: number): void;
    /**
-@@ -8670,6 +8756,8 @@ interface ElementInternals extends ARIAMixin {
+@@ -8692,6 +8778,8 @@ interface ElementInternals extends ARIAMixin {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ElementInternals/shadowRoot)
     */
    readonly shadowRoot: ShadowRoot | null;
@@ -269,7 +269,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /**
     * Returns the error message that would be shown to the user if internals's target element was to be checked for validity.
     *
-@@ -9580,7 +9668,6 @@ declare const GainNode: {
+@@ -9602,7 +9690,6 @@ declare const GainNode: {
  
  /**
   * This Gamepad API interface defines an individual gamepad or other controller, allowing access to information such as button presses, axis positions, and id.
@@ -277,7 +277,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Gamepad)
   */
-@@ -9599,7 +9686,7 @@ interface Gamepad {
+@@ -9621,7 +9708,7 @@ interface Gamepad {
    readonly mapping: GamepadMappingType;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Gamepad/timestamp) */
    readonly timestamp: DOMHighResTimeStamp;
@@ -286,7 +286,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  }
  
  declare const Gamepad: {
-@@ -9609,7 +9696,6 @@ declare const Gamepad: {
+@@ -9631,7 +9718,6 @@ declare const Gamepad: {
  
  /**
   * An individual button of a gamepad or other controller, allowing access to the current state of different types of buttons available on the control device.
@@ -294,7 +294,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/GamepadButton)
   */
-@@ -9629,7 +9715,6 @@ declare const GamepadButton: {
+@@ -9651,7 +9737,6 @@ declare const GamepadButton: {
  
  /**
   * This Gamepad API interface contains references to gamepads connected to the system, which is what the gamepad events Window.gamepadconnected and Window.gamepaddisconnected are fired in response to.
@@ -302,7 +302,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/GamepadEvent)
   */
-@@ -9649,8 +9734,6 @@ declare const GamepadEvent: {
+@@ -9671,8 +9756,6 @@ declare const GamepadEvent: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/GamepadHapticActuator)
   */
  interface GamepadHapticActuator {
@@ -311,7 +311,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    playEffect(
      type: GamepadHapticEffectType,
      params?: GamepadEffectParameters,
-@@ -10462,6 +10545,7 @@ interface HTMLAnchorElement extends HTMLElement, HTMLHyperlinkElementUtils {
+@@ -10484,6 +10567,7 @@ interface HTMLAnchorElement extends HTMLElement, HTMLHyperlinkElementUtils {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement/name)
     */
    name: string;
@@ -319,7 +319,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    ping: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement/referrerPolicy) */
    referrerPolicy: string;
-@@ -10555,6 +10639,7 @@ interface HTMLAreaElement extends HTMLElement, HTMLHyperlinkElementUtils {
+@@ -10577,6 +10661,7 @@ interface HTMLAreaElement extends HTMLElement, HTMLHyperlinkElementUtils {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAreaElement/noHref)
     */
    noHref: boolean;
@@ -327,7 +327,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    ping: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLAreaElement/referrerPolicy) */
    referrerPolicy: string;
-@@ -11448,7 +11533,11 @@ declare const HTMLElement: {
+@@ -11470,7 +11555,11 @@ declare const HTMLElement: {
  interface HTMLEmbedElement extends HTMLElement {
    /** @deprecated */
    align: string;
@@ -340,7 +340,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    height: string;
    /**
     * Sets or retrieves the name of the object.
-@@ -11458,7 +11547,11 @@ interface HTMLEmbedElement extends HTMLElement {
+@@ -11480,7 +11569,11 @@ interface HTMLEmbedElement extends HTMLElement {
    /** Sets or retrieves a URL to be loaded by the object. */
    src: string;
    type: string;
@@ -353,7 +353,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    width: string;
    getSVGDocument(): Document | null;
    addEventListener<K extends keyof HTMLElementEventMap>(
-@@ -12203,6 +12296,7 @@ interface HTMLIFrameElement extends HTMLElement {
+@@ -12225,6 +12318,7 @@ interface HTMLIFrameElement extends HTMLElement {
     */
    align: string;
    allow: string;
@@ -361,7 +361,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    allowFullscreen: boolean;
    /**
     * Retrieves the document object of the page or frame.
-@@ -12229,6 +12323,7 @@ interface HTMLIFrameElement extends HTMLElement {
+@@ -12251,6 +12345,7 @@ interface HTMLIFrameElement extends HTMLElement {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLIFrameElement/height)
     */
    height: string;
@@ -369,7 +369,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    loading: string;
    /**
     * Sets or retrieves a URI to a long description of the object.
-@@ -12500,7 +12595,11 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -12522,7 +12617,11 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
    checked: boolean;
    /** Sets or retrieves the state of the check box or radio button. */
    defaultChecked: boolean;
@@ -382,7 +382,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    defaultValue: string;
    dirName: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/disabled) */
-@@ -12559,12 +12658,25 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -12581,12 +12680,25 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/list)
     */
    readonly list: HTMLDataListElement | null;
@@ -411,7 +411,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    minLength: number;
    /**
     * Sets or retrieves the Boolean value indicating whether multiple items can be selected from a list.
-@@ -12595,16 +12707,28 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -12617,16 +12729,28 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
    required: boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/selectionDirection) */
    selectionDirection: 'forward' | 'backward' | 'none' | null;
@@ -443,7 +443,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    type: string;
    /**
     * Sets or retrieves the URL, often with a bookmark extension (#name), to use as a client-side image map.
-@@ -12623,7 +12747,11 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -12645,7 +12769,11 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/validity)
     */
    readonly validity: ValidityState;
@@ -456,7 +456,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    value: string;
    /** Returns a Date object representing the form control's value, if applicable; otherwise, returns null. Can be set, to change the value. Throws an "InvalidStateError" DOMException if the control isn't date- or time-based. */
    valueAsDate: Date | null;
-@@ -13348,16 +13476,31 @@ declare const HTMLMenuElement: {
+@@ -13370,16 +13498,31 @@ declare const HTMLMenuElement: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMetaElement)
   */
  interface HTMLMetaElement extends HTMLElement {
@@ -491,7 +491,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
     */
    scheme: string;
    addEventListener<K extends keyof HTMLElementEventMap>(
-@@ -13633,6 +13776,7 @@ interface HTMLObjectElement extends HTMLElement {
+@@ -13655,6 +13798,7 @@ interface HTMLObjectElement extends HTMLElement {
    type: string;
    /**
     * Sets or retrieves the URL, often with a bookmark extension (#name), to use as a client-side image map.
@@ -499,7 +499,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLObjectElement/useMap)
     */
-@@ -14384,7 +14528,7 @@ interface HTMLSelectElement extends HTMLElement {
+@@ -14406,7 +14550,7 @@ interface HTMLSelectElement extends HTMLElement {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLSelectElement/type)
     */
@@ -508,7 +508,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /**
     * Returns the error message that would be displayed if the user submits the form, or an empty string if no error message. It also triggers the standard error message, such as "this is a required field". The result is that the user sees validation messages without actually submitting.
     *
-@@ -14531,6 +14675,7 @@ declare const HTMLSlotElement: {
+@@ -14553,6 +14697,7 @@ declare const HTMLSlotElement: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLSourceElement)
   */
  interface HTMLSourceElement extends HTMLElement {
@@ -516,7 +516,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    height: number;
    /**
     * Gets or sets the intended media type of the media source.
-@@ -14554,6 +14699,7 @@ interface HTMLSourceElement extends HTMLElement {
+@@ -14576,6 +14721,7 @@ interface HTMLSourceElement extends HTMLElement {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLSourceElement/type)
     */
    type: string;
@@ -524,7 +524,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    width: number;
    addEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
-@@ -15435,7 +15581,11 @@ interface HTMLTextAreaElement extends HTMLElement {
+@@ -15457,7 +15603,11 @@ interface HTMLTextAreaElement extends HTMLElement {
    selectionStart: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLTextAreaElement/textLength) */
    readonly textLength: number;
@@ -537,7 +537,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    readonly type: string;
    /** Returns the error message that would be displayed if the user submits the form, or an empty string if no error message. It also triggers the standard error message, such as "this is a required field". The result is that the user sees validation messages without actually submitting. */
    readonly validationMessage: string;
-@@ -15773,11 +15923,13 @@ interface HTMLVideoElement extends HTMLMediaElement {
+@@ -15795,11 +15945,13 @@ interface HTMLVideoElement extends HTMLMediaElement {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement/width)
     */
    width: number;
@@ -551,7 +551,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    requestVideoFrameCallback(callback: VideoFrameRequestCallback): number;
    addEventListener<K extends keyof HTMLVideoElementEventMap>(
      type: K,
-@@ -17048,6 +17200,29 @@ declare const KeyframeEffect: {
+@@ -17070,6 +17222,29 @@ declare const KeyframeEffect: {
    new (source: KeyframeEffect): KeyframeEffect;
  };
  
@@ -581,7 +581,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  interface LinkStyle {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLLinkElement/sheet) */
    readonly sheet: CSSStyleSheet | null;
-@@ -26177,6 +26352,8 @@ interface ShadowRootEventMap {
+@@ -26199,6 +26374,8 @@ interface ShadowRootEventMap {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot) */
  interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot, InnerHTML {
@@ -590,7 +590,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot/delegatesFocus) */
    readonly delegatesFocus: boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot/host) */
-@@ -26186,6 +26363,7 @@ interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot, InnerHTML {
+@@ -26208,6 +26385,7 @@ interface ShadowRoot extends DocumentFragment, DocumentOrShadowRoot, InnerHTML {
    onslotchange: ((this: ShadowRoot, ev: Event) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot/slotAssignment) */
    readonly slotAssignment: SlotAssignmentMode;
@@ -598,7 +598,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    /** Throws a "NotSupportedError" DOMException if context object is a shadow root. */
    addEventListener<K extends keyof ShadowRootEventMap>(
      type: K,
-@@ -32055,7 +32233,11 @@ interface Window
+@@ -32077,7 +32255,11 @@ interface Window
    readonly window: Window & typeof globalThis;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/alert) */
    alert(message?: unknown): void;
@@ -611,7 +611,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
    blur(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
    cancelIdleCallback(handle: number): void;
-@@ -33932,7 +34114,11 @@ declare const visualViewport: VisualViewport | null;
+@@ -33954,7 +34136,11 @@ declare const visualViewport: VisualViewport | null;
  declare const window: Window & typeof globalThis;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/alert) */
  declare function alert(message?: unknown): void;
@@ -624,7 +624,7 @@ index 5cd3db14c1646c28fecdde1f8039e1b8ef49d392..2706739de1750e26065659e9d7fca247
  declare function blur(): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
  declare function cancelIdleCallback(handle: number): void;
-@@ -34971,8 +35157,7 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
+@@ -34993,8 +35179,7 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';

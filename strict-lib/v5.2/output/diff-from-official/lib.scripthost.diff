@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.scripthost.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  /////////////////////////////
-@@ -20,9 +5,9 @@ and limitations under the License.
+@@ -20,9 +27,9 @@ and limitations under the License.
  /////////////////////////////
  
  interface ActiveXObject {
@@ -29,7 +24,7 @@
  
  interface ITextWriter {
    Write(s: string): void;
-@@ -34,12 +19,12 @@ interface TextStreamBase {
+@@ -34,12 +41,12 @@ interface TextStreamBase {
    /**
     * The column number of the current character position in an input stream.
     */
@@ -44,7 +39,7 @@
  
    /**
     * Closes a text stream.
-@@ -103,38 +88,38 @@ interface TextStreamReader extends TextStreamBase {
+@@ -103,38 +110,38 @@ interface TextStreamReader extends TextStreamBase {
    /**
     * Indicates whether the stream pointer position is at the end of a line.
     */
@@ -91,7 +86,7 @@
  
    /**
     * Forces the script to stop immediately, with an optional exit code.
-@@ -144,60 +129,60 @@ declare var WScript: {
+@@ -144,60 +151,60 @@ declare var WScript: {
    /**
     * The Windows Script Host build version number.
     */
@@ -163,7 +158,7 @@
  
    /**
     * Retrieves an existing object with the specified ProgID from memory, or creates a new one from a file.
-@@ -206,7 +191,11 @@ declare var WScript: {
+@@ -206,7 +213,11 @@ declare var WScript: {
     * @param strProgID
     * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
     */
@@ -176,7 +171,7 @@
  
    /**
     * Suspends script execution for a specified length of time, then continues execution.
-@@ -218,12 +207,12 @@ declare var WScript: {
+@@ -218,12 +229,12 @@ declare var WScript: {
  /**
   * WSH is an alias for WScript under Windows Script Host
   */
@@ -191,7 +186,7 @@
    private constructor();
    private SafeArray_typekey: SafeArray<T>;
  }
-@@ -231,7 +220,7 @@ declare class SafeArray<T = any> {
+@@ -231,7 +242,7 @@ declare class SafeArray<T = any> {
  /**
   * Allows enumerating over a COM collection, which may not have indexed item access.
   */
@@ -200,7 +195,7 @@
    /**
     * Returns true if the current item is the last one in the collection, or the collection is empty,
     * or the current item is undefined.
-@@ -257,17 +246,17 @@ interface Enumerator<T = any> {
+@@ -257,17 +268,17 @@ interface Enumerator<T = any> {
  }
  
  interface EnumeratorConstructor {
@@ -223,7 +218,7 @@
    /**
     * Returns the number of dimensions (1-based).
     */
-@@ -276,7 +265,7 @@ interface VBArray<T = any> {
+@@ -276,7 +287,7 @@ interface VBArray<T = any> {
    /**
     * Takes an index for each dimension in the array, and returns the item at the corresponding location.
     */
@@ -232,7 +227,7 @@
  
    /**
     * Returns the smallest available index for a given dimension.
-@@ -299,10 +288,10 @@ interface VBArray<T = any> {
+@@ -299,10 +310,10 @@ interface VBArray<T = any> {
  }
  
  interface VBArrayConstructor {
@@ -245,7 +240,7 @@
  
  /**
   * Automation date (VT_DATE)
-@@ -317,5 +306,5 @@ interface DateConstructor {
+@@ -317,5 +328,5 @@ interface DateConstructor {
  }
  
  interface Date {

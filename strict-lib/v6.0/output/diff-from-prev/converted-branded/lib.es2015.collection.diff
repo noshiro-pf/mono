@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
-index 8b8b65757f0467fcc501cea7140840e9df307742..a6f4b4802cb35c91a54d8967899fdaa8b539b5f0 100644
+index d86858975169c5ce0027e801557de95c3745c69a..b79813d51a9fd978eba8dbc2462bceb277f37b55 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.collection.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
-@@ -1,6 +1,7 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,9 +20,10 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface Map<K, V> {
@@ -12,7 +24,7 @@ index 8b8b65757f0467fcc501cea7140840e9df307742..a6f4b4802cb35c91a54d8967899fdaa8
    clear(): void;
    /**
     * @returns true if an element in the Map existed and has been removed, or false if the element does not exist.
-@@ -84,7 +85,9 @@ interface Set<T> {
+@@ -106,7 +107,9 @@ interface Set<T> {
     * Appends a new element with a specified value to the end of the Set.
     */
    add(value: T): this;

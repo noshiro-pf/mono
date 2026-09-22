@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2016.intl.d.ts b/v5.7/output/lib-files/lib.es2016.intl.d.ts
-index f01c7cefefbf4f064c9992410ab4968d10659198..575dcc91424e2683ac26e5502b36ec0be0f9c60e 100644
+index e171364919384696ce109dc339751a544cd92824..a27f7bb835e720f2ccbc11ca58c612c088b45f19 100644
 --- a/v5.6/output/lib-files/lib.es2016.intl.d.ts
 +++ b/v5.7/output/lib-files/lib.es2016.intl.d.ts
-@@ -6,7 +6,7 @@ declare namespace Intl {
+@@ -28,7 +28,7 @@ declare namespace Intl {
     * the canonical locale names. Duplicates will be omitted and elements
     * will be validated as structurally valid language tags.
     *

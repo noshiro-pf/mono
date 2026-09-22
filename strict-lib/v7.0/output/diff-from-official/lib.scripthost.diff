@@ -1,19 +1,14 @@
-@@ -1,26 +1,11 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,14 +13,21 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.scripthost.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /////////////////////////////
  /// Windows Script Host APIS
  /////////////////////////////
@@ -27,7 +22,7 @@
  
  interface ITextWriter {
    Write(s: string): void;
-@@ -32,12 +17,12 @@ interface TextStreamBase {
+@@ -32,12 +39,12 @@ interface TextStreamBase {
    /**
     * The column number of the current character position in an input stream.
     */
@@ -42,7 +37,7 @@
  
    /**
     * Closes a text stream.
-@@ -101,38 +86,38 @@ interface TextStreamReader extends TextStreamBase {
+@@ -101,38 +108,38 @@ interface TextStreamReader extends TextStreamBase {
    /**
     * Indicates whether the stream pointer position is at the end of a line.
     */
@@ -89,7 +84,7 @@
  
    /**
     * Forces the script to stop immediately, with an optional exit code.
-@@ -142,60 +127,60 @@ declare var WScript: {
+@@ -142,60 +149,60 @@ declare var WScript: {
    /**
     * The Windows Script Host build version number.
     */
@@ -161,7 +156,7 @@
  
    /**
     * Retrieves an existing object with the specified ProgID from memory, or creates a new one from a file.
-@@ -204,7 +189,11 @@ declare var WScript: {
+@@ -204,7 +211,11 @@ declare var WScript: {
     * @param strProgID
     * @param strPrefix Function names in the form prefix_event will be bound to this object's COM events.
     */
@@ -174,7 +169,7 @@
  
    /**
     * Suspends script execution for a specified length of time, then continues execution.
-@@ -216,12 +205,12 @@ declare var WScript: {
+@@ -216,12 +227,12 @@ declare var WScript: {
  /**
   * WSH is an alias for WScript under Windows Script Host
   */
@@ -189,7 +184,7 @@
    private constructor();
    private SafeArray_typekey: SafeArray<T>;
  }
-@@ -229,7 +218,7 @@ declare class SafeArray<T = any> {
+@@ -229,7 +240,7 @@ declare class SafeArray<T = any> {
  /**
   * Allows enumerating over a COM collection, which may not have indexed item access.
   */
@@ -198,7 +193,7 @@
    /**
     * Returns true if the current item is the last one in the collection, or the collection is empty,
     * or the current item is undefined.
-@@ -255,17 +244,17 @@ interface Enumerator<T = any> {
+@@ -255,17 +266,17 @@ interface Enumerator<T = any> {
  }
  
  interface EnumeratorConstructor {
@@ -221,7 +216,7 @@
    /**
     * Returns the number of dimensions (1-based).
     */
-@@ -274,7 +263,7 @@ interface VBArray<T = any> {
+@@ -274,7 +285,7 @@ interface VBArray<T = any> {
    /**
     * Takes an index for each dimension in the array, and returns the item at the corresponding location.
     */
@@ -230,7 +225,7 @@
  
    /**
     * Returns the smallest available index for a given dimension.
-@@ -297,10 +286,10 @@ interface VBArray<T = any> {
+@@ -297,10 +308,10 @@ interface VBArray<T = any> {
  }
  
  interface VBArrayConstructor {
@@ -243,7 +238,7 @@
  
  /**
   * Automation date (VT_DATE)
-@@ -315,5 +304,5 @@ interface DateConstructor {
+@@ -315,5 +326,5 @@ interface DateConstructor {
  }
  
  interface Date {

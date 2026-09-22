@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2015.symbol.d.ts b/v7.0/output/lib-files-branded/lib.es2015.symbol.d.ts
-index 663725be37a6b2a136622cd2bfe5f18fe4861900..3df2235d8520e7dd0cca38ba65f054584c2a3e0c 100644
+index 256bd32dcb1340d277eed3e7f6a4f7f87df58d70..7f9ed1ee4514d42819086125ae12c37108de73db 100644
 --- a/v6.0/output/lib-files-branded/lib.es2015.symbol.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2015.symbol.d.ts
-@@ -19,7 +19,7 @@ interface SymbolConstructor {
+@@ -41,7 +41,7 @@ interface SymbolConstructor {
  
    /**
     * Returns a key from the global symbol registry matching the given Symbol if found.

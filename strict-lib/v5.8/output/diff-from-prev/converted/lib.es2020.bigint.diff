@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files/lib.es2020.bigint.d.ts b/v5.8/output/lib-files/lib.es2020.bigint.d.ts
-index fe09957cdc7589f72034b881c51a7275c23cc3dc..a26819781306719df59b18e6a661e1875386c578 100644
+index 3e414a01a0c9fd16699d4435380010fcf698aa70..af44b7dfaeb392b5a29a902ac3e1f77e4944ad9a 100644
 --- a/v5.7/output/lib-files/lib.es2020.bigint.d.ts
 +++ b/v5.8/output/lib-files/lib.es2020.bigint.d.ts
-@@ -487,6 +487,11 @@ interface BigInt64ArrayConstructor {
+@@ -509,6 +509,11 @@ interface BigInt64ArrayConstructor {
      byteOffset?: number,
      length?: number,
    ): BigInt64Array<TArrayBuffer>;
@@ -14,7 +14,7 @@ index fe09957cdc7589f72034b881c51a7275c23cc3dc..a26819781306719df59b18e6a661e187
    new (array: ArrayLike<bigint> | ArrayBuffer): BigInt64Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
-@@ -500,14 +505,13 @@ interface BigInt64ArrayConstructor {
+@@ -522,14 +527,13 @@ interface BigInt64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -32,7 +32,7 @@ index fe09957cdc7589f72034b881c51a7275c23cc3dc..a26819781306719df59b18e6a661e187
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -516,6 +520,24 @@ interface BigInt64ArrayConstructor {
+@@ -538,6 +542,24 @@ interface BigInt64ArrayConstructor {
      mapfn: (v: U, k: number) => bigint,
      thisArg?: unknown,
    ): BigInt64Array<ArrayBuffer>;
@@ -57,7 +57,7 @@ index fe09957cdc7589f72034b881c51a7275c23cc3dc..a26819781306719df59b18e6a661e187
  }
  declare const BigInt64Array: BigInt64ArrayConstructor;
  
-@@ -858,6 +880,11 @@ interface BigUint64ArrayConstructor {
+@@ -880,6 +902,11 @@ interface BigUint64ArrayConstructor {
      byteOffset?: number,
      length?: number,
    ): BigUint64Array<TArrayBuffer>;
@@ -69,7 +69,7 @@ index fe09957cdc7589f72034b881c51a7275c23cc3dc..a26819781306719df59b18e6a661e187
    new (array: ArrayLike<bigint> | ArrayBuffer): BigUint64Array<ArrayBuffer>;
  
    /** The size in bytes of each element in the array. */
-@@ -871,16 +898,39 @@ interface BigUint64ArrayConstructor {
+@@ -893,16 +920,39 @@ interface BigUint64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.

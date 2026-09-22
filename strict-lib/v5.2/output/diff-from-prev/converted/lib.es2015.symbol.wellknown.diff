@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files/lib.es2015.symbol.wellknown.d.ts b/v5.2/output/lib-files/lib.es2015.symbol.wellknown.d.ts
-index cb627f3092f082262d0968db99e644626100086c..2c146e3c5a41dd0e53ee2cbcfe5c96b6af0e5e8b 100644
+index a36b58ad81e7cdc2424f6513a4e2c171130367e7..b7e46051f9d5a70915392bce76efcaae2ce053b3 100644
 --- a/v5.1/output/lib-files/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.2/output/lib-files/lib.es2015.symbol.wellknown.d.ts
-@@ -121,7 +121,7 @@ interface Map<K, V> {
+@@ -143,7 +143,7 @@ interface Map<K, V> {
    readonly [Symbol.toStringTag]: string;
  }
  
@@ -11,7 +11,7 @@ index cb627f3092f082262d0968db99e644626100086c..2c146e3c5a41dd0e53ee2cbcfe5c96b6
    readonly [Symbol.toStringTag]: string;
  }
  
-@@ -129,7 +129,7 @@ interface Set<T> {
+@@ -151,7 +151,7 @@ interface Set<T> {
    readonly [Symbol.toStringTag]: string;
  }
  

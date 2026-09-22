@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
-index cc295f769b1a04114b6e10a8aefe680c4c60aa0d..61b14ec7e4fe2c8551dae519641323f2e3e05532 100644
+index ecfecefdae9dfd2b270de5236dd92a61134a108a..65582903599f86c0ed51900b713a50e576b785d7 100644
 --- a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
-@@ -505,6 +505,14 @@ interface Float16ArrayConstructor {
+@@ -527,6 +527,14 @@ interface Float16ArrayConstructor {
      byteOffset?: NumberType.TypedArraySize,
      length?: NumberType.TypedArraySize,
    ): Float16Array<TArrayBuffer>;

@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.full.d.ts b/v6.0/output/lib-files/lib.esnext.full.d.ts
-index e333099b5415e32fb4b161a5923eca144702b491..c84935fdd2c747eb75afabcf207f87154e877401 100644
+index c662b84948e5e86c58a9440e9fee0780e0296bc5..4cd2a33bccf0d8371e35f5077fbded4c36785085 100644
 --- a/v5.9/output/lib-files/lib.esnext.full.d.ts
 +++ b/v6.0/output/lib-files/lib.esnext.full.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.esnext.d.ts" />

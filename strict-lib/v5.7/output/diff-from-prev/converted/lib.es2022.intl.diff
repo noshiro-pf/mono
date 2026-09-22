@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2022.intl.d.ts b/v5.7/output/lib-files/lib.es2022.intl.d.ts
-index 814d11100e4595f9019c171336721bad71c1c9c7..6b5d19a437e8a8ec023347f57665912a2017ab90 100644
+index 89aeb3e4d75742fb39bea10b515d3ba297233e08..a5b53f343752da911a1ea31124e8b53ee6275eed 100644
 --- a/v5.6/output/lib-files/lib.es2022.intl.d.ts
 +++ b/v5.7/output/lib-files/lib.es2022.intl.d.ts
-@@ -4,7 +4,7 @@ declare namespace Intl {
+@@ -26,7 +26,7 @@ declare namespace Intl {
    /**
     * An object with some or all properties of the `Intl.Segmenter` constructor `options` parameter.
     *
@@ -11,7 +11,7 @@ index 814d11100e4595f9019c171336721bad71c1c9c7..6b5d19a437e8a8ec023347f57665912a
     */
    interface SegmenterOptions {
      /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
-@@ -72,14 +72,14 @@ declare namespace Intl {
+@@ -94,14 +94,14 @@ declare namespace Intl {
       *
       * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
       *  For the general form and interpretation of the `locales` argument,
@@ -30,7 +30,7 @@ index 814d11100e4595f9019c171336721bad71c1c9c7..6b5d19a437e8a8ec023347f57665912a
       */
      new (locales?: LocalesArgument, options?: SegmenterOptions): Segmenter;
  
-@@ -88,12 +88,12 @@ declare namespace Intl {
+@@ -110,12 +110,12 @@ declare namespace Intl {
       *
       * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
       *  For the general form and interpretation of the `locales` argument,
@@ -46,7 +46,7 @@ index 814d11100e4595f9019c171336721bad71c1c9c7..6b5d19a437e8a8ec023347f57665912a
       */
      supportedLocalesOf(
        locales: LocalesArgument,
-@@ -103,7 +103,7 @@ declare namespace Intl {
+@@ -125,7 +125,7 @@ declare namespace Intl {
  
    /**
     * Returns a sorted array of the supported collation, calendar, currency, numbering system, timezones, and units by the implementation.

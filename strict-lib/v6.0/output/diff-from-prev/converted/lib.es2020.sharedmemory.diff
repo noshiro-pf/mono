@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2020.sharedmemory.d.ts b/v6.0/output/lib-files/lib.es2020.sharedmemory.d.ts
-index efc974b8fd7b0937ed1dd9578124b75d3f2869b2..dd6cb3e0c8f4d82355a826339654a29028aa23dd 100644
+index 010c05a1242d1dce70d1ebd0a8c8d119a2c3baff..34880ac20b337863b1bc5a379e3fb92b3e4494ef 100644
 --- a/v5.9/output/lib-files/lib.es2020.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files/lib.es2020.sharedmemory.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2020.bigint.d.ts" />

@@ -138,6 +138,21 @@ const skipForStubFile =
   (src) =>
     src.includes(stubFileMarker) ? src : fn(src);
 
+/**
+ * The notice that follows the Microsoft banner in every generated file. Each
+ * file is published inside a bundle that also carries `LICENSE` and
+ * `NOTICE`, which is where the derivation is spelled out once.
+ */
+const modificationNotice = (filename: string): string =>
+  dedent`
+    /*
+     * Modified from TypeScript's \`${filename}\` by strict-ts-lib
+     * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
+     * stricter types. This is not the original file. See the NOTICE and LICENSE
+     * files of the package this ships in.
+     */
+  `;
+
 export const convert = (
   filename: string,
   converterConfig: ConverterConfig,
@@ -156,13 +171,20 @@ export const convert = (
   return (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        // Remove the leading Microsoft copyright banner. Matched as a regex
-        // (the whole `/*! … */` block at the top of the file) rather than a
-        // literal, because the exact wording drifts between TypeScript releases
-        // — e.g. TS 6.0 fixed the long-standing "MERCHANTABLITY" typo to
-        // "MERCHANTABILITY". The match span is identical to the old literal for
-        // 5.x, so their generated output is unchanged.
-        replaceWithNoMatchCheck(/^\/\*![\s\S]*?\*\//gu, ''),
+        // Keep the leading Microsoft copyright banner, and say under it that
+        // the file is not the original. The lib files are Apache-2.0, whose
+        // section 4 asks exactly this of a derivative work: retain the
+        // notices the source carries, and mark modified files as modified.
+        // Matched as a regex (the whole `/*! … */` block at the top of the
+        // file) rather than a literal, because the exact wording drifts
+        // between TypeScript releases — e.g. TS 6.0 fixed the long-standing
+        // "MERCHANTABLITY" typo to "MERCHANTABILITY" — and with the no-match
+        // check on, a release that drops the banner fails here rather than
+        // shipping without it.
+        replaceWithNoMatchCheck(
+          /^\/\*![\s\S]*?\*\//gu,
+          `$&\n\n${modificationNotice(filename)}`,
+        ),
         replaceWithNoMatchCheck(
           '/// <reference no-default-lib="true"/>',
           dedent`

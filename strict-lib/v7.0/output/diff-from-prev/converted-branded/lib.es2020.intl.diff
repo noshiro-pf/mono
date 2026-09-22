@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2020.intl.d.ts b/v7.0/output/lib-files-branded/lib.es2020.intl.d.ts
-index 7df921265899c66572a26fb1f600676aba3ae141..2280ea5b9613aeadc1c74f580f42242ccb2b2312 100644
+index 01aae901f559227a8cfea587ae678ccca23a98be..17045de7a291f178b06c528ca9f251768a1f6fa3 100644
 --- a/v6.0/output/lib-files-branded/lib.es2020.intl.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2020.intl.d.ts
-@@ -157,15 +157,15 @@ declare namespace Intl {
+@@ -179,15 +179,15 @@ declare namespace Intl {
      format(value: number, unit: RelativeTimeFormatUnit): string;
  
      /**

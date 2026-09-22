@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2022.intl.d.ts b/v6.0/output/lib-files/lib.es2022.intl.d.ts
-index ce8271c051c57aa4406c4c534207371c7f1e07a1..2de69bc914f0929014291e5614e2108749597be9 100644
+index 8d34a8fa2500628475caf7810e1da939bfcb5fc8..167b0e24c5eba5fafe9e6ab7917f24c05f26eb65 100644
 --- a/v5.9/output/lib-files/lib.es2022.intl.d.ts
 +++ b/v6.0/output/lib-files/lib.es2022.intl.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  declare namespace Intl {

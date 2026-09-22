@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts
-index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757b9f6b71d 100644
+index f934ea67ef5851fe2941bb4e1c6a8fe4c8e192be..d001868ee3d5ed9fcdcf69789b485f9ad0d28d7e 100644
 --- a/v5.5/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts
-@@ -183,7 +183,7 @@ interface BigInt64Array {
+@@ -205,7 +205,7 @@ interface BigInt64Array {
    ): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -11,7 +11,7 @@ index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757
      readonly [NumberType.TypedArraySize, import('ts-type-forge').BigInt64]
    >;
  
-@@ -315,7 +315,7 @@ interface BigInt64Array {
+@@ -337,7 +337,7 @@ interface BigInt64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -20,7 +20,7 @@ index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -501,9 +501,9 @@ interface BigInt64Array {
+@@ -523,9 +523,9 @@ interface BigInt64Array {
    valueOf(): BigInt64Array;
  
    /** Yields each value in the array. */
@@ -32,7 +32,7 @@ index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757
  
    readonly [Symbol.toStringTag]: 'BigInt64Array';
  
-@@ -581,7 +581,7 @@ interface BigUint64Array {
+@@ -603,7 +603,7 @@ interface BigUint64Array {
    ): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -41,7 +41,7 @@ index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757
      readonly [NumberType.TypedArraySize, import('ts-type-forge').BigUint64]
    >;
  
-@@ -713,7 +713,7 @@ interface BigUint64Array {
+@@ -735,7 +735,7 @@ interface BigUint64Array {
    join(separator?: string): string;
  
    /** Yields each index in the array. */
@@ -50,7 +50,7 @@ index 7e2e3dbe567311de4275f520669ae11aded6add0..4124ec72b49a7538151f80833f2bf757
  
    /**
     * Returns the index of the last occurrence of a value in an array.
-@@ -899,9 +899,9 @@ interface BigUint64Array {
+@@ -921,9 +921,9 @@ interface BigUint64Array {
    valueOf(): BigUint64Array;
  
    /** Yields each value in the array. */

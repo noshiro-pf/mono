@@ -1,8 +1,8 @@
 diff --git a/v5.2/output/lib-files-branded/lib.dom.d.ts b/v5.3/output/lib-files-branded/lib.dom.d.ts
-index 36a549188785ee56949b5cc5270aab6e446b0ec6..6ce12613bc17c14d42069c5b1f638f1d2d2fc0b6 100644
+index fb28868aa6454e39519dfa7e1c92081b853eb2e4..8e312ec0dce01358223fc8210c86514e8fa58dd6 100644
 --- a/v5.2/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.3/output/lib-files-branded/lib.dom.d.ts
-@@ -1423,6 +1423,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
+@@ -1445,6 +1445,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
    keyFramesDecoded?: number;
    kind: string;
    lastPacketReceivedTimestamp?: DOMHighResTimeStamp;
@@ -10,7 +10,7 @@ index 36a549188785ee56949b5cc5270aab6e446b0ec6..6ce12613bc17c14d42069c5b1f638f1d
    nackCount?: number;
    packetsDiscarded?: number;
    pliCount?: number;
-@@ -1437,6 +1438,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
+@@ -1459,6 +1460,7 @@ interface RTCInboundRtpStreamStats extends RTCReceivedRtpStreamStats {
    totalSamplesDuration?: number;
    totalSamplesReceived?: number;
    totalSquaredInterFrameDelay?: number;
@@ -18,7 +18,7 @@ index 36a549188785ee56949b5cc5270aab6e446b0ec6..6ce12613bc17c14d42069c5b1f638f1d
  }
  
  interface RTCLocalSessionDescriptionInit {
-@@ -26813,7 +26815,16 @@ interface SubtleCrypto {
+@@ -26835,7 +26837,16 @@ interface SubtleCrypto {
      format: Exclude<KeyFormat, 'jwk'>,
      key: CryptoKey,
    ): Promise<ArrayBuffer>;

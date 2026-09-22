@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files/lib.dom.iterable.d.ts b/v5.9/output/lib-files/lib.dom.iterable.d.ts
-index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d48658afb6435 100644
+index 8e42c096f5fab910795564f55c29b98a2f38fa54..695203c9badd011e7b41d782b817b6ecb5619abe 100644
 --- a/v5.8/output/lib-files/lib.dom.iterable.d.ts
 +++ b/v5.9/output/lib-files/lib.dom.iterable.d.ts
-@@ -5,7 +5,11 @@
+@@ -27,7 +27,11 @@ and limitations under the License.
  /////////////////////////////
  
  interface AudioParam {
@@ -15,7 +15,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    setValueCurveAtTime(
      values: Iterable<number>,
      startTime: number,
-@@ -16,12 +20,20 @@ interface AudioParam {
+@@ -38,12 +42,20 @@ interface AudioParam {
  interface AudioParamMap extends ReadonlyMap<string, AudioParam> {}
  
  interface BaseAudioContext {
@@ -38,7 +38,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    createPeriodicWave(
      real: Iterable<number>,
      imag: Iterable<number>,
-@@ -63,7 +75,11 @@ interface CSSUnparsedValue {
+@@ -85,7 +97,11 @@ interface CSSUnparsedValue {
  }
  
  interface Cache {
@@ -51,7 +51,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    addAll(requests: Iterable<RequestInfo>): Promise<void>;
  }
  
-@@ -83,6 +99,21 @@ interface CanvasPathDrawingStyles {
+@@ -105,6 +121,21 @@ interface CanvasPathDrawingStyles {
    setLineDash(segments: Iterable<number>): void;
  }
  
@@ -73,7 +73,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
  interface CustomStateSet extends Set<string> {}
  
  interface DOMRectList {
-@@ -174,7 +205,7 @@ interface HighlightRegistry extends Map<string, Highlight> {}
+@@ -196,7 +227,7 @@ interface HighlightRegistry extends Map<string, Highlight> {}
  
  interface IDBDatabase {
    /**
@@ -82,7 +82,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
     */
-@@ -187,9 +218,7 @@ interface IDBDatabase {
+@@ -209,9 +240,7 @@ interface IDBDatabase {
  
  interface IDBObjectStore {
    /**
@@ -93,7 +93,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/createIndex)
     */
-@@ -207,7 +236,11 @@ interface ImageTrackList {
+@@ -229,7 +258,11 @@ interface ImageTrackList {
  interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
  
  interface MIDIOutput {
@@ -106,7 +106,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    send(data: Iterable<number>, timestamp?: DOMHighResTimeStamp): void;
  }
  
-@@ -258,6 +291,7 @@ interface NamedNodeMap {
+@@ -280,6 +313,7 @@ interface NamedNodeMap {
  
  interface Navigator {
    /**
@@ -114,7 +114,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
     * Available only in secure contexts.
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigator/requestMediaKeySystemAccess)
-@@ -266,7 +300,11 @@ interface Navigator {
+@@ -288,7 +322,11 @@ interface Navigator {
      keySystem: string,
      supportedConfigurations: Iterable<MediaKeySystemConfiguration>,
    ): Promise<MediaKeySystemAccess>;
@@ -127,7 +127,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    vibrate(pattern: Iterable<number>): boolean;
  }
  
-@@ -299,7 +337,11 @@ interface PluginArray {
+@@ -321,7 +359,11 @@ interface PluginArray {
  }
  
  interface RTCRtpTransceiver {
@@ -140,7 +140,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    setCodecPreferences(codecs: Iterable<RTCRtpCodec>): void;
  }
  
-@@ -361,7 +403,11 @@ interface StyleSheetList {
+@@ -383,7 +425,11 @@ interface StyleSheetList {
  }
  
  interface SubtleCrypto {
@@ -153,7 +153,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    deriveKey(
      algorithm:
        | AlgorithmIdentifier
-@@ -378,7 +424,11 @@ interface SubtleCrypto {
+@@ -400,7 +446,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -166,7 +166,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    generateKey(
      algorithm: 'Ed25519' | { readonly name: 'Ed25519' },
      extractable: boolean,
-@@ -399,7 +449,11 @@ interface SubtleCrypto {
+@@ -421,7 +471,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKeyPair | CryptoKey>;
@@ -179,7 +179,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    importKey(
      format: 'jwk',
      keyData: JsonWebKey,
-@@ -424,7 +478,11 @@ interface SubtleCrypto {
+@@ -446,7 +500,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -192,7 +192,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
    unwrapKey(
      format: KeyFormat,
      wrappedKey: BufferSource,
-@@ -479,50 +537,70 @@ interface URLSearchParams {
+@@ -501,50 +559,70 @@ interface URLSearchParams {
  interface ViewTransitionTypeSet extends Set<string> {}
  
  interface WEBGL_draw_buffers {
@@ -278,7 +278,7 @@ index 49740504fd1b38a8e12aa6872f0b8aba6465e5fc..bd94fcb9037eff2f6f157af4c70d4865
      offsetsOffset: number,
      drawcount: GLsizei,
    ): void;
-@@ -562,7 +640,7 @@ interface WebGL2RenderingContextBase {
+@@ -584,7 +662,7 @@ interface WebGL2RenderingContextBase {
    getUniformIndices(
      program: WebGLProgram,
      uniformNames: Iterable<string>,

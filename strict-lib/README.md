@@ -126,4 +126,9 @@ definition for 'es2022.sharedmemory'`.
 
 ## License
 
-This project is licensed under the [Apache License 2.0](./LICENSE).
+[Apache License 2.0](../LICENSE), the same license as the TypeScript lib
+files every package here is generated from (Copyright Microsoft Corporation).
+Each generated file keeps the upstream copyright banner and states beneath it
+that it was modified, and each published bundle ships `LICENSE` and a
+`NOTICE` naming the upstream commit — which is what Apache-2.0 section 4 asks
+of a derivative work.

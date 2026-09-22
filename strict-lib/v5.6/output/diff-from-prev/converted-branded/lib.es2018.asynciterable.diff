@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.es2018.asynciterable.d.ts b/v5.6/output/lib-files-branded/lib.es2018.asynciterable.d.ts
-index c38125bfacb8b2677c9150c5f3ba03aaa1e5b911..bc643700bcf535bb94bf5768201a4ef023cf7947 100644
+index 043eb492e067b30e0e2da6389c5b9db4b215a750..e66da031ba0fb17a36f25cfeb495d44c0bb5fc07 100644
 --- a/v5.5/output/lib-files-branded/lib.es2018.asynciterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.es2018.asynciterable.d.ts
-@@ -11,10 +11,10 @@ interface SymbolConstructor {
+@@ -33,10 +33,10 @@ interface SymbolConstructor {
    readonly asyncIterator: unique symbol;
  }
  
@@ -15,7 +15,7 @@ index c38125bfacb8b2677c9150c5f3ba03aaa1e5b911..bc643700bcf535bb94bf5768201a4ef0
    ): Promise<IteratorResult<T, TReturn>>;
    return?(
      value?: TReturn | PromiseLike<TReturn>,
-@@ -22,10 +22,28 @@ interface AsyncIterator<T, TReturn = any, TNext = undefined> {
+@@ -44,10 +44,28 @@ interface AsyncIterator<T, TReturn = any, TNext = undefined> {
    throw?(e?: unknown): Promise<IteratorResult<T, TReturn>>;
  }
  

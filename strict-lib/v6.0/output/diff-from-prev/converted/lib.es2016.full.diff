@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2016.full.d.ts b/v6.0/output/lib-files/lib.es2016.full.d.ts
-index 2c2f211eefda52ab35ffea0ed8d9a566875690b1..7c354fea44e7bf4714b6e8a8d481412bd915ca87 100644
+index b83eca46a9f96a8623a6042b41b6fa84e9c46027..b76224b1992209b4f4fb7339708c944192b058ed 100644
 --- a/v5.9/output/lib-files/lib.es2016.full.d.ts
 +++ b/v6.0/output/lib-files/lib.es2016.full.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2016.d.ts" />

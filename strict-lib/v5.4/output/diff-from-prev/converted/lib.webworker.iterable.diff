@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.webworker.iterable.d.ts b/v5.4/output/lib-files/lib.webworker.iterable.d.ts
-index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a183446426 100644
+index fef3f9f156c336e3d2bb00a8dacda4887e8b04de..435a7754c41f7337fa01f0ed33f9ad6edcb08fcd 100644
 --- a/v5.3/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.4/output/lib-files/lib.webworker.iterable.d.ts
-@@ -150,6 +150,11 @@ interface SubtleCrypto {
+@@ -172,6 +172,11 @@ interface SubtleCrypto {
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
@@ -14,7 +14,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
    generateKey(
      algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
      extractable: boolean,
-@@ -232,42 +237,42 @@ interface WEBGL_multi_draw {
+@@ -254,42 +259,42 @@ interface WEBGL_multi_draw {
    multiDrawArraysInstancedWEBGL(
      mode: GLenum,
      firstsList: Int32Array | Iterable<GLint>,
@@ -67,7 +67,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      drawcount: GLsizei,
    ): void;
  }
-@@ -278,21 +283,21 @@ interface WebGL2RenderingContextBase {
+@@ -300,21 +305,21 @@ interface WebGL2RenderingContextBase {
      buffer: GLenum,
      drawbuffer: GLint,
      values: Iterable<GLfloat>,
@@ -92,7 +92,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/drawBuffers) */
    drawBuffers(buffers: Iterable<GLenum>): void;
-@@ -328,28 +333,28 @@ interface WebGL2RenderingContextBase {
+@@ -350,28 +355,28 @@ interface WebGL2RenderingContextBase {
    uniform1uiv(
      location: WebGLUniformLocation | null,
      data: Iterable<GLuint>,
@@ -125,7 +125,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -357,7 +362,7 @@ interface WebGL2RenderingContextBase {
+@@ -379,7 +384,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -134,7 +134,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -365,7 +370,7 @@ interface WebGL2RenderingContextBase {
+@@ -387,7 +392,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -143,7 +143,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -373,7 +378,7 @@ interface WebGL2RenderingContextBase {
+@@ -395,7 +400,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -152,7 +152,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -381,7 +386,7 @@ interface WebGL2RenderingContextBase {
+@@ -403,7 +408,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -161,7 +161,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -389,7 +394,7 @@ interface WebGL2RenderingContextBase {
+@@ -411,7 +416,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -170,7 +170,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -397,7 +402,7 @@ interface WebGL2RenderingContextBase {
+@@ -419,7 +424,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -179,7 +179,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribI) */
-@@ -411,56 +416,56 @@ interface WebGL2RenderingContextOverloads {
+@@ -433,56 +438,56 @@ interface WebGL2RenderingContextOverloads {
    uniform1fv(
      location: WebGLUniformLocation | null,
      data: Iterable<GLfloat>,
@@ -244,7 +244,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -468,7 +473,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -490,7 +495,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -253,7 +253,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -476,7 +481,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -498,7 +503,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,
@@ -262,7 +262,7 @@ index d1782f9c04f9eeba6859741e634fcad0576824a9..0816bced5c2ff6369c992db23d6cc2a1
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -484,7 +489,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -506,7 +511,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Iterable<GLfloat>,

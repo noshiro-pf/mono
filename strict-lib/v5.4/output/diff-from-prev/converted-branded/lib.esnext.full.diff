@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files-branded/lib.esnext.full.d.ts b/v5.4/output/lib-files-branded/lib.esnext.full.d.ts
-index d6615409fef0e5df17813afd225343d56549043e..e333099b5415e32fb4b161a5923eca144702b491 100644
+index a86374ffe02a3ba1c104c9cf18b5adcb9a5cfbe7..c662b84948e5e86c58a9440e9fee0780e0296bc5 100644
 --- a/v5.3/output/lib-files-branded/lib.esnext.full.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.esnext.full.d.ts
-@@ -5,3 +5,4 @@
+@@ -27,3 +27,4 @@ and limitations under the License.
  /// <reference path="./lib.webworker.importscripts.d.ts" />
  /// <reference path="./lib.scripthost.d.ts" />
  /// <reference path="./lib.dom.iterable.d.ts" />

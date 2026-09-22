@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files/lib.es2015.core.d.ts b/v7.0/output/lib-files/lib.es2015.core.d.ts
-index b426e29f61b4e53e844a341f19549efdf7f90cb9..0e9c12af1a2584cf476e9f5b214c09b3af12c0ca 100644
+index 3c102d3e9daf5e9ac6b6a3b2f944ea3a00faa6fe..3faaf503817c2ccc075ebc53df05f7172b4723bf 100644
 --- a/v6.0/output/lib-files/lib.es2015.core.d.ts
 +++ b/v7.0/output/lib-files/lib.es2015.core.d.ts
-@@ -110,7 +110,7 @@ interface Math {
+@@ -132,7 +132,7 @@ interface Math {
    imul(x: number, y: number): number;
  
    /**

@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files-branded/lib.webworker.iterable.d.ts b/v5.8/output/lib-files-branded/lib.webworker.iterable.d.ts
-index 5c26799d6b6e1d0a351daf74c3b548399326ef64..ffca25e54d4e7e6af627679857d5a3e5e67afa63 100644
+index d33f1db847bc3708034aa1f23f550b3a8a61a1d7..b3bd0c2a35640dd912c1942375bd38313c488f20 100644
 --- a/v5.7/output/lib-files-branded/lib.webworker.iterable.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.webworker.iterable.d.ts
-@@ -4,11 +4,6 @@
+@@ -26,11 +26,6 @@ and limitations under the License.
  /// Worker Iterable APIs
  /////////////////////////////
  
@@ -14,7 +14,7 @@ index 5c26799d6b6e1d0a351daf74c3b548399326ef64..ffca25e54d4e7e6af627679857d5a3e5
  interface CSSNumericArray {
    [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
    entries(): ArrayIterator<readonly [number, CSSNumericValue]>;
-@@ -125,6 +120,10 @@ interface IDBObjectStore {
+@@ -147,6 +142,10 @@ interface IDBObjectStore {
    ): IDBIndex;
  }
  
@@ -25,7 +25,7 @@ index 5c26799d6b6e1d0a351daf74c3b548399326ef64..ffca25e54d4e7e6af627679857d5a3e5
  interface MessageEvent<T = unknown> {
    /** @deprecated */
    initMessageEvent(
-@@ -178,7 +177,7 @@ interface SubtleCrypto {
+@@ -200,7 +199,7 @@ interface SubtleCrypto {
    ): Promise<CryptoKey>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
    generateKey(
@@ -34,7 +34,7 @@ index 5c26799d6b6e1d0a351daf74c3b548399326ef64..ffca25e54d4e7e6af627679857d5a3e5
      extractable: boolean,
      keyUsages: ReadonlyArray<'sign' | 'verify'>,
    ): Promise<CryptoKeyPair>;
-@@ -503,7 +502,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -525,7 +524,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: number,
      srcLength?: GLuint,
    ): void;

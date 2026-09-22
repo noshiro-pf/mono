@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2020.d.ts b/v6.0/output/lib-files-branded/lib.es2020.d.ts
-index 80a994ef2a85fed48eb817b8c98294b1d545cae1..490a371daad522322da060b632ed3955a8371baf 100644
+index 9dc47edc501b8e162e4e9a9e7a6f30d0547ab964..f98016712ef7e11dbcdff4570f68421672cfa2b3 100644
 --- a/v5.9/output/lib-files-branded/lib.es2020.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2020.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2019.d.ts" />

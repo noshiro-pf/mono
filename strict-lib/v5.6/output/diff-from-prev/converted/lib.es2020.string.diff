@@ -1,8 +1,9 @@
 diff --git a/v5.5/output/lib-files/lib.es2020.string.d.ts b/v5.6/output/lib-files/lib.es2020.string.d.ts
-index fac6484ff6101a90baa97c473613e4708c4e5d6d..5af0551976d8c634762f0982bb5039238cb41152 100644
+index a579af6cc97d84222c6d01b3cfe092bf8d571369..e1de11a5258f2fbd63b381b1bf89812e85e1804b 100644
 --- a/v5.5/output/lib-files/lib.es2020.string.d.ts
 +++ b/v5.6/output/lib-files/lib.es2020.string.d.ts
-@@ -1,6 +1,6 @@
+@@ -22,7 +22,7 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 -/// <reference path="./lib.es2015.iterable.d.ts" />
@@ -10,7 +11,7 @@ index fac6484ff6101a90baa97c473613e4708c4e5d6d..5af0551976d8c634762f0982bb503923
  
  interface String {
    /**
-@@ -8,7 +8,7 @@ interface String {
+@@ -30,7 +30,7 @@ interface String {
     * containing the results of that search.
     * @param regexp A variable name or string literal containing the regular expression pattern and flags.
     */

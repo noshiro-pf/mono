@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.webworker.d.ts b/v5.2/output/lib-files-branded/lib.webworker.d.ts
-index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647dac226f12 100644
+index b0e330ab5c50faa390c653960bcdfd3c3bc6faa0..68fd35612f2e70bce6bc5ecebbf624a80be7cd66 100644
 --- a/v5.1/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.webworker.d.ts
-@@ -437,7 +437,7 @@ interface NotificationOptions {
+@@ -459,7 +459,7 @@ interface NotificationOptions {
    lang?: string;
    renotify?: boolean;
    requireInteraction?: boolean;
@@ -11,7 +11,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    tag?: string;
    timestamp?: EpochTimeStamp;
    vibrate?: VibratePattern;
-@@ -522,7 +522,6 @@ interface RTCEncodedAudioFrameMetadata {
+@@ -544,7 +544,6 @@ interface RTCEncodedAudioFrameMetadata {
  }
  
  interface RTCEncodedVideoFrameMetadata {
@@ -19,7 +19,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    dependencies?: readonly number[];
    frameId?: number;
    height?: number;
-@@ -692,8 +691,8 @@ interface TextDecoderOptions {
+@@ -714,8 +713,8 @@ interface TextDecoderOptions {
  }
  
  interface TextEncoderEncodeIntoResult {
@@ -30,7 +30,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  }
  
  interface Transformer<I = unknown, O = unknown> {
-@@ -851,6 +850,32 @@ interface WebGLContextEventInit extends EventInit {
+@@ -873,6 +872,32 @@ interface WebGLContextEventInit extends EventInit {
    statusMessage?: string;
  }
  
@@ -63,7 +63,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  interface WorkerOptions {
    credentials?: RequestCredentials;
    name?: string;
-@@ -962,9 +987,9 @@ interface AbortSignal extends EventTarget {
+@@ -984,9 +1009,9 @@ interface AbortSignal extends EventTarget {
  declare const AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
@@ -75,7 +75,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    timeout(milliseconds: number): AbortSignal;
  };
  
-@@ -1822,6 +1847,8 @@ interface CanvasShadowStyles {
+@@ -1844,6 +1869,8 @@ interface CanvasShadowStyles {
  }
  
  interface CanvasState {
@@ -84,7 +84,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/restore) */
    restore(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/save) */
-@@ -2326,7 +2353,7 @@ interface DOMPoint extends DOMPointReadOnly {
+@@ -2348,7 +2375,7 @@ interface DOMPoint extends DOMPointReadOnly {
  declare const DOMPoint: {
    prototype: DOMPoint;
    new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
@@ -93,7 +93,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    fromPoint(other?: DOMPointInit): DOMPoint;
  };
  
-@@ -2349,7 +2376,7 @@ interface DOMPointReadOnly {
+@@ -2371,7 +2398,7 @@ interface DOMPointReadOnly {
  declare const DOMPointReadOnly: {
    prototype: DOMPointReadOnly;
    new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
@@ -102,7 +102,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    fromPoint(other?: DOMPointInit): DOMPointReadOnly;
  };
  
-@@ -2423,7 +2450,7 @@ declare const DOMRectReadOnly: {
+@@ -2445,7 +2472,7 @@ declare const DOMRectReadOnly: {
      width?: number,
      height?: number,
    ): DOMRectReadOnly;
@@ -111,7 +111,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    fromRect(other?: DOMRectInit): DOMRectReadOnly;
  };
  
-@@ -3231,11 +3258,17 @@ interface FileSystemSyncAccessHandle {
+@@ -3253,11 +3280,17 @@ interface FileSystemSyncAccessHandle {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemSyncAccessHandle/getSize) */
    getSize(): number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileSystemSyncAccessHandle/read) */
@@ -131,7 +131,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  }
  
  declare const FileSystemSyncAccessHandle: {
-@@ -3431,6 +3464,8 @@ interface Headers {
+@@ -3453,6 +3486,8 @@ interface Headers {
    delete(name: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get) */
    get(name: string): string | null;
@@ -140,7 +140,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has) */
    has(name: string): boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set) */
-@@ -3819,7 +3854,7 @@ declare const IDBKeyRange: {
+@@ -3841,7 +3876,7 @@ declare const IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range.
     *
@@ -149,7 +149,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
     */
    bound(
      lower: unknown,
-@@ -3830,19 +3865,19 @@ declare const IDBKeyRange: {
+@@ -3852,19 +3887,19 @@ declare const IDBKeyRange: {
    /**
     * Returns a new IDBKeyRange starting at key with no upper bound. If open is true, key is not included in the range.
     *
@@ -172,7 +172,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
     */
    upperBound(upper: unknown, open?: boolean): IDBKeyRange;
  };
-@@ -4657,6 +4692,8 @@ interface Notification extends EventTarget {
+@@ -4679,6 +4714,8 @@ interface Notification extends EventTarget {
    onerror: ((this: Notification, ev: Event) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/show_event) */
    onshow: ((this: Notification, ev: Event) => unknown) | null;
@@ -181,7 +181,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/tag) */
    readonly tag: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/title) */
-@@ -4688,7 +4725,7 @@ interface Notification extends EventTarget {
+@@ -4710,7 +4747,7 @@ interface Notification extends EventTarget {
  declare const Notification: {
    prototype: Notification;
    new (title: string, options?: NotificationOptions): Notification;
@@ -190,7 +190,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    readonly permission: NotificationPermission;
  };
  
-@@ -5105,7 +5142,7 @@ interface PerformanceObserver {
+@@ -5127,7 +5164,7 @@ interface PerformanceObserver {
  declare const PerformanceObserver: {
    prototype: PerformanceObserver;
    new (callback: PerformanceObserverCallback): PerformanceObserver;
@@ -199,7 +199,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    readonly supportedEntryTypes: ReadonlyArray<string>;
  };
  
-@@ -5320,7 +5357,7 @@ interface PushManager {
+@@ -5342,7 +5379,7 @@ interface PushManager {
  declare const PushManager: {
    prototype: PushManager;
    new (): PushManager;
@@ -208,7 +208,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    readonly supportedContentEncodings: ReadonlyArray<string>;
  };
  
-@@ -5708,9 +5745,11 @@ interface Response extends Body {
+@@ -5730,9 +5767,11 @@ interface Response extends Body {
  declare const Response: {
    prototype: Response;
    new (body?: BodyInit | null, init?: ResponseInit): Response;
@@ -222,7 +222,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    redirect(url: string | URL, status?: number): Response;
  };
  
-@@ -5824,7 +5863,6 @@ interface ServiceWorkerContainer extends EventTarget {
+@@ -5846,7 +5885,6 @@ interface ServiceWorkerContainer extends EventTarget {
    onmessage:
      | ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown)
      | null;
@@ -230,7 +230,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    onmessageerror:
      | ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown)
      | null;
-@@ -6318,7 +6356,7 @@ interface TextDecoder extends TextDecoderCommon {
+@@ -6340,7 +6378,7 @@ interface TextDecoder extends TextDecoderCommon {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)
     */
@@ -239,7 +239,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  }
  
  declare const TextDecoder: {
-@@ -6533,14 +6571,18 @@ interface URL {
+@@ -6555,14 +6593,18 @@ interface URL {
  declare const URL: {
    prototype: URL;
    new (url: string | URL, base?: string | URL): URL;
@@ -260,7 +260,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /**
     * Appends a specified key/value pair as a new search parameter.
     *
-@@ -6552,7 +6594,7 @@ interface URLSearchParams {
+@@ -6574,7 +6616,7 @@ interface URLSearchParams {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)
     */
@@ -269,7 +269,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /**
     * Returns the first value associated to the given search parameter.
     *
-@@ -6570,7 +6612,7 @@ interface URLSearchParams {
+@@ -6592,7 +6634,7 @@ interface URLSearchParams {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)
     */
@@ -278,7 +278,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /**
     * Sets the value associated to a given search parameter to the given value. If there were several values, delete the others.
     *
-@@ -10093,6 +10135,100 @@ declare const WebSocket: {
+@@ -10115,6 +10157,100 @@ declare const WebSocket: {
    readonly CLOSED: 3;
  };
  
@@ -379,7 +379,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  /**
   * This ServiceWorker API interface represents the scope of a service worker client that is a document in a browser context, controlled by an active worker. The service worker client independently selects and uses a service worker for its own loading and sub-resources.
   *
-@@ -10754,16 +10890,19 @@ declare namespace WebAssembly {
+@@ -10776,16 +10912,19 @@ declare namespace WebAssembly {
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global) */
@@ -403,7 +403,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) */
-@@ -10840,9 +10979,9 @@ declare namespace WebAssembly {
+@@ -10862,9 +11001,9 @@ declare namespace WebAssembly {
      new (descriptor: TableDescriptor, value?: unknown): Table;
    };
  
@@ -415,7 +415,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    }
  
    interface MemoryDescriptor {
-@@ -10868,6 +11007,16 @@ declare namespace WebAssembly {
+@@ -10890,6 +11029,16 @@ declare namespace WebAssembly {
      maximum?: number;
    }
  
@@ -432,7 +432,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    interface WebAssemblyInstantiatedSource {
      instance: Instance;
      module: Module;
-@@ -10875,19 +11024,12 @@ declare namespace WebAssembly {
+@@ -10897,19 +11046,12 @@ declare namespace WebAssembly {
  
    type ImportExportKind = 'function' | 'global' | 'memory' | 'table';
    type TableKind = 'anyfunc' | 'externref';
@@ -453,7 +453,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile) */
    function compile(bytes: BufferSource): Promise<Module>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compileStreaming) */
-@@ -11195,6 +11337,7 @@ declare function removeEventListener(
+@@ -11217,6 +11359,7 @@ declare function removeEventListener(
    options?: boolean | EventListenerOptions,
  ): void;
  type AlgorithmIdentifier = Algorithm | string;
@@ -461,7 +461,7 @@ index 878b9913f733018a9b44ae91418406c1cb4d1ec2..520535e514a59d3d82d29e7eb082647d
  type BigInteger = Uint8Array;
  type BinaryData = ArrayBuffer | ArrayBufferView;
  type BlobPart = BufferSource | Blob | string;
-@@ -11493,6 +11636,8 @@ type VideoPixelFormat =
+@@ -11515,6 +11658,8 @@ type VideoPixelFormat =
    | 'RGBX';
  type VideoTransferCharacteristics = 'bt709' | 'iec61966-2-1' | 'smpte170m';
  type WebGLPowerPreference = 'default' | 'high-performance' | 'low-power';

@@ -1,8 +1,9 @@
 diff --git a/v5.6/output/lib-files/lib.es2020.string.d.ts b/v5.7/output/lib-files/lib.es2020.string.d.ts
-index 5af0551976d8c634762f0982bb5039238cb41152..639df38fbcd71354408d0ec1771ba23dbccd6803 100644
+index e1de11a5258f2fbd63b381b1bf89812e85e1804b..5731eb943b3d02f67cd0caa930727ceac5c96176 100644
 --- a/v5.6/output/lib-files/lib.es2020.string.d.ts
 +++ b/v5.7/output/lib-files/lib.es2020.string.d.ts
-@@ -1,5 +1,7 @@
+@@ -22,6 +22,8 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 +/// <reference path="./lib.es2015.iterable.d.ts" />

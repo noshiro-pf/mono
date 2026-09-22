@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files-branded/lib.es2022.intl.d.ts b/v5.9/output/lib-files-branded/lib.es2022.intl.d.ts
-index 682d5d9a605ea449ddd791c56e6f1ac682951bc1..a8032debe8487b5cc174bea8489d34cc2b35aa3b 100644
+index e11f4fcf1e75555057a0a2bbec3ae937fa445feb..bd09bc8ff63d646324ed59c58c9098dec8d4b958 100644
 --- a/v5.8/output/lib-files-branded/lib.es2022.intl.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.es2022.intl.d.ts
-@@ -13,15 +13,27 @@ declare namespace Intl {
+@@ -35,15 +35,27 @@ declare namespace Intl {
      readonly granularity?: 'grapheme' | 'word' | 'sentence' | undefined;
    }
  
@@ -30,7 +30,7 @@ index 682d5d9a605ea449ddd791c56e6f1ac682951bc1..a8032debe8487b5cc174bea8489d34cc
      resolvedOptions(): ResolvedSegmenterOptions;
    }
  
-@@ -38,13 +50,20 @@ declare namespace Intl {
+@@ -60,13 +72,20 @@ declare namespace Intl {
      [Symbol.iterator](): SegmentIterator<T>;
    }
  
@@ -52,7 +52,7 @@ index 682d5d9a605ea449ddd791c56e6f1ac682951bc1..a8032debe8487b5cc174bea8489d34cc
  
      /** Returns an iterator to iterate over the segments. */
      [Symbol.iterator](): SegmentIterator<SegmentData>;
-@@ -64,6 +83,11 @@ declare namespace Intl {
+@@ -86,6 +105,11 @@ declare namespace Intl {
      readonly isWordLike?: boolean;
    }
  

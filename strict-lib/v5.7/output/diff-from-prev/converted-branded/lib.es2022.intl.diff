@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2022.intl.d.ts b/v5.7/output/lib-files-branded/lib.es2022.intl.d.ts
-index f31f45ec1d86ad66faab5bc352b4a6051b666122..682d5d9a605ea449ddd791c56e6f1ac682951bc1 100644
+index d2b9636ca81bb3096adc8a3257333b18df150d77..e11f4fcf1e75555057a0a2bbec3ae937fa445feb 100644
 --- a/v5.6/output/lib-files-branded/lib.es2022.intl.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2022.intl.d.ts
-@@ -4,7 +4,7 @@ declare namespace Intl {
+@@ -26,7 +26,7 @@ declare namespace Intl {
    /**
     * An object with some or all properties of the `Intl.Segmenter` constructor `options` parameter.
     *
@@ -11,7 +11,7 @@ index f31f45ec1d86ad66faab5bc352b4a6051b666122..682d5d9a605ea449ddd791c56e6f1ac6
     */
    interface SegmenterOptions {
      /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
-@@ -72,14 +72,14 @@ declare namespace Intl {
+@@ -94,14 +94,14 @@ declare namespace Intl {
       *
       * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
       *  For the general form and interpretation of the `locales` argument,
@@ -30,7 +30,7 @@ index f31f45ec1d86ad66faab5bc352b4a6051b666122..682d5d9a605ea449ddd791c56e6f1ac6
       */
      new (locales?: LocalesArgument, options?: SegmenterOptions): Segmenter;
  
-@@ -88,12 +88,12 @@ declare namespace Intl {
+@@ -110,12 +110,12 @@ declare namespace Intl {
       *
       * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
       *  For the general form and interpretation of the `locales` argument,
@@ -46,7 +46,7 @@ index f31f45ec1d86ad66faab5bc352b4a6051b666122..682d5d9a605ea449ddd791c56e6f1ac6
       */
      supportedLocalesOf(
        locales: LocalesArgument,
-@@ -103,7 +103,7 @@ declare namespace Intl {
+@@ -125,7 +125,7 @@ declare namespace Intl {
  
    /**
     * Returns a sorted array of the supported collation, calendar, currency, numbering system, timezones, and units by the implementation.

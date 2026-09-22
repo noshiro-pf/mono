@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.esnext.collection.d.ts b/v5.5/output/lib-files-branded/lib.esnext.collection.d.ts
-index 7fa07f66f8ec8af723a258617597e0ddca94fa81..8229d9f96e3e909f0f6a048517dc13ddebeb35de 100644
+index 36d7ac5a759e02ff942b0185bbf46640c5f0f676..967aa58d33d561c6b9886bdc54f27baf7ede3407 100644
 --- a/v5.4/output/lib-files-branded/lib.esnext.collection.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.esnext.collection.d.ts
-@@ -11,3 +11,80 @@ interface MapConstructor {
+@@ -33,3 +33,80 @@ interface MapConstructor {
      keySelector: (item: T, index: NumberType.ArraySize) => K,
    ): ReadonlyMap<K, readonly T[]>;
  }

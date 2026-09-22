@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2015.iterable.d.ts b/v5.2/output/lib-files-branded/lib.es2015.iterable.d.ts
-index 4138f464a3b99b97efe9bcf1e04176a03fa75fd2..0f919c6cfc8b88b4d20a9a51eae0e67317867ce9 100644
+index d1ba93c78ca5ca2123e2f81de9137bd820ac2265..0ed37d635a5b19e9494bd37937b7a9bcf437a4eb 100644
 --- a/v5.1/output/lib-files-branded/lib.es2015.iterable.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2015.iterable.d.ts
-@@ -149,10 +149,12 @@ interface MapConstructor {
+@@ -171,10 +171,12 @@ interface MapConstructor {
    new <K, V>(iterable?: Iterable<readonly [K, V]>): Map<K, V>;
  }
  
@@ -17,7 +17,7 @@ index 4138f464a3b99b97efe9bcf1e04176a03fa75fd2..0f919c6cfc8b88b4d20a9a51eae0e673
  }
  
  interface Set<T> {
-@@ -198,10 +200,10 @@ interface SetConstructor {
+@@ -220,10 +222,10 @@ interface SetConstructor {
    new <T>(iterable?: Iterable<T>): Set<T>;
  }
  

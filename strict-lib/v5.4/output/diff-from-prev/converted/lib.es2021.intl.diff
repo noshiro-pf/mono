@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.es2021.intl.d.ts b/v5.4/output/lib-files/lib.es2021.intl.d.ts
-index d3c2c8e07f68d447320c067b449014a7e2e42c09..851d042ebcc7cb466ded86178f6185d26b650a7b 100644
+index c734ff199d0fc66a995b4cb07f10e2421442f801..be8e2d6ae458bc2817f852abc69016c4cbfc0db2 100644
 --- a/v5.3/output/lib-files/lib.es2021.intl.d.ts
 +++ b/v5.4/output/lib-files/lib.es2021.intl.d.ts
-@@ -135,10 +135,7 @@ declare namespace Intl {
+@@ -157,10 +157,7 @@ declare namespace Intl {
       *
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat).
       */
@@ -14,7 +14,7 @@ index d3c2c8e07f68d447320c067b449014a7e2e42c09..851d042ebcc7cb466ded86178f6185d2
  
      /**
       * Returns an array containing those of the provided locales that are
-@@ -157,8 +154,8 @@ declare namespace Intl {
+@@ -179,8 +176,8 @@ declare namespace Intl {
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/ListFormat/supportedLocalesOf).
       */
      supportedLocalesOf(

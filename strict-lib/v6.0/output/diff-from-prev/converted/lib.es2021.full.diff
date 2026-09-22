@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2021.full.d.ts b/v6.0/output/lib-files/lib.es2021.full.d.ts
-index ca5c00db1a66cd3ea7c4c08ab7add35ca215e8d6..efc584a07ee6bfe2c17bb27558c2d5001a29c243 100644
+index 0e0340cb1f9ef350aefc1bd6422b0fa065938369..6df6d10e4b61a3ab702c8f6b2de0706021e39cdc 100644
 --- a/v5.9/output/lib-files/lib.es2021.full.d.ts
 +++ b/v6.0/output/lib-files/lib.es2021.full.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2021.d.ts" />

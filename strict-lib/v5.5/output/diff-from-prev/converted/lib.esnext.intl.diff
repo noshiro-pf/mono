@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.esnext.intl.d.ts b/v5.5/output/lib-files/lib.esnext.intl.d.ts
-index fd0e99aa35ddd2871f92e524dba73e7339015230..a12fc86f3b55773ab214f1e00f4a2b44d27f47f3 100644
+index c90048a0a7ad550db3f463a76dd0f4e470724eba..f41426e2b471f7b286d830e919859d8a2cd239e8 100644
 --- a/v5.4/output/lib-files/lib.esnext.intl.d.ts
 +++ b/v5.5/output/lib-files/lib.esnext.intl.d.ts
-@@ -1,15 +1,5 @@
+@@ -23,15 +23,5 @@ and limitations under the License.
  /// <reference no-default-lib="true"/>
  
  declare namespace Intl {

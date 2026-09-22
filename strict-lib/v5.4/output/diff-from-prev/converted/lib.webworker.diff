@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.webworker.d.ts b/v5.4/output/lib-files/lib.webworker.d.ts
-index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51f46a19b4 100644
+index b85bc88cd9034bfdb853a99dbe38b16180aad636..0a863e4bcd9eddbd72c3149a069d38190874e1c7 100644
 --- a/v5.3/output/lib-files/lib.webworker.d.ts
 +++ b/v5.4/output/lib-files/lib.webworker.d.ts
-@@ -166,7 +166,7 @@ interface EcdsaParams extends Algorithm {
+@@ -188,7 +188,7 @@ interface EcdsaParams extends Algorithm {
  }
  
  interface EncodedVideoChunkInit {
@@ -11,7 +11,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    duration?: number;
    timestamp: number;
    type: EncodedVideoChunkType;
-@@ -250,7 +250,6 @@ interface FontFaceDescriptors {
+@@ -272,7 +272,6 @@ interface FontFaceDescriptors {
    stretch?: string;
    style?: string;
    unicodeRange?: string;
@@ -19,7 +19,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    weight?: string;
  }
  
-@@ -415,32 +414,21 @@ interface NavigationPreloadState {
+@@ -437,32 +436,21 @@ interface NavigationPreloadState {
    headerValue?: string;
  }
  
@@ -52,7 +52,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  }
  
  interface Pbkdf2Params extends Algorithm {
-@@ -518,16 +506,21 @@ interface QueuingStrategyInit {
+@@ -540,16 +528,21 @@ interface QueuingStrategyInit {
  
  interface RTCEncodedAudioFrameMetadata {
    contributingSources?: readonly number[];
@@ -74,7 +74,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    width?: number;
  }
  
-@@ -588,6 +581,7 @@ interface RequestInit {
+@@ -610,6 +603,7 @@ interface RequestInit {
    method?: string;
    /** A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request's mode. */
    mode?: RequestMode;
@@ -82,7 +82,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** A string indicating whether request follows redirects, results in an error upon encountering a redirect, or returns the redirect (in an opaque fashion). Sets request's redirect. */
    redirect?: RequestRedirect;
    /** A string whose value is a same-origin URL, "about:client", or the empty string, to set request's referrer. */
-@@ -760,7 +754,7 @@ interface VideoDecoderConfig {
+@@ -782,7 +776,7 @@ interface VideoDecoderConfig {
    codedHeight?: number;
    codedWidth?: number;
    colorSpace?: VideoColorSpaceInit;
@@ -91,7 +91,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    displayAspectHeight?: number;
    displayAspectWidth?: number;
    hardwareAcceleration?: HardwareAcceleration;
-@@ -873,7 +867,7 @@ interface WebTransportOptions {
+@@ -895,7 +889,7 @@ interface WebTransportOptions {
  }
  
  interface WebTransportSendStreamOptions {
@@ -100,7 +100,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  }
  
  interface WorkerOptions {
-@@ -1023,7 +1017,9 @@ interface AbstractWorker {
+@@ -1045,7 +1039,9 @@ interface AbstractWorker {
  }
  
  interface AnimationFrameProvider {
@@ -110,7 +110,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    requestAnimationFrame(callback: FrameRequestCallback): number;
  }
  
-@@ -1871,10 +1867,20 @@ interface CanvasTextDrawingStyles {
+@@ -1893,10 +1889,20 @@ interface CanvasTextDrawingStyles {
    font: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/fontKerning) */
    fontKerning: CanvasFontKerning;
@@ -131,7 +131,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  }
  
  interface CanvasTransform {
-@@ -2497,6 +2503,7 @@ declare const DecompressionStream: {
+@@ -2519,6 +2525,7 @@ declare const DecompressionStream: {
  interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
    message: MessageEvent;
    messageerror: MessageEvent;
@@ -139,7 +139,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  }
  
  /**
-@@ -2520,6 +2527,10 @@ interface DedicatedWorkerGlobalScope
+@@ -2542,6 +2549,10 @@ interface DedicatedWorkerGlobalScope
    onmessageerror:
      | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
      | null;
@@ -150,7 +150,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /**
     * Aborts dedicatedWorkerGlobal.
     *
-@@ -2653,7 +2664,7 @@ interface EncodedVideoChunk {
+@@ -2675,7 +2686,7 @@ interface EncodedVideoChunk {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk/type) */
    readonly type: EncodedVideoChunkType;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/EncodedVideoChunk/copyTo) */
@@ -159,7 +159,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  }
  
  declare const EncodedVideoChunk: {
-@@ -3110,7 +3121,11 @@ interface FileReader extends EventTarget {
+@@ -3132,7 +3143,11 @@ interface FileReader extends EventTarget {
    abort(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsArrayBuffer) */
    readAsArrayBuffer(blob: Blob): void;
@@ -172,7 +172,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readAsBinaryString(blob: Blob): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FileReader/readAsDataURL) */
    readAsDataURL(blob: Blob): void;
-@@ -3317,8 +3332,6 @@ interface FontFace {
+@@ -3339,8 +3354,6 @@ interface FontFace {
    style: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFace/unicodeRange) */
    unicodeRange: string;
@@ -181,7 +181,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFace/weight) */
    weight: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FontFace/load) */
-@@ -4672,6 +4685,8 @@ interface NotificationEventMap {
+@@ -4694,6 +4707,8 @@ interface NotificationEventMap {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification)
   */
  interface Notification extends EventTarget {
@@ -190,7 +190,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/body) */
    readonly body: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/data) */
-@@ -4690,6 +4705,8 @@ interface Notification extends EventTarget {
+@@ -4712,6 +4727,8 @@ interface Notification extends EventTarget {
    onerror: ((this: Notification, ev: Event) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/show_event) */
    onshow: ((this: Notification, ev: Event) => unknown) | null;
@@ -199,7 +199,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/silent) */
    readonly silent: boolean | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Notification/tag) */
-@@ -5424,9 +5441,13 @@ declare const PushSubscriptionOptions: {
+@@ -5446,9 +5463,13 @@ declare const PushSubscriptionOptions: {
    new (): PushSubscriptionOptions;
  };
  
@@ -213,7 +213,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    getMetadata(): RTCEncodedAudioFrameMetadata;
  }
  
-@@ -5435,10 +5456,15 @@ declare const RTCEncodedAudioFrame: {
+@@ -5457,10 +5478,15 @@ declare const RTCEncodedAudioFrame: {
    new (): RTCEncodedAudioFrame;
  };
  
@@ -229,7 +229,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    getMetadata(): RTCEncodedVideoFrameMetadata;
  }
  
-@@ -5447,6 +5473,36 @@ declare const RTCEncodedVideoFrame: {
+@@ -5469,6 +5495,36 @@ declare const RTCEncodedVideoFrame: {
    new (): RTCEncodedVideoFrame;
  };
  
@@ -266,7 +266,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController) */
  interface ReadableByteStreamController {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/byobRequest) */
-@@ -5861,6 +5917,7 @@ interface ServiceWorkerContainer extends EventTarget {
+@@ -5883,6 +5939,7 @@ interface ServiceWorkerContainer extends EventTarget {
    onmessage:
      | ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown)
      | null;
@@ -274,7 +274,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    onmessageerror:
      | ((this: ServiceWorkerContainer, ev: MessageEvent) => unknown)
      | null;
-@@ -5966,6 +6023,7 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
+@@ -5988,6 +6045,7 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
      | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/registration) */
    readonly registration: ServiceWorkerRegistration;
@@ -282,7 +282,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly serviceWorker: ServiceWorker;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting) */
    skipWaiting(): Promise<void>;
-@@ -6479,6 +6537,24 @@ interface TextMetrics {
+@@ -6501,6 +6559,24 @@ interface TextMetrics {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextMetrics/actualBoundingBoxRight)
     */
    readonly actualBoundingBoxRight: number;
@@ -307,7 +307,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /**
     * Returns the measurement described below.
     *
-@@ -6491,6 +6567,18 @@ interface TextMetrics {
+@@ -6513,6 +6589,18 @@ interface TextMetrics {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextMetrics/fontBoundingBoxDescent)
     */
    readonly fontBoundingBoxDescent: number;
@@ -326,7 +326,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /**
     * Returns the measurement described below.
     *
-@@ -6798,7 +6886,7 @@ interface VideoFrame {
+@@ -6820,7 +6908,7 @@ interface VideoFrame {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoFrame/close) */
    close(): void;
    copyTo(
@@ -335,7 +335,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      options?: VideoFrameCopyToOptions,
    ): Promise<PlaneLayout[]>;
  }
-@@ -6806,7 +6894,7 @@ interface VideoFrame {
+@@ -6828,7 +6916,7 @@ interface VideoFrame {
  declare const VideoFrame: {
    prototype: VideoFrame;
    new (image: CanvasImageSource, init?: VideoFrameInit): VideoFrame;
@@ -344,7 +344,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  };
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_color_buffer_float) */
-@@ -6976,42 +7064,42 @@ interface WEBGL_multi_draw {
+@@ -6998,42 +7086,42 @@ interface WEBGL_multi_draw {
    multiDrawArraysInstancedWEBGL(
      mode: GLenum,
      firstsList: Int32Array | readonly GLint[],
@@ -397,7 +397,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      drawcount: GLsizei,
    ): void;
  }
-@@ -7038,7 +7126,6 @@ declare const WebGL2RenderingContext: {
+@@ -7060,7 +7148,6 @@ declare const WebGL2RenderingContext: {
    readonly STENCIL: 0x1802;
    readonly RED: 0x1903;
    readonly RGB8: 0x8051;
@@ -405,7 +405,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly RGB10_A2: 0x8059;
    readonly TEXTURE_BINDING_3D: 0x806a;
    readonly UNPACK_SKIP_IMAGES: 0x806d;
-@@ -7549,6 +7636,7 @@ declare const WebGL2RenderingContext: {
+@@ -7571,6 +7658,7 @@ declare const WebGL2RenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -413,7 +413,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly RGB565: 0x8d62;
    readonly DEPTH_COMPONENT16: 0x81a5;
    readonly STENCIL_INDEX8: 0x8d48;
-@@ -7640,21 +7728,21 @@ interface WebGL2RenderingContextBase {
+@@ -7662,21 +7750,21 @@ interface WebGL2RenderingContextBase {
      buffer: GLenum,
      drawbuffer: GLint,
      values: Float32List,
@@ -438,7 +438,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clientWaitSync) */
    clientWaitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLuint64): GLenum;
-@@ -7679,7 +7767,7 @@ interface WebGL2RenderingContextBase {
+@@ -7701,7 +7789,7 @@ interface WebGL2RenderingContextBase {
      depth: GLsizei,
      border: GLint,
      srcData: ArrayBufferView,
@@ -447,7 +447,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLengthOverride?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/compressedTexSubImage3D) */
-@@ -7707,7 +7795,7 @@ interface WebGL2RenderingContextBase {
+@@ -7729,7 +7817,7 @@ interface WebGL2RenderingContextBase {
      depth: GLsizei,
      format: GLenum,
      srcData: ArrayBufferView,
@@ -456,7 +456,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLengthOverride?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/copyBufferSubData) */
-@@ -7810,7 +7898,7 @@ interface WebGL2RenderingContextBase {
+@@ -7832,7 +7920,7 @@ interface WebGL2RenderingContextBase {
      target: GLenum,
      srcByteOffset: GLintptr,
      dstBuffer: ArrayBufferView,
@@ -465,7 +465,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      length?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/getFragDataLocation) */
-@@ -7930,7 +8018,7 @@ interface WebGL2RenderingContextBase {
+@@ -7952,7 +8040,7 @@ interface WebGL2RenderingContextBase {
      format: GLenum,
      type: GLenum,
      srcData: ArrayBufferView,
@@ -474,7 +474,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/texStorage2D) */
    texStorage2D(
-@@ -7988,7 +8076,7 @@ interface WebGL2RenderingContextBase {
+@@ -8010,7 +8098,7 @@ interface WebGL2RenderingContextBase {
      format: GLenum,
      type: GLenum,
      srcData: ArrayBufferView | null,
@@ -483,7 +483,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings) */
    transformFeedbackVaryings(
-@@ -8002,7 +8090,7 @@ interface WebGL2RenderingContextBase {
+@@ -8024,7 +8112,7 @@ interface WebGL2RenderingContextBase {
    uniform1uiv(
      location: WebGLUniformLocation | null,
      data: Uint32List,
@@ -492,7 +492,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
-@@ -8015,7 +8103,7 @@ interface WebGL2RenderingContextBase {
+@@ -8037,7 +8125,7 @@ interface WebGL2RenderingContextBase {
    uniform2uiv(
      location: WebGLUniformLocation | null,
      data: Uint32List,
@@ -501,7 +501,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
-@@ -8029,7 +8117,7 @@ interface WebGL2RenderingContextBase {
+@@ -8051,7 +8139,7 @@ interface WebGL2RenderingContextBase {
    uniform3uiv(
      location: WebGLUniformLocation | null,
      data: Uint32List,
@@ -510,7 +510,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniform) */
-@@ -8044,7 +8132,7 @@ interface WebGL2RenderingContextBase {
+@@ -8066,7 +8154,7 @@ interface WebGL2RenderingContextBase {
    uniform4uiv(
      location: WebGLUniformLocation | null,
      data: Uint32List,
@@ -519,7 +519,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformBlockBinding) */
-@@ -8058,7 +8146,7 @@ interface WebGL2RenderingContextBase {
+@@ -8080,7 +8168,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -528,7 +528,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -8066,7 +8154,7 @@ interface WebGL2RenderingContextBase {
+@@ -8088,7 +8176,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -537,7 +537,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -8074,7 +8162,7 @@ interface WebGL2RenderingContextBase {
+@@ -8096,7 +8184,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -546,7 +546,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -8082,7 +8170,7 @@ interface WebGL2RenderingContextBase {
+@@ -8104,7 +8192,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -555,7 +555,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -8090,7 +8178,7 @@ interface WebGL2RenderingContextBase {
+@@ -8112,7 +8200,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -564,7 +564,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/uniformMatrix) */
-@@ -8098,7 +8186,7 @@ interface WebGL2RenderingContextBase {
+@@ -8120,7 +8208,7 @@ interface WebGL2RenderingContextBase {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -573,7 +573,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/vertexAttribDivisor) */
-@@ -8139,7 +8227,6 @@ interface WebGL2RenderingContextBase {
+@@ -8161,7 +8249,6 @@ interface WebGL2RenderingContextBase {
    readonly STENCIL: 0x1802;
    readonly RED: 0x1903;
    readonly RGB8: 0x8051;
@@ -581,7 +581,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly RGB10_A2: 0x8059;
    readonly TEXTURE_BINDING_3D: 0x806a;
    readonly UNPACK_SKIP_IMAGES: 0x806d;
-@@ -8395,25 +8482,29 @@ interface WebGL2RenderingContextBase {
+@@ -8417,25 +8504,29 @@ interface WebGL2RenderingContextBase {
  interface WebGL2RenderingContextOverloads {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/bufferData) */
    bufferData(target: GLenum, size: GLsizeiptr, usage: GLenum): void;
@@ -615,7 +615,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      length?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/compressedTexImage2D) */
-@@ -8435,7 +8526,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8457,7 +8548,7 @@ interface WebGL2RenderingContextOverloads {
      height: GLsizei,
      border: GLint,
      srcData: ArrayBufferView,
@@ -624,7 +624,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLengthOverride?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/compressedTexSubImage2D) */
-@@ -8459,7 +8550,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8481,7 +8572,7 @@ interface WebGL2RenderingContextOverloads {
      height: GLsizei,
      format: GLenum,
      srcData: ArrayBufferView,
@@ -633,7 +633,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLengthOverride?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/readPixels) */
-@@ -8489,7 +8580,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8511,7 +8602,7 @@ interface WebGL2RenderingContextOverloads {
      format: GLenum,
      type: GLenum,
      dstData: ArrayBufferView,
@@ -642,7 +642,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/texImage2D) */
    texImage2D(
-@@ -8543,7 +8634,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8565,7 +8656,7 @@ interface WebGL2RenderingContextOverloads {
      format: GLenum,
      type: GLenum,
      srcData: ArrayBufferView,
@@ -651,7 +651,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/texSubImage2D) */
    texSubImage2D(
-@@ -8598,62 +8689,62 @@ interface WebGL2RenderingContextOverloads {
+@@ -8620,62 +8711,62 @@ interface WebGL2RenderingContextOverloads {
      format: GLenum,
      type: GLenum,
      srcData: ArrayBufferView,
@@ -723,7 +723,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -8661,7 +8752,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8683,7 +8774,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -732,7 +732,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -8669,7 +8760,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8691,7 +8782,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -741,7 +741,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/uniformMatrix) */
-@@ -8677,7 +8768,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8699,7 +8790,7 @@ interface WebGL2RenderingContextOverloads {
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
      data: Float32List,
@@ -750,7 +750,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      srcLength?: GLuint,
    ): void;
  }
-@@ -9043,6 +9134,7 @@ declare const WebGLRenderingContext: {
+@@ -9065,6 +9156,7 @@ declare const WebGLRenderingContext: {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -758,7 +758,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly RGB565: 0x8d62;
    readonly DEPTH_COMPONENT16: 0x81a5;
    readonly STENCIL_INDEX8: 0x8d48;
-@@ -9790,6 +9882,7 @@ interface WebGLRenderingContextBase {
+@@ -9812,6 +9904,7 @@ interface WebGLRenderingContextBase {
    readonly RENDERBUFFER: 0x8d41;
    readonly RGBA4: 0x8056;
    readonly RGB5_A1: 0x8057;
@@ -766,7 +766,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    readonly RGB565: 0x8d62;
    readonly DEPTH_COMPONENT16: 0x81a5;
    readonly STENCIL_INDEX8: 0x8d48;
-@@ -9831,9 +9924,17 @@ interface WebGLRenderingContextBase {
+@@ -9853,9 +9946,17 @@ interface WebGLRenderingContextBase {
  interface WebGLRenderingContextOverloads {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/bufferData) */
    bufferData(target: GLenum, size: GLsizeiptr, usage: GLenum): void;
@@ -786,7 +786,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/compressedTexImage2D) */
    compressedTexImage2D(
      target: GLenum,
-@@ -10199,13 +10300,13 @@ interface WebTransportDatagramDuplexStream {
+@@ -10221,13 +10322,13 @@ interface WebTransportDatagramDuplexStream {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/incomingHighWaterMark) */
    incomingHighWaterMark: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/incomingMaxAge) */
@@ -802,7 +802,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/readable) */
    readonly readable: ReadableStream;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/writable) */
-@@ -10842,44 +10943,44 @@ declare const XMLHttpRequestUpload: {
+@@ -10864,44 +10965,44 @@ declare const XMLHttpRequestUpload: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
@@ -866,7 +866,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -10894,11 +10995,11 @@ declare namespace WebAssembly {
+@@ -10916,11 +11017,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -881,7 +881,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      valueOf(): ValueTypeMap[T];
    }
  
-@@ -10910,9 +11011,9 @@ declare namespace WebAssembly {
+@@ -10932,9 +11033,9 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -893,7 +893,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      readonly exports: Exports;
    }
  
-@@ -10929,11 +11030,11 @@ declare namespace WebAssembly {
+@@ -10951,11 +11052,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -908,7 +908,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      grow(delta: number): number;
    }
  
-@@ -10942,17 +11043,17 @@ declare namespace WebAssembly {
+@@ -10964,17 +11065,17 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -930,7 +930,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      imports(moduleObject: Module): ModuleImportDescriptor[];
    };
  
-@@ -10964,15 +11065,15 @@ declare namespace WebAssembly {
+@@ -10986,15 +11087,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -951,7 +951,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
      set(index: number, value?: unknown): void;
    }
  
-@@ -11032,13 +11133,13 @@ declare namespace WebAssembly {
+@@ -11054,13 +11155,13 @@ declare namespace WebAssembly {
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
    type ValueType = keyof ValueTypeMap;
@@ -968,7 +968,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -11047,12 +11148,12 @@ declare namespace WebAssembly {
+@@ -11069,12 +11170,12 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -983,7 +983,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
    function validate(bytes: BufferSource): boolean;
  }
  
-@@ -11162,6 +11263,10 @@ declare const onmessage:
+@@ -11184,6 +11285,10 @@ declare const onmessage:
  declare const onmessageerror:
    | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
    | null;
@@ -994,7 +994,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  /**
   * Aborts dedicatedWorkerGlobal.
   *
-@@ -11306,7 +11411,9 @@ declare function structuredClone<T = unknown>(
+@@ -11328,7 +11433,9 @@ declare function structuredClone<T = unknown>(
    value: T,
    options?: StructuredSerializeOptions,
  ): T;
@@ -1004,7 +1004,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  declare function addEventListener<
    K extends keyof DedicatedWorkerGlobalScopeEventMap,
-@@ -11414,7 +11521,6 @@ type Transferable =
+@@ -11436,7 +11543,6 @@ type Transferable =
    | VideoFrame
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
@@ -1012,7 +1012,7 @@ index 2190767bb9d413fbe85ac47c4efd1163a31888d2..7d97730ac93fdf85efc8cdfd6a907e51
  type XMLHttpRequestBodyInit =
    | Blob
    | BufferSource
-@@ -11604,6 +11710,7 @@ type RequestDestination =
+@@ -11626,6 +11732,7 @@ type RequestDestination =
    | 'worker'
    | 'xslt';
  type RequestMode = 'cors' | 'navigate' | 'no-cors' | 'same-origin';

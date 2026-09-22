@@ -1,14 +1,26 @@
 diff --git a/v5.9/output/lib-files/lib.es2020.bigint.d.ts b/v6.0/output/lib-files/lib.es2020.bigint.d.ts
-index a26819781306719df59b18e6a661e1875386c578..a91b38269fdf538805aa040b2406fd3818185c43 100644
+index af44b7dfaeb392b5a29a902ac3e1f77e4944ad9a..f4e9d9e0bed39f0ef744dc170675b91d637fd40a 100644
 --- a/v5.9/output/lib-files/lib.es2020.bigint.d.ts
 +++ b/v6.0/output/lib-files/lib.es2020.bigint.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2020.intl.d.ts" />
  
  interface BigIntToLocaleStringOptions {
-@@ -286,7 +284,7 @@ interface BigInt64Array<
+@@ -308,7 +306,7 @@ interface BigInt64Array<
    includes(searchElement: bigint, fromIndex?: number): boolean;
  
    /**
@@ -17,7 +29,7 @@ index a26819781306719df59b18e6a661e1875386c578..a91b38269fdf538805aa040b2406fd38
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -304,7 +302,7 @@ interface BigInt64Array<
+@@ -326,7 +324,7 @@ interface BigInt64Array<
    keys(): ArrayIterator<number>;
  
    /**
@@ -26,7 +38,7 @@ index a26819781306719df59b18e6a661e1875386c578..a91b38269fdf538805aa040b2406fd38
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -677,7 +675,7 @@ interface BigUint64Array<
+@@ -699,7 +697,7 @@ interface BigUint64Array<
    includes(searchElement: bigint, fromIndex?: number): boolean;
  
    /**
@@ -35,7 +47,7 @@ index a26819781306719df59b18e6a661e1875386c578..a91b38269fdf538805aa040b2406fd38
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -695,7 +693,7 @@ interface BigUint64Array<
+@@ -717,7 +715,7 @@ interface BigUint64Array<
    keys(): ArrayIterator<number>;
  
    /**

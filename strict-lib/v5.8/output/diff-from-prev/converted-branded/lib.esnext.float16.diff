@@ -1,9 +1,31 @@
 diff --git a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts b/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..cc295f769b1a04114b6e10a8aefe680c4c60aa0d
+index 0000000000000000000000000000000000000000..ecfecefdae9dfd2b270de5236dd92a61134a108a
 --- /dev/null
 +++ b/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
-@@ -0,0 +1,601 @@
+@@ -0,0 +1,623 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABLITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.esnext.float16.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference no-default-lib="true"/>
 +
 +/// <reference path="./lib.es2015.symbol.d.ts" />

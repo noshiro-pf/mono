@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.dom.asynciterable.d.ts b/v6.0/output/lib-files-branded/lib.dom.asynciterable.d.ts
-index 656b891fdaaabe3b5d6668911a9002e8e896b4cb..3b3e55b7a43b5d3e58dd5f54d1ef8f082227a35a 100644
+index 8a093be5b1b9d954bcc8343551920c3e7af5e89b..bc102fe6e0d9e1f7ca23d470f30f2d100d080528 100644
 --- a/v5.9/output/lib-files-branded/lib.dom.asynciterable.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.dom.asynciterable.d.ts
-@@ -1,41 +1,2 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,44 +20,5 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
 -/////////////////////////////

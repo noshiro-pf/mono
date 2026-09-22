@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts b/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
-index ca86575fb30c46bb05b66b2fd99af85cb659bbf5..0d451b7c754fba5868017677183d1f4082ce1767 100644
+index cc86135ffb0a70ea6095a0325ec66490526aa9d0..f70dc9da3c2b01fa87681521e6d143c5053ece05 100644
 --- a/v5.9/output/lib-files/lib.es2024.arraybuffer.d.ts
 +++ b/v6.0/output/lib-files/lib.es2024.arraybuffer.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface ArrayBuffer {

@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts b/v7.0/output/lib-files-branded/lib.es2015.collection.d.ts
-index a6f4b4802cb35c91a54d8967899fdaa8b539b5f0..a6bf538376583875c52b29e5a7c9edbd9c9e453a 100644
+index b79813d51a9fd978eba8dbc2462bceb277f37b55..7b4a22d9f70723ef18d76c397539f95969400974 100644
 --- a/v6.0/output/lib-files-branded/lib.es2015.collection.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2015.collection.d.ts
-@@ -106,7 +106,7 @@ interface Set<T> {
+@@ -128,7 +128,7 @@ interface Set<T> {
     */
    has(value: T | (import('ts-type-forge').WidenLiteral<T> & {})): boolean;
    /**
@@ -11,7 +11,7 @@ index a6f4b4802cb35c91a54d8967899fdaa8b539b5f0..a6bf538376583875c52b29e5a7c9edbd
     */
    readonly size: NumberType.ArraySize;
  }
-@@ -119,11 +119,20 @@ interface SetConstructor {
+@@ -141,11 +141,20 @@ interface SetConstructor {
  declare const Set: SetConstructor;
  
  interface ReadonlySet<T> {

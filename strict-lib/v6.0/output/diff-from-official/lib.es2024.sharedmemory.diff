@@ -1,25 +1,20 @@
-@@ -1,19 +1,4 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,7 +13,14 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
 -/// <reference lib="es2020.bigint" />
++/*
++ * Modified from TypeScript's `lib.es2024.sharedmemory.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2020.bigint.d.ts" />
  
  interface Atomics {
    /**
-@@ -30,8 +15,8 @@ interface Atomics {
+@@ -30,8 +37,8 @@ interface Atomics {
      value: number,
      timeout?: number,
    ):
@@ -30,7 +25,7 @@
  
    /**
     * A non-blocking, asynchronous version of wait which is usable on the main thread.
-@@ -47,8 +32,8 @@ interface Atomics {
+@@ -47,8 +54,8 @@ interface Atomics {
      value: bigint,
      timeout?: number,
    ):
@@ -41,7 +36,7 @@
  }
  
  interface SharedArrayBuffer {
-@@ -77,6 +62,6 @@ interface SharedArrayBuffer {
+@@ -77,6 +84,6 @@ interface SharedArrayBuffer {
  interface SharedArrayBufferConstructor {
    new (
      byteLength: number,

@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2017.sharedmemory.d.ts b/v5.7/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
-index 16ab9b313e40d930682551e6026aaa3d9a01b96a..4514d51a9b42dc8e4380e242287537bd9d6e0502 100644
+index b63aeab7f5c907e9a1316aace7cab3b6f266397a..d2b80dd214deecb5c2478574449a5af103a8779b 100644
 --- a/v5.6/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
-@@ -13,7 +13,7 @@ interface SharedArrayBuffer {
+@@ -35,7 +35,7 @@ interface SharedArrayBuffer {
     * Returns a section of an SharedArrayBuffer.
     */
    slice(
@@ -11,7 +11,7 @@ index 16ab9b313e40d930682551e6026aaa3d9a01b96a..4514d51a9b42dc8e4380e242287537bd
      end?: NumberType.TypedArraySizeArg,
    ): SharedArrayBuffer;
    readonly [Symbol.species]: SharedArrayBuffer;
-@@ -22,7 +22,7 @@ interface SharedArrayBuffer {
+@@ -44,7 +44,7 @@ interface SharedArrayBuffer {
  
  interface SharedArrayBufferConstructor {
    readonly prototype: SharedArrayBuffer;
@@ -20,7 +20,7 @@ index 16ab9b313e40d930682551e6026aaa3d9a01b96a..4514d51a9b42dc8e4380e242287537bd
  }
  declare const SharedArrayBuffer: SharedArrayBufferConstructor;
  
-@@ -331,7 +331,7 @@ interface Atomics {
+@@ -353,7 +353,7 @@ interface Atomics {
     * `"not-equal"`.
     */
    wait(
@@ -29,7 +29,7 @@ index 16ab9b313e40d930682551e6026aaa3d9a01b96a..4514d51a9b42dc8e4380e242287537bd
      index: NumberType.TypedArraySizeArg,
      value: import('ts-type-forge').Int32,
      timeout?: number,
-@@ -340,12 +340,12 @@ interface Atomics {
+@@ -362,12 +362,12 @@ interface Atomics {
    /**
     * Wakes up sleeping agents that are waiting on the given index of the array, returning the
     * number of agents that were awoken.

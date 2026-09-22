@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files-branded/lib.webworker.d.ts b/v5.8/output/lib-files-branded/lib.webworker.d.ts
-index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647e8d67ec2 100644
+index ad34194faa1019ed78c3cbb59c4d6c2e715eefb8..e6283c1935af9758e235fca9bc2c788b76da2e84 100644
 --- a/v5.7/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.webworker.d.ts
-@@ -275,7 +275,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {
+@@ -297,7 +297,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {
  
  interface FetchEventInit extends ExtendableEventInit {
    clientId?: string;
@@ -11,7 +11,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    preloadResponse?: Promise<unknown>;
    replacesClientId?: string;
    request: Request;
-@@ -383,6 +383,26 @@ interface ImageDataSettings {
+@@ -405,6 +405,26 @@ interface ImageDataSettings {
    colorSpace?: PredefinedColorSpace;
  }
  
@@ -38,7 +38,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  interface ImageEncodeOptions {
    quality?: number;
    type?: string;
-@@ -2459,8 +2479,11 @@ interface DOMMatrix extends DOMMatrixReadOnly {
+@@ -2481,8 +2501,11 @@ interface DOMMatrix extends DOMMatrixReadOnly {
    m43: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrix#instance_properties) */
    m44: number;
@@ -50,7 +50,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    preMultiplySelf(other?: DOMMatrixInit): DOMMatrix;
    rotateAxisAngleSelf(
      x?: number,
-@@ -2469,6 +2492,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
+@@ -2491,6 +2514,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
      angle?: number,
    ): DOMMatrix;
    rotateFromVectorSelf(x?: number, y?: number): DOMMatrix;
@@ -58,7 +58,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    rotateSelf(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
    scale3dSelf(
      scale?: number,
-@@ -2484,8 +2508,11 @@ interface DOMMatrix extends DOMMatrixReadOnly {
+@@ -2506,8 +2530,11 @@ interface DOMMatrix extends DOMMatrixReadOnly {
      originY?: number,
      originZ?: number,
    ): DOMMatrix;
@@ -70,7 +70,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    translateSelf(tx?: number, ty?: number, tz?: number): DOMMatrix;
  }
  
-@@ -2511,7 +2538,9 @@ interface DOMMatrixReadOnly {
+@@ -2533,7 +2560,9 @@ interface DOMMatrixReadOnly {
    readonly e: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly#instance_properties) */
    readonly f: number;
@@ -80,7 +80,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    readonly isIdentity: boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly#instance_properties) */
    readonly m11: number;
-@@ -2547,8 +2576,11 @@ interface DOMMatrixReadOnly {
+@@ -2569,8 +2598,11 @@ interface DOMMatrixReadOnly {
    readonly m44: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/flipX) */
    flipX(): DOMMatrix;
@@ -92,7 +92,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    multiply(other?: DOMMatrixInit): DOMMatrix;
    rotate(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
    rotateAxisAngle(
-@@ -2577,9 +2609,13 @@ interface DOMMatrixReadOnly {
+@@ -2599,9 +2631,13 @@ interface DOMMatrixReadOnly {
    scaleNonUniform(scaleX?: number, scaleY?: number): DOMMatrix;
    skewX(sx?: number): DOMMatrix;
    skewY(sy?: number): DOMMatrix;
@@ -106,7 +106,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    transformPoint(point?: DOMPointInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMMatrixReadOnly/translate) */
    translate(tx?: number, ty?: number, tz?: number): DOMMatrix;
-@@ -2622,6 +2658,7 @@ interface DOMPointReadOnly {
+@@ -2644,6 +2680,7 @@ interface DOMPointReadOnly {
    readonly y: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/z) */
    readonly z: number;
@@ -114,7 +114,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    matrixTransform(matrix?: DOMMatrixInit): DOMPoint;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMPointReadOnly/toJSON) */
    toJSON(): unknown;
-@@ -2636,11 +2673,17 @@ declare const DOMPointReadOnly: {
+@@ -2658,11 +2695,17 @@ declare const DOMPointReadOnly: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMQuad) */
  interface DOMQuad {
@@ -132,7 +132,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    toJSON(): unknown;
  }
  
-@@ -2658,9 +2701,13 @@ declare const DOMQuad: {
+@@ -2680,9 +2723,13 @@ declare const DOMQuad: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRect) */
  interface DOMRect extends DOMRectReadOnly {
@@ -146,7 +146,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    y: number;
  }
  
-@@ -2689,6 +2736,7 @@ interface DOMRectReadOnly {
+@@ -2711,6 +2758,7 @@ interface DOMRectReadOnly {
    readonly x: number;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMRectReadOnly/y) */
    readonly y: number;
@@ -154,7 +154,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    toJSON(): unknown;
  }
  
-@@ -2747,7 +2795,8 @@ declare const DecompressionStream: {
+@@ -2769,7 +2817,8 @@ declare const DecompressionStream: {
    new (format: CompressionFormat): DecompressionStream;
  };
  
@@ -164,7 +164,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    message: MessageEvent;
    messageerror: MessageEvent;
    rtctransform: RTCTransformEvent;
-@@ -2759,21 +2808,16 @@ interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
+@@ -2781,21 +2830,16 @@ interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope)
   */
  interface DedicatedWorkerGlobalScope
@@ -190,7 +190,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
    onrtctransform:
      | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
-@@ -2944,10 +2988,15 @@ declare const EncodedVideoChunk: {
+@@ -2966,10 +3010,15 @@ declare const EncodedVideoChunk: {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent)
   */
  interface ErrorEvent extends Event {
@@ -206,7 +206,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    readonly message: string;
  }
  
-@@ -3275,7 +3324,7 @@ interface FetchEvent extends ExtendableEvent {
+@@ -3297,7 +3346,7 @@ interface FetchEvent extends ExtendableEvent {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/clientId) */
    readonly clientId: string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/handled) */
@@ -215,7 +215,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/preloadResponse) */
    readonly preloadResponse: Promise<unknown>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/request) */
-@@ -3723,6 +3772,16 @@ declare const FormData: {
+@@ -3745,6 +3794,16 @@ declare const FormData: {
    new (): FormData;
  };
  
@@ -232,7 +232,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  interface GenericTransformStream {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CompressionStream/readable) */
    readonly readable: ReadableStream;
-@@ -4639,6 +4698,70 @@ declare const ImageData: {
+@@ -4661,6 +4720,70 @@ declare const ImageData: {
    ): ImageData;
  };
  
@@ -303,7 +303,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  interface ImportMeta {
    url: string;
    resolve(specifier: string): string;
-@@ -4803,7 +4926,39 @@ declare const MessageEvent: {
+@@ -4825,7 +4948,39 @@ declare const MessageEvent: {
    new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
  };
  
@@ -344,7 +344,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    message: MessageEvent;
    messageerror: MessageEvent;
  }
-@@ -4813,11 +4968,7 @@ interface MessagePortEventMap {
+@@ -4835,11 +4990,7 @@ interface MessagePortEventMap {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort)
   */
@@ -357,7 +357,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /**
     * Disconnects the port, so that it is no longer active.
     *
-@@ -5733,6 +5884,85 @@ declare const PushSubscriptionOptions: {
+@@ -5755,6 +5906,85 @@ declare const PushSubscriptionOptions: {
    new (): PushSubscriptionOptions;
  };
  
@@ -443,7 +443,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCEncodedAudioFrame) */
  interface RTCEncodedAudioFrame {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/RTCEncodedAudioFrame/data) */
-@@ -5922,7 +6152,7 @@ declare const ReadableStreamDefaultReader: {
+@@ -5944,7 +6174,7 @@ declare const ReadableStreamDefaultReader: {
  
  interface ReadableStreamGenericReader {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/closed) */
@@ -452,7 +452,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/cancel) */
    cancel(reason?: unknown): Promise<void>;
  }
-@@ -6008,7 +6238,11 @@ interface Request extends Body {
+@@ -6030,7 +6260,11 @@ interface Request extends Body {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/integrity)
     */
    readonly integrity: string;
@@ -465,7 +465,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    readonly keepalive: boolean;
    /**
     * Returns request's HTTP method, which is "GET" by default.
-@@ -6594,7 +6828,7 @@ interface SubtleCrypto {
+@@ -6616,7 +6850,7 @@ interface SubtleCrypto {
    ): Promise<ArrayBuffer | JsonWebKey>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
    generateKey(
@@ -474,7 +474,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
      extractable: boolean,
      keyUsages: ReadonlyArray<'sign' | 'verify'>,
    ): Promise<CryptoKeyPair>;
-@@ -8046,7 +8280,7 @@ interface WebGL2RenderingContextBase {
+@@ -8068,7 +8302,7 @@ interface WebGL2RenderingContextBase {
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext/clientWaitSync) */
    clientWaitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLuint64): GLenum;
@@ -483,7 +483,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    compressedTexImage3D(
      target: GLenum,
      level: GLint,
-@@ -8780,7 +9014,7 @@ interface WebGL2RenderingContextBase {
+@@ -8802,7 +9036,7 @@ interface WebGL2RenderingContextBase {
  }
  
  interface WebGL2RenderingContextOverloads {
@@ -492,7 +492,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    bufferData(target: GLenum, size: GLsizeiptr, usage: GLenum): void;
    bufferData(
      target: GLenum,
-@@ -8794,7 +9028,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -8816,7 +9050,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset: number,
      length?: GLuint,
    ): void;
@@ -501,7 +501,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    bufferSubData(
      target: GLenum,
      dstByteOffset: GLintptr,
-@@ -9047,7 +9281,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -9069,7 +9303,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: number,
      srcLength?: GLuint,
    ): void;
@@ -510,7 +510,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -9474,12 +9708,14 @@ declare const WebGLRenderingContext: {
+@@ -9496,12 +9730,14 @@ declare const WebGLRenderingContext: {
  };
  
  interface WebGLRenderingContextBase {
@@ -526,7 +526,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/activeTexture) */
    activeTexture(texture: GLenum): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/attachShader) */
-@@ -9798,6 +10034,7 @@ interface WebGLRenderingContextBase {
+@@ -9820,6 +10056,7 @@ interface WebGLRenderingContextBase {
    isShader(shader: WebGLShader | null): GLboolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/isTexture) */
    isTexture(texture: WebGLTexture | null): GLboolean;
@@ -534,7 +534,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    lineWidth(width: GLfloat): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebGLRenderingContext/linkProgram) */
    linkProgram(program: WebGLProgram): void;
-@@ -10557,7 +10794,7 @@ interface WebTransport {
+@@ -10579,7 +10816,7 @@ interface WebTransport {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransport/incomingUnidirectionalStreams) */
    readonly incomingUnidirectionalStreams: ReadableStream;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransport/ready) */
@@ -543,7 +543,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransport/close) */
    close(closeInfo?: WebTransportCloseInfo): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransport/createBidirectionalStream) */
-@@ -10680,11 +10917,11 @@ interface WindowOrWorkerGlobalScope {
+@@ -10702,11 +10939,11 @@ interface WindowOrWorkerGlobalScope {
    atob(data: string): string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
    btoa(data: string): string;
@@ -558,7 +558,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    createImageBitmap(
      image: ImageBitmapSource,
      options?: ImageBitmapOptions,
-@@ -10699,44 +10936,39 @@ interface WindowOrWorkerGlobalScope {
+@@ -10721,44 +10958,39 @@ interface WindowOrWorkerGlobalScope {
    ): Promise<ImageBitmap>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch) */
    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
@@ -612,7 +612,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /**
     * Clones message and transmits it to worker's global environment. transfer can be passed as a list of objects that are to be transferred rather than cloned.
     *
-@@ -10916,6 +11148,12 @@ interface WorkerNavigator
+@@ -10938,6 +11170,12 @@ interface WorkerNavigator
    readonly mediaCapabilities: MediaCapabilities;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerNavigator/permissions) */
    readonly permissions: Permissions;
@@ -625,7 +625,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  }
  
  declare const WorkerNavigator: {
-@@ -10971,11 +11209,11 @@ declare const WritableStreamDefaultController: {
+@@ -10993,11 +11231,11 @@ declare const WritableStreamDefaultController: {
   */
  interface WritableStreamDefaultWriter<W = unknown> {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed) */
@@ -639,7 +639,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
    abort(reason?: unknown): Promise<void>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
-@@ -11567,14 +11805,6 @@ interface WebCodecsErrorCallback {
+@@ -11589,14 +11827,6 @@ interface WebCodecsErrorCallback {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/name)
   */
  declare const name: string;
@@ -654,7 +654,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
  declare const onrtctransform:
    | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
-@@ -11682,11 +11912,11 @@ declare const performance: Performance;
+@@ -11704,11 +11934,11 @@ declare const performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;
@@ -669,7 +669,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -11704,23 +11934,23 @@ declare function fetch(
+@@ -11726,23 +11956,23 @@ declare function fetch(
    input: RequestInfo | URL,
    init?: RequestInit,
  ): Promise<Response>;
@@ -698,7 +698,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  declare function structuredClone<T = unknown>(
    value: T,
    options?: StructuredSerializeOptions,
-@@ -11729,6 +11959,14 @@ declare function structuredClone<T = unknown>(
+@@ -11751,6 +11981,14 @@ declare function structuredClone<T = unknown>(
  declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
@@ -713,7 +713,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  declare function addEventListener<
    K extends keyof DedicatedWorkerGlobalScopeEventMap,
  >(
-@@ -11800,6 +12038,7 @@ type IDBValidKey =
+@@ -11822,6 +12060,7 @@ type IDBValidKey =
    | BufferSource
    | readonly IDBValidKey[];
  type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
@@ -721,7 +721,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
  type Int32List = Int32Array | readonly GLint[];
  type MessageEventSource = MessagePort | ServiceWorker;
  type NamedCurve = string;
-@@ -11834,6 +12073,7 @@ type Transferable =
+@@ -11856,6 +12095,7 @@ type Transferable =
    | TransformStream
    | AudioData
    | VideoFrame
@@ -729,7 +729,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type XMLHttpRequestBodyInit =
-@@ -11984,7 +12224,9 @@ type OffscreenRenderingContextId =
+@@ -12006,7 +12246,9 @@ type OffscreenRenderingContextId =
    | 'webgpu';
  type OpusBitstreamFormat = 'ogg' | 'opus';
  type PermissionName =
@@ -739,7 +739,7 @@ index 516ddbf90ffc3d859380c8ce2209514b1f362147..e6d20787a78a27fdf968b573a06e6647
    | 'midi'
    | 'notifications'
    | 'persistent-storage'
-@@ -11995,6 +12237,7 @@ type PermissionState = 'denied' | 'granted' | 'prompt';
+@@ -12017,6 +12259,7 @@ type PermissionState = 'denied' | 'granted' | 'prompt';
  type PredefinedColorSpace = 'display-p3' | 'srgb';
  type PremultiplyAlpha = 'default' | 'none' | 'premultiply';
  type PushEncryptionKeyName = 'auth' | 'p256dh';

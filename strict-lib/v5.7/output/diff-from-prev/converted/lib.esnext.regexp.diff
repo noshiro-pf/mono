@@ -1,9 +1,31 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.regexp.d.ts b/v5.6/output/lib-files/lib.esnext.regexp.d.ts
 deleted file mode 100644
-index f85fdba98664c975391e078684a184d34a68c73f..0000000000000000000000000000000000000000
+index 201c307b0fb3bcd05ef5eb497d8353dffe3ba0b7..0000000000000000000000000000000000000000
 --- a/v5.6/output/lib-files/lib.esnext.regexp.d.ts
 +++ /dev/null
-@@ -1,9 +0,0 @@
+@@ -1,31 +0,0 @@
+-/*! *****************************************************************************
+-Copyright (c) Microsoft Corporation. All rights reserved.
+-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+-this file except in compliance with the License. You may obtain a copy of the
+-License at http://www.apache.org/licenses/LICENSE-2.0
+-
+-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
+-
+-See the Apache Version 2.0 License for specific language governing permissions
+-and limitations under the License.
+-***************************************************************************** */
+-
+-/*
+- * Modified from TypeScript's `lib.esnext.regexp.d.ts` by strict-ts-lib
+- * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
+- * stricter types. This is not the original file. See the NOTICE and LICENSE
+- * files of the package this ships in.
+- */
+-
 -/// <reference no-default-lib="true"/>
 -
 -interface RegExp {

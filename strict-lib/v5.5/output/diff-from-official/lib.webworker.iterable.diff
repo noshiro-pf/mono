@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.webworker.iterable.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  /////////////////////////////
-@@ -26,21 +11,21 @@ interface AbortSignal {
+@@ -26,21 +33,21 @@ interface AbortSignal {
  
  interface CSSNumericArray {
    [Symbol.iterator](): IterableIterator<CSSNumericValue>;
@@ -42,7 +37,7 @@
    keys(): IterableIterator<number>;
    values(): IterableIterator<CSSUnparsedSegment>;
  }
-@@ -77,9 +62,9 @@ interface FileList {
+@@ -77,9 +84,9 @@ interface FileList {
  interface FontFaceSet extends Set<FontFace> {}
  
  interface FormData {
@@ -54,7 +49,7 @@
    /** Returns a list of keys in the list. */
    keys(): IterableIterator<string>;
    /** Returns a list of values in the list. */
-@@ -87,9 +72,9 @@ interface FormData {
+@@ -87,9 +94,9 @@ interface FormData {
  }
  
  interface Headers {
@@ -66,7 +61,7 @@
    /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
    keys(): IterableIterator<string>;
    /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
-@@ -124,7 +109,7 @@ interface IDBObjectStore {
+@@ -124,7 +131,7 @@ interface IDBObjectStore {
    ): IDBIndex;
  }
  
@@ -75,7 +70,7 @@
    /**
     * @deprecated
     *
-@@ -134,7 +119,7 @@ interface MessageEvent<T = any> {
+@@ -134,7 +141,7 @@ interface MessageEvent<T = any> {
      type: string,
      bubbles?: boolean,
      cancelable?: boolean,
@@ -84,7 +79,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -143,8 +128,10 @@ interface MessageEvent<T = any> {
+@@ -143,8 +150,10 @@ interface MessageEvent<T = any> {
  }
  
  interface StylePropertyMapReadOnly {
@@ -97,7 +92,7 @@
    keys(): IterableIterator<string>;
    values(): IterableIterator<Iterable<CSSStyleValue>>;
  }
-@@ -236,9 +223,9 @@ interface SubtleCrypto {
+@@ -236,9 +245,9 @@ interface SubtleCrypto {
  }
  
  interface URLSearchParams {
@@ -109,7 +104,7 @@
    /** Returns a list of keys in the search params. */
    keys(): IterableIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -324,7 +311,7 @@ interface WebGL2RenderingContextBase {
+@@ -324,7 +333,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,

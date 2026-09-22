@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.es2015.iterable.d.ts b/v5.6/output/lib-files-branded/lib.es2015.iterable.d.ts
-index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e4d3c2cb3 100644
+index 0ed37d635a5b19e9494bd37937b7a9bcf437a4eb..8a795804ccfdf54d7779645f657cec6f4c428488 100644
 --- a/v5.5/output/lib-files-branded/lib.es2015.iterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.es2015.iterable.d.ts
-@@ -24,39 +24,71 @@ type IteratorResult<T, TReturn = any> =
+@@ -46,39 +46,71 @@ type IteratorResult<T, TReturn = any> =
    | IteratorYieldResult<T>
    | IteratorReturnResult<TReturn>;
  
@@ -84,7 +84,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface ArrayConstructor {
-@@ -81,67 +113,75 @@ interface ArrayConstructor {
+@@ -103,67 +135,75 @@ interface ArrayConstructor {
  
  interface ReadonlyArray<T> {
    /** Iterator of values in the array. */
@@ -173,7 +173,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface MapConstructor {
-@@ -157,42 +197,50 @@ interface WeakMapConstructor {
+@@ -179,42 +219,50 @@ interface WeakMapConstructor {
    ): WeakMap<K, V>;
  }
  
@@ -232,7 +232,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface SetConstructor {
-@@ -226,27 +274,35 @@ interface PromiseConstructor {
+@@ -248,27 +296,35 @@ interface PromiseConstructor {
    race<T>(values: Iterable<T | PromiseLike<T>>): Promise<Awaited<T>>;
  }
  
@@ -273,7 +273,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Int8ArrayConstructor {
-@@ -269,21 +325,21 @@ interface Int8ArrayConstructor {
+@@ -291,21 +347,21 @@ interface Int8ArrayConstructor {
  }
  
  interface Uint8Array {
@@ -299,7 +299,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Uint8ArrayConstructor {
-@@ -306,23 +362,23 @@ interface Uint8ArrayConstructor {
+@@ -328,23 +384,23 @@ interface Uint8ArrayConstructor {
  }
  
  interface Uint8ClampedArray {
@@ -327,7 +327,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Uint8ClampedArrayConstructor {
-@@ -345,23 +401,23 @@ interface Uint8ClampedArrayConstructor {
+@@ -367,23 +423,23 @@ interface Uint8ClampedArrayConstructor {
  }
  
  interface Int16Array {
@@ -355,7 +355,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Int16ArrayConstructor {
-@@ -384,21 +440,21 @@ interface Int16ArrayConstructor {
+@@ -406,21 +462,21 @@ interface Int16ArrayConstructor {
  }
  
  interface Uint16Array {
@@ -381,7 +381,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Uint16ArrayConstructor {
-@@ -421,21 +477,21 @@ interface Uint16ArrayConstructor {
+@@ -443,21 +499,21 @@ interface Uint16ArrayConstructor {
  }
  
  interface Int32Array {
@@ -407,7 +407,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Int32ArrayConstructor {
-@@ -458,21 +514,21 @@ interface Int32ArrayConstructor {
+@@ -480,21 +536,21 @@ interface Int32ArrayConstructor {
  }
  
  interface Uint32Array {
@@ -433,7 +433,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Uint32ArrayConstructor {
-@@ -495,21 +551,21 @@ interface Uint32ArrayConstructor {
+@@ -517,21 +573,21 @@ interface Uint32ArrayConstructor {
  }
  
  interface Float32Array {
@@ -459,7 +459,7 @@ index 0f919c6cfc8b88b4d20a9a51eae0e67317867ce9..556b8297c57a88b4ee35bfd3bab6989e
  }
  
  interface Float32ArrayConstructor {
-@@ -532,21 +588,21 @@ interface Float32ArrayConstructor {
+@@ -554,21 +610,21 @@ interface Float32ArrayConstructor {
  }
  
  interface Float64Array {

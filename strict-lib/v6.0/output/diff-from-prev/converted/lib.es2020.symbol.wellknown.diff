@@ -1,14 +1,26 @@
 diff --git a/v5.9/output/lib-files/lib.es2020.symbol.wellknown.d.ts b/v6.0/output/lib-files/lib.es2020.symbol.wellknown.d.ts
-index d1f7704a5a06c768c6d698fbb9d0b35191c08bbb..f5f1dfa24e850892b46e1ec9fa2a51c4ec53c756 100644
+index cb058ef1eefb01eedea7071794fde0905a115823..c58628f4e6684c02754ab868a4610013a60ddbdf 100644
 --- a/v5.9/output/lib-files/lib.es2020.symbol.wellknown.d.ts
 +++ b/v6.0/output/lib-files/lib.es2020.symbol.wellknown.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2015.iterable.d.ts" />
  /// <reference path="./lib.es2015.symbol.d.ts" />
  
-@@ -25,5 +23,5 @@ interface RegExp {
+@@ -47,5 +45,5 @@ interface RegExp {
     * containing the results of that search.
     * @param string A string to search within.
     */

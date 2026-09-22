@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es5.d.ts b/v5.4/output/lib-files-branded/lib.es5.d.ts
-index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c9374352e 100644
+index d0871c99fbebd4e7c7a0a60fcbab64c6357eee15..9604ebb6dc53a8c6580b4ed0d0ec06ac30eacb17 100644
 --- a/v5.3/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es5.d.ts
-@@ -747,6 +747,7 @@ interface ImportCallOptions {
+@@ -769,6 +769,7 @@ interface ImportCallOptions {
  
  /**
   * The type for the `assert` property of the optional second argument to `import()`.
@@ -10,7 +10,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
   */
  interface ImportAssertions {
    readonly [key: string]: string;
-@@ -2101,6 +2102,11 @@ type Capitalize<S extends string> = intrinsic;
+@@ -2123,6 +2124,11 @@ type Capitalize<S extends string> = intrinsic;
   */
  type Uncapitalize<S extends string> = intrinsic;
  
@@ -22,7 +22,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
  /**
   * Marker for contextual 'this' type
   */
-@@ -6153,7 +6159,8 @@ declare namespace Intl {
+@@ -6175,7 +6181,8 @@ declare namespace Intl {
      compare(x: string, y: string): number;
      resolvedOptions(): ResolvedCollatorOptions;
    }
@@ -32,7 +32,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
      new (
        locales?: string | readonly string[],
        options?: CollatorOptions,
-@@ -6163,7 +6170,9 @@ declare namespace Intl {
+@@ -6185,7 +6192,9 @@ declare namespace Intl {
        locales: string | readonly string[],
        options?: CollatorOptions,
      ): readonly string[];
@@ -43,7 +43,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
  
    interface NumberFormatOptions {
      readonly localeMatcher?: string | undefined;
-@@ -6220,7 +6229,8 @@ declare namespace Intl {
+@@ -6242,7 +6251,8 @@ declare namespace Intl {
      format(value: number): string;
      resolvedOptions(): ResolvedNumberFormatOptions;
    }
@@ -53,7 +53,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
      new (
        locales?: string | readonly string[],
        options?: NumberFormatOptions,
-@@ -6234,7 +6244,9 @@ declare namespace Intl {
+@@ -6256,7 +6266,9 @@ declare namespace Intl {
        options?: NumberFormatOptions,
      ): readonly string[];
      readonly prototype: NumberFormat;
@@ -64,7 +64,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
  
    interface DateTimeFormatOptions {
      readonly localeMatcher?: 'best fit' | 'lookup' | undefined;
-@@ -6286,7 +6298,8 @@ declare namespace Intl {
+@@ -6308,7 +6320,8 @@ declare namespace Intl {
      format(date?: Date | number): string;
      resolvedOptions(): ResolvedDateTimeFormatOptions;
    }
@@ -74,7 +74,7 @@ index 00c598456f1701cd66de1976293c4debbf80f9d0..1472f668cc826270a359c052f83b5a2c
      new (
        locales?: string | readonly string[],
        options?: DateTimeFormatOptions,
-@@ -6300,7 +6313,9 @@ declare namespace Intl {
+@@ -6322,7 +6335,9 @@ declare namespace Intl {
        options?: DateTimeFormatOptions,
      ): readonly string[];
      readonly prototype: DateTimeFormat;

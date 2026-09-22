@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2020.promise.d.ts b/v6.0/output/lib-files-branded/lib.es2020.promise.d.ts
-index 97f009861b9ff426df0553f5037e22ceab5a669c..964539b792e46d52661f1ac57f78d06e373fe7eb 100644
+index b194a2cd1f8429cdaa072e9c5b3c5457a95b2935..f317a637928327e8cbb9aa6feb2e3f45f6321403 100644
 --- a/v5.9/output/lib-files-branded/lib.es2020.promise.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2020.promise.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface PromiseFulfilledResult<T> {

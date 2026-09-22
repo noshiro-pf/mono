@@ -1,8 +1,9 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.d.ts b/v5.7/output/lib-files/lib.esnext.d.ts
-index 159ddbb011de28810d136a6a315af8bed1571726..e129aeef4ebdc2e9d7e5be0ad0ea86f097810cb6 100644
+index 268b8e3ae593245bb406626713bb5e02f70a9bfa..8c71710ac49ae8a42993deaaa10880c3573ace64 100644
 --- a/v5.6/output/lib-files/lib.esnext.d.ts
 +++ b/v5.7/output/lib-files/lib.esnext.d.ts
-@@ -1,13 +1,9 @@
+@@ -22,14 +22,10 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 -/// <reference path="./lib.es2023.d.ts" />
