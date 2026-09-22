@@ -1,5 +1,21 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 10.7.1
+
+### Patch Changes
+
+- fd63446: `--version` reports the version of the package the command was installed from.
+
+    Every CLI in these packages now resolves its version from its own
+    `package.json` when it starts, rather than printing a string held in the
+    source. The value a command prints and the version a consumer installed are
+    the same thing by construction, so a release cannot move one without the
+    other.
+
+    `prepare-release` and `sync-cli-versions`, which carried the version into the
+    sources, are removed along with the string they maintained. Nothing else
+    called them.
+
 ## 10.7.0
 
 ### Minor Changes
