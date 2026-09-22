@@ -1,6 +1,6 @@
 {
   "name": "ts-codemod-cli",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": false,
   "description": "Command line interface for ts-codemod-lib.",
   "keywords": [
