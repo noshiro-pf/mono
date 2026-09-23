@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.esnext.disposable.d.ts b/v5.4/output/lib-files/lib.esnext.disposable.d.ts
-index 1ff8a271fa7dca33763f3695deec4d6695fbafbf..4c7b74f3dfe08e30ae09d0a596e464abdd45b4a7 100644
+index 04d1894264f99219061ac054041b5539210e9993..3eb3f928416b4a45a98bfcdc4dd5cdf12564c96a 100644
 --- a/v5.3/output/lib-files/lib.esnext.disposable.d.ts
 +++ b/v5.4/output/lib-files/lib.esnext.disposable.d.ts
-@@ -27,7 +27,7 @@ interface SuppressedError extends Error {
+@@ -49,7 +49,7 @@ interface SuppressedError extends Error {
    readonly suppressed: unknown;
  }
  

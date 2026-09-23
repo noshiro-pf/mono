@@ -1,8 +1,8 @@
 diff --git a/v5.0/output/lib-files-branded/lib.webworker.d.ts b/v5.1/output/lib-files-branded/lib.webworker.d.ts
-index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1cb4d1ec2 100644
+index 4c117bdec5b613210158ddb7ec86161d6ffbddfb..b0e330ab5c50faa390c653960bcdfd3c3bc6faa0 100644
 --- a/v5.0/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.1/output/lib-files-branded/lib.webworker.d.ts
-@@ -49,11 +49,30 @@ interface AudioConfiguration {
+@@ -71,11 +71,30 @@ interface AudioConfiguration {
    spatialRendering?: boolean;
  }
  
@@ -33,7 +33,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface CacheQueryOptions {
    ignoreMethod?: boolean;
    ignoreSearch?: boolean;
-@@ -146,6 +165,17 @@ interface EcdsaParams extends Algorithm {
+@@ -168,6 +187,17 @@ interface EcdsaParams extends Algorithm {
    hash: HashAlgorithmIdentifier;
  }
  
@@ -51,7 +51,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface ErrorEventInit extends EventInit {
    colno?: number;
    error?: unknown;
-@@ -191,6 +221,10 @@ interface FilePropertyBag extends BlobPropertyBag {
+@@ -213,6 +243,10 @@ interface FilePropertyBag extends BlobPropertyBag {
    lastModified?: number;
  }
  
@@ -62,7 +62,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface FileSystemGetDirectoryOptions {
    create?: boolean;
  }
-@@ -437,6 +471,11 @@ interface PermissionDescriptor {
+@@ -459,6 +493,11 @@ interface PermissionDescriptor {
    name: PermissionName;
  }
  
@@ -74,7 +74,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface ProgressEventInit extends EventInit {
    lengthComputable?: boolean;
    loaded?: number;
-@@ -528,6 +567,11 @@ interface RegistrationOptions {
+@@ -550,6 +589,11 @@ interface RegistrationOptions {
    updateViaCache?: ServiceWorkerUpdateViaCache;
  }
  
@@ -86,7 +86,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface RequestInit {
    /** A BodyInit object or null to set request's body. */
    body?: BodyInit | null;
-@@ -712,6 +756,85 @@ interface VideoConfiguration {
+@@ -734,6 +778,85 @@ interface VideoConfiguration {
    width: number;
  }
  
@@ -172,7 +172,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLContextAttributes {
    alpha?: boolean;
    antialias?: boolean;
-@@ -734,14 +857,27 @@ interface WorkerOptions {
+@@ -756,14 +879,27 @@ interface WorkerOptions {
    type?: WorkerType;
  }
  
@@ -201,7 +201,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    drawElementsInstancedANGLE(
      mode: GLenum,
      count: GLsizei,
-@@ -749,15 +885,28 @@ interface ANGLE_instanced_arrays {
+@@ -771,15 +907,28 @@ interface ANGLE_instanced_arrays {
      offset: GLintptr,
      primcount: GLsizei,
    ): void;
@@ -233,7 +233,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    abort(reason?: unknown): void;
  }
  
-@@ -770,12 +919,23 @@ interface AbortSignalEventMap {
+@@ -792,12 +941,23 @@ interface AbortSignalEventMap {
    abort: Event;
  }
  
@@ -259,7 +259,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    throwIfAborted(): void;
    addEventListener<K extends keyof AbortSignalEventMap>(
      type: K,
-@@ -802,7 +962,9 @@ interface AbortSignal extends EventTarget {
+@@ -824,7 +984,9 @@ interface AbortSignal extends EventTarget {
  declare const AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
@@ -269,7 +269,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    timeout(milliseconds: number): AbortSignal;
  };
  
-@@ -811,6 +973,7 @@ interface AbstractWorkerEventMap {
+@@ -833,6 +995,7 @@ interface AbstractWorkerEventMap {
  }
  
  interface AbstractWorker {
@@ -277,7 +277,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    onerror: ((this: AbstractWorker, ev: ErrorEvent) => unknown) | null;
    addEventListener<K extends keyof AbstractWorkerEventMap>(
      type: K,
-@@ -839,13 +1002,23 @@ interface AnimationFrameProvider {
+@@ -861,13 +1024,23 @@ interface AnimationFrameProvider {
    requestAnimationFrame(callback: FrameRequestCallback): number;
  }
  
@@ -302,7 +302,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    text(): Promise<string>;
  }
  
-@@ -855,12 +1028,19 @@ declare const Blob: {
+@@ -877,12 +1050,19 @@ declare const Blob: {
  };
  
  interface Body {
@@ -322,7 +322,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    text(): Promise<string>;
  }
  
-@@ -869,16 +1049,31 @@ interface BroadcastChannelEventMap {
+@@ -891,16 +1071,31 @@ interface BroadcastChannelEventMap {
    messageerror: MessageEvent;
  }
  
@@ -357,7 +357,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    postMessage(message: unknown): void;
    addEventListener<K extends keyof BroadcastChannelEventMap>(
      type: K,
-@@ -913,9 +1108,15 @@ declare const BroadcastChannel: {
+@@ -935,9 +1130,15 @@ declare const BroadcastChannel: {
    new (name: string): BroadcastChannel;
  };
  
@@ -374,7 +374,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly size: QueuingStrategySize<ArrayBufferView>;
  }
  
-@@ -924,29 +1125,412 @@ declare const ByteLengthQueuingStrategy: {
+@@ -946,29 +1147,412 @@ declare const ByteLengthQueuingStrategy: {
    new (init: QueuingStrategyInit): ByteLengthQueuingStrategy;
  };
  
@@ -787,7 +787,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    put(request: RequestInfo | URL, response: Response): Promise<void>;
  }
  
-@@ -958,15 +1542,22 @@ declare const Cache: {
+@@ -980,15 +1564,22 @@ declare const Cache: {
  /**
   * The storage for Cache objects.
   * Available only in secure contexts.
@@ -810,7 +810,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    open(cacheName: string): Promise<Cache>;
  }
  
-@@ -976,11 +1567,14 @@ declare const CacheStorage: {
+@@ -998,11 +1589,14 @@ declare const CacheStorage: {
  };
  
  interface CanvasCompositing {
@@ -825,7 +825,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    drawImage(image: CanvasImageSource, dx: number, dy: number): void;
    drawImage(
      image: CanvasImageSource,
-@@ -1003,11 +1597,15 @@ interface CanvasDrawImage {
+@@ -1025,11 +1619,15 @@ interface CanvasDrawImage {
  }
  
  interface CanvasDrawPath {
@@ -841,7 +841,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    isPointInPath(x: number, y: number, fillRule?: CanvasFillRule): boolean;
    isPointInPath(
      path: Path2D,
-@@ -1015,26 +1613,34 @@ interface CanvasDrawPath {
+@@ -1037,26 +1635,34 @@ interface CanvasDrawPath {
      y: number,
      fillRule?: CanvasFillRule,
    ): boolean;
@@ -876,7 +876,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    createRadialGradient(
      x0: number,
      y0: number,
-@@ -1046,15 +1652,22 @@ interface CanvasFillStrokeStyles {
+@@ -1068,15 +1674,22 @@ interface CanvasFillStrokeStyles {
  }
  
  interface CanvasFilters {
@@ -900,7 +900,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    addColorStop(offset: number, color: string): void;
  }
-@@ -1065,12 +1678,14 @@ declare const CanvasGradient: {
+@@ -1087,12 +1700,14 @@ declare const CanvasGradient: {
  };
  
  interface CanvasImageData {
@@ -915,7 +915,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getImageData(
      sx: number,
      sy: number,
-@@ -1078,6 +1693,7 @@ interface CanvasImageData {
+@@ -1100,6 +1715,7 @@ interface CanvasImageData {
      sh: number,
      settings?: ImageDataSettings,
    ): ImageData;
@@ -923,7 +923,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    putImageData(imagedata: ImageData, dx: number, dy: number): void;
    putImageData(
      imagedata: ImageData,
-@@ -1091,11 +1707,14 @@ interface CanvasImageData {
+@@ -1113,11 +1729,14 @@ interface CanvasImageData {
  }
  
  interface CanvasImageSmoothing {
@@ -938,7 +938,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    arc(
      x: number,
      y: number,
-@@ -1104,7 +1723,9 @@ interface CanvasPath {
+@@ -1126,7 +1745,9 @@ interface CanvasPath {
      endAngle: number,
      counterclockwise?: boolean,
    ): void;
@@ -948,7 +948,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    bezierCurveTo(
      cp1x: number,
      cp1y: number,
-@@ -1113,7 +1734,9 @@ interface CanvasPath {
+@@ -1135,7 +1756,9 @@ interface CanvasPath {
      x: number,
      y: number,
    ): void;
@@ -958,7 +958,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    ellipse(
      x: number,
      y: number,
-@@ -1124,10 +1747,15 @@ interface CanvasPath {
+@@ -1146,10 +1769,15 @@ interface CanvasPath {
      endAngle: number,
      counterclockwise?: boolean,
    ): void;
@@ -974,7 +974,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    roundRect(
      x: number,
      y: number,
-@@ -1138,18 +1766,33 @@ interface CanvasPath {
+@@ -1160,18 +1788,33 @@ interface CanvasPath {
  }
  
  interface CanvasPathDrawingStyles {
@@ -1010,7 +1010,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    setTransform(transform?: DOMMatrix2DInit): void;
  }
  
-@@ -1159,42 +1802,64 @@ declare const CanvasPattern: {
+@@ -1181,42 +1824,64 @@ declare const CanvasPattern: {
  };
  
  interface CanvasRect {
@@ -1075,7 +1075,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    setTransform(
      a: number,
      b: number,
-@@ -1204,6 +1869,7 @@ interface CanvasTransform {
+@@ -1226,6 +1891,7 @@ interface CanvasTransform {
      f: number,
    ): void;
    setTransform(transform?: DOMMatrix2DInit): void;
@@ -1083,7 +1083,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    transform(
      a: number,
      b: number,
-@@ -1212,15 +1878,25 @@ interface CanvasTransform {
+@@ -1234,15 +1900,25 @@ interface CanvasTransform {
      e: number,
      f: number,
    ): void;
@@ -1110,7 +1110,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    postMessage(message: unknown, transfer: readonly Transferable[]): void;
    postMessage(message: unknown, options?: StructuredSerializeOptions): void;
  }
-@@ -1230,13 +1906,21 @@ declare const Client: {
+@@ -1252,13 +1928,21 @@ declare const Client: {
    new (): Client;
  };
  
@@ -1133,7 +1133,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    openWindow(url: string | URL): Promise<WindowClient | null>;
  }
  
-@@ -1245,13 +1929,29 @@ declare const Clients: {
+@@ -1267,13 +1951,29 @@ declare const Clients: {
    new (): Clients;
  };
  
@@ -1167,7 +1167,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly wasClean: boolean;
  }
  
-@@ -1260,9 +1960,23 @@ declare const CloseEvent: {
+@@ -1282,9 +1982,23 @@ declare const CloseEvent: {
    new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
  };
  
@@ -1192,7 +1192,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly size: QueuingStrategySize;
  }
  
-@@ -1271,12 +1985,25 @@ declare const CountQueuingStrategy: {
+@@ -1293,12 +2007,25 @@ declare const CountQueuingStrategy: {
    new (init: QueuingStrategyInit): CountQueuingStrategy;
  };
  
@@ -1221,7 +1221,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    randomUUID(): `${string}-${string}-${string}-${string}-${string}`;
  }
  
-@@ -1288,11 +2015,17 @@ declare const Crypto: {
+@@ -1310,11 +2037,17 @@ declare const Crypto: {
  /**
   * The CryptoKey dictionary of the Web Crypto API represents a cryptographic key.
   * Available only in secure contexts.
@@ -1239,7 +1239,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly usages: readonly KeyUsage[];
  }
  
-@@ -1301,10 +2034,19 @@ declare const CryptoKey: {
+@@ -1323,10 +2056,19 @@ declare const CryptoKey: {
    new (): CryptoKey;
  };
  
@@ -1261,7 +1261,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    initCustomEvent(
      type: string,
      bubbles?: boolean,
-@@ -1318,11 +2060,21 @@ declare const CustomEvent: {
+@@ -1340,11 +2082,21 @@ declare const CustomEvent: {
    new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
  };
  
@@ -1285,7 +1285,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly name: string;
    readonly INDEX_SIZE_ERR: 1;
    readonly DOMSTRING_SIZE_ERR: 2;
-@@ -1381,6 +2133,7 @@ declare const DOMException: {
+@@ -1403,6 +2155,7 @@ declare const DOMException: {
    readonly DATA_CLONE_ERR: 25;
  };
  
@@ -1293,7 +1293,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface DOMMatrix extends DOMMatrixReadOnly {
    a: number;
    b: number;
-@@ -1415,12 +2168,14 @@ interface DOMMatrix extends DOMMatrixReadOnly {
+@@ -1437,12 +2190,14 @@ interface DOMMatrix extends DOMMatrixReadOnly {
    ): DOMMatrix;
    rotateFromVectorSelf(x?: number, y?: number): DOMMatrix;
    rotateSelf(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
@@ -1308,7 +1308,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    scaleSelf(
      scaleX?: number,
      scaleY?: number,
-@@ -1442,43 +2197,76 @@ declare const DOMMatrix: {
+@@ -1464,43 +2219,76 @@ declare const DOMMatrix: {
    fromMatrix(other?: DOMMatrixInit): DOMMatrix;
  };
  
@@ -1385,7 +1385,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    scale(
      scaleX?: number,
      scaleY?: number,
-@@ -1487,20 +2275,31 @@ interface DOMMatrixReadOnly {
+@@ -1509,20 +2297,31 @@ interface DOMMatrixReadOnly {
      originY?: number,
      originZ?: number,
    ): DOMMatrix;
@@ -1418,7 +1418,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    translate(tx?: number, ty?: number, tz?: number): DOMMatrix;
  }
  
-@@ -1512,39 +2311,59 @@ declare const DOMMatrixReadOnly: {
+@@ -1534,39 +2333,59 @@ declare const DOMMatrixReadOnly: {
    fromMatrix(other?: DOMMatrixInit): DOMMatrixReadOnly;
  };
  
@@ -1478,7 +1478,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getBounds(): DOMRect;
    toJSON(): unknown;
  }
-@@ -1561,6 +2380,7 @@ declare const DOMQuad: {
+@@ -1583,6 +2402,7 @@ declare const DOMQuad: {
    fromRect(other?: DOMRectInit): DOMQuad;
  };
  
@@ -1486,7 +1486,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface DOMRect extends DOMRectReadOnly {
    height: number;
    width: number;
-@@ -1574,14 +2394,23 @@ declare const DOMRect: {
+@@ -1596,14 +2416,23 @@ declare const DOMRect: {
    fromRect(other?: DOMRectInit): DOMRect;
  };
  
@@ -1510,7 +1510,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly y: number;
    toJSON(): unknown;
  }
-@@ -1594,16 +2423,33 @@ declare const DOMRectReadOnly: {
+@@ -1616,16 +2445,33 @@ declare const DOMRectReadOnly: {
      width?: number,
      height?: number,
    ): DOMRectReadOnly;
@@ -1548,7 +1548,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    item(index: number): string | null;
    [index: number]: string;
  }
-@@ -1613,25 +2459,51 @@ declare const DOMStringList: {
+@@ -1635,25 +2481,51 @@ declare const DOMStringList: {
    new (): DOMStringList;
  };
  
@@ -1606,7 +1606,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    postMessage(message: unknown, transfer: readonly Transferable[]): void;
    postMessage(message: unknown, options?: StructuredSerializeOptions): void;
    addEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(
-@@ -1667,13 +2539,16 @@ declare const DedicatedWorkerGlobalScope: {
+@@ -1689,13 +2561,16 @@ declare const DedicatedWorkerGlobalScope: {
    new (): DedicatedWorkerGlobalScope;
  };
  
@@ -1623,7 +1623,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EXT_color_buffer_half_float {
    readonly RGBA16F_EXT: 0x881a;
    readonly RGB16F_EXT: 0x881b;
-@@ -1681,11 +2556,17 @@ interface EXT_color_buffer_half_float {
+@@ -1703,11 +2578,17 @@ interface EXT_color_buffer_half_float {
    readonly UNSIGNED_NORMALIZED_EXT: 0x8c17;
  }
  
@@ -1642,7 +1642,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EXT_sRGB {
    readonly SRGB_EXT: 0x8c40;
    readonly SRGB_ALPHA_EXT: 0x8c42;
-@@ -1693,8 +2574,10 @@ interface EXT_sRGB {
+@@ -1715,8 +2596,10 @@ interface EXT_sRGB {
    readonly FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING_EXT: 0x8210;
  }
  
@@ -1653,7 +1653,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EXT_texture_compression_bptc {
    readonly COMPRESSED_RGBA_BPTC_UNORM_EXT: 0x8e8c;
    readonly COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT: 0x8e8d;
-@@ -1702,6 +2585,7 @@ interface EXT_texture_compression_bptc {
+@@ -1724,6 +2607,7 @@ interface EXT_texture_compression_bptc {
    readonly COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT: 0x8e8f;
  }
  
@@ -1661,7 +1661,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EXT_texture_compression_rgtc {
    readonly COMPRESSED_RED_RGTC1_EXT: 0x8dbb;
    readonly COMPRESSED_SIGNED_RED_RGTC1_EXT: 0x8dbc;
-@@ -1709,12 +2593,17 @@ interface EXT_texture_compression_rgtc {
+@@ -1731,12 +2615,17 @@ interface EXT_texture_compression_rgtc {
    readonly COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT: 0x8dbe;
  }
  
@@ -1680,7 +1680,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EXT_texture_norm16 {
    readonly R16_EXT: 0x822a;
    readonly RG16_EXT: 0x822c;
-@@ -1726,12 +2615,40 @@ interface EXT_texture_norm16 {
+@@ -1748,12 +2637,40 @@ interface EXT_texture_norm16 {
    readonly RGBA16_SNORM_EXT: 0x8f9b;
  }
  
@@ -1722,7 +1722,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly message: string;
  }
  
-@@ -1740,43 +2657,119 @@ declare const ErrorEvent: {
+@@ -1762,43 +2679,119 @@ declare const ErrorEvent: {
    new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
  };
  
@@ -1861,7 +1861,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    stopPropagation(): void;
    readonly NONE: 0;
    readonly CAPTURING_PHASE: 1;
-@@ -1807,17 +2800,37 @@ interface EventSourceEventMap {
+@@ -1829,17 +2822,37 @@ interface EventSourceEventMap {
    open: Event;
  }
  
@@ -1903,7 +1903,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    close(): void;
    readonly CONNECTING: 0;
    readonly OPEN: 1;
-@@ -1862,7 +2875,11 @@ declare const EventSource: {
+@@ -1884,7 +2897,11 @@ declare const EventSource: {
    readonly CLOSED: 2;
  };
  
@@ -1916,7 +1916,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface EventTarget {
    /**
     * Appends an event listener for events whose type attribute value is type. The callback argument sets the callback that will be invoked when the event is dispatched.
-@@ -1878,15 +2895,25 @@ interface EventTarget {
+@@ -1900,15 +2917,25 @@ interface EventTarget {
     * If an AbortSignal is passed for options's signal, then the event listener will be removed when signal is aborted.
     *
     * The event listener is appended to target's event listener list and is not appended if it has the same type, callback, and capture.
@@ -1944,7 +1944,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    removeEventListener(
      type: string,
      callback: EventListenerOrEventListenerObject | null,
-@@ -1899,8 +2926,13 @@ declare const EventTarget: {
+@@ -1921,8 +2948,13 @@ declare const EventTarget: {
    new (): EventTarget;
  };
  
@@ -1959,7 +1959,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    waitUntil(f: Promise<unknown>): void;
  }
  
-@@ -1909,12 +2941,21 @@ declare const ExtendableEvent: {
+@@ -1931,12 +2963,21 @@ declare const ExtendableEvent: {
    new (type: string, eventInitDict?: ExtendableEventInit): ExtendableEvent;
  };
  
@@ -1982,7 +1982,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly source: Client | ServiceWorker | MessagePort | null;
  }
  
-@@ -1926,13 +2967,23 @@ declare const ExtendableMessageEvent: {
+@@ -1948,13 +2989,23 @@ declare const ExtendableMessageEvent: {
    ): ExtendableMessageEvent;
  };
  
@@ -2007,7 +2007,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    respondWith(r: Response | PromiseLike<Response>): void;
  }
  
-@@ -1941,10 +2992,17 @@ declare const FetchEvent: {
+@@ -1963,10 +3014,17 @@ declare const FetchEvent: {
    new (type: string, eventInitDict: FetchEventInit): FetchEvent;
  };
  
@@ -2026,7 +2026,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly webkitRelativePath: string;
  }
  
-@@ -1957,9 +3015,15 @@ declare const File: {
+@@ -1979,9 +3037,15 @@ declare const File: {
    ): File;
  };
  
@@ -2043,7 +2043,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    item(index: number): File | null;
    [index: number]: File;
  }
-@@ -1978,34 +3042,52 @@ interface FileReaderEventMap {
+@@ -2000,34 +3064,52 @@ interface FileReaderEventMap {
    progress: ProgressEvent<FileReader>;
  }
  
@@ -2097,7 +2097,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readAsText(blob: Blob, encoding?: string): void;
    readonly EMPTY: 0;
    readonly LOADING: 1;
-@@ -2040,12 +3122,23 @@ declare const FileReader: {
+@@ -2062,12 +3144,23 @@ declare const FileReader: {
    readonly DONE: 2;
  };
  
@@ -2123,7 +2123,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readAsText(blob: Blob, encoding?: string): string;
  }
  
-@@ -2054,18 +3147,26 @@ declare const FileReaderSync: {
+@@ -2076,18 +3169,26 @@ declare const FileReaderSync: {
    new (): FileReaderSync;
  };
  
@@ -2151,7 +2151,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    resolve(
      possibleDescendant: FileSystemHandle,
    ): Promise<readonly string[] | null>;
-@@ -2076,10 +3177,20 @@ declare const FileSystemDirectoryHandle: {
+@@ -2098,10 +3199,20 @@ declare const FileSystemDirectoryHandle: {
    new (): FileSystemDirectoryHandle;
  };
  
@@ -2173,7 +2173,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getFile(): Promise<File>;
  }
  
-@@ -2088,10 +3199,17 @@ declare const FileSystemFileHandle: {
+@@ -2110,10 +3221,17 @@ declare const FileSystemFileHandle: {
    new (): FileSystemFileHandle;
  };
  
@@ -2192,7 +2192,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    isSameEntry(other: FileSystemHandle): Promise<boolean>;
  }
  
-@@ -2100,13 +3218,23 @@ declare const FileSystemHandle: {
+@@ -2122,13 +3240,23 @@ declare const FileSystemHandle: {
    new (): FileSystemHandle;
  };
  
@@ -2217,7 +2217,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    write(buffer: BufferSource, options?: FileSystemReadWriteOptions): number;
  }
  
-@@ -2115,20 +3243,54 @@ declare const FileSystemSyncAccessHandle: {
+@@ -2137,20 +3265,54 @@ declare const FileSystemSyncAccessHandle: {
    new (): FileSystemSyncAccessHandle;
  };
  
@@ -2272,7 +2272,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    load(): Promise<FontFace>;
  }
  
-@@ -2147,13 +3309,21 @@ interface FontFaceSetEventMap {
+@@ -2169,13 +3331,21 @@ interface FontFaceSetEventMap {
    loadingerror: Event;
  }
  
@@ -2294,7 +2294,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    load(font: string, text?: string): Promise<readonly FontFace[]>;
    forEach(
      callbackfn: (value: FontFace, key: FontFace, parent: FontFaceSet) => void,
-@@ -2186,7 +3356,9 @@ declare const FontFaceSet: {
+@@ -2208,7 +3378,9 @@ declare const FontFaceSet: {
    new (initialFaces: readonly FontFace[]): FontFaceSet;
  };
  
@@ -2304,7 +2304,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly fontfaces: ReadonlyArray<FontFace>;
  }
  
-@@ -2199,17 +3371,32 @@ declare const FontFaceSetLoadEvent: {
+@@ -2221,17 +3393,32 @@ declare const FontFaceSetLoadEvent: {
  };
  
  interface FontFaceSource {
@@ -2340,7 +2340,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    forEach(
      callbackfn: (
        value: FormDataEntryValue,
-@@ -2226,16 +3413,27 @@ declare const FormData: {
+@@ -2248,16 +3435,27 @@ declare const FormData: {
  };
  
  interface GenericTransformStream {
@@ -2369,7 +2369,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    set(name: string, value: string): void;
    forEach(
      callbackfn: (value: string, key: string, parent: Headers) => void,
-@@ -2248,27 +3446,62 @@ declare const Headers: {
+@@ -2270,27 +3468,62 @@ declare const Headers: {
    new (init?: HeadersInit): Headers;
  };
  
@@ -2440,7 +2440,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    delete(): IDBRequest<undefined>;
    /**
-@@ -2277,6 +3510,8 @@ interface IDBCursor {
+@@ -2299,6 +3532,8 @@ interface IDBCursor {
     * Throws a "DataError" DOMException if the effective object store uses in-line keys and the key would have changed.
     *
     * If successful, request's result will be the record's key.
@@ -2449,7 +2449,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    update(value: unknown): IDBRequest<IDBValidKey>;
  }
-@@ -2286,9 +3521,17 @@ declare const IDBCursor: {
+@@ -2308,9 +3543,17 @@ declare const IDBCursor: {
    new (): IDBCursor;
  };
  
@@ -2469,7 +2469,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly value: unknown;
  }
  
-@@ -2304,26 +3547,50 @@ interface IDBDatabaseEventMap {
+@@ -2326,26 +3569,50 @@ interface IDBDatabaseEventMap {
    versionchange: IDBVersionChangeEvent;
  }
  
@@ -2525,7 +2525,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    createObjectStore(
      name: string,
-@@ -2333,9 +3600,15 @@ interface IDBDatabase extends EventTarget {
+@@ -2355,9 +3622,15 @@ interface IDBDatabase extends EventTarget {
     * Deletes the object store with the given name.
     *
     * Throws a "InvalidStateError" DOMException if not called within an upgrade transaction.
@@ -2542,7 +2542,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    transaction(
      storeNames: string | readonly string[],
      mode?: IDBTransactionMode,
-@@ -2368,18 +3641,33 @@ declare const IDBDatabase: {
+@@ -2390,18 +3663,33 @@ declare const IDBDatabase: {
    new (): IDBDatabase;
  };
  
@@ -2579,7 +2579,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    open(name: string, version?: number): IDBOpenDBRequest;
  }
  
-@@ -2388,31 +3676,52 @@ declare const IDBFactory: {
+@@ -2410,31 +3698,52 @@ declare const IDBFactory: {
    new (): IDBFactory;
  };
  
@@ -2635,7 +2635,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    getAll(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2422,6 +3731,8 @@ interface IDBIndex {
+@@ -2444,6 +3753,8 @@ interface IDBIndex {
     * Retrieves the keys of records matching the given key or key range in query (up to count if given).
     *
     * If successful, request's result will be an Array of the keys.
@@ -2644,7 +2644,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    getAllKeys(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2431,12 +3742,16 @@ interface IDBIndex {
+@@ -2453,12 +3764,16 @@ interface IDBIndex {
     * Retrieves the key of the first record matching the given key or key range in query.
     *
     * If successful, request's result will be the key, or undefined if there was no matching record.
@@ -2661,7 +2661,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    openCursor(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2446,6 +3761,8 @@ interface IDBIndex {
+@@ -2468,6 +3783,8 @@ interface IDBIndex {
     * Opens a cursor with key only flag set over the records matching query, ordered by direction. If query is null, all records in index are matched.
     *
     * If successful, request's result will be an IDBCursor, or null if there were no matching records.
@@ -2670,7 +2670,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    openKeyCursor(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2458,49 +3775,113 @@ declare const IDBIndex: {
+@@ -2480,49 +3797,113 @@ declare const IDBIndex: {
    new (): IDBIndex;
  };
  
@@ -2800,7 +2800,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly transaction: IDBTransaction;
    /**
     * Adds or updates a record in store with the given value and key.
-@@ -2510,24 +3891,32 @@ interface IDBObjectStore {
+@@ -2532,24 +3913,32 @@ interface IDBObjectStore {
     * If put() is used, any existing record with the key will be replaced. If add() is used, and if a record with the key already exists the request will fail, with request's error set to a "ConstraintError" DOMException.
     *
     * If successful, request's result will be the record's key.
@@ -2833,7 +2833,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    createIndex(
      name: string,
-@@ -2538,24 +3927,32 @@ interface IDBObjectStore {
+@@ -2560,24 +3949,32 @@ interface IDBObjectStore {
     * Deletes records in store with the given key or in the given key range in query.
     *
     * If successful, request's result will be undefined.
@@ -2866,7 +2866,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    getAll(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2565,6 +3962,8 @@ interface IDBObjectStore {
+@@ -2587,6 +3984,8 @@ interface IDBObjectStore {
     * Retrieves the keys of records matching the given key or key range in query (up to count if given).
     *
     * If successful, request's result will be an Array of the keys.
@@ -2875,7 +2875,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    getAllKeys(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2574,13 +3973,18 @@ interface IDBObjectStore {
+@@ -2596,13 +3995,18 @@ interface IDBObjectStore {
     * Retrieves the key of the first record matching the given key or key range in query.
     *
     * If successful, request's result will be the key, or undefined if there was no matching record.
@@ -2894,7 +2894,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    openCursor(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2590,6 +3994,8 @@ interface IDBObjectStore {
+@@ -2612,6 +4016,8 @@ interface IDBObjectStore {
     * Opens a cursor with key only flag set over the records matching query, ordered by direction. If query is null, all records in store are matched.
     *
     * If successful, request's result will be an IDBCursor pointing at the first matching record, or null if there were no matching records.
@@ -2903,7 +2903,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    openKeyCursor(
      query?: IDBValidKey | IDBKeyRange | null,
-@@ -2603,6 +4009,8 @@ interface IDBObjectStore {
+@@ -2625,6 +4031,8 @@ interface IDBObjectStore {
     * If put() is used, any existing record with the key will be replaced. If add() is used, and if a record with the key already exists the request will fail, with request's error set to a "ConstraintError" DOMException.
     *
     * If successful, request's result will be the record's key.
@@ -2912,7 +2912,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    put(value: unknown, key?: IDBValidKey): IDBRequest<IDBValidKey>;
  }
-@@ -2617,11 +4025,17 @@ interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
+@@ -2639,11 +4047,17 @@ interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
    upgradeneeded: IDBVersionChangeEvent;
  }
  
@@ -2931,7 +2931,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    onupgradeneeded:
      | ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => unknown)
      | null;
-@@ -2663,19 +4077,45 @@ interface IDBRequestEventMap {
+@@ -2685,19 +4099,45 @@ interface IDBRequestEventMap {
    success: Event;
  }
  
@@ -2983,7 +2983,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly transaction: IDBTransaction | null;
    addEventListener<K extends keyof IDBRequestEventMap>(
      type: K,
-@@ -2710,23 +4150,53 @@ interface IDBTransactionEventMap {
+@@ -2732,23 +4172,53 @@ interface IDBTransactionEventMap {
    error: Event;
  }
  
@@ -3043,7 +3043,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    objectStore(name: string): IDBObjectStore;
    addEventListener<K extends keyof IDBTransactionEventMap>(
      type: K,
-@@ -2755,9 +4225,15 @@ declare const IDBTransaction: {
+@@ -2777,9 +4247,15 @@ declare const IDBTransaction: {
    new (): IDBTransaction;
  };
  
@@ -3060,7 +3060,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly oldVersion: number;
  }
  
-@@ -2769,12 +4245,25 @@ declare const IDBVersionChangeEvent: {
+@@ -2791,12 +4267,25 @@ declare const IDBVersionChangeEvent: {
    ): IDBVersionChangeEvent;
  };
  
@@ -3089,7 +3089,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    close(): void;
  }
  
-@@ -2783,8 +4272,13 @@ declare const ImageBitmap: {
+@@ -2805,8 +4294,13 @@ declare const ImageBitmap: {
    new (): ImageBitmap;
  };
  
@@ -3104,7 +3104,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    transferFromImageBitmap(bitmap: ImageBitmap | null): void;
  }
  
-@@ -2793,14 +4287,31 @@ declare const ImageBitmapRenderingContext: {
+@@ -2815,14 +4309,31 @@ declare const ImageBitmapRenderingContext: {
    new (): ImageBitmapRenderingContext;
  };
  
@@ -3140,7 +3140,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly width: number;
  }
  
-@@ -2815,13 +4326,20 @@ declare const ImageData: {
+@@ -2837,13 +4348,20 @@ declare const ImageData: {
    ): ImageData;
  };
  
@@ -3162,7 +3162,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly name: string;
  }
  
-@@ -2830,9 +4348,15 @@ declare const Lock: {
+@@ -2852,9 +4370,15 @@ declare const Lock: {
    new (): Lock;
  };
  
@@ -3179,7 +3179,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    request(name: string, callback: LockGrantedCallback): Promise<unknown>;
    request(
      name: string,
-@@ -2846,10 +4370,13 @@ declare const LockManager: {
+@@ -2868,10 +4392,13 @@ declare const LockManager: {
    new (): LockManager;
  };
  
@@ -3193,7 +3193,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    encodingInfo(
      configuration: MediaEncodingConfiguration,
    ): Promise<MediaCapabilitiesEncodingInfo>;
-@@ -2860,11 +4387,23 @@ declare const MediaCapabilities: {
+@@ -2882,11 +4409,23 @@ declare const MediaCapabilities: {
    new (): MediaCapabilities;
  };
  
@@ -3220,7 +3220,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly port2: MessagePort;
  }
  
-@@ -2873,19 +4412,47 @@ declare const MessageChannel: {
+@@ -2895,19 +4434,47 @@ declare const MessageChannel: {
    new (): MessageChannel;
  };
  
@@ -3275,7 +3275,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    initMessageEvent(
      type: string,
      bubbles?: boolean,
-@@ -2908,20 +4475,36 @@ interface MessagePortEventMap {
+@@ -2930,20 +4497,36 @@ interface MessagePortEventMap {
    messageerror: MessageEvent;
  }
  
@@ -3315,7 +3315,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    start(): void;
    addEventListener<K extends keyof MessagePortEventMap>(
      type: K,
-@@ -2950,11 +4533,19 @@ declare const MessagePort: {
+@@ -2972,11 +4555,19 @@ declare const MessagePort: {
    new (): MessagePort;
  };
  
@@ -3336,7 +3336,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    setHeaderValue(value: string): Promise<void>;
  }
  
-@@ -2963,40 +4554,75 @@ declare const NavigationPreloadManager: {
+@@ -2985,40 +4576,75 @@ declare const NavigationPreloadManager: {
    new (): NavigationPreloadManager;
  };
  
@@ -3417,7 +3417,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly storage: StorageManager;
  }
  
-@@ -3007,19 +4633,35 @@ interface NotificationEventMap {
+@@ -3029,19 +4655,35 @@ interface NotificationEventMap {
    show: Event;
  }
  
@@ -3454,7 +3454,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    close(): void;
    addEventListener<K extends keyof NotificationEventMap>(
      type: K,
-@@ -3046,12 +4688,19 @@ interface Notification extends EventTarget {
+@@ -3068,12 +4710,19 @@ interface Notification extends EventTarget {
  declare const Notification: {
    prototype: Notification;
    new (title: string, options?: NotificationOptions): Notification;
@@ -3475,7 +3475,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly notification: Notification;
  }
  
-@@ -3060,13 +4709,17 @@ declare const NotificationEvent: {
+@@ -3082,13 +4731,17 @@ declare const NotificationEvent: {
    new (type: string, eventInitDict: NotificationEventInit): NotificationEvent;
  };
  
@@ -3493,7 +3493,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    blendFuncSeparateiOES(
      buf: GLuint,
      srcRGB: GLenum,
-@@ -3074,7 +4727,9 @@ interface OES_draw_buffers_indexed {
+@@ -3096,7 +4749,9 @@ interface OES_draw_buffers_indexed {
      srcAlpha: GLenum,
      dstAlpha: GLenum,
    ): void;
@@ -3503,7 +3503,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    colorMaskiOES(
      buf: GLuint,
      r: GLboolean,
-@@ -3082,43 +4737,77 @@ interface OES_draw_buffers_indexed {
+@@ -3104,43 +4759,77 @@ interface OES_draw_buffers_indexed {
      b: GLboolean,
      a: GLboolean,
    ): void;
@@ -3587,7 +3587,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    framebufferTextureMultiviewOVR(
      target: GLenum,
      attachment: GLenum,
-@@ -3138,11 +4827,14 @@ interface OffscreenCanvasEventMap {
+@@ -3160,11 +4849,14 @@ interface OffscreenCanvasEventMap {
    contextrestored: Event;
  }
  
@@ -3602,7 +3602,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    height: number;
    oncontextlost: ((this: OffscreenCanvas, ev: Event) => unknown) | null;
-@@ -3151,12 +4843,16 @@ interface OffscreenCanvas extends EventTarget {
+@@ -3173,12 +4865,16 @@ interface OffscreenCanvas extends EventTarget {
     * These attributes return the dimensions of the OffscreenCanvas object's bitmap.
     *
     * They can be set, to replace the bitmap with a new, transparent black bitmap of the specified dimensions (effectively resizing it).
@@ -3619,7 +3619,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    convertToBlob(options?: ImageEncodeOptions): Promise<Blob>;
    /**
-@@ -3165,6 +4861,8 @@ interface OffscreenCanvas extends EventTarget {
+@@ -3187,6 +4883,8 @@ interface OffscreenCanvas extends EventTarget {
     * This specification defines the "2d" context below, which is similar but distinct from the "2d" context that is created from a canvas element. The WebGL specifications define the "webgl" and "webgl2" contexts. [WEBGL]
     *
     * Returns null if the canvas has already been initialized with another context type (e.g., trying to get a "2d" context after getting a "webgl" context).
@@ -3628,7 +3628,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    getContext(
      contextId: '2d',
-@@ -3186,7 +4884,11 @@ interface OffscreenCanvas extends EventTarget {
+@@ -3208,7 +4906,11 @@ interface OffscreenCanvas extends EventTarget {
      contextId: OffscreenRenderingContextId,
      options?: unknown,
    ): OffscreenRenderingContext | null;
@@ -3641,7 +3641,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    transferToImageBitmap(): ImageBitmap;
    addEventListener<K extends keyof OffscreenCanvasEventMap>(
      type: K,
-@@ -3221,6 +4923,7 @@ declare const OffscreenCanvas: {
+@@ -3243,6 +4945,7 @@ declare const OffscreenCanvas: {
    new (width: number, height: number): OffscreenCanvas;
  };
  
@@ -3649,7 +3649,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface OffscreenCanvasRenderingContext2D
    extends
      CanvasCompositing,
-@@ -3239,6 +4942,7 @@ interface OffscreenCanvasRenderingContext2D
+@@ -3261,6 +4964,7 @@ interface OffscreenCanvasRenderingContext2D
      CanvasTextDrawingStyles,
      CanvasTransform {
    readonly canvas: OffscreenCanvas;
@@ -3657,7 +3657,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    commit(): void;
  }
  
-@@ -3247,9 +4951,17 @@ declare const OffscreenCanvasRenderingContext2D: {
+@@ -3269,9 +4973,17 @@ declare const OffscreenCanvasRenderingContext2D: {
    new (): OffscreenCanvasRenderingContext2D;
  };
  
@@ -3677,7 +3677,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    addPath(path: Path2D, transform?: DOMMatrix2DInit): void;
  }
  
-@@ -3262,26 +4974,43 @@ interface PerformanceEventMap {
+@@ -3284,26 +4996,43 @@ interface PerformanceEventMap {
    resourcetimingbufferfull: Event;
  }
  
@@ -3722,7 +3722,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    toJSON(): unknown;
    addEventListener<K extends keyof PerformanceEventMap>(
      type: K,
-@@ -3310,12 +5039,21 @@ declare const Performance: {
+@@ -3332,12 +5061,21 @@ declare const Performance: {
    new (): Performance;
  };
  
@@ -3745,7 +3745,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    toJSON(): unknown;
  }
  
-@@ -3324,8 +5062,13 @@ declare const PerformanceEntry: {
+@@ -3346,8 +5084,13 @@ declare const PerformanceEntry: {
    new (): PerformanceEntry;
  };
  
@@ -3760,7 +3760,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly detail: unknown;
  }
  
-@@ -3334,8 +5077,13 @@ declare const PerformanceMark: {
+@@ -3356,8 +5099,13 @@ declare const PerformanceMark: {
    new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
  };
  
@@ -3775,7 +3775,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly detail: unknown;
  }
  
-@@ -3344,21 +5092,30 @@ declare const PerformanceMeasure: {
+@@ -3366,21 +5114,30 @@ declare const PerformanceMeasure: {
    new (): PerformanceMeasure;
  };
  
@@ -3806,7 +3806,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getEntriesByType(type: string): PerformanceEntryList;
  }
  
-@@ -3367,26 +5124,49 @@ declare const PerformanceObserverEntryList: {
+@@ -3389,26 +5146,49 @@ declare const PerformanceObserverEntryList: {
    new (): PerformanceObserverEntryList;
  };
  
@@ -3857,7 +3857,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    toJSON(): unknown;
  }
  
-@@ -3395,10 +5175,15 @@ declare const PerformanceResourceTiming: {
+@@ -3417,10 +5197,15 @@ declare const PerformanceResourceTiming: {
    new (): PerformanceResourceTiming;
  };
  
@@ -3873,7 +3873,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    toJSON(): unknown;
  }
  
-@@ -3411,9 +5196,13 @@ interface PermissionStatusEventMap {
+@@ -3433,9 +5218,13 @@ interface PermissionStatusEventMap {
    change: Event;
  }
  
@@ -3887,7 +3887,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly state: PermissionState;
    addEventListener<K extends keyof PermissionStatusEventMap>(
      type: K,
-@@ -3448,7 +5237,9 @@ declare const PermissionStatus: {
+@@ -3470,7 +5259,9 @@ declare const PermissionStatus: {
    new (): PermissionStatus;
  };
  
@@ -3897,7 +3897,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    query(permissionDesc: PermissionDescriptor): Promise<PermissionStatus>;
  }
  
-@@ -3457,11 +5248,18 @@ declare const Permissions: {
+@@ -3479,11 +5270,18 @@ declare const Permissions: {
    new (): Permissions;
  };
  
@@ -3917,7 +3917,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly total: number;
  }
  
-@@ -3470,8 +5268,11 @@ declare const ProgressEvent: {
+@@ -3492,8 +5290,11 @@ declare const ProgressEvent: {
    new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
  };
  
@@ -3929,7 +3929,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly reason: unknown;
  }
  
-@@ -3486,8 +5287,11 @@ declare const PromiseRejectionEvent: {
+@@ -3508,8 +5309,11 @@ declare const PromiseRejectionEvent: {
  /**
   * This Push API interface represents a push message that has been received. This event is sent to the global scope of a ServiceWorker. It contains the information sent from an application server to a PushSubscription.
   * Available only in secure contexts.
@@ -3941,7 +3941,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly data: PushMessageData | null;
  }
  
-@@ -3499,29 +5303,41 @@ declare const PushEvent: {
+@@ -3521,29 +5325,41 @@ declare const PushEvent: {
  /**
   * This Push API interface provides a way to receive notifications from third-party servers as well as request URLs for push notifications.
   * Available only in secure contexts.
@@ -3983,7 +3983,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    text(): string;
  }
  
-@@ -3533,13 +5349,21 @@ declare const PushMessageData: {
+@@ -3555,13 +5371,21 @@ declare const PushMessageData: {
  /**
   * This Push API interface provides a subcription's URL endpoint and allows unsubscription from a push service.
   * Available only in secure contexts.
@@ -4005,7 +4005,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    unsubscribe(): Promise<boolean>;
  }
  
-@@ -3548,9 +5372,15 @@ declare const PushSubscription: {
+@@ -3570,9 +5394,15 @@ declare const PushSubscription: {
    new (): PushSubscription;
  };
  
@@ -4022,7 +4022,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly userVisibleOnly: boolean;
  }
  
-@@ -3582,11 +5412,17 @@ declare const RTCEncodedVideoFrame: {
+@@ -3604,11 +5434,17 @@ declare const RTCEncodedVideoFrame: {
    new (): RTCEncodedVideoFrame;
  };
  
@@ -4040,7 +4040,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    error(e?: unknown): void;
  }
  
-@@ -3595,21 +5431,31 @@ declare const ReadableByteStreamController: {
+@@ -3617,21 +5453,31 @@ declare const ReadableByteStreamController: {
    new (): ReadableByteStreamController;
  };
  
@@ -4073,7 +4073,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    tee(): [ReadableStream<R>, ReadableStream<R>];
  }
  
-@@ -3629,10 +5475,13 @@ declare const ReadableStream: {
+@@ -3651,10 +5497,13 @@ declare const ReadableStream: {
    ): ReadableStream<R>;
  };
  
@@ -4087,7 +4087,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    releaseLock(): void;
  }
  
-@@ -3641,9 +5490,13 @@ declare const ReadableStreamBYOBReader: {
+@@ -3663,9 +5512,13 @@ declare const ReadableStreamBYOBReader: {
    new (stream: ReadableStream): ReadableStreamBYOBReader;
  };
  
@@ -4101,7 +4101,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    respondWithNewView(view: ArrayBufferView): void;
  }
  
-@@ -3652,10 +5505,15 @@ declare const ReadableStreamBYOBRequest: {
+@@ -3674,10 +5527,15 @@ declare const ReadableStreamBYOBRequest: {
    new (): ReadableStreamBYOBRequest;
  };
  
@@ -4117,7 +4117,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    error(e?: unknown): void;
  }
  
-@@ -3664,10 +5522,13 @@ declare const ReadableStreamDefaultController: {
+@@ -3686,10 +5544,13 @@ declare const ReadableStreamDefaultController: {
    new (): ReadableStreamDefaultController;
  };
  
@@ -4131,7 +4131,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    releaseLock(): void;
  }
  
-@@ -3677,38 +5538,141 @@ declare const ReadableStreamDefaultReader: {
+@@ -3699,38 +5560,141 @@ declare const ReadableStreamDefaultReader: {
  };
  
  interface ReadableStreamGenericReader {
@@ -4287,7 +4287,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    clone(): Request;
  }
  
-@@ -3717,38 +5681,68 @@ declare const Request: {
+@@ -3739,38 +5703,68 @@ declare const Request: {
    new (input: RequestInfo | URL, init?: RequestInit): Request;
  };
  
@@ -4358,7 +4358,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly violatedDirective: string;
  }
  
-@@ -3767,11 +5761,17 @@ interface ServiceWorkerEventMap extends AbstractWorkerEventMap {
+@@ -3789,11 +5783,17 @@ interface ServiceWorkerEventMap extends AbstractWorkerEventMap {
  /**
   * This ServiceWorker API interface provides a reference to a service worker. Multiple browsing contexts (e.g. pages, workers, etc.) can be associated with the same service worker, each through a unique ServiceWorker object.
   * Available only in secure contexts.
@@ -4376,7 +4376,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    postMessage(message: unknown, transfer: readonly Transferable[]): void;
    postMessage(message: unknown, options?: StructuredSerializeOptions): void;
    addEventListener<K extends keyof ServiceWorkerEventMap>(
-@@ -3810,27 +5810,38 @@ interface ServiceWorkerContainerEventMap {
+@@ -3832,27 +5832,38 @@ interface ServiceWorkerContainerEventMap {
  /**
   * The ServiceWorkerContainer interface of the ServiceWorker API provides an object representing the service worker as an overall unit in the network ecosystem, including facilities to register, unregister and update service workers, and access the state of service workers and their registrations.
   * Available only in secure contexts.
@@ -4415,7 +4415,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    startMessages(): void;
    addEventListener<K extends keyof ServiceWorkerContainerEventMap>(
      type: K,
-@@ -3877,34 +5888,50 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
+@@ -3899,34 +5910,50 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
    pushsubscriptionchange: Event;
  }
  
@@ -4467,7 +4467,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    skipWaiting(): Promise<void>;
    addEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(
      type: K,
-@@ -3946,23 +5973,37 @@ interface ServiceWorkerRegistrationEventMap {
+@@ -3968,23 +5995,37 @@ interface ServiceWorkerRegistrationEventMap {
  /**
   * This ServiceWorker API interface represents the service worker registration. You register a service worker to control one or more pages that share the same origin.
   * Available only in secure contexts.
@@ -4505,7 +4505,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    update(): Promise<void>;
    addEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(
      type: K,
-@@ -4001,13 +6042,23 @@ interface SharedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
+@@ -4023,13 +6064,23 @@ interface SharedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
    connect: MessageEvent;
  }
  
@@ -4531,7 +4531,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    close(): void;
    addEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(
      type: K,
-@@ -4042,10 +6093,17 @@ declare const SharedWorkerGlobalScope: {
+@@ -4064,10 +6115,17 @@ declare const SharedWorkerGlobalScope: {
    new (): SharedWorkerGlobalScope;
  };
  
@@ -4550,7 +4550,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    persisted(): Promise<boolean>;
  }
  
-@@ -4054,11 +6112,39 @@ declare const StorageManager: {
+@@ -4076,11 +6134,39 @@ declare const StorageManager: {
    new (): StorageManager;
  };
  
@@ -4590,7 +4590,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    decrypt(
      algorithm:
        | AlgorithmIdentifier
-@@ -4069,6 +6155,7 @@ interface SubtleCrypto {
+@@ -4091,6 +6177,7 @@ interface SubtleCrypto {
      key: CryptoKey,
      data: BufferSource,
    ): Promise<ArrayBuffer>;
@@ -4598,7 +4598,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    deriveBits(
      algorithm:
        | AlgorithmIdentifier
-@@ -4078,6 +6165,7 @@ interface SubtleCrypto {
+@@ -4100,6 +6187,7 @@ interface SubtleCrypto {
      baseKey: CryptoKey,
      length: number,
    ): Promise<ArrayBuffer>;
@@ -4606,7 +4606,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    deriveKey(
      algorithm:
        | AlgorithmIdentifier
-@@ -4094,10 +6182,12 @@ interface SubtleCrypto {
+@@ -4116,10 +6204,12 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: readonly KeyUsage[],
    ): Promise<CryptoKey>;
@@ -4619,7 +4619,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    encrypt(
      algorithm:
        | AlgorithmIdentifier
-@@ -4108,11 +6198,13 @@ interface SubtleCrypto {
+@@ -4130,11 +6220,13 @@ interface SubtleCrypto {
      key: CryptoKey,
      data: BufferSource,
    ): Promise<ArrayBuffer>;
@@ -4633,7 +4633,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    generateKey(
      algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
      extractable: boolean,
-@@ -4128,6 +6220,7 @@ interface SubtleCrypto {
+@@ -4150,6 +6242,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: readonly KeyUsage[],
    ): Promise<CryptoKeyPair | CryptoKey>;
@@ -4641,7 +4641,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    importKey(
      format: 'jwk',
      keyData: JsonWebKey,
-@@ -4152,11 +6245,13 @@ interface SubtleCrypto {
+@@ -4174,11 +6267,13 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: readonly KeyUsage[],
    ): Promise<CryptoKey>;
@@ -4655,7 +4655,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    unwrapKey(
      format: KeyFormat,
      wrappedKey: BufferSource,
-@@ -4176,12 +6271,14 @@ interface SubtleCrypto {
+@@ -4198,12 +6293,14 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: readonly KeyUsage[],
    ): Promise<CryptoKey>;
@@ -4670,7 +4670,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    wrapKey(
      format: KeyFormat,
      key: CryptoKey,
-@@ -4200,7 +6297,11 @@ declare const SubtleCrypto: {
+@@ -4222,7 +6319,11 @@ declare const SubtleCrypto: {
    new (): SubtleCrypto;
  };
  
@@ -4683,7 +4683,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface TextDecoder extends TextDecoderCommon {
    /**
     * Returns the result of running encoding's decoder. The method can be invoked zero or more times with options's stream set to true, and then once without options's stream (or set to false), to process a fragmented input. If the invocation without options's stream (or set to false) has no input, it's clearest to omit both arguments.
-@@ -4214,6 +6315,8 @@ interface TextDecoder extends TextDecoderCommon {
+@@ -4236,6 +6337,8 @@ interface TextDecoder extends TextDecoderCommon {
     * ```
     *
     * If the error mode is "fatal" and encoding's decoder returns error, throws a TypeError.
@@ -4692,7 +4692,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    decode(input?: BufferSource, options?: TextDecodeOptions): string;
  }
-@@ -4224,14 +6327,27 @@ declare const TextDecoder: {
+@@ -4246,14 +6349,27 @@ declare const TextDecoder: {
  };
  
  interface TextDecoderCommon {
@@ -4723,7 +4723,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
    readonly readable: ReadableStream<string>;
    readonly writable: WritableStream<BufferSource>;
-@@ -4242,11 +6358,23 @@ declare const TextDecoderStream: {
+@@ -4264,11 +6380,23 @@ declare const TextDecoderStream: {
    new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
  };
  
@@ -4750,7 +4750,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    encodeInto(
      source: string,
      destination: Uint8Array,
-@@ -4259,10 +6387,15 @@ declare const TextEncoder: {
+@@ -4281,10 +6409,15 @@ declare const TextEncoder: {
  };
  
  interface TextEncoderCommon {
@@ -4767,7 +4767,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface TextEncoderStream extends GenericTransformStream, TextEncoderCommon {
    readonly readable: ReadableStream<Uint8Array>;
    readonly writable: WritableStream<string>;
-@@ -4273,21 +6406,53 @@ declare const TextEncoderStream: {
+@@ -4295,21 +6428,53 @@ declare const TextEncoderStream: {
    new (): TextEncoderStream;
  };
  
@@ -4829,7 +4829,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly width: number;
  }
  
-@@ -4296,8 +6461,11 @@ declare const TextMetrics: {
+@@ -4318,8 +6483,11 @@ declare const TextMetrics: {
    new (): TextMetrics;
  };
  
@@ -4841,7 +4841,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly writable: WritableStream<I>;
  }
  
-@@ -4310,10 +6478,15 @@ declare const TransformStream: {
+@@ -4332,10 +6500,15 @@ declare const TransformStream: {
    ): TransformStream<I, O>;
  };
  
@@ -4857,7 +4857,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    terminate(): void;
  }
  
-@@ -4322,44 +6495,89 @@ declare const TransformStreamDefaultController: {
+@@ -4344,44 +6517,89 @@ declare const TransformStreamDefaultController: {
    new (): TransformStreamDefaultController;
  };
  
@@ -4954,7 +4954,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    sort(): void;
    /** Returns a string containing a query string suitable for use in a URL. Does not include the question mark. */
    toString(): string;
-@@ -4378,14 +6596,19 @@ declare const URLSearchParams: {
+@@ -4400,14 +6618,19 @@ declare const URLSearchParams: {
        | string
        | URLSearchParams,
    ): URLSearchParams;
@@ -4975,7 +4975,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    toJSON(): VideoColorSpaceInit;
  }
  
-@@ -4394,13 +6617,161 @@ declare const VideoColorSpace: {
+@@ -4416,13 +6639,161 @@ declare const VideoColorSpace: {
    new (init?: VideoColorSpaceInit): VideoColorSpace;
  };
  
@@ -5137,7 +5137,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getSupportedProfiles(): readonly string[];
    readonly COMPRESSED_RGBA_ASTC_4x4_KHR: 0x93b0;
    readonly COMPRESSED_RGBA_ASTC_5x4_KHR: 0x93b1;
-@@ -4432,6 +6803,7 @@ interface WEBGL_compressed_texture_astc {
+@@ -4454,6 +6825,7 @@ interface WEBGL_compressed_texture_astc {
    readonly COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR: 0x93dd;
  }
  
@@ -5145,7 +5145,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WEBGL_compressed_texture_etc {
    readonly COMPRESSED_R11_EAC: 0x9270;
    readonly COMPRESSED_SIGNED_R11_EAC: 0x9271;
-@@ -4445,11 +6817,24 @@ interface WEBGL_compressed_texture_etc {
+@@ -4467,11 +6839,24 @@ interface WEBGL_compressed_texture_etc {
    readonly COMPRESSED_SRGB8_ALPHA8_ETC2_EAC: 0x9279;
  }
  
@@ -5171,7 +5171,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WEBGL_compressed_texture_s3tc {
    readonly COMPRESSED_RGB_S3TC_DXT1_EXT: 0x83f0;
    readonly COMPRESSED_RGBA_S3TC_DXT1_EXT: 0x83f1;
-@@ -4457,6 +6842,7 @@ interface WEBGL_compressed_texture_s3tc {
+@@ -4479,6 +6864,7 @@ interface WEBGL_compressed_texture_s3tc {
    readonly COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83f3;
  }
  
@@ -5179,7 +5179,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WEBGL_compressed_texture_s3tc_srgb {
    readonly COMPRESSED_SRGB_S3TC_DXT1_EXT: 0x8c4c;
    readonly COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT: 0x8c4d;
-@@ -4464,22 +6850,34 @@ interface WEBGL_compressed_texture_s3tc_srgb {
+@@ -4486,22 +6872,34 @@ interface WEBGL_compressed_texture_s3tc_srgb {
    readonly COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT: 0x8c4f;
  }
  
@@ -5216,7 +5216,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    drawBuffersWEBGL(buffers: readonly GLenum[]): void;
    readonly COLOR_ATTACHMENT0_WEBGL: 0x8ce0;
    readonly COLOR_ATTACHMENT1_WEBGL: 0x8ce1;
-@@ -4517,12 +6915,17 @@ interface WEBGL_draw_buffers {
+@@ -4539,12 +6937,17 @@ interface WEBGL_draw_buffers {
    readonly MAX_DRAW_BUFFERS_WEBGL: 0x8824;
  }
  
@@ -5234,7 +5234,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    multiDrawArraysInstancedWEBGL(
      mode: GLenum,
      firstsList: Int32Array | readonly GLint[],
-@@ -4533,6 +6936,7 @@ interface WEBGL_multi_draw {
+@@ -4555,6 +6958,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -5242,7 +5242,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    multiDrawArraysWEBGL(
      mode: GLenum,
      firstsList: Int32Array | readonly GLint[],
-@@ -4541,6 +6945,7 @@ interface WEBGL_multi_draw {
+@@ -4563,6 +6967,7 @@ interface WEBGL_multi_draw {
      countsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -5250,7 +5250,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    multiDrawElementsInstancedWEBGL(
      mode: GLenum,
      countsList: Int32Array | readonly GLsizei[],
-@@ -4552,6 +6957,7 @@ interface WEBGL_multi_draw {
+@@ -4574,6 +6979,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -5258,7 +5258,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    multiDrawElementsWEBGL(
      mode: GLenum,
      countsList: Int32Array | readonly GLsizei[],
-@@ -4563,6 +6969,7 @@ interface WEBGL_multi_draw {
+@@ -4585,6 +6991,7 @@ interface WEBGL_multi_draw {
    ): void;
  }
  
@@ -5266,7 +5266,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGL2RenderingContext
    extends
      WebGL2RenderingContextBase,
-@@ -5134,13 +7541,17 @@ declare const WebGL2RenderingContext: {
+@@ -5156,13 +7563,17 @@ declare const WebGL2RenderingContext: {
  };
  
  interface WebGL2RenderingContextBase {
@@ -5284,7 +5284,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    bindBufferRange(
      target: GLenum,
      index: GLuint,
-@@ -5148,12 +7559,16 @@ interface WebGL2RenderingContextBase {
+@@ -5170,12 +7581,16 @@ interface WebGL2RenderingContextBase {
      offset: GLintptr,
      size: GLsizeiptr,
    ): void;
@@ -5301,7 +5301,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    blitFramebuffer(
      srcX0: GLint,
      srcY0: GLint,
-@@ -5166,31 +7581,37 @@ interface WebGL2RenderingContextBase {
+@@ -5188,31 +7603,37 @@ interface WebGL2RenderingContextBase {
      mask: GLbitfield,
      filter: GLenum,
    ): void;
@@ -5339,7 +5339,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexImage3D(
      target: GLenum,
      level: GLint,
-@@ -5214,6 +7635,7 @@ interface WebGL2RenderingContextBase {
+@@ -5236,6 +7657,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLengthOverride?: GLuint,
    ): void;
@@ -5347,7 +5347,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexSubImage3D(
      target: GLenum,
      level: GLint,
-@@ -5241,6 +7663,7 @@ interface WebGL2RenderingContextBase {
+@@ -5263,6 +7685,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLengthOverride?: GLuint,
    ): void;
@@ -5355,7 +5355,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    copyBufferSubData(
      readTarget: GLenum,
      writeTarget: GLenum,
-@@ -5248,6 +7671,7 @@ interface WebGL2RenderingContextBase {
+@@ -5270,6 +7693,7 @@ interface WebGL2RenderingContextBase {
      writeOffset: GLintptr,
      size: GLsizeiptr,
    ): void;
@@ -5363,7 +5363,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    copyTexSubImage3D(
      target: GLenum,
      level: GLint,
-@@ -5259,22 +7683,34 @@ interface WebGL2RenderingContextBase {
+@@ -5281,22 +7705,34 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -5398,7 +5398,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    drawElementsInstanced(
      mode: GLenum,
      count: GLsizei,
-@@ -5282,6 +7718,7 @@ interface WebGL2RenderingContextBase {
+@@ -5304,6 +7740,7 @@ interface WebGL2RenderingContextBase {
      offset: GLintptr,
      instanceCount: GLsizei,
    ): void;
@@ -5406,7 +5406,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    drawRangeElements(
      mode: GLenum,
      start: GLuint,
-@@ -5290,9 +7727,13 @@ interface WebGL2RenderingContextBase {
+@@ -5312,9 +7749,13 @@ interface WebGL2RenderingContextBase {
      type: GLenum,
      offset: GLintptr,
    ): void;
@@ -5420,7 +5420,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    framebufferTextureLayer(
      target: GLenum,
      attachment: GLenum,
-@@ -5300,20 +7741,24 @@ interface WebGL2RenderingContextBase {
+@@ -5322,20 +7763,24 @@ interface WebGL2RenderingContextBase {
      level: GLint,
      layer: GLint,
    ): void;
@@ -5445,7 +5445,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getBufferSubData(
      target: GLenum,
      srcByteOffset: GLintptr,
-@@ -5321,27 +7766,39 @@ interface WebGL2RenderingContextBase {
+@@ -5343,27 +7788,39 @@ interface WebGL2RenderingContextBase {
      dstOffset?: GLuint,
      length?: GLuint,
    ): void;
@@ -5485,7 +5485,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    invalidateSubFramebuffer(
      target: GLenum,
      attachments: readonly GLenum[],
-@@ -5350,13 +7807,21 @@ interface WebGL2RenderingContextBase {
+@@ -5372,13 +7829,21 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -5507,7 +5507,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    renderbufferStorageMultisample(
      target: GLenum,
      samples: GLsizei,
-@@ -5364,9 +7829,13 @@ interface WebGL2RenderingContextBase {
+@@ -5386,9 +7851,13 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -5521,7 +5521,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texImage3D(
      target: GLenum,
      level: GLint,
-@@ -5416,6 +7885,7 @@ interface WebGL2RenderingContextBase {
+@@ -5438,6 +7907,7 @@ interface WebGL2RenderingContextBase {
      srcData: ArrayBufferView,
      srcOffset: GLuint,
    ): void;
@@ -5529,7 +5529,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texStorage2D(
      target: GLenum,
      levels: GLsizei,
-@@ -5423,6 +7893,7 @@ interface WebGL2RenderingContextBase {
+@@ -5445,6 +7915,7 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -5537,7 +5537,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texStorage3D(
      target: GLenum,
      levels: GLsizei,
-@@ -5431,6 +7902,7 @@ interface WebGL2RenderingContextBase {
+@@ -5453,6 +7924,7 @@ interface WebGL2RenderingContextBase {
      height: GLsizei,
      depth: GLsizei,
    ): void;
@@ -5545,7 +5545,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texSubImage3D(
      target: GLenum,
      level: GLint,
-@@ -5471,41 +7943,49 @@ interface WebGL2RenderingContextBase {
+@@ -5493,41 +7965,49 @@ interface WebGL2RenderingContextBase {
      srcData: ArrayBufferView | null,
      srcOffset?: GLuint,
    ): void;
@@ -5595,7 +5595,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniform4ui(
      location: WebGLUniformLocation | null,
      v0: GLuint,
-@@ -5513,17 +7993,20 @@ interface WebGL2RenderingContextBase {
+@@ -5535,17 +8015,20 @@ interface WebGL2RenderingContextBase {
      v2: GLuint,
      v3: GLuint,
    ): void;
@@ -5616,7 +5616,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix2x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5531,6 +8014,7 @@ interface WebGL2RenderingContextBase {
+@@ -5553,6 +8036,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5624,7 +5624,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix2x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5538,6 +8022,7 @@ interface WebGL2RenderingContextBase {
+@@ -5560,6 +8044,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5632,7 +5632,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix3x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5545,6 +8030,7 @@ interface WebGL2RenderingContextBase {
+@@ -5567,6 +8052,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5640,7 +5640,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix3x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5552,6 +8038,7 @@ interface WebGL2RenderingContextBase {
+@@ -5574,6 +8060,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5648,7 +5648,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix4x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5559,6 +8046,7 @@ interface WebGL2RenderingContextBase {
+@@ -5581,6 +8068,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5656,7 +5656,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix4x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -5566,9 +8054,13 @@ interface WebGL2RenderingContextBase {
+@@ -5588,9 +8076,13 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5670,7 +5670,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    vertexAttribI4ui(
      index: GLuint,
      x: GLuint,
-@@ -5576,7 +8068,9 @@ interface WebGL2RenderingContextBase {
+@@ -5598,7 +8090,9 @@ interface WebGL2RenderingContextBase {
      z: GLuint,
      w: GLuint,
    ): void;
@@ -5680,7 +5680,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    vertexAttribIPointer(
      index: GLuint,
      size: GLint,
-@@ -5584,6 +8078,7 @@ interface WebGL2RenderingContextBase {
+@@ -5606,6 +8100,7 @@ interface WebGL2RenderingContextBase {
      stride: GLsizei,
      offset: GLintptr,
    ): void;
@@ -5688,7 +5688,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    waitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLint64): void;
    readonly READ_BUFFER: 0x0c02;
    readonly UNPACK_ROW_LENGTH: 0x0cf2;
-@@ -5851,6 +8346,7 @@ interface WebGL2RenderingContextBase {
+@@ -5873,6 +8368,7 @@ interface WebGL2RenderingContextBase {
  }
  
  interface WebGL2RenderingContextOverloads {
@@ -5696,7 +5696,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    bufferData(target: GLenum, size: GLsizeiptr, usage: GLenum): void;
    bufferData(target: GLenum, srcData: BufferSource | null, usage: GLenum): void;
    bufferData(
-@@ -5860,6 +8356,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -5882,6 +8378,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset: GLuint,
      length?: GLuint,
    ): void;
@@ -5704,7 +5704,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    bufferSubData(
      target: GLenum,
      dstByteOffset: GLintptr,
-@@ -5872,6 +8369,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -5894,6 +8391,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset: GLuint,
      length?: GLuint,
    ): void;
@@ -5712,7 +5712,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexImage2D(
      target: GLenum,
      level: GLint,
-@@ -5893,6 +8391,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -5915,6 +8413,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLengthOverride?: GLuint,
    ): void;
@@ -5720,7 +5720,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexSubImage2D(
      target: GLenum,
      level: GLint,
-@@ -5916,6 +8415,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -5938,6 +8437,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLengthOverride?: GLuint,
    ): void;
@@ -5728,7 +5728,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readPixels(
      x: GLint,
      y: GLint,
-@@ -5944,6 +8444,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -5966,6 +8466,7 @@ interface WebGL2RenderingContextOverloads {
      dstData: ArrayBufferView,
      dstOffset: GLuint,
    ): void;
@@ -5736,7 +5736,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texImage2D(
      target: GLenum,
      level: GLint,
-@@ -5997,6 +8498,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -6019,6 +8520,7 @@ interface WebGL2RenderingContextOverloads {
      srcData: ArrayBufferView,
      srcOffset: GLuint,
    ): void;
@@ -5744,7 +5744,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texSubImage2D(
      target: GLenum,
      level: GLint,
-@@ -6051,54 +8553,63 @@ interface WebGL2RenderingContextOverloads {
+@@ -6073,54 +8575,63 @@ interface WebGL2RenderingContextOverloads {
      srcData: ArrayBufferView,
      srcOffset: GLuint,
    ): void;
@@ -5808,7 +5808,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -6106,6 +8617,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -6128,6 +8639,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5816,7 +5816,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -6113,6 +8625,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -6135,6 +8647,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -5824,7 +5824,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -6122,10 +8635,17 @@ interface WebGL2RenderingContextOverloads {
+@@ -6144,10 +8657,17 @@ interface WebGL2RenderingContextOverloads {
    ): void;
  }
  
@@ -5843,7 +5843,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly type: GLenum;
  }
  
-@@ -6134,7 +8654,11 @@ declare const WebGLActiveInfo: {
+@@ -6156,7 +8676,11 @@ declare const WebGLActiveInfo: {
    new (): WebGLActiveInfo;
  };
  
@@ -5856,7 +5856,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLBuffer {}
  
  declare const WebGLBuffer: {
-@@ -6142,8 +8666,13 @@ declare const WebGLBuffer: {
+@@ -6164,8 +8688,13 @@ declare const WebGLBuffer: {
    new (): WebGLBuffer;
  };
  
@@ -5871,7 +5871,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly statusMessage: string;
  }
  
-@@ -6152,7 +8681,11 @@ declare const WebGLContextEvent: {
+@@ -6174,7 +8703,11 @@ declare const WebGLContextEvent: {
    new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
  };
  
@@ -5884,7 +5884,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLFramebuffer {}
  
  declare const WebGLFramebuffer: {
-@@ -6160,7 +8693,11 @@ declare const WebGLFramebuffer: {
+@@ -6182,7 +8715,11 @@ declare const WebGLFramebuffer: {
    new (): WebGLFramebuffer;
  };
  
@@ -5897,7 +5897,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLProgram {}
  
  declare const WebGLProgram: {
-@@ -6168,6 +8705,7 @@ declare const WebGLProgram: {
+@@ -6190,6 +8727,7 @@ declare const WebGLProgram: {
    new (): WebGLProgram;
  };
  
@@ -5905,7 +5905,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLQuery {}
  
  declare const WebGLQuery: {
-@@ -6175,7 +8713,11 @@ declare const WebGLQuery: {
+@@ -6197,7 +8735,11 @@ declare const WebGLQuery: {
    new (): WebGLQuery;
  };
  
@@ -5918,7 +5918,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLRenderbuffer {}
  
  declare const WebGLRenderbuffer: {
-@@ -6183,7 +8725,11 @@ declare const WebGLRenderbuffer: {
+@@ -6205,7 +8747,11 @@ declare const WebGLRenderbuffer: {
    new (): WebGLRenderbuffer;
  };
  
@@ -5931,7 +5931,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLRenderingContext
    extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
  
-@@ -6489,50 +9035,73 @@ declare const WebGLRenderingContext: {
+@@ -6511,50 +9057,73 @@ declare const WebGLRenderingContext: {
  };
  
  interface WebGLRenderingContextBase {
@@ -6005,7 +6005,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    copyTexImage2D(
      target: GLenum,
      level: GLint,
-@@ -6543,6 +9112,7 @@ interface WebGLRenderingContextBase {
+@@ -6565,6 +9134,7 @@ interface WebGLRenderingContextBase {
      height: GLsizei,
      border: GLint,
    ): void;
@@ -6013,7 +6013,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    copyTexSubImage2D(
      target: GLenum,
      level: GLint,
-@@ -6553,42 +9123,69 @@ interface WebGLRenderingContextBase {
+@@ -6575,42 +9145,69 @@ interface WebGLRenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -6083,7 +6083,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    framebufferTexture2D(
      target: GLenum,
      attachment: GLenum,
-@@ -6596,18 +9193,28 @@ interface WebGLRenderingContextBase {
+@@ -6618,18 +9215,28 @@ interface WebGLRenderingContextBase {
      texture: WebGLTexture | null,
      level: GLint,
    ): void;
@@ -6112,7 +6112,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getExtension(
      extensionName: 'ANGLE_instanced_arrays',
    ): ANGLE_instanced_arrays | null;
-@@ -6671,6 +9278,9 @@ interface WebGLRenderingContextBase {
+@@ -6693,6 +9300,9 @@ interface WebGLRenderingContextBase {
    getExtension(
      extensionName: 'WEBGL_compressed_texture_etc1',
    ): WEBGL_compressed_texture_etc1 | null;
@@ -6122,7 +6122,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getExtension(
      extensionName: 'WEBGL_compressed_texture_s3tc',
    ): WEBGL_compressed_texture_s3tc | null;
-@@ -6690,91 +9300,137 @@ interface WebGLRenderingContextBase {
+@@ -6712,91 +9322,137 @@ interface WebGLRenderingContextBase {
    getExtension(extensionName: 'WEBGL_lose_context'): WEBGL_lose_context | null;
    getExtension(extensionName: 'WEBGL_multi_draw'): WEBGL_multi_draw | null;
    getExtension(name: string): unknown;
@@ -6260,7 +6260,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniform4f(
      location: WebGLUniformLocation | null,
      x: GLfloat,
-@@ -6782,6 +9438,7 @@ interface WebGLRenderingContextBase {
+@@ -6804,6 +9460,7 @@ interface WebGLRenderingContextBase {
      z: GLfloat,
      w: GLfloat,
    ): void;
@@ -6268,7 +6268,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniform4i(
      location: WebGLUniformLocation | null,
      x: GLint,
-@@ -6789,14 +9446,23 @@ interface WebGLRenderingContextBase {
+@@ -6811,14 +9468,23 @@ interface WebGLRenderingContextBase {
      z: GLint,
      w: GLint,
    ): void;
@@ -6292,7 +6292,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    vertexAttrib4f(
      index: GLuint,
      x: GLfloat,
-@@ -6804,7 +9470,9 @@ interface WebGLRenderingContextBase {
+@@ -6826,7 +9492,9 @@ interface WebGLRenderingContextBase {
      z: GLfloat,
      w: GLfloat,
    ): void;
@@ -6302,7 +6302,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    vertexAttribPointer(
      index: GLuint,
      size: GLint,
-@@ -6813,6 +9481,7 @@ interface WebGLRenderingContextBase {
+@@ -6835,6 +9503,7 @@ interface WebGLRenderingContextBase {
      stride: GLsizei,
      offset: GLintptr,
    ): void;
@@ -6310,7 +6310,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    viewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void;
    readonly DEPTH_BUFFER_BIT: 0x00000100;
    readonly STENCIL_BUFFER_BIT: 0x00000400;
-@@ -7113,9 +9782,12 @@ interface WebGLRenderingContextBase {
+@@ -7135,9 +9804,12 @@ interface WebGLRenderingContextBase {
  }
  
  interface WebGLRenderingContextOverloads {
@@ -6323,7 +6323,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexImage2D(
      target: GLenum,
      level: GLint,
-@@ -7125,6 +9797,7 @@ interface WebGLRenderingContextOverloads {
+@@ -7147,6 +9819,7 @@ interface WebGLRenderingContextOverloads {
      border: GLint,
      data: ArrayBufferView,
    ): void;
@@ -6331,7 +6331,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    compressedTexSubImage2D(
      target: GLenum,
      level: GLint,
-@@ -7135,6 +9808,7 @@ interface WebGLRenderingContextOverloads {
+@@ -7157,6 +9830,7 @@ interface WebGLRenderingContextOverloads {
      format: GLenum,
      data: ArrayBufferView,
    ): void;
@@ -6339,7 +6339,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readPixels(
      x: GLint,
      y: GLint,
-@@ -7144,6 +9818,7 @@ interface WebGLRenderingContextOverloads {
+@@ -7166,6 +9840,7 @@ interface WebGLRenderingContextOverloads {
      type: GLenum,
      pixels: ArrayBufferView | null,
    ): void;
@@ -6347,7 +6347,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texImage2D(
      target: GLenum,
      level: GLint,
-@@ -7163,6 +9838,7 @@ interface WebGLRenderingContextOverloads {
+@@ -7185,6 +9860,7 @@ interface WebGLRenderingContextOverloads {
      type: GLenum,
      source: TexImageSource,
    ): void;
@@ -6355,7 +6355,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    texSubImage2D(
      target: GLenum,
      level: GLint,
-@@ -7183,24 +9859,35 @@ interface WebGLRenderingContextOverloads {
+@@ -7205,24 +9881,35 @@ interface WebGLRenderingContextOverloads {
      type: GLenum,
      source: TexImageSource,
    ): void;
@@ -6391,7 +6391,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    uniformMatrix4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -7208,6 +9895,7 @@ interface WebGLRenderingContextOverloads {
+@@ -7230,6 +9917,7 @@ interface WebGLRenderingContextOverloads {
    ): void;
  }
  
@@ -6399,7 +6399,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLSampler {}
  
  declare const WebGLSampler: {
-@@ -7215,7 +9903,11 @@ declare const WebGLSampler: {
+@@ -7237,7 +9925,11 @@ declare const WebGLSampler: {
    new (): WebGLSampler;
  };
  
@@ -6412,7 +6412,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLShader {}
  
  declare const WebGLShader: {
-@@ -7223,10 +9915,17 @@ declare const WebGLShader: {
+@@ -7245,10 +9937,17 @@ declare const WebGLShader: {
    new (): WebGLShader;
  };
  
@@ -6431,7 +6431,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly rangeMin: GLint;
  }
  
-@@ -7235,6 +9934,7 @@ declare const WebGLShaderPrecisionFormat: {
+@@ -7257,6 +9956,7 @@ declare const WebGLShaderPrecisionFormat: {
    new (): WebGLShaderPrecisionFormat;
  };
  
@@ -6439,7 +6439,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLSync {}
  
  declare const WebGLSync: {
-@@ -7242,7 +9942,11 @@ declare const WebGLSync: {
+@@ -7264,7 +9964,11 @@ declare const WebGLSync: {
    new (): WebGLSync;
  };
  
@@ -6452,7 +6452,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLTexture {}
  
  declare const WebGLTexture: {
-@@ -7250,6 +9954,7 @@ declare const WebGLTexture: {
+@@ -7272,6 +9976,7 @@ declare const WebGLTexture: {
    new (): WebGLTexture;
  };
  
@@ -6460,7 +6460,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLTransformFeedback {}
  
  declare const WebGLTransformFeedback: {
-@@ -7257,7 +9962,11 @@ declare const WebGLTransformFeedback: {
+@@ -7279,7 +9984,11 @@ declare const WebGLTransformFeedback: {
    new (): WebGLTransformFeedback;
  };
  
@@ -6473,7 +6473,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLUniformLocation {}
  
  declare const WebGLUniformLocation: {
-@@ -7265,6 +9974,7 @@ declare const WebGLUniformLocation: {
+@@ -7287,6 +9996,7 @@ declare const WebGLUniformLocation: {
    new (): WebGLUniformLocation;
  };
  
@@ -6481,7 +6481,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLVertexArrayObject {}
  
  declare const WebGLVertexArrayObject: {
-@@ -7272,6 +9982,7 @@ declare const WebGLVertexArrayObject: {
+@@ -7294,6 +10004,7 @@ declare const WebGLVertexArrayObject: {
    new (): WebGLVertexArrayObject;
  };
  
@@ -6489,7 +6489,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface WebGLVertexArrayObjectOES {}
  
  interface WebSocketEventMap {
-@@ -7281,35 +9992,71 @@ interface WebSocketEventMap {
+@@ -7303,35 +10014,71 @@ interface WebSocketEventMap {
    open: Event;
  }
  
@@ -6568,7 +6568,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void;
    readonly CONNECTING: 0;
    readonly OPEN: 1;
-@@ -7346,11 +10093,19 @@ declare const WebSocket: {
+@@ -7368,11 +10115,19 @@ declare const WebSocket: {
    readonly CLOSED: 3;
  };
  
@@ -6589,7 +6589,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    navigate(url: string | URL): Promise<WindowClient | null>;
  }
  
-@@ -7360,18 +10115,33 @@ declare const WindowClient: {
+@@ -7382,18 +10137,33 @@ declare const WindowClient: {
  };
  
  interface WindowOrWorkerGlobalScope {
@@ -6624,7 +6624,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    createImageBitmap(
      image: ImageBitmapSource,
      options?: ImageBitmapOptions,
-@@ -7384,23 +10154,29 @@ interface WindowOrWorkerGlobalScope {
+@@ -7406,23 +10176,29 @@ interface WindowOrWorkerGlobalScope {
      sh: number,
      options?: ImageBitmapOptions,
    ): Promise<ImageBitmap>;
@@ -6657,7 +6657,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  }
  
  interface WorkerEventMap extends AbstractWorkerEventMap {
-@@ -7408,14 +10184,28 @@ interface WorkerEventMap extends AbstractWorkerEventMap {
+@@ -7430,14 +10206,28 @@ interface WorkerEventMap extends AbstractWorkerEventMap {
    messageerror: MessageEvent;
  }
  
@@ -6689,7 +6689,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    terminate(): void;
    addEventListener<K extends keyof WorkerEventMap>(
      type: K,
-@@ -7453,16 +10243,32 @@ interface WorkerGlobalScopeEventMap {
+@@ -7475,16 +10265,32 @@ interface WorkerGlobalScopeEventMap {
    unhandledrejection: PromiseRejectionEvent;
  }
  
@@ -6725,7 +6725,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    ononline: ((this: WorkerGlobalScope, ev: Event) => unknown) | null;
    onrejectionhandled:
      | ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
-@@ -7470,9 +10276,17 @@ interface WorkerGlobalScope
+@@ -7492,9 +10298,17 @@ interface WorkerGlobalScope
    onunhandledrejection:
      | ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
      | null;
@@ -6745,7 +6745,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    importScripts(...urls: (string | URL)[]): void;
    addEventListener<K extends keyof WorkerGlobalScopeEventMap>(
      type: K,
-@@ -7507,17 +10321,30 @@ declare const WorkerGlobalScope: {
+@@ -7529,17 +10343,30 @@ declare const WorkerGlobalScope: {
    new (): WorkerGlobalScope;
  };
  
@@ -6777,7 +6777,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    readonly search: string;
  }
  
-@@ -7526,16 +10353,24 @@ declare const WorkerLocation: {
+@@ -7548,16 +10375,24 @@ declare const WorkerLocation: {
    new (): WorkerLocation;
  };
  
@@ -6803,7 +6803,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  }
  
  declare const WorkerNavigator: {
-@@ -7543,11 +10378,19 @@ declare const WorkerNavigator: {
+@@ -7565,11 +10400,19 @@ declare const WorkerNavigator: {
    new (): WorkerNavigator;
  };
  
@@ -6824,7 +6824,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getWriter(): WritableStreamDefaultWriter<W>;
  }
  
-@@ -7559,9 +10402,15 @@ declare const WritableStream: {
+@@ -7581,9 +10424,15 @@ declare const WritableStream: {
    ): WritableStream<W>;
  };
  
@@ -6841,7 +6841,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    error(e?: unknown): void;
  }
  
-@@ -7570,14 +10419,25 @@ declare const WritableStreamDefaultController: {
+@@ -7592,14 +10441,25 @@ declare const WritableStreamDefaultController: {
    new (): WritableStreamDefaultController;
  };
  
@@ -6868,7 +6868,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    write(chunk?: W): Promise<void>;
  }
  
-@@ -7590,17 +10450,32 @@ interface XMLHttpRequestEventMap extends XMLHttpRequestEventTargetEventMap {
+@@ -7612,17 +10472,32 @@ interface XMLHttpRequestEventMap extends XMLHttpRequestEventTargetEventMap {
    readystatechange: Event;
  }
  
@@ -6904,7 +6904,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    readonly responseText: string;
    /**
-@@ -7613,28 +10488,47 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7635,28 +10510,47 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * When set: throws an "InvalidStateError" DOMException if state is loading or done.
     *
     * When set: throws an "InvalidAccessError" DOMException if the synchronous flag is set and current global object is a Window object.
@@ -6954,7 +6954,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    getResponseHeader(name: string): string | null;
    /**
     * Sets the request method, request URL, and synchronous flag.
-@@ -7644,6 +10538,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7666,6 +10560,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Throws a "SecurityError" DOMException if method is a case-insensitive match for `CONNECT`, `TRACE`, or `TRACK`.
     *
     * Throws an "InvalidAccessError" DOMException if async is false, current global object is a Window object, and the timeout attribute is not zero or the responseType attribute is not the empty string.
@@ -6963,7 +6963,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
-@@ -7657,12 +10553,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7679,12 +10575,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Acts as if the `Content-Type` header value for a response is mime. (It does not change the header.)
     *
     * Throws an "InvalidStateError" DOMException if state is loading or done.
@@ -6980,7 +6980,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    send(body?: XMLHttpRequestBodyInit | null): void;
    /**
-@@ -7671,6 +10571,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7693,6 +10593,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Throws an "InvalidStateError" DOMException if either state is not opened or the send() flag is set.
     *
     * Throws a "SyntaxError" DOMException if name is not a header name or if value is not a header value.
@@ -6989,7 +6989,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
     */
    setRequestHeader(name: string, value: string): void;
    readonly UNSENT: 0;
-@@ -7720,6 +10622,7 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -7742,6 +10644,7 @@ interface XMLHttpRequestEventTargetEventMap {
    timeout: ProgressEvent<XMLHttpRequestEventTarget>;
  }
  
@@ -6997,7 +6997,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -7761,6 +10664,7 @@ declare const XMLHttpRequestEventTarget: {
+@@ -7783,6 +10686,7 @@ declare const XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -7005,7 +7005,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -7795,26 +10699,46 @@ declare const XMLHttpRequestUpload: {
+@@ -7817,26 +10721,46 @@ declare const XMLHttpRequestUpload: {
    new (): XMLHttpRequestUpload;
  };
  
@@ -7052,7 +7052,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -7829,8 +10753,11 @@ declare namespace WebAssembly {
+@@ -7851,8 +10775,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -7064,7 +7064,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
      valueOf(): unknown;
    }
  
-@@ -7839,7 +10766,9 @@ declare namespace WebAssembly {
+@@ -7861,7 +10788,9 @@ declare namespace WebAssembly {
      new (descriptor: GlobalDescriptor, v?: unknown): Global;
    };
  
@@ -7074,7 +7074,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
      readonly exports: Exports;
    }
  
-@@ -7856,8 +10785,11 @@ declare namespace WebAssembly {
+@@ -7878,8 +10807,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -7086,7 +7086,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
      grow(delta: number): number;
    }
  
-@@ -7866,16 +10798,20 @@ declare namespace WebAssembly {
+@@ -7888,16 +10820,20 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -7107,7 +7107,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
      imports(moduleObject: Module): readonly ModuleImportDescriptor[];
    };
  
-@@ -7887,10 +10823,15 @@ declare namespace WebAssembly {
+@@ -7909,10 +10845,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -7123,7 +7123,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
      set(index: number, value?: unknown): void;
    }
  
-@@ -7947,10 +10888,13 @@ declare namespace WebAssembly {
+@@ -7969,10 +10910,13 @@ declare namespace WebAssembly {
    type ImportValue = ExportValue | number;
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
@@ -7137,7 +7137,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -7959,13 +10903,19 @@ declare namespace WebAssembly {
+@@ -7981,13 +10925,19 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -7157,7 +7157,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface FrameRequestCallback {
    (time: DOMHighResTimeStamp): void;
  }
-@@ -7992,6 +10942,10 @@ interface QueuingStrategySize<T = unknown> {
+@@ -8014,6 +10964,10 @@ interface QueuingStrategySize<T = unknown> {
    (chunk: T): number;
  }
  
@@ -7168,7 +7168,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  interface TransformerFlushCallback<O> {
    (controller: TransformStreamDefaultController<O>): void | PromiseLike<void>;
  }
-@@ -8038,21 +10992,43 @@ interface UnderlyingSourceStartCallback<R> {
+@@ -8060,21 +11014,43 @@ interface UnderlyingSourceStartCallback<R> {
    (controller: ReadableStreamController<R>): unknown;
  }
  
@@ -7215,7 +7215,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  declare function postMessage(
    message: unknown,
    transfer: readonly Transferable[],
-@@ -8061,21 +11037,37 @@ declare function postMessage(
+@@ -8083,21 +11059,37 @@ declare function postMessage(
    message: unknown,
    options?: StructuredSerializeOptions,
  ): void;
@@ -7256,7 +7256,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  declare const ononline:
    | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
-@@ -8085,25 +11077,53 @@ declare const onrejectionhandled:
+@@ -8107,25 +11099,53 @@ declare const onrejectionhandled:
  declare const onunhandledrejection:
    | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
@@ -7314,7 +7314,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -8116,26 +11136,32 @@ declare function createImageBitmap(
+@@ -8138,26 +11158,32 @@ declare function createImageBitmap(
    sh: number,
    options?: ImageBitmapOptions,
  ): Promise<ImageBitmap>;
@@ -7350,7 +7350,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  declare function cancelAnimationFrame(handle: number): void;
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  declare function addEventListener<
-@@ -8174,10 +11200,15 @@ type BinaryData = ArrayBuffer | ArrayBufferView;
+@@ -8196,10 +11222,15 @@ type BinaryData = ArrayBuffer | ArrayBufferView;
  type BlobPart = BufferSource | Blob | string;
  type BodyInit = ReadableStream | XMLHttpRequestBodyInit;
  type BufferSource = ArrayBufferView | ArrayBuffer;
@@ -7367,7 +7367,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type Float32List = Float32Array | readonly GLfloat[];
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
-@@ -8224,8 +11255,9 @@ type ReadableStreamReadResult<T> =
+@@ -8246,8 +11277,9 @@ type ReadableStreamReadResult<T> =
  type ReadableStreamReader<T> =
    | ReadableStreamDefaultReader<T>
    | ReadableStreamBYOBReader;
@@ -7378,7 +7378,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type TimerHandler = string | Function;
  type Transferable =
    | OffscreenCanvas
-@@ -8234,6 +11266,7 @@ type Transferable =
+@@ -8256,6 +11288,7 @@ type Transferable =
    | ReadableStream
    | WritableStream
    | TransformStream
@@ -7386,7 +7386,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type VibratePattern = number | readonly number[];
-@@ -8243,7 +11276,25 @@ type XMLHttpRequestBodyInit =
+@@ -8265,7 +11298,25 @@ type XMLHttpRequestBodyInit =
    | FormData
    | URLSearchParams
    | string;
@@ -7412,7 +7412,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type CanvasDirection = 'inherit' | 'ltr' | 'rtl';
  type CanvasFillRule = 'evenodd' | 'nonzero';
  type CanvasFontKerning = 'auto' | 'none' | 'normal';
-@@ -8281,9 +11332,12 @@ type CanvasTextRendering =
+@@ -8303,9 +11354,12 @@ type CanvasTextRendering =
    | 'optimizeLegibility'
    | 'optimizeSpeed';
  type ClientTypes = 'all' | 'sharedworker' | 'window' | 'worker';
@@ -7425,7 +7425,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type EndingType = 'native' | 'transparent';
  type FileSystemHandleKind = 'directory' | 'file';
  type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
-@@ -8317,12 +11371,16 @@ type GlobalCompositeOperation =
+@@ -8339,12 +11393,16 @@ type GlobalCompositeOperation =
    | 'source-out'
    | 'source-over'
    | 'xor';
@@ -7443,7 +7443,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type KeyFormat = 'jwk' | 'pkcs8' | 'raw' | 'spki';
  type KeyType = 'private' | 'public' | 'secret';
-@@ -8335,6 +11393,7 @@ type KeyUsage =
+@@ -8357,6 +11415,7 @@ type KeyUsage =
    | 'unwrapKey'
    | 'verify'
    | 'wrapKey';
@@ -7451,7 +7451,7 @@ index 2f8599f26a797ad7b0a4304a920115ef70c0161e..878b9913f733018a9b44ae91418406c1
  type LockMode = 'exclusive' | 'shared';
  type MediaDecodingType = 'file' | 'media-source' | 'webrtc';
  type MediaEncodingType = 'record' | 'webrtc';
-@@ -8420,10 +11479,22 @@ type ServiceWorkerState =
+@@ -8442,10 +11501,22 @@ type ServiceWorkerState =
  type ServiceWorkerUpdateViaCache = 'all' | 'imports' | 'none';
  type TransferFunction = 'hlg' | 'pq' | 'srgb';
  type VideoColorPrimaries = 'bt470bg' | 'bt709' | 'smpte170m';

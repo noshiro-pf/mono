@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2015.collection.d.ts b/v5.2/output/lib-files-branded/lib.es2015.collection.d.ts
-index ae410b44fb1f5de9cf9207c9dc1b7ba2df32df5e..8b8b65757f0467fcc501cea7140840e9df307742 100644
+index ddbd118b6fef54c4cc6edbdfe412ef66c790ac0e..d86858975169c5ce0027e801557de95c3745c69a 100644
 --- a/v5.1/output/lib-files-branded/lib.es2015.collection.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2015.collection.d.ts
-@@ -49,7 +49,7 @@ interface ReadonlyMap<K, V> {
+@@ -71,7 +71,7 @@ interface ReadonlyMap<K, V> {
    readonly size: NumberType.ArraySize;
  }
  
@@ -11,7 +11,7 @@ index ae410b44fb1f5de9cf9207c9dc1b7ba2df32df5e..8b8b65757f0467fcc501cea7140840e9
    /**
     * Removes the specified element from the WeakMap.
     * @returns true if the element was successfully removed, or false if it was not present.
-@@ -65,17 +65,17 @@ interface WeakMap<K extends object, V> {
+@@ -87,17 +87,17 @@ interface WeakMap<K extends object, V> {
    has(key: K | (import('ts-type-forge').WidenLiteral<K> & {})): boolean;
    /**
     * Adds a new element with a specified key and value.
@@ -33,7 +33,7 @@ index ae410b44fb1f5de9cf9207c9dc1b7ba2df32df5e..8b8b65757f0467fcc501cea7140840e9
  }
  declare const WeakMap: WeakMapConstructor;
  
-@@ -124,9 +124,9 @@ interface ReadonlySet<T> {
+@@ -146,9 +146,9 @@ interface ReadonlySet<T> {
    readonly size: NumberType.ArraySize;
  }
  
@@ -45,7 +45,7 @@ index ae410b44fb1f5de9cf9207c9dc1b7ba2df32df5e..8b8b65757f0467fcc501cea7140840e9
     */
    add(value: T): this;
    /**
-@@ -135,14 +135,14 @@ interface WeakSet<T extends object> {
+@@ -157,14 +157,14 @@ interface WeakSet<T extends object> {
     */
    delete(value: T): boolean;
    /**

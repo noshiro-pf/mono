@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.dom.iterable.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  /////////////////////////////
-@@ -50,7 +35,7 @@ interface CSSKeyframesRule {
+@@ -50,7 +57,7 @@ interface CSSKeyframesRule {
  
  interface CSSNumericArray {
    [Symbol.iterator](): ArrayIterator<CSSNumericValue>;
@@ -26,7 +21,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSNumericValue>;
  }
-@@ -65,14 +50,14 @@ interface CSSStyleDeclaration {
+@@ -65,14 +72,14 @@ interface CSSStyleDeclaration {
  
  interface CSSTransformValue {
    [Symbol.iterator](): ArrayIterator<CSSTransformComponent>;
@@ -43,7 +38,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<CSSUnparsedSegment>;
  }
-@@ -110,7 +95,7 @@ interface DOMStringList {
+@@ -110,7 +117,7 @@ interface DOMStringList {
  
  interface DOMTokenList {
    [Symbol.iterator](): ArrayIterator<string>;
@@ -52,7 +47,7 @@
    keys(): ArrayIterator<number>;
    values(): ArrayIterator<string>;
  }
-@@ -136,9 +121,9 @@ interface FormDataIterator<T> extends IteratorObject<
+@@ -136,9 +143,9 @@ interface FormDataIterator<T> extends IteratorObject<
  }
  
  interface FormData {
@@ -64,7 +59,7 @@
    /** Returns a list of keys in the list. */
    keys(): FormDataIterator<string>;
    /** Returns a list of values in the list. */
-@@ -174,9 +159,9 @@ interface HeadersIterator<T> extends IteratorObject<
+@@ -174,9 +181,9 @@ interface HeadersIterator<T> extends IteratorObject<
  }
  
  interface Headers {
@@ -76,7 +71,7 @@
    /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
    keys(): HeadersIterator<string>;
    /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
-@@ -238,9 +223,9 @@ interface MediaKeyStatusMapIterator<T> extends IteratorObject<
+@@ -238,9 +245,9 @@ interface MediaKeyStatusMapIterator<T> extends IteratorObject<
  
  interface MediaKeyStatusMap {
    [Symbol.iterator](): MediaKeyStatusMapIterator<
@@ -88,7 +83,7 @@
    keys(): MediaKeyStatusMapIterator<BufferSource>;
    values(): MediaKeyStatusMapIterator<MediaKeyStatus>;
  }
-@@ -249,13 +234,13 @@ interface MediaList {
+@@ -249,13 +256,13 @@ interface MediaList {
    [Symbol.iterator](): ArrayIterator<string>;
  }
  
@@ -104,7 +99,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -288,7 +273,7 @@ interface Navigator {
+@@ -288,7 +295,7 @@ interface Navigator {
  interface NodeList {
    [Symbol.iterator](): ArrayIterator<Node>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -113,7 +108,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -298,7 +283,7 @@ interface NodeList {
+@@ -298,7 +305,7 @@ interface NodeList {
  interface NodeListOf<TNode extends Node> {
    [Symbol.iterator](): ArrayIterator<TNode>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -122,7 +117,7 @@
    /** Returns an list of keys in the list. */
    keys(): ArrayIterator<number>;
    /** Returns an list of values in the list. */
-@@ -318,7 +303,7 @@ interface RTCRtpTransceiver {
+@@ -318,7 +325,7 @@ interface RTCRtpTransceiver {
    setCodecPreferences(codecs: Iterable<RTCRtpCodec>): void;
  }
  
@@ -131,7 +126,7 @@
  
  interface SVGLengthList {
    [Symbol.iterator](): ArrayIterator<SVGLength>;
-@@ -362,10 +347,10 @@ interface StylePropertyMapReadOnlyIterator<T> extends IteratorObject<
+@@ -362,10 +369,10 @@ interface StylePropertyMapReadOnlyIterator<T> extends IteratorObject<
  
  interface StylePropertyMapReadOnly {
    [Symbol.iterator](): StylePropertyMapReadOnlyIterator<
@@ -144,7 +139,7 @@
    >;
    keys(): StylePropertyMapReadOnlyIterator<string>;
    values(): StylePropertyMapReadOnlyIterator<Iterable<CSSStyleValue>>;
-@@ -395,7 +380,7 @@ interface SubtleCrypto {
+@@ -395,7 +402,7 @@ interface SubtleCrypto {
    ): Promise<CryptoKey>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
    generateKey(
@@ -153,7 +148,7 @@
      extractable: boolean,
      keyUsages: ReadonlyArray<'sign' | 'verify'>,
    ): Promise<CryptoKeyPair>;
-@@ -482,9 +467,9 @@ interface URLSearchParamsIterator<T> extends IteratorObject<
+@@ -482,9 +489,9 @@ interface URLSearchParamsIterator<T> extends IteratorObject<
  }
  
  interface URLSearchParams {
@@ -165,7 +160,7 @@
    /** Returns a list of keys in the search params. */
    keys(): URLSearchParamsIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -572,7 +557,7 @@ interface WebGL2RenderingContextBase {
+@@ -572,7 +579,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,

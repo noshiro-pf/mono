@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.es2020.intl.d.ts b/v5.5/output/lib-files-branded/lib.es2020.intl.d.ts
-index 24e87639d3f518b234217eb5e41a73114b7c1bae..265bb13498b8592317d179ff321b2b1164e1bfc1 100644
+index dd10b64d67d59a1a71636e69e046713a5bfa083a..ab299d1f88bf38e4046c3c3ecb57daeacff34507 100644
 --- a/v5.4/output/lib-files-branded/lib.es2020.intl.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.es2020.intl.d.ts
-@@ -232,7 +232,26 @@ declare namespace Intl {
+@@ -254,7 +254,26 @@ declare namespace Intl {
      ): readonly UnicodeBCP47LocaleIdentifier[];
    };
  
@@ -29,7 +29,7 @@ index 24e87639d3f518b234217eb5e41a73114b7c1bae..265bb13498b8592317d179ff321b2b11
      readonly compactDisplay?: 'short' | 'long' | undefined;
      readonly notation?:
        | 'standard'
-@@ -240,26 +259,28 @@ declare namespace Intl {
+@@ -262,26 +281,28 @@ declare namespace Intl {
        | 'engineering'
        | 'compact'
        | undefined;

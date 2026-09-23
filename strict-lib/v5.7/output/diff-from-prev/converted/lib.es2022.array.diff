@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2022.array.d.ts b/v5.7/output/lib-files/lib.es2022.array.d.ts
-index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612851ee030 100644
+index 17859e76d6ee609a9d6beb03de90e8db7fc69c7c..2d3c4b7d4b575606b3ee828631186d6062f2bacc 100644
 --- a/v5.6/output/lib-files/lib.es2022.array.d.ts
 +++ b/v5.7/output/lib-files/lib.es2022.array.d.ts
-@@ -16,7 +16,7 @@ interface ReadonlyArray<T> {
+@@ -38,7 +38,7 @@ interface ReadonlyArray<T> {
    at(index: number): T | undefined;
  }
  
@@ -11,7 +11,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -24,7 +24,7 @@ interface Int8Array {
+@@ -46,7 +46,7 @@ interface Int8Array {
    at(index: number): import('ts-type-forge').Int8 | undefined;
  }
  
@@ -20,7 +20,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -32,7 +32,7 @@ interface Uint8Array {
+@@ -54,7 +54,7 @@ interface Uint8Array {
    at(index: number): import('ts-type-forge').Uint8 | undefined;
  }
  
@@ -29,7 +29,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -40,7 +40,7 @@ interface Uint8ClampedArray {
+@@ -62,7 +62,7 @@ interface Uint8ClampedArray {
    at(index: number): import('ts-type-forge').Uint8 | undefined;
  }
  
@@ -38,7 +38,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -48,7 +48,7 @@ interface Int16Array {
+@@ -70,7 +70,7 @@ interface Int16Array {
    at(index: number): number | undefined;
  }
  
@@ -47,7 +47,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -56,7 +56,7 @@ interface Uint16Array {
+@@ -78,7 +78,7 @@ interface Uint16Array {
    at(index: number): number | undefined;
  }
  
@@ -56,7 +56,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -64,7 +64,7 @@ interface Int32Array {
+@@ -86,7 +86,7 @@ interface Int32Array {
    at(index: number): number | undefined;
  }
  
@@ -65,7 +65,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -72,7 +72,7 @@ interface Uint32Array {
+@@ -94,7 +94,7 @@ interface Uint32Array {
    at(index: number): number | undefined;
  }
  
@@ -74,7 +74,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -80,7 +80,7 @@ interface Float32Array {
+@@ -102,7 +102,7 @@ interface Float32Array {
    at(index: number): number | undefined;
  }
  
@@ -83,7 +83,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -88,7 +88,7 @@ interface Float64Array {
+@@ -110,7 +110,7 @@ interface Float64Array {
    at(index: number): number | undefined;
  }
  
@@ -92,7 +92,7 @@ index b4e4d05fc92c826b41c0bc1cdb85a6fe289d3272..6589528b9c224b6393e37d2cc74ab612
    /**
     * Returns the item located at the specified index.
     * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
-@@ -96,7 +96,7 @@ interface BigInt64Array {
+@@ -118,7 +118,7 @@ interface BigInt64Array {
    at(index: number): bigint | undefined;
  }
  

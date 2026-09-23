@@ -1,19 +1,14 @@
-@@ -1,47 +1,32 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,35 +13,42 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2020.bigint.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
 -/// <reference lib="es2020.intl" />
@@ -53,7 +48,7 @@
  
    /**
     * How to display the currency in currency formatting. It is only used when [[Style]] has the value "currency". The default is "symbol".
-@@ -52,142 +37,52 @@ interface BigIntToLocaleStringOptions {
+@@ -52,142 +59,52 @@ interface BigIntToLocaleStringOptions {
     *
     * "name" to use a localized currency name such as "dollar"
     */
@@ -218,7 +213,7 @@
  
    /**
     * The formatting that should be displayed for the number, the defaults is "standard"
-@@ -200,12 +95,12 @@ interface BigIntToLocaleStringOptions {
+@@ -200,12 +117,12 @@ interface BigIntToLocaleStringOptions {
     *
     *     "compact" string representing exponent, defaults is using the "short" form
     */
@@ -233,7 +228,7 @@
  }
  
  interface BigInt {
-@@ -213,7 +108,7 @@ interface BigInt {
+@@ -213,7 +130,7 @@ interface BigInt {
     * Returns a string representation of an object.
     * @param radix Specifies a radix for converting numeric values to strings.
     */
@@ -242,7 +237,7 @@
  
    /** Returns a string representation appropriate to the host environment's current locale. */
    toLocaleString(
-@@ -237,17 +132,23 @@ interface BigIntConstructor {
+@@ -237,17 +154,23 @@ interface BigIntConstructor {
     * @param bits The number of low bits to use
     * @param int The BigInt whose bits to extract
     */
@@ -269,7 +264,7 @@
  
  /**
   * A typed array of 64-bit signed integer values. The contents are initialized to 0. If the
-@@ -255,7 +156,7 @@ declare var BigInt: BigIntConstructor;
+@@ -255,7 +178,7 @@ declare var BigInt: BigIntConstructor;
   */
  interface BigInt64Array {
    /** The size in bytes of each element in the array. */
@@ -278,7 +273,7 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: ArrayBufferLike;
-@@ -278,7 +179,7 @@ interface BigInt64Array {
+@@ -278,7 +201,7 @@ interface BigInt64Array {
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -287,7 +282,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -290,7 +191,7 @@ interface BigInt64Array {
+@@ -290,7 +213,7 @@ interface BigInt64Array {
     */
    every(
      predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
@@ -296,7 +291,7 @@
    ): boolean;
  
    /**
-@@ -311,8 +212,8 @@ interface BigInt64Array {
+@@ -311,8 +234,8 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    filter(
@@ -307,7 +302,7 @@
    ): BigInt64Array;
  
    /**
-@@ -326,7 +227,7 @@ interface BigInt64Array {
+@@ -326,7 +249,7 @@ interface BigInt64Array {
     */
    find(
      predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
@@ -316,7 +311,7 @@
    ): bigint | undefined;
  
    /**
-@@ -340,7 +241,7 @@ interface BigInt64Array {
+@@ -340,7 +263,7 @@ interface BigInt64Array {
     */
    findIndex(
      predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
@@ -325,7 +320,7 @@
    ): number;
  
    /**
-@@ -352,7 +253,7 @@ interface BigInt64Array {
+@@ -352,7 +275,7 @@ interface BigInt64Array {
     */
    forEach(
      callbackfn: (value: bigint, index: number, array: BigInt64Array) => void,
@@ -334,7 +329,7 @@
    ): void;
  
    /**
-@@ -401,7 +302,7 @@ interface BigInt64Array {
+@@ -401,7 +324,7 @@ interface BigInt64Array {
     */
    map(
      callbackfn: (value: bigint, index: number, array: BigInt64Array) => bigint,
@@ -343,7 +338,7 @@
    ): BigInt64Array;
  
    /**
-@@ -509,7 +410,7 @@ interface BigInt64Array {
+@@ -509,7 +432,7 @@ interface BigInt64Array {
     */
    some(
      predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
@@ -352,7 +347,7 @@
    ): boolean;
  
    /**
-@@ -528,7 +429,7 @@ interface BigInt64Array {
+@@ -528,7 +451,7 @@ interface BigInt64Array {
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
@@ -361,7 +356,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  
-@@ -559,13 +460,13 @@ interface BigInt64ArrayConstructor {
+@@ -559,13 +482,13 @@ interface BigInt64ArrayConstructor {
    ): BigInt64Array;
  
    /** The size in bytes of each element in the array. */
@@ -377,7 +372,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -577,11 +478,11 @@ interface BigInt64ArrayConstructor {
+@@ -577,11 +500,11 @@ interface BigInt64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,
@@ -391,7 +386,7 @@
  
  /**
   * A typed array of 64-bit unsigned integer values. The contents are initialized to 0. If the
-@@ -589,7 +490,7 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
+@@ -589,7 +512,7 @@ declare var BigInt64Array: BigInt64ArrayConstructor;
   */
  interface BigUint64Array {
    /** The size in bytes of each element in the array. */
@@ -400,7 +395,7 @@
  
    /** The ArrayBuffer instance referenced by the array. */
    readonly buffer: ArrayBufferLike;
-@@ -612,7 +513,7 @@ interface BigUint64Array {
+@@ -612,7 +535,7 @@ interface BigUint64Array {
    copyWithin(target: number, start: number, end?: number): this;
  
    /** Yields index, value pairs for every entry in the array. */
@@ -409,7 +404,7 @@
  
    /**
     * Determines whether all the members of an array satisfy the specified test.
-@@ -624,7 +525,7 @@ interface BigUint64Array {
+@@ -624,7 +547,7 @@ interface BigUint64Array {
     */
    every(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -418,7 +413,7 @@
    ): boolean;
  
    /**
-@@ -645,8 +546,8 @@ interface BigUint64Array {
+@@ -645,8 +568,8 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    filter(
@@ -429,7 +424,7 @@
    ): BigUint64Array;
  
    /**
-@@ -660,7 +561,7 @@ interface BigUint64Array {
+@@ -660,7 +583,7 @@ interface BigUint64Array {
     */
    find(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -438,7 +433,7 @@
    ): bigint | undefined;
  
    /**
-@@ -674,7 +575,7 @@ interface BigUint64Array {
+@@ -674,7 +597,7 @@ interface BigUint64Array {
     */
    findIndex(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -447,7 +442,7 @@
    ): number;
  
    /**
-@@ -686,7 +587,7 @@ interface BigUint64Array {
+@@ -686,7 +609,7 @@ interface BigUint64Array {
     */
    forEach(
      callbackfn: (value: bigint, index: number, array: BigUint64Array) => void,
@@ -456,7 +451,7 @@
    ): void;
  
    /**
-@@ -735,7 +636,7 @@ interface BigUint64Array {
+@@ -735,7 +658,7 @@ interface BigUint64Array {
     */
    map(
      callbackfn: (value: bigint, index: number, array: BigUint64Array) => bigint,
@@ -465,7 +460,7 @@
    ): BigUint64Array;
  
    /**
-@@ -843,7 +744,7 @@ interface BigUint64Array {
+@@ -843,7 +766,7 @@ interface BigUint64Array {
     */
    some(
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
@@ -474,7 +469,7 @@
    ): boolean;
  
    /**
-@@ -862,7 +763,7 @@ interface BigUint64Array {
+@@ -862,7 +785,7 @@ interface BigUint64Array {
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
@@ -483,7 +478,7 @@
      options?: Intl.NumberFormatOptions,
    ): string;
  
-@@ -893,13 +794,13 @@ interface BigUint64ArrayConstructor {
+@@ -893,13 +816,13 @@ interface BigUint64ArrayConstructor {
    ): BigUint64Array;
  
    /** The size in bytes of each element in the array. */
@@ -499,7 +494,7 @@
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -911,11 +812,11 @@ interface BigUint64ArrayConstructor {
+@@ -911,11 +834,11 @@ interface BigUint64ArrayConstructor {
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (v: U, k: number) => bigint,

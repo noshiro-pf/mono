@@ -1,19 +1,14 @@
-@@ -1,25 +1,13 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,13 +13,23 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2016.array.include.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  interface Array<T> {
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
@@ -28,7 +23,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -28,7 +16,10 @@ interface ReadonlyArray<T> {
+@@ -28,7 +38,10 @@ interface ReadonlyArray<T> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
@@ -40,7 +35,7 @@
  }
  
  interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -37,7 +28,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -37,7 +50,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
@@ -52,7 +47,7 @@
  }
  
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -46,7 +40,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -46,7 +62,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
@@ -64,7 +59,7 @@
  }
  
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-@@ -55,7 +52,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+@@ -55,7 +74,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */

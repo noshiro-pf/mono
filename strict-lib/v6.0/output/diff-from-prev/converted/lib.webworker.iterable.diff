@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.webworker.iterable.d.ts b/v6.0/output/lib-files/lib.webworker.iterable.d.ts
-index a9b3f24e51a2bcb46fe5200732ed31902cec6602..3b3e55b7a43b5d3e58dd5f54d1ef8f082227a35a 100644
+index cd7ae1d4754617c8897fd7c622c5dc16e6ba3ebf..fc272c5fb9b5086e55a776cd396aa721d387d1f9 100644
 --- a/v5.9/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v6.0/output/lib-files/lib.webworker.iterable.d.ts
-@@ -1,630 +1,2 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,633 +20,5 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
 -/////////////////////////////

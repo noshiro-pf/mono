@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2021.promise.d.ts b/v6.0/output/lib-files/lib.es2021.promise.d.ts
-index 36e10c5817a689a24d0f17ff53652e0f69c2776c..fb0030932747df1e27540961aee02c303b9fd442 100644
+index f8411b996cd71f4e08c04356d57394d215dc0bc6..11c9e2c299e84760718d21a3ee7ee5691a2415b7 100644
 --- a/v5.9/output/lib-files/lib.es2021.promise.d.ts
 +++ b/v6.0/output/lib-files/lib.es2021.promise.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface AggregateError extends Error {

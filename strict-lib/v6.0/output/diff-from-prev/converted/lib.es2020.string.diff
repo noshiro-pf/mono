@@ -1,14 +1,26 @@
 diff --git a/v5.9/output/lib-files/lib.es2020.string.d.ts b/v6.0/output/lib-files/lib.es2020.string.d.ts
-index 639df38fbcd71354408d0ec1771ba23dbccd6803..726c6df5f444c6df0993372cc4281ea6d30e8bf2 100644
+index 5731eb943b3d02f67cd0caa930727ceac5c96176..a057cafaf58641e7cccfe3ecfcd590c9d8b6f8f6 100644
 --- a/v5.9/output/lib-files/lib.es2020.string.d.ts
 +++ b/v6.0/output/lib-files/lib.es2020.string.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2015.iterable.d.ts" />
  /// <reference path="./lib.es2020.intl.d.ts" />
  /// <reference path="./lib.es2020.symbol.wellknown.d.ts" />
-@@ -8,7 +6,7 @@ interface String {
+@@ -30,7 +28,7 @@ interface String {
    /**
     * Matches a string with a regular expression, and returns an iterable of matches
     * containing the results of that search.

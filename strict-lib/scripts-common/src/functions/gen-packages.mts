@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { Json, Num, Result, pipe } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { makeEmptyDir, pathExists } from 'ts-repo-utils';
-import { type Context } from '../context.mjs';
+import { libSourceOf, type Context } from '../context.mjs';
 import { type ConverterConfig } from '../convert-dts/common.mjs';
 import { typeUtilsName } from '../convert-dts/constants.mjs';
 import { formatDir } from './utils/format.mjs';
@@ -26,6 +26,23 @@ const LINKER_FILE = 'link-libs.mjs';
  * anything: `ENOENT: ... strict-lib/v5.0/output/lib/CHANGELOG.md`.
  */
 const CHANGELOG_FILE = 'CHANGELOG.md';
+
+/**
+ * Copied from the repository root. Every declaration in the bundle is a
+ * derivative of a TypeScript lib file, which is Apache-2.0 (Copyright
+ * Microsoft), and section 4 of that license asks a redistributor to give the
+ * recipient a copy of it. `package.json`'s `license` field names it and
+ * hands over nothing.
+ */
+const LICENSE_FILE = 'LICENSE';
+
+/**
+ * What the bundle is derived from, in the file Apache-2.0 reserves for
+ * attribution. Each generated file also keeps the Microsoft banner and says
+ * beneath it that it was modified; this is the one place the whole story is
+ * told, with the upstream commit the files were taken from.
+ */
+const NOTICE_FILE = 'NOTICE';
 
 /** The subset of `package.json` fields this generator reads. */
 const packageJsonType = t.record({
@@ -294,6 +311,10 @@ const genBundlePackage = async (
         '!libs/**/package.json',
         LINKER_FILE,
         CHANGELOG_FILE,
+        // npm ships a `LICENSE` whether or not it is named; `NOTICE` it does
+        // not, and naming both keeps the list the whole truth.
+        LICENSE_FILE,
+        NOTICE_FILE,
       ],
       // Named after the package so that two of these installed side by side
       // do not fight over one command.
@@ -331,7 +352,37 @@ const genBundlePackage = async (
     await bundleChangelog(paths.strictTsLib.$, libName),
   );
 
+  await fs.copyFile(
+    path.resolve(paths.root, LICENSE_FILE),
+    path.resolve(bundleDir, LICENSE_FILE),
+  );
+
   const repoUrl = versionConfig.repo.replace(/\.git$/u, '');
+
+  const libSource = libSourceOf(versionConfig);
+
+  await fs.writeFile(
+    path.resolve(bundleDir, NOTICE_FILE),
+    [
+      libName,
+      'Copyright (c) noshiro-pf',
+      '',
+      'Licensed under the Apache License, Version 2.0; see LICENSE.',
+      '',
+      'This package is a derivative work of the built-in library declaration',
+      `files (lib.*.d.ts) of TypeScript ${versionConfig.typescriptVersion}:`,
+      '',
+      `    https://github.com/${libSource.repo}/tree/${libSource.ref}/${libSource.dir}`,
+      '',
+      'Copyright (c) Microsoft Corporation. All rights reserved.',
+      'Licensed under the Apache License, Version 2.0.',
+      '',
+      'Every file under libs/ and libs-branded/ keeps the copyright notice of',
+      'the file it was generated from, followed by a note that it was modified.',
+      `The changes are described at ${repoUrl}.`,
+      '',
+    ].join('\n'),
+  );
 
   await fs.writeFile(
     path.resolve(bundleDir, 'README.md'),
@@ -352,6 +403,12 @@ const genBundlePackage = async (
       '',
       ...setupSection(libName, versionConfig.typescriptVersion),
       `See <${repoUrl}> for usage and version support.`,
+      '',
+      '## License',
+      '',
+      'Apache-2.0, like the TypeScript lib files it is generated from',
+      '(Copyright Microsoft Corporation). `LICENSE` and `NOTICE` in this',
+      'package have the details.',
       '',
     ].join('\n'),
   );

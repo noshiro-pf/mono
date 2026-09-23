@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.dom.d.ts b/v6.0/output/lib-files/lib.dom.d.ts
-index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029d053b37a 100644
+index 93c7313e1079fd86829708d44d91760509da6120..11d25e9dda3a632d15be66f979ad06da897e9d4c 100644
 --- a/v5.9/output/lib-files/lib.dom.d.ts
 +++ b/v6.0/output/lib-files/lib.dom.d.ts
-@@ -1,9 +1,14 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,12 +20,17 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 +/// <reference path="./lib.es2015.d.ts" />
 +/// <reference path="./lib.es2018.asynciterable.d.ts" />
@@ -18,7 +30,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AddEventListenerOptions extends EventListenerOptions {
    once?: boolean;
    passive?: boolean;
-@@ -54,6 +59,12 @@ interface Algorithm {
+@@ -76,6 +81,12 @@ interface Algorithm {
    name: string;
  }
  
@@ -31,7 +43,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AnalyserOptions extends AudioNodeOptions {
    fftSize?: number;
    maxDecibels?: number;
-@@ -139,6 +150,7 @@ interface AudioDecoderSupport {
+@@ -161,6 +172,7 @@ interface AudioDecoderSupport {
  }
  
  interface AudioEncoderConfig {
@@ -39,7 +51,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    bitrate?: number;
    bitrateMode?: BitrateMode;
    codec: string;
-@@ -208,6 +220,13 @@ interface AuthenticationExtensionsClientOutputs {
+@@ -230,6 +242,13 @@ interface AuthenticationExtensionsClientOutputs {
    prf?: AuthenticationExtensionsPRFOutputs;
  }
  
@@ -53,7 +65,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AuthenticationExtensionsLargeBlobInputs {
    read?: boolean;
    support?: string;
-@@ -226,6 +245,12 @@ interface AuthenticationExtensionsLargeBlobOutputs {
+@@ -248,6 +267,12 @@ interface AuthenticationExtensionsLargeBlobOutputs {
    written?: boolean;
  }
  
@@ -66,7 +78,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AuthenticationExtensionsPRFInputs {
    eval?: AuthenticationExtensionsPRFValues;
    evalByCredential?: Record<string, AuthenticationExtensionsPRFValues>;
-@@ -241,6 +266,11 @@ interface AuthenticationExtensionsPRFOutputs {
+@@ -263,6 +288,11 @@ interface AuthenticationExtensionsPRFOutputs {
    results?: AuthenticationExtensionsPRFValues;
  }
  
@@ -78,7 +90,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AuthenticationExtensionsPRFValues {
    first: BufferSource;
    second?: BufferSource;
-@@ -251,6 +281,31 @@ interface AuthenticationExtensionsPRFValuesJSON {
+@@ -273,6 +303,31 @@ interface AuthenticationExtensionsPRFValuesJSON {
    second?: Base64URLString;
  }
  
@@ -110,7 +122,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface AuthenticatorSelectionCriteria {
    authenticatorAttachment?: AuthenticatorAttachment;
    requireResidentKey?: boolean;
-@@ -353,6 +408,11 @@ interface CloseEventInit extends EventInit {
+@@ -375,6 +430,11 @@ interface CloseEventInit extends EventInit {
    wasClean?: boolean;
  }
  
@@ -122,7 +134,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface CompositionEventInit extends UIEventInit {
    data?: string;
  }
-@@ -378,6 +438,11 @@ interface ConstantSourceOptions {
+@@ -400,6 +460,11 @@ interface ConstantSourceOptions {
    offset?: number;
  }
  
@@ -134,7 +146,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ConstrainBooleanParameters {
    exact?: boolean;
    ideal?: boolean;
-@@ -459,6 +524,13 @@ interface CryptoKeyPair {
+@@ -481,6 +546,13 @@ interface CryptoKeyPair {
    publicKey: CryptoKey;
  }
  
@@ -148,7 +160,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface CustomEventInit<T = unknown> extends EventInit {
    detail?: T;
  }
-@@ -603,7 +675,7 @@ interface EffectTiming {
+@@ -625,7 +697,7 @@ interface EffectTiming {
  }
  
  interface ElementCreationOptions {
@@ -157,7 +169,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    is?: string;
  }
  
-@@ -632,6 +704,7 @@ interface EncodedVideoChunkInit {
+@@ -654,6 +726,7 @@ interface EncodedVideoChunkInit {
  
  interface EncodedVideoChunkMetadata {
    decoderConfig?: VideoDecoderConfig;
@@ -165,7 +177,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  interface ErrorEventInit extends EventInit {
-@@ -703,6 +776,7 @@ interface FocusEventInit extends UIEventInit {
+@@ -725,6 +798,7 @@ interface FocusEventInit extends UIEventInit {
  }
  
  interface FocusOptions {
@@ -173,7 +185,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    preventScroll?: boolean;
  }
  
-@@ -715,6 +789,7 @@ interface FontFaceDescriptors {
+@@ -737,6 +811,7 @@ interface FontFaceDescriptors {
    stretch?: string;
    style?: string;
    unicodeRange?: string;
@@ -181,7 +193,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    weight?: string;
  }
  
-@@ -730,6 +805,364 @@ interface FullscreenOptions {
+@@ -752,6 +827,364 @@ interface FullscreenOptions {
    navigationUI?: FullscreenNavigationUI;
  }
  
@@ -546,7 +558,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface GainOptions extends AudioNodeOptions {
    gain?: number;
  }
-@@ -744,7 +1177,7 @@ interface GamepadEffectParameters {
+@@ -766,7 +1199,7 @@ interface GamepadEffectParameters {
  }
  
  interface GamepadEventInit extends EventInit {
@@ -555,7 +567,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  interface GetAnimationsOptions {
-@@ -842,6 +1275,7 @@ interface ImageBitmapRenderingContextSettings {
+@@ -864,6 +1297,7 @@ interface ImageBitmapRenderingContextSettings {
  
  interface ImageDataSettings {
    colorSpace?: PredefinedColorSpace;
@@ -563,7 +575,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  interface ImageDecodeOptions {
-@@ -885,6 +1319,7 @@ interface InputEventInit extends UIEventInit {
+@@ -907,6 +1341,7 @@ interface InputEventInit extends UIEventInit {
  interface IntersectionObserverInit {
    root?: Element | Document | null;
    rootMargin?: string;
@@ -571,7 +583,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    threshold?: number | readonly number[];
  }
  
-@@ -918,12 +1353,12 @@ interface KeySystemTrackConfiguration {
+@@ -940,12 +1375,12 @@ interface KeySystemTrackConfiguration {
  }
  
  interface KeyboardEventInit extends EventModifierInit {
@@ -586,7 +598,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    keyCode?: number;
    location?: number;
    repeat?: boolean;
-@@ -938,6 +1373,8 @@ interface Keyframe {
+@@ -960,6 +1395,8 @@ interface Keyframe {
  
  interface KeyframeAnimationOptions extends KeyframeEffectOptions {
    id?: string;
@@ -595,7 +607,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    timeline?: AnimationTimeline | null;
  }
  
-@@ -1114,7 +1551,7 @@ interface MediaTrackCapabilities {
+@@ -1136,7 +1573,7 @@ interface MediaTrackCapabilities {
    channelCount?: ULongRange;
    deviceId?: string;
    displaySurface?: string;
@@ -604,7 +616,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    facingMode?: readonly string[];
    frameRate?: DoubleRange;
    groupId?: string;
-@@ -1132,7 +1569,7 @@ interface MediaTrackConstraintSet {
+@@ -1154,7 +1591,7 @@ interface MediaTrackConstraintSet {
    channelCount?: ConstrainULong;
    deviceId?: ConstrainDOMString;
    displaySurface?: ConstrainDOMString;
@@ -613,7 +625,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    facingMode?: ConstrainDOMString;
    frameRate?: ConstrainDouble;
    groupId?: ConstrainDOMString;
-@@ -1154,7 +1591,7 @@ interface MediaTrackSettings {
+@@ -1176,7 +1613,7 @@ interface MediaTrackSettings {
    channelCount?: number;
    deviceId?: string;
    displaySurface?: string;
@@ -622,7 +634,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    facingMode?: string;
    frameRate?: number;
    groupId?: string;
-@@ -1227,11 +1664,59 @@ interface MutationObserverInit {
+@@ -1249,11 +1686,59 @@ interface MutationObserverInit {
    subtree?: boolean;
  }
  
@@ -682,7 +694,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface NotificationOptions {
    badge?: string;
    body?: string;
-@@ -1469,6 +1954,7 @@ interface PointerLockOptions {
+@@ -1491,6 +1976,7 @@ interface PointerLockOptions {
  }
  
  interface PopStateEventInit extends EventInit {
@@ -690,7 +702,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    state?: unknown;
  }
  
-@@ -1967,6 +2453,10 @@ interface RTCTransportStats extends RTCStats {
+@@ -1989,6 +2475,10 @@ interface RTCTransportStats extends RTCStats {
    tlsVersion?: string;
  }
  
@@ -701,7 +713,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ReadableStreamGetReaderOptions {
    /**
     * Creates a ReadableStreamBYOBReader and locks the stream to the new reader.
-@@ -2013,6 +2503,23 @@ interface RegistrationOptions {
+@@ -2035,6 +2525,23 @@ interface RegistrationOptions {
    updateViaCache?: ServiceWorkerUpdateViaCache;
  }
  
@@ -725,7 +737,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ReportingObserverOptions {
    buffered?: boolean;
    types?: readonly string[];
-@@ -2101,6 +2608,37 @@ interface SVGBoundingBoxOptions {
+@@ -2123,6 +2630,37 @@ interface SVGBoundingBoxOptions {
    stroke?: boolean;
  }
  
@@ -763,7 +775,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ScrollIntoViewOptions extends ScrollOptions {
    block?: ScrollLogicalPosition;
    inline?: ScrollLogicalPosition;
-@@ -2110,6 +2648,11 @@ interface ScrollOptions {
+@@ -2132,6 +2670,11 @@ interface ScrollOptions {
    behavior?: ScrollBehavior;
  }
  
@@ -775,7 +787,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ScrollToOptions extends ScrollOptions {
    left?: number;
    top?: number;
-@@ -2132,7 +2675,7 @@ interface SecurityPolicyViolationEventInit extends EventInit {
+@@ -2154,7 +2697,7 @@ interface SecurityPolicyViolationEventInit extends EventInit {
  
  interface ShadowRootInit {
    clonable?: boolean;
@@ -784,7 +796,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    delegatesFocus?: boolean;
    mode: ShadowRootMode;
    serializable?: boolean;
-@@ -2146,6 +2689,20 @@ interface ShareData {
+@@ -2168,6 +2711,20 @@ interface ShareData {
    url?: string;
  }
  
@@ -805,7 +817,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface SpeechSynthesisErrorEventInit extends SpeechSynthesisEventInit {
    error: SpeechSynthesisErrorCode;
  }
-@@ -2219,6 +2776,22 @@ interface SubmitEventInit extends EventInit {
+@@ -2241,6 +2798,22 @@ interface SubmitEventInit extends EventInit {
    submitter?: HTMLElement | null;
  }
  
@@ -828,7 +840,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface TextDecodeOptions {
    stream?: boolean;
  }
-@@ -2233,9 +2806,19 @@ interface TextEncoderEncodeIntoResult {
+@@ -2255,9 +2828,19 @@ interface TextEncoderEncodeIntoResult {
    written: number;
  }
  
@@ -848,7 +860,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  interface TouchEventInit extends EventModifierInit {
-@@ -2292,6 +2875,39 @@ interface ULongRange {
+@@ -2314,6 +2897,39 @@ interface ULongRange {
    min?: number;
  }
  
@@ -888,7 +900,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface UnderlyingByteSource {
    autoAllocateChunkSize?: number;
    cancel?: UnderlyingSourceCancelCallback;
-@@ -2325,6 +2941,11 @@ interface UnderlyingSource<R = unknown> {
+@@ -2347,6 +2963,11 @@ interface UnderlyingSource<R = unknown> {
    type?: ReadableStreamType;
  }
  
@@ -900,7 +912,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface ValidityStateFlags {
    badInput?: boolean;
    customError?: boolean;
-@@ -2458,6 +3079,12 @@ interface VideoFrameInit {
+@@ -2480,6 +3101,12 @@ interface VideoFrameInit {
    visibleRect?: DOMRectInit;
  }
  
@@ -913,7 +925,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  interface WaveShaperOptions extends AudioNodeOptions {
    curve?: readonly number[] | Float32Array;
    oversample?: OverSampleType;
-@@ -2473,6 +3100,7 @@ interface WebGLContextAttributes {
+@@ -2495,6 +3122,7 @@ interface WebGLContextAttributes {
    premultipliedAlpha?: boolean;
    preserveDrawingBuffer?: boolean;
    stencil?: boolean;
@@ -921,7 +933,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  interface WebGLContextEventInit extends EventInit {
-@@ -2490,13 +3118,14 @@ interface WebTransportErrorOptions {
+@@ -2512,13 +3140,14 @@ interface WebTransportErrorOptions {
  }
  
  interface WebTransportHash {
@@ -938,7 +950,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    requireUnreliable?: boolean;
    serverCertificateHashes?: readonly WebTransportHash[];
  }
-@@ -2567,7 +3196,7 @@ type XPathNSResolver =
+@@ -2589,7 +3218,7 @@ type XPathNSResolver =
   */
  interface ANGLE_instanced_arrays {
    /**
@@ -947,7 +959,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ANGLE_instanced_arrays/drawArraysInstancedANGLE)
     */
-@@ -2578,7 +3207,7 @@ interface ANGLE_instanced_arrays {
+@@ -2600,7 +3229,7 @@ interface ANGLE_instanced_arrays {
      primcount: GLsizei,
    ): void;
    /**
@@ -956,7 +968,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ANGLE_instanced_arrays/drawElementsInstancedANGLE)
     */
-@@ -2590,7 +3219,7 @@ interface ANGLE_instanced_arrays {
+@@ -2612,7 +3241,7 @@ interface ANGLE_instanced_arrays {
      primcount: GLsizei,
    ): void;
    /**
@@ -965,7 +977,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ANGLE_instanced_arrays/vertexAttribDivisorANGLE)
     */
-@@ -2718,7 +3347,7 @@ interface AbortController {
+@@ -2740,7 +3369,7 @@ interface AbortController {
     */
    readonly signal: AbortSignal;
    /**
@@ -974,7 +986,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)
     */
-@@ -2741,7 +3370,7 @@ interface AbortSignalEventMap {
+@@ -2763,7 +3392,7 @@ interface AbortSignalEventMap {
   */
  interface AbortSignal extends EventTarget {
    /**
@@ -983,7 +995,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/aborted)
     */
-@@ -2755,7 +3384,7 @@ interface AbortSignal extends EventTarget {
+@@ -2777,7 +3406,7 @@ interface AbortSignal extends EventTarget {
     */
    readonly reason: unknown;
    /**
@@ -992,7 +1004,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)
     */
-@@ -2786,13 +3415,13 @@ declare const AbortSignal: {
+@@ -2808,13 +3437,13 @@ declare const AbortSignal: {
    prototype: AbortSignal;
    new (): AbortSignal;
    /**
@@ -1008,7 +1020,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)
     */
-@@ -2806,13 +3435,13 @@ declare const AbortSignal: {
+@@ -2828,13 +3457,13 @@ declare const AbortSignal: {
  };
  
  /**
@@ -1024,7 +1036,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbstractRange/collapsed)
     */
-@@ -2830,7 +3459,7 @@ interface AbstractRange {
+@@ -2852,7 +3481,7 @@ interface AbstractRange {
     */
    readonly endOffset: number;
    /**
@@ -1033,7 +1045,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbstractRange/startContainer)
     */
-@@ -2878,7 +3507,7 @@ interface AbstractWorker {
+@@ -2900,7 +3529,7 @@ interface AbstractWorker {
  }
  
  /**
@@ -1042,7 +1054,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnalyserNode)
   */
-@@ -2890,25 +3519,25 @@ interface AnalyserNode extends AudioNode {
+@@ -2912,25 +3541,25 @@ interface AnalyserNode extends AudioNode {
     */
    fftSize: number;
    /**
@@ -1072,7 +1084,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnalyserNode/smoothingTimeConstant)
     */
-@@ -2932,7 +3561,7 @@ interface AnalyserNode extends AudioNode {
+@@ -2954,7 +3583,7 @@ interface AnalyserNode extends AudioNode {
     */
    getFloatFrequencyData(array: Float32Array<ArrayBuffer>): void;
    /**
@@ -1081,7 +1093,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnalyserNode/getFloatTimeDomainData)
     */
-@@ -2973,7 +3602,7 @@ interface Animation extends EventTarget {
+@@ -2995,7 +3624,7 @@ interface Animation extends EventTarget {
     */
    currentTime: CSSNumberish | null;
    /**
@@ -1090,7 +1102,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/effect)
     */
-@@ -2996,6 +3625,12 @@ interface Animation extends EventTarget {
+@@ -3018,6 +3647,12 @@ interface Animation extends EventTarget {
    onfinish: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/remove_event) */
    onremove: ((this: Animation, ev: AnimationPlaybackEvent) => unknown) | null;
@@ -1103,7 +1115,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    /**
     * The read-only **`Animation.pending`** property of the Web Animations API indicates whether the animation is currently waiting for an asynchronous operation such as initiating playback or pausing a running animation.
     *
-@@ -3015,7 +3650,7 @@ interface Animation extends EventTarget {
+@@ -3037,7 +3672,7 @@ interface Animation extends EventTarget {
     */
    playbackRate: number;
    /**
@@ -1112,7 +1124,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/ready)
     */
-@@ -3033,7 +3668,7 @@ interface Animation extends EventTarget {
+@@ -3055,7 +3690,7 @@ interface Animation extends EventTarget {
     */
    startTime: CSSNumberish | null;
    /**
@@ -1121,7 +1133,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/timeline)
     */
-@@ -3045,7 +3680,7 @@ interface Animation extends EventTarget {
+@@ -3067,7 +3702,7 @@ interface Animation extends EventTarget {
     */
    cancel(): void;
    /**
@@ -1130,7 +1142,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/commitStyles)
     */
-@@ -3063,25 +3698,25 @@ interface Animation extends EventTarget {
+@@ -3085,25 +3720,25 @@ interface Animation extends EventTarget {
     */
    pause(): void;
    /**
@@ -1160,7 +1172,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Animation/updatePlaybackRate)
     */
-@@ -3117,25 +3752,25 @@ declare const Animation: {
+@@ -3139,25 +3774,25 @@ declare const Animation: {
  };
  
  /**
@@ -1190,7 +1202,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnimationEffect/updateTiming)
     */
-@@ -3160,13 +3795,13 @@ interface AnimationEvent extends Event {
+@@ -3182,13 +3817,13 @@ interface AnimationEvent extends Event {
     */
    readonly animationName: string;
    /**
@@ -1206,7 +1218,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnimationEvent/pseudoElement)
     */
-@@ -3189,19 +3824,19 @@ interface AnimationFrameProvider {
+@@ -3211,19 +3846,19 @@ interface AnimationFrameProvider {
  }
  
  /**
@@ -1229,7 +1241,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AnimationPlaybackEvent/timelineTime)
     */
-@@ -3217,17 +3852,23 @@ declare const AnimationPlaybackEvent: {
+@@ -3239,17 +3874,23 @@ declare const AnimationPlaybackEvent: {
  };
  
  /**
@@ -1255,7 +1267,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  }
  
  declare const AnimationTimeline: {
-@@ -3236,25 +3877,25 @@ declare const AnimationTimeline: {
+@@ -3258,25 +3899,25 @@ declare const AnimationTimeline: {
  };
  
  /**
@@ -1285,7 +1297,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Attr/namespaceURI)
     */
-@@ -3267,13 +3908,13 @@ interface Attr extends Node {
+@@ -3289,13 +3930,13 @@ interface Attr extends Node {
     */
    readonly ownerElement: Element | null;
    /**
@@ -1301,7 +1313,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Attr/specified)
-@@ -3285,7 +3926,7 @@ interface Attr extends Node {
+@@ -3307,7 +3948,7 @@ interface Attr extends Node {
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Attr/value)
     */
    value: string;
@@ -1310,7 +1322,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    get textContent(): string;
    set textContent(value: string | null);
  }
-@@ -3296,7 +3937,7 @@ declare const Attr: {
+@@ -3318,7 +3959,7 @@ declare const Attr: {
  };
  
  /**
@@ -1319,7 +1331,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBuffer)
   */
-@@ -3314,7 +3955,7 @@ interface AudioBuffer {
+@@ -3336,7 +3977,7 @@ interface AudioBuffer {
     */
    readonly length: number;
    /**
@@ -1328,7 +1340,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBuffer/numberOfChannels)
     */
-@@ -3326,7 +3967,7 @@ interface AudioBuffer {
+@@ -3348,7 +3989,7 @@ interface AudioBuffer {
     */
    readonly sampleRate: number;
    /**
@@ -1337,7 +1349,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBuffer/copyFromChannel)
     */
-@@ -3336,7 +3977,7 @@ interface AudioBuffer {
+@@ -3358,7 +3999,7 @@ interface AudioBuffer {
      bufferOffset?: number,
    ): void;
    /**
@@ -1346,7 +1358,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBuffer/copyToChannel)
     */
-@@ -3371,19 +4012,19 @@ interface AudioBufferSourceNode extends AudioScheduledSourceNode {
+@@ -3393,19 +4034,19 @@ interface AudioBufferSourceNode extends AudioScheduledSourceNode {
     */
    buffer: AudioBuffer | null;
    /**
@@ -1369,7 +1381,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBufferSourceNode/loopEnd)
     */
-@@ -3401,7 +4042,7 @@ interface AudioBufferSourceNode extends AudioScheduledSourceNode {
+@@ -3423,7 +4064,7 @@ interface AudioBufferSourceNode extends AudioScheduledSourceNode {
     */
    readonly playbackRate: AudioParam;
    /**
@@ -1378,7 +1390,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioBufferSourceNode/start)
     */
-@@ -3443,13 +4084,13 @@ declare const AudioBufferSourceNode: {
+@@ -3465,13 +4106,13 @@ declare const AudioBufferSourceNode: {
  };
  
  /**
@@ -1394,7 +1406,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioContext/baseLatency)
     */
-@@ -3461,13 +4102,13 @@ interface AudioContext extends BaseAudioContext {
+@@ -3483,13 +4124,13 @@ interface AudioContext extends BaseAudioContext {
     */
    readonly outputLatency: number;
    /**
@@ -1410,7 +1422,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioContext/createMediaElementSource)
     */
-@@ -3475,19 +4116,19 @@ interface AudioContext extends BaseAudioContext {
+@@ -3497,19 +4138,19 @@ interface AudioContext extends BaseAudioContext {
      mediaElement: HTMLMediaElement,
    ): MediaElementAudioSourceNode;
    /**
@@ -1433,7 +1445,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioContext/getOutputTimestamp)
     */
-@@ -3499,7 +4140,7 @@ interface AudioContext extends BaseAudioContext {
+@@ -3521,7 +4162,7 @@ interface AudioContext extends BaseAudioContext {
     */
    resume(): Promise<void>;
    /**
@@ -1442,7 +1454,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioContext/suspend)
     */
-@@ -3538,25 +4179,25 @@ declare const AudioContext: {
+@@ -3560,25 +4201,25 @@ declare const AudioContext: {
   */
  interface AudioData {
    /**
@@ -1472,7 +1484,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioData/numberOfFrames)
     */
-@@ -3568,7 +4209,7 @@ interface AudioData {
+@@ -3590,7 +4231,7 @@ interface AudioData {
     */
    readonly sampleRate: number;
    /**
@@ -1481,7 +1493,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioData/timestamp)
     */
-@@ -3580,7 +4221,7 @@ interface AudioData {
+@@ -3602,7 +4243,7 @@ interface AudioData {
     */
    allocationSize(options: AudioDataCopyToOptions): number;
    /**
@@ -1490,7 +1502,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioData/clone)
     */
-@@ -3592,7 +4233,7 @@ interface AudioData {
+@@ -3614,7 +4255,7 @@ interface AudioData {
     */
    close(): void;
    /**
@@ -1499,7 +1511,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioData/copyTo)
     */
-@@ -3696,13 +4337,13 @@ declare const AudioDecoder: {
+@@ -3718,13 +4359,13 @@ declare const AudioDecoder: {
  };
  
  /**
@@ -1515,7 +1527,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioDestinationNode/maxChannelCount)
     */
-@@ -3803,67 +4444,67 @@ declare const AudioEncoder: {
+@@ -3825,67 +4466,67 @@ declare const AudioEncoder: {
  };
  
  /**
@@ -1594,7 +1606,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioListener/setOrientation)
-@@ -3877,7 +4518,7 @@ interface AudioListener {
+@@ -3899,7 +4540,7 @@ interface AudioListener {
      zUp: number,
    ): void;
    /**
@@ -1603,7 +1615,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioListener/setPosition)
-@@ -3903,37 +4544,37 @@ interface AudioNode extends EventTarget {
+@@ -3925,37 +4566,37 @@ interface AudioNode extends EventTarget {
     */
    channelCount: number;
    /**
@@ -1647,7 +1659,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioNode/connect)
     */
-@@ -3963,14 +4604,14 @@ declare const AudioNode: {
+@@ -3985,14 +4626,14 @@ declare const AudioNode: {
  };
  
  /**
@@ -1664,7 +1676,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/defaultValue)
     */
-@@ -3988,37 +4629,37 @@ interface AudioParam {
+@@ -4010,37 +4651,37 @@ interface AudioParam {
     */
    readonly minValue: number;
    /**
@@ -1708,7 +1720,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setTargetAtTime)
     */
-@@ -4028,13 +4669,13 @@ interface AudioParam {
+@@ -4050,13 +4691,13 @@ interface AudioParam {
      timeConstant: number,
    ): AudioParam;
    /**
@@ -1724,7 +1736,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime)
     */
-@@ -4068,7 +4709,7 @@ declare const AudioParamMap: {
+@@ -4090,7 +4731,7 @@ declare const AudioParamMap: {
  };
  
  /**
@@ -1733,7 +1745,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   * @deprecated As of the August 29 2014 Web Audio API spec publication, this feature has been marked as deprecated, and is soon to be replaced by AudioWorklet.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioProcessingEvent)
-@@ -4089,7 +4730,7 @@ interface AudioProcessingEvent extends Event {
+@@ -4111,7 +4752,7 @@ interface AudioProcessingEvent extends Event {
     */
    readonly outputBuffer: AudioBuffer;
    /**
@@ -1742,7 +1754,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioProcessingEvent/playbackTime)
-@@ -4111,7 +4752,7 @@ interface AudioScheduledSourceNodeEventMap {
+@@ -4133,7 +4774,7 @@ interface AudioScheduledSourceNodeEventMap {
  }
  
  /**
@@ -1751,7 +1763,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioScheduledSourceNode)
   */
-@@ -4119,13 +4760,13 @@ interface AudioScheduledSourceNode extends AudioNode {
+@@ -4141,13 +4782,13 @@ interface AudioScheduledSourceNode extends AudioNode {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioScheduledSourceNode/ended_event) */
    onended: ((this: AudioScheduledSourceNode, ev: Event) => unknown) | null;
    /**
@@ -1767,7 +1779,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioScheduledSourceNode/stop)
     */
-@@ -4181,7 +4822,7 @@ interface AudioWorkletNodeEventMap {
+@@ -4203,7 +4844,7 @@ interface AudioWorkletNodeEventMap {
  }
  
  /**
@@ -1776,7 +1788,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   * Available only in secure contexts.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioWorkletNode)
-@@ -4192,13 +4833,13 @@ interface AudioWorkletNode extends AudioNode {
+@@ -4214,13 +4855,13 @@ interface AudioWorkletNode extends AudioNode {
      | ((this: AudioWorkletNode, ev: ErrorEvent) => unknown)
      | null;
    /**
@@ -1792,7 +1804,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioWorkletNode/port)
     */
-@@ -4241,7 +4882,7 @@ declare const AudioWorkletNode: {
+@@ -4263,7 +4904,7 @@ declare const AudioWorkletNode: {
  };
  
  /**
@@ -1801,7 +1813,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   * Available only in secure contexts.
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAssertionResponse)
-@@ -4254,13 +4895,13 @@ interface AuthenticatorAssertionResponse extends AuthenticatorResponse {
+@@ -4276,13 +4917,13 @@ interface AuthenticatorAssertionResponse extends AuthenticatorResponse {
     */
    readonly authenticatorData: ArrayBuffer;
    /**
@@ -1817,7 +1829,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAssertionResponse/userHandle)
     */
-@@ -4273,14 +4914,14 @@ declare const AuthenticatorAssertionResponse: {
+@@ -4295,14 +4936,14 @@ declare const AuthenticatorAssertionResponse: {
  };
  
  /**
@@ -1834,7 +1846,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/attestationObject)
     */
-@@ -4292,7 +4933,7 @@ interface AuthenticatorAttestationResponse extends AuthenticatorResponse {
+@@ -4314,7 +4955,7 @@ interface AuthenticatorAttestationResponse extends AuthenticatorResponse {
     */
    getAuthenticatorData(): ArrayBuffer;
    /**
@@ -1843,7 +1855,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/getPublicKey)
     */
-@@ -4317,14 +4958,14 @@ declare const AuthenticatorAttestationResponse: {
+@@ -4339,14 +4980,14 @@ declare const AuthenticatorAttestationResponse: {
  };
  
  /**
@@ -1860,7 +1872,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorResponse/clientDataJSON)
     */
-@@ -4337,13 +4978,13 @@ declare const AuthenticatorResponse: {
+@@ -4359,13 +5000,13 @@ declare const AuthenticatorResponse: {
  };
  
  /**
@@ -1876,7 +1888,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BarProp/visible)
     */
-@@ -4360,32 +5001,32 @@ interface BaseAudioContextEventMap {
+@@ -4382,32 +5023,32 @@ interface BaseAudioContextEventMap {
  }
  
  /**
@@ -1914,7 +1926,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/listener)
     */
-@@ -4393,31 +5034,31 @@ interface BaseAudioContext extends EventTarget {
+@@ -4415,31 +5056,31 @@ interface BaseAudioContext extends EventTarget {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/statechange_event) */
    onstatechange: ((this: BaseAudioContext, ev: Event) => unknown) | null;
    /**
@@ -1951,7 +1963,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createBuffer)
     */
-@@ -4427,55 +5068,55 @@ interface BaseAudioContext extends EventTarget {
+@@ -4449,55 +5090,55 @@ interface BaseAudioContext extends EventTarget {
      sampleRate: number,
    ): AudioBuffer;
    /**
@@ -2016,7 +2028,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createIIRFilter)
     */
-@@ -4484,19 +5125,19 @@ interface BaseAudioContext extends EventTarget {
+@@ -4506,19 +5147,19 @@ interface BaseAudioContext extends EventTarget {
      feedback: readonly number[],
    ): IIRFilterNode;
    /**
@@ -2039,7 +2051,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createPeriodicWave)
     */
-@@ -4506,7 +5147,7 @@ interface BaseAudioContext extends EventTarget {
+@@ -4528,7 +5169,7 @@ interface BaseAudioContext extends EventTarget {
      constraints?: PeriodicWaveConstraints,
    ): PeriodicWave;
    /**
@@ -2048,7 +2060,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/createScriptProcessor)
-@@ -4517,19 +5158,19 @@ interface BaseAudioContext extends EventTarget {
+@@ -4539,19 +5180,19 @@ interface BaseAudioContext extends EventTarget {
      numberOfOutputChannels?: number,
    ): ScriptProcessorNode;
    /**
@@ -2071,7 +2083,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BaseAudioContext/decodeAudioData)
     */
-@@ -4572,13 +5213,13 @@ declare const BaseAudioContext: {
+@@ -4594,13 +5235,13 @@ declare const BaseAudioContext: {
  };
  
  /**
@@ -2087,7 +2099,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BeforeUnloadEvent/returnValue)
-@@ -4592,43 +5233,43 @@ declare const BeforeUnloadEvent: {
+@@ -4614,43 +5255,43 @@ declare const BeforeUnloadEvent: {
  };
  
  /**
@@ -2138,7 +2150,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BiquadFilterNode/getFrequencyResponse)
     */
-@@ -4678,19 +5319,19 @@ interface Blob {
+@@ -4700,19 +5341,19 @@ interface Blob {
     */
    bytes(): Promise<Uint8Array<ArrayBuffer>>;
    /**
@@ -2161,7 +2173,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)
     */
-@@ -4703,7 +5344,7 @@ declare const Blob: {
+@@ -4725,7 +5366,7 @@ declare const Blob: {
  };
  
  /**
@@ -2170,7 +2182,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BlobEvent)
   */
-@@ -4715,7 +5356,7 @@ interface BlobEvent extends Event {
+@@ -4737,7 +5378,7 @@ interface BlobEvent extends Event {
     */
    readonly data: Blob;
    /**
@@ -2179,7 +2191,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BlobEvent/timecode)
     */
-@@ -4752,13 +5393,13 @@ interface BroadcastChannelEventMap {
+@@ -4774,13 +5415,13 @@ interface BroadcastChannelEventMap {
  }
  
  /**
@@ -2195,7 +2207,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/name)
     */
-@@ -4770,13 +5411,13 @@ interface BroadcastChannel extends EventTarget {
+@@ -4792,13 +5433,13 @@ interface BroadcastChannel extends EventTarget {
      | ((this: BroadcastChannel, ev: MessageEvent) => unknown)
      | null;
    /**
@@ -2211,7 +2223,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/BroadcastChannel/postMessage)
     */
-@@ -4836,7 +5477,7 @@ declare const ByteLengthQueuingStrategy: {
+@@ -4858,7 +5499,7 @@ declare const ByteLengthQueuingStrategy: {
  };
  
  /**
@@ -2220,7 +2232,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CDATASection)
   */
-@@ -4847,91 +5488,6 @@ declare const CDATASection: {
+@@ -4869,91 +5510,6 @@ declare const CDATASection: {
    new (): CDATASection;
  };
  
@@ -2312,7 +2324,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  /**
   * The **`CSSAnimation`** interface of the Web Animations API represents an Animation object.
   *
-@@ -4939,7 +5495,7 @@ declare const CSPViolationReportBody: {
+@@ -4961,7 +5517,7 @@ declare const CSPViolationReportBody: {
   */
  interface CSSAnimation extends Animation {
    /**
@@ -2321,7 +2333,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSAnimation/animationName)
     */
-@@ -5022,67 +5578,67 @@ declare const CSSContainerRule: {
+@@ -5044,67 +5600,67 @@ declare const CSSContainerRule: {
   */
  interface CSSCounterStyleRule extends CSSRule {
    /**
@@ -2400,7 +2412,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSCounterStyleRule/system)
     */
-@@ -5101,7 +5657,7 @@ declare const CSSCounterStyleRule: {
+@@ -5123,7 +5679,7 @@ declare const CSSCounterStyleRule: {
   */
  interface CSSFontFaceRule extends CSSRule {
    /**
@@ -2409,7 +2421,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSFontFaceRule/style)
     */
-@@ -5115,13 +5671,13 @@ declare const CSSFontFaceRule: {
+@@ -5137,13 +5693,13 @@ declare const CSSFontFaceRule: {
  };
  
  /**
@@ -2425,7 +2437,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSFontFeatureValuesRule/fontFamily)
     */
-@@ -5146,19 +5702,19 @@ interface CSSFontPaletteValuesRule extends CSSRule {
+@@ -5168,19 +5724,19 @@ interface CSSFontPaletteValuesRule extends CSSRule {
     */
    readonly basePalette: string;
    /**
@@ -2448,7 +2460,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSFontPaletteValuesRule/overrideColors)
     */
-@@ -5177,19 +5733,19 @@ declare const CSSFontPaletteValuesRule: {
+@@ -5199,19 +5755,19 @@ declare const CSSFontPaletteValuesRule: {
   */
  interface CSSGroupingRule extends CSSRule {
    /**
@@ -2471,7 +2483,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSGroupingRule/insertRule)
     */
-@@ -5220,7 +5776,7 @@ declare const CSSImageValue: {
+@@ -5242,7 +5798,7 @@ declare const CSSImageValue: {
   */
  interface CSSImportRule extends CSSRule {
    /**
@@ -2480,7 +2492,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSImportRule/href)
     */
-@@ -5232,14 +5788,14 @@ interface CSSImportRule extends CSSRule {
+@@ -5254,14 +5810,14 @@ interface CSSImportRule extends CSSRule {
     */
    readonly layerName: string | null;
    /**
@@ -2497,7 +2509,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSImportRule/styleSheet)
     */
-@@ -5258,19 +5814,19 @@ declare const CSSImportRule: {
+@@ -5280,19 +5836,19 @@ declare const CSSImportRule: {
  };
  
  /**
@@ -2520,7 +2532,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeyframeRule/style)
     */
-@@ -5284,7 +5840,7 @@ declare const CSSKeyframeRule: {
+@@ -5306,7 +5862,7 @@ declare const CSSKeyframeRule: {
  };
  
  /**
@@ -2529,7 +2541,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeyframesRule)
   */
-@@ -5296,7 +5852,7 @@ interface CSSKeyframesRule extends CSSRule {
+@@ -5318,7 +5874,7 @@ interface CSSKeyframesRule extends CSSRule {
     */
    readonly cssRules: CSSRuleList;
    /**
@@ -2538,7 +2550,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeyframesRule/length)
     */
-@@ -5340,7 +5896,7 @@ declare const CSSKeyframesRule: {
+@@ -5362,7 +5918,7 @@ declare const CSSKeyframesRule: {
   */
  interface CSSKeywordValue extends CSSStyleValue {
    /**
@@ -2547,7 +2559,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSKeywordValue/value)
     */
-@@ -5372,13 +5928,13 @@ declare const CSSLayerBlockRule: {
+@@ -5394,13 +5950,13 @@ declare const CSSLayerBlockRule: {
  };
  
  /**
@@ -2563,7 +2575,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSLayerStatementRule/nameList)
     */
-@@ -5406,13 +5962,13 @@ declare const CSSMathClamp: {
+@@ -5428,13 +5984,13 @@ declare const CSSMathClamp: {
  };
  
  /**
@@ -2579,7 +2591,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathInvert/value)
     */
-@@ -5425,13 +5981,13 @@ declare const CSSMathInvert: {
+@@ -5447,13 +6003,13 @@ declare const CSSMathInvert: {
  };
  
  /**
@@ -2595,7 +2607,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMax/values)
     */
-@@ -5444,13 +6000,13 @@ declare const CSSMathMax: {
+@@ -5466,13 +6022,13 @@ declare const CSSMathMax: {
  };
  
  /**
@@ -2611,7 +2623,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathMin/values)
     */
-@@ -5463,13 +6019,13 @@ declare const CSSMathMin: {
+@@ -5485,13 +6041,13 @@ declare const CSSMathMin: {
  };
  
  /**
@@ -2627,7 +2639,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathNegate/value)
     */
-@@ -5482,13 +6038,13 @@ declare const CSSMathNegate: {
+@@ -5504,13 +6060,13 @@ declare const CSSMathNegate: {
  };
  
  /**
@@ -2643,7 +2655,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathProduct/values)
     */
-@@ -5501,7 +6057,7 @@ declare const CSSMathProduct: {
+@@ -5523,7 +6079,7 @@ declare const CSSMathProduct: {
  };
  
  /**
@@ -2652,7 +2664,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathSum)
   */
-@@ -5526,7 +6082,7 @@ declare const CSSMathSum: {
+@@ -5548,7 +6104,7 @@ declare const CSSMathSum: {
   */
  interface CSSMathValue extends CSSNumericValue {
    /**
@@ -2661,7 +2673,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMathValue/operator)
     */
-@@ -5539,13 +6095,13 @@ declare const CSSMathValue: {
+@@ -5561,13 +6117,13 @@ declare const CSSMathValue: {
  };
  
  /**
@@ -2677,7 +2689,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMatrixComponent/matrix)
     */
-@@ -5567,7 +6123,7 @@ declare const CSSMatrixComponent: {
+@@ -5589,7 +6145,7 @@ declare const CSSMatrixComponent: {
   */
  interface CSSMediaRule extends CSSConditionRule {
    /**
@@ -2686,7 +2698,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSMediaRule/media)
     */
-@@ -5593,7 +6149,7 @@ interface CSSNamespaceRule extends CSSRule {
+@@ -5615,7 +6171,7 @@ interface CSSNamespaceRule extends CSSRule {
     */
    readonly namespaceURI: string;
    /**
@@ -2695,7 +2707,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNamespaceRule/prefix)
     */
-@@ -5632,7 +6188,7 @@ declare const CSSNestedDeclarations: {
+@@ -5654,7 +6210,7 @@ declare const CSSNestedDeclarations: {
   */
  interface CSSNumericArray {
    /**
@@ -2704,7 +2716,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericArray/length)
     */
-@@ -5660,61 +6216,61 @@ declare const CSSNumericArray: {
+@@ -5682,61 +6238,61 @@ declare const CSSNumericArray: {
   */
  interface CSSNumericValue extends CSSStyleValue {
    /**
@@ -2776,7 +2788,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSNumericValue/type)
     */
-@@ -5725,13 +6281,46 @@ declare const CSSNumericValue: {
+@@ -5747,13 +6303,46 @@ declare const CSSNumericValue: {
    prototype: CSSNumericValue;
    new (): CSSNumericValue;
    /**
@@ -2824,7 +2836,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  /**
   * **`CSSPageRule`** represents a single CSS @page rule.
   *
-@@ -5739,17 +6328,17 @@ declare const CSSNumericValue: {
+@@ -5761,17 +6350,17 @@ declare const CSSNumericValue: {
   */
  interface CSSPageRule extends CSSGroupingRule {
    /**
@@ -2845,7 +2857,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    set style(cssText: string);
  }
  
-@@ -5759,13 +6348,13 @@ declare const CSSPageRule: {
+@@ -5781,13 +6370,13 @@ declare const CSSPageRule: {
  };
  
  /**
@@ -2861,7 +2873,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSPerspective/length)
     */
-@@ -5777,6 +6366,185 @@ declare const CSSPerspective: {
+@@ -5799,6 +6388,185 @@ declare const CSSPerspective: {
    new (length: CSSPerspectiveValue): CSSPerspective;
  };
  
@@ -3047,7 +3059,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  /**
   * The **`CSSPropertyRule`** interface of the CSS Properties and Values API represents a single CSS @property rule.
   *
-@@ -5815,31 +6583,31 @@ declare const CSSPropertyRule: {
+@@ -5837,31 +6605,31 @@ declare const CSSPropertyRule: {
  };
  
  /**
@@ -3084,7 +3096,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRotate/z)
     */
-@@ -5858,7 +6626,7 @@ declare const CSSRotate: {
+@@ -5880,7 +6648,7 @@ declare const CSSRotate: {
  };
  
  /**
@@ -3093,7 +3105,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRule)
   */
-@@ -5876,13 +6644,13 @@ interface CSSRule {
+@@ -5898,13 +6666,13 @@ interface CSSRule {
     */
    readonly parentRule: CSSRule | null;
    /**
@@ -3109,7 +3121,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     * @deprecated
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRule/type)
-@@ -5894,6 +6662,7 @@ interface CSSRule {
+@@ -5916,6 +6684,7 @@ interface CSSRule {
    readonly MEDIA_RULE: 4;
    readonly FONT_FACE_RULE: 5;
    readonly PAGE_RULE: 6;
@@ -3117,7 +3129,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    readonly NAMESPACE_RULE: 10;
    readonly KEYFRAMES_RULE: 7;
    readonly KEYFRAME_RULE: 8;
-@@ -5911,6 +6680,7 @@ declare const CSSRule: {
+@@ -5933,6 +6702,7 @@ declare const CSSRule: {
    readonly MEDIA_RULE: 4;
    readonly FONT_FACE_RULE: 5;
    readonly PAGE_RULE: 6;
@@ -3125,7 +3137,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    readonly NAMESPACE_RULE: 10;
    readonly KEYFRAMES_RULE: 7;
    readonly KEYFRAME_RULE: 8;
-@@ -5920,7 +6690,7 @@ declare const CSSRule: {
+@@ -5942,7 +6712,7 @@ declare const CSSRule: {
  };
  
  /**
@@ -3134,7 +3146,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRuleList)
   */
-@@ -5932,7 +6702,7 @@ interface CSSRuleList {
+@@ -5954,7 +6724,7 @@ interface CSSRuleList {
     */
    readonly length: number;
    /**
@@ -3143,7 +3155,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSRuleList/item)
     */
-@@ -5946,25 +6716,25 @@ declare const CSSRuleList: {
+@@ -5968,25 +6738,25 @@ declare const CSSRuleList: {
  };
  
  /**
@@ -3173,7 +3185,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSScale/z)
     */
-@@ -5983,13 +6753,13 @@ declare const CSSScale: {
+@@ -6005,13 +6775,13 @@ declare const CSSScale: {
   */
  interface CSSScopeRule extends CSSGroupingRule {
    /**
@@ -3189,7 +3201,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSScopeRule/start)
     */
-@@ -6002,19 +6772,19 @@ declare const CSSScopeRule: {
+@@ -6024,19 +6794,19 @@ declare const CSSScopeRule: {
  };
  
  /**
@@ -3212,7 +3224,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkew/ay)
     */
-@@ -6027,13 +6797,13 @@ declare const CSSSkew: {
+@@ -6049,13 +6819,13 @@ declare const CSSSkew: {
  };
  
  /**
@@ -3228,7 +3240,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkewX/ax)
     */
-@@ -6046,13 +6816,13 @@ declare const CSSSkewX: {
+@@ -6068,13 +6838,13 @@ declare const CSSSkewX: {
  };
  
  /**
@@ -3244,7 +3256,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSSSkewY/ay)
     */
-@@ -6077,5820 +6847,3787 @@ declare const CSSStartingStyleRule: {
+@@ -6099,5820 +6869,3787 @@ declare const CSSStartingStyleRule: {
  };
  
  /**
@@ -11405,7 +11417,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -11898,9 +10635,12 @@ interface Element
+@@ -11920,9 +10657,12 @@ interface Element
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -11420,7 +11432,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -11910,697 +10650,923 @@ interface Element
+@@ -11932,697 +10672,923 @@ interface Element
    ): void;
  }
  
@@ -12834,7 +12846,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -12608,9 +11574,9 @@ interface FileReader extends EventTarget {
+@@ -12630,9 +11596,9 @@ interface FileReader extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -12846,7 +12858,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -12620,2735 +11586,2352 @@ interface FileReader extends EventTarget {
+@@ -12642,2735 +11608,2352 @@ interface FileReader extends EventTarget {
    ): void;
  }
  
@@ -17183,7 +17195,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -15356,12 +13939,9 @@ interface HTMLFieldSetElement extends HTMLElement {
+@@ -15378,12 +13961,9 @@ interface HTMLFieldSetElement extends HTMLElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -17198,7 +17210,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -15371,866 +13951,764 @@ interface HTMLFieldSetElement extends HTMLElement {
+@@ -15393,866 +13973,764 @@ interface HTMLFieldSetElement extends HTMLElement {
    ): void;
  }
  
@@ -18576,7 +18588,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -16238,9 +14716,9 @@ interface HTMLImageElement extends HTMLElement {
+@@ -16260,9 +14738,9 @@ interface HTMLImageElement extends HTMLElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -18588,7 +18600,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -16250,364 +14728,456 @@ interface HTMLImageElement extends HTMLElement {
+@@ -16272,364 +14750,456 @@ interface HTMLImageElement extends HTMLElement {
    ): void;
  }
  
@@ -19252,7 +19264,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -16615,9 +15185,14 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -16637,9 +15207,14 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -19269,7 +19281,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -16627,258 +15202,220 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
+@@ -16649,258 +15224,220 @@ interface HTMLInputElement extends HTMLElement, PopoverInvokerElement {
    ): void;
  }
  
@@ -19674,7 +19686,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -16886,9 +15423,9 @@ interface HTMLLinkElement extends HTMLElement, LinkStyle {
+@@ -16908,9 +15445,9 @@ interface HTMLLinkElement extends HTMLElement, LinkStyle {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -19686,7 +19698,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -16898,496 +15435,484 @@ interface HTMLLinkElement extends HTMLElement, LinkStyle {
+@@ -16920,496 +15457,484 @@ interface HTMLLinkElement extends HTMLElement, LinkStyle {
    ): void;
  }
  
@@ -20507,7 +20519,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -17395,9 +15920,9 @@ interface HTMLMetaElement extends HTMLElement {
+@@ -17417,9 +15942,9 @@ interface HTMLMetaElement extends HTMLElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -20519,7 +20531,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -17407,609 +15932,828 @@ interface HTMLMetaElement extends HTMLElement {
+@@ -17429,609 +15954,828 @@ interface HTMLMetaElement extends HTMLElement {
    ): void;
  }
  
@@ -21730,7 +21742,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -18017,9 +16761,9 @@ interface HTMLOutputElement extends HTMLElement {
+@@ -18039,9 +16783,9 @@ interface HTMLOutputElement extends HTMLElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -21742,7 +21754,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -18029,765 +16773,1398 @@ interface HTMLOutputElement extends HTMLElement {
+@@ -18051,765 +16795,1398 @@ interface HTMLOutputElement extends HTMLElement {
    ): void;
  }
  
@@ -23651,7 +23663,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -18795,9 +18172,12 @@ interface HTMLStyleElement extends HTMLElement, LinkStyle {
+@@ -18817,9 +18194,12 @@ interface HTMLStyleElement extends HTMLElement, LinkStyle {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -23666,7 +23678,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -18807,30 +18187,112 @@ interface HTMLStyleElement extends HTMLElement, LinkStyle {
+@@ -18829,30 +18209,112 @@ interface HTMLStyleElement extends HTMLElement, LinkStyle {
    ): void;
  }
  
@@ -23795,7 +23807,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -18840,10 +18302,7 @@ interface HTMLTableCaptionElement extends HTMLElement {
+@@ -18862,10 +18324,7 @@ interface HTMLTableCaptionElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -23807,7 +23819,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -18853,106 +18312,112 @@ interface HTMLTableCaptionElement extends HTMLElement {
+@@ -18875,106 +18334,112 @@ interface HTMLTableCaptionElement extends HTMLElement {
    ): void;
  }
  
@@ -23985,7 +23997,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -18961,11 +18426,11 @@ interface HTMLTableCellElement extends HTMLElement {
+@@ -18983,11 +18448,11 @@ interface HTMLTableCellElement extends HTMLElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -24000,7 +24012,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -18976,59 +18441,67 @@ interface HTMLTableCellElement extends HTMLElement {
+@@ -18998,59 +18463,67 @@ interface HTMLTableCellElement extends HTMLElement {
    ): void;
  }
  
@@ -24108,7 +24120,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19038,10 +18511,7 @@ interface HTMLTableColElement extends HTMLElement {
+@@ -19060,10 +18533,7 @@ interface HTMLTableColElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -24120,7 +24132,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19051,18 +18521,37 @@ interface HTMLTableColElement extends HTMLElement {
+@@ -19073,18 +18543,37 @@ interface HTMLTableColElement extends HTMLElement {
    ): void;
  }
  
@@ -24166,7 +24178,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -19071,11 +18560,11 @@ interface HTMLTableDataCellElement extends HTMLTableCellElement {
+@@ -19093,11 +18582,11 @@ interface HTMLTableDataCellElement extends HTMLTableCellElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -24181,7 +24193,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -19086,162 +18575,134 @@ interface HTMLTableDataCellElement extends HTMLTableCellElement {
+@@ -19108,162 +18597,134 @@ interface HTMLTableDataCellElement extends HTMLTableCellElement {
    ): void;
  }
  
@@ -24410,7 +24422,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19251,7 +18712,7 @@ interface HTMLTableElement extends HTMLElement {
+@@ -19273,7 +18734,7 @@ interface HTMLTableElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -24419,7 +24431,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19261,118 +18722,78 @@ interface HTMLTableElement extends HTMLElement {
+@@ -19283,118 +18744,78 @@ interface HTMLTableElement extends HTMLElement {
    ): void;
  }
  
@@ -24582,7 +24594,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19382,10 +18803,7 @@ interface HTMLTableRowElement extends HTMLElement {
+@@ -19404,10 +18825,7 @@ interface HTMLTableRowElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -24594,7 +24606,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19395,69 +18813,68 @@ interface HTMLTableRowElement extends HTMLElement {
+@@ -19417,69 +18835,68 @@ interface HTMLTableRowElement extends HTMLElement {
    ): void;
  }
  
@@ -24706,7 +24718,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19467,10 +18884,7 @@ interface HTMLTableSectionElement extends HTMLElement {
+@@ -19489,10 +18906,7 @@ interface HTMLTableSectionElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -24718,7 +24730,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19480,53 +18894,26 @@ interface HTMLTableSectionElement extends HTMLElement {
+@@ -19502,53 +18916,26 @@ interface HTMLTableSectionElement extends HTMLElement {
    ): void;
  }
  
@@ -24782,7 +24794,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19536,10 +18923,7 @@ interface HTMLTemplateElement extends HTMLElement {
+@@ -19558,10 +18945,7 @@ interface HTMLTemplateElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -24794,7 +24806,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19549,211 +18933,27 @@ interface HTMLTemplateElement extends HTMLElement {
+@@ -19571,211 +18955,27 @@ interface HTMLTemplateElement extends HTMLElement {
    ): void;
  }
  
@@ -25016,7 +25028,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
        ev: HTMLElementEventMap[K],
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
-@@ -19766,7 +18966,7 @@ interface HTMLTextAreaElement extends HTMLElement {
+@@ -19788,7 +18988,7 @@ interface HTMLTextAreaElement extends HTMLElement {
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
      listener: (
@@ -25025,7 +25037,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
        ev: HTMLElementEventMap[K],
      ) => unknown,
      options?: boolean | EventListenerOptions,
-@@ -19778,65 +18978,32 @@ interface HTMLTextAreaElement extends HTMLElement {
+@@ -19800,65 +19000,32 @@ interface HTMLTextAreaElement extends HTMLElement {
    ): void;
  }
  
@@ -25104,7 +25116,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19846,7 +19013,7 @@ interface HTMLTitleElement extends HTMLElement {
+@@ -19868,7 +19035,7 @@ interface HTMLTitleElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -25113,7 +25125,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19856,66 +19023,62 @@ interface HTMLTitleElement extends HTMLElement {
+@@ -19878,66 +19045,62 @@ interface HTMLTitleElement extends HTMLElement {
    ): void;
  }
  
@@ -25208,7 +25220,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19925,7 +19088,7 @@ interface HTMLTrackElement extends HTMLElement {
+@@ -19947,7 +19110,7 @@ interface HTMLTrackElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -25217,7 +25229,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19935,28 +19098,21 @@ interface HTMLTrackElement extends HTMLElement {
+@@ -19957,28 +19120,21 @@ interface HTMLTrackElement extends HTMLElement {
    ): void;
  }
  
@@ -25255,7 +25267,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19966,7 +19122,10 @@ interface HTMLUListElement extends HTMLElement {
+@@ -19988,7 +19144,10 @@ interface HTMLUListElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -25267,7 +25279,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -19976,20 +19135,23 @@ interface HTMLUListElement extends HTMLElement {
+@@ -19998,20 +19157,23 @@ interface HTMLUListElement extends HTMLElement {
    ): void;
  }
  
@@ -25298,7 +25310,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -19999,7 +19161,7 @@ interface HTMLUnknownElement extends HTMLElement {
+@@ -20021,7 +19183,7 @@ interface HTMLUnknownElement extends HTMLElement {
    ): void;
    removeEventListener<K extends keyof HTMLElementEventMap>(
      type: K,
@@ -25307,7 +25319,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -20009,97 +19171,16 @@ interface HTMLUnknownElement extends HTMLElement {
+@@ -20031,97 +19193,16 @@ interface HTMLUnknownElement extends HTMLElement {
    ): void;
  }
  
@@ -25412,7 +25424,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -20107,12 +19188,9 @@ interface HTMLVideoElement extends HTMLMediaElement {
+@@ -20129,12 +19210,9 @@ interface HTMLVideoElement extends HTMLMediaElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -25427,7 +25439,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -20122,369 +19200,252 @@ interface HTMLVideoElement extends HTMLMediaElement {
+@@ -20144,369 +19222,252 @@ interface HTMLVideoElement extends HTMLMediaElement {
    ): void;
  }
  
@@ -25936,7 +25948,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -20492,9 +19453,9 @@ interface IDBDatabase extends EventTarget {
+@@ -20514,9 +19475,9 @@ interface IDBDatabase extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -25948,7 +25960,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -20504,385 +19465,360 @@ interface IDBDatabase extends EventTarget {
+@@ -20526,385 +19487,360 @@ interface IDBDatabase extends EventTarget {
    ): void;
  }
  
@@ -26565,7 +26577,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -20890,12 +19826,9 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
+@@ -20912,12 +19848,9 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -26580,7 +26592,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -20905,59 +19838,32 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
+@@ -20927,59 +19860,32 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
    ): void;
  }
  
@@ -26659,7 +26671,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -20965,9 +19871,12 @@ interface IDBRequest<T = unknown> extends EventTarget {
+@@ -20987,9 +19893,12 @@ interface IDBRequest<T = unknown> extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -26674,7 +26686,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -20977,80 +19886,31 @@ interface IDBRequest<T = unknown> extends EventTarget {
+@@ -20999,80 +19908,31 @@ interface IDBRequest<T = unknown> extends EventTarget {
    ): void;
  }
  
@@ -26774,7 +26786,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -21058,9 +19918,9 @@ interface IDBTransaction extends EventTarget {
+@@ -21080,9 +19940,9 @@ interface IDBTransaction extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -26786,7 +26798,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -21070,961 +19930,883 @@ interface IDBTransaction extends EventTarget {
+@@ -21092,961 +19952,883 @@ interface IDBTransaction extends EventTarget {
    ): void;
  }
  
@@ -28300,7 +28312,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -22032,9 +20814,9 @@ interface MIDIAccess extends EventTarget {
+@@ -22054,9 +20836,9 @@ interface MIDIAccess extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -28312,7 +28324,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22044,60 +20826,38 @@ interface MIDIAccess extends EventTarget {
+@@ -22066,60 +20848,38 @@ interface MIDIAccess extends EventTarget {
    ): void;
  }
  
@@ -28392,7 +28404,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22107,65 +20867,38 @@ interface MIDIInput extends MIDIPort {
+@@ -22129,65 +20889,38 @@ interface MIDIInput extends MIDIPort {
    ): void;
  }
  
@@ -28478,7 +28490,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -22173,9 +20906,9 @@ interface MIDIOutput extends MIDIPort {
+@@ -22195,9 +20928,9 @@ interface MIDIOutput extends MIDIPort {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -28490,7 +28502,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22185,99 +20918,166 @@ interface MIDIOutput extends MIDIPort {
+@@ -22207,99 +20940,166 @@ interface MIDIOutput extends MIDIPort {
    ): void;
  }
  
@@ -28709,7 +28721,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -22285,9 +21085,9 @@ interface MIDIPort extends EventTarget {
+@@ -22307,9 +21107,9 @@ interface MIDIPort extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -28721,7 +28733,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22297,28 +21097,32 @@ interface MIDIPort extends EventTarget {
+@@ -22319,28 +21119,32 @@ interface MIDIPort extends EventTarget {
    ): void;
  }
  
@@ -28770,7 +28782,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -22326,9 +21130,9 @@ interface MathMLElement
+@@ -22348,9 +21152,9 @@ interface MathMLElement
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -28782,7 +28794,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22338,337 +21142,339 @@ interface MathMLElement
+@@ -22360,337 +21164,339 @@ interface MathMLElement
    ): void;
  }
  
@@ -29364,7 +29376,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -22677,11 +21483,11 @@ interface MediaKeySession extends EventTarget {
+@@ -22699,11 +21505,11 @@ interface MediaKeySession extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -29379,7 +29391,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -22692,246 +21498,220 @@ interface MediaKeySession extends EventTarget {
+@@ -22714,246 +21520,220 @@ interface MediaKeySession extends EventTarget {
    ): void;
  }
  
@@ -29767,7 +29779,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -22939,9 +21719,9 @@ interface MediaQueryList extends EventTarget {
+@@ -22961,9 +21741,9 @@ interface MediaQueryList extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -29779,7 +29791,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -22951,129 +21731,45 @@ interface MediaQueryList extends EventTarget {
+@@ -22973,129 +21753,45 @@ interface MediaQueryList extends EventTarget {
    ): void;
  }
  
@@ -29930,7 +29942,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23081,9 +21777,9 @@ interface MediaRecorder extends EventTarget {
+@@ -23103,9 +21799,9 @@ interface MediaRecorder extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -29942,7 +29954,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23093,141 +21789,137 @@ interface MediaRecorder extends EventTarget {
+@@ -23115,141 +21811,137 @@ interface MediaRecorder extends EventTarget {
    ): void;
  }
  
@@ -30164,7 +30176,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23235,9 +21927,9 @@ interface MediaSource extends EventTarget {
+@@ -23257,9 +21949,9 @@ interface MediaSource extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -30176,7 +30188,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23247,111 +21939,119 @@ interface MediaSource extends EventTarget {
+@@ -23269,111 +21961,119 @@ interface MediaSource extends EventTarget {
    ): void;
  }
  
@@ -30364,7 +30376,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23359,9 +22059,9 @@ interface MediaStream extends EventTarget {
+@@ -23381,9 +22081,9 @@ interface MediaStream extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -30376,7 +30388,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23371,158 +22071,191 @@ interface MediaStream extends EventTarget {
+@@ -23393,158 +22093,191 @@ interface MediaStream extends EventTarget {
    ): void;
  }
  
@@ -30659,7 +30671,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -23531,11 +22264,11 @@ interface MediaStreamTrack extends EventTarget {
+@@ -23553,11 +22286,11 @@ interface MediaStreamTrack extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -30674,7 +30686,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -23546,125 +22279,158 @@ interface MediaStreamTrack extends EventTarget {
+@@ -23568,125 +22301,158 @@ interface MediaStreamTrack extends EventTarget {
    ): void;
  }
  
@@ -30919,7 +30931,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23672,9 +22438,12 @@ interface MessageEventTarget<T> {
+@@ -23694,9 +22460,12 @@ interface MessageEventTarget<T> {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -30934,7 +30946,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23684,39 +22453,26 @@ interface MessageEventTarget<T> {
+@@ -23706,39 +22475,26 @@ interface MessageEventTarget<T> {
    ): void;
  }
  
@@ -30986,7 +30998,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23724,9 +22480,9 @@ interface MessagePort extends EventTarget, MessageEventTarget<MessagePort> {
+@@ -23746,9 +22502,9 @@ interface MessagePort extends EventTarget, MessageEventTarget<MessagePort> {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -30998,7 +31010,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23736,481 +22492,511 @@ interface MessagePort extends EventTarget, MessageEventTarget<MessagePort> {
+@@ -23758,481 +22514,511 @@ interface MessagePort extends EventTarget, MessageEventTarget<MessagePort> {
    ): void;
  }
  
@@ -31814,7 +31826,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -24218,12 +23004,9 @@ interface NavigationHistoryEntry extends EventTarget {
+@@ -24240,12 +23026,9 @@ interface NavigationHistoryEntry extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -31829,7 +31841,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -24233,817 +23016,956 @@ interface NavigationHistoryEntry extends EventTarget {
+@@ -24255,817 +23038,956 @@ interface NavigationHistoryEntry extends EventTarget {
    ): void;
  }
  
@@ -33321,7 +33333,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -25051,9 +23973,12 @@ interface Notification extends EventTarget {
+@@ -25073,9 +23995,12 @@ interface Notification extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -33336,7 +33348,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -25063,268 +23988,223 @@ interface Notification extends EventTarget {
+@@ -25085,268 +24010,223 @@ interface Notification extends EventTarget {
    ): void;
  }
  
@@ -33772,7 +33784,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -25332,12 +24212,9 @@ interface OfflineAudioContext extends BaseAudioContext {
+@@ -25354,12 +24234,9 @@ interface OfflineAudioContext extends BaseAudioContext {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -33787,7 +33799,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -25347,85 +24224,96 @@ interface OfflineAudioContext extends BaseAudioContext {
+@@ -25369,85 +24246,96 @@ interface OfflineAudioContext extends BaseAudioContext {
    ): void;
  }
  
@@ -33937,7 +33949,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -25434,11 +24322,11 @@ interface OffscreenCanvas extends EventTarget {
+@@ -25456,11 +24344,11 @@ interface OffscreenCanvas extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -33952,7 +33964,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -25449,737 +24337,767 @@ interface OffscreenCanvas extends EventTarget {
+@@ -25471,737 +24359,767 @@ interface OffscreenCanvas extends EventTarget {
    ): void;
  }
  
@@ -35193,7 +35205,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -26188,11 +25106,11 @@ interface PaymentResponse extends EventTarget {
+@@ -26210,11 +25128,11 @@ interface PaymentResponse extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -35208,7 +35220,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -26203,124 +25121,152 @@ interface PaymentResponse extends EventTarget {
+@@ -26225,124 +25143,152 @@ interface PaymentResponse extends EventTarget {
    ): void;
  }
  
@@ -35432,7 +35444,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -26328,9 +25274,9 @@ interface Performance extends EventTarget {
+@@ -26350,9 +25296,9 @@ interface Performance extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -35444,7 +35456,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -26340,719 +25286,982 @@ interface Performance extends EventTarget {
+@@ -26362,719 +25308,982 @@ interface Performance extends EventTarget {
    ): void;
  }
  
@@ -36820,7 +36832,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -27060,12 +26269,9 @@ interface PermissionStatus extends EventTarget {
+@@ -27082,12 +26291,9 @@ interface PermissionStatus extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -36835,7 +36847,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -27075,82 +26281,128 @@ interface PermissionStatus extends EventTarget {
+@@ -27097,82 +26303,128 @@ interface PermissionStatus extends EventTarget {
    ): void;
  }
  
@@ -37009,7 +37021,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -27158,12 +26410,9 @@ interface PictureInPictureWindow extends EventTarget {
+@@ -27180,12 +26432,9 @@ interface PictureInPictureWindow extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -37024,7 +37036,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -27173,542 +26422,491 @@ interface PictureInPictureWindow extends EventTarget {
+@@ -27195,542 +26444,491 @@ interface PictureInPictureWindow extends EventTarget {
    ): void;
  }
  
@@ -37884,7 +37896,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -27716,9 +26914,12 @@ interface RTCDTMFSender extends EventTarget {
+@@ -27738,9 +26936,12 @@ interface RTCDTMFSender extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -37899,7 +37911,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -27728,223 +26929,246 @@ interface RTCDTMFSender extends EventTarget {
+@@ -27750,223 +26951,246 @@ interface RTCDTMFSender extends EventTarget {
    ): void;
  }
  
@@ -38289,7 +38301,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -27952,12 +27176,9 @@ interface RTCDtlsTransport extends EventTarget {
+@@ -27974,12 +27198,9 @@ interface RTCDtlsTransport extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -38304,7 +38316,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -27967,290 +27188,410 @@ interface RTCDtlsTransport extends EventTarget {
+@@ -27989,290 +27210,410 @@ interface RTCDtlsTransport extends EventTarget {
    ): void;
  }
  
@@ -38880,7 +38892,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -28258,12 +27599,9 @@ interface RTCIceTransport extends EventTarget {
+@@ -28280,12 +27621,9 @@ interface RTCIceTransport extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -38895,7 +38907,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -28273,280 +27611,158 @@ interface RTCIceTransport extends EventTarget {
+@@ -28295,280 +27633,158 @@ interface RTCIceTransport extends EventTarget {
    ): void;
  }
  
@@ -39276,7 +39288,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -28555,11 +27771,11 @@ interface RTCPeerConnection extends EventTarget {
+@@ -28577,11 +27793,11 @@ interface RTCPeerConnection extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -39291,7 +39303,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -28570,323 +27786,125 @@ interface RTCPeerConnection extends EventTarget {
+@@ -28592,323 +27808,125 @@ interface RTCPeerConnection extends EventTarget {
    ): void;
  }
  
@@ -39686,7 +39698,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -28894,12 +27912,9 @@ interface RTCSctpTransport extends EventTarget {
+@@ -28916,12 +27934,9 @@ interface RTCSctpTransport extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -39701,7 +39713,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -28909,972 +27924,826 @@ interface RTCSctpTransport extends EventTarget {
+@@ -28931,972 +27946,826 @@ interface RTCSctpTransport extends EventTarget {
    ): void;
  }
  
@@ -41145,7 +41157,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -29882,9 +28751,12 @@ interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
+@@ -29904,9 +28773,12 @@ interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -41160,7 +41172,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -29894,1395 +28766,835 @@ interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
+@@ -29916,1395 +28788,835 @@ interface SVGAElement extends SVGGraphicsElement, SVGURIReference {
    ): void;
  }
  
@@ -43103,7 +43115,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -31290,12 +29602,9 @@ interface SVGFEDiffuseLightingElement
+@@ -31312,12 +29624,9 @@ interface SVGFEDiffuseLightingElement
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -43118,7 +43130,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -31305,190 +29614,267 @@ interface SVGFEDiffuseLightingElement
+@@ -31327,190 +29636,267 @@ interface SVGFEDiffuseLightingElement
    ): void;
  }
  
@@ -43512,7 +43524,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -31497,11 +29883,11 @@ interface SVGFEDropShadowElement
+@@ -31519,11 +29905,11 @@ interface SVGFEDropShadowElement
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -43527,7 +43539,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -31512,21 +29898,86 @@ interface SVGFEDropShadowElement
+@@ -31534,21 +29920,86 @@ interface SVGFEDropShadowElement
    ): void;
  }
  
@@ -43623,7 +43635,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -31534,9 +29985,12 @@ interface SVGFEFloodElement
+@@ -31556,9 +30007,12 @@ interface SVGFEFloodElement
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -43638,7 +43650,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -31546,53 +30000,78 @@ interface SVGFEFloodElement
+@@ -31568,53 +30022,78 @@ interface SVGFEFloodElement
    ): void;
  }
  
@@ -43751,7 +43763,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -31600,9 +30079,12 @@ interface SVGFEFuncBElement extends SVGComponentTransferFunctionElement {
+@@ -31622,9 +30101,12 @@ interface SVGFEFuncBElement extends SVGComponentTransferFunctionElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -43766,7 +43778,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -31612,855 +30094,511 @@ interface SVGFEFuncBElement extends SVGComponentTransferFunctionElement {
+@@ -31634,855 +30116,511 @@ interface SVGFEFuncBElement extends SVGComponentTransferFunctionElement {
    ): void;
  }
  
@@ -44940,7 +44952,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -32468,12 +30606,9 @@ interface SVGForeignObjectElement extends SVGGraphicsElement {
+@@ -32490,12 +30628,9 @@ interface SVGForeignObjectElement extends SVGGraphicsElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -44955,7 +44967,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32483,199 +30618,127 @@ interface SVGForeignObjectElement extends SVGGraphicsElement {
+@@ -32505,199 +30640,127 @@ interface SVGForeignObjectElement extends SVGGraphicsElement {
    ): void;
  }
  
@@ -45229,7 +45241,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -32683,9 +30746,12 @@ interface SVGGraphicsElement extends SVGElement, SVGTests {
+@@ -32705,9 +30768,12 @@ interface SVGGraphicsElement extends SVGElement, SVGTests {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -45244,7 +45256,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32695,56 +30761,130 @@ interface SVGGraphicsElement extends SVGElement, SVGTests {
+@@ -32717,56 +30783,130 @@ interface SVGGraphicsElement extends SVGElement, SVGTests {
    ): void;
  }
  
@@ -45401,7 +45413,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -32752,9 +30892,9 @@ interface SVGImageElement extends SVGGraphicsElement, SVGURIReference {
+@@ -32774,9 +30914,9 @@ interface SVGImageElement extends SVGGraphicsElement, SVGURIReference {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -45413,7 +45425,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32764,795 +30904,732 @@ interface SVGImageElement extends SVGGraphicsElement, SVGURIReference {
+@@ -32786,795 +30926,732 @@ interface SVGImageElement extends SVGGraphicsElement, SVGURIReference {
    ): void;
  }
  
@@ -46679,7 +46691,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -33560,9 +31637,12 @@ interface SVGPolygonElement extends SVGGeometryElement, SVGAnimatedPoints {
+@@ -33582,9 +31659,12 @@ interface SVGPolygonElement extends SVGGeometryElement, SVGAnimatedPoints {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -46694,7 +46706,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -33572,20 +31652,82 @@ interface SVGPolygonElement extends SVGGeometryElement, SVGAnimatedPoints {
+@@ -33594,20 +31674,82 @@ interface SVGPolygonElement extends SVGGeometryElement, SVGAnimatedPoints {
    ): void;
  }
  
@@ -46785,7 +46797,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -33593,9 +31735,12 @@ interface SVGPolylineElement extends SVGGeometryElement, SVGAnimatedPoints {
+@@ -33615,9 +31757,12 @@ interface SVGPolylineElement extends SVGGeometryElement, SVGAnimatedPoints {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -46800,7 +46812,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -33605,508 +31750,573 @@ interface SVGPolylineElement extends SVGGeometryElement, SVGAnimatedPoints {
+@@ -33627,508 +31772,573 @@ interface SVGPolylineElement extends SVGGeometryElement, SVGAnimatedPoints {
    ): void;
  }
  
@@ -47713,7 +47725,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -34114,9 +32324,9 @@ interface SVGStopElement extends SVGElement {
+@@ -34136,9 +32346,9 @@ interface SVGStopElement extends SVGElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -47725,7 +47737,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -34126,108 +32336,144 @@ interface SVGStopElement extends SVGElement {
+@@ -34148,108 +32358,144 @@ interface SVGStopElement extends SVGElement {
    ): void;
  }
  
@@ -47930,7 +47942,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -34235,9 +32481,9 @@ interface SVGStyleElement extends SVGElement, LinkStyle {
+@@ -34257,9 +32503,9 @@ interface SVGStyleElement extends SVGElement, LinkStyle {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -47942,7 +47954,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -34247,53 +32493,67 @@ interface SVGStyleElement extends SVGElement, LinkStyle {
+@@ -34269,53 +32515,67 @@ interface SVGStyleElement extends SVGElement, LinkStyle {
    ): void;
  }
  
@@ -48044,7 +48056,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -34301,9 +32561,12 @@ interface SVGSymbolElement extends SVGElement, SVGFitToViewBox {
+@@ -34323,9 +32583,12 @@ interface SVGSymbolElement extends SVGElement, SVGFitToViewBox {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -48059,7 +48071,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -34313,332 +32576,298 @@ interface SVGSymbolElement extends SVGElement, SVGFitToViewBox {
+@@ -34335,332 +32598,298 @@ interface SVGSymbolElement extends SVGElement, SVGFitToViewBox {
    ): void;
  }
  
@@ -48603,7 +48615,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -34646,9 +32875,12 @@ interface SVGTitleElement extends SVGElement {
+@@ -34668,9 +32897,12 @@ interface SVGTitleElement extends SVGElement {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -48618,7 +48630,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -34658,376 +32890,280 @@ interface SVGTitleElement extends SVGElement {
+@@ -34680,376 +32912,280 @@ interface SVGTitleElement extends SVGElement {
    ): void;
  }
  
@@ -49175,7 +49187,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -35036,11 +33172,11 @@ interface ScreenOrientation extends EventTarget {
+@@ -35058,11 +33194,11 @@ interface ScreenOrientation extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -49190,7 +49202,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -35051,357 +33187,323 @@ interface ScreenOrientation extends EventTarget {
+@@ -35073,357 +33209,323 @@ interface ScreenOrientation extends EventTarget {
    ): void;
  }
  
@@ -49742,7 +49754,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -35409,9 +33511,12 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
+@@ -35431,9 +33533,12 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -49757,7 +49769,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -35421,677 +33526,572 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
+@@ -35443,677 +33548,572 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
    ): void;
  }
  
@@ -50792,7 +50804,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -36099,12 +34099,9 @@ interface SpeechSynthesis extends EventTarget {
+@@ -36121,12 +34121,9 @@ interface SpeechSynthesis extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -50807,7 +50819,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -36114,1152 +34111,982 @@ interface SpeechSynthesis extends EventTarget {
+@@ -36136,1152 +34133,982 @@ interface SpeechSynthesis extends EventTarget {
    ): void;
  }
  
@@ -52602,7 +52614,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -37267,9 +35094,9 @@ interface TextTrack extends EventTarget {
+@@ -37289,9 +35116,9 @@ interface TextTrack extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -52614,7 +52626,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -37279,59 +35106,116 @@ interface TextTrack extends EventTarget {
+@@ -37301,59 +35128,116 @@ interface TextTrack extends EventTarget {
    ): void;
  }
  
@@ -52763,7 +52775,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -37339,9 +35223,12 @@ interface TextTrackCue extends EventTarget {
+@@ -37361,9 +35245,12 @@ interface TextTrackCue extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -52778,7 +52790,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -37351,70 +35238,114 @@ interface TextTrackCue extends EventTarget {
+@@ -37373,70 +35260,114 @@ interface TextTrackCue extends EventTarget {
    ): void;
  }
  
@@ -52936,7 +52948,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -37422,9 +35353,9 @@ interface TextTrackList extends EventTarget {
+@@ -37444,9 +35375,9 @@ interface TextTrackList extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -52948,7 +52960,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -37432,770 +35363,806 @@ interface TextTrackList extends EventTarget {
+@@ -37454,770 +35385,806 @@ interface TextTrackList extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | EventListenerOptions,
    ): void;
@@ -54308,7 +54320,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -38203,9 +36170,9 @@ interface VTTCue extends TextTrackCue {
+@@ -38225,9 +36192,9 @@ interface VTTCue extends TextTrackCue {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -54320,7 +54332,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -38215,212 +36182,147 @@ interface VTTCue extends TextTrackCue {
+@@ -38237,212 +36204,147 @@ interface VTTCue extends TextTrackCue {
    ): void;
  }
  
@@ -54635,7 +54647,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -38428,9 +36330,12 @@ interface VideoDecoder extends EventTarget {
+@@ -38450,9 +36352,12 @@ interface VideoDecoder extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -54650,7 +54662,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -38440,75 +36345,27 @@ interface VideoDecoder extends EventTarget {
+@@ -38462,75 +36367,27 @@ interface VideoDecoder extends EventTarget {
    ): void;
  }
  
@@ -54738,7 +54750,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -38516,9 +36373,9 @@ interface VideoEncoder extends EventTarget {
+@@ -38538,9 +36395,9 @@ interface VideoEncoder extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -54750,7 +54762,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -38528,270 +36385,405 @@ interface VideoEncoder extends EventTarget {
+@@ -38550,270 +36407,405 @@ interface VideoEncoder extends EventTarget {
    ): void;
  }
  
@@ -55326,7 +55338,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -38799,9 +36791,12 @@ interface VisualViewport extends EventTarget {
+@@ -38821,9 +36813,12 @@ interface VisualViewport extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -55341,7 +55353,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -38811,350 +36806,263 @@ interface VisualViewport extends EventTarget {
+@@ -38833,350 +36828,263 @@ interface VisualViewport extends EventTarget {
    ): void;
  }
  
@@ -55883,7 +55895,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -39163,11 +37071,11 @@ interface WakeLockSentinel extends EventTarget {
+@@ -39185,11 +37093,11 @@ interface WakeLockSentinel extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -55898,7 +55910,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -39178,3199 +37086,2169 @@ interface WakeLockSentinel extends EventTarget {
+@@ -39200,3199 +37108,2169 @@ interface WakeLockSentinel extends EventTarget {
    ): void;
  }
  
@@ -61082,7 +61094,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -42378,9 +39256,9 @@ interface WebSocket extends EventTarget {
+@@ -42400,9 +39278,9 @@ interface WebSocket extends EventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -61094,7 +61106,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -42390,710 +39268,968 @@ interface WebSocket extends EventTarget {
+@@ -42412,710 +39290,968 @@ interface WebSocket extends EventTarget {
    ): void;
  }
  
@@ -62461,7 +62473,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -43101,9 +40237,12 @@ interface Window
+@@ -43123,9 +40259,12 @@ interface Window
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -62476,7 +62488,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43111,111 +40250,99 @@ interface Window
+@@ -43133,111 +40272,99 @@ interface Window
      listener: EventListenerOrEventListenerObject,
      options?: boolean | EventListenerOptions,
    ): void;
@@ -62669,7 +62681,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -43224,11 +40351,11 @@ interface WindowEventHandlers {
+@@ -43246,11 +40373,11 @@ interface WindowEventHandlers {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -62684,7 +62696,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -43239,107 +40366,79 @@ interface WindowEventHandlers {
+@@ -43261,107 +40388,79 @@ interface WindowEventHandlers {
    ): void;
  }
  
@@ -62852,7 +62864,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -43347,9 +40446,9 @@ interface Worker
+@@ -43369,9 +40468,9 @@ interface Worker
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -62864,7 +62876,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43359,160 +40458,191 @@ interface Worker
+@@ -43381,160 +40480,191 @@ interface Worker
    ): void;
  }
  
@@ -63157,7 +63169,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -43520,9 +40650,12 @@ interface XMLDocument extends Document {
+@@ -43542,9 +40672,12 @@ interface XMLDocument extends Document {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -63172,7 +63184,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43530,148 +40663,224 @@ interface XMLDocument extends Document {
+@@ -43552,148 +40685,224 @@ interface XMLDocument extends Document {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | EventListenerOptions,
    ): void;
@@ -63477,7 +63489,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -43679,9 +40888,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -43701,9 +40910,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -63492,7 +63504,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43691,83 +40903,167 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -43713,83 +40925,167 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
  }
  
@@ -63721,7 +63733,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -43776,11 +41072,11 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -43798,11 +41094,11 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -63736,7 +63748,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -43791,1674 +41087,9593 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -43813,1674 +41109,9593 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    ): void;
  }
  
@@ -74643,7 +74655,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  declare const ondragend: ((this: Window, ev: DragEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/dragenter_event) */
  declare const ondragenter: ((this: Window, ev: DragEvent) => unknown) | null;
-@@ -45487,7 +50702,7 @@ declare const ongotpointercapture:
+@@ -45509,7 +50724,7 @@ declare const ongotpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/input_event) */
@@ -74652,7 +74664,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keydown_event) */
-@@ -45741,7 +50956,7 @@ declare const onunhandledrejection:
+@@ -45763,7 +50978,7 @@ declare const onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -74661,7 +74673,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event)
   */
-@@ -45766,6 +50981,8 @@ declare const isSecureContext: boolean;
+@@ -45788,6 +51003,8 @@ declare const isSecureContext: boolean;
  declare const origin: string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
  declare const performance: Performance;
@@ -74670,7 +74682,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -45866,6 +51083,10 @@ type CanvasImageSource =
+@@ -45888,6 +51105,10 @@ type CanvasImageSource =
  type ClipboardItemData = Promise<string | Blob>;
  type ClipboardItems = readonly ClipboardItem[];
  type ConstrainBoolean = boolean | ConstrainBooleanParameters;
@@ -74681,7 +74693,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type ConstrainDOMString =
    | string
    | readonly string[]
-@@ -45891,6 +51112,44 @@ type GLsizei = number;
+@@ -45913,6 +51134,44 @@ type GLsizei = number;
  type GLsizeiptr = number;
  type GLuint = number;
  type GLuint64 = number;
@@ -74726,7 +74738,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
-@@ -45917,15 +51176,16 @@ type OffscreenRenderingContext =
+@@ -45939,15 +51198,16 @@ type OffscreenRenderingContext =
    | OffscreenCanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -74746,7 +74758,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -45939,9 +51199,16 @@ type RenderingContext =
+@@ -45961,9 +51221,16 @@ type RenderingContext =
    | CanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -74764,7 +74776,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type TexImageSource =
    | ImageBitmap
    | ImageData
-@@ -45963,6 +51230,7 @@ type Transferable =
+@@ -45985,6 +51252,7 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;
@@ -74772,7 +74784,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type Uint32List = Uint32Array<ArrayBufferLike> | readonly GLuint[];
  type VibratePattern = number | readonly number[];
  type WindowProxy = Window;
-@@ -45972,6 +51240,7 @@ type XMLHttpRequestBodyInit =
+@@ -45994,6 +51262,7 @@ type XMLHttpRequestBodyInit =
    | FormData
    | URLSearchParams
    | string;
@@ -74780,7 +74792,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type AlignSetting = 'center' | 'end' | 'left' | 'right' | 'start';
  type AlphaOption = 'discard' | 'keep';
  type AnimationPlayState = 'finished' | 'idle' | 'paused' | 'running';
-@@ -46150,6 +51419,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
+@@ -46172,6 +51441,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';
@@ -75033,7 +75045,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type GamepadHapticEffectType = 'dual-rumble' | 'trigger-rumble';
  type GamepadHapticsResult = 'complete' | 'preempted';
  type GamepadMappingType = '' | 'standard' | 'xr-standard';
-@@ -46190,6 +51705,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
+@@ -46212,6 +51727,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
  type IDBRequestReadyState = 'done' | 'pending';
  type IDBTransactionDurability = 'default' | 'relaxed' | 'strict';
  type IDBTransactionMode = 'readonly' | 'readwrite' | 'versionchange';
@@ -75041,7 +75053,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type ImageOrientation = 'flipY' | 'from-image' | 'none';
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type InsertPosition = 'afterbegin' | 'afterend' | 'beforebegin' | 'beforeend';
-@@ -46249,11 +51765,10 @@ type MediaSessionAction =
+@@ -46271,11 +51787,10 @@ type MediaSessionAction =
    | 'stop';
  type MediaSessionPlaybackState = 'none' | 'paused' | 'playing';
  type MediaStreamTrackState = 'ended' | 'live';
@@ -75057,7 +75069,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type NavigationType = 'push' | 'reload' | 'replace' | 'traverse';
  type NotificationDirection = 'auto' | 'ltr' | 'rtl';
  type NotificationPermission = 'default' | 'denied' | 'granted';
-@@ -46264,6 +51779,15 @@ type OffscreenRenderingContextId =
+@@ -46286,6 +51801,15 @@ type OffscreenRenderingContextId =
    | 'webgl2'
    | 'webgpu';
  type OpusBitstreamFormat = 'ogg' | 'opus';
@@ -75073,7 +75085,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type OrientationType =
    | 'landscape-primary'
    | 'landscape-secondary'
-@@ -46309,7 +51833,6 @@ type RTCDtlsTransportState =
+@@ -46331,7 +51855,6 @@ type RTCDtlsTransportState =
    | 'connecting'
    | 'failed'
    | 'new';
@@ -75081,7 +75093,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type RTCErrorDetailType =
    | 'data-channel-failure'
    | 'dtls-failure'
-@@ -46371,7 +51894,6 @@ type RTCStatsIceCandidatePairState =
+@@ -46393,7 +51916,6 @@ type RTCStatsIceCandidatePairState =
    | 'failed'
    | 'frozen'
    | 'in-progress'
@@ -75089,7 +75101,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
    | 'succeeded'
    | 'waiting';
  type RTCStatsType =
-@@ -46450,6 +51972,8 @@ type ResponseType =
+@@ -46472,6 +51994,8 @@ type ResponseType =
    | 'error'
    | 'opaque'
    | 'opaqueredirect';
@@ -75098,7 +75110,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type ScrollBehavior = 'auto' | 'instant' | 'smooth';
  type ScrollLogicalPosition = 'center' | 'end' | 'nearest' | 'start';
  type ScrollRestoration = 'auto' | 'manual';
-@@ -46466,6 +51990,15 @@ type ServiceWorkerState =
+@@ -46488,6 +52012,15 @@ type ServiceWorkerState =
  type ServiceWorkerUpdateViaCache = 'all' | 'imports' | 'none';
  type ShadowRootMode = 'closed' | 'open';
  type SlotAssignmentMode = 'manual' | 'named';
@@ -75114,7 +75126,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type SpeechSynthesisErrorCode =
    | 'audio-busy'
    | 'audio-hardware'
-@@ -46479,6 +52012,7 @@ type SpeechSynthesisErrorCode =
+@@ -46501,6 +52034,7 @@ type SpeechSynthesisErrorCode =
    | 'synthesis-unavailable'
    | 'text-too-long'
    | 'voice-unavailable';
@@ -75122,7 +75134,7 @@ index 75722a30f8cd0e10b0b8bce24fe9fb49b894224c..0353ef36ca76e334d66f6ae80e588029
  type TextTrackKind =
    | 'captions'
    | 'chapters'
-@@ -46517,3 +52051,1012 @@ type XMLHttpRequestResponseType =
+@@ -46539,3 +52073,1012 @@ type XMLHttpRequestResponseType =
    | 'document'
    | 'json'
    | 'text';

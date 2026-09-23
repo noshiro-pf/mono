@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2015.collection.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  interface Map<K, V> {
    /**
     * Removes all elements from the Map.
-@@ -26,8 +11,8 @@ interface Map<K, V> {
+@@ -26,8 +33,8 @@ interface Map<K, V> {
     * Executes a provided function once per each key/value pair in the Map, in insertion order.
     */
    forEach(
@@ -28,7 +23,7 @@
    ): void;
    /**
     * Returns a specified element from the Map object. If the value that is associated to the provided key is an object, then you will get a reference to that object and any change made to that object will effectively modify it inside the Map.
-@@ -37,7 +22,7 @@ interface Map<K, V> {
+@@ -37,7 +44,7 @@ interface Map<K, V> {
    /**
     * @returns boolean indicating whether an element with the specified key exists or not.
     */
@@ -37,7 +32,7 @@
    /**
     * Adds a new element with a specified key and value to the Map. If an element with the same key already exists, the element will be updated.
     */
-@@ -49,19 +34,19 @@ interface Map<K, V> {
+@@ -49,19 +56,19 @@ interface Map<K, V> {
  }
  
  interface MapConstructor {
@@ -63,7 +58,7 @@
    readonly size: number;
  }
  
-@@ -78,7 +63,7 @@ interface WeakMap<K extends WeakKey, V> {
+@@ -78,7 +85,7 @@ interface WeakMap<K extends WeakKey, V> {
    /**
     * @returns a boolean indicating whether an element with the specified key exists or not.
     */
@@ -72,7 +67,7 @@
    /**
     * Adds a new element with a specified key and value.
     * @param key Must be an object or symbol.
-@@ -87,12 +72,13 @@ interface WeakMap<K extends WeakKey, V> {
+@@ -87,12 +94,13 @@ interface WeakMap<K extends WeakKey, V> {
  }
  
  interface WeakMapConstructor {
@@ -90,7 +85,7 @@
  
  interface Set<T> {
    /**
-@@ -112,13 +98,13 @@ interface Set<T> {
+@@ -112,13 +120,13 @@ interface Set<T> {
     * Executes a provided function once per each value in the Set object, in insertion order.
     */
    forEach(
@@ -107,7 +102,7 @@
    /**
     * @returns the number of (unique) elements in the Set.
     */
-@@ -126,10 +112,11 @@ interface Set<T> {
+@@ -126,10 +134,11 @@ interface Set<T> {
  }
  
  interface SetConstructor {
@@ -122,7 +117,7 @@
  
  interface ReadonlySet<T> {
    /**
-@@ -137,12 +124,12 @@ interface ReadonlySet<T> {
+@@ -137,12 +146,12 @@ interface ReadonlySet<T> {
     */
    forEach(
      callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
@@ -137,7 +132,7 @@
    /**
     * @returns the number of (unique) elements in the Set.
     */
-@@ -162,11 +149,12 @@ interface WeakSet<T extends WeakKey> {
+@@ -162,11 +171,12 @@ interface WeakSet<T extends WeakKey> {
    /**
     * @returns a boolean indicating whether a value exists in the WeakSet or not.
     */

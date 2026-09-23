@@ -1,8 +1,8 @@
 diff --git a/v5.0/output/lib-files/lib.webworker.iterable.d.ts b/v5.1/output/lib-files/lib.webworker.iterable.d.ts
-index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0576824a9 100644
+index 37d87c8fd3b0b615c2ef4cfaac40ff6cb5156349..fef3f9f156c336e3d2bb00a8dacda4887e8b04de 100644
 --- a/v5.0/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.1/output/lib-files/lib.webworker.iterable.d.ts
-@@ -4,11 +4,34 @@
+@@ -26,11 +26,34 @@ and limitations under the License.
  /// Worker Iterable APIs
  /////////////////////////////
  
@@ -37,7 +37,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    roundRect(
      x: number,
      y: number,
-@@ -19,6 +42,7 @@ interface CanvasPath {
+@@ -41,6 +64,7 @@ interface CanvasPath {
  }
  
  interface CanvasPathDrawingStyles {
@@ -45,7 +45,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    setLineDash(segments: Iterable<number>): void;
  }
  
-@@ -53,7 +77,11 @@ interface Headers {
+@@ -75,7 +99,11 @@ interface Headers {
  }
  
  interface IDBDatabase {
@@ -58,7 +58,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    transaction(
      storeNames: string | Iterable<string>,
      mode?: IDBTransactionMode,
-@@ -66,6 +94,8 @@ interface IDBObjectStore {
+@@ -88,6 +116,8 @@ interface IDBObjectStore {
     * Creates a new index in store with the given name, keyPath and options and returns a new IDBIndex. If the keyPath and options define constraints that cannot be satisfied with the data already in store the upgrade transaction will abort with a "ConstraintError" DOMException.
     *
     * Throws an "InvalidStateError" DOMException if not called within an upgrade transaction.
@@ -67,7 +67,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
     */
    createIndex(
      name: string,
-@@ -75,7 +105,11 @@ interface IDBObjectStore {
+@@ -97,7 +127,11 @@ interface IDBObjectStore {
  }
  
  interface MessageEvent<T = unknown> {
@@ -80,7 +80,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    initMessageEvent(
      type: string,
      bubbles?: boolean,
-@@ -88,7 +122,17 @@ interface MessageEvent<T = unknown> {
+@@ -110,7 +144,17 @@ interface MessageEvent<T = unknown> {
    ): void;
  }
  
@@ -98,7 +98,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    deriveKey(
      algorithm:
        | AlgorithmIdentifier
-@@ -105,6 +149,7 @@ interface SubtleCrypto {
+@@ -127,6 +171,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -106,7 +106,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    generateKey(
      algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
      extractable: boolean,
-@@ -120,6 +165,7 @@ interface SubtleCrypto {
+@@ -142,6 +187,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKeyPair | CryptoKey>;
@@ -114,7 +114,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    importKey(
      format: 'jwk',
      keyData: JsonWebKey,
-@@ -144,6 +190,7 @@ interface SubtleCrypto {
+@@ -166,6 +212,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -122,7 +122,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    unwrapKey(
      format: KeyFormat,
      wrappedKey: BufferSource,
-@@ -176,10 +223,12 @@ interface URLSearchParams {
+@@ -198,10 +245,12 @@ interface URLSearchParams {
  }
  
  interface WEBGL_draw_buffers {
@@ -135,7 +135,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    multiDrawArraysInstancedWEBGL(
      mode: GLenum,
      firstsList: Int32Array | Iterable<GLint>,
-@@ -190,6 +239,7 @@ interface WEBGL_multi_draw {
+@@ -212,6 +261,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -143,7 +143,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    multiDrawArraysWEBGL(
      mode: GLenum,
      firstsList: Int32Array | Iterable<GLint>,
-@@ -198,6 +248,7 @@ interface WEBGL_multi_draw {
+@@ -220,6 +270,7 @@ interface WEBGL_multi_draw {
      countsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -151,7 +151,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    multiDrawElementsInstancedWEBGL(
      mode: GLenum,
      countsList: Int32Array | Iterable<GLsizei>,
-@@ -209,6 +260,7 @@ interface WEBGL_multi_draw {
+@@ -231,6 +282,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -159,7 +159,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    multiDrawElementsWEBGL(
      mode: GLenum,
      countsList: Int32Array | Iterable<GLsizei>,
-@@ -221,35 +273,43 @@ interface WEBGL_multi_draw {
+@@ -243,35 +295,43 @@ interface WEBGL_multi_draw {
  }
  
  interface WebGL2RenderingContextBase {
@@ -203,7 +203,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    invalidateSubFramebuffer(
      target: GLenum,
      attachments: Iterable<GLenum>,
-@@ -258,35 +318,41 @@ interface WebGL2RenderingContextBase {
+@@ -280,35 +340,41 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -245,7 +245,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix2x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -294,6 +360,7 @@ interface WebGL2RenderingContextBase {
+@@ -316,6 +382,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -253,7 +253,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix2x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -301,6 +368,7 @@ interface WebGL2RenderingContextBase {
+@@ -323,6 +390,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -261,7 +261,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix3x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -308,6 +376,7 @@ interface WebGL2RenderingContextBase {
+@@ -330,6 +398,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -269,7 +269,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix3x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -315,6 +384,7 @@ interface WebGL2RenderingContextBase {
+@@ -337,6 +406,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -277,7 +277,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix4x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -322,6 +392,7 @@ interface WebGL2RenderingContextBase {
+@@ -344,6 +414,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -285,7 +285,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix4x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -329,59 +400,70 @@ interface WebGL2RenderingContextBase {
+@@ -351,59 +422,70 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -356,7 +356,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -389,6 +471,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -411,6 +493,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -364,7 +364,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -396,6 +479,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -418,6 +501,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -372,7 +372,7 @@ index 5d82cb6830828e412a948dc2320e4f87173a9bb8..d1782f9c04f9eeba6859741e634fcad0
    uniformMatrix4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -406,31 +490,46 @@ interface WebGL2RenderingContextOverloads {
+@@ -428,31 +512,46 @@ interface WebGL2RenderingContextOverloads {
  }
  
  interface WebGLRenderingContextBase {

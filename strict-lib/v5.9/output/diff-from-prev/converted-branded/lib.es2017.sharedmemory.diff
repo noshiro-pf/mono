@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files-branded/lib.es2017.sharedmemory.d.ts b/v5.9/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
-index 4514d51a9b42dc8e4380e242287537bd9d6e0502..cd07da4b32680190d1e3a2fcc5290c406b624694 100644
+index d2b80dd214deecb5c2478574449a5af103a8779b..be052cfbfc69262698879e70538e16301d2d6ed6 100644
 --- a/v5.8/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
-@@ -16,13 +16,13 @@ interface SharedArrayBuffer {
+@@ -38,13 +38,13 @@ interface SharedArrayBuffer {
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
    ): SharedArrayBuffer;

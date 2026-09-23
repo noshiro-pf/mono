@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.dom.iterable.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  /////////////////////////////
-@@ -50,7 +35,7 @@ interface CSSKeyframesRule {
+@@ -50,7 +57,7 @@ interface CSSKeyframesRule {
  
  interface CSSNumericArray {
    [Symbol.iterator](): IterableIterator<CSSNumericValue>;
@@ -26,7 +21,7 @@
    keys(): IterableIterator<number>;
    values(): IterableIterator<CSSNumericValue>;
  }
-@@ -65,14 +50,14 @@ interface CSSStyleDeclaration {
+@@ -65,14 +72,14 @@ interface CSSStyleDeclaration {
  
  interface CSSTransformValue {
    [Symbol.iterator](): IterableIterator<CSSTransformComponent>;
@@ -43,7 +38,7 @@
    keys(): IterableIterator<number>;
    values(): IterableIterator<CSSUnparsedSegment>;
  }
-@@ -108,7 +93,7 @@ interface DOMStringList {
+@@ -108,7 +115,7 @@ interface DOMStringList {
  
  interface DOMTokenList {
    [Symbol.iterator](): IterableIterator<string>;
@@ -52,7 +47,7 @@
    keys(): IterableIterator<number>;
    values(): IterableIterator<string>;
  }
-@@ -126,9 +111,9 @@ interface FileList {
+@@ -126,9 +133,9 @@ interface FileList {
  interface FontFaceSet extends Set<FontFace> {}
  
  interface FormData {
@@ -64,7 +59,7 @@
    /** Returns a list of keys in the list. */
    keys(): IterableIterator<string>;
    /** Returns a list of values in the list. */
-@@ -156,9 +141,9 @@ interface HTMLSelectElement {
+@@ -156,9 +163,9 @@ interface HTMLSelectElement {
  }
  
  interface Headers {
@@ -76,7 +71,7 @@
    /** Returns an iterator allowing to go through all keys of the key/value pairs contained in this object. */
    keys(): IterableIterator<string>;
    /** Returns an iterator allowing to go through all values of the key/value pairs contained in this object. */
-@@ -207,8 +192,10 @@ interface MIDIOutput {
+@@ -207,8 +214,10 @@ interface MIDIOutput {
  interface MIDIOutputMap extends ReadonlyMap<string, MIDIOutput> {}
  
  interface MediaKeyStatusMap {
@@ -89,7 +84,7 @@
    keys(): IterableIterator<BufferSource>;
    values(): IterableIterator<MediaKeyStatus>;
  }
-@@ -217,7 +204,7 @@ interface MediaList {
+@@ -217,7 +226,7 @@ interface MediaList {
    [Symbol.iterator](): IterableIterator<string>;
  }
  
@@ -98,7 +93,7 @@
    /**
     * @deprecated
     *
-@@ -227,7 +214,7 @@ interface MessageEvent<T = any> {
+@@ -227,7 +236,7 @@ interface MessageEvent<T = any> {
      type: string,
      bubbles?: boolean,
      cancelable?: boolean,
@@ -107,7 +102,7 @@
      origin?: string,
      lastEventId?: string,
      source?: MessageEventSource | null,
-@@ -260,7 +247,7 @@ interface Navigator {
+@@ -260,7 +269,7 @@ interface Navigator {
  interface NodeList {
    [Symbol.iterator](): IterableIterator<Node>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -116,7 +111,7 @@
    /** Returns an list of keys in the list. */
    keys(): IterableIterator<number>;
    /** Returns an list of values in the list. */
-@@ -270,7 +257,7 @@ interface NodeList {
+@@ -270,7 +279,7 @@ interface NodeList {
  interface NodeListOf<TNode extends Node> {
    [Symbol.iterator](): IterableIterator<TNode>;
    /** Returns an array of key, value pairs for every entry in the list. */
@@ -125,7 +120,7 @@
    /** Returns an list of keys in the list. */
    keys(): IterableIterator<number>;
    /** Returns an list of values in the list. */
-@@ -290,7 +277,7 @@ interface RTCRtpTransceiver {
+@@ -290,7 +299,7 @@ interface RTCRtpTransceiver {
    setCodecPreferences(codecs: Iterable<RTCRtpCodecCapability>): void;
  }
  
@@ -134,7 +129,7 @@
  
  interface SVGLengthList {
    [Symbol.iterator](): IterableIterator<SVGLength>;
-@@ -325,8 +312,10 @@ interface SpeechRecognitionResultList {
+@@ -325,8 +334,10 @@ interface SpeechRecognitionResultList {
  }
  
  interface StylePropertyMapReadOnly {
@@ -147,7 +142,7 @@
    keys(): IterableIterator<string>;
    values(): IterableIterator<Iterable<CSSStyleValue>>;
  }
-@@ -434,9 +423,9 @@ interface TouchList {
+@@ -434,9 +445,9 @@ interface TouchList {
  }
  
  interface URLSearchParams {
@@ -159,7 +154,7 @@
    /** Returns a list of keys in the search params. */
    keys(): IterableIterator<string>;
    /** Returns a list of values in the search params. */
-@@ -522,7 +511,7 @@ interface WebGL2RenderingContextBase {
+@@ -522,7 +533,7 @@ interface WebGL2RenderingContextBase {
      program: WebGLProgram,
      uniformIndices: Iterable<GLuint>,
      pname: GLenum,

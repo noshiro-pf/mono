@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.dom.iterable.d.ts b/v5.5/output/lib-files/lib.dom.iterable.d.ts
-index 7aa19c8bb4926aba941c48eacee305cb7cde8d7f..e49de2cf5e8df2c7352c331cc275eb4584de3341 100644
+index 84177394bf5a56658e4005316f7c61684bf9c689..453fd4f2d5d0930a1871c052d75a7bf97c84082e 100644
 --- a/v5.4/output/lib-files/lib.dom.iterable.d.ts
 +++ b/v5.5/output/lib-files/lib.dom.iterable.d.ts
-@@ -4,6 +4,11 @@
+@@ -26,6 +26,11 @@ and limitations under the License.
  /// Window Iterable APIs
  /////////////////////////////
  
@@ -14,7 +14,7 @@ index 7aa19c8bb4926aba941c48eacee305cb7cde8d7f..e49de2cf5e8df2c7352c331cc275eb45
  interface AudioParam {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AudioParam/setValueCurveAtTime) */
    setValueCurveAtTime(
-@@ -83,6 +88,8 @@ interface CanvasPathDrawingStyles {
+@@ -105,6 +110,8 @@ interface CanvasPathDrawingStyles {
    setLineDash(segments: Iterable<number>): void;
  }
  

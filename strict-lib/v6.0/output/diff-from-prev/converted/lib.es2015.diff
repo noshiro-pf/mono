@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2015.d.ts b/v6.0/output/lib-files/lib.es2015.d.ts
-index 5d3de1c9077e7e06bd17878880f3d7f8c5f5c2cb..d03c57f187bf88d43e6180c18b9f8fbdbe225236 100644
+index e209a42a8b1c852e455a3779c26bef10cbb09ea7..4bd087808c383b8afe7aa112356253348b395835 100644
 --- a/v5.9/output/lib-files/lib.es2015.d.ts
 +++ b/v6.0/output/lib-files/lib.es2015.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es5.d.ts" />

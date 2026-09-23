@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2017.typedarrays.d.ts b/v5.7/output/lib-files/lib.es2017.typedarrays.d.ts
-index 8a86e0e23e84a7a9479fb2c15755185ba3ef7c3f..90ee1a680e928765176cacc4243b8aa4424216e4 100644
+index d3d70c6b8b455f67cbd3f75e11e5c991beba89cb..e4fe10b597968ed718b2b8fef1dc5bfabfa9374a 100644
 --- a/v5.6/output/lib-files/lib.es2017.typedarrays.d.ts
 +++ b/v5.7/output/lib-files/lib.es2017.typedarrays.d.ts
-@@ -1,37 +1,37 @@
+@@ -23,37 +23,37 @@ and limitations under the License.
  /// <reference no-default-lib="true"/>
  
  interface Int8ArrayConstructor {

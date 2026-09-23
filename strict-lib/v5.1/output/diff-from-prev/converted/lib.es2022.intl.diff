@@ -1,8 +1,8 @@
 diff --git a/v5.0/output/lib-files/lib.es2022.intl.d.ts b/v5.1/output/lib-files/lib.es2022.intl.d.ts
-index e0c242875f465b60d2f1c6e340106f3001934fe4..31633d742e6d345c379b10dcdfe15834757fe5b9 100644
+index 885a56b02772b14834ad8e1a9fe9595ca176b23a..6bfedeb8785915b477af466976623bba3e2255b8 100644
 --- a/v5.0/output/lib-files/lib.es2022.intl.d.ts
 +++ b/v5.1/output/lib-files/lib.es2022.intl.d.ts
-@@ -95,4 +95,21 @@ declare namespace Intl {
+@@ -117,4 +117,21 @@ declare namespace Intl {
        options?: Pick<SegmenterOptions, 'localeMatcher'>,
      ): BCP47LanguageTag[];
    };

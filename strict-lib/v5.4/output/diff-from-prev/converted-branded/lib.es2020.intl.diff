@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2020.intl.d.ts b/v5.4/output/lib-files-branded/lib.es2020.intl.d.ts
-index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a73114b7c1bae 100644
+index a93c29833d9f68d1b9565c6600423a9f98167ade..dd10b64d67d59a1a71636e69e046713a5bfa083a 100644
 --- a/v5.3/output/lib-files-branded/lib.es2020.intl.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2020.intl.d.ts
-@@ -3,9 +3,11 @@
+@@ -25,9 +25,11 @@ and limitations under the License.
  /// <reference path="./lib.es2018.intl.d.ts" />
  declare namespace Intl {
    /**
@@ -16,7 +16,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
     */
    type UnicodeBCP47LocaleIdentifier = string;
  
-@@ -73,16 +75,9 @@ declare namespace Intl {
+@@ -95,16 +97,9 @@ declare namespace Intl {
    type RelativeTimeFormatStyle = 'long' | 'short' | 'narrow';
  
    /**
@@ -35,7 +35,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
     */
    type LocalesArgument =
      | UnicodeBCP47LocaleIdentifier
-@@ -209,9 +204,7 @@ declare namespace Intl {
+@@ -231,9 +226,7 @@ declare namespace Intl {
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat).
       */
      new (
@@ -46,7 +46,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
        options?: RelativeTimeFormatOptions,
      ): RelativeTimeFormat;
  
-@@ -234,9 +227,7 @@ declare namespace Intl {
+@@ -256,9 +249,7 @@ declare namespace Intl {
       * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/supportedLocalesOf).
       */
      supportedLocalesOf(
@@ -57,7 +57,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
        options?: RelativeTimeFormatOptions,
      ): readonly UnicodeBCP47LocaleIdentifier[];
    };
-@@ -317,7 +308,7 @@ declare namespace Intl {
+@@ -339,7 +330,7 @@ declare namespace Intl {
      /** Attempts to remove information about the locale that would be added by calling `Locale.maximize()`. */
      minimize(): Locale;
      /** Returns the locale's full locale identifier string. */
@@ -66,7 +66,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
    }
  
    /**
-@@ -335,7 +326,10 @@ declare namespace Intl {
+@@ -357,7 +348,10 @@ declare namespace Intl {
     * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale).
     */
    const Locale: {
@@ -78,7 +78,7 @@ index 65838710b7c866b95b358452a39d393b55b4f91a..24e87639d3f518b234217eb5e41a7311
    };
  
    type DisplayNamesFallback = 'code' | 'none';
-@@ -428,6 +422,52 @@ declare namespace Intl {
+@@ -450,6 +444,52 @@ declare namespace Intl {
      supportedLocalesOf(
        locales?: LocalesArgument,
        options?: { readonly localeMatcher?: RelativeTimeFormatLocaleMatcher },

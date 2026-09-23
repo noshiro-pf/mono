@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.esnext.d.ts b/v5.5/output/lib-files-branded/lib.esnext.d.ts
-index f45cfa590cdc5a0a0d040fbda819c3a8bf1ac3aa..ed4c93ea503cdc98145bc1b0a818cfadeb2887ba 100644
+index f8b52a8bcd8aef706e58e1c36584db955f8112c8..d8ac84570c2aef832947852b61c5267e8c4fdc94 100644
 --- a/v5.4/output/lib-files-branded/lib.esnext.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.esnext.d.ts
-@@ -7,3 +7,6 @@
+@@ -29,3 +29,6 @@ and limitations under the License.
  /// <reference path="./lib.esnext.promise.d.ts" />
  /// <reference path="./lib.esnext.object.d.ts" />
  /// <reference path="./lib.esnext.collection.d.ts" />

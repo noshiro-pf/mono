@@ -1,29 +1,24 @@
-@@ -1,21 +1,6 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,9 +13,16 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
 -/// <reference lib="es2015.symbol" />
 -/// <reference lib="es2015.iterable" />
 -/// <reference lib="es2018.asynciterable" />
++/*
++ * Modified from TypeScript's `lib.esnext.disposable.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2015.symbol.d.ts" />
 +/// <reference path="./lib.es2015.iterable.d.ts" />
 +/// <reference path="./lib.es2018.asynciterable.d.ts" />
  
  interface SymbolConstructor {
    /**
-@@ -38,16 +23,16 @@ interface AsyncDisposable {
+@@ -38,16 +45,16 @@ interface AsyncDisposable {
  }
  
  interface SuppressedError extends Error {
@@ -45,7 +40,7 @@
  
  interface DisposableStack {
    /**
-@@ -114,7 +99,7 @@ interface DisposableStackConstructor {
+@@ -114,7 +121,7 @@ interface DisposableStackConstructor {
    new (): DisposableStack;
    readonly prototype: DisposableStack;
  }
@@ -54,7 +49,7 @@
  
  interface AsyncDisposableStack {
    /**
-@@ -181,7 +166,7 @@ interface AsyncDisposableStackConstructor {
+@@ -181,7 +188,7 @@ interface AsyncDisposableStackConstructor {
    new (): AsyncDisposableStack;
    readonly prototype: AsyncDisposableStack;
  }

@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.dom.asynciterable.d.ts b/v5.5/output/lib-files/lib.dom.asynciterable.d.ts
-index 586fe130f4724d8044e8205f0d41ddbd84025b33..638bac452fe122a5d22b250b211c43f33e6d63dc 100644
+index 80524d09c97f8ccbffd0dd69c9e24c90d7debb90..7fd07d337e642af3af29216df55bb7c5c506b93c 100644
 --- a/v5.4/output/lib-files/lib.dom.asynciterable.d.ts
 +++ b/v5.5/output/lib-files/lib.dom.asynciterable.d.ts
-@@ -12,3 +12,10 @@ interface FileSystemDirectoryHandle {
+@@ -34,3 +34,10 @@ interface FileSystemDirectoryHandle {
    keys(): AsyncIterableIterator<string>;
    values(): AsyncIterableIterator<FileSystemHandle>;
  }

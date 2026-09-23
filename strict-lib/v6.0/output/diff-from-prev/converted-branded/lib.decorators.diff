@@ -1,9 +1,28 @@
 diff --git a/v5.9/output/lib-files-branded/lib.decorators.d.ts b/v6.0/output/lib-files-branded/lib.decorators.d.ts
-index 98af8a1aedffe8ef2c98e2cf0d9335b98672d34d..d1062990587925ecde6bd5e7cc6aff9fbd33e353 100644
+index ab74030f7a46e50a58797855b6006417d08cd386..73466f216c414f19cb0b3ecc1b93ece701236ff7 100644
 --- a/v5.9/output/lib-files-branded/lib.decorators.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.decorators.d.ts
-@@ -1,4 +1,3 @@
--/// <reference no-default-lib="true"/>
- /// <reference lib="es5" />
+@@ -1,3 +1,4 @@
++/// <reference lib="es5" />
+ /*! *****************************************************************************
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+@@ -7,7 +8,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
  
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,9 +21,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
+-/// <reference no-default-lib="true"/>
+-/// <reference lib="es5" />
+-
  /**
+  * The decorator context types provided to class element decorators.
+  */

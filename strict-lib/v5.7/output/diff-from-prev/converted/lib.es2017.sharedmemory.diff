@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2017.sharedmemory.d.ts b/v5.7/output/lib-files/lib.es2017.sharedmemory.d.ts
-index 18ce9e4ebb17ddcc43e6c1718367630b8c63ee2c..24333188dd0cc1079aa5b8ac2953522ab3fa3ace 100644
+index 7a5650b67cfdfc31ec8b144493d961005aa92978..e71938f54e9a1098691ebdb01bfcbdc35573ee31 100644
 --- a/v5.6/output/lib-files/lib.es2017.sharedmemory.d.ts
 +++ b/v5.7/output/lib-files/lib.es2017.sharedmemory.d.ts
-@@ -12,14 +12,14 @@ interface SharedArrayBuffer {
+@@ -34,14 +34,14 @@ interface SharedArrayBuffer {
    /**
     * Returns a section of an SharedArrayBuffer.
     */
@@ -19,7 +19,7 @@ index 18ce9e4ebb17ddcc43e6c1718367630b8c63ee2c..24333188dd0cc1079aa5b8ac2953522a
  }
  declare const SharedArrayBuffer: SharedArrayBufferConstructor;
  
-@@ -202,7 +202,7 @@ interface Atomics {
+@@ -224,7 +224,7 @@ interface Atomics {
     * `"not-equal"`.
     */
    wait(
@@ -28,7 +28,7 @@ index 18ce9e4ebb17ddcc43e6c1718367630b8c63ee2c..24333188dd0cc1079aa5b8ac2953522a
      index: number,
      value: number,
      timeout?: number,
-@@ -211,11 +211,15 @@ interface Atomics {
+@@ -233,11 +233,15 @@ interface Atomics {
    /**
     * Wakes up sleeping agents that are waiting on the given index of the array, returning the
     * number of agents that were awoken.

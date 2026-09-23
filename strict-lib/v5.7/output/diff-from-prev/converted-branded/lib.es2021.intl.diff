@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2021.intl.d.ts b/v5.7/output/lib-files-branded/lib.es2021.intl.d.ts
-index 7e4216e77250d539ac7ac12ace23c927e9b33602..d39190e55cb14d70f8b103beee3b61a13b992601 100644
+index 5504ccfffb6e684627133de29cbc1a43f4187845..99e13f3a686b12d59026903c63b4943fb72b0194 100644
 --- a/v5.6/output/lib-files-branded/lib.es2021.intl.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2021.intl.d.ts
-@@ -40,28 +40,28 @@ declare namespace Intl {
+@@ -62,28 +62,28 @@ declare namespace Intl {
    /**
     * The locale matching algorithm to use.
     *
@@ -35,7 +35,7 @@ index 7e4216e77250d539ac7ac12ace23c927e9b33602..d39190e55cb14d70f8b103beee3b61a1
     */
    interface ListFormatOptions {
      /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
-@@ -82,26 +82,26 @@ declare namespace Intl {
+@@ -104,26 +104,26 @@ declare namespace Intl {
      /**
       * Returns a string with a language-specific representation of the list.
       *
@@ -66,7 +66,7 @@ index 7e4216e77250d539ac7ac12ace23c927e9b33602..d39190e55cb14d70f8b103beee3b61a1
       */
      formatToParts(list: Iterable<string>): readonly {
        readonly type: 'element' | 'literal';
-@@ -113,7 +113,7 @@ declare namespace Intl {
+@@ -135,7 +135,7 @@ declare namespace Intl {
       * formatting options computed during the construction of the current
       * `Intl.ListFormat` object.
       *
@@ -75,7 +75,7 @@ index 7e4216e77250d539ac7ac12ace23c927e9b33602..d39190e55cb14d70f8b103beee3b61a1
       */
      resolvedOptions(): ResolvedListFormatOptions;
    }
-@@ -122,19 +122,19 @@ declare namespace Intl {
+@@ -144,19 +144,19 @@ declare namespace Intl {
      readonly prototype: ListFormat;
  
      /**
@@ -100,7 +100,7 @@ index 7e4216e77250d539ac7ac12ace23c927e9b33602..d39190e55cb14d70f8b103beee3b61a1
       */
      new (locales?: LocalesArgument, options?: ListFormatOptions): ListFormat;
  
-@@ -144,15 +144,15 @@ declare namespace Intl {
+@@ -166,15 +166,15 @@ declare namespace Intl {
       *
       * @param locales - A string with a [BCP 47 language tag](http://tools.ietf.org/html/rfc5646), or an array of such strings.
       *  For the general form and interpretation of the `locales` argument,

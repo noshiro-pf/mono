@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2020.bigint.d.ts b/v5.7/output/lib-files/lib.es2020.bigint.d.ts
-index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275c23cc3dc 100644
+index 2faae6b6a913a53f88756bc6baa27f8eedf5abf9..3e414a01a0c9fd16699d4435380010fcf698aa70 100644
 --- a/v5.6/output/lib-files/lib.es2020.bigint.d.ts
 +++ b/v5.7/output/lib-files/lib.es2020.bigint.d.ts
-@@ -4,7 +4,7 @@
+@@ -26,7 +26,7 @@ and limitations under the License.
  
  interface BigIntToLocaleStringOptions {
    /**
@@ -11,7 +11,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
     */
    readonly localeMatcher?: string;
    /**
-@@ -154,12 +154,14 @@ declare const BigInt: BigIntConstructor;
+@@ -176,12 +176,14 @@ declare const BigInt: BigIntConstructor;
   * A typed array of 64-bit signed integer values. The contents are initialized to 0. If the
   * requested number of bytes could not be allocated, an exception is raised.
   */
@@ -28,7 +28,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** The length in bytes of the array. */
    readonly byteLength: number;
-@@ -190,7 +192,11 @@ interface BigInt64Array {
+@@ -212,7 +214,11 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    every(
@@ -41,7 +41,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): boolean;
  
-@@ -212,9 +218,13 @@ interface BigInt64Array {
+@@ -234,9 +240,13 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    filter(
@@ -57,7 +57,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -226,7 +236,11 @@ interface BigInt64Array {
+@@ -248,7 +258,11 @@ interface BigInt64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    find(
@@ -70,7 +70,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): bigint | undefined;
  
-@@ -240,7 +254,11 @@ interface BigInt64Array {
+@@ -262,7 +276,11 @@ interface BigInt64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
@@ -83,7 +83,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): number;
  
-@@ -252,7 +270,11 @@ interface BigInt64Array {
+@@ -274,7 +292,11 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
@@ -96,7 +96,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): void;
  
-@@ -301,9 +323,13 @@ interface BigInt64Array {
+@@ -323,9 +345,13 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    map(
@@ -112,7 +112,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -320,7 +346,7 @@ interface BigInt64Array {
+@@ -342,7 +368,7 @@ interface BigInt64Array {
        previousValue: bigint,
        currentValue: bigint,
        currentIndex: number,
@@ -121,7 +121,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => bigint,
    ): bigint;
  
-@@ -339,7 +365,7 @@ interface BigInt64Array {
+@@ -361,7 +387,7 @@ interface BigInt64Array {
        previousValue: U,
        currentValue: bigint,
        currentIndex: number,
@@ -130,7 +130,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => U,
      initialValue: U,
    ): U;
-@@ -359,7 +385,7 @@ interface BigInt64Array {
+@@ -381,7 +407,7 @@ interface BigInt64Array {
        previousValue: bigint,
        currentValue: bigint,
        currentIndex: number,
@@ -139,7 +139,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => bigint,
    ): bigint;
  
-@@ -378,7 +404,7 @@ interface BigInt64Array {
+@@ -400,7 +426,7 @@ interface BigInt64Array {
        previousValue: U,
        currentValue: bigint,
        currentIndex: number,
@@ -148,7 +148,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => U,
      initialValue: U,
    ): U;
-@@ -398,7 +424,7 @@ interface BigInt64Array {
+@@ -420,7 +446,7 @@ interface BigInt64Array {
     * @param start The beginning of the specified portion of the array.
     * @param end The end of the specified portion of the array.
     */
@@ -157,7 +157,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -409,7 +435,11 @@ interface BigInt64Array {
+@@ -431,7 +457,11 @@ interface BigInt64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    some(
@@ -170,7 +170,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): boolean;
  
-@@ -425,7 +455,7 @@ interface BigInt64Array {
+@@ -447,7 +477,7 @@ interface BigInt64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -179,7 +179,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
-@@ -437,7 +467,7 @@ interface BigInt64Array {
+@@ -459,7 +489,7 @@ interface BigInt64Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -188,7 +188,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** Yields each value in the array. */
    values(): ArrayIterator<bigint>;
-@@ -448,16 +478,16 @@ interface BigInt64Array {
+@@ -470,16 +500,16 @@ interface BigInt64Array {
  
    [index: number]: bigint;
  }
@@ -212,7 +212,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** The size in bytes of each element in the array. */
    readonly BYTES_PER_ELEMENT: 8;
-@@ -466,7 +496,7 @@ interface BigInt64ArrayConstructor {
+@@ -488,7 +518,7 @@ interface BigInt64ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -221,7 +221,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -474,26 +504,33 @@ interface BigInt64ArrayConstructor {
+@@ -496,26 +526,33 @@ interface BigInt64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -260,7 +260,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** The length in bytes of the array. */
    readonly byteLength: number;
-@@ -524,7 +561,11 @@ interface BigUint64Array {
+@@ -546,7 +583,11 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    every(
@@ -273,7 +273,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): boolean;
  
-@@ -546,9 +587,13 @@ interface BigUint64Array {
+@@ -568,9 +609,13 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    filter(
@@ -289,7 +289,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -560,7 +605,11 @@ interface BigUint64Array {
+@@ -582,7 +627,11 @@ interface BigUint64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    find(
@@ -302,7 +302,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): bigint | undefined;
  
-@@ -574,7 +623,11 @@ interface BigUint64Array {
+@@ -596,7 +645,11 @@ interface BigUint64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
@@ -315,7 +315,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): number;
  
-@@ -586,7 +639,11 @@ interface BigUint64Array {
+@@ -608,7 +661,11 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
@@ -328,7 +328,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): void;
  
-@@ -635,9 +692,13 @@ interface BigUint64Array {
+@@ -657,9 +714,13 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    map(
@@ -344,7 +344,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -654,7 +715,7 @@ interface BigUint64Array {
+@@ -676,7 +737,7 @@ interface BigUint64Array {
        previousValue: bigint,
        currentValue: bigint,
        currentIndex: number,
@@ -353,7 +353,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => bigint,
    ): bigint;
  
-@@ -673,7 +734,7 @@ interface BigUint64Array {
+@@ -695,7 +756,7 @@ interface BigUint64Array {
        previousValue: U,
        currentValue: bigint,
        currentIndex: number,
@@ -362,7 +362,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => U,
      initialValue: U,
    ): U;
-@@ -693,7 +754,7 @@ interface BigUint64Array {
+@@ -715,7 +776,7 @@ interface BigUint64Array {
        previousValue: bigint,
        currentValue: bigint,
        currentIndex: number,
@@ -371,7 +371,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => bigint,
    ): bigint;
  
-@@ -712,7 +773,7 @@ interface BigUint64Array {
+@@ -734,7 +795,7 @@ interface BigUint64Array {
        previousValue: U,
        currentValue: bigint,
        currentIndex: number,
@@ -380,7 +380,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      ) => U,
      initialValue: U,
    ): U;
-@@ -732,7 +793,7 @@ interface BigUint64Array {
+@@ -754,7 +815,7 @@ interface BigUint64Array {
     * @param start The beginning of the specified portion of the array.
     * @param end The end of the specified portion of the array.
     */
@@ -389,7 +389,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -743,7 +804,11 @@ interface BigUint64Array {
+@@ -765,7 +826,11 @@ interface BigUint64Array {
     * If thisArg is omitted, undefined is used as the this value.
     */
    some(
@@ -402,7 +402,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
      thisArg?: unknown,
    ): boolean;
  
-@@ -759,7 +824,7 @@ interface BigUint64Array {
+@@ -781,7 +846,7 @@ interface BigUint64Array {
     * @param begin The index of the beginning of the array.
     * @param end The index of the end of the array.
     */
@@ -411,7 +411,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
-@@ -771,7 +836,7 @@ interface BigUint64Array {
+@@ -793,7 +858,7 @@ interface BigUint64Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -420,7 +420,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** Yields each value in the array. */
    values(): ArrayIterator<bigint>;
-@@ -782,16 +847,18 @@ interface BigUint64Array {
+@@ -804,16 +869,18 @@ interface BigUint64Array {
  
    [index: number]: bigint;
  }
@@ -445,7 +445,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /** The size in bytes of each element in the array. */
    readonly BYTES_PER_ELEMENT: 8;
-@@ -800,7 +867,7 @@ interface BigUint64ArrayConstructor {
+@@ -822,7 +889,7 @@ interface BigUint64ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -454,7 +454,7 @@ index 0f1e14022f3a639ec2ce81a66f98988260d447af..fe09957cdc7589f72034b881c51a7275
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -815,10 +882,9 @@ interface BigUint64ArrayConstructor {
+@@ -837,10 +904,9 @@ interface BigUint64ArrayConstructor {
      thisArg?: unknown,
    ): BigUint64Array;
  }

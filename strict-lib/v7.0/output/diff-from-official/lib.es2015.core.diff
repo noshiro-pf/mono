@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2015.core.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  interface Array<T> {
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -24,12 +9,12 @@ interface Array<T> {
+@@ -24,12 +31,12 @@ interface Array<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    find<S extends T>(
@@ -34,7 +29,7 @@
    ): T | undefined;
  
    /**
-@@ -42,8 +27,8 @@ interface Array<T> {
+@@ -42,8 +49,8 @@ interface Array<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
@@ -45,7 +40,7 @@
    ): number;
  
    /**
-@@ -68,7 +53,7 @@ interface Array<T> {
+@@ -68,7 +75,7 @@ interface Array<T> {
    copyWithin(target: number, start: number, end?: number): this;
  
    toLocaleString(
@@ -54,7 +49,7 @@
      options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
    ): string;
  }
-@@ -89,14 +74,14 @@ interface ArrayConstructor {
+@@ -89,14 +96,14 @@ interface ArrayConstructor {
    from<T, U>(
      arrayLike: ArrayLike<T>,
      mapfn: (v: T, k: number) => U,
@@ -71,7 +66,7 @@
  }
  
  interface DateConstructor {
-@@ -115,7 +100,7 @@ interface Math {
+@@ -115,7 +122,7 @@ interface Math {
     * Returns the number of leading zero bits in the 32-bit binary representation of a number.
     * @param x A numeric expression.
     */
@@ -80,7 +75,7 @@
  
    /**
     * Returns the result of 32-bit multiplication of two numbers.
-@@ -201,7 +186,7 @@ interface Math {
+@@ -201,7 +208,7 @@ interface Math {
     *     If any argument is NaN, the result is NaN.
     *     If all arguments are either +0 or −0, the result is +0.
     */
@@ -89,7 +84,7 @@
  
    /**
     * Returns the integral part of the numeric expression x, removing any fractional digits.
-@@ -237,13 +222,13 @@ interface NumberConstructor {
+@@ -237,13 +244,13 @@ interface NumberConstructor {
     * number. Only finite values of the type number, result in true.
     * @param number A numeric value.
     */
@@ -105,7 +100,7 @@
  
    /**
     * Returns a Boolean value that indicates whether a value is the reserved value NaN (not a
-@@ -251,13 +236,13 @@ interface NumberConstructor {
+@@ -251,13 +258,13 @@ interface NumberConstructor {
     * to a number. Only values of the type number, that are also NaN, result in true.
     * @param number A numeric value.
     */
@@ -121,7 +116,7 @@
  
    /**
     * The value of the largest integer n such that n and n + 1 are both exactly representable as
-@@ -286,7 +271,10 @@ interface NumberConstructor {
+@@ -286,7 +293,10 @@ interface NumberConstructor {
     * If this argument is not supplied, strings with a prefix of '0x' are considered hexadecimal.
     * All other strings are considered decimal.
     */
@@ -133,7 +128,7 @@
  }
  
  interface ObjectConstructor {
-@@ -328,33 +316,33 @@ interface ObjectConstructor {
+@@ -328,33 +338,33 @@ interface ObjectConstructor {
     * @param target The target object to copy to.
     * @param sources One or more source objects from which to copy properties
     */
@@ -172,7 +167,7 @@
  }
  
  interface ReadonlyArray<T> {
-@@ -369,11 +357,11 @@ interface ReadonlyArray<T> {
+@@ -369,11 +379,11 @@ interface ReadonlyArray<T> {
     */
    find<S extends T>(
      predicate: (value: T, index: number, obj: readonly T[]) => value is S,
@@ -187,7 +182,7 @@
    ): T | undefined;
  
    /**
-@@ -386,12 +374,12 @@ interface ReadonlyArray<T> {
+@@ -386,12 +396,12 @@ interface ReadonlyArray<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    findIndex(
@@ -203,7 +198,7 @@
      options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions,
    ): string;
  }
-@@ -576,7 +564,7 @@ interface StringConstructor {
+@@ -576,7 +586,7 @@ interface StringConstructor {
     * Return the String value whose elements are, in order, the elements in the List elements.
     * If length is 0, the empty string is returned.
     */
@@ -212,7 +207,7 @@
  
    /**
     * String.raw is usually used as a tag function of a Tagged Template String. When called as
-@@ -588,70 +576,70 @@ interface StringConstructor {
+@@ -588,70 +598,70 @@ interface StringConstructor {
     * @param substitutions A set of substitution values.
     */
    raw(

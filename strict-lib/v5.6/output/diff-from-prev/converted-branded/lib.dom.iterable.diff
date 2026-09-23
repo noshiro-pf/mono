@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.iterable.d.ts b/v5.6/output/lib-files-branded/lib.dom.iterable.d.ts
-index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23dc88da80a 100644
+index a09f4024e98a0ddd9c226cc47b9e16c0a336cd18..a86be9436354f865ad04364e880b7cc03663aba8 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.iterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.iterable.d.ts
-@@ -35,40 +35,38 @@ interface BaseAudioContext {
+@@ -57,40 +57,38 @@ interface BaseAudioContext {
  }
  
  interface CSSKeyframesRule {
@@ -58,7 +58,7 @@ index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23d
  }
  
  interface Cache {
-@@ -95,70 +93,86 @@ interface CanvasPathDrawingStyles {
+@@ -117,70 +115,86 @@ interface CanvasPathDrawingStyles {
  interface CustomStateSet extends Set<string> {}
  
  interface DOMRectList {
@@ -166,7 +166,7 @@ index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23d
  }
  
  interface Highlight extends Set<AbstractRange> {}
-@@ -202,25 +216,29 @@ interface MIDIOutput {
+@@ -224,25 +238,29 @@ interface MIDIOutput {
  
  interface MIDIOutputMap extends ReadonlyMap<string, MIDIOutput> {}
  
@@ -206,7 +206,7 @@ index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23d
    initMessageEvent(
      type: string,
      bubbles?: boolean,
-@@ -234,11 +252,11 @@ interface MessageEvent<T = unknown> {
+@@ -256,11 +274,11 @@ interface MessageEvent<T = unknown> {
  }
  
  interface MimeTypeArray {
@@ -220,7 +220,7 @@ index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23d
  }
  
  interface Navigator {
-@@ -256,83 +274,93 @@ interface Navigator {
+@@ -278,83 +296,93 @@ interface Navigator {
  }
  
  interface NodeList {
@@ -338,7 +338,7 @@ index 1a0f200ed1d731aa59baf35c8430a937ed547d71..da1b5038f5711946cfc9092008c0c23d
  }
  
  interface SubtleCrypto {
-@@ -422,25 +450,33 @@ interface SubtleCrypto {
+@@ -444,25 +472,33 @@ interface SubtleCrypto {
  }
  
  interface TextTrackCueList {

@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.es2019.intl.d.ts b/v5.5/output/lib-files/lib.es2019.intl.d.ts
-index 7ff014edd487474e56489f98ff6f89247700ad37..69f1cfefe4efd0d117ddbb3c914cb7fe05f0ece0 100644
+index 36be26126a8b6c2c1a41470075d8451dbc0d88ea..4fbe7f2f4da50123b7f0ff2b5d01116ca717e59d 100644
 --- a/v5.4/output/lib-files/lib.es2019.intl.d.ts
 +++ b/v5.5/output/lib-files/lib.es2019.intl.d.ts
-@@ -2,6 +2,6 @@
+@@ -24,6 +24,6 @@ and limitations under the License.
  
  declare namespace Intl {
    interface DateTimeFormatPartTypesRegistry {

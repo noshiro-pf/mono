@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files/lib.es2023.array.d.ts b/v5.2/output/lib-files/lib.es2023.array.d.ts
-index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad504623a497 100644
+index e2284333e9165064dc857d80806ea9a7a98ed815..b8adf45b113b7573c206066cf33f60fb6f6e4d03 100644
 --- a/v5.1/output/lib-files/lib.es2023.array.d.ts
 +++ b/v5.2/output/lib-files/lib.es2023.array.d.ts
-@@ -32,6 +32,50 @@ interface Array<T> {
+@@ -54,6 +54,50 @@ interface Array<T> {
      predicate: (value: T, index: number, array: readonly T[]) => boolean,
      thisArg?: unknown,
    ): number;
@@ -53,7 +53,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface ReadonlyArray<T> {
-@@ -66,6 +110,50 @@ interface ReadonlyArray<T> {
+@@ -88,6 +132,50 @@ interface ReadonlyArray<T> {
      predicate: (value: T, index: number, array: readonly T[]) => boolean,
      thisArg?: unknown,
    ): number;
@@ -104,7 +104,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Int8Array {
-@@ -112,6 +200,39 @@ interface Int8Array {
+@@ -134,6 +222,39 @@ interface Int8Array {
      ) => boolean,
      thisArg?: unknown,
    ): number;
@@ -144,7 +144,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Uint8Array {
-@@ -158,6 +279,39 @@ interface Uint8Array {
+@@ -180,6 +301,39 @@ interface Uint8Array {
      ) => boolean,
      thisArg?: unknown,
    ): number;
@@ -184,7 +184,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Uint8ClampedArray {
-@@ -204,6 +358,39 @@ interface Uint8ClampedArray {
+@@ -226,6 +380,39 @@ interface Uint8ClampedArray {
      ) => boolean,
      thisArg?: unknown,
    ): number;
@@ -224,7 +224,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Int16Array {
-@@ -238,6 +425,34 @@ interface Int16Array {
+@@ -260,6 +447,34 @@ interface Int16Array {
      predicate: (value: number, index: number, array: Int16Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -259,7 +259,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Uint16Array {
-@@ -272,6 +487,34 @@ interface Uint16Array {
+@@ -294,6 +509,34 @@ interface Uint16Array {
      predicate: (value: number, index: number, array: Uint16Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -294,7 +294,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Int32Array {
-@@ -306,6 +549,34 @@ interface Int32Array {
+@@ -328,6 +571,34 @@ interface Int32Array {
      predicate: (value: number, index: number, array: Int32Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -329,7 +329,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Uint32Array {
-@@ -340,6 +611,34 @@ interface Uint32Array {
+@@ -362,6 +633,34 @@ interface Uint32Array {
      predicate: (value: number, index: number, array: Uint32Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -364,7 +364,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Float32Array {
-@@ -378,6 +677,34 @@ interface Float32Array {
+@@ -400,6 +699,34 @@ interface Float32Array {
      predicate: (value: number, index: number, array: Float32Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -399,7 +399,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface Float64Array {
-@@ -416,6 +743,34 @@ interface Float64Array {
+@@ -438,6 +765,34 @@ interface Float64Array {
      predicate: (value: number, index: number, array: Float64Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -434,7 +434,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface BigInt64Array {
-@@ -454,6 +809,34 @@ interface BigInt64Array {
+@@ -476,6 +831,34 @@ interface BigInt64Array {
      predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
      thisArg?: unknown,
    ): number;
@@ -469,7 +469,7 @@ index b82888df29c9270fea4182d333686cce021ea66f..71eb5d84dbc203e82e96e823b105ad50
  }
  
  interface BigUint64Array {
-@@ -492,4 +875,32 @@ interface BigUint64Array {
+@@ -514,4 +897,32 @@ interface BigUint64Array {
      predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
      thisArg?: unknown,
    ): number;

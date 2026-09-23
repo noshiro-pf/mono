@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2022.d.ts b/v5.7/output/lib-files/lib.es2022.d.ts
-index eb852adb24e488edcca65ba1844e7c8fdb8647fc..4388e20e623be73f2ba303d51f49c874a611ab65 100644
+index 510a59d8825c5e622ca873e928980931e170b010..a191847316d6270128731280e99e6121b7496176 100644
 --- a/v5.6/output/lib-files/lib.es2022.d.ts
 +++ b/v5.7/output/lib-files/lib.es2022.d.ts
-@@ -5,6 +5,5 @@
+@@ -27,6 +27,5 @@ and limitations under the License.
  /// <reference path="./lib.es2022.error.d.ts" />
  /// <reference path="./lib.es2022.intl.d.ts" />
  /// <reference path="./lib.es2022.object.d.ts" />

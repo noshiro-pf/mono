@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files/lib.es2017.object.d.ts b/v5.6/output/lib-files/lib.es2017.object.d.ts
-index 2bba1751be7e624c1399e284cb5ddd169900f809..837d24a3b7fde8634914686da214a98642bdaebb 100644
+index 2d37c7d79fd477771e2bc57083265e2c1bb93892..f0fd14e97cdf2949de0b10d378b8f638c0b86ba6 100644
 --- a/v5.5/output/lib-files/lib.es2017.object.d.ts
 +++ b/v5.6/output/lib-files/lib.es2017.object.d.ts
-@@ -53,19 +53,19 @@ declare namespace StrictLibInternals {
+@@ -75,19 +75,19 @@ declare namespace StrictLibInternals {
  
  interface ObjectConstructor {
    /**
@@ -25,7 +25,7 @@ index 2bba1751be7e624c1399e284cb5ddd169900f809..837d24a3b7fde8634914686da214a986
     * @param o Object that contains the properties and methods. This can be an object that you created or an existing Document Object Model (DOM) object.
     *
     * ```ts
-@@ -97,7 +97,7 @@ interface ObjectConstructor {
+@@ -119,7 +119,7 @@ interface ObjectConstructor {
    ): (readonly [string, T])[];
  
    /**

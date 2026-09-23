@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2023.array.d.ts b/v5.2/output/lib-files-branded/lib.es2023.array.d.ts
-index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758a1cb86ca 100644
+index b3660ee49d602b57f368c14e6a8b568c56f94b20..e6945e3e302e4750dbe4495dcd93c72c151a1fe7 100644
 --- a/v5.1/output/lib-files-branded/lib.es2023.array.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2023.array.d.ts
-@@ -44,6 +44,57 @@ interface Array<T> {
+@@ -66,6 +66,57 @@ interface Array<T> {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.ArraySearchResult;
@@ -60,7 +60,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface ReadonlyArray<T> {
-@@ -90,6 +141,57 @@ interface ReadonlyArray<T> {
+@@ -112,6 +163,57 @@ interface ReadonlyArray<T> {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.ArraySearchResult;
@@ -118,7 +118,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Int8Array {
-@@ -136,6 +238,42 @@ interface Int8Array {
+@@ -158,6 +260,42 @@ interface Int8Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -161,7 +161,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Uint8Array {
-@@ -182,6 +320,42 @@ interface Uint8Array {
+@@ -204,6 +342,42 @@ interface Uint8Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -204,7 +204,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Uint8ClampedArray {
-@@ -228,6 +402,42 @@ interface Uint8ClampedArray {
+@@ -250,6 +424,42 @@ interface Uint8ClampedArray {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -247,7 +247,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Int16Array {
-@@ -274,6 +484,42 @@ interface Int16Array {
+@@ -296,6 +506,42 @@ interface Int16Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -290,7 +290,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Uint16Array {
-@@ -320,6 +566,42 @@ interface Uint16Array {
+@@ -342,6 +588,42 @@ interface Uint16Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -333,7 +333,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Int32Array {
-@@ -366,6 +648,42 @@ interface Int32Array {
+@@ -388,6 +670,42 @@ interface Int32Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -376,7 +376,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Uint32Array {
-@@ -412,6 +730,42 @@ interface Uint32Array {
+@@ -434,6 +752,42 @@ interface Uint32Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -419,7 +419,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Float32Array {
-@@ -458,6 +812,42 @@ interface Float32Array {
+@@ -480,6 +834,42 @@ interface Float32Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -462,7 +462,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface Float64Array {
-@@ -504,6 +894,42 @@ interface Float64Array {
+@@ -526,6 +916,42 @@ interface Float64Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -505,7 +505,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface BigInt64Array {
-@@ -550,6 +976,42 @@ interface BigInt64Array {
+@@ -572,6 +998,42 @@ interface BigInt64Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
@@ -548,7 +548,7 @@ index 80477a6c12e685ab6648a0b0bb98821a7a138078..0751713e18c6aa6e19b67094e2077758
  }
  
  interface BigUint64Array {
-@@ -596,4 +1058,40 @@ interface BigUint64Array {
+@@ -618,4 +1080,40 @@ interface BigUint64Array {
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;

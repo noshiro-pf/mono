@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.decorators.legacy.d.ts b/v6.0/output/lib-files/lib.decorators.legacy.d.ts
-index 91a9dca664151a4c24ccd2c3f14ac20be9b23406..e7364ff990197481bf4d629e624acd60c40a4242 100644
+index d0d7847512c6dee87de506c4067c36ec81adea67..15b79d33566353e280a953c7a15fa4a82db80e25 100644
 --- a/v5.9/output/lib-files/lib.decorators.legacy.d.ts
 +++ b/v6.0/output/lib-files/lib.decorators.legacy.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  declare type ClassDecorator = <TFunction extends Function>(

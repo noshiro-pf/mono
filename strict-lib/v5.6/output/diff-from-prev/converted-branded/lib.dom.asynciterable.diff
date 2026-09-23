@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.asynciterable.d.ts b/v5.6/output/lib-files-branded/lib.dom.asynciterable.d.ts
-index 638bac452fe122a5d22b250b211c43f33e6d63dc..656b891fdaaabe3b5d6668911a9002e8e896b4cb 100644
+index 7fd07d337e642af3af29216df55bb7c5c506b93c..8a093be5b1b9d954bcc8343551920c3e7af5e89b 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.asynciterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.asynciterable.d.ts
-@@ -4,18 +4,38 @@
+@@ -26,18 +26,38 @@ and limitations under the License.
  /// Window Async Iterable APIs
  /////////////////////////////
  

@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.es2021.full.d.ts b/v5.4/output/lib-files/lib.es2021.full.d.ts
-index b8283cc187cb29dbe9fface451c2de4aed2954b3..ca5c00db1a66cd3ea7c4c08ab7add35ca215e8d6 100644
+index a0b32b6b6b2fb5e73a40ddf8086200b2403d8d62..0e0340cb1f9ef350aefc1bd6422b0fa065938369 100644
 --- a/v5.3/output/lib-files/lib.es2021.full.d.ts
 +++ b/v5.4/output/lib-files/lib.es2021.full.d.ts
-@@ -5,3 +5,4 @@
+@@ -27,3 +27,4 @@ and limitations under the License.
  /// <reference path="./lib.webworker.importscripts.d.ts" />
  /// <reference path="./lib.scripthost.d.ts" />
  /// <reference path="./lib.dom.iterable.d.ts" />

@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files/lib.es2015.iterable.d.ts b/v5.8/output/lib-files/lib.es2015.iterable.d.ts
-index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6932a8f91 100644
+index c5f53f603a3d47dceb5560223f6cd41f29bc57ef..6a588febfbdb61ea74239469e068144813fbd4d1 100644
 --- a/v5.7/output/lib-files/lib.es2015.iterable.d.ts
 +++ b/v5.8/output/lib-files/lib.es2015.iterable.d.ts
-@@ -208,10 +208,12 @@ interface SetIterator<T> extends IteratorObject<
+@@ -230,10 +230,12 @@ interface SetIterator<T> extends IteratorObject<
  interface Set<T> {
    /** Iterates over values in the set. */
    [Symbol.iterator](): SetIterator<T>;
@@ -15,7 +15,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Despite its name, returns an iterable of the values in the set.
     */
-@@ -289,14 +291,17 @@ interface String {
+@@ -311,14 +313,17 @@ interface String {
  
  interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Int8>;
@@ -33,7 +33,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -308,19 +313,18 @@ interface Int8ArrayConstructor {
+@@ -330,19 +335,18 @@ interface Int8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -57,7 +57,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => import('ts-type-forge').Int8,
      thisArg?: unknown,
    ): Int8Array<ArrayBuffer>;
-@@ -328,14 +332,17 @@ interface Int8ArrayConstructor {
+@@ -350,14 +354,17 @@ interface Int8ArrayConstructor {
  
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
@@ -75,7 +75,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -347,19 +354,18 @@ interface Uint8ArrayConstructor {
+@@ -369,19 +376,18 @@ interface Uint8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -99,7 +99,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => import('ts-type-forge').Uint8,
      thisArg?: unknown,
    ): Uint8Array<ArrayBuffer>;
-@@ -367,6 +373,7 @@ interface Uint8ArrayConstructor {
+@@ -389,6 +395,7 @@ interface Uint8ArrayConstructor {
  
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
@@ -107,7 +107,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an array of key, value pairs for every entry in the array
     */
-@@ -388,21 +395,20 @@ interface Uint8ClampedArrayConstructor {
+@@ -410,21 +417,20 @@ interface Uint8ClampedArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -133,7 +133,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => import('ts-type-forge').Uint8,
      thisArg?: unknown,
    ): Uint8ClampedArray<ArrayBuffer>;
-@@ -431,19 +437,18 @@ interface Int16ArrayConstructor {
+@@ -453,19 +459,18 @@ interface Int16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -157,7 +157,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => number,
      thisArg?: unknown,
    ): Int16Array<ArrayBuffer>;
-@@ -451,14 +456,17 @@ interface Int16ArrayConstructor {
+@@ -473,14 +478,17 @@ interface Int16ArrayConstructor {
  
  interface Uint16Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<number>;
@@ -175,7 +175,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -470,19 +478,18 @@ interface Uint16ArrayConstructor {
+@@ -492,19 +500,18 @@ interface Uint16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -199,7 +199,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => number,
      thisArg?: unknown,
    ): Uint16Array<ArrayBuffer>;
-@@ -490,14 +497,17 @@ interface Uint16ArrayConstructor {
+@@ -512,14 +519,17 @@ interface Uint16ArrayConstructor {
  
  interface Int32Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<number>;
@@ -217,7 +217,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -509,19 +519,18 @@ interface Int32ArrayConstructor {
+@@ -531,19 +541,18 @@ interface Int32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -241,7 +241,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => number,
      thisArg?: unknown,
    ): Int32Array<ArrayBuffer>;
-@@ -529,14 +538,17 @@ interface Int32ArrayConstructor {
+@@ -551,14 +560,17 @@ interface Int32ArrayConstructor {
  
  interface Uint32Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<number>;
@@ -259,7 +259,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -548,19 +560,18 @@ interface Uint32ArrayConstructor {
+@@ -570,19 +582,18 @@ interface Uint32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -283,7 +283,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => number,
      thisArg?: unknown,
    ): Uint32Array<ArrayBuffer>;
-@@ -568,14 +579,17 @@ interface Uint32ArrayConstructor {
+@@ -590,14 +601,17 @@ interface Uint32ArrayConstructor {
  
  interface Float32Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<number>;
@@ -301,7 +301,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -587,19 +601,18 @@ interface Float32ArrayConstructor {
+@@ -609,19 +623,18 @@ interface Float32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -325,7 +325,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
      mapfn?: (v: T, k: number) => number,
      thisArg?: unknown,
    ): Float32Array<ArrayBuffer>;
-@@ -607,14 +620,17 @@ interface Float32ArrayConstructor {
+@@ -629,14 +642,17 @@ interface Float32ArrayConstructor {
  
  interface Float64Array<TArrayBuffer extends ArrayBufferLike> {
    [Symbol.iterator](): ArrayIterator<number>;
@@ -343,7 +343,7 @@ index 1de4dc587c7679122a21f5a569c51815ac2e3c7c..bb87028a70f386e6b7e246e7c4832dd6
    /**
     * Returns an list of values in the array
     */
-@@ -626,19 +642,18 @@ interface Float64ArrayConstructor {
+@@ -648,19 +664,18 @@ interface Float64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.

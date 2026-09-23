@@ -1,25 +1,20 @@
-@@ -1,19 +1,5 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,7 +13,15 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2015.reflect.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
 +/// <reference lib="es5" />
  
  declare namespace Reflect {
    /**
-@@ -23,16 +9,16 @@ declare namespace Reflect {
+@@ -23,16 +31,16 @@ declare namespace Reflect {
     * @param thisArgument The object to be used as the this object.
     * @param argumentsList An array of argument values to be passed to the function.
     */
@@ -40,7 +35,7 @@
  
    /**
     * Constructs the target with the elements of specified array as the arguments
-@@ -41,16 +27,16 @@ declare namespace Reflect {
+@@ -41,16 +49,16 @@ declare namespace Reflect {
     * @param argumentsList An array of argument values to be passed to the constructor.
     * @param newTarget The constructor to be used as the `new.target` object.
     */
@@ -61,7 +56,7 @@
  
    /**
     * Adds a property to an object, or modifies attributes of an existing property.
-@@ -62,7 +48,7 @@ declare namespace Reflect {
+@@ -62,7 +70,7 @@ declare namespace Reflect {
    function defineProperty(
      target: object,
      propertyKey: PropertyKey,
@@ -70,7 +65,7 @@
    ): boolean;
  
    /**
-@@ -84,7 +70,7 @@ declare namespace Reflect {
+@@ -84,7 +92,7 @@ declare namespace Reflect {
      target: T,
      propertyKey: P,
      receiver?: unknown,
@@ -79,7 +74,7 @@
  
    /**
     * Gets the own property descriptor of the specified object.
-@@ -95,7 +81,7 @@ declare namespace Reflect {
+@@ -95,7 +103,7 @@ declare namespace Reflect {
    function getOwnPropertyDescriptor<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,
@@ -88,7 +83,7 @@
  
    /**
     * Returns the prototype of an object.
-@@ -140,14 +126,14 @@ declare namespace Reflect {
+@@ -140,14 +148,14 @@ declare namespace Reflect {
    function set<T extends object, P extends PropertyKey>(
      target: T,
      propertyKey: P,

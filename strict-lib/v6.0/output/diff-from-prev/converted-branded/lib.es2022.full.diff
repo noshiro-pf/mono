@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2022.full.d.ts b/v6.0/output/lib-files-branded/lib.es2022.full.d.ts
-index ad97999006e1ae9f5186b010f00a6c7a59ac8d0c..823291fafff8f75b1f1041bb72dffacb68f5d78c 100644
+index e8a1407219f6ef04fb86a7d1db85235a5cb5f7ca..dc67a784f790bd5d3f577825102d69a3b79453ba 100644
 --- a/v5.9/output/lib-files-branded/lib.es2022.full.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2022.full.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2022.d.ts" />

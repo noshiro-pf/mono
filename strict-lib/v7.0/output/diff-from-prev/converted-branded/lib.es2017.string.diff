@@ -1,8 +1,9 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2017.string.d.ts b/v7.0/output/lib-files-branded/lib.es2017.string.d.ts
-index fd102d3fc1d6e4fc603177138b99ba1ec664ed92..e1711db63f1bcc10717a567c47ef344de88c2641 100644
+index 8948b51178d3d5412e5ac751e306fb07f42affb0..43224c60c7f4470434ffc3d443d84fb951f19b79 100644
 --- a/v6.0/output/lib-files-branded/lib.es2017.string.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2017.string.d.ts
-@@ -1,33 +1,37 @@
+@@ -22,34 +22,38 @@ and limitations under the License.
+ 
  interface String {
    /**
 -   * Pads the current string with a given string (possibly repeated) so that the resulting string reaches a given length.

@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.collection.d.ts b/v6.0/output/lib-files/lib.esnext.collection.d.ts
-index 3ac131fa90ac3247f55b0c55a3a528b30266a0e3..ebe5503fe9188440e6de6d7ac5c31aa3766fff0f 100644
+index e70411b5308e2da6560e6f3a28a132abc0abc0b8..dbeefb990a425cc4a95e38a4057993835ee4e57a 100644
 --- a/v5.9/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v6.0/output/lib-files/lib.esnext.collection.d.ts
-@@ -1,80 +1,31 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,83 +20,34 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 +/// <reference path="./lib.es2025.collection.d.ts" />
  

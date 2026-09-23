@@ -1,9 +1,31 @@
 diff --git a/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts b/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..f85fdba98664c975391e078684a184d34a68c73f
+index 0000000000000000000000000000000000000000..cb8af78b474c70b148669f2678b9f1c1263dd5e9
 --- /dev/null
 +++ b/v5.7/output/lib-files-branded/lib.es2024.regexp.d.ts
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,31 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABLITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.es2024.regexp.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference no-default-lib="true"/>
 +
 +interface RegExp {

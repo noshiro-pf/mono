@@ -17,7 +17,9 @@
     "libs-branded",
     "!libs/**/package.json",
     "link-libs.mjs",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "type": "module",
   "sideEffects": false,

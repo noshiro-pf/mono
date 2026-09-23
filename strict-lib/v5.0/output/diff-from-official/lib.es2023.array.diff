@@ -1,23 +1,18 @@
-@@ -1,18 +1,3 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2023.array.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  interface Array<T> {
-@@ -26,12 +11,12 @@ interface Array<T> {
+@@ -26,12 +33,12 @@ interface Array<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLast<S extends T>(
@@ -34,7 +29,7 @@
    ): T | undefined;
  
    /**
-@@ -44,8 +29,8 @@ interface Array<T> {
+@@ -44,8 +51,8 @@ interface Array<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -45,7 +40,7 @@
    ): number;
  }
  
-@@ -61,11 +46,11 @@ interface ReadonlyArray<T> {
+@@ -61,11 +68,11 @@ interface ReadonlyArray<T> {
     */
    findLast<S extends T>(
      predicate: (value: T, index: number, array: readonly T[]) => value is S,
@@ -60,7 +55,7 @@
    ): T | undefined;
  
    /**
-@@ -78,8 +63,8 @@ interface ReadonlyArray<T> {
+@@ -78,8 +85,8 @@ interface ReadonlyArray<T> {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -71,7 +66,7 @@
    ): number;
  }
  
-@@ -93,14 +78,22 @@ interface Int8Array {
+@@ -93,14 +100,22 @@ interface Int8Array {
     * @param thisArg If provided, it will be used as the this value for each invocation of
     * predicate. If it is not provided, undefined is used instead.
     */
@@ -100,7 +95,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true, and -1
-@@ -112,8 +105,12 @@ interface Int8Array {
+@@ -112,8 +127,12 @@ interface Int8Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -115,7 +110,7 @@
    ): number;
  }
  
-@@ -127,14 +124,22 @@ interface Uint8Array {
+@@ -127,14 +146,22 @@ interface Uint8Array {
     * @param thisArg If provided, it will be used as the this value for each invocation of
     * predicate. If it is not provided, undefined is used instead.
     */
@@ -144,7 +139,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true, and -1
-@@ -146,8 +151,12 @@ interface Uint8Array {
+@@ -146,8 +173,12 @@ interface Uint8Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -159,7 +154,7 @@
    ): number;
  }
  
-@@ -161,22 +170,22 @@ interface Uint8ClampedArray {
+@@ -161,22 +192,22 @@ interface Uint8ClampedArray {
     * @param thisArg If provided, it will be used as the this value for each invocation of
     * predicate. If it is not provided, undefined is used instead.
     */
@@ -189,7 +184,7 @@
  
    /**
     * Returns the index of the last element in the array where predicate is true, and -1
-@@ -189,11 +198,11 @@ interface Uint8ClampedArray {
+@@ -189,11 +220,11 @@ interface Uint8ClampedArray {
     */
    findLastIndex(
      predicate: (
@@ -204,7 +199,7 @@
    ): number;
  }
  
-@@ -209,11 +218,11 @@ interface Int16Array {
+@@ -209,11 +240,11 @@ interface Int16Array {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: Int16Array) => value is S,
@@ -219,7 +214,7 @@
    ): number | undefined;
  
    /**
-@@ -226,8 +235,8 @@ interface Int16Array {
+@@ -226,8 +257,8 @@ interface Int16Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -230,7 +225,7 @@
    ): number;
  }
  
-@@ -243,11 +252,11 @@ interface Uint16Array {
+@@ -243,11 +274,11 @@ interface Uint16Array {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: Uint16Array) => value is S,
@@ -245,7 +240,7 @@
    ): number | undefined;
  
    /**
-@@ -260,8 +269,8 @@ interface Uint16Array {
+@@ -260,8 +291,8 @@ interface Uint16Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -256,7 +251,7 @@
    ): number;
  }
  
-@@ -277,11 +286,11 @@ interface Int32Array {
+@@ -277,11 +308,11 @@ interface Int32Array {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: Int32Array) => value is S,
@@ -271,7 +266,7 @@
    ): number | undefined;
  
    /**
-@@ -294,8 +303,8 @@ interface Int32Array {
+@@ -294,8 +325,8 @@ interface Int32Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -282,7 +277,7 @@
    ): number;
  }
  
-@@ -311,11 +320,11 @@ interface Uint32Array {
+@@ -311,11 +342,11 @@ interface Uint32Array {
     */
    findLast<S extends number>(
      predicate: (value: number, index: number, array: Uint32Array) => value is S,
@@ -297,7 +292,7 @@
    ): number | undefined;
  
    /**
-@@ -328,8 +337,8 @@ interface Uint32Array {
+@@ -328,8 +359,8 @@ interface Uint32Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -308,7 +303,7 @@
    ): number;
  }
  
-@@ -349,11 +358,11 @@ interface Float32Array {
+@@ -349,11 +380,11 @@ interface Float32Array {
        index: number,
        array: Float32Array,
      ) => value is S,
@@ -323,7 +318,7 @@
    ): number | undefined;
  
    /**
-@@ -366,8 +375,8 @@ interface Float32Array {
+@@ -366,8 +397,8 @@ interface Float32Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -334,7 +329,7 @@
    ): number;
  }
  
-@@ -387,11 +396,11 @@ interface Float64Array {
+@@ -387,11 +418,11 @@ interface Float64Array {
        index: number,
        array: Float64Array,
      ) => value is S,
@@ -349,7 +344,7 @@
    ): number | undefined;
  
    /**
-@@ -404,8 +413,8 @@ interface Float64Array {
+@@ -404,8 +435,8 @@ interface Float64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -360,7 +355,7 @@
    ): number;
  }
  
-@@ -425,11 +434,11 @@ interface BigInt64Array {
+@@ -425,11 +456,11 @@ interface BigInt64Array {
        index: number,
        array: BigInt64Array,
      ) => value is S,
@@ -375,7 +370,7 @@
    ): bigint | undefined;
  
    /**
-@@ -442,8 +451,8 @@ interface BigInt64Array {
+@@ -442,8 +473,8 @@ interface BigInt64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(
@@ -386,7 +381,7 @@
    ): number;
  }
  
-@@ -463,11 +472,11 @@ interface BigUint64Array {
+@@ -463,11 +494,11 @@ interface BigUint64Array {
        index: number,
        array: BigUint64Array,
      ) => value is S,
@@ -401,7 +396,7 @@
    ): bigint | undefined;
  
    /**
-@@ -480,7 +489,7 @@ interface BigUint64Array {
+@@ -480,7 +511,7 @@ interface BigUint64Array {
     * predicate. If it is not provided, undefined is used instead.
     */
    findLastIndex(

@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files/lib.decorators.d.ts b/v5.2/output/lib-files/lib.decorators.d.ts
-index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bcba5bfd11 100644
+index 796cef601f7a1c1265b7804bfd2eee32e09a0e34..da781b19c26701d22a816dcd031e950deddf1bb0 100644
 --- a/v5.1/output/lib-files/lib.decorators.d.ts
 +++ b/v5.2/output/lib-files/lib.decorators.d.ts
-@@ -16,6 +16,14 @@ type ClassMemberDecoratorContext =
+@@ -38,6 +38,14 @@ type ClassMemberDecoratorContext =
   */
  type DecoratorContext = ClassDecoratorContext | ClassMemberDecoratorContext;
  
@@ -17,7 +17,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  /**
   * Context provided to a class decorator.
   * @template Class The type of the decorated class associated with this context.
-@@ -51,6 +59,8 @@ interface ClassDecoratorContext<
+@@ -73,6 +81,8 @@ interface ClassDecoratorContext<
     * ```
     */
    addInitializer(initializer: (this: Class) => void): void;
@@ -26,7 +26,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  }
  
  /**
-@@ -121,6 +131,8 @@ interface ClassMethodDecoratorContext<
+@@ -143,6 +153,8 @@ interface ClassMethodDecoratorContext<
     * ```
     */
    addInitializer(initializer: (this: This) => void): void;
@@ -35,7 +35,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  }
  
  /**
-@@ -163,6 +175,8 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
+@@ -185,6 +197,8 @@ interface ClassGetterDecoratorContext<This = unknown, Value = unknown> {
     * decorating a non-`static` element).
     */
    addInitializer(initializer: (this: This) => void): void;
@@ -44,7 +44,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  }
  
  /**
-@@ -205,6 +219,8 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
+@@ -227,6 +241,8 @@ interface ClassSetterDecoratorContext<This = unknown, Value = unknown> {
     * decorating a non-`static` element).
     */
    addInitializer(initializer: (this: This) => void): void;
@@ -53,7 +53,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  }
  
  /**
-@@ -256,6 +272,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
+@@ -278,6 +294,8 @@ interface ClassAccessorDecoratorContext<This = unknown, Value = unknown> {
     * decorating a non-`static` element).
     */
    addInitializer(initializer: (this: This) => void): void;
@@ -62,7 +62,7 @@ index c0c005aa00a576488017b7f6bd6a75b50ad75162..39ce31b52116ccc745974e7f748b22bc
  }
  
  /**
-@@ -348,4 +366,6 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
+@@ -370,4 +388,6 @@ interface ClassFieldDecoratorContext<This = unknown, Value = unknown> {
     * decorating a non-`static` element).
     */
    addInitializer(initializer: (this: This) => void): void;

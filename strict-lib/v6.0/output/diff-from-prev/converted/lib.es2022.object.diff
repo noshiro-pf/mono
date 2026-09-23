@@ -1,9 +1,28 @@
 diff --git a/v5.9/output/lib-files/lib.es2022.object.d.ts b/v6.0/output/lib-files/lib.es2022.object.d.ts
-index 3c4e95571279755d8e40c61dc05488fe5a513ea0..59be2020b89cb4bae6a3afdf680bcd1ee687c1b0 100644
+index b72411b66466a644ae5684fde6ab7683649d47d7..f0f18a49b870f25603bc49ce9901eaeb3fcd0087 100644
 --- a/v5.9/output/lib-files/lib.es2022.object.d.ts
 +++ b/v6.0/output/lib-files/lib.es2022.object.d.ts
-@@ -1,4 +1,3 @@
--/// <reference no-default-lib="true"/>
- /// <reference lib="es5" />
+@@ -1,3 +1,4 @@
++/// <reference lib="es5" />
+ /*! *****************************************************************************
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+@@ -7,7 +8,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
  
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,9 +21,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
+-/// <reference no-default-lib="true"/>
+-/// <reference lib="es5" />
+-
  /**
+  * @internal
+  * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、

@@ -1,27 +1,22 @@
-@@ -1,20 +1,5 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,8 +13,15 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
 -/// <reference lib="es2015.symbol" />
 -/// <reference lib="es2015.symbol.wellknown" />
++/*
++ * Modified from TypeScript's `lib.es2017.sharedmemory.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2015.symbol.d.ts" />
 +/// <reference path="./lib.es2015.symbol.wellknown.d.ts" />
  
  interface SharedArrayBuffer {
    /**
-@@ -34,10 +19,10 @@ interface SharedArrayBufferConstructor {
+@@ -34,10 +41,10 @@ interface SharedArrayBufferConstructor {
    new (byteLength?: number): SharedArrayBuffer;
    readonly [Symbol.species]: SharedArrayBufferConstructor;
  }
@@ -34,7 +29,7 @@
  }
  
  interface Atomics {
-@@ -47,13 +32,17 @@ interface Atomics {
+@@ -47,13 +54,17 @@ interface Atomics {
     * will block.
     */
    add(
@@ -59,7 +54,7 @@
      index: number,
      value: number,
    ): number;
-@@ -64,13 +53,17 @@ interface Atomics {
+@@ -64,13 +75,17 @@ interface Atomics {
     * write operation against the array will block.
     */
    and(
@@ -84,7 +79,7 @@
      index: number,
      value: number,
    ): number;
-@@ -81,13 +74,19 @@ interface Atomics {
+@@ -81,13 +96,19 @@ interface Atomics {
     * other read or write operation against the array will block.
     */
    compareExchange(
@@ -111,7 +106,7 @@
      index: number,
      expectedValue: number,
      replacementValue: number,
-@@ -99,13 +98,17 @@ interface Atomics {
+@@ -99,13 +120,17 @@ interface Atomics {
     * block.
     */
    exchange(
@@ -136,7 +131,7 @@
      index: number,
      value: number,
    ): number;
-@@ -121,14 +124,10 @@ interface Atomics {
+@@ -121,14 +146,10 @@ interface Atomics {
     * Returns the value at the given position in the array. Until this atomic operation completes,
     * any other read or write operation against the array will block.
     */
@@ -154,7 +149,7 @@
      index: number,
    ): number;
  
-@@ -138,13 +137,17 @@ interface Atomics {
+@@ -138,13 +159,17 @@ interface Atomics {
     * operation against the array will block.
     */
    or(
@@ -179,7 +174,7 @@
      index: number,
      value: number,
    ): number;
-@@ -154,13 +157,17 @@ interface Atomics {
+@@ -154,13 +179,17 @@ interface Atomics {
     * atomic operation completes, any other read or write operation against the array will block.
     */
    store(
@@ -204,7 +199,7 @@
      index: number,
      value: number,
    ): number;
-@@ -171,13 +178,17 @@ interface Atomics {
+@@ -171,13 +200,17 @@ interface Atomics {
     * array will block.
     */
    sub(
@@ -229,7 +224,7 @@
      index: number,
      value: number,
    ): number;
-@@ -214,13 +225,17 @@ interface Atomics {
+@@ -214,13 +247,17 @@ interface Atomics {
     * operation against the array will block.
     */
    xor(
@@ -254,7 +249,7 @@
      index: number,
      value: number,
    ): number;
-@@ -228,4 +243,4 @@ interface Atomics {
+@@ -228,4 +265,4 @@ interface Atomics {
    readonly [Symbol.toStringTag]: 'Atomics';
  }
  

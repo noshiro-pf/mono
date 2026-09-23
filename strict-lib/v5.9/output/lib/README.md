@@ -38,3 +38,9 @@ TypeScript 5.9. Just do not turn it off.
 `--unlink` removes the links again.
 
 See <https://github.com/noshiro-pf/mono> for usage and version support.
+
+## License
+
+Apache-2.0, like the TypeScript lib files it is generated from
+(Copyright Microsoft Corporation). `LICENSE` and `NOTICE` in this
+package have the details.

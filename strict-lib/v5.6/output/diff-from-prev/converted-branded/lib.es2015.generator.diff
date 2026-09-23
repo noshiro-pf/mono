@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.es2015.generator.d.ts b/v5.6/output/lib-files-branded/lib.es2015.generator.d.ts
-index 56d348b5e78ed1469fed78532cbdf38d5e07e693..29e2b648c6852f0fdb565052f2bc0f4a2de5bd09 100644
+index e6f3992f740ae857ede0fdd16980db876e6f0186..698198f0c86c96489f8495f1005c88ca479bb6e1 100644
 --- a/v5.5/output/lib-files-branded/lib.es2015.generator.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.es2015.generator.d.ts
-@@ -6,9 +6,9 @@ interface Generator<
+@@ -28,9 +28,9 @@ interface Generator<
    T = unknown,
    TReturn = any,
    TNext = unknown,

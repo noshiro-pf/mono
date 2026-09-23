@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2019.array.d.ts b/v6.0/output/lib-files/lib.es2019.array.d.ts
-index b75d09d676217de535bfbff5d6fac58eaec8cd7f..df8bfbf4b99ec33739d3f04eec63bb01a46eaa5f 100644
+index ad6e6c2225a3c2507d7e27f279f934a25eb494f9..0c90f070a0e7b65173943a328b3841a68ae44dd9 100644
 --- a/v5.9/output/lib-files/lib.es2019.array.d.ts
 +++ b/v6.0/output/lib-files/lib.es2019.array.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  type FlatArray<Arr, Depth extends number> = {

@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2015.core.d.ts b/v7.0/output/lib-files-branded/lib.es2015.core.d.ts
-index 056b392d954cb9545836a209c08b6ea6b282feb5..d6db65e3ae727e793c46b9f6920cfb45d09b80a8 100644
+index d188f4fd354f139d24278041ceaaa6f853d7ae16..ba77ccbd60a8a5a0e4d8617db8f054cb85a8adf2 100644
 --- a/v6.0/output/lib-files-branded/lib.es2015.core.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es2015.core.d.ts
-@@ -133,7 +133,7 @@ interface Math {
+@@ -155,7 +155,7 @@ interface Math {
    ): import('ts-type-forge').Int32;
  
    /**

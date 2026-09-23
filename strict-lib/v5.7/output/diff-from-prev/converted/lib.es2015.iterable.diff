@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files/lib.es2015.iterable.d.ts b/v5.7/output/lib-files/lib.es2015.iterable.d.ts
-index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815ac2e3c7c 100644
+index 28425b8169da08e6c0a04108a40d353b930f484a..c5f53f603a3d47dceb5560223f6cd41f29bc57ef 100644
 --- a/v5.6/output/lib-files/lib.es2015.iterable.d.ts
 +++ b/v5.7/output/lib-files/lib.es2015.iterable.d.ts
-@@ -287,7 +287,7 @@ interface String {
+@@ -309,7 +309,7 @@ interface String {
    [Symbol.iterator](): StringIterator<string>;
  }
  
@@ -11,7 +11,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Int8>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -304,7 +304,7 @@ interface Int8Array {
+@@ -326,7 +326,7 @@ interface Int8Array {
  }
  
  interface Int8ArrayConstructor {
@@ -20,7 +20,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -312,14 +312,21 @@ interface Int8ArrayConstructor {
+@@ -334,14 +334,21 @@ interface Int8ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -45,7 +45,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -336,7 +343,7 @@ interface Uint8Array {
+@@ -358,7 +365,7 @@ interface Uint8Array {
  }
  
  interface Uint8ArrayConstructor {
@@ -54,7 +54,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -344,14 +351,21 @@ interface Uint8ArrayConstructor {
+@@ -366,14 +373,21 @@ interface Uint8ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -79,7 +79,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Uint8>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -370,7 +384,7 @@ interface Uint8ClampedArray {
+@@ -392,7 +406,7 @@ interface Uint8ClampedArray {
  }
  
  interface Uint8ClampedArrayConstructor {
@@ -88,7 +88,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -380,12 +394,21 @@ interface Uint8ClampedArrayConstructor {
+@@ -402,12 +416,21 @@ interface Uint8ClampedArrayConstructor {
     */
    from<T extends number>(
      arrayLike: Iterable<T>,
@@ -112,7 +112,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -404,7 +427,7 @@ interface Int16Array {
+@@ -426,7 +449,7 @@ interface Int16Array {
  }
  
  interface Int16ArrayConstructor {
@@ -121,7 +121,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -412,14 +435,21 @@ interface Int16ArrayConstructor {
+@@ -434,14 +457,21 @@ interface Int16ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -146,7 +146,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -436,7 +466,7 @@ interface Uint16Array {
+@@ -458,7 +488,7 @@ interface Uint16Array {
  }
  
  interface Uint16ArrayConstructor {
@@ -155,7 +155,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -444,14 +474,21 @@ interface Uint16ArrayConstructor {
+@@ -466,14 +496,21 @@ interface Uint16ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -180,7 +180,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -468,7 +505,7 @@ interface Int32Array {
+@@ -490,7 +527,7 @@ interface Int32Array {
  }
  
  interface Int32ArrayConstructor {
@@ -189,7 +189,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -476,14 +513,21 @@ interface Int32ArrayConstructor {
+@@ -498,14 +535,21 @@ interface Int32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -214,7 +214,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -500,7 +544,7 @@ interface Uint32Array {
+@@ -522,7 +566,7 @@ interface Uint32Array {
  }
  
  interface Uint32ArrayConstructor {
@@ -223,7 +223,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -508,14 +552,21 @@ interface Uint32ArrayConstructor {
+@@ -530,14 +574,21 @@ interface Uint32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -248,7 +248,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -532,7 +583,7 @@ interface Float32Array {
+@@ -554,7 +605,7 @@ interface Float32Array {
  }
  
  interface Float32ArrayConstructor {
@@ -257,7 +257,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -540,14 +591,21 @@ interface Float32ArrayConstructor {
+@@ -562,14 +613,21 @@ interface Float32ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -282,7 +282,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
    [Symbol.iterator](): ArrayIterator<number>;
    /**
     * Returns an array of key, value pairs for every entry in the array
-@@ -564,7 +622,7 @@ interface Float64Array {
+@@ -586,7 +644,7 @@ interface Float64Array {
  }
  
  interface Float64ArrayConstructor {
@@ -291,7 +291,7 @@ index 44bcbb86bfc205291e2cca0f7bec2b08f76dfa9e..1de4dc587c7679122a21f5a569c51815
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -572,9 +630,16 @@ interface Float64ArrayConstructor {
+@@ -594,9 +652,16 @@ interface Float64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */

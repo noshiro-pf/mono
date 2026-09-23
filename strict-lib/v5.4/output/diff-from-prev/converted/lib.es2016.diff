@@ -1,8 +1,8 @@
 diff --git a/v5.3/output/lib-files/lib.es2016.d.ts b/v5.4/output/lib-files/lib.es2016.d.ts
-index ccd1e132472bd0fa4036a20fef7bdf267bcca2d3..09d2179d801f6026d00d39e7bad41d02bd811a8b 100644
+index 61877e1a18c4b5cd4c2a4e3f4c0174c3db6a3c3e..a648517b5018fbcdb66dc6bf07035eb632aea81a 100644
 --- a/v5.3/output/lib-files/lib.es2016.d.ts
 +++ b/v5.4/output/lib-files/lib.es2016.d.ts
-@@ -2,3 +2,4 @@
+@@ -24,3 +24,4 @@ and limitations under the License.
  
  /// <reference path="./lib.es2015.d.ts" />
  /// <reference path="./lib.es2016.array.include.d.ts" />

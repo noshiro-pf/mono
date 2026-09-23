@@ -1,9 +1,31 @@
 diff --git a/v6.0/output/lib-files/lib.es2025.float16.d.ts b/v6.0/output/lib-files/lib.es2025.float16.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..dc857db09d986d18b4f77a25b85f1171acae6388
+index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b213dc40bc
 --- /dev/null
 +++ b/v6.0/output/lib-files/lib.es2025.float16.d.ts
-@@ -0,0 +1,503 @@
+@@ -0,0 +1,525 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABILITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.es2025.float16.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2015.symbol.d.ts" />
 +/// <reference path="./lib.es2015.iterable.d.ts" />
 +

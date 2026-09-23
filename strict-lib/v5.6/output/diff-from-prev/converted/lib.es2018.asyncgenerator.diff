@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files/lib.es2018.asyncgenerator.d.ts b/v5.6/output/lib-files/lib.es2018.asyncgenerator.d.ts
-index 97c71f49db41e73ce71250a5f9130834dac92f6e..f45b0d819610922bd6d44ceff57fbe0639c2a082 100644
+index 25d9531a658ffa95b2db6eca9b3b05fabf0e1e18..c32f6afcc1cc6e934300c571cade590301d05ccc 100644
 --- a/v5.5/output/lib-files/lib.es2018.asyncgenerator.d.ts
 +++ b/v5.6/output/lib-files/lib.es2018.asyncgenerator.d.ts
-@@ -6,10 +6,10 @@ interface AsyncGenerator<
+@@ -28,10 +28,10 @@ interface AsyncGenerator<
    T = unknown,
    TReturn = any,
    TNext = unknown,

@@ -1,8 +1,8 @@
 diff --git a/v5.6/output/lib-files-branded/lib.esnext.array.d.ts b/v5.7/output/lib-files-branded/lib.esnext.array.d.ts
-index 7223df4fc5f45616610ebb3e48fc8ffdb9bedcd8..8abaeb04945a96292bee2988f1b252b1d1232583 100644
+index d09a05dcfa065ac1dff495bd2342ce1edabf07a1..db948feddab8918de7298b0d6e9074063d088424 100644
 --- a/v5.6/output/lib-files-branded/lib.esnext.array.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.esnext.array.d.ts
-@@ -22,7 +22,7 @@ interface ArrayConstructor {
+@@ -44,7 +44,7 @@ interface ArrayConstructor {
     */
    fromAsync<T, U>(
      iterableOrArrayLike: AsyncIterable<T> | Iterable<T> | ArrayLike<T>,

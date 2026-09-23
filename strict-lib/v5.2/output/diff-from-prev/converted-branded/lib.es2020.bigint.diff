@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.2/output/lib-files-branded/lib.es2020.bigint.d.ts
-index 1280bc4e95c715c44f643394b066518e0be29672..cf1f0dff434a2d6ce92bf31ff9f2be9d7c2bc595 100644
+index ff282c3b55a96c9d5abd12915db28ab98d7f7cef..f0f25eacba900e06ec1c904a44af24ea392999e5 100644
 --- a/v5.1/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2020.bigint.d.ts
-@@ -173,7 +173,7 @@ interface BigInt64Array {
+@@ -195,7 +195,7 @@ interface BigInt64Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -11,7 +11,7 @@ index 1280bc4e95c715c44f643394b066518e0be29672..cf1f0dff434a2d6ce92bf31ff9f2be9d
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -568,7 +568,7 @@ interface BigUint64Array {
+@@ -590,7 +590,7 @@ interface BigUint64Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it

@@ -1,8 +1,8 @@
 diff --git a/v5.7/output/lib-files-branded/lib.esnext.iterator.d.ts b/v5.8/output/lib-files-branded/lib.esnext.iterator.d.ts
-index 3abf8049b92647319c17c1a4f03b7f6fed137429..9f6e1bf1fbd7212f9a09f67fa1ff0ffe22a0c0f3 100644
+index d11c72504e4de29ac306e824af6b79c477a858f5..aa477f3a68ed75f4c49e49f0794d9838b143b46d 100644
 --- a/v5.7/output/lib-files-branded/lib.esnext.iterator.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.esnext.iterator.d.ts
-@@ -125,7 +125,7 @@ declare global {
+@@ -147,7 +147,7 @@ declare global {
  
      /**
       * Performs the specified action for each element in the iterator.

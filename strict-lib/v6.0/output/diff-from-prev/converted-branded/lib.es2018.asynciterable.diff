@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2018.asynciterable.d.ts b/v6.0/output/lib-files-branded/lib.es2018.asynciterable.d.ts
-index bc643700bcf535bb94bf5768201a4ef023cf7947..19ae8e2e4f22f2707740bd0f0c9381a383c95093 100644
+index e66da031ba0fb17a36f25cfeb495d44c0bb5fc07..057ae8108c84b0d54d15b5d329998cf4f9846830 100644
 --- a/v5.9/output/lib-files-branded/lib.es2018.asynciterable.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2018.asynciterable.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  /// <reference path="./lib.es2015.symbol.d.ts" />

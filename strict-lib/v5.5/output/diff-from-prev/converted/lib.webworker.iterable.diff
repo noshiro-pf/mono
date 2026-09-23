@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.webworker.iterable.d.ts b/v5.5/output/lib-files/lib.webworker.iterable.d.ts
-index 0816bced5c2ff6369c992db23d6cc2a183446426..dcd9374d5c425f6b975e85f4bec69ddc55e92695 100644
+index 435a7754c41f7337fa01f0ed33f9ad6edcb08fcd..f70470002c055e16403ae027d58acd80da08eb0e 100644
 --- a/v5.4/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.5/output/lib-files/lib.webworker.iterable.d.ts
-@@ -4,6 +4,11 @@
+@@ -26,6 +26,11 @@ and limitations under the License.
  /// Worker Iterable APIs
  /////////////////////////////
  

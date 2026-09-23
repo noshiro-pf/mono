@@ -1,8 +1,9 @@
 diff --git a/v5.6/output/lib-files/lib.esnext.collection.d.ts b/v5.7/output/lib-files/lib.esnext.collection.d.ts
-index 2cf94d51ed7347f3243fb058a92e19ea195cecaa..3ac131fa90ac3247f55b0c55a3a528b30266a0e3 100644
+index e9ccbd80ffdd6102cb451a0f8feae9e058626000..e70411b5308e2da6560e6f3a28a132abc0abc0b8 100644
 --- a/v5.6/output/lib-files/lib.esnext.collection.d.ts
 +++ b/v5.7/output/lib-files/lib.esnext.collection.d.ts
-@@ -1,16 +1,6 @@
+@@ -22,17 +22,7 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 -interface MapConstructor {

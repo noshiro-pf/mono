@@ -1,8 +1,9 @@
 diff --git a/v5.1/output/lib-files/lib.es2021.weakref.d.ts b/v5.2/output/lib-files/lib.es2021.weakref.d.ts
-index 6eb6feb23688d08d3bd614963481a30a3639857c..6d134ad5c044dff9dd0b9f0d341311b829a5c2e8 100644
+index f6aa0e7e770cfbddd84ab6b806164dc1dabfbc56..b5e307f6b83e38134aecfd404a5d997b65d1ce53 100644
 --- a/v5.1/output/lib-files/lib.es2021.weakref.d.ts
 +++ b/v5.2/output/lib-files/lib.es2021.weakref.d.ts
-@@ -1,11 +1,12 @@
+@@ -22,12 +22,13 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 -interface WeakRef<T extends object> {
@@ -17,7 +18,7 @@ index 6eb6feb23688d08d3bd614963481a30a3639857c..6d134ad5c044dff9dd0b9f0d341311b8
     */
    deref(): T | undefined;
  }
-@@ -14,10 +15,11 @@ interface WeakRefConstructor {
+@@ -36,10 +37,11 @@ interface WeakRefConstructor {
    readonly prototype: WeakRef<object>;
  
    /**
@@ -32,7 +33,7 @@ index 6eb6feb23688d08d3bd614963481a30a3639857c..6d134ad5c044dff9dd0b9f0d341311b8
  }
  
  declare const WeakRef: WeakRefConstructor;
-@@ -26,22 +28,23 @@ interface FinalizationRegistry<T> {
+@@ -48,22 +50,23 @@ interface FinalizationRegistry<T> {
    readonly [Symbol.toStringTag]: 'FinalizationRegistry';
  
    /**
@@ -66,7 +67,7 @@ index 6eb6feb23688d08d3bd614963481a30a3639857c..6d134ad5c044dff9dd0b9f0d341311b8
  }
  
  interface FinalizationRegistryConstructor {
-@@ -49,7 +52,7 @@ interface FinalizationRegistryConstructor {
+@@ -71,7 +74,7 @@ interface FinalizationRegistryConstructor {
  
    /**
     * Creates a finalization registry with an associated cleanup callback

@@ -1,8 +1,9 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
-index bd305cae94e6e9b55356ca289d83cec9adde317c..a74f7c0643dc1e325444161dc9c124a8361777d6 100644
+index 268340e1d4476d7b1d5d4e678b10163cc873cce9..feeb46ee32a14486fcf24d4d05f24fa978c5a795 100644
 --- a/v5.6/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2020.sharedmemory.d.ts
-@@ -1,5 +1,7 @@
+@@ -22,6 +22,8 @@ and limitations under the License.
+ 
  /// <reference no-default-lib="true"/>
  
 +/// <reference path="./lib.es2020.bigint.d.ts" />
@@ -10,7 +11,7 @@ index bd305cae94e6e9b55356ca289d83cec9adde317c..a74f7c0643dc1e325444161dc9c124a8
  interface Atomics {
    /**
     * Adds a value to the value at the given position in the array, returning the original value.
-@@ -134,7 +136,7 @@ interface Atomics {
+@@ -156,7 +158,7 @@ interface Atomics {
     * `"not-equal"`.
     */
    wait(
@@ -19,7 +20,7 @@ index bd305cae94e6e9b55356ca289d83cec9adde317c..a74f7c0643dc1e325444161dc9c124a8
      index: NumberType.TypedArraySizeArg,
      value: import('ts-type-forge').BigInt64,
      timeout?: number,
-@@ -148,7 +150,7 @@ interface Atomics {
+@@ -170,7 +172,7 @@ interface Atomics {
     * @param count The number of sleeping agents to notify. Defaults to +Infinity.
     */
    notify(

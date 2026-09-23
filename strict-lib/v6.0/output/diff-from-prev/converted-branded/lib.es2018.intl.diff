@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2018.intl.d.ts b/v6.0/output/lib-files-branded/lib.es2018.intl.d.ts
-index 3e2dbe8b105779a50414d98813e468129d467177..5d32529101909c2d294f2f429e7fc6d76fca7f51 100644
+index e7c4e849dc94f3d1153c831684bd18d74830de39..066584f874f2d885fa673d320ae1249852f7f848 100644
 --- a/v5.9/output/lib-files-branded/lib.es2018.intl.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2018.intl.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  declare namespace Intl {

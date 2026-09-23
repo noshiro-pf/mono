@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files/lib.es2017.sharedmemory.d.ts b/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
-index 24333188dd0cc1079aa5b8ac2953522ab3fa3ace..6dc54bb77402b44212f469a87e44726de26a3f24 100644
+index e71938f54e9a1098691ebdb01bfcbdc35573ee31..35c78faf0f4f742dd1ee3973d67206f0d7b36d2c 100644
 --- a/v5.8/output/lib-files/lib.es2017.sharedmemory.d.ts
 +++ b/v5.9/output/lib-files/lib.es2017.sharedmemory.d.ts
-@@ -13,13 +13,13 @@ interface SharedArrayBuffer {
+@@ -35,13 +35,13 @@ interface SharedArrayBuffer {
     * Returns a section of an SharedArrayBuffer.
     */
    slice(begin?: number, end?: number): SharedArrayBuffer;

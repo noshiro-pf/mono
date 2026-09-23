@@ -1,0 +1,16 @@
+strict-ts-lib-v5.9
+Copyright (c) noshiro-pf
+
+Licensed under the Apache License, Version 2.0; see LICENSE.
+
+This package is a derivative work of the built-in library declaration
+files (lib.*.d.ts) of TypeScript 5.9.3:
+
+    https://github.com/microsoft/TypeScript/tree/v5.9.3/lib
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0.
+
+Every file under libs/ and libs-branded/ keeps the copyright notice of
+the file it was generated from, followed by a note that it was modified.
+The changes are described at https://github.com/noshiro-pf/mono.

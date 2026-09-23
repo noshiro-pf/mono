@@ -1,8 +1,8 @@
 diff --git a/v5.0/output/lib-files-branded/lib.dom.iterable.d.ts b/v5.1/output/lib-files-branded/lib.dom.iterable.d.ts
-index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7f2c2d208 100644
+index badd31f3a39030e3d0ce80c6d5834345523ff12f..97141993e595384c89e07804816c08d816b6cc2e 100644
 --- a/v5.0/output/lib-files-branded/lib.dom.iterable.d.ts
 +++ b/v5.1/output/lib-files-branded/lib.dom.iterable.d.ts
-@@ -5,6 +5,7 @@
+@@ -27,6 +27,7 @@ and limitations under the License.
  /////////////////////////////
  
  interface AudioParam {
@@ -10,7 +10,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    setValueCurveAtTime(
      values: Iterable<number>,
      startTime: number,
-@@ -15,10 +16,12 @@ interface AudioParam {
+@@ -37,10 +38,12 @@ interface AudioParam {
  interface AudioParamMap extends ReadonlyMap<string, AudioParam> {}
  
  interface BaseAudioContext {
@@ -23,7 +23,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    createPeriodicWave(
      real: Iterable<number>,
      imag: Iterable<number>,
-@@ -30,6 +33,13 @@ interface CSSKeyframesRule {
+@@ -52,6 +55,13 @@ interface CSSKeyframesRule {
    [Symbol.iterator](): IterableIterator<CSSKeyframeRule>;
  }
  
@@ -37,7 +37,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
  interface CSSRuleList {
    [Symbol.iterator](): IterableIterator<CSSRule>;
  }
-@@ -38,11 +48,31 @@ interface CSSStyleDeclaration {
+@@ -60,11 +70,31 @@ interface CSSStyleDeclaration {
    [Symbol.iterator](): IterableIterator<string>;
  }
  
@@ -69,7 +69,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    roundRect(
      x: number,
      y: number,
-@@ -53,6 +83,7 @@ interface CanvasPath {
+@@ -75,6 +105,7 @@ interface CanvasPath {
  }
  
  interface CanvasPathDrawingStyles {
@@ -77,7 +77,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    setLineDash(segments: Iterable<number>): void;
  }
  
-@@ -124,7 +155,11 @@ interface Headers {
+@@ -146,7 +177,11 @@ interface Headers {
  }
  
  interface IDBDatabase {
@@ -90,7 +90,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    transaction(
      storeNames: string | Iterable<string>,
      mode?: IDBTransactionMode,
-@@ -137,6 +172,8 @@ interface IDBObjectStore {
+@@ -159,6 +194,8 @@ interface IDBObjectStore {
     * Creates a new index in store with the given name, keyPath and options and returns a new IDBIndex. If the keyPath and options define constraints that cannot be satisfied with the data already in store the upgrade transaction will abort with a "ConstraintError" DOMException.
     *
     * Throws an "InvalidStateError" DOMException if not called within an upgrade transaction.
@@ -99,7 +99,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
     */
    createIndex(
      name: string,
-@@ -148,6 +185,7 @@ interface IDBObjectStore {
+@@ -170,6 +207,7 @@ interface IDBObjectStore {
  interface MIDIInputMap extends ReadonlyMap<string, MIDIInput> {}
  
  interface MIDIOutput {
@@ -107,7 +107,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    send(data: Iterable<number>, timestamp?: DOMHighResTimeStamp): void;
  }
  
-@@ -167,7 +205,11 @@ interface MediaList {
+@@ -189,7 +227,11 @@ interface MediaList {
  }
  
  interface MessageEvent<T = unknown> {
@@ -120,7 +120,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    initMessageEvent(
      type: string,
      bubbles?: boolean,
-@@ -189,11 +231,16 @@ interface NamedNodeMap {
+@@ -211,11 +253,16 @@ interface NamedNodeMap {
  }
  
  interface Navigator {
@@ -138,7 +138,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    vibrate(pattern: Iterable<number>): boolean;
  }
  
-@@ -226,6 +273,7 @@ interface PluginArray {
+@@ -248,6 +295,7 @@ interface PluginArray {
  }
  
  interface RTCRtpTransceiver {
@@ -146,7 +146,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    setCodecPreferences(codecs: Iterable<RTCRtpCodecCapability>): void;
  }
  
-@@ -263,11 +311,21 @@ interface SpeechRecognitionResultList {
+@@ -285,11 +333,21 @@ interface SpeechRecognitionResultList {
    [Symbol.iterator](): IterableIterator<SpeechRecognitionResult>;
  }
  
@@ -168,7 +168,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    deriveKey(
      algorithm:
        | AlgorithmIdentifier
-@@ -284,6 +342,7 @@ interface SubtleCrypto {
+@@ -306,6 +364,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -176,7 +176,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    generateKey(
      algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
      extractable: boolean,
-@@ -299,6 +358,7 @@ interface SubtleCrypto {
+@@ -321,6 +380,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKeyPair | CryptoKey>;
@@ -184,7 +184,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    importKey(
      format: 'jwk',
      keyData: JsonWebKey,
-@@ -323,6 +383,7 @@ interface SubtleCrypto {
+@@ -345,6 +405,7 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -192,7 +192,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    unwrapKey(
      format: KeyFormat,
      wrappedKey: BufferSource,
-@@ -367,10 +428,12 @@ interface URLSearchParams {
+@@ -389,10 +450,12 @@ interface URLSearchParams {
  }
  
  interface WEBGL_draw_buffers {
@@ -205,7 +205,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    multiDrawArraysInstancedWEBGL(
      mode: GLenum,
      firstsList: Int32Array | Iterable<GLint>,
-@@ -381,6 +444,7 @@ interface WEBGL_multi_draw {
+@@ -403,6 +466,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -213,7 +213,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    multiDrawArraysWEBGL(
      mode: GLenum,
      firstsList: Int32Array | Iterable<GLint>,
-@@ -389,6 +453,7 @@ interface WEBGL_multi_draw {
+@@ -411,6 +475,7 @@ interface WEBGL_multi_draw {
      countsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -221,7 +221,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    multiDrawElementsInstancedWEBGL(
      mode: GLenum,
      countsList: Int32Array | Iterable<GLsizei>,
-@@ -400,6 +465,7 @@ interface WEBGL_multi_draw {
+@@ -422,6 +487,7 @@ interface WEBGL_multi_draw {
      instanceCountsOffset: GLuint,
      drawcount: GLsizei,
    ): void;
@@ -229,7 +229,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    multiDrawElementsWEBGL(
      mode: GLenum,
      countsList: Int32Array | Iterable<GLsizei>,
-@@ -412,35 +478,43 @@ interface WEBGL_multi_draw {
+@@ -434,35 +500,43 @@ interface WEBGL_multi_draw {
  }
  
  interface WebGL2RenderingContextBase {
@@ -273,7 +273,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    invalidateSubFramebuffer(
      target: GLenum,
      attachments: Iterable<GLenum>,
-@@ -449,35 +523,41 @@ interface WebGL2RenderingContextBase {
+@@ -471,35 +545,41 @@ interface WebGL2RenderingContextBase {
      width: GLsizei,
      height: GLsizei,
    ): void;
@@ -315,7 +315,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix2x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -485,6 +565,7 @@ interface WebGL2RenderingContextBase {
+@@ -507,6 +587,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -323,7 +323,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix2x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -492,6 +573,7 @@ interface WebGL2RenderingContextBase {
+@@ -514,6 +595,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -331,7 +331,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix3x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -499,6 +581,7 @@ interface WebGL2RenderingContextBase {
+@@ -521,6 +603,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -339,7 +339,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix3x4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -506,6 +589,7 @@ interface WebGL2RenderingContextBase {
+@@ -528,6 +611,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -347,7 +347,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix4x2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -513,6 +597,7 @@ interface WebGL2RenderingContextBase {
+@@ -535,6 +619,7 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -355,7 +355,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix4x3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -520,59 +605,70 @@ interface WebGL2RenderingContextBase {
+@@ -542,59 +627,70 @@ interface WebGL2RenderingContextBase {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -426,7 +426,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix2fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -580,6 +676,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -602,6 +698,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -434,7 +434,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix3fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -587,6 +684,7 @@ interface WebGL2RenderingContextOverloads {
+@@ -609,6 +706,7 @@ interface WebGL2RenderingContextOverloads {
      srcOffset?: GLuint,
      srcLength?: GLuint,
    ): void;
@@ -442,7 +442,7 @@ index e215d9cabc716c8845054cc6be1a71d6ebca8d27..b3a26bcf82251ccc706c8407115f9ec7
    uniformMatrix4fv(
      location: WebGLUniformLocation | null,
      transpose: GLboolean,
-@@ -597,31 +695,46 @@ interface WebGL2RenderingContextOverloads {
+@@ -619,31 +717,46 @@ interface WebGL2RenderingContextOverloads {
  }
  
  interface WebGLRenderingContextBase {

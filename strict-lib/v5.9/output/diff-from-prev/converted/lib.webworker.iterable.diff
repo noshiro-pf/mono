@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files/lib.webworker.iterable.d.ts b/v5.9/output/lib-files/lib.webworker.iterable.d.ts
-index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed31902cec6602 100644
+index b3bd0c2a35640dd912c1942375bd38313c488f20..cd7ae1d4754617c8897fd7c622c5dc16e6ba3ebf 100644
 --- a/v5.8/output/lib-files/lib.webworker.iterable.d.ts
 +++ b/v5.9/output/lib-files/lib.webworker.iterable.d.ts
-@@ -26,7 +26,11 @@ interface CSSUnparsedValue {
+@@ -48,7 +48,11 @@ interface CSSUnparsedValue {
  }
  
  interface Cache {
@@ -15,7 +15,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
    addAll(requests: Iterable<RequestInfo>): Promise<void>;
  }
  
-@@ -46,6 +50,21 @@ interface CanvasPathDrawingStyles {
+@@ -68,6 +72,21 @@ interface CanvasPathDrawingStyles {
    setLineDash(segments: Iterable<number>): void;
  }
  
@@ -37,7 +37,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
  interface DOMStringList {
    [Symbol.iterator](): ArrayIterator<string>;
  }
-@@ -94,7 +113,7 @@ interface Headers {
+@@ -116,7 +135,7 @@ interface Headers {
  
  interface IDBDatabase {
    /**
@@ -46,7 +46,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBDatabase/transaction)
     */
-@@ -107,9 +126,7 @@ interface IDBDatabase {
+@@ -129,9 +148,7 @@ interface IDBDatabase {
  
  interface IDBObjectStore {
    /**
@@ -57,7 +57,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/IDBObjectStore/createIndex)
     */
-@@ -158,7 +175,11 @@ interface StylePropertyMapReadOnly {
+@@ -180,7 +197,11 @@ interface StylePropertyMapReadOnly {
  }
  
  interface SubtleCrypto {
@@ -70,7 +70,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
    deriveKey(
      algorithm:
        | AlgorithmIdentifier
-@@ -175,7 +196,11 @@ interface SubtleCrypto {
+@@ -197,7 +218,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -83,7 +83,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
    generateKey(
      algorithm: 'Ed25519' | { readonly name: 'Ed25519' },
      extractable: boolean,
-@@ -196,7 +221,11 @@ interface SubtleCrypto {
+@@ -218,7 +243,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKeyPair | CryptoKey>;
@@ -96,7 +96,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
    importKey(
      format: 'jwk',
      keyData: JsonWebKey,
-@@ -221,7 +250,11 @@ interface SubtleCrypto {
+@@ -243,7 +272,11 @@ interface SubtleCrypto {
      extractable: boolean,
      keyUsages: Iterable<KeyUsage>,
    ): Promise<CryptoKey>;
@@ -109,7 +109,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
    unwrapKey(
      format: KeyFormat,
      wrappedKey: BufferSource,
-@@ -262,50 +295,70 @@ interface URLSearchParams {
+@@ -284,50 +317,70 @@ interface URLSearchParams {
  }
  
  interface WEBGL_draw_buffers {
@@ -195,7 +195,7 @@ index ffca25e54d4e7e6af627679857d5a3e5e67afa63..a9b3f24e51a2bcb46fe5200732ed3190
      offsetsOffset: number,
      drawcount: GLsizei,
    ): void;
-@@ -345,7 +398,7 @@ interface WebGL2RenderingContextBase {
+@@ -367,7 +420,7 @@ interface WebGL2RenderingContextBase {
    getUniformIndices(
      program: WebGLProgram,
      uniformNames: Iterable<string>,

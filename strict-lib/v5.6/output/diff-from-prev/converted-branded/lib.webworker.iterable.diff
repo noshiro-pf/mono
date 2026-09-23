@@ -1,8 +1,8 @@
 diff --git a/v5.5/output/lib-files-branded/lib.webworker.iterable.d.ts b/v5.6/output/lib-files-branded/lib.webworker.iterable.d.ts
-index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b548399326ef64 100644
+index f70470002c055e16403ae027d58acd80da08eb0e..d33f1db847bc3708034aa1f23f550b3a8a61a1d7 100644
 --- a/v5.5/output/lib-files-branded/lib.webworker.iterable.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.webworker.iterable.d.ts
-@@ -10,24 +10,24 @@ interface AbortSignal {
+@@ -32,24 +32,24 @@ interface AbortSignal {
  }
  
  interface CSSNumericArray {
@@ -39,7 +39,7 @@ index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b54839
  }
  
  interface Cache {
-@@ -52,33 +52,49 @@ interface CanvasPathDrawingStyles {
+@@ -74,33 +74,49 @@ interface CanvasPathDrawingStyles {
  }
  
  interface DOMStringList {
@@ -99,7 +99,7 @@ index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b54839
  }
  
  interface IDBDatabase {
-@@ -110,11 +126,7 @@ interface IDBObjectStore {
+@@ -132,11 +148,7 @@ interface IDBObjectStore {
  }
  
  interface MessageEvent<T = unknown> {
@@ -112,7 +112,7 @@ index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b54839
    initMessageEvent(
      type: string,
      bubbles?: boolean,
-@@ -127,13 +139,23 @@ interface MessageEvent<T = unknown> {
+@@ -149,13 +161,23 @@ interface MessageEvent<T = unknown> {
    ): void;
  }
  
@@ -140,7 +140,7 @@ index dcd9374d5c425f6b975e85f4bec69ddc55e92695..5c26799d6b6e1d0a351daf74c3b54839
  }
  
  interface SubtleCrypto {
-@@ -222,14 +244,22 @@ interface SubtleCrypto {
+@@ -244,14 +266,22 @@ interface SubtleCrypto {
    ): Promise<CryptoKey>;
  }
  

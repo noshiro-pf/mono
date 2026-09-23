@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.es2023.d.ts b/v5.5/output/lib-files-branded/lib.es2023.d.ts
-index 4e8a09b29b720470fa1467f99e07ff83e566b3cd..ab4f866dd5a2909de8d0a4cdad16e54847311d31 100644
+index 086befd52af8030519ef7eecbc6286ca7afc5c5a..19f720f0da2587936321e2bf9b44a5979a09892b 100644
 --- a/v5.4/output/lib-files-branded/lib.es2023.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.es2023.d.ts
-@@ -3,3 +3,4 @@
+@@ -25,3 +25,4 @@ and limitations under the License.
  /// <reference path="./lib.es2022.d.ts" />
  /// <reference path="./lib.es2023.array.d.ts" />
  /// <reference path="./lib.es2023.collection.d.ts" />

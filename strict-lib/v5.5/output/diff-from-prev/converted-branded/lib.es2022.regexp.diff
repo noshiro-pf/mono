@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files-branded/lib.es2022.regexp.d.ts b/v5.5/output/lib-files-branded/lib.es2022.regexp.d.ts
-index 0f2d3dd710b291e57e4fc9204bc871e1fb387a6b..6fd74f871c28c901bb07f378215d6ce056cec487 100644
+index cb7d10e8e7839705a0f0dc513027ef060d6917b9..14ddcb7cf09b350d762d040d204c7862f0516b55 100644
 --- a/v5.4/output/lib-files-branded/lib.es2022.regexp.d.ts
 +++ b/v5.5/output/lib-files-branded/lib.es2022.regexp.d.ts
-@@ -21,7 +21,7 @@ interface RegExpIndicesArray extends Array<
+@@ -43,7 +43,7 @@ interface RegExpIndicesArray extends Array<
  
  interface RegExp {
    /**

@@ -1,25 +1,20 @@
-@@ -1,19 +1,4 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABILITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,7 +13,14 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
 -/// <reference lib="es2018.intl" />
++/*
++ * Modified from TypeScript's `lib.es2020.intl.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference path="./lib.es2018.intl.d.ts" />
  declare namespace Intl {
    /**
     * A string that is a valid [Unicode BCP 47 Locale Identifier](https://unicode.org/reports/tr35/#Unicode_locale_identifier).
-@@ -106,11 +91,11 @@ declare namespace Intl {
+@@ -106,11 +113,11 @@ declare namespace Intl {
     */
    interface RelativeTimeFormatOptions {
      /** The locale matching algorithm to use. For information about this option, see [Intl page](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl#Locale_negotiation). */
@@ -34,7 +29,7 @@
    }
  
    /**
-@@ -121,10 +106,10 @@ declare namespace Intl {
+@@ -121,10 +128,10 @@ declare namespace Intl {
     * [MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/resolvedOptions#Description).
     */
    interface ResolvedRelativeTimeFormatOptions {
@@ -49,7 +44,7 @@
    }
  
    /**
-@@ -135,13 +120,13 @@ declare namespace Intl {
+@@ -135,13 +142,13 @@ declare namespace Intl {
     */
    type RelativeTimeFormatPart =
      | {
@@ -68,7 +63,7 @@
        };
  
    interface RelativeTimeFormat {
-@@ -246,64 +231,64 @@ declare namespace Intl {
+@@ -246,64 +253,64 @@ declare namespace Intl {
    };
  
    interface NumberFormatOptionsStyleRegistry {
@@ -164,7 +159,7 @@
    }
  
    type LocaleHourCycleKey = 'h12' | 'h23' | 'h11' | 'h24';
-@@ -311,32 +296,32 @@ declare namespace Intl {
+@@ -311,32 +318,32 @@ declare namespace Intl {
  
    interface LocaleOptions {
      /** A string containing the language, and the script and region if available. */
@@ -209,7 +204,7 @@
      /** Gets the most likely values for the language, script, and region of the locale based on existing values. */
      maximize(): Locale;
      /** Attempts to remove information about the locale that would be added by calling `Locale.maximize()`. */
-@@ -379,19 +364,19 @@ declare namespace Intl {
+@@ -379,19 +386,19 @@ declare namespace Intl {
    type DisplayNamesLanguageDisplay = 'dialect' | 'standard';
  
    interface DisplayNamesOptions {
@@ -239,7 +234,7 @@
    }
  
    interface DisplayNames {
-@@ -427,7 +412,7 @@ declare namespace Intl {
+@@ -427,7 +434,7 @@ declare namespace Intl {
     * [Compatibility](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames#browser_compatibility).
     */
    const DisplayNames: {
@@ -248,7 +243,7 @@
  
      /**
       * @param locales A string with a BCP 47 language tag, or an array of such strings.
-@@ -455,7 +440,7 @@ declare namespace Intl {
+@@ -455,7 +462,7 @@ declare namespace Intl {
       */
      supportedLocalesOf(
        locales?: LocalesArgument,
@@ -257,7 +252,7 @@
      ): UnicodeBCP47LocaleIdentifier[];
    };
  
-@@ -501,7 +486,7 @@ declare namespace Intl {
+@@ -501,7 +508,7 @@ declare namespace Intl {
  
      supportedLocalesOf(
        locales: LocalesArgument,

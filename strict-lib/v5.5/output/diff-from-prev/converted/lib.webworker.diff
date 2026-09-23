@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.webworker.d.ts b/v5.5/output/lib-files/lib.webworker.d.ts
-index 7d97730ac93fdf85efc8cdfd6a907e51f46a19b4..02907e8a9596e4fdde7a824e10ebffb5df1148f9 100644
+index 0a863e4bcd9eddbd72c3149a069d38190874e1c7..d1ffded7404df9db20940cd794ded19487883615 100644
 --- a/v5.4/output/lib-files/lib.webworker.d.ts
 +++ b/v5.5/output/lib-files/lib.webworker.d.ts
-@@ -533,6 +533,17 @@ interface ReadableStreamGetReaderOptions {
+@@ -555,6 +555,17 @@ interface ReadableStreamGetReaderOptions {
    mode?: ReadableStreamReaderMode;
  }
  
@@ -20,7 +20,7 @@ index 7d97730ac93fdf85efc8cdfd6a907e51f46a19b4..02907e8a9596e4fdde7a824e10ebffb5
  interface ReadableStreamReadDoneResult<T> {
    done: true;
    value?: T;
-@@ -630,16 +641,16 @@ interface RsaPssParams extends Algorithm {
+@@ -652,16 +663,16 @@ interface RsaPssParams extends Algorithm {
  interface SecurityPolicyViolationEventInit extends EventInit {
    blockedURI?: string;
    columnNumber?: number;
@@ -43,7 +43,7 @@ index 7d97730ac93fdf85efc8cdfd6a907e51f46a19b4..02907e8a9596e4fdde7a824e10ebffb5
  }
  
  interface StorageEstimate {
-@@ -983,6 +994,8 @@ declare const AbortSignal: {
+@@ -1005,6 +1016,8 @@ declare const AbortSignal: {
    new (): AbortSignal;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static) */
    abort(reason?: unknown): AbortSignal;
@@ -52,7 +52,7 @@ index 7d97730ac93fdf85efc8cdfd6a907e51f46a19b4..02907e8a9596e4fdde7a824e10ebffb5
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static) */
    timeout(milliseconds: number): AbortSignal;
  };
-@@ -5983,6 +5996,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
+@@ -6005,6 +6018,7 @@ interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
  
  /**
   * This ServiceWorker API interface represents the global execution context of a service worker.

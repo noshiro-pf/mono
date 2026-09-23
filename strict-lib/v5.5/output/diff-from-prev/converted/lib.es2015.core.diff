@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.es2015.core.d.ts b/v5.5/output/lib-files/lib.es2015.core.d.ts
-index a7d044e25fb1bc00a5178b54b8fc503c2a93d4da..69262140d60875a7aa741a3535d3798c23733231 100644
+index 71883373ae66906ff34aa404fcd9dbd9bf6b3aa2..aa65de225cdfa6f74e5ed70766d8e6220ff4dbd9 100644
 --- a/v5.4/output/lib-files/lib.es2015.core.d.ts
 +++ b/v5.5/output/lib-files/lib.es2015.core.d.ts
-@@ -53,6 +53,11 @@ interface Array<T> {
+@@ -75,6 +75,11 @@ interface Array<T> {
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(target: number, start: number, end?: number): this;
@@ -14,7 +14,7 @@ index a7d044e25fb1bc00a5178b54b8fc503c2a93d4da..69262140d60875a7aa741a3535d3798c
  }
  
  interface ArrayConstructor {
-@@ -374,6 +379,11 @@ interface ReadonlyArray<T> {
+@@ -396,6 +401,11 @@ interface ReadonlyArray<T> {
      predicate: (value: T, index: number, obj: readonly T[]) => boolean,
      thisArg?: unknown,
    ): number;
@@ -26,7 +26,7 @@ index a7d044e25fb1bc00a5178b54b8fc503c2a93d4da..69262140d60875a7aa741a3535d3798c
  }
  
  interface RegExp {
-@@ -572,3 +582,66 @@ interface StringConstructor {
+@@ -594,3 +604,66 @@ interface StringConstructor {
      ...substitutions: readonly unknown[]
    ): string;
  }

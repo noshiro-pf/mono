@@ -1,9 +1,31 @@
 diff --git a/v5.5/output/lib-files-branded/lib.es2023.intl.d.ts b/v5.5/output/lib-files-branded/lib.es2023.intl.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..38aa32cf49748ad21529493f6235304481e640f5
+index 0000000000000000000000000000000000000000..01407700d66eb19d2642d446f8e41890648cbdcd
 --- /dev/null
 +++ b/v5.5/output/lib-files-branded/lib.es2023.intl.d.ts
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,128 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABLITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.es2023.intl.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference no-default-lib="true"/>
 +
 +declare namespace Intl {

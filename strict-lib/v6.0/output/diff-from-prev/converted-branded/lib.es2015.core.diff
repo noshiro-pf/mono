@@ -1,14 +1,26 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.core.d.ts b/v6.0/output/lib-files-branded/lib.es2015.core.d.ts
-index f792791a2b92356ec57fd4e01427a70f1dd751e9..056b392d954cb9545836a209c08b6ea6b282feb5 100644
+index d51168d4f08c45e97dee626bede1617bff0b726a..d188f4fd354f139d24278041ceaaa6f853d7ae16 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.core.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.core.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface Array<T> {
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -224,7 +222,7 @@ interface Math {
+@@ -246,7 +244,7 @@ interface Math {
      | import('ts-type-forge').NaNType;
  
    /**

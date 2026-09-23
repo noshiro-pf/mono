@@ -1,19 +1,14 @@
-@@ -1,25 +1,10 @@
--/*! *****************************************************************************
--Copyright (c) Microsoft Corporation. All rights reserved.
--Licensed under the Apache License, Version 2.0 (the "License"); you may not use
--this file except in compliance with the License. You may obtain a copy of the
--License at http://www.apache.org/licenses/LICENSE-2.0
--
--THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
--KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
--WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
--MERCHANTABLITY OR NON-INFRINGEMENT.
--
--See the Apache Version 2.0 License for specific language governing permissions
--and limitations under the License.
--***************************************************************************** */
--
+@@ -13,13 +13,20 @@ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+ ***************************************************************************** */
+ 
++/*
++ * Modified from TypeScript's `lib.es2015.promise.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
  /// <reference no-default-lib="true"/>
  
  interface PromiseConstructor {
@@ -25,7 +20,7 @@
  
    /**
     * Creates a new Promise.
-@@ -30,7 +15,7 @@ interface PromiseConstructor {
+@@ -30,7 +37,7 @@ interface PromiseConstructor {
    new <T>(
      executor: (
        resolve: (value: T | PromiseLike<T>) => void,
@@ -34,7 +29,7 @@
      ) => void,
    ): Promise<T>;
  
-@@ -40,7 +25,7 @@ interface PromiseConstructor {
+@@ -40,7 +47,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -43,7 +38,7 @@
      values: T,
    ): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
  
-@@ -53,7 +38,7 @@ interface PromiseConstructor {
+@@ -53,7 +60,7 @@ interface PromiseConstructor {
     * @param values An array of Promises.
     * @returns A new Promise.
     */
@@ -52,7 +47,7 @@
      values: T,
    ): Promise<Awaited<T[number]>>;
  
-@@ -65,7 +50,7 @@ interface PromiseConstructor {
+@@ -65,7 +72,7 @@ interface PromiseConstructor {
     * @param reason The reason the promise was rejected.
     * @returns A new rejected Promise.
     */
@@ -61,7 +56,7 @@
  
    /**
     * Creates a new resolved promise.
-@@ -86,4 +71,4 @@ interface PromiseConstructor {
+@@ -86,4 +93,4 @@ interface PromiseConstructor {
    resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
  }
  

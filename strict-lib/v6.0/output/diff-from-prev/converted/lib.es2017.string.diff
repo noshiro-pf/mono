@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files/lib.es2017.string.d.ts b/v6.0/output/lib-files/lib.es2017.string.d.ts
-index 217eaad6439f434c20066ca79cfa582af9b8bc9d..1b78acce70bfed8d8681bfcce939d17b7845e157 100644
+index ee6db206e0bb576cca95d0ddd476d007193e9c06..d651e68549ac256f2f9b18d8665850c7aa2f5539 100644
 --- a/v5.9/output/lib-files/lib.es2017.string.d.ts
 +++ b/v6.0/output/lib-files/lib.es2017.string.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface String {

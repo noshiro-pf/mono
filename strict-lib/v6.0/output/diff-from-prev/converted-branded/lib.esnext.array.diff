@@ -1,8 +1,20 @@
 diff --git a/v5.9/output/lib-files-branded/lib.esnext.array.d.ts b/v6.0/output/lib-files-branded/lib.esnext.array.d.ts
-index 8abaeb04945a96292bee2988f1b252b1d1232583..8682c23b17f592ef1beb6b36864c98edd3746d2d 100644
+index db948feddab8918de7298b0d6e9074063d088424..b06d059107a964126927c8746912d907a75574ea 100644
 --- a/v5.9/output/lib-files-branded/lib.esnext.array.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.esnext.array.d.ts
-@@ -1,5 +1,3 @@
+@@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+-MERCHANTABLITY OR NON-INFRINGEMENT.
++MERCHANTABILITY OR NON-INFRINGEMENT.
+ 
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+@@ -20,8 +20,6 @@ and limitations under the License.
+  * files of the package this ships in.
+  */
+ 
 -/// <reference no-default-lib="true"/>
 -
  interface ArrayConstructor {

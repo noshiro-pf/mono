@@ -1,9 +1,31 @@
 diff --git a/v5.7/output/lib-files/lib.es2024.sharedmemory.d.ts b/v5.7/output/lib-files/lib.es2024.sharedmemory.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..66549c62ccbfd94516b5dd0b157d0be4c3b0f896
+index 0000000000000000000000000000000000000000..2de1418b60da77631ca2e8a141e36921f925cf3f
 --- /dev/null
 +++ b/v5.7/output/lib-files/lib.es2024.sharedmemory.d.ts
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,91 @@
++/*! *****************************************************************************
++Copyright (c) Microsoft Corporation. All rights reserved.
++Licensed under the Apache License, Version 2.0 (the "License"); you may not use
++this file except in compliance with the License. You may obtain a copy of the
++License at http://www.apache.org/licenses/LICENSE-2.0
++
++THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
++WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
++MERCHANTABLITY OR NON-INFRINGEMENT.
++
++See the Apache Version 2.0 License for specific language governing permissions
++and limitations under the License.
++***************************************************************************** */
++
++/*
++ * Modified from TypeScript's `lib.es2024.sharedmemory.d.ts` by strict-ts-lib
++ * (https://github.com/noshiro-pf/mono): the declarations are rewritten with
++ * stricter types. This is not the original file. See the NOTICE and LICENSE
++ * files of the package this ships in.
++ */
++
 +/// <reference no-default-lib="true"/>
 +
 +/// <reference path="./lib.es2020.bigint.d.ts" />
