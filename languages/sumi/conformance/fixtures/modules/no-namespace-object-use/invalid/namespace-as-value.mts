@@ -9,7 +9,7 @@ export const passed = use(ns);
 export const aliased = ns;
 
 // @sumi-expect-error modules/no-namespace-object-use
-export const spread = { ...ns };
+export const spread = { ...ns } as const;
 
 // @sumi-expect-error modules/no-namespace-object-use
 export const computed = ns['helper'];

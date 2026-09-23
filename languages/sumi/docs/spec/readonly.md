@@ -24,6 +24,7 @@ Sumi lint では逆向きのアプローチを取る — **readonly を省略可
 - 配列は常に `readonly T[]`、タプルは `readonly [A, B]`。
 - オブジェクト型のプロパティは常に `readonly`(`Readonly<{...}>` / `DeepReadonly<...>` 可)。
 - 可変にしたい場所は素の型を書き、変数側の `mut_` prefix と組み合わせる([variables-and-mutation.md](./variables-and-mutation.md))。
+- **型を書かない `const` も readonly にする**(確定 2026-09-16 — D-60): 名前が `mut_` で始まらない `const` の型が配列・オブジェクトリテラルから推論されるなら、そのリテラルに `as const` を付ける。型注釈のある束縛は注釈の側で検査する。
 
 これは eslint-config-typed が既に強制している内容(`functional/prefer-readonly-type` 系)と一致する。
 
@@ -44,7 +45,7 @@ readonly-by-default は自分のコードだけでは完結しない — `lib.d.
 
 ## 強制手段
 
-- Sumi lint: 引数は tsgolint の `prefer-readonly-parameter-types`、注釈の記法は `convert-to-readonly` の判定を fork した検査専用ルール `sumi/require-readonly-type`(D-45。readonly の綴りは正規化しない。現行 ESLint 運用は `functional/prefer-readonly-type` 系)。
+- Sumi lint: 引数は tsgolint の `prefer-readonly-parameter-types`、注釈の記法は `convert-to-readonly` の判定を fork した検査専用ルール `sumi/require-readonly-type`(D-45。readonly の綴りは正規化しない。現行 ESLint 運用は `functional/prefer-readonly-type` 系)、無注釈の `const` のリテラルは `sumi/require-as-const`(D-60。現行運用は `append-as-const` codemod)。
 
 ## TS へ戻るときの影響
 
@@ -53,5 +54,5 @@ readonly-by-default は自分のコードだけでは完結しない — `lib.d.
 ## 未解決の論点
 
 - `DeepReadonly` をどこまで推奨するか(浅い readonly との使い分け基準)。
-- ローカル変数の型注釈省略時(推論)に checker がどこまで readonly 性を要求するか。`as const` の強制範囲。
+- ~~ローカル変数の型注釈省略時(推論)に checker がどこまで readonly 性を要求するか。`as const` の強制範囲。~~ → リテラルからの推論は D-60 で決着(`mut_` でない `const` のリテラルに `as const`)。**残り**: 呼び出しの戻り値から推論される型(`new Map()`、可変な型を返す外部 API)には readonly 性を求めていない。これらへの破壊的操作は `mutation/no-mutation-without-mut-prefix` が担う。
 - Sumi sugar の `mutable` キーワードの正確な文法(プロパティ修飾子か、型演算子 `mutable T[]` か、両方か)。

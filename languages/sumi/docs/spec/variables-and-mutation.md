@@ -61,7 +61,7 @@ let mut x = 0;    // 可変束縛(TS の let mut_x に transpile — D-35。ejec
 
 ## 強制手段
 
-- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入(`for … of` / `for … in` の左辺を含む)/ `delete` / 組み込みの破壊的メソッド — `Array` と型付き配列、`Map`・`Set`・弱参照コレクション(`getOrInsert` 系を含む)、`Date` の setter、`Object`・`Reflect`。`Readonly<Date>` のように mapped type 越しに見えるメンバーも宣言元のインターフェースで判定する。型情報が要るので oxlint preset ではなくチェッカー側。[enforcement-map.md](../enforcement-map.md))。
+- Sumi lint: `functional/no-let`(`mut_` prefix 例外付き)、`prefer-const`、`sumi/no-mutation-without-mut-prefix`(@sumi-lang/checker — 代入(`for … of` / `for … in` の左辺を含む)/ `delete` / 組み込みの破壊的メソッド — `Array` と型付き配列、`Map`・`Set`・弱参照コレクション(`getOrInsert` 系を含む)、`Date` の setter、`Object`・`Reflect`。`Readonly<Date>` のように mapped type 越しに見えるメンバーも宣言元のインターフェースで判定する。型情報が要るので oxlint preset ではなくチェッカー側。型が既に書き込みを禁じている代入・`delete` はコンパイラの指摘に任せる — D-60。[enforcement-map.md](../enforcement-map.md))。
 
 ## TS へ戻るときの影響
 

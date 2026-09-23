@@ -5,7 +5,12 @@ import {
   type SourceFile,
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
-import { API, type Checker } from 'typescript-native/unstable/sync';
+import {
+  API,
+  type Checker,
+  type Diagnostic,
+  type Program,
+} from 'typescript-native/unstable/sync';
 import { type CheckerDiagnostic, type Rule } from './types.mjs';
 
 /**
@@ -67,7 +72,7 @@ export const runRules = (
 
       if (sourceFile === undefined || sourceFile.isDeclarationFile) continue;
 
-      walkFile(sourceFile, rules, checker, mut_diagnostics);
+      walkFile(sourceFile, rules, program, checker, mut_diagnostics);
     }
   });
 
@@ -86,12 +91,35 @@ const walkFile = (
   sourceFile: SourceFile,
   rules: readonly Rule[],
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  program: Program,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: Checker,
   // The accumulator every rule reports into: one array for the whole run, so
   // a rule's `report` costs a push rather than a copy.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_diagnostics: CheckerDiagnostic[],
 ): void => {
+  // Fetched only if a rule asks: most files never need them.
+  let mut_compilerDiagnostics: readonly Diagnostic[] | undefined = undefined;
+
+  const isReportedByCompiler = (
+    node: TsNode,
+    codes: ReadonlySet<number>,
+  ): boolean => {
+    mut_compilerDiagnostics ??= program.getSemanticDiagnostics(
+      sourceFile.fileName,
+    );
+
+    const start = node.getStart(sourceFile);
+
+    return mut_compilerDiagnostics.some(
+      (diagnostic) =>
+        codes.has(diagnostic.code) &&
+        diagnostic.pos >= start &&
+        diagnostic.end <= node.end,
+    );
+  };
+
   // One context per rule, built once per file: `report` closes over the rule's
   // own ID so a rule cannot report under another's.
   const contexts = rules.map((rule) => ({
@@ -99,6 +127,7 @@ const walkFile = (
     context: {
       checker,
       sourceFile,
+      isReportedByCompiler,
       report: (
         node: TsNode,
         messageId: string,

@@ -58,6 +58,25 @@ describe(noMutationWithoutMutPrefix.ruleId, () => {
         `,
       },
       {
+        name: 'a write the type already refuses is the compiler’s to report',
+        code: dedent`
+          const frozen = { a: 1, nested: { b: [1] } } as const;
+          frozen.a = 2;
+          frozen.a += 1;
+          frozen.nested.b[0] = 2;
+          delete frozen.a;
+          const readonlyRow: readonly number[] = [0];
+          readonlyRow[0] = 1;
+          const readonlyBag: Readonly<Record<string, number>> = { a: 1 };
+          readonlyBag['a'] = 2;
+          delete readonlyBag['a'];
+          for (frozen.a of [1, 2]) {
+            // each iteration would assign frozen.a
+          }
+          export const frozenOut = [frozen, readonlyRow, readonlyBag] as const;
+        `,
+      },
+      {
         name: 'rebinding a variable is `functional/no-let`’s business',
         code: dedent`
           let mut_count = 0;
@@ -209,6 +228,19 @@ describe(noMutationWithoutMutPrefix.ruleId, () => {
         errors: [
           { messageId: 'assignment', line: 2 },
           { messageId: 'assignment', line: 5 },
+        ],
+      },
+      {
+        name: 'a write through `as` stays reported, because the compiler accepts it',
+        code: dedent`
+          const frozenAs = { a: 1 } as const;
+          (frozenAs.a as number) = 2;
+          delete (frozenAs as Partial<{ a: number }>).a;
+          export const frozenAsOut = frozenAs;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 2 },
+          { messageId: 'deletion', line: 3 },
         ],
       },
       {
