@@ -40,9 +40,7 @@ export const getParseTree = (
   ) {
     const body = getParseTree(tokens.slice(4, -1));
 
-    if (body === undefined) return undefined;
-
-    return ['lambda', tokens[2], body];
+    return body === undefined ? undefined : ['lambda', tokens[2], body];
   }
 
   /* (e e)? */
@@ -64,9 +62,9 @@ export const getParseTree = (
 
         const right = getParseTree(rightTokens);
 
-        if (left === undefined || right === undefined) return undefined;
-
-        return [left, right];
+        return left === undefined || right === undefined
+          ? undefined
+          : [left, right];
       }
     }
   }

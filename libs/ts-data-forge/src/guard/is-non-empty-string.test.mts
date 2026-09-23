@@ -55,24 +55,28 @@ describe(isNonEmptyString, () => {
     const value: unknown = 'test';
 
     // @ts-expect-error Testing non-string types
-    if (isNonEmptyString(value)) {
-      expectType<typeof value, NonEmptyString>('=');
-
-      // TypeScript knows it's a string
-      expect(value.length).toBeGreaterThan(0);
-
-      expect(value.at(0)).toBe('t');
+    if (!isNonEmptyString(value)) {
+      return;
     }
+
+    expectType<typeof value, NonEmptyString>('=');
+
+    // TypeScript knows it's a string
+    expect(value.length).toBeGreaterThan(0);
+
+    expect(value.at(0)).toBe('t');
   });
 
   test('should narrow string | undefined | null types', () => {
     const maybeString: string | undefined | null = 'hello';
 
-    if (isNonEmptyString(maybeString)) {
-      expectType<typeof maybeString, NonEmptyString>('=');
-
-      expect(maybeString.toUpperCase()).toBe('HELLO');
+    if (!isNonEmptyString(maybeString)) {
+      return;
     }
+
+    expectType<typeof maybeString, NonEmptyString>('=');
+
+    expect(maybeString.toUpperCase()).toBe('HELLO');
   });
 
   test('should work in filter operations', () => {

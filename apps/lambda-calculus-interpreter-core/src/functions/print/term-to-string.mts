@@ -13,9 +13,5 @@ export const termToString = (term: LambdaTerm): string => {
     return `(${termToString(term[0])} ${termToString(term[1])})`;
   }
 
-  if (isAbstraction(term)) {
-    return `(λ${term[1]}.${termToString(term[2])})`;
-  }
-
-  return '';
+  return isAbstraction(term) ? `(λ${term[1]}.${termToString(term[2])})` : '';
 };

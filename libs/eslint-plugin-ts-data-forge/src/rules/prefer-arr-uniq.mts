@@ -248,9 +248,7 @@ const findVariable = (
 
   if (variable !== undefined) return variable;
 
-  if (scope.upper === null) return undefined;
-
-  return findVariable(scope.upper, name);
+  return scope.upper === null ? undefined : findVariable(scope.upper, name);
 };
 
 /**
@@ -296,11 +294,9 @@ const isPrimitiveType = (
 ): boolean => {
   const resolved = resolveConstraint(checker, type);
 
-  if (resolved.isUnion()) {
-    return resolved.types.every((t) => isPrimitiveType(checker, t));
-  }
-
-  return (resolved.flags & primitiveTypeFlags) !== 0;
+  return resolved.isUnion()
+    ? resolved.types.every((t) => isPrimitiveType(checker, t))
+    : (resolved.flags & primitiveTypeFlags) !== 0;
 };
 
 const primitiveTypeFlags =
@@ -444,11 +440,9 @@ const getDeclaredParameterType = (
 
   // A rest parameter's declared type is the array of arguments, not the type of
   // one; the contextual type is the better answer there.
-  if (parameter === undefined || parameter.dotDotDotToken !== undefined) {
-    return undefined;
-  }
-
-  return checker.getTypeAtLocation(parameter);
+  return parameter === undefined || parameter.dotDotDotToken !== undefined
+    ? undefined
+    : checker.getTypeAtLocation(parameter);
 };
 
 /**

@@ -31,6 +31,9 @@ namespace OnlyExportComponents {
    *       "allowConstantExport": {
    *         "type": "boolean"
    *       },
+   *       "allowCompoundComponents": {
+   *         "type": "boolean"
+   *       },
    *       "checkJS": {
    *         "type": "boolean"
    *       }
@@ -44,6 +47,7 @@ namespace OnlyExportComponents {
     extraHOCs?: readonly string[];
     allowExportNames?: readonly string[];
     allowConstantExport?: boolean;
+    allowCompoundComponents?: boolean;
     checkJS?: boolean;
   }>;
 

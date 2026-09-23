@@ -23,13 +23,9 @@ if (import.meta.vitest !== undefined) {
     // With reviver
     const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
 
-    const withReviver = Json.parse(jsonWithDate, (key, value) => {
-      if (key === 'created' && typeof value === 'string') {
-        return new Date(value);
-      }
-
-      return value;
-    });
+    const withReviver = Json.parse(jsonWithDate, (key, value) =>
+      key === 'created' && typeof value === 'string' ? new Date(value) : value,
+    );
 
     assert.isTrue(Result.isOk(withReviver));
 

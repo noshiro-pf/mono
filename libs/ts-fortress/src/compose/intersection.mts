@@ -35,29 +35,29 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
       for (const type of types) {
         const res = type.validate(a);
 
-        if (Result.isErr(res)) {
-          yield {
-            path: [],
-            actualValue: a,
-            expectedType: typeNameFilled,
-            typeName: typeNameFilled,
-            details: {
-              kind: 'intersection',
-              typeNames: types.map((t) => t.typeName),
-            },
-          } satisfies ValidationError;
-
-          yield* res.value;
+        if (!Result.isErr(res)) {
+          continue;
         }
+
+        yield {
+          path: [],
+          actualValue: a,
+          expectedType: typeNameFilled,
+          typeName: typeNameFilled,
+          details: {
+            kind: 'intersection',
+            typeNames: types.map((t) => t.typeName),
+          },
+        } satisfies ValidationError;
+
+        yield* res.value;
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Result.ok(a as T);
+    return Arr.isNonEmpty(errors)
+      ? Result.err(errors)
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as T);
   };
 
   const is = createIsFn<T>(validate);
@@ -128,13 +128,11 @@ const mergePruned = (x: unknown, y: unknown): unknown => {
   }
 
   // Both members pruned the same input array, so the lengths always match;
-  // merge element-wise to keep every represented element path.
-  if (Arr.isArray(x) && Arr.isArray(y) && x.length === y.length) {
-    return x.map((xi, i) => mergePruned(xi, y[i]));
-  }
-
-  // Not structurally mergeable — the later member wins.
-  return y;
+  // merge element-wise to keep every represented element path. Otherwise not
+  // structurally mergeable — the later member wins.
+  return Arr.isArray(x) && Arr.isArray(y) && x.length === y.length
+    ? x.map((xi, i) => mergePruned(xi, y[i]))
+    : y;
 };
 
 type IntersectionType<Types extends NonEmptyTuple<UnknownType>> = Type<

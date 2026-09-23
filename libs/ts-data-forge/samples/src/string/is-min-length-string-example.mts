@@ -11,11 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isMinLengthString(12, 'short'));
 
-    if (Str.isMinLengthString(12, input)) {
-      const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
+    if (!Str.isMinLengthString(12, input)) return;
 
-      assert.isTrue(nonEmpty.length >= 12);
-    }
+    const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
+
+    assert.isTrue(nonEmpty.length >= 12);
 
     // embed-sample-code-ignore-below
   });

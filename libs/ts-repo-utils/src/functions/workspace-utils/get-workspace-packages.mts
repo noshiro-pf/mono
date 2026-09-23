@@ -74,9 +74,9 @@ export const getWorkspacePackages = async (
 
         const parsed = Json.parse(result.value);
 
-        if (Result.isErr(parsed)) return undefined;
-
-        return [maybePackagePath, parsed.value] as const;
+        return Result.isErr(parsed)
+          ? undefined
+          : ([maybePackagePath, parsed.value] as const);
       }),
     );
 
@@ -136,9 +136,5 @@ const getKeyValueRecordFromJsonValue = (
 
   const obj = value[key];
 
-  if (!isRecord(obj)) {
-    return {};
-  }
-
-  return Obj.filter(obj, isString);
+  return !isRecord(obj) ? {} : Obj.filter(obj, isString);
 };

@@ -60,9 +60,9 @@ export const listPullRequests = async (): Promise<
     `gh pr list --state open --limit 100 --json ${PR_JSON_FIELDS}`,
   );
 
-  if (Result.isErr(listed)) return listed;
-
-  return parseJson(listed.value, PullRequestListSchema);
+  return Result.isErr(listed)
+    ? listed
+    : parseJson(listed.value, PullRequestListSchema);
 };
 
 export const viewPullRequest = async (
@@ -70,9 +70,9 @@ export const viewPullRequest = async (
 ): Promise<Result<PullRequest, string>> => {
   const viewed = await git(`gh pr view ${prNumber} --json ${PR_JSON_FIELDS}`);
 
-  if (Result.isErr(viewed)) return viewed;
-
-  return parseJson(viewed.value, PullRequestSchema);
+  return Result.isErr(viewed)
+    ? viewed
+    : parseJson(viewed.value, PullRequestSchema);
 };
 
 export const remoteSha = async (

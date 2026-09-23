@@ -547,11 +547,8 @@ const isGuaranteedNonEmptyString = (
  * literal and non-string types cannot.
  */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const couldBeNonEmptyString = (type: ts.Type): boolean => {
-  if (type.isStringLiteral()) return type.value !== '';
-
-  return classifyAtom(type) === 'string';
-};
+const couldBeNonEmptyString = (type: ts.Type): boolean =>
+  type.isStringLiteral() ? type.value !== '' : classifyAtom(type) === 'string';
 
 /**
  * Returns `true` when evaluating the expression cannot have observable side

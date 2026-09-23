@@ -46,15 +46,12 @@ export const valueof = <const R extends UnknownRecord>(
     }) as ValueOfType<R>;
   }
 
-  if (Arr.isNonEmpty(types)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return types[0] as ValueOfType<R>;
-  }
-
-  // types is empty
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return undefinedType satisfies Type<undefined> as ValueOfType<R>;
+  return Arr.isNonEmpty(types)
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (types[0] as ValueOfType<R>)
+    : // types is empty
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (undefinedType satisfies Type<undefined> as ValueOfType<R>);
 };
 
 type ValueOfType<T extends UnknownRecord> =

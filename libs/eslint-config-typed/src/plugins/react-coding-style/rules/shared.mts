@@ -123,9 +123,7 @@ export const getReactMemoArrowFunction = (
     return undefined;
   }
 
-  if (firstArgument.type !== AST_NODE_TYPES.ArrowFunctionExpression) {
-    return undefined;
-  }
-
-  return firstArgument;
+  return firstArgument.type !== AST_NODE_TYPES.ArrowFunctionExpression
+    ? undefined
+    : firstArgument;
 };

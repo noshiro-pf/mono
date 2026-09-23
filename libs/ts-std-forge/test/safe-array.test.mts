@@ -23,21 +23,25 @@ describe('SafeArray.isArray', () => {
 
     assert.isTrue(SafeArray.isArray(value));
 
-    if (SafeArray.isArray(value)) {
-      expectType<typeof value, readonly number[]>('=');
-
-      assert.deepStrictEqual(value, [1, 2]);
+    if (!SafeArray.isArray(value)) {
+      return;
     }
+
+    expectType<typeof value, readonly number[]>('=');
+
+    assert.deepStrictEqual(value, [1, 2]);
   });
 
   test('narrows unknown to readonly unknown[] rather than to any[]', () => {
     const value: unknown = [1, 2] as const;
 
-    if (SafeArray.isArray(value)) {
-      expectType<typeof value, readonly unknown[]>('=');
-
-      assert.strictEqual(value.length, 2);
+    if (!SafeArray.isArray(value)) {
+      return;
     }
+
+    expectType<typeof value, readonly unknown[]>('=');
+
+    assert.strictEqual(value.length, 2);
   });
 });
 
@@ -73,11 +77,13 @@ describe('SafeArray.isNonEmpty', () => {
 
     assert.isTrue(SafeArray.isNonEmpty(values));
 
-    if (SafeArray.isNonEmpty(values)) {
-      expectType<(typeof values)[0], number>('=');
-
-      assert.strictEqual(values[0], 1);
+    if (!SafeArray.isNonEmpty(values)) {
+      return;
     }
+
+    expectType<(typeof values)[0], number>('=');
+
+    assert.strictEqual(values[0], 1);
   });
 
   test('is the complement of isEmpty over the same inputs', () => {

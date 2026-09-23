@@ -11,9 +11,7 @@ const fahrenheitAtom = atom(68);
 const temperatureAtom = atom((get) => {
   const mode = get(modeAtom);
 
-  if (mode === 'celsius') return get(celsiusAtom);
-
-  return get(fahrenheitAtom);
+  return mode === 'celsius' ? get(celsiusAtom) : get(fahrenheitAtom);
 });
 
 // embed-sample-code-ignore-below

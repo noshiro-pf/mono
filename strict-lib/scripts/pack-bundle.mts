@@ -85,12 +85,10 @@ export const packBundle = async (
     { silent: true },
   );
 
-  if (Result.isErr(packed)) {
-    return Result.err(`${bundle.name}: npm pack failed`);
-  }
-
   // `npm pack` of an unscoped package emits `<name>-<version>.tgz`.
-  return Result.ok(path.join(destDir, `${bundle.name}-${bundle.version}.tgz`));
+  return Result.isErr(packed)
+    ? Result.err(`${bundle.name}: npm pack failed`)
+    : Result.ok(path.join(destDir, `${bundle.name}-${bundle.version}.tgz`));
 };
 
 /** The subset of `package.json` fields this module reads. */

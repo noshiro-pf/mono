@@ -963,11 +963,13 @@ describe('Arr transformations', () => {
         expect(fruits.value[1]?.name).toBe('banana');
       }
 
-      if (Optional.isSome(vegetables)) {
-        expect(vegetables.value).toHaveLength(1);
-
-        expect(vegetables.value[0]?.name).toBe('carrot');
+      if (!Optional.isSome(vegetables)) {
+        return;
       }
+
+      expect(vegetables.value).toHaveLength(1);
+
+      expect(vegetables.value[0]?.name).toBe('carrot');
     });
 
     test('should work with numeric keys', () => {

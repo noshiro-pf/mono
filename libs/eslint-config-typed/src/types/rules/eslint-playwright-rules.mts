@@ -206,6 +206,50 @@ namespace MissingPlaywrightAwait {
 }
 
 /**
+ * @description Disallow the `timeout` option on actions
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-action-timeout.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoActionTimeout {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allow": {
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array",
+   *         "uniqueItems": true
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    allow?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Disallow commented out tests
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-commented-out-tests.md
  *
@@ -319,6 +363,22 @@ namespace NoEval {
 }
 
 /**
+ * @description Disallow using `export` in files containing tests
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-export.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoExport {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Prevent usage of `.only()` focus test annotation
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-focused-test.md
  *
@@ -405,6 +465,77 @@ namespace NoHooks {
    */
   export type Options = Readonly<{
     allow?: readonly unknown[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow identical titles
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-identical-title.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace NoIdenticalTitle {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow magic numbers as Playwright timeout values
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-magic-timeouts.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoMagicTimeouts {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allow": {
+   *         "items": {
+   *           "type": "number"
+   *         },
+   *         "type": "array"
+   *       },
+   *       "minOccurrences": {
+   *         "minimum": 1,
+   *         "type": "integer"
+   *       },
+   *       "properties": {
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    allow?: readonly number[];
+    minOccurrences?: number;
+    properties?: readonly string[];
   }>;
 
   export type RuleEntry =
@@ -701,8 +832,24 @@ namespace NoSkippedTest {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowConditional": {
-   *         "default": false,
-   *         "type": "boolean"
+   *         "anyOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "additionalProperties": false,
+   *             "properties": {
+   *               "fixme": {
+   *                 "type": "boolean"
+   *               },
+   *               "skip": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "type": "object"
+   *           }
+   *         ],
+   *         "default": false
    *       },
    *       "disallowFixme": {
    *         "default": false,
@@ -718,7 +865,12 @@ namespace NoSkippedTest {
     /**
      * @default false
      */
-    allowConditional?: boolean;
+    allowConditional?:
+      | boolean
+      | Readonly<{
+          fixme?: boolean;
+          skip?: boolean;
+        }>;
     /**
      * @default false
      */
@@ -790,6 +942,71 @@ namespace NoSlowedTest {
  *  ```
  */
 namespace NoStandaloneExpect {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow template literals in test, describe, and step titles
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-template-literal-title.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoTemplateLiteralTitle {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "ignore": {
+   *         "additionalItems": false,
+   *         "items": {
+   *           "enum": [
+   *             "test",
+   *             "test.describe",
+   *             "test.step"
+   *           ]
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    ignore?: readonly ('test' | 'test.describe' | 'test.step')[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow explicitly returning from tests
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-test-return-statement.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoTestReturnStatement {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -943,6 +1160,56 @@ namespace NoWaitForTimeout {
  */
 namespace PreferComparisonMatcher {
   export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Prefer having the last statement in a test be an assertion
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-ending-with-an-expect.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferEndingWithAnExpect {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "assertFunctionNames": {
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       },
+   *       "assertFunctionPatterns": {
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    assertFunctionNames?: readonly string[];
+    assertFunctionPatterns?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1220,6 +1487,59 @@ namespace PreferToHaveLength {
  */
 namespace PreferWebFirstAssertions {
   export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Require a reason for `.skip()` and `.fixme()` annotations
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-annotation-reason.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireAnnotationReason {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "annotations": {
+   *         "items": {
+   *           "enum": [
+   *             "fail",
+   *             "fixme",
+   *             "skip",
+   *             "slow"
+   *           ],
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       },
+   *       "pattern": {
+   *         "type": "string"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    annotations?: readonly ('fail' | 'fixme' | 'skip' | 'slow')[];
+    pattern?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1676,6 +1996,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/max-expects': MaxExpects.RuleEntry;
   'playwright/max-nested-describe': MaxNestedDescribe.RuleEntry;
   'playwright/missing-playwright-await': MissingPlaywrightAwait.RuleEntry;
+  'playwright/no-action-timeout': NoActionTimeout.RuleEntry;
   'playwright/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
   'playwright/no-conditional-expect': NoConditionalExpect.RuleEntry;
   'playwright/no-conditional-in-test': NoConditionalInTest.RuleEntry;
@@ -1683,10 +2004,13 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-duplicate-slow': NoDuplicateSlow.RuleEntry;
   'playwright/no-element-handle': NoElementHandle.RuleEntry;
   'playwright/no-eval': NoEval.RuleEntry;
+  'playwright/no-export': NoExport.RuleEntry;
   'playwright/no-focused-test': NoFocusedTest.RuleEntry;
   'playwright/no-force-option': NoForceOption.RuleEntry;
   'playwright/no-get-by-title': NoGetByTitle.RuleEntry;
   'playwright/no-hooks': NoHooks.RuleEntry;
+  'playwright/no-identical-title': NoIdenticalTitle.RuleEntry;
+  'playwright/no-magic-timeouts': NoMagicTimeouts.RuleEntry;
   'playwright/no-nested-step': NoNestedStep.RuleEntry;
   'playwright/no-networkidle': NoNetworkidle.RuleEntry;
   'playwright/no-nth-methods': NoNthMethods.RuleEntry;
@@ -1698,6 +2022,8 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
   'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
   'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'playwright/no-template-literal-title': NoTemplateLiteralTitle.RuleEntry;
+  'playwright/no-test-return-statement': NoTestReturnStatement.RuleEntry;
   'playwright/no-unnecessary-assertions': NoUnnecessaryAssertions.RuleEntry;
   'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
   'playwright/no-unused-locators': NoUnusedLocators.RuleEntry;
@@ -1707,6 +2033,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-wait-for-selector': NoWaitForSelector.RuleEntry;
   'playwright/no-wait-for-timeout': NoWaitForTimeout.RuleEntry;
   'playwright/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  'playwright/prefer-ending-with-an-expect': PreferEndingWithAnExpect.RuleEntry;
   'playwright/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
   'playwright/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
   'playwright/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
@@ -1719,6 +2046,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/prefer-to-have-count': PreferToHaveCount.RuleEntry;
   'playwright/prefer-to-have-length': PreferToHaveLength.RuleEntry;
   'playwright/prefer-web-first-assertions': PreferWebFirstAssertions.RuleEntry;
+  'playwright/require-annotation-reason': RequireAnnotationReason.RuleEntry;
   'playwright/require-hook': RequireHook.RuleEntry;
   'playwright/require-soft-assertions': RequireSoftAssertions.RuleEntry;
   'playwright/require-tags': RequireTags.RuleEntry;
@@ -1737,15 +2065,20 @@ export type EslintPlaywrightRulesOption = Readonly<{
   'playwright/max-expects': MaxExpects.Options;
   'playwright/max-nested-describe': MaxNestedDescribe.Options;
   'playwright/missing-playwright-await': MissingPlaywrightAwait.Options;
+  'playwright/no-action-timeout': NoActionTimeout.Options;
   'playwright/no-hooks': NoHooks.Options;
+  'playwright/no-magic-timeouts': NoMagicTimeouts.Options;
   'playwright/no-raw-locators': NoRawLocators.Options;
   'playwright/no-restricted-locators': NoRestrictedLocators.Options;
   'playwright/no-restricted-matchers': NoRestrictedMatchers.Options;
   'playwright/no-restricted-roles': NoRestrictedRoles.Options;
   'playwright/no-skipped-test': NoSkippedTest.Options;
   'playwright/no-slowed-test': NoSlowedTest.Options;
+  'playwright/no-template-literal-title': NoTemplateLiteralTitle.Options;
+  'playwright/prefer-ending-with-an-expect': PreferEndingWithAnExpect.Options;
   'playwright/prefer-lowercase-title': PreferLowercaseTitle.Options;
   'playwright/prefer-native-locators': PreferNativeLocators.Options;
+  'playwright/require-annotation-reason': RequireAnnotationReason.Options;
   'playwright/require-hook': RequireHook.Options;
   'playwright/require-top-level-describe': RequireTopLevelDescribe.Options;
   'playwright/valid-expect': ValidExpect.Options;

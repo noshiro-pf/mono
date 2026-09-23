@@ -39,11 +39,13 @@ import { atom, createStore } from 'jotai/vanilla';
 
         store.set(counterAtom, mut_count);
 
-        if (mut_count >= 4) {
-          clearInterval(interval);
-
-          resolve();
+        if (!(mut_count >= 4)) {
+          return;
         }
+
+        clearInterval(interval);
+
+        resolve();
       }, 100);
     });
 

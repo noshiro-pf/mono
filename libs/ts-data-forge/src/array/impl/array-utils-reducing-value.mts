@@ -605,11 +605,9 @@ export function join(
     case 1: {
       const [arg] = args;
 
-      if (isString(arg) || isUndefined(arg)) {
-        return (array) => joinImpl(array, arg);
-      }
-
-      return joinImpl(arg, undefined);
+      return isString(arg) || isUndefined(arg)
+        ? (array) => joinImpl(array, arg)
+        : joinImpl(arg, undefined);
     }
 
     case 2: {

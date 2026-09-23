@@ -406,9 +406,7 @@ const outOfScopeReason = (
     return `base is ${pr.baseRefName}`;
   }
 
-  if (!isSafeRefName(pr.headRefName)) {
-    return `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`;
-  }
-
-  return undefined;
+  return !isSafeRefName(pr.headRefName)
+    ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
+    : undefined;
 };

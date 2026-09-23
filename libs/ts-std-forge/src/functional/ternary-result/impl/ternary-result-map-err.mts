@@ -63,12 +63,9 @@ export function mapErr<R extends UnknownTernaryResult, E2>(
 const mapErrImpl = <R extends UnknownTernaryResult, E2>(
   result: R,
   mapFn: (error: UnwrapErr<R>) => E2,
-): TernaryResult<UnwrapOk<R>, E2, UnwrapWarn<R>> => {
-  if (isErr(result)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return err(mapFn(result.value as UnwrapErr<R>));
-  }
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return result as TernaryResult<UnwrapOk<R>, E2, UnwrapWarn<R>>;
-};
+): TernaryResult<UnwrapOk<R>, E2, UnwrapWarn<R>> =>
+  isErr(result)
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      err(mapFn(result.value as UnwrapErr<R>))
+    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (result as TernaryResult<UnwrapOk<R>, E2, UnwrapWarn<R>>);

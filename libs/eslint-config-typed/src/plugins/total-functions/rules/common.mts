@@ -70,13 +70,11 @@ export const isLiteral = (
     return Arr.isEmpty(sourceNode.properties);
   }
 
-  if (sourceNode.type === AST_NODE_TYPES.ArrayExpression) {
-    // empty object literal: []
-    return Arr.isEmpty(sourceNode.elements);
-  }
-
+  // empty object literal: []
+  //
   // TODO: handle recursive case for both arrays and objects and
   // permit literals such as string and numbers as properties
-
-  return false;
+  return sourceNode.type === AST_NODE_TYPES.ArrayExpression
+    ? Arr.isEmpty(sourceNode.elements)
+    : false;
 };

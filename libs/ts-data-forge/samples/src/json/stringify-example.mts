@@ -21,19 +21,18 @@ if (import.meta.vitest !== undefined) {
     assert.isTrue(Result.isOk(formatted));
 
     // With replacer
-    const filtered = Json.stringify(data, (key, value) => {
-      if (key === 'age') return undefined; // omit age field
-
-      return value;
-    });
+    const filtered = Json.stringify(data, (key, value) =>
+      // omit age field
+      key === 'age' ? undefined : value,
+    );
 
     assert.isTrue(Result.isOk(filtered));
 
-    if (Result.isOk(filtered)) {
-      assert.isTrue(isString(filtered.value));
+    if (!Result.isOk(filtered)) return;
 
-      assert.isFalse(filtered.value.includes('age'));
-    }
+    assert.isTrue(isString(filtered.value));
+
+    assert.isFalse(filtered.value.includes('age'));
 
     // embed-sample-code-ignore-below
   });

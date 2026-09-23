@@ -54,9 +54,7 @@ const isPropertyAccess = (
     return parent.left === identifier;
   }
 
-  if (parent.type === AST_NODE_TYPES.JSXMemberExpression) {
-    return parent.object === identifier;
-  }
-
-  return false;
+  return parent.type === AST_NODE_TYPES.JSXMemberExpression
+    ? parent.object === identifier
+    : false;
 };

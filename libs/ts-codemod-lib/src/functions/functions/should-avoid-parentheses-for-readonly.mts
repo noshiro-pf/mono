@@ -16,13 +16,9 @@ import * as tsm from 'ts-morph';
 export const shouldAvoidParenthesesForReadonly = (node: tsm.Node): boolean => {
   const parent = node.getParent();
 
-  if (parent === undefined) {
-    return false;
-  }
-
   // Check if parent is TypePredicate: x is T
   // In this case, we MUST avoid parentheses: x is readonly T (not x is (readonly T))
   // because `x is (readonly T)` is a syntax error
   // For all other cases, keep parentheses for safety
-  return parent.isKind(tsm.SyntaxKind.TypePredicate);
+  return parent?.isKind(tsm.SyntaxKind.TypePredicate) ?? false;
 };

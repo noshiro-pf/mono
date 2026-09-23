@@ -189,11 +189,9 @@ const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
 
   const { versions, time } = raw;
 
-  if (!isListOfStrings(versions) || !isRecord(time)) {
-    return undefined;
-  }
-
-  return { versions, time };
+  return !isListOfStrings(versions) || !isRecord(time)
+    ? undefined
+    : { versions, time };
 };
 
 // ---------------------------------------------------------------------------
@@ -606,11 +604,9 @@ export const parseStableVersion = (
 
   const [, major, minor, patch] = match;
 
-  if (major === undefined || minor === undefined || patch === undefined) {
-    return undefined;
-  }
-
-  return { major, minor, patch };
+  return major === undefined || minor === undefined || patch === undefined
+    ? undefined
+    : { major, minor, patch };
 };
 
 export const compareVersions = (a: StableVersion, b: StableVersion): number => {

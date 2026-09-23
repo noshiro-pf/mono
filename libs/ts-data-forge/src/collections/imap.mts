@@ -759,10 +759,10 @@ class IMapClass<K extends MapSetKeyType, V>
 
   /** @inheritdoc */
   get(key: K | (WidenLiteral<K> & {})): Optional<V> {
-    if (!this.has(key)) return Optional.none;
-
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-non-null-assertion
-    return Optional.some(this.#map.get(key as K)!);
+    return this.has(key)
+      ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-non-null-assertion
+        Optional.some(this.#map.get(key as K)!)
+      : Optional.none;
   }
 
   /** @inheritdoc */

@@ -27,10 +27,6 @@ export const fromThrowable = <T,>(
   try {
     return ok(fn());
   } catch (error) {
-    if (isError(error)) {
-      return err(error);
-    }
-
-    return err(new Error(unknownToString(error)));
+    return isError(error) ? err(error) : err(new Error(unknownToString(error)));
   }
 };

@@ -76,24 +76,26 @@ export const createRouterLinkClickHandler =
     const href = el.href;
 
     if (
-      !ev.defaultPrevented &&
-      ev.button === 0 && // Ignore everything but left clicks
-      (el.target === '' || el.target === '_self') && // Let browser handle "target=_blank" etc.
-      !isModifiedEvent(ev) // Ignore clicks with modifier keys
+      ev.defaultPrevented ||
+      ev.button !== 0 || // Ignore everything but left clicks
+      (el.target !== '' && el.target !== '_self') || // Let browser handle "target=_blank" etc.
+      isModifiedEvent(ev) // Ignore clicks with modifier keys
     ) {
-      ev.preventDefault();
+      return;
+    }
 
-      // If the URL hasn't changed, a regular <a> will do a replace instead of
-      // a push, so do the same here.
-      const replace =
-        // eslint-disable-next-line unicorn/prefer-global-this
-        replaceProp === true || createPath(window.location) === href;
+    ev.preventDefault();
 
-      if (replace) {
-        redirectFn(href);
-      } else {
-        pushFn(href);
-      }
+    // If the URL hasn't changed, a regular <a> will do a replace instead of
+    // a push, so do the same here.
+    const replace =
+      // eslint-disable-next-line unicorn/prefer-global-this
+      replaceProp === true || createPath(window.location) === href;
+
+    if (replace) {
+      redirectFn(href);
+    } else {
+      pushFn(href);
     }
   };
 

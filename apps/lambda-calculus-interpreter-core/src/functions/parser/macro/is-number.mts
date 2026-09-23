@@ -25,11 +25,7 @@ export const isNumber = (
   const sub = (t: LambdaTerm): boolean => {
     if (isVariable(t)) return t === z;
 
-    if (isApplication(t)) {
-      return t[0] === s && sub(t[1]);
-    }
-
-    return false;
+    return isApplication(t) ? t[0] === s && sub(t[1]) : false;
   };
 
   // ToDo

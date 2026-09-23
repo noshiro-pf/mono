@@ -29,13 +29,11 @@ const extractFileIgnoreTransformers = (code: string): readonly string[] => {
     if (match !== null) {
       const targetTransformers = match[1]?.trim() ?? '';
 
-      // Empty means ignore all transformers
-      if (targetTransformers === '') {
-        return [];
-      }
-
-      // Parse comma-separated transformer names
-      return targetTransformers.split(',').map((name) => name.trim());
+      // Empty means ignore all transformers; otherwise parse comma-separated
+      // transformer names
+      return targetTransformers === ''
+        ? []
+        : targetTransformers.split(',').map((name) => name.trim());
     }
   }
 
@@ -67,13 +65,11 @@ const shouldSkipFile = (
     return true;
   }
 
-  // If transformer name is not specified, don't skip
-  if (transformerName === undefined) {
-    return false;
-  }
-
-  // Check if the transformer is in the ignore list
-  return ignoredTransformers.includes(transformerName);
+  // If transformer name is not specified, don't skip; otherwise check if the
+  // transformer is in the ignore list
+  return transformerName === undefined
+    ? false
+    : ignoredTransformers.includes(transformerName);
 };
 
 export const transformSourceCode = (

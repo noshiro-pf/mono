@@ -154,13 +154,11 @@ export const flattenShapeStructure = (
       // Intersection can be flattened by merging all parts
       const parts = structure.parts.map(flattenShapeStructure);
 
-      if (parts.includes(undefined)) {
-        // Contains union - cannot flatten
-        return undefined;
-      }
-
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return Obj.merge(...(parts as readonly UnknownShape[]));
+      return parts.includes(undefined)
+        ? // Contains union - cannot flatten
+          undefined
+        : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          Obj.merge(...(parts as readonly UnknownShape[]));
     }
     case 'union': {
       // Union cannot be flattened to a single shape

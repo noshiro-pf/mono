@@ -17,9 +17,7 @@ export const normalizeList = (
     asNonNegativeFiniteNumber(0),
   );
 
-  if (Num.isNonZero(maxValueInList)) {
-    return Arr.map(list, (l) => NonNegativeFiniteNumber.div(l, maxValueInList));
-  }
-
-  return list;
+  return Num.isNonZero(maxValueInList)
+    ? Arr.map(list, (l) => NonNegativeFiniteNumber.div(l, maxValueInList))
+    : list;
 };

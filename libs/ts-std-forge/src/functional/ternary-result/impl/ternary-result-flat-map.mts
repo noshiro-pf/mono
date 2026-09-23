@@ -100,11 +100,9 @@ const flatMapImpl = <R extends UnknownTernaryResult, S2, W2, E2>(
       );
     }
 
-    if (isWarn(next)) {
-      return warn(next.value, next.warning satisfies W2 | UnwrapWarn<R>);
-    }
-
-    return next;
+    return isWarn(next)
+      ? warn(next.value, next.warning satisfies W2 | UnwrapWarn<R>)
+      : next;
   }
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

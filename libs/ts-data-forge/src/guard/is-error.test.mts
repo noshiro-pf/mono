@@ -111,11 +111,13 @@ describe('isError from @sindresorhus/is', () => {
   test('should act as a type guard', () => {
     const value: Error | string = new Error('test');
 
-    if (isErrorBySindreSorhus(value)) {
-      expectType<typeof value, Error>('=');
-
-      expect(value.message).toBe('test');
+    if (!isErrorBySindreSorhus(value)) {
+      return;
     }
+
+    expectType<typeof value, Error>('=');
+
+    expect(value.message).toBe('test');
   });
 
   test('should work with AggregateError', () => {

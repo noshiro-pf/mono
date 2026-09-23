@@ -171,10 +171,10 @@ const readScenario = async (
     fs.readFile(path.resolve(dir, file), 'utf8'),
   );
 
-  if (Result.isErr(read)) return undefined;
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return JSON.parse(read.value) as unknown as Results;
+  return Result.isErr(read)
+    ? undefined
+    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (JSON.parse(read.value) as unknown as Results);
 };
 
 /** `''` for a single-point scenario, the sweep's labels for a swept one. */

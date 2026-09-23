@@ -293,11 +293,13 @@ describe('Arr search operations', () => {
 
       expect(result).toBeGreaterThanOrEqual(0);
 
-      if (result !== -1) {
-        expectType<typeof result, SizeType.Arr>('=');
-
-        expect(result).toBe(1);
+      if (result === -1) {
+        return;
       }
+
+      expectType<typeof result, SizeType.Arr>('=');
+
+      expect(result).toBe(1);
     });
 
     test('should return -1 for non-existent element', () => {
@@ -317,11 +319,13 @@ describe('Arr search operations', () => {
 
       expect(result).toBeGreaterThanOrEqual(0);
 
-      if (result !== -1) {
-        expectType<typeof result, SizeType.Arr>('=');
-
-        expect(result).toBe(3);
+      if (result === -1) {
+        return;
       }
+
+      expectType<typeof result, SizeType.Arr>('=');
+
+      expect(result).toBe(3);
     });
 
     test('should return -1 when element not found from index', () => {
@@ -365,11 +369,13 @@ describe('Arr search operations', () => {
 
       expect(result).toBeGreaterThanOrEqual(0);
 
-      if (result !== -1) {
-        expectType<typeof result, SizeType.Arr>('=');
-
-        expect(result).toBe(3);
+      if (result === -1) {
+        return;
       }
+
+      expectType<typeof result, SizeType.Arr>('=');
+
+      expect(result).toBe(3);
     });
 
     test('should return -1 for non-existent element', () => {
@@ -389,11 +395,13 @@ describe('Arr search operations', () => {
 
       expect(result).toBeGreaterThanOrEqual(0);
 
-      if (result !== -1) {
-        expectType<typeof result, SizeType.Arr>('=');
-
-        expect(result).toBe(1);
+      if (result === -1) {
+        return;
       }
+
+      expectType<typeof result, SizeType.Arr>('=');
+
+      expect(result).toBe(1);
     });
 
     test('should return -1 when element not found before index', () => {

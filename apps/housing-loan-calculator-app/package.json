@@ -34,8 +34,8 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^6.18.0",
-    "@blueprintjs/icons": "^6.13.0",
+    "@blueprintjs/core": "^6.19.0",
+    "@blueprintjs/icons": "^6.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "normalize.css": "^8.0.1",

@@ -110,15 +110,15 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
           }
         }
 
-        if (queues.every((list) => !list.isEmpty)) {
-          const nextValue =
-            // `Arr.map` has a single result element type, so it reports
-            // `A[number] | undefined` per position rather than `A[P]`.
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
+        if (queues.some((list) => list.isEmpty)) return;
 
-          setNext(nextValue, updateToken);
-        }
+        const nextValue =
+          // `Arr.map` has a single result element type, so it reports
+          // `A[number] | undefined` per position rather than `A[P]`.
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
+
+        setNext(nextValue, updateToken);
       },
   );
 };

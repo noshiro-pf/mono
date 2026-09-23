@@ -80,14 +80,14 @@ const setAnswerBeingEditedSectionState = (
   setAnswerBeingEditedSectionState_(nextState);
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
-  if (nextState === 'creating') {
-    const user = Auth.getFireAuthUserSnapshot();
+  if (nextState !== 'creating') return;
 
-    updateAnswerBeingEdited((ans) => ({
-      ...ans,
-      user: { ...ans.user, id: mapOptional(user?.uid, UserId.cast) ?? null },
-    }));
-  }
+  const user = Auth.getFireAuthUserSnapshot();
+
+  updateAnswerBeingEdited((ans) => ({
+    ...ans,
+    user: { ...ans.user, id: mapOptional(user?.uid, UserId.cast) ?? null },
+  }));
 };
 
 const [resetAnswerBeingEditedAction$, resetAnswerBeingEdited] =

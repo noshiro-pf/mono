@@ -170,11 +170,9 @@ export const record = <
           const value = a[k];
 
           // For optional fields, if the value is undefined, keep it as undefined
-          if (value === undefined && v.optional === true) {
-            return tp(k, undefined);
-          }
-
-          return tp(k, v.fill(value));
+          return value === undefined && v.optional === true
+            ? tp(k, undefined)
+            : tp(k, v.fill(value));
         }
 
         return tp(k, v.defaultValue);

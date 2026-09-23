@@ -263,12 +263,12 @@ describe('Stack test', () => {
     for (const i of range(100)) {
       stack.push(i);
 
-      if (i % 2 === 1) {
-        // Pop every other time
-        const result = stack.pop();
+      if (i % 2 !== 1) continue;
 
-        expect(Optional.unwrap(result)).toBe(i);
-      }
+      // Pop every other time
+      const result = stack.pop();
+
+      expect(Optional.unwrap(result)).toBe(i);
     }
 
     // Should have 50 elements remaining (0, 2, 4, ..., 98)

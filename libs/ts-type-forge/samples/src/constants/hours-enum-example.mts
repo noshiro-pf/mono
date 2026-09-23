@@ -8,8 +8,7 @@ const formatHour = (hour: HoursEnum): string =>
 const is12HourFormat = (hour: HoursEnum): string => {
   if (hour === 0) return '12 AM';
   if (hour === 12) return '12 PM';
-  if (hour < 12) return `${hour} AM`;
-  return `${hour - 12} PM`;
+  return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
 };
 
 const midnight = 0 satisfies HoursEnum;

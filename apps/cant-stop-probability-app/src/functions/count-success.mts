@@ -73,11 +73,9 @@ const progressFor = (
     return 'twoLine';
   }
 
-  if (x1 || x2 || x3 || y1 || y2 || y3 || z1 || z2 || z3) {
-    return 'oneLine';
-  }
-
-  return 'noLine';
+  return x1 || x2 || x3 || y1 || y2 || y3 || z1 || z2 || z3
+    ? 'oneLine'
+    : 'noLine';
 };
 
 export const countSuccess = (

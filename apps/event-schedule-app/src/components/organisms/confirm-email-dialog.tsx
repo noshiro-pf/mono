@@ -41,11 +41,13 @@ export const ConfirmEmailDialog = memoNamed<ConfirmEmailDialogProps>(
     React.useEffect(() => {
       const email = fireAuthUser?.email;
 
-      if (isString(email)) {
-        ConfirmEmailDialogStore.inputEmailHandler(email);
-
-        ConfirmEmailDialogStore.enterClickHandler();
+      if (!isString(email)) {
+        return;
       }
+
+      ConfirmEmailDialogStore.inputEmailHandler(email);
+
+      ConfirmEmailDialogStore.enterClickHandler();
     }, [fireAuthUser?.email]);
 
     return (

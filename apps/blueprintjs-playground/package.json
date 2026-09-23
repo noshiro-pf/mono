@@ -27,11 +27,11 @@
     "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts"
   },
   "dependencies": {
-    "@blueprintjs/core": "^6.18.0",
-    "@blueprintjs/datetime": "^6.2.4",
-    "@blueprintjs/datetime2": "^3.2.4",
-    "@blueprintjs/icons": "^6.13.0",
-    "@blueprintjs/select": "^6.3.4",
+    "@blueprintjs/core": "^6.19.0",
+    "@blueprintjs/datetime": "^6.2.5",
+    "@blueprintjs/datetime2": "^3.2.5",
+    "@blueprintjs/icons": "^6.14.0",
+    "@blueprintjs/select": "^6.3.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "normalize.css": "^8.0.1",

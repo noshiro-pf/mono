@@ -362,28 +362,30 @@ const transformNode = (
     return;
   }
 
-  if (tsm.Node.isConditionalExpression(node)) {
-    // For conditional expressions, traverse both branches in a non-const context
-    transformNode(
-      node.getWhenTrue(),
-      {
-        isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
-        isUnderConstContext: false,
-      },
-      options,
-    );
-
-    transformNode(
-      node.getWhenFalse(),
-      {
-        isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
-        isUnderConstContext: false,
-      },
-      options,
-    );
-
-    // return;
+  if (!tsm.Node.isConditionalExpression(node)) {
+    return;
   }
+
+  // For conditional expressions, traverse both branches in a non-const context
+  transformNode(
+    node.getWhenTrue(),
+    {
+      isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
+      isUnderConstContext: false,
+    },
+    options,
+  );
+
+  transformNode(
+    node.getWhenFalse(),
+    {
+      isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
+      isUnderConstContext: false,
+    },
+    options,
+  );
+
+  // return;
 };
 
 /**

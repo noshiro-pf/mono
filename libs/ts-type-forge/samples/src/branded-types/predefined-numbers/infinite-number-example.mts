@@ -5,10 +5,8 @@ import { type FiniteNumber, type InfiniteNumber } from 'ts-type-forge';
 const isInfinite = (x: number): x is InfiniteNumber =>
   !Number.isNaN(x) && !Number.isFinite(x);
 
-const checkOverflow = (x: number): FiniteNumber | InfiniteNumber => {
-  if (isInfinite(x)) return x;
-  return x as FiniteNumber;
-};
+const checkOverflow = (x: number): FiniteNumber | InfiniteNumber =>
+  isInfinite(x) ? x : (x as FiniteNumber);
 
 // embed-sample-code-ignore-below
 export { checkOverflow, isInfinite };

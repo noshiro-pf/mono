@@ -716,11 +716,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
         const target = branches[sel];
 
-        if (target === undefined) {
-            return 0;
-        }
-
-        return target.get();
+        return target === undefined ? 0 : target.get();
     });
 
     let mut_lastValue = 0;
@@ -768,11 +764,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
         const targetAtom = branchAtoms[sel];
 
-        if (targetAtom === undefined) {
-            return 0;
-        }
-
-        return get(targetAtom);
+        return targetAtom === undefined ? 0 : get(targetAtom);
     });
 
     const store = createStore();

@@ -14,11 +14,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const target = branches[sel];
 
-    if (target === undefined) {
-      return 0;
-    }
-
-    return target.get();
+    return target === undefined ? 0 : target.get();
   });
 
   let mut_lastValue = 0;

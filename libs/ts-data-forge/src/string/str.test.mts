@@ -34,25 +34,29 @@ describe(Str.isMinLengthString, () => {
   test('should act as a type guard', () => {
     const value: string = 'very-secret-password';
 
-    if (Str.isMinLengthString(12, value)) {
-      expectType<typeof value, MinLengthString<12>>('<=');
-
-      expectType<typeof value, NonEmptyString>('<='); // 12 >= 1
-
-      expectType<typeof value, MinLengthString<16>>('!<=');
-
-      expect(value.length).toBeGreaterThanOrEqual(12);
+    if (!Str.isMinLengthString(12, value)) {
+      return;
     }
+
+    expectType<typeof value, MinLengthString<12>>('<=');
+
+    expectType<typeof value, NonEmptyString>('<='); // 12 >= 1
+
+    expectType<typeof value, MinLengthString<16>>('!<=');
+
+    expect(value.length).toBeGreaterThanOrEqual(12);
   });
 
   test('should preserve literal string types', () => {
     const literal = 'hello';
 
-    if (Str.isMinLengthString(3, literal)) {
-      expectType<typeof literal, 'hello'>('<=');
-
-      expectType<typeof literal, MinLengthString<3>>('<=');
+    if (!Str.isMinLengthString(3, literal)) {
+      return;
     }
+
+    expectType<typeof literal, 'hello'>('<=');
+
+    expectType<typeof literal, MinLengthString<3>>('<=');
   });
 });
 
@@ -80,15 +84,17 @@ describe(Str.isMaxLengthString, () => {
   test('should act as a type guard', () => {
     const value: string = 'noshiro';
 
-    if (Str.isMaxLengthString(32, value)) {
-      expectType<typeof value, MaxLengthString<32>>('<=');
-
-      expectType<typeof value, MaxLengthString<64>>('<='); // 32 <= 64
-
-      expectType<typeof value, MaxLengthString<16>>('!<=');
-
-      expect(value.length).toBeLessThanOrEqual(32);
+    if (!Str.isMaxLengthString(32, value)) {
+      return;
     }
+
+    expectType<typeof value, MaxLengthString<32>>('<=');
+
+    expectType<typeof value, MaxLengthString<64>>('<='); // 32 <= 64
+
+    expectType<typeof value, MaxLengthString<16>>('!<=');
+
+    expect(value.length).toBeLessThanOrEqual(32);
   });
 });
 
@@ -112,19 +118,21 @@ describe(Str.isBoundedLengthString, () => {
   test('should act as a type guard', () => {
     const value: string = 'user-12345678';
 
-    if (Str.isBoundedLengthString(8, 16, value)) {
-      expectType<typeof value, BoundedLengthString<8, 16>>('<=');
-
-      expectType<typeof value, BoundedLengthString<1, 255>>('<='); // [8, 16] ⊆ [1, 255]
-
-      expectType<typeof value, MinLengthString<8>>('<=');
-
-      expectType<typeof value, MaxLengthString<16>>('<=');
-
-      expectType<typeof value, NonEmptyString>('<='); // 8 >= 1
-
-      expectType<typeof value, BoundedLengthString<10, 16>>('!<=');
+    if (!Str.isBoundedLengthString(8, 16, value)) {
+      return;
     }
+
+    expectType<typeof value, BoundedLengthString<8, 16>>('<=');
+
+    expectType<typeof value, BoundedLengthString<1, 255>>('<='); // [8, 16] ⊆ [1, 255]
+
+    expectType<typeof value, MinLengthString<8>>('<=');
+
+    expectType<typeof value, MaxLengthString<16>>('<=');
+
+    expectType<typeof value, NonEmptyString>('<='); // 8 >= 1
+
+    expectType<typeof value, BoundedLengthString<10, 16>>('!<=');
   });
 });
 
@@ -148,19 +156,21 @@ describe(Str.isFixedLengthString, () => {
   test('should act as a type guard', () => {
     const value: string = 'JP';
 
-    if (Str.isFixedLengthString(2, value)) {
-      expectType<typeof value, FixedLengthString<2>>('<=');
-
-      expectType<typeof value, BoundedLengthString<2, 2>>('<=');
-
-      expectType<typeof value, MaxLengthString<5>>('<='); // 2 <= 5
-
-      expectType<typeof value, MinLengthString<1>>('<='); // 2 >= 1
-
-      expectType<typeof value, NonEmptyString>('<=');
-
-      expectType<typeof value, FixedLengthString<3>>('!<=');
+    if (!Str.isFixedLengthString(2, value)) {
+      return;
     }
+
+    expectType<typeof value, FixedLengthString<2>>('<=');
+
+    expectType<typeof value, BoundedLengthString<2, 2>>('<=');
+
+    expectType<typeof value, MaxLengthString<5>>('<='); // 2 <= 5
+
+    expectType<typeof value, MinLengthString<1>>('<='); // 2 >= 1
+
+    expectType<typeof value, NonEmptyString>('<=');
+
+    expectType<typeof value, FixedLengthString<3>>('!<=');
   });
 });
 

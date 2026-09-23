@@ -11,11 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isMaxLengthString(3, input));
 
-    if (Str.isMaxLengthString(32, input)) {
-      const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
+    if (!Str.isMaxLengthString(32, input)) return;
 
-      assert.isTrue(relaxed.length <= 32);
-    }
+    const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
+
+    assert.isTrue(relaxed.length <= 32);
 
     // embed-sample-code-ignore-below
   });

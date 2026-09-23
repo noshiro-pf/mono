@@ -783,9 +783,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   add(key: K): ISet<K> {
-    if (this.has(key)) return this;
-
-    return ISet.create([...this.#set, key]);
+    return this.has(key) ? this : ISet.create([...this.#set, key]);
   }
 
   /** @inheritdoc */

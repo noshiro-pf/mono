@@ -99,9 +99,9 @@ const getNonNullObjectIdentifierName = (
 
   if (rightIdentifierName === undefined) return undefined;
 
-  if (leftIdentifierName !== rightIdentifierName) return undefined;
-
-  return leftIdentifierName;
+  return leftIdentifierName !== rightIdentifierName
+    ? undefined
+    : leftIdentifierName;
 };
 
 const getTypeofObjectIdentifierName = (
@@ -121,9 +121,9 @@ const getTypeofObjectIdentifierName = (
 
   if (right.value !== 'object') return undefined;
 
-  if (left.argument.type !== AST_NODE_TYPES.Identifier) return undefined;
-
-  return left.argument.name;
+  return left.argument.type !== AST_NODE_TYPES.Identifier
+    ? undefined
+    : left.argument.name;
 };
 
 const getNonNullCheckIdentifierName = (
@@ -139,7 +139,5 @@ const getNonNullCheckIdentifierName = (
 
   if (right.type !== AST_NODE_TYPES.Literal) return undefined;
 
-  if (right.value !== null) return undefined;
-
-  return left.name;
+  return right.value !== null ? undefined : left.name;
 };

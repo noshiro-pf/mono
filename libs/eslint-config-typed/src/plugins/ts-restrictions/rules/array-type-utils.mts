@@ -103,9 +103,5 @@ export const matchArrayFromCall = (
 
   const arg = node.arguments[0];
 
-  if (arg.type === AST_NODE_TYPES.SpreadElement) {
-    return undefined;
-  }
-
-  return arg;
+  return arg.type === AST_NODE_TYPES.SpreadElement ? undefined : arg;
 };

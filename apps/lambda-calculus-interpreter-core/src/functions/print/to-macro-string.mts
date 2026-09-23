@@ -7,7 +7,5 @@ export const toMacroString = (term: LambdaTerm): string => {
 
   if (isAlphaEqual(term, SUCC)) return 'SUCC';
 
-  if (isNumber(term)) return (toNumber(term) ?? 0).toString();
-
-  return '[ERROR]';
+  return isNumber(term) ? (toNumber(term) ?? 0).toString() : '[ERROR]';
 };

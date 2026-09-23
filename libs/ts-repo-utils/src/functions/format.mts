@@ -155,11 +155,9 @@ export const formatFiles = async (
   if (results.every((r) => r.status === 'fulfilled')) {
     const fulfilled = results.map((r) => r.value);
 
-    if (fulfilled.every(Result.isOk)) {
-      return Result.ok(undefined);
-    }
-
-    return Result.err(fulfilled.filter(Result.isErr).map((r) => r.value));
+    return fulfilled.every(Result.isOk)
+      ? Result.ok(undefined)
+      : Result.err(fulfilled.filter(Result.isErr).map((r) => r.value));
   }
 
   return Result.err(

@@ -59,26 +59,13 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
         const namedImports = getNamedImports(tsDataForgeImport);
 
         // Group nodes by function name to handle imports efficiently
-        const mut_functionNameToNodes = new Map<
-          string,
-          Readonly<{
-            node: TSESTree.TSAsExpression;
-            typeName: string;
-            functionName: string;
-          }>[]
-        >();
-
-        for (const nodeInfo of mut_nodesToFix) {
-          const mut_nodes =
-            mut_functionNameToNodes.get(nodeInfo.functionName) ?? [];
-
-          mut_nodes.push(nodeInfo);
-
-          mut_functionNameToNodes.set(nodeInfo.functionName, mut_nodes);
-        }
+        const functionNameToNodes = Map.groupBy(
+          mut_nodesToFix,
+          (nodeInfo) => nodeInfo.functionName,
+        );
 
         // Process each group
-        for (const [functionName, nodes] of mut_functionNameToNodes) {
+        for (const [functionName, nodes] of functionNameToNodes) {
           const hasImport = namedImports.includes(functionName);
 
           for (const [index, { node, typeName }] of nodes.entries()) {
@@ -125,7 +112,5 @@ const getBrandedNumberTypeInfo = (
 
   const functionName = brandedNumberTypeNameToFunctionName.get(typeName);
 
-  if (functionName === undefined) return undefined;
-
-  return { typeName, functionName };
+  return functionName === undefined ? undefined : { typeName, functionName };
 };

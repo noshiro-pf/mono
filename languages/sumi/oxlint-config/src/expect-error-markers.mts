@@ -78,23 +78,25 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
       continue;
     }
 
-    if (mut_pending.length > 0) {
-      if (lineText === '') {
-        mut_problems.push(
-          `line ${lineNumber}: @sumi-expect-error marker must be immediately followed by a code line`,
-        );
+    if (!(mut_pending.length > 0)) {
+      continue;
+    }
 
-        mut_pending.length = 0;
-
-        continue;
-      }
-
-      for (const [, pending] of mut_pending) {
-        mut_expected.push({ ...pending, line: lineNumber });
-      }
+    if (lineText === '') {
+      mut_problems.push(
+        `line ${lineNumber}: @sumi-expect-error marker must be immediately followed by a code line`,
+      );
 
       mut_pending.length = 0;
+
+      continue;
     }
+
+    for (const [, pending] of mut_pending) {
+      mut_expected.push({ ...pending, line: lineNumber });
+    }
+
+    mut_pending.length = 0;
   }
 
   for (const [markerLine] of mut_pending) {

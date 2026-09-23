@@ -50,9 +50,5 @@ const extractEnumFromPattern = (pattern: string): readonly string[] => {
   // パターン: ^(option1|option2|...)$ の形式を想定
   const match = /^\^?\(([^)]+)\)\$?$/u.exec(pattern);
 
-  if (match?.[1] !== undefined) {
-    return match[1].split('|');
-  }
-
-  return [];
+  return match?.[1] !== undefined ? match[1].split('|') : [];
 };

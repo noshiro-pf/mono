@@ -81,11 +81,9 @@ export const checkJapaneseParentheses = async (
     0,
   );
 
-  if (fix || !Arr.isNonEmpty(offending)) {
-    return Result.ok({ files: files.length, fixed: fix ? total : 0, total });
-  }
-
-  return Result.err(formatViolations(offending));
+  return fix || !Arr.isNonEmpty(offending)
+    ? Result.ok({ files: files.length, fixed: fix ? total : 0, total })
+    : Result.err(formatViolations(offending));
 };
 
 /**

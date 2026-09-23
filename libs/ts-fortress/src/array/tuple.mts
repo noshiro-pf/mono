@@ -75,12 +75,10 @@ export const tuple = <const A extends readonly UnknownType[]>(
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Result.ok(a as T);
+    return Arr.isNonEmpty(errors)
+      ? Result.err(errors)
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as T);
   };
 
   const fill: Type<T>['fill'] = (a) =>

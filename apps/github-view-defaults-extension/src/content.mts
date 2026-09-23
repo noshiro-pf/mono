@@ -156,11 +156,13 @@ const patchAnchor = (element: Element): void => {
     return;
   }
 
-  if (!listening.has(element)) {
-    listening.add(element);
-
-    element.addEventListener('click', suppressClientSideNavigation);
+  if (listening.has(element)) {
+    return;
   }
+
+  listening.add(element);
+
+  element.addEventListener('click', suppressClientSideNavigation);
 };
 
 /**

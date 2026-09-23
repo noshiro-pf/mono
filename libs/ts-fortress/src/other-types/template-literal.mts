@@ -112,11 +112,7 @@ export const templateLiteral = <T extends string>({
   const fill: Type<T>['fill'] = (a) => {
     const result = validate(a);
 
-    if (Result.isOk(result)) {
-      return result.value;
-    }
-
-    return defaultValue;
+    return Result.isOk(result) ? result.value : defaultValue;
   };
 
   return {

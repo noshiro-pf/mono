@@ -44,13 +44,9 @@ export namespace Json {
    * // With reviver
    * const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
    *
-   * const withReviver = Json.parse(jsonWithDate, (key, value) => {
-   *   if (key === 'created' && typeof value === 'string') {
-   *     return new Date(value);
-   *   }
-   *
-   *   return value;
-   * });
+   * const withReviver = Json.parse(jsonWithDate, (key, value) =>
+   *   key === 'created' && typeof value === 'string' ? new Date(value) : value,
+   * );
    *
    * assert.isTrue(Result.isOk(withReviver));
    * ```
@@ -115,19 +111,18 @@ export namespace Json {
    * assert.isTrue(Result.isOk(formatted));
    *
    * // With replacer
-   * const filtered = Json.stringify(data, (key, value) => {
-   *   if (key === 'age') return undefined; // omit age field
-   *
-   *   return value;
-   * });
+   * const filtered = Json.stringify(data, (key, value) =>
+   *   // omit age field
+   *   key === 'age' ? undefined : value,
+   * );
    *
    * assert.isTrue(Result.isOk(filtered));
    *
-   * if (Result.isOk(filtered)) {
-   *   assert.isTrue(isString(filtered.value));
+   * if (!Result.isOk(filtered)) return;
    *
-   *   assert.isFalse(filtered.value.includes('age'));
-   * }
+   * assert.isTrue(isString(filtered.value));
+   *
+   * assert.isFalse(filtered.value.includes('age'));
    * ```
    *
    * @param value - The JavaScript value to serialize. Can be any value that
@@ -287,24 +282,22 @@ export namespace Json {
    *
    * assert.isTrue(Result.isOk(formatted));
    *
-   * if (Result.isOk(formatted)) {
-   *   assert.isTrue(isString(formatted.value));
+   * if (!Result.isOk(formatted)) return;
    *
-   *   // Check that keys are in order (first key should be "apple")
-   *   assert.isTrue(
-   *     formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
-   *   );
+   * assert.isTrue(isString(formatted.value));
    *
-   *   assert.isTrue(
-   *     formatted.value.indexOf('"mango"') <
-   *       formatted.value.indexOf('"nested"'),
-   *   );
+   * // Check that keys are in order (first key should be "apple")
+   * assert.isTrue(
+   *   formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
+   * );
    *
-   *   assert.isTrue(
-   *     formatted.value.indexOf('"nested"') <
-   *       formatted.value.indexOf('"zebra"'),
-   *   );
-   * }
+   * assert.isTrue(
+   *   formatted.value.indexOf('"mango"') < formatted.value.indexOf('"nested"'),
+   * );
+   *
+   * assert.isTrue(
+   *   formatted.value.indexOf('"nested"') < formatted.value.indexOf('"zebra"'),
+   * );
    * ```
    *
    * @param value - An object (`UnknownRecord`) to serialize. Must be a plain

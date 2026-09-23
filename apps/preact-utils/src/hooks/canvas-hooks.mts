@@ -14,12 +14,12 @@ export const useCanvasContext2d = (): readonly [
   Preact.useEffect(() => {
     const canvasEl = canvasRef.current;
 
-    if (canvasEl !== null) {
-      const ctx2d = canvasEl.getContext('2d');
+    if (canvasEl === null) return;
 
-      if (ctx2d !== null) {
-        setCtx(ctx2d);
-      }
+    const ctx2d = canvasEl.getContext('2d');
+
+    if (ctx2d !== null) {
+      setCtx(ctx2d);
     }
   }, [canvasRef]);
 

@@ -75,11 +75,7 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    return Result.ok(a);
+    return Arr.isNonEmpty(errors) ? Result.err(errors) : Result.ok(a);
   };
 
   const fill: Type<T>['fill'] = (a) =>

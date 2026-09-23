@@ -215,11 +215,9 @@ export const recursion = <A,>(
     ownKeys: (target) => {
       const inner = getInnerType();
 
-      if (hasRecordInternals(inner)) {
-        return [...Object.keys(target), 'shapeStructure', 'excessProperty'];
-      }
-
-      return Object.keys(target);
+      return hasRecordInternals(inner)
+        ? [...Object.keys(target), 'shapeStructure', 'excessProperty']
+        : Object.keys(target);
     },
     getOwnPropertyDescriptor: (target, prop) => {
       if (prop === 'shapeStructure' || prop === 'excessProperty') {

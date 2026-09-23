@@ -197,9 +197,7 @@ export const createClient = (
   ): Promise<Result<A, string>> => {
     const text = await request(route);
 
-    if (Result.isErr(text)) return text;
-
-    return parseJson(text.value, schema, route);
+    return Result.isErr(text) ? text : parseJson(text.value, schema, route);
   };
 
   const comparison = async (

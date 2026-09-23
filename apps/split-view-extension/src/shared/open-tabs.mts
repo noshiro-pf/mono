@@ -21,11 +21,7 @@ export const readOpenSplitViewTabs = async (): Promise<OpenSplitViewTabs> => {
 
   const value: unknown = stored[splitViewOpenTabsSessionKey];
 
-  if (!isRecord(value)) {
-    return {};
-  }
-
-  return Obj.filter(value, isString);
+  return !isRecord(value) ? {} : Obj.filter(value, isString);
 };
 
 export const recordOpenSplitViewTab = async (

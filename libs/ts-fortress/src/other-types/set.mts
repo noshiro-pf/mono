@@ -41,28 +41,26 @@ export const SetType = <T extends UnknownType>(
       for (const element of a) {
         const res = elementType.validate(element);
 
-        if (Result.isErr(res)) {
-          yield {
-            path: [],
-            actualValue: element,
-            expectedType: typeName,
-            typeName,
-            details: {
-              kind: 'set-element',
-              expectedType: elementType.typeName,
-            },
-          } satisfies ValidationError;
-
-          yield* res.value;
+        if (!Result.isErr(res)) {
+          continue;
         }
+
+        yield {
+          path: [],
+          actualValue: element,
+          expectedType: typeName,
+          typeName,
+          details: {
+            kind: 'set-element',
+            expectedType: elementType.typeName,
+          },
+        } satisfies ValidationError;
+
+        yield* res.value;
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    return Result.ok(a);
+    return Arr.isNonEmpty(errors) ? Result.err(errors) : Result.ok(a);
   };
 
   const fill: Type<S>['fill'] = (a) =>

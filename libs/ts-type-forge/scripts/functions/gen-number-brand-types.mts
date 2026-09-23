@@ -528,12 +528,10 @@ const rangeLines = (family: FamilySpec, sign: SignKey): readonly string[] => {
 
   const { lowSym, highSym, lowDec, highDec, split } = rangeForSign(b, sign);
 
-  if (split) {
-    // Non-zero over a signed range: two disjoint intervals.
-    return [`Range: [${b.minSym}, -1] ∪ [1, ${b.maxSym}]`];
-  }
-
-  return [`Range: [${lowSym}, ${highSym}] or [${lowDec}, ${highDec}]`];
+  // Non-zero over a signed range: two disjoint intervals.
+  return split
+    ? [`Range: [${b.minSym}, -1] ∪ [1, ${b.maxSym}]`]
+    : [`Range: [${lowSym}, ${highSym}] or [${lowDec}, ${highDec}]`];
 };
 
 type RangeParts = Readonly<{

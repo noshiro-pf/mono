@@ -126,11 +126,7 @@ const normalizeNames = (
     return new Set();
   }
 
-  if (typeof names === 'string') {
-    return new Set([names]);
-  }
-
-  return new Set(names);
+  return typeof names === 'string' ? new Set([names]) : new Set(names);
 };
 
 /** The function the given node belongs to, nested functions being the nearest. */
@@ -179,13 +175,11 @@ const getDefinitionIfNotMemoized = (
     return undefined;
   }
 
-  if (isReactApiCall(context, parent, 'forwardRef')) {
-    // `React.memo(React.forwardRef(...))` is memoized; `React.forwardRef(...)`
-    // alone is not.
-    return getDefinitionIfNotMemoized(context, parent);
-  }
-
-  return undefined;
+  // `React.memo(React.forwardRef(...))` is memoized; `React.forwardRef(...)`
+  // alone is not.
+  return isReactApiCall(context, parent, 'forwardRef')
+    ? getDefinitionIfNotMemoized(context, parent)
+    : undefined;
 };
 
 /** The name the given expression is bound to, when it is bound to one. */

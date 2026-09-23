@@ -244,13 +244,15 @@ const logStep = async ({
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
 
-  if (Result.isErr(result)) {
-    console.info(`${errorMsg}: ${result.value.message}`);
-
-    console.info('❌ Check failed');
-
-    process.exit(1);
+  if (!Result.isErr(result)) {
+    return;
   }
+
+  console.info(`${errorMsg}: ${result.value.message}`);
+
+  console.info('❌ Check failed');
+
+  process.exit(1);
 };
 
 await checkAll();

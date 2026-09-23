@@ -30,10 +30,8 @@ export function unwrapOk<R extends UnknownTernaryResult>(
 export function unwrapOk<R extends UnknownTernaryResult>(
   result: R,
 ): UnwrapOk<R> | undefined {
-  if (isOk(result) || isWarn(result)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return result.value as UnwrapOk<R>;
-  }
-
-  return undefined;
+  return isOk(result) || isWarn(result)
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (result.value as UnwrapOk<R>)
+    : undefined;
 }

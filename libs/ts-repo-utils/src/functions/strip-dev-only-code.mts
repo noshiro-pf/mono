@@ -693,13 +693,11 @@ const specifierEraseRange = (
     ];
   }
 
-  if (neighbors.prev !== undefined) {
-    // `{ a, X }` -> `{ a }`: the comma that precedes and this one.
-    return [neighbors.prev.getEnd(), specifier.getEnd()];
-  }
-
+  // `{ a, X }` -> `{ a }`: the comma that precedes and this one.
   // The only specifier: the caller erases the whole declaration instead.
-  return [specifier.getStart(sourceFile), specifier.getEnd()];
+  return neighbors.prev !== undefined
+    ? [neighbors.prev.getEnd(), specifier.getEnd()]
+    : [specifier.getStart(sourceFile), specifier.getEnd()];
 };
 
 /**

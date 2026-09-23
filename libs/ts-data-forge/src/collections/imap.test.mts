@@ -656,12 +656,13 @@ describe('IMap.every', () => {
       ['b', 'world'],
     ]);
 
-    if (map.every((value): value is string => typeof value === 'string')) {
-      // Type should be narrowed to IMap<string, string>
-      const firstValue = Optional.unwrap(map.get('a'));
+    if (!map.every((value): value is string => typeof value === 'string'))
+      return;
 
-      assert.isTrue(isString(firstValue));
-    }
+    // Type should be narrowed to IMap<string, string>
+    const firstValue = Optional.unwrap(map.get('a'));
+
+    assert.isTrue(isString(firstValue));
   });
 });
 

@@ -127,13 +127,10 @@ describe('parse', () => {
   });
 
   test('should use reviver function to transform values', () => {
-    const dateReviver = (_key: string, value: unknown): unknown => {
-      if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/u.test(value)) {
-        return new Date(value);
-      }
-
-      return value;
-    };
+    const dateReviver = (_key: string, value: unknown): unknown =>
+      typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/u.test(value)
+        ? new Date(value)
+        : value;
 
     const jsonString = '{"name":"test","created":"2023-12-01T10:00:00.000Z"}';
 
@@ -141,25 +138,24 @@ describe('parse', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (
+    if (!(
       isRecord(result.value) &&
       hasKey(result.value, 'name') &&
       hasKey(result.value, 'created')
-    ) {
-      expect(result.value.name).toBe('test');
-
-      expect(result.value.created).toBeInstanceOf(Date);
+    )) {
+      return;
     }
+
+    expect(result.value.name).toBe('test');
+
+    expect(result.value.created).toBeInstanceOf(Date);
   });
 
   test('should handle reviver returning different types', () => {
-    const transformReviver = (key: string, value: unknown): unknown => {
-      if (key === 'number' && typeof value === 'string') {
-        return Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN);
-      }
-
-      return value;
-    };
+    const transformReviver = (key: string, value: unknown): unknown =>
+      key === 'number' && typeof value === 'string'
+        ? Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN)
+        : value;
 
     const result = Json.parse(
       '{"number":"42","text":"hello"}',
@@ -172,15 +168,17 @@ describe('parse', () => {
 
     expect(result.value).toHaveProperty('text');
 
-    if (
+    if (!(
       isRecord(result.value) &&
       hasKey(result.value, 'number') &&
       hasKey(result.value, 'text')
-    ) {
-      expect(result.value.number).toBe(42);
-
-      expect(result.value.text).toBe('hello');
+    )) {
+      return;
     }
+
+    expect(result.value.number).toBe(42);
+
+    expect(result.value.text).toBe('hello');
   });
 });
 
@@ -336,11 +334,8 @@ describe('stringify', () => {
       email: 'john@example.com',
     } as const;
 
-    const secureReplacer = (key: string, value: unknown): unknown => {
-      if (key === 'password') return '[REDACTED]';
-
-      return value;
-    };
+    const secureReplacer = (key: string, value: unknown): unknown =>
+      key === 'password' ? '[REDACTED]' : value;
 
     const result = Json.stringify(data, secureReplacer);
 
@@ -428,25 +423,29 @@ describe('stringifySelected', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (isRecord(parsed) && hasKey(parsed, 'users')) {
-      assert.isTrue(Arr.isArray(parsed.users));
-
-      expect(parsed.users).toHaveLength(2);
-
-      if (Arr.isArray(parsed.users)) {
-        assert.deepStrictEqual(parsed.users[0], { id: 1, name: 'Alice' });
-
-        expect(parsed.users[0]).not.toHaveProperty('secret');
-      }
-
-      if (isRecord(parsed) && hasKey(parsed, 'metadata')) {
-        assert.deepStrictEqual(parsed.metadata, { total: 2 });
-
-        expect(parsed.metadata).not.toHaveProperty('page');
-
-        expect(parsed.metadata).not.toHaveProperty('internal');
-      }
+    if (!(isRecord(parsed) && hasKey(parsed, 'users'))) {
+      return;
     }
+
+    assert.isTrue(Arr.isArray(parsed.users));
+
+    expect(parsed.users).toHaveLength(2);
+
+    if (Arr.isArray(parsed.users)) {
+      assert.deepStrictEqual(parsed.users[0], { id: 1, name: 'Alice' });
+
+      expect(parsed.users[0]).not.toHaveProperty('secret');
+    }
+
+    if (!(isRecord(parsed) && hasKey(parsed, 'metadata'))) {
+      return;
+    }
+
+    assert.deepStrictEqual(parsed.metadata, { total: 2 });
+
+    expect(parsed.metadata).not.toHaveProperty('page');
+
+    expect(parsed.metadata).not.toHaveProperty('internal');
   });
 
   test('should work with array indices', () => {
@@ -569,23 +568,25 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (isRecord(parsed)) {
-      const keys = Object.keys(parsed);
+    if (!isRecord(parsed)) return;
 
-      assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
+    const keys = Object.keys(parsed);
 
-      if (hasKey(parsed, 'user') && isRecord(parsed.user)) {
-        const userKeys = Object.keys(parsed.user);
+    assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
 
-        assert.deepStrictEqual(userKeys, ['address', 'age', 'name']); // sorted nested keys
+    if (!hasKey(parsed, 'user') || !isRecord(parsed.user)) return;
 
-        if (hasKey(parsed.user, 'address') && isRecord(parsed.user.address)) {
-          const addressKeys = Object.keys(parsed.user.address);
+    const userKeys = Object.keys(parsed.user);
 
-          assert.deepStrictEqual(addressKeys, ['city', 'country', 'zip']); // sorted deeper nested keys
-        }
-      }
+    assert.deepStrictEqual(userKeys, ['address', 'age', 'name']); // sorted nested keys
+
+    if (!hasKey(parsed.user, 'address') || !isRecord(parsed.user.address)) {
+      return;
     }
+
+    const addressKeys = Object.keys(parsed.user.address);
+
+    assert.deepStrictEqual(addressKeys, ['city', 'country', 'zip']); // sorted deeper nested keys
   });
 
   test('should handle arrays with objects', () => {
@@ -609,34 +610,35 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (isRecord(parsed)) {
-      // Check top-level keys are sorted
-      const topKeys = Object.keys(parsed);
+    if (!isRecord(parsed)) return;
 
-      assert.deepStrictEqual(topKeys, ['metadata', 'users']);
+    // Check top-level keys are sorted
+    const topKeys = Object.keys(parsed);
 
-      // Check metadata keys are sorted
-      if (hasKey(parsed, 'metadata') && isRecord(parsed.metadata)) {
-        const metadataKeys = Object.keys(parsed.metadata);
+    assert.deepStrictEqual(topKeys, ['metadata', 'users']);
 
-        assert.deepStrictEqual(metadataKeys, ['author', 'created', 'version']);
-      }
+    // Check metadata keys are sorted
+    if (hasKey(parsed, 'metadata') && isRecord(parsed.metadata)) {
+      const metadataKeys = Object.keys(parsed.metadata);
 
-      // Check user object keys are sorted
-      if (
-        hasKey(parsed, 'users') &&
-        Arr.isArray(parsed.users) &&
-        Arr.isNonEmpty(parsed.users)
-      ) {
-        const firstUser = parsed.users[0];
-
-        if (isRecord(firstUser)) {
-          const userKeys = Object.keys(firstUser);
-
-          assert.deepStrictEqual(userKeys, ['active', 'id', 'name']);
-        }
-      }
+      assert.deepStrictEqual(metadataKeys, ['author', 'created', 'version']);
     }
+
+    // Check user object keys are sorted
+    if (
+      !hasKey(parsed, 'users') ||
+      !Arr.isArray(parsed.users) ||
+      !Arr.isNonEmpty(parsed.users)
+    )
+      return;
+
+    const firstUser = parsed.users[0];
+
+    if (!isRecord(firstUser)) return;
+
+    const userKeys = Object.keys(firstUser);
+
+    assert.deepStrictEqual(userKeys, ['active', 'id', 'name']);
   });
 
   test('should handle formatting with space parameter', () => {
@@ -727,24 +729,27 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (isRecord(parsed) && hasKey(parsed, 'level1')) {
-      const level1 = parsed.level1;
+    if (!isRecord(parsed) || !hasKey(parsed, 'level1')) return;
 
-      if (isRecord(level1)) {
-        assert.deepStrictEqual(Object.keys(level1), ['a', 'z']);
+    const level1 = parsed.level1;
 
-        if (
-          hasKey(level1, 'a') &&
-          isRecord(level1.a) &&
-          hasKey(level1.a, 'nested')
-        ) {
-          const nested = level1.a.nested;
+    if (!isRecord(level1)) {
+      return;
+    }
 
-          if (isRecord(nested)) {
-            assert.deepStrictEqual(Object.keys(nested), ['x', 'y']);
-          }
-        }
-      }
+    assert.deepStrictEqual(Object.keys(level1), ['a', 'z']);
+
+    if (
+      !hasKey(level1, 'a') ||
+      !isRecord(level1.a) ||
+      !hasKey(level1.a, 'nested')
+    )
+      return;
+
+    const nested = level1.a.nested;
+
+    if (isRecord(nested)) {
+      assert.deepStrictEqual(Object.keys(nested), ['x', 'y']);
     }
   });
 });

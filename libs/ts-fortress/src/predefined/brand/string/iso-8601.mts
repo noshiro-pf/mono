@@ -71,9 +71,7 @@ const isISO8601 =
       ? regexpIso8601StrictSeparator.test(str)
       : regexpIso8601.test(str);
 
-    if (check && filledOptions.strict) return isValidDate(str);
-
-    return check;
+    return check && filledOptions.strict ? isValidDate(str) : check;
   };
 
 // from http://goo.gl/0ejHHW
@@ -99,10 +97,9 @@ const isValidDate = (str: string): boolean => {
     const oDay = Number(ordinalMatch[2]);
 
     // if is leap year
-    if ((oYear % 4 === 0 && oYear % 100 !== 0) || oYear % 400 === 0)
-      return oDay <= 366;
-
-    return oDay <= 365;
+    return (oYear % 4 === 0 && oYear % 100 !== 0) || oYear % 400 === 0
+      ? oDay <= 366
+      : oDay <= 365;
   }
 
   const match = /(\d{4})-?(\d{0,2})-?(\d*)/u.exec(str)?.map(Number);

@@ -11,7 +11,7 @@ export const parseLambdaTerm = (input: string): LambdaTerm | undefined => {
 
   const converted = expandShortcuts(tokens);
 
-  if (!tokensRepresentsLambdaTerm(converted)) return undefined;
-
-  return getParseTree(converted);
+  return !tokensRepresentsLambdaTerm(converted)
+    ? undefined
+    : getParseTree(converted);
 };

@@ -11,11 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isFixedLengthString(3, input));
 
-    if (Str.isFixedLengthString(2, input)) {
-      const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
+    if (!Str.isFixedLengthString(2, input)) return;
 
-      assert.isTrue(atMost5.length === 2);
-    }
+    const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
+
+    assert.isTrue(atMost5.length === 2);
 
     // embed-sample-code-ignore-below
   });

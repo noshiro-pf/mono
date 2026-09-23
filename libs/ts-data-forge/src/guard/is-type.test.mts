@@ -143,11 +143,13 @@ describe(isString, () => {
   test('should act as a type guard', () => {
     const value: unknown = 'test';
 
-    if (isString(value)) {
-      expectType<typeof value, string>('=');
-
-      expect(value).toHaveLength(4);
+    if (!isString(value)) {
+      return;
     }
+
+    expectType<typeof value, string>('=');
+
+    expect(value).toHaveLength(4);
   });
 });
 
@@ -182,11 +184,13 @@ describe(isNumber, () => {
   test('should act as a type guard', () => {
     const value: unknown = 42;
 
-    if (isNumber(value)) {
-      expectType<typeof value, number>('=');
-
-      expect(value + 1).toBe(43);
+    if (!isNumber(value)) {
+      return;
     }
+
+    expectType<typeof value, number>('=');
+
+    expect(value + 1).toBe(43);
   });
 });
 
@@ -212,11 +216,13 @@ describe(isBigint, () => {
   test('should act as a type guard', () => {
     const value: unknown = 123n;
 
-    if (isBigint(value)) {
-      expectType<typeof value, bigint>('=');
-
-      expect(value + 1n).toBe(124n);
+    if (!isBigint(value)) {
+      return;
     }
+
+    expectType<typeof value, bigint>('=');
+
+    expect(value + 1n).toBe(124n);
   });
 });
 
@@ -243,11 +249,13 @@ describe(isBoolean, () => {
   test('should act as a type guard', () => {
     const value: unknown = true;
 
-    if (isBoolean(value)) {
-      expectType<typeof value, boolean>('=');
-
-      assert.isTrue(value);
+    if (!isBoolean(value)) {
+      return;
     }
+
+    expectType<typeof value, boolean>('=');
+
+    assert.isTrue(value);
   });
 });
 
@@ -271,11 +279,13 @@ describe(isSymbol, () => {
   test('should act as a type guard', () => {
     const value: unknown = Symbol('test');
 
-    if (isSymbol(value)) {
-      expectType<typeof value, symbol>('=');
-
-      expect(value.toString()).toContain('Symbol');
+    if (!isSymbol(value)) {
+      return;
     }
+
+    expectType<typeof value, symbol>('=');
+
+    expect(value.toString()).toContain('Symbol');
   });
 });
 
@@ -307,12 +317,14 @@ describe(isNotBoolean, () => {
   test('should act as a type guard', () => {
     const value: string | number | boolean = 'test';
 
-    if (isNotBoolean(value)) {
-      expectType<typeof value, string | number>('<=');
-
-      // Should not have boolean methods
-      assert.isTrue(typeof value === 'string' || typeof value === 'number');
+    if (!isNotBoolean(value)) {
+      return;
     }
+
+    expectType<typeof value, string | number>('<=');
+
+    // Should not have boolean methods
+    assert.isTrue(typeof value === 'string' || typeof value === 'number');
   });
 });
 
@@ -354,11 +366,13 @@ describe(isNotNumber, () => {
   test('should act as a type guard', () => {
     const value: string | number | boolean = 'test';
 
-    if (isNotNumber(value)) {
-      expectType<typeof value, string | boolean>('<=');
-
-      assert.isTrue(typeof value === 'string' || typeof value === 'boolean');
+    if (!isNotNumber(value)) {
+      return;
     }
+
+    expectType<typeof value, string | boolean>('<=');
+
+    assert.isTrue(typeof value === 'string' || typeof value === 'boolean');
   });
 });
 
@@ -392,11 +406,13 @@ describe(isNotBigint, () => {
   test('should act as a type guard', () => {
     const value: number | bigint = 123;
 
-    if (isNotBigint(value)) {
-      expectType<typeof value, number>('<=');
-
-      expectTypeOf(value).toBeNumber();
+    if (!isNotBigint(value)) {
+      return;
     }
+
+    expectType<typeof value, number>('<=');
+
+    expectTypeOf(value).toBeNumber();
   });
 });
 
@@ -434,11 +450,13 @@ describe(isNotString, () => {
   test('should act as a type guard', () => {
     const value: string | number | boolean = 42;
 
-    if (isNotString(value)) {
-      expectType<typeof value, number | boolean>('<=');
-
-      assert.isTrue(typeof value === 'number' || typeof value === 'boolean');
+    if (!isNotString(value)) {
+      return;
     }
+
+    expectType<typeof value, number | boolean>('<=');
+
+    assert.isTrue(typeof value === 'number' || typeof value === 'boolean');
   });
 });
 
@@ -474,11 +492,13 @@ describe(isNotSymbol, () => {
   test('should act as a type guard', () => {
     const value: string | number | symbol = 'test';
 
-    if (isNotSymbol(value)) {
-      expectType<typeof value, string | number>('<=');
-
-      assert.isTrue(typeof value === 'string' || typeof value === 'number');
+    if (!isNotSymbol(value)) {
+      return;
     }
+
+    expectType<typeof value, string | number>('<=');
+
+    assert.isTrue(typeof value === 'string' || typeof value === 'number');
   });
 });
 
@@ -510,12 +530,14 @@ describe(isNullish, () => {
   test('should act as a type guard', () => {
     const value: string | null | undefined = null;
 
-    if (isNullish(value)) {
-      expectType<typeof value, null | undefined>('<=');
-
-      // Value is guaranteed to be null or undefined in this branch
-      expect(true).toBe(true);
+    if (!isNullish(value)) {
+      return;
     }
+
+    expectType<typeof value, null | undefined>('<=');
+
+    // Value is guaranteed to be null or undefined in this branch
+    expect(true).toBe(true);
   });
 
   test('should handle edge cases', () => {
@@ -558,11 +580,13 @@ describe(isNonNullish, () => {
   test('should act as a type guard', () => {
     const value: string | null | undefined = 'test';
 
-    if (isNonNullish(value)) {
-      expectType<typeof value, string>('<=');
-
-      expect(value).toHaveLength(4);
+    if (!isNonNullish(value)) {
+      return;
     }
+
+    expectType<typeof value, string>('<=');
+
+    expect(value).toHaveLength(4);
   });
 
   test('should work with array filtering', () => {
@@ -588,12 +612,14 @@ describe(isNonNullish, () => {
 
     const value: ComplexType = 42;
 
-    if (isNonNullish(value)) {
-      expectType<typeof value, string | number | boolean>('<=');
-
-      // Value is guaranteed to be non-nullish in this branch
-      expect(true).toBe(true);
+    if (!isNonNullish(value)) {
+      return;
     }
+
+    expectType<typeof value, string | number | boolean>('<=');
+
+    // Value is guaranteed to be non-nullish in this branch
+    expect(true).toBe(true);
   });
 });
 
@@ -601,11 +627,13 @@ describe('type guard behavior in complex scenarios', () => {
   test('should work with nested conditions', () => {
     const value: string | number | boolean | null | undefined = 'test';
 
-    if (isNonNullish(value) && isNotBoolean(value) && isNotNumber(value)) {
-      expectType<typeof value, string>('<=');
-
-      expectTypeOf(value).toBeString();
+    if (!(isNonNullish(value) && isNotBoolean(value) && isNotNumber(value))) {
+      return;
     }
+
+    expectType<typeof value, string>('<=');
+
+    expectTypeOf(value).toBeString();
   });
 
   test('should work with array operations', () => {

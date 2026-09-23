@@ -10,14 +10,12 @@ import { isVariable } from './is-variable.mjs';
 export const isLambdaTerm = (term: unknown): term is LambdaTerm =>
   isVariable(term) || isAbstraction(term) || isApplication(term);
 
-export const isAbstraction = (term: unknown): term is LambdaAbstraction => {
-  if (!Arr.isArray(term) || !hasLength(term, 3)) return false;
+export const isAbstraction = (term: unknown): term is LambdaAbstraction =>
+  !Arr.isArray(term) || !hasLength(term, 3)
+    ? false
+    : term[0] === 'lambda' && isVariable(term[1]) && isLambdaTerm(term[2]);
 
-  return term[0] === 'lambda' && isVariable(term[1]) && isLambdaTerm(term[2]);
-};
-
-export const isApplication = (term: unknown): term is LambdaApplication => {
-  if (!Arr.isArray(term) || !hasLength(term, 2)) return false;
-
-  return isLambdaTerm(term[0]) && isLambdaTerm(term[1]);
-};
+export const isApplication = (term: unknown): term is LambdaApplication =>
+  !Arr.isArray(term) || !hasLength(term, 2)
+    ? false
+    : isLambdaTerm(term[0]) && isLambdaTerm(term[1]);

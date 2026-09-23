@@ -63,44 +63,42 @@ const resetAllState = (): void => {
 const restoreFromLocalStorage = (): void => {
   const fromStorage = EventScheduleAppLocalStorage.restoreCreateEventPageTemp();
 
-  if (Result.isOk(fromStorage)) {
-    const ev = fromStorage.value;
+  if (Result.isErr(fromStorage)) return;
 
-    if (ev === undefined) return;
+  const ev = fromStorage.value;
 
-    commonStateHandlers.setTitle(ev.title);
+  if (ev === undefined) return;
 
-    commonStateHandlers.setNotes(ev.notes);
+  commonStateHandlers.setTitle(ev.title);
 
-    commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
+  commonStateHandlers.setNotes(ev.notes);
 
-    // 過去日（今日含む）は復元しない
-    commonStateHandlers.setDatetimeRangeList(
-      ev.datetimeRangeList.filter(
-        (d) => compareYearMonthDate(d.ymd, now()) > 0,
-      ),
-    );
+  commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
 
-    commonStateHandlers.setAnswerIcons(ev.answerIcons);
+  // 過去日（今日含む）は復元しない
+  commonStateHandlers.setDatetimeRangeList(
+    ev.datetimeRangeList.filter((d) => compareYearMonthDate(d.ymd, now()) > 0),
+  );
 
-    if (ev.answerDeadline === 'none') {
-      commonStateHandlers.turnOffAnswerDeadlineSection();
-    } else {
-      commonStateHandlers.turnOnAnswerDeadlineSection();
+  commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
-      commonStateHandlers.setAnswerDeadline(ev.answerDeadline);
-    }
+  if (ev.answerDeadline === 'none') {
+    commonStateHandlers.turnOffAnswerDeadlineSection();
+  } else {
+    commonStateHandlers.turnOnAnswerDeadlineSection();
 
-    if (ev.notificationSettings === 'none') {
-      commonStateHandlers.turnOffNotificationSection();
-    } else {
-      commonStateHandlers.turnOnNotificationSection();
+    commonStateHandlers.setAnswerDeadline(ev.answerDeadline);
+  }
 
-      commonStateHandlers.setNotificationSettingsWithEmail({
-        ...ev.notificationSettings,
-        email: Auth.getFireAuthUserSnapshot()?.email ?? '',
-      });
-    }
+  if (ev.notificationSettings === 'none') {
+    commonStateHandlers.turnOffNotificationSection();
+  } else {
+    commonStateHandlers.turnOnNotificationSection();
+
+    commonStateHandlers.setNotificationSettingsWithEmail({
+      ...ev.notificationSettings,
+      email: Auth.getFireAuthUserSnapshot()?.email ?? '',
+    });
   }
 };
 
