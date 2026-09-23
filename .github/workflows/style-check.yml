@@ -127,6 +127,16 @@ jobs:
           # rebase drops a row from it. Regenerating it here and letting the
           # repository-clean step below compare is the only thing that notices.
           - gen:deps-graph
+          # Every LICENSE file is a copy of the root one, written from it here
+          # and compared by the repository-clean step below — so a tool that
+          # reformats one, or a hand that mistypes one, is a failure rather
+          # than a package that ships a license nobody read. The generator
+          # also refuses to run at all unless the root file still hashes to
+          # the canonical Apache-2.0 text, which is the only way a typo in the
+          # source gets caught rather than propagated. Its `--verify-upstream`
+          # is deliberately not here: it fetches apache.org, and a check that
+          # fetches is a check that fails when the fetch does.
+          - gen:license-files
           # Every committed generated source: the `index.mts` barrels, the
           # ESLint rule types, ts-data-forge's branded numbers, ts-type-forge's
           # `global.mts` / `entry-point.mts`, the synstate re-export shims, the
