@@ -362,8 +362,10 @@ ingest the feed). Outside reports come through private vulnerability reporting
   `Merge-After: #N` body trailer (not read inside fenced code) plus
   `blocks-release` for the release (see "Releases"), and it rebases before
   removing `skip-ci` so the matrix runs once. A bot that opens a pull request
-  labels it (`pnpm-update.yml` does; `node-support-update.yml` deliberately
-  does not). Details in `tools/scripts/cmd/unblock-prs/README.md`.
+  labels it, and which label says whether it is queued: `pnpm-update.yml`
+  opens with `merge-queued`, `node-support-update.yml` with `skip-ci` and
+  auto-merge armed — held until a person queues it, as `open-pr` leaves a
+  session's. Details in `tools/scripts/cmd/unblock-prs/README.md`.
 
 ## Releases
 

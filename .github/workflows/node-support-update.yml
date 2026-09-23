@@ -22,16 +22,25 @@ name: Node.js Support Update
 # The pull request is where the new versions are proven: node-version-compatibility.yml
 # runs the full matrix on it, so a version that does not work never reaches
 # main. That is the whole reason the refresh is a pull request and not a push.
+# The `skip-ci` label it opens with moves when that happens rather than
+# whether: every check skips while the label is on, so the matrix runs once,
+# on the head that will merge, at the moment the label comes off — which is
+# also what makes the weekly force-push to this branch cost nothing.
 #
 # `update` installs the dependency tree and holds a token in the same job,
 # which pnpm-update.yml deliberately does not — see "What a job that holds a
 # key may do" there for the three rules this one still follows. It is not
 # split because of what its token cannot do: no `workflows` permission, so a
-# rewritten workflow file cannot be pushed, and no auto-merge is armed, so
-# nothing it opens merges unattended. What the update step writes is
+# rewritten workflow file cannot be pushed, and nothing it opens merges
+# unattended. Auto-merge *is* armed, and that second half survives only
+# because the pull request is opened carrying `skip-ci`: `no-skip-ci-label` is
+# pending for as long as the label is on, so the merge waits for a person to
+# queue it. Arming is what spares them a second action when they do, not a
+# statement that this should merge. What the update step writes is
 # `tools/configs/node-support.json` and the `package.json` fields derived from
-# it. Grant this token `workflows`, or arm auto-merge here, and the split
-# becomes necessary.
+# it. Grant this token `workflows`, or arm auto-merge with nothing holding the
+# merge — open it without the label, or add `merge-queued` here as
+# pnpm-update.yml does — and the split becomes necessary.
 
 on:
   schedule:
@@ -207,7 +216,7 @@ jobs:
           client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
           permission-contents: write # push the branch
-          permission-pull-requests: write # open the pull request
+          permission-pull-requests: write # open it, label it, arm auto-merge
 
       - name: Open a pull request if anything changed
         env:
@@ -254,15 +263,46 @@ jobs:
 
           # By branch name alone `gh pr view` also finds a merged pull request,
           # and this branch is recreated every run — so ask for an open one.
+          #
+          # `--label skip-ci` at creation rather than in a call of its own:
+          # the label is what holds the merge once auto-merge is armed below,
+          # and asking for it in the same request leaves no window in which
+          # the pull request exists without it.
           if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
             gh pr create \
               --base main \
               --head "$branch" \
+              --label skip-ci \
               --title 'chore: refresh the Node.js support targets' \
               --body "$(printf '%s\n' \
                 'Refreshes the pinned `lts` and `current` versions in `tools/configs/node-support.json` from the Node.js release data, and the `volta.node` / `devEngines.runtime` fields derived from them.' \
                 '' \
                 'The `engines.node` floor (`targets.minimum`) is deliberately not touched: raising it is a breaking change for consumers, so it moves by a decision rather than on a schedule. Nothing a consumer can observe changes here, which is why there is no changeset.' \
                 '' \
-                'The compatibility matrix on this pull request is what proves the new versions work. Rebuilt from main every run, so force-pushes to this branch are expected.')"
+                'The compatibility matrix on this pull request is what proves the new versions work, and it runs when `skip-ci` comes off — on the head that will merge. Rebuilt from main every run, so force-pushes to this branch are expected.' \
+                '' \
+                'Held by `skip-ci` with auto-merge already armed: add `merge-queued` once the new versions are worth taking, and `unblock-prs` rebases it, takes `skip-ci` off, and GitHub merges it when the matrix is green.')"
+          fi
+
+          # Arming reads the pull request afresh instead of trusting the call
+          # above, and refuses unless the label is on it — `skip-ci` is the
+          # only thing holding this merge, since the `main` ruleset asks for no
+          # approvals and `.github/CODEOWNERS` does not cover what this writes.
+          # "The label call succeeded" and "the label is on now" are not the
+          # same claim, and this is the one decision that lands on `main`;
+          # `pnpm run open-pr` refuses here for the same reason, see
+          # tools/scripts/cmd/open-pr/README.md.
+          #
+          # A run over a pull request that already exists does not put
+          # `skip-ci` back on. A label already taken off was taken off to
+          # start the matrix, auto-merge was armed by the run that opened the
+          # pull request, and re-adding it would stop the very checks that
+          # removal asked for.
+          armable="$(gh pr view "$branch" --json state,isDraft,labels \
+            --jq '[.state == "OPEN", (.isDraft | not), any(.labels[].name; . == "skip-ci")] | all')"
+
+          if [ "$armable" = 'true' ]; then
+            gh pr merge --auto --squash "$branch"
+          else
+            echo "::notice::Not arming auto-merge: ${branch} is not an open, ready pull request carrying \`skip-ci\`. A run that opened one armed it already."
           fi
