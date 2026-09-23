@@ -3,6 +3,7 @@
   "version": "0.6.3",
   "private": true,
   "description": "Generator harness for TypeScript 5.5 strict lib packages",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "gen:lib": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/gen.mts",
