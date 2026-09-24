@@ -136,7 +136,7 @@ export const WorkspacePicker = memoNamed(
 
         <button
           className={'top-bar__button'}
-          title={'Add a split view and show it here'}
+          title={'Add a split view and open it in a new tab'}
           type={'button'}
           onClick={onCreate}
         >

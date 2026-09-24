@@ -59,9 +59,12 @@ The full list, with the reasoning the README leaves out.
   (`split.html?ws=<id>`), which is what survives a reload, a browser restart
   with session restore, and a tab reopened with Ctrl+Shift+T.
 - **The select at the left of the toolbar is the list of saved split views.**
-  Choosing one swaps this tab's contents for it; `＋` adds one. **`Alt+1`..
-  `Alt+9` selects by position**, and works with the focus inside a pane as well
-  as on the page.
+  Choosing one swaps this tab's contents for it. **`Alt+1`..`Alt+9` selects by
+  position**, and works with the focus inside a pane as well as on the page.
+- **`＋` adds a split view and opens it in a new tab**, leaving this tab on the
+  one it was showing: adding one is usually for a second set of pages beside
+  the first, not instead of it. The list is saved before the tab opens, so the
+  new page finds its entry — name included — rather than adding one of its own.
 - **`Edit` opens a popover** — rename, reorder, open in a tab of its own,
   delete, and the JSON `Export` / `Import`. A popover rather than a second
   toolbar row: a row costs the panes its height for the whole session. It
