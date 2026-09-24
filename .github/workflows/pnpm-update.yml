@@ -9,8 +9,8 @@ name: pnpm update
 # This replaces Dependabot entirely: the npm dependencies come from
 # `update-packages` (whose skip rules — `update.ignoreDeps`,
 # `minimumReleaseAge` — live in pnpm-workspace.yaml), and the action pins in
-# `.github/workflows/` come from `update-actions`. There is no
-# .github/dependabot.yml.
+# `.github/workflows/` and `.github/actions/` come from `update-actions`.
+# There is no .github/dependabot.yml.
 #
 # `update-packages` also carries `--filter '!./strict-lib/v*/output/lib'`, which
 # is the one skip that cannot live in pnpm-workspace.yaml. Those twelve
@@ -99,14 +99,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      # `install: false`: the two steps below change pnpm and the action pins
+      # before anything is installed, and "Update dependencies" installs once
+      # they have.
+      - name: Set up pnpm and Node.js
+        uses: ./.github/actions/setup
         with:
-          node-version-file: 'package.json'
-          cache: 'pnpm'
+          install: false
 
       # The latest pnpm, majors included — unlike the action pins, which
       # `update-actions` deliberately keeps within `^current`. The difference
@@ -280,7 +279,10 @@ jobs:
           # job that holds the key — `pnpm install` and
           # `verify:npm-packages:published:update` write manifests, the
           # lockfile and the catalog, `update-changeset` writes one changeset,
-          # and `update-actions` moves the action pins. A patch reaching
+          # and `update-actions` moves the action pins in the workflows and in
+          # the composite actions under `.github/actions/` — the two places
+          # `mature-updates.mts` reads; a third has to be named in both, or
+          # its pins stop moving without a word. A patch reaching
           # beyond that is not a dependency update whatever it is, and this is
           # the last point before it becomes a commit that auto-merges.
           #
@@ -310,7 +312,8 @@ jobs:
             | grep -Ev '^(pnpm-lock\.yaml|pnpm-workspace\.yaml)$' \
             | grep -Ev '(^|/)package\.json$' \
             | grep -Ev '^\.changeset/[^/]+\.md$' \
-            | grep -Ev '^\.github/workflows/[^/]+\.ya?ml$' || true)"
+            | grep -Ev '^\.github/workflows/[^/]+\.ya?ml$' \
+            | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' || true)"
 
           if [ -n "$unexpected" ]; then
             echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'

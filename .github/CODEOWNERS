@@ -19,6 +19,11 @@
 # ここを止めれば、その経路には必ず人間が一度入る。
 /.github/workflows/ @noshiro-pf
 
+# 上と同じ理由。composite action は workflow から `uses:` で呼ばれ、同じ
+# job の中で同じ権限で動くので、書き換えられたときの効き方は workflow
+# ファイルと変わらない。
+/.github/actions/ @noshiro-pf
+
 # 上のゲートそのものを外す変更を、同じ経路で通されないようにする。
 /.github/CODEOWNERS @noshiro-pf
 

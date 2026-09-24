@@ -69,12 +69,10 @@ jobs:
 
     # A few API calls and a read-only checkout. `gh` needs a token to be set
     # at all, hence `github.token`; `actions: read` is what listing the
-    # earlier runs and their jobs needs; `packages: read` is what the install
-    # needs for the `@noshiro-pf` scope.
+    # earlier runs and their jobs needs.
     permissions:
       actions: read
       contents: read
-      packages: read
 
     outputs:
       branch_up_to_date: ${{ steps.branch_state.outputs.branch_up_to_date }}
@@ -93,7 +91,7 @@ jobs:
       # made while behind has no verdict to read. First, so that it is in the
       # list whatever the steps after it do. See "Reusing a verdict" in
       # README.md.
-      - name: "Verdict reusable by tree: ${{ github.event_name != 'pull_request' || github.event.pull_request.base.ref == (github.event.repository.default_branch || 'main') }}"
+      - name: "Verdict reusable by tree: ${{ github.event_name != 'pull_request' || github.event.pull_request.base.ref == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}"
         run: echo 'Recorded in the step name above, for the reuse lookup of later runs.'
 
       - name: Check whether the branch is behind the base branch
@@ -105,7 +103,7 @@ jobs:
           # Every event that reaches here carries the repository, so the
           # fallback is only there because an empty value would turn this gate
           # off without saying so: no base branch would ever match it.
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+          DEFAULT_BRANCH: ${{ case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}
         run: |
           run_the_checks() {
             echo "${1}"
@@ -166,8 +164,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+          HEAD_SHA: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+          DEFAULT_BRANCH: ${{ case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main') }}
           RESULT_JOB: ${{ inputs.result-job }}
         run: |
           # Leaves both outputs empty, which the callers read as "run the checks".
@@ -280,62 +278,24 @@ jobs:
           (steps.reuse.outputs.reused_result == '' || inputs.diff-when-reused)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
       - name: Fetch main
         if: steps.checkout.outcome == 'success'
         run: git fetch origin main # To allow the diff gate below to get the diff from main
 
-      - name: Install pnpm
+      - name: Set up pnpm, Node.js and the dependencies
         if: steps.checkout.outcome == 'success'
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: ./.github/actions/setup
 
-      - name: Set up Node.js
-        if: steps.checkout.outcome == 'success'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: 'package.json'
-          registry-url: https://npm.pkg.github.com/
-          scope: '@noshiro-pf'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        if: steps.checkout.outcome == 'success'
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # Which base the diff is taken against — origin/main, or on a push to
+      # main what main pointed at before it — and the check of `diff-scope`
+      # are in the script, `planDiffCheck`. The `pnpm run` it ends in writes
+      # `should_run=` to `GITHUB_OUTPUT` itself.
       - name: Check diff
         id: check_diff
         if: steps.checkout.outcome == 'success'
-        # The script writes `should_run=` to `GITHUB_OUTPUT` itself.
-        #
-        # It diffs against origin/main. On a push to main that is a diff
-        # against HEAD itself, which comes back empty and reads as "nothing
-        # relevant changed" — so every caller would skip, and its jobs would
-        # report `skipped`, which satisfies a required status check. Compare
-        # with what main pointed at before the push instead.
         env:
           BEFORE: ${{ github.event.before }}
-          SCOPE: ${{ inputs.diff-scope }}
-        run: |
-          case "${SCOPE}" in
-            code | style | strict-lib) ;;
-            *)
-              echo "::error::Unknown diff-scope \"${SCOPE}\"; expected code, style, strict-lib or none."
-              exit 1
-              ;;
-          esac
-
-          script="z:check-should-run:${SCOPE}-checks"
-
-          if [ "${GITHUB_REF_NAME}" != 'main' ]; then
-            pnpm run "${script}"
-          elif [ -n "${BEFORE}" ] && [ "${BEFORE}" != '0000000000000000000000000000000000000000' ]; then
-            git fetch --depth=1 origin "${BEFORE}"
-            pnpm run "${script}" --base-branch "${BEFORE}"
-          else
-            # A manual run, or the first push to the branch: there is nothing
-            # to compare against, so run everything rather than skip it.
-            echo 'should_run=true' >>"${GITHUB_OUTPUT}"
-          fi
+          DIFF_SCOPE: ${{ inputs.diff-scope }}
+        run: node ./tools/scripts/cmd/workflow-steps.mts check-diff

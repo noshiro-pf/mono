@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
   cancel-in-progress: true
 
 permissions: {}
@@ -35,7 +35,6 @@ jobs:
     permissions:
       actions: read
       contents: read
-      packages: read
     with:
       # The same ignore list code-check.yml gates on, which is why it lives in
       # the root package.json rather than in either workflow.
@@ -83,10 +82,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
       # Resolved from the checkout rather than written into the matrix above,
       # so that the versions this job runs and the versions
@@ -103,18 +99,15 @@ jobs:
           echo "${TARGET} -> Node ${version}"
           echo "version=${version}" >>"${GITHUB_OUTPUT}"
 
-      - name: Set up Node.js for `${{ matrix.target }}`
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ steps.node-version.outputs.version }}
-          cache: 'pnpm'
-
       # `--engine-strict` is what turns the `minimum` entry from a claim into a
       # check: pnpm refuses the install when any package's `engines.node`
       # excludes the running version, so the floor every published package
       # promises is exercised on the exact version it names.
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --engine-strict
+      - name: Set up pnpm, Node.js for `${{ matrix.target }}` and the dependencies
+        uses: ./.github/actions/setup
+        with:
+          node-version: ${{ steps.node-version.outputs.version }}
+          engine-strict: true
 
       - name: Verify installation
         run: pnpm list
