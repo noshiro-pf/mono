@@ -204,11 +204,9 @@ const lintFix = async (
     ].join(' ')} ${targetFiles.join(' ')}`,
   );
 
-  if (Result.isErr(result) && result.value.code !== 0) {
-    return { type: 'error', error: result.value.stderr };
-  }
-
-  return { type: 'ok' };
+  return Result.isErr(result) && result.value.code !== 0
+    ? { type: 'error', error: result.value.stderr }
+    : { type: 'ok' };
 };
 
 /** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */

@@ -123,14 +123,14 @@ const createCombineObservable = <const A extends NonEmptyUnknownList>(
           (a) => a.getSnapshot(),
         );
 
-        if (Arr.every(parentValues, Optional.isSome)) {
-          const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
-            parentValues,
-            (a) => a.value,
-          );
+        if (!Arr.every(parentValues, Optional.isSome)) return;
 
-          setNext(nextValue, updateToken);
-        }
+        const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
+          parentValues,
+          (a) => a.value,
+        );
+
+        setNext(nextValue, updateToken);
       },
   );
 };

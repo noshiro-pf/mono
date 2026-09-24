@@ -32,39 +32,41 @@ describe(isMinLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [0, 1, 2, 3] as const;
 
-    if (isMinLengthArray(3, value)) {
-      expectType<typeof value, MinLengthArray<3, number>>('<=');
+    if (!isMinLengthArray(3, value)) return;
 
-      expectType<typeof value, MinLengthArray<1, number>>('<='); // 3 >= 1
+    expectType<typeof value, MinLengthArray<3, number>>('<=');
 
-      expectType<typeof value, MinLengthArray<5, number>>('!<=');
+    expectType<typeof value, MinLengthArray<1, number>>('<='); // 3 >= 1
 
-      // indexed access below the minimum length does not include `undefined`
-      // (even under `noUncheckedIndexedAccess`)
-      const _first = value[0];
+    expectType<typeof value, MinLengthArray<5, number>>('!<=');
 
-      expectType<typeof _first, number>('=');
+    // indexed access below the minimum length does not include `undefined`
+    // (even under `noUncheckedIndexedAccess`)
+    const _first = value[0];
 
-      const _third = value[2];
+    expectType<typeof _first, number>('=');
 
-      expectType<typeof _third, number>('=');
+    const _third = value[2];
 
-      const _fourth = value[3];
+    expectType<typeof _third, number>('=');
 
-      expectType<typeof _fourth, number | undefined>('=');
+    const _fourth = value[3];
 
-      expect(value.length).toBeGreaterThanOrEqual(3);
-    }
+    expectType<typeof _fourth, number | undefined>('=');
+
+    expect(value.length).toBeGreaterThanOrEqual(3);
   });
 
   test('should preserve the original array type', () => {
     const tuple = [1, 2, 3] as const;
 
-    if (isMinLengthArray(2, tuple)) {
-      expectType<typeof tuple, readonly [1, 2, 3]>('<=');
-
-      expectType<typeof tuple, MinLengthArray<2, 1 | 2 | 3>>('<=');
+    if (!isMinLengthArray(2, tuple)) {
+      return;
     }
+
+    expectType<typeof tuple, readonly [1, 2, 3]>('<=');
+
+    expectType<typeof tuple, MinLengthArray<2, 1 | 2 | 3>>('<=');
   });
 });
 
@@ -86,15 +88,17 @@ describe(isMaxLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [0, 1, 2] as const;
 
-    if (isMaxLengthArray(8, value)) {
-      expectType<typeof value, MaxLengthArray<8, number>>('<=');
-
-      expectType<typeof value, MaxLengthArray<16, number>>('<='); // 8 <= 16
-
-      expectType<typeof value, MaxLengthArray<2, number>>('!<=');
-
-      expect(value.length).toBeLessThanOrEqual(8);
+    if (!isMaxLengthArray(8, value)) {
+      return;
     }
+
+    expectType<typeof value, MaxLengthArray<8, number>>('<=');
+
+    expectType<typeof value, MaxLengthArray<16, number>>('<='); // 8 <= 16
+
+    expectType<typeof value, MaxLengthArray<2, number>>('!<=');
+
+    expect(value.length).toBeLessThanOrEqual(8);
   });
 });
 
@@ -116,17 +120,19 @@ describe(isBoundedLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [1, 2, 3] as const;
 
-    if (isBoundedLengthArray(1, 5, value)) {
-      expectType<typeof value, BoundedLengthArray<1, 5, number>>('<=');
-
-      expectType<typeof value, BoundedLengthArray<0, 100, number>>('<=');
-
-      expectType<typeof value, MinLengthArray<1, number>>('<=');
-
-      expectType<typeof value, MaxLengthArray<5, number>>('<=');
-
-      expectType<typeof value, BoundedLengthArray<2, 5, number>>('!<=');
+    if (!isBoundedLengthArray(1, 5, value)) {
+      return;
     }
+
+    expectType<typeof value, BoundedLengthArray<1, 5, number>>('<=');
+
+    expectType<typeof value, BoundedLengthArray<0, 100, number>>('<=');
+
+    expectType<typeof value, MinLengthArray<1, number>>('<=');
+
+    expectType<typeof value, MaxLengthArray<5, number>>('<=');
+
+    expectType<typeof value, BoundedLengthArray<2, 5, number>>('!<=');
   });
 });
 
@@ -146,27 +152,27 @@ describe(isFixedLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [255, 128, 0] as const;
 
-    if (isFixedLengthArray(3, value)) {
-      expectType<typeof value, FixedLengthArray<3, number>>('<=');
+    if (!isFixedLengthArray(3, value)) return;
 
-      expectType<typeof value, MaxLengthArray<5, number>>('<='); // 3 <= 5
+    expectType<typeof value, FixedLengthArray<3, number>>('<=');
 
-      expectType<typeof value, MinLengthArray<1, number>>('<='); // 3 >= 1
+    expectType<typeof value, MaxLengthArray<5, number>>('<='); // 3 <= 5
 
-      expectType<typeof value, FixedLengthArray<4, number>>('!<=');
+    expectType<typeof value, MinLengthArray<1, number>>('<='); // 3 >= 1
 
-      // `length` is narrowed to the literal and in-range indexed access does
-      // not include `undefined` (even under `noUncheckedIndexedAccess`)
-      const _len = value.length;
+    expectType<typeof value, FixedLengthArray<4, number>>('!<=');
 
-      expectType<typeof _len, 3>('=');
+    // `length` is narrowed to the literal and in-range indexed access does
+    // not include `undefined` (even under `noUncheckedIndexedAccess`)
+    const _len = value.length;
 
-      const _second = value[1];
+    expectType<typeof _len, 3>('=');
 
-      expectType<typeof _second, number>('=');
+    const _second = value[1];
 
-      expect(value).toHaveLength(3);
-    }
+    expectType<typeof _second, number>('=');
+
+    expect(value).toHaveLength(3);
   });
 });
 
@@ -182,13 +188,13 @@ describe('curried length guards', () => {
 
     assert.isTrue(hasThree(value));
 
-    if (hasThree(value)) {
-      expectType<typeof value, MinLengthArray<3, number>>('<=');
+    if (!hasThree(value)) return;
 
-      const _first = value[0];
+    expectType<typeof value, MinLengthArray<3, number>>('<=');
 
-      expectType<typeof _first, number>('=');
-    }
+    const _first = value[0];
+
+    expectType<typeof _first, number>('=');
   });
 
   test('isMaxLengthArray narrows when applied later', () => {

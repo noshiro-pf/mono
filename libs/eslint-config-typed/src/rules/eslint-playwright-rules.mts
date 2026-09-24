@@ -35,6 +35,10 @@ export const eslintPlaywrightRules = {
   'playwright/valid-describe-callback': 'error',
   'playwright/valid-expect': withDefaultOption('error'),
   'playwright/valid-title': 'off',
+  'playwright/no-identical-title': 'error',
+  'playwright/no-test-return-statement': 'error',
+  'playwright/no-export': 'off',
+  'playwright/prefer-ending-with-an-expect': withDefaultOption('error'),
 
   /* eslint-plugin-playwright specific rules */
 
@@ -73,4 +77,10 @@ export const eslintPlaywrightRules = {
   'playwright/require-tags': 'error',
   'playwright/require-to-pass-timeout': 'error',
   'playwright/no-unnecessary-assertions': 'error',
+  'playwright/no-action-timeout': withDefaultOption('error'),
+  'playwright/no-magic-timeouts': withDefaultOption('error'),
+  'playwright/require-annotation-reason': withDefaultOption('error'),
+
+  /** Stylistic, and not recommended by the plugin. */
+  'playwright/no-template-literal-title': 'off',
 } as const satisfies EslintPlaywrightRules;

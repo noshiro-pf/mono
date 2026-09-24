@@ -169,12 +169,13 @@ export const transformDeclarationFile = (
       return;
     }
 
-    if (ts.isTypeReferenceNode(node) && ts.isIdentifier(node.typeName)) {
-      const renamed = readonlyCollectionRename.get(node.typeName.text);
+    if (!ts.isTypeReferenceNode(node) || !ts.isIdentifier(node.typeName))
+      return;
 
-      if (renamed !== undefined) {
-        replace(node.typeName.getStart(sf), node.typeName.getEnd(), renamed);
-      }
+    const renamed = readonlyCollectionRename.get(node.typeName.text);
+
+    if (renamed !== undefined) {
+      replace(node.typeName.getStart(sf), node.typeName.getEnd(), renamed);
     }
   };
 

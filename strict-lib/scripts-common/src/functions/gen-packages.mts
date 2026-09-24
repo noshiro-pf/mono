@@ -108,11 +108,7 @@ export const genPackages = async (
   // result.
   const bundleResult = await genBundlePackage(ctx, version, tsTypeForgeRange);
 
-  if (Result.isErr(bundleResult)) {
-    return bundleResult;
-  }
-
-  return Result.ok(undefined);
+  return Result.isErr(bundleResult) ? bundleResult : Result.ok(undefined);
 };
 
 // Generate declarations into the published package, one flavor per call
@@ -638,9 +634,9 @@ const installedTypeForgeMajor = async (
     )
     .catch(() => undefined);
 
-  if (installed === undefined) return undefined;
-
-  return /(\d+)/u.exec(parsePackageJson(installed)?.version ?? '')?.[1];
+  return installed === undefined
+    ? undefined
+    : /(\d+)/u.exec(parsePackageJson(installed)?.version ?? '')?.[1];
 };
 
 const getTsTypeForgeRange = async (

@@ -85,11 +85,9 @@ export const runTransformerCLI = async (
 
   echoIfNotSilent(hr);
 
-  if (Arr.isNonEmpty(errorFiles)) {
-    return Result.err(undefined);
-  }
-
-  return Result.ok(undefined);
+  return Arr.isNonEmpty(errorFiles)
+    ? Result.err(undefined)
+    : Result.ok(undefined);
 };
 
 const getFilesForTransformation = async (

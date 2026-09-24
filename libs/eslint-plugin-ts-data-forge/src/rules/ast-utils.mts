@@ -43,9 +43,9 @@ export const isIntegerLiteralOrConstant = (
 
   // Reject if there is an explicit type annotation (e.g., `const n: number = 3`)
   // because the literal type is widened and type guard cannot narrow it.
-  if (def.node.id.typeAnnotation !== undefined) return false;
-
-  return isIntegerLiteral(def.node.init);
+  return def.node.id.typeAnnotation !== undefined
+    ? false
+    : isIntegerLiteral(def.node.init);
 };
 
 export const isLengthAccess = (
@@ -163,7 +163,5 @@ const findVariable = (
 
   if (variable !== undefined) return variable;
 
-  if (scope.upper === null) return undefined;
-
-  return findVariable(scope.upper, name);
+  return scope.upper === null ? undefined : findVariable(scope.upper, name);
 };

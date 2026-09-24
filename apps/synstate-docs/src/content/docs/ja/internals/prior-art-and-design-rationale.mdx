@@ -57,9 +57,7 @@ Jotai では、派生 atom が条件に応じて異なる atom を読み取れ�
 const temperatureAtom = atom((get) => {
     const mode = get(modeAtom);
 
-    if (mode === 'celsius') return get(celsiusAtom);
-
-    return get(fahrenheitAtom);
+    return mode === 'celsius' ? get(celsiusAtom) : get(fahrenheitAtom);
 });
 ```
 

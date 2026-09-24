@@ -47,11 +47,9 @@ const onRefreshClick = async (
     poll,
   );
 
-  if (Result.isErr(fixAnswerAndUpdateMessageResult)) {
-    return fixAnswerAndUpdateMessageResult;
-  }
-
-  return Result.ok(undefined);
+  return Result.isErr(fixAnswerAndUpdateMessageResult)
+    ? fixAnswerAndUpdateMessageResult
+    : Result.ok(undefined);
 };
 
 const onMessageReactCommon = async (
@@ -67,11 +65,9 @@ const onMessageReactCommon = async (
   if (action.value === undefined) return Result.ok(undefined);
 
   if (action.value === 'refresh') {
-    if (action.type === 'add') {
-      return onRefreshClick(reaction);
-    }
-
-    return Result.ok(undefined);
+    return action.type === 'add'
+      ? onRefreshClick(reaction)
+      : Result.ok(undefined);
   }
 
   const dateOptionId = toDateOptionId(reaction.message.id);

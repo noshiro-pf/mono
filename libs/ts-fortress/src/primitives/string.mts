@@ -308,12 +308,10 @@ const validateConstraints = (
 
   const result2 = validateLengthConstraint('maxLength', constraints.maxLength);
 
-  if (Result.isErr(result2)) {
-    return Result.err(result2.value);
-  }
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return Result.ok(constraints as Constraints);
+  return Result.isErr(result2)
+    ? Result.err(result2.value)
+    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Result.ok(constraints as Constraints);
 };
 
 const validateLengthConstraint = (
@@ -382,11 +380,9 @@ const createConstraintsPredicate =
       return Result.err({ constraint: 'lowercase', value: true } as const);
     }
 
-    if (regex !== undefined && !regex.test(value)) {
-      return Result.err({ constraint: 'regex', value: regex.source } as const);
-    }
-
-    return Result.ok(true);
+    return regex !== undefined && !regex.test(value)
+      ? Result.err({ constraint: 'regex', value: regex.source } as const)
+      : Result.ok(true);
   };
 
 const defaultValueErrorMessage = (

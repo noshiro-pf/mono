@@ -89,31 +89,31 @@ export const main = async (): Promise<void> => {
       ),
     );
 
-    if (reExportMessageFiles) {
-      const contentStr = Json.stringify(value, undefined, 2);
+    if (!reExportMessageFiles) continue;
 
-      if (Result.isErr(contentStr)) {
-        console.error(contentStr.value);
+    const contentStr = Json.stringify(value, undefined, 2);
 
-        return;
-      }
+    if (Result.isErr(contentStr)) {
+      console.error(contentStr.value);
 
-      // `JSON.stringify` returns `undefined` for `undefined`, a function or a
-      // symbol, and `ts-data-forge`'s `Json.stringify` says so in its type.
-      // `value` came out of `Json.parse`, so it is never one of those — but
-      // there is nothing to write if it somehow is.
-      if (contentStr.value === undefined) {
-        return;
-      }
-
-      // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
-      await fs.mkdir(distSubDir, { recursive: true });
-
-      const distFile = path.resolve(distSubDir, file.name);
-
-      // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
-      await fs.writeFile(distFile, contentStr.value);
+      return;
     }
+
+    // `JSON.stringify` returns `undefined` for `undefined`, a function or a
+    // symbol, and `ts-data-forge`'s `Json.stringify` says so in its type.
+    // `value` came out of `Json.parse`, so it is never one of those — but
+    // there is nothing to write if it somehow is.
+    if (contentStr.value === undefined) {
+      return;
+    }
+
+    // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
+    await fs.mkdir(distSubDir, { recursive: true });
+
+    const distFile = path.resolve(distSubDir, file.name);
+
+    // eslint-disable-next-line no-await-in-loop, security/detect-non-literal-fs-filename
+    await fs.writeFile(distFile, contentStr.value);
   }
 
   const downloadListSliced = mut_downloadList.slice(0, maxFileDownloadCount);

@@ -236,9 +236,9 @@ const enclosingTypeAlias = (
 ): TSESTree.TSTypeAliasDeclaration | undefined => {
   if (node.type === AST_NODE_TYPES.TSTypeAliasDeclaration) return node;
 
-  if (node.type === AST_NODE_TYPES.Program) return undefined;
-
-  return enclosingTypeAlias(node.parent);
+  return node.type === AST_NODE_TYPES.Program
+    ? undefined
+    : enclosingTypeAlias(node.parent);
 };
 
 /**

@@ -101,21 +101,25 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
 
-  if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
-
-    process.exit(1);
+  if (!Result.isErr(result)) {
+    return;
   }
+
+  console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
+  process.exit(1);
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
 
-  if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${result.value.message}`);
-
-    process.exit(1);
+  if (!Result.isErr(result)) {
+    return;
   }
+
+  console.error(`${errorMsg}: ${result.value.message}`);
+
+  process.exit(1);
 };
 
 await build();

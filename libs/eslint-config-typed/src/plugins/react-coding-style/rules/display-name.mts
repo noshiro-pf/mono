@@ -137,11 +137,7 @@ const normalizeNames = (
     return new Set();
   }
 
-  if (typeof names === 'string') {
-    return new Set([names]);
-  }
-
-  return new Set(names);
+  return typeof names === 'string' ? new Set([names]) : new Set(names);
 };
 
 const getDisplayNameAssignment = (
@@ -188,11 +184,9 @@ const getDisplayNameAssignment = (
     return undefined;
   }
 
-  if (nextStatement.expression.type !== AST_NODE_TYPES.AssignmentExpression) {
-    return undefined;
-  }
-
-  return nextStatement.expression;
+  return nextStatement.expression.type !== AST_NODE_TYPES.AssignmentExpression
+    ? undefined
+    : nextStatement.expression;
 };
 
 const isComponentDisplayNameAssignment = (

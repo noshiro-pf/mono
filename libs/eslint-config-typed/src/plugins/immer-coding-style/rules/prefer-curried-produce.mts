@@ -216,11 +216,7 @@ const getTypeParametersText = ({
     sourceCode,
   });
 
-  if (returnType !== undefined) {
-    return `<${returnType}>`;
-  }
-
-  return '';
+  return returnType !== undefined ? `<${returnType}>` : '';
 };
 
 const getArrowFunctionParameterType = ({
@@ -240,11 +236,9 @@ const getArrowFunctionParameterType = ({
 
   const typeAnnotation = parameter.typeAnnotation?.typeAnnotation;
 
-  if (typeAnnotation === undefined) {
-    return undefined;
-  }
-
-  return sourceCode.getText(castDeepMutable(typeAnnotation));
+  return typeAnnotation === undefined
+    ? undefined
+    : sourceCode.getText(castDeepMutable(typeAnnotation));
 };
 
 const getArrowFunctionReturnType = ({
@@ -258,11 +252,9 @@ const getArrowFunctionReturnType = ({
 }>): string | undefined => {
   const typeAnnotation = arrowFunction.returnType?.typeAnnotation;
 
-  if (typeAnnotation === undefined) {
-    return undefined;
-  }
-
-  return sourceCode.getText(castDeepMutable(typeAnnotation));
+  return typeAnnotation === undefined
+    ? undefined
+    : sourceCode.getText(castDeepMutable(typeAnnotation));
 };
 
 const normalizeMultilineText = (text: string): string => {

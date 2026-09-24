@@ -10,11 +10,11 @@ import { type NarrowToSome } from './types.mjs';
  * ```ts
  * const optionalNumber = Optional.some(42);
  *
- * if (Optional.isSome(optionalNumber)) {
- *   const value: number = optionalNumber.value;
+ * if (!Optional.isSome(optionalNumber)) return;
  *
- *   assert.isTrue(value === 42);
- * }
+ * const value: number = optionalNumber.value;
+ *
+ * assert.isTrue(value === 42);
  * ```
  *
  * @template O The {@link UnknownOptional} type to check.

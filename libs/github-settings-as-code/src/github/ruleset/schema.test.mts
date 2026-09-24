@@ -86,18 +86,18 @@ describe('the ruleset schema', () => {
 
     assert.deepStrictEqual(outcomeOf(files[0][0], declared), files[0][0]);
 
-    if (Result.isOk(declared)) {
-      // `getRuleset` hands the whole API response to this type, and a response
-      // carries more than the seven fields that go back out again.
-      const result = RulesetPicked.validate({
-        ...declared.value,
-        source: 'noshiro-pf/mono',
-        source_type: 'Repository',
-        node_id: 'RRS_lACqUmVwb3NpdG9yeQ',
-      });
+    if (Result.isErr(declared)) return;
 
-      assert.isTrue(Result.isOk(result));
-    }
+    // `getRuleset` hands the whole API response to this type, and a response
+    // carries more than the seven fields that go back out again.
+    const result = RulesetPicked.validate({
+      ...declared.value,
+      source: 'noshiro-pf/mono',
+      source_type: 'Repository',
+      node_id: 'RRS_lACqUmVwb3NpdG9yeQ',
+    });
+
+    assert.isTrue(Result.isOk(result));
   });
 
   test('accepts a ruleset built from values GitHub does use', () => {

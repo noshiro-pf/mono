@@ -44,9 +44,7 @@ const processDeclarations = (
 
     const typeNode = typeAlias.getTypeNode();
 
-    if (typeNode === undefined) return false;
-
-    return visitTypeNode(typeNode);
+    return typeNode === undefined ? false : visitTypeNode(typeNode);
   });
 
   const interfaceModifications = container
@@ -103,9 +101,7 @@ const processInterfaceDeclaration = (
     .map((property) => {
       const typeNode = property.getTypeNode();
 
-      if (typeNode === undefined) return false;
-
-      return visitTypeNode(typeNode);
+      return typeNode === undefined ? false : visitTypeNode(typeNode);
     })
     .includes(true);
 };
@@ -210,11 +206,9 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
     return visitTypeNode(node.getTypeNode());
   }
 
-  if (tsm.Node.isNamedTupleMember(node)) {
-    return visitTypeNode(node.getTypeNode());
-  }
-
-  return false;
+  return tsm.Node.isNamedTupleMember(node)
+    ? visitTypeNode(node.getTypeNode())
+    : false;
 };
 
 const isStringUnknownIndexSignature = (

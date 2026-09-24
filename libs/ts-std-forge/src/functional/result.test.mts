@@ -58,11 +58,13 @@ describe('Result test', () => {
     test('type guard for Ok results', () => {
       const result: Result<number, string> = Result.ok(42);
 
-      if (Result.isOk(result)) {
-        expectType<typeof result, Ok<number>>('<=');
-
-        expect(result.value).toBe(42);
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      expectType<typeof result, Ok<number>>('<=');
+
+      expect(result.value).toBe(42);
     });
 
     test('returns false for Err results', () => {
@@ -76,11 +78,13 @@ describe('Result test', () => {
     test('type guard for Err results', () => {
       const result: Result<number, string> = Result.err('error');
 
-      if (Result.isErr(result)) {
-        expectType<typeof result, Err<string>>('<=');
-
-        expect(result.value).toBe('error');
+      if (!Result.isErr(result)) {
+        return;
       }
+
+      expectType<typeof result, Err<string>>('<=');
+
+      expect(result.value).toBe('error');
     });
 
     test('returns false for Ok results', () => {
@@ -1183,11 +1187,7 @@ describe('Result test', () => {
       const result = Result.safeTry(function* () {
         const x = yield* Result.safeUnwrap(source);
 
-        if (x > 0) {
-          return Result.err('e2');
-        }
-
-        return Result.ok(x);
+        return x > 0 ? Result.err('e2') : Result.ok(x);
       });
 
       expectType<typeof result, Result<number, 'e1' | 'e2'>>('=');

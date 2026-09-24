@@ -15,7 +15,5 @@ export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
 
   const compareEndHmResult = compareHm(a.end, b.end);
 
-  if (compareEndHmResult !== 0) return compareEndHmResult;
-
-  return 0;
+  return compareEndHmResult !== 0 ? compareEndHmResult : 0;
 };

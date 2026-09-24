@@ -9,9 +9,7 @@ export const getFreeVariables = (term: LambdaTerm): readonly Variable[] => {
     return getFreeVariables(term[2]).filter((ch) => ch !== term[1]);
   }
 
-  if (isApplication(term)) {
-    return [...getFreeVariables(term[0]), ...getFreeVariables(term[1])];
-  }
-
-  return [];
+  return isApplication(term)
+    ? [...getFreeVariables(term[0]), ...getFreeVariables(term[1])]
+    : [];
 };

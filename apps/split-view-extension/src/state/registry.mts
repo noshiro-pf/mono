@@ -277,11 +277,9 @@ export const loadWorkspaceRegistry = async (): Promise<WorkspaceRegistry> => {
 
   const parsed = parseWorkspaceRegistry(stored[registryStorageKey]);
 
-  if (parsed !== undefined && Arr.isNonEmpty(parsed.entries)) {
-    return parsed;
-  }
-
-  return registryFromStoredWorkspaces(await listStoredWorkspaces());
+  return parsed !== undefined && Arr.isNonEmpty(parsed.entries)
+    ? parsed
+    : registryFromStoredWorkspaces(await listStoredWorkspaces());
 };
 
 export const saveWorkspaceRegistry = async (

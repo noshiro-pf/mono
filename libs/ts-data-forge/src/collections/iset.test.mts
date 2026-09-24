@@ -188,13 +188,14 @@ describe('every method as type guard', () => {
   test('should narrow type when used as type guard', () => {
     const set = ISet.create<string | number>(['hello', 'world']);
 
-    if (set.every((value): value is string => typeof value === 'string')) {
-      // Type should be narrowed to ISet<string>
-      const values = set.toArray();
+    if (!set.every((value): value is string => typeof value === 'string'))
+      return;
 
-      for (const value of values) {
-        assert.isTrue(isString(value));
-      }
+    // Type should be narrowed to ISet<string>
+    const values = set.toArray();
+
+    for (const value of values) {
+      assert.isTrue(isString(value));
     }
   });
 

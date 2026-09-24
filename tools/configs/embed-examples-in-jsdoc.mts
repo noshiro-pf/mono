@@ -164,12 +164,14 @@ export const embedExamplesInJsDoc = async ({
 
       const updatedContent = mut_results.join('');
 
-      if (updatedContent !== sourceContent) {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
-
-        mut_modifiedFiles.push(sourceFilePath);
+      if (updatedContent === sourceContent) {
+        continue;
       }
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
+
+      mut_modifiedFiles.push(sourceFilePath);
     }
 
     if (Arr.isNonEmpty(mut_modifiedFiles)) {

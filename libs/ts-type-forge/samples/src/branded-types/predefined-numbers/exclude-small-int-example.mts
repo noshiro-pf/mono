@@ -9,12 +9,9 @@ import {
 type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
 type PureCount = ExcludeSmallInt<Count>; // Uint
 
-const toLargeCount = (n: Count): ExcludeSmallInt<Count> => {
-  if (typeof n === 'number') {
-    return (n + 1000) as Uint; // Convert small to large
-  }
-  return n;
-};
+const toLargeCount = (n: Count): ExcludeSmallInt<Count> =>
+  // Convert small to large
+  typeof n === 'number' ? ((n + 1000) as Uint) : n;
 
 // embed-sample-code-ignore-below
 export { toLargeCount };

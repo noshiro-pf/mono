@@ -110,11 +110,9 @@ export const readNodeSupportConfig = async (): Promise<
 > => {
   const parsed = await readJsonFile(nodeSupportConfigPath);
 
-  if (Result.isErr(parsed)) {
-    return Result.err(parsed.value);
-  }
-
-  return parseNodeSupportConfig(parsed.value);
+  return Result.isErr(parsed)
+    ? Result.err(parsed.value)
+    : parseNodeSupportConfig(parsed.value);
 };
 
 /**
@@ -753,9 +751,9 @@ const readStringAt = (
 
     if (head === undefined) return current;
 
-    if (!isRecord(current) || !hasKey(current, head)) return undefined;
-
-    return walk(current[head], tail);
+    return !isRecord(current) || !hasKey(current, head)
+      ? undefined
+      : walk(current[head], tail);
   };
 
   const found = walk(source, keyPath);

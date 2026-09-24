@@ -53,12 +53,14 @@ export const normalizeCoveragePaths = async (): Promise<
       )
       .join('\n');
 
-    if (after !== before) {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(file, after);
-
-      mut_rewritten.push(prefix);
+    if (after === before) {
+      continue;
     }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(file, after);
+
+    mut_rewritten.push(prefix);
   }
 
   return Result.ok(mut_rewritten.length);

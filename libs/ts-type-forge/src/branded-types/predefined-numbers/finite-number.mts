@@ -41,10 +41,8 @@ export type FiniteNumber = TSTypeForgeInternals_ExtendNumberBrand<
  * const isInfinite = (x: number): x is InfiniteNumber =>
  *   !Number.isNaN(x) && !Number.isFinite(x);
  *
- * const checkOverflow = (x: number): FiniteNumber | InfiniteNumber => {
- *   if (isInfinite(x)) return x;
- *   return x as FiniteNumber;
- * };
+ * const checkOverflow = (x: number): FiniteNumber | InfiniteNumber =>
+ *   isInfinite(x) ? x : (x as FiniteNumber);
  * ```
  */
 export type InfiniteNumber = TSTypeForgeInternals_ExtendNumberBrand<
@@ -61,11 +59,10 @@ export type InfiniteNumber = TSTypeForgeInternals_ExtendNumberBrand<
  * const isPosInfinity = (x: number): x is POSITIVE_INFINITY =>
  *   x === Number.POSITIVE_INFINITY;
  *
- * const handleLimit = (x: number): FiniteNumber | POSITIVE_INFINITY => {
- *   if (x > Number.MAX_VALUE)
- *     return Number.POSITIVE_INFINITY as POSITIVE_INFINITY;
- *   return x as FiniteNumber;
- * };
+ * const handleLimit = (x: number): FiniteNumber | POSITIVE_INFINITY =>
+ *   x > Number.MAX_VALUE
+ *     ? (Number.POSITIVE_INFINITY as POSITIVE_INFINITY)
+ *     : (x as FiniteNumber);
  * ```
  */
 export type POSITIVE_INFINITY = TSTypeForgeInternals_ExtendNumberBrand<
@@ -82,11 +79,10 @@ export type POSITIVE_INFINITY = TSTypeForgeInternals_ExtendNumberBrand<
  * const isNegInfinity = (x: number): x is NEGATIVE_INFINITY =>
  *   x === Number.NEGATIVE_INFINITY;
  *
- * const handleUnderflow = (x: number): FiniteNumber | NEGATIVE_INFINITY => {
- *   if (x < -Number.MAX_VALUE)
- *     return Number.NEGATIVE_INFINITY as NEGATIVE_INFINITY;
- *   return x as FiniteNumber;
- * };
+ * const handleUnderflow = (x: number): FiniteNumber | NEGATIVE_INFINITY =>
+ *   x < -Number.MAX_VALUE
+ *     ? (Number.NEGATIVE_INFINITY as NEGATIVE_INFINITY)
+ *     : (x as FiniteNumber);
  * ```
  */
 export type NEGATIVE_INFINITY = TSTypeForgeInternals_ExtendNumberBrand<

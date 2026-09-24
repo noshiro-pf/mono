@@ -14,11 +14,11 @@ import { type NarrowToOk } from './types.mjs';
  *   string
  * >;
  *
- * if (TernaryResult.isOk(maybeNumber)) {
- *   const value: number = maybeNumber.value;
+ * if (!TernaryResult.isOk(maybeNumber)) return;
  *
- *   assert.strictEqual(value, 42);
- * }
+ * const value: number = maybeNumber.value;
+ *
+ * assert.strictEqual(value, 42);
  * ```
  */
 export const isOk = <R extends UnknownTernaryResult>(

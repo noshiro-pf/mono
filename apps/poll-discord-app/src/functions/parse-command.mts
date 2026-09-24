@@ -117,7 +117,7 @@ export const gpParseRandCommandArgument = (
 ): Result<number, undefined> => {
   const n = Result.unwrapOkOr(Num.safeParseInt(commandArguments), Number.NaN);
 
-  if (!Number.isSafeInteger(n) || n < 2) return Result.err(undefined);
-
-  return Result.ok(n);
+  return !Number.isSafeInteger(n) || n < 2
+    ? Result.err(undefined)
+    : Result.ok(n);
 };

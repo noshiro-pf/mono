@@ -9,17 +9,17 @@ catalog:
   '@testing-library/dom': 10.4.2
   '@testing-library/preact': 3.2.4
   '@testing-library/react': 16.3.3
-  '@types/node': 26.5.1
+  '@types/node': 26.6.1
   '@types/react': 19.3.0
   '@types/react-dom': 19.3.0
   '@typescript-eslint/parser': 8.70.0
   '@typescript-eslint/rule-tester': 8.70.0
   '@vitejs/plugin-react': 6.1.1
-  '@vitest/browser-playwright': 5.0.0
-  '@vitest/coverage-v8': 5.0.0
-  '@vitest/ui': 5.0.0
+  '@vitest/browser-playwright': 5.0.1
+  '@vitest/coverage-v8': 5.0.1
+  '@vitest/ui': 5.0.1
   argparse: 3.0.2
-  cspell: 10.3.1
+  cspell: 10.3.3
   dedent: 1.7.2
   esbuild: 0.28.2
   eslint: 10.10.0
@@ -30,12 +30,12 @@ catalog:
   markdownlint-cli2: 0.23.2
   mobx: 7.0.3
   npm-run-all2: 9.0.3
-  oxfmt: 0.67.0
-  oxlint: 1.82.0
+  oxfmt: 0.68.0
+  oxlint: 1.83.0
   oxlint-tsgolint: 7.0.2001
   playwright: 1.63.0
   preact: 10.29.8
-  prettier: 3.9.6
+  prettier: 3.9.7
   prettier-plugin-organize-imports: 4.3.0
   prettier-plugin-packagejson: 3.0.2
   react: 19.3.0
@@ -47,7 +47,7 @@ catalog:
   typescript: 6.0.3
   valtio: 2.3.2
   vite: 8.3.0
-  vitest: 5.0.0
+  vitest: 5.0.1
   zustand: 5.0.15
 
 packages:
@@ -144,7 +144,6 @@ minimumReleaseAgeExclude:
   - '@octokit/request@10.0.16'
   - '@octokit/request-error@7.1.2'
   - '@octokit/types@18.0.0'
-  - '@types/node@24.13.4'
   - '@types/react@19.3.0'
   - '@types/react-dom@19.3.0'
 

@@ -275,7 +275,6 @@ export const eslintUnicornRules = {
   'unicorn/no-unsafe-property-key': 'off',
 
   'unicorn/no-unsafe-string-replacement': 'error',
-  'unicorn/no-unused-array-method-return': 'error',
   'unicorn/no-useless-boolean-cast': 'error',
   'unicorn/no-useless-concat': 'error',
   'unicorn/no-useless-else': 'error',
@@ -509,6 +508,7 @@ export const eslintUnicornRules = {
   'unicorn/no-instanceof-array': 0,
   'unicorn/no-length-as-slice-end': 0,
   'unicorn/prevent-abbreviations': 0,
+  'unicorn/no-unused-array-method-return': 0, // replaced by unicorn/no-unused-builtin-method-return in v75
 
   // Added in v73.
 
@@ -531,4 +531,47 @@ export const eslintUnicornRules = {
   /** Stylistic, and not recommended by the plugin. */
   'unicorn/consistent-arrow-return-style': 'off',
   'unicorn/iteration-fallback-style': 'off',
+
+  // Added in v75.
+
+  'unicorn/no-async-iterator-callback': 'error',
+  'unicorn/no-unused-builtin-method-return': 'error',
+  'unicorn/no-unused-iterator-helper': 'error',
+  'unicorn/no-useless-set-construction': 'error',
+  'unicorn/no-using-resource-escape': 'error',
+  'unicorn/prefer-iterator-zip': 'error',
+  'unicorn/prefer-temporal-conversion': 'error',
+
+  /**
+   * Off, though the plugin recommends it. Guards here are written one
+   * condition at a time, each under the comment saying why it exits; the fix
+   * cannot merge guards with a comment between them, so it left about sixty
+   * reports to rewrite by hand into one condition that no longer says why.
+   */
+  'unicorn/prefer-combined-guards': 'off',
+
+  /**
+   * Off, as the plugin recommends. Reading JSON goes through `fs` here, and
+   * `unicorn/consistent-json-file-read` already says how.
+   */
+  'unicorn/prefer-json-import': 'off',
+
+  /**
+   * `Uint8Array#toHex()` and `Uint8Array.fromHex()` are not in every Node.js
+   * version this config supports; not recommended by the plugin either.
+   */
+  'unicorn/prefer-uint8array-hex': 'off',
+
+  // These rules only support the `css/css` language, so enabling them in a
+  // JavaScript/TypeScript config makes ESLint fail to start.
+  'unicorn/no-deprecated-css-features': 'off',
+  'unicorn/no-duplicate-css-selectors': 'off',
+  'unicorn/no-duplicate-font-family-names': 'off',
+  'unicorn/no-invalid-media-features': 'off',
+  'unicorn/no-nesting-with-mixed-specificity': 'off',
+  'unicorn/no-redundant-nested-style-rules': 'off',
+  'unicorn/no-unknown-css-annotations': 'off',
+  'unicorn/no-unknown-pseudo-selectors': 'off',
+  'unicorn/no-unscoped-css-nesting-selector': 'off',
+  'unicorn/prefer-media-feature-range-syntax': 'off',
 } as const satisfies EslintUnicornRules;

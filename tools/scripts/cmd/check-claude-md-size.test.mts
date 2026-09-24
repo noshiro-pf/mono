@@ -27,15 +27,13 @@ describe('checkClaudeMdSize', () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.include(
-        result.value,
-        'CLAUDE.md is 4 lines, 1 over its budget of 3.',
-      );
+    assert.include(
+      result.value,
+      'CLAUDE.md is 4 lines, 1 over its budget of 3.',
+    );
 
-      assert.include(result.value, 'LINE_BUDGET');
+    assert.include(result.value, 'LINE_BUDGET');
 
-      assert.include(result.value, '"What belongs in this file"');
-    }
+    assert.include(result.value, '"What belongs in this file"');
   });
 });

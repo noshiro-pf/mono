@@ -305,11 +305,9 @@ const readAccountPackageNames = async (
 
   const parsed = Json.parse(listed.stdout);
 
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return Result.err(`Unparsable npm output: ${listed.stdout.trim()}`);
-  }
-
-  return Result.ok(Object.keys(parsed.value));
+  return Result.isErr(parsed) || !isRecord(parsed.value)
+    ? Result.err(`Unparsable npm output: ${listed.stdout.trim()}`)
+    : Result.ok(Object.keys(parsed.value));
 };
 
 const inspectPackage = async (

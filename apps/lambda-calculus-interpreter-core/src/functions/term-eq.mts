@@ -11,9 +11,7 @@ export const termEq = (term1: LambdaTerm, term2: LambdaTerm): boolean => {
     return term1[1] === term2[1] && termEq(term1[2], term2[2]);
   }
 
-  if (isApplication(term1) && isApplication(term2)) {
-    return termEq(term1[0], term2[0]) && termEq(term1[1], term2[1]);
-  }
-
-  return false;
+  return isApplication(term1) && isApplication(term2)
+    ? termEq(term1[0], term2[0]) && termEq(term1[1], term2[1])
+    : false;
 };

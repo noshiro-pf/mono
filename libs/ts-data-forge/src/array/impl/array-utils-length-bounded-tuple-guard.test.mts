@@ -92,11 +92,13 @@ describe('Arr structural tuple length guards', () => {
     test('should work as type guard with exact length (additional)', () => {
       const array: readonly number[] = [1, 2, 3] as const;
 
-      if (isFixedLengthTuple(3, array)) {
-        expectType<typeof array, FixedLengthTuple<3, number>>('=');
-
-        expect(array).toHaveLength(3);
+      if (!isFixedLengthTuple(3, array)) {
+        return;
       }
+
+      expectType<typeof array, FixedLengthTuple<3, number>>('=');
+
+      expect(array).toHaveLength(3);
     });
   });
 
@@ -180,11 +182,13 @@ describe('Arr structural tuple length guards', () => {
     test('should work as type guard for at least length (additional)', () => {
       const array: readonly number[] = [1, 2, 3] as const;
 
-      if (isMinLengthTuple(2, array)) {
-        expectType<typeof array, MinLengthTuple<2, number>>('=');
-
-        expect(array.length).toBeGreaterThanOrEqual(2);
+      if (!isMinLengthTuple(2, array)) {
+        return;
       }
+
+      expectType<typeof array, MinLengthTuple<2, number>>('=');
+
+      expect(array.length).toBeGreaterThanOrEqual(2);
     });
   });
 
@@ -255,11 +259,13 @@ describe('Arr structural tuple length guards', () => {
     test('should work as type guard for at most length (additional)', () => {
       const array: readonly number[] = [1, 2] as const;
 
-      if (isMaxLengthTuple(3, array)) {
-        expectType<typeof array, MaxLengthTuple<3, number>>('=');
-
-        expect(array.length).toBeLessThanOrEqual(3);
+      if (!isMaxLengthTuple(3, array)) {
+        return;
       }
+
+      expectType<typeof array, MaxLengthTuple<3, number>>('=');
+
+      expect(array.length).toBeLessThanOrEqual(3);
     });
   });
 
@@ -332,13 +338,15 @@ describe('Arr structural tuple length guards', () => {
     test('should work as type guard for bounded length (additional)', () => {
       const array: readonly number[] = [1, 2] as const;
 
-      if (isBoundedLengthTuple(1, 3, array)) {
-        expectType<typeof array, BoundedLengthTuple<1, 3, number>>('=');
-
-        expect(array.length).toBeGreaterThanOrEqual(1);
-
-        expect(array.length).toBeLessThanOrEqual(3);
+      if (!isBoundedLengthTuple(1, 3, array)) {
+        return;
       }
+
+      expectType<typeof array, BoundedLengthTuple<1, 3, number>>('=');
+
+      expect(array.length).toBeGreaterThanOrEqual(1);
+
+      expect(array.length).toBeLessThanOrEqual(3);
     });
   });
 
@@ -364,14 +372,14 @@ describe('Arr structural tuple length guards', () => {
 
       assert.isTrue(isNonEmptyTuple(values));
 
-      if (isNonEmptyTuple(values)) {
-        expectType<typeof values, MinLengthTuple<1, number>>('=');
+      if (!isNonEmptyTuple(values)) return;
 
-        // The structural prefix makes the first element defined.
-        const first: number = values[0];
+      expectType<typeof values, MinLengthTuple<1, number>>('=');
 
-        assert.deepStrictEqual(first, 1);
-      }
+      // The structural prefix makes the first element defined.
+      const first: number = values[0];
+
+      assert.deepStrictEqual(first, 1);
     });
 
     test('rejects an empty array', () => {

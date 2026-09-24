@@ -152,7 +152,7 @@ const isTupleTyped = (
     return constraint !== undefined && isTupleTyped(checker, constraint);
   }
 
-  if (type.isTupleType()) return true;
-
-  return type.isTypeReference() && type.getTarget().isTupleType();
+  return type.isTupleType()
+    ? true
+    : type.isTypeReference() && type.getTarget().isTupleType();
 };

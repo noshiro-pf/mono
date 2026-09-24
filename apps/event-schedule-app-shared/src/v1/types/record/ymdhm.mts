@@ -61,7 +61,5 @@ export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
 
   const compareHmResult = compareHm(a.hm, b.hm);
 
-  if (compareHmResult !== 0) return compareHmResult;
-
-  return 0;
+  return compareHmResult !== 0 ? compareHmResult : 0;
 };

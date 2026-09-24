@@ -274,9 +274,7 @@ const mutNameOf = (node: AnyNode): string | undefined => {
       : undefined;
   }
 
-  if (node.type === AST_NODE_TYPES.TSPropertySignature) {
-    return propertyName(node.key);
-  }
-
-  return undefined;
+  return node.type === AST_NODE_TYPES.TSPropertySignature
+    ? propertyName(node.key)
+    : undefined;
 };

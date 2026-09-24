@@ -85,12 +85,11 @@ export type SmallUint = SmallInt<'>=0'>;
  * type Count = WithSmallInt<Uint>;
  * // Count is 0 | 1 | 2 | ... | 39 | Uint
  *
- * const increment = (n: Count): Count => {
- *   if (typeof n === 'number' && n < 39) {
- *     return (n + 1) as Count; // Type narrowing works with literals
- *   }
- *   return ((n as number) + 1) as Count;
- * };
+ * const increment = (n: Count): Count =>
+ *   // Type narrowing works with literals
+ *   typeof n === 'number' && n < 39
+ *     ? ((n + 1) as Count)
+ *     : (((n as number) + 1) as Count);
  *
  * // Common patterns:
  * type SmallInt = WithSmallInt<Int>; // -40 to 39 | Int
@@ -128,12 +127,9 @@ type CastToInt<T> = T extends Int ? T : never;
  * type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
  * type PureCount = ExcludeSmallInt<Count>; // Uint
  *
- * const toLargeCount = (n: Count): ExcludeSmallInt<Count> => {
- *   if (typeof n === 'number') {
- *     return (n + 1000) as Uint; // Convert small to large
- *   }
- *   return n;
- * };
+ * const toLargeCount = (n: Count): ExcludeSmallInt<Count> =>
+ *   // Convert small to large
+ *   typeof n === 'number' ? ((n + 1000) as Uint) : n;
  * ```
  */
 export type ExcludeSmallInt<

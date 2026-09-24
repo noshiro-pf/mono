@@ -13,11 +13,7 @@ export const getGitRoot = async (
     silent: options?.silent ?? false,
   });
 
-  if (Result.isErr(result)) {
-    return result;
-  }
-
-  return Result.ok(result.value.stdout.trim());
+  return Result.isErr(result) ? result : Result.ok(result.value.stdout.trim());
 };
 
 /**

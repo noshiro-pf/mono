@@ -18,11 +18,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const targetAtom = branchAtoms[sel];
 
-    if (targetAtom === undefined) {
-      return 0;
-    }
-
-    return get(targetAtom);
+    return targetAtom === undefined ? 0 : get(targetAtom);
   });
 
   const store = createStore();

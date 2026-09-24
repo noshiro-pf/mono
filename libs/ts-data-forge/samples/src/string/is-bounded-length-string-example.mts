@@ -11,11 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
 
-    if (Str.isBoundedLengthString(8, 16, input)) {
-      const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
+    if (!Str.isBoundedLengthString(8, 16, input)) return;
 
-      assert.isTrue(userId.length >= 8 && userId.length <= 16);
-    }
+    const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
+
+    assert.isTrue(userId.length >= 8 && userId.length <= 16);
 
     // embed-sample-code-ignore-below
   });

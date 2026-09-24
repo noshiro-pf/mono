@@ -98,18 +98,18 @@ export const expandMustMatchPatternProperties = (
     }
 
     // 共通の型を definitions に追加
-    const mut_newDefinitions = { ...definitions };
-
-    // PatternOrPatternArray 型を追加
-    if (mut_patternTypeSchema !== undefined) {
-      mut_newDefinitions['PatternOrPatternArray'] = mut_patternTypeSchema;
-    }
-
-    mut_newDefinitions['MustMatchType'] = mut_expandedMustMatchSchema;
+    const newDefinitions = {
+      ...definitions,
+      // PatternOrPatternArray 型を追加
+      ...(mut_patternTypeSchema === undefined
+        ? {}
+        : { PatternOrPatternArray: mut_patternTypeSchema }),
+      MustMatchType: mut_expandedMustMatchSchema,
+    } as const;
 
     return {
       ...rest,
-      definitions: mut_newDefinitions,
+      definitions: newDefinitions,
       properties: {
         ...properties,
         mustMatch: {

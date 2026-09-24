@@ -14,11 +14,9 @@ const parseConfig = (
     }
   })();
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'port') || !isNumber(parsed.port)) {
-    return Promise.resolve(Result.err({ message: 'Invalid config shape' }));
-  }
-
-  return Promise.resolve(Result.ok({ port: parsed.port }));
+  return !isRecord(parsed) || !hasKey(parsed, 'port') || !isNumber(parsed.port)
+    ? Promise.resolve(Result.err({ message: 'Invalid config shape' }))
+    : Promise.resolve(Result.ok({ port: parsed.port }));
 };
 
 const assertValidConfig = createResultAssert({

@@ -76,9 +76,7 @@ const isWrappedWithParentheses = (str: string): boolean => {
 export const wrapWithParentheses = (nodeStr: string): string => {
   const trimmed = nodeStr.trim();
 
-  if (isWrappedWithParentheses(trimmed)) {
-    return trimmed;
-  }
-
-  return `(${trimmed})` as const;
+  return isWrappedWithParentheses(trimmed)
+    ? trimmed
+    : (`(${trimmed})` as const);
 };

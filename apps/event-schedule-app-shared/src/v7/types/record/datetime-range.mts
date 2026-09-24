@@ -25,7 +25,5 @@ export const compareDatetimeRange = (
 
   const compareTimeRangeResult = compareTimeRange(a.timeRange, b.timeRange);
 
-  if (compareTimeRangeResult !== 0) return compareTimeRangeResult;
-
-  return 0;
+  return compareTimeRangeResult !== 0 ? compareTimeRangeResult : 0;
 };

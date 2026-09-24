@@ -198,9 +198,9 @@ const readLog = async (): Promise<
       dir,
     );
 
-    if (Result.isErr(fetched)) return fetched;
-
-    return git(`git show ${sh(`FETCH_HEAD:${RUN_LOG_PATH}`)}`, dir);
+    return Result.isErr(fetched)
+      ? fetched
+      : git(`git show ${sh(`FETCH_HEAD:${RUN_LOG_PATH}`)}`, dir);
   });
 
   if (Result.isErr(shown)) return shown;
@@ -295,9 +295,7 @@ const inScratchRepo = async <T,>(
 
     const hooks = await git('git config core.hooksPath /dev/null', dir);
 
-    if (Result.isErr(hooks)) return hooks;
-
-    return await body(dir);
+    return Result.isErr(hooks) ? hooks : await body(dir);
   } finally {
     await fs.rm(dir, { recursive: true, force: true });
   }

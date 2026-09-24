@@ -33,19 +33,19 @@ export const resolveImportPath = (
         const pathIndex =
           matchedKey !== undefined ? pathIndexMap[matchedKey] : 0;
 
-        if (Arr.isNonEmpty(value)) {
-          const pathValue: string =
-            mapNullable(pathIndex, (i) => value[i]) ?? value[0];
+        if (!Arr.isNonEmpty(value)) continue;
 
-          // `baseUrl` is deprecated in TypeScript 6.0, but this rule still
-          // needs to read it (if present) to resolve legacy `baseUrl`-relative
-          // `paths` entries the same way `tsc` does.
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          const { baseUrl } = tsconfigOptions;
+        const pathValue: string =
+          mapNullable(pathIndex, (i) => value[i]) ?? value[0];
 
-          mut_importAliasMap[key] =
-            baseUrl !== undefined ? path.join(baseUrl, pathValue) : pathValue;
-        }
+        // `baseUrl` is deprecated in TypeScript 6.0, but this rule still
+        // needs to read it (if present) to resolve legacy `baseUrl`-relative
+        // `paths` entries the same way `tsc` does.
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        const { baseUrl } = tsconfigOptions;
+
+        mut_importAliasMap[key] =
+          baseUrl !== undefined ? path.join(baseUrl, pathValue) : pathValue;
       }
     }
   } catch {
@@ -112,10 +112,7 @@ const readTsConfig = (tsconfigPath: string): ts.CompilerOptions | undefined => {
     },
   );
 
-  if (result === undefined) {
-    // 'Failed to parse tsconfig.'
-    return undefined;
-  }
-
-  return result.options; // 正規化済みの compilerOptions
+  // undefined: 'Failed to parse tsconfig.'
+  // result.options: 正規化済みの compilerOptions
+  return result?.options;
 };

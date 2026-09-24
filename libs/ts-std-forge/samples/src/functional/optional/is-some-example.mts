@@ -6,11 +6,11 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const optionalNumber = Optional.some(42);
 
-    if (Optional.isSome(optionalNumber)) {
-      const value: number = optionalNumber.value;
+    if (!Optional.isSome(optionalNumber)) return;
 
-      assert.isTrue(value === 42);
-    }
+    const value: number = optionalNumber.value;
+
+    assert.isTrue(value === 42);
 
     // embed-sample-code-ignore-below
   });

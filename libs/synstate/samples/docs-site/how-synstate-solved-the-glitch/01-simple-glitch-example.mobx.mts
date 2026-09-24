@@ -34,13 +34,15 @@ import { computed, observable, reaction, runInAction } from 'mobx';
           state.counter = mut_count;
         });
 
-        if (mut_count >= 4) {
-          clearInterval(interval);
-
-          dispose();
-
-          resolve();
+        if (!(mut_count >= 4)) {
+          return;
         }
+
+        clearInterval(interval);
+
+        dispose();
+
+        resolve();
       }, 100);
     });
 

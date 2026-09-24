@@ -33,24 +33,22 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.isOk(formatted));
 
-    if (Result.isOk(formatted)) {
-      assert.isTrue(isString(formatted.value));
+    if (!Result.isOk(formatted)) return;
 
-      // Check that keys are in order (first key should be "apple")
-      assert.isTrue(
-        formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
-      );
+    assert.isTrue(isString(formatted.value));
 
-      assert.isTrue(
-        formatted.value.indexOf('"mango"') <
-          formatted.value.indexOf('"nested"'),
-      );
+    // Check that keys are in order (first key should be "apple")
+    assert.isTrue(
+      formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
+    );
 
-      assert.isTrue(
-        formatted.value.indexOf('"nested"') <
-          formatted.value.indexOf('"zebra"'),
-      );
-    }
+    assert.isTrue(
+      formatted.value.indexOf('"mango"') < formatted.value.indexOf('"nested"'),
+    );
+
+    assert.isTrue(
+      formatted.value.indexOf('"nested"') < formatted.value.indexOf('"zebra"'),
+    );
 
     // embed-sample-code-ignore-below
   });

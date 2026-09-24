@@ -279,12 +279,12 @@ assert.isTrue(Num.roundToInt(3.7) === 4);
 // Type guards
 const value = 5; // example value
 
-if (Num.isNonZero(value)) {
-    // value is guaranteed to be non-zero
-    const result = Num.div(10, value); // Safe division
+if (!Num.isNonZero(value)) return;
 
-    assert.isTrue(result === 2);
-}
+// value is guaranteed to be non-zero
+const result = Num.div(10, value); // Safe division
+
+assert.isTrue(result === 2);
 ```
 
 #### Branded Number Types for Enhanced Type Safety

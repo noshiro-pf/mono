@@ -37,11 +37,11 @@ export namespace Str {
    *
    * assert.isFalse(Str.isMinLengthString(12, 'short'));
    *
-   * if (Str.isMinLengthString(12, input)) {
-   *   const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
+   * if (!Str.isMinLengthString(12, input)) return;
    *
-   *   assert.isTrue(nonEmpty.length >= 12);
-   * }
+   * const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
+   *
+   * assert.isTrue(nonEmpty.length >= 12);
    * ```
    *
    * @template MinLength - The minimum number of characters (inclusive).
@@ -79,11 +79,11 @@ export namespace Str {
    *
    * assert.isFalse(Str.isMaxLengthString(3, input));
    *
-   * if (Str.isMaxLengthString(32, input)) {
-   *   const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
+   * if (!Str.isMaxLengthString(32, input)) return;
    *
-   *   assert.isTrue(relaxed.length <= 32);
-   * }
+   * const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
+   *
+   * assert.isTrue(relaxed.length <= 32);
    * ```
    *
    * @template MaxLength - The maximum number of characters (inclusive).
@@ -122,11 +122,11 @@ export namespace Str {
    *
    * assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
    *
-   * if (Str.isBoundedLengthString(8, 16, input)) {
-   *   const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
+   * if (!Str.isBoundedLengthString(8, 16, input)) return;
    *
-   *   assert.isTrue(userId.length >= 8 && userId.length <= 16);
-   * }
+   * const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
+   *
+   * assert.isTrue(userId.length >= 8 && userId.length <= 16);
    * ```
    *
    * @template MinLength - The minimum number of characters (inclusive).
@@ -171,11 +171,11 @@ export namespace Str {
    *
    * assert.isFalse(Str.isFixedLengthString(3, input));
    *
-   * if (Str.isFixedLengthString(2, input)) {
-   *   const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
+   * if (!Str.isFixedLengthString(2, input)) return;
    *
-   *   assert.isTrue(atMost5.length === 2);
-   * }
+   * const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
+   *
+   * assert.isTrue(atMost5.length === 2);
    * ```
    *
    * @template Length - The exact number of characters.

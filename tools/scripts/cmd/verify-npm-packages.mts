@@ -302,11 +302,9 @@ const collectExportsPaths = (
   if (Arr.isArray(exportsField))
     return exportsField.flatMap(collectExportsPaths);
 
-  if (isRecord(exportsField)) {
-    return Object.values(exportsField).flatMap(collectExportsPaths);
-  }
-
-  return [];
+  return isRecord(exportsField)
+    ? Object.values(exportsField).flatMap(collectExportsPaths)
+    : [];
 };
 
 /**
@@ -518,11 +516,9 @@ const peerSpecs = async (
 
   const parsed = Json.parse(manifest.value.stdout);
 
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
-    return Result.err(`Could not read the manifest of ${pkg.name}@${spec}.`);
-  }
-
-  return Result.ok(declaredPeers(parsed.value));
+  return Result.isErr(parsed) || !isRecord(parsed.value)
+    ? Result.err(`Could not read the manifest of ${pkg.name}@${spec}.`)
+    : Result.ok(declaredPeers(parsed.value));
 };
 
 /** The non-optional `peerDependencies` of a manifest, as plain specs. */

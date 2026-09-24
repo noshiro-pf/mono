@@ -271,21 +271,20 @@ const pageRules: readonly PageRule[] = [
       // shares and the path the tab is appended to.
       const branches = url.pathname.replace(/\/$/u, '');
 
-      if (isTabOfSameBranchesPage(readFrom, url.origin, branches)) {
-        // An anchor to the overview, sitting on that very page: the "Overview"
-        // tab, which is the one link this rule must not send to the list.
-        // Marking it is what carries the request into the next document, where
-        // the address is all that is left of it.
-        return `${url.origin}${branches}${searchWith(url.search, overviewParam)}${url.hash}`;
-      }
-
+      // An anchor to the overview, sitting on that very page: the "Overview"
+      // tab, which is the one link this rule must not send to the list.
+      // Marking it is what carries the request into the next document, where
+      // the address is all that is left of it.
+      //
       // Anywhere else — the repository's own navigation, a comment, or the page
       // itself rather than a link on one — the branches are what was asked for.
       //
       // The query is carried over because the branches page puts its search
       // there: `?query=release` on the overview means the same thing on the
       // list, and dropping it would throw away what was typed.
-      return `${url.origin}${branches}/${allBranchesSegment}${url.search}${url.hash}`;
+      return isTabOfSameBranchesPage(readFrom, url.origin, branches)
+        ? `${url.origin}${branches}${searchWith(url.search, overviewParam)}${url.hash}`
+        : `${url.origin}${branches}/${allBranchesSegment}${url.search}${url.hash}`;
     },
   },
 ] as const;

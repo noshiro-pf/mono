@@ -104,9 +104,7 @@ export const rest = async <A,>(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
-  if (Result.isErr(response)) return response;
-
-  return validate(response.value, schema);
+  return Result.isErr(response) ? response : validate(response.value, schema);
 };
 
 /** What a REST call may carry besides its path. */

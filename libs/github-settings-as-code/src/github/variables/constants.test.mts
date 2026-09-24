@@ -99,12 +99,14 @@ describe(assertVariableNamesAreValid, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      assert.isTrue(result.value.message.includes('WITH-HYPHEN'));
-
-      assert.isTrue(result.value.message.includes('GITHUB_TOKEN'));
-
-      assert.isFalse(result.value.message.includes('FINE'));
+    if (!Result.isErr(result)) {
+      return;
     }
+
+    assert.isTrue(result.value.message.includes('WITH-HYPHEN'));
+
+    assert.isTrue(result.value.message.includes('GITHUB_TOKEN'));
+
+    assert.isFalse(result.value.message.includes('FINE'));
   });
 });

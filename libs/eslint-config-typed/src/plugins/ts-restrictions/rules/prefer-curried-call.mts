@@ -97,11 +97,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
     ): boolean => {
       if (callee.type === AST_NODE_TYPES.Identifier) return true;
 
-      if (callee.type === AST_NODE_TYPES.MemberExpression) {
-        return !callee.optional && isNamespaceObject(callee.object);
-      }
-
-      return false;
+      return callee.type === AST_NODE_TYPES.MemberExpression
+        ? !callee.optional && isNamespaceObject(callee.object)
+        : false;
     };
 
     /**

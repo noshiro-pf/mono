@@ -57,9 +57,7 @@ In Jotai, a derived atom can conditionally read different atoms:
 const temperatureAtom = atom((get) => {
     const mode = get(modeAtom);
 
-    if (mode === 'celsius') return get(celsiusAtom);
-
-    return get(fahrenheitAtom);
+    return mode === 'celsius' ? get(celsiusAtom) : get(fahrenheitAtom);
 });
 ```
 

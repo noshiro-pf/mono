@@ -297,11 +297,7 @@ const checkCountOf = (memberType: UnknownType): number => {
     return shape === undefined ? 1 : Object.keys(shape).length;
   }
 
-  if (hasTupleInternals(memberType)) {
-    return memberType.elementTypes.length;
-  }
-
-  return 1;
+  return hasTupleInternals(memberType) ? memberType.elementTypes.length : 1;
 };
 
 const validationErrorsOf = (

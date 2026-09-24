@@ -10,11 +10,11 @@ if (import.meta.vitest !== undefined) {
       string
     >;
 
-    if (TernaryResult.isOk(maybeNumber)) {
-      const value: number = maybeNumber.value;
+    if (!TernaryResult.isOk(maybeNumber)) return;
 
-      assert.strictEqual(value, 42);
-    }
+    const value: number = maybeNumber.value;
+
+    assert.strictEqual(value, 42);
 
     // embed-sample-code-ignore-below
   });

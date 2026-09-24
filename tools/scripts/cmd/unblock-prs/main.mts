@@ -167,11 +167,13 @@ const unblockPrs = async (
 
     if (cycle.next === 'stop' || options.once || options.dryRun) break;
 
-    if (cycle.next === 'idle') {
-      log(`Nothing to do. Checking again in ${options.idleIntervalSec}s.`);
-
-      await pause(options.idleIntervalSec * 1000);
+    if (cycle.next !== 'idle') {
+      continue;
     }
+
+    log(`Nothing to do. Checking again in ${options.idleIntervalSec}s.`);
+
+    await pause(options.idleIntervalSec * 1000);
   }
 
   // After the loop rather than after each cycle: one run is one entry, and a

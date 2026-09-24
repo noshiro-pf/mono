@@ -223,12 +223,10 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
       if (type.isIntersection()) return summarizeIntersection(type);
 
-      if ((flags & ts.TypeFlags.Object) !== 0) {
-        return summarizeObjectLikeType(type);
-      }
-
       // Anything unrecognized (non-union `enum`, `keyof`, …) is unsafe.
-      return 'unsafe';
+      return (flags & ts.TypeFlags.Object) !== 0
+        ? summarizeObjectLikeType(type)
+        : 'unsafe';
     };
 
     /**
@@ -484,9 +482,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
               (token) => token.value === '||=',
             );
 
-            if (operatorToken === null) return null;
-
-            return fixer.replaceText(operatorToken, '??=');
+            return operatorToken === null
+              ? null
+              : fixer.replaceText(operatorToken, '??=');
           },
         });
       },

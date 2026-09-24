@@ -20,13 +20,10 @@ if (import.meta.vitest !== undefined) {
 
     const obj5 = { value: 1.00001 } as const;
 
-    const closeEnough = (a: unknown, b: unknown): boolean => {
-      if (typeof a === 'number' && typeof b === 'number') {
-        return Math.abs(a - b) < 0.001;
-      }
-
-      return Object.is(a, b);
-    };
+    const closeEnough = (a: unknown, b: unknown): boolean =>
+      typeof a === 'number' && typeof b === 'number'
+        ? Math.abs(a - b) < 0.001
+        : Object.is(a, b);
 
     assert.isTrue(Obj.shallowEq(obj4, obj5, closeEnough));
 

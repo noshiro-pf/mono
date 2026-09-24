@@ -13,7 +13,5 @@ export const getPlatform = (): 'mac' | 'other' | 'windows' => {
 
   if (platform.includes('MAC')) return 'mac';
 
-  if (platform.includes('WIN')) return 'windows';
-
-  return 'other';
+  return platform.includes('WIN') ? 'windows' : 'other';
 };

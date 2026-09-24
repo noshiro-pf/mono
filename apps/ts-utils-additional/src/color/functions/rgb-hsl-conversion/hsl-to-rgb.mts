@@ -13,9 +13,7 @@ const hue2rgb = (p: number, q: number, s: number): number => {
 
   if (t < 1 / 2) return q;
 
-  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-
-  return p;
+  return t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p;
 };
 
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {

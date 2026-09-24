@@ -92,11 +92,7 @@ export const MapType = <K extends UnknownType, V extends UnknownType>(
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    return Result.ok(a);
+    return Arr.isNonEmpty(errors) ? Result.err(errors) : Result.ok(a);
   };
 
   const fill: Type<M>['fill'] = (a) =>

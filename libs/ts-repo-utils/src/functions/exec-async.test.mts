@@ -25,11 +25,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout.trim()).toBe('hello world');
-
-        expect(result.value.stderr).toBe('');
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      expect(result.value.stdout.trim()).toBe('hello world');
+
+      expect(result.value.stderr).toBe('');
     });
 
     test('should execute command with multiple lines of output', async () => {
@@ -37,11 +39,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
-
-        expect(result.value.stderr).toBe('');
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
+
+      expect(result.value.stderr).toBe('');
     });
 
     test('should handle empty output', async () => {
@@ -49,11 +53,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value.stdout).toBe('');
-
-        expect(result.value.stderr).toBe('');
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      expect(result.value.stdout).toBe('');
+
+      expect(result.value.stderr).toBe('');
     });
   });
 
@@ -63,11 +69,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        expect(result.value).toBeDefined();
-
-        expect(result.value.code).toBeDefined();
+      if (!Result.isErr(result)) {
+        return;
       }
+
+      expect(result.value).toBeDefined();
+
+      expect(result.value.code).toBeDefined();
     });
 
     test('should handle exit code error', async () => {
@@ -75,11 +83,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isErr(result));
 
-      if (Result.isErr(result)) {
-        expect(result.value).toBeDefined();
-
-        expect(result.value.code).toBe(1);
+      if (!Result.isErr(result)) {
+        return;
       }
+
+      expect(result.value).toBeDefined();
+
+      expect(result.value.code).toBe(1);
     });
 
     test('should capture stderr on error', async () => {
@@ -138,11 +148,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        assert.isTrue(Buffer.isBuffer(result.value.stdout));
-
-        assert.isTrue(Buffer.isBuffer(result.value.stderr));
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      assert.isTrue(Buffer.isBuffer(result.value.stdout));
+
+      assert.isTrue(Buffer.isBuffer(result.value.stderr));
     });
 
     test('should return Buffer with null encoding', async () => {
@@ -150,11 +162,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        assert.isTrue(Buffer.isBuffer(result.value.stdout));
-
-        assert.isTrue(Buffer.isBuffer(result.value.stderr));
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      assert.isTrue(Buffer.isBuffer(result.value.stdout));
+
+      assert.isTrue(Buffer.isBuffer(result.value.stderr));
     });
 
     test('should handle utf8 encoding', async () => {
@@ -165,11 +179,13 @@ describe('exec-async', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expectTypeOf(result.value.stdout).toBeString();
-
-        expect(result.value.stdout.trim()).toBe('test 日本語');
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      expectTypeOf(result.value.stdout).toBeString();
+
+      expect(result.value.stdout.trim()).toBe('test 日本語');
     });
   });
 
@@ -224,12 +240,14 @@ describe('exec-async', () => {
         Result<Readonly<{ stdout: string; stderr: string }>, ExecException>
       >(result);
 
-      if (Result.isOk(result)) {
-        // These assignments will fail at compile time if types don't match
-        assertType<string>(result.value.stdout);
-
-        assertType<string>(result.value.stderr);
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      // These assignments will fail at compile time if types don't match
+      assertType<string>(result.value.stdout);
+
+      assertType<string>(result.value.stderr);
     });
 
     test('should infer string result type with default options', async () => {
@@ -252,11 +270,13 @@ describe('exec-async', () => {
         Result<Readonly<{ stdout: Buffer; stderr: Buffer }>, ExecException>
       >('=');
 
-      if (Result.isOk(result)) {
-        assertType<Buffer>(result.value.stdout);
-
-        assertType<Buffer>(result.value.stderr);
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      assertType<Buffer>(result.value.stdout);
+
+      assertType<Buffer>(result.value.stderr);
     });
 
     test('should infer Buffer result type with null encoding', async () => {
@@ -267,11 +287,13 @@ describe('exec-async', () => {
         Result<Readonly<{ stdout: Buffer; stderr: Buffer }>, ExecException>
       >('=');
 
-      if (Result.isOk(result)) {
-        assertType<Buffer>(result.value.stdout);
-
-        assertType<Buffer>(result.value.stderr);
+      if (!Result.isOk(result)) {
+        return;
       }
+
+      assertType<Buffer>(result.value.stdout);
+
+      assertType<Buffer>(result.value.stderr);
     });
 
     test('should infer string result type with specific BufferEncoding', async () => {

@@ -29,11 +29,9 @@ export const loadWorkspaceState = async (
 
   const raw: unknown = stored[key];
 
-  if (!isRecord(raw) || !hasKey(raw, 'state')) {
-    return undefined;
-  }
-
-  return parseWorkspaceState(raw.state);
+  return !isRecord(raw) || !hasKey(raw, 'state')
+    ? undefined
+    : parseWorkspaceState(raw.state);
 };
 
 export const saveWorkspaceState = async (

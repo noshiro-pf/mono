@@ -33,11 +33,9 @@ const fpTsEffectTypeParameter = (
 
     const signature = signatures[0];
 
-    if (signature === undefined || !Arr.isFixedLengthArray(1, signatures)) {
-      return undefined;
-    }
-
-    return signature.getReturnType();
+    return signature === undefined || !Arr.isFixedLengthArray(1, signatures)
+      ? undefined
+      : signature.getReturnType();
   }
 
   // TODO extract the type param from other effect types.

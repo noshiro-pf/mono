@@ -137,12 +137,10 @@ export function boundedLengthTuple<A>(
       }
     });
 
-    if (Arr.isNonEmpty(errors)) {
-      return Result.err(errors);
-    }
-
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Result.ok(a as unknown as T);
+    return Arr.isNonEmpty(errors)
+      ? Result.err(errors)
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as unknown as T);
   };
 
   const fill: Type<T>['fill'] = (a) => {

@@ -29,12 +29,10 @@ export const validateElements = <A,>(
     }
   });
 
-  if (Arr.isNonEmpty(errors)) {
-    return Result.err(errors);
-  }
-
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return Result.ok(a as readonly A[]);
+  return Arr.isNonEmpty(errors)
+    ? Result.err(errors)
+    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Result.ok(a as readonly A[]);
 };
 
 /**

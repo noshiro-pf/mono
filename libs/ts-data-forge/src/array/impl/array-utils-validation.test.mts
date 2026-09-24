@@ -66,22 +66,26 @@ describe('Arr validations', () => {
     test('should work with readonly arrays', () => {
       const readonlyArray: readonly number[] = [1, 2, 3] as const;
 
-      if (isArray(readonlyArray)) {
-        expectType<typeof readonlyArray, readonly number[]>('=');
-
-        expect(readonlyArray).toHaveLength(3);
+      if (!isArray(readonlyArray)) {
+        return;
       }
+
+      expectType<typeof readonlyArray, readonly number[]>('=');
+
+      expect(readonlyArray).toHaveLength(3);
     });
 
     test('should work with mutable arrays', () => {
       // transformer-ignore-next-line convert-to-readonly, append-as-const
       const mutableArray: number[] = [1, 2, 3];
 
-      if (isArray(mutableArray)) {
-        expectType<typeof mutableArray, number[]>('=');
-
-        expect(mutableArray).toHaveLength(3);
+      if (!isArray(mutableArray)) {
+        return;
       }
+
+      expectType<typeof mutableArray, number[]>('=');
+
+      expect(mutableArray).toHaveLength(3);
     });
 
     test('should exclude impossible array types from unions', () => {
@@ -170,11 +174,13 @@ describe('Arr validations', () => {
     test('should work as type guard (additional)', () => {
       const value: unknown = [1, 2, 3] as const;
 
-      if (isArray(value)) {
-        expectType<typeof value, readonly unknown[]>('=');
-
-        expect(value).toHaveLength(3);
+      if (!isArray(value)) {
+        return;
       }
+
+      expectType<typeof value, readonly unknown[]>('=');
+
+      expect(value).toHaveLength(3);
     });
 
     test('should handle array-like objects', () => {
@@ -238,14 +244,9 @@ describe('Arr validations', () => {
       });
 
       test('should work with generic function', () => {
-        const processGeneric = <T,>(value: T | readonly number[]): number => {
-          if (isArray(value)) {
-            // Type is narrowed to array type within this block
-            return value.length;
-          }
-
-          return 0;
-        };
+        const processGeneric = <T,>(value: T | readonly number[]): number =>
+          // Type is narrowed to array type within the first branch
+          isArray(value) ? value.length : 0;
 
         expect(processGeneric([1, 2, 3])).toBe(3);
 
@@ -264,15 +265,12 @@ describe('Arr validations', () => {
       test('should work with conditional types', () => {
         type ArrayOrValue<T> = T extends readonly unknown[] ? T : readonly T[];
 
-        const makeArray = <T,>(value: T): ArrayOrValue<T> => {
-          if (isArray(value)) {
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            return value as ArrayOrValue<T>;
-          }
-
-          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          return [value] as ArrayOrValue<T>;
-        };
+        const makeArray = <T,>(value: T): ArrayOrValue<T> =>
+          isArray(value)
+            ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              (value as ArrayOrValue<T>)
+            : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              ([value] as ArrayOrValue<T>);
 
         assert.deepStrictEqual(makeArray([1, 2, 3]), [1, 2, 3]);
 
@@ -284,11 +282,13 @@ describe('Arr validations', () => {
 
         const tagged = Object.assign([1, 2, 3], { tag: 'test' }) as TaggedArray;
 
-        if (isArray(tagged)) {
-          expectType<typeof tagged, TaggedArray>('=');
-
-          expect(tagged.tag).toBe('test');
+        if (!isArray(tagged)) {
+          return;
         }
+
+        expectType<typeof tagged, TaggedArray>('=');
+
+        expect(tagged.tag).toBe('test');
       });
 
       test('should work with branded types', () => {
