@@ -5,10 +5,9 @@
 - [日本語](#日本語)
 - [English](#english)
 
-The conventions this reads are `CLAUDE.md`'s: "Required status checks",
-"Triggers, `skip-ci`, out-of-date branches" and the `Merge-After:` trailer
-described in `tools/scripts/cmd/unblock-prs/README.md`. This file describes
-what the script does with them.
+The conventions this reads are `CLAUDE.md`'s: "CI" and the `Merge-After:`
+trailer described in `tools/scripts/cmd/unblock-prs/README.md`. This file
+describes what the script does with them.
 
 ## 日本語
 

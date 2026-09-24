@@ -238,9 +238,9 @@ const formatViolations = (violations: readonly string[]): string =>
     '',
     ...violations.map((message) => `  ${message}`),
     '',
-    'See CLAUDE.md, "Triggers, `skip-ci`, out-of-date branches":',
-    'moving a trigger and leaving the comparison behind turns',
-    '`cancel-in-progress` off with nothing to say so.',
+    'See .github/workflows/README.md, "Concurrency": moving a trigger',
+    'and leaving the comparison behind turns `cancel-in-progress` off',
+    'with nothing to say so.',
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {

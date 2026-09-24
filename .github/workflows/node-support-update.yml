@@ -28,19 +28,19 @@ name: Node.js Support Update
 # also what makes the weekly force-push to this branch cost nothing.
 #
 # `update` installs the dependency tree and holds a token in the same job,
-# which pnpm-update.yml deliberately does not — see "What a job that holds a
-# key may do" there for the three rules this one still follows. It is not
-# split because of what its token cannot do: no `workflows` permission, so a
-# rewritten workflow file cannot be pushed, and nothing it opens merges
-# unattended. Auto-merge *is* armed, and that second half survives only
-# because the pull request is opened carrying `skip-ci`: `no-skip-ci-label` is
-# pending for as long as the label is on, so the merge waits for a person to
-# queue it. Arming is what spares them a second action when they do, not a
-# statement that this should merge. What the update step writes is
-# `tools/configs/node-support.json` and the `package.json` fields derived from
-# it. Grant this token `workflows`, or arm auto-merge with nothing holding the
-# merge — open it without the label, or add `merge-queued` here as
-# pnpm-update.yml does — and the split becomes necessary.
+# which "Jobs that hold a key" in README.md says not to do; it still follows
+# the three rules there. It is not split because of what its token cannot do:
+# no `workflows` permission, so a rewritten workflow file cannot be pushed, and
+# nothing it opens merges unattended. Auto-merge *is* armed, and that second
+# half survives only because the pull request is opened carrying `skip-ci`:
+# `no-skip-ci-label` is pending for as long as the label is on, so the merge
+# waits for a person to queue it. Arming is what spares them a second action
+# when they do, not a statement that this should merge. What the update step
+# writes is `tools/configs/node-support.json` and the `package.json` fields
+# derived from it. Grant this token `workflows`, or arm auto-merge with
+# nothing holding the merge — open it without the label, or add
+# `merge-queued` here as pnpm-update.yml does — and the split becomes
+# necessary.
 
 on:
   schedule:
@@ -181,9 +181,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # No token in the git config: `pnpm install` below runs dependency
-          # lifecycle scripts, and the App token must not be exposed to them.
-          # It is supplied inline for the push alone, as in pnpm-update.yml.
           persist-credentials: false
 
       - name: Install pnpm
@@ -232,16 +229,12 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          # No hooks. `pnpm install` above ran the dependency tree's lifecycle
-          # scripts, and one of them can leave a `.git/hooks/pre-commit` behind
-          # — which `git commit` would then run, here, with the App token
-          # already in this step's environment. Set for the rest of the step
-          # rather than per command, so a `git` added later is covered too.
+          # `pnpm install` above ran the dependency tree's lifecycle scripts
+          # in this very job, so this is not a formality here. Set for the
+          # rest of the step rather than per command, so a `git` added later
+          # is covered too.
           git config core.hooksPath /dev/null
 
-          # A fixed branch name rebuilt from main every run, as in
-          # pnpm-update.yml: one open pull request at a time, always rebased,
-          # never a stale one left beside the new one.
           branch='chore/node-support-update'
           git switch -c "$branch"
           git add -A
@@ -249,11 +242,6 @@ jobs:
 
           remote_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          # `--force-with-lease` with an explicit value: `actions/checkout`
-          # configures a fetch refspec for the default branch alone, so this
-          # branch has no remote-tracking ref and the valueless form would be
-          # rejected as "stale info" on every run after the first. An empty
-          # expected value means "expect it not to exist".
           remote_ref="$(git ls-remote "$remote_url" "refs/heads/${branch}")"
           expected="$(printf '%s' "$remote_ref" | cut -f1)"
 
@@ -261,9 +249,6 @@ jobs:
             "$remote_url" \
             "HEAD:refs/heads/${branch}"
 
-          # By branch name alone `gh pr view` also finds a merged pull request,
-          # and this branch is recreated every run — so ask for an open one.
-          #
           # `--label skip-ci` at creation rather than in a call of its own:
           # the label is what holds the merge once auto-merge is armed below,
           # and asking for it in the same request leaves no window in which

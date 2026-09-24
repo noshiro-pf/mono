@@ -105,9 +105,9 @@ Read by hand, this is what to watch for:
   finished last. Every suite of one push is created in the same second, so
   which suite got the higher id is luck: usually the superseding green one,
   and when it is not, the stale red holds the merge until something pushes
-  or re-runs. `CLAUDE.md`, "Triggers, `skip-ci`, out-of-date branches" says
-  to ignore that red; this is the case where GitHub does not, and a reader
-  who sorts by `started_at` calls a blocked pull request green.
+  or re-runs. `CLAUDE.md`, "Commits and pull requests" says to ignore that
+  red; this is the case where GitHub does not, and a reader who sorts by
+  `started_at` calls a blocked pull request green.
 
 `pr-report` reads the required contexts from `repo-settings/rulesets/main.json`
 rather than from GitHub, because the API that serves a ruleset wants an admin

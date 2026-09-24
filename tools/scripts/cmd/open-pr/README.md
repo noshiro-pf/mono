@@ -9,8 +9,7 @@ this repository wants one opened, in the one order that is safe.
 - [English](#english)
 
 The conventions this follows are `CLAUDE.md`'s: "Commits and pull requests"
-and "Triggers, `skip-ci`, out-of-date branches". This file describes what the
-script does with them.
+and "CI". This file describes what the script does with them.
 
 ## 日本語
 

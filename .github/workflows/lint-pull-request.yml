@@ -2,33 +2,35 @@
 
 name: Lint Pull Request
 
+# Three checks on the pull request itself rather than on its tree: the title,
+# the commit messages, and the commit count. Each job's name is its required
+# context. `pull_request_target`, and why nothing here checks the branch out,
+# is in README.md under "`pull_request_target`"; the `skip-ci` condition on
+# each job is under "`skip-ci` and `no-skip-ci-label`" there.
+
 on:
   pull_request_target:
     branches:
       - 'main'
       # `archive/**` holds frozen snapshots of retired work. They are never
-      # merged back, so every check on them is wasted CI — the same reason
-      # the check workflows run only for pull requests and pushes to main.
-      # `main` above already excludes them; the negation states the intent
-      # explicitly so that widening the filter later does not quietly pull
-      # them back in.
+      # merged back, so every check on them is wasted CI. `main` above already
+      # excludes them; the negation states the intent explicitly so that
+      # widening the filter later does not quietly pull them back in.
       - '!archive/**'
     types:
       - opened
-      # Title, body or base branch. A body edit re-runs both jobs as well,
-      # and has to: a job skipped on "the title did not change" would report
-      # `skipped` for a required context and supersede a red title check
-      # with a satisfied one.
+      # Title, body or base branch — the one check workflow that reads
+      # `edited`, because the title is its input. A body edit re-runs every
+      # job as well, and has to: a job skipped on "the title did not change"
+      # would report `skipped` for a required context and supersede a red
+      # title check with a satisfied one.
       - edited
       - synchronize
-      # So that `skip-ci` skips these checks as it skips the five check
-      # workflows, and taking the label off runs them again — see the job
-      # `if`s below.
       - labeled
       - unlabeled
 
 # The title is edited and the branch pushed to in bursts; only the last state
-# is worth a run — see the note in code-check.yml.
+# is worth a run.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
@@ -53,14 +55,8 @@ env:
   LC_ALL: C.UTF-8
 
 jobs:
-  # Both jobs skip while the `skip-ci` label is on, as every check workflow
-  # does — see the note in code-check.yml. Each job's name is its required
-  # context and neither has a matrix, so the check run GitHub creates for
-  # the skipped job carries that very name, reported as `skipped`, which a
-  # required status check accepts; `no-skip-ci-label` in skip-ci-label.yml is what
-  # holds the merge meanwhile, and taking the label off fires `unlabeled`,
-  # which runs both again. Only `pull_request_target` reaches this workflow,
-  # so there is no other event to exempt.
+  # Only `pull_request_target` reaches this workflow, so the `skip-ci`
+  # condition has no other event to exempt.
   semantic-pull-request:
     name: Validate PR title
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
@@ -100,10 +96,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      # Read through the API rather than from a checkout: this workflow runs on
-      # `pull_request_target`, so checking the branch out would put its contents
-      # on a runner holding a token the branch's author does not have. Nothing
-      # here executes anything from the pull request — `gh` fetches the commit
+      # Read through the API rather than from a checkout. Nothing here
+      # executes anything from the pull request — `gh` fetches the commit
       # list, `grep` reads it.
       #
       # A squash merge concatenates these into the commit body
@@ -153,11 +147,9 @@ jobs:
       # message can be decided: one commit, whose message is the one the
       # repository keeps.
       #
-      # Read through the API, for the reason the job above gives: this
-      # workflow runs on `pull_request_target`, and nothing from the branch is
-      # put on a runner holding a token its author does not have. `.commits`
-      # on the pull request itself is the total — the commit list endpoint
-      # caps at 250, and a count is all this needs.
+      # Read through the API, as the job above does. `.commits` on the pull
+      # request itself is the total — the commit list endpoint caps at 250,
+      # and a count is all this needs.
       #
       # A pull request based on another one (the chain CLAUDE.md describes)
       # counts its parent's commit too, and so reads as more than one until

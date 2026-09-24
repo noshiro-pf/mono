@@ -1,64 +1,14 @@
 name: Skip CI Label
 
-# `skip-ci` on a pull request skips the four check workflows and the two lint
-# jobs — see the note in code-check.yml. GitHub has no label-based merge
-# block, so on its own the label would leave a pull request that nothing
-# checked looking exactly like one that passed. This is the block: a required
-# status check, `no-skip-ci-label`, that stays `pending` for as long as the label
-# is on.
-#
-# It is the *only* thing that blocks a labelled pull request. The `*-result`
-# aggregates in the check workflows deliberately report `skipped` rather than
-# red while the label is on — a pull request nobody is checking yet should
-# read grey, not broken — and a skipped required check is satisfied. So the
-# blocking is concentrated here, in one check that names its reason. Removing
-# this workflow, or its `no-skip-ci-label` context from
-# `repo-settings/rulesets/main.json`, would leave `skip-ci` skipping every check
-# with nothing holding the merge at all.
-#
-# `no-skip-ci-label` is a commit status, not the check run of a job. A job's
-# check run concludes the way the job ends — success, failure, skipped,
-# cancelled — and none of those is right here. Skipped and success both
-# satisfy a required check, so they cannot hold the merge. Failure holds it,
-# and did until this became a status, but it also says something false: a
-# pull request whose author has not asked for the checks yet is not broken,
-# and GitHub took it at its word — a red cross in the pull request list, a
-# `fail` in `gh pr checks`, and a "workflow run failed" e-mail on every push
-# and every label event. A commit status can be written in any state, and
-# `pending` is the one that means what is meant: the required check is
-# simply not there yet. It blocks the merge exactly as failure did, and
-# nothing notifies anyone about it.
-#
-# The status is written with `GITHUB_TOKEN`, so it is attributed to the
-# GitHub Actions app — the `integration_id` the ruleset pins the context to.
-#
-# The job runs on every event, label or no label, because a status has to be
-# written on every head commit: a commit without one reads as "Expected —
-# waiting for status to be reported", which blocks forever. That is one
-# runner for a few seconds per event, where the previous shape booted none
-# without the label; `gates / check` already costs each check workflow the
-# same on the same events.
+# Writes the `no-skip-ci-label` commit status — the one thing that holds a
+# pull request carrying `skip-ci` — on every head commit. Why it is a commit
+# status rather than a job's check run, why it is written on every event, and
+# what it holds together with the `*-result` aggregates is in README.md under
+# "`skip-ci` and `no-skip-ci-label`"; `pull_request_target` and what it asks
+# of this job is under "`pull_request_target`" there.
 #
 # No `push` trigger: the required checks are evaluated when a pull request
 # merges, and the `main` ruleset accepts no other way onto the branch.
-#
-# `pull_request_target`, not `pull_request`, for the reason
-# `lint-pull-request.yml` gives for the same choice: it runs the workflow file
-# as it exists on the base branch. Under `pull_request` the file that runs is
-# the one on the pull request's own head, so the branch this status is
-# deciding about would be the branch supplying the decision — and the
-# `statuses: write` below is already all the permission that needs. Since this
-# is the one required check a `skip-ci` pull request does not satisfy by
-# skipping, that gate belongs on `main`.
-#
-# The usual hazard of `pull_request_target` — a writable token in a job that
-# runs the branch's code — is absent here, and must stay absent: this job
-# checks nothing out and executes nothing from the working tree, only the
-# `run:` block below, which the event resolved from the base branch. A step
-# added here must keep to that; read the pull request from the event payload,
-# never from a checkout. Moving the trigger means moving the event name in the
-# concurrency block with it — `pnpm run check:root:workflow-event-name` holds
-# the two in agreement here and in every other workflow.
 #
 # No `branches:` filter, deliberately. The required checks are `main`'s, but a
 # pull request whose base is anything else still needs this status written:
@@ -94,6 +44,8 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      # No checkout, and nothing executed from the tree: only this `run:`
+      # block, which the event resolved from the base branch.
       - name: Write the `no-skip-ci-label` status for the head commit
         env:
           GH_TOKEN: ${{ github.token }}

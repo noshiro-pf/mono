@@ -7,9 +7,9 @@
 - [日本語](#日本語)
 - [English](#english)
 
-The authority for the conventions this reads is `CLAUDE.md`: "Required status
-checks", "Triggers, `skip-ci`, out-of-date branches" and "Commits and pull
-requests". This file describes what the script does with them.
+The authority for the conventions this reads is `CLAUDE.md`: "CI" and
+"Commits and pull requests". This file describes what the script does with
+them.
 
 ## 日本語
 

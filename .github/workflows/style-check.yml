@@ -1,23 +1,11 @@
 name: Style Check
 
-on:
-  # No `push`, not even for `main`. The `main` ruleset accepts changes through
-  # pull requests only and requires the branch to be up to date, so the squash
-  # commit a merge makes has the same tree as the pull request's head — a tree
-  # this workflow has already checked. See the note in code-check.yml, which
-  # keeps one job on `push` for a reason of its own.
+# The check workflow shape — triggers, concurrency, `permissions: {}`, the
+# gate, the aggregate — is in README.md. What is particular to this one: the
+# `style` ignore list, and a matrix of formatters and generators whose check
+# is that the tree is clean afterwards.
 
-  # `synchronize` fires on every push to the pull request's branch, so these
-  # types cover the pull request's whole life — a draft included. `labeled` /
-  # `unlabeled` are what let a `skip-ci` label stop and restart the checks; see
-  # the note in code-check.yml.
-  #
-  # No `paths` filter here. Every job in this matrix is a required status
-  # check, and a workflow that a path filter skips never reports one — so a
-  # pull request changing only the filtered files would wait on checks that
-  # never arrive. Paths that do not concern this workflow are skipped a step
-  # at a time by the `Check diff` gate below, the same way code-check.yml
-  # does it.
+on:
   pull_request:
     types:
       - opened
@@ -26,55 +14,32 @@ on:
       - labeled
       - unlabeled
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# One run per pull request; a push cancels the run still going for the
-# previous one. `cancel-in-progress` is an expression rather than `true` so
-# that a `workflow_dispatch` run is left alone — see the note in
-# code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Deny by default; each job grants back exactly what it needs. See the note in
-# code-check.yml for why the repository's own default is not good enough here.
 permissions: {}
 
 jobs:
-  # Whether the branch is behind `main`, whether the diff touches anything
-  # this workflow reads, and whether `skip-ci` is on the pull request — see the
-  # notes in code-check.yml and check-gates.yml.
   gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, 'skip-ci')
     uses: ./.github/workflows/check-gates.yml
-    # What check-gates.yml's own job declares. A caller's job-level
-    # `permissions` is the ceiling for the workflow it calls — permissions can
-    # be reduced along the chain, never elevated — so the top-level `{}` above
-    # would otherwise leave the called workflow unable to check out.
     permissions:
       actions: read
       contents: read
       packages: read
     with:
       # `style`, a much narrower ignore list than `code`: `experimental/` and
-      # nothing else. Every entry in this matrix can be affected by a change
-      # the code list ignores — three of them check markdown, `ws:doc`
-      # regenerates the package READMEs, and `ws:check:ext` globs *every* file
-      # under the directories it is given — so `code` would skip this workflow
-      # exactly when it should fail. What may go on either list is in
-      # check-gates.yml, under "Whether the diff matters".
+      # nothing else — see "The ignore lists" in README.md.
       diff-scope: style
       result-job: style-check-result
 
   style-check:
     needs: gates
-    # Skip the whole job while the pull request carries the `skip-ci` label,
-    # while its branch is behind `main` and cannot be merged as it stands, or
-    # when the diff touches nothing any command below reads — see the notes in
-    # code-check.yml. Being a draft no longer skips anything.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -84,24 +49,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
-    # 25, matching code-check.yml, whose matrix builds the repository the same
-    # way this one does. It was 10, and `ws:doc` — the longest entry, because
-    # it regenerates every package README on top of that build — was measured
-    # at 9m31s and 9m44s across branches, under thirty seconds of headroom. A
-    # `pnpm/action-setup` step that took three minutes instead of its usual
-    # few seconds was enough to spend it: the build finished and the runner
-    # cancelled the job in the same second, before `ws:doc` ran at all. What
-    # the cap is for is a command that hangs, not a slow runner, and every
-    # entry here has finished well inside 10 minutes of its own.
+    # 25, matching code-check.yml: `ws:doc`, the longest entry, was measured at
+    # 9m31s and 9m44s under a 10-minute cap — see "The work" in README.md.
     timeout-minutes: 25
 
     strategy:
-      # The matrix entries are independent checks. Letting one cancel the
-      # others hides their results, and the aggregate below reports the
-      # cancelled ones as a failure, so the pull request is blocked on an
-      # unrelated failure with nothing to read.
       fail-fast: false
       matrix:
         command:
@@ -115,10 +68,9 @@ jobs:
           # around Japanese text, the shape of `.markdownlint-cli2.mjs`, and
           # the READMEs whose code fences no sample backs. They are here and
           # not in `check:root` because `check:root` is a `code-check.yml`
-          # entry, and that workflow's ignore list drops `**.md` and
-          # `.markdownlint-cli2.mjs` — so a diff touching only those skips the
-          # very checks that read them. `style` ignores `experimental/` and
-          # nothing else. None of the three needs `dist/`.
+          # entry, whose ignore list drops `**.md` and `.markdownlint-cli2.mjs`
+          # — so a diff touching only those would skip the very checks that
+          # read them. None of the three needs `dist/`.
           - check:prose
           - ws:doc
           - ws:check:ext
@@ -152,11 +104,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, not the merge commit GitHub synthesises for a
-          # `pull_request` event: these checks assert properties of the branch
-          # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a `workflow_dispatch` run this falls
-          # back to the dispatched commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install pnpm
@@ -179,7 +126,8 @@ jobs:
       # siblings and resolve through their `exports` map to dist/. Nothing is
       # built yet on a clean checkout, so these two need the packages emitted
       # first. The other matrix entries do not touch dist/, so they skip the
-      # build.
+      # build — which is why this workflow has no `build` job the way
+      # code-check.yml does.
       #
       # `ws:check:ext` used to be on this list and is not: `check-ext.mts`
       # globs file names under `src/` and `scripts/` and resolves nothing, so
@@ -194,12 +142,8 @@ jobs:
       - name: Check if there is no file diff
         run: pnpm run z:assert-repo-is-clean
 
-  # The one required status check for this workflow: it reports whatever
-  # happened above, so that a skipped run cannot read as a passing one. The
-  # two clauses after `always()` are the skips that are not failures — a
-  # `skip-ci` label, held by `no-skip-ci-label`, and a branch behind the base
-  # branch, held by the ruleset — for which this job reports `skipped` rather
-  # than red. See the note on `code-check-result` in code-check.yml.
+  # The one required status check for this workflow — see "The aggregate job"
+  # in README.md.
   style-check-result:
     needs:
       - gates
@@ -210,7 +154,6 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
-    # Reads `needs.*.result` and echoes. It touches nothing.
     permissions: {}
     timeout-minutes: 5
 
@@ -218,9 +161,6 @@ jobs:
       - name: Require the checks above to have passed
         env:
           RESULT: ${{ needs.style-check.result }}
-          # Set when an earlier run already reached a verdict on this head
-          # commit and the checks above were skipped for it — see "A commit that
-          # already has a verdict" in check-gates.yml.
           REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
           REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |

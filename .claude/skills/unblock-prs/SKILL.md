@@ -69,7 +69,7 @@ label is on, the five check workflows and the two lint jobs skip and
 which is the only thing holding the merge — so its checks cannot go green
 however long it is watched, and `pr-report` calls the verdict `paused` rather
 than pretending otherwise. Taking the label off is the action, one PR at a
-time. See "Triggers, `skip-ci`, out-of-date branches" in `CLAUDE.md`.
+time. See "CI" in `CLAUDE.md`.
 
 `chore/pnpm-update` is opened `merge-queued` by the bot, with auto-merge, so it
 is in scope — but `pnpm-update.yml` force-pushes that branch twice a week. If

@@ -45,49 +45,12 @@ name: pnpm update
 # `changesets/action` v2 is why. It requires Changesets CLI v3 and renamed every
 # input, so the major landing unattended broke release.yml on main.
 #
-# Because that step rewrites files under .github/workflows/, the token below has
-# to carry the `workflows` permission, or the push is rejected the moment an
-# action pin moves.
-#
-# Authenticates with a GitHub App installation token (the same App used by
-# release.yml) so that the push triggers the push-based CI workflows and the
-# repository owner (a ruleset bypass actor) can auto-merge. The App's
-# installation must be granted Workflows: write; the `permission-*` inputs can
-# only narrow what the App already holds, never widen it.
-#
-# ## What a job that holds a key may do
-#
-# Three rules, and the split below is made of them. They hold wherever a job
-# carries a token and something in the same run has executed third-party code
-# — `node-support-update.yml` and `release.yml` are the other two, and both
-# say which of these they lean on.
-#
-# - **A `run:` block is the definition GitHub resolved** when the run started.
-#   A file in the tree is read at invocation instead, after anything that ran
-#   earlier could have rewritten it. So a step that must not trust the tree
-#   stays inline, and uses `git` / `gh` only.
-# - **Work that needs no token goes before `Generate Token`.** A step placed
-#   before `pnpm install` runs its script with `node`, never `pnpm run`, which
-#   installs first — that is why `mature-updates.mts` imports `node:*` alone.
-# - **`git config core.hooksPath /dev/null` before committing on a runner.**
-#   An install script can leave a `.git/hooks/pre-commit` behind, and `git
-#   commit` would run it with the token already in the step's environment.
-#
-# ## One branch, reused
-#
-# The branch is `chore/pnpm-update` with no date in it, and every run rebuilds
-# it from a fresh checkout of main and force-pushes. A run that lands no update
-# therefore does not leave a stale pull request behind for the next one to sit
-# beside — there is only ever one open, and the run that opened it started from
-# main's tip.
-#
-# That rebuild happens twice a week, so it is not what keeps an open pull
-# request current. The one this opens carries `merge-queued` and auto-merge and
-# normally merges within the hour; one held open by a red check is rebased by
-# `unblock-prs`, not by the next run.
-#
-# Reusing the name is what makes the two details below matter; with a new dated
-# branch each run neither could bite, because the branch never already existed.
+# Because that step rewrites files under .github/workflows/, the App token in
+# `commit` has to carry the `workflows` permission, or the push is rejected
+# the moment an action pin moves. That is also the reason this workflow is
+# split into two jobs: the three rules for a job that holds a key, the split,
+# the fixed branch name, the lease and the labels are in README.md under
+# "Jobs that hold a key", and this file says only what is its own.
 
 on:
   schedule:
@@ -111,26 +74,14 @@ on:
 
   workflow_dispatch:
 
-# Deny by default; each job grants back what it needs. Neither writes through
-# `GITHUB_TOKEN` — the branch and the pull request go through the App token in
-# `commit` — so `contents: read` is the whole of it. See the note in
-# code-check.yml.
+# Neither job writes through `GITHUB_TOKEN` — the branch and the pull request
+# go through the App token in `commit` — so `contents: read` is the whole of it.
 permissions: {}
 
 jobs:
   # Everything that runs the dependency tree's own code, and nothing that holds
-  # a key.
-  #
-  # This job and `commit` used to be one. Splitting them is the only thing that
-  # actually contains a compromised dependency rather than raising the bar for
-  # it: `pnpm install` and every `tsx` invocation below execute third-party code
-  # — `allowBuilds` gates install scripts, not the import-time code of the
-  # toolchain — and anything that runs here can rewrite a file a later step
-  # would execute, or append to `$GITHUB_PATH` so that a later step's `git` or
-  # `gh` is something else. Both of those reach across steps. Neither reaches
-  # across jobs: `commit` gets a fresh runner, a fresh checkout and a fresh
-  # environment, and the only thing that crosses is a patch, which it applies
-  # rather than executes.
+  # a key. What crosses to `commit` is a patch, which it applies rather than
+  # executes.
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -146,10 +97,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # No token in the git config. This job runs the dependency tree's own
-          # code — `pnpm install` and every `tsx` invocation below — and the
-          # `GITHUB_TOKEN` this job does hold is read-only anyway. The key that
-          # can write is in `commit`, on another runner.
           persist-credentials: false
 
       - name: Install pnpm
@@ -185,21 +132,11 @@ jobs:
       - name: Update pnpm itself
         run: node ./tools/scripts/cmd/mature-updates.mts pnpm
 
-      # Before the install, not after, and a step of its own — both for the
-      # same reason. `pnpm install` below runs the dependency tree's lifecycle
-      # scripts, and what this step executes is a file in the working tree
-      # (`mature-updates.mts`, through `pnpm run`), which those scripts can
-      # rewrite. Running it first means the file this step executes is still
-      # the one that was checked out, and the token it carries has not been
-      # anywhere near them. See "What a job that holds a key may do" at the top
-      # of this file for the general shape.
-      #
-      # `node`, not `pnpm run update-actions`, for the same reason the step
-      # above invokes the script directly: `pnpm run` verifies the workspace's
-      # dependencies first and installs them when they are missing, which is
-      # exactly the thing this step has to come before. The script imports
-      # `node:*` alone, so Node runs it with no `node_modules` at all. The
-      # package.json script stays as the local entry point.
+      # Before the install, and with `node` rather than `pnpm run` (which
+      # would install first): the second rule under "Jobs that hold a key".
+      # The script imports `node:*` alone, so Node runs it with no
+      # `node_modules` at all; the package.json script stays as the local
+      # entry point.
       #
       # `GITHUB_TOKEN` only reads the Releases and Commits APIs here, and lifts
       # the unauthenticated rate limit that the runners' shared IP range
@@ -264,14 +201,12 @@ jobs:
         with:
           name: pnpm-update-patch
           path: ${{ runner.temp }}/pnpm-update.patch
-          # Read once, by the job below, minutes later.
           retention-days: 1
 
-  # The key lives here, and nothing from the dependency tree does. This job
-  # installs nothing and runs nothing out of the working tree: `git` and `gh`
-  # are on the runner image, and the patch is applied, never executed — and
-  # what it applied is held to the paths a dependency update writes before any
-  # of it is committed. See the check in the last step.
+  # The key lives here, and nothing from the dependency tree does: `git` and
+  # `gh` are on the runner image, and the patch is applied, never executed —
+  # and what it applied is held to the paths a dependency update writes before
+  # any of it is committed. See the check in the last step.
   commit:
     needs: update
     if: needs.update.outputs.changed == 'true'
@@ -329,16 +264,12 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
-          # No hooks. Nothing in this job installs anything, so there is no
-          # install script to have left a `.git/hooks/pre-commit` behind — but
-          # the patch is still something another job produced, and the cost of
-          # being sure is one line.
+          # Nothing in this job installs anything, so there is no install
+          # script to have left a hook behind — but the patch is still
+          # something another job produced, and the cost of being sure is one
+          # line.
           git config core.hooksPath /dev/null
 
-          # A fixed branch name, not one carrying the date: every run starts
-          # from whatever `main` was when `update` checked out, so force-pushing
-          # here both refreshes the open pull request and rebases it, instead of
-          # leaving yesterday's behind and opening another one.
           branch="chore/pnpm-update"
           git switch -c "$branch"
           git add -A
@@ -389,19 +320,8 @@ jobs:
 
           git commit -m "chore: update dependencies"
 
-          # Authenticate the push inline so the PAT is never written to git config.
           remote_url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
-          # `--force-with-lease` with no value compares against the
-          # remote-tracking ref, and `actions/checkout` configures a fetch
-          # refspec for the default branch alone — so this branch has none, and
-          # the push is rejected with "stale info" every run after the one that
-          # creates it. Naming the expected value restores the protection: an
-          # empty value means "expect it not to exist", which is what the first
-          # run wants.
-          # Two steps rather than a pipeline, so that a failed `ls-remote` stops
-          # the job instead of yielding an empty lease and force-pushing anyway
-          # — a pipeline would report `cut`'s exit status, which is always 0.
           remote_ref="$(git ls-remote "$remote_url" "refs/heads/${branch}")"
           expected="$(printf '%s' "$remote_ref" | cut -f1)"
 
@@ -409,10 +329,6 @@ jobs:
             "$remote_url" \
             "HEAD:refs/heads/${branch}"
 
-          # By branch name alone `gh pr view` also finds a merged pull request,
-          # and the branch is recreated every run — so once the first one
-          # merges, this would skip creating the next and then fail trying to
-          # auto-merge a closed pull request. Ask for an open one.
           if [ "$(gh pr view "$branch" --json state --jq .state 2>/dev/null)" != 'OPEN' ]; then
             # `merge-queued` is what `unblock-prs` reads: without it nothing
             # rebases this branch when main moves under it. It is opened
