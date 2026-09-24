@@ -55,12 +55,12 @@ jobs:
       # would cost it a checkout and an install to save the one runner this
       # workflow has.
       diff-scope: none
-      result-job: verify-published-result
+      result-job: verify-published-result / result
 
   verify-published:
     needs: gates
     # No `should_run` clause: the gate was not asked the diff question.
-    # `changed` is this job's answer to it, read by the aggregate below.
+    # `no_verdict` is this job's answer to it, read by the aggregate below.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -71,8 +71,10 @@ jobs:
       contents: read
     timeout-minutes: 20
 
+    # `true` only when the pins step answered "unchanged". Empty — this job
+    # skipped for a reused verdict — or `false` keeps the aggregate running.
     outputs:
-      changed: ${{ steps.pins.outputs.changed }}
+      no_verdict: ${{ steps.pins.outputs.changed == 'false' }}
 
     steps:
       - name: Checkout
@@ -123,8 +125,8 @@ jobs:
             echo 'changed=true' >>"${GITHUB_OUTPUT}"
           else
             # `false` only here, where the question was answered: an empty
-            # output — this step never reached, or the job skipped for a
-            # reused verdict — keeps the aggregate running.
+            # output — this step never reached — reads as "verify", and the
+            # aggregate judges the job.
             echo 'changed=false' >>"${GITHUB_OUTPUT}"
             echo 'The published pins did not change; nothing to verify.'
           fi
@@ -137,52 +139,18 @@ jobs:
         if: steps.pins.outputs.changed == 'true'
         run: pnpm run verify:npm-packages:published
 
-  # The one required status check for this workflow — see "The aggregate job"
-  # in README.md. `changed` stands where the others have `should_run`: pins
-  # that did not move are a diff this workflow does not read, so the
-  # aggregate reports `skipped` rather than a `success` that verified
-  # nothing. That `success` would be a verdict about the tree *and* the base
-  # it was compared with, and a verdict is reused by tree alone — see
-  # "Reusing a verdict" in README.md.
+  # The one required status check for this workflow, reported as
+  # `verify-published-result / result` — see "The aggregate job" in README.md. A
+  # `no_verdict` from `verify-published` skips it: pins that did not move are
+  # a diff this workflow does not read, so the aggregate reports `skipped`
+  # rather than a `success` that verified nothing. That `success` would be a
+  # verdict about the tree *and* the base it was compared with, and a verdict
+  # is reused by tree alone — see "Reusing a verdict" in README.md.
   verify-published-result:
     needs:
       - gates
       - verify-published
-    if: >-
-      always() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.verify-published.outputs.changed != 'false'
-    runs-on: ubuntu-latest
-    permissions: {}
-    timeout-minutes: 5
-
-    steps:
-      - name: Require the checks above to have passed
-        env:
-          RESULT: ${{ needs.verify-published.result }}
-          REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
-          REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
-        run: |
-          case "${REUSED_RESULT}" in
-            success)
-              echo "The checks already passed on this tree: ${REUSED_FROM}"
-              exit 0
-              ;;
-            failure)
-              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
-              echo "${summary}"
-              echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-              exit 1
-              ;;
-          esac
-
-          if [ "${RESULT}" = 'success' ]; then
-            echo 'The checks passed.'
-            exit 0
-          fi
-
-          summary="The checks did not pass on this commit (result: ${RESULT})."
-          echo "${summary}"
-          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-          exit 1
+    if: always()
+    uses: ./.github/workflows/check-result.yml
+    with:
+      needs: ${{ toJSON(needs) }}

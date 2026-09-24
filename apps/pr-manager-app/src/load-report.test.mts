@@ -43,7 +43,7 @@ describe(loadReport, () => {
         pullRequest({
           number: 7,
           contexts: [
-            checkRun('code-check-result', 'COMPLETED', 'FAILURE'),
+            checkRun('code-check-result / result', 'COMPLETED', 'FAILURE'),
             {
               __typename: 'StatusContext',
               context: 'no-skip-ci-label',
@@ -61,7 +61,7 @@ describe(loadReport, () => {
 
     assert.isDefined(entry);
 
-    assert.deepStrictEqual(entry.checks.failed, ['code-check-result']);
+    assert.deepStrictEqual(entry.checks.failed, ['code-check-result / result']);
 
     // `EXPECTED` is a status nobody has reported yet: a wait, not a failure.
     assert.deepStrictEqual(entry.checks.pending, ['no-skip-ci-label']);
@@ -75,7 +75,9 @@ describe(loadReport, () => {
       report([
         pullRequest({
           number: 7,
-          contexts: [checkRun('code-check-result', 'COMPLETED', 'SUCCESS')],
+          contexts: [
+            checkRun('code-check-result / result', 'COMPLETED', 'SUCCESS'),
+          ],
           contextsAfter: 'cursor-1',
         }),
       ]),
@@ -338,7 +340,7 @@ const RULESET = JSON.stringify({
       type: 'required_status_checks',
       parameters: {
         required_status_checks: [
-          { context: 'code-check-result' },
+          { context: 'code-check-result / result' },
           { context: 'no-skip-ci-label' },
         ],
       },
@@ -382,7 +384,7 @@ const checkRun = (
   }) as const;
 
 const PASSING = [
-  checkRun('code-check-result', 'COMPLETED', 'SUCCESS'),
+  checkRun('code-check-result / result', 'COMPLETED', 'SUCCESS'),
   {
     __typename: 'StatusContext',
     context: 'no-skip-ci-label',

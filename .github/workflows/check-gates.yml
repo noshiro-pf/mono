@@ -22,8 +22,10 @@ on:
         required: true
       result-job:
         description: >-
-          The id of the caller's aggregate job (`code-check-result`, …), whose
-          conclusion in an earlier run on the same tree is what gets reused.
+          The caller's aggregate job as the jobs API names it, which for a job
+          of check-result.yml is `<caller job> / result`
+          (`code-check-result / result`, …). Its conclusion in an earlier run
+          on the same tree is what gets reused.
         type: string
         required: true
       diff-when-reused:

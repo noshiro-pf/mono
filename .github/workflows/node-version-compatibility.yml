@@ -39,7 +39,7 @@ jobs:
       # The same ignore list code-check.yml gates on, which is why it lives in
       # the root package.json rather than in either workflow.
       diff-scope: code
-      result-job: test-node-versions-result
+      result-job: test-node-versions-result / result
 
   test-node-versions:
     needs: gates
@@ -118,47 +118,13 @@ jobs:
       - name: Test
         run: pnpm run ws:check:test
 
-  # The one required status check for this workflow — see "The aggregate job"
-  # in README.md.
+  # The one required status check for this workflow, reported as
+  # `test-node-versions-result / result` — see "The aggregate job" in README.md.
   test-node-versions-result:
     needs:
       - gates
       - test-node-versions
-    if: >-
-      always() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false'
-    runs-on: ubuntu-latest
-    permissions: {}
-    timeout-minutes: 5
-
-    steps:
-      - name: Require the checks above to have passed
-        env:
-          RESULT: ${{ needs.test-node-versions.result }}
-          REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
-          REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
-        run: |
-          case "${REUSED_RESULT}" in
-            success)
-              echo "The checks already passed on this tree: ${REUSED_FROM}"
-              exit 0
-              ;;
-            failure)
-              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
-              echo "${summary}"
-              echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-              exit 1
-              ;;
-          esac
-
-          if [ "${RESULT}" = 'success' ]; then
-            echo 'The checks passed.'
-            exit 0
-          fi
-
-          summary="The checks did not pass on this commit (result: ${RESULT})."
-          echo "${summary}"
-          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-          exit 1
+    if: always()
+    uses: ./.github/workflows/check-result.yml
+    with:
+      needs: ${{ toJSON(needs) }}

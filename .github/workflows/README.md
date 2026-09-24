@@ -13,12 +13,13 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 | Workflow                         | Runs on                                        | Reports a required context              |
 | :------------------------------- | :--------------------------------------------- | :-------------------------------------- |
-| `code-check.yml`                 | pull requests; `push` to `main`                | `code-check-result`                     |
-| `style-check.yml`                | pull requests; `push` to `main`                | `style-check-result`                    |
-| `strict-lib-gen.yml`             | pull requests; `push` to `main`                | `strict-lib-gen-result`                 |
-| `node-version-compatibility.yml` | pull requests; `push` to `main`                | `test-node-versions-result`             |
-| `verify-published-packages.yml`  | pull requests; `push` to `main`                | `verify-published-result`               |
+| `code-check.yml`                 | pull requests; `push` to `main`                | `code-check-result / result`            |
+| `style-check.yml`                | pull requests; `push` to `main`                | `style-check-result / result`           |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`                | `strict-lib-gen-result / result`        |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`                | `test-node-versions-result / result`    |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`                | `verify-published-result / result`      |
 | `check-gates.yml`                | `workflow_call`, from the five above           | none; it is the gate the five share     |
+| `check-result.yml`               | `workflow_call`, from the five above           | the five above; it is their aggregate   |
 | `skip-ci-label.yml`              | `pull_request_target`                          | the `no-skip-ci-label` commit status    |
 | `lint-pull-request.yml`          | `pull_request_target`                          | its three jobs, by name                 |
 | `release.yml`                    | `push` to `main`                               | none                                    |
@@ -40,7 +41,8 @@ Five workflows check a pull request: `code-check.yml`, `style-check.yml`,
 ```text
 gates  (check-gates.yml, reusable)
   └─ the work: a matrix, or one job
-       └─ <name>-result  (the one required context)
+       └─ <name>-result  (check-result.yml, reusable;
+                          the one required context, `<name>-result / result`)
 ```
 
 Everything in this section is that shape. A workflow that departs from it says
@@ -171,8 +173,8 @@ Grants that recur:
   and permissions can be reduced along the chain, never elevated, so the
   top-level `{}` would otherwise leave the called workflow unable to check
   out.
-- **`permissions: {}` on the aggregate**, which reads `needs.*.result` and
-  echoes.
+- **`permissions: {}` on the aggregate** (`check-result.yml`), which reads
+  the `needs` it is handed and echoes.
 
 ### Checkout
 
@@ -263,7 +265,7 @@ gates:
         contents: read
     with:
         diff-scope: code # or style, strict-lib, none
-        result-job: code-check-result
+        result-job: code-check-result / result
 
 the-work:
     needs: gates
@@ -339,8 +341,9 @@ of their own, so what they mean is here:
 - **`none`** (`verify-published-packages.yml`) skips the diff question
   altogether, for a workflow that gates itself in shell; the gate then costs
   a few API calls and no checkout. That workflow's own "nothing relevant"
-  has to skip its aggregate as `should_run: false` does (see "Reusing a
-  verdict").
+  has to skip its aggregate as `should_run: false` does, which its job's
+  `no_verdict` output does (see "Reusing a verdict" and "The aggregate
+  job").
 
 #### Reusing a verdict
 
@@ -434,15 +437,15 @@ would have left them "Expected", blocking forever.
 ```yaml
 <name>-result:
     needs: [gates, the-work]
-    if: >-
-        always() &&
-        (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-        needs.gates.outputs.branch_up_to_date != 'false' &&
-        needs.gates.outputs.should_run != 'false'
-    permissions: {}
+    if: always()
+    uses: ./.github/workflows/check-result.yml
+    with:
+        needs: ${{ toJSON(needs) }}
 ```
 
-The one required status check of each check workflow. The jobs that do the
+The one required status check of each check workflow, reported as
+`<name>-result / result`: a job in a called workflow reports its check run
+as `<calling job> / <called job>`. The jobs that do the
 work still report their own check runs and are still worth reading, but none
 of them is required, because a required context can be satisfied by a run
 that never happened. Two ways, both measured on this repository:
@@ -460,16 +463,34 @@ The aggregate closes both. Its name does not depend on a matrix, so every run
 supersedes the last, and `always()` means a failed or cancelled matrix still
 gets a verdict rather than leaving this job skipped along with the work.
 
-The clauses after `always()` are the skips that are not failures, and they are
-job-level on purpose: the aggregate then reports `skipped` for them, grey and
-satisfying the required check, rather than red. Something else holds the merge
-in each case (see "The gate"). `should_run` is among them only in the
-workflows that ask the gate the diff question; `verify-published-packages.yml`
-answers it itself and reads its own job's `changed` there instead.
+Every aggregate is the same job, so it is one reusable workflow and the caller
+hands it `toJSON(needs)`: the gate's outputs and every other job's `result`
+are in it, and `skip-ci` is in the event, which the called workflow reads as
+its own.
 
-The step itself reads `REUSED_RESULT` first (`success` passes, `failure`
-fails and says to use "Re-run all jobs"), then `RESULT`. A red aggregate does
-not name what failed; open the run.
+**The skips are on the called job, never on the calling one.** A calling job
+that GitHub skips reports one check run under its own name, `<name>-result`,
+and the required `<name>-result / result` would never arrive: "Expected —
+waiting", blocking forever. So the caller carries `if: always()` and nothing
+else, and `check-result.yml`'s job-level `if` holds the skips that are not
+failures: `skip-ci`, a branch behind `main`, `should_run: false`, and any need
+that outputs `no_verdict: 'true'` (`verify-published-packages.yml`, whose job
+answers the diff question itself). They are job-level on purpose: the
+aggregate then reports `skipped`, grey and satisfying the required check,
+rather than red, and boots no runner. Something else holds the merge in each
+case (see "The gate"). That `if` starts with `always()` too, because a called
+job with no status function carries an implicit `success()`, and a cancelled
+run would then read `skipped` rather than red.
+
+The step reads the gate's `reused_result` first (`success` passes, `failure`
+fails and says to use "Re-run all jobs"), then requires every need but
+`gates` to have succeeded, and a red aggregate names the jobs that did not,
+with their results. `gates` is left out because a gate that fails to answer
+fails open. The need has to be named `gates`, and a caller that names no
+other job fails rather than passes.
+
+`check-gates.yml` finds an earlier verdict by the aggregate's job name, so
+each caller passes it as `result-job: <name>-result / result`.
 
 ### The work
 
@@ -663,9 +684,10 @@ Nothing checks this; a review does.
   nothing; a new matrix entry needs nothing. `repo-settings/README.md` has
   that, renaming a context, and the bypass.
 - **A check workflow calls `check-gates.yml`** with the caller shape above,
-  picks its `diff-scope`, and ends in an aggregate. Its verdict is reused by
-  tree, so a result that depends on anything else must skip the aggregate
-  rather than conclude (see "Reusing a verdict").
+  picks its `diff-scope`, and ends in a call to `check-result.yml` (see "The
+  aggregate job"). Its verdict is reused by tree, so a result that depends on
+  anything else must skip the aggregate with `no_verdict` rather than
+  conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:ci-commands`,
   `check:root:workflow-event-name`, `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.

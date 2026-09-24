@@ -39,7 +39,7 @@ jobs:
       contents: read
     with:
       diff-scope: code
-      result-job: code-check-result
+      result-job: code-check-result / result
       # `coverage-main` runs on a reused verdict and skips on an irrelevant
       # diff, so on a push the diff question is asked either way.
       diff-when-reused: ${{ github.event_name == 'push' }}
@@ -239,59 +239,14 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
 
-  # The one required status check for this workflow — see "The aggregate job"
-  # in README.md.
+  # The one required status check for this workflow, reported as
+  # `code-check-result / result` — see "The aggregate job" in README.md.
   code-check-result:
     needs:
       - gates
       - build
       - code-check
-    if: >-
-      always() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false'
-    runs-on: ubuntu-latest
-    permissions: {}
-    timeout-minutes: 5
-
-    steps:
-      - name: Require the checks above to have passed
-        env:
-          RESULT: ${{ needs.code-check.result }}
-          # Named separately so that a red aggregate says which of the two it
-          # was: a failed build skips the matrix, which would otherwise read
-          # only as `skipped`.
-          BUILD_RESULT: ${{ needs.build.result }}
-          REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
-          REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
-        run: |
-          case "${REUSED_RESULT}" in
-            success)
-              echo "The checks already passed on this tree: ${REUSED_FROM}"
-              exit 0
-              ;;
-            failure)
-              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
-              echo "${summary}"
-              echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-              exit 1
-              ;;
-          esac
-
-          if [ "${RESULT}" = 'success' ]; then
-            echo 'The checks passed.'
-            exit 0
-          fi
-
-          if [ "${BUILD_RESULT}" != 'success' ]; then
-            summary="\`ws:build\` did not pass, so the checks did not run (result: ${BUILD_RESULT})."
-            echo "${summary}"
-            echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-            exit 1
-          fi
-
-          summary="The checks did not pass on this commit (result: ${RESULT})."
-          echo "${summary}"
-          echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
-          exit 1
+    if: always()
+    uses: ./.github/workflows/check-result.yml
+    with:
+      needs: ${{ toJSON(needs) }}

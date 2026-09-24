@@ -57,13 +57,13 @@ describe(classifyCommitStatus, () => {
 });
 
 describe(summarizeChecks, () => {
-  const required = ['code-check-result', 'no-skip-ci-label'] as const;
+  const required = ['code-check-result / result', 'no-skip-ci-label'] as const;
 
   test('every required context green is a pass', () => {
     const summary = summarizeChecks({
       required,
       reported: new Map([
-        ['code-check-result', 'passed'],
+        ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'passed'],
       ]),
       paused: false,
@@ -79,7 +79,7 @@ describe(summarizeChecks, () => {
     // absent from the check list rather than pending in it.
     const summary = summarizeChecks({
       required,
-      reported: new Map([['code-check-result', 'passed']]),
+      reported: new Map([['code-check-result / result', 'passed']]),
       paused: false,
     });
 
@@ -94,7 +94,7 @@ describe(summarizeChecks, () => {
     const summary = summarizeChecks({
       required,
       reported: new Map([
-        ['code-check-result', 'failed'],
+        ['code-check-result / result', 'failed'],
         ['no-skip-ci-label', 'pending'],
       ]),
       paused: false,
@@ -102,7 +102,7 @@ describe(summarizeChecks, () => {
 
     assert.deepStrictEqual(summary.verdict, 'failing');
 
-    assert.deepStrictEqual(summary.failed, ['code-check-result']);
+    assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
   });
 
   test('`skip-ci` is a pause, and the detail is still reported', () => {
@@ -114,7 +114,7 @@ describe(summarizeChecks, () => {
     const summary = summarizeChecks({
       required,
       reported: new Map([
-        ['code-check-result', 'failed'],
+        ['code-check-result / result', 'failed'],
         ['no-skip-ci-label', 'pending'],
       ]),
       paused: true,
@@ -122,7 +122,7 @@ describe(summarizeChecks, () => {
 
     assert.deepStrictEqual(summary.verdict, 'paused');
 
-    assert.deepStrictEqual(summary.failed, ['code-check-result']);
+    assert.deepStrictEqual(summary.failed, ['code-check-result / result']);
 
     assert.deepStrictEqual(summary.pending, ['no-skip-ci-label']);
   });
@@ -131,7 +131,7 @@ describe(summarizeChecks, () => {
     const summary = summarizeChecks({
       required,
       reported: new Map([
-        ['code-check-result', 'passed'],
+        ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'passed'],
         ['some-optional-job', 'failed'],
       ]),
@@ -156,14 +156,24 @@ const run = (
 
 describe(statesFromCheckRuns, () => {
   test('the run in the later suite is the one that counts', () => {
-    // `code-check-result`: the cancelled suite was created first, so the
-    // green that superseded it is what GitHub answers with.
+    // `code-check-result / result`: the cancelled suite was created first, so
+    // the green that superseded it is what GitHub answers with.
     const states = statesFromCheckRuns([
-      run('code-check-result', 'success', 96_234_480_526, 106_168_151_475),
-      run('code-check-result', 'failure', 96_234_480_291, 106_166_534_044),
+      run(
+        'code-check-result / result',
+        'success',
+        96_234_480_526,
+        106_168_151_475,
+      ),
+      run(
+        'code-check-result / result',
+        'failure',
+        96_234_480_291,
+        106_166_534_044,
+      ),
     ]);
 
-    assert.deepStrictEqual(states.get('code-check-result'), 'passed');
+    assert.deepStrictEqual(states.get('code-check-result / result'), 'passed');
   });
 
   test('a stale red in a later suite still holds the merge', () => {
@@ -174,36 +184,45 @@ describe(statesFromCheckRuns, () => {
     // while GitHub blocks it.
     const states = statesFromCheckRuns([
       run(
-        'test-node-versions-result',
+        'test-node-versions-result / result',
         'success',
         96_234_480_391,
         106_167_733_967,
       ),
       run(
-        'test-node-versions-result',
+        'test-node-versions-result / result',
         'failure',
         96_234_480_438,
         106_166_533_069,
       ),
     ]);
 
-    assert.deepStrictEqual(states.get('test-node-versions-result'), 'failed');
+    assert.deepStrictEqual(
+      states.get('test-node-versions-result / result'),
+      'failed',
+    );
   });
 
   test('the order the runs arrive in does not decide it', () => {
     const forwards = statesFromCheckRuns([
-      run('style-check-result', 'failure', 96_234_480_277, 1),
-      run('style-check-result', 'success', 96_234_480_875, 2),
+      run('style-check-result / result', 'failure', 96_234_480_277, 1),
+      run('style-check-result / result', 'success', 96_234_480_875, 2),
     ]);
 
     const backwards = statesFromCheckRuns([
-      run('style-check-result', 'success', 96_234_480_875, 2),
-      run('style-check-result', 'failure', 96_234_480_277, 1),
+      run('style-check-result / result', 'success', 96_234_480_875, 2),
+      run('style-check-result / result', 'failure', 96_234_480_277, 1),
     ]);
 
-    assert.deepStrictEqual(forwards.get('style-check-result'), 'passed');
+    assert.deepStrictEqual(
+      forwards.get('style-check-result / result'),
+      'passed',
+    );
 
-    assert.deepStrictEqual(backwards.get('style-check-result'), 'passed');
+    assert.deepStrictEqual(
+      backwards.get('style-check-result / result'),
+      'passed',
+    );
   });
 
   test('a re-run inside one suite is told apart by its id', () => {
@@ -251,11 +270,11 @@ describe(reportedContexts, () => {
   test('reads check runs and commit statuses together', () => {
     assert.deepStrictEqual(
       reportedContexts(
-        [completedRun('code-check-result', 'success')],
+        [completedRun('code-check-result / result', 'success')],
         [{ context: 'no-skip-ci-label', state: 'pending' }],
       ),
       new Map([
-        ['code-check-result', 'passed'],
+        ['code-check-result / result', 'passed'],
         ['no-skip-ci-label', 'pending'],
       ]),
     );
