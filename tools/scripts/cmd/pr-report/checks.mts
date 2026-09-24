@@ -24,9 +24,9 @@ import { type ChecksSummary, type ContextState } from './types.mjs';
  * This is why the rule is not "the newest `started_at`", which reads more
  * natural and would call such a pull request green while GitHub blocks it.
  * A report that says a blocked pull request will merge is worse than one
- * that says a green one will not: `CLAUDE.md`'s "Triggers, `skip-ci`,
- * out-of-date branches" says to ignore the red the cancelled run leaves, and
- * this is the case where GitHub does not.
+ * that says a green one will not: `CLAUDE.md`'s "Commits and pull requests"
+ * says to ignore the red the cancelled run leaves, and this is the case where
+ * GitHub does not.
  */
 export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],

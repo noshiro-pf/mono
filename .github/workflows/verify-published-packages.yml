@@ -12,18 +12,12 @@ name: Verify Published Packages
 # The local half of the check — tarballs packed from the branch — runs on every
 # branch as part of code-check.yml. This one does not need a build: it installs
 # from the registry.
+#
+# The check workflow shape — triggers, concurrency, `permissions: {}`, the
+# gate, the aggregate — is in README.md. What is particular to this one: the
+# diff question is answered in shell here rather than by the gate.
 
 on:
-  # No `push`, not even for `main`. The `main` ruleset accepts changes through
-  # pull requests only and requires the branch to be up to date, so the squash
-  # commit a merge makes has the same tree as the pull request's head — a tree
-  # this workflow has already checked. See the note in code-check.yml, which
-  # keeps one job on `push` for a reason of its own.
-
-  # `synchronize` fires on every push to the pull request's branch, so these
-  # types cover the pull request's whole life — a draft included. `labeled` /
-  # `unlabeled` are what let a `skip-ci` label stop and restart the checks; see
-  # the note in code-check.yml.
   pull_request:
     types:
       - opened
@@ -34,48 +28,34 @@ on:
 
   workflow_dispatch:
 
-# One run per pull request; a push cancels the run still going for the
-# previous one. `cancel-in-progress` is an expression rather than `true` so
-# that a `workflow_dispatch` run is left alone — see the note in
-# code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Deny by default; each job grants back exactly what it needs. See the note in
-# code-check.yml for why the repository's own default is not good enough here.
 permissions: {}
 
 jobs:
-  # Whether the branch is behind `main`, and whether `skip-ci` is on the pull
-  # request — see the notes in code-check.yml. `diff-scope: none` because the
-  # one job below gates itself in shell, against a merge base and a single
-  # directory rather than against one of the root package.json's ignore
-  # lists: asking check-gates.yml for that answer would cost it a checkout
-  # and an install to save the one runner this workflow has.
   gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, 'skip-ci')
     uses: ./.github/workflows/check-gates.yml
-    # What check-gates.yml's own job declares. A caller's job-level
-    # `permissions` is the ceiling for the workflow it calls — permissions can
-    # be reduced along the chain, never elevated — so the top-level `{}` above
-    # would otherwise leave the called workflow unable to check out.
     permissions:
       actions: read
       contents: read
       packages: read
     with:
+      # `none`: the one job below gates itself in shell, against a merge base
+      # and a single directory rather than against one of the root
+      # package.json's ignore lists. Asking check-gates.yml for that answer
+      # would cost it a checkout and an install to save the one runner this
+      # workflow has.
       diff-scope: none
       result-job: verify-published-result
 
   verify-published:
     needs: gates
-    # Skip the whole job while the pull request carries the `skip-ci` label, or
-    # while its branch is behind `main` and cannot be merged as it stands —
-    # see the notes in code-check.yml. Being a draft no longer skips
-    # anything.
+    # No `should_run` clause: the gate was not asked the diff question.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -90,11 +70,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, not the merge commit GitHub synthesises for a
-          # `pull_request` event: these checks assert properties of the branch
-          # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a `workflow_dispatch` run this falls
-          # back to the dispatched commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # The gate below resolves a merge base, which does not exist in the
           # default shallow clone. It also brings every branch in as
@@ -145,12 +120,8 @@ jobs:
         if: steps.pins.outputs.changed == 'true'
         run: pnpm run verify:npm-packages:published
 
-  # The one required status check for this workflow: it reports whatever
-  # happened above, so that a skipped run cannot read as a passing one. The
-  # two clauses after `always()` are the skips that are not failures — a
-  # `skip-ci` label, held by `no-skip-ci-label`, and a branch behind the base
-  # branch, held by the ruleset — for which this job reports `skipped` rather
-  # than red. See the note on `code-check-result` in code-check.yml.
+  # The one required status check for this workflow — see "The aggregate job"
+  # in README.md. No `should_run` clause, as above.
   verify-published-result:
     needs:
       - gates
@@ -160,7 +131,6 @@ jobs:
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false'
     runs-on: ubuntu-latest
-    # Reads `needs.*.result` and echoes. It touches nothing.
     permissions: {}
     timeout-minutes: 5
 
@@ -168,9 +138,6 @@ jobs:
       - name: Require the checks above to have passed
         env:
           RESULT: ${{ needs.verify-published.result }}
-          # Set when an earlier run already reached a verdict on this head
-          # commit and the checks above were skipped for it — see "A commit that
-          # already has a verdict" in check-gates.yml.
           REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
           REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |

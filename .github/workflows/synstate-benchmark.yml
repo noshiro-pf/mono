@@ -1,11 +1,8 @@
 name: SynState Benchmark
 
-# A `paths` filter, unlike every check workflow here.
-#
-# The reason those carry none is that each reports a required status check, and
-# a workflow a path filter skips never reports one — the pull request would wait
-# forever on a check that never arrives (see the note in style-check.yml). This
-# workflow reports none: a benchmark on a shared runner is a measurement, not a
+# A `paths` filter, unlike every check workflow here (see "Triggers" in
+# README.md for why those carry none). This workflow reports no required
+# status check: a benchmark on a shared runner is a measurement, not a
 # verdict, and gating a merge on it would gate it on the runner's mood. So a
 # path filter is exactly right here, and it keeps every unrelated pull request
 # from spending five minutes measuring what it did not touch.

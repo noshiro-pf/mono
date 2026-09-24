@@ -21,14 +21,11 @@ name: Strict Lib Generation
 #   would regenerate the library on every pull request in the repository.
 #
 # So it gates on `z:check-should-run:strict-lib-checks`, a list of its own.
+#
+# The check workflow shape — triggers, concurrency, `permissions: {}`, the
+# gate, the aggregate — is in README.md.
 
 on:
-  # No `push`, not even for `main`: a merge is a squash of a branch that
-  # already contained main's tip, so its tree is one this workflow has already
-  # checked. See the trigger note in code-check.yml.
-  #
-  # `labeled` / `unlabeled` let a `skip-ci` label stop and restart the check;
-  # see the note in code-check.yml. No `paths` filter — see style-check.yml.
   pull_request:
     types:
       - opened
@@ -37,23 +34,15 @@ on:
       - labeled
       - unlabeled
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# One run per pull request; a push cancels the run for the previous one. See
-# the note in code-check.yml.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Deny by default; each job grants back exactly what it needs. See the note in
-# code-check.yml.
 permissions: {}
 
 jobs:
-  # Is the branch up to date with `main`, and does the diff touch anything the
-  # generator reads? See check-gates.yml.
-  #
   # The ignore list is `z:check-should-run:strict-lib-checks` in the root
   # `package.json`. A pull request is skipped only when *every* changed path
   # matches it, so a pattern belongs there only when nothing below can read the
@@ -112,9 +101,6 @@ jobs:
 
   strict-lib-gen:
     needs: gates
-    # The same three skips as code-check.yml, for the same reasons: `skip-ci`,
-    # a branch behind `main`, and a diff nothing here reads. `!cancelled()`
-    # and `!= 'false'` so that a gate that failed to answer fails open.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -124,7 +110,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
     timeout-minutes: 25
 
@@ -132,8 +117,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, not the merge commit: the check asserts that the
-          # branch's own output matches its own generator.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install pnpm
@@ -174,9 +157,8 @@ jobs:
       - name: Check if there is no file diff
         run: pnpm run z:assert-repo-is-clean
 
-  # The one required status check for this workflow. See the note on
-  # `code-check-result` in code-check.yml for why a required context is an
-  # aggregate rather than the job that does the work.
+  # The one required status check for this workflow — see "The aggregate job"
+  # in README.md.
   strict-lib-gen-result:
     needs:
       - gates
@@ -187,7 +169,6 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
-    # Reads `needs.*.result` and echoes. It touches nothing.
     permissions: {}
     timeout-minutes: 5
 
@@ -195,9 +176,6 @@ jobs:
       - name: Require the check above to have passed
         env:
           RESULT: ${{ needs.strict-lib-gen.result }}
-          # Set when an earlier run already reached a verdict on this head
-          # commit and the check above were skipped for it — see "A commit that
-          # already has a verdict" in check-gates.yml.
           REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
           REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |

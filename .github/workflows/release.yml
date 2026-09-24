@@ -1,6 +1,13 @@
 # cspell:ignore esbuild unrs
 name: Release
 
+# 依存ツリーのコードが動く `build` job と、鍵（ `id-token: write` と App
+# token ）を持つ `release` job に分けてある。分割そのものの理屈 — job の境界
+# だけが `$GITHUB_ENV` / `$GITHUB_PATH` を止めること、成果物は tar 一つで
+# それはデータであること、鍵を持つ job は tree から何も実行しないこと — は
+# README.md の "Jobs that hold a key" にあり、ここには release 固有の事情
+# （ OIDC / npm trusted publisher ）だけを書く。
+
 on:
   push:
     branches:
@@ -9,9 +16,9 @@ on:
 env:
   CI: true
 
-# Deny by default; each job grants back what it needs. `build` below is the
-# reason this line exists: without it the job would inherit the repository
-# default, and the whole point of that job is that it holds nothing.
+# `build` below is the reason this line exists: without it the job would
+# inherit the repository default, and the whole point of that job is that it
+# holds nothing.
 permissions: {}
 
 jobs:
@@ -25,17 +32,8 @@ jobs:
   # `main` 上の正規の run の中で起きるので、`release` environment の branch
   # policy も CODEOWNERS も通過する — どちらも「どの ref が動くか」「何が
   # マージされるか」を見ていて、「その run の中で何が実行されるか」は見ない。
-  #
-  # job を分けることがその経路を閉じる。`id-token: write` の無い job には
-  # `ACTIONS_ID_TOKEN_REQUEST_*` がそもそも存在しないので、ここで動くコードは
-  # OIDC トークンを要求できない。ステップの並べ替えやインライン化では届かない
-  # ことにも注意: `$GITHUB_ENV` / `$GITHUB_PATH` は同じ job の後続ステップに
-  # 適用されるので、ここで動いたコードは二つ先のステップの `git` や `npm` が
-  # 何を指すかを決められる。それが止まるのは job の境界 — 新しいランナー、
-  # 新しいチェックアウト、新しい環境 — だけ。
-  #
-  # 出力として渡るのは `dist/` の tar 一つ。publish 側はそれを展開するだけで、
-  # tarball はデータであって実行されない。
+  # `id-token: write` の無い job には `ACTIONS_ID_TOKEN_REQUEST_*` がそもそも
+  # 存在しないので、ここで動くコードは OIDC トークンを要求できない。
   #
   # これで消えるのは publish の権限そのものへの到達で、`dist/` の中身が正しい
   # ことの保証ではない。被害は「任意のパッケージを任意の時に publish」から
@@ -64,8 +62,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # ここで動くのは依存ツリー自身のコードなので、git config に
-          # 認証情報を残さない。この job はそもそも何も push しない。
           persist-credentials: false
 
       - name: Install pnpm
@@ -85,12 +81,8 @@ jobs:
       - name: Build all packages
         run: pnpm run ws:build
 
-      # code-check.yml の `build` job と同じ形。ファイルそのものではなく tar
-      # 一つにするのは、アップロードとダウンロードの両端が一ファイルで済む
-      # ため。`find` なのは、何も build しなかったワークスペースディレクトリが
-      # あっても `tar` に展開されないグロブが渡らないようにするため。深さは
-      # `libs/<name>/dist` と `languages/<language>/<name>/dist` の両方を拾い、
-      # `node_modules` は除く（依存自身の `dist` はこちらの持ち物ではない）。
+      # code-check.yml の `build` job と同じ形（ README.md の "The `dist/`
+      # artifact" ）。
       - name: Pack the build output
         run: |
           set -euo pipefail
@@ -104,7 +96,6 @@ jobs:
         with:
           name: dist
           path: ${{ runner.temp }}/dist.tar.gz
-          # Read once, by the job below, minutes later.
           retention-days: 1
 
   release:
@@ -187,8 +178,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # `build` job が出したもの。この job はビルドしない — それがこの分割の
-      # 全部。展開される tar はデータで、ここで実行されるのは `npm publish` に
-      # 渡る `dist/` の中身だけ。
+      # 全部。
       #
       # provenance の指す先は変わらない。npm が attestation に書くのは run の
       # OIDC claim（ repository / workflow_ref / commit ）で、job ではない。
@@ -203,10 +193,8 @@ jobs:
       - name: Unpack the build output
         run: tar -xzf "${RUNNER_TEMP}/dist.tar.gz"
 
-      # install も artifact の展開もこのステップより前に置いてある。トークンを
-      # 要さない作業を `Generate Token` より前に済ませるのは、pnpm-update.yml
-      # の「 What a job that holds a key may do 」の 2 つめで、ここに足す
-      # ステップも同じ順序に従うこと。
+      # install も artifact の展開もこのステップより前に置いてある（ "Jobs
+      # that hold a key" の 2 つめ ）。ここに足すステップも同じ順序に従うこと。
       - name: Generate Token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0

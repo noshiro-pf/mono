@@ -31,14 +31,10 @@ name: PR Report
 # list is only the question "what can change the report", and the answer is
 # the pull requests themselves, `main` moving under all of them, and time.
 on:
-  # `pull_request_target`, not `pull_request`, for two reasons that both
-  # matter. A `pull_request` run from a fork gets a read-only token whatever
-  # `permissions:` below says, so the push would fail — silently, as far as
-  # the report's readers are concerned, since the branch would simply stop
-  # changing. And `pull_request` resolves the workflow file, and the
-  # checkout, from the pull request's own head: the branch being reported on
-  # would be the branch supplying the reporter. The usual hazard of
-  # `pull_request_target` is answered at the checkout step below.
+  # `pull_request_target`, not `pull_request` — see README.md. A fork's
+  # `pull_request` run would fail its push silently, as far as the report's
+  # readers are concerned, since the branch would simply stop changing. The
+  # usual hazard is answered at the checkout step below.
   pull_request_target:
     types:
       # Membership of the list.
@@ -107,8 +103,6 @@ on:
 
   workflow_dispatch:
 
-# Deny by default; each job grants back what it needs. The split below is
-# what this is in aid of.
 permissions: {}
 
 concurrency:
@@ -130,8 +124,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Runs the dependency tree, and holds nothing. Everything this job produces
-  # leaves as an artifact.
+  # Runs the dependency tree, and holds nothing — the split under "Jobs that
+  # hold a key" in README.md. Everything this job produces leaves as an
+  # artifact.
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -195,10 +190,7 @@ jobs:
           retention-days: 1
 
   # Holds the token, and installs nothing. No checkout either: every step
-  # below is the definition GitHub resolved rather than a file out of a tree,
-  # so there is nothing here a dependency of the job above could have
-  # rewritten. This is the same split, and the same reason, as
-  # `pnpm-update.yml`.
+  # below is the definition GitHub resolved rather than a file out of a tree.
   publish:
     needs: report
     runs-on: ubuntu-latest

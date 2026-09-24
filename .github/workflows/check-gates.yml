@@ -1,99 +1,12 @@
 name: Check Gates
 
-# The two questions each check workflow has to answer before it is worth
-# booting a matrix: is the pull request's branch up to date with the base
-# branch, and does its diff touch anything the workflow reads? One job answers
-# both, once per workflow run, and the caller turns the answers into
-# job-level `if`s — the only thing that skips a job before a runner boots.
-#
-# ## Being behind the base branch
-#
-# That is the state the pull request page calls "This branch is out-of-date
-# with the base branch". Such a branch cannot be merged: `main`'s ruleset sets
-# `strict_required_status_checks_policy`, so the required checks have to pass
-# on a head that already contains main's tip, and updating the branch fires
-# `synchronize` and runs every check again on the commit that will actually be
-# merged. The run happening before that update is a run whose result nothing
-# can use.
-#
-# ## Whether the diff matters
-#
-# `check-should-run` from `ts-repo-utils`, against one of the three
-# `z:check-should-run:*` ignore lists in the root `package.json`. Those lists
-# are JSON and can carry no comment of their own, so what they mean is here:
-#
-# - **A path goes on a list only when no command that workflow runs reads
-#   it.** `articles/` is not on the style list because Prettier formats it;
-#   `**.md` is not on the strict-lib list because the changelogs are copied
-#   into the bundles. Adding a path wrongly fails nothing — it makes the
-#   workflow skip a diff it was the one thing meant to judge.
-# - **A check workflow carries no `paths:` filter of its own.** A workflow
-#   filtered out that way reports no status at all, and a required context
-#   that never arrives blocks the merge forever. This gate is what decides,
-#   and it decides after the workflow has started.
-# - **A gate is a job-level `if`**, so a step added inside a gated job needs
-#   no condition of its own.
-# - **A job downstream of a gate reads `!cancelled()` and `!= 'false'`, never
-#   `== 'true'`.** A gate that failed to answer then fails open — the work
-#   runs — rather than skipping silently.
-#
-# This used to be a step inside every job, which meant each of the 22 matrix
-# runners across the three workflows booted, checked out and installed
-# dependencies (~45s apiece) before finding out it had nothing to do. Here it
-# costs one runner for all of them.
-#
-# Two things had to be true before it could move:
-#
-# - The answer needs `pnpm install` — the gate is a program, not a glob match
-#   — so it cannot live in a job-level `if`, which GitHub evaluates from the
-#   event payload alone. Hence a job that computes it and a caller that reads
-#   its output, which is the shape this workflow already had for the branch
-#   question.
-# - A skipped matrix job produces one check run named after the *job*, never
-#   the `code-check (…)` matrix contexts. While those were the required
-#   status checks, skipping the job at job level would have left them missing
-#   — "Expected", blocking forever. Only since the `*-result` aggregates
-#   became the required contexts is a job-level skip safe here.
-#
-# ## A commit that already has a verdict
-#
-# Every job the callers run reads the pull request's head commit and nothing
-# else — they check out `pull_request.head.sha` — so a second run on the same
-# head can only repeat the first one's verdict, pass or fail. Such runs are
-# common: any label event (`merge-queued`, `bug`, …), `reopened`, and a
-# `skip-ci` taken off a commit that was checked before it went on. So when an
-# earlier run of the calling workflow on this head reached a verdict, its
-# aggregate job's conclusion is handed back as `reused_result`, the callers
-# skip their matrix, and their aggregate reports that conclusion — green or
-# red, never skipped, so a reused verdict cannot read as a check that did not
-# happen.
-#
-# What makes "same head" enough is the branch question above: the lookup only
-# happens on an up-to-date branch of the default branch, where the commit that
-# would be merged has the head's tree, workflow files included. An earlier run
-# made while the branch was behind has a skipped aggregate and is not a
-# verdict.
-#
-# Some things are deliberately not reused:
-#
-# - A run that was cancelled — its aggregate still runs under `always()` and
-#   reads red, but it says nothing about the commit.
-# - A skipped aggregate (`skip-ci`, behind, nothing relevant in the diff).
-# - Anything, when this is a re-run (`run_attempt` > 1) or not a
-#   `pull_request` event. "Re-run all jobs" and `workflow_dispatch` are how a
-#   person asks for the checks to actually run — to see whether a failure was
-#   a flake, say. "Re-run failed jobs" is not enough after a reused failure:
-#   it keeps this job's outputs from the first attempt.
-#
-# Where several earlier runs have a verdict, the one whose aggregate completed
-# last wins, so a flake that was re-run to green supersedes the red that a
-# later run reused from it.
-#
-# ## Why a workflow of its own
-#
-# `workflow_call` rather than the same shell copied into four workflows:
-# there is one answer to give and one place to change it. Callers fail open —
-# see the note on the `if` in code-check.yml.
+# The gate every check workflow calls: is the pull request's branch up to
+# date with the base branch, does its diff touch anything the caller reads,
+# and has an earlier run already reached a verdict on this head commit? The
+# design — why the questions are asked here rather than in a job-level `if`,
+# what the callers do with the answers, what may go on an ignore list, which
+# verdicts are reused — is in README.md, under "The gate: `check-gates.yml`".
+# What follows is only what the steps themselves need to say.
 
 on:
   workflow_call:
@@ -223,8 +136,8 @@ jobs:
           echo "${summary}"
           echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
 
-      # See "A commit that already has a verdict" at the top. Before the
-      # checkout, because a reused verdict makes the diff question moot.
+      # Before the checkout, because a reused verdict makes the diff question
+      # moot.
       - name: Look for a verdict already reached on this head commit
         id: reuse
         if: steps.branch_state.outputs.branch_up_to_date != 'false'
@@ -304,8 +217,7 @@ jobs:
 
       # Everything below answers the diff question, and is worth nothing when
       # the caller is going to skip on either answer above — so it is gated on
-      # both as well as on the scope. A branch behind `main` therefore still
-      # costs the four seconds this gate used to cost in total.
+      # both as well as on the scope.
       - name: Checkout
         id: checkout
         if: >-
@@ -314,9 +226,6 @@ jobs:
           steps.reuse.outputs.reused_result == ''
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, not the merge commit GitHub synthesises for a
-          # `pull_request` event, so that the diff is the one the callers'
-          # checks will actually run against.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Fetch main

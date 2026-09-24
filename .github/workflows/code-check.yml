@@ -2,38 +2,20 @@
 
 name: Code Check
 
+# The check workflow shape — triggers, concurrency, `permissions: {}`, the
+# gate, the aggregate — is in README.md. What is particular to this one: a
+# `build` job that serves `dist/` to the matrix, and a `coverage-main` job
+# that is the one thing in the repository run on a push to `main`.
+
 on:
-  # Only main, and on main only the `coverage-main` job below runs. Pull
-  # request branches are covered by the `pull_request` events — running both
-  # event kinds would list every check twice on the pull request.
-  #
-  # A push to main is a merge (the `main` ruleset allows no other way onto
-  # the branch), and a merge here is a squash of a branch that already
-  # contained main's tip (`strict_required_status_checks_policy`), so the
-  # commit it makes has the same tree as the pull request's head — a tree
-  # every check in this matrix has already run on. This workflow used to run
-  # the whole matrix on it anyway, at 108 runner-minutes per merge, to confirm
-  # what the pull request had confirmed. The other check workflows have no
-  # `push` trigger at all for the same reason.
-  #
-  # The one thing a pull request run cannot do is give Codecov its baseline:
-  # coverage is compared against the base commit's report, and the base
-  # commit is one on main. So `ws:check:test:cov` alone runs on main, in a job of
-  # its own, and uploads.
+  # The only `push` trigger among the check workflows, and on `main` only
+  # `coverage-main` runs on it: Codecov compares a pull request's coverage
+  # against the base commit's report, and the base commit is one on `main`.
+  # See "Triggers" in README.md for why nothing else runs there.
   push:
     branches:
       - main
 
-  # `synchronize` fires on every push to the pull request's branch, so these
-  # types cover the pull request's whole life — a draft included. A draft is
-  # checked like anything else: work in progress is exactly where a CI result
-  # is worth having, and the two mechanisms below are what keep that from
-  # being expensive. `labeled` / `unlabeled` are here so that adding `skip-ci`
-  # stops the checks and taking it off starts them again. No
-  # `ready_for_review`: a draft is checked on every push, so marking it ready
-  # changes nothing about the commit, and a run for it re-checked the same
-  # head with the same result. No `paths` filter here, for the same reason
-  # the steps are gated one at a time — see the `Check diff` step.
   pull_request:
     types:
       - opened
@@ -42,62 +24,20 @@ on:
       - labeled
       - unlabeled
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# One run per pull request: a push cancels the run still going for the
-# previous one, which is what makes a branch pushed to five times in a row
-# cost one CI result rather than five. Nothing is lost by that on a pull
-# request branch — the `Check diff` gate below diffs against `origin/main`,
-# so the newer run covers every commit the cancelled one would have.
-#
-# `cancel-in-progress` is deliberately an expression rather than a bare
-# `true`. On `main` that same gate diffs against `github.event.before`, so
-# each push's run covers only that push: cancelling the run for X when Y
-# lands would leave the diff X introduced checked by nothing at all. Pushes
-# to `main` therefore run to completion.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Deny by default; each job grants back exactly what it needs.
-#
-# The repository's own default is "read and write"
-# (`GET /repos/{owner}/{repo}/actions/permissions/workflow`), and without a
-# `permissions` key every job here inherits it. Every job here also runs the
-# branch's own code — the `prepare` script during `pnpm install`, `ws:build`,
-# `eslint.config.mts`, the vitest configs — so that default hands a
-# write-capable `GITHUB_TOKEN` to whatever the branch happens to contain.
-#
-# A fork's pull request is capped at read-only by GitHub whatever this says,
-# but a branch in this repository is not, and `chore/pnpm-update` is exactly
-# that: a branch whose contents are whatever the registry served that morning,
-# opened and auto-merged with no human in between. Nothing below writes
-# anything.
-#
-# Keep this as the deny-all form rather than a repository-wide setting: a
-# setting is one switch for every workflow at once, and
-# `repo-settings/actions-settings/` does not model it, so a change there would
-# not be noticed by the settings drift check, which runs from the private
-# `noshiro-pf/mono-security` — see "Security findings" in CLAUDE.md.
 permissions: {}
 
 jobs:
-  # Is the branch up to date with `main`, and does the diff touch anything
-  # this workflow reads? A job of its own because both answers take work a
-  # job-level `if` cannot do — an API call and a `pnpm install` — and because
-  # a step cannot skip the job it is in. See check-gates.yml. It carries the
-  # `skip-ci` condition as well, so a labelled pull request costs no runner
-  # anywhere: this job is skipped, and the ones below it with it.
   gates:
     if: >-
       github.event_name != 'pull_request' ||
       !contains(github.event.pull_request.labels.*.name, 'skip-ci')
     uses: ./.github/workflows/check-gates.yml
-    # What check-gates.yml's own job declares. A caller's job-level
-    # `permissions` is the ceiling for the workflow it calls — permissions can
-    # be reduced along the chain, never elevated — so the top-level `{}` above
-    # would otherwise leave the called workflow unable to check out.
     permissions:
       actions: read
       contents: read
@@ -106,68 +46,27 @@ jobs:
       diff-scope: code
       result-job: code-check-result
 
-  # `ws:build` once, for every entry of the matrix below to unpack.
+  # `ws:build` once, for every entry of the matrix below to unpack — see "The
+  # `dist/` artifact" in README.md.
   #
   # Each of those entries needs `dist/`: a package's `build` only type-checks
   # what it publishes, so tests, scripts, configs and lint configs all reach
   # their workspace siblings through the `exports` map, which resolves there.
   # Each entry used to run the build for itself — fourteen runs of the same
   # 34-second command producing the same 27 directories, about eight
-  # runner-minutes a pull request.
-  #
-  # What that trades is wall clock. The matrix now waits on one build rather
-  # than each entry doing its own alongside the others, and this job costs its
-  # own checkout and install on top, so the critical path grows by roughly a
-  # minute while the runner time falls by six. The entries that do not read
-  # `dist/` pay the wait too; splitting the matrix to spare them would be two
-  # matrices to keep in step, which is a worse trade than the wait.
-  #
-  # Two workflows deliberately keep building per job. In
-  # node-version-compatibility.yml, building on each Node version *is* the
-  # check. In style-check.yml only two of the nine entries build at all, so a
-  # job to serve them would cost more than it saves.
+  # runner-minutes a pull request. What that trades is wall clock: the matrix
+  # waits on one build and this job costs its own checkout and install, so the
+  # critical path grows by roughly a minute while the runner time falls by
+  # six. Splitting the matrix to spare the entries that do not read `dist/`
+  # would be two matrices to keep in step, which is a worse trade than the
+  # wait.
   build:
     needs: gates
-    # This is where the gate lives now: the matrix below waits on this job, so
-    # everything that skips the checks skips them by skipping this.
-    #
-    # Four states are not worth a CI run, and each skips the whole job before a
-    # runner is booted — a job-level `if` is evaluated by GitHub itself.
-    #
-    # - A `skip-ci` label on the pull request says its author does not want the
-    #   checks yet. Labels arrive in the event payload, so this costs nothing,
-    #   and taking the label off fires `unlabeled`, which runs everything
-    #   again. Being a draft is deliberately NOT one of these states — a draft
-    #   is where a CI result is most useful.
-    # - A branch behind `main` is the "This branch is out-of-date with the base
-    #   branch" state: it cannot be merged, and the update that clears it fires
-    #   `synchronize` and runs everything again — on the commit that will
-    #   actually be merged, which this one is not.
-    # - A diff that touches nothing any command below reads. This used to be a
-    #   step inside each job, which meant every runner in the matrix booted,
-    #   checked out and installed dependencies before finding out it had
-    #   nothing to do; the gate job pays that once. What may go on an ignore
-    #   list is in check-gates.yml, under "Whether the diff matters".
-    # - A verdict already reached on this head commit, which the matrix would
-    #   only repeat. See "A commit already checked is not checked again".
-    #
-    # The skipped conclusion satisfies a required status check in every case,
-    # so each of them needs something else to hold the merge — and each has
-    # one. Out of date: the ruleset's `strict_required_status_checks_policy`.
-    # `skip-ci`: the `no-skip-ci-label` status written by skip-ci-label.yml,
-    # which stays `pending` for as long as the label is on. Nothing relevant in
-    # the diff: nothing here would have read those paths anyway, which is the
-    # one case where "not checked" is the right answer. A reused verdict: the
-    # aggregate reports that verdict rather than `skipped`.
-    #
-    # `!cancelled()` and `!= 'false'` rather than `== 'true'`, because a gate
-    # that failed to answer leaves `should_run` empty: failing open costs a CI
-    # run, failing closed would skip every check on the pull request while
-    # reporting the required ones as satisfied.
-    #
-    # Not on `push`: that is a merge of a tree this matrix has already run on —
-    # see the trigger note at the top. `coverage-main` below is what a push
-    # runs.
+    # This is where the gate lives: the matrix below waits on this job, so
+    # everything that skips the checks skips them by skipping this. The
+    # clauses are the caller shape from README.md plus `!= 'push'`: a push is
+    # a merge of a tree this matrix has already run on, and `coverage-main`
+    # is what a push runs.
     if: >-
       !cancelled() &&
       github.event_name != 'push' &&
@@ -178,7 +77,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
     timeout-minutes: 15
 
@@ -186,8 +84,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, as the matrix below checks out: the artifact has to
-          # be the build of the commit those jobs are checking.
+          # The artifact has to be the build of the commit the matrix checks.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install pnpm
@@ -209,15 +106,6 @@ jobs:
       - name: Build all packages
         run: pnpm run ws:build
 
-      # One tarball rather than the 3,875 files themselves: the archive is
-      # 7 MB where the tree is 42 MB, and one file is one upload rather than a
-      # per-file walk at both ends.
-      #
-      # `find` rather than a shell glob, so that a workspace directory with
-      # nothing built leaves `tar` holding no unexpanded pattern. The depth
-      # covers `libs/<name>/dist` and `languages/<language>/<name>/dist` alike,
-      # and `node_modules` is pruned because a dependency's own `dist` is not
-      # ours to carry.
       - name: Pack the build output
         run: |
           set -euo pipefail
@@ -231,7 +119,6 @@ jobs:
         with:
           name: dist
           path: ${{ runner.temp }}/dist.tar.gz
-          # Read by the matrix below, minutes later, and by nothing else.
           retention-days: 1
 
   code-check:
@@ -255,15 +142,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
     timeout-minutes: 25
 
     strategy:
-      # The matrix entries are independent checks. Letting one cancel the
-      # others hides their results, and the aggregate below reports the
-      # cancelled ones as a failure, so the pull request is blocked on an
-      # unrelated failure with nothing to read.
       fail-fast: false
       matrix:
         command:
@@ -293,11 +175,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The branch tip, not the merge commit GitHub synthesises for a
-          # `pull_request` event: these checks assert properties of the branch
-          # itself, and the merge ref does not even exist while the pull
-          # request has a conflict. On a push event this falls back to the
-          # pushed commit.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install pnpm
@@ -323,7 +200,6 @@ jobs:
         if: matrix.command == 'ws:check:test:browser' || matrix.command == 'ws:check:test:cov' || matrix.command == 'ws:check:e2e'
         run: pnpm exec playwright install chromium
 
-      # What the `build` job above emitted, in place of building again.
       - name: Download the build output
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -348,10 +224,9 @@ jobs:
         if: matrix.command == 'ws:check:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
-  # What a push to main runs: the `ws:check:test:cov` entry of the matrix above and
-  # nothing else, so that Codecov has a report on the base commit to compare
-  # a pull request's against. See the trigger note at the top for why the
-  # rest of the matrix does not run here.
+  # What a push to main runs: the `ws:check:test:cov` entry of the matrix above
+  # and nothing else, so that Codecov has a report on the base commit to
+  # compare a pull request's against.
   #
   # A job of its own rather than a step condition inside the matrix job,
   # because a matrix entry that boots a runner and skips every step still
@@ -370,7 +245,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # `setup-node` below points the `@noshiro-pf` scope at GitHub Packages.
       packages: read
     timeout-minutes: 25
 
@@ -406,43 +280,9 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
-  # The one required status check for this workflow. Everything above still
-  # reports its own check run and is still worth reading, but none of them is
-  # required any more, because a required context can be satisfied by a run
-  # that never happened. Two ways, both measured on this repository:
-  #
-  # - A job GitHub skips produces exactly one check run, named after the
-  #   *job* (`code-check`) — never the matrix contexts
-  #   (`code-check (check:root)`, …). Those contexts are not superseded, so
-  #   they keep whatever they last said on that commit: a green from an
-  #   earlier run stays green, and the pull request reads as fully checked
-  #   while nothing ran.
-  # - A skipped job whose check run name *is* the required context — a job
-  #   with no matrix, as `verify-published` is — reports `skipped`, and GitHub
-  #   counts a skipped required check as satisfied.
-  #
-  # This job closes both. Its name does not depend on a matrix, so every run
-  # supersedes the last, and `always()` means a failed or cancelled matrix
-  # still gets a verdict here rather than leaving this job skipped along with
-  # the work.
-  #
-  # The two clauses after `always()` are the two skips that are *not*
-  # failures, and they are job-level on purpose: this job then reports
-  # `skipped` for them — grey, and satisfying the required check — rather
-  # than red. Something else holds the merge in each case, and neither is
-  # this workflow's business:
-  #
-  # - `skip-ci`: the `no-skip-ci-label` status skip-ci-label.yml writes stays `pending`
-  #   for as long as the label is on, and it is required. **That status and
-  #   its context in the ruleset are what stop a labelled pull request from
-  #   merging.** Delete either and the hole this job exists to close reopens
-  #   — the two go together.
-  # - Behind the base branch: `strict_required_status_checks_policy` holds
-  #   the merge, and the update that clears it runs everything again on the
-  #   commit that will actually be merged.
-  #
-  # Not on `push` either: the matrix does not run there (see `coverage-main`),
-  # and there is no pull request on main for a required check to hold.
+  # The one required status check for this workflow — see "The aggregate job"
+  # in README.md. Not on `push` either: the matrix does not run there, and
+  # there is no pull request on main for a required check to hold.
   code-check-result:
     needs:
       - gates
@@ -455,7 +295,6 @@ jobs:
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
-    # Reads `needs.*.result` and echoes. It touches nothing.
     permissions: {}
     timeout-minutes: 5
 
@@ -467,9 +306,6 @@ jobs:
           # was: a failed build skips the matrix, which would otherwise read
           # only as `skipped`.
           BUILD_RESULT: ${{ needs.build.result }}
-          # Set when an earlier run already reached a verdict on this head
-          # commit and the checks above were skipped for it — see "A commit that
-          # already has a verdict" in check-gates.yml.
           REUSED_RESULT: ${{ needs.gates.outputs.reused_result }}
           REUSED_FROM: ${{ needs.gates.outputs.reused_from }}
         run: |

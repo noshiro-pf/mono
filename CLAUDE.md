@@ -206,62 +206,37 @@ and `.github/CODEOWNERS`.
 
 ## CI
 
-### Required status checks
+The design the workflows share is `.github/workflows/README.md`: triggers,
+concurrency, permissions, the gate and its ignore lists, the `*-result`
+aggregates, `skip-ci`, what a job that holds a key may do, and what a new
+workflow has to be wired to. A workflow's own comments say only what is
+particular to it. Here is only what a session has to act on.
 
-The nine required contexts (`repo-settings/rulesets/main.json`) are the five
-`*-result` aggregate jobs, the `no-skip-ci-label` commit status, and the three
-`lint-pull-request.yml` jobs. **None is a job that does work**: a skipped job
-satisfies a required check and a skipped matrix job does not expand its
-matrix, so matrix contexts made required directly go stale. Each aggregate is
-`if: always()` and asserts `needs.<job>.result == 'success'`, reporting
-`skipped` only for `skip-ci`, a branch behind `main`, and a diff the workflow
-does not read — each held by something else.
-
-- A new matrix entry needs nothing; a new job or workflow needs its aggregate
-  context added to `main.json`, or it runs and blocks nothing.
-  `repo-settings/README.md` has that, renaming a context, and the bypass.
-- A red aggregate does not name what failed; open the run.
-
-### Diff gates
-
-Check workflows carry no `paths` filter; `check-gates.yml` decides per
-workflow whether the diff touches anything it reads, from the three
-`z:check-should-run:*` ignore lists in the root `package.json`. What may go on
-a list, and what a job downstream of a gate may assume, is written in that
-workflow.
-
-### Triggers, `skip-ci`, out-of-date branches
-
-The check workflows trigger on `pull_request` (`opened`, `synchronize`,
-`reopened`, `labeled`, `unlabeled`) and `workflow_dispatch`; only
-`code-check.yml` also runs one job on a push to `main`, for Codecov's base
-report. Nothing else runs on `main`, so **after a bypass merge run the
-workflows by hand**. Drafts are checked like anything else. Do not add
-`edited` or `issue_comment`: such a run cancels the one in progress and its
-skipped aggregate supersedes the last verdict.
-
-- **`skip-ci` label**: every gated job skips while it is on, booting no
-  runner; removing it (`unlabeled`) is what starts the checks on a commit
-  already pushed. Any label event re-runs the checks, so add other labels
-  before pushing or after the checks report.
-- **`no-skip-ci-label`** is a commit status written by `skip-ci-label.yml` on
-  every event (`pending` with the label, `success` without). It is the only
-  thing holding a labelled pull request; deleting the workflow or its context
-  leaves `skip-ci` skipping everything with nothing holding the merge. It runs
-  on `pull_request_target` with no checkout so that `main`'s copy decides;
-  keep it executing nothing from the tree.
+- **The required contexts** (`repo-settings/rulesets/main.json`) are the five
+  `*-result` aggregates, the `no-skip-ci-label` status and the three
+  `lint-pull-request.yml` jobs. None does work, because a skipped job
+  satisfies a required check. A new matrix entry needs nothing; a new job or
+  workflow needs its aggregate context added there, or it runs and blocks
+  nothing. A red aggregate does not name what failed; open the run.
+- Nothing but `code-check.yml`'s coverage job runs on `main`, so **after a
+  bypass merge run the workflows by hand**.
+- **`skip-ci`** skips every check and boots no runner; the `no-skip-ci-label`
+  status (`skip-ci-label.yml`) is the only thing holding the merge while it is
+  on. Taking it off is what starts the checks. Any label event re-runs them,
+  so add other labels before pushing or after the checks report.
 - `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
   strings are in the workflows and `tools/scripts/cmd/unblock-prs/`. Change
   them everywhere or nowhere.
-- **A commit already checked is not checked again**: `check-gates.yml` reuses
-  the aggregate verdict of an earlier run on the same head, failure included.
+- **A commit already checked is not checked again**, failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
-- **A branch behind `main` runs nothing**; the ruleset blocks it and the update
-  re-runs everything.
+- **A branch behind `main` runs nothing**; the update re-runs everything.
+- **A diff a workflow does not read skips it**, by the `z:check-should-run:*`
+  ignore lists in the root `package.json`; what may go on one is in the
+  README. Adding a path wrongly fails nothing.
 - `pnpm run check:root:ci-commands` asks whether any matrix command duplicates
-  another and whether any check script runs nowhere. What a script body cannot
-  show is declared in `DECLARED_COVERAGE`; `UNCOVERED_BY_DESIGN` is a list of
-  claims, each with a reason, not a silencer.
+  another and whether any check script runs nowhere; what a script body
+  cannot show is declared in `DECLARED_COVERAGE`, and `UNCOVERED_BY_DESIGN` is
+  a list of claims with reasons, not a silencer.
 
 ## Spell checking
 
