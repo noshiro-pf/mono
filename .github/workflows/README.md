@@ -13,11 +13,11 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 | Workflow                         | Runs on                                        | Reports a required context              |
 | :------------------------------- | :--------------------------------------------- | :-------------------------------------- |
-| `code-check.yml`                 | pull requests; `push` to `main` (coverage)     | `code-check-result`                     |
-| `style-check.yml`                | pull requests                                  | `style-check-result`                    |
-| `strict-lib-gen.yml`             | pull requests                                  | `strict-lib-gen-result`                 |
-| `node-version-compatibility.yml` | pull requests                                  | `test-node-versions-result`             |
-| `verify-published-packages.yml`  | pull requests                                  | `verify-published-result`               |
+| `code-check.yml`                 | pull requests; `push` to `main`                | `code-check-result`                     |
+| `style-check.yml`                | pull requests; `push` to `main`                | `style-check-result`                    |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`                | `strict-lib-gen-result`                 |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`                | `test-node-versions-result`             |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`                | `verify-published-result`               |
 | `check-gates.yml`                | `workflow_call`, from the five above           | none; it is the gate the five share     |
 | `skip-ci-label.yml`              | `pull_request_target`                          | the `no-skip-ci-label` commit status    |
 | `lint-pull-request.yml`          | `pull_request_target`                          | its three jobs, by name                 |
@@ -51,6 +51,8 @@ so in its own comments.
 
 ```yaml
 on:
+    push:
+        branches: [main]
     pull_request:
         types: [opened, synchronize, reopened, labeled, unlabeled]
     workflow_dispatch:
@@ -68,16 +70,20 @@ on:
   verdict is what makes that affordable.
 - **No `edited`, no `issue_comment`.** Such a run cancels the one in progress
   (see "Concurrency") and its skipped aggregate supersedes the last verdict.
-- **No `push`, not even for `main`.** The `main` ruleset accepts changes
-  through pull requests only and requires the branch to be up to date
-  (`strict_required_status_checks_policy`), so the squash commit a merge makes
-  has the same tree as the pull request's head, which every check has already
-  run on. Running the matrix on `main` cost 108 runner-minutes per merge to
-  confirm what the pull request had confirmed. The one exception is
-  `code-check.yml`'s `coverage-main` job, because Codecov compares a pull
-  request's coverage against the base commit's report and the base commit is
-  on `main`. Nothing else runs on `main`, so after a bypass merge the
-  workflows are run by hand.
+- **`push` to `main`**, where the gate asks whether the pushed tree already
+  has a verdict (see "Reusing a verdict"). A merge of an up-to-date branch is
+  a squash whose tree is the pull request's head's, so it normally does, and
+  the push costs the gate job and nothing else; running the whole matrix
+  there instead once cost 108 runner-minutes per merge to confirm what the
+  pull request had confirmed. A merge the ruleset was bypassed for (out of
+  date, `skip-ci` still on, red) may land a tree that has no verdict, and then
+  the checks run on `main` in full. Nothing has to tell the two apart, and
+  nobody has to remember to run anything by hand. `code-check.yml`'s
+  `coverage-main` job runs on `main` whatever the verdict, because Codecov
+  compares a pull request's coverage against the base commit's report and the
+  base commit is on `main`. On `main` the aggregate holds no merge; it is
+  what a later run on the same tree reuses, and a red one is the signal that
+  a bypass merge landed something broken.
 - **`workflow_dispatch`** is how the checks are asked for from the Actions
   tab. Such a run is exempt from every gate: there is no pull request to be
   behind anything, and no verdict is reused.
@@ -91,8 +97,8 @@ on:
 
 ```yaml
 concurrency:
-    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+    cancel-in-progress: true
 ```
 
 One run per pull request: a push cancels the run still going for the previous
@@ -101,15 +107,36 @@ five. Nothing is lost by that on a pull request branch, because the gate diffs
 against `origin/main` and the newer run covers every commit the cancelled one
 would have.
 
-`cancel-in-progress` is an expression rather than `true` so that a
-`workflow_dispatch` or `push` run is left alone. On `main`, `code-check.yml`'s
-gate diffs against `github.event.before`, so each push's run covers only that
-push; cancelling the run for X when Y lands would leave X's diff checked by
-nothing. The event name in that expression has to be one the workflow
-triggers on, or the expression is a constant and `cancel-in-progress` is
-silently off; `pnpm run check:root:workflow-event-name` holds the two in
-agreement, and a workflow whose trigger moves (`pull_request_target`) moves
-the name with it.
+On `main` it is the group, not `cancel-in-progress`, that keeps a run alive.
+The gate there diffs against `github.event.before`, so each push's run covers
+only that push, and a push run that is cancelled leaves its diff checked by
+nothing. Cancelling one while it runs is only half of that: GitHub also
+replaces a run _waiting_ in a group with the next one to arrive, whatever
+`cancel-in-progress` says. So each push to `main` has a group of its own,
+keyed on the pushed commit, and no two push runs ever share one. That leaves
+nothing for `cancel-in-progress` to spare, and it is a plain `true`.
+
+`workflow_dispatch` keeps the ref as its group, so a second dispatch on a
+branch cancels the first; the commit the first was for keeps its push run's
+result. Keying it on the commit instead would put it in that push run's
+group, and a dispatch would then cancel the push run's `coverage-main`, the
+Codecov base report for that commit.
+
+`queue: max`, which lets up to 100 runs wait in a group, is not a substitute
+for the group per commit. It takes a literal rather than an expression, so it
+would apply to pull request runs as well, and GitHub rejects it alongside
+`cancel-in-progress: true`, the one thing a pull request's group needs.
+Queued rather than parallel is also nothing a push run needs: each reads only
+its own tree and its own `github.event.before`.
+
+Three workflows outside this shape, `skip-ci-label.yml`,
+`lint-pull-request.yml` and `synstate-benchmark.yml`, do write
+`cancel-in-progress: ${{ github.event_name == '…' }}`, so that a run of their
+other triggers is left alone. The event name in that expression has to be one
+the workflow triggers on, or the expression is a constant and
+`cancel-in-progress` is silently off; `pnpm run check:root:workflow-event-name`
+holds the two in agreement, and a workflow whose trigger moves
+(`pull_request_target`) moves the name with it.
 
 ### Permissions
 
@@ -181,7 +208,7 @@ that file rather than writing it into the workflow.
 The two questions each check workflow has to answer before it is worth booting
 a matrix: is the pull request's branch up to date with the base branch, and
 does its diff touch anything the workflow reads? A third follows from the
-first: has an earlier run already reached a verdict on this head commit? One
+first: has an earlier run already reached a verdict on this tree? One
 reusable job answers all three, once per workflow run, and the caller turns
 the answers into job-level `if`s, the only thing that skips a job before a
 runner boots.
@@ -230,8 +257,8 @@ booted, since a job-level `if` is evaluated by GitHub itself:
 - **A diff that touches nothing the workflow reads**, decided by
   `check-should-run` from `ts-repo-utils` against one of the three
   `z:check-should-run:*` ignore lists in the root `package.json`.
-- **A verdict already reached on this head commit**, which the work would
-  only repeat.
+- **A verdict already reached on this tree**, which the work would only
+  repeat.
 
 The skipped conclusion satisfies a required status check in every case, so
 each needs something else to hold the merge, and each has one. Behind:
@@ -275,30 +302,80 @@ of their own, so what they mean is here:
   explains each entry.
 - **`none`** (`verify-published-packages.yml`) skips the diff question
   altogether, for a workflow that gates itself in shell; the gate then costs
-  one API call and no checkout.
+  a few API calls and no checkout. That workflow's own "nothing relevant"
+  has to skip its aggregate as `should_run: false` does (see "Reusing a
+  verdict").
 
 #### Reusing a verdict
 
-Every check job reads the pull request's head commit and nothing else, so a
-second run on the same head can only repeat the first one's verdict, pass or
-fail. Such runs are common: any label event (`merge-queued`, `bug`, …),
-`reopened`, and a `skip-ci` taken off a commit that was checked before it went
-on. So when an earlier run of the calling workflow on this head reached a
-verdict, its aggregate job's conclusion is handed back as `reused_result`, the
+A _verdict_ is what a run's aggregate job concluded: `success` or `failure`.
+A skipped aggregate is not one, and neither is a cancelled run's.
+
+Every check job checks out one commit (the pull request's head, or the pushed
+commit) and reads its tree and nothing else, workflow files included. So a
+second run on the same tree can only repeat the first one's verdict, pass or
+fail. When an earlier run of the calling workflow on this tree reached a
+verdict, its aggregate's conclusion is handed back as `reused_result`, the
 caller skips its work, and its aggregate reports that conclusion, green or
 red, never skipped.
 
-What makes "same head" enough is the branch question: the lookup only happens
-on an up-to-date branch of the default branch, where the commit that would be
-merged has the head's tree, workflow files included. Deliberately not reused:
-a cancelled run (its aggregate runs under `always()` and reads red, but says
-nothing about the commit); a skipped aggregate; anything when this is a re-run
-(`run_attempt` > 1) or not a `pull_request` event. "Re-run all jobs" and
-`workflow_dispatch` are how a person asks for the checks to actually run.
-"Re-run failed jobs" is not enough after a reused failure: it keeps the gate's
-outputs from the first attempt. Where several earlier runs have a verdict,
-the one whose aggregate completed last wins, so a flake re-run to green
-supersedes the red a later run reused from it.
+**The key is the tree, not the commit**, because the commit changes where the
+content does not. Such runs are common:
+
+- any label event (`merge-queued`, `bug`, …), `reopened`, and a `skip-ci`
+  taken off a commit that was checked before it went on;
+- a rebase that changes no content: `unblock-prs` rebases each queued pull
+  request onto `main` as the one before it merges, and a branch that already
+  contained the merged commits comes out with a new head and the same tree;
+- the squash commit a merge makes on `main`, whose tree is the up-to-date
+  head's (see "Triggers").
+
+The lookup happens on a `pull_request` onto the default branch whose branch is
+up to date with it (an earlier run made while the branch was behind has a
+skipped aggregate and is not a verdict), and on a `push` to the default
+branch. The candidates are runs of every event, since a pull request's verdict
+is what a push to `main` reuses: the calling workflow's latest 100 completed
+runs, a few days here, matched on the runs API's `head_commit.tree_id`. A
+matching run further back is not found and the checks simply run, as they do
+the first time a tree is seen.
+
+**A verdict has to be a function of the tree.** That is what makes reusing it
+by tree sound, and it is why a job whose result also depends on what it was
+compared with must not leave a verdict for that case.
+`verify-published-packages.yml` verifies only when the pins differ from its
+base, so "the pins did not move" skips its aggregate, the same answer the
+gate's `should_run: false` gives. A `success` there would say "nothing to
+verify against this base", and handed to a tree whose base differs — a revert
+back to older pins, say — it would pass pins nobody verified.
+
+Deliberately not reused:
+
+- a cancelled run: its aggregate runs under `always()` and reads red, but
+  says nothing about the tree;
+- a skipped aggregate;
+- a run on a fork's branch: with the tree as the key a verdict travels to
+  other pull requests and to `main`, and one reached on a branch outside
+  this repository is not one to hand on;
+- a run of a pull request onto a branch other than the default one. Such a
+  run executes the workflow files of its head merged into that base, and
+  the gate lets it run while behind, so its verdict is not one about the
+  head's tree. What the base was is recorded when the run happens, in the
+  name of the gate's first step (`Verdict reusable by tree: true|false`),
+  which the lookup reads back from the run's jobs; the runs API's
+  `pull_requests` cannot say it, since it describes the pull requests open
+  on that head now, after any retargeting, and is empty once they close. A
+  run from before the step existed recorded nothing and is not reused;
+- anything when this is a re-run (`run_attempt` > 1) or a
+  `workflow_dispatch`. "Re-run all jobs" and `workflow_dispatch` are how a
+  person asks for the checks to actually run. "Re-run failed jobs" is not
+  enough after a reused failure: it keeps the gate's outputs from the first
+  attempt.
+
+Where several earlier runs have a verdict, the one whose aggregate completed
+last wins, so a flake re-run to green supersedes the red a later run reused
+from it. A verdict that was itself reused is a verdict like any other; its
+`reused_from` names the run it came from, so the original is one link further
+on each time.
 
 #### Why a workflow of its own
 
@@ -308,9 +385,9 @@ payload alone; hence a job that computes them and a caller that reads its
 outputs. `workflow_call` rather than the same shell copied into each
 workflow, because there is one answer to give and one place to change it.
 
-This used to be a step inside every job, which meant each of the 22 matrix
-runners across three workflows booted, checked out and installed dependencies
-(about 45 seconds apiece) before finding out it had nothing to do. It could
+This used to be a step inside every job, which meant every matrix runner in
+every check workflow booted, checked out and installed dependencies (about 45
+seconds apiece) before finding out it had nothing to do. It could
 only move to job level once the `*-result` aggregates became the required
 contexts: a skipped matrix job produces one check run named after the job,
 never the matrix contexts, and while those were required a job-level skip
@@ -351,7 +428,8 @@ The clauses after `always()` are the skips that are not failures, and they are
 job-level on purpose: the aggregate then reports `skipped` for them, grey and
 satisfying the required check, rather than red. Something else holds the merge
 in each case (see "The gate"). `should_run` is among them only in the
-workflows that ask the diff question.
+workflows that ask the gate the diff question; `verify-published-packages.yml`
+answers it itself and reads its own job's `changed` there instead.
 
 The step itself reads `REUSED_RESULT` first (`success` passes, `failure`
 fails and says to use "Re-run all jobs"), then `RESULT`. A red aggregate does
@@ -534,7 +612,9 @@ can only narrow what the App already holds), so that the push triggers the
   late; `pnpm run check:root:workflow-run-names` checks that every name there
   is a workflow that exists.
 - **A check workflow calls `check-gates.yml`** with the caller shape above,
-  picks its `diff-scope`, and ends in an aggregate.
+  picks its `diff-scope`, and ends in an aggregate. Its verdict is reused by
+  tree, so a result that depends on anything else must skip the aggregate
+  rather than conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:ci-commands`,
   `check:root:workflow-event-name`, `check:root:workflow-run-names`,
   `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself

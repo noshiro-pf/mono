@@ -218,8 +218,9 @@ particular to it. Here is only what a session has to act on.
   satisfies a required check. A new matrix entry needs nothing; a new job or
   workflow needs its aggregate context added there, or it runs and blocks
   nothing. A red aggregate does not name what failed; open the run.
-- Nothing but `code-check.yml`'s coverage job runs on `main`, so **after a
-  bypass merge run the workflows by hand**.
+- **A push to `main` runs the check workflows too.** A merged tree that
+  already has a verdict costs one gate job; one that has none, as a bypass
+  merge can land, is checked in full. Nothing needs running by hand.
 - **`skip-ci`** skips every check and boots no runner; the `no-skip-ci-label`
   status (`skip-ci-label.yml`) is the only thing holding the merge while it is
   on. Taking it off is what starts the checks. Any label event re-runs them,
@@ -227,7 +228,8 @@ particular to it. Here is only what a session has to act on.
 - `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
   strings are in the workflows and `tools/scripts/cmd/unblock-prs/`. Change
   them everywhere or nowhere.
-- **A commit already checked is not checked again**, failure included.
+- **A tree already checked is not checked again** — after a rebase that
+  changes no content, on another pull request, on `main` — failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
 - **A branch behind `main` runs nothing**; the update re-runs everything.
 - **A diff a workflow does not read skips it**, by the `z:check-should-run:*`

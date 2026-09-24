@@ -5,13 +5,9 @@ name: Code Check
 # The check workflow shape — triggers, concurrency, `permissions: {}`, the
 # gate, the aggregate — is in README.md. What is particular to this one: a
 # `build` job that serves `dist/` to the matrix, and a `coverage-main` job
-# that is the one thing in the repository run on a push to `main`.
+# that uploads coverage on a push to `main` when the matrix does not run.
 
 on:
-  # The only `push` trigger among the check workflows, and on `main` only
-  # `coverage-main` runs on it: Codecov compares a pull request's coverage
-  # against the base commit's report, and the base commit is one on `main`.
-  # See "Triggers" in README.md for why nothing else runs there.
   push:
     branches:
       - main
@@ -27,8 +23,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -45,6 +41,9 @@ jobs:
     with:
       diff-scope: code
       result-job: code-check-result
+      # `coverage-main` runs on a reused verdict and skips on an irrelevant
+      # diff, so on a push the diff question is asked either way.
+      diff-when-reused: ${{ github.event_name == 'push' }}
 
   # `ws:build` once, for every entry of the matrix below to unpack — see "The
   # `dist/` artifact" in README.md.
@@ -64,12 +63,9 @@ jobs:
     needs: gates
     # This is where the gate lives: the matrix below waits on this job, so
     # everything that skips the checks skips them by skipping this. The
-    # clauses are the caller shape from README.md plus `!= 'push'`: a push is
-    # a merge of a tree this matrix has already run on, and `coverage-main`
-    # is what a push runs.
+    # clauses are the caller shape from README.md.
     if: >-
       !cancelled() &&
-      github.event_name != 'push' &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false' &&
@@ -224,9 +220,12 @@ jobs:
         if: matrix.command == 'ws:check:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
-  # What a push to main runs: the `ws:check:test:cov` entry of the matrix above
-  # and nothing else, so that Codecov has a report on the base commit to
-  # compare a pull request's against.
+  # What a push to main runs when the matrix above reused a verdict: its
+  # `ws:check:test:cov` entry and nothing else, so that Codecov has a report
+  # on the base commit to compare a pull request's against. The upload is the
+  # point of this job, so a verdict cannot stand in for it. When the matrix
+  # does run on a push — no verdict matched, or the gate failed to answer —
+  # its own `ws:check:test:cov` entry uploads, and this job stays out of it.
   #
   # A job of its own rather than a step condition inside the matrix job,
   # because a matrix entry that boots a runner and skips every step still
@@ -234,13 +233,15 @@ jobs:
   # setup steps are the matrix job's, repeated; keep the two in step.
   #
   # Gated on the diff exactly as the matrix is — `gates` compares against
-  # `github.event.before` on main — so a merge that touched nothing the
-  # tests read uploads nothing, as it did not before either.
+  # `github.event.before` on main, and answers that even for a reused verdict
+  # (`diff-when-reused`) — so a merge that touched nothing the tests read
+  # uploads nothing.
   coverage-main:
     needs: gates
     if: >-
       !cancelled() &&
       github.event_name == 'push' &&
+      needs.gates.outputs.reused_result != '' &&
       needs.gates.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     permissions:
@@ -281,8 +282,7 @@ jobs:
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
 
   # The one required status check for this workflow — see "The aggregate job"
-  # in README.md. Not on `push` either: the matrix does not run there, and
-  # there is no pull request on main for a required check to hold.
+  # in README.md.
   code-check-result:
     needs:
       - gates
@@ -290,7 +290,6 @@ jobs:
       - code-check
     if: >-
       always() &&
-      github.event_name != 'push' &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
       needs.gates.outputs.branch_up_to_date != 'false' &&
       needs.gates.outputs.should_run != 'false'
@@ -311,11 +310,11 @@ jobs:
         run: |
           case "${REUSED_RESULT}" in
             success)
-              echo "The checks already passed on this commit: ${REUSED_FROM}"
+              echo "The checks already passed on this tree: ${REUSED_FROM}"
               exit 0
               ;;
             failure)
-              summary="The checks already failed on this commit: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
+              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
               echo "${summary}"
               echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
               exit 1

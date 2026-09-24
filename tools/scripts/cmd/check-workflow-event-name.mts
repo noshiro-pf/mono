@@ -14,15 +14,15 @@ import { projectRootPath } from '../project-root-path.mjs';
  * symptom: nothing errors, nothing is red, and the expression quietly stops
  * being a condition.
  *
- * Seven workflows here are built on one: `cancel-in-progress` is written as
- * `${{ github.event_name == 'pull_request' }}` rather than `true` so that a
- * `workflow_dispatch` or `push` run is left alone. Left naming the old event
- * after a trigger moves, that expression turns `cancel-in-progress` off
- * altogether — and in `skip-ci-label.yml` that is a `labeled` run writing
- * `pending` after the `unlabeled` run wrote `success`, leaving a pull request
- * blocked with no label on it. The same sentence is one edit in the `on:`
- * block away in every one of them, which is why this is asked of the
- * directory rather than of one file.
+ * Three workflows here are built on one: `cancel-in-progress` is written as
+ * `${{ github.event_name == 'pull_request' }}` (or `'pull_request_target'`)
+ * rather than `true` so that a run of their other triggers is left alone.
+ * Left naming the old event after a trigger moves, that expression turns
+ * `cancel-in-progress` off altogether — and in `skip-ci-label.yml` that is a
+ * `labeled` run writing `pending` after the `unlabeled` run wrote `success`,
+ * leaving a pull request blocked with no label on it. The same sentence is
+ * one edit in the `on:` block away in every one of them, which is why this is
+ * asked of the directory rather than of one file.
  *
  * A workflow reached through `workflow_call` is not asked. Inside a reusable
  * workflow `github.event_name` is the *caller's* event, never `workflow_call`,

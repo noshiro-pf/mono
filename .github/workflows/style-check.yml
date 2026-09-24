@@ -6,6 +6,10 @@ name: Style Check
 # is that the tree is clean afterwards.
 
 on:
+  push:
+    branches:
+      - main
+
   pull_request:
     types:
       - opened
@@ -17,8 +21,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -166,11 +170,11 @@ jobs:
         run: |
           case "${REUSED_RESULT}" in
             success)
-              echo "The checks already passed on this commit: ${REUSED_FROM}"
+              echo "The checks already passed on this tree: ${REUSED_FROM}"
               exit 0
               ;;
             failure)
-              summary="The checks already failed on this commit: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
+              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
               echo "${summary}"
               echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
               exit 1
