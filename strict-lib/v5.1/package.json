@@ -1,6 +1,6 @@
 {
   "name": "strict-ts-lib-v5.1-source",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "private": true,
   "description": "Generator harness for TypeScript 5.1 strict lib packages",
   "license": "Apache-2.0",

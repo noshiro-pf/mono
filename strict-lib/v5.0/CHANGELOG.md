@@ -1,5 +1,19 @@
 # strict-ts-lib-v5.0-source
 
+## 0.6.4
+
+### Patch Changes
+
+- 4ad8086: The published bundles now carry the attribution Apache-2.0 asks of a
+  derivative work.
+
+    Every generated declaration file is a rewrite of a TypeScript lib file, which
+    is Copyright Microsoft Corporation under Apache-2.0. The generator used to
+    strip the upstream copyright banner and the bundles shipped no license text.
+    Now each file keeps the banner and states beneath it that it was modified,
+    and each bundle ships `LICENSE` and a `NOTICE` naming the upstream commit it
+    was generated from. Nothing about the declarations themselves changed.
+
 ## 0.6.3
 
 ### Patch Changes
