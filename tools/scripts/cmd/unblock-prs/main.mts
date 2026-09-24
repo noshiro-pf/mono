@@ -2,15 +2,20 @@ import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
-import { checkPreflight, viewPullRequest } from './github.mjs';
+import {
+  checkPreflight,
+  postSetAsideStatus,
+  viewPullRequest,
+} from './github.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
 import { advance } from './rebase.mjs';
-import { pruneSkips, withSkip } from './skips.mjs';
+import { newSkips, pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
   type CycleResult,
   type LoopState,
   type PullRequest,
+  type SkipRecord,
   type SkipRecords,
   type WatchOutcome,
 } from './types.mjs';
@@ -159,6 +164,10 @@ const unblockPrs = async (
   while (!stopRequested()) {
     const cycle = await runCycle(defaultBranch, mut_state, options);
 
+    if (!options.dryRun) {
+      await announceSetAside(newSkips(mut_state.skipped, cycle.state.skipped));
+    }
+
     mut_state = cycle.state;
 
     if (cycle.next === 'stop' || options.once || options.dryRun) {
@@ -175,6 +184,30 @@ const unblockPrs = async (
   }
 
   return Result.ok(undefined);
+};
+
+/**
+ * Says on each newly set-aside pull request why, where GitHub keeps it, so
+ * that finding out does not mean finding the terminal this ran in. A status
+ * that could not be written is reported and nothing more: the job is to land
+ * pull requests, and this is not a reason to stop.
+ */
+const announceSetAside = async (
+  skips: readonly SkipRecord[],
+): Promise<void> => {
+  for (const skip of skips) {
+    const posted = await postSetAsideStatus(skip.headSha, {
+      reason: skip.reason,
+      baseSha: skip.baseSha,
+      detail: skip.detail,
+    });
+
+    if (Result.isErr(posted)) {
+      log(
+        `#${skip.number}: could not leave a status saying why: ${posted.value}`,
+      );
+    }
+  }
 };
 
 const runCycle = async (

@@ -3,6 +3,7 @@
  * how long.
  */
 
+import { setAsideStillApplies } from 'pr-report-core';
 import {
   type PullRequest,
   type SkipRecord,
@@ -26,14 +27,17 @@ import {
  * the same failing matrix through again, and fixing the failure is the
  * skill's job, not this script's — the push that carries the fix is what
  * clears it.
+ *
+ * The base half is `pr-report-core`'s `setAsideStillApplies`, because the
+ * Pull Requests Manager page applies the same rule to the status this script
+ * leaves on the pull request.
  */
 export const skipStillApplies = (
   skip: SkipRecord,
   pr: PullRequest,
   baseSha: string,
 ): boolean =>
-  skip.headSha === pr.headRefOid &&
-  (skip.reason === 'checks-failed' || skip.baseSha === baseSha);
+  skip.headSha === pr.headRefOid && setAsideStillApplies(skip, baseSha);
 
 /** Drops records for pull requests that are gone or have moved on. */
 export const pruneSkips = (
@@ -53,3 +57,23 @@ export const pruneSkips = (
 
 export const withSkip = (skipped: SkipRecords, skip: SkipRecord): SkipRecords =>
   new Map([...skipped, [skip.number, skip]]);
+
+/**
+ * The records in `after` that `before` did not have — a pull request newly
+ * set aside, or set aside again for a different reason or in a different
+ * state. What the loop writes to GitHub, once each, rather than on every
+ * survey that finds the same record standing.
+ */
+export const newSkips = (
+  before: SkipRecords,
+  after: SkipRecords,
+): readonly SkipRecord[] =>
+  Array.from(after.values()).filter((skip) => {
+    const previous = before.get(skip.number);
+
+    return (
+      previous?.headSha !== skip.headSha ||
+      previous.baseSha !== skip.baseSha ||
+      previous.reason !== skip.reason
+    );
+  });

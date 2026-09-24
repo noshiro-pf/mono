@@ -30,6 +30,9 @@ order and the counts a report leads with cannot differ between the two.
   contexts, and whether code owners have to approve. Parsed from its text,
   because the command reads it from the checkout and the page from the
   default branch.
+- **`set-aside.mts`** — the commit status `unblock-prs` leaves on a pull
+  request it passes over: its context, the description it writes and the page
+  reads back, and how long it applies.
 - **`labels.mts`** — `skip-ci`, `merge-queued` and `blocks-release`. They
   exist only on GitHub, so these strings and the ones in
   `.github/workflows/` are the whole of their declaration.

@@ -49,7 +49,7 @@ const CONTEXT_NODES = [
   'nodes {',
   '  __typename',
   '  ... on CheckRun { databaseId name status conclusion checkSuite { databaseId } }',
-  '  ... on StatusContext { context state }',
+  '  ... on StatusContext { context state description }',
   '}',
 ].join(' ');
 
@@ -62,10 +62,11 @@ export const REPORT_QUERY = [
   `    open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC }) {`,
   '      totalCount',
   '      nodes {',
-  '        number title body isDraft url updatedAt mergeable',
+  '        number title body isDraft url updatedAt',
   '        author { login }',
   '        autoMergeRequest { enabledAt }',
   '        headRefName headRefOid baseRefName',
+  '        baseRef { target { oid } }',
   `        ${LABELS}`,
   `        ${CLOSING_ISSUES}`,
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
@@ -227,6 +228,7 @@ const ContextSchema = t.union([
     __typename: t.literal('StatusContext'),
     context: t.string(),
     state: t.string(),
+    description: t.union([t.string(), t.nullType]),
   }),
 ]);
 
@@ -255,12 +257,19 @@ const OpenPullRequestSchema = t.record({
   isDraft: t.boolean(),
   url: t.string(),
   updatedAt: t.string(),
-  mergeable: t.string(),
   author: AuthorSchema,
   autoMergeRequest: t.union([t.record({}), t.nullType]),
   headRefName: t.string(),
   headRefOid: t.string(),
   baseRefName: t.string(),
+  /**
+   * The base branch's tip now, which is what a set-aside status is judged
+   * against. `null` when the base branch has been deleted.
+   */
+  baseRef: t.union([
+    t.record({ target: t.union([t.record({ oid: t.string() }), t.nullType]) }),
+    t.nullType,
+  ]),
   labels: LabelsSchema,
   closingIssuesReferences: ClosingIssuesSchema,
   latestOpinionatedReviews: t.record({

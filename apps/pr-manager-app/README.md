@@ -18,9 +18,13 @@ behind its base.
 And the two things that stop a pull request that is otherwise ready, which
 nothing on GitHub's own list shows:
 
-- **It conflicts with its base.** This is the pull request `unblock-prs` sets
-  aside: its rebase stops on the conflict, and nothing but a person will move
-  it again.
+- **`unblock-prs` set it aside**, and why: a rebase that conflicted, a push
+  that was refused, a watch that timed out. The script leaves a commit status
+  on the head it gave up on, and the page reads it from the check results it
+  already fetches. Not GitHub's own `mergeable`, which says whether a _merge_
+  conflicts — the script rebases, and a chained pull request whose parent was
+  squash-merged is where the two answers part. Once the base has moved the
+  badge turns grey: the next run tries again.
 - **It waits for a code owner.** `main`'s ruleset asks for no approvals, except
   a code owner's on the paths `.github/CODEOWNERS` lists — so a pull request
   touching one stays green and never merges. When the author is the only

@@ -1,5 +1,10 @@
 /** Everything that shells out to `gh` or `git`, and nothing that decides. */
 
+import {
+  describeSetAside,
+  SET_ASIDE_CONTEXT,
+  type SetAside,
+} from 'pr-report-core';
 import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $ } from 'ts-repo-utils';
@@ -90,6 +95,39 @@ export const remoteSha = async (
     ? Result.err(`origin has no branch named ${branch}`)
     : Result.ok(sha);
 };
+
+/**
+ * Leaves a `failure` commit status on the head a pull request was set aside
+ * at, saying why and against which base. `pr-report-core`'s `set-aside.mts`
+ * says what reads it and why it is a status rather than a label or a
+ * comment.
+ */
+export const postSetAsideStatus = async (
+  headSha: string,
+  setAside: SetAside,
+): Promise<Result<undefined, string>> => {
+  if (!SHA.test(headSha)) {
+    return Result.err(`unexpected head SHA: ${JSON.stringify(headSha)}`);
+  }
+
+  const posted = await git(
+    [
+      'gh api --method POST',
+      // `{owner}` and `{repo}` are `gh api`'s placeholders for the
+      // repository of the working directory, not interpolations.
+      sh([STATUSES_ROUTE, headSha].join('/')),
+      '-f state=failure',
+      `-f ${sh(`context=${SET_ASIDE_CONTEXT}`)}`,
+      `-f ${sh(`description=${describeSetAside(setAside)}`)}`,
+    ].join(' '),
+  );
+
+  return Result.isErr(posted) ? posted : Result.ok(undefined);
+};
+
+const SHA = /^[0-9a-f]{40}$/u;
+
+const STATUSES_ROUTE = 'repos/{owner}/{repo}/statuses';
 
 /**
  * Runs a git or gh command silently and resolves to its stdout, or to a
