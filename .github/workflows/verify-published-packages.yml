@@ -15,9 +15,14 @@ name: Verify Published Packages
 #
 # The check workflow shape — triggers, concurrency, `permissions: {}`, the
 # gate, the aggregate — is in README.md. What is particular to this one: the
-# diff question is answered in shell here rather than by the gate.
+# diff question is answered in shell here rather than by the gate, and its
+# "no" skips the aggregate exactly as the gate's `should_run: false` would.
 
 on:
+  push:
+    branches:
+      - main
+
   pull_request:
     types:
       - opened
@@ -29,8 +34,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
@@ -56,6 +61,7 @@ jobs:
   verify-published:
     needs: gates
     # No `should_run` clause: the gate was not asked the diff question.
+    # `changed` is this job's answer to it, read by the aggregate below.
     if: >-
       !cancelled() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
@@ -65,6 +71,9 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 20
+
+    outputs:
+      changed: ${{ steps.pins.outputs.changed }}
 
     steps:
       - name: Checkout
@@ -79,16 +88,32 @@ jobs:
 
       - name: Check whether the pins changed
         id: pins
+        env:
+          BEFORE: ${{ github.event.before }}
         run: |
           if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
             echo 'changed=true' >>"${GITHUB_OUTPUT}"
             exit 0
           fi
 
-          # The merge base, not main's tip: once `pnpm-update` moves the pins
-          # on main, a two-dot diff calls that a change made here and runs
-          # this against the branch's older pins.
-          base="$(git merge-base origin/main HEAD)"
+          if [ "${GITHUB_EVENT_NAME}" = 'push' ]; then
+            # On main the merge base below is HEAD itself, so the diff would
+            # always be empty: every push would read "unchanged" and a bypass
+            # merge that moved the pins would never be verified. Compare with
+            # what main pointed at before the push instead, as the gate's
+            # diff does; with no such commit, verify.
+            if [ -z "${BEFORE}" ] || [ "${BEFORE}" = '0000000000000000000000000000000000000000' ]; then
+              echo 'changed=true' >>"${GITHUB_OUTPUT}"
+              exit 0
+            fi
+
+            base="${BEFORE}"
+          else
+            # The merge base, not main's tip: once `pnpm-update` moves the
+            # pins on main, a two-dot diff calls that a change made here and
+            # runs this against the branch's older pins.
+            base="$(git merge-base origin/main HEAD)"
+          fi
 
           # Assigned rather than piped into `grep -q`, which reports grep's
           # status: `git diff` failing on an unresolvable base came back as
@@ -98,6 +123,10 @@ jobs:
           if [ -n "${changed_files}" ]; then
             echo 'changed=true' >>"${GITHUB_OUTPUT}"
           else
+            # `false` only here, where the question was answered: an empty
+            # output — this step never reached, or the job skipped for a
+            # reused verdict — keeps the aggregate running.
+            echo 'changed=false' >>"${GITHUB_OUTPUT}"
             echo 'The published pins did not change; nothing to verify.'
           fi
 
@@ -121,7 +150,12 @@ jobs:
         run: pnpm run verify:npm-packages:published
 
   # The one required status check for this workflow — see "The aggregate job"
-  # in README.md. No `should_run` clause, as above.
+  # in README.md. `changed` stands where the others have `should_run`: pins
+  # that did not move are a diff this workflow does not read, so the
+  # aggregate reports `skipped` rather than a `success` that verified
+  # nothing. That `success` would be a verdict about the tree *and* the base
+  # it was compared with, and a verdict is reused by tree alone — see
+  # "Reusing a verdict" in README.md.
   verify-published-result:
     needs:
       - gates
@@ -129,7 +163,8 @@ jobs:
     if: >-
       always() &&
       (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false'
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.verify-published.outputs.changed != 'false'
     runs-on: ubuntu-latest
     permissions: {}
     timeout-minutes: 5
@@ -143,11 +178,11 @@ jobs:
         run: |
           case "${REUSED_RESULT}" in
             success)
-              echo "The checks already passed on this commit: ${REUSED_FROM}"
+              echo "The checks already passed on this tree: ${REUSED_FROM}"
               exit 0
               ;;
             failure)
-              summary="The checks already failed on this commit: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
+              summary="The checks already failed on this tree: ${REUSED_FROM} — use \"Re-run all jobs\" to run them again."
               echo "${summary}"
               echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
               exit 1
