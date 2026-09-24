@@ -161,7 +161,8 @@ const findVariable = (
 ): TSESLint.Scope.Variable | undefined => {
   const variable = scope.set.get(name);
 
-  if (variable !== undefined) return variable;
-
-  return scope.upper === null ? undefined : findVariable(scope.upper, name);
+  return (
+    variable ??
+    (scope.upper === null ? undefined : findVariable(scope.upper, name))
+  );
 };

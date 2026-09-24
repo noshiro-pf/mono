@@ -93,11 +93,9 @@ export const updatePollTitle = async (
       ),
     ]);
 
-  if (Result.isErr(updateSummaryMessageResult)) {
-    return updateSummaryMessageResult;
-  }
-
-  return Result.isErr(updateTitleMessageResult)
-    ? updateTitleMessageResult
-    : fixAnswerAndUpdateMessage(messages, newPoll);
+  return Result.isErr(updateSummaryMessageResult)
+    ? updateSummaryMessageResult
+    : Result.isErr(updateTitleMessageResult)
+      ? updateTitleMessageResult
+      : fixAnswerAndUpdateMessage(messages, newPoll);
 };

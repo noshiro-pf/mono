@@ -22,11 +22,12 @@ export const isNumber = (
 
   const body = term[2][2];
 
-  const sub = (t: LambdaTerm): boolean => {
-    if (isVariable(t)) return t === z;
-
-    return isApplication(t) ? t[0] === s && sub(t[1]) : false;
-  };
+  const sub = (t: LambdaTerm): boolean =>
+    isVariable(t)
+      ? t === z
+      : isApplication(t)
+        ? t[0] === s && sub(t[1])
+        : false;
 
   // ToDo
   return sub(body);

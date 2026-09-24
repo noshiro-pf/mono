@@ -76,13 +76,12 @@ export type CheckRunReport = Readonly<{
 export const classifyCheckRun = (
   status: string,
   conclusion: string | undefined,
-): ContextState => {
-  if (status !== 'completed') return 'pending';
-
-  return conclusion !== undefined && PASSING_CONCLUSIONS.has(conclusion)
-    ? 'passed'
-    : 'failed';
-};
+): ContextState =>
+  status !== 'completed'
+    ? 'pending'
+    : conclusion !== undefined && PASSING_CONCLUSIONS.has(conclusion)
+      ? 'passed'
+      : 'failed';
 
 const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set([
   'neutral',

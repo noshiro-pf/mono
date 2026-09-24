@@ -46,15 +46,11 @@ const isPropertyAccess = (
 ): boolean => {
   const parent = identifier.parent;
 
-  if (parent.type === AST_NODE_TYPES.MemberExpression) {
-    return parent.object === identifier && !parent.computed;
-  }
-
-  if (parent.type === AST_NODE_TYPES.TSQualifiedName) {
-    return parent.left === identifier;
-  }
-
-  return parent.type === AST_NODE_TYPES.JSXMemberExpression
-    ? parent.object === identifier
-    : false;
+  return parent.type === AST_NODE_TYPES.MemberExpression
+    ? parent.object === identifier && !parent.computed
+    : parent.type === AST_NODE_TYPES.TSQualifiedName
+      ? parent.left === identifier
+      : parent.type === AST_NODE_TYPES.JSXMemberExpression
+        ? parent.object === identifier
+        : false;
 };

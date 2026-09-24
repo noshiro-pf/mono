@@ -12,11 +12,11 @@ const toOxlintRuleName = (code: string): string | undefined => {
 
   const rule = groups?.['rule'];
 
-  if (plugin === undefined || rule === undefined || plugin === 'sumi') {
-    return undefined;
-  }
-
-  return plugin === 'eslint' ? rule : `${plugin}/${rule}`;
+  return plugin === undefined || rule === undefined || plugin === 'sumi'
+    ? undefined
+    : plugin === 'eslint'
+      ? rule
+      : `${plugin}/${rule}`;
 };
 
 /**

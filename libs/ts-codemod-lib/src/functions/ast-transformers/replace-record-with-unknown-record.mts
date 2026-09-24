@@ -198,15 +198,9 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
   }
 
   // Handles `readonly T[]`, `readonly [...]`, `keyof T`
-  if (tsm.Node.isTypeOperatorTypeNode(node)) {
-    return visitTypeNode(node.getTypeNode());
-  }
-
-  if (tsm.Node.isRestTypeNode(node)) {
-    return visitTypeNode(node.getTypeNode());
-  }
-
-  return tsm.Node.isNamedTupleMember(node)
+  return tsm.Node.isTypeOperatorTypeNode(node) ||
+    tsm.Node.isRestTypeNode(node) ||
+    tsm.Node.isNamedTupleMember(node)
     ? visitTypeNode(node.getTypeNode())
     : false;
 };

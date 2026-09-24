@@ -36,11 +36,11 @@ export const parseClosingIssueRefs = (
       .flatMap((match) => {
         const { number, owner, repo: name, urlNumber } = match.groups ?? {};
 
-        if (number !== undefined) return readNumber(number);
-
-        return owner === repo.owner && name === repo.name
-          ? readNumber(urlNumber ?? '')
-          : [];
+        return number !== undefined
+          ? readNumber(number)
+          : owner === repo.owner && name === repo.name
+            ? readNumber(urlNumber ?? '')
+            : [];
       })
       .toArray(),
   );

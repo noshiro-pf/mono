@@ -182,11 +182,14 @@ export type DayOfWeekName =
  * const formatHour = (hour: HoursEnum): string =>
  *   hour.toString().padStart(2, '0');
  *
- * const is12HourFormat = (hour: HoursEnum): string => {
- *   if (hour === 0) return '12 AM';
- *   if (hour === 12) return '12 PM';
- *   return hour < 12 ? `${hour} AM` : `${hour - 12} PM`;
- * };
+ * const is12HourFormat = (hour: HoursEnum): string =>
+ *   hour === 0
+ *     ? '12 AM'
+ *     : hour === 12
+ *       ? '12 PM'
+ *       : hour < 12
+ *         ? `${hour} AM`
+ *         : `${hour - 12} PM`;
  *
  * const midnight = 0 satisfies HoursEnum;
  * const noon = 12 satisfies HoursEnum;

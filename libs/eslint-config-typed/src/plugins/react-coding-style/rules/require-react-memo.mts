@@ -121,13 +121,12 @@ export const requireReactMemoRule: TSESLint.RuleModule<MessageIds, Options> = {
 
 const normalizeNames = (
   names: string | undefined | readonly string[],
-): ReadonlySet<string> => {
-  if (names === undefined) {
-    return new Set();
-  }
-
-  return typeof names === 'string' ? new Set([names]) : new Set(names);
-};
+): ReadonlySet<string> =>
+  names === undefined
+    ? new Set()
+    : typeof names === 'string'
+      ? new Set([names])
+      : new Set(names);
 
 /** The function the given node belongs to, nested functions being the nearest. */
 const getEnclosingFunction = (

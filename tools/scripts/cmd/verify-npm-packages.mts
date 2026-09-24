@@ -296,16 +296,14 @@ const collectPaths = (manifest: JsonValue): readonly string[] => {
 /** `exports` nests conditions arbitrarily deep; every leaf string is a path. */
 const collectExportsPaths = (
   exportsField: JsonValue | undefined,
-): readonly string[] => {
-  if (isString(exportsField)) return [exportsField];
-
-  if (Arr.isArray(exportsField))
-    return exportsField.flatMap(collectExportsPaths);
-
-  return isRecord(exportsField)
-    ? Object.values(exportsField).flatMap(collectExportsPaths)
-    : [];
-};
+): readonly string[] =>
+  isString(exportsField)
+    ? ([exportsField] as const)
+    : Arr.isArray(exportsField)
+      ? exportsField.flatMap(collectExportsPaths)
+      : isRecord(exportsField)
+        ? Object.values(exportsField).flatMap(collectExportsPaths)
+        : ([] as const);
 
 /**
  * Writes the space: one project per package, each depending only on that

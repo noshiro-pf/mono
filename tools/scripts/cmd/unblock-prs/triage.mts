@@ -398,15 +398,13 @@ const outOfScopeReason = (
   // Nothing here merges anything — auto-merge does, once the checks are
   // green. A queued pull request without it would be released from
   // `skip-ci`, go green, and sit there.
-  if (!isRecord(pr.autoMergeRequest)) return 'auto-merge is not enabled';
-
-  if (pr.isDraft) return 'draft';
-
-  if (pr.baseRefName !== context.defaultBranch) {
-    return `base is ${pr.baseRefName}`;
-  }
-
-  return !isSafeRefName(pr.headRefName)
-    ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
-    : undefined;
+  return !isRecord(pr.autoMergeRequest)
+    ? 'auto-merge is not enabled'
+    : pr.isDraft
+      ? 'draft'
+      : pr.baseRefName !== context.defaultBranch
+        ? `base is ${pr.baseRefName}`
+        : !isSafeRefName(pr.headRefName)
+          ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
+          : undefined;
 };

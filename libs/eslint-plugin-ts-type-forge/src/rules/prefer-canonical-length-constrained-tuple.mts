@@ -140,9 +140,9 @@ const canonicalNameFor = (
       : MUTABLE_MIN_LENGTH_TUPLE_TYPE_NAME;
   }
 
-  if (fixedCount < MIN_FIXED_LENGTH) return undefined;
-
-  return isReadonly
-    ? FIXED_LENGTH_TUPLE_TYPE_NAME
-    : MUTABLE_FIXED_LENGTH_TUPLE_TYPE_NAME;
+  return fixedCount < MIN_FIXED_LENGTH
+    ? undefined
+    : isReadonly
+      ? FIXED_LENGTH_TUPLE_TYPE_NAME
+      : MUTABLE_FIXED_LENGTH_TUPLE_TYPE_NAME;
 };

@@ -11,7 +11,9 @@ export const getPlatform = (): 'mac' | 'other' | 'windows' => {
   // eslint-disable-next-line unicorn/prefer-global-this
   const platform = window.navigator.platform.toUpperCase();
 
-  if (platform.includes('MAC')) return 'mac';
-
-  return platform.includes('WIN') ? 'windows' : 'other';
+  return platform.includes('MAC')
+    ? 'mac'
+    : platform.includes('WIN')
+      ? 'windows'
+      : 'other';
 };

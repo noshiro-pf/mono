@@ -172,11 +172,11 @@ export const removePaneAt = (
 
   const second = removePaneAt(node.second, targetPaneId);
 
-  if (first === undefined) {
-    return second;
-  }
-
-  return second === undefined ? first : { ...node, first, second };
+  return first === undefined
+    ? second
+    : second === undefined
+      ? first
+      : { ...node, first, second };
 };
 
 /** Sets the ratio of the split node at `path`, clamped away from the edges. */

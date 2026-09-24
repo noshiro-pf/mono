@@ -749,11 +749,11 @@ const readStringAt = (
   const walk = (current: unknown, rest: readonly string[]): unknown => {
     const [head, ...tail] = rest;
 
-    if (head === undefined) return current;
-
-    return !isRecord(current) || !hasKey(current, head)
-      ? undefined
-      : walk(current[head], tail);
+    return head === undefined
+      ? current
+      : !isRecord(current) || !hasKey(current, head)
+        ? undefined
+        : walk(current[head], tail);
   };
 
   const found = walk(source, keyPath);

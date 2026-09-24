@@ -9,6 +9,7 @@ import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferDedent } from './prefer-dedent.mjs';
 import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
 import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-when-safe.mjs';
+import { preferTernary } from './prefer-ternary.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
@@ -21,4 +22,5 @@ export const tsRestrictionsRules = {
   'prefer-dedent': preferDedent,
   'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
   'prefer-nullish-coalescing-when-safe': preferNullishCoalescingWhenSafe,
+  'prefer-ternary': preferTernary,
 } as const satisfies ESLintPlugin['rules'];

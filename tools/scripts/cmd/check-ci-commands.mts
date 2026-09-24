@@ -224,11 +224,11 @@ export const matchScriptNames = (
       : scriptNames.filter((name) => expression.value.test(name));
   }
 
-  if (pattern.includes('*')) {
-    return scriptNames.filter((name) => matchesGlob(pattern, name));
-  }
-
-  return scriptNames.includes(pattern) ? [pattern] : [];
+  return pattern.includes('*')
+    ? scriptNames.filter((name) => matchesGlob(pattern, name))
+    : scriptNames.includes(pattern)
+      ? [pattern]
+      : [];
 };
 
 /**

@@ -132,13 +132,12 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
 
 const normalizeNames = (
   names: string | undefined | readonly string[],
-): ReadonlySet<string> => {
-  if (names === undefined) {
-    return new Set();
-  }
-
-  return typeof names === 'string' ? new Set([names]) : new Set(names);
-};
+): ReadonlySet<string> =>
+  names === undefined
+    ? new Set()
+    : typeof names === 'string'
+      ? new Set([names])
+      : new Set(names);
 
 const getDisplayNameAssignment = (
   node: DeepReadonly<TSESTree.VariableDeclarator>,
@@ -176,15 +175,8 @@ const getDisplayNameAssignment = (
 
   const nextStatement = program.body[componentIndex + 1];
 
-  if (nextStatement === undefined) {
-    return undefined;
-  }
-
-  if (nextStatement.type !== AST_NODE_TYPES.ExpressionStatement) {
-    return undefined;
-  }
-
-  return nextStatement.expression.type !== AST_NODE_TYPES.AssignmentExpression
+  return nextStatement?.type !== AST_NODE_TYPES.ExpressionStatement ||
+    nextStatement.expression.type !== AST_NODE_TYPES.AssignmentExpression
     ? undefined
     : nextStatement.expression;
 };
