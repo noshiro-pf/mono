@@ -86,16 +86,22 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
           callee.property.type === AST_NODE_TYPES.Identifier &&
           callee.property.name === 'parseInt';
 
-        if (!isGlobalParseInt && !isNumberParseInt) return;
+        if (!isGlobalParseInt && !isNumberParseInt) {
+          return;
+        }
 
         const args = node.arguments;
 
         const firstArg = args[0];
 
-        if (firstArg === undefined) return;
+        if (firstArg === undefined) {
+          return;
+        }
 
         // Spread argument (`parseInt(...rest)`) cannot be rewritten safely.
-        if (firstArg.type === AST_NODE_TYPES.SpreadElement) return;
+        if (firstArg.type === AST_NODE_TYPES.SpreadElement) {
+          return;
+        }
 
         // Only base 10: accept a missing radix or an explicit literal `10`.
         if (args.length >= 2) {
@@ -109,17 +115,23 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
         // The argument must be a `string` so the autofix is type-safe against
         // `SafeNumber.parseInteger(value: string)`. Without type information,
         // skip.
-        if (services?.program == null) return;
+        if (services?.program == null) {
+          return;
+        }
 
         const checker = services.program.getTypeChecker();
 
         const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
 
-        if (tsNode === undefined) return;
+        if (tsNode === undefined) {
+          return;
+        }
 
         const argType = checker.getTypeAtLocation(tsNode);
 
-        if (!isStringType(argType)) return;
+        if (!isStringType(argType)) {
+          return;
+        }
 
         mut_nodesToFix.push({ node, argExpression: firstArg });
       },

@@ -71,7 +71,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
         services.esTreeNodeToTSNodeMap.get(node),
       );
 
-      if (symbol === undefined) return false;
+      if (symbol === undefined) {
+        return false;
+      }
 
       const resolved =
         (symbol.flags & ts.SymbolFlags.Alias) !== 0
@@ -95,11 +97,10 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       callee: TSESTree.Expression,
     ): boolean =>
-      callee.type === AST_NODE_TYPES.Identifier
-        ? true
-        : callee.type === AST_NODE_TYPES.MemberExpression
-          ? !callee.optional && isNamespaceObject(callee.object)
-          : false;
+      callee.type === AST_NODE_TYPES.Identifier ||
+      (callee.type === AST_NODE_TYPES.MemberExpression &&
+        !callee.optional &&
+        isNamespaceObject(callee.object));
 
     /**
      * `true` when the arrow's single parameter is referenced exactly once, at
@@ -117,7 +118,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
 
       const variable = scope.variables.find((v) => v.name === paramName);
 
-      if (variable === undefined) return false;
+      if (variable === undefined) {
+        return false;
+      }
 
       const [reference] = variable.references;
 
@@ -129,7 +132,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       ArrowFunctionExpression: (node) => {
-        if (node.async || !Arr.isFixedLengthArray(1, node.params)) return;
+        if (node.async || !Arr.isFixedLengthArray(1, node.params)) {
+          return;
+        }
 
         const [param] = node.params;
 
@@ -140,11 +145,15 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        if (node.body.type !== AST_NODE_TYPES.CallExpression) return;
+        if (node.body.type !== AST_NODE_TYPES.CallExpression) {
+          return;
+        }
 
         const call = node.body;
 
-        if (call.optional) return;
+        if (call.optional) {
+          return;
+        }
 
         const [firstArg, ...restArgs] = call.arguments;
 
@@ -160,7 +169,9 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        if (!paramUsedOnlyAt(node, param.name, firstArg)) return;
+        if (!paramUsedOnlyAt(node, param.name, firstArg)) {
+          return;
+        }
 
         const calleeType = getType(call.callee);
 
@@ -247,7 +258,9 @@ const hasCurriedSignature = (
   restCount: number,
 ): boolean =>
   type.getCallSignatures().some((signature) => {
-    if (!isCallableWith(signature, restCount)) return false;
+    if (!isCallableWith(signature, restCount)) {
+      return false;
+    }
 
     return signature
       .getReturnType()

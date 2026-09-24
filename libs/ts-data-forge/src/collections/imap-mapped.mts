@@ -1031,7 +1031,9 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   /** @inheritdoc */
   every(predicate: (value: V, key: K) => boolean): boolean {
     for (const [k, v] of this.entries()) {
-      if (!predicate(v, k)) return false;
+      if (!predicate(v, k)) {
+        return false;
+      }
     }
 
     return true;
@@ -1040,7 +1042,9 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   /** @inheritdoc */
   some(predicate: (value: V, key: K) => boolean): boolean {
     for (const [k, v] of this.entries()) {
-      if (predicate(v, k)) return true;
+      if (predicate(v, k)) {
+        return true;
+      }
     }
 
     return false;
@@ -1073,7 +1077,9 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   set(key: K, value: V): IMapMapped<K, V, KM> {
     const curr = this.get(key);
 
-    if (Optional.isSome(curr) && value === curr.value) return this;
+    if (Optional.isSome(curr) && value === curr.value) {
+      return this;
+    }
 
     const keyMapped = this.#toKey(key);
 

@@ -83,7 +83,9 @@ const createMergeObservable = <const P extends NonEmptyUnknownList>(
             o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
         );
 
-        if (parentToUse === undefined) return;
+        if (parentToUse === undefined) {
+          return;
+        }
 
         const nextValue =
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion

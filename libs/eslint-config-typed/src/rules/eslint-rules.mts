@@ -140,7 +140,13 @@ export const eslintRules = {
   // The following rules can be used in some cases. See the README for more
   // information. (These are marked with `0` instead of `"off"` so that a
   // script can distinguish them.)
-  curly: 'off',
+  //
+  // `curly` is taken back out of this list. eslint-config-prettier turns it off
+  // only because `multi-line` and `multi-or-nest` decide by line breaks, which
+  // the formatter moves; `all` asks for braces whatever the layout, so the two
+  // cannot disagree. A branch without braces is one statement added below it
+  // away from running unconditionally.
+  curly: ['error', 'all'],
   'no-unexpected-multiline': 'off',
 
   // The rest are rules that you never need to enable when using Prettier.

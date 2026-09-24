@@ -58,7 +58,7 @@ import { configureStore, createSelector, createSlice } from '@reduxjs/toolkit';
 
         store.dispatch(counterSlice.actions.set(mut_count));
 
-        if (!(mut_count >= 4)) {
+        if (mut_count < 4) {
           return;
         }
 

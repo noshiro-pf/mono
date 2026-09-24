@@ -663,3 +663,20 @@ describe('number constraint validation messages', () => {
     );
   });
 });
+
+describe('number constrained by an order', () => {
+  test.each([
+    ['negative', number(-1, { negative: true })],
+    ['nonNegative', number(0, { nonNegative: true })],
+    ['positive', number(1, { positive: true })],
+    ['nonPositive', number(0, { nonPositive: true })],
+    ['gt', number(1, { gt: 0 })],
+    ['gte', number(0, { gte: 0 })],
+    ['min', number(0, { min: 0 })],
+    ['lt', number(0, { lt: 1 })],
+    ['lte', number(1, { lte: 1 })],
+    ['max', number(1, { max: 1 })],
+  ] as const)('%s rejects NaN, which no order holds for', (_, type) => {
+    assert.isFalse(type.is(Number.NaN));
+  });
+});

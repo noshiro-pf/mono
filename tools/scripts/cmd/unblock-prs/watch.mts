@@ -38,7 +38,9 @@ export const watch = async (
   while (!stopRequested()) {
     await pause(options.pollIntervalSec * 1000);
 
-    if (stopRequested()) break;
+    if (stopRequested()) {
+      break;
+    }
 
     const viewed = await viewPullRequest(pr.number);
 
@@ -47,25 +49,37 @@ export const watch = async (
 
       log(`#${pr.number}: poll failed (${mut_errors}): ${viewed.value}`);
 
-      if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) return 'error';
+      if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) {
+        return 'error';
+      }
 
       continue;
     }
 
     const current = viewed.value;
 
-    if (current.state === 'MERGED') return 'merged';
+    if (current.state === 'MERGED') {
+      return 'merged';
+    }
 
-    if (current.state !== 'OPEN') return 'closed';
+    if (current.state !== 'OPEN') {
+      return 'closed';
+    }
 
-    if (!isRecord(current.autoMergeRequest)) return 'auto-merge-disabled';
+    if (!isRecord(current.autoMergeRequest)) {
+      return 'auto-merge-disabled';
+    }
 
     // The label skips every check workflow and leaves `no-skip-ci-label`
     // `pending`, so from here the checks can only sit there until the watch
     // times out. Stop now and let the survey set it aside.
-    if (isSkipCiLabelled(current)) return 'skip-ci-labelled';
+    if (isSkipCiLabelled(current)) {
+      return 'skip-ci-labelled';
+    }
 
-    if (current.headRefOid !== expectedHead) return 'head-moved';
+    if (current.headRefOid !== expectedHead) {
+      return 'head-moved';
+    }
 
     if (
       current.mergeStateStatus === 'BEHIND' ||
@@ -81,7 +95,9 @@ export const watch = async (
 
       log(`#${pr.number}: poll failed (${mut_errors}): ${checks.value}`);
 
-      if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) return 'error';
+      if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) {
+        return 'error';
+      }
 
       continue;
     }
@@ -116,7 +132,9 @@ export const watch = async (
         `#${pr.number}: ${current.mergeStateStatus}, all ${summary.total} required checks green (${mut_greenPolls}/${budget}), waiting for auto-merge`,
       );
 
-      if (mut_greenPolls >= budget) return 'not-merging';
+      if (mut_greenPolls >= budget) {
+        return 'not-merging';
+      }
     }
 
     if (Date.now() > deadline) {

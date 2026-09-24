@@ -42,7 +42,9 @@ export const renderMarkdown = (report: PrReport): string => {
   const line = (node: TreeNode, depth: number): readonly string[] => {
     const entry = byNumber.get(node.number);
 
-    if (entry === undefined) return [];
+    if (entry === undefined) {
+      return [];
+    }
 
     const indent = '  '.repeat(depth);
 
@@ -85,7 +87,9 @@ export const renderTerminal = (report: PrReport): string => {
   ): readonly string[] => {
     const entry = byNumber.get(node.number);
 
-    if (entry === undefined) return [];
+    if (entry === undefined) {
+      return [];
+    }
 
     const body = node.repeated
       ? (`#${node.number} — see above` as const)
@@ -261,7 +265,9 @@ const mergedSection = (
   report: PrReport,
   format: 'markdown' | 'terminal',
 ): readonly string[] => {
-  if (!Arr.isNonEmpty(report.merged)) return [] as const;
+  if (!Arr.isNonEmpty(report.merged)) {
+    return [] as const;
+  }
 
   const markdown = format === 'markdown';
 

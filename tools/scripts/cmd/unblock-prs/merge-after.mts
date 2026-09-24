@@ -36,7 +36,9 @@ export const waitingOnNote = (
 ): Classification | undefined => {
   const blockers = waitingOn(pr, context);
 
-  if (!Arr.isNonEmpty(blockers)) return undefined;
+  if (!Arr.isNonEmpty(blockers)) {
+    return undefined;
+  }
 
   return {
     kind: 'note',

@@ -46,7 +46,9 @@ export const lastLines = (text: string, count: number): string =>
 
 /** Sleeps, returning early when a stop has been requested. */
 export const pause = async (ms: number): Promise<void> => {
-  if (stopRequested()) return;
+  if (stopRequested()) {
+    return;
+  }
 
   await sleep(ms, undefined, { signal: stopController.signal }).catch(
     () => undefined,

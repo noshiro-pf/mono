@@ -45,7 +45,9 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
     return {
       BinaryExpression: (node) => {
         // Check for `xs.length > 0` or `0 < xs.length`
-        if (node.operator !== '>' && node.operator !== '<') return;
+        if (node.operator !== '>' && node.operator !== '<') {
+          return;
+        }
 
         const isLengthOnLeft = node.operator === '>';
 
@@ -79,7 +81,9 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
             const isArrayType =
               checker.isArrayType(type) || checker.isTupleType(type);
 
-            if (!isArrayType) return;
+            if (!isArrayType) {
+              return;
+            }
           } else {
             return;
           }

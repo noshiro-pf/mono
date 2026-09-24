@@ -70,7 +70,9 @@ const fromPromiseImpl = <S, E>(
     .catch((error: unknown) => {
       // A panic is a bug, not a recoverable failure: let it propagate.
 
-      if (isPanicError(error)) throw error;
+      if (isPanicError(error)) {
+        throw error;
+      }
 
       return Result.err(mapError(error));
     });

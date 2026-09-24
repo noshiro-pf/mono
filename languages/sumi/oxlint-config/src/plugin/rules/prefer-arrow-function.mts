@@ -26,7 +26,9 @@ export const preferArrowFunction = createRule({
   defaultOptions: [],
   create: (context) => ({
     FunctionExpression: (node) => {
-      if (node.generator) return;
+      if (node.generator) {
+        return;
+      }
 
       // An accessor's body can only be a function expression: a getter is
       // allowed as written (D-47), and a setter is what no-setter reports.
@@ -41,9 +43,13 @@ export const preferArrowFunction = createRule({
       context.report({ node, messageId: 'expression' });
     },
     FunctionDeclaration: (node) => {
-      if (node.generator || node.id === null) return;
+      if (node.generator || node.id === null) {
+        return;
+      }
 
-      if (hasOverloadSignature(node)) return;
+      if (hasOverloadSignature(node)) {
+        return;
+      }
 
       context.report({
         node: node.id,
@@ -63,7 +69,9 @@ const hasOverloadSignature = (
 ): boolean => {
   const name = declaration.id?.name;
 
-  if (name === undefined) return false;
+  if (name === undefined) {
+    return false;
+  }
 
   const container =
     declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration

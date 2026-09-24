@@ -20,7 +20,9 @@ export const updateELO = (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const other_score = other_scores[0][i]!;
 
-    if (other_score === '') continue;
+    if (other_score === '') {
+      continue;
+    }
 
     const win =
       self_score > other_score ? 1 : self_score === other_score ? 0.5 : 0;

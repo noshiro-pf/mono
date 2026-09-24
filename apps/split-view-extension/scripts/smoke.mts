@@ -184,11 +184,10 @@ const main = async (): Promise<void> => {
         .locator('#go')
         .click();
 
-      return (await settlesTo('/second', 3000))
-        ? true
-        : attempt >= 3
-          ? false
-          : clickThrough(attempt + 1);
+      return (
+        (await settlesTo('/second', 3000)) ||
+        (attempt >= 3 ? false : clickThrough(attempt + 1))
+      );
     };
 
     const followed = await clickThrough(1);

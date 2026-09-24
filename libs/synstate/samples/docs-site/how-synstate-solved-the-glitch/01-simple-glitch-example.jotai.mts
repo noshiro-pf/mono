@@ -39,7 +39,7 @@ import { atom, createStore } from 'jotai/vanilla';
 
         store.set(counterAtom, mut_count);
 
-        if (!(mut_count >= 4)) {
+        if (mut_count < 4) {
           return;
         }
 

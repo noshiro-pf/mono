@@ -61,7 +61,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         const arrayExpression = node.callee.object;
 
         // Check if we have 2 arguments: reducer function and initial value 0
-        if (!Arr.isFixedLengthTuple(2, node.arguments)) return;
+        if (!Arr.isFixedLengthTuple(2, node.arguments)) {
+          return;
+        }
 
         const reducer = node.arguments[0];
 
@@ -96,7 +98,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
         const checker = services?.program?.getTypeChecker();
 
-        if (checker === undefined) return;
+        if (checker === undefined) {
+          return;
+        }
 
         // Case 1: (a, b) => a + b
         if (
@@ -189,7 +193,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
             mut_propName = leftProp.value;
           }
 
-          if (mut_propName === undefined) return;
+          if (mut_propName === undefined) {
+            return;
+          }
 
           // Check if property type is number
           if (services?.program !== undefined && services.program !== null) {

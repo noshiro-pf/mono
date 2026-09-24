@@ -40,7 +40,9 @@ export const BpDatePicker = memoNamed<BpDatePickerProps>(
           return;
         }
 
-        if (isUserChange !== true) return;
+        if (isUserChange !== true) {
+          return;
+        }
 
         const dt = decodeDate(dateStr);
 

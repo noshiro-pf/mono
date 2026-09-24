@@ -60,7 +60,9 @@ const state = combine([
 const submit = async (user: FireAuthUser): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (emailInputHasError(s)) return;
+  if (emailInputHasError(s)) {
+    return;
+  }
 
   setTrueIsWaitingResponse();
 
@@ -78,7 +80,9 @@ const submit = async (user: FireAuthUser): Promise<void> => {
 
   const credential: AuthCredential | undefined = signInResult.value;
 
-  if (credential === undefined) return;
+  if (credential === undefined) {
+    return;
+  }
 
   const res1 = await api.auth.reauthenticateWithCredential(user, credential);
 
@@ -140,7 +144,9 @@ const enterClickHandler = (): void => {
 
   const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
-  if (enterButtonDisabled || fireAuthUser === undefined) return;
+  if (enterButtonDisabled || fireAuthUser === undefined) {
+    return;
+  }
 
   // TODO: use toast
   submit(fireAuthUser).catch(console.error);

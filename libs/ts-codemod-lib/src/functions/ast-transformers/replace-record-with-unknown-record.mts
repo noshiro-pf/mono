@@ -44,7 +44,7 @@ const processDeclarations = (
 
     const typeNode = typeAlias.getTypeNode();
 
-    return typeNode === undefined ? false : visitTypeNode(typeNode);
+    return typeNode !== undefined && visitTypeNode(typeNode);
   });
 
   const interfaceModifications = container
@@ -101,7 +101,7 @@ const processInterfaceDeclaration = (
     .map((property) => {
       const typeNode = property.getTypeNode();
 
-      return typeNode === undefined ? false : visitTypeNode(typeNode);
+      return typeNode !== undefined && visitTypeNode(typeNode);
     })
     .includes(true);
 };
@@ -166,13 +166,13 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
         if (tsm.Node.isPropertySignature(member)) {
           const typeNode = member.getTypeNode();
 
-          return typeNode === undefined ? false : visitTypeNode(typeNode);
+          return typeNode !== undefined && visitTypeNode(typeNode);
         }
 
         if (tsm.Node.isIndexSignatureDeclaration(member)) {
           const typeNode = member.getReturnTypeNode();
 
-          return typeNode === undefined ? false : visitTypeNode(typeNode);
+          return typeNode !== undefined && visitTypeNode(typeNode);
         }
 
         return false;
@@ -198,11 +198,12 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
   }
 
   // Handles `readonly T[]`, `readonly [...]`, `keyof T`
-  return tsm.Node.isTypeOperatorTypeNode(node) ||
-    tsm.Node.isRestTypeNode(node) ||
-    tsm.Node.isNamedTupleMember(node)
-    ? visitTypeNode(node.getTypeNode())
-    : false;
+  return (
+    (tsm.Node.isTypeOperatorTypeNode(node) ||
+      tsm.Node.isRestTypeNode(node) ||
+      tsm.Node.isNamedTupleMember(node)) &&
+    visitTypeNode(node.getTypeNode())
+  );
 };
 
 const isStringUnknownIndexSignature = (
@@ -293,7 +294,9 @@ const ensureUnknownRecordImport = (sourceFile: tsm.SourceFile): void => {
     .getNamedImports()
     .some((ni) => ni.getName() === UNKNOWN_RECORD_NAME);
 
-  if (alreadyImported) return;
+  if (alreadyImported) {
+    return;
+  }
 
   existingImport.addNamedImport({
     name: UNKNOWN_RECORD_NAME,

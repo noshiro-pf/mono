@@ -44,7 +44,9 @@ const restoreCreateEventPageTemp = (): Result<
 > => {
   const fromDb = restore(keys.createEventPage);
 
-  if (fromDb === undefined) return Result.ok(undefined);
+  if (fromDb === undefined) {
+    return Result.ok(undefined);
+  }
 
   const obj = Json.parse(fromDb);
 

@@ -35,7 +35,9 @@ export const substitute = (
   if (isAbstraction(term)) {
     const [, arg, body] = term;
 
-    if (arg === from) return term;
+    if (arg === from) {
+      return term;
+    }
 
     const freeVariables = getFreeVariables(to);
 

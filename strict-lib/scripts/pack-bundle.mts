@@ -108,7 +108,9 @@ const parsePackageJson = (
 ): t.TypeOf<typeof packageJsonType> | undefined => {
   const parsed = Json.parse(text);
 
-  if (Result.isErr(parsed)) return undefined;
+  if (Result.isErr(parsed)) {
+    return undefined;
+  }
 
   const result = packageJsonType.validate(parsed.value);
 

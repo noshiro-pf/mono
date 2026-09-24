@@ -54,7 +54,9 @@ export const buildMergeAfterForest = (
   const mut_roots: number[] = [];
 
   for (const { number } of entries.toSorted((a, b) => a.number - b.number)) {
-    if (cyclic.has(number)) continue;
+    if (cyclic.has(number)) {
+      continue;
+    }
 
     const parents = (dependencies.get(number) ?? []).filter(
       (n) => !cyclic.has(n),

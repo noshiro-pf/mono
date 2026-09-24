@@ -50,7 +50,6 @@ const isPropertyAccess = (
     ? parent.object === identifier && !parent.computed
     : parent.type === AST_NODE_TYPES.TSQualifiedName
       ? parent.left === identifier
-      : parent.type === AST_NODE_TYPES.JSXMemberExpression
-        ? parent.object === identifier
-        : false;
+      : parent.type === AST_NODE_TYPES.JSXMemberExpression &&
+        parent.object === identifier;
 };

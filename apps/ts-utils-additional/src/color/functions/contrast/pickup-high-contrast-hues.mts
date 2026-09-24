@@ -54,7 +54,9 @@ export function pickupHighContrastHues(
   saturation: Percent,
   lightness: Percent,
 ): NonEmptyArray<Hue> | undefined {
-  if (!Num.isPositive(n)) return undefined;
+  if (!Num.isPositive(n)) {
+    return undefined;
+  }
 
   const luminanceList: NonEmptyArray<NonNegativeFiniteNumber> = Arr.map(
     hues,
@@ -82,7 +84,7 @@ export function pickupHighContrastHues(
   );
 
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
-    if (!(value > mut_y)) {
+    if (value <= mut_y) {
       continue;
     }
 

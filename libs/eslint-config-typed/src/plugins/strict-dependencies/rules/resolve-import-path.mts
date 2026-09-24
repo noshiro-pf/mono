@@ -33,7 +33,9 @@ export const resolveImportPath = (
         const pathIndex =
           matchedKey !== undefined ? pathIndexMap[matchedKey] : 0;
 
-        if (!Arr.isNonEmpty(value)) continue;
+        if (!Arr.isNonEmpty(value)) {
+          continue;
+        }
 
         const pathValue: string =
           mapNullable(pathIndex, (i) => value[i]) ?? value[0];

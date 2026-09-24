@@ -59,7 +59,9 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
     const strictNullChecks =
       compilerOptions.strictNullChecks ?? compilerOptions.strict ?? false;
 
-    if (!strictNullChecks) return {};
+    if (!strictNullChecks) {
+      return {};
+    }
 
     const checker = parserServices.program.getTypeChecker();
 
@@ -92,7 +94,9 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
 
     return {
       LogicalExpression: (node) => {
-        if (node.operator !== '??') return;
+        if (node.operator !== '??') {
+          return;
+        }
 
         // Only target the literal `?? undefined` syntax.
         if (
@@ -109,7 +113,9 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
           node.right,
         );
 
-        if (!isUndefinedType(checker.getTypeAtLocation(rightTsNode))) return;
+        if (!isUndefinedType(checker.getTypeAtLocation(rightTsNode))) {
+          return;
+        }
 
         const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(node.left);
 
@@ -118,7 +124,9 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
         // The `?? undefined` is meaningful only when the left-hand side can be
         // `null` (it normalizes `null` to `undefined`). If `null` is not part
         // of the type, the operator is a no-op and should be removed.
-        if (typeIncludesNull(leftType)) return;
+        if (typeIncludesNull(leftType)) {
+          return;
+        }
 
         context.report({
           node,

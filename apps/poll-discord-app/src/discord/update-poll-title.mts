@@ -16,7 +16,9 @@ import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 export const updatePollTitle = async (
   message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
-  if (message.author.bot) return Result.ok(undefined);
+  if (message.author.bot) {
+    return Result.ok(undefined);
+  }
 
   if (
     !message.content.startsWith(`${triggerCommand.rp} `) &&
@@ -28,25 +30,35 @@ export const updatePollTitle = async (
 
   const [title] = rpParseCommand(message.content);
 
-  if (title === undefined) return Result.ok(undefined);
+  if (title === undefined) {
+    return Result.ok(undefined);
+  }
 
   const pollIdResult = await firestoreApi.getPollIdByCommandMessageId(
     toCommandMessageId(message.id),
   );
 
-  if (Result.isErr(pollIdResult)) return pollIdResult;
+  if (Result.isErr(pollIdResult)) {
+    return pollIdResult;
+  }
 
   const pollId = pollIdResult.value;
 
-  if (pollId === undefined) return Result.ok(undefined);
+  if (pollId === undefined) {
+    return Result.ok(undefined);
+  }
 
   const pollResult = await firestoreApi.getPollById(pollId);
 
-  if (Result.isErr(pollResult)) return pollResult;
+  if (Result.isErr(pollResult)) {
+    return pollResult;
+  }
 
   const poll = pollResult.value;
 
-  if (poll === undefined) return Result.ok(undefined);
+  if (poll === undefined) {
+    return Result.ok(undefined);
+  }
 
   const channel = message.channel;
 

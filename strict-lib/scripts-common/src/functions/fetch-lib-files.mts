@@ -143,7 +143,9 @@ export const fetchLibFiles = async (
   {
     const res = await formatDir(copiedDir);
 
-    if (Result.isErr(res)) return res;
+    if (Result.isErr(res)) {
+      return res;
+    }
   }
 
   return Result.ok(undefined);

@@ -45,7 +45,9 @@ export function pickupHighContrastHues(
   firstHue: Hue,
   useLog: boolean,
 ): NonEmptyArray<Hue> | undefined {
-  if (!Num.isPositive(n)) return undefined;
+  if (!Num.isPositive(n)) {
+    return undefined;
+  }
 
   const hues = Arr.map(huesDefault, (h) => toHue((h - firstHue + 360) % 360));
 
@@ -77,7 +79,7 @@ export function pickupHighContrastHues(
   );
 
   for (const [x, value] of luminanceDiffAccumulated.entries()) {
-    if (!(value > mut_y)) {
+    if (value <= mut_y) {
       continue;
     }
 

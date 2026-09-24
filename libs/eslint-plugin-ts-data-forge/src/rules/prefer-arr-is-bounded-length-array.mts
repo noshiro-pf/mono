@@ -47,16 +47,22 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
     return {
       LogicalExpression: (node) => {
         // Only `a && b` can encode a `min && max` length range.
-        if (node.operator !== '&&') return;
+        if (node.operator !== '&&') {
+          return;
+        }
 
         const left = parseLengthComparison(node.left, sourceCode);
 
         const right = parseLengthComparison(node.right, sourceCode);
 
-        if (left === undefined || right === undefined) return;
+        if (left === undefined || right === undefined) {
+          return;
+        }
 
         // Need one lower bound and one upper bound on the same array.
-        if (left.kind === right.kind) return;
+        if (left.kind === right.kind) {
+          return;
+        }
 
         if (
           sourceCode.getText(left.array) !== sourceCode.getText(right.array)
@@ -83,7 +89,9 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
             const isArrayType =
               checker.isArrayType(type) || checker.isTupleType(type);
 
-            if (!isArrayType) return;
+            if (!isArrayType) {
+              return;
+            }
           } else {
             return;
           }

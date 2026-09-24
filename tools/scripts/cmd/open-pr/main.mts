@@ -40,36 +40,48 @@ export const openPullRequest = async (
 ): Promise<Result<string, string>> => {
   const context = await preflight();
 
-  if (Result.isErr(context)) return context;
+  if (Result.isErr(context)) {
+    return context;
+  }
 
   const { api, branch, defaultBranch } = context.value;
 
   const base = options.base ?? defaultBranch;
 
-  if (options.dryRun) return dryRun(api, branch, base, options);
+  if (options.dryRun) {
+    return dryRun(api, branch, base, options);
+  }
 
   const pushed = await pushBranch(branch);
 
-  if (Result.isErr(pushed)) return Result.err(`cannot push: ${pushed.value}`);
+  if (Result.isErr(pushed)) {
+    return Result.err(`cannot push: ${pushed.value}`);
+  }
 
   log(`pushed ${branch}`);
 
   const existing = await findOpenPullRequest(api, branch);
 
-  if (Result.isErr(existing)) return existing;
+  if (Result.isErr(existing)) {
+    return existing;
+  }
 
   const prNumber =
     existing.value === undefined
       ? await open(api, branch, base, options)
       : Result.ok(existing.value.number);
 
-  if (Result.isErr(prNumber)) return prNumber;
+  if (Result.isErr(prNumber)) {
+    return prNumber;
+  }
 
   // Re-read rather than reuse what the listing said: between then and now
   // this run has created it, and a draft cannot be armed.
   const created = await viewPullRequest(api, prNumber.value);
 
-  if (Result.isErr(created)) return created;
+  if (Result.isErr(created)) {
+    return created;
+  }
 
   if (created.value.isDraft) {
     const ready = await markReady(api, created.value.nodeId);
@@ -103,7 +115,9 @@ const arm = async (
 ): Promise<Result<string, string>> => {
   const current = await viewPullRequest(api, prNumber);
 
-  if (Result.isErr(current)) return current;
+  if (Result.isErr(current)) {
+    return current;
+  }
 
   const blocked = armBlockedBy(current.value);
 
@@ -137,11 +151,15 @@ const open = async (
 ): Promise<Result<number, string>> => {
   const title = await resolveTitle(options);
 
-  if (Result.isErr(title)) return title;
+  if (Result.isErr(title)) {
+    return title;
+  }
 
   const body = await resolveBody(options);
 
-  if (Result.isErr(body)) return body;
+  if (Result.isErr(body)) {
+    return body;
+  }
 
   const created = await createPullRequest({
     api,
@@ -201,7 +219,9 @@ const dryRun = async (
 ): Promise<Result<string, string>> => {
   const existing = await findOpenPullRequest(api, branch);
 
-  if (Result.isErr(existing)) return existing;
+  if (Result.isErr(existing)) {
+    return existing;
+  }
 
   const title = await resolveTitle(options);
 

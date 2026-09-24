@@ -47,7 +47,9 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
       TSAsExpression: (node) => {
         const typeInfo = getBrandedNumberTypeInfo(node.typeAnnotation);
 
-        if (typeInfo === undefined) return;
+        if (typeInfo === undefined) {
+          return;
+        }
 
         mut_nodesToFix.push({
           node,
@@ -101,14 +103,19 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
 const getBrandedNumberTypeInfo = (
   typeAnnotation: DeepReadonly<TSESTree.TypeNode>,
 ): Readonly<{ typeName: string; functionName: string }> | undefined => {
-  if (typeAnnotation.type !== AST_NODE_TYPES.TSTypeReference) return undefined;
-
-  if (typeAnnotation.typeName.type !== AST_NODE_TYPES.Identifier)
+  if (typeAnnotation.type !== AST_NODE_TYPES.TSTypeReference) {
     return undefined;
+  }
+
+  if (typeAnnotation.typeName.type !== AST_NODE_TYPES.Identifier) {
+    return undefined;
+  }
 
   const typeName = typeAnnotation.typeName.name;
 
-  if (!brandedNumberTypeNameToFunctionName.has(typeName)) return undefined;
+  if (!brandedNumberTypeNameToFunctionName.has(typeName)) {
+    return undefined;
+  }
 
   const functionName = brandedNumberTypeNameToFunctionName.get(typeName);
 

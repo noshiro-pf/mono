@@ -16,9 +16,13 @@ export const HoursMinutesFromDate = (date: Date): HoursMinutes =>
   }) as const;
 
 export const compareHm = (a: HoursMinutes, b: HoursMinutes): -1 | 0 | 1 => {
-  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
+  if (a.hours !== b.hours) {
+    return a.hours < b.hours ? -1 : 1;
+  }
 
-  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
+  if (a.minutes !== b.minutes) {
+    return a.minutes < b.minutes ? -1 : 1;
+  }
 
   return 0;
 };

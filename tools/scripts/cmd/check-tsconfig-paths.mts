@@ -112,7 +112,9 @@ const collectTsconfigFiles = async (): Promise<
 const checkFile = async (file: string): Promise<readonly Violation[]> => {
   const paths = await readPaths(file);
 
-  if (paths === undefined) return [];
+  if (paths === undefined) {
+    return [];
+  }
 
   const packageDir = await findPackageDir(path.dirname(file));
 
@@ -120,7 +122,9 @@ const checkFile = async (file: string): Promise<readonly Violation[]> => {
   // `tools/configs/tsconfig.tsx.json` is the case here, and its `paths` are a
   // different mechanism — `tsx`'s runtime resolution for build scripts that
   // run before any `dist/` exists. See CLAUDE.md, "Build".
-  if (packageDir === undefined) return [];
+  if (packageDir === undefined) {
+    return [];
+  }
 
   const packageName = await readPackageName(packageDir);
 
@@ -229,12 +233,16 @@ const checkTarget = async ({
 
   // A pattern cannot be checked for existence: `*` stands for whatever the
   // importer wrote. The containment check above still applies to it.
-  if (target.includes('*')) return [];
+  if (target.includes('*')) {
+    return [];
+  }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const stat = await Result.fromPromise(fs.stat(resolved));
 
-  if (Result.isOk(stat) && stat.value.isFile()) return [];
+  if (Result.isOk(stat) && stat.value.isFile()) {
+    return [];
+  }
 
   return [
     {
@@ -264,14 +272,18 @@ const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const text = await Result.fromPromise(fs.readFile(file, 'utf8'));
 
-  if (Result.isErr(text)) return undefined;
+  if (Result.isErr(text)) {
+    return undefined;
+  }
 
   // These files are JSONC. `parseConfigFileTextToJson` is what tsc itself
   // reads them with, so comments and trailing commas are handled exactly as
   // the compiler handles them.
   const parsed: unknown = ts.parseConfigFileTextToJson(file, text.value).config;
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'compilerOptions')) return undefined;
+  if (!isRecord(parsed) || !hasKey(parsed, 'compilerOptions')) {
+    return undefined;
+  }
 
   const compilerOptions: unknown = parsed.compilerOptions;
 
@@ -281,7 +293,9 @@ const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
 
   const entries: unknown = compilerOptions.paths;
 
-  if (!isRecord(entries)) return undefined;
+  if (!isRecord(entries)) {
+    return undefined;
+  }
 
   const baseUrl: unknown = hasKey(compilerOptions, 'baseUrl')
     ? compilerOptions.baseUrl
@@ -304,7 +318,9 @@ const findPackageDir = async (
   startDir: string,
 ): Promise<string | undefined> => {
   const walk = async (dir: string): Promise<string | undefined> => {
-    if (dir === projectRootPath) return undefined;
+    if (dir === projectRootPath) {
+      return undefined;
+    }
 
     const stat = await Result.fromPromise(
       // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -327,11 +343,15 @@ const readPackageName = async (
     fs.readFile(path.resolve(packageDir, 'package.json'), 'utf8'),
   );
 
-  if (Result.isErr(text)) return undefined;
+  if (Result.isErr(text)) {
+    return undefined;
+  }
 
   const parsed: unknown = JSON.parse(text.value);
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'name')) return undefined;
+  if (!isRecord(parsed) || !hasKey(parsed, 'name')) {
+    return undefined;
+  }
 
   const name: unknown = parsed.name;
 

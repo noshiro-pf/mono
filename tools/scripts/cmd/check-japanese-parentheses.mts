@@ -160,7 +160,9 @@ export const toFullwidthParentheses = (
   const rewriteOnce = (text: string): string => {
     const violations = findHalfwidthParentheses(text, options);
 
-    if (!Arr.isNonEmpty(violations)) return text;
+    if (!Arr.isNonEmpty(violations)) {
+      return text;
+    }
 
     const lines = text.split('\n');
 
@@ -180,7 +182,9 @@ export const toFullwidthParentheses = (
   };
 
   const rewriteUntilStable = (text: string, passesLeft: number): string => {
-    if (passesLeft <= 0) return text;
+    if (passesLeft <= 0) {
+      return text;
+    }
 
     const rewritten = rewriteOnce(text);
 
@@ -366,19 +370,25 @@ const enclosesJapaneseProse = (
   pair: string,
   inner: string,
 ): boolean => {
-  if (!containsJapanese(inner)) return false;
+  if (!containsJapanese(inner)) {
+    return false;
+  }
 
   const before = line.slice(0, index);
 
   // A Markdown link or image destination: the parentheses hold a URL, and a
   // Japanese anchor (`](#日本語の見出し)`) is a Japanese string that must stay
   // exactly as the heading spells it.
-  if (before.endsWith(']')) return false;
+  if (before.endsWith(']')) {
+    return false;
+  }
 
   // An inline code span. Counting backticks is enough because a span does not
   // survive a line break, so an odd count before the `(` means the scan is
   // inside one.
-  if ((before.match(/`/gu) ?? []).length % 2 === 1) return false;
+  if ((before.match(/`/gu) ?? []).length % 2 === 1) {
+    return false;
+  }
 
   const after = line.slice(index + pair.length);
 

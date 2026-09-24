@@ -71,7 +71,9 @@ const state = combine([
 const submit = async (user: FireAuthUser): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (deleteAccountPageHasError(s)) return;
+  if (deleteAccountPageHasError(s)) {
+    return;
+  }
 
   const credential: AuthCredential = EmailAuthProvider.credential(
     s.email.inputValue,
@@ -151,7 +153,9 @@ const enterClickHandler = (): void => {
 
   const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
-  if (enterButtonDisabled || fireAuthUser === undefined) return;
+  if (enterButtonDisabled || fireAuthUser === undefined) {
+    return;
+  }
 
   // TODO: use toast
   submit(fireAuthUser).catch(console.error);

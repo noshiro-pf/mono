@@ -56,20 +56,14 @@ const shouldSkipFile = (
 
   const hasFileIgnoreComment = patterns.some((regex) => regex.test(code));
 
-  if (!hasFileIgnoreComment && Arr.isEmpty(ignoredTransformers)) {
-    return false;
-  }
-
-  // Empty array means ignore all transformers (file-level ignore without specific transformers)
-  if (Arr.isEmpty(ignoredTransformers)) {
-    return true;
-  }
-
-  // If transformer name is not specified, don't skip; otherwise check if the
-  // transformer is in the ignore list
-  return transformerName === undefined
-    ? false
-    : ignoredTransformers.includes(transformerName);
+  return Arr.isEmpty(ignoredTransformers)
+    ? // Empty array means ignore all transformers (file-level ignore without
+      // specific transformers), so skip exactly when there is such a comment
+      hasFileIgnoreComment
+    : // If transformer name is not specified, don't skip; otherwise check if
+      // the transformer is in the ignore list
+      transformerName !== undefined &&
+        ignoredTransformers.includes(transformerName);
 };
 
 export const transformSourceCode = (

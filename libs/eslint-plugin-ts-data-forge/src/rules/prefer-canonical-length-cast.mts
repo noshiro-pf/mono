@@ -145,20 +145,26 @@ export const preferCanonicalLengthCast: TSESLint.RuleModule<
       'Arr',
     );
 
-    if (arrLocalName === undefined) return {};
+    if (arrLocalName === undefined) {
+      return {};
+    }
 
     return {
       CallExpression: (node) => {
         const castName = getCastName(node, arrLocalName);
 
-        if (castName === undefined) return;
+        if (castName === undefined) {
+          return;
+        }
 
         const rewrite = CAST_REWRITES.find(
           (candidate) =>
             candidate.cast === castName && matchesBounds(node, candidate),
         );
 
-        if (rewrite === undefined) return;
+        if (rewrite === undefined) {
+          return;
+        }
 
         const boundsText = node.arguments
           .slice(0, rewrite.bounds.length)
@@ -238,7 +244,9 @@ const matchesBounds = (
   return rewrite.bounds.every((matcher, index) => {
     const value = bounds[index];
 
-    if (value === undefined) return false;
+    if (value === undefined) {
+      return false;
+    }
 
     switch (matcher) {
       case 'anyLength':

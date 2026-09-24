@@ -181,11 +181,15 @@ const readDocScript = async (
     path.resolve(packageDir, 'package.json'),
   );
 
-  if (text === undefined) return undefined;
+  if (text === undefined) {
+    return undefined;
+  }
 
   const parsed: unknown = JSON.parse(text);
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) return undefined;
+  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
+    return undefined;
+  }
 
   const { scripts } = parsed;
 

@@ -52,7 +52,9 @@ export const checkClaudeMdReferences = async (): Promise<
 
     const firstError = results.find(Result.isErr);
 
-    if (firstError !== undefined) return Result.err(firstError.value);
+    if (firstError !== undefined) {
+      return Result.err(firstError.value);
+    }
 
     const citations = results.flatMap((result) =>
       Result.isErr(result) ? [] : result.value,
@@ -230,7 +232,9 @@ const visit = async (
 ): Promise<Result<readonly Citation[], string>> => {
   const contents = await readRepositoryFile(file);
 
-  if (Result.isErr(contents)) return contents;
+  if (Result.isErr(contents)) {
+    return contents;
+  }
 
   return Result.ok(
     collectCitations(contents.value, {

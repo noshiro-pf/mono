@@ -146,7 +146,9 @@ export const loadReport = async (
 
   const read = readReportData(first.result.value.data);
 
-  if (Result.isErr(read)) return { rateLimit: first.rateLimit, result: read };
+  if (Result.isErr(read)) {
+    return { rateLimit: first.rateLimit, result: read };
+  }
 
   const { requirements, codeOwners, openPulls, merged } = read.value;
 
@@ -314,7 +316,9 @@ const readReportData = (
     `${MAIN_RULESET_PATH} on the default branch`,
   );
 
-  if (Result.isErr(requirements)) return requirements;
+  if (Result.isErr(requirements)) {
+    return requirements;
+  }
 
   return Result.ok({
     requirements: requirements.value,
@@ -414,11 +418,15 @@ const applyFollowUps = (
   for (const followUp of followUps) {
     const pull = mut_byNumber.get(followUp.number);
 
-    if (pull === undefined) continue;
+    if (pull === undefined) {
+      continue;
+    }
 
     const next = applyOne(pull, followUp, field(followUpAlias(followUp)));
 
-    if (Result.isErr(next)) return next;
+    if (Result.isErr(next)) {
+      return next;
+    }
 
     mut_byNumber.set(followUp.number, next.value);
   }

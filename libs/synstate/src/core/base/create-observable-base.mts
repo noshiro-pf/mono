@@ -130,7 +130,9 @@ export const createObservableBaseHandle = <A,>(
   };
 
   const completeBase = (): void => {
-    if (mut_isCompleted) return; // terminate only once
+    if (mut_isCompleted) {
+      return; // terminate only once
+    }
 
     // change state
     mut_isCompleted = true;
@@ -220,7 +222,9 @@ export const createManagerObservableParts = <A,>(
   const mut_descendantsIdSet: MutableSet<ObservableId> = new Set();
 
   const addDescendant = <B,>(child: ChildObservable<B>): void => {
-    if (mut_descendantsIdSet.has(child.id)) return;
+    if (mut_descendantsIdSet.has(child.id)) {
+      return;
+    }
 
     mut_descendantsIdSet.add(child.id);
 

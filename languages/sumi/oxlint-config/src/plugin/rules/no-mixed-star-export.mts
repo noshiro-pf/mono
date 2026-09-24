@@ -36,10 +36,14 @@ export const noMixedStarExport = createRule({
   defaultOptions: [],
   create: (context) => ({
     Program: (program) => {
-      if (!program.body.some(isStarExport)) return;
+      if (!program.body.some(isStarExport)) {
+        return;
+      }
 
       for (const statement of program.body) {
-        if (isStarExport(statement)) continue;
+        if (isStarExport(statement)) {
+          continue;
+        }
 
         if (statement.type === AST_NODE_TYPES.ExportAllDeclaration) {
           // `export * as ns from` — an ExportAllDeclaration with `exported`.
@@ -66,7 +70,9 @@ export const noMixedStarExport = createRule({
 const isStarExport = (
   statement: DeepReadonly<TSESTree.ProgramStatement>,
 ): boolean => {
-  if (statement.type !== AST_NODE_TYPES.ExportAllDeclaration) return false;
+  if (statement.type !== AST_NODE_TYPES.ExportAllDeclaration) {
+    return false;
+  }
 
   const exported: unknown = statement.exported;
 

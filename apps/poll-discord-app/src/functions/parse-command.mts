@@ -101,7 +101,9 @@ export const gpParseGroupingCommandArgument = (
     Number.NaN,
   );
 
-  if (!isNumGroups(numGroups)) return Result.err(undefined);
+  if (!isNumGroups(numGroups)) {
+    return Result.err(undefined);
+  }
 
   return Result.ok([
     numGroups,

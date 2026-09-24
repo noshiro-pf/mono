@@ -58,7 +58,9 @@ const ymd2str = ({ year, month, date }: YearMonthDate): string =>
 const ymdFromStr = (ymdStr: string): YearMonthDate | undefined => {
   const res = ymdStr.split('-');
 
-  if (!hasLength(res, 3)) return undefined;
+  if (!hasLength(res, 3)) {
+    return undefined;
+  }
 
   const ret = {
     year: Num.from(res[0]),

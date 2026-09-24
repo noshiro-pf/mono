@@ -372,7 +372,9 @@ describe('Arr structural tuple length guards', () => {
 
       assert.isTrue(isNonEmptyTuple(values));
 
-      if (!isNonEmptyTuple(values)) return;
+      if (!isNonEmptyTuple(values)) {
+        return;
+      }
 
       expectType<typeof values, MinLengthTuple<1, number>>('=');
 

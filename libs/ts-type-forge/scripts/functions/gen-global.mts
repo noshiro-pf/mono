@@ -50,9 +50,13 @@ export const genGlobal = async (
 
     const { types, namespaces } = extractTypeExports(content);
 
-    for (const e of types) mut_allTypes.push(e);
+    for (const e of types) {
+      mut_allTypes.push(e);
+    }
 
-    for (const ns of namespaces) mut_allNamespaces.push(ns);
+    for (const ns of namespaces) {
+      mut_allNamespaces.push(ns);
+    }
   }
 
   const mut_lines: string[] = [

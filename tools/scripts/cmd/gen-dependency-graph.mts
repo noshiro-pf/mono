@@ -102,11 +102,15 @@ const readPackage = async (dir: string): Promise<PackageInfo | undefined> => {
     fs.readFile(path.join(dir, 'package.json'), 'utf8'),
   );
 
-  if (Result.isErr(result)) return undefined;
+  if (Result.isErr(result)) {
+    return undefined;
+  }
 
   const parsed: unknown = JSON.parse(result.value);
 
-  if (!isRecord(parsed) || typeof parsed['name'] !== 'string') return undefined;
+  if (!isRecord(parsed) || typeof parsed['name'] !== 'string') {
+    return undefined;
+  }
 
   return {
     name: parsed['name'],
@@ -162,7 +166,9 @@ const toStages = (
       edgesOf(pkg).every(([dep]) => dep === pkg.name || mut_placed.has(dep)),
     );
 
-    if (!Arr.isNonEmpty(ready)) return undefined;
+    if (!Arr.isNonEmpty(ready)) {
+      return undefined;
+    }
 
     mut_stages.push(ready.map((pkg) => pkg.name));
 
@@ -189,20 +195,27 @@ const findCycle = (
     name: string,
     trail: readonly string[],
   ): readonly string[] | undefined => {
-    if (trail.includes(name))
+    if (trail.includes(name)) {
       return Arr.toPushed(trail.slice(trail.indexOf(name)), name);
+    }
 
-    if (mut_done.has(name)) return undefined;
+    if (mut_done.has(name)) {
+      return undefined;
+    }
 
     const pkg = byName.get(name);
 
     if (pkg !== undefined) {
       for (const [dep] of edgesOf(pkg)) {
-        if (dep === name) continue;
+        if (dep === name) {
+          continue;
+        }
 
         const found = walk(dep, Arr.toPushed(trail, name));
 
-        if (found !== undefined) return found;
+        if (found !== undefined) {
+          return found;
+        }
       }
     }
 
@@ -214,7 +227,9 @@ const findCycle = (
   for (const pkg of packages) {
     const found = walk(pkg.name, []);
 
-    if (found !== undefined) return found;
+    if (found !== undefined) {
+      return found;
+    }
   }
 
   return undefined;

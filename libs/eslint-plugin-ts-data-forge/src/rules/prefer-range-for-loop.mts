@@ -81,7 +81,9 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         const endExpr = node.test.right;
 
         // Check update: ++i, i++, i += 1, or i += step
-        if (node.update === null) return;
+        if (node.update === null) {
+          return;
+        }
 
         let mut_step: string | undefined;
 

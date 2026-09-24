@@ -30,7 +30,9 @@ const [pageInput, setPageInput] = createState(1);
 // fromPromise は成功時に Result.Ok(rows)、失敗時に Result.Err(error) を発行
 const tableDataResult = fromPromise(
   fetch('/api/rows').then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
+    }
     /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `Response.json()` is `unknown` under the strict standard library, so this cast is what a reader would write. The line is stripped from the embedded output.
     return r.json() as Promise<readonly Row[]>;
   }),

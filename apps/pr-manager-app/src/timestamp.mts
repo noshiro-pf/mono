@@ -13,7 +13,9 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * every browser this page may be opened in has yet.
  */
 export const epochMsOf = (timestamp: string): number | undefined => {
-  if (!timestamp.endsWith('Z')) return undefined;
+  if (!timestamp.endsWith('Z')) {
+    return undefined;
+  }
 
   const [whole = '', fraction = '', ...rest] = timestamp
     .slice(0, -1)

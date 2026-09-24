@@ -75,7 +75,9 @@ const BLACK_LUMINANCE = 0;
 const parseHex = (color: string): Rgb | undefined => {
   const digits = color.startsWith('#') ? color.slice(1) : color;
 
-  if (!/^[0-9a-f]{6}$/iu.test(digits)) return undefined;
+  if (!/^[0-9a-f]{6}$/iu.test(digits)) {
+    return undefined;
+  }
 
   const pair = (at: number): number =>
     Number.parseInt(digits.slice(at, at + 2), 16);

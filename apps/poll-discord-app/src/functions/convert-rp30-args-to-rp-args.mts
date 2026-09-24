@@ -34,7 +34,9 @@ export const convertRp60ArgToRpArgs = (
 > => {
   const res = rp3060ParseCommand(commandArguments, 'convertRp60ArgsToRpArgs');
 
-  if (Result.isErr(res)) return res;
+  if (Result.isErr(res)) {
+    return res;
+  }
 
   const [title, arg1AsNumber, arg2AsNumber] = res.value;
 
@@ -50,7 +52,9 @@ export const convertRp60dArgToRpArgs = (
 > => {
   const res = rp3060dParseCommand(commandArguments, 'convertRp30dArgsToRpArgs');
 
-  if (Result.isErr(res)) return res;
+  if (Result.isErr(res)) {
+    return res;
+  }
 
   const [arg1AsNumber, arg2AsNumber] = res.value;
 
@@ -92,7 +96,9 @@ export const convertRp30ArgToRpArgs = (
 > => {
   const res = rp3060ParseCommand(commandArguments, 'convertRp30ArgsToRpArgs');
 
-  if (Result.isErr(res)) return res;
+  if (Result.isErr(res)) {
+    return res;
+  }
 
   const [title, arg1AsNumber, arg2AsNumber] = res.value;
 
@@ -108,7 +114,9 @@ export const convertRp30dArgToRpArgs = (
 > => {
   const res = rp3060dParseCommand(commandArguments, 'convertRp30dArgsToRpArgs');
 
-  if (Result.isErr(res)) return res;
+  if (Result.isErr(res)) {
+    return res;
+  }
 
   const [arg1AsNumber, arg2AsNumber] = res.value;
 

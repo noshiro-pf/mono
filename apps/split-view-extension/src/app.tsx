@@ -615,7 +615,9 @@ export const App = memoNamed('App', () => {
         // overwritten in storage.
         const live = mut_liveSession.current;
 
-        if (live.workspaceId === undefined) return;
+        if (live.workspaceId === undefined) {
+          return;
+        }
 
         const restored = await loadWorkspaceState(live.workspaceId);
 

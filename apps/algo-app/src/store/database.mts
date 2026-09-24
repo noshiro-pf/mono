@@ -124,7 +124,9 @@ const mut_unsubscribe: {
 };
 
 roomId$.subscribe((roomId) => {
-  if (roomId === undefined) return;
+  if (roomId === undefined) {
+    return;
+  }
 
   if (mut_unsubscribe.room !== undefined) {
     mut_unsubscribe.room();

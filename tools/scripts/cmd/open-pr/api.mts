@@ -29,7 +29,9 @@ export type ApiContext = Readonly<{ repo: Repo; token: string }>;
 export const resolveToken = async (): Promise<Result<string, string>> => {
   const fromEnv = process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'] ?? '';
 
-  if (fromEnv !== '') return Result.ok(fromEnv);
+  if (fromEnv !== '') {
+    return Result.ok(fromEnv);
+  }
 
   const fromGh = await git('gh auth token');
 
@@ -135,11 +137,15 @@ export const graphql = async (
     body: JSON.stringify({ query, variables }),
   });
 
-  if (Result.isErr(response)) return response;
+  if (Result.isErr(response)) {
+    return response;
+  }
 
   const parsed = validate(response.value, GraphqlResponseSchema);
 
-  if (Result.isErr(parsed)) return parsed;
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
 
   const errors = parsed.value.errors ?? [];
 
@@ -206,7 +212,9 @@ const send = async ({
 const messageFrom = (body: string): string => {
   const parsed = Json.parse(body);
 
-  if (Result.isErr(parsed)) return body.slice(0, 200);
+  if (Result.isErr(parsed)) {
+    return body.slice(0, 200);
+  }
 
   const validated = t
     .record({ message: t.optional(t.string()) })

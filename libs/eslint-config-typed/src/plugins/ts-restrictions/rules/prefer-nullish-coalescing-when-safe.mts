@@ -117,7 +117,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
     const strictNullChecks =
       compilerOptions.strictNullChecks ?? compilerOptions.strict ?? false;
 
-    if (!strictNullChecks) return {};
+    if (!strictNullChecks) {
+      return {};
+    }
 
     const checker = parserServices.program.getTypeChecker();
 
@@ -155,9 +157,13 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         return constraint === undefined ? 'unsafe' : summarizeType(constraint);
       }
 
-      if ((flags & NULLISH_TYPE_FLAGS) !== 0) return NULLABLE_SUMMARY;
+      if ((flags & NULLISH_TYPE_FLAGS) !== 0) {
+        return NULLABLE_SUMMARY;
+      }
 
-      if ((flags & ts.TypeFlags.Never) !== 0) return NEVER_FALSY_SUMMARY;
+      if ((flags & ts.TypeFlags.Never) !== 0) {
+        return NEVER_FALSY_SUMMARY;
+      }
 
       // Literal types (each is falsy only when it is the falsy literal of its
       // primitive kind). Enum literal types carry the same literal flags and
@@ -200,7 +206,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         return SINGLE_FALSY_SUMMARY.emptyString;
       }
 
-      if ((flags & ts.TypeFlags.Number) !== 0) return 'unsafe';
+      if ((flags & ts.TypeFlags.Number) !== 0) {
+        return 'unsafe';
+      }
 
       if ((flags & ts.TypeFlags.Boolean) !== 0) {
         return SINGLE_FALSY_SUMMARY.false;
@@ -221,7 +229,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         return NEVER_FALSY_SUMMARY;
       }
 
-      if (type.isIntersection()) return summarizeIntersection(type);
+      if (type.isIntersection()) {
+        return summarizeIntersection(type);
+      }
 
       // Anything unrecognized (non-union `enum`, `keyof`, …) is unsafe.
       return (flags & ts.TypeFlags.Object) !== 0
@@ -245,13 +255,17 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         (member) => (member.flags & PRIMITIVE_LIKE_TYPE_FLAGS) !== 0,
       );
 
-      if (Arr.isEmpty(primitiveMembers)) return summarizeObjectLikeType(type);
+      if (Arr.isEmpty(primitiveMembers)) {
+        return summarizeObjectLikeType(type);
+      }
 
       const knownSummaries = primitiveMembers
         .map(summarizeType)
         .filter((summary): summary is TypeSummary => summary !== 'unsafe');
 
-      if (Arr.isEmpty(knownSummaries)) return 'unsafe';
+      if (Arr.isEmpty(knownSummaries)) {
+        return 'unsafe';
+      }
 
       return knownSummaries.reduce<TypeSummary>(
         (intersection, summary) => ({
@@ -296,13 +310,17 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       right: TSESTree.Expression,
       tag: FalsyValueTag,
     ): boolean => {
-      if (!isSideEffectFreeSimpleExpression(right)) return false;
+      if (!isSideEffectFreeSimpleExpression(right)) {
+        return false;
+      }
 
       const rightType = checker.getTypeAtLocation(
         parserServices.esTreeNodeToTSNodeMap.get(right),
       );
 
-      if (rightType.isUnion()) return false;
+      if (rightType.isUnion()) {
+        return false;
+      }
 
       switch (tag) {
         case 'emptyString':
@@ -338,9 +356,13 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       right: TSESTree.Expression,
     ): boolean => {
-      if (summary.falsyValues.size === 0) return true;
+      if (summary.falsyValues.size === 0) {
+        return true;
+      }
 
-      if (summary.falsyValues.size > 1) return false;
+      if (summary.falsyValues.size > 1) {
+        return false;
+      }
 
       const [tag] = summary.falsyValues;
 
@@ -349,13 +371,19 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
 
     return {
       LogicalExpression: (node) => {
-        if (node.operator !== '||') return;
+        if (node.operator !== '||') {
+          return;
+        }
 
         const summary = summarizeExpressionType(node.left);
 
-        if (summary === 'unsafe') return;
+        if (summary === 'unsafe') {
+          return;
+        }
 
-        if (!falsyCaseIsHarmless(summary, node.right)) return;
+        if (!falsyCaseIsHarmless(summary, node.right)) {
+          return;
+        }
 
         if (!summary.nullable) {
           // A never-nullish left-hand side makes the whole `|| <fallback>`
@@ -375,12 +403,16 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
                 (token) => token.value === '||',
               );
 
-              if (operatorToken === null) return null;
+              if (operatorToken === null) {
+                return null;
+              }
 
               const tokenBeforeOperator =
                 context.sourceCode.getTokenBefore(operatorToken);
 
-              if (tokenBeforeOperator === null) return null;
+              if (tokenBeforeOperator === null) {
+                return null;
+              }
 
               // Remove from the end of the left operand's last token (its
               // closing parenthesis included, so `(a, b) || ''` keeps its
@@ -421,7 +453,9 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
               (token) => token.value === '||',
             );
 
-            if (operatorToken === null) return null;
+            if (operatorToken === null) {
+              return null;
+            }
 
             const mut_fixes: TSESLint.RuleFix[] = [
               fixer.replaceText(operatorToken, '??'),
@@ -448,18 +482,26 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
       },
 
       AssignmentExpression: (node) => {
-        if (node.operator !== '||=') return;
+        if (node.operator !== '||=') {
+          return;
+        }
 
         const summary = summarizeExpressionType(node.left);
 
-        if (summary === 'unsafe') return;
+        if (summary === 'unsafe') {
+          return;
+        }
 
         // Only a nullable target is rewritten. On a never-nullish one the
         // equivalent cleanup would be deleting the whole statement, which is
         // out of this rule's scope.
-        if (!summary.nullable) return;
+        if (!summary.nullable) {
+          return;
+        }
 
-        if (!falsyCaseIsHarmless(summary, node.right)) return;
+        if (!falsyCaseIsHarmless(summary, node.right)) {
+          return;
+        }
 
         // When the falsy non-nullish case is reachable (the singleton-match
         // case), `||=` assigns where `??=` does not. On a property that

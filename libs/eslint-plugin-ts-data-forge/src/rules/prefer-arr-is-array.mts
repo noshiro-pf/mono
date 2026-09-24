@@ -40,7 +40,9 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       CallExpression: (node) => {
-        if (!isArrayIsArrayCall(node)) return;
+        if (!isArrayIsArrayCall(node)) {
+          return;
+        }
 
         mut_nodesToFix.push(node);
       },
@@ -59,7 +61,9 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
             fix: (fixer) => {
               const callee = node.callee;
 
-              if (callee.type !== AST_NODE_TYPES.MemberExpression) return [];
+              if (callee.type !== AST_NODE_TYPES.MemberExpression) {
+                return [];
+              }
 
               const replacement = `Arr.isArray${sourceCode.getText(node).slice(sourceCode.getText(callee).length)}`;
 
@@ -82,17 +86,27 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
 const isArrayIsArrayCall = (
   node: DeepReadonly<TSESTree.CallExpression>,
 ): boolean => {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) return false;
+  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+    return false;
+  }
 
   const { object, property } = node.callee;
 
-  if (object.type !== AST_NODE_TYPES.Identifier) return false;
+  if (object.type !== AST_NODE_TYPES.Identifier) {
+    return false;
+  }
 
-  if (object.name !== 'Array') return false;
+  if (object.name !== 'Array') {
+    return false;
+  }
 
-  if (property.type !== AST_NODE_TYPES.Identifier) return false;
+  if (property.type !== AST_NODE_TYPES.Identifier) {
+    return false;
+  }
 
-  if (property.name !== 'isArray') return false;
+  if (property.name !== 'isArray') {
+    return false;
+  }
 
   return true;
 };

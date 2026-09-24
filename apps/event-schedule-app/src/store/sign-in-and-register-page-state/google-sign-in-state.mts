@@ -46,7 +46,9 @@ const googleSignInSubmit = async (
 };
 
 const googleSignInClickHandler = (): void => {
-  if (getGoogleSignInButtonDisabledStateSnapshot()) return;
+  if (getGoogleSignInButtonDisabledStateSnapshot()) {
+    return;
+  }
 
   // TODO: use toast
   googleSignInSubmit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(

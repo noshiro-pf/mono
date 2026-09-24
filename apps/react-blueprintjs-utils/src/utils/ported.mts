@@ -25,7 +25,9 @@ export const isEmailString = (str: string): boolean =>
 
 /** A six-digit hex colour to `[r, g, b]`; black for anything that is not one. */
 export const hexToRgb = (hex: string): FixedLengthTuple<3, number> => {
-  if (!/^#[0-9a-f]{6}$/iu.test(hex)) return [0, 0, 0];
+  if (!/^#[0-9a-f]{6}$/iu.test(hex)) {
+    return [0, 0, 0];
+  }
 
   const parse = (from: number): number =>
     Math.min(255, Math.max(0, Number.parseInt(hex.slice(from, from + 2), 16)));

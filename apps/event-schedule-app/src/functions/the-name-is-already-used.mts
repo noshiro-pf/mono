@@ -3,6 +3,4 @@ export const theNameIsAlreadyUsedFn = (
   answers: readonly Answer[],
   nameToOmit: UserName | undefined,
 ): boolean =>
-  userName === nameToOmit
-    ? false
-    : answers.some((a) => a.user.name === userName);
+  userName !== nameToOmit && answers.some((a) => a.user.name === userName);

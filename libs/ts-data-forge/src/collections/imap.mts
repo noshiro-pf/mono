@@ -776,7 +776,9 @@ class IMapClass<K extends MapSetKeyType, V>
   /** @inheritdoc */
   every(predicate: (value: V, key: K) => boolean): boolean {
     for (const [k, v] of this.entries()) {
-      if (!predicate(v, k)) return false;
+      if (!predicate(v, k)) {
+        return false;
+      }
     }
 
     return true;
@@ -785,7 +787,9 @@ class IMapClass<K extends MapSetKeyType, V>
   /** @inheritdoc */
   some(predicate: (value: V, key: K) => boolean): boolean {
     for (const [k, v] of this.entries()) {
-      if (predicate(v, k)) return true;
+      if (predicate(v, k)) {
+        return true;
+      }
     }
 
     return false;
@@ -812,7 +816,9 @@ class IMapClass<K extends MapSetKeyType, V>
   set(key: K, value: V): IMap<K, V> {
     const curr = this.get(key);
 
-    if (Optional.isSome(curr) && value === curr.value) return this; // has no changes
+    if (Optional.isSome(curr) && value === curr.value) {
+      return this; // has no changes
+    }
 
     if (!this.has(key)) {
       return IMap.create([...this.#map, tp(key, value)]);

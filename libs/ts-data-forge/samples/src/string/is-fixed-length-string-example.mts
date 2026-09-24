@@ -11,7 +11,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isFixedLengthString(3, input));
 
-    if (!Str.isFixedLengthString(2, input)) return;
+    if (!Str.isFixedLengthString(2, input)) {
+      return;
+    }
 
     const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
 

@@ -57,7 +57,9 @@ export const ymdhm2Date = (ymdhm: Ymdhm): Date =>
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);
 
-  if (compareYmdResult !== 0) return compareYmdResult;
+  if (compareYmdResult !== 0) {
+    return compareYmdResult;
+  }
 
   const compareHmResult = compareHm(a.hm, b.hm);
 

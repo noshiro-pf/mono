@@ -58,15 +58,23 @@ export const confirmTossBalloonProps$: InitializedObservable<
   ConfirmTossBalloonProps | undefined
 > = combine([isMyTurn$, gameState$, cardPositions$]).pipe(
   map(([isMyTurn, gameState, cardPositions]) => {
-    if (!isMyTurn) return undefined;
+    if (!isMyTurn) {
+      return undefined;
+    }
 
-    if (!gameState.confirmTossBalloonIsOpen) return undefined;
+    if (!gameState.confirmTossBalloonIsOpen) {
+      return undefined;
+    }
 
-    if (cardPositions === undefined) return undefined;
+    if (cardPositions === undefined) {
+      return undefined;
+    }
 
     const anchorCard = gameState.cardChosenToToss;
 
-    if (anchorCard === undefined) return undefined;
+    if (anchorCard === undefined) {
+      return undefined;
+    }
 
     return {
       anchorCardRect: cardPositions[anchorCard.color][anchorCard.number],
@@ -85,15 +93,23 @@ export const selectAnswerBalloonProps$: InitializedObservable<
   SelectAnswerBalloonProps | undefined
 > = combine([isMyTurn$, gameState$, cardPositions$, displayValues$]).pipe(
   map(([isMyTurn, gameState, cardPositions, displayValues]) => {
-    if (!isMyTurn) return undefined;
+    if (!isMyTurn) {
+      return undefined;
+    }
 
-    if (!gameState.selectAnswerBalloonIsOpen) return undefined;
+    if (!gameState.selectAnswerBalloonIsOpen) {
+      return undefined;
+    }
 
-    if (cardPositions === undefined) return undefined;
+    if (cardPositions === undefined) {
+      return undefined;
+    }
 
     const anchorCard = gameState.cardChosenToBeAttacked;
 
-    if (anchorCard === undefined) return undefined;
+    if (anchorCard === undefined) {
+      return undefined;
+    }
 
     const cardColor = anchorCard.color;
 
@@ -118,15 +134,23 @@ export const decidedAnswerBalloonProps$: InitializedObservable<
   DecidedAnswerBalloonProps | undefined
 > = combine([cardPositions$, gameState$, displayValues$]).pipe(
   map(([cardPositions, gameState, displayValues]) => {
-    if (cardPositions === undefined) return undefined;
+    if (cardPositions === undefined) {
+      return undefined;
+    }
 
-    if (!gameState.decidedAnswerBalloonIsOpen) return undefined;
+    if (!gameState.decidedAnswerBalloonIsOpen) {
+      return undefined;
+    }
 
-    if (gameState.answerSelected === undefined) return undefined;
+    if (gameState.answerSelected === undefined) {
+      return undefined;
+    }
 
     const anchorCard = gameState.cardChosenToBeAttacked;
 
-    if (anchorCard === undefined) return undefined;
+    if (anchorCard === undefined) {
+      return undefined;
+    }
 
     return {
       anchorCardRect: cardPositions[anchorCard.color][anchorCard.number],

@@ -72,7 +72,9 @@ export const buildCalleeResolver = (
 
   const localToCanonical = new Map<string, string>(
     specifiers.flatMap((specifier) => {
-      if (specifier.type !== AST_NODE_TYPES.ImportSpecifier) return [];
+      if (specifier.type !== AST_NODE_TYPES.ImportSpecifier) {
+        return [];
+      }
 
       const importedName =
         specifier.imported.type === AST_NODE_TYPES.Identifier

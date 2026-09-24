@@ -111,7 +111,9 @@ const typedocPackages = async (): Promise<readonly string[]> => {
   const mut_found: string[] = [];
 
   for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
+    if (!entry.isDirectory()) {
+      continue;
+    }
 
     const hasTypedoc = await pathExists(
       path.resolve(libsDir, entry.name, 'configs/typedoc.config.mjs'),

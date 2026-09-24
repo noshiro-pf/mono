@@ -45,7 +45,9 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
       LogicalExpression: (node) => {
         const identifierName = getNonNullObjectIdentifierName(node);
 
-        if (identifierName === undefined) return;
+        if (identifierName === undefined) {
+          return;
+        }
 
         mut_nodesToFix.push({ node, identifierName });
       },
@@ -86,7 +88,9 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
 const getNonNullObjectIdentifierName = (
   node: DeepReadonly<TSESTree.LogicalExpression>,
 ): string | undefined => {
-  if (node.operator !== '&&') return undefined;
+  if (node.operator !== '&&') {
+    return undefined;
+  }
 
   const leftIdentifierName = getTypeofObjectIdentifierName(node.left);
 
@@ -102,9 +106,13 @@ const getNonNullObjectIdentifierName = (
 const getTypeofObjectIdentifierName = (
   node: DeepReadonly<TSESTree.Expression>,
 ): string | undefined => {
-  if (node.type !== AST_NODE_TYPES.BinaryExpression) return undefined;
+  if (node.type !== AST_NODE_TYPES.BinaryExpression) {
+    return undefined;
+  }
 
-  if (node.operator !== '===') return undefined;
+  if (node.operator !== '===') {
+    return undefined;
+  }
 
   const { left, right } = node;
 
@@ -120,9 +128,13 @@ const getTypeofObjectIdentifierName = (
 const getNonNullCheckIdentifierName = (
   node: DeepReadonly<TSESTree.Expression>,
 ): string | undefined => {
-  if (node.type !== AST_NODE_TYPES.BinaryExpression) return undefined;
+  if (node.type !== AST_NODE_TYPES.BinaryExpression) {
+    return undefined;
+  }
 
-  if (node.operator !== '!==') return undefined;
+  if (node.operator !== '!==') {
+    return undefined;
+  }
 
   const { left, right } = node;
 

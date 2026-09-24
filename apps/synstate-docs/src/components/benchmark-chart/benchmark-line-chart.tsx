@@ -54,7 +54,9 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
     s.values.filter((v): v is number => v !== undefined),
   );
 
-  if (Arr.isEmpty(allValues)) return undefined;
+  if (Arr.isEmpty(allValues)) {
+    return undefined;
+  }
 
   const yMin = logScale ? Math.max(0.1, Math.min(...allValues)) : 0;
 

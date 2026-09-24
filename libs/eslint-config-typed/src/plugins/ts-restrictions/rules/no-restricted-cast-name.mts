@@ -30,7 +30,9 @@ type MessageIds = 'restrictedCast';
 const getTypeName = (
   typeAnnotation: DeepReadonly<TSESTree.TypeNode> | undefined,
 ): string | undefined => {
-  if (typeAnnotation === undefined) return undefined;
+  if (typeAnnotation === undefined) {
+    return undefined;
+  }
 
   if (typeAnnotation.type === AST_NODE_TYPES.TSAnyKeyword) {
     return 'any';
@@ -202,11 +204,15 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
       TSAsExpression: (node) => {
         const typeName = getTypeName(node.typeAnnotation);
 
-        if (typeName === undefined) return;
+        if (typeName === undefined) {
+          return;
+        }
 
         const fixWith = mut_restrictedTypes.get(typeName);
 
-        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) return;
+        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) {
+          return;
+        }
 
         context.report({
           node: node.typeAnnotation,
@@ -227,11 +233,15 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
       TSTypeAssertion: (node) => {
         const typeName = getTypeName(node.typeAnnotation);
 
-        if (typeName === undefined) return;
+        if (typeName === undefined) {
+          return;
+        }
 
         const fixWith = mut_restrictedTypes.get(typeName);
 
-        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) return;
+        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) {
+          return;
+        }
 
         context.report({
           node: node.typeAnnotation,

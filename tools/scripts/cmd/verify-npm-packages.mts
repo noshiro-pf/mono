@@ -57,19 +57,25 @@ export const verifyNpmPackages = async (
       ? await packAll(packages)
       : Result.ok<ReadonlyRecord<string, string>>({});
 
-  if (Result.isErr(tarballs)) return tarballs;
+  if (Result.isErr(tarballs)) {
+    return tarballs;
+  }
 
   if (target === 'local') {
     const advertised = await checkAdvertisedPaths(tarballs.value);
 
-    if (Result.isErr(advertised)) return advertised;
+    if (Result.isErr(advertised)) {
+      return advertised;
+    }
   }
 
   const generated = await generateSpace(target, spaceDir, packages, {
     updatePins: options?.updatePins ?? false,
   });
 
-  if (Result.isErr(generated)) return generated;
+  if (Result.isErr(generated)) {
+    return generated;
+  }
 
   // What the space actually contains, which in the published space is not
   // every publishable package — see `generateSpace`.
@@ -81,7 +87,9 @@ export const verifyNpmPackages = async (
 
   const installed = await installProjects(spaceDir, included);
 
-  if (Result.isErr(installed)) return installed;
+  if (Result.isErr(installed)) {
+    return installed;
+  }
 
   console.info('ok\n');
 
@@ -270,7 +278,9 @@ const checkAdvertisedPaths = async (
 };
 
 const collectPaths = (manifest: JsonValue): readonly string[] => {
-  if (!isRecord(manifest)) return [];
+  if (!isRecord(manifest)) {
+    return [];
+  }
 
   const fromTopLevel = (['main', 'module', 'types'] as const)
     .map((key) => manifest[key])
@@ -335,7 +345,9 @@ const generateSpace = async (
           )
         : await publishedVersionPin(dir, pkg.name, options.updatePins);
 
-    if (Result.isErr(pin)) return pin;
+    if (Result.isErr(pin)) {
+      return pin;
+    }
 
     const spec = pin.value;
 
@@ -354,7 +366,9 @@ const generateSpace = async (
 
     const peers = await peerSpecs(target, dir, pkg, spec, options.updatePins);
 
-    if (Result.isErr(peers)) return peers;
+    if (Result.isErr(peers)) {
+      return peers;
+    }
 
     await writeFile(
       path.resolve(dir, 'pnpm-workspace.yaml'),
@@ -491,11 +505,15 @@ const peerSpecs = async (
   spec: string,
   updatePins: boolean,
 ): Promise<Result<ReadonlyRecord<string, string>, string>> => {
-  if (target === 'local') return Result.ok(declaredPeers(pkg.manifest));
+  if (target === 'local') {
+    return Result.ok(declaredPeers(pkg.manifest));
+  }
 
   const committed = updatePins ? undefined : await readCommittedPeers(dir, pkg);
 
-  if (committed !== undefined) return Result.ok(committed);
+  if (committed !== undefined) {
+    return Result.ok(committed);
+  }
 
   // The whole manifest rather than the two fields by name: `npm view` given
   // several fields prints them keyed by field name only when more than one of
@@ -527,10 +545,14 @@ const declaredPeers = (manifest: JsonValue): ReadonlyRecord<string, string> => {
     ? manifest['peerDependenciesMeta']
     : undefined;
 
-  if (!isRecord(peers)) return {};
+  if (!isRecord(peers)) {
+    return {};
+  }
 
   const isOptional = (name: string): boolean => {
-    if (!isRecord(meta)) return false;
+    if (!isRecord(meta)) {
+      return false;
+    }
 
     const entry = meta[name];
 
@@ -556,15 +578,21 @@ const readCommittedPeers = async (
     .readFile(path.resolve(dir, 'package.json'), 'utf8')
     .catch(() => undefined);
 
-  if (raw === undefined) return undefined;
+  if (raw === undefined) {
+    return undefined;
+  }
 
   const parsed = Json.parse(raw);
 
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) return undefined;
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+    return undefined;
+  }
 
   const deps = parsed.value['dependencies'];
 
-  if (!isRecord(deps)) return undefined;
+  if (!isRecord(deps)) {
+    return undefined;
+  }
 
   return Obj.filterMap(deps, (spec, name) =>
     name !== pkg.name &&
@@ -653,11 +681,15 @@ const publishedVersionPin = async (
     ? undefined
     : await readPinnedVersion(dir, packageName);
 
-  if (existing !== undefined) return Result.ok(existing);
+  if (existing !== undefined) {
+    return Result.ok(existing);
+  }
 
   const latest = await $(`npm view ${packageName} version`, { silent: true });
 
-  if (Result.isOk(latest)) return Result.ok(latest.value.stdout.trim());
+  if (Result.isOk(latest)) {
+    return Result.ok(latest.value.stdout.trim());
+  }
 
   // A network fault, a registry outage or an auth error is reported as-is:
   // reading those as "not published" would drop packages from the check at
@@ -694,15 +726,21 @@ const readPinnedVersion = async (
     .readFile(path.resolve(dir, 'package.json'), 'utf8')
     .catch(() => undefined);
 
-  if (raw === undefined) return undefined;
+  if (raw === undefined) {
+    return undefined;
+  }
 
   const parsed = Json.parse(raw);
 
-  if (Result.isErr(parsed) || !isRecord(parsed.value)) return undefined;
+  if (Result.isErr(parsed) || !isRecord(parsed.value)) {
+    return undefined;
+  }
 
   const deps = parsed.value['dependencies'];
 
-  if (!isRecord(deps)) return undefined;
+  if (!isRecord(deps)) {
+    return undefined;
+  }
 
   const pinned = deps[packageName];
 
@@ -771,7 +809,9 @@ const strictLibCompilerOptions = (
 ): ReadonlyRecord<string, JsonValue> => {
   const major = strictLibTypeScriptMajor(packageName);
 
-  if (major === undefined) return {};
+  if (major === undefined) {
+    return {};
+  }
 
   return {
     // What is under test is the standard library. Without this, tsc walks up
@@ -897,8 +937,9 @@ const readPublishablePackages = async (): Promise<
 
   return (
     packages
-      .filter((pkg) =>
-        isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
+      .filter(
+        (pkg) =>
+          isRecord(pkg.packageJson) && pkg.packageJson['private'] !== true,
       )
       .map((pkg) => ({
         name: pkg.name,

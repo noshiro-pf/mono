@@ -28,14 +28,18 @@ const generateDiffForFile = async (
   jaDir: string,
   fileName: string,
 ): Promise<DiffOutcome | undefined> => {
-  if (fileName.endsWith('.diff')) return undefined;
+  if (fileName.endsWith('.diff')) {
+    return undefined;
+  }
 
   const jaFilePath = path.resolve(jaDir, fileName);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const jaStat = await fs.stat(jaFilePath);
 
-  if (!jaStat.isFile()) return undefined;
+  if (!jaStat.isFile()) {
+    return undefined;
+  }
 
   const enFilePath = path.resolve(enDir, fileName);
 
@@ -58,7 +62,9 @@ const generateDiffForFile = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const jaContent = await fs.readFile(jaFilePath, 'utf8');
 
-  if (enContent === jaContent) return 'skipped';
+  if (enContent === jaContent) {
+    return 'skipped';
+  }
 
   // Use system `diff` for proper unified diff output
   let mut_diffContent: string;

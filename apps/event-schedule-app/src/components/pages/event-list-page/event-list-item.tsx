@@ -52,11 +52,11 @@ export const EventListItemComponent = memoNamed<Props>(
 
     const hasUnanswered = React.useMemo<boolean>(
       () =>
-        fireAuthUser === undefined
-          ? false
-          : (answers
-              .find(({ user }) => user.id === fireAuthUser.uid)
-              ?.selection.some((a) => a.iconId === 'none') ?? false),
+        (fireAuthUser !== undefined &&
+          answers
+            .find(({ user }) => user.id === fireAuthUser.uid)
+            ?.selection.some((a) => a.iconId === 'none')) ??
+        false,
       [answers, fireAuthUser],
     );
 

@@ -16,36 +16,41 @@ export const isIntegerLiteralOrConstant = (
   sourceCode: TSESLint.SourceCode,
 ): boolean => {
   // Direct integer literal (e.g., 3)
-  if (isIntegerLiteral(node)) return true;
+  if (isIntegerLiteral(node)) {
+    return true;
+  }
 
   // Identifier referencing a const variable initialized with an integer literal
-  if (node.type !== AST_NODE_TYPES.Identifier) return false;
+  if (node.type !== AST_NODE_TYPES.Identifier) {
+    return false;
+  }
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const scope = sourceCode.getScope(node as TSESTree.Node);
 
   const variable = findVariable(scope, node.name);
 
-  if (variable === undefined) return false;
+  if (variable === undefined) {
+    return false;
+  }
 
   // Must have exactly one definition (const)
-  if (variable.defs.length !== 1) return false;
+  if (variable.defs.length !== 1) {
+    return false;
+  }
 
   const def = variable.defs[0];
 
-  if (def === undefined) return false;
-
-  if (!isVariableDefinition(def)) return false;
-
-  if (def.parent.kind !== 'const') return false;
-
-  if (def.node.init == null) return false;
-
-  // Reject if there is an explicit type annotation (e.g., `const n: number = 3`)
-  // because the literal type is widened and type guard cannot narrow it.
-  return def.node.id.typeAnnotation !== undefined
-    ? false
-    : isIntegerLiteral(def.node.init);
+  return (
+    def !== undefined &&
+    isVariableDefinition(def) &&
+    def.parent.kind === 'const' &&
+    def.node.init != null &&
+    // Reject if there is an explicit type annotation (e.g., `const n: number = 3`)
+    // because the literal type is widened and type guard cannot narrow it.
+    def.node.id.typeAnnotation === undefined &&
+    isIntegerLiteral(def.node.init)
+  );
 };
 
 export const isLengthAccess = (
@@ -91,9 +96,13 @@ export const parseLengthComparison = (
 
   const boundSide = lengthOnLeft ? right : left;
 
-  if (!isLengthAccess(lengthSide)) return undefined;
+  if (!isLengthAccess(lengthSide)) {
+    return undefined;
+  }
 
-  if (!isIntegerLiteralOrConstant(boundSide, sourceCode)) return undefined;
+  if (!isIntegerLiteralOrConstant(boundSide, sourceCode)) {
+    return undefined;
+  }
 
   const kind: LengthComparison['kind'] = (
     lengthOnLeft ? operator === '>=' : operator === '<='
@@ -128,13 +137,17 @@ export const isPartOfBoundedLengthCheck = (
 
   const self = parseLengthComparison(node, sourceCode);
 
-  if (self === undefined) return false;
+  if (self === undefined) {
+    return false;
+  }
 
   const sibling = parent.left === node ? parent.right : parent.left;
 
   const other = parseLengthComparison(sibling, sourceCode);
 
-  if (other === undefined) return false;
+  if (other === undefined) {
+    return false;
+  }
 
   return (
     self.kind !== other.kind &&

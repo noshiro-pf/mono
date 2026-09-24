@@ -70,11 +70,15 @@ export type CheckResult = Readonly<
 export const runCheck = (project: string): Result<CheckResult, string> => {
   const tsconfigPath = resolveTsconfigPath(project);
 
-  if (Result.isErr(tsconfigPath)) return tsconfigPath;
+  if (Result.isErr(tsconfigPath)) {
+    return tsconfigPath;
+  }
 
   const config = showConfig(tsconfigPath.value);
 
-  if (Result.isErr(config)) return config;
+  if (Result.isErr(config)) {
+    return config;
+  }
 
   const violations = validateCompilerOptions(config.value.compilerOptions);
 

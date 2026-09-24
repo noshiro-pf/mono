@@ -712,24 +712,33 @@ describe('Optional test', () => {
     test('should convert non-null values to Some', () => {
       const helloOpt = Optional.fromNullable('hello');
 
-      if (Optional.isSome(helloOpt))
+      if (Optional.isSome(helloOpt)) {
         expect(Optional.unwrap(helloOpt)).toBe('hello');
+      }
 
       const numOpt = Optional.fromNullable(42);
 
-      if (Optional.isSome(numOpt)) expect(Optional.unwrap(numOpt)).toBe(42);
+      if (Optional.isSome(numOpt)) {
+        expect(Optional.unwrap(numOpt)).toBe(42);
+      }
 
       const zeroOpt = Optional.fromNullable(0);
 
-      if (Optional.isSome(zeroOpt)) expect(Optional.unwrap(zeroOpt)).toBe(0);
+      if (Optional.isSome(zeroOpt)) {
+        expect(Optional.unwrap(zeroOpt)).toBe(0);
+      }
 
       const emptyOpt = Optional.fromNullable('');
 
-      if (Optional.isSome(emptyOpt)) expect(Optional.unwrap(emptyOpt)).toBe('');
+      if (Optional.isSome(emptyOpt)) {
+        expect(Optional.unwrap(emptyOpt)).toBe('');
+      }
 
       const falseOpt = Optional.fromNullable(false);
 
-      if (Optional.isSome(falseOpt)) assert.isFalse(Optional.unwrap(falseOpt));
+      if (Optional.isSome(falseOpt)) {
+        assert.isFalse(Optional.unwrap(falseOpt));
+      }
     });
 
     test('should convert null to None', () => {

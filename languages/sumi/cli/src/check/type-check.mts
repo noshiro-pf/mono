@@ -66,7 +66,9 @@ const parseDiagnosticLine = (
 
   const markerAt = text.indexOf(marker);
 
-  if (markerAt === -1) return undefined;
+  if (markerAt === -1) {
+    return undefined;
+  }
 
   const head = text.slice(0, markerAt);
 
@@ -74,7 +76,9 @@ const parseDiagnosticLine = (
 
   const codeEnd = rest.indexOf(': ');
 
-  if (codeEnd === -1) return undefined;
+  if (codeEnd === -1) {
+    return undefined;
+  }
 
   const code = rest.slice(0, codeEnd);
 
@@ -85,11 +89,15 @@ const parseDiagnosticLine = (
   }
 
   // `<file>(<line>,<column>): `
-  if (!head.endsWith('): ')) return undefined;
+  if (!head.endsWith('): ')) {
+    return undefined;
+  }
 
   const open = head.lastIndexOf('(');
 
-  if (open === -1) return undefined;
+  if (open === -1) {
+    return undefined;
+  }
 
   const lineText = head.slice(open + 1, -3).split(',', 1)[0] ?? '0';
 

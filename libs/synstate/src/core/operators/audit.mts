@@ -147,7 +147,9 @@ const createAuditObservable = <A,>(
         mut_timerId = setTimeout(() => {
           const sn = parentObservable.getSnapshot();
 
-          if (Optional.isNone(sn)) return;
+          if (Optional.isNone(sn)) {
+            return;
+          }
 
           startUpdate(sn.value);
 

@@ -6,7 +6,9 @@ import { termEq } from '../term-eq.mjs';
 import { evaluate1step } from './eval-1-step.mjs';
 
 export const evalSequence = (term: LambdaTerm): readonly LambdaTerm[] => {
-  if (!isLambdaTerm(term)) return [];
+  if (!isLambdaTerm(term)) {
+    return [];
+  }
 
   let mut_curr = term;
   // let prev = undefined;
@@ -16,7 +18,9 @@ export const evalSequence = (term: LambdaTerm): readonly LambdaTerm[] => {
   for (const _counter of range(asSafeUint(MAX_STEPS), 0, -1)) {
     const next = evaluate1step(mut_curr);
 
-    if (termEq(next, mut_curr)) break;
+    if (termEq(next, mut_curr)) {
+      break;
+    }
 
     mut_seq.push(next);
 

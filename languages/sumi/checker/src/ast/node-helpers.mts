@@ -29,11 +29,15 @@ export const ownerOf = (
 ): string | undefined => {
   const symbol = checker.getSymbolAtLocation(access.name);
 
-  if (symbol === undefined) return undefined;
+  if (symbol === undefined) {
+    return undefined;
+  }
 
   const parent = symbol.getParent();
 
-  if (parent !== undefined) return parent.name;
+  if (parent !== undefined) {
+    return parent.name;
+  }
 
   // A member reached through a mapped type — `Readonly<Date>`,
   // `Readonly<Uint8Array>` — is a synthesized symbol with no parent, so the

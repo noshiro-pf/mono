@@ -57,12 +57,16 @@ export const fromPromise = <A, E = unknown>(
     ({ startUpdate, isCompleted, complete }) => {
       promise
         .then((value) => {
-          if (isCompleted()) return;
+          if (isCompleted()) {
+            return;
+          }
 
           startUpdate(Result.ok(value));
         })
         .catch((error: unknown) => {
-          if (isCompleted()) return;
+          if (isCompleted()) {
+            return;
+          }
 
           startUpdate(
             Result.err(

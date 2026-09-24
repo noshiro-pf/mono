@@ -36,17 +36,23 @@ export const reportStdTypeReference = <MessageIds extends string>(
   const typeName = node.typeName;
 
   // `ns.Pick` / `import('…').Pick` never denote the standard-library type.
-  if (typeName.type !== AST_NODE_TYPES.Identifier) return;
+  if (typeName.type !== AST_NODE_TYPES.Identifier) {
+    return;
+  }
 
   const stdName = typeName.name;
 
   const candidates = alternatives.get(stdName);
 
-  if (candidates === undefined) return;
+  if (candidates === undefined) {
+    return;
+  }
 
   // A file that declares — or imports — its own `Pick` does not mean the
   // standard-library one, so there is nothing to steer.
-  if (isLocallyBound(context.sourceCode, node, stdName)) return;
+  if (isLocallyBound(context.sourceCode, node, stdName)) {
+    return;
+  }
 
   const program = context.sourceCode.ast;
 

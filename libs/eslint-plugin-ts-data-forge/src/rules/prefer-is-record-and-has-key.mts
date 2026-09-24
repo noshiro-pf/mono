@@ -54,7 +54,9 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         expression: TSESTree.Expression,
       ): boolean => {
-        if (checker === undefined) return false;
+        if (checker === undefined) {
+          return false;
+        }
 
         const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
 
@@ -84,13 +86,17 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           }
 
           // Check arguments: Object.hasOwn(obj, key)
-          if (node.arguments.length !== 2) return;
+          if (node.arguments.length !== 2) {
+            return;
+          }
 
           const objArg = node.arguments[0];
 
           const keyArg = node.arguments[1];
 
-          if (objArg === undefined || keyArg === undefined) return;
+          if (objArg === undefined || keyArg === undefined) {
+            return;
+          }
 
           // Type guard: ensure arguments are Expressions (not SpreadElement)
           if (
@@ -109,14 +115,18 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
 
         // Handle key in obj
         BinaryExpression: (node) => {
-          if (node.operator !== 'in') return;
+          if (node.operator !== 'in') {
+            return;
+          }
 
           const keyExpression = node.left;
 
           const objExpression = node.right;
 
           // Type guard: ensure keyExpression is Expression (not PrivateIdentifier)
-          if (keyExpression.type === AST_NODE_TYPES.PrivateIdentifier) return;
+          if (keyExpression.type === AST_NODE_TYPES.PrivateIdentifier) {
+            return;
+          }
 
           mut_nodesToFix.push({
             node,

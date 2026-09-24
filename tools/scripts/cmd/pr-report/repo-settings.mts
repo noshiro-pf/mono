@@ -24,7 +24,9 @@ export const readRequiredContexts = async (): Promise<
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const text = await Result.fromPromise(fs.readFile(file, 'utf8'));
 
-  if (Result.isErr(text)) return Result.err(`cannot read ${file}`);
+  if (Result.isErr(text)) {
+    return Result.err(`cannot read ${file}`);
+  }
 
   return Result.map(
     parseRuleset(text.value, file),
@@ -39,7 +41,9 @@ export const readRepoRef = async (): Promise<Result<RepoRef, string>> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const text = await Result.fromPromise(fs.readFile(file, 'utf8'));
 
-  if (Result.isErr(text)) return Result.err(`cannot read ${file}`);
+  if (Result.isErr(text)) {
+    return Result.err(`cannot read ${file}`);
+  }
 
   const parsed = Json.parse(text.value);
 

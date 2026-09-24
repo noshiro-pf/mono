@@ -373,7 +373,9 @@ const buildMembers = (family: FamilySpec): readonly Member[] => {
   const mut_primaries: Member[] = [];
 
   for (const sign of signOrder) {
-    if (sign !== 'any' && !family.signs.includes(sign)) continue;
+    if (sign !== 'any' && !family.signs.includes(sign)) {
+      continue;
+    }
 
     if (sign === 'any') {
       mut_primaries.push({
@@ -524,7 +526,9 @@ const describeSign = (sign: SignKey): string => {
 const rangeLines = (family: FamilySpec, sign: SignKey): readonly string[] => {
   const b = family.bounds;
 
-  if (b === undefined) return [];
+  if (b === undefined) {
+    return [];
+  }
 
   const { lowSym, highSym, lowDec, highDec, split } = rangeForSign(b, sign);
 

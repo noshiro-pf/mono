@@ -190,7 +190,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
     ): boolean => {
       const tsNode = services?.esTreeNodeToTSNodeMap?.get(node);
 
-      if (checker === undefined || tsNode === undefined) return true;
+      if (checker === undefined || tsNode === undefined) {
+        return true;
+      }
 
       const type = checker.getTypeAtLocation(tsNode);
 
@@ -227,7 +229,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       accumulation: Accumulation,
     ): string | undefined => {
-      if (callback.async || callback.generator) return undefined;
+      if (callback.async || callback.generator) {
+        return undefined;
+      }
 
       // `reduce`'s fourth parameter is the whole array, which `scan` never
       // hands its callback; an annotation on the accumulator describes that
@@ -266,7 +270,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
         (variable) => variable.name === accumulatorParam.name,
       );
 
-      if (accumulator === undefined) return undefined;
+      if (accumulator === undefined) {
+        return undefined;
+      }
 
       // `acc.at(-1)` is `T | undefined` only because `at` can go out of bounds,
       // which a seeded accumulator never does. So once the value `scan` carries
@@ -281,13 +287,19 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
         const identifier = reference.identifier;
 
         // The `...acc` / `Arr.toPushed(acc, …)` target the rewrite drops.
-        if (identifier === accumulatorRef) continue;
+        if (identifier === accumulatorRef) {
+          continue;
+        }
 
-        if (identifier.type !== AST_NODE_TYPES.Identifier) return undefined;
+        if (identifier.type !== AST_NODE_TYPES.Identifier) {
+          return undefined;
+        }
 
         const lastRead = enclosingLastRead(identifier);
 
-        if (lastRead === undefined) return undefined;
+        if (lastRead === undefined) {
+          return undefined;
+        }
 
         const guard = carriesNullish ? undefined : nullishGuardAround(lastRead);
 
@@ -299,11 +311,15 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
 
       // Two reads inside one `?? ` — `acc.at(-1) ?? acc.at(-1)` — would give
       // ranges that contain one another, which no ordering of splices resolves.
-      if (overlaps(mut_lastReads)) return undefined;
+      if (overlaps(mut_lastReads)) {
+        return undefined;
+      }
 
       // With no read of the previous value this is a `map` with a seed rather
       // than a scan, and the accumulator parameter would be left unused.
-      if (mut_lastReads.length === 0) return undefined;
+      if (mut_lastReads.length === 0) {
+        return undefined;
+      }
 
       const parameterText = callback.params
         .map((param) => sourceCode.getText(param))
@@ -333,7 +349,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       callback: TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
     ): readonly TSESTree.Node[] | undefined => {
-      if (!Arr.isFixedLengthArray(2, callback.params)) return undefined;
+      if (!Arr.isFixedLengthArray(2, callback.params)) {
+        return undefined;
+      }
 
       const [elementParam, indexParam] = callback.params;
 
@@ -358,7 +376,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
         return undefined;
       }
 
-      if (elementVariable.references.length > 0) return undefined;
+      if (elementVariable.references.length > 0) {
+        return undefined;
+      }
 
       return indexVariable.references.map(
         (reference) => reference.identifier as TSESTree.Node,
@@ -395,11 +415,15 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
 
         switch (methodName) {
           case 'map': {
-            if (rest.length > 0) break;
+            if (rest.length > 0) {
+              break;
+            }
 
             const indexReads = indexReadsOf(callback);
 
-            if (indexReads === undefined) break;
+            if (indexReads === undefined) {
+              break;
+            }
 
             mut_candidates.push({
               call: node,
@@ -415,7 +439,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
             // Two arguments, so that the initial value is explicit: a `reduce`
             // without one starts from the first element and has no `scan`
             // spelling at all.
-            if (rest.length !== 1 || !appendsToItsAccumulator(callback)) break;
+            if (rest.length !== 1 || !appendsToItsAccumulator(callback)) {
+              break;
+            }
 
             const [initial] = rest;
 
@@ -483,7 +509,9 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
               ),
           );
 
-          if (rebuild === undefined) continue;
+          if (rebuild === undefined) {
+            continue;
+          }
 
           context.report({
             node: candidate.call,
@@ -605,7 +633,9 @@ const appendsToItsAccumulator = (
 ): boolean => {
   const [accumulatorParam] = callback.params;
 
-  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) return false;
+  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) {
+    return false;
+  }
 
   const { body } = callback;
 
@@ -645,14 +675,18 @@ const accumulationOf = (
 ): Accumulation | undefined => {
   const [accumulatorParam] = callback.params;
 
-  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) return undefined;
+  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) {
+    return undefined;
+  }
 
   const { body } = callback;
 
   // `[...acc, ELEMENT]` — exactly one spread and one new value, since `scan`
   // appends exactly one per step.
   if (body.type === AST_NODE_TYPES.ArrayExpression) {
-    if (!Arr.isFixedLengthArray(2, body.elements)) return undefined;
+    if (!Arr.isFixedLengthArray(2, body.elements)) {
+      return undefined;
+    }
 
     const [spread, element] = body.elements;
 

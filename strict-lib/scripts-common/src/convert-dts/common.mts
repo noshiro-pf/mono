@@ -412,7 +412,9 @@ export const anyArgumentsTypeDefString = (): string =>
 export const ensureEs5Reference: MonoTypeFunction<string> = (src) => {
   const es5Ref = '/// <reference lib="es5" />';
 
-  if (src.includes(es5Ref)) return src;
+  if (src.includes(es5Ref)) {
+    return src;
+  }
 
   const noDefaultLibRef = '/// <reference no-default-lib="true"/>';
 

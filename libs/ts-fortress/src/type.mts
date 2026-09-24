@@ -271,7 +271,9 @@ const hasUnionInternalsImpl = (t: unknown): t is UnionTypeInternals =>
   isRecord(t) && hasKey(t, 'memberTypes') && Arr.isArray(t.memberTypes);
 
 const isValidShapeStructure = (s: unknown): s is ShapeStructure => {
-  if (!isRecord(s) || !hasKey(s, 'kind')) return false;
+  if (!isRecord(s) || !hasKey(s, 'kind')) {
+    return false;
+  }
 
   if (s.kind === 'simple') {
     return hasKey(s, 'shape') && isRecord(s.shape);

@@ -117,7 +117,9 @@ export const applyExpectErrors = (
   for (const file of files) {
     const source = readFile(file);
 
-    if (source === undefined) continue;
+    if (source === undefined) {
+      continue;
+    }
 
     // `parseMarkers` reports the marker's own problems (a malformed one, or
     // one at the end of the file) through `problems`; those are the corpus's

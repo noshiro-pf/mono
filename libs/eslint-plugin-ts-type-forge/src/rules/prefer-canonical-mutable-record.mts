@@ -87,7 +87,9 @@ export const preferCanonicalMutableRecord: TSESLint.RuleModule<
       const typeName = node.typeName;
 
       // `ns.Mutable` / `import('…').Mutable` never denote the ts-type-forge type.
-      if (typeName.type !== AST_NODE_TYPES.Identifier) return false;
+      if (typeName.type !== AST_NODE_TYPES.Identifier) {
+        return false;
+      }
 
       return (
         typeName.name ===
@@ -101,7 +103,9 @@ export const preferCanonicalMutableRecord: TSESLint.RuleModule<
 
     return {
       TSTypeReference: (node) => {
-        if (!referencesTsTypeForgeType(node, MUTABLE_TYPE_NAME)) return;
+        if (!referencesTsTypeForgeType(node, MUTABLE_TYPE_NAME)) {
+          return;
+        }
 
         const wrapped = node.typeArguments?.params;
 

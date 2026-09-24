@@ -154,7 +154,9 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
       CallExpression: (node) => {
         const resolved = resolveCallee(node.callee);
 
-        if (resolved === undefined) return;
+        if (resolved === undefined) {
+          return;
+        }
 
         const rewrite = REWRITES.find(
           (candidate) =>
@@ -162,7 +164,9 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
             matchesRewrite(node, candidate),
         );
 
-        if (rewrite === undefined) return;
+        if (rewrite === undefined) {
+          return;
+        }
 
         // A namespace call (`t.maxLengthTuple(...)`) only swaps the property
         // name, so it never needs a binding of its own.
@@ -217,7 +221,9 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
           index,
           { node, propertyNode, rewrite, localName },
         ] of reportable.entries()) {
-          if (localName === undefined) continue;
+          if (localName === undefined) {
+            continue;
+          }
 
           context.report({
             node,
@@ -274,7 +280,9 @@ const matchesRewrite = (
   const boundsMatch = rewrite.bounds.every((matcher, index) => {
     const value = bounds[index];
 
-    if (value === undefined) return false;
+    if (value === undefined) {
+      return false;
+    }
 
     switch (matcher) {
       case 'anyLength':

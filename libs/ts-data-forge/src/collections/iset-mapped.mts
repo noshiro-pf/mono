@@ -1240,7 +1240,9 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   /** @inheritdoc */
   every(predicate: (key: K) => boolean): boolean {
     for (const key of this.values()) {
-      if (!predicate(key)) return false;
+      if (!predicate(key)) {
+        return false;
+      }
     }
 
     return true;
@@ -1249,7 +1251,9 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   /** @inheritdoc */
   some(predicate: (key: K) => boolean): boolean {
     for (const key of this.values()) {
-      if (predicate(key)) return true;
+      if (predicate(key)) {
+        return true;
+      }
     }
 
     return false;
@@ -1257,7 +1261,9 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   add(key: K): ISetMapped<K, KM> {
-    if (this.has(key)) return this;
+    if (this.has(key)) {
+      return this;
+    }
 
     return ISetMapped.create(
       [...this.#set, this.#toKey(key)].map(this.#fromKey),

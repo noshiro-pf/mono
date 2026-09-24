@@ -169,8 +169,9 @@ export const transformDeclarationFile = (
       return;
     }
 
-    if (!ts.isTypeReferenceNode(node) || !ts.isIdentifier(node.typeName))
+    if (!ts.isTypeReferenceNode(node) || !ts.isIdentifier(node.typeName)) {
       return;
+    }
 
     const renamed = readonlyCollectionRename.get(node.typeName.text);
 

@@ -13,11 +13,15 @@ import { asNonZeroSafeInt, Num } from 'ts-data-forge';
 export const describeAge = (epochMs: number, nowMs: number): string => {
   const elapsed = nowMs - epochMs;
 
-  if (elapsed < 0) return 'just now';
+  if (elapsed < 0) {
+    return 'just now';
+  }
 
   const unit = UNITS.find(({ millis }) => elapsed >= millis);
 
-  if (unit === undefined) return 'just now';
+  if (unit === undefined) {
+    return 'just now';
+  }
 
   const amount = Num.divInt(elapsed, unit.millis);
 

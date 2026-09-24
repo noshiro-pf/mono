@@ -97,7 +97,9 @@ export const preferNamespaceImport: TSESLint.RuleModule<MessageIds, Options> = {
           (declaration) => !isNamespaceOnly(declaration),
         );
 
-        if (!Arr.isNonEmpty(reported)) return;
+        if (!Arr.isNonEmpty(reported)) {
+          return;
+        }
 
         const namespaceSpecifiers = declarations
           .flatMap((declaration) => declaration.specifiers)
@@ -210,7 +212,9 @@ const buildFixPlan = (
   // `import type * as t` cannot carry a value reference, so a value import
   // does not merge into one; a namespace import of its own would be a second
   // one, which the check above rules out.
-  if (!typeOnly && reused?.parent.importKind === 'type') return undefined;
+  if (!typeOnly && reused?.parent.importKind === 'type') {
+    return undefined;
+  }
 
   const mut_rewrites: ReferenceRewrite[] = [];
 
@@ -224,7 +228,9 @@ const buildFixPlan = (
         candidate.defs.some((def) => def.node === specifier),
       );
 
-      if (member === undefined || variable === undefined) return undefined;
+      if (member === undefined || variable === undefined) {
+        return undefined;
+      }
 
       for (const reference of variable.references) {
         const rewrite = buildReferenceRewrite(
@@ -234,7 +240,9 @@ const buildFixPlan = (
           member.name,
         );
 
-        if (rewrite === undefined) return undefined;
+        if (rewrite === undefined) {
+          return undefined;
+        }
 
         mut_rewrites.push(rewrite);
       }
@@ -305,7 +313,9 @@ const buildReferenceRewrite = (
 
   // `export { string }` names the binding rather than using it, and a member
   // access is not a name — such a file has to be rewritten by hand.
-  if (parent.type === AST_NODE_TYPES.ExportSpecifier) return undefined;
+  if (parent.type === AST_NODE_TYPES.ExportSpecifier) {
+    return undefined;
+  }
 
   return {
     identifier,

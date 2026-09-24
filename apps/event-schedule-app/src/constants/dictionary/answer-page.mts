@@ -132,9 +132,13 @@ export const answerPageDictionary = {
           (b) => b,
         );
 
-        if (numChecked === 0) return '曜日：なし';
+        if (numChecked === 0) {
+          return '曜日：なし';
+        }
 
-        if (numChecked === 7) return '曜日：すべて';
+        if (numChecked === 7) {
+          return '曜日：すべて';
+        }
 
         return numChecked <= 3
           ? `${zipped

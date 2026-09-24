@@ -63,11 +63,15 @@ const resetAllState = (): void => {
 const restoreFromLocalStorage = (): void => {
   const fromStorage = EventScheduleAppLocalStorage.restoreCreateEventPageTemp();
 
-  if (Result.isErr(fromStorage)) return;
+  if (Result.isErr(fromStorage)) {
+    return;
+  }
 
   const ev = fromStorage.value;
 
-  if (ev === undefined) return;
+  if (ev === undefined) {
+    return;
+  }
 
   commonStateHandlers.setTitle(ev.title);
 
@@ -147,7 +151,9 @@ const createEvent = async (): Promise<Result<undefined, string>> => {
     notificationSettingsWithEmail,
   } = commonState;
 
-  if (!eventScheduleValidationOk) return Result.ok(undefined);
+  if (!eventScheduleValidationOk) {
+    return Result.ok(undefined);
+  }
 
   const email = notificationSettingsWithEmail?.email ?? '';
 

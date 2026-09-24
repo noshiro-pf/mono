@@ -57,7 +57,9 @@ type PackageJson = t.TypeOf<typeof packageJsonType>;
 const parsePackageJson = (jsonStr: string): PackageJson | undefined => {
   const parsed = Json.parse(jsonStr);
 
-  if (Result.isErr(parsed)) return undefined;
+  if (Result.isErr(parsed)) {
+    return undefined;
+  }
 
   const result = packageJsonType.validate(parsed.value);
 
@@ -421,7 +423,9 @@ const genBundlePackage = async (
   // ')' but found 'Identifier'`, exit 2), taking the release down with it.
   const formatRes = await formatDir(bundleDir);
 
-  if (Result.isErr(formatRes)) return formatRes;
+  if (Result.isErr(formatRes)) {
+    return formatRes;
+  }
 
   console.info(`${bundleDir} (bundle package) generated.`);
 
@@ -549,7 +553,9 @@ const bundleChangelog = async (
 
   // Before the first release there is nothing to carry over, and the file
   // still has to exist: the changesets action reads it either way.
-  if (harnessChangelog === undefined) return `# ${libName}\n`;
+  if (harnessChangelog === undefined) {
+    return `# ${libName}\n`;
+  }
 
   const [heading, ...rest] = harnessChangelog.split('\n');
 
@@ -650,7 +656,9 @@ const getTsTypeForgeRange = async (
   const value =
     parsePackageJson(packageJsonStr)?.devDependencies?.[typeUtilsName];
 
-  if (value === undefined) return undefined;
+  if (value === undefined) {
+    return undefined;
+  }
 
   // The declaration carries a version to read when it is a plain range, and
   // nothing to read when it is `workspace:*` — which is what it says inside a

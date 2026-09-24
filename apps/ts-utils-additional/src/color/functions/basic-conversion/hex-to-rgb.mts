@@ -11,7 +11,9 @@ const parseAsHex = (hexStr: string): RgbValue =>
   Uint8.fromNumber(Number.parseInt(hexStr, 16));
 
 export const hexToRgb = (hex: string): Rgb => {
-  if (!/^#[0-9a-fA-F]{6}$/u.test(hex)) return [0, 0, 0];
+  if (!/^#[0-9a-fA-F]{6}$/u.test(hex)) {
+    return [0, 0, 0];
+  }
 
   return [
     parseAsHex(hex.slice(1, 3)),

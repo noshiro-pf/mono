@@ -76,7 +76,9 @@ export const canvasAppStateHandlerGenerator = (
         break;
 
       case 'bboxFacePointerOver':
-        if (mut_state.grabbingObject.type !== undefined) return;
+        if (mut_state.grabbingObject.type !== undefined) {
+          return;
+        }
 
         // highlight on
         turnOnHighlight(action.pixiBbox);

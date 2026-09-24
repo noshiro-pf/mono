@@ -31,7 +31,9 @@ export const createMobXAdapter = (): Adapter => {
       );
     },
     onMouseMove: (pos) => {
-      if (mut_mousePos === undefined) return;
+      if (mut_mousePos === undefined) {
+        return;
+      }
 
       // Both mutations are batched in a single action — no intermediate state
       runInAction(() => {

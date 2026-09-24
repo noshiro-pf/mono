@@ -118,7 +118,9 @@ const notificationSettingsDiff = (
   emailPrev: string | undefined,
   emailCurr: string | undefined,
 ): readonly string[] | undefined => {
-  if (emailPrev === emailCurr && fastDeepEqual(a, b)) return undefined;
+  if (emailPrev === emailCurr && fastDeepEqual(a, b)) {
+    return undefined;
+  }
 
   if (a === 'none' || b === 'none') {
     return [
@@ -188,7 +190,9 @@ const datetimeRangeListDiff = (
 
   const diff = ISetMapped.diff(setA, setB);
 
-  if (diff.added.isEmpty && diff.deleted.isEmpty) return undefined;
+  if (diff.added.isEmpty && diff.deleted.isEmpty) {
+    return undefined;
+  }
 
   const added = diff.added.toArray();
 

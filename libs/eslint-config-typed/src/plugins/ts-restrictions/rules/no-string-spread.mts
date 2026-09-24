@@ -105,7 +105,9 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
           node.argument,
         );
 
-        if (!isStringLikeType(checker.getTypeAtLocation(argTsNode))) return;
+        if (!isStringLikeType(checker.getTypeAtLocation(argTsNode))) {
+          return;
+        }
 
         context.report({
           node,

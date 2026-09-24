@@ -97,7 +97,9 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
 
     return {
       CallExpression: (node) => {
-        if (node.arguments.length !== 1) return;
+        if (node.arguments.length !== 1) {
+          return;
+        }
 
         const argument = node.arguments[0];
 
@@ -110,11 +112,15 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
 
         const resolved = resolveGuard(node.callee);
 
-        if (resolved === undefined) return;
+        if (resolved === undefined) {
+          return;
+        }
 
         const spec = COMPARISON_GUARDS[resolved.canonicalName];
 
-        if (spec === undefined) return;
+        if (spec === undefined) {
+          return;
+        }
 
         const argRaw = sourceCode.getText(argument);
 

@@ -37,7 +37,9 @@ export namespace Str {
    *
    * assert.isFalse(Str.isMinLengthString(12, 'short'));
    *
-   * if (!Str.isMinLengthString(12, input)) return;
+   * if (!Str.isMinLengthString(12, input)) {
+   *   return;
+   * }
    *
    * const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
    *
@@ -79,7 +81,9 @@ export namespace Str {
    *
    * assert.isFalse(Str.isMaxLengthString(3, input));
    *
-   * if (!Str.isMaxLengthString(32, input)) return;
+   * if (!Str.isMaxLengthString(32, input)) {
+   *   return;
+   * }
    *
    * const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
    *
@@ -122,7 +126,9 @@ export namespace Str {
    *
    * assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
    *
-   * if (!Str.isBoundedLengthString(8, 16, input)) return;
+   * if (!Str.isBoundedLengthString(8, 16, input)) {
+   *   return;
+   * }
    *
    * const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
    *
@@ -171,7 +177,9 @@ export namespace Str {
    *
    * assert.isFalse(Str.isFixedLengthString(3, input));
    *
-   * if (!Str.isFixedLengthString(2, input)) return;
+   * if (!Str.isFixedLengthString(2, input)) {
+   *   return;
+   * }
    *
    * const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
    *

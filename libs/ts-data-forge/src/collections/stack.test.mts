@@ -263,7 +263,9 @@ describe('Stack test', () => {
     for (const i of range(100)) {
       stack.push(i);
 
-      if (i % 2 !== 1) continue;
+      if (i % 2 !== 1) {
+        continue;
+      }
 
       // Pop every other time
       const result = stack.pop();

@@ -141,7 +141,9 @@ const renderNamespace = (config: BrandedNumberConfig): string => {
 };
 
 const renderExpectType = (config: BrandedNumberConfig): readonly string[] => {
-  if (config.numberClassParams === undefined) return [];
+  if (config.numberClassParams === undefined) {
+    return [];
+  }
 
   const numberClass = [
     'TsDataForgeInternals.RefinedNumberUtils.NumberClass<',
@@ -339,7 +341,9 @@ const wrapText = (text: string, width: number): readonly string[] => {
     }>
   >(
     (acc, word) => {
-      if (acc.current === '') return { lines: acc.lines, current: word };
+      if (acc.current === '') {
+        return { lines: acc.lines, current: word };
+      }
 
       const candidate = `${acc.current} ${word}` as const;
 

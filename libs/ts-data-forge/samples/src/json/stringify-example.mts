@@ -28,7 +28,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.isOk(filtered));
 
-    if (!Result.isOk(filtered)) return;
+    if (!Result.isOk(filtered)) {
+      return;
+    }
 
     assert.isTrue(isString(filtered.value));
 

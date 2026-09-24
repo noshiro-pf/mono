@@ -152,7 +152,9 @@ const saveToDatabase = async (): Promise<void> => {
     notificationSettingsWithEmail,
   } = commonState;
 
-  if (!eventScheduleValidationOk || eventId === undefined) return;
+  if (!eventScheduleValidationOk || eventId === undefined) {
+    return;
+  }
 
   const email = notificationSettingsWithEmail?.email ?? '';
 

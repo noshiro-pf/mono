@@ -25,7 +25,9 @@ export const noLetWithoutMutPrefix = createRule({
   defaultOptions: [],
   create: (context) => ({
     VariableDeclaration: (node) => {
-      if (node.kind !== 'let') return;
+      if (node.kind !== 'let') {
+        return;
+      }
 
       // Walk the binding patterns level by level; only Identifier leaves are
       // bindings. (A switch inside a loop is avoided on purpose: the cases

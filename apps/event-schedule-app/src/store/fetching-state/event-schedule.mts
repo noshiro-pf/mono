@@ -36,7 +36,9 @@ const result$ = eventScheduleResult$;
 
 combine([fetchEventScheduleThrottled$, Router.eventId$]).subscribe(
   ([_, eventId]) => {
-    if (eventId === undefined) return;
+    if (eventId === undefined) {
+      return;
+    }
 
     api.event
       .fetch(eventId)

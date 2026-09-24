@@ -159,7 +159,9 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
       CallExpression: (node) => {
         const roundTrip = parseEntriesRoundTrip(node);
 
-        if (roundTrip === undefined) return;
+        if (roundTrip === undefined) {
+          return;
+        }
 
         mut_roundTrips.push({ node, roundTrip });
       },
@@ -225,13 +227,19 @@ export const preferObjOverEntriesRoundTrip: TSESLint.RuleModule<
 const parseEntriesRoundTrip = (
   node: TSESTree.CallExpression,
 ): RoundTrip | undefined => {
-  if (!isObjectStaticCall(node, 'fromEntries')) return undefined;
+  if (!isObjectStaticCall(node, 'fromEntries')) {
+    return undefined;
+  }
 
-  if (!Arr.isFixedLengthTuple(1, node.arguments)) return undefined;
+  if (!Arr.isFixedLengthTuple(1, node.arguments)) {
+    return undefined;
+  }
 
   const [transform] = node.arguments;
 
-  if (transform.type !== AST_NODE_TYPES.CallExpression) return undefined;
+  if (transform.type !== AST_NODE_TYPES.CallExpression) {
+    return undefined;
+  }
 
   const { callee } = transform;
 
@@ -265,11 +273,15 @@ const parseEntriesRoundTrip = (
 
   const [record] = entriesCall.arguments;
 
-  if (record.type === AST_NODE_TYPES.SpreadElement) return undefined;
+  if (record.type === AST_NODE_TYPES.SpreadElement) {
+    return undefined;
+  }
 
   // A second argument (`thisArg`) or a callback that also takes the entry index
   // has no counterpart in `Obj`.
-  if (!Arr.isFixedLengthTuple(1, transform.arguments)) return undefined;
+  if (!Arr.isFixedLengthTuple(1, transform.arguments)) {
+    return undefined;
+  }
 
   const [callback] = transform.arguments;
 
@@ -287,11 +299,15 @@ const parseEntriesRoundTrip = (
 
   const [entryPattern] = callback.params;
 
-  if (entryPattern.type !== AST_NODE_TYPES.ArrayPattern) return undefined;
+  if (entryPattern.type !== AST_NODE_TYPES.ArrayPattern) {
+    return undefined;
+  }
 
   const entryParams = parseEntryPattern(entryPattern);
 
-  if (entryParams === undefined) return undefined;
+  if (entryParams === undefined) {
+    return undefined;
+  }
 
   const body = callback.body;
 
@@ -320,7 +336,9 @@ const parseEntriesRoundTrip = (
     }
 
     case 'flatMap': {
-      if (body.type !== AST_NODE_TYPES.ConditionalExpression) return undefined;
+      if (body.type !== AST_NODE_TYPES.ConditionalExpression) {
+        return undefined;
+      }
 
       const onTrue = parseSingletonEntry(body.consequent, entryParams.keyParam);
 
@@ -365,7 +383,9 @@ type EntryParams = Readonly<{
 const parseEntryPattern = (
   pattern: TSESTree.ArrayPattern,
 ): EntryParams | undefined => {
-  if (pattern.elements.length > 2) return undefined;
+  if (pattern.elements.length > 2) {
+    return undefined;
+  }
 
   const [keyElement, valueElement] = pattern.elements;
 
@@ -399,7 +419,9 @@ const parseKeptEntry = (
   node: TSESTree.Expression,
   keyParam: TSESTree.Identifier | undefined,
 ): KeptEntry | undefined => {
-  if (keyParam === undefined) return undefined;
+  if (keyParam === undefined) {
+    return undefined;
+  }
 
   const tuple = stripTypeWrappers(node);
 
