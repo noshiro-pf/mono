@@ -40,8 +40,9 @@ Keep measurements, anecdotes and issue numbers out; one sentence of _why_ is
 enough.
 
 Rules about how this file is written belong in this section and nowhere else.
-It is English throughout, though the repository's other prose and its code
-comments may be Japanese — see "Japanese text".
+Its length is held by `check:prose:claude-md-size`. It is English throughout,
+though the repository's other prose and its code comments may be Japanese —
+see "Japanese text".
 
 ## Repository layout
 
