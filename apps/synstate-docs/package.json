@@ -7,6 +7,7 @@
     "url": "git+https://github.com/noshiro-pf/mono.git",
     "directory": "apps/synstate-docs"
   },
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "benchmark": "run-s z:build:synstate z:benchmark:derived-chain z:benchmark:cascaded-diamond z:benchmark:conditional-fan-out z:benchmark:deep-chain gen:benchmark-doc fix:fmt",

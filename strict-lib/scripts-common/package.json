@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Shared scripts for generating strict-ts-lib-vX.Y-* packages",
+  "license": "Apache-2.0",
   "type": "module",
   "exports": {
     "./commands/gen": "./src/commands/gen.mts",
