@@ -226,8 +226,8 @@ particular to it. Here is only what a session has to act on.
   on. Taking it off is what starts the checks. Any label event re-runs them,
   so add other labels before pushing or after the checks report.
 - `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
-  strings are in the workflows and `tools/scripts/cmd/unblock-prs/`. Change
-  them everywhere or nowhere.
+  strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
+  Change them everywhere or nowhere.
 - **A tree already checked is not checked again** — after a rebase that
   changes no content, on another pull request, on `main` — failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".

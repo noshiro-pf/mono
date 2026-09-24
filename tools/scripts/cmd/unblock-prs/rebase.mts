@@ -6,14 +6,10 @@
 
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import { git, viewPullRequest } from './github.mjs';
-import {
-  isMergeQueued,
-  isSkipCiLabelled,
-  MERGE_QUEUED_LABEL,
-  SKIP_CI_LABEL,
-} from './labels.mjs';
+import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import {
   type Advanced,
   type PullRequest,

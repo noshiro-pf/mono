@@ -1,16 +1,18 @@
-import { type PayloadEntry } from 'pr-report-payload';
 import * as React from 'react';
 import { Arr } from 'ts-data-forge';
+import { type Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
 import { CommitDivergence } from './commit-divergence.js';
+import { ConflictBadge } from './conflict-badge.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
+import { ReviewBadge } from './review-badge.js';
 import { StateBadge } from './state-badge.js';
 import { VerdictBadge } from './verdict-badge.js';
 
 type Props = Readonly<{
-  entry: PayloadEntry;
+  entry: Entry;
   /** The scale every divergence bar in the report is drawn against. */
   scaleMax: number;
 }>;
@@ -29,6 +31,11 @@ export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
       <StateBadge isDraft={entry.isDraft} />
       <VerdictBadge checks={entry.checks} />
       <AutoMergeBadge armed={entry.autoMerge} />
+      <ConflictBadge
+        baseRef={entry.baseRef}
+        mergeability={entry.mergeability}
+      />
+      <ReviewBadge review={entry.codeOwnerReview} />
     </div>
 
     <div className={'pull-request-heading'}>

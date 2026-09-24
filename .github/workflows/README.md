@@ -24,7 +24,6 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `release.yml`                    | `push` to `main`                               | none                                    |
 | `pnpm-update.yml`                | schedule                                       | none; opens `chore/pnpm-update`         |
 | `node-support-update.yml`        | schedule                                       | none; opens `chore/node-support-update` |
-| `pr-report.yml`                  | pull request events, `push`, `workflow_run`, … | none; writes `data/pr-report`           |
 | `deploy-pages.yml`               | `push` to `main`                               | none                                    |
 | `synstate-benchmark.yml`         | `push` to `main`, pull requests, path-filtered | none; a measurement, not a verdict      |
 
@@ -548,13 +547,13 @@ on and `success` without it.
   request labelled `merge-queued`, after rebasing, so the matrix runs once on
   the head that will merge.
 - `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
-  strings are in the workflows and `tools/scripts/cmd/unblock-prs/`. Change
-  them everywhere or nowhere.
+  strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
+  Change them everywhere or nowhere.
 
 ## `pull_request_target`
 
-Three workflows run on `pull_request_target` rather than `pull_request`:
-`skip-ci-label.yml`, `lint-pull-request.yml` and `pr-report.yml`. It runs the
+Two workflows run on `pull_request_target` rather than `pull_request`:
+`skip-ci-label.yml` and `lint-pull-request.yml`. It runs the
 workflow file as it exists on the base branch, and its token is the base
 repository's whatever the head is. Under `pull_request` the file that runs is
 the one on the pull request's own head, so the branch a check is deciding
@@ -562,17 +561,16 @@ about would be the branch supplying the decision; and a run from a fork gets a
 read-only token whatever `permissions:` says.
 
 The usual hazard, a writable token in a job that runs the branch's code, is
-answered the same way in all three: **the job checks nothing out from the
-pull request and executes nothing from its tree.** It reads the pull request
-from the event payload or through the API, and runs only its own `run:`
-blocks, which the event resolved from the base branch. `pr-report.yml` does
-check out and install, and pins the checkout to the default branch for that
-reason. A step added to any of them keeps to this.
+answered the same way in both: **the job checks nothing out from the pull
+request and executes nothing from its tree.** It reads the pull request from
+the event payload or through the API, and runs only its own `run:` blocks,
+which the event resolved from the base branch. A step added to either keeps
+to this.
 
 ## Jobs that hold a key
 
-Four workflows push, open pull requests or publish: `pnpm-update.yml`,
-`node-support-update.yml`, `release.yml`, `pr-report.yml`. Each runs
+Three workflows push, open pull requests or publish: `pnpm-update.yml`,
+`node-support-update.yml`, `release.yml`. Each runs
 third-party code somewhere in the same run (`pnpm install` and every `tsx`
 invocation execute the dependency tree; `allowBuilds` gates install scripts,
 not the import-time code of the toolchain), and each holds a key that can
@@ -604,7 +602,7 @@ So the job that runs the dependency tree holds nothing (`contents: read`,
 `persist-credentials: false` on its checkout, so no token is in the git
 config either), and the job that holds the key installs nothing and runs
 nothing out of the working tree. `pnpm-update.yml` crosses a patch,
-`release.yml` a `dist/` tarball, `pr-report.yml` the report files.
+`release.yml` a `dist/` tarball.
 `node-support-update.yml` is the one that is not split, and says why.
 
 ### Pushing a branch and opening a pull request
@@ -664,17 +662,12 @@ Nothing checks this; a review does.
   context added to `repo-settings/rulesets/main.json`, or it runs and blocks
   nothing; a new matrix entry needs nothing. `repo-settings/README.md` has
   that, renaming a context, and the bypass.
-- **A workflow behind a required context** is also named in the
-  `workflow_run` list of `pr-report.yml`, or its result reaches the report
-  late; `pnpm run check:root:workflow-run-names` checks that every name there
-  is a workflow that exists.
 - **A check workflow calls `check-gates.yml`** with the caller shape above,
   picks its `diff-scope`, and ends in an aggregate. Its verdict is reused by
   tree, so a result that depends on anything else must skip the aggregate
   rather than conclude (see "Reusing a verdict").
 - **Local guards that read this directory**: `check:root:ci-commands`,
-  `check:root:workflow-event-name`, `check:root:workflow-run-names`,
-  `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
+  `check:root:workflow-event-name`, `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
 - **`.github/workflows/` and `.github/actions/` are owned in
   `.github/CODEOWNERS`**, so a change there waits for the owner's review, and

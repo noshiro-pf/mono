@@ -1,6 +1,9 @@
 // cspell:ignore RRGGBB
 
-/** The shapes every module here passes around. */
+/**
+ * The shapes a report is made of, whichever side reads GitHub for it:
+ * `pr-report` over REST, the Pull Requests Manager page over GraphQL.
+ */
 
 /** The repository being reported on. */
 export type RepoRef = Readonly<{ owner: string; name: string }>;
@@ -111,6 +114,17 @@ export type MergedPullRequest = Readonly<{
   labels: readonly Label[];
   /** Read from the body: GitHub's own list is only served for open ones. */
   linkedIssues: readonly LinkedIssue[];
+}>;
+
+/** The counts a report leads with. */
+export type Summary = Readonly<{
+  open: number;
+  /** Labelled `merge-queued`: the author saying it is to be landed. */
+  queued: number;
+  draft: number;
+  failing: number;
+  /** Behind the base, which the ruleset refuses to merge. */
+  behind: number;
 }>;
 
 export type PrReport = Readonly<{

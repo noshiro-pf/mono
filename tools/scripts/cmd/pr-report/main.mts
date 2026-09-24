@@ -1,14 +1,10 @@
-import * as fs from 'node:fs/promises';
-import { serializePayload } from 'pr-report-payload';
+import { buildReport, type PrReport } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { createClient, parseRepoRef } from './github.mjs';
 import { HELP, parseOptions, type Format, type Options } from './options.mjs';
-import { toPayload } from './payload.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
 import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
-import { buildReport } from './report.mjs';
-import { type PrReport } from './types.mjs';
 
 /**
  * Reports the state of every open pull request, in one page.
@@ -42,7 +38,7 @@ import { type PrReport } from './types.mjs';
  */
 export const prReport = async (
   options: Options,
-): Promise<Result<Output, string>> => {
+): Promise<Result<string, string>> => {
   const repo =
     options.repo === undefined
       ? await readRepoRef()
@@ -86,43 +82,16 @@ export const prReport = async (
     mergedWithinDays: options.mergedDays,
   });
 
-  // Always, whatever was asked to be printed: it is a projection of a report
-  // already in hand, and `--payload-file` is allowed to ask for it beside any
-  // of the three.
-  const payload = serializePayload(toPayload(report));
-
-  return Result.ok({ payload, text: print(report, options.format, payload) });
+  return Result.ok(print(report, options.format));
 };
 
-/**
- * What one run produces.
- *
- * Two outputs from one run rather than two runs, because
- * `.github/workflows/pr-report.yml` wants the Markdown for the issue and the
- * payload for the branch the page reads. Two runs would cost twice the API
- * budget and twice the wall clock, and would leave the issue and the page
- * describing moments that differ by whatever happened between them.
- */
-export type Output = Readonly<{
-  /** What was asked for on standard output. */
-  text: string;
-  /**
-   * What `--payload-file` writes, and what the workflow force-pushes to the
-   * report's own branch. See `apps/pr-report-payload`.
-   */
-  payload: string;
-}>;
-
-const print = (report: PrReport, format: Format, payload: string): string => {
+const print = (report: PrReport, format: Format): string => {
   switch (format) {
     case 'json':
       return JSON.stringify(serializable(report), undefined, 2);
 
     case 'markdown':
       return renderMarkdown(report);
-
-    case 'payload':
-      return payload;
 
     case 'terminal':
       return renderTerminal(report);
@@ -164,14 +133,6 @@ if (isDirectlyExecuted(import.meta.url)) {
       process.exit(1);
     }
 
-    const { payloadFile } = options.value;
-
-    if (payloadFile !== undefined) {
-      // The path is the caller's own, given on their own command line.
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(payloadFile, result.value.payload);
-    }
-
-    console.info(result.value.text);
+    console.info(result.value);
   }
 }

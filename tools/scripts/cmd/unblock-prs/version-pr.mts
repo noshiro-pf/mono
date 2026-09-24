@@ -20,9 +20,9 @@
  *   release workflow's, and the only thing to do here is wait for it.
  */
 
+import { BLOCKS_RELEASE_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { git } from './github.mjs';
-import { BLOCKS_RELEASE_LABEL } from './labels.mjs';
 import {
   type Classification,
   type PullRequest,

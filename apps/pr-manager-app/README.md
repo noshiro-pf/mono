@@ -7,18 +7,27 @@
 
 ## What it is
 
-The same report `pnpm run pr-report` prints and `.github/workflows/pr-report.yml`
-writes into an issue, in a form that can be left open in a tab: the merge order
-the `Merge-After:` trailers declare drawn as the tree it is, the issues each
-pull request closes with their titles, its labels in GitHub's own colours, the
-branch it is of, whether it is open or a draft, whether auto-merge is armed,
-the verdict of the contexts the ruleset requires, and how far each branch is
-ahead of and behind its base.
+The state of every open pull request, read straight from GitHub, in a form
+that can be left open in a tab: the merge order the `Merge-After:` trailers
+declare drawn as the tree it is, the issues each pull request closes with
+their titles, its labels in GitHub's own colours, the branch it is of,
+whether it is open or a draft, whether auto-merge is armed, the verdict of
+the contexts the ruleset requires, and how far each branch is ahead of and
+behind its base.
 
-Below that, two sections that are not about the queue: **what merged** in the
-last week, and **what `unblock-prs` did** — the runs of the script that lands
-the queue, which until now said everything it did on a terminal and nowhere
-else.
+And the two things that stop a pull request that is otherwise ready, which
+nothing on GitHub's own list shows:
+
+- **It conflicts with its base.** This is the pull request `unblock-prs` sets
+  aside: its rebase stops on the conflict, and nothing but a person will move
+  it again.
+- **It waits for a code owner.** `main`'s ruleset asks for no approvals, except
+  a code owner's on the paths `.github/CODEOWNERS` lists — so a pull request
+  touching one stays green and never merges. When the author is the only
+  owner it can never be approved, and the badge says it needs a ruleset
+  bypass instead.
+
+Below that, what merged in the last week.
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
@@ -26,91 +35,60 @@ is a page that is safe to leave open.
 
 ## Where the data comes from
 
-Two requests, both to the GitHub REST contents API and both for one JSON file
-on a branch of its own: `pr-report.json` on `data/pr-report`, written by the
-workflow, and `unblock-prs-log.json` on `data/unblock-prs-log`, written by the
-script. `pr-report-payload` holds both sides of that convention and says why a
-branch — it was an issue body until recently, and an issue is a thing people
-read and subscribe to rather than a database.
+GitHub's GraphQL API, from the browser, on every read. There is no report
+file in between: pressing **Refresh** shows what GitHub shows at that moment.
 
-`pr-report.md` sits beside `pr-report.json` on the same branch, written by the
-same run: the same report as prose, which GitHub renders. This page does not
-read it, and links at it when it cannot show the report itself — a reader who
-came here for the report should not leave without it.
+What is decided about the pull requests — the verdict over the required
+contexts, the merge order, the counts — is `pr-report-core`, the same code
+`pnpm run pr-report` decides it with, so the page and the command cannot
+disagree about a pull request. Which contexts are required, and which paths
+need a code owner, are read from `repo-settings/rulesets/main.json` and
+`.github/CODEOWNERS` on the default branch, in the same query.
 
-The log is asked for alongside the report rather than after it, and a log that
-is missing or unreadable is a sentence in its own section rather than a reason
-for the page to show nothing. There is no log until someone runs the script,
-and the page says so.
-
-The short version: asking GitHub about the pull requests directly costs three
-requests each, and an anonymous browser gets sixty an hour for the whole
-address it sits behind. The report pays that cost in a job that holds a token;
-the page reads what it wrote.
+**GraphQL, because of how GitHub charges.** REST charges a request, and one
+pull request takes three — the comparison against its base and the two kinds
+of check — so polling twenty of them would spend an hour's 5,000 in minutes.
+GraphQL charges a query by the size of what it asks for, and one query asks
+for everything: measured against this repository, **about 5 points and 5
+seconds a read**, the report query and one follow-up for ahead / behind
+together. The follow-up is separate because it can only name the heads once
+the first answer has.
 
 ## Staying current
 
-The page re-reads the report **while it is on screen** — every two minutes
-without a token, every fifteen seconds with one — and again the moment a
-hidden tab is brought back. Nothing has to be clicked; **Refresh** is there
-for impatience, and is also what re-reads the `unblock-prs` log, since only a
-person running that script writes one and a timer has nothing to find.
+The page reads GitHub **every fifteen seconds while it is on screen**, again
+the moment a hidden tab is brought back, and at once when **Refresh** is
+pressed. A hidden tab reads nothing.
 
-**Both intervals are set by the rate limit, not by taste.** The obvious
-reasoning is wrong here and it is worth writing down:
+**The interval is set by the budget.** GraphQL has no conditional request, so
+a read that finds nothing new costs the same as one that finds everything.
+Every fifteen seconds is 240 reads an hour, about 1,200 of the 5,000 points an
+account gets, which leaves the rest for whatever else that account does with
+GraphQL — `gh` included, since the budget is the account's.
 
-| caller                          |                  limit | is a `304` charged? |
-| :------------------------------ | ---------------------: | :------------------ |
-| anonymous — the default         |   60/hour, per address | **yes**             |
-| authenticated — an optional PAT | 5000/hour, per account | no                  |
+A read may add to the page and may say it failed, but **may not take the page
+away**: a read that fails leaves the last report on screen with a note beside
+it. And an older read never replaces a newer one — a poll and a Refresh can
+both be out at once, and whichever answers last is not necessarily the one
+that asked last.
 
-Both measured against this repository: `x-ratelimit-remaining` unchanged
-across four conditional requests with a token, and falling 59, 58, 57 across
-three without one. So without a token the conditional request saves the
-transfer and the parse and saves nothing on the quota — one request every two
-minutes is 30 an hour, leaving half the budget for reloads and for whatever
-else shares the address. With one, a poll that finds nothing is free outright,
-and both halves of the arithmetic change: the budget is 5,000 an hour and it
-belongs to the account rather than to the address.
+The "read 3 minutes ago" line is measured against a clock of its own that
+ticks every 30 seconds, so a tab that stopped reading does not go on looking
+fresh.
 
-Little is lost to the slower of the two. The report is rewritten by a workflow
-that takes about a minute (median 58s over its last twenty runs), so neither
-interval is what decides how old the page is.
+## The token
 
-A poll may add to the page and may say it failed, but **may not take the page
-away**: a refresh that fails leaves the last report on screen with a note
-beside it, because a dashboard that blanks on a spent rate limit is worse than
-one showing data from four minutes ago.
+**GraphQL answers nobody without a token**, so the page reads nothing until
+it has one; the panel at the top is open until then.
 
-So the page is as fresh as the last run of `pr-report.yml`, which is every
-pull request event, every push to `main`, **every completion of a workflow
-behind a required context**, and 07:00 JST. That last trigger is what makes a
-CI verdict arrive about a minute after the run ends rather than at the next
-pull request event.
-
-The "generated 3 hours ago" line is measured against a clock of its own that
-ticks every 30 seconds. It used to be fixed at the moment of the load, which
-meant a tab left open read as fresh forever.
-
-## The optional token
-
-There is a panel at the top of the page that takes a GitHub personal access
-token, and **the page works without one** — it is closed by default and most
-readers will never open it.
-
-**It buys the rate limit and nothing else.** The page reads two JSON files out
-of a public repository; a token gives it no data a stranger could not already
-see.
-That is what makes the recipe the panel asks for the correct one rather than a
-cautious one:
+**It needs no permission at all.** The repository is public, and a token is
+only what GraphQL asks a caller to be:
 
 - **A classic token with no scopes ticked.** In GitHub's words, "a token with
   no assigned scopes can only access public information". It cannot read a
-  private repository, write anything, or act as its owner. The limit is
-  charged to the _account_, not to what the token may reach, so a token that
-  can do nothing lifts it exactly as far as one that can do everything.
-- Or **a fine-grained token** on `noshiro-pf/mono` alone, with
-  `Issues: Read-only` and nothing else.
+  private repository, write anything, or act as its owner.
+- Or **a fine-grained token** with repository access set to _Public
+  repositories_, which is read-only access to what anyone can already see.
 
 The panel says both of those on screen, with links to the two pages, so that
 nobody has to come here to find out what to tick.
@@ -141,10 +119,9 @@ pnpm run preview
 pnpm run check:test
 ```
 
-The files are read from the live API in every one of these, including `dev`.
-Without a token that is sixty requests an hour for the whole address — two per
-load, so thirty loads, which is only a limit if the page is being reloaded in
-a loop. `dev` gets no `Content-Security-Policy`; only the build does.
+Every one of these reads the live API, including `dev`, and spends the
+token's GraphQL budget like the published page does. `dev` gets no
+`Content-Security-Policy`; only the build does.
 
 ## Deployment
 

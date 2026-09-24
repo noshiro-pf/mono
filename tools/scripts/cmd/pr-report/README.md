@@ -43,26 +43,22 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
 
 ```bash
 pnpm run pr-report                      # 端末向け（既定）
-pnpm run pr-report -- --format markdown # GitHub issue / Claude 向け
-pnpm run pr-report -- --format payload  # ページが読む JSON
+pnpm run pr-report -- --format markdown # GitHub / Claude 向け
 pnpm run pr-report -- --format json     # 他のツールに渡す（body 込みの全体）
 pnpm run pr-report -- --repo owner/name # 別のリポジトリ
 pnpm run pr-report -- --merged-days 3   # 「直近マージ」の遡る日数
 pnpm run pr-report -- --merged-limit 5  # その最大件数
-pnpm run pr-report -- --format markdown --payload-file out.json # 1回で両方
 ```
 
 `--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
 掛かります。上限は「入らないから」ではなく「読めなくなるから」で、20件を超えた
-あたりからこのセクションは一覧ではなく履歴になります。出力先はファイルなので
-文字数の上限はありません。
+あたりからこのセクションは一覧ではなく履歴になります。
 
 ### トークン
 
 `GITHUB_TOKEN` か `GH_TOKEN` があれば使い、無ければ無認証で読みます。mono は
 public なので無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
-す（PR 1本あたり約3リクエスト = 20本程度まで）。workflow は `github.token` を
-渡すので、この上限は手元で無認証に走らせたときの話です。
+す（PR 1本あたり約3リクエスト = 20本程度まで）。
 
 トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
 閉じる issue を GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
@@ -105,55 +101,16 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
 
 ### 出力先
 
-スクリプトは stdout に出すだけです。配信は2つ。
+スクリプトは stdout に出すだけです。Claude の routine や `/unblock-prs` が同じ
+コマンドを実行して結果を読みます。
 
-- `.github/workflows/pr-report.yml` が実行し、`data/pr-report` ブランチを
-  上書きします（通知もタイムラインも増えません）。同じ本文が run summary にも
-  出ます。
-- Claude の routine が同じコマンドを実行して結果を貼ります。そのまま
-  `/unblock-prs` に繋げられるのが、読むだけのレポートとの違いです。
-
-`data/pr-report` ブランチに2つのファイルが置かれます。`pr-report.json` を読むの
-が **GitHub Pull Requests Manager**
-（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）、
-`pr-report.md` は同じレポートの散文で、GitHub がそのままレンダリングします。
-
-以前は issue に書いていました。issue は人が読んで購読するものであって簡易DBで
-はない、というのが移した理由です。issue が持っていて惜しかった唯一の性質 —
-「現在の状態が固定 URL で人に読める」— は `pr-report.md` がそのまま引き継ぎ、
-代わりに publish job から `issues: write` と `gh` が消えました。詳細は
-`apps/pr-report-payload/README.md`。
-
-**1回の実行で両方を出します。** workflow は `--format markdown` と
-`--payload-file` を同時に渡します。2回実行すると API を倍使い、しかも2つの
-ファイルがその間に起きたことの分だけ違う瞬間を指してしまいます。
-
-workflow は2つの job に分かれています。`report` は依存ツリーを走らせますがトー
-クンを持たず、成果物を artifact で渡すだけ。`publish` はトークンを持ちますが
-checkout も install もせず、`git` と `gh` だけを inline で叩きます。
-`pnpm-update.yml` と同じ分け方で、理由も同じです。
-
-workflow が走るのは、**レポートの内容を変えうることが起きたとき**です。PR の
-open / close / reopen、body と title の編集（`Merge-After:` と closing keyword
-がそこにあるため）、ラベルの着脱、push、draft の切り替え、`main` への push
-（全 PR の ahead / behind が同時に動くので）、そして**必須 context を出す7つの
-workflow の完了**。加えて毎日 07:00 JST の schedule と `workflow_dispatch`。
-
-最後のものは `workflow_run` です。`check_suite` ではありません — GitHub は
-Actions 自身のスイートではそれで workflow を起動しないので、チェックの完了は
-長らくこの workflow に届いていませんでした。`workflow_run` は名前で対象を指す
-ので、**必須 context を出す workflow を増やしたらここにも足す**必要がありま
-す。名前が実在するかは `pnpm run check:root:workflow-run-names` が見ます。
-
-イベントは**合図としてしか使いません** — payload の中身は job に一切入らず、
-毎回 API から全 PR を読み直します。schedule は、Actions 以外が書く status が
-将来現れたときのための下限として残しています。
-
-同じ issue と同じブランチを全 run が書き換えるため concurrency は1グループに
-直列化しています。`cancel-in-progress` は使いません。GitHub は run が queue に入った時点で
-「すでに queue にいた run」を落とすので、バースト時は実行中の1本＋最新の1本だ
-け残り、間は捨てられます。これが欲しい debounce そのもので、しかも枯渇しませ
-ん。
+**GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`）はこの
+スクリプトの出力を読みません。ページは GitHub の GraphQL API を毎回自分で読み、
+判定（必須 context の verdict、`Merge-After:` の木、件数）はこのスクリプトと同じ
+`apps/pr-report-core` で下します。REST と GraphQL の2つの読み方があるのは、
+Claude Code セッションのプロキシが GraphQL を拒否するためで、このスクリプトは
+そこでも動くよう REST のままです。
 
 ## English
 
@@ -176,7 +133,7 @@ labelled `merge-queued` with nothing armed to land it is the combination
 
 ```bash
 pnpm run pr-report                      # for a terminal (the default)
-pnpm run pr-report -- --format markdown # for a GitHub issue or Claude
+pnpm run pr-report -- --format markdown # for GitHub or Claude
 pnpm run pr-report -- --format json     # for another tool
 pnpm run pr-report -- --repo owner/name # a different repository
 pnpm run pr-report -- --merged-days 3   # how far back "recently merged" goes
@@ -184,9 +141,8 @@ pnpm run pr-report -- --merged-limit 5  # and how many it lists
 ```
 
 The merged section is bounded twice, by days (7) and by count (20). The cap is
-about reading rather than about fitting — the report is written to a file,
-which refuses nothing — and past twenty the section stops being a list and
-starts being an archive.
+about reading rather than about fitting: past twenty the section stops being
+a list and starts being an archive.
 
 `GITHUB_TOKEN` or `GH_TOKEN` is used when set. Without one the public API
 allows 60 requests an hour — about twenty pull requests at roughly three
@@ -214,52 +170,13 @@ part of them as the whole. Pull requests on a `Merge-After` cycle are named in
 their own section instead of being drawn, since there is no position in a
 merge order to draw them at.
 
-The script only prints. `.github/workflows/pr-report.yml` is what puts the text
-somewhere: it force-pushes two files to `data/pr-report` — `pr-report.json`,
-which the **GitHub Pull Requests Manager** page
-(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) reads,
-and `pr-report.md`, the same report as prose, which GitHub renders on the
-branch. It repeats the same text in the run summary.
+The script only prints. A Claude routine and `/unblock-prs` run the same
+command and read what it prints.
 
-This wrote to an issue until recently. `apps/pr-report-payload/README.md` says
-why a branch; the short version is that an issue is a thing people open and
-subscribe to rather than a database, and that the one property worth keeping —
-a current report at a URL, readable without the app — is what `pr-report.md`
-carries over. What it costs the publishing job is `issues: write` and every
-call to `gh`.
-
-**One run produces both.** The workflow passes `--payload-file` beside
-`--format markdown`, because a second run would cost another twenty requests
-and another minute, and would leave the issue and the page describing moments
-that differ by whatever happened in between.
-
-The workflow is two jobs. `report` runs the dependency tree and holds no
-token, handing what it made over as an artifact; `publish` holds the token and
-neither checks out nor installs anything, using only inline `git` and `gh`.
-The same split as `pnpm-update.yml`, for the same reason.
-
-It runs whenever something that can change the report happens — a
-pull request opened, closed, reopened, edited, labelled, pushed to or switched
-in or out of draft, a push to `main`, which moves the ahead / behind of every
-open pull request at once, and the completion of each of the seven workflows
-behind the required contexts — plus the daily schedule and
-`workflow_dispatch`.
-
-That last one is `workflow_run`, not `check_suite`: GitHub does not trigger a
-workflow with `check_suite` when the suite is Actions' own, which is why a
-check finishing went unheard here for so long. `workflow_run` matches on
-another workflow's `name:`, so **a workflow added behind a required context
-has to be added to that list too**, and
-`pnpm run check:root:workflow-run-names` is what checks that every name there
-resolves to a workflow that exists.
-
-The events are pings and nothing else: no payload reaches the job, which
-re-reads every pull request from the API each time. The schedule stays as the
-floor, for anything that reports a status without an Actions workflow behind
-it.
-
-Every run edits the same body, so they share one concurrency group and run one
-at a time, deliberately not with `cancel-in-progress`: GitHub already drops a
-run that was queued when another is queued behind the same running one, which
-debounces a burst down to one running plus the newest pending without the risk
-that a trickle of events keeps cancelling the run that was about to write.
+The **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>, `apps/pr-manager-app`) does
+not read this output. It reads GitHub's GraphQL API itself on every read, and
+reaches its verdicts, merge order and counts through the same
+`apps/pr-report-core` this script uses. There are two ways of reading because
+a Claude Code session's proxy refuses GraphQL, and this script stays on REST
+so that it runs there too.

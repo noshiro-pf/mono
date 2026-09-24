@@ -1,28 +1,14 @@
-/** Turning the payload's numbers into what the page says. */
+/** Turning the report's numbers into what the page says. */
 
-import { type PayloadComparison } from 'pr-report-payload';
 import { asNonZeroSafeInt, Num } from 'ts-data-forge';
-
-/**
- * `+3 / -12`: three commits of its own, twelve of the base it has not got.
- * The second number is the one that matters — the ruleset blocks a branch
- * that is behind, so anything but `-0` is a rebase waiting to happen.
- */
-export const describeComparison = (
-  comparison: PayloadComparison | null,
-): string =>
-  comparison === null
-    ? 'ahead/behind unread'
-    : (`+${comparison.aheadBy} / -${comparison.behindBy}` as const);
 
 /**
  * How long ago, in the largest unit that is still more than one.
  *
- * Both instants are milliseconds since the epoch — the report's own, carried
- * in the payload, and the browser's — so this is subtraction rather than
- * date parsing. `now` is a parameter so that the answer is a function of its
- * arguments: a report is only as useful as it is fresh, and the timestamp
- * alone does not say whether it is.
+ * Both instants are milliseconds since the epoch, so this is subtraction
+ * rather than date parsing. `now` is a parameter so that the answer is a
+ * function of its arguments: a report is only as useful as it is fresh, and
+ * the timestamp alone does not say whether it is.
  */
 export const describeAge = (epochMs: number, nowMs: number): string => {
   const elapsed = nowMs - epochMs;
@@ -46,13 +32,11 @@ const UNITS = [
 ] as const;
 
 /**
- * An instant in the reader's own time zone, because the report's own
- * `generatedAt` is UTC and almost nobody is.
+ * An instant in the reader's own time zone, because GitHub's timestamps are
+ * UTC and almost nobody is.
  *
  * `Intl.DateTimeFormat.format` takes the epoch milliseconds directly, so
- * nothing here has to make a `Date` — which matters twice over: this
- * repository's lint bans the constructor, and the number came across the
- * wire precisely so that no side has to parse a date string.
+ * nothing here has to make a `Date`.
  *
  * The locale is the reader's rather than one chosen here, so a Japanese
  * browser gets `2026年9月22日 1:42:27 JST` where an English one gets

@@ -2,11 +2,12 @@ import {
   classifyCheckRun,
   classifyCommitStatus,
   combineContextStates,
+  reportedContexts,
   statesFromCheckRuns,
   summarizeChecks,
 } from './checks.mjs';
 
-describe('classifyCheckRun', () => {
+describe(classifyCheckRun, () => {
   test('an unfinished run is pending whatever it last concluded', () => {
     assert.deepStrictEqual(classifyCheckRun('queued', undefined), 'pending');
 
@@ -43,7 +44,7 @@ describe('classifyCheckRun', () => {
   });
 });
 
-describe('classifyCommitStatus', () => {
+describe(classifyCommitStatus, () => {
   test('reads the four states a commit status has', () => {
     assert.deepStrictEqual(classifyCommitStatus('success'), 'passed');
 
@@ -55,7 +56,7 @@ describe('classifyCommitStatus', () => {
   });
 });
 
-describe('summarizeChecks', () => {
+describe(summarizeChecks, () => {
   const required = ['code-check-result', 'no-skip-ci-label'] as const;
 
   test('every required context green is a pass', () => {
@@ -153,7 +154,7 @@ const run = (
   id: number,
 ) => ({ name, status: 'completed', conclusion, checkSuiteId, id }) as const;
 
-describe('statesFromCheckRuns', () => {
+describe(statesFromCheckRuns, () => {
   test('the run in the later suite is the one that counts', () => {
     // `code-check-result`: the cancelled suite was created first, so the
     // green that superseded it is what GitHub answers with.
@@ -223,7 +224,7 @@ describe('statesFromCheckRuns', () => {
   });
 });
 
-describe('combineContextStates', () => {
+describe(combineContextStates, () => {
   test('a red check run is not covered by a green status of the same name', () => {
     // GitHub: "If a check and a commit status have the same name, both must
     // pass when that name is required."
@@ -245,3 +246,45 @@ describe('combineContextStates', () => {
     assert.deepStrictEqual(combineContextStates('passed', 'passed'), 'passed');
   });
 });
+
+describe(reportedContexts, () => {
+  test('reads check runs and commit statuses together', () => {
+    assert.deepStrictEqual(
+      reportedContexts(
+        [completedRun('code-check-result', 'success')],
+        [{ context: 'no-skip-ci-label', state: 'pending' }],
+      ),
+      new Map([
+        ['code-check-result', 'passed'],
+        ['no-skip-ci-label', 'pending'],
+      ]),
+    );
+  });
+
+  test('keeps the stricter of a check run and a status of one name', () => {
+    assert.deepStrictEqual(
+      reportedContexts(
+        [completedRun('lint', 'failure')],
+        [{ context: 'lint', state: 'success' }],
+      ),
+      new Map([['lint', 'failed']]),
+    );
+
+    assert.deepStrictEqual(
+      reportedContexts(
+        [completedRun('lint', 'success')],
+        [{ context: 'lint', state: 'pending' }],
+      ),
+      new Map([['lint', 'pending']]),
+    );
+  });
+});
+
+const completedRun = (name: string, conclusion: string) =>
+  ({
+    name,
+    status: 'completed',
+    conclusion,
+    checkSuiteId: 1,
+    id: 1,
+  }) as const;

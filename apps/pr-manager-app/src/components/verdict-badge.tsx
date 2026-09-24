@@ -1,8 +1,9 @@
-import { type PayloadChecks } from 'pr-report-payload';
+import { type ChecksSummary } from 'pr-report-core';
 import * as React from 'react';
 import { presentVerdict } from '../verdict.mjs';
+import { BadgeIcon } from './badge-icon.js';
 
-type Props = Readonly<{ checks: PayloadChecks }>;
+type Props = Readonly<{ checks: ChecksSummary }>;
 
 /** The verdict of the contexts the ruleset requires, as an icon and a word. */
 export const VerdictBadge = React.memo<Props>((props) => {
@@ -16,25 +17,7 @@ export const VerdictBadge = React.memo<Props>((props) => {
       data-status={verdict.status}
       title={`over the ${checks.required} contexts the ruleset requires`}
     >
-      {/*
-       * Inline rather than an `<img>`: it inherits `currentColor` from the
-       * badge, so one drawing serves the four status colours and dark mode,
-       * and the page's `img-src` never comes into it. `aria-hidden` because
-       * the word beside it is the label.
-       */}
-      <svg
-        aria-hidden={'true'}
-        className={'badge-icon'}
-        fill={'none'}
-        focusable={'false'}
-        stroke={'currentColor'}
-        strokeLinecap={'round'}
-        strokeLinejoin={'round'}
-        strokeWidth={1.6}
-        viewBox={'0 0 16 16'}
-      >
-        <path d={verdict.icon} />
-      </svg>
+      <BadgeIcon path={verdict.icon} />
 
       {verdict.label}
     </span>

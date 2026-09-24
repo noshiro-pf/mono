@@ -1,8 +1,8 @@
 /** What the command line says, and how it is read. */
 
 import * as util from 'node:util';
+import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Num, Result } from 'ts-data-forge';
-import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from './labels.mjs';
 
 export type Options = Readonly<{
   /** Run one cycle — survey, act on one pull request, report — and exit. */
@@ -15,13 +15,6 @@ export type Options = Readonly<{
   pollIntervalSec: number;
   /** How long to watch one pull request before giving up on it. */
   watchTimeoutMin: number;
-  /**
-   * Whether a run that acted on something writes what it did to the
-   * `data/unblock-prs-log` branch. On by default: the whole point of a log
-   * is that
-   * it is there without anyone having asked for it that time.
-   */
-  writeLog: boolean;
 }>;
 
 export const defaultOptions: Options = {
@@ -30,7 +23,6 @@ export const defaultOptions: Options = {
   idleIntervalSec: 300,
   pollIntervalSec: 60,
   watchTimeoutMin: 90,
-  writeLog: true,
 } as const;
 
 export const HELP = [
@@ -46,7 +38,6 @@ export const HELP = [
   `  --idle-interval <sec>  wait between surveys when nothing is behind (default ${defaultOptions.idleIntervalSec})`,
   `  --poll-interval <sec>  wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
   `  --watch-timeout <min>  give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
-  '  --no-log               do not write this run to the data/unblock-prs-log branch',
   '  -h, --help             show this help',
 ].join('\n');
 
@@ -68,10 +59,6 @@ export const parseOptions = (
         'idle-interval': { type: 'string' },
         'poll-interval': { type: 'string' },
         'watch-timeout': { type: 'string' },
-        // Spelled as its own flag rather than as a negatable `--log`:
-        // `parseArgs` does not read `--no-x` as the negation of `x`, and a
-        // flag that looks like one and is not would be worse than neither.
-        'no-log': { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -129,6 +116,5 @@ export const parseOptions = (
     idleIntervalSec: idleIntervalSec.value,
     pollIntervalSec: pollIntervalSec.value,
     watchTimeoutMin: watchTimeoutMin.value,
-    writeLog: !values['no-log'],
   });
 };

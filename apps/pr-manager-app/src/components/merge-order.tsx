@@ -1,12 +1,13 @@
-import { type PayloadEntry, type PayloadTreeNode } from 'pr-report-payload';
+import { type TreeNode } from 'pr-report-core';
 import * as React from 'react';
 import { Arr } from 'ts-data-forge';
+import { type Entry } from '../load-report.mjs';
 import { ExternalLink } from './external-link.js';
 import { PullRequestCard } from './pull-request-card.js';
 
 type Props = Readonly<{
-  nodes: readonly PayloadTreeNode[];
-  byNumber: ReadonlyMap<number, PayloadEntry>;
+  nodes: readonly TreeNode[];
+  byNumber: ReadonlyMap<number, Entry>;
   /** The scale every divergence bar in the report is drawn against. */
   scaleMax: number;
   /** Only the top level is the list; everything below it is a continuation. */

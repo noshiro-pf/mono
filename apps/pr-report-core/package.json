@@ -1,12 +1,12 @@
 {
-  "name": "pr-report-payload",
+  "name": "pr-report-core",
   "version": "0.0.0",
   "private": true,
-  "description": "The machine-readable report `pr-report` embeds in its issue, and the app reads back",
+  "description": "What `pr-report` and the Pull Requests Manager page decide about the open pull requests, whichever API they read",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
-    "directory": "apps/pr-report-payload"
+    "directory": "apps/pr-report-core"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",

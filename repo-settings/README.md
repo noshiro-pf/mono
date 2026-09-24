@@ -47,18 +47,5 @@
 
 ## rulesets/restrict-deletion.json
 
-`archive/**` と `data/**` の削除を禁じる。 bypass_actors は空なので、admin も
+`archive/**` の削除を禁じる。 bypass_actors は空なので、admin も
 `GITHUB_TOKEN` も消せない。
-
-- **`deletion` だけで、`non_fast_forward` は入れない。** `data/**` は
-  `pr-report.yml` と `unblock-prs` が毎回 orphan commit を force-push する
-  ブランチで、履歴を残さないことがそのまま「リポジトリにレポート1回ぶんの
-  コミットを溜めない」設計になっている。force-push を止めると書き込みが
-  止まる。
-- **`creation` も入れない。** ブランチを作るのは各書き手の初回実行で、
-  そこで止まると何も始まらない。
-- `data/**` に何が置かれるか（ ブランチ名とファイル名 ）は
-  `apps/pr-report-payload/src/location.mts` が決めていて、
-  `pnpm run check:root:data-branch-files` がそのファイルがリポジトリ本体の
-  直下に現れていないことを見張っている — `data/*` を `main` にマージした、
-  というのがその現れ方になる。

@@ -1,15 +1,9 @@
 /** Everything that talks to GitHub, and nothing that decides. */
 
-import { Arr, Json, Result } from 'ts-data-forge';
-import * as t from 'ts-fortress';
 import {
-  classifyCommitStatus,
-  combineContextStates,
-  statesFromCheckRuns,
+  closingIssuesIn,
+  reportedContexts,
   type CheckRunReport,
-} from './checks.mjs';
-import { parseClosingIssueRefs } from './linked-issues.mjs';
-import {
   type Comparison,
   type ContextState,
   type Label,
@@ -17,7 +11,10 @@ import {
   type MergedPullRequest,
   type PullRequestFacts,
   type RepoRef,
-} from './types.mjs';
+} from 'pr-report-core';
+import { Arr, Json, Result } from 'ts-data-forge';
+import * as t from 'ts-fortress';
+import { parseClosingIssueRefs } from './linked-issues.mjs';
 
 const API_VERSION = '2022-11-28';
 
@@ -94,14 +91,21 @@ const ClosingIssuesSchema = t.record({
         nodes: t.array(
           t.record({
             number: t.number(),
+            // `null` for an issue the token may not see, which
+            // `closingIssuesIn` skips: one unreadable issue used to fail this
+            // whole answer and drop every pull request's list with it.
             closingIssuesReferences: t.record({
               nodes: t.array(
-                t.record({
-                  number: t.number(),
-                  title: t.string(),
-                  url: t.string(),
-                  state: t.string(),
-                }),
+                t.union([
+                  t.record({
+                    number: t.number(),
+                    title: t.string(),
+                    url: t.string(),
+                    state: t.string(),
+                    repository: t.record({ nameWithOwner: t.string() }),
+                  }),
+                  t.nullType,
+                ]),
               ),
             }),
           }),
@@ -285,33 +289,10 @@ export const createClient = (
       CombinedStatusSchema,
     );
 
-    const fromRuns = Result.isErr(runs)
-      ? new Map<string, ContextState>()
-      : statesFromCheckRuns(runs.value);
-
-    const fromStatuses: readonly (readonly [string, ContextState])[] =
-      Result.isErr(statuses)
-        ? ([] as const)
-        : statuses.value.statuses.map(({ context, state }) => [
-            context,
-            classifyCommitStatus(state),
-          ]);
-
-    // A commit status and a check run of the same name are two requirements,
-    // not one reported twice: GitHub asks both to pass. So the stricter of
-    // the two is kept rather than whichever was read second.
-    const mut_states = new Map<string, ContextState>(fromRuns);
-
-    for (const [name, state] of fromStatuses) {
-      const reported = mut_states.get(name);
-
-      mut_states.set(
-        name,
-        reported === undefined ? state : combineContextStates(reported, state),
-      );
-    }
-
-    return mut_states;
+    return reportedContexts(
+      Result.isErr(runs) ? [] : runs.value,
+      Result.isErr(statuses) ? [] : statuses.value.statuses,
+    );
   };
 
   /**
@@ -330,7 +311,7 @@ export const createClient = (
       '      nodes {',
       '        number',
       '        closingIssuesReferences(first: 10) {',
-      '          nodes { number title url state }',
+      '          nodes { number title url state repository { nameWithOwner } }',
       '        }',
       '      }',
       '    }',
@@ -355,13 +336,7 @@ export const createClient = (
     return new Map(
       parsed.value.data.repository.pullRequests.nodes.map((node) => [
         node.number,
-        node.closingIssuesReferences.nodes.map((issue) => ({
-          number: issue.number,
-          title: issue.title,
-          url: issue.url,
-          state:
-            issue.state === 'CLOSED' ? ('closed' as const) : ('open' as const),
-        })),
+        closingIssuesIn(repo, node.closingIssuesReferences.nodes),
       ]),
     );
   };

@@ -8,7 +8,7 @@ const forest = (
     declared.map(([number, mergeAfter]) => ({ number, mergeAfter })),
   );
 
-describe('buildMergeAfterForest', () => {
+describe(buildMergeAfterForest, () => {
   test('a pull request with no declaration is a root of its own', () => {
     const { roots, cyclic } = forest([
       [1, []],

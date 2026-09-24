@@ -1,8 +1,7 @@
 /** The issues a pull request body says it closes. */
 
+import { outsideCodeFences, type RepoRef } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
-import { outsideCodeFences } from '../unblock-prs/merge-after.mjs';
-import { type RepoRef } from './types.mjs';
 
 /**
  * The keywords GitHub acts on, followed by `#12` or by the issue's URL.

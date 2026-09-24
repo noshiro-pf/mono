@@ -1,21 +1,17 @@
 /** What one survey says about each pull request, and why. */
 
+import {
+  findMergeAfterCycles,
+  MERGE_QUEUED_LABEL,
+  parseMergeAfter,
+  SKIP_CI_LABEL,
+} from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import { listRequiredChecks, summarizeChecks } from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
 import { git, listPullRequests, remoteSha } from './github.mjs';
-import {
-  blocksRelease,
-  isMergeQueued,
-  isSkipCiLabelled,
-  MERGE_QUEUED_LABEL,
-  SKIP_CI_LABEL,
-} from './labels.mjs';
-import {
-  findMergeAfterCycles,
-  parseMergeAfter,
-  waitingOnNote,
-} from './merge-after.mjs';
+import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import { waitingOnNote } from './merge-after.mjs';
 import { skipStillApplies } from './skips.mjs';
 import {
   type Classification,

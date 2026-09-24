@@ -1,8 +1,8 @@
 /** What the command line says, and how it is read. */
 
 import * as util from 'node:util';
+import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Num, Result } from 'ts-data-forge';
-import { SKIP_CI_LABEL } from '../unblock-prs/labels.mjs';
 
 export type Options = Readonly<{
   /** The pull request title; the branch's last commit subject when absent. */
