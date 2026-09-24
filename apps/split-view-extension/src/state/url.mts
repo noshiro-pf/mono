@@ -51,15 +51,13 @@ export const normalizeAddress = (input: string): string => {
   // hand-written one would only disagree with it.
   const hostname = hostnameOf(`https://${trimmed}`);
 
-  if (hostname === undefined) {
-    return toSearchUrl(trimmed);
-  }
-
-  if (localHostnames.has(hostname)) {
-    return `http://${trimmed}`;
-  }
-
-  return hostname.includes('.') ? `https://${trimmed}` : toSearchUrl(trimmed);
+  return hostname === undefined
+    ? toSearchUrl(trimmed)
+    : localHostnames.has(hostname)
+      ? `http://${trimmed}`
+      : hostname.includes('.')
+        ? `https://${trimmed}`
+        : toSearchUrl(trimmed);
 };
 
 /** The origin of an address, for reaching the site outside the failing page. */

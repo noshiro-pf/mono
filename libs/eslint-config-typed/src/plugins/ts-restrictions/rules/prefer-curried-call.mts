@@ -94,13 +94,12 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
     const isEtaSafeCallee = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       callee: TSESTree.Expression,
-    ): boolean => {
-      if (callee.type === AST_NODE_TYPES.Identifier) return true;
-
-      return callee.type === AST_NODE_TYPES.MemberExpression
-        ? !callee.optional && isNamespaceObject(callee.object)
-        : false;
-    };
+    ): boolean =>
+      callee.type === AST_NODE_TYPES.Identifier
+        ? true
+        : callee.type === AST_NODE_TYPES.MemberExpression
+          ? !callee.optional && isNamespaceObject(callee.object)
+          : false;
 
     /**
      * `true` when the arrow's single parameter is referenced exactly once, at

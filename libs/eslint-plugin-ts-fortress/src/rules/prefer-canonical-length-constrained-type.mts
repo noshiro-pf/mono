@@ -328,9 +328,9 @@ const dropBoundsFix = (
 
     const next = node.arguments[index + 1];
 
-    if (rewrite.keep.includes(index)) return [];
-
-    return dropped === undefined || next === undefined
+    return dropped === undefined ||
+      next === undefined ||
+      rewrite.keep.includes(index)
       ? []
       : [fixer.removeRange([dropped.range[0], next.range[0]])];
   });

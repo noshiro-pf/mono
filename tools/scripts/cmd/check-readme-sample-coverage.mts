@@ -189,9 +189,11 @@ const readDocScript = async (
 
   const { scripts } = parsed;
 
-  if (!isRecord(scripts) || !hasKey(scripts, 'doc')) return undefined;
-
-  return isString(scripts.doc) ? scripts.doc : undefined;
+  return !isRecord(scripts) || !hasKey(scripts, 'doc')
+    ? undefined
+    : isString(scripts.doc)
+      ? scripts.doc
+      : undefined;
 };
 
 const readFileOrUndefined = async (

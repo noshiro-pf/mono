@@ -50,11 +50,9 @@ export const resolveTypeName = (
     canonicalName,
   );
 
-  if (importedLocalName !== undefined) {
-    return { localName: importedLocalName, needsImport: false };
-  }
-
-  return hasConflictingDeclaration(program, canonicalName)
-    ? undefined
-    : { localName: canonicalName, needsImport: importStyle === 'named' };
+  return importedLocalName !== undefined
+    ? { localName: importedLocalName, needsImport: false }
+    : hasConflictingDeclaration(program, canonicalName)
+      ? undefined
+      : { localName: canonicalName, needsImport: importStyle === 'named' };
 };

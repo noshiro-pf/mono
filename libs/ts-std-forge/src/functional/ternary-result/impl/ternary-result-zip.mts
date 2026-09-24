@@ -49,9 +49,9 @@ export const zip = <S1, W1, E1, S2, W2, E2>(
 
   const pair = [resultA.value, resultB.value] as const;
 
-  if (isWarn(resultA)) {
-    return warn(pair, resultA.warning);
-  }
-
-  return isWarn(resultB) ? warn(pair, resultB.warning) : ok(pair);
+  return isWarn(resultA)
+    ? warn(pair, resultA.warning)
+    : isWarn(resultB)
+      ? warn(pair, resultB.warning)
+      : ok(pair);
 };

@@ -233,13 +233,12 @@ const definesRecursiveTypeAlias = (
 /** The `type X = …` declaration `node` sits in, if any. */
 const enclosingTypeAlias = (
   node: TSESTree.Node,
-): TSESTree.TSTypeAliasDeclaration | undefined => {
-  if (node.type === AST_NODE_TYPES.TSTypeAliasDeclaration) return node;
-
-  return node.type === AST_NODE_TYPES.Program
-    ? undefined
-    : enclosingTypeAlias(node.parent);
-};
+): TSESTree.TSTypeAliasDeclaration | undefined =>
+  node.type === AST_NODE_TYPES.TSTypeAliasDeclaration
+    ? node
+    : node.type === AST_NODE_TYPES.Program
+      ? undefined
+      : enclosingTypeAlias(node.parent);
 
 /**
  * Which other type names each `type X = …` in the file refers to, keyed by `X`.

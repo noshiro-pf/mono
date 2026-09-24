@@ -689,12 +689,12 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [DateEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L156)
     - [DayOfWeekIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L162)
     - [DayOfWeekName](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L168)
-    - [HoursEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L196)
-    - [MinutesEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L202)
-    - [SecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L208)
-    - [MillisecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L214)
-    - [Sexagesimal](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L220)
-    - [Percent](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L249)
+    - [HoursEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L199)
+    - [MinutesEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L205)
+    - [SecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L211)
+    - [MillisecondsEnum](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L217)
+    - [Sexagesimal](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L223)
+    - [Percent](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/int-enum.mts#L252)
 - src/constants/primitive.mts
     - [Primitive](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/constants/primitive.mts#L23)
 - src/constants/record.mts

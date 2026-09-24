@@ -132,7 +132,7 @@ export const eslintUnicornRules = {
     'error',
     { minimumCases: 2, emptyDefaultCase: 'no-default-case' },
   ],
-  'unicorn/prefer-ternary': ['error', 'only-single-line'],
+  'unicorn/prefer-ternary': 'off', // Replaced by ts-restrictions/prefer-ternary, which also folds chains
   'unicorn/prefer-top-level-await': 'error',
   'unicorn/prefer-type-error': 'error',
 

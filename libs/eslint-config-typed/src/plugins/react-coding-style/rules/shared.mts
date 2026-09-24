@@ -119,11 +119,7 @@ export const getReactMemoArrowFunction = (
 ): DeepReadonly<TSESTree.ArrowFunctionExpression> | undefined => {
   const [firstArgument] = node.arguments;
 
-  if (firstArgument === undefined) {
-    return undefined;
-  }
-
-  return firstArgument.type !== AST_NODE_TYPES.ArrowFunctionExpression
+  return firstArgument?.type !== AST_NODE_TYPES.ArrowFunctionExpression
     ? undefined
     : firstArgument;
 };

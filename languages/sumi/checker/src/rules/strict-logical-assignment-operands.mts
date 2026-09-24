@@ -84,11 +84,11 @@ const isBooleanTyped = (
 ): boolean => {
   const type = checker.getTypeAtLocation(operand);
 
-  if (type === undefined) return false;
-
-  return type.isUnionType()
-    ? type.getTypes().every(isBooleanLike)
-    : isBooleanLike(type);
+  return type === undefined
+    ? false
+    : type.isUnionType()
+      ? type.getTypes().every(isBooleanLike)
+      : isBooleanLike(type);
 };
 
 const isBooleanLike = (type: Type): boolean =>

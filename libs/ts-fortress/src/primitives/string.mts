@@ -364,25 +364,20 @@ const createConstraintsPredicate =
       } as const);
     }
 
-    if (endsWith !== undefined && !value.endsWith(endsWith)) {
-      return Result.err({ constraint: 'endsWith', value: endsWith } as const);
-    }
-
-    if (includes !== undefined && !value.includes(includes)) {
-      return Result.err({ constraint: 'includes', value: includes } as const);
-    }
-
-    if (uppercase === true && value !== value.toUpperCase()) {
-      return Result.err({ constraint: 'uppercase', value: true } as const);
-    }
-
-    if (lowercase === true && value !== value.toLowerCase()) {
-      return Result.err({ constraint: 'lowercase', value: true } as const);
-    }
-
-    return regex !== undefined && !regex.test(value)
-      ? Result.err({ constraint: 'regex', value: regex.source } as const)
-      : Result.ok(true);
+    return endsWith !== undefined && !value.endsWith(endsWith)
+      ? Result.err({ constraint: 'endsWith', value: endsWith } as const)
+      : includes !== undefined && !value.includes(includes)
+        ? Result.err({ constraint: 'includes', value: includes } as const)
+        : uppercase === true && value !== value.toUpperCase()
+          ? Result.err({ constraint: 'uppercase', value: true } as const)
+          : lowercase === true && value !== value.toLowerCase()
+            ? Result.err({ constraint: 'lowercase', value: true } as const)
+            : regex !== undefined && !regex.test(value)
+              ? Result.err({
+                  constraint: 'regex',
+                  value: regex.source,
+                } as const)
+              : Result.ok(true);
   };
 
 const defaultValueErrorMessage = (

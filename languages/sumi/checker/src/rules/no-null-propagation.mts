@@ -68,13 +68,11 @@ export const noNullPropagation: Rule = {
  * collection being iterated. Return positions are next
  * (spec/null-undefined.md).
  */
-const annotationFreeDeclarationName = (node: TsNode): TsNode | undefined => {
-  if (isBindingElement(node)) return node.name;
-
-  return isVariableDeclaration(node) && node.type === undefined
+const annotationFreeDeclarationName = (node: TsNode): TsNode | undefined =>
+  isBindingElement(node) ||
+  (isVariableDeclaration(node) && node.type === undefined)
     ? node.name
     : undefined;
-};
 
 /** Whether `null` is the type itself or one of its union members. */
 const includesNull = (type: Type): boolean =>

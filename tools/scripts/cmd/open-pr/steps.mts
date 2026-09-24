@@ -22,11 +22,11 @@ export const armBlockedBy = (pr: PullRequest): string | undefined => {
 
   // GitHub refuses to arm a draft, so this would fail anyway; saying so here
   // means the failure names the reason rather than quoting `gh`.
-  if (pr.isDraft) return 'it is a draft';
-
-  return hasLabel(pr, SKIP_CI_LABEL)
-    ? undefined
-    : `${SKIP_CI_LABEL} is not on it, so arming would leave nothing holding the merge`;
+  return pr.isDraft
+    ? 'it is a draft'
+    : hasLabel(pr, SKIP_CI_LABEL)
+      ? undefined
+      : `${SKIP_CI_LABEL} is not on it, so arming would leave nothing holding the merge`;
 };
 
 /** Whether GitHub already holds an auto-merge request for this one. */

@@ -338,6 +338,46 @@ namespace PreferNullishCoalescingWhenSafe {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Prefer ternary expressions over `if` statements, and chains of them, that only choose what to return or assign.
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferTernary {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "string",
+   *     "enum": [
+   *       "always",
+   *       "only-single-line"
+   *     ],
+   *     "description": "Whether to always prefer ternary, or only when every test and branch is on one line."
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * Whether to always prefer ternary, or only when every test and branch is on one line.
+   */
+  export type Options = 'always' | 'only-single-line';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
@@ -349,10 +389,12 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
+  'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
+  'ts-restrictions/prefer-ternary': PreferTernary.Options;
 }>;

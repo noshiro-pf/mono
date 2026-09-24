@@ -2,11 +2,12 @@
 
 import { Arr, asPositiveSafeInt, PositiveSafeInt } from 'ts-data-forge';
 
-export const formatTickLabel = (v: number): string => {
-  if (v >= 1000) return `${(v / 1000).toString()}s`;
-
-  return v < 1 ? v.toFixed(1) : Math.round(v).toString();
-};
+export const formatTickLabel = (v: number): string =>
+  v >= 1000
+    ? (`${(v / 1000).toString()}s` as const)
+    : v < 1
+      ? v.toFixed(1)
+      : Math.round(v).toString();
 
 export const generateLinearTicks = (
   max: PositiveSafeInt,

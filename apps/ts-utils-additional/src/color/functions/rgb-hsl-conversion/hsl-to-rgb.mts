@@ -9,11 +9,13 @@ import { numberToRgbValue } from '../from-number/index.mjs';
 const hue2rgb = (p: number, q: number, s: number): number => {
   const t = s < 0 ? s + 1 : s > 1 ? s - 1 : s;
 
-  if (t < 1 / 6) return p + (q - p) * (6 * t);
-
-  if (t < 1 / 2) return q;
-
-  return t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p;
+  return t < 1 / 6
+    ? p + (q - p) * (6 * t)
+    : t < 1 / 2
+      ? q
+      : t < 2 / 3
+        ? p + (q - p) * (2 / 3 - t) * 6
+        : p;
 };
 
 export const hslToRgb = ([h, s, l]: Hsl): Rgb => {

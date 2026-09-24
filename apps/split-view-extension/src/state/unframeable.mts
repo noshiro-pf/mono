@@ -36,27 +36,19 @@ export const unframeableKindOf = (
 
   const parsed = parseUrl(address);
 
-  if (parsed === undefined) {
-    return undefined;
-  }
-
-  if (browserSchemes.has(parsed.protocol)) {
-    return 'browser-page';
-  }
-
-  if (extensionSchemes.has(parsed.protocol)) {
-    return 'extension-page';
-  }
-
-  if (parsed.protocol === 'file:') {
-    return 'local-file';
-  }
-
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    return 'unsupported-scheme';
-  }
-
-  return isWebStore(parsed.hostname, parsed.pathname) ? 'web-store' : undefined;
+  return parsed === undefined
+    ? undefined
+    : browserSchemes.has(parsed.protocol)
+      ? 'browser-page'
+      : extensionSchemes.has(parsed.protocol)
+        ? 'extension-page'
+        : parsed.protocol === 'file:'
+          ? 'local-file'
+          : parsed.protocol !== 'http:' && parsed.protocol !== 'https:'
+            ? 'unsupported-scheme'
+            : isWebStore(parsed.hostname, parsed.pathname)
+              ? 'web-store'
+              : undefined;
 };
 
 /**

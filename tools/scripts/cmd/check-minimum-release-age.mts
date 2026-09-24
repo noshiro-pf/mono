@@ -109,11 +109,12 @@ export const reasonCoversEntry = (target: string, entry: string): boolean =>
  */
 export const classifyExcludeEntry = (
   entry: string,
-): ExcludeEntryProblem | undefined => {
-  if (entry.includes(WILDCARD)) return 'pattern';
-
-  return hasVersion(entry) ? undefined : 'bare-name';
-};
+): ExcludeEntryProblem | undefined =>
+  entry.includes(WILDCARD)
+    ? 'pattern'
+    : hasVersion(entry)
+      ? undefined
+      : 'bare-name';
 
 export type MinimumReleaseAgeSettings = Readonly<{
   delayMinutes: number | undefined;

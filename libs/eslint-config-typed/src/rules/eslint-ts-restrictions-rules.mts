@@ -13,6 +13,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/prefer-dedent': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
   'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',
+  'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),
 } as const satisfies EslintTsRestrictionsRules;
