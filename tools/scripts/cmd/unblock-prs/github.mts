@@ -3,6 +3,7 @@
 import {
   describeSetAside,
   SET_ASIDE_CONTEXT,
+  SKIP_CI_LABEL,
   type SetAside,
 } from 'pr-report-core';
 import { Json, Result } from 'ts-data-forge';
@@ -94,6 +95,16 @@ export const remoteSha = async (
   return sha === undefined || sha === ''
     ? Result.err(`origin has no branch named ${branch}`)
     : Result.ok(sha);
+};
+
+export const addSkipCiLabel = async (
+  prNumber: number,
+): Promise<Result<undefined, string>> => {
+  const added = await git(
+    `gh pr edit ${prNumber} --add-label ${sh(SKIP_CI_LABEL)}`,
+  );
+
+  return Result.isErr(added) ? added : Result.ok(undefined);
 };
 
 /**

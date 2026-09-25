@@ -75,6 +75,51 @@ PR — から行います。public repository なので、コメントではな�
 **`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
 せるだけで、順番が来たら外すのがこのスクリプトの仕事です。
 
+### 解放されている PR は1本まで
+
+`merge-queued` が付いていて `skip-ci` の無い PR を「解放されている」と呼びます。
+push されてもラベルが外れても、フルマトリクスが走る PR です。**解放されている
+PR は常に1本まで** に保ちます。`main` が動く前にマージできるのは1本だけなの
+で、2本目の実行は捨てることになるからです。
+
+#### なぜ必要か — 起きていたこと
+
+このスクリプトと `/unblock-prs` skill は、同じキューを互いに見えないまま並行し
+て動かします。ルールが無いと、例えば次のことが起きます。
+
+1. `merge-queued` の PR A の `skip-ci` を外し、CI を走らせる。CI が失敗してマー
+   ジが止まる。A は `skip-ci` が外れたまま見送られる。
+2. このスクリプトが次の `merge-queued` PR B を pick し、`skip-ci` を外す。
+3. skill が A の失敗を直して push する。A の `skip-ci` は外れたままなので、この
+   push で A のマトリクスも走る。
+4. A と B で CI が同時に走り、先にマージされた方が `main` を動かす。もう片方は
+   `BEHIND` に戻り、その CI 実行は丸ごと無駄になる。
+
+どちらの書き手も単独では正しく動いています。無駄は、「CI を走らせてよいのは1本
+だけ」という状態がどこにも記録されていないことから生まれます。`skip-ci` をその
+記録として使います。
+
+#### ルール
+
+- **解放する前に他を止める。** PR を解放する前、つまり `skip-ci` を外す前や、ラベ
+  ルの無い PR を rebase して push する前に、他の open な `merge-queued` PR で
+  `skip-ci` の無いもの全部に `skip-ci` を付けます。in flight の PR を watch す
+  る前も同じです。見送った PR も、draft も、auto-merge の無いものも対象です。
+  どれも push されれば CI が走るからです。`pnpm-update.yml` はラベル無しで PR
+  を開くので、ここで止まります。上の例では手順 2 で A に `skip-ci` が付き、手
+  順 3 の push はチェックを全部 skip します。A はキューに戻り、B の後で rebase
+  されて解放されます。
+- **解放した直後にもう一度見る。** skill が同じ瞬間に別の PR を解放していると、ど
+  ちらも相手がまだ止まっているのを見てから解放したことになります。2本とも解放
+  されていたら、pick の順（番号の小さい順、version PR は最後）で先の方だけを残
+  し、残りに `skip-ci` を付けます。自分の PR が負けた場合は survey からやり直し
+  ます。skill も同じ規則で決めるので、両者は同じ1本に落ち着きます。
+
+この規則が保証するのは CI 時間だけで、マージの正しさは保証しません。それは
+ruleset（最新の `main` の上で必須チェックが全部緑）が別に保証しています。一覧
+を読んでからラベルを付けるまでの数秒の間に誰かが push すると、2本目の実行は起
+こりえます。ただし直後の見直しで片方が止められます。
+
 ### 起動時
 
 `gh auth status` とデフォルトブランチの取得。SIGINT / SIGTERM のハンドラを設置
@@ -150,6 +195,14 @@ version commit が「まだ消費していない changeset を含む先端」の
 
 失敗（conflict / push 拒否 / ラベル除去失敗）した場合は記録して **同じサイクル
 内で次の候補へ** 進みます。キューが止まるわけではありません。
+
+例外は **作業中にブランチが動いた場合** です（rebase 前の fetch で head が
+survey と違う / lease 負けで push が拒否され、remote の head が変わっている /
+ラベルを外す前の再確認で head が違う）。これは skill や人が同じ PR を動かして
+いるということなので、失敗として記録せず、次の候補にも進まずに survey からやり
+直します。次の候補を rebase すると、相手が起動するマトリクスの横でもう1本走ら
+せることになるからです。`/unblock-prs` skill はこのスクリプトと並行して動く前
+提で書かれています。
 
 #### 4. watch
 
@@ -259,6 +312,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `merge-after.mts` | 宣言された順序が pick に何を言うか                        |
 | `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
+| `release.mts`     | 解放されている PR を1本に保つ                             |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
 | `quiet.mts`       | 何もない時にどれだけ待つか                                |
 | `checks.mts`      | マージが何を待っているか                                  |
@@ -345,6 +399,53 @@ is public, and a label needs write access while a comment does not.
 **`skip-ci` is not a scope rule.** It pauses a queued pull request, and taking
 it off when its turn comes is the job.
 
+### One released pull request at a time
+
+A pull request labelled `merge-queued` without `skip-ci` is **released**:
+pushing to it, or taking the label off, runs the full matrix. **At most one is
+released at any time.** Only one can merge before `main` moves, so a second
+one's run is thrown away.
+
+#### Why — what happened without it
+
+This script and the `/unblock-prs` skill move the same queue side by side,
+and neither can see the other. Without the rule:
+
+1. Queued pull request A has its `skip-ci` taken off, and its matrix runs. A
+   check fails and the merge is blocked. A is set aside with the label off.
+2. This script picks the next queued pull request, B, and takes its `skip-ci`
+   off.
+3. The skill fixes A's failure and pushes. A has no label, so the push starts
+   A's matrix too.
+4. A and B run at once. Whichever merges first moves `main`, the other goes
+   back to `BEHIND`, and the whole of its run is wasted.
+
+Each writer was right on its own. The waste comes from "only one may run" being
+written down nowhere, and `skip-ci` is where it is now written.
+
+#### The rule
+
+- **Pause the others before releasing one.** That means before taking
+  `skip-ci` off, before rebasing and pushing a pull request that has no label,
+  and before watching the one in flight. Every other open `merge-queued` pull
+  request without `skip-ci` gets the label. Set-aside ones, drafts and ones
+  without auto-merge are included, because each runs a matrix when pushed to.
+  `pnpm-update.yml` opens its pull request without the label, and this is
+  where it gets paused. In the example, A gets `skip-ci` at step 2, so the push
+  at step 3 skips every check. A is back in the queue, to be rebased and
+  released after B.
+- **Look again straight after releasing.** If the skill released another pull
+  request in the same moment, each writer saw the other still paused. When two
+  are released, the one first in the pick order keeps its release (lowest
+  number, the version pull request last) and the rest are paused. If the loser
+  is this run's own, it surveys again. The skill decides by the same rule, so
+  both settle on the same one.
+
+The rule protects CI time, not correctness. The ruleset protects correctness
+on its own: every required check green, on the current `main`. A push in the
+seconds between reading the list and adding a label can still start a second
+run, and the look afterwards pauses one of the two.
+
 ### At startup
 
 `gh auth status` and the default branch. SIGINT / SIGTERM handlers are
@@ -425,6 +526,15 @@ Otherwise take the first candidate (lowest number, `DIRTY` last) and:
 A failure — a real conflict, a refused push, a label that could not be
 removed — is recorded and **the next candidate is tried in the same cycle**.
 The queue does not stop.
+
+The exception is **a branch that moved under it**: the head the fetch finds
+is not the one the survey saw, a push lost its lease to a head that has
+since changed, or the re-read before taking the label off finds a different
+head. That is the skill or a person moving the same pull request, so nothing
+is recorded, and the cycle surveys again rather than moving on — rebasing the
+next candidate would start a second matrix beside the one the other writer is
+about to start. The `/unblock-prs` skill is written to run alongside this
+script.
 
 #### 4. Watch
 
@@ -541,6 +651,7 @@ the paths it changes and `.github/CODEOWNERS`.
 | `merge-after.mts` | what the declared order says about picking               |
 | `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
+| `release.mts`     | holding the queue to one released pull request           |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
 | `quiet.mts`       | how long to sleep when there is nothing to do            |
 | `checks.mts`      | what the merge is waiting for                            |

@@ -8,7 +8,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import { git, viewPullRequest } from './github.mjs';
+import { git, remoteSha, viewPullRequest } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import {
   type Advanced,
@@ -21,7 +21,8 @@ import { isVersionPullRequest } from './version-pr.mjs';
 /**
  * Rebases the pull request's branch onto `origin/<defaultBranch>` in a
  * throwaway worktree and force-pushes the result, expecting the remote branch
- * to still be at the head the survey saw. Resolves to the new head.
+ * to still be at the head the survey saw. Resolves to the new head, or to
+ * `moved` when the branch is no longer where the survey saw it.
  *
  * The worktree is detached, so the checkout this runs from is never touched,
  * and it is removed on the way out of every path: the work inside it is a
@@ -32,12 +33,12 @@ import { isVersionPullRequest } from './version-pr.mjs';
 const rebaseAndPush = async (
   pr: PullRequest,
   defaultBranch: string,
-): Promise<Result<string, RebaseFailure>> => {
+): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
   const worktreeDir = path.join(os.tmpdir(), 'unblock-prs', `pr-${pr.number}`);
 
-  const rebaseFailed = (detail: string): Result<string, RebaseFailure> =>
+  const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
     Result.err({ reason: 'rebase-failed', detail });
 
   // A previous run may have been interrupted with this worktree in place.
@@ -58,9 +59,7 @@ const rebaseAndPush = async (
   }
 
   if (remoteHead.value.trim() !== pr.headRefOid) {
-    return rebaseFailed(
-      `origin/${branch} moved since the survey (${remoteHead.value.trim().slice(0, 10)} != ${pr.headRefOid.slice(0, 10)}).`,
-    );
+    return Result.ok({ kind: 'moved' });
   }
 
   const added = await git(
@@ -88,10 +87,10 @@ const rebaseInWorktree = async (
   pr: PullRequest,
   defaultBranch: string,
   worktreeDir: string,
-): Promise<Result<string, RebaseFailure>> => {
+): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
-  const rebaseFailed = (detail: string): Result<string, RebaseFailure> =>
+  const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
     Result.err({ reason: 'rebase-failed', detail });
 
   const rebased = await git(
@@ -114,7 +113,7 @@ const rebaseInWorktree = async (
   const sha = newHead.value.trim();
 
   if (sha === pr.headRefOid) {
-    return Result.ok(sha);
+    return Result.ok({ kind: 'rebased', head: sha });
   }
 
   const baseHead = await git(`git rev-parse ${sh(`origin/${defaultBranch}`)}`);
@@ -139,14 +138,22 @@ const rebaseInWorktree = async (
   );
 
   if (Result.isErr(pushed)) {
-    return Result.err({
-      reason: 'push-failed',
-      detail: `push refused: ${lastLines(pushed.value, 5)}`,
-    });
+    // A lease that lost is someone else pushing in the time the rebase took,
+    // and that is not a reason to set the pull request aside.
+    const remoteHeadNow = await remoteSha(branch);
+
+    return Result.isOk(remoteHeadNow) && remoteHeadNow.value !== pr.headRefOid
+      ? Result.ok({ kind: 'moved' })
+      : Result.err({
+          reason: 'push-failed',
+          detail: `push refused: ${lastLines(pushed.value, 5)}`,
+        });
   }
 
-  return Result.ok(sha);
+  return Result.ok({ kind: 'rebased', head: sha });
 };
+
+type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
 
 /**
  * Brings one pull request as close to merging as this script can: onto the
@@ -163,6 +170,13 @@ const rebaseInWorktree = async (
  * take off either: then GitHub's `BEHIND` or `DIRTY` was stale and the survey
  * has to start over. A paused pull request that is already on top of the base
  * is simply one whose only obstacle was the label.
+ *
+ * A branch that moves while this is moving it is someone else moving the same
+ * pull request — the skill runs beside this script, and a person may push —
+ * so it resolves to `moved` and leaves the rest to that someone. Recording it
+ * as a failure would set a pull request aside for being worked on, and trying
+ * the next candidate would start a second matrix beside the one the other
+ * writer is about to start.
  *
  * The version pull request is the exception: only the label comes off it.
  * `changesets/action` rebuilds that branch from the tip of the base itself
@@ -186,7 +200,11 @@ export const advance = async (
 
     return Result.isErr(unlabelled)
       ? unlabelled
-      : Result.ok({ kind: 'advanced', head: pr.headRefOid });
+      : Result.ok(
+          unlabelled.value === 'moved'
+            ? { kind: 'moved' }
+            : { kind: 'advanced', head: pr.headRefOid },
+        );
   }
 
   const rebased = await rebaseAndPush(pr, defaultBranch);
@@ -195,7 +213,11 @@ export const advance = async (
     return rebased;
   }
 
-  const head = rebased.value;
+  if (rebased.value.kind === 'moved') {
+    return Result.ok({ kind: 'moved' });
+  }
+
+  const { head } = rebased.value;
 
   if (!isSkipCiLabelled(pr)) {
     return head === pr.headRefOid
@@ -207,7 +229,11 @@ export const advance = async (
 
   return Result.isErr(removed)
     ? removed
-    : Result.ok({ kind: 'advanced', head });
+    : Result.ok(
+        removed.value === 'moved'
+          ? { kind: 'moved' }
+          : { kind: 'advanced', head },
+      );
 };
 
 /**
@@ -218,8 +244,8 @@ export const advance = async (
 const removeSkipCiLabel = async (
   pr: PullRequest,
   head: string,
-): Promise<Result<undefined, RebaseFailure>> => {
-  const failed = (detail: string): Result<undefined, RebaseFailure> =>
+): Promise<Result<'moved' | 'removed', RebaseFailure>> => {
+  const failed = (detail: string): Result<'moved' | 'removed', RebaseFailure> =>
     Result.err({ reason: 'unlabel-failed', detail });
 
   const current = await viewPullRequest(pr.number);
@@ -233,13 +259,13 @@ const removeSkipCiLabel = async (
   }
 
   if (current.value.headRefOid !== head) {
-    return failed('someone pushed to the branch while it was rebasing');
+    return Result.ok('moved');
   }
 
   if (!isSkipCiLabelled(current.value)) {
     // Someone took the label off in the meantime, which is the thing this was
     // about to do.
-    return Result.ok(undefined);
+    return Result.ok('removed');
   }
 
   if (!isMergeQueued(current.value)) {
@@ -252,7 +278,7 @@ const removeSkipCiLabel = async (
 
   return Result.isErr(removed)
     ? failed(`cannot remove ${SKIP_CI_LABEL}: ${lastLines(removed.value, 2)}`)
-    : Result.ok(undefined);
+    : Result.ok('removed');
 };
 
 const removeWorktree = async (worktreeDir: string): Promise<void> => {
