@@ -395,16 +395,27 @@ const main = async (): Promise<void> => {
       (await page.locator('link#split-view-favicon').getAttribute('href')) ??
       '';
 
-    // A second split view, in the same tab.
-    await page.locator('.top-bar__button[title*="Add a split view"]').click();
+    // A second split view, which opens in a tab of its own and leaves this
+    // one where it was.
+    const [createdTab] = await Promise.all([
+      context.waitForEvent('page', { timeout: 8000 }),
+      page.locator('.top-bar__button[title*="Add a split view"]').click(),
+    ]);
 
-    await page.waitForTimeout(800);
+    await createdTab.waitForLoadState();
+
+    await createdTab.waitForTimeout(800);
 
     const optionsAfterCreate = await workspaceOptionCount();
 
-    const titleAfterCreate = await page.title();
+    const titleKeptAfterCreate = await page.title();
 
-    const panesInNewWorkspace = await page.locator('.pane').count();
+    const titleAfterCreate = await createdTab.title();
+
+    const panesInNewWorkspace = await createdTab.locator('.pane').count();
+
+    // Closed again, so that opening them all below has one to open.
+    await createdTab.close();
 
     // `Alt+1` goes back to the first, which has to come back at the address it
     // was left at — the whole point of the list.
@@ -854,9 +865,14 @@ const main = async (): Promise<void> => {
         faviconAtStart.slice(0, 22),
       ),
       check(
-        'creating one adds it to the list and shows it',
+        'creating one adds it to the list and shows it in a new tab',
         optionsAfterCreate === 2 && titleAfterCreate.startsWith('2: '),
         `${String(optionsAfterCreate)} / ${titleAfterCreate}`,
+      ),
+      check(
+        'and the tab it was created from stays where it was',
+        titleKeptAfterCreate === titleAtStart,
+        titleKeptAfterCreate,
       ),
       check(
         'a new split view starts at the default layout',

@@ -67,7 +67,8 @@ split views are kept.
 | resize                               | drag a divider                                                              |
 | move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                 |
 | zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                         |
-| add a split view / switch            | `＋` / the select at the top left, or `Alt+1` … `Alt+9`                     |
+| add a split view (in a new tab)      | `＋` at the top left                                                        |
+| switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                            |
 | rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file |
 | reopen everything after a restart    | **Edit** → **↗ Open all**                                                   |
 | get out of a pane that will not work | its "open in a new tab" button                                              |

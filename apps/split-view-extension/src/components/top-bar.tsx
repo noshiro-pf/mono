@@ -137,7 +137,7 @@ export const TopBar = memoNamed(
             </li>
             <li>
               {
-                'The select at the left is the list of saved split views. Choosing one swaps this tab’s contents for it, and Alt+1..9 does the same — even with the focus inside a pane. ＋ adds one.'
+                'The select at the left is the list of saved split views. Choosing one swaps this tab’s contents for it, and Alt+1..9 does the same — even with the focus inside a pane. ＋ adds one, in a new tab.'
               }
             </li>
             <li>

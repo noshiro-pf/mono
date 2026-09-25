@@ -159,14 +159,23 @@ const main = async (): Promise<void> => {
 
     await page.waitForTimeout(600);
 
-    // The list of saved split views, with the popover open.
-    await page.locator('.top-bar__button[title*="Add a split view"]').click();
+    // The list of saved split views, with the popover open. `＋` opens the
+    // new one in a tab of its own, which is closed again: the shot is of this
+    // tab, with two entries in its list.
+    const [createdTab] = await Promise.all([
+      context.waitForEvent('page', { timeout: 8000 }),
+      page.locator('.top-bar__button[title*="Add a split view"]').click(),
+    ]);
 
-    await page.waitForTimeout(800);
+    await createdTab.waitForLoadState();
 
-    await page.locator('.workspace-picker__select').selectOption({ index: 0 });
+    await createdTab.waitForTimeout(800);
 
-    await page.waitForTimeout(1200);
+    await createdTab.close();
+
+    await page.bringToFront();
+
+    await page.waitForTimeout(400);
 
     await page.locator('.top-bar__button[title*="Rename, reorder"]').click();
 

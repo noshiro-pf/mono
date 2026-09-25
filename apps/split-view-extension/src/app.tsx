@@ -419,20 +419,36 @@ export const App = memoNamed('App', () => {
     [switchWorkspace],
   );
 
+  /**
+   * Adds a split view and opens it in a tab of its own.
+   *
+   * A new tab rather than this one, so that adding a split view never takes
+   * away the one on screen. The list is written before the tab is opened: the
+   * new page reads it on load, and one that did not find the entry yet would
+   * add its own under a name of its choosing.
+   */
   const handleCreateWorkspace = React.useCallback((): void => {
-    const workspaceId = crypto.randomUUID();
+    const create = async (): Promise<void> => {
+      const workspaceId = crypto.randomUUID();
 
-    commitRegistry(
-      addWorkspaceEntry(mut_liveRegistry.current, {
+      const next = addWorkspaceEntry(mut_liveRegistry.current, {
         id: workspaceId,
         name: nextWorkspaceName(mut_liveRegistry.current),
         createdAt: Date.now(),
         pinned: false,
-      }),
-    );
+      });
 
-    switchWorkspace(workspaceId, { history: 'push', saveCurrent: true });
-  }, [commitRegistry, switchWorkspace]);
+      mut_liveRegistry.current = next;
+
+      setRegistry(next);
+
+      await saveWorkspaceRegistry(next);
+
+      await openWorkspaceInNewTab(workspaceId);
+    };
+
+    create().catch(console.error);
+  }, []);
 
   const handleOpenWorkspaceInNewTab = React.useCallback(
     (workspaceId: string): void => {
