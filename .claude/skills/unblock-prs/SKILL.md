@@ -1,6 +1,6 @@
 ---
 name: unblock-prs
-description: Clear what is blocking the open pull requests labelled `merge-queued` — rebase the one that is out-of-date with the base branch, take `skip-ci` off when its turn comes, watch its checks, fix what fails — one PR at a time, in the order they declare with `Merge-After:` and `blocks-release`, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, release the merge queue, watch CI, or fix a failing check on a PR.
+description: Clear what is blocking the open pull requests labelled `merge-queued` — rebase the one that is out-of-date with the base branch, take `skip-ci` off when its turn comes, watch its checks, fix what fails — one PR at a time, in the order they declare with `Merge-After:`, their stack and `blocks-release`, and never merge anything. Use when asked to unblock or look after the open PRs, rebase branches behind main, release the merge queue, watch CI, or fix a failing check on a PR.
 ---
 
 # Unblock open pull requests
@@ -11,11 +11,17 @@ merge, so GitHub can merge them itself.
 **Scope.** Only pull requests labelled `merge-queued` with auto-merge already
 enabled (`autoMerge` is true). The label is the author saying this
 one is reviewed and is to be landed; auto-merge is what actually lands it,
-since this skill never merges anything. A PR without the label is none of this
-skill's business however ready it looks — pass it over in silence. A PR with
-the label that cannot be acted on (a draft, no auto-merge, a base that is not
-`main`) is reported, because the label asked for something and the answer is
-no.
+since this skill never merges anything. **Nobody arms it but the worker**
+(`pnpm run unblock-prs`), which does so when it picks a queued PR —
+`open-pr` opens every PR unarmed. So a queued PR without auto-merge is
+waiting for the worker's pick, not broken: report it as that, and leave it to
+the worker, since arming is GraphQL, which the proxy refuses, and this skill
+never arms anything anyway. A PR without the label is none of this skill's
+business however ready it looks — pass it over in silence. A PR with the label
+that cannot be acted on (a draft, a base that is neither `main` nor another
+open PR's branch, auto-merge switched off by hand) is reported, because the
+label asked for something and the answer is no. A PR stacked on another waits for it
+— see "Stacked pull requests" below.
 
 **`skip-ci` does not put a PR out of scope; taking it off is the job.** It
 pauses a queued PR rather than removing it, and the release is a PR at a time,
@@ -115,10 +121,11 @@ pnpm run pr-report -- --format json
 ```
 
 `entries` is one object per open pull request. The scope rule is
-`autoMerge === true` and a `labels` entry whose `name` is `merge-queued`;
-still drop any
-whose `baseRef` is not `main`. The declared order is already read for you, as
-`mergeAfter` and `blockedBy` — see "The declared merge order" below.
+`autoMerge === true` and a `labels` entry whose `name` is `merge-queued`.
+One whose `stackedOn` is set is a layer of a stack and waits for that one;
+drop any other whose `baseRef` is not `main`. The declared order is already
+read for you, as `mergeAfter`, `stackedOn` and `blockedBy` — see "The declared
+merge order" and "Stacked pull requests" below.
 
 **A `skip-ci` PR in that list is a paused one, not an excluded one.** While the
 label is on, the five check workflows and the two lint jobs skip and
@@ -390,6 +397,27 @@ it has not merged. That is a queue that has stalled and is waiting for a
 person, which is what a declared order is for — do not take the next PR out of
 turn to keep things moving.
 
+## Stacked pull requests
+
+A PR whose base is another open PR's branch is a layer stacked on it, and
+`stackedOn` names that PR. Its diff is its own layer, which is the point of
+opening it that way (`pnpm run open-pr -- --base <branch>`, which also writes
+the layer below into `Merge-After:`); it waits for the layer below whether or
+not the trailer is there, and `blockedBy` already includes it. `tools/scripts/cmd/unblock-prs/stack.mts`
+has the whole life of a layer; the two things a session has to do by hand:
+
+- **Carry the layers above along when you rebase one.** Note the PR's
+  `headSha` before 2a, and after the rebase replay each layer stacked on it,
+  lowest first, onto the new head — `git rebase --onto <new head> <old head>`
+  in a worktree of that layer's branch, then `git push --force-with-lease`
+  against its old head. Otherwise its diff carries the old commits of the layer
+  below, and GitHub's own rebase when that layer merges starts from a head it
+  does not contain. A layer whose branch does not contain the old head is not
+  yours to guess at: report it.
+- **A layer GitHub moved onto `main` has no auto-merge** until the worker picks
+  it, like any queued PR; nothing arms a layer while it is stacked, because
+  armed onto a branch no ruleset covers it would merge into the layer below.
+
 ## The release goes last
 
 **`changeset-release/main`** is the PR `changesets/action` opens to version the
@@ -433,7 +461,8 @@ One line per PR, in the order handled: number, what was done (rebased and merged
 by GitHub / rebased and waiting / fix pushed / left alone and why), and where its
 checks stand. Name any PR left failing and what the failure is. Do not report a
 run as green while checks are still pending, and say plainly which PRs were never
-reached and which were out of scope — for lacking `merge-queued`, or for
-lacking auto-merge — and which the worker had set aside, with its reason.
+reached and which were out of scope — for lacking `merge-queued` — which are
+waiting for the worker to pick and arm them, and which the worker had set
+aside, with its reason.
 Report it as an order: which PR was released, what is
 behind it, and what each one is waiting on.

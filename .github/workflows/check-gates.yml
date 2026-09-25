@@ -71,10 +71,12 @@ jobs:
 
     # A few API calls and a read-only checkout. `gh` needs a token to be set
     # at all, hence `github.token`; `actions: read` is what listing the
-    # earlier runs and their jobs needs.
+    # earlier runs and their jobs needs, and `pull-requests: read` what asking
+    # whether the base is a stacked pull request's parent needs.
     permissions:
       actions: read
       contents: read
+      pull-requests: read
 
     outputs:
       branch_up_to_date: ${{ steps.branch_state.outputs.branch_up_to_date }}
@@ -122,11 +124,25 @@ jobs:
           fi
 
           # Only the default branch carries the strict policy, so only there
-          # does being behind block the merge and guarantee another run. A pull
+          # does being behind block the merge and guarantee another run. The
+          # one other base treated alike is the branch of an open pull request
+          # from this repository — a stacked pull request, which gets its run
+          # when it is restacked or moved onto the default branch. A pull
           # request onto any other branch is checked as it is: skipping it
           # would wait for an update that nothing requires and may never come.
+          # See "The gate" in README.md.
           if [ "${BASE_REF}" != "${DEFAULT_BRANCH}" ]; then
-            run_the_checks "The base branch is ${BASE_REF}, not ${DEFAULT_BRANCH}: being behind it blocks nothing, so the checks run."
+            # `-X GET` with `-f` sends the fields as the query string, encoded,
+            # since a branch name is the pull request author's to choose.
+            if ! stacked_on="$(gh api -X GET "repos/${GITHUB_REPOSITORY}/pulls" -f state=open -f per_page=1 -f "head=${GITHUB_REPOSITORY_OWNER}:${BASE_REF}" --jq '.[0].number // ""' 2>&1)"; then
+              run_the_checks "Could not ask whether ${BASE_REF} is an open pull request's branch, so the checks run: ${stacked_on}"
+            fi
+
+            if [ -z "${stacked_on}" ]; then
+              run_the_checks "The base branch is ${BASE_REF}, not ${DEFAULT_BRANCH} nor an open pull request's branch: being behind it blocks nothing, so the checks run."
+            fi
+
+            echo "Stacked on #${stacked_on}, whose branch ${BASE_REF} is."
           fi
 
           # `behind_by` is what the pull request page turns into "This branch is
@@ -153,7 +169,11 @@ jobs:
 
           echo 'branch_up_to_date=false' >>"${GITHUB_OUTPUT}"
 
-          summary="The branch is ${behind_by} commit(s) behind ${BASE_REF} — \"out-of-date with the base branch\", which cannot be merged. Update the branch: the run after the update is the one whose result counts."
+          if [ "${BASE_REF}" = "${DEFAULT_BRANCH}" ]; then
+            summary="The branch is ${behind_by} commit(s) behind ${BASE_REF} — \"out-of-date with the base branch\", which cannot be merged. Update the branch: the run after the update is the one whose result counts."
+          else
+            summary="The branch is ${behind_by} commit(s) behind ${BASE_REF}, the pull request it is stacked on, so its diff is not its own layer. Restack it: the run after that is the one whose result counts."
+          fi
           echo "${summary}"
           echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
 
@@ -290,14 +310,15 @@ jobs:
         if: steps.checkout.outcome == 'success'
         uses: ./.github/actions/setup
 
-      # Which base the diff is taken against — origin/main, or on a push to
-      # main what main pointed at before it — and the check of `diff-scope`
-      # are in the script, `planDiffCheck`. The `pnpm run` it ends in writes
-      # `should_run=` to `GITHUB_OUTPUT` itself.
+      # Which base the diff is taken against — the pull request's own base,
+      # or on a push to main what main pointed at before it — and the check
+      # of `diff-scope` are in the script, `planDiffCheck`. The `pnpm run` it
+      # ends in writes `should_run=` to `GITHUB_OUTPUT` itself.
       - name: Check diff
         id: check_diff
         if: steps.checkout.outcome == 'success'
         env:
           BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           DIFF_SCOPE: ${{ inputs.diff-scope }}
         run: node ./tools/scripts/cmd/workflow-steps.mts check-diff

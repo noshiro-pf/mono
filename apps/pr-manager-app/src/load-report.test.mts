@@ -175,6 +175,53 @@ describe(loadReport, () => {
     assert.strictEqual(loaded.summary.setAside, 1);
   });
 
+  test('reads a stack out of the bases, and compares each layer with its own', async () => {
+    const { fetchImpl, sent } = answering(
+      report([
+        pullRequest({ number: 7 }),
+        pullRequest({ number: 8, baseRefName: 'branch-7' }),
+        // A fork's branch of the same name is not #7's.
+        pullRequest({ number: 9, baseRefName: 'branch-10' }),
+        pullRequest({ number: 10, isCrossRepository: true }),
+      ]),
+      followUpAnswer({
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_10: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(
+      sent[1]?.variables['compare_8_base'],
+      'refs/heads/branch-7',
+    );
+
+    assert.deepStrictEqual(
+      loaded.entries.map(({ number, stackedOn }) => [number, stackedOn]),
+      [
+        [7, undefined],
+        [8, 7],
+        [9, undefined],
+        [10, undefined],
+      ],
+    );
+
+    assert.deepStrictEqual(
+      loaded.roots.map(({ number, children }) => [
+        number,
+        children.map((child) => child.number),
+      ]),
+      [
+        [7, [8]],
+        [9, []],
+        [10, []],
+      ],
+    );
+  });
+
   test('keeps what merged in the last week, newest first', async () => {
     const { fetchImpl } = answering(
       report(
@@ -390,6 +437,7 @@ const report = (
   ({
     data: {
       repository: {
+        defaultBranchRef: { name: 'main' },
         ruleset: { text: RULESET },
         codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
         open: { totalCount, nodes: openNodes },
@@ -444,11 +492,15 @@ const pullRequest = ({
   contexts = PASSING,
   contextsAfter,
   files = ['libs/x/src/a.mts'],
+  baseRefName = 'main',
+  isCrossRepository = false,
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
   contextsAfter?: string;
   files?: readonly string[];
+  baseRefName?: string;
+  isCrossRepository?: boolean;
 }>): unknown =>
   ({
     number,
@@ -461,7 +513,8 @@ const pullRequest = ({
     autoMergeRequest: null,
     headRefName: `branch-${number}`,
     headRefOid: `sha-${number}`,
-    baseRefName: 'main',
+    baseRefName,
+    isCrossRepository,
     baseRef: { target: { oid: BASE_TIP } },
     labels: { nodes: [] },
     closingIssuesReferences: { nodes: [] },

@@ -1,7 +1,10 @@
+// cspell:ignore retarget retargeted
+
 /** Everything that shells out to `gh` or `git`, and nothing that decides. */
 
 import {
   describeSetAside,
+  MERGE_QUEUED_LABEL,
   SET_ASIDE_CONTEXT,
   SKIP_CI_LABEL,
   type SetAside,
@@ -14,11 +17,12 @@ import {
   PullRequestListSchema,
   PullRequestSchema,
   type PullRequest,
+  type TimelineEvent,
 } from './types.mjs';
 import { isSafeRefName, sh } from './util.mjs';
 
 const PR_JSON_FIELDS =
-  'number,title,body,state,headRefName,headRefOid,baseRefName,isDraft,mergeStateStatus,autoMergeRequest,labels';
+  'number,id,title,body,state,headRefName,headRefOid,baseRefName,isCrossRepository,isDraft,mergeStateStatus,autoMergeRequest,labels';
 
 /**
  * Passed to every git and gh invocation. `GIT_TERMINAL_PROMPT=0` turns a
@@ -155,6 +159,181 @@ export const postSetAsideStatus = async (
 
   return Result.isErr(posted) ? posted : Result.ok(undefined);
 };
+
+/**
+ * What the pull request's timeline says about its base, its auto-merge and
+ * its being queued, oldest first: `stack.mts` reads which branch GitHub moved
+ * it off, and `auto-merge.mts` whether a person disarmed it since it was
+ * queued.
+ *
+ * GraphQL, because the REST timeline does not say which branches a change of
+ * base was between. Enabling auto-merge is three event types, one per merge
+ * method; a label other than `merge-queued` is dropped.
+ */
+export const readTimeline = async (
+  prNumber: number,
+): Promise<Result<readonly TimelineEvent[], string>> => {
+  const answered = await git(
+    [
+      'gh api graphql',
+      // `gh` fills these two placeholders in from the working directory's
+      // repository.
+      `-F ${sh('owner={owner}')}`,
+      `-F ${sh('repo={repo}')}`,
+      `-F number=${prNumber}`,
+      `-f ${sh(`query=${TIMELINE_QUERY}`)}`,
+    ].join(' '),
+  );
+
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const parsed = parseJson(answered.value, TimelineSchema);
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  return Result.ok(
+    parsed.value.data.repository.pullRequest.timelineItems.nodes.flatMap(
+      toTimelineEvents,
+    ),
+  );
+};
+
+const toTimelineEvents = (
+  node: t.TypeOf<typeof TimelineNodeSchema>,
+): readonly TimelineEvent[] => {
+  switch (node.__typename) {
+    case 'BaseRefChangedEvent':
+      return [
+        {
+          kind: 'base-changed',
+          from: node.previousRefName ?? '',
+          to: node.currentRefName ?? '',
+        },
+      ];
+
+    case 'AutoMergeDisabledEvent':
+      return [
+        {
+          kind: 'auto-merge-disabled',
+          manually: node.reasonCode === 'manually_disabled',
+        },
+      ];
+
+    case 'LabeledEvent':
+      return node.label?.name === MERGE_QUEUED_LABEL
+        ? [{ kind: 'queued' }]
+        : [];
+
+    default:
+      return [{ kind: 'auto-merge-enabled' }];
+  }
+};
+
+const TIMELINE_QUERY = [
+  'query($owner: String!, $repo: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $repo) {',
+  '    pullRequest(number: $number) {',
+  '      timelineItems(last: 100, itemTypes: [BASE_REF_CHANGED_EVENT, AUTO_MERGE_ENABLED_EVENT, AUTO_SQUASH_ENABLED_EVENT, AUTO_REBASE_ENABLED_EVENT, AUTO_MERGE_DISABLED_EVENT, LABELED_EVENT]) {',
+  '        nodes {',
+  '          __typename',
+  '          ... on BaseRefChangedEvent { previousRefName currentRefName }',
+  '          ... on AutoMergeDisabledEvent { reasonCode }',
+  '          ... on LabeledEvent { label { name } }',
+  '        }',
+  '      }',
+  '    }',
+  '  }',
+  '}',
+].join(' ');
+
+const TimelineNodeSchema = t.record({
+  __typename: t.string(),
+  previousRefName: t.optional(t.union([t.string(), t.nullType])),
+  currentRefName: t.optional(t.union([t.string(), t.nullType])),
+  reasonCode: t.optional(t.union([t.string(), t.nullType])),
+  label: t.optional(t.union([t.record({ name: t.string() }), t.nullType])),
+});
+
+const TimelineSchema = t.record({
+  data: t.record({
+    repository: t.record({
+      pullRequest: t.record({
+        timelineItems: t.record({
+          nodes: t.array(TimelineNodeSchema),
+        }),
+      }),
+    }),
+  }),
+});
+
+/**
+ * The head the last merged pull request from `branch` was merged at, or
+ * `undefined` when none was — the layer a retargeted pull request was
+ * stacked on, whose commits it may still carry.
+ */
+export const mergedHeadOf = async (
+  branch: string,
+): Promise<Result<MergedHead | undefined, string>> => {
+  const listed = await git(
+    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json number,headRefOid,mergedAt`,
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const parsed = parseJson(listed.value, MergedHeadListSchema);
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  const [latest] = parsed.value.toSorted((a, b) =>
+    b.mergedAt.localeCompare(a.mergedAt),
+  );
+
+  return Result.ok(
+    latest === undefined
+      ? undefined
+      : { number: latest.number, headSha: latest.headRefOid },
+  );
+};
+
+export type MergedHead = Readonly<{ number: number; headSha: string }>;
+
+const MergedHeadListSchema = t.array(
+  t.record({
+    number: t.number(),
+    headRefOid: t.string(),
+    mergedAt: t.string(),
+  }),
+);
+
+/**
+ * Arms auto-merge, squash being the one method the ruleset allows. The
+ * mutation rather than `gh pr merge --auto`, which merges on the spot when
+ * nothing holds the pull request; this one refuses instead.
+ */
+export const armAutoMerge = async (
+  nodeId: string,
+): Promise<Result<undefined, string>> => {
+  const armed = await git(
+    [
+      'gh api graphql',
+      `-f ${sh(`id=${nodeId}`)}`,
+      `-f ${sh(`query=${ARM_MUTATION}`)}`,
+    ].join(' '),
+  );
+
+  return Result.isErr(armed) ? armed : Result.ok(undefined);
+};
+
+const ARM_MUTATION =
+  'mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }';
 
 const SHA = /^[0-9a-f]{40}$/u;
 

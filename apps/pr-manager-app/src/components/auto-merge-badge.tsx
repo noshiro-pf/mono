@@ -5,12 +5,10 @@ type Props = Readonly<{ armed: boolean }>;
 /**
  * Whether anything will land the pull request once the checks go green.
  *
- * Both states, because off is the state worth seeing. The label is the
- * request and auto-merge is the mechanism, and the two come apart: a pull
- * request labelled `merge-queued` with nothing armed to land it is the
- * combination `unblock-prs` passes over with "auto-merge is not enabled", and
- * until this page existed the only place that was visible was that script's
- * own output.
+ * Both states. The label is the request and auto-merge is the mechanism:
+ * `unblock-prs` arms a pull request labelled `merge-queued` when it picks it,
+ * so off is where every queued pull request waits for its turn, and on is its
+ * turn having come — or a bot that armed its own.
  */
 export const AutoMergeBadge = React.memo<Props>(({ armed }) => (
   <span className={'badge'} data-auto-merge={armed ? 'on' : 'off'}>

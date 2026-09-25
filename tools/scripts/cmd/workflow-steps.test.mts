@@ -142,11 +142,36 @@ describe('check-diff', () => {
       planDiffCheck({
         DIFF_SCOPE: 'code',
         GITHUB_REF_NAME: '2058/merge',
+        BASE_REF: 'main',
         BEFORE: '',
       }),
       {
         ok: true,
         value: { run: ['run', 'z:check-should-run:code-checks'] },
+      },
+    );
+  });
+
+  test('diffs a stacked pull request against the branch it is stacked on', () => {
+    assert.deepStrictEqual(
+      planDiffCheck({
+        DIFF_SCOPE: 'code',
+        GITHUB_REF_NAME: '2070/merge',
+        BASE_REF: 'feat/lower-layer',
+        BEFORE: '',
+      }),
+      {
+        ok: true,
+        value: {
+          fetch:
+            '+refs/heads/feat/lower-layer:refs/remotes/origin/feat/lower-layer',
+          run: [
+            'run',
+            'z:check-should-run:code-checks',
+            '--base-branch',
+            'origin/feat/lower-layer',
+          ],
+        },
       },
     );
   });

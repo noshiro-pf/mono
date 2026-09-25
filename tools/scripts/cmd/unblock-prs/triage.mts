@@ -2,17 +2,22 @@
 
 import {
   findMergeAfterCycles,
+  findStackParents,
   MERGE_QUEUED_LABEL,
   parseMergeAfter,
   SKIP_CI_LABEL,
+  stackDescendants,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
+import { type StrictPick } from 'ts-type-forge';
+import { armsOnPick } from './auto-merge.mjs';
 import { listRequiredChecks, summarizeChecks } from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
-import { git, listPullRequests, remoteSha } from './github.mjs';
+import { git, listPullRequests, readTimeline, remoteSha } from './github.mjs';
 import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
 import { skipStillApplies } from './skips.mjs';
+import { stackedNote } from './stack.mjs';
 import {
   type Classification,
   type PullRequest,
@@ -130,21 +135,36 @@ export const triage = async (
 ): Promise<Triage> => {
   const sorted = pullRequests.toSorted((a, b) => a.number - b.number);
 
+  const stackParents = findStackParents(
+    sorted.map((pr) => ({
+      number: pr.number,
+      headRef: pr.headRefName,
+      baseRef: pr.baseRefName,
+      fromFork: pr.isCrossRepository,
+    })),
+    base.defaultBranch,
+  );
+
   const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
-    sorted.map(
-      (pr) =>
-        [
-          pr.number,
-          // The version pull request declares nothing: its body is rewritten
-          // on every push to the base, so a trailer written there would hold
-          // for a cycle or two and then silently stop. `blocks-release`, on
-          // the pull requests it is waiting for, is how an order is declared
-          // on it. Other pull requests may still name *it*.
-          isVersionPullRequest(pr, base.defaultBranch)
-            ? []
-            : parseMergeAfter(pr.body),
-        ] as const,
-    ),
+    sorted.map((pr) => {
+      const parent = stackParents.get(pr.number);
+
+      return [
+        pr.number,
+        // The version pull request declares nothing: its body is rewritten
+        // on every push to the base, so a trailer written there would hold
+        // for a cycle or two and then silently stop. `blocks-release`, on
+        // the pull requests it is waiting for, is how an order is declared
+        // on it. Other pull requests may still name *it*. A stacked pull
+        // request waits for the layer below it whether or not it says so.
+        isVersionPullRequest(pr, base.defaultBranch)
+          ? []
+          : Arr.uniq([
+              ...(parent === undefined ? [] : [parent]),
+              ...parseMergeAfter(pr.body),
+            ]),
+      ] as const;
+    }),
   );
 
   const cycles = findMergeAfterCycles(dependencies);
@@ -153,6 +173,7 @@ export const triage = async (
     ...base,
     openNumbers: new Set(sorted.map((pr) => pr.number)),
     dependencies,
+    stackParents,
     cyclic: new Set(cycles.flat()),
     releaseBlockers: sorted.filter(blocksRelease),
   } as const;
@@ -177,6 +198,18 @@ export const triage = async (
           candidateRank(a, base.defaultBranch) -
           candidateRank(b, base.defaultBranch),
       ),
+    // Anything this cycle may pick — a candidate, or one in flight — that
+    // has no auto-merge yet. `classify` has already set aside the ones a
+    // person disarmed.
+    toArm: new Set(
+      classified.flatMap(({ pr, result }) =>
+        (result.kind === 'candidate' || result.kind === 'in-flight') &&
+        !isRecord(pr.autoMergeRequest)
+          ? [pr.number]
+          : [],
+      ),
+    ),
+    stackParents,
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
@@ -217,6 +250,28 @@ const classify = async (
           : `the branch is pushed again or ${context.defaultBranch} moves`
       }`,
     };
+  }
+
+  // A layer of a stack: its turn comes when GitHub moves it onto the default
+  // branch, which is when the one below it merges. Until then there is
+  // nothing to rebase it onto but that layer, which this script does when it
+  // moves that layer. See `stack.mts`.
+  const parent = context.stackParents.get(pr.number);
+
+  if (parent !== undefined) {
+    return stackedNote(pr, parent, context);
+  }
+
+  // Nothing here merges anything — auto-merge does, once the checks are
+  // green — but this script is what arms it, when it picks a queued pull
+  // request (`auto-merge.mts`). One a person disarmed after queueing it is
+  // passed over until they queue it again.
+  if (!isRecord(pr.autoMergeRequest)) {
+    const disarmed = await disarmedByHand(pr);
+
+    if (disarmed !== undefined) {
+      return disarmed;
+    }
   }
 
   // The version pull request is derived state, rebuilt from the tip of the
@@ -279,6 +334,32 @@ const classify = async (
         note: `#${pr.number}: merge state ${pr.mergeStateStatus}`,
       };
   }
+};
+
+/**
+ * The note to report instead of picking a queued pull request without
+ * auto-merge, when a person switched it off after queueing it; `undefined`
+ * when this script may arm it. A timeline that cannot be read is not taken as
+ * permission.
+ */
+const disarmedByHand = async (
+  pr: PullRequest,
+): Promise<Classification | undefined> => {
+  const events = await readTimeline(pr.number);
+
+  if (Result.isErr(events)) {
+    return {
+      kind: 'note',
+      note: `#${pr.number}: no auto-merge, and could not read whether someone switched it off (${lastLines(events.value, 2)})`,
+    };
+  }
+
+  return armsOnPick(events.value)
+    ? undefined
+    : {
+        kind: 'note',
+        note: `#${pr.number}: auto-merge was switched off by hand after it was queued; take ${MERGE_QUEUED_LABEL} off and put it back to queue it again`,
+      };
 };
 
 /**
@@ -368,7 +449,7 @@ export const reportTriage = (
 
   for (const [position, pr] of triaged.candidates.entries()) {
     log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch)} — ${pr.title}`,
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)} — ${pr.title}`,
     );
   }
 };
@@ -377,21 +458,31 @@ export const reportTriage = (
 export const describeAction = (
   pr: PullRequest,
   defaultBranch: string,
-): string =>
-  isVersionPullRequest(pr, defaultBranch)
-    ? (`take ${SKIP_CI_LABEL} off it — the release workflow owns the branch` as const)
-    : [
-        `rebase onto ${defaultBranch}`,
-        isConflicting(pr)
-          ? ', which GitHub says conflicts — a rebase will say'
-          : '',
-        isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
-      ].join('');
+  triaged: StrictPick<Triage, 'stackParents' | 'toArm'>,
+): string => {
+  if (isVersionPullRequest(pr, defaultBranch)) {
+    return `take ${SKIP_CI_LABEL} off it — the release workflow owns the branch`;
+  }
+
+  const above = stackDescendants(triaged.stackParents, pr.number);
+
+  return [
+    `rebase onto ${defaultBranch}`,
+    isConflicting(pr)
+      ? ', which GitHub says conflicts — a rebase will say'
+      : '',
+    Arr.isNonEmpty(above)
+      ? `, carry ${above.map((n) => `#${n}`).join(', ')} stacked on it along`
+      : '',
+    triaged.toArm.has(pr.number) ? ', arm auto-merge' : '',
+    isSkipCiLabelled(pr) ? `, then take ${SKIP_CI_LABEL} off it` : '',
+  ].join('');
+};
 
 /** Why a pull request is none of this script's business, if it is not. */
 const outOfScopeReason = (
   pr: PullRequest,
-  context: TriageBase,
+  context: TriageContext,
 ): string | undefined => {
   if (pr.state !== 'OPEN') {
     return `state is ${pr.state}`;
@@ -405,16 +496,16 @@ const outOfScopeReason = (
     return `not labelled ${MERGE_QUEUED_LABEL}`;
   }
 
-  // Nothing here merges anything — auto-merge does, once the checks are
-  // green. A queued pull request without it would be released from
-  // `skip-ci`, go green, and sit there.
-  return !isRecord(pr.autoMergeRequest)
-    ? 'auto-merge is not enabled'
-    : pr.isDraft
-      ? 'draft'
-      : pr.baseRefName !== context.defaultBranch
-        ? `base is ${pr.baseRefName}`
-        : !isSafeRefName(pr.headRefName)
-          ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
-          : undefined;
+  // A base that is neither the default branch nor another open pull
+  // request's branch is one nothing here knows how to land on. A stacked one
+  // whose parent has just merged reads this way for the moment before GitHub
+  // moves it.
+  return pr.isDraft
+    ? 'draft'
+    : pr.baseRefName !== context.defaultBranch &&
+        !context.stackParents.has(pr.number)
+      ? `base is ${pr.baseRefName}, which no open pull request is from`
+      : !isSafeRefName(pr.headRefName)
+        ? `branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell`
+        : undefined;
 };

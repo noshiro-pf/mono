@@ -9,7 +9,8 @@
 
 The state of every open pull request, read straight from GitHub, in a form
 that can be left open in a tab: the merge order the `Merge-After:` trailers
-declare drawn as the tree it is, the issues each pull request closes with
+and the stacks declare drawn as the tree it is — a pull request onto another's
+branch is marked `stacked on #N` under it — the issues each pull request closes with
 their titles, its labels in GitHub's own colours, the branch it is of,
 whether it is open or a draft, whether auto-merge is armed, the verdict of
 the contexts the ruleset requires, and how far each branch is ahead of and

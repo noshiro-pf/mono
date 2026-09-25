@@ -20,22 +20,24 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
 
 出力に載るのは、GitHub の PR 一覧では1画面で分からないものだけです。
 
-- **マージ順** — `Merge-After:` トレーラが宣言するのはグラフですが、PR 一覧では
-  4本の stack が無関係な4行に見えます。木として描けば、上にあるものが次に見る
-  ものです。
+- **マージ順** — `Merge-After:` トレーラと stack（base が別の open な PR の
+  ブランチである PR は、その PR の上に積まれた層）が宣言するのはグラフですが、
+  PR 一覧では4本の stack が無関係な4行に見えます。木として描けば、上にあるもの
+  が次に見るものです。積まれた PR には `stacked on #N` と出します。
 - **閉じる issue** — body を開かずに「これは何のための PR か」が分かるように。
 - **ラベル** — `skip-ci` と `merge-queued` はこのリポジトリの「まだ」と「準備
   完了」そのものです。
-- **auto-merge** — ラベルは依頼、auto-merge は機構で、この2つはズレ得ます。
-  `merge-queued` が付いているのに auto-merge が無い PR を `unblock-prs` は
-  「auto-merge is not enabled」として見送るので、そこに `no auto-merge` と出し
-  ます。news のときだけ言う項目で、誰もキューに入れていない PR については黙り
-  ます。
+- **auto-merge** — ラベルは依頼、auto-merge は機構です。`unblock-prs` は
+  `merge-queued` の PR を pick したときに auto-merge を張るので、張られていない
+  のはキューで順番を待つ PR の普通の状態です。張られているときだけ
+  `auto-merge` と出します（順番が来た、という news なので）。
 - **ruleset が要求する context の判定** — 「走ったチェック」とは別物です。何も
   報告していない required context は永久に "Expected — waiting" のまま出ますし、
   赤い aggregate は何が落ちたかを名乗りません。どちらも名指しで出します。
 - **base との ahead / behind** — behind な branch は何も走らず何もマージされま
-  せん。PR ページはそれを文章で言うだけで、差の大きさは言いません。
+  せん。PR ページはそれを文章で言うだけで、差の大きさは言いません。積まれた PR
+  の base は下の層なので、behind は「下の層が動いたのに積み直されていない」と
+  いう意味です。
 - **直近マージされた PR** — キューの話ではない唯一の節で、日次レポートの読者が
   最初に持つ疑問（昨日キューに入れたものは入ったのか）に答えます。
 
@@ -119,17 +121,19 @@ writes nothing — no labels, no rebases, no merges, no comments — which is wh
 makes it safe to run on a schedule, with a read-only token or none.
 
 It reports what the pull request list cannot show in one screen: the merge
-order declared by the `Merge-After:` trailers drawn as a tree, the issues each
+order declared by the `Merge-After:` trailers and by the stacks — a pull
+request onto another's branch is a layer on it, marked `stacked on #N` — drawn
+as a tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
 requires (named, including the ones that have reported nothing at all), how
-far the branch is ahead of and behind its base, and — the one section that is
+far the branch is ahead of and behind its base (for a stacked one, behind the
+layer below means that layer moved and this one was not restacked), and — the one section that is
 not about the queue — what merged recently.
 
-Auto-merge is reported only when it is news. The label is the request and
-auto-merge is the mechanism, and the two can come apart: a pull request
-labelled `merge-queued` with nothing armed to land it is the combination
-`unblock-prs` passes over with "auto-merge is not enabled", and it reads
-`no auto-merge` here. One that has never been queued says nothing either way.
+Auto-merge is reported only when it is armed. The label is the request and
+auto-merge is the mechanism, which `unblock-prs` arms when it picks a queued
+pull request, so one not yet armed is the ordinary state of the queue and
+`auto-merge` on an entry means its turn has come.
 
 ```bash
 pnpm run pr-report                      # for a terminal (the default)

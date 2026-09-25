@@ -23,8 +23,12 @@ order and the counts a report leads with cannot differ between the two.
 - **`merge-after.mts`** — reading the `Merge-After:` trailers out of a body,
   and finding the cycles in them. `unblock-prs` reads the same declarations
   to decide what it may pick.
-- **`tree.mts`** and **`report.mts`** — the declarations as the forest they
-  describe, and everything read arranged into a report.
+- **`stack.mts`** — which pull request is stacked on which: one onto another
+  open pull request's branch waits for it as if it had declared
+  `Merge-After:` on it. `unblock-prs` reads the same stacks to decide what it
+  may pick and what it carries along.
+- **`tree.mts`** and **`report.mts`** — the declarations and the stacks as the
+  forest they describe, and everything read arranged into a report.
 - **`summarize.mts`** — the counts a report leads with.
 - **`ruleset.mts`** — what `repo-settings/rulesets/main.json` requires: the
   contexts, and whether code owners have to approve. Parsed from its text,

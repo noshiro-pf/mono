@@ -48,6 +48,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
     with:
       # `none`: the one job below gates itself in shell, against a merge base
       # and a single directory rather than against one of the root

@@ -168,7 +168,7 @@ Grants that recur:
 
 - **`contents: read`** for a checkout.
 - **A caller's job-level `permissions` on the `gates` job** restating what
-  `check-gates.yml` declares (`actions`, `contents`: read). A
+  `check-gates.yml` declares (`actions`, `contents`, `pull-requests`: read). A
   caller's job-level `permissions` is the ceiling for the workflow it calls,
   and permissions can be reduced along the chain, never elevated, so the
   top-level `{}` would otherwise leave the called workflow unable to check
@@ -263,6 +263,7 @@ gates:
     permissions:
         actions: read
         contents: read
+        pull-requests: read
     with:
         diff-scope: code # or style, strict-lib, none
         result-job: code-check-result / result
@@ -290,11 +291,19 @@ booted, since a job-level `if` is evaluated by GitHub itself:
   checks to pass on a head that already contains `main`'s tip, and updating
   the branch fires `synchronize` and runs everything again on the commit that
   will actually be merged. A run before that update is a run whose result
-  nothing can use. Only the default branch carries the strict policy, so a
-  pull request onto any other branch is checked as it is.
+  nothing can use. Only the default branch carries the strict policy. The one
+  other base treated alike is a **stacked** pull request's: the branch of
+  another open pull request here. Behind it, the layer's diff carries the old
+  commits of the one below, and the run that counts comes when it is
+  restacked (`unblock-prs` does it when it moves the layer below) or moved
+  onto `main` when that layer merges. A pull request onto any other branch is
+  checked as it is.
 - **A diff that touches nothing the workflow reads**, decided by
   `check-should-run` from `ts-repo-utils` against one of the three
-  `z:check-should-run:*` ignore lists in the root `package.json`.
+  `z:check-should-run:*` ignore lists in the root `package.json`. The diff is
+  against the pull request's own base, so a stacked layer is judged on its own
+  changes; the layers below are judged on their own pull requests, and once
+  they merge the layer's diff against `main` is the same set of changes.
 - **A verdict already reached on this tree**, which the work would only
   repeat.
 
@@ -304,6 +313,16 @@ the ruleset. `skip-ci`: the `no-skip-ci-label` status. Nothing relevant in
 the diff: nothing would have read those paths anyway, which is the one case
 where "not checked" is the right answer. A reused verdict: the aggregate
 reports that verdict rather than `skipped`.
+
+A stacked pull request is the exception, and on purpose: no ruleset covers
+its base, so nothing its checks report holds anything, skipped or not. What
+keeps a layer from merging into the one below is that nothing arms it —
+`open-pr` arms nothing, and `unblock-prs` arms a pull request only when it
+picks it, which a layer is only once GitHub has moved it onto `main`, where
+the ruleset applies. A ruleset for stacked bases
+would not do better: its required checks and its pull request rule both apply
+to pushes, and a layer's branch is force-pushed every time it is amended or
+restacked. `repo-settings/README.md` records the same decision.
 
 **A job downstream of a gate reads `!cancelled()` and `!= 'false'`, never
 `== 'true'`.** A gate that failed to answer leaves its output empty and then
@@ -653,7 +672,8 @@ can only narrow what the App already holds), so that the push triggers the
   `merge-queued` and arms auto-merge: nobody reviews it, and `unblock-prs`
   rebases it when `main` moves. `node-support-update.yml` opens with
   `skip-ci` and arms auto-merge: held until a person adds `merge-queued`, as
-  `pnpm run open-pr` leaves a session's pull request. `release.yml` puts
+  `pnpm run open-pr` leaves a session's pull request (unarmed — `unblock-prs`
+  arms that one when it picks it). `release.yml` puts
   `skip-ci` on the version pull request on every run. Which label a bot opens
   with is the whole statement of whether it is queued.
 

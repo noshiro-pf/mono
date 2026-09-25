@@ -37,6 +37,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
     with:
       diff-scope: code
       result-job: code-check-result / result

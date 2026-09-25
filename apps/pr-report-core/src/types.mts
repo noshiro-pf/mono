@@ -61,13 +61,18 @@ export type PullRequestFacts = Readonly<{
   /**
    * Whether auto-merge is armed. Separate from `merge-queued`, which is the
    * author saying a pull request is to be landed: the label is the request
-   * and this is the mechanism, and `unblock-prs` passes over a pull request
-   * that has the one without the other.
+   * and this is the mechanism, which `unblock-prs` arms when it picks the
+   * pull request.
    */
   autoMerge: boolean;
   headRef: string;
   headSha: string;
   baseRef: string;
+  /**
+   * Whether the head branch lives in a fork, which keeps it from being read
+   * as the parent of a stacked pull request. See `stack.mts`.
+   */
+  fromFork: boolean;
   url: string;
   updatedAt: string;
   /** Undefined when the comparison could not be read. */
@@ -81,15 +86,24 @@ export type ReportEntry = PullRequestFacts &
   Readonly<{
     /** Every number the body declared, whether or not it is still open. */
     mergeAfter: readonly number[];
-    /** The subset of it that is still open, and so still constrains. */
+    /**
+     * The open pull request whose head branch this one's base is, if any: a
+     * stacked pull request waits for it as if it had declared it.
+     */
+    stackedOn: number | undefined;
+    /**
+     * What is still open of `mergeAfter` and `stackedOn`, and so still
+     * constrains.
+     */
     blockedBy: readonly number[];
     checks: ChecksSummary;
   }>;
 
 /**
  * One pull request in the merge order. `repeated` marks the second and later
- * appearances of a pull request that declared more than one predecessor: it
- * is drawn under each of them, but expanded under the first only.
+ * appearances of a pull request with more than one predecessor — declared,
+ * or the one it is stacked on: it is drawn under each of them, but expanded
+ * under the first only.
  */
 export type TreeNode = Readonly<{
   number: number;
@@ -129,6 +143,8 @@ export type Summary = Readonly<{
 
 export type PrReport = Readonly<{
   repo: RepoRef;
+  /** What nothing is stacked on; see `stack.mts`. */
+  defaultBranch: string;
   /** ISO 8601, so that a reader can tell a stale report from a fresh one. */
   generatedAt: string;
   /** Whether a token was used, which is what decides how much is known. */
@@ -136,7 +152,10 @@ export type PrReport = Readonly<{
   required: readonly string[];
   /** Every open pull request, lowest number first. */
   entries: readonly ReportEntry[];
-  /** The merge order, as a forest. Pull requests on a cycle are not in it. */
+  /**
+   * The merge order, as a forest: the `Merge-After:` declarations and the
+   * stacks together. Pull requests on a cycle are not in it.
+   */
   roots: readonly TreeNode[];
   cycles: readonly (readonly number[])[];
   /** Merged within {@link PrReport.mergedWithinDays}, newest first. */

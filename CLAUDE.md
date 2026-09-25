@@ -231,7 +231,8 @@ particular to it. Here is only what a session has to act on.
 - **A tree already checked is not checked again** — after a rebase that
   changes no content, on another pull request, on `main` — failure included.
   Re-examine a reused failure with "Re-run all jobs", not "Re-run failed jobs".
-- **A branch behind `main` runs nothing**; the update re-runs everything.
+- **A branch behind `main` runs nothing**; the update re-runs everything. A
+  stacked one behind the pull request below it is the same, until restacked.
 - **A diff a workflow does not read skips it**, by the `z:check-should-run:*`
   ignore lists in the root `package.json`; what may go on one is in the
   README. Adding a path wrongly fails nothing.
@@ -298,52 +299,57 @@ ingest the feed). Outside reports come through private vulnerability reporting
   `Validate commit count` in `lint-pull-request.yml` is what says so. This is
   the exception to "do not force-push an open pull request": a fix pushed to
   the branch is `git commit --amend` and a force-push with `--force-with-lease`,
-  which is the session's to do on its own branch. A chained pull request reads
-  as more than one commit until its parent merges and it is rebased, and
-  `unblock-prs` rebases before taking `skip-ci` off — the job does not run
-  while the label is on.
+  which is the session's to do on its own branch — and amending a layer of a
+  stack means replaying the layers above onto it
+  (`git rebase --onto <new> <old>`) and force-pushing them too.
 - **`pnpm run open-pr` opens it**: push, create it ready for review (never a
-  draft), add `skip-ci`, then arm auto-merge — in that order, which the script
-  enforces by re-reading the pull request and refusing to arm one the label is
-  not on. **The order is the safety**: `skip-ci` is the only thing holding the
-  merge, since the ruleset asks for `required_approving_review_count: 0` and
-  outside `.github/CODEOWNERS` paths a green branch has nothing else to clear.
-  Run the local checks first and say in the description which ones — while the
-  label is on they are the only checks the branch gets. Details in
-  `tools/scripts/cmd/open-pr/README.md`.
-- **In a Claude Code session it gets as far as `skip-ci` and stops there.** The
-  proxy refuses GitHub's GraphQL outright, and arming auto-merge is GraphQL
-  only — `gh pr merge --auto` is refused the same way, so this is the
-  environment rather than the script. What it leaves is the safe half, and the
-  session arms auto-merge with its own GitHub tooling. **Do not teach the
-  script the proxy's `ccr/` route**: it is not GitHub's API and answers 404
-  from anywhere else, so it would be a code path dead everywhere the command
-  normally runs.
+  draft), add `skip-ci` — and never arm auto-merge. **Nothing is armed until
+  the queue picks it**: the ruleset asks for
+  `required_approving_review_count: 0`, so outside `.github/CODEOWNERS` paths
+  an armed green branch merges with nothing else to clear, and a stacked one,
+  onto a branch no ruleset covers, merges into the layer below at once.
+  `unblock-prs` arms a `merge-queued` pull request when it picks it, and not a
+  second time after a person switches it off. Run the local checks first and
+  say in the description which ones — while the label is on they are the only
+  checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
+- **A Claude Code session's proxy refuses GitHub's GraphQL**, which `open-pr`
+  needs only to take an existing draft out of draft, and which arming
+  auto-merge needs always — one more reason that is `unblock-prs`'s, run by
+  the author. **Do not teach a script the proxy's `ccr/` route**: it is not
+  GitHub's API and answers 404 from anywhere else, so it would be a code path
+  dead everywhere the command normally runs.
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
   failed" notifications naming nothing — ignore them**, the `labeled` run
   supersedes them.
 - Taking `skip-ci` off is how CI is asked for, and `unblock-prs` takes it off
   only from a pull request labelled `merge-queued`. **Queueing one is that
-  label alone** — auto-merge is already armed — and it is the author's; a
-  session leaves `skip-ci` on. The label itself blocks nothing: GitHub does
+  label alone** — `unblock-prs` arms auto-merge in its turn — and it is the
+  author's; a session leaves `skip-ci` on. The label itself blocks nothing: GitHub does
   not read it, so it is never a substitute for `skip-ci`.
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
   branch's one commit; anything larger is a question. `main` moving under the
   branch is not the session's to fix: ask before rebasing.
-- **Several pull requests from one session are chained** (`main <- A <- B`),
-  likeliest merge first, unless the paths are plainly disjoint. Each still
-  targets `main`.
+- **Several pull requests from one session are stacked** (`main <- A <- B`),
+  likeliest merge first, unless the paths are plainly disjoint: B is opened
+  with `pnpm run open-pr -- --base <A's branch>`, so its diff is its own layer,
+  and `open-pr` writes `Merge-After: #A` into it too (the tools read the base
+  alone; the trailer states the order in the body). `unblock-prs` picks B,
+  and so arms it, only once A has merged and GitHub has moved B onto `main`.
+  No ruleset covers a stacked base, so nothing but that keeps B out of A's
+  branch: never arm or merge a layer by hand.
 - `pnpm run unblock-prs` (and the `unblock-prs` skill) lands queued pull
   requests one at a time: scope is the `merge-queued` label, order is the
-  `Merge-After: #N` body trailer (not read inside fenced code) plus
-  `blocks-release` for the release (see "Releases"), and it rebases before
-  removing `skip-ci` so the matrix runs once. A bot that opens a pull request
-  labels it, and which label says whether it is queued: `pnpm-update.yml`
-  opens with `merge-queued`, `node-support-update.yml` with `skip-ci` and
-  auto-merge armed — held until a person queues it, as `open-pr` leaves a
-  session's. Details in `tools/scripts/cmd/unblock-prs/README.md`.
+  stack, the `Merge-After: #N` body trailer (not read inside fenced code) and
+  `blocks-release` for the release (see "Releases"), and it rebases —
+  carrying the layers above along — and arms auto-merge before removing
+  `skip-ci` so the matrix runs once. A bot that opens a pull request labels
+  it, and which label says whether it is queued: `pnpm-update.yml` opens with
+  `merge-queued`, `node-support-update.yml` with `skip-ci` — held until a
+  person queues it, as `open-pr` leaves a session's. Both arm their own
+  auto-merge, which `unblock-prs` would do anyway. Details in
+  `tools/scripts/cmd/unblock-prs/README.md`.
 
 ## Releases
 
@@ -365,8 +371,8 @@ written there is wiped precisely when another queued pull request merging first
 made it matter — which is why **`blocks-release`, on the pull request the
 release must contain, is the only ordering that holds**. `release.yml` keeps
 `skip-ci` on the version pull request, so it is held from the moment it
-exists; arming auto-merge
-and adding `merge-queued` is the author's act of saying "release this".
+exists; adding `merge-queued` is the author's act of saying "release this",
+and `unblock-prs` arms it when it picks it.
 `unblock-prs` never rebases that branch — `release.yml` rebuilds it from the
 tip itself, and a rebase would carry the old version commit onto a tip whose
 changesets it never consumed, releasing without them.

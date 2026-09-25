@@ -12,10 +12,10 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
  * What it answers, and why each part is here rather than a click away on
  * GitHub:
  *
- * - **The merge order.** The `Merge-After:` trailers describe a graph that
- *   the pull request list cannot show at all; a stack of four reads as four
- *   unrelated rows there. Drawn as a tree, the one at the top is the one to
- *   look at.
+ * - **The merge order.** The `Merge-After:` trailers and the stacks — a pull
+ *   request onto another's branch — describe a graph that the pull request
+ *   list cannot show at all; a stack of four reads as four unrelated rows
+ *   there. Drawn as a tree, the one at the top is the one to look at.
  * - **The issues each pull request closes**, so that "what is this for" does
  *   not need the body opened.
  * - **The labels**, because `skip-ci` and `merge-queued` are how this
@@ -27,7 +27,9 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
  *   failed. Both are said here by name.
  * - **How far ahead and behind the branch is.** A branch behind its base runs
  *   nothing and merges nothing, and the pull request page states it only as
- *   a sentence, without the size of the gap.
+ *   a sentence, without the size of the gap. For a stacked pull request the
+ *   base is the layer below, and behind it means the layer below has moved
+ *   and this one has not been restacked onto it.
  * - **What landed recently.** The one section that is not about the queue,
  *   and the first question a reader of a daily report has: did the thing I
  *   queued yesterday go in.
@@ -58,6 +60,12 @@ export const prReport = async (
     process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'],
   );
 
+  const defaultBranch = await client.defaultBranch(repo.value);
+
+  if (Result.isErr(defaultBranch)) {
+    return defaultBranch;
+  }
+
   const facts = await client.facts(repo.value);
 
   if (Result.isErr(facts)) {
@@ -80,6 +88,7 @@ export const prReport = async (
 
   const report = buildReport({
     repo: repo.value,
+    defaultBranch: defaultBranch.value,
     generatedAt: Temporal.Now.instant()
       .round({ smallestUnit: 'second' })
       .toString(),
