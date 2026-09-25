@@ -138,15 +138,24 @@ export type WatchOutcome =
   | 'timeout'
   | 'skip-ci-labelled';
 
+/** What the loop remembers about how long the list has sat still. */
+export type Quiet = Readonly<{
+  /** The last survey's fingerprint; none before any survey has succeeded. */
+  fingerprint: string | undefined;
+  /** How many surveys in a row have seen what the one before them saw. */
+  unchanged: number;
+}>;
+
 /**
  * What one run carries from cycle to cycle: the pull requests it has given up
- * on, the ones it has acted on and last saw open, and where the base was when
- * it last looked.
+ * on, the ones it has acted on and last saw open, where the base was when it
+ * last looked, and how long the list has sat still.
  */
 export type LoopState = Readonly<{
   skipped: SkipRecords;
   tracked: ReadonlySet<number>;
   baseSha: string | undefined;
+  quiet: Quiet;
 }>;
 
 export type CycleResult = Readonly<{

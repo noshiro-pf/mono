@@ -9,7 +9,14 @@ export type Options = Readonly<{
   once: boolean;
   /** Survey and say what would be done, without rebasing or pushing. */
   dryRun: boolean;
-  /** How long to wait between surveys when nothing is out of date. */
+  /** How long to wait between surveys while the list is still changing. */
+  activeIntervalSec: number;
+  /**
+   * How many surveys in a row must see an unchanged list before the wait
+   * between them grows to `idleIntervalSec`.
+   */
+  idleAfter: number;
+  /** How long to wait between surveys once the list has sat still. */
   idleIntervalSec: number;
   /** How often to poll the pull request being watched. */
   pollIntervalSec: number;
@@ -20,8 +27,10 @@ export type Options = Readonly<{
 export const defaultOptions: Options = {
   once: false,
   dryRun: false,
+  activeIntervalSec: 30,
+  idleAfter: 10,
   idleIntervalSec: 300,
-  pollIntervalSec: 60,
+  pollIntervalSec: 30,
   watchTimeoutMin: 90,
 } as const;
 
@@ -33,12 +42,14 @@ export const HELP = [
   `default branch, takes ${SKIP_CI_LABEL} off it, and waits for GitHub to merge it.`,
   '',
   'Options:',
-  '  --once                 run one cycle and exit',
-  '  --dry-run              survey and report what would be done, then exit',
-  `  --idle-interval <sec>  wait between surveys when nothing is behind (default ${defaultOptions.idleIntervalSec})`,
-  `  --poll-interval <sec>  wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
-  `  --watch-timeout <min>  give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
-  '  -h, --help             show this help',
+  '  --once                   run one cycle and exit',
+  '  --dry-run                survey and report what would be done, then exit',
+  `  --active-interval <sec>  wait between surveys while the list is changing (default ${defaultOptions.activeIntervalSec})`,
+  `  --idle-after <n>         unchanged surveys before slowing to --idle-interval (default ${defaultOptions.idleAfter})`,
+  `  --idle-interval <sec>    wait between surveys once the list has sat still (default ${defaultOptions.idleIntervalSec})`,
+  `  --poll-interval <sec>    wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
+  `  --watch-timeout <min>    give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
+  '  -h, --help               show this help',
 ].join('\n');
 
 export const parseOptions = (
@@ -56,6 +67,8 @@ export const parseOptions = (
       options: {
         once: { type: 'boolean', default: false },
         'dry-run': { type: 'boolean', default: false },
+        'active-interval': { type: 'string' },
+        'idle-after': { type: 'string' },
         'idle-interval': { type: 'string' },
         'poll-interval': { type: 'string' },
         'watch-timeout': { type: 'string' },
@@ -92,6 +105,26 @@ export const parseOptions = (
         );
   };
 
+  const activeIntervalSec = positive(
+    'active-interval',
+    values['active-interval'],
+    defaultOptions.activeIntervalSec,
+  );
+
+  if (Result.isErr(activeIntervalSec)) {
+    return activeIntervalSec;
+  }
+
+  const idleAfter = positive(
+    'idle-after',
+    values['idle-after'],
+    defaultOptions.idleAfter,
+  );
+
+  if (Result.isErr(idleAfter)) {
+    return idleAfter;
+  }
+
   const idleIntervalSec = positive(
     'idle-interval',
     values['idle-interval'],
@@ -125,6 +158,8 @@ export const parseOptions = (
   return Result.ok({
     once: values.once,
     dryRun: values['dry-run'],
+    activeIntervalSec: activeIntervalSec.value,
+    idleAfter: idleAfter.value,
     idleIntervalSec: idleIntervalSec.value,
     pollIntervalSec: pollIntervalSec.value,
     watchTimeoutMin: watchTimeoutMin.value,
