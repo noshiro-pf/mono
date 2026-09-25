@@ -8,8 +8,15 @@
 /** The repository being reported on. */
 export type RepoRef = Readonly<{ owner: string; name: string }>;
 
-/** What one context has reported on a head commit. */
-export type ContextState = 'failed' | 'passed' | 'pending';
+/**
+ * What one context has reported on a head commit.
+ *
+ * `skipped` is its own state rather than a kind of `passed`. GitHub counts a
+ * skip as met, and so does the verdict — but once the two are one word a
+ * reader cannot tell them apart, and the aggregate that skipped may be from a
+ * round that was superseded by one about to fail.
+ */
+export type ContextState = 'failed' | 'passed' | 'pending' | 'skipped';
 
 export type ChecksSummary = Readonly<{
   /**
@@ -18,8 +25,14 @@ export type ChecksSummary = Readonly<{
    * "failing" describes it.
    */
   verdict: 'failing' | 'passed' | 'paused' | 'pending';
+  /**
+   * Every required context by what it reported. These four and
+   * {@link ChecksSummary.missing} are disjoint and cover the required list.
+   */
+  passed: readonly string[];
   failed: readonly string[];
   pending: readonly string[];
+  skipped: readonly string[];
   /**
    * Required contexts with nothing reported on the head commit at all.
    * GitHub shows these as "Expected — waiting for status to be reported":
@@ -74,11 +87,25 @@ export type PullRequestFacts = Readonly<{
    */
   fromFork: boolean;
   url: string;
+  /**
+   * When anything about the pull request last changed — a label, a comment,
+   * an edit — which is why it is not {@link PullRequestFacts.headCommittedAt}.
+   */
   updatedAt: string;
+  /**
+   * When the head commit was made, which is when the branch was last pushed
+   * to as nearly as GitHub records it. Undefined when it could not be read.
+   */
+  headCommittedAt: string | undefined;
   /** Undefined when the comparison could not be read. */
   comparison: Comparison | undefined;
   /** What every context reported on the head commit, required or not. */
   reported: ReadonlyMap<string, ContextState>;
+  /**
+   * Whether any check run on the head commit has not finished, required or
+   * not. See `anyRunInProgress` for why the required ones are not enough.
+   */
+  checksRunning: boolean;
   linkedIssues: readonly LinkedIssue[];
 }>;
 
@@ -130,6 +157,21 @@ export type MergedPullRequest = Readonly<{
   linkedIssues: readonly LinkedIssue[];
 }>;
 
+/**
+ * One open issue. Its own shape rather than a pull request's with fields
+ * blanked: an issue has no branch, no checks and no place in a merge order.
+ */
+export type OpenIssue = Readonly<{
+  number: number;
+  title: string;
+  author: string;
+  url: string;
+  labels: readonly Label[];
+  createdAt: string;
+  updatedAt: string;
+  comments: number;
+}>;
+
 /** The counts a report leads with. */
 export type Summary = Readonly<{
   open: number;
@@ -162,4 +204,8 @@ export type PrReport = Readonly<{
   merged: readonly MergedPullRequest[];
   /** How far back that list goes. */
   mergedWithinDays: number;
+  /** The open issues, most recently updated first. */
+  issues: readonly OpenIssue[];
+  /** What that list is capped at, so that a full one can say so. */
+  issuesLimit: number;
 }>;

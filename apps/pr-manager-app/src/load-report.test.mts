@@ -28,13 +28,113 @@ describe(loadReport, () => {
 
     assert.deepStrictEqual(entry.checks, {
       verdict: 'passed',
+      passed: ['code-check-result / result', 'no-skip-ci-label'],
       failed: [],
       pending: [],
+      skipped: [],
       missing: [],
       required: 2,
     });
 
     assert.strictEqual(loaded.summary.behind, 1);
+  });
+
+  test('reads when the head was committed, beside when anything changed', async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({ number: 7, committedDate: '2026-09-21T03:04:05Z' }),
+      ]),
+      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(
+      loaded.entries[0]?.headCommittedAt,
+      '2026-09-21T03:04:05Z',
+    );
+
+    assert.strictEqual(loaded.entries[0]?.updatedAt, '2026-09-23T00:00:00Z');
+  });
+
+  // #2031: the round before had skipped, and the round that replaced it had
+  // not yet created its aggregate. The page showed a tick.
+  test('keeps the verdict pending while anything on the head is running', async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 7,
+          contexts: [
+            checkRun('code-check-result / result', 'COMPLETED', 'SKIPPED'),
+            checkRun('code-check (ws:fix:lint)', 'IN_PROGRESS', null),
+            {
+              __typename: 'StatusContext',
+              context: 'no-skip-ci-label',
+              state: 'SUCCESS',
+              description: null,
+            },
+          ],
+        }),
+      ]),
+      followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    const entry = loaded.entries[0];
+
+    assert.isDefined(entry);
+
+    assert.strictEqual(entry.checksRunning, true);
+
+    assert.strictEqual(entry.checks.verdict, 'pending');
+
+    assert.deepStrictEqual(entry.checks.skipped, [
+      'code-check-result / result',
+    ]);
+
+    assert.deepStrictEqual(entry.checks.passed, ['no-skip-ci-label']);
+  });
+
+  test('lists the open issues, and how many there are in all', async () => {
+    const { fetchImpl } = answering(
+      report([], [], 0, {
+        totalCount: 42,
+        nodes: [
+          openIssue(2036, ['pr-manager-app']),
+          // An issue the token may not see.
+          null,
+          openIssue(1976, []),
+        ],
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.issues.totalCount, 42);
+
+    assert.deepStrictEqual(loaded.issues.items, [
+      {
+        number: 2036,
+        title: 'Issue 2036',
+        author: 'someone',
+        url: 'https://github.com/noshiro-pf/mono/issues/2036',
+        labels: [{ name: 'pr-manager-app', color: 'ededed', description: '' }],
+        createdAt: '2026-09-20T00:00:00Z',
+        updatedAt: '2026-09-23T00:00:00Z',
+        comments: 3,
+      },
+      {
+        number: 1976,
+        title: 'Issue 1976',
+        author: 'someone',
+        url: 'https://github.com/noshiro-pf/mono/issues/1976',
+        labels: [],
+        createdAt: '2026-09-20T00:00:00Z',
+        updatedAt: '2026-09-23T00:00:00Z',
+        comments: 3,
+      },
+    ]);
   });
 
   test('reads a check run and a commit status as the shared verdict does', async () => {
@@ -433,6 +533,10 @@ const report = (
   openNodes: readonly unknown[],
   mergedNodes: readonly unknown[] = [],
   totalCount: number = openNodes.length,
+  issues: Readonly<{
+    totalCount: number;
+    nodes: readonly unknown[];
+  }> = NO_ISSUES,
 ): unknown =>
   ({
     data: {
@@ -442,8 +546,29 @@ const report = (
         codeOwners: { text: '/.github/workflows/ @noshiro-pf\n' },
         open: { totalCount, nodes: openNodes },
         merged: { nodes: mergedNodes },
+        issues,
       },
     },
+  }) as const;
+
+const NO_ISSUES = { totalCount: 0, nodes: [] } as const;
+
+const openIssue = (number: number, labels: readonly string[]): unknown =>
+  ({
+    number,
+    title: `Issue ${number}`,
+    url: `https://github.com/noshiro-pf/mono/issues/${number}`,
+    createdAt: '2026-09-20T00:00:00Z',
+    updatedAt: '2026-09-23T00:00:00Z',
+    author: { login: 'someone' },
+    labels: {
+      nodes: labels.map((labelName) => ({
+        name: labelName,
+        color: 'ededed',
+        description: null,
+      })),
+    },
+    comments: { totalCount: 3 },
   }) as const;
 
 const followUpAnswer = (fields: ReadonlyRecord<string, unknown>): unknown =>
@@ -494,6 +619,7 @@ const pullRequest = ({
   files = ['libs/x/src/a.mts'],
   baseRefName = 'main',
   isCrossRepository = false,
+  committedDate = '2026-09-22T00:00:00Z',
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
@@ -501,6 +627,7 @@ const pullRequest = ({
   files?: readonly string[];
   baseRefName?: string;
   isCrossRepository?: boolean;
+  committedDate?: string;
 }>): unknown =>
   ({
     number,
@@ -527,6 +654,7 @@ const pullRequest = ({
       nodes: [
         {
           commit: {
+            committedDate,
             statusCheckRollup: {
               contexts: {
                 pageInfo: {

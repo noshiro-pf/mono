@@ -19,8 +19,10 @@ const facts = (
     fromFork: false,
     url: `https://github.com/o/r/pull/${number}`,
     updatedAt: '2026-09-26T00:00:00Z',
+    headCommittedAt: undefined,
     comparison: undefined,
     reported: new Map(),
+    checksRunning: false,
     linkedIssues: [],
     ...overrides,
   }) as const;

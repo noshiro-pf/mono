@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
 import { MERGED_WITHIN_DAYS, type LoadedReport } from '../load-report.mjs';
 import { CyclesSection } from './cycles-section.js';
+import { IssuesSection } from './issues-section.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
 import { SummaryRow } from './summary-row.js';
@@ -13,7 +14,10 @@ type Props = Readonly<{
   nowMs: number;
 }>;
 
-/** A report that loaded: the counts, the queue, and what landed. */
+/**
+ * A report that loaded: the counts, the queue, what landed, and what is
+ * open that is not a pull request.
+ */
 export const ReportView = React.memo<Props>((props) => {
   const { report, nowMs } = props;
 
@@ -39,6 +43,7 @@ export const ReportView = React.memo<Props>((props) => {
           <MergeOrder
             byNumber={byNumber}
             nodes={report.roots}
+            nowMs={nowMs}
             scaleMax={divergenceScale(report.entries)}
           />
         ) : (
@@ -54,6 +59,12 @@ export const ReportView = React.memo<Props>((props) => {
         merged={report.merged}
         nowMs={nowMs}
         withinDays={MERGED_WITHIN_DAYS}
+      />
+
+      <IssuesSection
+        issues={report.issues.items}
+        nowMs={nowMs}
+        totalCount={report.issues.totalCount}
       />
     </>
   );
