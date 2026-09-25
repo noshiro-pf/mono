@@ -154,7 +154,9 @@ const report = (
 
   console.log(`${crxPath}  (${String(Math.round(crx.length / 1024))} kB)`);
 
-  console.log('  manifest `key` removed, source maps left out');
+  console.log(
+    '  manifest `key` and `web_accessible_resources` removed, source maps left out',
+  );
 
   console.log(`  signed with ${key.source}`);
 

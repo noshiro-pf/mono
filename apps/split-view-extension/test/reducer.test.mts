@@ -1,3 +1,4 @@
+import { hasKey, isRecord } from 'ts-data-forge';
 import {
   createPane,
   findPane,
@@ -237,6 +238,15 @@ describe('set-sandboxed', () => {
 });
 
 describe('reconcileWorkspace', () => {
+  test('keeps the title', () => {
+    const repaired = reconcileWorkspace({
+      ...initialWorkspaceState(),
+      title: '#2071 split view',
+    });
+
+    assert.deepStrictEqual(repaired.title, '#2071 split view');
+  });
+
   test('creates the panes the tree refers to and drops the ones it does not', () => {
     const repaired = reconcileWorkspace({
       version: 1,
@@ -286,6 +296,31 @@ describe('parseWorkspaceState', () => {
       nextPaneId: 2,
       activePaneId: 1,
     });
+  });
+
+  test('keeps a title, and drops one that is not a non-empty string', () => {
+    const stored = {
+      version: 1,
+      root: { kind: 'pane', paneId: 0 },
+      panes: [{ id: 0, url: 'https://example.com', sandboxed: true }],
+      nextPaneId: 1,
+      activePaneId: 0,
+    } as const;
+
+    assert.deepStrictEqual(
+      parseWorkspaceState({ ...stored, title: '#2071 split view' })?.title,
+      '#2071 split view',
+    );
+
+    assert.isFalse(
+      isRecord(parseWorkspaceState({ ...stored, title: 42 }) ?? {}) &&
+        hasKey(parseWorkspaceState({ ...stored, title: 42 }) ?? {}, 'title'),
+    );
+
+    assert.isFalse(
+      isRecord(parseWorkspaceState({ ...stored, title: '' }) ?? {}) &&
+        hasKey(parseWorkspaceState({ ...stored, title: '' }) ?? {}, 'title'),
+    );
   });
 
   test('refuses a value with no usable tree', () => {

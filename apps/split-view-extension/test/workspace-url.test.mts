@@ -1,3 +1,4 @@
+import { hasKey, isRecord } from 'ts-data-forge';
 import {
   createPane,
   findPane,
@@ -107,6 +108,45 @@ describe('workspaceUrlSearch', () => {
     assert.deepStrictEqual(
       workspaceUrlSearch('one', initialWorkspaceState()),
       '?ws=one&layout=rcppcpp',
+    );
+  });
+});
+
+describe('workspaceUrlSearch, with a title', () => {
+  const titled: WorkspaceState = {
+    ...review,
+    title: '#2052 keep service workers away from panes',
+  } as const;
+
+  test('writes the title after the id, escaped as a query value', () => {
+    assert.deepStrictEqual(
+      workspaceUrlSearch('pr', titled),
+      '?ws=pr&title=%232052+keep+service+workers+away+from+panes&layout=r70pp&url=https://github.com/noshiro-pf/mono/pull/2052/files&url=https://github.com/noshiro-pf/mono/pull/2052',
+    );
+  });
+
+  test('is read back with the rest of the view', () => {
+    assert.deepStrictEqual(
+      parseWorkspaceUrl(workspaceUrlSearch('pr', titled)).state,
+      titled,
+    );
+  });
+
+  test('is no title when it is blank', () => {
+    const request = parseWorkspaceUrl(
+      '?title=%20&layout=r70pp&url=example.com&url=example.org',
+    );
+
+    assert.isFalse(
+      request.state === undefined ||
+        (isRecord(request.state) && hasKey(request.state, 'title')),
+    );
+  });
+
+  test('is ignored without a view to title', () => {
+    assert.deepStrictEqual(
+      parseWorkspaceUrl('?ws=abc&title=x').state,
+      undefined,
     );
   });
 });

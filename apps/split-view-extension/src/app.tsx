@@ -60,6 +60,7 @@ import {
   saveWorkspaceState,
   setServiceWorkerResetOrigin,
   setWorkspaceEntryPinned,
+  tabLabelOf,
   watchServiceWorkerResetOrigins,
   watchWorkspaceRegistry,
   workspaceAtPosition,
@@ -736,22 +737,34 @@ export const App = memoNamed('App', () => {
   }, [switchWorkspace]);
 
   // The tab's own title and favicon, so that a window of split views can be
-  // told apart in the tab strip.
-  React.useEffect(() => {
-    const shown = session.workspaceId;
+  // told apart in the tab strip. Worked out first and applied only when it
+  // changes: the view changes on every pointer move of a splitter drag, and
+  // the favicon is drawn on a canvas.
+  const tabIdentity = React.useMemo(() => {
+    const { workspaceId: shown, state: shownState } = session;
 
     if (shown === undefined) {
-      return;
+      return undefined;
     }
 
     const entry = workspaceEntryOf(registry, shown);
 
     const position = workspacePositionOf(registry, shown);
 
-    if (entry !== undefined && position !== undefined) {
-      applyTabIdentity(position, entry.name);
+    return entry === undefined || position === undefined
+      ? undefined
+      : { position, label: tabLabelOf(shownState, entry.name) };
+  }, [registry, session]);
+
+  const tabPosition = tabIdentity?.position;
+
+  const tabLabel = tabIdentity?.label;
+
+  React.useEffect(() => {
+    if (tabPosition !== undefined && tabLabel !== undefined) {
+      applyTabIdentity(tabPosition, tabLabel);
     }
-  }, [registry, session.workspaceId]);
+  }, [tabPosition, tabLabel]);
 
   /**
    * When the tab's own notes are taken.

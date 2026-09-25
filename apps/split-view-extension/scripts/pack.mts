@@ -36,7 +36,9 @@ const main = (): void => {
 
   console.log(`${zipPath}  (${String(Math.round(size / 1024))} kB)`);
 
-  console.log('  manifest `key` removed, source maps left out');
+  console.log(
+    '  manifest `key` and `web_accessible_resources` removed, source maps left out',
+  );
 };
 
 main();

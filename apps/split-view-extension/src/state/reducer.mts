@@ -271,6 +271,7 @@ export const reconcileWorkspace = (state: WorkspaceState): WorkspaceState => {
       state.activePaneId !== undefined && paneIds.includes(state.activePaneId)
         ? state.activePaneId
         : paneIds[0],
+    ...(state.title === undefined ? {} : { title: state.title }),
   };
 };
 

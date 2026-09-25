@@ -19,6 +19,12 @@
   },
   "permissions": ["storage", "favicon", "declarativeNetRequestWithHostAccess"],
   "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["split.html"],
+      "matches": ["https://noshiro-pf.github.io/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

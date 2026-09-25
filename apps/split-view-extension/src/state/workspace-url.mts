@@ -37,6 +37,8 @@ const { history: browserHistory } = globalThis;
  * - `name`: what to call the split view, when this URL is what adds it to the
  *   list. Read once and not written back — the name is the list's, not the
  *   view's.
+ * - `title`: what to call the tab. Part of the view, so saved and written
+ *   back; see `WorkspaceState['title']`.
  */
 export const layoutQueryParam = 'layout';
 
@@ -47,6 +49,8 @@ export const paneZoomQueryParam = 'zoom';
 export const paneSandboxQueryParam = 'sandbox';
 
 export const workspaceNameQueryParam = 'name';
+
+export const workspaceTitleQueryParam = 'title';
 
 /** What a `split.html` URL asks for. Each part is absent when the URL is. */
 export type WorkspaceUrlRequest = Readonly<{
@@ -122,6 +126,9 @@ export const workspaceUrlSearch = (
 
   const parts = [
     `${workspaceQueryParam}=${encode(workspaceId)}`,
+    ...(state.title === undefined
+      ? ([] as const)
+      : ([`${workspaceTitleQueryParam}=${encode(state.title)}`] as const)),
     `${layoutQueryParam}=${formatLayoutSpec(state.root)}`,
     ...withoutTrailing(addresses, '').map(
       (address) => `${paneUrlQueryParam}=${encode(address)}` as const,
@@ -146,6 +153,8 @@ export const parseWorkspaceUrl = (search: string): WorkspaceUrlRequest => {
 
   const workspaceName = params.get(workspaceNameQueryParam)?.trim();
 
+  const title = params.get(workspaceTitleQueryParam)?.trim();
+
   const addresses = params.getAll(paneUrlQueryParam);
 
   const root = layoutOf(params.get(layoutQueryParam), addresses.length);
@@ -164,6 +173,7 @@ export const parseWorkspaceUrl = (search: string): WorkspaceUrlRequest => {
             addresses,
             params.getAll(paneZoomQueryParam),
             params.getAll(paneSandboxQueryParam),
+            title === undefined || title === '' ? undefined : title,
           ),
   };
 };
@@ -216,6 +226,7 @@ const stateOf = (
   addresses: readonly string[],
   zooms: readonly string[],
   sandboxes: readonly string[],
+  title: string | undefined,
 ): WorkspaceState => {
   const paneIds = paneIdsOf(root);
 
@@ -230,6 +241,7 @@ const stateOf = (
     })),
     nextPaneId: paneIds.length,
     activePaneId: paneIds[0],
+    ...(title === undefined ? {} : { title }),
   };
 };
 

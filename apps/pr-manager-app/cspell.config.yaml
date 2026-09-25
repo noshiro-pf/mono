@@ -11,3 +11,8 @@ words:
   # GitHub's default label colour, which `src/label-color.mts` falls back to
   # and its test asserts on.
   - ededed
+  # The id `split-view-extension` pins, and the layout `src/split-view.mts`
+  # asks it for (diff, then conversation beside issue), named in the module
+  # and its test.
+  - nifmgpafbfpgpcijgmfpcoonjbalbkhf
+  - rprpp
