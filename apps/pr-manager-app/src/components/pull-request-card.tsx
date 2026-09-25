@@ -3,11 +3,11 @@ import { Arr } from 'ts-data-forge';
 import { type Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
 import { CommitDivergence } from './commit-divergence.js';
-import { ConflictBadge } from './conflict-badge.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
 import { ReviewBadge } from './review-badge.js';
+import { SetAsideBadge } from './set-aside-badge.js';
 import { StateBadge } from './state-badge.js';
 import { VerdictBadge } from './verdict-badge.js';
 
@@ -31,10 +31,7 @@ export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
       <StateBadge isDraft={entry.isDraft} />
       <VerdictBadge checks={entry.checks} />
       <AutoMergeBadge armed={entry.autoMerge} />
-      <ConflictBadge
-        baseRef={entry.baseRef}
-        mergeability={entry.mergeability}
-      />
+      <SetAsideBadge baseRef={entry.baseRef} setAside={entry.setAside} />
       <ReviewBadge review={entry.codeOwnerReview} />
     </div>
 

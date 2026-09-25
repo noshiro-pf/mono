@@ -23,9 +23,9 @@ export const SummaryRow = React.memo<Props>(({ summary }) => (
     />
     <StatTile label={'behind base'} value={summary.behind} />
     <StatTile
-      label={'conflicting'}
-      tone={summary.conflicting > 0 ? 'critical' : undefined}
-      value={summary.conflicting}
+      label={'set aside'}
+      tone={summary.setAside > 0 ? 'critical' : undefined}
+      value={summary.setAside}
     />
     <StatTile
       label={'awaiting code owner'}

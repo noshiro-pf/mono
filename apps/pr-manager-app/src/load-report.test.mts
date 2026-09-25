@@ -1,4 +1,4 @@
-import { isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { REPORT_SOURCE } from './constants.mjs';
 import { type Fetch, type FetchInit } from './graphql.mjs';
@@ -48,6 +48,7 @@ describe(loadReport, () => {
               __typename: 'StatusContext',
               context: 'no-skip-ci-label',
               state: 'EXPECTED',
+              description: null,
             },
           ],
         }),
@@ -92,6 +93,7 @@ describe(loadReport, () => {
                   __typename: 'StatusContext',
                   context: 'no-skip-ci-label',
                   state: 'PENDING',
+                  description: null,
                 },
               ],
             },
@@ -109,14 +111,10 @@ describe(loadReport, () => {
     ]);
   });
 
-  test('reports a conflict and a wait for a code owner', async () => {
+  test('reports a wait for a code owner', async () => {
     const { fetchImpl } = answering(
       report([
-        pullRequest({
-          number: 7,
-          mergeable: 'CONFLICTING',
-          files: ['.github/workflows/release.yml'],
-        }),
+        pullRequest({ number: 7, files: ['.github/workflows/release.yml'] }),
       ]),
       followUpAnswer({ compare_7: { compare: { aheadBy: 1, behindBy: 0 } } }),
     );
@@ -127,8 +125,6 @@ describe(loadReport, () => {
 
     assert.isDefined(entry);
 
-    assert.strictEqual(entry.mergeability, 'conflicting');
-
     assert.deepStrictEqual(entry.codeOwnerReview, {
       state: 'required',
       paths: ['.github/workflows/release.yml'],
@@ -136,9 +132,47 @@ describe(loadReport, () => {
       authorOwns: false,
     });
 
-    assert.strictEqual(loaded.summary.conflicting, 1);
-
     assert.strictEqual(loaded.summary.awaitingReview, 1);
+  });
+
+  test('reports what unblock-prs said when it set a pull request aside', async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 7,
+          contexts: Arr.toPushed(PASSING, setAsideStatus(BASE_TIP)),
+        }),
+        pullRequest({
+          number: 8,
+          contexts: Arr.toPushed(PASSING, setAsideStatus('b'.repeat(40))),
+        }),
+        pullRequest({ number: 9 }),
+      ]),
+      followUpAnswer({
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.entries[0]?.setAside, {
+      reason: 'rebase-failed',
+      baseSha: BASE_TIP,
+      detail: 'rebase conflicts',
+      current: true,
+    });
+
+    // Set aside against a base that has moved since: the next run retries it.
+    assert.isFalse(loaded.entries[1]?.setAside?.current ?? true);
+
+    assert.isUndefined(loaded.entries[2]?.setAside);
+
+    // Its own status is not a required context, so the verdict is untouched.
+    assert.strictEqual(loaded.entries[0]?.checks.verdict, 'passed');
+
+    assert.strictEqual(loaded.summary.setAside, 1);
   });
 
   test('keeps what merged in the last week, newest first', async () => {
@@ -389,20 +423,31 @@ const PASSING = [
     __typename: 'StatusContext',
     context: 'no-skip-ci-label',
     state: 'SUCCESS',
+    description: null,
   },
 ] as const;
+
+/** Where `main` is in every answer here. */
+const BASE_TIP = 'a'.repeat(40);
+
+/** The status `unblock-prs` leaves on a pull request it set aside. */
+const setAsideStatus = (baseSha: string): unknown =>
+  ({
+    __typename: 'StatusContext',
+    context: 'unblock-prs',
+    state: 'FAILURE',
+    description: `rebase-failed at ${baseSha}: rebase conflicts`,
+  }) as const;
 
 const pullRequest = ({
   number,
   contexts = PASSING,
   contextsAfter,
-  mergeable = 'MERGEABLE',
   files = ['libs/x/src/a.mts'],
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
   contextsAfter?: string;
-  mergeable?: string;
   files?: readonly string[];
 }>): unknown =>
   ({
@@ -412,12 +457,12 @@ const pullRequest = ({
     isDraft: false,
     url: `https://github.com/noshiro-pf/mono/pull/${number}`,
     updatedAt: '2026-09-23T00:00:00Z',
-    mergeable,
     author: { login: 'someone' },
     autoMergeRequest: null,
     headRefName: `branch-${number}`,
     headRefOid: `sha-${number}`,
     baseRefName: 'main',
+    baseRef: { target: { oid: BASE_TIP } },
     labels: { nodes: [] },
     closingIssuesReferences: { nodes: [] },
     latestOpinionatedReviews: { nodes: [] },

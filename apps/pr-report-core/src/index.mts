@@ -4,6 +4,7 @@ export * from './labels.mjs';
 export * from './merge-after.mjs';
 export * from './report.mjs';
 export * from './ruleset.mjs';
+export * from './set-aside.mjs';
 export * from './summarize.mjs';
 export * from './tree.mjs';
 export * from './types.mjs';

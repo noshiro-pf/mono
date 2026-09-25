@@ -1,7 +1,6 @@
 export * from './auto-merge-badge.js';
 export * from './badge-icon.js';
 export * from './commit-divergence.js';
-export * from './conflict-badge.js';
 export * from './cycles-section.js';
 export * from './external-link.js';
 export * from './label-chip.js';
@@ -13,6 +12,7 @@ export * from './notice.js';
 export * from './pull-request-card.js';
 export * from './report-view.js';
 export * from './review-badge.js';
+export * from './set-aside-badge.js';
 export * from './stat-tile.js';
 export * from './state-badge.js';
 export * from './summary-row.js';

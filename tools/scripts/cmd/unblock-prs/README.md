@@ -221,13 +221,26 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 
 ### 見送った PR はどこで分かるか
 
-このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。ただ、見送る
-理由のうち後から知りたいものは GitHub 自身が知っています。rebase が conflict
-した PR は GitHub 上でも base と conflict しており、code owner の承認待ちで
-止まっている PR は変更したパスと `.github/CODEOWNERS` から分かります。
-**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/pr-manager/>）
-はその2つを PR ごとに表示するので、端末を見に行かなくても止まっている理由が
+このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。そこで PR を
+見送るたびに、**その PR の head commit に commit status を書きます**（context
+`unblock-prs`、state `failure`、description に理由と見送った時点の base の
+SHA）。**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/pr-manager/>）
+がそれを読んで PR ごとに表示するので、端末を見に行かなくても止まっている理由が
 分かります。
+
+- **GitHub の `mergeable` ではなくこちら**を見るのは、あれが merge の可否で、
+  このスクリプトがするのは rebase だからです（`DIRTY` を信用しない理由と同じ）。
+- **消す必要はありません。** status は commit に付くので、push で head が変われば
+  新しい head には付いていません。base が動いた場合はページが古い記録として
+  灰色で表示します（`checks-failed` を除く — `skips.mts` と同じ規則を
+  `pr-report-core` の `setAsideStillApplies` で共有しています）。
+- 必須 context ではないのでマージは止めません。PR 上に ✗ が1つ付きます。
+- 書けるのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は
+  書き直しません。`--dry-run` では書きません。書けなかったときはその旨を
+  ログに出して続行します。
+
+code owner の承認待ちで止まっている PR は、変更したパスと `.github/CODEOWNERS`
+からページが自分で判定します。
 
 ### ファイル構成
 
@@ -477,13 +490,29 @@ sleeps for `--idle-interval` (300s) and surveys again.
 ### Where a passed-over pull request shows
 
 This script runs on someone's machine and says everything it does on standard
-output. But the reasons worth knowing afterwards are ones GitHub knows too: a
-pull request whose rebase conflicted conflicts with its base on GitHub as
-well, and one waiting for a code owner can be told from the paths it changes
-and `.github/CODEOWNERS`. The **GitHub Pull Requests Manager** page
-(<https://noshiro-pf.github.io/mono/pr-manager/>) shows both for every pull
-request, so finding out why one is not moving does not mean finding the
-terminal the script ran in.
+output. So each time it sets a pull request aside it also **writes a commit
+status on that pull request's head**: context `unblock-prs`, state `failure`,
+and a description with the reason and the base's SHA at the time. The
+**GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>) reads it and shows it on
+the pull request, so finding out why one is not moving does not mean finding
+the terminal the script ran in.
+
+- **This rather than GitHub's `mergeable`**, because that answers whether a
+  merge conflicts and this script rebases — the same reason it does not take
+  `DIRTY` at its word.
+- **Nothing ever takes it off.** A status belongs to one commit, so a push
+  leaves the new head without it. A moved base the page shows as a grey,
+  older record (except `checks-failed`), by the rule `skips.mts` uses too,
+  shared as `setAsideStillApplies` in `pr-report-core`.
+- It is not a required context, so it holds no merge; it adds one ✗ to the
+  pull request.
+- It is written when a pull request is newly set aside, not again on every
+  survey that finds the same record standing; not at all under `--dry-run`;
+  and a status that could not be written is logged and nothing more.
+
+A pull request waiting for a code owner the page works out for itself, from
+the paths it changes and `.github/CODEOWNERS`.
 
 ### Layout
 

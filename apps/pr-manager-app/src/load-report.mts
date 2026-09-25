@@ -15,7 +15,10 @@ import {
   closingIssuesIn,
   MAIN_RULESET_PATH,
   parseRuleset,
+  parseSetAside,
   reportedContexts,
+  SET_ASIDE_CONTEXT,
+  setAsideStillApplies,
   summarize,
   type CheckRunReport,
   type Comparison,
@@ -26,6 +29,7 @@ import {
   type RepoRef,
   type ReportEntry,
   type RulesetRequirements,
+  type SetAside,
   type Summary,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
@@ -61,18 +65,22 @@ import {
 } from './report-query.mjs';
 import { epochMsOf } from './timestamp.mjs';
 
-/** Whether GitHub can merge the head into its base without a conflict. */
-export type Mergeability = 'conflicting' | 'mergeable' | 'unknown';
+/**
+ * What `unblock-prs` said when it last set the pull request aside, read from
+ * the status it leaves on the head. `current` is whether it still applies:
+ * set aside against a base that has since moved, the next run tries again.
+ */
+export type SetAsideView = SetAside & Readonly<{ current: boolean }>;
 
 /** One open pull request, as the page shows it. */
 export type Entry = ReportEntry &
   Readonly<{
     /**
-     * `conflicting` is the state `unblock-prs` cannot get past: its rebase
-     * stops on the conflict and it sets the pull request aside, which it
-     * used to be the only one to know.
+     * Absent unless `unblock-prs` set this head aside. Its own record rather
+     * than GitHub's `mergeable`, which says whether a *merge* conflicts —
+     * `pr-report-core`'s `set-aside.mts` says why that is not the question.
      */
-    mergeability: Mergeability;
+    setAside: SetAsideView | undefined;
     codeOwnerReview: CodeOwnerReview;
   }>;
 
@@ -80,7 +88,8 @@ export type Merged = MergedPullRequest & Readonly<{ mergedAtEpochMs: number }>;
 
 export type PageSummary = Summary &
   Readonly<{
-    conflicting: number;
+    /** Set aside by `unblock-prs`, against the base as it is now. */
+    setAside: number;
     /** Waiting for a code owner to approve. */
     awaitingReview: number;
   }>;
@@ -525,7 +534,7 @@ const assemble = ({
 
     return {
       ...entry,
-      mergeability: mergeabilityOf(pull?.pr.mergeable),
+      setAside: pull === undefined ? undefined : setAsideOf(pull),
       codeOwnerReview:
         pull === undefined
           ? { state: 'unknown' }
@@ -548,9 +557,8 @@ const assemble = ({
     required,
     summary: {
       ...summarize(entries),
-      conflicting: entries.filter(
-        ({ mergeability }) => mergeability === 'conflicting',
-      ).length,
+      setAside: entries.filter((entry) => entry.setAside?.current === true)
+        .length,
       awaitingReview: entries.filter(
         (entry) => entry.codeOwnerReview.state === 'required',
       ).length,
@@ -627,15 +635,31 @@ const statusState = (state: string): string =>
   state === 'EXPECTED' ? 'pending' : state.toLowerCase();
 
 /**
- * GitHub works this out in the background after every push to either side,
- * and says `UNKNOWN` until it has; the next read will know.
+ * The status `unblock-prs` left on this head, if it left one. A status
+ * belongs to one commit, so a push since has already made it someone else's.
  */
-const mergeabilityOf = (mergeable: string | undefined): Mergeability =>
-  mergeable === 'CONFLICTING'
-    ? 'conflicting'
-    : mergeable === 'MERGEABLE'
-      ? 'mergeable'
-      : 'unknown';
+const setAsideOf = (pull: PullState): SetAsideView | undefined => {
+  const left = pull.contexts.find(
+    (node) =>
+      node.__typename === 'StatusContext' && node.context === SET_ASIDE_CONTEXT,
+  );
+
+  const setAside =
+    left?.__typename === 'StatusContext' && left.description !== null
+      ? parseSetAside(left.description)
+      : undefined;
+
+  if (setAside === undefined) {
+    return undefined;
+  }
+
+  const baseTip = pull.pr.baseRef?.target?.oid;
+
+  return {
+    ...setAside,
+    current: baseTip !== undefined && setAsideStillApplies(setAside, baseTip),
+  };
+};
 
 const approversOf = (pr: OpenPullRequest): readonly string[] =>
   pr.latestOpinionatedReviews.nodes.flatMap(({ state, author }) =>
