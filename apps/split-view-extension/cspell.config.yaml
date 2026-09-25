@@ -33,3 +33,10 @@ words:
   # from a site refusing to be framed, which is a different thing with a
   # different answer.
   - unframeable
+  # Layouts in the notation of `src/layout/spec.mts`, as the examples in the
+  # README, the docs and the tests spell them: a 2×2 grid, one pane beside two
+  # stacked, three side by side, and a spec with one child too many.
+  - rcppcpp
+  - rpcpp
+  - prpp
+  - rppp

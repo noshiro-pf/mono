@@ -57,7 +57,12 @@ The full list, with the reasoning the README leaves out.
 - **The layout is saved and restored on reload**, including where you navigated
   to inside each pane. The tab's URL carries the workspace id
   (`split.html?ws=<id>`), which is what survives a reload, a browser restart
-  with session restore, and a tab reopened with Ctrl+Shift+T.
+  with session restore, and a tab reopened with Ctrl+Shift+T — and, from the
+  first save on, the view itself: the layout, the addresses, the zoom. The
+  address bar is therefore a link to what is on screen, and a URL written by
+  hand opens the view it describes. See "The URL" in
+  [`storage-and-state.md`](./storage-and-state.md#the-url) for what wins when
+  the URL and storage disagree.
 - **The select at the left of the toolbar is the list of saved split views.**
   Choosing one swaps this tab's contents for it. **`Alt+1`..`Alt+9` selects by
   position**, and works with the focus inside a pane as well as on the page.

@@ -7,4 +7,4 @@ export * from './sw-origins.mjs';
 export * from './tab-identity.mjs';
 export * from './unframeable.mjs';
 export * from './url.mjs';
-export * from './workspace-id.mjs';
+export * from './workspace-url.mjs';
