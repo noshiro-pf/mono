@@ -20,6 +20,8 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  *   the page and from inside a pane, renaming, exporting, deleting, and the
  *   whole list surviving a reload. The tab's title and its numbered favicon
  *   are here too, because nothing outside a browser draws either.
+ * - A split view opened from a URL that describes it — layout, addresses,
+ *   zoom — and the address bar following the view from then on.
  *
  * It needs a headed browser, because Chromium loads no extensions in the
  * headless shell. On a machine with no display:
@@ -880,6 +882,93 @@ const main = async (): Promise<void> => {
     // controls are in the overflow menu.
     const zoomAfterMove = await frameStyleOf(0);
 
+    // --- a split view described by its URL ------------------------------
+    // The query says what to show: the layout, the addresses and the zoom.
+    // With no `ws=` it is a new split view, named by the URL; and from then
+    // on the page writes the whole view back into the address bar, so the
+    // URL is always a link to what is on screen.
+    const optionsBeforeLink = await workspaceOptionCount();
+
+    const linkedUrl = `chrome-extension://${extensionId}/split.html?${[
+      'layout=r70pp',
+      `url=http://localhost:${String(serverPort)}/`,
+      `url=http://localhost:${String(serverPort)}/second`,
+      'zoom=1',
+      'zoom=0.75',
+      'name=linked',
+    ].join('&')}` as const;
+
+    await page.goto(linkedUrl);
+
+    await page.waitForSelector('.pane', { timeout: 10_000 });
+
+    // Long enough for the debounced save, which is when the URL is written.
+    await page.waitForTimeout(800);
+
+    const linkedPaneCount = await page.locator('.pane').count();
+
+    const linkedLeft = await paneBox(0);
+
+    const linkedRight = await paneBox(1);
+
+    const linkedSpan = linkedLeft.width + linkedRight.width;
+
+    const linkedRatio = Num.isNonZero(linkedSpan)
+      ? Num.div(linkedLeft.width, linkedSpan)
+      : 0;
+
+    const linkedAddresses = [
+      await page.locator('.pane__input').nth(0).inputValue(),
+      await page.locator('.pane__input').nth(1).inputValue(),
+    ] as const;
+
+    const linkedZoom = await frameStyleOf(1);
+
+    const linkedTitle = await page.title();
+
+    const optionsAfterLink = await workspaceOptionCount();
+
+    const urlAfterLink = page.url();
+
+    // A navigation inside a pane reaches the address bar of the tab, once
+    // the page has heard of it and saved. Retried as the first click-through
+    // is, for the same reason.
+    const linkThrough = async (attempt: number): Promise<boolean> => {
+      await page
+        .locator('.pane iframe')
+        .first()
+        .contentFrame()
+        .locator('#go')
+        .click();
+
+      return (
+        (await settlesTo('/second', 3000)) ||
+        (attempt >= 3 ? false : linkThrough(attempt + 1))
+      );
+    };
+
+    const linkFollowed = await linkThrough(1);
+
+    await page.waitForTimeout(800);
+
+    const urlAfterNavigation = page.url();
+
+    // And that URL, reloaded, shows exactly what it says.
+    await page.reload();
+
+    await page.waitForSelector('.pane', { timeout: 10_000 });
+
+    await page.waitForTimeout(800);
+
+    const relinkedAddress = await page
+      .locator('.pane__input')
+      .first()
+      .inputValue();
+
+    const relinkedZoom = await frameStyleOf(1);
+
+    const optionsAfterRelink = await workspaceOptionCount();
+
     report([
       check(
         'the toolbar names the build, in a build that has diagnostics',
@@ -1096,6 +1185,50 @@ const main = async (): Promise<void> => {
         'a moved pane keeps its zoom',
         zoomAfterMove.includes('zoom: 1.5'),
         zoomAfterMove,
+      ),
+      check(
+        'a URL describing a split view opens it: two panes at 7:3',
+        linkedPaneCount === 2 && Math.abs(linkedRatio - 0.7) < 0.03,
+        `${String(linkedPaneCount)} panes / ${linkedRatio.toFixed(2)}`,
+      ),
+      check(
+        'at the addresses it names, in order',
+        linkedAddresses[0].endsWith(`:${String(serverPort)}/`) &&
+          linkedAddresses[1].endsWith('/second'),
+        linkedAddresses.join(' , '),
+      ),
+      check(
+        'and at the zoom it names',
+        linkedZoom.includes('zoom: 0.75'),
+        linkedZoom,
+      ),
+      check(
+        'as a new split view on the list, named by the URL',
+        optionsAfterLink === optionsBeforeLink + 1 &&
+          linkedTitle.endsWith(': linked'),
+        `${String(optionsAfterLink)} / ${linkedTitle}`,
+      ),
+      check(
+        'the address bar then names the split view, and drops the name',
+        urlAfterLink.includes('ws=') &&
+          urlAfterLink.includes('layout=r70pp') &&
+          !urlAfterLink.includes('name='),
+        urlAfterLink.slice(urlAfterLink.indexOf('?')),
+      ),
+      check(
+        'and follows a navigation made inside a pane',
+        linkFollowed &&
+          urlAfterNavigation.includes(
+            `url=http://localhost:${String(serverPort)}/second&url=http://localhost:${String(serverPort)}/second`,
+          ),
+        urlAfterNavigation.slice(urlAfterNavigation.indexOf('?')),
+      ),
+      check(
+        'so that reloading it shows what it says, as the same split view',
+        relinkedAddress.endsWith('/second') &&
+          relinkedZoom.includes('zoom: 0.75') &&
+          optionsAfterRelink === optionsAfterLink,
+        `${relinkedAddress} / ${relinkedZoom} / ${String(optionsAfterRelink)}`,
       ),
       check(
         'no uncaught errors on the page',

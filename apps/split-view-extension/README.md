@@ -1,3 +1,5 @@
+<!-- cspell:ignore nifmgpafbfpgpcijgmfpcoonjbalbkhf -->
+
 # Split View
 
 A Chrome extension that splits one tab into a grid of web pages. Chrome's own
@@ -59,19 +61,20 @@ split views are kept.
 
 ## Using it
 
-| to                                   | do this                                                                     |
-| :----------------------------------- | :-------------------------------------------------------------------------- |
-| open a page in a pane                | type an address (or a search) into the pane's address bar and press Enter   |
-| change the whole layout              | a preset in the top bar — `2 cols`, `2×2`, `L1+R2`, …                       |
-| split a pane / close it              | the split buttons in the pane's toolbar / `✕`                               |
-| resize                               | drag a divider                                                              |
-| move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                 |
-| zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                         |
-| add a split view (in a new tab)      | `＋` at the top left                                                        |
-| switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                            |
-| rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file |
-| reopen everything after a restart    | **Edit** → **↗ Open all**                                                   |
-| get out of a pane that will not work | its "open in a new tab" button                                              |
+| to                                   | do this                                                                         |
+| :----------------------------------- | :------------------------------------------------------------------------------ |
+| open a page in a pane                | type an address (or a search) into the pane's address bar and press Enter       |
+| change the whole layout              | a preset in the top bar — `2 cols`, `2×2`, `L1+R2`, …                           |
+| split a pane / close it              | the split buttons in the pane's toolbar / `✕`                                   |
+| resize                               | drag a divider                                                                  |
+| move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                     |
+| zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                             |
+| add a split view (in a new tab)      | `＋` at the top left                                                            |
+| open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url) |
+| switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                |
+| rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file     |
+| reopen everything after a restart    | **Edit** → **↗ Open all**                                                       |
+| get out of a pane that will not work | its "open in a new tab" button                                                  |
 
 On a narrow pane, the less common buttons move into its `⋯` menu.
 
@@ -101,6 +104,44 @@ and the number on the tab's icon, so reorder the list to give the ones you use
 most the shortest reach. **↗ Open all** puts every saved split view in a tab of
 its own, leaving the ones already open alone, and a split view that was in a
 pinned tab comes back pinned.
+
+### Open from a URL
+
+The address bar always holds a link to what is on screen: which saved split
+view the tab shows, the layout, the address of every pane and the zoom of any
+pane that is zoomed. Bookmark it, or write one by hand and open it — a URL that
+describes a split view opens it, and adds it to the list if it names none.
+
+```text
+chrome-extension://nifmgpafbfpgpcijgmfpcoonjbalbkhf/split.html
+    ?layout=r70pp
+    &url=https://github.com/noshiro-pf/mono/pull/2052/files
+    &url=https://github.com/noshiro-pf/mono/pull/2052
+```
+
+That is a pull request's diff beside its conversation, at 7:3. The id in the
+host part is the one an unpacked build has wherever it is loaded from; a build
+installed from the store has an id of its own (see
+[`docs/how-it-works.md`](./docs/how-it-works.md#the-list-and-what-it-is-keyed-to)).
+
+| parameter | means                                                                                                                                                                                                                                                                                                                             |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout`  | the arrangement: `p` is a pane, `r` puts the next two things side by side and `c` stacks them, each followed by the first one's share in percent when it is not 50. `rcppcpp` is a 2×2 grid, `rpcpp` one pane beside two stacked. A preset's name (`grid-2x2`, `columns-3`, …) works too. Left out, the addresses go side by side |
+| `url`     | one per pane, in the order the layout names them — down each column, then rightwards. Written as in the address bar, so `github.com/…` works, and escaped as any query value is (`encodeURIComponent`), so an address with a query or a fragment of its own comes through whole. A pane with none stays empty                     |
+| `zoom`    | one per pane, `0.5` to `2`. Left out, 100%                                                                                                                                                                                                                                                                                        |
+| `sandbox` | one per pane, `0` to turn that pane's sandbox off (the padlock). Left out, on                                                                                                                                                                                                                                                     |
+| `name`    | what to call the split view, when this URL is what adds it to the list                                                                                                                                                                                                                                                            |
+| `ws`      | which saved split view to show. Alone, it opens what is saved; with the parameters above, what they describe is shown and saved under that id                                                                                                                                                                                     |
+
+So a link with `ws=pr-review` and the parameters above reuses one saved split
+view for every pull request you open this way, and a link without `ws` adds a
+split view each time. A bookmark taken from the address bar carries the view as
+it was when bookmarked; to bookmark a saved split view as it is now, keep only
+its `ws`.
+
+Only the address bar, a bookmark, another extension, or a page listed in the
+manifest's `web_accessible_resources` can open a `chrome-extension://` URL —
+an ordinary web page cannot link to one until it is listed there.
 
 ## Good to know
 

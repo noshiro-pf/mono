@@ -295,21 +295,29 @@ export const saveWorkspaceRegistry = async (
  * `fromUrl` wins when it names a workspace, registered or not — a `?ws=` that
  * is not in the list is *added* to it rather than refused, because such a URL
  * is a bookmark, a restored session, or the smoke test, and losing the layout
- * it names would be the one unrecoverable outcome. The list is written back
- * only when this changed it.
+ * it names would be the one unrecoverable outcome. An entry added here is
+ * named by `fromUrl.name` when the URL gave one; an entry already on the list
+ * keeps its name, which is the list's to change and not a link's. The list is
+ * written back only when this changed it.
  */
 export const resolveWorkspace = async (
-  fromUrl: string | undefined,
+  fromUrl: Readonly<{
+    workspaceId: string | undefined;
+    name: string | undefined;
+  }>,
   now: number,
 ): Promise<Readonly<{ registry: WorkspaceRegistry; workspaceId: string }>> => {
   const loaded = await loadWorkspaceRegistry();
 
+  const requestedId = fromUrl.workspaceId;
+
   const withUrlEntry =
-    fromUrl === undefined || workspaceEntryOf(loaded, fromUrl) !== undefined
+    requestedId === undefined ||
+    workspaceEntryOf(loaded, requestedId) !== undefined
       ? loaded
       : addWorkspaceEntry(loaded, {
-          id: fromUrl,
-          name: nextWorkspaceName(loaded),
+          id: requestedId,
+          name: fromUrl.name ?? nextWorkspaceName(loaded),
           createdAt: now,
           pinned: false,
         });
@@ -324,7 +332,7 @@ export const resolveWorkspace = async (
       });
 
   const workspaceId =
-    fromUrl ??
+    requestedId ??
     (withFirstEntry.activeId !== undefined &&
     workspaceEntryOf(withFirstEntry, withFirstEntry.activeId) !== undefined
       ? withFirstEntry.activeId

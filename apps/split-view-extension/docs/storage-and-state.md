@@ -17,7 +17,7 @@ and never read.
 | :----------------------- | :------------------------------------------------------- | :----------------------------------------------------------------------- |
 | `chrome.storage.local`   | every saved split view, the list of them, per-site flags | until the extension is removed — survives rebuilds, reloads and restarts |
 | `chrome.storage.session` | the split view's tab id (and the diagnostics log)        | until the browser closes                                                 |
-| the page's URL (`?ws=`)  | which split view **this tab** is showing                 | the tab: a reload, a session restore, `Ctrl+Shift+T`                     |
+| the page's URL           | which split view **this tab** is showing, and the view   | the tab: a reload, a session restore, `Ctrl+Shift+T`, a bookmark         |
 | React state              | the layout being edited, until the save debounce fires   | the page                                                                 |
 | nowhere                  | scroll position in a pane, form contents inside a frame  | —                                                                        |
 
@@ -216,18 +216,46 @@ already use.
 
 ## The URL
 
-`split.html?ws=<id>` — the one piece of state a reload preserves by itself,
-which is what carries a split view through a reload, a browser restart with
-session restore, and a tab reopened with `Ctrl+Shift+T`.
+`split.html?ws=<id>&layout=<spec>&url=…&url=…` — the one piece of state a
+reload preserves by itself, which is what carries a split view through a
+reload, a browser restart with session restore, and a tab reopened with
+`Ctrl+Shift+T`. `ws` says _which_ saved split view the tab shows; the rest is a
+snapshot of _what_ it shows, written so that the address bar is a link to the
+view on screen, and so that a link can describe a view that was never saved.
 
-- Resolved on load and written back with `replaceState`, which adds no history
-  entry: the workspace the page settled on is not somewhere the user navigated
-  to.
-- Switching writes it with `pushState`, so the browser's Back button walks back
-  through the split views visited in this tab. `popstate` switches to whatever
-  the URL then names.
-- A `split.html` with **no** `?ws=` is what the toolbar button opens, and means
-  "the one I had last" — the registry's `activeId`.
+| parameter | carries                                                                                                                      |
+| :-------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| `ws`      | the workspace id                                                                                                             |
+| `layout`  | the tree, in the notation of `formatLayoutSpec` (`src/layout/spec.mts`): `rcppcpp` is a 2×2 grid, `r70pp` two columns at 7:3 |
+| `url`     | one per pane, in tree order (`paneIdsOf`); `currentUrl ?? url`, as the stored record. Trailing empty panes are left off      |
+| `zoom`    | one per pane; left off while every pane is at 100%                                                                           |
+| `sandbox` | one per pane, `0` for off; left off while every pane is sandboxed                                                            |
+| `name`    | read only, never written: names the entry when this URL is what adds it                                                      |
+
+Not in it: `activePaneId`, `nextPaneId`, and the ratio beyond a tenth of a
+percent. The storage record is the full state; the URL is a projection of it,
+close enough that a view rebuilt from its URL is the view.
+
+**Written when storage is written**, in the debounced save and with
+`replaceState`, so a reload finds the URL and the record in agreement — and no
+more often, because the browser throttles a page that rewrites its history
+entry on every pointer move of a splitter drag. Switching writes it with
+`pushState`, so the browser's Back button walks back through the split views
+visited in this tab; `popstate` switches to whatever `ws` the URL then names,
+from storage.
+
+**Read on load, and what the URL describes wins.** A URL with only `ws` opens
+what is saved under that id; one with a `layout` or an `url` shows what it
+describes and saves it under `ws` — under a new id, added to the list, when
+there is no `ws`. On a reload the two agree and nothing changes hands. Where
+they differ, the URL is a link somebody made to show something: a bookmark
+opens the view as it was bookmarked, and a link from another program opens the
+view it asks for. The sandbox is part of the snapshot for the reload's sake — a
+pane's padlock would otherwise come back on with every reload — and it is only
+a URL the user opened that can turn it off.
+
+A `split.html` with **no** `?ws=` and no view is what the toolbar button opens,
+and means "the one I had last" — the registry's `activeId`.
 
 ## Which split view a tab shows
 
@@ -236,31 +264,34 @@ session restore, and a tab reopened with `Ctrl+Shift+T`.
 1. Read `workspaceRegistry`. If there is none, or it has no entries, build one
    from the `workspace:*` keys that are in storage (see
    [Migration](#migration-and-repair)).
-2. If the URL named an id that is **not** on the list, add it, named
-   `split-view-<n>`. Such a URL is a bookmark, a restored session or the smoke
-   test, and the layout it names is the one thing that cannot be recovered any
-   other way.
+2. If the URL named an id that is **not** on the list, add it, named by the
+   URL's `name` or else `split-view-<n>`. Such a URL is a bookmark, a restored
+   session or the smoke test, and the layout it names is the one thing that
+   cannot be recovered any other way. A URL that describes a view and names no
+   id is given a fresh `crypto.randomUUID()` first, so it lands here.
 3. If the list is still empty, create one entry with the id `default`.
 4. The workspace to show is the URL's id, or `activeId`, or the first entry.
 5. Mark it active, and write the list back **only if any of the above changed
    it**.
 
-Then the layout: `loadWorkspaceState(id)`, or a fresh 2×2 grid if storage has
-nothing under that id.
+Then the layout: the one the URL describes, if it does; otherwise
+`loadWorkspaceState(id)`, or a fresh 2×2 grid if storage has nothing under that
+id. The URL is then rewritten from the result, and the debounced save writes
+the record.
 
 ## When each record is written
 
 The layout on screen is the only state that is not already in storage, so every
 path that could lose it writes it first.
 
-| moment                          | what is written                                                                |
-| :------------------------------ | :----------------------------------------------------------------------------- |
-| 250 ms after any change         | the layout. Debounced because a splitter drag changes it on every pointer move |
-| `pagehide`                      | the layout — a tab closed inside the window                                    |
-| before switching split views    | the layout, immediately: the debounce may not have fired                       |
-| before opening one in a new tab | the layout, so the new tab starts from what is on screen                       |
-| before exporting                | the layout, because the export reads storage rather than the page              |
-| any list edit, and any switch   | the list                                                                       |
+| moment                          | what is written                                                                             |
+| :------------------------------ | :------------------------------------------------------------------------------------------ |
+| 250 ms after any change         | the layout, and the URL. Debounced because a splitter drag changes it on every pointer move |
+| `pagehide`                      | the layout — a tab closed inside the window                                                 |
+| before switching split views    | the layout, immediately: the debounce may not have fired                                    |
+| before opening one in a new tab | the layout, so the new tab starts from what is on screen                                    |
+| before exporting                | the layout, because the export reads storage rather than the page                           |
+| any list edit, and any switch   | the list                                                                                    |
 
 The one case that deliberately does **not** save first is switching away from a
 workspace that has just been deleted — saving it would write the record back.
@@ -432,19 +463,20 @@ the shortcut would work only while the toolbar had the focus. It carries
 
 ## Where each piece lives
 
-| file                         | what it owns                                                                |
-| :--------------------------- | :-------------------------------------------------------------------------- |
-| `src/layout/types.mts`       | `LayoutNode`, `PaneState`, `WorkspaceState` — the shapes stored             |
-| `src/layout/tree.mts`        | the pure tree operations: split, remove, set ratio                          |
-| `src/layout/geometry.mts`    | the tree flattened into rectangles, and the hit-test behind a drop          |
-| `src/layout/presets.mts`     | the preset layouts, and the rule that a grid is a row of columns            |
-| `src/layout/zoom.mts`        | the zoom ladder, its clamp and its formatting                               |
-| `src/state/reducer.mts`      | `workspaceReducer`, and reconciliation                                      |
-| `src/state/storage.mts`      | `workspace:<id>`: read, write, list, delete, prune                          |
-| `src/state/registry.mts`     | `workspaceRegistry`: the list, its edits, its migration, its cross-tab sync |
-| `src/state/backup.mts`       | the JSON export and import                                                  |
-| `src/state/workspace-id.mts` | the `?ws=` in the URL                                                       |
-| `src/state/tab-identity.mts` | the tab's title, and the numbered favicon drawn on a canvas                 |
-| `src/state/sw-origins.mts`   | `serviceWorkerResetOrigins`                                                 |
-| `src/shared/protocol.mts`    | the `postMessage` messages, and their validators                            |
-| `src/shared/shortcuts.mts`   | what counts as `Alt+1..9`                                                   |
+| file                          | what it owns                                                                |
+| :---------------------------- | :-------------------------------------------------------------------------- |
+| `src/layout/types.mts`        | `LayoutNode`, `PaneState`, `WorkspaceState` — the shapes stored             |
+| `src/layout/tree.mts`         | the pure tree operations: split, remove, set ratio                          |
+| `src/layout/geometry.mts`     | the tree flattened into rectangles, and the hit-test behind a drop          |
+| `src/layout/presets.mts`      | the preset layouts, and the rule that a grid is a row of columns            |
+| `src/layout/zoom.mts`         | the zoom ladder, its clamp and its formatting                               |
+| `src/layout/spec.mts`         | the layout as a string, for the URL: `rcppcpp`                              |
+| `src/state/reducer.mts`       | `workspaceReducer`, and reconciliation                                      |
+| `src/state/storage.mts`       | `workspace:<id>`: read, write, list, delete, prune                          |
+| `src/state/registry.mts`      | `workspaceRegistry`: the list, its edits, its migration, its cross-tab sync |
+| `src/state/backup.mts`        | the JSON export and import                                                  |
+| `src/state/workspace-url.mts` | the URL: reading a view out of it, writing the view into it                 |
+| `src/state/tab-identity.mts`  | the tab's title, and the numbered favicon drawn on a canvas                 |
+| `src/state/sw-origins.mts`    | `serviceWorkerResetOrigins`                                                 |
+| `src/shared/protocol.mts`     | the `postMessage` messages, and their validators                            |
+| `src/shared/shortcuts.mts`    | what counts as `Alt+1..9`                                                   |

@@ -49,7 +49,8 @@ import {
   openEveryWorkspaceInTabs,
   openWorkspaceInNewTab,
   pruneUnlistedWorkspaces,
-  putWorkspaceIdInUrl,
+  putWorkspaceInUrl,
+  readWorkspaceUrl,
   reconcileWorkspace,
   removeWorkspaceEntry,
   removeWorkspaceState,
@@ -346,21 +347,37 @@ export const App = memoNamed('App', () => {
     const initialize = async (): Promise<void> => {
       await ensureRule();
 
-      // `?ws=` wins where there is one — it is what a reload, a restored
-      // session and a bookmark carry — and the list's `activeId` answers when
-      // there is not, which is the toolbar button's case.
-      const resolved = await resolveWorkspace(workspaceIdFromUrl(), Date.now());
+      // The URL says which split view this tab shows, and may say what it
+      // shows. `?ws=` wins where there is one — it is what a reload, a
+      // restored session and a bookmark carry — and the list's `activeId`
+      // answers when there is not, which is the toolbar button's case. A URL
+      // that describes a view without naming one is a new split view, as `+`
+      // makes one: it gets an id of its own and a place on the list.
+      const request = readWorkspaceUrl();
 
-      putWorkspaceIdInUrl(resolved.workspaceId, 'replace');
+      const resolved = await resolveWorkspace(
+        {
+          workspaceId:
+            request.workspaceId ??
+            (request.state === undefined ? undefined : crypto.randomUUID()),
+          name: request.name,
+        },
+        Date.now(),
+      );
 
-      const restored = await loadWorkspaceState(resolved.workspaceId);
+      // A view the URL describes is shown over the one saved under that id:
+      // the URL is written from the view whenever the view is saved, so on a
+      // reload the two agree, and where they differ the URL is a link that was
+      // made to show something.
+      const shown =
+        request.state ??
+        sessionStateOf(await loadWorkspaceState(resolved.workspaceId));
+
+      putWorkspaceInUrl(resolved.workspaceId, shown, 'replace');
 
       commitRegistry(resolved.registry);
 
-      setSession({
-        workspaceId: resolved.workspaceId,
-        state: sessionStateOf(restored),
-      });
+      setSession({ workspaceId: resolved.workspaceId, state: shown });
 
       setResetOrigins(await loadServiceWorkerResetOrigins());
 
@@ -399,12 +416,12 @@ export const App = memoNamed('App', () => {
           await saveWorkspaceState(live.workspaceId, live.state);
         }
 
-        const restored = await loadWorkspaceState(workspaceId);
+        const shown = sessionStateOf(await loadWorkspaceState(workspaceId));
 
-        setSession({ workspaceId, state: sessionStateOf(restored) });
+        setSession({ workspaceId, state: shown });
 
         if (options.history !== 'none') {
-          putWorkspaceIdInUrl(workspaceId, options.history);
+          putWorkspaceInUrl(workspaceId, shown, options.history);
         }
 
         commitRegistry(
@@ -789,6 +806,10 @@ export const App = memoNamed('App', () => {
 
   // Saving is debounced because a splitter drag changes the state on every
   // pointer move; `pagehide` is what covers a tab closed inside the window.
+  //
+  // The URL is written at the same moment as storage, and only then: it is
+  // the same snapshot, so a reload finds the two in agreement, and the browser
+  // throttles a page that rewrites its history entry on every pointer move.
   React.useEffect(() => {
     const { workspaceId: saveTo, state: toSave } = session;
 
@@ -800,7 +821,11 @@ export const App = memoNamed('App', () => {
       saveWorkspaceState(saveTo, toSave).catch(console.error);
     };
 
-    const timer = setTimeout(save, saveDebounceMs);
+    const timer = setTimeout(() => {
+      save();
+
+      putWorkspaceInUrl(saveTo, toSave, 'replace');
+    }, saveDebounceMs);
 
     addEventListener('pagehide', save);
 
