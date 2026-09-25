@@ -218,32 +218,16 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 | `--idle-interval <sec>` |  300 | 何もない時の再 survey までの待ち時間  |
 | `--poll-interval <sec>` |   60 | watch 中のポーリング間隔              |
 | `--watch-timeout <min>` |   90 | 1本を諦めるまでの時間                 |
-| `--no-log`              |      | 実行結果を issue に書かない           |
 
-### 実行ログ
+### 見送った PR はどこで分かるか
 
-このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。rebase が
-conflict した、push が弾かれた、auto-merge の無い PR を見送った — どれも一度
-きり、誰かの端末で起きて、そのあとはどこにも残りません。
-
-そこで、**何かに手を出した実行だけ**が `data/unblock-prs-log` ブランチの
-`unblock-prs-log.json` に記録を追記します（何もしなかった実行は書きません。夜
-通し回した idle ループが「何もなし」で埋まるだけなので）。保持するのは直近 20
-実行、1実行あたり 50 イベントまで。イベントは行ではなく構造 —「どの PR に」
-「何をして」「どうなったか」— で、それを **GitHub Pull Requests Manager**
-（<https://noshiro-pf.github.io/mono/pr-manager/>）が読んで表示します。
-
-以前は issue でした。issue は人が読んで購読するものであって簡易DBではない、と
-いうのが移した理由です（`apps/pr-report-payload/README.md`）。push は
-`origin` が既に指している URL に対する素の `git` なので、普段ブランチを push
-しているのと同じ資格情報で通ります。毎回 orphan commit を force-push するため、
-ブランチは常に1コミット1ファイルのままです。署名はしません — 機械の出力です
-し、`commit.gpgsign` を大域で有効にしている環境で鍵が無いときにログだけが落ち
-るのは筋が悪いからです。
-
-書き込みに失敗しても実行は止まりません。このスクリプトの仕事は PR を landing
-させることで、ログが書けなかったことはそれを止める理由ではありません — ただし
-黙って消えるのは最悪なので、その旨はログに出ます。
+このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。ただ、見送る
+理由のうち後から知りたいものは GitHub 自身が知っています。rebase が conflict
+した PR は GitHub 上でも base と conflict しており、code owner の承認待ちで
+止まっている PR は変更したパスと `.github/CODEOWNERS` から分かります。
+**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/pr-manager/>）
+はその2つを PR ごとに表示するので、端末を見に行かなくても止まっている理由が
+分かります。
 
 ### ファイル構成
 
@@ -251,19 +235,21 @@ conflict した、push が弾かれた、auto-merge の無い PR を見送った
 | :---------------- | :-------------------------------------------------------- |
 | `main.mts`        | ループ本体とコマンドライン（入口）                        |
 | `triage.mts`      | 1回の survey が各 PR について何を言うか                   |
-| `merge-after.mts` | 宣言された順序 — トレーラのパーサと閉路検出               |
+| `merge-after.mts` | 宣言された順序が pick に何を言うか                        |
 | `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
 | `checks.mts`      | マージが何を待っているか                                  |
 | `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                 |
-| `labels.mts`      | 2つのラベルとその意味                                     |
+| `labels.mts`      | 3つのラベルがその PR について何を言うか                   |
 | `skips.mts`       | 諦めた PR を何をもって覚え続けるか                        |
 | `options.mts`     | コマンドライン                                            |
 | `types.mts`       | 共有される型とスキーマ                                    |
 | `constants.mts`   | 待ち時間と諦めるまでの回数                                |
-| `run-log.mts`     | この実行が何をしたかと、それを書く issue                  |
 | `util.mts`        | quoting、ログ、停止シグナル                               |
+
+トレーラのパーサと閉路検出、ラベルの文字列は、同じ宣言を読む Pull Requests
+Manager と共有するため `apps/pr-report-core` にあります。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -487,35 +473,17 @@ sleeps for `--idle-interval` (300s) and surveys again.
 | `--idle-interval <sec>` |     300 | wait between surveys when there is nothing |
 | `--poll-interval <sec>` |      60 | wait between polls of the watched one      |
 | `--watch-timeout <min>` |      90 | give up on one pull request after this     |
-| `--no-log`              |         | do not write the run to its issue          |
 
-### The run log
+### Where a passed-over pull request shows
 
 This script runs on someone's machine and says everything it does on standard
-output, which is exactly where nobody can see it afterwards. A rebase that
-conflicted, a push that was refused, a queued pull request passed over for
-having no auto-merge — each happened once, on a terminal, and was never
-visible again.
-
-So a run that **acts on something** adds a record to `unblock-prs-log.json` on
-the `data/unblock-prs-log` branch. A run that acts on nothing writes nothing,
-or an idle overnight loop would fill the log with entries saying so. Twenty
-runs are kept, fifty events each. The entries are events rather than lines —
-which pull request, what was done, how it turned out — which is also what the
-**GitHub Pull Requests Manager** page
-(<https://noshiro-pf.github.io/mono/pr-manager/>) lays out as rows.
-
-It was an issue until recently; `apps/pr-report-payload/README.md` says why a
-branch. The push is plain `git` against whatever URL `origin` already
-resolves to, so it works with the credentials you push branches with, SSH or
-HTTPS. Each run force-pushes a fresh orphan commit, so the branch stays one
-commit holding one file. It signs nothing: this is machine output, and a
-`commit.gpgsign` set globally would otherwise make the log — and only the log
-— fail on a machine with no key loaded.
-
-A log that could not be written never fails the run: the job is to land pull
-requests, and this is not a reason to stop doing it. It is a reason to say so,
-which it does, because an entry that silently went missing is worse than none.
+output. But the reasons worth knowing afterwards are ones GitHub knows too: a
+pull request whose rebase conflicted conflicts with its base on GitHub as
+well, and one waiting for a code owner can be told from the paths it changes
+and `.github/CODEOWNERS`. The **GitHub Pull Requests Manager** page
+(<https://noshiro-pf.github.io/mono/pr-manager/>) shows both for every pull
+request, so finding out why one is not moving does not mean finding the
+terminal the script ran in.
 
 ### Layout
 
@@ -523,19 +491,22 @@ which it does, because an entry that silently went missing is worse than none.
 | :---------------- | :------------------------------------------------------- |
 | `main.mts`        | the loop and the command line (entry point)              |
 | `triage.mts`      | what one survey says about each pull request, and why    |
-| `merge-after.mts` | the declared order — the trailer parser, cycle detection |
+| `merge-after.mts` | what the declared order says about picking               |
 | `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
 | `checks.mts`      | what the merge is waiting for                            |
 | `github.mts`      | everything that shells out to `gh` or `git`              |
-| `labels.mts`      | the two labels, and what each one means                  |
+| `labels.mts`      | what the three labels say about a pull request           |
 | `skips.mts`       | what the loop remembers, and for how long                |
 | `options.mts`     | the command line                                         |
 | `types.mts`       | the shapes every module passes around                    |
 | `constants.mts`   | how long it waits, and how long before it gives up       |
-| `run-log.mts`     | what this run did, and the issue it is written to        |
 | `util.mts`        | quoting, logging, the stop signal                        |
+
+The trailer parser, the cycle detection and the label strings are in
+`apps/pr-report-core`, shared with the Pull Requests Manager page, which reads
+the same declarations.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.

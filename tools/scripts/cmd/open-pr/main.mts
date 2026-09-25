@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
+import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { SKIP_CI_LABEL } from '../unblock-prs/labels.mjs';
 import { log } from '../unblock-prs/util.mjs';
 import { type ApiContext } from './api.mjs';
 import {

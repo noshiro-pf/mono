@@ -1,8 +1,5 @@
 import * as React from 'react';
-import {
-  ANONYMOUS_POLL_INTERVAL_MS,
-  SIGNED_IN_POLL_INTERVAL_MS,
-} from '../constants.mjs';
+import { POLL_INTERVAL_MS } from '../constants.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
 import { type StoredToken } from '../token.mjs';
 import { ExternalLink } from './external-link.js';
@@ -20,14 +17,13 @@ type Props = Readonly<{
  * Where a reader gives the page a token, and — the part that matters more —
  * where they are told which one to make.
  *
- * Closed by default, because the page works without it and most readers will
- * never open it. What is behind it is two recipes and the reason there are
- * two: the token this page wants is the weakest GitHub can mint, since the
- * rate limit it is here for is charged to the account rather than to
- * anything the token is allowed to reach. Asking for a token with no
- * permissions is not a way of being careful with somebody else's account, it
- * is the correct token for the job, and saying so is what keeps a reader
- * from reaching for `repo` because it sounded like the one that works.
+ * Open until there is a token, because the page reads nothing without one,
+ * and closed after, because then it has nothing left to ask. What is behind
+ * it is the recipe and the reason for it: GraphQL answers nobody without a
+ * token, but reading a public repository needs no permission at all, so the
+ * token this page wants is the weakest GitHub can mint. Saying so is what
+ * keeps a reader from reaching for `repo` because it sounded like the one
+ * that works.
  */
 export const TokenPanel = React.memo<Props>((props) => {
   const { token, rateLimit, saveError, onSave, onForget } = props;
@@ -79,18 +75,16 @@ export const TokenPanel = React.memo<Props>((props) => {
   const low = rateLimit !== undefined && isRunningLow(rateLimit);
 
   return (
-    <details className={'token-panel'}>
+    <details className={'token-panel'} open={token === undefined}>
       <summary className={'token-summary'}>
-        {token === undefined
-          ? 'Reading without a token'
-          : 'Reading with a token'}
+        {token === undefined ? 'A token is needed' : 'Reading with a token'}
       </summary>
 
       <div className={'token-body'}>
         <p className={low ? 'token-state token-state-low' : 'token-state'}>
           {token === undefined
-            ? `${limitWords(rateLimit, ANONYMOUS_LIMIT)} Checking every ${seconds(ANONYMOUS_POLL_INTERVAL_MS)}.${low ? RUNNING_LOW_WITHOUT_TOKEN : ''}`
-            : `Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit, SIGNED_IN_LIMIT)} Checking every ${seconds(SIGNED_IN_POLL_INTERVAL_MS)}.${low ? RUNNING_LOW : ''}`}
+            ? 'Nothing is read until there is one.'
+            : `Held ${token.store === 'device' ? 'on this device' : 'in this tab only'}. ${limitWords(rateLimit)} Reading every ${seconds(POLL_INTERVAL_MS)} while this tab is visible.${low ? RUNNING_LOW : ''}`}
         </p>
 
         <form className={'token-form'} onSubmit={onSubmit}>
@@ -153,19 +147,14 @@ const REMEMBER_ID = 'github-token-remember';
  * What GitHub allows, said before it has answered for the first time. Only
  * the fallback: the numbers on screen after that are GitHub's own.
  */
-const ANONYMOUS_LIMIT = 60;
-
-const SIGNED_IN_LIMIT = 5000;
+const GRAPHQL_LIMIT = 5000;
 
 /**
- * The anonymous budget belongs to the address rather than to the page, so a
- * reader can arrive at one that is nearly spent through no act of their own
- * — and the thing they can do about it is right here.
+ * The budget belongs to the token's account, so anything else that account
+ * does with GraphQL spends it too.
  */
-const RUNNING_LOW_WITHOUT_TOKEN =
-  ' Running low — the budget is shared with everything behind this address, and a token of your own lifts it to 5,000.';
-
-const RUNNING_LOW = ' Running low; the window resets within the hour.';
+const RUNNING_LOW =
+  ' Running low — the budget is shared with everything else this account does with GraphQL, and it resets within the hour.';
 
 const MS_PER_SECOND = 1000;
 
@@ -176,13 +165,10 @@ const SECONDS_PER_MINUTE = 60;
  * yet. The fallback is the documented size of the window rather than a blank,
  * so the sentence reads the same before the first answer arrives.
  */
-const limitWords = (
-  rateLimit: RateLimit | undefined,
-  fallbackLimit: number,
-): string =>
+const limitWords = (rateLimit: RateLimit | undefined): string =>
   rateLimit === undefined
-    ? (`${fallbackLimit.toLocaleString('en')} requests an hour.` as const)
-    : (`${rateLimit.remaining.toLocaleString('en')} of ${rateLimit.limit.toLocaleString('en')} requests left this hour.` as const);
+    ? (`${GRAPHQL_LIMIT.toLocaleString('en')} GraphQL points an hour.` as const)
+    : (`${rateLimit.remaining.toLocaleString('en')} of ${rateLimit.limit.toLocaleString('en')} GraphQL points left this hour.` as const);
 
 const seconds = (ms: number): string => {
   const total = ms / MS_PER_SECOND;
@@ -207,7 +193,7 @@ const TokenHelp = React.memo(() => (
 
     <p>
       {
-        'This page reads two small JSON files out of a public repository and nothing else. It needs no permission you do not already have as a stranger — what it needs is the higher rate limit, and GitHub charges that to the account rather than to what the token is allowed to reach. So the right token here is the weakest one you can make.'
+        'This page asks GitHub’s GraphQL API about the pull requests of a public repository, and nothing else. GraphQL answers nobody without a token, but reading a public repository needs no permission you do not already have as a stranger. So the right token here is the weakest one you can make.'
       }
     </p>
 
@@ -227,12 +213,12 @@ const TokenHelp = React.memo(() => (
       <li>
         <strong>{'Tick no scopes at all.'}</strong>{' '}
         {
-          'In GitHub’s words, “a token with no assigned scopes can only access public information”. It cannot read a private repository, write anything, or act as you. Lost, it is worth one thing: somebody else’s 5,000 requests an hour.'
+          'In GitHub’s words, “a token with no assigned scopes can only access public information”. It cannot read a private repository, write anything, or act as you. Lost, it is worth one thing: somebody else’s share of your rate limit.'
         }
       </li>
     </ol>
 
-    <h4>{'Or: a fine-grained token, narrowed to this repository'}</h4>
+    <h4>{'Or: a fine-grained token that reads public repositories'}</h4>
 
     <ol>
       <li>
@@ -246,20 +232,10 @@ const TokenHelp = React.memo(() => (
       </li>
 
       <li>
-        {'Repository access: Only select repositories → noshiro-pf/mono.'}
-      </li>
-
-      <li>
-        {'Repository permissions: '}
-        <strong>{'Issues → Read-only'}</strong>
+        {'Repository access: '}
+        <strong>{'Public repositories'}</strong>
         {
-          '. Metadata → Read-only comes with it. Nothing else, and no account permissions.'
-        }
-      </li>
-
-      <li>
-        {
-          '(A fine-grained token can read public repositories on its own, so the Issues permission may not even be needed — granting it is the version that is certain to work.)'
+          '. That is read-only access to what anyone can already see, and no permissions need adding to it.'
         }
       </li>
     </ol>

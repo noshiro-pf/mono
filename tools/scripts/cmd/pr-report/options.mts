@@ -3,7 +3,7 @@
 import * as util from 'node:util';
 import { Num, Result } from 'ts-data-forge';
 
-export const FORMATS = ['json', 'markdown', 'payload', 'terminal'] as const;
+export const FORMATS = ['json', 'markdown', 'terminal'] as const;
 
 export type Format = (typeof FORMATS)[number];
 
@@ -15,16 +15,6 @@ export type Options = Readonly<{
   mergedDays: number;
   /** And how many of them it lists, whatever the window turns up. */
   mergedLimit: number;
-  /**
-   * Where to also write the machine-readable payload, if anywhere.
-   *
-   * A second output rather than a second run, because a run is twenty or so
-   * requests against the API and about a minute of wall clock, and
-   * `pr-report.yml` needs both the Markdown and the payload from the same
-   * moment: two runs would have the issue and the page describing states
-   * that differ by whatever happened in between.
-   */
-  payloadFile: string | undefined;
 }>;
 
 /**
@@ -35,9 +25,8 @@ export type Options = Readonly<{
 export const DEFAULT_MERGED_DAYS = 7;
 
 /**
- * A cap as well as a window, and now a matter of reading rather than of
- * fitting: the report is written to a file, which refuses nothing. Twenty is
- * more than enough to answer "did the thing I queued go in", which is what
+ * A cap as well as a window, and a matter of reading rather than of
+ * fitting. Twenty is more than enough to answer "did the thing I queued go in", which is what
  * the section is for, and past that the section stops being a list and
  * starts being an archive.
  */
@@ -52,13 +41,10 @@ export const HELP = [
   '',
   'Options:',
   `  --format <${FORMATS.join('|')}>  how to print it (default terminal)`,
-  '                                   `payload` is the one the page reads;',
   '                                   `json` is the whole report, bodies and all',
   '  --repo <owner/name>              which repository (default: this one)',
   `  --merged-days <n>                how far back "recently merged" goes (default ${DEFAULT_MERGED_DAYS})`,
   `  --merged-limit <n>               how many it lists at most (default ${DEFAULT_MERGED_LIMIT})`,
-  '  --payload-file <path>            also write the payload there, from the',
-  '                                   same run that printed the report',
   '  -h, --help                       show this help',
   '',
   'Reads GITHUB_TOKEN or GH_TOKEN when one is set. Without it the public API',
@@ -83,7 +69,6 @@ export const parseOptions = (
         repo: { type: 'string' },
         'merged-days': { type: 'string' },
         'merged-limit': { type: 'string' },
-        'payload-file': { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -124,7 +109,6 @@ export const parseOptions = (
     repo: values.repo,
     mergedDays: mergedDays.value,
     mergedLimit: mergedLimit.value,
-    payloadFile: values['payload-file'],
   });
 };
 

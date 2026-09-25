@@ -1,9 +1,10 @@
-import { type PayloadComparison } from 'pr-report-payload';
+import { type Comparison } from 'pr-report-core';
 import * as React from 'react';
 import { Num } from 'ts-data-forge';
 
 type Props = Readonly<{
-  comparison: PayloadComparison | null;
+  /** Absent when GitHub could not compare them. */
+  comparison: Comparison | undefined;
   /**
    * The largest count on either side anywhere in the report, so that a bar on
    * one card can be compared with a bar on another. A per-card scale would
@@ -40,7 +41,7 @@ export const CommitDivergence = React.memo<Props>((props) => {
     [comparison?.aheadBy, scaleMax],
   );
 
-  if (comparison === null) {
+  if (comparison === undefined) {
     return <span className={'divergence-unread'}>{'ahead/behind unread'}</span>;
   }
 

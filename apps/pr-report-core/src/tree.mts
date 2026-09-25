@@ -1,7 +1,7 @@
 /** The merge order the pull requests declare, as a forest. */
 
 import { Arr } from 'ts-data-forge';
-import { findMergeAfterCycles } from '../unblock-prs/merge-after.mjs';
+import { findMergeAfterCycles } from './merge-after.mjs';
 import { type TreeNode } from './types.mjs';
 
 export type Forest = Readonly<{

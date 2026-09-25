@@ -10,8 +10,8 @@
   //
   // Every workspace package reachable from a source-run entry point needs an
   // entry here — `z:repo-settings` runs `github-settings-as-code`'s `src/`,
-  // which reaches `ts-fortress` and `octokit-safe-types`, and `pr-report`
-  // reaches `pr-report-payload` for the block it embeds in the issue.
+  // which reaches `ts-fortress` and `octokit-safe-types`, and `pr-report`,
+  // `unblock-prs` and `open-pr` reach `pr-report-core`.
   //
   // Passed explicitly: `tsx --tsconfig ../../tools/configs/tsconfig.tsx.json`.
   // Only affects that process; type-checking uses each package's own tsconfig.
@@ -25,7 +25,7 @@
       "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
       "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
       "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"],
-      "pr-report-payload": ["apps/pr-report-payload/src/index.mts"]
+      "pr-report-core": ["apps/pr-report-core/src/index.mts"]
     }
   }
 }

@@ -1,14 +1,15 @@
-import { type PayloadSummary } from 'pr-report-payload';
 import * as React from 'react';
+import { type PageSummary } from '../load-report.mjs';
 import { StatTile } from './stat-tile.js';
 
-type Props = Readonly<{ summary: PayloadSummary }>;
+type Props = Readonly<{ summary: PageSummary }>;
 
 /**
  * What a reader who opens the page and closes it again has still learnt.
  *
- * The counts are the report's own — see `PayloadSummary` for why they are
- * carried rather than recomputed here.
+ * The first five are `pr-report-core`'s, the same counts `pnpm run pr-report`
+ * leads with; the last two are what stops a pull request that is otherwise
+ * ready, and are only this page's.
  */
 export const SummaryRow = React.memo<Props>(({ summary }) => (
   <div className={'summary-row'}>
@@ -21,6 +22,16 @@ export const SummaryRow = React.memo<Props>(({ summary }) => (
       value={summary.failing}
     />
     <StatTile label={'behind base'} value={summary.behind} />
+    <StatTile
+      label={'conflicting'}
+      tone={summary.conflicting > 0 ? 'critical' : undefined}
+      value={summary.conflicting}
+    />
+    <StatTile
+      label={'awaiting code owner'}
+      tone={summary.awaitingReview > 0 ? 'warning' : undefined}
+      value={summary.awaitingReview}
+    />
   </div>
 ));
 

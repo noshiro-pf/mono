@@ -30,8 +30,7 @@ export type ChipColors = Readonly<{
  * The three colours for one label.
  *
  * `color` is what the GitHub API sends: six hex digits with no `#`. Anything
- * else — an empty string from a payload written before colours were carried,
- * or a value GitHub has never sent — falls back to the grey GitHub gives a
+ * else — an empty string, or a value GitHub has never sent — falls back to the grey GitHub gives a
  * new label, because a chip that is the wrong colour is better than a page
  * that is not there.
  */

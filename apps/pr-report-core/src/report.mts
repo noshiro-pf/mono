@@ -1,8 +1,8 @@
 /** Everything read, arranged into what gets rendered. */
 
-import { SKIP_CI_LABEL } from '../unblock-prs/labels.mjs';
-import { parseMergeAfter } from '../unblock-prs/merge-after.mjs';
 import { summarizeChecks } from './checks.mjs';
+import { SKIP_CI_LABEL } from './labels.mjs';
+import { parseMergeAfter } from './merge-after.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import {
   type MergedPullRequest,
@@ -10,6 +10,7 @@ import {
   type PullRequestFacts,
   type RepoRef,
   type ReportEntry,
+  type TreeNode,
 } from './types.mjs';
 
 /**
@@ -34,7 +35,35 @@ export const buildReport = ({
   pulls: readonly PullRequestFacts[];
   merged: readonly MergedPullRequest[];
   mergedWithinDays: number;
-}>): PrReport => {
+}>): PrReport =>
+  ({
+    repo,
+    generatedAt,
+    authenticated,
+    required,
+    ...buildEntries({ required, pulls }),
+    merged,
+    mergedWithinDays,
+  }) as const;
+
+export type DecidedEntries = Readonly<{
+  entries: readonly ReportEntry[];
+  roots: readonly TreeNode[];
+  cycles: readonly (readonly number[])[];
+}>;
+
+/**
+ * The part of a report that is decided rather than read: each open pull
+ * request's declared order and check verdict, and the merge order they add
+ * up to.
+ */
+export const buildEntries = ({
+  required,
+  pulls,
+}: Readonly<{
+  required: readonly string[];
+  pulls: readonly PullRequestFacts[];
+}>): DecidedEntries => {
   const open = new Set(pulls.map(({ number }) => number));
 
   const entries: readonly ReportEntry[] = pulls
@@ -56,15 +85,5 @@ export const buildReport = ({
 
   const { roots, cycles } = buildMergeAfterForest(entries);
 
-  return {
-    repo,
-    generatedAt,
-    authenticated,
-    required,
-    entries,
-    roots,
-    cycles,
-    merged,
-    mergedWithinDays,
-  };
+  return { entries, roots, cycles };
 };

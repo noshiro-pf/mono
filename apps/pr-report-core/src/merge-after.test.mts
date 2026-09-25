@@ -1,6 +1,6 @@
 import { findMergeAfterCycles, parseMergeAfter } from './merge-after.mjs';
 
-describe('parseMergeAfter', () => {
+describe(parseMergeAfter, () => {
   test('reads one reference from a trailer', () => {
     assert.deepStrictEqual(
       parseMergeAfter('Adds the parser.\n\nMerge-After: #1901\n'),
@@ -87,7 +87,7 @@ describe('parseMergeAfter', () => {
   });
 });
 
-describe('findMergeAfterCycles', () => {
+describe(findMergeAfterCycles, () => {
   test('finds nothing in a chain', () => {
     assert.deepStrictEqual(
       findMergeAfterCycles(

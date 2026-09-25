@@ -91,8 +91,8 @@ describe(chipColors, () => {
   });
 
   test('falls back rather than failing on a colour it was not given', () => {
-    // A payload written before colours were carried sends the empty string,
-    // and a page that threw for it would be a page nobody could open.
+    // A page that threw for a colour it did not know would be a page
+    // nobody could open.
     expect(chipColors('').background).toBe('#ededed');
 
     expect(chipColors('nope').background).toBe('#ededed');

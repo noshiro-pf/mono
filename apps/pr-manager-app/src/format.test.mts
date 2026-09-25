@@ -1,14 +1,4 @@
-import { describeAge, describeComparison } from './format.mjs';
-
-describe(describeComparison, () => {
-  test('writes both counts, the behind one being the one that blocks', () => {
-    expect(describeComparison({ aheadBy: 3, behindBy: 12 })).toBe('+3 / -12');
-  });
-
-  test('says so when the comparison could not be read', () => {
-    expect(describeComparison(null)).toBe('ahead/behind unread');
-  });
-});
+import { describeAge } from './format.mjs';
 
 describe(describeAge, () => {
   const noon = 1_758_384_000_000;

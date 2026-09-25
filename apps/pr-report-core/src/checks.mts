@@ -100,6 +100,39 @@ const outranks = (run: CheckRunReport, previous: CheckRunReport): boolean =>
     : run.checkSuiteId > previous.checkSuiteId;
 
 /**
+ * What every context has reported on one commit, from both places GitHub
+ * keeps them. The aggregate jobs are check runs; `no-skip-ci-label` is a
+ * commit status, so reading only the first would report the context that
+ * holds every labelled pull request as missing.
+ *
+ * `state` is a commit status's as the REST API spells it, in lower case.
+ */
+export const reportedContexts = (
+  runs: readonly CheckRunReport[],
+  statuses: readonly Readonly<{ context: string; state: string }>[],
+): ReadonlyMap<string, ContextState> => {
+  // A commit status and a check run of the same name are two requirements,
+  // not one reported twice: GitHub asks both to pass. So the stricter of
+  // the two is kept rather than whichever was read second.
+  const mut_states = new Map<string, ContextState>(statesFromCheckRuns(runs));
+
+  for (const { context, state } of statuses) {
+    const fromStatus = classifyCommitStatus(state);
+
+    const reported = mut_states.get(context);
+
+    mut_states.set(
+      context,
+      reported === undefined
+        ? fromStatus
+        : combineContextStates(reported, fromStatus),
+    );
+  }
+
+  return mut_states;
+};
+
+/**
  * What a context reported that is both a check run and a commit status.
  *
  * Not "the status wins", which is what this used to assume. GitHub's own

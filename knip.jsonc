@@ -594,9 +594,9 @@
     },
 
     // Not an Astro site like the entry above assumes: a single entry point.
-    // The contract between `pr-report` and the app below, which is the only
-    // reason it is a package of its own.
-    "apps/pr-report-payload": {
+    // What `pr-report` and the app below share, which is the only reason it
+    // is a package of its own.
+    "apps/pr-report-core": {
       "entry": ["src/index.mts", "configs/*.mts", "scripts/**/*.mts"],
       "project": ["**/*.mts"],
     },

@@ -1,82 +1,60 @@
 import * as React from 'react';
-import { Arr, type Result } from 'ts-data-forge';
-import { type LoadedReport, type LoadedRunLog } from '../fetch-report.mjs';
+import { Arr } from 'ts-data-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
+import { MERGED_WITHIN_DAYS, type LoadedReport } from '../load-report.mjs';
 import { CyclesSection } from './cycles-section.js';
-import { ExternalLink } from './external-link.js';
 import { MergeOrder } from './merge-order.js';
 import { MergedSection } from './merged-section.js';
-import { RunLogSection } from './run-log-section.js';
 import { SummaryRow } from './summary-row.js';
 
 type Props = Readonly<{
   report: LoadedReport;
-  /** The log, or the sentence saying why the page has not got one. */
-  runLog: Result<LoadedRunLog, string>;
-  /** Passed in so that "generated 3 hours ago" is a function of its inputs. */
+  /** Passed in so that "read 3 minutes ago" is a function of its inputs. */
   nowMs: number;
 }>;
 
-/** A report that loaded: the counts, the queue, what landed, and the caveats. */
+/** A report that loaded: the counts, the queue, and what landed. */
 export const ReportView = React.memo<Props>((props) => {
-  const { report, runLog, nowMs } = props;
-
-  const { payload, sourceUrl } = report;
+  const { report, nowMs } = props;
 
   const repoUrl =
-    `https://github.com/${payload.repo.owner}/${payload.repo.name}` as const;
+    `https://github.com/${report.repo.owner}/${report.repo.name}` as const;
 
   const byNumber = new Map(
-    payload.entries.map((entry) => [entry.number, entry]),
+    report.entries.map((entry) => [entry.number, entry]),
   );
 
   return (
     <>
       <p className={'page-subtitle'}>
-        {`Generated ${describeAge(payload.generatedAtEpochMs, nowMs)} `}
-        <ExternalLink href={sourceUrl}>{'from the report data'}</ExternalLink>
-        {' · '}
-
-        {/* The UTC the report was written in stays on hover and in the DOM. */}
-        <time dateTime={payload.generatedAt} title={payload.generatedAt}>
-          {formatLocalTime(payload.generatedAtEpochMs)}
-        </time>
+        {`Read from GitHub ${describeAge(report.readAtEpochMs, nowMs)} · `}
+        {formatLocalTime(report.readAtEpochMs)}
       </p>
 
-      <SummaryRow summary={payload.summary} />
+      <SummaryRow summary={report.summary} />
 
       <section className={'section'}>
         <h2 className={'section-title'}>{'Merge order'}</h2>
-        {Arr.isNonEmpty(payload.entries) ? (
+        {Arr.isNonEmpty(report.entries) ? (
           <MergeOrder
             byNumber={byNumber}
-            nodes={payload.roots}
-            scaleMax={divergenceScale(payload.entries)}
+            nodes={report.roots}
+            scaleMax={divergenceScale(report.entries)}
           />
         ) : (
           <p className={'section-note'}>{'No open pull requests.'}</p>
         )}
       </section>
 
-      {Arr.isNonEmpty(payload.cycles) ? (
-        <CyclesSection cycles={payload.cycles} repoUrl={repoUrl} />
+      {Arr.isNonEmpty(report.cycles) ? (
+        <CyclesSection cycles={report.cycles} repoUrl={repoUrl} />
       ) : undefined}
 
       <MergedSection
-        merged={payload.merged}
+        merged={report.merged}
         nowMs={nowMs}
-        withinDays={payload.mergedWithinDays}
+        withinDays={MERGED_WITHIN_DAYS}
       />
-
-      <RunLogSection nowMs={nowMs} repoUrl={repoUrl} runLog={runLog} />
-
-      {payload.authenticated ? undefined : (
-        <p className={'footnote'}>
-          {
-            'This report was read without a token: the linked issues are the ones the bodies declare with a closing keyword, not GitHub’s own list.'
-          }
-        </p>
-      )}
     </>
   );
 });
@@ -90,12 +68,12 @@ ReportView.displayName = 'ReportView';
  */
 const divergenceScale = (
   entries: readonly Readonly<{
-    comparison: Readonly<{ aheadBy: number; behindBy: number }> | null;
+    comparison: Readonly<{ aheadBy: number; behindBy: number }> | undefined;
   }>[],
 ): number =>
   Math.max(
     1,
     ...entries.flatMap(({ comparison }) =>
-      comparison === null ? [] : [comparison.aheadBy, comparison.behindBy],
+      comparison === undefined ? [] : [comparison.aheadBy, comparison.behindBy],
     ),
   );

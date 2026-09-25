@@ -1,23 +1,14 @@
 /**
- * The optional token, and the one thing it buys.
+ * The token, which the page cannot read anything without.
  *
- * This page reads two JSON files out of a public repository and nothing
- * else, so a token gives it no data it could not already see. What it gives it is the
- * rate limit. GitHub allows an anonymous caller 60 requests an hour for the
- * whole address the browser sits behind and charges it for a `304` as well
- * as for a `200`, which is what holds the poll at two minutes. It allows an
- * authenticated caller 5,000 an hour and charges nothing at all for a `304`,
- * so the same page with a token can look every fifteen seconds and spend
- * less doing it.
- *
- * That is the whole of it, and two things follow. The page has to work
- * without a token, because it is a convenience rather than a requirement.
- * And the token may be the weakest one GitHub can mint — the limit is
- * charged to the account, not to what the token is allowed to reach — which
- * is why the panel asks for one with no permissions rather than one that can
- * read issues. Nothing here ever sends it anywhere but `api.github.com`, and
- * the `Content-Security-Policy` the build writes into `index.html` is what
- * makes that a property of the page rather than a promise about its code.
+ * GitHub's GraphQL API answers nobody without one, and GraphQL is what makes
+ * the page affordable: one query for every open pull request rather than
+ * three REST requests for each. What the token needs is no permission at
+ * all — the repository is public — so the panel asks for the weakest one
+ * GitHub can mint. Nothing here ever sends it anywhere but `api.github.com`,
+ * and the `Content-Security-Policy` the build writes into `index.html` is
+ * what makes that a property of the page rather than a promise about its
+ * code.
  *
  * **Where it is kept is the reader's choice, and the default is the cautious
  * one.** `sessionStorage` belongs to the one tab and is gone when the tab
@@ -51,7 +42,7 @@ export type StoredToken = Readonly<{ value: string; store: TokenStore }>;
 /**
  * The part of `Storage` this needs, which is also the whole of what a test
  * has to stand in for. Taken as an argument rather than reached for, in the
- * same way and for the same reason as `Fetch` in `fetch-report.mts`: what is
+ * same way and for the same reason as `Fetch` in `graphql.mts`: what is
  * left implicit is what no test reads.
  */
 export type KeyValueStore = Readonly<{

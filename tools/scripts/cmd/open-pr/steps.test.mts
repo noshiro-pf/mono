@@ -1,4 +1,4 @@
-import { SKIP_CI_LABEL } from '../unblock-prs/labels.mjs';
+import { SKIP_CI_LABEL } from 'pr-report-core';
 import { armBlockedBy, isArmed, mergeAfterTrailer } from './steps.mjs';
 import { type PullRequest } from './types.mjs';
 

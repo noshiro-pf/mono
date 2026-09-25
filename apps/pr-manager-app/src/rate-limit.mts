@@ -1,26 +1,21 @@
 /**
- * What GitHub says is left of the budget this page is spending.
+ * What GitHub says is left of the GraphQL budget this page is spending.
  *
- * Worth showing rather than assuming, for two reasons. The anonymous budget
- * belongs to the address rather than to the page, so a reader behind an
- * office or a university address can arrive at a page that is already out of
- * requests through no act of their own, and a number on screen is the
- * difference between that and "the report is broken". And it is how a reader
- * sees that a token they pasted is being accepted: the limit goes from 60 to
- * 5,000 the moment GitHub accepts it, which no other part of the page would
- * show.
+ * Worth showing rather than assuming: the budget belongs to the token's
+ * account, not to the page, so whatever else that account does with GraphQL
+ * — `gh` included — spends the same 5,000 points an hour, and a number on
+ * screen is the difference between that and "the page is broken".
  *
- * The headers arrive on every answer including a `304` — GitHub names them
- * in `Access-Control-Expose-Headers` on that answer too, which is what makes
- * them readable from a page served somewhere else.
+ * GitHub names these headers in `Access-Control-Expose-Headers`, which is
+ * what makes them readable from a page served somewhere else.
  */
 
 import { Num, Result } from 'ts-data-forge';
 
 export type RateLimit = Readonly<{
-  /** Requests left in the current window. */
+  /** Points left in the current window. */
   remaining: number;
-  /** The size of the window: 60 without a token, 5,000 with one. */
+  /** The size of the window: 5,000 points for a personal token. */
   limit: number;
   /** When the window refills, as epoch milliseconds. */
   resetEpochMs: number;
@@ -48,9 +43,8 @@ export const readRateLimit = (headers: Headers): RateLimit | undefined => {
 /**
  * Whether the budget has fallen far enough to be worth saying out loud.
  *
- * A fraction rather than a count, so that the same test reads correctly for
- * both windows: a quarter of 60 is a reader who has minutes left, and a
- * quarter of 5,000 is a reader who has a problem somewhere else.
+ * A fraction rather than a count, so that the test reads correctly whatever
+ * size of window GitHub gives the account.
  */
 export const isRunningLow = (rateLimit: RateLimit): boolean =>
   rateLimit.remaining <= rateLimit.limit * LOW;

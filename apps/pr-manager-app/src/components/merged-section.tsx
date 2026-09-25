@@ -1,13 +1,13 @@
-import { type PayloadMerged } from 'pr-report-payload';
 import * as React from 'react';
 import { Arr } from 'ts-data-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
+import { type Merged } from '../load-report.mjs';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
 
 type Props = Readonly<{
-  merged: readonly PayloadMerged[];
+  merged: readonly Merged[];
   withinDays: number;
   nowMs: number;
 }>;

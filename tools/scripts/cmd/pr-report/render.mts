@@ -1,15 +1,15 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
-import { Arr } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
-import { MERGE_QUEUED_LABEL } from '../unblock-prs/labels.mjs';
-import { summarize } from './summarize.mjs';
 import {
+  MERGE_QUEUED_LABEL,
+  summarize,
   type ChecksSummary,
   type PrReport,
   type ReportEntry,
   type TreeNode,
-} from './types.mjs';
+} from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 const EMPTY = 'No open pull requests.';
 
@@ -25,17 +25,12 @@ const GLYPH = {
 >;
 
 /**
- * The report as Markdown, for the file on the report's branch, the run
- * summary, or the Claude app.
+ * The report as Markdown, for pasting into GitHub or a conversation with
+ * Claude.
  *
  * The merge order is a nested list rather than a table because the nesting
  * *is* the information — a table would have to spell the tree back out in a
  * column, and a reader would have to rebuild it.
- *
- * Prose only. The machine-readable copy the Pull Requests Manager app reads
- * used to be a collapsed JSON block at the bottom of this; it is now a file
- * on a branch of its own, written by the same run — see
- * `apps/pr-report-payload`, and `--format payload` for the other half.
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
@@ -135,11 +130,11 @@ const heading = (report: PrReport): string => `# ${title(report)}` as const;
 /**
  * One line saying how much there is and how much of it wants attention, so
  * that a reader who opens the report and closes it again has still learnt
- * the only thing a daily report has to tell them. The same counts travel in
- * the payload, from the same {@link summarize}.
+ * the only thing a daily report has to tell them. The Pull Requests
+ * Manager page leads with the same counts, from the same {@link summarize}.
  */
 const summary = (report: PrReport): string => {
-  const counts = summarize(report);
+  const counts = summarize(report.entries);
 
   return [
     `**${counts.open} open**`,

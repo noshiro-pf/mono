@@ -1,8 +1,12 @@
 // cspell:ignore ededed
 
+import {
+  buildReport,
+  type Label,
+  type PrReport,
+  type PullRequestFacts,
+} from 'pr-report-core';
 import { renderMarkdown, renderTerminal } from './render.mjs';
-import { buildReport } from './report.mjs';
-import { type Label, type PrReport, type PullRequestFacts } from './types.mjs';
 
 /** Labels by name alone, for the tests that do not care what colour they are. */
 const labelled = (...names: readonly string[]): readonly Label[] =>

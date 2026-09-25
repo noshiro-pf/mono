@@ -1,8 +1,8 @@
-import { type PayloadLabel } from 'pr-report-payload';
+import { type Label } from 'pr-report-core';
 import * as React from 'react';
 import { chipColors } from '../label-color.mjs';
 
-type Props = Readonly<{ label: PayloadLabel }>;
+type Props = Readonly<{ label: Label }>;
 
 /**
  * One label, in the colour GitHub gives it.

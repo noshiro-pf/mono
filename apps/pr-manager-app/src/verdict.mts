@@ -1,6 +1,6 @@
 /** How a check verdict is shown. */
 
-import { type PayloadChecks } from 'pr-report-payload';
+import { type ChecksSummary } from 'pr-report-core';
 
 /**
  * The four reserved status roles of the palette. `neutral` is not one of them
@@ -37,7 +37,7 @@ export type VerdictPresentation = Readonly<{
  * a queue of them read as a wall of failures.
  */
 export const presentVerdict = (
-  verdict: PayloadChecks['verdict'],
+  verdict: ChecksSummary['verdict'],
 ): VerdictPresentation => {
   switch (verdict) {
     case 'passed':
