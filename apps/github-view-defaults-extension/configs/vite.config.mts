@@ -1,6 +1,8 @@
 import * as path from 'node:path';
 import { defineConfig } from 'vite';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { writeManifestVersion } from '../../../tools/configs/chrome-extension-manifest.mjs';
 
 /**
  * The whole build: one content script, and the manifest and icons beside it.
@@ -9,14 +11,19 @@ import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
  * cannot carry `import` statements. Library mode with the `iife` format emits
  * one self-contained file, which is what the manifest names.
  *
- * `public/` is copied verbatim by Vite's `publicDir` handling, so `dist/` is
- * what `chrome://extensions` loads as-is.
+ * `public/` is copied by Vite's `publicDir` handling, the manifest given the
+ * `package.json` version on the way, so `dist/` is what `chrome://extensions`
+ * loads as-is.
  */
+const outDir = path.resolve(workspaceRootPath, 'dist');
+
 export default defineConfig({
   root: workspaceRootPath,
 
+  plugins: [writeManifestVersion({ packageRoot: workspaceRootPath, outDir })],
+
   build: {
-    outDir: path.resolve(workspaceRootPath, 'dist'),
+    outDir,
     emptyOutDir: true,
     sourcemap: true,
 

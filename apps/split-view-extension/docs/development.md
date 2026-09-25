@@ -60,6 +60,12 @@ on the extension's card in `chrome://extensions`.
 what Chrome attributes a pane's request to and which framing headers arrive —
 the way to make "this pane will not load" answerable.
 
+The version is the one in `package.json`, and a changeset is what raises it:
+`pnpm changeset` from the repository root for any change the extension ships,
+`minor` for a feature and `patch` for a fix. The build writes it into
+`dist/manifest.json`; `public/manifest.json` carries none, and the build fails
+if it does.
+
 Publishing it is [`store-listing.md`](./store-listing.md): the copy for every
 field of the dashboard, a justification per permission, and what to expect from
 the review of an extension that strips framing headers. The screenshots it

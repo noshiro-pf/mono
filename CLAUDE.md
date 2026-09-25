@@ -348,8 +348,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
 ## Releases
 
 Changesets only; do not reintroduce `semantic-release`. `pnpm changeset` for
-any user-visible change to a `libs/` package; `.changeset/` at the root is
-the only one. **A package's first publish is manual** (`libs/first-release.md`).
+any user-visible change to a `libs/` package or a Chrome extension (`minor` for
+a feature, `patch` for a fix); `.changeset/` at the root is the only one. An
+extension's version is its `package.json`'s, which the build writes into
+`dist/manifest.json`, so without a changeset its next store upload is refused
+as not newer. **A package's first publish is manual** (`libs/first-release.md`).
 Tags are `<package-name>@<version>`; repository-prefixed tags are imported
 history, never create new ones. `changeset:version-packages` formats
 `strict-lib/` before regenerating the bundles, because `changeset version`

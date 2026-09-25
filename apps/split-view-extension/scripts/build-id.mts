@@ -5,7 +5,7 @@
  * It exists so that the split view can say which build it is running. An
  * unpacked extension is reloaded by hand, and "did the reload take?" is
  * otherwise unanswerable from the page — the manifest's version only changes
- * when someone edits it.
+ * on a release.
  */
 const adjectives: readonly string[] = [
   'brave',

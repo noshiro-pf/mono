@@ -22,7 +22,7 @@ GitHub View Defaults
 **Summary** (132 characters)
 
 ```text
-Opens GitHub pull request diffs with whitespace hidden and reviewed files collapsed, and the branches page as the full list.
+Opens GitHub PR diffs with whitespace hidden and viewed files collapsed, branches as the full list, and numbers PR and issue tabs.
 ```
 
 **Description**
@@ -49,8 +49,12 @@ the ordinary GitHub page, opened the way you would have set it up by hand.
   reaches the overview and stays there when you reload it.
 • The address is the whole of it. What you get depends on the address you open
   and nothing else, so a link, a typed URL, a bookmark and a reload all agree.
-• Two kinds of page, and no others. Pull request diffs and the branch overview.
-  Commit pages, comparisons and the rest of GitHub are untouched.
+• Numbered tabs. A pull request or an issue gets its number at the front of
+  the tab title — "#1234 Fix the thing" — so a row of narrow tabs still says
+  which is which.
+• Two kinds of page, and no others. Pull request diffs and the branch overview
+  have their address changed; pull requests and issues have their tab title
+  numbered. Commit pages, comparisons and the rest of GitHub are untouched.
 • Nothing is collected, stored or sent. No account, no analytics, no server, no
   storage permission. It runs on github.com and nowhere else.
 
@@ -69,7 +73,8 @@ The store asks for one sentence, and means it:
 Opens GitHub pages at the view their own controls would have to be clicked to
 reach — pull request diffs with whitespace-only changes hidden and viewed files
 collapsed, and a repository's branches as the full list — so that view does not
-have to be chosen by hand on every page.
+have to be chosen by hand on every page, and titles pull request and issue tabs
+with their number first so they can be told apart.
 ```
 
 ## Permission justifications
@@ -83,9 +88,11 @@ one thing to justify is the content script.
 The extension's only job is to send two kinds of GitHub URL to the view they
 would otherwise have to be clicked into. Deciding whether the current page is
 such a URL, and rewriting the links on the page that point at one, has to
-happen in the page. The script reads the page's address and the href of its
-links, and nothing else — no page content, no form fields, no cookies, no
-storage. It is declared for github.com alone and runs nowhere else.
+happen in the page, and so does putting a pull request's or an issue's number
+at the front of its tab title. The script reads the page's address, the href of
+its links and the page title, and nothing else — no other page content, no form
+fields, no cookies, no storage. It is declared for github.com alone and runs
+nowhere else.
 ```
 
 **Remote code**: No. The one script in the package is in the package; nothing

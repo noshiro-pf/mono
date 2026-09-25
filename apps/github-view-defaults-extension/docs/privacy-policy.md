@@ -1,6 +1,6 @@
 # GitHub View Defaults — privacy policy
 
-Last updated: 2026-09-19
+Last updated: 2026-09-25
 
 **GitHub View Defaults collects nothing, stores nothing, and sends nothing.**
 There is no account, no analytics, no telemetry, no server and no third party
@@ -15,17 +15,20 @@ page, and is gone when the page is left.
 
 ## What it reads
 
-One script runs on `https://github.com` pages, and reads two kinds of thing:
+One script runs on `https://github.com` pages, and reads three kinds of thing:
 
-- **The address of the page**, to decide whether it is a pull request diff or a
-  repository's branch overview.
+- **The address of the page**, to decide whether it is a pull request diff, a
+  repository's branch overview, or a pull request or issue whose number goes
+  in the tab title.
 - **The `href` of the links on the page**, to decide which of them point at
   one.
+- **The title of the page** — the text of the tab — on a pull request or an
+  issue, to put its number in front of it.
 
 That is all of it. It does not read the address the page was reached from: an
 earlier version read `document.referrer` for one decision, and that decision is
-now made from the address itself. It does not read page content, diffs, comments, form fields,
-cookies or storage, and it reads nothing at all on any other site: the
+now made from the address itself. It does not read any other page content —
+diffs, comments, form fields — nor cookies or storage, and it reads nothing at all on any other site: the
 extension is declared for `github.com` and is not injected anywhere else.
 
 ## What it changes
@@ -39,6 +42,8 @@ extension is declared for `github.com` and is not injected anywhere else.
   tab so that the overview stays reachable.
 - It makes the same two changes to links on the page that point at such an
   address.
+- It puts the number of a pull request or an issue, as `#1234`, at the front of
+  that page's tab title.
 
 Nothing else on the page is touched, and nothing is added to any request.
 

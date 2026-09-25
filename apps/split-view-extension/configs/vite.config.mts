@@ -4,6 +4,8 @@ import { Arr, isRecord } from 'ts-data-forge';
 import { defineConfig, type Plugin as VitePlugin } from 'vite';
 import { makeBuildId } from '../scripts/build-id.mjs';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { writeManifestVersion } from '../../../tools/configs/chrome-extension-manifest.mjs';
 
 /**
  * The permissions the diagnostics need, and nothing else needs.
@@ -68,19 +70,28 @@ const stripCrossOriginAttribute = (): VitePlugin => ({
  * script cannot be a module, so it needs its own format. See
  * `vite.content.config.mts`.
  *
- * `public/manifest.json` is copied verbatim by Vite's `publicDir` handling, so
- * `dist/` is what `chrome://extensions` loads as-is.
+ * `public/manifest.json` is copied by Vite's `publicDir` handling and given the
+ * `package.json` version on the way, so `dist/` is what `chrome://extensions`
+ * loads as-is.
  */
 export default defineConfig(({ mode }) => {
   /** A development build carries the diagnostics; a production build does not. */
   const diagnostics = mode !== 'production';
 
+  const outDir = path.resolve(workspaceRootPath, 'dist');
+
+  const manifestVersion = writeManifestVersion({
+    packageRoot: workspaceRootPath,
+    outDir,
+  });
+
   const plugins = diagnostics
     ? [
         stripCrossOriginAttribute(),
-        addDiagnosticPermissions(path.resolve(workspaceRootPath, 'dist')),
+        manifestVersion,
+        addDiagnosticPermissions(outDir),
       ]
-    : [stripCrossOriginAttribute()];
+    : [stripCrossOriginAttribute(), manifestVersion];
 
   return {
     root: workspaceRootPath,
@@ -100,7 +111,7 @@ export default defineConfig(({ mode }) => {
     base: './',
 
     build: {
-      outDir: path.resolve(workspaceRootPath, 'dist'),
+      outDir,
       emptyOutDir: true,
       sourcemap: true,
 

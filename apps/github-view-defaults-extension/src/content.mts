@@ -1,3 +1,4 @@
+import { numberedTitleOf } from './page-title.mjs';
 import {
   isSettledLink,
   managedPagePathOf,
@@ -8,8 +9,8 @@ import {
 /**
  * The content script, injected into github.com at `document_start`.
  *
- * It does two things, and the second is what makes the first almost never
- * happen:
+ * It does two things about addresses, and the second is what makes the first
+ * almost never happen:
  *
  * - **It redirects the page it lands on**, when that page is one the rules
  *   speak for and it was not opened the way they want it. This is the fallback
@@ -23,6 +24,9 @@ import {
  * `document_start` is what makes the redirect cheap: the script runs before the
  * document is parsed, so the load it abandons is a response that had barely
  * begun to render.
+ *
+ * Apart from those, it puts a pull request's or an issue's number at the front
+ * of the tab title. See `page-title.mts`.
  */
 
 // Neither `window.location`, `globalThis.location` nor a bare `location`
@@ -31,6 +35,11 @@ import {
 // it something that is none of the three; the same dance as `browserHistory`
 // in `split-view-extension`'s frame agent.
 const { location: browserLocation } = globalThis;
+
+// `document.title = …` is a mutation the lint rules reject unless the object it
+// is reached through is named as mutable — the same trick as `mut_page` in
+// `split-view-extension`'s `tab-identity.mts`. Only the title goes through it.
+const { document: mut_page } = globalThis;
 
 /**
  * Elements already looked at, so that a rescan does not re-parse every `href`
@@ -62,10 +71,30 @@ const listening = new WeakSet<Element>();
  */
 const mut_settledPages = new Set<string>();
 
+/**
+ * The title this script last wrote, the title it was written over, and the
+ * title the document reported straight after.
+ *
+ * `shown` is kept apart from `written` because the `document.title` getter
+ * collapses whitespace, so what reads back is not always what was written; a
+ * comparison against `written` alone would write again on every mutation, and
+ * every write is a mutation.
+ *
+ * `base` is what lets a client-side navigation from one pull request to another
+ * renumber the title rather than stack a second number in front of the first,
+ * for the moment the address has changed and GitHub's new title has not
+ * arrived.
+ */
+const mut_ownTitle: {
+  last: Readonly<{ base: string; written: string; shown: string }> | undefined;
+} = { last: undefined };
+
 const main = (): void => {
   applyPreferredUrlToThisPage();
 
   patchNewAnchors();
+
+  applyNumberToTitle();
 
   watchForChanges();
 };
@@ -107,6 +136,34 @@ const applyPreferredUrlToThisPage = (): void => {
   // the user looked at, so it does not belong in the history. Going back from
   // here should leave the pull request, not bounce through a redirect.
   browserLocation.replace(next);
+};
+
+/**
+ * Puts the pull request's or issue's number at the front of the tab title,
+ * whenever the title or the address has moved on from what was last written.
+ *
+ * GitHub rewrites the title on every client-side navigation, so this is asked
+ * on every batch of mutations rather than once; asking costs a URL parse and a
+ * few string comparisons.
+ */
+const applyNumberToTitle = (): void => {
+  const current = document.title;
+
+  // What this script wrote, if the title still reads as it did straight after.
+  const ours =
+    mut_ownTitle.last?.shown === current ? mut_ownTitle.last : undefined;
+
+  const base = ours?.base ?? current;
+
+  const next = numberedTitleOf(base, browserLocation.href);
+
+  if (next === current || next === ours?.written) {
+    return;
+  }
+
+  mut_page.title = next;
+
+  mut_ownTitle.last = { base, written: next, shown: mut_page.title };
 };
 
 /** Every element the page has grown since the last look. */
@@ -242,6 +299,11 @@ const watchForChanges = (): void => {
     if (mutations.some((mutation) => mutation.type !== 'attributes')) {
       patchNewAnchors();
     }
+
+    // Not behind either check above: a new title can arrive in a batch of its
+    // own, after the address it belongs to, and it arrives as a `childList`
+    // mutation of `<title>` like any other.
+    applyNumberToTitle();
   });
 
   observer.observe(document, {

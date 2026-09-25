@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "Split View",
   "description": "Splits one tab into a grid of web pages.",
-  "version": "0.2.0",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0FWvfaJsCbrP2Ps2faotAcf2DuLySek2MEJeYDgm3bGFHLsSP6pUTkzQqcBAJPnMF6Fcw2Pff/0qDNeve5bx7VGiUW2ruG5o+CMdoziCKV7XwjIUFIxNG4Fucz/k0qDDHG74RktR+SidIkEM2vsHsbxp4icS/ELDGZ7MXeC+cO96d2rHHhp196bM1BmRkBK0Nl8mTrARg3b3Tp298co2u6yrgEQTlncuWtheBaf+pUcASMc+sEhTX98AKOvoLUXig+TUbwKkR2tmIwTDOKLeder8GWsfRIGNA87sdyPQRJ5OoM93DhRl/ZEc6a805ThJrKmkWzuw+CxjGLq0NMpzwIDAQAB",
   "minimum_chrome_version": "116",
   "action": {
