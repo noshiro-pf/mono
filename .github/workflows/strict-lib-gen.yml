@@ -41,7 +41,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
   cancel-in-progress: true
 
 permissions: {}
@@ -61,8 +61,8 @@ jobs:
   #   rewrite is under `strict-lib/`, which is not ignored.
   # - `apps/`, `languages/`: the generator imports nothing from them. Their
   #   `package.json` files are read by the `pnpm install` the generator runs
-  #   at the end, but "Install dependencies" above has already installed the
-  #   same lockfile, and `--frozen-lockfile` there fails first on a manifest
+  #   at the end, but the setup step below has already installed the same
+  #   lockfile, and `--frozen-lockfile` there fails first on a manifest
   #   the lockfile does not match.
   # - `LICENSE` and the style tools' own configuration (`.editorconfig`,
   #   `.prettierrc`, `.prettierignore`, `.cspell.config.yaml`,
@@ -86,7 +86,8 @@ jobs:
   # - `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`: a new oxfmt or
   #   TypeScript version changes the formatted and parsed output.
   # - `tools/`: `tsconfig.tsx.json` decides what those imports resolve to.
-  # - `.github/`: this workflow and check-gates.yml are in it.
+  # - `.github/`: this workflow, check-gates.yml and the setup action are in
+  #   it.
   #
   # When the generator starts reading something new, check it against the
   # list before relying on a green run.
@@ -98,7 +99,6 @@ jobs:
     permissions:
       actions: read
       contents: read
-      packages: read
     with:
       diff-scope: strict-lib
       result-job: strict-lib-gen-result
@@ -114,30 +114,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read
     timeout-minutes: 25
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version-file: 'package.json'
-          registry-url: https://npm.pkg.github.com/
-          scope: '@noshiro-pf'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up pnpm, Node.js and the dependencies
+        uses: ./.github/actions/setup
 
       # No `ws:build`. Every harness runs `tsx` with
       # `tools/configs/tsconfig.tsx.json`, which maps our packages to their
@@ -146,12 +132,9 @@ jobs:
       #
       # `temp/copied/` is tracked, so this step fetches nothing: it reformats
       # the upstream lib files, reruns the codemod and the converter, and
-      # regenerates `output/`. It ends with a `pnpm install` of its own, which
-      # is why the token is set here too.
+      # regenerates `output/`.
       - name: Regenerate the strict standard library
         run: pnpm run strict-lib:gen:with-codemod-fixed
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # `output/diff-from-prev/` compares consecutive series, so it has to run
       # after all of them have been regenerated.

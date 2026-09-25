@@ -393,6 +393,39 @@ describe('actions', () => {
       ].join('\n'),
     );
 
+    // A composite action carries pins as well, and a workflow that uses it
+    // carries none of them: a pin read only from `.github/workflows/` would
+    // never move again, and nothing would say so.
+    const actionDir = path.join(dir, '.github', 'actions', 'setup');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(actionDir, { recursive: true });
+
+    const action = path.join(actionDir, 'action.yml');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      action,
+      [
+        'runs:',
+        '  using: composite',
+        '  steps:',
+        '    - name: Install pnpm',
+        `      uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
+        '    - name: Set up Node.js',
+        `      uses: actions/setup-node@${sha('4')} # v7.0.0`,
+        '',
+      ].join('\n'),
+    );
+
+    // Not an action: only an `action.yml` is read under `.github/actions/`.
+    const notes = path.join(actionDir, 'notes.yml');
+
+    const notesText = `pin: actions/setup-node@${sha('4')} # v7.0.0\n` as const;
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(notes, notesText);
+
     installFakePnpm(dir, '{}');
 
     const releasesByRepo: ReadonlyRecord<string, readonly unknown[]> = {
@@ -414,11 +447,16 @@ describe('actions', () => {
         { tag_name: 'v1.2.4', published_at: realDaysAgo(30) },
         { tag_name: 'v1.2.3', published_at: realDaysAgo(90) },
       ],
+      'actions/setup-node': [
+        { tag_name: 'v7.0.1', published_at: realDaysAgo(10) },
+        { tag_name: 'v7.0.0', published_at: realDaysAgo(90) },
+      ],
     } as const;
 
     const commitShaByTag: ReadonlyRecord<string, string> = {
       'actions/checkout@v7.0.2': sha('b'),
       'owner/tool@v1.2.4': sha('c'),
+      'actions/setup-node@v7.0.1': sha('d'),
     } as const;
 
     const mut_requests: string[] = [];
@@ -493,7 +531,7 @@ describe('actions', () => {
         'pnpm/action-setup: v6.1.0 unchanged (held back by minimumReleaseAge: []; majors waiting for a human: [])\n',
       );
 
-      assert.include(stdout, 'Moved 3 action pin(s).\n');
+      assert.include(stdout, 'Moved 4 action pin(s).\n');
 
       assert.strictEqual(
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -511,11 +549,32 @@ describe('actions', () => {
         ].join('\n'),
       );
 
-      // One releases query per distinct pin, one commit lookup per move, all
+      assert.strictEqual(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFileSync(action, 'utf8'),
+        [
+          'runs:',
+          '  using: composite',
+          '  steps:',
+          '    - name: Install pnpm',
+          `      uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
+          '    - name: Set up Node.js',
+          `      uses: actions/setup-node@${sha('d')} # v7.0.1`,
+          '',
+        ].join('\n'),
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      assert.strictEqual(fs.readFileSync(notes, 'utf8'), notesText);
+
+      // One releases query per distinct pin — `pnpm/action-setup` is in both
+      // files and asked about once — one commit lookup per move, all
       // authenticated.
       assert.deepStrictEqual(mut_requests.toSorted(), [
         'Bearer fake-token /repos/actions/checkout/commits/v7.0.2',
         'Bearer fake-token /repos/actions/checkout/releases',
+        'Bearer fake-token /repos/actions/setup-node/commits/v7.0.1',
+        'Bearer fake-token /repos/actions/setup-node/releases',
         'Bearer fake-token /repos/owner/tool/commits/v1.2.4',
         'Bearer fake-token /repos/owner/tool/releases',
         'Bearer fake-token /repos/pnpm/action-setup/releases',

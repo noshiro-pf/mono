@@ -32,7 +32,7 @@ on:
 # The title is edited and the branch pushed to in bursts; only the last state
 # is worth a run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request_target', github.event.pull_request.number, github.ref) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 permissions:

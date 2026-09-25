@@ -29,7 +29,7 @@ on:
 # `success` would leave the pull request blocked with no label on it. The
 # newer event's run is the one whose answer is current.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request_target', github.event.pull_request.number, github.ref) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 permissions:

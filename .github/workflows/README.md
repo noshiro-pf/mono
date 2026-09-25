@@ -97,7 +97,7 @@ on:
 
 ```yaml
 concurrency:
-    group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'push' && github.sha) || github.ref }}
+    group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
     cancel-in-progress: true
 ```
 
@@ -166,11 +166,8 @@ not be noticed by the settings drift check, which runs from the private
 Grants that recur:
 
 - **`contents: read`** for a checkout.
-- **`packages: read`** wherever `setup-node` points the `@noshiro-pf` scope at
-  GitHub Packages (`registry-url` / `scope`), which the install then reaches
-  with `NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`.
 - **A caller's job-level `permissions` on the `gates` job** restating what
-  `check-gates.yml` declares (`actions`, `contents`, `packages`: read). A
+  `check-gates.yml` declares (`actions`, `contents`: read). A
   caller's job-level `permissions` is the ceiling for the workflow it calls,
   and permissions can be reduced along the chain, never elevated, so the
   top-level `{}` would otherwise leave the called workflow unable to check
@@ -183,7 +180,7 @@ Grants that recur:
 ```yaml
 - uses: actions/checkout@…
   with:
-      ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 ```
 
 The branch tip, not the merge commit GitHub synthesises for a `pull_request`
@@ -194,14 +191,55 @@ to be the diff the checks then run against. On a `push` or
 
 ### Setup
 
-Every job that runs repository code has the same four steps: checkout,
+```yaml
+- name: Checkout
+  uses: actions/checkout@…
+
+- name: Set up pnpm, Node.js and the dependencies
+  uses: ./.github/actions/setup
+```
+
+Every job that runs repository code starts with these two steps. The second
+is the composite action `.github/actions/setup/action.yml`:
 `pnpm/action-setup`, `actions/setup-node` with
 `node-version-file: 'package.json'` and `cache: 'pnpm'`, and
-`pnpm install --frozen-lockfile`. The Node version is therefore `volta.node`,
-which `check:root:node-support` holds equal to `targets.current` in
-`tools/configs/node-support.json`; the two workflows that pin another version
-(`node-version-compatibility.yml`, `node-support-update.yml`) resolve it from
-that file rather than writing it into the workflow.
+`pnpm install --frozen-lockfile`. It is the one place those action pins are
+written, rather than every job that takes the steps.
+
+- **The Node version is `volta.node`**, which `check:root:node-support` holds
+  equal to `targets.current` in `tools/configs/node-support.json`. The two
+  workflows that run another version (`node-version-compatibility.yml`,
+  `node-support-update.yml`) resolve it from that file in a step before this
+  one and pass it as `node-version`, rather than writing it into the
+  workflow.
+- **The inputs are the callers' real differences, and each caller says why**:
+  `engine-strict` in `node-version-compatibility.yml` and deliberately not in
+  `node-support-update.yml`'s canary, `ignore-scripts` in `release.yml`'s
+  publishing job, `install: false` in `pnpm-update.yml`, which changes pnpm
+  before it installs anything.
+- **The checkout stays in the caller.** A local action is read from the
+  workspace, so it cannot be resolved before something has checked it out.
+- **A composite action is a file in the tree**, read when its step starts
+  rather than when the run does (see "Jobs that hold a key"). It is safe
+  because it is the first step after the checkout, before anything has run
+  that could have rewritten it. Keep it there.
+- **The install is `tools/scripts/cmd/workflow-steps.mts install`**, which
+  also checks that each boolean input is `true` or `false`: a misspelt one
+  would otherwise read as `false`. The script is read later still, after
+  `setup-node` has run pnpm for its cache, and that is safe for a different
+  reason: the step goes on to run `pnpm install`, so whatever could have
+  rewritten the script runs there anyway, with the same reach. The same
+  script's `check-diff` is `check-gates.yml`'s diff step, for the same
+  reason. A step that must not trust the tree, such as the path check in
+  `pnpm-update.yml`'s `commit` job, stays inline; the script's header says
+  which steps may move there, and on which Node it has to run.
+- **A composite action cannot read `secrets`.** None is needed: nothing
+  installs from GitHub Packages any more, so no job points `setup-node` at it
+  or passes `NODE_AUTH_TOKEN` to the install.
+- **Composite actions live under `.github/actions/`**, which is where
+  `update-actions` reads pins besides the workflows, and the only other path
+  `pnpm-update.yml`'s `commit` job accepts in its patch. An action anywhere
+  else keeps its pins where they are, and nothing reports it.
 
 ### The gate: `check-gates.yml`
 
@@ -224,7 +262,6 @@ gates:
     permissions:
         actions: read
         contents: read
-        packages: read
     with:
         diff-scope: code # or style, strict-lib, none
         result-job: code-check-result
@@ -601,6 +638,26 @@ can only narrow what the App already holds), so that the push triggers the
   `skip-ci` on the version pull request on every run. Which label a bot opens
   with is the whole statement of whether it is queued.
 
+## Expressions
+
+**`&&` and `||` join booleans, and nothing else.** An expression that
+chooses a value is `case(pred1, val1, …, default)`, not
+`cond && a || b`, which silently yields `b` whenever `a` is empty, `0` or
+`false`. The same goes for the fallback that `a || b` reads as:
+
+- **Choose by the event** when the value depends on it:
+  `case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha)`.
+  The event name has to be one the workflow triggers on, or the predicate
+  is a constant; `check:root:workflow-event-name` holds every such
+  comparison to the triggers (see "Concurrency").
+- **Test a value that may be missing with `!= ''`**:
+  `case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main')`.
+  A missing property is `null`, and `null != ''` is `false`, because a
+  comparison between a string and `null` converts both to numbers, and both
+  convert to `0`.
+
+Nothing checks this; a review does.
+
 ## Adding or changing a workflow
 
 - **A new job or workflow that should block a merge** needs its aggregate
@@ -619,9 +676,11 @@ can only narrow what the App already holds), so that the push triggers the
   `check:root:workflow-event-name`, `check:root:workflow-run-names`,
   `check:root:node-support`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
-- **`.github/workflows/` is owned in `.github/CODEOWNERS`**, so a change here
-  waits for the owner's review, and a bot's pull request that touches it does
-  not auto-merge. The action pins are the one thing a bot writes here.
+- **`.github/workflows/` and `.github/actions/` are owned in
+  `.github/CODEOWNERS`**, so a change there waits for the owner's review, and
+  a bot's pull request that touches either does not auto-merge. The action
+  pins are the one thing a bot writes there.
 - **Action pins are SHAs with a version comment**, moved by `update-actions`
   within their major; a major waits for a human (see "Dependencies" in
-  `CLAUDE.md`).
+  `CLAUDE.md`). A pin the setup action already carries belongs there, not in
+  a workflow (see "Setup").

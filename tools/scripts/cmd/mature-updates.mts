@@ -35,11 +35,14 @@ import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
  * one adds the `pnpm` npm package to switch, `@pnpm/exe.*` optional
  * dependencies and all.
  *
- * **`actions`** moves every `uses: owner/repo@<sha> # vX.Y.Z` pin under
- * `.github/workflows/` to the newest release of the same major that is older
- * than the hold. `pnpm update --include-github-actions` cannot apply the
- * hold: it resolves action versions from `git ls-remote` refs, which carry a
- * tag name and a SHA but no publication date. GitHub's Releases API carries
+ * **`actions`** moves every `uses: owner/repo@<sha> # vX.Y.Z` pin in the
+ * workflows (`.github/workflows/*.yml`) and in the composite actions they call
+ * (an `action.yml` at any depth under `.github/actions/`) to the newest
+ * release of the same major that is older than the hold. A pin anywhere else
+ * is not read, and nothing says so: it simply stops moving.
+ * `pnpm update --include-github-actions` cannot apply the hold: it resolves
+ * action versions from `git ls-remote` refs, which carry a tag name and a SHA
+ * but no publication date. GitHub's Releases API carries
  * `published_at`, so that is what this reads, and the tag is resolved to its
  * commit through the Commits API — the same SHA pin pnpm writes. A major
  * still waits for a human, as before; it is reported, not taken. Set
@@ -200,13 +203,12 @@ const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
 
 export const updateActionPins = async (
   options: Readonly<{
-    workflowsDir?: string;
+    githubDir?: string;
     api?: GitHubApi;
     now?: number;
   }> = {},
 ): Promise<void> => {
-  const workflowsDir =
-    options.workflowsDir ?? path.join(process.cwd(), '.github', 'workflows');
+  const githubDir = options.githubDir ?? path.join(process.cwd(), '.github');
 
   const api = options.api ?? createGitHubApi();
 
@@ -218,7 +220,7 @@ export const updateActionPins = async (
 
   console.log(describeHold(hold, cutoff));
 
-  const pins = readActionPins(workflowsDir);
+  const pins = readActionPins(githubDir);
 
   const groups = Object.groupBy(pins, (pin) => `${pin.repo}@${pin.tag}`);
 
@@ -255,7 +257,7 @@ export const updateActionPins = async (
       continue;
     }
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- workflow files found above.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
     const lines = fs.readFileSync(file, 'utf8').split('\n');
 
     const rewritten = fileUpdates.reduce(
@@ -264,7 +266,7 @@ export const updateActionPins = async (
       lines,
     );
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- workflow files found above.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- files found by `listPinnedFiles`.
     fs.writeFileSync(file, rewritten.join('\n'));
   }
 
@@ -392,7 +394,7 @@ export const renderActionPin = (
   `${pin.prefix}${pin.repo}${pin.subpath}@${pin.sha} # ${pin.tag}` as const;
 
 export type ActionPin = Readonly<{
-  /** Absolute path of the workflow file. */
+  /** Absolute path of the workflow or `action.yml`. */
   file: string;
   /** Zero-based line index within `file`. */
   line: number;
@@ -432,25 +434,50 @@ export type GitHubApi = Readonly<{
 
 type ActionPinUpdate = Readonly<{ pin: ActionPin; tag: string; sha: string }>;
 
-const readActionPins = (workflowsDir: string): readonly ActionPin[] =>
+const readActionPins = (githubDir: string): readonly ActionPin[] =>
+  listPinnedFiles(githubDir).flatMap((file) =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow or an `action.yml`.
+    fs
+      .readFileSync(file, 'utf8')
+      .split('\n')
+      .flatMap((text, line) => {
+        const pin = parseActionPinLine(text);
+
+        return pin === undefined ? [] : [{ ...pin, file, line }];
+      }),
+  );
+
+/**
+ * Where a pin can be: the workflows, which GitHub reads from
+ * `.github/workflows/` alone, and the composite actions, which can live
+ * anywhere in the tree and are kept under `.github/actions/` so that this
+ * finds them. `pnpm-update.yml` allows the same two sets of paths in the patch
+ * its `commit` job applies; a third place has to be added to both.
+ */
+const listPinnedFiles = (githubDir: string): readonly string[] => {
+  const workflowsDir = path.join(githubDir, 'workflows');
+
+  const actionsDir = path.join(githubDir, 'actions');
+
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- the workflows directory.
-  fs
+  const workflows = fs
     .readdirSync(workflowsDir)
     .filter((name) => /\.ya?ml$/u.test(name))
-    .toSorted()
-    .flatMap((name) => {
-      const file = path.join(workflowsDir, name);
+    .map((name) => path.join(workflowsDir, name));
 
-      // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow file.
-      return fs
-        .readFileSync(file, 'utf8')
-        .split('\n')
-        .flatMap((text, line) => {
-          const pin = parseActionPinLine(text);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- the actions directory.
+  const hasActions = fs.existsSync(actionsDir);
 
-          return pin === undefined ? [] : [{ ...pin, file, line }];
-        });
-    });
+  const actions = hasActions
+    ? // eslint-disable-next-line security/detect-non-literal-fs-filename -- the actions directory.
+      fs
+        .readdirSync(actionsDir, { encoding: 'utf8', recursive: true })
+        .filter((name) => /^action\.ya?ml$/u.test(path.basename(name)))
+        .map((name) => path.join(actionsDir, name))
+    : ([] as const);
+
+  return [...workflows, ...actions].toSorted();
+};
 
 const describeSelection = (
   pin: ActionPin,
