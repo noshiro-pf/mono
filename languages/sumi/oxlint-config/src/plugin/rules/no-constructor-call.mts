@@ -50,11 +50,15 @@ export const noConstructorCall = createRule({
     CallExpression: (node) => {
       const callee = node.callee;
 
-      if (callee.type !== AST_NODE_TYPES.Identifier) return;
+      if (callee.type !== AST_NODE_TYPES.Identifier) {
+        return;
+      }
 
       const alternative = bannedCallees.get(callee.name);
 
-      if (alternative === undefined) return;
+      if (alternative === undefined) {
+        return;
+      }
 
       // A user declaration of the same name shadows the global: not our case.
       for (
@@ -65,7 +69,9 @@ export const noConstructorCall = createRule({
       ) {
         const variable = mut_scope.set.get(callee.name);
 
-        if (variable !== undefined && variable.defs.length > 0) return;
+        if (variable !== undefined && variable.defs.length > 0) {
+          return;
+        }
       }
 
       context.report({

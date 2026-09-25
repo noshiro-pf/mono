@@ -105,7 +105,9 @@ export const CanvasMain = memoNamed<Props>('CanvasMain', (props) => {
   );
 
   React.useEffect(() => {
-    if (pixiApp === undefined || canvasAppStateHandler === undefined) return;
+    if (pixiApp === undefined || canvasAppStateHandler === undefined) {
+      return;
+    }
 
     const removePointerEventListener = addGlobalPointerEventListener(
       pixiApp.app,

@@ -18,8 +18,8 @@
 +// fromPromise は成功時に Result.Ok(rows)、失敗時に Result.Err(error) を発行
  const tableDataResult = fromPromise(
    fetch('/api/rows').then((r) => {
-     if (!r.ok) throw new Error(`HTTP ${r.status}`);
-@@ -36,7 +36,7 @@
+     if (!r.ok) {
+@@ -38,7 +38,7 @@
    }),
  );
  
@@ -28,7 +28,7 @@
  const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
    debounce(300),
  );
-@@ -44,7 +44,7 @@
+@@ -46,7 +46,7 @@
  const filteredRows = combine([headerValues, tableDataResult]).pipe(
    map(([filters, result]) =>
      Result.isErr(result)
@@ -37,7 +37,7 @@
        : result.value.filter(
            (row) =>
              row.name.includes(filters[0]) &&
-@@ -54,20 +54,20 @@
+@@ -56,20 +56,20 @@
    ),
  );
  
@@ -62,7 +62,7 @@
  const currentPage = merge([
    pageReset,
    combine([pageInput, pageLength]).pipe(
-@@ -75,7 +75,7 @@
+@@ -77,7 +77,7 @@
    ),
  ]);
  
@@ -71,7 +71,7 @@
  const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
    map(([rows, page, perPage]) => {
      const start = (page - 1) * perPage;
-@@ -83,10 +83,10 @@
+@@ -85,10 +85,10 @@
    }),
  );
  

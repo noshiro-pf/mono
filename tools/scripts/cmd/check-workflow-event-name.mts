@@ -84,9 +84,13 @@ export const parseWorkflowTriggers = (
 export const collectEventNameViolations = (
   triggers: WorkflowTriggers,
 ): readonly string[] => {
-  if (!Arr.isNonEmpty(triggers.comparedEventNames)) return [];
+  if (!Arr.isNonEmpty(triggers.comparedEventNames)) {
+    return [];
+  }
 
-  if (triggers.triggerEvents.includes(REUSABLE_EVENT)) return [];
+  if (triggers.triggerEvents.includes(REUSABLE_EVENT)) {
+    return [];
+  }
 
   if (!Arr.isNonEmpty(triggers.triggerEvents)) {
     return [
@@ -151,7 +155,9 @@ const collectTriggerEvents = (lines: readonly string[]): readonly string[] => {
     (line) => line.trimEnd() === TRIGGER_BLOCK_KEY,
   );
 
-  if (blockIndex === -1) return [];
+  if (blockIndex === -1) {
+    return [];
+  }
 
   const rest = lines.slice(blockIndex + 1);
 

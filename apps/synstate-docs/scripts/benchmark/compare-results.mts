@@ -149,7 +149,9 @@ const comparePoint = (
 
   const c = valueAt(current, label, point);
 
-  if (b === undefined || c === undefined || !Num.isNonZero(b)) return [];
+  if (b === undefined || c === undefined || !Num.isNonZero(b)) {
+    return [];
+  }
 
   return [
     {
@@ -192,7 +194,9 @@ const valueAt = (
 
   const index = results.xLabels.indexOf(point);
 
-  if (index === -1) return undefined;
+  if (index === -1) {
+    return undefined;
+  }
 
   return (
     results.series.find((s) => s.label === label)?.values[index] ?? undefined

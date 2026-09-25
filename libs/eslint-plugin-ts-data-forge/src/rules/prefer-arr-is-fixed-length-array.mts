@@ -52,7 +52,9 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
     return {
       BinaryExpression: (node) => {
         // Check for `xs.length === n` or `n === xs.length` or `xs.length !== n`
-        if (node.operator !== '===' && node.operator !== '!==') return;
+        if (node.operator !== '===' && node.operator !== '!==') {
+          return;
+        }
 
         const isNegated = node.operator === '!==';
 
@@ -62,10 +64,14 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
 
         const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
-        if (!isLengthAccess(lengthSide)) return;
+        if (!isLengthAccess(lengthSide)) {
+          return;
+        }
 
         // Only match integer literals or const variables initialized with integer literals
-        if (!isIntegerLiteralOrConstant(valueSide, sourceCode)) return;
+        if (!isIntegerLiteralOrConstant(valueSide, sourceCode)) {
+          return;
+        }
 
         // lengthSide is MemberExpression accessing .length
         const arrayExpression = lengthSide.object;
@@ -83,7 +89,9 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
             const isArrayType =
               checker.isArrayType(type) || checker.isTupleType(type);
 
-            if (!isArrayType) return;
+            if (!isArrayType) {
+              return;
+            }
           } else {
             return;
           }

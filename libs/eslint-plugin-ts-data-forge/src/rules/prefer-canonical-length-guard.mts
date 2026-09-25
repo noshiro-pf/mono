@@ -124,7 +124,9 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
       rule.create(context),
     );
 
-    if (arrLocalName === undefined) return mergeVisitors(comparisonVisitors);
+    if (arrLocalName === undefined) {
+      return mergeVisitors(comparisonVisitors);
+    }
 
     return mergeVisitors([
       ...comparisonVisitors,
@@ -132,7 +134,9 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
         CallExpression: (node) => {
           const guardName = getGuardName(node, arrLocalName);
 
-          if (guardName === undefined) return;
+          if (guardName === undefined) {
+            return;
+          }
 
           const rewrite = GUARD_REWRITES.find(
             (entry) => entry.guard === guardName,
@@ -145,7 +149,9 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
           // The array is the last argument; the bounds precede it.
           const array = node.arguments[rewrite.bounds.length];
 
-          if (array === undefined) return;
+          if (array === undefined) {
+            return;
+          }
 
           const arrayText = sourceCode.getText(array);
 
@@ -185,7 +191,9 @@ const mergeVisitors = (
 
   for (const visitor of visitors) {
     for (const [selector, handler] of Object.entries(visitor)) {
-      if (typeof handler !== 'function') continue;
+      if (typeof handler !== 'function') {
+        continue;
+      }
 
       const mut_handlers = mut_merged[selector] ?? [];
 

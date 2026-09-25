@@ -26,17 +26,24 @@ export function alphaConversion(
 ): LambdaAbstraction;
 
 export function alphaConversion(to: Variable, term: LambdaTerm): LambdaTerm {
-  if (!isAbstraction(term)) return term;
+  if (!isAbstraction(term)) {
+    return term;
+  }
 
   const from = term[1]; // "x" of "(λx.M[x])"
 
   const sub = (t: LambdaTerm): LambdaTerm => {
-    if (isVariable(t)) return t === from ? to : t;
+    if (isVariable(t)) {
+      return t === from ? to : t;
+    }
 
-    if (isApplication(t)) return [sub(t[0]), sub(t[1])];
+    if (isApplication(t)) {
+      return [sub(t[0]), sub(t[1])];
+    }
 
-    if (isAbstraction(t))
+    if (isAbstraction(t)) {
       return t[1] === from ? t : ['lambda', t[1], sub(t[2])];
+    }
 
     return t; // dummy
   };

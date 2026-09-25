@@ -656,8 +656,9 @@ describe('IMap.every', () => {
       ['b', 'world'],
     ]);
 
-    if (!map.every((value): value is string => typeof value === 'string'))
+    if (!map.every((value): value is string => typeof value === 'string')) {
       return;
+    }
 
     // Type should be narrowed to IMap<string, string>
     const firstValue = Optional.unwrap(map.get('a'));

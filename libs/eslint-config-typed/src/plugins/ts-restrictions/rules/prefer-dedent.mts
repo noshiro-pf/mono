@@ -83,7 +83,9 @@ export const preferDedent: TSESLint.RuleModule<MessageIds, Options> = {
       // The quasi of a tagged template — `` tag`...` `` — is a `TemplateLiteral`
       // whose parent is the `TaggedTemplateExpression`. That is the shape this
       // rule asks for, so it is also the shape it must not report.
-      if (node.parent.type === AST_NODE_TYPES.TaggedTemplateExpression) return;
+      if (node.parent.type === AST_NODE_TYPES.TaggedTemplateExpression) {
+        return;
+      }
 
       if (
         node.quasis.every((quasi) => !LINE_TERMINATOR.test(quasi.value.raw))

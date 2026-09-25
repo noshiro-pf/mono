@@ -82,7 +82,9 @@ React.useEffect(() => {
                 setResults(data);
             })
             .catch((error) => {
-                if (error.name !== 'AbortError') throw error;
+                if (error.name !== 'AbortError') {
+                    throw error;
+                }
             });
     }, 300);
 
@@ -162,7 +164,9 @@ let currentPage = 1;
 const fetchData = async (): Promise<void> => {
     try {
         allRows = await fetch('/api/rows').then((r) => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            if (!r.ok) {
+                throw new Error(`HTTP ${r.status}`);
+            }
             return r.json();
         });
         updateTable();
@@ -258,7 +262,9 @@ const [pageInput, setPageInput] = createState(1);
 // fromPromise emits Result.Ok(rows) on success, Result.Err(error) on failure
 const tableDataResult = fromPromise(
     fetch('/api/rows').then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) {
+            throw new Error(`HTTP ${r.status}`);
+        }
         return r.json() as Promise<readonly Row[]>;
     }),
 );

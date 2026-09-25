@@ -34,7 +34,9 @@ export const noInternalModuleImport = createRule({
   defaultOptions: [],
   create: (context) => {
     const check = (source: DeepReadonly<TSESTree.Node> | null): void => {
-      if (source === null) return;
+      if (source === null) {
+        return;
+      }
 
       if (
         source.type !== AST_NODE_TYPES.Literal ||
@@ -60,7 +62,9 @@ export const noInternalModuleImport = createRule({
 
       const packageName = packageNameOf(specifier);
 
-      if (packageName === undefined || packageName === specifier) return;
+      if (packageName === undefined || packageName === specifier) {
+        return;
+      }
 
       if (
         packageHasExports(path.dirname(context.filename), packageName) === false
@@ -155,6 +159,8 @@ const packageHasExports = (
       );
     }
 
-    if (path.dirname(mut_dir) === mut_dir) return undefined;
+    if (path.dirname(mut_dir) === mut_dir) {
+      return undefined;
+    }
   }
 };

@@ -52,7 +52,9 @@ export const ButtonWithConfirm = memoNamed<Props>(
     const alive = useAlive();
 
     const onConfirm = React.useCallback(() => {
-      if (!alive.current) return;
+      if (!alive.current) {
+        return;
+      }
 
       const afterConfirm = (): void => {
         if (toastConfig !== undefined) {
@@ -80,7 +82,9 @@ export const ButtonWithConfirm = memoNamed<Props>(
 
         Promise.resolve(p)
           .then(() => {
-            if (!alive.current) return;
+            if (!alive.current) {
+              return;
+            }
 
             afterConfirm();
 

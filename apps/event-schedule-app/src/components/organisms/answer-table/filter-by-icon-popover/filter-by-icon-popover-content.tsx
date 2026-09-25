@@ -36,7 +36,9 @@ export const FilterByIconPopoverContent = memoNamed<Props>(
       React.ChangeEventHandler<HTMLInputElement>
     >(
       (ev) => {
-        if (!(ev.target instanceof HTMLInputElement)) return;
+        if (!(ev.target instanceof HTMLInputElement)) {
+          return;
+        }
 
         if (ev.target.checked) {
           enableFiltering();

@@ -31,17 +31,23 @@ export const preflight = async (): Promise<
 > => {
   const token = await resolveToken();
 
-  if (Result.isErr(token)) return token;
+  if (Result.isErr(token)) {
+    return token;
+  }
 
   const repo = await resolveRepo();
 
-  if (Result.isErr(repo)) return repo;
+  if (Result.isErr(repo)) {
+    return repo;
+  }
 
   const api: ApiContext = { repo: repo.value, token: token.value } as const;
 
   const branch = await readRefName('git rev-parse --abbrev-ref HEAD');
 
-  if (Result.isErr(branch)) return branch;
+  if (Result.isErr(branch)) {
+    return branch;
+  }
 
   if (branch.value === 'HEAD') {
     return Result.err('HEAD is detached; check a branch out first');
@@ -73,7 +79,9 @@ export const preflight = async (): Promise<
 export const lastCommitSubject = async (): Promise<Result<string, string>> => {
   const subject = await git('git log -1 --format=%s');
 
-  if (Result.isErr(subject)) return subject;
+  if (Result.isErr(subject)) {
+    return subject;
+  }
 
   const trimmed = subject.value.trim();
 
@@ -116,7 +124,9 @@ export const findOpenPullRequest = async (
     },
   );
 
-  if (Result.isErr(listed)) return listed;
+  if (Result.isErr(listed)) {
+    return listed;
+  }
 
   const [found] = listed.value;
 
@@ -230,7 +240,9 @@ const readRefName = async (
 ): Promise<Result<string, string>> => {
   const read = await git(command);
 
-  if (Result.isErr(read)) return Result.err(`${command} failed: ${read.value}`);
+  if (Result.isErr(read)) {
+    return Result.err(`${command} failed: ${read.value}`);
+  }
 
   const name = read.value.trim();
 

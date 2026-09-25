@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-negated-comparison */
 import { Arr, expectType, Int, isNumber, Result } from 'ts-data-forge';
 import {
   type ArrayElement,
@@ -417,6 +416,12 @@ const createConstraintsPredicate =
       return Result.err({ constraint: 'safeInteger', value: true } as const);
     }
 
+    // Each check says "the flag is on, and the condition it asks for does not
+    // hold" — the negation of the condition itself, not its inverse. That is
+    // what rejects NaN: every order comparison with NaN is false, so
+    // `!(value < 0)` holds for NaN where `value >= 0` does not, and the result
+    // type promises a number that is not NaN.
+    /* eslint-disable ts-restrictions/no-negated-comparison -- each check is written as the negated condition on purpose; see above */
     if (nonZero === true && !(value !== 0)) {
       return Result.err({ constraint: 'nonZero', value: true } as const);
     }
@@ -460,6 +465,7 @@ const createConstraintsPredicate =
     if (max !== undefined && !(value <= max)) {
       return Result.err({ constraint: 'max', value: max.toString() } as const);
     }
+    /* eslint-enable ts-restrictions/no-negated-comparison */
 
     // `value % 0` throws a RangeError, so the zero divisor is handled
     // separately: it only admits zero.

@@ -16,39 +16,57 @@ export const useMerged = <T1, T2, T3, T4, T5, T6, T7, T8, T9>(
   const [merged, set] = useState(init);
 
   React.useEffect(() => {
-    if (value1 !== undefined) set(value1);
+    if (value1 !== undefined) {
+      set(value1);
+    }
   }, [value1]);
 
   React.useEffect(() => {
-    if (value2 !== undefined) set(value2);
+    if (value2 !== undefined) {
+      set(value2);
+    }
   }, [value2]);
 
   React.useEffect(() => {
-    if (value3 !== undefined) set(value3);
+    if (value3 !== undefined) {
+      set(value3);
+    }
   }, [value3]);
 
   React.useEffect(() => {
-    if (value4 !== undefined) set(value4);
+    if (value4 !== undefined) {
+      set(value4);
+    }
   }, [value4]);
 
   React.useEffect(() => {
-    if (value5 !== undefined) set(value5);
+    if (value5 !== undefined) {
+      set(value5);
+    }
   }, [value5]);
 
   React.useEffect(() => {
-    if (value6 !== undefined) set(value6);
+    if (value6 !== undefined) {
+      set(value6);
+    }
   }, [value6]);
 
   React.useEffect(() => {
-    if (value7 !== undefined) set(value7);
+    if (value7 !== undefined) {
+      set(value7);
+    }
   }, [value7]);
 
   React.useEffect(() => {
-    if (value8 !== undefined) set(value8);
+    if (value8 !== undefined) {
+      set(value8);
+    }
   }, [value8]);
 
   React.useEffect(() => {
-    if (value9 !== undefined) set(value9);
+    if (value9 !== undefined) {
+      set(value9);
+    }
   }, [value9]);
 
   return merged;

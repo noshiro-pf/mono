@@ -71,7 +71,9 @@ export const App = React.memo(() => {
   // Sets no state until GitHub has answered, which is what lets the effect
   // and the timer below call it.
   const read = React.useCallback((): void => {
-    if (tokenValue === undefined) return;
+    if (tokenValue === undefined) {
+      return;
+    }
 
     const startedAtMs = Date.now();
 

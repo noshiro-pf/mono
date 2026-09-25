@@ -8,11 +8,15 @@ import { isDeprecated } from '../is-deprecated.mjs';
  * ルールのメタ情報から JSDoc コメント形式の文字列を生成する
  */
 export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
-  if (meta === undefined) return '';
+  if (meta === undefined) {
+    return '';
+  }
 
   const { deprecated, docs, fixable, hasSuggestions, type } = meta;
 
-  if (docs === undefined) return '';
+  if (docs === undefined) {
+    return '';
+  }
 
   const { description, recommended, url } = docs;
 

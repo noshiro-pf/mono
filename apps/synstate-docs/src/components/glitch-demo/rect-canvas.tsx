@@ -21,9 +21,13 @@ export const RectCanvas = React.memo<Props>((props) => {
   React.useEffect(() => {
     adapter.setup({
       onEmit: (pos) => {
-        if (!isDraggingRef.current) return;
+        if (!isDraggingRef.current) {
+          return;
+        }
 
-        if (pos.x < 0 || pos.y < 0) return;
+        if (pos.x < 0 || pos.y < 0) {
+          return;
+        }
 
         const t0 = performance.now();
 
@@ -63,7 +67,9 @@ export const RectCanvas = React.memo<Props>((props) => {
     (e: React.MouseEvent<HTMLCanvasElement>): Point => {
       const canvas = canvasRef.current;
 
-      if (canvas === null) return { x: 0, y: 0 };
+      if (canvas === null) {
+        return { x: 0, y: 0 };
+      }
 
       const rect = canvas.getBoundingClientRect();
 
@@ -108,7 +114,9 @@ export const RectCanvas = React.memo<Props>((props) => {
   const handleMouseMove = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!isDraggingRef.current) return;
+      if (!isDraggingRef.current) {
+        return;
+      }
 
       const pos = getCanvasPos(e);
 

@@ -50,7 +50,9 @@ const state = combine([
 const submit = async (user: FireAuthUser): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (updateDisplayNamePageHasError(s)) return;
+  if (updateDisplayNamePageHasError(s)) {
+    return;
+  }
 
   const res = await api.auth.update.displayName(user, s.displayName.inputValue);
 
@@ -92,7 +94,9 @@ const enterClickHandler = (): void => {
 
   const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
-  if (enterButtonDisabled || fireAuthUser === undefined) return;
+  if (enterButtonDisabled || fireAuthUser === undefined) {
+    return;
+  }
 
   // TODO: use toast
   submit(fireAuthUser).catch(console.error);

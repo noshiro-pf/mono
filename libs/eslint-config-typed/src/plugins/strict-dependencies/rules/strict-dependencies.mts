@@ -135,7 +135,9 @@ export const strictDependenciesRule: TSESLint.RuleModule<
 
         for (const dependency of dependencies) {
           // そもそもmoduleがimportPathと一致していない場合は必ず報告しない
-          if (!isMatch(importPath, dependency.module)) continue;
+          if (!isMatch(importPath, dependency.module)) {
+            continue;
+          }
 
           /**
            * 1. 参照元チェックをしてAllowであればそこで処理を終了する
@@ -154,7 +156,9 @@ export const strictDependenciesRule: TSESLint.RuleModule<
             (dependency.excludeTypeImportChecks === true &&
               node.importKind === 'type');
 
-          if (isAllowedByPath) continue;
+          if (isAllowedByPath) {
+            continue;
+          }
 
           if (dependency.targetMembers !== undefined) {
             const commonImportedList = getCommonElements<string>(

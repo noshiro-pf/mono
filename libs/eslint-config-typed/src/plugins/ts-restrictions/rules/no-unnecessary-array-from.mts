@@ -110,7 +110,9 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
 
           const arg = matchArrayFromCall(inner);
 
-          if (arg === undefined) return;
+          if (arg === undefined) {
+            return;
+          }
 
           // The argument must already be an array (not a `Set` / `Map` / iterable
           // that genuinely needs `Array.from()` to become an array).
@@ -118,7 +120,9 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
             parserServices.esTreeNodeToTSNodeMap.get(arg),
           );
 
-          if (!isArrayOrTupleType(argType)) return;
+          if (!isArrayOrTupleType(argType)) {
+            return;
+          }
 
           // Guard against a shadowed `Array` binding whose `.from()` does not
           // return an array: the real `Array.from(arrayLike)` is always an array.
@@ -126,7 +130,9 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
             parserServices.esTreeNodeToTSNodeMap.get(inner),
           );
 
-          if (!isArrayOrTupleType(innerType)) return;
+          if (!isArrayOrTupleType(innerType)) {
+            return;
+          }
 
           context.report({
             node: inner,

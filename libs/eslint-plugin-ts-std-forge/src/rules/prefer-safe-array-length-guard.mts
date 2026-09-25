@@ -92,11 +92,15 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       expression: TSESTree.Expression,
     ): boolean => {
-      if (checker === undefined) return false;
+      if (checker === undefined) {
+        return false;
+      }
 
       const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
 
-      if (tsNode === undefined) return false;
+      if (tsNode === undefined) {
+        return false;
+      }
 
       const type = checker.getTypeAtLocation(tsNode);
 
@@ -113,9 +117,13 @@ export const preferSafeArrayLengthGuard: TSESLint.RuleModule<
       BinaryExpression: (node) => {
         const matched = matchLengthComparison(node);
 
-        if (matched === undefined) return;
+        if (matched === undefined) {
+          return;
+        }
 
-        if (!isArrayLike(matched.arrayExpression)) return;
+        if (!isArrayLike(matched.arrayExpression)) {
+          return;
+        }
 
         mut_nodesToFix.push({ node, ...matched });
       },
@@ -174,7 +182,9 @@ const matchLengthComparison = (
   | undefined => {
   const { left, right } = node;
 
-  if (left.type === AST_NODE_TYPES.PrivateIdentifier) return undefined;
+  if (left.type === AST_NODE_TYPES.PrivateIdentifier) {
+    return undefined;
+  }
 
   const lengthOnLeft = isLengthAccess(left);
 
@@ -182,7 +192,9 @@ const matchLengthComparison = (
 
   const boundSide = lengthOnLeft ? right : left;
 
-  if (!isLengthAccess(lengthSide)) return undefined;
+  if (!isLengthAccess(lengthSide)) {
+    return undefined;
+  }
 
   // `xs.length === ys.length` has `.length` on both sides and no literal
   // bound, so the bound check below rejects it.

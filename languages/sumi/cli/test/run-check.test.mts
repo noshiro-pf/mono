@@ -53,7 +53,9 @@ describe(runCheck, () => {
 
     assert.strictEqual(result.value.kind, 'checked');
 
-    if (result.value.kind !== 'checked') return;
+    if (result.value.kind !== 'checked') {
+      return;
+    }
 
     assert.strictEqual(result.value.ok, true);
 
@@ -78,7 +80,9 @@ describe(runCheck, () => {
 
     assert.strictEqual(result.value.kind, 'checked');
 
-    if (result.value.kind !== 'checked') return;
+    if (result.value.kind !== 'checked') {
+      return;
+    }
 
     assert.strictEqual(result.value.ok, false);
 

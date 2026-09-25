@@ -543,8 +543,8 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [FixedLengthArray](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-arrays/length-constrained-array.mts#L354)
     - [MutableFixedLengthArray](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-arrays/length-constrained-array.mts#L391)
 - src/branded-types/predefined-numbers/bigint.mts
-    - [BigInt64](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/bigint.mts#L18)
-    - [BigUint64](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/bigint.mts#L33)
+    - [BigInt64](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/bigint.mts#L20)
+    - [BigUint64](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/bigint.mts#L37)
 - src/branded-types/predefined-numbers/core.mts
     - [NaNType](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L58)
     - [ValidNumber](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/branded-types/predefined-numbers/core.mts#L81)

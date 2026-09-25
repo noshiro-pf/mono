@@ -568,13 +568,17 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (!isRecord(parsed)) return;
+    if (!isRecord(parsed)) {
+      return;
+    }
 
     const keys = Object.keys(parsed);
 
     assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
 
-    if (!hasKey(parsed, 'user') || !isRecord(parsed.user)) return;
+    if (!hasKey(parsed, 'user') || !isRecord(parsed.user)) {
+      return;
+    }
 
     const userKeys = Object.keys(parsed.user);
 
@@ -610,7 +614,9 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (!isRecord(parsed)) return;
+    if (!isRecord(parsed)) {
+      return;
+    }
 
     // Check top-level keys are sorted
     const topKeys = Object.keys(parsed);
@@ -629,12 +635,15 @@ describe('stringifySortedKey', () => {
       !hasKey(parsed, 'users') ||
       !Arr.isArray(parsed.users) ||
       !Arr.isNonEmpty(parsed.users)
-    )
+    ) {
       return;
+    }
 
     const firstUser = parsed.users[0];
 
-    if (!isRecord(firstUser)) return;
+    if (!isRecord(firstUser)) {
+      return;
+    }
 
     const userKeys = Object.keys(firstUser);
 
@@ -729,7 +738,9 @@ describe('stringifySortedKey', () => {
 
     const parsed: unknown = JSON.parse(result.value);
 
-    if (!isRecord(parsed) || !hasKey(parsed, 'level1')) return;
+    if (!isRecord(parsed) || !hasKey(parsed, 'level1')) {
+      return;
+    }
 
     const level1 = parsed.level1;
 
@@ -743,8 +754,9 @@ describe('stringifySortedKey', () => {
       !hasKey(level1, 'a') ||
       !isRecord(level1.a) ||
       !hasKey(level1.a, 'nested')
-    )
+    ) {
       return;
+    }
 
     const nested = level1.a.nested;
 

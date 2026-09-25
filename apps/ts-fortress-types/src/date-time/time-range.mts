@@ -11,7 +11,9 @@ export type TimeRange = t.TypeOf<typeof TimeRange>;
 export const compareTimeRange = (a: TimeRange, b: TimeRange): number => {
   const compareStartHmResult = compareHm(a.start, b.start);
 
-  if (compareStartHmResult !== 0) return compareStartHmResult;
+  if (compareStartHmResult !== 0) {
+    return compareStartHmResult;
+  }
 
   const compareEndHmResult = compareHm(a.end, b.end);
 

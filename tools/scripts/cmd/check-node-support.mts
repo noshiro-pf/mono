@@ -188,7 +188,9 @@ export const compareVersions = (a: Version, b: Version): number =>
 export const parseVersion = (value: string): Version | undefined => {
   const match = /^(\d+)\.(\d+)\.(\d+)$/u.exec(value);
 
-  if (match === null) return undefined;
+  if (match === null) {
+    return undefined;
+  }
 
   const [, major, minor, patch] = match;
 
@@ -386,7 +388,9 @@ const parseTargets = (
 const parseKnownBroken = (
   value: unknown,
 ): Result<KnownBroken | null, string> => {
-  if (value === null || value === undefined) return Result.ok(null);
+  if (value === null || value === undefined) {
+    return Result.ok(null);
+  }
 
   if (!isRecord(value)) {
     return Result.err('❌ `knownBroken` must be an object or null.');
@@ -436,9 +440,13 @@ const expectedCeiling = (config: NodeSupportConfig): number | undefined => {
       ? undefined
       : parseVersion(config.knownBroken.since)?.major;
 
-  if (broken !== undefined) return broken;
+  if (broken !== undefined) {
+    return broken;
+  }
 
-  if (config.policy !== 'major-ceiling') return undefined;
+  if (config.policy !== 'major-ceiling') {
+    return undefined;
+  }
 
   const current = parseVersion(config.targets.current);
 
@@ -496,7 +504,9 @@ const checkEnginesNode = (
   // A package that makes no claim has none to get wrong. Requiring `engines`
   // everywhere would mean adding it to thirty private applications that
   // nobody installs.
-  if (declared === undefined || declared === expected.enginesNode) return [];
+  if (declared === undefined || declared === expected.enginesNode) {
+    return [];
+  }
 
   return [
     {
@@ -513,7 +523,9 @@ const checkVoltaNode = (
 ): readonly Violation[] => {
   const declared = readStringAt(manifest.parsed, ['volta', 'node']);
 
-  if (declared === undefined || declared === expected.voltaNode) return [];
+  if (declared === undefined || declared === expected.voltaNode) {
+    return [];
+  }
 
   return [
     {
@@ -622,7 +634,9 @@ const checkWorkflowMatrix = async (): Promise<readonly Violation[]> => {
     .map((entry) => entry.trim())
     .filter((entry) => entry !== '');
 
-  if (declared.join(',') === MATRIX_TARGETS.join(',')) return [];
+  if (declared.join(',') === MATRIX_TARGETS.join(',')) {
+    return [];
+  }
 
   return [
     {
@@ -643,7 +657,9 @@ const applyFixes = async (violations: readonly Violation[]): Promise<void> => {
   const mut_byFile = new Map<string, readonly Violation['fix'][]>();
 
   for (const { fix } of violations) {
-    if (fix === undefined) continue;
+    if (fix === undefined) {
+      continue;
+    }
 
     mut_byFile.set(
       fix.absolutePath,
@@ -655,7 +671,9 @@ const applyFixes = async (violations: readonly Violation[]): Promise<void> => {
     Array.from(mut_byFile, async ([absolutePath, fixes]) => {
       const parsed = await readJsonFile(absolutePath);
 
-      if (Result.isErr(parsed)) return;
+      if (Result.isErr(parsed)) {
+        return;
+      }
 
       const updated = fixes.reduce<unknown>(
         (source, fix) =>
@@ -728,7 +746,9 @@ const setStringAt = (
 ): unknown => {
   const [head, ...tail] = keyPath;
 
-  if (head === undefined) return value;
+  if (head === undefined) {
+    return value;
+  }
 
   const base = isRecord(source) ? source : ({} as const);
 

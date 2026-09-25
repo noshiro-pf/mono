@@ -22,7 +22,9 @@ export const SnakeCanvas = React.memo<Props>((props) => {
 
     adapter.setup(chainDepth, {
       onEmit: (points) => {
-        if (!mut_active) return;
+        if (!mut_active) {
+          return;
+        }
 
         const t0 = performance.now();
 
@@ -53,7 +55,9 @@ export const SnakeCanvas = React.memo<Props>((props) => {
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current;
 
-      if (canvas === null) return;
+      if (canvas === null) {
+        return;
+      }
 
       const rect = canvas.getBoundingClientRect();
 
@@ -158,7 +162,9 @@ const drawSnake = (
 ): void => {
   mut_ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  if (Arr.isEmpty(points)) return;
+  if (Arr.isEmpty(points)) {
+    return;
+  }
 
   const segmentCount = asSafeUint(points.length);
 

@@ -7,7 +7,9 @@ import { substitute } from './substitute.mjs';
 
 export const betaReduction1step = (term: LambdaTerm): LambdaTerm => {
   // console.log( 'betaReduction1step', term );
-  if (isVariable(term)) return term;
+  if (isVariable(term)) {
+    return term;
+  }
 
   if (isAbstraction(term)) {
     return ['lambda', term[1], betaReduction1step(term[2])];

@@ -107,7 +107,9 @@ export const extractTypeExports = (content: string): FileExports => {
 
       let mut_j = mut_i + nsMatch[0].length;
 
-      while (mut_j < len && cleaned[mut_j] !== '{') mut_j += 1;
+      while (mut_j < len && cleaned[mut_j] !== '{') {
+        mut_j += 1;
+      }
 
       if (mut_j >= len) {
         mut_i = len;
@@ -256,7 +258,9 @@ const findMatchingBrace = (content: string, startIdx: number): number => {
 
     mut_depth += depthDelta(ch, ['{'], ['}']);
 
-    if (ch === '}' && mut_depth === 0) return mut_i + 1;
+    if (ch === '}' && mut_depth === 0) {
+      return mut_i + 1;
+    }
 
     mut_i += 1;
   }
@@ -273,7 +277,9 @@ const parseTypeHeader = (
 
   let mut_j = startIdx + prefixLen;
 
-  while (mut_j < len && /\s/u.test(content[mut_j] ?? '')) mut_j += 1;
+  while (mut_j < len && /\s/u.test(content[mut_j] ?? '')) {
+    mut_j += 1;
+  }
 
   let mut_generic = '';
 
@@ -297,23 +303,35 @@ const parseTypeHeader = (
 const skipDeclareGlobal = (content: string, startIdx: number): number => {
   let mut_i = startIdx;
 
-  while (mut_i < content.length && /\s/u.test(content[mut_i] ?? '')) mut_i += 1;
+  while (mut_i < content.length && /\s/u.test(content[mut_i] ?? '')) {
+    mut_i += 1;
+  }
 
-  if (content.slice(mut_i, mut_i + 14) !== 'declare global') return -1;
+  if (content.slice(mut_i, mut_i + 14) !== 'declare global') {
+    return -1;
+  }
 
-  while (mut_i < content.length && content[mut_i] !== '{') mut_i += 1;
+  while (mut_i < content.length && content[mut_i] !== '{') {
+    mut_i += 1;
+  }
 
-  if (mut_i >= content.length) return -1;
+  if (mut_i >= content.length) {
+    return -1;
+  }
 
   let mut_depth = 0;
 
   while (mut_i < content.length) {
-    if (content[mut_i] === '{') mut_depth += 1;
+    if (content[mut_i] === '{') {
+      mut_depth += 1;
+    }
 
     if (content[mut_i] === '}') {
       mut_depth -= 1;
 
-      if (mut_depth === 0) return mut_i + 1;
+      if (mut_depth === 0) {
+        return mut_i + 1;
+      }
     }
 
     mut_i += 1;
@@ -355,7 +373,9 @@ const findMatchingGt = (content: string, startIdx: number): number => {
 
     mut_depth += depthDelta(ch, ['<'], ['>']);
 
-    if (ch === '>' && mut_depth === 0) return mut_i + 1;
+    if (ch === '>' && mut_depth === 0) {
+      return mut_i + 1;
+    }
 
     mut_i += 1;
   }
@@ -384,7 +404,9 @@ const extractParamNames = (generic: string): readonly string[] => {
     }
   }
 
-  if (mut_curr.trim() !== '') mut_params.push(mut_curr.trim());
+  if (mut_curr.trim() !== '') {
+    mut_params.push(mut_curr.trim());
+  }
 
   return mut_params.map((p) => (p.split(/[\s=]/u, 1)[0] ?? '').trim());
 };

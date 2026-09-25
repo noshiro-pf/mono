@@ -281,7 +281,9 @@ const hasVersion = (entry: string): boolean => {
 
 const findDelayMinutes = (lines: readonly string[]): number | undefined => {
   const declared = lines.flatMap((line) => {
-    if (!line.startsWith(DELAY_KEY)) return [];
+    if (!line.startsWith(DELAY_KEY)) {
+      return [];
+    }
 
     const parsed = Num.safeParseInt(
       stripComment(line.slice(DELAY_KEY.length)).trim(),
@@ -317,7 +319,9 @@ const collectListItems = (startLines: readonly string[]): readonly string[] => {
   return block.flatMap((line) => {
     const trimmed = stripComment(line).trim();
 
-    if (!trimmed.startsWith(LIST_ITEM_PREFIX)) return [];
+    if (!trimmed.startsWith(LIST_ITEM_PREFIX)) {
+      return [];
+    }
 
     const item = stripQuotes(trimmed.slice(LIST_ITEM_PREFIX.length).trim());
 
@@ -356,7 +360,9 @@ const collectReasons = (lines: readonly string[]): readonly WaiverReason[] =>
   lines.flatMap((line, index) => {
     const target = REASON_HEADING.exec(line)?.groups?.['target'];
 
-    if (target === undefined) return [];
+    if (target === undefined) {
+      return [];
+    }
 
     const next = lines[index + 1];
 

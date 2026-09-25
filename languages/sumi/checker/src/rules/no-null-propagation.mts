@@ -38,11 +38,15 @@ export const noNullPropagation: Rule = {
   visit: (node, { checker, report }) => {
     const name = annotationFreeDeclarationName(node);
 
-    if (name === undefined) return;
+    if (name === undefined) {
+      return;
+    }
 
     const type = checker.getTypeAtLocation(name);
 
-    if (type === undefined || !includesNull(type)) return;
+    if (type === undefined || !includesNull(type)) {
+      return;
+    }
 
     report(name, 'inferredNull');
   },

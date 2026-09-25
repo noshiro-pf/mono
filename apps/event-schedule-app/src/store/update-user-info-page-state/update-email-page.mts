@@ -76,7 +76,9 @@ const state = combine([
 const submit = async (user: FireAuthUser): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (updateEmailPageHasError(s)) return;
+  if (updateEmailPageHasError(s)) {
+    return;
+  }
 
   const currentEmail = user.email ?? '';
 
@@ -158,7 +160,9 @@ const enterClickHandler = (): void => {
 
   const fireAuthUser = Auth.getFireAuthUserSnapshot();
 
-  if (enterButtonDisabled || fireAuthUser === undefined) return;
+  if (enterButtonDisabled || fireAuthUser === undefined) {
+    return;
+  }
 
   // TODO: use toast
   submit(fireAuthUser).catch(console.error);

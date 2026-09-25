@@ -44,7 +44,9 @@ export const JoinRoomPage = memoNamed<Props>('JoinRoomPage', ({ roomId }) => {
   const room = db.useRoom();
 
   const onJoinRoomButtonClick = useCallback(() => {
-    if (room === undefined) return;
+    if (room === undefined) {
+      return;
+    }
 
     if (room.password !== '' && room.password !== password) {
       setShowPasswordError(true);

@@ -91,32 +91,43 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
             callee.type === AST_NODE_TYPES.Identifier &&
             callee.name === 'Number';
 
-          if (!isGlobalParseFloat && !isNumberParseFloat && !isNumberCall)
+          if (!isGlobalParseFloat && !isNumberParseFloat && !isNumberCall) {
             return;
+          }
 
           const args = node.arguments;
 
           const firstArg = args[0];
 
-          if (firstArg === undefined) return;
+          if (firstArg === undefined) {
+            return;
+          }
 
           // Spread argument (`parseFloat(...rest)`) cannot be rewritten safely.
-          if (firstArg.type === AST_NODE_TYPES.SpreadElement) return;
+          if (firstArg.type === AST_NODE_TYPES.SpreadElement) {
+            return;
+          }
 
           // The argument must be purely `string` so the autofix is type-safe
           // against `Num.safeParseFloat(s: string)`. Without type information,
           // skip.
-          if (services?.program == null) return;
+          if (services?.program == null) {
+            return;
+          }
 
           const checker = services.program.getTypeChecker();
 
           const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
 
-          if (tsNode === undefined) return;
+          if (tsNode === undefined) {
+            return;
+          }
 
           const argType = checker.getTypeAtLocation(tsNode);
 
-          if (!isStringType(argType)) return;
+          if (!isStringType(argType)) {
+            return;
+          }
 
           mut_nodesToFix.push({ node, argExpression: firstArg });
         },

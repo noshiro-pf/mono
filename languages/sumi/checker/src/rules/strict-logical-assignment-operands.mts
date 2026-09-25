@@ -32,7 +32,9 @@ export const strictLogicalAssignmentOperands: Rule = {
       '{{operands}} not boolean. `x {{operator}} y` is `x = x {{logicalOperator}} y`, and Sumi folds booleans there rather than truthiness (D-29). Compare explicitly, or use `??=` when coalescing a value.',
   },
   visit: (node, { checker, report }) => {
-    if (!isBinaryExpression(node)) return;
+    if (!isBinaryExpression(node)) {
+      return;
+    }
 
     const operator = node.operatorToken.kind;
 
@@ -48,7 +50,9 @@ export const strictLogicalAssignmentOperands: Rule = {
       { side: 'right', operand: node.right },
     ].filter(({ operand }) => !isBooleanTyped(checker, operand));
 
-    if (offending.length === 0) return;
+    if (offending.length === 0) {
+      return;
+    }
 
     const text = operatorText(operator);
 
@@ -84,11 +88,12 @@ const isBooleanTyped = (
 ): boolean => {
   const type = checker.getTypeAtLocation(operand);
 
-  return type === undefined
-    ? false
-    : type.isUnionType()
+  return (
+    type !== undefined &&
+    (type.isUnionType()
       ? type.getTypes().every(isBooleanLike)
-      : isBooleanLike(type);
+      : isBooleanLike(type))
+  );
 };
 
 const isBooleanLike = (type: Type): boolean =>

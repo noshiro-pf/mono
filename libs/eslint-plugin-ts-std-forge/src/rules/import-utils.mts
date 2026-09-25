@@ -20,7 +20,9 @@ export const getTsStdForgeImport = (
 export const getNamedImports = (
   node: DeepReadonly<TSESTree.ImportDeclaration> | undefined,
 ): readonly string[] => {
-  if (node === undefined) return [];
+  if (node === undefined) {
+    return [];
+  }
 
   return node.specifiers.flatMap((specifier) =>
     specifier.type === AST_NODE_TYPES.ImportSpecifier

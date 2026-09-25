@@ -106,7 +106,9 @@ const createWithCurrentValueFromObservable = <A, B>(
 
         const curr = observable.getSnapshot();
 
-        if (Optional.isNone(curr)) return; // skip update
+        if (Optional.isNone(curr)) {
+          return; // skip update
+        }
 
         setNext([ps.value, curr.value], updateToken);
       },

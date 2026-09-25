@@ -42,7 +42,9 @@ export const reportNpmTrustedPublishers = async (
     ? Result.ok<readonly string[]>([])
     : await readAccountPackageNames(options.user);
 
-  if (Result.isErr(accountPackages)) return accountPackages;
+  if (Result.isErr(accountPackages)) {
+    return accountPackages;
+  }
 
   const inRepo = new Set(workspacePackages);
 
@@ -57,7 +59,9 @@ export const reportNpmTrustedPublishers = async (
   const mut_reports: PackageReport[] = [];
 
   for (const [index, name] of names.entries()) {
-    if (index > 0) await sleep(options.delayMs);
+    if (index > 0) {
+      await sleep(options.delayMs);
+    }
 
     console.error(`[${index + 1}/${names.length}] ${name}`);
 
@@ -87,7 +91,9 @@ export const reportNpmTrustedPublishers = async (
 export const parseTrustListOutput = (
   stdout: string,
 ): Result<readonly TrustConfig[], string> => {
-  if (stdout.trim() === '') return Result.ok([]);
+  if (stdout.trim() === '') {
+    return Result.ok([]);
+  }
 
   const parsed = Json.parse(stdout);
 
@@ -109,7 +115,9 @@ export const parseTrustListOutput = (
   const mut_configs: TrustConfig[] = [];
 
   for (const item of items) {
-    if (!isRecord(item)) continue;
+    if (!isRecord(item)) {
+      continue;
+    }
 
     if (isRecord(item['error'])) {
       return Result.err(
@@ -274,8 +282,8 @@ const readPublishablePackageNames = async (): Promise<readonly string[]> => {
   const packages = await getWorkspacePackages(projectRootPath);
 
   return packages
-    .filter((pkg) =>
-      isRecord(pkg.packageJson) ? pkg.packageJson['private'] !== true : false,
+    .filter(
+      (pkg) => isRecord(pkg.packageJson) && pkg.packageJson['private'] !== true,
     )
     .map((pkg) => pkg.name);
 };
@@ -449,11 +457,15 @@ const parseOptions = (
     }),
   );
 
-  if (Result.isErr(parsed)) return Result.err(unknownToString(parsed.value));
+  if (Result.isErr(parsed)) {
+    return Result.err(unknownToString(parsed.value));
+  }
 
   const { values } = parsed.value;
 
-  if (values.help) return Result.ok('help');
+  if (values.help) {
+    return Result.ok('help');
+  }
 
   const delayMs = Result.unwrapOkOr(Num.safeParseInt(values.delay), Number.NaN);
 

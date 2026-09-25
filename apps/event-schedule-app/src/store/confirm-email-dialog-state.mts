@@ -59,7 +59,9 @@ const state = combine([
 const submit = async (eventId: string, email: string): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (confirmEmailDialogHasError(s)) return;
+  if (confirmEmailDialogHasError(s)) {
+    return;
+  }
 
   const verifyEmailResult = await api.event.verifyEmail(eventId, email);
 
@@ -102,7 +104,9 @@ const enterClickHandler = (): void => {
 
   const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
 
-  if (enterButtonDisabled) return;
+  if (enterButtonDisabled) {
+    return;
+  }
 
   const email = formState.email.inputValue;
 

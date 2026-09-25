@@ -183,7 +183,9 @@ const main = (): void => {
 
   const example = exampleList[exampleIdx];
 
-  if (example === undefined) return;
+  if (example === undefined) {
+    return;
+  }
 
   printExampleCases(example.cases, testCaseIdx);
 
@@ -203,7 +205,9 @@ const main = (): void => {
 
   const exampleCase = example.cases[testCaseIdx];
 
-  if (exampleCase === undefined) return;
+  if (exampleCase === undefined) {
+    return;
+  }
 
   if (isPreviewMode) {
     exampleCase.preview(TICK.preview);

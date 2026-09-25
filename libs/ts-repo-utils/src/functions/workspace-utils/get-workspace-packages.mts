@@ -70,7 +70,9 @@ export const getWorkspacePackages = async (
           fs.readFile(maybePackagePath, 'utf8'),
         );
 
-        if (Result.isErr(result)) return undefined;
+        if (Result.isErr(result)) {
+          return undefined;
+        }
 
         const parsed = Json.parse(result.value);
 

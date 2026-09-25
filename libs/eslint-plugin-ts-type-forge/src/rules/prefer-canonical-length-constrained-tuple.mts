@@ -81,11 +81,15 @@ export const preferCanonicalLengthConstrainedTuple: TSESLint.RuleModule<
       TSTupleType: (node) => {
         const shape = analyzeUniformTuple(node, sourceCode);
 
-        if (shape === undefined || shape.fixedCount > maxLength) return;
+        if (shape === undefined || shape.fixedCount > maxLength) {
+          return;
+        }
 
         const canonicalName = canonicalNameFor(shape);
 
-        if (canonicalName === undefined) return;
+        if (canonicalName === undefined) {
+          return;
+        }
 
         mut_rewrites.push({
           node: shape.node,

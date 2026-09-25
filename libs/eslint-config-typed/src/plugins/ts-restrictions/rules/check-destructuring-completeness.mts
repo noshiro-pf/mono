@@ -99,12 +99,16 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
     const isReactComponentPropsDestructuring = (
       node: DeepReadonly<TSESTree.VariableDeclarator>,
     ): boolean => {
-      if (!alwaysCheckReactComponentProps) return false;
+      if (!alwaysCheckReactComponentProps) {
+        return false;
+      }
 
       const parent = node.parent;
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (parent === undefined) return false;
+      if (parent === undefined) {
+        return false;
+      }
 
       // Case 1: const { a, b } = props; inside component
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -112,7 +116,9 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         const grandParent = parent.parent;
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (grandParent === undefined) return false;
+        if (grandParent === undefined) {
+          return false;
+        }
 
         // Check if we're inside a BlockStatement of an arrow function component
         if (grandParent.type === AST_NODE_TYPES.BlockStatement) {
@@ -158,13 +164,17 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         (prop) => prop.type === AST_NODE_TYPES.RestElement,
       );
 
-      if (hasRestElement) return;
+      if (hasRestElement) {
+        return;
+      }
 
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       const tsNode = esTreeNodeToTSNodeMap.get(tsSourceNode as never);
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (tsNode === undefined) return;
+      if (tsNode === undefined) {
+        return;
+      }
 
       const type = typeChecker.getTypeAtLocation(tsNode);
 
@@ -174,7 +184,9 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
       // Dynamic computed properties cannot be resolved statically,
       // so skip completeness check when they are present.
-      if (collected.hasDynamicComputedKey) return;
+      if (collected.hasDynamicComputedKey) {
+        return;
+      }
 
       const missingProps = objectProps.filter(
         (prop) => !collected.names.has(prop),
@@ -194,22 +206,32 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
     return {
       VariableDeclarator: (node) => {
-        if (node.id.type !== AST_NODE_TYPES.ObjectPattern) return;
+        if (node.id.type !== AST_NODE_TYPES.ObjectPattern) {
+          return;
+        }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (node.init === undefined || node.init === null) return;
+        if (node.init === undefined || node.init === null) {
+          return;
+        }
 
         const shouldCheck =
           hasDirectiveComment(node) || isReactComponentPropsDestructuring(node);
 
-        if (!shouldCheck) return;
+        if (!shouldCheck) {
+          return;
+        }
 
         checkObjectPatternCompleteness(node.id, node.init);
       },
       ArrowFunctionExpression: (node) => {
-        if (!alwaysCheckReactComponentProps) return;
+        if (!alwaysCheckReactComponentProps) {
+          return;
+        }
 
-        if (!isReactComponentFunction(node)) return;
+        if (!isReactComponentFunction(node)) {
+          return;
+        }
 
         for (const param of node.params) {
           if (param.type === AST_NODE_TYPES.ObjectPattern) {
@@ -259,7 +281,9 @@ const collectDestructuredPropNames = (
   let mut_hasDynamicComputedKey = false;
 
   for (const prop of properties) {
-    if (prop.type !== AST_NODE_TYPES.Property) continue;
+    if (prop.type !== AST_NODE_TYPES.Property) {
+      continue;
+    }
 
     if (!prop.computed) {
       switch (prop.key.type) {
@@ -301,7 +325,9 @@ const collectDestructuredPropNames = (
 const isReactComponentFunction = (
   node: DeepReadonly<TSESTree.Node> | undefined | null,
 ): boolean => {
-  if (node === undefined || node === null) return false;
+  if (node === undefined || node === null) {
+    return false;
+  }
 
   // Arrow function component
   if (node.type === AST_NODE_TYPES.ArrowFunctionExpression) {
@@ -309,12 +335,16 @@ const isReactComponentFunction = (
 
     if (body.type === AST_NODE_TYPES.BlockStatement) {
       return body.body.some((statement) => {
-        if (statement.type !== AST_NODE_TYPES.ReturnStatement) return false;
+        if (statement.type !== AST_NODE_TYPES.ReturnStatement) {
+          return false;
+        }
 
         const { argument } = statement;
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (argument === null || argument === undefined) return false;
+        if (argument === null || argument === undefined) {
+          return false;
+        }
 
         const argType = (argument as Readonly<{ type?: string }>).type;
 

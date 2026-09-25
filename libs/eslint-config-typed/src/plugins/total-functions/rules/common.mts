@@ -65,16 +65,13 @@ export const isLiteral = (
     return false;
   }
 
-  if (sourceNode.type === AST_NODE_TYPES.ObjectExpression) {
-    // empty object literal: {}
-    return Arr.isEmpty(sourceNode.properties);
-  }
-
-  // empty object literal: []
-  //
-  // TODO: handle recursive case for both arrays and objects and
-  // permit literals such as string and numbers as properties
-  return sourceNode.type === AST_NODE_TYPES.ArrayExpression
-    ? Arr.isEmpty(sourceNode.elements)
-    : false;
+  return sourceNode.type === AST_NODE_TYPES.ObjectExpression
+    ? // empty object literal: {}
+      Arr.isEmpty(sourceNode.properties)
+    : // empty object literal: []
+      //
+      // TODO: handle recursive case for both arrays and objects and
+      // permit literals such as string and numbers as properties
+      sourceNode.type === AST_NODE_TYPES.ArrayExpression &&
+        Arr.isEmpty(sourceNode.elements);
 };

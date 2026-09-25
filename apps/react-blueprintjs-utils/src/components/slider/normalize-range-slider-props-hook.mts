@@ -57,7 +57,9 @@ export const useNormalizedRangeSliderProps = ({
   }, [_stepSize]);
 
   const labelStepSize = React.useMemo(() => {
-    if (_labelStepSize === undefined) return stepSize;
+    if (_labelStepSize === undefined) {
+      return stepSize;
+    }
 
     if (!Number.isFinite(_labelStepSize)) {
       console.error('`labelStepSize` should be finite.');

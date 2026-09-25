@@ -85,7 +85,9 @@ export const saveToken = (
 
   const target = stores[token.store];
 
-  if (target === undefined) return Result.err(UNAVAILABLE);
+  if (target === undefined) {
+    return Result.err(UNAVAILABLE);
+  }
 
   try {
     target.setItem(KEY, token.value);

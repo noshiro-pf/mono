@@ -64,7 +64,9 @@ export const analyzeUniformTuple = (
   tuple: TSESTree.TSTupleType,
   sourceCode: TSESLint.SourceCode,
 ): UniformTupleShape | undefined => {
-  if (isInConditionalTypeExtendsClause(tuple)) return undefined;
+  if (isInConditionalTypeExtendsClause(tuple)) {
+    return undefined;
+  }
 
   const { parent } = tuple;
 
@@ -97,11 +99,15 @@ export const analyzeUniformTuple = (
       ? getArrayElementType(last.typeAnnotation)
       : undefined;
 
-  if (hasRest && restElementType === undefined) return undefined;
+  if (hasRest && restElementType === undefined) {
+    return undefined;
+  }
 
   const [head] = leading;
 
-  if (head === undefined) return undefined;
+  if (head === undefined) {
+    return undefined;
+  }
 
   const elementText = sourceCode.getText(head);
 
@@ -145,7 +151,9 @@ export const analyzeUniformTuple = (
  */
 const isInConditionalTypeExtendsClause = (node: TSESTree.Node): boolean => {
   // The root has no parent, so it terminates the walk.
-  if (node.type === AST_NODE_TYPES.Program) return false;
+  if (node.type === AST_NODE_TYPES.Program) {
+    return false;
+  }
 
   const { parent } = node;
 
@@ -201,7 +209,9 @@ const definesRecursiveTypeAlias = (
 ): boolean => {
   const alias = enclosingTypeAlias(tuple);
 
-  if (alias === undefined) return false;
+  if (alias === undefined) {
+    return false;
+  }
 
   const references = aliasReferenceGraph(programOf(alias), sourceCode);
 
@@ -214,11 +224,17 @@ const definesRecursiveTypeAlias = (
   while (true) {
     const next = mut_queue.pop();
 
-    if (next === undefined) return false;
+    if (next === undefined) {
+      return false;
+    }
 
-    if (next === alias.id.name) return true;
+    if (next === alias.id.name) {
+      return true;
+    }
 
-    if (mut_seen.has(next)) continue;
+    if (mut_seen.has(next)) {
+      continue;
+    }
 
     mut_seen.add(next);
 
@@ -253,7 +269,9 @@ const aliasReferenceGraph = (
 ): ReadonlyMap<string, ReadonlySet<string>> => {
   const cached = aliasReferenceGraphCache.get(program);
 
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    return cached;
+  }
 
   const mut_graph = new Map<string, ReadonlySet<string>>();
 
@@ -314,7 +332,9 @@ const walk = (
 ): void => {
   visit(node);
 
-  if (!isRecord(node)) return;
+  if (!isRecord(node)) {
+    return;
+  }
 
   const keys =
     sourceCode.visitorKeys[node.type] ??
@@ -325,7 +345,9 @@ const walk = (
 
     if (Arr.isArray(value)) {
       for (const element of value) {
-        if (isNode(element)) walk(element, sourceCode, visit);
+        if (isNode(element)) {
+          walk(element, sourceCode, visit);
+        }
       }
     } else if (isNode(value)) {
       walk(value, sourceCode, visit);
@@ -341,7 +363,9 @@ const isNode = (value: unknown): value is TSESTree.Node =>
 const getArrayElementType = (
   node: TSESTree.TypeNode,
 ): TSESTree.TypeNode | undefined => {
-  if (node.type === AST_NODE_TYPES.TSArrayType) return node.elementType;
+  if (node.type === AST_NODE_TYPES.TSArrayType) {
+    return node.elementType;
+  }
 
   return node.type === AST_NODE_TYPES.TSTypeOperator &&
     node.operator === 'readonly' &&

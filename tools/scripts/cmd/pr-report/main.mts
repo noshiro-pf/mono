@@ -44,11 +44,15 @@ export const prReport = async (
       ? await readRepoRef()
       : parseRepoRef(options.repo);
 
-  if (Result.isErr(repo)) return repo;
+  if (Result.isErr(repo)) {
+    return repo;
+  }
 
   const required = await readRequiredContexts();
 
-  if (Result.isErr(required)) return required;
+  if (Result.isErr(required)) {
+    return required;
+  }
 
   const client = createClient(
     process.env['GITHUB_TOKEN'] ?? process.env['GH_TOKEN'],
@@ -56,7 +60,9 @@ export const prReport = async (
 
   const facts = await client.facts(repo.value);
 
-  if (Result.isErr(facts)) return facts;
+  if (Result.isErr(facts)) {
+    return facts;
+  }
 
   // One more request, and the one section that is not about what is open:
   // what landed. A report that only lists the queue cannot answer "did the
@@ -68,7 +74,9 @@ export const prReport = async (
     options.mergedLimit,
   );
 
-  if (Result.isErr(merged)) return merged;
+  if (Result.isErr(merged)) {
+    return merged;
+  }
 
   const report = buildReport({
     repo: repo.value,

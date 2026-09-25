@@ -6,12 +6,14 @@ import {
 export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-restricted-syntax': 'off',
   'ts-restrictions/no-restricted-cast-name': 'off',
+  'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
   'ts-restrictions/prefer-curried-call': 'error',
   'ts-restrictions/prefer-dedent': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
+  'ts-restrictions/prefer-logical-over-boolean-ternary': 'error',
   'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
   'ts-restrictions/check-destructuring-completeness':

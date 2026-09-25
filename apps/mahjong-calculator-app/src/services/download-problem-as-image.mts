@@ -8,7 +8,9 @@ import { downloadFile } from '../utils/index.mjs';
 export const downloadProblemAsImage = async (): Promise<void> => {
   const target = document.querySelector<HTMLDivElement>('#problem');
 
-  if (target === null) return;
+  if (target === null) {
+    return;
+  }
 
   const config = { useCORS: true } as const;
 
@@ -22,7 +24,9 @@ export const downloadProblemAsImage = async (): Promise<void> => {
 
   const revealedBlocks = revealedBlocks$.getSnapshot();
 
-  if (Optional.isNone(handSorted) || Optional.isNone(revealedBlocks)) return;
+  if (Optional.isNone(handSorted) || Optional.isNone(revealedBlocks)) {
+    return;
+  }
 
   downloadFile(
     src,

@@ -5,10 +5,14 @@ export const tokensRepresentsLambdaTerm = (
   tokens: readonly string[],
 ): boolean => {
   /* e ::= x | (lambda x.e) | (e e) */
-  if (tokens.length < 1) return false;
+  if (tokens.length < 1) {
+    return false;
+  }
 
   /* x? */
-  if (Arr.isFixedLengthArray(1, tokens)) return isVariable(tokens[0]);
+  if (Arr.isFixedLengthArray(1, tokens)) {
+    return isVariable(tokens[0]);
+  }
 
   /* (lambda x.e)? */
   if (
@@ -18,8 +22,9 @@ export const tokensRepresentsLambdaTerm = (
     tokens[3] === '.' &&
     tokensRepresentsLambdaTerm(tokens.slice(4, -1)) &&
     Optional.toNullable(Arr.last(tokens)) === ')'
-  )
+  ) {
     return true;
+  }
 
   /* (e e)? */
   if (tokens[0] === '(' && Optional.toNullable(Arr.last(tokens)) === ')') {
@@ -27,8 +32,9 @@ export const tokensRepresentsLambdaTerm = (
       if (
         tokensRepresentsLambdaTerm(tokens.slice(1, asUint32(sep))) &&
         tokensRepresentsLambdaTerm(tokens.slice(asUint32(sep), -1))
-      )
+      ) {
         return true;
+      }
     }
 
     return false;

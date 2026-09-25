@@ -9,7 +9,9 @@ if (import.meta.vitest !== undefined) {
       'check logs',
     ) as TernaryResult<string, string, string>;
 
-    if (!TernaryResult.isWarn(maybeWarn)) return;
+    if (!TernaryResult.isWarn(maybeWarn)) {
+      return;
+    }
 
     assert.strictEqual(maybeWarn.value, 'value');
 

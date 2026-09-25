@@ -44,7 +44,9 @@ const refreshAnswers = (): void => {
 /* subscriptions */
 
 combine([fetchAnswersThrottled$, Router.eventId$]).subscribe(([_, eventId]) => {
-  if (eventId === undefined) return;
+  if (eventId === undefined) {
+    return;
+  }
 
   setRefreshButtonIsLoading(true);
 

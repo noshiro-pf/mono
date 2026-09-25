@@ -62,11 +62,15 @@ export const noTupleMutatingMethod: Rule = {
       '`{{method}}` moves or overwrites a tuple’s elements by position, and its type states a type per position — so a value can land in a slot typed for something else. Use the copying form (`toSorted`, `toReversed`, `with`), which returns an array.',
   },
   visit: (node, { checker, report }) => {
-    if (!isCallExpression(node)) return;
+    if (!isCallExpression(node)) {
+      return;
+    }
 
     const callee = node.expression;
 
-    if (!isPropertyAccessExpression(callee)) return;
+    if (!isPropertyAccessExpression(callee)) {
+      return;
+    }
 
     const method = callee.name.text;
 
@@ -74,11 +78,15 @@ export const noTupleMutatingMethod: Rule = {
 
     // The syntactic filter that keeps the pass cheap: everything else costs
     // nothing, and the checker is asked only about these nine names.
-    if (messageId === undefined) return;
+    if (messageId === undefined) {
+      return;
+    }
 
     // `Array` rather than `ReadonlyArray`: a readonly tuple does not have
     // these members at all, so tsc has already refused the call.
-    if (ownerOf(checker, callee) !== 'Array') return;
+    if (ownerOf(checker, callee) !== 'Array') {
+      return;
+    }
 
     const receiverType = checker.getTypeAtLocation(callee.expression);
 
@@ -152,7 +160,8 @@ const isTupleTyped = (
     return constraint !== undefined && isTupleTyped(checker, constraint);
   }
 
-  return type.isTupleType()
-    ? true
-    : type.isTypeReference() && type.getTarget().isTupleType();
+  return (
+    type.isTupleType() ||
+    (type.isTypeReference() && type.getTarget().isTupleType())
+  );
 };

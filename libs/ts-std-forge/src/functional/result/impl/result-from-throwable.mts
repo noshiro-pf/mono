@@ -42,7 +42,9 @@ export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
   } catch (error) {
     // A panic is a bug, not a recoverable failure: let it propagate.
 
-    if (isPanicError(error)) throw error;
+    if (isPanicError(error)) {
+      throw error;
+    }
 
     if (isError(error)) {
       return err(error);

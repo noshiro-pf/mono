@@ -11,7 +11,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
 
-    if (!Str.isBoundedLengthString(8, 16, input)) return;
+    if (!Str.isBoundedLengthString(8, 16, input)) {
+      return;
+    }
 
     const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
 

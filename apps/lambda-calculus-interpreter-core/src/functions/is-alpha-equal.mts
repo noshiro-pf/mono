@@ -18,7 +18,10 @@ export const isAlphaEqual = (term1: LambdaTerm, term2: LambdaTerm): boolean => {
     return isAlphaEqual(term1[2], term2converted[2]);
   }
 
-  return isApplication(term1) && isApplication(term2)
-    ? isAlphaEqual(term1[0], term2[0]) && isAlphaEqual(term1[1], term2[1])
-    : false;
+  return (
+    isApplication(term1) &&
+    isApplication(term2) &&
+    isAlphaEqual(term1[0], term2[0]) &&
+    isAlphaEqual(term1[1], term2[1])
+  );
 };

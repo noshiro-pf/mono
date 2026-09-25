@@ -165,9 +165,13 @@ export const askGraphql = async (
  * something to say about.
  */
 export const withoutNullNodes = (value: unknown): unknown => {
-  if (Arr.isArray(value)) return value.map(withoutNullNodes);
+  if (Arr.isArray(value)) {
+    return value.map(withoutNullNodes);
+  }
 
-  if (!isRecord(value)) return value;
+  if (!isRecord(value)) {
+    return value;
+  }
 
   return Obj.map(value, (field, key) =>
     key === 'nodes' && Arr.isArray(field)

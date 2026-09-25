@@ -71,23 +71,33 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
   defaultOptions: [],
   create: (context) => ({
     TSArrayType: (node) => {
-      if (isExcluded(node) || isCovered(node, 'array')) return;
+      if (isExcluded(node) || isCovered(node, 'array')) {
+        return;
+      }
 
       context.report({ node, messageId: 'array' });
     },
     TSTupleType: (node) => {
-      if (isExcluded(node) || isCovered(node, 'tuple')) return;
+      if (isExcluded(node) || isCovered(node, 'tuple')) {
+        return;
+      }
 
       context.report({ node, messageId: 'tuple' });
     },
     TSTypeReference: (node) => {
-      if (node.typeName.type !== AST_NODE_TYPES.Identifier) return;
+      if (node.typeName.type !== AST_NODE_TYPES.Identifier) {
+        return;
+      }
 
       const alternative = mutableReferences.get(node.typeName.name);
 
-      if (alternative === undefined) return;
+      if (alternative === undefined) {
+        return;
+      }
 
-      if (isExcluded(node) || isCovered(node, 'reference')) return;
+      if (isExcluded(node) || isCovered(node, 'reference')) {
+        return;
+      }
 
       context.report({
         node: node.typeName,
@@ -96,13 +106,19 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
       });
     },
     TSPropertySignature: (node) => {
-      if (node.readonly) return;
+      if (node.readonly) {
+        return;
+      }
 
-      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) return;
+      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) {
+        return;
+      }
 
       const name = propertyName(node.key);
 
-      if (name?.startsWith(MUT_PREFIX) === true) return;
+      if (name?.startsWith(MUT_PREFIX) === true) {
+        return;
+      }
 
       context.report({
         node: node.key,
@@ -111,16 +127,24 @@ export const requireReadonlyType = createRule<readonly [], MessageIds>({
       });
     },
     TSIndexSignature: (node) => {
-      if (node.readonly) return;
+      if (node.readonly) {
+        return;
+      }
 
-      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) return;
+      if (isExcluded(node) || isMemberOfCoveredLiteral(node)) {
+        return;
+      }
 
       context.report({ node, messageId: 'indexSignature' });
     },
     TSMappedType: (node) => {
-      if (node.readonly === true || node.readonly === '+') return;
+      if (node.readonly === true || node.readonly === '+') {
+        return;
+      }
 
-      if (isExcluded(node) || isCovered(node, 'mapped')) return;
+      if (isExcluded(node) || isCovered(node, 'mapped')) {
+        return;
+      }
 
       context.report({ node, messageId: 'mappedType' });
     },
@@ -170,7 +194,9 @@ const isCovered = (node: AnyNode, kind: Kind): boolean => {
     mut_parent = mut_parent.parent;
   }
 
-  if (mut_parent === undefined) return false;
+  if (mut_parent === undefined) {
+    return false;
+  }
 
   if (
     mut_parent.type === AST_NODE_TYPES.TSTypeOperator &&
@@ -209,9 +235,13 @@ const isCovered = (node: AnyNode, kind: Kind): boolean => {
     shallowReadonlyNames.has(reference.typeName.name) &&
     mut_parent.params[0] === mut_current;
 
-  if (!isReadonlyArgument) return false;
+  if (!isReadonlyArgument) {
+    return false;
+  }
 
-  if (kind !== 'reference') return true;
+  if (kind !== 'reference') {
+    return true;
+  }
 
   // `Readonly<Array<T>>` is a ReadonlyArray and `Readonly<Record<K, V>>` a
   // readonly record; `Readonly<Map<K, V>>` / `Readonly<Set<T>>` are not.
@@ -248,7 +278,9 @@ const isExcluded = (node: AnyNode): boolean => {
       return true;
     }
 
-    if (declaresMutName(mut_current)) return true;
+    if (declaresMutName(mut_current)) {
+      return true;
+    }
   }
 
   return false;

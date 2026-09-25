@@ -71,7 +71,9 @@ export const BpNumericInput = memoNamed<BpNumericInputProps>(
           onBlur(ev);
         }
 
-        if (onValueChangeFiltered === undefined) return;
+        if (onValueChangeFiltered === undefined) {
+          return;
+        }
 
         const parsed = parseNumericString(state);
 

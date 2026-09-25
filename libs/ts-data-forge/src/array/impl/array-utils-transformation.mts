@@ -548,7 +548,9 @@ export const uniqBy = <
   return array.filter((val) => {
     const mappedValue = mapFn(val);
 
-    if (mut_mappedValues.has(mappedValue)) return false;
+    if (mut_mappedValues.has(mappedValue)) {
+      return false;
+    }
 
     mut_mappedValues.add(mappedValue);
 
@@ -972,12 +974,16 @@ export const zip = <
 export const cartesianProduct = <T,>(
   arrays: readonly (readonly T[])[],
 ): readonly (readonly T[])[] => {
-  if (!isNonEmpty(arrays)) return [[]];
+  if (!isNonEmpty(arrays)) {
+    return [[]];
+  }
 
   const [first, ...rest] = arrays;
 
   // If first array is empty, the result is empty
-  if (!isNonEmpty(first)) return [];
+  if (!isNonEmpty(first)) {
+    return [];
+  }
 
   const restProduct = cartesianProduct(rest);
 

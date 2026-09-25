@@ -46,7 +46,9 @@ export const EventListPage = memoNamed('EventListPage', () => {
           tp(
             e,
             () => {
-              if (fireAuthUser === undefined) return;
+              if (fireAuthUser === undefined) {
+                return;
+              }
 
               archiveEventScheduleHandler(e.eventScheduleMetadata.id, {
                 id: UserId.cast(fireAuthUser.uid),
@@ -54,7 +56,9 @@ export const EventListPage = memoNamed('EventListPage', () => {
               }).catch(noop);
             },
             () => {
-              if (fireAuthUser === undefined) return;
+              if (fireAuthUser === undefined) {
+                return;
+              }
 
               unarchiveEventScheduleHandler(e.eventScheduleMetadata.id, {
                 id: UserId.cast(fireAuthUser.uid),

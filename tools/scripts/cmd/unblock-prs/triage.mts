@@ -62,11 +62,15 @@ export const survey = async (
     mut_listed = await listPullRequests();
   }
 
-  if (Result.isErr(mut_listed)) return mut_listed;
+  if (Result.isErr(mut_listed)) {
+    return mut_listed;
+  }
 
   const baseSha = await remoteSha(defaultBranch);
 
-  if (Result.isErr(baseSha)) return baseSha;
+  if (Result.isErr(baseSha)) {
+    return baseSha;
+  }
 
   return Result.ok({
     pullRequests: mut_listed.value,
@@ -224,7 +228,9 @@ const classify = async (
   if (isVersionPullRequest(pr, context.defaultBranch)) {
     const held = await versionPullRequestHold(pr, context);
 
-    if (held !== undefined) return held;
+    if (held !== undefined) {
+      return held;
+    }
 
     // Nothing holds it. Paused means there is a label to take off; otherwise
     // it is already on its way and auto-merge owns it, exactly as with
@@ -339,7 +345,9 @@ export const reportTriage = (
   );
 
   for (const cycle of triaged.cycles) {
-    if (!Arr.isNonEmpty(cycle)) continue;
+    if (!Arr.isNonEmpty(cycle)) {
+      continue;
+    }
 
     log(
       `  Merge-After cycle: ${[...cycle, cycle[0]].map((number) => `#${number}`).join(' → ')}`,
@@ -383,13 +391,17 @@ const outOfScopeReason = (
   pr: PullRequest,
   context: TriageBase,
 ): string | undefined => {
-  if (pr.state !== 'OPEN') return `state is ${pr.state}`;
+  if (pr.state !== 'OPEN') {
+    return `state is ${pr.state}`;
+  }
 
   // First, so that everything after it is a reason reported only for a pull
   // request that asked. `merge-queued` is the whole of the scope rule: it is
   // the author saying this one is reviewed and is to be landed, which is a
   // different statement from auto-merge, and one no bot makes by accident.
-  if (!isMergeQueued(pr)) return `not labelled ${MERGE_QUEUED_LABEL}`;
+  if (!isMergeQueued(pr)) {
+    return `not labelled ${MERGE_QUEUED_LABEL}`;
+  }
 
   // Nothing here merges anything — auto-merge does, once the checks are
   // green. A queued pull request without it would be released from

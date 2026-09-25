@@ -32,7 +32,7 @@ import { createStore } from 'zustand/vanilla';
 
         store.setState({ counter: mut_count });
 
-        if (!(mut_count >= 4)) {
+        if (mut_count < 4) {
           return;
         }
 

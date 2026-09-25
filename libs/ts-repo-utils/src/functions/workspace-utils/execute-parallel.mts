@@ -286,7 +286,9 @@ const topologicalSortPackages = (
   const packageMap = new Map(packages.map((p) => [p.name, p]));
 
   const visit = (pkgName: string): void => {
-    if (mut_visited.has(pkgName)) return;
+    if (mut_visited.has(pkgName)) {
+      return;
+    }
 
     mut_visited.add(pkgName);
 

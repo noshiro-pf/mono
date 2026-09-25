@@ -22,7 +22,9 @@ export const ImageElementRenderer = memoNamed<Props>(
     const elementRef = React.useRef<Mutable<HTMLDivElement>>(null);
 
     React.useEffect(() => {
-      if (elementRef.current == null) return;
+      if (elementRef.current == null) {
+        return;
+      }
 
       // `replaceChildren()` rather than `innerHTML = ''`: it empties the node
       // without going through the HTML parser, which is what the lint rule is

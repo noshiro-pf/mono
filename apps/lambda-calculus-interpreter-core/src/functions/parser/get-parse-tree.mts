@@ -25,8 +25,9 @@ export const getParseTree = (
   }
 
   /* x? */
-  if (Arr.isFixedLengthArray(1, tokens) && isVariable(tokens[0]))
+  if (Arr.isFixedLengthArray(1, tokens) && isVariable(tokens[0])) {
     return tokens[0];
+  }
 
   /* (lambda x.e)? */
   if (

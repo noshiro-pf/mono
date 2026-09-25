@@ -61,14 +61,18 @@ export const LabelButtonItemView = memoNamed<Props>(
     );
 
     const onLabelClickConditional = React.useCallback(() => {
-      if (disabled) return;
+      if (disabled) {
+        return;
+      }
 
       props.onLabelClick();
     }, [disabled, props]);
 
     const onVisibilityIconClickConditional = React.useCallback(
       (ev: Readonly<React.BaseSyntheticEvent>) => {
-        if (disabled) return;
+        if (disabled) {
+          return;
+        }
 
         props.onVisibilityIconClick(ev);
       },

@@ -89,7 +89,9 @@ export const main = async (): Promise<void> => {
       ),
     );
 
-    if (!reExportMessageFiles) continue;
+    if (!reExportMessageFiles) {
+      continue;
+    }
 
     const contentStr = Json.stringify(value, undefined, 2);
 

@@ -421,7 +421,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         return classifyLiteralComparison(op, n);
       }
 
-      if (!isSimpleReference(receiver)) return undefined;
+      if (!isSimpleReference(receiver)) {
+        return undefined;
+      }
 
       const m = matchLengthMinus(other, receiverText);
 
@@ -435,11 +437,15 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       if (args.length === 1) {
         const [start] = args;
 
-        if (start === undefined) return undefined;
+        if (start === undefined) {
+          return undefined;
+        }
 
         const n = asNonNegativeIntegerLiteral(start);
 
-        if (n !== undefined) return normalizeCountedOp('skip', n);
+        if (n !== undefined) {
+          return normalizeCountedOp('skip', n);
+        }
 
         const negated = asNegatedPositiveIntegerLiteral(start);
 
@@ -461,7 +467,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
         const n = asNonNegativeIntegerLiteral(end);
 
-        if (n !== undefined) return normalizeCountedOp('take', n);
+        if (n !== undefined) {
+          return normalizeCountedOp('take', n);
+        }
 
         const negated = asNegatedPositiveIntegerLiteral(end);
 
@@ -469,7 +477,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return normalizeCountedOp('skipLast', negated);
         }
 
-        if (!isSimpleReference(receiver)) return undefined;
+        if (!isSimpleReference(receiver)) {
+          return undefined;
+        }
 
         const m = matchLengthMinus(end, sourceCode.getText(receiver));
 
@@ -487,12 +497,16 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       if (args.length === 1) {
         const [start] = args;
 
-        if (start === undefined) return undefined;
+        if (start === undefined) {
+          return undefined;
+        }
 
         const n = asNonNegativeIntegerLiteral(start);
 
         // `xs.toSpliced(N)` removes everything from index N on → take N.
-        if (n !== undefined) return normalizeCountedOp('take', n);
+        if (n !== undefined) {
+          return normalizeCountedOp('take', n);
+        }
 
         const negated = asNegatedPositiveIntegerLiteral(start);
 
@@ -516,12 +530,16 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         // `xs.toSpliced(0, N)` removes the first N elements → skip N.
         const n = asNonNegativeIntegerLiteral(deleteCount);
 
-        if (n !== undefined) return normalizeCountedOp('skip', n);
+        if (n !== undefined) {
+          return normalizeCountedOp('skip', n);
+        }
 
         // `xs.toSpliced(0, xs.length - N)` keeps the last N → takeLast N.
         // (Note: `xs.toSpliced(0, -N)` clamps the delete count to 0 and is a
         // plain copy, so it is deliberately NOT treated as takeLast.)
-        if (!isSimpleReference(receiver)) return undefined;
+        if (!isSimpleReference(receiver)) {
+          return undefined;
+        }
 
         const m = matchLengthMinus(deleteCount, receiverText);
 
@@ -649,7 +667,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
         // The receiver must be an array or tuple (not a string / typed array
         // / other object that happens to share the method name).
-        if (!isArrayOrTupleType(getTypeOf(receiver))) return;
+        if (!isArrayOrTupleType(getTypeOf(receiver))) {
+          return;
+        }
 
         const receiverText = sourceCode.getText(receiver);
 
@@ -657,7 +677,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           case 'slice': {
             const op = classifySliceArgs(node.arguments, receiver);
 
-            if (op !== undefined) report(node, op, toArgText(receiver));
+            if (op !== undefined) {
+              report(node, op, toArgText(receiver));
+            }
 
             return;
           }
@@ -669,7 +691,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
               receiverText,
             );
 
-            if (op !== undefined) report(node, op, toArgText(receiver));
+            if (op !== undefined) {
+              report(node, op, toArgText(receiver));
+            }
 
             return;
           }
@@ -683,7 +707,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
             const op = classifyFilterCallback(callback, receiver, receiverText);
 
-            if (op !== undefined) report(node, op, toArgText(receiver));
+            if (op !== undefined) {
+              report(node, op, toArgText(receiver));
+            }
 
             return;
           }
@@ -735,7 +761,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       ArrayExpression: (node) => {
         // `[item, ...xs]` → `Arr.toUnshifted(xs, item)`,
         // `[...xs, item]` → `Arr.toPushed(xs, item)`.
-        if (node.elements.length !== 2) return;
+        if (node.elements.length !== 2) {
+          return;
+        }
 
         const [first, second] = node.elements;
 
@@ -760,11 +788,15 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         // `spread`, `item`, and `fn` are set together (all from the same
         // tuple), so checking `spread` also guarantees the others are
         // defined.
-        if (spread === undefined) return;
+        if (spread === undefined) {
+          return;
+        }
 
         // Spreading a non-array iterable (`[v, ...someSet]`) is a genuine
         // conversion, not an element addition to an array.
-        if (!isArrayOrTupleType(getTypeOf(spread.argument))) return;
+        if (!isArrayOrTupleType(getTypeOf(spread.argument))) {
+          return;
+        }
 
         report(
           node,

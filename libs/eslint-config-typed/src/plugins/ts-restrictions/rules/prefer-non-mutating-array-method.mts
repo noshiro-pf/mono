@@ -117,22 +117,30 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         // are targeted (e.g. `fill(v, start, end)` has no direct equivalent).
         switch (methodName) {
           case 'reverse':
-            if (!Arr.isEmpty(node.arguments)) return;
+            if (!Arr.isEmpty(node.arguments)) {
+              return;
+            }
 
             break;
 
           case 'sort':
-            if (node.arguments.length > 1) return;
+            if (node.arguments.length > 1) {
+              return;
+            }
 
             break;
 
           case 'splice':
-            if (Arr.isEmpty(node.arguments)) return;
+            if (Arr.isEmpty(node.arguments)) {
+              return;
+            }
 
             break;
 
           case 'fill':
-            if (!Arr.isFixedLengthArray(1, node.arguments)) return;
+            if (!Arr.isFixedLengthArray(1, node.arguments)) {
+              return;
+            }
 
             break;
 
@@ -156,7 +164,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
         const arg = matchArrayFromCall(inner);
 
-        if (arg === undefined) return;
+        if (arg === undefined) {
+          return;
+        }
 
         // The argument must already be an array (not a `Set` / `Map` / iterable
         // where `Array.from()` is a genuine conversion, not a defensive copy).
@@ -164,7 +174,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           parserServices.esTreeNodeToTSNodeMap.get(arg),
         );
 
-        if (!isArrayOrTupleType(argType)) return;
+        if (!isArrayOrTupleType(argType)) {
+          return;
+        }
 
         // Guard against a shadowed `Array` binding whose `.from()` does not
         // return an array: the real `Array.from(arrayLike)` is always an array.
@@ -172,7 +184,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           parserServices.esTreeNodeToTSNodeMap.get(inner),
         );
 
-        if (!isArrayOrTupleType(innerType)) return;
+        if (!isArrayOrTupleType(innerType)) {
+          return;
+        }
 
         const sourceCode = context.sourceCode;
 
@@ -210,7 +224,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           }
         })();
 
-        if (replacement === undefined) return;
+        if (replacement === undefined) {
+          return;
+        }
 
         context.report({
           node,

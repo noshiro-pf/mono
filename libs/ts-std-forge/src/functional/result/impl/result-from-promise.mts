@@ -55,7 +55,9 @@ export const fromPromise = <P extends Promise<unknown>>(
     .catch((error: unknown) => {
       // A panic is a bug, not a recoverable failure: let it propagate.
 
-      if (isPanicError(error)) throw error;
+      if (isPanicError(error)) {
+        throw error;
+      }
 
       return err(error);
     });

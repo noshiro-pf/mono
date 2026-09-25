@@ -84,7 +84,9 @@ export const matchArrayFromCall = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Expression,
 ): TSESTree.Expression | undefined => {
-  if (node.type !== AST_NODE_TYPES.CallExpression) return undefined;
+  if (node.type !== AST_NODE_TYPES.CallExpression) {
+    return undefined;
+  }
 
   const callee = node.callee;
 
@@ -99,7 +101,9 @@ export const matchArrayFromCall = (
     return undefined;
   }
 
-  if (!Arr.isFixedLengthArray(1, node.arguments)) return undefined;
+  if (!Arr.isFixedLengthArray(1, node.arguments)) {
+    return undefined;
+  }
 
   const arg = node.arguments[0];
 

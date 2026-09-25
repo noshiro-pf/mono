@@ -22,7 +22,9 @@ export const globalTypeNames = (
 
   const cached = mut_cache.get(key);
 
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    return cached;
+  }
 
   const mut_names = new Set<string>();
 
@@ -35,14 +37,18 @@ export const globalTypeNames = (
     mut_lib !== undefined;
     mut_lib = mut_pending.pop()
   ) {
-    if (mut_visited.has(mut_lib)) continue;
+    if (mut_visited.has(mut_lib)) {
+      continue;
+    }
 
     mut_visited.add(mut_lib);
 
     const file = path.join(libDir, `lib.${mut_lib}.d.ts`);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    if (!fs.existsSync(file)) continue;
+    if (!fs.existsSync(file)) {
+      continue;
+    }
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const text = fs.readFileSync(file, 'utf8');
@@ -50,13 +56,17 @@ export const globalTypeNames = (
     for (const match of text.matchAll(referenceLibRegex)) {
       const referenced = match[1];
 
-      if (referenced !== undefined) mut_pending.push(referenced.toLowerCase());
+      if (referenced !== undefined) {
+        mut_pending.push(referenced.toLowerCase());
+      }
     }
 
     for (const match of text.matchAll(typeDeclarationRegex)) {
       const name = match[1];
 
-      if (name !== undefined) mut_names.add(name);
+      if (name !== undefined) {
+        mut_names.add(name);
+      }
     }
   }
 

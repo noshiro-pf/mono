@@ -33,11 +33,17 @@ export const ymdFromDate = (date: Date): YearMonthDate =>
   }) as const;
 
 export const compareYmd = (a: YearMonthDate, b: YearMonthDate): -1 | 0 | 1 => {
-  if (a.year !== b.year) return a.year < b.year ? -1 : 1;
+  if (a.year !== b.year) {
+    return a.year < b.year ? -1 : 1;
+  }
 
-  if (a.month !== b.month) return a.month < b.month ? -1 : 1;
+  if (a.month !== b.month) {
+    return a.month < b.month ? -1 : 1;
+  }
 
-  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+  if (a.date !== b.date) {
+    return a.date < b.date ? -1 : 1;
+  }
 
   return 0;
 };

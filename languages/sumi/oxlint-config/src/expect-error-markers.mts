@@ -78,7 +78,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
       continue;
     }
 
-    if (!(mut_pending.length > 0)) {
+    if (mut_pending.length === 0) {
       continue;
     }
 

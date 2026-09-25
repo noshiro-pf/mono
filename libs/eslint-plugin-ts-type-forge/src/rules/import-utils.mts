@@ -87,7 +87,9 @@ const declaresName = (
   node: TSESTree.Node | null | undefined,
   name: string,
 ): boolean => {
-  if (node === null || node === undefined) return false;
+  if (node === null || node === undefined) {
+    return false;
+  }
 
   if (
     node.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||

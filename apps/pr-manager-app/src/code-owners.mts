@@ -163,7 +163,9 @@ export const codeOwnerReview = ({
   approvers: readonly string[];
   author: string;
 }>): CodeOwnerReview => {
-  if (!required) return { state: 'not-required' };
+  if (!required) {
+    return { state: 'not-required' };
+  }
 
   const approved = new Set(approvers.map((login) => login.toLowerCase()));
 
@@ -189,7 +191,9 @@ export const codeOwnerReview = ({
     };
   }
 
-  if (!filesComplete) return { state: 'unknown' };
+  if (!filesComplete) {
+    return { state: 'unknown' };
+  }
 
   const owned = files.some((path) => Arr.isNonEmpty(ownersOf(path, rules)));
 

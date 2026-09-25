@@ -92,7 +92,9 @@ export const DepGraph = React.memo<Props>((props) => {
 
         const to = nodeMap.get(e.to);
 
-        if (from === undefined || to === undefined) return undefined;
+        if (from === undefined || to === undefined) {
+          return undefined;
+        }
 
         const edgeKey = `${e.from}-${e.to}` as const;
 

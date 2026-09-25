@@ -44,7 +44,9 @@ export const compareDatetimeRange = (
 ): number => {
   const compareYmdResult = compareYmd(a.ymd, b.ymd);
 
-  if (compareYmdResult !== 0) return compareYmdResult;
+  if (compareYmdResult !== 0) {
+    return compareYmdResult;
+  }
 
   const compareTimeRangeResult = compareTimeRange(a.timeRange, b.timeRange);
 

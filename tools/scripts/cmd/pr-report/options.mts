@@ -74,11 +74,15 @@ export const parseOptions = (
     }),
   );
 
-  if (Result.isErr(parsed)) return Result.err(parsed.value.message);
+  if (Result.isErr(parsed)) {
+    return Result.err(parsed.value.message);
+  }
 
   const { values } = parsed.value;
 
-  if (values.help) return Result.ok('help');
+  if (values.help) {
+    return Result.ok('help');
+  }
 
   const format = values.format ?? 'terminal';
 
@@ -94,7 +98,9 @@ export const parseOptions = (
     DEFAULT_MERGED_DAYS,
   );
 
-  if (Result.isErr(mergedDays)) return mergedDays;
+  if (Result.isErr(mergedDays)) {
+    return mergedDays;
+  }
 
   const mergedLimit = positive(
     'merged-limit',
@@ -102,7 +108,9 @@ export const parseOptions = (
     DEFAULT_MERGED_LIMIT,
   );
 
-  if (Result.isErr(mergedLimit)) return mergedLimit;
+  if (Result.isErr(mergedLimit)) {
+    return mergedLimit;
+  }
 
   return Result.ok({
     format,
@@ -122,7 +130,9 @@ const positive = (
   raw: string | undefined,
   fallback: number,
 ): Result<number, string> => {
-  if (raw === undefined) return Result.ok(fallback);
+  if (raw === undefined) {
+    return Result.ok(fallback);
+  }
 
   const parsed = Result.unwrapOkOr(Num.safeParseFloat(raw), Number.NaN);
 

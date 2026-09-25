@@ -80,7 +80,9 @@ export const remoteSha = async (
 ): Promise<Result<string, string>> => {
   const listed = await git(`git ls-remote --heads origin ${sh(branch)}`);
 
-  if (Result.isErr(listed)) return listed;
+  if (Result.isErr(listed)) {
+    return listed;
+  }
 
   const sha = listed.value.trim().split(/\s+/u, 1)[0];
 
@@ -115,7 +117,9 @@ export const parseJson = <A,>(
 ): Result<A, string> => {
   const parsed = Json.parse(text);
 
-  if (Result.isErr(parsed)) return Result.err(`invalid JSON: ${parsed.value}`);
+  if (Result.isErr(parsed)) {
+    return Result.err(`invalid JSON: ${parsed.value}`);
+  }
 
   const validated = schema.validate(parsed.value);
 

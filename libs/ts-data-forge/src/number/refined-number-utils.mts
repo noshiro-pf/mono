@@ -392,7 +392,7 @@ export namespace TsDataForgeInternals {
         (integerOrSafeInteger === 'Integer'
           ? Number.isInteger(a)
           : Number.isSafeInteger(a)) &&
-        (nonZero === true ? a !== 0 : true) &&
+        (nonZero !== true || a !== 0) &&
         (isFnOrUndefined(MIN_VALUE, MAX_VALUE)?.(a) ?? true);
 
       const castType = castTypeImpl<ElementType>(is, typeNameInMessage);
@@ -469,7 +469,9 @@ export namespace TsDataForgeInternals {
         while (true) {
           const r = randomImpl(min, max);
 
-          if (Num.isNonZero(r)) return clampOrCastFn(r);
+          if (Num.isNonZero(r)) {
+            return clampOrCastFn(r);
+          }
         }
       };
 
@@ -611,7 +613,7 @@ export namespace TsDataForgeInternals {
     }>): OperatorsForFloat<ElementType, MIN_VALUE, MAX_VALUE> => {
       const is = (a: number): a is ElementType =>
         Number.isFinite(a) &&
-        (nonZero === true ? a !== 0 : true) &&
+        (nonZero !== true || a !== 0) &&
         (isFnOrUndefined(MIN_VALUE, MAX_VALUE)?.(a) ?? true);
 
       const castType = castTypeImpl<ElementType>(is, typeNameInMessage);
@@ -667,7 +669,9 @@ export namespace TsDataForgeInternals {
         while (true) {
           const r = random(min, max);
 
-          if (isNonZero(r)) return r;
+          if (isNonZero(r)) {
+            return r;
+          }
         }
       };
 

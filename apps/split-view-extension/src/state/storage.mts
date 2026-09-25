@@ -208,9 +208,8 @@ const parsePaneState = (value: unknown): PaneState | undefined => {
     currentUrl: undefined,
     title: undefined,
     sandboxed:
-      hasKey(value, 'sandboxed') && typeof value.sandboxed === 'boolean'
-        ? value.sandboxed
-        : true,
+      !(hasKey(value, 'sandboxed') && typeof value.sandboxed === 'boolean') ||
+      value.sandboxed,
     historyLength: 1,
     zoom:
       hasKey(value, 'zoom') && typeof value.zoom === 'number'

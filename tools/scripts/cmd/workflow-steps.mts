@@ -112,17 +112,25 @@ export const installArgs = (
 ): Parsed<readonly string[] | undefined> => {
   const install = readBoolean(env, 'install');
 
-  if (!install.ok) return install;
+  if (!install.ok) {
+    return install;
+  }
 
   const engineStrict = readBoolean(env, 'engine-strict');
 
-  if (!engineStrict.ok) return engineStrict;
+  if (!engineStrict.ok) {
+    return engineStrict;
+  }
 
   const ignoreScripts = readBoolean(env, 'ignore-scripts');
 
-  if (!ignoreScripts.ok) return ignoreScripts;
+  if (!ignoreScripts.ok) {
+    return ignoreScripts;
+  }
 
-  if (!install.value) return { ok: true, value: undefined };
+  if (!install.value) {
+    return { ok: true, value: undefined };
+  }
 
   return {
     ok: true,
@@ -172,7 +180,9 @@ export const planDiffCheck = (
 > => {
   const scope = readChoice(env, 'diff-scope', ['code', 'style', 'strict-lib']);
 
-  if (!scope.ok) return scope;
+  if (!scope.ok) {
+    return scope;
+  }
 
   const script = `z:check-should-run:${scope.value}-checks` as const;
 

@@ -40,7 +40,9 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const checkLicenses = (): Result<CheckSummary, string> => {
   const installed = readInstalledLicenses();
 
-  if (Result.isErr(installed)) return installed;
+  if (Result.isErr(installed)) {
+    return installed;
+  }
 
   const violations = collectViolations(installed.value, licensePolicy);
 
@@ -114,7 +116,9 @@ export const isAllowedExpression = (
       ? trimmed.slice(1, -1)
       : trimmed;
 
-  if (inner.includes('(') || inner.includes(')')) return false;
+  if (inner.includes('(') || inner.includes(')')) {
+    return false;
+  }
 
   return inner
     .split(' OR ')
@@ -150,8 +154,9 @@ export const collectViolations = (
     if (
       isExcepted(entry, policy) ||
       isAllowedExpression(entry.license, allowed)
-    )
+    ) {
       return [];
+    }
 
     const subject =
       `${entry.name}@${entry.versions.join(' | ')} (${entry.license})` as const;

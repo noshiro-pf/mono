@@ -39,7 +39,9 @@ const isPublishedPackage = (dir: string): boolean => {
   const manifestPath = path.resolve(dir, 'package.json');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  if (!fs.existsSync(manifestPath)) return false;
+  if (!fs.existsSync(manifestPath)) {
+    return false;
+  }
 
   const manifest: unknown = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename

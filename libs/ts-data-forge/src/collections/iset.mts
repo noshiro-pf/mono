@@ -766,7 +766,9 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
   /** @inheritdoc */
   every(predicate: (key: K) => boolean): boolean {
     for (const key of this.values()) {
-      if (!predicate(key)) return false;
+      if (!predicate(key)) {
+        return false;
+      }
     }
 
     return true;
@@ -775,7 +777,9 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
   /** @inheritdoc */
   some(predicate: (key: K) => boolean): boolean {
     for (const key of this.values()) {
-      if (predicate(key)) return true;
+      if (predicate(key)) {
+        return true;
+      }
     }
 
     return false;

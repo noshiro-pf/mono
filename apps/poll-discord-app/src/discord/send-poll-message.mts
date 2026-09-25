@@ -69,7 +69,9 @@ const rpSendPollMessageSub = async (
     // eslint-disable-next-line no-await-in-loop
     const result = await Result.fromPromise(messageChannel.send(el));
 
-    if (Result.isErr(result)) return result;
+    if (Result.isErr(result)) {
+      return result;
+    }
 
     mut_dateOptionAndMessageListTemp.push([
       {
@@ -104,7 +106,9 @@ const rpSendPollMessageSub = async (
     messageChannel.send({ embeds: [summaryMessageEmbed] }),
   );
 
-  if (Result.isErr(summaryMessageInitResult)) return summaryMessageInitResult;
+  if (Result.isErr(summaryMessageInitResult)) {
+    return summaryMessageInitResult;
+  }
 
   const summaryMessageInit = summaryMessageInitResult.value;
 
@@ -114,7 +118,9 @@ const rpSendPollMessageSub = async (
     summaryMessageInit.edit({ embeds: [summaryMessageEmbed] }),
   );
 
-  if (Result.isErr(summaryMessageEditResult)) return summaryMessageEditResult;
+  if (Result.isErr(summaryMessageEditResult)) {
+    return summaryMessageEditResult;
+  }
 
   const summaryMessage = summaryMessageEditResult.value;
 
@@ -122,7 +128,9 @@ const rpSendPollMessageSub = async (
     summaryMessage.react(emojis.refresh.unicode),
   );
 
-  if (Result.isErr(summaryMessageReactResult)) return summaryMessageReactResult;
+  if (Result.isErr(summaryMessageReactResult)) {
+    return summaryMessageReactResult;
+  }
 
   return Result.ok({
     titleMessageId,
@@ -138,9 +146,13 @@ const rpSendPollMessage = async (
   title: string | undefined,
   pollOptions: readonly string[],
 ): Promise<Result<undefined, unknown>> => {
-  if (title === undefined) return Result.ok(undefined);
+  if (title === undefined) {
+    return Result.ok(undefined);
+  }
 
-  if (Arr.isEmpty(pollOptions)) return Result.ok(undefined);
+  if (Arr.isEmpty(pollOptions)) {
+    return Result.ok(undefined);
+  }
 
   const replySubResult = await rpSendPollMessageSub(
     discordChannel,
@@ -148,7 +160,9 @@ const rpSendPollMessage = async (
     pollOptions,
   );
 
-  if (Result.isErr(replySubResult)) return replySubResult;
+  if (Result.isErr(replySubResult)) {
+    return replySubResult;
+  }
 
   const { summaryMessage, dateOptions, dateOptionMessageList, titleMessageId } =
     replySubResult.value;
@@ -245,13 +259,19 @@ const gpSendGroupingMessage = async (
     removeCommandPrefix(messageFilled.content, triggerCommand.gp),
   );
 
-  if (Result.isErr(parseResult)) return Result.ok(undefined);
+  if (Result.isErr(parseResult)) {
+    return Result.ok(undefined);
+  }
 
   const [numGroups, nameList] = parseResult.value;
 
-  if (Arr.isEmpty(nameList)) return Result.ok(undefined);
+  if (Arr.isEmpty(nameList)) {
+    return Result.ok(undefined);
+  }
 
-  if (nameList.length < numGroups) return Result.ok(undefined);
+  if (nameList.length < numGroups) {
+    return Result.ok(undefined);
+  }
 
   const replySubResult = await gpSendGroupingMessageSub(
     messageFilled.channel,
@@ -268,7 +288,9 @@ const gpSendRandMessage = async (
     removeCommandPrefix(messageFilled.content, triggerCommand.rand),
   );
 
-  if (Result.isErr(parseResult)) return Result.ok(undefined);
+  if (Result.isErr(parseResult)) {
+    return Result.ok(undefined);
+  }
 
   const n = parseResult.value;
 
@@ -280,7 +302,9 @@ const gpSendRandMessage = async (
 export const sendMessageMain = async (
   message: Discord.Message,
 ): Promise<Result<undefined, unknown>> => {
-  if (message.author.bot) return Result.ok(undefined);
+  if (message.author.bot) {
+    return Result.ok(undefined);
+  }
 
   if (message.content.startsWith(`${triggerCommand.gp} `)) {
     return gpSendGroupingMessage(message);
@@ -306,7 +330,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp30),
     );
 
-    if (Result.isErr(res)) return res;
+    if (Result.isErr(res)) {
+      return res;
+    }
 
     return rpSendPollMessage(
       message.channel,
@@ -321,7 +347,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp60),
     );
 
-    if (Result.isErr(res)) return res;
+    if (Result.isErr(res)) {
+      return res;
+    }
 
     return rpSendPollMessage(
       message.channel,
@@ -336,7 +364,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp30d),
     );
 
-    if (Result.isErr(res)) return res;
+    if (Result.isErr(res)) {
+      return res;
+    }
 
     return rpSendPollMessage(
       message.channel,
@@ -351,7 +381,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp60d),
     );
 
-    if (Result.isErr(res)) return res;
+    if (Result.isErr(res)) {
+      return res;
+    }
 
     return rpSendPollMessage(
       message.channel,

@@ -110,7 +110,9 @@ const createZipObservable = <const A extends NonEmptyUnknownList>(
           }
         }
 
-        if (queues.some((list) => list.isEmpty)) return;
+        if (queues.some((list) => list.isEmpty)) {
+          return;
+        }
 
         const nextValue =
           // `Arr.map` has a single result element type, so it reports

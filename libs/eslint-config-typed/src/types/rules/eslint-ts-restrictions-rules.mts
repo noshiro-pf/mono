@@ -58,6 +58,22 @@ namespace CheckDestructuringCompleteness {
 }
 
 /**
+ * @description Invert the operator of a negated comparison instead of negating it (`!(a === b)` → `a !== b`, `!(a < b)` → `a >= b` when no operand can be NaN).
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace NoNegatedComparison {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow type assertions with specified type names
  *
  *  ```md
@@ -309,6 +325,21 @@ namespace PreferDedent {
 }
 
 /**
+ * @description Replace a ternary with one boolean literal branch by `&&` or `||` (`a ? false : b` → `!a && b`, `a ? true : b` → `a || b`).
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferLogicalOverBooleanTernary {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)
  *
  *  ```md
@@ -380,6 +411,7 @@ namespace PreferTernary {
 
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
+  'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
@@ -387,6 +419,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
+  'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;

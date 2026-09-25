@@ -77,9 +77,10 @@ export namespace Obj {
 
     const bEntries = Object.entries(b);
 
-    return aEntries.length !== bEntries.length
-      ? false
-      : aEntries.every(([k, v]) => eq(b[k], v));
+    return (
+      aEntries.length === bEntries.length &&
+      aEntries.every(([k, v]) => eq(b[k], v))
+    );
   };
 
   /**
@@ -718,19 +719,27 @@ const deepPickImpl = (
   record: UnknownRecord,
   path: readonly (string | number)[],
 ): UnknownRecord => {
-  if (!Arr.isNonEmpty(path)) return record;
+  if (!Arr.isNonEmpty(path)) {
+    return record;
+  }
 
   const head = path[0];
 
-  if (!hasKey(record, head)) return {};
+  if (!hasKey(record, head)) {
+    return {};
+  }
 
   const value = record[head];
 
   const tail = path.slice(1);
 
-  if (!Arr.isNonEmpty(tail)) return { [head]: value };
+  if (!Arr.isNonEmpty(tail)) {
+    return { [head]: value };
+  }
 
-  if (!isRecord(value)) return { [head]: {} };
+  if (!isRecord(value)) {
+    return { [head]: {} };
+  }
 
   return {
     [head]: deepPickImpl(value, tail),
@@ -741,11 +750,15 @@ const deepOmitImpl = (
   record: UnknownRecord,
   path: readonly (string | number)[],
 ): UnknownRecord => {
-  if (!Arr.isNonEmpty(path)) return record;
+  if (!Arr.isNonEmpty(path)) {
+    return record;
+  }
 
   const head = path[0];
 
-  if (!hasKey(record, head)) return record;
+  if (!hasKey(record, head)) {
+    return record;
+  }
 
   const tail = path.slice(1);
 
@@ -757,7 +770,9 @@ const deepOmitImpl = (
 
   const value = record[head];
 
-  if (!isRecord(value)) return record;
+  if (!isRecord(value)) {
+    return record;
+  }
 
   return {
     ...record,

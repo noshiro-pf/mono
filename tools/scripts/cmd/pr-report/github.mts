@@ -175,7 +175,9 @@ export const createClient = (
 
     const text = await response.text();
 
-    if (response.ok) return Result.ok(text);
+    if (response.ok) {
+      return Result.ok(text);
+    }
 
     // Told apart from any other 403, because it is the one failure a reader
     // can do something about without reading the body of the answer.
@@ -245,7 +247,9 @@ export const createClient = (
         CheckRunsSchema,
       );
 
-      if (Result.isErr(answered)) return answered;
+      if (Result.isErr(answered)) {
+        return answered;
+      }
 
       for (const run of answered.value.check_runs) {
         mut_collected.push({
@@ -327,11 +331,15 @@ export const createClient = (
       }),
     );
 
-    if (Result.isErr(answered)) return new Map();
+    if (Result.isErr(answered)) {
+      return new Map();
+    }
 
     const parsed = parseJson(answered.value, ClosingIssuesSchema, '/graphql');
 
-    if (Result.isErr(parsed)) return new Map();
+    if (Result.isErr(parsed)) {
+      return new Map();
+    }
 
     return new Map(
       parsed.value.data.repository.pullRequests.nodes.map((node) => [
@@ -357,14 +365,18 @@ export const createClient = (
         PullRequestListSchema,
       );
 
-      if (Result.isErr(listed)) return listed;
+      if (Result.isErr(listed)) {
+        return listed;
+      }
 
       const cutoff =
         Temporal.Now.instant().epochMilliseconds -
         withinDays * 24 * 60 * 60 * 1000;
 
       const within = listed.value.filter((pr) => {
-        if (pr.merged_at === null) return false;
+        if (pr.merged_at === null) {
+          return false;
+        }
 
         const at = Result.fromThrowable(
           () => Temporal.Instant.from(pr.merged_at ?? '').epochMilliseconds,
@@ -404,7 +416,9 @@ export const createClient = (
         PullRequestListSchema,
       );
 
-      if (Result.isErr(listed)) return listed;
+      if (Result.isErr(listed)) {
+        return listed;
+      }
 
       if (Arr.isFixedLengthArray(PAGE_SIZE, listed.value)) {
         return Result.err(

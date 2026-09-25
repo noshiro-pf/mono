@@ -10,7 +10,9 @@ const counter = (t: NumberTermBody<Variable, Variable>): number =>
   isVariable(t) ? 0 : 1 + counter(t[1]);
 
 export const toNumber = (term: LambdaTerm): number | undefined => {
-  if (!isNumber(term)) return undefined;
+  if (!isNumber(term)) {
+    return undefined;
+  }
 
   // const s = term[1];
   // const z = term[2][1];

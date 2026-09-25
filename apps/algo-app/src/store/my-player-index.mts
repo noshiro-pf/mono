@@ -6,7 +6,9 @@ import { myName$ } from './my-name.mjs';
 export const myPlayerIndex$: InitializedObservable<PlayerIndex | undefined> =
   combine([db.room$, myName$]).pipe(
     map(([room, myName]) => {
-      if (room === undefined || myName === undefined) return undefined;
+      if (room === undefined || myName === undefined) {
+        return undefined;
+      }
 
       const index: number = room.players.findIndex((p) => p.name === myName);
 

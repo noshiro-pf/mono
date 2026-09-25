@@ -62,7 +62,9 @@ export const outsideCodeFences = (body: string): string => {
   return body
     .split('\n')
     .map((line) => {
-      if (!FENCE_LINE.test(line)) return mut_inFence ? '' : line;
+      if (!FENCE_LINE.test(line)) {
+        return mut_inFence ? '' : line;
+      }
 
       mut_inFence = !mut_inFence;
 
@@ -103,7 +105,9 @@ export const findMergeAfterCycles = (
       return;
     }
 
-    if (mut_finished.has(node)) return;
+    if (mut_finished.has(node)) {
+      return;
+    }
 
     for (const dependency of dependencies.get(node) ?? []) {
       visit(dependency, Arr.toPushed(walked, node));
@@ -122,7 +126,9 @@ export const findMergeAfterCycles = (
 };
 
 const rotateToLowest = (cycle: readonly number[]): readonly number[] => {
-  if (!Arr.isNonEmpty(cycle)) return cycle;
+  if (!Arr.isNonEmpty(cycle)) {
+    return cycle;
+  }
 
   const at = cycle.indexOf(Math.min(...cycle));
 

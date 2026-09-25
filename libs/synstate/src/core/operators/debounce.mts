@@ -135,7 +135,9 @@ const createDebounceObservable = <A,>(
 
         // set timer
         mut_timerId = setTimeout(() => {
-          if (Optional.isNone(sn)) return;
+          if (Optional.isNone(sn)) {
+            return;
+          }
 
           startUpdate(sn.value);
         }, milliSeconds);

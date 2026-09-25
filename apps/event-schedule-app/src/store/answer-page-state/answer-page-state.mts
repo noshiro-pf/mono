@@ -80,7 +80,9 @@ const setAnswerBeingEditedSectionState = (
   setAnswerBeingEditedSectionState_(nextState);
 
   // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
-  if (nextState !== 'creating') return;
+  if (nextState !== 'creating') {
+    return;
+  }
 
   const user = Auth.getFireAuthUserSnapshot();
 
@@ -296,7 +298,9 @@ const onSubmitAnswerImpl = async (
   answerBeingEdited: Answer,
   answerBeingEditedSection: 'creating' | 'editing' | 'hidden',
 ): Promise<void> => {
-  if (eventId === undefined) return;
+  if (eventId === undefined) {
+    return;
+  }
 
   setSubmitButtonIsLoading(true);
 
@@ -366,9 +370,13 @@ const onSubmitEmptyAnswerImpl = async (
   eventId: string | undefined,
   fireAuthUser: FireAuthUser | undefined,
 ): Promise<void> => {
-  if (eventId === undefined) return;
+  if (eventId === undefined) {
+    return;
+  }
 
-  if (fireAuthUser === undefined) return;
+  if (fireAuthUser === undefined) {
+    return;
+  }
 
   setSubmitButtonIsLoading(true);
 
@@ -412,7 +420,9 @@ const onDeleteAnswerImpl = async (
   eventId: string | undefined,
   answerBeingEdited: Answer,
 ): Promise<void> => {
-  if (eventId === undefined) return;
+  if (eventId === undefined) {
+    return;
+  }
 
   setSubmitButtonIsLoading(true);
 

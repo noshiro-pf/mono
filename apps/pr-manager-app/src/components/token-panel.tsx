@@ -53,7 +53,9 @@ export const TokenPanel = React.memo<Props>((props) => {
 
       const trimmed = typed.trim();
 
-      if (trimmed === '') return;
+      if (trimmed === '') {
+        return;
+      }
 
       onSave({ value: trimmed, store: remember ? 'device' : 'session' });
 

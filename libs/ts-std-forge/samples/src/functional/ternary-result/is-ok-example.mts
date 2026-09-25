@@ -10,7 +10,9 @@ if (import.meta.vitest !== undefined) {
       string
     >;
 
-    if (!TernaryResult.isOk(maybeNumber)) return;
+    if (!TernaryResult.isOk(maybeNumber)) {
+      return;
+    }
 
     const value: number = maybeNumber.value;
 

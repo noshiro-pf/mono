@@ -64,15 +64,21 @@ export const parseOptions = (
     }),
   );
 
-  if (Result.isErr(parsed)) return Result.err(parsed.value.message);
+  if (Result.isErr(parsed)) {
+    return Result.err(parsed.value.message);
+  }
 
   const { values } = parsed.value;
 
-  if (values.help) return Result.ok('help');
+  if (values.help) {
+    return Result.ok('help');
+  }
 
   const mergeAfter = parseMergeAfter(values['merge-after'] ?? []);
 
-  if (Result.isErr(mergeAfter)) return mergeAfter;
+  if (Result.isErr(mergeAfter)) {
+    return mergeAfter;
+  }
 
   return Result.ok({
     title: values.title,

@@ -70,7 +70,9 @@ const state = combine([
 const submit = async (pageToBack: string | undefined): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (signInPageHasError(s)) return;
+  if (signInPageHasError(s)) {
+    return;
+  }
 
   const signInResult = await api.auth.signIn(
     s.email.inputValue,
@@ -136,8 +138,9 @@ const enterClickHandler = (): void => {
   if (
     enterButtonDisabled$.getSnapshot().value ||
     GoogleSignInStore.googleSignInButtonDisabledState.getSnapshot().value
-  )
+  ) {
     return;
+  }
 
   // TODO: use toast
   submit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(

@@ -156,7 +156,9 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
       const strictNullChecks =
         compilerOptions.strictNullChecks ?? compilerOptions.strict ?? false;
 
-      if (!strictNullChecks) return {};
+      if (!strictNullChecks) {
+        return {};
+      }
 
       const checker = parserServices.program.getTypeChecker();
 
@@ -249,7 +251,9 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
       return {
         CallExpression: (node) => {
-          if (node.arguments.length !== 1) return;
+          if (node.arguments.length !== 1) {
+            return;
+          }
 
           const argument = node.arguments[0];
 
@@ -262,15 +266,21 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
           const resolved = resolveGuard(node.callee);
 
-          if (resolved === undefined) return;
+          if (resolved === undefined) {
+            return;
+          }
 
           const { canonicalName, propertyNode, isNamespace } = resolved;
 
-          if (ignored.has(canonicalName)) return;
+          if (ignored.has(canonicalName)) {
+            return;
+          }
 
           const spec = GUARD_SPECS[canonicalName];
 
-          if (spec === undefined) return;
+          if (spec === undefined) {
+            return;
+          }
 
           const argTsNode = parserServices.esTreeNodeToTSNodeMap.get(argument);
 
@@ -278,7 +288,9 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
           const parts = collectUnionParts(argType);
 
-          if (parts === undefined) return; // opaque / generic → bail conservatively
+          if (parts === undefined) {
+            return; // opaque / generic → bail conservatively
+          }
 
           const inputAtoms = new Set(parts.map(classifyAtom));
 
@@ -413,7 +425,9 @@ const collectUnionParts = (type: ts.Type): readonly ts.Type[] | undefined => {
   const parts = type.isUnion() ? type.types : ([type] as const);
 
   for (const part of parts) {
-    if ((part.flags & DEFERRED_OR_OPAQUE_FLAGS) !== 0) return undefined;
+    if ((part.flags & DEFERRED_OR_OPAQUE_FLAGS) !== 0) {
+      return undefined;
+    }
   }
 
   return parts;
@@ -473,19 +487,33 @@ const isCallableType = (
 const classifyAtom = (type: ts.Type): Atom => {
   const { flags } = type;
 
-  if ((flags & ts.TypeFlags.Undefined) !== 0) return 'undefined';
+  if ((flags & ts.TypeFlags.Undefined) !== 0) {
+    return 'undefined';
+  }
 
-  if ((flags & ts.TypeFlags.Null) !== 0) return 'null';
+  if ((flags & ts.TypeFlags.Null) !== 0) {
+    return 'null';
+  }
 
-  if ((flags & ts.TypeFlags.BooleanLike) !== 0) return 'boolean';
+  if ((flags & ts.TypeFlags.BooleanLike) !== 0) {
+    return 'boolean';
+  }
 
-  if ((flags & ts.TypeFlags.NumberLike) !== 0) return 'number';
+  if ((flags & ts.TypeFlags.NumberLike) !== 0) {
+    return 'number';
+  }
 
-  if ((flags & ts.TypeFlags.StringLike) !== 0) return 'string';
+  if ((flags & ts.TypeFlags.StringLike) !== 0) {
+    return 'string';
+  }
 
-  if ((flags & ts.TypeFlags.BigIntLike) !== 0) return 'bigint';
+  if ((flags & ts.TypeFlags.BigIntLike) !== 0) {
+    return 'bigint';
+  }
 
-  if ((flags & ts.TypeFlags.ESSymbolLike) !== 0) return 'symbol';
+  if ((flags & ts.TypeFlags.ESSymbolLike) !== 0) {
+    return 'symbol';
+  }
 
   // Branded primitives (e.g. `NonEmptyString = string & {...}`) are
   // intersections; classify them by their underlying primitive constituent.
@@ -493,7 +521,9 @@ const classifyAtom = (type: ts.Type): Atom => {
     for (const constituent of type.types) {
       const atom = classifyAtom(constituent);
 
-      if (atom !== 'other') return atom;
+      if (atom !== 'other') {
+        return atom;
+      }
     }
   }
 
@@ -525,13 +555,19 @@ const isGuaranteedNonEmptyString = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   checker: ts.TypeChecker,
 ): boolean => {
-  if (type.isStringLiteral()) return type.value !== '';
+  if (type.isStringLiteral()) {
+    return type.value !== '';
+  }
 
-  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) return false;
+  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) {
+    return false;
+  }
 
   const minLengthSymbol = type.getProperty(MIN_LENGTH_BRAND_KEY);
 
-  if (minLengthSymbol === undefined) return false;
+  if (minLengthSymbol === undefined) {
+    return false;
+  }
 
   // The `MinLength` brand value is `MinLengthTuple<N, 0>`; it has a required
   // first element (`'0'`) exactly when `N >= 1`, i.e. the string is non-empty.

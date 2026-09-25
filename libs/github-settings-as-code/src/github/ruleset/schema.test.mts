@@ -86,7 +86,9 @@ describe('the ruleset schema', () => {
 
     assert.deepStrictEqual(outcomeOf(files[0][0], declared), files[0][0]);
 
-    if (Result.isErr(declared)) return;
+    if (Result.isErr(declared)) {
+      return;
+    }
 
     // `getRuleset` hands the whole API response to this type, and a response
     // carries more than the seven fields that go back out again.

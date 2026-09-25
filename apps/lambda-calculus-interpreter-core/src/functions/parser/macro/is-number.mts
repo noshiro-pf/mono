@@ -10,24 +10,26 @@ export const isNumber = (
   term: LambdaTerm,
 ): term is NumberTerm<Variable, Variable> => {
   // 2 = ['lambda', 's', ['lambda', 'z', ['s', ['s', 'z'] ] ] ]
-  if (!isAbstraction(term)) return false;
+  if (!isAbstraction(term)) {
+    return false;
+  }
 
-  if (!isAbstraction(term[2])) return false;
+  if (!isAbstraction(term[2])) {
+    return false;
+  }
 
   const s = term[1];
 
   const z = term[2][1];
 
-  if (s === z) return false;
+  if (s === z) {
+    return false;
+  }
 
   const body = term[2][2];
 
   const sub = (t: LambdaTerm): boolean =>
-    isVariable(t)
-      ? t === z
-      : isApplication(t)
-        ? t[0] === s && sub(t[1])
-        : false;
+    isVariable(t) ? t === z : isApplication(t) && t[0] === s && sub(t[1]);
 
   // ToDo
   return sub(body);

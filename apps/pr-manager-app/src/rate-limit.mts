@@ -56,7 +56,9 @@ const LOW = 0.25;
 const readCount = (headers: Headers, header: string): number | undefined => {
   const raw = headers.get(header);
 
-  if (raw === null) return undefined;
+  if (raw === null) {
+    return undefined;
+  }
 
   const value = Result.unwrapOkOr(Num.safeParseInt(raw), Number.NaN);
 

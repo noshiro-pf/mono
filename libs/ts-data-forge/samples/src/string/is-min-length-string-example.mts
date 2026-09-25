@@ -11,7 +11,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isMinLengthString(12, 'short'));
 
-    if (!Str.isMinLengthString(12, input)) return;
+    if (!Str.isMinLengthString(12, input)) {
+      return;
+    }
 
     const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
 

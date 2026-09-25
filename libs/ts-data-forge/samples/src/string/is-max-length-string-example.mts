@@ -11,7 +11,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(Str.isMaxLengthString(3, input));
 
-    if (!Str.isMaxLengthString(32, input)) return;
+    if (!Str.isMaxLengthString(32, input)) {
+      return;
+    }
 
     const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
 

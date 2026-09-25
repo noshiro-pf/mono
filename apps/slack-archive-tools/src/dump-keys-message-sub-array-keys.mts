@@ -13,7 +13,9 @@ const collectRecordKeys = (
   mut_keyPatternsAsString: Set<string>,
 ): void => {
   for (const o of items) {
-    if (!isRecord(o)) continue;
+    if (!isRecord(o)) {
+      continue;
+    }
 
     const ks = Object.keys(o);
 
@@ -40,11 +42,15 @@ const collectSubArrayKeys = (
   mut_keyPatternsAsString: Set<string>,
 ): void => {
   for (const c of values) {
-    if (!hasKey(c, pathKey)) continue;
+    if (!hasKey(c, pathKey)) {
+      continue;
+    }
 
     const arr = c[pathKey];
 
-    if (!Arr.isArray(arr)) continue;
+    if (!Arr.isArray(arr)) {
+      continue;
+    }
 
     collectRecordKeys(arr, mut_keys, mut_keyPatternsAsString);
   }

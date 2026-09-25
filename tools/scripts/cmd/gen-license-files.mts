@@ -57,19 +57,27 @@ export const genLicenseFiles = async (): Promise<
 > => {
   const rootLicense = await readRootLicense();
 
-  if (Result.isErr(rootLicense)) return rootLicense;
+  if (Result.isErr(rootLicense)) {
+    return rootLicense;
+  }
 
   const manifests = readWorkspaceManifests();
 
-  if (Result.isErr(manifests)) return manifests;
+  if (Result.isErr(manifests)) {
+    return manifests;
+  }
 
   const rootDeclaration = checkRootDeclaration(manifests.value);
 
-  if (Result.isErr(rootDeclaration)) return rootDeclaration;
+  if (Result.isErr(rootDeclaration)) {
+    return rootDeclaration;
+  }
 
   const trackedLicenseFiles = listTrackedLicenseFiles();
 
-  if (Result.isErr(trackedLicenseFiles)) return trackedLicenseFiles;
+  if (Result.isErr(trackedLicenseFiles)) {
+    return trackedLicenseFiles;
+  }
 
   const licenseTexts = licenseTextsFrom(rootLicense.value);
 
@@ -92,7 +100,9 @@ export const genLicenseFiles = async (): Promise<
 
     // `collectViolations` has refused every license with no text, so this
     // cannot be missing; the lookup is what proves it.
-    if (text === undefined) continue;
+    if (text === undefined) {
+      continue;
+    }
 
     if (await writeIfDifferent(target.path, text)) {
       mut_written.push(target.path);
@@ -408,7 +418,9 @@ const readWorkspaceManifests = (): Result<
   for (const project of projects.value) {
     const manifest = readManifest(project.path);
 
-    if (Result.isErr(manifest)) return manifest;
+    if (Result.isErr(manifest)) {
+      return manifest;
+    }
 
     mut_manifests.push({
       dir: toRepoRelative(project.path),
@@ -519,7 +531,9 @@ const writeIfDifferent = async (
   repoRelativePath: string,
   text: string,
 ): Promise<boolean> => {
-  if ((await readFileOrUndefined(repoRelativePath)) === text) return false;
+  if ((await readFileOrUndefined(repoRelativePath)) === text) {
+    return false;
+  }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path under a package pnpm listed.
   await fs.writeFile(path.resolve(projectRootPath, repoRelativePath), text);

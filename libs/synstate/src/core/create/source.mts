@@ -59,7 +59,9 @@ export function source<const A>(...args: readonly A[]): SourceObservable<A> {
     },
     ({ startUpdate, isCompleted }) => ({
       next: (nextValue: A) => {
-        if (isCompleted()) return;
+        if (isCompleted()) {
+          return;
+        }
 
         startUpdate(nextValue);
       },

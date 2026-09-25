@@ -240,9 +240,13 @@ const hasCircularDependencyFrom = (
   mut_visited: MutableSet<ObservableId>,
   mut_inPath: MutableSet<ObservableId>,
 ): boolean => {
-  if (mut_inPath.has(node.id)) return true;
+  if (mut_inPath.has(node.id)) {
+    return true;
+  }
 
-  if (mut_visited.has(node.id)) return false;
+  if (mut_visited.has(node.id)) {
+    return false;
+  }
 
   mut_visited.add(node.id);
 
@@ -304,7 +308,9 @@ const registerChild = <A,>(
   while (Arr.isNonEmpty(mut_rest)) {
     const p = mut_rest.pop();
 
-    if (p === undefined) break;
+    if (p === undefined) {
+      break;
+    }
 
     if (isManagerObservable(p)) {
       p.addDescendant(child);

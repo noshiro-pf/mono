@@ -113,7 +113,9 @@ const createCombineObservable = <const A extends NonEmptyUnknownList>(
     },
     ({ setNext }) =>
       (updateToken) => {
-        if (parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
+        if (parents.every((o) => o.updateToken !== updateToken)) {
+          return; // all parents are skipped
+        }
 
         // Same shape-preserving chain as the initial value: `Arr.map` (not the
         // native one, which drops the tuple shape) into the uniform
@@ -123,7 +125,9 @@ const createCombineObservable = <const A extends NonEmptyUnknownList>(
           (a) => a.getSnapshot(),
         );
 
-        if (!Arr.every(parentValues, Optional.isSome)) return;
+        if (!Arr.every(parentValues, Optional.isSome)) {
+          return;
+        }
 
         const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
           parentValues,

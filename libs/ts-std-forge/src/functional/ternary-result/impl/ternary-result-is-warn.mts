@@ -13,7 +13,9 @@ import { type NarrowToWarn } from './types.mjs';
  *   'check logs',
  * ) as TernaryResult<string, string, string>;
  *
- * if (!TernaryResult.isWarn(maybeWarn)) return;
+ * if (!TernaryResult.isWarn(maybeWarn)) {
+ *   return;
+ * }
  *
  * assert.strictEqual(maybeWarn.value, 'value');
  *

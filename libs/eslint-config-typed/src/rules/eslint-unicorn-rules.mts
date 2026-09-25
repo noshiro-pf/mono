@@ -253,7 +253,7 @@ export const eslintUnicornRules = {
   'unicorn/no-manually-wrapped-comments': 'off',
   'unicorn/no-mismatched-map-key': 'error',
   'unicorn/no-negated-array-predicate': 'error',
-  'unicorn/no-negated-comparison': withDefaultOption('error'),
+  'unicorn/no-negated-comparison': 'off', // Replaced by ts-restrictions/no-negated-comparison
   'unicorn/no-object-methods-with-collections': 'error',
   'unicorn/no-optional-chaining-on-undeclared-variable': 'error',
   'unicorn/no-redundant-comparison': 'error',

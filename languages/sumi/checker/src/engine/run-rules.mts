@@ -61,11 +61,15 @@ export const runRules = (
 
   const walked = Result.fromThrowable(() => {
     for (const fileName of program.getSourceFileNames()) {
-      if (isTarget !== undefined && !isTarget(fileName)) continue;
+      if (isTarget !== undefined && !isTarget(fileName)) {
+        continue;
+      }
 
       const sourceFile = program.getSourceFile(fileName);
 
-      if (sourceFile === undefined || sourceFile.isDeclarationFile) continue;
+      if (sourceFile === undefined || sourceFile.isDeclarationFile) {
+        continue;
+      }
 
       walkFile(sourceFile, rules, checker, mut_diagnostics);
     }

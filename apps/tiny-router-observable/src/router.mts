@@ -103,7 +103,9 @@ export const createRouter = (): Router => {
       )
       .map((a) => a.toString()).value;
 
-    if (nextSearchParams === prev) return;
+    if (nextSearchParams === prev) {
+      return;
+    }
 
     mut_url.search = nextSearchParams;
 

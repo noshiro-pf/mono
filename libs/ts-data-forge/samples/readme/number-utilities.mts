@@ -35,7 +35,9 @@ import { Num } from 'ts-data-forge';
     // Type guards
     const value = 5; // example value
 
-    if (!Num.isNonZero(value)) return;
+    if (!Num.isNonZero(value)) {
+      return;
+    }
 
     // value is guaranteed to be non-zero
     const result = Num.div(10, value); // Safe division

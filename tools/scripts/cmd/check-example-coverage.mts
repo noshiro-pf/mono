@@ -229,7 +229,9 @@ const findWiringViolation = async (
     };
   }
 
-  if (docScript.includes('gen:jsdoc')) return undefined;
+  if (docScript.includes('gen:jsdoc')) {
+    return undefined;
+  }
 
   const genDocs = await readFileOrUndefined(
     path.resolve(packageDir, 'scripts/cmd/gen-docs.mts'),
@@ -253,15 +255,21 @@ const readScripts = async (
     path.resolve(packageDir, 'package.json'),
   );
 
-  if (text === undefined) return undefined;
+  if (text === undefined) {
+    return undefined;
+  }
 
   const parsed: unknown = JSON.parse(text);
 
-  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) return undefined;
+  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
+    return undefined;
+  }
 
   const scripts: unknown = parsed.scripts;
 
-  if (!isRecord(scripts)) return undefined;
+  if (!isRecord(scripts)) {
+    return undefined;
+  }
 
   return Obj.filterMap(scripts, (value) =>
     isString(value) ? Optional.some(value) : Optional.none,

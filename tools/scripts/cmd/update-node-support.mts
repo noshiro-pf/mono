@@ -188,7 +188,9 @@ const lowestSupportedLts = (
     (major) => !releases.eolMajors.has(major),
   );
 
-  if (!Arr.isNonEmpty(supportedLtsMajors)) return config.targets.minimum;
+  if (!Arr.isNonEmpty(supportedLtsMajors)) {
+    return config.targets.minimum;
+  }
 
   const oldestSupportedLtsMajor = Math.min(...supportedLtsMajors);
 
@@ -212,9 +214,13 @@ const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
     fetchJson(scheduleUrl),
   ]);
 
-  if (Result.isErr(distResult)) return Result.err(distResult.value);
+  if (Result.isErr(distResult)) {
+    return Result.err(distResult.value);
+  }
 
-  if (Result.isErr(scheduleResult)) return Result.err(scheduleResult.value);
+  if (Result.isErr(scheduleResult)) {
+    return Result.err(scheduleResult.value);
+  }
 
   const dist: unknown = distResult.value;
 
@@ -229,7 +235,9 @@ const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
   const mut_newestReleaseDate = { current: '' };
 
   for (const entry of dist) {
-    if (!isRecord(entry) || !hasKey(entry, 'version')) continue;
+    if (!isRecord(entry) || !hasKey(entry, 'version')) {
+      continue;
+    }
 
     const date: unknown = hasKey(entry, 'date') ? entry.date : undefined;
 
@@ -239,11 +247,15 @@ const fetchReleaseData = async (): Promise<Result<ReleaseData, string>> => {
 
     const raw: unknown = entry.version;
 
-    if (!isString(raw)) continue;
+    if (!isString(raw)) {
+      continue;
+    }
 
     const version = parseVersion(raw.replace(/^v/u, ''));
 
-    if (version === undefined) continue;
+    if (version === undefined) {
+      continue;
+    }
 
     const known = mut_latestByMajor.get(version.major);
 
@@ -286,7 +298,9 @@ const eolMajorsFrom = (
 ): ReadonlySet<number> => {
   const mut_eol = new Set<number>();
 
-  if (today === '' || !isRecord(schedule)) return mut_eol;
+  if (today === '' || !isRecord(schedule)) {
+    return mut_eol;
+  }
 
   for (const [key, value] of Object.entries(schedule)) {
     const major = Result.unwrapOkOr(
@@ -294,7 +308,9 @@ const eolMajorsFrom = (
       Number.NaN,
     );
 
-    if (!Number.isSafeInteger(major) || !isRecord(value)) continue;
+    if (!Number.isSafeInteger(major) || !isRecord(value)) {
+      continue;
+    }
 
     const end: unknown = hasKey(value, 'end') ? value.end : undefined;
 

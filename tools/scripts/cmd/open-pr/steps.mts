@@ -18,7 +18,9 @@ import { type PullRequest } from './types.mjs';
  * reverted, or a pull request someone else touched in between.
  */
 export const armBlockedBy = (pr: PullRequest): string | undefined => {
-  if (pr.state !== 'OPEN') return `it is ${pr.state}`;
+  if (pr.state !== 'OPEN') {
+    return `it is ${pr.state}`;
+  }
 
   // GitHub refuses to arm a draft, so this would fail anyway; saying so here
   // means the failure names the reason rather than quoting `gh`.

@@ -48,7 +48,9 @@ export const ThroughputCanvas = React.memo<Props>((props) => {
 
   // rAF loop — only active when running
   React.useEffect(() => {
-    if (!running) return;
+    if (!running) {
+      return;
+    }
 
     let mut_active = true;
 
@@ -61,7 +63,9 @@ export const ThroughputCanvas = React.memo<Props>((props) => {
     const cy = CANVAS_HEIGHT / 2;
 
     const tick = (): void => {
-      if (!mut_active) return;
+      if (!mut_active) {
+        return;
+      }
 
       const mut_ctx = canvasRef.current?.getContext('2d');
 
@@ -213,7 +217,9 @@ const drawSnake = (
 ): void => {
   mut_ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  if (Arr.isEmpty(points)) return;
+  if (Arr.isEmpty(points)) {
+    return;
+  }
 
   const segmentCount = asSafeUint(points.length);
 

@@ -119,7 +119,9 @@ const updateInImpl = (
 ): unknown => {
   const key = keyPath[index];
 
-  if (key === undefined || index >= keyPath.length) return updater(obj);
+  if (key === undefined || index >= keyPath.length) {
+    return updater(obj);
+  }
 
   if (Arr.isArray(obj)) {
     return obj.map((v: unknown, i) =>

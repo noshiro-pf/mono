@@ -77,7 +77,9 @@ export const noMutationWithoutMutPrefix: Rule = {
   },
   visit: (node, { checker, report }) => {
     if (isBinaryExpression(node)) {
-      if (!isAssignmentOperator(node.operatorToken.kind)) return;
+      if (!isAssignmentOperator(node.operatorToken.kind)) {
+        return;
+      }
 
       reportAssignedAccess(node.left, report);
 
@@ -95,31 +97,41 @@ export const noMutationWithoutMutPrefix: Rule = {
     if (isDeleteExpression(node)) {
       const deleted = unwrap(node.expression);
 
-      if (!isAccess(deleted) || isMutPermitted(deleted)) return;
+      if (!isAccess(deleted) || isMutPermitted(deleted)) {
+        return;
+      }
 
       report(deleted, 'deletion', { path: pathText(deleted) });
 
       return;
     }
 
-    if (!isCallExpression(node)) return;
+    if (!isCallExpression(node)) {
+      return;
+    }
 
     const callee = node.expression;
 
-    if (!isPropertyAccessExpression(callee)) return;
+    if (!isPropertyAccessExpression(callee)) {
+      return;
+    }
 
     const method = callee.name.text;
 
     // The syntactic filter that keeps the pass cheap: a name no mutator has
     // costs nothing, and the checker is asked only about what is left.
-    if (!mutatorMethodNames.has(method)) return;
+    if (!mutatorMethodNames.has(method)) {
+      return;
+    }
 
     const owner = ownerOf(checker, callee);
 
     const alternative =
       owner === undefined ? undefined : mutatorsByOwner.get(owner)?.get(method);
 
-    if (owner === undefined || alternative === undefined) return;
+    if (owner === undefined || alternative === undefined) {
+      return;
+    }
 
     const staticOwner = argumentMutatingOwners.get(owner);
 
@@ -363,7 +375,9 @@ const isMutPermitted = (node: TsNode): boolean =>
 const pathSegments = (node: TsNode): readonly string[] => {
   const unwrapped = unwrap(node);
 
-  if (isIdentifier(unwrapped)) return [unwrapped.text];
+  if (isIdentifier(unwrapped)) {
+    return [unwrapped.text];
+  }
 
   if (isPropertyAccessExpression(unwrapped)) {
     return [...pathSegments(unwrapped.expression), unwrapped.name.text];
@@ -412,11 +426,15 @@ const isFreshValue = (
     return true;
   }
 
-  if (!isCallExpression(unwrapped)) return false;
+  if (!isCallExpression(unwrapped)) {
+    return false;
+  }
 
   const callee = unwrapped.expression;
 
-  if (!isPropertyAccessExpression(callee)) return false;
+  if (!isPropertyAccessExpression(callee)) {
+    return false;
+  }
 
   const owner = ownerOf(checker, callee);
 
@@ -436,7 +454,9 @@ const reportAssignedAccess = (
 ): void => {
   const target = unwrap(node);
 
-  if (!isAccess(target) || isMutPermitted(target)) return;
+  if (!isAccess(target) || isMutPermitted(target)) {
+    return;
+  }
 
   report(target, 'assignment', { path: pathText(target) });
 };

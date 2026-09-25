@@ -3,7 +3,9 @@ import * as t from 'ts-fortress';
 import { type PermutationString } from 'ts-utils-additional';
 
 const permutationStringImpl = (s: string): readonly string[] => {
-  if (s.length === 0) return [];
+  if (s.length === 0) {
+    return [];
+  }
 
   const mut_values = [];
 

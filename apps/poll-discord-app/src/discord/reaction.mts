@@ -36,11 +36,15 @@ const onRefreshClick = async (
     toPollId(reactionFilled.message.id),
   );
 
-  if (Result.isErr(pollResult)) return pollResult;
+  if (Result.isErr(pollResult)) {
+    return pollResult;
+  }
 
   const poll = pollResult.value;
 
-  if (poll === undefined) return Result.err('poll not found');
+  if (poll === undefined) {
+    return Result.err('poll not found');
+  }
 
   const fixAnswerAndUpdateMessageResult = await fixAnswerAndUpdateMessage(
     messages,
@@ -60,9 +64,13 @@ const onMessageReactCommon = async (
   reaction: Discord.MessageReaction,
   user: Discord.PartialUser | Discord.User,
 ): Promise<Result<undefined, unknown>> => {
-  if (user.bot) return Result.ok(undefined);
+  if (user.bot) {
+    return Result.ok(undefined);
+  }
 
-  if (action.value === undefined) return Result.ok(undefined);
+  if (action.value === undefined) {
+    return Result.ok(undefined);
+  }
 
   if (action.value === 'refresh') {
     return action.type === 'add'
@@ -82,7 +90,9 @@ const onMessageReactCommon = async (
 
   const pollIdResult = await firestoreApi.getPollIdByDateOptionId(dateOptionId);
 
-  if (Result.isErr(pollIdResult)) return pollIdResult;
+  if (Result.isErr(pollIdResult)) {
+    return pollIdResult;
+  }
 
   const pollId = pollIdResult.value;
 
@@ -114,7 +124,9 @@ const onMessageReactCommon = async (
     }),
   ]);
 
-  if (messages.size === 0) return Result.err('messages not found.');
+  if (messages.size === 0) {
+    return Result.err('messages not found.');
+  }
 
   if (Result.isErr(updateMessageReactionResult)) {
     return updateMessageReactionResult;

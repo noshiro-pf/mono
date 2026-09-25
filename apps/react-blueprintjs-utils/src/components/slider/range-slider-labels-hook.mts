@@ -27,7 +27,9 @@ export const useRangeSliderLabels = ({
   maxLabel: string;
 }> => {
   const customLabelValuesWithRatio = React.useMemo(() => {
-    if (customLabelValues === undefined) return [];
+    if (customLabelValues === undefined) {
+      return [];
+    }
 
     const isInRangeInclusive = Num.isInRangeInclusive(min, max);
 

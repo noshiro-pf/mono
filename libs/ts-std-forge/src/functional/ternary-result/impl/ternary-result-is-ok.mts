@@ -14,7 +14,9 @@ import { type NarrowToOk } from './types.mjs';
  *   string
  * >;
  *
- * if (!TernaryResult.isOk(maybeNumber)) return;
+ * if (!TernaryResult.isOk(maybeNumber)) {
+ *   return;
+ * }
  *
  * const value: number = maybeNumber.value;
  *

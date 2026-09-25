@@ -80,7 +80,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
     ): TSESTree.Range => {
       const depth = parenthesisDepth(node);
 
-      if (depth === 0) return [node.range[0], node.range[1]];
+      if (depth === 0) {
+        return [node.range[0], node.range[1]];
+      }
 
       const opening = sourceCode.getTokenBefore(asNode(node), {
         skip: depth - 1,
@@ -111,7 +113,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
     const operandText = (
       node: DeepReadonly<TSESTree.Node> | undefined,
     ): string => {
-      if (node === undefined) return 'undefined';
+      if (node === undefined) {
+        return 'undefined';
+      }
 
       const text = sourceCode.text.slice(...parenthesizedRange(node));
 
@@ -128,7 +132,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
     const foldChain = (chain: Chain): Folded | undefined => {
       const { arms, fallback } = chain;
 
-      if (arms.some(({ test }) => isTernary(test))) return undefined;
+      if (arms.some(({ test }) => isTernary(test))) {
+        return undefined;
+      }
 
       if (
         isOnlySingleLine &&
@@ -147,7 +153,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
       const first = peel(leaves);
 
-      if (first === undefined) return undefined;
+      if (first === undefined) {
+        return undefined;
+      }
 
       let mut_prefix = first.prefix;
 
@@ -156,7 +164,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
       for (;;) {
         const next = peel(mut_leaves);
 
-        if (next === undefined) break;
+        if (next === undefined) {
+          break;
+        }
 
         mut_prefix += next.prefix;
 
@@ -178,7 +188,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
       ) {
         const returned = leaves.map((leaf) => leaf.argument ?? undefined);
 
-        if (Arr.butLast(returned).some(isTernary)) return undefined;
+        if (Arr.butLast(returned).some(isTernary)) {
+          return undefined;
+        }
 
         // `return a ? true : false` is `return a` or `return !!a`, which is
         // not this rule's to say.
@@ -189,7 +201,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
       const [head] = leaves;
 
-      if (head?.type !== AST_NODE_TYPES.AssignmentExpression) return undefined;
+      if (head?.type !== AST_NODE_TYPES.AssignmentExpression) {
+        return undefined;
+      }
 
       const isSameAssignment = leaves.every(
         (leaf) =>
@@ -199,7 +213,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
           isSameReference(leaf.left, head.left),
       );
 
-      if (!isSameAssignment) return undefined;
+      if (!isSameAssignment) {
+        return undefined;
+      }
 
       const assigned = leaves.map((leaf) =>
         leaf?.type === AST_NODE_TYPES.AssignmentExpression
@@ -207,7 +223,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
           : undefined,
       );
 
-      if (Arr.butLast(assigned).some(isTernary)) return undefined;
+      if (Arr.butLast(assigned).some(isTernary)) {
+        return undefined;
+      }
 
       const [left] = parenthesizedRange(head.left);
 
@@ -238,11 +256,15 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
       | undefined => {
       const chain = collectChain(node);
 
-      if (chain === undefined) return undefined;
+      if (chain === undefined) {
+        return undefined;
+      }
 
       const folded = foldChain(chain);
 
-      if (folded === undefined) return undefined;
+      if (folded === undefined) {
+        return undefined;
+      }
 
       const range: TSESTree.Range = [node.range[0], chain.last.range[1]];
 
@@ -298,7 +320,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
     const letPlusIfProblem = (
       node: DeepReadonly<TSESTree.IfStatement>,
     ): TSESLint.ReportDescriptor<MessageIds> | undefined => {
-      if (node.alternate !== null) return undefined;
+      if (node.alternate !== null) {
+        return undefined;
+      }
 
       const body = nodeBodyOf(node.consequent);
 
@@ -311,9 +335,13 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
 
       const { left, right } = body;
 
-      if (left.type !== AST_NODE_TYPES.Identifier) return undefined;
+      if (left.type !== AST_NODE_TYPES.Identifier) {
+        return undefined;
+      }
 
-      if (isTernary(node.test) || isTernary(right)) return undefined;
+      if (isTernary(node.test) || isTernary(right)) {
+        return undefined;
+      }
 
       if (
         isOnlySingleLine &&
@@ -352,7 +380,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         asNode<TSESTree.Identifier>(left),
       );
 
-      if (variable === null) return undefined;
+      if (variable === null) {
+        return undefined;
+      }
 
       const isInside = (
         reference: DeepReadonly<TSESLint.Scope.Reference>,
@@ -375,7 +405,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         messageId: 'preferTernary',
       } as const;
 
-      if (hasCommentInRange([previous.range[0], node.range[1]])) return problem;
+      if (hasCommentInRange([previous.range[0], node.range[1]])) {
+        return problem;
+      }
 
       const hasOtherWrites = variable.references.some(
         (reference) =>
@@ -455,7 +487,9 @@ export const preferTernary: TSESLint.RuleModule<MessageIds, Options> = {
         const problem =
           chainProblem(node)?.descriptor ?? letPlusIfProblem(node);
 
-        if (problem !== undefined) context.report(problem);
+        if (problem !== undefined) {
+          context.report(problem);
+        }
       },
     };
   },
@@ -562,7 +596,9 @@ const collectChain = (
       continue;
     }
 
-    if (body.type !== AST_NODE_TYPES.ReturnStatement) return undefined;
+    if (body.type !== AST_NODE_TYPES.ReturnStatement) {
+      return undefined;
+    }
 
     const next = siblingOf(mut_last, 1);
 
@@ -570,7 +606,9 @@ const collectChain = (
       return { arms: mut_arms, fallback: next, last: next };
     }
 
-    if (next?.type !== AST_NODE_TYPES.IfStatement) return undefined;
+    if (next?.type !== AST_NODE_TYPES.IfStatement) {
+      return undefined;
+    }
 
     mut_if = next;
 
@@ -631,7 +669,9 @@ const siblingOf = (
 ): DeepReadonly<TSESTree.Node> | undefined => {
   const list = statementListOf(node);
 
-  if (list === undefined) return undefined;
+  if (list === undefined) {
+    return undefined;
+  }
 
   const index = list.indexOf(node);
 
@@ -643,7 +683,9 @@ const statementListOf = (
 ): readonly DeepReadonly<TSESTree.Node>[] | undefined => {
   const { parent } = node;
 
-  if (parent === undefined) return undefined;
+  if (parent === undefined) {
+    return undefined;
+  }
 
   if (
     parent.type === AST_NODE_TYPES.Program ||

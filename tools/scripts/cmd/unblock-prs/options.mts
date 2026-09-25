@@ -64,18 +64,24 @@ export const parseOptions = (
     }),
   );
 
-  if (Result.isErr(parsed)) return Result.err(parsed.value.message);
+  if (Result.isErr(parsed)) {
+    return Result.err(parsed.value.message);
+  }
 
   const { values } = parsed.value;
 
-  if (values.help) return Result.ok('help');
+  if (values.help) {
+    return Result.ok('help');
+  }
 
   const positive = (
     name: string,
     raw: string | undefined,
     fallback: number,
   ): Result<number, string> => {
-    if (raw === undefined) return Result.ok(fallback);
+    if (raw === undefined) {
+      return Result.ok(fallback);
+    }
 
     const n = Num.safeParseInt(raw);
 
@@ -92,7 +98,9 @@ export const parseOptions = (
     defaultOptions.idleIntervalSec,
   );
 
-  if (Result.isErr(idleIntervalSec)) return idleIntervalSec;
+  if (Result.isErr(idleIntervalSec)) {
+    return idleIntervalSec;
+  }
 
   const pollIntervalSec = positive(
     'poll-interval',
@@ -100,7 +108,9 @@ export const parseOptions = (
     defaultOptions.pollIntervalSec,
   );
 
-  if (Result.isErr(pollIntervalSec)) return pollIntervalSec;
+  if (Result.isErr(pollIntervalSec)) {
+    return pollIntervalSec;
+  }
 
   const watchTimeoutMin = positive(
     'watch-timeout',
@@ -108,7 +118,9 @@ export const parseOptions = (
     defaultOptions.watchTimeoutMin,
   );
 
-  if (Result.isErr(watchTimeoutMin)) return watchTimeoutMin;
+  if (Result.isErr(watchTimeoutMin)) {
+    return watchTimeoutMin;
+  }
 
   return Result.ok({
     once: values.once,

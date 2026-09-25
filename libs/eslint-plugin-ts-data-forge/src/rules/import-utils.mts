@@ -20,7 +20,9 @@ export const getTsDataForgeImport = (
 export const getNamedImports = (
   node: DeepReadonly<TSESTree.ImportDeclaration> | undefined,
 ): readonly string[] => {
-  if (node === undefined) return [];
+  if (node === undefined) {
+    return [];
+  }
 
   return node.specifiers.flatMap((specifier) =>
     specifier.type === AST_NODE_TYPES.ImportSpecifier
@@ -83,7 +85,9 @@ export const buildCalleeResolver = (
 
   const localToCanonical = new Map<string, string>(
     specifiers.flatMap((specifier) => {
-      if (specifier.type !== AST_NODE_TYPES.ImportSpecifier) return [];
+      if (specifier.type !== AST_NODE_TYPES.ImportSpecifier) {
+        return [];
+      }
 
       const importedName =
         specifier.imported.type === AST_NODE_TYPES.Identifier

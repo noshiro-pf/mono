@@ -62,10 +62,14 @@ export const noGlobalTypeShadow = createRule<Options, 'shadow'>({
         check(node.id);
       },
       TSModuleDeclaration: (node) => {
-        if (node.id.type === AST_NODE_TYPES.Identifier) check(node.id);
+        if (node.id.type === AST_NODE_TYPES.Identifier) {
+          check(node.id);
+        }
       },
       ClassDeclaration: (node) => {
-        if (node.id !== null) check(node.id);
+        if (node.id !== null) {
+          check(node.id);
+        }
       },
       TSTypeParameter: (node) => {
         check(node.name);

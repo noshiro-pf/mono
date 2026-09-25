@@ -118,7 +118,9 @@ export namespace Json {
    *
    * assert.isTrue(Result.isOk(filtered));
    *
-   * if (!Result.isOk(filtered)) return;
+   * if (!Result.isOk(filtered)) {
+   *   return;
+   * }
    *
    * assert.isTrue(isString(filtered.value));
    *
@@ -282,7 +284,9 @@ export namespace Json {
    *
    * assert.isTrue(Result.isOk(formatted));
    *
-   * if (!Result.isOk(formatted)) return;
+   * if (!Result.isOk(formatted)) {
+   *   return;
+   * }
    *
    * assert.isTrue(isString(formatted.value));
    *

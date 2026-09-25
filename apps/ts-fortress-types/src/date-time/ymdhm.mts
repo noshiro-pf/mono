@@ -31,15 +31,25 @@ export const Ymdhm2Date = (ymdhm: Ymdhm): Date =>
   );
 
 export const compareYmdhm = (a: Ymdhm, b: Ymdhm): -1 | 0 | 1 => {
-  if (a.year !== b.year) return a.year < b.year ? -1 : 1;
+  if (a.year !== b.year) {
+    return a.year < b.year ? -1 : 1;
+  }
 
-  if (a.month !== b.month) return a.month < b.month ? -1 : 1;
+  if (a.month !== b.month) {
+    return a.month < b.month ? -1 : 1;
+  }
 
-  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+  if (a.date !== b.date) {
+    return a.date < b.date ? -1 : 1;
+  }
 
-  if (a.hours !== b.hours) return a.hours < b.hours ? -1 : 1;
+  if (a.hours !== b.hours) {
+    return a.hours < b.hours ? -1 : 1;
+  }
 
-  if (a.minutes !== b.minutes) return a.minutes < b.minutes ? -1 : 1;
+  if (a.minutes !== b.minutes) {
+    return a.minutes < b.minutes ? -1 : 1;
+  }
 
   return 0;
 };

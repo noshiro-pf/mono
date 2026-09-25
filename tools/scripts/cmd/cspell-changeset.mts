@@ -59,7 +59,9 @@ export const cspellChangeset = async (): Promise<Result<number, string>> => {
 
   const packageDirs = await getWorkspacePackageDirs();
 
-  if (Result.isErr(packageDirs)) return packageDirs;
+  if (Result.isErr(packageDirs)) {
+    return packageDirs;
+  }
 
   const plans = await Promise.all(
     files.map(async (file) => planFor(file, packageDirs.value)),
@@ -229,20 +231,26 @@ const planFor = async (
 const readChangesetPackageNames = async (
   file: string,
 ): Promise<readonly string[]> => {
-  if (path.extname(file) !== '.md') return [];
+  if (path.extname(file) !== '.md') {
+    return [];
+  }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = await fs.readFile(file, 'utf8');
 
   const lines = content.split('\n');
 
-  if (lines[0]?.trim() !== '---') return [];
+  if (lines[0]?.trim() !== '---') {
+    return [];
+  }
 
   const end = lines.findIndex(
     (line, index) => index > 0 && line.trim() === '---',
   );
 
-  if (end === -1) return [];
+  if (end === -1) {
+    return [];
+  }
 
   return lines
     .slice(1, end)

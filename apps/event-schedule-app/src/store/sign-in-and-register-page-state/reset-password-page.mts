@@ -44,7 +44,9 @@ const state = combine([
 const submit = async (pageToBack: string | undefined): Promise<void> => {
   const s = dispatch({ type: 'submit' });
 
-  if (resetPasswordPageHasError(s)) return;
+  if (resetPasswordPageHasError(s)) {
+    return;
+  }
 
   const sendPasswordResetEmailResult = await api.auth.sendPasswordResetEmail(
     s.email.inputValue,
@@ -94,7 +96,9 @@ const submit = async (pageToBack: string | undefined): Promise<void> => {
 };
 
 const enterClickHandler = (): void => {
-  if (enterButtonDisabled$.getSnapshot().value) return;
+  if (enterButtonDisabled$.getSnapshot().value) {
+    return;
+  }
 
   // TODO: use toast
   submit(Optional.unwrap(Router.pageToBack$.getSnapshot())).catch(

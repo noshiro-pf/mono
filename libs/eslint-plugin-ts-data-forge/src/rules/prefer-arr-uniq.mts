@@ -79,18 +79,25 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
     ): void => {
       const arrayExpression = getSetSourceArray(setNode);
 
-      if (arrayExpression === undefined) return;
+      if (arrayExpression === undefined) {
+        return;
+      }
 
-      if (!isGlobal(sourceCode, node, 'Set')) return;
+      if (!isGlobal(sourceCode, node, 'Set')) {
+        return;
+      }
 
       const arrayTsNode = getTsNode(arrayExpression);
 
-      if (arrayTsNode === undefined) return;
+      if (arrayTsNode === undefined) {
+        return;
+      }
 
       if (
         !isPrimitiveArrayType(checker, checker.getTypeAtLocation(arrayTsNode))
-      )
+      ) {
         return;
+      }
 
       mut_matches.push({
         node,
@@ -117,17 +124,23 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        if (!isGlobal(sourceCode, node, 'Array')) return;
+        if (!isGlobal(sourceCode, node, 'Array')) {
+          return;
+        }
 
         check(node, node.arguments[0]);
       },
       ArrayExpression: (node) => {
         // [...new Set(xs)]
-        if (!Arr.isFixedLengthTuple(1, node.elements)) return;
+        if (!Arr.isFixedLengthTuple(1, node.elements)) {
+          return;
+        }
 
         const element = node.elements[0];
 
-        if (element?.type !== AST_NODE_TYPES.SpreadElement) return;
+        if (element?.type !== AST_NODE_TYPES.SpreadElement) {
+          return;
+        }
 
         check(node, element.argument);
       },
@@ -335,7 +348,9 @@ const needsMutableResult = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
 ): boolean => {
-  if (isUsedAsMutable(checker, getTsNode, node)) return true;
+  if (isUsedAsMutable(checker, getTsNode, node)) {
+    return true;
+  }
 
   const parent = node.parent;
 
@@ -398,9 +413,13 @@ const isUsedAsMutable = (
   // whose declared type is a mutable array.
   const tsNode = getTsNode(node);
 
-  if (tsNode === undefined) return false;
+  if (tsNode === undefined) {
+    return false;
+  }
 
-  if (!ts.isExpression(tsNode)) return false;
+  if (!ts.isExpression(tsNode)) {
+    return false;
+  }
 
   const expectedType =
     getDeclaredParameterType(checker, tsNode) ??
@@ -433,7 +452,9 @@ const getDeclaredParameterType = (
 
   const index = call.arguments?.indexOf(argument) ?? -1;
 
-  if (index === -1) return undefined;
+  if (index === -1) {
+    return undefined;
+  }
 
   const declaration = checker.getResolvedSignature(call)?.getDeclaration();
 

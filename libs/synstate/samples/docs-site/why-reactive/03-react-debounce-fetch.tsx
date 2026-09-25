@@ -28,7 +28,9 @@ import * as React from 'react';
           })
           .catch((error) => {
             /* embed-sample-code-ignore-this-line */ // @ts-expect-error the `catch` callback parameter is `unknown` under the strict standard library. Leaving the sample naive is the point; the line is stripped from the embedded output.
-            if (error.name !== 'AbortError') throw error;
+            if (error.name !== 'AbortError') {
+              throw error;
+            }
           });
       }, 300);
 

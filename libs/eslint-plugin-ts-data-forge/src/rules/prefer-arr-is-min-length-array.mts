@@ -50,11 +50,15 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
     return {
       BinaryExpression: (node) => {
         // Check for `xs.length >= n` or `n <= xs.length`
-        if (node.operator !== '>=' && node.operator !== '<=') return;
+        if (node.operator !== '>=' && node.operator !== '<=') {
+          return;
+        }
 
         // Defer to `prefer-arr-is-bounded-length-array` when this comparison is
         // the lower bound of a `min && max` pair on the same array.
-        if (isPartOfBoundedLengthCheck(node, sourceCode)) return;
+        if (isPartOfBoundedLengthCheck(node, sourceCode)) {
+          return;
+        }
 
         // xs.length >= n  or  n <= xs.length
         const isLengthOnLeft = node.operator === '>=';
@@ -64,10 +68,14 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
         const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
         // Check if lengthSide is accessing .length
-        if (!isLengthAccess(lengthSide)) return;
+        if (!isLengthAccess(lengthSide)) {
+          return;
+        }
 
         // Only match integer literals or const variables initialized with integer literals
-        if (!isIntegerLiteralOrConstant(valueSide, sourceCode)) return;
+        if (!isIntegerLiteralOrConstant(valueSide, sourceCode)) {
+          return;
+        }
 
         // lengthSide is MemberExpression accessing .length
         const arrayExpression = lengthSide.object;
@@ -85,7 +93,9 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
             const isArrayType =
               checker.isArrayType(type) || checker.isTupleType(type);
 
-            if (!isArrayType) return;
+            if (!isArrayType) {
+              return;
+            }
           } else {
             return;
           }

@@ -32,7 +32,9 @@ describe(isMinLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [0, 1, 2, 3] as const;
 
-    if (!isMinLengthArray(3, value)) return;
+    if (!isMinLengthArray(3, value)) {
+      return;
+    }
 
     expectType<typeof value, MinLengthArray<3, number>>('<=');
 
@@ -152,7 +154,9 @@ describe(isFixedLengthArray, () => {
   test('should act as a type guard', () => {
     const value: readonly number[] = [255, 128, 0] as const;
 
-    if (!isFixedLengthArray(3, value)) return;
+    if (!isFixedLengthArray(3, value)) {
+      return;
+    }
 
     expectType<typeof value, FixedLengthArray<3, number>>('<=');
 
@@ -188,7 +192,9 @@ describe('curried length guards', () => {
 
     assert.isTrue(hasThree(value));
 
-    if (!hasThree(value)) return;
+    if (!hasThree(value)) {
+      return;
+    }
 
     expectType<typeof value, MinLengthArray<3, number>>('<=');
 

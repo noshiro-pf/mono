@@ -87,12 +87,16 @@ export const fromAbortablePromise = <A, E = unknown>(
 
       promise
         .then((value) => {
-          if (isCompleted()) return;
+          if (isCompleted()) {
+            return;
+          }
 
           startUpdate(Result.ok(value));
         })
         .catch((error: unknown) => {
-          if (isCompleted()) return;
+          if (isCompleted()) {
+            return;
+          }
 
           // Silently ignore AbortError — it means the observable was
           // intentionally completed (e.g., by switchMap).

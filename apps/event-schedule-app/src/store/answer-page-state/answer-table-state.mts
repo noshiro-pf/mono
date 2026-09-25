@@ -314,8 +314,9 @@ const tableBodyValuesFiltered$ = combine([
     const tableBodyValuesFiltered = tableBodyValues.filter((row) => {
       const { answerTableRow, answerSummaryRow, score, datetimeRange } = row;
 
-      if (answerSummaryRow === undefined || answerTableRow === undefined)
+      if (answerSummaryRow === undefined || answerTableRow === undefined) {
         return false;
+      }
 
       const numAnswers = answerTableRow.length;
 
@@ -391,7 +392,9 @@ const tableBodyValuesFiltered$ = combine([
       );
     });
 
-    if (!filterState.rank.enabled) return tableBodyValuesFiltered;
+    if (!filterState.rank.enabled) {
+      return tableBodyValuesFiltered;
+    }
 
     const scoreThreshold = pipe(tableBodyValuesFiltered)
       .map((ar) => ar.map((a) => a.score))

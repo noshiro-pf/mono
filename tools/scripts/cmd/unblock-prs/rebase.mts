@@ -113,7 +113,9 @@ const rebaseInWorktree = async (
 
   const sha = newHead.value.trim();
 
-  if (sha === pr.headRefOid) return Result.ok(sha);
+  if (sha === pr.headRefOid) {
+    return Result.ok(sha);
+  }
 
   const baseHead = await git(`git rev-parse ${sh(`origin/${defaultBranch}`)}`);
 
@@ -189,7 +191,9 @@ export const advance = async (
 
   const rebased = await rebaseAndPush(pr, defaultBranch);
 
-  if (Result.isErr(rebased)) return rebased;
+  if (Result.isErr(rebased)) {
+    return rebased;
+  }
 
   const head = rebased.value;
 

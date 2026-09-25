@@ -46,7 +46,9 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
           return;
         }
 
-        if (isUserChange !== true) return;
+        if (isUserChange !== true) {
+          return;
+        }
 
         const dt = parseDate(dateStr);
 

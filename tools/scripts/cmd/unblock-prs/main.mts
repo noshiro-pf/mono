@@ -138,7 +138,9 @@ const unblockPrs = async (
 ): Promise<Result<undefined, string>> => {
   const preflight = await checkPreflight();
 
-  if (Result.isErr(preflight)) return preflight;
+  if (Result.isErr(preflight)) {
+    return preflight;
+  }
 
   const { defaultBranch } = preflight.value;
 
@@ -159,7 +161,9 @@ const unblockPrs = async (
 
     mut_state = cycle.state;
 
-    if (cycle.next === 'stop' || options.once || options.dryRun) break;
+    if (cycle.next === 'stop' || options.once || options.dryRun) {
+      break;
+    }
 
     if (cycle.next !== 'idle') {
       continue;
@@ -244,7 +248,9 @@ const runCycle = async (
       `#${target.number} is up to date (${target.mergeStateStatus}); watching it rather than rebasing another.`,
     );
 
-    if (options.dryRun) return { state: state(mut_skipped), next: 'stop' };
+    if (options.dryRun) {
+      return { state: state(mut_skipped), next: 'stop' };
+    }
 
     const outcome = await watch(
       target,

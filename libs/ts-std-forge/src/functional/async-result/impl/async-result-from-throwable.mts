@@ -74,7 +74,9 @@ const fromThrowableImpl = async <S, E>(
   } catch (error) {
     // A panic is a bug, not a recoverable failure: let it propagate.
 
-    if (isPanicError(error)) throw error;
+    if (isPanicError(error)) {
+      throw error;
+    }
 
     return Result.err(mapError(error));
   }

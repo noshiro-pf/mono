@@ -139,7 +139,9 @@ export const buildCoverageGraph = (
   const mut_edges = new Map<CommandId, Set<CommandId>>();
 
   const addEdge = ({ from, to }: Edge): void => {
-    if (from === to) return;
+    if (from === to) {
+      return;
+    }
 
     const mut_targets = mut_edges.get(from) ?? new Set<CommandId>();
 
@@ -148,9 +150,13 @@ export const buildCoverageGraph = (
     mut_edges.set(from, mut_targets);
   };
 
-  for (const edge of derived) addEdge(edge);
+  for (const edge of derived) {
+    addEdge(edge);
+  }
 
-  for (const edge of declared) addEdge(edge);
+  for (const edge of declared) {
+    addEdge(edge);
+  }
 
   return { commands, edges: mut_edges };
 };
@@ -188,7 +194,9 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
 
     const target = targetIndex === -1 ? undefined : tokens[targetIndex];
 
-    if (target === undefined || tokens.length > targetIndex + 1) continue;
+    if (target === undefined || tokens.length > targetIndex + 1) {
+      continue;
+    }
 
     if (tokens.some((token) => RECURSIVE_FLAGS.has(token))) {
       mut_recursive.push(target);
@@ -263,7 +271,9 @@ export const findRedundantCommands = (
 
   return commands.flatMap((covering) =>
     commands.flatMap((covered) => {
-      if (covering === covered) return [];
+      if (covering === covered) {
+        return [];
+      }
 
       if (
         !reaches(
@@ -310,11 +320,17 @@ export const findUncoveredCommands = (
     Object.keys(scripts)
       .toSorted()
       .flatMap((scriptName) => {
-        if (!isCheckScript(scriptName)) return [];
+        if (!isCheckScript(scriptName)) {
+          return [];
+        }
 
-        if (covered.has(toCommandId(directory, scriptName))) return [];
+        if (covered.has(toCommandId(directory, scriptName))) {
+          return [];
+        }
 
-        if (isUncoveredByDesign(directory, scriptName)) return [];
+        if (isUncoveredByDesign(directory, scriptName)) {
+          return [];
+        }
 
         return [
           `\`${scriptName}\` in ${directory}/package.json is a check that no check workflow runs.`,
@@ -511,9 +527,13 @@ const toCommandId = (directory: string, scriptName: string): CommandId =>
  * the five below.
  */
 const isCheckScript = (scriptName: string): boolean => {
-  if (scriptName.startsWith(PLUMBING_PREFIX)) return false;
+  if (scriptName.startsWith(PLUMBING_PREFIX)) {
+    return false;
+  }
 
-  if (scriptName.startsWith(VERIFY_PREFIX)) return true;
+  if (scriptName.startsWith(VERIFY_PREFIX)) {
+    return true;
+  }
 
   // A leading scope is skipped by asking about the segments rather than about
   // the whole name, so `ws:check:types` and `strict-lib:check:lint` count and
@@ -555,7 +575,9 @@ const tokenize = (args: string): readonly string[] => {
   const mut_state = { quote: '' };
 
   const flush = (): void => {
-    if (Arr.isEmpty(mut_current)) return;
+    if (Arr.isEmpty(mut_current)) {
+      return;
+    }
 
     mut_tokens.push(mut_current.join(''));
 
@@ -595,22 +617,30 @@ const WHITESPACE: ReadonlySet<string> = new Set([' ', '\t']);
 const matchesGlob = (pattern: string, name: string): boolean => {
   const segments = pattern.split('*');
 
-  if (Arr.isFixedLengthArray(1, segments)) return name === pattern;
+  if (Arr.isFixedLengthArray(1, segments)) {
+    return name === pattern;
+  }
 
   const first = segments.at(0) ?? '';
 
   const last = segments.at(-1) ?? '';
 
-  if (!name.startsWith(first) || !name.endsWith(last)) return false;
+  if (!name.startsWith(first) || !name.endsWith(last)) {
+    return false;
+  }
 
-  if (first.length + last.length > name.length) return false;
+  if (first.length + last.length > name.length) {
+    return false;
+  }
 
   const mut_cursor = { at: first.length };
 
   for (const segment of segments.slice(1, -1)) {
     const found = name.indexOf(segment, mut_cursor.at);
 
-    if (found === -1) return false;
+    if (found === -1) {
+      return false;
+    }
 
     mut_cursor.at = found + segment.length;
   }
@@ -629,13 +659,17 @@ const reachableFrom = (
   while (Arr.isNonEmpty(mut_queue)) {
     const current = mut_queue.shift();
 
-    if (current === undefined) break;
+    if (current === undefined) {
+      break;
+    }
 
     const unseen = Array.from(graph.edges.get(current) ?? []).filter(
       (next) => !mut_seen.has(next),
     );
 
-    for (const next of unseen) mut_seen.add(next);
+    for (const next of unseen) {
+      mut_seen.add(next);
+    }
 
     mut_queue.push(...unseen);
   }
@@ -654,7 +688,9 @@ const readManifests = async (): Promise<
 > => {
   const rootManifest = await readRootManifest();
 
-  if (Result.isErr(rootManifest)) return rootManifest;
+  if (Result.isErr(rootManifest)) {
+    return rootManifest;
+  }
 
   const packages = await Result.fromPromise(
     getWorkspacePackages(projectRootPath),
@@ -703,11 +739,15 @@ const readRootManifest = async (): Promise<Result<Manifest, string>> => {
 };
 
 const readScripts = (manifest: unknown): ReadonlyRecord<string, string> => {
-  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) return {};
+  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
+    return {};
+  }
 
   const scripts = manifest.scripts;
 
-  if (!isRecord(scripts)) return {};
+  if (!isRecord(scripts)) {
+    return {};
+  }
 
   return Obj.filterMap(scripts, (body) =>
     isString(body) ? Optional.some(body) : Optional.none,
@@ -761,7 +801,9 @@ const readWorkflow = async (
 
   const { triggerEvents } = parseWorkflowTriggers(contents.value);
 
-  if (!triggerEvents.includes(PULL_REQUEST_EVENT)) return Result.ok(undefined);
+  if (!triggerEvents.includes(PULL_REQUEST_EVENT)) {
+    return Result.ok(undefined);
+  }
 
   return Result.ok({
     relativePath,
@@ -814,7 +856,9 @@ const collectMatrixEntries = (
     (line) => indentOf(line) > 0 && line.trim() === `${key}:`,
   );
 
-  if (startIndex === -1) return [];
+  if (startIndex === -1) {
+    return [];
+  }
 
   const indent = indentOf(lines[startIndex] ?? '');
 
@@ -829,7 +873,9 @@ const collectMatrixEntries = (
   return block.flatMap((line) => {
     const trimmed = line.trim();
 
-    if (!trimmed.startsWith(LIST_ITEM)) return [];
+    if (!trimmed.startsWith(LIST_ITEM)) {
+      return [];
+    }
 
     const entry = trimmed.slice(LIST_ITEM.length).trim();
 

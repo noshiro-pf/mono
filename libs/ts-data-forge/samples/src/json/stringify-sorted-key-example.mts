@@ -33,7 +33,9 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.isOk(formatted));
 
-    if (!Result.isOk(formatted)) return;
+    if (!Result.isOk(formatted)) {
+      return;
+    }
 
     assert.isTrue(isString(formatted.value));
 

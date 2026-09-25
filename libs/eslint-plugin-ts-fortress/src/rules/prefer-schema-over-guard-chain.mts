@@ -163,7 +163,9 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
           ? operand.argument
           : operand;
 
-      if (call.type !== AST_NODE_TYPES.CallExpression) return undefined;
+      if (call.type !== AST_NODE_TYPES.CallExpression) {
+        return undefined;
+      }
 
       const name =
         call.callee.type === AST_NODE_TYPES.Identifier
@@ -174,7 +176,9 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
             ? call.callee.property.name
             : undefined;
 
-      if (name === undefined || !guards.includes(name)) return undefined;
+      if (name === undefined || !guards.includes(name)) {
+        return undefined;
+      }
 
       const [subject] = call.arguments;
 
@@ -183,7 +187,9 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
 
     return {
       LogicalExpression: (node) => {
-        if (node.operator === '??') return;
+        if (node.operator === '??') {
+          return;
+        }
 
         // Only the outermost node of a chain, so that `a && b && c` is judged
         // once as three operands rather than three times as nested pairs.
@@ -199,13 +205,17 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
         for (const operand of operandsOf(node)) {
           const name = guardedName(operand);
 
-          if (name === undefined) continue;
+          if (name === undefined) {
+            continue;
+          }
 
           mut_counts.set(name, (mut_counts.get(name) ?? 0) + 1);
         }
 
         for (const [name, count] of mut_counts) {
-          if (count < threshold) continue;
+          if (count < threshold) {
+            continue;
+          }
 
           context.report({
             node,
@@ -239,7 +249,9 @@ const rootIdentifierOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
 ): string | undefined => {
-  if (node.type === AST_NODE_TYPES.Identifier) return node.name;
+  if (node.type === AST_NODE_TYPES.Identifier) {
+    return node.name;
+  }
 
   if (node.type === AST_NODE_TYPES.MemberExpression) {
     return rootIdentifierOf(node.object);

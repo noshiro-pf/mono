@@ -10,7 +10,9 @@ import { type NarrowToSome } from './types.mjs';
  * ```ts
  * const optionalNumber = Optional.some(42);
  *
- * if (!Optional.isSome(optionalNumber)) return;
+ * if (!Optional.isSome(optionalNumber)) {
+ *   return;
+ * }
  *
  * const value: number = optionalNumber.value;
  *
