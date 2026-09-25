@@ -1,8 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GitHub View Defaults",
-  "description": "Opens GitHub pull request diffs with whitespace hidden and viewed files collapsed, and the branches page as the full list.",
-  "version": "0.3.0",
+  "description": "Opens GitHub PR diffs with whitespace hidden and viewed files collapsed, branches as the full list, and numbers PR and issue tabs.",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/16.png",

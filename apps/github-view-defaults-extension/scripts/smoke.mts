@@ -9,7 +9,8 @@ import { distPath } from './store-package.mjs';
  * Loads the built extension into a real Chromium and checks the things nothing
  * else can check: that the redirect happens, that the links are rewritten, that
  * a click on one goes where the link says, that a reload answers what the
- * address says rather than what the click before it said — and that none of it
+ * address says rather than what the click before it said, that the tab title
+ * carries the number of the pull request or issue — and that none of it
  * happens twice.
  *
  * **It never touches github.com.** Every request to that origin is fulfilled
@@ -264,6 +265,81 @@ const main = async (): Promise<void> => {
       'which a reload does not undo either',
       await settle(),
       `${origin}/noshiro-pf/mono/branches/all`,
+    );
+
+    console.log('the tab title');
+
+    /** The title once the observer has had a turn to act on it. */
+    const settledTitle = async (): Promise<string> => {
+      await page.waitForTimeout(settleStepMs);
+
+      return page.title();
+    };
+
+    await visit(`${origin}/noshiro-pf/mono/pull/1`);
+
+    check(
+      'a pull request is numbered',
+      await settledTitle(),
+      '#1 pull request fixture',
+    );
+
+    await visit(`${origin}/noshiro-pf/mono/issues/2`);
+
+    check(
+      'an issue is numbered',
+      await settledTitle(),
+      '#2 pull request fixture',
+    );
+
+    await visit(`${origin}/noshiro-pf/mono/pull/1/files`);
+
+    check(
+      'a diff reached through the redirect is numbered',
+      await settledTitle(),
+      '#1 pull request fixture',
+    );
+
+    await visit(`${origin}/noshiro-pf/mono/branches/yours`);
+
+    check(
+      'a page that is neither is left alone',
+      await settledTitle(),
+      'pull request fixture',
+    );
+
+    // What GitHub does on a client-side navigation: the address moves without
+    // a document load, and the page sets a new title. Once with the title
+    // arriving after the address, which is the order that would stack a second
+    // number in front of the first if the old one were taken for the page's.
+    await visit(`${origin}/noshiro-pf/mono/pull/1`);
+
+    await page.evaluate(() => {
+      history.pushState(null, '', '/noshiro-pf/mono/pull/3');
+
+      document.body.append(document.createElement('span'));
+    });
+
+    await settledTitle();
+
+    // As a string, like the fixture's own script: this runs in the page, and
+    // what it does there is the site's behavior, not this file's.
+    await page.evaluate("document.title = 'the third one'");
+
+    check(
+      'a client-side navigation is renumbered, not numbered twice',
+      await settledTitle(),
+      '#3 the third one',
+    );
+
+    await page.evaluate(
+      "history.pushState(null, '', '/noshiro-pf/mono/pulls'); document.title = 'the list'",
+    );
+
+    check(
+      'and a navigation away is not numbered',
+      await settledTitle(),
+      'the list',
     );
 
     console.log('the address bar the site rewrites');

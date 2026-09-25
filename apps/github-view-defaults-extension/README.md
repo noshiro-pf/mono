@@ -3,7 +3,9 @@
 A Chrome extension that opens a few GitHub pages the way you would have set
 them up by hand: a pull request diff with whitespace-only changes hidden and
 the files you have already marked as viewed collapsed, and a repository's
-branches page as the full list of branches rather than the overview.
+branches page as the full list of branches rather than the overview. It also
+puts a pull request's or an issue's number at the front of its tab title, where
+a narrow tab still shows it.
 
 | page                                  | opened as                                              |
 | :------------------------------------ | :----------------------------------------------------- |
@@ -23,6 +25,13 @@ The diff half is the same idea as
 [Hide Whitespace for GitHub](https://github.com/jackchuka/chrome-extension-github-whitespace),
 which is where the approach comes from, with the viewed-files parameter added
 and one difference in behavior — see below.
+
+The tab title is changed on these pages and no others:
+
+| page                                               | tab title                             |
+| :------------------------------------------------- | :------------------------------------ |
+| `/{owner}/{repo}/pull/{n}`, and every tab below it | `#{n}` in front of GitHub's own title |
+| `/{owner}/{repo}/issues/{n}`                       | the same                              |
 
 ## What it does, exactly
 
@@ -63,9 +72,18 @@ and one difference in behavior — see below.
       the list. `overview=1` cannot disagree with itself that way.
     - `overview=1` is not one of GitHub's parameters; GitHub ignores it. The
       extension reads only whether it is there, the way it reads `w` on a diff.
+- **On a pull request or an issue, the tab title leads with its number.**
+  GitHub's title for a pull request is
+  `Fix the thing by someone · Pull Request #2054 · owner/repo`, and a tab strip
+  cuts it off from the right, so the number is the first thing lost. The
+  extension writes `#2054` in front of it, and keeps doing so as GitHub
+  rewrites the title on its own navigations. A title that already starts with
+  the number is left as it is. The pull request and issue lists, a new issue
+  and discussions are not numbered.
 - **Nothing else.** No options, no storage, no network, no permissions beyond
-  running on `github.com`. Both rules are a table in `src/page-url.mts`;
-  changing them is an edit and a rebuild.
+  running on `github.com`. Both address rules are a table in
+  `src/page-url.mts`, and the title rule is `src/page-title.mts`; changing them
+  is an edit and a rebuild.
 
 Only `https://github.com` is matched. A GitHub Enterprise installation on
 another host is not covered — add its origin to `content_scripts.matches` in
@@ -117,6 +135,11 @@ Three mechanisms, in the order they matter:
   address changing under it and asks again. The question it asks reads the
   address and nothing else, so a typed URL, a bookmark, a notification link and
   a reload are all answered the same.
+- **The title is numbered** by the same observer, on every batch of mutations:
+  a changed `<title>` is one. What the extension last wrote is remembered along
+  with the title it was written over, so a client-side move from one pull
+  request to another renumbers the title rather than putting a second number in
+  front of the first.
 
 **Each page is acted on once, and once only.** GitHub takes the
 parameters in and then rewrites its own address bar without them — measured on
@@ -126,9 +149,10 @@ would put them back, and the page would load again, forever. So the paths
 already dealt with are remembered for the life of the document: parameters
 coming off afterwards is GitHub having used them, not GitHub having lost them.
 
-`src/page-url.mts` holds all of the rules and touches no DOM — which URLs count
-and what the extension wants of them — and `src/content.mts` is the glue that
-applies it. `test/page-url.test.mts` covers the first of those.
+`src/page-url.mts` holds the address rules and touches no DOM — which URLs
+count and what the extension wants of them — and `src/page-title.mts` holds the
+title rule the same way; `src/content.mts` is the glue that applies them.
+`test/page-url.test.mts` and `test/page-title.test.mts` cover the first two.
 
 ## Commands
 
@@ -156,9 +180,12 @@ extension decided about is decided the same way again.
 ## Release
 
 1. `pnpm run test && pnpm run build && xvfb-run -a pnpm run smoke`.
-2. Raise `version` in [`public/manifest.json`](./public/manifest.json). It is
-   the manifest's version that the store reads and that names the package; the
-   `package.json` version is unused, this being a private package.
+2. Build from a `main` on which the version pull request
+   (`chore: version packages`) has merged. The version is the one in
+   `package.json`, raised there by the changesets merged since the last
+   release; the build writes it into `dist/manifest.json`, and
+   `public/manifest.json` carries none. A change with no changeset leaves the
+   version where it was, and the store refuses an upload that is not newer.
 3. `pnpm run pack`, which builds and writes
    `pack/github-view-defaults-extension-<version>.zip` — `dist/` without its
    source maps. `pack/` is not tracked.
