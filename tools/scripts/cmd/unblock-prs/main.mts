@@ -8,6 +8,12 @@ import {
   viewPullRequest,
 } from './github.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
+import {
+  idleWaitSec,
+  initialQuiet,
+  observeSurvey,
+  surveyFingerprint,
+} from './quiet.mjs';
 import { advance } from './rebase.mjs';
 import { newSkips, pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
@@ -71,8 +77,11 @@ import { watch } from './watch.mjs';
  * 6. Survey again, saying what became of the pull requests this run has
  *    touched. One that merges after the watch gave up simply stops appearing
  *    in the list, and this is the only place that gets recorded. When there
- *    is nothing to do the script sleeps for `--idle-interval` seconds before
- *    looking again, and keeps going until it is interrupted or `--once` was
+ *    is nothing to do the script sleeps before looking again —
+ *    `--active-interval` seconds while the list keeps changing, so a pull
+ *    request queued a moment ago is not left for minutes, and
+ *    `--idle-interval` once `--idle-after` surveys in a row have seen the
+ *    same list — and keeps going until it is interrupted or `--once` was
  *    given.
  *
  * The rebase happens in a `git worktree` under the OS temp directory, so the
@@ -131,6 +140,7 @@ import { watch } from './watch.mjs';
  *   taking `skip-ci` off.
  * - `watch.mts` — polling one pull request until it merges, or until it will
  *   not.
+ * - `quiet.mts` — how long to sleep when there is nothing to do.
  * - `checks.mts` — what the merge is waiting for, judged against the contexts
  *   the ruleset requires.
  * - `github.mts` — everything that shells out to `gh` or `git`, and nothing
@@ -159,6 +169,7 @@ const unblockPrs = async (
     skipped: new Map(),
     tracked: new Set(),
     baseSha: undefined,
+    quiet: initialQuiet,
   };
 
   while (!stopRequested()) {
@@ -178,9 +189,11 @@ const unblockPrs = async (
       continue;
     }
 
-    log(`Nothing to do. Checking again in ${options.idleIntervalSec}s.`);
+    const waitSec = idleWaitSec(mut_state.quiet, options);
 
-    await pause(options.idleIntervalSec * 1000);
+    log(`Nothing to do. Checking again in ${waitSec}s.`);
+
+    await pause(waitSec * 1000);
   }
 
   return Result.ok(undefined);
@@ -234,6 +247,11 @@ const runCycle = async (
   // whose merge would otherwise go unrecorded.
   const tracked = await reportDeparted(before.tracked, pullRequests);
 
+  const quiet = observeSurvey(
+    before.quiet,
+    surveyFingerprint({ pullRequests, baseSha }),
+  );
+
   const state = (
     nextSkipped: SkipRecords,
     nextTracked: ReadonlySet<number> = tracked,
@@ -242,6 +260,7 @@ const runCycle = async (
       skipped: nextSkipped,
       tracked: nextTracked,
       baseSha,
+      quiet,
     }) as const;
 
   const skipped = pruneSkips(before.skipped, pullRequests, baseSha);

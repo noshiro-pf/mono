@@ -153,7 +153,7 @@ version commit が「まだ消費していない changeset を含む先端」の
 
 #### 4. watch
 
-`--poll-interval`（既定60秒）待ってから、マージするか「しない」と確定するまで
+`--poll-interval`（既定30秒）待ってから、マージするか「しない」と確定するまで
 ポーリングします。各回で次の順に判定し、該当した時点で抜けます。
 
 | 条件                              | 結果                          |
@@ -206,18 +206,26 @@ rebase しても同じマトリクスが同じように落ちるだけで、直�
 
 このサイクルで触った PR が次の survey で open 一覧から消えていれば、マージされ
 たのかクローズされたのかを報告します。watch を諦めた数分後にマージされた PR を
-取りこぼさないためです。何もすることがなければ `--idle-interval`（既定300秒）
-待って再 survey します。
+取りこぼさないためです。
+
+何もすることがなければ待ってから再 survey します。待ち時間は一覧が動いている
+かどうかで変わります。open な PR の一覧（head、merge state、ラベル、
+auto-merge、draft、本文）と `main` の tip が `--idle-after`（既定10回）続けて
+前回の survey と同じになるまでは `--active-interval`（既定30秒）、それ以降は
+`--idle-interval`（既定300秒）です。何か変われば短い間隔に戻ります。今キュー
+に入れた PR を数分放置しないためです。
 
 ### オプション
 
-| オプション              | 既定 | 意味                                  |
-| :---------------------- | ---: | :------------------------------------ |
-| `--once`                |      | 1サイクルだけ実行して終了             |
-| `--dry-run`             |      | survey と報告だけ行い、何も変更しない |
-| `--idle-interval <sec>` |  300 | 何もない時の再 survey までの待ち時間  |
-| `--poll-interval <sec>` |   60 | watch 中のポーリング間隔              |
-| `--watch-timeout <min>` |   90 | 1本を諦めるまでの時間                 |
+| オプション                | 既定 | 意味                                         |
+| :------------------------ | ---: | :------------------------------------------- |
+| `--once`                  |      | 1サイクルだけ実行して終了                    |
+| `--dry-run`               |      | survey と報告だけ行い、何も変更しない        |
+| `--active-interval <sec>` |   30 | 一覧が動いている間の再 survey までの待ち時間 |
+| `--idle-after <n>`        |   10 | 何回続けて変化が無ければ長い間隔にするか     |
+| `--idle-interval <sec>`   |  300 | 一覧が止まった後の再 survey までの待ち時間   |
+| `--poll-interval <sec>`   |   30 | watch 中のポーリング間隔                     |
+| `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
 
 ### 見送った PR はどこで分かるか
 
@@ -252,6 +260,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
+| `quiet.mts`       | 何もない時にどれだけ待つか                                |
 | `checks.mts`      | マージが何を待っているか                                  |
 | `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                 |
 | `labels.mts`      | 3つのラベルがその PR について何を言うか                   |
@@ -419,7 +428,7 @@ The queue does not stop.
 
 #### 4. Watch
 
-After one `--poll-interval` (60s by default), poll until it merges or until
+After one `--poll-interval` (30s by default), poll until it merges or until
 something says it will not. Each poll tests these in order and leaves on the
 first that matches:
 
@@ -474,18 +483,27 @@ failure is a person's job, so the push that carries the fix is what clears it.
 
 A pull request this run acted on that has left the open list by the next
 survey is reported as merged or closed. Nothing else would notice one that
-merged minutes after the watch gave up on it. With nothing to do, the loop
-sleeps for `--idle-interval` (300s) and surveys again.
+merged minutes after the watch gave up on it.
+
+With nothing to do, the loop sleeps and surveys again, for how long depending
+on whether the list is still moving. It sleeps `--active-interval` (30s) until
+`--idle-after` (10) surveys in a row have seen the same open pull requests
+(head, merge state, labels, auto-merge, draft flag, body) and the same tip of
+`main`, and `--idle-interval` (300s) from then on. Any change brings it back
+to the short interval, so a pull request queued a moment ago is not left for
+minutes.
 
 ### Options
 
-| Option                  | Default | Meaning                                    |
-| :---------------------- | ------: | :----------------------------------------- |
-| `--once`                |         | run one cycle and exit                     |
-| `--dry-run`             |         | survey and report, change nothing          |
-| `--idle-interval <sec>` |     300 | wait between surveys when there is nothing |
-| `--poll-interval <sec>` |      60 | wait between polls of the watched one      |
-| `--watch-timeout <min>` |      90 | give up on one pull request after this     |
+| Option                    | Default | Meaning                                    |
+| :------------------------ | ------: | :----------------------------------------- |
+| `--once`                  |         | run one cycle and exit                     |
+| `--dry-run`               |         | survey and report, change nothing          |
+| `--active-interval <sec>` |      30 | wait between surveys while the list moves  |
+| `--idle-after <n>`        |      10 | unchanged surveys before the long wait     |
+| `--idle-interval <sec>`   |     300 | wait between surveys once it has sat still |
+| `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
+| `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
 
 ### Where a passed-over pull request shows
 
@@ -524,6 +542,7 @@ the paths it changes and `.github/CODEOWNERS`.
 | `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
+| `quiet.mts`       | how long to sleep when there is nothing to do            |
 | `checks.mts`      | what the merge is waiting for                            |
 | `github.mts`      | everything that shells out to `gh` or `git`              |
 | `labels.mts`      | what the three labels say about a pull request           |
