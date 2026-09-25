@@ -68,7 +68,7 @@ export const create = <const V,>(
 ): Result<readonly V[], CreateError> => {
   // `isSafeInteger` rather than `isInteger`: the two agree on everything at
   // or below `maxArrayLength`, which is well inside the safe range.
-  if (!Number.isSafeInteger(length) || length < 0 || length > maxArrayLength) {
+  if (!Number.isSafeInteger(length) || length < 0 || maxArrayLength < length) {
     return Result.err({ kind: 'invalid-length', length });
   }
 

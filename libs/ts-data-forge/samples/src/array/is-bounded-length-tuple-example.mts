@@ -13,7 +13,7 @@ if (import.meta.vitest !== undefined) {
     assert.isFalse(Arr.isBoundedLengthTuple(1, 3, quad));
 
     if (Arr.isBoundedLengthTuple(1, 3, pair)) {
-      assert.isTrue(pair.length >= 1 && pair.length <= 3);
+      assert.isTrue(1 <= pair.length && pair.length <= 3);
     }
 
     // embed-sample-code-ignore-below

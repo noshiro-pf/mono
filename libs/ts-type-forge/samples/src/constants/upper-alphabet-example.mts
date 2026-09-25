@@ -12,7 +12,7 @@ type T1 = FirstLetter<'Hello'>; // 'H'
 type T2 = FirstLetter<'world'>; // never
 
 const isUppercase = (char: string): char is UpperAlphabet =>
-  char.length === 1 && char >= 'A' && char <= 'Z';
+  char.length === 1 && 'A' <= char && char <= 'Z';
 
 // embed-sample-code-ignore-below
 export { isUppercase };

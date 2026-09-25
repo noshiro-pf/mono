@@ -3,7 +3,7 @@ import { type Int32 } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 const isInt32 = (x: number): x is Int32 =>
-  Number.isSafeInteger(x) && x >= -(2 ** 31) && x <= 2 ** 31 - 1;
+  Number.isSafeInteger(x) && -(2 ** 31) <= x && x <= 2 ** 31 - 1;
 
 const toInt32 = (x: number): Int32 => (x | 0) as Int32;
 

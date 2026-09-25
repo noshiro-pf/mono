@@ -264,7 +264,7 @@ const matchesRewrite = (
 
   if (
     args.length < boundCount + 1 ||
-    args.length > boundCount + 2 ||
+    boundCount + 2 < args.length ||
     // Explicit type arguments pin the bound independently of the literal, so
     // dropping or moving the literal could change the resulting type.
     node.typeArguments !== undefined ||

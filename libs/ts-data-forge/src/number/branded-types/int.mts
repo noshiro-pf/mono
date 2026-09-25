@@ -175,7 +175,7 @@ export const Int = {
    *
    * assert.isTrue(Int.is(randomValue));
    *
-   * assert.isTrue(randomValue >= 1 && randomValue <= 6);
+   * assert.isTrue(1 <= randomValue && randomValue <= 6);
    * ```
    *
    * @param min - The minimum value (inclusive)

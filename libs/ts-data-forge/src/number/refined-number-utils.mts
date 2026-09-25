@@ -578,7 +578,7 @@ export namespace TsDataForgeInternals {
      *
      * assert.isTrue(coerced >= Number.MIN_VALUE);
      *
-     * assert.isTrue(boundedRandom >= 10 && boundedRandom <= 20);
+     * assert.isTrue(10 <= boundedRandom && boundedRandom <= 20);
      *
      * assert.isTrue(nonZeroRandom > 0);
      * ```

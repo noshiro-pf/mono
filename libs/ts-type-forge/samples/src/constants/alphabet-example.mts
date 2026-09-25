@@ -6,7 +6,7 @@ type AlphabetCount = 52; // LowerAlphabet (26) + UpperAlphabet (26)
 
 const isAlphabetic = (char: string): char is Alphabet =>
   char.length === 1 &&
-  ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'));
+  (('a' <= char && char <= 'z') || ('A' <= char && char <= 'Z'));
 
 type ExtractAlpha<S extends string> = S extends `${infer F}${infer R}`
   ? F extends Alphabet

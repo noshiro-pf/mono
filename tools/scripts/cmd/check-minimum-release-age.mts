@@ -87,7 +87,7 @@ export const parseMinimumReleaseAgeSettings = (
     waiverReasons: collectReasons(reasonBlock),
     misplacedReasonTargets: collectReasons(
       lines.filter(
-        (_line, index) => index < blockStartIndex || index >= pruneIndex,
+        (_line, index) => index < blockStartIndex || pruneIndex <= index,
       ),
     ).map((reason) => reason.target),
   };
@@ -276,7 +276,7 @@ type ViolationReason =
 const hasVersion = (entry: string): boolean => {
   const separatorIndex = entry.indexOf('@', entry.startsWith('@') ? 1 : 0);
 
-  return separatorIndex > 0 && separatorIndex < entry.length - 1;
+  return 0 < separatorIndex && separatorIndex < entry.length - 1;
 };
 
 const findDelayMinutes = (lines: readonly string[]): number | undefined => {

@@ -238,7 +238,7 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // array, and would be wrong on `scan`'s value parameter.
       if (
         callback.params.length < 2 ||
-        callback.params.length > 3 ||
+        3 < callback.params.length ||
         callback.params.some(
           (param) =>
             param.type !== AST_NODE_TYPES.Identifier ||

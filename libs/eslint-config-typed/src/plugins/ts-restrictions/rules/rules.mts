@@ -11,6 +11,7 @@ import { preferDedent } from './prefer-dedent.mjs';
 import { preferLogicalOverBooleanTernary } from './prefer-logical-over-boolean-ternary.mjs';
 import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
 import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-when-safe.mjs';
+import { preferRangeInNumberLineOrder } from './prefer-range-in-number-line-order.mjs';
 import { preferTernary } from './prefer-ternary.mjs';
 
 export const tsRestrictionsRules = {
@@ -26,5 +27,6 @@ export const tsRestrictionsRules = {
   'prefer-logical-over-boolean-ternary': preferLogicalOverBooleanTernary,
   'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
   'prefer-nullish-coalescing-when-safe': preferNullishCoalescingWhenSafe,
+  'prefer-range-in-number-line-order': preferRangeInNumberLineOrder,
   'prefer-ternary': preferTernary,
 } as const satisfies ESLintPlugin['rules'];

@@ -15,6 +15,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
   'ts-restrictions/prefer-logical-over-boolean-ternary': 'error',
   'ts-restrictions/prefer-nullish-coalescing-when-safe': 'error',
+  'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),

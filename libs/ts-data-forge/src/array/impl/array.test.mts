@@ -26,7 +26,7 @@ describe('Array.some', () => {
   });
 
   test('case 2', () => {
-    assert.isFalse(xs.some((x) => x <= 1 && 3 <= x));
+    assert.isFalse(xs.some((x) => 3 <= x && x <= 1));
   });
 });
 

@@ -9,7 +9,7 @@ type Test1 = IsVowel<'a'>; // true
 type Test2 = IsVowel<'b'>; // false
 
 const validateLowercase = (char: string): char is LowerAlphabet =>
-  char.length === 1 && char >= 'a' && char <= 'z';
+  char.length === 1 && 'a' <= char && char <= 'z';
 
 // embed-sample-code-ignore-below
 export { validateLowercase };

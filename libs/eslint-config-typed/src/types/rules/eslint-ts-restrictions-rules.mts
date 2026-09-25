@@ -370,6 +370,22 @@ namespace PreferNullishCoalescingWhenSafe {
 }
 
 /**
+ * @description Write a range check in the order of the number line (`x >= min && max >= x` → `min <= x && x <= max`, `min > x || x > max` → `x < min || max < x`).
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace PreferRangeInNumberLineOrder {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Prefer ternary expressions over `if` statements, and chains of them, that only choose what to return or assign.
  *
  *  ```md
@@ -422,6 +438,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
+  'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
 }>;
 

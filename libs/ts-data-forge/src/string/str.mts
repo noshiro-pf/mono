@@ -132,7 +132,7 @@ export namespace Str {
    *
    * const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
    *
-   * assert.isTrue(userId.length >= 8 && userId.length <= 16);
+   * assert.isTrue(8 <= userId.length && userId.length <= 16);
    * ```
    *
    * @template MinLength - The minimum number of characters (inclusive).
@@ -154,7 +154,7 @@ export namespace Str {
     maxLength: MaxLength,
     s: S,
   ): s is BoundedLengthString<MinLength, MaxLength> & S =>
-    s.length >= minLength && s.length <= maxLength;
+    minLength <= s.length && s.length <= maxLength;
 
   /**
    * Type guard that checks if a string has exactly `length` characters.
@@ -369,7 +369,7 @@ export namespace Str {
    *
    * const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
    *
-   * assert.isTrue(relaxed.length >= 8 && relaxed.length <= 16);
+   * assert.isTrue(8 <= relaxed.length && relaxed.length <= 16);
    *
    * // curried version
    * const asUserId = Str.asBoundedLengthString(8, 16);

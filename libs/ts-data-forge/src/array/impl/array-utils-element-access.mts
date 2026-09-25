@@ -58,7 +58,7 @@ const atImpl = <E,>(
   index: SizeType.ArgArrWithNegative,
 ): Optional<E> =>
   pipe(index < 0 ? array.length + index : index).map((normalizedIndex) =>
-    normalizedIndex < 0 || normalizedIndex >= array.length
+    normalizedIndex < 0 || array.length <= normalizedIndex
       ? Optional.none
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         Optional.some(array[normalizedIndex]!),

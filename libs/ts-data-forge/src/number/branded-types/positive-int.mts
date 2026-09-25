@@ -192,7 +192,7 @@ export const PositiveInt = {
    *
    * assert.isTrue(PositiveInt.is(randomValue));
    *
-   * assert.isTrue(randomValue >= 3 && randomValue <= 6);
+   * assert.isTrue(3 <= randomValue && randomValue <= 6);
    * ```
    *
    * @param min - The minimum value (inclusive)

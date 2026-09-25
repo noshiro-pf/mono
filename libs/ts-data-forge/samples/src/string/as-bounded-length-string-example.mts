@@ -9,7 +9,7 @@ if (import.meta.vitest !== undefined) {
 
     const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
 
-    assert.isTrue(relaxed.length >= 8 && relaxed.length <= 16);
+    assert.isTrue(8 <= relaxed.length && relaxed.length <= 16);
 
     // curried version
     const asUserId = Str.asBoundedLengthString(8, 16);

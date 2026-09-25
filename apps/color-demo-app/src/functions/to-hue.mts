@@ -1,7 +1,7 @@
 import { type Hue } from 'ts-utils-additional';
 
 const isHue = (a: number): a is Hue =>
-  Number.isSafeInteger(a) && a >= 0 && a < 360;
+  Number.isSafeInteger(a) && 0 <= a && a < 360;
 
 export const toHue = (a: number): Hue => {
   if (isHue(a)) {
