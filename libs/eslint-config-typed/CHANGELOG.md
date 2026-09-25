@@ -1,5 +1,53 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.14.0
+
+### Minor Changes
+
+- 8d21527: Turn `curly` on with `all`, and add two rules that normalize boolean
+  expressions:
+
+    - `ts-restrictions/prefer-logical-over-boolean-ternary` writes a ternary with
+      one boolean literal branch as the logical operator it spells out:
+      `a ? false : b` → `!a && b` and `a ? b : true` → `!a || b` always, and
+      `a ? true : b` → `a || b` and `a ? b : false` → `a && b` when `a` is a
+      boolean, since otherwise they would yield `a` itself instead of `true` or
+      `false`.
+    - `ts-restrictions/no-negated-comparison` folds a negation into the comparison
+      it negates: `!(a === b)` → `a !== b`, `!(a < b)` → `a >= b`. A relational
+      comparison is fixed only when no operand can be `NaN` — strings, `bigint`,
+      number literals, and number brands declaring `NaNValue: false`; for a plain
+      `number` the inversion is offered as a suggestion, because `!(x >= 0)` is
+      `true` for `NaN` and `x < 0` is not. It replaces
+      `unicorn/no-negated-comparison`, which is turned off.
+
+    `curly` had been off with the rest of what eslint-config-prettier disables;
+    only its `multi-line` and `multi-or-nest` options can disagree with a
+    formatter, and `all` is neither.
+
+- 89bddd9: Add `ts-restrictions/prefer-range-in-number-line-order`, which writes a range
+  check in the order of the number line, smaller to the left:
+  `x >= min && max >= x` → `min <= x && x <= max`, and
+  `min > x || x > max` → `x < min || max < x`. A range check is two relational
+  comparisons adjacent in a chain of `&&` or `||` that share the value tested;
+  the comparison with the lower bound is moved first if it is not. An operand
+  with a side effect gets a suggestion instead of a fix, since the fix changes
+  the order in which operands are evaluated.
+- 3ec19f7: Add `ts-restrictions/prefer-ternary`, which reports everything
+  `unicorn/prefer-ternary` does and also folds a whole chain of them:
+  consecutive `if`s that return, `else if` branches, and a fallback that is
+  already a ternary become one `return a ? 1 : b ? 2 : 3;`. unicorn folds one
+  `if` at a time and refuses a branch that returns a ternary, so it left every
+  chain folded at its last link only.
+
+    A chain only this rule would fold is left alone when a comment sits inside it,
+    since the fix has nowhere to put the comment; the part below the last comment
+    is still folded. Under `only-single-line`, a fallback ternary is measured
+    branch by branch, so one Prettier has wrapped over several lines still folds.
+
+    The configuration turns `unicorn/prefer-ternary` off and turns
+    `ts-restrictions/prefer-ternary` on with the same `only-single-line` option.
+
 ## 5.13.0
 
 ### Minor Changes
