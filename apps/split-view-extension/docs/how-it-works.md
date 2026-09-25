@@ -260,19 +260,39 @@ while the repository's own pages load.
 
 The way out is to remove the worker, which is what `Clear SW` in a pane's toolbar
 does: it opens a hidden frame at the site's origin, has the content script there
-call `registration.unregister()`, and reloads the pane. The site registers its
-worker again on its next ordinary visit, so this is an escape from a pane that
-cannot load rather than a permanent change. The button appears only on a pane
-that has failed to report.
+call `registration.unregister()`, and loads the pane again — at the page a link
+was taking it to, when the frame said where it was going before it left, since
+that is the page that failed. The site registers its worker again on its next
+ordinary visit, so this is an escape from a pane that cannot load rather than a
+permanent change. The button appears only on a pane that has failed to report.
+**A helper frame that has not answered in ten seconds is given up on** and the
+pane says it did not load: the site's worker may answer the root as well, and a
+pane waiting on an answer that will never come used to stay blank until the
+whole tab was reloaded.
 
 `Always clear` next to it puts the **origin** on a list kept in `local` storage: a
-pane at an origin on that list removes the worker without being asked — when it
-fails to load, and again whenever it loads successfully, since the site
-re-registers on every visit. Per origin because that is the only unit there is:
-a worker is registered for a scope (`/` for the sites this matters to) and
-`unregister()` takes the whole registration, so "only under `/issues`" is not
-something the browser can be asked for. It is also exactly what the button was
-already doing.
+pane at an origin on that list removes the worker without being asked — through
+the helper frame when it fails to load, and from inside the page, once a second,
+for as long as a page of that origin is open in the pane.
+
+- **Once a second, not once at `load`.** A site registers its worker whenever it
+  likes — GitHub does it a moment after the page has loaded — so a clear made at
+  `load` finds nothing, and the worker registered after it answers the pane's
+  next navigation. That is what made the setting look as if it had not stuck.
+- **The worker can come back from outside the pane.** Where the pane's storage
+  is not partitioned from the site's — Chrome exempts frames of sites an
+  extension has host access to, though the smoke test runs with partitioning
+  off and does not show it — the worker a pane removes is the site's own, and
+  the site open in another tab registers it again. A navigation in the pane
+  can still meet it; that one fails, is cleared, and lands where the link was
+  going.
+- **Per origin** because that is the only unit there is: a worker is registered
+  for a scope (`/` for the sites this matters to) and `unregister()` takes the
+  whole registration, so "only under `/issues`" is not something the browser
+  can be asked for. It is also exactly what the button was already doing.
+- **The list is watched, not read once**, by every split view page and by the
+  content script in every pane, so turning it on reaches a pane already showing
+  the site and a split view open in another tab.
 
 ## The list, and what it is keyed to
 
@@ -398,7 +418,10 @@ there is something to say:
   "the frame finished loading and the content script in it did not report
   within 800ms" is an answer, where a fixed timer would call every slow page a
   failure. A `load` that never comes — a server that never responds — is
-  covered by a backstop at ten seconds.
+  covered by a backstop at ten seconds. The count of reports starts at the
+  `load` event itself: started any later, the previous document's answer was
+  counted for the new one, and a link into a page that will not frame was never
+  noticed at all.
 
 **And it can be sent away.** "Show the frame anyway" reveals what is behind it,
 because the signal is "nothing in the frame answered", and a page this

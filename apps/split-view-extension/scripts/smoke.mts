@@ -323,6 +323,10 @@ const main = async (): Promise<void> => {
 
     const blockedAgain = !(await appears('#sw-target', 2000));
 
+    // The helper frame a clear uses loads the site's root, which nothing else
+    // asks for in this stretch — so its hits are the clears.
+    const clearsBefore = server.hits('/');
+
     await openPaneMenu();
 
     await page
@@ -339,6 +343,10 @@ const main = async (): Promise<void> => {
       .then(() => true)
       .catch(() => false);
 
+    await page.waitForTimeout(1500);
+
+    const automaticClears = server.hits('/') - clearsBefore;
+
     // And a page on that origin which registers a worker on every visit — what
     // a real one does — is loaded once and left alone. It used to be loaded
     // twice: the clear that keeps the worker away from the *next* navigation
@@ -351,6 +359,96 @@ const main = async (): Promise<void> => {
     await page.waitForTimeout(6000);
 
     const loopPageLoads = server.hits('/sw-loop');
+
+    // A clear that never hears back — here the helper frame lands on a
+    // connection error, as it does on a site whose worker answers its root as
+    // well — used to leave the pane waiting on it for good: no fallback, and
+    // the button to try again set the helper to the address it already had.
+    // Only reloading the whole tab brought the pane back.
+    await address.fill('http://127.0.0.1:1/');
+
+    await address.press('Enter');
+
+    await appears('.pane__fallback', 12_000);
+
+    await openPaneMenu();
+
+    await page
+      .locator('.pane__menu-item[title*="Always clear service workers"]')
+      .first()
+      .click();
+
+    await page.waitForTimeout(1500);
+
+    const hiddenWhileClearing = await page.locator('.pane__fallback').count();
+
+    const fallbackAfterClearGaveUp = await appears('.pane__fallback', 15_000);
+
+    // A site that registers its worker only after the page has loaded — which
+    // is what GitHub does — used to keep it: the pane cleared the workers once,
+    // at `load`, before there was one to clear. The next navigation was
+    // answered by the worker and blocked, and the clear that followed reloaded
+    // the page the link was on rather than the one it led to.
+    // The pane's own frame by name: the helper frame a clear uses sits beside
+    // it, and while one is waiting it is the first `iframe` in the pane.
+    const paneContent = page
+      .locator('.pane .pane__frame')
+      .first()
+      .contentFrame();
+
+    await address.fill(`http://localhost:${String(serverPort)}/sw-late`);
+
+    await address.press('Enter');
+
+    await paneContent.locator('#sw-late').waitFor({ timeout: 10_000 });
+
+    await page.waitForTimeout(3000);
+
+    await paneContent.locator('#to-target').click();
+
+    const lateWorkerKeptAway = await paneContent
+      .locator('#sw-target')
+      .waitFor({ timeout: 12_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    const lateWorkerPageLoads = server.hits('/sw-late');
+
+    // And a worker registered from outside the pane — the same site open in an
+    // ordinary tab — reaches the pane's next navigation before anything in the
+    // pane can see it arrive. That navigation is blocked, and the clear that
+    // follows has to land where the link was going.
+    await address.fill(`http://localhost:${String(serverPort)}/sw-late`);
+
+    await address.press('Enter');
+
+    await paneContent.locator('#sw-late').waitFor({ timeout: 10_000 });
+
+    await page.waitForTimeout(3000);
+
+    const siteTab = await context.newPage();
+
+    await siteTab.goto(`http://localhost:${String(serverPort)}/sw-home`);
+
+    await siteTab.evaluate(async () => {
+      // Destructured, as in `frame-agent.mts`: no spelling of `navigator`
+      // satisfies every lint rule at once.
+      const { navigator: tabNavigator } = globalThis;
+
+      await tabNavigator.serviceWorker.ready;
+    });
+
+    await paneContent.locator('#to-target').click();
+
+    const outsideWorkerCleared = await paneContent
+      .locator('#sw-target')
+      .waitFor({ timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    await siteTab.close();
+
+    await page.bringToFront();
 
     // --- the fallback shown in place of a page that will not load ------
     // The pane is at the service-worker page above, which loaded in the end;
@@ -830,9 +928,34 @@ const main = async (): Promise<void> => {
         '',
       ),
       check(
+        'and clears it once, not again straight after its own reload',
+        automaticClears === 1,
+        automaticClears,
+      ),
+      check(
         'a page that registers a worker on every visit is loaded once',
         loopPageLoads === 1,
         loopPageLoads,
+      ),
+      check(
+        'a pane on an always-clear origin keeps loading while the clear runs',
+        hiddenWhileClearing === 0,
+        hiddenWhileClearing,
+      ),
+      check(
+        'and says so when the clear never hears back, instead of waiting for good',
+        fallbackAfterClearGaveUp,
+        '',
+      ),
+      check(
+        'a worker the site registers after loading is kept away from the next navigation',
+        lateWorkerKeptAway && lateWorkerPageLoads === 1,
+        lateWorkerPageLoads,
+      ),
+      check(
+        'a worker registered in another tab is cleared, landing where the link led',
+        outsideWorkerCleared,
+        '',
       ),
       check(
         'a pane showing a page leaves it alone',
@@ -1122,6 +1245,16 @@ const startPageServer = async (): Promise<
     '});',
   ].join('\n');
 
+  // A page that registers its worker a moment after it has loaded, as GitHub
+  // does, and links to the page that worker answers.
+  const lateRegistrationPage = [
+    '<!doctype html><html lang="en"><head><title>SW Late</title></head><body>',
+    '<h1 id="sw-late">sw late</h1>',
+    '<a href="/sw-target" id="to-target">target</a>',
+    "<script>addEventListener('load', () => { setTimeout(() => { navigator.serviceWorker.register('/sw.js'); }, 500); });</script>",
+    '</body></html>',
+  ].join('');
+
   const serviceWorkerTarget = [
     '<!doctype html><html lang="en"><head><title>SW Target</title></head>',
     '<body><h1 id="sw-target">sw target</h1></body></html>',
@@ -1185,6 +1318,12 @@ const startPageServer = async (): Promise<
 
       if (route === '/sw-target') {
         response.end(serviceWorkerTarget);
+
+        return;
+      }
+
+      if (route === '/sw-late') {
+        response.end(lateRegistrationPage);
 
         return;
       }

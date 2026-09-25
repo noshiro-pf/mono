@@ -192,9 +192,15 @@ because `chrome.storage` serializes with JSON semantics.
 
 `readonly string[]`, sorted, of origins like `https://github.com`. A pane at an
 origin on this list unregisters the site's service worker without being asked —
-when it fails to load, and again whenever it loads, since the site re-registers
-on every visit. It lives outside the workspaces on purpose: it is a fact about a
-site, not about one layout, and it should hold for every split view.
+through the helper frame when it fails to load, and from inside the page, once
+a second, for as long as a page of that origin is open in it, since the site
+registers its worker again whenever it likes. It lives outside the workspaces on
+purpose: it is a fact about a site, not about one layout, and it should hold for
+every split view.
+
+Its readers watch it rather than read it once — every split view page, and the
+content script in every pane — so that a toggle takes effect everywhere without
+a reload.
 
 ## `chrome.storage.session`
 
@@ -400,8 +406,9 @@ talking to.
 | :----------- | :--------------------------- | :---------------------------------------- | :---------------------------------------------------------- |
 | page → frame | `assign`                     | `paneId`                                  | tells a frame which pane it is, and where to answer         |
 | page → frame | `command`                    | `paneId`, `back`/`forward`/`reload`       | the pane toolbar's navigation buttons                       |
-| page → frame | `unregister-service-workers` | `paneId`                                  | `Clear SW`, and the per-origin list                         |
+| page → frame | `unregister-service-workers` | `paneId`                                  | `Clear SW`, sent to the helper frame                        |
 | frame → page | `state`                      | `paneId`, `url`, `title`, `historyLength` | where the frame is now; dropped when it would repeat itself |
+| frame → page | `leaving`                    | `paneId`, `url`                           | where a link or script is taking the frame, before it goes  |
 | frame → page | `service-workers`            | `paneId`, `count`                         | how many registrations went                                 |
 | frame → page | `shortcut`                   | `paneId`, `code`                          | `Alt+1..9` pressed with the focus **inside** a pane         |
 | frame → page | `zoom`                       | `paneId`, `in`/`out`                      | `Ctrl`+wheel, or a trackpad pinch, inside a pane            |
@@ -411,6 +418,12 @@ pane the message came from rather than to the `paneId` in it — so a framed sit
 can zoom the pane it is in and no other. The frame's listener is a non-passive
 one that calls `preventDefault`, without which the browser would zoom the whole
 tab as well.
+
+`leaving` comes from the Navigation API's `navigate` event, for cross-document
+GET navigations only. The page keeps it until a document answers: if none does,
+the page the link led to is the one that failed, so a clear, the reload button
+and "open in a new tab" all go there instead of back to the page the link was
+on.
 
 `shortcut` is the one the page handles itself rather than the pane's component:
 a key event does not cross a frame boundary, so without the frame forwarding it

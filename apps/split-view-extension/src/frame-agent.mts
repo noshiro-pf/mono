@@ -11,6 +11,10 @@ import {
   type ShortcutKeyEvent,
   type ZoomWheelEvent,
 } from './shared/index.mjs';
+import {
+  loadServiceWorkerResetOrigins,
+  watchServiceWorkerResetOrigins,
+} from './state/index.mjs';
 
 /**
  * The content script that runs inside every pane.
@@ -31,6 +35,17 @@ import {
  */
 const reportIntervalMs = 1000;
 
+/**
+ * How often a page on an always-clear origin looks for a worker registered
+ * since the last look.
+ *
+ * A site registers its worker whenever it likes — GitHub does it a moment
+ * after the page has loaded — so one look at `load` misses it, and the worker
+ * it misses is the one that answers the pane's next navigation. One
+ * `getRegistrations()` a second, and only on an origin on the list.
+ */
+const serviceWorkerSweepIntervalMs = 1000;
+
 // See the note in `header-rules.mts`: `window.navigator` / `globalThis.navigator`
 // / a bare `navigator` cannot all satisfy the lint rules at once.
 const { navigator: browserNavigator } = globalThis;
@@ -40,6 +55,10 @@ const { navigator: browserNavigator } = globalThis;
 // (it is a restricted global). Destructuring it once names it something that is
 // none of those.
 const { history: browserHistory } = globalThis;
+
+// The same for the Navigation API, which is what says where a document is
+// leaving for.
+const { navigation: browserNavigation } = globalThis;
 
 const main = (): void => {
   if (!isSplitViewFrame()) {
@@ -204,6 +223,76 @@ const main = (): void => {
   // which fires no event outside the page's own world. Polling a string
   // comparison is what covers that without reaching into the page.
   setInterval(report, reportIntervalMs);
+
+  /**
+   * Says where this document is navigating to, before it goes.
+   *
+   * The page cannot see a link's destination, and the document that arrives
+   * there may be one nothing can report from — a page answered by the site's
+   * worker is refused a frame. Once the worker has been cleared, the pane has
+   * to go to *that* address; reloading the one it last heard from takes the
+   * user back to the page the link was on. GET navigations only: a form post
+   * cannot be repeated by going to its address.
+   */
+  browserNavigation.addEventListener('navigate', (navigateEvent) => {
+    if (
+      mut_paneId === undefined ||
+      mut_replyOrigin === undefined ||
+      navigateEvent.destination.sameDocument ||
+      navigateEvent.downloadRequest !== null ||
+      navigateEvent.formData !== null
+    ) {
+      return;
+    }
+
+    const message: FrameToPageMessage = {
+      tag: splitViewMessageTag,
+      kind: 'leaving',
+      paneId: mut_paneId,
+      url: navigateEvent.destination.url,
+    } as const;
+
+    window.parent.postMessage(message, mut_replyOrigin);
+  });
+
+  keepServiceWorkersAway();
+};
+
+/**
+ * Removes the site's service workers for as long as this document is open, if
+ * its origin is on the always-clear list.
+ *
+ * Here rather than in the page because the page learns where a pane is only
+ * from its reports, and because the page can reach a document only once it has
+ * loaded: a worker the site registers afterwards used to stay, and answered the
+ * pane's next navigation out of reach of the header rules. The list is watched
+ * rather than read once, so that turning the setting on takes effect in a pane
+ * already showing the site.
+ */
+const keepServiceWorkersAway = (): void => {
+  const { origin: siteOrigin } = document.location;
+
+  let mut_onList = false;
+
+  const sweep = (): void => {
+    if (mut_onList) {
+      removeServiceWorkers().catch(() => undefined);
+    }
+  };
+
+  const adopt = (origins: readonly string[]): void => {
+    mut_onList = origins.includes(siteOrigin);
+
+    sweep();
+  };
+
+  loadServiceWorkerResetOrigins()
+    .then(adopt)
+    .catch(() => undefined);
+
+  watchServiceWorkerResetOrigins(adopt);
+
+  setInterval(sweep, serviceWorkerSweepIntervalMs);
 };
 
 /**
@@ -220,20 +309,25 @@ const unregisterServiceWorkers = async (
   paneId: number,
   replyOrigin: string,
 ): Promise<void> => {
+  const message: FrameToPageMessage = {
+    tag: splitViewMessageTag,
+    kind: 'service-workers',
+    paneId,
+    count: await removeServiceWorkers(),
+  } as const;
+
+  window.parent.postMessage(message, replyOrigin);
+};
+
+/** Unregisters every service worker of this origin, and counts them. */
+const removeServiceWorkers = async (): Promise<number> => {
   const registrations = await browserNavigator.serviceWorker.getRegistrations();
 
   const results = await Promise.all(
     registrations.map(async (registration) => registration.unregister()),
   );
 
-  const message: FrameToPageMessage = {
-    tag: splitViewMessageTag,
-    kind: 'service-workers',
-    paneId,
-    count: results.filter((removed) => removed).length,
-  } as const;
-
-  window.parent.postMessage(message, replyOrigin);
+  return results.filter((removed) => removed).length;
 };
 
 const runCommand = (command: FrameCommand): void => {

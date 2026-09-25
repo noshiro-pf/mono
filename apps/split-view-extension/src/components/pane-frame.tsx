@@ -213,18 +213,39 @@ export const PaneFrame = memoNamed(
     );
 
     /**
-     * Reports from the document that is in the frame now, counted rather than
+     * Reports since the frame's last `load` event, counted rather than
      * remembered: `pane.currentUrl` says that *some* document answered, and a
      * pane that follows a link into a page which will not be framed has to
      * notice that the next one did not.
+     *
+     * Zeroed by the `load` handler itself, before the greeting goes out. It used
+     * to be zeroed a render later, so the answer the *previous* document gave
+     * to its own greeting was counted for the next one — and a link into a page
+     * that would not frame was taken for a page that had answered. No fallback,
+     * no automatic clear, and a reload button that asked the dead frame to
+     * reload itself.
      */
     const mut_reportsSinceLoad = React.useRef(0);
 
     /** Bumped on every `load` of the pane's frame, to run the check below. */
     const [loadCount, setLoadCount] = React.useState(0);
 
-    /** That load ended in a document nothing answered from. */
-    const [frameBlocked, setFrameBlocked] = React.useState(false);
+    /**
+     * The load that ended in a document nothing answered from.
+     *
+     * Keyed, like `waitedFor`, rather than a flag: a flag is still set in the
+     * render where the pane moves to a new address or reloads, and the
+     * automatic clear read it as the new load failing — a second clear and a
+     * second reload straight after every first one.
+     */
+    const [blockedLoad, setBlockedLoad] = React.useState<string | undefined>(
+      undefined,
+    );
+
+    const frameBlocked = blockedLoad === loadKey;
+
+    /** `loadKey` for the timer below, which outlives the render it was set in. */
+    const mut_loadKey = React.useRef(loadKey);
 
     /** The fallback was sent away for the document in the frame now. */
     const [fallbackDismissed, setFallbackDismissed] = React.useState(false);
@@ -256,6 +277,37 @@ export const PaneFrame = memoNamed(
     const [serviceWorkersRemoved, setServiceWorkersRemoved] = React.useState<
       number | undefined
     >(undefined);
+
+    /** The load a reset was already attempted for, so it happens once. */
+    const [resetAttemptedFor, setResetAttemptedFor] = React.useState<
+      string | undefined
+    >(undefined);
+
+    /**
+     * Where the document in the frame said it was navigating to, until a
+     * document answers from there. See `frame-agent.mts`.
+     */
+    const mut_leavingFor = React.useRef<string | undefined>(undefined);
+
+    /**
+     * Loads the pane afresh, in a new element: at the address a link was
+     * taking it to when the frame said so, and at the last address it
+     * reported otherwise.
+     *
+     * The document that failed is the one a link led to, so reloading the last
+     * page that reported would put the user back where they clicked.
+     */
+    const replaceFrame = React.useCallback((): void => {
+      const destination = mut_leavingFor.current;
+
+      mut_leavingFor.current = undefined;
+
+      if (destination === undefined) {
+        dispatch({ type: 'reload', paneId: pane.id });
+      } else {
+        onNavigate(pane.id, destination);
+      }
+    }, [dispatch, onNavigate, pane.id]);
 
     /** Known from the address alone: the browser frames none of these. */
     const browserRefusal = unframeableKindOf(address);
@@ -308,12 +360,9 @@ export const PaneFrame = memoNamed(
     const clearingAutomatically =
       alwaysReset &&
       blockedBySite &&
-      (resetUrl !== undefined || automaticClears < maxAutomaticClears);
-
-    /** The load a reset was already attempted for, so it happens once. */
-    const [resetAttemptedFor, setResetAttemptedFor] = React.useState<
-      string | undefined
-    >(undefined);
+      (resetUrl !== undefined ||
+        (automaticClears < maxAutomaticClears &&
+          resetAttemptedFor !== loadKey));
 
     React.useEffect(() => {
       setDraft(address);
@@ -357,7 +406,15 @@ export const PaneFrame = memoNamed(
 
             setResetUrl(undefined);
 
-            dispatch({ type: 'reload', paneId: pane.id });
+            replaceFrame();
+          }
+
+          return;
+        }
+
+        if (message.kind === 'leaving') {
+          if (fromPane) {
+            mut_leavingFor.current = message.url;
           }
 
           return;
@@ -389,7 +446,9 @@ export const PaneFrame = memoNamed(
         // wrong from this moment on.
         mut_reportsSinceLoad.current += 1;
 
-        setFrameBlocked(false);
+        mut_leavingFor.current = undefined;
+
+        setBlockedLoad(undefined);
 
         // A document that answered is a document that loaded, so whatever the
         // automatic clears below have spent getting here, they have spent it
@@ -410,7 +469,7 @@ export const PaneFrame = memoNamed(
       return () => {
         removeEventListener('message', onMessage);
       };
-    }, [paneFrame, resetFrame, dispatch, pane.id]);
+    }, [paneFrame, resetFrame, dispatch, replaceFrame, pane.id]);
 
     React.useEffect(() => {
       if (agentSeen) {
@@ -439,19 +498,9 @@ export const PaneFrame = memoNamed(
       // will not frame should say so again.
       setFallbackDismissed(false);
 
-      const answered = mut_reportsSinceLoad.current > 0;
-
-      mut_reportsSinceLoad.current = 0;
-
-      if (answered) {
-        setFrameBlocked(false);
-
-        return undefined;
-      }
-
       const timer = setTimeout(() => {
         if (mut_reportsSinceLoad.current === 0) {
-          setFrameBlocked(true);
+          setBlockedLoad(mut_loadKey.current);
         }
       }, greetingGraceMs);
 
@@ -460,13 +509,18 @@ export const PaneFrame = memoNamed(
       };
     }, [loadCount]);
 
-    // A new address, or a reload, starts all of that over.
+    // A new address, or a reload, starts all of that over — including a clear
+    // still waiting on its helper frame, which was for the document before.
     React.useEffect(() => {
-      setFrameBlocked(false);
+      mut_loadKey.current = loadKey;
 
       setFallbackDismissed(false);
 
+      setResetUrl(undefined);
+
       mut_reportsSinceLoad.current = 0;
+
+      mut_leavingFor.current = undefined;
     }, [loadKey]);
 
     const sendToFrame = React.useCallback(
@@ -505,6 +559,8 @@ export const PaneFrame = memoNamed(
     }, [announceToFrame]);
 
     const handleFrameLoad = React.useCallback((): void => {
+      mut_reportsSinceLoad.current = 0;
+
       announceToFrame();
 
       setLoadCount((count) => count + 1);
@@ -541,13 +597,15 @@ export const PaneFrame = memoNamed(
 
     const handleReload = React.useCallback((): void => {
       // Reloading through the agent keeps the frame's history; replacing the
-      // element is the only way to reload a pane that has no agent.
-      if (agentSeen) {
+      // element is the only way to reload a pane that has no agent — including
+      // one whose agent answered for an earlier document than the one there
+      // now, which is what a link into a page that will not frame leaves.
+      if (agentSeen && !frameBlocked) {
         sendCommand('reload');
       } else {
-        dispatch({ type: 'reload', paneId: pane.id });
+        replaceFrame();
       }
-    }, [agentSeen, sendCommand, dispatch, pane.id]);
+    }, [agentSeen, frameBlocked, sendCommand, replaceFrame]);
 
     const handleSplitRow = React.useCallback((): void => {
       dispatch({ type: 'split', paneId: pane.id, axis: 'row' });
@@ -625,20 +683,27 @@ export const PaneFrame = memoNamed(
       siteOrigin,
     ]);
 
-    // And while such a pane is loading fine, the worker is kept away: the site
-    // registers it again on every visit, and the next navigation would be the
-    // one to fail. Once per load rather than once per pane — every document is
-    // another chance for the site to register one — and nobody hears it in a
-    // document that failed to load, which is what the clear above is for.
+    // While such a pane is loading fine, the content script in it keeps the
+    // worker away by itself; see `keepServiceWorkersAway` in `frame-agent.mts`.
+
+    // A helper frame that never answers — its address answered by the site's
+    // worker as well, or not reachable at all — is given up on, so that the
+    // pane says it did not load instead of waiting on it for good. Nothing
+    // else ends the wait: the button to clear again would set the address the
+    // helper already has.
     React.useEffect(() => {
-      if (alwaysReset && loadCount > 0) {
-        sendToFrame({
-          tag: splitViewMessageTag,
-          kind: 'unregister-service-workers',
-          paneId: pane.id,
-        });
+      if (resetUrl === undefined) {
+        return undefined;
       }
-    }, [alwaysReset, loadCount, sendToFrame, pane.id]);
+
+      const timer = setTimeout(() => {
+        setResetUrl(undefined);
+      }, noAnswerTimeoutMs);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [resetUrl]);
 
     const handleResetFrameLoad = React.useCallback((): void => {
       const target = resetFrame?.contentWindow;
@@ -692,10 +757,16 @@ export const PaneFrame = memoNamed(
     }, []);
 
     const handleOpenExternally = React.useCallback((): void => {
-      if (address !== '') {
-        chrome.tabs.create({ url: address }).catch(console.error);
+      // A pane that followed a link into a page that will not frame is still
+      // showing the address it came from; the page wanted is the other one.
+      const target = frameBlocked
+        ? (mut_leavingFor.current ?? address)
+        : address;
+
+      if (target !== '') {
+        chrome.tabs.create({ url: target }).catch(console.error);
       }
-    }, [address]);
+    }, [frameBlocked, address]);
 
     const style = React.useMemo<React.CSSProperties>(
       () => ({

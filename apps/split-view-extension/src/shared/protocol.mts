@@ -75,6 +75,13 @@ export type FrameToPageMessage = Readonly<
     }
   | {
       tag: typeof splitViewMessageTag;
+      kind: 'leaving';
+      paneId: number;
+      /** Where the document is navigating to, as the Navigation API says. */
+      url: string;
+    }
+  | {
+      tag: typeof splitViewMessageTag;
       kind: 'shortcut';
       paneId: number;
       /** `KeyboardEvent.code`, so that it is the *key*, not what it types. */
@@ -149,6 +156,20 @@ export const asFrameToPageMessage = (
           kind: 'service-workers',
           paneId: value.paneId,
           count: value.count,
+        }
+      : undefined;
+  }
+
+  if (value.kind === 'leaving') {
+    return hasKey(value, 'paneId') &&
+      typeof value.paneId === 'number' &&
+      hasKey(value, 'url') &&
+      typeof value.url === 'string'
+      ? {
+          tag: splitViewMessageTag,
+          kind: 'leaving',
+          paneId: value.paneId,
+          url: value.url,
         }
       : undefined;
   }

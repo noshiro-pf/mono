@@ -59,6 +59,7 @@ import {
   saveWorkspaceState,
   setServiceWorkerResetOrigin,
   setWorkspaceEntryPinned,
+  watchServiceWorkerResetOrigins,
   watchWorkspaceRegistry,
   workspaceAtPosition,
   workspaceEntryOf,
@@ -305,6 +306,10 @@ export const App = memoNamed('App', () => {
 
   /** Origins whose service workers a pane removes without being asked. */
   const [resetOrigins, setResetOrigins] = React.useState<readonly string[]>([]);
+
+  // Another tab's toggle has to reach this one's panes too: read once, the
+  // list stayed as it was here until this tab was reloaded.
+  React.useEffect(() => watchServiceWorkerResetOrigins(setResetOrigins), []);
 
   const handleToggleResetOrigin = React.useCallback(
     (siteOrigin: string, enabled: boolean): void => {

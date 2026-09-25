@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 const storageKey = 'serviceWorkerResetOrigins';
 
@@ -19,11 +20,42 @@ export const loadServiceWorkerResetOrigins = async (): Promise<
 > => {
   const stored = await chrome.storage.local.get(storageKey);
 
-  const value: unknown = stored[storageKey];
+  return parseOrigins(stored[storageKey]);
+};
 
-  return Arr.isArray(value)
-    ? value.filter((entry) => typeof entry === 'string')
-    : [];
+/**
+ * Calls back whenever the list is written, by any tab or frame.
+ *
+ * A list read once is a list that goes stale: a split view open in another tab
+ * would go on letting the worker answer until that tab was reloaded, and a pane
+ * would not start keeping it away until its page was loaded again — which is
+ * what "always" looked like when it did not seem to stick.
+ */
+export const watchServiceWorkerResetOrigins = (
+  onWritten: (origins: readonly string[]) => void,
+): (() => void) => {
+  const listener = (
+    // As in `watchWorkspaceRegistry`: `chrome.storage.StorageChange` has
+    // mutable fields, which a parameter type may not.
+    changes: ReadonlyRecord<string, Readonly<{ newValue?: unknown }>>,
+    areaName: string,
+  ): void => {
+    if (areaName !== 'local') {
+      return;
+    }
+
+    const change = changes[storageKey];
+
+    if (change !== undefined) {
+      onWritten(parseOrigins(change.newValue));
+    }
+  };
+
+  chrome.storage.onChanged.addListener(listener);
+
+  return () => {
+    chrome.storage.onChanged.removeListener(listener);
+  };
 };
 
 export const setServiceWorkerResetOrigin = async (
@@ -42,3 +74,8 @@ export const setServiceWorkerResetOrigin = async (
 
   return next;
 };
+
+const parseOrigins = (value: unknown): readonly string[] =>
+  Arr.isArray(value)
+    ? value.filter((entry) => typeof entry === 'string')
+    : ([] as const);
