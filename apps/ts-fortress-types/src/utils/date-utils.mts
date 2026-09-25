@@ -209,7 +209,7 @@ const monthToIndex = {
 } as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
 
 const isInteger = (n: number, min: number, max: number): boolean =>
-  Number.isSafeInteger(n) && n >= min && n <= max;
+  Number.isSafeInteger(n) && min <= n && n <= max;
 
 const isSafeUint = (n: number): n is SafeUint =>
   Number.isSafeInteger(n) && n >= 0;

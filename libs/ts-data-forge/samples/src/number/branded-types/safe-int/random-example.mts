@@ -12,7 +12,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(SafeInt.is(randomValue));
 
-    assert.isTrue(randomValue >= -10 && randomValue <= 10);
+    assert.isTrue(-10 <= randomValue && randomValue <= 10);
 
     // embed-sample-code-ignore-below
   });

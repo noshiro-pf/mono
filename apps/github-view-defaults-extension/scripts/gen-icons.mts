@@ -164,7 +164,7 @@ const isInsideBar = (
 
   const y1 = bar.y1 * size;
 
-  if (px < x0 || px > x1 || py < y0 || py > y1) {
+  if (px < x0 || x1 < px || py < y0 || y1 < py) {
     return false;
   }
 

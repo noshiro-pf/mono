@@ -65,9 +65,9 @@ export const dropTargetAt = (
   const over = geometry.panes.find(
     (entry) =>
       entry.paneId !== movedPaneId &&
-      point.x >= entry.rect.left &&
+      entry.rect.left <= point.x &&
       point.x < entry.rect.left + entry.rect.width &&
-      point.y >= entry.rect.top &&
+      entry.rect.top <= point.y &&
       point.y < entry.rect.top + entry.rect.height,
   );
 

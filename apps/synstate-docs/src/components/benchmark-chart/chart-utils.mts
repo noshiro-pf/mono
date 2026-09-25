@@ -31,7 +31,7 @@ export const generateLogTicks = (
     for (const m of [1, 2, 5] as const) {
       const v = base * m;
 
-      if (v >= min && v <= max) {
+      if (min <= v && v <= max) {
         mut_ticks.push(v);
       }
     }

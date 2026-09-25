@@ -45,7 +45,7 @@ export const fromCodePoint = (
     if (
       !Number.isSafeInteger(codePoint) ||
       codePoint < 0 ||
-      codePoint > MAX_CODE_POINT
+      MAX_CODE_POINT < codePoint
     ) {
       return Result.err({ kind: 'invalid-code-point', codePoint, index });
     }

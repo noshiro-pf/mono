@@ -271,7 +271,7 @@ const hasBoundedLength = (
   minLength: SupportedLength,
   maxLength: SupportedLength,
   xs: readonly unknown[],
-): boolean => xs.length >= minLength && xs.length <= maxLength;
+): boolean => minLength <= xs.length && xs.length <= maxLength;
 
 /**
  * Type guard that checks if an array has exactly `length` elements.

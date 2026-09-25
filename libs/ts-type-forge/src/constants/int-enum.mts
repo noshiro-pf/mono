@@ -17,7 +17,7 @@ import {
  * type ByteValue = Uint8; // Single byte representation
  *
  * const isValidUint8 = (value: number): value is Uint8 =>
- *   Number.isInteger(value) && value >= 0 && value <= 255;
+ *   Number.isInteger(value) && 0 <= value && value <= 255;
  * ```
  */
 export type Uint8 = Index<256>;
@@ -34,7 +34,7 @@ export type Uint8 = Index<256>;
  * type NineBitValue = Uint9;
  *
  * const validate9Bit = (value: number): value is Uint9 =>
- *   Number.isInteger(value) && value >= 0 && value <= 511;
+ *   Number.isInteger(value) && 0 <= value && value <= 511;
  * ```
  */
 export type Uint9 = Index<512>;
@@ -52,7 +52,7 @@ export type Uint9 = Index<512>;
  * type PortNumber = Uint10; // Some port ranges
  *
  * const isValid10Bit = (value: number): value is Uint10 =>
- *   Number.isInteger(value) && value >= 0 && value <= 1023;
+ *   Number.isInteger(value) && 0 <= value && value <= 1023;
  * ```
  */
 export type Uint10 = Index<1024>;

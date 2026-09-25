@@ -218,7 +218,7 @@ const hasMaxLength = (
  * assert.isFalse(Arr.isBoundedLengthTuple(1, 3, quad));
  *
  * if (Arr.isBoundedLengthTuple(1, 3, pair)) {
- *   assert.isTrue(pair.length >= 1 && pair.length <= 3);
+ *   assert.isTrue(1 <= pair.length && pair.length <= 3);
  * }
  * ```
  */
@@ -263,4 +263,4 @@ const isWithinBounds = (
   min: SizeType.ArgArr,
   max: SizeType.ArgArr,
   array: readonly unknown[],
-): boolean => array.length >= min && array.length <= max;
+): boolean => min <= array.length && array.length <= max;

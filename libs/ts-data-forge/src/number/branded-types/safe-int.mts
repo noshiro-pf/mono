@@ -217,7 +217,7 @@ export const SafeInt = {
    *
    * assert.isTrue(SafeInt.is(randomValue));
    *
-   * assert.isTrue(randomValue >= -10 && randomValue <= 10);
+   * assert.isTrue(-10 <= randomValue && randomValue <= 10);
    * ```
    *
    * @param min - The minimum value (inclusive)

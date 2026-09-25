@@ -132,7 +132,7 @@ const isInRoundedSquare = (size: number, px: number, py: number): boolean => {
 
   const high = size - low;
 
-  if (px < low || px > high || py < low || py > high) {
+  if (px < low || high < px || py < low || high < py) {
     return false;
   }
 
@@ -171,7 +171,7 @@ const paneBoundsOf = (
 const isInPane = (
   [near, nearEnd, far, farEnd]: readonly [number, number, number, number],
   t: number,
-): boolean => (t >= near && t < nearEnd) || (t >= far && t < farEnd);
+): boolean => (near <= t && t < nearEnd) || (far <= t && t < farEnd);
 
 /**
  * The whole file for one size.

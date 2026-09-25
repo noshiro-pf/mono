@@ -10,7 +10,7 @@ import { type Int } from './int.mjs';
  * const toBigInt64 = (x: bigint): BigInt64 => {
  *   const min = -(2n ** 63n);
  *   const max = 2n ** 63n - 1n;
- *   if (x >= min && x <= max) {
+ *   if (min <= x && x <= max) {
  *     return x as BigInt64;
  *   }
  *   throw new Error('Out of BigInt64 range');
@@ -27,7 +27,7 @@ export type BigInt64 = ExtendBrand<ChangeBaseBrand<Int, bigint>, 'BigInt64'>;
  * ```ts
  * const toBigUint64 = (x: bigint): BigUint64 => {
  *   const max = 2n ** 64n - 1n;
- *   if (x >= 0n && x <= max) {
+ *   if (0n <= x && x <= max) {
  *     return x as BigUint64;
  *   }
  *   throw new Error('Out of BigUint64 range');

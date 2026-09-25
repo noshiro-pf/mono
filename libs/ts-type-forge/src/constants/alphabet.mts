@@ -15,7 +15,7 @@
  * type Test2 = IsVowel<'b'>; // false
  *
  * const validateLowercase = (char: string): char is LowerAlphabet =>
- *   char.length === 1 && char >= 'a' && char <= 'z';
+ *   char.length === 1 && 'a' <= char && char <= 'z';
  * ```
  */
 export type LowerAlphabet = (
@@ -42,7 +42,7 @@ export type LowerAlphabet = (
  * type T2 = FirstLetter<'world'>; // never
  *
  * const isUppercase = (char: string): char is UpperAlphabet =>
- *   char.length === 1 && char >= 'A' && char <= 'Z';
+ *   char.length === 1 && 'A' <= char && char <= 'Z';
  * ```
  */
 export type UpperAlphabet = Uppercase<LowerAlphabet>;
@@ -60,7 +60,7 @@ export type UpperAlphabet = Uppercase<LowerAlphabet>;
  *
  * const isAlphabetic = (char: string): char is Alphabet =>
  *   char.length === 1 &&
- *   ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'));
+ *   (('a' <= char && char <= 'z') || ('A' <= char && char <= 'Z'));
  *
  * type ExtractAlpha<S extends string> = S extends `${infer F}${infer R}`
  *   ? F extends Alphabet

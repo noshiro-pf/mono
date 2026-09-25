@@ -17,7 +17,7 @@ if (import.meta.vitest !== undefined) {
 
     const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
 
-    assert.isTrue(userId.length >= 8 && userId.length <= 16);
+    assert.isTrue(8 <= userId.length && userId.length <= 16);
 
     // embed-sample-code-ignore-below
   });

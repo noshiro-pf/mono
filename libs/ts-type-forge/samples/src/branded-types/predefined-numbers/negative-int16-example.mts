@@ -3,7 +3,7 @@ import { type NegativeInt16 } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 const isNegativeInt16 = (x: number): x is NegativeInt16 =>
-  Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 15);
+  Number.isSafeInteger(x) && -(2 ** 15) <= x && x < 0;
 
 const relativePosition = (offset: NegativeInt16) => ({ x: offset });
 

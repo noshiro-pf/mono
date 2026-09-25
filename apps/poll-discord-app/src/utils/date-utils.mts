@@ -34,4 +34,4 @@ export namespace DateUtils {
 }
 
 const isDayOfWeekIndex = (n: number): n is DayOfWeekIndex =>
-  Number.isSafeInteger(n) && n >= 0 && n <= 6;
+  Number.isSafeInteger(n) && 0 <= n && n <= 6;

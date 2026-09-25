@@ -12,7 +12,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Uint.is(randomValue));
 
-    assert.isTrue(randomValue >= 0 && randomValue <= 3);
+    assert.isTrue(0 <= randomValue && randomValue <= 3);
 
     // embed-sample-code-ignore-below
   });

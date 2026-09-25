@@ -12,7 +12,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(PositiveInt.is(randomValue));
 
-    assert.isTrue(randomValue >= 3 && randomValue <= 6);
+    assert.isTrue(3 <= randomValue && randomValue <= 6);
 
     // embed-sample-code-ignore-below
   });

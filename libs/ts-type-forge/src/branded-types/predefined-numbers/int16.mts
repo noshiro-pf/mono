@@ -19,7 +19,7 @@ import { type WithSmallInt } from './small-int.mjs';
  * @example
  * ```ts
  * const isInt16 = (x: number): x is Int16 =>
- *   Number.isSafeInteger(x) && x >= -(2 ** 15) && x <= 2 ** 15 - 1;
+ *   Number.isSafeInteger(x) && -(2 ** 15) <= x && x <= 2 ** 15 - 1;
  *
  * const audioSample = (value: Int16) => ({ sample: value });
  * const temperature = (celsius: Int16) => ({ celsius });
@@ -38,7 +38,7 @@ export type Int16 = TSTypeForgeInternals_ExtendNumberBrand<
  * @example
  * ```ts
  * const isNonZeroInt16 = (x: number): x is NonZeroInt16 =>
- *   Number.isSafeInteger(x) && x !== 0 && x >= -(2 ** 15) && x <= 2 ** 15 - 1;
+ *   Number.isSafeInteger(x) && x !== 0 && -(2 ** 15) <= x && x <= 2 ** 15 - 1;
  *
  * const offset = (value: NonZeroInt16) => ({ offset: value });
  * ```
@@ -53,7 +53,7 @@ export type NonZeroInt16 = IntersectBrand<Int16, NonZeroNumber>;
  * @example
  * ```ts
  * const isNonNegativeInt16 = (x: number): x is NonNegativeInt16 =>
- *   Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 15 - 1;
+ *   Number.isSafeInteger(x) && 0 <= x && x <= 2 ** 15 - 1;
  *
  * const altitude = (meters: NonNegativeInt16) => ({ altitude: meters });
  * ```
@@ -68,7 +68,7 @@ export type NonNegativeInt16 = IntersectBrand<Int16, NonNegativeNumber>;
  * @example
  * ```ts
  * const isPositiveInt16 = (x: number): x is PositiveInt16 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 15 - 1;
+ *   Number.isSafeInteger(x) && 0 < x && x <= 2 ** 15 - 1;
  *
  * const year = (value: PositiveInt16) => ({ year: value });
  * ```
@@ -83,7 +83,7 @@ export type PositiveInt16 = IntersectBrand<Int16, PositiveNumber>;
  * @example
  * ```ts
  * const isNegativeInt16 = (x: number): x is NegativeInt16 =>
- *   Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 15);
+ *   Number.isSafeInteger(x) && -(2 ** 15) <= x && x < 0;
  *
  * const relativePosition = (offset: NegativeInt16) => ({ x: offset });
  * ```
@@ -98,7 +98,7 @@ export type NegativeInt16 = IntersectBrand<Int16, NegativeNumber>;
  * @example
  * ```ts
  * const isNonPositiveInt16 = (x: number): x is NonPositiveInt16 =>
- *   Number.isSafeInteger(x) && x <= 0 && x >= -(2 ** 15);
+ *   Number.isSafeInteger(x) && -(2 ** 15) <= x && x <= 0;
  *
  * const relativeFloor = (level: NonPositiveInt16) => ({ level });
  * ```

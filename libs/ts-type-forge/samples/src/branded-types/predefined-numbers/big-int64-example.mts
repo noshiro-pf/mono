@@ -5,7 +5,7 @@ import { type BigInt64 } from 'ts-type-forge';
 const toBigInt64 = (x: bigint): BigInt64 => {
   const min = -(2n ** 63n);
   const max = 2n ** 63n - 1n;
-  if (x >= min && x <= max) {
+  if (min <= x && x <= max) {
     return x as BigInt64;
   }
   throw new Error('Out of BigInt64 range');
