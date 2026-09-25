@@ -12,8 +12,15 @@ that can be left open in a tab: the merge order the `Merge-After:` trailers
 declare drawn as the tree it is, the issues each pull request closes with
 their titles, its labels in GitHub's own colours, the branch it is of,
 whether it is open or a draft, whether auto-merge is armed, the verdict of
-the contexts the ruleset requires, and how far each branch is ahead of and
-behind its base.
+the contexts the ruleset requires, how far each branch is ahead of and
+behind its base, and when it was last pushed to and last updated.
+
+The verdict carries its parts — `1✗ 1… 1– 6✓`, failed, still coming,
+skipped, passed, with the names on hover — and stays "running" while
+anything at all is still going on the head commit. Both are there because a
+pull request once showed a tick two minutes before its CI failed: the round
+before had skipped its required aggregates, and the round replacing it had
+not created them yet.
 
 And the two things that stop a pull request that is otherwise ready, which
 nothing on GitHub's own list shows:
@@ -31,7 +38,8 @@ nothing on GitHub's own list shows:
   owner it can never be approved, and the badge says it needs a ruleset
   bypass instead.
 
-Below that, what merged in the last week.
+Below that, what merged in the last week, and the open issues, most recently
+updated first (thirty at most, said so when there are more).
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it

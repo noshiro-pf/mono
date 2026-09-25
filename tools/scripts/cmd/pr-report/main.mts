@@ -31,6 +31,8 @@ import { readRepoRef, readRequiredContexts } from './repo-settings.mjs';
  * - **What landed recently.** The one section that is not about the queue,
  *   and the first question a reader of a daily report has: did the thing I
  *   queued yesterday go in.
+ * - **What is open that is not a pull request** — the open issues, so that
+ *   "what is there to do" does not need a second tab.
  *
  * It reads and prints. Nothing here labels, rebases, merges or comments —
  * that is `unblock-prs`, and keeping the report incapable of it is what makes
@@ -78,6 +80,14 @@ export const prReport = async (
     return merged;
   }
 
+  // And one more for what is open that is not a pull request, so that "what
+  // is there to do" is answered in one place rather than two.
+  const issues = await client.issues(repo.value, options.issuesLimit);
+
+  if (Result.isErr(issues)) {
+    return issues;
+  }
+
   const report = buildReport({
     repo: repo.value,
     generatedAt: Temporal.Now.instant()
@@ -88,6 +98,8 @@ export const prReport = async (
     pulls: facts.value,
     merged: merged.value,
     mergedWithinDays: options.mergedDays,
+    issues: issues.value,
+    issuesLimit: options.issuesLimit,
   });
 
   return Result.ok(print(report, options.format));

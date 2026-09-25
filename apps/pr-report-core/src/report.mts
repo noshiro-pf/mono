@@ -6,6 +6,7 @@ import { parseMergeAfter } from './merge-after.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import {
   type MergedPullRequest,
+  type OpenIssue,
   type PrReport,
   type PullRequestFacts,
   type RepoRef,
@@ -27,6 +28,8 @@ export const buildReport = ({
   pulls,
   merged,
   mergedWithinDays,
+  issues,
+  issuesLimit,
 }: Readonly<{
   repo: RepoRef;
   generatedAt: string;
@@ -35,6 +38,8 @@ export const buildReport = ({
   pulls: readonly PullRequestFacts[];
   merged: readonly MergedPullRequest[];
   mergedWithinDays: number;
+  issues: readonly OpenIssue[];
+  issuesLimit: number;
 }>): PrReport =>
   ({
     repo,
@@ -44,6 +49,8 @@ export const buildReport = ({
     ...buildEntries({ required, pulls }),
     merged,
     mergedWithinDays,
+    issues,
+    issuesLimit,
   }) as const;
 
 export type DecidedEntries = Readonly<{
@@ -79,6 +86,7 @@ export const buildEntries = ({
           required,
           reported: facts.reported,
           paused: facts.labels.some((label) => label.name === SKIP_CI_LABEL),
+          running: facts.checksRunning,
         }),
       };
     });

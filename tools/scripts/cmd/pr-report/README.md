@@ -36,8 +36,10 @@ rebase・マージ・コメントは一切しません（それは `unblock-prs`
   赤い aggregate は何が落ちたかを名乗りません。どちらも名指しで出します。
 - **base との ahead / behind** — behind な branch は何も走らず何もマージされま
   せん。PR ページはそれを文章で言うだけで、差の大きさは言いません。
-- **直近マージされた PR** — キューの話ではない唯一の節で、日次レポートの読者が
+- **直近マージされた PR** — キューの話ではない節で、日次レポートの読者が
   最初に持つ疑問（昨日キューに入れたものは入ったのか）に答えます。
+- **open な issue** — 更新の新しい順に最大 30 件。「やることは何か」を別タブ
+  無しで答えるためです。件数が上限に達したときは見出しに `+` を付けます。
 
 ### 実行
 
@@ -48,6 +50,7 @@ pnpm run pr-report -- --format json     # 他のツールに渡す（body 込み
 pnpm run pr-report -- --repo owner/name # 別のリポジトリ
 pnpm run pr-report -- --merged-days 3   # 「直近マージ」の遡る日数
 pnpm run pr-report -- --merged-limit 5  # その最大件数
+pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 ```
 
 `--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
@@ -58,7 +61,7 @@ pnpm run pr-report -- --merged-limit 5  # その最大件数
 
 `GITHUB_TOKEN` か `GH_TOKEN` があれば使い、無ければ無認証で読みます。mono は
 public なので無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
-す（PR 1本あたり約3リクエスト = 20本程度まで）。
+す（PR 1本あたり約3リクエスト = 20本程度まで。issue 一覧は全体で1リクエスト）。
 
 トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
 閉じる issue を GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
@@ -73,8 +76,16 @@ public なので無認証でも動き、1回のレポートは匿名の 60 reque
   state だからです。ただし root のファイルは `pnpm run repo-settings:apply` を
   実行するまで GitHub には効かないので、適用前に足した context は全 PR で
   missing として出ます — レポートがそう言うのは正しい挙動です。
-- **`skipped` は合格です。** gated job は `skip-ci` のときと workflow が読まない
-  diff のときに skip し、GitHub はそれを満たされたものとして扱います。
+- **`skipped` は合格として数えますが、`skipped` として報告します。** gated job は
+  `skip-ci` のときと workflow が読まない diff のときに skip し、GitHub はそれを
+  満たされたものとして扱うので、判定では合格に数えます。`passed` に畳み込まない
+  のは、畳み込んでいたために CI が落ちている PR が ✅ に見えた（#2031）からです。
+- **head commit で何かがまだ動いていれば `pending` です。** 必須 context だけで
+  なく、その commit の全 check run を見ます。aggregate は `if: always()` で、
+  待っている job が終わるまで新しいラウンドの run が作られないので、「必須
+  context が全部報告済み」はラウンドの途中でも成り立ち、その報告は一つ前の
+  ラウンドのものです。#2031 では `skip-ci` を外した直後、前のラウンドの
+  `skipped` だけが残っていて、2分後に `failure` になりました。
 - **`skip-ci` は `paused`** という独立の判定にしています。ラベルが付いている間、
   見えている赤はラベルが付く前のもの — 典型的には `labeled` run に取り消された
   `opened` run の残骸 — なので、`failing` と呼ぶとキューに入った PR が全部壊れて
@@ -122,8 +133,9 @@ It reports what the pull request list cannot show in one screen: the merge
 order declared by the `Merge-After:` trailers drawn as a tree, the issues each
 pull request closes, its labels, the verdict of the contexts the ruleset
 requires (named, including the ones that have reported nothing at all), how
-far the branch is ahead of and behind its base, and — the one section that is
-not about the queue — what merged recently.
+far the branch is ahead of and behind its base, and — the two sections that
+are not about the queue — what merged recently and which issues are open (the
+most recently updated thirty, `--issues-limit`, with a `+` on a full list).
 
 Auto-merge is reported only when it is news. The label is the request and
 auto-merge is the mechanism, and the two can come apart: a pull request
@@ -138,6 +150,7 @@ pnpm run pr-report -- --format json     # for another tool
 pnpm run pr-report -- --repo owner/name # a different repository
 pnpm run pr-report -- --merged-days 3   # how far back "recently merged" goes
 pnpm run pr-report -- --merged-limit 5  # and how many it lists
+pnpm run pr-report -- --issues-limit 10 # how many open issues it lists
 ```
 
 The merged section is bounded twice, by days (7) and by count (20). The cap is
@@ -151,8 +164,13 @@ the ones the bodies declare with a closing keyword rather than GitHub's own
 list, which only GraphQL serves. The report says so at the bottom when it ran
 that way.
 
-Four rules decide the verdicts. `skipped` is a pass, because GitHub counts it
-as one. `skip-ci` is its own verdict, `paused`, because while the label is on
+Five rules decide the verdicts. `skipped` is counted as met, because GitHub
+counts it so, but reported as `skipped` rather than folded into `passed`.
+Anything still running on the head commit, required or not, keeps the verdict
+`pending`: an aggregate has no run in a new round until the jobs it waits on
+finish, so "every required context has reported" is true halfway through a
+round, out of the round before. Together those two are what showed #2031 a
+tick two minutes before its CI failed. `skip-ci` is its own verdict, `paused`, because while the label is on
 the red a reader sees is the cancelled `opened` run rather than news — it is
 still listed, as `stale red:`. `no-skip-ci-label` is a commit status, not a
 check run, so both endpoints are read. And where one name has reported more

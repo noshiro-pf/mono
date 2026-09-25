@@ -1,6 +1,7 @@
 /** How a check verdict is shown. */
 
 import { type ChecksSummary } from 'pr-report-core';
+import { Arr } from 'ts-data-forge';
 
 /**
  * The four reserved status roles of the palette. `neutral` is not one of them
@@ -71,3 +72,42 @@ export const presentVerdict = (
       };
   }
 };
+
+/** `1✗ 1… 7✓`, leaving out whichever states nothing is in. */
+export const describeCheckCounts = (checks: ChecksSummary): string =>
+  partsOf(checks)
+    .flatMap(({ glyph, names }) =>
+      Arr.isEmpty(names) ? [] : [`${names.length}${glyph}`],
+    )
+    .join(' ');
+
+/** The same, spelled out with the names, for the hover. */
+export const describeCheckBreakdown = (checks: ChecksSummary): string =>
+  Arr.toUnshifted(`over the ${checks.required} contexts the ruleset requires:`)(
+    partsOf(checks).flatMap(({ label, names }) =>
+      Arr.isEmpty(names) ? [] : [`${label} — ${names.join(', ')}`],
+    ),
+  ).join('\n');
+
+type Part = Readonly<{
+  label: string;
+  glyph: string;
+  names: readonly string[];
+}>;
+
+/**
+ * The states a required context can be in, in the order a reader triages
+ * them: what is wrong, what is still coming, what was skipped, what is fine.
+ * A context with nothing reported yet is still coming.
+ */
+const partsOf = (checks: ChecksSummary): readonly Part[] =>
+  [
+    { label: 'failed', glyph: '\u{2717}', names: checks.failed },
+    {
+      label: 'pending',
+      glyph: '\u{2026}',
+      names: [...checks.pending, ...checks.missing],
+    },
+    { label: 'skipped', glyph: '\u{2013}', names: checks.skipped },
+    { label: 'passed', glyph: '\u{2713}', names: checks.passed },
+  ] as const;

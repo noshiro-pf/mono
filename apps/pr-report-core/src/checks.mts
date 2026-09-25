@@ -66,9 +66,10 @@ export type CheckRunReport = Readonly<{
  *
  * A run that has not completed is pending whatever it concluded last — the
  * conclusion of a re-run is the previous verdict until the new one finishes.
- * A `skipped` conclusion is a pass, because GitHub counts it as one: the
- * gated jobs skip on `skip-ci` and on a diff the workflow does not read, and
- * reading that as a failure would call every gated pull request red.
+ * A `skipped` conclusion is reported as `skipped` and counted as met by
+ * {@link summarizeChecks}, because GitHub counts it as met: the gated jobs
+ * skip on `skip-ci` and on a diff the workflow does not read, and reading
+ * that as a failure would call every gated pull request red.
  * Everything else that finished — `cancelled`, `stale`, `timed_out`,
  * `action_required` — is something a reader has to act on, so it is a
  * failure here even where GitHub is vaguer about it.
@@ -79,15 +80,27 @@ export const classifyCheckRun = (
 ): ContextState =>
   status !== 'completed'
     ? 'pending'
-    : conclusion !== undefined && PASSING_CONCLUSIONS.has(conclusion)
-      ? 'passed'
-      : 'failed';
+    : conclusion === 'skipped'
+      ? 'skipped'
+      : conclusion !== undefined && PASSING_CONCLUSIONS.has(conclusion)
+        ? 'passed'
+        : 'failed';
 
 const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set([
   'neutral',
-  'skipped',
   'success',
 ]);
+
+/**
+ * Whether any run on the head commit has not finished.
+ *
+ * Every run, not only the required ones: the aggregates are `if: always()`
+ * and have no run in the newest round until the jobs they wait on are done,
+ * so "every required context has reported" is true of a commit halfway
+ * through a round — with the reports coming from the round before.
+ */
+export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
+  runs.some((run) => run.status !== 'completed');
 
 /**
  * Which of two runs of one name GitHub would answer with: the one in the
@@ -139,7 +152,8 @@ export const reportedContexts = (
  * answer is that neither does: "If a check and a commit status have the same
  * name, both must pass when that name is required." So the stricter of the
  * two is the verdict, and a green status cannot cover a red check run of the
- * same name.
+ * same name. A skip beside a pass is a skip: both are met, but only one of
+ * them ran.
  */
 export const combineContextStates = (
   a: ContextState,
@@ -149,7 +163,9 @@ export const combineContextStates = (
     ? 'failed'
     : a === 'pending' || b === 'pending'
       ? 'pending'
-      : 'passed';
+      : a === 'skipped' || b === 'skipped'
+        ? 'skipped'
+        : 'passed';
 
 /**
  * What one commit status has reported. `no-skip-ci-label` is one of these
@@ -179,19 +195,31 @@ export const classifyCommitStatus = (state: string): ContextState => {
  * red left by the `opened` run that the `labeled` run cancelled. Calling
  * that "failing" would make every queued pull request look broken; the
  * failures are still listed, because they are what a reader asks about.
+ *
+ * `running` is the third thing that makes a verdict provisional, beside a
+ * required context that is pending and one that has not reported. Without it
+ * a commit mid-round reads as settled out of the round before — which is how
+ * a failing pull request (#2031) came to show a tick.
  */
 export const summarizeChecks = ({
   required,
   reported,
   paused,
+  running,
 }: Readonly<{
   required: readonly string[];
   reported: ReadonlyMap<string, ContextState>;
   paused: boolean;
+  /** Whether anything at all is still going on the head commit. */
+  running: boolean;
 }>): ChecksSummary => {
+  const passed = required.filter((c) => reported.get(c) === 'passed');
+
   const failed = required.filter((c) => reported.get(c) === 'failed');
 
   const pending = required.filter((c) => reported.get(c) === 'pending');
+
+  const skipped = required.filter((c) => reported.get(c) === 'skipped');
 
   const missing = required.filter((c) => !reported.has(c));
 
@@ -200,11 +228,13 @@ export const summarizeChecks = ({
       ? 'paused'
       : Arr.isNonEmpty(failed)
         ? 'failing'
-        : Arr.isNonEmpty(pending) || Arr.isNonEmpty(missing)
+        : running || Arr.isNonEmpty(pending) || Arr.isNonEmpty(missing)
           ? 'pending'
           : 'passed',
+    passed,
     failed,
     pending,
+    skipped,
     missing,
     required: required.length,
   };

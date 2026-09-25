@@ -3,7 +3,8 @@
  *
  * Two kinds of query. **The report query** asks for everything that can be
  * asked for at once: every open pull request with its labels, reviews,
- * changed files and check results, what merged recently, and the two files
+ * changed files and check results, what merged recently, the open issues,
+ * and the two files
  * on the default branch that say what a pull request is required to have —
  * the ruleset and `CODEOWNERS`. **A follow-up** asks for what could only be
  * named after that answer: how far each head is from its base, and the next
@@ -32,6 +33,13 @@ export const OPEN_LIMIT = 50;
  * does not sort by merge time.
  */
 const MERGED_SCAN = 30;
+
+/**
+ * How many open issues are listed, most recently updated first — the same
+ * number `pnpm run pr-report` defaults to. Enough to see what is open
+ * without the section becoming the page.
+ */
+export const ISSUES_LIMIT = 30;
 
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
@@ -71,7 +79,7 @@ export const REPORT_QUERY = [
   `        ${CLOSING_ISSUES}`,
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
   `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
-  `        commits(last: 1) { nodes { commit { statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
+  `        commits(last: 1) { nodes { commit { committedDate statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
   '      }',
   '    }',
   `    merged: pullRequests(states: MERGED, first: ${MERGED_SCAN}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
@@ -80,6 +88,15 @@ export const REPORT_QUERY = [
   '        author { login }',
   `        ${LABELS}`,
   `        ${CLOSING_ISSUES}`,
+  '      }',
+  '    }',
+  `    issues(states: OPEN, first: ${ISSUES_LIMIT}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
+  '      totalCount',
+  '      nodes {',
+  '        number title url createdAt updatedAt',
+  '        author { login }',
+  `        ${LABELS}`,
+  '        comments { totalCount }',
   '      }',
   '    }',
   '  }',
@@ -278,7 +295,13 @@ const OpenPullRequestSchema = t.record({
   files: FilesPageSchema,
   commits: t.record({
     nodes: t.array(
-      t.record({ commit: t.record({ statusCheckRollup: RollupSchema }) }),
+      t.record({
+        commit: t.record({
+          /** When the head commit was made: the branch's last push, nearly. */
+          committedDate: t.string(),
+          statusCheckRollup: RollupSchema,
+        }),
+      }),
     ),
   }),
 });
@@ -299,6 +322,19 @@ const MergedPullRequestSchema = t.record({
 
 export type MergedPullRequestNode = t.TypeOf<typeof MergedPullRequestSchema>;
 
+const OpenIssueSchema = t.record({
+  number: t.number(),
+  title: t.string(),
+  url: t.string(),
+  createdAt: t.string(),
+  updatedAt: t.string(),
+  author: AuthorSchema,
+  labels: LabelsSchema,
+  comments: t.record({ totalCount: t.number() }),
+});
+
+export type OpenIssueNode = t.TypeOf<typeof OpenIssueSchema>;
+
 /** `null` when the path is not on the default branch. */
 const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);
 
@@ -311,6 +347,10 @@ export const ReportDataSchema = t.record({
       nodes: t.array(OpenPullRequestSchema),
     }),
     merged: t.record({ nodes: t.array(MergedPullRequestSchema) }),
+    issues: t.record({
+      totalCount: t.number(),
+      nodes: t.array(OpenIssueSchema),
+    }),
   }),
 });
 

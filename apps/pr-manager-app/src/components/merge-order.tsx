@@ -10,6 +10,8 @@ type Props = Readonly<{
   byNumber: ReadonlyMap<number, Entry>;
   /** The scale every divergence bar in the report is drawn against. */
   scaleMax: number;
+  /** The instant every age in the tree is measured against. */
+  nowMs: number;
   /** Only the top level is the list; everything below it is a continuation. */
   depth?: number;
 }>;
@@ -21,7 +23,7 @@ type Props = Readonly<{
  * reader to rebuild it; nested, the one at the top is the one to look at.
  */
 export const MergeOrder = React.memo<Props>(
-  ({ nodes, byNumber, scaleMax, depth = 0 }) => (
+  ({ nodes, byNumber, scaleMax, nowMs, depth = 0 }) => (
     <ul className={depth === 0 ? 'merge-order' : 'merge-order-children'}>
       {nodes.map((node) => {
         const entry = byNumber.get(node.number);
@@ -38,7 +40,11 @@ export const MergeOrder = React.memo<Props>(
                 {' — shown above'}
               </div>
             ) : (
-              <PullRequestCard entry={entry} scaleMax={scaleMax} />
+              <PullRequestCard
+                entry={entry}
+                nowMs={nowMs}
+                scaleMax={scaleMax}
+              />
             )}
 
             {Arr.isNonEmpty(node.children) ? (
@@ -46,6 +52,7 @@ export const MergeOrder = React.memo<Props>(
                 byNumber={byNumber}
                 depth={depth + 1}
                 nodes={node.children}
+                nowMs={nowMs}
                 scaleMax={scaleMax}
               />
             ) : undefined}
