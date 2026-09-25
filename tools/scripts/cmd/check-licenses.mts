@@ -15,7 +15,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * This is what holds the `pnpm-update` pull request when an update changes a
  * license: that pull request auto-merges on green, this runs in `check:root`,
- * and `code-check-result` is required. Nothing in `pnpm-update.yml` knows
+ * and `code-check-result / result` is required. Nothing in `pnpm-update.yml` knows
  * about licenses, and nothing has to — the job there that holds the key runs
  * nothing from the tree, and this way it still does not.
  *

@@ -148,9 +148,9 @@ counted on the spot.
 
 ## Which job failed, and why
 
-A `*-result` aggregate does not name what failed — it is an `if: always()`
-job asserting on its `needs`. Go from it to the run, and from the run to the
-job that actually failed.
+A `*-result / result` aggregate names the jobs among its `needs` that did not
+pass (its step summary), not the step or the matrix entry that failed. Go
+from it to the run, and from the run to the job that actually failed.
 
 The aggregate's `details_url` is `.../actions/runs/<run_id>/job/<job_id>`.
 With the run id:
@@ -193,7 +193,7 @@ Find which run is holding it: list the runs of that name and take the one in
 the greatest `check_suite.id`, then read its `details_url` for the run id.
 
 ```bash
-gh_api 'repos/noshiro-pf/mono/commits/<sha>/check-runs?check_name=test-node-versions-result' \
+gh_api 'repos/noshiro-pf/mono/commits/<sha>/check-runs?check_name=test-node-versions-result%20%2F%20result' \
     | python3 -c '
 import json, sys
 runs = json.load(sys.stdin)["check_runs"]

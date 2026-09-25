@@ -43,23 +43,23 @@
         "do_not_enforce_on_create": true,
         "required_status_checks": [
           {
-            "context": "code-check-result",
+            "context": "code-check-result / result",
             "integration_id": 15368
           },
           {
-            "context": "style-check-result",
+            "context": "style-check-result / result",
             "integration_id": 15368
           },
           {
-            "context": "strict-lib-gen-result",
+            "context": "strict-lib-gen-result / result",
             "integration_id": 15368
           },
           {
-            "context": "test-node-versions-result",
+            "context": "test-node-versions-result / result",
             "integration_id": 15368
           },
           {
-            "context": "verify-published-result",
+            "context": "verify-published-result / result",
             "integration_id": 15368
           },
           {

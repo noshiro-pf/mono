@@ -19,7 +19,10 @@ describe(parseRuleset, () => {
             parameters: {
               strict_required_status_checks_policy: true,
               required_status_checks: [
-                { context: 'code-check-result', integration_id: 15_368 },
+                {
+                  context: 'code-check-result / result',
+                  integration_id: 15_368,
+                },
                 { context: 'no-skip-ci-label' },
               ],
             },
@@ -32,7 +35,7 @@ describe(parseRuleset, () => {
     assert.isTrue(Result.isOk(parsed));
 
     assert.deepStrictEqual(parsed.value, {
-      requiredContexts: ['code-check-result', 'no-skip-ci-label'],
+      requiredContexts: ['code-check-result / result', 'no-skip-ci-label'],
       requireCodeOwnerReview: true,
     });
   });

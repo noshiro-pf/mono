@@ -1,0 +1,85 @@
+name: Check Result
+
+# The aggregate every check workflow ends in: the one required context each of
+# them reports, as `<caller job> / result`. Why there is an aggregate at all,
+# and why its skips are skips rather than failures, is in README.md under "The
+# aggregate job". What follows is only what this file itself needs to say.
+
+on:
+  workflow_call:
+    inputs:
+      needs:
+        description: >-
+          `toJSON(needs)` of the calling job, which names `gates` (the
+          check-gates.yml job) and the jobs that do the work. Every need but
+          `gates` has to succeed. A need that outputs `no_verdict: 'true'`
+          skips this job, as the gate's `should_run: false` does.
+        type: string
+        required: true
+
+jobs:
+  # The skips live here, on the called job, and not on the calling one: a
+  # calling job that GitHub skips reports a check run under its own name
+  # alone, and `<caller> / result` — the required context — would then never
+  # arrive at all. So the caller always calls, and this job skips, which
+  # reports that context as `skipped` without booting a runner.
+  #
+  # `always()`, because without a status function the job carries an implicit
+  # `success()`, and a cancelled run would then read `skipped` — satisfied —
+  # rather than red.
+  result:
+    if: >-
+      always() &&
+      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
+      fromJSON(inputs.needs).gates.outputs.branch_up_to_date != 'false' &&
+      fromJSON(inputs.needs).gates.outputs.should_run != 'false' &&
+      !contains(fromJSON(inputs.needs).*.outputs.no_verdict, 'true')
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 5
+
+    steps:
+      - name: Require the checks to have passed
+        env:
+          NEEDS: ${{ inputs.needs }}
+        run: |
+          set -euo pipefail
+
+          fail() {
+            echo "${1}"
+            echo "${1}" >>"${GITHUB_STEP_SUMMARY}"
+            exit 1
+          }
+
+          reused_result="$(jq -r '.gates.outputs.reused_result // ""' <<<"${NEEDS}")"
+          reused_from="$(jq -r '.gates.outputs.reused_from // ""' <<<"${NEEDS}")"
+
+          case "${reused_result}" in
+            success)
+              echo "The checks already passed on this tree: ${reused_from}"
+              exit 0
+              ;;
+            failure)
+              fail "The checks already failed on this tree: ${reused_from} — use \"Re-run all jobs\" to run them again."
+              ;;
+          esac
+
+          # A caller that passed nothing but the gate would otherwise pass
+          # with nothing checked.
+          if [ "$(jq '[keys[] | select(. != "gates")] | length' <<<"${NEEDS}")" -eq 0 ]; then
+            echo '::error::`needs` names no job besides `gates`, so there is nothing to judge.'
+            exit 1
+          fi
+
+          # The gate's own result is left out on purpose: a gate that fails
+          # to answer fails open, and the work runs anyway.
+          not_passed="$(jq -r '[to_entries[]
+            | select(.key != "gates" and .value.result != "success")
+            | "`\(.key)` (\(.value.result))"] | join(", ")' <<<"${NEEDS}")"
+
+          if [ -z "${not_passed}" ]; then
+            echo 'The checks passed.'
+            exit 0
+          fi
+
+          fail "Did not pass on this commit: ${not_passed}."

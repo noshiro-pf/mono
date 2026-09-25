@@ -37,7 +37,7 @@ const report = (pulls: readonly PullRequestFacts[]): PrReport =>
   buildReport({
     repo: { owner: 'noshiro-pf', name: 'mono' },
     generatedAt: '2026-09-18T09:00:00Z',
-    required: ['code-check-result', 'no-skip-ci-label'],
+    required: ['code-check-result / result', 'no-skip-ci-label'],
     merged: [],
     mergedWithinDays: 7,
     authenticated: false,

@@ -201,7 +201,7 @@ matrix コマンドを実行する。
 `tools/scripts/cmd/check-tsconfig-paths.mts` が、パッケージに属する
 `tsconfig*.json` をすべて読み、`compilerOptions.paths` の各エントリについて次を
 検査する。`check:root:*` の一員なので `pnpm run check:root` に自動的に入り、
-必須ステータスチェック `code-check-result` の下（`code-check (check:root)`）で
+必須ステータスチェック `code-check-result / result` の下（`code-check (check:root)`）で
 走る。
 
 | 検査                             | 落ちる例                                                                |
