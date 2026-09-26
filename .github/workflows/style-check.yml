@@ -35,6 +35,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
     with:
       # `style`, a much narrower ignore list than `code`: `experimental/` and
       # nothing else — see "The ignore lists" in README.md.

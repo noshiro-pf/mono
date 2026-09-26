@@ -1,8 +1,10 @@
 /** Everything read, arranged into what gets rendered. */
 
+import { Arr } from 'ts-data-forge';
 import { summarizeChecks } from './checks.mjs';
 import { SKIP_CI_LABEL } from './labels.mjs';
 import { parseMergeAfter } from './merge-after.mjs';
+import { findStackParents } from './stack.mjs';
 import { buildMergeAfterForest } from './tree.mjs';
 import {
   type MergedPullRequest,
@@ -21,6 +23,7 @@ import {
  */
 export const buildReport = ({
   repo,
+  defaultBranch,
   generatedAt,
   required,
   authenticated,
@@ -29,6 +32,7 @@ export const buildReport = ({
   mergedWithinDays,
 }: Readonly<{
   repo: RepoRef;
+  defaultBranch: string;
   generatedAt: string;
   required: readonly string[];
   authenticated: boolean;
@@ -38,10 +42,11 @@ export const buildReport = ({
 }>): PrReport =>
   ({
     repo,
+    defaultBranch,
     generatedAt,
     authenticated,
     required,
-    ...buildEntries({ required, pulls }),
+    ...buildEntries({ required, defaultBranch, pulls }),
     merged,
     mergedWithinDays,
   }) as const;
@@ -54,27 +59,38 @@ export type DecidedEntries = Readonly<{
 
 /**
  * The part of a report that is decided rather than read: each open pull
- * request's declared order and check verdict, and the merge order they add
- * up to.
+ * request's declared order, the stack it is in, its check verdict, and the
+ * merge order they add up to.
  */
 export const buildEntries = ({
   required,
+  defaultBranch,
   pulls,
 }: Readonly<{
   required: readonly string[];
+  defaultBranch: string;
   pulls: readonly PullRequestFacts[];
 }>): DecidedEntries => {
   const open = new Set(pulls.map(({ number }) => number));
+
+  const parents = findStackParents(pulls, defaultBranch);
 
   const entries: readonly ReportEntry[] = pulls
     .toSorted((a, b) => a.number - b.number)
     .map((facts) => {
       const mergeAfter = parseMergeAfter(facts.body);
 
+      const stackedOn = parents.get(facts.number);
+
       return {
         ...facts,
         mergeAfter,
-        blockedBy: mergeAfter.filter((n) => open.has(n)),
+        stackedOn,
+        blockedBy: Arr.uniq(
+          stackedOn === undefined
+            ? mergeAfter
+            : Arr.toUnshifted(stackedOn)(mergeAfter),
+        ).filter((n) => open.has(n)),
         checks: summarizeChecks({
           required,
           reported: facts.reported,
@@ -83,7 +99,14 @@ export const buildEntries = ({
       };
     });
 
-  const { roots, cycles } = buildMergeAfterForest(entries);
+  // The forest reads what each entry waits for, which for a stacked one
+  // includes the layer below it.
+  const { roots, cycles } = buildMergeAfterForest(
+    entries.map(({ number, blockedBy }) => ({
+      number,
+      mergeAfter: blockedBy,
+    })),
+  );
 
   return { entries, roots, cycles };
 };

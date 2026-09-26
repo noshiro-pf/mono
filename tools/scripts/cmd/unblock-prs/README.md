@@ -20,17 +20,27 @@ them.
 他のブランチはすべて `BEHIND` に戻るため、まとめて rebase しても1本を除いて捨
 てることになるからです。
 
-**やらないこと**: マージ（auto-merge の仕事）、auto-merge を有効にすること、
-`merge-queued` を付けること、レビュー承認、失敗したチェックの修正（skill の仕
-事）。rebase は使い捨ての `git worktree` の中で行うので、実行元のチェックアウ
+**やらないこと**: マージ（auto-merge の仕事）、`merge-queued` を付けること、
+レビュー承認、失敗したチェックの修正（skill の仕事）。rebase は使い捨ての `git worktree` の中で行うので、実行元のチェックアウ
 トの作業ツリーには触れません。
 
-### PR 側で宣言する3つのこと
+### PR 側で宣言する4つのこと
 
 **`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
-に無視します。付いていて、かつ動かせない PR（auto-merge 無し / draft /
-base が `main` でない）は理由をログに出します — ラベルは明示的な依頼なので、
-答えが「できない」なら黙っていてはいけないからです。
+に無視します。付いていて、かつ動かせない PR（draft / base が `main` でも open な
+PR のブランチでもない / 手で auto-merge を切られた）は理由をログに出します —
+ラベルは明示的な依頼なので、答えが「できない」なら黙っていてはいけないから
+です。
+
+**auto-merge を張るのはこのスクリプトだけです**（ `auto-merge.mts` ）。
+`open-pr` はどの PR にも張らず、ここが `merge-queued` の PR を pick したときに
+張ります — rebase する候補なら push の後・`skip-ci` を外す前に、up-to-date で
+watch する PR なら watch の前に。ruleset は承認を要求しないので、張られた PR は
+緑になった瞬間にマージされます。キューに入れる前に張らないのはそのためで、
+stack の層は base が ruleset の掛からないブランチなので、張った瞬間に下の層へ
+マージされかねません。`merge-queued` が付いた後に人が auto-merge を切っていた
+ら張り直さず報告します（ timeline で判定）。`merge-queued` を付け直せば再び
+対象になります。
 
 **`Merge-After:` トレーラ** が順序を宣言します。行頭に書き、複数の番号を1行に
 並べても、行を分けても構いません。
@@ -49,6 +59,27 @@ Merge-After: #1901, #1903
   そこに含まれる PR は放置します（スクリプトには解消できないため）。
 - **コードフェンス内のトレーラは読みません。** 宣言とその実例は同じ文字列なの
   で、この機能を説明する文書が本物の制約になってしまわないようにするためです。
+
+**base（stacked PR）** も順序を宣言します。base が別の open な PR のブランチ
+である PR は、その PR の上に積まれた層です（GitHub の stacked pull request）。
+差分はその層の分だけになり、レビューしやすくなります。
+
+- 下の層がマージされるまで pick されません。判定は base だけで行うので、
+  `Merge-After:` の無い stack も認識します。`open-pr --base` は下の層を
+  `Merge-After:` にも書きますが、base と同じ意味で、二重に数えることはありません。
+- 下の層がマージされると、GitHub がこの PR を `main` に付け替えます（ネイティブ
+  の stack なら rebase もします）。そこから先は普通の PR です。
+- 積まれている間は pick されないので、auto-merge も張られません。張られるのは
+  `main` に付け替えられて順番が来たときです。
+- **下の層を rebase したら、上の層も一緒に運びます。** `git rebase --onto <新しい
+head> <古い head>` で各層を自分のコミットだけ積み直して push します。こうしない
+  と上の層の差分に下の層の古いコミットが混ざり、下の層がマージされたときの
+  GitHub の rebase も上の層が含んでいない head から始まることになります。
+  `merge-queued` の有無は問いません — stack は1つの単位として動きます。
+- 付け替えられた PR に、GitHub が rebase しなかったために下の層のコミットが
+  残っていれば、マージされた head から `--onto` で rebase します。patch が
+  squash commit と一致することに頼らないためです。
+- fork のブランチは親にならず、積み直しの対象にもなりません。
 
 **`blocks-release` ラベル** は「次のリリースにはこれが入っていなければならな
 い」という宣言です。これが付いた PR が1本でも open な間、version PR
@@ -137,14 +168,17 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 
 #### 2. triage
 
-1. 全 PR の body から `Merge-After:` を読んで依存グラフを作り、閉路を検出
-   （ version PR の body だけは読みません — 上書きされるので）。
+1. 全 PR の body から `Merge-After:` を、base から stack を読んで依存グラフを
+   作り、閉路を検出（ version PR の body だけは読みません — 上書きされるので）。
 2. **範囲判定** — `merge-queued` が無ければ `ignore`（無言）。あって動かせなけ
    れば `note`（理由を出力）。
 3. **skip 記録** — 前のサイクルで諦めた PR は、当時の head と base のままなら
    `note`。
-4. **`Merge-After` ゲート** — 指定先が1つでも open なら `note`。
-5. **version PR** — `changeset-release/<デフォルトブランチ>` から来た PR は専
+4. **stack** — 積まれている PR は「下の層が先」と `note`。
+   **auto-merge** — 無い PR は、`merge-queued` の後に人が切っていれば `note`。
+   そうでなければ先へ進み、pick されたときに張られます。
+5. **`Merge-After` ゲート** — 指定先が1つでも open なら `note`。
+6. **version PR** — `changeset-release/<デフォルトブランチ>` から来た PR は専
    用の扱いになります。`blocks-release` の付いた open な PR があれば `note`。
    無ければ、そのブランチが **main の現在の先端の上に建っているか** を
    `git merge-base` で確かめ、建っていなければ `note`（ Release workflow がま
@@ -153,7 +187,7 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
    **in-flight**。`mergeStateStatus` を使わないのは、これを読み違えた代償が
    「feature 抜きのリリース」だからです（ GitHub の答えは非同期に計算された
    キャッシュ）。
-6. **振り分け**
+7. **振り分け**
     - `skip-ci` 付き → **candidate**。merge state は見ません。
       `no-skip-ci-label` が pending なので、どれだけ準備できていても必ず
       `BLOCKED` になり、「スキップされたチェック」と「実行中のチェック」が区別
@@ -177,23 +211,31 @@ version commit が「まだ消費していない changeset を含む先端」の
 
 #### 3. 1本だけ動かす
 
-**in-flight があればそれを watch して終わり** — rebase はしません。
+**in-flight があればそれを watch して終わり** — rebase はしません。auto-merge
+が無ければ watch の前に張ります。
 
 なければ candidate の先頭（番号順、`DIRTY` は最後）に対して:
 
 1. 使い捨て worktree で `origin/main` に rebase し、`--force-with-lease`
-   （survey が見た head を明示）で push。
-2. `skip-ci` が付いていれば、**push の後で** 再確認（まだ open か / head が今
+   （survey が見た head を明示）で push。stack から降ろされた PR がマージ済みの
+   下の層の head をまだ含んでいれば、その head からの `--onto` にします。
+2. head が変わったなら、その上に積まれた層を下から順に `--onto` で積み直して
+   push します。積み直せない層（衝突、fork、下の層が動かなかった）は理由を
+   ログに出して残し、この PR 自体は止めません。
+3. auto-merge が無ければ、再確認（open / `main` 向き / head が今 push したもの /
+   `merge-queued` がまだ付いている）してから張ります。`skip-ci` を外す前なので、
+   張っている間もマージはラベルが止めています。
+4. `skip-ci` が付いていれば、**push の後で** 再確認（まだ open か / head が今
    push したものか / 両ラベルがまだ付いているか）してからラベルを外します。
    順序が要点です。ラベルが付いている間の push は全チェックが skip される
    `synchronize` を起こすだけで無料ですが、ラベルを外すと `unlabeled` が発火
    し、**実際にマージされる head の上で** マトリクスが1回だけ走ります。逆順だ
    と rebase 前の head でフルマトリクスが起動し、直後の push がそれをキャンセ
    ルします。
-3. rebase が no-op で、かつ `skip-ci` も付いていなかった場合だけ「GitHub の
+5. rebase が no-op で、かつ `skip-ci` も付いていなかった場合だけ「GitHub の
    merge state が古かった」と判断し、30秒待って survey からやり直します。
 
-失敗（conflict / push 拒否 / ラベル除去失敗）した場合は記録して **同じサイクル
+失敗（conflict / push 拒否 / auto-merge を張れない / ラベル除去失敗）した場合は記録して **同じサイクル
 内で次の候補へ** 進みます。キューが止まるわけではありません。
 
 例外は **作業中にブランチが動いた場合** です（rebase 前の fetch で head が
@@ -253,6 +295,7 @@ green に見えます（#2069 はこれで `not-merging` になりました）�
 | `rebase-failed`（実際に衝突した） |      ✓      |          ✓          |
 | `push-failed`                     |      ✓      |          ✓          |
 | `unlabel-failed`                  |      ✓      |          ✓          |
+| `arm-failed`                      |      ✓      |          ✓          |
 | `already-in-base`                 |      ✓      |          ✓          |
 | `not-merging`                     |      ✓      |          ✓          |
 | `watch-timeout`                   |      ✓      |          ✓          |
@@ -325,6 +368,8 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `main.mts`        | ループ本体とコマンドライン（入口）                        |
 | `triage.mts`      | 1回の survey が各 PR について何を言うか                   |
 | `merge-after.mts` | 宣言された順序が pick に何を言うか                        |
+| `auto-merge.mts`  | いつ auto-merge を張るか                                  |
+| `stack.mts`       | stacked PR — いつ待たせ、いつ張り、何を運ぶか             |
 | `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `release.mts`     | 解放されている PR を1本に保つ                             |
@@ -339,8 +384,9 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `constants.mts`   | 待ち時間と諦めるまでの回数                                |
 | `util.mts`        | quoting、ログ、停止シグナル                               |
 
-トレーラのパーサと閉路検出、ラベルの文字列は、同じ宣言を読む Pull Requests
-Manager と共有するため `apps/pr-report-core` にあります。
+トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列
+は、同じ宣言を読む Pull Requests Manager と共有するため `apps/pr-report-core`
+にあります。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -354,17 +400,28 @@ the order those pull requests declare. One per cycle, always: merging any of
 them moves `main` and puts every other branch back to `BEHIND`, so a batch
 rebase runs a full CI matrix per branch and throws all but the first away.
 
-**What it never does**: merge (auto-merge's job), enable auto-merge, add
-`merge-queued`, approve a review, or fix a failing check (the skill's job).
+**What it never does**: merge (auto-merge's job), add `merge-queued`, approve a
+review, or fix a failing check (the skill's job).
 The rebase happens in a throwaway `git worktree`, so the checkout it runs from
 is never touched.
 
-### The three things a pull request declares
+### The four things a pull request declares
 
 **The `merge-queued` label is the scope rule.** A pull request without it is
-passed over in silence. One that has it and cannot be acted on — no
-auto-merge, a draft, a base that is not `main` — is reported, because the
-label asked for something and the answer is no.
+passed over in silence. One that has it and cannot be acted on — a draft, a
+base that is neither `main` nor an open pull request's branch, auto-merge
+switched off by hand — is reported, because the label asked for something and
+the answer is no.
+
+**This script is the only thing that arms auto-merge** (`auto-merge.mts`).
+`open-pr` arms nothing; this script arms a queued pull request when it picks
+it — one it rebases after the push and before `skip-ci` comes off, one already
+up to date before it is watched. The ruleset asks for no approvals, so an
+armed pull request merges the moment it goes green, which is why nothing is
+armed before it is queued; and a layer of a stack, onto a branch no ruleset
+covers, could merge into the layer below the moment it was armed. One a person
+disarmed after it was queued is not armed again but reported, read from the
+timeline; putting `merge-queued` back on queues it again.
 
 **The `Merge-After:` trailer declares the order.** On its own line, naming as
 many numbers as it likes, on one line or several:
@@ -385,6 +442,32 @@ Merge-After: #1901, #1903
   because nothing here can move it.
 - **A trailer inside a fenced code block is not read**, so a document
   describing the convention does not become a constraint.
+
+**The base declares an order too.** A pull request onto another open pull
+request's branch is a layer stacked on it — GitHub's stacked pull requests —
+and its diff is its own layer and nothing below it, which is what makes it
+reviewable.
+
+- It is not picked until the layer below it has merged. The base alone says
+  so, so a stack with no `Merge-After:` is recognized too; `open-pr --base`
+  writes the layer below into `Merge-After:` as well, which means the same and
+  is not counted twice.
+- When the layer below merges, GitHub moves this one onto `main` (and, with
+  native stacks, rebases it there). From then on it is an ordinary pull
+  request.
+- A stacked pull request is never picked, so never armed. It is armed when
+  its turn comes, after GitHub has moved it onto `main`.
+- **When a layer is rebased, the layers above it are carried along.** Each is
+  replayed with `git rebase --onto <new head> <old head>` — its own commits and
+  nothing else — and pushed. Otherwise each would show the layer below's old
+  commits in its diff, and GitHub's rebase when that layer merges would start
+  from a head the layer above does not contain. `merge-queued` is not asked:
+  a stack moves as one.
+- A pull request moved off a stack that GitHub did not rebase still carries
+  the merged layer's commits; it is rebased with `--onto` from the head that
+  layer merged at, rather than trusting the patches to match the squash
+  commit.
+- A fork's branch is never a parent, and never restacked.
 
 **The `blocks-release` label says the next release must contain this pull
 request.** While one carrying it is open, the version pull request — the one
@@ -479,15 +562,19 @@ GitHub is still computing is never read as up to date. The tip of
 
 #### 2. Triage
 
-1. Build the dependency graph from every body's `Merge-After:`, and find the
-   cycles in it. The version pull request's body is the one that is not read,
-   because it is overwritten; others may still name it.
+1. Build the dependency graph from every body's `Merge-After:` and every
+   base's stack, and find the cycles in it. The version pull request's body is
+   the one that is not read, because it is overwritten; others may still name
+   it.
 2. **Scope** — no `merge-queued` means `ignore`, silently. Queued but not
    actionable means a `note` naming the reason.
 3. **Skip records** — a pull request a previous cycle gave up on is a `note`
    for as long as its head and the base are where they were.
-4. **The `Merge-After` gate** — a `note` while anything it names is open.
-5. **The version pull request** — one whose branch is
+4. **Stacks** — a stacked pull request is a `note` saying the layer below goes
+   first. **Auto-merge** — one without it is a `note` if a person switched it
+   off after it was queued; otherwise it goes on, and is armed when picked.
+5. **The `Merge-After` gate** — a `note` while anything it names is open.
+6. **The version pull request** — one whose branch is
    `changeset-release/<default branch>` is handled on its own. A `note` while
    any pull request labelled `blocks-release` is open. Otherwise `git
 merge-base` says whether the branch was built on the current tip of the
@@ -496,7 +583,7 @@ merge-base` says whether the branch was built on the current tip of the
    **failing** or **in flight** by its required checks. `mergeStateStatus` is
    not what answers this one: GitHub's answer is computed asynchronously and
    cached, and being wrong here releases a set the branch was built before.
-6. **The rest**
+7. **The rest**
     - Carrying `skip-ci` → **candidate**, whatever the merge state says. With
       `no-skip-ci-label` pending it reads `BLOCKED` however ready it is, and
       checks that were skipped are indistinguishable from checks still
@@ -522,24 +609,35 @@ a queued change and the release are both ready, the change goes in first.
 #### 3. Act on exactly one
 
 **If anything is in flight, watch that and stop** — do not rebase another.
+Arm it first if it has no auto-merge.
 
 Otherwise take the first candidate (lowest number, `DIRTY` last) and:
 
 1. Rebase onto `origin/main` in a throwaway worktree and push with
-   `--force-with-lease`, leased against the head the survey saw.
-2. If it carries `skip-ci`, ask GitHub once more — still open, head is the
+   `--force-with-lease`, leased against the head the survey saw. A pull
+   request moved off a stack that still contains the head its merged layer
+   merged at is rebased `--onto` from that head.
+2. If the head moved, restack the layers above it, lowest first, each with
+   `--onto`, and push them. A layer that cannot be moved — a conflict, a fork,
+   a layer below that did not move — is logged and left; the pull request
+   whose turn it is goes on regardless.
+3. If it has no auto-merge, ask GitHub once more — still open, onto `main`,
+   head is the commit just pushed, `merge-queued` still on — and arm it. This
+   comes before `skip-ci` is taken off, so the label holds the merge while it
+   happens.
+4. If it carries `skip-ci`, ask GitHub once more — still open, head is the
    commit just pushed, both labels still on — and then take the label off.
    The order is the point: while the label is on, the push fires a
    `synchronize` whose every check skips, so it is free; taking the label off
    then fires `unlabeled` and runs the matrix once, **on the head that will
    actually be merged**. The other order starts a full matrix on the
    pre-rebase head and has the push cancel it.
-3. A rebase that changed nothing, on a pull request with no label to take off
+5. A rebase that changed nothing, on a pull request with no label to take off
    either, means GitHub's merge state was stale: wait thirty seconds and
    survey again.
 
-A failure — a real conflict, a refused push, a label that could not be
-removed — is recorded and **the next candidate is tried in the same cycle**.
+A failure — a real conflict, a refused push, auto-merge that could not be
+armed, a label that could not be removed — is recorded and **the next candidate is tried in the same cycle**.
 The queue does not stop.
 
 The exception is **a branch that moved under it**: the head the fetch finds
@@ -603,6 +701,7 @@ A verdict lasts as long as the state it was reached in.
 | `rebase-failed` (a real conflict) |         ✓         |             ✓             |
 | `push-failed`                     |         ✓         |             ✓             |
 | `unlabel-failed`                  |         ✓         |             ✓             |
+| `arm-failed`                      |         ✓         |             ✓             |
 | `already-in-base`                 |         ✓         |             ✓             |
 | `not-merging`                     |         ✓         |             ✓             |
 | `watch-timeout`                   |         ✓         |             ✓             |
@@ -680,6 +779,8 @@ the paths it changes and `.github/CODEOWNERS`.
 | `main.mts`        | the loop and the command line (entry point)              |
 | `triage.mts`      | what one survey says about each pull request, and why    |
 | `merge-after.mts` | what the declared order says about picking               |
+| `auto-merge.mts`  | when this script arms auto-merge                         |
+| `stack.mts`       | stacked pull requests — when they wait, arm and move     |
 | `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `release.mts`     | holding the queue to one released pull request           |
@@ -694,9 +795,9 @@ the paths it changes and `.github/CODEOWNERS`.
 | `constants.mts`   | how long it waits, and how long before it gives up       |
 | `util.mts`        | quoting, logging, the stop signal                        |
 
-The trailer parser, the cycle detection and the label strings are in
-`apps/pr-report-core`, shared with the Pull Requests Manager page, which reads
-the same declarations.
+The trailer parser, the cycle detection, which pull request is stacked on
+which, and the label strings are in `apps/pr-report-core`, shared with the
+Pull Requests Manager page, which reads the same declarations.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.

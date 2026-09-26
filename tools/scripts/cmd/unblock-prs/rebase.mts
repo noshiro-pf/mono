@@ -1,29 +1,58 @@
-// cspell:ignore unlabel unlabelling
+// cspell:ignore unlabel unlabelling retarget retargeted
 
 /**
- * Moving a branch: onto the tip of the base, and out from under `skip-ci`.
+ * Moving a branch: onto the tip of the base, with the layers stacked on it
+ * carried along, and out from under `skip-ci`.
  */
 
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
-import { Result } from 'ts-data-forge';
-import { git, remoteSha, viewPullRequest } from './github.mjs';
+import { Arr, isRecord, Result } from 'ts-data-forge';
+import {
+  armAutoMerge,
+  git,
+  mergedHeadOf,
+  readTimeline,
+  remoteSha,
+  viewPullRequest,
+  type MergedHead,
+} from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { describeConflict } from './set-aside-detail.mjs';
+import { restackable, retargetedFrom } from './stack.mjs';
 import {
   type Advanced,
+  type AdvancePlan,
   type PullRequest,
   type RebaseFailure,
 } from './types.mjs';
-import { lastLines, sh } from './util.mjs';
+import { isSafeRefName, lastLines, log, sh } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
- * Rebases the pull request's branch onto `origin/<defaultBranch>` in a
- * throwaway worktree and force-pushes the result, expecting the remote branch
- * to still be at the head the survey saw. Resolves to the new head, or to
- * `moved` when the branch is no longer where the survey saw it.
+ * Where a branch is rebased to, and what it is rebased from.
+ *
+ * `onto` is a revision: `origin/<default branch>` for a pull request's own
+ * turn, or the new head of the layer below for a restack. `upstream`, when
+ * given, is the commit below the branch's own commits, and makes the rebase
+ * `git rebase --onto <onto> <upstream>`: exactly the commits after it are
+ * replayed, whatever their patches look like upstream. `required` says what
+ * to do when the branch does not contain it: fail, or fall back to a plain
+ * rebase, which drops commits already upstream by their patches.
+ */
+type RebaseTarget = Readonly<{
+  onto: string;
+  /** Refspecs to fetch from `origin` besides the branch itself. */
+  fetch: readonly string[];
+  upstream: Readonly<{ sha: string; required: boolean }> | undefined;
+}>;
+
+/**
+ * Rebases the pull request's branch in a throwaway worktree and
+ * force-pushes the result, expecting the remote branch to still be at the
+ * head the survey saw. Resolves to the new head, or to `moved` when the
+ * branch is no longer where the survey saw it.
  *
  * The worktree is detached, so the checkout this runs from is never touched,
  * and it is removed on the way out of every path: the work inside it is a
@@ -33,7 +62,7 @@ import { isVersionPullRequest } from './version-pr.mjs';
  */
 const rebaseAndPush = async (
   pr: PullRequest,
-  defaultBranch: string,
+  target: RebaseTarget,
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
@@ -46,7 +75,9 @@ const rebaseAndPush = async (
   await removeWorktree(worktreeDir);
 
   const fetched = await git(
-    `git fetch --quiet origin ${sh(defaultBranch)} ${sh(branch)}`,
+    Arr.toUnshifted('git fetch --quiet origin')(
+      Arr.toPushed(target.fetch, branch).map(sh),
+    ).join(' '),
   );
 
   if (Result.isErr(fetched)) {
@@ -71,7 +102,7 @@ const rebaseAndPush = async (
     return rebaseFailed(`checkout failed: ${added.value}`);
   }
 
-  const result = await rebaseInWorktree(pr, defaultBranch, worktreeDir);
+  const result = await rebaseInWorktree(pr, target, worktreeDir);
 
   await removeWorktree(worktreeDir);
 
@@ -86,7 +117,7 @@ const rebaseAndPush = async (
  */
 const rebaseInWorktree = async (
   pr: PullRequest,
-  defaultBranch: string,
+  target: RebaseTarget,
   worktreeDir: string,
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
@@ -94,8 +125,27 @@ const rebaseInWorktree = async (
   const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
     Result.err({ reason: 'rebase-failed', detail });
 
+  const { upstream } = target;
+
+  const contained =
+    upstream !== undefined &&
+    Result.isOk(
+      await git(
+        `git merge-base --is-ancestor ${sh(upstream.sha)} HEAD`,
+        worktreeDir,
+      ),
+    );
+
+  if (!contained && upstream?.required === true) {
+    return rebaseFailed(
+      `it does not contain ${upstream.sha.slice(0, 10)}, the head it was stacked on, so which commits are its own cannot be told`,
+    );
+  }
+
   const rebased = await git(
-    `git rebase ${sh(`origin/${defaultBranch}`)}`,
+    contained
+      ? `git rebase --onto ${sh(target.onto)} ${sh(upstream.sha)}`
+      : `git rebase ${sh(target.onto)}`,
     worktreeDir,
   );
 
@@ -113,7 +163,7 @@ const rebaseInWorktree = async (
           ? conflicted.value.split('\n').filter((line) => line !== '')
           : [],
         lastLines(rebased.value, 5),
-        defaultBranch,
+        target.onto,
       ),
     );
   }
@@ -130,16 +180,17 @@ const rebaseInWorktree = async (
     return Result.ok({ kind: 'rebased', head: sha });
   }
 
-  const baseHead = await git(`git rev-parse ${sh(`origin/${defaultBranch}`)}`);
+  const ontoHead = await git(`git rev-parse ${sh(target.onto)}`, worktreeDir);
 
-  if (Result.isOk(baseHead) && sha === baseHead.value.trim()) {
-    // The rebase left the branch at the base: every commit on it had a
-    // patch already upstream, so `git rebase` skipped the lot. Pushing that
-    // would leave a pull request with no commits in it, which auto-merge
-    // will never merge, so leave the branch alone and say what happened.
+  if (Result.isOk(ontoHead) && sha === ontoHead.value.trim()) {
+    // The rebase left the branch at what it was rebased onto: every commit
+    // on it had a patch already there, so `git rebase` skipped the lot.
+    // Pushing that would leave a pull request with no commits in it, which
+    // auto-merge will never merge, so leave the branch alone and say what
+    // happened.
     return Result.err({
       reason: 'already-in-base',
-      detail: `every commit is already in ${defaultBranch}; the pull request has nothing left to merge`,
+      detail: `every commit is already in ${target.onto}; the pull request has nothing left to merge`,
     });
   }
 
@@ -171,14 +222,23 @@ type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
 
 /**
  * Brings one pull request as close to merging as this script can: onto the
- * tip of the base, and out from under `skip-ci`.
+ * tip of the base, with the layers stacked on it carried along, armed, and
+ * out from under `skip-ci`.
  *
  * The order is the point. While `skip-ci` is on, the push the rebase makes
  * fires a `synchronize` whose every check workflow skips, so it costs
  * nothing; removing the label afterwards fires `unlabeled`, and the matrix
  * that starts then runs once, on the head that will actually be merged. Doing
  * it the other way round starts a full matrix on the pre-rebase head and has
- * the push cancel it through the concurrency group.
+ * the push cancel it through the concurrency group. Arming comes between
+ * the two, so that while it happens the label still holds the merge.
+ *
+ * A pull request GitHub moved off a stack is rebased with `--onto` from the
+ * head its merged parent was merged at, when it still contains that head —
+ * GitHub's own rebase on retargeting can fail, and then the branch still
+ * carries the parent's commits, whose patches match the squash commit only
+ * if nothing changed them on the way in. Otherwise the plain rebase drops
+ * them by patch, as it always has.
  *
  * A rebase that changes nothing is a failure only when there was no label to
  * take off either: then GitHub's `BEHIND` or `DIRTY` was stale and the survey
@@ -202,12 +262,21 @@ type Rebased = Readonly<{ kind: 'moved' } | { kind: 'rebased'; head: string }>;
 export const advance = async (
   pr: PullRequest,
   defaultBranch: string,
+  plan: AdvancePlan,
 ): Promise<Result<Advanced, RebaseFailure>> => {
   if (isVersionPullRequest(pr, defaultBranch)) {
     if (!isSkipCiLabelled(pr)) {
       // Triage only ever offers this one while it is paused, so nothing to
       // take off means the survey is a release behind.
       return Result.ok({ kind: 'stale-merge-state' });
+    }
+
+    if (plan.arm) {
+      const armed = await armOnPick(pr, pr.headRefOid, defaultBranch);
+
+      if (Result.isErr(armed) || armed.value === 'moved') {
+        return Result.isErr(armed) ? armed : Result.ok({ kind: 'moved' });
+      }
     }
 
     const unlabelled = await removeSkipCiLabel(pr, pr.headRefOid);
@@ -221,7 +290,19 @@ export const advance = async (
         );
   }
 
-  const rebased = await rebaseAndPush(pr, defaultBranch);
+  const merged = await stackedOnMerged(pr, defaultBranch);
+
+  const rebased = await rebaseAndPush(pr, {
+    onto: `origin/${defaultBranch}`,
+    fetch:
+      merged === undefined
+        ? [defaultBranch]
+        : [defaultBranch, `refs/pull/${merged.number}/head`],
+    upstream:
+      merged === undefined
+        ? undefined
+        : { sha: merged.headSha, required: false },
+  });
 
   if (Result.isErr(rebased)) {
     return rebased;
@@ -232,6 +313,18 @@ export const advance = async (
   }
 
   const { head } = rebased.value;
+
+  if (head !== pr.headRefOid) {
+    await restack(pr, head, plan.descendants);
+  }
+
+  if (plan.arm) {
+    const armed = await armOnPick(pr, head, defaultBranch);
+
+    if (Result.isErr(armed) || armed.value === 'moved') {
+      return Result.isErr(armed) ? armed : Result.ok({ kind: 'moved' });
+    }
+  }
 
   if (!isSkipCiLabelled(pr)) {
     return head === pr.headRefOid
@@ -293,6 +386,171 @@ const removeSkipCiLabel = async (
   return Result.isErr(removed)
     ? failed(`cannot remove ${SKIP_CI_LABEL}: ${lastLines(removed.value, 2)}`)
     : Result.ok('removed');
+};
+
+/**
+ * The layer this pull request was stacked on, if GitHub moved it onto the
+ * default branch when that layer merged — and so the head below its own
+ * commits, if GitHub did not rebase it. Anything that cannot be read is
+ * `undefined`, and the rebase falls back to dropping commits by their
+ * patches, which a one-commit layer squash-merged unchanged also survives.
+ */
+const stackedOnMerged = async (
+  pr: PullRequest,
+  defaultBranch: string,
+): Promise<MergedHead | undefined> => {
+  const events = await readTimeline(pr.number);
+
+  if (Result.isErr(events)) {
+    log(
+      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(events.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  const from = retargetedFrom(events.value, defaultBranch);
+
+  if (from === undefined || !isSafeRefName(from)) {
+    return undefined;
+  }
+
+  const merged = await mergedHeadOf(from);
+
+  if (Result.isErr(merged)) {
+    log(
+      `#${pr.number}: cannot read what merged from ${from}; rebasing by patch. (${lastLines(merged.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return merged.value;
+};
+
+/**
+ * Carries every layer stacked on `pr` along after it moved from its old head
+ * to `head`: each is replayed with `--onto` from the head it was on to the
+ * one that replaced it, lowest layer first so that each finds its own new
+ * base already pushed. A layer that cannot be moved, or that someone else
+ * moved first, is reported and left where it is, and so is everything on
+ * it; none of this stops `pr` itself, whose turn it is.
+ */
+const restack = async (
+  pr: PullRequest,
+  head: string,
+  descendants: readonly PullRequest[],
+): Promise<void> => {
+  const mut_moved = new Map<string, Readonly<{ from: string; to: string }>>([
+    [pr.headRefName, { from: pr.headRefOid, to: head }],
+  ]);
+
+  for (const layer of descendants) {
+    const below = mut_moved.get(layer.baseRefName);
+
+    if (below === undefined) {
+      log(
+        `#${layer.number}: not restacked — the layer it is on, ${layer.baseRefName}, did not move.`,
+      );
+
+      continue;
+    }
+
+    const refused = restackable(layer);
+
+    if (refused !== undefined) {
+      log(`#${layer.number}: not restacked — ${refused}.`);
+
+      continue;
+    }
+
+    const moved = await rebaseAndPush(layer, {
+      onto: below.to,
+      fetch: [],
+      upstream: { sha: below.from, required: true },
+    });
+
+    if (Result.isErr(moved)) {
+      log(
+        `#${layer.number}: not restacked onto ${layer.baseRefName} — ${moved.value.detail}`,
+      );
+
+      continue;
+    }
+
+    if (moved.value.kind === 'moved') {
+      log(
+        `#${layer.number}: not restacked — its branch moved since the survey, so someone else is moving it.`,
+      );
+
+      continue;
+    }
+
+    log(
+      `#${layer.number}: restacked onto ${layer.baseRefName} at ${below.to.slice(0, 10)}.`,
+    );
+
+    mut_moved.set(layer.headRefName, {
+      from: layer.headRefOid,
+      to: moved.value.head,
+    });
+  }
+};
+
+/**
+ * Arms auto-merge on the pull request this cycle picked, having first asked
+ * whether it is still what triage saw: open, on the default branch, queued,
+ * at `head`. A head other than that is someone else moving it, as in
+ * `removeSkipCiLabel`. `auto-merge.mts` says why this script is what arms it.
+ *
+ * Called for one it rebases after the push and before `skip-ci` comes off, so
+ * that the label holds the merge until the matrix that decides it starts; and
+ * for one already up to date before it is watched.
+ */
+export const armOnPick = async (
+  pr: PullRequest,
+  head: string,
+  defaultBranch: string,
+): Promise<Result<'armed' | 'moved', RebaseFailure>> => {
+  const failed = (detail: string): Result<'armed' | 'moved', RebaseFailure> =>
+    Result.err({ reason: 'arm-failed', detail });
+
+  const current = await viewPullRequest(pr.number);
+
+  if (Result.isErr(current)) {
+    return failed(`cannot re-read it before arming: ${current.value}`);
+  }
+
+  if (current.value.state === 'OPEN' && current.value.headRefOid !== head) {
+    return Result.ok('moved');
+  }
+
+  const refused =
+    current.value.state !== 'OPEN'
+      ? (`it is ${current.value.state} now` as const)
+      : current.value.baseRefName !== defaultBranch
+        ? (`its base is ${current.value.baseRefName} now` as const)
+        : !isMergeQueued(current.value)
+          ? (`${MERGE_QUEUED_LABEL} came off before it was armed` as const)
+          : undefined;
+
+  if (refused !== undefined) {
+    return failed(`not arming auto-merge: ${refused}`);
+  }
+
+  if (isRecord(current.value.autoMergeRequest)) {
+    return Result.ok('armed');
+  }
+
+  const armed = await armAutoMerge(current.value.id);
+
+  if (Result.isErr(armed)) {
+    return failed(`cannot arm auto-merge: ${lastLines(armed.value, 2)}`);
+  }
+
+  log(`#${pr.number}: auto-merge armed.`);
+
+  return Result.ok('armed');
 };
 
 const removeWorktree = async (worktreeDir: string): Promise<void> => {

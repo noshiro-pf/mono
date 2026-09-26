@@ -54,8 +54,8 @@ describe('parseOptions', () => {
     assert.isTrue(Result.isErr(parsed('--merge-after', 'later')));
   });
 
-  // A draft cannot be armed, so the option that would ask for one is not
-  // quietly ignored.
+  // `unblock-prs` passes a draft over, so the option that would ask for one
+  // is not quietly ignored.
   test('refuses an unknown option rather than ignoring it', () => {
     assert.isTrue(Result.isErr(parsed('--draft')));
   });

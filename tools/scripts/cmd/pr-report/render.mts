@@ -1,7 +1,6 @@
 /** The report as text: Markdown for GitHub and Claude, plain for a terminal. */
 
 import {
-  MERGE_QUEUED_LABEL,
   summarize,
   type ChecksSummary,
   type PrReport,
@@ -165,6 +164,9 @@ const describe = (
 
   const detail = [
     entry.isDraft ? 'draft' : undefined,
+    entry.stackedOn === undefined
+      ? undefined
+      : (`stacked on #${entry.stackedOn}` as const),
     commits(entry),
     ...entry.labels.map(({ name }) => (markdown ? `\`${name}\`` : `[${name}]`)),
     autoMerge(entry),
@@ -178,26 +180,20 @@ const describe = (
 };
 
 /**
- * Whether anything will land the pull request once the checks go green.
- *
- * Said only when it is news. A pull request nobody has queued and nobody has
- * armed is the ordinary case, and a line for it on every entry would bury the
- * one combination that matters: `merge-queued` — the author saying this is to
- * be landed — with no auto-merge to land it. `unblock-prs` passes such a pull
- * request over with "auto-merge is not enabled", and until now the only place
- * that was visible was that script's own log.
+ * Whether anything will land the pull request once the checks go green, said
+ * only when something will. `unblock-prs` arms a queued pull request when it
+ * picks it, so one not yet armed — queued or not — is the ordinary case, and
+ * armed is the news: its turn has come.
  */
 const autoMerge = (entry: ReportEntry): string | undefined =>
-  entry.autoMerge
-    ? 'auto-merge'
-    : entry.labels.some((label) => label.name === MERGE_QUEUED_LABEL)
-      ? 'no auto-merge'
-      : undefined;
+  entry.autoMerge ? 'auto-merge' : undefined;
 
 /**
- * `+3 / -12`: three commits of its own, twelve of `main` it has not got.
+ * `+3 / -12`: three commits of its own, twelve of its base it has not got.
  * The second number is the one that matters — the ruleset blocks a branch
- * that is behind, so anything but `-0` is a rebase waiting to happen.
+ * that is behind `main`, and a stacked one behind the layer below it shows
+ * that layer's old commits in its diff — so anything but `-0` is a rebase
+ * waiting to happen.
  */
 const commits = (entry: ReportEntry): string =>
   entry.comparison === undefined

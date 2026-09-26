@@ -135,6 +135,73 @@ export const findOpenPullRequest = async (
   return Result.ok(found === undefined ? undefined : toPullRequest(found));
 };
 
+/**
+ * The open pull request whose branch `base` is, when a new one is to be
+ * stacked on it: exactly one, from this repository. Anything else is not a
+ * stack `unblock-prs` or the reports would recognize, and is refused rather
+ * than opened.
+ */
+export const findStackParent = async (
+  api: ApiContext,
+  base: string,
+): Promise<Result<number, string>> => {
+  const listed = await rest(
+    api,
+    'GET',
+    '/pulls',
+    PullRequestListResponseSchema,
+    {
+      query: {
+        state: 'open',
+        per_page: '2',
+        head: `${api.repo.owner}:${base}`,
+      },
+    },
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const [parent, second] = listed.value;
+
+  return parent === undefined
+    ? Result.err(
+        `${base} is neither the default branch nor the branch of an open pull request; a stacked pull request targets the branch of the one below it`,
+      )
+    : second === undefined
+      ? Result.ok(parent.number)
+      : Result.err(
+          `${base} is the branch of more than one open pull request (#${parent.number}, #${second.number}), so which one this is stacked on cannot be told`,
+        );
+};
+
+/**
+ * Whether the branch contains the tip of `base`, as a layer stacked on it
+ * has to: one that does not shows the layer below's old commits in its diff.
+ */
+export const containsBase = async (
+  base: string,
+): Promise<Result<undefined, string>> => {
+  const fetched = await git(
+    `git fetch --quiet origin ${sh(`+refs/heads/${base}:refs/remotes/origin/${base}`)}`,
+  );
+
+  if (Result.isErr(fetched)) {
+    return Result.err(`cannot fetch ${base}: ${fetched.value}`);
+  }
+
+  const contained = await git(
+    `git merge-base --is-ancestor ${sh(`origin/${base}`)} HEAD`,
+  );
+
+  return Result.isErr(contained)
+    ? Result.err(
+        `the branch does not contain the tip of ${base}; rebase it onto origin/${base} first, or its diff will carry that layer's old commits`,
+      )
+    : Result.ok(undefined);
+};
+
 export const viewPullRequest = async (
   api: ApiContext,
   prNumber: number,
@@ -150,8 +217,9 @@ export const viewPullRequest = async (
 };
 
 /**
- * Creates it ready for review — never a draft, because a draft cannot be
- * armed and arming is the next step.
+ * Creates it ready for review — never a draft, because `unblock-prs` passes a
+ * draft over, and queueing a pull request is meant to be `merge-queued` and
+ * nothing else.
  */
 export const createPullRequest = async ({
   api,
@@ -194,7 +262,11 @@ export const addLabel = async (
   return Result.isErr(added) ? added : Result.ok(undefined);
 };
 
-/** GraphQL: the REST API cannot take a pull request out of draft. */
+/**
+ * GraphQL: the REST API cannot take a pull request out of draft. The one
+ * GraphQL call this command makes, and only for a pull request someone
+ * opened as a draft before running it.
+ */
 export const markReady = async (
   api: ApiContext,
   nodeId: string,
@@ -204,30 +276,6 @@ export const markReady = async (
     dedent`
       mutation ($id: ID!) {
         markPullRequestReadyForReview(input: { pullRequestId: $id }) {
-          clientMutationId
-        }
-      }
-    `,
-    { id: nodeId },
-  );
-
-/**
- * GraphQL: the REST API cannot arm auto-merge either.
- *
- * Squash, because the `main` ruleset allows nothing else — a pull request
- * armed with another method would sit there refusing to merge.
- */
-export const armAutoMerge = async (
-  api: ApiContext,
-  nodeId: string,
-): Promise<Result<undefined, string>> =>
-  graphql(
-    api,
-    dedent`
-      mutation ($id: ID!) {
-        enablePullRequestAutoMerge(
-          input: { pullRequestId: $id, mergeMethod: SQUASH }
-        ) {
           clientMutationId
         }
       }

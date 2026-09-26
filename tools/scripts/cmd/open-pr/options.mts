@@ -9,7 +9,10 @@ export type Options = Readonly<{
   title: string | undefined;
   /** A file to take the body from; only the trailer, or nothing, when absent. */
   bodyFile: string | undefined;
-  /** What to target; the repository's default branch when absent. */
+  /**
+   * What to target; the repository's default branch when absent. Another
+   * open pull request's branch stacks it on that pull request.
+   */
   base: string | undefined;
   /** Pull requests to declare with `Merge-After:`, in the order given. */
   mergeAfter: readonly number[];
@@ -21,10 +24,9 @@ export const HELP = [
   'Usage: pnpm run open-pr [-- options]',
   '',
   'Opens the pull request for the current branch the way this repository',
-  'wants one opened: push, create it ready for review, add the',
-  `${SKIP_CI_LABEL} label, then arm auto-merge — in that order, because the`,
-  'label is the only thing holding the merge and arming before it is arming',
-  'with nothing holding it.',
+  'wants one opened: push, create it ready for review, and add the',
+  `${SKIP_CI_LABEL} label. It never arms auto-merge: unblock-prs does, when it`,
+  'picks the pull request once it is labelled merge-queued.',
   '',
   'Re-running is safe: each step is skipped when it is already done, so a run',
   'that failed part way through is finished by running it again.',
@@ -35,7 +37,8 @@ export const HELP = [
   'Options:',
   '  --title <text>          pull request title (default: the last commit subject)',
   '  --body-file <path>      file to take the body from (default: the trailer alone)',
-  '  --base <branch>         what to target (default: the repository default branch)',
+  '  --base <branch>         what to target (default: the repository default branch);',
+  '                          the branch of an open pull request stacks it on that one',
   '  --merge-after <number>  declare a predecessor; repeat for several',
   '  --dry-run               say what would be done, and touch nothing',
   '  -h, --help              show this help',

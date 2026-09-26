@@ -45,6 +45,15 @@
   マージすることになる理由でもある。どのパスを挙げ、どのパスをあえて挙げて
   いないかは `.github/CODEOWNERS` 自身に書いてある。
 
+- **stacked pull request の中間層（ base が `main` でない PR ）には ruleset を
+  掛けない。** 掛けられるのは required status checks か pull request ルール
+  だが、どちらもそのブランチへの push そのものに効くので、amend や積み直しの
+  たびに force-push される層のブランチが push できなくなる。中間層を守って
+  いるのは「誰も auto-merge を張らない」ことで、`open-pr` はどの PR にも張らず、
+  `unblock-prs` は pick した PR にだけ張る。層が pick されるのは GitHub が
+  `main` に付け替えた後で、そこから先はこの ruleset が掛かる。理由の詳細は `.github/workflows/README.md` の
+  「The gate」。
+
 ## rulesets/restrict-deletion.json
 
 `archive/**` の削除を禁じる。 bypass_actors は空なので、admin も

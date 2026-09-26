@@ -7,6 +7,8 @@ import * as t from 'ts-fortress';
 /** The fields read from `gh pr list` / `gh pr view`. */
 export const PullRequestSchema = t.record({
   number: t.number(),
+  /** The node id, which the GraphQL mutation that arms auto-merge takes. */
+  id: t.string(),
   title: t.string(),
   /** Where a `Merge-After:` declaration is read from. */
   body: t.string(),
@@ -14,6 +16,11 @@ export const PullRequestSchema = t.record({
   headRefName: t.string(),
   headRefOid: t.string(),
   baseRefName: t.string(),
+  /**
+   * Whether the head branch lives in a fork. A fork's branch is never the
+   * parent of a stack, and never pushed to when one is restacked.
+   */
+  isCrossRepository: t.boolean(),
   isDraft: t.boolean(),
   mergeStateStatus: t.string(),
   autoMergeRequest: t.unknown(),
@@ -26,6 +33,7 @@ export const PullRequestListSchema = t.array(PullRequestSchema);
 
 export type SkipReason =
   | 'already-in-base'
+  | 'arm-failed'
   | 'checks-failed'
   | 'not-merging'
   | 'push-failed'
@@ -92,8 +100,13 @@ export type TriageContext = TriageBase &
   Readonly<{
     /** The numbers of the pull requests that are open right now. */
     openNumbers: ReadonlySet<number>;
-    /** What each pull request declared it must merge after. */
+    /**
+     * What each pull request must merge after: what it declared, and the one
+     * it is stacked on.
+     */
     dependencies: ReadonlyMap<number, readonly number[]>;
+    /** Which open pull request each stacked one is on: child → parent. */
+    stackParents: ReadonlyMap<number, number>;
     /** Every number that sits on a `Merge-After` cycle. */
     cyclic: ReadonlySet<number>;
     /**
@@ -120,9 +133,17 @@ export type Triage = Readonly<{
   /**
    * The queued pull requests this cycle may act on — behind the base, or
    * paused by `skip-ci`, or both — with nothing they declared `Merge-After`
-   * on still open. Lowest number first.
+   * on still open, and on the default branch rather than stacked. Lowest
+   * number first.
    */
   candidates: readonly PullRequest[];
+  /**
+   * The candidates and the pull requests in flight that have no auto-merge
+   * yet, which this script arms when it picks them. See `auto-merge.mts`.
+   */
+  toArm: ReadonlySet<number>;
+  /** Which open pull request each stacked one is on: child → parent. */
+  stackParents: ReadonlyMap<number, number>;
   /** Up to date with checks still running, or clean and about to merge. */
   inFlight: readonly PullRequest[];
   /** Up to date, but a required check has failed. */
@@ -132,6 +153,18 @@ export type Triage = Readonly<{
   /** The `Merge-After` cycles, each starting at its lowest number. */
   cycles: readonly (readonly number[])[];
 }>;
+
+/**
+ * What a pull request's timeline says about its base, its auto-merge and its
+ * being queued, in the order it happened. `stack.mts` reads the base changes
+ * and `auto-merge.mts` the rest.
+ */
+export type TimelineEvent = Readonly<
+  | { kind: 'auto-merge-disabled'; manually: boolean }
+  | { kind: 'auto-merge-enabled' }
+  | { kind: 'base-changed'; from: string; to: string }
+  | { kind: 'queued' }
+>;
 
 export type WatchOutcome =
   | 'auto-merge-disabled'
@@ -195,6 +228,20 @@ export type Advanced = Readonly<
 
 export type RebaseFailure = Readonly<{
   reason:
-    'already-in-base' | 'push-failed' | 'rebase-failed' | 'unlabel-failed';
+    | 'already-in-base'
+    | 'arm-failed'
+    | 'push-failed'
+    | 'rebase-failed'
+    | 'unlabel-failed';
   detail: string;
+}>;
+
+/**
+ * What `advance` is asked to do besides the rebase: arm auto-merge, and carry
+ * the layers stacked on it along.
+ */
+export type AdvancePlan = Readonly<{
+  arm: boolean;
+  /** Every open layer above it, each after the one it is on. */
+  descendants: readonly PullRequest[];
 }>;

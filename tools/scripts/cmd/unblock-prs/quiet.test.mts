@@ -10,12 +10,14 @@ const pullRequest = (
   fields: Partial<PullRequest> & Readonly<{ number: number }>,
 ): PullRequest =>
   ({
+    id: `PR_${fields.number}`,
     title: `pull request #${fields.number}`,
     body: '',
     state: 'OPEN',
     headRefName: `feature/${fields.number}`,
     headRefOid: 'a'.repeat(40),
     baseRefName: 'main',
+    isCrossRepository: false,
     isDraft: false,
     mergeStateStatus: 'BLOCKED',
     autoMergeRequest: {},

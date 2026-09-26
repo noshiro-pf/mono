@@ -1,4 +1,4 @@
-import { SKIP_CI_LABEL } from 'pr-report-core';
+import { SKIP_CI_LABEL, stackDescendants } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
@@ -14,7 +14,7 @@ import {
   observeSurvey,
   surveyFingerprint,
 } from './quiet.mjs';
-import { advance } from './rebase.mjs';
+import { advance, armOnPick } from './rebase.mjs';
 import {
   firstInReleaseOrder,
   pauseAllBut,
@@ -36,9 +36,9 @@ import { installStopHandlers, log, pause, stopRequested } from './util.mjs';
 import { watch } from './watch.mjs';
 
 /**
- * Keeps the pull requests that already have auto-merge enabled moving, one at
- * a time, by rebasing the one that is out-of-date with the default branch and
- * waiting for GitHub to merge it.
+ * Keeps the pull requests labelled `merge-queued` moving, one at a time, by
+ * rebasing the one that is out-of-date with the default branch, arming its
+ * auto-merge, and waiting for GitHub to merge it.
  *
  * This is the mechanical half of the `/unblock-prs` skill. The skill also
  * reads failing checks and fixes what they complain about; this script does
@@ -47,14 +47,16 @@ import { watch } from './watch.mjs';
  *
  * One cycle:
  *
- * 1. List the open pull requests labelled `merge-queued` with auto-merge
- *    enabled (`autoMergeRequest` is not null) whose base is the default
- *    branch. Everything else is not this script's business: an unlabelled
- *    pull request is passed over in silence, and a labelled one that cannot
- *    be acted on — a draft, no auto-merge, a base that is not the default
- *    branch — is reported, because the label asked for something and the
- *    answer is no. Drafts and anything a previous cycle gave up on are set
- *    aside.
+ * 1. List the open pull requests labelled `merge-queued` whose base is the
+ *    default branch. Everything else is not this script's business: an
+ *    unlabelled pull request is passed over in silence, and a labelled one
+ *    that cannot be acted on — a draft, auto-merge switched off by hand after
+ *    it was queued, a base that is neither the default
+ *    branch nor another open pull request's — is reported, because the label
+ *    asked for something and the answer is no. A stacked one waits for the
+ *    layer below it (`stack.mts`). Auto-merge is this script's to arm, when
+ *    it picks a pull request (`auto-merge.mts`). Drafts and anything a
+ *    previous cycle gave up on are set aside.
  * 2. If one of them is already up to date and its checks are running, or it
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
@@ -62,9 +64,10 @@ import { watch } from './watch.mjs';
  * 3. Otherwise take the lowest-numbered pull request that is `BEHIND` —
  *    or, once those are exhausted, one GitHub calls `DIRTY` — rebase it onto
  *    `origin/<default branch>` in a throwaway worktree, and push with
- *    `--force-with-lease` against the head the survey saw. A rebase that
- *    conflicts, or a push that is refused, drops that pull request for as
- *    long as its head and the base stay where they are, and the next
+ *    `--force-with-lease` against the head the survey saw, carrying the
+ *    layers stacked on it along. A rebase that conflicts, or a push that is
+ *    refused, drops that pull request for as long as its head and the base
+ *    stay where they are, and the next
  *    candidate is tried in the same cycle. A branch that moved under the
  *    rebase is not one of those: someone else — the skill, or a person — is
  *    moving it, so nothing is recorded and the cycle surveys again rather
@@ -100,8 +103,12 @@ import { watch } from './watch.mjs';
  *
  * ## The order, and `skip-ci`
  *
- * Three things the pull requests themselves declare shape that loop.
+ * Four things the pull requests themselves declare shape that loop.
  *
+ * - **A base that is another open pull request's branch** stacks the pull
+ *   request on that one: it is not picked while that one is open, exactly as
+ *   if it had declared `Merge-After:` on it. `stack.mts` says what happens
+ *   when the layer below moves, and when it merges.
  * - **`Merge-After: #1234` in the body** adds an ordering constraint: the
  *   pull request is not *picked* while any pull request it names is still
  *   open. It constrains picking and nothing else — one that is already up to
@@ -152,6 +159,8 @@ import { watch } from './watch.mjs';
  * - `triage.mts` — what one survey says about each pull request, and why.
  * - `merge-after.mts` — the declared order: the trailer parser and the cycle
  *   detection.
+ * - `stack.mts` — stacked pull requests: when they wait, when they are armed,
+ *   and what moves with them.
  * - `version-pr.mts` — the version pull request, and what holds it back.
  * - `rebase.mts` — moving a branch: the rebase in a throwaway worktree, and
  *   taking `skip-ci` off.
@@ -316,8 +325,10 @@ const runCycle = async (
   const watched = firstInReleaseOrder(triaged.inFlight, defaultBranch);
 
   if (watched !== undefined) {
+    const arm = triaged.toArm.has(watched.number);
+
     log(
-      `#${watched.number} is up to date (${watched.mergeStateStatus}); watching it rather than rebasing another.`,
+      `#${watched.number} is up to date (${watched.mergeStateStatus}); ${arm ? 'arming auto-merge and ' : ''}watching it rather than rebasing another.`,
     );
 
     if (options.dryRun) {
@@ -325,6 +336,37 @@ const runCycle = async (
     }
 
     await pauseAllBut(watched.number);
+
+    // Before the watch, which reads a pull request without auto-merge as one
+    // someone switched it off on.
+    if (arm) {
+      const armed = await armOnPick(watched, watched.headRefOid, defaultBranch);
+
+      if (Result.isErr(armed)) {
+        log(`#${watched.number}: ${armed.value.detail}`);
+
+        return {
+          state: state(
+            withSkip(mut_skipped, {
+              number: watched.number,
+              headSha: watched.headRefOid,
+              baseSha,
+              reason: armed.value.reason,
+              detail: armed.value.detail,
+            }),
+          ),
+          next: 'survey',
+        };
+      }
+
+      if (armed.value === 'moved') {
+        log(
+          `#${watched.number}: its branch moved before it was armed; surveying again.`,
+        );
+
+        return { state: state(mut_skipped), next: 'survey' };
+      }
+    }
 
     const ended = await watch(
       watched,
@@ -347,7 +389,7 @@ const runCycle = async (
       const first = triaged.candidates[0];
 
       log(
-        `Would ${describeAction(first, defaultBranch)} for #${first.number}.`,
+        `Would ${describeAction(first, defaultBranch, triaged)} for #${first.number}.`,
       );
     }
 
@@ -360,14 +402,20 @@ const runCycle = async (
     }
 
     log(
-      `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch)}.`,
+      `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch, triaged)}.`,
     );
 
     // Before the push or the label removal that starts its matrix, so that
     // at no point are two queued pull requests released.
     await pauseAllBut(target.number);
 
-    const advanced = await advance(target, defaultBranch);
+    const advanced = await advance(target, defaultBranch, {
+      arm: triaged.toArm.has(target.number),
+      descendants: stackDescendants(
+        triaged.stackParents,
+        target.number,
+      ).flatMap((number) => pullRequests.filter((pr) => pr.number === number)),
+    });
 
     if (Result.isErr(advanced)) {
       log(`#${target.number}: ${advanced.value.detail}`);

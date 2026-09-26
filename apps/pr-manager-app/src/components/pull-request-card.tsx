@@ -61,6 +61,15 @@ export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
         <span className={'branch-base'}>{entry.baseRef}</span>
       </span>
 
+      {entry.stackedOn === undefined ? undefined : (
+        <span
+          className={'stacked-on'}
+          title={`Its base is the branch of #${entry.stackedOn}, so its diff is its own layer. GitHub moves it onto the base of #${entry.stackedOn} once that one merges.`}
+        >
+          {`stacked on #${entry.stackedOn}`}
+        </span>
+      )}
+
       <CommitDivergence
         baseRef={entry.baseRef}
         comparison={entry.comparison}

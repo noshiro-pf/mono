@@ -24,6 +24,7 @@ const facts = (
     headRef: `branch-${overrides.number}`,
     headSha: '0'.repeat(40),
     baseRef: 'main',
+    fromFork: false,
     url: `https://github.com/noshiro-pf/mono/pull/${overrides.number}`,
     updatedAt: '2026-09-18T00:00:00Z',
     comparison: { aheadBy: 1, behindBy: 0 },
@@ -36,6 +37,7 @@ const facts = (
 const report = (pulls: readonly PullRequestFacts[]): PrReport =>
   buildReport({
     repo: { owner: 'noshiro-pf', name: 'mono' },
+    defaultBranch: 'main',
     generatedAt: '2026-09-18T09:00:00Z',
     required: ['code-check-result / result', 'no-skip-ci-label'],
     merged: [],
@@ -71,6 +73,23 @@ describe('renderMarkdown', () => {
     assert.isTrue(lines[child]?.startsWith('  - ') === true);
 
     assert.isTrue(lines[parent]?.startsWith('- ') === true);
+  });
+
+  test('nests a stacked pull request under the one it is on, and says so', () => {
+    const rendered = renderMarkdown(
+      report([
+        facts({ number: 1901 }),
+        facts({ number: 1903, baseRef: 'branch-1901' }),
+      ]),
+    );
+
+    const lines = rendered.split('\n');
+
+    const child = lines.findIndex((l) => l.includes('#1903'));
+
+    assert.isTrue(lines[child]?.startsWith('  - ') === true);
+
+    assert.include(lines[child] ?? '', 'stacked on #1901');
   });
 
   test('links the pull request and every issue it closes', () => {
@@ -139,10 +158,9 @@ describe('renderMarkdown', () => {
     assert.isFalse(rendered.includes('no auto-merge'));
   });
 
-  // The combination `unblock-prs` passes over with "auto-merge is not
-  // enabled": queued, so the author asked for it to land, and nothing that
-  // would land it.
-  test('names a queued pull request that has no auto-merge', () => {
+  // The ordinary state of a queued pull request: `unblock-prs` arms it when
+  // it picks it, so its absence until then is not news.
+  test('says nothing about a queued pull request not yet armed', () => {
     const rendered = renderMarkdown(
       report([
         facts({
@@ -153,7 +171,7 @@ describe('renderMarkdown', () => {
       ]),
     );
 
-    assert.isTrue(rendered.includes('no auto-merge'));
+    assert.isFalse(rendered.includes('auto-merge'));
   });
 
   test('says nothing about auto-merge on a pull request that is not queued', () => {

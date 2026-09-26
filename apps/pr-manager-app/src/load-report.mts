@@ -4,7 +4,8 @@
  * There is no report file any more: every read asks GitHub about the open
  * pull requests as they are now, so pressing **Refresh** shows what GitHub
  * shows. What is decided about them — the verdict over the required
- * contexts, the merge order the `Merge-After:` trailers declare, the counts —
+ * contexts, the merge order the `Merge-After:` trailers and the stacks
+ * declare, the counts —
  * is `pr-report-core`, the same code `pnpm run pr-report` decides it with.
  * What is added here is what only this page reports: whether a pull request
  * conflicts with its base, and whether it waits for a code owner.
@@ -159,7 +160,8 @@ export const loadReport = async (
     return { rateLimit: first.rateLimit, result: read };
   }
 
-  const { requirements, codeOwners, openPulls, merged } = read.value;
+  const { defaultBranch, requirements, codeOwners, openPulls, merged } =
+    read.value;
 
   const followedUp = await followUpRounds({
     pulls: openPulls.map((pr) =>
@@ -203,6 +205,7 @@ export const loadReport = async (
     result: Result.ok(
       assemble({
         repo,
+        defaultBranch,
         nowMs,
         required: requirements.requiredContexts,
         requireCodeOwnerReview: requirements.requireCodeOwnerReview,
@@ -289,6 +292,7 @@ const readReportData = (
   data: unknown,
 ): Result<
   Readonly<{
+    defaultBranch: string;
     requirements: RulesetRequirements;
     codeOwners: readonly CodeOwnersRule[];
     openPulls: readonly OpenPullRequest[];
@@ -304,7 +308,8 @@ const readReportData = (
     );
   }
 
-  const { ruleset, codeOwners, merged } = validated.value.repository;
+  const { defaultBranchRef, ruleset, codeOwners, merged } =
+    validated.value.repository;
 
   const openPulls = validated.value.repository.open;
 
@@ -330,6 +335,9 @@ const readReportData = (
   }
 
   return Result.ok({
+    // A repository with no default branch has no commits, and so no pull
+    // requests to read a stack out of; the name is never compared.
+    defaultBranch: defaultBranchRef?.name ?? '',
     requirements: requirements.value,
     codeOwners: codeOwners === null ? [] : parseCodeOwners(codeOwners.text),
     openPulls: openPulls.nodes,
@@ -507,6 +515,7 @@ const applyOne = (
 /** Everything read, arranged into what the page shows. */
 const assemble = ({
   repo,
+  defaultBranch,
   nowMs,
   required,
   requireCodeOwnerReview,
@@ -515,6 +524,7 @@ const assemble = ({
   merged,
 }: Readonly<{
   repo: RepoRef;
+  defaultBranch: string;
   nowMs: number;
   required: readonly string[];
   requireCodeOwnerReview: boolean;
@@ -524,6 +534,7 @@ const assemble = ({
 }>): LoadedReport => {
   const report = buildEntries({
     required,
+    defaultBranch,
     pulls: pulls.map((pull) => factsOf(repo, pull)),
   });
 
@@ -618,6 +629,7 @@ const factsOf = (repo: RepoRef, pull: PullState): PullRequestFacts => {
     headRef: pr.headRefName,
     headSha: pr.headRefOid,
     baseRef: pr.baseRefName,
+    fromFork: pr.isCrossRepository,
     url: pr.url,
     updatedAt: pr.updatedAt,
     comparison: pull.comparison === 'pending' ? undefined : pull.comparison,

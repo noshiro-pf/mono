@@ -54,7 +54,13 @@ const PullRequestSchema = t.record({
   // Only its presence is read: what the report answers is whether anything
   // will land the pull request once the checks go green.
   auto_merge: t.union([t.record({}), t.nullType]),
-  head: t.record({ ref: t.string(), sha: t.string() }),
+  // `repo` is `null` for a head whose fork has been deleted. Read so that a
+  // fork's branch is not taken for the parent of a stacked pull request.
+  head: t.record({
+    ref: t.string(),
+    sha: t.string(),
+    repo: t.union([t.record({ full_name: t.string() }), t.nullType]),
+  }),
   base: t.record({ ref: t.string() }),
 });
 
@@ -118,6 +124,8 @@ const ClosingIssuesSchema = t.record({
 export type Client = Readonly<{
   /** Whether a token was found, which decides how much can be read. */
   authenticated: boolean;
+  /** What pull requests target unless they are stacked. */
+  defaultBranch: (repo: RepoRef) => Promise<Result<string, string>>;
   facts: (
     repo: RepoRef,
   ) => Promise<Result<readonly PullRequestFacts[], string>>;
@@ -352,6 +360,17 @@ export const createClient = (
   return {
     authenticated: token !== undefined,
 
+    defaultBranch: async (repo) => {
+      const answered = await getJson(
+        `/repos/${repo.owner}/${repo.name}`,
+        t.record({ default_branch: t.string() }),
+      );
+
+      return Result.isErr(answered)
+        ? answered
+        : Result.ok(answered.value.default_branch);
+    },
+
     merged: async (repo, withinDays, limit) => {
       // Sorted by `updated`, not by when they merged: GitHub does not sort
       // closed pull requests by merge time, and `updated` is the closest
@@ -447,6 +466,7 @@ export const createClient = (
           headRef: pr.head.ref,
           headSha: pr.head.sha,
           baseRef: pr.base.ref,
+          fromFork: pr.head.repo?.full_name !== `${repo.owner}/${repo.name}`,
           url: pr.html_url,
           updatedAt: pr.updated_at,
           comparison: await comparison(repo, pr.base.ref, pr.head.sha),

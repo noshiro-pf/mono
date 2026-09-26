@@ -6,9 +6,10 @@ import { log } from '../unblock-prs/util.mjs';
 import { type ApiContext } from './api.mjs';
 import {
   addLabel,
-  armAutoMerge,
+  containsBase,
   createPullRequest,
   findOpenPullRequest,
+  findStackParent,
   lastCommitSubject,
   markReady,
   preflight,
@@ -16,24 +17,25 @@ import {
   viewPullRequest,
 } from './github.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
-import { armBlockedBy, isArmed, mergeAfterTrailer } from './steps.mjs';
+import { mergeAfterTrailer, withStackParent } from './steps.mjs';
 
 /**
  * Opens the pull request for the current branch the way this repository wants
- * one opened: push, create it ready for review, add `skip-ci`, then arm
- * auto-merge.
+ * one opened: push, create it ready for review, and add `skip-ci`.
  *
- * **The order is the point, and it is why this is a script.** `skip-ci` is
- * the only thing holding the merge — the `main` ruleset asks for no
- * approvals, so outside the paths `.github/CODEOWNERS` lists a green branch
- * has nothing else to clear. Arming before the label is arming with nothing
- * holding it, and the window is only as short as whatever runs next. Written
- * down in prose the order is a thing to remember; here it is a thing that
- * happens, and `armBlockedBy` re-reads the pull request and refuses rather
- * than trusting that the label call earlier in this same run did what it said.
+ * **It never arms auto-merge.** `unblock-prs` does, when it picks the pull
+ * request — once the author has queued it with `merge-queued`, and once it is
+ * onto the default branch. Armed any earlier, it would merge the moment its
+ * checks went green, reviewed or not; and a stacked one, onto a branch no
+ * ruleset covers, the moment nothing held it, into the layer below. So
+ * `skip-ci` holds the checks and nothing is armed until the queue says so.
  *
  * Every step is skipped when it is already done, so a run that failed part
  * way through is finished by running it again rather than unpicked.
+ *
+ * **A `--base` other than the default branch stacks it** on the open pull
+ * request that branch is from, which has to exist and which the branch has to
+ * contain, and declares that one with `Merge-After:` as well.
  */
 export const openPullRequest = async (
   options: Options,
@@ -48,8 +50,16 @@ export const openPullRequest = async (
 
   const base = options.base ?? defaultBranch;
 
+  const parent = base === defaultBranch ? undefined : await stackOn(api, base);
+
+  if (parent !== undefined && Result.isErr(parent)) {
+    return parent;
+  }
+
+  const mergeAfter = withStackParent(options.mergeAfter, parent?.value);
+
   if (options.dryRun) {
-    return dryRun(api, branch, base, options);
+    return dryRun(api, branch, base, options, parent?.value, mergeAfter);
   }
 
   const pushed = await pushBranch(branch);
@@ -68,7 +78,7 @@ export const openPullRequest = async (
 
   const prNumber =
     existing.value === undefined
-      ? await open(api, branch, base, options)
+      ? await open(api, branch, base, options, mergeAfter)
       : Result.ok(existing.value.number);
 
   if (Result.isErr(prNumber)) {
@@ -76,7 +86,7 @@ export const openPullRequest = async (
   }
 
   // Re-read rather than reuse what the listing said: between then and now
-  // this run has created it, and a draft cannot be armed.
+  // this run has created it.
   const created = await viewPullRequest(api, prNumber.value);
 
   if (Result.isErr(created)) {
@@ -101,46 +111,38 @@ export const openPullRequest = async (
 
   log(`#${prNumber.value}: ${SKIP_CI_LABEL} is on`);
 
-  return arm(api, prNumber.value);
+  return Result.ok(
+    [
+      `#${prNumber.value}: opened, ${SKIP_CI_LABEL} on, auto-merge left unarmed.`,
+      `Once it is reviewed, add merge-queued: unblock-prs arms auto-merge when it picks it${parent === undefined ? '' : `, which is once #${parent.value} has merged`}.`,
+    ].join('\n'),
+  );
 };
 
 /**
- * The step the order exists for. What it acts on is a fresh read: the label
- * call above reported success, which is not the same as the label being on
- * now, and this is the one decision where the difference lands on `main`.
+ * The pull request a new one onto `base` is stacked on, having checked that
+ * the branch is on its tip. Asked before anything is pushed, so that a base
+ * nothing will recognize as a stack is refused rather than opened.
  */
-const arm = async (
+const stackOn = async (
   api: ApiContext,
-  prNumber: number,
-): Promise<Result<string, string>> => {
-  const current = await viewPullRequest(api, prNumber);
+  base: string,
+): Promise<Result<number, string>> => {
+  const parent = await findStackParent(api, base);
 
-  if (Result.isErr(current)) {
-    return current;
+  if (Result.isErr(parent)) {
+    return parent;
   }
 
-  const blocked = armBlockedBy(current.value);
+  const contained = await containsBase(base);
 
-  if (blocked !== undefined) {
-    return Result.err(`#${prNumber}: not arming auto-merge because ${blocked}`);
+  if (Result.isErr(contained)) {
+    return contained;
   }
 
-  if (isArmed(current.value)) {
-    return Result.ok(`#${prNumber}: auto-merge was already armed.`);
-  }
+  log(`stacking on #${parent.value} (${base})`);
 
-  const armed = await armAutoMerge(api, current.value.nodeId);
-
-  if (Result.isErr(armed)) {
-    return Result.err(`cannot arm auto-merge: ${armed.value}`);
-  }
-
-  return Result.ok(
-    [
-      `#${prNumber}: opened, ${SKIP_CI_LABEL} on, auto-merge armed.`,
-      `Take ${SKIP_CI_LABEL} off only through unblock-prs, by adding merge-queued once it has been reviewed.`,
-    ].join('\n'),
-  );
+  return parent;
 };
 
 const open = async (
@@ -148,6 +150,7 @@ const open = async (
   branch: string,
   base: string,
   options: Options,
+  mergeAfter: readonly number[],
 ): Promise<Result<number, string>> => {
   const title = await resolveTitle(options);
 
@@ -155,7 +158,7 @@ const open = async (
     return title;
   }
 
-  const body = await resolveBody(options);
+  const body = await resolveBody(options, mergeAfter);
 
   if (Result.isErr(body)) {
     return body;
@@ -185,8 +188,9 @@ const resolveTitle = async (
 
 const resolveBody = async (
   options: Options,
+  mergeAfter: readonly number[],
 ): Promise<Result<string, string>> => {
-  const trailer = mergeAfterTrailer(options.mergeAfter);
+  const trailer = mergeAfterTrailer(mergeAfter);
 
   if (options.bodyFile === undefined) {
     return Result.ok(trailer === undefined ? '' : `${trailer}\n`);
@@ -216,6 +220,8 @@ const dryRun = async (
   branch: string,
   base: string,
   options: Options,
+  parent: number | undefined,
+  mergeAfter: readonly number[],
 ): Promise<Result<string, string>> => {
   const existing = await findOpenPullRequest(api, branch);
 
@@ -225,7 +231,7 @@ const dryRun = async (
 
   const title = await resolveTitle(options);
 
-  const trailer = mergeAfterTrailer(options.mergeAfter);
+  const trailer = mergeAfterTrailer(mergeAfter);
 
   const steps: readonly string[] = [
     `push ${branch} to origin`,
@@ -236,9 +242,9 @@ const dryRun = async (
       ? `#${existing.value.number}: mark it ready for review`
       : undefined,
     `add ${SKIP_CI_LABEL}`,
-    existing.value !== undefined && isArmed(existing.value)
-      ? 'auto-merge is armed already'
-      : `re-read it, and arm auto-merge only if ${SKIP_CI_LABEL} is on`,
+    parent === undefined
+      ? 'leave auto-merge unarmed: unblock-prs arms it when it picks it'
+      : `leave auto-merge unarmed: it is stacked on #${parent}, and unblock-prs arms it when it picks it, after #${parent} merges`,
     trailer === undefined ? undefined : `declare ${trailer}`,
   ].filter((step) => step !== undefined);
 

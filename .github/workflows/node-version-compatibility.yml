@@ -35,6 +35,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
     with:
       # The same ignore list code-check.yml gates on, which is why it lives in
       # the root package.json rather than in either workflow.

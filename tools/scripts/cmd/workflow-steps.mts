@@ -166,12 +166,18 @@ const runInstall = (env: Env): void => {
  * to `GITHUB_OUTPUT` itself), after fetching `fetch` when it is set.
  * `run-everything`: there is nothing to diff against.
  *
- * The diff is against `origin/main`, except on a push to main, where that is
- * a diff against HEAD itself: it comes back empty and reads as "nothing
- * relevant changed", so every caller would skip and report `skipped`, which
- * satisfies a required check. There it is against what main pointed at
- * before the push, and with no such commit — a manual run, or the first push
- * to the branch — everything runs rather than nothing.
+ * A pull request's diff is against its base: `origin/main`, or for one
+ * stacked on another pull request that one's branch, so that a layer is
+ * judged on its own changes and not on those of the layers below it, which
+ * their own pull requests judge. Once the layer below merges, GitHub moves
+ * this one onto main and the diff is against main again — the same changes.
+ *
+ * On a push to main the base would be HEAD itself: the diff comes back empty
+ * and reads as "nothing relevant changed", so every caller would skip and
+ * report `skipped`, which satisfies a required check. There it is against
+ * what main pointed at before the push, and with no such commit — a manual
+ * run, or the first push to the branch — everything runs rather than
+ * nothing.
  */
 export const planDiffCheck = (
   env: Env,
@@ -187,7 +193,17 @@ export const planDiffCheck = (
   const script = `z:check-should-run:${scope.value}-checks` as const;
 
   if (env['GITHUB_REF_NAME'] !== 'main') {
-    return { ok: true, value: { run: ['run', script] } };
+    const base = env['BASE_REF'] ?? '';
+
+    return base === '' || base === 'main'
+      ? { ok: true, value: { run: ['run', script] } }
+      : {
+          ok: true,
+          value: {
+            fetch: `+refs/heads/${base}:refs/remotes/origin/${base}`,
+            run: ['run', script, '--base-branch', `origin/${base}`],
+          },
+        };
   }
 
   const before = env['BEFORE'] ?? '';

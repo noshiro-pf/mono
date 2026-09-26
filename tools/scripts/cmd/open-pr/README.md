@@ -3,7 +3,7 @@
 # `open-pr`
 
 `pnpm run open-pr` — opens the pull request for the current branch the way
-this repository wants one opened, in the one order that is safe.
+this repository wants one opened: held by `skip-ci`, and never armed.
 
 - [日本語](#日本語)
 - [English](#english)
@@ -16,22 +16,21 @@ and "CI". This file describes what the script does with them.
 ### 何をするスクリプトか
 
 現在のブランチを push し、PR を **ready for review** で作り、**`skip-ci`** を
-付け、**最後に auto-merge を張ります**。この4手順だけです。マージもしませんし、
-`merge-queued` も付けません（それはレビュー後に人が行うことです）。
+付けます。この3手順だけです。マージもせず、`merge-queued` も付けず（それは
+レビュー後に人が行うことです）、**auto-merge も張りません**。
 
-### なぜスクリプトなのか — 順序が安全性そのものだから
+### auto-merge を張らない理由
 
-**`skip-ci` がマージを止めている唯一のものです。** `main` の ruleset は
-`required_approving_review_count: 0` なので、`.github/CODEOWNERS` が挙げるパス
-の外では、緑になった PR には他に何もクリアするものが残りません。
+`main` の ruleset は `required_approving_review_count: 0` なので、
+`.github/CODEOWNERS` が挙げるパスの外では、auto-merge の張られた PR は緑に
+なった瞬間にマージされます。レビューが済んでいるかどうかは関係ありません。
+stack する PR（下記）ならなおさらで、base は ruleset の掛からないブランチなので、
+張った瞬間に下の層のブランチへマージされかねません。
 
-したがって **ラベルより先に auto-merge を張ると、「止めるものが無い状態で武装
-している」瞬間が生まれます**。その窓が開いている長さは、次に何が走るか次第です。
-
-散文で書けば順序は「覚えておくこと」ですが、ここでは「起きること」になります。
-さらに `armBlockedBy` は **PR を読み直してから** 判断します。同じ実行の中で数行
-上のラベル追加が成功を報告していても、それは「今ラベルが付いている」ことと同じ
-ではないからです。この差が `main` に着地する唯一の判断がここです。
+そこで **auto-merge は `unblock-prs` が、`merge-queued` の付いた PR を pick した
+ときに張ります**。キューに入れること（ `merge-queued` ）が「マージしてよい」の
+合図で、それより前には誰も張りません。`skip-ci` はチェックを止め、
+`no-skip-ci-label` でマージも止めておくためのものです。
 
 ### 認証情報
 
@@ -43,8 +42,8 @@ runner には前2つが既にあり、`gh` で設定しただけのマシンで�
 `gh` を捨てたのは、このコマンドが一番効く場所 — クラウドのコンテナや runner —
 が `gh` の入っていない場所だからです。呼ぶ API は `gh` と同じものです。
 
-4つの書き込みのうち2つ（draft の解除と auto-merge の武装）は REST に無いので
-GraphQL の mutation を使います。
+既存の PR が draft だったときに ready にする操作だけは REST に無いので、GraphQL
+の mutation を使います。
 
 **プロキシ配下でも動きます。** Node の `fetch` は `HTTPS_PROXY` を自動では見な
 いため、スクリプト側で `NODE_USE_ENV_PROXY=1` を付けています。これが無いと
@@ -53,8 +52,7 @@ GraphQL の mutation を使います。
 ### 途中で失敗したら、もう一度実行してください
 
 各ステップは既に済んでいればスキップされます。PR が既にあれば作らず、ラベルが
-既にあれば付け直さず、auto-merge が既に張られていれば何もしません。巻き戻す必要
-はありません。
+既にあれば付け直しません。巻き戻す必要はありません。
 
 ### 実行
 
@@ -62,14 +60,15 @@ GraphQL の mutation を使います。
 pnpm run open-pr                                   # 既定
 pnpm run open-pr -- --dry-run                      # 何をするかだけ表示
 pnpm run open-pr -- --title 'fix: 説明' --body-file ./pr.md
-pnpm run open-pr -- --merge-after '#1901'          # チェーンを宣言
+pnpm run open-pr -- --merge-after '#1901'          # 順序を宣言
+pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 ```
 
 | オプション           |                既定 | 意味                                      |
 | :------------------- | ------------------: | :---------------------------------------- |
 | `--title <text>`     |  直前のコミット件名 | PR タイトル（英語、Conventional Commits） |
 | `--body-file <path>` | トレーラのみ / 空欄 | 本文を読むファイル                        |
-| `--base <branch>`    |  リポジトリの既定値 | 対象ブランチ                              |
+| `--base <branch>`    |  リポジトリの既定値 | 対象ブランチ（PR のブランチなら stack）   |
 | `--merge-after <n>`  |                なし | `Merge-After:` を宣言（複数回可）         |
 | `--dry-run`          |                 off | 何も触らずに手順だけ出す                  |
 
@@ -77,38 +76,56 @@ pnpm run open-pr -- --merge-after '#1901'          # チェーンを宣言
 チェックがそのブランチの唯一のチェックなので、どれを走らせたかを本文に書いて
 ください。`--merge-after` を付けると `Merge-After:` 行が本文の先頭に入ります。
 
+### stacked PR
+
+`--base` に別の open な PR のブランチを渡すと、その PR の上に積んだ PR になり
+ます。差分はこの層の分だけになり、`unblock-prs` と各レポートは下の層がマージ
+されるまで待つものとして扱います。下の層の番号は `Merge-After:` として本文の
+先頭にも自動で入ります（ `--merge-after` を併用すれば同じ行にまとめます）。
+ツールは base だけでも stack を読むので、これは順序を本文にも書いておくための
+ものです。
+
+- その base を head とする open な PR がこのリポジトリにちょうど1本あること、
+  そして現在のブランチが `origin/<base>` の先端を含んでいることを、push の前に
+  確かめます。どちらかが違えば何もせずに止まります。
+- auto-merge はほかの PR と同じく張りません。`unblock-prs` は下の層がマージされ
+  て GitHub がこの PR を既定ブランチに付け替えるまで pick しないので、張られる
+  のもそのときです。
+
 ### 拒否すること
 
 - 既定ブランチの上にいるとき（先にブランチを切ってください）
 - detached HEAD のとき
 - 認証情報がどこからも取れないとき
-- **読み直した PR に `skip-ci` が無いとき** — auto-merge を張らずに失敗します
-- **PR が draft のとき** — GitHub が draft に auto-merge を張れないため、
-  先に ready にします（既存 PR が draft だった場合）
+- `--base` が open な PR のブランチでない、または現在のブランチがその先端を
+  含まないとき
+
+既存の PR が draft だった場合は ready にします。`unblock-prs` は draft を pick
+しないからです。
 
 ### この後
 
-レビューが終わったら **`merge-queued` を付けるだけ**です。auto-merge は既に
-張られているので、`unblock-prs` が順番に rebase して `skip-ci` を外し、緑に
-なった時点で GitHub がマージします。**`skip-ci` を手で外さないでください** —
-それが未レビューのままマージさせる唯一の操作です。
+レビューが終わったら **`merge-queued` を付けるだけ**です。順番が来ると
+`unblock-prs` が rebase して auto-merge を張り、`skip-ci` を外し、緑になった
+時点で GitHub がマージします。**auto-merge を手で張らないでください** — それが
+未レビューのままマージさせる操作です。
 
 ## English
 
 `pnpm run open-pr` pushes the current branch, creates the pull request ready
-for review, adds `skip-ci`, and arms auto-merge — in that order. It merges
-nothing and never adds `merge-queued`, which is a person's statement that the
-pull request has been reviewed.
+for review, and adds `skip-ci`. It merges nothing, never adds `merge-queued`,
+which is a person's statement that the pull request has been reviewed, and
+**never arms auto-merge**.
 
-**The order is why this is a script rather than a paragraph.** `skip-ci` is
-the only thing holding the merge: the `main` ruleset asks for
+**Why it arms nothing.** The `main` ruleset asks for
 `required_approving_review_count: 0`, so outside the paths `.github/CODEOWNERS`
-lists a green pull request has nothing else to clear. Arming before the label
-is arming with nothing holding it, for however long whatever runs next takes.
-And the arming step acts on a **fresh read** rather than on what the label call
-a few lines earlier reported, because "the call succeeded" and "the label is on
-now" are not the same claim, and this is the one decision where the difference
-lands on `main`.
+lists an armed pull request merges the moment it goes green, reviewed or not.
+A stacked one (below) is worse off: its base is a branch no ruleset covers, so
+armed it could merge into the layer below at once. So **`unblock-prs` arms a
+pull request when it picks it**, which it does only once it is labelled
+`merge-queued` and onto the default branch: queueing is the signal that it may
+merge, and nothing is armed before it. `skip-ci` holds the checks, and with
+`no-skip-ci-label` the merge, until then.
 
 It calls the GitHub API directly; `gh` is not required. The token is looked
 for in **`GITHUB_TOKEN`, then `GH_TOKEN`, then `gh auth token`** — the first
@@ -116,8 +133,8 @@ two are already set in a container or on a runner, and the third picks up a
 machine set up with `gh` alone, so neither kind of machine has to export
 anything. `gh` was dropped because the places this command is most useful are
 the places `gh` is least likely to be installed; the API it calls is the same
-one `gh` calls. Two of its four writes — taking a pull request out of draft
-and arming auto-merge — have no REST equivalent and go through GraphQL.
+one `gh` calls. Taking an existing pull request out of draft has no REST
+equivalent and goes through GraphQL.
 
 It works behind a proxy: Node's `fetch` does not read `HTTPS_PROXY` on its
 own, so the script sets `NODE_USE_ENV_PROXY=1`. Without that it bypasses the
@@ -131,14 +148,15 @@ through is finished by running it again rather than unpicked.
 pnpm run open-pr                                   # the default
 pnpm run open-pr -- --dry-run                      # say what would be done
 pnpm run open-pr -- --title 'fix: a thing' --body-file ./pr.md
-pnpm run open-pr -- --merge-after '#1901'          # declare a chain
+pnpm run open-pr -- --merge-after '#1901'          # declare an order
+pnpm run open-pr -- --base feat/lower-layer        # stack it on that one
 ```
 
 | option               |                default | meaning                                   |
 | :------------------- | ---------------------: | :---------------------------------------- |
 | `--title <text>`     |    last commit subject | the title, in English                     |
 | `--body-file <path>` |  the trailer, or empty | where to read the body from               |
-| `--base <branch>`    | the repository default | what to target                            |
+| `--base <branch>`    | the repository default | what to target; a pull request's stacks   |
 | `--merge-after <n>`  |                   none | declare a predecessor; repeat for several |
 | `--dry-run`          |                    off | print the steps and touch nothing         |
 
@@ -147,12 +165,23 @@ locally are the only checks the branch gets, so say which ones. `--merge-after`
 puts the `Merge-After:` line at the top of the body, where `unblock-prs` reads
 it.
 
+A `--base` that is another open pull request's branch stacks this one on it:
+the diff is its own layer, and `unblock-prs` and the reports treat it as
+waiting for the layer below. That layer is also written into the
+`Merge-After:` line at the top of the body, first, alongside anything given
+with `--merge-after`: the tools read the stack from the base alone, and the
+trailer states the order in the body as every other declared order is. Before
+pushing, the script checks that exactly one open pull request here is from
+that branch and that the current branch contains the tip of `origin/<base>`,
+and stops otherwise. `unblock-prs` does not pick it, and so does not arm it,
+until the layer below has merged and GitHub has moved it onto the default
+branch.
+
 It refuses to run on the default branch, on a detached HEAD, and without a
-credential. It refuses to arm when the re-read says the pull request is
-not open, is a draft, or does not carry `skip-ci` — the last of those being the
-whole point.
+credential. An existing pull request that is a draft is marked ready, because
+`unblock-prs` does not pick a draft.
 
 Afterwards, queueing it is one action: add `merge-queued` once it has been
-reviewed. `unblock-prs` takes `skip-ci` off when its turn comes, and GitHub
-merges it. Taking `skip-ci` off by hand is the one action that merges
-unreviewed work.
+reviewed. When its turn comes `unblock-prs` rebases it, arms auto-merge, takes
+`skip-ci` off, and GitHub merges it once the checks are green. Arming it by
+hand is the action that merges unreviewed work.

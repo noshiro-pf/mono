@@ -57,6 +57,7 @@ const CONTEXT_NODES = [
 export const REPORT_QUERY = [
   'query PullRequestsManager($owner: String!, $name: String!) {',
   '  repository(owner: $owner, name: $name) {',
+  '    defaultBranchRef { name }',
   `    ruleset: object(expression: "HEAD:${MAIN_RULESET_PATH}") { ... on Blob { text } }`,
   `    codeOwners: object(expression: "HEAD:${CODE_OWNERS_PATH}") { ... on Blob { text } }`,
   `    open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC }) {`,
@@ -65,7 +66,7 @@ export const REPORT_QUERY = [
   '        number title body isDraft url updatedAt',
   '        author { login }',
   '        autoMergeRequest { enabledAt }',
-  '        headRefName headRefOid baseRefName',
+  '        headRefName headRefOid baseRefName isCrossRepository',
   '        baseRef { target { oid } }',
   `        ${LABELS}`,
   `        ${CLOSING_ISSUES}`,
@@ -262,6 +263,8 @@ const OpenPullRequestSchema = t.record({
   headRefName: t.string(),
   headRefOid: t.string(),
   baseRefName: t.string(),
+  /** A fork's head branch is never the parent of a stacked pull request. */
+  isCrossRepository: t.boolean(),
   /**
    * The base branch's tip now, which is what a set-aside status is judged
    * against. `null` when the base branch has been deleted.
@@ -304,6 +307,8 @@ const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);
 
 export const ReportDataSchema = t.record({
   repository: t.record({
+    /** `null` only for a repository with no commits, and so no pull requests. */
+    defaultBranchRef: t.union([t.record({ name: t.string() }), t.nullType]),
     ruleset: BlobSchema,
     codeOwners: BlobSchema,
     open: t.record({

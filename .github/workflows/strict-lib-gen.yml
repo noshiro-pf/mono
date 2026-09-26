@@ -99,6 +99,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
     with:
       diff-scope: strict-lib
       result-job: strict-lib-gen-result / result

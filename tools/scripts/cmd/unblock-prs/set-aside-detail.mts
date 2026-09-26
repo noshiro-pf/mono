@@ -56,8 +56,8 @@ export const describeTimeout = (
 export const describeConflict = (
   conflicted: readonly string[],
   output: string,
-  defaultBranch: string,
+  onto: string,
 ): string =>
   Arr.isNonEmpty(conflicted)
-    ? (`conflicts with ${defaultBranch} in ${conflicted.join(', ')}` as const)
-    : (`rebase onto ${defaultBranch} failed: ${output.replaceAll(/\s+/gu, ' ').trim()}` as const);
+    ? (`conflicts with ${onto} in ${conflicted.join(', ')}` as const)
+    : (`rebase onto ${onto} failed: ${output.replaceAll(/\s+/gu, ' ').trim()}` as const);

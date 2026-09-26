@@ -395,6 +395,11 @@ a:focus-visible {
   color: var(--ink-muted);
 }
 
+.stacked-on {
+  color: var(--ink-secondary);
+  font-size: 0.75rem;
+}
+
 /* --- ahead / behind ----------------------------------------------------- */
 
 .divergence {
