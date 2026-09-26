@@ -473,18 +473,21 @@ a:focus-visible {
 
 /* --- what landed -------------------------------------------------------- */
 
-.merged-list {
+.merged-list,
+.issue-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.merged-item {
+.merged-item,
+.issue-item {
   border-block-end: 1px solid var(--hairline);
   padding: 0.6rem 0;
 }
 
-.merged-item:last-child {
+.merged-item:last-child,
+.issue-item:last-child {
   border-block-end: 0;
 }
 
@@ -648,4 +651,28 @@ a:focus-visible {
   flex: none;
   height: 0.9em;
   width: 0.9em;
+}
+
+/*
+ * The age reads at the row's own weight and the label beside it quieter:
+ * "pushed" and "updated" say which instant, and the age is what a reader
+ * scans the column for.
+ */
+.timestamp {
+  color: var(--ink-muted);
+}
+
+.timestamp time {
+  color: var(--ink-secondary);
+}
+
+/*
+ * The counts beside the verdict, in the badge's own colour but quieter: the
+ * word is the verdict and these are its parts, and a reader scanning a
+ * column of badges should still be reading the words.
+ */
+.badge-counts {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  opacity: 0.75;
 }

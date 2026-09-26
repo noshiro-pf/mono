@@ -1,4 +1,9 @@
-import { presentVerdict } from './verdict.mjs';
+import { type ChecksSummary } from 'pr-report-core';
+import {
+  describeCheckBreakdown,
+  describeCheckCounts,
+  presentVerdict,
+} from './verdict.mjs';
 
 describe(presentVerdict, () => {
   test('never leaves the colour to carry the meaning on its own', () => {
@@ -29,5 +34,50 @@ describe(presentVerdict, () => {
     expect(presentVerdict('paused').status).toBe('neutral');
 
     expect(presentVerdict('failing').status).toBe('critical');
+  });
+});
+
+/** #2031 as the page came to see it: one failed, one not reported yet. */
+const checks: ChecksSummary = {
+  verdict: 'failing',
+  passed: ['style-check-result / result', 'no-skip-ci-label'],
+  failed: ['code-check-result / result'],
+  pending: [],
+  skipped: ['test-node-versions-result / result'],
+  missing: ['spell-check-result / result'],
+  required: 5,
+} as const;
+
+describe(describeCheckCounts, () => {
+  test('counts each state, worst first, leaving out the empty ones', () => {
+    // A context nothing has reported on yet is still coming, so it is
+    // counted with the pending ones.
+    expect(describeCheckCounts(checks)).toBe(
+      '1\u{2717} 1\u{2026} 1\u{2013} 2\u{2713}',
+    );
+
+    expect(
+      describeCheckCounts({
+        ...checks,
+        verdict: 'passed',
+        failed: [],
+        skipped: [],
+        missing: [],
+      }),
+    ).toBe('2\u{2713}');
+  });
+});
+
+describe(describeCheckBreakdown, () => {
+  test('names every required context under the state it is in', () => {
+    expect(describeCheckBreakdown(checks)).toBe(
+      [
+        'over the 5 contexts the ruleset requires:',
+        'failed — code-check-result / result',
+        'pending — spell-check-result / result',
+        'skipped — test-node-versions-result / result',
+        'passed — style-check-result / result, no-skip-ci-label',
+      ].join('\n'),
+    );
   });
 });

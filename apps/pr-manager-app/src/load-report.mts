@@ -7,11 +7,12 @@
  * contexts, the merge order the `Merge-After:` trailers and the stacks
  * declare, the counts —
  * is `pr-report-core`, the same code `pnpm run pr-report` decides it with.
- * What is added here is what only this page reports: whether a pull request
- * conflicts with its base, and whether it waits for a code owner.
+ * What is added here is what only this page reports: why `unblock-prs` set a
+ * pull request aside, and whether it waits for a code owner.
  */
 
 import {
+  anyRunInProgress,
   buildEntries,
   closingIssuesIn,
   MAIN_RULESET_PATH,
@@ -25,6 +26,7 @@ import {
   type Comparison,
   type Label,
   type MergedPullRequest,
+  type OpenIssue,
   type PrReport,
   type PullRequestFacts,
   type RepoRef,
@@ -56,12 +58,14 @@ import {
   FilesFieldSchema,
   followUpAlias,
   followUpQuery,
+  ISSUES_LIMIT,
   OPEN_LIMIT,
   REPORT_QUERY,
   ReportDataSchema,
   type ContextNode,
   type FollowUp,
   type MergedPullRequestNode,
+  type OpenIssueNode,
   type OpenPullRequest,
 } from './report-query.mjs';
 import { epochMsOf } from './timestamp.mjs';
@@ -106,6 +110,11 @@ export type LoadedReport = Readonly<{
   cycles: PrReport['cycles'];
   /** Merged within {@link MERGED_WITHIN_DAYS}, newest first. */
   merged: readonly Merged[];
+  /**
+   * The open issues, most recently updated first, at most `ISSUES_LIMIT`;
+   * `totalCount` is how many are open in all, so a cut list can say so.
+   */
+  issues: Readonly<{ items: readonly OpenIssue[]; totalCount: number }>;
 }>;
 
 /**
@@ -160,7 +169,7 @@ export const loadReport = async (
     return { rateLimit: first.rateLimit, result: read };
   }
 
-  const { defaultBranch, requirements, codeOwners, openPulls, merged } =
+  const { defaultBranch, requirements, codeOwners, openPulls, merged, issues } =
     read.value;
 
   const followedUp = await followUpRounds({
@@ -212,6 +221,7 @@ export const loadReport = async (
         codeOwners,
         pulls,
         merged,
+        issues,
       }),
     ),
   };
@@ -297,6 +307,7 @@ const readReportData = (
     codeOwners: readonly CodeOwnersRule[];
     openPulls: readonly OpenPullRequest[];
     merged: readonly MergedPullRequestNode[];
+    issues: Readonly<{ nodes: readonly OpenIssueNode[]; totalCount: number }>;
   }>,
   string
 > => {
@@ -308,7 +319,7 @@ const readReportData = (
     );
   }
 
-  const { defaultBranchRef, ruleset, codeOwners, merged } =
+  const { defaultBranchRef, ruleset, codeOwners, merged, issues } =
     validated.value.repository;
 
   const openPulls = validated.value.repository.open;
@@ -342,6 +353,7 @@ const readReportData = (
     codeOwners: codeOwners === null ? [] : parseCodeOwners(codeOwners.text),
     openPulls: openPulls.nodes,
     merged: merged.nodes,
+    issues,
   });
 };
 
@@ -522,6 +534,7 @@ const assemble = ({
   codeOwners,
   pulls,
   merged,
+  issues,
 }: Readonly<{
   repo: RepoRef;
   defaultBranch: string;
@@ -531,6 +544,7 @@ const assemble = ({
   codeOwners: readonly CodeOwnersRule[];
   pulls: readonly PullState[];
   merged: readonly MergedPullRequestNode[];
+  issues: Readonly<{ nodes: readonly OpenIssueNode[]; totalCount: number }>;
 }>): LoadedReport => {
   const report = buildEntries({
     required,
@@ -588,6 +602,10 @@ const assemble = ({
       .filter(({ mergedAtEpochMs }) => mergedAtEpochMs >= cutoff)
       .toSorted((a, b) => b.mergedAtEpochMs - a.mergedAtEpochMs)
       .slice(0, MERGED_LIMIT),
+    issues: {
+      items: issues.nodes.slice(0, ISSUES_LIMIT).map(issueOf),
+      totalCount: issues.totalCount,
+    },
   };
 };
 
@@ -632,8 +650,10 @@ const factsOf = (repo: RepoRef, pull: PullState): PullRequestFacts => {
     fromFork: pr.isCrossRepository,
     url: pr.url,
     updatedAt: pr.updatedAt,
+    headCommittedAt: pr.commits.nodes[0]?.commit.committedDate,
     comparison: pull.comparison === 'pending' ? undefined : pull.comparison,
     reported: reportedContexts(runs, statuses),
+    checksRunning: anyRunInProgress(runs),
     linkedIssues: closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
   };
 };
@@ -694,6 +714,18 @@ const mergedOf = (
     mergedAtEpochMs,
     labels: labelsOf(pr.labels.nodes),
     linkedIssues: closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
+  }) as const;
+
+const issueOf = (issue: OpenIssueNode): OpenIssue =>
+  ({
+    number: issue.number,
+    title: issue.title,
+    author: issue.author?.login ?? GHOST,
+    url: issue.url,
+    labels: labelsOf(issue.labels.nodes),
+    createdAt: issue.createdAt,
+    updatedAt: issue.updatedAt,
+    comments: issue.comments.totalCount,
   }) as const;
 
 /** What GitHub calls an account that has been deleted. */

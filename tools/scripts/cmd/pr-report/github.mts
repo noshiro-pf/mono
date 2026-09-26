@@ -1,6 +1,7 @@
 /** Everything that talks to GitHub, and nothing that decides. */
 
 import {
+  anyRunInProgress,
   closingIssuesIn,
   reportedContexts,
   type CheckRunReport,
@@ -9,6 +10,7 @@ import {
   type Label,
   type LinkedIssue,
   type MergedPullRequest,
+  type OpenIssue,
   type PullRequestFacts,
   type RepoRef,
 } from 'pr-report-core';
@@ -69,6 +71,17 @@ const PullRequestListSchema = t.array(PullRequestSchema);
 const ComparisonSchema = t.record({
   ahead_by: t.number(),
   behind_by: t.number(),
+  /**
+   * The commits the head has that the base does not, oldest first, so the
+   * last is the head commit — read for its date, which comes free with the
+   * counts rather than as a request of its own. Truncated on a long branch,
+   * which is why its length is checked against `ahead_by` before use.
+   */
+  commits: t.array(
+    t.record({
+      commit: t.record({ committer: t.record({ date: t.string() }) }),
+    }),
+  ),
 });
 
 const CheckRunsSchema = t.record({
@@ -85,6 +98,30 @@ const CheckRunsSchema = t.record({
     }),
   ),
 });
+
+/**
+ * GitHub answers pull requests from the issues endpoint too, and the only
+ * thing telling one apart in the answer is the `pull_request` key.
+ */
+const IssueListSchema = t.array(
+  t.record({
+    number: t.number(),
+    title: t.string(),
+    html_url: t.string(),
+    created_at: t.string(),
+    updated_at: t.string(),
+    comments: t.number(),
+    user: t.union([t.record({ login: t.string() }), t.nullType]),
+    labels: t.array(
+      t.record({
+        name: t.string(),
+        color: t.string(),
+        description: t.union([t.string(), t.nullType]),
+      }),
+    ),
+    pull_request: t.optional(t.record({})),
+  }),
+);
 
 const CombinedStatusSchema = t.record({
   statuses: t.array(t.record({ context: t.string(), state: t.string() })),
@@ -138,6 +175,11 @@ export type Client = Readonly<{
     withinDays: number,
     limit: number,
   ) => Promise<Result<readonly MergedPullRequest[], string>>;
+  /** The open issues, most recently updated first, at most `limit`. */
+  issues: (
+    repo: RepoRef,
+    limit: number,
+  ) => Promise<Result<readonly OpenIssue[], string>>;
 }>;
 
 /**
@@ -218,7 +260,12 @@ export const createClient = (
     repo: RepoRef,
     base: string,
     headSha: string,
-  ): Promise<Comparison | undefined> => {
+  ): Promise<
+    Readonly<{
+      comparison: Comparison | undefined;
+      headCommittedAt: string | undefined;
+    }>
+  > => {
     const compared = await getJson(
       // A base with a slash in it has to be escaped, and only the slash:
       // GitHub reads `compare/{base}...{head}` as one path segment.
@@ -226,12 +273,22 @@ export const createClient = (
       ComparisonSchema,
     );
 
-    return Result.isErr(compared)
-      ? undefined
-      : {
-          aheadBy: compared.value.ahead_by,
-          behindBy: compared.value.behind_by,
-        };
+    if (Result.isErr(compared)) {
+      return { comparison: undefined, headCommittedAt: undefined };
+    }
+
+    const { ahead_by, behind_by, commits } = compared.value;
+
+    return {
+      comparison: { aheadBy: ahead_by, behindBy: behind_by },
+      // Only when the list is whole: on a branch too long for one answer
+      // the last commit listed is not the head. A branch level with its
+      // base has no commit of its own to date.
+      headCommittedAt:
+        commits.length === ahead_by
+          ? commits.at(-1)?.commit.committer.date
+          : undefined,
+    };
   };
 
   /**
@@ -291,7 +348,9 @@ export const createClient = (
   const contextStates = async (
     repo: RepoRef,
     sha: string,
-  ): Promise<ReadonlyMap<string, ContextState>> => {
+  ): Promise<
+    Readonly<{ reported: ReadonlyMap<string, ContextState>; running: boolean }>
+  > => {
     const prefix = `/repos/${repo.owner}/${repo.name}/commits/${sha}` as const;
 
     const runs = await checkRuns(prefix);
@@ -301,10 +360,15 @@ export const createClient = (
       CombinedStatusSchema,
     );
 
-    return reportedContexts(
-      Result.isErr(runs) ? [] : runs.value,
-      Result.isErr(statuses) ? [] : statuses.value.statuses,
-    );
+    const runList = Result.isErr(runs) ? ([] as const) : runs.value;
+
+    return {
+      reported: reportedContexts(
+        runList,
+        Result.isErr(statuses) ? [] : statuses.value.statuses,
+      ),
+      running: anyRunInProgress(runList),
+    };
   };
 
   /**
@@ -369,6 +433,37 @@ export const createClient = (
       return Result.isErr(answered)
         ? answered
         : Result.ok(answered.value.default_branch);
+    },
+
+    issues: async (repo, limit) => {
+      // A full page rather than `limit`: pull requests come back from this
+      // endpoint too and are filtered out after, so asking for exactly the
+      // cap would let a run of recently updated pull requests crowd the
+      // issues out.
+      const listed = await getJson(
+        `/repos/${repo.owner}/${repo.name}/issues?state=open&per_page=${PAGE_SIZE}&sort=updated&direction=desc`,
+        IssueListSchema,
+      );
+
+      if (Result.isErr(listed)) {
+        return listed;
+      }
+
+      return Result.ok(
+        listed.value
+          .filter((issue) => issue.pull_request === undefined)
+          .slice(0, limit)
+          .map((issue) => ({
+            number: issue.number,
+            title: issue.title,
+            author: issue.user?.login ?? 'unknown',
+            url: issue.html_url,
+            labels: labelsOf(issue.labels),
+            createdAt: issue.created_at,
+            updatedAt: issue.updated_at,
+            comments: issue.comments,
+          })),
+      );
     },
 
     merged: async (repo, withinDays, limit) => {
@@ -455,6 +550,10 @@ export const createClient = (
       for (const pr of listed.value) {
         const body = pr.body ?? '';
 
+        const compared = await comparison(repo, pr.base.ref, pr.head.sha);
+
+        const checks = await contextStates(repo, pr.head.sha);
+
         mut_facts.push({
           number: pr.number,
           title: pr.title,
@@ -469,8 +568,10 @@ export const createClient = (
           fromFork: pr.head.repo?.full_name !== `${repo.owner}/${repo.name}`,
           url: pr.html_url,
           updatedAt: pr.updated_at,
-          comparison: await comparison(repo, pr.base.ref, pr.head.sha),
-          reported: await contextStates(repo, pr.head.sha),
+          headCommittedAt: compared.headCommittedAt,
+          comparison: compared.comparison,
+          reported: checks.reported,
+          checksRunning: checks.running,
           linkedIssues:
             linked.get(pr.number) ??
             parseClosingIssueRefs(body, repo).map((number) => ({

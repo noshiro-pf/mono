@@ -15,6 +15,8 @@ export type Options = Readonly<{
   mergedDays: number;
   /** And how many of them it lists, whatever the window turns up. */
   mergedLimit: number;
+  /** How many open issues it lists, most recently updated first. */
+  issuesLimit: number;
 }>;
 
 /**
@@ -32,6 +34,12 @@ export const DEFAULT_MERGED_DAYS = 7;
  */
 export const DEFAULT_MERGED_LIMIT = 20;
 
+/**
+ * Enough to see what is open without the section becoming the report. The
+ * page asks for the same number.
+ */
+export const DEFAULT_ISSUES_LIMIT = 30;
+
 export const HELP = [
   'Usage: pnpm run pr-report [-- options]',
   '',
@@ -45,6 +53,7 @@ export const HELP = [
   '  --repo <owner/name>              which repository (default: this one)',
   `  --merged-days <n>                how far back "recently merged" goes (default ${DEFAULT_MERGED_DAYS})`,
   `  --merged-limit <n>               how many it lists at most (default ${DEFAULT_MERGED_LIMIT})`,
+  `  --issues-limit <n>               how many open issues it lists (default ${DEFAULT_ISSUES_LIMIT})`,
   '  -h, --help                       show this help',
   '',
   'Reads GITHUB_TOKEN or GH_TOKEN when one is set. Without it the public API',
@@ -69,6 +78,7 @@ export const parseOptions = (
         repo: { type: 'string' },
         'merged-days': { type: 'string' },
         'merged-limit': { type: 'string' },
+        'issues-limit': { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -112,11 +122,22 @@ export const parseOptions = (
     return mergedLimit;
   }
 
+  const issuesLimit = positive(
+    'issues-limit',
+    values['issues-limit'],
+    DEFAULT_ISSUES_LIMIT,
+  );
+
+  if (Result.isErr(issuesLimit)) {
+    return issuesLimit;
+  }
+
   return Result.ok({
     format,
     repo: values.repo,
     mergedDays: mergedDays.value,
     mergedLimit: mergedLimit.value,
+    issuesLimit: issuesLimit.value,
   });
 };
 

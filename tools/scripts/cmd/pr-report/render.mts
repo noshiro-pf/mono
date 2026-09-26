@@ -33,7 +33,14 @@ const GLYPH = {
  */
 export const renderMarkdown = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
-    return [heading(report), '', EMPTY, ''].join('\n');
+    return [
+      heading(report),
+      '',
+      EMPTY,
+      ...mergedSection(report, 'markdown'),
+      ...issuesSection(report, 'markdown'),
+      '',
+    ].join('\n');
   }
 
   const byNumber = index(report);
@@ -66,6 +73,7 @@ export const renderMarkdown = (report: PrReport): string => {
     ...report.roots.flatMap((root) => line(root, 0)),
     ...cyclesSection(report),
     ...mergedSection(report, 'markdown'),
+    ...issuesSection(report, 'markdown'),
     ...footnote(report),
     '',
   ].join('\n');
@@ -74,7 +82,14 @@ export const renderMarkdown = (report: PrReport): string => {
 /** The same report drawn with box characters, for a terminal. */
 export const renderTerminal = (report: PrReport): string => {
   if (!Arr.isNonEmpty(report.entries)) {
-    return [title(report), '', EMPTY, ''].join('\n');
+    return [
+      title(report),
+      '',
+      EMPTY,
+      ...mergedSection(report, 'terminal').map(withoutHeadingMark),
+      ...issuesSection(report, 'terminal').map(withoutHeadingMark),
+      '',
+    ].join('\n');
   }
 
   const byNumber = index(report);
@@ -115,12 +130,16 @@ export const renderTerminal = (report: PrReport): string => {
     summary(report).replaceAll('*', ''),
     '',
     ...report.roots.flatMap((root) => line(root, '', '')),
-    ...cyclesSection(report).map((l) => l.replace(/^#+ /u, '')),
-    ...mergedSection(report, 'terminal').map((l) => l.replace(/^#+ /u, '')),
+    ...cyclesSection(report).map(withoutHeadingMark),
+    ...mergedSection(report, 'terminal').map(withoutHeadingMark),
+    ...issuesSection(report, 'terminal').map(withoutHeadingMark),
     ...footnote(report).map((l) => l.replace(/^> /u, '')),
     '',
   ].join('\n');
 };
+
+/** A Markdown heading as the plain line a terminal shows. */
+const withoutHeadingMark = (line: string): string => line.replace(/^#+ /u, '');
 
 const index = (report: PrReport): ReadonlyMap<number, ReportEntry> =>
   new Map(report.entries.map((entry) => [entry.number, entry]));
@@ -285,6 +304,53 @@ const mergedSection = (
       ] as const;
 
       return `- ${ref} ${markdown ? `**${pr.title}**` : pr.title} · ${detail.join(' · ')}`;
+    }),
+  ] as const;
+};
+
+/**
+ * What is open that is not a pull request.
+ *
+ * Last, after what merged, because it is the one section that is not about
+ * the queue at all: a reader asks "what is in flight" first and "what is
+ * waiting to be started" second. A list as long as its cap says `+`, since
+ * it may not be all of them.
+ */
+const issuesSection = (
+  report: PrReport,
+  format: 'markdown' | 'terminal',
+): readonly string[] => {
+  if (!Arr.isNonEmpty(report.issues)) {
+    return [] as const;
+  }
+
+  const markdown = format === 'markdown';
+
+  const full = report.issues.length >= report.issuesLimit;
+
+  return [
+    '',
+    `## Open issues (${report.issues.length}${full ? '+' : ''})`,
+    '',
+    ...report.issues.map((issue) => {
+      const ref = markdown
+        ? (`[#${issue.number}](${issue.url})` as const)
+        : (`#${issue.number}` as const);
+
+      const detail = [
+        `updated ${issue.updatedAt}`,
+        `by ${issue.author}`,
+        ...(issue.comments > 0
+          ? ([
+              `${issue.comments} comment${issue.comments === 1 ? '' : 's'}`,
+            ] as const)
+          : ([] as const)),
+        ...issue.labels.map(({ name }) =>
+          markdown ? `\`${name}\`` : `[${name}]`,
+        ),
+      ] as const;
+
+      return `- ${ref} ${markdown ? `**${issue.title}**` : issue.title} · ${detail.join(' · ')}`;
     }),
   ] as const;
 };
