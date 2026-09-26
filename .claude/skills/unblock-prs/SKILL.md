@@ -62,7 +62,11 @@ not do, and made safe where they overlap:
   `rebase-failed` is step 2b; the other reasons are to report. The worker
   leaves that pull request alone until its head moves (or, for every reason
   but `checks-failed`, `main` does), so working on it collides with nothing,
-  and the push that carries the work is what hands it back.
+  and the push that carries the work is what hands it back. A
+  `checks-failed` it wrote on the pull request it was watching comes after it
+  tried the one fix it makes itself — running the `fix:` / `gen:` matrix
+  entries that failed and pushing what they wrote, when nothing else failed —
+  so what is left is a real failure, or a fixer that did not settle it.
 - **Every write is leased against a SHA this session read**:
   `expected_head_sha` on `update-branch`, `--force-with-lease=<branch>:<sha>`
   on a push. A lease that loses means someone else — the worker,
@@ -328,6 +332,9 @@ Two things about reproducing the rest:
   `fix:codemod:full`, `ws:fix:lint` and `ws:gen` fail by _changing_
   files, and the fix is to run the command locally and commit what it wrote. A
   green run of the command with a dirty tree afterwards is still a failure.
+  The worker does this itself for the pull request it is watching when every
+  failed job is such an entry (its README, "4a"); a pull request in that state
+  that it has not touched is one it was not watching.
 
 Reproduce locally before pushing — a speculative fix costs another full matrix,
 which is the cost this whole loop exists to avoid. Fix the cause: `CLAUDE.md`

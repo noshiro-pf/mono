@@ -3,6 +3,7 @@
 import {
   buildReport,
   type Label,
+  type OpenIssue,
   type PrReport,
   type PullRequestFacts,
 } from 'pr-report-core';
@@ -26,23 +27,42 @@ const facts = (
     baseRef: 'main',
     url: `https://github.com/noshiro-pf/mono/pull/${overrides.number}`,
     updatedAt: '2026-09-18T00:00:00Z',
+    headCommittedAt: '2026-09-17T00:00:00Z',
     comparison: { aheadBy: 1, behindBy: 0 },
     autoMerge: false,
     reported: new Map(),
+    checksRunning: false,
     linkedIssues: [],
     ...overrides,
   }) as const;
 
-const report = (pulls: readonly PullRequestFacts[]): PrReport =>
+const report = (
+  pulls: readonly PullRequestFacts[],
+  issues: readonly OpenIssue[] = [],
+): PrReport =>
   buildReport({
     repo: { owner: 'noshiro-pf', name: 'mono' },
     generatedAt: '2026-09-18T09:00:00Z',
     required: ['code-check-result / result', 'no-skip-ci-label'],
     merged: [],
     mergedWithinDays: 7,
+    issues,
+    issuesLimit: 3,
     authenticated: false,
     pulls,
   });
+
+const issue = (number: number): OpenIssue =>
+  ({
+    number,
+    title: `issue ${number}`,
+    author: 'noshiro-pf',
+    url: `https://github.com/noshiro-pf/mono/issues/${number}`,
+    labels: labelled('bug'),
+    createdAt: '2026-09-10T00:00:00Z',
+    updatedAt: '2026-09-17T00:00:00Z',
+    comments: 2,
+  }) as const;
 
 describe('renderMarkdown', () => {
   test('says so plainly when there is nothing open', () => {
@@ -177,6 +197,62 @@ describe('renderMarkdown', () => {
     assert.isTrue(rendered.includes('#1'));
 
     assert.isTrue(rendered.includes('#2'));
+  });
+});
+
+describe('the open issues section', () => {
+  test('lists every open issue with a link, its labels and its comments', () => {
+    const rendered = renderMarkdown(
+      report([facts({ number: 1901 })], [issue(2036)]),
+    );
+
+    assert.isTrue(rendered.includes('## Open issues (1)'));
+
+    assert.isTrue(
+      rendered.includes(
+        '- [#2036](https://github.com/noshiro-pf/mono/issues/2036) **issue 2036**',
+      ),
+    );
+
+    assert.isTrue(rendered.includes('`bug`'));
+
+    assert.isTrue(rendered.includes('2 comments'));
+  });
+
+  test('says when the list is full, so that it may not be all of them', () => {
+    const rendered = renderMarkdown(
+      report([facts({ number: 1901 })], [issue(1), issue(2), issue(3)]),
+    );
+
+    assert.isTrue(rendered.includes('## Open issues (3+)'));
+  });
+
+  test('is left out when no issue is open', () => {
+    const rendered = renderMarkdown(report([facts({ number: 1901 })]));
+
+    assert.isFalse(rendered.includes('Open issues'));
+  });
+
+  test('is there even when no pull request is open', () => {
+    const rendered = renderMarkdown(report([], [issue(2036)]));
+
+    assert.isTrue(rendered.includes('No open pull requests.'));
+
+    assert.isTrue(rendered.includes('#2036'));
+  });
+
+  test('drops the Markdown in a terminal', () => {
+    const rendered = renderTerminal(
+      report([facts({ number: 1901 })], [issue(2036)]),
+    );
+
+    assert.isTrue(rendered.includes('Open issues (1)'));
+
+    assert.isFalse(rendered.includes('## Open issues'));
+
+    assert.isTrue(rendered.includes('#2036 issue 2036'));
+
+    assert.isTrue(rendered.includes('[bug]'));
   });
 });
 

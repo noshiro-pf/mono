@@ -12,8 +12,15 @@ that can be left open in a tab: the merge order the `Merge-After:` trailers
 declare drawn as the tree it is, the issues each pull request closes with
 their titles, its labels in GitHub's own colours, the branch it is of,
 whether it is open or a draft, whether auto-merge is armed, the verdict of
-the contexts the ruleset requires, and how far each branch is ahead of and
-behind its base.
+the contexts the ruleset requires, how far each branch is ahead of and
+behind its base, and when it was last pushed to and last updated.
+
+The verdict carries its parts — `1✗ 1… 1– 6✓`, failed, still coming,
+skipped, passed, with the names on hover — and stays "running" while
+anything at all is still going on the head commit. Both are there because a
+pull request once showed a tick two minutes before its CI failed: the round
+before had skipped its required aggregates, and the round replacing it had
+not created them yet.
 
 And the two things that stop a pull request that is otherwise ready, which
 nothing on GitHub's own list shows:
@@ -31,7 +38,8 @@ nothing on GitHub's own list shows:
   owner it can never be approved, and the badge says it needs a ruleset
   bypass instead.
 
-Below that, what merged in the last week.
+Below that, what merged in the last week, and the open issues, most recently
+updated first (thirty at most, said so when there are more).
 
 It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
@@ -61,10 +69,26 @@ pull request waiting on nothing but a cycle member is drawn as a root.
 
 Each card has a **⧉ split view** link beside the title, which opens the pull
 request in [`split-view-extension`](../split-view-extension/README.md): the
-diff on the left and the conversation on the right, at 7:3. When the pull
-request closes an issue, the issue joins them on the right and the three are
-2:1:1 — the first issue only, if it closes several. The tab is titled with
-the pull request's number and title, `#2071 feat(…): …`.
+diff on the left and the conversation on the right, at 7:3. The diff hides
+whitespace changes and the files already marked viewed
+(`?w=1&show-viewed-files=false`). When the pull request closes an issue, or
+names the Claude Code session it was written in, that joins the conversation
+on the right half, at 1:1; with both, the session is on the left of the right
+half, beside the conversation stacked over the issue. The first issue and the
+first session only, if it names several. The conversation and the issue are
+shown at 75%. The tab is titled with the pull request's number and title,
+`#2071 feat(…): …`.
+
+A session is named by a `Claude-Session:` line in the pull request's
+description, which `CLAUDE.md` asks a session to write, and the card lists
+it under the issues by its title:
+
+```md
+Claude-Session: [Open a pull request in a split view](https://claude.ai/code/session_…)
+```
+
+Only a `https://claude.ai/code/session_…` URL is taken, and not from inside a
+fenced code block.
 
 Every link names one saved split view, `PR Manager`, so the extension's list
 gains one entry rather than one per pull request; a tab already open on an

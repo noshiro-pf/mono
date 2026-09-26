@@ -1,8 +1,10 @@
 export * from './auto-merge-badge.js';
 export * from './badge-icon.js';
+export * from './claude-sessions.js';
 export * from './commit-divergence.js';
 export * from './cycles-section.js';
 export * from './external-link.js';
+export * from './issues-section.js';
 export * from './label-chip.js';
 export * from './linked-issues.js';
 export * from './load-state-view.js';
@@ -17,5 +19,6 @@ export * from './split-view-link.js';
 export * from './stat-tile.js';
 export * from './state-badge.js';
 export * from './summary-row.js';
+export * from './timestamp.js';
 export * from './token-panel.js';
 export * from './verdict-badge.js';

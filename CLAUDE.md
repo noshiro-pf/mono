@@ -311,6 +311,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
   Run the local checks first and say in the description which ones — while the
   label is on they are the only checks the branch gets. Details in
   `tools/scripts/cmd/open-pr/README.md`.
+- **A Claude Code session names itself in the description**, on a line of its
+  own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
+  title as it reads when the pull request is opened, or the URL alone when the
+  session cannot see its title. Nothing checks it; the Pull Requests Manager
+  reads it to link and open the session.
 - **In a Claude Code session it gets as far as `skip-ci` and stops there.** The
   proxy refuses GitHub's GraphQL outright, and arming auto-merge is GraphQL
   only — `gh pr merge --auto` is refused the same way, so this is the
