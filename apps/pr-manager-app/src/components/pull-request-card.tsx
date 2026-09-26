@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Arr } from 'ts-data-forge';
 import { type Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
+import { ClaudeSessions } from './claude-sessions.js';
 import { CommitDivergence } from './commit-divergence.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
@@ -26,8 +27,9 @@ type Props = Readonly<{
  *
  * Five rows, in the order a reader asks the questions. What state is it in —
  * the badges. What is it — the number, the title, a link that opens it in a
- * split view, and the issues it closes. Which branch, and how far from its
- * base. When did it last move. What has been said about it — the labels, and
+ * split view, the issues it closes and the Claude Code sessions it was
+ * written in. Which branch, and how far from its base. When did it last
+ * move. What has been said about it — the labels, and
  * the names of any checks that are red.
  */
 export const PullRequestCard = React.memo<Props>(
@@ -52,6 +54,12 @@ export const PullRequestCard = React.memo<Props>(
       {Arr.isNonEmpty(entry.linkedIssues) ? (
         <div className={'pull-request-row'}>
           <LinkedIssues issues={entry.linkedIssues} />
+        </div>
+      ) : undefined}
+
+      {Arr.isNonEmpty(entry.claudeSessions) ? (
+        <div className={'pull-request-row'}>
+          <ClaudeSessions sessions={entry.claudeSessions} />
         </div>
       ) : undefined}
 

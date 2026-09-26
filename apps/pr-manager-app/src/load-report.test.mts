@@ -137,6 +137,29 @@ describe(loadReport, () => {
     ]);
   });
 
+  test('reads the Claude Code sessions out of the body', async () => {
+    const url = 'https://claude.ai/code/session_015ESrbamCgMWqeNyk6SCZcL';
+
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 7,
+          body: `Adds a thing.\n\nClaude-Session: [Add a thing](${url})\n`,
+        }),
+        pullRequest({ number: 8 }),
+      ]),
+      followUpAnswer({ compare_7: null, compare_8: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.entries[0]?.claudeSessions, [
+      { title: 'Add a thing', url },
+    ]);
+
+    assert.deepStrictEqual(loaded.entries[1]?.claudeSessions, []);
+  });
+
   test('reads a check run and a commit status as the shared verdict does', async () => {
     const { fetchImpl } = answering(
       report([
@@ -570,17 +593,19 @@ const pullRequest = ({
   contextsAfter,
   files = ['libs/x/src/a.mts'],
   committedDate = '2026-09-22T00:00:00Z',
+  body = '',
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
   contextsAfter?: string;
   files?: readonly string[];
   committedDate?: string;
+  body?: string;
 }>): unknown =>
   ({
     number,
     title: `Pull request ${number}`,
-    body: '',
+    body,
     isDraft: false,
     url: `https://github.com/noshiro-pf/mono/pull/${number}`,
     updatedAt: '2026-09-23T00:00:00Z',
