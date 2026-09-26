@@ -2,6 +2,7 @@ import { type Rule } from './engine/index.mjs';
 import {
   noMutationWithoutMutPrefix,
   noNullPropagation,
+  noOverloadedFunctionExpression,
   noTupleMutatingMethod,
   strictLogicalAssignmentOperands,
 } from './rules/index.mjs';
@@ -13,6 +14,7 @@ import {
 export const allRules: readonly Rule[] = [
   noMutationWithoutMutPrefix,
   noNullPropagation,
+  noOverloadedFunctionExpression,
   noTupleMutatingMethod,
   strictLogicalAssignmentOperands,
 ] as const;

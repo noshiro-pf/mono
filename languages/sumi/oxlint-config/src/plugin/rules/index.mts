@@ -1,6 +1,7 @@
 export * from './create-rule.mjs';
 export * from './generic-arrow-trailing-comma.mjs';
 export * from './global-type-names.mjs';
+export * from './no-call-signature-member.mjs';
 export * from './no-class.mjs';
 export * from './no-constructor-call.mjs';
 export * from './no-decorator.mjs';

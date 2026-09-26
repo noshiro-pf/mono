@@ -44,6 +44,13 @@ TS API 上の薄い単一パスツール。parser も型検査器も書かない
 
 - **React Compiler を意識した設計（2026-09-02、ユーザー要望 — issue #1753 のコメント、未整理）。** React Compiler は「コンポーネントとフックが冪等で、レンダー中に値を変更しない」ことを前提にメモ化を自動挿入する。Sumi の既存の規律 — `const` 既定と `mut_` prefix(D-14)、`functional/immutable-data` 相当、readonly 強制(D-45)、副作用 import の禁止 — はその前提とほぼ同じものを別の言葉で言っており、**Sumi lint を通ったコードは React Compiler が最適化できるコードである**という関係を明示できるはずである。整理すべき点: (1) React Compiler の bail-out 条件（レンダー中の変更、条件付きフック呼び出し、ref の読み書き）と Sumi の規則の対応表を作り、Sumi 側で捕まえられていない条件があれば規則を足すか記録する。(2) `mut_` 束縛をどこまで許すか — レンダー中のローカルな可変アキュムレータは React Compiler も許すので、規則の緩さの線が一致しているかを確認する。(3) React Compiler が要求する `"use memo"` / `"use no memo"` ディレクティブと、D-36 の default export emit 設定や `sumi.config` の関係。(4) synstate（このリポジトリの状態管理ライブラリ）と React Compiler の相互作用は別問題として切り分ける。
 
+### Sumi sugar / refined の利用者向けドキュメント（2026-09-13 追記 — D-59）
+
+規則そのものではなく**規則に従うための書き方**を、利用者向けドキュメントとして書く必要がある。最初の項目は**アセットの扱い**:
+
+- **CSS・画像等は `index.html` の `<link>` かバンドラ設定側に出す。** 副作用 import は例外なく禁止(D-59)で、`import './index.css'` はモジュールの実行ではなくバンドラへの指示なので「関数として import して呼ぶ」という代替が存在しない。加えて Sumi のモジュール解決は `.css` を解決しない。つまり Sumi 下のアプリでは**アセットがモジュールグラフに載らない**という前提そのものを説明する必要がある([spec/modules.md](./spec/modules.md) の「副作用 import の代替」)。
+- 同じ枠で書くべきものが他にもあるはず(`dotenv/config` → `config()` のような置き換え表、prelude の入れ方、`sumi.config` の書き方)。**「ルール作成ガイド」（下記）と同じ成果物の一部**として扱う。
+
 ### 既存コードベースの段階的移行（bulk suppressions、2026-09-09 追記 — D-57）
 
 `sumi check` に **ESLint の bulk suppressions 相当**を持たせ、既存の TS プロジェクトが違反を全部直す前に Sumi lint を CI へ載せられるようにする。既存の違反はファイル外の一覧（仮に `sumi-suppressions.json`）に件数として記録し、記録済みの分だけを黙らせる。**新規の違反はゼロ**が初日から強制でき、負債は 1 か所で数えられる。
