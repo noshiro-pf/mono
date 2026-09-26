@@ -8,14 +8,19 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * Stages `dist/` as the Chrome Web Store wants it, and says which version it
  * is.
  *
- * Two things have to come off on the way, which is why the package is a copy
- * rather than `dist/` itself:
+ * Three things have to come off on the way, which is why the package is a
+ * copy rather than `dist/` itself:
  *
  * - **`key` in the manifest.** The store assigns an id from the key it holds
  *   and refuses a manifest that names one. It stays in `public/manifest.json`
  *   all the same: that is what pins the id of the *unpacked* build, so that a
  *   checkout loaded from another path is still the same extension with the
  *   same storage.
+ * - **`web_accessible_resources`**, for the same reason from the other side.
+ *   It lets the pr-manager-app open `split.html` from a link, and that link
+ *   names the pinned id, which a store install does not have — so in the
+ *   package it would reach nobody, and would only let every page it lists
+ *   tell that the extension is installed.
  * - **The source maps**, which are three quarters of the build and of no use
  *   to anyone who has only the package.
  *
@@ -40,7 +45,31 @@ export const stageForStore = (): Readonly<{
     filter: (source) => !source.endsWith('.map'),
   });
 
-  const { key, ...withoutKey } = manifest;
+  const { manifest: forStore, key } = storeManifestOf(manifest);
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.writeFileSync(
+    path.resolve(stagingPath, 'manifest.json'),
+    `${JSON.stringify(forStore, undefined, 2)}\n`,
+  );
+
+  return { version, manifestKey: key };
+};
+
+/**
+ * The built manifest as the store takes it: without `key` and
+ * `web_accessible_resources`, which only the unpacked build under the pinned
+ * id has any use for. `key` is handed back, for `pack:crx` to report which id
+ * it implies.
+ */
+export const storeManifestOf = (
+  manifest: UnknownRecord,
+): Readonly<{ manifest: UnknownRecord; key: string }> => {
+  const {
+    key,
+    web_accessible_resources: _webAccessibleResources,
+    ...forStore
+  } = manifest;
 
   if (key === undefined) {
     throw new Error(
@@ -48,17 +77,11 @@ export const stageForStore = (): Readonly<{
     );
   }
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.writeFileSync(
-    path.resolve(stagingPath, 'manifest.json'),
-    `${JSON.stringify(withoutKey, undefined, 2)}\n`,
-  );
-
   if (typeof key !== 'string') {
     throw new TypeError('The manifest `key` is not a string.');
   }
 
-  return { version, manifestKey: key };
+  return { manifest: forStore, key };
 };
 
 export const distPath = path.resolve(workspaceRootPath, 'dist');

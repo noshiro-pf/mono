@@ -141,6 +141,11 @@ export const parseWorkspaceState = (
       hasKey(value, 'activePaneId') && typeof value.activePaneId === 'number'
         ? value.activePaneId
         : undefined,
+    ...(hasKey(value, 'title') &&
+    typeof value.title === 'string' &&
+    value.title !== ''
+      ? { title: value.title }
+      : {}),
   };
 };
 

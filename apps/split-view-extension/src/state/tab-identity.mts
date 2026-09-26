@@ -1,4 +1,6 @@
 import { Num } from 'ts-data-forge';
+import { paneIdsOf, type WorkspaceState } from '../layout/index.mjs';
+import { findPane } from './reducer.mjs';
 
 // `document.title = …` is a mutation the lint rules reject unless the object it
 // is reached through is named as mutable — the same trick `frame-agent.mts`
@@ -13,6 +15,28 @@ const { document: mut_page } = globalThis;
  */
 export const tabTitleOf = (position: number, workspaceName: string): string =>
   `${String(position)}: ${workspaceName}` as const;
+
+/**
+ * What follows the number in the tab's title.
+ *
+ * The title the split view was opened with, when it has one. Otherwise the
+ * title of the first pane in tree order — the top left, which is where a
+ * reader looks first — so that the tab says what is on screen, as an ordinary
+ * tab does. The split view's name only while that pane has reported nothing:
+ * before its page has loaded, for an empty pane, and for a page the frame
+ * agent cannot run in.
+ */
+export const tabLabelOf = (
+  state: WorkspaceState,
+  workspaceName: string,
+): string => {
+  const firstPaneId = paneIdsOf(state.root)[0];
+
+  const firstPaneTitle =
+    firstPaneId === undefined ? undefined : findPane(state, firstPaneId)?.title;
+
+  return state.title ?? firstPaneTitle ?? workspaceName;
+};
 
 /**
  * The colour of the favicon for a position, from a fixed cycle.

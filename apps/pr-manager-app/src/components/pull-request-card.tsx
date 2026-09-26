@@ -8,6 +8,7 @@ import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
 import { ReviewBadge } from './review-badge.js';
 import { SetAsideBadge } from './set-aside-badge.js';
+import { SplitViewLink } from './split-view-link.js';
 import { StateBadge } from './state-badge.js';
 import { VerdictBadge } from './verdict-badge.js';
 
@@ -21,9 +22,10 @@ type Props = Readonly<{
  * One open pull request: what it is, and what is holding it up.
  *
  * Four rows, in the order a reader asks the questions. What state is it in —
- * the badges. What is it — the number, the title, and the issues it closes.
- * Which branch, and how far from its base. What has been said about it — the
- * labels, and the names of any checks that are red.
+ * the badges. What is it — the number, the title, a link that opens it in a
+ * split view, and the issues it closes. Which branch, and how far from its
+ * base. What has been said about it — the labels, and the names of any checks
+ * that are red.
  */
 export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
   <article className={'pull-request'}>
@@ -40,6 +42,7 @@ export const PullRequestCard = React.memo<Props>(({ entry, scaleMax }) => (
       <ExternalLink href={entry.url} variant={'pull-request-title'}>
         {entry.title}
       </ExternalLink>
+      <SplitViewLink entry={entry} />
     </div>
 
     {Arr.isNonEmpty(entry.linkedIssues) ? (

@@ -126,8 +126,18 @@ type WorkspaceState = Readonly<{
     panes: readonly PaneState[];
     nextPaneId: number;
     activePaneId: number | undefined;
+    title?: string; // the tab's title, when the view was opened with one
 }>;
 ```
+
+`title` is what the tab is called, when a URL's `title=` gave the view one —
+the PR Manager's `#<number> <title>`. It is absent from every view made any
+other way, and from every record saved before it existed, which is why it is
+optional rather than `| undefined`: the parser keeps it only when it is a
+non-empty string. Without one, the tab follows the page in the first pane in
+tree order, and the split view's name while that pane has reported no title
+(`tabLabelOf` in `src/state/tab-identity.mts`). The tab title is
+`<position>: <that>` either way.
 
 #### `root` — the layout, as a binary tree
 
@@ -226,6 +236,7 @@ view on screen, and so that a link can describe a view that was never saved.
 | parameter | carries                                                                                                                      |
 | :-------- | :--------------------------------------------------------------------------------------------------------------------------- |
 | `ws`      | the workspace id                                                                                                             |
+| `title`   | the view's `title`, when it has one                                                                                          |
 | `layout`  | the tree, in the notation of `formatLayoutSpec` (`src/layout/spec.mts`): `rcppcpp` is a 2×2 grid, `r70pp` two columns at 7:3 |
 | `url`     | one per pane, in tree order (`paneIdsOf`); `currentUrl ?? url`, as the stored record. Trailing empty panes are left off      |
 | `zoom`    | one per pane; left off while every pane is at 100%                                                                           |

@@ -248,6 +248,11 @@ a:focus-visible {
   font-weight: 600;
 }
 
+.split-view {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
 .pull-request-repeated {
   color: var(--ink-secondary);
   font-size: 0.875rem;

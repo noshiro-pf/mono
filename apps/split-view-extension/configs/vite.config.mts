@@ -5,6 +5,8 @@ import { defineConfig, type Plugin as VitePlugin } from 'vite';
 import { makeBuildId } from '../scripts/build-id.mjs';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
+import { appDevPort } from '../../../tools/configs/app-dev-ports.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
 import { writeManifestVersion } from '../../../tools/configs/chrome-extension-manifest.mjs';
 
 /**
@@ -51,6 +53,67 @@ const addDiagnosticPermissions = (outDir: string): VitePlugin => ({
 });
 
 /**
+ * The pr-manager-app dev server, `pnpm run dev` and `pnpm run preview` alike,
+ * as the origins its "split view" links come from while it is being worked on.
+ *
+ * `public/manifest.json` lets `https://noshiro-pf.github.io` open `split.html`;
+ * a link clicked on the same page served from `localhost` is otherwise refused
+ * with `ERR_BLOCKED_BY_CLIENT`, while the same URL pasted into the address bar
+ * opens, which makes it look like a fault in the link. Added here rather than
+ * written into the manifest so that the port has one source,
+ * `app-dev-ports.mts`, and so that it is one port rather than all of
+ * `localhost`.
+ *
+ * **A development build only.** Whatever else runs on that port on a
+ * machine with the extension installed could open a split view of its
+ * choosing, so a production build — the one `pack` and `pack:crx` make, and
+ * the one the README installs — lists the published origin and nothing else.
+ */
+const addPrManagerDevOrigins = (outDir: string): VitePlugin => ({
+  name: 'split-view:pr-manager-dev-origins',
+  writeBundle: (): void => {
+    const port = appDevPort(
+      path.resolve(workspaceRootPath, '../pr-manager-app'),
+    );
+
+    const manifestPath = path.resolve(outDir, 'manifest.json');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const manifest: unknown = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    if (
+      !isRecord(manifest) ||
+      !Arr.isArray(manifest['web_accessible_resources'])
+    ) {
+      throw new Error('manifest.json has no web_accessible_resources array');
+    }
+
+    const devOrigins = [
+      `http://localhost:${port}/*`,
+      `http://127.0.0.1:${port}/*`,
+    ] as const;
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      manifestPath,
+      `${JSON.stringify(
+        {
+          ...manifest,
+          web_accessible_resources: manifest['web_accessible_resources'].map(
+            (entry) =>
+              isRecord(entry) && Arr.isArray(entry['matches'])
+                ? { ...entry, matches: [...entry['matches'], ...devOrigins] }
+                : entry,
+          ),
+        },
+        undefined,
+        2,
+      )}\n`,
+    );
+  },
+});
+
+/**
  * Vite marks the tags it injects into the HTML `crossorigin`, which makes the
  * browser fetch them in CORS mode. Same-origin `chrome-extension://` responses
  * carry no CORS headers, so this is at best redundant and at worst a load
@@ -75,7 +138,10 @@ const stripCrossOriginAttribute = (): VitePlugin => ({
  * loads as-is.
  */
 export default defineConfig(({ mode }) => {
-  /** A development build carries the diagnostics; a production build does not. */
+  /**
+   * A development build carries the diagnostics and the pr-manager-app dev
+   * server's origins; a production build carries neither.
+   */
   const diagnostics = mode !== 'production';
 
   const outDir = path.resolve(workspaceRootPath, 'dist');
@@ -89,6 +155,7 @@ export default defineConfig(({ mode }) => {
     ? [
         stripCrossOriginAttribute(),
         manifestVersion,
+        addPrManagerDevOrigins(outDir),
         addDiagnosticPermissions(outDir),
       ]
     : [stripCrossOriginAttribute(), manifestVersion];

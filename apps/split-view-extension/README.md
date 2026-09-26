@@ -101,9 +101,11 @@ history and whatever you had typed into it.
 One set of panes for writing, another for monitoring, another for a project you
 come back to once a week. The number in front of each name is its `Alt` shortcut
 and the number on the tab's icon, so reorder the list to give the ones you use
-most the shortest reach. **↗ Open all** puts every saved split view in a tab of
-its own, leaving the ones already open alone, and a split view that was in a
-pinned tab comes back pinned.
+most the shortest reach. The tab's title is that number and the title of the
+page in the top-left pane, so a tab strip of split views reads like one of
+ordinary tabs; the name stands in while that pane has no page. **↗ Open all**
+puts every saved split view in a tab of its own, leaving the ones already open
+alone, and a split view that was in a pinned tab comes back pinned.
 
 ### Open from a URL
 
@@ -131,6 +133,7 @@ installed from the store has an id of its own (see
 | `zoom`    | one per pane, `0.5` to `2`. Left out, 100%                                                                                                                                                                                                                                                                                        |
 | `sandbox` | one per pane, `0` to turn that pane's sandbox off (the padlock). Left out, on                                                                                                                                                                                                                                                     |
 | `name`    | what to call the split view, when this URL is what adds it to the list                                                                                                                                                                                                                                                            |
+| `title`   | what to call the tab, `#2071 Fix the thing` say. Saved with the view. Left out, the tab follows the top-left pane                                                                                                                                                                                                                 |
 | `ws`      | which saved split view to show. Alone, it opens what is saved; with the parameters above, what they describe is shown and saved under that id                                                                                                                                                                                     |
 
 So a link with `ws=pr-review` and the parameters above reuses one saved split
@@ -140,8 +143,20 @@ it was when bookmarked; to bookmark a saved split view as it is now, keep only
 its `ws`.
 
 Only the address bar, a bookmark, another extension, or a page listed in the
-manifest's `web_accessible_resources` can open a `chrome-extension://` URL —
-an ordinary web page cannot link to one until it is listed there.
+manifest's `web_accessible_resources` can open a `chrome-extension://` URL.
+A build from source lists one origin, `https://noshiro-pf.github.io`, for the
+[PR Manager](../pr-manager-app/README.md#opening-a-pull-request-in-a-split-view)'s
+split view links; Chrome reads the list by origin, so that is every app
+published there. `pnpm run build:dev` adds the PR Manager's dev server on
+`localhost` as well (see [`docs/development.md`](./docs/development.md)). The
+store package lists none, since those links name the id a build from source
+has (see
+[`docs/how-it-works.md`](./docs/how-it-works.md#the-list-and-what-it-is-keyed-to)). A
+link from anywhere else is refused with `ERR_BLOCKED_BY_CLIENT`, although the
+same URL typed into the address bar opens. Being listed also lets those pages put
+`split.html` in a frame of their own, where it would be their page showing
+other sites with the refusal to be framed taken away — so a split view that
+finds itself framed draws nothing.
 
 ## Good to know
 

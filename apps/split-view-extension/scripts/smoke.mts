@@ -18,10 +18,12 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * - A reload comes back to the same layout, at the same addresses.
  * - The saved list of split views: creating one, switching with `Alt+N` from
  *   the page and from inside a pane, renaming, exporting, deleting, and the
- *   whole list surviving a reload. The tab's title and its numbered favicon
+ *   whole list surviving a reload. The tab's title — the top-left pane's
+ *   page, or the name while that pane is empty — and its numbered favicon
  *   are here too, because nothing outside a browser draws either.
  * - A split view opened from a URL that describes it — layout, addresses,
- *   zoom — and the address bar following the view from then on.
+ *   zoom, the tab's title — and the address bar following the view from then
+ *   on.
  *
  * It needs a headed browser, because Chromium loads no extensions in the
  * headless shell. On a machine with no display:
@@ -119,6 +121,33 @@ const main = async (): Promise<void> => {
       return poll();
     };
 
+    // The same, for the tab's title, which follows a pane's page only once
+    // the frame has reported it.
+    const titleSettlesTo = async (
+      suffix: string,
+      timeout: number,
+    ): Promise<boolean> => {
+      const deadline = Date.now() + timeout;
+
+      const poll = async (): Promise<boolean> => {
+        const title = await page.title();
+
+        if (title.endsWith(suffix)) {
+          return true;
+        }
+
+        if (Date.now() > deadline) {
+          return false;
+        }
+
+        await page.waitForTimeout(200);
+
+        return poll();
+      };
+
+      return poll();
+    };
+
     // Installing opens a split view of its own, which would put a second
     // workspace on the saved list and race this page for it. Both go before
     // anything is asserted: the tab, and whatever it wrote. The page under test
@@ -174,6 +203,12 @@ const main = async (): Promise<void> => {
       '.pane iframe[title="Refuses Framing"]',
       8000,
     );
+
+    // And the tab takes it up, this being the top-left pane: a fresh layout
+    // numbers its panes in tree order, and the first address bar is pane 0.
+    const tabFollowsPane = await titleSettlesTo(': Refuses Framing', 5000);
+
+    const tabTitleAfterReport = await page.title();
 
     // The click is retried: the pane's toolbar settles asynchronously (the
     // favicon arrives on its own schedule), and a click dispatched while the
@@ -896,6 +931,7 @@ const main = async (): Promise<void> => {
       'zoom=1',
       'zoom=0.75',
       'name=linked',
+      'title=Linked%20view',
     ].join('&')}` as const;
 
     await page.goto(linkedUrl);
@@ -925,6 +961,10 @@ const main = async (): Promise<void> => {
     const linkedZoom = await frameStyleOf(1);
 
     const linkedTitle = await page.title();
+
+    const linkedOption = await page
+      .locator('.workspace-picker__select option:checked')
+      .innerText();
 
     const optionsAfterLink = await workspaceOptionCount();
 
@@ -984,6 +1024,11 @@ const main = async (): Promise<void> => {
       check('a pane holds a frame', framed, ''),
       check('a page that refuses framing is framed anyway', bodyShown, ''),
       check('the content script reports the frame title', titleReported, ''),
+      check(
+        "the tab is titled by the top-left pane's page",
+        tabFollowsPane,
+        tabTitleAfterReport,
+      ),
       check('the address bar follows an in-frame navigation', followed, ''),
       check(
         'dragging a divider narrows the pane beside it',
@@ -1066,8 +1111,8 @@ const main = async (): Promise<void> => {
         optionsAtStart,
       ),
       check(
-        'the tab is titled by the position and the name',
-        titleAtStart.startsWith('1: split-view-'),
+        'the tab is titled by its position',
+        titleAtStart.startsWith('1: '),
         titleAtStart,
       ),
       check(
@@ -1101,7 +1146,7 @@ const main = async (): Promise<void> => {
         titleAfterPaneShortcut,
       ),
       check(
-        'renaming reaches the picker and the tab title',
+        'renaming reaches the picker, and the title of a tab with no page',
         renamedOption.includes('検証') && renamedTitle === '2: 検証',
         `${renamedOption} / ${renamedTitle}`,
       ),
@@ -1205,12 +1250,18 @@ const main = async (): Promise<void> => {
       check(
         'as a new split view on the list, named by the URL',
         optionsAfterLink === optionsBeforeLink + 1 &&
-          linkedTitle.endsWith(': linked'),
-        `${String(optionsAfterLink)} / ${linkedTitle}`,
+          linkedOption.includes('linked'),
+        `${String(optionsAfterLink)} / ${linkedOption}`,
       ),
       check(
-        'the address bar then names the split view, and drops the name',
+        'and in a tab titled by the URL',
+        linkedTitle.endsWith(': Linked view'),
+        linkedTitle,
+      ),
+      check(
+        'the address bar then names the split view, keeps the title, and drops the name',
         urlAfterLink.includes('ws=') &&
+          urlAfterLink.includes('title=Linked+view') &&
           urlAfterLink.includes('layout=r70pp') &&
           !urlAfterLink.includes('name='),
         urlAfterLink.slice(urlAfterLink.indexOf('?')),

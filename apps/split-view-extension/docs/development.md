@@ -30,7 +30,7 @@ Everything below is run from `apps/split-view-extension`.
 
 ```sh
 pnpm run build       # writes dist/ — what to load normally
-pnpm run build:dev   # the same, plus the diagnostics
+pnpm run build:dev   # the same, plus the diagnostics and localhost links
 pnpm run gen:icons   # redraws public/icons/*.png, which the build copies
 pnpm run pack        # writes pack/split-view-extension-<version>.zip, for the store
 pnpm run pack:crx    # the same, signed, for an item with verified CRX upload
@@ -58,7 +58,11 @@ on the extension's card in `chrome://extensions`.
 
 `build:dev` adds a read-only `webRequest` log in the service worker, which shows
 what Chrome attributes a pane's request to and which framing headers arrive —
-the way to make "this pane will not load" answerable.
+the way to make "this pane will not load" answerable. It also lets the
+pr-manager-app dev server (`pnpm run dev` / `preview` there) open `split.html`
+from a link, which a production build allows from `noshiro-pf.github.io` only;
+from `localhost` a production build refuses the link with
+`ERR_BLOCKED_BY_CLIENT`.
 
 The version is the one in `package.json`, and a changeset is what raises it:
 `pnpm changeset` from the repository root for any change the extension ships,

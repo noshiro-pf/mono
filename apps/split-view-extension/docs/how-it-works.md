@@ -343,6 +343,12 @@ from. Two things follow:
   unpacked under the pinned id. The published extension therefore has a
   _different_ id from the local one and starts with empty storage; `Export` and
   `Import` are how the saved split views come across.
+- **`web_accessible_resources` comes out of the package with the `key`**,
+  because it is there for a link that names the pinned id — the PR Manager's.
+  In a store install that link reaches nothing, and the entry would only let
+  every page it lists tell that the extension is installed. So a store install
+  opens a split view from a URL typed, bookmarked or opened by another
+  extension, and from no web page.
 
 `Export` writes every saved split view — names, layouts, addresses — as one
 JSON file, and `Import` reads it back by id: an id already on the list has its

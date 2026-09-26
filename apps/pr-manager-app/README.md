@@ -57,6 +57,34 @@ cycle waits, in the end, for itself, so there is no place in an order to draw
 it. The cycles are named in their own section below the tree instead, and a
 pull request waiting on nothing but a cycle member is drawn as a root.
 
+## Opening a pull request in a split view
+
+Each card has a **⧉ split view** link beside the title, which opens the pull
+request in [`split-view-extension`](../split-view-extension/README.md): the
+diff on the left and the conversation on the right, at 7:3. When the pull
+request closes an issue, the issue joins them on the right and the three are
+2:1:1 — the first issue only, if it closes several. The tab is titled with
+the pull request's number and title, `#2071 feat(…): …`.
+
+Every link names one saved split view, `PR Manager`, so the extension's list
+gains one entry rather than one per pull request; a tab already open on an
+earlier pull request keeps showing it, because the extension shows what a
+tab's URL describes.
+
+The link reaches the extension only where three things hold, and none of
+them can be checked from this page, whose `Content-Security-Policy` lets it
+connect to `api.github.com` alone:
+
+- **The extension is installed unpacked**, under the id `key` in its manifest
+  pins. A build from the Chrome Web Store has an id of its own, and its
+  package lists no page that may link to it.
+- **The build lists this page's origin** in its `web_accessible_resources`:
+  every build from source lists `noshiro-pf.github.io`, and only the
+  extension's `pnpm run build:dev` lists the port `pnpm run dev` and
+  `pnpm run preview` serve on here. Otherwise the link opens the browser's "blocked" page,
+  `ERR_BLOCKED_BY_CLIENT`, although the same URL pasted into the address bar
+  opens: Chrome checks the origin only for a navigation a page starts.
+
 ## Where the data comes from
 
 GitHub's GraphQL API, from the browser, on every read. There is no report

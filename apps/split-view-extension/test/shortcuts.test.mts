@@ -1,7 +1,12 @@
 import {
+  createPane,
+  paneNode,
+  splitNode,
+  tabLabelOf,
   tabTitleOf,
   workspacePositionFromCode,
   workspaceShortcutCodeOf,
+  type WorkspaceState,
 } from '../src/index.mjs';
 
 const keyEvent = (
@@ -79,5 +84,40 @@ describe('tabTitleOf', () => {
   // The number leads because a tab strip truncates from the right.
   test('leads with the position', () => {
     assert.deepStrictEqual(tabTitleOf(2, '調査'), '2: 調査');
+  });
+});
+
+describe('tabLabelOf', () => {
+  // Pane 0 is on the right, so the first pane in tree order is pane 1.
+  const view: WorkspaceState = {
+    version: 1,
+    root: splitNode('row', paneNode(1), paneNode(0)),
+    panes: [
+      { ...createPane(0), title: 'right' },
+      { ...createPane(1), title: 'left' },
+    ],
+    nextPaneId: 2,
+    activePaneId: 0,
+  } as const;
+
+  test('is the title the view was opened with, when it has one', () => {
+    assert.deepStrictEqual(
+      tabLabelOf({ ...view, title: '#2071 split view' }, '調査'),
+      '#2071 split view',
+    );
+  });
+
+  test('is otherwise the title of the first pane in tree order', () => {
+    assert.deepStrictEqual(tabLabelOf(view, '調査'), 'left');
+  });
+
+  test('is the name of the split view while that pane has reported no title', () => {
+    assert.deepStrictEqual(
+      tabLabelOf(
+        { ...view, panes: [view.panes[0] ?? createPane(0), createPane(1)] },
+        '調査',
+      ),
+      '調査',
+    );
   });
 });
