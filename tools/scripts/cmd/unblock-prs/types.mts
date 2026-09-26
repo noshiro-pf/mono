@@ -163,9 +163,16 @@ export type CycleResult = Readonly<{
   next: 'idle' | 'stop' | 'survey';
 }>;
 
-/** How far `advance` got with one pull request. */
+/**
+ * How far `advance` got with one pull request. `moved` is the branch moving
+ * under it — someone else, the skill or a person, is taking that pull
+ * request forward — which is neither progress nor a failure of the pull
+ * request.
+ */
 export type Advanced = Readonly<
-  { kind: 'advanced'; head: string } | { kind: 'stale-merge-state' }
+  | { kind: 'advanced'; head: string }
+  | { kind: 'moved' }
+  | { kind: 'stale-merge-state' }
 >;
 
 export type RebaseFailure = Readonly<{

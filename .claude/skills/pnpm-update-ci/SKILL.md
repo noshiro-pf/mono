@@ -55,7 +55,8 @@ Take the entry whose `headRef` is `chore/pnpm-update`.
   update that day; both are the system working.
 - **`labels` has `skip-ci`** (each is `{ name, color, description }`, so the
   test is on `name`) — end silently. Somebody stopped it on
-  purpose, and taking the label off is not this skill's job.
+  purpose, or the queue paused it until its turn (one queued pull request is
+  released at a time), and taking the label off is not this skill's job.
 - **`checks.verdict` is `passed`** — end silently. Auto-merge will land it.
 - **`checks.verdict` is `pending`** — the matrix is still running. Wait, and
   come back to this step; a full matrix is about 25 minutes.

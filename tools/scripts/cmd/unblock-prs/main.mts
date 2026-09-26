@@ -15,6 +15,11 @@ import {
   surveyFingerprint,
 } from './quiet.mjs';
 import { advance } from './rebase.mjs';
+import {
+  firstInReleaseOrder,
+  pauseAllBut,
+  settleAfterRelease,
+} from './release.mjs';
 import { newSkips, pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
@@ -58,7 +63,10 @@ import { watch } from './watch.mjs';
  *    `--force-with-lease` against the head the survey saw. A rebase that
  *    conflicts, or a push that is refused, drops that pull request for as
  *    long as its head and the base stay where they are, and the next
- *    candidate is tried in the same cycle.
+ *    candidate is tried in the same cycle. A branch that moved under the
+ *    rebase is not one of those: someone else — the skill, or a person — is
+ *    moving it, so nothing is recorded and the cycle surveys again rather
+ *    than start a second matrix on the next candidate.
  * 4. Poll the rebased pull request until it merges, or until something says
  *    it will not: a required check failed, auto-merge was switched off, the
  *    `skip-ci` label went on, the branch was pushed by someone else, or every
@@ -127,6 +135,13 @@ import { watch } from './watch.mjs';
  * its `skip-ci` off. Everything that declared `Merge-After` on it then waits,
  * because it has not merged, which is what a declared order is for.
  *
+ * **One queued pull request is released at a time.** Before releasing one,
+ * and while watching the one in flight, every other open `merge-queued` pull
+ * request without `skip-ci` is given the label, set-aside ones included: a
+ * second released pull request is a matrix run to be thrown away. After
+ * releasing, it looks again, because the skill may have released another in
+ * the same moment; the one first in the pick order keeps its release.
+ *
  * ## Where the rest of it is
  *
  * This file is the loop and the command line. Reading order, roughly outside
@@ -138,6 +153,7 @@ import { watch } from './watch.mjs';
  * - `version-pr.mts` — the version pull request, and what holds it back.
  * - `rebase.mts` — moving a branch: the rebase in a throwaway worktree, and
  *   taking `skip-ci` off.
+ * - `release.mts` — holding the queue to one released pull request.
  * - `watch.mts` — polling one pull request until it merges, or until it will
  *   not.
  * - `quiet.mts` — how long to sleep when there is nothing to do.
@@ -293,28 +309,32 @@ const runCycle = async (
     return { state: state(mut_skipped), next: 'stop' };
   }
 
-  if (Arr.isNonEmpty(triaged.inFlight)) {
-    const target = triaged.inFlight[0];
+  // Normally the only one. Two are what a pull request opened already
+  // released looks like, and the one that is not first is paused below.
+  const watched = firstInReleaseOrder(triaged.inFlight, defaultBranch);
 
+  if (watched !== undefined) {
     log(
-      `#${target.number} is up to date (${target.mergeStateStatus}); watching it rather than rebasing another.`,
+      `#${watched.number} is up to date (${watched.mergeStateStatus}); watching it rather than rebasing another.`,
     );
 
     if (options.dryRun) {
       return { state: state(mut_skipped), next: 'stop' };
     }
 
+    await pauseAllBut(watched.number);
+
     const outcome = await watch(
-      target,
-      target.headRefOid,
+      watched,
+      watched.headRefOid,
       requiredContexts,
       options,
     );
 
     return {
       state: state(
-        applyWatchOutcome(mut_skipped, target, baseSha, outcome),
-        trackAfterWatch(tracked, target.number, outcome),
+        applyWatchOutcome(mut_skipped, watched, baseSha, outcome),
+        trackAfterWatch(tracked, watched.number, outcome),
       ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
     };
@@ -341,6 +361,10 @@ const runCycle = async (
       `#${target.number} (${target.headRefName}) is next: ${describeAction(target, defaultBranch)}.`,
     );
 
+    // Before the push or the label removal that starts its matrix, so that
+    // at no point are two queued pull requests released.
+    await pauseAllBut(target.number);
+
     const advanced = await advance(target, defaultBranch);
 
     if (Result.isErr(advanced)) {
@@ -355,6 +379,17 @@ const runCycle = async (
       });
 
       continue;
+    }
+
+    if (advanced.value.kind === 'moved') {
+      // Someone else is moving this one — the skill, or a person. Whatever
+      // they pushed is likely to start a matrix, so rather than start a
+      // second on the next candidate, survey again and take what is there.
+      log(
+        `#${target.number} moved while this run was moving it; leaving it to whoever pushed, and surveying again.`,
+      );
+
+      return { state: state(mut_skipped), next: 'survey' };
     }
 
     if (advanced.value.kind === 'stale-merge-state') {
@@ -373,6 +408,14 @@ const runCycle = async (
     }
 
     const { head } = advanced.value;
+
+    if ((await settleAfterRelease(target, defaultBranch)) === 'yielded') {
+      log(
+        `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
+      );
+
+      return { state: state(mut_skipped), next: 'survey' };
+    }
 
     log(
       `#${target.number} is at ${head.slice(0, 10)}; waiting for it to merge.`,

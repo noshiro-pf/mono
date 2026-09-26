@@ -29,7 +29,8 @@ still unmerged, report why — do not finish it by hand.
 **One at a time.** Merging any PR moves `main`, which puts every other open
 branch back to `BEHIND`. A batch rebase therefore runs a full CI matrix per
 branch and throws all but the first away. Never rebase a second PR while one is
-still in flight.
+still in flight, and never leave more than one queued PR without `skip-ci` —
+see "Beside the worker".
 
 Invoking this skill is the explicit instruction `CLAUDE.md` asks for before
 pushing: for one PR at a time, you may push to that PR's branch, force-pushing
@@ -41,6 +42,62 @@ a session it. Every call below is the REST API or `pnpm run pr-report`;
 helper, and what each `gh` command became. `pnpm run unblock-prs` itself does
 shell out to `gh`, which is what keeps that script the author's to run — this
 skill is the half a session can do.
+
+## Beside the worker
+
+`pnpm run unblock-prs` is the worker: it runs on the author's machine for
+hours, surveying every few minutes, rebasing, taking `skip-ci` off and
+watching — the same queue this skill moves, through the same labels and the
+same branches. **Assume it is running.** A session cannot see it — it has no
+process here, no lock and no heartbeat — and a session that assumes it is
+alone is how two writers end up force-pushing one branch or running two
+matrices where one was meant to run. The two are split by what the worker does
+not do, and made safe where they overlap:
+
+- **What the worker sets aside is this skill's.** Each time it gives up on a
+  pull request it writes a `failure` commit status, context `unblock-prs`, on
+  that head: `reported["unblock-prs"] === "failed"` in the report, and the
+  description in `GET /commits/{sha}/status` reads
+  `<reason> at <base sha>: <detail>`. `checks-failed` is step 4 and
+  `rebase-failed` is step 2b; the other reasons are to report. The worker
+  leaves that pull request alone until its head moves (or, for every reason
+  but `checks-failed`, `main` does), so working on it collides with nothing,
+  and the push that carries the work is what hands it back.
+- **Every write is leased against a SHA this session read**:
+  `expected_head_sha` on `update-branch`, `--force-with-lease=<branch>:<sha>`
+  on a push. A lease that loses means someone else — the worker,
+  `pnpm-update.yml`, `release.yml`, the author — moved the branch. Survey
+  again and take the new state; do not retry against a fresh lease, and do
+  not turn to another pull request instead, because whoever pushed is about
+  to start a matrix. The worker does the same.
+- **Pick as the worker picks** (step 2), so that two writers choosing at once
+  choose the same pull request and the lease settles which of them moves it.
+- **Re-read just before anything that starts a matrix** — a rebase, taking
+  `skip-ci` off, a push without the label. An up-to-date pull request with no
+  `skip-ci` and checks pending is in flight, whoever put it there, and it is
+  watched, not joined by a second.
+- **At most one queued pull request is released**, released meaning
+  `merge-queued` without `skip-ci`: a push to it, or the label coming off,
+  starts the full matrix, and only one can merge before `main` moves.
+  Releasing — taking `skip-ci` off, or pushing to one that has no label — is
+  done only when nothing is in flight, and first puts `skip-ci`
+  (`POST /issues/{n}/labels`) on every other released one: set-aside ones,
+  drafts and ones without auto-merge included. Then run the report again.
+  Another released one means someone released it in the same moment, and the
+  one first in the pick order (lowest number, the version PR last) keeps its
+  release: put `skip-ci` on the rest, yours included if it lost, and go back
+  to step 1. While watching, the same: of the ones in flight the first in the
+  pick order is kept, and every other released one is paused —
+  `pnpm-update.yml` opens its pull request without the label. The worker
+  applies the same rule, so both settle on the same one. The case it exists
+  for is in `tools/scripts/cmd/unblock-prs/README.md`, "One released pull
+  request at a time".
+- **So a push while another pull request is in flight goes out under
+  `skip-ci`**: put the label on first, then push. The push costs nothing, and
+  the pull request is back in the queue, to be rebased and released in turn
+  by the worker or by this skill's next pass. By the time a failure has been
+  reproduced and fixed, the worker has usually released the next pull request
+  already.
 
 ## The loop
 
@@ -102,11 +159,19 @@ conflict is a conflict.
 
 ## 2. Pick exactly one, and rebase it
 
-Take whichever PR the user named; otherwise the one most likely to go green
-unattended — small, already reviewed, oldest first among equals. Everything else
-waits, untouched. A PR sitting at `BEHIND` costs nothing.
+Only when nothing is in flight (step 1). Take whichever PR the user named;
+otherwise the one the worker would take, so that both of you choose the same
+one: among those with `behindBy > 0` or carrying `skip-ci`, with `blockedBy`
+empty and no `unblock-prs` failure on the head that still applies, the lowest
+number, the version PR last. The worker also puts last one GitHub calls
+`DIRTY`, which the report does not carry; where that makes the two differ, the
+lease settles it. Everything else waits, untouched. A PR sitting at `BEHIND`
+costs nothing.
 
 ### 2a. The normal case
+
+If the PR carries no `skip-ci`, the rebase is its release: pause the others
+first (see "Beside the worker").
 
 ```bash
 curl -sS -X PUT -w '\n%{http_code}\n' \
@@ -114,6 +179,7 @@ curl -sS -X PUT -w '\n%{http_code}\n' \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "User-Agent: noshiro-pf-mono" \
+    -d '{"expected_head_sha": "<headSha from the survey>"}' \
     'https://api.github.com/repos/noshiro-pf/mono/pulls/<number>/update-branch'
 ```
 
@@ -123,6 +189,18 @@ merge anything, and it leaves auto-merge armed. A 202 means GitHub accepted the
 job, not that it finished — the head moves a moment later. Confirm it did, and
 that checks are queued on the new SHA, by running the report again and looking
 at `headSha`, `autoMerge` and `checks`.
+
+A 422 is either lease: the head is no longer the one named, so someone else
+moved it — survey again — or GitHub cannot rebase it, which is step 2b. The
+report's `headSha` says which.
+
+If it carries `skip-ci`, take it off now, and only now: run the report again
+and check that `headSha` is the rebased one, `behindBy` is 0, both labels
+are still on and nothing else is released or in flight; pause the others,
+then `DELETE /repos/noshiro-pf/mono/issues/<number>/labels/skip-ci`. A 404
+there means someone else took it off in the meantime, which is what you were
+about to do. Either way, run the report once more and settle a second release
+as "Beside the worker" says before going to step 3.
 
 If the local clone has that branch checked out, it is now stale. Only resync it
 when `git status --porcelain` is empty — never discard uncommitted work:
@@ -147,9 +225,15 @@ git push --force-with-lease="<branch>:<sha-before-the-rebase>" origin <branch>
 
 Name the expected SHA in `--force-with-lease`. A bare `--force-with-lease`
 compares against the remote-tracking ref, which is only as fresh as the last
-fetch — the same trap `pnpm-update.yml` hit. Resolve conflicts by keeping the
-intent of both sides; if the resolution is not obvious, stop and ask rather than
-guessing. `git rebase --abort` puts everything back.
+fetch — the same trap `pnpm-update.yml` hit. A refused push is the branch
+moving under you: survey again rather than rebasing once more. Resolve
+conflicts by keeping the intent of both sides; if the resolution is not
+obvious, stop and ask rather than guessing. `git rebase --abort` puts
+everything back.
+
+A conflict takes time to resolve, and another pull request may be in flight by
+the time it is: then the push goes out under `skip-ci` (see "Beside the
+worker"). Otherwise, if it carries `skip-ci`, take it off as in 2a.
 
 Note that a force-push does not disarm auto-merge; if `autoMerge` did come
 back false, say so and stop rather than re-enabling it.
@@ -190,6 +274,10 @@ until then keep waiting rather than starting on the next PR.
 means the `skip-ci` label went on while you were watching, which also skipped
 every other check on that commit. Stop watching, go back to step 1, and treat
 the PR as out of scope until the label comes off.
+
+**A `headSha` that changes when you did not push** is the worker rebasing it
+because `main` moved, or `pnpm-update.yml` rebuilding its branch. Go back to
+step 1 and take the new state rather than moving it back.
 
 Do not start the next PR while this one is being watched.
 
@@ -244,10 +332,14 @@ Two things about reproducing the rest:
 Reproduce locally before pushing — a speculative fix costs another full matrix,
 which is the cost this whole loop exists to avoid. Fix the cause: `CLAUDE.md`
 rules hold, so no file-level `eslint-disable`, no loosening `eslint.config.mts`,
-no `as any`. Then `pnpm run fmt`, commit with a Conventional Commits message,
-push to the branch, and go back to watching. Auto-merge survives the push, so a
-green result merges the PR without another command. Do not re-rebase for a fix
-unless `main` has moved.
+no `as any`. Then `pnpm run fmt`, amend it onto the branch's one commit, and
+push with `--force-with-lease=<branch>:<the headSha you fixed>`. Re-read the
+report just before the push: if another queued PR is in flight, the push goes
+out under `skip-ci` (see "Beside the worker") and this PR waits its turn;
+otherwise the push is its release — pause the others first, push, settle, and
+go back to watching. Auto-merge survives the
+push, so a green result merges the PR without another command. Do not
+re-rebase for a fix unless `main` has moved.
 
 `code-check` and `node-version-compatibility` jobs gate on
 `z:check-should-run:code-checks`, and `style-check` jobs on
@@ -342,5 +434,6 @@ by GitHub / rebased and waiting / fix pushed / left alone and why), and where it
 checks stand. Name any PR left failing and what the failure is. Do not report a
 run as green while checks are still pending, and say plainly which PRs were never
 reached and which were out of scope — for lacking `merge-queued`, or for
-lacking auto-merge. Report it as an order: which PR was released, what is
+lacking auto-merge — and which the worker had set aside, with its reason.
+Report it as an order: which PR was released, what is
 behind it, and what each one is waiting on.
