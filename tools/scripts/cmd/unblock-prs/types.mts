@@ -68,6 +68,11 @@ export type ChecksSummary = Readonly<{
    * has reported from what the ruleset requires.
    */
   missing: readonly string[];
+  /**
+   * Checks on the head that have not finished and are not among `pending`,
+   * mostly the jobs a required aggregate is still waiting on.
+   */
+  running: readonly string[];
   /** How many checks the verdict was reached over. */
   total: number;
 }>;

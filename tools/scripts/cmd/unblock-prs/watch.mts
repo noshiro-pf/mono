@@ -5,7 +5,9 @@ import {
   describeWaitingOn,
   isMergeableState,
   listRequiredChecks,
+  listRunningChecks,
   summarizeChecks,
+  type ReportedCheck,
 } from './checks.mjs';
 import {
   BLOCKED_GREEN_POLLS_BEFORE_GIVING_UP,
@@ -88,7 +90,7 @@ export const watch = async (
       return 'behind-again';
     }
 
-    const checks = await listRequiredChecks(pr.number);
+    const checks = await readChecks(pr.number);
 
     if (Result.isErr(checks)) {
       mut_errors += 1;
@@ -104,7 +106,11 @@ export const watch = async (
 
     mut_errors = 0;
 
-    const summary = summarizeChecks(checks.value, requiredContexts);
+    const summary = summarizeChecks(
+      checks.value.required,
+      requiredContexts,
+      checks.value.running,
+    );
 
     if (summary.status === 'failed') {
       log(`#${pr.number}: failed: ${summary.failed.join(', ')}`);
@@ -147,4 +153,29 @@ export const watch = async (
   }
 
   return 'stopped';
+};
+
+/** The required checks and the names of every check still running. */
+const readChecks = async (
+  prNumber: number,
+): Promise<
+  Result<
+    Readonly<{
+      required: readonly ReportedCheck[];
+      running: readonly string[];
+    }>,
+    string
+  >
+> => {
+  const required = await listRequiredChecks(prNumber);
+
+  if (Result.isErr(required)) {
+    return required;
+  }
+
+  const running = await listRunningChecks(prNumber);
+
+  return Result.isErr(running)
+    ? running
+    : Result.ok({ required: required.value, running: running.value });
 };
