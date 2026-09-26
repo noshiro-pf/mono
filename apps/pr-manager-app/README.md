@@ -37,6 +37,26 @@ It **only reads**. Nothing here labels, rebases, merges or comments — that is
 `pnpm run unblock-prs`, run by a person — and a page that cannot do any of it
 is a page that is safe to leave open.
 
+## The merge order
+
+A pull request is drawn under what its `Merge-After:` names, so the tree read
+top down is the order things can land, and a root is one that nothing open is
+holding up. A number that names nothing still open is dropped: the pull
+request it named has merged, which is the constraint being met.
+
+**A pull request that names several appears under each of them, and is drawn
+in full once** — its card and everything below it, under whichever of them
+the page reaches first reading downwards, not the first the trailer lists.
+Everywhere else it is one line, `#N — shown above`, which is always true
+because the page is read in the order it is drawn. So a diamond does not draw
+its lower half twice. The card does not list what it waits for; its other
+predecessors are the ones carrying a `shown above` line for it.
+
+A pull request on a `Merge-After` cycle is not in the tree: every member of a
+cycle waits, in the end, for itself, so there is no place in an order to draw
+it. The cycles are named in their own section below the tree instead, and a
+pull request waiting on nothing but a cycle member is drawn as a root.
+
 ## Where the data comes from
 
 GitHub's GraphQL API, from the browser, on every read. There is no report
