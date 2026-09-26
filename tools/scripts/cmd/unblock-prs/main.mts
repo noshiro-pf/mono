@@ -1,6 +1,7 @@
 import { SKIP_CI_LABEL } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { autoFix } from './auto-fix.mjs';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
 import {
   checkPreflight,
@@ -39,9 +40,9 @@ import { watch } from './watch.mjs';
  * waiting for GitHub to merge it.
  *
  * This is the mechanical half of the `/unblock-prs` skill. The skill also
- * reads failing checks and fixes what they complain about; this script does
- * not, and it never merges anything — auto-merge does that once the checks
- * are green.
+ * reads failing checks and fixes what they complain about; this script fixes
+ * only the one kind that needs no reading — a fixer's diff, see step 4 — and
+ * it never merges anything: auto-merge does that once the checks are green.
  *
  * One cycle:
  *
@@ -77,6 +78,11 @@ import { watch } from './watch.mjs';
  *    `gh pr checks` rather than pending in it, so reading its absence as
  *    success is what used to write a pull request off three minutes into a
  *    twenty-five minute matrix.
+ *    When a required check failed and every job that failed under it is a
+ *    `fix:` or `gen:` entry of the check matrices, run those commands, amend
+ *    what they wrote onto the branch's one commit, push, and watch the new
+ *    head instead — once, and only for the pull request this cycle is
+ *    watching, never the others that are failing.
  * 5. Remember the verdict against the head *and* the base it was reached on,
  *    so the pull request is left alone until someone pushes to it or the
  *    base moves. The base moving is exactly what a pull request that sat
@@ -156,6 +162,8 @@ import { watch } from './watch.mjs';
  * - `release.mts` — holding the queue to one released pull request.
  * - `watch.mts` — polling one pull request until it merges, or until it will
  *   not.
+ * - `auto-fix.mts` — running the fixer a failed check names, and pushing
+ *   what it wrote.
  * - `quiet.mts` — how long to sleep when there is nothing to do.
  * - `checks.mts` — what the merge is waiting for, judged against the contexts
  *   the ruleset requires.
@@ -324,16 +332,21 @@ const runCycle = async (
 
     await pauseAllBut(watched.number);
 
-    const outcome = await watch(
+    const { outcome, head } = await watchAndFix(
       watched,
       watched.headRefOid,
-      requiredContexts,
+      { defaultBranch, requiredContexts },
       options,
     );
 
     return {
       state: state(
-        applyWatchOutcome(mut_skipped, watched, baseSha, outcome),
+        applyWatchOutcome(
+          mut_skipped,
+          { ...watched, headRefOid: head },
+          baseSha,
+          outcome,
+        ),
         trackAfterWatch(tracked, watched.number, outcome),
       ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
@@ -407,8 +420,6 @@ const runCycle = async (
       return { state: state(mut_skipped), next: 'survey' };
     }
 
-    const { head } = advanced.value;
-
     if ((await settleAfterRelease(target, defaultBranch)) === 'yielded') {
       log(
         `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
@@ -417,11 +428,18 @@ const runCycle = async (
       return { state: state(mut_skipped), next: 'survey' };
     }
 
+    const advancedHead = advanced.value.head;
+
     log(
-      `#${target.number} is at ${head.slice(0, 10)}; waiting for it to merge.`,
+      `#${target.number} is at ${advancedHead.slice(0, 10)}; waiting for it to merge.`,
     );
 
-    const outcome = await watch(target, head, requiredContexts, options);
+    const { outcome, head } = await watchAndFix(
+      target,
+      advancedHead,
+      { defaultBranch, requiredContexts },
+      options,
+    );
 
     return {
       state: state(
@@ -439,6 +457,61 @@ const runCycle = async (
 
   // Nothing to act on, or every candidate failed to rebase or push.
   return { state: state(mut_skipped), next: 'idle' };
+};
+
+/**
+ * Watches one pull request, and when its checks fail on nothing but a fixer's
+ * diff, has `autoFix` push the fix and watches the new head in its place.
+ * Resolves to the outcome and the head it was reached on, which is the one a
+ * skip record has to name.
+ *
+ * Once per watch: a head `autoFix` wrote that fails again is a fixer that
+ * does not agree with CI, and running it again would only push the same diff.
+ * The pull request is set aside as any other failure is, and nothing else
+ * failing in the queue is touched — the one being watched is the one this
+ * cycle picked.
+ */
+const watchAndFix = async (
+  pr: PullRequest,
+  expectedHead: string,
+  context: Readonly<{
+    defaultBranch: string;
+    requiredContexts: readonly string[];
+  }>,
+  options: Options,
+): Promise<Readonly<{ outcome: WatchOutcome; head: string }>> => {
+  const outcome = await watch(
+    pr,
+    expectedHead,
+    context.requiredContexts,
+    options,
+  );
+
+  if (outcome !== 'checks-failed' || !options.autoFix || stopRequested()) {
+    return { outcome, head: expectedHead };
+  }
+
+  const fixed = await autoFix(pr, expectedHead, context.defaultBranch);
+
+  switch (fixed.kind) {
+    case 'declined':
+      log(`#${pr.number}: not fixing it here: ${fixed.detail}`);
+
+      return { outcome, head: expectedHead };
+
+    case 'moved':
+      return { outcome: 'head-moved', head: expectedHead };
+
+    case 'pushed':
+      log(
+        `#${pr.number}: pushed what ${fixed.commands.join(', ')} wrote as ${fixed.head.slice(0, 10)}; watching it again.`,
+      );
+
+      return {
+        outcome: await watch(pr, fixed.head, context.requiredContexts, options),
+        head: fixed.head,
+      };
+  }
 };
 
 /**

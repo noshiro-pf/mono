@@ -8,7 +8,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import { git, remoteSha, viewPullRequest } from './github.mjs';
+import { git, remoteSha, removeWorktree, viewPullRequest } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import {
   type Advanced,
@@ -279,11 +279,4 @@ const removeSkipCiLabel = async (
   return Result.isErr(removed)
     ? failed(`cannot remove ${SKIP_CI_LABEL}: ${lastLines(removed.value, 2)}`)
     : Result.ok('removed');
-};
-
-const removeWorktree = async (worktreeDir: string): Promise<void> => {
-  // Both fail harmlessly when there is nothing to remove.
-  await git(`git worktree remove --force ${sh(worktreeDir)}`);
-
-  await git('git worktree prune');
 };

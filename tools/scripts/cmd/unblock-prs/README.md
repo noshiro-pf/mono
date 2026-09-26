@@ -1,4 +1,4 @@
-<!-- cspell:ignore unlabel, gpgsign -->
+<!-- cspell:ignore unlabel, gpgsign, tmpfs -->
 
 # `unblock-prs`
 
@@ -22,8 +22,9 @@ them.
 
 **やらないこと**: マージ（auto-merge の仕事）、auto-merge を有効にすること、
 `merge-queued` を付けること、レビュー承認、失敗したチェックの修正（skill の仕
-事）。rebase は使い捨ての `git worktree` の中で行うので、実行元のチェックアウ
-トの作業ツリーには触れません。
+事。例外は fixer の差分だけで落ちた場合で、「4a」を参照）。rebase は使い捨ての
+`git worktree` の中で行うので、実行元のチェックアウトの作業ツリーには触れませ
+ん。
 
 ### PR 側で宣言する3つのこと
 
@@ -237,6 +238,50 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 まま green の場合は8回。後者が長いのは、check run が superseded された直後の一
 瞬がこの形になるためです。
 
+#### 4a. fixer の差分だけで落ちたなら直す
+
+watch が `checks-failed` で終わったら、その head の check run を集約 job の下の
+matrix の job まで読みます。失敗した job が **すべて** `code-check (X)` か
+`style-check (X)` で、`X` が `fix:` か `gen:` のコマンド（`ws:` /
+`strict-lib:` 付きも含む）なら、それはコマンドがファイルを書き換えただけの失敗
+です。どの job も最後に `z:assert-repo-is-clean` を実行するからです。その場合
+に限り、次のことをします。
+
+1. 使い捨ての worktree で `pnpm install --frozen-lockfile` し、CI がビルドする
+   entry（`code-check` のすべてと `ws:gen`）があれば `ws:build` を実行します。
+   worktree は `~/.local/state/unblock-prs/` に作ります。OS の temp は tmpfs
+   のことが多く、pnpm store から `node_modules` をハードリンクできません。git
+   ディレクトリや `~/.cache` の下も使えません。`fix:fmt:diff` は絶対パスのどこ
+   かに `.git` / `.cache` / `dist` / `build` / `out` を含むファイルをすべて飛ば
+   すためです。
+2. 失敗したコマンドを、生成系 → その他 → フォーマッタの順に実行し、最後に
+   `fix:fmt:diff` を実行します。
+3. 差分があれば PR の1コミットに `--amend` し、失敗した head を lease にして
+   `--force-with-lease` で push します。push は解放と同じ扱いなので、その前に
+   他の PR を止めます。
+4. 新しい head を watch します。**次の PR は pick しません。**
+
+次の場合は何もせず、理由をログに出して従来通り `checks-failed` として見送り
+ます。
+
+- 失敗した job に1つでも fixer 以外がある（型、テスト、`ws:doc`、
+  `Validate commit count` など）。push しても落ちるマトリクスを1回走らせるだけ
+  なので、全体を skill に任せます。
+- ブランチが1コミットでない。squash はメッセージを書く行為なので skill の仕事
+  です。
+- コマンドが失敗した、または差分が出なかった。
+- 自動修正で push した head がまた落ちた。1回の watch につき1回までです。
+
+対象は watch している1本、つまりこのサイクルが pick した PR だけです。
+`merge-queued` で CI が落ちている他の PR には触れません。
+
+- **`ws:doc` は対象外です。** `doc` が書くのは untracked な出力で、tree を汚す
+  のはその中で呼ばれる生成器（`ws:gen` でも走る）です。しかも実行に10分かか
+  ります。
+- **oxfmt。** `fix:fmt:diff` は Prettier だけで、`strict-lib/` は整形しませ
+  ん。fixer のうち `strict-lib/` に書くのは `strict-lib:fix:fmt` 自身だけなの
+  で、それが落ちていればそのコマンドが実行されます。
+
 #### 5. 記憶して次のサイクルへ
 
 判定は **その head かつその base のまま** の間だけ有効です。
@@ -279,6 +324,7 @@ auto-merge、draft、本文）と `main` の tip が `--idle-after`（既定10�
 | `--idle-interval <sec>`   |  300 | 一覧が止まった後の再 survey までの待ち時間   |
 | `--poll-interval <sec>`   |   30 | watch 中のポーリング間隔                     |
 | `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
+| `--no-auto-fix`           |      | 「4a」の自動修正をしない                     |
 
 ### 見送った PR はどこで分かるか
 
@@ -314,6 +360,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `release.mts`     | 解放されている PR を1本に保つ                             |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
+| `auto-fix.mts`    | fixer の差分だけの失敗を直して push                       |
 | `quiet.mts`       | 何もない時にどれだけ待つか                                |
 | `checks.mts`      | マージが何を待っているか                                  |
 | `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                 |
@@ -340,9 +387,9 @@ them moves `main` and puts every other branch back to `BEHIND`, so a batch
 rebase runs a full CI matrix per branch and throws all but the first away.
 
 **What it never does**: merge (auto-merge's job), enable auto-merge, add
-`merge-queued`, approve a review, or fix a failing check (the skill's job).
-The rebase happens in a throwaway `git worktree`, so the checkout it runs from
-is never touched.
+`merge-queued`, approve a review, or fix a failing check (the skill's job —
+except a failure that is only a fixer's diff, see "4a"). The rebase happens in
+a throwaway `git worktree`, so the checkout it runs from is never touched.
 
 ### The three things a pull request declares
 
@@ -572,6 +619,50 @@ polls: three when GitHub itself calls it mergeable, eight while it still reads
 `BLOCKED`, because that combination is also what a check run that has just
 been superseded looks like for a moment.
 
+#### 4a. Fix a failure that is only a fixer's diff
+
+When the watch ends in `checks-failed`, the head's check runs are read down to
+the matrix jobs under the aggregates. If **every** job that failed is a
+`code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
+command (under `ws:` or `strict-lib:` too), the failure is the command having
+rewritten files, because every job ends with `z:assert-repo-is-clean`. Then,
+and only then:
+
+1. In a throwaway worktree, `pnpm install --frozen-lockfile`, and `ws:build`
+   when CI builds for one of the entries (every `code-check` entry, and
+   `ws:gen`). The worktree goes in `~/.local/state/unblock-prs/`. Not the OS
+   temp directory, which is often a tmpfs, and the pnpm store hard-links
+   `node_modules` only within one filesystem. Not the git directory or
+   `~/.cache` either, because `fix:fmt:diff` skips every file with a `.git`,
+   `.cache`, `dist`, `build` or `out` segment anywhere in its absolute path.
+2. Run the failed commands, generators first and formatters last, then
+   `fix:fmt:diff`.
+3. If anything changed, amend it onto the pull request's one commit and push
+   with `--force-with-lease` against the head that failed. The push is a
+   release, so the others are paused first.
+4. Watch the new head. **The next pull request is not picked.**
+
+Nothing is done, and the pull request is set aside as `checks-failed` as
+before with the reason logged, when:
+
+- Any failed job is not a fixer (types, tests, `ws:doc`, `Validate commit
+count`, …). Pushing would run a matrix that fails anyway, so the whole of it
+  is left to the skill.
+- The branch is not one commit. Squashing writes a message, which is the
+  skill's to do.
+- A command failed, or none of them changed anything.
+- The head the fix pushed failed again. It is once per watch.
+
+It applies to the one pull request being watched, the one this cycle picked,
+and never to the other queued pull requests whose checks are failing.
+
+- **`ws:doc` is not a fixer.** What `doc` writes is untracked; what leaves the
+  tree dirty is a generator it calls, which `ws:gen` runs too, and it takes ten
+  minutes.
+- **oxfmt.** `fix:fmt:diff` is Prettier only and leaves `strict-lib/` alone.
+  Of the fixers only `strict-lib:fix:fmt` itself writes there, so when that
+  entry failed it is the command that runs.
+
 #### 5. Remember, and go round again
 
 A verdict lasts as long as the state it was reached in.
@@ -614,6 +705,7 @@ minutes.
 | `--idle-interval <sec>`   |     300 | wait between surveys once it has sat still |
 | `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
 | `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
+| `--no-auto-fix`           |         | skip the fix in "4a"                       |
 
 ### Where a passed-over pull request shows
 
@@ -653,6 +745,7 @@ the paths it changes and `.github/CODEOWNERS`.
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `release.mts`     | holding the queue to one released pull request           |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
+| `auto-fix.mts`    | fixing and pushing a failure that is only a fixer's diff |
 | `quiet.mts`       | how long to sleep when there is nothing to do            |
 | `checks.mts`      | what the merge is waiting for                            |
 | `github.mts`      | everything that shells out to `gh` or `git`              |

@@ -175,6 +175,17 @@ export type Advanced = Readonly<
   | { kind: 'stale-merge-state' }
 >;
 
+/**
+ * What `autoFix` did about a failed head. `declined` covers everything that
+ * is not a fixer's diff and everything that went wrong on the way; either way
+ * the failure stands and is the skill's. `moved` is what it is for `advance`.
+ */
+export type AutoFixed = Readonly<
+  | { kind: 'declined'; detail: string }
+  | { kind: 'moved' }
+  | { kind: 'pushed'; head: string; commands: readonly string[] }
+>;
+
 export type RebaseFailure = Readonly<{
   reason:
     'already-in-base' | 'push-failed' | 'rebase-failed' | 'unlabel-failed';

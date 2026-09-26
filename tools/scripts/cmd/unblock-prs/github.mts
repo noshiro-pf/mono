@@ -1,9 +1,13 @@
-/** Everything that shells out to `gh` or `git`, and nothing that decides. */
+/**
+ * Everything that shells out to `gh` or `git`, and nothing that decides.
+ * `git` is also what `auto-fix.mts` runs its `pnpm` commands through.
+ */
 
 import {
   describeSetAside,
   SET_ASIDE_CONTEXT,
   SKIP_CI_LABEL,
+  type CheckRunReport,
   type SetAside,
 } from 'pr-report-core';
 import { Json, Result } from 'ts-data-forge';
@@ -136,9 +140,77 @@ export const postSetAsideStatus = async (
   return Result.isErr(posted) ? posted : Result.ok(undefined);
 };
 
+/**
+ * Every check run GitHub Actions reported on one commit, every job of every
+ * workflow rather than only the required aggregates, so that a failure can
+ * be traced to the matrix entry under the aggregate. Other apps' runs — the
+ * codecov ones — are left out: nothing here can act on them, and none is
+ * required.
+ */
+export const listCheckRuns = async (
+  headSha: string,
+): Promise<Result<readonly CheckRunReport[], string>> => {
+  if (!SHA.test(headSha)) {
+    return Result.err(`unexpected head SHA: ${JSON.stringify(headSha)}`);
+  }
+
+  const listed = await git(
+    [
+      'gh api --paginate --slurp',
+      // `gh api`'s placeholders again, as in `postSetAsideStatus`.
+      sh([COMMITS_ROUTE, headSha, 'check-runs?per_page=100'].join('/')),
+    ].join(' '),
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const pages = parseJson(listed.value, CheckRunPagesSchema);
+
+  return Result.isErr(pages)
+    ? pages
+    : Result.ok(
+        pages.value
+          .flatMap((page) => page.check_runs)
+          .filter((run) => run.app?.slug === 'github-actions')
+          .map((run) => ({
+            id: run.id,
+            checkSuiteId: run.check_suite.id,
+            name: run.name,
+            status: run.status,
+            conclusion: run.conclusion ?? undefined,
+          })),
+      );
+};
+
+const CheckRunPagesSchema = t.array(
+  t.record({
+    check_runs: t.array(
+      t.record({
+        id: t.number(),
+        check_suite: t.record({ id: t.number() }),
+        app: t.union([t.record({ slug: t.string() }), t.nullType]),
+        name: t.string(),
+        status: t.string(),
+        conclusion: t.union([t.string(), t.nullType]),
+      }),
+    ),
+  }),
+);
+
+export const removeWorktree = async (worktreeDir: string): Promise<void> => {
+  // Both fail harmlessly when there is nothing to remove.
+  await git(`git worktree remove --force ${sh(worktreeDir)}`);
+
+  await git('git worktree prune');
+};
+
 const SHA = /^[0-9a-f]{40}$/u;
 
 const STATUSES_ROUTE = 'repos/{owner}/{repo}/statuses';
+
+const COMMITS_ROUTE = 'repos/{owner}/{repo}/commits';
 
 /**
  * Runs a git or gh command silently and resolves to its stdout, or to a
