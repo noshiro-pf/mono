@@ -3,6 +3,7 @@ import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { autoFix } from './auto-fix.mjs';
 import { STALE_STATE_PAUSE_MS } from './constants.mjs';
+import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
   checkPreflight,
   postSetAsideStatus,
@@ -25,6 +26,7 @@ import { newSkips, pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
   type CycleResult,
+  type Demotions,
   type LoopState,
   type PullRequest,
   type SkipRecord,
@@ -53,13 +55,16 @@ import { watch } from './watch.mjs';
  *    be acted on — a draft, no auto-merge, a base that is not the default
  *    branch — is reported, because the label asked for something and the
  *    answer is no. Drafts and anything a previous cycle gave up on are set
- *    aside.
+ *    aside, and so is one whose review holds its merge — a code owner has
+ *    not approved it, or a conversation is unresolved — because no check
+ *    reports that, and releasing it would only run a matrix to sit green.
  * 2. If one of them is already up to date and its checks are running, or it
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
  *    so a second rebase now would only run a CI matrix to throw it away.
  * 3. Otherwise take the lowest-numbered pull request that is `BEHIND` —
- *    or, once those are exhausted, one GitHub calls `DIRTY` — rebase it onto
+ *    or, once those are exhausted, one GitHub calls `DIRTY`, then the version
+ *    pull request, then one a watch saw sit green — rebase it onto
  *    `origin/<default branch>` in a throwaway worktree, and push with
  *    `--force-with-lease` against the head the survey saw. A rebase that
  *    conflicts, or a push that is refused, drops that pull request for as
@@ -85,9 +90,11 @@ import { watch } from './watch.mjs';
  *    watching, never the others that are failing.
  * 5. Remember the verdict against the head *and* the base it was reached on,
  *    so the pull request is left alone until someone pushes to it or the
- *    base moves. The base moving is exactly what a pull request that sat
- *    green without merging was waiting for: it is `BEHIND` now, and a rebase
- *    is this script's job.
+ *    base moves. A pull request that sat green without merging is also
+ *    picked last from then on, until someone else pushes to it: the base
+ *    moving makes it `BEHIND` and a candidate again, but whatever held it is
+ *    something triage could not read, and it would otherwise go first each
+ *    time anything else merged.
  * 6. Survey again, saying what became of the pull requests this run has
  *    touched. One that merges after the watch gave up simply stops appearing
  *    in the list, and this is the only place that gets recorded. When there
@@ -154,6 +161,7 @@ import { watch } from './watch.mjs';
  * in:
  *
  * - `triage.mts` — what one survey says about each pull request, and why.
+ * - `review.mts` — whether a pull request's own review holds its merge.
  * - `merge-after.mts` — the declared order: the trailer parser and the cycle
  *   detection.
  * - `version-pr.mts` — the version pull request, and what holds it back.
@@ -169,8 +177,8 @@ import { watch } from './watch.mjs';
  *   the ruleset requires.
  * - `github.mts` — everything that shells out to `gh` or `git`, and nothing
  *   that decides.
- * - `labels.mts`, `skips.mts`, `options.mts`, `types.mts`, `constants.mts`,
- *   `util.mts` — the vocabulary.
+ * - `labels.mts`, `skips.mts`, `demotions.mts`, `options.mts`, `types.mts`,
+ *   `constants.mts`, `util.mts` — the vocabulary.
  */
 const unblockPrs = async (
   options: Options,
@@ -191,6 +199,7 @@ const unblockPrs = async (
 
   let mut_state: LoopState = {
     skipped: new Map(),
+    demoted: new Map(),
     tracked: new Set(),
     baseSha: undefined,
     quiet: initialQuiet,
@@ -260,7 +269,8 @@ const runCycle = async (
     return { state: before, next: 'idle' };
   }
 
-  const { pullRequests, baseSha, requiredContexts } = surveyed.value;
+  const { pullRequests, baseSha, requiredContexts, reviewRequirements } =
+    surveyed.value;
 
   if (before.baseSha !== undefined && before.baseSha !== baseSha) {
     log(`${defaultBranch} moved to ${baseSha.slice(0, 10)}.`);
@@ -271,32 +281,38 @@ const runCycle = async (
   // whose merge would otherwise go unrecorded.
   const tracked = await reportDeparted(before.tracked, pullRequests);
 
-  const quiet = observeSurvey(
-    before.quiet,
-    surveyFingerprint({ pullRequests, baseSha }),
-  );
-
-  const state = (
-    nextSkipped: SkipRecords,
-    nextTracked: ReadonlySet<number> = tracked,
-  ): LoopState =>
-    ({
-      skipped: nextSkipped,
-      tracked: nextTracked,
-      baseSha,
-      quiet,
-    }) as const;
-
   const skipped = pruneSkips(before.skipped, pullRequests, baseSha);
+
+  const demoted = pruneDemotions(before.demoted, pullRequests);
 
   const triaged = await triage(pullRequests, {
     defaultBranch,
     baseSha,
     skipped,
+    demoted,
     requiredContexts,
+    reviewRequirements,
   });
 
-  reportTriage(triaged, pullRequests.length, defaultBranch);
+  reportTriage(triaged, pullRequests.length, { defaultBranch, demoted });
+
+  const quiet = observeSurvey(
+    before.quiet,
+    surveyFingerprint({ pullRequests, baseSha }, triaged.held),
+  );
+
+  const state = (
+    nextSkipped: SkipRecords,
+    nextDemoted: Demotions = demoted,
+    nextTracked: ReadonlySet<number> = tracked,
+  ): LoopState =>
+    ({
+      skipped: nextSkipped,
+      demoted: nextDemoted,
+      tracked: nextTracked,
+      baseSha,
+      quiet,
+    }) as const;
 
   // A pull request that is up to date and already failing gets remembered
   // now, so that it is not rebased the moment `main` moves and put through
@@ -347,6 +363,7 @@ const runCycle = async (
           baseSha,
           outcome,
         ),
+        afterWatch(demoted, watched.number, head, outcome),
         trackAfterWatch(tracked, watched.number, outcome),
       ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
@@ -420,15 +437,18 @@ const runCycle = async (
       return { state: state(mut_skipped), next: 'survey' };
     }
 
+    const advancedHead = advanced.value.head;
+
+    // The rebase is this run's, not the author's, so a demotion goes with it.
+    const demotedNow = followHead(demoted, target.number, advancedHead);
+
     if ((await settleAfterRelease(target, defaultBranch)) === 'yielded') {
       log(
         `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
       );
 
-      return { state: state(mut_skipped), next: 'survey' };
+      return { state: state(mut_skipped, demotedNow), next: 'survey' };
     }
-
-    const advancedHead = advanced.value.head;
 
     log(
       `#${target.number} is at ${advancedHead.slice(0, 10)}; waiting for it to merge.`,
@@ -449,6 +469,7 @@ const runCycle = async (
           baseSha,
           outcome,
         ),
+        afterWatch(demotedNow, target.number, head, outcome),
         trackAfterWatch(tracked, target.number, outcome),
       ),
       next: outcome === 'stopped' ? 'stop' : 'survey',
@@ -620,7 +641,7 @@ const applyWatchOutcome = (
 
     case 'not-merging':
       log(
-        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it — a review, an unresolved conversation, or auto-merge armed by someone who may not merge.`,
+        `#${pr.number}: every required check reported green and it is still open; something other than the checks holds it that its review does not show — auto-merge armed by someone who may not merge, or a rule this script does not read. It goes last from now on, until someone pushes to it.`,
       );
 
       return withSkip(skipped, {

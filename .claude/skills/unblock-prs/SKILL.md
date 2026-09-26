@@ -172,6 +172,20 @@ number, the version PR last. The worker also puts last one GitHub calls
 lease settles it. Everything else waits, untouched. A PR sitting at `BEHIND`
 costs nothing.
 
+**Pass over one its review holds, as the worker does.** The ruleset asks for
+a code owner's approval of every changed path `.github/CODEOWNERS` owns, and
+for every conversation resolved. No check reports either, so a PR missing one
+goes green and sits there, and releasing it spends a matrix for nothing. For a
+PR you are about to pick, list its files (`GET /pulls/{n}/files`); if one is
+under a path `CODEOWNERS` owns, read `GET /pulls/{n}/reviews` for an owner's
+latest review being `APPROVED`. If it has none, leave the PR in the queue and
+report it as waiting for that approval. Say so too when the author is the
+owner, since an author cannot approve their own PR. Unresolved conversations
+are GraphQL only, so the worker sees them and this skill does not; the lease
+settles that difference as it settles `DIRTY`. The worker also picks last one
+it saw sit green without merging. It remembers that in its own process only,
+so the skill cannot see it.
+
 ### 2a. The normal case
 
 If the PR carries no `skip-ci`, the rebase is its release: pause the others

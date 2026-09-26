@@ -1,5 +1,6 @@
 export * from './checks.mjs';
 export * from './closing-issues.mjs';
+export * from './code-owners.mjs';
 export * from './labels.mjs';
 export * from './merge-after.mjs';
 export * from './report.mjs';

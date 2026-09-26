@@ -1,5 +1,5 @@
+import { type CodeOwnerReview } from 'pr-report-core';
 import * as React from 'react';
-import { type CodeOwnerReview } from '../code-owners.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 type Props = Readonly<{ review: CodeOwnerReview }>;

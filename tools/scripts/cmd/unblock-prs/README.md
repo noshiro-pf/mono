@@ -134,7 +134,10 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 `gh pr list` で open な PR を全件取得します（`body` を含む — 順序をそこから読
 むため）。`mergeStateStatus` が `UNKNOWN` の PR があれば10秒おきに最大6回引き
 直します。GitHub が計算中の状態を「up-to-date」と誤読しないためです。あわせて
-`origin/main` の SHA と、ruleset が要求する status check の一覧を取得します。
+`origin/main` の SHA と、`main` に適用されている rule を取得します。rule から
+読むのは、必須の status check の一覧と、レビューへの2つの要件（code owner の承
+認、会話の解決）です。宣言ファイルではなく GitHub が実際に適用しているものを読
+みます。
 
 #### 2. triage
 
@@ -166,6 +169,26 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in-flight**。
     - `BLOCKED` → 必須チェックを読み、失敗なら **failing**、未完なら
       **in-flight**。
+7. **レビュー待ち** — **candidate** になった PR と、`BLOCKED` のまま
+   **in-flight** になった PR について、レビューがマージを止めていないかを
+   GraphQL 1回でまとめて読みます。止めていれば **held**（理由を出力）にして、
+   rebase も解放も watch もしません。読むのは ruleset が要求する2つです。
+    - **code owner の承認** — 変更したパスのうち `.github/CODEOWNERS` に所有者
+      がいるもの全部に、所有者の承認が要ります。GitHub の `reviewDecision` は
+      branch protection の答えで、ruleset のこのリポジトリでは常に `null` なの
+      で、`CODEOWNERS` と変更ファイルと承認から計算します。Pull Requests
+      Manager と同じ `pr-report-core` の `codeOwnerReview` です。作者自身が所有
+      者なら、作者は自分の PR を承認できないので、そう出力します。
+    - **未解決の会話** — 1件でもあれば。
+
+    チェックでは分からない理由でマージできない PR を解放すると、マトリクスを
+    1回丸ごと使い、watch の間キューを止めます。しかも `main` が動くたびに
+    `BEHIND` として先頭に戻ってくるので、他の PR がマージされるたびに同じこと
+    を繰り返します。承認や会話の解決があれば次の survey で答えが変わるので、
+    skip 記録は作りません。変更ファイルが1ページ（100件）に収まらず判定しきれ
+    ない場合と、読み取りに失敗した場合は、止めません（以前の動作）。GitHub が
+    mergeable と言っている in-flight の PR は、それ自体が「チェック以外に残っ
+    ているものは無い」という答えなので、今まで通り watch します。
 
 このスクリプトは **version PR を rebase しません。** `changeset-release/main`
 は Release workflow が main の先端から毎回作り直して force-push するブランチで、
@@ -180,7 +203,9 @@ version commit が「まだ消費していない changeset を含む先端」の
 
 **in-flight があればそれを watch して終わり** — rebase はしません。
 
-なければ candidate の先頭（番号順、`DIRTY` は最後）に対して:
+なければ candidate の先頭に対して、次の手順を行います。並びは番号順で、後ろに回
+すものが3種類あります。`DIRTY`、その後ろに version PR、さらにその後ろに green
+のまま止まった PR（「5」）です。
 
 1. 使い捨て worktree で `origin/main` に rebase し、`--force-with-lease`
    （survey が見た head を明示）で push。
@@ -232,9 +257,11 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 `gh pr checks` の出力に pending として並ぶのではなく **行ごと現れません**。報
 告済みだけで判定すると、25分かかるマトリクスの3分目に「完了」と誤読します。
 
-全部 green なのにマージされない場合（未解決の会話、レビュー不足、マージ権限の
-無い人が auto-merge を有効にした等）は rebase では直せないので、連続 green 回
-数で打ち切ります。GitHub 自身が mergeable と言っている場合は3回、`BLOCKED` の
+全部 green なのにマージされない場合は rebase では直せないので、連続 green 回
+数で打ち切ります。原因のうち未解決の会話と code owner の承認不足は triage が先
+に見つけて解放しないので（「2」の7）、ここに来るのはそれ以外です。たとえばマー
+ジ権限の無い人が auto-merge を有効にした、このスクリプトが読まない rule に引っ
+かかっている、などです。GitHub 自身が mergeable と言っている場合は3回、`BLOCKED` の
 まま green の場合は8回。後者が長いのは、check run が superseded された直後の一
 瞬がこの形になるためです。
 
@@ -302,13 +329,24 @@ base の移動と一緒に消えたかもしれないので、`main` が動け�
 rebase しても同じマトリクスが同じように落ちるだけで、直すのは人間の仕事だから
 です。
 
+`not-merging` の PR は、記録が消えた後も **candidate の最後**（version PR より
+後ろ）に回されます。`main` が動けば記録は消えて `BEHIND` の candidate に戻り
+ます。しかし原因は triage が読めなかったものなので、次もマージされない見込みが
+高いです。先頭に置いたままだと、他の PR がマージされるたびにこの PR がマトリク
+スを1回使い、green になって打ち切られる、という流れを繰り返します。除外ではな
+く最後に回すだけなのは、推測が外れることがあるからです（原因がその後に解消して
+いる場合）。この降格は **誰かが push するまで** 続きます。このスクリプト自身の
+rebase や「4a」の push では解けません。記憶はプロセスの中だけにあるので、再起
+動すると忘れます。
+
 このサイクルで触った PR が次の survey で open 一覧から消えていれば、マージされ
 たのかクローズされたのかを報告します。watch を諦めた数分後にマージされた PR を
 取りこぼさないためです。
 
 何もすることがなければ待ってから再 survey します。待ち時間は一覧が動いている
 かどうかで変わります。open な PR の一覧（head、merge state、ラベル、
-auto-merge、draft、本文）と `main` の tip が `--idle-after`（既定10回）続けて
+auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip が
+`--idle-after`（既定10回）続けて
 前回の survey と同じになるまでは `--active-interval`（既定30秒）、それ以降は
 `--idle-interval`（既定300秒）です。何か変われば短い間隔に戻ります。今キュー
 に入れた PR を数分放置しないためです。
@@ -347,7 +385,9 @@ SHA）。**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/p
   ログに出して続行します。
 
 code owner の承認待ちで止まっている PR は、変更したパスと `.github/CODEOWNERS`
-からページが自分で判定します。
+からページが自分で判定します。このスクリプトも同じ判定で、その PR を解放せずに
+残します（「2」の7）。この場合 status は書きません。承認されれば次の survey で
+動き出すからです。
 
 ### ファイル構成
 
@@ -359,6 +399,7 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `version-pr.mts`  | version PR と、それを止めているもの                       |
 | `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
 | `release.mts`     | 解放されている PR を1本に保つ                             |
+| `review.mts`      | レビューがマージを止めているか                            |
 | `watch.mts`       | 1本をマージまでポーリング                                 |
 | `auto-fix.mts`    | fixer の差分だけの失敗を直して push                       |
 | `quiet.mts`       | 何もない時にどれだけ待つか                                |
@@ -366,13 +407,14 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 | `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                 |
 | `labels.mts`      | 3つのラベルがその PR について何を言うか                   |
 | `skips.mts`       | 諦めた PR を何をもって覚え続けるか                        |
+| `demotions.mts`   | green のまま止まった PR をいつまで最後に回すか            |
 | `options.mts`     | コマンドライン                                            |
 | `types.mts`       | 共有される型とスキーマ                                    |
 | `constants.mts`   | 待ち時間と諦めるまでの回数                                |
 | `util.mts`        | quoting、ログ、停止シグナル                               |
 
-トレーラのパーサと閉路検出、ラベルの文字列は、同じ宣言を読む Pull Requests
-Manager と共有するため `apps/pr-report-core` にあります。
+トレーラのパーサと閉路検出、ラベルの文字列、`CODEOWNERS` の判定は、同じ宣言を
+読む Pull Requests Manager と共有するため `apps/pr-report-core` にあります。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -507,7 +549,10 @@ exits immediately.
 order is read from. While any of them reports `mergeStateStatus: UNKNOWN` the
 list is fetched again, up to six times at ten-second intervals, so a state
 GitHub is still computing is never read as up to date. The tip of
-`origin/main` and the contexts the ruleset requires are read too.
+`origin/main` is read too, and so are the rules GitHub applies to `main`: the
+contexts they require, and whether they require a code owner's approval and
+every conversation resolved. These are the rules GitHub enforces, not the ones
+declared under `repo-settings/`.
 
 #### 2. Triage
 
@@ -540,6 +585,30 @@ merge-base` says whether the branch was built on the current tip of the
     - `CLEAN` / `UNSTABLE` / `HAS_HOOKS` → **in flight**.
     - `BLOCKED` → read the required checks: **failing** if one failed,
       **in flight** if they are still running.
+7. **Its review** — for every **candidate**, and every **in flight** that
+   GitHub still calls `BLOCKED`, one GraphQL request reads whether its review
+   holds the merge. If it does, the pull request is **held**, with the reason
+   in the output, and is not rebased, released or watched. Two things are
+   read, the two the ruleset asks for:
+    - **A code owner's approval** of every changed path that
+      `.github/CODEOWNERS` gives an owner. GitHub's `reviewDecision` answers
+      for branch protection, not a ruleset, and is `null` for every pull
+      request here. So this is worked out from `CODEOWNERS`, the changed files
+      and the approvals, by `pr-report-core`'s `codeOwnerReview`, the same
+      code the Pull Requests Manager uses. When the author owns the path it
+      says so, since an author may not approve their own pull request.
+    - **An unresolved conversation**, any at all.
+
+    Releasing a pull request that cannot merge for a reason no check reports
+    runs a whole matrix and holds the queue for the length of a watch. And
+    since `main` moving puts it back at the front as `BEHIND`, it would do so
+    again every time anything else merged. An approval or a resolved
+    conversation changes the answer on the next survey, so nothing is
+    recorded. A pull request whose changed files run past one page (100) is
+    not held on a guess, and neither is anything when the request fails; that
+    is how the script behaved before it asked. One in flight that GitHub calls
+    mergeable is watched as ever: that state is GitHub's own answer that
+    nothing but the checks is left.
 
 **The version pull request is never rebased.** `changeset-release/main` is
 rebuilt from the tip of the base and force-pushed by the release workflow on
@@ -555,7 +624,9 @@ a queued change and the release are both ready, the change goes in first.
 
 **If anything is in flight, watch that and stop** — do not rebase another.
 
-Otherwise take the first candidate (lowest number, `DIRTY` last) and:
+Otherwise take the first candidate. Candidates go lowest number first, with
+three kinds moved back: `DIRTY` after the rest, the version pull request after
+that, and one that sat green without merging (step 5) last of all. Then:
 
 1. Rebase onto `origin/main` in a throwaway worktree and push with
    `--force-with-lease`, leased against the head the survey saw.
@@ -613,9 +684,11 @@ reported writes a pull request off three minutes into a twenty-five minute
 matrix.
 
 A pull request that is green and still open is held by something a rebase
-cannot fix — an unresolved conversation, a missing review, auto-merge armed by
-someone who may not merge — so it is given a budget of consecutive green
-polls: three when GitHub itself calls it mergeable, eight while it still reads
+cannot fix, so it is given a budget of consecutive green polls. An unresolved
+conversation or a missing code-owner approval is caught by triage before
+release (step 2, item 7), so what reaches this point is anything else, such as
+auto-merge armed by someone who may not merge, or a rule this script does not
+read. The budget is three when GitHub itself calls it mergeable, eight while it still reads
 `BLOCKED`, because that combination is also what a check run that has just
 been superseded looks like for a moment.
 
@@ -682,6 +755,16 @@ conflicted with may have gone with it. `checks-failed` is the exception —
 rebasing would put the same failing matrix through again, and fixing the
 failure is a person's job, so the push that carries the fix is what clears it.
 
+A `not-merging` pull request is also **picked last** from then on, after the
+version pull request, and this outlives the record. `main` moving clears the
+record and makes it a `BEHIND` candidate again. But what held it is something
+triage could not read, so it will most likely not merge next time either. Left
+at the front, it would run a matrix, sit green and be given up on each time
+anything else merged. It is moved back rather than excluded, because the
+guess is wrong for one whose cause has since cleared. The demotion lasts until
+**someone else pushes**: this script's own rebase, or a "4a" push, carries it
+along. It is kept in memory only, so a restart forgets it.
+
 A pull request this run acted on that has left the open list by the next
 survey is reported as merged or closed. Nothing else would notice one that
 merged minutes after the watch gave up on it.
@@ -689,8 +772,8 @@ merged minutes after the watch gave up on it.
 With nothing to do, the loop sleeps and surveys again, for how long depending
 on whether the list is still moving. It sleeps `--active-interval` (30s) until
 `--idle-after` (10) surveys in a row have seen the same open pull requests
-(head, merge state, labels, auto-merge, draft flag, body) and the same tip of
-`main`, and `--idle-interval` (300s) from then on. Any change brings it back
+(head, merge state, labels, auto-merge, draft flag, body), the same reasons a
+review holds any of them, and the same tip of `main`, and `--idle-interval` (300s) from then on. Any change brings it back
 to the short interval, so a pull request queued a moment ago is not left for
 minutes.
 
@@ -732,7 +815,10 @@ the terminal the script ran in.
   and a status that could not be written is logged and nothing more.
 
 A pull request waiting for a code owner the page works out for itself, from
-the paths it changes and `.github/CODEOWNERS`.
+the paths it changes and `.github/CODEOWNERS`. This script works it out the
+same way and leaves that pull request in the queue (step 2, item 7). It writes
+no status for it, because an approval puts it back in the running on the next
+survey.
 
 ### Layout
 
@@ -744,6 +830,7 @@ the paths it changes and `.github/CODEOWNERS`.
 | `version-pr.mts`  | the version pull request, and what holds it back         |
 | `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
 | `release.mts`     | holding the queue to one released pull request           |
+| `review.mts`      | whether a pull request's review holds its merge          |
 | `watch.mts`       | polling one pull request until it merges, or will not    |
 | `auto-fix.mts`    | fixing and pushing a failure that is only a fixer's diff |
 | `quiet.mts`       | how long to sleep when there is nothing to do            |
@@ -751,14 +838,15 @@ the paths it changes and `.github/CODEOWNERS`.
 | `github.mts`      | everything that shells out to `gh` or `git`              |
 | `labels.mts`      | what the three labels say about a pull request           |
 | `skips.mts`       | what the loop remembers, and for how long                |
+| `demotions.mts`   | how long one that sat green without merging goes last    |
 | `options.mts`     | the command line                                         |
 | `types.mts`       | the shapes every module passes around                    |
 | `constants.mts`   | how long it waits, and how long before it gives up       |
 | `util.mts`        | quoting, logging, the stop signal                        |
 
-The trailer parser, the cycle detection and the label strings are in
-`apps/pr-report-core`, shared with the Pull Requests Manager page, which reads
-the same declarations.
+The trailer parser, the cycle detection, the label strings and the
+`CODEOWNERS` rules are in `apps/pr-report-core`, shared with the Pull Requests
+Manager page, which reads the same declarations.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.

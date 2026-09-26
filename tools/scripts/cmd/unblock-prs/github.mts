@@ -5,15 +5,18 @@
 
 import {
   describeSetAside,
+  requirementsOfRules,
   SET_ASIDE_CONTEXT,
   SKIP_CI_LABEL,
   type CheckRunReport,
+  type RulesetRequirements,
   type SetAside,
 } from 'pr-report-core';
-import { Json, Result } from 'ts-data-forge';
+import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { $ } from 'ts-repo-utils';
 import { projectRootPath } from '../../project-root-path.mjs';
+import { type ReviewState } from './review.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,
@@ -100,6 +103,184 @@ export const remoteSha = async (
     ? Result.err(`origin has no branch named ${branch}`)
     : Result.ok(sha);
 };
+
+/**
+ * What GitHub enforces on the branch, every ruleset that applies to it
+ * together — rather than what `repo-settings/` declares, which changes
+ * nothing until it is applied.
+ */
+export const readBranchRules = async (
+  branch: string,
+): Promise<Result<RulesetRequirements, string>> => {
+  const listed = await git(
+    [
+      'gh api',
+      // Joined rather than interpolated: `gh` fills the `{owner}` and
+      // `{repo}` placeholders in, and a template literal holding them is
+      // indistinguishable from a mistyped one to `unicorn`.
+      sh(['repos', '{owner}', '{repo}', 'rules', 'branches', branch].join('/')),
+    ].join(' '),
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const rules = parseJson(listed.value, t.array(t.unknown()));
+
+  return Result.isErr(rules)
+    ? rules
+    : Result.ok(requirementsOfRules(rules.value));
+};
+
+/**
+ * `CODEOWNERS` on the default branch, and what `review.mts` reads about each
+ * of `numbers`, in one GraphQL request. `undefined` for a repository without
+ * `.github/CODEOWNERS` — the one place the Pull Requests Manager reads it
+ * from too.
+ *
+ * Every number goes in as a variable, and each pull request comes back under
+ * its own alias.
+ */
+export const readReviewStates = async (
+  numbers: readonly number[],
+  defaultBranch: string,
+): Promise<
+  Result<
+    Readonly<{
+      codeOwners: string | undefined;
+      states: ReadonlyMap<number, ReviewState>;
+    }>,
+    string
+  >
+> => {
+  const query = [
+    `query ReviewStates(${['$owner: String!', '$name: String!', '$codeOwners: String!', ...numbers.map((n) => `$pr_${n}: Int!`)].join(', ')}) {`,
+    '  repository(owner: $owner, name: $name) {',
+    '    codeOwners: object(expression: $codeOwners) { ... on Blob { text } }',
+    ...numbers.map(
+      (n) => `    pr_${n}: pullRequest(number: $pr_${n}) { ...ReviewState }`,
+    ),
+    '  }',
+    '}',
+    'fragment ReviewState on PullRequest {',
+    '  author { login }',
+    '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
+    `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path } }`,
+    // A pull request with more conversations than one page is counted from
+    // the first page. Undercounting only ever holds less, and holding less
+    // is what happened before this was read at all.
+    `  reviewThreads(first: ${PAGE_SIZE}) { nodes { isResolved } }`,
+    '}',
+  ].join('\n');
+
+  const answered = await git(
+    [
+      'gh api graphql',
+      `-f ${sh(`query=${query}`)}`,
+      // `-F` fills `{owner}` and `{repo}` in, as `gh api` does in a path,
+      // and sends a number as a number.
+      `-F ${sh('owner={owner}')}`,
+      `-F ${sh('name={repo}')}`,
+      `-f ${sh(`codeOwners=${defaultBranch}:${CODE_OWNERS_PATH}`)}`,
+      ...numbers.map((n) => `-F ${sh(`pr_${n}=${n}`)}`),
+    ].join(' '),
+  );
+
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const parsed = parseJson(answered.value, ReviewStatesAnswerSchema);
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  const { repository } = parsed.value.data;
+
+  if (!isRecord(repository)) {
+    return Result.err('GitHub answered without the repository');
+  }
+
+  const codeOwners = CodeOwnersBlobSchema.validate(repository['codeOwners']);
+
+  const nodes = numbers.map(
+    (n) => [n, ReviewStateNodeSchema.validate(repository[`pr_${n}`])] as const,
+  );
+
+  const invalid = nodes.flatMap(([n, node]) =>
+    Result.isErr(node)
+      ? [`#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`]
+      : [],
+  );
+
+  if (Arr.isNonEmpty(invalid)) {
+    return Result.err(invalid.join('\n'));
+  }
+
+  const states: ReadonlyMap<number, ReviewState> = new Map(
+    nodes.flatMap(([n, node]) =>
+      Result.isOk(node) ? [[n, reviewStateOf(node.value)] as const] : [],
+    ),
+  );
+
+  return Result.ok({
+    codeOwners:
+      Result.isOk(codeOwners) && codeOwners.value !== null
+        ? codeOwners.value.text
+        : undefined,
+    states,
+  });
+};
+
+const CODE_OWNERS_PATH = '.github/CODEOWNERS';
+
+/** One page of a list inside a pull request. */
+const PAGE_SIZE = 100;
+
+const ReviewStatesAnswerSchema = t.record({
+  data: t.record({
+    repository: t.unknown(),
+  }),
+});
+
+const CodeOwnersBlobSchema = t.union([
+  t.record({ text: t.string() }),
+  t.nullType,
+]);
+
+const LoginSchema = t.union([t.record({ login: t.string() }), t.nullType]);
+
+const ReviewStateNodeSchema = t.record({
+  author: LoginSchema,
+  latestOpinionatedReviews: t.record({
+    nodes: t.array(t.record({ state: t.string(), author: LoginSchema })),
+  }),
+  files: t.record({
+    pageInfo: t.record({ hasNextPage: t.boolean() }),
+    nodes: t.array(t.record({ path: t.string() })),
+  }),
+  reviewThreads: t.record({
+    nodes: t.array(t.record({ isResolved: t.boolean() })),
+  }),
+});
+
+const reviewStateOf = (
+  node: t.TypeOf<typeof ReviewStateNodeSchema>,
+): ReviewState =>
+  ({
+    author: node.author?.login ?? '',
+    approvers: node.latestOpinionatedReviews.nodes.flatMap(
+      ({ state, author }) =>
+        state === 'APPROVED' && author !== null ? [author.login] : [],
+    ),
+    files: node.files.nodes.map(({ path }) => path),
+    filesComplete: !node.files.pageInfo.hasNextPage,
+    unresolvedConversations: node.reviewThreads.nodes.filter(
+      ({ isResolved }) => !isResolved,
+    ).length,
+  }) as const;
 
 export const addSkipCiLabel = async (
   prNumber: number,

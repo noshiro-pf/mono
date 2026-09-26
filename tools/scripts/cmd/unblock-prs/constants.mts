@@ -14,8 +14,10 @@ export const STALE_STATE_PAUSE_MS = 30_000;
 /**
  * How many consecutive polls a pull request may sit with every required
  * context green, and GitHub saying nothing holds the merge, before it is
- * written off as held by something a rebase cannot fix — a missing review, an
- * unresolved conversation, auto-merge armed by someone who may not merge.
+ * written off as held by something a rebase cannot fix. Triage keeps back
+ * the two such things it can read, a missing code-owner approval and an
+ * unresolved conversation, so this is what is left: auto-merge armed by
+ * someone who may not merge, or a rule nothing here reads.
  */
 export const GREEN_POLLS_BEFORE_GIVING_UP = 3;
 

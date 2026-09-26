@@ -1,6 +1,6 @@
 /** What `repo-settings/rulesets/main.json` asks of a pull request. */
 
-import { Json, Result } from 'ts-data-forge';
+import { Arr, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 /** Where the ruleset is declared, relative to the repository root. */
@@ -14,6 +14,8 @@ export type RulesetRequirements = Readonly<{
    * its owners to approve it.
    */
   requireCodeOwnerReview: boolean;
+  /** Whether every review conversation has to be resolved first. */
+  requireConversationResolution: boolean;
 }>;
 
 /**
@@ -46,27 +48,50 @@ export const parseRuleset = (
     );
   }
 
-  const { rules } = validated.value;
+  return Result.ok(requirementsOfRules(validated.value.rules));
+};
 
-  return Result.ok({
-    requiredContexts: rules.flatMap((rule) => {
-      const status = RequiredStatusChecksRuleSchema.validate(rule);
+/**
+ * The requirements a list of rules adds up to: the contexts of every
+ * `required_status_checks` rule, and a review requirement wherever any
+ * `pull_request` rule asks for it. The list is a ruleset's `rules`, or what
+ * `GET /repos/{owner}/{repo}/rules/branches/{branch}` answers — every rule of
+ * every ruleset that applies to the branch, which is what `unblock-prs` reads
+ * because it is what GitHub enforces rather than what was declared. A rule of
+ * any other kind, or one whose parameters are not the expected shape, adds
+ * nothing.
+ */
+export const requirementsOfRules = (
+  rules: readonly unknown[],
+): RulesetRequirements =>
+  ({
+    requiredContexts: Arr.uniq(
+      rules.flatMap((rule) => {
+        const status = RequiredStatusChecksRuleSchema.validate(rule);
 
-      return Result.isErr(status)
-        ? []
-        : status.value.parameters.required_status_checks.map(
-            ({ context }) => context,
-          );
-    }),
+        return Result.isErr(status)
+          ? []
+          : status.value.parameters.required_status_checks.map(
+              ({ context }) => context,
+            );
+      }),
+    ),
     requireCodeOwnerReview: rules.some((rule) => {
-      const review = PullRequestRuleSchema.validate(rule);
+      const review = CodeOwnerReviewRuleSchema.validate(rule);
 
       return (
         Result.isOk(review) && review.value.parameters.require_code_owner_review
       );
     }),
-  });
-};
+    requireConversationResolution: rules.some((rule) => {
+      const review = ConversationResolutionRuleSchema.validate(rule);
+
+      return (
+        Result.isOk(review) &&
+        review.value.parameters.required_review_thread_resolution
+      );
+    }),
+  }) as const;
 
 const RulesetSchema = t.record({ rules: t.array(t.unknown()) });
 
@@ -82,7 +107,12 @@ const RequiredStatusChecksRuleSchema = t.record({
   }),
 });
 
-const PullRequestRuleSchema = t.record({
+const CodeOwnerReviewRuleSchema = t.record({
   type: t.literal('pull_request'),
   parameters: t.record({ require_code_owner_review: t.boolean() }),
+});
+
+const ConversationResolutionRuleSchema = t.record({
+  type: t.literal('pull_request'),
+  parameters: t.record({ required_review_thread_resolution: t.boolean() }),
 });

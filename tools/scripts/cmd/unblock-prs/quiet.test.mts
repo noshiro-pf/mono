@@ -83,6 +83,23 @@ describe('surveyFingerprint', () => {
     );
   });
 
+  // What a pull request's review holds is read by triage, not listed by
+  // `gh`, so it is passed in: an approval or a resolved conversation is what
+  // the held pull request was waiting for.
+  test('changes when what a review holds changes', () => {
+    const held = ['#1: waiting for @owner to approve a.yml'] as const;
+
+    assert.notStrictEqual(
+      surveyFingerprint({ pullRequests: [one], baseSha }, held),
+      surveyFingerprint({ pullRequests: [one], baseSha }, []),
+    );
+
+    assert.strictEqual(
+      surveyFingerprint({ pullRequests: [one], baseSha }, held),
+      surveyFingerprint({ pullRequests: [one], baseSha }, Array.from(held)),
+    );
+  });
+
   // Nothing triage reads depends on the title, so an edit to it is not
   // something to hurry back for.
   test('ignores a retitle', () => {

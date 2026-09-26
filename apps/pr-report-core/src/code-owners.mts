@@ -6,7 +6,9 @@
  * waits for an owner to approve it — and nothing on a pull request reports
  * that wait: `reviewDecision` answers `null` for every pull request here,
  * owned paths or not, because it describes branch protection rather than a
- * ruleset. So the page works it out the way GitHub does, from the file.
+ * ruleset. So it is worked out the way GitHub does, from the file — by the
+ * Pull Requests Manager page, to show the wait, and by `unblock-prs`, to
+ * leave a pull request that waits in the queue rather than run its checks.
  *
  * The patterns are the subset of `.gitignore` syntax GitHub documents for
  * this file: a leading `/` or a `/` in the middle anchors a pattern to the
@@ -142,8 +144,8 @@ export type CodeOwnerReview = Readonly<
  *
  * Owners are compared by login, case-insensitively, as GitHub compares
  * them. A team owner (`@org/team`) is never matched by one person's
- * approval here, because telling who is on the team takes a permission this
- * page does not ask for; `CODEOWNERS` in this repository names no team.
+ * approval here, because telling who is on the team takes a permission
+ * neither reader asks for; `CODEOWNERS` in this repository names no team.
  */
 export const codeOwnerReview = ({
   required,

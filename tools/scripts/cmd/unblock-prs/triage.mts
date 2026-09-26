@@ -3,18 +3,32 @@
 import {
   findMergeAfterCycles,
   MERGE_QUEUED_LABEL,
+  parseCodeOwners,
   parseMergeAfter,
   SKIP_CI_LABEL,
+  type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
-import { listRequiredChecks, summarizeChecks } from './checks.mjs';
+import {
+  isMergeableState,
+  listRequiredChecks,
+  summarizeChecks,
+} from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
-import { git, listPullRequests, remoteSha } from './github.mjs';
+import { isDemoted } from './demotions.mjs';
+import {
+  listPullRequests,
+  readBranchRules,
+  readReviewStates,
+  remoteSha,
+} from './github.mjs';
 import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
+import { reviewHold } from './review.mjs';
 import { skipStillApplies } from './skips.mjs';
 import {
   type Classification,
+  type Demotions,
   type PullRequest,
   type Survey,
   type Triage,
@@ -26,7 +40,6 @@ import {
   lastLines,
   log,
   pause,
-  sh,
   stopRequested,
 } from './util.mjs';
 import { isVersionPullRequest, versionPullRequestHold } from './version-pr.mjs';
@@ -72,56 +85,47 @@ export const survey = async (
     return baseSha;
   }
 
+  const rules = await readRules(defaultBranch);
+
   return Result.ok({
     pullRequests: mut_listed.value,
     baseSha: baseSha.value,
-    requiredContexts: await listRequiredContexts(defaultBranch),
+    requiredContexts: rules.requiredContexts,
+    reviewRequirements: {
+      requireCodeOwnerReview: rules.requireCodeOwnerReview,
+      requireConversationResolution: rules.requireConversationResolution,
+    },
   });
 };
 
 /**
- * The contexts the ruleset requires on the default branch, as GitHub reports
- * them, deduplicated across rulesets.
+ * What the rules on the default branch require, as GitHub applies them.
  *
- * This is what lets "green" mean the whole list rather than the part of it
- * that has reported. A required context with no check run on the head commit
- * is not pending in `gh pr checks` — it is absent from it — so a pull request
- * three minutes into a twenty-five minute matrix looks finished without this.
+ * The required contexts are what let "green" mean the whole list rather than
+ * the part of it that has reported. A required context with no check run on
+ * the head commit is not pending in `gh pr checks` — it is absent from it —
+ * so a pull request three minutes into a twenty-five minute matrix looks
+ * finished without them. The review rules are what `review.mts` asks about.
  *
- * A repository whose rules cannot be read gives an empty list, and the watch
- * falls back to judging by what has reported, on a longer leash.
+ * Rules that cannot be read require nothing: the watch falls back to judging
+ * by what has reported, on a longer leash, and no review holds anything.
  */
-const listRequiredContexts = async (
-  branch: string,
-): Promise<readonly string[]> => {
-  const listed = await git(
-    [
-      'gh api',
-      // Joined rather than interpolated: `gh` fills the `{owner}` and
-      // `{repo}` placeholders in, and a template literal holding them is
-      // indistinguishable from a mistyped one to `unicorn`.
-      sh(['repos', '{owner}', '{repo}', 'rules', 'branches', branch].join('/')),
-      '--jq',
-      sh(
-        '.[] | select(.type == "required_status_checks") | .parameters.required_status_checks[].context',
-      ),
-    ].join(' '),
-  );
+const readRules = async (branch: string): Promise<RulesetRequirements> => {
+  const rules = await readBranchRules(branch);
 
-  if (Result.isErr(listed)) {
+  if (Result.isErr(rules)) {
     log(
-      `Cannot read the required checks for ${branch}; judging by what has reported. (${lastLines(listed.value, 2)})`,
+      `Cannot read the rules for ${branch}; judging by the checks that have reported, and holding nothing for review. (${lastLines(rules.value, 2)})`,
     );
 
-    return [];
+    return {
+      requiredContexts: [],
+      requireCodeOwnerReview: false,
+      requireConversationResolution: false,
+    };
   }
 
-  return Arr.uniq(
-    listed.value
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line !== ''),
-  );
+  return rules.value;
 };
 
 export const triage = async (
@@ -157,29 +161,46 @@ export const triage = async (
     releaseBlockers: sorted.filter(blocksRelease),
   } as const;
 
-  const classified = await Promise.all(
+  const beforeReview = await Promise.all(
     sorted.map(async (pr) => ({ pr, result: await classify(pr, context) })),
   );
+
+  const holds = await readReviewHolds(
+    beforeReview.filter(({ pr, result }) => shouldAskReview(pr, result)),
+    context,
+  );
+
+  const classified = beforeReview.map(({ pr, result }) => {
+    const reason = holds.get(pr.number);
+
+    return {
+      pr,
+      result:
+        reason === undefined
+          ? result
+          : ({ kind: 'held', reason } satisfies Classification),
+    };
+  });
 
   return {
     cycles,
     inScope: classified.filter(({ result }) => result.kind !== 'ignore').length,
-    // Lowest number first — the declared order has already been applied, as a
-    // gate rather than a sort — but the ones GitHub only *thinks* conflict go
-    // last: a rebase this script is sure of is worth spending the cycle on
-    // before one it is guessing at. `toSorted` is stable, so the numbers keep
-    // their order within each group.
-    candidates: classified
-      .filter(({ result }) => result.kind === 'candidate')
-      .map(({ pr }) => pr)
-      .toSorted(
-        (a, b) =>
-          candidateRank(a, base.defaultBranch) -
-          candidateRank(b, base.defaultBranch),
-      ),
+    candidates: orderCandidates(
+      classified
+        .filter(({ result }) => result.kind === 'candidate')
+        .map(({ pr }) => pr),
+      base,
+    ),
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),
+    held: classified.flatMap(({ pr, result }) =>
+      result.kind === 'held'
+        ? [
+            `#${pr.number}: held by its review — ${result.reason}; nothing is run until that changes`,
+          ]
+        : [],
+    ),
     failing: classified.flatMap(({ pr, result }) =>
       result.kind === 'failing' ? [{ pr, summary: result.summary }] : [],
     ),
@@ -282,6 +303,68 @@ const classify = async (
 };
 
 /**
+ * Whether what triage decided about a pull request is worth asking its
+ * review about: one it is about to pick, or one it is about to watch while
+ * GitHub still calls it `BLOCKED`. A merge state GitHub already calls
+ * mergeable is its own answer that nothing but the checks is left, so that
+ * one is watched as ever.
+ */
+const shouldAskReview = (pr: PullRequest, result: Classification): boolean =>
+  result.kind === 'candidate' ||
+  (result.kind === 'in-flight' && !isMergeableState(pr.mergeStateStatus));
+
+/**
+ * Why each pull request's review holds it, by number, for those it holds —
+ * `review.mts` says what is asked and why. One request covers all of them.
+ * A request that fails holds nothing, which is how this script behaved
+ * before it asked.
+ */
+const readReviewHolds = async (
+  entries: readonly Readonly<{ pr: PullRequest }>[],
+  context: TriageContext,
+): Promise<ReadonlyMap<number, string>> => {
+  const { requireCodeOwnerReview, requireConversationResolution } =
+    context.reviewRequirements;
+
+  if (
+    !Arr.isNonEmpty(entries) ||
+    (!requireCodeOwnerReview && !requireConversationResolution)
+  ) {
+    return new Map();
+  }
+
+  const read = await readReviewStates(
+    entries.map(({ pr }) => pr.number),
+    context.defaultBranch,
+  );
+
+  if (Result.isErr(read)) {
+    log(
+      `Cannot read the reviews; holding nothing for them. (${lastLines(read.value, 2)})`,
+    );
+
+    return new Map();
+  }
+
+  const rules = {
+    requireCodeOwnerReview,
+    requireConversationResolution,
+    codeOwners:
+      read.value.codeOwners === undefined
+        ? ([] as const)
+        : parseCodeOwners(read.value.codeOwners),
+  } as const;
+
+  return new Map(
+    Array.from(read.value.states).flatMap(([prNumber, state]) => {
+      const hold = reviewHold(state, rules);
+
+      return hold === undefined ? [] : [[prNumber, hold] as const];
+    }),
+  );
+};
+
+/**
  * What a pull request nothing here can move is doing: waiting on its checks,
  * or held by one that failed.
  *
@@ -321,27 +404,55 @@ const isConflicting = (pr: PullRequest): boolean =>
   pr.mergeStateStatus === 'DIRTY';
 
 /**
- * Where a candidate sits in the cycle's order, lowest first. Within a rank
- * the numbers keep their order, because `toSorted` is stable.
+ * The cycle's order. The declared order has already been applied, as a gate
+ * rather than a sort, so this is lowest number first within four ranks:
  *
- * The version pull request goes last. This is an ordering rather than the
- * gate — `blocks-release` is the gate — so it never stops a release: it only
- * says that when a queued change and the release are both ready, the change
- * goes first. The alternative is releasing, then rebuilding the version pull
- * request for a second release of the very thing that was already queued.
+ * 1. The rest.
+ * 2. What GitHub only *thinks* conflicts: a rebase this script is sure of is
+ *    worth spending the cycle on before one it is guessing at.
+ * 3. The version pull request. This is an ordering rather than the gate —
+ *    `blocks-release` is the gate — so it never stops a release: it only says
+ *    that when a queued change and the release are both ready, the change
+ *    goes first. The alternative is releasing, then rebuilding the version
+ *    pull request for a second release of the very thing that was already
+ *    queued.
+ * 4. What a watch has seen green and still open (`demotions.mts`), after the
+ *    release too: the release is known to be able to merge, and this is
+ *    known to have sat without merging.
+ *
+ * `toSorted` is stable, so the numbers keep their order within each rank.
  */
-const candidateRank = (pr: PullRequest, defaultBranch: string): number =>
-  isVersionPullRequest(pr, defaultBranch) ? 2 : isConflicting(pr) ? 1 : 0;
+export const orderCandidates = (
+  candidates: readonly PullRequest[],
+  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+): readonly PullRequest[] =>
+  candidates
+    .toSorted((a, b) => a.number - b.number)
+    .toSorted((a, b) => candidateRank(a, context) - candidateRank(b, context));
+
+const candidateRank = (
+  pr: PullRequest,
+  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+): number =>
+  isDemoted(context.demoted, pr)
+    ? 3
+    : isVersionPullRequest(pr, context.defaultBranch)
+      ? 2
+      : isConflicting(pr)
+        ? 1
+        : 0;
 
 export const reportTriage = (
   triaged: Triage,
   total: number,
-  defaultBranch: string,
+  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
 ): void => {
+  const { defaultBranch } = context;
+
   const paused = triaged.candidates.filter(isSkipCiLabelled).length;
 
   log(
-    `${total} open pull request(s), ${triaged.inScope} labelled ${MERGE_QUEUED_LABEL}: ${triaged.candidates.length} to act on (${paused} paused by ${SKIP_CI_LABEL}), ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing.`,
+    `${total} open pull request(s), ${triaged.inScope} labelled ${MERGE_QUEUED_LABEL}: ${triaged.candidates.length} to act on (${paused} paused by ${SKIP_CI_LABEL}), ${triaged.inFlight.length} in flight, ${triaged.failing.length} failing, ${triaged.held.length} held by review.`,
   );
 
   for (const cycle of triaged.cycles) {
@@ -352,6 +463,10 @@ export const reportTriage = (
     log(
       `  Merge-After cycle: ${[...cycle, cycle[0]].map((number) => `#${number}`).join(' → ')}`,
     );
+  }
+
+  for (const held of triaged.held) {
+    log(`  ${held}`);
   }
 
   for (const note of triaged.notes) {
@@ -366,7 +481,7 @@ export const reportTriage = (
 
   for (const [position, pr] of triaged.candidates.entries()) {
     log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch)} — ${pr.title}`,
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''} — ${pr.title}`,
     );
   }
 };

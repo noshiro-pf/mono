@@ -35,7 +35,12 @@ const context = (blockers: readonly PullRequest[]): TriageContext =>
     defaultBranch: 'main',
     baseSha: 'b'.repeat(40),
     skipped: new Map(),
+    demoted: new Map(),
     requiredContexts: [],
+    reviewRequirements: {
+      requireCodeOwnerReview: false,
+      requireConversationResolution: false,
+    },
     openNumbers: new Set(),
     dependencies: new Map(),
     cyclic: new Set(),

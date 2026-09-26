@@ -2,7 +2,9 @@
 
 /** The shapes every module here passes around. */
 
+import { type RulesetRequirements } from 'pr-report-core';
 import * as t from 'ts-fortress';
+import { type StrictPick } from 'ts-type-forge';
 
 /** The fields read from `gh pr list` / `gh pr view`. */
 export const PullRequestSchema = t.record({
@@ -49,12 +51,26 @@ export type SkipRecord = Readonly<{
 
 export type SkipRecords = ReadonlyMap<number, SkipRecord>;
 
+/**
+ * Pull request number → the head it was demoted at: the pull requests picked
+ * last, after a watch saw them green and still open. See `demotions.mts`.
+ */
+export type Demotions = ReadonlyMap<number, string>;
+
+/** What the ruleset asks of a review, read by `review.mts`. */
+export type ReviewRequirements = StrictPick<
+  RulesetRequirements,
+  'requireCodeOwnerReview' | 'requireConversationResolution'
+>;
+
 export type Survey = Readonly<{
   pullRequests: readonly PullRequest[];
   /** The tip of the default branch at the time of the survey. */
   baseSha: string;
   /** The contexts the ruleset requires, empty when they cannot be read. */
   requiredContexts: readonly string[];
+  /** Nothing is required when the rules cannot be read. */
+  reviewRequirements: ReviewRequirements;
 }>;
 
 export type ChecksSummary = Readonly<{
@@ -77,7 +93,9 @@ export type TriageBase = Readonly<{
   defaultBranch: string;
   baseSha: string;
   skipped: SkipRecords;
+  demoted: Demotions;
   requiredContexts: readonly string[];
+  reviewRequirements: ReviewRequirements;
 }>;
 
 export type TriageContext = TriageBase &
@@ -99,6 +117,7 @@ export type TriageContext = TriageBase &
 export type Classification = Readonly<
   | { kind: 'candidate' }
   | { kind: 'failing'; summary: ChecksSummary }
+  | { kind: 'held'; reason: string }
   | { kind: 'ignore' }
   | { kind: 'in-flight' }
   | { kind: 'note'; note: string }
@@ -119,6 +138,12 @@ export type Triage = Readonly<{
   inFlight: readonly PullRequest[];
   /** Up to date, but a required check has failed. */
   failing: readonly Failing[];
+  /**
+   * Queued pull requests that would have been picked or watched but for
+   * their review — an owner's approval or a conversation still open — each
+   * as a note like the ones below.
+   */
+  held: readonly string[];
   /** Everything else, with the reason it was set aside. */
   notes: readonly string[];
   /** The `Merge-After` cycles, each starting at its lowest number. */
@@ -148,11 +173,13 @@ export type Quiet = Readonly<{
 
 /**
  * What one run carries from cycle to cycle: the pull requests it has given up
- * on, the ones it has acted on and last saw open, where the base was when it
- * last looked, and how long the list has sat still.
+ * on, the ones it picks last, the ones it has acted on and last saw open,
+ * where the base was when it last looked, and how long the list has sat
+ * still.
  */
 export type LoopState = Readonly<{
   skipped: SkipRecords;
+  demoted: Demotions;
   tracked: ReadonlySet<number>;
   baseSha: string | undefined;
   quiet: Quiet;

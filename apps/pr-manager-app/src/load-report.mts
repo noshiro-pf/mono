@@ -14,7 +14,9 @@ import {
   anyRunInProgress,
   buildEntries,
   closingIssuesIn,
+  codeOwnerReview,
   MAIN_RULESET_PATH,
+  parseCodeOwners,
   parseRuleset,
   parseSetAside,
   reportedContexts,
@@ -22,6 +24,8 @@ import {
   setAsideStillApplies,
   summarize,
   type CheckRunReport,
+  type CodeOwnerReview,
+  type CodeOwnersRule,
   type Comparison,
   type Label,
   type MergedPullRequest,
@@ -37,12 +41,6 @@ import {
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
-import {
-  codeOwnerReview,
-  parseCodeOwners,
-  type CodeOwnerReview,
-  type CodeOwnersRule,
-} from './code-owners.mjs';
 import { type ReportSource } from './constants.mjs';
 import {
   askGraphql,
