@@ -17,14 +17,18 @@ export const initialQuiet: Quiet = {
 /**
  * The part of a survey triage reads: the base, and for every open pull
  * request its head, merge state, labels, auto-merge, draft flag and body —
- * the body because that is where `Merge-After:` is declared. The title is
- * left out, as is the order `gh` lists things in.
+ * the body because that is where `Merge-After:` is declared — and what the
+ * reviews hold, which triage reads separately: an approval or a resolved
+ * conversation is exactly what a held pull request is waiting for. The title
+ * is left out, as is the order `gh` lists things in.
  */
 export const surveyFingerprint = (
   survey: StrictPick<Survey, 'baseSha' | 'pullRequests'>,
+  reviewHolds: readonly string[] = [],
 ): string =>
   JSON.stringify({
     baseSha: survey.baseSha,
+    reviewHolds: reviewHolds.toSorted(),
     pullRequests: survey.pullRequests
       .toSorted((a, b) => a.number - b.number)
       .map((pr) => [

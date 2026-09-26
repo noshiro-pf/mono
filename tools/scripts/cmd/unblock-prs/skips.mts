@@ -19,7 +19,8 @@ import {
  * without merging or ran out of watch time: once the base moves that pull
  * request is `BEHIND`, which is the one thing this script knows how to fix,
  * and a verdict that outlived its state is what left a ready pull request
- * sitting still through cycle after cycle of "Nothing to do". A rebase or
+ * sitting still through cycle after cycle of "Nothing to do". One that sat
+ * green goes back in the running last, not first — `demotions.mts`. A rebase or
  * push failure is tied to the base for the older reason: the commit it
  * conflicted with may have gone with it.
  *
