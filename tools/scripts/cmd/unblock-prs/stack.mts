@@ -22,15 +22,21 @@
  *    the one below in its diff, and GitHub's own rebase, when that one
  *    merges, would start from a head the layer does not contain.
  * 3. **The layer below merges.** GitHub moves this one onto the default
- *    branch (and, with native stacks, rebases it there). From then on it is
- *    an ordinary pull request, picked and armed in its turn like any other,
- *    save one thing only its timeline remembers: if GitHub did not rebase
- *    it, it still carries the merged layer's commits, which the rebase drops
- *    with `--onto` rather than trusting the patches to match.
+ *    branch. From then on it is an ordinary pull request, picked and armed
+ *    in its turn like any other, save one thing only its timeline remembers:
+ *    it still carries the merged layer's commits, which the rebase drops with
+ *    `--onto` rather than trusting the patches to match.
+ *
+ * A stack here is made by the base alone. GitHub's native stacks are not
+ * landed: GitHub refuses auto-merge on a pull request in one ("Auto-merge is
+ * not supported for stacked pull requests"), and keeps a layer in its stack
+ * after the one below has merged and it has been moved onto the default
+ * branch — so one is reported rather than picked, and merged by hand.
  */
 
 import {
   type Classification,
+  type NativeStackEntry,
   type PullRequest,
   type TimelineEvent,
   type TriageContext,
@@ -68,6 +74,22 @@ export const stackedNote = (
         : ''
     }`,
   }) as const;
+
+/**
+ * What to report instead of picking a pull request in one of GitHub's native
+ * stacks, which GitHub will not let this script arm; `undefined` for one in
+ * none.
+ */
+export const nativeStackNote = (
+  pr: PullRequest,
+  entry: NativeStackEntry | undefined,
+): Classification | undefined =>
+  entry === undefined
+    ? undefined
+    : ({
+        kind: 'note',
+        note: `#${pr.number}: layer ${entry.position} of ${entry.size} of GitHub's native stack #${entry.stack}, on which GitHub refuses auto-merge; merge it by hand (a stack made by the base alone needs no native stack)`,
+      } as const);
 
 /**
  * Why a layer cannot be carried along when the one below it moves, or

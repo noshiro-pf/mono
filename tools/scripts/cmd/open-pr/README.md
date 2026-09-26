@@ -91,6 +91,10 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 - auto-merge はほかの PR と同じく張りません。`unblock-prs` は下の層がマージされ
   て GitHub がこの PR を既定ブランチに付け替えるまで pick しないので、張られる
   のもそのときです。
+- **GitHub のネイティブ stack にはしないでください。** stack は base だけで
+  作ります。GitHub はネイティブ stack に入った PR に auto-merge を張らせず、
+  下の層がマージされて既定ブランチに付け替えられた後も stack から外さないので、
+  `unblock-prs` はその PR を pick せず、手でマージするよう報告します。
 
 ### 拒否すること
 
@@ -176,6 +180,12 @@ that branch and that the current branch contains the tip of `origin/<base>`,
 and stops otherwise. `unblock-prs` does not pick it, and so does not arm it,
 until the layer below has merged and GitHub has moved it onto the default
 branch.
+
+**Do not make it one of GitHub's native stacks**; the base alone is the
+stack. GitHub refuses auto-merge on a pull request in a native stack, and
+keeps it in the stack after the layer below has merged and it has been moved
+onto the default branch, so `unblock-prs` does not pick it and reports it to
+be merged by hand.
 
 It refuses to run on the default branch, on a detached HEAD, and without a
 credential. An existing pull request that is a draft is marked ready, because
