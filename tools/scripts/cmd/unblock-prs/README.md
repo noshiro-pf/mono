@@ -231,6 +231,13 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 `gh pr checks` の出力に pending として並ぶのではなく **行ごと現れません**。報
 告済みだけで判定すると、25分かかるマトリクスの3分目に「完了」と誤読します。
 
+**head 上で何か一つでも実行中なら green とは数えません**（必須かどうかを問わず）。
+必須の集約ジョブは、待っているジョブが終わるまで新しい round に check run を
+持たないので、その間 `--required` は前の round の結果を返します。前の round が
+`skip-ci` で飛ばされたものなら集約は全部 `skipped` で、マトリクスの途中なのに
+green に見えます（#2069 はこれで `not-merging` になりました）。fail はこの間も
+すぐ判定します。
+
 全部 green なのにマージされない場合（未解決の会話、レビュー不足、マージ権限の
 無い人が auto-merge を有効にした等）は rebase では直せないので、連続 green 回
 数で打ち切ります。GitHub 自身が mergeable と言っている場合は3回、`BLOCKED` の
@@ -564,6 +571,13 @@ has reported. A required context with no check run on the head commit is not
 pending in `gh pr checks` — it is _absent_ from it, so judging by what has
 reported writes a pull request off three minutes into a twenty-five minute
 matrix.
+
+**Nothing on the head may still be running**, required or not. A required
+aggregate has no run in a new round until the jobs it waits on are done, so
+until then `--required` answers with the round before, and when that round
+was the one `skip-ci` skipped, every aggregate reads `skipped` and the commit
+looks green halfway through its matrix (#2069 was set aside `not-merging` so).
+A failure is still acted on at once.
 
 A pull request that is green and still open is held by something a rebase
 cannot fix — an unresolved conversation, a missing review, auto-merge armed by

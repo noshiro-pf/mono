@@ -302,7 +302,9 @@ const classifyByChecks = async (
     };
   }
 
-  const summary = summarizeChecks(checks.value, context.requiredContexts);
+  // Checks still running only decide between pending and passed, and both
+  // are in flight here, so they are not asked for.
+  const summary = summarizeChecks(checks.value, context.requiredContexts, []);
 
   // Pending — including a required context that has not reported at all — or
   // green and about to merge. A green one that stays open is caught by the
