@@ -67,8 +67,13 @@ Merge-After: #1901, #1903
 - 下の層がマージされるまで pick されません。判定は base だけで行うので、
   `Merge-After:` の無い stack も認識します。`open-pr --base` は下の層を
   `Merge-After:` にも書きますが、base と同じ意味で、二重に数えることはありません。
-- 下の層がマージされると、GitHub がこの PR を `main` に付け替えます（ネイティブ
-  の stack なら rebase もします）。そこから先は普通の PR です。
+- 下の層がマージされると、GitHub がこの PR を `main` に付け替えます。そこから
+  先は普通の PR です。
+- **GitHub のネイティブ stack は扱いません。** GitHub はネイティブ stack に
+  入った PR に auto-merge を張らせず（ "Auto-merge is not supported for stacked
+  pull requests" ）、下の層がマージされて `main` に付け替えられた後も stack
+  から外しません。そういう PR は pick せず、手でマージするよう `note` で報告
+  します。stack は base だけで作ってください。
 - 積まれている間は pick されないので、auto-merge も張られません。張られるのは
   `main` に付け替えられて順番が来たときです。
 - **下の層を rebase したら、上の層も一緒に運びます。** `git rebase --onto <新しい
@@ -175,7 +180,8 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 3. **skip 記録** — 前のサイクルで諦めた PR は、当時の head と base のままなら
    `note`。
 4. **stack** — 積まれている PR は「下の層が先」と `note`。
-   **auto-merge** — 無い PR は、`merge-queued` の後に人が切っていれば `note`。
+   **auto-merge** — 無い PR は、GitHub のネイティブ stack に入っていれば
+   `note`（手でマージ）、`merge-queued` の後に人が切っていれば `note`。
    そうでなければ先へ進み、pick されたときに張られます。
 5. **`Merge-After` ゲート** — 指定先が1つでも open なら `note`。
 6. **version PR** — `changeset-release/<デフォルトブランチ>` から来た PR は専
@@ -452,9 +458,14 @@ reviewable.
   so, so a stack with no `Merge-After:` is recognized too; `open-pr --base`
   writes the layer below into `Merge-After:` as well, which means the same and
   is not counted twice.
-- When the layer below merges, GitHub moves this one onto `main` (and, with
-  native stacks, rebases it there). From then on it is an ordinary pull
-  request.
+- When the layer below merges, GitHub moves this one onto `main`. From then
+  on it is an ordinary pull request.
+- **GitHub's native stacks are not landed.** GitHub refuses auto-merge on a
+  pull request in one ("Auto-merge is not supported for stacked pull
+  requests"), and keeps a layer in its stack after the layer below has merged
+  and it has been moved onto `main`. Such a pull request is not picked but
+  reported as a `note`, to be merged by hand. Make a stack with the base
+  alone.
 - A stacked pull request is never picked, so never armed. It is armed when
   its turn comes, after GitHub has moved it onto `main`.
 - **When a layer is rebased, the layers above it are carried along.** Each is
@@ -571,7 +582,8 @@ GitHub is still computing is never read as up to date. The tip of
 3. **Skip records** — a pull request a previous cycle gave up on is a `note`
    for as long as its head and the base are where they were.
 4. **Stacks** — a stacked pull request is a `note` saying the layer below goes
-   first. **Auto-merge** — one without it is a `note` if a person switched it
+   first. **Auto-merge** — one without it is a `note` if it is in one of
+   GitHub's native stacks (to be merged by hand), or if a person switched it
    off after it was queued; otherwise it goes on, and is armed when picked.
 5. **The `Merge-After` gate** — a `note` while anything it names is open.
 6. **The version pull request** — one whose branch is

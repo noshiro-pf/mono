@@ -13,11 +13,17 @@ import { type StrictPick } from 'ts-type-forge';
 import { armsOnPick } from './auto-merge.mjs';
 import { listRequiredChecks, summarizeChecks } from './checks.mjs';
 import { UNKNOWN_STATE_RETRIES, UNKNOWN_STATE_RETRY_MS } from './constants.mjs';
-import { git, listPullRequests, readTimeline, remoteSha } from './github.mjs';
+import {
+  git,
+  listPullRequests,
+  readNativeStack,
+  readTimeline,
+  remoteSha,
+} from './github.mjs';
 import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
 import { skipStillApplies } from './skips.mjs';
-import { stackedNote } from './stack.mjs';
+import { nativeStackNote, stackedNote } from './stack.mjs';
 import {
   type Classification,
   type PullRequest,
@@ -265,8 +271,15 @@ const classify = async (
   // Nothing here merges anything — auto-merge does, once the checks are
   // green — but this script is what arms it, when it picks a queued pull
   // request (`auto-merge.mts`). One a person disarmed after queueing it is
-  // passed over until they queue it again.
+  // passed over until they queue it again, and one in a native stack, which
+  // GitHub will not let anything arm, until someone merges it by hand.
   if (!isRecord(pr.autoMergeRequest)) {
+    const nativeStacked = await inNativeStack(pr);
+
+    if (nativeStacked !== undefined) {
+      return nativeStacked;
+    }
+
     const disarmed = await disarmedByHand(pr);
 
     if (disarmed !== undefined) {
@@ -334,6 +347,27 @@ const classify = async (
         note: `#${pr.number}: merge state ${pr.mergeStateStatus}`,
       };
   }
+};
+
+/**
+ * The note to report instead of picking a pull request in one of GitHub's
+ * native stacks (`stack.mts`). One whose stack cannot be read is picked, and
+ * GitHub's refusal to arm it, should it come, sets it aside.
+ */
+const inNativeStack = async (
+  pr: PullRequest,
+): Promise<Classification | undefined> => {
+  const entry = await readNativeStack(pr.number);
+
+  if (Result.isErr(entry)) {
+    log(
+      `#${pr.number}: cannot read whether it is in a native stack; treating it as in none. (${lastLines(entry.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return nativeStackNote(pr, entry.value);
 };
 
 /**

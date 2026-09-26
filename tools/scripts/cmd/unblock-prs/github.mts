@@ -16,6 +16,7 @@ import { projectRootPath } from '../../project-root-path.mjs';
 import {
   PullRequestListSchema,
   PullRequestSchema,
+  type NativeStackEntry,
   type PullRequest,
   type TimelineEvent,
 } from './types.mjs';
@@ -265,6 +266,72 @@ const TimelineSchema = t.record({
         timelineItems: t.record({
           nodes: t.array(TimelineNodeSchema),
         }),
+      }),
+    }),
+  }),
+});
+
+/**
+ * The pull request's place in one of GitHub's native stacks, or `undefined`
+ * when it is in none. GraphQL, because `gh pr view` does not know them.
+ */
+export const readNativeStack = async (
+  prNumber: number,
+): Promise<Result<NativeStackEntry | undefined, string>> => {
+  const answered = await git(
+    [
+      'gh api graphql',
+      `-F ${sh('owner={owner}')}`,
+      `-F ${sh('repo={repo}')}`,
+      `-F number=${prNumber}`,
+      `-f ${sh(`query=${NATIVE_STACK_QUERY}`)}`,
+    ].join(' '),
+  );
+
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const parsed = parseJson(answered.value, NativeStackSchema);
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  const entry = parsed.value.data.repository.pullRequest.stackEntry;
+
+  return Result.ok(
+    entry === null
+      ? undefined
+      : {
+          stack: entry.stack.number,
+          position: entry.position,
+          size: entry.stack.size,
+        },
+  );
+};
+
+const NATIVE_STACK_QUERY = [
+  'query($owner: String!, $repo: String!, $number: Int!) {',
+  '  repository(owner: $owner, name: $repo) {',
+  '    pullRequest(number: $number) {',
+  '      stackEntry { position stack { number size } }',
+  '    }',
+  '  }',
+  '}',
+].join(' ');
+
+const NativeStackSchema = t.record({
+  data: t.record({
+    repository: t.record({
+      pullRequest: t.record({
+        stackEntry: t.union([
+          t.record({
+            position: t.number(),
+            stack: t.record({ number: t.number(), size: t.number() }),
+          }),
+          t.nullType,
+        ]),
       }),
     }),
   }),
