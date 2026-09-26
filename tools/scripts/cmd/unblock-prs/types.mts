@@ -45,6 +45,8 @@ export type SkipRecord = Readonly<{
   baseSha: string;
   reason: SkipReason;
   detail: string;
+  /** Where the set-aside status's "Details" leads, when there is a page for it. */
+  link?: string;
 }>;
 
 export type SkipRecords = ReadonlyMap<number, SkipRecord>;
@@ -59,7 +61,8 @@ export type Survey = Readonly<{
 
 export type ChecksSummary = Readonly<{
   status: 'failed' | 'passed' | 'pending';
-  failed: readonly string[];
+  /** With the run's link, which is what a set-aside status points at. */
+  failed: readonly Readonly<{ name: string; link: string }>[];
   pending: readonly string[];
   /**
    * Required contexts with no check run on the head commit at all. GitHub
@@ -142,6 +145,16 @@ export type WatchOutcome =
   | 'stopped'
   | 'timeout'
   | 'skip-ci-labelled';
+
+/**
+ * How a watch ended, and for an outcome that sets the pull request aside,
+ * what its status says: `detail` and, where there is a page for it, `link`.
+ */
+export type Watched = Readonly<{
+  outcome: WatchOutcome;
+  detail?: string;
+  link?: string;
+}>;
 
 /** What the loop remembers about how long the list has sat still. */
 export type Quiet = Readonly<{

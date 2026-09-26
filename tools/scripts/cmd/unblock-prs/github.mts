@@ -81,6 +81,21 @@ export const viewPullRequest = async (
     : parseJson(viewed.value, PullRequestSchema);
 };
 
+/**
+ * `REVIEW_REQUIRED`, `CHANGES_REQUESTED`, `APPROVED`, or empty when the
+ * rules ask for no review. Read only when a green pull request will not
+ * merge, to say what holds it.
+ */
+export const viewReviewDecision = async (
+  prNumber: number,
+): Promise<Result<string, string>> => {
+  const viewed = await git(
+    `gh pr view ${prNumber} --json reviewDecision --jq .reviewDecision`,
+  );
+
+  return Result.isErr(viewed) ? viewed : Result.ok(viewed.value.trim());
+};
+
 export const remoteSha = async (
   branch: string,
 ): Promise<Result<string, string>> => {
@@ -116,6 +131,8 @@ export const addSkipCiLabel = async (
 export const postSetAsideStatus = async (
   headSha: string,
   setAside: SetAside,
+  /** Where the status's "Details" leads; GitHub shows no link without one. */
+  targetUrl: string | undefined,
 ): Promise<Result<undefined, string>> => {
   if (!SHA.test(headSha)) {
     return Result.err(`unexpected head SHA: ${JSON.stringify(headSha)}`);
@@ -130,6 +147,9 @@ export const postSetAsideStatus = async (
       '-f state=failure',
       `-f ${sh(`context=${SET_ASIDE_CONTEXT}`)}`,
       `-f ${sh(`description=${describeSetAside(setAside)}`)}`,
+      ...(targetUrl === undefined
+        ? []
+        : [`-f ${sh(`target_url=${targetUrl}`)}`]),
     ].join(' '),
   );
 

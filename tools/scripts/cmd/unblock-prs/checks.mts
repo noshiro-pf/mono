@@ -82,7 +82,7 @@ export const summarizeChecks = (
 ): ChecksSummary => {
   const failed = checks
     .filter((check) => check.bucket === 'fail' || check.bucket === 'cancel')
-    .map((check) => check.name);
+    .map(({ name, link }) => ({ name, link }));
 
   const pending = checks
     .filter((check) => check.bucket === 'pending')

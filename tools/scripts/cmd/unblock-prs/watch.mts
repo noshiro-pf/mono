@@ -14,10 +14,15 @@ import {
   GREEN_POLLS_BEFORE_GIVING_UP,
   MAX_CONSECUTIVE_POLL_ERRORS,
 } from './constants.mjs';
-import { viewPullRequest } from './github.mjs';
+import { viewPullRequest, viewReviewDecision } from './github.mjs';
 import { isSkipCiLabelled } from './labels.mjs';
 import { type Options } from './options.mjs';
-import { type PullRequest, type WatchOutcome } from './types.mjs';
+import {
+  describeFailedChecks,
+  describeHold,
+  describeTimeout,
+} from './set-aside-detail.mjs';
+import { type PullRequest, type Watched } from './types.mjs';
 import { log, pause, stopRequested } from './util.mjs';
 
 /**
@@ -30,7 +35,7 @@ export const watch = async (
   expectedHead: string,
   requiredContexts: readonly string[],
   options: Options,
-): Promise<WatchOutcome> => {
+): Promise<Watched> => {
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
 
   let mut_greenPolls = 0;
@@ -52,7 +57,7 @@ export const watch = async (
       log(`#${pr.number}: poll failed (${mut_errors}): ${viewed.value}`);
 
       if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) {
-        return 'error';
+        return { outcome: 'error' };
       }
 
       continue;
@@ -61,33 +66,33 @@ export const watch = async (
     const current = viewed.value;
 
     if (current.state === 'MERGED') {
-      return 'merged';
+      return { outcome: 'merged' };
     }
 
     if (current.state !== 'OPEN') {
-      return 'closed';
+      return { outcome: 'closed' };
     }
 
     if (!isRecord(current.autoMergeRequest)) {
-      return 'auto-merge-disabled';
+      return { outcome: 'auto-merge-disabled' };
     }
 
     // The label skips every check workflow and leaves `no-skip-ci-label`
     // `pending`, so from here the checks can only sit there until the watch
     // times out. Stop now and let the survey set it aside.
     if (isSkipCiLabelled(current)) {
-      return 'skip-ci-labelled';
+      return { outcome: 'skip-ci-labelled' };
     }
 
     if (current.headRefOid !== expectedHead) {
-      return 'head-moved';
+      return { outcome: 'head-moved' };
     }
 
     if (
       current.mergeStateStatus === 'BEHIND' ||
       current.mergeStateStatus === 'DIRTY'
     ) {
-      return 'behind-again';
+      return { outcome: 'behind-again' };
     }
 
     const checks = await readChecks(pr.number);
@@ -98,7 +103,7 @@ export const watch = async (
       log(`#${pr.number}: poll failed (${mut_errors}): ${checks.value}`);
 
       if (mut_errors >= MAX_CONSECUTIVE_POLL_ERRORS) {
-        return 'error';
+        return { outcome: 'error' };
       }
 
       continue;
@@ -113,9 +118,11 @@ export const watch = async (
     );
 
     if (summary.status === 'failed') {
-      log(`#${pr.number}: failed: ${summary.failed.join(', ')}`);
+      const failed = describeFailedChecks(summary);
 
-      return 'checks-failed';
+      log(`#${pr.number}: ${failed.detail}`);
+
+      return { outcome: 'checks-failed', ...failed };
     }
 
     if (summary.status === 'pending') {
@@ -139,7 +146,15 @@ export const watch = async (
       );
 
       if (mut_greenPolls >= budget) {
-        return 'not-merging';
+        const reviewDecision = await viewReviewDecision(pr.number);
+
+        return {
+          outcome: 'not-merging',
+          detail: describeHold(
+            current.mergeStateStatus,
+            Result.isOk(reviewDecision) ? reviewDecision.value : undefined,
+          ),
+        };
       }
     }
 
@@ -148,11 +163,14 @@ export const watch = async (
         `#${pr.number}: still waiting on ${describeWaitingOn(summary)} after ${options.watchTimeoutMin} minutes.`,
       );
 
-      return 'timeout';
+      return {
+        outcome: 'timeout',
+        detail: describeTimeout(summary, options.watchTimeoutMin),
+      };
     }
   }
 
-  return 'stopped';
+  return { outcome: 'stopped' };
 };
 
 /** The required checks and the names of every check still running. */
