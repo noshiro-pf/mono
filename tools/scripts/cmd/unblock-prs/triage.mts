@@ -362,7 +362,7 @@ export const reportTriage = (
 
   for (const { pr, summary } of triaged.failing) {
     log(
-      `  #${pr.number}: up to date but failing: ${summary.failed.join(', ')}`,
+      `  #${pr.number}: up to date but failing: ${summary.failed.map((check) => check.name).join(', ')}`,
     );
   }
 

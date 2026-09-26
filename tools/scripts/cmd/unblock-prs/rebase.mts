@@ -10,6 +10,7 @@ import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import { git, remoteSha, viewPullRequest } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
+import { describeConflict } from './set-aside-detail.mjs';
 import {
   type Advanced,
   type PullRequest,
@@ -99,9 +100,22 @@ const rebaseInWorktree = async (
   );
 
   if (Result.isErr(rebased)) {
+    const conflicted = await git(
+      'git diff --name-only --diff-filter=U',
+      worktreeDir,
+    );
+
     await git('git rebase --abort', worktreeDir);
 
-    return rebaseFailed(`rebase conflicts: ${lastLines(rebased.value, 5)}`);
+    return rebaseFailed(
+      describeConflict(
+        Result.isOk(conflicted)
+          ? conflicted.value.split('\n').filter((line) => line !== '')
+          : [],
+        lastLines(rebased.value, 5),
+        defaultBranch,
+      ),
+    );
   }
 
   const newHead = await git('git rev-parse HEAD', worktreeDir);

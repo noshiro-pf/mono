@@ -20,6 +20,7 @@ import {
   pauseAllBut,
   settleAfterRelease,
 } from './release.mjs';
+import { describeFailedChecks } from './set-aside-detail.mjs';
 import { newSkips, pruneSkips, withSkip } from './skips.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
@@ -28,6 +29,7 @@ import {
   type PullRequest,
   type SkipRecord,
   type SkipRecords,
+  type Watched,
   type WatchOutcome,
 } from './types.mjs';
 import { installStopHandlers, log, pause, stopRequested } from './util.mjs';
@@ -225,11 +227,11 @@ const announceSetAside = async (
   skips: readonly SkipRecord[],
 ): Promise<void> => {
   for (const skip of skips) {
-    const posted = await postSetAsideStatus(skip.headSha, {
-      reason: skip.reason,
-      baseSha: skip.baseSha,
-      detail: skip.detail,
-    });
+    const posted = await postSetAsideStatus(
+      skip.headSha,
+      { reason: skip.reason, baseSha: skip.baseSha, detail: skip.detail },
+      skip.link,
+    );
 
     if (Result.isErr(posted)) {
       log(
@@ -300,7 +302,7 @@ const runCycle = async (
         headSha: pr.headRefOid,
         baseSha,
         reason: 'checks-failed',
-        detail: summary.failed.join(', '),
+        ...describeFailedChecks(summary),
       }),
     skipped,
   );
@@ -324,7 +326,7 @@ const runCycle = async (
 
     await pauseAllBut(watched.number);
 
-    const outcome = await watch(
+    const ended = await watch(
       watched,
       watched.headRefOid,
       requiredContexts,
@@ -333,10 +335,10 @@ const runCycle = async (
 
     return {
       state: state(
-        applyWatchOutcome(mut_skipped, watched, baseSha, outcome),
-        trackAfterWatch(tracked, watched.number, outcome),
+        applyWatchOutcome(mut_skipped, watched, baseSha, ended),
+        trackAfterWatch(tracked, watched.number, ended.outcome),
       ),
-      next: outcome === 'stopped' ? 'stop' : 'survey',
+      next: ended.outcome === 'stopped' ? 'stop' : 'survey',
     };
   }
 
@@ -421,7 +423,7 @@ const runCycle = async (
       `#${target.number} is at ${head.slice(0, 10)}; waiting for it to merge.`,
     );
 
-    const outcome = await watch(target, head, requiredContexts, options);
+    const ended = await watch(target, head, requiredContexts, options);
 
     return {
       state: state(
@@ -429,11 +431,11 @@ const runCycle = async (
           mut_skipped,
           { ...target, headRefOid: head },
           baseSha,
-          outcome,
+          ended,
         ),
-        trackAfterWatch(tracked, target.number, outcome),
+        trackAfterWatch(tracked, target.number, ended.outcome),
       ),
-      next: outcome === 'stopped' ? 'stop' : 'survey',
+      next: ended.outcome === 'stopped' ? 'stop' : 'survey',
     };
   }
 
@@ -501,9 +503,9 @@ const applyWatchOutcome = (
   skipped: SkipRecords,
   pr: PullRequest,
   baseSha: string,
-  outcome: WatchOutcome,
+  ended: Watched,
 ): SkipRecords => {
-  switch (outcome) {
+  switch (ended.outcome) {
     case 'merged':
       log(`#${pr.number} merged.`);
 
@@ -542,7 +544,8 @@ const applyWatchOutcome = (
         headSha: pr.headRefOid,
         baseSha,
         reason: 'checks-failed',
-        detail: 'a required check failed',
+        detail: ended.detail ?? 'a required check failed',
+        link: ended.link,
       });
 
     case 'not-merging':
@@ -555,7 +558,7 @@ const applyWatchOutcome = (
         headSha: pr.headRefOid,
         baseSha,
         reason: 'not-merging',
-        detail: 'green but not merged',
+        detail: ended.detail ?? 'green but not merged',
       });
 
     case 'timeout':
@@ -566,7 +569,7 @@ const applyWatchOutcome = (
         headSha: pr.headRefOid,
         baseSha,
         reason: 'watch-timeout',
-        detail: 'checks did not finish in time',
+        detail: ended.detail ?? 'checks did not finish in time',
       });
 
     case 'error':

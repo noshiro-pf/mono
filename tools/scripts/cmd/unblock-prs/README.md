@@ -302,6 +302,14 @@ SHA）。**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/p
   新しい head には付いていません。base が動いた場合はページが古い記録として
   灰色で表示します（`checks-failed` を除く — `skips.mts` と同じ規則を
   `pr-report-core` の `setAsideStillApplies` で共有しています）。
+- **description の理由の後ろには、読む人が次に探しに行くものを書きます**
+  （`set-aside-detail.mts`）: `checks-failed` は落ちたチェック名、
+  `not-merging` は何が止めているか（`reviewDecision` による必須レビュー
+  不足・変更要求、それ以外なら未解決の会話か auto-merge を張った人）、
+  `watch-timeout` はまだ待っていたもの、`rebase-failed` は conflict した
+  ファイル。GitHub は description を140字で切るので、収まらない分は
+  `…` になります。`checks-failed` は落ちた run へのリンク（`target_url`）
+  も付くので、PR の "Details" からそのまま開けます。
 - 必須 context ではないのでマージは止めません。PR 上に ✗ が1つ付きます。
 - 書けるのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は
   書き直しません。`--dry-run` では書きません。書けなかったときはその旨を
@@ -647,6 +655,15 @@ the terminal the script ran in.
   leaves the new head without it. A moved base the page shows as a grey,
   older record (except `checks-failed`), by the rule `skips.mts` uses too,
   shared as `setAsideStillApplies` in `pr-report-core`.
+- **After the reason, the description says what a reader would go and look
+  for next** (`set-aside-detail.mts`): the failed checks for
+  `checks-failed`; for `not-merging`, what holds it — a missing required
+  review or requested changes by `reviewDecision`, and otherwise an
+  unresolved conversation or who armed auto-merge; what it was still waiting
+  on for `watch-timeout`; the conflicting files for `rebase-failed`. GitHub
+  keeps a description to 140 characters, so what does not fit ends in `…`.
+  `checks-failed` also links the failed run (`target_url`), so "Details" on
+  the pull request opens it.
 - It is not a required context, so it holds no merge; it adds one ✗ to the
   pull request.
 - It is written when a pull request is newly set aside, not again on every
