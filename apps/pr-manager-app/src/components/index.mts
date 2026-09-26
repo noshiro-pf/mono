@@ -1,5 +1,6 @@
 export * from './auto-merge-badge.js';
 export * from './badge-icon.js';
+export * from './claude-sessions.js';
 export * from './commit-divergence.js';
 export * from './cycles-section.js';
 export * from './external-link.js';
