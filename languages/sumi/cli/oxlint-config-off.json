@@ -23,6 +23,7 @@
     "prefer-const": "off",
     "prefer-rest-params": "off",
     "prefer-template": "off",
+    "typescript/adjacent-overload-signatures": "off",
     "typescript/ban-ts-comment": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/method-signature-style": "off",
@@ -36,6 +37,7 @@
     "typescript/restrict-plus-operands": "off",
     "typescript/strict-boolean-expressions": "off",
     "typescript/triple-slash-reference": "off",
+    "typescript/unified-signatures": "off",
     "unicorn/no-null": "off"
   }
 }

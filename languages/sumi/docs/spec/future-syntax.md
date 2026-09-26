@@ -1,4 +1,4 @@
-<!-- cspell:ignore neverthrow bivariance -->
+<!-- cspell:ignore neverthrow bivariance unshift -->
 
 # Sumi sugar 独自構文の候補
 
@@ -117,15 +117,206 @@ fn add(a: number, b: number): number {
 | Elixir / Erlang                  | multiple function clauses — 同名 `def` をパターン + guard 付きで並べる。実装分離の最も宣言的な形      |
 | Rust / Haskell / OCaml           | オーバーロードなし（trait / 型クラスによるアドホック多相、または別名関数）                            |
 
-TS の「関数型を `&` で結ぶ」「interface にメソッド記法で並べる」はいずれも読みにくく、method 記法は bivariance の温床でもある([classes.md](./classes.md))。**言語間で同一の関数を書き比べたコード例は [overload-survey.md](../overload-survey.md) にまとめた。**
+TS の「関数型を `&` で結ぶ」「interface にメソッド記法で並べる」はいずれも読みにくく、method 記法は bivariance の温床でもある([classes.md](./classes.md))。(2026-09-16 注: Sumi lint では、オーバーロードされた関数の**型**は関数型の `&` だけで書く。代入先になったときに generic が消去されないため — [functions.md](./functions.md)「オーバーロードの記法」。読みにくさの評価は記法 sugar の動機としては残る)**言語間で同一の関数を書き比べたコード例は [overload-survey.md](../overload-survey.md) にまとめた。**
 
 ### Sumi sugar の設計案
 
 1. **案 A(最小)**: `fn` にシグネチャ列挙を統合した専用記法。実装は TS と同じく 1 つで、emit は TS のオーバーロード宣言 + 実装へ **1:1**。記法だけの改善なのでランタイム生成なし・emit 品質問題なし。
 2. **案 B(実装分離)**: Swift/Elixir 形 — 同名 `fn` を複数書き、各 clause が自分のシグネチャで**完全に型検査**される。emit は transpiler が判別 dispatch（`typeof` / arity 分岐）を**生成**する。TS オーバーロードの「実装検査が緩い」弱点を根本から消せるが、(a) transpiler が意味を持つコードを生成する最初のケースになり（生成 dispatch の可読性 = eject 品質が課題）、(b) clause 間が**実行時に判別可能**（arity か runtime タグで分岐できる）という制約が必要（型引数の違いだけのオーバーロードは dispatch 不能）。
-3. 推奨順: まず案 A で記法を確定し、案 B は「clause の実行時判別可能性」の条件を詰めてから別判断。案 B の型検査部分（clause ごとの厳密検査）だけを Sumi refined の checker で先取りする道もある。
+3. ~~推奨順: まず案 A で記法を確定し、案 B は「clause の実行時判別可能性」の条件を詰めてから別判断。~~ → **D-58(2026-09-10)で差し替え**: 案 A（シグネチャ列挙を `fn` に統合）は**採らない**。1 つの本体が N 個のシグネチャを名乗る形こそが TS の不健全性の源なので、記法だけ整えても弱点はそのまま残る。**案 B に寄せる**が、条件を「実行時に判別可能」に加えて**節どうしが互いに素**まで強める（重なりを許すと順序が黙って意味を持つ）。ただし**入れるかどうか自体が未決**である — リポジトリの 19 個のオーバーロード（標本 — 母集団は `libs/` だけで 157 個）のうち実行時に分岐するのは `panic` の 1 個だけ（その `panic` も戻り値が同じ精密化）で、A（カリー化）は `pipe.mapWith` で、精密化は単一シグネチャで、いずれも構文なしに消える。詳細は [overload-design.md](../overload-design.md)。
 
 Sumi lint との接続: D-13（named function はオーバーロード時のみ）により、Sumi lint の `function` 宣言の出現箇所 = オーバーロード関数だけになっている。Sumi sugar で `fn` を導入すれば、この出現箇所がそのまま `fn` 化の対象になり移行が機械的。
+
+## 候補 9: tuple リテラルの構文(2026-09-13 追記、ユーザー要望 — issue [#1753](https://github.com/noshiro-pf/mono/issues/1753) のコメント)
+
+TS の `[a, b, c] as const` に相当し、**配列型ではなく readonly tuple 型に推論される**リテラル構文が欲しい。mutable tuple も作れるようにしたい。
+
+### 要望の中心は「注釈なしで mutable tuple を書く手段が無い」こと（2026-09-13 補足）
+
+最初の記録は軸の分解に寄っていたが、要望の中心はもっと具体的だった。**`const mut_tpl1: [number, number] = ???` の `???` に書ける式が無い。** そして `#[1, 2]` を `as const` 相当として入れても、それは readonly 側なので `???` には入らない。
+
+式だけで（束縛に注釈を書かずに）到達できる型を実測した（TypeScript 7.0.2 / 6.0.3 で同結果）:
+
+| 欲しい型                    | readonly | tuple | 要素型  | 注釈なしの式          |
+| :-------------------------- | :------- | :---- | :------ | :-------------------- |
+| `number[]`                  | ✗        | ✗     | widened | `[1, 2]`              |
+| `readonly [1, 2]`           | ✓        | ✓     | literal | `[1, 2] as const`     |
+| `readonly number[]`         | ✓        | ✗     | widened | **無い**(注釈が要る)  |
+| **`[number, number]`**      | ✗        | ✓     | widened | **無い** ← 要望はここ |
+| `[1, 2]`(mutable・literal)  | ✗        | ✓     | literal | **無い**              |
+| `readonly [number, number]` | ✓        | ✓     | widened | **無い**              |
+
+**`mut_` prefix は推論を一切変えない**ことも確認した（`const mut_a = [1, 2]` は `number[]` のまま）。`mut_` は束縛の名前であって式の性質ではないので、当然ではあるが、最初の記録で「mutable は `mut_` 束縛が担う」と書いたのは誤りだった。
+
+### 6 通りのうち書けるようにすべきなのは 2 通り（実測 2026-09-13）
+
+表は 6 行あるが、**mutable × literal は誰も欲しがらない組み合わせ**である。要素型がリテラルだと、可変なスロットに書き戻せる値がその同じリテラルしかない:
+
+```ts
+let mut_lit: [1, 2] = [1, 2];
+mut_lit[0] = 1; // 通る(唯一代入できる値)
+mut_lit[0] = 3; // 型エラー
+```
+
+つまり **readonly なら literal、mutable なら widened** が実用上の唯一の組み合わせであり、記法は 2 つで足りる。
+
+### 配列と tuple を別の型ファミリーにするか（2026-09-14、ユーザー提起）
+
+#### 現状の部分型関係（実測）
+
+**「最小長 N の配列 `[T, T, ...T[]]` は サイズ N の tuple `[T, T]` の supertype」— 合っている。** TypeScript 7.0.2 / 6.0.3 で確認:
+
+```text
+[T, T]  <:  [T, T, ...T[]]  <:  T[]
+readonly [T, T]  <:  readonly [T, T, ...T[]]  <:  readonly T[]
+[T, T]  <:  readonly [T, T]
+```
+
+逆向き（`[T, T, ...T[]]` → `[T, T]`、`readonly [T, T]` → `[T, T]`）はすべて拒否される。
+
+#### 新しい言語の意味論として妥当か: **readonly なら妥当、mutable なら不健全**
+
+- **mutable では破れる（実測）。** 幅の部分型付けと mutation が組み合わさると壊れる:
+
+    ```ts
+    const grow = (mut_xs: [number, number, ...number[]]): void => {
+        mut_xs.push(3);
+    };
+    const mut_pair: [number, number] = [1, 2];
+
+    grow(mut_pair); // 通る
+
+    const claimed: 2 = mut_pair.length; // 型は 2 のまま、実行時は 3
+    mut_pair[2]; // 型エラーのまま、実行時には 3 が入っている
+    ```
+
+    これは配列の共変性と同じ古典的な穴で、**部分型の向きが問題なのではなく、可変であることが問題**である。
+
+- **readonly なら健全**で、その理由は Python の型仕様が明言している: _"Because tuple contents are immutable, the element types of a tuple are covariant."_ Python は `tuple[int, int] <: tuple[int, ...]` を認めるが、それは **tuple が不変だから**であって、`list` との間には部分型関係を置いていない。**不変性が部分型付けを許している**という構図がそのまま Sumi に当てはまる。
+
+- **Sumi ではこの穴は既に塞がっている（実測）。** 上の例が成立するには**可変 tuple を引数の型に書く**必要があるが、preset はそれを 2 つの規則で拒否する（`sumi/require-readonly-type` と `typescript/prefer-readonly-parameter-types` — D-45）。readonly 版の同じ関数は通る。つまり**readonly-by-default が、部分型関係に手を入れずに不健全性だけを取り除いている。**
+
+- 付随して分かったこと: **rest 要素があっても `push` は健全ではない。** `[string, ...number[]]` に対し `push` の引数型は全要素型の union(`string | number`)になるので、`mut_t.push('oops')` が通り、`number[]` の側に string が入る（実測）。したがって `mutation/no-tuple-mutating-method` が rest 付き tuple にも 9 つすべてを禁止しているのは過剰ではなく正しい。
+
+#### 別ファミリーにする案 — 他言語はほぼそうしている
+
+| 言語            | tuple と配列の関係                                                                                                                                 |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rust            | `(T, U)` / `[T; N]` / `[T]` は**別の型**。部分型付けは（ライフタイム以外）無く、`&[T; N]` → `&[T]` は unsized coercion。tuple に長さ多相の形は無い |
+| Haskell / OCaml | arity ごとに別の型。リストとの関係は無く、変換は手書き                                                                                             |
+| Swift           | tuple は構造的な別ファミリー。`Array` との部分型関係も長さ多相も無い                                                                               |
+| Scala 3         | `Tuple` は `*:` の cons 構造（長さ多相な操作が書ける）。`Array` / `Seq` とは別                                                                     |
+| Python          | `tuple[...]` の中に固定長と可変長(`tuple[int, ...]`)があり両者に部分型関係。`list` との関係は**無い**                                              |
+| TypeScript      | **tuple は配列である。** 可変長 tuple へも `T[]` へも部分型。可変だと不健全（上記）                                                                |
+
+**TS が外れ値なのには理由がある: JS では tuple は実行時に本当に配列**である。Sumi はその実行時を共有するので、別ファミリーにしても値は同じオブジェクトのままになる（Rust の `[T; N]` と `&[T]` も表現は地続きなので、それ自体は矛盾ではない）。
+
+#### 分離の代償: `NonEmptyArray` は変換ではなく**narrowing** に依存している
+
+このリポジトリで `NonEmptyArray<T> = readonly [T, ...T[]]` と `Arr.isNonEmpty` は **488 箇所**に出る。`noUncheckedIndexedAccess` の下で添字アクセスを安全にする中心的なイディオムであり、`isNonEmpty` は**型ガード**である — `readonly T[]` を `readonly [T, ...T[]]` へ narrowing する。これは**まさに部分型関係そのもの**なので、別ファミリーにすると「相互変換と spread を提供すれば足りる」では済まず、**narrowing が書けなくなる**（ガードの結果として別ファミリーの値を作り直すことになる）。
+
+#### 現時点の見立て
+
+**1 つのファミリーのまま、readonly 側の部分型関係を保つ**のが筋に見える。分離が買うのは健全性だが、**Sumi はそれを readonly-by-default と `mutation/no-tuple-mutating-method` で既に得ている**（上の実測）一方、分離が失うのは 488 箇所が依存する narrowing である。Sumi refined で独自型検査器を持つ段になれば「可変 tuple には幅の部分型を認めない」という**より狭い選択肢**も取れるので、ファミリーを分ける前にそちらを検討する順序が自然。
+
+### Sumi lint のライブラリ形は 2 行で書ける（実測 2026-09-13）
+
+D-37 は各候補に「Sumi lint でのライブラリ形」と両向きの codemod を要求する。この候補についてはライブラリ形が**ごく小さい**:
+
+```ts
+export const tuple = <const T extends readonly unknown[]>(...xs: T): T => xs;
+export const mutTuple = <T extends unknown[]>(...xs: T): T => xs;
+
+const t = tuple(1, 2); // readonly [1, 2]
+const mut_t = mutTuple(1, 2); // [number, number] ← 注釈なしで到達できる
+```
+
+**widening の違いは型引数の `const` 修飾子 1 つだけから出る** — `<const T>` なら literal、`<T>` なら widened。前節の「readonly なら literal、mutable なら widened」がそのまま 1 トークンの差に対応するので、sugar の 2 つの記法はこの 2 つの関数へ機械的に落ちる。
+
+### 値の等価性もライブラリ形で提供できる — interning(実測 2026-09-17、ユーザー提起)
+
+上の `tuple` は恒等関数だが、**同じ要素なら同じインスタンスを返す**(interning)ように実装すると、`#[1, 2] === #[1, 2]` が**`===` を一切書き換えずに**成り立つ。要素ごとに `Map`(プリミティブ)/ `WeakMap`（オブジェクト）を辿るトライで正準インスタンスを引き、無ければ `Object.freeze` した配列を登録する。依存なしの 15 行ほどの実装で Node 上で確認した:
+
+| 式                                                                   | 結果                                                |
+| :------------------------------------------------------------------- | :-------------------------------------------------- |
+| `tuple(1, 2) === tuple(1, 2)`                                        | `true`                                              |
+| `Object.isFrozen(tuple(1, 2))` / `Array.isArray(tuple(1, 2))`        | `true` / `true`(普通の配列のまま)                   |
+| `tuple(tuple(1), 'x') === tuple(tuple(1), 'x')`                      | `true`(要素の tuple も正準なので入れ子でも成り立つ) |
+| `tuple(1) === tuple(1, undefined)`                                   | `false`(長さも鍵に含める)                           |
+| `tuple(Number.NaN) === tuple(Number.NaN)` / `tuple(-0) === tuple(0)` | `true` / `true`(`Map` の鍵の SameValueZero)         |
+| `tuple({}) === tuple({})`                                            | `false`(オブジェクト要素は同一性で比べる)           |
+| `new Set([tuple(1, 2), tuple(1, 2)]).size`                           | `1`(`Map` / `Set` の鍵として値のように振る舞う)     |
+
+- **`===` を書き換えないことが要点である。** 比較の側を変える方式（下記の immutable.js）は、`unknown` や generic を経由した比較・`Map` / `Set` の鍵・`Array.prototype.includes` に届かない。interning は値の側を正準化するので、それらすべてで一貫する。
+- **D-37 の「糖衣構文は Sumi lint + ライブラリと一対一対応」にそのまま収まる。** `#[1, 2]` は `tuple(1, 2)` へ落ち、逆向きの codemod も字面どおり。出力は読める TS のライブラリ呼び出しで、TS としての意味論は変わらない（大原則 2 は「値の意味をライブラリが決める」ことを妨げない）。
+- **型は恒等版と同じ**(`<const T extends readonly unknown[]>(...xs: T): T` → `readonly [1, 2]`)。変わるのは実行時だけで、返り値が凍結された正準インスタンスになる。
+- **`#mut[...]` は interning できない。** 可変な値を共有すると、1 か所の書き換えが同じ要素で作った全員に見えてしまう。したがって値の等価性を持つのは readonly 側だけで、`#mut[...]` は恒等版の `mutTuple` に落ちる。印が 2 つ（tuple 性と可変性）ある記法とも整合する — 等価性は「readonly な tuple」の性質になる。
+- **`as const` とは実行時に区別される。** `[1, 2] as const === [1, 2] as const` は `false` のままなので、Sumi lint → sugar の codemod は `as const` を `#[...]` に機械的に置き換えてはならない（同一性で比べている箇所や、凍結されていないことに依存する箇所の意味が変わる）。変換してよいのは `tuple(...)` の呼び出しだけ。
+- **代償**: 生成のたびに要素数ぶりの表引きがかかる。プリミティブを鍵にする表は `WeakMap` にできず GC されないので、実運用には `WeakRef` / `FinalizationRegistry` による掃除が要る。深い不変性・値の等価性が成り立つのは要素がプリミティブか正準な tuple のときだけで、可変なオブジェクトを入れるとその同一性で比べることになる。
+
+**immutable.js は候補にならない。** `List([1, 2]) === List([1, 2])` は `false` で、値の比較は `Immutable.is` / `.equals` を呼ぶ（比較の側を変える方式）。`===` に合わせるには sugar が型を見て `===` を書き換える必要があり、上の理由で `unknown` / generic 経由の比較で壊れる。また `List` は配列ではないので、TS の配列 API・`readonly [A, B]` の型・ts-data-forge とつながらない。
+
+### 記法: 軸が 2 つある以上、印も 2 つ要る（2026-09-13 ユーザー指摘）
+
+- **`#[1, 2]` / `#mut[1, 2]`**（ユーザー案）。`#` が tuple 性を、`mut` が可変性を担う **2 つの独立した印の合成**になっている。
+- ~~**`mut` を式の前置詞にする**: `[1, 2]` / `mut [1, 2]`~~ → **不採用でよい**（ユーザー指摘）。印が 1 つしか無いので、`mut [1, 2]` が `number[]` なのか `[number, number]` なのかを言えない。結局その区別のために型注釈が要ることになり、注釈を書かずに済ませたいという要望の出発点に反する。**tuple 性と可変性は直交する軸なので、印を 1 つに畳むと必ずどちらかが曖昧になる。**
+- **束縛の可変性から推論する**（記法を足さない案）も同じ理由で不足する。`let mut t = [1, 2]` は可変性しか伝えず、tuple にしたいのか配列にしたいのかを言えない。要望の例だけは解けるが一般には解けない。
+- 残る論点は **`#` という字面**で、取り下げられた Record & Tuple の記憶を呼ぶ（下記）。~~採るなら「値等価も深い凍結も無い」ことを明記できるかが条件になる。~~ → interning するライブラリ形に落とせば `#[...]` は**値の等価性と凍結を実際に持てる**（上記、2026-09-17）ので、字面が呼ぶ期待と意味論を一致させる選択肢ができた。
+
+### 「tuple は長さ不変、mut 版は書き換えのみ」は TypeScript には無い（実測 2026-09-13、2026-09-14 に拡張）
+
+要望の意味論は **tuple 型は長さが不変で、mut 版は要素の書き換えだけができる**こと。TypeScript の可変 tuple はこれを**満たさない**。しかも破れるのは長さだけではない — tuple 型は**位置ごとの型**も主張しており、そちらも保たれない（ユーザー指摘 2026-09-14）:
+
+| 操作                                                  | `readonly [A, B]` | `[A, B]` | `#mut[...]` に期待する挙動 |
+| :---------------------------------------------------- | :---------------- | :------- | :------------------------- |
+| `t[0] = x`(スロットの型で検査される)                  | ✗                 | ✓        | ✓                          |
+| `push` / `pop` / `shift` / `unshift` / `splice`(長さ) | ✗                 | **✓**    | **✗**                      |
+| `sort` / `reverse` / `fill` / `copyWithin`(位置)      | ✗                 | **✓**    | **✗**                      |
+| `t.length = n`                                        | ✗                 | ✗        | ✗                          |
+| `t[2] = x`(範囲外)                                    | ✗                 | ✗        | ✗                          |
+
+可変 tuple は `Array` を継承しているので、**ミューテータ 9 つがそのまま使える**。しかもこれは様式の問題ではなく**健全性の穴**である:
+
+```ts
+const mut_t: [number, number] = [1, 2];
+mut_t.push(3);
+const claimed: 2 = mut_t.length; // 型は 2 のまま通る
+mut_t[2]; // 型エラー(「index 2 は無い」)
+// 実行時: length は 3、mut_t[2] は 3
+```
+
+`length` への代入だけは TypeScript が弾く（tuple の `length` はリテラル型 `2` なので）が、メソッド経由は素通りする。
+
+### 帰結: `#mut[...]` は Sumi lint 側の規則を 1 つ必要とする
+
+したがって「mut 版は書き換えのみ」を成立させるには、**tuple 型のレシーバに対する長さ変更メソッドを、`mut_` 束縛であっても禁止する**規則が要る。現在の `mutation/no-mutation-without-mut-prefix` は `mut_` なら配列のミューテータを許すので、そこに条件を 1 つ足す形になる。レシーバが tuple かどうかは型情報なので **`@sumi-lang/checker` 側**(`Type.isTupleType()` がある)。
+
+異種要素の tuple では位置の側がもっと露骨に壊れる（実測 2026-09-14、`[number, string]` = `[1, 'a']` に対して）:`reverse()` → `["a", 1]`、`fill(0)` → `[0, 0]`、`copyWithin(0, 1)` → `["a", "a"]`。**4 つとも TypeScript は受け付け**、その後も `t[1]` は `string` 型のまま number を保持する。
+
+**この規則は sugar を待たずに単体で価値がある** — `[A, B]` という型注釈が長さと位置ごとの型を本当に意味するようになり、上の健全性の穴が塞がる — ので**先に実装した**（`mutation/no-tuple-mutating-method`、ミューテータ 9 つすべてが対象。要素への代入とコピー形 `toSorted` / `toReversed` / `with` は対象外）。sugar の側から見れば**前提条件**でもある: `#mut[...]` が「長さ不変」を約束するなら、それが落ちた先の TS も同じ制約を満たしていなければ、sugar の出力が Sumi lint を満たすという大原則が崩れる。その前提はこれで満たされたので、候補 9 に残る論点は**記法だけ**になった。
+
+### リポジトリの現況 — 既に機械化されている
+
+`as const` はソースに **1,937 箇所**あり、`ts-codemod-lib` の `append-as-const` transformer が機械的に付与している。その transformer は `ignorePrefixes: ['mut_', '#mut_', '_mut_', 'draft']` を持つ — つまりこのリポジトリの運用は既に **「`mut_` 以外のリテラルには `as const` を付ける」** であり、判定は D-14 の `mut_` 規律とちょうど一致している。
+
+つまり **readonly 側の需要は既に機械化されている**。候補 9 で新しいのは mutable 側で、そこは codemod の対象外（`mut_` は `ignorePrefixes` に入っている）である一方、前節のとおり式の形が存在しない。**readonly 側は追認、mutable 側は新設**という非対称な構図になる。
+
+### TC39 との関係（調査 2026-09-13）
+
+- **Record & Tuple は取り下げられている。** Stage 2 まで進んだのち **2025-04-15 に withdrawn**、リポジトリも archive 済み([tc39/proposal-record-tuple#394](https://github.com/tc39/proposal-record-tuple/issues/394))。`#[1, 2]` / `#{ a: 1 }` という構文、新しいプリミティブ、`typeof` の拡張、プリミティブしか入れられない深い不変性が提案の中身だった。
+- **将来 JS がその構文を持つ見込みは無くなった**ので、`#[...]` に収束先としての価値は無い。~~それ以上に、**構文が約束する意味論を lowering が提供できない**: `#[...]` を知っている読み手は値としての等価性(`#[1,2] === #[1,2]`)と深い凍結を期待するが、`as const` へ落とすだけではどちらも得られない。Sumi sugar の出力は TS であり意味論を変えない（大原則 2）ので、この差は埋まらない。~~ → **訂正(2026-09-17)**: 埋まらないのは `as const` へ落とす場合だけだった。interning する `tuple()` へ落とせば、`===` を書き換えずに値の等価性と凍結が得られる（「値の等価性もライブラリ形で提供できる」の節）。したがって `#[...]` を借りるかどうかは、字面の問題ではなく**値の等価性を提供するかどうか**の判断になる。
+- **後継の Composites は tuple の代わりにならない。** Stage 1、`Composite({ x: 1 })` という**オブジェクト**（プリミティブではない）で、interning による値等価を与える。ただし**名前付きプロパティのみ**で位置による tuple 形が無く、可変値も入れられる。tuple の需要には答えない。**仕組みは上の `tuple()` と同じ interning** で、言語側の進む方向とも矛盾しない。
+- ~~**参考になるのは意味論の側**である。「immutable tuple」が実行時に何を意味するか（値等価・深い凍結）は、**Sumi refined**（独自型検査器と実行時表現を持てる層）でしか提供できない。Sumi sugar の候補 9 は**型の付き方の話**に限定し、値等価は refined の論点として切り離すのが筋が通る。~~ → **訂正(2026-09-17)**: 要素がプリミティブか正準な tuple である限り、値の等価性と深い凍結は **Sumi sugar のライブラリ形で提供できる**。refined に残るのは、interning では届かない部分 — 可変なオブジェクトを含む値の構造的な等価性、新しいプリミティブとしての `typeof`、表引きの費用を型検査器の知識で省く最適化 — に限られる。auto freezing([variables-and-mutation.md](./variables-and-mutation.md))とは、凍結を伴う点で引き続き関係する。
+
+### 未解決の論点
+
+- **`#` の字面**を採るか（2 印の合成という形は確定的でよい）。~~採るなら値等価を期待させないことを明記できるか。~~ → 値の等価性を提供する(interning する `tuple()` へ落とす)なら、字面が呼ぶ期待と意味論が一致する。
+- **`#[...]` に値の等価性を持たせるか**（2026-09-17 追加）。持たせるなら `tuple()` は interning 版になり、表引きの費用と、プリミティブを鍵にする表の `WeakRef` / `FinalizationRegistry` による掃除を ts-std-forge が引き受ける。持たせないなら恒等版のままで、`#` の字面は再検討になる。
+- **ライブラリ形の 2 版をどう置くか。** 恒等版（型だけ）と interning 版（型 + 実行時の正準化）は型が同じで実行時が違うので、同じ名前で入れ替えると呼び出し側の同一性の比較の意味が黙って変わる。別名にするか、最初から interning 版だけにするか。
+- **リテラルの既定**を readonly tuple に変えるか、現行の `number[]` のままにするか。変えると `readonly number[]`（homogeneous・可変長）を書く側の代償が出る — 1,937 箇所の `as const` を「tuple が欲しかった / 配列が欲しかった」で数えると判断材料になる。
+- **ライブラリ形を先に入れるか。** `tuple` / `mutTuple` は 2 行で、sugar を待たずに ts-std-forge に置ける。D-37 の「ライブラリ先行」の原則からはそうすべきで、そうすれば `???` の穴は sugar より前に埋まる。
+- **`readonly [number, number]` と `readonly number[]`** は依然として注釈でしか書けない。2 記法で足りるという整理はこの 2 つを注釈側に残す前提なので、実際に困るかを dogfood で見る。
+- object literal 側(`{ a: 1 } as const`)も同じ軸を持つので、tuple だけ先に決めてよいか。
 
 ## 導入順（提案）
 

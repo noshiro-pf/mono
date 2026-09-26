@@ -1,5 +1,6 @@
 import {
   genericArrowTrailingComma,
+  noCallSignatureMember,
   noClass,
   noConstructorCall,
   noDecorator,
@@ -32,6 +33,7 @@ export const sumiPlugin = {
   meta: { name: 'sumi' },
   rules: {
     'generic-arrow-trailing-comma': genericArrowTrailingComma,
+    'no-call-signature-member': noCallSignatureMember,
     'no-class': noClass,
     'no-constructor-call': noConstructorCall,
     'no-decorator': noDecorator,

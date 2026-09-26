@@ -66,6 +66,12 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
     'functions/explicit-return-type',
   ],
   ['sumi(prefer-arrow-function)', 'functions/prefer-arrow-function'],
+  ['sumi(no-call-signature-member)', 'functions/no-call-signature-member'],
+  [
+    'typescript(adjacent-overload-signatures)',
+    'functions/adjacent-overload-signatures',
+  ],
+  ['typescript(unified-signatures)', 'functions/unified-signatures'],
 
   // jsx
   ['sumi(generic-arrow-trailing-comma)', 'jsx/generic-arrow-trailing-comma'],
