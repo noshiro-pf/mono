@@ -312,6 +312,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
   second time after a person switches it off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
   checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
+- **A Claude Code session names itself in the description**, on a line of its
+  own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
+  title as it reads when the pull request is opened, or the URL alone when the
+  session cannot see its title. Nothing checks it; the Pull Requests Manager
+  reads it to link and open the session.
 - **A Claude Code session's proxy refuses GitHub's GraphQL**, which `open-pr`
   needs only to take an existing draft out of draft, and which arming
   auto-merge needs always — one more reason that is `unblock-prs`'s, run by
