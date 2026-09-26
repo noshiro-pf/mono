@@ -166,6 +166,18 @@ export type TimelineEvent = Readonly<
   | { kind: 'queued' }
 >;
 
+/**
+ * A pull request's place in one of GitHub's native stacks, which `stack.mts`
+ * says this script does not land.
+ */
+export type NativeStackEntry = Readonly<{
+  /** The stack's number, from the same sequence as the pull requests'. */
+  stack: number;
+  /** 1 for the layer on the base branch, 2 for the one on it, and so on. */
+  position: number;
+  size: number;
+}>;
+
 export type WatchOutcome =
   | 'auto-merge-disabled'
   | 'behind-again'
