@@ -154,6 +154,19 @@ The "read 3 minutes ago" line is measured against a clock of its own that
 ticks every 30 seconds, so a tab that stopped reading does not go on looking
 fresh.
 
+An answer for a token that has since been cleared or replaced is dropped, so
+**Clear** empties the page even while a read is still out.
+
+**The state is in synstate stores** under `src/store/`, not in the components:
+`reader.mts` holds what was read and decides when to read, `token-store.mts`
+the token and its form, `theme-store.mts` light or dark. Each takes what it
+touches in the browser as an argument — the timers as synstate `counter`s and
+the DOM events as observables — which is what lets a test drive them with a
+`source`, and `store.mts` hands them the real ones. What is kept outside the
+page follows a store by subscription: storage follows the token, and the URL
+and `<html>` follow the theme. The components only read the stores and call
+their actions.
+
 ## The token
 
 **GraphQL answers nobody without a token**, so the page reads nothing until

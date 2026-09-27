@@ -1,14 +1,7 @@
 import * as React from 'react';
-import {
-  applyTheme,
-  effectiveTheme,
-  saveTheme,
-  subscribeToSystemColorScheme,
-  systemColorScheme,
-  themeFromLocation,
-  toggledTheme,
-  type Theme,
-} from '../theme.mjs';
+import { useObservableValue } from 'synstate-react-hooks';
+import { themeStore } from '../store/index.mjs';
+import { effectiveTheme } from '../theme.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
 /**
@@ -21,22 +14,9 @@ import { BadgeIcon } from './badge-icon.js';
  * what is on screen, and the URL keeps it.
  */
 export const ThemeButton = React.memo(() => {
-  const [theme, setTheme] = React.useState<Theme>(() => themeFromLocation());
+  const theme = useObservableValue(themeStore.theme);
 
-  const system = React.useSyncExternalStore(
-    subscribeToSystemColorScheme,
-    systemColorScheme,
-  );
-
-  React.useEffect(() => {
-    applyTheme(theme);
-
-    saveTheme(theme);
-  }, [theme]);
-
-  const toggle = React.useCallback((): void => {
-    setTheme((current) => toggledTheme(current, system));
-  }, [system]);
+  const system = useObservableValue(themeStore.system);
 
   const dark = effectiveTheme(theme, system) === 'dark';
 
@@ -50,7 +30,7 @@ export const ThemeButton = React.memo(() => {
           : 'Chosen here, and kept in the URL. A press back to what the system shows follows the system again.'
       }
       type={'button'}
-      onClick={toggle}
+      onClick={themeStore.toggle}
     >
       <BadgeIcon path={dark ? MOON : SUN} />
       {'Dark'}
