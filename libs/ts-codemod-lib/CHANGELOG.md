@@ -1,5 +1,11 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 3.3.3
+
+### Patch Changes
+
+- 1cfd86a: `transformSourceCode` now finds file-level ignore comments (`/* transformer-ignore ... */` and its aliases) with a single linear scan instead of regular expressions, so the time it takes grows linearly with the size of the source text. Which comments are recognized, and the transformer names read from them, are unchanged.
+
 ## 3.3.2
 
 ### Patch Changes
