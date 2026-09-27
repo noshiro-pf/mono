@@ -7,7 +7,8 @@ type Props = Readonly<{ entry: SplitViewSource }>;
 
 /**
  * Opens the pull request in `split-view-extension` — the diff beside the
- * conversation, and the issue it closes beside those when there is one.
+ * conversation, and beside those the issue it closes and the Claude Code
+ * session it was written in, when it names them.
  *
  * Drawn whether or not the extension is installed: the page's
  * `Content-Security-Policy` lets it connect to `api.github.com` alone, so it
@@ -18,8 +19,8 @@ export const SplitViewLink = React.memo<Props>(({ entry }) => (
   <ExternalLink
     href={splitViewUrl(entry)}
     title={
-      Arr.isNonEmpty(entry.linkedIssues)
-        ? 'open the diff, the conversation and the issue side by side (needs split-view-extension)'
+      Arr.isNonEmpty(entry.linkedIssues) || Arr.isNonEmpty(entry.claudeSessions)
+        ? 'open the diff, the conversation, and the issue or the session beside them (needs split-view-extension)'
         : 'open the diff and the conversation side by side (needs split-view-extension)'
     }
     variant={'split-view'}

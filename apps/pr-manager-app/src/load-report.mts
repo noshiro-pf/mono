@@ -37,6 +37,7 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
 import {
   codeOwnerReview,
   parseCodeOwners,
@@ -87,6 +88,8 @@ export type Entry = ReportEntry &
      */
     setAside: SetAsideView | undefined;
     codeOwnerReview: CodeOwnerReview;
+    /** Read from the `Claude-Session:` trailers in the body. */
+    claudeSessions: readonly ClaudeSession[];
   }>;
 
 export type Merged = MergedPullRequest & Readonly<{ mergedAtEpochMs: number }>;
@@ -571,6 +574,7 @@ const assemble = ({
               approvers: approversOf(pull.pr),
               author: entry.author,
             }),
+      claudeSessions: parseClaudeSessions(entry.body),
     };
   });
 
