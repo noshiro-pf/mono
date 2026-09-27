@@ -1,3 +1,5 @@
+// cspell:ignore retargeted
+
 import { SKIP_CI_LABEL, stackDescendants } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
@@ -16,7 +18,7 @@ import {
   observeSurvey,
   surveyFingerprint,
 } from './quiet.mjs';
-import { advance, armOnPick } from './rebase.mjs';
+import { advance, armOnPick, restackRetargeted } from './rebase.mjs';
 import {
   firstInReleaseOrder,
   pauseAllBut,
@@ -24,6 +26,7 @@ import {
 } from './release.mjs';
 import { describeFailedChecks } from './set-aside-detail.mjs';
 import { newSkips, pruneSkips, withSkip } from './skips.mjs';
+import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
   type CycleResult,
@@ -62,7 +65,10 @@ import { watch } from './watch.mjs';
  *    previous cycle gave up on are set aside, and so is one whose review
  *    holds its merge — a code owner has not approved it, or a conversation
  *    is unresolved — because no check reports that, and releasing it would
- *    only run a matrix to sit green.
+ *    only run a matrix to sit green. The one thing done without the label
+ *    comes first: a layer GitHub moved onto the default branch when the one
+ *    below it merged, still carrying that one's commits, is rebased off them
+ *    and the list read again (`stack.mts`).
  * 2. If one of them is already up to date and its checks are running, or it
  *    is clean and about to merge, watch that one instead of rebasing another:
  *    the merge will move `main` and put every other branch back to `BEHIND`,
@@ -215,6 +221,7 @@ const unblockPrs = async (
     tracked: new Set(),
     baseSha: undefined,
     quiet: initialQuiet,
+    stackedOn: undefined,
   };
 
   while (!stopRequested()) {
@@ -273,7 +280,32 @@ const runCycle = async (
   before: LoopState,
   options: Options,
 ): Promise<CycleResult> => {
-  const surveyed = await survey(defaultBranch);
+  const listed = await survey(defaultBranch);
+
+  if (Result.isErr(listed)) {
+    log(`Survey failed: ${listed.value}`);
+
+    return { state: before, next: 'idle' };
+  }
+
+  // What the next cycle compares its bases with. From this survey rather
+  // than the one below, which a layer moving in between could skip.
+  const stackedOn = stackedOnAfter(
+    before.stackedOn,
+    listed.value.pullRequests,
+    stackParentsOf(listed.value.pullRequests, defaultBranch),
+  );
+
+  // A layer the one below merged from under goes first, labelled or not, and
+  // the heads read before it are then read again. See `stack.mts`.
+  const surveyed = (await restackRetargeted(
+    before.stackedOn,
+    listed.value.pullRequests,
+    defaultBranch,
+    options.dryRun,
+  ))
+    ? await survey(defaultBranch)
+    : listed;
 
   if (Result.isErr(surveyed)) {
     log(`Survey failed: ${surveyed.value}`);
@@ -324,6 +356,7 @@ const runCycle = async (
       tracked: nextTracked,
       baseSha,
       quiet,
+      stackedOn,
     }) as const;
 
   // A pull request that is up to date and already failing gets remembered
