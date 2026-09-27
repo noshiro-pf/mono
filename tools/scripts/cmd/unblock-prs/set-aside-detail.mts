@@ -61,3 +61,21 @@ export const describeConflict = (
   Arr.isNonEmpty(conflicted)
     ? (`conflicts with ${onto} in ${conflicted.join(', ')}` as const)
     : (`rebase onto ${onto} failed: ${output.replaceAll(/\s+/gu, ' ').trim()}` as const);
+
+/**
+ * The end of what a failed command printed. Node's message starts with
+ * `Command failed: <the command>`, which says nothing the reason does not and
+ * alone fills a status: an arm that failed was once reported as its own
+ * GraphQL mutation, cut off before GitHub's answer. Only a command that
+ * printed nothing is left with that line.
+ */
+export const describeCommandFailure = (message: string): string => {
+  const lines = message.trim().split('\n');
+
+  const printed =
+    lines[0]?.startsWith(COMMAND_FAILED) === true ? Arr.tail(lines) : lines;
+
+  return Arr.takeLast(Arr.isNonEmpty(printed) ? printed : lines, 2).join('\n');
+};
+
+const COMMAND_FAILED = 'Command failed: ';

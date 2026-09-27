@@ -1,6 +1,11 @@
 // cspell:ignore retarget retargeted
 
-import { restackable, retargetedFrom, stackedNote } from './stack.mjs';
+import {
+  nativeStackNote,
+  restackable,
+  retargetedFrom,
+  stackedNote,
+} from './stack.mjs';
 import {
   type PullRequest,
   type TimelineEvent,
@@ -128,5 +133,27 @@ describe(restackable, () => {
 
   test('refuses one that is not open', () => {
     assert.isDefined(restackable(pullRequest({ number: 2, state: 'CLOSED' })));
+  });
+});
+
+describe(nativeStackNote, () => {
+  test('is nothing for a pull request in no native stack', () => {
+    assert.isUndefined(nativeStackNote(pullRequest({ number: 2 }), undefined));
+  });
+
+  test('says why one in a native stack is not armed, and what to do', () => {
+    // GitHub keeps the layer in the stack after the one below it merged and
+    // it was moved onto `main`, and refuses auto-merge for as long.
+    assert.deepStrictEqual(
+      nativeStackNote(pullRequest({ number: 2 }), {
+        stack: 3,
+        position: 2,
+        size: 2,
+      }),
+      {
+        kind: 'note',
+        note: "#2: layer 2 of 2 of GitHub's native stack #3, on which GitHub refuses auto-merge; merge it by hand (a stack made by the base alone needs no native stack)",
+      },
+    );
   });
 });

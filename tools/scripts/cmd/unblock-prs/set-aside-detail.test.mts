@@ -1,4 +1,5 @@
 import {
+  describeCommandFailure,
   describeConflict,
   describeFailedChecks,
   describeHold,
@@ -89,6 +90,37 @@ describe(describeConflict, () => {
       describeConflict([], 'error: could not apply 1234abc\nhint: …', 'main'),
       'rebase onto main failed: error: could not apply 1234abc hint: …',
     );
+  });
+});
+
+describe(describeCommandFailure, () => {
+  test('keeps what the command printed rather than the command', () => {
+    // The command line alone fills a status description, which is how
+    // GitHub's answer came to be cut off.
+    assert.strictEqual(
+      describeCommandFailure(
+        "Command failed: gh api graphql -f 'id=PR_1' -f 'query=mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }'\ngh: Auto-merge is not supported for stacked pull requests.",
+      ),
+      'gh: Auto-merge is not supported for stacked pull requests.',
+    );
+  });
+
+  test('keeps the last two lines of a longer answer', () => {
+    assert.strictEqual(
+      describeCommandFailure('Command failed: gh pr edit 1\none\ntwo\nthree'),
+      'two\nthree',
+    );
+  });
+
+  test('keeps the command when it printed nothing', () => {
+    assert.strictEqual(
+      describeCommandFailure('Command failed: gh pr edit 1'),
+      'Command failed: gh pr edit 1',
+    );
+  });
+
+  test('keeps the end of a message that names no command', () => {
+    assert.strictEqual(describeCommandFailure('one\ntwo\nthree'), 'two\nthree');
   });
 });
 

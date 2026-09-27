@@ -20,7 +20,10 @@ import {
   type MergedHead,
 } from './github.mjs';
 import { isMergeQueued, isSkipCiLabelled } from './labels.mjs';
-import { describeConflict } from './set-aside-detail.mjs';
+import {
+  describeCommandFailure,
+  describeConflict,
+} from './set-aside-detail.mjs';
 import { restackable, retargetedFrom } from './stack.mjs';
 import {
   type Advanced,
@@ -385,7 +388,9 @@ const removeSkipCiLabel = async (
   );
 
   return Result.isErr(removed)
-    ? failed(`cannot remove ${SKIP_CI_LABEL}: ${lastLines(removed.value, 2)}`)
+    ? failed(
+        `cannot remove ${SKIP_CI_LABEL}: ${describeCommandFailure(removed.value)}`,
+      )
     : Result.ok('removed');
 };
 
@@ -546,7 +551,9 @@ export const armOnPick = async (
   const armed = await armAutoMerge(current.value.id);
 
   if (Result.isErr(armed)) {
-    return failed(`cannot arm auto-merge: ${lastLines(armed.value, 2)}`);
+    return failed(
+      `cannot arm auto-merge: ${describeCommandFailure(armed.value)}`,
+    );
   }
 
   log(`#${pr.number}: auto-merge armed.`);
