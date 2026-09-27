@@ -6,8 +6,9 @@ import { type Entry } from './load-report.mjs';
  * left, without whitespace changes or the files marked viewed, and the
  * conversation on the right at 7:3. When the pull request closes an issue or
  * names the Claude Code session it was written in, the right half is shared
- * with it — the conversation beside the one at 1:1, and with both,
- * the session beside the conversation stacked over the issue.
+ * with it at 1:1 — the conversation beside the issue, the session beside the
+ * conversation — and with both, the session beside the conversation stacked
+ * over the issue. The session is always next to the diff.
  *
  * Only the first issue and the first session are shown. A pull request that
  * names several is rare enough that another pane, narrower than anything is
@@ -44,7 +45,7 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
         ? ({ layout: 'r70pp', panes: [diff, conversation] } as const)
         : ({
             layout: 'rprpp',
-            panes: [diff, conversation, { url: sessionUrl, zoom: full }],
+            panes: [diff, { url: sessionUrl, zoom: full }, conversation],
           } as const)
       : sessionUrl === undefined
         ? ({

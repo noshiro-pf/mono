@@ -12,9 +12,9 @@ words:
   # and its test asserts on.
   - ededed
   # The id `split-view-extension` pins, and the layouts `src/split-view.mts`
-  # asks it for (diff, then conversation beside issue or session; diff, then
-  # session beside conversation over issue), named in the module and its
-  # test.
+  # asks it for (diff, then conversation beside issue or session beside
+  # conversation; diff, then session beside conversation over issue), named
+  # in the module and its test.
   - nifmgpafbfpgpcijgmfpcoonjbalbkhf
   - rprpp
   - rprpcpp
