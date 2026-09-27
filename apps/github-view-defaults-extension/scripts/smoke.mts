@@ -20,7 +20,11 @@ import { distPath } from './store-package.mjs';
  * parameters in and then strips `show-viewed-files` back off its own address
  * bar, while going on mutating the DOM. An extension that reads that as "the
  * defaults are gone" redirects forever; the check is that the page is loaded
- * twice — asked for, and redirected once — and then no more.
+ * twice — asked for, and redirected once — and then no more. A second fixture
+ * does what the site does on a pull request with files already marked viewed —
+ * drops the whole query for a fragment naming the first file that is not — and
+ * the check is that the address gets the defaults back with no load at all,
+ * in the tab and in a frame.
  *
  * It needs a headed browser, because Chromium loads no extensions in the
  * headless shell. On a machine with no display:
@@ -110,27 +114,41 @@ const main = async (): Promise<void> => {
       previous: string,
       ticksLeft: number,
       isDone: (url: string) => boolean,
+      readUrl: () => string,
     ): Promise<string> => {
       if (ticksLeft <= 0) {
-        return page.url();
+        return readUrl();
       }
 
       await page.waitForTimeout(settleStepMs);
 
-      const current = page.url();
+      const current = readUrl();
 
       return current === previous && isDone(current)
         ? current
-        : settledUrl(current, ticksLeft - 1, isDone);
+        : settledUrl(current, ticksLeft - 1, isDone, readUrl);
     };
 
+    const pageUrl = (): string => page.url();
+
     const settle = async (): Promise<string> =>
-      settledUrl('', settleTicks, anyUrl);
+      settledUrl('', settleTicks, anyUrl, pageUrl);
 
     /** `settle`, for an address that is only final once the page rewrote it. */
     const settleUntil = async (
       isDone: (url: string) => boolean,
-    ): Promise<string> => settledUrl('', settleTicks, isDone);
+    ): Promise<string> => settledUrl('', settleTicks, isDone, pageUrl);
+
+    /** `settleUntil`, for the address of the frame `frameHostFixture` holds. */
+    const settleFrameUntil = async (
+      isDone: (url: string) => boolean,
+    ): Promise<string> =>
+      settledUrl(
+        '',
+        settleTicks,
+        isDone,
+        () => page.frame({ name: frameName })?.url() ?? '(no frame)',
+      );
 
     /** `goto` is interrupted when the extension redirects, which is the point. */
     const visit = async (url: string): Promise<string> => {
@@ -359,10 +377,39 @@ const main = async (): Promise<void> => {
     // asked for, taken off again, asked for again.
     await page.waitForTimeout(loopWatchMs);
 
+    // The extension writes the parameter back once, in place, and the fixture
+    // takes it off again, to the same address. That second time is the site
+    // insisting, and it is left there rather than fought over.
     check(
-      'and the defaults are not forced back',
+      'and the defaults are neither loaded again nor fought over',
       `${String(mut_documentLoads.length)} page loads, at ${page.url()}`,
       `2 page loads, at ${origin}/stripped/mono/pull/1/files?w=1`,
+    );
+
+    console.log('the address bar the site sends to a file');
+
+    // `/jumped/` is the fixture that behaves like GitHub on a pull request with
+    // files already marked viewed: once, it drops the query for a fragment
+    // naming the first file that is not.
+    await visit(
+      `${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false`,
+    );
+
+    check(
+      'the defaults are written back beside the fragment, without a load',
+      `${String(mut_documentLoads.length)} page load, at ${await settleUntil((url) => url.includes('#'))}`,
+      `1 page load, at ${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false#diff-abc`,
+    );
+
+    // A split-view pane is a frame, which a content script is not injected
+    // into unless it asks. The frame opens the bare diff, so this is the
+    // redirect and the write-back both, inside it.
+    await visit(`${origin}/frame-host`);
+
+    check(
+      'and the same happens inside a frame',
+      await settleFrameUntil((url) => url.includes('#')),
+      `${origin}/jumped/mono/pull/1/files?w=1&show-viewed-files=false#diff-abc`,
     );
   } finally {
     await context.close();
@@ -380,6 +427,9 @@ const main = async (): Promise<void> => {
 /** The only origin the extension is declared for. */
 const origin = 'https://github.com';
 
+/** The `name` of the frame `/frame-host` holds. */
+const frameName = 'pane';
+
 /** The `isDone` of a wait that only asks the address to stop moving. */
 const anyUrl = (): boolean => true;
 
@@ -394,11 +444,21 @@ const loopWatchMs = 2500;
  *
  * Enough of a pull request page to click through: the tab links the extension
  * rewrites, two it must leave alone, the branches links whose treatment depends
- * on the page they are read from, and — under `/stripped/` — the address-bar
- * rewriting the real site does.
+ * on the page they are read from, and — under `/stripped/` and `/jumped/` —
+ * the address-bar rewriting the real site does. `/frame-host` is a page
+ * holding a diff in a frame, as a split view does.
  */
 const fixtureFor = (url: string): string => {
   const { pathname } = new URL(url);
+
+  if (pathname === '/frame-host') {
+    return [
+      '<!doctype html>',
+      '<meta charset="utf-8">',
+      '<title>frame host fixture</title>',
+      `<iframe name="${frameName}" src="/jumped/mono/pull/1/files"></iframe>`,
+    ].join('\n');
+  }
 
   return [
     '<!doctype html>',
@@ -417,6 +477,9 @@ const fixtureFor = (url: string): string => {
     '<div id="feed"></div>',
     pathname.startsWith('/stripped/')
       ? `<script>${addressRewritingScript}</script>`
+      : '',
+    pathname.startsWith('/jumped/')
+      ? `<script>${jumpToFileScript}</script>`
       : '',
   ].join('\n');
 };
@@ -439,6 +502,21 @@ const addressRewritingScript = [
   "    url.searchParams.delete('show-viewed-files');",
   "    history.replaceState(null, '', url.toString());",
   '  }',
+  "  document.getElementById('feed').append(document.createElement('span'));",
+  '}, 200);',
+].join('\n');
+
+/**
+ * What GitHub does to the address of a diff whose files are partly marked
+ * viewed: it scrolls to the first one that is not, and writes its anchor as the
+ * fragment with the query gone. Once, and then it goes on mutating the DOM.
+ */
+const jumpToFileScript = [
+  'setTimeout(() => {',
+  "  history.replaceState(null, '', location.pathname + '#diff-abc');",
+  "  document.getElementById('feed').append(document.createElement('span'));",
+  '}, 200);',
+  'setInterval(() => {',
   "  document.getElementById('feed').append(document.createElement('span'));",
   '}, 200);',
 ].join('\n');
