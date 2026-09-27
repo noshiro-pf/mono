@@ -73,7 +73,7 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('adds the Claude Code session on the right, at 2:1:1', () => {
+  test('puts the Claude Code session between the diff and the conversation, at 2:1:1', () => {
     const params = paramsOf(
       splitViewUrl({
         ...pullRequest,
@@ -86,8 +86,8 @@ describe(splitViewUrl, () => {
 
     assert.deepStrictEqual(params.getAll('url'), [
       diffUrl,
-      pullRequestUrl,
       'https://claude.ai/code/session_01First',
+      pullRequestUrl,
     ]);
   });
 
@@ -135,7 +135,7 @@ describe(splitViewUrl, () => {
       }),
     );
 
-    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['1', '0.75', '1']);
+    assert.deepStrictEqual(sessionOnly.getAll('zoom'), ['1', '1', '0.75']);
   });
 
   test('titles the tab with the number and the title of the pull request', () => {

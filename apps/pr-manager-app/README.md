@@ -73,9 +73,10 @@ request in [`split-view-extension`](../split-view-extension/README.md): the
 diff on the left and the conversation on the right, at 7:3. The diff hides
 whitespace changes and the files already marked viewed
 (`?w=1&show-viewed-files=false`). When the pull request closes an issue, or
-names the Claude Code session it was written in, that joins the conversation
-on the right half, at 1:1; with both, the session is on the left of the right
-half, beside the conversation stacked over the issue. The first issue and the
+names the Claude Code session it was written in, that shares the right half
+at 1:1 — the issue right of the conversation, the session left of it, next to
+the diff; with both, the session is on the left of the right half, beside the
+conversation stacked over the issue. The first issue and the
 first session only, if it names several. The conversation and the issue are
 shown at 75%. The tab is titled with the pull request's number and title,
 `#2071 feat(…): …`.
