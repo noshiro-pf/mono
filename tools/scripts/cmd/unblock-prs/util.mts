@@ -56,10 +56,19 @@ export const pause = async (ms: number): Promise<void> => {
 };
 
 export const log = (message: string): void => {
-  console.info(
-    `[${Temporal.Now.instant().round({ smallestUnit: 'millisecond' }).toString()}] ${message}`,
-  );
+  console.info(logLine(message));
 };
+
+/**
+ * `message` stamped with the time in the machine's time zone (`TZ`), because
+ * the person reading the log reads it against their own clock. The offset
+ * stays in the stamp, so a line pasted elsewhere still names one instant.
+ */
+export const logLine = (
+  message: string,
+  now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO(),
+): string =>
+  `[${now.toString({ smallestUnit: 'millisecond', timeZoneName: 'never' })}] ${message}` as const;
 
 export const installStopHandlers = (): void => {
   const onSignal = (signal: NodeJS.Signals): void => {

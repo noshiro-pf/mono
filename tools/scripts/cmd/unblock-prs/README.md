@@ -420,6 +420,10 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 | `--watch-timeout <min>`   |   90 | 1本を諦めるまでの時間                        |
 | `--no-auto-fix`           |      | 「4a」の自動修正をしない                     |
 
+ログの各行の時刻はマシンの既定のタイムゾーンで、UTC からのオフセット付きで出ます
+（例: `[2026-09-27T21:03:04.500+09:00]`）。別のタイムゾーンで読みたいときは
+`TZ=Asia/Tokyo pnpm run unblock-prs` のように `TZ` で指定します。
+
 ### 見送った PR はどこで分かるか
 
 このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。そこで PR を
@@ -922,6 +926,10 @@ minutes.
 | `--poll-interval <sec>`   |      30 | wait between polls of the watched one      |
 | `--watch-timeout <min>`   |      90 | give up on one pull request after this     |
 | `--no-auto-fix`           |         | skip the fix in "4a"                       |
+
+Each log line is stamped with the time in the machine's time zone, with its
+offset from UTC (`[2026-09-27T21:03:04.500+09:00]`). To read it in another
+zone, set `TZ`: `TZ=Asia/Tokyo pnpm run unblock-prs`.
 
 ### Where a passed-over pull request shows
 
