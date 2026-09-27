@@ -13,6 +13,7 @@ import {
   type Observable as SynstateObservable,
 } from 'synstate';
 import { REPORT_SOURCE } from '../constants.mjs';
+import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadReport } from '../load-report.mjs';
 import {
   applyTheme,
@@ -22,6 +23,7 @@ import {
   themeFromLocation,
 } from '../theme.mjs';
 import { browserStores } from '../token.mjs';
+import { createLayoutStore } from './layout-store.mjs';
 import { createReader } from './reader.mjs';
 import { createThemeStore } from './theme-store.mjs';
 import { createTokenStore } from './token-store.mjs';
@@ -47,6 +49,12 @@ export const themeStore = createThemeStore({
   save: saveTheme,
 });
 
+export const layoutStore = createLayoutStore({
+  initial: layoutFromLocation(),
+  save: saveLayout,
+  saveDelayMs: 300,
+});
+
 /**
  * Starts the timers and the listeners. Called once, from `main.tsx`, before
  * the first render: the theme is written to `<html>` as it starts, so a page
@@ -59,12 +67,16 @@ export const startStore = (): (() => void) => {
 
   const stopReader = reader.start();
 
+  const stopLayout = layoutStore.start();
+
   return () => {
     stopToken();
 
     stopTheme();
 
     stopReader();
+
+    stopLayout();
   };
 };
 
