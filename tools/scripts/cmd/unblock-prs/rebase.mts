@@ -2,12 +2,17 @@
 
 /**
  * Moving a branch: onto the tip of the base, with the layers stacked on it
- * carried along, and out from under `skip-ci`.
+ * carried along, and out from under `skip-ci` — or, for a layer the one below
+ * it merged from under, off that layer's commits and nothing more.
  */
 
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { MERGE_QUEUED_LABEL, SKIP_CI_LABEL } from 'pr-report-core';
+import {
+  MERGE_QUEUED_LABEL,
+  SKIP_CI_LABEL,
+  stackDescendants,
+} from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import {
   armAutoMerge,
@@ -24,14 +29,21 @@ import {
   describeCommandFailure,
   describeConflict,
 } from './set-aside-detail.mjs';
-import { restackable, retargetedFrom } from './stack.mjs';
+import {
+  restackable,
+  retargetedFrom,
+  retargetedLayers,
+  stackParentsOf,
+} from './stack.mjs';
 import {
   type Advanced,
   type AdvancePlan,
   type PullRequest,
   type RebaseFailure,
+  type RetargetedLayer,
+  type StackedOn,
 } from './types.mjs';
-import { isSafeRefName, lastLines, log, sh } from './util.mjs';
+import { isSafeRefName, lastLines, log, sh, stopRequested } from './util.mjs';
 import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
@@ -348,6 +360,46 @@ export const advance = async (
 };
 
 /**
+ * Rebases every pull request GitHub moved onto the default branch when the
+ * layer below it merged, and that still carries that layer's commits, off
+ * them: `--onto` from the head the layer merged at to the squash commit it
+ * merged as, carrying the layers stacked on it along. `stack.mts` says why
+ * this waits for no queue, and why the tree comes out as it went in.
+ *
+ * Nothing is armed or released: `skip-ci` stays as it is, and a push under
+ * it fires a `synchronize` whose every check skips. Resolves to whether any
+ * branch moved — by this, or by someone else under it — since either makes
+ * the heads the survey read stale.
+ */
+export const restackRetargeted = async (
+  before: StackedOn | undefined,
+  pullRequests: readonly PullRequest[],
+  defaultBranch: string,
+  dryRun: boolean,
+): Promise<boolean> => {
+  const stackParents = stackParentsOf(pullRequests, defaultBranch);
+
+  let mut_moved = false;
+
+  for (const layer of retargetedLayers(before, pullRequests, defaultBranch)) {
+    if (stopRequested()) {
+      break;
+    }
+
+    const outcome = await restackOffMerged(layer, defaultBranch, {
+      dryRun,
+      descendants: stackDescendants(stackParents, layer.pr.number).flatMap(
+        (number) => pullRequests.filter((pr) => pr.number === number),
+      ),
+    });
+
+    mut_moved ||= outcome !== 'untouched';
+  }
+
+  return mut_moved;
+};
+
+/**
  * Takes `skip-ci` off, having first asked GitHub whether the pull request
  * still wants it. Removing the label starts a CI matrix, and the survey it
  * was decided on is a rebase old by now.
@@ -432,6 +484,155 @@ const stackedOnMerged = async (
   }
 
   return merged.value;
+};
+
+/**
+ * One layer of `restackRetargeted`. Whatever cannot be read or done is said
+ * and left: the layer is where GitHub put it, which is where it would be
+ * without this.
+ */
+const restackOffMerged = async (
+  { pr, from }: RetargetedLayer,
+  defaultBranch: string,
+  plan: Readonly<{ dryRun: boolean; descendants: readonly PullRequest[] }>,
+): Promise<'moved' | 'restacked' | 'untouched'> => {
+  const branch = from ?? (await retargetedFromTimeline(pr, defaultBranch));
+
+  if (branch === undefined || !isSafeRefName(branch)) {
+    return 'untouched';
+  }
+
+  const merged = await mergedHeadOf(branch);
+
+  if (Result.isErr(merged)) {
+    log(
+      `#${pr.number}: cannot read what merged from ${branch}, so not rebasing it off that. (${lastLines(merged.value, 2)})`,
+    );
+
+    return 'untouched';
+  }
+
+  // Nothing merged from that branch: the layer below was closed, or a person
+  // moved this one.
+  if (merged.value === undefined) {
+    return 'untouched';
+  }
+
+  const { number, headSha, mergeCommit } = merged.value;
+
+  const carried = await carries(pr, headSha, [
+    defaultBranch,
+    `refs/pull/${number}/head`,
+  ]);
+
+  if (Result.isErr(carried)) {
+    log(
+      `#${pr.number}: cannot tell whether it still carries #${number}'s commits. (${lastLines(carried.value, 2)})`,
+    );
+
+    return 'untouched';
+  }
+
+  // GitHub rebased it itself, or this already has.
+  if (!carried.value) {
+    return 'untouched';
+  }
+
+  if (mergeCommit === undefined) {
+    log(
+      `#${pr.number}: still carries #${number}'s commits, but GitHub does not say what #${number} merged as; leaving it.`,
+    );
+
+    return 'untouched';
+  }
+
+  if (plan.dryRun) {
+    log(
+      `Would rebase #${pr.number} off #${number}'s commits, onto the squash commit ${mergeCommit.slice(0, 10)}.`,
+    );
+
+    return 'untouched';
+  }
+
+  // `carries` has just fetched everything the rebase needs.
+  const rebased = await rebaseAndPush(pr, {
+    onto: mergeCommit,
+    fetch: [],
+    upstream: { sha: headSha, required: true },
+  });
+
+  if (Result.isErr(rebased)) {
+    log(
+      `#${pr.number}: still carries #${number}'s commits, and cannot be rebased off them — ${rebased.value.detail}`,
+    );
+
+    return 'untouched';
+  }
+
+  if (rebased.value.kind === 'moved') {
+    log(
+      `#${pr.number}: not rebased off #${number}'s commits — its branch moved since the survey, so someone else is moving it.`,
+    );
+
+    return 'moved';
+  }
+
+  const { head } = rebased.value;
+
+  log(
+    `#${pr.number}: came off #${number} still carrying its commits; rebased its own onto #${number}'s squash commit ${mergeCommit.slice(0, 10)}, at ${head.slice(0, 10)}.`,
+  );
+
+  await restack(pr, head, plan.descendants);
+
+  return 'restacked';
+};
+
+/**
+ * The branch the pull request's timeline says GitHub moved it off, if it
+ * did. A timeline that cannot be read says nothing.
+ */
+const retargetedFromTimeline = async (
+  pr: PullRequest,
+  defaultBranch: string,
+): Promise<string | undefined> => {
+  const events = await readTimeline(pr.number);
+
+  if (Result.isErr(events)) {
+    log(
+      `#${pr.number}: cannot read whether it came off a stack, so not rebasing it off one. (${lastLines(events.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return retargetedFrom(events.value, defaultBranch);
+};
+
+/**
+ * Whether the pull request's head, as the survey saw it, contains `sha`,
+ * having fetched the branch and `refspecs` to find out.
+ */
+const carries = async (
+  pr: PullRequest,
+  sha: string,
+  refspecs: readonly string[],
+): Promise<Result<boolean, string>> => {
+  const fetched = await git(
+    Arr.toUnshifted('git fetch --quiet origin')(
+      Arr.toPushed(refspecs, pr.headRefName).map(sh),
+    ).join(' '),
+  );
+
+  if (Result.isErr(fetched)) {
+    return Result.err(fetched.value);
+  }
+
+  const contained = await git(
+    `git merge-base --is-ancestor ${sh(sha)} ${sh(pr.headRefOid)}`,
+  );
+
+  return Result.ok(Result.isOk(contained));
 };
 
 /**

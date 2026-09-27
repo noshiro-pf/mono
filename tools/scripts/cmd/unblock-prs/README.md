@@ -28,7 +28,8 @@ them.
 ### PR 側で宣言する4つのこと
 
 **`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
-に無視します。付いていて、かつ動かせない PR（draft / base が `main` でも open な
+に無視します（例外は1つだけで、下の層がマージされて `main` に付け替えられた層の
+積み直しです。下の「base」の項を参照）。付いていて、かつ動かせない PR（draft / base が `main` でも open な
 PR のブランチでもない / 手で auto-merge を切られた）は理由をログに出します —
 ラベルは明示的な依頼なので、答えが「できない」なら黙っていてはいけないから
 です。
@@ -70,6 +71,20 @@ Merge-After: #1901, #1903
   `Merge-After:` にも書きますが、base と同じ意味で、二重に数えることはありません。
 - 下の層がマージされると、GitHub がこの PR を `main` に付け替えます。そこから
   先は普通の PR です。
+- **付け替えられた層は、キューに入れなくても積み直します。** 付け替えられた PR
+  はマージされた下の層のコミットをまだ含んでいるので、差分に下の層の変更まで
+  表示されます。次の survey で、下の層がマージされたときの head から、その
+  squash commit の上へ `--onto` で rebase し、上の層も一緒に運びます（「1a」）。
+    - ラベルは問いません。これは GitHub が付け替えたことの後始末で、順番が来た
+      わけではないからです。`main` の新しい変更は持ち込まず、レビューが終わって
+      いる必要もありません。
+    - ruleset は up-to-date のブランチしか、squash でしかマージさせないので、
+      squash commit のツリーはマージされた head のツリーと同じです。したがって
+      積み直した層のツリーも元と同じで、変わるのは履歴（と差分の見え方）だけで
+      す。チェック済みのツリーは再チェックされないので、`skip-ci` が外れていても
+      CI は増えません。
+    - `skip-ci` も auto-merge も触りません。`merge-queued` の付いた層は対象外で
+      す。pick されたときの rebase が同じコミットを同じ方法で落とすからです。
 - **GitHub のネイティブ stack は扱いません。** GitHub はネイティブ stack に
   入った PR に auto-merge を張らせず（ "Auto-merge is not supported for stacked
   pull requests" ）、下の層がマージされて `main` に付け替えられた後も stack
@@ -174,6 +189,26 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 読むのは、必須の status check の一覧と、レビューへの2つの要件（code owner の承
 認、会話の解決）です。宣言ファイルではなく GitHub が実際に適用しているものを読
 みます。
+
+#### 1a. 付け替えられた層の積み直し
+
+前回の survey で stack の層だった PR（下の層がマージされ、まだ付け替えられて
+いないものも含む）のうち、今回 `main` を base にしていて `merge-queued` の無い
+ものについて、次を確かめます。
+
+- 付け替え元のブランチから最後にマージされた PR の head を、まだ含んでいるか。
+- 含んでいれば、その head から squash commit の上へ `--onto` で rebase し、
+  `--force-with-lease`（survey が見た head を明示）で push します。その上の層
+  も「3」の2と同じように積み直します。
+- 何か動いたら、survey をもう一度取ってから triage に進みます。読んだ head が
+  古くなっているからです。
+
+起動直後の1回目には比べる前回がないので、`main` を base にしている PR すべて
+について timeline からどのブランチから付け替えられたかを読みます。含んでいな
+い（GitHub が rebase した、または積み直し済み）PR は黙って通り過ぎます。
+conflict や fork など積み直せない層は理由をログに出して残し、次からは追いませ
+ん（記録は作りません。そのまま置いておけば、GitHub が付け替えたときの状態で
+す）。`--dry-run` では何をするかを出力するだけです。
 
 #### 2. triage
 
@@ -459,29 +494,29 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 
 ### ファイル構成
 
-| ファイル          | 役割                                                      |
-| :---------------- | :-------------------------------------------------------- |
-| `main.mts`        | ループ本体とコマンドライン（入口）                        |
-| `triage.mts`      | 1回の survey が各 PR について何を言うか                   |
-| `merge-after.mts` | 宣言された順序が pick に何を言うか                        |
-| `auto-merge.mts`  | いつ auto-merge を張るか                                  |
-| `stack.mts`       | stacked PR — いつ待たせ、いつ張り、何を運ぶか             |
-| `version-pr.mts`  | version PR と、それを止めているもの                       |
-| `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去 |
-| `release.mts`     | 解放されている PR を1本に保つ                             |
-| `review.mts`      | レビューがマージを止めているか                            |
-| `watch.mts`       | 1本をマージまでポーリング                                 |
-| `auto-fix.mts`    | fixer の差分だけの失敗を直して push                       |
-| `quiet.mts`       | 何もない時にどれだけ待つか                                |
-| `checks.mts`      | マージが何を待っているか                                  |
-| `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                 |
-| `labels.mts`      | 3つのラベルがその PR について何を言うか                   |
-| `skips.mts`       | 諦めた PR を何をもって覚え続けるか                        |
-| `demotions.mts`   | green のまま止まった PR をいつまで最後に回すか            |
-| `options.mts`     | コマンドライン                                            |
-| `types.mts`       | 共有される型とスキーマ                                    |
-| `constants.mts`   | 待ち時間と諦めるまでの回数                                |
-| `util.mts`        | quoting、ログ、停止シグナル                               |
+| ファイル          | 役割                                                          |
+| :---------------- | :------------------------------------------------------------ |
+| `main.mts`        | ループ本体とコマンドライン（入口）                            |
+| `triage.mts`      | 1回の survey が各 PR について何を言うか                       |
+| `merge-after.mts` | 宣言された順序が pick に何を言うか                            |
+| `auto-merge.mts`  | いつ auto-merge を張るか                                      |
+| `stack.mts`       | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
+| `version-pr.mts`  | version PR と、それを止めているもの                           |
+| `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
+| `release.mts`     | 解放されている PR を1本に保つ                                 |
+| `review.mts`      | レビューがマージを止めているか                                |
+| `watch.mts`       | 1本をマージまでポーリング                                     |
+| `auto-fix.mts`    | fixer の差分だけの失敗を直して push                           |
+| `quiet.mts`       | 何もない時にどれだけ待つか                                    |
+| `checks.mts`      | マージが何を待っているか                                      |
+| `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                     |
+| `labels.mts`      | 3つのラベルがその PR について何を言うか                       |
+| `skips.mts`       | 諦めた PR を何をもって覚え続けるか                            |
+| `demotions.mts`   | green のまま止まった PR をいつまで最後に回すか                |
+| `options.mts`     | コマンドライン                                                |
+| `types.mts`       | 共有される型とスキーマ                                        |
+| `constants.mts`   | 待ち時間と諦めるまでの回数                                    |
+| `util.mts`        | quoting、ログ、停止シグナル                                   |
 
 トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
 `CODEOWNERS` の判定は、同じ宣言を読む Pull Requests Manager と共有するため
@@ -507,7 +542,9 @@ the checkout it runs from is never touched.
 ### The four things a pull request declares
 
 **The `merge-queued` label is the scope rule.** A pull request without it is
-passed over in silence. One that has it and cannot be acted on — a draft, a
+passed over in silence — with one exception, a layer GitHub moved onto `main`
+when the layer below it merged, which is rebased off that layer's commits
+whatever its labels (see "the base" below). One that has it and cannot be acted on — a draft, a
 base that is neither `main` nor an open pull request's branch, auto-merge
 switched off by hand — is reported, because the label asked for something and
 the answer is no.
@@ -553,6 +590,22 @@ reviewable.
   is not counted twice.
 - When the layer below merges, GitHub moves this one onto `main`. From then
   on it is an ordinary pull request.
+- **A layer moved onto `main` is restacked without being queued.** It still
+  carries the merged layer's commits, so its diff shows that layer's changes
+  as its own. The next survey rebases it with `--onto` from the head that
+  layer merged at onto its squash commit, carrying the layers above along
+  ("1a").
+    - No label is asked: this undoes GitHub's move, and is not the pull
+      request's turn. It brings in nothing new from `main`, and needs no review
+      to have finished.
+    - The ruleset merges only an up-to-date branch, and only by squash, so the
+      squash commit's tree is the merged head's, and the restacked layer's tree
+      is the one it had. Only its history, and so its diff, changes; a tree
+      already checked is not checked again, so it costs no CI even with
+      `skip-ci` off.
+    - `skip-ci` and auto-merge are left as they are. A layer labelled
+      `merge-queued` is left to its rebase when it is picked, which drops the
+      same commits the same way.
 - **GitHub's native stacks are not landed.** GitHub refuses auto-merge on a
   pull request in one ("Auto-merge is not supported for stacked pull
   requests"), and keeps a layer in its stack after the layer below has merged
@@ -666,6 +719,28 @@ GitHub is still computing is never read as up to date. The tip of
 contexts they require, and whether they require a code owner's approval and
 every conversation resolved. These are the rules GitHub enforces, not the ones
 declared under `repo-settings/`.
+
+#### 1a. Restack the layers GitHub moved
+
+For each pull request the last survey saw as a layer — including one whose
+parent had merged and which GitHub had yet to move — that is now onto `main`
+and not labelled `merge-queued`:
+
+- Does it still contain the head the last pull request merged from the branch
+  it was moved off?
+- If so, rebase it with `--onto` from that head onto the squash commit, push
+  with `--force-with-lease` against the head the survey saw, and restack the
+  layers above it as in step 2 of "3".
+- If anything moved, survey again before triage, since the heads it read are
+  stale.
+
+The first cycle of a run has no previous survey, so it reads the timeline of
+every pull request onto `main` for the branch it was moved off. One that no
+longer contains the merged head — GitHub rebased it, or it was restacked
+already — is passed over in silence. A layer that cannot be restacked — a
+conflict, a fork — is logged with the reason and left, and not followed
+again: no record is kept, and left alone it is where GitHub put it. With
+`--dry-run` it only says what it would do.
 
 #### 2. Triage
 
@@ -972,29 +1047,29 @@ survey.
 
 ### Layout
 
-| File              | Role                                                     |
-| :---------------- | :------------------------------------------------------- |
-| `main.mts`        | the loop and the command line (entry point)              |
-| `triage.mts`      | what one survey says about each pull request, and why    |
-| `merge-after.mts` | what the declared order says about picking               |
-| `auto-merge.mts`  | when this script arms auto-merge                         |
-| `stack.mts`       | stacked pull requests — when they wait, arm and move     |
-| `version-pr.mts`  | the version pull request, and what holds it back         |
-| `rebase.mts`      | moving a branch — the worktree rebase, the label removal |
-| `release.mts`     | holding the queue to one released pull request           |
-| `review.mts`      | whether a pull request's review holds its merge          |
-| `watch.mts`       | polling one pull request until it merges, or will not    |
-| `auto-fix.mts`    | fixing and pushing a failure that is only a fixer's diff |
-| `quiet.mts`       | how long to sleep when there is nothing to do            |
-| `checks.mts`      | what the merge is waiting for                            |
-| `github.mts`      | everything that shells out to `gh` or `git`              |
-| `labels.mts`      | what the three labels say about a pull request           |
-| `skips.mts`       | what the loop remembers, and for how long                |
-| `demotions.mts`   | how long one that sat green without merging goes last    |
-| `options.mts`     | the command line                                         |
-| `types.mts`       | the shapes every module passes around                    |
-| `constants.mts`   | how long it waits, and how long before it gives up       |
-| `util.mts`        | quoting, logging, the stop signal                        |
+| File              | Role                                                          |
+| :---------------- | :------------------------------------------------------------ |
+| `main.mts`        | the loop and the command line (entry point)                   |
+| `triage.mts`      | what one survey says about each pull request, and why         |
+| `merge-after.mts` | what the declared order says about picking                    |
+| `auto-merge.mts`  | when this script arms auto-merge                              |
+| `stack.mts`       | stacked pull requests — when they wait, arm, move and restack |
+| `version-pr.mts`  | the version pull request, and what holds it back              |
+| `rebase.mts`      | moving a branch — the worktree rebase, the label removal      |
+| `release.mts`     | holding the queue to one released pull request                |
+| `review.mts`      | whether a pull request's review holds its merge               |
+| `watch.mts`       | polling one pull request until it merges, or will not         |
+| `auto-fix.mts`    | fixing and pushing a failure that is only a fixer's diff      |
+| `quiet.mts`       | how long to sleep when there is nothing to do                 |
+| `checks.mts`      | what the merge is waiting for                                 |
+| `github.mts`      | everything that shells out to `gh` or `git`                   |
+| `labels.mts`      | what the three labels say about a pull request                |
+| `skips.mts`       | what the loop remembers, and for how long                     |
+| `demotions.mts`   | how long one that sat green without merging goes last         |
+| `options.mts`     | the command line                                              |
+| `types.mts`       | the shapes every module passes around                         |
+| `constants.mts`   | how long it waits, and how long before it gives up            |
+| `util.mts`        | quoting, logging, the stop signal                             |
 
 The trailer parser, the cycle detection, which pull request is stacked on
 which, the label strings and the `CODEOWNERS` rules are in

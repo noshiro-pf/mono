@@ -523,15 +523,15 @@ const NativeStackSchema = t.record({
 });
 
 /**
- * The head the last merged pull request from `branch` was merged at, or
- * `undefined` when none was — the layer a retargeted pull request was
- * stacked on, whose commits it may still carry.
+ * The head the last merged pull request from `branch` was merged at, and the
+ * commit its merge made, or `undefined` when none was — the layer a
+ * retargeted pull request was stacked on, whose commits it may still carry.
  */
 export const mergedHeadOf = async (
   branch: string,
 ): Promise<Result<MergedHead | undefined, string>> => {
   const listed = await git(
-    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json number,headRefOid,mergedAt`,
+    `gh pr list --state merged --head ${sh(branch)} --limit 5 --json number,headRefOid,mergeCommit,mergedAt`,
   );
 
   if (Result.isErr(listed)) {
@@ -551,16 +551,26 @@ export const mergedHeadOf = async (
   return Result.ok(
     latest === undefined
       ? undefined
-      : { number: latest.number, headSha: latest.headRefOid },
+      : {
+          number: latest.number,
+          headSha: latest.headRefOid,
+          mergeCommit: latest.mergeCommit?.oid,
+        },
   );
 };
 
-export type MergedHead = Readonly<{ number: number; headSha: string }>;
+export type MergedHead = Readonly<{
+  number: number;
+  headSha: string;
+  /** The squash commit on the base; GitHub may not have it for a moment. */
+  mergeCommit: string | undefined;
+}>;
 
 const MergedHeadListSchema = t.array(
   t.record({
     number: t.number(),
     headRefOid: t.string(),
+    mergeCommit: t.union([t.record({ oid: t.string() }), t.nullType]),
     mergedAt: t.string(),
   }),
 );

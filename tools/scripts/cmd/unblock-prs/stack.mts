@@ -23,9 +23,18 @@
  *    merges, would start from a head the layer does not contain.
  * 3. **The layer below merges.** GitHub moves this one onto the default
  *    branch. From then on it is an ordinary pull request, picked and armed
- *    in its turn like any other, save one thing only its timeline remembers:
- *    it still carries the merged layer's commits, which the rebase drops with
- *    `--onto` rather than trusting the patches to match.
+ *    in its turn like any other, save one thing: it still carries the merged
+ *    layer's commits, so its diff shows that layer's changes as its own. The
+ *    next survey rebases them off with `--onto`, from the head that layer
+ *    merged at to its squash commit, and carries the layers above along —
+ *    without waiting for it to be queued, because that is an undoing of
+ *    GitHub's move, not a turn: it adds nothing from the base, and needs no
+ *    review to have finished. The ruleset merges a branch only when it is up
+ *    to date and only by squash, so that commit's tree is the merged head's,
+ *    and the rebased layer's tree is the one it had: only its history, and
+ *    so its diff, changes. A queued layer is left to its own rebase when it
+ *    is picked, which drops the same commits the same way on its way onto
+ *    the tip.
  *
  * A stack here is made by the base alone. GitHub's native stacks are not
  * landed: GitHub refuses auto-merge on a pull request in one ("Auto-merge is
@@ -34,14 +43,19 @@
  * branch — so one is reported rather than picked, and merged by hand.
  */
 
+import { findStackParents } from 'pr-report-core';
+import { isMergeQueued } from './labels.mjs';
 import {
   type Classification,
   type NativeStackEntry,
   type PullRequest,
+  type RetargetedLayer,
+  type StackedOn,
   type TimelineEvent,
   type TriageContext,
 } from './types.mjs';
 import { isSafeRefName } from './util.mjs';
+import { isVersionPullRequest } from './version-pr.mjs';
 
 /**
  * The branch the pull request was stacked on, if the last change of its base
@@ -104,3 +118,73 @@ export const restackable = (pr: PullRequest): string | undefined =>
       : !isSafeRefName(pr.headRefName)
         ? (`branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell` as const)
         : undefined;
+
+/** Which open pull request each stacked one is on: child → parent. */
+export const stackParentsOf = (
+  pullRequests: readonly PullRequest[],
+  defaultBranch: string,
+): ReadonlyMap<number, number> =>
+  findStackParents(
+    pullRequests.map((pr) => ({
+      number: pr.number,
+      headRef: pr.headRefName,
+      baseRef: pr.baseRefName,
+      fromFork: pr.isCrossRepository,
+    })),
+    defaultBranch,
+  );
+
+/**
+ * What to remember of this survey's stacks for the next one: every layer, by
+ * the branch it is on, and every layer remembered before that is still on
+ * that branch. The second is a layer whose parent has merged while GitHub
+ * has yet to move it — no open pull request heads its base any longer, so
+ * the bases alone no longer say it is a layer, but it has still to come off
+ * one.
+ */
+export const stackedOnAfter = (
+  before: StackedOn | undefined,
+  pullRequests: readonly PullRequest[],
+  stackParents: ReadonlyMap<number, number>,
+): StackedOn =>
+  new Map(
+    pullRequests
+      .filter(
+        (pr) =>
+          stackParents.has(pr.number) ||
+          before?.get(pr.number) === pr.baseRefName,
+      )
+      .map((pr) => [pr.number, pr.baseRefName] as const),
+  );
+
+/**
+ * The pull requests the last survey saw stacked and this one sees on the
+ * default branch — before the first survey, every pull request on the
+ * default branch, whose timeline then says whether it came off a stack.
+ *
+ * A queued one is not among them: its own rebase, when it is picked, drops
+ * the merged layer's commits on its way onto the tip. Nor is anything that
+ * cannot be pushed to, or the version pull request, which was never a layer.
+ */
+export const retargetedLayers = (
+  before: StackedOn | undefined,
+  pullRequests: readonly PullRequest[],
+  defaultBranch: string,
+): readonly RetargetedLayer[] =>
+  pullRequests
+    .filter(
+      (pr) =>
+        pr.baseRefName === defaultBranch &&
+        !isMergeQueued(pr) &&
+        !isVersionPullRequest(pr, defaultBranch) &&
+        restackable(pr) === undefined,
+    )
+    .flatMap((pr): readonly RetargetedLayer[] => {
+      if (before === undefined) {
+        return [{ pr, from: undefined }];
+      }
+
+      const from = before.get(pr.number);
+
+      return from === undefined ? [] : [{ pr, from }];
+    });

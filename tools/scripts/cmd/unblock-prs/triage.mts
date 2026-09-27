@@ -2,7 +2,6 @@
 
 import {
   findMergeAfterCycles,
-  findStackParents,
   MERGE_QUEUED_LABEL,
   parseCodeOwners,
   parseMergeAfter,
@@ -32,7 +31,7 @@ import { blocksRelease, isMergeQueued, isSkipCiLabelled } from './labels.mjs';
 import { waitingOnNote } from './merge-after.mjs';
 import { reviewHold } from './review.mjs';
 import { skipStillApplies } from './skips.mjs';
-import { nativeStackNote, stackedNote } from './stack.mjs';
+import { nativeStackNote, stackedNote, stackParentsOf } from './stack.mjs';
 import {
   type Classification,
   type Demotions,
@@ -141,15 +140,7 @@ export const triage = async (
 ): Promise<Triage> => {
   const sorted = pullRequests.toSorted((a, b) => a.number - b.number);
 
-  const stackParents = findStackParents(
-    sorted.map((pr) => ({
-      number: pr.number,
-      headRef: pr.headRefName,
-      baseRef: pr.baseRefName,
-      fromFork: pr.isCrossRepository,
-    })),
-    base.defaultBranch,
-  );
+  const stackParents = stackParentsOf(sorted, base.defaultBranch);
 
   const dependencies: ReadonlyMap<number, readonly number[]> = new Map(
     sorted.map((pr) => {

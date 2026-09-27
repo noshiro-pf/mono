@@ -1,4 +1,4 @@
-// cspell:ignore unlabel
+// cspell:ignore unlabel retargeted
 
 /** The shapes every module here passes around. */
 
@@ -226,6 +226,25 @@ export type Watched = Readonly<{
   link?: string;
 }>;
 
+/**
+ * Pull request number → the branch it was last seen stacked on: every layer
+ * of a stack, and one whose parent has left the open list while GitHub has
+ * yet to move it off that parent's branch. A layer that leaves this map by
+ * landing on the default branch is one `stack.mts` may have to rebase off
+ * the layer that merged below it.
+ */
+export type StackedOn = ReadonlyMap<number, string>;
+
+/**
+ * A pull request on the default branch that may have been moved there when
+ * the layer below it merged: `from` is that layer's branch, or `undefined`
+ * when it has to be read from the pull request's timeline.
+ */
+export type RetargetedLayer = Readonly<{
+  pr: PullRequest;
+  from: string | undefined;
+}>;
+
 /** What the loop remembers about how long the list has sat still. */
 export type Quiet = Readonly<{
   /** The last survey's fingerprint; none before any survey has succeeded. */
@@ -237,8 +256,8 @@ export type Quiet = Readonly<{
 /**
  * What one run carries from cycle to cycle: the pull requests it has given up
  * on, the ones it picks last, the ones it has acted on and last saw open,
- * where the base was when it last looked, and how long the list has sat
- * still.
+ * where the base was when it last looked, how long the list has sat still,
+ * and which pull requests were stacked on what.
  */
 export type LoopState = Readonly<{
   skipped: SkipRecords;
@@ -246,6 +265,8 @@ export type LoopState = Readonly<{
   tracked: ReadonlySet<number>;
   baseSha: string | undefined;
   quiet: Quiet;
+  /** `undefined` until the first survey, which has nothing to compare with. */
+  stackedOn: StackedOn | undefined;
 }>;
 
 export type CycleResult = Readonly<{

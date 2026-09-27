@@ -439,6 +439,13 @@ has the whole life of a layer; the two things a session has to do by hand:
   it, like any queued PR; nothing arms a layer while it is stacked, because
   armed onto a branch no ruleset covers it would merge into the layer below.
 
+A layer GitHub moved onto `main` when the one below merged still carries that
+layer's commits. The worker rebases it off them at its next survey, queued or
+not — `git rebase --onto <squash commit> <merged head>`, which leaves the tree
+as it was — and carries the layers above along. Do the same if you get there
+first, not a rebase onto `main`: that is the PR's turn, and it is not yours to
+give an unqueued one.
+
 ## The release goes last
 
 **`changeset-release/main`** is the PR `changesets/action` opens to version the
