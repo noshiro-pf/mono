@@ -3,7 +3,15 @@
  * The tokens are the validated default palette of the data-visualization
  * guidance: chart surface, page plane, the three inks, the hairlines, and the
  * four reserved status steps. Dark mode is a selected set of steps rather than
- * an automatic flip, which is why every value is written twice.
+ * an automatic flip, which is why every value is written twice — once for
+ * each side of `light-dark()`.
+ *
+ * `color-scheme` is what picks the side. It is `light dark` until the reader
+ * presses the theme button, which is the system's preference; the button
+ * sets `data-theme` on `<html>` (`src/theme.mts`), and that pins it. One set
+ * of tokens rather than a copy under `prefers-color-scheme` and another under
+ * `[data-theme]`, which is what the media query alone could not do: it
+ * cannot be overridden from the page.
  *
  * A status colour never carries meaning on its own here — every badge that
  * uses one also carries a glyph and a word, which is the mitigation the
@@ -12,23 +20,23 @@
  */
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 
-  --surface: #fcfcfb;
-  --plane: #f9f9f7;
-  --ink-primary: #0b0b0b;
-  --ink-secondary: #52514e;
+  --surface: light-dark(#fcfcfb, #1a1a19);
+  --plane: light-dark(#f9f9f7, #0d0d0d);
+  --ink-primary: light-dark(#0b0b0b, #fff);
+  --ink-secondary: light-dark(#52514e, #c3c2b7);
   --ink-muted: #898781;
-  --hairline: #e1e0d9;
-  --baseline: #c3c2b7;
-  --border-ring: rgb(11 11 11 / 10%);
+  --hairline: light-dark(#e1e0d9, #2c2c2a);
+  --baseline: light-dark(#c3c2b7, #383835);
+  --border-ring: light-dark(rgb(11 11 11 / 10%), rgb(255 255 255 / 10%));
 
   --status-good: #0ca30c;
   --status-warning: #fab219;
   --status-serious: #ec835a;
   --status-critical: #d03b3b;
 
-  --accent: #2a78d6;
+  --accent: light-dark(#2a78d6, #3987e5);
 
   /*
    * The diverging pair for the ahead / behind bars. Blue and red, with the
@@ -38,31 +46,20 @@
    * than its status steps, because "39 behind" is a measurement and not a
    * failure.
    */
-  --diverge-ahead: #2a78d6;
-  --diverge-behind: #e34948;
+  --diverge-ahead: light-dark(#2a78d6, #3987e5);
+  --diverge-behind: light-dark(#e34948, #e66767);
 
   --radius: 8px;
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-    --surface: #1a1a19;
-    --plane: #0d0d0d;
-    --ink-primary: #fff;
-    --ink-secondary: #c3c2b7;
-    --ink-muted: #898781;
-    --hairline: #2c2c2a;
-    --baseline: #383835;
-    --border-ring: rgb(255 255 255 / 10%);
-
-    --accent: #3987e5;
-    --diverge-ahead: #3987e5;
-    --diverge-behind: #e66767;
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 * {
@@ -123,7 +120,8 @@ a:focus-visible {
   gap: 0.75rem;
 }
 
-.refresh-button {
+.refresh-button,
+.theme-button {
   background: var(--surface);
   border: 1px solid var(--baseline);
   border-radius: var(--radius);
@@ -134,9 +132,21 @@ a:focus-visible {
   padding: 0.35rem 0.85rem;
 }
 
-.refresh-button:hover:not(:disabled) {
+.refresh-button:hover:not(:disabled),
+.theme-button:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Laid out like a badge: the glyph and the word beside it. */
+.theme-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.theme-button[aria-pressed='true'] {
+  border-color: var(--accent);
 }
 
 .refresh-button:disabled {
