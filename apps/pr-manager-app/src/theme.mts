@@ -16,6 +16,8 @@
  * lets a page that was switched to dark and back follow the system again.
  */
 
+import { currentSearch, rewriteSearch } from './url.mjs';
+
 /**
  * What the page is told to be. `auto` is no choice, and follows the system.
  *
@@ -72,14 +74,8 @@ export const toggledTheme = (theme: Theme, system: ColorScheme): Theme => {
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-// Neither `window.location`, `globalThis.location` nor a bare `location`
-// satisfies the lint rules together; destructuring once names each something
-// that is none of the three — the same as in `github-view-defaults-extension`.
-const { location: browserLocation, history: browserHistory } = globalThis;
-
 /** What the query string asks for, now. */
-export const themeFromLocation = (): Theme =>
-  themeFromSearch(browserLocation.search);
+export const themeFromLocation = (): Theme => themeFromSearch(currentSearch());
 
 /** What the system prefers now. */
 export const systemColorScheme = (): ColorScheme =>
@@ -107,26 +103,7 @@ export const applyTheme = (theme: Theme): void => {
   mut_dataset[THEME_PARAM] = theme;
 };
 
-/**
- * Writes the choice into the address bar without a navigation or a history
- * entry: a theme is not somewhere the back button should go.
- *
- * The whole path is written, not just the query — `replaceState` with an
- * empty URL resolves to the current one, old query included, so going back
- * to `auto` would otherwise change nothing.
- */
+/** Writes the choice into the address bar; see `rewriteSearch`. */
 export const saveTheme = (theme: Theme): void => {
-  const { pathname, search, hash } = browserLocation;
-
-  const nextSearch = searchWithTheme(search, theme);
-
-  if (nextSearch === search) {
-    return;
-  }
-
-  browserHistory.replaceState(
-    browserHistory.state,
-    '',
-    `${pathname}${nextSearch}${hash}`,
-  );
+  rewriteSearch((search) => searchWithTheme(search, theme));
 };

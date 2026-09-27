@@ -121,7 +121,8 @@ a:focus-visible {
 }
 
 .refresh-button,
-.theme-button {
+.theme-button,
+.header-button {
   background: var(--surface);
   border: 1px solid var(--baseline);
   border-radius: var(--radius);
@@ -133,7 +134,8 @@ a:focus-visible {
 }
 
 .refresh-button:hover:not(:disabled),
-.theme-button:hover {
+.theme-button:hover,
+.header-button:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -209,6 +211,210 @@ a:focus-visible {
   color: var(--ink-secondary);
   font-size: 0.875rem;
   margin: 0 0 0.75rem;
+}
+
+/* --- the blocks and their layout --------------------------------------- */
+
+/*
+ * Two columns take a wider page, since the point of them is a screen that has
+ * room; below 60rem they stack into one whatever the layout says, which is why
+ * the grid template the component writes inline is harmless there.
+ */
+.page:has(.block-layout[data-columns='2']) {
+  max-width: 120rem;
+}
+
+@media (width >= 60rem) {
+  .block-layout[data-columns='2'] {
+    align-items: start;
+    display: grid;
+  }
+}
+
+@media (width < 60rem) {
+  .column-divider {
+    display: none;
+  }
+}
+
+.block-column {
+  min-width: 0;
+}
+
+.block-layout[data-moving='true'] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.layout-block {
+  position: relative;
+}
+
+.layout-block[data-dragging='true'] {
+  opacity: 0.45;
+}
+
+.block-handle {
+  color: var(--ink-muted);
+  cursor: grab;
+  line-height: 1.6;
+  padding: 0 0.3rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.block-handle:hover {
+  color: var(--accent);
+}
+
+/* A block given a height scrolls on its own; without one it is as tall as what it holds. */
+.block-body[data-sized='true'] {
+  overflow: auto;
+}
+
+.block-body > .section:last-child {
+  margin-bottom: 0.5rem;
+}
+
+.block-edge {
+  border-top: 2px solid transparent;
+  cursor: ns-resize;
+  height: 0.6rem;
+  margin-bottom: 1.25rem;
+  touch-action: none;
+}
+
+.block-edge:hover {
+  border-top-color: var(--accent);
+}
+
+.drop-marker {
+  background: var(--accent);
+  border-radius: 2px;
+  height: 3px;
+  margin: 0 0 0.75rem;
+}
+
+.column-divider {
+  align-self: stretch;
+  cursor: col-resize;
+  position: relative;
+  touch-action: none;
+  width: 1.25rem;
+}
+
+.column-divider::before {
+  background: var(--hairline);
+  bottom: 0;
+  content: '';
+  left: calc(50% - 0.5px);
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+
+.column-divider:hover::before {
+  background: var(--accent);
+  left: calc(50% - 1px);
+  width: 2px;
+}
+
+/* --- the layout settings ------------------------------------------------ */
+
+.view-settings {
+  background: var(--surface);
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
+  color: var(--ink-primary);
+  max-width: min(34rem, 92vw);
+  padding: 1.25rem 1.5rem;
+}
+
+.view-settings::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.view-settings-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.view-settings-group {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.85rem 0.75rem;
+}
+
+.view-settings-group legend {
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  padding: 0 0.25rem;
+}
+
+.view-settings-choice {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.view-settings-blocks {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.view-settings-block {
+  margin: 0.35rem 0;
+}
+
+.view-settings-block > * {
+  vertical-align: middle;
+}
+
+.view-settings-name {
+  display: inline-block;
+  min-width: 7.5rem;
+}
+
+.view-settings-height {
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  margin: 0 0.35rem 0 0.75rem;
+}
+
+.view-settings-move,
+.view-settings-small {
+  background: var(--plane);
+  border: 1px solid var(--baseline);
+  border-radius: 6px;
+  color: var(--ink-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  margin-right: 0.25rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.view-settings-move {
+  min-width: 1.9rem;
+}
+
+.view-settings-move:hover,
+.view-settings-small:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.view-settings-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
 }
 
 /* --- the merge order ---------------------------------------------------- */

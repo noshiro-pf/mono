@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { Arr } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
+import { type BlockId } from '../layout.mjs';
 import { MERGED_WITHIN_DAYS, type LoadedReport } from '../load-report.mjs';
+import { BlockLayout } from './block-layout.js';
 import { CyclesSection } from './cycles-section.js';
 import { IssuesSection } from './issues-section.js';
 import { MergeOrder } from './merge-order.js';
@@ -15,18 +18,61 @@ type Props = Readonly<{
 }>;
 
 /**
- * A report that loaded: the counts, the queue, what landed, and what is
- * open that is not a pull request.
+ * A report that loaded: the counts, then the three blocks — the queue, what
+ * landed, and what is open that is not a pull request — laid out as the
+ * reader arranged them (`layout.mts`).
  */
 export const ReportView = React.memo<Props>((props) => {
   const { report, nowMs } = props;
 
-  const repoUrl =
-    `https://github.com/${report.repo.owner}/${report.repo.name}` as const;
+  // One object per report and clock tick, so that `BlockLayout` is not
+  // handed a new one on every render.
+  const blocks = React.useMemo<ReadonlyRecord<BlockId, React.ReactNode>>(() => {
+    const repoUrl =
+      `https://github.com/${report.repo.owner}/${report.repo.name}` as const;
 
-  const byNumber = new Map(
-    report.entries.map((entry) => [entry.number, entry]),
-  );
+    const byNumber = new Map(
+      report.entries.map((entry) => [entry.number, entry]),
+    );
+
+    return {
+      open: (
+        <>
+          <section className={'section'}>
+            <h2 className={'section-title'}>{'Merge order'}</h2>
+            {Arr.isNonEmpty(report.entries) ? (
+              <MergeOrder
+                byNumber={byNumber}
+                nodes={report.roots}
+                nowMs={nowMs}
+                scaleMax={divergenceScale(report.entries)}
+              />
+            ) : (
+              <p className={'section-note'}>{'No open pull requests.'}</p>
+            )}
+          </section>
+
+          {Arr.isNonEmpty(report.cycles) ? (
+            <CyclesSection cycles={report.cycles} repoUrl={repoUrl} />
+          ) : undefined}
+        </>
+      ),
+      merged: (
+        <MergedSection
+          merged={report.merged}
+          nowMs={nowMs}
+          withinDays={MERGED_WITHIN_DAYS}
+        />
+      ),
+      issues: (
+        <IssuesSection
+          issues={report.issues.items}
+          nowMs={nowMs}
+          totalCount={report.issues.totalCount}
+        />
+      ),
+    };
+  }, [report, nowMs]);
 
   return (
     <>
@@ -37,35 +83,7 @@ export const ReportView = React.memo<Props>((props) => {
 
       <SummaryRow summary={report.summary} />
 
-      <section className={'section'}>
-        <h2 className={'section-title'}>{'Merge order'}</h2>
-        {Arr.isNonEmpty(report.entries) ? (
-          <MergeOrder
-            byNumber={byNumber}
-            nodes={report.roots}
-            nowMs={nowMs}
-            scaleMax={divergenceScale(report.entries)}
-          />
-        ) : (
-          <p className={'section-note'}>{'No open pull requests.'}</p>
-        )}
-      </section>
-
-      {Arr.isNonEmpty(report.cycles) ? (
-        <CyclesSection cycles={report.cycles} repoUrl={repoUrl} />
-      ) : undefined}
-
-      <MergedSection
-        merged={report.merged}
-        nowMs={nowMs}
-        withinDays={MERGED_WITHIN_DAYS}
-      />
-
-      <IssuesSection
-        issues={report.issues.items}
-        nowMs={nowMs}
-        totalCount={report.issues.totalCount}
-      />
+      <BlockLayout blocks={blocks} />
     </>
   );
 });

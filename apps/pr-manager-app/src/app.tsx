@@ -6,6 +6,7 @@ import {
   Notice,
   ThemeButton,
   TokenPanel,
+  ViewSettings,
 } from './components/index.mjs';
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
 import { reader, tokenStore } from './store/index.mjs';
@@ -57,6 +58,8 @@ export const App = React.memo(() => {
               {'last refresh failed'}
             </span>
           ) : undefined}
+
+          <ViewSettings />
 
           <ThemeButton />
 

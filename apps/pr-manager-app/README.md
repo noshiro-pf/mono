@@ -66,6 +66,34 @@ cycle waits, in the end, for itself, so there is no place in an order to draw
 it. The cycles are named in their own section below the tree instead, and a
 pull request waiting on nothing but a cycle member is drawn as a root.
 
+## Layout
+
+The page is three blocks under the counts: the merge order (with any cycles
+under it), what merged, and the open issues. **Layout**, beside the theme
+button, arranges them:
+
+- **One column or two.** Two need a screen at least 60rem wide; on a narrower
+  one they stack whatever the layout says. The line between them is dragged to
+  share the width, and double-clicked to even it.
+- **The order**, and which column each block is in. A block is dragged by the
+  ⠿ at its top right; a line shows where it will land.
+- **A height of its own.** A block's bottom edge is dragged to give it one,
+  and it then scrolls by itself; a double click there gives the natural
+  height back.
+
+Everything the pointer does on the page can be done in the Layout dialog with
+a keyboard, which is why the drag surfaces themselves are pointer-only. The
+drags are pointer events rather than the HTML drag and drop API, which draws
+its own ghost image and does not work with touch.
+
+**The layout is kept in the URL**, as the theme is, so a bookmark opens the
+same way: `cols=2`, `left=open.merged`, `right=issues`, `split=40` (the left
+column's share, in percent) and `h.open=480` (a height, in pixels). Only what
+differs from one column in the usual order is written, a moment after the last
+change so that a drag does not rewrite the address bar on every pointer move.
+A URL edited by hand still opens: unknown blocks are dropped, missing ones put
+back, and numbers clamped.
+
 ## Opening a pull request in a split view
 
 Each card has a **⧉ split view** link beside the title, which opens the pull
@@ -159,12 +187,14 @@ An answer for a token that has since been cleared or replaced is dropped, so
 
 **The state is in synstate stores** under `src/store/`, not in the components:
 `reader.mts` holds what was read and decides when to read, `token-store.mts`
-the token and its form, `theme-store.mts` light or dark. Each takes what it
+the token and its form, `theme-store.mts` light or dark, `layout-store.mts`
+the layout and the drags and dialog that change it. Each takes what it
 touches in the browser as an argument — the timers as synstate `counter`s and
 the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
-page follows a store by subscription: storage follows the token, and the URL
-and `<html>` follow the theme. The components only read the stores and call
+page follows a store by subscription: storage follows the token, the URL
+and `<html>` follow the theme, the URL follows the layout (through
+`debounce`), and the Layout dialog opens and closes as the store says. The components only read the stores and call
 their actions.
 
 ## The token
