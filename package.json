@@ -140,7 +140,7 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "jiti": "catalog:",
-    "knip": "6.36.0",
+    "knip": "6.37.0",
     "markdownlint": "catalog:",
     "markdownlint-cli2": "catalog:",
     "npm-run-all2": "catalog:",
@@ -163,7 +163,7 @@
     "vitest": "catalog:",
     "zenn-cli": "^0.5.4"
   },
-  "packageManager": "pnpm@12.4.2",
+  "packageManager": "pnpm@12.5.1",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"

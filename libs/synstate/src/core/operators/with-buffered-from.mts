@@ -1,3 +1,8 @@
+// The operator's one cast (`KeepInitialValueOperator`) is the downcast the
+// `eslint-disable-next-line` beside it already accepts; a line marker cannot
+// share that line with it, so it is accepted for the file.
+// @sumi-expect-error-file banned-syntax/no-unsafe-type-assertion
+
 import { Arr, Optional, pipe } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import {

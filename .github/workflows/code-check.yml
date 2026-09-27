@@ -190,7 +190,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         if: matrix.command == 'ws:check:test:cov'
-        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
   # What a push to main runs when the matrix above reused a verdict: its
   # `ws:check:test:cov` entry and nothing else, so that Codecov has a report
@@ -238,7 +238,7 @@ jobs:
         run: pnpm run ws:check:test:cov
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
   # The one required status check for this workflow, reported as
   # `code-check-result / result` — see "The aggregate job" in README.md.
