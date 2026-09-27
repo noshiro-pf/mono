@@ -1,5 +1,6 @@
 import { type Comparison } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
 import { Num } from 'ts-data-forge';
 
 type Props = Readonly<{
@@ -28,49 +29,52 @@ type Props = Readonly<{
  * Both numbers are written out beside the bars. A reader should never have to
  * measure a bar to learn a count that is three characters long.
  */
-export const CommitDivergence = React.memo<Props>((props) => {
-  const { comparison, scaleMax, baseRef } = props;
+export const CommitDivergence = memoNamed<Props>(
+  'CommitDivergence',
+  (props) => {
+    const { comparison, scaleMax, baseRef } = props;
 
-  const behind = React.useMemo(
-    () => ({ inlineSize: share(comparison?.behindBy ?? 0, scaleMax) }),
-    [comparison?.behindBy, scaleMax],
-  );
+    const behind = useMemo(
+      () => ({ inlineSize: share(comparison?.behindBy ?? 0, scaleMax) }),
+      [comparison?.behindBy, scaleMax],
+    );
 
-  const ahead = React.useMemo(
-    () => ({ inlineSize: share(comparison?.aheadBy ?? 0, scaleMax) }),
-    [comparison?.aheadBy, scaleMax],
-  );
+    const ahead = useMemo(
+      () => ({ inlineSize: share(comparison?.aheadBy ?? 0, scaleMax) }),
+      [comparison?.aheadBy, scaleMax],
+    );
 
-  if (comparison === undefined) {
-    return <span className={'divergence-unread'}>{'ahead/behind unread'}</span>;
-  }
+    if (comparison === undefined) {
+      return (
+        <span className={'divergence-unread'}>{'ahead/behind unread'}</span>
+      );
+    }
 
-  return (
-    <span
-      className={'divergence'}
-      title={`${comparison.aheadBy} commit(s) ${baseRef} does not have, ${comparison.behindBy} of ${baseRef} this branch does not`}
-    >
+    return (
       <span
-        className={'divergence-count'}
-      >{`${comparison.behindBy} behind`}</span>
+        className={'divergence'}
+        title={`${comparison.aheadBy} commit(s) ${baseRef} does not have, ${comparison.behindBy} of ${baseRef} this branch does not`}
+      >
+        <span
+          className={'divergence-count'}
+        >{`${comparison.behindBy} behind`}</span>
 
-      <span aria-hidden={'true'} className={'divergence-track'}>
-        <span className={'divergence-half divergence-behind'}>
-          <span className={'divergence-bar'} style={behind} />
+        <span aria-hidden={'true'} className={'divergence-track'}>
+          <span className={'divergence-half divergence-behind'}>
+            <span className={'divergence-bar'} style={behind} />
+          </span>
+          <span className={'divergence-half divergence-ahead'}>
+            <span className={'divergence-bar'} style={ahead} />
+          </span>
         </span>
-        <span className={'divergence-half divergence-ahead'}>
-          <span className={'divergence-bar'} style={ahead} />
-        </span>
+
+        <span
+          className={'divergence-count'}
+        >{`${comparison.aheadBy} ahead`}</span>
       </span>
-
-      <span
-        className={'divergence-count'}
-      >{`${comparison.aheadBy} ahead`}</span>
-    </span>
-  );
-});
-
-CommitDivergence.displayName = 'CommitDivergence';
+    );
+  },
+);
 
 /**
  * A zero draws nothing at all rather than a sliver: "nothing on this side" is

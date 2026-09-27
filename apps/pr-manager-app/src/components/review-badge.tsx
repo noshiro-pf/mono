@@ -1,5 +1,5 @@
 import { type CodeOwnerReview } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { BadgeIcon } from './badge-icon.js';
 
 type Props = Readonly<{ review: CodeOwnerReview }>;
@@ -12,7 +12,7 @@ type Props = Readonly<{ review: CodeOwnerReview }>;
  * stays green and never merges, and nothing on it says why. Shown only when
  * that is the case, or when it cannot be told.
  */
-export const ReviewBadge = React.memo<Props>((props) => {
+export const ReviewBadge = memoNamed<Props>('ReviewBadge', (props) => {
   const { review } = props;
 
   switch (review.state) {
@@ -60,8 +60,6 @@ export const ReviewBadge = React.memo<Props>((props) => {
       );
   }
 });
-
-ReviewBadge.displayName = 'ReviewBadge';
 
 /** An eye. */
 const REVIEW_ICON =

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useObservableValue } from 'synstate-react-hooks';
+import { memoNamed } from 'preact-utils';
+import { useObservableValue } from 'synstate-preact-hooks';
 import {
   ExternalLink,
   LoadStateView,
@@ -26,7 +26,7 @@ import { reader, tokenStore } from './store/index.mjs';
  * itself current rather than going stale behind a tab. When it reads is
  * `store/reader.mts`; this only draws what the store holds.
  */
-export const App = React.memo(() => {
+export const App = memoNamed('App', () => {
   const state = useObservableValue(reader.loadState);
 
   const nowMs = useObservableValue(reader.nowMs);
@@ -88,5 +88,3 @@ export const App = React.memo(() => {
     </main>
   );
 });
-
-App.displayName = 'App';

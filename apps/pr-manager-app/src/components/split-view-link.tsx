@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { splitViewUrl, type SplitViewSource } from '../split-view.mjs';
 import { ExternalLink } from './external-link.js';
@@ -15,7 +15,7 @@ type Props = Readonly<{ entry: SplitViewSource }>;
  * cannot ask. Without the extension the new tab is Chrome's "blocked" page,
  * which the title says in advance.
  */
-export const SplitViewLink = React.memo<Props>(({ entry }) => (
+export const SplitViewLink = memoNamed<Props>('SplitViewLink', ({ entry }) => (
   <ExternalLink
     href={splitViewUrl(entry)}
     title={
@@ -29,5 +29,3 @@ export const SplitViewLink = React.memo<Props>(({ entry }) => (
     {'split view'}
   </ExternalLink>
 ));
-
-SplitViewLink.displayName = 'SplitViewLink';

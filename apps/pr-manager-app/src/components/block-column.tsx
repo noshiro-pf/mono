@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { Fragment, type ComponentChildren } from 'preact';
+import { memoNamed } from 'preact-utils';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type BlockId, type ColumnIndex, type Layout } from '../layout.mjs';
 import { type Moving } from '../store/index.mjs';
@@ -7,7 +8,7 @@ import { LayoutBlock } from './layout-block.js';
 type Props = Readonly<{
   column: ColumnIndex;
   ids: readonly BlockId[];
-  blocks: ReadonlyRecord<BlockId, React.ReactNode>;
+  blocks: ReadonlyRecord<BlockId, ComponentChildren>;
   heights: Layout['heights'];
   moving: Moving | undefined;
 }>;
@@ -20,7 +21,7 @@ type Props = Readonly<{
  * page does not reflow under the pointer. The line is placed by counting the
  * other blocks only, which is how `DropTarget.index` counts them.
  */
-export const BlockColumn = React.memo<Props>((props) => {
+export const BlockColumn = memoNamed<Props>('BlockColumn', (props) => {
   const { column, ids, blocks, heights, moving } = props;
 
   const markerAt =
@@ -34,7 +35,7 @@ export const BlockColumn = React.memo<Props>((props) => {
         const position = others.indexOf(id);
 
         return (
-          <React.Fragment key={id}>
+          <Fragment key={id}>
             {markerAt !== undefined && position === markerAt ? (
               <div aria-hidden={'true'} className={'drop-marker'} />
             ) : undefined}
@@ -47,7 +48,7 @@ export const BlockColumn = React.memo<Props>((props) => {
             >
               {blocks[id]}
             </LayoutBlock>
-          </React.Fragment>
+          </Fragment>
         );
       })}
 
@@ -57,5 +58,3 @@ export const BlockColumn = React.memo<Props>((props) => {
     </div>
   );
 });
-
-BlockColumn.displayName = 'BlockColumn';

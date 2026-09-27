@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useObservableValue } from 'synstate-react-hooks';
+import { memoNamed } from 'preact-utils';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { themeStore } from '../store/index.mjs';
 import { effectiveTheme, type ColorScheme } from '../theme.mjs';
 import { BadgeIcon } from './badge-icon.js';
@@ -12,7 +12,7 @@ import { BadgeIcon } from './badge-icon.js';
  * is read; a pair has neither problem. What a pick means is in `theme.mts`:
  * the URL keeps it, unless it is what the system shows anyway.
  */
-export const ThemeSwitch = React.memo(() => {
+export const ThemeSwitch = memoNamed('ThemeSwitch', () => {
   const theme = useObservableValue(themeStore.theme);
 
   const system = useObservableValue(themeStore.system);
@@ -51,8 +51,6 @@ export const ThemeSwitch = React.memo(() => {
     </fieldset>
   );
 });
-
-ThemeSwitch.displayName = 'ThemeSwitch';
 
 // Outside the component, since neither reads its props.
 

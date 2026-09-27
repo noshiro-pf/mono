@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { type PageSummary } from '../load-report.mjs';
 import { StatTile } from './stat-tile.js';
 
@@ -11,7 +11,7 @@ type Props = Readonly<{ summary: PageSummary }>;
  * leads with; the last two are what stops a pull request that is otherwise
  * ready, and are only this page's.
  */
-export const SummaryRow = React.memo<Props>(({ summary }) => (
+export const SummaryRow = memoNamed<Props>('SummaryRow', ({ summary }) => (
   <div className={'summary-row'}>
     <StatTile label={'open'} value={summary.open} />
     <StatTile label={'queued'} value={summary.queued} />
@@ -34,5 +34,3 @@ export const SummaryRow = React.memo<Props>(({ summary }) => (
     />
   </div>
 ));
-
-SummaryRow.displayName = 'SummaryRow';

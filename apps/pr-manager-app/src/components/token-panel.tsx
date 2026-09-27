@@ -1,5 +1,10 @@
-import * as React from 'react';
-import { useObservableValue } from 'synstate-react-hooks';
+import {
+  type GenericEventHandler,
+  type InputEventHandler,
+  type SubmitEventHandler,
+} from 'preact';
+import { memoNamed } from 'preact-utils';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { POLL_INTERVAL_MS } from '../constants.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
 import { reader, tokenStore } from '../store/index.mjs';
@@ -17,7 +22,7 @@ import { ExternalLink } from './external-link.js';
  * keeps a reader from reaching for `repo` because it sounded like the one
  * that works.
  */
-export const TokenPanel = React.memo(() => {
+export const TokenPanel = memoNamed('TokenPanel', () => {
   const token = useObservableValue(tokenStore.token);
 
   const saveError = useObservableValue(tokenStore.saveError);
@@ -59,10 +64,9 @@ export const TokenPanel = React.memo(() => {
             placeholder={
               token === undefined ? 'ghp_… or github_pat_…' : '••••••••'
             }
-            spellCheck={false}
             type={'password'}
             value={typed}
-            onChange={onTypedChange}
+            onInput={onTypedInput}
           />
 
           <label className={'token-remember'} htmlFor={REMEMBER_ID}>
@@ -101,22 +105,18 @@ export const TokenPanel = React.memo(() => {
   );
 });
 
-TokenPanel.displayName = 'TokenPanel';
-
 // Outside the component, since none of them reads its props: one function
 // each serves every render, with no `useCallback` to keep it stable.
 
-const onTypedChange: React.ChangeEventHandler<HTMLInputElement> = (changed) => {
-  tokenStore.setTyped(changed.target.value);
+const onTypedInput: InputEventHandler<HTMLInputElement> = (changed) => {
+  tokenStore.setTyped(changed.currentTarget.value);
 };
 
-const onRememberChange: React.ChangeEventHandler<HTMLInputElement> = (
-  changed,
-) => {
-  tokenStore.setRemember(changed.target.checked);
+const onRememberChange: GenericEventHandler<HTMLInputElement> = (changed) => {
+  tokenStore.setRemember(changed.currentTarget.checked);
 };
 
-const onSubmit: React.SubmitEventHandler<HTMLFormElement> = (submitted) => {
+const onSubmit: SubmitEventHandler<HTMLFormElement> = (submitted) => {
   // The page has nowhere to submit to — `form-action 'none'` in the policy
   // says as much — and the element is a form so that Enter submits it.
   submitted.preventDefault();
@@ -172,7 +172,7 @@ const seconds = (ms: number): string => {
  * *tick nothing*, in those words, with GitHub's own sentence about what that
  * grants.
  */
-const TokenHelp = React.memo(() => (
+const TokenHelp = memoNamed('TokenHelp', () => (
   <details className={'token-help'}>
     <summary>{'Which token, and with what permissions?'}</summary>
 
@@ -240,5 +240,3 @@ const TokenHelp = React.memo(() => (
     </p>
   </details>
 ));
-
-TokenHelp.displayName = 'TokenHelp';

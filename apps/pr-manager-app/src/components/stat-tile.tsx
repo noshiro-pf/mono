@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { type StatusRole } from '../verdict.mjs';
 
 type Props = Readonly<{
@@ -18,11 +18,12 @@ type Props = Readonly<{
  * chart of five unrelated magnitudes would invite a comparison that means
  * nothing.
  */
-export const StatTile = React.memo<Props>(({ value, label, tone }) => (
-  <div className={'stat-tile'} data-status={tone}>
-    <span className={'stat-value'}>{value}</span>
-    <span className={'stat-label'}>{label}</span>
-  </div>
-));
-
-StatTile.displayName = 'StatTile';
+export const StatTile = memoNamed<Props>(
+  'StatTile',
+  ({ value, label, tone }) => (
+    <div className={'stat-tile'} data-status={tone}>
+      <span className={'stat-value'}>{value}</span>
+      <span className={'stat-label'}>{label}</span>
+    </div>
+  ),
+);

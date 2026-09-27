@@ -1,5 +1,6 @@
 import { type Label } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
 import { chipColors } from '../label-color.mjs';
 
 type Props = Readonly<{ label: Label }>;
@@ -11,10 +12,10 @@ type Props = Readonly<{ label: Label }>;
  * whole point: a reader who knows what `skip-ci` looks like on GitHub should
  * not have to read the word here.
  */
-export const LabelChip = React.memo<Props>((props) => {
+export const LabelChip = memoNamed<Props>('LabelChip', (props) => {
   const { label } = props;
 
-  const style = React.useMemo(() => {
+  const style = useMemo(() => {
     const colors = chipColors(label.color);
 
     return {
@@ -34,5 +35,3 @@ export const LabelChip = React.memo<Props>((props) => {
     </span>
   );
 });
-
-LabelChip.displayName = 'LabelChip';

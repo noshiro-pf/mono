@@ -1,5 +1,5 @@
 import { type TreeNode } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { type Entry } from '../load-report.mjs';
 import { ExternalLink } from './external-link.js';
@@ -22,7 +22,8 @@ type Props = Readonly<{
  * A table would have to spell the tree back out in a column and leave the
  * reader to rebuild it; nested, the one at the top is the one to look at.
  */
-export const MergeOrder = React.memo<Props>(
+export const MergeOrder = memoNamed<Props>(
+  'MergeOrder',
   ({ nodes, byNumber, scaleMax, nowMs, depth = 0 }) => (
     <ul className={depth === 0 ? 'merge-order' : 'merge-order-children'}>
       {nodes.map((node) => {
@@ -62,5 +63,3 @@ export const MergeOrder = React.memo<Props>(
     </ul>
   ),
 );
-
-MergeOrder.displayName = 'MergeOrder';

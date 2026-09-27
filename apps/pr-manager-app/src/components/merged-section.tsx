@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
 import { type Merged } from '../load-report.mjs';
@@ -19,7 +19,8 @@ type Props = Readonly<{
  * what they no longer have to — and it is still the first question a daily
  * report has to answer: did the thing I queued yesterday go in.
  */
-export const MergedSection = React.memo<Props>(
+export const MergedSection = memoNamed<Props>(
+  'MergedSection',
   ({ merged, withinDays, nowMs }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
@@ -67,5 +68,3 @@ export const MergedSection = React.memo<Props>(
     </section>
   ),
 );
-
-MergedSection.displayName = 'MergedSection';

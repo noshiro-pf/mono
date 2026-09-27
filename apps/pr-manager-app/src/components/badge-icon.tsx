@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{
   /** The `d` of one path, drawn on a 16×16 viewBox. */
@@ -13,7 +13,7 @@ type Props = Readonly<{
  * `img-src` never comes into it. `aria-hidden` because the word beside it is
  * the label.
  */
-export const BadgeIcon = React.memo<Props>(({ path }) => (
+export const BadgeIcon = memoNamed<Props>('BadgeIcon', ({ path }) => (
   <svg
     aria-hidden={'true'}
     className={'badge-icon'}
@@ -28,5 +28,3 @@ export const BadgeIcon = React.memo<Props>(({ path }) => (
     <path d={path} />
   </svg>
 ));
-
-BadgeIcon.displayName = 'BadgeIcon';

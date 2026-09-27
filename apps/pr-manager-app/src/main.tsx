@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { createRoot } from 'react-dom/client';
+import { render } from 'preact';
 import { App } from './app.js';
 import './index.css';
 import { startStore } from './store/index.mjs';
@@ -12,8 +11,4 @@ if (container === null) {
 
 startStore();
 
-createRoot(container).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+render(<App />, container);

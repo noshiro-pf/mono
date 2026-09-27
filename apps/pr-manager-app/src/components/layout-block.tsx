@@ -1,4 +1,6 @@
-import * as React from 'react';
+import { type ComponentChildren, type PointerEventHandler } from 'preact';
+import { memoNamed } from 'preact-utils';
+import { useCallback, useMemo, useRef } from 'preact/hooks';
 import {
   BLOCK_NAMES,
   nearestDropTarget,
@@ -14,7 +16,7 @@ type Props = Readonly<{
   /** Absent is the natural height, with no scroll of its own. */
   height: number | undefined;
   dragging: boolean;
-  children: React.ReactNode;
+  children: ComponentChildren;
 }>;
 
 /**
@@ -30,15 +32,13 @@ type Props = Readonly<{
  * layout settings move a block and change its height with buttons, which is
  * the keyboard's way to the same things.
  */
-export const LayoutBlock = React.memo<Props>((props) => {
+export const LayoutBlock = memoNamed<Props>('LayoutBlock', (props) => {
   const { id, column, height, dragging, children } = props;
 
   /** Only to measure the block as drawn when a height drag starts. */
-  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-  const onHandleDown = React.useCallback<
-    React.PointerEventHandler<HTMLDivElement>
-  >(
+  const onHandleDown = useCallback<PointerEventHandler<HTMLDivElement>>(
     (pressed) => {
       if (pressed.button !== 0) {
         return;
@@ -53,9 +53,7 @@ export const LayoutBlock = React.memo<Props>((props) => {
     [id],
   );
 
-  const onHandleMove = React.useCallback<
-    React.PointerEventHandler<HTMLDivElement>
-  >(
+  const onHandleMove = useCallback<PointerEventHandler<HTMLDivElement>>(
     (moved) => {
       if (!moved.currentTarget.hasPointerCapture(moved.pointerId)) {
         return;
@@ -97,9 +95,7 @@ export const LayoutBlock = React.memo<Props>((props) => {
     [id],
   );
 
-  const onEdgeDown = React.useCallback<
-    React.PointerEventHandler<HTMLDivElement>
-  >(
+  const onEdgeDown = useCallback<PointerEventHandler<HTMLDivElement>>(
     (pressed) => {
       const body = bodyRef.current;
 
@@ -120,11 +116,11 @@ export const LayoutBlock = React.memo<Props>((props) => {
     [id],
   );
 
-  const onEdgeDoubleClick = React.useCallback((): void => {
+  const onEdgeDoubleClick = useCallback((): void => {
     layoutStore.setHeight(id, undefined);
   }, [id]);
 
-  const bodyStyle = React.useMemo(
+  const bodyStyle = useMemo(
     () => (height === undefined ? undefined : { height }),
     [height],
   );
@@ -162,7 +158,7 @@ export const LayoutBlock = React.memo<Props>((props) => {
         aria-hidden={'true'}
         className={'block-edge'}
         title={'Drag to set the height; double-click for the natural height'}
-        onDoubleClick={onEdgeDoubleClick}
+        onDblClick={onEdgeDoubleClick}
         onLostPointerCapture={onEdgeUp}
         onPointerDown={onEdgeDown}
         onPointerMove={onEdgeMove}
@@ -171,8 +167,6 @@ export const LayoutBlock = React.memo<Props>((props) => {
     </div>
   );
 });
-
-LayoutBlock.displayName = 'LayoutBlock';
 
 // Outside the component, since none of them reads its props: one function
 // each serves every render, with no `useCallback` to keep it stable.
@@ -185,7 +179,7 @@ const onHandleCancel = (): void => {
   layoutStore.cancelMove();
 };
 
-const onEdgeMove: React.PointerEventHandler<HTMLDivElement> = (moved) => {
+const onEdgeMove: PointerEventHandler<HTMLDivElement> = (moved) => {
   layoutStore.resizeTo(moved.clientY);
 };
 

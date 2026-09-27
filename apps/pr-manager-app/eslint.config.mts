@@ -1,7 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForReact,
+  eslintConfigForPreact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   type FlatConfig,
@@ -23,7 +23,15 @@ export default [
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
 
-  ...eslintConfigForReact(),
+  ...eslintConfigForPreact(),
+  {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      // Preact takes the DOM's own event names, and the double click is the
+      // one this page uses that React spells differently (`onDoubleClick`).
+      'react/no-unknown-property': ['error', { ignore: ['onDblClick'] }],
+    }),
+  },
   eslintConfigForVitest(),
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),

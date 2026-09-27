@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { type Entry } from '../load-report.mjs';
 import { AutoMergeBadge } from './auto-merge-badge.js';
@@ -32,7 +32,8 @@ type Props = Readonly<{
  * move. What has been said about it — the labels, and
  * the names of any checks that are red.
  */
-export const PullRequestCard = React.memo<Props>(
+export const PullRequestCard = memoNamed<Props>(
+  'PullRequestCard',
   ({ entry, scaleMax, nowMs }) => (
     <article className={'pull-request'}>
       <div className={'pull-request-badges'}>
@@ -121,5 +122,3 @@ export const PullRequestCard = React.memo<Props>(
     </article>
   ),
 );
-
-PullRequestCard.displayName = 'PullRequestCard';

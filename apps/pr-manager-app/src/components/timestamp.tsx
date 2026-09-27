@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { describeAge, formatLocalTime } from '../format.mjs';
 import { epochMsOf } from '../timestamp.mjs';
 
@@ -17,7 +17,7 @@ type Props = Readonly<{
  * Nothing at all when there is none, rather than a dash: a row of empty
  * labels is a row a reader has to check every time to find it still empty.
  */
-export const Timestamp = React.memo<Props>((props) => {
+export const Timestamp = memoNamed<Props>('Timestamp', (props) => {
   const { label, iso, nowMs } = props;
 
   const epochMs = iso === undefined ? undefined : epochMsOf(iso);
@@ -31,5 +31,3 @@ export const Timestamp = React.memo<Props>((props) => {
     </span>
   );
 });
-
-Timestamp.displayName = 'Timestamp';
