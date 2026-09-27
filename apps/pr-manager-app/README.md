@@ -218,7 +218,16 @@ The tokens in `src/index.css` are the validated default palette of the
 repository's data-visualization guidance — chart surface, page plane, three
 inks, the hairlines, and the four reserved status steps. Dark mode is a
 selected set of steps rather than an automatic flip, which is why every value
-is written twice.
+is written twice, once on each side of `light-dark()`.
+
+**Light or dark follows the system until the button beside Refresh is
+pressed.** A press flips what is on screen and keeps the choice in the URL,
+`?theme=light` or `?theme=dark`, so a bookmark or a pasted link opens the same
+way, and no key is added to a `localStorage` every app on the origin shares.
+It is a toggle between two looks rather than a cycle through "system, light,
+dark", which would have a press that changes nothing visible; a choice that
+comes back to what the system shows drops the parameter, and the page follows
+the system again.
 
 A status colour never carries meaning alone: every badge that uses one also
 carries a glyph and a word. Two of the four steps sit below 3:1 on the light

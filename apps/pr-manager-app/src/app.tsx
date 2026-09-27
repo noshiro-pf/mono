@@ -4,6 +4,7 @@ import {
   ExternalLink,
   LoadStateView,
   Notice,
+  ThemeButton,
   TokenPanel,
 } from './components/index.mjs';
 import {
@@ -201,6 +202,8 @@ export const App = React.memo(() => {
               {'last refresh failed'}
             </span>
           ) : undefined}
+
+          <ThemeButton />
 
           <button
             className={'refresh-button'}
