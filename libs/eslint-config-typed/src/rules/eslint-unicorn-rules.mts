@@ -194,7 +194,7 @@ export const eslintUnicornRules = {
   'unicorn/require-module-attributes': 'error',
   'unicorn/require-module-specifiers': 'error',
 
-  'unicorn/no-immediate-mutation': 'error',
+  'unicorn/no-immediate-mutation': withDefaultOption('error'),
   'unicorn/no-useless-collection-argument': 'error',
   'unicorn/isolated-functions': 'off',
   'unicorn/consistent-template-literal-escape': 'error',
@@ -233,7 +233,7 @@ export const eslintUnicornRules = {
   'unicorn/no-array-from-fill': 'error',
   // Conflicts with the standard JSDoc `*`-prefixed comment style used across this repo
   'unicorn/no-asterisk-prefix-in-documentation-comments': 'off',
-  'unicorn/no-break-in-nested-loop': 'error',
+  'unicorn/no-break-in-nested-loop': withDefaultOption('error'),
   'unicorn/no-computed-property-existence-check': 'error',
   'unicorn/no-confusing-array-splice': 'error',
   'unicorn/no-confusing-array-with': 'error',
