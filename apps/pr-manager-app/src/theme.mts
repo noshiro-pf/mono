@@ -86,21 +86,11 @@ export const systemColorScheme = (): ColorScheme =>
   matchMedia(DARK_QUERY).matches ? 'dark' : 'light';
 
 /**
- * Calls `onChange` whenever the system's preference changes — an OS that
- * turns dark at sunset does so while the page is open. The shape
- * `React.useSyncExternalStore` asks for.
+ * The media query whose `change` event says the system's preference changed
+ * — an OS that turns dark at sunset does so while the page is open.
  */
-export const subscribeToSystemColorScheme = (
-  onChange: () => void,
-): (() => void) => {
-  const query = matchMedia(DARK_QUERY);
-
-  query.addEventListener('change', onChange);
-
-  return () => {
-    query.removeEventListener('change', onChange);
-  };
-};
+export const systemColorSchemeQuery = (): MediaQueryList =>
+  matchMedia(DARK_QUERY);
 
 /**
  * Tells the stylesheet. `data-theme` on `<html>` sets `color-scheme`, which

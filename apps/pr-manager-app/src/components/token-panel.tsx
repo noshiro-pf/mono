@@ -1,17 +1,9 @@
 import * as React from 'react';
+import { useObservableValue } from 'synstate-react-hooks';
 import { POLL_INTERVAL_MS } from '../constants.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
-import { type StoredToken } from '../token.mjs';
+import { reader, tokenStore } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
-
-type Props = Readonly<{
-  token: StoredToken | undefined;
-  rateLimit: RateLimit | undefined;
-  /** What went wrong keeping it, if the browser refused to. */
-  saveError: string | undefined;
-  onSave: (token: StoredToken) => void;
-  onForget: () => void;
-}>;
 
 /**
  * Where a reader gives the page a token, and — the part that matters more —
@@ -25,50 +17,16 @@ type Props = Readonly<{
  * keeps a reader from reaching for `repo` because it sounded like the one
  * that works.
  */
-export const TokenPanel = React.memo<Props>((props) => {
-  const { token, rateLimit, saveError, onSave, onForget } = props;
+export const TokenPanel = React.memo(() => {
+  const token = useObservableValue(tokenStore.token);
 
-  const [typed, setTyped] = React.useState('');
+  const saveError = useObservableValue(tokenStore.saveError);
 
-  const [remember, setRemember] = React.useState(false);
+  const typed = useObservableValue(tokenStore.typed);
 
-  const onTypedChange = React.useCallback<
-    React.ChangeEventHandler<HTMLInputElement>
-  >((changed) => {
-    setTyped(changed.target.value);
-  }, []);
+  const remember = useObservableValue(tokenStore.remember);
 
-  const onRememberChange = React.useCallback<
-    React.ChangeEventHandler<HTMLInputElement>
-  >((changed) => {
-    setRemember(changed.target.checked);
-  }, []);
-
-  const onSubmit = React.useCallback<React.SubmitEventHandler<HTMLFormElement>>(
-    (submitted) => {
-      // The page has nowhere to submit to — `form-action 'none'` in the
-      // policy says as much — and the element is a form so that Enter
-      // submits it.
-      submitted.preventDefault();
-
-      const trimmed = typed.trim();
-
-      if (trimmed === '') {
-        return;
-      }
-
-      onSave({ value: trimmed, store: remember ? 'device' : 'session' });
-
-      setTyped('');
-    },
-    [onSave, remember, typed],
-  );
-
-  const onClear = React.useCallback((): void => {
-    setTyped('');
-
-    onForget();
-  }, [onForget]);
+  const rateLimit = useObservableValue(reader.rateLimit);
 
   // Said in the sentence as well as shown in the colour: the reserved status
   // steps are not allowed to carry a meaning on their own here, and a reader
@@ -123,7 +81,11 @@ export const TokenPanel = React.memo<Props>((props) => {
               {'Use this token'}
             </button>
 
-            <button className={'token-clear'} type={'button'} onClick={onClear}>
+            <button
+              className={'token-clear'}
+              type={'button'}
+              onClick={tokenStore.forget}
+            >
               {'Clear'}
             </button>
           </div>
@@ -140,6 +102,27 @@ export const TokenPanel = React.memo<Props>((props) => {
 });
 
 TokenPanel.displayName = 'TokenPanel';
+
+// Outside the component, since none of them reads its props: one function
+// each serves every render, with no `useCallback` to keep it stable.
+
+const onTypedChange: React.ChangeEventHandler<HTMLInputElement> = (changed) => {
+  tokenStore.setTyped(changed.target.value);
+};
+
+const onRememberChange: React.ChangeEventHandler<HTMLInputElement> = (
+  changed,
+) => {
+  tokenStore.setRemember(changed.target.checked);
+};
+
+const onSubmit: React.SubmitEventHandler<HTMLFormElement> = (submitted) => {
+  // The page has nowhere to submit to — `form-action 'none'` in the policy
+  // says as much — and the element is a form so that Enter submits it.
+  submitted.preventDefault();
+
+  tokenStore.submit();
+};
 
 const INPUT_ID = 'github-token';
 

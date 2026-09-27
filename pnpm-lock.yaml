@@ -1739,6 +1739,12 @@ importers:
       pr-report-core:
         specifier: workspace:*
         version: link:../pr-report-core
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
+      synstate-react-hooks:
+        specifier: workspace:*
+        version: link:../../libs/synstate-react-hooks
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
