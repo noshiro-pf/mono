@@ -22,6 +22,11 @@ export type Options = Readonly<{
   pollIntervalSec: number;
   /** How long to watch one pull request before giving up on it. */
   watchTimeoutMin: number;
+  /**
+   * Whether a watched pull request whose failure is only a fixer's diff has
+   * the fixer run, amended onto its commit and pushed. See `auto-fix.mts`.
+   */
+  autoFix: boolean;
 }>;
 
 export const defaultOptions: Options = {
@@ -32,6 +37,7 @@ export const defaultOptions: Options = {
   idleIntervalSec: 300,
   pollIntervalSec: 30,
   watchTimeoutMin: 90,
+  autoFix: true,
 } as const;
 
 export const HELP = [
@@ -40,6 +46,8 @@ export const HELP = [
   `Takes the ${MERGE_QUEUED_LABEL} pull requests in the order they declare with`,
   '`Merge-After:`, one at a time: rebases the one that is out of date with the',
   `default branch, takes ${SKIP_CI_LABEL} off it, and waits for GitHub to merge it.`,
+  'When its checks fail only because a fix: or gen: entry of the check matrices',
+  'left a diff, runs that command, amends the result and pushes it, once.',
   '',
   'Options:',
   '  --once                   run one cycle and exit',
@@ -49,6 +57,7 @@ export const HELP = [
   `  --idle-interval <sec>    wait between surveys once the list has sat still (default ${defaultOptions.idleIntervalSec})`,
   `  --poll-interval <sec>    wait between polls of the watched pull request (default ${defaultOptions.pollIntervalSec})`,
   `  --watch-timeout <min>    give up on a pull request after this long (default ${defaultOptions.watchTimeoutMin})`,
+  "  --no-auto-fix            leave a failure that is only a fixer's diff as it is",
   '  -h, --help               show this help',
 ].join('\n');
 
@@ -72,6 +81,7 @@ export const parseOptions = (
         'idle-interval': { type: 'string' },
         'poll-interval': { type: 'string' },
         'watch-timeout': { type: 'string' },
+        'no-auto-fix': { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }),
@@ -163,5 +173,6 @@ export const parseOptions = (
     idleIntervalSec: idleIntervalSec.value,
     pollIntervalSec: pollIntervalSec.value,
     watchTimeoutMin: watchTimeoutMin.value,
+    autoFix: !values['no-auto-fix'],
   });
 };

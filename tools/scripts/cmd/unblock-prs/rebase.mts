@@ -15,6 +15,7 @@ import {
   mergedHeadOf,
   readTimeline,
   remoteSha,
+  removeWorktree,
   viewPullRequest,
   type MergedHead,
 } from './github.mjs';
@@ -551,11 +552,4 @@ export const armOnPick = async (
   log(`#${pr.number}: auto-merge armed.`);
 
   return Result.ok('armed');
-};
-
-const removeWorktree = async (worktreeDir: string): Promise<void> => {
-  // Both fail harmlessly when there is nothing to remove.
-  await git(`git worktree remove --force ${sh(worktreeDir)}`);
-
-  await git('git worktree prune');
 };
