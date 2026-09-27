@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    A pull request, on the page's accent blue (`--accent` in `src/index.css`).
+    Fixed colours rather than following the theme: the icon sits on the
+    browser's tab strip, not on the page, and white on blue reads on a light
+    strip and a dark one alike. SVG rather than an `.ico`, because the one
+    drawing is sharp at every size a browser asks for; `public/` rather than
+    `src/`, so it keeps one URL, which Vite prefixes with the base path.
+  -->
+  <rect width="32" height="32" rx="7" fill="#2a78d6" />
+  <g
+    fill="none"
+    stroke="#fff"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="2.4"
+  >
+    <circle cx="10" cy="8" r="2.6" />
+    <circle cx="10" cy="24" r="2.6" />
+    <circle cx="22" cy="24" r="2.6" />
+    <path d="M10 10.6v10.8" />
+    <path d="M22 21.4V13a3 3 0 0 0-3-3h-4" />
+    <path d="M17.5 7l-3 3l3 3" />
+  </g>
+</svg>
