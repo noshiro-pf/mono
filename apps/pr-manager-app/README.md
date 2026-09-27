@@ -100,7 +100,13 @@ Each card has a **⧉ split view** link beside the title, which opens the pull
 request in [`split-view-extension`](../split-view-extension/README.md): the
 diff on the left and the conversation on the right, at 7:3. The diff hides
 whitespace changes and the files already marked viewed
-(`?w=1&show-viewed-files=false`). When the pull request closes an issue, or
+(`?w=1&show-viewed-files=false`). GitHub takes those off the pane's address
+once the diff has opened — on a pull request with files already marked viewed
+it leaves `/changes#diff-…` — and the split view saves the address the pane
+is at, so without
+[`github-view-defaults-extension`](../github-view-defaults-extension/README.md),
+which puts them back, the next time that split view opens the diff shows
+everything. When the pull request closes an issue, or
 names the Claude Code session it was written in, that shares the right half
 at 1:1 — the issue right of the conversation, the session left of it, next to
 the diff; with both, the session is on the left of the right half, beside the

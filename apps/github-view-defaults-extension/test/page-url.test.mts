@@ -6,6 +6,7 @@ import {
   overviewParam,
   preferredUrlOfLink,
   preferredUrlOfPage,
+  restoredUrlOfPage,
 } from '../src/index.mjs';
 
 const pageOrigin = 'https://github.com';
@@ -147,6 +148,72 @@ describe('preferredUrlOf, on a pull request diff', () => {
 
       assert.deepStrictEqual(preferredUrlOfPage(once, pageOrigin), undefined);
     });
+  });
+});
+
+describe('restoredUrlOfPage', () => {
+  test('puts the defaults back on a diff the site sent to one of its files', () => {
+    // What GitHub leaves when it scrolls a diff to the first file not yet
+    // marked viewed: the fragment on, the query off.
+    assert.deepStrictEqual(
+      restoredUrlOfPage(
+        `${pageOrigin}/noshiro-pf/mono/pull/2089/changes#diff-d2fbcdbd`,
+        pageOrigin,
+      ),
+      `${pageOrigin}/noshiro-pf/mono/pull/2089/changes?w=1&show-viewed-files=false#diff-d2fbcdbd`,
+    );
+  });
+
+  test('puts back only the one the site took off', () => {
+    assert.deepStrictEqual(
+      restoredUrlOfPage(
+        `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=1`,
+        pageOrigin,
+      ),
+      `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=1&show-viewed-files=false`,
+    );
+  });
+
+  test('leaves a diff alone when its address still says both', () => {
+    assert.deepStrictEqual(
+      restoredUrlOfPage(
+        `${pageOrigin}/noshiro-pf/mono/pull/1/changes?show-viewed-files=false&w=1#diff-abc`,
+        pageOrigin,
+      ),
+      undefined,
+    );
+  });
+
+  test('never overrules what the address says', () => {
+    // GitHub's own controls write these; putting the default back would undo
+    // the click.
+    assert.deepStrictEqual(
+      restoredUrlOfPage(
+        `${pageOrigin}/noshiro-pf/mono/pull/1/files?w=0&show-viewed-files=true`,
+        pageOrigin,
+      ),
+      undefined,
+    );
+  });
+
+  test('does not send the branch overview to the list in place', () => {
+    // That answer names another page, and an address changed without loading
+    // it would describe a page that is not the one on screen.
+    assert.deepStrictEqual(
+      restoredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/branches`, pageOrigin),
+      undefined,
+    );
+
+    assert.isDefined(
+      preferredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/branches`, pageOrigin),
+    );
+  });
+
+  test('leaves a page no rule speaks for alone', () => {
+    assert.deepStrictEqual(
+      restoredUrlOfPage(`${pageOrigin}/noshiro-pf/mono/pull/1`, pageOrigin),
+      undefined,
+    );
   });
 });
 

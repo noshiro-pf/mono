@@ -4,12 +4,14 @@ import {
   managedPagePathOf,
   preferredUrlOfLink,
   preferredUrlOfPage,
+  restoredUrlOfPage,
 } from './page-url.mjs';
 
 /**
- * The content script, injected into github.com at `document_start`.
+ * The content script, injected into github.com at `document_start`, in every
+ * frame — a split-view pane showing a diff is a page like any other.
  *
- * It does two things about addresses, and the second is what makes the first
+ * It does three things about addresses, and the second is what makes the first
  * almost never happen:
  *
  * - **It redirects the page it lands on**, when that page is one the rules
@@ -20,6 +22,9 @@ import {
  *   want. A "Files changed" tab clicked from the conversation view then
  *   navigates straight to the settled URL, and the redirect above has nothing
  *   to do.
+ * - **It puts the defaults back on the address** when the site takes them off
+ *   a page already showing them, without loading it again. See
+ *   `restoreAddress`.
  *
  * `document_start` is what makes the redirect cheap: the script runs before the
  * document is parsed, so the load it abandons is a response that had barely
@@ -35,6 +40,9 @@ import {
 // it something that is none of the three; the same dance as `browserHistory`
 // in `split-view-extension`'s frame agent.
 const { location: browserLocation } = globalThis;
+
+// The same for `history`, which is what writes an address without loading it.
+const { history: browserHistory } = globalThis;
 
 // `document.title = …` is a mutation the lint rules reject unless the object it
 // is reached through is named as mutable — the same trick as `mut_page` in
@@ -66,10 +74,20 @@ const listening = new WeakSet<Element>();
  * that rewrite as "the defaults are gone", puts them back, and the page loads
  * again — forever.
  *
- * So a page is given the defaults once. If they come off afterwards, that is
- * GitHub having used them, not GitHub having lost them.
+ * So a page is loaded with the defaults once. If they come off afterwards,
+ * they are written back onto the address in place — see `restoreAddress` —
+ * and never by loading the page again.
  */
 const mut_settledPages = new Set<string>();
+
+/**
+ * The addresses the site wrote that `restoreAddress` has already written over.
+ *
+ * A site that writes the same address a second time after it was restored is
+ * insisting on it, and answering again would be a tug of war over the address
+ * bar for the life of the page. Each address the site writes is answered once.
+ */
+const mut_restoredAddresses = new Set<string>();
 
 /**
  * The title this script last wrote, the title it was written over, and the
@@ -119,14 +137,16 @@ const applyPreferredUrlToThisPage = (): void => {
     // It arrived the way the rules want it — because a rewritten link brought
     // us here, because the redirect below has just happened and this is the new
     // document, or because the rule decided to leave it be. Either way this
-    // page is done, and what GitHub does to the address from here is its own
-    // business.
+    // page is not loaded again; if GitHub takes the defaults off its address
+    // from here, `restoreAddress` writes them back in place.
     mut_settledPages.add(page);
 
     return;
   }
 
   if (mut_settledPages.has(page)) {
+    restoreAddress();
+
     return;
   }
 
@@ -136,6 +156,39 @@ const applyPreferredUrlToThisPage = (): void => {
   // the user looked at, so it does not belong in the history. Going back from
   // here should leave the pull request, not bounce through a redirect.
   browserLocation.replace(next);
+};
+
+/**
+ * Writes the defaults back onto the address of a page already acted on, when
+ * the site has taken them off, without loading anything.
+ *
+ * GitHub takes them off a diff it has already applied them to — to normalize
+ * its address, and to point at the first file not yet marked viewed, as
+ * `/changes#diff-…` with no query. The page goes on showing the diff the way
+ * the defaults asked, but the address no longer says so, and a reload, a
+ * bookmark or a split-view pane saving where it is then reopens it without
+ * them.
+ *
+ * `replaceState` fires no event and GitHub's router does not look, so the page
+ * is left as it is; the state object is carried over because that router keeps
+ * its place in the history there.
+ */
+const restoreAddress = (): void => {
+  const current = browserLocation.href;
+
+  if (mut_restoredAddresses.has(current)) {
+    return;
+  }
+
+  const next = restoredUrlOfPage(current, browserLocation.origin);
+
+  if (next === undefined) {
+    return;
+  }
+
+  mut_restoredAddresses.add(current);
+
+  browserHistory.replaceState(browserHistory.state, '', next);
 };
 
 /**
@@ -273,7 +326,8 @@ const watchForChanges = (): void => {
     // every GitHub tab; the page is mutating anyway whenever this is true.
     //
     // Most of what this catches is not a navigation at all but GitHub tidying
-    // its own address bar, which is why `mut_settledPages` guards the answer.
+    // its own address bar, which is why `mut_settledPages` guards the answer:
+    // a page already loaded is only given its address back, not reloaded.
     if (currentHref !== mut_lastHref) {
       mut_lastHref = currentHref;
 

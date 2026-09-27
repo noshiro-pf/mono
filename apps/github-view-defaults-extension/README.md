@@ -56,6 +56,16 @@ The tab title is changed on these pages and no others:
   page with `w=0` or `show-viewed-files=true` on it; forcing the defaults back
   would leave no way to look at what the extension hides. A link somebody
   shared with `w=0` on it keeps it, too.
+- **The address goes on saying it.** GitHub takes the parameters back off a
+  diff it has opened with them — and on a pull request with files already
+  marked viewed it jumps to the first one that is not, leaving
+  `/changes#diff-…` with no query at all. The extension writes the missing ones
+  back onto the address, beside the fragment, without loading the page again,
+  so a reload, a bookmark or a split view saving where its pane is still opens
+  the diff the same way.
+- **Inside a frame too.** A diff in a pane of a split view
+  ([`split-view-extension`](../split-view-extension/README.md)) is treated as it
+  would be in a tab of its own.
 - **The branches "Overview" tab still works.** It points at the very URL the
   branch rule redirects, so redirecting it whatever the address said would make
   the overview unreachable. The way out is in the address: the extension gives
@@ -141,13 +151,16 @@ Three mechanisms, in the order they matter:
   request to another renumbers the title rather than putting a second number in
   front of the first.
 
-**Each page is acted on once, and once only.** GitHub takes the
+**Each page is loaded once, and once only.** GitHub takes the
 parameters in and then rewrites its own address bar without them — measured on
 a logged-out session, `?w=1&show-viewed-files=false` becomes `?w=1` a moment
 after the page loads. An extension that read that as "the defaults are gone"
-would put them back, and the page would load again, forever. So the paths
-already dealt with are remembered for the life of the document: parameters
-coming off afterwards is GitHub having used them, not GitHub having lost them.
+and redirected would load the page again, forever. So the paths already dealt
+with are remembered for the life of the document, and parameters coming off
+one of them afterwards are put back with `history.replaceState` — the address
+changes, the page does not. Each address GitHub writes is answered once: if it
+writes the same one again after that, it is insisting, and the address is left
+as GitHub wants it rather than fought over.
 
 `src/page-url.mts` holds the address rules and touches no DOM — which URLs
 count and what the extension wants of them — and `src/page-title.mts` holds the
@@ -172,10 +185,11 @@ The icons are committed, so `gen:icons` is only run when the shape changes.
 `smoke` needs a headed browser — Chromium loads no extensions in the headless
 shell — so on a machine with no display run it as `xvfb-run -a pnpm run smoke`.
 It touches no network: every github.com request is answered from a fixture in
-`scripts/smoke.mts`, which is also what lets it check the two things the unit
-tests cannot — that the extension does not redirect a second time when the site
-takes the parameters off its own address bar, and that a reload of a page the
-extension decided about is decided the same way again.
+`scripts/smoke.mts`, which is also what lets it check what the unit tests
+cannot — that the extension does not redirect a second time when the site takes
+the parameters off its own address bar but writes them back in place, in a tab
+and in a frame, and that a reload of a page the extension decided about is
+decided the same way again.
 
 ## Release
 

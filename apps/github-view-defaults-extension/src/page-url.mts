@@ -89,6 +89,40 @@ export const preferredUrlOfPage = (
 ): string | undefined => preferredUrl(href, pageOrigin, undefined);
 
 /**
+ * The address to write back over this page's own, without loading anything,
+ * or `undefined` when there is nothing to put back.
+ *
+ * This is asked of a page the extension has already acted on, when the site
+ * has since rewritten its address bar. GitHub does that twice over on a diff:
+ * it normalizes a parameter off once it has read it, and on a pull request
+ * with files already marked viewed it scrolls to the first one that is not and
+ * writes `/changes#diff-…` with no query at all. The page is still showing
+ * what the defaults asked for, so this is not a redirect: the address is only
+ * made to say so again, which is what a reload, a bookmark, or a split-view
+ * pane saving where it is reads.
+ *
+ * Only an answer that keeps the path qualifies. One that names another page —
+ * the branch overview sent to the list — cannot be written in place, because
+ * the address would then describe a page other than the one on screen.
+ */
+export const restoredUrlOfPage = (
+  href: string,
+  pageOrigin: string,
+): string | undefined => {
+  const page = managedPageOf(href, pageOrigin);
+
+  if (page === undefined) {
+    return undefined;
+  }
+
+  const next = page.rule.preferredUrl(page.url, undefined);
+
+  const nextPath = next === undefined ? undefined : parseUrl(next)?.pathname;
+
+  return nextPath === page.url.pathname ? next : undefined;
+};
+
+/**
  * What a link on the page at `pageHref` should point at, or `undefined` when it
  * already points there.
  *
