@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isSameReference } from './reference-utils.mjs';
 
 type Options = readonly [('always' | 'only-single-line')?];
 
@@ -699,65 +700,6 @@ const statementListOf = (
   return parent.type === AST_NODE_TYPES.SwitchCase
     ? parent.consequent
     : undefined;
-};
-
-/** Whether two assignment targets are the same, as `x.y` and `x['y']` are. */
-const isSameReference = (
-  left: DeepReadonly<TSESTree.Node>,
-  right: DeepReadonly<TSESTree.Node>,
-): boolean => {
-  if (
-    left.type === AST_NODE_TYPES.Super ||
-    left.type === AST_NODE_TYPES.ThisExpression
-  ) {
-    return right.type === left.type;
-  }
-
-  if (
-    left.type === AST_NODE_TYPES.Identifier ||
-    left.type === AST_NODE_TYPES.PrivateIdentifier
-  ) {
-    return right.type === left.type && right.name === left.name;
-  }
-
-  if (left.type === AST_NODE_TYPES.Literal) {
-    return right.type === left.type && right.value === left.value;
-  }
-
-  if (
-    left.type !== AST_NODE_TYPES.MemberExpression ||
-    right.type !== AST_NODE_TYPES.MemberExpression
-  ) {
-    return false;
-  }
-
-  const name = staticPropertyName(left);
-
-  return name === undefined
-    ? left.computed === right.computed &&
-        isSameReference(left.object, right.object) &&
-        isSameReference(left.property, right.property)
-    : name === staticPropertyName(right) &&
-        isSameReference(left.object, right.object);
-};
-
-const staticPropertyName = (
-  node: DeepReadonly<TSESTree.MemberExpression>,
-): string | undefined => {
-  if (!node.computed) {
-    return node.property.type === AST_NODE_TYPES.PrivateIdentifier
-      ? `#${node.property.name}`
-      : node.property.name;
-  }
-
-  const value = ASTUtils.getStaticValue(asNode(node.property))?.value;
-
-  // `x[0]` and `x['0']` name the same property.
-  return typeof value === 'string'
-    ? value
-    : typeof value === 'number' || typeof value === 'bigint'
-      ? value.toString()
-      : undefined;
 };
 
 /**

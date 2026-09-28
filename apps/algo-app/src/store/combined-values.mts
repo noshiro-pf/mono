@@ -47,10 +47,9 @@ export const turnPlayerHighlighterPosition$ = combine([
   playerNamePositions$,
   displayValues$,
 ]).pipe(
-  map(([playerNamePositions, displayValues]) =>
-    playerNamePositions === undefined
-      ? undefined
-      : playerNamePositions[displayValues.turnPlayer],
+  map(
+    ([playerNamePositions, displayValues]) =>
+      playerNamePositions?.[displayValues.turnPlayer],
   ),
 );
 
