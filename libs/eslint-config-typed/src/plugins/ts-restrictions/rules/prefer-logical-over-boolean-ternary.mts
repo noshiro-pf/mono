@@ -12,6 +12,7 @@ import {
   isComparison,
   isExactlyInvertible,
 } from './comparison-utils.mjs';
+import { jsxValuePositionOf } from './jsx-utils.mjs';
 
 type Options = readonly [];
 
@@ -38,8 +39,10 @@ type MessageIds = 'preferLogical';
  * `NaN` has no exact short negation, so that ternary is left alone.
  *
  * A ternary whose branches are both boolean literals is `no-unneeded-ternary`'s.
- * One directly in JSX is not turned into `&&`, which the JSX conventions and
- * react/jsx-no-leaked-render keep out of it.
+ * One whose value is rendered or passed in JSX is rewritten only when its
+ * other branch is a boolean too: there `&&` and `||` take booleans on both
+ * sides (`ts-restrictions/jsx-boolean-logical-operands`), so
+ * `{a ? false : <X />}` stays a ternary.
  */
 export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
   MessageIds,
@@ -135,19 +138,16 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
         return undefined;
       }
 
+      const other = consequentValue === undefined ? consequent : alternate;
+
+      if (jsxValuePositionOf(node) !== undefined && !isBoolean(other)) {
+        return undefined;
+      }
+
       if (consequentValue === true) {
         return isBoolean(test)
           ? `${operand(test, '||')} || ${operand(alternate, '||')}`
           : undefined;
-      }
-
-      // In JSX, `&&` is what react/jsx-no-leaked-render rewrites into
-      // `cond ? x : null`, turning the `false` this came from into `null`.
-      if (
-        (consequentValue === false || alternateValue === false) &&
-        node.parent.type === AST_NODE_TYPES.JSXExpressionContainer
-      ) {
-        return undefined;
       }
 
       if (consequentValue === false) {

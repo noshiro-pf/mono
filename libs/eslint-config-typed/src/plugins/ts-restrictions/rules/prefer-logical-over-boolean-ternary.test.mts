@@ -66,12 +66,14 @@ describe('prefer-logical-over-boolean-ternary', () => {
           `,
         },
         {
-          name: 'no `&&` in JSX, where react/jsx-no-leaked-render turns it back into a ternary with `null`',
+          name: 'in JSX, not when the other branch is not a boolean: `&&` / `||` take only booleans there',
           filename: 'file.tsx',
           code: dedent`
-            declare const a: boolean, b: string;
+            declare const a: boolean, b: string, c: boolean;
             const e = <input value={a ? false : b} />;
             const f = <input value={a ? b : false} />;
+            const g = <input value={a ? true : b} />;
+            const h = <div>{c ? (a ? false : b) : null}</div>;
           `,
         },
       ],
@@ -216,17 +218,25 @@ describe('prefer-logical-over-boolean-ternary', () => {
           ],
         },
         {
-          name: '`||` in JSX is fine',
+          name: 'in JSX, when both branches are booleans',
           filename: 'file.tsx',
           code: dedent`
-            declare const a: boolean, b: string;
-            const e = <input value={a ? true : b} />;
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a ? true : b} />;
+            const f = <input disabled={a ? false : b} />;
+            const g = <div>{a ? b : false}</div>;
           `,
           output: dedent`
-            declare const a: boolean, b: string;
-            const e = <input value={a || b} />;
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a || b} />;
+            const f = <input disabled={!a && b} />;
+            const g = <div>{a && b}</div>;
           `,
-          errors: [{ messageId: 'preferLogical' }],
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
         },
         {
           name: 'the prefer-ternary shape `a ? true : b ? c : d`',

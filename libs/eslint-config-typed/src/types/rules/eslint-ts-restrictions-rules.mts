@@ -58,6 +58,21 @@ namespace CheckDestructuringCompleteness {
 }
 
 /**
+ * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace JsxBooleanLogicalOperands {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Invert the operator of a negated comparison instead of negating it (`!(a === b)` → `a !== b`, `!(a < b)` → `a >= b` when no operand can be NaN).
  *
  *  ```md
@@ -442,6 +457,7 @@ namespace PreferTernary {
 
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
+  'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
