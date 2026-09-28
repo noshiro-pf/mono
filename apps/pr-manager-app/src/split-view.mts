@@ -14,9 +14,10 @@ import { type Entry } from './load-report.mjs';
  * names several is rare enough that another pane, narrower than anything is
  * readable in, is not worth drawing for it.
  *
- * The conversation and the issue are shown at 75%, so that more of each fits
- * in a pane narrower than GitHub lays them out for; the diff and the session
- * stay at 100%.
+ * The conversation and the issue are shown at 75% when they share the right
+ * half, so that more of each fits in a pane narrower than GitHub lays them
+ * out for; the conversation alone in the right 30% is wide enough to stay at
+ * 100%, as the diff and the session always do.
  *
  * The tab is titled `#<number> <title>`, as a tab of the pull request on
  * GitHub would be with the number first.
@@ -42,7 +43,10 @@ export const splitViewUrl = (entry: SplitViewSource): string => {
   const { layout, panes } =
     issueUrl === undefined
       ? sessionUrl === undefined
-        ? ({ layout: 'r70pp', panes: [diff, conversation] } as const)
+        ? ({
+            layout: 'r70pp',
+            panes: [diff, { url: entry.url, zoom: full }],
+          } as const)
         : ({
             layout: 'rprpp',
             panes: [diff, { url: sessionUrl, zoom: full }, conversation],
@@ -116,5 +120,5 @@ const diffQuery = 'w=1&show-viewed-files=false';
 /** 100%, where the extension's `zoom` leaves a pane when it is absent. */
 const full = 1;
 
-/** The conversation and the issue. */
+/** The conversation and the issue, when they share the right half. */
 const reading = 0.75;

@@ -112,7 +112,8 @@ at 1:1 — the issue right of the conversation, the session left of it, next to
 the diff; with both, the session is on the left of the right half, beside the
 conversation stacked over the issue. The first issue and the
 first session only, if it names several. The conversation and the issue are
-shown at 75%. The tab is titled with the pull request's number and title,
+shown at 75% when they share the right half, and the conversation alone at
+100%. The tab is titled with the pull request's number and title,
 `#2071 feat(…): …`.
 
 A session is named by a `Claude-Session:` line in the pull request's
