@@ -1,15 +1,24 @@
 ---
 name: pnpm-update-ci
-description: Fix the CI on the dependency-update pull request the pnpm-update workflow opens, and nothing else — find the open `chore/pnpm-update` pull request, judge its required checks, reproduce a failure locally, push the fix, and end silently when there is nothing wrong. Use when asked to look after the pnpm-update pull request, fix the dependency bump's CI, or when run as the scheduled routine that follows `pnpm-update.yml`.
+description: Fix the CI on the dependency-update pull request the pnpm-update workflow opens, and nothing else — find the open `chore/pnpm-update` pull request, judge its required checks, reproduce a failure locally, push the fix, and end silently when there is nothing wrong. Use when asked to look after the pnpm-update pull request, fix the dependency bump's CI, or when run as the routine that follows `pnpm-update.yml`.
 ---
 
 # Fix the CI on the pnpm-update pull request
 
-`.github/workflows/pnpm-update.yml` runs twice a week at 21:07 UTC. It rebuilds
+`.github/workflows/pnpm-update.yml` is scheduled twice a week. It rebuilds
 `chore/pnpm-update` from `main`, force-pushes it, and opens
-`chore: update dependencies` with `merge-queued` and auto-merge armed. Roughly
-an hour later this runs, and its whole job is: if that pull request's CI is
-red, make it green.
+`chore: update dependencies` with `merge-queued` and auto-merge armed — or,
+when the previous one is still open, only force-pushes and re-arms it. This
+runs as a routine, and its whole job is: if that pull request's CI is red,
+make it green.
+
+The routine is started by that pull request being opened, not by a clock:
+GitHub starts a scheduled workflow when it has capacity, which is routinely
+hours after its cron time, so a routine timed to follow it ran before the
+pull request existed. The run that only force-pushes opens nothing, so a
+schedule may start this too, as a backup for that case. Either way, expect
+to arrive while the checks are still running, and stay until they finish
+(step 1).
 
 **When nothing is wrong, end without saying anything.** No "checked, all green"
 — this runs unattended, and a report nobody asked for is noise on a schedule.
@@ -58,13 +67,29 @@ Take the entry whose `headRef` is `chore/pnpm-update`.
   purpose, or the queue paused it until its turn (one queued pull request is
   released at a time), and taking the label off is not this skill's job.
 - **`checks.verdict` is `passed`** — end silently. Auto-merge will land it.
-- **`checks.verdict` is `pending`** — the matrix is still running. Wait, and
-  come back to this step; a full matrix is about 25 minutes.
+- **`checks.verdict` is `pending`** — the matrix is still running, which is
+  the usual state when this starts. Wait for it (below), then come back to
+  this step. Do not end the session on `pending`: nothing else will come back
+  to look.
 - **`checks.verdict` is `failing`** — step 2.
 
 `comparison.behindBy` being non-zero changes none of the above. So does
 `checks.verdict` being `paused`, which is the `skip-ci` case above said
 another way.
+
+**Waiting.** There is no server-side wait to ask for, so poll: run
+`pnpm run pr-report -- --format json` every 60 seconds or more, in the
+background, until the entry's `checks.verdict` stops being `pending`. A full
+matrix is about 25 minutes. Trust `checks.verdict` over counting the contexts
+yourself: a required context whose workflow has not reported yet is absent
+rather than pending, and `pr-report` counts it — see `unblock-prs`, "3. Watch
+the checks".
+
+Keep going until the verdict settles, but not forever. **Stop and report
+where it stands** when the verdict is still `pending` two hours after this
+run started, or when the checks are red again after a second fix pushed by
+this run. Either says something needs a person, and a third attempt costs a
+matrix to find out what the second one already showed.
 
 Keep `headSha`. It is what says, later, whether the bot force-pushed the
 branch out from under this run.
@@ -165,5 +190,7 @@ which license to which, and end.
 
 ## Report
 
-Nothing at all, if nothing was done. Otherwise: which check failed, why, what
-the fix was, and where the checks stand after the push. Short.
+Nothing at all, if nothing was done and the verdict settled. Otherwise: which
+check failed, why, what the fix was, and where the checks stand after the
+push — or, when the wait above was given up, which contexts were still
+pending or failing and for how long. Short.
