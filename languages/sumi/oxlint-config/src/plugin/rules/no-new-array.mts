@@ -1,11 +1,13 @@
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { createRule } from './create-rule.mjs';
+import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * `banned-syntax/no-new-array` — `new Array(...)` in every form is banned
  * (its single-numeric-argument case, which ESLint's `no-array-constructor`
  * allows, is exactly the trap). The call form `Array(...)` is covered by
- * `no-constructor-call`.
+ * `no-constructor-call`. A type wrapper around the constructor
+ * (`new (Array as ArrayConstructor)(3)`) is looked through.
  */
 export const noNewArray = createRule({
   meta: {
@@ -23,9 +25,11 @@ export const noNewArray = createRule({
   defaultOptions: [],
   create: (context) => ({
     NewExpression: (node) => {
+      const callee = skipTypeWrappers(node.callee);
+
       if (
-        node.callee.type === AST_NODE_TYPES.Identifier &&
-        node.callee.name === 'Array'
+        callee.type === AST_NODE_TYPES.Identifier &&
+        callee.name === 'Array'
       ) {
         context.report({ node, messageId: 'noNewArray' });
       }

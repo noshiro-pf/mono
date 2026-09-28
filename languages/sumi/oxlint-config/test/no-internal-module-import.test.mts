@@ -109,6 +109,18 @@ const files = {
     'dynamic-reach.mts',
     "export const load = async (): Promise<number> => (await import('./a/b.mjs')).b;\n",
   ),
+  dynamicWrappedReach: write(
+    'dynamic-wrapped-reach.mts',
+    "export const load = async (): Promise<number> => (await import('./a/b.mjs' satisfies string)).b;\n",
+  ),
+  dynamicTemplateReach: write(
+    'dynamic-template-reach.mts',
+    'export const load = async (): Promise<number> => (await import(`./a/b.mjs`)).b;\n',
+  ),
+  dynamicWrappedInternal: write(
+    'dynamic-wrapped-internal.mts',
+    "export const load = async (): Promise<number> => (await import('@scope/legacy/lib/deep.js' as string)).deep;\n",
+  ),
 } as const;
 
 const run = runOxlint(Object.values(files));
@@ -147,5 +159,17 @@ describe('sumi/no-internal-module-import', () => {
     assert.deepStrictEqual(codesOf(files.reach), [CODE]);
 
     assert.deepStrictEqual(codesOf(files.dynamicReach), [CODE]);
+  });
+});
+
+describe('sumi/no-internal-module-import through type wrappers', () => {
+  test('a dynamic specifier behind `satisfies` or `as` is still judged', () => {
+    assert.deepStrictEqual(codesOf(files.dynamicWrappedReach), [CODE]);
+
+    assert.deepStrictEqual(codesOf(files.dynamicWrappedInternal), [CODE]);
+  });
+
+  test('a template literal with no substitutions is a string specifier', () => {
+    assert.deepStrictEqual(codesOf(files.dynamicTemplateReach), [CODE]);
   });
 });

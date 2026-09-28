@@ -423,7 +423,9 @@ const removeAsConstInConstTypeParameterArgs = (
     const args = call.getArguments();
 
     // Cheap syntactic pre-check before touching the type checker
-    if (!args.some(isAsConstNode)) {
+    if (
+      args.every((arg) => !isAsConstNode(skipParenthesizedExpressions(arg)))
+    ) {
       continue;
     }
 
@@ -478,7 +480,14 @@ const removeAsConstArgsOfCall = (
       return;
     }
 
-    if (argument.wasForgotten() || !isAsConstNode(argument)) {
+    if (argument.wasForgotten()) {
+      continue;
+    }
+
+    // `f(([1] as const))` is the same argument as `f([1] as const)`.
+    const asConst = skipParenthesizedExpressions(argument);
+
+    if (!isAsConstNode(asConst)) {
       continue;
     }
 
@@ -503,9 +512,16 @@ const removeAsConstArgsOfCall = (
       argument.getText(),
     );
 
-    options.replaceNode(argument, argument.getExpression().getText());
+    // The parentheses go with it: an argument needs none of its own.
+    options.replaceNode(argument, asConst.getExpression().getText());
   }
 };
+
+/** `node` with the parentheses written around it taken off. */
+const skipParenthesizedExpressions = (node: tsm.Node): tsm.Node =>
+  tsm.Node.isParenthesizedExpression(node)
+    ? skipParenthesizedExpressions(node.getExpression())
+    : node;
 
 type ResolvedCallTarget = Readonly<{
   parameters: readonly tsm.ParameterDeclaration[];

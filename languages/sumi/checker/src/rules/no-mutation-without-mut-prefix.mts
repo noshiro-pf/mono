@@ -55,8 +55,10 @@ import { type Rule, type RuleContext } from '../engine/index.mjs';
  *
  * A `for … of` / `for … in` whose target is a member access
  * (`for (obj.current of xs)`) assigns on every iteration and is reported like
- * an assignment. Parentheses and `as` around a target (`(obj.x as T) = 1`)
- * are looked through.
+ * an assignment. Parentheses and type wrappers — `as`, `satisfies`, `!`,
+ * `<T>` — are looked through wherever they appear: around a target
+ * (`(obj.x satisfies T) = 1`), a callee (`(xs.push)(1)`) or a receiver, whose
+ * method is resolved on the type of the value rather than of the cast.
  *
  * One known gap: a destructuring assignment whose targets are member accesses
  * (`[a.x, b.y] = pair`) is not reported, because the left of the assignment is
@@ -110,7 +112,8 @@ export const noMutationWithoutMutPrefix: Rule = {
       return;
     }
 
-    const callee = node.expression;
+    // `(xs.push)(1)` and `(xs.push as F)(1)` still call `push` on `xs`.
+    const callee = unwrap(node.expression);
 
     if (!isPropertyAccessExpression(callee)) {
       return;
@@ -430,7 +433,7 @@ const isFreshValue = (
     return false;
   }
 
-  const callee = unwrapped.expression;
+  const callee = unwrap(unwrapped.expression);
 
   if (!isPropertyAccessExpression(callee)) {
     return false;

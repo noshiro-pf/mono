@@ -224,3 +224,78 @@ describe(noMutationWithoutMutPrefix.ruleId, () => {
     ],
   });
 });
+
+describe(`${noMutationWithoutMutPrefix.ruleId} through type wrappers`, () => {
+  testRule(noMutationWithoutMutPrefix, {
+    valid: [
+      {
+        name: 'a `mut_` receiver behind `satisfies` or `<T>`',
+        code: dedent`
+          const mut_xs: number[] = [];
+          (mut_xs satisfies number[]).push(1);
+          (<number[]>mut_xs).push(2);
+          export const mutated = mut_xs;
+        `,
+      },
+      {
+        name: 'a value made on the spot, behind `satisfies`',
+        code: dedent`
+          declare const source: Readonly<{ a: number }>;
+          export const sorted = ([3, 1, 2] satisfies number[]).sort();
+          export const merged = Object.assign({} satisfies object, source);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an assignment target behind `satisfies` or `<T>`',
+        code: dedent`
+          const o: { a: number } = { a: 1 };
+          (o.a satisfies number) = 2;
+          (o.a satisfies number) += 1;
+          for ((o.a satisfies number) of [1, 2]) {
+            // each iteration assigns o.a
+          }
+          (<number>o.a) = 3;
+          export const oOut = o;
+        `,
+        errors: [
+          { messageId: 'assignment', line: 2 },
+          { messageId: 'assignment', line: 3 },
+          { messageId: 'assignment', line: 4 },
+          { messageId: 'assignment', line: 7 },
+        ],
+      },
+      {
+        name: 'a mutator called through a wrapped callee',
+        code: dedent`
+          const xs: number[] = [];
+          (xs.push)(1);
+          (xs.push satisfies (...items: number[]) => number)(1);
+          (xs.sort as () => number[])();
+          (xs.reverse)!();
+          export const xsOut = xs;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 2 },
+          { messageId: 'mutatingCall', line: 3 },
+          { messageId: 'mutatingCall', line: 4 },
+          { messageId: 'mutatingCall', line: 5 },
+        ],
+      },
+      {
+        name: 'a receiver cast to a type whose method is not a built-in’s',
+        code: dedent`
+          const ys: number[] = [];
+          (ys as { push: (...items: number[]) => number }).push(1);
+          (<{ sort: () => unknown }>ys).sort();
+          export const ysOut = ys;
+        `,
+        errors: [
+          { messageId: 'mutatingCall', line: 2 },
+          { messageId: 'mutatingCall', line: 3 },
+        ],
+      },
+    ],
+  });
+});
