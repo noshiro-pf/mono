@@ -829,3 +829,77 @@ ruleTester.run(
     ],
   } as const,
 );
+
+describe('no-unsafe-mutable-readonly-assignment through type wrappers', () => {
+  ruleTester.run(
+    'no-unsafe-mutable-readonly-assignment',
+    noUnsafeMutableReadonlyAssignment,
+    {
+      valid: [
+        {
+          name: 'a cast that keeps the source mutable',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            declare const ma: MutableA;
+            const mb = ma as MutableA;
+            const mc = ma satisfies MutableA;
+          `,
+        },
+        {
+          name: 'an empty literal cast to a readonly type',
+          filename: 'file.ts',
+          code: dedent`
+            type ReadonlyA = Readonly<{ a?: string }>;
+            const ra = {} as ReadonlyA;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a mutable value cast to a readonly type',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            type ReadonlyA = Readonly<MutableA>;
+            declare const func: (p: ReadonlyA) => void;
+            declare const mutableA: MutableA;
+            func(mutableA as ReadonlyA);
+            const r: ReadonlyA = mutableA as ReadonlyA;
+            const s: ReadonlyA = <ReadonlyA>mutableA;
+          `,
+          errors: [
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSAsExpression,
+            },
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSAsExpression,
+            },
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSTypeAssertion,
+            },
+          ],
+        },
+        {
+          name: 'a mutable value cast through unknown',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            type ReadonlyA = Readonly<MutableA>;
+            declare const mutableA: MutableA;
+            const r = mutableA as unknown as ReadonlyA;
+          `,
+          errors: [
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSAsExpression,
+            },
+          ],
+        },
+      ],
+    },
+  );
+});

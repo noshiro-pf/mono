@@ -69,3 +69,38 @@ tester.run(ruleName, propsTypeAnnotationStyleRule, {
     },
   ],
 });
+
+describe('props-type-annotation-style through type wrappers', () => {
+  tester.run(ruleName, propsTypeAnnotationStyleRule, {
+    valid: [
+      {
+        name: 'a wrapped arrow function without annotation',
+        code: dedent`
+          const Component = React.memo<Props>(((props) => {
+            return React.createElement('div', props);
+          }) satisfies React.FC<Props>);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'arrow function wrapped in `satisfies`',
+        code: dedent`
+          const Component = React.memo(((props: Props) => {
+            return React.createElement('div', props);
+          }) satisfies React.FC<Props>);
+        `,
+        errors: [{ messageId: 'disallowPropsTypeAnnotation' }],
+      },
+      {
+        name: 'memo callee wrapped in `as`',
+        code: dedent`
+          const Component = (React.memo as typeof React.memo)((props: Props) => {
+            return React.createElement('div', props);
+          });
+        `,
+        errors: [{ messageId: 'disallowPropsTypeAnnotation' }],
+      },
+    ],
+  });
+});

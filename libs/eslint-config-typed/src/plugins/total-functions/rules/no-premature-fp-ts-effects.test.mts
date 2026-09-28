@@ -107,3 +107,56 @@ ruleTester.run('no-premature-fp-ts-effects', noPrematureFpTsEffects, {
     },
   ],
 } as const);
+
+describe('no-premature-fp-ts-effects through type wrappers', () => {
+  ruleTester.run('no-premature-fp-ts-effects', noPrematureFpTsEffects, {
+    valid: [
+      {
+        name: 'a wrapped function that is not an effect at any layer',
+        filename: 'file.ts',
+        code: dedent`
+          declare const f: () => void;
+          (f satisfies () => void)();
+          f!();
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'an effect cast to a plain function',
+        filename: 'file.ts',
+        code: dedent`
+          export interface IO<A> {
+            (): A
+          }
+          declare const effect: IO<void>;
+          (effect as () => void)();
+          (<() => void>effect)();
+          (effect satisfies unknown as () => void)();
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a plain function cast to an effect',
+        filename: 'file.ts',
+        code: dedent`
+          export interface IO<A> {
+            (): A
+          }
+          declare const f: () => void;
+          declare const effect: IO<void>;
+          (f as IO<void>)();
+          effect!();
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+    ],
+  });
+});

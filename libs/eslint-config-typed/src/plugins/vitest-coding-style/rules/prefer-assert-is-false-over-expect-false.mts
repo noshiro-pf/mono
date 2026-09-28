@@ -5,12 +5,19 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
+import { argumentText, withoutTypeWrappers } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverExpectFalse';
 
 type Options = readonly [];
 
+/**
+ * `expect(X).toBe(false)` becomes `assert.isFalse(X)` when `X` is a boolean. The
+ * calls, the `expect` function and the `false` are read through `as`,
+ * `satisfies`, `!` and `<T>`; `X` keeps its wrappers, and its type is asked
+ * with them, since that is the argument `assert.isFalse` receives.
+ */
 export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -36,21 +43,33 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
 
     return {
       CallExpression: (node) => {
+        const callee = withoutTypeWrappers(node.callee);
+
+        if (callee.type !== AST_NODE_TYPES.MemberExpression) {
+          return;
+        }
+
+        const expectCall = withoutTypeWrappers(callee.object);
+
+        const [rawExpected] = node.arguments;
+
+        const expected =
+          rawExpected === undefined ||
+          rawExpected.type === AST_NODE_TYPES.SpreadElement
+            ? rawExpected
+            : withoutTypeWrappers(rawExpected);
+
         if (
-          node.callee.type === AST_NODE_TYPES.MemberExpression &&
-          node.callee.object.type === AST_NODE_TYPES.CallExpression &&
-          getVitestReceiver(
-            context.sourceCode,
-            node.callee.object.callee,
-            'expect',
-          ) !== undefined &&
-          node.callee.property.type === AST_NODE_TYPES.Identifier &&
-          node.callee.property.name === 'toBe' &&
+          expectCall.type === AST_NODE_TYPES.CallExpression &&
+          getVitestReceiver(context.sourceCode, expectCall.callee, 'expect') !==
+            undefined &&
+          callee.property.type === AST_NODE_TYPES.Identifier &&
+          callee.property.name === 'toBe' &&
           Arr.isFixedLengthTuple(1, node.arguments) &&
-          node.arguments[0].type === AST_NODE_TYPES.Literal &&
-          node.arguments[0].value === false
+          expected?.type === AST_NODE_TYPES.Literal &&
+          expected.value === false
         ) {
-          const arg = node.callee.object.arguments[0];
+          const arg = expectCall.arguments[0];
 
           if (arg !== undefined) {
             const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
@@ -64,7 +83,8 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
             }
           }
 
-          const argText = context.sourceCode.getText(arg);
+          const argText =
+            arg === undefined ? '' : argumentText(context.sourceCode.text, arg);
 
           context.report({
             node,

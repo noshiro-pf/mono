@@ -306,3 +306,61 @@ describe('no-restricted-cast-name', () => {
     );
   });
 });
+
+describe('no-restricted-cast-name with parenthesized operands', () => {
+  const toUnknown = [
+    { name: 'any', fixWith: { kind: 'type', name: 'unknown' } },
+  ] as const;
+
+  const toCast = [
+    { name: 'any', fixWith: { kind: 'function', name: 'cast' } },
+  ] as const;
+
+  tester.run('no-restricted-cast-name', noRestrictedCastName, {
+    valid: [],
+    invalid: [
+      {
+        name: 'an `as` keeps the parentheses around its operand',
+        code: 'const f = () => ({ a: 1 }) as any;',
+        options: toUnknown,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const f = () => ({ a: 1 }) as unknown;',
+      },
+      {
+        name: 'a comma expression passed to the function keeps its parentheses',
+        code: 'const y = (log(), x) as any;',
+        options: toCast,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const y = cast((log(), x));',
+      },
+      {
+        name: 'a comma expression under `<T>` passed to the function',
+        code: 'const y = <any>(log(), x);',
+        options: toCast,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const y = cast((log(), x));',
+      },
+      {
+        name: '`<T>` turned into `as` under a binary operator is parenthesized',
+        code: 'const y = 1 + <any>s;',
+        options: toUnknown,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const y = 1 + (s as unknown);',
+      },
+      {
+        name: 'the operand of `<T>` turned into `as` keeps its parentheses',
+        code: 'const y = <any>(a == b);',
+        options: toUnknown,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const y = (a == b) as unknown;',
+      },
+      {
+        name: 'an object literal under `<T>` in an arrow body',
+        code: 'const f = () => <any>{ a: 1 };',
+        options: toUnknown,
+        errors: [{ messageId: 'restrictedCast' }],
+        output: 'const f = () => ({ a: 1 }) as unknown;',
+      },
+    ],
+  });
+});

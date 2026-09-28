@@ -222,3 +222,85 @@ describe('prefer-non-mutating-array-method', () => {
     ],
   });
 });
+
+describe('prefer-non-mutating-array-method through type wrappers', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [
+      {
+        name: 'a cast does not make a Set an array',
+        code: dedent`
+          declare const s: ReadonlySet<number>;
+          Array.from(s as unknown as number[]).sort();
+        `,
+      },
+      {
+        name: 'a cast does not make a fill value safe to re-evaluate',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const f: () => number;
+          const y = Array.from(xs).fill(f() as number);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the `Array.from()` call is wrapped in `as` or `!`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = (Array.from(xs) as number[]).sort();
+          const z = Array.from(xs)!.reverse();
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = (xs as number[]).toSorted();
+          const z = xs!.toReversed();
+        `,
+        errors: [
+          { messageId: 'preferNonMutatingMethod' },
+          { messageId: 'preferNonMutatingMethod' },
+        ],
+      },
+      {
+        name: 'a fill value wrapped in `satisfies`',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs).fill(0 satisfies number);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = xs.map(() => 0 satisfies number);
+        `,
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-non-mutating-array-method with parenthesized operands', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a comma expression argument keeps its parentheses',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare function log(): void;
+          declare const cmp: (a: number, b: number) => number;
+          const y = Array.from(xs).sort((log(), cmp));
+          const z = Array.from(xs).splice(0, (log(), 1));
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          declare function log(): void;
+          declare const cmp: (a: number, b: number) => number;
+          const y = xs.toSorted((log(), cmp));
+          const z = xs.toSpliced(0, (log(), 1));
+        `,
+        errors: [
+          { messageId: 'preferNonMutatingMethod' },
+          { messageId: 'preferNonMutatingMethod' },
+        ],
+      },
+    ],
+  });
+});

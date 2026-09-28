@@ -1,5 +1,6 @@
 import { type TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper, type TypeWrapper } from '../../ast-utils/index.mjs';
 
 type MessageIds = 'non-tree-shakable-access';
 
@@ -67,11 +68,19 @@ const checkModuleNamespaceUsage = (
   }
 };
 
+/** `node`, or the outermost of the type wrappers directly around it. */
+const outermostTypeWrapper = (
+  node:
+    DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier> | TypeWrapper,
+): DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier> | TypeWrapper =>
+  isTypeWrapper(node.parent) ? outermostTypeWrapper(node.parent) : node;
+
 const isTreeShakingSafeReference = (
   identifier: DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier>,
 ): boolean => {
-  // Only allow `id.foo` or `id["foo"]` references.
-  const parent = identifier.parent;
+  // Only allow `id.foo` or `id["foo"]` references. A type wrapper is erased
+  // before bundling, so `(id as T).foo` and `id!.foo` are `id.foo`.
+  const { parent } = outermostTypeWrapper(identifier);
   // if (parent === undefined) {
   //   return false;
   // }

@@ -6,8 +6,8 @@ import {
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
-import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 

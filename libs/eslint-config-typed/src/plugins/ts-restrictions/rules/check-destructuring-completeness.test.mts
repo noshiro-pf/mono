@@ -286,3 +286,84 @@ describe('check-destructuring-completeness', () => {
   // this file finishes in ~6s with coverage, but it is scheduled alongside
   // the package's other 37 coverage-instrumented files and can starve.
 }, 60000);
+
+describe('check-destructuring-completeness through type wrappers', () => {
+  tester.run(
+    'check-destructuring-completeness',
+    checkDestructuringCompleteness,
+    {
+      valid: [
+        {
+          name: 'a complete destructuring of wrapped props',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const MyComponent = (props: Props) => {
+              const { a, b, c } = props satisfies Props;
+              return <div>{a}{b}{c}</div>;
+            };
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'props wrapped in `satisfies`, `!` or `as`',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const A = (props: Props) => {
+              const { a, b } = props satisfies Props;
+              return <div>{a}{b}</div>;
+            };
+            const B = (props: Props | undefined) => {
+              const { a, b } = props!;
+              return <div>{a}{b}</div>;
+            };
+            const C = (props: Props) => {
+              const { a, b } = props as Pick<Props, 'a' | 'b'>;
+              return <div>{a}{b}</div>;
+            };
+          `,
+          errors: [
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+          ],
+        },
+        {
+          name: 'a component whose returned JSX is wrapped',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const A = ({ a, b }: Props) => (<div>{a}{b}</div>) satisfies React.ReactNode;
+            const B = ({ a, b }: Props) => <div>{a}{b}</div> as React.ReactElement;
+            const C = (props: Props) => {
+              const { a, b } = props;
+              return (<div>{a}{b}</div>) satisfies React.ReactNode;
+            };
+          `,
+          errors: [
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+            {
+              messageId: 'incompleteDestructuring',
+              data: { missingProps: 'c' },
+            },
+          ],
+        },
+      ],
+    },
+  );
+}, 60000);

@@ -1,13 +1,28 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  ESLintUtils,
+  type TSESTree,
+} from '@typescript-eslint/utils';
 import {
   isTypeAssignableToString,
   isTypeFlagSet,
   unionTypeParts,
 } from 'tsutils';
-import { TypeFlags } from 'typescript';
+import { type Type, TypeFlags } from 'typescript';
 import { createRule } from './common.mjs';
+import {
+  typeWrapperLayers,
+  withoutTypeWrappers,
+} from './type-wrapper-layers.mjs';
 
-/** An ESLint rule to ban partial String.prototype.normalize(). */
+/**
+ * An ESLint rule to ban partial String.prototype.normalize().
+ *
+ * The callee, its receiver, a computed key and the argument are read through
+ * `as`, `satisfies`, `!` and `<T>`: the receiver is a string, and the key is
+ * `normalize`, if the type at any wrapper layer says so, and the argument is a
+ * safe form only if its own type — not a cast — says so.
+ */
 
 export const noPartialStringNormalize = createRule({
   name: 'no-partial-string-normalize',
@@ -27,21 +42,31 @@ export const noPartialStringNormalize = createRule({
 
     const checker = parserServices.program.getTypeChecker();
 
+    const typeOf = (expression: TSESTree.Expression): Type =>
+      checker.getTypeAtLocation(
+        parserServices.esTreeNodeToTSNodeMap.get(expression),
+      );
+
     return {
       CallExpression: (node) => {
         // We only care if this call is a member expression.
+        // `s.normalize!(f)` and `(s.normalize satisfies unknown)(f)` call the
+        // same method.
 
-        if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+        const callee = withoutTypeWrappers(node.callee);
+
+        if (callee.type !== AST_NODE_TYPES.MemberExpression) {
           return;
         }
 
-        const objectType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(node.callee.object),
-        );
+        // We only care if this call is on a string object — as the value's
+        // own type or as any type it is asserted to have on the way.
 
-        // We only care if this call is on a string object.
-
-        if (!isTypeAssignableToString(checker, objectType)) {
+        if (
+          typeWrapperLayers(callee.object).every(
+            (layer) => !isTypeAssignableToString(checker, typeOf(layer)),
+          )
+        ) {
           return;
         }
 
@@ -58,22 +83,21 @@ export const noPartialStringNormalize = createRule({
         // Or this form:
         // const n: "normalize" | "includes" = ...;
         // const foo = ""[n]("");
-        const isNormalize =
-          (node.callee.property.type === AST_NODE_TYPES.Literal &&
-            node.callee.computed &&
-            node.callee.property.value === 'normalize') ||
-          (node.callee.property.type === AST_NODE_TYPES.Identifier &&
-            !node.callee.computed &&
-            node.callee.property.name === 'normalize') ||
-          (node.callee.property.type === AST_NODE_TYPES.Identifier &&
-            node.callee.computed &&
-            unionTypeParts(
-              checker.getTypeAtLocation(
-                parserServices.esTreeNodeToTSNodeMap.get(node.callee.property),
-              ),
-            ).some(
-              (type) => type.isStringLiteral() && type.value === 'normalize',
-            ));
+        //
+        // A computed key is read through its type wrappers
+        // (`""["normalize" satisfies string]`, `""[n!]`), and is a normalize
+        // if the type at any of them says it may be.
+        const isNormalize = callee.computed
+          ? typeWrapperLayers(callee.property).some((key) =>
+              key.type === AST_NODE_TYPES.Literal
+                ? key.value === 'normalize'
+                : unionTypeParts(typeOf(key)).some(
+                    (type) =>
+                      type.isStringLiteral() && type.value === 'normalize',
+                  ),
+            )
+          : callee.property.type === AST_NODE_TYPES.Identifier &&
+            callee.property.name === 'normalize';
 
         // We only care if this call is to the normalize method.
 
@@ -86,13 +110,18 @@ export const noPartialStringNormalize = createRule({
           return;
         }
 
-        const argument = node.arguments[0];
+        const rawArgument = node.arguments[0];
 
-        if (argument === undefined) {
+        if (rawArgument === undefined) {
           // We only care if the caller provides an argument.
           // Zero arguments (`"".normalize()`) is always safe.
           return;
         }
+
+        const argument =
+          rawArgument.type === AST_NODE_TYPES.SpreadElement
+            ? rawArgument
+            : withoutTypeWrappers(rawArgument);
 
         const safeValues = new Set(['NFC', 'NFD', 'NFKC', 'NFKD']);
 
@@ -108,11 +137,7 @@ export const noPartialStringNormalize = createRule({
 
         if (
           argument.type === AST_NODE_TYPES.Identifier &&
-          unionTypeParts(
-            checker.getTypeAtLocation(
-              parserServices.esTreeNodeToTSNodeMap.get(argument),
-            ),
-          ).every(
+          unionTypeParts(typeOf(argument)).every(
             (type) =>
               (type.isStringLiteral() && safeValues.has(type.value)) ||
               isTypeFlagSet(type, TypeFlags.Undefined),

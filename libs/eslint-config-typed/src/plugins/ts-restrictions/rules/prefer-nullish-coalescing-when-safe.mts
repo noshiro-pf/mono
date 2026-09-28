@@ -6,8 +6,9 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 
@@ -307,9 +308,12 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
      */
     const rhsIsMatchingFalsyLiteral = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      right: TSESTree.Expression,
+      wrappedRight: TSESTree.Expression,
       tag: FalsyValueTag,
     ): boolean => {
+      // `'' satisfies string` is the literal `''` all the same.
+      const right = asNode(skipTypeWrappers(wrappedRight));
+
       if (!isSideEffectFreeSimpleExpression(right)) {
         return false;
       }
@@ -375,7 +379,11 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
           return;
         }
 
-        const summary = summarizeExpressionType(node.left);
+        // The value's own type: `m.get(k)!` may still be `undefined`, and
+        // `(s as 'a') || 'x'` may still see `''`.
+        const left = asNode(skipTypeWrappers(node.left));
+
+        const summary = summarizeExpressionType(left);
 
         if (summary === 'unsafe') {
           return;
@@ -486,7 +494,11 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
           return;
         }
 
-        const summary = summarizeExpressionType(node.left);
+        // The value's own type: `m.get(k)!` may still be `undefined`, and
+        // `(s as 'a') || 'x'` may still see `''`.
+        const left = asNode(skipTypeWrappers(node.left));
+
+        const summary = summarizeExpressionType(left);
 
         if (summary === 'unsafe') {
           return;
@@ -509,7 +521,7 @@ export const preferNullishCoalescingWhenSafe: TSESLint.RuleModule<
         // so only plain identifier targets are rewritten there.
         if (
           summary.falsyValues.size > 0 &&
-          node.left.type !== AST_NODE_TYPES.Identifier
+          left.type !== AST_NODE_TYPES.Identifier
         ) {
           return;
         }
@@ -623,3 +635,11 @@ const isSideEffectFreeSimpleExpression = (
   node.type === AST_NODE_TYPES.Identifier ||
   (node.type === AST_NODE_TYPES.TemplateLiteral &&
     Arr.isEmpty(node.expressions));
+
+/**
+ * The `@typescript-eslint/utils` helpers take mutable nodes; this rule only
+ * ever reads them.
+ */
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

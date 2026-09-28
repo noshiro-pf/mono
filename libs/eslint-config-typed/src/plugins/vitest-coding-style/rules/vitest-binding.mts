@@ -5,6 +5,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { isTypeWrapper } from '../../ast-utils/index.mjs';
+import { withoutTypeWrappers } from './type-wrappers.mjs';
 
 /**
  * The identifier a `<receiver>.<method>(...)` call is made on, when that
@@ -34,6 +36,11 @@ import { Arr } from 'ts-data-forge';
  * The identifier is returned rather than a boolean so that a fixer can reuse
  * its text: rewriting `a.ok(x)` to `assert.isTrue(x)` would name a binding the
  * file may not have.
+ *
+ * `node` is read through the type wrappers around it, so
+ * `(assert as typeof assert).ok(x)` and `assert!.ok(x)` are Vitest's `assert`
+ * too. The identifier returned is then the one inside the wrappers, and is not
+ * `node`: a fixer that replaces it must leave the wrappers around it.
  */
 export const getVitestReceiver = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -42,18 +49,23 @@ export const getVitestReceiver = (
   node: TSESTree.Node,
   expectedName: 'assert' | 'expect',
 ): TSESTree.Identifier | undefined => {
-  if (node.type !== AST_NODE_TYPES.Identifier) {
+  const receiver = isTypeWrapper(node) ? withoutTypeWrappers(node) : node;
+
+  if (receiver.type !== AST_NODE_TYPES.Identifier) {
     return undefined;
   }
 
-  const variable = ASTUtils.findVariable(sourceCode.getScope(node), node);
+  const variable = ASTUtils.findVariable(
+    sourceCode.getScope(receiver),
+    receiver,
+  );
 
   const isVitestBinding =
     variable === null || Arr.isEmpty(variable.defs)
-      ? node.name === expectedName
+      ? receiver.name === expectedName
       : variable.defs.every((def) => isVitestImportOf(def, expectedName));
 
-  return isVitestBinding ? node : undefined;
+  return isVitestBinding ? receiver : undefined;
 };
 
 const isVitestImportOf = (

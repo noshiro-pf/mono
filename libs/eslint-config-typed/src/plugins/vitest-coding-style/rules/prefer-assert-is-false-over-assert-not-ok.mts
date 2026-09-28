@@ -1,10 +1,16 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { isCalleeOfCall } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverAssertNotOk';
 
 type Options = readonly [];
 
+/**
+ * `assert.isNotOk(X)` and `assert.notOk(X)` become `assert.isFalse(X)`. The
+ * receiver and the call are read through `as`, `satisfies`, `!` and `<T>`,
+ * which the fix leaves in place.
+ */
 export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -30,8 +36,7 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
           undefined &&
         node.property.type === AST_NODE_TYPES.Identifier &&
         (node.property.name === 'isNotOk' || node.property.name === 'notOk') &&
-        node.parent.type === AST_NODE_TYPES.CallExpression &&
-        node.parent.callee === node
+        isCalleeOfCall(node)
       ) {
         const { property } = node;
 

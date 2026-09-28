@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 /**
  * Converts a `DeepReadonly` AST node back to the plain node type expected by
@@ -22,12 +23,17 @@ export const castNode = <N extends TSESTree.Node>(node: DeepReadonly<N>): N =>
 const isReactMemberExpression = (
   node: DeepReadonly<TSESTree.MemberExpression>,
   propertyName: string,
-): boolean =>
-  node.object.type === AST_NODE_TYPES.Identifier &&
-  node.object.name === 'React' &&
-  node.property.type === AST_NODE_TYPES.Identifier &&
-  node.property.name === propertyName &&
-  !node.computed;
+): boolean => {
+  const object = skipTypeWrappers(node.object);
+
+  return (
+    object.type === AST_NODE_TYPES.Identifier &&
+    object.name === 'React' &&
+    node.property.type === AST_NODE_TYPES.Identifier &&
+    node.property.name === propertyName &&
+    !node.computed
+  );
+};
 
 /**
  * Check if the given identifier is imported from "react"
@@ -89,24 +95,26 @@ const isImportedFromReact = (
  * Check if the given CallExpression is a React API call.
  * Supports both namespace imports (React.memo) and named imports (memo).
  * Verifies that the identifier is actually imported from "react".
+ * Type wrappers around the callee and around `React` are looked through:
+ * `(React.memo as typeof React.memo)(...)` and `React.memo!(...)` are memo
+ * calls.
  */
 export const isReactApiCall = (
   context: DeepReadonly<TSESLint.RuleContext<string, unknown[]>>,
   node: DeepReadonly<TSESTree.CallExpression>,
   apiName: string,
 ): boolean => {
+  const callee = skipTypeWrappers(node.callee);
+
   // Check for named import: memo(...)
-  if (
-    node.callee.type === AST_NODE_TYPES.Identifier &&
-    node.callee.name === apiName
-  ) {
+  if (callee.type === AST_NODE_TYPES.Identifier && callee.name === apiName) {
     return isImportedFromReact(context, apiName);
   }
 
   // Check for namespace import: React.memo(...)
   if (
-    node.callee.type === AST_NODE_TYPES.MemberExpression &&
-    isReactMemberExpression(node.callee, apiName)
+    callee.type === AST_NODE_TYPES.MemberExpression &&
+    isReactMemberExpression(callee, apiName)
   ) {
     return isImportedFromReact(context, 'React');
   }
@@ -114,12 +122,45 @@ export const isReactApiCall = (
   return false;
 };
 
+/**
+ * The arrow function passed to `React.memo` as its first argument, type
+ * wrappers around it taken off:
+ * `React.memo(((props) => …) satisfies React.FC<Props>)` passes one.
+ */
 export const getReactMemoArrowFunction = (
   node: DeepReadonly<TSESTree.CallExpression>,
 ): DeepReadonly<TSESTree.ArrowFunctionExpression> | undefined => {
   const [firstArgument] = node.arguments;
 
-  return firstArgument?.type !== AST_NODE_TYPES.ArrowFunctionExpression
+  if (
+    firstArgument === undefined ||
+    firstArgument.type === AST_NODE_TYPES.SpreadElement
+  ) {
+    return undefined;
+  }
+
+  const argument = skipTypeWrappers(firstArgument);
+
+  return argument.type !== AST_NODE_TYPES.ArrowFunctionExpression
     ? undefined
-    : firstArgument;
+    : argument;
+};
+
+/**
+ * The outermost type wrapper whose value is `node`'s, or `node` itself when
+ * its parent is not one: from the arrow function in
+ * `((props) => <div />) satisfies React.FC as React.FC`, the `as` expression.
+ * A rule that asks where a value ends up (a variable's initializer, a call's
+ * argument) asks it of the node this returns.
+ */
+export const climbTypeWrappers = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
+  const { parent } = node;
+
+  return parent !== undefined &&
+    isTypeWrapper(parent) &&
+    parent.expression === node
+    ? climbTypeWrappers(parent)
+    : node;
 };

@@ -173,3 +173,39 @@ describe('no-string-spread', () => {
     ],
   });
 });
+
+describe('no-string-spread through type wrappers', () => {
+  tester.run('no-string-spread', noStringSpread, {
+    valid: [
+      {
+        name: 'a cast to a non-string type of a non-string value',
+        code: dedent`
+          declare const xs: readonly string[];
+          const ys = [...(xs as Iterable<string>)];
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a string cast to an iterable is still a string',
+        code: dedent`
+          declare const s: string;
+          const cs = [...(s as Iterable<string>)];
+          const ds = [...(s satisfies Iterable<string>)];
+        `,
+        errors: [
+          { messageId: 'noStringSpread' },
+          { messageId: 'noStringSpread' },
+        ],
+      },
+      {
+        name: 'a value cast to string is flagged',
+        code: dedent`
+          declare const u: unknown;
+          const cs = [...(u as string)];
+        `,
+        errors: [{ messageId: 'noStringSpread' }],
+      },
+    ],
+  });
+});

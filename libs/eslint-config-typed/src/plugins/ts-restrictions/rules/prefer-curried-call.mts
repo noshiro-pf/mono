@@ -5,7 +5,9 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 
@@ -26,6 +28,10 @@ type MessageIds = 'useFunctionDirectly' | 'useCurriedForm';
  *
  * The arrow's single parameter must appear exactly once, as the first argument
  * of the call, so dropping the wrapper is behavior-preserving.
+ *
+ * The callee is judged through type wrappers, by the type of its value (a cast
+ * cannot lend it a curried signature), and the fix keeps the wrappers,
+ * parenthesizing a callee that needs it: `(c ? g : h)(a, 1)` → `(c ? g : h)(1)`.
  */
 export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -173,16 +179,16 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        const calleeType = getType(call.callee);
+        // The value's own type: `(f as unknown as Curried)` is still `f`.
+        const callee = asNode(skipTypeWrappers(call.callee));
+
+        const calleeType = getType(callee);
 
         const calleeText = sourceCode.getText(call.callee);
 
         if (Arr.isEmpty(restArgs)) {
           // `(a) => f(a)` → `f`
-          if (
-            !isEtaSafeCallee(call.callee) ||
-            !isEffectivelyUnary(calleeType)
-          ) {
+          if (!isEtaSafeCallee(callee) || !isEffectivelyUnary(calleeType)) {
             return;
           }
 
@@ -210,7 +216,15 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        const replacement = `${calleeText}(${restArgs
+        // `getText` leaves out the source's parentheses, which a callee other
+        // than a member access or a call needs: `(c ? g : h)(1)`.
+        const calleeOfCallText = PARENTHESES_FREE_CALLEE_TYPES.has(
+          call.callee.type,
+        )
+          ? calleeText
+          : `(${calleeText})`;
+
+        const replacement = `${calleeOfCallText}(${restArgs
           .map((arg) => sourceCode.getText(arg))
           .join(', ')})`;
 
@@ -340,10 +354,12 @@ const isOptionalParameter = (
  * count (so hoisting it out of the wrapper is safe). Anything not recognized
  * (calls, `new`, `await`, assignments, updates) is treated as impure.
  */
-const isPureExpression = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): boolean => {
+const isPureExpression = (node: DeepReadonly<TSESTree.Node>): boolean => {
+  // A type wrapper evaluates to its operand: `x as number`, `x!`.
+  if (isTypeWrapper(node)) {
+    return isPureExpression(skipTypeWrappers(node));
+  }
+
   if (
     node.type === AST_NODE_TYPES.Literal ||
     node.type === AST_NODE_TYPES.Identifier ||
@@ -403,3 +419,17 @@ const isPureExpression = (
 
   return false;
 };
+
+/**
+ * Callee kinds whose source text can be followed by an argument list without
+ * parentheses.
+ */
+const PARENTHESES_FREE_CALLEE_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
+  AST_NODE_TYPES.Identifier,
+  AST_NODE_TYPES.MemberExpression,
+  AST_NODE_TYPES.CallExpression,
+]);
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

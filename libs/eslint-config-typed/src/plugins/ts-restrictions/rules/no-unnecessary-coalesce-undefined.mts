@@ -2,8 +2,11 @@ import {
   AST_NODE_TYPES,
   ESLintUtils,
   type TSESLint,
+  type TSESTree,
 } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 
@@ -29,6 +32,13 @@ const DEFERRED_TYPE_FLAGS =
 const isUndefinedType = (type: ts.Type): boolean =>
   !type.isUnion() && (type.flags & ts.TypeFlags.Undefined) !== 0;
 
+/**
+ * Removes `x ?? undefined` when the type of `x` excludes `null`. Both operands
+ * are read through type wrappers: `?? (undefined satisfies undefined)` is
+ * matched, and the type asked is that of the value, so `x! ?? undefined` with
+ * a nullable `x` is left alone. The fix keeps the left-hand side's wrappers
+ * and parentheses.
+ */
 export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -98,26 +108,31 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
           return;
         }
 
-        // Only target the literal `?? undefined` syntax.
+        // Only target the literal `?? undefined` syntax, seen through type
+        // wrappers (`?? (undefined satisfies undefined)`).
+        const right = asNode(skipTypeWrappers(node.right));
+
         if (
-          node.right.type !== AST_NODE_TYPES.Identifier ||
-          node.right.name !== 'undefined'
+          right.type !== AST_NODE_TYPES.Identifier ||
+          right.name !== 'undefined'
         ) {
           return;
         }
 
         // Confirm the right-hand side really is the `undefined` value and not a
         // shadowed binding (e.g. `const undefined = 123`), in which case
-        // `x ?? undefined` is not equivalent to `x`.
-        const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.right,
-        );
+        // `x ?? undefined` is not equivalent to `x`. A cast would vouch for
+        // the shadowed binding, so the unwrapped identifier is asked.
+        const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(right);
 
         if (!isUndefinedType(checker.getTypeAtLocation(rightTsNode))) {
           return;
         }
 
-        const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(node.left);
+        // The value's own type: `x!` and `(x as string)` may still be `null`.
+        const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+          asNode(skipTypeWrappers(node.left)),
+        );
 
         const leftType = checker.getTypeAtLocation(leftTsNode);
 
@@ -131,11 +146,39 @@ export const noUnnecessaryCoalesceUndefined: TSESLint.RuleModule<
         context.report({
           node,
           messageId: 'unnecessaryCoalesceUndefined',
-          fix: (fixer) =>
-            fixer.replaceText(node, context.sourceCode.getText(node.left)),
+          fix: (fixer) => {
+            const operatorToken = context.sourceCode.getFirstTokenBetween(
+              node.left,
+              node.right,
+              (token) => token.value === '??',
+            );
+
+            if (operatorToken === null) {
+              return null;
+            }
+
+            const tokenBeforeOperator =
+              context.sourceCode.getTokenBefore(operatorToken);
+
+            if (tokenBeforeOperator === null) {
+              return null;
+            }
+
+            // Remove from the end of the left operand's last token (its
+            // closing parenthesis included, so `(a, b) ?? undefined` keeps its
+            // parentheses) to the end of the whole expression.
+            return fixer.removeRange([
+              tokenBeforeOperator.range[1],
+              node.range[1],
+            ]);
+          },
         });
       },
     };
   },
   defaultOptions: [],
 } as const;
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

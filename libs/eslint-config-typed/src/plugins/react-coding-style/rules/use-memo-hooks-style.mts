@@ -28,11 +28,13 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
         return;
       }
 
-      const parent = node.parent;
+      // `!` and `satisfies` leave the type to `useMemo`; an `as` over them,
+      // as in `React.useMemo(...)! as T`, does not.
+      const { parent } = skipNonAssertingParents(node);
 
       if (
-        (parent.type === AST_NODE_TYPES.TSAsExpression ||
-          parent.type === AST_NODE_TYPES.TSTypeAssertion) &&
+        (parent?.type === AST_NODE_TYPES.TSAsExpression ||
+          parent?.type === AST_NODE_TYPES.TSTypeAssertion) &&
         !isConstAssertion(parent.typeAnnotation)
       ) {
         context.report({
@@ -41,7 +43,7 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
         });
       }
 
-      if (parent.type === AST_NODE_TYPES.TSTypeAnnotation) {
+      if (parent?.type === AST_NODE_TYPES.TSTypeAnnotation) {
         context.report({
           node: castNode(parent),
           messageId: 'disallowUseMemoTypeAnnotation',
@@ -66,6 +68,22 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
   }),
   defaultOptions: [],
 } as const;
+
+/**
+ * The outermost of the `!` and `satisfies` expressions directly around `node`,
+ * or `node` itself when there is none.
+ */
+const skipNonAssertingParents = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
+  const { parent } = node;
+
+  return (parent?.type === AST_NODE_TYPES.TSNonNullExpression ||
+    parent?.type === AST_NODE_TYPES.TSSatisfiesExpression) &&
+    parent.expression === node
+    ? skipNonAssertingParents(parent)
+    : node;
+};
 
 const checkNodeForTypeAnnotations = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,

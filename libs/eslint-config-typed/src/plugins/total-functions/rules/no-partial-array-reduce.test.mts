@@ -269,3 +269,92 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     },
   ],
 } as const);
+
+describe('no-partial-array-reduce through type wrappers', () => {
+  ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
+    valid: [
+      {
+        name: 'a non-empty array literal behind a wrapper is still non-empty',
+        filename: 'file.ts',
+        code: dedent`
+          (["a"] satisfies readonly string[]).reduce(() => "a");
+        `,
+      },
+      {
+        name: 'a wrapped method that is not reduce',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          xs.map!((a) => a);
+          xs['map' satisfies string]((a) => a);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a wrapped callee',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          xs.reduce!((a, b) => a + b);
+          (xs.reduce satisfies unknown)((a, b) => a + b);
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a wrapped computed key',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const k: 'reduce' | undefined;
+          xs['reduce' satisfies string]((a, b) => a + b);
+          xs[k!]((a, b) => a + b);
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a receiver cast to a type that is not an array',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          (xs as { reduce(cb: (a: number, b: number) => number): number }).reduce((a, b) => a + b);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+      {
+        name: 'a receiver asserted to be an array',
+        filename: 'file.ts',
+        code: dedent`
+          declare const u: unknown;
+          (u as number[]).reduce((a, b) => a + b);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+      {
+        name: 'a cast to a non-empty tuple does not prove the array non-empty',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          (xs as unknown as readonly [number, ...number[]]).reduce((a, b) => a + b);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+      {
+        name: 'a key cast to reduce',
+        filename: 'file.ts',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const k: string;
+          xs[k as 'reduce']((a, b) => a + b);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+    ],
+  });
+});

@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
-import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 /**
  * Whether two expressions name the same variable or property, as `x.y` and

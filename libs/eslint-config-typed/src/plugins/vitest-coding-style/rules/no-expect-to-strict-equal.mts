@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import { argumentText, withoutTypeWrappers } from './type-wrappers.mjs';
 
 type MessageIds = 'useAssert';
 
@@ -29,6 +30,9 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
  *
  * The compile-time check is preferred because it is the one that cannot be
  * recovered by adding a second assertion.
+ *
+ * The calls and the `expect` function are read through `as`, `satisfies`, `!`
+ * and `<T>` (`expect(X)!.toStrictEqual(Y)`); `X` and `Y` keep theirs.
  */
 export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
@@ -50,11 +54,13 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
     return {
       CallExpression: (node) => {
-        if (!isToStrictEqualInvocation(node)) {
+        const callee = withoutTypeWrappers(node.callee);
+
+        if (node.optional || !isToStrictEqualMember(callee)) {
           return;
         }
 
-        const expectCall = node.callee.object;
+        const expectCall = withoutTypeWrappers(callee.object);
 
         if (!isExpectCall(expectCall)) {
           return;
@@ -73,9 +79,9 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
         const expectedArgument = node.arguments[0];
 
-        const actualText = sourceCode.getText(actualArgument);
+        const actualText = argumentText(sourceCode.text, actualArgument);
 
-        const expectedText = sourceCode.getText(expectedArgument);
+        const expectedText = argumentText(sourceCode.text, expectedArgument);
 
         const typeArgumentText = getTypeArgumentText(node, sourceCode);
 
@@ -98,42 +104,29 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
   },
 } as const;
 
-const isToStrictEqualInvocation = (
+/** Whether `callee`, with its type wrappers taken off, is `<x>.toStrictEqual`. */
+const isToStrictEqualMember = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-): node is TSESTree.CallExpression &
-  Readonly<{
-    callee: TSESTree.MemberExpression &
-      Readonly<{
-        object: TSESTree.CallExpression;
-        property: TSESTree.Identifier;
-      }>;
-  }> => {
-  if (
-    node.callee.type !== AST_NODE_TYPES.MemberExpression ||
-    node.optional ||
-    node.callee.optional ||
-    node.callee.computed
-  ) {
-    return false;
-  }
-
-  return (
-    node.callee.property.type === AST_NODE_TYPES.Identifier &&
-    node.callee.property.name === 'toStrictEqual' &&
-    node.callee.object.type === AST_NODE_TYPES.CallExpression
-  );
-};
+  callee: TSESTree.Expression,
+): callee is TSESTree.MemberExpression =>
+  callee.type === AST_NODE_TYPES.MemberExpression &&
+  !callee.optional &&
+  !callee.computed &&
+  callee.property.type === AST_NODE_TYPES.Identifier &&
+  callee.property.name === 'toStrictEqual';
 
 const isExpectCall = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-): node is TSESTree.CallExpression &
-  Readonly<{
-    callee: TSESTree.Identifier;
-  }> =>
-  node.callee.type === AST_NODE_TYPES.Identifier &&
-  node.callee.name === 'expect';
+  node: TSESTree.Expression,
+): node is TSESTree.CallExpression => {
+  if (node.type !== AST_NODE_TYPES.CallExpression) {
+    return false;
+  }
+
+  const callee = withoutTypeWrappers(node.callee);
+
+  return callee.type === AST_NODE_TYPES.Identifier && callee.name === 'expect';
+};
 
 const getTypeArgumentText = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -5,6 +5,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper, skipTypeWrappers } from '../../ast-utils/index.mjs';
 import {
   createIsArrayOrTupleType,
   matchArrayFromCall,
@@ -29,6 +31,10 @@ type MessageIds = 'preferNonMutatingMethod';
  * expression result is used as the removed elements. Code of the shape
  * `Array.from(xs).splice(...)` is treated as intending the copy semantics
  * (otherwise the defensive copy is dead), which is exactly `toSpliced`.
+ *
+ * The `Array.from()` call is found through type wrappers, which the fix keeps
+ * (`(Array.from(xs) as T[]).sort()` → `(xs as T[]).toSorted()`), and the
+ * argument's type is that of its value, not of a cast around it.
  */
 const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set([
   'fill',
@@ -46,9 +52,13 @@ const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set([
  * while `map` would create one per slot.
  */
 const isSafeToReEvaluate = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Expression,
+  node: DeepReadonly<TSESTree.Expression>,
 ): boolean => {
+  // A type wrapper evaluates to its operand: `0 satisfies number`.
+  if (isTypeWrapper(node)) {
+    return isSafeToReEvaluate(skipTypeWrappers(node));
+  }
+
   if (
     node.type === AST_NODE_TYPES.Identifier ||
     node.type === AST_NODE_TYPES.ThisExpression ||
@@ -159,8 +169,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           return;
         }
 
-        // The object must be a call of the shape `Array.from(<arg>)`.
-        const inner = callee.object;
+        // The object must be a call of the shape `Array.from(<arg>)`, seen
+        // through type wrappers: `(Array.from(xs) as number[]).sort()`.
+        const inner = asNode(skipTypeWrappers(callee.object));
 
         const arg = matchArrayFromCall(inner);
 
@@ -170,8 +181,12 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
         // The argument must already be an array (not a `Set` / `Map` / iterable
         // where `Array.from()` is a genuine conversion, not a defensive copy).
+        // The value's own type is asked: `s as unknown as number[]` is still a
+        // `Set`.
         const argType = checker.getTypeAtLocation(
-          parserServices.esTreeNodeToTSNodeMap.get(arg),
+          parserServices.esTreeNodeToTSNodeMap.get(
+            asNode(skipTypeWrappers(arg)),
+          ),
         );
 
         if (!isArrayOrTupleType(argType)) {
@@ -190,8 +205,14 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
         const sourceCode = context.sourceCode;
 
+        // `getText` leaves out the parentheses around a comma expression,
+        // which an argument list needs.
         const argsText = node.arguments
-          .map((argument) => sourceCode.getText(argument))
+          .map((argument) =>
+            argument.type === AST_NODE_TYPES.SequenceExpression
+              ? `(${sourceCode.getText(argument)})`
+              : sourceCode.getText(argument),
+          )
           .join(', ');
 
         const replacement = ((): string | undefined => {
@@ -232,13 +253,22 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           node,
           messageId: 'preferNonMutatingMethod',
           data: { mutatingMethod: methodName, replacement },
+          // The `Array.from(...)` call and the `<method>(...)` part are
+          // replaced separately, so that wrappers around the call and the
+          // `?.` between them are kept.
           fix: (fixer) => {
             const objectText = toMemberObjectText(
               sourceCode.getText(arg),
               arg.type,
             );
 
-            return fixer.replaceText(node, `${objectText}.${replacement}`);
+            return [
+              fixer.replaceText(inner, objectText),
+              fixer.replaceTextRange(
+                [callee.property.range[0], node.range[1]],
+                replacement,
+              ),
+            ];
           },
         });
       },
@@ -246,3 +276,7 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
   },
   defaultOptions: [],
 } as const;
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

@@ -149,3 +149,76 @@ describe('display-name', () => {
     });
   });
 });
+
+describe('display-name through type wrappers', () => {
+  tester.run('display-name', displayNameRule, {
+    valid: [
+      {
+        name: 'a wrapped memo call with displayName',
+        code: dedent`
+          const C = React.memo(() => <div />) satisfies React.FC;
+          C.displayName = 'C';
+        `,
+      },
+      {
+        name: 'displayName wrapped in `as const` or `satisfies`',
+        code: dedent`
+          const C = React.memo(() => <div />);
+          C.displayName = 'C' as const;
+          const D = React.memo(() => <div />);
+          D.displayName = 'D' satisfies string;
+          const E = React.memo(() => <div />);
+          E.displayName = \`E\`!;
+        `,
+      },
+      {
+        name: 'the component wrapped on the left of the assignment',
+        code: dedent`
+          const C = React.memo(() => <div />);
+          (C as React.NamedExoticComponent).displayName = 'C';
+          const D = React.memo(() => <div />);
+          D!.displayName = 'D';
+          const E = React.memo(() => <div />);
+          (E.displayName satisfies string | undefined) = 'E';
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'memo call wrapped in `satisfies`, without displayName',
+        code: dedent`
+          const C = React.memo(() => <div />) satisfies React.FC;
+        `,
+        errors: [{ messageId: 'missingDisplayName' }],
+      },
+      {
+        name: 'memo callee wrapped in `as`, without displayName',
+        code: dedent`
+          const C = (React.memo as typeof React.memo)(() => <div />);
+        `,
+        errors: [{ messageId: 'missingDisplayName' }],
+      },
+      {
+        name: 'a wrapped displayName that does not match',
+        code: dedent`
+          const C = React.memo(() => <div />);
+          C.displayName = 'Other' as const;
+        `,
+        errors: [
+          {
+            messageId: 'mismatchedDisplayName',
+            data: { componentName: 'C' },
+          },
+        ],
+      },
+      {
+        name: 'the wrong component wrapped on the left of the assignment',
+        code: dedent`
+          const C = React.memo(() => <div />);
+          (Other as React.NamedExoticComponent).displayName = 'C';
+        `,
+        errors: [{ messageId: 'missingDisplayName' }],
+      },
+    ],
+  });
+});

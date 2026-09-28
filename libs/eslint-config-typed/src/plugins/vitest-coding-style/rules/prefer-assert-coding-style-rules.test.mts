@@ -5,6 +5,7 @@ import { preferAssertDeepStrictEqualOverDeepEqualRule } from './prefer-assert-de
 import { preferAssertIsFalseOverNegatedAssertIsTrueRule } from './prefer-assert-is-false-over-assert-negation.mjs';
 import { preferAssertIsFalseOverAssertNotOkRule } from './prefer-assert-is-false-over-assert-not-ok.mjs';
 import { preferAssertIsFalseOverExpectFalseRule } from './prefer-assert-is-false-over-expect-false.mjs';
+import { preferAssertIsTrueOverNegatedAssertIsFalseRule } from './prefer-assert-is-true-over-assert-negated-is-false.mjs';
 import { preferAssertIsTrueOverAssertRule } from './prefer-assert-is-true-over-assert.mjs';
 import { preferAssertIsTrueOverExpectTrueRule } from './prefer-assert-is-true-over-expect-true.mjs';
 
@@ -292,4 +293,459 @@ describe('chai API', () => {
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert
     assert(1);
   });
+});
+
+describe('prefer-assert-deep-strict-equal-over-deep-equal through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-deep-strict-equal-over-deep-equal',
+    preferAssertDeepStrictEqualOverDeepEqualRule,
+    {
+      valid: [
+        {
+          name: 'a wrapped receiver that is not Vitest’s',
+          code: dedent`
+            import assert from 'node:assert';
+            (assert as typeof assert).deepEqual(a, b);
+          `,
+        },
+        {
+          name: 'a wrapped method that is not called',
+          code: 'const f = assert.deepEqual satisfies unknown;',
+        },
+      ],
+      invalid: [
+        {
+          name: 'a wrapped receiver or method keeps its wrapper',
+          code: dedent`
+            (assert as typeof assert).deepEqual(a, b);
+            assert!.deepEqual(a, b);
+            assert.deepEqual!(a, b);
+            (assert.deepEqual satisfies unknown)(a, b);
+          `,
+          output: dedent`
+            (assert as typeof assert).deepStrictEqual(a, b);
+            assert!.deepStrictEqual(a, b);
+            assert.deepStrictEqual!(a, b);
+            (assert.deepStrictEqual satisfies unknown)(a, b);
+          `,
+          errors: [
+            { messageId: 'preferAssertDeepStrictEqual' },
+            { messageId: 'preferAssertDeepStrictEqual' },
+            { messageId: 'preferAssertDeepStrictEqual' },
+            { messageId: 'preferAssertDeepStrictEqual' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-false-over-assert-is-not-ok through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-assert-is-not-ok',
+    preferAssertIsFalseOverAssertNotOkRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a wrapped receiver or method keeps its wrapper',
+          code: dedent`
+            (assert as typeof assert).notOk(x);
+            assert!.isNotOk(x);
+            assert.notOk!(x);
+          `,
+          output: dedent`
+            (assert as typeof assert).isFalse(x);
+            assert!.isFalse(x);
+            assert.isFalse!(x);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsFalseOverAssertNotOk' },
+            { messageId: 'preferAssertIsFalseOverAssertNotOk' },
+            { messageId: 'preferAssertIsFalseOverAssertNotOk' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-assert through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-true-over-assert',
+    preferAssertIsTrueOverAssertRule,
+    {
+      valid: [
+        {
+          name: 'a wrapped receiver that is not Vitest’s',
+          code: dedent`
+            import assert from 'node:assert';
+            (assert as typeof assert)(x);
+            (assert as typeof assert).ok(x);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a wrapped receiver keeps its wrapper',
+          code: dedent`
+            (assert as typeof assert).ok(x);
+            assert!.isOk(x);
+          `,
+          output: dedent`
+            (assert as typeof assert).isTrue(x);
+            assert!.isTrue(x);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsTrueOverAssert' },
+            { messageId: 'preferAssertIsTrueOverAssert' },
+          ],
+        },
+        {
+          name: 'a wrapped bare callee is reported without a fix',
+          code: dedent`
+            (assert as typeof assert)(x);
+            assert!(x);
+          `,
+          output: null,
+          errors: [
+            { messageId: 'preferAssertIsTrueOverAssert' },
+            { messageId: 'preferAssertIsTrueOverAssert' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-false-over-negated-assert-is-true through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-negated-assert-is-true',
+    preferAssertIsFalseOverNegatedAssertIsTrueRule,
+    {
+      valid: [
+        {
+          name: 'a wrapped receiver that is not Vitest’s',
+          code: dedent`
+            import { assert } from './my-helpers.mjs';
+            (assert as typeof assert).isTrue(!foo);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a wrapped negation',
+          code: dedent`
+            declare const flag: boolean;
+            assert.isTrue(!flag as boolean);
+            assert.isTrue((!flag) satisfies boolean);
+            assert.isTrue(!flag!);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isFalse(flag);
+            assert.isFalse(flag);
+            assert.isFalse(flag!);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsFalseOverAssertNegation' },
+            { messageId: 'preferAssertIsFalseOverAssertNegation' },
+            { messageId: 'preferAssertIsFalseOverAssertNegation' },
+          ],
+        },
+        {
+          name: 'a wrapped receiver keeps its wrapper',
+          code: dedent`
+            (assert as typeof assert).isTrue(!foo);
+            assert!.isTrue(!foo);
+          `,
+          output: dedent`
+            (assert as typeof assert).isFalse(foo);
+            assert!.isFalse(foo);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsFalseOverAssertNegation' },
+            { messageId: 'preferAssertIsFalseOverAssertNegation' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-false-over-negated-assert-is-true with parenthesized operands', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-negated-assert-is-true',
+    preferAssertIsFalseOverNegatedAssertIsTrueRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a sequence expression stays one argument',
+          code: 'assert.isTrue(!(setup(), flag));',
+          output: 'assert.isFalse((setup(), flag));',
+          errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-negated-assert-is-false', () => {
+  ruleTester.run(
+    'prefer-assert-is-true-over-negated-assert-is-false',
+    preferAssertIsTrueOverNegatedAssertIsFalseRule,
+    {
+      valid: [
+        { code: 'assert.isFalse(foo);' },
+        { code: 'assert.isTrue(!foo);' },
+        {
+          code: dedent`
+            import { assert } from './my-helpers.mjs';
+            assert.isFalse(!foo);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          code: 'assert.isFalse(!foo);',
+          output: 'assert.isTrue(foo);',
+          errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
+        },
+        {
+          code: dedent`
+            import { assert as a } from 'vitest';
+            a.isFalse(!foo);
+          `,
+          output: dedent`
+            import { assert as a } from 'vitest';
+            a.isTrue(foo);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-negated-assert-is-false through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-true-over-negated-assert-is-false',
+    preferAssertIsTrueOverNegatedAssertIsFalseRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a wrapped negation',
+          code: dedent`
+            declare const flag: boolean;
+            assert.isFalse(!flag as boolean);
+            assert.isFalse((!flag) satisfies boolean);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag);
+            assert.isTrue(flag);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' },
+            { messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' },
+          ],
+        },
+        {
+          name: 'a wrapped receiver keeps its wrapper',
+          code: '(assert as typeof assert).isFalse(!foo);',
+          output: '(assert as typeof assert).isTrue(foo);',
+          errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-negated-assert-is-false with parenthesized operands', () => {
+  ruleTester.run(
+    'prefer-assert-is-true-over-negated-assert-is-false',
+    preferAssertIsTrueOverNegatedAssertIsFalseRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a sequence expression stays one argument',
+          code: 'assert.isFalse(!(setup(), flag));',
+          output: 'assert.isTrue((setup(), flag));',
+          errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-expect-true through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-over-expect-true',
+    preferAssertIsTrueOverExpectTrueRule,
+    {
+      valid: [
+        {
+          name: 'a wrapped callee that is not Vitest’s',
+          code: dedent`
+            import { expect } from './my-helpers.mjs';
+            declare const flag: boolean;
+            (expect as typeof expect)(flag).toBe(true);
+          `,
+        },
+        {
+          name: 'a wrapped literal that is not true',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag).toBe(false as boolean);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a wrapped true',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag).toBe(true as const);
+            expect(flag).toBe(true satisfies boolean);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag);
+            assert.isTrue(flag);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsTrueOverExpectTrue' },
+            { messageId: 'preferAssertIsTrueOverExpectTrue' },
+          ],
+        },
+        {
+          name: 'a wrapped expect function or expect call',
+          code: dedent`
+            declare const flag: boolean;
+            (expect as typeof expect)(flag).toBe(true);
+            expect(flag)!.toBe(true);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag);
+            assert.isTrue(flag);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsTrueOverExpectTrue' },
+            { messageId: 'preferAssertIsTrueOverExpectTrue' },
+          ],
+        },
+        {
+          name: 'a wrapped argument keeps its wrapper',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag satisfies boolean).toBe(true);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isTrue(flag satisfies boolean);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-true-over-expect-true with parenthesized operands', () => {
+  ruleTester.run(
+    'prefer-assert-is-over-expect-true',
+    preferAssertIsTrueOverExpectTrueRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a sequence expression stays one argument',
+          code: dedent`
+            declare const setup: () => void;
+            declare const flag: boolean;
+            expect((setup(), flag)).toBe(true);
+          `,
+          output: dedent`
+            declare const setup: () => void;
+            declare const flag: boolean;
+            assert.isTrue((setup(), flag));
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-false-over-expect-false through type wrappers', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-expect-false',
+    preferAssertIsFalseOverExpectFalseRule,
+    {
+      valid: [
+        {
+          name: 'a wrapped literal that is not false',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag).toBe(true as boolean);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a wrapped false, expect function or expect call',
+          code: dedent`
+            declare const flag: boolean;
+            expect(flag).toBe(false as const);
+            expect(flag).toBe(false satisfies boolean);
+            (expect as typeof expect)(flag).toBe(false);
+            expect(flag)!.toBe(false);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isFalse(flag);
+            assert.isFalse(flag);
+            assert.isFalse(flag);
+            assert.isFalse(flag);
+          `,
+          errors: [
+            { messageId: 'preferAssertIsFalseOverExpectFalse' },
+            { messageId: 'preferAssertIsFalseOverExpectFalse' },
+            { messageId: 'preferAssertIsFalseOverExpectFalse' },
+            { messageId: 'preferAssertIsFalseOverExpectFalse' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-assert-is-false-over-expect-false with parenthesized operands', () => {
+  ruleTester.run(
+    'prefer-assert-is-false-over-expect-false',
+    preferAssertIsFalseOverExpectFalseRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'a sequence expression stays one argument',
+          code: dedent`
+            declare const setup: () => void;
+            declare const flag: boolean;
+            expect((setup(), flag)).toBe(false);
+          `,
+          output: dedent`
+            declare const setup: () => void;
+            declare const flag: boolean;
+            assert.isFalse((setup(), flag));
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverExpectFalse' }],
+        },
+      ],
+    },
+  );
 });

@@ -274,3 +274,120 @@ describe(ruleName, () => {
     });
   });
 });
+
+describe('require-react-memo through type wrappers', () => {
+  tester.run(ruleName, requireReactMemoRule, {
+    valid: [
+      {
+        name: 'a wrapped component passed to memo is memoized',
+        code: dedent`
+          const A = React.memo(((props: Props) => <div />) as React.FC<Props>);
+          const B = React.memo((() => <div />) satisfies React.FC);
+        `,
+      },
+      {
+        name: 'a memo call with a wrapped callee is memoized',
+        code: dedent`
+          const A = (React.memo as typeof React.memo)(() => <div />);
+          const B = React.memo!(() => <div />);
+        `,
+      },
+      {
+        name: 'a wrapped forwardRef passed to memo is memoized',
+        code: dedent`
+          const A = React.memo(
+            React.forwardRef<HTMLDivElement>((_, ref) => <div ref={ref} />) as React.FC,
+          );
+          const B = React.memo(
+            React.forwardRef(
+              ((_, ref) => <div ref={ref} />) as React.ForwardRefRenderFunction<HTMLDivElement>,
+            ),
+          );
+        `,
+      },
+      {
+        name: 'a memo call wrapped as a whole is memoized',
+        code: dedent`
+          const A = React.memo(() => <div />) satisfies React.FC;
+        `,
+      },
+      {
+        name: 'a wrapped function invoked immediately is not a definition',
+        code: dedent`
+          const A = ((() => <div />) as () => React.ReactNode)();
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'component wrapped in `satisfies`',
+        code: dedent`
+          const Foo = ((props: Props) => <div />) satisfies (p: Props) => React.ReactNode;
+        `,
+        errors: [
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Foo' },
+          },
+        ],
+      },
+      {
+        name: 'component wrapped in `as` or `!`',
+        code: dedent`
+          const Foo = ((props: Props) => <div />) as React.FC<Props>;
+          const Bar = (() => <div />)!;
+        `,
+        errors: [
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Foo' },
+          },
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Bar' },
+          },
+        ],
+      },
+      {
+        name: 'forwardRef call wrapped in `as`',
+        code: dedent`
+          const Foo = React.forwardRef<HTMLDivElement>((_, ref) => <div ref={ref} />) as unknown as React.FC;
+        `,
+        errors: [
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Foo' },
+          },
+        ],
+      },
+      {
+        name: 'component wrapped in `as` inside forwardRef',
+        code: dedent`
+          const Foo = React.forwardRef(
+            ((_, ref) => <div ref={ref} />) as React.ForwardRefRenderFunction<HTMLDivElement>,
+          );
+        `,
+        errors: [
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Foo' },
+          },
+        ],
+      },
+      {
+        name: 'forwardRef callee wrapped in `as`',
+        code: dedent`
+          const Foo = (React.forwardRef as typeof React.forwardRef)(
+            (_, ref) => <div ref={ref} />,
+          );
+        `,
+        errors: [
+          {
+            messageId: 'requireReactMemo',
+            data: { componentName: 'Foo' },
+          },
+        ],
+      },
+    ],
+  });
+});

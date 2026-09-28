@@ -145,3 +145,89 @@ ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
     },
   ],
 } as const);
+
+describe('no-partial-string-normalize through type wrappers', () => {
+  ruleTester.run('no-partial-string-normalize', noPartialStringNormalize, {
+    valid: [
+      {
+        name: 'a wrapped safe literal',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          s.normalize('NFC' satisfies string);
+        `,
+      },
+      {
+        name: 'a wrapped method that is not normalize',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const t: string;
+          s.includes!(t);
+          s['includes' satisfies string](t);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a wrapped callee',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const form: string;
+          s.normalize!(form);
+          (s.normalize satisfies unknown)(form);
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a wrapped computed key',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const form: string;
+          declare const k: 'normalize' | undefined;
+          s['normalize' satisfies string](form);
+          s[k!](form);
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a receiver cast to a type that is not a string',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const form: string;
+          (s as { normalize(f: string): string }).normalize(form);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+      {
+        name: 'a receiver asserted to be a string',
+        filename: 'file.ts',
+        code: dedent`
+          declare const u: unknown;
+          declare const form: string;
+          (u as string).normalize(form);
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+      {
+        name: 'an argument cast to a safe form is still an arbitrary string',
+        filename: 'file.ts',
+        code: dedent`
+          declare const s: string;
+          declare const form: string;
+          s.normalize(form as 'NFC');
+        `,
+        errors: [{ messageId: 'errorStringGeneric' }],
+      },
+    ],
+  });
+});

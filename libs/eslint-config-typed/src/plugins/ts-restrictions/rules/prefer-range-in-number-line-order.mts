@@ -6,7 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
-import { skipTypeWrappers } from './type-wrapper-utils.mjs';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 

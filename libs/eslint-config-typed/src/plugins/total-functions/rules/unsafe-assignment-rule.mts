@@ -11,6 +11,7 @@ import {
   type ImmutabilityOverrides,
 } from 'is-immutable-type';
 import { type Program, type Type, type TypeChecker } from 'typescript';
+import { withoutTypeWrappers } from './type-wrapper-layers.mjs';
 
 type MessageId = 'errorStringGeneric';
 
@@ -112,7 +113,75 @@ export const createNoUnsafeAssignmentRule =
         : 'unknown';
     };
 
+    /**
+     * A type assertion is an assignment of its operand to the asserted type.
+     * Without this, `mutable as Readonly<T>` passes: every other listener
+     * takes the source type from the assertion, which is already the
+     * destination type. The operand's type is read through any wrappers
+     * inside it, so `x as unknown as T` is judged from `x` to `T`. `as const`
+     * is left to the listener of the position it stands in.
+     */
+    const checkTypeAssertion = (
+      node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
+    ): void => {
+      if (isConstAssertion(node.typeAnnotation)) {
+        return;
+      }
+
+      const sourceNode = withoutTypeWrappers(node.expression);
+
+      const destinationType = checker.getTypeAtLocation(
+        parserServices.esTreeNodeToTSNodeMap.get(node.typeAnnotation),
+      );
+
+      const sourceType = checker.getTypeAtLocation(
+        parserServices.esTreeNodeToTSNodeMap.get(sourceNode),
+      );
+
+      const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
+        sourceNode,
+        destinationType,
+        sourceType,
+      );
+
+      if (arrayMethodCallSafety === 'safe') {
+        return;
+      }
+
+      if (
+        arrayMethodCallSafety === 'unsafe' ||
+        isUnsafeAssignment(
+          program,
+          checker,
+          destinationType,
+          sourceType,
+          sourceNode,
+        ) === 'unsafe'
+      ) {
+        context.report({
+          node,
+          messageId: 'errorStringGeneric',
+          data: {
+            sourceType: checker.typeToString(sourceType),
+            destinationType: checker.typeToString(destinationType),
+            sourceImmutability:
+              Immutability[
+                getSafeTypeImmutability(program, checker, sourceType)
+              ],
+            destinationImmutability:
+              Immutability[
+                getSafeTypeImmutability(program, checker, destinationType)
+              ],
+          },
+        } as const);
+      }
+    };
+
     return {
+      TSAsExpression: checkTypeAssertion,
+
+      TSTypeAssertion: checkTypeAssertion,
+
       VariableDeclaration: (node): void => {
         for (const declaration of node.declarations) {
           if (
@@ -471,3 +540,8 @@ export const createNoUnsafeAssignmentRule =
       },
     };
   };
+
+const isConstAssertion = (typeAnnotation: TSESTree.TypeNode): boolean =>
+  typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+  typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+  typeAnnotation.typeName.name === 'const';
