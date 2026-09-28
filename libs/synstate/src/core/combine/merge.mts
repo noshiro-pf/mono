@@ -65,6 +65,7 @@ import {
 export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   createMergeObservable(parents) as MergeObservableRefined<OS>;
 
@@ -88,6 +89,7 @@ const createMergeObservable = <const P extends NonEmptyUnknownList>(
         }
 
         const nextValue =
+          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Optional.unwrap(parentToUse.getSnapshot()) as ArrayElement<P>;
 

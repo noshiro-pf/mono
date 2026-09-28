@@ -595,3 +595,17 @@
     - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧（allow リストの精査待ち）から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
     - **アセットの扱いは利用者向けドキュメントに書く**（implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」）。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
     - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする（ユーザー要望）。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない（大原則: sugar の出力は Sumi lint を満たす）。
+
+## D-60: `sumi check` は他のリンタの disable コメントに従わず、マーカーはその next-line 指示の行を飛び越す
+
+- **ステータス**: 確定（2026-09-28、ユーザー要望）
+- **判断**:
+    1. oxlint プリセットを `options.respectEslintDisableDirectives: false` で走らせる。Sumi の診断に答えられるのは `@sumi-expect-error`（D-51）だけにする。
+    2. `@sumi-expect-error` は、マーカーの次の行が他のリンタの next-line 指示（`eslint-disable-next-line` / `oxlint-disable-next-line`、`//` と 1 行の `/* */` の両方）であれば、それを飛ばしてその次の行に掛かる。他のコメント行は飛ばさない — `// @ts-ignore` のようにコメント行そのものに診断が出るルールがある。
+- **理由**:
+    - **oxlint は `eslint-disable*` を既定で読み、ルール名の末尾だけで照合する。** `eslint-disable-next-line total-functions/no-unsafe-type-assertion` は `typescript/no-unsafe-type-assertion` も黙らせる（`foo/no-unsafe-type-assertion` でも同じ。oxlint 1.83.0 で実測）。synstate ではキャスト 22 件と `readonly/require-readonly-parameter` 1 件がこれで `sumi check` から見えていなかった。表に出たのはキャスト 7 件だけで、それも oxlint-tsgolint 7.0.2002 で、括弧から始まる複数行の式の診断が抑制から外れたためだった。D-51 の「出なければ違反」という保証は、ESLint 用のコメントで黙って迂回できていたことになる。
+    - **ESLint と Sumi が同じ行を見る場合は両方のコメントが要る。** ESLint の `eslint-disable-next-line` は直後の行にしか掛からない。マーカーが直後の行に掛かるままだと、2 つを同じ行の上に重ねられない（それが #2097 のファイル単位マーカーの理由だった）。マーカーを先に書き、指示の行を飛ばして同じ行に掛かるようにすれば、両方とも行単位で書ける。順序を逆にすると ESLint の指示がマーカー行に掛かり、ESLint が未使用の指示として報告するので、誤りは黙って残らない。
+- **帰結**:
+    - synstate の 7 ファイルの `@sumi-expect-error-file` は行単位のマーカーに置き換えた。他の 16 件にもマーカーを足した。
+    - `oxlint-disable*` は oxlint 自身の指示なので設定では止められず、今も Sumi の診断を黙らせられる。D-51 はこれを `@sumi-expect-error` で置き換える前提だが、禁止する仕組みはまだ無い。
+    - `total-functions/no-unsafe-type-assertion` は `typescript/no-unsafe-type-assertion` より厳しいわけではない（2026-09-28 に同じ入力で比較）。前者だけが報告するのは `any as unknown`・`unknown as unknown`・新しいオブジェクトリテラルの upcast（excess property による誤検知）で、`any` の方は `banned-syntax/no-any` が既に禁じている。逆に後者だけが報告するのは `ReadonlySet<any> as ReadonlySet<string>` と `as any`。Sumi に同等のルールを足す必要は無い。

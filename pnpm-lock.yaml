@@ -2874,6 +2874,9 @@ importers:
       cspell:
         specifier: 'catalog:'
         version: 10.3.3
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)

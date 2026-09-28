@@ -1,8 +1,3 @@
-// The operator's one cast (`KeepInitialValueOperator`) is the downcast the
-// `eslint-disable-next-line` beside it already accepts; a line marker cannot
-// share that line with it, so it is accepted for the file.
-// @sumi-expect-error-file banned-syntax/no-unsafe-type-assertion
-
 import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
@@ -55,6 +50,7 @@ import { withInitialValue } from './with-initial-value.mjs';
 export const map = <A, B>(
   mapFn: (x: A, index: SafeUint | -1) => B,
 ): KeepInitialValueOperator<A, B> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
     createMapObservable(parentObservable, mapFn)) as KeepInitialValueOperator<

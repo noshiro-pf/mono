@@ -52,10 +52,11 @@ type Entry = Readonly<
  * Applies the `@sumi-expect-error` directives in `files` to both engines'
  * diagnostics.
  *
- * A marker names a neutral rule ID and applies to the next non-marker line,
- * exactly as it does in the conformance corpus — one spelling, one meaning
- * (D-51). A diagnostic it names on that line is suppressed; a marker nothing
- * answered comes back in `unused` for the caller to report.
+ * A marker names a neutral rule ID and applies to the next line that is
+ * neither a marker nor another linter's next-line directive, exactly as it does
+ * in the conformance corpus — one spelling, one meaning (D-51). A diagnostic it
+ * names on that line is suppressed; a marker nothing answered comes back in
+ * `unused` for the caller to report.
  *
  * Both engines are matched in one pass, because which of them produced a
  * diagnostic is not something a marker can say: the oxlint preset and the
@@ -139,10 +140,9 @@ export const applyExpectErrors = (
       if (Arr.isEmpty(matched)) {
         mut_unused.push({
           filename: file,
-          // `expected` carries the line of the *code* the marker applies to;
-          // the marker itself is the line above. A file-scoped marker has no
-          // line of its own to report.
-          line: marker.fileScoped ? 0 : marker.line - 1,
+          // The marker's own line, not the code's: the two need not be
+          // adjacent. A file-scoped marker has none, and reports 0.
+          line: marker.markerLine,
           ruleId: marker.ruleId,
         });
       } else {

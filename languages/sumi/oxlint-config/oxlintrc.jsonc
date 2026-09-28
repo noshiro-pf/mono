@@ -12,7 +12,15 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["eslint", "typescript", "unicorn", "import"],
   "jsPlugins": ["./dist/plugin/index.mjs"],
-  "options": { "typeAware": true },
+  "options": {
+    "typeAware": true,
+    // oxlint reads `eslint-disable*` comments by default and matches them by
+    // rule name alone, so `eslint-disable-next-line
+    // total-functions/no-unsafe-type-assertion` would silence
+    // `typescript/no-unsafe-type-assertion` here without a word. Only
+    // `@sumi-expect-error` answers for a Sumi diagnostic (D-60).
+    "respectEslintDisableDirectives": false,
+  },
   "categories": {
     "correctness": "off",
     "suspicious": "off",

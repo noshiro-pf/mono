@@ -130,6 +130,39 @@ describe(applyExpectErrors, () => {
     );
   });
 
+  test('a marker above an eslint-disable-next-line reaches the line both name', () => {
+    withFile(
+      dedent`
+        // @sumi-expect-error banned-syntax/no-var
+        // eslint-disable-next-line no-var
+        var x = 1;
+      `,
+      (file) => {
+        const result = applyExpectErrors([file], [lintDiagnostic(file, 3)], []);
+
+        assert.deepStrictEqual(result.lint, []);
+
+        assert.deepStrictEqual(result.unused, []);
+      },
+    );
+  });
+
+  test('an unused marker above a directive is reported on its own line', () => {
+    withFile(
+      dedent`
+        const a = 1;
+        // @sumi-expect-error banned-syntax/no-var
+        // eslint-disable-next-line no-var
+        var x = 1;
+      `,
+      (file) => {
+        assert.deepStrictEqual(applyExpectErrors([file], [], []).unused, [
+          { filename: file, line: 2, ruleId: 'banned-syntax/no-var' },
+        ]);
+      },
+    );
+  });
+
   test('the file-scoped form matches any line and reports line 0 when unused', () => {
     withFile(
       dedent`
