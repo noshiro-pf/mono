@@ -1,8 +1,3 @@
-// The operator's one cast (`KeepInitialValueOperator`) is the downcast the
-// `eslint-disable-next-line` beside it already accepts; a line marker cannot
-// share that line with it, so it is accepted for the file.
-// @sumi-expect-error-file banned-syntax/no-unsafe-type-assertion
-
 import { Optional } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import {
@@ -62,6 +57,7 @@ import {
 export const takeUntil = <A,>(
   notifier: Observable<unknown>,
 ): KeepInitialValueOperator<A, A> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ((parentObservable) =>
     createTakeUntilObservable(

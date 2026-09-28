@@ -2,7 +2,11 @@
  * Parser for the `@sumi-expect-error` markers:
  *
  * - `// @sumi-expect-error <rule-id> ["message substring"]` applies to the next
- *   non-marker line (markers stack).
+ *   line that is neither a marker (markers stack) nor another linter's
+ *   next-line directive (`eslint-disable-next-line`,
+ *   `oxlint-disable-next-line`). Skipping the directive is what lets both sit
+ *   above one line: ESLint's applies to the line right after it, so the marker
+ *   goes first and reaches past it to the same line.
  * - `// @sumi-expect-error-file <rule-id>` describes a file-wide diagnostic.
  *
  * One parser, two callers, because D-51 gave the marker one spelling and one
@@ -24,6 +28,9 @@ export type ExpectedDiagnostic = Readonly<{
   messageIncludes: string | undefined;
   /** 1-based line of the code the marker applies to (0 for file-scoped). */
   line: number;
+
+  /** 1-based line of the marker itself (0 for file-scoped). */
+  markerLine: number;
   fileScoped: boolean;
 }>;
 
@@ -41,7 +48,10 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
   const mut_problems: string[] = [];
 
   // Markers waiting for the next code line, as [1-based marker line, parsed].
-  const mut_pending: [number, Omit<ExpectedDiagnostic, 'line'>][] = [];
+  const mut_pending: [
+    number,
+    Omit<ExpectedDiagnostic, 'line' | 'markerLine'>,
+  ][] = [];
 
   for (const [index, lineText] of lines.entries()) {
     const lineNumber = index + 1;
@@ -55,6 +65,7 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
           messageIncludes: parsed.messageIncludes,
           fileScoped: true,
           line: 0,
+          markerLine: 0,
         });
       } else {
         mut_pending.push([
@@ -82,6 +93,10 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
       continue;
     }
 
+    if (isNextLineDirective(lineText)) {
+      continue;
+    }
+
     if (lineText === '') {
       mut_problems.push(
         `line ${lineNumber}: @sumi-expect-error marker must be immediately followed by a code line`,
@@ -92,8 +107,8 @@ export const parseMarkers = (sourceText: string): ParsedMarkers => {
       continue;
     }
 
-    for (const [, pending] of mut_pending) {
-      mut_expected.push({ ...pending, line: lineNumber });
+    for (const [markerLine, pending] of mut_pending) {
+      mut_expected.push({ ...pending, line: lineNumber, markerLine });
     }
 
     mut_pending.length = 0;
@@ -114,6 +129,22 @@ export const hasMarkerLikeComment = (sourceText: string): boolean =>
     .some((line) => line.trimStart().startsWith(markerPrefix));
 
 const markerPrefix = '// @sumi-expect-error';
+
+const nextLineDirectivePrefixes = [
+  '// eslint-disable-next-line',
+  '/* eslint-disable-next-line',
+  '// oxlint-disable-next-line',
+  '/* oxlint-disable-next-line',
+] as const;
+
+/**
+ * Whether `line` is another linter's directive for the line after it — the
+ * one kind of comment line a marker reaches past. Any other comment is a line
+ * a marker can mean: a diagnostic can sit on the comment itself (`// @ts-ignore`
+ * is one).
+ */
+const isNextLineDirective = (line: string): boolean =>
+  nextLineDirectivePrefixes.some((prefix) => line.startsWith(prefix));
 
 type ParsedMarkerLine = Readonly<
   | {
