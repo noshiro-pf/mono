@@ -1,5 +1,6 @@
 import {
   AST_NODE_TYPES,
+  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
@@ -238,7 +239,7 @@ export const preferCanonicalLengthConstrainedType: TSESLint.RuleModule<
                 ? buildImportsFix(fixer, program, namesNeedingImport)
                 : []),
               fixer.replaceText(propertyNode, localName),
-              ...dropBoundsFix(fixer, node, rewrite),
+              ...dropBoundsFix(fixer, node, rewrite, sourceCode),
             ],
           });
         }
@@ -316,44 +317,91 @@ const boundsText = (
 
 /**
  * Removes the length arguments the rewrite drops. Each removal runs from the
- * dropped argument up to the start of the next one, so the comma, whitespace
- * and any comments in between go with it; the ranges never overlap.
+ * dropped argument's first token — the outermost of the parentheses the
+ * source puts around it, which `node.range` leaves out — up to the token after
+ * the comma that follows it. So the argument's own parentheses, the comma and
+ * any whitespace and comments after it go with it, while the next argument
+ * keeps its parentheses; the ranges never overlap.
  */
 const dropBoundsFix = (
   fixer: TSESLint.RuleFixer,
   node: TSESTree.CallExpression,
   rewrite: Rewrite,
+  sourceCode: TSESLint.SourceCode,
 ): readonly TSESLint.RuleFix[] =>
   rewrite.bounds.flatMap((_, index) => {
     // Read before the `includes` below, not after. The strict standard
     // library types `includes` as `searchElement is T` — that is what lets a
     // literal union narrow a wider value — but the predicate applies to the
     // false branch too, and here `keep` is `readonly number[]` against a
-    // `number`, so `index` narrows to `never` past the guard and `index + 1`
-    // stops type-checking. A false `includes` means "not in this array", not
-    // "not of this type".
+    // `number`, so `index` narrows to `never` past the guard. A false
+    // `includes` means "not in this array", not "not of this type".
     const dropped = node.arguments[index];
 
-    const next = node.arguments[index + 1];
+    if (dropped === undefined || rewrite.keep.includes(index)) {
+      return [];
+    }
 
-    return dropped === undefined ||
-      next === undefined ||
-      rewrite.keep.includes(index)
+    const depth = parenthesesDepth(dropped, sourceCode);
+
+    const first = sourceCode.getFirstToken(dropped);
+
+    const start =
+      first === null || depth === 0
+        ? first
+        : sourceCode.getTokenBefore(first, { skip: depth - 1 });
+
+    // The first comma after the argument, not the token after it, which for
+    // `(1)` is the closing parenthesis.
+    const comma = sourceCode.getTokenAfter(dropped, ASTUtils.isCommaToken);
+
+    const end = comma === null ? null : sourceCode.getTokenAfter(comma);
+
+    return start === null || end === null
       ? []
-      : [fixer.removeRange([dropped.range[0], next.range[0]])];
+      : [fixer.removeRange([start.range[0], end.range[0]])];
   });
+
+/** How many pairs of parentheses the source puts around `node`. */
+const parenthesesDepth = (
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+  depth: number = 0,
+): number =>
+  ASTUtils.isParenthesized(depth + 1, node, sourceCode)
+    ? parenthesesDepth(node, sourceCode, depth + 1)
+    : depth;
 
 /**
  * A non-negative integer literal's value, or `undefined` for anything else —
  * a computed bound cannot be matched against the rewrite table.
+ *
+ * Read through `satisfies` and `as const`, which leave the literal's type as it
+ * is, but not through any other `as`: `1 as number` widens the bound the
+ * combinator infers, so the call no longer builds the type the table names.
  */
-const getLengthLiteral = (node: TSESTree.Node): number | undefined =>
-  node.type === AST_NODE_TYPES.Literal &&
-  typeof node.value === 'number' &&
-  Number.isSafeInteger(node.value) &&
-  node.value >= 0
-    ? node.value
+const getLengthLiteral = (node: TSESTree.Node): number | undefined => {
+  const literal = skipLiteralPreservingWrappers(node);
+
+  return literal.type === AST_NODE_TYPES.Literal &&
+    typeof literal.value === 'number' &&
+    Number.isSafeInteger(literal.value) &&
+    literal.value >= 0
+    ? literal.value
     : undefined;
+};
+
+/** `node` without the `satisfies` and `as const` around it. */
+const skipLiteralPreservingWrappers = (node: TSESTree.Node): TSESTree.Node =>
+  node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
+  (node.type === AST_NODE_TYPES.TSAsExpression && isConstAssertion(node))
+    ? skipLiteralPreservingWrappers(node.expression)
+    : node;
+
+const isConstAssertion = (node: TSESTree.TSAsExpression): boolean =>
+  node.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+  node.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+  node.typeAnnotation.typeName.name === 'const';
 
 /**
  * Whether the options argument may carry a `defaultValue`. Anything that is not

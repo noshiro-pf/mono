@@ -141,3 +141,85 @@ describe('prefer-schema-over-guard-chain', () => {
     ],
   });
 });
+
+describe('prefer-schema-over-guard-chain through type wrappers', () => {
+  tester.run('prefer-schema-over-guard-chain', preferSchemaOverGuardChain, {
+    valid: [],
+    invalid: [
+      {
+        name: 'guards on members of a value cast with `as`',
+        code: dedent`
+          type R = Readonly<{ a: unknown; b: unknown }>;
+          declare const x: unknown;
+          const ok =
+            isRecord(x) &&
+            hasKey(x, 'a') &&
+            isString((x as R).a) &&
+            hasKey(x, 'b') &&
+            isString((x as R).b);
+        `,
+        errors: [
+          { messageId: 'preferSchema', data: { name: 'x', count: '5' } },
+        ],
+      },
+      {
+        name: 'guards on a value wrapped in `satisfies`, `<T>` and `!`',
+        code: dedent`
+          declare const x: unknown;
+          const ok =
+            isRecord(x satisfies unknown) &&
+            hasKey(<unknown>x, 'a') &&
+            isString(x!) &&
+            hasKey(x as unknown, 'b') &&
+            isString(x);
+        `,
+        errors: [
+          { messageId: 'preferSchema', data: { name: 'x', count: '5' } },
+        ],
+      },
+      {
+        name: 'guard calls that are themselves wrapped',
+        code: dedent`
+          declare const x: unknown;
+          const ok =
+            (isRecord(x) satisfies boolean) &&
+            (hasKey(x, 'a') as boolean) &&
+            isString(x.a) &&
+            hasKey(x, 'b') &&
+            isString(x.b);
+        `,
+        errors: [
+          { messageId: 'preferSchema', data: { name: 'x', count: '5' } },
+        ],
+      },
+      {
+        name: 'a chain with a wrapped link in it, reported once',
+        code: dedent`
+          declare const x: unknown;
+          const ok =
+            (isRecord(x) && hasKey(x, 'a') && isString(x.a) satisfies boolean) &&
+            hasKey(x, 'b') &&
+            isString(x.b);
+        `,
+        errors: [
+          { messageId: 'preferSchema', data: { name: 'x', count: '5' } },
+        ],
+      },
+      {
+        name: 'negated guards whose argument is wrapped, in an `||` chain',
+        code: dedent`
+          declare const x: unknown;
+          const bad =
+            !(isRecord(x) as boolean) ||
+            !hasKey(x, 'a') ||
+            !isString(x.a) ||
+            !hasKey(x, 'b') ||
+            !isString(x.b);
+        `,
+        errors: [
+          { messageId: 'preferSchema', data: { name: 'x', count: '5' } },
+        ],
+      },
+    ],
+  });
+});
