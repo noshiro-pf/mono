@@ -18,6 +18,8 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
 
     const isMobile = useIsMobile();
 
+    const shortcuts = !isMobile && answerDeadlineShortcuts;
+
     return (
       <FormGroup
         helperText={
@@ -30,7 +32,7 @@ export const AnswerDeadlineDatepicker = memoNamed<Props>(
       >
         <BpDatetimePicker
           disabled={!useAnswerDeadline}
-          shortcuts={isMobile ? false : answerDeadlineShortcuts}
+          shortcuts={shortcuts}
           showActionsBar={false}
           ymdhm={answerDeadline}
           onYmdhmChange={onAnswerDeadlineChange}

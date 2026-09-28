@@ -39,6 +39,7 @@ export const just = <const A,>(value: A): InitializedRootObservable<A> => {
 
   obs.complete();
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return obs as InitializedRootObservable<A>;
 };

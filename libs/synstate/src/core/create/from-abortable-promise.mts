@@ -70,6 +70,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * ```
  */
 export const fromAbortablePromise = <A, E = unknown>(
+  // @sumi-expect-error readonly/require-readonly-parameter
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   factory: (signal: AbortSignal) => Promise<A>,
 ): FromPromiseObservable<A, E> => {
@@ -106,6 +107,7 @@ export const fromAbortablePromise = <A, E = unknown>(
 
           startUpdate(
             Result.err(
+              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               error as E,
             ),

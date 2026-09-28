@@ -69,6 +69,7 @@ const parsed = Json.parse(text)?;   // Err ならこの関数から即 return Er
 - **emit 案**: 関数全体を `safeTry(function* () { ... yield* r; ... })` へ包む変換、または早期 return の明示展開(`const _r = Json.parse(text); if (Result.isErr(_r)) return _r; const parsed = _r.value;`)。後者の方が eject 品質（可読性）は高い。
 - **TC39 関連**: try expressions / Safe Assignment Operator(`?=`)として議論されている系統（Stage 0〜1 相当、流動的）。
 - **論点**: 後置 `?` を候補 3（nullable 適用）と両方に使うと曖昧になる。Rust は `?` = Result/Option 伝播で統一している。候補 3 と 4 を「nullish/Err の伝播」として一つの構文に統合できるかが設計の勘所。
+- 三項演算子との衝突は、sugar が三項演算子を持たないことで解消済み（候補 10、D-61）。
 
 ## 候補 5: prelude の auto-import
 
@@ -318,6 +319,69 @@ mut_t[2]; // 型エラー(「index 2 は無い」)
 - **`readonly [number, number]` と `readonly number[]`** は依然として注釈でしか書けない。2 記法で足りるという整理はこの 2 つを注釈側に残す前提なので、実際に困るかを dogfood で見る。
 - object literal 側(`{ a: 1 } as const`)も同じ軸を持つので、tuple だけ先に決めてよいか。
 
+## 候補 10: if 式（三項演算子の置き換え — 確定 2026-09-28、D-61）
+
+Sumi sugar / Sumi refined は値の世界の三項演算子 `?:` を持たず、`if (c) a else b` の if 式で置き換える。後置 `?`（候補 3・4）のために `?` を空けるのが目的である。三項演算子があると `parse(t)? - 1` は `parse(t) ? -1 : …` の書き出しとも読めてしまい、`:` まで先読みしないと決まらない。三項演算子がなければ、式の中の `?` は後置 `?`・`?.`・`??` だけになる。Sumi lint の「条件による値の選択は三項演算子で」([booleans-and-logic.md](./booleans-and-logic.md))は Sumi lint の判断としてそのまま残る。
+
+- **Sumi lint**: 三項演算子そのもの。emit は `c ? a : b` への一対一で、逆向きの codemod も機械的に書ける(D-37)。
+- **形**: Kotlin / Scala 型。条件は文の `if` と同じく括弧で囲む。Rust 型の `if c { a } else { b }` は、条件の括弧を外す代わりに分岐をブロックで区切る必要があり、ブロックの最後の式が値になる規則を持ち込むことになる。
+- **TC39 関連**: do expressions(`do { if (c) { a } else { b } }`、Stage 1 のまま停滞)。if 式そのものの proposal は無い。
+
+### 書き方
+
+```ts
+// Sumi lint
+const sign = x >= 0 ? 'non-negative' : 'negative';
+
+const grade = score >= 90 ? 'A' : score >= 70 ? 'B' : score >= 50 ? 'C' : 'D';
+```
+
+```text
+// Sumi sugar
+const sign = if (x >= 0) 'non-negative' else 'negative';
+
+const grade =
+    if (score >= 90) 'A'
+    else if (score >= 70) 'B'
+    else if (score >= 50) 'C'
+    else 'D';
+```
+
+三項演算子の `else` 側への入れ子は `else if` の連鎖になり、2026-08-27 にパターンマッチ（候補 2）へ預けた「入れ子の読みにくさ」の多くはここで解消する。
+
+アロー関数の本体・`return`・引数など、式が書ける位置ならどこにでも書ける。Sumi lint の三項演算子はどの位置にも現れるので、位置を制限すると lint から sugar への codemod が書けなくなる（Swift 5.9 の SE-0380 は `return`・変数の初期化・代入に限っているが、この理由で採らない）。
+
+```text
+const abs = (x: number): number => if (x >= 0) x else -x;
+
+return if (Arr.isNonEmpty(xs)) Optional.some(xs[0]) else Optional.none;
+
+setLabel(if (isEditing) 'Save' else 'Edit');
+
+const port = if (env.PORT === undefined) 8080 else parseInt(env.PORT)?;
+```
+
+### 規則
+
+1. **`else` は必須。** `else` の無い if 式を許すと dangling else が戻る。必須なら `if (a) if (b) x else y else z` は一通りにしか読めない。
+2. **分岐の先頭の `{` は構文エラー。** オブジェクトリテラルはアロー関数の本体と同じく括弧で包む(`if (c) ({ a: 1 }) else ({ a: 2 })`)。ブロックに文を書いて最後の式を値にする形(Rust / Kotlin)は `?:` へ一対一に落ちず、`mut_` 変数への持ち上げ（名前の生成が要る）か IIFE（受け入れ条件の可読性に反する）が要る。候補 2 の emit と同じ難所なので、そちらと一緒に解く。`{` を予約しておけば、後から入れても既存のコードを壊さない。
+3. **二項演算子などのオペランドにするときは括弧が必須。**
+
+    ```text
+    const total = base + (if (hasTax) tax else 0);   // OK
+    const total = base + if (hasTax) tax else 0;     // 構文エラー
+    ```
+
+    TS でも `base + (hasTax ? tax : 0)` と括弧が要るので、括弧はどちら向きの変換でもそのまま残る。if 式は `else` の後ろを右端まで取る(`if (c) a else b + 1` の `else` 側は `b + 1`)。三項演算子と同じ結合である。
+
+4. **文の先頭の `if` は文。** JS で文の先頭の `{` がブロックになるのと同じ扱い。そのうえで文の `if` に波括弧を必須にする(`curly: all`)と、「文の `if` は必ず波括弧あり、式の `if` は必ず波括弧なし」と字面で分かれる。`curly` は D-37 に従って Sumi lint の段階から強制する([enforcement-map.md](../enforcement-map.md))。
+
+### 残る論点
+
+- **JSX の条件描画が長くなる。** `{cond ? <X /> : undefined}` は `{if (cond) <X /> else undefined}` になる。JSX の `{…}` の直下に限って `else` の省略を認める案がある（`}` で閉じるので dangling else は起きない）が、特例を 1 つ増やすことになるので、最初は入れずに様子を見る。
+- **型の条件型 `A extends B ? C : D` は変えない。** 型の世界の `?` は後置 `?` と衝突しないので、変える理由がない。2026-08-27 に三項演算子の利点とした「型の条件構文と字面が揃う」は失われ、値と型で構文が分かれる。
+- **`then` 側への入れ子**(`a ? (b ? x : y) : z`)は `if (a) if (b) x else y else z` と一通りに読めるが、読みやすさのために括弧を付けるかは `sumi fmt` の論点。
+
 ## 導入順（提案）
 
-依存関係と費用対効果から: 候補 5(構文変更なし・transpiler の骨格作り)→ 候補 6(トークン置換に近い低リスク変換)→ 候補 1(式の局所変換)→ 候補 4(制御フロー変換 — emit 品質の本丸)→ 候補 2(最大の構文追加)→ 候補 3（型主導 emit が必要なら最後）。候補 7 は transpiler ではなく型検査器の拡張（第 3 層 — D-37）なのでこの順序の外に置く。各候補は着手前に「Sumi lint ライブラリ形」と両向きの codemod を明記する(D-37)。
+依存関係と費用対効果から: 候補 5(構文変更なし・transpiler の骨格作り)→ 候補 6(トークン置換に近い低リスク変換)→ 候補 10(式の局所変換。候補 3・4 の後置 `?` はこれが前提)→ 候補 1(式の局所変換)→ 候補 4(制御フロー変換 — emit 品質の本丸)→ 候補 2(最大の構文追加)→ 候補 3（型主導 emit が必要なら最後）。候補 7 は transpiler ではなく型検査器の拡張（第 3 層 — D-37）なのでこの順序の外に置く。各候補は着手前に「Sumi lint ライブラリ形」と両向きの codemod を明記する(D-37)。

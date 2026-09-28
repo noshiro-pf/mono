@@ -223,7 +223,7 @@ const main = async (): Promise<void> => {
 
       return (
         (await settlesTo('/second', 3000)) ||
-        (attempt >= 3 ? false : clickThrough(attempt + 1))
+        (attempt < 3 && (await clickThrough(attempt + 1)))
       );
     };
 
@@ -983,7 +983,7 @@ const main = async (): Promise<void> => {
 
       return (
         (await settlesTo('/second', 3000)) ||
-        (attempt >= 3 ? false : linkThrough(attempt + 1))
+        (attempt < 3 && (await linkThrough(attempt + 1)))
       );
     };
 

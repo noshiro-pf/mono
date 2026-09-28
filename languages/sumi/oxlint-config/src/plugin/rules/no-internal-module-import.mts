@@ -105,9 +105,10 @@ const reachesIntoDirectory = (specifier: string): boolean => {
     .split('/')
     .filter((segment) => segment !== '.' && segment !== '..');
 
-  return segments.length <= 1
-    ? false
-    : !(segments.length === 2 && segments[1] === 'index.mjs');
+  return (
+    segments.length > 1 &&
+    !(segments.length === 2 && segments[1] === 'index.mjs')
+  );
 };
 
 /** `@scope/name/sub` → `@scope/name`; `name/sub` → `name`; `undefined` for a non-package specifier. */

@@ -595,3 +595,43 @@
     - 副作用 import の禁止は `import/no-unassigned-import` を `allow: []` で**実装済み**。対応表の該当行は 🔧（allow リストの精査待ち）から ✅ に変わる — 精査の結論が「例外を作らない」だったため。
     - **アセットの扱いは利用者向けドキュメントに書く**（implementation-plan の「Sumi sugar / refined の利用者向けドキュメント」）。規則ではなく規則に従うための作法であり、`sumi check` の対象が synstate 3 パッケージだけで apps を含まない現在は表面化していないが、apps を対象に入れた時点で最初に当たる。
     - Sumi sugar の emit では inline / 一括どちらの形で出すかを config で選べるようにする（ユーザー要望）。**ただし束縛が全部型の文は `import type` で出す** — でなければ出力が Sumi lint を通らない（大原則: sugar の出力は Sumi lint を満たす）。
+
+## D-60: `sumi check` は他のリンタの disable コメントに従わず、マーカーはその next-line 指示の行を飛び越す
+
+- **ステータス**: 確定（2026-09-28、ユーザー要望）
+- **判断**:
+    1. oxlint プリセットを `options.respectEslintDisableDirectives: false` で走らせる。Sumi の診断に答えられるのは `@sumi-expect-error`（D-51）だけにする。
+    2. `@sumi-expect-error` は、マーカーの次の行が他のリンタの next-line 指示（`eslint-disable-next-line` / `oxlint-disable-next-line`、`//` と 1 行の `/* */` の両方）であれば、それを飛ばしてその次の行に掛かる。他のコメント行は飛ばさない — `// @ts-ignore` のようにコメント行そのものに診断が出るルールがある。
+- **理由**:
+    - **oxlint は `eslint-disable*` を既定で読み、ルール名の末尾だけで照合する。** `eslint-disable-next-line total-functions/no-unsafe-type-assertion` は `typescript/no-unsafe-type-assertion` も黙らせる（`foo/no-unsafe-type-assertion` でも同じ。oxlint 1.83.0 で実測）。synstate ではキャスト 22 件と `readonly/require-readonly-parameter` 1 件がこれで `sumi check` から見えていなかった。表に出たのはキャスト 7 件だけで、それも oxlint-tsgolint 7.0.2002 で、括弧から始まる複数行の式の診断が抑制から外れたためだった。D-51 の「出なければ違反」という保証は、ESLint 用のコメントで黙って迂回できていたことになる。
+    - **ESLint と Sumi が同じ行を見る場合は両方のコメントが要る。** ESLint の `eslint-disable-next-line` は直後の行にしか掛からない。マーカーが直後の行に掛かるままだと、2 つを同じ行の上に重ねられない（それが #2097 のファイル単位マーカーの理由だった）。マーカーを先に書き、指示の行を飛ばして同じ行に掛かるようにすれば、両方とも行単位で書ける。順序を逆にすると ESLint の指示がマーカー行に掛かり、ESLint が未使用の指示として報告するので、誤りは黙って残らない。
+- **帰結**:
+    - synstate の 7 ファイルの `@sumi-expect-error-file` は行単位のマーカーに置き換えた。他の 16 件にもマーカーを足した。
+    - `oxlint-disable*` は oxlint 自身の指示なので設定では止められず、今も Sumi の診断を黙らせられる。D-51 はこれを `@sumi-expect-error` で置き換える前提だが、禁止する仕組みはまだ無い。
+    - `total-functions/no-unsafe-type-assertion` は `typescript/no-unsafe-type-assertion` より厳しいわけではない（2026-09-28 に同じ入力で比較）。前者だけが報告するのは `any as unknown`・`unknown as unknown`・新しいオブジェクトリテラルの upcast（excess property による誤検知）で、`any` の方は `banned-syntax/no-any` が既に禁じている。逆に後者だけが報告するのは `ReadonlySet<any> as ReadonlySet<string>` と `as any`。Sumi に同等のルールを足す必要は無い。
+
+## D-61: Sumi sugar / Sumi refined は三項演算子を持たず、if 式で置き換える
+
+- **ステータス**: 確定（2026-09-28、ユーザー決定）
+- **判断**:
+    1. Sumi sugar / Sumi refined は値の世界の三項演算子 `?:` を持たない。条件による値の選択は if 式 `if (c) a else b` で書き、emit は `c ? a : b` への一対一とする。型の条件型 `A extends B ? C : D` は変えない。
+    2. if 式の形は Kotlin / Scala 型: 条件は括弧で囲む、`else` は必須、分岐は式で先頭の `{` は構文エラー（予約）、二項演算子などのオペランドにするときは括弧が必須、式が書ける位置ならどこにでも書ける。
+    3. 文の `if` は波括弧を必須にする(`curly: all`)。Sumi lint の段階から強制する。
+    4. JSX の `{…}` の直下で `else` を省略する特例は、最初は入れない。
+    5. **Sumi sugar が新しく加える構文は、空白やインデントに依存しない。** 区別はトークンの綴り（2 文字の演算子など）で付ける。
+- **理由**:
+    - **後置 `?`（候補 3 の `f(v?)`、候補 4 のエラー伝播）のために `?` を空ける。** 三項演算子があると `parse(t)? - 1` は `parse(t) ? -1 : …` の書き出しとも読めて、`:` まで先読みしないと決まらない。三項演算子がなければ、式の中の `?` は後置 `?`・`?.`・`??` だけになる。Rust は if 式と `?` 伝播を持ち、三項演算子を持たない。
+    - **Kotlin 型を選ぶのは、条件の括弧が文の `if` と揃うから。** Rust 型(`if c { a } else { b }`)は条件の括弧を外す代わりに分岐をブロックで区切り、ブロックの最後の式が値になる規則を持ち込む。
+    - **`else` 必須は dangling else を無くす。** `if (a) if (b) x else y else z` は一通りにしか読めない。
+    - **`{` を予約するのは、`?:` へ一対一に落ちない形を締め出すため。** ブロックに文を書いて最後の式を値にすると、emit に `mut_` 変数への持ち上げ（名前の生成）か IIFE が要り、受け入れ条件の名前保存・可読性に反する。候補 2 の emit と同じ難所なのでそちらと一緒に解き、予約しておけば後から入れても既存のコードを壊さない。
+    - **オペランドでの括弧必須は、TS 側の三項演算子にも括弧が要るから。** 括弧はどちら向きの変換でもそのまま残る（D-37 の往復）。
+    - **位置を制限しないのは、Sumi lint の三項演算子がどの位置にも現れるから。** 位置を制限すると lint から sugar への codemod が書けない。
+    - **`curly` で文の `if` と式の `if` が字面で分かれる**: 文は必ず波括弧あり、式は必ず波括弧なし。
+- **却下した代替案**:
+    - **三項演算子を残し、Swift のように空白で区別する**（三項演算子の `?` は前後に空白が必須）。判断 5 により採らない。Python や YAML のインデント依存構文と同じく、好みが分かれる字句規則を言語に入れない。
+    - **三項演算子を残し、後置 `?` を諦める。** 後置 `?` は使いたい（ユーザー判断）。
+    - **Swift 5.9(SE-0380)のように if 式を `return`・変数の初期化・代入に限る。** 上の「位置を制限しない」理由による。
+- **帰結**:
+    - [spec/booleans-and-logic.md](./spec/booleans-and-logic.md) の「条件による値の選択は三項演算子で（確定 2026-08-27）」は Sumi lint の判断として残る。そこで挙げた「型の条件構文と字面が揃う」利点は sugar では失われ、値と型で構文が分かれる。入れ子の読みにくさは `else if` の連鎖で大半が解消する。
+    - 構文と残る論点（JSX の冗長さ、`then` 側の入れ子の括弧）は [spec/future-syntax.md](./spec/future-syntax.md) の候補 10。
+    - `curly: all` は eslint-config-typed では有効だが、oxlint preset には入っていない。oxlint 1.83.0 のネイティブ `curly` で足りるので、新規実装は要らない。
