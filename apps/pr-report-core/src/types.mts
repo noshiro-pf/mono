@@ -26,8 +26,9 @@ export type ChecksSummary = Readonly<{
    */
   verdict: 'failing' | 'passed' | 'paused' | 'pending';
   /**
-   * Every required context by what it reported. These four and
-   * {@link ChecksSummary.missing} are disjoint and cover the required list.
+   * Every required context by what it reported. These four,
+   * {@link ChecksSummary.missing} and {@link ChecksSummary.notRun} are
+   * disjoint and cover the required list.
    */
   passed: readonly string[];
   failed: readonly string[];
@@ -39,6 +40,13 @@ export type ChecksSummary = Readonly<{
    * absent from the check list rather than pending in it.
    */
   missing: readonly string[];
+  /**
+   * Required contexts with nothing reported, on a pull request whose base the
+   * ruleset does not cover — a stacked one. A workflow may run on pull
+   * requests into `main` only, and then its contexts never come here; nothing
+   * waits for them, since GitHub requires nothing of this base either.
+   */
+  notRun: readonly string[];
   /** How many contexts the verdict was reached over. */
   required: number;
 }>;

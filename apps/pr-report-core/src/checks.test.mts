@@ -72,6 +72,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'passed');
@@ -87,6 +88,7 @@ describe(summarizeChecks, () => {
       reported: new Map([['code-check-result / result', 'passed']]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'pending');
@@ -105,6 +107,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'failing');
@@ -126,6 +129,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: true,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'paused');
@@ -144,6 +148,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'passed');
@@ -162,6 +167,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: true,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'pending');
@@ -179,6 +185,7 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: true,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'failing');
@@ -194,11 +201,90 @@ describe(summarizeChecks, () => {
       ]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'passed');
 
     assert.deepStrictEqual(summary.failed, []);
+  });
+
+  // #2103, stacked on `chore/pnpm-update`: `lint-pull-request.yml` runs on
+  // pull requests into `main` only, so its three contexts never came, and
+  // the page kept calling a pull request whose checks had all passed
+  // "checks running".
+  describe('on a base the ruleset does not cover', () => {
+    const withLint = Arr.toPushed(required, 'Validate PR title');
+
+    test('a context that never reported is not waited for', () => {
+      const summary = summarizeChecks({
+        required: withLint,
+        reported: new Map([
+          ['code-check-result / result', 'passed'],
+          ['no-skip-ci-label', 'passed'],
+        ]),
+        paused: false,
+        running: false,
+        baseCovered: false,
+      });
+
+      assert.deepStrictEqual(summary.verdict, 'passed');
+
+      assert.deepStrictEqual(summary.notRun, ['Validate PR title']);
+
+      assert.deepStrictEqual(summary.missing, []);
+
+      assert.deepStrictEqual(summary.required, 3);
+    });
+
+    test('while nothing required has reported, everything is still coming', () => {
+      // Between a push and the first check suite, a head commit has nothing
+      // on it at all; that is not a pass over zero contexts.
+      const summary = summarizeChecks({
+        required: withLint,
+        reported: new Map(),
+        paused: false,
+        running: false,
+        baseCovered: false,
+      });
+
+      assert.deepStrictEqual(summary.verdict, 'pending');
+
+      assert.deepStrictEqual(summary.missing, withLint);
+
+      assert.deepStrictEqual(summary.notRun, []);
+    });
+
+    test('a context that reported is judged as anywhere else', () => {
+      const summary = summarizeChecks({
+        required: withLint,
+        reported: new Map([
+          ['code-check-result / result', 'failed'],
+          ['no-skip-ci-label', 'pending'],
+        ]),
+        paused: false,
+        running: false,
+        baseCovered: false,
+      });
+
+      assert.deepStrictEqual(summary.verdict, 'failing');
+
+      assert.deepStrictEqual(summary.pending, ['no-skip-ci-label']);
+    });
+  });
+
+  test('on a base the ruleset covers, nothing is excused from reporting', () => {
+    const summary = summarizeChecks({
+      required,
+      reported: new Map([['code-check-result / result', 'passed']]),
+      paused: false,
+      running: false,
+      baseCovered: true,
+    });
+
+    assert.deepStrictEqual(summary.missing, ['no-skip-ci-label']);
+
+    assert.deepStrictEqual(summary.notRun, []);
   });
 });
 
@@ -472,6 +558,7 @@ describe('a required context in a superseded round', () => {
       reported: statesFromCheckRuns(runs),
       paused: false,
       running: anyRunInProgress(runs),
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'pending');
@@ -507,6 +594,7 @@ describe('a required context in a superseded round', () => {
       ]),
       paused: false,
       running: false,
+      baseCovered: true,
     });
 
     assert.deepStrictEqual(summary.verdict, 'failing');

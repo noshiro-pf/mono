@@ -33,6 +33,7 @@ describe(loadReport, () => {
       pending: [],
       skipped: [],
       missing: [],
+      notRun: [],
       required: 2,
     });
 

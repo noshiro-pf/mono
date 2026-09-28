@@ -45,6 +45,7 @@ const checks: ChecksSummary = {
   pending: [],
   skipped: ['test-node-versions-result / result'],
   missing: ['spell-check-result / result'],
+  notRun: [],
   required: 5,
 } as const;
 
@@ -79,5 +80,31 @@ describe(describeCheckBreakdown, () => {
         'passed — style-check-result / result, no-skip-ci-label',
       ].join('\n'),
     );
+  });
+
+  // #2103, stacked on another pull request's branch: the three
+  // `lint-pull-request.yml` contexts run on pull requests into `main` only,
+  // and were listed as pending under a verdict that had passed.
+  test('says which contexts do not run on a stacked base', () => {
+    const stacked: ChecksSummary = {
+      verdict: 'passed',
+      passed: ['code-check-result / result', 'no-skip-ci-label'],
+      failed: [],
+      pending: [],
+      skipped: [],
+      missing: [],
+      notRun: ['Validate PR title', 'Validate commit count'],
+      required: 4,
+    } as const;
+
+    expect(describeCheckBreakdown(stacked)).toBe(
+      [
+        'over the 4 contexts the ruleset requires:',
+        'not run on this base — Validate PR title, Validate commit count',
+        'passed — code-check-result / result, no-skip-ci-label',
+      ].join('\n'),
+    );
+
+    expect(describeCheckCounts(stacked)).toBe('2\u{2205} 2\u{2713}');
   });
 });
