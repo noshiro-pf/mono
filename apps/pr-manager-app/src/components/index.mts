@@ -23,7 +23,7 @@ export * from './split-view-link.js';
 export * from './stat-tile.js';
 export * from './state-badge.js';
 export * from './summary-row.js';
-export * from './theme-button.js';
+export * from './theme-switch.js';
 export * from './timestamp.js';
 export * from './token-panel.js';
 export * from './verdict-badge.js';

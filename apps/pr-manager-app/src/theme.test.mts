@@ -1,8 +1,8 @@
 import {
+  chosenTheme,
   effectiveTheme,
   searchWithTheme,
   themeFromSearch,
-  toggledTheme,
 } from './theme.mjs';
 
 describe(themeFromSearch, () => {
@@ -61,32 +61,24 @@ describe(effectiveTheme, () => {
   });
 });
 
-describe(toggledTheme, () => {
-  test('from auto, to the opposite of the system', () => {
-    expect(toggledTheme('auto', 'light')).toBe('dark');
+describe(chosenTheme, () => {
+  test('the other look than the system is kept as a choice', () => {
+    expect(chosenTheme('dark', 'light')).toBe('dark');
 
-    expect(toggledTheme('auto', 'dark')).toBe('light');
+    expect(chosenTheme('light', 'dark')).toBe('light');
   });
 
-  test('back to auto when the opposite is what the system shows', () => {
-    expect(toggledTheme('dark', 'light')).toBe('auto');
+  test('the look the system shows is no choice at all', () => {
+    expect(chosenTheme('light', 'light')).toBe('auto');
 
-    expect(toggledTheme('light', 'dark')).toBe('auto');
+    expect(chosenTheme('dark', 'dark')).toBe('auto');
   });
 
-  test('to the other theme when the system already agrees with this one', () => {
-    // Reached by typing `?theme=dark` on a dark system, or by the system
-    // turning dark while the page was open.
-    expect(toggledTheme('dark', 'dark')).toBe('light');
-
-    expect(toggledTheme('light', 'light')).toBe('dark');
-  });
-
-  test('every press changes what is on screen', () => {
+  test('what is on screen is always the look picked', () => {
     for (const system of ['light', 'dark'] as const) {
-      for (const theme of ['auto', 'light', 'dark'] as const) {
-        expect(effectiveTheme(toggledTheme(theme, system), system)).not.toBe(
-          effectiveTheme(theme, system),
+      for (const picked of ['light', 'dark'] as const) {
+        expect(effectiveTheme(chosenTheme(picked, system), system)).toBe(
+          picked,
         );
       }
     }

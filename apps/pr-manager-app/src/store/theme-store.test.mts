@@ -8,14 +8,14 @@ describe(createThemeStore, () => {
 
     store.start();
 
-    store.toggle();
+    store.choose('light');
 
     assert.deepStrictEqual(applied, ['dark', 'auto']);
 
     assert.deepStrictEqual(saved, ['dark', 'auto']);
   });
 
-  test('toggles against what the system prefers now', () => {
+  test('chooses against what the system prefers now', () => {
     const { store, system } = setup('auto', 'light');
 
     store.start();
@@ -24,9 +24,13 @@ describe(createThemeStore, () => {
 
     assert.strictEqual(store.system.getSnapshot().value, 'dark');
 
-    store.toggle();
+    store.choose('light');
 
     assert.strictEqual(store.theme.getSnapshot().value, 'light');
+
+    store.choose('dark');
+
+    assert.strictEqual(store.theme.getSnapshot().value, 'auto');
   });
 
   test('stop ends the listener and the writes', () => {
@@ -38,7 +42,7 @@ describe(createThemeStore, () => {
 
     system.set('dark');
 
-    store.toggle();
+    store.choose('dark');
 
     assert.strictEqual(store.system.getSnapshot().value, 'light');
 

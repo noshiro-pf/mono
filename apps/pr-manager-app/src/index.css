@@ -7,8 +7,8 @@
  * each side of `light-dark()`.
  *
  * `color-scheme` is what picks the side. It is `light dark` until the reader
- * presses the theme button, which is the system's preference; the button
- * sets `data-theme` on `<html>` (`src/theme.mts`), and that pins it. One set
+ * picks a look in the theme switch, which is the system's preference; the
+ * switch sets `data-theme` on `<html>` (`src/theme.mts`), and that pins it. One set
  * of tokens rather than a copy under `prefers-color-scheme` and another under
  * `[data-theme]`, which is what the media query alone could not do: it
  * cannot be overridden from the page.
@@ -121,7 +121,6 @@ a:focus-visible {
 }
 
 .refresh-button,
-.theme-button,
 .header-button {
   background: var(--surface);
   border: 1px solid var(--baseline);
@@ -134,21 +133,58 @@ a:focus-visible {
 }
 
 .refresh-button:hover:not(:disabled),
-.theme-button:hover,
 .header-button:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-/* Laid out like a badge: the glyph and the word beside it. */
-.theme-button {
-  align-items: center;
+/*
+ * A segmented control: one outline around both looks, a hairline between
+ * them, and the pressed one filled. A `<fieldset>` for the group role, with
+ * its own margin and padding taken off. Each option is laid out like a badge, the
+ * glyph and the word beside it.
+ */
+.theme-switch {
+  border: 1px solid var(--baseline);
+  border-radius: var(--radius);
   display: inline-flex;
-  gap: 0.35rem;
+  margin: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
-.theme-button[aria-pressed='true'] {
-  border-color: var(--accent);
+.theme-switch-option {
+  align-items: center;
+  background: var(--surface);
+  border: none;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.875rem;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.theme-switch-option + .theme-switch-option {
+  border-left: 1px solid var(--baseline);
+}
+
+.theme-switch-option:hover:not([aria-pressed='true']) {
+  color: var(--accent);
+}
+
+.theme-switch-option[aria-pressed='true'] {
+  background: var(--hairline);
+  color: var(--ink-primary);
+  cursor: default;
+  font-weight: 600;
+}
+
+.theme-switch-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .refresh-button:disabled {
