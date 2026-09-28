@@ -391,6 +391,96 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('positions judged through parentheses and type wrappers', () => {
+    test.each([
+      {
+        name: 'a parenthesized read is still asserted',
+        source: 'console.log((xs[0]).toFixed());',
+        expected: 'console.log((xs[0]!).toFixed());',
+      },
+      {
+        name: 'parenthesized equality against undefined',
+        source: 'console.log((xs[0]) === undefined);',
+        expected: 'console.log((xs[0]) === undefined);',
+      },
+      {
+        name: 'parenthesized nullish coalescing',
+        source: 'console.log((xs[0]) ?? 0);',
+        expected: 'console.log((xs[0]) ?? 0);',
+      },
+      {
+        name: 'parenthesized optional property access',
+        source: 'console.log((xs[0])?.toFixed());',
+        expected: 'console.log((xs[0])?.toFixed());',
+      },
+      {
+        name: 'parenthesized if condition',
+        source: 'if ((xs[0])) { console.log(1); }',
+        expected: 'if ((xs[0])) { console.log(1); }',
+      },
+      {
+        name: 'parenthesized typeof operand',
+        source: 'console.log(typeof (xs[0]));',
+        expected: 'console.log(typeof (xs[0]));',
+      },
+      {
+        name: 'parenthesized negation operand',
+        source: 'console.log(!((xs[0])));',
+        expected: 'console.log(!((xs[0])));',
+      },
+      {
+        name: 'parenthesized existing non-null assertion',
+        source: 'console.log((xs[0])!.toFixed());',
+        expected: 'console.log((xs[0])!.toFixed());',
+      },
+      {
+        name: 'parenthesized type assertion',
+        source: 'console.log(((xs[0]) as number).toFixed());',
+        expected: 'console.log(((xs[0]) as number).toFixed());',
+      },
+      {
+        name: 'satisfies a type without undefined, which needs the assertion',
+        source: 'console.log(xs[0] satisfies number);',
+        expected: 'console.log(xs[0]! satisfies number);',
+      },
+      {
+        name: 'parenthesized satisfies a type without undefined',
+        source: 'console.log((xs[0]) satisfies number);',
+        expected: 'console.log((xs[0]!) satisfies number);',
+      },
+      {
+        name: 'satisfies a type with undefined, where the assertion is harmless',
+        source: 'console.log(xs[0] satisfies number | undefined);',
+        expected: 'console.log(xs[0]! satisfies number | undefined);',
+      },
+      {
+        name: 'parenthesized satisfies a type with undefined',
+        source: 'console.log((xs[0]) satisfies number | undefined);',
+        expected: 'console.log((xs[0]!) satisfies number | undefined);',
+      },
+      {
+        name: 'parenthesized compound assignment target',
+        source: '(mut_ys[0]) += 1;',
+        expected: '(mut_ys[0]) += 1;',
+      },
+      {
+        name: 'parenthesized assignment target',
+        source: '(mut_ys[0]) = 1;',
+        expected: '(mut_ys[0]) = 1;',
+      },
+      {
+        name: 'parenthesized delete target',
+        source: "delete (rec['a']);",
+        expected: "delete (rec['a']);",
+      },
+      {
+        name: 'parenthesized for-of loop target',
+        source: 'for ((mut_ys[0]) of xs) { break; }',
+        expected: 'for ((mut_ys[0]) of xs) { break; }',
+      },
+    ])('$name', testFn);
+  });
+
   describe('applyLevel: "avoidWhereUndefinedIsAllowed"', () => {
     test.each([
       {
@@ -531,6 +621,27 @@ describe(enableNoUncheckedIndexedAccessTransformer, () => {
       const sum = pair[0] + pair[1];
 
       console.log(parseRoute, bump, cell, sum);
+    `;
+
+    expect(diagnosticsUnderTheOption(source).length).toBeGreaterThan(0);
+
+    assert.deepStrictEqual(
+      diagnosticsUnderTheOption(transformInProject(source)),
+      [],
+    );
+  });
+
+  test('an access under `satisfies` or in parentheses compiles once transformed', () => {
+    const source = dedent`
+      declare const xs: readonly number[];
+
+      export const a = xs[0] satisfies number;
+
+      export const b = (xs[0]) satisfies number;
+
+      export const c = (xs[0]).toFixed();
+
+      export const d = (xs[0]) === undefined ? 0 : (xs[0]) ?? 1;
     `;
 
     expect(diagnosticsUnderTheOption(source).length).toBeGreaterThan(0);

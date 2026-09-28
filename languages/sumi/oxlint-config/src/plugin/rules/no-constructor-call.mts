@@ -1,5 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
 import { createRule } from './create-rule.mjs';
+import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * The built-ins that have both a `new` form and a call form whose call form
@@ -30,7 +31,8 @@ const bannedCallees: ReadonlyMap<string, string> = new Map([
  * plain function (`Number(x)`, `String(x)`, ...) is banned (D-15 / D-41): it
  * is an implicit conversion whose intent is not in the name and whose failure
  * is a sentinel. A locally declared binding of the same name is not the
- * global and is left alone.
+ * global and is left alone. A type wrapper around the callee
+ * (`(Number satisfies NumberConstructor)(x)`) is looked through.
  */
 export const noConstructorCall = createRule({
   meta: {
@@ -48,7 +50,8 @@ export const noConstructorCall = createRule({
   defaultOptions: [],
   create: (context) => ({
     CallExpression: (node) => {
-      const callee = node.callee;
+      // `(Number satisfies NumberConstructor)('1')` still calls `Number`.
+      const callee = skipTypeWrappers(node.callee);
 
       if (callee.type !== AST_NODE_TYPES.Identifier) {
         return;
@@ -63,7 +66,7 @@ export const noConstructorCall = createRule({
       // A user declaration of the same name shadows the global: not our case.
       for (
         let mut_scope: TSESLint.Scope.Scope | null =
-          context.sourceCode.getScope(callee);
+          context.sourceCode.getScope(node.callee);
         mut_scope !== null;
         mut_scope = mut_scope.upper
       ) {
@@ -75,7 +78,7 @@ export const noConstructorCall = createRule({
       }
 
       context.report({
-        node: callee,
+        node: node.callee,
         messageId: 'noConstructorCall',
         data: { name: callee.name, alternative },
       });

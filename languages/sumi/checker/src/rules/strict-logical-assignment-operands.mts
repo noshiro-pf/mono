@@ -8,6 +8,7 @@ import {
   type Checker,
   type Type,
 } from 'typescript-native/unstable/sync';
+import { unwrap } from '../ast/index.mjs';
 import { type Rule } from '../engine/index.mjs';
 
 /**
@@ -86,7 +87,9 @@ const isBooleanTyped = (
 
   operand: TsNode,
 ): boolean => {
-  const type = checker.getTypeAtLocation(operand);
+  // The type of the value, not of a cast or a `!` around it: neither makes a
+  // `boolean | undefined` any less able to be `undefined`.
+  const type = checker.getTypeAtLocation(unwrap(operand));
 
   return (
     type !== undefined &&

@@ -165,3 +165,50 @@ describe(noTupleMutatingMethod.ruleId, () => {
     ],
   });
 });
+
+describe(`${noTupleMutatingMethod.ruleId} through type wrappers`, () => {
+  testRule(noTupleMutatingMethod, {
+    valid: [
+      {
+        name: 'an array cast to a tuple is still an array',
+        code: dedent`
+          const mut_grow: number[] = [1, 2];
+          (mut_grow as [number, number]).push(3);
+          export const grow = mut_grow;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a mutator called through a wrapped callee',
+        code: dedent`
+          const mut_p: [number, string] = [1, 'a'];
+          (mut_p.push)(3);
+          (mut_p.push satisfies (...items: (number | string)[]) => number)(3);
+          (mut_p.reverse)!();
+          export const p = mut_p;
+        `,
+        errors: [
+          { messageId: 'lengthChanged', line: 2 },
+          { messageId: 'lengthChanged', line: 3 },
+          { messageId: 'positionsRewritten', line: 4 },
+        ],
+      },
+      {
+        name: 'a tuple cast to an array is still a tuple',
+        code: dedent`
+          const mut_q: [number, string] = [1, 'a'];
+          (mut_q as (number | string)[]).push(3);
+          (<(number | string)[]>mut_q).reverse();
+          (mut_q satisfies (number | string)[]).sort();
+          export const q = mut_q;
+        `,
+        errors: [
+          { messageId: 'lengthChanged', line: 2 },
+          { messageId: 'positionsRewritten', line: 3 },
+          { messageId: 'positionsRewritten', line: 4 },
+        ],
+      },
+    ],
+  });
+});

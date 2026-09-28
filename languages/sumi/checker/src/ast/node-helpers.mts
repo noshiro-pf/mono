@@ -3,10 +3,15 @@ import {
   isInterfaceDeclaration,
   isNonNullExpression,
   isParenthesizedExpression,
+  isSatisfiesExpression,
+  isTypeAssertion,
   type PropertyAccessExpression,
   type Node as TsNode,
 } from 'typescript-native/unstable/ast';
-import { type Checker } from 'typescript-native/unstable/sync';
+import {
+  type Checker,
+  type Symbol as TsSymbol,
+} from 'typescript-native/unstable/sync';
 
 /**
  * The name of the interface that declares the member being accessed, or
@@ -18,6 +23,11 @@ import { type Checker } from 'typescript-native/unstable/sync';
  * narrow the candidates by syntax first: the pass walks every node of every
  * file and each query is a round trip (D-55). The fallback for a member
  * reached through a mapped type costs one more.
+ *
+ * A receiver behind a type wrapper (`(xs as T).push`, `(<T>xs).sort`) is
+ * resolved on the type of the value underneath, because the cast's type can
+ * say anything: `{ push: … }` would hide `Array`'s `push` behind a member of
+ * one's own (docs/writing-lint-rules.md at the repository root).
  */
 export const ownerOf = (
   // `Checker` is TypeScript's own interface, declared mutable; this package
@@ -27,7 +37,7 @@ export const ownerOf = (
 
   access: PropertyAccessExpression,
 ): string | undefined => {
-  const symbol = checker.getSymbolAtLocation(access.name);
+  const symbol = memberSymbolOf(checker, access);
 
   if (symbol === undefined) {
     return undefined;
@@ -51,10 +61,47 @@ export const ownerOf = (
     : undefined;
 };
 
-/** Parentheses, `as` and `!` say nothing about what an expression denotes. */
+/**
+ * Parentheses, `as`, `satisfies`, `!` and `<T>` say nothing about what an
+ * expression denotes. Judge the syntax, and ask the type, of what is
+ * underneath (docs/writing-lint-rules.md at the repository root).
+ */
 export const unwrap = (node: TsNode): TsNode =>
   isParenthesizedExpression(node) ||
   isAsExpression(node) ||
-  isNonNullExpression(node)
+  isSatisfiesExpression(node) ||
+  isNonNullExpression(node) ||
+  isTypeAssertion(node)
     ? unwrap(node.expression)
     : node;
+
+/**
+ * The member `access` names: the symbol the checker resolved, or — when the
+ * receiver is wrapped — the property of that name on the unwrapped
+ * receiver's type.
+ */
+const memberSymbolOf = (
+  // `Checker` is TypeScript's own interface, declared mutable; this package
+  // does not get to restate it.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: Checker,
+
+  access: PropertyAccessExpression,
+): TsSymbol | undefined => {
+  const receiver = unwrap(access.expression);
+
+  if (receiver === access.expression) {
+    return checker.getSymbolAtLocation(access.name);
+  }
+
+  const receiverType = checker.getTypeAtLocation(receiver);
+
+  if (receiverType === undefined) {
+    return undefined;
+  }
+
+  return checker.getPropertyOfType(
+    checker.getApparentType(receiverType) ?? receiverType,
+    access.name.text,
+  );
+};

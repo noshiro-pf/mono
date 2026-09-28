@@ -3,6 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { type DeepReadonly } from 'ts-type-forge';
 import { createRule } from './create-rule.mjs';
+import { skipTypeWrappers } from './skip-type-wrappers.mjs';
 
 /**
  * `modules/no-internal-module-import` — a module is addressed by its public
@@ -38,14 +39,11 @@ export const noInternalModuleImport = createRule({
         return;
       }
 
-      if (
-        source.type !== AST_NODE_TYPES.Literal ||
-        typeof source.value !== 'string'
-      ) {
+      const specifier = staticSpecifierOf(skipTypeWrappers(source));
+
+      if (specifier === undefined) {
         return;
       }
-
-      const specifier = source.value;
 
       if (specifier.startsWith('./') || specifier.startsWith('../')) {
         if (reachesIntoDirectory(specifier)) {
@@ -94,6 +92,29 @@ export const noInternalModuleImport = createRule({
     };
   },
 });
+
+/**
+ * The string a specifier spells out, whether written as a string literal or
+ * as a template literal with no substitutions (`import(\`./a/b.mjs\`)`);
+ * `undefined` for one computed at run time. The caller has already looked
+ * through `as` / `satisfies`, which a dynamic import's argument may carry.
+ */
+const staticSpecifierOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): string | undefined => {
+  if (node.type === AST_NODE_TYPES.Literal) {
+    return typeof node.value === 'string' ? node.value : undefined;
+  }
+
+  if (
+    node.type === AST_NODE_TYPES.TemplateLiteral &&
+    node.expressions.length === 0
+  ) {
+    return node.quasis[0]?.value.cooked ?? undefined;
+  }
+
+  return undefined;
+};
 
 /**
  * `./a/b.mjs` reaches; `./a.mjs`, `../a.mjs` and `./a/index.mjs` do not.
