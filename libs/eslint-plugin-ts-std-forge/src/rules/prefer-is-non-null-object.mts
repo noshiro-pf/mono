@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import { skipTypeWrappers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -85,16 +85,24 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
   defaultOptions: [],
 } as const;
 
+// Every operand below is read through its type wrappers: `typeof (u satisfies
+// unknown) === 'object' && u! !== null` is the same check.
+
 const getNonNullObjectIdentifierName = (
-  node: DeepReadonly<TSESTree.LogicalExpression>,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.LogicalExpression,
 ): string | undefined => {
   if (node.operator !== '&&') {
     return undefined;
   }
 
-  const leftIdentifierName = getTypeofObjectIdentifierName(node.left);
+  const leftIdentifierName = getTypeofObjectIdentifierName(
+    skipTypeWrappers(node.left),
+  );
 
-  const rightIdentifierName = getNonNullCheckIdentifierName(node.right);
+  const rightIdentifierName = getNonNullCheckIdentifierName(
+    skipTypeWrappers(node.right),
+  );
 
   return leftIdentifierName === undefined ||
     rightIdentifierName === undefined ||
@@ -104,7 +112,8 @@ const getNonNullObjectIdentifierName = (
 };
 
 const getTypeofObjectIdentifierName = (
-  node: DeepReadonly<TSESTree.Expression>,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
 ): string | undefined => {
   if (node.type !== AST_NODE_TYPES.BinaryExpression) {
     return undefined;
@@ -114,19 +123,29 @@ const getTypeofObjectIdentifierName = (
     return undefined;
   }
 
-  const { left, right } = node;
+  const left = skipTypeWrappers(node.left);
 
-  return left.type !== AST_NODE_TYPES.UnaryExpression ||
+  const right = skipTypeWrappers(node.right);
+
+  if (
+    left.type !== AST_NODE_TYPES.UnaryExpression ||
     left.operator !== 'typeof' ||
     right.type !== AST_NODE_TYPES.Literal ||
-    right.value !== 'object' ||
-    left.argument.type !== AST_NODE_TYPES.Identifier
-    ? undefined
-    : left.argument.name;
+    right.value !== 'object'
+  ) {
+    return undefined;
+  }
+
+  const argument = skipTypeWrappers(left.argument);
+
+  return argument.type === AST_NODE_TYPES.Identifier
+    ? argument.name
+    : undefined;
 };
 
 const getNonNullCheckIdentifierName = (
-  node: DeepReadonly<TSESTree.Expression>,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
 ): string | undefined => {
   if (node.type !== AST_NODE_TYPES.BinaryExpression) {
     return undefined;
@@ -136,7 +155,9 @@ const getNonNullCheckIdentifierName = (
     return undefined;
   }
 
-  const { left, right } = node;
+  const left = skipTypeWrappers(node.left);
+
+  const right = skipTypeWrappers(node.right);
 
   return left.type !== AST_NODE_TYPES.Identifier ||
     right.type !== AST_NODE_TYPES.Literal ||

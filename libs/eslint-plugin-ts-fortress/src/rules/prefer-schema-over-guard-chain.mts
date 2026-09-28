@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isTypeWrapper, skipTypeWrappers } from './ast-utils.mjs';
 import { TS_FORTRESS_MODULE } from './constants.mjs';
 
 type Options = readonly [
@@ -157,23 +158,27 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       operand: TSESTree.Node,
     ): string | undefined => {
+      const unwrapped = skipTypeWrappers(operand);
+
       const call =
-        operand.type === AST_NODE_TYPES.UnaryExpression &&
-        operand.operator === '!'
-          ? operand.argument
-          : operand;
+        unwrapped.type === AST_NODE_TYPES.UnaryExpression &&
+        unwrapped.operator === '!'
+          ? skipTypeWrappers(unwrapped.argument)
+          : unwrapped;
 
       if (call.type !== AST_NODE_TYPES.CallExpression) {
         return undefined;
       }
 
+      const callee = skipTypeWrappers(call.callee);
+
       const name =
-        call.callee.type === AST_NODE_TYPES.Identifier
-          ? call.callee.name
-          : call.callee.type === AST_NODE_TYPES.MemberExpression &&
-              !call.callee.computed &&
-              call.callee.property.type === AST_NODE_TYPES.Identifier
-            ? call.callee.property.name
+        callee.type === AST_NODE_TYPES.Identifier
+          ? callee.name
+          : callee.type === AST_NODE_TYPES.MemberExpression &&
+              !callee.computed &&
+              callee.property.type === AST_NODE_TYPES.Identifier
+            ? callee.property.name
             : undefined;
 
       if (name === undefined || !guards.includes(name)) {
@@ -192,10 +197,13 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
         }
 
         // Only the outermost node of a chain, so that `a && b && c` is judged
-        // once as three operands rather than three times as nested pairs.
+        // once as three operands rather than three times as nested pairs. A
+        // type wrapper between two links does not end the chain.
+        const parent = parentOutsideTypeWrappers(node);
+
         if (
-          node.parent.type === AST_NODE_TYPES.LogicalExpression &&
-          node.parent.operator === node.operator
+          parent?.type === AST_NODE_TYPES.LogicalExpression &&
+          parent.operator === node.operator
         ) {
           return;
         }
@@ -229,17 +237,31 @@ export const preferSchemaOverGuardChain: TSESLint.RuleModule<
   defaultOptions: [{}],
 } as const;
 
-/** The operands of a chain of one logical operator, flattened. */
+/**
+ * The operands of a chain of one logical operator, flattened, reading through
+ * the type wrappers around a link (`(a && b satisfies boolean) && c`).
+ */
 const operandsOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.LogicalExpression,
 ): readonly TSESTree.Node[] =>
-  [node.left, node.right].flatMap((side) =>
-    side.type === AST_NODE_TYPES.LogicalExpression &&
-    side.operator === node.operator
-      ? operandsOf(side)
-      : [side],
-  );
+  [node.left, node.right].flatMap((side) => {
+    const unwrapped = skipTypeWrappers(side);
+
+    return unwrapped.type === AST_NODE_TYPES.LogicalExpression &&
+      unwrapped.operator === node.operator
+      ? operandsOf(unwrapped)
+      : [side];
+  });
+
+/** The parent of `node` and of the type wrappers around it. */
+const parentOutsideTypeWrappers = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): TSESTree.Node | undefined =>
+  node.parent !== undefined && isTypeWrapper(node.parent)
+    ? parentOutsideTypeWrappers(node.parent)
+    : node.parent;
 
 /**
  * The identifier a member access chain starts from — `a` for `a.b.c` — so that
@@ -257,13 +279,8 @@ const rootIdentifierOf = (
     return rootIdentifierOf(node.object);
   }
 
-  // `a?.b` and `a!.b` are the same root as `a.b`.
-  if (
-    node.type === AST_NODE_TYPES.ChainExpression ||
-    node.type === AST_NODE_TYPES.TSNonNullExpression
-  ) {
-    return rootIdentifierOf(node.expression);
-  }
-
-  return undefined;
+  // `a?.b`, `a!.b` and `(a as T).b` are the same root as `a.b`.
+  return node.type === AST_NODE_TYPES.ChainExpression || isTypeWrapper(node)
+    ? rootIdentifierOf(node.expression)
+    : undefined;
 };

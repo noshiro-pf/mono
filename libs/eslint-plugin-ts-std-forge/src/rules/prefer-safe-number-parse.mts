@@ -5,6 +5,12 @@ import {
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 import {
+  getArgumentText,
+  getValueType,
+  isIdentifierNamed,
+  skipTypeWrappers,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsStdForgeImport,
@@ -65,8 +71,6 @@ export const preferSafeNumberParse: TSESLint.RuleModule<MessageIds, Options> = {
 
     const tsStdForgeImport = getTsStdForgeImport(program);
 
-    const services = sourceCode.parserServices;
-
     const mut_nodesToFix: {
       node: TSESTree.CallExpression;
       argExpression: TSESTree.Expression;
@@ -74,7 +78,7 @@ export const preferSafeNumberParse: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       CallExpression: (node) => {
-        const { callee } = node;
+        const callee = skipTypeWrappers(node.callee);
 
         // Match `parseFloat(...)` (global function).
         const isGlobalParseFloat =
@@ -85,8 +89,7 @@ export const preferSafeNumberParse: TSESLint.RuleModule<MessageIds, Options> = {
         const isNumberParseFloat =
           callee.type === AST_NODE_TYPES.MemberExpression &&
           !callee.computed &&
-          callee.object.type === AST_NODE_TYPES.Identifier &&
-          callee.object.name === 'Number' &&
+          isIdentifierNamed(callee.object, 'Number') &&
           callee.property.type === AST_NODE_TYPES.Identifier &&
           callee.property.name === 'parseFloat';
 
@@ -112,23 +115,12 @@ export const preferSafeNumberParse: TSESLint.RuleModule<MessageIds, Options> = {
         }
 
         // The argument must be purely `string` so the autofix is type-safe
-        // against `SafeNumber.parse(value: string)`. Without type information,
-        // skip.
-        if (services?.program == null) {
-          return;
-        }
+        // against `SafeNumber.parse(value: string)`, and that of the value, not
+        // of a cast: `Number(true as unknown as string)` is 1, the rewrite NaN.
+        // Without type information, skip.
+        const argType = getValueType(sourceCode, firstArg);
 
-        const checker = services.program.getTypeChecker();
-
-        const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
-
-        if (tsNode === undefined) {
-          return;
-        }
-
-        const argType = checker.getTypeAtLocation(tsNode);
-
-        if (!isStringType(argType)) {
+        if (argType === undefined || !isStringType(argType)) {
           return;
         }
 
@@ -145,7 +137,7 @@ export const preferSafeNumberParse: TSESLint.RuleModule<MessageIds, Options> = {
           index,
           { node, argExpression },
         ] of mut_nodesToFix.entries()) {
-          const argText = sourceCode.getText(argExpression);
+          const argText = getArgumentText(sourceCode, argExpression);
 
           context.report({
             node,
