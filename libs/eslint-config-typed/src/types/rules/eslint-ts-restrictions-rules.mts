@@ -370,6 +370,21 @@ namespace PreferNullishCoalescingWhenSafe {
 }
 
 /**
+ * @description Replace a ternary that yields `undefined` for a nullish value and an access on it otherwise by an optional chain (`x == null ? undefined : x.b` → `x?.b`).
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferOptionalChainOverTernary {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Write a range check in the order of the number line (`x >= min && max >= x` → `min <= x && x <= max`, `min > x || x > max` → `x < min || max < x`).
  *
  *  ```md
@@ -438,6 +453,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
+  'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
 }>;
