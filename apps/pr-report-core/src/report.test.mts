@@ -1,5 +1,5 @@
 import { buildEntries } from './report.mjs';
-import { type PullRequestFacts } from './types.mjs';
+import { type ContextState, type PullRequestFacts } from './types.mjs';
 
 const facts = (
   number: number,
@@ -88,6 +88,35 @@ describe(buildEntries, () => {
     assert.deepStrictEqual(
       roots.map(({ number }) => number),
       [2],
+    );
+  });
+
+  test('only a pull request into the default branch waits for every context', () => {
+    // `Validate PR title` runs on pull requests into `main` only, and the
+    // ruleset that requires it covers nothing else.
+    const reported = new Map<string, ContextState>([
+      ['code-check-result / result', 'passed'],
+    ]);
+
+    const { entries } = buildEntries({
+      required: ['code-check-result / result', 'Validate PR title'],
+      defaultBranch: 'main',
+      pulls: [
+        facts(1, { reported }),
+        facts(2, { baseRef: 'branch-1', reported }),
+      ],
+    });
+
+    assert.deepStrictEqual(
+      entries.map(({ checks }) => [
+        checks.verdict,
+        checks.missing,
+        checks.notRun,
+      ]),
+      [
+        ['pending', ['Validate PR title'], []],
+        ['passed', [], ['Validate PR title']],
+      ],
     );
   });
 });

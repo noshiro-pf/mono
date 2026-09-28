@@ -200,18 +200,29 @@ export const classifyCommitStatus = (state: string): ContextState => {
  * required context that is pending and one that has not reported. Without it
  * a commit mid-round reads as settled out of the round before — which is how
  * a failing pull request (#2031) came to show a tick.
+ *
+ * **Off the covered base, a context that never reported is not awaited.**
+ * The contexts are the ones the ruleset asks of `main`, and a workflow that
+ * runs only on pull requests into `main` never reports on a stacked one —
+ * which kept #2103, every check of it green, "running" until it was moved
+ * onto `main`. Such a context is {@link ChecksSummary.notRun} instead, but
+ * only once some required context has reported: before the first check
+ * suite, nothing having come is not a pass over zero contexts.
  */
 export const summarizeChecks = ({
   required,
   reported,
   paused,
   running,
+  baseCovered,
 }: Readonly<{
   required: readonly string[];
   reported: ReadonlyMap<string, ContextState>;
   paused: boolean;
   /** Whether anything at all is still going on the head commit. */
   running: boolean;
+  /** Whether the ruleset applies to the pull request's base branch. */
+  baseCovered: boolean;
 }>): ChecksSummary => {
   const passed = required.filter((c) => reported.get(c) === 'passed');
 
@@ -221,7 +232,13 @@ export const summarizeChecks = ({
 
   const skipped = required.filter((c) => reported.get(c) === 'skipped');
 
-  const missing = required.filter((c) => !reported.has(c));
+  const unreported = required.filter((c) => !reported.has(c));
+
+  const awaited = baseCovered || unreported.length === required.length;
+
+  const missing = awaited ? unreported : ([] as const);
+
+  const notRun = awaited ? ([] as const) : unreported;
 
   return {
     verdict: paused
@@ -236,6 +253,7 @@ export const summarizeChecks = ({
     pending,
     skipped,
     missing,
+    notRun,
     required: required.length,
   };
 };

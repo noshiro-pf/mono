@@ -103,6 +103,8 @@ export const buildEntries = ({
           reported: facts.reported,
           paused: facts.labels.some((label) => label.name === SKIP_CI_LABEL),
           running: facts.checksRunning,
+          // The ruleset's own condition: `~DEFAULT_BRANCH` and `main`.
+          baseCovered: facts.baseRef === defaultBranch,
         }),
       };
     });

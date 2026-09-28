@@ -97,8 +97,9 @@ type Part = Readonly<{
 
 /**
  * The states a required context can be in, in the order a reader triages
- * them: what is wrong, what is still coming, what was skipped, what is fine.
- * A context with nothing reported yet is still coming.
+ * them: what is wrong, what is still coming, what was skipped or will not
+ * come, what is fine. A context with nothing reported yet is still coming,
+ * unless the pull request is stacked and it is one that never runs there.
  */
 const partsOf = (checks: ChecksSummary): readonly Part[] =>
   [
@@ -109,5 +110,6 @@ const partsOf = (checks: ChecksSummary): readonly Part[] =>
       names: [...checks.pending, ...checks.missing],
     },
     { label: 'skipped', glyph: '\u{2013}', names: checks.skipped },
+    { label: 'not run on this base', glyph: '\u{2205}', names: checks.notRun },
     { label: 'passed', glyph: '\u{2713}', names: checks.passed },
   ] as const;
