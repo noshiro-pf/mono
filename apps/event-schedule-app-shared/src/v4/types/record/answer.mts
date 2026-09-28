@@ -57,8 +57,7 @@ export const fillAnswer = (p?: PartialAnswer): Answer =>
     comment: p?.comment ?? d.comment,
     selection: (p?.selection ?? d.selection).map(fillAnswerSelection),
     [ANSWER_KEY_CREATED_AT]:
-      (p === undefined ? undefined : p[ANSWER_KEY_CREATED_AT]) ??
-      d[ANSWER_KEY_CREATED_AT],
+      p?.[ANSWER_KEY_CREATED_AT] ?? d[ANSWER_KEY_CREATED_AT],
     weight: p?.weight ?? d.weight,
     isRequiredParticipants:
       p?.isRequiredParticipants ?? d.isRequiredParticipants,
