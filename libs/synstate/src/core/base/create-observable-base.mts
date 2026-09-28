@@ -274,7 +274,7 @@ type AssembleObservableArgs<
   Extra extends ReadonlyRecord<string, unknown>,
 > = Readonly<{
   kind: Kind;
-  depth: number;
+  depth: Kind extends 'root' ? 0 : number;
   handle: ObservableBaseHandle<A>;
   tryUpdate: (updateToken: UpdateToken) => void;
   tryComplete: () => void;
@@ -309,7 +309,10 @@ export const assembleObservable = <
   extra,
 }: AssembleObservableArgs<A, Kind, Extra>): Extra &
   ObservableBase<A> &
-  Readonly<{ kind: Kind }> => {
+  Readonly<{
+    kind: Kind;
+    depth: AssembleObservableArgs<A, Kind, Extra>['depth'];
+  }> => {
   function pipe<B>(
     operator: WithInitialValueOperator<A, B>,
   ): InitializedObservable<B>;
