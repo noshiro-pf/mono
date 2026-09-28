@@ -4,7 +4,7 @@ import {
   ExternalLink,
   LoadStateView,
   Notice,
-  ThemeButton,
+  ThemeSwitch,
   TokenPanel,
   ViewSettings,
 } from './components/index.mjs';
@@ -61,7 +61,7 @@ export const App = React.memo(() => {
 
           <ViewSettings />
 
-          <ThemeButton />
+          <ThemeSwitch />
 
           <button
             className={'refresh-button'}

@@ -8,12 +8,12 @@
  * on an origin every app under `noshiro-pf.github.io` shares, and is gone
  * from a tab opened without it.
  *
- * **Every press flips what is on screen.** The button is a toggle between two
- * looks, not a cycle through three settings — a cycle would have a press
- * that changes nothing visible, which reads as a button that is broken. So
- * pressing it chooses the opposite of what is shown, and a choice that comes
- * back to what the system shows is stored as no choice at all, which is what
- * lets a page that was switched to dark and back follow the system again.
+ * **Two buttons, one per look, and the pressed one is what is on screen.**
+ * Not a third for the system: it would be pressed on a page that looks
+ * exactly as one of the other two says, and pressing it would often change
+ * nothing visible. So picking a look chooses it, and picking the one the
+ * system shows is stored as no choice at all, which is what lets a page that
+ * was switched to dark and back follow the system again.
  */
 
 import { currentSearch, rewriteSearch } from './url.mjs';
@@ -64,13 +64,9 @@ export const effectiveTheme = (
   system: ColorScheme,
 ): ColorScheme => (theme === 'auto' ? system : theme);
 
-/** The opposite of what is on screen, as no choice when the system agrees. */
-export const toggledTheme = (theme: Theme, system: ColorScheme): Theme => {
-  const next: ColorScheme =
-    effectiveTheme(theme, system) === 'dark' ? 'light' : 'dark';
-
-  return next === system ? 'auto' : next;
-};
+/** The look picked, as no choice when the system agrees. */
+export const chosenTheme = (picked: ColorScheme, system: ColorScheme): Theme =>
+  picked === system ? 'auto' : picked;
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
