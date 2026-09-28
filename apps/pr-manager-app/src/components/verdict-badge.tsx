@@ -1,5 +1,5 @@
 import { type ChecksSummary } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import {
   describeCheckBreakdown,
   describeCheckCounts,
@@ -18,7 +18,7 @@ type Props = Readonly<{ checks: ChecksSummary }>;
  * skipped in a round that was being superseded — is invisible unless the
  * parts are shown. The names are on hover.
  */
-export const VerdictBadge = React.memo<Props>((props) => {
+export const VerdictBadge = memoNamed<Props>('VerdictBadge', (props) => {
   const { checks } = props;
 
   const verdict = presentVerdict(checks.verdict);
@@ -37,5 +37,3 @@ export const VerdictBadge = React.memo<Props>((props) => {
     </span>
   );
 });
-
-VerdictBadge.displayName = 'VerdictBadge';

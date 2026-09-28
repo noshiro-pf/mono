@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { useObservableValue } from 'synstate-react-hooks';
+import { type ComponentChildren } from 'preact';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
@@ -8,7 +10,7 @@ import { ColumnDivider } from './column-divider.js';
 
 type Props = Readonly<{
   /** What each block holds. Where it goes is the layout's. */
-  blocks: ReadonlyRecord<BlockId, React.ReactNode>;
+  blocks: ReadonlyRecord<BlockId, ComponentChildren>;
 }>;
 
 /**
@@ -19,14 +21,14 @@ type Props = Readonly<{
  * for two, the stylesheet stacks them into one (the grid template is then
  * ignored, which is why it can be an inline style).
  */
-export const BlockLayout = React.memo<Props>((props) => {
+export const BlockLayout = memoNamed<Props>('BlockLayout', (props) => {
   const { blocks } = props;
 
   const layout = useObservableValue(layoutStore.layout);
 
   const moving = useObservableValue(layoutStore.moving);
 
-  const style = React.useMemo(
+  const style = useMemo(
     () =>
       layout.columns === 2
         ? {
@@ -67,5 +69,3 @@ export const BlockLayout = React.memo<Props>((props) => {
     </div>
   );
 });
-
-BlockLayout.displayName = 'BlockLayout';

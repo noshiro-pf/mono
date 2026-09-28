@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{ armed: boolean }>;
 
@@ -10,11 +10,12 @@ type Props = Readonly<{ armed: boolean }>;
  * so off is where every queued pull request waits for its turn, and on is its
  * turn having come — or a bot that armed its own.
  */
-export const AutoMergeBadge = React.memo<Props>(({ armed }) => (
-  <span className={'badge'} data-auto-merge={armed ? 'on' : 'off'}>
-    <span aria-hidden={'true'}>{armed ? '⇥' : '⊘'}</span>
-    {armed ? 'auto-merge on' : 'auto-merge off'}
-  </span>
-));
-
-AutoMergeBadge.displayName = 'AutoMergeBadge';
+export const AutoMergeBadge = memoNamed<Props>(
+  'AutoMergeBadge',
+  ({ armed }) => (
+    <span className={'badge'} data-auto-merge={armed ? 'on' : 'off'}>
+      <span aria-hidden={'true'}>{armed ? '⇥' : '⊘'}</span>
+      {armed ? 'auto-merge on' : 'auto-merge off'}
+    </span>
+  ),
+);

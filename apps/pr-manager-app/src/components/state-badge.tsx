@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{ isDraft: boolean }>;
 
@@ -14,11 +14,9 @@ type Props = Readonly<{ isDraft: boolean }>;
  * colour here would put it on the same row as the check verdict, which is a
  * status.
  */
-export const StateBadge = React.memo<Props>(({ isDraft }) => (
+export const StateBadge = memoNamed<Props>('StateBadge', ({ isDraft }) => (
   <span className={'badge'} data-state={isDraft ? 'draft' : 'open'}>
     <span aria-hidden={'true'}>{isDraft ? '◌' : '●'}</span>
     {isDraft ? 'draft' : 'open'}
   </span>
 ));
-
-StateBadge.displayName = 'StateBadge';

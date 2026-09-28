@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { type LoadState } from '../load-state.mjs';
 import { Notice } from './notice.js';
 import { ReportView } from './report-view.js';
@@ -6,7 +6,7 @@ import { ReportView } from './report-view.js';
 type Props = Readonly<{ state: LoadState; nowMs: number }>;
 
 /** What the state says, once there is a token to have read with. */
-export const LoadStateView = React.memo<Props>((props) => {
+export const LoadStateView = memoNamed<Props>('LoadStateView', (props) => {
   const { state, nowMs } = props;
 
   switch (state.type) {
@@ -20,5 +20,3 @@ export const LoadStateView = React.memo<Props>((props) => {
       return <ReportView nowMs={nowMs} report={state.report} />;
   }
 });
-
-LoadStateView.displayName = 'LoadStateView';

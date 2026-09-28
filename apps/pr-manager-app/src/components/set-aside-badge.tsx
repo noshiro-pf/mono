@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { type SetAsideView } from '../load-report.mjs';
 import { BadgeIcon } from './badge-icon.js';
 
@@ -12,7 +12,7 @@ type Props = Readonly<{ setAside: SetAsideView | undefined; baseRef: string }>;
  * is its answer to give, not a merge check's. Once the base has moved the
  * next run tries again, so the badge stops being a status and becomes a note.
  */
-export const SetAsideBadge = React.memo<Props>((props) => {
+export const SetAsideBadge = memoNamed<Props>('SetAsideBadge', (props) => {
   const { setAside, baseRef } = props;
 
   if (setAside === undefined) {
@@ -38,8 +38,6 @@ export const SetAsideBadge = React.memo<Props>((props) => {
     </span>
   );
 });
-
-SetAsideBadge.displayName = 'SetAsideBadge';
 
 /** An arrow that goes around rather than through. */
 const SET_ASIDE_ICON = 'M3 12.5V9.5a4 4 0 0 1 4-4h6M10.5 3l2.5 2.5L10.5 8';

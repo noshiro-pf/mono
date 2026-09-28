@@ -1,5 +1,6 @@
 import { type LinkedIssue } from 'pr-report-core';
-import * as React from 'react';
+import { Fragment } from 'preact';
+import { memoNamed } from 'preact-utils';
 import { ExternalLink } from './external-link.js';
 
 type Props = Readonly<{ issues: readonly LinkedIssue[] }>;
@@ -12,19 +13,17 @@ type Props = Readonly<{ issues: readonly LinkedIssue[] }>;
  * The list is GitHub's own — the one in the pull request's sidebar, which
  * includes a link made by hand — so the titles are always there.
  */
-export const LinkedIssues = React.memo<Props>(({ issues }) => (
+export const LinkedIssues = memoNamed<Props>('LinkedIssues', ({ issues }) => (
   <span className={'linked-issues'}>
     {'closes '}
     {issues.map((issue, index) => (
-      <React.Fragment key={issue.number}>
+      <Fragment key={issue.number}>
         {index === 0 ? '' : ', '}
         <ExternalLink dataState={issue.state} href={issue.url}>
           {`#${issue.number}`}
         </ExternalLink>
         {issue.title === '' ? '' : ` ${issue.title}`}
-      </React.Fragment>
+      </Fragment>
     ))}
   </span>
 ));
-
-LinkedIssues.displayName = 'LinkedIssues';

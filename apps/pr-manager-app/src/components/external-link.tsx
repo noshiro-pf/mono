@@ -1,8 +1,9 @@
-import * as React from 'react';
+import { type ComponentChildren } from 'preact';
+import { memoNamed } from 'preact-utils';
 
 type Props = Readonly<{
   href: string;
-  children: React.ReactNode;
+  children: ComponentChildren;
   /**
    * What the link is, rather than what it should look like: `className` on a
    * component is what `react/forbid-component-props` forbids, and rightly —
@@ -28,7 +29,8 @@ type Props = Readonly<{
  * `noopener`, which is what keeps the opened page from reaching back through
  * `window.opener`.
  */
-export const ExternalLink = React.memo<Props>(
+export const ExternalLink = memoNamed<Props>(
+  'ExternalLink',
   ({ href, children, variant, dataState, title }) => (
     <a
       className={variant}
@@ -42,5 +44,3 @@ export const ExternalLink = React.memo<Props>(
     </a>
   ),
 );
-
-ExternalLink.displayName = 'ExternalLink';

@@ -601,7 +601,7 @@
       "project": ["**/*.mts"],
     },
 
-    // Not an Astro site like the entry above assumes: a Vite React app whose
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
     // entry is the module `index.html` loads.
     "apps/pr-manager-app": {
       "entry": ["src/main.tsx", "configs/*.mts", "scripts/**/*.mts"],

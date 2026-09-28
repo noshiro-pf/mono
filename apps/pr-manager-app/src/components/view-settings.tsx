@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { useObservableValue } from 'synstate-react-hooks';
+import { type InputEventHandler, type RefCallback } from 'preact';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
+import { useObservableValue } from 'synstate-preact-hooks';
 import { Arr } from 'ts-data-forge';
 import {
   MAX_SPLIT,
@@ -22,10 +24,10 @@ import { ViewSettingsRow } from './view-settings-row.js';
  * tells it when Escape closes the dialog. Every change applies at once, so
  * there is nothing to confirm or cancel.
  */
-export const ViewSettings = React.memo(() => {
+export const ViewSettings = memoNamed('ViewSettings', () => {
   const layout = useObservableValue(layoutStore.layout);
 
-  const columns = React.useMemo<
+  const columns = useMemo<
     readonly (readonly [ColumnIndex, readonly BlockId[]])[]
   >(
     () =>
@@ -90,7 +92,7 @@ export const ViewSettings = React.memo(() => {
                 min={MIN_SPLIT}
                 type={'range'}
                 value={layout.split}
-                onChange={onSplitChange}
+                onInput={onSplitInput}
               />
             </label>
           ) : undefined}
@@ -154,14 +156,12 @@ export const ViewSettings = React.memo(() => {
   );
 });
 
-ViewSettings.displayName = 'ViewSettings';
-
 // Outside the component, since none of them reads its props: one function
 // each serves every render, with no `useCallback` to keep it stable.
 
 // A modal dialog is opened by a call, not an attribute, so the element
 // follows the store by subscribing to it for as long as it is mounted.
-const followOpen: React.RefCallback<HTMLDialogElement> = (dialog) => {
+const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
   if (dialog === null) {
     return undefined;
   }
@@ -187,8 +187,8 @@ const twoColumns = (): void => {
   layoutStore.setColumns(2);
 };
 
-const onSplitChange: React.ChangeEventHandler<HTMLInputElement> = (changed) => {
-  layoutStore.setSplit(changed.target.valueAsNumber);
+const onSplitInput: InputEventHandler<HTMLInputElement> = (changed) => {
+  layoutStore.setSplit(changed.currentTarget.valueAsNumber);
 };
 
 const TITLE_ID = 'view-settings-title';

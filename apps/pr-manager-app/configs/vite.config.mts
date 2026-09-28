@@ -28,9 +28,9 @@ import { pagesAppBase } from '../../../tools/configs/pages-apps.mjs';
  * allowed to set it — it needs a real header, and GitHub Pages sends
  * `X-Frame-Options: deny` on its own.
  *
- * Build-only, because the dev server needs an inline preamble for Fast
- * Refresh and a websocket for HMR, and a policy loose enough for those would
- * not be worth shipping.
+ * Build-only, because the dev server's HMR talks to it over a websocket,
+ * which `connect-src` would then have to name, and a policy loosened for that
+ * would not be worth shipping.
  */
 const contentSecurityPolicy: VitePlugin = {
   name: 'pr-manager-app:content-security-policy',
@@ -60,7 +60,7 @@ const contentSecurityPolicy: VitePlugin = {
 
 const shared: UserConfig = defineViteAppConfig({
   packageRoot: workspaceRootPath,
-  framework: 'react',
+  framework: 'preact',
   // This app is served from the repository's Pages site rather than a host of
   // its own, so the asset URLs have to carry the whole prefix. The table it
   // comes from is the same one `build-pages-site.mts` copies by.

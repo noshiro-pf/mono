@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { type PointerEventHandler } from 'preact';
+import { memoNamed } from 'preact-utils';
 import { DEFAULT_LAYOUT, splitAt } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -12,23 +13,21 @@ import { layoutStore } from '../store/index.mjs';
  * the slider in the layout settings, which is a real control rather than a
  * `separator` that would have to be taught to be one.
  */
-export const ColumnDivider = React.memo(() => (
+export const ColumnDivider = memoNamed('ColumnDivider', () => (
   <div
     aria-hidden={'true'}
     className={'column-divider'}
     title={'Drag to share the width; double-click to even it'}
-    onDoubleClick={onDoubleClick}
+    onDblClick={onDoubleClick}
     onPointerDown={onPointerDown}
     onPointerMove={onPointerMove}
   />
 ));
 
-ColumnDivider.displayName = 'ColumnDivider';
-
 // Outside the component, since none of them reads its props: one function
 // each serves every render, with no `useCallback` to keep it stable.
 
-const onPointerDown: React.PointerEventHandler<HTMLDivElement> = (pressed) => {
+const onPointerDown: PointerEventHandler<HTMLDivElement> = (pressed) => {
   if (pressed.button !== 0) {
     return;
   }
@@ -38,7 +37,7 @@ const onPointerDown: React.PointerEventHandler<HTMLDivElement> = (pressed) => {
   pressed.currentTarget.setPointerCapture(pressed.pointerId);
 };
 
-const onPointerMove: React.PointerEventHandler<HTMLDivElement> = (moved) => {
+const onPointerMove: PointerEventHandler<HTMLDivElement> = (moved) => {
   const box = moved.currentTarget.parentElement?.getBoundingClientRect();
 
   if (

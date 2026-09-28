@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
+import { useCallback } from 'preact/hooks';
 import { BLOCK_NAMES, type BlockId, type ColumnIndex } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -18,35 +19,35 @@ type Props = Readonly<{
  * height. A button that could do nothing is left out rather than disabled,
  * so tabbing along the row stops only where something can happen.
  */
-export const ViewSettingsRow = React.memo<Props>((props) => {
+export const ViewSettingsRow = memoNamed<Props>('ViewSettingsRow', (props) => {
   const { id, column, index, count, twoColumns, height } = props;
 
   const blockName = BLOCK_NAMES[id];
 
-  const up = React.useCallback((): void => {
+  const up = useCallback((): void => {
     layoutStore.move(id, { column, index: index - 1 });
   }, [id, column, index]);
 
-  const down = React.useCallback((): void => {
+  const down = useCallback((): void => {
     layoutStore.move(id, { column, index: index + 1 });
   }, [id, column, index]);
 
-  const across = React.useCallback((): void => {
+  const across = useCallback((): void => {
     layoutStore.move(id, { column: column === 0 ? 1 : 0, index: 0 });
   }, [id, column]);
 
-  const shorter = React.useCallback((): void => {
+  const shorter = useCallback((): void => {
     layoutStore.setHeight(id, (height ?? FIRST_HEIGHT) - HEIGHT_STEP);
   }, [id, height]);
 
-  const taller = React.useCallback((): void => {
+  const taller = useCallback((): void => {
     layoutStore.setHeight(
       id,
       height === undefined ? FIRST_HEIGHT : height + HEIGHT_STEP,
     );
   }, [id, height]);
 
-  const natural = React.useCallback((): void => {
+  const natural = useCallback((): void => {
     layoutStore.setHeight(id, undefined);
   }, [id]);
 
@@ -138,8 +139,6 @@ export const ViewSettingsRow = React.memo<Props>((props) => {
     </li>
   );
 });
-
-ViewSettingsRow.displayName = 'ViewSettingsRow';
 
 /** What "Fix" gives a block that had its natural height. */
 const FIRST_HEIGHT = 480;

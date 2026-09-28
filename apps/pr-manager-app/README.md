@@ -230,9 +230,9 @@ The build writes a `Content-Security-Policy` into `index.html` naming
 nowhere else" is a property of the page rather than a promise about its code.
 `style-src` allows inline styles because the label chips and the ahead/behind
 bars carry `style` attributes computed from the report; `script-src` does not.
-The policy is added by a build-only Vite plugin, because the dev server needs
-an inline preamble for Fast Refresh and a websocket for HMR, and a policy
-loose enough for those would not be worth shipping.
+The policy is added by a build-only Vite plugin, because the dev server's HMR
+talks to it over a websocket, which `connect-src` would then have to name, and
+a policy loosened for that would not be worth shipping.
 
 **A token is never a build-time value.** `vite build` bakes in what it is
 given, and this bundle is served from a public site.

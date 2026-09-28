@@ -1,4 +1,6 @@
-import * as React from 'react';
+import { type ComponentChildren } from 'preact';
+import { memoNamed } from 'preact-utils';
+import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { describeAge, formatLocalTime } from '../format.mjs';
@@ -22,12 +24,12 @@ type Props = Readonly<{
  * landed, and what is open that is not a pull request — laid out as the
  * reader arranged them (`layout.mts`).
  */
-export const ReportView = React.memo<Props>((props) => {
+export const ReportView = memoNamed<Props>('ReportView', (props) => {
   const { report, nowMs } = props;
 
   // One object per report and clock tick, so that `BlockLayout` is not
   // handed a new one on every render.
-  const blocks = React.useMemo<ReadonlyRecord<BlockId, React.ReactNode>>(() => {
+  const blocks = useMemo<ReadonlyRecord<BlockId, ComponentChildren>>(() => {
     const repoUrl =
       `https://github.com/${report.repo.owner}/${report.repo.name}` as const;
 
@@ -87,8 +89,6 @@ export const ReportView = React.memo<Props>((props) => {
     </>
   );
 });
-
-ReportView.displayName = 'ReportView';
 
 /**
  * One scale for every divergence bar on the page, so that a bar on one card

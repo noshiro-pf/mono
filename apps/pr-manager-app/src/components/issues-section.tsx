@@ -1,5 +1,5 @@
 import { type OpenIssue } from 'pr-report-core';
-import * as React from 'react';
+import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
@@ -21,7 +21,8 @@ type Props = Readonly<{
  * no checks and no place in a merge order, and a card shaped like a pull
  * request's would spend most of its height saying so.
  */
-export const IssuesSection = React.memo<Props>(
+export const IssuesSection = memoNamed<Props>(
+  'IssuesSection',
   ({ issues, totalCount, nowMs }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
@@ -71,5 +72,3 @@ export const IssuesSection = React.memo<Props>(
     </section>
   ),
 );
-
-IssuesSection.displayName = 'IssuesSection';
