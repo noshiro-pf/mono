@@ -594,3 +594,27 @@ describe('prefer-ternary', () => {
     ],
   });
 });
+
+describe('prefer-ternary through type wrappers', () => {
+  tester.run('prefer-ternary', preferTernary, {
+    valid: [],
+    invalid: [
+      {
+        name: 'the same target, one side reached through `as` or `!`',
+        code: dedent`
+          declare const o: { x: number } | undefined;
+          if (a) {
+            (o as { x: number }).x = 1;
+          } else {
+            o!.x = 2;
+          }
+        `,
+        output: dedent`
+          declare const o: { x: number } | undefined;
+          (o as { x: number }).x = a ? 1 : 2;
+        `,
+        errors: [{ messageId: 'preferTernary' }],
+      },
+    ],
+  });
+});

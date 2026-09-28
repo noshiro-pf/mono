@@ -304,3 +304,79 @@ describe('prefer-range-in-number-line-order', () => {
     },
   );
 });
+
+describe('prefer-range-in-number-line-order through type wrappers', () => {
+  tester.run(
+    'prefer-range-in-number-line-order',
+    preferRangeInNumberLineOrder,
+    {
+      valid: [
+        {
+          name: 'a literal wrapped in `satisfies` is still a bound',
+          code: dedent`
+            declare const a: number, b: number;
+            const x = a < (0 satisfies number) && 0 < b;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'the value tested wrapped in `satisfies` or `as`',
+          code: dedent`
+            declare const x: number, min: number, max: number;
+            const y = x >= min && max >= (x satisfies number);
+            const z = (x as number) < max && x >= min;
+          `,
+          output: dedent`
+            declare const x: number, min: number, max: number;
+            const y = min <= x && (x satisfies number) <= max;
+            const z = min <= x && (x as number) < max;
+          `,
+          errors: [
+            {
+              messageId: 'preferNumberLineOrder',
+              data: { replacement: 'min <= x && (x satisfies number) <= max' },
+            },
+            { messageId: 'preferNumberLineOrder' },
+          ],
+        },
+        {
+          name: 'the message keeps the parentheses around each comparison balanced',
+          code: dedent`
+            declare const x: number, min: number, max: number;
+            const y = (x >= min) && (max >= x);
+          `,
+          output: dedent`
+            declare const x: number, min: number, max: number;
+            const y = (min <= x) && (x <= max);
+          `,
+          errors: [
+            {
+              messageId: 'preferNumberLineOrder',
+              data: { replacement: '(min <= x) && (x <= max)' },
+            },
+          ],
+        },
+        {
+          name: 'a comparison wrapped in `satisfies boolean`',
+          code: dedent`
+            declare const x: number, min: number, max: number;
+            const y = ((x >= min) satisfies boolean) && max >= x;
+          `,
+          output: dedent`
+            declare const x: number, min: number, max: number;
+            const y = ((min <= x) satisfies boolean) && x <= max;
+          `,
+          errors: [
+            {
+              messageId: 'preferNumberLineOrder',
+              data: {
+                replacement: '((min <= x) satisfies boolean) && x <= max',
+              },
+            },
+          ],
+        },
+      ],
+    },
+  );
+});

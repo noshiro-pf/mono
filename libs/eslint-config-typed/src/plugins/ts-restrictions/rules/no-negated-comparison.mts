@@ -12,6 +12,7 @@ import {
   isComparison,
   isExactlyInvertible,
 } from './comparison-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 
@@ -27,6 +28,10 @@ type MessageIds =
  * inversion is offered as a suggestion, because every relational comparison
  * with `NaN` is `false` — `!(x >= 0)` holds for `NaN` and `x < 0` does not —
  * and a check written that way may be relying on it.
+ *
+ * The comparison is found, and its operands' types are read, through any
+ * `as`, `satisfies` or `!`: `!((a === b) satisfies boolean)` is `a !== b`, and
+ * a `number` cast to a brand that excludes `NaN` may still be one.
  *
  * `!!(a === b)` is a conversion to boolean, not a negation, and is left alone.
  * A comment the fix would drop leaves the report without a fix.
@@ -59,7 +64,9 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
 
     const getType = (node: DeepReadonly<TSESTree.Node>): ts.Type =>
       checker.getTypeAtLocation(
-        services.esTreeNodeToTSNodeMap.get(asNode(node)),
+        services.esTreeNodeToTSNodeMap.get(
+          asNode(isTypeWrapper(node) ? skipTypeWrappers(node) : node),
+        ),
       );
 
     /** A comment between the `!` and the comparison, which the fix drops. */
@@ -147,16 +154,21 @@ export const noNegatedComparison: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       UnaryExpression: (node) => {
+        if (node.operator !== '!') {
+          return;
+        }
+
+        const argument = skipTypeWrappers(node.argument);
+
         if (
-          node.operator !== '!' ||
-          !isComparison(node.argument) ||
+          !isComparison(argument) ||
           (node.parent.type === AST_NODE_TYPES.UnaryExpression &&
             node.parent.operator === '!')
         ) {
           return;
         }
 
-        report(node, node.argument);
+        report(node, argument);
       },
     };
   },

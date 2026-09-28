@@ -66,10 +66,8 @@ export namespace Obj {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     keyPath.reduce<unknown>(
       (acc, key) =>
-        acc === null || acc === undefined
-          ? undefined
-          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            (acc as UnknownRecord)[key as string],
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (acc as UnknownRecord | null | undefined)?.[key as string],
       record,
     ) as RecordValueAtPath<R, Path>;
 

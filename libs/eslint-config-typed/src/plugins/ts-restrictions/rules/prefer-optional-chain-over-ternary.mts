@@ -9,6 +9,7 @@ import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { isSameReference } from './reference-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 
@@ -96,8 +97,10 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
      * when that value is nullish (`false`: exactly when it is not).
      */
     const nullishCheckOf = (
-      test: DeepReadonly<TSESTree.Expression>,
+      wrappedTest: DeepReadonly<TSESTree.Expression>,
     ): NullishCheck | undefined => {
+      const test = skipTypeWrappers(wrappedTest);
+
       if (test.type === AST_NODE_TYPES.LogicalExpression) {
         return strictPairCheckOf(test);
       }
@@ -123,7 +126,11 @@ export const preferOptionalChainOverTernary: TSESLint.RuleModule<
           ? ts.TypeFlags.Undefined | ts.TypeFlags.Void
           : ts.TypeFlags.Null;
 
-      return mayHold(value, other) ? undefined : { value, nullishWhenTrue };
+      // The value's own type: `(x as B | undefined) === undefined` does not
+      // make the `null` a `B | null | undefined` holds go away.
+      return mayHold(skipTypeWrappers(value), other)
+        ? undefined
+        : { value, nullishWhenTrue };
     };
 
     const replacementOf = (
@@ -217,17 +224,12 @@ type NullComparison = Readonly<{
   operator: '==' | '!=' | '===' | '!==';
 }>;
 
-const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.TSAsExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.TSSatisfiesExpression,
-  AST_NODE_TYPES.TSTypeAssertion,
-]);
-
 /** `x == null`, `undefined !== x` and the like, whichever side `x` is on. */
 const nullComparisonOf = (
-  node: DeepReadonly<TSESTree.Node>,
+  expression: DeepReadonly<TSESTree.Expression>,
 ): NullComparison | undefined => {
+  const node = skipTypeWrappers(expression);
+
   if (
     node.type !== AST_NODE_TYPES.BinaryExpression ||
     !isEqualityOperator(node.operator) ||
@@ -283,23 +285,20 @@ const firstLinkFrom = (
 ):
   | DeepReadonly<TSESTree.CallExpression | TSESTree.MemberExpression>
   | undefined => {
-  const link =
-    branch.type === AST_NODE_TYPES.ChainExpression ? branch.expression : branch;
-
-  if (link.type === AST_NODE_TYPES.MemberExpression) {
-    return isSameReference(link.object, value)
-      ? link
-      : firstLinkFrom(link.object, value);
+  if (isTypeWrapper(branch) || branch.type === AST_NODE_TYPES.ChainExpression) {
+    return firstLinkFrom(branch.expression, value);
   }
 
-  if (link.type === AST_NODE_TYPES.CallExpression) {
-    return isSameReference(link.callee, value)
-      ? link
-      : firstLinkFrom(link.callee, value);
+  if (branch.type === AST_NODE_TYPES.MemberExpression) {
+    return isSameReference(branch.object, value)
+      ? branch
+      : firstLinkFrom(branch.object, value);
   }
 
-  return link.type === AST_NODE_TYPES.TSNonNullExpression
-    ? firstLinkFrom(link.expression, value)
+  return branch.type === AST_NODE_TYPES.CallExpression
+    ? isSameReference(branch.callee, value)
+      ? branch
+      : firstLinkFrom(branch.callee, value)
     : undefined;
 };
 
@@ -337,15 +336,6 @@ const outermostWrapperOf = (
     : node;
 };
 
-const isTypeWrapper = (
-  node: DeepReadonly<TSESTree.Node>,
-): node is DeepReadonly<
-  | TSESTree.TSAsExpression
-  | TSESTree.TSNonNullExpression
-  | TSESTree.TSSatisfiesExpression
-  | TSESTree.TSTypeAssertion
-> => TYPE_WRAPPERS.has(node.type);
-
 const typeMayHold = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   type: ts.Type,
@@ -379,16 +369,23 @@ const typeMayHold = (
 };
 
 const nullishKindOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): 'null' | 'undefined' | undefined =>
-  node.type === AST_NODE_TYPES.Literal && node.raw === 'null'
+  node: DeepReadonly<TSESTree.Expression>,
+): 'null' | 'undefined' | undefined => {
+  const value = skipTypeWrappers(node);
+
+  return value.type === AST_NODE_TYPES.Literal && value.raw === 'null'
     ? 'null'
-    : isUndefined(node)
+    : isUndefined(value)
       ? 'undefined'
       : undefined;
+};
 
-const isUndefined = (node: DeepReadonly<TSESTree.Node>): boolean =>
-  node.type === AST_NODE_TYPES.Identifier && node.name === 'undefined';
+/** `undefined`, through any type wrapper around it. */
+const isUndefined = (node: DeepReadonly<TSESTree.Expression>): boolean => {
+  const value = skipTypeWrappers(node);
+
+  return value.type === AST_NODE_TYPES.Identifier && value.name === 'undefined';
+};
 
 const isEqualityOperator = (
   operator: string,

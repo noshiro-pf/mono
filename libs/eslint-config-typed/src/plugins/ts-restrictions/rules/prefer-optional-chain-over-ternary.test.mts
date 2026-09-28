@@ -280,3 +280,98 @@ describe('prefer-optional-chain-over-ternary', () => {
     },
   );
 });
+
+describe('prefer-optional-chain-over-ternary through type wrappers', () => {
+  tester.run(
+    'prefer-optional-chain-over-ternary',
+    preferOptionalChainOverTernary,
+    {
+      valid: [
+        {
+          name: 'a cast cannot rule out the `null` a strict check leaves',
+          code: dedent`
+            declare const x: Readonly<{ b: number }> | null | undefined;
+            const y =
+              (x as Readonly<{ b: number }> | undefined) === undefined
+                ? undefined
+                : x?.b;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: '`undefined` wrapped in `satisfies` or `as` is still `undefined`',
+          code: dedent`
+            declare const x: Readonly<{ b: number }> | undefined;
+            const y = x == null ? (undefined satisfies undefined) : x.b;
+            const z = x === (undefined as undefined) ? undefined : x.b;
+          `,
+          output: dedent`
+            declare const x: Readonly<{ b: number }> | undefined;
+            const y = x?.b;
+            const z = x?.b;
+          `,
+          errors: [
+            { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+          ],
+        },
+        {
+          name: 'the checked value, or the access, wrapped in `satisfies`',
+          code: dedent`
+            type B = Readonly<{ b: number }>;
+            declare const x: B | undefined;
+            const y = (x satisfies B | undefined) == null ? undefined : x.b;
+            const z = x == null ? undefined : (x.b satisfies number);
+            const w = x == null ? undefined : (x satisfies B).b;
+          `,
+          output: dedent`
+            type B = Readonly<{ b: number }>;
+            declare const x: B | undefined;
+            const y = x?.b;
+            const z = x?.b satisfies number;
+            const w = (x satisfies B)?.b;
+          `,
+          errors: [
+            { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+          ],
+        },
+        {
+          name: 'the whole check, or one half of a pair, wrapped in `satisfies boolean`',
+          code: dedent`
+            declare const x: Readonly<{ b: number }> | null | undefined;
+            const y = ((x == null) satisfies boolean) ? undefined : x?.b;
+            const z =
+              ((x === null) satisfies boolean) || x === undefined
+                ? undefined
+                : x?.b;
+          `,
+          output: dedent`
+            declare const x: Readonly<{ b: number }> | null | undefined;
+            const y = x?.b;
+            const z =
+              x?.b;
+          `,
+          errors: [
+            { messageId: 'preferOptionalChain' },
+            { messageId: 'preferOptionalChain' },
+          ],
+        },
+        {
+          name: 'a non-null assertion on the checked value',
+          code: dedent`
+            declare const x: Readonly<{ b: number }> | undefined;
+            const y = x == null ? undefined : x!.b;
+          `,
+          output: dedent`
+            declare const x: Readonly<{ b: number }> | undefined;
+            const y = x!?.b;
+          `,
+          errors: [{ messageId: 'preferOptionalChain' }],
+        },
+      ],
+    },
+  );
+});

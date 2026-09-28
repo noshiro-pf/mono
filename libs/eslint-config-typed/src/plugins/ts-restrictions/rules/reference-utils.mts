@@ -4,16 +4,22 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 /**
  * Whether two expressions name the same variable or property, as `x.y` and
  * `x['y']` do. Only identifiers, `this`, `super`, literals and member accesses
- * on them qualify; anything else (a call, say) is never the same.
+ * on them qualify; anything else (a call, say) is never the same. A type
+ * wrapper changes no reference: `(x as T).y` and `x!.y` are `x.y`.
  */
 export const isSameReference = (
-  left: DeepReadonly<TSESTree.Node>,
-  right: DeepReadonly<TSESTree.Node>,
+  rawLeft: DeepReadonly<TSESTree.Node>,
+  rawRight: DeepReadonly<TSESTree.Node>,
 ): boolean => {
+  const left = isTypeWrapper(rawLeft) ? skipTypeWrappers(rawLeft) : rawLeft;
+
+  const right = isTypeWrapper(rawRight) ? skipTypeWrappers(rawRight) : rawRight;
+
   if (
     left.type === AST_NODE_TYPES.Super ||
     left.type === AST_NODE_TYPES.ThisExpression
