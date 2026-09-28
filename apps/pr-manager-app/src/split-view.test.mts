@@ -110,13 +110,15 @@ describe(splitViewUrl, () => {
     ]);
   });
 
-  test('shows the conversation and the issue at 75%', () => {
+  test('shows the conversation at 100% when it has the right 30% to itself', () => {
     const alone = paramsOf(
       splitViewUrl({ ...pullRequest, linkedIssues: [], claudeSessions: [] }),
     );
 
-    assert.deepStrictEqual(alone.getAll('zoom'), ['1', '0.75']);
+    assert.deepStrictEqual(alone.getAll('zoom'), ['1', '1']);
+  });
 
+  test('shows the conversation and the issue at 75% when they share the right half', () => {
     const all = paramsOf(
       splitViewUrl({
         ...pullRequest,
