@@ -7,6 +7,7 @@ import { type DeepReadonly } from 'ts-type-forge';
  * look through them, so that a wrapper neither hides a pattern
  * (`a ? (false satisfies boolean) : b`) nor vouches for a type
  * (`(n as unknown as boolean) ? true : b`, whose value is still a number).
+ * A new rule should too: `docs/writing-lint-rules.md` at the repository root.
  */
 export const skipTypeWrappers = (
   node: DeepReadonly<TSESTree.Expression>,
