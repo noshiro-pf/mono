@@ -50,6 +50,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "cspell": "catalog:",
+    "dedent": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "jiti": "catalog:",

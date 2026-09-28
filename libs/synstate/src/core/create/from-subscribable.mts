@@ -76,6 +76,7 @@ export const fromSubscribable = <A, E = unknown>(
         (error?: unknown) => {
           startUpdate(
             Result.err(
+              // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               error as E,
             ),

@@ -74,6 +74,7 @@ import {
 export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   createCombineObservable(parents) as unknown as CombineObservableRefined<OS>;
 
