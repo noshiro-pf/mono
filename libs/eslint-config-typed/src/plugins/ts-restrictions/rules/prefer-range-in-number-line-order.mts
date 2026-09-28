@@ -5,7 +5,8 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
+import { skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 
@@ -26,6 +27,10 @@ type MessageIds = 'preferNumberLineOrder' | 'reorderRange';
  * tested — which is smaller than the other operand in one comparison and
  * larger in the other. A shared operand that is a literal is a bound, not a
  * value tested, and `a < 0 && 0 < b` is left alone.
+ *
+ * A comparison, and the operands compared, are recognized through any `as`,
+ * `satisfies` or `!`: in `((x >= min) satisfies boolean) && max >= x` the
+ * range is still there, and so is the value tested in `(x as number)`.
  *
  * Writing `a > b` as `b < a` is exact, `NaN` included. It does evaluate the
  * operands in the other order, and moving the lower bound's comparison first
@@ -62,9 +67,34 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
         .join(' ');
 
     const isSame = (
-      a: DeepReadonly<TSESTree.Node>,
-      b: DeepReadonly<TSESTree.Node>,
-    ): boolean => tokensOf(a) === tokensOf(b);
+      a: DeepReadonly<TSESTree.Expression>,
+      b: DeepReadonly<TSESTree.Expression>,
+    ): boolean =>
+      tokensOf(skipTypeWrappers(a)) === tokensOf(skipTypeWrappers(b));
+
+    /** The range of `node` with the parentheses written around it. */
+    const parenthesizedRange = (
+      node: DeepReadonly<TSESTree.Node>,
+    ): FixedLengthTuple<2, number> => {
+      const depthFrom = (known: number): number =>
+        ASTUtils.isParenthesized(known + 1, asNode(node), sourceCode)
+          ? depthFrom(known + 1)
+          : known;
+
+      const depth = depthFrom(0);
+
+      if (depth === 0) {
+        return node.range;
+      }
+
+      const open = sourceCode.getTokenBefore(asNode(node), { skip: depth - 1 });
+
+      const close = sourceCode.getTokenAfter(asNode(node), { skip: depth - 1 });
+
+      return open === null || close === null
+        ? node.range
+        : ([open.range[0], close.range[1]] as const);
+    };
 
     /**
      * The text of one side of `node`, with the parentheses and comments
@@ -114,8 +144,11 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
 
     const checkPair = (
       logical: '&&' | '||',
-      first: RelationalComparison,
-      second: RelationalComparison,
+      [first, second]: FixedLengthTuple<2, RelationalComparison>,
+      [outerFirst, outerSecond]: FixedLengthTuple<
+        2,
+        DeepReadonly<TSESTree.Expression>
+      >,
     ): boolean => {
       const a = ascending(first);
 
@@ -145,7 +178,7 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
         ? lowerBoundSide.upper
         : lowerBoundSide.lower;
 
-      if (isLiteralLike(value)) {
+      if (isLiteralLike(skipTypeWrappers(value))) {
         return false;
       }
 
@@ -157,10 +190,18 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
 
       const secondText = ascendingText(upperBoundSide.node);
 
+      // What the two operands read as once fixed, with whatever wraps the
+      // comparisons (parentheses, `satisfies boolean`) kept in place.
+      const [start] = parenthesizedRange(outerFirst);
+
+      const [, end] = parenthesizedRange(outerSecond);
+
       const replacement = [
+        sourceCode.text.slice(start, first.range[0]),
         firstText,
         sourceCode.text.slice(first.range[1], second.range[0]),
         secondText,
+        sourceCode.text.slice(second.range[1], end),
       ].join('');
 
       const fix = (fixer: TSESLint.RuleFixer): readonly TSESLint.RuleFix[] => [
@@ -200,18 +241,22 @@ export const preferRangeInNumberLineOrder: TSESLint.RuleModule<
       operands: readonly DeepReadonly<TSESTree.Expression>[],
       index: number,
     ): void => {
-      const first = operands[index];
+      const outerFirst = operands[index];
 
-      const second = operands[index + 1];
+      const outerSecond = operands[index + 1];
 
-      if (first === undefined || second === undefined) {
+      if (outerFirst === undefined || outerSecond === undefined) {
         return;
       }
+
+      const first = skipTypeWrappers(outerFirst);
+
+      const second = skipTypeWrappers(outerSecond);
 
       const isRange =
         isRelationalComparison(first) &&
         isRelationalComparison(second) &&
-        checkPair(logical, first, second);
+        checkPair(logical, [first, second], [outerFirst, outerSecond]);
 
       // A comparison belongs to one range check at most.
       checkChain(logical, operands, index + (isRange ? 2 : 1));

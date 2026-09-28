@@ -7,6 +7,7 @@ import {
 import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 
@@ -34,7 +35,9 @@ type MessageIds = 'booleanOperands' | 'nonBooleanLeft';
  *
  * An operand is "in JSX" when its value can come out of the braces: the
  * expression in `{…}` itself, a branch of a ternary there, or an operand of a
- * longer `&&` / `||` / `??` chain. The test of a ternary is not. This replaces
+ * longer `&&` / `||` / `??` chain. The test of a ternary is not. An operand is
+ * judged by the type of its value, through any `as`, `satisfies` or `!`: a cast
+ * to `boolean` does not make a number one. This replaces
  * `react/jsx-no-leaked-render`, which reported every `&&` alike, whatever its
  * operands were.
  */
@@ -65,10 +68,10 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
 
     const checker = services.program.getTypeChecker();
 
-    const isBoolean = (node: DeepReadonly<TSESTree.Node>): boolean =>
+    const isBoolean = (node: DeepReadonly<TSESTree.Expression>): boolean =>
       typeIsBoolean(
         checker.getTypeAtLocation(
-          services.esTreeNodeToTSNodeMap.get(asNode(node)),
+          services.esTreeNodeToTSNodeMap.get(asNode(skipTypeWrappers(node))),
         ),
         checker,
       );
@@ -80,12 +83,16 @@ export const jsxBooleanLogicalOperands: TSESLint.RuleModule<
       node: DeepReadonly<TSESTree.LogicalExpression>,
       position: JsxValuePosition,
     ): string => {
-      const test = LOOSER_THAN_TERNARY_TEST.has(node.left.type)
-        ? `(${textOf(node.left)})`
-        : textOf(node.left);
+      // A type wrapper is kept in parentheses: `a as T ? …` could read the `?`
+      // as part of the type.
+      const test =
+        LOOSER_THAN_TERNARY_TEST.has(node.left.type) || isTypeWrapper(node.left)
+          ? `(${textOf(node.left)})`
+          : textOf(node.left);
 
       const other =
-        node.right.type === AST_NODE_TYPES.SequenceExpression
+        node.right.type === AST_NODE_TYPES.SequenceExpression ||
+        isTypeWrapper(node.right)
           ? `(${textOf(node.right)})`
           : textOf(node.right);
 

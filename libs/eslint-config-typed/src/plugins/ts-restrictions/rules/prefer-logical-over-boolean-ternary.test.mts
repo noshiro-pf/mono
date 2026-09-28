@@ -254,3 +254,121 @@ describe('prefer-logical-over-boolean-ternary', () => {
     },
   );
 });
+
+describe('prefer-logical-over-boolean-ternary through type wrappers', () => {
+  tester.run(
+    'prefer-logical-over-boolean-ternary',
+    preferLogicalOverBooleanTernary,
+    {
+      valid: [
+        {
+          name: 'a cast to `boolean` does not make the test one',
+          code: dedent`
+            declare const n: number, b: boolean;
+            const x = (n as unknown as boolean) ? true : b;
+            const y = (n as unknown as boolean) ? b : false;
+          `,
+        },
+        {
+          name: 'in JSX, a cast does not make the other branch a boolean',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, n: number;
+            const e = <input disabled={a ? false : (n as unknown as boolean)} />;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a boolean literal wrapped in `satisfies` or `as const`',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const w = a ? (false satisfies boolean) : b;
+            const x = a ? (true satisfies boolean) : b;
+            const y = a ? b : (false as const);
+            const z = a ? b : (true as boolean);
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean;
+            const w = !a && b;
+            const x = a || b;
+            const y = a && b;
+            const z = !a || b;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'two literal branches that no-unneeded-ternary does not see for the wrapper',
+          code: dedent`
+            declare const a: boolean;
+            declare const n: number;
+            const x = a ? (true satisfies boolean) : false;
+            const y = n === 0 ? false : (true as const);
+          `,
+          output: dedent`
+            declare const a: boolean;
+            declare const n: number;
+            const x = a;
+            const y = n !== 0;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'a wrapped test is negated whole',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const x = (a satisfies boolean) ? false : b;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean;
+            const x = !(a satisfies boolean) && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-logical-over-boolean-ternary with parenthesized operands', () => {
+  tester.run(
+    'prefer-logical-over-boolean-ternary',
+    preferLogicalOverBooleanTernary,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'the parentheses in the source do not stand in for the ones the new operator needs',
+          code: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            const w = (a || b) ? false : c;
+            const x = (a || b) ? c : false;
+            const y = a ? false : (b || c);
+            const z = a ? (b || c) : true;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            const w = !(a || b) && c;
+            const x = (a || b) && c;
+            const y = !a && (b || c);
+            const z = !a || b || c;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+      ],
+    },
+  );
+});

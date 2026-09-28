@@ -158,3 +158,77 @@ describe('jsx-boolean-logical-operands', () => {
     ],
   });
 });
+
+describe('jsx-boolean-logical-operands through type wrappers', () => {
+  tester.run('jsx-boolean-logical-operands', jsxBooleanLogicalOperands, {
+    valid: [
+      {
+        name: '`satisfies` on a boolean operand changes nothing',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const a: boolean, b: boolean;
+          const e = <input disabled={(a satisfies boolean) || b} />;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the logical expression wrapped in `satisfies` is still in JSX',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const a: boolean;
+          const e = <div>{(a && <span />) satisfies unknown}</div>;
+        `,
+        output: dedent`
+          declare const a: boolean;
+          const e = <div>{(a ? <span /> : undefined) satisfies unknown}</div>;
+        `,
+        errors: [{ messageId: 'booleanOperands' }],
+      },
+      {
+        name: 'a wrapped operand keeps its parentheses in the ternary',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const a: boolean;
+          const e = <div>{(a satisfies boolean) && (<span /> satisfies unknown)}</div>;
+        `,
+        output: dedent`
+          declare const a: boolean;
+          const e = <div>{(a satisfies boolean) ? (<span /> satisfies unknown) : undefined}</div>;
+        `,
+        errors: [{ messageId: 'booleanOperands' }],
+      },
+      {
+        name: 'a cast to `boolean` does not make an operand one',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const a: boolean, n: number;
+          const e = <div>{(n as unknown as boolean) && <span />}</div>;
+          const f = <input disabled={a && (n as unknown as boolean)} />;
+          const g = <input disabled={a && (n as never)} />;
+        `,
+        output: dedent`
+          declare const a: boolean, n: number;
+          const e = <div>{(n as unknown as boolean) && <span />}</div>;
+          const f = <input disabled={a ? (n as unknown as boolean) : false} />;
+          const g = <input disabled={a ? (n as never) : false} />;
+        `,
+        errors: [
+          { messageId: 'nonBooleanLeft' },
+          { messageId: 'booleanOperands' },
+          { messageId: 'booleanOperands' },
+        ],
+      },
+      {
+        name: 'nor does a non-null assertion',
+        filename: 'file.tsx',
+        code: dedent`
+          declare const b: boolean | undefined;
+          const e = <div>{b! && <span />}</div>;
+        `,
+        output: null,
+        errors: [{ messageId: 'nonBooleanLeft' }],
+      },
+    ],
+  });
+});

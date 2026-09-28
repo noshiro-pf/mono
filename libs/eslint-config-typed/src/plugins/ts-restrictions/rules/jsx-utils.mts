@@ -1,5 +1,6 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper } from './type-wrapper-utils.mjs';
 
 /**
  * Where `node`'s value ends up in JSX, if it does: rendered as a child, or
@@ -39,11 +40,4 @@ const passesValueThrough = (
 ): boolean =>
   parent.type === AST_NODE_TYPES.ConditionalExpression
     ? parent.test !== child
-    : VALUE_PASSING_TYPES.has(parent.type);
-
-const VALUE_PASSING_TYPES: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.LogicalExpression,
-  AST_NODE_TYPES.TSAsExpression,
-  AST_NODE_TYPES.TSNonNullExpression,
-  AST_NODE_TYPES.TSSatisfiesExpression,
-]);
+    : parent.type === AST_NODE_TYPES.LogicalExpression || isTypeWrapper(parent);

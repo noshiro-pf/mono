@@ -1,6 +1,5 @@
 import {
   AST_NODE_TYPES,
-  ASTUtils,
   ESLintUtils,
   type TSESLint,
   type TSESTree,
@@ -13,6 +12,7 @@ import {
   isExactlyInvertible,
 } from './comparison-utils.mjs';
 import { jsxValuePositionOf } from './jsx-utils.mjs';
+import { isTypeWrapper, skipTypeWrappers } from './type-wrapper-utils.mjs';
 
 type Options = readonly [];
 
@@ -38,7 +38,13 @@ type MessageIds = 'preferLogical';
  * inverted when no operand can be `NaN`. A relational comparison that may be
  * `NaN` has no exact short negation, so that ternary is left alone.
  *
- * A ternary whose branches are both boolean literals is `no-unneeded-ternary`'s.
+ * A literal and a type are read through any `as`, `satisfies` or `!`:
+ * `(false satisfies boolean)` is `false`, and `(n as unknown as boolean)` is
+ * still the number it was, so `a ? true : b` is left alone for it.
+ *
+ * A ternary whose branches are both bare boolean literals is
+ * `no-unneeded-ternary`'s. When a wrapper hides one of them from it, this rule
+ * writes `a ? (true as boolean) : false` as `a` and the reverse as `!a`.
  * One whose value is rendered or passed in JSX is rewritten only when its
  * other branch is a boolean too: there `&&` and `||` take booleans on both
  * sides (`ts-restrictions/jsx-boolean-logical-operands`), so
@@ -68,33 +74,43 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
 
     const checker = services.program.getTypeChecker();
 
+    /** The type of the value, through any `as`, `satisfies` or `!`. */
     const getType = (node: DeepReadonly<TSESTree.Node>): ts.Type =>
       checker.getTypeAtLocation(
-        services.esTreeNodeToTSNodeMap.get(asNode(node)),
+        services.esTreeNodeToTSNodeMap.get(
+          asNode(isTypeWrapper(node) ? skipTypeWrappers(node) : node),
+        ),
       );
 
     const textOf = (node: DeepReadonly<TSESTree.Node>): string =>
       sourceCode.getText(asNode(node));
 
-    /** `node` as an operand of `operator`, parenthesized if need be. */
+    /**
+     * `node` as an operand of `operator`, parenthesized if need be. The text
+     * of a node never includes the parentheses written around it, so they are
+     * added here whether or not the source had them.
+     */
     const operand = (
       node: DeepReadonly<TSESTree.Node>,
       operator: '&&' | '||',
     ): string =>
-      !ASTUtils.isParenthesized(asNode(node), sourceCode) &&
-      bindsLooserThan(node, operator)
-        ? `(${textOf(node)})`
-        : textOf(node);
+      bindsLooserThan(node, operator) ? `(${textOf(node)})` : textOf(node);
 
-    const isBoolean = (node: DeepReadonly<TSESTree.Node>): boolean =>
-      (node.type === AST_NODE_TYPES.UnaryExpression && node.operator === '!') ||
-      (node.type === AST_NODE_TYPES.BinaryExpression &&
-        (isComparison(node) ||
-          node.operator === 'in' ||
-          node.operator === 'instanceof')) ||
-      constituentsOf(getType(node)).every(
-        (type) => (type.flags & ts.TypeFlags.BooleanLike) !== 0,
+    const isBoolean = (wrapped: DeepReadonly<TSESTree.Expression>): boolean => {
+      const node = skipTypeWrappers(wrapped);
+
+      return (
+        (node.type === AST_NODE_TYPES.UnaryExpression &&
+          node.operator === '!') ||
+        (node.type === AST_NODE_TYPES.BinaryExpression &&
+          (isComparison(node) ||
+            node.operator === 'in' ||
+            node.operator === 'instanceof')) ||
+        constituentsOf(getType(node)).every(
+          (type) => (type.flags & ts.TypeFlags.BooleanLike) !== 0,
+        )
       );
+    };
 
     /**
      * The negation of `node`, as an operand of `&&` or `||` — or `undefined`
@@ -119,8 +135,7 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
           : undefined;
       }
 
-      return ASTUtils.isParenthesized(asNode(node), sourceCode) ||
-        BINDS_AS_TIGHT_AS_UNARY.has(node.type)
+      return BINDS_AS_TIGHT_AS_UNARY.has(node.type)
         ? `!${textOf(node)}`
         : `!(${textOf(node)})`;
     };
@@ -135,7 +150,20 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
       const alternateValue = booleanLiteralValue(alternate);
 
       if (consequentValue !== undefined && alternateValue !== undefined) {
-        return undefined;
+        // Two bare literals are no-unneeded-ternary's, which does not see
+        // one through `satisfies` or `as`.
+        if (
+          consequentValue === alternateValue ||
+          (!isTypeWrapper(consequent) && !isTypeWrapper(alternate))
+        ) {
+          return undefined;
+        }
+
+        return consequentValue
+          ? isBoolean(test)
+            ? operand(test, '||')
+            : undefined
+          : negationOf(test, '||');
       }
 
       const other = consequentValue === undefined ? consequent : alternate;
@@ -195,12 +223,17 @@ export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<
   defaultOptions: [],
 } as const;
 
+/** `true` or `false`, through any `as`, `satisfies` or `!` around it. */
 const booleanLiteralValue = (
-  node: DeepReadonly<TSESTree.Node>,
-): boolean | undefined =>
-  node.type === AST_NODE_TYPES.Literal && typeof node.value === 'boolean'
-    ? node.value
+  node: DeepReadonly<TSESTree.Expression>,
+): boolean | undefined => {
+  const value = skipTypeWrappers(node);
+
+  return value.type === AST_NODE_TYPES.Literal &&
+    typeof value.value === 'boolean'
+    ? value.value
     : undefined;
+};
 
 /** Whether `node`, as an operand of `operator`, needs parentheses. */
 const bindsLooserThan = (

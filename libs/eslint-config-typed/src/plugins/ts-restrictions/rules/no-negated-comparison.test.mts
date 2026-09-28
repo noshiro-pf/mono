@@ -299,3 +299,52 @@ describe('no-negated-comparison', () => {
     ],
   });
 });
+
+describe('no-negated-comparison through type wrappers', () => {
+  tester.run('no-negated-comparison', noNegatedComparison, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a comparison wrapped in `satisfies` is still negated',
+        code: dedent`
+          declare const a: string, b: string;
+          const x = !((a === b) satisfies boolean);
+          const y = !(a < b satisfies boolean);
+        `,
+        output: dedent`
+          declare const a: string, b: string;
+          const x = a !== b;
+          const y = a >= b;
+        `,
+        errors: [
+          { messageId: 'negatedComparison' },
+          { messageId: 'negatedComparison' },
+        ],
+      },
+      {
+        name: 'a cast to a never-NaN brand does not make a `number` one',
+        code: dedent`
+          type ValidNumber = number & Readonly<{ NaNValue: false }>;
+          declare const n: number;
+          const x = !((n as ValidNumber) < 1);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'negatedComparisonMaybeNaN',
+            suggestions: [
+              {
+                messageId: 'invertComparison',
+                output: dedent`
+                  type ValidNumber = number & Readonly<{ NaNValue: false }>;
+                  declare const n: number;
+                  const x = (n as ValidNumber) >= 1;
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});
