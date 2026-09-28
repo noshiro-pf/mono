@@ -1,6 +1,6 @@
 # Split View — privacy policy
 
-Last updated: 2026-09-11
+Last updated: 2026-09-29
 
 **Split View collects nothing, sends nothing, and has no server.** There is no
 account, no analytics, no telemetry and no third party of any kind.
@@ -16,8 +16,9 @@ Everything it stores is in the browser's own extension storage
 - **Per-site settings** — the origins whose service workers a pane removes on
   sight, which the user turns on per site.
 
-That is all of it. It never leaves the device: nothing in this extension makes
-a network request of its own. Removing the extension removes the lot.
+That is all of it. It never leaves the device, and it is sent nowhere. The one
+network request the extension makes of its own is to GitHub, described below.
+Removing the extension removes the lot.
 
 ## What the extension reads
 
@@ -26,9 +27,17 @@ a network request of its own. Removing the extension removes the lot.
   its tooltip can show where it is, and so that a reload can come back to it.
   The address is saved as described above; the title is not saved. Neither is
   transmitted anywhere.
-- **Nothing else about the page.** The script does not read page content, form
-  fields, cookies or storage, and on a page that is not inside a split view it
-  stops immediately.
+- **A GitHub pull request's title and the issue it closes**, when you ask for
+  that pull request to be opened in a split view — with the **⧉ Split view**
+  button on its page, or from the context menu. A script on github.com loads the
+  pull request's conversation page from github.com, as your browser would if you
+  opened it, and reads two things from it: the title, which names the new tab,
+  and the address of the first issue the pull request closes, which is opened in
+  a pane. Both become part of that split view and are saved as described above.
+  Nothing is read until you ask, and nothing is sent anywhere else.
+- **Nothing else about the page.** The scripts do not read page content, form
+  fields, cookies or storage beyond the above, and on a page that is not inside
+  a split view or a GitHub pull request they stop immediately.
 
 ## What the panes themselves do
 

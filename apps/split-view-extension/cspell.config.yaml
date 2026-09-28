@@ -35,8 +35,10 @@ words:
   - unframeable
   # Layouts in the notation of `src/layout/spec.mts`, as the examples in the
   # README, the docs and the tests spell them: a 2×2 grid, one pane beside two
-  # stacked, three side by side, and a spec with one child too many.
+  # stacked, three side by side, and a spec with one child too many — and the
+  # three columns a GitHub pull request opens in when it closes an issue.
   - rcppcpp
   - rpcpp
   - prpp
   - rppp
+  - rprpp

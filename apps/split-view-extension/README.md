@@ -61,20 +61,21 @@ split views are kept.
 
 ## Using it
 
-| to                                   | do this                                                                         |
-| :----------------------------------- | :------------------------------------------------------------------------------ |
-| open a page in a pane                | type an address (or a search) into the pane's address bar and press Enter       |
-| change the whole layout              | a preset in the top bar — `2 cols`, `2×2`, `L1+R2`, …                           |
-| split a pane / close it              | the split buttons in the pane's toolbar / `✕`                                   |
-| resize                               | drag a divider                                                                  |
-| move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                     |
-| zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                             |
-| add a split view (in a new tab)      | `＋` at the top left                                                            |
-| open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url) |
-| switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                |
-| rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file     |
-| reopen everything after a restart    | **Edit** → **↗ Open all**                                                       |
-| get out of a pane that will not work | its "open in a new tab" button                                                  |
+| to                                   | do this                                                                          |
+| :----------------------------------- | :------------------------------------------------------------------------------- |
+| open a page in a pane                | type an address (or a search) into the pane's address bar and press Enter        |
+| change the whole layout              | a preset in the top bar — `2 cols`, `2×2`, `L1+R2`, …                            |
+| split a pane / close it              | the split buttons in the pane's toolbar / `✕`                                    |
+| resize                               | drag a divider                                                                   |
+| move a pane                          | drag the grip at the left of its toolbar (`Escape` cancels)                      |
+| zoom one pane                        | `−` / `+` in its toolbar, or `Ctrl` + wheel over it                              |
+| add a split view (in a new tab)      | `＋` at the top left                                                             |
+| open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url)  |
+| open a GitHub pull request in one    | **⧉ Split view** on its page — see [GitHub pull requests](#github-pull-requests) |
+| switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                 |
+| rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file      |
+| reopen everything after a restart    | **Edit** → **↗ Open all**                                                        |
+| get out of a pane that will not work | its "open in a new tab" button                                                   |
 
 On a narrow pane, the less common buttons move into its `⋯` menu.
 
@@ -158,6 +159,32 @@ same URL typed into the address bar opens. Being listed also lets those pages pu
 other sites with the refusal to be framed taken away — so a split view that
 finds itself framed draws nothing.
 
+### GitHub pull requests
+
+Every pull request page on github.com, in any repository, has a **⧉ Split
+view** button at the bottom left. It opens the pull request in a new tab the way
+the [PR Manager](../pr-manager-app/README.md#opening-a-pull-request-in-a-split-view)'s
+links do: the diff, without whitespace changes or the files already marked
+viewed, beside the conversation at 7:3 — and when the pull request closes an
+issue, the right half shared with that issue. Everything is at 100%, except
+the conversation and the issue when they share the right half, which are at
+75% so that more of each fits. `Ctrl`+click or a middle click opens it behind the current tab.
+
+A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
+request in Split View** in its context menu, and so does a pull request's own
+page.
+
+The title and the issue are read from the pull request's conversation page, as
+you see it, so a private repository works when you are signed in. The issue is
+the first one GitHub lists under "Successfully merging this pull request may
+close these issues". A link from outside GitHub opens without the issue, since
+nothing there can read it, and so does a pull request whose page could not be
+read.
+
+Every pull request opened this way reuses one saved split view, **GitHub pull
+request**, instead of adding one to the list each time; the PR Manager's links
+use another, so the two do not replace each other's.
+
 ## Good to know
 
 - **Most sites ask not to be shown inside another page.** For its own panes, and
@@ -186,6 +213,7 @@ The reasons behind each of these are in
 | `host_permissions: <all_urls>`        | those rules only act on sites the extension has access to |
 | `storage`                             | to save your split views                                  |
 | `favicon`                             | to show each site's icon in its pane's toolbar            |
+| `contextMenus`                        | for **Open pull request in Split View** on a link         |
 
 ## For developers
 

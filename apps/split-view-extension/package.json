@@ -11,9 +11,10 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
-    "build": "run-s build:page build:content",
+    "build": "run-s build:page build:content build:github-button",
     "build:content": "vite build --config ./configs/vite.content.config.mts",
-    "build:dev": "run-s build:page:dev build:content",
+    "build:dev": "run-s build:page:dev build:content build:github-button",
+    "build:github-button": "vite build --config ./configs/vite.github-button.config.mts",
     "build:page": "vite build --config ./configs/vite.config.mts",
     "build:page:dev": "vite build --mode development --config ./configs/vite.config.mts",
     "check:lint": "eslint .",

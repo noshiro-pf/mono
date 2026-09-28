@@ -106,13 +106,15 @@ a verbatim dump of a real profile; when each record is written and how it is
 repaired on the way back in; the backup file's format; the reducer's actions;
 and the `postMessage` protocol. What follows here is the browser-facing half.
 
-| piece                 | what it does                                                             |
-| :-------------------- | :----------------------------------------------------------------------- |
-| `src/layout/`         | the binary layout tree, and the rectangles it flattens into              |
-| `src/state/`          | the reducer, the saved list, the address bar's parsing, and storage      |
-| `src/components/`     | the page: the list of split views, a toolbar, the panes and the dividers |
-| `src/frame-agent.mts` | the content script that runs inside every pane                           |
-| `src/background.mts`  | the service worker: the toolbar button, and cleanup on tab close         |
+| piece                   | what it does                                                                                               |
+| :---------------------- | :--------------------------------------------------------------------------------------------------------- |
+| `src/layout/`           | the binary layout tree, and the rectangles it flattens into                                                |
+| `src/state/`            | the reducer, the saved list, the address bar's parsing, and storage                                        |
+| `src/components/`       | the page: the list of split views, a toolbar, the panes and the dividers                                   |
+| `src/frame-agent.mts`   | the content script that runs inside every pane                                                             |
+| `src/github-button.mts` | the content script that puts **⧉ Split view** on GitHub's pull requests                                    |
+| `src/github/`           | a pull request's address, title and split view; its messages                                               |
+| `src/background.mts`    | the service worker: the toolbar button, the context menu, opening a pull request, and cleanup on tab close |
 
 Five things are worth knowing before changing any of it.
 
