@@ -156,7 +156,16 @@ export const eslintUnicornRules = {
    */
   'unicorn/prefer-native-coercion-functions': 'off',
 
-  'unicorn/prefer-logical-operator-over-ternary': 'error',
+  /**
+   * Since v76 it also rewrites a ternary with one boolean literal branch, with
+   * no option to leave that part out. It turns `{a ? false : <X />}` into the
+   * `&&` that ts-restrictions/jsx-boolean-logical-operands rejects, and
+   * inverts a comparison that may be `NaN`. The boolean branches are
+   * ts-restrictions/prefer-logical-over-boolean-ternary's, a nullish check
+   * guarding an access is ts-restrictions/prefer-optional-chain-over-ternary's,
+   * and `a ? a : b` is no-unneeded-ternary's for an identifier.
+   */
+  'unicorn/prefer-logical-operator-over-ternary': 'off',
   'unicorn/no-unnecessary-polyfills': withDefaultOption('error'),
   'unicorn/no-anonymous-default-export': 'error',
   'unicorn/no-await-in-promise-methods': 'error',
