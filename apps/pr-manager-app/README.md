@@ -169,6 +169,13 @@ seconds a read**, the report query and one follow-up for ahead / behind
 together. The follow-up is separate because it can only name the heads once
 the first answer has.
 
+**The issues a pull request closes are GitHub's reading of its body.**
+`closingIssuesReferences` links a closing keyword only on a pull request into
+the default branch, so a stacked one would list nothing until the layers
+below it merged. The page also reads the keywords GitHub marks in the rendered
+body (`bodyHTML`), whatever the base, and asks one more query for the titles of
+the issues only the body names — a query made only when there are any.
+
 ## Staying current
 
 The page reads GitHub **every fifteen seconds while it is on screen**, again

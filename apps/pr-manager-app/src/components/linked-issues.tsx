@@ -11,7 +11,9 @@ type Props = Readonly<{ issues: readonly LinkedIssue[] }>;
  * unreadable in a terminal" says what the pull request is for.
  *
  * The list is GitHub's own — the one in the pull request's sidebar, which
- * includes a link made by hand — so the titles are always there.
+ * includes a link made by hand — and the keywords GitHub read in the body of
+ * a pull request it does not link them on yet, a stacked one. The titles are
+ * there unless GitHub would not describe the issue.
  */
 export const LinkedIssues = memoNamed<Props>('LinkedIssues', ({ issues }) => (
   <span className={'linked-issues'}>

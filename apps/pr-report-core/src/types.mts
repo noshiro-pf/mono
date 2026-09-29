@@ -64,7 +64,10 @@ export type Label = Readonly<{
 
 export type LinkedIssue = Readonly<{
   number: number;
-  /** Empty when the issue was read from the body without a token. */
+  /**
+   * Empty when the issue was read from the body without a token, or GitHub
+   * would not describe it.
+   */
   title: string;
   url: string;
   state: 'closed' | 'open' | 'unknown';
