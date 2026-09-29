@@ -15,6 +15,7 @@ import {
   anyRunInProgress,
   buildEntries,
   closingIssuesIn,
+  closingKeywordIssuesIn,
   codeOwnerReview,
   MAIN_RULESET_PATH,
   parseCodeOwners,
@@ -28,6 +29,7 @@ import {
   type CodeOwnersRule,
   type Comparison,
   type Label,
+  type LinkedIssue,
   type MergedPullRequest,
   type OpenIssue,
   type PrReport,
@@ -40,6 +42,7 @@ import {
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { type StrictPick } from 'ts-type-forge';
 import { parseClaudeSessions, type ClaudeSession } from './claude-session.mjs';
 import { type ReportSource } from './constants.mjs';
 import {
@@ -56,7 +59,10 @@ import {
   FilesFieldSchema,
   followUpAlias,
   followUpQuery,
+  issueAlias,
   ISSUES_LIMIT,
+  IssueSchema,
+  issuesQuery,
   OPEN_LIMIT,
   REPORT_QUERY,
   ReportDataSchema,
@@ -143,7 +149,8 @@ export type LoadRequest = Readonly<{
  * first follow-up always runs, because how far each head is from its base
  * can only be asked once the heads are known; any more are a list that did
  * not fit in one page, which is rare and bounded by
- * {@link MAX_FOLLOW_UP_ROUNDS}.
+ * {@link MAX_FOLLOW_UP_ROUNDS}. Last, and only when a body closes an issue
+ * GitHub has not linked, one more for what those issues are called.
  */
 export const loadReport = async (
   source: ReportSource,
@@ -193,10 +200,8 @@ export const loadReport = async (
     },
   });
 
-  const { rateLimit } = followedUp;
-
   if (Result.isErr(followedUp.result)) {
-    return { rateLimit, result: followedUp.result };
+    return { rateLimit: followedUp.rateLimit, result: followedUp.result };
   }
 
   const pulls = followedUp.result.value;
@@ -205,11 +210,35 @@ export const loadReport = async (
 
   if (unfinished !== undefined) {
     return {
-      rateLimit,
+      rateLimit: followedUp.rateLimit,
       result: Result.err(
         `#${unfinished.pr.number} has more check results than this page reads, so its verdict would be a guess.`,
       ),
     };
+  }
+
+  const described = await describeIssues({
+    repo,
+    numbers: Arr.uniq(
+      [...openPulls, ...merged].flatMap((pr) => unlinkedIssuesOf(repo, pr)),
+    ),
+    rateLimit: followedUp.rateLimit,
+    ask: async (asked) => {
+      const { query, variables: bound } = issuesQuery(asked);
+
+      return askGraphql({
+        query,
+        variables: { ...variables, ...bound },
+        token,
+        ...(fetchImpl === undefined ? {} : { fetchImpl }),
+      });
+    },
+  });
+
+  const { rateLimit } = described;
+
+  if (Result.isErr(described.result)) {
+    return { rateLimit, result: described.result };
   }
 
   return {
@@ -225,6 +254,7 @@ export const loadReport = async (
         pulls,
         merged,
         issues,
+        described: described.result.value,
       }),
     ),
   };
@@ -277,6 +307,58 @@ const followUpRounds = async ({
     rateLimit: latestLimit,
     ask,
   });
+};
+
+/**
+ * What GitHub calls the issues in `numbers`, keyed by number, as a linked
+ * one would be listed. Nothing is asked when there are none, which is so for
+ * every pull request into the default branch. An issue GitHub will not
+ * describe — deleted, or moved to another repository — is left out rather
+ * than failing the read, and is listed by its number alone.
+ */
+const describeIssues = async ({
+  repo,
+  numbers,
+  rateLimit,
+  ask,
+}: Readonly<{
+  repo: RepoRef;
+  numbers: readonly number[];
+  rateLimit: RateLimit | undefined;
+  ask: (asked: readonly number[]) => Promise<Answered<GraphqlAnswer>>;
+}>): Promise<Answered<ReadonlyMap<number, LinkedIssue>>> => {
+  if (!Arr.isNonEmpty(numbers)) {
+    return { rateLimit, result: Result.ok(new Map()) };
+  }
+
+  const answered = await ask(numbers);
+
+  const latestLimit = answered.rateLimit ?? rateLimit;
+
+  if (Result.isErr(answered.result)) {
+    return { rateLimit: latestLimit, result: answered.result };
+  }
+
+  const { data } = answered.result.value;
+
+  const repository: unknown = isRecord(data) ? data['repository'] : undefined;
+
+  const nodes = numbers.flatMap((number) => {
+    const validated = IssueSchema.validate(
+      isRecord(repository) ? repository[issueAlias(number)] : undefined,
+    );
+
+    return Result.isOk(validated) ? [validated.value] : [];
+  });
+
+  return {
+    rateLimit: latestLimit,
+    result: Result.ok(
+      new Map(
+        closingIssuesIn(repo, nodes).map((issue) => [issue.number, issue]),
+      ),
+    ),
+  };
 };
 
 /**
@@ -538,6 +620,7 @@ const assemble = ({
   pulls,
   merged,
   issues,
+  described,
 }: Readonly<{
   repo: RepoRef;
   defaultBranch: string;
@@ -548,11 +631,12 @@ const assemble = ({
   pulls: readonly PullState[];
   merged: readonly MergedPullRequestNode[];
   issues: Readonly<{ nodes: readonly OpenIssueNode[]; totalCount: number }>;
+  described: ReadonlyMap<number, LinkedIssue>;
 }>): LoadedReport => {
   const report = buildEntries({
     required,
     defaultBranch,
-    pulls: pulls.map((pull) => factsOf(repo, pull)),
+    pulls: pulls.map((pull) => factsOf(repo, pull, described)),
   });
 
   const byNumber = new Map(pulls.map((pull) => [pull.pr.number, pull]));
@@ -601,7 +685,7 @@ const assemble = ({
 
         return mergedAtEpochMs === undefined
           ? []
-          : [mergedOf(repo, pr, mergedAtEpochMs)];
+          : [mergedOf(repo, pr, mergedAtEpochMs, described)];
       })
       .filter(({ mergedAtEpochMs }) => mergedAtEpochMs >= cutoff)
       .toSorted((a, b) => b.mergedAtEpochMs - a.mergedAtEpochMs)
@@ -615,7 +699,11 @@ const assemble = ({
 
 const MS_PER_DAY = 86_400_000;
 
-const factsOf = (repo: RepoRef, pull: PullState): PullRequestFacts => {
+const factsOf = (
+  repo: RepoRef,
+  pull: PullState,
+  described: ReadonlyMap<number, LinkedIssue>,
+): PullRequestFacts => {
   const { pr } = pull;
 
   const runs: readonly CheckRunReport[] = pull.contexts.flatMap((node) =>
@@ -658,8 +746,52 @@ const factsOf = (repo: RepoRef, pull: PullState): PullRequestFacts => {
     comparison: pull.comparison === 'pending' ? undefined : pull.comparison,
     reported: reportedContexts(runs, statuses),
     checksRunning: anyRunInProgress(runs),
-    linkedIssues: closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
+    linkedIssues: linkedIssuesOf(repo, pr, described),
   };
+};
+
+/**
+ * The issues GitHub links, then the ones the body closes by keyword that it
+ * does not link yet: GitHub links a keyword only on a pull request into the
+ * default branch, and a stacked one waits for the layers below to merge.
+ */
+const linkedIssuesOf = (
+  repo: RepoRef,
+  pr: ClosingSources,
+  described: ReadonlyMap<number, LinkedIssue>,
+): readonly LinkedIssue[] =>
+  [
+    ...closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
+    ...unlinkedIssuesOf(repo, pr).map(
+      (number): LinkedIssue =>
+        described.get(number) ?? {
+          number,
+          title: '',
+          url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
+          state: 'unknown',
+        },
+    ),
+  ] as const;
+
+/** What a pull request says it closes, read both ways. */
+type ClosingSources = StrictPick<
+  OpenPullRequest,
+  'bodyHTML' | 'closingIssuesReferences'
+>;
+
+const unlinkedIssuesOf = (
+  repo: RepoRef,
+  pr: ClosingSources,
+): readonly number[] => {
+  const linked = new Set(
+    closingIssuesIn(repo, pr.closingIssuesReferences.nodes).map(
+      ({ number }) => number,
+    ),
+  );
+
+  return closingKeywordIssuesIn(repo, pr.bodyHTML).filter(
+    (number) => !linked.has(number),
+  );
 };
 
 /**
@@ -714,6 +846,7 @@ const mergedOf = (
   repo: RepoRef,
   pr: MergedPullRequestNode,
   mergedAtEpochMs: number,
+  described: ReadonlyMap<number, LinkedIssue>,
 ): Merged =>
   ({
     number: pr.number,
@@ -725,7 +858,7 @@ const mergedOf = (
     mergedAt: pr.mergedAt,
     mergedAtEpochMs,
     labels: labelsOf(pr.labels.nodes),
-    linkedIssues: closingIssuesIn(repo, pr.closingIssuesReferences.nodes),
+    linkedIssues: linkedIssuesOf(repo, pr, described),
   }) as const;
 
 const issueOf = (issue: OpenIssueNode): OpenIssue =>

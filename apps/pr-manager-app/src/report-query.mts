@@ -48,8 +48,10 @@ const CODE_OWNERS_PATH = '.github/CODEOWNERS';
 
 const LABELS = 'labels(first: 20) { nodes { name color description } }';
 
+const ISSUE_FIELDS = 'number title url state repository { nameWithOwner }';
+
 const CLOSING_ISSUES =
-  'closingIssuesReferences(first: 10) { nodes { number title url state repository { nameWithOwner } } }';
+  `closingIssuesReferences(first: 10) { nodes { ${ISSUE_FIELDS} } }` as const;
 
 const PAGE_INFO = 'pageInfo { hasNextPage endCursor }';
 
@@ -71,7 +73,7 @@ export const REPORT_QUERY = [
   `    open: pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: ASC }) {`,
   '      totalCount',
   '      nodes {',
-  '        number title body isDraft url updatedAt',
+  '        number title body bodyHTML isDraft url updatedAt',
   '        author { login }',
   '        autoMergeRequest { enabledAt }',
   '        headRefName headRefOid baseRefName isCrossRepository',
@@ -86,7 +88,7 @@ export const REPORT_QUERY = [
   '    }',
   `    merged: pullRequests(states: MERGED, first: ${MERGED_SCAN}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
   '      nodes {',
-  '        number title url mergedAt headRefName baseRefName',
+  '        number title bodyHTML url mergedAt headRefName baseRefName',
   '        author { login }',
   `        ${LABELS}`,
   `        ${CLOSING_ISSUES}`,
@@ -201,6 +203,37 @@ const followUpPart = (
   }
 };
 
+/**
+ * One query for the issues a body closes by keyword that GitHub has not
+ * linked, so that each is listed as a linked one is. The aliases are
+ * `issue_N`, which is what {@link issueAlias} reads them back by.
+ */
+export const issuesQuery = (
+  numbers: readonly number[],
+): Readonly<{
+  query: string;
+  variables: ReadonlyRecord<string, number>;
+}> =>
+  ({
+    query: [
+      `query Issues(${['$owner: String!', '$name: String!', ...numbers.map((number) => `$${issueAlias(number)}: Int!`)].join(', ')}) {`,
+      '  repository(owner: $owner, name: $name) {',
+      ...numbers.map((number) => {
+        const alias = issueAlias(number);
+
+        return `    ${alias}: issue(number: $${alias}) { ${ISSUE_FIELDS} }`;
+      }),
+      '  }',
+      '}',
+    ].join('\n'),
+    variables: Object.fromEntries(
+      numbers.map((number) => [issueAlias(number), number]),
+    ),
+  }) as const;
+
+export const issueAlias = (number: number): string =>
+  `issue_${number}` as const;
+
 const PageInfoSchema = t.record({
   hasNextPage: t.boolean(),
   endCursor: t.union([t.string(), t.nullType]),
@@ -216,17 +249,15 @@ const LabelsSchema = t.record({
   ),
 });
 
-const ClosingIssuesSchema = t.record({
-  nodes: t.array(
-    t.record({
-      number: t.number(),
-      title: t.string(),
-      url: t.string(),
-      state: t.string(),
-      repository: t.record({ nameWithOwner: t.string() }),
-    }),
-  ),
+export const IssueSchema = t.record({
+  number: t.number(),
+  title: t.string(),
+  url: t.string(),
+  state: t.string(),
+  repository: t.record({ nameWithOwner: t.string() }),
 });
+
+const ClosingIssuesSchema = t.record({ nodes: t.array(IssueSchema) });
 
 /** `null` for a deleted account, which GitHub calls a ghost. */
 const AuthorSchema = t.union([t.record({ login: t.string() }), t.nullType]);
@@ -273,6 +304,8 @@ const OpenPullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
   body: t.string(),
+  /** Where GitHub marks the closing keywords it read in `body`. */
+  bodyHTML: t.string(),
   isDraft: t.boolean(),
   url: t.string(),
   updatedAt: t.string(),
@@ -329,6 +362,7 @@ export type OpenPullRequest = t.TypeOf<typeof OpenPullRequestSchema>;
 const MergedPullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
+  bodyHTML: t.string(),
   url: t.string(),
   mergedAt: t.string(),
   headRefName: t.string(),

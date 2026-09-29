@@ -440,6 +440,140 @@ describe(loadReport, () => {
     );
   });
 
+  // #1962: stacked on another pull request's branch, so GitHub links none of
+  // its closing keywords until it is moved onto `main`, but marks them.
+  test('lists an issue a stacked pull request closes by keyword', async () => {
+    const { fetchImpl, sent } = answering(
+      report([
+        pullRequest({
+          number: 1962,
+          baseRefName: 'branch-1956',
+          bodyHTML: keywordHtml('Closes', 2043),
+        }),
+      ]),
+      followUpAnswer({ compare_1962: null }),
+      followUpAnswer({ issue_2043: closes(2043, 'noshiro-pf/mono', 'OPEN') }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(sent.length, 3);
+
+    assert.isTrue(sent[2]?.query.includes('issue_2043: issue(') ?? false);
+
+    assert.strictEqual(sent[2]?.variables['issue_2043'], 2043);
+
+    assert.deepStrictEqual(loaded.entries[0]?.linkedIssues, [
+      {
+        number: 2043,
+        title: 'Issue 2043',
+        url: 'https://github.com/noshiro-pf/mono/issues/2043',
+        state: 'open',
+      },
+    ]);
+  });
+
+  test('asks nothing more for an issue GitHub already linked', async () => {
+    const { fetchImpl, sent } = answering(
+      report(
+        [
+          pullRequest({
+            number: 2126,
+            bodyHTML: keywordHtml('Closes', 2122),
+            closingIssues: [closes(2122, 'noshiro-pf/mono')],
+          }),
+        ],
+        [
+          merged(
+            2125,
+            '2026-09-23T00:00:00Z',
+            [closes(2121, 'noshiro-pf/mono')],
+            keywordHtml('Closes', 2121),
+          ),
+        ],
+      ),
+      followUpAnswer({ compare_2126: null }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(sent.length, 2);
+
+    assert.deepStrictEqual(
+      loaded.entries[0]?.linkedIssues.map(({ number, state }) => ({
+        number,
+        state,
+      })),
+      [{ number: 2122, state: 'closed' }],
+    );
+
+    assert.deepStrictEqual(
+      loaded.merged[0]?.linkedIssues.map(({ number }) => number),
+      [2121],
+    );
+  });
+
+  test('lists a keyword issue after the ones GitHub linked, each once', async () => {
+    const { fetchImpl, sent } = answering(
+      report(
+        [],
+        [
+          merged(
+            2000,
+            '2026-09-23T00:00:00Z',
+            [closes(1990, 'noshiro-pf/mono')],
+            [keywordHtml('Fixes', 1995), keywordHtml('Closes', 1990)].join(
+              '\n',
+            ),
+          ),
+        ],
+      ),
+      followUpAnswer({ issue_1995: closes(1995, 'noshiro-pf/mono') }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.strictEqual(sent.length, 2);
+
+    assert.deepStrictEqual(
+      loaded.merged[0]?.linkedIssues.map(({ number }) => number),
+      [1990, 1995],
+    );
+  });
+
+  test('still lists by number an issue GitHub would not describe', async () => {
+    const { fetchImpl } = answering(
+      report([
+        pullRequest({
+          number: 1962,
+          baseRefName: 'branch-1956',
+          bodyHTML: keywordHtml('Closes', 2043),
+        }),
+      ]),
+      followUpAnswer({ compare_1962: null }),
+      {
+        data: { repository: { issue_2043: null } },
+        errors: [
+          {
+            message: 'Could not resolve to an Issue with the number of 2043.',
+            path: ['repository', 'issue_2043'],
+          },
+        ],
+      },
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(loaded.entries[0]?.linkedIssues, [
+      {
+        number: 2043,
+        title: '',
+        url: 'https://github.com/noshiro-pf/mono/issues/2043',
+        state: 'unknown',
+      },
+    ]);
+  });
+
   test('refuses to report part of the open pull requests as the whole', async () => {
     const { fetchImpl } = answering(report([], [], 51));
 
@@ -700,6 +834,8 @@ const pullRequest = ({
   isCrossRepository = false,
   committedDate = '2026-09-22T00:00:00Z',
   body = '',
+  bodyHTML = '',
+  closingIssues = [],
   headRefOid = `sha-${number}`,
   comments = [],
 }: Readonly<{
@@ -711,6 +847,8 @@ const pullRequest = ({
   isCrossRepository?: boolean;
   committedDate?: string;
   body?: string;
+  bodyHTML?: string;
+  closingIssues?: readonly unknown[];
   headRefOid?: string;
   comments?: readonly unknown[];
 }>): unknown =>
@@ -718,6 +856,7 @@ const pullRequest = ({
     number,
     title: `Pull request ${number}`,
     body,
+    bodyHTML,
     isDraft: false,
     url: `https://github.com/noshiro-pf/mono/pull/${number}`,
     updatedAt: '2026-09-23T00:00:00Z',
@@ -729,7 +868,7 @@ const pullRequest = ({
     isCrossRepository,
     baseRef: { target: { oid: BASE_TIP } },
     labels: { nodes: [] },
-    closingIssuesReferences: { nodes: [] },
+    closingIssuesReferences: { nodes: closingIssues },
     latestOpinionatedReviews: { nodes: [] },
     files: {
       pageInfo: { hasNextPage: false, endCursor: null },
@@ -760,10 +899,12 @@ const merged = (
   number: number,
   mergedAt: string,
   closingIssues: readonly unknown[] = [],
+  bodyHTML: string = '',
 ): unknown =>
   ({
     number,
     title: `Merged ${number}`,
+    bodyHTML,
     url: `https://github.com/noshiro-pf/mono/pull/${number}`,
     mergedAt,
     headRefName: `branch-${number}`,
@@ -774,11 +915,29 @@ const merged = (
   }) as const;
 
 /** A closing issue as GraphQL answers it, in the repository given. */
-const closes = (number: number, nameWithOwner: string): unknown =>
+const closes = (
+  number: number,
+  nameWithOwner: string,
+  state: string = 'CLOSED',
+): unknown =>
   ({
     number,
     title: `Issue ${number}`,
     url: `https://github.com/${nameWithOwner}/issues/${number}`,
-    state: 'CLOSED',
+    state,
     repository: { nameWithOwner },
   }) as const;
+
+/**
+ * A paragraph of `bodyHTML` closing an issue of this repository, as GitHub
+ * renders one: the keyword marked, then the reference.
+ */
+const keywordHtml = (keyword: string, number: number): string =>
+  [
+    `<p dir="auto"><span class="issue-keyword">${keyword}</span> `,
+    '<a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="1" data-permission-text="Title is private"',
+    ` data-url="https://github.com/noshiro-pf/mono/issues/${number}"`,
+    ' data-hovercard-type="issue"',
+    ` data-hovercard-url="/noshiro-pf/mono/issues/${number}/hovercard"`,
+    ` href="https://github.com/noshiro-pf/mono/issues/${number}">#${number}</a>.</p>`,
+  ].join('');
