@@ -1,11 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!--
-    A pull request, on the page's accent blue (`--accent` in `src/index.css`).
+    A pull request, on the page's accent blue (the `accent` custom property
+    in `src/index.css`).
     Fixed colours rather than following the theme: the icon sits on the
     browser's tab strip, not on the page, and white on blue reads on a light
     strip and a dark one alike. SVG rather than an `.ico`, because the one
     drawing is sharp at every size a browser asks for; `public/` rather than
     `src/`, so it keeps one URL, which Vite prefixes with the base path.
+
+    Never two hyphens in a row inside this comment, not even to name a
+    custom property: XML forbids them there, and a browser then rejects the
+    whole file and shows no icon, while an image viewer draws it regardless.
   -->
   <rect width="32" height="32" rx="7" fill="#2a78d6" />
   <g
