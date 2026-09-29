@@ -482,3 +482,77 @@ describe('prefer-nullish-coalescing-when-safe', () => {
     },
   );
 });
+
+describe('prefer-nullish-coalescing-when-safe through type wrappers', () => {
+  tester.run(
+    'prefer-nullish-coalescing-when-safe',
+    preferNullishCoalescingWhenSafe,
+    {
+      valid: [
+        {
+          name: 'a cast to a type without `""` does not make `""` go away',
+          code: dedent`
+            declare const s: string | undefined;
+            declare const u: string;
+            const r = (s as 'a' | undefined) || 'x';
+            const q = (u as 'a') || 'x';
+          `,
+        },
+        {
+          name: 'nor for `||=`',
+          code: dedent`
+            let s: string | undefined;
+            (s as 'a' | undefined) ||= 'b';
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a non-null assertion does not make the left side never nullish',
+          code: dedent`
+            declare const m: ReadonlyMap<string, Readonly<{ id: number }>>;
+            declare const def: Readonly<{ id: number }>;
+            declare const s: string | undefined;
+            const v = m.get('k')! || def;
+            const t = s! || '';
+          `,
+          output: dedent`
+            declare const m: ReadonlyMap<string, Readonly<{ id: number }>>;
+            declare const def: Readonly<{ id: number }>;
+            declare const s: string | undefined;
+            const v = m.get('k')! ?? def;
+            const t = s! ?? '';
+          `,
+          errors: [
+            { messageId: 'preferNullishCoalescing' },
+            { messageId: 'preferNullishCoalescing' },
+          ],
+        },
+        {
+          name: 'the fallback wrapped in `satisfies`',
+          code: dedent`
+            declare const s: string | undefined;
+            const r = s || ('' satisfies string);
+          `,
+          output: dedent`
+            declare const s: string | undefined;
+            const r = s ?? ('' satisfies string);
+          `,
+          errors: [{ messageId: 'preferNullishCoalescing' }],
+        },
+        {
+          name: 'a `||=` target reached through `!` is still the variable',
+          code: dedent`
+            let s: string | undefined;
+            s! ||= '';
+          `,
+          output: dedent`
+            let s: string | undefined;
+            s! ??= '';
+          `,
+          errors: [{ messageId: 'preferNullishCoalescingAssignment' }],
+        },
+      ],
+    },
+  );
+});

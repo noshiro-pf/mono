@@ -151,3 +151,51 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     },
   ],
 } as const);
+
+describe('no-partial-url-constructor through type wrappers', () => {
+  ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
+    valid: [
+      {
+        name: 'a wrapped valid literal',
+        filename: 'file.ts',
+        code: dedent`
+          new URL("https://example.com" satisfies string);
+          new URL("/hello" as string, "https://example.com" satisfies string);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a constructor cast to a type that is not URL',
+        filename: 'file.ts',
+        code: dedent`
+          declare const input: string;
+          new (URL as new (url: string) => URL)(input);
+          new (URL satisfies unknown as new (url: string) => URL)(input);
+        `,
+        errors: [
+          { messageId: 'errorStringGeneric' },
+          { messageId: 'errorStringGeneric' },
+        ],
+      },
+      {
+        name: 'a wrapped invalid literal',
+        filename: 'file.ts',
+        code: dedent`
+          new URL("foo" satisfies string);
+          new URL("foo" as string, "bar"!);
+        `,
+        errors: [
+          {
+            messageId: 'errorStringWillDefinitelyThrow',
+            type: AST_NODE_TYPES.TSSatisfiesExpression,
+          },
+          {
+            messageId: 'errorStringWillDefinitelyThrow',
+            type: AST_NODE_TYPES.NewExpression,
+          },
+        ],
+      },
+    ],
+  });
+});

@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 import { castNode, isReactApiCall } from './shared.mjs';
 
 type Options = readonly [
@@ -18,6 +19,9 @@ type MessageIds = 'missingDisplayName' | 'mismatchedDisplayName';
 /**
  * Rule to require displayName property for React components
  * This helps with debugging and component identification in React DevTools
+ *
+ * Type wrappers (`as`, `satisfies`, `!`, `<T>`) are looked through on the
+ * memo call, on the component in `C.displayName` and on the assigned name.
  */
 export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -68,11 +72,13 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
         return;
       }
 
-      if (node.init?.type !== AST_NODE_TYPES.CallExpression) {
+      const init = node.init === null ? undefined : skipTypeWrappers(node.init);
+
+      if (init?.type !== AST_NODE_TYPES.CallExpression) {
         return;
       }
 
-      if (!isReactApiCall(context, node.init, 'memo')) {
+      if (!isReactApiCall(context, init, 'memo')) {
         return;
       }
 
@@ -185,27 +191,34 @@ const isComponentDisplayNameAssignment = (
   assignment: DeepReadonly<TSESTree.AssignmentExpression>,
   componentName: string,
 ): assignment is TSESTree.AssignmentExpression => {
-  if (assignment.left.type !== AST_NODE_TYPES.MemberExpression) {
+  const left = skipTypeWrappers(assignment.left);
+
+  if (left.type !== AST_NODE_TYPES.MemberExpression) {
     return false;
   }
 
-  if (assignment.left.object.type !== AST_NODE_TYPES.Identifier) {
+  const object = skipTypeWrappers(left.object);
+
+  if (object.type !== AST_NODE_TYPES.Identifier) {
     return false;
   }
 
-  if (assignment.left.object.name !== componentName) {
+  if (object.name !== componentName) {
     return false;
   }
 
   return (
-    assignment.left.property.type === AST_NODE_TYPES.Identifier &&
-    assignment.left.property.name === 'displayName'
+    left.property.type === AST_NODE_TYPES.Identifier &&
+    left.property.name === 'displayName'
   );
 };
 
 const extractDisplayName = (
-  expression: DeepReadonly<TSESTree.Expression>,
+  wrappedExpression: DeepReadonly<TSESTree.Expression>,
 ): string | undefined => {
+  // `'C' as const` and `'C' satisfies string` name the component `C` too.
+  const expression = skipTypeWrappers(wrappedExpression);
+
   if (
     expression.type === AST_NODE_TYPES.Literal &&
     typeof expression.value === 'string'

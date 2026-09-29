@@ -1,5 +1,11 @@
-import { ESLintUtils, type TSESLint } from '@typescript-eslint/utils';
+import {
+  ESLintUtils,
+  type TSESLint,
+  type TSESTree,
+} from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { isTypeWrapper } from '../../ast-utils/index.mjs';
 
 type Options = readonly [];
 
@@ -41,6 +47,10 @@ const DEFERRED_TYPE_FLAGS =
  * If a character split is really intended, spell it out with
  * `Array.from(str)` (identical to the spread, code-point aware) or
  * `str.split('')`.
+ *
+ * A spread argument wrapped in `as` / `satisfies` / `!` / `<T>` is flagged when
+ * the value or any wrapper around it is string-like, so that a cast
+ * (`[...(s as Iterable<string>)]`) does not hide a string.
  */
 export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -95,17 +105,22 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
       return (type.flags & ts.TypeFlags.StringLike) !== 0;
     };
 
+    const isStringLikeTypedNode = (
+      node: DeepReadonly<TSESTree.Expression>,
+    ): boolean =>
+      isStringLikeType(
+        checker.getTypeAtLocation(
+          parserServices.esTreeNodeToTSNodeMap.get(asNode(node)),
+        ),
+      );
+
     return {
       // `SpreadElement` covers every value-spread position: array literals
       // (`[...x]`), call / new arguments (`f(...x)`), and object literals
       // (`{...x}`). Destructuring rest (`[a, ...rest]`, `{ ...rest }`) is a
       // `RestElement` / `RestType` and is intentionally not matched.
       SpreadElement: (node) => {
-        const argTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.argument,
-        );
-
-        if (!isStringLikeType(checker.getTypeAtLocation(argTsNode))) {
+        if (!someLayerIs(node.argument, isStringLikeTypedNode)) {
           return;
         }
 
@@ -118,3 +133,19 @@ export const noStringSpread: TSESLint.RuleModule<MessageIds, Options> = {
   },
   defaultOptions: [],
 } as const;
+
+/**
+ * Whether `predicate` holds for `node` or for any expression inside the type
+ * wrappers around it: `(s as Iterable<string>)` is asked about both itself and
+ * `s`.
+ */
+const someLayerIs = (
+  node: DeepReadonly<TSESTree.Expression>,
+  predicate: (layer: DeepReadonly<TSESTree.Expression>) => boolean,
+): boolean =>
+  predicate(node) ||
+  (isTypeWrapper(node) && someLayerIs(node.expression, predicate));
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
-import { castNode, isReactApiCall } from './shared.mjs';
+import { castNode, climbTypeWrappers, isReactApiCall } from './shared.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -153,19 +153,24 @@ const getEnclosingFunction = (
  * Walks outward through the calls the given node is passed to and returns the
  * expression whose value is what a name is bound to, or `undefined` when the
  * result is memoized or is passed to a function this rule knows nothing about
- * (a custom HOC, a hook, an array callback, ...).
+ * (a custom HOC, a hook, an array callback, ...). Type wrappers are passed
+ * through on the way: `React.memo(fn as React.FC)` is memoized, and
+ * `React.forwardRef(fn) as React.FC` is not.
  */
 const getDefinitionIfNotMemoized = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, Options>>,
   node: DeepReadonly<TSESTree.Node>,
 ): DeepReadonly<TSESTree.Node> | undefined => {
-  const parent = node.type === AST_NODE_TYPES.Program ? undefined : node.parent;
+  const wrapped = climbTypeWrappers(node);
+
+  const parent =
+    wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
 
   if (parent?.type !== AST_NODE_TYPES.CallExpression) {
     return node;
   }
 
-  if (parent.callee === node) {
+  if (parent.callee === wrapped) {
     // An immediately invoked function is not a component definition.
     return undefined;
   }
@@ -181,7 +186,10 @@ const getDefinitionIfNotMemoized = (
     : undefined;
 };
 
-/** The name the given expression is bound to, when it is bound to one. */
+/**
+ * The name the given expression is bound to, when it is bound to one, through
+ * type wrappers: `const Foo = (() => <div />) satisfies React.FC;` binds `Foo`.
+ */
 const getComponentId = (
   node: DeepReadonly<TSESTree.Node>,
 ): DeepReadonly<TSESTree.Identifier> | undefined => {
@@ -189,11 +197,14 @@ const getComponentId = (
     return node.id ?? undefined;
   }
 
-  const parent = node.type === AST_NODE_TYPES.Program ? undefined : node.parent;
+  const wrapped = climbTypeWrappers(node);
+
+  const parent =
+    wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
 
   if (
     parent?.type === AST_NODE_TYPES.VariableDeclarator &&
-    parent.init === node &&
+    parent.init === wrapped &&
     parent.id.type === AST_NODE_TYPES.Identifier
   ) {
     return parent.id;

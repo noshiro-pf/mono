@@ -147,3 +147,85 @@ describe('shared helpers', () => {
     ],
   });
 });
+
+describe('shared helpers through type wrappers', () => {
+  tester.run('isReactApiCall', reactApiRule, {
+    valid: [
+      {
+        name: 'a wrapped callee imported from elsewhere is still not React',
+        code: dedent`
+          import { memo } from 'not-react';
+          const Component = (memo as typeof memo)(() => null);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'callee wrapped in `as`',
+        code: dedent`
+          import * as React from 'react';
+          const Component = (React.memo as typeof React.memo)(() => null);
+        `,
+        errors: [{ messageId: 'reactApiDetected' }],
+      },
+      {
+        name: 'callee wrapped in `satisfies`',
+        code: dedent`
+          import * as React from 'react';
+          const Component = (React.memo satisfies unknown)(() => null);
+        `,
+        errors: [{ messageId: 'reactApiDetected' }],
+      },
+      {
+        name: 'callee with `!`',
+        code: dedent`
+          import * as React from 'react';
+          const Component = React.memo!(() => null);
+        `,
+        errors: [{ messageId: 'reactApiDetected' }],
+      },
+      {
+        name: 'the `React` object wrapped',
+        code: dedent`
+          import * as React from 'react';
+          const A = (React as typeof React).memo(() => null);
+          const B = React!.memo(() => null);
+        `,
+        errors: [
+          { messageId: 'reactApiDetected' },
+          { messageId: 'reactApiDetected' },
+        ],
+      },
+      {
+        name: 'named import wrapped in `as`',
+        code: dedent`
+          import { memo } from 'react';
+          const Component = (memo as typeof memo)(() => null);
+        `,
+        errors: [{ messageId: 'reactApiDetected' }],
+      },
+    ],
+  });
+
+  tester.run('getReactMemoArrowFunction', reactMemoArrowRule, {
+    valid: [],
+    invalid: [
+      {
+        name: 'arrow function wrapped in `satisfies`',
+        code: dedent`
+          import * as React from 'react';
+          const Wrapped = React.memo((() => null) satisfies React.FC);
+        `,
+        errors: [{ messageId: 'arrowDetected' }],
+      },
+      {
+        name: 'arrow function wrapped in `as`',
+        code: dedent`
+          import { memo } from 'react';
+          const Wrapped = memo((() => null) as React.FC);
+        `,
+        errors: [{ messageId: 'arrowDetected' }],
+      },
+    ],
+  });
+});

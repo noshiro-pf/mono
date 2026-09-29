@@ -625,3 +625,72 @@ ruleTester.run(
     ],
   } as const,
 );
+
+describe('no-unsafe-readonly-mutable-assignment through type wrappers', () => {
+  ruleTester.run(
+    'no-unsafe-readonly-mutable-assignment',
+    noUnsafeReadonlyMutableAssignment,
+    {
+      valid: [
+        {
+          name: 'a cast that keeps the source readonly',
+          filename: 'file.ts',
+          code: dedent`
+            type ReadonlyA = { readonly a: string };
+            const ra: ReadonlyA = { a: "" } as const;
+            const rb = ra as ReadonlyA;
+            const rc = ra satisfies ReadonlyA;
+          `,
+        },
+        {
+          name: 'a literal cast to a mutable type',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            const ma = {} as MutableA;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a readonly value cast to a mutable type',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            type ReadonlyA = { readonly a: string };
+            declare const func: (p: MutableA) => void;
+            const ra: ReadonlyA = { a: "" } as const;
+            func(ra as MutableA);
+            const ma: MutableA = <MutableA>ra;
+          `,
+          errors: [
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSAsExpression,
+            },
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSTypeAssertion,
+            },
+          ],
+        },
+        {
+          name: 'a readonly value cast through unknown',
+          filename: 'file.ts',
+          code: dedent`
+            type MutableA = { a: string };
+            type ReadonlyA = { readonly a: string };
+            const ra: ReadonlyA = { a: "" } as const;
+            const ma = ra as unknown as MutableA;
+          `,
+          errors: [
+            {
+              messageId: 'errorStringGeneric',
+              type: AST_NODE_TYPES.TSAsExpression,
+            },
+          ],
+        },
+      ],
+    },
+  );
+});

@@ -162,3 +162,102 @@ describe('no-unnecessary-coalesce-undefined', () => {
     },
   );
 });
+
+describe('no-unnecessary-coalesce-undefined through type wrappers', () => {
+  tester.run(
+    'no-unnecessary-coalesce-undefined',
+    noUnnecessaryCoalesceUndefined,
+    {
+      valid: [
+        {
+          name: 'a `!` or a cast on the left-hand side does not remove `null` from its value',
+          code: dedent`
+            declare const x: string | null;
+            const y = x! ?? undefined;
+            const z = (x as string) ?? undefined;
+          `,
+        },
+        {
+          name: 'a cast does not make a shadowed `undefined` the value',
+          code: dedent`
+            declare const x: string;
+            const f = (undefined: number) => x ?? (undefined as unknown as undefined);
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: '`undefined` wrapped in `satisfies` or `as`',
+          code: dedent`
+            declare const x: string | undefined;
+            const y = x ?? (undefined satisfies undefined);
+            const z = x ?? (undefined as undefined);
+          `,
+          output: dedent`
+            declare const x: string | undefined;
+            const y = x;
+            const z = x;
+          `,
+          errors: [
+            { messageId: 'unnecessaryCoalesceUndefined' },
+            { messageId: 'unnecessaryCoalesceUndefined' },
+          ],
+        },
+        {
+          name: 'the left-hand side keeps its wrapper',
+          code: dedent`
+            declare const x: string | undefined;
+            const y = (x satisfies string | undefined) ?? undefined;
+          `,
+          output: dedent`
+            declare const x: string | undefined;
+            const y = (x satisfies string | undefined);
+          `,
+          errors: [{ messageId: 'unnecessaryCoalesceUndefined' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('no-unnecessary-coalesce-undefined with parenthesized operands', () => {
+  tester.run(
+    'no-unnecessary-coalesce-undefined',
+    noUnnecessaryCoalesceUndefined,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'the parentheses around the left-hand side are kept',
+          code: dedent`
+            declare function log(): void;
+            declare function f(...a: readonly unknown[]): void;
+            declare const b: string;
+            f((log(), b) ?? undefined);
+          `,
+          output: dedent`
+            declare function log(): void;
+            declare function f(...a: readonly unknown[]): void;
+            declare const b: string;
+            f((log(), b));
+          `,
+          errors: [{ messageId: 'unnecessaryCoalesceUndefined' }],
+        },
+        {
+          name: 'a parenthesized conditional under another `??`',
+          code: dedent`
+            declare const c: boolean;
+            declare const a: string, b: string, d: string;
+            const y = (c ? a : b) ?? undefined ?? d;
+          `,
+          output: dedent`
+            declare const c: boolean;
+            declare const a: string, b: string, d: string;
+            const y = (c ? a : b) ?? d;
+          `,
+          errors: [{ messageId: 'unnecessaryCoalesceUndefined' }],
+        },
+      ],
+    },
+  );
+});

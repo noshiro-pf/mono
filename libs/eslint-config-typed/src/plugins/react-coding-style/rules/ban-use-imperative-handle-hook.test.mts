@@ -70,3 +70,38 @@ describe('ban-use-imperative-handle-hook', () => {
     });
   });
 });
+
+describe('ban-use-imperative-handle-hook through type wrappers', () => {
+  tester.run(ruleName, banUseImperativeHandleHook, {
+    valid: [],
+    invalid: [
+      {
+        name: 'callee wrapped in `as`',
+        code: dedent`
+          const Component = React.memo<Props>((props) => {
+            (React.useImperativeHandle as typeof React.useImperativeHandle)(
+              props.ref,
+              () => ({}),
+            );
+            return null;
+          });
+        `,
+        errors: [{ messageId: 'disallowUseImperativeHandle' }],
+      },
+      {
+        name: 'callee with `!`, and the `React` object wrapped',
+        code: dedent`
+          const Component = React.memo<Props>((props) => {
+            React.useImperativeHandle!(props.ref, () => ({}));
+            (React satisfies unknown).useImperativeHandle(props.ref, () => ({}));
+            return null;
+          });
+        `,
+        errors: [
+          { messageId: 'disallowUseImperativeHandle' },
+          { messageId: 'disallowUseImperativeHandle' },
+        ],
+      },
+    ],
+  });
+});

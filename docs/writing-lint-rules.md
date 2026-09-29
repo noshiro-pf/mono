@@ -34,9 +34,9 @@
 避け方:
 
 - **構文を見る前、型を聞く前に剥がす。** ESLint のルールでは
-  `libs/eslint-config-typed/src/plugins/ts-restrictions/rules/type-wrapper-utils.mts`
-  の `skipTypeWrappers` を使う。同じ参照かどうかは、同じ場所の
-  `reference-utils.mts` の `isSameReference` がラッパー越しに比べる。
+  `libs/eslint-config-typed/src/plugins/ast-utils/type-wrapper-utils.mts`
+  の `skipTypeWrappers` を使う。同じ参照かどうかは、
+  `ts-restrictions/rules/reference-utils.mts` の `isSameReference` がラッパー越しに比べる。
 - **位置を判定するときも剥がす。** 「JSX の中か」「呼び出しの callee か」のように
   親をたどる判定では、親がラッパーならさらにその上を見る（`jsx-utils.mts` の
   `jsxValuePositionOf`）。

@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
-import { isTypeWrapper } from './type-wrapper-utils.mjs';
+import { isTypeWrapper } from '../../ast-utils/index.mjs';
 
 /**
  * Where `node`'s value ends up in JSX, if it does: rendered as a child, or

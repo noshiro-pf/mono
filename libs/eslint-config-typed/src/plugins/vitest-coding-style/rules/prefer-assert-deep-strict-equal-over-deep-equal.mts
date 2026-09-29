@@ -1,10 +1,17 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { isCalleeOfCall } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertDeepStrictEqual';
 
 type Options = readonly [];
 
+/**
+ * `assert.deepEqual(X, Y)` becomes `assert.deepStrictEqual(X, Y)`. The
+ * receiver and the call are read through `as`, `satisfies`, `!` and `<T>`
+ * (`(assert as typeof assert).deepEqual(X, Y)`, `assert.deepEqual!(X, Y)`),
+ * which the fix leaves in place.
+ */
 export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -29,8 +36,7 @@ export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
           undefined &&
         node.property.type === AST_NODE_TYPES.Identifier &&
         node.property.name === 'deepEqual' &&
-        node.parent.type === AST_NODE_TYPES.CallExpression &&
-        node.parent.callee === node
+        isCalleeOfCall(node)
       ) {
         const { property } = node;
 

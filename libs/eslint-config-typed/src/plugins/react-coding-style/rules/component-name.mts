@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 import { isReactApiCall } from './shared.mjs';
 
 type ComponentNameOption = Readonly<{
@@ -60,14 +61,18 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       VariableDeclarator: (node) => {
+        // `const C = React.memo(...) satisfies React.FC;` is a memo component too.
+        const init =
+          node.init === null ? undefined : skipTypeWrappers(node.init);
+
         if (
           node.id.type !== AST_NODE_TYPES.Identifier ||
-          node.init?.type !== AST_NODE_TYPES.CallExpression
+          init?.type !== AST_NODE_TYPES.CallExpression
         ) {
           return;
         }
 
-        if (!isReactApiCall(context, node.init, 'memo')) {
+        if (!isReactApiCall(context, init, 'memo')) {
           return;
         }
 

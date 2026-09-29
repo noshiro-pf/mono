@@ -6,6 +6,7 @@ import {
 import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -18,6 +19,13 @@ type MessageIds = 'incompleteDestructuring';
 
 const DEFAULT_DIRECTIVE_KEYWORD = '@check-destructuring-completeness';
 
+/**
+ * Reports an object destructuring that leaves out properties of its source,
+ * when a directive comment asks for it or the destructured object is a React
+ * component's props. Type wrappers are seen through: `props satisfies Props`
+ * is still the props, whose own type lists the properties, and a component
+ * returning `(<div />) satisfies React.ReactNode` is still a component.
+ */
 export const checkDestructuringCompleteness: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -124,19 +132,19 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         if (grandParent.type === AST_NODE_TYPES.BlockStatement) {
           const greatGrandParent = grandParent.parent;
 
+          // `props satisfies Props`, `props!` and `props as Props` are still
+          // the props.
+          const init =
+            node.init === null ? undefined : skipTypeWrappers(node.init);
+
           if (
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             greatGrandParent?.type === AST_NODE_TYPES.ArrowFunctionExpression &&
-            node.init?.type === AST_NODE_TYPES.Identifier
+            init?.type === AST_NODE_TYPES.Identifier
           ) {
-            const initName =
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              node.init.type === AST_NODE_TYPES.Identifier
-                ? node.init.name
-                : undefined;
+            const initName = init.name;
 
             if (
-              initName !== undefined &&
               greatGrandParent.params.some(
                 (param) =>
                   param.type === AST_NODE_TYPES.Identifier &&
@@ -176,7 +184,12 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         return;
       }
 
-      const type = typeChecker.getTypeAtLocation(tsNode);
+      // Destructuring `null` / `undefined` throws, so only the non-nullable
+      // part of the type can be destructured: `props!` with a nullable
+      // `props` reads the properties of the rest.
+      const type = typeChecker.getNonNullableType(
+        typeChecker.getTypeAtLocation(tsNode),
+      );
 
       const objectProps = getObjectTypeProperties(type);
 
@@ -222,7 +235,9 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
           return;
         }
 
-        checkObjectPatternCompleteness(node.id, node.init);
+        // The value's own type: a cast to a narrower type does not make the
+        // properties it leaves out go away.
+        checkObjectPatternCompleteness(node.id, skipTypeWrappers(node.init));
       },
       ArrowFunctionExpression: (node) => {
         if (!alwaysCheckReactComponentProps) {
@@ -322,6 +337,14 @@ const collectDestructuredPropNames = (
   return { names: mut_names, hasDynamicComputedKey: mut_hasDynamicComputedKey };
 };
 
+/**
+ * Whether `node` is JSX. The JSX a component returns is looked for through type
+ * wrappers: `(<div />) satisfies React.ReactNode` is still a component's body.
+ */
+const isJsx = (node: DeepReadonly<TSESTree.Node>): boolean =>
+  node.type === AST_NODE_TYPES.JSXElement ||
+  node.type === AST_NODE_TYPES.JSXFragment;
+
 const isReactComponentFunction = (
   node: DeepReadonly<TSESTree.Node> | undefined | null,
 ): boolean => {
@@ -341,20 +364,11 @@ const isReactComponentFunction = (
 
         const { argument } = statement;
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (argument === null || argument === undefined) {
-          return false;
-        }
-
-        const argType = (argument as Readonly<{ type?: string }>).type;
-
-        return argType === 'JSXElement' || argType === 'JSXFragment';
+        return argument !== null && isJsx(skipTypeWrappers(argument));
       });
     }
 
-    const bodyType = (body as Readonly<{ type?: string }>).type;
-
-    return bodyType === 'JSXElement' || bodyType === 'JSXFragment';
+    return isJsx(skipTypeWrappers(body));
   }
 
   return false;

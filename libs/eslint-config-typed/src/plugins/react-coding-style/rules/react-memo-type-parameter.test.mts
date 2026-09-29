@@ -96,3 +96,37 @@ tester.run(ruleName, reactMemoTypeParameterRule, {
     },
   ],
 });
+
+describe('react-memo-type-parameter through type wrappers', () => {
+  tester.run(ruleName, reactMemoTypeParameterRule, {
+    valid: [
+      {
+        name: 'a wrapped arrow function without props needs no type parameter',
+        code: dedent`
+          const A = React.memo((() => React.createElement('div')) satisfies React.FC);
+          const B = React.memo((() => React.createElement('div')) as React.FC);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'memo callee wrapped in `as`, without type parameter',
+        code: dedent`
+          const Component = (React.memo as typeof React.memo)(
+            (props: { a: 1 }) => React.createElement('div', props),
+          );
+        `,
+        errors: [{ messageId: 'requirePropsTypeParameter' }],
+      },
+      {
+        name: 'a wrapped arrow function without props, with type parameter',
+        code: dedent`
+          const Component = React.memo<Props>(
+            (() => React.createElement('div')) satisfies React.FC,
+          );
+        `,
+        errors: [{ messageId: 'omitTypeParameterWhenPropsEmpty' }],
+      },
+    ],
+  });
+});

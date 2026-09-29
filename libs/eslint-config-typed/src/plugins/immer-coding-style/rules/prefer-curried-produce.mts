@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr, castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 
 type MessageIds = 'useCurriedProduce';
 
@@ -13,6 +14,11 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
     typeParameters?: TSESTree.TSTypeParameterInstantiation;
   }>;
 
+/**
+ * Rewrites `(state) => produce(state, recipe)` as `produce(recipe)`. The base
+ * state is recognized through type wrappers (`produce(state satisfies State,
+ * recipe)`), which change nothing at run time and go with the argument.
+ */
 export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
   meta: {
     type: 'suggestion',
@@ -57,15 +63,17 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
 
         const [baseArgument, ...restArguments] = callExpression.arguments;
 
-        if (
-          baseArgument === undefined ||
-          Arr.isEmpty(restArguments) ||
-          !isSameIdentifier(baseArgument, parameterName)
-        ) {
+        if (baseArgument === undefined || Arr.isEmpty(restArguments)) {
           return;
         }
 
-        if (hasOtherReferences(context, parameterName, baseArgument)) {
+        const baseIdentifier = findIdentifier(baseArgument, parameterName);
+
+        if (baseIdentifier === undefined) {
+          return;
+        }
+
+        if (hasOtherReferences(context, parameterName, baseIdentifier)) {
           return;
         }
 
@@ -137,11 +145,24 @@ const isProduceCall = (
   );
 };
 
-const isSameIdentifier = (
-  node: DeepReadonly<TSESTree.CallExpressionArgument>,
+/**
+ * The identifier named `expectedName` that `argument` is, inside any type
+ * wrappers (`state satisfies State`, `state!`), or `undefined`.
+ */
+const findIdentifier = (
+  argument: DeepReadonly<TSESTree.CallExpressionArgument>,
   expectedName: string,
-): node is TSESTree.Identifier =>
-  node.type === AST_NODE_TYPES.Identifier && node.name === expectedName;
+): DeepReadonly<TSESTree.Identifier> | undefined => {
+  if (argument.type === AST_NODE_TYPES.SpreadElement) {
+    return undefined;
+  }
+
+  const node = skipTypeWrappers(argument);
+
+  return node.type === AST_NODE_TYPES.Identifier && node.name === expectedName
+    ? node
+    : undefined;
+};
 
 const hasOtherReferences = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,

@@ -196,3 +196,57 @@ describe('use-memo-hooks-style', () => {
     });
   });
 });
+
+describe('use-memo-hooks-style through type wrappers', () => {
+  tester.run(ruleName, useMemoHooksStyleRule, {
+    valid: [
+      {
+        name: '`!` and `satisfies` alone are allowed',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number | undefined;
+
+          const a = React.useMemo(() => x, [])!;
+          const b = React.useMemo(() => x, [])! satisfies number;
+          const c = React.useMemo(() => x, []) satisfies number | undefined;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'type assertion after `!`',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number | undefined;
+
+          const v = React.useMemo(() => x, [])! as number;
+        `,
+        errors: [{ messageId: 'disallowUseMemoTypeAnnotation' }],
+      },
+      {
+        name: 'type assertion after `satisfies`',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number;
+
+          const v = React.useMemo(() => x, []) satisfies number as number;
+        `,
+        errors: [{ messageId: 'disallowUseMemoTypeAnnotation' }],
+      },
+      {
+        name: 'type assertion on a call whose callee is wrapped',
+        code: dedent`
+          import * as React from 'react';
+
+          declare const x: number;
+
+          const v = (React.useMemo as typeof React.useMemo)(() => x, []) as number;
+        `,
+        errors: [{ messageId: 'disallowUseMemoTypeAnnotation' }],
+      },
+    ],
+  });
+});

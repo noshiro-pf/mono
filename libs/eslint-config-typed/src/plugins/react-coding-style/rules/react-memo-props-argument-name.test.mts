@@ -54,3 +54,47 @@ tester.run(ruleName, reactMemoPropsArgumentNameRule, {
     },
   ],
 });
+
+describe('react-memo-props-argument-name through type wrappers', () => {
+  tester.run(ruleName, reactMemoPropsArgumentNameRule, {
+    valid: [
+      {
+        name: 'a wrapped arrow function whose argument is props',
+        code: dedent`
+          const Component = React.memo<Props>(((props) => {
+            return React.createElement('div', props);
+          }) satisfies React.FC<Props>);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'arrow function wrapped in `satisfies`',
+        code: dedent`
+          const Component = React.memo<Props>(((p) => {
+            return React.createElement('div', p);
+          }) satisfies React.FC<Props>);
+        `,
+        errors: [{ messageId: 'propsParamMustBeNamedProps' }],
+      },
+      {
+        name: 'arrow function wrapped in `as`, destructuring',
+        code: dedent`
+          const Component = React.memo<Props>((({ value }) => {
+            return React.createElement('div', { value });
+          }) as React.FC<Props>);
+        `,
+        errors: [{ messageId: 'propsParamMustBeIdentifier' }],
+      },
+      {
+        name: 'memo callee with `!`',
+        code: dedent`
+          const Component = React.memo!<Props>((p) => {
+            return React.createElement('div', p);
+          });
+        `,
+        errors: [{ messageId: 'propsParamMustBeNamedProps' }],
+      },
+    ],
+  });
+});

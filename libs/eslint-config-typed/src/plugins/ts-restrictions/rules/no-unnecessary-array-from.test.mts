@@ -283,3 +283,58 @@ describe('no-unnecessary-array-from', () => {
     ],
   });
 });
+
+describe('no-unnecessary-array-from through type wrappers', () => {
+  tester.run('no-unnecessary-array-from', noUnnecessaryArrayFrom, {
+    valid: [
+      {
+        name: 'a cast does not make a Set an array',
+        code: dedent`
+          declare const s: ReadonlySet<number>;
+          const y = Array.from(s as unknown as readonly number[]).map((x) => x * 2);
+        `,
+      },
+      {
+        name: 'a cast does not make a shadowed `Array.from` return an array',
+        code: dedent`
+          declare const Array: { from: (x: unknown) => ReadonlySet<number> };
+          declare const xs: readonly number[];
+          const y = (Array.from(xs) as unknown as readonly number[]).map((x) => x * 2);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the `Array.from()` call is wrapped in `satisfies` or `!`',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const f: (x: number) => number;
+          const y = (Array.from(xs) satisfies readonly number[]).toSorted();
+          const z = Array.from(xs)!.map(f);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          declare const f: (x: number) => number;
+          const y = (xs satisfies readonly number[]).toSorted();
+          const z = xs!.map(f);
+        `,
+        errors: [
+          { messageId: 'unnecessaryArrayFrom' },
+          { messageId: 'unnecessaryArrayFrom' },
+        ],
+      },
+      {
+        name: 'the argument keeps its wrapper',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs satisfies readonly number[]).toSorted();
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = (xs satisfies readonly number[]).toSorted();
+        `,
+        errors: [{ messageId: 'unnecessaryArrayFrom' }],
+      },
+    ],
+  });
+});

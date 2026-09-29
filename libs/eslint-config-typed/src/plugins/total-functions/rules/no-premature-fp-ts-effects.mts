@@ -2,8 +2,14 @@ import { ESLintUtils } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { createRule } from './common.mjs';
 import { fpTsEffectType } from './fp-ts.mjs';
+import { typeWrapperLayers } from './type-wrapper-layers.mjs';
 
-/** An ESLint rule to ban interpretation (execution) of fp-ts effects. */
+/**
+ * An ESLint rule to ban interpretation (execution) of fp-ts effects.
+ *
+ * The callee is read through `as`, `satisfies`, `!` and `<T>`, and is an
+ * effect if the type at any wrapper layer says so.
+ */
 
 export const noPrematureFpTsEffects = createRule({
   name: 'no-premature-fp-ts-effects',
@@ -29,15 +35,18 @@ export const noPrematureFpTsEffects = createRule({
           return;
         }
 
-        const calleeNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.callee,
+        // `(effect as () => void)()` still runs the effect, so the callee is
+        // an effect if the type at any wrapper layer says so.
+        const isEffect = typeWrapperLayers(node.callee).some(
+          (layer) =>
+            fpTsEffectType(
+              checker.getTypeAtLocation(
+                parserServices.esTreeNodeToTSNodeMap.get(layer),
+              ),
+            ) !== undefined,
         );
 
-        const calleeType = checker.getTypeAtLocation(calleeNode);
-
-        const effectType = fpTsEffectType(calleeType);
-
-        if (effectType === undefined) {
+        if (!isEffect) {
           return;
         }
 

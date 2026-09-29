@@ -173,3 +173,34 @@ describe('TypeScript concerns', () => {
     ],
   });
 });
+
+describe('import-star through type wrappers', () => {
+  tester.run(ruleName, importStarRule, {
+    valid: [
+      {
+        name: 'a member access on the namespace wrapped in `as`, `satisfies` or `!`',
+        code: dedent`
+          import * as t from 'foo';
+          const a = (t as typeof t).foo;
+          const b = t!.foo;
+          const c = (t satisfies typeof t)['foo'];
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the wrapped namespace itself is still forbidden',
+        code: dedent`
+          import * as t from 'foo';
+          declare const k: string;
+          const a = t as unknown;
+          const b = (t as Record<string, unknown>)[k];
+        `,
+        errors: [
+          { messageId: 'non-tree-shakable-access', data: { module: 'foo' } },
+          { messageId: 'non-tree-shakable-access', data: { module: 'foo' } },
+        ],
+      },
+    ],
+  });
+});

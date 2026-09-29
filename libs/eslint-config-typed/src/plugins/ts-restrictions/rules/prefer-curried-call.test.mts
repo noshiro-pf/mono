@@ -211,3 +211,114 @@ describe('prefer-curried-call', () => {
     ],
   });
 });
+
+/** A function with both a data-first and a curried signature. */
+const bothDecl = dedent`
+  type Both = {
+    (a: number, b: number): number;
+    (b: number): (a: number) => number;
+  };
+`;
+
+describe('prefer-curried-call through type wrappers', () => {
+  tester.run('prefer-curried-call', preferCurriedCall, {
+    valid: [
+      {
+        name: 'a cast does not give the callee a curried signature',
+        code: dedent`
+          ${bothDecl}
+          declare const f: (a: number, b: number) => number;
+          [1, 2].map((a) => (f as unknown as Both)(a, 1));
+        `,
+      },
+      {
+        name: 'a cast does not make the callee unary',
+        code: dedent`
+          declare const f: (a: string, radix?: number) => number;
+          ['1', '2'].map((a) => (f as (a: string) => number)(a));
+        `,
+      },
+      {
+        name: 'a cast does not make an impure argument pure',
+        code: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const h: () => number;
+          [1, 2].map((a) => g(a, h() as number));
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a remaining argument wrapped in `as` or `!`',
+        code: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const x: number;
+          declare const y: number | undefined;
+          [1, 2].map((a) => g(a, x as number));
+          [1, 2].map((a) => g(a, y!));
+        `,
+        output: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const x: number;
+          declare const y: number | undefined;
+          [1, 2].map(g(x as number));
+          [1, 2].map(g(y!));
+        `,
+        errors: [
+          { messageId: 'useCurriedForm' },
+          { messageId: 'useCurriedForm' },
+        ],
+      },
+      {
+        name: 'a callee wrapped in `satisfies` keeps the wrapper',
+        code: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const u: (a: number) => number;
+          [1, 2].map((a) => (g satisfies Both)(a, 1));
+          [1, 2].map((a) => (u satisfies (a: number) => number)(a));
+        `,
+        output: dedent`
+          ${bothDecl}
+          declare const g: Both;
+          declare const u: (a: number) => number;
+          [1, 2].map((g satisfies Both)(1));
+          [1, 2].map(u satisfies (a: number) => number);
+        `,
+        errors: [
+          { messageId: 'useCurriedForm' },
+          { messageId: 'useFunctionDirectly' },
+        ],
+      },
+    ],
+  });
+});
+
+describe('prefer-curried-call with parenthesized operands', () => {
+  tester.run('prefer-curried-call', preferCurriedCall, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a conditional callee keeps its parentheses',
+        code: dedent`
+          ${bothDecl}
+          declare const c: boolean;
+          declare const g: Both;
+          declare const h: Both;
+          [1, 2].map((a) => (c ? g : h)(a, 1));
+        `,
+        output: dedent`
+          ${bothDecl}
+          declare const c: boolean;
+          declare const g: Both;
+          declare const h: Both;
+          [1, 2].map((c ? g : h)(1));
+        `,
+        errors: [{ messageId: 'useCurriedForm' }],
+      },
+    ],
+  });
+});

@@ -2,7 +2,10 @@ import {
   AST_NODE_TYPES,
   ESLintUtils,
   type TSESLint,
+  type TSESTree,
 } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
+import { skipTypeWrappers } from '../../ast-utils/index.mjs';
 import {
   createIsArrayOrTupleType,
   matchArrayFromCall,
@@ -23,6 +26,10 @@ type MessageIds = 'unnecessaryArrayFrom';
  * Mutating counterparts (`sort`, `reverse`, `splice`, …) are intentionally
  * excluded: there the `Array.from()` copy is meaningful because it protects the
  * original array from being mutated in place.
+ *
+ * The `Array.from()` call is found through type wrappers, which the fix keeps
+ * (`(Array.from(x) satisfies T).map(f)` → `(x satisfies T).map(f)`), and the
+ * argument's type is that of its value, not of a cast around it.
  */
 const NON_MUTATING_ARRAY_METHODS: ReadonlySet<string> = new Set([
   'at',
@@ -105,8 +112,9 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
             return;
           }
 
-          // The object must be a call of the shape `Array.from(<arg>)`.
-          const inner = callee.object;
+          // The object must be a call of the shape `Array.from(<arg>)`, seen
+          // through type wrappers: `(Array.from(xs) satisfies T).toSorted()`.
+          const inner = asNode(skipTypeWrappers(callee.object));
 
           const arg = matchArrayFromCall(inner);
 
@@ -115,9 +123,13 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
           }
 
           // The argument must already be an array (not a `Set` / `Map` / iterable
-          // that genuinely needs `Array.from()` to become an array).
+          // that genuinely needs `Array.from()` to become an array). The
+          // value's own type is asked: `s as unknown as number[]` is still a
+          // `Set`.
           const argType = checker.getTypeAtLocation(
-            parserServices.esTreeNodeToTSNodeMap.get(arg),
+            parserServices.esTreeNodeToTSNodeMap.get(
+              asNode(skipTypeWrappers(arg)),
+            ),
           );
 
           if (!isArrayOrTupleType(argType)) {
@@ -153,3 +165,7 @@ export const noUnnecessaryArrayFrom: TSESLint.RuleModule<MessageIds, Options> =
     },
     defaultOptions: [],
   } as const;
+
+const asNode = <T extends TSESTree.Node>(node: DeepReadonly<T>): T =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as T;

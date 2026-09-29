@@ -1,8 +1,18 @@
 import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import { createRule, typeSymbolName } from './common.mjs';
+import {
+  typeWrapperLayers,
+  withoutTypeWrappers,
+} from './type-wrapper-layers.mjs';
 
-/** An ESLint rule to ban the partial URL construction. */
+/**
+ * An ESLint rule to ban the partial URL construction.
+ *
+ * The constructor and literal arguments are read through `as`, `satisfies`,
+ * `!` and `<T>`: the constructor is URL's if the type at any wrapper layer
+ * says so.
+ */
 
 export const noPartialUrlConstructor = createRule({
   name: 'no-partial-url-constructor',
@@ -31,29 +41,52 @@ export const noPartialUrlConstructor = createRule({
           return;
         }
 
-        const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
-          node.callee,
+        // The constructor is a URL if the type at any wrapper layer says so:
+        // `new (URL as new (url: string) => URL)(input)` still runs URL's.
+        const isUrlConstructor = typeWrapperLayers(node.callee).some(
+          (layer) => {
+            const objectNode = parserServices.esTreeNodeToTSNodeMap.get(layer);
+
+            const objectType = checker.getTypeAtLocation(objectNode);
+
+            const prototype = checker.getPropertyOfType(
+              objectType,
+              'prototype',
+            );
+
+            const prototypeType =
+              prototype !== undefined
+                ? checker.getTypeOfSymbolAtLocation(prototype, objectNode)
+                : undefined;
+
+            return (
+              prototypeType !== undefined &&
+              typeSymbolName(prototypeType) === 'URL'
+            );
+          },
         );
 
-        const objectType = checker.getTypeAtLocation(objectNode);
+        if (isUrlConstructor) {
+          // A literal argument is read through its type wrappers.
+          const literals = node.arguments.map((argument) => {
+            if (argument.type === AST_NODE_TYPES.SpreadElement) {
+              return undefined;
+            }
 
-        const prototype = checker.getPropertyOfType(objectType, 'prototype');
+            const value = withoutTypeWrappers(argument);
 
-        const prototypeType =
-          prototype !== undefined
-            ? checker.getTypeOfSymbolAtLocation(prototype, objectNode)
-            : undefined;
+            return value.type === AST_NODE_TYPES.Literal &&
+              typeof value.value === 'string'
+              ? value.value
+              : undefined;
+          });
 
-        if (
-          prototypeType !== undefined &&
-          typeSymbolName(prototypeType) === 'URL'
-        ) {
           if (
             Arr.isFixedLengthArray(1, node.arguments) &&
-            node.arguments[0].type === AST_NODE_TYPES.Literal &&
-            typeof node.arguments[0].value === 'string'
+            Arr.isFixedLengthArray(1, literals) &&
+            literals[0] !== undefined
           ) {
-            if (!isValidUrl(node.arguments[0].value)) {
+            if (!isValidUrl(literals[0])) {
               context.report({
                 node: node.arguments[0],
                 messageId: 'errorStringWillDefinitelyThrow',
@@ -64,13 +97,11 @@ export const noPartialUrlConstructor = createRule({
           }
 
           if (
-            Arr.isFixedLengthArray(2, node.arguments) &&
-            node.arguments[0].type === AST_NODE_TYPES.Literal &&
-            typeof node.arguments[0].value === 'string' &&
-            node.arguments[1].type === AST_NODE_TYPES.Literal &&
-            typeof node.arguments[1].value === 'string'
+            Arr.isFixedLengthArray(2, literals) &&
+            literals[0] !== undefined &&
+            literals[1] !== undefined
           ) {
-            if (!isValidUrl(node.arguments[0].value, node.arguments[1].value)) {
+            if (!isValidUrl(literals[0], literals[1])) {
               context.report({
                 node,
                 messageId: 'errorStringWillDefinitelyThrow',

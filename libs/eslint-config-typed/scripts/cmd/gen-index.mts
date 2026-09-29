@@ -18,5 +18,8 @@ await genIndex({
     fileName === 'eslint.config.gen.mts' ||
     absolutePath === path.resolve(srcDir, './entry-point.mts') ||
     mm.isMatch(absolutePath, path.resolve(srcDir, './constants/**')) ||
-    mm.isMatch(absolutePath, path.resolve(srcDir, './plugins/*/rules')),
+    mm.isMatch(absolutePath, path.resolve(srcDir, './plugins/*/rules')) ||
+    // Helpers the plugins share, kept out of the public exports; its
+    // index.mts is hand-written.
+    mm.isMatch(absolutePath, path.resolve(srcDir, './plugins/ast-utils')),
 });

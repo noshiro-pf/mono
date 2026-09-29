@@ -122,3 +122,41 @@ describe('prefer-curried-produce', () => {
     ],
   });
 });
+
+describe('prefer-curried-produce through type wrappers', () => {
+  tester.run(ruleName, preferCurriedProduceRule, {
+    valid: [],
+    invalid: [
+      {
+        name: 'the base state wrapped in `satisfies` or `!`',
+        code: dedent`
+          import { produce } from 'immer';
+
+          const update = (state: State) =>
+            produce(state satisfies State, (draft) => {
+              draft.count += 1;
+            });
+
+          const reset = (state: State) => produce(state!, (draft) => {
+            draft.count = 0;
+          });
+        `,
+        output: dedent`
+          import { produce } from 'immer';
+
+          const update = produce<State>((draft) => {
+            draft.count += 1;
+          });
+
+          const reset = produce<State>((draft) => {
+            draft.count = 0;
+          });
+        `,
+        errors: [
+          { messageId: 'useCurriedProduce' },
+          { messageId: 'useCurriedProduce' },
+        ],
+      },
+    ],
+  });
+});
