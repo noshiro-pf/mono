@@ -1,5 +1,11 @@
 # blueprintjs-playground
 
+## 0.0.7
+
+### Patch Changes
+
+- react-utils@0.0.10
+
 ## 0.0.6
 
 ### Patch Changes

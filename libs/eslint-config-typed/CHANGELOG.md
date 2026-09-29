@@ -1,5 +1,133 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.15.1
+
+### Patch Changes
+
+- b569e73: Read through `as`, `satisfies`, `!` and `<T>` in the `react-coding-style`
+  rules.
+
+    A type wrapper around a React call, its callee or the component passed to it
+    hid the component from these rules, and a wrapper around a display name made
+    one rule report a name that matched. Each now looks at the expression
+    underneath:
+
+    - The rules that look for a React call recognize one whose callee or `React`
+      object is wrapped: `(React.memo as typeof React.memo)(...)`, `React.memo!(...)`,
+      `(React as typeof React).memo(...)`. This alone makes
+      `ban-use-imperative-handle-hook` report
+      `(React.useImperativeHandle as typeof React.useImperativeHandle)(...)`.
+    - `props-type-annotation-style`, `react-memo-props-argument-name` and
+      `react-memo-type-parameter` find the arrow function in
+      `React.memo(((props) => …) satisfies React.FC<Props>)`.
+      `react-memo-type-parameter` no longer asks for a type parameter when that
+      wrapped function takes no props.
+    - `component-name` and `display-name` check `const C = React.memo(...) satisfies T;`.
+    - `display-name` accepts `C.displayName = 'C' as const;` and
+      `'C' satisfies string`, which it reported as mismatched, and a wrapped
+      component on the left, as in `(C as T).displayName = 'C'` and
+      `C!.displayName = 'C'`, which it reported as missing.
+    - `require-react-memo` reports a component that is wrapped before it is bound
+      or passed to `React.forwardRef`, as in
+      `const Foo = ((props: Props) => <div />) satisfies T;` and
+      `const Foo = React.forwardRef(...) as unknown as React.FC;`. A component
+      wrapped inside `React.memo(...)` still counts as memoized.
+    - `use-memo-hook-style` reports an `as` placed after `!` or `satisfies`, as in
+      `React.useMemo(...)! as T` and `React.useMemo(...) satisfies T as T`.
+      `satisfies` alone is still allowed.
+
+- b569e73: Read through `as`, `satisfies`, `!` and `<T>` in the `total-functions` and
+  `vitest-coding-style` rules, and fix a wrong fix for a parenthesized
+  sequence expression.
+
+    A type wrapper hid a call from these rules, or vouched for a type the value
+    did not have. Each now looks at the expression underneath:
+
+    - `total-functions/no-partial-array-reduce`: `xs.reduce!(f)`,
+      `(xs.reduce satisfies unknown)(f)`, `xs['reduce' satisfies string](f)`,
+      `xs[k!](f)` and a receiver cast to a type that is not an array are
+      reported. A receiver is an array, and a key is `reduce`, if the type at
+      any wrapper says so; a cast to a non-empty tuple does not prove the array
+      non-empty.
+    - `total-functions/no-partial-string-normalize`: the same for the callee,
+      the receiver and the key. `s.normalize('NFC' satisfies string)` is
+      accepted, and `s.normalize(form as 'NFC')` is still reported.
+    - `total-functions/no-partial-url-constructor`:
+      `new (URL as new (url: string) => URL)(input)` is reported, and a literal
+      argument is recognized through its wrappers.
+    - `total-functions/no-premature-fp-ts-effects`: `(effect as () => void)()`
+      is reported. The callee is an effect if the type at any wrapper says so.
+    - `total-functions/no-unsafe-mutable-readonly-assignment` and
+      `total-functions/no-unsafe-readonly-mutable-assignment`: a type assertion
+      is checked as an assignment of its operand to the asserted type, so
+      `func(mutable as ReadonlyA)` and `readonly as unknown as MutableA` are
+      reported. `as const` is left to the position it stands in.
+    - `vitest-coding-style/*`: `(assert as typeof assert).deepEqual(a, b)`,
+      `assert!.ok(x)`, `assert.notOk!(x)` and `(expect as typeof expect)(x)`
+      are recognized, and the fix keeps the wrapper.
+      `vitest-coding-style/prefer-assert-is-true-over-assert` reports
+      `(assert as typeof assert)(x)` without a fix.
+    - `vitest-coding-style/no-expect-to-strict-equal`: `expect(x)!.toStrictEqual(y)`
+      and a wrapped `expect` are reported.
+    - `vitest-coding-style/prefer-assert-is-false-over-assert-negation` and
+      `vitest-coding-style/prefer-assert-is-true-over-assert-negated-is-false`:
+      `assert.isTrue(!flag as boolean)` is `assert.isFalse(flag)`.
+    - `vitest-coding-style/prefer-assert-is-true-over-expect-true` and
+      `vitest-coding-style/prefer-assert-is-false-over-expect-false`:
+      `expect(flag).toBe(true as const)` is reported.
+
+    `no-expect-to-strict-equal`, the two negation rules and the two
+    `expect(…).toBe(…)` rules dropped the parentheses around a sequence
+    expression: `expect((setup(), x)).toStrictEqual(y)` became
+    `assert.deepStrictEqual(setup(), x, y)`, which passes three arguments. The
+    sequence is now kept in parentheses.
+
+- b569e73: Read through `as`, `satisfies`, `!` and `<T>` in the older `ts-restrictions`
+  rules, and keep the parentheses their fixes used to drop.
+
+    A type wrapper hid a pattern from these rules, or vouched for a type the
+    value did not have, and several fixes rebuilt an operand from its text
+    without the parentheses around it. Each rule now looks at the expression
+    underneath and keeps the wrappers in its fix:
+
+    - `ts-restrictions/prefer-nullish-coalescing-when-safe`: the left side is
+      judged by the value's own type. `m.get(k)! || def` used to lose its
+      `|| def` because `!` made the left side look never nullish; it now becomes
+      `m.get(k)! ?? def`. `(s as 'a' | undefined) || 'x'` is left alone, since `s`
+      may still be `''`. A fallback in `satisfies` and a `||=` target behind `!`
+      are recognized.
+    - `ts-restrictions/no-unnecessary-coalesce-undefined`: `x ?? (undefined satisfies undefined)`
+      is reported. `x! ?? undefined` and `(x as string) ?? undefined` are left
+      alone when `x` may be `null`. `(log(), b) ?? undefined` becomes
+      `(log(), b)`, not `log(), b`.
+    - `ts-restrictions/no-unnecessary-array-from`: `(Array.from(xs) satisfies readonly number[]).toSorted()`
+      becomes `(xs satisfies readonly number[]).toSorted()`.
+      `Array.from(s as unknown as readonly number[]).map(f)` on a `Set` is left
+      alone, since `s.map` would throw.
+    - `ts-restrictions/prefer-non-mutating-array-method`: `(Array.from(xs) as number[]).sort()`
+      becomes `(xs as number[]).toSorted()`, and `Array.from(xs).fill(0 satisfies number)`
+      becomes `xs.map(() => 0 satisfies number)`. A `Set` cast to an array is
+      left alone. `sort((log(), cmp))` keeps the parentheses of its argument.
+    - `ts-restrictions/prefer-curried-call`: the callee's curried signature is
+      read from its value, so `(f as unknown as Curried)(a, 1)` is left alone.
+      A remaining argument such as `x as number` counts as pure.
+      `(a) => (c ? g : h)(a, 1)` becomes `(c ? g : h)(1)`, not `c ? g : h(1)`.
+    - `ts-restrictions/no-string-spread`: `[...(s as Iterable<string>)]` is
+      reported when `s` is a string, as is a spread of a value cast to `string`.
+    - `ts-restrictions/check-destructuring-completeness`: `const { a, b } = props satisfies Props`
+      (or `props!`, `props as Props`) in a component is checked against the
+      props' own type, and a component whose returned JSX is wrapped
+      (`(<div />) satisfies React.ReactNode`) is recognized as one.
+    - `ts-restrictions/no-restricted-cast-name`: a `type` fix of `x as any`
+      replaces only the type, so `() => ({ a: 1 }) as any` keeps its
+      parentheses. A `<any>s` rewritten as `as` is parenthesized where needed
+      (`1 + (s as unknown)`), and a `function` fix keeps a comma expression's
+      parentheses (`cast((log(), x))`).
+    - `immer-coding-style/prefer-curried-produce`: `(s) => produce(s satisfies State, recipe)`
+      is reported.
+    - `tree-shakable/import-star`: `(ns as typeof ns).foo` and `ns!.foo` are
+      member accesses, no longer reported as a use of the whole namespace.
+
 ## 5.15.0
 
 ### Minor Changes

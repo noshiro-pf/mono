@@ -1,6 +1,6 @@
 {
   "name": "pr-manager-app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "GitHub Pull Requests Manager — the daily open pull request report as a page",
   "repository": {
