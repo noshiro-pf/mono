@@ -1,4 +1,63 @@
-import { describeOpenedWorkspaces } from '../src/index.mjs';
+import {
+  describeOpenedWorkspaces,
+  workspaceTabsToOpen,
+  type WorkspaceEntry,
+} from '../src/index.mjs';
+
+const entry = (id: string, pinned: boolean = false): WorkspaceEntry =>
+  ({
+    id,
+    name: id,
+    createdAt: 0,
+    pinned,
+  }) as const;
+
+describe('workspaceTabsToOpen', () => {
+  test('opens the list in its order, pinned ones pinned, all behind', () => {
+    assert.deepStrictEqual(
+      workspaceTabsToOpen(
+        [entry('a'), entry('b', true), entry('c')],
+        new Set(),
+        undefined,
+      ),
+      [
+        { workspaceId: 'a', pinned: false, active: false },
+        { workspaceId: 'b', pinned: true, active: false },
+        { workspaceId: 'c', pinned: false, active: false },
+      ],
+    );
+  });
+
+  test('leaves alone the ones already open in a tab', () => {
+    assert.deepStrictEqual(
+      workspaceTabsToOpen(
+        [entry('a'), entry('b'), entry('c')],
+        new Set(['b']),
+        undefined,
+      ),
+      [
+        { workspaceId: 'a', pinned: false, active: false },
+        { workspaceId: 'c', pinned: false, active: false },
+      ],
+    );
+  });
+
+  test('brings the one named to the front, and only that one', () => {
+    assert.deepStrictEqual(
+      workspaceTabsToOpen([entry('a'), entry('b'), entry('c')], new Set(), 'b'),
+      [
+        { workspaceId: 'a', pinned: false, active: false },
+        { workspaceId: 'b', pinned: false, active: true },
+        { workspaceId: 'c', pinned: false, active: false },
+      ],
+    );
+
+    assert.deepStrictEqual(
+      workspaceTabsToOpen([entry('a'), entry('b')], new Set(['b']), 'b'),
+      [{ workspaceId: 'a', pinned: false, active: false }],
+    );
+  });
+});
 
 describe('describeOpenedWorkspaces', () => {
   test('says what was opened', () => {

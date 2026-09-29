@@ -252,7 +252,11 @@ export const App = memoNamed('App', () => {
       return;
     }
 
-    await chrome.storage.session.set({ [splitViewTabIdSessionKey]: tab.id });
+    // The tab the toolbar button goes back to is the one last looked at, so a
+    // tab loading behind another does not claim it; it does when it is shown.
+    if (document.visibilityState === 'visible') {
+      await chrome.storage.session.set({ [splitViewTabIdSessionKey]: tab.id });
+    }
 
     setHeaderRuleActive(
       initiatorRuleActive && (await ensureHeaderRule(tab.id)),
@@ -364,6 +368,7 @@ export const App = memoNamed('App', () => {
           name: request.name,
         },
         Date.now(),
+        document.visibilityState === 'visible',
       );
 
       // A view the URL describes is shown over the one saved under that id:
@@ -802,11 +807,23 @@ export const App = memoNamed('App', () => {
   }, [noteThisTab, session.workspaceId]);
 
   // Coming back to the tab is the moment a discarded-and-restored tab id would
-  // have changed under us.
+  // have changed under us. It is also what makes this split view the one the
+  // toolbar button and a `split.html` with no `?ws=` go back to, which a tab
+  // that loaded behind another has not claimed yet.
   React.useEffect(() => {
     const onVisible = (): void => {
-      if (document.visibilityState === 'visible') {
-        ensureRule().catch(console.error);
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+
+      ensureRule().catch(console.error);
+
+      const { workspaceId } = mut_liveSession.current;
+
+      if (workspaceId !== undefined) {
+        commitRegistry(
+          activateWorkspaceEntry(mut_liveRegistry.current, workspaceId),
+        );
       }
     };
 
@@ -815,7 +832,7 @@ export const App = memoNamed('App', () => {
     return () => {
       removeEventListener('visibilitychange', onVisible);
     };
-  }, [ensureRule]);
+  }, [ensureRule, commitRegistry]);
 
   // Saving is debounced because a splitter drag changes the state on every
   // pointer move; `pagehide` is what covers a tab closed inside the window.

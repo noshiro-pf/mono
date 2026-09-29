@@ -95,8 +95,19 @@ The full list, with the reasoning the README leaves out.
       tab pinned and closed in the same breath comes back unpinned.
 - **`Export` / `Import` are the way across an extension id that changed** —
   see "The list, and what it is keyed to" below.
-- The toolbar button opens the split view you had last, or focuses the tab if
-  one is open.
+- **The toolbar button goes back to the split view you looked at last**: it
+  focuses that tab if it is open, and otherwise opens it.
+    - **With no split view open at all, it opens every one**, as `↗ Open all`
+      does, with the one looked at last in front. That is what an update
+      leaves: Chrome closes every tab of an extension page when it updates or
+      reloads the extension, and clicking through the list one by one
+      afterwards was the chore. While any split view is open the button only
+      goes back to one, so a split view closed on purpose stays closed.
+    - **"Looked at last" is claimed by being shown.** A page records itself as
+      the one to go back to (`activeId`, `splitViewTabId`) on load only if its
+      tab is visible, and again whenever the tab is shown. Otherwise the tabs
+      opened behind the front one would each claim it as they finished
+      loading, and the button would take you to whichever was slowest.
 
 ## The pieces
 
