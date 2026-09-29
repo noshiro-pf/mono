@@ -36,12 +36,15 @@ export const eventLogSessionKey = 'splitViewEventLog';
 export const maxEventLogEntries = 60;
 
 /**
- * Where the split views open right now are listed: tab id to workspace id.
+ * Where the split views open right now are listed: one key per tab, this
+ * prefix and the tab id, holding the workspace id.
  *
  * `splitViewTabIdSessionKey` above answers "which tab does the toolbar button
  * focus"; this answers "is this workspace already on screen somewhere", which
  * is what stops "open every split view" from opening a second tab on one that
  * is already open — two tabs saving one layout over each other. Session
- * storage, as above: a tab id means nothing once the browser has closed.
+ * storage, as above: a tab id means nothing once the browser has closed. A key
+ * per tab rather than one record, so that tabs loading at once do not write
+ * over each other's entries; see `open-tabs.mts`.
  */
-export const splitViewOpenTabsSessionKey = 'splitViewOpenTabs';
+export const splitViewOpenTabKeyPrefix = 'splitViewOpenTab:';

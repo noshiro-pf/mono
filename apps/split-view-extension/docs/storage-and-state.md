@@ -214,15 +214,24 @@ a reload.
 
 ## `chrome.storage.session`
 
-| key                 | holds                                                                                                                               |
-| :------------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `splitViewTabId`    | the tab id of the split view last shown, written by the page and read by the service worker so that the toolbar button can focus it |
-| `splitViewEventLog` | the diagnostics ring buffer — **only in `pnpm run build:dev`**, and capped at 60 entries                                            |
+| key                         | holds                                                                                                                                                                                                                           |
+| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `splitViewTabId`            | the tab id of the split view last shown, written by the page and read by the service worker so that the toolbar button can focus it                                                                                             |
+| `splitViewOpenTab:<tab id>` | the workspace id that tab is showing, one key per tab, written by the page and removed by the service worker when the tab closes. `↗ Open all` and the toolbar button read them all to leave the split views already open alone |
+| `splitViewEventLog`         | the diagnostics ring buffer — **only in `pnpm run build:dev`**, and capped at 60 entries                                                                                                                                        |
 
 Session storage, because a tab id is worth exactly as much as the browser
 session it belongs to. The alternative, `chrome.tabs.query({ url })`, would need
 the `tabs` permission; this needs nothing beyond the `storage` the workspaces
 already use.
+
+**`splitViewOpenTab:` is a key per tab, not one record**, so that each tab
+writes its own key and nothing else. A single record that every tab read,
+changed and wrote back lost entries whenever several loaded at once, which is
+what opening every split view does; a lost entry counted as not open until the
+tab wrote it again, up to 30 seconds later, and opening them all in that time
+opened it twice. Nothing is migrated from that record: session storage is
+cleared when the extension is updated.
 
 ## The URL
 

@@ -1,6 +1,6 @@
-import { hasKey, isRecord, isString, Obj } from 'ts-data-forge';
+import { isString } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
-import { splitViewOpenTabsSessionKey } from './constants.mjs';
+import { splitViewOpenTabKeyPrefix } from './constants.mjs';
 
 /**
  * Which tab is showing which saved split view, for this browser session.
@@ -10,41 +10,38 @@ import { splitViewOpenTabsSessionKey } from './constants.mjs';
  * same question, and filtering by URL needs the `tabs` permission; this needs
  * none, which is the trade the split view's own tab id is already recorded for.
  *
- * Read-modify-write from several tabs at once can lose an entry. Nothing here
- * is worth a lock: a lost entry costs one duplicate tab, and the reader below
- * checks every entry against the browser anyway.
+ * One key per tab, and each writer touches its own key only. A single record
+ * read, changed and written back by every tab lost entries whenever several
+ * tabs loaded at once — opening every split view is exactly that — and until a
+ * lost entry was written again, its split view counted as not open, so opening
+ * them all a second time opened it twice. The reader below still checks every
+ * entry against the browser, since an entry can outlive its tab.
  */
 export type OpenSplitViewTabs = ReadonlyRecord<string, string>;
 
 export const readOpenSplitViewTabs = async (): Promise<OpenSplitViewTabs> => {
-  const stored = await chrome.storage.session.get(splitViewOpenTabsSessionKey);
+  const stored = await chrome.storage.session.get(null);
 
-  const value: unknown = stored[splitViewOpenTabsSessionKey];
-
-  return !isRecord(value) ? {} : Obj.filter(value, isString);
+  return openSplitViewTabsFrom(stored);
 };
 
 export const recordOpenSplitViewTab = async (
   tabId: number,
   workspaceId: string,
 ): Promise<void> => {
-  const openTabs = await readOpenSplitViewTabs();
+  const key = openSplitViewTabKey(tabId);
 
-  if (openTabs[String(tabId)] === workspaceId) {
+  const stored = await chrome.storage.session.get(key);
+
+  if (stored[key] === workspaceId) {
     return;
   }
 
-  await writeOpenSplitViewTabs({ ...openTabs, [String(tabId)]: workspaceId });
+  await chrome.storage.session.set({ [key]: workspaceId });
 };
 
 export const forgetOpenSplitViewTab = async (tabId: number): Promise<void> => {
-  const openTabs = await readOpenSplitViewTabs();
-
-  if (!hasKey(openTabs, String(tabId))) {
-    return;
-  }
-
-  await writeOpenSplitViewTabs(withoutTab(openTabs, tabId));
+  await chrome.storage.session.remove(openSplitViewTabKey(tabId));
 };
 
 /**
@@ -55,28 +52,36 @@ export const moveOpenSplitViewTab = async (
   fromTabId: number,
   toTabId: number,
 ): Promise<void> => {
-  const openTabs = await readOpenSplitViewTabs();
+  const fromKey = openSplitViewTabKey(fromTabId);
 
-  const workspaceId = openTabs[String(fromTabId)];
+  const stored = await chrome.storage.session.get(fromKey);
 
-  if (workspaceId === undefined) {
+  const workspaceId: unknown = stored[fromKey];
+
+  if (!isString(workspaceId)) {
     return;
   }
 
-  await writeOpenSplitViewTabs({
-    ...withoutTab(openTabs, fromTabId),
-    [String(toTabId)]: workspaceId,
+  await chrome.storage.session.set({
+    [openSplitViewTabKey(toTabId)]: workspaceId,
   });
+
+  await chrome.storage.session.remove(fromKey);
 };
 
-const writeOpenSplitViewTabs = async (
-  openTabs: OpenSplitViewTabs,
-): Promise<void> => {
-  await chrome.storage.session.set({ [splitViewOpenTabsSessionKey]: openTabs });
-};
+export const openSplitViewTabKey = (tabId: number): string =>
+  `${splitViewOpenTabKeyPrefix}${String(tabId)}` as const;
 
-const withoutTab = (
-  openTabs: OpenSplitViewTabs,
-  tabId: number,
+/** The tabs recorded in the whole of session storage, keyed by tab id. */
+export const openSplitViewTabsFrom = (
+  stored: ReadonlyRecord<string, unknown>,
 ): OpenSplitViewTabs =>
-  Obj.filter(openTabs, (_workspaceId, key) => key !== String(tabId));
+  Object.fromEntries(
+    Object.entries(stored).flatMap(([key, workspaceId]) =>
+      key.startsWith(splitViewOpenTabKeyPrefix) && isString(workspaceId)
+        ? ([
+            [key.slice(splitViewOpenTabKeyPrefix.length), workspaceId],
+          ] as const)
+        : [],
+    ),
+  );
