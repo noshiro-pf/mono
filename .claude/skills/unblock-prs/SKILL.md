@@ -61,14 +61,18 @@ matrices where one was meant to run. The two are split by what the worker does
 not do, and made safe where they overlap:
 
 - **What the worker sets aside is this skill's.** Each time it gives up on a
-  pull request it writes a `failure` commit status, context `unblock-prs`, on
-  that head: `reported["unblock-prs"] === "failed"` in the report, and the
-  description in `GET /commits/{sha}/status` reads
-  `<reason> at <base sha>: <detail>`. `checks-failed` is step 4 and
-  `rebase-failed` is step 2b; the other reasons are to report. The worker
+  pull request it says so in that pull request's one set-aside comment
+  (`GET /issues/{n}/comments`, written by the account the worker runs as):
+  its first line is
+  `<!-- unblock-prs:set-aside reason=<reason> head=<sha> base=<sha> -->`,
+  the prose under it says why — the failed checks with their runs, what git
+  printed — and its last line is a "Retry" task box. One whose first line is
+  `<!-- unblock-prs:set-aside resolved -->` is over. `checks-failed` is step 4
+  and `rebase-failed` is step 2b; the other reasons are to report. The worker
   leaves that pull request alone until its head moves (or, for every reason
   but `checks-failed`, `main` does), so working on it collides with nothing,
-  and the push that carries the work is what hands it back. A
+  and the push that carries the work is what hands it back. Ticking the box is
+  a person's way to hand it back without a push; the skill does not tick it. A
   `checks-failed` it wrote on the pull request it was watching comes after it
   tried the one fix it makes itself — running the `fix:` / `gen:` matrix
   entries that failed and pushing what they wrote, when nothing else failed —

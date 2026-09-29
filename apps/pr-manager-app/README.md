@@ -27,9 +27,11 @@ And the two things that stop a pull request that is otherwise ready, which
 nothing on GitHub's own list shows:
 
 - **`unblock-prs` set it aside**, and why: a rebase that conflicted, a push
-  that was refused, a watch that timed out. The script leaves a commit status
-  on the head it gave up on, and the page reads it from the check results it
-  already fetches. Not GitHub's own `mergeable`, which says whether a _merge_
+  that was refused, a watch that timed out. The script leaves a comment on
+  the pull request it gave up on, and the page reads the record that comment
+  starts with — only from comments the signed-in account wrote, the one the
+  script runs as, since anyone can post a comment that looks like it. Not
+  GitHub's own `mergeable`, which says whether a _merge_
   conflicts — the script rebases, and a chained pull request whose parent was
   squash-merged is where the two answers part. Once the base has moved the
   badge turns grey: the next run tries again.

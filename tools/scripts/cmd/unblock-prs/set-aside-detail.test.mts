@@ -8,37 +8,22 @@ import {
 import { type ChecksSummary } from './types.mjs';
 
 describe(describeFailedChecks, () => {
-  test('names the failed checks and links the first', () => {
-    assert.deepStrictEqual(
-      describeFailedChecks(
-        summary({
-          failed: [
-            {
-              name: 'code-check-result / result',
-              link: 'https://example.test/1',
-            },
-            {
-              name: 'style-check-result / result',
-              link: 'https://example.test/2',
-            },
-          ],
-        }),
-      ),
+  test('names the failed checks and keeps each run', () => {
+    const failed = [
       {
-        detail:
-          'failed: code-check-result / result, style-check-result / result',
+        name: 'code-check-result / result',
         link: 'https://example.test/1',
       },
-    );
-  });
+      {
+        name: 'style-check-result / result',
+        link: 'https://example.test/2',
+      },
+    ] as const;
 
-  test('leaves the link out when the check has none', () => {
-    assert.deepStrictEqual(
-      describeFailedChecks(
-        summary({ failed: [{ name: 'no-skip-ci-label', link: '' }] }),
-      ),
-      { detail: 'failed: no-skip-ci-label', link: undefined },
-    );
+    assert.deepStrictEqual(describeFailedChecks(summary({ failed })), {
+      detail: 'failed: code-check-result / result, style-check-result / result',
+      failedChecks: failed,
+    });
   });
 });
 
@@ -95,8 +80,8 @@ describe(describeConflict, () => {
 
 describe(describeCommandFailure, () => {
   test('keeps what the command printed rather than the command', () => {
-    // The command line alone fills a status description, which is how
-    // GitHub's answer came to be cut off.
+    // The command line alone once filled a 140-character status, which is
+    // how GitHub's answer came to be cut off.
     assert.strictEqual(
       describeCommandFailure(
         "Command failed: gh api graphql -f 'id=PR_1' -f 'query=mutation($id: ID!) { enablePullRequestAutoMerge(input: { pullRequestId: $id, mergeMethod: SQUASH }) { clientMutationId } }'\ngh: Auto-merge is not supported for stacked pull requests.",

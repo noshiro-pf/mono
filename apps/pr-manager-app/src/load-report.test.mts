@@ -1,4 +1,5 @@
-import { Arr, isRecord, Json, Result } from 'ts-data-forge';
+import { writeSetAsideComment } from 'pr-report-core';
+import { isRecord, Json, Result } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { REPORT_SOURCE } from './constants.mjs';
 import { type Fetch, type FetchInit } from './graphql.mjs';
@@ -264,11 +265,13 @@ describe(loadReport, () => {
       report([
         pullRequest({
           number: 7,
-          contexts: Arr.toPushed(PASSING, setAsideStatus(BASE_TIP)),
+          headRefOid: HEAD,
+          comments: [comment('LGTM', false), setAsideComment(BASE_TIP)],
         }),
         pullRequest({
           number: 8,
-          contexts: Arr.toPushed(PASSING, setAsideStatus('b'.repeat(40))),
+          headRefOid: HEAD,
+          comments: [setAsideComment('b'.repeat(40))],
         }),
         pullRequest({ number: 9 }),
       ]),
@@ -283,8 +286,10 @@ describe(loadReport, () => {
 
     assert.deepStrictEqual(loaded.entries[0]?.setAside, {
       reason: 'rebase-failed',
+      headSha: HEAD,
       baseSha: BASE_TIP,
-      detail: 'rebase conflicts',
+      retry: false,
+      url: COMMENT_URL,
       current: true,
     });
 
@@ -293,10 +298,46 @@ describe(loadReport, () => {
 
     assert.isUndefined(loaded.entries[2]?.setAside);
 
-    // Its own status is not a required context, so the verdict is untouched.
-    assert.strictEqual(loaded.entries[0]?.checks.verdict, 'passed');
-
     assert.strictEqual(loaded.summary.setAside, 1);
+  });
+
+  test('reads only what the viewer wrote, at the head as it is now', async () => {
+    const { fetchImpl } = answering(
+      report([
+        // Anyone can post a comment that looks like the script's.
+        pullRequest({
+          number: 7,
+          headRefOid: HEAD,
+          comments: [{ ...setAsideComment(BASE_TIP), viewerDidAuthor: false }],
+        }),
+        // Set aside at a head the branch has been pushed past.
+        pullRequest({
+          number: 8,
+          comments: [setAsideComment(BASE_TIP)],
+        }),
+        pullRequest({
+          number: 9,
+          comments: [
+            comment(
+              '<!-- unblock-prs:set-aside resolved -->\n\nResolved.',
+              true,
+            ),
+          ],
+        }),
+      ]),
+      followUpAnswer({
+        compare_7: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_8: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_9: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const loaded = await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      loaded.entries.map((entry) => entry.setAside),
+      [undefined, undefined, undefined],
+    );
   });
 
   test('reads a stack out of the bases, and compares each layer with its own', async () => {
@@ -627,14 +668,28 @@ const PASSING = [
 /** Where `main` is in every answer here. */
 const BASE_TIP = 'a'.repeat(40);
 
-/** The status `unblock-prs` leaves on a pull request it set aside. */
-const setAsideStatus = (baseSha: string): unknown =>
-  ({
-    __typename: 'StatusContext',
-    context: 'unblock-prs',
-    state: 'FAILURE',
-    description: `rebase-failed at ${baseSha}: rebase conflicts`,
-  }) as const;
+const COMMENT_URL = 'https://github.com/noshiro-pf/mono/pull/7#issuecomment-1';
+
+const comment = (
+  body: string,
+  viewerDidAuthor: boolean,
+): Readonly<{ url: string; body: string; viewerDidAuthor: boolean }> =>
+  ({ url: COMMENT_URL, body, viewerDidAuthor }) as const;
+
+/** A head a set-aside record can name, which has to be a whole SHA. */
+const HEAD = 'c'.repeat(40);
+
+/** The comment `unblock-prs` leaves on a pull request it set aside at `HEAD`. */
+const setAsideComment = (
+  baseSha: string,
+): Readonly<{ url: string; body: string; viewerDidAuthor: boolean }> =>
+  comment(
+    writeSetAsideComment(
+      { reason: 'rebase-failed', headSha: HEAD, baseSha },
+      'Conflicts with main.',
+    ),
+    true,
+  );
 
 const pullRequest = ({
   number,
@@ -645,6 +700,8 @@ const pullRequest = ({
   isCrossRepository = false,
   committedDate = '2026-09-22T00:00:00Z',
   body = '',
+  headRefOid = `sha-${number}`,
+  comments = [],
 }: Readonly<{
   number: number;
   contexts?: readonly unknown[];
@@ -654,6 +711,8 @@ const pullRequest = ({
   isCrossRepository?: boolean;
   committedDate?: string;
   body?: string;
+  headRefOid?: string;
+  comments?: readonly unknown[];
 }>): unknown =>
   ({
     number,
@@ -665,7 +724,7 @@ const pullRequest = ({
     author: { login: 'someone' },
     autoMergeRequest: null,
     headRefName: `branch-${number}`,
-    headRefOid: `sha-${number}`,
+    headRefOid,
     baseRefName,
     isCrossRepository,
     baseRef: { target: { oid: BASE_TIP } },
@@ -694,6 +753,7 @@ const pullRequest = ({
         },
       ],
     },
+    comments: { nodes: comments },
   }) as const;
 
 const merged = (

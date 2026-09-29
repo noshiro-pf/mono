@@ -210,6 +210,27 @@ conflict や fork など積み直せない層は理由をログに出して残�
 ん（記録は作りません。そのまま置いておけば、GitHub が付け替えたときの状態で
 す）。`--dry-run` では何をするかを出力するだけです。
 
+#### 1b. 見送りの comment を読む
+
+`merge-queued` の PR と、このプロセスが見送りの記録を持っている PR について、
+自分のアカウントが書いた見送りの comment（「見送った PR はどこで分かるか」）を
+GraphQL 1回でまとめて読み、記録と突き合わせます（`skips.mts` の
+`settleSkips`）。
+
+- comment が見送った head から branch が動いた、または見送った base から
+  `main` が動いた（`checks-failed` を除く）なら、comment を1行の「解消済み」に
+  書き換えます。
+- 「再試行」のチェックボックスに人がチェックを入れていたら、comment を
+  「解消済み」に書き換え、その PR の見送りの記録を捨てます。今回の triage は
+  見送られていなかったものとしてその PR を扱います。また失敗すれば、また
+  見送って comment に書きます。
+- まだ有効なのにこのプロセスが記録を持っていない comment は、前のプロセスが
+  残したものです。記録として引き継ぎ、試し直しません。同じ head と base の
+  rebase は同じように conflict するからです。
+
+読めなければログに出して、記録はそのままで続行します。`--dry-run` では書き換え
+ません。
+
 #### 2. triage
 
 1. 全 PR の body から `Merge-After:` を、base から stack を読んで依存グラフを
@@ -462,65 +483,87 @@ auto-merge、draft、本文）、レビュー待ちの理由、`main` の tip �
 ### 見送った PR はどこで分かるか
 
 このスクリプトは手元で動き、何をしたかは標準出力にしか出ません。そこで PR を
-見送るたびに、**その PR の head commit に commit status を書きます**（context
-`unblock-prs`、state `failure`、description に理由と見送った時点の base の
-SHA）。**GitHub Pull Requests Manager**（<https://noshiro-pf.github.io/mono/pr-manager/>）
-がそれを読んで PR ごとに表示するので、端末を見に行かなくても止まっている理由が
-分かります。
+見送るたびに、**その PR に comment を書きます**。comment は PR ごとに1本で、
+2回目からは同じ comment を書き換えます。**GitHub Pull Requests Manager**
+（<https://noshiro-pf.github.io/mono/pr-manager/>）がそれを読んで PR ごとに
+表示するので、端末を見に行かなくても止まっている理由が分かります。
 
+- **1行目は機械が読む隠しコメント**です（
+  `<!-- unblock-prs:set-aside reason=… head=… base=… -->`）。理由と、見送った
+  時点の head と base の SHA を書きます。書式は `pr-report-core` の
+  `set-aside.mts` にあり、このスクリプトとページが同じものを読みます。その後の
+  文章は人が読むためのもので、機械は読みません（`set-aside-comment.mts`）。
+  理由の1文（`set-aside-detail.mts`: `checks-failed` は落ちたチェック名、
+  `not-merging` は何が止めているか、`watch-timeout` はまだ待っていたもの、
+  `rebase-failed` は conflict したファイル）、落ちた必須チェックそれぞれの
+  run へのリンク、失敗したコマンドの出力（`<details>` に畳み、末尾60行まで）、
+  何があれば解けるか、を書きます。
+- **最終行はチェックボックス「Retry」**です。チェックを入れると、次の
+  survey がその PR の見送りを捨てて試し直します（「1」の1b）。他人の comment
+  のチェックボックスを切り替えられるのは write 権限のある人だけです。
+  `checks-failed` のまま up to date な PR は、試し直しても同じ失敗を見つけて
+  また見送るだけです。直すのは push です。
+- **読むのは自分のアカウントが書いた comment だけ**です（GraphQL の
+  `viewerDidAuthor`）。リポジトリが public なので、誰でも同じ隠しコメントで
+  始まる comment を書けるからです。ページも同じ規則で読みます。
+- **本文ではなく comment** なのは、本文は作者やセッションや `open-pr` も書き
+  換え、REST の PATCH には条件付き更新がないので人の編集を消しかねないからです。
+  version PR の本文は push のたびに上書きされます。以前の commit status（
+  context `unblock-prs`、state `failure`）をやめたのは、必須でもないのに PR の
+  checks に ✗ が残り、140字しか書けず、人が消すことも試し直しを頼むこともでき
+  なかったからです。
 - **GitHub の `mergeable` ではなくこちら**を見るのは、あれが merge の可否で、
   このスクリプトがするのは rebase だからです（`DIRTY` を信用しない理由と同じ）。
-- **消す必要はありません。** status は commit に付くので、push で head が変われば
-  新しい head には付いていません。base が動いた場合はページが古い記録として
-  灰色で表示します（`checks-failed` を除く — `skips.mts` と同じ規則を
-  `pr-report-core` の `setAsideStillApplies` で共有しています）。
-- **description の理由の後ろには、読む人が次に探しに行くものを書きます**
-  （`set-aside-detail.mts`）: `checks-failed` は落ちたチェック名、
-  `not-merging` は何が止めているか（`reviewDecision` による必須レビュー
-  不足・変更要求、それ以外なら未解決の会話か auto-merge を張った人）、
-  `watch-timeout` はまだ待っていたもの、`rebase-failed` は conflict した
-  ファイル。GitHub は description を140字で切るので、収まらない分は
-  `…` になります。`checks-failed` は落ちた run へのリンク（`target_url`）
-  も付くので、PR の "Details" からそのまま開けます。
-- 必須 context ではないのでマージは止めません。PR 上に ✗ が1つ付きます。
-- 書けるのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は
-  書き直しません。`--dry-run` では書きません。書けなかったときはその旨を
-  ログに出して続行します。
+- **解けたら1行の「解消済み」に書き換えます。** head か base が動いた（
+  `checks-failed` は head だけ — `skips.mts` と同じ規則を `pr-report-core` の
+  `setAsideApplies` で共有しています）、または再試行を頼まれたときです。消さ
+  ないのは、timeline で経緯を追えるようにするためです。ページは、head が動いた
+  comment は表示せず、base が動いたものは灰色の古い記録として表示します。
+- マージは止めません。
+- 書くのは新しく見送ったときだけで、同じ状態のまま見送り続けている間は書き直し
+  ません。`--dry-run` では書きません。書けなかったときはその旨をログに出して
+  続行します。書き込むのは `gh` のアカウントなので、そのアカウントが作者の PR
+  では作者に通知は飛びません。PR を購読しているセッションは comment で起こされ
+  るので、自分の PR が見送られたことに気づけます。
+- 以前の commit status はすでに付いているものを API で消せませんが、次の push
+  で head が変われば消えるので放ってあります。
 
 code owner の承認待ちで止まっている PR は、変更したパスと `.github/CODEOWNERS`
 からページが自分で判定します。このスクリプトも同じ判定で、その PR を解放せずに
-残します（「2」の8）。この場合 status は書きません。承認されれば次の survey で
+残します（「2」の8）。この場合 comment は書きません。承認されれば次の survey で
 動き出すからです。
 
 ### ファイル構成
 
-| ファイル          | 役割                                                          |
-| :---------------- | :------------------------------------------------------------ |
-| `main.mts`        | ループ本体とコマンドライン（入口）                            |
-| `triage.mts`      | 1回の survey が各 PR について何を言うか                       |
-| `merge-after.mts` | 宣言された順序が pick に何を言うか                            |
-| `auto-merge.mts`  | いつ auto-merge を張るか                                      |
-| `stack.mts`       | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
-| `version-pr.mts`  | version PR と、それを止めているもの                           |
-| `rebase.mts`      | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
-| `release.mts`     | 解放されている PR を1本に保つ                                 |
-| `review.mts`      | レビューがマージを止めているか                                |
-| `watch.mts`       | 1本をマージまでポーリング                                     |
-| `auto-fix.mts`    | fixer の差分だけの失敗を直して push                           |
-| `quiet.mts`       | 何もない時にどれだけ待つか                                    |
-| `checks.mts`      | マージが何を待っているか                                      |
-| `github.mts`      | `gh` / `git` を叩くもの全部。判断はしない                     |
-| `labels.mts`      | 3つのラベルがその PR について何を言うか                       |
-| `skips.mts`       | 諦めた PR を何をもって覚え続けるか                            |
-| `demotions.mts`   | green のまま止まった PR をいつまで最後に回すか                |
-| `options.mts`     | コマンドライン                                                |
-| `types.mts`       | 共有される型とスキーマ                                        |
-| `constants.mts`   | 待ち時間と諦めるまでの回数                                    |
-| `util.mts`        | quoting、ログ、停止シグナル                                   |
+| ファイル                | 役割                                                          |
+| :---------------------- | :------------------------------------------------------------ |
+| `main.mts`              | ループ本体とコマンドライン（入口）                            |
+| `triage.mts`            | 1回の survey が各 PR について何を言うか                       |
+| `merge-after.mts`       | 宣言された順序が pick に何を言うか                            |
+| `auto-merge.mts`        | いつ auto-merge を張るか                                      |
+| `stack.mts`             | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
+| `version-pr.mts`        | version PR と、それを止めているもの                           |
+| `rebase.mts`            | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
+| `release.mts`           | 解放されている PR を1本に保つ                                 |
+| `review.mts`            | レビューがマージを止めているか                                |
+| `watch.mts`             | 1本をマージまでポーリング                                     |
+| `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
+| `quiet.mts`             | 何もない時にどれだけ待つか                                    |
+| `checks.mts`            | マージが何を待っているか                                      |
+| `github.mts`            | `gh` / `git` を叩くもの全部。判断はしない                     |
+| `labels.mts`            | 3つのラベルがその PR について何を言うか                       |
+| `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
+| `set-aside-comment.mts` | 見送りの comment の文章                                       |
+| `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
+| `options.mts`           | コマンドライン                                                |
+| `types.mts`             | 共有される型とスキーマ                                        |
+| `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
+| `util.mts`              | quoting、ログ、停止シグナル                                   |
 
 トレーラのパーサと閉路検出、どの PR がどの PR に積まれているか、ラベルの文字列、
-`CODEOWNERS` の判定は、同じ宣言を読む Pull Requests Manager と共有するため
-`apps/pr-report-core` にあります。
+`CODEOWNERS` の判定、見送りの comment の隠しコメントとチェックボックスの書式
+は、同じ宣言を読む Pull Requests Manager と共有するため `apps/pr-report-core`
+にあります。
 
 `index.mts` はありません。`ws:gen` は workspace メンバーしか歩かず `tools/` は
 意図的にメンバーではないので、手で維持するだけの barrel になります。
@@ -741,6 +784,27 @@ already — is passed over in silence. A layer that cannot be restacked — a
 conflict, a fork — is logged with the reason and left, and not followed
 again: no record is kept, and left alone it is where GitHub put it. With
 `--dry-run` it only says what it would do.
+
+#### 1b. Read the set-aside comments
+
+For the `merge-queued` pull requests and any other this process holds a record
+for, read the set-aside comments this account wrote ("Where a passed-over pull
+request shows") in one GraphQL request, and settle the records with them
+(`settleSkips` in `skips.mts`):
+
+- A comment set aside at a head the branch has moved from, or against a base
+  `main` has moved from (except `checks-failed`), is rewritten as one resolved
+  line.
+- A comment whose "Retry" box a person ticked is rewritten as resolved, and
+  that pull request's record is dropped: this cycle's triage treats it as if
+  it had never been set aside. One that fails again is set aside again, and
+  its comment says so again.
+- A comment still standing that this process holds no record for was left by
+  an earlier run. It is taken up as a record rather than tried again: a rebase
+  of the same head onto the same base conflicts the same way.
+
+Comments that cannot be read are logged, and the records stand as they were.
+With `--dry-run` nothing is rewritten.
 
 #### 2. Triage
 
@@ -1009,72 +1073,94 @@ zone, set `TZ`: `TZ=Asia/Tokyo pnpm run unblock-prs`.
 ### Where a passed-over pull request shows
 
 This script runs on someone's machine and says everything it does on standard
-output. So each time it sets a pull request aside it also **writes a commit
-status on that pull request's head**: context `unblock-prs`, state `failure`,
-and a description with the reason and the base's SHA at the time. The
-**GitHub Pull Requests Manager** page
+output. So each time it sets a pull request aside it also **writes a comment
+on that pull request** — one per pull request, edited in place from the second
+time on. The **GitHub Pull Requests Manager** page
 (<https://noshiro-pf.github.io/mono/pr-manager/>) reads it and shows it on
 the pull request, so finding out why one is not moving does not mean finding
 the terminal the script ran in.
 
+- **The first line is a hidden record for machines**
+  (`<!-- unblock-prs:set-aside reason=… head=… base=… -->`): the reason, and
+  the head's and the base's SHAs at the time. Its format is `set-aside.mts` in
+  `pr-report-core`, which this script and the page both read with. The prose
+  after it is for people and nothing reads it back (`set-aside-comment.mts`):
+  the reason's one sentence (`set-aside-detail.mts`: the failed checks for
+  `checks-failed`, what holds it for `not-merging`, what it was still waiting
+  on for `watch-timeout`, the conflicting files for `rebase-failed`), a link
+  to the run of each failed required check, what the failed command printed
+  (folded in `<details>`, its last 60 lines), and what will clear it.
+- **The last line is a "Retry" task box.** Ticking it has the next survey drop
+  the pull request's record and try it again (step 1b of "1"). Only those who
+  can write to the repository can tick a box in someone else's comment. A
+  `checks-failed` pull request that is up to date is only found failing and
+  set aside again; what clears that is a push.
+- **Only comments this account wrote count** (`viewerDidAuthor` in GraphQL):
+  the repository is public, and anyone can post a comment that starts with
+  the same hidden line. The page reads by the same rule.
+- **A comment, not the body**, because the author, a session and `open-pr`
+  write the body too, and the REST API has no conditional update to keep an
+  edit made in between; the version pull request's body is rewritten on every
+  push. **Not a commit status any more** (context `unblock-prs`, state
+  `failure`, as it was): that left a ✗ among the checks for a context nothing
+  requires, had 140 characters to say why, and could neither be taken off nor
+  asked to try again.
 - **This rather than GitHub's `mergeable`**, because that answers whether a
   merge conflicts and this script rebases — the same reason it does not take
   `DIRTY` at its word.
-- **Nothing ever takes it off.** A status belongs to one commit, so a push
-  leaves the new head without it. A moved base the page shows as a grey,
-  older record (except `checks-failed`), by the rule `skips.mts` uses too,
-  shared as `setAsideStillApplies` in `pr-report-core`.
-- **After the reason, the description says what a reader would go and look
-  for next** (`set-aside-detail.mts`): the failed checks for
-  `checks-failed`; for `not-merging`, what holds it — a missing required
-  review or requested changes by `reviewDecision`, and otherwise an
-  unresolved conversation or who armed auto-merge; what it was still waiting
-  on for `watch-timeout`; the conflicting files for `rebase-failed`. GitHub
-  keeps a description to 140 characters, so what does not fit ends in `…`.
-  `checks-failed` also links the failed run (`target_url`), so "Details" on
-  the pull request opens it.
-- It is not a required context, so it holds no merge; it adds one ✗ to the
-  pull request.
+- **Once it no longer applies it is rewritten as one resolved line**: the
+  head or the base moved (the head alone for `checks-failed`, by the rule
+  `skips.mts` uses too, shared as `setAsideApplies` in `pr-report-core`), or
+  a retry was asked for. It is kept rather than deleted, so the timeline
+  keeps what happened. The page shows nothing for a comment whose head has
+  moved, and a moved base as a grey, older record.
+- It holds no merge.
 - It is written when a pull request is newly set aside, not again on every
   survey that finds the same record standing; not at all under `--dry-run`;
-  and a status that could not be written is logged and nothing more.
+  and a comment that could not be written is logged and nothing more. It is
+  written as the `gh` account, so on a pull request that account opened the
+  author is not notified; a session subscribed to the pull request is woken
+  by it, and so learns its pull request was set aside.
+- The commit statuses written before cannot be deleted through the API; each
+  goes with its head at the next push, so they are left alone.
 
 A pull request waiting for a code owner the page works out for itself, from
 the paths it changes and `.github/CODEOWNERS`. This script works it out the
 same way and leaves that pull request in the queue (step 2, item 8). It writes
-no status for it, because an approval puts it back in the running on the next
-survey.
+no comment for it, because an approval puts it back in the running on the
+next survey.
 
 ### Layout
 
-| File              | Role                                                          |
-| :---------------- | :------------------------------------------------------------ |
-| `main.mts`        | the loop and the command line (entry point)                   |
-| `triage.mts`      | what one survey says about each pull request, and why         |
-| `merge-after.mts` | what the declared order says about picking                    |
-| `auto-merge.mts`  | when this script arms auto-merge                              |
-| `stack.mts`       | stacked pull requests — when they wait, arm, move and restack |
-| `version-pr.mts`  | the version pull request, and what holds it back              |
-| `rebase.mts`      | moving a branch — the worktree rebase, the label removal      |
-| `release.mts`     | holding the queue to one released pull request                |
-| `review.mts`      | whether a pull request's review holds its merge               |
-| `watch.mts`       | polling one pull request until it merges, or will not         |
-| `auto-fix.mts`    | fixing and pushing a failure that is only a fixer's diff      |
-| `quiet.mts`       | how long to sleep when there is nothing to do                 |
-| `checks.mts`      | what the merge is waiting for                                 |
-| `github.mts`      | everything that shells out to `gh` or `git`                   |
-| `labels.mts`      | what the three labels say about a pull request                |
-| `skips.mts`       | what the loop remembers, and for how long                     |
-| `demotions.mts`   | how long one that sat green without merging goes last         |
-| `options.mts`     | the command line                                              |
-| `types.mts`       | the shapes every module passes around                         |
-| `constants.mts`   | how long it waits, and how long before it gives up            |
-| `util.mts`        | quoting, logging, the stop signal                             |
+| File                    | Role                                                          |
+| :---------------------- | :------------------------------------------------------------ |
+| `main.mts`              | the loop and the command line (entry point)                   |
+| `triage.mts`            | what one survey says about each pull request, and why         |
+| `merge-after.mts`       | what the declared order says about picking                    |
+| `auto-merge.mts`        | when this script arms auto-merge                              |
+| `stack.mts`             | stacked pull requests — when they wait, arm, move and restack |
+| `version-pr.mts`        | the version pull request, and what holds it back              |
+| `rebase.mts`            | moving a branch — the worktree rebase, the label removal      |
+| `release.mts`           | holding the queue to one released pull request                |
+| `review.mts`            | whether a pull request's review holds its merge               |
+| `watch.mts`             | polling one pull request until it merges, or will not         |
+| `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
+| `quiet.mts`             | how long to sleep when there is nothing to do                 |
+| `checks.mts`            | what the merge is waiting for                                 |
+| `github.mts`            | everything that shells out to `gh` or `git`                   |
+| `labels.mts`            | what the three labels say about a pull request                |
+| `skips.mts`             | what the loop remembers, for how long, and what comments say  |
+| `set-aside-comment.mts` | the prose of the set-aside comment                            |
+| `demotions.mts`         | how long one that sat green without merging goes last         |
+| `options.mts`           | the command line                                              |
+| `types.mts`             | the shapes every module passes around                         |
+| `constants.mts`         | how long it waits, and how long before it gives up            |
+| `util.mts`              | quoting, logging, the stop signal                             |
 
 The trailer parser, the cycle detection, which pull request is stacked on
-which, the label strings and the `CODEOWNERS` rules are in
-`apps/pr-report-core`, shared with the Pull Requests Manager page, which reads
-the same declarations.
+which, the label strings, the `CODEOWNERS` rules and the set-aside comment's
+hidden record and task box are in `apps/pr-report-core`, shared with the Pull
+Requests Manager page, which reads the same declarations.
 
 There is no `index.mts`: `ws:gen` only walks workspace members and `tools/` is
 deliberately not one, so a barrel here would be hand-maintained for nothing.
