@@ -3,8 +3,8 @@
  *
  * Two kinds of query. **The report query** asks for everything that can be
  * asked for at once: every open pull request with its labels, reviews,
- * changed files and check results, what merged recently, the open issues,
- * and the two files
+ * changed files, check results and recent comments, what merged recently,
+ * the open issues, and the two files
  * on the default branch that say what a pull request is required to have —
  * the ruleset and `CODEOWNERS`. **A follow-up** asks for what could only be
  * named after that answer: how far each head is from its base, and the next
@@ -14,7 +14,7 @@
  * report query, and about one point for the follow-up that always runs.
  */
 
-import { MAIN_RULESET_PATH } from 'pr-report-core';
+import { MAIN_RULESET_PATH, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import { type ReadonlyRecord } from 'ts-type-forge';
 
@@ -81,6 +81,7 @@ export const REPORT_QUERY = [
   '        latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
   `        files(first: ${PAGE_SIZE}) { ${PAGE_INFO} nodes { path } }`,
   `        commits(last: 1) { nodes { commit { committedDate statusCheckRollup { contexts(first: ${PAGE_SIZE}) { ${PAGE_INFO} ${CONTEXT_NODES} } } } } }`,
+  `        comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { url body viewerDidAuthor } }`,
   '      }',
   '    }',
   `    merged: pullRequests(states: MERGED, first: ${MERGED_SCAN}, orderBy: { field: UPDATED_AT, direction: DESC }) {`,
@@ -283,7 +284,7 @@ const OpenPullRequestSchema = t.record({
   /** A fork's head branch is never the parent of a stacked pull request. */
   isCrossRepository: t.boolean(),
   /**
-   * The base branch's tip now, which is what a set-aside status is judged
+   * The base branch's tip now, which is what a set-aside comment is judged
    * against. `null` when the base branch has been deleted.
    */
   baseRef: t.union([
@@ -304,6 +305,20 @@ const OpenPullRequestSchema = t.record({
           committedDate: t.string(),
           statusCheckRollup: RollupSchema,
         }),
+      }),
+    ),
+  }),
+  /**
+   * Where `unblock-prs` says why it set the pull request aside, among the
+   * rest. `pr-report-core`'s `set-aside.mts` says why only the ones the
+   * viewer wrote are read.
+   */
+  comments: t.record({
+    nodes: t.array(
+      t.record({
+        url: t.string(),
+        body: t.string(),
+        viewerDidAuthor: t.boolean(),
       }),
     ),
   }),

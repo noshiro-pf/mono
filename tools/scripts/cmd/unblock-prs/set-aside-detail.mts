@@ -1,10 +1,11 @@
 /**
- * The words a set-aside status says after `<reason> at <base SHA>: `.
+ * The one sentence a set-aside record carries: what the log says, and what
+ * the comment on the pull request leads with.
  *
- * GitHub keeps a status description to 140 characters and the prefix takes
- * about 55 of them, so each says what a reader would otherwise have to go
- * and find — which check, which file, which hold — rather than restate the
- * reason. `describeSetAside` in `pr-report-core` cuts what does not fit.
+ * Each says what a reader would otherwise have to go and find — which check,
+ * which file, which hold — rather than restate the reason. The comment has
+ * room for more, and `set-aside-comment.mts` adds it: the failed checks with
+ * their runs, and what the command printed.
  */
 
 import { Arr } from 'ts-data-forge';
@@ -12,15 +13,15 @@ import { describeWaitingOn } from './checks.mjs';
 import { type ChecksSummary } from './types.mjs';
 
 /**
- * The failed required checks, and the first one's run as the status's
- * link, so that "Details" on the pull request opens the failure itself.
+ * The failed required checks by name, and each with its run, which the
+ * comment links so that the failure itself is one click away.
  */
 export const describeFailedChecks = (
   summary: ChecksSummary,
-): Readonly<{ detail: string; link: string | undefined }> =>
+): Readonly<{ detail: string; failedChecks: ChecksSummary['failed'] }> =>
   ({
     detail: `failed: ${summary.failed.map((check) => check.name).join(', ')}`,
-    link: summary.failed.find((check) => check.link !== '')?.link,
+    failedChecks: summary.failed,
   }) as const;
 
 /**
@@ -65,7 +66,7 @@ export const describeConflict = (
 /**
  * The end of what a failed command printed. Node's message starts with
  * `Command failed: <the command>`, which says nothing the reason does not and
- * alone fills a status: an arm that failed was once reported as its own
+ * crowds out what does: an arm that failed was once reported as its own
  * GraphQL mutation, cut off before GitHub's answer. Only a command that
  * printed nothing is left with that line.
  */

@@ -8,9 +8,11 @@ import { STALE_STATE_PAUSE_MS } from './constants.mjs';
 import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
 import {
   checkPreflight,
-  postSetAsideStatus,
+  readSetAsideComments,
   viewPullRequest,
+  writeSetAsideCommentOn,
 } from './github.mjs';
+import { isMergeQueued } from './labels.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
 import {
   idleWaitSec,
@@ -24,8 +26,13 @@ import {
   pauseAllBut,
   settleAfterRelease,
 } from './release.mjs';
+import {
+  describeResolvedBy,
+  resolvedCommentBody,
+  setAsideCommentBody,
+} from './set-aside-comment.mjs';
 import { describeFailedChecks } from './set-aside-detail.mjs';
-import { newSkips, pruneSkips, withSkip } from './skips.mjs';
+import { newSkips, pruneSkips, settleSkips, withSkip } from './skips.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import { describeAction, reportTriage, survey, triage } from './triage.mjs';
 import {
@@ -102,11 +109,14 @@ import { watch } from './watch.mjs';
  *    watching, never the others that are failing.
  * 5. Remember the verdict against the head *and* the base it was reached on,
  *    so the pull request is left alone until someone pushes to it or the
- *    base moves. A pull request that sat green without merging is also
- *    picked last from then on, until someone else pushes to it: the base
- *    moving makes it `BEHIND` and a candidate again, but whatever held it is
- *    something triage could not read, and it would otherwise go first each
- *    time anything else merged.
+ *    base moves, and say so in its one set-aside comment: a person ticks the
+ *    retry box there to have it tried anyway, the comment is rewritten as
+ *    resolved once the verdict ends, and a later run takes up a verdict it
+ *    finds still standing (`settleSkips`). A pull request that sat green
+ *    without merging is also picked last from then on, until someone else
+ *    pushes to it: the base moving makes it `BEHIND` and a candidate again,
+ *    but whatever held it is something triage could not read, and it would
+ *    otherwise go first each time anything else merged.
  * 6. Survey again, saying what became of the pull requests this run has
  *    touched. One that merges after the watch gave up simply stops appearing
  *    in the list, and this is the only place that gets recorded. When there
@@ -228,7 +238,10 @@ const unblockPrs = async (
     const cycle = await runCycle(defaultBranch, mut_state, options);
 
     if (!options.dryRun) {
-      await announceSetAside(newSkips(mut_state.skipped, cycle.state.skipped));
+      await announceSetAside(
+        newSkips(cycle.settled, cycle.state.skipped),
+        defaultBranch,
+      );
     }
 
     mut_state = cycle.state;
@@ -253,26 +266,89 @@ const unblockPrs = async (
 
 /**
  * Says on each newly set-aside pull request why, where GitHub keeps it, so
- * that finding out does not mean finding the terminal this ran in. A status
- * that could not be written is reported and nothing more: the job is to land
- * pull requests, and this is not a reason to stop.
+ * that finding out does not mean finding the terminal this ran in: in its one
+ * set-aside comment, written over the one it has or posted as its first. A
+ * comment that could not be written is reported and nothing more: the job is
+ * to land pull requests, and this is not a reason to stop.
  */
 const announceSetAside = async (
   skips: readonly SkipRecord[],
+  defaultBranch: string,
 ): Promise<void> => {
   for (const skip of skips) {
-    const posted = await postSetAsideStatus(
-      skip.headSha,
-      { reason: skip.reason, baseSha: skip.baseSha, detail: skip.detail },
-      skip.link,
-    );
+    const existing = await readSetAsideComments([skip.number]);
 
-    if (Result.isErr(posted)) {
+    const written = Result.isErr(existing)
+      ? existing
+      : await writeSetAsideCommentOn(
+          skip.number,
+          existing.value.get(skip.number)?.databaseId,
+          setAsideCommentBody(skip, defaultBranch),
+        );
+
+    if (Result.isErr(written)) {
       log(
-        `#${skip.number}: could not leave a status saying why: ${posted.value}`,
+        `#${skip.number}: could not leave a comment saying why: ${written.value}`,
       );
     }
   }
+};
+
+/**
+ * Reads this account's set-aside comments on the queued pull requests and on
+ * any other this run holds a record for, and settles the records with them
+ * (`settleSkips`): a comment whose state has ended, or whose retry box a
+ * person ticked, is rewritten as resolved — not under `--dry-run` — and one
+ * an earlier run left standing becomes a record again. Comments that cannot
+ * be read leave the records as they were.
+ */
+const settleWithComments = async (
+  skipped: SkipRecords,
+  pullRequests: readonly PullRequest[],
+  baseSha: string,
+  defaultBranch: string,
+  dryRun: boolean,
+): Promise<SkipRecords> => {
+  const read = await readSetAsideComments(
+    pullRequests
+      .filter((pr) => isMergeQueued(pr) || skipped.has(pr.number))
+      .map((pr) => pr.number),
+  );
+
+  if (Result.isErr(read)) {
+    log(`Cannot read the set-aside comments: ${read.value}`);
+
+    return skipped;
+  }
+
+  const settled = settleSkips(skipped, read.value, pullRequests, baseSha);
+
+  for (const { number, databaseId, setAside, resolvedBy } of settled.resolved) {
+    log(
+      `#${number}: no longer set aside (${setAside.reason}) — ${describeResolvedBy(resolvedBy, defaultBranch)}${resolvedBy === 'retry' ? '; trying it again' : ''}.`,
+    );
+
+    if (dryRun) {
+      continue;
+    }
+
+    const written = await writeSetAsideCommentOn(
+      number,
+      databaseId,
+      resolvedCommentBody(
+        setAside,
+        resolvedBy,
+        defaultBranch,
+        Temporal.Now.instant(),
+      ),
+    );
+
+    if (Result.isErr(written)) {
+      log(`#${number}: could not mark its comment resolved: ${written.value}`);
+    }
+  }
+
+  return settled.skipped;
 };
 
 const runCycle = async (
@@ -285,7 +361,7 @@ const runCycle = async (
   if (Result.isErr(listed)) {
     log(`Survey failed: ${listed.value}`);
 
-    return { state: before, next: 'idle' };
+    return { state: before, next: 'idle', settled: before.skipped };
   }
 
   // What the next cycle compares its bases with. From this survey rather
@@ -310,7 +386,7 @@ const runCycle = async (
   if (Result.isErr(surveyed)) {
     log(`Survey failed: ${surveyed.value}`);
 
-    return { state: before, next: 'idle' };
+    return { state: before, next: 'idle', settled: before.skipped };
   }
 
   const { pullRequests, baseSha, requiredContexts, reviewRequirements } =
@@ -325,7 +401,13 @@ const runCycle = async (
   // whose merge would otherwise go unrecorded.
   const tracked = await reportDeparted(before.tracked, pullRequests);
 
-  const skipped = pruneSkips(before.skipped, pullRequests, baseSha);
+  const skipped = await settleWithComments(
+    pruneSkips(before.skipped, pullRequests, baseSha),
+    pullRequests,
+    baseSha,
+    defaultBranch,
+    options.dryRun,
+  );
 
   const demoted = pruneDemotions(before.demoted, pullRequests);
 
@@ -375,7 +457,7 @@ const runCycle = async (
   );
 
   if (stopRequested()) {
-    return { state: state(mut_skipped), next: 'stop' };
+    return { state: state(mut_skipped), next: 'stop', settled: skipped };
   }
 
   // Normally the only one. Two are what a pull request opened already
@@ -390,7 +472,7 @@ const runCycle = async (
     );
 
     if (options.dryRun) {
-      return { state: state(mut_skipped), next: 'stop' };
+      return { state: state(mut_skipped), next: 'stop', settled: skipped };
     }
 
     await pauseAllBut(watched.number);
@@ -414,6 +496,7 @@ const runCycle = async (
             }),
           ),
           next: 'survey',
+          settled: skipped,
         };
       }
 
@@ -422,7 +505,7 @@ const runCycle = async (
           `#${watched.number}: its branch moved before it was armed; surveying again.`,
         );
 
-        return { state: state(mut_skipped), next: 'survey' };
+        return { state: state(mut_skipped), next: 'survey', settled: skipped };
       }
     }
 
@@ -445,6 +528,7 @@ const runCycle = async (
         trackAfterWatch(tracked, watched.number, ended.outcome),
       ),
       next: ended.outcome === 'stopped' ? 'stop' : 'survey',
+      settled: skipped,
     };
   }
 
@@ -457,12 +541,12 @@ const runCycle = async (
       );
     }
 
-    return { state: state(mut_skipped), next: 'stop' };
+    return { state: state(mut_skipped), next: 'stop', settled: skipped };
   }
 
   for (const target of triaged.candidates) {
     if (stopRequested()) {
-      return { state: state(mut_skipped), next: 'stop' };
+      return { state: state(mut_skipped), next: 'stop', settled: skipped };
     }
 
     log(
@@ -503,7 +587,7 @@ const runCycle = async (
         `#${target.number} moved while this run was moving it; leaving it to whoever pushed, and surveying again.`,
       );
 
-      return { state: state(mut_skipped), next: 'survey' };
+      return { state: state(mut_skipped), next: 'survey', settled: skipped };
     }
 
     if (advanced.value.kind === 'stale-merge-state') {
@@ -518,7 +602,7 @@ const runCycle = async (
 
       await pause(STALE_STATE_PAUSE_MS);
 
-      return { state: state(mut_skipped), next: 'survey' };
+      return { state: state(mut_skipped), next: 'survey', settled: skipped };
     }
 
     const advancedHead = advanced.value.head;
@@ -531,7 +615,11 @@ const runCycle = async (
         `#${target.number} was released at the same moment as another, which goes first; paused it again.`,
       );
 
-      return { state: state(mut_skipped, demotedNow), next: 'survey' };
+      return {
+        state: state(mut_skipped, demotedNow),
+        next: 'survey',
+        settled: skipped,
+      };
     }
 
     log(
@@ -557,11 +645,12 @@ const runCycle = async (
         trackAfterWatch(tracked, target.number, ended.outcome),
       ),
       next: ended.outcome === 'stopped' ? 'stop' : 'survey',
+      settled: skipped,
     };
   }
 
   // Nothing to act on, or every candidate failed to rebase or push.
-  return { state: state(mut_skipped), next: 'idle' };
+  return { state: state(mut_skipped), next: 'idle', settled: skipped };
 };
 
 /**
@@ -725,7 +814,7 @@ const applyWatchOutcome = (
         baseSha,
         reason: 'checks-failed',
         detail: ended.detail ?? 'a required check failed',
-        link: ended.link,
+        failedChecks: ended.failedChecks,
       });
 
     case 'not-merging':

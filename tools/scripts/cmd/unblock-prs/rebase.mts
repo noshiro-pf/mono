@@ -138,8 +138,15 @@ const rebaseInWorktree = async (
 ): Promise<Result<Rebased, RebaseFailure>> => {
   const branch = pr.headRefName;
 
-  const rebaseFailed = (detail: string): Result<Rebased, RebaseFailure> =>
-    Result.err({ reason: 'rebase-failed', detail });
+  const rebaseFailed = (
+    detail: string,
+    output?: string,
+  ): Result<Rebased, RebaseFailure> =>
+    Result.err({
+      reason: 'rebase-failed',
+      detail,
+      ...(output === undefined ? {} : { output }),
+    });
 
   const { upstream } = target;
 
@@ -181,6 +188,7 @@ const rebaseInWorktree = async (
         lastLines(rebased.value, 5),
         target.onto,
       ),
+      rebased.value,
     );
   }
 
@@ -228,6 +236,7 @@ const rebaseInWorktree = async (
       : Result.err({
           reason: 'push-failed',
           detail: `push refused: ${lastLines(pushed.value, 5)}`,
+          output: pushed.value,
         });
   }
 
@@ -408,8 +417,15 @@ const removeSkipCiLabel = async (
   pr: PullRequest,
   head: string,
 ): Promise<Result<'moved' | 'removed', RebaseFailure>> => {
-  const failed = (detail: string): Result<'moved' | 'removed', RebaseFailure> =>
-    Result.err({ reason: 'unlabel-failed', detail });
+  const failed = (
+    detail: string,
+    output?: string,
+  ): Result<'moved' | 'removed', RebaseFailure> =>
+    Result.err({
+      reason: 'unlabel-failed',
+      detail,
+      ...(output === undefined ? {} : { output }),
+    });
 
   const current = await viewPullRequest(pr.number);
 
@@ -442,6 +458,7 @@ const removeSkipCiLabel = async (
   return Result.isErr(removed)
     ? failed(
         `cannot remove ${SKIP_CI_LABEL}: ${describeCommandFailure(removed.value)}`,
+        removed.value,
       )
     : Result.ok('removed');
 };
@@ -719,8 +736,15 @@ export const armOnPick = async (
   head: string,
   defaultBranch: string,
 ): Promise<Result<'armed' | 'moved', RebaseFailure>> => {
-  const failed = (detail: string): Result<'armed' | 'moved', RebaseFailure> =>
-    Result.err({ reason: 'arm-failed', detail });
+  const failed = (
+    detail: string,
+    output?: string,
+  ): Result<'armed' | 'moved', RebaseFailure> =>
+    Result.err({
+      reason: 'arm-failed',
+      detail,
+      ...(output === undefined ? {} : { output }),
+    });
 
   const current = await viewPullRequest(pr.number);
 
@@ -754,6 +778,7 @@ export const armOnPick = async (
   if (Result.isErr(armed)) {
     return failed(
       `cannot arm auto-merge: ${describeCommandFailure(armed.value)}`,
+      armed.value,
     );
   }
 

@@ -6,14 +6,13 @@
  */
 
 import {
-  describeSetAside,
   MERGE_QUEUED_LABEL,
+  parseSetAsideComment,
   requirementsOfRules,
-  SET_ASIDE_CONTEXT,
+  SET_ASIDE_COMMENT_SCAN,
   SKIP_CI_LABEL,
   type CheckRunReport,
   type RulesetRequirements,
-  type SetAside,
 } from 'pr-report-core';
 import { Arr, isRecord, Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
@@ -24,6 +23,7 @@ import {
   PullRequestListSchema,
   PullRequestSchema,
   type NativeStackEntry,
+  type OwnSetAsideComment,
   type PullRequest,
   type TimelineEvent,
 } from './types.mjs';
@@ -211,7 +211,7 @@ export const readReviewStates = async (
     return answered;
   }
 
-  const parsed = parseJson(answered.value, ReviewStatesAnswerSchema);
+  const parsed = parseJson(answered.value, RepositoryAnswerSchema);
 
   if (Result.isErr(parsed)) {
     return parsed;
@@ -259,7 +259,7 @@ const CODE_OWNERS_PATH = '.github/CODEOWNERS';
 /** One page of a list inside a pull request. */
 const PAGE_SIZE = 100;
 
-const ReviewStatesAnswerSchema = t.record({
+const RepositoryAnswerSchema = t.record({
   data: t.record({
     repository: t.unknown(),
   }),
@@ -313,37 +313,131 @@ export const addSkipCiLabel = async (
 };
 
 /**
- * Leaves a `failure` commit status on the head a pull request was set aside
- * at, saying why and against which base. `pr-report-core`'s `set-aside.mts`
- * says what reads it and why it is a status rather than a label or a
- * comment.
+ * This account's set-aside comment on each of `numbers` that has one, in one
+ * GraphQL request: every number goes in as a variable and each pull request
+ * comes back under its own alias. `pr-report-core`'s `set-aside.mts` says
+ * why only `viewerDidAuthor` counts; of several, the oldest is the one.
  */
-export const postSetAsideStatus = async (
-  headSha: string,
-  setAside: SetAside,
-  /** Where the status's "Details" leads; GitHub shows no link without one. */
-  targetUrl: string | undefined,
-): Promise<Result<undefined, string>> => {
-  if (!SHA.test(headSha)) {
-    return Result.err(`unexpected head SHA: ${JSON.stringify(headSha)}`);
+export const readSetAsideComments = async (
+  numbers: readonly number[],
+): Promise<Result<ReadonlyMap<number, OwnSetAsideComment>, string>> => {
+  if (!Arr.isNonEmpty(numbers)) {
+    return Result.ok(new Map());
   }
 
-  const posted = await git(
+  const query = [
+    `query SetAsideComments(${['$owner: String!', '$name: String!', ...numbers.map((n) => `$pr_${n}: Int!`)].join(', ')}) {`,
+    '  repository(owner: $owner, name: $name) {',
+    ...numbers.map(
+      (n) =>
+        `    pr_${n}: pullRequest(number: $pr_${n}) { comments(last: ${SET_ASIDE_COMMENT_SCAN}) { nodes { databaseId body viewerDidAuthor } } }`,
+    ),
+    '  }',
+    '}',
+  ].join('\n');
+
+  const answered = await git(
     [
-      'gh api --method POST',
-      // `{owner}` and `{repo}` are `gh api`'s placeholders for the
-      // repository of the working directory, not interpolations.
-      sh([STATUSES_ROUTE, headSha].join('/')),
-      '-f state=failure',
-      `-f ${sh(`context=${SET_ASIDE_CONTEXT}`)}`,
-      `-f ${sh(`description=${describeSetAside(setAside)}`)}`,
-      ...(targetUrl === undefined
-        ? []
-        : [`-f ${sh(`target_url=${targetUrl}`)}`]),
+      'gh api graphql',
+      `-f ${sh(`query=${query}`)}`,
+      `-F ${sh('owner={owner}')}`,
+      `-F ${sh('name={repo}')}`,
+      ...numbers.map((n) => `-F ${sh(`pr_${n}=${n}`)}`),
     ].join(' '),
   );
 
-  return Result.isErr(posted) ? posted : Result.ok(undefined);
+  if (Result.isErr(answered)) {
+    return answered;
+  }
+
+  const parsed = parseJson(answered.value, RepositoryAnswerSchema);
+
+  if (Result.isErr(parsed)) {
+    return parsed;
+  }
+
+  const { repository } = parsed.value.data;
+
+  if (!isRecord(repository)) {
+    return Result.err('GitHub answered without the repository');
+  }
+
+  const nodes = numbers.map(
+    (n) => [n, CommentsNodeSchema.validate(repository[`pr_${n}`])] as const,
+  );
+
+  const invalid = nodes.flatMap(([n, node]) =>
+    Result.isErr(node)
+      ? [`#${n}: ${t.validationErrorsToMessages(node.value).join('\n')}`]
+      : [],
+  );
+
+  if (Arr.isNonEmpty(invalid)) {
+    return Result.err(invalid.join('\n'));
+  }
+
+  return Result.ok(
+    new Map(
+      nodes.flatMap(([n, node]) => {
+        const own = Result.isOk(node)
+          ? ownSetAsideComment(node.value.comments.nodes)
+          : undefined;
+
+        return own === undefined ? [] : [[n, own] as const];
+      }),
+    ),
+  );
+};
+
+const ownSetAsideComment = (
+  comments: readonly t.TypeOf<typeof CommentSchema>[],
+): OwnSetAsideComment | undefined =>
+  comments
+    .filter(({ viewerDidAuthor }) => viewerDidAuthor)
+    .flatMap(({ databaseId, body }) => {
+      const says = parseSetAsideComment(body);
+
+      return databaseId === null || says === undefined
+        ? []
+        : [{ databaseId, says }];
+    })
+    .at(0);
+
+const CommentSchema = t.record({
+  databaseId: t.union([t.number(), t.nullType]),
+  body: t.string(),
+  viewerDidAuthor: t.boolean(),
+});
+
+const CommentsNodeSchema = t.record({
+  comments: t.record({ nodes: t.array(CommentSchema) }),
+});
+
+/**
+ * Writes `body` as the pull request's set-aside comment: over `existing`,
+ * this account's own, when there is one — a pull request has one, edited in
+ * place — and as a new comment otherwise.
+ */
+export const writeSetAsideCommentOn = async (
+  prNumber: number,
+  existing: number | undefined,
+  body: string,
+): Promise<Result<undefined, string>> => {
+  const written = await git(
+    [
+      existing === undefined ? 'gh api --method POST' : 'gh api --method PATCH',
+      // `{owner}` and `{repo}` are `gh api`'s placeholders for the
+      // repository of the working directory, not interpolations.
+      sh(
+        existing === undefined
+          ? [ISSUES_ROUTE, prNumber, 'comments'].join('/')
+          : [ISSUES_ROUTE, 'comments', existing].join('/'),
+      ),
+      `-f ${sh(`body=${body}`)}`,
+    ].join(' '),
+  );
+
+  return Result.isErr(written) ? written : Result.ok(undefined);
 };
 
 /**
@@ -614,7 +708,7 @@ export const listCheckRuns = async (
   const listed = await git(
     [
       'gh api --paginate --slurp',
-      // `gh api`'s placeholders again, as in `postSetAsideStatus`.
+      // `gh api`'s placeholders again, as in `writeSetAsideCommentOn`.
       sh([COMMITS_ROUTE, headSha, 'check-runs?per_page=100'].join('/')),
     ].join(' '),
   );
@@ -665,7 +759,7 @@ export const removeWorktree = async (worktreeDir: string): Promise<void> => {
 
 const SHA = /^[0-9a-f]{40}$/u;
 
-const STATUSES_ROUTE = 'repos/{owner}/{repo}/statuses';
+const ISSUES_ROUTE = 'repos/{owner}/{repo}/issues';
 
 const COMMITS_ROUTE = 'repos/{owner}/{repo}/commits';
 

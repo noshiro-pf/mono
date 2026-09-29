@@ -1,62 +1,129 @@
 import {
-  describeSetAside,
-  parseSetAside,
-  SET_ASIDE_DESCRIPTION_LIMIT,
+  parseSetAsideComment,
+  setAsideApplies,
   setAsideStillApplies,
+  writeResolvedComment,
+  writeSetAsideComment,
+  type SetAside,
 } from './set-aside.mjs';
+
+const HEAD = 'c'.repeat(40);
 
 const BASE = 'a'.repeat(40);
 
-describe(describeSetAside, () => {
-  test('says why and against which base, in a form it can read back', () => {
-    const description = describeSetAside({
-      reason: 'rebase-failed',
-      baseSha: BASE,
-      detail: 'rebase conflicts: CONFLICT (content): Merge conflict in a.mts',
-    });
+const SET_ASIDE: SetAside = {
+  reason: 'rebase-failed',
+  headSha: HEAD,
+  baseSha: BASE,
+} as const;
 
-    assert.deepStrictEqual(parseSetAside(description), {
-      reason: 'rebase-failed',
-      baseSha: BASE,
-      detail: 'rebase conflicts: CONFLICT (content): Merge conflict in a.mts',
+describe(writeSetAsideComment, () => {
+  test('says why and at which head and base, in a form it can read back', () => {
+    assert.deepStrictEqual(
+      parseSetAsideComment(
+        writeSetAsideComment(SET_ASIDE, 'Conflicts with main in `a.mts`.'),
+      ),
+      { kind: 'standing', setAside: SET_ASIDE, retry: false },
+    );
+  });
+
+  test('keeps the record out of the prose', () => {
+    const body = writeSetAsideComment(SET_ASIDE, 'Conflicts with main.');
+
+    const lines = body.split('\n');
+
+    assert.match(lines[0] ?? '', /^<!--.*-->$/u);
+
+    assert.strictEqual(lines[2], 'Conflicts with main.');
+
+    assert.match(lines.at(-1) ?? '', /^- \[ \] Retry:/u);
+  });
+});
+
+describe(parseSetAsideComment, () => {
+  test('reads the retry box a person ticked', () => {
+    for (const mark of ['x', 'X']) {
+      const ticked = writeSetAsideComment(SET_ASIDE, 'prose').replace(
+        '- [ ] Retry:',
+        () => `- [${mark}] Retry:`,
+      );
+
+      assert.deepStrictEqual(parseSetAsideComment(ticked), {
+        kind: 'standing',
+        setAside: SET_ASIDE,
+        retry: true,
+      });
+    }
+  });
+
+  test('reads only the box on the last line', () => {
+    // What a command printed can hold anything, a ticked box included.
+    const body = writeSetAsideComment(
+      SET_ASIDE,
+      ['```text', '- [x] Retry: not this one', '```'].join('\n'),
+    );
+
+    assert.deepStrictEqual(parseSetAsideComment(body), {
+      kind: 'standing',
+      setAside: SET_ASIDE,
+      retry: false,
     });
   });
 
-  test('keeps within the length GitHub accepts, cutting the detail', () => {
-    const description = describeSetAside({
-      reason: 'rebase-failed',
-      baseSha: BASE,
-      detail: 'x'.repeat(500),
+  test('reads a comment GitHub gave back with CRLF line ends', () => {
+    const body = writeSetAsideComment(SET_ASIDE, 'prose')
+      .replace('- [ ] Retry:', '- [x] Retry:')
+      .replaceAll('\n', '\r\n');
+
+    assert.deepStrictEqual(parseSetAsideComment(body), {
+      kind: 'standing',
+      setAside: SET_ASIDE,
+      retry: true,
     });
-
-    assert.isTrue(description.length <= SET_ASIDE_DESCRIPTION_LIMIT);
-
-    assert.isTrue(description.endsWith('…'));
-
-    assert.strictEqual(parseSetAside(description)?.baseSha, BASE);
   });
 
-  test('puts the detail on one line', () => {
-    assert.strictEqual(
-      parseSetAside(
-        describeSetAside({
-          reason: 'push-failed',
-          baseSha: BASE,
-          detail: 'first line\nsecond line',
-        }),
-      )?.detail,
-      'first line second line',
+  test('reads a resolved one', () => {
+    assert.deepStrictEqual(
+      parseSetAsideComment(
+        writeResolvedComment('Resolved: the branch was pushed.'),
+      ),
+      { kind: 'resolved' },
+    );
+  });
+
+  test('is undefined for a comment it did not write', () => {
+    assert.isUndefined(parseSetAsideComment(''));
+
+    assert.isUndefined(parseSetAsideComment('LGTM'));
+
+    // The marker somewhere other than the first line.
+    assert.isUndefined(
+      parseSetAsideComment(`quoting:\n${writeSetAsideComment(SET_ASIDE, 'x')}`),
+    );
+
+    assert.isUndefined(
+      parseSetAsideComment(
+        `<!-- unblock-prs:set-aside reason=rebase-failed head=${'c'.repeat(7)} base=${BASE} -->`,
+      ),
     );
   });
 });
 
-describe(parseSetAside, () => {
-  test('is undefined for a description it did not write', () => {
-    assert.isUndefined(parseSetAside(''));
+describe(setAsideApplies, () => {
+  test('lasts while the head and the base are where they were', () => {
+    assert.isTrue(setAsideApplies(SET_ASIDE, HEAD, BASE));
 
-    assert.isUndefined(parseSetAside('All checks passed'));
+    assert.isFalse(setAsideApplies(SET_ASIDE, 'd'.repeat(40), BASE));
 
-    assert.isUndefined(parseSetAside(`rebase-failed at ${'a'.repeat(7)}: x`));
+    assert.isFalse(setAsideApplies(SET_ASIDE, HEAD, 'b'.repeat(40)));
+  });
+
+  test('outlives a moved base, but not a push, when the checks failed', () => {
+    const failed = { ...SET_ASIDE, reason: 'checks-failed' } as const;
+
+    assert.isTrue(setAsideApplies(failed, HEAD, 'b'.repeat(40)));
+
+    assert.isFalse(setAsideApplies(failed, 'd'.repeat(40), BASE));
   });
 });
 

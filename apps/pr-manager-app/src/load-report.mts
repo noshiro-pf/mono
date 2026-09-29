@@ -19,9 +19,8 @@ import {
   MAIN_RULESET_PATH,
   parseCodeOwners,
   parseRuleset,
-  parseSetAside,
+  parseSetAsideComment,
   reportedContexts,
-  SET_ASIDE_CONTEXT,
   setAsideStillApplies,
   summarize,
   type CheckRunReport,
@@ -71,10 +70,13 @@ import { epochMsOf } from './timestamp.mjs';
 
 /**
  * What `unblock-prs` said when it last set the pull request aside, read from
- * the status it leaves on the head. `current` is whether it still applies:
- * set aside against a base that has since moved, the next run tries again.
+ * the record its comment on the pull request starts with. `current` is
+ * whether it still applies: set aside against a base that has since moved,
+ * the next run tries again. `retry` is a person having ticked the comment's
+ * retry box, which the next run acts on.
  */
-export type SetAsideView = SetAside & Readonly<{ current: boolean }>;
+export type SetAsideView = SetAside &
+  Readonly<{ current: boolean; retry: boolean; url: string }>;
 
 /** One open pull request, as the page shows it. */
 export type Entry = ReportEntry &
@@ -669,28 +671,36 @@ const statusState = (state: string): string =>
   state === 'EXPECTED' ? 'pending' : state.toLowerCase();
 
 /**
- * The status `unblock-prs` left on this head, if it left one. A status
- * belongs to one commit, so a push since has already made it someone else's.
+ * What the viewer's `unblock-prs` comment on this pull request says, when it
+ * says the pull request is set aside at the head it is at now. Once the
+ * branch has been pushed the record is someone else's head's, and the
+ * script rewrites the comment as resolved on its next survey.
  */
 const setAsideOf = (pull: PullState): SetAsideView | undefined => {
-  const left = pull.contexts.find(
-    (node) =>
-      node.__typename === 'StatusContext' && node.context === SET_ASIDE_CONTEXT,
-  );
+  const found = pull.pr.comments.nodes
+    .filter(({ viewerDidAuthor }) => viewerDidAuthor)
+    .flatMap(({ url, body }) => {
+      const says = parseSetAsideComment(body);
 
-  const setAside =
-    left?.__typename === 'StatusContext' && left.description !== null
-      ? parseSetAside(left.description)
-      : undefined;
+      return says === undefined ? [] : [{ url, says }];
+    })
+    .at(0);
 
-  if (setAside === undefined) {
+  if (
+    found?.says.kind !== 'standing' ||
+    found.says.setAside.headSha !== pull.pr.headRefOid
+  ) {
     return undefined;
   }
+
+  const { setAside, retry } = found.says;
 
   const baseTip = pull.pr.baseRef?.target?.oid;
 
   return {
     ...setAside,
+    retry,
+    url: found.url,
     current: baseTip !== undefined && setAsideStillApplies(setAside, baseTip),
   };
 };

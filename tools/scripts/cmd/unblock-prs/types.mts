@@ -2,7 +2,7 @@
 
 /** The shapes every module here passes around. */
 
-import { type RulesetRequirements } from 'pr-report-core';
+import { type RulesetRequirements, type SetAsideComment } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import { type StrictPick } from 'ts-type-forge';
 
@@ -33,15 +33,18 @@ export type PullRequest = t.TypeOf<typeof PullRequestSchema>;
 
 export const PullRequestListSchema = t.array(PullRequestSchema);
 
-export type SkipReason =
-  | 'already-in-base'
-  | 'arm-failed'
-  | 'checks-failed'
-  | 'not-merging'
-  | 'push-failed'
-  | 'rebase-failed'
-  | 'unlabel-failed'
-  | 'watch-timeout';
+export const SKIP_REASONS = [
+  'already-in-base',
+  'arm-failed',
+  'checks-failed',
+  'not-merging',
+  'push-failed',
+  'rebase-failed',
+  'unlabel-failed',
+  'watch-timeout',
+] as const;
+
+export type SkipReason = (typeof SKIP_REASONS)[number];
 
 /**
  * Why a pull request is being left alone, and the state it was in at the
@@ -54,12 +57,25 @@ export type SkipRecord = Readonly<{
   headSha: string;
   baseSha: string;
   reason: SkipReason;
+  /** One sentence, which the log says and the comment leads with. */
   detail: string;
-  /** Where the set-aside status's "Details" leads, when there is a page for it. */
-  link?: string;
+  /** For `checks-failed`: each failed required check, with its run. */
+  failedChecks?: ChecksSummary['failed'];
+  /** What the command that failed printed, which the comment folds away. */
+  output?: string;
 }>;
 
 export type SkipRecords = ReadonlyMap<number, SkipRecord>;
+
+/**
+ * One of this account's set-aside comments on a pull request, and what it
+ * says. `pr-report-core`'s `set-aside.mts` says what it is.
+ */
+export type OwnSetAsideComment = Readonly<{
+  /** The REST id, which editing it takes. */
+  databaseId: number;
+  says: SetAsideComment;
+}>;
 
 /**
  * Pull request number → the head it was demoted at: the pull requests picked
@@ -85,7 +101,7 @@ export type Survey = Readonly<{
 
 export type ChecksSummary = Readonly<{
   status: 'failed' | 'passed' | 'pending';
-  /** With the run's link, which is what a set-aside status points at. */
+  /** With the run's link, which a set-aside comment points at. */
   failed: readonly Readonly<{ name: string; link: string }>[];
   pending: readonly string[];
   /**
@@ -218,12 +234,12 @@ export type WatchOutcome =
 
 /**
  * How a watch ended, and for an outcome that sets the pull request aside,
- * what its status says: `detail` and, where there is a page for it, `link`.
+ * what its comment says: `detail` and, when checks failed, which.
  */
 export type Watched = Readonly<{
   outcome: WatchOutcome;
   detail?: string;
-  link?: string;
+  failedChecks?: ChecksSummary['failed'];
 }>;
 
 /**
@@ -272,6 +288,13 @@ export type LoopState = Readonly<{
 export type CycleResult = Readonly<{
   state: LoopState;
   next: 'idle' | 'stop' | 'survey';
+  /**
+   * The records the cycle acted from — what it carried over, less what no
+   * longer applied, plus what the comments on the pull requests said. A
+   * record in `state` that is not among these, or differs from its entry, is
+   * one this cycle set aside, and the one its comment has to say.
+   */
+  settled: SkipRecords;
 }>;
 
 /**
@@ -305,6 +328,8 @@ export type RebaseFailure = Readonly<{
     | 'rebase-failed'
     | 'unlabel-failed';
   detail: string;
+  /** What the command that failed printed, when there is more than `detail`. */
+  output?: string;
 }>;
 
 /**
