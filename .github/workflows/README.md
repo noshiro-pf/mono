@@ -586,7 +586,8 @@ on and `success` without it.
   on a commit already pushed. `unblock-prs` takes it off only from a pull
   request labelled `merge-queued`, after rebasing, so the matrix runs once on
   the head that will merge.
-- `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
+- `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
+  on GitHub; the
   strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
   Change them everywhere or nowhere.
 

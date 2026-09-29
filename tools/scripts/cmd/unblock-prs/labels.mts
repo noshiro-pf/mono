@@ -1,12 +1,14 @@
 /**
- * What the three labels this script reads say about one pull request.
+ * What the four labels this script reads say about one pull request.
  * `merge-queued` decides whether a pull request is looked at, `skip-ci`
  * decides whether it has been released yet, and `blocks-release` decides
- * whether the version pull request may go at all. The strings themselves are
+ * whether the version pull request may go at all, and `auto-rebase` asks
+ * for a paused pull request to be kept on the tip. The strings themselves are
  * `pr-report-core`'s, because the Pull Requests Manager page reads them too.
  */
 
 import {
+  AUTO_REBASE_LABEL,
   BLOCKS_RELEASE_LABEL,
   MERGE_QUEUED_LABEL,
   SKIP_CI_LABEL,
@@ -38,3 +40,13 @@ export const isMergeQueued = (pr: PullRequest): boolean =>
  */
 export const blocksRelease = (pr: PullRequest): boolean =>
   pr.labels.some((label) => label.name === BLOCKS_RELEASE_LABEL);
+
+/**
+ * Whether the pull request asked to be kept on the tip of the default branch
+ * while it waits, by `auto-rebase`, or by being queued: either way the author
+ * wants it rebased, and while `skip-ci` is on a rebase before its turn costs
+ * nothing and makes its diff easier to read.
+ */
+export const wantsAutoRebase = (pr: PullRequest): boolean =>
+  isMergeQueued(pr) ||
+  pr.labels.some((label) => label.name === AUTO_REBASE_LABEL);

@@ -450,6 +450,12 @@ as it was — and carries the layers above along. Do the same if you get there
 first, not a rebase onto `main`: that is the PR's turn, and it is not yours to
 give an unqueued one.
 
+The worker also keeps a PR labelled `skip-ci` and either `auto-rebase` or
+`merge-queued` on `main` while the queue is idle — a plain rebase, the layers
+above carried along, no checks run under the label (step 3a of the README).
+That is the worker's alone: a session does not rebase an unqueued PR onto
+`main`, labelled or not.
+
 ## The release goes last
 
 **`changeset-release/main`** is the PR `changesets/action` opens to version the

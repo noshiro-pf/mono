@@ -38,3 +38,12 @@ export const MERGE_QUEUED_LABEL = 'merge-queued';
  * clean up.
  */
 export const BLOCKS_RELEASE_LABEL = 'blocks-release';
+
+/**
+ * The label that asks `unblock-prs` to keep a pull request on the tip of the
+ * default branch while it waits, so that its diff stays readable for review.
+ * It is honoured only together with `skip-ci`, under which the push runs no
+ * checks, and only when the queue has nothing to do. Put it on the bottom
+ * layer of a stack; the layers above are carried along.
+ */
+export const AUTO_REBASE_LABEL = 'auto-rebase';
