@@ -527,6 +527,14 @@ the intended fix where the error does not say.
 - Naming: `camelCase` / `PascalCase` / `kebab-case` files; `.mts` modules,
   `.d.mts` types. Prettier formats; Markdown uses 4-space indents.
 
+## Lint rules
+
+A custom rule (ESLint, the Sumi oxlint plugin or checker, a codemod) must see
+through `as`, `satisfies`, `!`, `<T>` and parentheses. Otherwise a wrapper
+hides the pattern it looks for, or vouches for a type the value does not have,
+and nothing fails. Read `docs/writing-lint-rules.md`, which says how and which
+tests to write, before writing or changing one.
+
 ## Libraries
 
 - **ts-type-forge**: `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` etc. are
