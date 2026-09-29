@@ -225,7 +225,8 @@ particular to it. Here is only what a session has to act on.
   status (`skip-ci-label.yml`) is the only thing holding the merge while it is
   on. Taking it off is what starts the checks. Any label event re-runs them,
   so add other labels before pushing or after the checks report.
-- `skip-ci`, `merge-queued` and `blocks-release` exist only on GitHub; the
+- `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
+  on GitHub; the
   strings are in the workflows and `apps/pr-report-core/src/labels.mts`.
   Change them everywhere or nowhere.
 - **A tree already checked is not checked again** — after a rebase that
@@ -335,7 +336,11 @@ ingest the feed). Outside reports come through private vulnerability reporting
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
   branch's one commit; anything larger is a question. `main` moving under the
-  branch is not the session's to fix: ask before rebasing.
+  branch is not the session's to fix: ask before rebasing, or ask for the
+  `auto-rebase` label, and `unblock-prs` keeps the branch on `main` itself. So
+  the branch may move under the session: an amend whose `--force-with-lease`
+  push is refused has lost nothing — `git fetch`, then
+  `git rebase --onto origin/<branch> <the head you knew>`, and push again.
 - **Several pull requests from one session are stacked** (`main <- A <- B`),
   likeliest merge first, unless the paths are plainly disjoint: B is opened
   with `pnpm run open-pr -- --base <A's branch>`, so its diff is its own layer,

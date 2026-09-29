@@ -29,7 +29,9 @@ import {
   describeCommandFailure,
   describeConflict,
 } from './set-aside-detail.mjs';
+import { withSkip } from './skips.mjs';
 import {
+  autoRebaseTargets,
   restackable,
   retargetedFrom,
   retargetedLayers,
@@ -41,6 +43,7 @@ import {
   type PullRequest,
   type RebaseFailure,
   type RetargetedLayer,
+  type SkipRecords,
   type StackedOn,
 } from './types.mjs';
 import { isSafeRefName, lastLines, log, sh, stopRequested } from './util.mjs';
@@ -406,6 +409,134 @@ export const restackRetargeted = async (
   }
 
   return mut_moved;
+};
+
+/**
+ * Rebases the pull requests that asked for it and are paused by `skip-ci`
+ * and behind the default branch onto it, carrying the layers stacked on each
+ * along, so that a stack waiting for review or for its turn keeps a diff of
+ * its own changes only. The push runs no checks: the label skips every workflow.
+ * `stack.mts` says which pull requests are eligible.
+ *
+ * A rebase that conflicts, or a push that is refused, is a set-aside like any
+ * other and is returned as one, tied to the head and the base it was tried at.
+ * Resolves to those records and whether any branch moved — by this, or by
+ * someone else under it — since either makes the survey stale.
+ */
+export const restackBehind = async (
+  pullRequests: readonly PullRequest[],
+  defaultBranch: string,
+  context: Readonly<{
+    baseSha: string;
+    skipped: SkipRecords;
+    dryRun: boolean;
+  }>,
+): Promise<Readonly<{ skipped: SkipRecords; moved: boolean }>> => {
+  const targets = autoRebaseTargets(
+    pullRequests,
+    defaultBranch,
+    context.baseSha,
+    context.skipped,
+  );
+
+  if (!Arr.isNonEmpty(targets)) {
+    return { skipped: context.skipped, moved: false };
+  }
+
+  const fetched = await git(
+    Arr.toUnshifted('git fetch --quiet origin')(
+      Arr.toUnshifted(defaultBranch)(targets.map((pr) => pr.headRefName)).map(
+        sh,
+      ),
+    ).join(' '),
+  );
+
+  if (Result.isErr(fetched)) {
+    log(`Cannot fetch to see what is behind: ${lastLines(fetched.value, 2)}`);
+
+    return { skipped: context.skipped, moved: false };
+  }
+
+  const stackParents = stackParentsOf(pullRequests, defaultBranch);
+
+  let mut_skipped = context.skipped;
+
+  let mut_moved = false;
+
+  for (const pr of targets) {
+    if (stopRequested()) {
+      break;
+    }
+
+    // Ancestry rather than `mergeStateStatus`: `skip-ci` holds that at
+    // `BLOCKED` whether or not the branch is behind.
+    const upToDate = await git(
+      `git merge-base --is-ancestor ${sh(`origin/${defaultBranch}`)} ${sh(pr.headRefOid)}`,
+    );
+
+    if (Result.isOk(upToDate)) {
+      continue;
+    }
+
+    if (context.dryRun) {
+      log(`Would rebase #${pr.number} onto ${defaultBranch}; it is behind.`);
+
+      continue;
+    }
+
+    const rebased = await rebaseAndPush(pr, {
+      onto: `origin/${defaultBranch}`,
+      fetch: [defaultBranch],
+      upstream: undefined,
+    });
+
+    if (Result.isErr(rebased)) {
+      log(
+        `#${pr.number}: behind ${defaultBranch}, and not rebased — ${rebased.value.detail}`,
+      );
+
+      mut_skipped = withSkip(mut_skipped, {
+        number: pr.number,
+        headSha: pr.headRefOid,
+        baseSha: context.baseSha,
+        reason: rebased.value.reason,
+        detail: rebased.value.detail,
+        ...(rebased.value.output === undefined
+          ? {}
+          : { output: rebased.value.output }),
+      });
+
+      continue;
+    }
+
+    if (rebased.value.kind === 'moved') {
+      mut_moved = true;
+
+      continue;
+    }
+
+    const { head } = rebased.value;
+
+    if (head === pr.headRefOid) {
+      continue;
+    }
+
+    mut_moved = true;
+
+    log(
+      `#${pr.number}: was behind ${defaultBranch}; rebased at ${head.slice(0, 10)}.`,
+    );
+
+    await restack(
+      pr,
+      head,
+      stackDescendants(stackParents, pr.number).flatMap((number) =>
+        pullRequests.filter((layer) => layer.number === number),
+      ),
+    );
+  }
+
+  return { skipped: mut_skipped, moved: mut_moved };
 };
 
 /**

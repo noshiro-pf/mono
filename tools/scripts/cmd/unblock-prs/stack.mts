@@ -44,12 +44,14 @@
  */
 
 import { findStackParents } from 'pr-report-core';
-import { isMergeQueued } from './labels.mjs';
+import { isMergeQueued, isSkipCiLabelled, wantsAutoRebase } from './labels.mjs';
+import { skipStillApplies } from './skips.mjs';
 import {
   type Classification,
   type NativeStackEntry,
   type PullRequest,
   type RetargetedLayer,
+  type SkipRecord,
   type StackedOn,
   type TimelineEvent,
   type TriageContext,
@@ -118,6 +120,35 @@ export const restackable = (pr: PullRequest): string | undefined =>
       : !isSafeRefName(pr.headRefName)
         ? (`branch name ${JSON.stringify(pr.headRefName)} will not be passed to a shell` as const)
         : undefined;
+
+/**
+ * The pull requests this script rebases onto the default branch ahead of any
+ * turn: the bottom layer of a stack, or a lone pull request, that asked for it
+ * (`wantsAutoRebase`) and is paused by `skip-ci`, so the push costs no
+ * matrix. Whether it is actually behind is for the caller to ask
+ * git: `skip-ci` leaves the merge state at `BLOCKED` whatever the branch is.
+ * The version pull request is the release workflow's, and one this script
+ * already gave up on stays given up on until its head or the base moves.
+ */
+export const autoRebaseTargets = (
+  pullRequests: readonly PullRequest[],
+  defaultBranch: string,
+  baseSha: string,
+  skipped: ReadonlyMap<number, SkipRecord>,
+): readonly PullRequest[] =>
+  pullRequests.filter((pr) => {
+    const skip = skipped.get(pr.number);
+
+    return (
+      pr.baseRefName === defaultBranch &&
+      !pr.isDraft &&
+      wantsAutoRebase(pr) &&
+      isSkipCiLabelled(pr) &&
+      !isVersionPullRequest(pr, defaultBranch) &&
+      restackable(pr) === undefined &&
+      (skip === undefined || !skipStillApplies(skip, pr, baseSha))
+    );
+  });
 
 /** Which open pull request each stacked one is on: child → parent. */
 export const stackParentsOf = (

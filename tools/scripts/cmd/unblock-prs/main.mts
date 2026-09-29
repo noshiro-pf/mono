@@ -12,7 +12,7 @@ import {
   viewPullRequest,
   writeSetAsideCommentOn,
 } from './github.mjs';
-import { isMergeQueued } from './labels.mjs';
+import { wantsAutoRebase } from './labels.mjs';
 import { HELP, parseOptions, type Options } from './options.mjs';
 import {
   idleWaitSec,
@@ -20,7 +20,12 @@ import {
   observeSurvey,
   surveyFingerprint,
 } from './quiet.mjs';
-import { advance, armOnPick, restackRetargeted } from './rebase.mjs';
+import {
+  advance,
+  armOnPick,
+  restackBehind,
+  restackRetargeted,
+} from './rebase.mjs';
 import {
   firstInReleaseOrder,
   pauseAllBut,
@@ -92,6 +97,11 @@ import { watch } from './watch.mjs';
  *    rebase is not one of those: someone else — the skill, or a person — is
  *    moving it, so nothing is recorded and the cycle surveys again rather
  *    than start a second matrix on the next candidate.
+ *    When there is no candidate and nothing in flight, a pull request paused
+ *    by `skip-ci` and labelled `auto-rebase` or `merge-queued` that is behind
+ *    is rebased onto the tip instead, with its layers — under the label the
+ *    push runs no checks, and it keeps the diff under review its own. Anything
+ *    that moved sends the cycle back to the survey.
  * 4. Poll the rebased pull request until it merges, or until something says
  *    it will not: a required check failed, auto-merge was switched off, the
  *    `skip-ci` label went on, the branch was pushed by someone else, or every
@@ -133,7 +143,7 @@ import { watch } from './watch.mjs';
  *
  * ## The order, and `skip-ci`
  *
- * Four things the pull requests themselves declare shape that loop.
+ * Five things the pull requests themselves declare shape that loop.
  *
  * - **A base that is another open pull request's branch** stacks the pull
  *   request on that one: it is not picked while that one is open, exactly as
@@ -168,6 +178,9 @@ import { watch } from './watch.mjs';
  *   either: taking `skip-ci` off, once the release workflow has rebuilt it on
  *   the current tip, is all it is ever given, and it is picked last so that a
  *   queued change goes into the release rather than after it.
+ * - **The `auto-rebase` label** asks for a pull request paused by `skip-ci`
+ *   to be kept on the tip while it waits, as a queued one is (step 3). It is
+ *   opt-in so that a branch left to sleep is never moved for want of a label.
  *
  * Releasing one is as far as it goes. From there it is an ordinary queued
  * pull request, and if its checks fail it is set aside like any other — with
@@ -295,7 +308,8 @@ const announceSetAside = async (
 };
 
 /**
- * Reads this account's set-aside comments on the queued pull requests and on
+ * Reads this account's set-aside comments on the pull requests that are queued or
+ * ask for `auto-rebase`, and on
  * any other this run holds a record for, and settles the records with them
  * (`settleSkips`): a comment whose state has ended, or whose retry box a
  * person ticked, is rewritten as resolved — not under `--dry-run` — and one
@@ -311,7 +325,7 @@ const settleWithComments = async (
 ): Promise<SkipRecords> => {
   const read = await readSetAsideComments(
     pullRequests
-      .filter((pr) => isMergeQueued(pr) || skipped.has(pr.number))
+      .filter((pr) => wantsAutoRebase(pr) || skipped.has(pr.number))
       .map((pr) => pr.number),
   );
 
@@ -530,6 +544,22 @@ const runCycle = async (
       next: ended.outcome === 'stopped' ? 'stop' : 'survey',
       settled: skipped,
     };
+  }
+
+  // Only when the queue has nothing to do: `main` is about to move again
+  // otherwise, and a push now would be undone by the next merge.
+  if (Arr.isEmpty(triaged.candidates)) {
+    const behind = await restackBehind(pullRequests, defaultBranch, {
+      baseSha,
+      skipped: mut_skipped,
+      dryRun: options.dryRun,
+    });
+
+    mut_skipped = behind.skipped;
+
+    if (behind.moved) {
+      return { state: state(mut_skipped), next: 'survey', settled: skipped };
+    }
   }
 
   if (options.dryRun) {

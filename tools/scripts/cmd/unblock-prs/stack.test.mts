@@ -1,6 +1,7 @@
 // cspell:ignore retarget retargeted
 
 import {
+  autoRebaseTargets,
   nativeStackNote,
   restackable,
   retargetedFrom,
@@ -11,6 +12,7 @@ import {
 } from './stack.mjs';
 import {
   type PullRequest,
+  type SkipRecord,
   type TimelineEvent,
   type TriageContext,
 } from './types.mjs';
@@ -297,6 +299,100 @@ describe(retargetedLayers, () => {
           pullRequest({ number: 3, headRefName: 'changeset-release/main' }),
         ],
         'main',
+      ),
+      [],
+    );
+  });
+});
+
+const labelled = (...names: readonly string[]): PullRequest['labels'] =>
+  names.map((name) => ({ name }));
+
+const targets = (
+  pullRequests: readonly PullRequest[],
+  skipped: ReadonlyMap<number, SkipRecord> = new Map(),
+): readonly number[] =>
+  autoRebaseTargets(pullRequests, 'main', 'b'.repeat(40), skipped).map(
+    (pr) => pr.number,
+  );
+
+describe(autoRebaseTargets, () => {
+  test('takes a paused pull request labelled auto-rebase, and a paused queued one', () => {
+    assert.deepStrictEqual(
+      targets([
+        pullRequest({ number: 1, labels: labelled('skip-ci', 'auto-rebase') }),
+        pullRequest({ number: 2, labels: labelled('skip-ci', 'merge-queued') }),
+      ]),
+      [1, 2],
+    );
+  });
+
+  test('leaves a paused pull request that asked for neither', () => {
+    assert.deepStrictEqual(
+      targets([pullRequest({ number: 1, labels: labelled('skip-ci') })]),
+      [],
+    );
+  });
+
+  test('leaves one that skip-ci is not on, since a push would run the matrix', () => {
+    assert.deepStrictEqual(
+      targets([
+        pullRequest({ number: 1, labels: labelled('auto-rebase') }),
+        pullRequest({ number: 2, labels: labelled('merge-queued') }),
+      ]),
+      [],
+    );
+  });
+
+  test('leaves a draft, a layer, a fork and the version pull request', () => {
+    assert.deepStrictEqual(
+      targets([
+        pullRequest({
+          number: 1,
+          isDraft: true,
+          labels: labelled('skip-ci', 'auto-rebase'),
+        }),
+        pullRequest({
+          number: 2,
+          baseRefName: 'feature/1',
+          labels: labelled('skip-ci', 'auto-rebase'),
+        }),
+        pullRequest({
+          number: 3,
+          isCrossRepository: true,
+          labels: labelled('skip-ci', 'auto-rebase'),
+        }),
+        pullRequest({
+          number: 4,
+          headRefName: 'changeset-release/main',
+          labels: labelled('skip-ci', 'merge-queued'),
+        }),
+      ]),
+      [],
+    );
+  });
+
+  test('leaves one this script gave up on at this head and base', () => {
+    const given = pullRequest({
+      number: 1,
+      labels: labelled('skip-ci', 'auto-rebase'),
+    });
+
+    assert.deepStrictEqual(
+      targets(
+        [given],
+        new Map([
+          [
+            1,
+            {
+              number: 1,
+              headSha: given.headRefOid,
+              baseSha: 'b'.repeat(40),
+              reason: 'rebase-failed',
+              detail: 'conflict',
+            },
+          ],
+        ]),
       ),
       [],
     );

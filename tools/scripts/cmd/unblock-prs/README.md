@@ -25,11 +25,12 @@ them.
 ちた場合で、「4a」を参照）。rebase は使い捨ての `git worktree` の中で行うので、
 実行元のチェックアウトの作業ツリーには触れません。
 
-### PR 側で宣言する4つのこと
+### PR 側で宣言する5つのこと
 
 **`merge-queued` ラベル** が対象範囲そのものです。付いていない PR は何も言わず
-に無視します（例外は1つだけで、下の層がマージされて `main` に付け替えられた層の
-積み直しです。下の「base」の項を参照）。付いていて、かつ動かせない PR（draft / base が `main` でも open な
+に無視します（例外は2つで、下の層がマージされて `main` に付け替えられた層の
+積み直し（下の「base」の項）と、`auto-rebase` の付いた PR を `main` に追従させる
+こと（下の「`auto-rebase`」の項）です）。付いていて、かつ動かせない PR（draft / base が `main` でも open な
 PR のブランチでもない / 手で auto-merge を切られた）は理由をログに出します —
 ラベルは明示的な依頼なので、答えが「できない」なら黙っていてはいけないから
 です。
@@ -124,8 +125,23 @@ head> <古い head>` で各層を自分のコミットだけ積み直して push
 PR — から行います。public repository なので、コメントではなく write 権限の要る
 ラベルであることにも意味があります。
 
+**`auto-rebase` ラベル** は「レビューや順番を待っている間も `main` に追従させ
+てほしい」という宣言です。差分を自分の変更だけにしておき、レビューしやすくする
+ためのものです（「3a」）。
+
+- `skip-ci` と一緒のときだけ効きます。`skip-ci` が付いていれば push しても CI
+  は走りません。
+- `merge-queued` の付いた PR も同じ扱いです。pick されない間（`Merge-After`
+  やレビュー待ち）も、`skip-ci` が付いていれば `main` に追従させます。
+- queue に動かす候補が無いときだけ動きます。`main` がすぐまた動くときに push
+  しても無駄になるからです。
+- stack の一番下の層に付ければ足ります。上の層はまとめて運ばれます。
+- 印を付けた PR だけが対象です（opt-in）。寝かせてあるブランチを付け忘れで動
+  かしてしまわないためです。レビューを頼む直前に付ければ足ります。
+
 **`skip-ci` は対象範囲の判定には使いません。** キューに入った PR を一時停止さ
-せるだけで、順番が来たら外すのがこのスクリプトの仕事です。
+せるだけで、順番が来たら外すのがこのスクリプトの仕事です。「3a」で `main` に追
+従させるかどうかの条件には使います（push しても CI が走らないことの保証として）。
 
 ### 解放されている PR は1本まで
 
@@ -333,6 +349,33 @@ survey と違う / lease 負けで push が拒否され、remote の head が変
 直します。次の候補を rebase すると、相手が起動するマトリクスの横でもう1本走ら
 せることになるからです。`/unblock-prs` skill はこのスクリプトと並行して動く前
 提で書かれています。
+
+#### 3a. 待っている PR を main に積み直す
+
+「3」で動かす候補が無いとき（進行中の PR も、pick する候補も無いとき）だけ、
+次の PR を `main` へ rebase します。`main` がすぐまた動くときに push しても無
+駄になるからです。レビュー中や順番待ちの PR の差分を、自分の変更だけにしてお
+くためのものです。
+
+- 対象: **`skip-ci` が付いていて**（push しても CI が走らない）、**
+  `auto-rebase` か `merge-queued` のどちらかが付いている** PR。そのうち open、
+  draft でない、同じリポジトリのブランチ、base が `main`、version PR ではない、
+  見送りの記録が今の head と `main` に対して残っていないもの。
+  `merge-queued` の PR がここまで来るのは、`Merge-After` やレビュー待ちなどで
+  pick されないときです。pick される前に rebase しておいても、`skip-ci` が付
+  いていれば損はありません。
+- `skip-ci` が付いていると merge state は `BLOCKED` のままなので、遅れている
+  かどうかは `BEHIND` / `DIRTY` ではなく、`git merge-base --is-ancestor` で
+  `origin/main` が head の祖先かどうかで判断します。
+- 普通の `git rebase origin/main` を試し、`--force-with-lease`（survey が見た
+  head を明示）で push します。その上の層は「3」の2と同じ `restack()` で積み直
+  します。衝突や push の拒否は見送りとして記録し、comment で知らせます（head
+  か `main` が動くか、retry の欄にチェックが入るまで試し直しません）。
+- 何か動いたら、triage の前に survey をやり直します。
+
+**`auto-rebase` ラベル**は stack の一番下の層に付ければ足ります。上の層はまと
+めて運ばれます。付いていない PR は、寝かせてあるブランチも含めて、この節では
+動かしません。
 
 #### 4. watch
 
@@ -582,12 +625,13 @@ review, or fix a failing check (the skill's job — except a failure that is onl
 a fixer's diff, see "4a"). The rebase happens in a throwaway `git worktree`, so
 the checkout it runs from is never touched.
 
-### The four things a pull request declares
+### The five things a pull request declares
 
 **The `merge-queued` label is the scope rule.** A pull request without it is
-passed over in silence — with one exception, a layer GitHub moved onto `main`
-when the layer below it merged, which is rebased off that layer's commits
-whatever its labels (see "the base" below). One that has it and cannot be acted on — a draft, a
+passed over in silence — with two exceptions: a layer GitHub moved onto
+`main` when the layer below it merged, which is rebased off that layer's
+commits whatever its labels (see "the base" below), and a pull request
+labelled `auto-rebase`, which is kept on `main` (see "`auto-rebase`" below). One that has it and cannot be acted on — a draft, a
 base that is neither `main` nor an open pull request's branch, auto-merge
 switched off by hand — is reported, because the label asked for something and
 the answer is no.
@@ -694,8 +738,23 @@ the declaration is made from the other side, by the pull request the release is
 waiting for. A label rather than a comment for a second reason: this repository
 is public, and a label needs write access while a comment does not.
 
+**The `auto-rebase` label asks for the pull request to be kept on `main`
+while it waits** for review or for its turn, so that its diff stays its own
+changes and easy to review ("3a").
+
+- It works only together with `skip-ci`, under which a push runs no checks.
+- A `merge-queued` pull request is treated the same: while it cannot be picked
+  (waiting on a `Merge-After` or its review), it is kept on `main` as long as
+  `skip-ci` is on.
+- It acts only when the queue has nothing to do, because a push while `main`
+  is about to move again is wasted.
+- It goes on the bottom layer of a stack; the layers above are carried along.
+- It is opt-in, so that a branch left to sleep is never moved for want of a
+  label. Putting it on just before asking for a review is enough.
+
 **`skip-ci` is not a scope rule.** It pauses a queued pull request, and taking
-it off when its turn comes is the job.
+it off when its turn comes is the job. It is a condition of "3a", as the
+guarantee that the push runs no checks.
 
 ### One released pull request at a time
 
@@ -921,6 +980,33 @@ is recorded, and the cycle surveys again rather than moving on — rebasing the
 next candidate would start a second matrix beside the one the other writer is
 about to start. The `/unblock-prs` skill is written to run alongside this
 script.
+
+#### 3a. Keep waiting pull requests on the tip
+
+Only when step 3 has nothing to act on — nothing in flight and no candidate to
+pick — rebase the following onto `main`, because a push while `main` is about
+to move again is wasted. It keeps the diff of a pull request under review, or
+waiting its turn, to its own changes.
+
+- Eligible: **labelled `skip-ci`** (so the push runs no checks) **and either
+  `auto-rebase` or `merge-queued`**; open, not a draft, a branch of this
+  repository, based on `main`, not the version pull request, and with no
+  set-aside record standing for its current head and `main`. A queued one gets
+  here only when it cannot be picked — waiting on a `Merge-After` or its
+  review — and rebasing it early under `skip-ci` costs nothing.
+- `skip-ci` leaves the merge state at `BLOCKED`, so whether it is behind is
+  read from git, not from `BEHIND` / `DIRTY`: `git merge-base --is-ancestor`
+  says whether `origin/main` is in its head.
+- A plain `git rebase origin/main`, pushed with `--force-with-lease` against
+  the head the survey saw; the layers above are carried by `restack()`, as in
+  step 2 of "3". A conflict or a refused push is a set-aside, announced in its
+  comment and not tried again until the head or `main` moves or the retry box
+  is ticked.
+- If anything moved, survey again before triage.
+
+**The `auto-rebase` label** goes on the bottom layer of a stack; the layers
+above are carried along. A pull request with neither label — a branch left to
+sleep included — is not moved by this step.
 
 #### 4. Watch
 
