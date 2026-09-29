@@ -32,27 +32,67 @@ export type OpenedWorkspaces = Readonly<{
  * A split view last seen in a pinned tab comes back pinned. Chrome puts pinned
  * tabs at the front of the strip itself, so the rest arrive in the order of the
  * list — which is the order their `Alt+N` are in.
+ *
+ * `frontId` is the one to bring to the front when it is among those opened;
+ * the rest open behind it. Without one, every tab opens behind the current one.
  */
 export const openEveryWorkspaceInTabs = async (
   entries: readonly WorkspaceEntry[],
+  frontId?: string,
 ): Promise<OpenedWorkspaces> => {
-  const alreadyOpen = await openWorkspaceIds();
-
-  const missing = entries.filter((entry) => !alreadyOpen.has(entry.id));
+  const tabs = workspaceTabsToOpen(entries, await openWorkspaceIds(), frontId);
 
   // One after another rather than all at once, so that the tabs land in the
   // order of the list rather than in the order the browser got round to them.
-  await missing.reduce<Promise<void>>(async (previous, entry) => {
-    await previous;
+  await tabs.reduce<Promise<void>>(
+    async (previous, { workspaceId, pinned, active }) => {
+      await previous;
 
-    await openWorkspaceTab(entry.id, entry.pinned, false);
-  }, Promise.resolve());
+      await openWorkspaceTab(workspaceId, pinned, active);
+    },
+    Promise.resolve(),
+  );
 
   return {
-    opened: missing.length,
-    alreadyOpen: entries.length - missing.length,
+    opened: tabs.length,
+    alreadyOpen: entries.length - tabs.length,
   } as const;
 };
+
+/**
+ * Whether any saved split view is open in a tab now, tabs that have gone not
+ * counted. None is what an extension update or a browser restart that did not
+ * restore the tabs leaves behind.
+ */
+export const isAnyWorkspaceOpen = async (): Promise<boolean> => {
+  const openIds = await openWorkspaceIds();
+
+  return openIds.size > 0;
+};
+
+/** One tab `openEveryWorkspaceInTabs` is about to open. */
+export type WorkspaceTabToOpen = Readonly<{
+  workspaceId: string;
+  pinned: boolean;
+  active: boolean;
+}>;
+
+/**
+ * The tabs opening every split view comes to: the list in its order, less the
+ * ones already open, with `frontId` the one active tab.
+ */
+export const workspaceTabsToOpen = (
+  entries: readonly WorkspaceEntry[],
+  alreadyOpen: ReadonlySet<string>,
+  frontId: string | undefined,
+): readonly WorkspaceTabToOpen[] =>
+  entries
+    .filter((entry) => !alreadyOpen.has(entry.id))
+    .map((entry) => ({
+      workspaceId: entry.id,
+      pinned: entry.pinned,
+      active: entry.id === frontId,
+    }));
 
 export const describeOpenedWorkspaces = ({
   opened,

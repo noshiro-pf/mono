@@ -107,7 +107,7 @@ dropped, a blank `name` falls back to the id, and an `activeId` naming no entry
 becomes the first entry's id.
 
 Writers: every list edit — create, rename, reorder, delete, import — and a
-switch, which sets `activeId`. `saveWorkspaceRegistry` writes the whole record
+switch or a tab being shown, which set `activeId`. `saveWorkspaceRegistry` writes the whole record
 each time; see [Keeping two tabs in step](#keeping-two-tabs-in-step).
 
 ### `workspace:<id>` — one split view
@@ -214,10 +214,10 @@ a reload.
 
 ## `chrome.storage.session`
 
-| key                 | holds                                                                                                                    |
-| :------------------ | :----------------------------------------------------------------------------------------------------------------------- |
-| `splitViewTabId`    | the tab id of the split view, written by the page and read by the service worker so that the toolbar button can focus it |
-| `splitViewEventLog` | the diagnostics ring buffer — **only in `pnpm run build:dev`**, and capped at 60 entries                                 |
+| key                 | holds                                                                                                                               |
+| :------------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `splitViewTabId`    | the tab id of the split view last shown, written by the page and read by the service worker so that the toolbar button can focus it |
+| `splitViewEventLog` | the diagnostics ring buffer — **only in `pnpm run build:dev`**, and capped at 60 entries                                            |
 
 Session storage, because a tab id is worth exactly as much as the browser
 session it belongs to. The alternative, `chrome.tabs.query({ url })`, would need
@@ -270,7 +270,7 @@ and means "the one I had last" — the registry's `activeId`.
 
 ## Which split view a tab shows
 
-`resolveWorkspace(fromUrl, now)` in `src/state/registry.mts`, on load:
+`resolveWorkspace(fromUrl, now, activate)` in `src/state/registry.mts`, on load:
 
 1. Read `workspaceRegistry`. If there is none, or it has no entries, build one
    from the `workspace:*` keys that are in storage (see
@@ -282,8 +282,9 @@ and means "the one I had last" — the registry's `activeId`.
    id is given a fresh `crypto.randomUUID()` first, so it lands here.
 3. If the list is still empty, create one entry with the id `default`.
 4. The workspace to show is the URL's id, or `activeId`, or the first entry.
-5. Mark it active, and write the list back **only if any of the above changed
-   it**.
+5. Mark it active if the tab is visible (`activate`) — a tab loading behind
+   another takes its turn when it is shown — and write the list back **only if
+   any of the above changed it**.
 
 Then the layout: the one the URL describes, if it does; otherwise
 `loadWorkspaceState(id)`, or a fresh 2×2 grid if storage has nothing under that

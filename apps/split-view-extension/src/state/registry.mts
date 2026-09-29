@@ -299,6 +299,12 @@ export const saveWorkspaceRegistry = async (
  * named by `fromUrl.name` when the URL gave one; an entry already on the list
  * keeps its name, which is the list's to change and not a link's. The list is
  * written back only when this changed it.
+ *
+ * `activate` is whether the workspace becomes the list's active one. A tab
+ * loading behind the one on screen — every tab but one when the split views
+ * are all opened at once — passes `false`, so that "where I was last" stays
+ * the one being looked at rather than whichever tab finished loading last. It
+ * takes its turn when it is shown.
  */
 export const resolveWorkspace = async (
   fromUrl: Readonly<{
@@ -306,6 +312,7 @@ export const resolveWorkspace = async (
     name: string | undefined;
   }>,
   now: number,
+  activate: boolean,
 ): Promise<Readonly<{ registry: WorkspaceRegistry; workspaceId: string }>> => {
   const loaded = await loadWorkspaceRegistry();
 
@@ -338,7 +345,9 @@ export const resolveWorkspace = async (
       ? withFirstEntry.activeId
       : (withFirstEntry.entries[0]?.id ?? defaultWorkspaceId));
 
-  const registry = activateWorkspaceEntry(withFirstEntry, workspaceId);
+  const registry = activate
+    ? activateWorkspaceEntry(withFirstEntry, workspaceId)
+    : withFirstEntry;
 
   if (registry !== loaded) {
     await saveWorkspaceRegistry(registry);

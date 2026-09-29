@@ -57,7 +57,9 @@ It is installed from source, as an unpacked extension. You need
 
 To update later: `git pull`, run the last two commands of step 1 again, and
 press the reload button on the extension's card in `chrome://extensions`. Your
-split views are kept.
+split views are kept, but Chrome closes their tabs when it reloads or updates an
+extension; click the toolbar button and every one of them opens again, each in
+a tab of its own.
 
 ## Using it
 
@@ -74,7 +76,7 @@ split views are kept.
 | open a GitHub pull request in one    | **⧉ Split view** on its page — see [GitHub pull requests](#github-pull-requests) |
 | switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                 |
 | rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file      |
-| reopen everything after a restart    | **Edit** → **↗ Open all**                                                        |
+| reopen everything after an update    | the toolbar button, while no split view is open — or **Edit** → **↗ Open all**   |
 | get out of a pane that will not work | its "open in a new tab" button                                                   |
 
 On a narrow pane, the less common buttons move into its `⋯` menu.
@@ -106,7 +108,10 @@ most the shortest reach. The tab's title is that number and the title of the
 page in the top-left pane, so a tab strip of split views reads like one of
 ordinary tabs; the name stands in while that pane has no page. **↗ Open all**
 puts every saved split view in a tab of its own, leaving the ones already open
-alone, and a split view that was in a pinned tab comes back pinned.
+alone, and a split view that was in a pinned tab comes back pinned. The toolbar
+button does the same when no split view is open at all — which is what an
+update of the extension, or a restart that did not restore the tabs, leaves —
+and brings the one you looked at last to the front.
 
 ### Open from a URL
 
