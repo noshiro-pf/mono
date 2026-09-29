@@ -23,7 +23,7 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   kind: Kind;
 
   // reactive dependency tree structure
-  depth: ObservableKind extends 'root' ? 0 : number;
+  depth: Kind extends 'root' ? 0 : number;
   addChild: <B>(child: ChildObservable<B>) => void;
 
   // state
@@ -192,6 +192,16 @@ export type WrapInitialized<A extends readonly unknown[]> = Readonly<{
 expectType<keyof AsyncChildObservable<unknown>, 'addDescendant'>('>=');
 
 expectType<keyof RootObservable<unknown>, 'addDescendant'>('>=');
+
+expectType<RootObservable<unknown>['depth'], 0>('=');
+
+expectType<InitializedRootObservable<unknown>['depth'], 0>('=');
+
+expectType<SyncChildObservable<unknown>['depth'], number>('=');
+
+expectType<AsyncChildObservable<unknown>['depth'], number>('=');
+
+expectType<ObservableBase<unknown>['depth'], number>('=');
 
 expectType<Unwrap<Wrap<readonly [1, 2, 3]>>, readonly [1, 2, 3]>('=');
 
