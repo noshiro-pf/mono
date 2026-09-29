@@ -129,9 +129,9 @@ const stripCrossOriginAttribute = (): VitePlugin => ({
 
 /**
  * The build of everything that runs as an ES module: the split-view page and
- * the service worker. The content script is a separate build — a content
+ * the service worker. The two content scripts are separate builds — a content
  * script cannot be a module, so it needs its own format. See
- * `vite.content.config.mts`.
+ * `content-script.config.mts`.
  *
  * `public/manifest.json` is copied by Vite's `publicDir` handling and given the
  * `package.json` version on the way, so `dist/` is what `chrome://extensions`
