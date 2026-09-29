@@ -1,5 +1,11 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.1
+
+### Patch Changes
+
+- be1da31: Update dependencies
+
 ## 4.0.0
 
 ### Major Changes

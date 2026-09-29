@@ -1,5 +1,86 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 5.15.0
+
+### Minor Changes
+
+- 80559d7: Require booleans on both sides of `&&` and `||` in JSX, and stop
+  `unicorn/prefer-logical-operator-over-ternary` from undoing it.
+
+    `ts-restrictions/jsx-boolean-logical-operands` replaces
+    `react/jsx-no-leaked-render`, which is turned off. It checks the operand
+    types: `{a && b}` and `disabled={a || b}` with two booleans pass, and
+    anything else is written as a ternary. `{a && <X />}` becomes
+    `{a ? <X /> : undefined}` as a child, and `v={a && x}` becomes
+    `v={a ? x : false}` as an attribute, keeping the exact value. A left
+    operand that is not a boolean (`{count && <X />}`, `{s || 'none'}`) is only
+    reported, because the comparison it stands for is the author's to write. A
+    ternary's branches and the operands of a longer chain count as JSX too; a
+    ternary's test does not.
+
+    `ts-restrictions/prefer-logical-over-boolean-ternary` now follows the same
+    line. In JSX it rewrites `a ? false : b` to `!a && b` only when `b` is a
+    boolean too, instead of never writing `&&` there at all.
+
+    `unicorn/prefer-logical-operator-over-ternary` is turned off. Since
+    eslint-plugin-unicorn v76 it also rewrites boolean-literal branches, with
+    no option to leave them out, and it turns `{a ? false : <X />}` back into
+    `&&` and inverts comparisons that may be `NaN`. What it covered is left to
+    the ts-restrictions rules above, `prefer-optional-chain-over-ternary`, and
+    `no-unneeded-ternary`.
+
+- be1da31: Add `ts-restrictions/prefer-optional-chain-over-ternary`, which writes a
+  ternary that yields `undefined` for a nullish value and an access on it
+  otherwise as the optional chain it spells out:
+  `x == null ? undefined : x.b` → `x?.b`, `x != null ? x.m(1) : undefined` →
+  `x?.m(1)`, `x === undefined ? undefined : x[0]` → `x?.[0]`.
+
+    The check must catch every nullish value, or the chain would short-circuit
+    where the ternary did not. `== null` and `x === null || x === undefined`
+    always do. A single strict check does when the type of `x` rules out the
+    other value: `x === undefined` for `B | undefined`, but not for
+    `B | null | undefined`, `any`, or an unconstrained type parameter.
+    `unicorn/prefer-logical-operator-over-ternary` reports only the loose and
+    paired forms, and offers them as suggestions.
+
+    It leaves a ternary alone where the chain would behave differently: as a
+    callee or a tag (`(x?.f)()` passes `x` as `this`), and under `delete`.
+
+### Patch Changes
+
+- be1da31: Update dependencies
+- f0267fe: Read through `as`, `satisfies`, `!` and `<T>` in the rules on logical
+  operators and ternaries, and fix a wrong fix for parenthesized operands.
+
+    A type wrapper hid a pattern from these rules, or vouched for a type the
+    value did not have. Each now looks at the expression underneath:
+
+    - `ts-restrictions/prefer-logical-over-boolean-ternary`:
+      `a ? (false satisfies boolean) : b` is `!a && b`. `(n as unknown as boolean) ? true : b`
+      is left alone, because `n || b` would yield the number. Two literal
+      branches that a wrapper hides from `no-unneeded-ternary` are written as
+      `a` or `!a`.
+    - `ts-restrictions/prefer-optional-chain-over-ternary`: `undefined`, the
+      checked value, the access and the whole check may be wrapped. A cast
+      cannot rule out the `null` that a strict check leaves.
+    - `ts-restrictions/jsx-boolean-logical-operands`: an operand is judged by
+      the type of its value. A cast to `boolean`, or a non-null assertion, does
+      not make it one.
+    - `ts-restrictions/no-negated-comparison`: `!((a === b) satisfies boolean)` is
+      `a !== b`. A `number` cast to a brand that excludes `NaN` is still treated
+      as possibly `NaN`.
+    - `ts-restrictions/prefer-range-in-number-line-order`: finds a comparison
+      wrapped in `satisfies boolean`, and a value tested written as
+      `(x as number)`.
+    - `ts-restrictions/prefer-ternary`: `(o as T).x = …` and `o!.x = …` assign
+      the same target.
+
+    `prefer-logical-over-boolean-ternary` also dropped the parentheses the
+    source wrote around an operand: `(a || b) ? false : c` became
+    `!a || b && c`, whose meaning is different. It now writes `!(a || b) && c`.
+    `prefer-range-in-number-line-order` reports a message whose parentheses
+    balance.
+
 ## 5.14.0
 
 ### Minor Changes

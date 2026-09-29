@@ -1,5 +1,20 @@
 # algo-app
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [41f401e]
+    - synstate@3.0.5
+    - preact-utils@0.0.6
+    - resize-observer-preact-hooks@0.0.4
+    - tiny-router-observable@0.0.9
+    - ts-utils-additional@0.0.4
+    - better-preact-use-state@1.0.4
+    - synstate-preact-hooks@3.0.5
+    - ts-data-forge@14.7.1
+    - ts-fortress@12.1.3
+
 ## 0.0.5
 
 ### Patch Changes
