@@ -1,41 +1,84 @@
 import { Result } from 'ts-data-forge';
-import { type RelaxedExtract } from 'ts-type-forge';
 import { type LoadedReport } from './load-report.mjs';
-import { asRefreshing, LOADING, merge, type LoadState } from './load-state.mjs';
+import {
+  asRefreshing,
+  LOADING,
+  READY,
+  settle,
+  type LoadStatus,
+} from './load-state.mjs';
 
-describe(merge, () => {
+describe(settle, () => {
   test('shows the first report, and the first failure', () => {
-    assert.deepStrictEqual(
-      merge(LOADING, Result.ok(readAt(10)), 10),
-      ready(10),
-    );
+    assert.deepStrictEqual(settle(LOADING, 0, Result.ok(readAt(10)), 10), {
+      status: READY,
+      report: readAt(10),
+    });
 
-    assert.deepStrictEqual(merge(LOADING, Result.err('refused'), 10), {
-      type: 'failed',
-      message: 'refused',
+    assert.deepStrictEqual(settle(LOADING, 0, Result.err('refused'), 10), {
+      status: { type: 'failed', message: 'refused' },
+      report: undefined,
     });
   });
 
   test('keeps the report on screen when a later read fails', () => {
     assert.deepStrictEqual(
-      merge(asRefreshing(ready(10)), Result.err('rate limit spent'), 20),
-      { ...ready(10), pollError: 'rate limit spent' },
+      settle(asRefreshing(READY), 10, Result.err('rate limit spent'), 20),
+      {
+        status: {
+          type: 'ready',
+          pollError: 'rate limit spent',
+          refreshing: false,
+        },
+        report: undefined,
+      },
     );
   });
 
   test('clears the failure once a read succeeds again', () => {
-    assert.deepStrictEqual(
-      merge({ ...ready(10), pollError: 'refused' }, Result.ok(readAt(30)), 30),
-      ready(30),
+    const failing: LoadStatus = {
+      type: 'ready',
+      pollError: 'refused',
+      refreshing: false,
+    } as const;
+
+    assert.deepStrictEqual(settle(failing, 10, Result.ok(readAt(30)), 30), {
+      status: READY,
+      report: readAt(30),
+    });
+  });
+
+  // What the reader writes is only what changed, and a read that brought a
+  // report to a page with nothing else to say leaves the status as it was.
+  test('hands back the status it was given when there is nothing new to say', () => {
+    assert.strictEqual(
+      settle(READY, 10, Result.ok(readAt(20)), 20).status,
+      READY,
     );
   });
 
   test('never lets an older read replace a newer one', () => {
-    const newer = ready(20);
+    assert.deepStrictEqual(settle(READY, 20, Result.ok(readAt(10)), 10), {
+      status: READY,
+      report: undefined,
+    });
 
-    assert.strictEqual(merge(newer, Result.ok(readAt(10)), 10), newer);
+    assert.deepStrictEqual(settle(READY, 20, Result.err('late failure'), 10), {
+      status: READY,
+      report: undefined,
+    });
+  });
+});
 
-    assert.strictEqual(merge(newer, Result.err('late failure'), 10), newer);
+describe(asRefreshing, () => {
+  test('marks a report as being read again, and leaves anything else', () => {
+    assert.deepStrictEqual(asRefreshing(READY), {
+      type: 'ready',
+      pollError: undefined,
+      refreshing: true,
+    });
+
+    assert.strictEqual(asRefreshing(LOADING), LOADING);
   });
 });
 
@@ -58,14 +101,4 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     cycles: [],
     merged: [],
     issues: { items: [], totalCount: 0 },
-  }) as const;
-
-const ready = (
-  readAtEpochMs: number,
-): RelaxedExtract<LoadState, Readonly<{ type: 'ready' }>> =>
-  ({
-    type: 'ready',
-    report: readAt(readAtEpochMs),
-    pollError: undefined,
-    refreshing: false,
   }) as const;

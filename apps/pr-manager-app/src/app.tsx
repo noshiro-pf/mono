@@ -1,5 +1,4 @@
 import { memoNamed } from 'preact-utils';
-import { useObservableValue } from 'synstate-preact-hooks';
 import {
   ExternalLink,
   LoadStateView,
@@ -9,7 +8,7 @@ import {
   ViewSettings,
 } from './components/index.mjs';
 import { REPORT_SOURCE, repositoryUrl } from './constants.mjs';
-import { reader, tokenStore } from './store/index.mjs';
+import { reader, readerSignals, tokenSignals } from './store/index.mjs';
 
 /**
  * GitHub Pull Requests Manager.
@@ -27,14 +26,14 @@ import { reader, tokenStore } from './store/index.mjs';
  * `store/reader.mts`; this only draws what the store holds.
  */
 export const App = memoNamed('App', () => {
-  const state = useObservableValue(reader.loadState);
+  const loadStatus = readerSignals.loadStatus.value;
 
-  const token = useObservableValue(tokenStore.token);
+  const token = tokenSignals.token.value;
 
   // Outside the JSX: `react/jsx-no-leaked-render` rewrites a `&&` in an
   // attribute into a ternary whose other arm is `null`, and `disabled` does
   // not accept `null`.
-  const refreshing = state.type === 'ready' && state.refreshing;
+  const refreshing = loadStatus.type === 'ready' && loadStatus.refreshing;
 
   const noToken = token === undefined;
 
@@ -51,8 +50,8 @@ export const App = memoNamed('App', () => {
         </div>
 
         <div className={'header-actions'}>
-          {state.type === 'ready' && state.pollError !== undefined ? (
-            <span className={'poll-error'} title={state.pollError}>
+          {loadStatus.type === 'ready' && loadStatus.pollError !== undefined ? (
+            <span className={'poll-error'} title={loadStatus.pollError}>
               {'last refresh failed'}
             </span>
           ) : undefined}
@@ -81,7 +80,7 @@ export const App = memoNamed('App', () => {
           }
         </Notice>
       ) : (
-        <LoadStateView state={state} />
+        <LoadStateView loadStatus={loadStatus} />
       )}
     </main>
   );
