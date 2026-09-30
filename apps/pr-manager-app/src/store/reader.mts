@@ -160,8 +160,10 @@ export const createReader = (deps: ReaderDeps): Reader => {
         read();
       });
 
+    // Nor is there anyone to read the ages to, and coming back moves the
+    // clock at once.
     const clockSubscription = clock
-      .pipe(filter((tick) => tick > 0))
+      .pipe(filter((tick) => tick > 0 && isVisible()))
       .subscribe(() => {
         setNowMs(now());
       });

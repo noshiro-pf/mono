@@ -194,9 +194,11 @@ it. And an older read never replaces a newer one — a poll and a Refresh can
 both be out at once, and whichever answers last is not necessarily the one
 that asked last.
 
-The "read 3 minutes ago" line is measured against a clock of its own that
-ticks every 30 seconds, so a tab that stopped reading does not go on looking
-fresh.
+The "read 3 minutes ago" line, and every other age on the page, is measured
+against a clock of its own that ticks every second while the tab is shown, so
+a tab that stopped reading does not go on looking fresh. The ages are Preact
+signals (`synstate-preact-signals`) bound to their text nodes, so a tick
+rewrites those and renders no component.
 
 An answer for a token that has since been cleared or replaced is dropped, so
 **Clear** empties the page even while a read is still out.

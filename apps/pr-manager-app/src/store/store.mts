@@ -12,6 +12,7 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
+import { toSignal } from 'synstate-preact-signals';
 import { REPORT_SOURCE } from '../constants.mjs';
 import { layoutFromLocation, saveLayout } from '../layout.mjs';
 import { loadReport } from '../load-report.mjs';
@@ -38,6 +39,13 @@ export const reader = createReader({
   isVisible: () => document.visibilityState === 'visible',
   visibilityChange: fromEvent(document, 'visibilitychange'),
 });
+
+/**
+ * `reader.nowMs` as a Preact signal, for the ages on the page. A signal
+ * handed to JSX as a child is bound to its text node, so a tick rewrites
+ * the ages and renders no component (`components/age.tsx`).
+ */
+export const nowMsSignal = toSignal(reader.nowMs);
 
 export const themeStore = createThemeStore({
   initial: themeFromLocation(),

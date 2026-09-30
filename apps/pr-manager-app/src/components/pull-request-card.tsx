@@ -18,8 +18,6 @@ type Props = Readonly<{
   entry: Entry;
   /** The scale every divergence bar in the report is drawn against. */
   scaleMax: number;
-  /** The instant the ages on the card are measured against. */
-  nowMs: number;
 }>;
 
 /**
@@ -34,7 +32,7 @@ type Props = Readonly<{
  */
 export const PullRequestCard = memoNamed<Props>(
   'PullRequestCard',
-  ({ entry, scaleMax, nowMs }) => (
+  ({ entry, scaleMax }) => (
     <article className={'pull-request'}>
       <div className={'pull-request-badges'}>
         <StateBadge isDraft={entry.isDraft} />
@@ -96,8 +94,8 @@ export const PullRequestCard = memoNamed<Props>(
        * and the head commit is when the branch itself last moved.
        */}
       <div className={'pull-request-row'}>
-        <Timestamp iso={entry.headCommittedAt} label={'pushed'} nowMs={nowMs} />
-        <Timestamp iso={entry.updatedAt} label={'updated'} nowMs={nowMs} />
+        <Timestamp iso={entry.headCommittedAt} label={'pushed'} />
+        <Timestamp iso={entry.updatedAt} label={'updated'} />
       </div>
 
       <div className={'pull-request-row'}>

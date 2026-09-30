@@ -29,8 +29,6 @@ import { reader, tokenStore } from './store/index.mjs';
 export const App = memoNamed('App', () => {
   const state = useObservableValue(reader.loadState);
 
-  const nowMs = useObservableValue(reader.nowMs);
-
   const token = useObservableValue(tokenStore.token);
 
   // Outside the JSX: `react/jsx-no-leaked-render` rewrites a `&&` in an
@@ -83,7 +81,7 @@ export const App = memoNamed('App', () => {
           }
         </Notice>
       ) : (
-        <LoadStateView nowMs={nowMs} state={state} />
+        <LoadStateView state={state} />
       )}
     </main>
   );

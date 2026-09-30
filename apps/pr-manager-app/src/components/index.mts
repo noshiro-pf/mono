@@ -1,3 +1,4 @@
+export * from './age.js';
 export * from './auto-merge-badge.js';
 export * from './badge-icon.js';
 export * from './block-column.js';

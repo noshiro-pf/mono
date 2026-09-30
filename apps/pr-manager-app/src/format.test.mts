@@ -9,14 +9,20 @@ describe(describeAge, () => {
     expect(describeAge(noon - 3 * 3_600_000, noon)).toBe('3 hours ago');
 
     expect(describeAge(noon - 2 * 86_400_000, noon)).toBe('2 days ago');
+
+    expect(describeAge(noon - 42_000, noon)).toBe('42 seconds ago');
   });
 
   test('does not write "1 hours"', () => {
     expect(describeAge(noon - 3_600_000, noon)).toBe('1 hour ago');
   });
 
-  test('says "just now" rather than "0 minutes ago"', () => {
-    expect(describeAge(noon - 30_000, noon)).toBe('just now');
+  test('says "just now" rather than "0 seconds ago"', () => {
+    expect(describeAge(noon - 999, noon)).toBe('just now');
+  });
+
+  test('does not write "1 seconds"', () => {
+    expect(describeAge(noon - 1000, noon)).toBe('1 second ago');
   });
 
   // A report written by a clock slightly ahead of the browser's is a report

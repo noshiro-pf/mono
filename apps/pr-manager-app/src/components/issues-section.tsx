@@ -9,7 +9,6 @@ type Props = Readonly<{
   issues: readonly OpenIssue[];
   /** How many are open in all, which the list may be a part of. */
   totalCount: number;
-  nowMs: number;
 }>;
 
 /**
@@ -23,7 +22,7 @@ type Props = Readonly<{
  */
 export const IssuesSection = memoNamed<Props>(
   'IssuesSection',
-  ({ issues, totalCount, nowMs }) => (
+  ({ issues, totalCount }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
         {issues.length < totalCount
@@ -47,11 +46,7 @@ export const IssuesSection = memoNamed<Props>(
               </div>
 
               <div className={'pull-request-row'}>
-                <Timestamp
-                  iso={issue.updatedAt}
-                  label={'updated'}
-                  nowMs={nowMs}
-                />
+                <Timestamp iso={issue.updatedAt} label={'updated'} />
 
                 <span>{`by ${issue.author}`}</span>
 
