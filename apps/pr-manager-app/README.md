@@ -180,7 +180,9 @@ the issues only the body names — a query made only when there are any.
 
 The page reads GitHub **every fifteen seconds while it is on screen**, again
 the moment a hidden tab is brought back, and at once when **Refresh** is
-pressed. A hidden tab reads nothing.
+pressed. A hidden tab reads nothing and has no poll timer running: hiding it
+stops the timer, and bringing it back starts a new one from the read it comes
+back to, so the next read is fifteen seconds after that one.
 
 **The interval is set by the budget.** GraphQL has no conditional request, so
 a read that finds nothing new costs the same as one that finds everything.
