@@ -313,6 +313,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   second time after a person switches it off. Run the local checks first and
   say in the description which ones — while the label is on they are the only
   checks the branch gets. Details in `tools/scripts/cmd/open-pr/README.md`.
+  **Then add `auto-rebase`** (REST `POST /issues/<n>/labels`; on a stack, the
+  bottom layer only), so `unblock-prs` keeps it on `main` while it waits.
 - **A Claude Code session names itself in the description**, on a line of its
   own outside a code fence: `Claude-Session: [<title>](<session URL>)`, the
   title as it reads when the pull request is opened, or the URL alone when the
@@ -336,9 +338,8 @@ ingest the feed). Outside reports come through private vulnerability reporting
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
   branch's one commit; anything larger is a question. `main` moving under the
-  branch is not the session's to fix: ask before rebasing, or ask for the
-  `auto-rebase` label, and `unblock-prs` keeps the branch on `main` itself. So
-  the branch may move under the session: an amend whose `--force-with-lease`
+  branch is `auto-rebase`'s to follow, not the session's: ask before rebasing.
+  So the branch may move under the session: an amend whose `--force-with-lease`
   push is refused has lost nothing — `git fetch`, then
   `git rebase --onto origin/<branch> <the head you knew>`, and push again.
 - **Several pull requests from one session are stacked** (`main <- A <- B`),
