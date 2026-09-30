@@ -128,6 +128,22 @@ describe(iso8601, () => {
     assert.isFalse(strictType.is('2009-02-29'));
   });
 
+  test('strict mode accepts the reduced forms that omit the month or day', () => {
+    const strictType = iso8601({
+      defaultValue: baseDefault,
+      strict: true,
+      strictSeparator: false,
+    });
+
+    assert.isTrue(strictType.is('2009'));
+
+    assert.isTrue(strictType.is('2009-05'));
+
+    assert.isTrue(strictType.is('2009-W01'));
+
+    assert.isFalse(strictType.is('2009-13'));
+  });
+
   test('strictSeparator mode enforces the T delimiter', () => {
     const type = iso8601({
       defaultValue: baseDefault,
@@ -144,10 +160,6 @@ describe(iso8601, () => {
     const result = baseType.validate('not-an-iso-date');
 
     assert.isTrue(Result.isErr(result));
-
-    if (!Result.isErr(result)) {
-      throw new Error('Expected validation failure');
-    }
 
     assert.deepStrictEqual(result.value, [
       {

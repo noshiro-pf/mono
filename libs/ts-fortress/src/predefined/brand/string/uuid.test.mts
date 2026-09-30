@@ -52,10 +52,6 @@ describe(uuid, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (!Result.isErr(result)) {
-      throw new Error('Expected validation failure');
-    }
-
     assert.deepStrictEqual(result.value, [
       {
         path: [],
@@ -91,10 +87,6 @@ describe(uuidV4, () => {
     const result = v4Type.validate(uuidV6Example);
 
     assert.isTrue(Result.isErr(result));
-
-    if (!Result.isErr(result)) {
-      throw new Error('Expected validation failure');
-    }
 
     assert.deepStrictEqual(result.value, [
       {

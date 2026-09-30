@@ -1,4 +1,5 @@
 import { Arr, expectType, Obj } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import type { Intersection, NonEmptyTuple, UnknownRecord } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import { literal } from '../other-types/index.mjs';
@@ -27,7 +28,7 @@ export const mergeRecords = <
   >,
 ): MergeRecordsType<Types> => {
   if (!recordTypes.every(hasRecordInternals)) {
-    throw new Error(
+    panic(
       'Expected a record type but received a non-record type in mergeRecords',
     );
   }
@@ -49,7 +50,7 @@ export const mergeRecords = <
   );
 
   if (estimatedVariantCount > MERGE_RECORDS_MAX_VARIANTS) {
-    throw new Error(
+    panic(
       `mergeRecords would create ${estimatedVariantCount} record variants, exceeding the limit of ${MERGE_RECORDS_MAX_VARIANTS}. ` +
         'This could lead to excessive memory or CPU usage. Consider simplifying the record types or reducing union/intersection nesting.',
     );
@@ -78,6 +79,7 @@ export const mergeRecords = <
       excessProperty,
     });
 
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return merged as MergeRecordsType<Types>;
   }
@@ -88,6 +90,7 @@ export const mergeRecords = <
     (shape) => record(shape, { excessProperty }),
   );
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return union(variants as NonEmptyTuple<Type<UnknownRecord>>, {
     typeName: typeNameFilled,

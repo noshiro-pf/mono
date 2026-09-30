@@ -58,6 +58,7 @@ const uintRangeInclusiveImpl = <Start extends Uint11, End extends Uint11>(
     options?.typeName ?? `uintRangeInclusive(${start}, ${end})`;
 
   const getDefaultValue = memoizeFunction(
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (): T => options?.defaultValue ?? (start as T),
   );
@@ -83,6 +84,7 @@ const uintRangeInclusiveImpl = <Start extends Uint11, End extends Uint11>(
       ]);
     }
 
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return Result.ok(a as T);
   };

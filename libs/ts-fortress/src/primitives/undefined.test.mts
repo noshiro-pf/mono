@@ -1,3 +1,5 @@
+// @sumi-expect-error-file null/no-null-in-type
+// @sumi-expect-error-file null/no-null-literal
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { expectType, Result } from 'ts-data-forge';
 import { undefinedType } from './undefined.mjs';

@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 /* cSpell:disable */
 
 import { expectType, Result } from 'ts-data-forge';
