@@ -83,6 +83,9 @@ export function at<
  * assert.isTrue(year.is(2000));
  * ```
  */
+// A record type with a shape is also a record type: nothing at run time tells
+// these two clauses apart, so they only refine the return type (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function at<
   const R extends UnknownRecord,
   const K extends keyof R & string,

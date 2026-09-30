@@ -35,6 +35,10 @@ export function boundedLengthTuple<
 
 // Only the lower bound is in `StructuralPrefixLength` (`0..10`), so the upper bound is dropped from the
 // result type and only the "at least `min`" guarantee is kept.
+// A length inside the supported range is also a `number`: nothing at run
+// time tells the clauses apart, so the set only refines the return type
+// (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthTuple<Min extends StructuralPrefixLength, A>(
   min: Min,
   max: number,
@@ -49,6 +53,7 @@ export function boundedLengthTuple<Min extends StructuralPrefixLength, A>(
 
 // Only the upper bound is in `StructuralPrefixLength` (`0..10`), so the lower bound is dropped from the
 // result type and only the "at most `max`" guarantee is kept.
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthTuple<Max extends StructuralPrefixLength, A>(
   min: number,
   max: Max,
@@ -62,6 +67,7 @@ export function boundedLengthTuple<Max extends StructuralPrefixLength, A>(
 ): Type<MaxLengthTuple<Max, A>>;
 
 // Neither bound is in `StructuralPrefixLength` (`0..10`), so the result length is left unconstrained.
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthTuple<A>(
   min: number,
   max: number,

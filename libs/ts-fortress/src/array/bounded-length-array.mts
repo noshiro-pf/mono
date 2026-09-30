@@ -41,6 +41,10 @@ export function boundedLengthArray<
 
 // Only the lower bound is in `SupportedLength`, so the upper bound is dropped from
 // the result type and only the "at least `min`" guarantee is kept.
+// A length inside the supported range is also a `number`: nothing at run
+// time tells the clauses apart, so the set only refines the return type
+// (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthArray<Min extends SupportedLength, A>(
   min: Min,
   max: number,
@@ -55,6 +59,7 @@ export function boundedLengthArray<Min extends SupportedLength, A>(
 
 // Only the upper bound is in `SupportedLength`, so the lower bound is dropped from
 // the result type and only the "at most `max`" guarantee is kept.
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthArray<Max extends SupportedLength, A>(
   min: number,
   max: Max,
@@ -68,6 +73,7 @@ export function boundedLengthArray<Max extends SupportedLength, A>(
 ): Type<MaxLengthArray<Max, A>>;
 
 // Neither bound is in `SupportedLength`, so the result length is left unconstrained.
+// @sumi-expect-error functions/no-refinement-overload
 export function boundedLengthArray<A>(
   min: number,
   max: number,

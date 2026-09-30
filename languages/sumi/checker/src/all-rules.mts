@@ -3,7 +3,9 @@ import {
   noMutationWithoutMutPrefix,
   noNullPropagation,
   noOverloadedFunctionExpression,
+  noRefinementOverload,
   noTupleMutatingMethod,
+  restrictCastMutable,
   strictLogicalAssignmentOperands,
 } from './rules/index.mjs';
 
@@ -15,7 +17,9 @@ export const allRules: readonly Rule[] = [
   noMutationWithoutMutPrefix,
   noNullPropagation,
   noOverloadedFunctionExpression,
+  noRefinementOverload,
   noTupleMutatingMethod,
+  restrictCastMutable,
   strictLogicalAssignmentOperands,
 ] as const;
 

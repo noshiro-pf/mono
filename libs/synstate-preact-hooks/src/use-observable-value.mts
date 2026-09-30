@@ -9,6 +9,10 @@ export function useObservableValue<A, B = A>(
 
 export function useObservableValue<A>(observable$: InitializedObservable<A>): A;
 
+// An `InitializedObservable` is also an `Observable`: nothing at run time tells
+// the two one-argument clauses apart, so they only refine the return type
+// (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function useObservableValue<A>(
   observable$: Observable<A>,
 ): A | undefined;
