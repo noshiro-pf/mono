@@ -1,5 +1,5 @@
 import { Arr, Optional, pipe } from 'ts-data-forge';
-import { type Observable } from '../types/index.mjs';
+import type { Observable } from '../types/index.mjs';
 
 export const maxDepth = (parents: readonly Observable<unknown>[]): number =>
   pipe(Arr.maxBy(parents, (p) => p.depth))

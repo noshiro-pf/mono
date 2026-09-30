@@ -1,4 +1,4 @@
-import { type Reducer } from 'ts-type-forge';
+import type { Reducer } from 'ts-type-forge';
 import { source, type InitializedObservable } from '../core/index.mjs';
 
 /**

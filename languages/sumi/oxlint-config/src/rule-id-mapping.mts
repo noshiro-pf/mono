@@ -53,6 +53,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   // boolean
   ['typescript(strict-boolean-expressions)', 'boolean/strict-logical-operands'],
   ['eslint(no-unused-expressions)', 'boolean/no-logical-expression-statement'],
+  ['eslint(curly)', 'boolean/require-braces'],
 
   // classes / exceptions
   ['sumi(no-class)', 'classes/no-class'],
@@ -79,6 +80,10 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
   // modules
   ['import(no-default-export)', 'modules/no-default-export'],
   ['import(no-unassigned-import)', 'modules/no-side-effect-import'],
+  // An inline-only type import and an import used only as a type are one
+  // language rule (D-59); the engine splits it in two.
+  ['typescript(no-import-type-side-effects)', 'modules/require-import-type'],
+  ['typescript(consistent-type-imports)', 'modules/require-import-type'],
   ['import(extensions)', 'modules/require-extension'],
   ['eslint(no-restricted-imports)', 'modules/no-index-file-import'],
   ['typescript(triple-slash-reference)', 'modules/no-triple-slash'],

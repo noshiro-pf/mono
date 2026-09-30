@@ -1,21 +1,21 @@
 import { expectType, type Result } from 'ts-data-forge';
-import {
-  type ArrayElement,
-  type FixedLengthTuple,
-  type NonEmptyTuple,
-  type SafeUint,
+import type {
+  ArrayElement,
+  FixedLengthTuple,
+  NonEmptyTuple,
+  SafeUint,
 } from 'ts-type-forge';
-import {
-  type AsyncChildObservable,
-  type InitializedObservable,
-  type InitializedRootObservable,
-  type InitializedSyncChildObservable,
-  type Observable,
-  type RootObservable,
-  type SyncChildObservable,
-  type Unwrap,
+import type {
+  AsyncChildObservable,
+  InitializedObservable,
+  InitializedRootObservable,
+  InitializedSyncChildObservable,
+  Observable,
+  RootObservable,
+  SyncChildObservable,
+  Unwrap,
 } from './observable.mjs';
-import { type NonEmptyUnknownList } from './types.mjs';
+import type { NonEmptyUnknownList } from './types.mjs';
 
 // RootObservable
 

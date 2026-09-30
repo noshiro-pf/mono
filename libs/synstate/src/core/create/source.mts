@@ -1,8 +1,8 @@
 import { Arr, Optional } from 'ts-data-forge';
 import { createRootObservable } from '../base/index.mjs';
-import {
-  type InitializedSourceObservable,
-  type SourceObservable,
+import type {
+  InitializedSourceObservable,
+  SourceObservable,
 } from '../types/index.mjs';
 
 /**

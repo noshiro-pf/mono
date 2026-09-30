@@ -84,6 +84,7 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
       'boolean/no-logical-expression-statement',
       ['@typescript-eslint/no-unused-expressions'],
     ],
+    ['boolean/require-braces', ['curly']],
 
     // classes / exceptions
     ['classes/no-class', ['functional/no-classes']],
@@ -125,6 +126,17 @@ export const eslintRulesByRuleId: ReadonlyMap<string, readonly string[]> =
     ],
     ['modules/no-side-effect-import', ['import-x/no-unassigned-import']],
     ['modules/require-extension', ['import-x/extensions']],
+    // consistent-type-imports stays on: the base config also bans
+    // `import('m').T` in type positions (disallowTypeAnnotations), which Sumi
+    // does not. The base config's `prefer-inline` asks for the very
+    // `import { type X }` D-59 bans, so it has to go, not just be covered.
+    [
+      'modules/require-import-type',
+      [
+        '@typescript-eslint/no-import-type-side-effects',
+        'import-x/consistent-type-specifier-style',
+      ],
+    ],
     ['modules/no-index-file-import', ['no-restricted-imports']],
     ['modules/no-triple-slash', ['@typescript-eslint/triple-slash-reference']],
     ['modules/no-require', ['@typescript-eslint/no-require-imports']],

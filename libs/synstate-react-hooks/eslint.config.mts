@@ -26,6 +26,10 @@ export default [
 
   {
     rules: defineKnownRules({
+      // `sumi check` asks for `import type` on a statement whose bindings are
+      // all types (D-59); the base config's `prefer-inline` asks for the
+      // opposite.
+      'import-x/consistent-type-specifier-style': 'off',
       '@typescript-eslint/no-shadow': [
         'error',
         {

@@ -1,5 +1,6 @@
 {
   "rules": {
+    "curly": "off",
     "eqeqeq": "off",
     "id-denylist": "off",
     "import/extensions": "off",
@@ -25,10 +26,12 @@
     "prefer-template": "off",
     "typescript/adjacent-overload-signatures": "off",
     "typescript/ban-ts-comment": "off",
+    "typescript/consistent-type-imports": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/method-signature-style": "off",
     "typescript/no-explicit-any": "off",
     "typescript/no-implied-eval": "off",
+    "typescript/no-import-type-side-effects": "off",
     "typescript/no-non-null-assertion": "off",
     "typescript/no-require-imports": "off",
     "typescript/no-unsafe-type-assertion": "off",

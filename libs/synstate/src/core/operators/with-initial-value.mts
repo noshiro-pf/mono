@@ -1,11 +1,11 @@
 import { expectType, Optional } from 'ts-data-forge';
 import { createInitializedSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
-import {
-  type InitializedObservable,
-  type Observable,
-  type WithInitialValueOperator,
-  type WithInitialValueOperatorObservable,
+import type {
+  InitializedObservable,
+  Observable,
+  WithInitialValueOperator,
+  WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
 
 /**

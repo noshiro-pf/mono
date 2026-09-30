@@ -1,9 +1,9 @@
 import { Optional, SafeUint, asSafeUint, pipe } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type Observable,
-  type SkipWhileOperatorObservable,
+import type {
+  DropInitialValueOperator,
+  Observable,
+  SkipWhileOperatorObservable,
 } from '../types/index.mjs';
 
 /**

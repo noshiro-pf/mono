@@ -1,6 +1,6 @@
 import { Result, type UnknownResult } from 'ts-data-forge';
 import { map } from '../../operators/index.mjs';
-import { type KeepInitialValueOperator } from '../../types/index.mjs';
+import type { KeepInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Transforms the success value (`Ok`) of a `Result` type emitted by the source.
