@@ -393,6 +393,9 @@ export const assembleObservable = <
     operator: WithInitialValueOperator<A, B>,
   ): InitializedObservable<B>;
 
+  // A `WithInitialValueOperator` is also an `Operator`: nothing at run time
+  // tells the two apart, so this set only refines the return type (#1952).
+  // @sumi-expect-error functions/no-refinement-overload
   function pipe<B>(operator: Operator<A, B>): Observable<B>;
 
   function pipe<B>(operator: Operator<A, B>): Observable<B> {

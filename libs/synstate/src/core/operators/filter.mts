@@ -68,6 +68,10 @@ export function filter<A, B extends A>(
   predicate: (value: A, index: SafeUint | -1) => value is B,
 ): DropInitialValueOperator<A, B>;
 
+// A type-guard predicate and a boolean one are both functions at run time, so
+// this set only refines the return type; it awaits the single-signature
+// rewrite (#1952).
+// @sumi-expect-error functions/no-refinement-overload
 export function filter<A>(
   predicate: (value: A, index: SafeUint | -1) => boolean,
 ): DropInitialValueOperator<A, A>;
