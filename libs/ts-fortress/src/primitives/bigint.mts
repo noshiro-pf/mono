@@ -1,4 +1,5 @@
 import { Arr, expectType, isBigint, Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type ArrayElement, type BoolAnd, type BoolNot } from 'ts-type-forge';
 import {
   attachConstraints,
@@ -48,7 +49,7 @@ export function bigint(
   const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
   if (Result.isErr(defaultValueConstraintsCheck)) {
-    throw new Error(
+    panic(
       defaultValueErrorMessage(
         defaultValue,
         defaultValueConstraintsCheck.value,

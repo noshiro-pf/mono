@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type IndexOfTuple, type UnknownRecord } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import {
@@ -113,13 +114,13 @@ export function at(
   // --- Tuple index access ---
   if (typeof keyOrIndex === 'number') {
     if (!hasTupleInternals(type)) {
-      throw new Error(`Expected a tuple type but received: ${type.typeName}`);
+      panic(`Expected a tuple type but received: ${type.typeName}`);
     }
 
     const elementType = type.elementTypes[keyOrIndex];
 
     if (elementType === undefined) {
-      throw new Error(
+      panic(
         `Index ${keyOrIndex} is out of range for tuple type: ${type.typeName}`,
       );
     }
@@ -129,7 +130,7 @@ export function at(
 
   // --- Record key access ---
   if (!hasRecordInternals(type)) {
-    throw new Error(`Expected a record type but received: ${type.typeName}`);
+    panic(`Expected a record type but received: ${type.typeName}`);
   }
 
   const shapes = expandShapeStructure(type.shapeStructure);
@@ -169,7 +170,7 @@ export function at(
     return collected[0];
   }
 
-  throw new Error(
+  panic(
     `Key ${JSON.stringify(keyOrIndex)} does not exist on record type: ${type.typeName}`,
   );
 }

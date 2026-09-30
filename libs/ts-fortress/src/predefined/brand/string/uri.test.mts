@@ -55,10 +55,6 @@ describe(uri, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (!Result.isErr(result)) {
-      throw new Error('Expected validation failure');
-    }
-
     assert.deepStrictEqual(result.value, [
       {
         path: [],

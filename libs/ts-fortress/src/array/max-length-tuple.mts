@@ -101,7 +101,9 @@ export function maxLengthTuple<A>(
 
     return Arr.isNonEmpty(errors)
       ? Result.err(errors)
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      : // No errors, so the value is of the validated type.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(a as unknown as T);
   };
 

@@ -1,3 +1,5 @@
+// @sumi-expect-error-file null/no-null-literal
+// @sumi-expect-error-file null/no-null-propagation
 import { expectType, Result } from 'ts-data-forge';
 import { array } from '../array/index.mjs';
 import { literal } from '../other-types/index.mjs';

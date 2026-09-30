@@ -39,13 +39,16 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
 
   const version = options?.version ?? 'all';
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return brand<UuidBaseString & NonEmptyString, readonly ['Uuid']>({
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     baseType: string(defaultValue, { nonempty: true }) as Type<
       UuidBaseString & NonEmptyString
     >,
     is: (s): s is T => uuidDef[version](s),
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     defaultValue: defaultValue as UuidBaseString & NonEmptyString,
     brandKeys: ['Uuid'],

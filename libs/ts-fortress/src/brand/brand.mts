@@ -1,4 +1,5 @@
 import { pipe, Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type Brand, type Primitive, type StrictExtract } from 'ts-type-forge';
 import {
   type ConstraintsCarrier,
@@ -53,9 +54,7 @@ export const brand = <
   const defaultValue: A = defaultValue_ ?? baseType.defaultValue;
 
   if (!is(defaultValue)) {
-    throw new Error(
-      `defaultValue ${defaultValue} doesn't pass \`is\` function`,
-    );
+    panic(`defaultValue ${defaultValue} doesn't pass \`is\` function`);
   }
 
   const brandKeysStr = [

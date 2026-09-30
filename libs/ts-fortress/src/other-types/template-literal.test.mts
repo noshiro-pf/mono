@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { templateLiteral } from './template-literal.mjs';
@@ -265,17 +266,9 @@ describe(templateLiteral, () => {
     test('uses pattern in error message', () => {
       const result = CustomString.validate('invalid');
 
-      assert.isFalse(Result.isOk(result));
+      assert.isTrue(Result.isErr(result));
 
-      if (!Result.isErr(result)) {
-        throw new Error('Expected error result');
-      }
-
-      const details = result.value[0]?.details;
-
-      if (details?.kind !== 'template-literal') {
-        throw new Error('Expected template-literal error');
-      }
+      assert.strictEqual(result.value[0]?.details?.kind, 'template-literal');
     });
   });
 

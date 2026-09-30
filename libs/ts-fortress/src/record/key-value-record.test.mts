@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { expectType, Result } from 'ts-data-forge';
 import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
 import { literal } from '../other-types/index.mjs';
