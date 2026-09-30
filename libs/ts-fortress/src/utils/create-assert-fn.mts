@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type Type } from '../type.mjs';
 import {
   validationErrorsToMessages,
@@ -14,6 +15,6 @@ export const createAssertFn =
     const res = validate(a);
 
     if (Result.isErr(res)) {
-      throw new Error(validationResultToString(res.value));
+      panic(validationResultToString(res.value));
     }
   };

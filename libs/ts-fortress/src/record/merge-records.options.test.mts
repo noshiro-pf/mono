@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';

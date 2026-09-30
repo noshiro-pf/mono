@@ -1,4 +1,5 @@
 import { Arr, expectType, isString, PositiveInt, Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import {
   type ArrayElement,
   type MaxLengthString,
@@ -51,7 +52,7 @@ export function string(
   const constraintsResult = validateConstraints(constraints);
 
   if (Result.isErr(constraintsResult)) {
-    throw new TypeError(constraintsResult.value);
+    panic(new TypeError(constraintsResult.value));
   }
 
   const constraintsPredicate = createConstraintsPredicate(
@@ -61,7 +62,7 @@ export function string(
   const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
   if (Result.isErr(defaultValueConstraintsCheck)) {
-    throw new Error(
+    panic(
       defaultValueErrorMessage(
         defaultValue,
         defaultValueConstraintsCheck.value,
@@ -310,7 +311,9 @@ const validateConstraints = (
 
   return Result.isErr(result2)
     ? Result.err(result2.value)
-    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    : // Both constraints are valid.
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Result.ok(constraints as Constraints);
 };
 

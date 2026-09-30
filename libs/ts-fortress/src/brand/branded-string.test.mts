@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { expectType, Result } from 'ts-data-forge';
 import { type Brand } from 'ts-type-forge';
 import { type TypeOf } from '../type.mjs';

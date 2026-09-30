@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { expectType, Result } from 'ts-data-forge';
 import { type MaxLengthTuple } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';

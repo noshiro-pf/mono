@@ -1,3 +1,5 @@
+// @sumi-expect-error-file null/no-null-in-type
+// @sumi-expect-error-file null/no-null-literal
 import { expectType } from 'ts-data-forge';
 import { array, tuple } from '../array/index.mjs';
 import { union } from '../compose/index.mjs';

@@ -1,4 +1,5 @@
 import { Arr, Obj, hasKey, isRecord, type Result } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import { type ValidationError } from './utils/index.mjs';
 
@@ -157,7 +158,9 @@ export const flattenShapeStructure = (
       return parts.includes(undefined)
         ? // Contains union - cannot flatten
           undefined
-        : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        : // No part is a union here.
+          // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           Obj.merge(...(parts as readonly UnknownShape[]));
     }
     case 'union': {
@@ -211,7 +214,7 @@ export const expandShapeStructure = (
       );
 
       if (estimatedVariantCount > EXPAND_SHAPE_STRUCTURE_MAX_VARIANTS) {
-        throw new Error(
+        panic(
           `Expanding this record type would create ${estimatedVariantCount} variants, exceeding the limit of ${EXPAND_SHAPE_STRUCTURE_MAX_VARIANTS}. This could lead to excessive memory or CPU usage. Consider simplifying the record types or reducing union/intersection nesting.`,
         );
       }
@@ -228,7 +231,7 @@ export const getShape = (internals: RecordTypeInternals): UnknownShape => {
   const flattened = flattenShapeStructure(internals.shapeStructure);
 
   if (flattened === undefined) {
-    throw new Error(
+    panic(
       'getShape() can only be called on simple or intersection record types, but received a union type. Use shapeStructure instead.',
     );
   }

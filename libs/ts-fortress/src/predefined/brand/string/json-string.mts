@@ -1,4 +1,4 @@
-import { isNonNullObject } from 'ts-data-forge';
+import { isNonNullObject, Json, Result } from 'ts-data-forge';
 import { type Brand, type NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
@@ -30,11 +30,9 @@ export const jsonString = (
 const defaultJsonString = '{}';
 
 const isJsonString = (str: string): str is JsonString => {
-  try {
-    return isNonNullObject(JSON.parse(str));
-  } catch {
-    return false;
-  }
+  const parsed = Json.parse(str);
+
+  return Result.isOk(parsed) && isNonNullObject(parsed.value);
 };
 
 if (import.meta.vitest !== undefined) {

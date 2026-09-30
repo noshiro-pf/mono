@@ -1,4 +1,5 @@
 import { Arr, expectType } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import { type IsNever, type UnknownRecord, type ValueOf } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
@@ -20,15 +21,13 @@ export const valueof = <const R extends UnknownRecord>(
   >,
 ): ValueOfType<R> => {
   if (!hasRecordInternals(recordType)) {
-    throw new Error(
-      `Expected a record type but received: ${recordType.typeName}`,
-    );
+    panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
   const shape = flattenShapeStructure(recordType.shapeStructure);
 
   if (shape === undefined) {
-    throw new Error(
+    panic(
       'valueof() requires a simple or intersection record type, but received a union type',
     );
   }
@@ -40,6 +39,7 @@ export const valueof = <const R extends UnknownRecord>(
   // and the mapping to `ValueOf<R>` cannot be re-established statically. The
   // two assertions below are that gap, and they are the whole of it.
   if (Arr.isMinLengthTuple(2, types)) {
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
@@ -47,9 +47,12 @@ export const valueof = <const R extends UnknownRecord>(
   }
 
   return Arr.isNonEmpty(types)
-    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    ? // The only member type.
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (types[0] as ValueOfType<R>)
     : // types is empty
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (undefinedType satisfies Type<undefined> as ValueOfType<R>);
 };

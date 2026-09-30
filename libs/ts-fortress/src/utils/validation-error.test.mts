@@ -1,3 +1,4 @@
+// @sumi-expect-error-file null/no-null-literal
 import { expectType } from 'ts-data-forge';
 import {
   createPrimitiveValidationError,

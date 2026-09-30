@@ -1,4 +1,5 @@
 import { expectType, Obj } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import {
   type ArrayElement,
   type StrictOmit,
@@ -29,19 +30,18 @@ export const omit = <
   >,
 ): OmittedType<R, KeysToOmit> => {
   if (!hasRecordInternals(recordType)) {
-    throw new Error(
-      `Expected a record type but received: ${recordType.typeName}`,
-    );
+    panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
   const shape = flattenShapeStructure(recordType.shapeStructure);
 
   if (shape === undefined) {
-    throw new Error(
+    panic(
       'omit() requires a simple or intersection record type, but received a union type',
     );
   }
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(Obj.omit(shape, keysToOmit), {
     typeName:
