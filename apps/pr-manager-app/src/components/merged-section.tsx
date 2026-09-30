@@ -1,7 +1,8 @@
 import { memoNamed } from 'preact-utils';
 import { Arr } from 'ts-data-forge';
-import { describeAge, formatLocalTime } from '../format.mjs';
+import { formatLocalTime } from '../format.mjs';
 import { type Merged } from '../load-report.mjs';
+import { Age } from './age.js';
 import { ExternalLink } from './external-link.js';
 import { LabelChip } from './label-chip.js';
 import { LinkedIssues } from './linked-issues.js';
@@ -9,7 +10,6 @@ import { LinkedIssues } from './linked-issues.js';
 type Props = Readonly<{
   merged: readonly Merged[];
   withinDays: number;
-  nowMs: number;
 }>;
 
 /**
@@ -21,7 +21,7 @@ type Props = Readonly<{
  */
 export const MergedSection = memoNamed<Props>(
   'MergedSection',
-  ({ merged, withinDays, nowMs }) => (
+  ({ merged, withinDays }) => (
     <section className={'section'}>
       <h2 className={'section-title'}>
         {`Merged in the last ${withinDays} day${withinDays === 1 ? '' : 's'}`}
@@ -45,7 +45,9 @@ export const MergedSection = memoNamed<Props>(
                   className={'merged-when'}
                   title={formatLocalTime(pr.mergedAtEpochMs)}
                 >
-                  {`merged ${describeAge(pr.mergedAtEpochMs, nowMs)} by ${pr.author}`}
+                  {'merged '}
+                  <Age epochMs={pr.mergedAtEpochMs} />
+                  {` by ${pr.author}`}
                 </span>
 
                 <span className={'branch'}>

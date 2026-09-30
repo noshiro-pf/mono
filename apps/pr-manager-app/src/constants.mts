@@ -30,5 +30,8 @@ export const POLL_INTERVAL_MS = 15_000;
  * How often "3 minutes ago" is recomputed. Not tied to the poll: a hidden
  * tab stops polling, and the sentence about how old the page is has to keep
  * up with that, or a tab left open reads as fresh forever.
+ *
+ * Every second, because the ages count seconds, and because a tick costs a
+ * text node per age rather than a render: they are signals (`age.tsx`).
  */
-export const CLOCK_TICK_MS = 30_000;
+export const CLOCK_TICK_MS = 1000;

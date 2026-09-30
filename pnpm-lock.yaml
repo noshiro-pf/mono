@@ -167,6 +167,9 @@ catalogs:
     '@playwright/test':
       specifier: 1.63.0
       version: 1.63.0
+    '@preact/signals':
+      specifier: 2.11.2
+      version: 2.11.2
     '@reduxjs/toolkit':
       specifier: 2.12.0
       version: 2.12.0
@@ -1748,6 +1751,9 @@ importers:
       synstate-preact-hooks:
         specifier: workspace:*
         version: link:../../libs/synstate-preact-hooks
+      synstate-preact-signals:
+        specifier: workspace:*
+        version: link:../../libs/synstate-preact-signals
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
@@ -1755,6 +1761,9 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
     devDependencies:
+      '@preact/signals':
+        specifier: 'catalog:'
+        version: 2.11.2(preact@10.29.8)
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.1(@vitest/browser@5.0.1)(vitest@5.0.1)
@@ -3689,7 +3698,7 @@ importers:
         version: link:../ts-type-forge
     devDependencies:
       '@preact/signals':
-        specifier: 2.11.2
+        specifier: 'catalog:'
         version: 2.11.2(preact@10.29.8)
       '@vitest/browser-playwright':
         specifier: 'catalog:'

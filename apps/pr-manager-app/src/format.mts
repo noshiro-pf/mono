@@ -33,6 +33,7 @@ const UNITS = [
   { name: 'day', millis: asNonZeroSafeInt(86_400_000) },
   { name: 'hour', millis: asNonZeroSafeInt(3_600_000) },
   { name: 'minute', millis: asNonZeroSafeInt(60_000) },
+  { name: 'second', millis: asNonZeroSafeInt(1000) },
 ] as const;
 
 /**

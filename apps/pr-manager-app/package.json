@@ -39,10 +39,12 @@
     "preact-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-preact-hooks": "workspace:*",
+    "synstate-preact-signals": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*"
   },
   "devDependencies": {
+    "@preact/signals": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "dedent": "catalog:",
     "eslint": "catalog:",

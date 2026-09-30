@@ -3,11 +3,11 @@ import { type LoadState } from '../load-state.mjs';
 import { Notice } from './notice.js';
 import { ReportView } from './report-view.js';
 
-type Props = Readonly<{ state: LoadState; nowMs: number }>;
+type Props = Readonly<{ state: LoadState }>;
 
 /** What the state says, once there is a token to have read with. */
 export const LoadStateView = memoNamed<Props>('LoadStateView', (props) => {
-  const { state, nowMs } = props;
+  const { state } = props;
 
   switch (state.type) {
     case 'loading':
@@ -17,6 +17,6 @@ export const LoadStateView = memoNamed<Props>('LoadStateView', (props) => {
       return <Notice tone={'critical'}>{state.message}</Notice>;
 
     case 'ready':
-      return <ReportView nowMs={nowMs} report={state.report} />;
+      return <ReportView report={state.report} />;
   }
 });

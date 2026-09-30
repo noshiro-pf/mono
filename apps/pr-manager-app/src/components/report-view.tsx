@@ -3,9 +3,10 @@ import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
 import { Arr } from 'ts-data-forge';
 import { type ReadonlyRecord } from 'ts-type-forge';
-import { describeAge, formatLocalTime } from '../format.mjs';
+import { formatLocalTime } from '../format.mjs';
 import { type BlockId } from '../layout.mjs';
 import { MERGED_WITHIN_DAYS, type LoadedReport } from '../load-report.mjs';
+import { Age } from './age.js';
 import { BlockLayout } from './block-layout.js';
 import { CyclesSection } from './cycles-section.js';
 import { IssuesSection } from './issues-section.js';
@@ -15,8 +16,6 @@ import { SummaryRow } from './summary-row.js';
 
 type Props = Readonly<{
   report: LoadedReport;
-  /** Passed in so that "read 3 minutes ago" is a function of its inputs. */
-  nowMs: number;
 }>;
 
 /**
@@ -25,10 +24,10 @@ type Props = Readonly<{
  * reader arranged them (`layout.mts`).
  */
 export const ReportView = memoNamed<Props>('ReportView', (props) => {
-  const { report, nowMs } = props;
+  const { report } = props;
 
-  // One object per report and clock tick, so that `BlockLayout` is not
-  // handed a new one on every render.
+  // One object per report, so that `BlockLayout` is not handed a new one on
+  // every render. The ages inside follow the clock without it (`age.tsx`).
   const blocks = useMemo<ReadonlyRecord<BlockId, ComponentChildren>>(() => {
     const repoUrl =
       `https://github.com/${report.repo.owner}/${report.repo.name}` as const;
@@ -46,7 +45,6 @@ export const ReportView = memoNamed<Props>('ReportView', (props) => {
               <MergeOrder
                 byNumber={byNumber}
                 nodes={report.roots}
-                nowMs={nowMs}
                 scaleMax={divergenceScale(report.entries)}
               />
             ) : (
@@ -60,26 +58,23 @@ export const ReportView = memoNamed<Props>('ReportView', (props) => {
         </>
       ),
       merged: (
-        <MergedSection
-          merged={report.merged}
-          nowMs={nowMs}
-          withinDays={MERGED_WITHIN_DAYS}
-        />
+        <MergedSection merged={report.merged} withinDays={MERGED_WITHIN_DAYS} />
       ),
       issues: (
         <IssuesSection
           issues={report.issues.items}
-          nowMs={nowMs}
           totalCount={report.issues.totalCount}
         />
       ),
     };
-  }, [report, nowMs]);
+  }, [report]);
 
   return (
     <>
       <p className={'page-subtitle'}>
-        {`Read from GitHub ${describeAge(report.readAtEpochMs, nowMs)} · `}
+        {'Read from GitHub '}
+        <Age epochMs={report.readAtEpochMs} />
+        {' · '}
         {formatLocalTime(report.readAtEpochMs)}
       </p>
 

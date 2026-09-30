@@ -105,6 +105,20 @@ describe(createReader, () => {
     assert.strictEqual(reader.nowMs.getSnapshot().value, 42_000);
   });
 
+  test('leaves the clock alone while the tab is hidden', () => {
+    const { reader, clock, timers, visibility } = setup(undefined);
+
+    reader.start();
+
+    visibility.set(false);
+
+    clock.set(42_000);
+
+    timers.fire(CLOCK_TICK_MS);
+
+    assert.strictEqual(reader.nowMs.getSnapshot().value, 0);
+  });
+
   test('refresh marks the report as refreshing and reads at once', async () => {
     const { reader, loads, clock } = setup(TOKEN_A);
 

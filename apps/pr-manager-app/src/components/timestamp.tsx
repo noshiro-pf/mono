@@ -1,13 +1,13 @@
 import { memoNamed } from 'preact-utils';
-import { describeAge, formatLocalTime } from '../format.mjs';
+import { formatLocalTime } from '../format.mjs';
 import { epochMsOf } from '../timestamp.mjs';
+import { Age } from './age.js';
 
 type Props = Readonly<{
   /** What it is the time of: `pushed`, `updated`, and so on. */
   label: string;
   /** As GitHub sends it; `undefined` when there is no such instant. */
   iso: string | undefined;
-  nowMs: number;
 }>;
 
 /**
@@ -18,7 +18,7 @@ type Props = Readonly<{
  * labels is a row a reader has to check every time to find it still empty.
  */
 export const Timestamp = memoNamed<Props>('Timestamp', (props) => {
-  const { label, iso, nowMs } = props;
+  const { label, iso } = props;
 
   const epochMs = iso === undefined ? undefined : epochMsOf(iso);
 
@@ -26,7 +26,7 @@ export const Timestamp = memoNamed<Props>('Timestamp', (props) => {
     <span className={'timestamp'}>
       {`${label} `}
       <time dateTime={iso} title={formatLocalTime(epochMs)}>
-        {describeAge(epochMs, nowMs)}
+        <Age epochMs={epochMs} />
       </time>
     </span>
   );
