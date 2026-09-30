@@ -25,6 +25,7 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   // reactive dependency tree structure
   depth: Kind extends 'root' ? 0 : number;
   addChild: <B>(child: ChildObservable<B>) => void;
+  deleteChild: <B>(child: ChildObservable<B>) => void;
 
   // state
   getSnapshot: () => Optional<A>;
@@ -84,6 +85,7 @@ namespace ObservableTypeConverter {
   > = O &
     Readonly<{
       addDescendant: <B>(child: ChildObservable<B>) => void;
+      deleteDescendant: <B>(child: ChildObservable<B>) => void;
     }>;
 }
 
