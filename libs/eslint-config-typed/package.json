@@ -151,7 +151,6 @@
     "eslint": ">=9.0.0",
     "typescript": ">=5.0.0 <7.0.0"
   },
-  "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"
