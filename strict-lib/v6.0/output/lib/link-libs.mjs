@@ -5,16 +5,17 @@
 //
 // WHAT IT IS FOR
 //
-// TypeScript resolves a lib replacement in one of two ways, and which one
-// depends on the version — they are exclusive, both measured:
+// TypeScript looks a lib replacement up as `@typescript/lib-<group>`, an
+// ordinary package name resolved through a fixed Node10 lookup. A single
+// package shipping every lib as a subdirectory has no name for it to find.
+// Which other route exists depends on the version, measured:
 //
-//   - TypeScript 7 reads `paths`, and no longer looks `@typescript/lib-*` up
-//     by name. Those consumers need no linking; the README's `paths` entry is
-//     the whole setup.
-//   - TypeScript 6 and earlier ignore `paths` here and resolve
-//     `@typescript/lib-<group>` as an ordinary package name, through a fixed
-//     Node10 lookup. A single package shipping every lib as a subdirectory has
-//     no name for them to find.
+//   - TypeScript 7 also reads `paths` for it, so a consumer on TypeScript 7
+//     alone may write the README's `paths` entry instead of linking.
+//   - TypeScript 6 and earlier ignore `paths` here; the name is the only
+//     route. That includes the TypeScript a linter loads: typescript-eslint
+//     requires the JavaScript `typescript` package, a 6.x one in a project
+//     whose type check runs TypeScript 7.
 //
 // This script supplies those names: one symlink per lib group, from
 // `node_modules/@typescript/lib-<group>` to this package's `libs/<group>`.

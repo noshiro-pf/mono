@@ -1256,6 +1256,13 @@ probe は `Number.isFinite('1')` への `@ts-expect-error`。`paths` は一切�
 `verify-npm-packages` も v7.0 についてはこの経路を検証し続ける。**消したのは
 このリポジトリ自身の開発時構成における二重性**であって、利用者の選択肢ではない。
 
+2026-10-01 追記: v7.0 の README は**リンカを先に**案内し、`paths` を代替として併記する
+形に改めた。`paths` だけでは typescript-eslint（JavaScript の compiler API が要るので
+TypeScript 6.x で動く）が黙って stock lib を見るため、型を読む lint を使う利用者には
+リンカしか効かない。`verify-npm-packages` は v7.0 を両方の経路で検査する。その際
+リポジトリ自身の `node_modules/@typescript/` のリンクを外して走らせる。外さないと
+TypeScript が `node_modules` を遡ってそれを拾い、`paths` が無効な設定でも probe が通っていた。
+
 ### 版ごとのパッケージは引き続き要る
 
 v7.0 が TS 6 まで面倒を見られるのは、6.0 と 7.0 の宣言が実質同一だからである。

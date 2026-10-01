@@ -1,13 +1,13 @@
 // The strict standard library ships types only, so this is a compile rather
 // than a run — and what it compiles is the replacement itself.
 //
-// The generated project follows whichever recipe the package's own README
-// gives, because the two TypeScript versions resolve a lib replacement in
-// exclusive ways: TypeScript 7 reads `paths`, and TypeScript 6 and earlier
-// resolve `@typescript/lib-*` by name, from the symlinks the package's own
-// `link-libs.mjs` creates. Either way, a layout that is not what TypeScript
-// asks for makes the replacement silently not happen — there is no error for
-// it — and this file stops erroring where it is told to expect an error.
+// The generated project follows each recipe the package's own README gives.
+// Every TypeScript resolves `@typescript/lib-*` by name, from the symlinks the
+// package's own `link-libs.mjs` creates; TypeScript 7 also reads `paths`, so
+// its package is compiled once each way. Either way, a layout that is not
+// what TypeScript asks for makes the replacement silently not happen — there
+// is no error for it — and this file stops erroring where it is told to
+// expect an error.
 
 // @ts-expect-error A string is not a `number`, which is what the strict
 // standard library narrows this parameter to. Under the stock library the
