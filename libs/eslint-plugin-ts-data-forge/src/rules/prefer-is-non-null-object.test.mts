@@ -154,3 +154,45 @@ describe('prefer-is-non-null-object', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-is-non-null-object through type wrappers', () => {
+  tester.run('prefer-is-non-null-object', preferIsNonNullObject, {
+    valid: [
+      {
+        name: 'checks on two different values, one wrapped',
+        code: dedent`
+          declare const u: unknown;
+          declare const v: unknown;
+          const ok = typeof u === 'object' && (v satisfies unknown) !== null;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the value wrapped on either side',
+        code: dedent`
+          import { isNonNullObject } from 'ts-data-forge';
+          declare const u: unknown;
+          const a = typeof u === 'object' && (u satisfies unknown) !== null;
+          const b = typeof u === 'object' && u! !== null;
+          const c = typeof (u satisfies unknown) === 'object' && u !== null;
+          const d = typeof u === ('object' as const) && u !== (null as null);
+        `,
+        output: dedent`
+          import { isNonNullObject } from 'ts-data-forge';
+          declare const u: unknown;
+          const a = isNonNullObject(u);
+          const b = isNonNullObject(u);
+          const c = isNonNullObject(u);
+          const d = isNonNullObject(u);
+        `,
+        errors: [
+          { messageId: 'useIsNonNullObject' },
+          { messageId: 'useIsNonNullObject' },
+          { messageId: 'useIsNonNullObject' },
+          { messageId: 'useIsNonNullObject' },
+        ],
+      },
+    ],
+  });
+}, 20000);

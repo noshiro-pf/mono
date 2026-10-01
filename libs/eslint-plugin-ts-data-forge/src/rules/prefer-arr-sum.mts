@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr, pipe } from 'ts-data-forge';
 import { type TypeReference } from 'typescript';
+import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -50,8 +51,10 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
     return {
       CallExpression: (node) => {
         // Check for xs.reduce(...)
+        // (`xs[reduce]` calls whatever method the variable `reduce` names)
         if (
           node.callee.type !== AST_NODE_TYPES.MemberExpression ||
+          node.callee.computed ||
           node.callee.property.type !== AST_NODE_TYPES.Identifier ||
           node.callee.property.name !== 'reduce'
         ) {
@@ -67,7 +70,10 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
         const reducer = node.arguments[0];
 
-        const initialValue = node.arguments[1];
+        // The initial value and the operands of the body are read through
+        // type wrappers: `0 as number` is still 0, `(b satisfies number)` is
+        // still `b`. Types are asked of the values underneath too.
+        const initialValue = skipTypeWrappers(node.arguments[1]);
 
         // Check initial value is 0
         if (
@@ -102,25 +108,43 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
+        if (
+          body.type !== AST_NODE_TYPES.BinaryExpression ||
+          body.operator !== '+'
+        ) {
+          return;
+        }
+
+        const left = skipTypeWrappers(body.left);
+
+        const right = skipTypeWrappers(body.right);
+
         // Case 1: (a, b) => a + b
         if (
-          body.type === AST_NODE_TYPES.BinaryExpression &&
-          body.operator === '+' &&
-          body.left.type === AST_NODE_TYPES.Identifier &&
-          body.left.name === param1.name &&
-          body.right.type === AST_NODE_TYPES.Identifier &&
-          body.right.name === param2.name
+          left.type === AST_NODE_TYPES.Identifier &&
+          left.name === param1.name &&
+          right.type === AST_NODE_TYPES.Identifier &&
+          right.name === param2.name
         ) {
-          // Check if arrayExpression type is number[] or compatible
+          // Check if arrayExpression type is number[] or compatible, both as
+          // written and under any wrapper: a cast does not turn strings,
+          // which `+` concatenates, into numbers.
+          const isNumberArray = (
+            // AST nodes hold mutable child arrays, so they are not deeply readonly.
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+            expression: TSESTree.Node,
+          ): boolean => {
+            const type = pipe(
+              services?.esTreeNodeToTSNodeMap?.get(expression),
+            ).mapNullable((tsNode) => checker.getTypeAtLocation(tsNode)).value;
 
-          const type = pipe(
-            services?.esTreeNodeToTSNodeMap?.get(arrayExpression),
-          ).mapNullable((tsNode) => checker.getTypeAtLocation(tsNode)).value;
+            if (
+              type === undefined || // Check if it's an array type or tuple type
+              (!checker.isArrayType(type) && !checker.isTupleType(type))
+            ) {
+              return false;
+            }
 
-          if (
-            type !== undefined && // Check if it's an array type or tuple type
-            (checker.isArrayType(type) || checker.isTupleType(type))
-          ) {
             // Get type arguments using the official API
             // TypeReference has typeArguments that we can access
             const typeArguments = checker.getTypeArguments(
@@ -128,20 +152,25 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
               type as TypeReference,
             );
 
-            if (Arr.isNonEmpty(typeArguments)) {
-              const elementType = typeArguments[0];
+            // Check if element type is assignable to number
+            return (
+              Arr.isNonEmpty(typeArguments) &&
+              checker.isTypeAssignableTo(
+                typeArguments[0],
+                checker.getNumberType(),
+              )
+            );
+          };
 
-              const numberType = checker.getNumberType();
-
-              // Check if element type is assignable to number
-              if (checker.isTypeAssignableTo(elementType, numberType)) {
-                mut_nodesToFix.push({
-                  node,
-                  arrayExpression,
-                  messageId: 'useArrSum',
-                });
-              }
-            }
+          if (
+            isNumberArray(arrayExpression) &&
+            isNumberArray(skipTypeWrappers(arrayExpression))
+          ) {
+            mut_nodesToFix.push({
+              node,
+              arrayExpression,
+              messageId: 'useArrSum',
+            });
           }
 
           return;
@@ -149,14 +178,12 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
         // Case 2: (a, b) => a.prop + b.prop or a['prop'] + b['prop']
         if (
-          body.type === AST_NODE_TYPES.BinaryExpression &&
-          body.operator === '+' &&
-          body.left.type === AST_NODE_TYPES.MemberExpression &&
-          body.right.type === AST_NODE_TYPES.MemberExpression
+          left.type === AST_NODE_TYPES.MemberExpression &&
+          right.type === AST_NODE_TYPES.MemberExpression
         ) {
-          const leftObj = body.left.object;
+          const leftObj = skipTypeWrappers(left.object);
 
-          const rightObj = body.right.object;
+          const rightObj = skipTypeWrappers(right.object);
 
           if (
             leftObj.type !== AST_NODE_TYPES.Identifier ||
@@ -168,25 +195,25 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
           }
 
           // Check if both access the same property
-          const leftProp = body.left.property;
+          const leftProp = left.property;
 
-          const rightProp = body.right.property;
+          const rightProp = right.property;
 
           let mut_propName: string | undefined;
 
           if (
             leftProp.type === AST_NODE_TYPES.Identifier &&
-            !body.left.computed &&
+            !left.computed &&
             rightProp.type === AST_NODE_TYPES.Identifier &&
-            !body.right.computed &&
+            !right.computed &&
             leftProp.name === rightProp.name
           ) {
             mut_propName = leftProp.name;
           } else if (
             leftProp.type === AST_NODE_TYPES.Literal &&
-            body.left.computed &&
+            left.computed &&
             rightProp.type === AST_NODE_TYPES.Literal &&
-            body.right.computed &&
+            right.computed &&
             leftProp.value === rightProp.value &&
             typeof leftProp.value === 'string'
           ) {
@@ -199,9 +226,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
 
           // Check if property type is number
           if (services?.program !== undefined && services.program !== null) {
-            const tsLeftProp = services.esTreeNodeToTSNodeMap?.get(body.left);
+            const tsLeftProp = services.esTreeNodeToTSNodeMap?.get(left);
 
-            const tsRightProp = services.esTreeNodeToTSNodeMap?.get(body.right);
+            const tsRightProp = services.esTreeNodeToTSNodeMap?.get(right);
 
             if (tsLeftProp !== undefined && tsRightProp !== undefined) {
               const leftPropType = checker.getTypeAtLocation(tsLeftProp);
@@ -223,7 +250,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
           // Generate mapper function
           const mapperParam = param1.name;
 
-          const mapper = body.left.computed
+          const mapper = left.computed
             ? `${mapperParam} => ${mapperParam}['${mut_propName}']`
             : `${mapperParam} => ${mapperParam}.${mut_propName}`;
 
@@ -241,7 +268,10 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         const hasArrImport = namedImports.includes('Arr');
 
         for (const [index, nodeInfo] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(nodeInfo.arrayExpression);
+          const arrayText = toArgumentText(
+            nodeInfo.arrayExpression,
+            sourceCode,
+          );
 
           context.report({
             node: nodeInfo.node,

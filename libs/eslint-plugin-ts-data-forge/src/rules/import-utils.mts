@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper } from './ast-utils.mjs';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
@@ -100,7 +101,16 @@ export const buildCalleeResolver = (
     }),
   );
 
-  return (callee) => {
+  // `(isNull as (u: unknown) => boolean)(x)` and `(tf as typeof tf).isNull(x)`
+  // still call `isNull`: both the callee and a namespace object are read
+  // through type wrappers.
+  const resolve = (
+    callee: DeepReadonly<TSESTree.Expression>,
+  ): ResolvedCallee | undefined => {
+    if (isTypeWrapper(callee)) {
+      return resolve(callee.expression);
+    }
+
     if (callee.type === AST_NODE_TYPES.Identifier) {
       const canonicalName = localToCanonical.get(callee.name);
 
@@ -115,24 +125,34 @@ export const buildCalleeResolver = (
     }
 
     if (
-      namespaceName !== undefined &&
-      callee.type === AST_NODE_TYPES.MemberExpression &&
-      !callee.computed &&
-      callee.object.type === AST_NODE_TYPES.Identifier &&
-      callee.object.name === namespaceName &&
-      callee.property.type === AST_NODE_TYPES.Identifier
+      namespaceName === undefined ||
+      callee.type !== AST_NODE_TYPES.MemberExpression ||
+      callee.computed ||
+      callee.property.type !== AST_NODE_TYPES.Identifier
     ) {
-      return {
-        canonicalName: callee.property.name,
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        propertyNode: callee.property as TSESTree.Node,
-        isNamespace: true,
-      };
+      return undefined;
     }
 
-    return undefined;
+    const object = skipReadonlyTypeWrappers(callee.object);
+
+    return object.type === AST_NODE_TYPES.Identifier &&
+      object.name === namespaceName
+      ? {
+          canonicalName: callee.property.name,
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          propertyNode: callee.property as TSESTree.Node,
+          isNamespace: true,
+        }
+      : undefined;
   };
+
+  return resolve;
 };
+
+const skipReadonlyTypeWrappers = (
+  node: DeepReadonly<TSESTree.Expression>,
+): DeepReadonly<TSESTree.Expression> =>
+  isTypeWrapper(node) ? skipReadonlyTypeWrappers(node.expression) : node;
 
 export const buildImportFixes = (
   fixer: TSESLint.RuleFixer,

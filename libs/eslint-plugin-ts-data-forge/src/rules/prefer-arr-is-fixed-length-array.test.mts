@@ -212,3 +212,66 @@ describe('prefer-arr-is-fixed-length-array', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-arr-is-fixed-length-array through type wrappers', () => {
+  tester.run('prefer-arr-is-fixed-length-array', preferArrIsFixedLengthArray, {
+    valid: [
+      {
+        name: 'a computed index named `length` is not the length',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const length: number;
+          const ok = xs[length] === 3;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the length or the bound wrapped',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = xs.length === (3 satisfies number);
+          const b = (xs.length as number) !== 3;
+          const c = (2 as number) === xs.length;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.isFixedLengthArray(3, xs);
+          const b = !Arr.isFixedLengthArray(3, xs);
+          const c = Arr.isFixedLengthArray(2, xs);
+        `,
+        errors: [
+          { messageId: 'useIsFixedLengthArray' },
+          { messageId: 'useIsFixedLengthArray' },
+          { messageId: 'useIsFixedLengthArray' },
+        ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-arr-is-fixed-length-array with parenthesized operands', () => {
+  tester.run('prefer-arr-is-fixed-length-array', preferArrIsFixedLengthArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence array keeps its parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = (log(), xs).length === 2;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = Arr.isFixedLengthArray(2, (log(), xs));
+        `,
+        errors: [{ messageId: 'useIsFixedLengthArray' }],
+      },
+    ],
+  });
+}, 20000);

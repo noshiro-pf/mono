@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -101,9 +102,11 @@ export const preferNumSafeParseInt: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        // Only base 10: accept a missing radix or an explicit literal `10`.
+        // Only base 10: accept a missing radix or an explicit literal `10`,
+        // under any type wrapper (`10 as const`).
         if (args.length >= 2) {
-          const radix = args[1];
+          const radix =
+            args[1] === undefined ? undefined : skipTypeWrappers(args[1]);
 
           if (radix?.type !== AST_NODE_TYPES.Literal || radix.value !== 10) {
             return;
@@ -111,22 +114,29 @@ export const preferNumSafeParseInt: TSESLint.RuleModule<MessageIds, Options> = {
         }
 
         // The argument must be a `string` so the autofix is type-safe against
-        // `Num.safeParseInt(s: string)`. Without type information, skip.
+        // `Num.safeParseInt(s: string)`. Without type information, skip. Both
+        // the value under any `as` / `!` / `satisfies` and the type the
+        // wrapper states are asked: a cast does not make a number a string.
         if (services?.program == null) {
           return;
         }
 
         const checker = services.program.getTypeChecker();
 
-        const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
+        const isString = (
+          // AST nodes hold mutable child arrays, so they are not deeply readonly.
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+          expression: TSESTree.Node,
+        ): boolean => {
+          const tsNode = services.esTreeNodeToTSNodeMap?.get(expression);
 
-        if (tsNode === undefined) {
-          return;
-        }
+          return (
+            tsNode !== undefined &&
+            isStringType(checker.getTypeAtLocation(tsNode))
+          );
+        };
 
-        const argType = checker.getTypeAtLocation(tsNode);
-
-        if (!isStringType(argType)) {
+        if (!isString(firstArg) || !isString(skipTypeWrappers(firstArg))) {
           return;
         }
 
@@ -143,7 +153,7 @@ export const preferNumSafeParseInt: TSESLint.RuleModule<MessageIds, Options> = {
           index,
           { node, argExpression },
         ] of mut_nodesToFix.entries()) {
-          const argText = sourceCode.getText(argExpression);
+          const argText = toArgumentText(argExpression, sourceCode);
 
           const originalText = sourceCode.getText(node);
 

@@ -305,3 +305,102 @@ describe('prefer-canonical-length-guard', () => {
     ],
   });
 });
+
+describe('prefer-canonical-length-guard through type wrappers', () => {
+  tester.run('prefer-canonical-length-guard', preferCanonicalLengthGuard, {
+    valid: [
+      {
+        name: 'a wrapped bound other than the degenerate one',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ok = Arr.isFixedLengthArray(1 as const, xs);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a bound wrapped in `as const` or `satisfies`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const a = Arr.isFixedLengthArray(0 as const, xs);
+          const b = Arr.isBoundedLengthTuple(0 satisfies number, 0, xs!);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const a = Arr.isEmpty(xs);
+          const b = Arr.isEmptyTuple(xs!);
+        `,
+        errors: [
+          { messageId: 'useCanonicalGuard' },
+          { messageId: 'useCanonicalGuard' },
+        ],
+      },
+    ],
+  });
+
+  typedTester.run('prefer-canonical-length-guard', preferCanonicalLengthGuard, {
+    valid: [
+      {
+        name: 'a computed index named `length` is not the length',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const length: number;
+          const ok = xs[length] > 0;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a folded-in comparison on a wrapped length',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = (xs.length satisfies number) > 0;
+          const b = xs.length >= 1 && (xs as readonly number[]).length <= 3;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.isNonEmpty(xs);
+          const b = Arr.isBoundedLengthArray(1, 3, xs);
+        `,
+        errors: [
+          { messageId: 'useIsNonEmpty' },
+          { messageId: 'useIsBoundedLengthArray' },
+        ],
+      },
+    ],
+  });
+});
+
+describe('prefer-canonical-length-guard with parenthesized operands', () => {
+  tester.run('prefer-canonical-length-guard', preferCanonicalLengthGuard, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence array keeps its parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = Arr.isFixedLengthArray(0, (log(), xs));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = Arr.isEmpty((log(), xs));
+        `,
+        errors: [{ messageId: 'useCanonicalGuard' }],
+      },
+    ],
+  });
+});

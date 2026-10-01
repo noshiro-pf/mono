@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { skipTypeWrappers } from './ast-utils.mjs';
 import {
   buildCalleeResolver,
   buildImportFixes,
@@ -282,7 +283,12 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
             return;
           }
 
-          const argTsNode = parserServices.esTreeNodeToTSNodeMap.get(argument);
+          // The type of the value, not the one an `as` / `!` / `satisfies`
+          // around it states: `isNullish(x as string | undefined)` still sees
+          // the `null` that `x` may hold, and `isUndefined` would miss it.
+          const argTsNode = parserServices.esTreeNodeToTSNodeMap.get(
+            skipTypeWrappers(argument),
+          );
 
           const argType = checker.getTypeAtLocation(argTsNode);
 
@@ -606,6 +612,12 @@ const isSideEffectFreeArg = (node: DeepReadonly<TSESTree.Node>): boolean => {
         isSideEffectFreeArg(node.object) &&
         (!node.computed || isSideEffectFreeArg(node.property))
       );
+
+    case AST_NODE_TYPES.TSAsExpression:
+    case AST_NODE_TYPES.TSNonNullExpression:
+    case AST_NODE_TYPES.TSSatisfiesExpression:
+    case AST_NODE_TYPES.TSTypeAssertion:
+      return isSideEffectFreeArg(node.expression);
 
     default:
       return false;

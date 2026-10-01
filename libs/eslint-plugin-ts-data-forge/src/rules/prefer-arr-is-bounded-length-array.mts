@@ -1,5 +1,10 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
-import { parseLengthComparison } from './ast-utils.mjs';
+import {
+  isArrayOrTupleExpression,
+  isSameArrayText,
+  parseLengthComparison,
+  toArgumentText,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -64,9 +69,7 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
           return;
         }
 
-        if (
-          sourceCode.getText(left.array) !== sourceCode.getText(right.array)
-        ) {
+        if (!isSameArrayText(left.array, right.array, sourceCode)) {
           return;
         }
 
@@ -77,25 +80,10 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
         const arrayExpression = min.array;
 
         // Check if arrayExpression is actually an array type
-        if (services?.program !== undefined && services.program !== null) {
-          const checker = services.program.getTypeChecker();
-
-          const tsNode = services.esTreeNodeToTSNodeMap?.get(arrayExpression);
-
-          if (tsNode !== undefined) {
-            const type = checker.getTypeAtLocation(tsNode);
-
-            // Check if it's an array type or tuple type
-            const isArrayType =
-              checker.isArrayType(type) || checker.isTupleType(type);
-
-            if (!isArrayType) {
-              return;
-            }
-          } else {
-            return;
-          }
-        } else {
+        if (
+          !isArrayOrTupleExpression(services, min.array) ||
+          !isArrayOrTupleExpression(services, max.array)
+        ) {
           return;
         }
 
@@ -115,7 +103,7 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
           index,
           { node, arrayExpression, minExpression, maxExpression },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(arrayExpression);
+          const arrayText = toArgumentText(arrayExpression, sourceCode);
 
           const minText = sourceCode.getText(minExpression);
 

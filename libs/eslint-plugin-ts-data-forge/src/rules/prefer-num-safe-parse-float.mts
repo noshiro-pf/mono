@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -36,7 +37,9 @@ const isStringType = (type: ts.Type): boolean => {
  * `Result.unwrapOkOr(Num.safeParseFloat(x), Number.NaN)` (ts-data-forge).
  *
  * `Number(x)` is only flagged when x is purely a string type to avoid false
- * positives for `Number(someBoolean)` or `Number(someNumber)` uses.
+ * positives for `Number(someBoolean)` or `Number(someNumber)` uses. The type is
+ * asked of the value under any `as` / `!` / `satisfies` too, so a cast does not
+ * vouch for a string that is not one.
  */
 export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
   {
@@ -117,15 +120,24 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
 
           const checker = services.program.getTypeChecker();
 
-          const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
+          // Both the value under any `as` / `!` / `satisfies` and the type the
+          // wrapper states must be `string`: the first is what `Number` sees at
+          // run time (`Number(v as string)` may still be handed `true`), the
+          // second is what the fix, which keeps the wrapper, passes on.
+          const isString = (
+            // AST nodes hold mutable child arrays, so they are not deeply readonly.
+            // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+            expression: TSESTree.Node,
+          ): boolean => {
+            const tsNode = services.esTreeNodeToTSNodeMap?.get(expression);
 
-          if (tsNode === undefined) {
-            return;
-          }
+            return (
+              tsNode !== undefined &&
+              isStringType(checker.getTypeAtLocation(tsNode))
+            );
+          };
 
-          const argType = checker.getTypeAtLocation(tsNode);
-
-          if (!isStringType(argType)) {
+          if (!isString(firstArg) || !isString(skipTypeWrappers(firstArg))) {
             return;
           }
 
@@ -142,7 +154,7 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
             index,
             { node, argExpression },
           ] of mut_nodesToFix.entries()) {
-            const argText = sourceCode.getText(argExpression);
+            const argText = toArgumentText(argExpression, sourceCode);
 
             const originalText = sourceCode.getText(node);
 

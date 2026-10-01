@@ -303,3 +303,114 @@ describe('prefer-canonical-length-cast', () => {
     ],
   });
 });
+
+describe('prefer-canonical-length-cast through type wrappers', () => {
+  tester.run('prefer-canonical-length-cast', preferCanonicalLengthCast, {
+    valid: [
+      {
+        name: 'a wrapped bound other than the degenerate one',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asMinLengthArray(2 as const, xs);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a bound wrapped in `as const`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asMinLengthArray(1 as const, xs);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asNonEmptyArray(xs);
+        `,
+        errors: [{ messageId: 'useCanonicalCast' }],
+      },
+      {
+        name: 'bounds wrapped in `satisfies`, the kept one keeping its wrapper',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asBoundedLengthTuple(3 satisfies number, 3 as const, xs!);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asFixedLengthTuple(3 satisfies number, xs!);
+        `,
+        errors: [{ messageId: 'useCanonicalCast' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-canonical-length-cast with parenthesized operands', () => {
+  tester.run('prefer-canonical-length-cast', preferCanonicalLengthCast, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a parenthesized array after the dropped bound',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asMinLengthArray(1, (xs));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asNonEmptyArray((xs));
+        `,
+        errors: [{ messageId: 'useCanonicalCast' }],
+      },
+      {
+        name: 'a parenthesized dropped bound',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asMinLengthArray((1), xs);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asNonEmptyArray(xs);
+        `,
+        errors: [{ messageId: 'useCanonicalCast' }],
+      },
+      {
+        name: 'a parenthesized second bound of a bounded cast',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asBoundedLengthArray(2, ((2)), xs);
+          const zs = Arr.asBoundedLengthArray((0), (0), (xs));
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+
+          declare const xs: readonly number[];
+          const ys = Arr.asFixedLengthArray(2, xs);
+          const zs = Arr.asEmptyArray((xs));
+        `,
+        errors: [
+          { messageId: 'useCanonicalCast' },
+          { messageId: 'useCanonicalCast' },
+        ],
+      },
+    ],
+  });
+});

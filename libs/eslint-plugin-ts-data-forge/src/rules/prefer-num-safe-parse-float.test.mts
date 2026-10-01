@@ -161,3 +161,75 @@ describe('prefer-num-safe-parse-float', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-num-safe-parse-float through type wrappers', () => {
+  tester.run('prefer-num-safe-parse-float', preferNumSafeParseFloat, {
+    valid: [
+      {
+        name: 'an unknown value cast to string',
+        code: dedent`
+          declare const v: unknown;
+          const a = Number(v as string);
+          const b = parseFloat(<string>v);
+        `,
+      },
+      {
+        name: 'a number cast to string',
+        code: dedent`
+          declare const n: number;
+          const a = Number(n as unknown as string);
+        `,
+      },
+      {
+        name: 'a `!` that leaves null in place (`Number(null)` is 0)',
+        code: dedent`
+          declare const s: string | null;
+          const a = Number(s!);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a string argument keeps its wrapper',
+        code: dedent`
+          declare const s: string;
+          const a = Number(s!);
+          const b = parseFloat(s satisfies string);
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          const a = Result.unwrapOkOr(Num.safeParseFloat(s!), Number.NaN);
+          const b = Result.unwrapOkOr(Num.safeParseFloat(s satisfies string), Number.NaN);
+        `,
+        errors: [
+          { messageId: 'useSafeParseFloat' },
+          { messageId: 'useSafeParseFloat' },
+        ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-num-safe-parse-float with parenthesized operands', () => {
+  tester.run('prefer-num-safe-parse-float', preferNumSafeParseFloat, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence argument keeps its parentheses',
+        code: dedent`
+          declare const s: string;
+          declare const log: () => void;
+          const a = Number((log(), s));
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          declare const log: () => void;
+          const a = Result.unwrapOkOr(Num.safeParseFloat((log(), s)), Number.NaN);
+        `,
+        errors: [{ messageId: 'useSafeParseFloat' }],
+      },
+    ],
+  });
+}, 20000);

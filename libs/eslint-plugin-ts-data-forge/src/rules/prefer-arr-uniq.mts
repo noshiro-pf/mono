@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
+import { skipTypeWrappers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getImportedLocalName,
@@ -221,8 +222,11 @@ const mutatingMethods: ReadonlySet<string> = new Set([
  */
 const getSetSourceArray = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
+  wrapped: TSESTree.Node,
 ): TSESTree.Expression | undefined => {
+  // `new Set(xs) as ReadonlySet<string>` is still `new Set(xs)`.
+  const node = skipTypeWrappers(wrapped);
+
   if (
     node.type !== AST_NODE_TYPES.NewExpression ||
     node.callee.type !== AST_NODE_TYPES.Identifier ||
@@ -348,15 +352,17 @@ const needsMutableResult = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.Node,
 ): boolean => {
-  if (isUsedAsMutable(checker, getTsNode, node)) {
+  const outer = outermostTypePreservingWrapper(node);
+
+  if (isUsedAsMutable(checker, getTsNode, outer)) {
     return true;
   }
 
-  const parent = node.parent;
+  const parent = outer.parent;
 
   if (
     parent?.type !== AST_NODE_TYPES.VariableDeclarator ||
-    parent.init !== node ||
+    parent.init !== outer ||
     parent.id.type !== AST_NODE_TYPES.Identifier ||
     parent.id.typeAnnotation !== undefined
   ) {
@@ -369,9 +375,33 @@ const needsMutableResult = (
     variable?.references.some(
       (reference) =>
         reference.init !== true &&
-        isUsedAsMutable(checker, getTsNode, reference.identifier),
+        isUsedAsMutable(
+          checker,
+          getTsNode,
+          outermostTypePreservingWrapper(reference.identifier),
+        ),
     ) ?? false
   );
+};
+
+/**
+ * `node`, or the outermost `!` / `satisfies` around it. Neither changes the
+ * type the value is used at, so `Array.from(new Set(xs))!.push(4)` and
+ * `ys!.push(4)` still need a mutable array. An `as` does change it, and a
+ * readonly array may be cast to a mutable one, so the walk stops there.
+ */
+const outermostTypePreservingWrapper = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): TSESTree.Node => {
+  const { parent } = node;
+
+  return parent !== undefined &&
+    (parent.type === AST_NODE_TYPES.TSNonNullExpression ||
+      parent.type === AST_NODE_TYPES.TSSatisfiesExpression) &&
+    parent.expression === node
+    ? outermostTypePreservingWrapper(parent)
+    : node;
 };
 
 const isUsedAsMutable = (
