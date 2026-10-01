@@ -289,3 +289,37 @@ describe('prefer-is-record-and-has-key', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-is-record-and-has-key through type wrappers', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [],
+    invalid: [
+      {
+        name: 'keeps isRecord for an array cast to a record: the value is still an array',
+        code: dedent`
+          declare const arr: readonly string[];
+          const ok = Object.hasOwn(arr as unknown as Record<string, unknown>, '0');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          declare const arr: readonly string[];
+          const ok = (isRecord(arr as unknown as Record<string, unknown>) && hasKey(arr as unknown as Record<string, unknown>, '0'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'keeps isRecord for a record widened to include an array: the author says it may be one',
+        code: dedent`
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = Object.hasOwn(obj as Readonly<Record<string, unknown>> | readonly unknown[], 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = (isRecord(obj as Readonly<Record<string, unknown>> | readonly unknown[]) && hasKey(obj as Readonly<Record<string, unknown>> | readonly unknown[], 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+    ],
+  });
+});

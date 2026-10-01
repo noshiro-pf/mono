@@ -93,6 +93,14 @@ describe('prefer-arr-is-non-empty through type wrappers', () => {
   tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
     valid: [
       {
+        name: 'a type that says `0` is not the value `0`: only a literal is read through its wrapper',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const n: number;
+          const a = xs.length > (n as 0);
+        `,
+      },
+      {
         name: 'a computed index named `length` is not the length',
         code: dedent`
           declare const xs: readonly number[];

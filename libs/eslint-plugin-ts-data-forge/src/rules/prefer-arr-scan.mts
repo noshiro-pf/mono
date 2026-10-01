@@ -6,7 +6,11 @@ import {
 import { Arr } from 'ts-data-forge';
 import { type FixedLengthTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
+import {
+  skipTypeWrappers,
+  toArgumentText,
+  typeWrapperLayers,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -280,12 +284,13 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // which a seeded accumulator never does. So once the value `scan` carries
       // is known not to be nullish, a `?? fallback` guarding the read is dead
       // and the fix takes it with the read — leaving it would hand the author an
-      // unnecessary condition that no rule can fix for them. Both the value
-      // under any `as` / `!` and the type the wrapper states are asked: the
-      // first is what `scan` carries at run time (`[init!]` may still hold
-      // `undefined`), the second is what it is typed as.
-      const carriesNullish = [seed, element].some(
-        (node) => isNullish(node) || isNullish(skipTypeWrappers(node)),
+      // unnecessary condition that no rule can fix for them. Every layer of
+      // type wrappers is asked (see typeWrapperLayers): the value under an
+      // `as` / `!` is what `scan` carries at run time (`[init!]` may still
+      // hold `undefined`), and a wider type a wrapper states is the author
+      // saying it may be nullish.
+      const carriesNullish = [seed, element].some((node) =>
+        typeWrapperLayers(node).some(isNullish),
       );
 
       const mut_lastReads: Splice[] = [];

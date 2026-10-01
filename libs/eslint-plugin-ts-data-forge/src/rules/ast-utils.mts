@@ -7,10 +7,10 @@ import { type DeepReadonly } from 'ts-type-forge';
 
 /**
  * `node` with every `as`, `satisfies`, `!` and `<T>` around it taken off: the
- * expression whose value it is. A rule judges syntax and asks types on this, so
- * that a wrapper neither hides a pattern (`xs.length > (0 as number)`) nor
- * vouches for a type (`Number(v as string)`, whose value is still `unknown`),
- * and writes its fix from the original node so the wrapper is kept. See
+ * expression whose value it is. A wrapper changes no value, so a rule judges
+ * syntax on this — `xs.length > (0 as number)` compares with the literal `0`
+ * — and writes its fix from the original node so the wrapper is kept. A type
+ * is another matter: see {@link typeWrapperLayers}. See
  * `docs/writing-lint-rules.md` at the repository root. A copy of
  * `eslint-config-typed`'s `type-wrapper-utils.mts`, since this package is
  * published on its own.
@@ -19,6 +19,25 @@ export const skipTypeWrappers = <N extends TSESTree.Node>(
   node: N,
 ): N | TSESTree.Expression =>
   isTypeWrapper(node) ? skipTypeWrappers(node.expression) : node;
+
+/**
+ * `node` and every expression inside the type wrappers around it, outermost
+ * first: `x as A as B` gives `x as A as B`, `x as A` and `x`.
+ *
+ * A conclusion a rule draws from a type — that a guard always holds, that a
+ * value is an array, that `?? 0` is dead — has to hold for the type of every
+ * layer. An assertion therefore only ever makes a rule more cautious: one
+ * that widens (`x as string | null`) is the author saying the value may be
+ * `null`, and is respected; one that narrows (`x!`, `v as string` on an
+ * `unknown`) is a claim the checker cannot verify, and the value's own type
+ * still decides.
+ */
+export const typeWrapperLayers = <N extends TSESTree.Node>(
+  node: N,
+): readonly (N | TSESTree.Expression)[] =>
+  isTypeWrapper(node)
+    ? ([node, ...typeWrapperLayers(node.expression)] as const)
+    : ([node] as const);
 
 export const isTypeWrapper = (
   node: DeepReadonly<TSESTree.Node>,
@@ -59,10 +78,10 @@ export const toArgumentText = (
 };
 
 /**
- * Whether `node` is an array or a tuple, asked both of the type an `as` / `!` /
- * `satisfies` around it states and of the value underneath: a cast does not
- * make a string an array, and the fix, which keeps the wrapper, has to
- * type-check too. `false` without type information.
+ * Whether `node` is an array or a tuple at every layer of type wrappers (see
+ * {@link typeWrapperLayers}): a cast does not make a string an array, and the
+ * fix, which keeps the wrapper, has to type-check too. `false` without type
+ * information.
  */
 export const isArrayOrTupleExpression = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -76,7 +95,7 @@ export const isArrayOrTupleExpression = (
     return false;
   }
 
-  return [node, skipTypeWrappers(node)].every((expression) => {
+  return typeWrapperLayers(node).every((expression) => {
     const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
 
     if (tsNode === undefined) {

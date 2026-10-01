@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
+import { toArgumentText, typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -120,10 +120,11 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
 
           const checker = services.program.getTypeChecker();
 
-          // Both the value under any `as` / `!` / `satisfies` and the type the
-          // wrapper states must be `string`: the first is what `Number` sees at
-          // run time (`Number(v as string)` may still be handed `true`), the
-          // second is what the fix, which keeps the wrapper, passes on.
+          // Every layer of type wrappers must be `string` (see
+          // typeWrapperLayers): the value underneath is what `Number` sees at
+          // run time (`Number(v as string)` may still be handed `true`), and
+          // the type a wrapper states is what the fix, which keeps the
+          // wrapper, passes on.
           const isString = (
             // AST nodes hold mutable child arrays, so they are not deeply readonly.
             // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -137,7 +138,7 @@ export const preferNumSafeParseFloat: TSESLint.RuleModule<MessageIds, Options> =
             );
           };
 
-          if (!isString(firstArg) || !isString(skipTypeWrappers(firstArg))) {
+          if (!typeWrapperLayers(firstArg).every(isString)) {
             return;
           }
 

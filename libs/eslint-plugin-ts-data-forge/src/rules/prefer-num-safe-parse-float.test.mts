@@ -181,6 +181,13 @@ describe('prefer-num-safe-parse-float through type wrappers', () => {
         `,
       },
       {
+        name: 'a string whose type a middle layer does not vouch for',
+        code: dedent`
+          declare const s: string;
+          const a = Number(s as unknown as string);
+        `,
+      },
+      {
         name: 'a `!` that leaves null in place (`Number(null)` is 0)',
         code: dedent`
           declare const s: string | null;

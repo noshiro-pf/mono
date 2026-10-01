@@ -497,6 +497,22 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
           const y = isNull(x!);
         `,
       },
+      {
+        name: 'isNull on a value widened to include null: the `as` is the author saying it may be null',
+        code: dedent`
+          import { isNull } from 'ts-data-forge';
+          declare const x: string;
+          const y = isNull(x as string | null);
+        `,
+      },
+      {
+        name: 'isNullish on a value widened to include null is not narrowed to isUndefined',
+        code: dedent`
+          import { isNullish } from 'ts-data-forge';
+          declare const x: string | undefined;
+          const y = isNullish(x as string | null | undefined);
+        `,
+      },
     ],
     invalid: [
       {
@@ -514,11 +530,11 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
         errors: [{ messageId: 'replaceTypeGuard' }],
       },
       {
-        name: 'isNull on a value cast to include null',
+        name: 'isNull on a value widened to exclude null still, at every layer',
         code: dedent`
           import { isNull } from 'ts-data-forge';
           declare const x: string;
-          const y = isNull(x as string | null);
+          const y = isNull(x as string | undefined);
         `,
         output: dedent`
           import { isNull } from 'ts-data-forge';

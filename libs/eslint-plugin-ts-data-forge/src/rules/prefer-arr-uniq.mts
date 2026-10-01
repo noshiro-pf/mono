@@ -5,7 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { skipTypeWrappers } from './ast-utils.mjs';
+import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getImportedLocalName,
@@ -88,15 +88,19 @@ export const preferArrUniq: TSESLint.RuleModule<MessageIds, Options> = {
         return;
       }
 
-      const arrayTsNode = getTsNode(arrayExpression);
+      // At every layer of type wrappers (see typeWrapperLayers).
+      const isPrimitiveArray = typeWrapperLayers(arrayExpression).every(
+        (layer) => {
+          const tsNode = getTsNode(layer);
 
-      if (arrayTsNode === undefined) {
-        return;
-      }
+          return (
+            tsNode !== undefined &&
+            isPrimitiveArrayType(checker, checker.getTypeAtLocation(tsNode))
+          );
+        },
+      );
 
-      if (
-        !isPrimitiveArrayType(checker, checker.getTypeAtLocation(arrayTsNode))
-      ) {
+      if (!isPrimitiveArray) {
         return;
       }
 

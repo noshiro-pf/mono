@@ -5,7 +5,11 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr, pipe } from 'ts-data-forge';
 import { type TypeReference } from 'typescript';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
+import {
+  skipTypeWrappers,
+  toArgumentText,
+  typeWrapperLayers,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -126,9 +130,9 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
           right.type === AST_NODE_TYPES.Identifier &&
           right.name === param2.name
         ) {
-          // Check if arrayExpression type is number[] or compatible, both as
-          // written and under any wrapper: a cast does not turn strings,
-          // which `+` concatenates, into numbers.
+          // Check if arrayExpression type is number[] or compatible at every
+          // layer of type wrappers: a cast does not turn strings, which `+`
+          // concatenates, into numbers.
           const isNumberArray = (
             // AST nodes hold mutable child arrays, so they are not deeply readonly.
             // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -162,10 +166,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
             );
           };
 
-          if (
-            isNumberArray(arrayExpression) &&
-            isNumberArray(skipTypeWrappers(arrayExpression))
-          ) {
+          if (typeWrapperLayers(arrayExpression).every(isNumberArray)) {
             mut_nodesToFix.push({
               node,
               arrayExpression,

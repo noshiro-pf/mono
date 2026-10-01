@@ -6,7 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { skipTypeWrappers } from './ast-utils.mjs';
+import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getImportedLocalName,
@@ -245,17 +245,16 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       checker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(node));
 
     /**
-     * Whether `predicate` holds both for the type an `as` / `!` / `satisfies`
-     * around `node` states and for the value underneath: a cast neither makes
-     * a `Set` an array nor stops an array from being flattened by `concat`, and
-     * the fix, which keeps the wrapper, has to type-check as well.
+     * Whether `predicate` holds for the type of every layer of type wrappers
+     * around `node` (see typeWrapperLayers): a cast neither makes a `Set` an
+     * array nor stops an array from being flattened by `concat`, and the fix,
+     * which keeps the wrapper, has to type-check as well.
      */
     const holdsThroughWrappers = (
       node: TSESTree.Node,
       predicate: (type: ts.Type) => boolean,
     ): boolean =>
-      predicate(getTypeOf(node)) &&
-      predicate(getTypeOf(skipTypeWrappers(node)));
+      typeWrapperLayers(node).every((layer) => predicate(getTypeOf(layer)));
 
     /**
      * `true` only when the type can never be an array in any branch, so

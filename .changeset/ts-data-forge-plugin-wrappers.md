@@ -7,6 +7,14 @@ Read through type wrappers, and keep the parentheses a fix needs. A
 type the value does not have, and a fix no longer drops parentheses the
 source wrote around an operand (a node's text never includes them).
 
+Syntax is read through a wrapper, since a wrapper changes no value:
+`xs.length > (0 as number)` compares with `0`. A conclusion drawn from a type
+has to hold at every layer of wrappers, so an assertion only ever makes a
+rule more cautious. A widening `as` is the author's word and is respected
+(`isNull(x as string | null)` on a `string` is not folded to `false`); a
+narrowing one (`x!`, `v as string` on an `unknown`) cannot vouch for the
+value, whose own type still decides.
+
 - `prefer-arr-scan`: a `?? fallback` is removed only when the seed and the
   appended value cannot be nullish under their wrappers either, so
   `[init!]` keeps it. An object literal or sequence element is written as
@@ -14,7 +22,7 @@ source wrote around an operand (a node's text never includes them).
   `[...(acc as T[]), x]` or `Arr.toPushed(acc!, x)`, and a wrapped sliced
   array, are recognized.
 - `prefer-canonical-array-slicing`: a receiver, spread or `concat` argument
-  must be an array (or not one) both as cast and underneath, so
+  must be an array (or not one) at every layer of wrappers, so
   `xs.concat(v as number)` with `v: number | readonly number[]` and
   `[...(set as unknown as T[]), x]` are left alone. Counts and the filter
   index may be wrapped (`xs.slice(1 as number)`).
@@ -22,9 +30,11 @@ source wrote around an operand (a node's text never includes them).
   parentheses with it and leaves those around the next one, instead of
   producing unbalanced output from `Arr.asMinLengthArray(1, (xs))`. A bound
   may be wrapped (`1 as const`).
-- `no-unnecessary-type-guard`: the argument's type is that of the value
-  under any wrapper, so `isNullish(x as string | undefined)` on a value that
-  may be `null` is no longer rewritten to `isUndefined`.
+- `no-unnecessary-type-guard`: a verdict (always true, always false, or a
+  narrower guard) is reported only when it holds for the argument's type at
+  every layer. `isNullish(x as string | undefined)` on a value that may be
+  `null` is no longer rewritten to `isUndefined`, and `isNull(x as string | null)`
+  on a `string` is left alone.
 - `prefer-comparison-over-nullish-guard`: a call under `as`, `satisfies` or
   `<T>` is written `(x === null) satisfies boolean`, and a `|`, `^`, `&`,
   equality, `as` or `satisfies` argument is parenthesized on the left of the
@@ -56,3 +66,6 @@ source wrote around an operand (a node's text never includes them).
   `xs[reduce](…)` is left alone, and a sequence array keeps its parentheses.
 - `prefer-arr-uniq`: `new Set(xs)` may be wrapped, and a result mutated
   through `!` or `satisfies` is only suggested, not fixed.
+- `prefer-is-record-and-has-key`: `isRecord` is dropped only when the object
+  is a record at every layer of wrappers, so an array cast to
+  `Record<string, unknown>` keeps it.

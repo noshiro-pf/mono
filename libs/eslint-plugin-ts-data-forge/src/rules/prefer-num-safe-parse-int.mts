@@ -4,7 +4,11 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
-import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
+import {
+  skipTypeWrappers,
+  toArgumentText,
+  typeWrapperLayers,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -114,9 +118,9 @@ export const preferNumSafeParseInt: TSESLint.RuleModule<MessageIds, Options> = {
         }
 
         // The argument must be a `string` so the autofix is type-safe against
-        // `Num.safeParseInt(s: string)`. Without type information, skip. Both
-        // the value under any `as` / `!` / `satisfies` and the type the
-        // wrapper states are asked: a cast does not make a number a string.
+        // `Num.safeParseInt(s: string)`. Without type information, skip. Every
+        // layer of type wrappers is asked (see typeWrapperLayers): a cast
+        // does not make a number a string.
         if (services?.program == null) {
           return;
         }
@@ -136,7 +140,7 @@ export const preferNumSafeParseInt: TSESLint.RuleModule<MessageIds, Options> = {
           );
         };
 
-        if (!isString(firstArg) || !isString(skipTypeWrappers(firstArg))) {
+        if (!typeWrapperLayers(firstArg).every(isString)) {
           return;
         }
 
