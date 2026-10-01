@@ -12,7 +12,7 @@ TypeScript リポジトリを前提に、**AI coding の促進**と**サプラ�
 
 この二つは直接には関係のない、別のテーマです。一緒に扱うのは、**どちらも「今」必要になった**という点が共通しているからです。AI によって攻撃側のコストも下がり、同時に自分たちがコードと依存を増やす速度も上がりました。どちらも、以前なら後回しにできた整備かもしれませんが、今はそのコストに見合うリターンがある時代になってきています。
 
-検証や実測は筆者の monorepo で行ったものですが、**他のリポジトリに持ち出せる形**に絞って書いています。
+検証や実測は筆者が普段開発している monorepo で行ったものですが、**他のリポジトリに持ち出せる形**に絞って書いています。
 
 https://github.com/noshiro-pf/mono
 
@@ -30,7 +30,7 @@ https://github.com/noshiro-pf/mono
 - **CI の install は必ず `--frozen-lockfile`。**
 - **`packageManager` フィールドでパッケージマネージャ自体のバージョンも固定する。**
 
-:::details minimumReleaseAgeExclude は「方針」ではなく「期限付き waiver」として書く
+:::details minimumReleaseAgeExclude は方針ではなく期限付きの免除として書く
 
 **除外エントリを名前だけで書くと、そのパッケージは以後ずっと隔離を素通りします。** 追加した理由が解消しても誰も気づきません。**バージョンまで書き、`minimumReleaseAgeExcludePrune: true` で失効させる**のが正解です（prune は pnpm 11.21 以降、デフォルトは `false`）。
 
