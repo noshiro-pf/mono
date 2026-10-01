@@ -83,7 +83,6 @@
     "typescript-native": "npm:typescript@7.0.2",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"
