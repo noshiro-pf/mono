@@ -265,8 +265,8 @@ const createPackages = async (
  * false` *and* `publicHoistPattern`, since a transitive dependency never
  * reaches the root `node_modules` where `libReplacement` looks. Shipping the
  * libs inside this package removes both: the only dependency a consumer
- * declares is direct, which pnpm always allows, and `paths` points TypeScript
- * at `libs/*` or `libs-branded/*`.
+ * declares is direct, which pnpm always allows, and the bundled linker (or, on
+ * TypeScript 7, `paths`) points TypeScript at `libs/*` or `libs-branded/*`.
  */
 const genBundlePackage = async (
   ctx: Context,
@@ -436,15 +436,20 @@ const genBundlePackage = async (
  * How a consumer points TypeScript at the flavor they chose — which differs by
  * TypeScript version, so each package documents only its own.
  *
- * TypeScript resolves a lib replacement in one of two ways, and they are
- * exclusive. Measured, package against its own TypeScript:
+ * Every version resolves a replacement by name, which the linker answers;
+ * TypeScript 7 alone also reads `paths`, so its package offers that as well.
+ * Measured, package against its own TypeScript:
  *
- * | TypeScript | route          | `libReplacement`                     |
- * | :--------- | :------------- | :----------------------------------- |
- * | 5.0 – 5.7  | name lookup    | not a known option; setting it errors |
- * | 5.8 – 5.9  | name lookup    | defaults to on                        |
- * | 6.x        | name lookup    | defaults to **off**; must be set      |
- * | 7.x        | `paths`        | defaults to **off**; must be set      |
+ * | TypeScript | route                    | `libReplacement`                      |
+ * | :--------- | :----------------------- | :------------------------------------ |
+ * | 5.0 – 5.7  | name lookup              | not a known option; setting it errors |
+ * | 5.8 – 5.9  | name lookup              | defaults to on                        |
+ * | 6.x        | name lookup              | defaults to **off**; must be set      |
+ * | 7.x        | name lookup, or `paths`  | defaults to **off**; must be set      |
+ *
+ * The linker comes first even at 7.x, because a project type-checking with
+ * TypeScript 7 still lints with a 6.x one: typescript-eslint needs the
+ * JavaScript compiler API, which TypeScript 7.0's package does not export.
  */
 const setupSection = (
   libName: string,
@@ -454,37 +459,20 @@ const setupSection = (
     .split('.')
     .map((part) => Result.unwrapOkOr(Num.safeParseInt(part), 0));
 
-  if (major >= 7) {
-    return [
-      'Point `paths` at the one you want, in your `tsconfig.json`:',
-      '',
-      '```jsonc',
-      '{',
-      '    "compilerOptions": {',
-      '        "libReplacement": true,',
-      '        "paths": {',
-      `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
-      '        },',
-      '    },',
-      '}',
-      '```',
-      '',
-      'Two things to watch, because both fail silently — the replacement simply',
-      'does not happen, with no error:',
-      '',
-      '- **`paths` is replaced, not merged, by a config that `extends` another**,',
-      '  so it has to be written in whichever config TypeScript actually loads.',
-      '- **The path is relative to the config that contains it**, which in a',
-      '  monorepo package is usually `../../node_modules/…`.',
-      '',
-    ];
-  }
-
   return [
-    `TypeScript ${major}.${minor} resolves \`@typescript/lib-*\` as ordinary`,
-    'package names, through a fixed Node10 lookup — it does not read `paths`',
-    'for this. Run the linker this package ships to supply those names. It',
-    'creates one symlink per lib group under `node_modules/@typescript/`:',
+    ...(major >= 7
+      ? [
+          `TypeScript ${major}.${minor} looks a replacement up as \`@typescript/lib-*\`,`,
+          'an ordinary package name. Run the linker this package ships to supply',
+          'those names. It creates one symlink per lib group under',
+          '`node_modules/@typescript/`:',
+        ]
+      : [
+          `TypeScript ${major}.${minor} resolves \`@typescript/lib-*\` as ordinary`,
+          'package names, through a fixed Node10 lookup — it does not read `paths`',
+          'for this. Run the linker this package ships to supply those names. It',
+          'creates one symlink per lib group under `node_modules/@typescript/`:',
+        ]),
     '',
     '```sh',
     `npx ${libName}-link             # plain \`number\``,
@@ -529,8 +517,44 @@ const setupSection = (
           ]),
     '`--unlink` removes the links again.',
     '',
+    ...(major >= 7 ? pathsAlternative(libName) : []),
   ];
 };
+
+/**
+ * The second route, which only TypeScript 7 reads. It saves the `prepare`
+ * script, and is worth offering only with what it does not reach said
+ * beside it.
+ */
+const pathsAlternative = (libName: string): readonly string[] => [
+  '**Or, if nothing runs TypeScript 6, `paths`.** TypeScript 7 also reads',
+  '`paths` for this, so instead of linking you can point it at the flavor you',
+  'want:',
+  '',
+  '```jsonc',
+  '{',
+  '    "compilerOptions": {',
+  '        "libReplacement": true,',
+  '        "paths": {',
+  `            "@typescript/lib-*": ["./node_modules/${libName}/libs/*"],`,
+  '        },',
+  '    },',
+  '}',
+  '```',
+  '',
+  'Three things to watch, because all of them fail silently — the replacement',
+  'simply does not happen, with no error:',
+  '',
+  '- **TypeScript 6 and earlier ignore it.** That includes your linter:',
+  '  typescript-eslint needs the JavaScript compiler API, which TypeScript 7.0',
+  '  does not export, so it runs a 6.x `typescript` and sees the stock library.',
+  '  Use the linker if anything type-aware runs on TypeScript 6.',
+  '- **`paths` is replaced, not merged, by a config that `extends` another**,',
+  '  so it has to be written in whichever config TypeScript actually loads.',
+  '- **The path is relative to the config that contains it**, which in a',
+  '  monorepo package is usually `../../node_modules/…`.',
+  '',
+];
 
 /**
  * The bundle's changelog, taken from the harness that changesets actually

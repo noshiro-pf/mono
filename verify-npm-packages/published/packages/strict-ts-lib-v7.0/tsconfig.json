@@ -8,10 +8,7 @@
     "noEmit": true,
     "skipLibCheck": false,
     "types": [],
-    "libReplacement": true,
-    "paths": {
-      "@typescript/lib-*": ["./node_modules/strict-ts-lib-v7.0/libs/*"]
-    }
+    "libReplacement": true
   },
   "include": ["strict-ts-lib-v7.0.mts"]
 }

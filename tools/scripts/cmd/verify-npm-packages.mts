@@ -93,7 +93,49 @@ export const verifyNpmPackages = async (
 
   console.info('ok\n');
 
-  return runChecks(spaceDir, included);
+  return withoutRootLibLinks(() => runChecks(spaceDir, included));
+};
+
+/**
+ * Runs `check` with the repository's own `@typescript/lib-*` links removed,
+ * and puts them back afterwards, whatever `check` returned.
+ *
+ * The root `prepare` links the strict library into the repository's
+ * `node_modules/@typescript/`, and every project in the space sits below it.
+ * TypeScript finds a lib replacement by walking up through `node_modules`, so
+ * with those links in place a project whose own setup did nothing still finds
+ * one — the repository's, not the package's — and its probe passes: a
+ * `strict-ts-lib-v7.0` project with no links and a `paths` entry pointing
+ * nowhere compiled clean.
+ */
+const withoutRootLibLinks = async (
+  check: () => Promise<Result<undefined, string>>,
+): Promise<Result<undefined, string>> => {
+  const unlinked = await $('pnpm run z:link-strict-lib --unlink', {
+    silent: true,
+    cwd: projectRootPath,
+  });
+
+  if (Result.isErr(unlinked)) {
+    return Result.err(
+      `Could not remove the repository's own @typescript/lib-* links: ${unlinked.value.message}`,
+    );
+  }
+
+  const result = await check();
+
+  const relinked = await $('pnpm run z:link-strict-lib', {
+    silent: true,
+    cwd: projectRootPath,
+  });
+
+  if (Result.isErr(relinked)) {
+    return Result.err(
+      `Could not restore the repository's own @typescript/lib-* links (run \`pnpm run z:link-strict-lib\`): ${relinked.value.message}`,
+    );
+  }
+
+  return result;
 };
 
 /**
@@ -399,24 +441,24 @@ const generateSpace = async (
 
     await writeFile(path.resolve(dir, smokeFileName(pkg.name)), content);
 
-    if (isTypesOnly(pkg.name)) {
-      await writeJson(path.resolve(dir, 'tsconfig.json'), {
-        compilerOptions: {
-          strict: true,
-          noUncheckedIndexedAccess: true,
-          target: 'ESNext',
-          module: 'NodeNext',
-          moduleResolution: 'nodenext',
-          noEmit: true,
-          skipLibCheck: false,
-          // What the strict library check exists to verify: that the recipe
-          // in the package's own README is enough for TypeScript to replace
-          // its own declarations. Which recipe that is depends on the
-          // version — see `strictLibCompilerOptions`.
-          ...strictLibCompilerOptions(pkg.name),
-        },
-        include: [smokeFileName(pkg.name)],
-      });
+    if (!isTypesOnly(pkg.name)) {
+      continue;
+    }
+
+    await writeJson(
+      path.resolve(dir, 'tsconfig.json'),
+      smokeTsconfig(pkg.name),
+    );
+
+    if (hasPathsRoute(pkg.name)) {
+      await writeJson(
+        path.resolve(dir, PATHS_TSCONFIG),
+        smokeTsconfig(pkg.name, {
+          paths: {
+            '@typescript/lib-*': [`./node_modules/${pkg.name}/libs/*`],
+          },
+        }),
+      );
     }
   }
 
@@ -768,6 +810,30 @@ const smokeSourceName = (packageName: string): string =>
     ? 'strict-ts-lib.mts'
     : smokeFileName(packageName);
 
+/** The `tsconfig.json` a types-only package is compiled through. */
+const smokeTsconfig = (
+  packageName: string,
+  extra: ReadonlyRecord<string, JsonValue> = {},
+): ReadonlyRecord<string, JsonValue> =>
+  ({
+    compilerOptions: {
+      strict: true,
+      noUncheckedIndexedAccess: true,
+      target: 'ESNext',
+      module: 'NodeNext',
+      moduleResolution: 'nodenext',
+      noEmit: true,
+      skipLibCheck: false,
+      // What the strict library check exists to verify: that the recipe in the
+      // package's own README is enough for TypeScript to replace its own
+      // declarations. Which recipe that is depends on the version — see
+      // `strictLibCompilerOptions`.
+      ...strictLibCompilerOptions(packageName),
+      ...extra,
+    },
+    include: [smokeFileName(packageName)],
+  }) as const;
+
 const isTypesOnly = (packageName: string): boolean =>
   typesOnlyPackages.has(packageName) || isStrictLibPackage(packageName);
 
@@ -792,17 +858,15 @@ const typescriptSpec = (pkg: PackageToCheck): string => {
 
 /**
  * The `compilerOptions` a strict standard library package's own README tells
- * a consumer to write. Nothing for a package that is not one.
+ * a consumer to write beside the linker. Nothing for a package that is not
+ * one.
  *
- * The two routes are exclusive, and which applies is the TypeScript version:
- *
- * - **TypeScript 7** reads `paths` and no longer looks `@typescript/lib-*` up
- *   by name.
- * - **TypeScript 6 and earlier** do the opposite — a fixed Node10 lookup that
- *   ignores `paths`. Those names come from the linker the package ships; see
- *   `needsLinker`. `libReplacement` stops defaulting to on at TypeScript 6,
- *   and is not a known option at all before 5.8, so it is set only where it
- *   is both valid and needed.
+ * Every version resolves `@typescript/lib-*` by name, which is what the
+ * linker the package ships answers; `libReplacement` stops defaulting to on at
+ * TypeScript 6, and is not a known option at all before 5.8, so it is set only
+ * where it is both valid and needed. TypeScript 7 also reads `paths` for a lib
+ * replacement, which its README offers as a second route — see
+ * `hasPathsRoute`.
  */
 const strictLibCompilerOptions = (
   packageName: string,
@@ -819,25 +883,23 @@ const strictLibCompilerOptions = (
     // `skipLibCheck: false` a modern `@types/node` against an old TypeScript
     // buries the check in `TS2451: Cannot redeclare block-scoped variable`.
     types: [],
-    ...(major >= 7
-      ? {
-          libReplacement: true,
-          paths: {
-            '@typescript/lib-*': [`./node_modules/${packageName}/libs/*`],
-          },
-        }
-      : major >= 6
-        ? { libReplacement: true }
-        : {}),
+    ...(major >= 6 ? { libReplacement: true } : {}),
   };
 };
 
-/** Every strict standard library package except the TypeScript 7 one. */
-const needsLinker = (packageName: string): boolean => {
+/**
+ * The packages whose README also offers `paths` instead of the linker: those
+ * for TypeScript 7, the first version to read `paths` for a lib replacement.
+ * Their project carries a second config, {@link PATHS_TSCONFIG}, compiled
+ * before anything is linked so that it proves `paths` alone is enough.
+ */
+const hasPathsRoute = (packageName: string): boolean => {
   const major = strictLibTypeScriptMajor(packageName);
 
-  return major !== undefined && major < 7;
+  return major !== undefined && major >= 7;
 };
+
+const PATHS_TSCONFIG = 'tsconfig.paths.json';
 
 const isStrictLibPackage = (packageName: string): boolean =>
   strictLibTypeScriptMajor(packageName) !== undefined;
@@ -877,20 +939,30 @@ const runChecks = async (
     const isolation =
       `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'` as const;
 
-    // The packages whose TypeScript resolves `@typescript/lib-*` by name are
-    // set up by the linker they ship, exactly as their README instructs —
-    // which makes the linker itself part of what is under test.
-    // `--dir` because the linker is run from the repository root rather than
-    // from the project, and under pnpm it cannot tell where it was installed
-    // from its own path — a consumer running `npx` in their project needs
-    // neither.
-    const link = needsLinker(pkg.name)
-      ? (`${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir} && ` as const)
+    const tsc = (tsconfig: string): string =>
+      `${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, tsconfig)}` as const;
+
+    // A strict standard library is set up by the linker it ships, exactly as
+    // its README instructs — which makes the linker itself part of what is
+    // under test. `--dir` because the linker is run from the repository root
+    // rather than from the project, and under pnpm it cannot tell where it was
+    // installed from its own path — a consumer running `npx` in their project
+    // needs neither.
+    const linker =
+      `${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir}` as const;
+
+    // The `paths` route goes first, after removing any links an earlier run
+    // left: with them in place, the name lookup would replace the libs on its
+    // own and the route would pass whether `paths` worked or not.
+    const pathsRoute = hasPathsRoute(pkg.name)
+      ? (`${linker} --unlink && ${tsc(PATHS_TSCONFIG)} && ` as const)
       : '';
 
-    const cmd = file.endsWith('.mts')
-      ? (`${link}${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, 'tsconfig.json')}` as const)
-      : (`${isolation} node ${path.resolve(dir, file)}` as const);
+    const cmd = isStrictLibPackage(pkg.name)
+      ? (`${pathsRoute}${linker} && ${tsc('tsconfig.json')}` as const)
+      : file.endsWith('.mts')
+        ? tsc('tsconfig.json')
+        : (`${isolation} node ${path.resolve(dir, file)}` as const);
 
     // From the project directory, which is where a consumer runs their own
     // build. It is not cosmetic: TypeScript 5.0 resolves `@typescript/lib-*`
