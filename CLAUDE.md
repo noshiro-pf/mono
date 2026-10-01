@@ -124,13 +124,9 @@ inventory in `docs/experimental-inventory.md`. Nothing here is installed,
 built or checked, and a diff touching only it skips every workflow.
 
 - Do not add it to the workspace, and do not fix code here in unrelated work.
-- An import is a snapshot: take the branch the work is on (check every
-  branch, say which), take only what a still-existing template does not
-  provide, and record source, commit and omissions in a `README.md` at its
-  top.
-- To revive a package, move it to `libs/` or `apps/` and migrate
-  `@noshiro/ts-utils` → `ts-data-forge`, `@noshiro/ts-type-utils` →
-  `ts-type-forge`, `@noshiro/io-ts` → `ts-fortress`.
+- Importing into it and reviving from it follow `experimental/README.md`;
+  above all, no `package.json` or lockfile stays here, because Dependabot
+  alerts on them and no setting excludes a directory.
 
 ## Commands
 
