@@ -1,2 +1,2 @@
-export const hasName = (value: object): boolean =>
+export const hasName = (value: Readonly<Record<string, unknown>>): boolean =>
   Object.hasOwn(value, 'name');

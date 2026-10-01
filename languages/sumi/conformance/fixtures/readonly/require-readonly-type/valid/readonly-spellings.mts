@@ -1,4 +1,6 @@
 // Every readonly spelling is accepted; none is normalized (D-45).
+import type { DeepReadonly, Mutable, ReadonlyRecord } from 'ts-type-forge';
+
 type Numbers = readonly number[];
 
 type Letters = ReadonlyArray<string>;

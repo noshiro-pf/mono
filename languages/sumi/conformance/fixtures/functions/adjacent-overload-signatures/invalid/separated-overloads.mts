@@ -4,6 +4,7 @@
 // by the next one or by the body); separated-declarations.mts is the case only
 // the rule reports.
 // @sumi-expect-error functions/adjacent-overload-signatures
+// @sumi-expect-error compiler/2391
 export function describe(value: string): string;
 export const separator = ', ';
 export function describe(value: readonly string[]): readonly string[];
