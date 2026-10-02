@@ -37,6 +37,7 @@
     "check:prose:claude-md-size": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-claude-md-size.mts",
     "check:prose:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts",
     "check:prose:markdownlint-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdownlint-config.mts",
+    "check:prose:next-major": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-next-major.mts",
     "check:prose:readme-sample-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-sample-coverage.mts",
     "check:published-deps": "pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' --quiet",
     "check:root": "pnpm run '/check:root:.*/'",
