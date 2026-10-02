@@ -208,28 +208,43 @@ export const createReader = (deps: ReaderDeps): Reader => {
         }
       });
 
-    // A counter's `0` comes at once rather than after an interval, and the
-    // token has just been read for, so only what follows it is a tick.
-    const poll = counter(POLL_INTERVAL_MS);
-
     const clock = counter(CLOCK_TICK_MS);
 
     // A hidden tab is a tab nobody is reading, and a forgotten one would
-    // otherwise go on spending the budget for the rest of the day. Coming
-    // back to it is the next subscription.
-    const pollSubscription = poll
-      .pipe(filter((tick) => tick > 0 && isVisible()))
-      .subscribe(() => {
-        read();
-      });
+    // otherwise go on spending the budget for the rest of the day. So the
+    // poll timer exists only while the tab is shown: made when it is shown,
+    // right after the read that showing it asks for, so the next read is one
+    // interval after that one rather than wherever an older period had got
+    // to; and completed when it is hidden.
+    let mut_poll: PollTimer | undefined = undefined;
 
-    const visibilitySubscription = visibilityChange
-      .pipe(filter(() => isVisible()))
-      .subscribe(() => {
+    const stopPolling = (): void => {
+      mut_poll?.stop();
+
+      mut_poll = undefined;
+    };
+
+    const startPolling = (): void => {
+      stopPolling();
+
+      mut_poll = pollEvery(counter(POLL_INTERVAL_MS), read);
+    };
+
+    if (isVisible()) {
+      startPolling();
+    }
+
+    const visibilitySubscription = visibilityChange.subscribe(() => {
+      if (isVisible()) {
         setNowMs(now());
 
         read();
-      });
+
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    });
 
     // Nor is there anyone to read the ages to, and coming back moves the
     // clock at once.
@@ -242,15 +257,13 @@ export const createReader = (deps: ReaderDeps): Reader => {
     return () => {
       tokenSubscription.unsubscribe();
 
-      pollSubscription.unsubscribe();
-
       visibilitySubscription.unsubscribe();
 
       clockSubscription.unsubscribe();
 
-      // Completing a counter is what clears its interval.
-      poll.complete();
+      stopPolling();
 
+      // Completing a counter is what clears its interval.
       clock.complete();
     };
   };
@@ -346,3 +359,28 @@ const divergenceScale = (entries: readonly Entry[]): number =>
       comparison === undefined ? [] : [comparison.aheadBy, comparison.behindBy],
     ),
   );
+
+type PollTimer = Readonly<{ stop: () => void }>;
+
+/**
+ * Reads on every tick of `poll`. A counter's `0` comes at once rather than
+ * after an interval, and whoever starts the timer has just read, so only
+ * what follows it is a tick.
+ */
+const pollEvery = (
+  poll: SynstateObservable<number>,
+  read: () => void,
+): PollTimer => {
+  const subscription = poll.pipe(filter((tick) => tick > 0)).subscribe(() => {
+    read();
+  });
+
+  return {
+    stop: () => {
+      subscription.unsubscribe();
+
+      // Completing a counter is what clears its interval.
+      poll.complete();
+    },
+  };
+};

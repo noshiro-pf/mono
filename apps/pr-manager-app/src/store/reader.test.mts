@@ -54,8 +54,8 @@ describe(createReader, () => {
     assert.deepStrictEqual(reader.rateLimit.getSnapshot().value, LIMIT);
   });
 
-  test('polls while the tab is visible, and not while it is hidden', () => {
-    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+  test('polls while the tab is visible', () => {
+    const { reader, loads, timers } = setup(TOKEN_A);
 
     reader.start();
 
@@ -63,11 +63,23 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 2);
 
-    visibility.set(false);
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 3);
+  });
+
+  test('stops the poll timer when the tab is hidden', () => {
+    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    visibility.hide();
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
 
     timers.fire(POLL_INTERVAL_MS);
 
-    assert.strictEqual(loads.length, 2);
+    assert.strictEqual(loads.length, 1);
   });
 
   test('reads, and moves the clock, when a hidden tab comes back', () => {
@@ -75,21 +87,72 @@ describe(createReader, () => {
 
     reader.start();
 
-    visibility.set(false);
-
-    visibility.change();
+    visibility.hide();
 
     assert.strictEqual(loads.length, 1);
 
     clock.set(9_000);
 
-    visibility.set(true);
-
-    visibility.change();
+    visibility.show();
 
     assert.strictEqual(loads.length, 2);
 
     assert.strictEqual(reader.nowMs.getSnapshot().value, 9_000);
+  });
+
+  // The failure this is here to prevent: a tab that came back was read at
+  // once and then again at whatever point the old period had reached, which
+  // could be a second later.
+  test('a tab that comes back polls from the read it came back to', () => {
+    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    visibility.hide();
+
+    visibility.show();
+
+    assert.strictEqual(timers.started(POLL_INTERVAL_MS), 2);
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
+
+    timers.emitFirst(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 2);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    assert.strictEqual(loads.length, 3);
+  });
+
+  test('a tab opened hidden reads once, and polls only once it is shown', () => {
+    const { reader, loads, timers, visibility } = setup(TOKEN_A);
+
+    visibility.set(false);
+
+    reader.start();
+
+    assert.strictEqual(loads.length, 1);
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
+
+    visibility.show();
+
+    assert.strictEqual(loads.length, 2);
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
+  });
+
+  test('being shown twice leaves one poll timer', () => {
+    const { reader, timers, visibility } = setup(TOKEN_A);
+
+    reader.start();
+
+    visibility.show();
+
+    visibility.show();
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 1);
   });
 
   test('moves the clock on its own timer', () => {
@@ -315,15 +378,31 @@ describe(createReader, () => {
 
     timers.fire(POLL_INTERVAL_MS);
 
-    visibility.change();
+    visibility.show();
 
     setToken({ value: 'b', store: 'session' });
 
     assert.strictEqual(loads.length, 1);
 
-    assert.strictEqual(timers.running(), 0);
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
+
+    assert.strictEqual(timers.running(CLOCK_TICK_MS), 0);
 
     assert.isFalse(visibility.listening());
+  });
+
+  test('stop ends a poll timer started by the tab coming back', () => {
+    const { reader, timers, visibility } = setup(TOKEN_A);
+
+    const stopReading = reader.start();
+
+    visibility.hide();
+
+    visibility.show();
+
+    stopReading();
+
+    assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
   });
 });
 
@@ -347,15 +426,23 @@ type Setup = Readonly<{
   loads: readonly PendingLoad[];
   clock: Readonly<{ set: (nowMs: number) => void }>;
   visibility: Readonly<{
+    /** Changes what `isVisible` answers, without the event. */
     set: (visible: boolean) => void;
-    change: () => void;
+    /** Hides the tab and says so, as the browser does. */
+    hide: () => void;
+    /** Shows the tab and says so. */
+    show: () => void;
     listening: () => boolean;
   }>;
   setToken: (token: StoredToken | undefined) => unknown;
   timers: Readonly<{
+    /** Ticks the newest timer of this interval. */
     fire: (ms: number) => void;
     emitFirst: (ms: number) => void;
-    running: () => number;
+    /** How many timers of this interval were ever asked for. */
+    started: (ms: number) => number;
+    /** How many timers of this interval are not yet completed. */
+    running: (ms: number) => number;
   }>;
 }>;
 
@@ -366,8 +453,14 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
 
   const mut_clock = { nowMs: 0 };
 
-  /** One `counter` stand-in per interval the reader asks for. */
-  const mut_counters = new Map<number, SourceObservable<number>>();
+  /** One `counter` stand-in per timer the reader asks for, oldest first. */
+  const mut_counters: Readonly<{
+    ms: number;
+    counter: SourceObservable<number>;
+  }>[] = [];
+
+  const countersOf = (ms: number): readonly SourceObservable<number>[] =>
+    mut_counters.filter((c) => c.ms === ms).map((c) => c.counter);
 
   const visibilityChange = source<undefined>();
 
@@ -376,7 +469,14 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     set: (visible: boolean) => {
       mut_visibility.visible = visible;
     },
-    change: () => {
+    hide: () => {
+      mut_visibility.visible = false;
+
+      visibilityChange.next(undefined);
+    },
+    show: () => {
+      mut_visibility.visible = true;
+
       visibilityChange.next(undefined);
     },
     listening: () => visibilityChange.hasSubscriber,
@@ -392,7 +492,7 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     counter: (ms) => {
       const counter = source<number>();
 
-      mut_counters.set(ms, counter);
+      mut_counters.push({ ms, counter });
 
       return counter;
     },
@@ -413,18 +513,14 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     timers: {
       // A counter's first emission is `0`, at once; a tick is the next one.
       fire: (ms: number) => {
-        const counter = mut_counters.get(ms);
-
-        counter?.next(1);
+        countersOf(ms).at(-1)?.next(1);
       },
       emitFirst: (ms: number) => {
-        mut_counters.get(ms)?.next(0);
+        countersOf(ms).at(-1)?.next(0);
       },
-      running: () =>
-        mut_counters
-          .values()
-          .filter((counter) => !counter.isCompleted)
-          .toArray().length,
+      started: (ms: number) => countersOf(ms).length,
+      running: (ms: number) =>
+        countersOf(ms).filter((counter) => !counter.isCompleted).length,
     },
   } as const;
 };
