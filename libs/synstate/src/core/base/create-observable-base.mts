@@ -76,6 +76,12 @@ export type ObservableBaseHandle<A> = Readonly<{
 
   addChild: <B>(child: ChildObservable<B>) => void;
 
+  /**
+   * Forgets `child`, which a completed child calls on each of its parents so
+   * that nothing keeps a reference to it (#2134).
+   */
+  deleteChild: <B>(child: ChildObservable<B>) => void;
+
   getSnapshot: () => Optional<A>;
 
   isCompleted: () => boolean;
@@ -119,7 +125,9 @@ export const createObservableBaseHandle = <A,>(
 ): ObservableBaseHandle<A> => {
   const id = issueObservableId();
 
-  let mut_children: readonly ChildObservable<unknown>[] = [];
+  // A set, not an array: a completed child removes itself, and that has to be
+  // O(1) for a UI that creates and completes derived nodes on every mount.
+  const mut_children: MutableSet<ChildObservable<unknown>> = new Set();
 
   const mut_subscribers: MutableMap<SubscriberId, Subscriber<A>> = new Map();
 
@@ -146,7 +154,7 @@ export const createObservableBaseHandle = <A,>(
 
     writers.setHasSubscriber(mut_subscribers.size > 0);
 
-    writers.setHasChild(Arr.isNonEmpty(mut_children));
+    writers.setHasChild(mut_children.size > 0);
   };
 
   const addSubscriber = (s: Subscriber<A>): SubscriberId => {
@@ -167,13 +175,15 @@ export const createObservableBaseHandle = <A,>(
   };
 
   const addChild = <B,>(child: ChildObservable<B>): void => {
-    mut_children = Arr.toPushed(
-      mut_children,
-
-      child as ChildObservable<unknown>,
-    );
+    mut_children.add(child);
 
     mut_writers?.setHasChild(true);
+  };
+
+  const deleteChild = <B,>(child: ChildObservable<B>): void => {
+    mut_children.delete(child);
+
+    mut_writers?.setHasChild(mut_children.size > 0);
   };
 
   const getSnapshot = (): Optional<A> => mut_currentValue;
@@ -184,8 +194,15 @@ export const createObservableBaseHandle = <A,>(
 
   const hasSubscriber = (): boolean => mut_subscribers.size > 0;
 
-  const hasActiveChild = (): boolean =>
-    mut_children.some((c) => !c.isCompleted);
+  const hasActiveChild = (): boolean => {
+    for (const c of mut_children) {
+      if (!c.isCompleted) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   const setNext = (nextValue: A, nextUpdateToken: UpdateToken): void => {
     mut_updateToken = nextUpdateToken;
@@ -219,7 +236,8 @@ export const createObservableBaseHandle = <A,>(
 
     mut_writers?.setHasSubscriber(false);
 
-    // propagate to children
+    // Propagate to children. A child that completes removes itself from
+    // `mut_children` during this loop, which iterating a `Set` tolerates.
     for (const o of mut_children) {
       o.tryComplete();
     }
@@ -259,6 +277,7 @@ export const createObservableBaseHandle = <A,>(
     id,
     attach,
     addChild,
+    deleteChild,
     getSnapshot,
     isCompleted,
     updateToken,
@@ -277,41 +296,98 @@ export const createObservableBaseHandle = <A,>(
 export type ManagerObservableParts<A> = Readonly<{
   addDescendant: <B>(child: ChildObservable<B>) => void;
 
+  /**
+   * Takes `child` out of the propagation order, which a completed child calls
+   * on every manager it registered to (#2134).
+   */
+  deleteDescendant: <B>(child: ChildObservable<B>) => void;
+
   /** Emits `nextValue` and propagates the update to all descendants. */
   startUpdate: (nextValue: A) => void;
 }>;
 
 /**
  * Builds the manager half of a root or async-child observable. Both start their
- * own update propagation, so both keep a descendant set and a depth-ordered
- * propagation list; this is the single implementation of that pair (the class
- * version duplicated it across `RootObservableClass` and
- * `AsyncChildObservableClass`).
+ * own update propagation, so both keep a depth-ordered propagation list; this
+ * is the single implementation of it (the class version duplicated it across
+ * `RootObservableClass` and `AsyncChildObservableClass`).
+ *
+ * The descendants are kept in one insertion-ordered set per depth, so adding
+ * and removing one is O(1) apart from the first node of a new depth. The flat
+ * array `startUpdate` walks is rebuilt only when an update finds it stale: it
+ * used to be copied on every `addDescendant`, which made creating n nodes under
+ * one root O(n²). Rebuilding at the start of an update also keeps the walk a
+ * snapshot, as the copy-on-write array was — a node created or completed while
+ * an update is propagating does not change which nodes that update visits.
  */
 export const createManagerObservableParts = <A,>(
   handle: ObservableBaseHandle<A>,
 ): ManagerObservableParts<A> => {
-  let mut_propagationOrder: readonly ChildObservable<unknown>[] = [];
+  const mut_buckets: MutableMap<
+    number,
+    MutableSet<ChildObservable<unknown>>
+  > = new Map();
 
-  const mut_descendantsIdSet: MutableSet<ObservableId> = new Set();
+  /** The keys of `mut_buckets`, ascending. */
+  let mut_depths: readonly number[] = [];
+
+  /** `undefined` while stale. */
+  let mut_propagationOrder: readonly ChildObservable<unknown>[] | undefined =
+    [];
 
   const addDescendant = <B,>(child: ChildObservable<B>): void => {
-    if (mut_descendantsIdSet.has(child.id)) {
-      return;
+    const mut_bucket = mut_buckets.get(child.depth);
+
+    if (mut_bucket === undefined) {
+      mut_buckets.set(child.depth, new Set<ChildObservable<unknown>>([child]));
+
+      mut_depths = Arr.toInserted(
+        mut_depths,
+        binarySearch(mut_depths, child.depth),
+        child.depth,
+      );
+    } else {
+      if (mut_bucket.has(child)) {
+        return;
+      }
+
+      mut_bucket.add(child);
     }
 
-    mut_descendantsIdSet.add(child.id);
+    mut_propagationOrder = undefined;
+  };
 
-    const insertPos = binarySearch(
-      mut_propagationOrder.map((a) => a.depth),
-      child.depth,
-    );
+  const deleteDescendant = <B,>(child: ChildObservable<B>): void => {
+    // An emptied bucket stays, so that its depth is not inserted again.
+    const mut_bucket = mut_buckets.get(child.depth);
 
-    mut_propagationOrder = Arr.toInserted(
-      mut_propagationOrder,
-      insertPos,
-      child,
-    );
+    if (mut_bucket?.delete(child) === true) {
+      mut_propagationOrder = undefined;
+    }
+  };
+
+  const getPropagationOrder = (): readonly ChildObservable<unknown>[] => {
+    if (mut_propagationOrder !== undefined) {
+      return mut_propagationOrder;
+    }
+
+    const mut_order: ChildObservable<unknown>[] = [];
+
+    for (const depth of mut_depths) {
+      const bucket = mut_buckets.get(depth);
+
+      if (bucket !== undefined) {
+        // Not `push(...bucket)`: a spread passes every element as an argument,
+        // which overflows the stack for a bucket of a few hundred thousand.
+        for (const c of bucket) {
+          mut_order.push(c);
+        }
+      }
+    }
+
+    mut_propagationOrder = mut_order;
+
+    return mut_order;
   };
 
   const startUpdate = (nextValue: A): void => {
@@ -319,12 +395,12 @@ export const createManagerObservableParts = <A,>(
 
     handle.setNext(nextValue, updateToken);
 
-    for (const p of mut_propagationOrder) {
+    for (const p of getPropagationOrder()) {
       p.tryUpdate(updateToken);
     }
   };
 
-  return { addDescendant, startUpdate };
+  return { addDescendant, deleteDescendant, startUpdate };
 };
 
 /** Default `tryUpdate` for observables that never receive parent updates. */
@@ -418,6 +494,8 @@ export const assembleObservable = <
     depth,
 
     addChild: handle.addChild,
+
+    deleteChild: handle.deleteChild,
 
     getSnapshot: handle.getSnapshot,
 
