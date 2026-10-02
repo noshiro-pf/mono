@@ -10,3 +10,5 @@ export const describe = (value: number | undefined): string => {
 };
 
 export const nothing = null;
+
+export const sizes = [1, 2];

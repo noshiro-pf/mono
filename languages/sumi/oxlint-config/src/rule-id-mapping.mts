@@ -102,6 +102,7 @@ export const oxlintCodeToRuleId: ReadonlyMap<string, string> = new Map([
 
   // readonly
   ['sumi(require-readonly-type)', 'readonly/require-readonly-type'],
+  ['sumi(require-as-const)', 'readonly/require-as-const'],
   [
     'typescript(prefer-readonly-parameter-types)',
     'readonly/require-readonly-parameter',

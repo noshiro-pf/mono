@@ -3,4 +3,4 @@ export const box = {
   set value(next: number) {
     console.log(next);
   },
-};
+} as const;

@@ -1,4 +1,4 @@
-const items = [1];
+const items = [1] as const;
 
 const total = 1;
 
