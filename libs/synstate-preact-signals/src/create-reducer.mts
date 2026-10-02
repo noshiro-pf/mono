@@ -2,6 +2,7 @@ import { type ReadonlySignal } from '@preact/signals';
 import {
   createReducer as createReducerBase,
   type InitializedObservable,
+  type StateOptions,
 } from 'synstate';
 import { type Reducer } from 'ts-type-forge';
 import { toSignal } from './to-signal.mjs';
@@ -40,6 +41,7 @@ import { toSignal } from './to-signal.mjs';
 export const createReducer = <S, A>(
   reducer: Reducer<S, A>,
   initialState: S,
+  options?: StateOptions<NoInfer<S>>,
 ): readonly [
   signal: ReadonlySignal<S>,
   dispatch: (action: A) => S,
@@ -52,6 +54,7 @@ export const createReducer = <S, A>(
   const [state, dispatch, { getSnapshot }] = createReducerBase(
     reducer,
     initialState,
+    options,
   );
 
   const sig = toSignal(state);

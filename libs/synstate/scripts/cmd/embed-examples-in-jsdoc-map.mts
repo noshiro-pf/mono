@@ -34,7 +34,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   },
   {
     sourcePath: 'src/utils/create-state.mts',
-    sampleFiles: ['samples/src/create-state-example.mts'],
+    sampleFiles: [
+      'samples/src/create-state-example.mts',
+      'samples/src/create-state-equals-example.mts',
+    ],
   },
   {
     sourcePath: 'src/utils/create-boolean-state.mts',
@@ -42,7 +45,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   },
   {
     sourcePath: 'src/utils/create-reducer.mts',
-    sampleFiles: ['samples/src/create-reducer-example.mts'],
+    sampleFiles: [
+      'samples/src/create-reducer-example.mts',
+      'samples/src/create-reducer-equals-example.mts',
+    ],
   },
   {
     sourcePath: 'src/utils/create-event-emitter.mts',

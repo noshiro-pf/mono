@@ -51,3 +51,25 @@ describe(createReducer, () => {
     assert.deepStrictEqual(mut_seen, [0, 1, 0]);
   });
 });
+
+describe('createReducer with equals', () => {
+  test('passes on only the dispatches that change the state', () => {
+    const [, dispatch, { state }] = createReducer(
+      (current: number, amount: number) => current + amount,
+      0,
+      { equals: Object.is },
+    );
+
+    const mut_seen: number[] = [];
+
+    state.subscribe((value) => {
+      mut_seen.push(value);
+    });
+
+    dispatch(0);
+
+    dispatch(2);
+
+    assert.deepStrictEqual(mut_seen, [0, 2]);
+  });
+});
