@@ -33,6 +33,7 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
   const getDefaultValue = memoizeFunction(
     (): T =>
       options?.defaultValue ??
+      // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       (Arr.create(size, elementType.defaultValue) as T),
   );
@@ -82,6 +83,7 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
     !Arr.isArray(a)
       ? getDefaultValue()
       : // TODO: remove as
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (Arr.map(
           Arr.seq(size),
@@ -89,6 +91,7 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
         ) as T);
 
   const prune = (a: T): T =>
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Arr.map(a, (el) => elementType.prune(el)) as T;
 

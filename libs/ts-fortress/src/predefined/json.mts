@@ -19,6 +19,7 @@ if (import.meta.vitest !== undefined) {
   test('JsonPrimitive', () => {
     expectType<TypeOf<typeof JsonPrimitive>, JsonPrimitive>('=');
 
+    // @sumi-expect-error null/no-null-in-type
     expectType<JsonPrimitive, null | boolean | number | string>('=');
 
     expect(JsonPrimitive.defaultValue).toBeNull();

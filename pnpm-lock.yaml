@@ -4089,10 +4089,16 @@ importers:
       ts-data-forge:
         specifier: workspace:~
         version: link:../ts-data-forge
+      ts-std-forge:
+        specifier: workspace:~
+        version: link:../ts-std-forge
       ts-type-forge:
         specifier: workspace:~
         version: link:../ts-type-forge
     devDependencies:
+      '@sumi-lang/cli':
+        specifier: workspace:*
+        version: link:../../languages/sumi/cli
       '@vitest/browser-playwright':
         specifier: 'catalog:'
         version: 5.0.1(playwright@1.63.0)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.1)

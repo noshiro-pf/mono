@@ -1,4 +1,5 @@
 import { Obj, expectType } from 'ts-data-forge';
+import { panic } from 'ts-std-forge';
 import {
   type ArrayElement,
   type NonEmptyTuple,
@@ -37,15 +38,13 @@ export const required = <
   >,
 ): RequiredType<R, KeysToBeRequired> => {
   if (!hasRecordInternals(recordType)) {
-    throw new Error(
-      `Expected a record type but received: ${recordType.typeName}`,
-    );
+    panic(`Expected a record type but received: ${recordType.typeName}`);
   }
 
   const shape = flattenShapeStructure(recordType.shapeStructure);
 
   if (shape === undefined) {
-    throw new Error(
+    panic(
       'required() requires a simple or intersection record type, but received a union type',
     );
   }
@@ -64,6 +63,7 @@ export const required = <
     keysToBeRequired.has(k) ? makeRequired(v) : v,
   ) satisfies UnknownShape;
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(requiredShape, {
     typeName: typeNameFilled,
@@ -90,12 +90,14 @@ type RequiredValue<
  */
 const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
   if (!isOptionalProperty(t)) {
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return t as RequiredPropertyType<T>;
   }
 
   const { optional: _, ...rest } = t;
 
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return rest as RequiredPropertyType<T>;
 };
