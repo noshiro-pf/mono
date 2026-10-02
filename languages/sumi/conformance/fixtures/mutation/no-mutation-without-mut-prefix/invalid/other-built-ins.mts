@@ -5,7 +5,7 @@
 const cache = new Map<string, number>();
 const stamp: Readonly<Date> = new Date(0);
 const bytes: Readonly<Uint8Array> = new Uint8Array(2);
-const record = { a: 1 };
+const record = { a: 1 } as const;
 
 // @sumi-expect-error mutation/no-mutation-without-mut-prefix
 cache.getOrInsert('a', 1);

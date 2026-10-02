@@ -13,4 +13,4 @@ export const shorthand = {
   method(): number {
     return 3;
   },
-};
+} as const;
