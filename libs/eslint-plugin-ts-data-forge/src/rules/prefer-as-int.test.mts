@@ -265,3 +265,54 @@ describe('prefer-as-int', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-as-int through type wrappers', () => {
+  tester.run('prefer-as-int', preferAsInt, {
+    valid: [],
+    invalid: [
+      {
+        name: 'an angle-bracket assertion',
+        code: dedent`
+          import { asInt } from 'ts-data-forge';
+          declare const n: number;
+          const a = <Int>n;
+        `,
+        output: dedent`
+          import { asInt } from 'ts-data-forge';
+          declare const n: number;
+          const a = asInt(n);
+        `,
+        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-as-int with parenthesized operands', () => {
+  tester.run('prefer-as-int', preferAsInt, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence operand keeps its parentheses',
+        code: dedent`
+          import { asInt } from 'ts-data-forge';
+          declare const log: () => void;
+          declare const n: number;
+          const a = (log(), n) as Int;
+          const b = <Int>(log(), n);
+        `,
+        output: dedent`
+          import { asInt } from 'ts-data-forge';
+          declare const log: () => void;
+          declare const n: number;
+          const a = asInt((log(), n));
+          const b = asInt((log(), n));
+        `,
+        errors: [
+          { messageId: 'useBrandedNumberCastFunction' },
+          { messageId: 'useBrandedNumberCastFunction' },
+        ],
+      },
+    ],
+  });
+}, 20000);

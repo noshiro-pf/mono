@@ -293,3 +293,152 @@ describe('prefer-arr-scan', () => {
     ],
   });
 });
+
+describe('prefer-arr-scan through type wrappers', () => {
+  tester.run('prefer-arr-scan', preferArrScan, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a seed whose `!` hides that it may be undefined keeps the `??`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const init: number | undefined;
+          const totals = xs.reduce(
+            (acc, x) => [...acc, (acc.at(-1) ?? 0) + x],
+            [init!],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const init: number | undefined;
+          const totals = Arr.scan(xs, (acc, x) => (acc ?? 0) + x, init!);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'an element cast away from undefined keeps the `??`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly (number | undefined)[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, ((acc.at(-1) ?? 0) && x) as number],
+            [0],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly (number | undefined)[];
+          const totals = Arr.scan(xs, (acc, x) => ((acc ?? 0) && x) as number, 0);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'a spread accumulator wrapped in `as`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...(acc as readonly number[]), (acc.at(-1) ?? 0) + x],
+            [0],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = Arr.scan(xs, (acc, x) => (acc) + x, 0);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'an Arr.toPushed target wrapped in `!`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => Arr.toPushed(acc!, (acc.at(-1) ?? 0) + x),
+            [0],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = Arr.scan(xs, (acc, x) => (acc) + x, 0);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'the sliced array wrapped in `as`',
+        code: dedent`
+          declare const xs: readonly string[];
+          const ys = xs.map((_, i) =>
+            (xs as readonly string[]).slice(0, i + 1).join(''),
+          );
+        `,
+        errors: [{ messageId: 'preferArrScanPrefix' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-arr-scan with parenthesized operands', () => {
+  tester.run('prefer-arr-scan', preferArrScan, {
+    valid: [],
+    invalid: [
+      {
+        name: 'an object literal element stays an expression body',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce(
+            (acc, x) => [...acc, { sum: acc.at(-1)!.sum + x }],
+            [{ sum: 0 }],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = Arr.scan(xs, (acc, x) => ({ sum: acc!.sum + x }), { sum: 0 });
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'an object literal element under a wrapper stays an expression body',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = xs.reduce(
+            (acc, x) => [...acc, { sum: acc.at(-1)!.sum + x } as const],
+            [{ sum: 0 }],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const totals = Arr.scan(xs, (acc, x) => ({ sum: acc!.sum + x } as const), { sum: 0 });
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'a sequence element and seed keep their parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: (n: number) => void;
+          const totals = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, (log(x), (acc.at(-1) ?? 0) + x)],
+            [(log(0), 0)],
+          );
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: (n: number) => void;
+          const totals = Arr.scan(xs, (acc, x) => (log(x), (acc) + x), (log(0), 0));
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+    ],
+  });
+});

@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { skipTypeWrappers, typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getImportedLocalName,
@@ -48,19 +49,24 @@ const normalizeCountedOp = (
         : ({ fn, count } as const);
 
 const asNonNegativeIntegerLiteral = (
-  node: TSESTree.Node,
-): number | undefined =>
-  node.type === AST_NODE_TYPES.Literal &&
-  typeof node.value === 'number' &&
-  Number.isInteger(node.value) &&
-  node.value >= 0
+  wrapped: TSESTree.Node,
+): number | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
+  return node.type === AST_NODE_TYPES.Literal &&
+    typeof node.value === 'number' &&
+    Number.isInteger(node.value) &&
+    node.value >= 0
     ? node.value
     : undefined;
+};
 
 /** Matches `-N` (unary minus of a positive integer literal) and returns `N`. */
 const asNegatedPositiveIntegerLiteral = (
-  node: TSESTree.Node,
+  wrapped: TSESTree.Node,
 ): number | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
   if (
     node.type !== AST_NODE_TYPES.UnaryExpression ||
     node.operator !== '-' ||
@@ -239,6 +245,18 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       checker.getTypeAtLocation(parserServices.esTreeNodeToTSNodeMap.get(node));
 
     /**
+     * Whether `predicate` holds for the type of every layer of type wrappers
+     * around `node` (see typeWrapperLayers): a cast neither makes a `Set` an
+     * array nor stops an array from being flattened by `concat`, and the fix,
+     * which keeps the wrapper, has to type-check as well.
+     */
+    const holdsThroughWrappers = (
+      node: TSESTree.Node,
+      predicate: (type: ts.Type) => boolean,
+    ): boolean =>
+      typeWrapperLayers(node).every((layer) => predicate(getTypeOf(layer)));
+
+    /**
      * `true` only when the type can never be an array in any branch, so
      * `xs.concat(v)` is guaranteed to append `v` as one element rather than
      * flattening it.
@@ -395,9 +413,14 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       const rawOperator = body.operator as ComparisonOperator;
 
-      const isIndex = (side: TSESTree.Node): boolean =>
-        side.type === AST_NODE_TYPES.Identifier &&
-        side.name === indexParam.name;
+      const isIndex = (wrapped: TSESTree.Node): boolean => {
+        const side = skipTypeWrappers(wrapped);
+
+        return (
+          side.type === AST_NODE_TYPES.Identifier &&
+          side.name === indexParam.name
+        );
+      };
 
       const [op, other] = isIndex(body.left)
         ? ([rawOperator, body.right] as const)
@@ -644,7 +667,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
             element.type !== AST_NODE_TYPES.SpreadElement &&
             node.arguments.length === 1 &&
             arg.type !== AST_NODE_TYPES.SpreadElement &&
-            isArrayOrTupleType(getTypeOf(arg))
+            holdsThroughWrappers(arg, isArrayOrTupleType)
           ) {
             report(
               node,
@@ -667,7 +690,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
         // The receiver must be an array or tuple (not a string / typed array
         // / other object that happens to share the method name).
-        if (!isArrayOrTupleType(getTypeOf(receiver))) {
+        if (!holdsThroughWrappers(receiver, isArrayOrTupleType)) {
           return;
         }
 
@@ -747,7 +770,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
             // `xs.concat(item)` appends only when `item` can never be an
             // array (otherwise `concat` would flatten it).
-            if (isDefinitelyNotArrayType(getTypeOf(arg))) {
+            if (holdsThroughWrappers(arg, isDefinitelyNotArrayType)) {
               report(
                 node,
                 { fn: 'toPushed', itemText: toArgText(arg) },
@@ -794,7 +817,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
         // Spreading a non-array iterable (`[v, ...someSet]`) is a genuine
         // conversion, not an element addition to an array.
-        if (!isArrayOrTupleType(getTypeOf(spread.argument))) {
+        if (!holdsThroughWrappers(spread.argument, isArrayOrTupleType)) {
           return;
         }
 

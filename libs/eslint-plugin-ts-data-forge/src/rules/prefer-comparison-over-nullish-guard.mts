@@ -29,7 +29,11 @@ const COMPARISON_GUARDS: ReadonlyRecord<string, ComparisonSpec> = {
 
 /**
  * Argument expression kinds whose precedence is lower than equality, so they
- * must be parenthesized when placed on the left of `===` / `!==`.
+ * must be parenthesized when placed on the left of `===` / `!==`. A node's text
+ * never includes the parentheses the source wrote around it, so this is decided
+ * on the kind alone. `as` / `satisfies` and a nested equality would parse as
+ * intended, but are parenthesized so that the type or the grouping is not read
+ * as part of the comparison.
  */
 const ARG_NEEDS_PARENS: ReadonlySet<string> = new Set([
   AST_NODE_TYPES.LogicalExpression,
@@ -38,11 +42,33 @@ const ARG_NEEDS_PARENS: ReadonlySet<string> = new Set([
   AST_NODE_TYPES.SequenceExpression,
   AST_NODE_TYPES.ArrowFunctionExpression,
   AST_NODE_TYPES.YieldExpression,
+  AST_NODE_TYPES.TSAsExpression,
+  AST_NODE_TYPES.TSSatisfiesExpression,
 ]);
+
+/** Binary operators that bind no tighter than `===` / `!==`. */
+const LOOSE_BINARY_OPERATORS: ReadonlySet<string> = new Set([
+  '|',
+  '^',
+  '&',
+  '==',
+  '!=',
+  '===',
+  '!==',
+]);
+
+const argumentNeedsParens = (
+  argument: DeepReadonly<TSESTree.Expression>,
+): boolean =>
+  ARG_NEEDS_PARENS.has(argument.type) ||
+  (argument.type === AST_NODE_TYPES.BinaryExpression &&
+    LOOSE_BINARY_OPERATORS.has(argument.operator));
 
 /**
  * Returns `true` when the comparison must be wrapped in parentheses to preserve
- * the original grouping given the call expression's parent context.
+ * the original grouping given the call expression's parent context. A type
+ * wrapper around the call is one such context: `x === null satisfies boolean`
+ * would apply the wrapper to `null`.
  */
 const needsWrappingInParent = (
   node: DeepReadonly<TSESTree.CallExpression>,
@@ -56,6 +82,9 @@ const needsWrappingInParent = (
     case AST_NODE_TYPES.AwaitExpression:
     case AST_NODE_TYPES.BinaryExpression:
     case AST_NODE_TYPES.TSNonNullExpression:
+    case AST_NODE_TYPES.TSAsExpression:
+    case AST_NODE_TYPES.TSSatisfiesExpression:
+    case AST_NODE_TYPES.TSTypeAssertion:
       return true;
 
     case AST_NODE_TYPES.MemberExpression:
@@ -124,9 +153,7 @@ export const preferComparisonOverNullishGuard: TSESLint.RuleModule<
 
         const argRaw = sourceCode.getText(argument);
 
-        const argText = ARG_NEEDS_PARENS.has(argument.type)
-          ? `(${argRaw})`
-          : argRaw;
+        const argText = argumentNeedsParens(argument) ? `(${argRaw})` : argRaw;
 
         const comparison = `${argText} ${spec.op} ${spec.literal}`;
 

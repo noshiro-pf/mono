@@ -186,3 +186,70 @@ describe('prefer-arr-is-max-length-array', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-arr-is-max-length-array through type wrappers', () => {
+  tester.run('prefer-arr-is-max-length-array', preferArrIsMaxLengthArray, {
+    valid: [
+      {
+        name: 'a computed index named `length` is not the length',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const length: number;
+          const ok = xs[length] <= 2;
+        `,
+      },
+      {
+        name: 'the upper half of a bounded pair whose other half is wrapped',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs!.length >= 1 && xs.length <= 3;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the length or the bound wrapped',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = (xs.length satisfies number) <= 2;
+          const b = xs.length <= (2 as number);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.isMaxLengthArray(2, xs);
+          const b = Arr.isMaxLengthArray(2, xs);
+        `,
+        errors: [
+          { messageId: 'useIsMaxLengthArray' },
+          { messageId: 'useIsMaxLengthArray' },
+        ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-arr-is-max-length-array with parenthesized operands', () => {
+  tester.run('prefer-arr-is-max-length-array', preferArrIsMaxLengthArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence array keeps its parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = (log(), xs).length <= 2;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = Arr.isMaxLengthArray(2, (log(), xs));
+        `,
+        errors: [{ messageId: 'useIsMaxLengthArray' }],
+      },
+    ],
+  });
+}, 20000);

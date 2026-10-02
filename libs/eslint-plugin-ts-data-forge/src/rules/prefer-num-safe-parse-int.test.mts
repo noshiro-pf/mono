@@ -135,3 +135,67 @@ describe('prefer-num-safe-parse-int', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-num-safe-parse-int through type wrappers', () => {
+  tester.run('prefer-num-safe-parse-int', preferNumSafeParseInt, {
+    valid: [
+      {
+        name: 'a number cast to string',
+        code: dedent`
+          declare const n: number;
+          const a = parseInt(n as unknown as string, 10);
+        `,
+      },
+      {
+        name: 'a wrapped radix other than 10',
+        code: dedent`
+          declare const s: string;
+          const a = parseInt(s, 16 as const);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a radix wrapped in `as const` or `satisfies`',
+        code: dedent`
+          declare const s: string;
+          const a = parseInt(s, 10 as const);
+          const b = Number.parseInt(s!, 10 satisfies number);
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          const a = Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN);
+          const b = Result.unwrapOkOr(Num.safeParseInt(s!), Number.NaN);
+        `,
+        errors: [
+          { messageId: 'useSafeParseInt' },
+          { messageId: 'useSafeParseInt' },
+        ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-num-safe-parse-int with parenthesized operands', () => {
+  tester.run('prefer-num-safe-parse-int', preferNumSafeParseInt, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence argument keeps its parentheses',
+        code: dedent`
+          declare const s: string;
+          declare const log: () => void;
+          const a = parseInt((log(), s), 10);
+        `,
+        output: dedent`
+          import { Num, Result } from 'ts-data-forge';
+          declare const s: string;
+          declare const log: () => void;
+          const a = Result.unwrapOkOr(Num.safeParseInt((log(), s)), Number.NaN);
+        `,
+        errors: [{ messageId: 'useSafeParseInt' }],
+      },
+    ],
+  });
+}, 20000);

@@ -1,8 +1,10 @@
 import {
   AST_NODE_TYPES,
+  ASTUtils,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { skipTypeWrappers } from './ast-utils.mjs';
 import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
 
 type Options = readonly [];
@@ -185,7 +187,7 @@ export const preferCanonicalLengthCast: TSESLint.RuleModule<
               node.callee,
               `${arrLocalName}.${rewrite.replacement}`,
             ),
-            ...dropBoundsFix(fixer, node, rewrite),
+            ...dropBoundsFix(fixer, sourceCode, node, rewrite),
           ],
         });
       },
@@ -263,11 +265,16 @@ const matchesBounds = (
 
 /**
  * Removes the length arguments the rewrite drops. Each removal runs from the
- * dropped argument up to the start of the next one, so the comma, whitespace
- * and any comments in between go with it; the ranges never overlap.
+ * first token after the delimiter before the dropped argument (the call's `(`
+ * or the previous comma) up to the first token after the comma that follows
+ * it. Parentheses the source put around the dropped argument, the comma,
+ * whitespace and any comments in between go with it; parentheses around the
+ * next argument stay. The ranges never overlap.
  */
 const dropBoundsFix = (
   fixer: TSESLint.RuleFixer,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
   // AST nodes hold mutable child arrays, so they are not deeply readonly.
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.CallExpression,
@@ -283,23 +290,46 @@ const dropBoundsFix = (
     // "not of this type".
     const dropped = node.arguments[index];
 
-    const next = node.arguments[index + 1];
+    const previous = node.arguments[index - 1];
 
-    return dropped === undefined ||
-      next === undefined ||
-      rewrite.keep.includes(index)
+    if (dropped === undefined || rewrite.keep.includes(index)) {
+      return [];
+    }
+
+    const delimiterBefore =
+      previous === undefined
+        ? sourceCode.getTokenAfter(node.callee, ASTUtils.isOpeningParenToken)
+        : sourceCode.getTokenAfter(previous, ASTUtils.isCommaToken);
+
+    const start =
+      delimiterBefore === null
+        ? null
+        : sourceCode.getTokenAfter(delimiterBefore);
+
+    const commaAfter = sourceCode.getTokenAfter(dropped, ASTUtils.isCommaToken);
+
+    const end =
+      commaAfter === null ? null : sourceCode.getTokenAfter(commaAfter);
+
+    return start === null || end === null
       ? []
-      : [fixer.removeRange([dropped.range[0], next.range[0]])];
+      : [fixer.removeRange([start.range[0], end.range[0]])];
   });
 
-/** A non-negative integer literal's value, or `undefined` for anything else. */
+/**
+ * A non-negative integer literal's value, or `undefined` for anything else.
+ * Read through type wrappers: `1 as const` is still the bound `1`.
+ */
 const getLengthLiteral = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): number | undefined =>
-  node.type === AST_NODE_TYPES.Literal &&
-  typeof node.value === 'number' &&
-  Number.isSafeInteger(node.value) &&
-  node.value >= 0
+  wrapped: TSESTree.Node,
+): number | undefined => {
+  const node = skipTypeWrappers(wrapped);
+
+  return node.type === AST_NODE_TYPES.Literal &&
+    typeof node.value === 'number' &&
+    Number.isSafeInteger(node.value) &&
+    node.value >= 0
     ? node.value
     : undefined;
+};

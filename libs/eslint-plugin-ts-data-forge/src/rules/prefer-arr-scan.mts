@@ -7,6 +7,11 @@ import { Arr } from 'ts-data-forge';
 import { type FixedLengthTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
 import {
+  skipTypeWrappers,
+  toArgumentText,
+  typeWrapperLayers,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsDataForgeImport,
@@ -135,10 +140,10 @@ type Splice = Readonly<{ range: FixedLengthTuple<2, number>; text: string }>;
  *   fourth parameter (the whole array) having no counterpart in `scan`.
  *
  * `acc.at(-1)` is typed `T | undefined` while `scan`'s accumulator is `S`, so a
- * `?? fallback` guarding it becomes redundant after the fix. It is left in
- * place rather than removed: it evaluates identically either way, and deciding
- * that it is dead needs to know that `S` excludes `undefined`, which is type
- * information this rule does not take.
+ * `?? fallback` guarding it becomes redundant after the fix. It is removed only
+ * when type information shows that neither the seed nor the appended value can
+ * be nullish — asked of each both as written and under any `as` / `!`, since
+ * `[init!]` may still hold `undefined` — and kept otherwise.
  *
  * ## What is not reported
  *
@@ -147,7 +152,8 @@ type Splice = Readonly<{ range: FixedLengthTuple<2, number>; text: string }>;
  * `scan` hands its callback the accumulated value and the element, never the
  * prefix, so such a callback is not one it can express.
  *
- * The array has to be spelled the same way in the `map` and in the `slice`.
+ * The array has to be spelled the same way in the `map` and in the `slice`,
+ * type wrappers aside (`(xs as readonly T[]).slice(…)` slices `xs`).
  * Deciding that two differently written expressions denote one array needs type
  * information and would still be a guess about aliasing.
  */
@@ -278,8 +284,14 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // which a seeded accumulator never does. So once the value `scan` carries
       // is known not to be nullish, a `?? fallback` guarding the read is dead
       // and the fix takes it with the read — leaving it would hand the author an
-      // unnecessary condition that no rule can fix for them.
-      const carriesNullish = isNullish(seed) || isNullish(element);
+      // unnecessary condition that no rule can fix for them. Every layer of
+      // type wrappers is asked (see typeWrapperLayers): the value under an
+      // `as` / `!` is what `scan` carries at run time (`[init!]` may still
+      // hold `undefined`), and a wider type a wrapper states is the author
+      // saying it may be nullish.
+      const carriesNullish = [seed, element].some((node) =>
+        typeWrapperLayers(node).some(isNullish),
+      );
 
       const mut_lastReads: Splice[] = [];
 
@@ -331,12 +343,22 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
         mut_lastReads,
       );
 
-      const arrayText = sourceCode.getText(
+      const arrayText = toArgumentText(
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (call.callee as TSESTree.MemberExpression).object,
+        sourceCode,
       );
 
-      return `Arr.scan(${arrayText}, (${parameterText}) => ${elementText}, ${sourceCode.getText(seed)})`;
+      // A node's text never includes the parentheses the source put around it:
+      // an object literal would open a block body, and a sequence would run on
+      // into the next argument.
+      const bodyText =
+        elementText.trimStart().startsWith('{') ||
+        element.type === AST_NODE_TYPES.SequenceExpression
+          ? `(${elementText})`
+          : elementText;
+
+      return `Arr.scan(${arrayText}, (${parameterText}) => ${bodyText}, ${toArgumentText(seed, sourceCode)})`;
     };
 
     /**
@@ -397,7 +419,11 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
 
         const methodName = node.callee.property.name;
 
-        const arrayText = sourceCode.getText(node.callee.object);
+        // Through type wrappers, so that `(xs as readonly T[]).slice(…)` is
+        // seen slicing the `xs` being mapped.
+        const arrayText = sourceCode.getText(
+          skipTypeWrappers(node.callee.object),
+        );
 
         if (SLICING_METHODS.has(methodName)) {
           mut_slices.push({ call: node, arrayText });
@@ -651,9 +677,13 @@ const appendsToItsAccumulator = (
         : undefined;
 
   const target =
-    spelling?.type === AST_NODE_TYPES.SpreadElement
-      ? spelling.argument
-      : spelling;
+    spelling === undefined || spelling === null
+      ? undefined
+      : skipTypeWrappers(
+          spelling.type === AST_NODE_TYPES.SpreadElement
+            ? spelling.argument
+            : spelling,
+        );
 
   return (
     target?.type === AST_NODE_TYPES.Identifier &&
@@ -690,13 +720,17 @@ const accumulationOf = (
 
     const [spread, element] = body.elements;
 
+    const spreadTarget =
+      spread?.type === AST_NODE_TYPES.SpreadElement
+        ? skipTypeWrappers(spread.argument)
+        : undefined;
+
     return element === null ||
       element.type === AST_NODE_TYPES.SpreadElement ||
-      spread?.type !== AST_NODE_TYPES.SpreadElement ||
-      spread.argument.type !== AST_NODE_TYPES.Identifier ||
-      spread.argument.name !== accumulatorParam.name
+      spreadTarget?.type !== AST_NODE_TYPES.Identifier ||
+      spreadTarget.name !== accumulatorParam.name
       ? undefined
-      : { accumulatorParam, accumulatorRef: spread.argument, element };
+      : { accumulatorParam, accumulatorRef: spreadTarget, element };
   }
 
   // `Arr.toPushed(acc, ELEMENT)`, matched on the method name as the rest of
@@ -714,7 +748,9 @@ const accumulationOf = (
       return undefined;
     }
 
-    const [target, element] = body.arguments;
+    const [wrappedTarget, element] = body.arguments;
+
+    const target = skipTypeWrappers(wrappedTarget);
 
     return element.type === AST_NODE_TYPES.SpreadElement ||
       target.type !== AST_NODE_TYPES.Identifier ||

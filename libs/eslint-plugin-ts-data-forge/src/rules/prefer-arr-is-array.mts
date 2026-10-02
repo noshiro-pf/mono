@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import { skipTypeWrappers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -65,15 +65,15 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
                 return [];
               }
 
-              const replacement = `Arr.isArray${sourceCode.getText(node).slice(sourceCode.getText(callee).length)}`;
-
+              // Only the callee is replaced: parentheses the source put around
+              // it are outside its range, and stay balanced.
               // Add import only for the first node and only if not already imported
               const importFixes =
                 index === 0 && !hasArrImport
                   ? buildImportFixes(fixer, program, tsDataForgeImport, ['Arr'])
                   : [];
 
-              return [...importFixes, fixer.replaceText(node, replacement)];
+              return [...importFixes, fixer.replaceText(callee, 'Arr.isArray')];
             },
           });
         }
@@ -84,13 +84,18 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
 } as const;
 
 const isArrayIsArrayCall = (
-  node: DeepReadonly<TSESTree.CallExpression>,
+  // AST nodes hold mutable child arrays, so they are not deeply readonly.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
 ): boolean => {
   if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
     return false;
   }
 
-  const { object, property } = node.callee;
+  const { property } = node.callee;
+
+  // `(Array as ArrayConstructor).isArray` is still `Array.isArray`.
+  const object = skipTypeWrappers(node.callee.object);
 
   if (object.type !== AST_NODE_TYPES.Identifier) {
     return false;
