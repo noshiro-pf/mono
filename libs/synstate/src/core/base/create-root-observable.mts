@@ -68,8 +68,12 @@ export const createRootObservable = <
     handle.completeBase();
   };
 
+  // A root without a teardown (`source`, `createState`, `just`) releases
+  // nothing by completing, so a child completing never completes it (#2133).
+  const autoComplete = onComplete !== undefined;
+
   const tryComplete = (): void => {
-    if (!handle.hasSubscriber() && !handle.hasActiveChild()) {
+    if (autoComplete && !handle.hasSubscriber() && !handle.hasActiveChild()) {
       complete();
     }
   };
@@ -87,6 +91,9 @@ export const createRootObservable = <
     tryUpdate: createTryUpdateNotImplemented,
     tryComplete,
     complete,
+    // A root has no parents to keep out of it.
+    dispose: complete,
+    autoComplete,
     extra: {
       ...extension,
       addDescendant,

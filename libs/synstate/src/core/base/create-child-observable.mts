@@ -101,7 +101,10 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservable<A> | undefined = undefined;
 
-  const complete = (): void => {
+  const autoComplete =
+    onComplete !== undefined || parents.some((p) => p.autoComplete);
+
+  const dispose = (): void => {
     // A completed node is reached again through every parent and child that
     // completes after it; running again would repeat the teardown and the
     // ancestor walk in `unregisterChild` for each of them.
@@ -116,6 +119,14 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     if (mut_self !== undefined) {
       unregisterChild(mut_self, parents);
     }
+  };
+
+  const complete = (): void => {
+    if (handle.isCompleted()) {
+      return;
+    }
+
+    dispose();
 
     // propagate to parents
     for (const par of parents) {
@@ -131,6 +142,7 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryCompleteChild({
       hasSubscriber: handle.hasSubscriber(),
       hasActiveChild: handle.hasActiveChild(),
+      autoComplete,
       parents,
       complete,
     });
@@ -149,6 +161,8 @@ export const createSyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
+    dispose,
+    autoComplete,
     extra: { parents },
   });
 
@@ -209,7 +223,10 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
   /** Set once assembled; see {@link unregisterChild}. */
   let mut_self: ChildObservable<A> | undefined = undefined;
 
-  const complete = (): void => {
+  const autoComplete =
+    onComplete !== undefined || parents.some((p) => p.autoComplete);
+
+  const dispose = (): void => {
     // A completed node is reached again through every parent and child that
     // completes after it; running again would repeat the teardown and the
     // ancestor walk in `unregisterChild` for each of them.
@@ -224,6 +241,14 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     if (mut_self !== undefined) {
       unregisterChild(mut_self, parents);
     }
+  };
+
+  const complete = (): void => {
+    if (handle.isCompleted()) {
+      return;
+    }
+
+    dispose();
 
     // propagate to parents
     for (const par of parents) {
@@ -239,6 +264,7 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryCompleteChild({
       hasSubscriber: handle.hasSubscriber(),
       hasActiveChild: handle.hasActiveChild(),
+      autoComplete,
       parents,
       complete,
     });
@@ -258,6 +284,8 @@ export const createAsyncChildObservable = <A, P extends NonEmptyUnknownList>(
     tryUpdate,
     tryComplete,
     complete,
+    dispose,
+    autoComplete,
     extra: { parents, addDescendant, deleteDescendant },
   });
 
@@ -400,11 +428,13 @@ const unregisterChild = <A,>(
 const tryCompleteChild = <A,>({
   hasSubscriber,
   hasActiveChild,
+  autoComplete,
   parents,
   complete,
 }: Readonly<{
   hasSubscriber: boolean;
   hasActiveChild: boolean;
+  autoComplete: boolean;
   parents: ChildObservable<A>['parents'];
   complete: () => void;
 }>): void => {
@@ -415,8 +445,8 @@ const tryCompleteChild = <A,>({
     return;
   }
 
-  // If there are no active child node
-  if (!hasSubscriber && !hasActiveChild) {
+  // If there are no active child node, and completing releases something
+  if (autoComplete && !hasSubscriber && !hasActiveChild) {
     complete();
   }
 
