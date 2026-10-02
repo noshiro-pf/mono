@@ -760,6 +760,30 @@ describe(appendAsConstTransformer, () => {
         `,
       },
       {
+        name: 'const type parameter should remove a parenthesized as const',
+        source: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f(([1, 2] as const));
+          const b = f(((({ x: 1 }) as const)));
+        `,
+        expected: dedent`
+          function f<const T>(x: T): T { return x; }
+          const a = f([1, 2]);
+          const b = f({ x: 1 });
+        `,
+      },
+      {
+        name: 'non-const type parameter should keep a parenthesized as const',
+        source: dedent`
+          function g<T>(x: T): T { return x; }
+          const b = g(([1, 2] as const));
+        `,
+        expected: dedent`
+          function g<T>(x: T): T { return x; }
+          const b = g([1, 2] as const);
+        `,
+      },
+      {
         name: 'mixed const and non-const type parameters should only remove for const ones',
         source: dedent`
           function h<const A, B>(a: A, b: B): A { return a; }

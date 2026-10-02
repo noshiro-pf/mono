@@ -280,27 +280,49 @@ const isIgnoredByComment = (
  * the target of an assignment the element type without `undefined`, so the
  * type comparison in {@link collectAssertionPositions} already passes them
  * over. The exceptions handled here are the ones it does widen.
+ *
+ * The position is that of the outermost parenthesis around the access:
+ * `(xs[0]) === undefined` tests the value exactly as `xs[0] === undefined`
+ * does, while the `!` still goes right after the access, inside them.
  */
 const isAssertableReadPosition = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: IndexReadExpression,
 ): boolean => {
-  const parent = node.getParent();
+  const outer = outermostParenthesized(node);
+
+  const parent = outer.getParent();
 
   if (parent === undefined) {
     return false;
   }
 
   return (
-    !isAlreadyAssertedOrGuarded(node, parent) &&
-    !isWriteTarget(node, parent) &&
-    !isTestedForAbsence(node, parent)
+    !isAlreadyAssertedOrGuarded(node, outer, parent) &&
+    !isWriteTarget(outer, parent) &&
+    !isTestedForAbsence(outer, parent)
   );
 };
 
-/** `xs[0]!`, `xs[0] as T`, `<T>xs[0]`, `xs[0]?.foo`, `xs[0]?.()`, `xs[0]?.[1]`. */
+/** `node`, or the outermost of the parentheses written around it. */
+const outermostParenthesized = (node: tsm.Node): tsm.Node => {
+  const parent = node.getParent();
+
+  return parent?.isKind(tsm.SyntaxKind.ParenthesizedExpression) === true
+    ? outermostParenthesized(parent)
+    : node;
+};
+
+/**
+ * `xs[0]!`, `xs[0] as T`, `<T>xs[0]`, `xs[0]?.foo`, `xs[0]?.()`, `xs[0]?.[1]`.
+ *
+ * `outer` is `node` with its parentheses (see
+ * {@link outermostParenthesized}); a chain continues from the access itself
+ * but is guarded from the outside of the parentheses (`(xs[0])?.foo`).
+ */
 const isAlreadyAssertedOrGuarded = (
   node: tsm.Node,
+  outer: tsm.Node,
   parent: tsm.Node,
 ): boolean => {
   if (
@@ -322,7 +344,7 @@ const isAlreadyAssertedOrGuarded = (
       parent.isKind(tsm.SyntaxKind.ElementAccessExpression) ||
       parent.isKind(tsm.SyntaxKind.CallExpression)) &&
     parent.hasQuestionDotToken() &&
-    parent.getExpression() === node
+    parent.getExpression() === outer
   );
 };
 
