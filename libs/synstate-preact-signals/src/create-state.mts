@@ -2,6 +2,7 @@ import { type ReadonlySignal } from '@preact/signals';
 import {
   createState as createStateBase,
   type InitializedObservable,
+  type StateOptions,
 } from 'synstate';
 import { toSignal } from './to-signal.mjs';
 
@@ -42,6 +43,7 @@ import { toSignal } from './to-signal.mjs';
  */
 export const createState = <S,>(
   initialState: S,
+  options?: StateOptions<NoInfer<S>>,
 ): readonly [
   signal: ReadonlySignal<S>,
   setState: (v: S) => S,
@@ -54,7 +56,7 @@ export const createState = <S,>(
   }>,
 ] => {
   const [state, setState, { updateState, resetState, getSnapshot }] =
-    createStateBase(initialState);
+    createStateBase(initialState, options);
 
   const sig = toSignal(state);
 

@@ -58,3 +58,23 @@ describe(createState, () => {
     assert.deepStrictEqual(mut_seen, [0, 1, 2]);
   });
 });
+
+describe('createState with equals', () => {
+  test('passes on only the updates that change the state', () => {
+    const [, setCount, { state }] = createState(0, { equals: Object.is });
+
+    const mut_seen: number[] = [];
+
+    state.subscribe((value) => {
+      mut_seen.push(value);
+    });
+
+    setCount(0);
+
+    setCount(1);
+
+    setCount(1);
+
+    assert.deepStrictEqual(mut_seen, [0, 1]);
+  });
+});

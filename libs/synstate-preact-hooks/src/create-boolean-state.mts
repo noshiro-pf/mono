@@ -1,11 +1,13 @@
 import {
-  type InitializedObservable,
   createBooleanState as createBooleanStateBase,
+  type InitializedObservable,
+  type StateOptions,
 } from 'synstate';
 import { useObservableValue } from './use-observable-value.mjs';
 
 export const createBooleanState = (
   initialState: boolean,
+  options?: StateOptions<boolean>,
 ): readonly [
   useCurrentValue: () => boolean,
   utils: Readonly<{
@@ -31,7 +33,7 @@ export const createBooleanState = (
       resetState,
       getSnapshot,
     },
-  ] = createBooleanStateBase(initialState);
+  ] = createBooleanStateBase(initialState, options);
 
   const useCurrentValue = (): boolean => useObservableValue(state);
 

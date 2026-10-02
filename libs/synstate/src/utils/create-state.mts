@@ -1,5 +1,5 @@
 import { type InitializedObservable } from '../core/index.mjs';
-import { createReducer } from './create-reducer.mjs';
+import { createReducer, type StateOptions } from './create-reducer.mjs';
 
 type Action<S> = Readonly<
   | {
@@ -28,6 +28,8 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *
  * @template S - The type of the state
  * @param initialState - The initial value of the state
+ * @param options - {@link StateOptions}: `equals`, to pass on only the
+ *   updates that change the state
  * @returns A 3-element tuple: `[state, setState, { updateState, resetState, getSnapshot, initialState }]`
  *
  * @example
@@ -54,9 +56,42 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *
  * assert.deepStrictEqual(stateHistory, [0, 10, 11, 0]);
  * ```
+ *
+ * @example
+ * ```ts
+ * const [filters, setFilters] = createState(
+ *   { label: 'bug', page: 1 },
+ *   { equals: fastDeepEqual },
+ * );
+ *
+ * const before = filters.getSnapshot().value;
+ *
+ * // Derived state is recomputed only when the state really changes.
+ * const query = filters.pipe(
+ *   map(({ label, page }) => `label:${label} page:${page}`),
+ * );
+ *
+ * const queryHistory: string[] = [];
+ *
+ * query.subscribe((value: string) => {
+ *   queryHistory.push(value);
+ * });
+ *
+ * setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
+ *
+ * assert.strictEqual(filters.getSnapshot().value, before);
+ *
+ * setFilters({ label: 'bug', page: 2 });
+ *
+ * assert.deepStrictEqual(queryHistory, [
+ *   'label:bug page:1',
+ *   'label:bug page:2',
+ * ]);
+ * ```
  */
 export const createState = <S,>(
   initialState: S,
+  options?: StateOptions<NoInfer<S>>,
 ): readonly [
   state: InitializedObservable<S>,
   setState: (v: S) => S,
@@ -70,6 +105,7 @@ export const createState = <S,>(
   const [state, dispatch, { getSnapshot }] = createReducer<S, Action<S>>(
     reducer,
     initialState,
+    options,
   );
 
   const updateState = (updateFn: (prev: S) => S): S =>
