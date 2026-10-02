@@ -13,7 +13,8 @@ describe('a completed observable leaves the propagation graph', () => {
   test('completed derived observables stop computing (#2134)', () => {
     const [count$, setCount] = createState(0);
 
-    // Keep the root alive (#2133 would complete it otherwise).
+    // A subscriber, so that the root has a reason to stay alive whatever the
+    // completion rules for an unused root are.
     count$.subscribe(() => {});
 
     let mut_calls = 0;
