@@ -1,7 +1,7 @@
+import { effect } from '@preact/signals';
 import { type InputEventHandler, type RefCallback } from 'preact';
 import { memoNamed } from 'preact-utils';
 import { useMemo } from 'preact/hooks';
-import { useObservableValue } from 'synstate-preact-hooks';
 import { Arr } from 'ts-data-forge';
 import {
   MAX_SPLIT,
@@ -9,7 +9,7 @@ import {
   type BlockId,
   type ColumnIndex,
 } from '../layout.mjs';
-import { layoutStore } from '../store/index.mjs';
+import { layoutSignals, layoutStore } from '../store/index.mjs';
 import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
@@ -20,12 +20,12 @@ import { ViewSettingsRow } from './view-settings-row.js';
  * Everything the pointer does on the page can be done here with a keyboard,
  * which is what lets the drag surfaces there be pointer-only. A native
  * `<dialog>`, opened modal, so focus and Escape are the browser's. Whether it
- * is open is the store's `settingsOpen`: the element subscribes to it, and
+ * is open is the store's `settingsOpen`: the element follows it, and
  * tells it when Escape closes the dialog. Every change applies at once, so
  * there is nothing to confirm or cancel.
  */
 export const ViewSettings = memoNamed('ViewSettings', () => {
-  const layout = useObservableValue(layoutStore.layout);
+  const layout = layoutSignals.layout.value;
 
   const columns = useMemo<
     readonly (readonly [ColumnIndex, readonly BlockId[]])[]
@@ -160,23 +160,21 @@ export const ViewSettings = memoNamed('ViewSettings', () => {
 // each serves every render, with no `useCallback` to keep it stable.
 
 // A modal dialog is opened by a call, not an attribute, so the element
-// follows the store by subscribing to it for as long as it is mounted.
+// follows the signal with an effect for as long as it is mounted.
 const followOpen: RefCallback<HTMLDialogElement> = (dialog) => {
   if (dialog === null) {
     return undefined;
   }
 
-  const subscription = layoutStore.settingsOpen.subscribe((shown) => {
+  return effect(() => {
+    const shown = layoutSignals.settingsOpen.value;
+
     if (shown && !dialog.open) {
       dialog.showModal();
     } else if (!shown && dialog.open) {
       dialog.close();
     }
   });
-
-  return () => {
-    subscription.unsubscribe();
-  };
 };
 
 const oneColumn = (): void => {
