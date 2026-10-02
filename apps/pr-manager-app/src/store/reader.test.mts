@@ -1,10 +1,9 @@
 import { createState, source, type SourceObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
-import { type RelaxedExtract } from 'ts-type-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import { type Answered } from '../graphql.mjs';
-import { type LoadedReport } from '../load-report.mjs';
-import { LOADING, type LoadState } from '../load-state.mjs';
+import { type LoadedReport, type Merged } from '../load-report.mjs';
+import { LOADING, READY, type LoadStatus } from '../load-state.mjs';
 import { type RateLimit } from '../rate-limit.mjs';
 import { type StoredToken } from '../token.mjs';
 import { createReader, type Reader } from './reader.mjs';
@@ -17,7 +16,7 @@ describe(createReader, () => {
 
     assert.deepStrictEqual(loads, []);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, LOADING);
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, LOADING);
   });
 
   test('reads at once with a token, and shows what it answers', async () => {
@@ -34,7 +33,7 @@ describe(createReader, () => {
 
     await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, ready(1_000));
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
 
     assert.deepStrictEqual(reader.rateLimit.getSnapshot().value, LIMIT);
 
@@ -119,6 +118,109 @@ describe(createReader, () => {
     assert.strictEqual(reader.nowMs.getSnapshot().value, 0);
   });
 
+  // A poll answers every fifteen seconds whether or not anything changed.
+  // What it writes is only what changed, so nothing drawn from the rest is
+  // told anything, let alone handed a new object.
+  test('a read that answers the same writes the time of reading and nothing else', async () => {
+    const { reader, loads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    const written = recordWrites(reader);
+
+    clock.set(2_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
+    assert.deepStrictEqual(written(), ['readAt']);
+
+    assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
+  });
+
+  test('a part that a read changed is replaced, and the others are kept', async () => {
+    const { reader, loads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    const written = recordWrites(reader);
+
+    clock.set(3_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(
+      loads,
+      1,
+      Result.ok({ ...readAt(2_000), merged: [MERGED] }),
+      LIMIT,
+    );
+
+    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+
+    assert.deepStrictEqual(written(), ['merged', 'readAt']);
+  });
+
+  test('says how the reading went apart from what it read', async () => {
+    const { reader, loads, timers, clock } = setup(TOKEN_A);
+
+    reader.start();
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'loading',
+    });
+
+    await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
+
+    const readyStatus = reader.loadStatus.getSnapshot().value;
+
+    assert.deepStrictEqual(readyStatus, READY);
+
+    clock.set(4_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
+
+    assert.strictEqual(reader.loadStatus.getSnapshot().value, readyStatus);
+
+    clock.set(5_000);
+
+    timers.fire(POLL_INTERVAL_MS);
+
+    await answer(loads, 2, Result.err('refused'), LIMIT);
+
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+      type: 'ready',
+      pollError: 'refused',
+      refreshing: false,
+    });
+  });
+
+  test('empties the parts when the token is forgotten', async () => {
+    const { reader, loads, setToken } = setup(TOKEN_A);
+
+    reader.start();
+
+    await answer(
+      loads,
+      0,
+      Result.ok({ ...readAt(1_000), merged: [MERGED] }),
+      LIMIT,
+    );
+
+    setToken(undefined);
+
+    assert.deepStrictEqual(reader.merged.getSnapshot().value, []);
+
+    assert.strictEqual(reader.readAt.getSnapshot().value, 0);
+  });
+
   test('refresh marks the report as refreshing and reads at once', async () => {
     const { reader, loads, clock } = setup(TOKEN_A);
 
@@ -132,14 +234,14 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 2);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, {
-      ...ready(1_000),
-      refreshing: true,
+    assert.deepStrictEqual(shown(reader), {
+      status: { type: 'ready', pollError: undefined, refreshing: true },
+      readAt: 1_000,
     });
 
     await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, ready(2_000));
+    assert.deepStrictEqual(shown(reader), { status: READY, readAt: 2_000 });
   });
 
   test('reads again when the token changes, and not when only where it is kept does', () => {
@@ -166,11 +268,11 @@ describe(createReader, () => {
 
     setToken(undefined);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, LOADING);
+    assert.deepStrictEqual(shown(reader), { status: LOADING, readAt: 0 });
 
     await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, LOADING);
+    assert.deepStrictEqual(shown(reader), { status: LOADING, readAt: 0 });
   });
 
   test('a load that throws is a failure, not an unhandled rejection', async () => {
@@ -182,7 +284,7 @@ describe(createReader, () => {
 
     await settle();
 
-    assert.deepStrictEqual(reader.loadState.getSnapshot().value, {
+    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
       type: 'failed',
       message: 'boom',
     });
@@ -344,6 +446,60 @@ const answer = async (
   await settle();
 };
 
+const shown = (
+  reader: Reader,
+): Readonly<{ status: LoadStatus; readAt: number }> =>
+  ({
+    status: reader.loadStatus.getSnapshot().value,
+    readAt: reader.readAt.getSnapshot().value,
+  }) as const;
+
+/**
+ * Listens to everything the page draws from, and answers with the names of
+ * what has been written since, sorted.
+ */
+const recordWrites = (reader: Reader): (() => readonly string[]) => {
+  const mut_written: string[] = [];
+
+  const parts = {
+    loadStatus: reader.loadStatus,
+    readAt: reader.readAt,
+    summary: reader.summary,
+    entries: reader.entries,
+    byNumber: reader.byNumber,
+    scaleMax: reader.scaleMax,
+    roots: reader.roots,
+    cycles: reader.cycles,
+    merged: reader.merged,
+    issues: reader.issues,
+    rateLimit: reader.rateLimit,
+  } as const;
+
+  for (const [partName, part] of Object.entries(parts)) {
+    part.subscribe(() => {
+      mut_written.push(partName);
+    });
+  }
+
+  // Subscribing hands over what each holds now, which is not a write.
+  mut_written.length = 0;
+
+  return () => mut_written.toSorted();
+};
+
+const MERGED: Merged = {
+  number: 7,
+  title: 'feat: something',
+  author: 'noshiro-pf',
+  url: 'https://github.com/noshiro-pf/mono/pull/7',
+  headRef: 'feat/something',
+  baseRef: 'main',
+  mergedAt: '2026-09-30T00:00:00Z',
+  mergedAtEpochMs: 1_759_190_400_000,
+  labels: [],
+  linkedIssues: [],
+} as const;
+
 const readAt = (readAtEpochMs: number): LoadedReport =>
   ({
     repo: { owner: 'noshiro-pf', name: 'mono' },
@@ -363,14 +519,4 @@ const readAt = (readAtEpochMs: number): LoadedReport =>
     cycles: [],
     merged: [],
     issues: { items: [], totalCount: 0 },
-  }) as const;
-
-const ready = (
-  readAtEpochMs: number,
-): RelaxedExtract<LoadState, Readonly<{ type: 'ready' }>> =>
-  ({
-    type: 'ready',
-    report: readAt(readAtEpochMs),
-    pollError: undefined,
-    refreshing: false,
   }) as const;
