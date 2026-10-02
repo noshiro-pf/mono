@@ -3,7 +3,11 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import {
+  getRangeWithParens,
+  isIdentifierNamed,
+  skipTypeWrappers,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -61,20 +65,21 @@ export const preferSafeArrayIsArray: TSESLint.RuleModule<MessageIds, Options> =
               node,
               messageId: 'useSafeArrayIsArray',
               fix: (fixer) => {
-                const callee = node.callee;
-
-                if (callee.type !== AST_NODE_TYPES.MemberExpression) {
-                  return [];
-                }
-
-                const replacement = `SafeArray.isArray${sourceCode.getText(node).slice(sourceCode.getText(callee).length)}`;
-
                 const importFixes =
                   index === 0 && !hasSafeArrayImport
                     ? buildImportFixes(fixer, program, ['SafeArray'])
                     : [];
 
-                return [...importFixes, fixer.replaceText(node, replacement)];
+                // Only the callee is replaced, type wrappers included, along
+                // with the parentheses around it, which its range leaves out;
+                // the arguments stay as written.
+                return [
+                  ...importFixes,
+                  fixer.replaceTextRange(
+                    getRangeWithParens(sourceCode, node.callee),
+                    'SafeArray.isArray',
+                  ),
+                ];
               },
             });
           }
@@ -85,19 +90,18 @@ export const preferSafeArrayIsArray: TSESLint.RuleModule<MessageIds, Options> =
   } as const;
 
 const isArrayIsArrayCall = (
-  node: DeepReadonly<TSESTree.CallExpression>,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
 ): boolean => {
-  if (node.callee.type !== AST_NODE_TYPES.MemberExpression) {
+  const callee = skipTypeWrappers(node.callee);
+
+  if (callee.type !== AST_NODE_TYPES.MemberExpression) {
     return false;
   }
 
-  const { object, property } = node.callee;
+  const { object, property } = callee;
 
-  if (object.type !== AST_NODE_TYPES.Identifier) {
-    return false;
-  }
-
-  if (object.name !== 'Array') {
+  if (!isIdentifierNamed(object, 'Array')) {
     return false;
   }
 

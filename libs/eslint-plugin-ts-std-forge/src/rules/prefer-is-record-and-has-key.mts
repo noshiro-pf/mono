@@ -6,6 +6,12 @@ import {
 import { SafeArray } from 'ts-std-forge';
 import * as ts from 'typescript';
 import {
+  getArgumentText,
+  getValueType,
+  isIdentifierNamed,
+  skipTypeWrappers,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsStdForgeImport,
@@ -40,15 +46,14 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
 
       const tsStdForgeImport = getTsStdForgeImport(program);
 
-      const services = sourceCode.parserServices;
-
-      const checker = services?.program?.getTypeChecker();
+      const checker = sourceCode.parserServices?.program?.getTypeChecker();
 
       /**
        * Whether the `isRecord(...)` half of the rewrite would be dead code
        * because the object already satisfies `hasKey`'s
        * `R extends UnknownRecord` constraint. Without type information nothing
-       * is known, so the guard is kept.
+       * is known, so the guard is kept. The type is the value's, not a cast's:
+       * an array cast to a record is still rejected by `isRecord`.
        */
       const isKnownRecord = (
         // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -58,12 +63,9 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           return false;
         }
 
-        const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
+        const type = getValueType(sourceCode, expression);
 
-        return (
-          tsNode !== undefined &&
-          isAlreadyRecordType(checker, checker.getTypeAtLocation(tsNode))
-        );
+        return type !== undefined && isAlreadyRecordType(checker, type);
       };
 
       const mut_nodesToFix: {
@@ -75,12 +77,13 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
       return {
         // Handle Object.hasOwn(obj, key)
         CallExpression: (node) => {
+          const callee = skipTypeWrappers(node.callee);
+
           if (
-            node.callee.type !== AST_NODE_TYPES.MemberExpression ||
-            node.callee.object.type !== AST_NODE_TYPES.Identifier ||
-            node.callee.object.name !== 'Object' ||
-            node.callee.property.type !== AST_NODE_TYPES.Identifier ||
-            node.callee.property.name !== 'hasOwn'
+            callee.type !== AST_NODE_TYPES.MemberExpression ||
+            !isIdentifierNamed(callee.object, 'Object') ||
+            callee.property.type !== AST_NODE_TYPES.Identifier ||
+            callee.property.name !== 'hasOwn'
           ) {
             return;
           }
@@ -157,9 +160,9 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
             index,
             { node, objExpression, keyExpression, needsIsRecord },
           ] of rewrites.entries()) {
-            const objText = sourceCode.getText(objExpression);
+            const objText = getArgumentText(sourceCode, objExpression);
 
-            const keyText = sourceCode.getText(keyExpression);
+            const keyText = getArgumentText(sourceCode, keyExpression);
 
             const originalText = sourceCode.getText(node);
 

@@ -5,6 +5,12 @@ import {
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 import {
+  getArgumentText,
+  getValueType,
+  isIdentifierNamed,
+  skipTypeWrappers,
+} from './ast-utils.mjs';
+import {
   buildImportFixes,
   getNamedImports,
   getTsStdForgeImport,
@@ -62,8 +68,6 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
 
     const tsStdForgeImport = getTsStdForgeImport(program);
 
-    const services = sourceCode.parserServices;
-
     const mut_nodesToFix: {
       node: TSESTree.CallExpression;
       argExpression: TSESTree.Expression;
@@ -71,7 +75,7 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
 
     return {
       CallExpression: (node) => {
-        const { callee } = node;
+        const callee = skipTypeWrappers(node.callee);
 
         // Match `parseInt(...)` or `Number.parseInt(...)`.
         const isGlobalParseInt =
@@ -81,8 +85,7 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
         const isNumberParseInt =
           callee.type === AST_NODE_TYPES.MemberExpression &&
           !callee.computed &&
-          callee.object.type === AST_NODE_TYPES.Identifier &&
-          callee.object.name === 'Number' &&
+          isIdentifierNamed(callee.object, 'Number') &&
           callee.property.type === AST_NODE_TYPES.Identifier &&
           callee.property.name === 'parseInt';
 
@@ -103,9 +106,11 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
           return;
         }
 
-        // Only base 10: accept a missing radix or an explicit literal `10`.
+        // Only base 10: accept a missing radix or an explicit literal `10`,
+        // read through its type wrappers, which leave the value as it is.
         if (args.length >= 2) {
-          const radix = args[1];
+          const radix =
+            args[1] === undefined ? undefined : skipTypeWrappers(args[1]);
 
           if (radix?.type !== AST_NODE_TYPES.Literal || radix.value !== 10) {
             return;
@@ -113,23 +118,12 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
         }
 
         // The argument must be a `string` so the autofix is type-safe against
-        // `SafeNumber.parseInteger(value: string)`. Without type information,
-        // skip.
-        if (services?.program == null) {
-          return;
-        }
+        // `SafeNumber.parseInteger(value: string)`, and that of the value, not
+        // of a cast: `parseInt(1e21 as unknown as string)` is 1, the rewrite
+        // 1e21. Without type information, skip.
+        const argType = getValueType(sourceCode, firstArg);
 
-        const checker = services.program.getTypeChecker();
-
-        const tsNode = services.esTreeNodeToTSNodeMap?.get(firstArg);
-
-        if (tsNode === undefined) {
-          return;
-        }
-
-        const argType = checker.getTypeAtLocation(tsNode);
-
-        if (!isStringType(argType)) {
+        if (argType === undefined || !isStringType(argType)) {
           return;
         }
 
@@ -146,7 +140,7 @@ export const preferSafeNumberParseInteger: TSESLint.RuleModule<
           index,
           { node, argExpression },
         ] of mut_nodesToFix.entries()) {
-          const argText = sourceCode.getText(argExpression);
+          const argText = getArgumentText(sourceCode, argExpression);
 
           context.report({
             node,
