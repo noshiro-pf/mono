@@ -49,6 +49,7 @@ export const knownRuleIds = [
   'functions/no-call-signature-member',
   'functions/no-fn-identifier',
   'functions/no-overloaded-function-expression',
+  'functions/no-refinement-overload',
   'functions/prefer-arrow-function',
   'functions/unified-signatures',
   'jsx/generic-arrow-trailing-comma',
@@ -71,6 +72,7 @@ export const knownRuleIds = [
   'null/no-null-propagation',
   'readonly/require-readonly-parameter',
   'readonly/require-readonly-type',
+  'readonly/restrict-cast-mutable',
 ] as const;
 
 export type KnownRuleId = (typeof knownRuleIds)[number];

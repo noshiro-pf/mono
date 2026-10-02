@@ -503,7 +503,7 @@
     - コーパスの runner は 2 エンジンを混ぜる形に変わった（`test/engine.test.mts`、旧 `oxlint-engine.test.mts`）。
     - **`checker` は RPC 越し**で `Type` はハンドル。ルールは「構文で候補を絞ってから型を聞く」形に書く（全ノードに型を聞けばプログラム全体の型付けを払う）。
     - API 名が `unstable/*` なので TypeScript のマイナー更新で壊れうる。`typescript-native` を 7.0.2 にピン止めしているので更新は自分のタイミングで受け止める。
-    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10 に実装済み。残りは `castMutable` 乱用の検出。
+    - 残る型情報ルールも同じ場所に実装する。論理代入のオペランド boolean 限定(`boolean/strict-logical-assignment-operands`)は 2026-09-09、`mut_` 以外への破壊的操作(`mutation/no-mutation-without-mut-prefix`)は 2026-09-10 に実装済み。`castMutable` 乱用の検出(`readonly/restrict-cast-mutable`)は 2026-09-30 に実装済み。
     - エディタ支援は未検証だが道はある: `API.fromLSPConnection` と `custom/initializeAPISession` で、動いている tsgo の LSP セッションに接続して同じ snapshot を共有できる。
 
 ## D-56: oxlint からの退避は段階的に行い、「言語仕様そのもの」を自前・「TS 一般の型安全規則」を既製品に置く線で分ける
@@ -566,7 +566,7 @@
     - **判断 3 の例外の根拠は誤りだった。** `method-signature-style: "property"` の下でも、オーバーロードされたメンバーは**プロパティの型を交差型にすれば書ける**(`encode: ((v: string) => string) & ((v: number) => number)`、解決順序・`Parameters<>` / `ReturnType<>`・generic HOF への推論とも呼び出しシグネチャの列挙と同じ — 実測 TypeScript 7.0.2 / 6.0.3)。呼び出し可能な値にプロパティが付く形も `((v: number) => string) & Readonly<{ label: string }>` で書ける。したがってメンバーとしての呼び出し / 構築シグネチャは**書く必要が一度も無く**、判断 4 により厳密な交差型に一本化できる
     - **値の側では交差型の注釈も認めない。** 関数式が複数シグネチャの型に代入できるのは、自分のシグネチャが各シグネチャに代入可能なときだけ — つまり自分のシグネチャだけで全呼び出しを受け付け、戻り値もどのシグネチャより粗くない。**受理される形は判断 1 の精密化そのもの**で単一シグネチャで書け、戻り値が引数に従う本物のオーバーロードは逆に `as` 無しには受理されない。`panic` の 2 本（どちらも `never`）はこの意味で精密化であり、`typescript/unified-signatures` も報告する
     - **`Readonly<>` の危険は記法 (2) 固有ではない**（`Readonly<F1 & F2>` も呼べない — 実測）。ただし readonly 化の codemod と `readonly/require-readonly-type` が包むのは型リテラルなので、シグネチャのメンバーを禁じれば包まれる型リテラルが常にレコードになり、#1881 の経路は閉じる
-    - **強制**: `functions/no-call-signature-member`（sumi プラグイン、`typescript/prefer-function-type` を包含）、`functions/no-overloaded-function-expression`（checker — 関数式の文脈型のシグネチャ数を見るので alias・`typeof`・注釈付きオブジェクトのプロパティも捕まえる）、`functions/adjacent-overload-signatures` と `functions/unified-signatures`（oxlint ネイティブ。後者は判断 1 のうち構文で決まる部分集合）。`functions/no-refinement-overload` は未実装のまま([#1952](https://github.com/noshiro-pf/mono/issues/1952))。宣言と節の整合性の検査行（`expectType` の 2 行）を要求するルールも未実装([#1953](https://github.com/noshiro-pf/mono/issues/1953))。振り分けの正しさはどちらも保証しない
+    - **強制**: `functions/no-call-signature-member`（sumi プラグイン、`typescript/prefer-function-type` を包含）、`functions/no-overloaded-function-expression`（checker — 関数式の文脈型のシグネチャ数を見るので alias・`typeof`・注釈付きオブジェクトのプロパティも捕まえる）、`functions/adjacent-overload-signatures` と `functions/unified-signatures`（oxlint ネイティブ。後者は判断 1 のうち構文で決まる部分集合）。`functions/no-refinement-overload`（checker — 2026-09-30 実装。[#1952](https://github.com/noshiro-pf/mono/issues/1952)）。宣言と節の整合性の検査行（`expectType` の 2 行）を要求するルールも未実装([#1953](https://github.com/noshiro-pf/mono/issues/1953))。振り分けの正しさはどちらも保証しない
     - **適合性アサートの向きの訂正**: [overload-design.md](./overload-design.md) の D のレシピにあった `const _: typeof arm1 & typeof arm2 = f` は宣言を節へ代入する向きで、**宣言が節より狭い嘘を通していた**（実測）。節を宣言へ代入する向き(`expectType<typeof arm1 & typeof arm2, typeof f>('<=')`)に直し、generic は `typeof f<Opaque>` で型引数を固定して消去を避ける
     - **測定の訂正**: 「19 個・17 ファイル・31 シグネチャ」は過少だった。2026-09-15 に TypeScript の AST で数え直すと、本体の無い `function` 宣言を伴う関数は `libs/` だけで 157 個（ts-data-forge 76、ts-std-forge 38、ts-fortress 35、synstate 系 6、ts-repo-utils 2）。種別ごとの内訳と「実行時分岐は `panic` だけ」という結論は、この母集団で分類し直すまで暫定とする
 
