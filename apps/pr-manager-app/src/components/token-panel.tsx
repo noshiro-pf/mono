@@ -4,10 +4,9 @@ import {
   type SubmitEventHandler,
 } from 'preact';
 import { memoNamed } from 'preact-utils';
-import { useObservableValue } from 'synstate-preact-hooks';
 import { POLL_INTERVAL_MS } from '../constants.mjs';
 import { isRunningLow, type RateLimit } from '../rate-limit.mjs';
-import { reader, tokenStore } from '../store/index.mjs';
+import { readerSignals, tokenSignals, tokenStore } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
 
 /**
@@ -23,15 +22,15 @@ import { ExternalLink } from './external-link.js';
  * that works.
  */
 export const TokenPanel = memoNamed('TokenPanel', () => {
-  const token = useObservableValue(tokenStore.token);
+  const token = tokenSignals.token.value;
 
-  const saveError = useObservableValue(tokenStore.saveError);
+  const saveError = tokenSignals.saveError.value;
 
-  const typed = useObservableValue(tokenStore.typed);
+  const typed = tokenSignals.typed.value;
 
-  const remember = useObservableValue(tokenStore.remember);
+  const remember = tokenSignals.remember.value;
 
-  const rateLimit = useObservableValue(reader.rateLimit);
+  const rateLimit = readerSignals.rateLimit.value;
 
   // Said in the sentence as well as shown in the colour: the reserved status
   // steps are not allowed to carry a meaning on their own here, and a reader
