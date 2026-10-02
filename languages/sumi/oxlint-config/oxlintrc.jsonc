@@ -114,6 +114,9 @@
       "error",
       { "allowShortCircuit": false, "allowTernary": false },
     ],
+    // D-61: a statement `if` always has braces, so that it reads apart from
+    // Sumi sugar's `if (c) a else b` expression, which never does
+    "curly": ["error", "all"],
 
     // ---- classes / exceptions (D-12, spec/exceptions.md, D-27) ----
     "sumi/no-class": "error",
@@ -146,6 +149,16 @@
     // ---- modules (spec/modules.md) ----
     "import/no-default-export": "error",
     "import/no-unassigned-import": ["error", { "allow": [] }],
+    // D-59: under verbatimModuleSyntax, `import { type X }` is emitted as
+    // `import {} from '...'` — a side-effect import — so a statement whose
+    // bindings are all types is written `import type`, and so is a namespace
+    // import used only as a type. `import('m').T` in a type position is
+    // erased and outside D-59, hence `disallowTypeAnnotations: false`.
+    "typescript/no-import-type-side-effects": "error",
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "disallowTypeAnnotations": false },
+    ],
     "import/extensions": ["error", "always", { "ignorePackages": true }],
     "no-restricted-imports": [
       "error",

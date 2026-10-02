@@ -1,6 +1,6 @@
 import { Optional } from 'ts-data-forge';
 import { createRootObservable } from '../base/index.mjs';
-import { type TimerId, type TimerObservable } from '../types/index.mjs';
+import type { TimerId, TimerObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits 0 after a specified delay and then completes.

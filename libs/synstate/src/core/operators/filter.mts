@@ -7,11 +7,11 @@ import {
 } from 'ts-data-forge';
 import { createSyncChildObservable } from '../base/index.mjs';
 import { source } from '../create/index.mjs';
-import {
-  type DropInitialValueOperator,
-  type FilterOperatorObservable,
-  type InitializedObservable,
-  type Observable,
+import type {
+  DropInitialValueOperator,
+  FilterOperatorObservable,
+  InitializedObservable,
+  Observable,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 

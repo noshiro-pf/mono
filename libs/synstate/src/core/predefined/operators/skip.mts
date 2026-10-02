@@ -1,7 +1,7 @@
 import { PositiveSafeInt } from 'ts-data-forge';
-import { type PositiveSafeIntWithSmallInt } from 'ts-type-forge';
+import type { PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { skipWhile } from '../../operators/index.mjs';
-import { type DropInitialValueOperator } from '../../types/index.mjs';
+import type { DropInitialValueOperator } from '../../types/index.mjs';
 
 /**
  * Skips the first `n` emissions from the source observable.
