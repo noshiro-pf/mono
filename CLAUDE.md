@@ -369,7 +369,10 @@ as not newer. **A package's first publish is manual** (`libs/first-release.md`).
 Tags are `<package-name>@<version>`; repository-prefixed tags are imported
 history, never create new ones. `changeset:version-packages` formats
 `strict-lib/` before regenerating the bundles, because `changeset version`
-writes changelogs Prettier does not own.
+writes changelogs Prettier does not own. **A breaking change put off to the
+next major goes in the package's `NEXT_MAJOR.md`** (a candidate under
+`## Undecided`), not a TODO comment; `check:prose:next-major` holds the
+breaking changeset until it is applied.
 
 **A release is queued like anything else, but the version pull request is
 declared _on_ rather than _by_.** `changesets/action` overwrites the title and
