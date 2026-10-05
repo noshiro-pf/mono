@@ -32,8 +32,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  * is a move _within_ the list (MIT to Apache-2.0), where there is nothing to
  * do about it anyway.
  *
- * It reads `pnpm licenses list --json`, which reads the installed
- * `node_modules` and the network not at all. Without an install every package
+ * It reads `pnpm licenses list --recursive --json`, which reads the installed
+ * `node_modules` and the network not at all. `--recursive` is what takes in
+ * the workspace members' dependencies: since pnpm 12.7 the listing without it
+ * covers the root project alone, and the exceptions for what only `apps/*` and
+ * `libs/*` install then read as stale. Without an install every package
  * comes back `Unknown`, so `Unknown` is a failure rather than a gap: a check
  * that passes because it saw nothing is the one shape this must not have.
  */
@@ -57,8 +60,9 @@ export const checkLicenses = (): Result<CheckSummary, string> => {
 };
 
 /**
- * One entry per package and license from `pnpm licenses list --json`, which
- * groups by license: `{ "MIT": [{ name, versions, license, … }], … }`.
+ * One entry per package and license from
+ * `pnpm licenses list --recursive --json`, which groups by license:
+ * `{ "MIT": [{ name, versions, license, … }], … }`.
  *
  * A package whose versions disagree appears once under each license
  * (`argparse` is Python-2.0 at 2.x and PSF-2.0 at 3.x), so the pair is the
@@ -71,7 +75,7 @@ export const parseLicensesOutput = (
 
   if (Result.isErr(parsed)) {
     return Result.err(
-      `\`pnpm licenses list --json\` returned no JSON: ${parsed.value}`,
+      `\`pnpm licenses list --recursive --json\` returned no JSON: ${parsed.value}`,
     );
   }
 
@@ -80,7 +84,7 @@ export const parseLicensesOutput = (
   if (Result.isErr(groups)) {
     return Result.err(
       Arr.toUnshifted(
-        '`pnpm licenses list --json` returned something other than packages grouped by license:',
+        '`pnpm licenses list --recursive --json` returned something other than packages grouped by license:',
       )(t.validationErrorsToMessages(groups.value)).join('\n'),
     );
   }
@@ -93,7 +97,7 @@ export const parseLicensesOutput = (
   return Arr.isNonEmpty(installed)
     ? Result.ok(installed)
     : Result.err(
-        '`pnpm licenses list --json` listed no package, so there is nothing to have checked.',
+        '`pnpm licenses list --recursive --json` listed no package, so there is nothing to have checked.',
       );
 };
 
@@ -288,9 +292,9 @@ type CheckSummary = Readonly<{
 }>;
 
 /**
- * What `pnpm licenses list --json` returns, to the extent this reads it.
- * `record` allows excess properties, so the `paths`, `author` and `homepage`
- * each entry also carries need no mention.
+ * What `pnpm licenses list --recursive --json` returns, to the extent this
+ * reads it. `record` allows excess properties, so the `paths`, `author` and
+ * `homepage` each entry also carries need no mention.
  */
 const PNPM_LICENSES = t.keyValueRecord(
   t.string(),
@@ -353,7 +357,7 @@ const readInstalledLicenses = (): Result<
   string
 > => {
   const output = Result.fromThrowable(() =>
-    execFileSync('pnpm', ['licenses', 'list', '--json'], {
+    execFileSync('pnpm', ['licenses', 'list', '--recursive', '--json'], {
       cwd: projectRootPath,
       encoding: 'utf8',
       // The listing carries every install path and is several hundred KB.
@@ -363,7 +367,7 @@ const readInstalledLicenses = (): Result<
 
   return Result.isErr(output)
     ? Result.err(
-        `\`pnpm licenses list --json\` failed: ${unknownToString(output.value)}`,
+        `\`pnpm licenses list --recursive --json\` failed: ${unknownToString(output.value)}`,
       )
     : parseLicensesOutput(output.value);
 };
