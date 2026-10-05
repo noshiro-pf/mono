@@ -7868,7 +7868,7 @@ namespace NoUselessConstructor {
  *  | :------------------- | :--------- |
  *  | type                 | suggestion |
  *  | deprecated           | false      |
- *  | fixable              | code       |
+ *  | hasSuggestions       | true       |
  *  | recommended          | strict     |
  *  | requiresTypeChecking | true       |
  *  ```

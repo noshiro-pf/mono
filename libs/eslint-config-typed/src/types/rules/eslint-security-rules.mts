@@ -6,11 +6,11 @@ import { type Linter } from 'eslint';
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-unsafe-regex.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectUnsafeRegex {
@@ -22,11 +22,11 @@ namespace DetectUnsafeRegex {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-regexp.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectNonLiteralRegexp {
@@ -38,11 +38,11 @@ namespace DetectNonLiteralRegexp {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-require.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectNonLiteralRequire {
@@ -54,11 +54,11 @@ namespace DetectNonLiteralRequire {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-fs-filename.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectNonLiteralFsFilename {
@@ -70,11 +70,11 @@ namespace DetectNonLiteralFsFilename {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-eval-with-expression.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectEvalWithExpression {
@@ -86,11 +86,11 @@ namespace DetectEvalWithExpression {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-pseudoRandomBytes.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectPseudoRandomBytes {
@@ -102,11 +102,11 @@ namespace DetectPseudoRandomBytes {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-possible-timing-attacks.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectPossibleTimingAttacks {
@@ -118,11 +118,11 @@ namespace DetectPossibleTimingAttacks {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-no-csrf-before-method-override.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectNoCsrfBeforeMethodOverride {
@@ -134,11 +134,11 @@ namespace DetectNoCsrfBeforeMethodOverride {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-buffer-noassert.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectBufferNoassert {
@@ -150,11 +150,11 @@ namespace DetectBufferNoassert {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-child-process.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectChildProcess {
@@ -166,11 +166,11 @@ namespace DetectChildProcess {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-disable-mustache-escape.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectDisableMustacheEscape {
@@ -182,11 +182,11 @@ namespace DetectDisableMustacheEscape {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-object-injection.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectObjectInjection {
@@ -198,11 +198,11 @@ namespace DetectObjectInjection {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-new-buffer.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectNewBuffer {
@@ -214,14 +214,30 @@ namespace DetectNewBuffer {
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-bidi-characters.md
  *
  *  ```md
- *  | key         | value |
- *  | :---------- | :---- |
- *  | type        | error |
- *  | deprecated  | false |
- *  | recommended | true  |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace DetectBidiCharacters {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Detects invisible characters that have no visible glyph and can be used to hide malicious code.
+ * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-invisible-characters.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace DetectInvisibleCharacters {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -240,4 +256,5 @@ export type EslintSecurityRules = Readonly<{
   'security/detect-object-injection': DetectObjectInjection.RuleEntry;
   'security/detect-new-buffer': DetectNewBuffer.RuleEntry;
   'security/detect-bidi-characters': DetectBidiCharacters.RuleEntry;
+  'security/detect-invisible-characters': DetectInvisibleCharacters.RuleEntry;
 }>;

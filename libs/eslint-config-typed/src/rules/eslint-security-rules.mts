@@ -15,4 +15,5 @@ export const eslintSecurityRules = {
   'security/detect-object-injection': 'off', // too many false positives
   'security/detect-new-buffer': 'error',
   'security/detect-bidi-characters': 'error',
+  'security/detect-invisible-characters': 'error',
 } as const satisfies EslintSecurityRules;
