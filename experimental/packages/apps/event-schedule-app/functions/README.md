@@ -1,2 +1,0 @@
--   `curl https://us-central1-event-schedule-app.cloudfunctions.net/addMessage?text=uppercasemetoo`
--   https://myaccount.google.com/u/1/lesssecureapps

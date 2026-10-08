@@ -320,6 +320,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: Cloud Functions with a
+    // single entry point, bundled by `scripts/build.mts`.
+    "apps/event-schedule-app-functions": {
+      "entry": ["src/index.mts", "scripts/**/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/numeric-input-utils": {
       "entry": ["src/index.mts"],

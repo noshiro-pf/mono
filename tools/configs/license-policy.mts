@@ -75,6 +75,10 @@ export const licensePolicy = {
       note: 'No conditions at all, not even the notice.',
     },
     {
+      license: 'MIT-0',
+      note: 'MIT with the notice condition removed, so no conditions at all, like 0BSD. On `nodemailer`.',
+    },
+    {
       license: 'Apache-2.0',
       note: 'This repository’s own license. Redistribution keeps the license text and any NOTICE file, and marks modified files. Carries an explicit patent grant that ends for whoever sues over the work. Incompatible with GPL-2.0-only, which nothing here is under.',
     },

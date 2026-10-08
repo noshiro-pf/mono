@@ -1,0 +1,59 @@
+{
+  "name": "event-schedule-app-functions",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/event-schedule-app-functions"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/build.mts",
+    "check:lint": "eslint .",
+    "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
+    "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
+    "fix:fmt:full": "prettier --write .",
+    "fix:lint": "eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:index",
+    "gen:index": "run-s gen:index:src fix:fmt",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --preserve index.mts",
+    "watch:build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/build.mts --watch",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
+    "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
+    "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
+  },
+  "dependencies": {
+    "event-schedule-app-shared": "workspace:*",
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0",
+    "nodemailer": "^10.0.13",
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*",
+    "ts-fortress-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/nodemailer": "^8.0.2",
+    "esbuild": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "npm-run-all2": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
+    "tsx": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.22.2"
+  }
+}

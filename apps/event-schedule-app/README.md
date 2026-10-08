@@ -12,28 +12,25 @@ Restored from `experimental/` — see
 ## Running it
 
 ```sh
-pnpm run dev      # Vite dev server
-pnpm run build    # production build into `build/`, which firebase.json serves
-pnpm run preview  # serve that build
+pnpm run dev        # Vite dev server
+pnpm run emulators  # Functions, Firestore and Pub/Sub emulators
+pnpm run build      # production build into `build/`, which firebase.json serves
+pnpm run preview    # serve that build
 ```
 
-The Cloud Functions, the Firestore rules and the Playwright end-to-end suite
-did not come across with the restore: they are deployment and integration
-concerns, and this repository does not deploy the app. They are still in
-`experimental/packages/apps/event-schedule-app/`.
+In development the app talks to the Firestore and Functions emulators
+(`useEmulators` in `src/env.mts`), so `dev` needs `emulators` running beside
+it. Sign-in still goes to the production Firebase Auth. `emulators` builds
+the functions in
+[`../event-schedule-app-functions`](../event-schedule-app-functions/README.md)
+first and keeps the emulators' data in `emulator-data/` between runs; run that
+package's `watch:build` to have the emulator pick up changes to the functions.
 
-### env
+The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
+emulators run through `pnpm dlx firebase-tools`, so nothing else is installed.
 
-The functions read a Gmail account from the Firebase environment config:
-
-```json
-{
-    "gmail": {
-        "email": "noshiro.app@gmail.com",
-        "password": "<password>"
-    }
-}
-```
+The Playwright suite that writes to Firestore (`create-event.spec.ts`) is still
+in `experimental/packages/apps/event-schedule-app/`.
 
 ### Firestore structure
 

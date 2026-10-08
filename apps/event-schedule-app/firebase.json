@@ -15,14 +15,16 @@
     "indexes": "firestore.indexes.json"
   },
   "functions": {
-    "source": "functions",
+    "source": "../event-schedule-app-functions/build",
     "codebase": "default",
     "ignore": [
       "node_modules",
       ".git",
       "firebase-debug.log",
-      "firebase-debug.*.log"
-    ]
+      "firebase-debug.*.log",
+      ".secret.local"
+    ],
+    "predeploy": ["pnpm --dir \"$RESOURCE_DIR/..\" run build"]
   },
   "emulators": {
     "auth": {

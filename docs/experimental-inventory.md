@@ -741,7 +741,7 @@ step 3 で復元した 18 パッケージは**コピー＆修正**で入れた�
 | :----------------------------------- | ---: | :---------------------------------------------------------- |
 | 旧ビルド設定                         |   57 | `configs/rollup.config.ts`・`tsconfig.build/test.json`      |
 | テンプレート残骸・暗黙グローバル・他 |   35 | `src/globals.d.ts`・`src/constants/dictionary/`             |
-| Firebase Functions                   |   30 | `event-schedule-app/functions/` — 移植先がまだ無い          |
+| Firebase Functions                   |   30 | `event-schedule-app/functions/` — 2026-10-09 に復元（末尾） |
 | Firebase 設定                        |   26 | `firebase.json`・`.firebaserc`・`firestore.*`               |
 | 別パッケージに移った分               |   18 | `blueprintjs-playground-styled` の `src/style-definitions/` |
 | e2e（Playwright）                    |   11 | `e2e/*.spec.ts`・`configs/playwright.config.ts`             |
@@ -1834,3 +1834,40 @@ npm 依存は増やしていない。app のディレクトリで
 `README.md` ・ `configs/vitest.config.ts` は復元先にも同名があるが、**部分復元**
 （color と shape だけを移し、array ・ num ・ types は残した）なので、残った
 ソースのためにマニフェストが要る。これは取りこぼしではない。
+
+## `event-schedule-app` の Functions と emulator の復元（2026-10-09）
+
+`experimental/packages/apps/event-schedule-app/` に残っていた `functions/`・
+`firestore.rules`・`firestore.indexes.json`・`.firebaserc` を戻した。Functions は
+`apps/event-schedule-app-functions` という独立したパッケージにし、
+`firebase.json` の `functions.source` からその `build/` を指している。
+`apps/event-schedule-app` の `pnpm run emulators` で Functions・Firestore・
+Pub/Sub の emulator が上がる。
+
+### 移行は機械的な部分と、そうでない 3 つ
+
+import の付け替えと `.chain` → `.map`、`IMap.get` が `Optional` を返す点は
+`event-schedule-app` 本体と同じ。そうでなかったのは次の 3 つである。
+
+- **`functions.config()` が firebase-functions v7 で消えた。** 値は
+  `defineJsonSecret('RUNTIME_CONFIG')` から読む。中身の形は変えていないので、
+  `firebase functions:config:export` で既存の設定をそのまま secret に移せる。
+  secret は関数の実行中にしか読めないため、メール送信の都度読むように変えた
+- **`firebase-admin` v14 は名前空間 API（`admin.firestore()`）を持たない。**
+  `firebase-admin/app`・`firebase-admin/firestore` から import する。
+  `eslint-config-typed` の `import-x/no-internal-modules` に
+  `firebase-admin/*` を足した
+- **Node.js 20 の Cloud Functions は 2026-10-30 に廃止される。** deploy する
+  runtime は 22 にした。v1 API（1st gen）のままにしたのは、2nd gen への移行が
+  全関数の改名を伴うからで、1st gen の Node.js 22 は 2027-10-31 まで使える
+
+### bundle する理由
+
+Cloud Functions は deploy されたディレクトリで `npm install` を走らせるので、
+`workspace:*` を含む `package.json` はそのままでは deploy できない。
+`scripts/build.mts` は workspace のパッケージを esbuild で `build/index.mjs` に
+bundle し、外に残す `firebase-admin`・`firebase-functions`・`nodemailer` だけを
+インストール済みのバージョンに固定した `build/package.json` を書く。
+firebase-tools は `node_modules/.bin/firebase-functions` を source と project の
+直下でしか探さないので、`build/node_modules` はパッケージの `node_modules` への
+リンクにしてある。

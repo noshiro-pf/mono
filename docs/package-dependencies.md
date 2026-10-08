@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 58 個。
+このリポジトリの workspace パッケージは 59 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -20,6 +20,7 @@ graph LR
   catan_dice_app["catan-dice-app"]
   color_demo_app["color-demo-app"]
   event_schedule_app["event-schedule-app"]
+  event_schedule_app_functions["event-schedule-app-functions"]
   event_schedule_app_shared["event-schedule-app-shared"]
   github_view_defaults_extension["github-view-defaults-extension"]
   housing_loan_calculator_app["housing-loan-calculator-app"]
@@ -115,6 +116,10 @@ graph LR
   event_schedule_app --> ts_data_forge
   event_schedule_app --> ts_fortress
   event_schedule_app --> ts_fortress_types
+  event_schedule_app_functions --> event_schedule_app_shared
+  event_schedule_app_functions --> ts_data_forge
+  event_schedule_app_functions --> ts_fortress
+  event_schedule_app_functions --> ts_fortress_types
   event_schedule_app_shared --> ts_data_forge
   event_schedule_app_shared --> ts_fortress
   event_schedule_app_shared --> ts_fortress_types
@@ -270,7 +275,7 @@ graph LR
 |    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `ts-utils-additional`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`          |
 |    5 | `poll-discord-app`, `pr-report-core`, `preact-utils`, `react-utils`, `slack-archive-tools`, `tiny-router-observable`, `ts-fortress-types`, `octokit-safe-types`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `ts-codemod-cli`                                                                                                       |
 |    6 | `algo-app`, `annotation-tool`, `blueprintjs-playground`, `catan-dice-app`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `mahjong-calculator-app`, `my-portfolio-app-preact`, `pr-manager-app`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `task-manager-app`, `github-settings-as-code` |
-|    7 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                                                               |
+|    7 | `blueprintjs-playground-styled`, `cant-stop-probability-app`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator-app`, `react-mui-utils`                                                                                                                                                                                                                               |
 |    8 | `color-demo-app`                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ### 参考: devDependencies も含めた場合
@@ -297,6 +302,8 @@ graph LR
 | `color-demo-app`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `event-schedule-app`                 | dep  | `better-react-use-state`&nbsp;`workspace:*`<br>`event-schedule-app-shared`&nbsp;`workspace:*`<br>`numeric-input-utils`&nbsp;`workspace:*`<br>`react-blueprintjs-utils`&nbsp;`workspace:*`<br>`react-utils`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`tiny-router-observable`&nbsp;`workspace:*`<br>`tiny-router-react-hooks`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*` |
 | `event-schedule-app`                 | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
+| `event-schedule-app-functions`       | dep  | `event-schedule-app-shared`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                             |
+| `event-schedule-app-functions`       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `event-schedule-app-shared`          | dep  | `ts-data-forge`&nbsp;`workspace:*`<br>`ts-fortress`&nbsp;`workspace:*`<br>`ts-fortress-types`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `event-schedule-app-shared`          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                       |
 | `github-view-defaults-extension`     | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -393,7 +400,7 @@ graph LR
 | `ts-std-forge`                       | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `ts-type-forge`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                     |
 
-58 / 58 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+59 / 59 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
