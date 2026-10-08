@@ -9,10 +9,14 @@ export const ButtonsWrapperNowrap = styled.div`
   display: flex;
   align-items: center;
 
-  & > * { margin-right: 5px; // margin between this button and the next button
-    margin-bottom: 5px; // margin between this button and the buttons on next line }
-  &::last-of-type { margin-right: 0;
-    margin-bottom: 0; }
+  & > * {
+    margin-right: 5px; /* margin between this button and the next button */
+    margin-bottom: 5px; /* margin between this button and the buttons on next line */
+  }
+  &::last-of-type {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
 `;
 
 export const ButtonsWrapper = styled(ButtonsWrapperNowrap)`
