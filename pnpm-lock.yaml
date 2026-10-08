@@ -2439,6 +2439,46 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-repo-utils
 
+  apps/task-manager-app:
+    dependencies:
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.3
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.9
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.9)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.9)
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+      tsx:
+        specifier: 'catalog:'
+        version: 4.23.15
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.2(@types/node@26.6.3)(@vitest/browser-playwright@5.0.2)(@vitest/coverage-v8@5.0.2)(@vitest/ui@5.0.2)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   apps/tiny-router-observable:
     dependencies:
       synstate:

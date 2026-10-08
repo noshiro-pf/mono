@@ -573,6 +573,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry above assumes: the framework-independent
+    // domain logic, with a single entry point until a UI is chosen.
+    "apps/task-manager-app": {
+      "entry": ["src/index.mts", "configs/*.mts"],
+      "project": ["**/*.mts"],
+    },
+
     // Not an Astro site like the entry above assumes: a set of Node programs,
     // each of which runs when imported, so there is no barrel to point at.
     "apps/slack-archive-tools": {
