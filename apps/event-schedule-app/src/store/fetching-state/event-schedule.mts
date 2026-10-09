@@ -3,6 +3,7 @@ import {
   combine,
   createEventEmitter,
   filter,
+  merge,
   throttle,
   unwrapResultOk,
   withInitialValue,
@@ -15,6 +16,15 @@ import { noop } from '../../utils-ported/index.mjs';
 import { Router } from '../router.mjs';
 
 const [fetchEventSchedule$, fetchEventSchedule] = createEventEmitter();
+
+/**
+ * For the refetch after this client has written the event. It is not
+ * throttled with the others: `throttle` drops a request that comes within
+ * `fetchThrottleTime` of the last one rather than delaying it, so a save made
+ * that soon after the page loaded went on showing the event as it was.
+ */
+const [refetchEventScheduleAfterWrite$, refetchEventScheduleAfterWrite] =
+  createEventEmitter();
 
 const fetchEventScheduleThrottled$ = fetchEventSchedule$.pipe(
   throttle(fetchThrottleTime),
@@ -34,20 +44,21 @@ const [
 
 const result$ = eventScheduleResult$;
 
-combine([fetchEventScheduleThrottled$, Router.eventId$]).subscribe(
-  ([_, eventId]) => {
-    if (eventId === undefined) {
-      return;
-    }
+combine([
+  merge([fetchEventScheduleThrottled$, refetchEventScheduleAfterWrite$]),
+  Router.eventId$,
+]).subscribe(([_, eventId]) => {
+  if (eventId === undefined) {
+    return;
+  }
 
-    api.event
-      .fetch(eventId)
-      .then((result) => {
-        setEventScheduleResult(result);
-      })
-      .catch(noop);
-  },
-);
+  api.event
+    .fetch(eventId)
+    .then((result) => {
+      setEventScheduleResult(result);
+    })
+    .catch(noop);
+});
 
 result$.subscribe((e) => {
   if (e !== undefined && Result.isErr(e)) {
@@ -66,4 +77,5 @@ export const EventScheduleStore = {
   result$,
   useEventScheduleResult,
   fetchEventSchedule,
+  refetchEventScheduleAfterWrite,
 } as const;

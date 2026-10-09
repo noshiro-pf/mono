@@ -29,8 +29,16 @@ package's `watch:build` to have the emulator pick up changes to the functions.
 The Firestore and Pub/Sub emulators need Java (JDK 21 or later), and the
 emulators run through `pnpm dlx firebase-tools`, so nothing else is installed.
 
-The Playwright suite that writes to Firestore (`create-event.spec.ts`) is still
-in `experimental/packages/apps/event-schedule-app/`.
+### End-to-end tests
+
+```sh
+pnpm run check:e2e            # what CI runs; leaves out the @emulators tests
+pnpm run check:e2e:emulators  # the tests that write to Firestore
+```
+
+`check:e2e:emulators` starts its own emulators with empty data
+(`firebase emulators:exec`), so stop `pnpm run emulators` first: they listen
+on the same ports. No workflow runs it yet, since no runner has Java.
 
 ### Firestore structure
 

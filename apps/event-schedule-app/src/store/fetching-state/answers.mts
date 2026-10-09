@@ -3,6 +3,7 @@ import {
   createEventEmitter,
   createState,
   filter,
+  merge,
   throttle,
   unwrapResultOk,
   withInitialValue,
@@ -17,6 +18,13 @@ import { Router } from '../router.mjs';
 import { EventScheduleStore } from './event-schedule.mjs';
 
 const [fetchAnswers$, fetchAnswers] = createEventEmitter();
+
+/**
+ * For the refetch after this client has written an answer. Not throttled, for
+ * the reason `refetchEventScheduleAfterWrite` gives.
+ */
+const [refetchAnswersAfterWrite$, refetchAnswersAfterWrite] =
+  createEventEmitter();
 
 const fetchAnswersThrottled$ = fetchAnswers$.pipe(throttle(fetchThrottleTime));
 
@@ -43,7 +51,10 @@ const refreshAnswers = (): void => {
 
 /* subscriptions */
 
-combine([fetchAnswersThrottled$, Router.eventId$]).subscribe(([_, eventId]) => {
+combine([
+  merge([fetchAnswersThrottled$, refetchAnswersAfterWrite$]),
+  Router.eventId$,
+]).subscribe(([_, eventId]) => {
   if (eventId === undefined) {
     return;
   }
@@ -94,5 +105,6 @@ export const AnswersStore = {
   useRefreshButtonIsDisabled,
   useRefreshButtonIsLoading,
   fetchAnswers,
+  refetchAnswersAfterWrite,
   refreshAnswers,
 } as const;

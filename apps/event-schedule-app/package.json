@@ -12,7 +12,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build --config ./configs/vite.config.mts",
-    "check:e2e": "playwright test --config ./configs/playwright.config.mts",
+    "check:e2e": "playwright test --config ./configs/playwright.config.mts --grep-invert @emulators",
+    "check:e2e:emulators": "pnpm --dir ../event-schedule-app-functions run build && pnpm dlx firebase-tools@15 emulators:exec --only functions,firestore,pubsub \"playwright test --config ./configs/playwright.config.mts --grep @emulators\"",
     "check:lint": "eslint .",
     "check:test": "vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
