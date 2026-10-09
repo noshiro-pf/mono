@@ -3,6 +3,7 @@ import { createTask } from './create-task.mjs';
 import {
   buildDependentIds,
   buildSourceIds,
+  isGraphNodeId,
   listNodes,
   nodeId,
 } from './graph-nodes.mjs';
@@ -57,6 +58,20 @@ describe(nodeId, () => {
       nodeId({ kind: 'task', id: asTaskId('x') }),
       nodeId({ kind: 'milestone', id: asMilestoneId('x') }),
     );
+  });
+});
+
+describe(isGraphNodeId, () => {
+  test('is a kind, a colon and an id', () => {
+    assert.isTrue(isGraphNodeId('task:a'));
+
+    assert.isTrue(isGraphNodeId('milestone:m:1'));
+
+    assert.isFalse(isGraphNodeId('task:'));
+
+    assert.isFalse(isGraphNodeId('project:p'));
+
+    assert.isFalse(isGraphNodeId(''));
   });
 });
 

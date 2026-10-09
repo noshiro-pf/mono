@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    Three nodes and the edges between them: a dependency graph, which is what
+    the app is built around. Fixed colours rather than following the theme,
+    because the icon sits on the browser's tab strip, not on the page.
+  -->
+  <rect width="32" height="32" rx="7" fill="#215db0" />
+  <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+    <path d="M10 10 L22 16 M10 22 L22 16" />
+  </g>
+  <g fill="#fff">
+    <rect x="5" y="6" width="9" height="8" rx="2" />
+    <rect x="5" y="18" width="9" height="8" rx="2" />
+    <path d="M23 11 L28 16 L23 21 L18 16 Z" />
+  </g>
+</svg>

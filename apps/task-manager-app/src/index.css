@@ -1,0 +1,1153 @@
+/*
+ * Blueprint supplies the look of the controls (`bp6-*` classes on our own
+ * elements). The one Blueprint component used is the date picker
+ * (`src/date-picker/`), through `preact/compat`. What follows is the layout,
+ * the status colours, the DAG, and what a phone needs: safe-area insets,
+ * 44px tap targets, and 16px inputs so that iOS does not zoom into a field.
+ *
+ * Dark mode follows `prefers-color-scheme`: the store puts `bp6-dark` on
+ * `<html>`, which switches Blueprint's styles and the tokens below.
+ */
+
+@import '@blueprintjs/core/lib/css/blueprint.css';
+@import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
+
+:root {
+  color-scheme: light;
+
+  --page: #f6f7f9;
+  --surface: #ffffff;
+  --text: #1c2127;
+  --muted: #5f6b7c;
+  --hairline: rgb(17 20 24 / 15%);
+  --focus: #2d72d2;
+  --danger: #ac2f33;
+  --edge: #738091;
+
+  /*
+   * One colour per display status, each with white text at 4.5:1 or more,
+   * and a tint of it for the DAG's node fills.
+   */
+  --status-ready: #1c6e42;
+  --status-ready-tint: #e8f5ee;
+  --status-blocked: #935610;
+  --status-blocked-tint: #fbf1e3;
+  --status-in-progress: #215db0;
+  --status-in-progress-tint: #e7f0fc;
+  --status-in-review: #5642a6;
+  --status-in-review-tint: #efebfb;
+  --status-done: #5f6b7c;
+  --status-done-tint: #edeff2;
+  --milestone: #8a5a00;
+  --milestone-tint: #fff3d6;
+
+  --header-height: 56px;
+  --tap: 36px;
+}
+
+:root.bp6-dark {
+  color-scheme: dark;
+
+  --page: #111418;
+  --surface: #1c2127;
+  --text: #f6f7f9;
+  --muted: #abb3bf;
+  --hairline: rgb(255 255 255 / 20%);
+  --focus: #8abbff;
+  --danger: #fa999c;
+  --edge: #8f99a8;
+
+  --status-ready-tint: #12301f;
+  --status-blocked-tint: #3b2a10;
+  --status-in-progress-tint: #13294a;
+  --status-in-review-tint: #2a2152;
+  --status-done-tint: #2f343c;
+  --milestone: #fbb360;
+  --milestone-tint: #3d2c0b;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --tap: 44px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Tap targets and iOS-safe inputs. */
+
+.bp6-button {
+  min-height: var(--tap);
+  min-width: var(--tap);
+}
+
+.bp6-button.bp6-small {
+  min-height: calc(var(--tap) - 4px);
+  min-width: calc(var(--tap) - 4px);
+}
+
+.bp6-input,
+.bp6-html-select select,
+textarea.bp6-input {
+  font-size: 16px;
+}
+
+.bp6-input,
+.bp6-html-select select {
+  min-height: var(--tap);
+}
+
+textarea.bp6-input {
+  min-height: calc(var(--tap) * 2);
+  resize: vertical;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+/* Screens before sign-in. */
+
+.center-screen {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.sign-in-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+
+/* The shell. */
+
+.main-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: max(8px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right)) 8px
+    max(12px, env(safe-area-inset-left));
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.view-switch {
+  margin: 0 auto 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: auto;
+  margin: 8px max(12px, env(safe-area-inset-right)) 0
+    max(12px, env(safe-area-inset-left));
+}
+
+/* The list. */
+
+.list-view {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px max(16px, env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.list-section + .list-section {
+  margin-top: 32px;
+}
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-switch {
+  margin: 0;
+}
+
+.sort-details {
+  position: relative;
+}
+
+.sort-summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.sort-summary::-webkit-details-marker {
+  display: none;
+}
+
+/*
+ * The sort editor (`sort-editor.tsx`): a dropdown of the list's
+ * 「並べ替え」, and a section of 「表示設定」 for the diagrams' order. A
+ * row's controls go below its name when there is no room beside it, and
+ * every button is a full tap target on a touch screen.
+ */
+.sort-details > .sort-editor {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 300px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px var(--hairline),
+    0 8px 24px rgb(0 0 0 / 20%);
+}
+
+.settings-field > .sort-editor {
+  align-self: stretch;
+}
+
+.sort-keys {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.sort-key-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 4px;
+}
+
+.sort-key-label {
+  flex: 1 0 7em;
+}
+
+.sort-key-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.sort-empty {
+  margin: 0 0 8px;
+}
+
+.sort-add {
+  display: block;
+}
+
+@media (pointer: coarse) {
+  .sort-key-row .bp6-button {
+    min-height: var(--tap);
+    min-width: var(--tap);
+  }
+}
+
+.task-table {
+  width: 100%;
+}
+
+.task-table td {
+  vertical-align: middle;
+}
+
+.task-row {
+  position: relative;
+}
+
+.task-row:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.row-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The title button is stretched over its row: the row is one tap target. */
+.row-link::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+.row-link:focus-visible {
+  outline: none;
+}
+
+.task-row.done,
+.task-card.done {
+  opacity: 0.72;
+}
+
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.status-badge {
+  color: #ffffff;
+}
+
+.status-badge.status-ready {
+  background: var(--status-ready);
+}
+
+.status-badge.status-blocked {
+  background: var(--status-blocked);
+}
+
+.status-badge.status-in-progress {
+  background: var(--status-in-progress);
+}
+
+.status-badge.status-in-review {
+  background: var(--status-in-review);
+}
+
+.status-badge.status-done {
+  background: var(--status-done);
+}
+
+.label-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.due-date.overdue {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.overdue-mark {
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.task-cards,
+.milestone-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task-card,
+.milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.task-card:focus-visible,
+.milestone-item:focus-visible {
+  outline: 2px solid var(--focus);
+}
+
+.task-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.task-card-priority {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.task-card-title,
+.milestone-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.task-card-meta,
+.milestone-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.milestone-badge.reached {
+  background: var(--milestone);
+  color: var(--surface);
+}
+
+.milestone-badge.pending {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--milestone);
+  color: var(--milestone);
+}
+
+@media (min-width: 600px) {
+  .milestone-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .milestone-meta {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .sort-details > .sort-editor {
+    position: static;
+    min-width: 0;
+    margin-top: 8px;
+  }
+
+  .sort-details[open] {
+    flex-basis: 100%;
+  }
+}
+
+/* The DAG. */
+
+.dag-view {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 320px;
+}
+
+.dag-message {
+  margin: 24px;
+}
+
+.dag-canvas {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.dag-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.dag-svg:active {
+  cursor: grabbing;
+}
+
+/*
+ * Over the canvas, across its top; first in the tab order, before the nodes.
+ * As wide as the canvas, for 「表示設定」 to sit at the right end, and
+ * letting the pointer through to the canvas between its controls.
+ */
+.dag-toolbar {
+  position: absolute;
+  top: 12px;
+  right: max(12px, env(safe-area-inset-right));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.dag-toolbar > * {
+  pointer-events: auto;
+}
+
+.dag-toolbar fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dag-settings-button {
+  margin-left: auto;
+}
+
+/*
+ * One row at 390px in every mode: the buttons a little tighter, and
+ * 「表示設定」 its gear alone, its name kept for assistive technology.
+ */
+@media (max-width: 599px) {
+  .dag-toolbar {
+    gap: 6px;
+  }
+
+  .dag-toolbar .bp6-button {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .dag-settings-button-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/*
+ * 「表示設定」: a native <dialog>, a popover hanging from its button (placed
+ * by `dag-settings-panel.tsx`) or, on a narrow screen, a sheet across the
+ * bottom.
+ */
+.settings-panel {
+  position: fixed;
+  inset: auto;
+  width: min(320px, calc(100vw - 16px));
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  overflow: auto;
+}
+
+.settings-panel::backdrop {
+  background: transparent;
+}
+
+.settings-panel[data-placement='sheet'] {
+  inset: auto 0 0;
+  width: 100%;
+  max-height: 85dvh;
+  border-radius: 12px 12px 0 0;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.settings-panel[data-placement='sheet']::backdrop {
+  background: rgb(17 20 24 / 50%);
+}
+
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 0 16px;
+}
+
+.settings-panel-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* One section per setting, stacked. */
+.settings-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 16px 16px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-field-control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.settings-field-label {
+  padding: 0;
+  font-weight: 600;
+}
+
+.settings-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.dag-controls {
+  position: absolute;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 8px;
+}
+
+/* 「タイル」's scroll indicator: a thin thumb on the right, never in the way. */
+.dag-scroll-thumb {
+  position: absolute;
+  right: max(4px, env(safe-area-inset-right));
+  width: 4px;
+  border-radius: 2px;
+  background: var(--muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.dag-edge-line {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.5;
+}
+
+.dag-arrow {
+  fill: var(--edge);
+}
+
+/* 「アーク」: a dependency through milestones is dashed. */
+.dag-arc.derived .dag-edge-line {
+  stroke-dasharray: 6 4;
+}
+
+/*
+ * The highlight of 「アーク」: what the pointed or focused task is joined to
+ * comes forward, the rest dims. Eased when the reader's setting animates,
+ * and not while the nodes move, whose opacity a tween sets frame by frame.
+ */
+.dag-node[data-highlight='dim'],
+.dag-edge[data-highlight='dim'] {
+  opacity: 0.2;
+}
+
+.dag-arc[data-highlight='on'] .dag-edge-line {
+  stroke: var(--focus);
+  stroke-width: 2.5;
+}
+
+.dag-arrow-highlight {
+  fill: var(--focus);
+}
+
+.dag-node[data-highlight='on'] .dag-node-shape {
+  stroke-width: 3;
+}
+
+.dag-svg[data-motion='true'][data-animating='false'] .dag-node,
+.dag-svg[data-motion='true'][data-animating='false'] .dag-edge {
+  transition: opacity 150ms ease-out;
+}
+
+/* The edges coming back after the view has changed mode. */
+.dag-svg[data-motion='true'] .dag-edges {
+  animation: dag-edges-in 240ms ease-out;
+}
+
+@keyframes dag-edges-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.dag-edge-label rect {
+  fill: var(--surface);
+  stroke: var(--hairline);
+}
+
+.dag-edge-label text {
+  fill: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dag-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.dag-node-shape {
+  stroke-width: 1.5;
+}
+
+.dag-node.dragging {
+  cursor: grabbing;
+}
+
+.dag-node.dragging .dag-node-shape {
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 25%));
+}
+
+.dag-node:focus-visible .dag-node-shape {
+  stroke: var(--focus);
+  stroke-width: 3;
+}
+
+.dag-node-title {
+  fill: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dag-node-meta {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.dag-node-warning {
+  fill: var(--danger);
+  font-size: 13px;
+}
+
+.dag-task.status-ready .dag-node-shape {
+  fill: var(--status-ready-tint);
+  stroke: var(--status-ready);
+}
+
+.dag-task.status-blocked .dag-node-shape {
+  fill: var(--status-blocked-tint);
+  stroke: var(--status-blocked);
+  stroke-dasharray: 4 3;
+}
+
+.dag-task.status-in-progress .dag-node-shape {
+  fill: var(--status-in-progress-tint);
+  stroke: var(--status-in-progress);
+}
+
+.dag-task.status-in-review .dag-node-shape {
+  fill: var(--status-in-review-tint);
+  stroke: var(--status-in-review);
+}
+
+.dag-task.status-done .dag-node-shape {
+  fill: var(--status-done-tint);
+  stroke: var(--status-done);
+}
+
+.dag-milestone .dag-node-shape {
+  stroke: var(--milestone);
+  stroke-width: 2;
+}
+
+.dag-milestone.reached .dag-node-shape {
+  fill: var(--milestone-tint);
+}
+
+.dag-milestone.pending .dag-node-shape {
+  fill: var(--surface);
+  stroke-dasharray: 5 3;
+}
+
+/* The dialog: a native <dialog> wearing Blueprint's dialog classes. */
+
+.node-dialog {
+  width: min(680px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  color: inherit;
+}
+
+/* `.bp6-dialog` sets `display: flex`, which would show a closed dialog. */
+.node-dialog:not([open]) {
+  display: none;
+}
+
+.node-dialog::backdrop {
+  background: rgb(17 20 24 / 70%);
+}
+
+.node-dialog-form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.node-dialog .bp6-dialog-header h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+}
+
+.node-dialog-body {
+  overflow: auto;
+}
+
+.node-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.node-dialog-footer .bp6-dialog-footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 599px) {
+  /* A full-screen sheet on a phone. */
+  .node-dialog {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .node-dialog .bp6-dialog-header {
+    border-radius: 0;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px 16px;
+}
+
+.form-grid .bp6-label {
+  margin: 0;
+}
+
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.manual-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.condition-group {
+  margin: 16px 0 0;
+  padding: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+}
+
+.condition-group legend {
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+.condition-hint {
+  margin: 0 0 12px;
+}
+
+.condition-dependencies {
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.condition-sub-label {
+  margin: 0 0 8px;
+  padding: 0;
+  font-weight: 600;
+}
+
+/* Over Blueprint's `label.bp6-label`, which zeroes the top margin. */
+label.description-field {
+  margin: 16px 0 0;
+}
+
+.milestone-explanation {
+  margin: 0 0 16px;
+}
+
+.milestone-explanation .bp6-heading {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.milestone-explanation p,
+.milestone-explanation ul {
+  margin: 0 0 8px;
+}
+
+.milestone-explanation > :last-child {
+  margin-bottom: 0;
+}
+
+/* Left a list item, so that it keeps its disclosure triangle. */
+.milestone-explanation-summary {
+  line-height: var(--tap);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+details[open] > .milestone-explanation-summary {
+  margin-bottom: 8px;
+}
+
+.milestone-reach-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+/* Dependency rows: one card each, the same grid whatever the source is. */
+
+.dependency-rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dependency-row-fields {
+  display: grid;
+  grid-template-areas:
+    'source source source remove'
+    'type days hours .';
+  grid-template-columns: minmax(0, 1fr) 7rem 7rem auto;
+  align-items: end;
+  gap: 8px 12px;
+}
+
+.dependency-row .bp6-label {
+  margin: 0;
+}
+
+.dependency-source {
+  grid-area: source;
+}
+
+.dependency-type {
+  grid-area: type;
+}
+
+.dependency-lag-days {
+  grid-area: days;
+}
+
+.dependency-lag-hours {
+  grid-area: hours;
+}
+
+.dependency-remove {
+  grid-area: remove;
+}
+
+/* A milestone or no source has no type to choose; the slot keeps its size. */
+.dependency-type-fixed {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap);
+}
+
+.dependency-row-message {
+  margin: 8px 0 0;
+}
+
+.dependency-row.invalid {
+  box-shadow: 0 0 0 1px var(--danger);
+}
+
+/* On its own line under the rows, so it never moves sideways. */
+.dependency-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+/* One column on a phone. */
+@media (max-width: 599px) {
+  .dependency-row-fields {
+    grid-template-areas:
+      'source'
+      'type'
+      'days'
+      'hours'
+      'remove';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dependency-remove {
+    justify-self: start;
+  }
+}
+
+/* Blueprint's date picker in a form field. */
+
+.date-time-field .bp6-label {
+  margin-bottom: 4px;
+}
+
+.date-time-field .bp6-popover-target {
+  display: block;
+}
+
+/*
+ * Blueprint places a select's caret at a fixed `top: 7px`, right for its own
+ * 30px select and too high for ours, which are taller (`--tap`). Centre it
+ * whatever the height. The date picker's month and year selects are the
+ * visible case.
+ */
+.bp6-html-select select + .bp6-icon {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/*
+ * Blueprint's 24px of right padding ends the text exactly where the caret
+ * (16px, 8px from the edge) begins. Ours (`HtmlSelect`) keep 8px clear of it.
+ * Before the date picker's rule below, which has the same specificity and
+ * sets its own selects tighter.
+ */
+.bp6-html-select select {
+  padding-right: 32px;
+  text-overflow: ellipsis;
+}
+
+/*
+ * The month and year selects leave only the caret's own width to its right,
+ * so at 16px the caret touches the text. A few pixels apart, as in
+ * Blueprint's own examples.
+ */
+.bp6-datepicker-month-select select,
+.bp6-datepicker-year-select select {
+  padding-right: 20px;
+}
+
+/*
+ * Blueprint places the month's caret by measuring the month's name in a
+ * hidden element, which keeps its 14px while the select is 16px (iOS zooms
+ * into a smaller one). Measure at the size that is drawn, or the caret lands
+ * inside the text; the padding is the gap the year's caret gets.
+ */
+.bp6-datepicker-caption-measure {
+  font-size: 16px;
+  padding-right: 4px;
+}
+
+.delete-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

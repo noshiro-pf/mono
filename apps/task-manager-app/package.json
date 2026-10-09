@@ -2,7 +2,7 @@
   "name": "task-manager-app",
   "version": "0.0.0",
   "private": true,
-  "description": "Task manager with a dependency DAG between tasks and events",
+  "description": "Task manager with a dependency DAG between tasks and milestones",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
@@ -11,11 +11,14 @@
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
-  "exports": "./src/index.mts",
   "scripts": {
+    "build": "vite build --config ./configs/vite.config.mts",
+    "check:e2e": "playwright test --config ./configs/playwright.config.mts",
     "check:lint": "eslint .",
     "check:test": "vitest --config ./configs/vitest.config.mts run",
+    "check:test:cov": "vitest --config ./configs/vitest.config.mts run --coverage",
     "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "dev": "vite --config ./configs/vite.config.mts",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fix:fmt:full": "prettier --write .",
@@ -23,7 +26,8 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --min-depth 1",
+    "preview": "vite preview --config ./configs/vite.config.mts",
     "test": "pnpm run check:test",
     "watch:test": "vitest --config ./configs/vitest.config.mts watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
@@ -32,19 +36,36 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "ts-data-forge": "workspace:*"
+    "@blueprintjs/core": "^6.20.0",
+    "@blueprintjs/datetime": "^6.2.6",
+    "date-fns": "^2.30.0",
+    "elkjs": "^0.12.0",
+    "firebase": "^12.19.0",
+    "preact-utils": "workspace:*",
+    "react": "npm:@preact/compat@^18.3.2",
+    "react-dom": "npm:@preact/compat@^18.3.2",
+    "synstate": "workspace:*",
+    "synstate-preact-signals": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@preact/signals": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "npm-run-all2": "catalog:",
+    "preact": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

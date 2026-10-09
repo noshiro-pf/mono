@@ -4,3 +4,14 @@ version: '0.2'
 # otherwise lose the root dictionaries and ignorePaths.
 import:
   - '../../.cspell.config.yaml'
+words:
+  # The layout library (`elkjs`), and the node placement strategy
+  # (`BRANDES_KOEPF`, after the paper that defines it) that
+  # `src/dag/graph-layout.mts` compares its own choice with.
+  - elkjs
+  - KOEPF
+  # `memberUids`, the field of a project document that `firestore.rules`,
+  # the converters and the README name.
+  - Uids
+  # The Firebase CLI's project file, named in the README.
+  - firebaserc

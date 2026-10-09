@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// Deployed by hand: `firebase deploy --only firestore:rules` from this
+// directory (see README.md). Editing this file changes nothing until then.
+//
+// Layout:
+//   projects/{projectId}                        { name, ownerUid, memberUids, createdAt }
+//   projects/{projectId}/tasks/{taskId}         a task, without its id
+//   projects/{projectId}/milestones/{milestoneId}
+//   projects/{projectId}/settings/dagLayout     the DAG's direction and node positions
+//
+// Each user has one personal project, whose id is their uid. Membership is a
+// list so that shared projects can come later without moving any data.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(projectId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.memberUids;
+    }
+
+    match /projects/{projectId} {
+      // A user may read their own personal project before it exists (the app
+      // checks for it on sign-in), and any project they are a member of.
+      allow get: if signedIn()
+        && (projectId == request.auth.uid
+            || request.auth.uid in resource.data.memberUids);
+
+      // Only one's own personal project, owned by oneself, with oneself as
+      // the only member.
+      allow create: if signedIn()
+        && projectId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'memberUids', 'createdAt'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.memberUids == [request.auth.uid];
+
+      match /tasks/{taskId} {
+        allow read, write: if isMember(projectId);
+      }
+
+      match /milestones/{milestoneId} {
+        allow read, write: if isMember(projectId);
+      }
+
+      match /settings/{docId} {
+        allow read, write: if isMember(projectId);
+      }
+    }
+
+    // Everything else — listing projects, updating or deleting one, any
+    // other collection — is denied.
+  }
+}
