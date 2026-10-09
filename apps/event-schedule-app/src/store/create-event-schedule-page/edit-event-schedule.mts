@@ -87,6 +87,22 @@ const setEventSchedule = (
   }
 };
 
+// The settings form knows nothing of who made the event or who archived it,
+// so `eventScheduleNormalized` carries the current user as `author` and an
+// empty `archivedBy`. An edit keeps both as the database has them: the
+// Firestore rules refuse an update that changes either.
+const keepIdentityOf = (
+  fromDatabase: EventSchedule | undefined,
+  eventSchedule: EventSchedule,
+): EventSchedule =>
+  fromDatabase === undefined
+    ? eventSchedule
+    : ({
+        ...eventSchedule,
+        author: fromDatabase.author,
+        archivedBy: fromDatabase.archivedBy,
+      } as const);
+
 const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
   emailVerified$,
   eventScheduleFromDatabase$,
@@ -100,7 +116,7 @@ const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
     ]) =>
       collectEventSettingsPageDiff(
         eventScheduleFromDatabase ?? eventScheduleInitialValue,
-        eventScheduleNormalized,
+        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
         emailVerified,
         notificationSettingsWithEmail?.email,
       ),
@@ -127,7 +143,10 @@ const hasNoChanges$: InitializedObservable<boolean> = combine([
       { eventScheduleNormalized, notificationSettingsWithEmail },
     ]) =>
       emailVerified === notificationSettingsWithEmail?.email &&
-      fastDeepEqual(eventScheduleFromDatabase, eventScheduleNormalized),
+      fastDeepEqual(
+        eventScheduleFromDatabase,
+        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
+      ),
   ),
 );
 
@@ -160,7 +179,13 @@ const saveToDatabase = async (): Promise<void> => {
 
   setIsLoadingTrue();
 
-  const res = await api.event.update(eventId, eventScheduleNormalized);
+  const res = await api.event.update(
+    eventId,
+    keepIdentityOf(
+      eventScheduleFromDatabase$.getSnapshot().value,
+      eventScheduleNormalized,
+    ),
+  );
 
   const res2 =
     email === '' ? undefined : await api.event.setAuthorsEmail(eventId, email);
