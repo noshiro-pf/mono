@@ -1,9 +1,326 @@
+// Firestore rules of event-schedule-app. Deployed by hand with
+// `pnpm dlx firebase-tools deploy --only firestore:rules` from this directory;
+// nothing in CI reads this file, so a change here is a change to what the
+// next deploy does.
+//
+// Who may do what (the Cloud Functions use the Admin SDK and bypass this):
+//
+// - An event is reached by its id alone, so `get` is open and `list` is not:
+//   the id in the URL is the only thing between a stranger and an event.
+// - An event is edited by its author. An event created while signed in has
+//   `author.id` and is edited by that account only; one created anonymously
+//   has `author.id == null` and stays editable by anyone who has the URL, as
+//   the app has always let it be. Nothing deletes an event.
+// - `archivedBy` is per user: a signed-in user adds or removes their own entry
+//   and touches nothing else. An author's edit leaves it as it is.
+// - Answers are public and anyone may post one. An answer with `user.id` is
+//   owned by that account; one with `user.id == null` is editable by anyone.
+//   Nothing is written to answers after the event's deadline.
+// - `internal/values` holds the author's notification email. It is written
+//   by whoever may edit the event and read by the functions alone.
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(9999, 12, 31);
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // `User` of event-schedule-app-shared: `id` is a uid or null.
+    function isUser(u) {
+      return u is map
+        && u.keys().hasOnly(['id', 'name'])
+        && u.keys().hasAll(['id', 'name'])
+        && (u.id == null || u.id is string)
+        && u.name is string
+        && u.name.size() <= 200;
+    }
+
+    // A `User` a request may write as its own: anonymous, or the caller.
+    function isSelf(u) {
+      return isUser(u) && (u.id == null || (isSignedIn() && u.id == uid()));
+    }
+
+    // Whether the caller may act as the owner of `u`: anonymous data has no
+    // owner and anyone may; owned data is the owner's alone.
+    function owns(u) {
+      return u.id == null || (isSignedIn() && u.id == uid());
+    }
+
+    function isIntIn(v, lo, hi) {
+      return v is int && v >= lo && v <= hi;
+    }
+
+    function isYmd(v) {
+      return v is map
+        && v.keys().hasOnly(['year', 'month', 'date'])
+        && v.keys().hasAll(['year', 'month', 'date'])
+        && isIntIn(v.year, 1900, 9999)
+        && isIntIn(v.month, 1, 12)
+        && isIntIn(v.date, 1, 31);
+    }
+
+    function isHm(v) {
+      return v is map
+        && v.keys().hasOnly(['hours', 'minutes'])
+        && v.keys().hasAll(['hours', 'minutes'])
+        && isIntIn(v.hours, 0, 23)
+        && isIntIn(v.minutes, 0, 59);
+    }
+
+    function isYmdhm(v) {
+      return v is map
+        && v.keys().hasOnly(['year', 'month', 'date', 'hours', 'minutes'])
+        && v.keys().hasAll(['year', 'month', 'date', 'hours', 'minutes'])
+        && isIntIn(v.year, 1900, 9999)
+        && isIntIn(v.month, 1, 12)
+        && isIntIn(v.date, 1, 31)
+        && isIntIn(v.hours, 0, 23)
+        && isIntIn(v.minutes, 0, 59);
+    }
+
+    function isDatetimeRange(v) {
+      return v is map
+        && v.keys().hasOnly(['ymd', 'timeRange'])
+        && v.keys().hasAll(['ymd', 'timeRange'])
+        && isYmd(v.ymd)
+        && v.timeRange is map
+        && v.timeRange.keys().hasOnly(['start', 'end'])
+        && v.timeRange.keys().hasAll(['start', 'end'])
+        && isHm(v.timeRange.start)
+        && isHm(v.timeRange.end);
+    }
+
+    function isAnswerIconSetting(v) {
+      return v is map
+        && v.keys().hasOnly(['description', 'point'])
+        && v.keys().hasAll(['description', 'point'])
+        && v.description is string
+        && v.description.size() <= 200
+        && v.point is number
+        && v.point >= 0
+        && v.point <= 10;
+    }
+
+    function isAnswerIcons(v) {
+      return v is map
+        && v.keys().hasOnly(['good', 'fair', 'poor'])
+        && v.keys().hasAll(['good', 'fair', 'poor'])
+        && isAnswerIconSetting(v.good)
+        && isAnswerIconSetting(v.fair)
+        && isAnswerIconSetting(v.poor);
+    }
+
+    function isNotificationSettings(v) {
+      return v is map
+        && v.keys().hasOnly([
+          'notifyOnAnswerChange',
+          'notifyAfterAnswerDeadline',
+          'notify00daysBeforeAnswerDeadline',
+          'notify01daysBeforeAnswerDeadline',
+          'notify03daysBeforeAnswerDeadline',
+          'notify07daysBeforeAnswerDeadline',
+          'notify14daysBeforeAnswerDeadline',
+          'notify28daysBeforeAnswerDeadline'
+        ])
+        && v.keys().hasAll([
+          'notifyOnAnswerChange',
+          'notifyAfterAnswerDeadline',
+          'notify00daysBeforeAnswerDeadline',
+          'notify01daysBeforeAnswerDeadline',
+          'notify03daysBeforeAnswerDeadline',
+          'notify07daysBeforeAnswerDeadline',
+          'notify14daysBeforeAnswerDeadline',
+          'notify28daysBeforeAnswerDeadline'
+        ])
+        && v.notifyOnAnswerChange is bool
+        && v.notifyAfterAnswerDeadline is bool
+        && v.notify00daysBeforeAnswerDeadline is bool
+        && v.notify01daysBeforeAnswerDeadline is bool
+        && v.notify03daysBeforeAnswerDeadline is bool
+        && v.notify07daysBeforeAnswerDeadline is bool
+        && v.notify14daysBeforeAnswerDeadline is bool
+        && v.notify28daysBeforeAnswerDeadline is bool;
+    }
+
+    // `EventSchedule` of event-schedule-app-shared. Rules cannot walk a list,
+    // so a list is checked by its size and its first element.
+    function isEventSchedule(d) {
+      return d.keys().hasOnly([
+          'title',
+          'notes',
+          'datetimeSpecification',
+          'datetimeRangeList',
+          'answerDeadline',
+          'answerIcons',
+          'notificationSettings',
+          'timezoneOffsetMinutes',
+          'author',
+          'archivedBy'
+        ])
+        && d.keys().hasAll([
+          'title',
+          'notes',
+          'datetimeSpecification',
+          'datetimeRangeList',
+          'answerDeadline',
+          'answerIcons',
+          'notificationSettings',
+          'timezoneOffsetMinutes',
+          'author',
+          'archivedBy'
+        ])
+        && d.title is string
+        && d.title.size() <= 500
+        && d.notes is string
+        && d.notes.size() <= 20000
+        && d.datetimeSpecification in [
+          'noStartEndSpecified',
+          'startSpecified',
+          'endSpecified',
+          'startAndEndSpecified'
+        ]
+        && d.datetimeRangeList is list
+        && d.datetimeRangeList.size() >= 1
+        && d.datetimeRangeList.size() <= 1000
+        && isDatetimeRange(d.datetimeRangeList[0])
+        && (d.answerDeadline == 'none' || isYmdhm(d.answerDeadline))
+        && isAnswerIcons(d.answerIcons)
+        && (d.notificationSettings == 'none'
+          || isNotificationSettings(d.notificationSettings))
+        && isIntIn(d.timezoneOffsetMinutes, -1440, 1440)
+        && isUser(d.author)
+        && d.archivedBy is list
+        && d.archivedBy.size() <= 10000;
+    }
+
+    // `Answer` of event-schedule-app-shared. `id` is '' on creation and the
+    // document id afterwards, so it is a string and nothing more.
+    function isAnswer(d) {
+      return d.keys().hasOnly([
+          'id',
+          'user',
+          'comment',
+          'selection',
+          'createdAt',
+          'weight',
+          'isRequiredParticipants'
+        ])
+        && d.keys().hasAll([
+          'id',
+          'user',
+          'comment',
+          'selection',
+          'createdAt',
+          'weight',
+          'isRequiredParticipants'
+        ])
+        && d.id is string
+        && d.id.size() <= 100
+        && isUser(d.user)
+        && d.comment is string
+        && d.comment.size() <= 10000
+        && d.selection is list
+        && d.selection.size() <= 1000
+        && d.createdAt is number
+        && d.weight is number
+        && d.isRequiredParticipants is bool;
+    }
+
+    match /events_v7/{eventId} {
+      function event() {
+        return get(/databases/$(database)/documents/events_v7/$(eventId)).data;
+      }
+
+      // The deadline is a wall-clock time in the event's own zone:
+      // `timezoneOffsetMinutes` is what `Date#getTimezoneOffset` returned
+      // where the event was made, so UTC is local plus the offset.
+      function isBeforeDeadline(ev) {
+        return ev.answerDeadline == 'none'
+          || request.time.toMillis()
+            < timestamp.date(
+                ev.answerDeadline.year,
+                ev.answerDeadline.month,
+                ev.answerDeadline.date
+              ).toMillis()
+              + (ev.answerDeadline.hours * 60
+                + ev.answerDeadline.minutes
+                + ev.timezoneOffsetMinutes)
+                * 60000;
+      }
+
+      // An edit by the author: every setting may change, the identity of the
+      // document (`author`) and the readers' own `archivedBy` may not.
+      function isAuthorsEdit() {
+        return owns(resource.data.author)
+          && isEventSchedule(request.resource.data)
+          && request.resource.data.author == resource.data.author
+          && request.resource.data.archivedBy == resource.data.archivedBy;
+      }
+
+      // `archiveEventSchedule` / `unarchiveEventSchedule`: an `arrayUnion` or
+      // `arrayRemove` of the caller's own `User` on `archivedBy`, and no other
+      // field. `removeAll` yields what one list has that the other does not.
+      function isOwnArchiveToggle() {
+        let before = resource.data.archivedBy;
+        let after = request.resource.data.archivedBy;
+        let added = after.removeAll(before);
+        let removed = before.removeAll(after);
+        return isSignedIn()
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['archivedBy'])
+          && after is list
+          && after.size() <= 10000
+          && (
+            (added.size() == 1
+              && removed.size() == 0
+              && after.size() == before.size() + 1
+              && isUser(added[0])
+              && added[0].id == uid())
+            || (added.size() == 0
+              && removed.size() >= 1
+              && removed.toSet().size() == 1
+              && after.size() < before.size()
+              && isUser(removed[0])
+              && removed[0].id == uid())
+          );
+      }
+
+      allow get: if true;
+      allow list: if false;
+      allow create: if isEventSchedule(request.resource.data)
+        && isSelf(request.resource.data.author)
+        && request.resource.data.archivedBy.size() == 0;
+      allow update: if isAuthorsEdit() || isOwnArchiveToggle();
+      allow delete: if false;
+
+      match /answers/{answerId} {
+        allow read: if true;
+        allow create: if isAnswer(request.resource.data)
+          && isSelf(request.resource.data.user)
+          && isBeforeDeadline(event());
+        allow update: if isAnswer(request.resource.data)
+          && owns(resource.data.user)
+          && isSelf(request.resource.data.user)
+          && isBeforeDeadline(event());
+        allow delete: if owns(resource.data.user)
+          && isBeforeDeadline(event());
+      }
+
+      match /internal/values {
+        allow read: if false;
+        allow create, update: if owns(event().author)
+          && request.resource.data.keys().hasOnly(['email'])
+          && request.resource.data.keys().hasAll(['email'])
+          && request.resource.data.email is string
+          && request.resource.data.email.size() <= 320;
+        allow delete: if false;
+      }
     }
   }
 }
