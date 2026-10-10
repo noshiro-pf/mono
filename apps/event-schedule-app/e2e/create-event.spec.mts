@@ -1,7 +1,17 @@
-import { range } from '@noshiro/mono-utils';
 import { expect, type Page, test } from '@playwright/test';
+import { Arr } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 
-test('create event', async ({ page, context }) => {
+// Writes to Firestore, so it runs against the emulators, through
+// `check:e2e:emulators`, and `check:e2e` leaves it out by this tag.
+
+/** Creating the event is a Firestore write, longer than the default 5s allows. */
+const createEventTimeout = 20_000;
+
+/** The answer page fetches the event and its answers before it can be used. */
+const answerPageLoadTimeout = 15_000;
+
+test('create event', { tag: '@emulators' }, async ({ page, context }) => {
   await page.goto('/');
 
   {
@@ -10,9 +20,10 @@ test('create event', async ({ page, context }) => {
     /* create an event */
 
     await createPage.getByTestId('title').fill('ボドゲ会（仮）');
+
     await createPage.getByTestId('note').fill('ノート（仮）');
 
-    for (const _ of range(0, 2)) {
+    for (const _ of Arr.range(0, 2)) {
       // eslint-disable-next-line no-await-in-loop
       await createPage
         .getByTestId('datetime-list')
@@ -37,12 +48,13 @@ test('create event', async ({ page, context }) => {
 
   await expect
     .soft(createEventResultDialogBody.getByTestId('url-wrapper'))
-    .toBeVisible({ timeout: 20_000 });
+    .toBeVisible({ timeout: createEventTimeout });
 
   {
     const backButton = createEventResultDialogFooter.getByTestId('back-button');
 
     await expect.soft(backButton).toBeVisible();
+
     await expect.soft(backButton).toBeDisabled();
 
     const clipboardButton =
@@ -82,63 +94,70 @@ test('create event', async ({ page, context }) => {
       .toHaveCount(0);
   }
 
+  const editEventSchedulePage = answerPage.getByTestId(
+    'edit-event-schedule-page',
+  );
+
+  // イベント設定を更新
+  const editPageSubmitButton = editEventSchedulePage
+    .getByTestId('submit-button')
+    .getByTestId('update-event-settings');
+
+  const editPageSubmitButtonWithConfirm = editEventSchedulePage
+    .getByTestId('submit-button')
+    .getByTestId('update-event-settings-with-confirm');
+
+  await expect.soft(editPageSubmitButtonWithConfirm).toBeHidden();
+
+  await expect.soft(editPageSubmitButton).toBeVisible();
+
+  // 未編集のときは更新ボタンは disabled
+  await expect.soft(editPageSubmitButton).toBeDisabled();
+
+  const title = editEventSchedulePage.getByTestId('title');
+
+  await expect.soft(title).toHaveValue('ボドゲ会（仮）');
+
+  await title.fill('ボドゲ会');
+
+  await expect.soft(title).toHaveValue('ボドゲ会');
+
+  const note = editEventSchedulePage.getByTestId('note');
+
+  await expect.soft(note).toHaveValue('ノート（仮）\n');
+
+  await note.fill('ノート\n');
+
+  await expect.soft(note).toHaveValue('ノート\n');
+
+  await expect.soft(editPageSubmitButtonWithConfirm).toBeHidden();
+
+  await expect.soft(editPageSubmitButton).toBeVisible();
+
+  await expect.soft(editPageSubmitButton).toBeEnabled();
+
   {
-    const editEventSchedulePage = answerPage.getByTestId(
-      'edit-event-schedule-page',
-    );
+    const fairPointInput = editEventSchedulePage
+      .getByTestId('icon-settings')
+      .getByTestId('fair-point-input')
+      .getByRole('textbox');
 
-    // イベント設定を更新
-    const editPageSubmitButton = editEventSchedulePage
-      .getByTestId('submit-button')
-      .getByTestId('update-event-settings');
+    await fairPointInput.clear();
 
-    const editPageSubmitButtonWithConfirm = editEventSchedulePage
-      .getByTestId('submit-button')
-      .getByTestId('update-event-settings-with-confirm');
+    await fairPointInput.fill('7.5');
 
-    await expect.soft(editPageSubmitButtonWithConfirm).toBeHidden();
-    await expect.soft(editPageSubmitButton).toBeVisible();
-
-    // 未編集のときは更新ボタンは disabled
-    await expect.soft(editPageSubmitButton).toBeDisabled();
-
-    const title = editEventSchedulePage.getByTestId('title');
-
-    await expect.soft(title).toHaveValue('ボドゲ会（仮）');
-    await title.fill('ボドゲ会');
-    await expect.soft(title).toHaveValue('ボドゲ会');
-
-    const note = editEventSchedulePage.getByTestId('note');
-
-    await expect.soft(note).toHaveValue('ノート（仮）\n');
-    await note.fill('ノート\n');
-    await expect.soft(note).toHaveValue('ノート\n');
-
-    await expect.soft(editPageSubmitButtonWithConfirm).toBeHidden();
-
-    await expect.soft(editPageSubmitButton).toBeVisible();
-    await expect.soft(editPageSubmitButton).toBeEnabled();
-
-    {
-      const fairPointInput = editEventSchedulePage
-        .getByTestId('icon-settings')
-        .getByTestId('fair-point-input')
-        .getByRole('textbox');
-
-      await fairPointInput.clear();
-      await fairPointInput.fill('7.5');
-      await fairPointInput.blur();
-    }
-
-    await expect.soft(editPageSubmitButton).toBeEnabled();
-
-    await editPageSubmitButton.click();
-
-    await expect.soft(answerPage.getByTestId('answer-page')).toBeVisible();
-
-    const text = answerPage.getByTestId('icon-description-row--fair');
-    await expect.soft(text).toHaveText('（7.5点）');
+    await fairPointInput.blur();
   }
+
+  await expect.soft(editPageSubmitButton).toBeEnabled();
+
+  await editPageSubmitButton.click();
+
+  await expect.soft(answerPage.getByTestId('answer-page')).toBeVisible();
+
+  const text = answerPage.getByTestId('icon-description-row--fair');
+
+  await expect.soft(text).toHaveText('（7.5点）');
 });
 
 const createAnswer = async (
@@ -146,7 +165,13 @@ const createAnswer = async (
   username: string,
 ): Promise<void> => {
   // create answer
-  await answerPage.getByTestId('add-answer-button').click({ timeout: 15_000 });
+  const addAnswerButton = answerPage.getByTestId('add-answer-button');
+
+  await expect.soft(addAnswerButton).toBeVisible({
+    timeout: answerPageLoadTimeout,
+  });
+
+  await addAnswerButton.click();
 
   const answerBeingEditedSection = answerPage.getByTestId(
     'answer-being-edited-section',

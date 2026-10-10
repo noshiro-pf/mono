@@ -197,9 +197,9 @@ const saveToDatabase = async (): Promise<void> => {
     intent: 'success',
   });
 
-  AnswersStore.fetchAnswers();
+  AnswersStore.refetchAnswersAfterWrite();
 
-  EventScheduleStore.fetchEventSchedule();
+  EventScheduleStore.refetchEventScheduleAfterWrite();
 
   onBackToAnswerPage();
 };

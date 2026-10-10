@@ -1871,3 +1871,19 @@ bundle し、外に残す `firebase-admin`・`firebase-functions`・`nodemailer`
 firebase-tools は `node_modules/.bin/firebase-functions` を source と project の
 直下でしか探さないので、`build/node_modules` はパッケージの `node_modules` への
 リンクにしてある。
+
+### `create-event.spec.ts` も戻した（2026-10-09）
+
+emulator が戻ったので、`experimental/` に残していた最後の e2e を
+`apps/event-schedule-app/e2e/create-event.spec.mts` に移した。`@emulators` タグを
+付け、`check:e2e` からは外し、`check:e2e:emulators` が
+`firebase emulators:exec` の中で走らせる。runner に Java が無いので CI には
+入れておらず、`check-ci-commands.mts` の `UNCOVERED_BY_DESIGN` に理由を書いた。
+
+**この spec は app の不具合を 1 つ見つけた。** 回答ページと回答の取得は
+`throttle(1000)` を通っていて、`throttle` は窓の中に来た要求を遅らせずに
+捨てる。イベント設定の保存はページを開いた時の取得から 1 秒以内に終わると、
+保存後の再取得が捨てられ、回答ページに保存前の設定が出たままになる。人の操作では
+まず起きないが、ローカルの emulator を相手にした Playwright では毎回起きた。
+書き込みの後の再取得（イベント設定の保存、回答の追加・更新・削除・後で回答）は
+`refetch…AfterWrite` として throttle を通さないようにした。

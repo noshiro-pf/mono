@@ -492,6 +492,14 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
     // `ws:` command for the same check, which is what CI runs.
   },
   {
+    directory: 'apps/event-schedule-app',
+    scriptName: 'check:e2e:emulators',
+    // The end-to-end test that writes to Firestore, run against the Firebase
+    // emulators, which need Java and firebase-tools that no runner sets up.
+    // `check:e2e` runs the rest of the suite; this one is run by hand until
+    // the emulators are wired into a workflow.
+  },
+  {
     scriptName: 'check:cspell',
     // The package-scoped spell check. The root `check:cspell` reads the whole
     // repository, so the per-package script exists to be run by hand in a

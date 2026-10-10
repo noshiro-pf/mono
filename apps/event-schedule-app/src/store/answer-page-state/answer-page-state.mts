@@ -318,7 +318,7 @@ const onSubmitAnswerImpl = async (
 
           setAnswerBeingEditedSectionState('hidden');
 
-          AnswersStore.fetchAnswers();
+          AnswersStore.refetchAnswersAfterWrite();
 
           clearAnswerBeingEditedFields();
 
@@ -346,7 +346,7 @@ const onSubmitAnswerImpl = async (
 
           setAnswerBeingEditedSectionState('hidden');
 
-          AnswersStore.fetchAnswers();
+          AnswersStore.refetchAnswersAfterWrite();
 
           clearAnswerBeingEditedFields();
 
@@ -403,7 +403,7 @@ const onSubmitEmptyAnswerImpl = async (
 
       setAnswerBeingEditedSectionState('hidden');
 
-      AnswersStore.fetchAnswers();
+      AnswersStore.refetchAnswersAfterWrite();
 
       clearAnswerBeingEditedFields();
 
@@ -436,7 +436,7 @@ const onDeleteAnswerImpl = async (
 
     setAnswerBeingEditedSectionState('hidden');
 
-    AnswersStore.fetchAnswers();
+    AnswersStore.refetchAnswersAfterWrite();
 
     clearAnswerBeingEditedFields();
   });
