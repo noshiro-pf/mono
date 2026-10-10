@@ -2441,10 +2441,52 @@ importers:
 
   apps/task-manager-app:
     dependencies:
+      '@blueprintjs/core':
+        specifier: ^6.20.0
+        version: 6.20.0(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      '@blueprintjs/datetime':
+        specifier: ^6.2.6
+        version: 6.2.6(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
+      elkjs:
+        specifier: ^0.12.0
+        version: 0.12.0
+      firebase:
+        specifier: ^12.19.0
+        version: 12.19.0
+      preact-utils:
+        specifier: workspace:*
+        version: link:../preact-utils
+      react:
+        specifier: npm:@preact/compat@^18.3.2
+        version: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom:
+        specifier: npm:@preact/compat@^18.3.2
+        version: '@preact/compat@18.3.2(preact@10.29.8)'
+      synstate:
+        specifier: workspace:*
+        version: link:../../libs/synstate
+      synstate-preact-signals:
+        specifier: workspace:*
+        version: link:../../libs/synstate-preact-signals
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/ts-fortress
     devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.63.0
+      '@preact/signals':
+        specifier: 'catalog:'
+        version: 2.11.2(preact@10.29.8)
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.2(@vitest/browser@5.0.2)(vitest@5.0.2)
       eslint:
         specifier: 'catalog:'
         version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -2454,12 +2496,18 @@ importers:
       eslint-plugin-ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/eslint-plugin-ts-type-forge
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.3
+      preact:
+        specifier: 'catalog:'
+        version: 10.29.8(preact-render-to-string@6.7.0)
       prettier:
         specifier: 'catalog:'
         version: 3.9.9
@@ -2475,6 +2523,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.2(@types/node@26.6.3)(@vitest/browser-playwright@5.0.2)(@vitest/coverage-v8@5.0.2)(@vitest/ui@5.0.2)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
@@ -7595,6 +7646,11 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
+  '@preact/compat@18.3.2':
+    resolution: {integrity: sha512-5vSl55K5yLMvocT7PBKxDOHGgYPjMrKQqqr6roSNjIXcJOtSgDDMjpiCAF3s7klRdmGrN75b/Przmjw8gmlg/w==}
+    peerDependencies:
+      preact: '*'
+
   '@preact/preset-vite@2.10.6':
     resolution: {integrity: sha512-ZZ5RIT2ZVXg8UxRA8VZpoT8CdpDG7RFIqOT4bELqNBp85+HKvQBbgmh3gsoW1UOQXx26TLe+ZRNKI7q281Kckw==}
     peerDependencies:
@@ -9346,6 +9402,9 @@ packages:
 
   electron-to-chromium@1.5.439:
     resolution: {integrity: sha512-qu6QIPXhsb+CRcAiTMNjR4A1y/7tCYKkKjr5CZXRVih6qkDf79peZ2BpEU3qoDBNCRrcy3Mra3X9nG5oruuA7Q==}
+
+  elkjs@0.12.0:
+    resolution: {integrity: sha512-YZcKynxVxYoKIOEpywEPwCFdg+BTbxQRNf3pbwdDCvc8O3kQD8bmIwSxKU1eOTVc4Xo+VG9Te+575mlfvOrhEQ==}
 
   emoji-regex-xs@2.0.1:
     resolution: {integrity: sha512-1QFuh8l7LqUcKe24LsPUNzjrzJQ7pgRwp1QMcZ5MX6mFplk2zQ08NVCM84++1cveaUUYtcCYHmeFEuNg16sU4g==}
@@ -13859,6 +13918,22 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
+  '@blueprintjs/core@6.20.0(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)':
+    dependencies:
+      '@blueprintjs/colors': 5.1.16
+      '@blueprintjs/icons': 6.14.1(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      '@floating-ui/react': 0.27.20(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))
+      '@popperjs/core': 2.11.8
+      classnames: 2.5.1
+      normalize.css: 8.0.1
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-popper: 2.3.0(@popperjs/core@2.11.8)(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))
+      react-transition-group: 4.4.5(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
   '@blueprintjs/core@6.20.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@blueprintjs/colors': 5.1.16
@@ -13889,6 +13964,22 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
+  '@blueprintjs/datetime@6.2.6(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)':
+    dependencies:
+      '@blueprintjs/core': 6.20.0(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      '@blueprintjs/icons': 6.14.1(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      '@blueprintjs/select': 6.3.6(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      classnames: 2.5.1
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.1(date-fns@2.30.0)
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-day-picker: 8.10.2(@preact/compat@18.3.2(preact@10.29.8))(date-fns@2.30.0)
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-innertext: 1.1.5(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
   '@blueprintjs/datetime@6.2.6(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@blueprintjs/core': 6.20.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -13905,12 +13996,34 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
+  '@blueprintjs/icons@6.14.1(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)':
+    dependencies:
+      change-case: 4.1.2
+      classnames: 2.5.1
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
   '@blueprintjs/icons@6.14.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       change-case: 4.1.2
       classnames: 2.5.1
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
+      tslib: 2.6.3
+    optionalDependencies:
+      '@types/react': 19.3.0
+
+  '@blueprintjs/select@6.3.6(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)':
+    dependencies:
+      '@blueprintjs/colors': 5.1.16
+      '@blueprintjs/core': 6.20.0(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      '@blueprintjs/icons': 6.14.1(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0)
+      classnames: 2.5.1
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
       tslib: 2.6.3
     optionalDependencies:
       '@types/react': 19.3.0
@@ -14970,11 +15083,25 @@ snapshots:
       '@floating-ui/core': 1.8.0
       '@floating-ui/utils': 0.2.12
 
+  '@floating-ui/react-dom@2.1.9(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))':
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+
   '@floating-ui/react-dom@2.1.9(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@floating-ui/dom': 1.8.0
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
+
+  '@floating-ui/react@0.27.20(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))':
+    dependencies:
+      '@floating-ui/react-dom': 2.1.9(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8))
+      '@floating-ui/utils': 0.2.12
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+      tabbable: 6.5.0
 
   '@floating-ui/react@0.27.20(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
@@ -15957,6 +16084,10 @@ snapshots:
   '@polka/url@1.0.0-next.29': {}
 
   '@popperjs/core@2.11.8': {}
+
+  '@preact/compat@18.3.2(preact@10.29.8)':
+    dependencies:
+      preact: 10.29.8(preact-render-to-string@6.7.0)
 
   '@preact/preset-vite@2.10.6(@babel/core@7.29.7(supports-color@7.2.0))(preact@10.29.8)(supports-color@7.2.0)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
@@ -17720,6 +17851,8 @@ snapshots:
       version-range: 4.15.0
 
   electron-to-chromium@1.5.439: {}
+
+  elkjs@0.12.0: {}
 
   emoji-regex-xs@2.0.1: {}
 
@@ -20437,6 +20570,11 @@ snapshots:
 
   re2js@2.8.6: {}
 
+  react-day-picker@8.10.2(@preact/compat@18.3.2(preact@10.29.8))(date-fns@2.30.0):
+    dependencies:
+      date-fns: 2.30.0
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+
   react-day-picker@8.10.2(date-fns@2.30.0)(react@19.3.0):
     dependencies:
       date-fns: 2.30.0
@@ -20449,6 +20587,11 @@ snapshots:
 
   react-fast-compare@3.2.2: {}
 
+  react-innertext@1.1.5(@preact/compat@18.3.2(preact@10.29.8))(@types/react@19.3.0):
+    dependencies:
+      '@types/react': 19.3.0
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+
   react-innertext@1.1.5(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       '@types/react': 19.3.0
@@ -20460,6 +20603,14 @@ snapshots:
 
   react-is@19.3.0: {}
 
+  react-popper@2.3.0(@popperjs/core@2.11.8)(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8)):
+    dependencies:
+      '@popperjs/core': 2.11.8
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-fast-compare: 3.2.2
+      warning: 4.0.3
+
   react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@popperjs/core': 2.11.8
@@ -20467,6 +20618,15 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
       react-fast-compare: 3.2.2
       warning: 4.0.3
+
+  react-transition-group@4.4.5(@preact/compat@18.3.2(preact@10.29.8))(@preact/compat@18.3.2(preact@10.29.8)):
+    dependencies:
+      '@babel/runtime': 7.29.7
+      dom-helpers: 5.2.1
+      loose-envify: 1.4.0
+      prop-types: 15.8.1
+      react: '@preact/compat@18.3.2(preact@10.29.8)'
+      react-dom: '@preact/compat@18.3.2(preact@10.29.8)'
 
   react-transition-group@4.4.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:

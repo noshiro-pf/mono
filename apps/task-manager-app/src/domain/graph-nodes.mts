@@ -13,6 +13,11 @@ import { type Dependency, type DomainState, type NodeRef } from './types.mjs';
 export const nodeId = (ref: NodeRef): GraphNodeId =>
   `${ref.kind}:${ref.id}` as const;
 
+/** Whether `value` is a node id: `task:` or `milestone:` and an id. */
+export const isGraphNodeId = (value: string): value is GraphNodeId =>
+  (value.startsWith('task:') && value.length > 'task:'.length) ||
+  (value.startsWith('milestone:') && value.length > 'milestone:'.length);
+
 /** Every node: the tasks in input order, then the milestones. */
 export const listNodes = (state: DomainState): readonly GraphNodeEntry[] =>
   [

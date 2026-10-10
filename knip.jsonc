@@ -573,11 +573,20 @@
       "project": ["**/*.mts"],
     },
 
-    // Not an Astro site like the entry above assumes: the framework-independent
-    // domain logic, with a single entry point until a UI is chosen.
+    // Not an Astro site like the entry above assumes: a Vite Preact app whose
+    // entry is the module `index.html` loads. `src/demo/` and `src/firebase/`
+    // are reached from it through dynamic imports.
     "apps/task-manager-app": {
-      "entry": ["src/index.mts", "configs/*.mts"],
-      "project": ["**/*.mts"],
+      "entry": [
+        "src/main.tsx",
+        "configs/*.mts",
+        "scripts/**/*.mts",
+        "e2e/**/*.spec.mts",
+      ],
+      "project": ["**/*.{mts,tsx}"],
+      // Loaded by `src/index.css` through CSS `@import` rather than by a
+      // module import, which knip does not follow.
+      "ignoreDependencies": ["@blueprintjs/core"],
     },
 
     // Not an Astro site like the entry above assumes: a set of Node programs,

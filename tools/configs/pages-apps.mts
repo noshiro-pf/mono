@@ -17,6 +17,7 @@ import { type FixedLengthTuple } from 'ts-type-forge';
  */
 const pagesApps = {
   'pr-manager-app': 'pr-manager',
+  'task-manager-app': 'task-manager',
 } as const;
 
 /**

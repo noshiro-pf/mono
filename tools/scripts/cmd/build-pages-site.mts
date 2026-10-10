@@ -19,6 +19,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   index.html            a list of what is here
  *   synstate/             the hand-written documentation site (Astro)
  *   pr-manager/           the Pull Requests Manager app (Vite)
+ *   task-manager/         the task manager app (Vite)
  *   ts-data-forge/        TypeDoc output
  *   …
  * ```
