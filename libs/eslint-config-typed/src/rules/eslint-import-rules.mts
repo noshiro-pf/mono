@@ -29,6 +29,7 @@ export const eslintImportsRules = {
         'preact/**',
         'immer/**',
         'firebase/*',
+        'firebase-admin/*',
         'firebase-functions/**',
         '@blueprintjs/*',
         '@material-ui/**',

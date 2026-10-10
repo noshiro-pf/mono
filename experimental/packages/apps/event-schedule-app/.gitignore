@@ -1,4 +1,2 @@
 scripts/*.json
 firestore_backup.json
-functions/.runtimeconfig.json
-functions/firebase-emulator-exports

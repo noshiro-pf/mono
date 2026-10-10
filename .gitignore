@@ -177,6 +177,9 @@ experimental/**/scripts/**/*.js
 .firebase/
 firebase-debug.log*
 firebase-debug.*.log*
+# What `pnpm run emulators` in apps/event-schedule-app exports on exit and
+# imports on the next start.
+apps/event-schedule-app/emulator-data
 
 # wireit (legacy build runner, experimental/ only)
 **/.wireit

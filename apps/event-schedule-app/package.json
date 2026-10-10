@@ -17,6 +17,7 @@
     "check:test": "vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "dev": "vite --config ./configs/vite.config.mts",
+    "emulators": "pnpm --dir ../event-schedule-app-functions run build && pnpm dlx firebase-tools@15 emulators:start --only functions,firestore,pubsub --import ./emulator-data --export-on-exit",
     "fix:fmt": "pnpm run z:format-uncommitted --cwd .",
     "fix:fmt:diff": "pnpm run z:format-diff-from origin/main --cwd .",
     "fix:fmt:full": "prettier --write .",
