@@ -11,15 +11,33 @@ rules_version = '2';
 //
 // Each user has one personal project, whose id is their uid. Membership is a
 // list so that shared projects can come later without moving any data.
+//
+// The rules decide who may touch a project, and little more: a document's
+// shape is checked by the app when it reads it (`src/repository/converters.mts`),
+// and the rules are deployed by hand, so they may lag behind the app.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Google is the only provider the app offers (README: Firebase の手作業).
+    // A token from any other provider — enabled in the console by mistake,
+    // or used straight against the Auth REST API with the public config —
+    // grants nothing.
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    // One's own personal project needs no lookup — and so is reachable
+    // before `projects/{uid}` exists, which lets the first sign-in's
+    // offline writes through. Any other project costs one read of its
+    // document per request, and the batched delete in the app makes one
+    // write per node whose dependencies it removes.
+    function canAccess(projectId) {
+      return signedIn()
+        && (projectId == request.auth.uid || isMember(projectId));
     }
 
     function isMember(projectId) {
-      return signedIn()
-        && request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.memberUids;
+      return request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.memberUids;
     }
 
     match /projects/{projectId} {
@@ -27,7 +45,8 @@ service cloud.firestore {
       // checks for it on sign-in), and any project they are a member of.
       allow get: if signedIn()
         && (projectId == request.auth.uid
-            || request.auth.uid in resource.data.memberUids);
+            || (resource != null
+                && request.auth.uid in resource.data.memberUids));
 
       // Only one's own personal project, owned by oneself, with oneself as
       // the only member.
@@ -38,15 +57,15 @@ service cloud.firestore {
         && request.resource.data.memberUids == [request.auth.uid];
 
       match /tasks/{taskId} {
-        allow read, write: if isMember(projectId);
+        allow read, write: if canAccess(projectId);
       }
 
       match /milestones/{milestoneId} {
-        allow read, write: if isMember(projectId);
+        allow read, write: if canAccess(projectId);
       }
 
       match /settings/{docId} {
-        allow read, write: if isMember(projectId);
+        allow read, write: if canAccess(projectId);
       }
     }
 
