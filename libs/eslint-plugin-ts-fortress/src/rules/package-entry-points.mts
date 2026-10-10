@@ -33,7 +33,7 @@ export const packageEntryPoints = (
     return new Set();
   }
 
-  const mut_cache = cacheOf(program);
+  const mut_cache = mut_cacheOf(program);
 
   if (mut_cache.has(packageJsonPath)) {
     return mut_cache.get(packageJsonPath);
@@ -50,9 +50,9 @@ export const packageEntryPoints = (
  * Keyed by the program, so that the files one program lints share one reading
  * of each `package.json`, and an edit that yields a new program reads it again.
  */
-const entryPointsCache = new WeakMap<
+const mut_entryPointsCache = new WeakMap<
   ts.Program,
-  ReadonlyMap<string, ReadonlySet<string> | undefined>
+  Map<string, ReadonlySet<string> | undefined>
 >();
 
 /** The legacy fields that name the `.` subpath alongside `exports`. */
@@ -86,10 +86,10 @@ const SOURCE_EXTENSIONS = [
   '.d.cts',
 ] as const;
 
-const cacheOf = (
+const mut_cacheOf = (
   program: ts.Program,
-): ReadonlyMap<string, ReadonlySet<string> | undefined> => {
-  const cached = entryPointsCache.get(program);
+): Map<string, ReadonlySet<string> | undefined> => {
+  const cached = mut_entryPointsCache.get(program);
 
   if (cached !== undefined) {
     return cached;
@@ -97,7 +97,7 @@ const cacheOf = (
 
   const mut_created = new Map<string, ReadonlySet<string> | undefined>();
 
-  entryPointsCache.set(program, mut_created);
+  mut_entryPointsCache.set(program, mut_created);
 
   return mut_created;
 };
