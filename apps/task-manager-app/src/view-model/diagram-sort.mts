@@ -5,40 +5,29 @@
  * editor as the list's keys (`sort-edit.mts`) in 「表示設定」.
  *
  * Every key may be removed: no keys orders by title ascending, the default.
- * Validated on read as the list settings are: anything that is not a list of
- * sort keys gives the default.
+ * Kept as every setting is (`persisted-setting.mts`): anything stored that
+ * is not a list gives the default, and a broken entry of one is repaired
+ * field by field.
  */
 
-import { Arr, Json, Result } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 import { type SortSpec } from '../domain/index.mjs';
-import { SortSpecsType, uniqueSortKeys } from './sort-edit.mjs';
+import { persistedSetting } from './persisted-setting.mjs';
+import { SortSpecCodec, uniqueSortKeys } from './sort-edit.mjs';
 
-export const DIAGRAM_SORT_STORAGE_KEY = 'task-manager-app:diagram-sort';
+export const DiagramSortCodec = t.array(SortSpecCodec, {
+  defaultValue: [{ key: 'title', order: 'asc' }] as const,
+});
 
 /** By title, and what no keys at all means. */
-export const DEFAULT_DIAGRAM_SORT: readonly SortSpec[] = [
-  { key: 'title', order: 'asc' },
-] as const;
+export const DEFAULT_DIAGRAM_SORT: readonly SortSpec[] =
+  DiagramSortCodec.defaultValue;
 
-/** The stored order, or the default when there is none to read. */
-export const parseDiagramSort = (
-  stored: string | null,
-): readonly SortSpec[] => {
-  if (stored === null) {
-    return DEFAULT_DIAGRAM_SORT;
-  }
-
-  const parsed = Result.flatMap(Json.parse(stored), (json) =>
-    SortSpecsType.validate(json),
-  );
-
-  return Result.isOk(parsed)
-    ? uniqueSortKeys(parsed.value)
-    : DEFAULT_DIAGRAM_SORT;
-};
-
-export const serializeDiagramSort = (sort: readonly SortSpec[]): string =>
-  JSON.stringify(sort);
+export const diagramSortStorage = persistedSetting(DiagramSortCodec, {
+  key: 'task-manager-app:diagram-sort',
+  normalize: uniqueSortKeys,
+});
 
 /** The keys the diagrams sort by: `sort`, or the default for none. */
 export const effectiveDiagramSort = (

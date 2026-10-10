@@ -1,12 +1,11 @@
 import {
   DEFAULT_DIAGRAM_SORT,
+  diagramSortStorage,
   effectiveDiagramSort,
-  parseDiagramSort,
-  serializeDiagramSort,
 } from './diagram-sort.mjs';
 
-describe(parseDiagramSort, () => {
-  test('round-trips with serializeDiagramSort', () => {
+describe(diagramSortStorage.parse, () => {
+  test('round-trips with serialize', () => {
     for (const sort of [
       [
         { key: 'priority', order: 'desc' },
@@ -16,14 +15,14 @@ describe(parseDiagramSort, () => {
       [],
     ] as const) {
       assert.deepStrictEqual(
-        parseDiagramSort(serializeDiagramSort(sort)),
+        diagramSortStorage.parse(diagramSortStorage.serialize(sort)),
         sort,
       );
     }
   });
 
   test('is title ascending for nothing stored', () => {
-    assert.deepStrictEqual(parseDiagramSort(null), [
+    assert.deepStrictEqual(diagramSortStorage.parse(null), [
       { key: 'title', order: 'asc' },
     ]);
 
@@ -43,16 +42,54 @@ describe(parseDiagramSort, () => {
       '[{"key":"title"}]',
       '{"sort":[{"key":"title","order":"desc"}],"hideDone":false}',
     ]) {
-      assert.deepStrictEqual(parseDiagramSort(stored), DEFAULT_DIAGRAM_SORT);
+      assert.deepStrictEqual(
+        diagramSortStorage.parse(stored),
+        DEFAULT_DIAGRAM_SORT,
+      );
     }
   });
 
   test('keeps the first of a key that is repeated', () => {
     assert.deepStrictEqual(
-      parseDiagramSort(
+      diagramSortStorage.parse(
         '[{"key":"title","order":"desc"},{"key":"title","order":"asc"}]',
       ),
       [{ key: 'title', order: 'desc' }],
+    );
+  });
+});
+
+describe('a partly broken diagram sort', () => {
+  test('keeps the keys that are fine and repairs the rest field by field', () => {
+    assert.deepStrictEqual(
+      diagramSortStorage.parse(
+        '[{"key":"priority","order":"desc"},{"key":"status","order":"sideways"}]',
+      ),
+      [
+        { key: 'priority', order: 'desc' },
+        { key: 'status', order: 'asc' },
+      ],
+    );
+  });
+
+  test('repairs an entry that is not a sort key to title ascending', () => {
+    assert.deepStrictEqual(
+      diagramSortStorage.parse('[{"key":"priority","order":"desc"},3]'),
+      [
+        { key: 'priority', order: 'desc' },
+        { key: 'title', order: 'asc' },
+      ],
+    );
+  });
+});
+
+describe('the stored diagram sort', () => {
+  test('keeps its key and its JSON, which earlier visits wrote', () => {
+    assert.strictEqual(diagramSortStorage.key, 'task-manager-app:diagram-sort');
+
+    assert.strictEqual(
+      diagramSortStorage.serialize([{ key: 'priority', order: 'desc' }]),
+      '[{"key":"priority","order":"desc"}]',
     );
   });
 });

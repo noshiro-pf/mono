@@ -4,32 +4,45 @@
  * `projects/{projectId}/milestones/{milestoneId}`, each document a record
  * without its id, and the DAG's layout in
  * `projects/{projectId}/settings/dagLayout` (`repository/converters.mts`).
+ * Every read and write goes through `api/firestore-io.mts`, which prunes
+ * each document written to its codec.
  *
  * The listeners hand back local writes at once, and the persistent cache
  * set up in `firebase-backend.mts` keeps the data readable — and writable,
  * queued — offline.
  */
 
-import {
-  collection,
-  doc,
-  onSnapshot,
-  setDoc,
-  writeBatch,
-  type Firestore,
-} from 'firebase/firestore';
+import { collection, doc, type Firestore } from 'firebase/firestore';
 import { Result } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { type Milestone, type Task } from '../domain/index.mjs';
 import {
+  commitBatch,
+  putDoc,
+  watchCollection,
+  watchDoc,
+  type DocTarget,
+} from '../api/index.mjs';
+import {
+  type Milestone,
+  type MilestoneId,
+  type Task,
+  type TaskId,
+} from '../domain/index.mjs';
+import {
+  DagLayoutDocCodec,
   dagLayoutFromDoc,
   dagLayoutToDoc,
+  MilestoneDocCodec,
   milestoneFromDoc,
   milestoneToDoc,
   readValidDocs,
+  TaskDocCodec,
   taskFromDoc,
   taskToDoc,
+  type DagLayoutDoc,
+  type MilestoneDoc,
   type Repository,
+  type TaskDoc,
 } from '../repository/index.mjs';
 
 export const createFirestoreRepository = (
@@ -43,13 +56,22 @@ export const createFirestoreRepository = (
   const collectionOf = (kind: 'task' | 'milestone'): typeof tasks =>
     kind === 'task' ? tasks : milestones;
 
-  const dagLayout = doc(
-    firestore,
-    'projects',
-    projectId,
-    'settings',
-    'dagLayout',
-  );
+  const taskDoc = (id: TaskId): DocTarget<TaskDoc> =>
+    ({
+      ref: doc(tasks, id),
+      codec: TaskDocCodec,
+    }) as const;
+
+  const milestoneDoc = (id: MilestoneId): DocTarget<MilestoneDoc> =>
+    ({
+      ref: doc(milestones, id),
+      codec: MilestoneDocCodec,
+    }) as const;
+
+  const dagLayout: DocTarget<DagLayoutDoc> = {
+    ref: doc(firestore, 'projects', projectId, 'settings', 'dagLayout'),
+    codec: DagLayoutDocCodec,
+  } as const;
 
   return {
     subscribe: (observer) => {
@@ -65,39 +87,23 @@ export const createFirestoreRepository = (
         }
       };
 
-      const stopTasks = onSnapshot(
-        tasks,
-        (snapshot) => {
-          mut_tasks = readValidDocs(
-            snapshot.docs.map((snapshotDoc) => ({
-              id: snapshotDoc.id,
-              data: snapshotDoc.data(),
-            })),
-            taskFromDoc,
-            warn,
-          );
+      const stopTasks = watchCollection(tasks, {
+        next: (docs) => {
+          mut_tasks = readValidDocs(docs, taskFromDoc, warn);
 
           emit();
         },
-        observer.error,
-      );
+        error: observer.error,
+      });
 
-      const stopMilestones = onSnapshot(
-        milestones,
-        (snapshot) => {
-          mut_milestones = readValidDocs(
-            snapshot.docs.map((snapshotDoc) => ({
-              id: snapshotDoc.id,
-              data: snapshotDoc.data(),
-            })),
-            milestoneFromDoc,
-            warn,
-          );
+      const stopMilestones = watchCollection(milestones, {
+        next: (docs) => {
+          mut_milestones = readValidDocs(docs, milestoneFromDoc, warn);
 
           emit();
         },
-        observer.error,
-      );
+        error: observer.error,
+      });
 
       return () => {
         stopTasks();
@@ -105,35 +111,31 @@ export const createFirestoreRepository = (
         stopMilestones();
       };
     },
-    putTask: (task) => setDoc(doc(tasks, task.id), taskToDoc(task)),
+    putTask: (task) => putDoc(taskDoc(task.id), taskToDoc(task)),
     putMilestone: (milestone) =>
-      setDoc(doc(milestones, milestone.id), milestoneToDoc(milestone)),
-    deleteNode: (ref, { updatedTasks, updatedMilestones }) => {
-      const batch = writeBatch(firestore);
+      putDoc(milestoneDoc(milestone.id), milestoneToDoc(milestone)),
+    deleteNode: (ref, { updatedTasks, updatedMilestones }) =>
+      commitBatch(firestore, (batch) => {
+        batch.delete(doc(collectionOf(ref.kind), ref.id));
 
-      batch.delete(doc(collectionOf(ref.kind), ref.id));
+        for (const task of updatedTasks) {
+          batch.set(taskDoc(task.id), taskToDoc(task));
+        }
 
-      for (const task of updatedTasks) {
-        batch.set(doc(tasks, task.id), taskToDoc(task));
-      }
-
-      for (const milestone of updatedMilestones) {
-        batch.set(doc(milestones, milestone.id), milestoneToDoc(milestone));
-      }
-
-      return batch.commit();
-    },
+        for (const milestone of updatedMilestones) {
+          batch.set(milestoneDoc(milestone.id), milestoneToDoc(milestone));
+        }
+      }),
     subscribeDagLayout: (observer) =>
-      onSnapshot(
-        dagLayout,
-        (snapshot) => {
-          if (!snapshot.exists()) {
+      watchDoc(dagLayout.ref, {
+        next: (data) => {
+          if (data === undefined) {
             observer.next(undefined);
 
             return;
           }
 
-          const layout = dagLayoutFromDoc(snapshot.data());
+          const layout = dagLayoutFromDoc(data);
 
           if (Result.isErr(layout)) {
             warn(`Ignored an invalid DAG layout: ${layout.value.join('; ')}`);
@@ -145,10 +147,10 @@ export const createFirestoreRepository = (
 
           observer.next(layout.value);
         },
-        observer.error,
-      ),
+        error: observer.error,
+      }),
     putDagLayout: (layout, updatedAt) =>
-      setDoc(dagLayout, dagLayoutToDoc(layout, updatedAt)),
+      putDoc(dagLayout, dagLayoutToDoc(layout, updatedAt)),
   };
 };
 

@@ -47,6 +47,50 @@ export default [
     }),
   },
 
+  {
+    // Every read from Firestore and every write to it goes through
+    // `src/api/`, which prunes each document written to its codec. Outside
+    // it, Firestore gives only what builds a reference or sets it up: a new
+    // name is allowed here only if it neither reads nor writes. The
+    // TypeScript rule is used so as not to replace the options of the base
+    // `no-restricted-imports`.
+    files: ['src/**'],
+    ignores: ['src/api/**'],
+    rules: defineKnownRules({
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'firebase/firestore',
+              allowImportNames: [
+                'collection',
+                'doc',
+                'initializeFirestore',
+                'persistentLocalCache',
+                'persistentMultipleTabManager',
+              ],
+              allowTypeImports: true,
+              message:
+                'Read and write Firestore through src/api/, which prunes every document written to its codec.',
+            },
+          ],
+          patterns: [
+            {
+              group: [
+                'firebase/firestore/*',
+                '@firebase/firestore',
+                '@firebase/firestore/*',
+              ],
+              message:
+                'Read and write Firestore through src/api/, which prunes every document written to its codec.',
+            },
+          ],
+        },
+      ],
+    }),
+  },
+
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],

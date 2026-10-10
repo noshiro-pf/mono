@@ -8,66 +8,18 @@ import {
   createEventEmitter,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { type SortSpec } from './domain/index.mjs';
-import {
-  ANIMATION_SETTING_STORAGE_KEY,
-  DAG_VIEW_MODE_STORAGE_KEY,
-  DIAGRAM_SORT_STORAGE_KEY,
-  LIST_SETTINGS_STORAGE_KEY,
-  NODE_SIZE_STORAGE_KEY,
-  parseAnimationSetting,
-  parseDagViewMode,
-  parseDiagramSort,
-  parseListSettings,
-  parseNodeSize,
-  serializeAnimationSetting,
-  serializeDagViewMode,
-  serializeDiagramSort,
-  serializeListSettings,
-  serializeNodeSize,
-  type AnimationSetting,
-  type DagViewMode,
-  type ListSettings,
-  type NodeSize,
-} from './view-model/index.mjs';
+import { type PersistedSetting } from './view-model/index.mjs';
 
-export const loadListSettings = (): ListSettings =>
-  parseListSettings(readStorage(LIST_SETTINGS_STORAGE_KEY));
+/** The setting stored on this device, or its default. */
+export const loadSetting = <A,>(setting: PersistedSetting<A>): A =>
+  setting.parse(readStorage(setting.key));
 
-export const saveListSettings = (settings: ListSettings): void => {
-  writeStorage(LIST_SETTINGS_STORAGE_KEY, serializeListSettings(settings));
-};
-
-export const loadAnimationSetting = (): AnimationSetting =>
-  parseAnimationSetting(readStorage(ANIMATION_SETTING_STORAGE_KEY));
-
-export const saveAnimationSetting = (setting: AnimationSetting): void => {
-  writeStorage(
-    ANIMATION_SETTING_STORAGE_KEY,
-    serializeAnimationSetting(setting),
-  );
-};
-
-export const loadDagViewMode = (): DagViewMode =>
-  parseDagViewMode(readStorage(DAG_VIEW_MODE_STORAGE_KEY));
-
-export const saveDagViewMode = (mode: DagViewMode): void => {
-  writeStorage(DAG_VIEW_MODE_STORAGE_KEY, serializeDagViewMode(mode));
-};
-
-export const loadNodeSize = (): NodeSize =>
-  parseNodeSize(readStorage(NODE_SIZE_STORAGE_KEY));
-
-export const saveNodeSize = (size: NodeSize): void => {
-  writeStorage(NODE_SIZE_STORAGE_KEY, serializeNodeSize(size));
-};
-
-export const loadDiagramSort = (): readonly SortSpec[] =>
-  parseDiagramSort(readStorage(DIAGRAM_SORT_STORAGE_KEY));
-
-export const saveDiagramSort = (sort: readonly SortSpec[]): void => {
-  writeStorage(DIAGRAM_SORT_STORAGE_KEY, serializeDiagramSort(sort));
-};
+/** What stores the setting on this device. */
+export const saveSetting =
+  <A,>(setting: PersistedSetting<A>) =>
+  (value: A): void => {
+    writeStorage(setting.key, setting.serialize(value));
+  };
 
 /**
  * A DOM event as an observable, listened to for as long as the page is
