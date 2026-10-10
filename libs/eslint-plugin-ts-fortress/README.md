@@ -11,15 +11,15 @@ auto-fixable, and every rewrite is **type-preserving**.
 npm install --save-dev eslint-plugin-ts-fortress
 ```
 
-Requires ESLint 9+ (flat config) and TypeScript. Only `no-type-only-codec` is
-type-aware, and it is not in the `recommended` preset, so the preset needs no
-configured TypeScript project.
+Requires ESLint 9+ (flat config) and TypeScript. A configured TypeScript project
+is not required: only `no-type-only-codec` reads type information, and without it
+the rule checks less rather than failing (see
+[Type information](#type-information)).
 
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and
-turns on **every** rule at `error` but the opt-in
-[`no-type-only-codec`](#no-type-only-codec):
+turns on **every** rule at `error`:
 
 ```ts
 // eslint.config.mts
@@ -75,7 +75,7 @@ export default [
 | `prefer-canonical-length-constrained-type` | Normalize a length-constrained array combinator with degenerate bounds to its canonical form.  |
 | `prefer-namespace-import`                  | Require `ts-fortress` to be imported as a namespace rather than by name.                       |
 | `prefer-schema-over-guard-chain`           | Report a hand-written chain of type guards on one value once it is long enough to be a schema. |
-| `no-type-only-codec` (opt-in, type-aware)  | Report a codec whose value nothing reads, only the type `TypeOf` derives from it.              |
+| `no-type-only-codec`                       | Report a codec whose value nothing reads, only the type `TypeOf` derives from it.              |
 
 ### `prefer-canonical-length-constrained-type`
 
@@ -327,26 +327,22 @@ The rule looks at a top-level `const X` paired with a top-level
   a namespace import read as `ns.X` or `ns['X']` outside a type, or used whole
   (`f(ns)`, `ns[key]`); a dynamic `import()`. Re-exports are followed, so a
   barrel is transparent.
-- **an entry point** (option below) that re-exports it as a value, directly or
+- **an entry point** — a file the package publishes (see
+  [Entry points](#entry-points)) — that re-exports it as a value, directly or
   through any chain of `export { … } from` / `export * from`.
 
 The rule reports; there is no fix, since writing the type out is not
 mechanical.
 
-#### Enabling it
+#### Type information
 
-The rule is not in `recommended`. It needs type information — the importers come
-from the TypeScript program the file is linted with — and a library has to name
-its entry points, or every codec of its public API that the package itself only
-uses as a type is reported:
+Whether another file reads an exported codec is a question about the whole
+TypeScript project, so the rule answers it from the program a file is linted
+with. Turn type information on for it to check exported codecs at all:
 
 ```ts
 // eslint.config.mts
-import {
-    eslintPluginTsFortress,
-    type EslintTsFortressRules,
-} from 'eslint-plugin-ts-fortress';
-import * as path from 'node:path';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 
 export default [
     eslintPluginTsFortress.configs.recommended,
@@ -357,31 +353,46 @@ export default [
                 tsconfigRootDir: import.meta.dirname,
             },
         },
-        rules: {
-            'ts-fortress/no-type-only-codec': [
-                'error',
-                {
-                    entryPoints: [
-                        path.resolve(import.meta.dirname, 'src/index.mts'),
-                    ],
-                },
-            ],
-        } satisfies Partial<EslintTsFortressRules>,
     },
 ];
 ```
 
-- `entryPoints` (default none) — the source files behind the package's
-  `exports`. A codec they export, directly or through re-exports, is public API
-  and never reported. Relative paths resolve against the directory ESLint runs
-  in, so pass absolute ones, as above. An application leaves it empty.
+Without it, a codec that is not exported is still checked — that needs nothing
+but its own file — and an exported one is left alone.
 
 The rule sees the files of that program and nothing else. An importer counts
 only if the `tsconfig.json` linting the codec's file includes it, so tests under
-a separate project import nothing as far as the rule can tell, and a package
-that imports the codec through `exports` is accounted for by `entryPoints`
-alone. A codec that is not exported is decided from its own file and needs no
-type information.
+a separate project import nothing as far as the rule can tell, and another
+package that imports the codec reaches it through an entry point.
+
+#### Entry points
+
+A codec the package publishes is public API, whoever uses it. The entry points
+are read from the `package.json` nearest to the file — `exports`, every subpath
+and condition of it, and the legacy `main`, `module`, `types` and `typings`
+fields — and traced back to source: a target that is a file of the project is
+taken as it is, and an output such as `./dist/index.mjs` becomes the source it
+was built from, `src/index.mts` (the project's `outDir` and `rootDir` are used
+when set; otherwise a leading `dist`, `lib`, `build`, `out`, `esm` or `cjs`
+directory becomes `src`). The conditions of one subpath describe one module, so
+a subpath counts as traced when any of its targets is, and a `types` file a
+build writes on its own does not need a source. A package that publishes nothing
+— an application — has no entry points.
+
+When some subpath cannot be traced back to a file of the project, what the
+package publishes is not known, and the rule leaves its exported codecs alone
+rather than report public API. Name the entry points yourself for such a layout:
+
+```ts
+'ts-fortress/no-type-only-codec': [
+  'error',
+  { entryPoints: [path.resolve(import.meta.dirname, 'src/public-api.mts')] },
+],
+```
+
+- `entryPoints` (default: read from `package.json`) — the files whose exports
+  are public API, replacing what `package.json` says. Relative paths resolve
+  against the directory ESLint runs in, so pass absolute ones, as above.
 
 ## License
 

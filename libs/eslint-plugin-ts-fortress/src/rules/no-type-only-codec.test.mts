@@ -42,12 +42,14 @@ const mut_projectNames = new Set<string>();
 
 /**
  * Writes a project for one case and returns what `RuleTester` needs to lint
- * its `codec.mts`: the file name and its content.
+ * its codec file — `codec.mts` unless `codecPath` says otherwise: the file
+ * name and its content.
  */
 const project = (
   name: string,
   files: ReadonlyRecord<string, string>,
   codec: string = USER_CODEC,
+  codecPath: string = 'codec.mts',
 ): Readonly<{ filename: string; code: string }> => {
   if (mut_projectNames.has(name)) {
     throw new Error(`duplicate project name: ${name}`);
@@ -59,7 +61,7 @@ const project = (
 
   for (const [file, content] of Object.entries({
     'tsconfig.json': TSCONFIG,
-    'codec.mts': codec,
+    [codecPath]: codec,
     ...files,
   })) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -69,11 +71,14 @@ const project = (
     fs.writeFileSync(path.join(dir, file), content);
   }
 
-  return { filename: path.join(dir, 'codec.mts'), code: codec };
+  return { filename: path.join(dir, codecPath), code: codec };
 };
 
 const entryPoint = (name: string, file: string): string =>
   path.join(projectsRoot, name, file);
+
+const packageJson = (fields: ReadonlyRecord<string, unknown>): string =>
+  JSON.stringify({ name: 'pkg', type: 'module', ...fields });
 
 const tester = new RuleTester({
   languageOptions: {
@@ -306,6 +311,82 @@ describe('no-type-only-codec', () => {
         ),
       },
       {
+        name: 'public through `exports` naming a source file',
+        ...project('package-exports-source', {
+          'package.json': packageJson({ exports: './index.mts' }),
+          'index.mts': dedent`
+            export * from './codec.mjs';
+          `,
+        }),
+      },
+      {
+        name: 'public through `exports` naming the build output of a source file',
+        ...project(
+          'package-exports-dist',
+          {
+            'package.json': packageJson({
+              exports: {
+                '.': {
+                  import: {
+                    types: './dist/types.d.mts',
+                    default: './dist/entry-point.mjs',
+                  },
+                },
+              },
+            }),
+            'src/entry-point.mts': dedent`
+              export * from './codec.mjs';
+            `,
+          },
+          USER_CODEC,
+          'src/codec.mts',
+        ),
+      },
+      {
+        name: 'public through the legacy `module` / `types` fields',
+        ...project(
+          'package-module-field',
+          {
+            'package.json': packageJson({
+              module: './dist/index.mjs',
+              types: './dist/index.d.mts',
+            }),
+            'src/index.mts': dedent`
+              export { User } from './codec.mjs';
+            `,
+          },
+          USER_CODEC,
+          'src/codec.mts',
+        ),
+      },
+      {
+        name: 'public through a subpath pattern',
+        ...project(
+          'package-exports-pattern',
+          {
+            'package.json': packageJson({
+              exports: { './*': './dist/schemas/*.mjs' },
+            }),
+          },
+          USER_CODEC,
+          'src/schemas/codec.mts',
+        ),
+      },
+      {
+        name: 'a package whose `exports` cannot all be traced back to source',
+        ...project('package-exports-unresolved', {
+          'package.json': packageJson({
+            exports: {
+              '.': './index.mts',
+              './generated': './dist/generated.mjs',
+            },
+          }),
+          'index.mts': dedent`
+            export const unrelated = 1;
+          `,
+        }),
+      },
+      {
         name: 'a type alias that is not `TypeOf<typeof X>`',
         ...project(
           'not-a-pair',
@@ -335,6 +416,61 @@ describe('no-type-only-codec', () => {
       },
     ],
     invalid: [
+      {
+        name: '`exports` that do not reach the codec',
+        ...project('package-exports-elsewhere', {
+          'package.json': packageJson({ exports: './index.mts' }),
+          'index.mts': dedent`
+            export const unrelated = 1;
+          `,
+        }),
+        errors: [
+          {
+            messageId: 'typeOnlyCodec',
+            data: { name: 'User', typeName: 'User' },
+          },
+        ],
+      },
+      {
+        name: '`exports` that re-export only the type',
+        ...project('package-exports-type-only', {
+          'package.json': packageJson({ exports: './index.mts' }),
+          'index.mts': dedent`
+            export type { User } from './codec.mjs';
+          `,
+        }),
+        errors: [
+          {
+            messageId: 'typeOnlyCodec',
+            data: { name: 'User', typeName: 'User' },
+          },
+        ],
+      },
+      {
+        name: 'explicit `entryPoints` that leave out what `package.json` exports',
+        ...project('package-overridden-reported', {
+          'package.json': packageJson({ exports: './index.mts' }),
+          'index.mts': dedent`
+            export * from './codec.mjs';
+          `,
+          'other.mts': dedent`
+            export const unrelated = 1;
+          `,
+        }),
+        options: [
+          {
+            entryPoints: [
+              entryPoint('package-overridden-reported', 'other.mts'),
+            ],
+          },
+        ] as const,
+        errors: [
+          {
+            messageId: 'typeOnlyCodec',
+            data: { name: 'User', typeName: 'User' },
+          },
+        ],
+      },
       {
         name: 'no importer at all',
         ...project('no-importer', {}),
@@ -629,6 +765,10 @@ describe('no-type-only-codec without type information', () => {
 
           export const isUser = (u: unknown): boolean => User.is(u);
         `,
+      },
+      {
+        name: 'an exported codec is left alone without a program to find its importers in',
+        code: USER_CODEC,
       },
       {
         name: 'a file without a ts-fortress import is not looked at',
