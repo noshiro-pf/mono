@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
+import { skipTypeWrappers, toArgumentText } from './ast-utils.mjs';
 import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
 import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';
 import { preferArrIsFixedLengthArray } from './prefer-arr-is-fixed-length-array.mjs';
@@ -153,7 +154,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
             return;
           }
 
-          const arrayText = sourceCode.getText(array);
+          const arrayText = toArgumentText(array, sourceCode);
 
           context.report({
             node,
@@ -234,7 +235,8 @@ const getGuardName = (
 
 /**
  * Whether the call is `guard(...bounds, array)` with every bound written as the
- * exact numeric literal the rewrite requires.
+ * exact numeric literal the rewrite requires, under any type wrapper
+ * (`0 as const` is still the bound 0).
  *
  * The arity check also excludes the curried form (`guard(...bounds)`): the
  * degenerate guards take only the array, so there is nothing to rewrite it to.
@@ -250,10 +252,14 @@ const matchesBounds = (
     return false;
   }
 
-  return args.every(
-    (arg, index) =>
+  return args.every((arg, index) => {
+    const bound = skipTypeWrappers(arg);
+
+    return (
       arg.type !== AST_NODE_TYPES.SpreadElement &&
       (index === bounds.length ||
-        (arg.type === AST_NODE_TYPES.Literal && arg.value === bounds[index])),
-  );
+        (bound.type === AST_NODE_TYPES.Literal &&
+          bound.value === bounds[index]))
+    );
+  });
 };

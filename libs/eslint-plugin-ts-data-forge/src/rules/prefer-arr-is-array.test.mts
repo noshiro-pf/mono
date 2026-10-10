@@ -60,3 +60,43 @@ ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
     },
   ],
 });
+
+describe('prefer-arr-is-array through type wrappers', () => {
+  ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'Array reached through `as`',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = (Array as ArrayConstructor).isArray(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = Arr.isArray(value);
+        `,
+        errors: [{ messageId: 'useArrIsArray' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-arr-is-array with parenthesized operands', () => {
+  ruleTester.run('prefer-arr-is-array', preferArrIsArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a parenthesized callee',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = (Array.isArray)(value);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const result = (Arr.isArray)(value);
+        `,
+        errors: [{ messageId: 'useArrIsArray' }],
+      },
+    ],
+  });
+});

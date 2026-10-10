@@ -5,6 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
+import { typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -58,12 +59,16 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
           return false;
         }
 
-        const tsNode = services?.esTreeNodeToTSNodeMap?.get(expression);
+        // At every layer of type wrappers (see typeWrapperLayers): an array
+        // cast to `Record<string, unknown>` still needs its `isRecord`.
+        return typeWrapperLayers(expression).every((layer) => {
+          const tsNode = services?.esTreeNodeToTSNodeMap?.get(layer);
 
-        return (
-          tsNode !== undefined &&
-          isAlreadyRecordType(checker, checker.getTypeAtLocation(tsNode))
-        );
+          return (
+            tsNode !== undefined &&
+            isAlreadyRecordType(checker, checker.getTypeAtLocation(tsNode))
+          );
+        });
       };
 
       const mut_nodesToFix: {

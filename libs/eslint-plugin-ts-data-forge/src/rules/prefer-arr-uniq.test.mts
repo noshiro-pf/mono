@@ -453,3 +453,74 @@ describe('prefer-arr-uniq', () => {
     ],
   });
 });
+
+describe('prefer-arr-uniq through type wrappers', () => {
+  tester.run('prefer-arr-uniq', preferArrUniq, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a Set wrapped in `as` or `satisfies`',
+        code: dedent`
+          declare const xs: readonly string[];
+          const a = Array.from(new Set(xs) as ReadonlySet<string>);
+          const b = [...(new Set(xs) satisfies ReadonlySet<string>)];
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly string[];
+          const a = Arr.uniq(xs);
+          const b = Arr.uniq(xs);
+        `,
+        errors: [{ messageId: 'useArrUniq' }, { messageId: 'useArrUniq' }],
+      },
+      {
+        name: 'only suggests when the result is mutated through `!`',
+        code: dedent`
+          const xs = [3, 1, 3];
+          Array.from(new Set(xs))!.push(4);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrUniq',
+            suggestions: [
+              {
+                messageId: 'suggestArrUniq',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  const xs = [3, 1, 3];
+                  Arr.uniq(xs)!.push(4);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'only suggests when a variable initialized through `!` is mutated',
+        code: dedent`
+          const xs = [3, 1, 3];
+          const ys = Array.from(new Set(xs))!;
+          ys.push(4);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrUniq',
+            suggestions: [
+              {
+                messageId: 'suggestArrUniq',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  const xs = [3, 1, 3];
+                  const ys = Arr.uniq(xs)!;
+                  ys.push(4);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});

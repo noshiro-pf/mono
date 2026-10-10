@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { typeWrapperLayers } from './ast-utils.mjs';
 import {
   buildCalleeResolver,
   buildImportFixes,
@@ -282,138 +283,199 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
             return;
           }
 
-          const argTsNode = parserServices.esTreeNodeToTSNodeMap.get(argument);
+          // A conclusion drawn from the argument's type has to hold at every
+          // layer of type wrappers around it (see typeWrapperLayers):
+          // `isNull(x as string | null)` is the author saying `x` may be
+          // `null`, and `isNullish(x as string | undefined)` still sees the
+          // `null` that `x` may hold.
+          const layerTypes = typeWrapperLayers(argument).map((layer) =>
+            checker.getTypeAtLocation(
+              parserServices.esTreeNodeToTSNodeMap.get(layer),
+            ),
+          );
 
-          const argType = checker.getTypeAtLocation(argTsNode);
+          const verdict = layerTypes
+            .map((type) => verdictOf(spec, type, checker))
+            .find(
+              (candidate): candidate is Verdict =>
+                candidate !== undefined &&
+                layerTypes.every((type) =>
+                  holdsOn(candidate, spec, type, checker),
+                ),
+            );
 
-          const parts = collectUnionParts(argType);
-
-          if (parts === undefined) {
-            return; // opaque / generic → bail conservatively
+          if (verdict === undefined) {
+            return;
           }
 
-          const inputAtoms = new Set(parts.map(classifyAtom));
-
-          const hasMemberOutsideTarget = (
-            atoms: readonly AtomKey[],
-          ): boolean => {
-            const targetSet = new Set<Atom>(atoms);
-
-            return parts.some((p) => !targetSet.has(classifyAtom(p)));
-          };
-
-          switch (spec.kind) {
-            case 'excludeFrom': {
-              const removable = spec.atoms.filter((a) => inputAtoms.has(a));
-
-              if (removable.length === 0) {
-                // Nothing to exclude → the guard always holds.
-                reportConstant(node, canonicalName, true, argument);
-              } else if (!hasMemberOutsideTarget(spec.atoms)) {
-                // Every member is excluded → the guard never holds.
-                reportConstant(node, canonicalName, false, argument);
-              } else if (removable.length < spec.atoms.length) {
-                const replacement = spec.replacements?.[joinAtoms(removable)];
-
-                if (replacement !== undefined) {
-                  reportReplace(
-                    node,
-                    canonicalName,
-                    replacement,
-                    isNamespace,
-                    propertyNode,
-                  );
-                }
-              }
-
-              break;
-            }
-
-            case 'narrowTo': {
-              const present = spec.atoms.filter((a) => inputAtoms.has(a));
-
-              if (present.length === 0) {
-                // No member is in the target set → the guard never holds.
-                reportConstant(node, canonicalName, false, argument);
-              } else if (!hasMemberOutsideTarget(spec.atoms)) {
-                // Input ⊆ target → the guard always holds and narrows nothing.
-                reportConstant(node, canonicalName, true, argument);
-              } else if (present.length < spec.atoms.length) {
-                const replacement = spec.replacements?.[joinAtoms(present)];
-
-                if (replacement !== undefined) {
-                  reportReplace(
-                    node,
-                    canonicalName,
-                    replacement,
-                    isNamespace,
-                    propertyNode,
-                  );
-                }
-              }
-
-              break;
-            }
-
-            case 'record': {
-              if (parts.every((p) => isGuaranteedRecord(p, checker))) {
-                // Every member already satisfies `UnknownRecord`.
-                reportConstant(node, canonicalName, true, argument);
-              } else if (
-                parts.every((p) => isGuaranteedNotRecord(p, checker))
-              ) {
-                // No member can ever be a non-null, non-array object.
-                reportConstant(node, canonicalName, false, argument);
-              }
-
-              break;
-            }
-
-            case 'nonEmptyString': {
-              const hasNullish =
-                inputAtoms.has('undefined') || inputAtoms.has('null');
-
-              const nonNullishParts = parts.filter((p) => {
-                const atom = classifyAtom(p);
-
-                return atom !== 'undefined' && atom !== 'null';
-              });
-
-              if (!nonNullishParts.some(couldBeNonEmptyString)) {
-                // No member can be a non-empty string → the guard never holds.
-                reportConstant(node, canonicalName, false, argument);
-
-                break;
-              }
-
-              if (
-                nonNullishParts.some(
-                  (p) => !isGuaranteedNonEmptyString(p, checker),
-                )
-              ) {
-                break; // still does real string/empty work
-              }
-
-              if (hasNullish) {
-                reportReplace(
-                  node,
-                  canonicalName,
-                  'isNonNullish',
-                  isNamespace,
-                  propertyNode,
-                );
-              } else {
-                reportConstant(node, canonicalName, true, argument);
-              }
-
-              break;
-            }
+          if (verdict.kind === 'constant') {
+            reportConstant(node, canonicalName, verdict.value, argument);
+          } else {
+            reportReplace(
+              node,
+              canonicalName,
+              verdict.replacement,
+              isNamespace,
+              propertyNode,
+            );
           }
         },
       };
     },
     defaultOptions: [{}],
   } as const;
+
+/** What the rule concludes about a guard call from one type of its argument. */
+type Verdict = DeepReadonly<
+  | { kind: 'constant'; value: boolean }
+  | { kind: 'replace'; replacement: string }
+>;
+
+/**
+ * What a guard with `spec` does on an argument of `type`: always the same
+ * boolean, the same as a narrower guard, or nothing the rule can say.
+ */
+const verdictOf = (
+  spec: GuardSpec,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): Verdict | undefined => {
+  const parts = collectUnionParts(type);
+
+  if (parts === undefined) {
+    return undefined; // opaque / generic → bail conservatively
+  }
+
+  const inputAtoms = new Set(parts.map(classifyAtom));
+
+  const hasMemberOutsideTarget = (atoms: readonly AtomKey[]): boolean => {
+    const targetSet = new Set<Atom>(atoms);
+
+    return parts.some((p) => !targetSet.has(classifyAtom(p)));
+  };
+
+  switch (spec.kind) {
+    case 'excludeFrom': {
+      const removable = spec.atoms.filter((a) => inputAtoms.has(a));
+
+      if (removable.length === 0) {
+        // Nothing to exclude → the guard always holds.
+        return { kind: 'constant', value: true } as const;
+      }
+
+      if (!hasMemberOutsideTarget(spec.atoms)) {
+        // Every member is excluded → the guard never holds.
+        return { kind: 'constant', value: false } as const;
+      }
+
+      return replacementVerdict(
+        removable.length < spec.atoms.length
+          ? spec.replacements?.[joinAtoms(removable)]
+          : undefined,
+      );
+    }
+
+    case 'narrowTo': {
+      const present = spec.atoms.filter((a) => inputAtoms.has(a));
+
+      if (present.length === 0) {
+        // No member is in the target set → the guard never holds.
+        return { kind: 'constant', value: false } as const;
+      }
+
+      if (!hasMemberOutsideTarget(spec.atoms)) {
+        // Input ⊆ target → the guard always holds and narrows nothing.
+        return { kind: 'constant', value: true } as const;
+      }
+
+      return replacementVerdict(
+        present.length < spec.atoms.length
+          ? spec.replacements?.[joinAtoms(present)]
+          : undefined,
+      );
+    }
+
+    case 'record':
+      // Every member already satisfies `UnknownRecord`, or none can ever be
+      // a non-null, non-array object.
+      return parts.every((p) => isGuaranteedRecord(p, checker))
+        ? ({ kind: 'constant', value: true } as const)
+        : parts.every((p) => isGuaranteedNotRecord(p, checker))
+          ? ({ kind: 'constant', value: false } as const)
+          : undefined;
+
+    case 'nonEmptyString': {
+      const nonNullishParts = parts.filter((p) => {
+        const atom = classifyAtom(p);
+
+        return atom !== 'undefined' && atom !== 'null';
+      });
+
+      if (!nonNullishParts.some(couldBeNonEmptyString)) {
+        // No member can be a non-empty string → the guard never holds.
+        return { kind: 'constant', value: false } as const;
+      }
+
+      if (
+        nonNullishParts.some((p) => !isGuaranteedNonEmptyString(p, checker))
+      ) {
+        return undefined; // still does real string/empty work
+      }
+
+      return inputAtoms.has('undefined') || inputAtoms.has('null')
+        ? ({ kind: 'replace', replacement: 'isNonNullish' } as const)
+        : ({ kind: 'constant', value: true } as const);
+    }
+  }
+};
+
+const replacementVerdict = (
+  replacement: string | undefined,
+): Verdict | undefined =>
+  replacement === undefined
+    ? undefined
+    : ({ kind: 'replace', replacement } as const);
+
+/**
+ * Whether `verdict`, drawn from one layer's type, also holds for `type`. A
+ * constant has to come out the same. A replacement holds where the rule would
+ * suggest the same one, or where the guard and its replacement are the same
+ * constant: under `x!` on a `string | null`, `isNonNullish` and `isNotNull`
+ * are both always `true` on `string`.
+ */
+const holdsOn = (
+  verdict: Verdict,
+  spec: GuardSpec,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean => {
+  const onType = verdictOf(spec, type, checker);
+
+  if (verdict.kind === 'constant') {
+    return onType?.kind === 'constant' && onType.value === verdict.value;
+  }
+
+  if (onType?.kind === 'replace') {
+    return onType.replacement === verdict.replacement;
+  }
+
+  const replacementSpec = GUARD_SPECS[verdict.replacement];
+
+  const replacementOnType =
+    replacementSpec === undefined
+      ? undefined
+      : verdictOf(replacementSpec, type, checker);
+
+  return (
+    onType?.kind === 'constant' &&
+    replacementOnType?.kind === 'constant' &&
+    replacementOnType.value === onType.value
+  );
+};
 
 /**
  * Decomposes a type into its union members. Returns `undefined` when any member
@@ -606,6 +668,12 @@ const isSideEffectFreeArg = (node: DeepReadonly<TSESTree.Node>): boolean => {
         isSideEffectFreeArg(node.object) &&
         (!node.computed || isSideEffectFreeArg(node.property))
       );
+
+    case AST_NODE_TYPES.TSAsExpression:
+    case AST_NODE_TYPES.TSNonNullExpression:
+    case AST_NODE_TYPES.TSSatisfiesExpression:
+    case AST_NODE_TYPES.TSTypeAssertion:
+      return isSideEffectFreeArg(node.expression);
 
     default:
       return false;

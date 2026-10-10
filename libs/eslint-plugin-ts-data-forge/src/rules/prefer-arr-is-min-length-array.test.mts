@@ -200,3 +200,73 @@ describe('prefer-arr-is-min-length-array', () => {
     ],
   });
 }, 20000);
+
+describe('prefer-arr-is-min-length-array through type wrappers', () => {
+  tester.run('prefer-arr-is-min-length-array', preferArrIsMinLengthArray, {
+    valid: [
+      {
+        name: 'a computed index named `length` is not the length',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const length: number;
+          const ok = xs[length] >= 2;
+        `,
+      },
+      {
+        name: 'the lower half of a bounded pair whose other half is wrapped',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs.length >= 1 && (xs as readonly number[]).length <= 3;
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the length or the bound wrapped',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = (xs.length satisfies number) >= 2;
+          const b = xs.length >= (2 as number);
+          const c = (3 satisfies number) <= xs.length!;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.isMinLengthArray(2, xs);
+          const b = Arr.isMinLengthArray(2, xs);
+          const c = Arr.isMinLengthArray(3, xs);
+        `,
+        errors: [
+          { messageId: 'useIsMinLengthArray' },
+          { messageId: 'useIsMinLengthArray' },
+          { messageId: 'useIsMinLengthArray' },
+        ],
+      },
+    ],
+  });
+}, 20000);
+
+describe('prefer-arr-is-min-length-array with parenthesized operands', () => {
+  tester.run('prefer-arr-is-min-length-array', preferArrIsMinLengthArray, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a sequence array keeps its parentheses',
+        code: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = (log(), xs).length >= 2;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const log: () => void;
+          const ok = Arr.isMinLengthArray(2, (log(), xs));
+        `,
+        errors: [{ messageId: 'useIsMinLengthArray' }],
+      },
+    ],
+  });
+}, 20000);

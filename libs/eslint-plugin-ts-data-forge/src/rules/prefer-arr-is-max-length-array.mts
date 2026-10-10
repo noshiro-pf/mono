@@ -1,8 +1,11 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import {
+  asLengthAccess,
+  isArrayOrTupleExpression,
   isIntegerLiteralOrConstant,
-  isLengthAccess,
   isPartOfBoundedLengthCheck,
+  skipTypeWrappers,
+  toArgumentText,
 } from './ast-utils.mjs';
 import {
   buildImportFixes,
@@ -63,12 +66,15 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
         // xs.length <= n  or  n >= xs.length
         const isLengthOnLeft = node.operator === '<=';
 
-        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
+        // Both sides are read through type wrappers.
+        const lengthSide = asLengthAccess(
+          node[isLengthOnLeft ? 'left' : 'right'],
+        );
 
         const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
         // Check if lengthSide is accessing .length
-        if (!isLengthAccess(lengthSide)) {
+        if (lengthSide === undefined) {
           return;
         }
 
@@ -77,36 +83,19 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
           return;
         }
 
-        // lengthSide is MemberExpression accessing .length
         const arrayExpression = lengthSide.object;
 
         // Check if arrayExpression is actually an array type
-        if (services?.program !== undefined && services.program !== null) {
-          const checker = services.program.getTypeChecker();
-
-          const tsNode = services.esTreeNodeToTSNodeMap?.get(arrayExpression);
-
-          if (tsNode !== undefined) {
-            const type = checker.getTypeAtLocation(tsNode);
-
-            // Check if it's an array type or tuple type
-            const isArrayType =
-              checker.isArrayType(type) || checker.isTupleType(type);
-
-            if (!isArrayType) {
-              return;
-            }
-          } else {
-            return;
-          }
-        } else {
+        if (!isArrayOrTupleExpression(services, arrayExpression)) {
           return;
         }
 
         mut_nodesToFix.push({
           node,
           arrayExpression,
-          lengthExpression: valueSide,
+          // The literal or constant itself: a wrapper such as `as number`
+          // would only widen the length the guard narrows to.
+          lengthExpression: skipTypeWrappers(valueSide),
         });
       },
       'Program:exit': () => {
@@ -118,7 +107,7 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
           index,
           { node, arrayExpression, lengthExpression },
         ] of mut_nodesToFix.entries()) {
-          const arrayText = sourceCode.getText(arrayExpression);
+          const arrayText = toArgumentText(arrayExpression, sourceCode);
 
           const lengthText = sourceCode.getText(lengthExpression);
 

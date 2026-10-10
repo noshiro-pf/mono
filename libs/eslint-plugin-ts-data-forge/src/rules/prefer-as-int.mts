@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { type DeepReadonly } from 'ts-type-forge';
+import { toArgumentText } from './ast-utils.mjs';
 import { brandedNumberTypeNameToFunctionName } from './branded-number-types.mjs';
 import {
   buildImportFixes,
@@ -38,25 +39,32 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
     const tsDataForgeImport = getTsDataForgeImport(program);
 
     const mut_nodesToFix: {
-      node: TSESTree.TSAsExpression;
+      node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion;
       typeName: string;
       functionName: string;
     }[] = [];
 
+    // `x as Int` and `<Int>x` are the same assertion.
+    const collect = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
+    ): void => {
+      const typeInfo = getBrandedNumberTypeInfo(node.typeAnnotation);
+
+      if (typeInfo === undefined) {
+        return;
+      }
+
+      mut_nodesToFix.push({
+        node,
+        typeName: typeInfo.typeName,
+        functionName: typeInfo.functionName,
+      });
+    };
+
     return {
-      TSAsExpression: (node) => {
-        const typeInfo = getBrandedNumberTypeInfo(node.typeAnnotation);
-
-        if (typeInfo === undefined) {
-          return;
-        }
-
-        mut_nodesToFix.push({
-          node,
-          typeName: typeInfo.typeName,
-          functionName: typeInfo.functionName,
-        });
-      },
+      TSAsExpression: collect,
+      TSTypeAssertion: collect,
       'Program:exit': () => {
         const namedImports = getNamedImports(tsDataForgeImport);
 
@@ -79,7 +87,7 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
                 functionName,
               },
               fix: (fixer) => {
-                const replacement = `${functionName}(${sourceCode.getText(node.expression)})`;
+                const replacement = `${functionName}(${toArgumentText(node.expression, sourceCode)})`;
 
                 // Add import only for the first node of this function and only if not already imported
                 const importFixes =
